@@ -574,8 +574,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CutPlaneButton->SetBalloonHelpString("Cut with an implicit plane. It is identical to generating point scalars from an implicit plane, and taking an iso surface. This filter typically reduces the dimensionality of the data.  A 3D input data set will produce an 2D output plane.");
 
   this->ClipPlaneButton->SetParent(this->Toolbar);
-  this->ClipPlaneButton->Create(app, "-text Clip");
-  //this->CutPlaneButton->Create(app, "-image PVClipPlaneButton");
+  //this->ClipPlaneButton->Create(app, "-text Clip");
+  this->ClipPlaneButton->Create(app, "-image PVClipPlaneButton");
   this->ClipPlaneButton->SetCommand(this, "ClipPlaneCallback");
   this->ClipPlaneButton->SetBalloonHelpString("Clip with an implicit plane.  Takes a portion of the data set away and does not reduce the dimensionality of the data set.  A 3d input data set will produce a 3d output data set.");
 

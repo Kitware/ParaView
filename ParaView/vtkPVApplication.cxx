@@ -64,6 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGlyphButton.h"
 #include "vtkPV3DCursor.h"
 #include "vtkPVCutPlaneButton.h"
+#include "vtkPVClipPlaneButton.h"
 #include "vtkTimerLog.h"
 #include "vtkProbeFilter.h"
 
@@ -494,6 +495,8 @@ void vtkPVApplication::CreateButtonPhotos()
                     PV_ACTIVE_3D_CURSOR_BUTTON_WIDTH, PV_ACTIVE_3D_CURSOR_BUTTON_HEIGHT);
   this->CreatePhoto("PVCutPlaneButton", PV_CUT_PLANE_BUTTON,
                     PV_CUT_PLANE_BUTTON_WIDTH, PV_CUT_PLANE_BUTTON_HEIGHT);
+  this->CreatePhoto("PVClipPlaneButton", PV_CLIP_PLANE_BUTTON,
+                    PV_CLIP_PLANE_BUTTON_WIDTH, PV_CLIP_PLANE_BUTTON_HEIGHT);
 }
 
 //----------------------------------------------------------------------------
