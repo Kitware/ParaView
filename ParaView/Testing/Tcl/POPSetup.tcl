@@ -12,8 +12,6 @@ set pvContOutput [$pvCont GetNthPVOutput 0]
 $pvContOutput ColorByProperty
 $pvContOutput ChangeActorColor 0 [expr 197.0/255.0] 1.0
 
-$pvView EventuallyRender
-
 
 # Load the model of the ocean floor.
 set pvFloor [$pvWindow Open "E:/Law/ParaView/ParaView/data/POP/oceanFloorSmall.vtk"]
@@ -23,13 +21,10 @@ set pvFloorOutput [$pvFloor GetNthPVOutput 0]
 $pvFloorOutput ColorByProperty
 $pvFloorOutput ChangeActorColor 0.5 0.4 0.4
 
-$pvView EventuallyRender
-
 
 # load the pop volume
 set pvPOP [$pvWindow Open "E:/Law/ParaView/ParaView/data/POP/small.pop"]
 $pvPOP AcceptCallback
-update
 
 set sInt [$pvWindow GetSourceInterface "vtkExtractGrid"]
 set pvExtractGrid [$sInt CreateCallback]
@@ -47,27 +42,18 @@ $pvExtractGridOutput ColorByPointFieldComponent Temperature 0
 [$pvExtractGridOutput GetColorMapMenu] SetValue {Blue to Red}
 $pvExtractGridOutput ChangeColorMap
 
-# Turn on scalar bar.
-$pvExtractGridOutput SetScalarBarVisibility 1
-$pvExtractGridOutput SetScalarBarOrientationToHorizontal
-
-update
-$pvView EventuallyRender
-update
-
-
-
-
-
-
+$pvExtractGrid SetVisibility 0
 
 
 # Create an iso surface of Salinity and color it by temerature.
 $pvWindow SetCurrentPVSource $pvPOP
 
 set pvContour [$pvWindow ContourCallback]
-[$pvContour GetVTKSource] SetValue 0 0.032
+[$pvContour GetVTKSource] SetValue 0 0.035
 $pvContour UpdateParameterWidgets
+
+[$pvContour GetScalarOperationMenu] SetValue "Salinity"
+$pvContour ChangeScalars
 $pvContour AcceptCallback
 
 # change to the data page.
@@ -83,6 +69,7 @@ $pvContourOutput ChangeColorMap
 $pvContourOutput SetScalarBarVisibility 1
 $pvContourOutput SetScalarBarOrientationToHorizontal
 
+$pvContourOutput SetVisibility 0
 
 
 

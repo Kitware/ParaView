@@ -52,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkPVSource;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
+class vtkMapper;
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -140,6 +141,12 @@ public:
   void StartLog(char *filename);
   void StopLog();
   void AddLogEntry(char *tag, float value);
+
+  // Description:
+  // Temporary fix because empty VTK objects do not have arrays.
+  // This will create arrays if they exist on other processes.
+  void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
+  void SendCompleteArrays(vtkMapper *mapper);
 
 protected:
   vtkPVApplication();

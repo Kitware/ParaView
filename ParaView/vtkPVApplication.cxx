@@ -67,6 +67,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVClipPlaneButton.h"
 #include "vtkTimerLog.h"
 #include "vtkProbeFilter.h"
+#include "vtkMapper.h"
+
+#include "vtkIntArray.h"
+#include "vtkFloatArray.h"
+#include "vtkLongArray.h"
+#include "vtkShortArray.h"
+#include "vtkCharArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkUnsignedIntArray.h"
+#include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedLongArray.h"
+#include "vtkUnsignedShortArray.h"
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
@@ -606,6 +618,213 @@ void vtkPVApplication::AddLogEntry(char *tag, float val)
     ((vtkTimerLog*)this->Log)->FormatAndMarkEvent("%s: %f", tag, val);
     }
 }
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
+{
+  int i, j;
+  int numProcs;
+  int nonEmptyFlag;
+
+  if (mapper->GetInput() == NULL || this->Controller == NULL ||
+      mapper->GetInput()->GetNumberOfPoints() > 0 ||
+      mapper->GetInput()->GetNumberOfCells() > 0)
+    {
+    return;
+    }
+
+  // Find the first non empty data object on another processes.
+  numProcs = this->Controller->GetNumberOfProcesses();
+  for (i = 1; i < numProcs; ++i)
+    {
+    this->RemoteScript(i, "Application SendCompleteArrays %s", mapperTclName);
+    this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
+    if (nonEmptyFlag)
+      { // This process has data.  Receive all the arrays, type and component.
+      int num;
+      vtkDataArray *array;
+      char *name;
+      int nameLength;
+      int type;
+      int numComps;
+      
+      // First Point data.
+      this->Controller->Receive(&num, 1, i, 987244);
+      for (j = 0; j < num; ++j)
+        {
+        this->Controller->Receive(&type, 1, i, 987245);
+        switch (type)
+          {
+          case VTK_INT:
+            array = vtkIntArray::New();
+            break;
+          case VTK_FLOAT:
+            array = vtkFloatArray::New();
+            break;
+          case VTK_DOUBLE:
+            array = vtkDoubleArray::New();
+            break;
+          case VTK_CHAR:
+            array = vtkCharArray::New();
+            break;
+          case VTK_LONG:
+            array = vtkLongArray::New();
+            break;
+          case VTK_SHORT:
+            array = vtkShortArray::New();
+            break;
+          case VTK_UNSIGNED_CHAR:
+            array = vtkUnsignedCharArray::New();
+            break;
+          case VTK_UNSIGNED_INT:
+            array = vtkUnsignedIntArray::New();
+            break;
+          case VTK_UNSIGNED_LONG:
+            array = vtkUnsignedLongArray::New();
+            break;
+          case VTK_UNSIGNED_SHORT:
+            array = vtkUnsignedShortArray::New();
+            break;
+          }
+        this->Controller->Receive(&numComps, 1, i, 987246);
+        array->SetNumberOfComponents(numComps);
+        this->Controller->Receive(&nameLength, 1, i, 987247);
+        name = new char[nameLength];
+        this->Controller->Receive(name, nameLength, i, 987248);
+        array->SetName(name);
+        delete [] name;
+        mapper->GetInput()->GetPointData()->AddArray(array);
+        array->Delete();
+        } // end of loop over point arrays.
+
+      // Next Cell data.
+      this->Controller->Receive(&num, 1, i, 987244);
+      for (j = 0; j < num; ++j)
+        {
+        this->Controller->Receive(&type, 1, i, 987245);
+        switch (type)
+          {
+          case VTK_INT:
+            array = vtkIntArray::New();
+            break;
+          case VTK_FLOAT:
+            array = vtkFloatArray::New();
+            break;
+          case VTK_DOUBLE:
+            array = vtkDoubleArray::New();
+            break;
+          case VTK_CHAR:
+            array = vtkCharArray::New();
+            break;
+          case VTK_LONG:
+            array = vtkLongArray::New();
+            break;
+          case VTK_SHORT:
+            array = vtkShortArray::New();
+            break;
+          case VTK_UNSIGNED_CHAR:
+            array = vtkUnsignedCharArray::New();
+            break;
+          case VTK_UNSIGNED_INT:
+            array = vtkUnsignedIntArray::New();
+            break;
+          case VTK_UNSIGNED_LONG:
+            array = vtkUnsignedLongArray::New();
+            break;
+          case VTK_UNSIGNED_SHORT:
+            array = vtkUnsignedShortArray::New();
+            break;
+          }
+        this->Controller->Receive(&numComps, 1, i, 987246);
+        array->SetNumberOfComponents(numComps);
+        this->Controller->Receive(&nameLength, 1, i, 987247);
+        name = new char[nameLength];
+        this->Controller->Receive(name, nameLength, i, 987248);
+        array->SetName(name);
+        delete [] name;
+        mapper->GetInput()->GetCellData()->AddArray(array);
+        array->Delete();
+        } // end of loop over cell arrays.
+      
+      // We only need information from one.
+      return;
+      } // End of if-non-empty check.
+    }// End of loop over processes.
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
+{
+  int nonEmptyFlag;
+  int num;
+  int i;
+  int type;
+  int numComps;
+  int nameLength;
+  const char *name;
+  vtkDataArray *array;
+
+  if (mapper->GetInput() == NULL ||
+      (mapper->GetInput()->GetNumberOfPoints() == 0 &&
+       mapper->GetInput()->GetNumberOfCells() == 0))
+    {
+    nonEmptyFlag = 0;
+    this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
+    return;
+    }
+  nonEmptyFlag = 1;
+  this->Controller->Send(&nonEmptyFlag, 1, 0, 987243);
+
+  // First point data.
+  num = mapper->GetInput()->GetPointData()->GetNumberOfArrays();
+  this->Controller->Send(&num, 1, 0, 987244);
+  for (i = 0; i < num; ++i)
+    {
+    array = mapper->GetInput()->GetPointData()->GetArray(i);
+    type = array->GetDataType();
+
+    this->Controller->Send(&type, 1, 0, 987245);
+    numComps = array->GetNumberOfComponents();
+
+    this->Controller->Send(&numComps, 1, 0, 987246);
+    name = array->GetName();
+    if (name == NULL)
+      {
+      name = "";
+      }
+    nameLength = strlen(name)+1;
+    this->Controller->Send(&nameLength, 1, 0, 987247);
+    // I am pretty sure that Send does not modify the string.
+    this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
+    }
+
+  // Next cell data.
+  num = mapper->GetInput()->GetCellData()->GetNumberOfArrays();
+  this->Controller->Send(&num, 1, 0, 987244);
+  for (i = 0; i < num; ++i)
+    {
+    array = mapper->GetInput()->GetCellData()->GetArray(i);
+    type = array->GetDataType();
+
+    this->Controller->Send(&type, 1, 0, 987245);
+    numComps = array->GetNumberOfComponents();
+
+    this->Controller->Send(&numComps, 1, 0, 987246);
+    name = array->GetName();
+    if (name == NULL)
+      {
+      name = "";
+      }
+    nameLength = strlen(name+1);
+    this->Controller->Send(&nameLength, 1, 0, 987247);
+    this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
+    }
+}
+
 
 //============================================================================
 // Make instances of sources.

@@ -214,7 +214,11 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 			   pvd->GetVTKDataTclName(), extentTclName);
     // Hold onto name so it can be deleted.
     pvs->SetExtentTranslatorTclName(extentTclName);
-
+    // Not as load balanced, but more efficient reading.
+    if (s->IsA("vtkPOPReader"))
+      {
+      pvApp->BroadcastScript("%s SetSplitModeToYSlab", extentTclName);
+      }
     }
   else
     {
@@ -222,6 +226,15 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       "%s SetExtentTranslator [%s GetExtentTranslator]",
       pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
     }
+  
+  // Hack here specifically for the POP reader.  Initialize the clip extent variable.
+  if (s->IsA("vtkPOPReader"))
+    {
+    // Call update information first to set the clip extent.
+    this->Script("%s SetFileName %s", pvs->GetVTKSourceTclName(), this->DataFileName);
+    this->Script("%s UpdateInformation", pvd->GetVTKDataTclName());
+    }
+
 
   // Loop through the methods creating widgets.
   this->MethodInterfaces->InitTraversal();

@@ -2250,6 +2250,7 @@ const char* vtkPVWindow::StandardSourceInterfaces =
 "<Source class=\"vtkPOPReader\" root=\"POPReader\" output=\"vtkStructuredGrid\">\n"
 "  <File name=\"FileName\" extension=\"pop\" help=\"Select the file for the data set\"/>\n"
 "  <Scalar name=\"Radius\" type=\"float\" help=\"Set the radius of the data set\"/>\n"
+"  <Vector name=\"ClipExtent\" type=\"int\" length=\"6\" help=\"For reading a smaller extent.\"/>\n"
 "</Source>\n"
 "\n"
 "<Source class=\"vtkSphereSource\" root=\"Sphere\" output=\"vtkPolyData\">\n"

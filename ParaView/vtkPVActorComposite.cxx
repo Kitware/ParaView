@@ -726,6 +726,11 @@ void vtkPVActorComposite::UpdateProperties()
   // the AmbientScale.
   //  this->AmbientScale->SetValue(this->Property->GetAmbient());
 
+
+  // Temporary fix because empty VTK objects do not have arrays.
+  // This will create arrays if they exist on other processes.
+  pvApp->CompleteArrays(this->Mapper, this->MapperTclName);
+
   currentColorBy = this->ColorMenu->GetValue();
   this->ColorMenu->ClearEntries();
   this->ColorMenu->AddEntryWithCommand("Property",
