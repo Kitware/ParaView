@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.17");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.18");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -484,6 +484,12 @@ float* vtkKWRenderWidget::GetBackgroundColor()
 void vtkKWRenderWidget::Close()
 {
   this->RemoveBindings();
+
+  if (this->GetCornerAnnotation())
+    {
+    this->GetCornerAnnotation()->ClearAllTexts();
+    this->GetCornerAnnotation()->VisibilityOff();
+    }
 }
 
 void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
