@@ -83,7 +83,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.24");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.25");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -188,9 +188,9 @@ void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
 //----------------------------------------------------------------------------
 void vtkKWToolbar::Create(vtkKWApplication *app)
 {
-  // Must set the application
+  // Set the application
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("widget already created");
     return;
@@ -222,6 +222,10 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
   // to keep track of default options)
 
   this->DefaultOptionsWidget->Create(app, "");
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
