@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.46");
+vtkCxxRevisionMacro(vtkKWEntry, "1.47");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -113,9 +113,9 @@ vtkKWEntry::~vtkKWEntry()
 //----------------------------------------------------------------------------
 char *vtkKWEntry::GetValue()
 {
-  if ( !this->IsCreated() )
+  if (!this->IsCreated())
     {
-    return 0;
+    return NULL;
     }
 
   const char *val = this->Script("%s get", this->Entry->GetWidgetName());
@@ -126,21 +126,35 @@ char *vtkKWEntry::GetValue()
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetValueAsInt()
 {
-  if ( !this->IsCreated() )
+  if (!this->IsCreated())
     {
     return 0;
     }
-  return atoi(this->GetValue());
+  
+  char *val = this->GetValue();
+  if (!val || !*val)
+    {
+    return 0;
+    }
+
+  return atoi(val);
 }
 
 //----------------------------------------------------------------------------
 double vtkKWEntry::GetValueAsFloat()
 {
-  if ( !this->IsCreated() )
+  if (!this->IsCreated())
     {
     return 0;
     }
-  return atof(this->GetValue());
+
+  char *val = this->GetValue();
+  if (!val || !*val)
+    {
+    return 0;
+    }
+
+  return atof(val);
 }
 
 //----------------------------------------------------------------------------
@@ -222,6 +236,12 @@ void vtkKWEntry::SetValue(const char *s)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(int i)
 {
+  char *val = this->GetValue();
+  if (val && *val && i = this->GetValueAsInt())
+    {
+    return;
+    }
+
   char tmp[1024];
   sprintf(tmp, "%d", i);
   this->SetValue(tmp);
@@ -230,7 +250,8 @@ void vtkKWEntry::SetValue(int i)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(double f)
 {
-  if (f == this->GetValueAsFloat())
+  char *val = this->GetValue();
+  if (val && *val && f == this->GetValueAsFloat())
     {
     return;
     }
@@ -243,7 +264,8 @@ void vtkKWEntry::SetValue(double f)
 //----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(double f, int size)
 {
-  if (f == this->GetValueAsFloat())
+  char *val = this->GetValue();
+  if (val && *val && f == this->GetValueAsFloat())
     {
     return;
     }
