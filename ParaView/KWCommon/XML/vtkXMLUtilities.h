@@ -79,6 +79,21 @@ public:
                              ostream&, 
                              vtkIndent *indent = 0);
 
+  // Description:
+  // Write a vtkXMLDataElement to a file
+  // Return 1 on success, 0 otherwise.
+  static void WriteElement(vtkXMLDataElement*, 
+                           const char *filename);
+
+  // Description:
+  // Read a vtkXMLDataElement from a file
+  // Return the root element on success, NULL otherwise.
+  // Note that you have to call Delete() on the element returned by that
+  // function to ensure it is freed properly.
+  //BTX
+  static vtkXMLDataElement* ReadElement(const char *filename);
+  //ETX
+
 protected:  
   vtkXMLUtilities() {};
   ~vtkXMLUtilities() {};

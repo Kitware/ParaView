@@ -44,9 +44,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 #include "vtkXMLDataElement.h"
+#include "vtkXMLDataParser.h"
 
 vtkStandardNewMacro(vtkXMLUtilities);
-vtkCxxRevisionMacro(vtkXMLUtilities, "1.1");
+vtkCxxRevisionMacro(vtkXMLUtilities, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkXMLUtilities::ConvertSpecialChars(const char *str, ostream &os)
@@ -187,4 +188,43 @@ void vtkXMLUtilities::FlattenElement(vtkXMLDataElement *elem,
       }
     os << "</" << elem->GetName() << ">\n";
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLUtilities::WriteElement(vtkXMLDataElement *elem, 
+                                   const char *filename)
+{
+  if (!filename)
+    {
+    return;
+    }
+
+  ofstream os(filename, ios::out);
+  vtkIndent indent;
+
+  vtkXMLUtilities::FlattenElement(elem, os, &indent);
+}
+
+//----------------------------------------------------------------------------
+vtkXMLDataElement*
+vtkXMLUtilities::ReadElement(const char *filename)
+{
+  if (!filename)
+    {
+    return NULL;
+    }
+
+  vtkXMLDataElement *res = NULL;
+  vtkXMLDataParser* xml_parser = vtkXMLDataParser::New();
+
+  ifstream is(filename);
+  xml_parser->SetStream(&is);
+  if (xml_parser->Parse())
+    {
+    res = xml_parser->GetRootElement();
+    res->SetReferenceCount(res->GetReferenceCount() + 1);
+    }
+
+  xml_parser->Delete();
+  return res;
 }
