@@ -56,6 +56,10 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWWidget;
 class vtkKWLabel;
+class vtkKWThumbWheel;
+class vtkKWScale;
+class vtkTransform;
+class vtkBoxWidget;
 
 class VTK_EXPORT vtkPVBoxWidget : public vtkPV3DWidget
 {
@@ -100,6 +104,43 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // These are callbacks for the transformation of the box.
+  void ScaleCallback();
+  void TranslateCallback();
+  void OrientationCallback();
+  void ScaleEndCallback();
+  void TranslateEndCallback();
+  void OrientationEndCallback();
+
+  // Description:
+  // Set the box
+  void SetScaleNoTrace(float p[3])
+    { this->SetScaleNoTrace(p[0], p[1], p[2]); }
+  void SetScaleNoTrace(float px, float py, float pz);
+  void SetScale(float p[3])
+    { this->SetScale(p[0], p[1], p[2]); }
+  void SetScale(float px, float py, float pz);
+  void SetTranslateNoTrace(float p[3])
+    { this->SetTranslateNoTrace(p[0], p[1], p[2]); }
+  void SetTranslateNoTrace(float px, float py, float pz);
+  void SetTranslate(float p[3])
+    { this->SetTranslate(p[0], p[1], p[2]); }
+  void SetTranslate(float px, float py, float pz);
+  void SetOrientationNoTrace(float p[3])
+    { this->SetOrientationNoTrace(p[0], p[1], p[2]); }
+  void SetOrientationNoTrace(float px, float py, float pz);
+  void SetOrientation(float p[3])
+    { this->SetOrientation(p[0], p[1], p[2]); }
+  void SetOrientation(float px, float py, float pz);
+
+  vtkBoxWidget* GetBoxWidget();
+
+  vtkGetObjectMacro(BoxTransform, vtkTransform);
+
+  void UpdateBox();
+  void UpdateFromBox();
+
 protected:
   vtkPVBoxWidget();
   ~vtkPVBoxWidget();
@@ -117,6 +158,21 @@ protected:
   char *BoxTclName;
   vtkSetStringMacro(BoxTclName);
 
+  char *BoxTransformTclName;
+  vtkSetStringMacro(BoxTransformTclName);
+
+  char *BoxMatrixTclName;
+  vtkSetStringMacro(BoxMatrixTclName);
+
+  vtkKWFrame*        ControlFrame;
+  vtkKWLabel*        TranslateLabel;
+  vtkKWThumbWheel*   TranslateThumbWheel[3];
+  vtkKWLabel*        ScaleLabel;
+  vtkKWThumbWheel*   ScaleThumbWheel[3];
+  vtkKWLabel*        OrientationLabel;
+  vtkKWScale*        OrientationScale[3];
+
+  vtkTransform*      BoxTransform;
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
@@ -126,6 +182,23 @@ protected:
   // This saves the implicit sphere.  Parts will share this
   // one sphere.
   virtual void SaveInBatchScript(ofstream *file);
+
+  float* GetPositionFromGUI();
+  float* GetRotationFromGUI();
+  float* GetScaleFromGUI();
+  vtkSetVector3Macro(PositionGUI, float);
+  vtkSetVector3Macro(RotationGUI, float);
+  vtkSetVector3Macro(ScaleGUI,    float);
+  float PositionGUI[3];
+  float RotationGUI[3];
+  float ScaleGUI[3];
+
+  vtkSetVector3Macro(StoredPosition, float);
+  vtkSetVector3Macro(StoredScale,    float);
+  vtkSetVector3Macro(StoredRotation, float);
+  float StoredPosition[3];
+  float StoredRotation[3];
+  float StoredScale[3];
 
 private:
   vtkPVBoxWidget(const vtkPVBoxWidget&); // Not implemented
