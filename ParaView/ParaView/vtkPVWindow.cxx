@@ -1983,10 +1983,10 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   pvApp->BroadcastScript(
     "%s SetExtentTranslator [%s GetExtentTranslator]",
     pvd->GetVTKDataTclName(), current->GetVTKDataTclName());
-    // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
-    pvApp->BroadcastScript(
-      "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
-      contour->GetVTKSourceTclName(), current->GetVTKDataTclName());
+  // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
+  pvApp->BroadcastScript(
+    "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
+    contour->GetVTKSourceTclName(), current->GetVTKDataTclName());
 
   contour->Delete();
   pvd->Delete();

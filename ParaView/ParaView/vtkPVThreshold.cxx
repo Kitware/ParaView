@@ -343,9 +343,9 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
             << " GetOutput]\n\t";
       }
     *file << this->ChangeScalarsFilterTclName
-          << " SetInputFieldToPointDataField\n";
+          << " SetInputFieldToPointDataField\n\t";
     *file << this->ChangeScalarsFilterTclName
-          << " SetOutputAttributeDataToPointData\n";
+          << " SetOutputAttributeDataToPointData\n\t";
     *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
           << this->DefaultScalarsName << " 0\n\n";
     }
@@ -402,9 +402,11 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
   
   *file << this->VTKSourceTclName << " ThresholdBetween "
         << this->LowerValueScale->GetValue() << " "
-        << this->UpperValueScale->GetValue() << "\n\t"
-        << this->VTKSourceTclName << " SetAllScalars "
-        << this->AllScalarsCheck->GetState() << "\n\n";
+        << this->UpperValueScale->GetValue() << "\n\t";
+//        << this->VTKSourceTclName << " SetAllScalars "
+//        << this->AllScalarsCheck->GetState() << "\n\n";
+  this->AllScalarsCheck->SaveInTclScript(file, this->VTKSourceTclName);
+  *file << "\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

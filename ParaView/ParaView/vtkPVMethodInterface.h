@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 // .NAME vtkPVMethodInterface - Every thing needed to define a widget for a method.
 // .SECTION Description
-// The intent is that subclasses will be createdthe specifically define widgets.
+// The intent is that subclasses will be created that specifically define widgets.
 
 
 #ifndef __vtkPVMethodInterface_h

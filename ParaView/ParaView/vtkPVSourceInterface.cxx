@@ -395,15 +395,23 @@ void vtkPVSourceInterface::SaveInTclScript(ofstream *file, const char *sourceNam
   vtkPVMethodInterface *currentMethod;
   int i;
   char *result;
+  int widgetType;
   
   methods = this->GetMethodInterfaces();
   for (i = 0; i < methods->GetNumberOfItems(); i++)
     {
     currentMethod = (vtkPVMethodInterface*)methods->GetItemAsObject(i);
-    *file << "\t" << sourceName << " " << currentMethod->GetSetCommand();
-    this->Script("set tempValue [%s %s]", sourceName,
-                 currentMethod->GetGetCommand());
-    result = this->Application->GetMainInterp()->result;
-    *file << " " << result << "\n";
+    widgetType = currentMethod->GetWidgetType();
+    if (widgetType != VTK_PV_METHOD_WIDGET_TOGGLE &&
+        widgetType != VTK_PV_METHOD_WIDGET_FILE &&
+        widgetType != VTK_PV_METHOD_WIDGET_SELECTION &&
+        widgetType != VTK_PV_METHOD_WIDGET_ENTRY)
+      {
+      *file << "\t" << sourceName << " " << currentMethod->GetSetCommand();
+      this->Script("set tempValue [%s %s]", sourceName,
+                   currentMethod->GetGetCommand());
+      result = this->Application->GetMainInterp()->result;
+      *file << " " << result << "\n";
+      }
     }
 }

@@ -102,6 +102,9 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
   this->SetName(label);
 
   this->SetApplication(pvApp);
+
+  this->SetSetCommand(setCmd);
+  this->SetGetCommand(getCmd);
   
   // create the top level
   wname = this->GetWidgetName();
@@ -119,8 +122,6 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     this->Script("pack %s -side left", this->Label->GetWidgetName());
     }
   
-  //sprintf(acceptCmd, "%s AcceptHelper2 %s %s \"",
-  //        this->PVSource->GetTclName(), tclName, setCmd);
   sprintf(acceptCmd, "eval %s %s ", tclName, setCmd);
   
   // Now the sublabels and entries
@@ -220,7 +221,6 @@ vtkKWEntry* vtkPVVectorEntry::GetEntry(int idx)
   return ((vtkKWEntry*)this->Entries->GetItemAsObject(idx));
 }
 
-
 void vtkPVVectorEntry::SetValue(char** values, int num)
 {
   int idx;
@@ -238,7 +238,6 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
     }
   this->ModifiedCallback();
 }
-
 
 void vtkPVVectorEntry::SetValue(char *v0)
 {

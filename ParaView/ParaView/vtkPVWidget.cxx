@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVWidget.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWApplication.h"
 
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::New()
@@ -60,6 +61,9 @@ vtkPVWidget::vtkPVWidget()
   this->AcceptCommands = vtkStringList::New();
   this->ResetCommands = vtkStringList::New();
 
+  this->SetCommand = NULL;
+  this->GetCommand = NULL;
+
   this->TraceInitialized = 0;
   this->ModifiedFlag = 0;
   this->Name = NULL;
@@ -72,6 +76,10 @@ vtkPVWidget::~vtkPVWidget()
   this->AcceptCommands = NULL;
   this->ResetCommands->Delete();
   this->ResetCommands = NULL;
+  
+  this->SetSetCommand(NULL);
+  this->SetGetCommand(NULL);
+
   this->PVSource = NULL;
 }
 
@@ -80,6 +88,15 @@ void vtkPVWidget::SetPVSource(vtkPVSource *source)
   this->PVSource = source;
 }
 
+void vtkPVWidget::SaveInTclScript(ofstream *file, const char *sourceName)
+{
+  char *result;
+  
+  *file << sourceName << " " << this->SetCommand;
+  this->Script("set tempValue [%s %s]", sourceName, this->GetCommand);
+  result = this->Application->GetMainInterp()->result;
+  *file << " " << result << "\n";
+}
 
 void vtkPVWidget::Accept()
 {
@@ -117,4 +134,3 @@ void vtkPVWidget::ModifiedCallback()
     this->PVSource->EntryChanged(0, 0);
     }
 }
-

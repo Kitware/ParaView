@@ -374,9 +374,9 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
             << " GetOutput]\n\t";
       }
     *file << this->ChangeScalarsFilterTclName
-          << " SetInputFieldToPointDataField\n";
+          << " SetInputFieldToPointDataField\n\t";
     *file << this->ChangeScalarsFilterTclName
-          << " SetOutputAttributeDataToPointData\n";
+          << " SetOutputAttributeDataToPointData\n\t";
     if (this->DefaultScalarsName)
       {
       *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
@@ -384,31 +384,31 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
       }
     else if (this->DefaultVectorsName)
       {
-      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
-            << this->DefaultScalarsName << " 0\n";
-      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 1 "
-            << this->DefaultScalarsName << " 1\n";
-      *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 2 "
-            << this->DefaultScalarsName << " 2\n";
+      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 0 "
+            << this->DefaultVectorsName << " 0\n\t";
+      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 1 "
+            << this->DefaultVectorsName << " 1\n\t";
+      *file << this->ChangeScalarsFilterTclName << " SetVectorComponent 2 "
+            << this->DefaultVectorsName << " 2\n";
       }
     *file << "\n";
     }
 
-  //if (strcmp(this->GlyphSourceTclName, "pvGlyphArrowOutput") == 0)
-  //  {
-  //  sprintf(sourceName, "pvGlyphArrow%d", this->InstanceCount);
-  //  *file << "vtkArrowSource " << sourceName << "\n\n";
-  //  }
-  //else if (strcmp(this->GlyphSourceTclName, "pvGlyphConeOutput") == 0)
-  //  {
-  //  sprintf(sourceName, "pvGlyphCone%d", this->InstanceCount);
-  //  *file << "vtkConeSource " << sourceName << "\n\n";
-  //  }
-  //else if (strcmp(this->GlyphSourceTclName, "pvGlyphSphereOutput") == 0)
-  //  {
-  //  sprintf(sourceName, "pvGlyphSphere%d", this->InstanceCount);
-  //  *file << "vtkSphereSource " << sourceName << "\n\n";
-  //  }
+  if (strcmp(this->GlyphSource->GetVTKDataTclName(), "pvGlyphArrowOutput") == 0)
+    {
+    sprintf(sourceName, "pvGlyphArrow%d", this->InstanceCount);
+    *file << "vtkArrowSource " << sourceName << "\n\n";
+    }
+  else if (strcmp(this->GlyphSource->GetVTKDataTclName(), "pvGlyphConeOutput") == 0)
+    {
+    sprintf(sourceName, "pvGlyphCone%d", this->InstanceCount);
+    *file << "vtkConeSource " << sourceName << "\n\n";
+    }
+  else if (strcmp(this->GlyphSource->GetVTKDataTclName(), "pvGlyphSphereOutput") == 0)
+    {
+    sprintf(sourceName, "pvGlyphSphere%d", this->InstanceCount);
+    *file << "vtkSphereSource " << sourceName << "\n\n";
+    }
   
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n";
@@ -487,12 +487,19 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
     *file << "VectorRotationOff\n\t";
     }
   
-  *file << this->VTKSourceTclName << " SetOrient "
-        << this->OrientCheck->GetState() << "\n\t";
-  *file << this->VTKSourceTclName << " SetScaling "
-        << this->ScaleCheck->GetState() << "\n\t";
-  *file << this->VTKSourceTclName << " SetScaleFactor "
-        << this->ScaleEntry->GetEntry(0)->GetValueAsFloat() << "\n\n";
+//  *file << this->VTKSourceTclName << " SetOrient "
+//        << this->OrientCheck->GetState() << "\n\t";
+//  *file << this->VTKSourceTclName << " SetScaling "
+//        << this->ScaleCheck->GetState() << "\n\t";
+  this->OrientCheck->SaveInTclScript(file, this->VTKSourceTclName);
+  *file << "\t";
+  this->ScaleCheck->SaveInTclScript(file, this->VTKSourceTclName);
+  *file << "\t";
+  
+//  *file << this->VTKSourceTclName << " SetScaleFactor "
+//        << this->ScaleEntry->GetEntry(0)->GetValueAsFloat() << "\n\n";
+  this->ScaleEntry->SaveInTclScript(file, this->VTKSourceTclName);
+  *file << "\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

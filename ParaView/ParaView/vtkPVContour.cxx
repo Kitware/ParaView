@@ -393,9 +393,9 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
             << " GetOutput]\n\t";
       }
     *file << this->ChangeScalarsFilterTclName
-          << " SetInputFieldToPointDataField\n";
+          << " SetInputFieldToPointDataField\n\t";
     *file << this->ChangeScalarsFilterTclName
-          << " SetOutputAttributeDataToPointData\n";
+          << " SetOutputAttributeDataToPointData\n\t";
     *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
           << this->DefaultScalarsName << " 0\n\n";
     }
@@ -452,12 +452,18 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
           << source->GetValue(i) << "\n\t";
     }
 
-  *file << this->VTKSourceTclName << " SetComputeNormals "
-        << this->ComputeNormalsCheck->GetState() << "\n\t"
-        << this->VTKSourceTclName << " SetComputeGradients "
-        << this->ComputeGradientsCheck->GetState() << "\n\t"
-        << this->VTKSourceTclName << " SetComputeScalars "
-        << this->ComputeScalarsCheck->GetState() << "\n\n";
-  
+//  *file << this->VTKSourceTclName << " SetComputeNormals "
+//        << this->ComputeNormalsCheck->GetState() << "\n\t"
+//        << this->VTKSourceTclName << " SetComputeGradients "
+//        << this->ComputeGradientsCheck->GetState() << "\n\t"
+//        << this->VTKSourceTclName << " SetComputeScalars "
+//        << this->ComputeScalarsCheck->GetState() << "\n\n";
+  this->ComputeNormalsCheck->SaveInTclScript(file, this->VTKSourceTclName);
+  *file << "\t";
+  this->ComputeGradientsCheck->SaveInTclScript(file, this->VTKSourceTclName);
+  *file << "\t";
+  this->ComputeScalarsCheck->SaveInTclScript(file, this->VTKSourceTclName);
+  *file << "\n";
+
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

@@ -80,6 +80,10 @@ public:
   vtkGetObjectMacro(PVSource, vtkPVSource);
 
   // Description:
+  // Save this widget to a file.  
+  virtual void SaveInTclScript(ofstream *file, const char *sourceName);
+  
+  // Description:
   // With this name, you can get this widget from the PVSource.
   // It is to allow access to this widget from a script.
   vtkSetStringMacro(Name);
@@ -98,6 +102,12 @@ protected:
 
   vtkStringList *AcceptCommands;
   vtkStringList *ResetCommands;
+  
+  char *SetCommand;
+  char *GetCommand;
+  
+  vtkSetStringMacro(SetCommand);
+  vtkSetStringMacro(GetCommand);
   
   vtkPVSource *PVSource;
 

@@ -133,6 +133,9 @@ void vtkPVSelectionList::SetAccessMethods(const char* setCmd,
     return;
     }
 
+  this->SetSetCommand(setCmd);
+  this->SetGetCommand(getCmd);
+  
   // Command to update the UI.
   this->ResetCommands->AddString("%s SetCurrentValue [%s %s]",
                                  this->GetTclName(), 

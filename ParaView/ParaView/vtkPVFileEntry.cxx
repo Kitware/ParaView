@@ -97,6 +97,9 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
   // For getting the widget in a script.
   this->SetName(label);
   this->SetApplication(pvApp);
+
+  this->SetSetCommand(setCmd);
+  this->SetGetCommand(getCmd);
   
   // create the top level
   wname = this->GetWidgetName();
@@ -150,9 +153,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
   // Format a command to move value from widget to vtkObjects (on all
   // processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  //this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
-  //                                this->PVSource->GetTclName(), tclName,
-  //                                setCmd, this->Entry->GetTclName());
   this->AcceptCommands->AddString("%s %s [%s GetValue]",
                                   tclName, setCmd, this->Entry->GetTclName());
 }

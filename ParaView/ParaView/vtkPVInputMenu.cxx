@@ -232,7 +232,7 @@ void vtkPVInputMenu::Accept()
                          this->CurrentValue->GetTclName());
     }
 
-  // Super does nothing.  We have to do every thing here.
+  // Super does nothing.  We have to do everything here.
   // Notice we are changing PVObjects here so we do not
   // broadcast the script.
   if (this->CurrentValue)
@@ -247,8 +247,6 @@ void vtkPVInputMenu::Accept()
 
   this->vtkPVWidget::Accept();
 }
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Reset()
@@ -274,4 +272,3 @@ void vtkPVInputMenu::Reset()
     
   this->vtkPVWidget::Reset();
 }
-

@@ -95,6 +95,9 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *label,
   
   this->SetApplication(pvApp);
   
+  this->SetSetCommand(setCmd);
+  this->SetGetCommand(getCmd);
+  
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
@@ -124,16 +127,13 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *label,
   this->ResetCommands->AddString("%s SetState [%s %s]",
                                  this->CheckButton->GetTclName(), tclName,
                                  getCmd); 
+  
   // Format a command to move value from widget to vtkObjects (on all
   // processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  //this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
-  //                                this->PVSource->GetTclName(), tclName,
-  //                                setCmd, this->CheckButton->GetTclName()); 
-  this->AcceptCommands->AddString("%s %s [%s GetState]",
-                              tclName, setCmd, this->CheckButton->GetTclName()); 
+  this->AcceptCommands->AddString("%s %s [%s GetState]", tclName, setCmd,
+                                  this->CheckButton->GetTclName());
 }
-
 
 void vtkPVLabeledToggle::SetState(int val)
 {
@@ -148,8 +148,6 @@ void vtkPVLabeledToggle::SetState(int val)
   this->CheckButton->SetState(val); 
   this->ModifiedCallback();
 }
-
-
 
 void vtkPVLabeledToggle::Accept()
 {
@@ -171,5 +169,3 @@ void vtkPVLabeledToggle::Accept()
 
   this->vtkPVWidget::Accept();
 }
-
-

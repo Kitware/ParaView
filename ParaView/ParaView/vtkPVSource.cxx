@@ -1309,11 +1309,12 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
   char sourceTclName[256];
   char* tempName;
   char* extension;
-  int pos;
+  int pos, i, numWidgets;
   char *charFound;
   char *dataName;
   vtkPVSourceInterface *pvsInterface = NULL;
-
+  vtkPVWidget *widget;
+  
   if (this->GetNthPVInput(0))
     {
     pvsInterface = this->GetNthPVInput(0)->GetPVSource()->GetInterface();
@@ -1442,6 +1443,22 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
   if (this->Interface)
     {
     this->Interface->SaveInTclScript(file, tclName);
+    }
+
+  numWidgets = this->Widgets->GetNumberOfItems();
+  for (i = 0; i < numWidgets; i++)
+    {
+    widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
+    if (widget && (widget->IsA("vtkPVLabeledToggle") ||
+                   widget->IsA("vtkPVFileEntry") ||
+                   widget->IsA("vtkPVScale") ||
+                   widget->IsA("vtkPVSelectionList") ||
+                   widget->IsA("vtkPVStringEntry") ||
+                   widget->IsA("vtkPVVectorEntry")) )
+      {
+      *file << "\t";
+      widget->SaveInTclScript(file, tclName);
+      }
     }
   
   *file << "\n";

@@ -95,6 +95,9 @@ void vtkPVStringEntry::Create(vtkKWApplication *pvApp, char *label,
   
   this->SetApplication(pvApp);
   
+  this->SetSetCommand(setCmd);
+  this->SetGetCommand(getCmd);
+  
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);

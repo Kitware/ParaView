@@ -95,7 +95,10 @@ void vtkPVScale::Create(vtkKWApplication *pvApp, char *label,
   this->SetName(label);
   
   this->SetApplication(pvApp);
- 
+
+  this->SetSetCommand(setCmd);
+  this->SetGetCommand(getCmd);
+  
   // create the top level
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
