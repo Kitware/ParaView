@@ -638,30 +638,19 @@ void vtkKWView::EditCopy()
 void vtkKWView::Select(vtkKWWindow *pw)
 {
   // now add property options
-  this->Script(
-    "%s insert 0 command -label \"View\" -command {%s ShowViewProperties}",
-    this->GetParentWindow()->GetMenuProperties()->GetWidgetName(), 
-    this->GetTclName());
-
+  pw->GetMenuProperties()->InsertCommand(0,"View", this, "ShowViewProperties");
+  
   // add the Print option
-  this->Script("%s insert %d command -label {Print} -command {%s Print}",
-               this->ParentWindow->GetMenuFile()->GetWidgetName(), 
-               this->ParentWindow->GetFileMenuIndex(),
-               this->GetTclName());
+  pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
+                                   "Print", this, "Print");
   
   // add the save as image option
-  this->Script(
-    "%s insert %d command -label {Save As Image} -command {%s SaveAsImage}",
-    this->ParentWindow->GetMenuFile()->GetWidgetName(), 
-    this->ParentWindow->GetFileMenuIndex(),
-    this->GetTclName());
+  pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
+                                   "Save As Image",this, "SaveAsImage");
   
 #ifdef _WIN32
   // add the edit copy option
-  this->Script(
-    "%s add command -label \"Copy\" -command {%s EditCopy}",
-    this->ParentWindow->GetMenuEdit()->GetWidgetName(), 
-    this->GetTclName());
+  pw->GetMenuEdit()->AddCommand("Copy",this,"EditCopy");
 #endif
   // change the color of the frame
   this->Script("%s configure -bg #008", this->Label->GetWidgetName());
@@ -685,13 +674,13 @@ void vtkKWView::Select(vtkKWWindow *pw)
 
 void vtkKWView::Deselect(vtkKWWindow *pw)
 {
-  this->Script( "%s delete View", pw->GetMenuProperties()->GetWidgetName());
-  this->Script( "%s delete Print", pw->GetMenuFile()->GetWidgetName());
-  this->Script( "%s delete {Save As Image}",
-                pw->GetMenuFile()->GetWidgetName());
+  pw->GetMenuProperties()->DeleteMenuItem("View");
+  pw->GetMenuFile()->DeleteMenuItem("Print");
+  pw->GetMenuFile()->DeleteMenuItem("Save Ad Image");
+
 #ifdef _WIN32
   // add the edit copy option
-  this->Script( "%s delete Copy", pw->GetMenuEdit()->GetWidgetName());
+  pw->GetMenuEdit()->DeleteMenuItem("Copy");
 #endif
   // change the color of the frame
   this->Script("%s configure -bg #888", this->Label->GetWidgetName());
@@ -919,5 +908,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
 }
