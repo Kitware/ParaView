@@ -52,27 +52,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkLongArray.h"
 #include "vtkMapper.h"
+#include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVServerFileDialog.h"
 #include "vtkPVWindow.h"
 #include "vtkShortArray.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
 #include "vtkSource.h"
 #include "vtkString.h"
+#include "vtkString.h"
 #include "vtkStringList.h"
+#include "vtkStringList.h"
+#include "vtkTclUtil.h"
 #include "vtkTclUtil.h"
 #include "vtkToolkits.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkMapper.h"
-#include "vtkString.h"
-#include "vtkStringList.h"
-#include "vtkTclUtil.h"
 
 #include "vtkKWRemoteExecute.h"
 #include "vtkPVConnectDialog.h"
@@ -206,7 +207,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.30");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.31");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -987,6 +988,14 @@ int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
     {
     return this->Superclass::GetDirectoryListing(dir, dirs, files, perm);
     }
+}
+
+//----------------------------------------------------------------------------
+vtkKWLoadSaveDialog* vtkPVClientServerModule::NewLoadSaveDialog()
+{
+  vtkPVServerFileDialog* dialog = vtkPVServerFileDialog::New();
+  dialog->SetMasterWindow(this->GetPVApplication()->GetMainWindow());
+  return dialog;
 }
 
 //----------------------------------------------------------------------------

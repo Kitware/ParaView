@@ -40,29 +40,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVProcessModule.h"
-#include "vtkObjectFactory.h"
 
-#include "vtkToolkits.h"
-#include "vtkPVConfig.h"
-#include "vtkMultiProcessController.h"
-#include "vtkDummyController.h"
-#include "vtkPVApplication.h"
-#include "vtkPVDataInformation.h"
-#include "vtkDataSet.h"
-#include "vtkSource.h"
-#include "vtkFloatArray.h"
-#include "vtkDoubleArray.h"
 #include "vtkCharArray.h"
+#include "vtkDataSet.h"
+#include "vtkDoubleArray.h"
+#include "vtkDummyController.h"
+#include "vtkFloatArray.h"
+#include "vtkKWLoadSaveDialog.h"
 #include "vtkLongArray.h"
-#include "vtkShortArray.h"
-#include "vtkUnsignedIntArray.h"
-#include "vtkUnsignedLongArray.h"
-#include "vtkUnsignedShortArray.h"
 #include "vtkMapper.h"
+#include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVConfig.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVPart.h"
+#include "vtkShortArray.h"
+#include "vtkSource.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
-#include "vtkPVPart.h"
+#include "vtkToolkits.h"
+#include "vtkUnsignedIntArray.h"
+#include "vtkUnsignedLongArray.h"
+#include "vtkUnsignedShortArray.h"
 
 #include <vtkstd/string>
 
@@ -79,7 +80,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.15");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.16");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -483,6 +484,12 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
   delete [] filesTcl;
   delete [] result;
   return 1;
+}
+
+//----------------------------------------------------------------------------
+vtkKWLoadSaveDialog* vtkPVProcessModule::NewLoadSaveDialog()
+{
+  return vtkKWLoadSaveDialog::New();
 }
 
 //----------------------------------------------------------------------------

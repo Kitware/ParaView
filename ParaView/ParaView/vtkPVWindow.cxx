@@ -58,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLoadSaveDialog.h"
-#include "vtkPVServerFileDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
@@ -129,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.431");
+vtkCxxRevisionMacro(vtkPVWindow, "1.432");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1910,14 +1909,13 @@ void vtkPVWindow::OpenCallback()
   str << "{{ParaView Files} {" << this->FileExtensions << "}} "
       << this->FileDescriptions << " {{All Files} {*}}" << ends;
 
-  //vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
-  vtkPVServerFileDialog* loadDialog = vtkPVServerFileDialog::New();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkKWLoadSaveDialog* loadDialog = pm->NewLoadSaveDialog();
   this->RetrieveLastPath(loadDialog, "OpenPath");
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView File");
   loadDialog->SetDefaultExtension(".vtk");
   loadDialog->SetFileTypes(str.str());
-  loadDialog->SetMasterWindow(this);
   str.rdbuf()->freeze(0);  
   if ( loadDialog->Invoke() )
     {
@@ -4048,7 +4046,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.431 $");
+  this->ExtractRevision(os,"$Revision: 1.432 $");
 }
 
 //-----------------------------------------------------------------------------

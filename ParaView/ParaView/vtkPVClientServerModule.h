@@ -141,6 +141,10 @@ public:
                                   vtkStringList* files, const char* perm);
   
   // Description:
+  // Get a file selection dialog instance.
+  virtual vtkKWLoadSaveDialog* NewLoadSaveDialog();
+  
+  // Description:
   // Get a reference to a vtkDataObject from the server-side root node
   // given the Tcl name of the object.
   virtual vtkDataObject* ReceiveRootDataObject(const char* tclName);

@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWObject.h"
 
 class vtkDataObject;
+class vtkKWLoadSaveDialog;
 class vtkMapper;
 class vtkMultiProcessController;
 class vtkPVApplication;
@@ -156,6 +157,10 @@ public:
   // Get a reference to a vtkDataObject from the server-side root node
   // given the Tcl name of the object.
   virtual vtkDataObject* ReceiveRootDataObject(const char* tclName);
+  
+  // Description:
+  // Get a file selection dialog instance.
+  virtual vtkKWLoadSaveDialog* NewLoadSaveDialog();
   
 protected:
   vtkPVProcessModule();
