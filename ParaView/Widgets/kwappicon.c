@@ -156,8 +156,9 @@ int SetApplicationIconCmd(ClientData clientdata,
       }
     }
 
-  SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LPARAM)hIcon);
-
+//  SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LPARAM)hIcon);
+  SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LONG)hIcon);
+  
 #endif // WIN32
 
   return TCL_OK;
