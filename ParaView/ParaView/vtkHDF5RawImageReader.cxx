@@ -29,15 +29,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkShortArray.h"
 
-#include <hdf5.h>
-
-#include <sys/stat.h>
-
+// Include ordering of these four files is very sensitive on HP-UX.
 #include <vector>
 #include <string>
+#include <sys/stat.h>
+#include <hdf5.h>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.2");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.3");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
