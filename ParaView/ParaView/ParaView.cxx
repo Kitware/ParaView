@@ -91,11 +91,13 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     vtkPVApplication *app = vtkPVApplication::New();
 
 #ifdef PV_USE_SGI_PIPES
-  int numPipes = 1;
-  app->SetNumberOfPipes(numPipes);
+    int numPipes = 1;
+    app->SetNumberOfPipes(numPipes);
 #endif
-
-    //app->SetupTrapsForSignals(myId);   
+    
+#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
+    app->SetupTrapsForSignals(myId);   
+#endif // PV_HAVE_TRAPS_FOR_SIGNALS
     app->SetController(controller);
     app->Script("wm withdraw .");
     app->Start(pvArgs->argc,pvArgs->argv);

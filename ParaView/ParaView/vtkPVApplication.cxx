@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.136");
+vtkCxxRevisionMacro(vtkPVApplication, "1.137");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -891,28 +891,6 @@ void vtkPVApplication::SendDataBounds(vtkDataSet *data)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SendProbeData(vtkProbeFilter *source)
-{
-  if (this->Controller->GetLocalProcessId() == 0)
-    {
-    return;
-    }
-  
-  vtkDataSet *output = source->GetOutput();
-  float bounds[6];
-  
-  source->GetSource()->GetBounds(bounds);
-  
-  vtkIdType numPoints = source->GetValidPoints()->GetMaxId() + 1;
-  this->Controller->Send(&numPoints, 1, 0, 1970);
-  if (numPoints > 0)
-    {
-    this->Controller->Send(source->GetValidPoints(), 0, 1971);
-    this->Controller->Send(output, 0, 1972);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVApplication::SendDataNumberOfCells(vtkDataSet *data)
 {
   int num;
@@ -1409,6 +1387,7 @@ void vtkPVApplication::LogEndEvent(char* str)
   vtkTimerLog::MarkEndEvent(str);
 }
 
+#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
 //----------------------------------------------------------------------------
 void vtkPVApplication::SetupTrapsForSignals(int nodeid)
 {
@@ -1526,6 +1505,7 @@ void vtkPVApplication::ErrorExit()
   }
   exit(1);
 }
+#endif // PV_HAVE_TRAPS_FOR_SIGNALS
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)

@@ -109,17 +109,21 @@ public:
   virtual void Exit();
   
   // Description:
-  // When error happens, try to exit as gracefully as you can.
-  static void ErrorExit();
-  
-  // Description:
   // class static method to initialize Tcl/Tk
-  static Tcl_Interp *InitializeTcl(int argc, char *argv[]);  
+  static Tcl_Interp *InitializeTcl(int argc, char *argv[]);
 
+//BTX
+#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
   // Description:
   // Setup traps for signals that may kill ParaView.
   void SetupTrapsForSignals(int nodeid);
   static void TrapsForSignals(int signal);
+
+  // Description:
+  // When error happens, try to exit as gracefully as you can.
+  static void ErrorExit();
+#endif // PV_HAVE_TRAPS_FOR_SIGNALS
+//ETX
 
   // Description:
   // This constructs a vtk object (type specified by class name) and
@@ -144,7 +148,6 @@ public:
   void SendDataNumberOfCells(vtkDataSet *data);
   void SendDataNumberOfPoints(vtkDataSet *data);
   void SendMapperColorRange(vtkPolyDataMapper *mapper);
-  void SendProbeData(vtkProbeFilter *source);
   void SendDataArrayRange(vtkDataSet *data, int pointDataFlag,
                           char *arrayName, int component);
   
