@@ -312,10 +312,6 @@ protected:
   vtkPVData();
   ~vtkPVData();
 
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char token[1024]);
-  
   int InstanceCount;
   
   // This points to the source widget that owns this data widget.

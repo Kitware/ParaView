@@ -443,11 +443,6 @@ public:
   void SetCenterOfRotation(float x, float y, float z);
 
   // Description:
-  // This method is for testing only.
-  void SaveSessionFile(const char* path);
-  void LoadSessionFile(const char* path);
-
-  // Description:
   // Get the source from a name. This is used for serialization.
   vtkPVSource* GetSourceFromName(const char*);
   void AddToNamesToSources(const char* name, vtkPVSource* source);
@@ -502,10 +497,6 @@ public:
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
-
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char token[1024]);
 
   int OpenWithReader(const char *fileName, vtkPVReaderModule* reader);
   vtkPVReaderModule* InitializeRead(vtkPVReaderModule* proto, 
@@ -679,8 +670,6 @@ protected:
 private:
 
 //BTX
-  void SerializeSource(ostream& os, vtkIndent indent, vtkPVSource*,
-                       vtkArrayMap<void*,int>*);
   vtkArrayMap<const char*, vtkPVSource*> *NamesToSources;
 //ETX
 

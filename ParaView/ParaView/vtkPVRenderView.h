@@ -276,10 +276,6 @@ protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
 
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char token[1024]);
-
   void CalculateBBox(char* name, int bbox[4]);
 
   // This is used before a render to make sure all visible sources

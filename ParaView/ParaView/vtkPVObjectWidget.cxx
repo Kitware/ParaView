@@ -42,14 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVObjectWidget.h"
 
 #include "vtkArrayMap.txx"
-#include "vtkKWSerializer.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -131,51 +130,6 @@ int vtkPVObjectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
-
-//-----------------------------------------------------------------------------
-void vtkPVObjectWidget::SerializeRevision(ostream& os, vtkIndent indent)
-{
-  this->Superclass::SerializeRevision(os,indent);
-  os << indent << "vtkPVObjectWidget ";
-  this->ExtractRevision(os,"$Revision: 1.11 $");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVObjectWidget::SerializeSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::SerializeSelf(os, indent);
-  if ( this->ObjectTclName && this->VariableName )
-    {
-    os << indent << "Variable " << this->VariableName << " \""
-       << this->Script("%s Get%s", this->ObjectTclName, this->VariableName)
-       << " \"" << endl;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVObjectWidget::SerializeToken(istream& is, const char token[1024])
-{
-  if ( vtkString::Equals(token, "Variable") )
-    {
-    char varname[1024];
-    char ntoken[1024];
-    varname[0] = 0;
-    if ( !( is >> varname ) )
-      {
-      vtkErrorMacro("Problem parsing variable name");
-      return;
-      }
-    vtkKWSerializer::GetNextToken(&is,ntoken);
-    //cout << "Variable: " << varname << " Value: " << ntoken << endl;
-    this->Script("%s Set%s %s", this->ObjectTclName, varname, ntoken);
-    }
-  else
-    {
-    //cout << "Unknown Token for " << this->GetClassName() << ": " 
-    //     << token << endl;
-    this->Superclass::SerializeToken(is,token);  
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVObjectWidget::PrintSelf(ostream& os, vtkIndent indent)

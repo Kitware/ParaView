@@ -90,10 +90,6 @@ protected:
   vtkPVObjectWidget();
   ~vtkPVObjectWidget();
 
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char token[1024]);
-
   char *ObjectTclName;
   char *VariableName;
 

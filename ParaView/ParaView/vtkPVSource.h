@@ -465,10 +465,6 @@ protected:
   vtkPVDataInformation *DataInformation;
   int DataInformationValid;
 
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char token[1024]);
-
   // Description:
   // Create a menu to select the input.
   virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 

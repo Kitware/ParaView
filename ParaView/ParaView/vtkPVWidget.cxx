@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVWidget, "1.34");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -429,20 +429,6 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
       }
     }
   return 1;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
-{
-  this->Superclass::SerializeRevision(os,indent);
-  os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.33 $");
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWidget::SerializeSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::SerializeSelf(os, indent);
 }
 
 //-----------------------------------------------------------------------------

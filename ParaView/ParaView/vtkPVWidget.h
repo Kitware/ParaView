@@ -246,8 +246,6 @@ public:
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
 
   char *ModifiedCommandObjectTclName;
   char *ModifiedCommandMethod;
