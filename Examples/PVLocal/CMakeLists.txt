@@ -30,11 +30,10 @@ ENDIF(NOT ParaView_FOUND)
 INCLUDE(${PARAVIEW_USE_FILE})
 
 # Configure output directories.
-SET (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH
+SET (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE INTERNAL
      "Single output directory for building all libraries.")
-SET (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE PATH
+SET (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin CACHE INTERNAL
      "Single output directory for building all executables.")
-MARK_AS_ADVANCED(LIBRARY_OUTPUT_PATH EXECUTABLE_OUTPUT_PATH)
 
 # Create the configuration header.
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/vtkPVLocalConfigure.h.in
