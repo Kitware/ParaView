@@ -12,11 +12,12 @@ public:
     {
       ClientServerInterpreter->Delete();
     }
-  
+  void GetResultMessageData(const unsigned char**, size_t*);
   void ProcessMessage(const unsigned char*, size_t);
   void PrintObjects();
 private:
   vtkClientServerInterpreter* ClientServerInterpreter;
+  vtkClientServerStream ServerStream;
 };
 
   
@@ -27,6 +28,7 @@ public:
     {
       this->server = s;
     }
+  vtkClientServerMessage* GetResultMessage();
   void RunTests();
   vtkClientServerStream stream;
   Server* server;
@@ -43,51 +45,27 @@ Server::Server()
   Vtkparaviewcswrapped_Initialize(this->ClientServerInterpreter);
 }
 
+void Server::GetResultMessageData(const unsigned char** data, size_t* len)
+{ 
+  vtkClientServerID id;
+  id.ID=0;
+  vtkClientServerMessage* ames = this->ClientServerInterpreter->GetMessageFromID(id);
+  if(!ames)
+    {
+    *data  = 0;
+    *len = 0;
+    return;
+    }
+  this->ServerStream.Reset();
+  this->ServerStream << ames << vtkClientServerStream::End;
+  this->ServerStream.GetData(data, len);
+}
+
 void Server::ProcessMessage(const unsigned char* msg, size_t length)
 {
   if(this->ClientServerInterpreter->ProcessMessage(msg, length))
     {
     cerr << "error in process message\n";
-    }
-  else
-    {
-    vtkClientServerID id;
-    id.ID=0;
-    vtkClientServerMessage* ames = this->ClientServerInterpreter->GetMessageFromID(id);
-    if(!ames)
-      {
-      cerr << "nothing returned\n";
-      }
-    else
-      {
-      unsigned int cc;
-      cerr << "num args = " << ames->NumberOfArguments << "\n";
-      for ( cc = 0; cc < ames->NumberOfArguments; cc ++ )
-        {
-        cerr << cc << ": ";
-        if ( cc > 0 )
-          {
-          cerr << " ";
-          }
-        switch( ames->ArgumentTypes[cc] )
-          {
-          case vtkClientServerStream::string_value:
-            {
-            char* str = new char[ames->ArgumentSizes[cc]+1];
-            str[ames->ArgumentSizes[cc]] = 0;
-            strncpy(str, (const char*)ames->Arguments[cc], ames->ArgumentSizes[cc]);
-            cerr << str << "\n";
-            delete [] str;
-            }
-            break;
-          case vtkClientServerStream::int_value:
-            {
-            cerr << *reinterpret_cast<const int*>(ames->Arguments[cc]) << "\n";
-            }
-            break;
-          }
-        }
-      }
     }
 }
 
@@ -95,6 +73,22 @@ void Server::ProcessMessage(const unsigned char* msg, size_t length)
 void Server::PrintObjects()
 {
 }
+
+vtkClientServerMessage* ClientManager::GetResultMessage()
+{
+  const unsigned char* data;
+  size_t len;
+  // simulate getting a message over a socket from the server
+  server->GetResultMessageData(&data, &len);
+  
+  // now create a message on the client and print it out
+  const unsigned char *nextPos;
+  vtkClientServerMessage* ames
+    = vtkClientServerMessage::GetMessage(data,len, &nextPos);
+  return ames;
+}
+
+
 
 void ClientManager::RunTests()
 {
@@ -109,6 +103,11 @@ void ClientManager::RunTests()
   stream << vtkClientServerStream::Invoke << instance_id << "GetClassName" << vtkClientServerStream::End;
   stream.GetData(&data, &len);
   server->ProcessMessage(data, len);
+  vtkstd::string name;
+  if(this->GetResultMessage()->GetArgument(0, &name))
+    {
+    cerr << name.c_str() << "\n";
+    }
   stream.Reset();
   stream << vtkClientServerStream::Invoke << instance_id << "SetReferenceCount" << 10 << vtkClientServerStream::End;
   stream.GetData(&data, &len);
@@ -117,6 +116,11 @@ void ClientManager::RunTests()
   stream << vtkClientServerStream::Invoke << instance_id << "GetReferenceCount" << vtkClientServerStream::End;
   stream.GetData(&data, &len);
   server->ProcessMessage(data, len);
+  int refcount;
+  if(this->GetResultMessage()->GetArgument(0, &refcount))
+    {
+    cerr << refcount << "\n";
+    }
 }
 
 int main()
