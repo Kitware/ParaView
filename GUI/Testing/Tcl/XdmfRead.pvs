@@ -17,7 +17,7 @@ set kw(vtkTemp18) [$kw(vtkTemp2) GetMainView]
 $kw(vtkTemp18) SetOrientationAxesVisibility 0
 set kw(vtkTemp582) [$kw(vtkTemp2) InitializeReadCustom "XdmfReader" "${DataDir}/Data/Test1.xmf"]
 $kw(vtkTemp582) SetDomain {Domain0}
-$kw(vtkTemp582) EnableGrid {Solids}
+$kw(vtkTemp582) EnableGrid {Unnamed}
 $kw(vtkTemp2) ReadFileInformation $kw(vtkTemp582) "${DataDir}/Data/Test1.xmf"
 $kw(vtkTemp2) FinalizeRead $kw(vtkTemp582) "${DataDir}/Data/Test1.xmf"
 set kw(vtkTemp606) [$kw(vtkTemp582) GetPVWidget {Filename}]
