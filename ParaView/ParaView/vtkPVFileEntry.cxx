@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.48");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.49");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -421,7 +421,8 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     for ( cc = med-cnt; cc < med+cnt; cc ++ )
       {
       sprintf(rfname, format, path, file, cc, ext);
-      if ( vtkKWDirectoryUtilities::FileExists(rfname) )
+      if ( files->GetIndex(rfname+strlen(path)+1) >= 0 )
+        //vtkKWDirectoryUtilities::FileExists(rfname) )
         {
         this->Entry->AddValue(rfname);
         //cout << "File: " << rfname << endl;
@@ -453,7 +454,8 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     for ( cc = med-cnt; cc < med+cnt; cc ++ )
       {
       sprintf(rfname, secondformat, path, file, cc, ext);
-      if ( vtkKWDirectoryUtilities::FileExists(rfname) )
+      if ( files->GetIndex(rfname+strlen(path)+1) >= 0 )
+      // vtkKWDirectoryUtilities::FileExists(rfname) )
         {
         this->Entry->AddValue(rfname);
         //cout << "File: " << rfname << endl;
