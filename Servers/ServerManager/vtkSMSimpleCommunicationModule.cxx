@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMSimpleCommunicationModule);
-vtkCxxRevisionMacro(vtkSMSimpleCommunicationModule, "1.1");
+vtkCxxRevisionMacro(vtkSMSimpleCommunicationModule, "1.1.2.1");
 
 //----------------------------------------------------------------------------
 vtkSMSimpleCommunicationModule::vtkSMSimpleCommunicationModule()
@@ -114,14 +114,7 @@ void vtkSMSimpleCommunicationModule::GatherInformation(vtkPVInformation* info,
 //----------------------------------------------------------------------------
 void vtkSMSimpleCommunicationModule::Connect()
 {
-  this->SocketController->Initialize();
-  if (!this->SocketController->ConnectTo("localhost", 11111))
-    {
-    vtkErrorMacro("Could not connect");
-    }
-  // TODO: Temporary solution
-  int numServerProcs;
-  this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
+  vtkErrorMacro("Deprecated Function");
 }
 
 //----------------------------------------------------------------------------
