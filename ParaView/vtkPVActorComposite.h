@@ -179,6 +179,8 @@ public:
   
   void SetCubeAxesVisibility(int val);
   void CubeAxesCheckCallback();
+
+  void CenterCamera();
   
   // Description:
   // Save out the mapper and actor to a file.
@@ -289,6 +291,8 @@ protected:
   vtkKWCheckButton *CubeAxesCheck;
   char* CubeAxesTclName;
   vtkSetStringMacro(CubeAxesTclName);
+
+  vtkKWPushButton *ResetCameraButton;
 };
 
 #endif

@@ -108,6 +108,8 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->CubeAxesCheck = vtkKWCheckButton::New();
 
   this->VisibilityCheck = vtkKWCheckButton::New();
+
+  this->ResetCameraButton = vtkKWPushButton::New();
   
   this->PVData = NULL;
   this->DataSetInput = NULL;
@@ -450,6 +452,11 @@ void vtkPVActorComposite::CreateProperties()
                             this->GetTclName());
   this->VisibilityCheck->SetState(1);
 
+  this->ResetCameraButton->SetParent(this->Properties);
+  this->ResetCameraButton->Create(this->Application, "");
+  this->ResetCameraButton->SetLabel("Reset Camera");
+  this->ResetCameraButton->SetCommand(this, "CenterCamera");
+  
   this->Script("pack %s", this->StatsFrame->GetWidgetName());
   this->Script("pack %s %s -side left",
 	       this->NumCellsLabel->GetWidgetName(),
@@ -483,6 +490,8 @@ void vtkPVActorComposite::CreateProperties()
                this->CubeAxesCheck->GetWidgetName());
   this->Script("pack %s",
                this->VisibilityCheck->GetWidgetName());
+  this->Script("pack %s",
+               this->ResetCameraButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -1098,6 +1107,21 @@ void vtkPVActorComposite::Deselect(vtkKWView *v)
   this->vtkKWComposite::Deselect(v);
 
   this->Script("pack forget %s", this->Notebook->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::CenterCamera()
+{
+  float bounds[6];
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  char* tclName;
+  
+  tclName = this->GetPVRenderView()->GetRendererTclName();
+  this->GetPVData()->GetBounds(bounds);
+  pvApp->BroadcastScript("%s ResetCamera %f %f %f %f %f %f",
+                         tclName, bounds[0], bounds[1], bounds[2],
+                         bounds[3], bounds[4], bounds[5]);
+  this->GetPVRenderView()->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------
