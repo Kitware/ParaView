@@ -42,7 +42,11 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                ThresholdAttrMode
                Trace
                VectorTextSpace
-               Write)
+               Write
+               TestPolyDataIO
+               TestUnstructuredGridIO
+               TestRectilinearGridIO
+               TestImageDataIO    )
 
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
