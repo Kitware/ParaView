@@ -205,9 +205,7 @@ void vtkPVProbe::CreateProperties()
                this->DimensionalityMenu->GetWidgetName());
   
   this->SelectPointButton->SetParent(this->GetParameterFrame()->GetFrame());
-//  this->SelectPointButton->Create(pvApp, "-text \"3D Cursor\"");
-  this->SelectPointButton->Create(pvApp, "-image PV3DCursorButton");
-  this->SelectPointButton->SetBalloonHelpString("3D Cursor");
+  this->SelectPointButton->Create(pvApp, "-text \"3D Cursor\"");
   this->SelectPointButton->SetCommand(this, "SetInteractor");
   
   this->ProbeFrame->SetParent(this->GetParameterFrame()->GetFrame());
