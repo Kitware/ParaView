@@ -182,7 +182,9 @@ vtkKWVolumeComposite::~vtkKWVolumeComposite()
   
   this->LowResResampler->Delete();
   this->MedResResampler->Delete();
-
+  this->VProResampler->Delete();
+  
+  this->LowResVolumeProMapper->Delete();
   this->VolumeProMapper->Delete();
 }
 
@@ -457,5 +459,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.17 $");
+  this->ExtractRevision(os,"$Revision: 1.18 $");
 }
