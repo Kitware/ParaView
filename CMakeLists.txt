@@ -17,6 +17,13 @@ OPTION(BUILD_SHARED_LIBS "Build VTK with shared libraries." OFF)
 
 OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.4.5" ON)
 
+# Include the standard Dart testing module
+INCLUDE (${CMAKE_ROOT}/Modules/FindDart.cmake)
+IF(BUILD_TESTING)
+  ENABLE_TESTING()
+  INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
+ENDIF(BUILD_TESTING)
+
 OPTION (PARAVIEW_LINK_XDMF "Build ParaView complete using included Xdmf library" ON)
 MARK_AS_ADVANCED(PARAVIEW_LINK_XDMF)
 IF(PARAVIEW_LINK_XDMF)
@@ -141,13 +148,6 @@ IF (WIN32)
     CACHE FILEPATH "path to html help" FORCE)
   LINK_LIBRARIES( ${HTML_HELP_LIBRARY} )
 ENDIF (WIN32)
-
-# Include the standard Dart testing module
-INCLUDE (${CMAKE_ROOT}/Modules/FindDart.cmake)
-IF(BUILD_TESTING)
-  ENABLE_TESTING()
-  INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
-ENDIF(BUILD_TESTING)
 
 #
 # try to find the data files for VTKData
