@@ -817,13 +817,6 @@ proc extract_init {} {
     $extract(vtkTemp645) AddValue 0.000000
     $extract(vtkTemp598) AcceptCallback
 
-    set extract(vtkTemp703) [$extract(vtkTemp1) CreatePVSource FeatureEdges]
-    $extract(vtkTemp703) AcceptCallback
-    set extract(vtkTemp733) [$extract(vtkTemp703) GetPVOutput]
-    $extract(vtkTemp733) SetLineWidth 2
-    $extract(vtkTemp733) SetLineWidth 3
-    $extract(vtkTemp733) ColorByProperty
-
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp598)
     set extract(vtkTemp780) [$extract(vtkTemp1) CreatePVSource Glyph]
     set extract(vtkTemp795) [$extract(vtkTemp780) GetPVWidget {Orient}]
@@ -840,7 +833,6 @@ proc extract_init {} {
     $extract(vtkTemp384) SetVisibility 0
     $extract(vtkTemp478) SetVisibility 0
     $extract(vtkTemp598) SetVisibility 0
-    $extract(vtkTemp703) SetVisibility 0
     $extract(vtkTemp780) SetVisibility 0
 }
 
@@ -1079,7 +1071,6 @@ proc extract_run {} {
 
     ChangeDemoText "Running Glyph Demo:\n Vectors fields can be inspected by applying glyphs (currently arrows -vector arrows-, cones and spheres) to the points in a dataset. The glyphs can be scaled by scalars, vector component or vector magnitude and can be oriented using a vector field."
 
-    $extract(vtkTemp703) SetVisibility 1
     $extract(vtkTemp780) SetVisibility 1
     set extract(vtkTemp807) [$extract(vtkTemp780) GetPVOutput]
     $extract(vtkTemp807) ChangeActorColor 0.996078 0.117647 0.125490
@@ -1093,7 +1084,6 @@ proc extract_run {} {
     $extract(vtkTemp106) SetCurrentTime -5.000000
     $extract(vtkTemp106) SetCurrentTime -6.000000
     $extract(vtkTemp106) SetCurrentTime -7.000000
-    $extract(vtkTemp703) SetVisibility 0
     $extract(vtkTemp780) SetVisibility 0
 
     if $pvDemoShouldStop {
@@ -3726,7 +3716,6 @@ if ![info exists DemoDir] {
         catch {$clip(vtkTemp384) DeleteCallback}
 
         catch {$extract(vtkTemp780) DeleteCallback}
-        catch {$extract(vtkTemp703) DeleteCallback}
         catch {$extract(vtkTemp598) DeleteCallback}
         catch {$extract(vtkTemp478) DeleteCallback}
         catch {$extract(vtkTemp384) DeleteCallback}
