@@ -24,24 +24,21 @@
 
 class vtkCompositeRenderManager;
 
-class VTK_EXPORT vtkPVIceTRenderModule : public vtkPVMultiDisplayRenderModule
+class VTK_EXPORT vtkPVIceTRenderModule : public vtkPVCompositeRenderModule
 {
 public:
   static vtkPVIceTRenderModule* New();
-  vtkTypeRevisionMacro(vtkPVIceTRenderModule,vtkPVMultiDisplayRenderModule);
+  vtkTypeRevisionMacro(vtkPVIceTRenderModule,vtkPVCompositeRenderModule);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set the ProcessModule right after construction.
   virtual void SetProcessModule(vtkProcessModule *pm);
 
-  void StillRender();
-  void InteractiveRender();
-
   // Description:
   // IceT Does not have this option.
   void SetUseCompositeCompression(int);
-  
+
 protected:
   vtkPVIceTRenderModule();
   ~vtkPVIceTRenderModule();

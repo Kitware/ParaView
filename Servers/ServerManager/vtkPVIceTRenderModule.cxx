@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.3");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModule::vtkPVIceTRenderModule()
@@ -59,8 +59,6 @@ vtkPVIceTRenderModule::~vtkPVIceTRenderModule()
     }
 }
 
-//#############################
-//#############################
 //----------------------------------------------------------------------------
 void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
 {
@@ -213,48 +211,12 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
                   << vtkClientServerStream::End;
   pvm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
 }
-//#############################E
-//#############################E
-
-//----------------------------------------------------------------------------
-void vtkPVIceTRenderModule::StillRender()
-{
-  // No reduction for still render.
-  /*
-  if (this->ProcessModule && this->DisplayManagerTclName)
-    {
-    this->ProcessModule->RootScript("%s SetImageReductionFactor 1",
-                                         this->DisplayManagerTclName);
-    this->ProcessModule->BroadcastScript("%s ParallelRenderingOn",
-                                         this->DisplayManagerTclName);
-    }
-  */
-
-  this->Superclass::StillRender();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVIceTRenderModule::InteractiveRender()
-{
-  /*
-  if (this->ProcessModule && this->DisplayManagerTclName)
-    {
-    this->ProcessModule->RootScript("%s SetImageReductionFactor %d",
-                                         this->DisplayManagerTclName,
-                                         this->ReductionFactor);
-    this->ProcessModule->BroadcastScript("%s ParallelRenderingOn",
-                                         this->DisplayManagerTclName);
-    }
-  */
-  this->Superclass::InteractiveRender();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVIceTRenderModule::SetUseCompositeCompression(int)
 {
   // IceT does not have this option.
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVIceTRenderModule::PrintSelf(ostream& os, vtkIndent indent)

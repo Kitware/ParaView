@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVMultiDisplayRenderModule::vtkPVMultiDisplayRenderModule()
@@ -177,11 +177,12 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       }
     }
 
+  // No reduction for still render.
   if (pm && this->CompositeID.ID)
     {
-    pm->GetStream() 
-      << vtkClientServerStream::Invoke 
-      << this->CompositeID << "SetImageReductionFactor" << 1 
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CompositeID << "SetImageReductionFactor" << 1
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT);
     }
@@ -208,13 +209,13 @@ void vtkPVMultiDisplayRenderModule::StillRender()
       }
     // Save this so we know where to get the z buffer (for picking?).
     this->LocalRender = localRender;
-    }  
+    }
 
   // This was to fix a clipping range bug. Still Render can get called some 
   // funky ways.  Some do not reset the clipping range.
   // Interactive renders get called through the PVInteractorStyles
   // which call ResetCameraClippingRange on the Renderer.
-  // We could convert them to call a method on the module directly ...
+  // We could convert still renders to call a method on the module directly ...
   this->Renderer->ResetCameraClippingRange();
 
   // This used to be the way LODs (geometry and pixel redection) we choosen.
@@ -264,6 +265,8 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
   int localRender;
   int useLOD;
   vtkPVProcessModule* pm = this->ProcessModule;
+
+  //pm->SendPrepareProgress();
 
   // Compute memory totals.
   this->Displays->InitTraversal();
@@ -353,6 +356,7 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
           << vtkClientServerStream::End;
         pm->SendStream(vtkProcessModule::CLIENT);
         }
+      // Save this so we know where to get the z buffer.
       this->LocalRender = localRender;
       }
     }

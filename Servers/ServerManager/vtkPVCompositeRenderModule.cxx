@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -141,7 +141,7 @@ void vtkPVCompositeRenderModule::StillRender()
       << this->CompositeID << "SetImageReductionFactor" << 1
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT);
-    if (pm->GetClientMode())
+    if (pm->GetClientMode() && !pm->GetUseTiledDisplay() )
       {
       // No squirt if disabled, otherwise only lossless for still render.  
       int squirtLevel = 0;
@@ -179,7 +179,7 @@ void vtkPVCompositeRenderModule::StillRender()
       }
     // Save this so we know where to get the z buffer (for picking?).
     this->LocalRender = localRender;
-   }
+    }
 
   // This was to fix a clipping range bug. Still Render can get called some 
   // funky ways.  Some do not reset the clipping range.
@@ -218,6 +218,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   int localRender;
   int useLOD;
   vtkPVProcessModule* pm = this->ProcessModule;
+
   pm->SendPrepareProgress();
 
   // Compute memory totals.
@@ -257,6 +258,11 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     {
     localRender = 1;
     }
+  if (useLOD)
+    {
+    localRender = 1;
+    }
+
   // Change the collection flags and update.
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
@@ -297,10 +303,10 @@ void vtkPVCompositeRenderModule::InteractiveRender()
       }
     // Save this so we know where to get the z buffer.
     this->LocalRender = localRender;
-   }
+    }
 
   // Handle squirt compression.
-  if (pm->GetClientMode())
+  if (pm->GetClientMode() && !pm->GetUseTiledDisplay() )
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
