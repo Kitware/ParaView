@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.56");
+vtkCxxRevisionMacro(vtkKWScale, "1.57");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -113,6 +113,10 @@ vtkKWScale::vtkKWScale()
 // ---------------------------------------------------------------------------
 vtkKWScale::~vtkKWScale()
 {
+  if ( this->IsCreated() )
+    {
+    this->UnBind();
+    }
   if (this->Command)
     {
     delete [] this->Command;
@@ -485,6 +489,9 @@ void vtkKWScale::Bind()
 // ---------------------------------------------------------------------------
 void vtkKWScale::UnBind()
 {
+  this->Script("bind %s <Configure> {}",
+               this->GetWidgetName());
+  
   if (this->Scale && this->Scale->IsCreated())
     {
     this->Script("bind %s <ButtonPress>", 
