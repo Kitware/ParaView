@@ -276,6 +276,24 @@ public:
   virtual void DragAndDropPerformCallback(int x, int y);
   virtual void DragAndDropEndCallback(int x, int y);
 
+  // Description:
+  // Some constant that can be used to specify anchoring
+  //BTX
+  enum
+  {
+    ANCHOR_N,
+    ANCHOR_NE,
+    ANCHOR_E,
+    ANCHOR_SE,
+    ANCHOR_S,
+    ANCHOR_SW,
+    ANCHOR_W,
+    ANCHOR_NW,
+    ANCHOR_CENTER
+  };
+  //ETX
+  virtual const char* GetAnchorAsString(int);
+
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
