@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.23");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.24");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -352,8 +352,8 @@ void vtkPVMinMax::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Update()
 {
-  float range[2];
-  float oldRange[2];
+  double range[2];
+  double oldRange[2];
 
   vtkPVArrayInformation *ai;
 
@@ -391,8 +391,8 @@ void vtkPVMinMax::Update()
   int place = (int)(floor(log10((double)(range[1]-range[0])) - 1.5));
   double resolution = pow(10.0, (double)(place));
   // Now find the range at resolution values.
-  range[0] = (float)(floor((double)(range[0]) / resolution) * resolution);
-  range[1] = (float)(ceil((double)(range[1]) / resolution) * resolution);
+  range[0] = (floor((double)(range[0]) / resolution) * resolution);
+  range[1] = (ceil((double)(range[1]) / resolution) * resolution);
 
 
   oldRange[1] = this->MinScale->GetRangeMax();
