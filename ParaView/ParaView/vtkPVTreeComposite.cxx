@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.50");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.51");
 
 
 //=========================================================================
@@ -590,14 +590,14 @@ void vtkPVTreeComposite::ReadReducedImage()
     {
     this->RenderWindow->GetRGBAPixelData(0, 0, this->ReducedImageSize[0]-1,
                                          this->ReducedImageSize[1]-1,
-                                         this->LastRenderInFrontBuffer(),
+                                         this->ChooseBuffer(),
                                          this->ReducedFloatImage);
     }
   else
     {
     this->RenderWindow->GetRGBAPixelData(0, 0, this->FullImageSize[0]-1,
                                          this->FullImageSize[1]-1,
-                                         this->LastRenderInFrontBuffer(),
+                                         this->ChooseBuffer(),
                                          this->FullFloatImage);
     this->FullImageUpToDate = 1;
     this->ReducedFloatImage
@@ -621,7 +621,7 @@ void vtkPVTreeComposite::SetRenderWindowFloatPixelData(vtkFloatArray *pixels,
                                        pixelDimensions[0]-1,
                                        pixelDimensions[1]-1,
                                        pixels,
-                                       this->LastRenderInFrontBuffer());
+                                       this->ChooseBuffer());
 }
 
 // Done disabling compositing when no data is on satelite processes.
