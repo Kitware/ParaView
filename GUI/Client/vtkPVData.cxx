@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.268");
+vtkCxxRevisionMacro(vtkPVData, "1.269");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -250,7 +250,10 @@ vtkPVData::~vtkPVData()
   
   this->VolumeScalarsMenuLabel->Delete();
   this->VolumeScalarsMenuLabel = NULL;
-  
+
+  this->VolumeScalarsMenu->Delete();
+  this->VolumeScalarsMenu = NULL;
+
   this->RepresentationMenuLabel->Delete();
   this->RepresentationMenuLabel = NULL;  
   this->RepresentationMenu->Delete();
