@@ -126,7 +126,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.574");
+vtkCxxRevisionMacro(vtkPVWindow, "1.575");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2592,7 +2592,19 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   *file << endl;
 
+  *file << "set saveState 0" << endl;
+  *file << "for {set i  1} {$i < [expr $argc - 1]} {incr i} {" << endl;
+  *file << "  if {[lindex $argv $i] == \"-XML\"} {" << endl;
+  *file << "    set saveState 1" << endl;
+  *file << "    set stateName [lindex $argv [expr $i + 1]]" << endl;
+  *file << "  }" << endl;
+  *file << "}" << endl;
+
   
+  *file << "if { $saveState } {" << endl;
+  *file << "   $proxyManager SaveState $stateName" << endl;
+  *file << "} else {" << endl;
+
   if (animationFlag)
     {
     this->AnimationInterface->SaveInBatchScript(file, 
@@ -2616,6 +2628,8 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
     }
 
+
+  *file << "}" << endl;
   *file << endl;
 
   *file << "$proxyManager UnRegisterProxies" << endl;
