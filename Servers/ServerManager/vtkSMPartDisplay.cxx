@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.10");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.11");
 
 
 //----------------------------------------------------------------------------s
@@ -169,7 +169,6 @@ vtkSMPartDisplay::vtkSMPartDisplay()
   this->VolumePropertyProxy    = 0;
   this->VolumeColorProxy       = 0;
   this->VolumeOpacityProxy     = 0; 
-  this->VolumeFieldFilterProxy = 0;
   this->Volume                 = 0;
   this->VolumeColor            = 0;
   this->VolumeOpacity          = 0;
@@ -245,11 +244,6 @@ vtkSMPartDisplay::~vtkSMPartDisplay()
     {
     this->VolumeOpacityProxy->Delete();
     this->VolumeOpacityProxy = 0;
-    }
-  if (this->VolumeFieldFilterProxy != 0 )
-    {
-    this->VolumeFieldFilterProxy->Delete();
-    this->VolumeFieldFilterProxy = 0;
     }
   if (this->MapperProxy != 0)
     {
@@ -387,9 +381,6 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
   this->VolumeColorProxy->SetVTKClassName("vtkColorTransferFunction");
   this->VolumeColorProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);
 
-  this->VolumeFieldFilterProxy = vtkSMProxy::New();
-  this->VolumeFieldFilterProxy->SetVTKClassName("vtkFieldDataToAttributeDataFilter");
-  this->VolumeFieldFilterProxy->SetServersSelf(vtkProcessModule::CLIENT_AND_SERVERS);    
   this->GeometryProxy->CreateVTKObjects(num);
   this->UpdateSuppressorProxy->CreateVTKObjects(num);
   this->MapperProxy->CreateVTKObjects(num);
@@ -401,7 +392,6 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
   this->VolumePropertyProxy->CreateVTKObjects(num);
   this->VolumeOpacityProxy->CreateVTKObjects(num);
   this->VolumeColorProxy->CreateVTKObjects(num);
-  this->VolumeFieldFilterProxy->CreateVTKObjects(num);
 
   // Set the current default.  
   this->UseTriangleStripsProperty->SetElement(0, pm->GetUseTriangleStrips());
@@ -595,15 +585,10 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
         strcmp(cnInfo->GetVTKClassName(), "vtkUnstructuredGrid") == 0 )
       {
       // Must loop through inputs .... fixme
-      stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
+      stream << vtkClientServerStream::Invoke << this->VolumeTetraFilterProxy->GetID(i)
              << "SetInput" << input->GetPart(i)->GetID(0)
              << vtkClientServerStream::End;
     
-      stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
-             << "GetOutput" << vtkClientServerStream::End;
-      stream << vtkClientServerStream::Invoke << this->VolumeTetraFilterProxy->GetID(i)
-             << "SetInput" <<  vtkClientServerStream::LastResult 
-             << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << this->VolumeTetraFilterProxy->GetID(i)
              << "GetOutput" << vtkClientServerStream::End;
       stream << vtkClientServerStream::Invoke << this->VolumeMapperProxy->GetID(i)
@@ -1236,15 +1221,14 @@ void vtkSMPartDisplay::VolumeRenderPointField(const char *name)
   this->ColorField = vtkDataSet::POINT_DATA_FIELD;
 
   int i, num;
-  num = this->VolumeFieldFilterProxy->GetNumberOfIDs();
+  num = this->VolumeMapperProxy->GetNumberOfIDs();
   for (i = 0; i < num; ++i)
     {
-    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
-          << "SetInputFieldToPointDataField" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
-          << "SetOutputAttributeDataToPointData" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
-          << "SetScalarComponent" << 0 << name << 0 << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->VolumeMapperProxy->GetID(i)
+           << "SetScalarModeToUsePointFieldData"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->VolumeMapperProxy->GetID(i)
+           << "SelectScalarArray" << name << vtkClientServerStream::End;
     }
   pm->SendStream(vtkProcessModule::DATA_SERVER);
 
@@ -1264,15 +1248,14 @@ void vtkSMPartDisplay::VolumeRenderCellField(const char *name)
   this->ColorField = vtkDataSet::CELL_DATA_FIELD;
 
   int i, num;
-  num = this->VolumeFieldFilterProxy->GetNumberOfIDs();
+  num = this->VolumeMapperProxy->GetNumberOfIDs();
   for (i = 0; i < num; ++i)
     {
-    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
-          << "SetInputFieldToCellDataField" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
-          << "SetOutputAttributeDataToCellData" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
-          << "SetScalarComponent" << 0 << name << 0 << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->VolumeMapperProxy->GetID(i)
+           << "SetScalarModeToUseCellFieldData"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->VolumeMapperProxy->GetID(i)
+           << "SelectScalarArray" << name << vtkClientServerStream::End;
     }
   pm->SendStream(vtkProcessModule::DATA_SERVER);
 
@@ -1677,7 +1660,6 @@ void vtkSMPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VolumeOpacityProxy: "     << this->VolumeOpacityProxy     << endl;
   os << indent << "VolumeColorProxy: "       << this->VolumeColorProxy       << endl;
   os << indent << "VolumeTetraFilterProxy: " << this->VolumeTetraFilterProxy << endl;
-  os << indent << "VolumeFieldFilterProxy: " << this->VolumeFieldFilterProxy << endl;
 
 }
 

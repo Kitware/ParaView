@@ -254,7 +254,6 @@ protected:
   vtkSMProxy* VolumeOpacityProxy;
   vtkSMProxy* VolumeColorProxy;
   vtkSMProxy* VolumeTetraFilterProxy;
-  vtkSMProxy* VolumeFieldFilterProxy;
 
   // These are too complex to make into a property for internal use.
   int    Representation;
