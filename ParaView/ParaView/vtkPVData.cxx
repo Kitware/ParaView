@@ -2414,7 +2414,6 @@ void vtkPVData::SetPointSize(int size)
     return;
     }
   this->PointSizeScale->SetValue(size);
-  this->ChangePointSize();
 }
 
 //----------------------------------------------------------------------------
@@ -2425,7 +2424,6 @@ void vtkPVData::SetLineWidth(int width)
     return;
     }
   this->LineWidthScale->SetValue(width);
-  this->ChangeLineWidth();
 }
 
 //----------------------------------------------------------------------------
@@ -2768,7 +2766,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.128 $");
+  this->ExtractRevision(os,"$Revision: 1.129 $");
 }
 
 //----------------------------------------------------------------------------
