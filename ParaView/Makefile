@@ -40,7 +40,6 @@ vtkPVGlyph3D \
 vtkPVImageData \
 vtkPVImageClip \
 vtkPVImageMandelbrotSource \
-vtkPVImageReader \
 vtkPVImageShiftScale \
 vtkPVImageSlice \
 vtkPVImageSource \

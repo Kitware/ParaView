@@ -37,6 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVPolyDataSource.h"
+#include "vtkPVImageSource.h"
 #include "vtkPVSourceList.h"
 #include "vtkInteractorStyleTrackballCamera.h"
 
@@ -57,7 +58,7 @@ public:
 
   // Description:
   // These create new sources.
-  void CreateImageReader();
+  vtkPVImageSource *CreateImageReader();
   void CreateFractalVolume();
   vtkPVPolyDataSource *CreateCone();
   vtkPVPolyDataSource *CreateSTLReader();

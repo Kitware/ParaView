@@ -630,19 +630,38 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSuperQuadric()
 
 //----------------------------------------------------------------------------
 // Setup the pipeline
-void vtkPVWindow::CreateImageReader()
+vtkPVImageSource *vtkPVWindow::CreateImageReader()
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-  vtkPVImageReader *reader;
+  static int instanceCount = 0;
+  vtkPVSource *pvs;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
-  reader = vtkPVImageReader::New();
-  reader->Clone(pvApp);
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  pvs = pvApp->MakePVSource("vtkPVImageSource","vtkImageReader",
+                            "ImageReader", ++instanceCount);
+  if (pvs == NULL) {return NULL;}
   
-  reader->SetName("imageReader");
-  this->MainView->AddComposite(reader);
-  this->SetCurrentSource(reader);
-  
-  reader->Delete();
+  // Add the new Source to the View, and make it current.
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  pvs->AddLabeledEntry("FilePrefix:", "SetFilePrefix", "GetFilePrefix");
+  pvs->AddLabeledEntry("FilePattern:", "SetFilePattern", "GetFilePattern");
+  pvs->AddModeList("ByteOrder", "SetDataByteOrder", "GetDataByteOrder");
+  pvs->AddModeListItem("BigEndian", 0);
+  pvs->AddModeListItem("LittleEndian", 1);
+  pvs->AddVector6Entry("DataExtent:", "X Min", "X Max", "Y Min", "Y Max",
+		       "Z Min", "Z Max", "SetDataExtent", "GetDataExtent");
+  pvs->AddVector3Entry("DataSpacing:", "X", "Y", "Z", "SetDataSpacing", "GetDataSpacing");
+  pvs->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
+  return vtkPVImageSource::SafeDownCast(pvs);
 }
 
 //----------------------------------------------------------------------------
