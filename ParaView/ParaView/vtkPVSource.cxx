@@ -1115,7 +1115,6 @@ vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
 void vtkPVSource::SaveInTclScript(ofstream *file)
 {
   int i, numWidgets;
-  vtkPVSourceInterface *pvsInterface = NULL;
   vtkPVWidget *widget;
 
   // Detect special sources we do not handle yet.

@@ -106,10 +106,9 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
   vtkPVData **inputs = currentSource->GetPVInputs();
   vtkPVData **outputs;
   int numInputs, xMid, yMid, y, i;
-  char *result, *tmp;
+  char *tmp;
   int bbox[4];
-  int bboxIn[4], bboxOut[4], bboxSource[4], bboxLine[4], xRightOfFirst, shift;
-  int leftOverlap = 0;
+  int bboxIn[4], bboxOut[4], bboxSource[4];
   vtkPVData *moreOut;
   static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
   

@@ -2082,12 +2082,8 @@ void vtkPVData::SaveInTclScript(ofstream *file)
 {
   float range[2], position[2];
   const char* scalarMode;
-  static int readerNum = -1;
-  static int outputNum;
   char* result;
   char* renTclName;
-  vtkPVSourceInterface *pvsInterface =
-    this->GetPVSource()->GetInterface();
 
   renTclName = this->GetPVRenderView()->GetRendererTclName();
 
