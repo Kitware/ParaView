@@ -656,6 +656,7 @@ protected:
 
   double LastProgress;
   int ExpectProgress;
+  int ModifiedEnableState;
 
   vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
   vtkKWUserInterfaceNotebookManager *UserInterfaceManager;

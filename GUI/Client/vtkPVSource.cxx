@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.348.2.1");
+vtkCxxRevisionMacro(vtkPVSource, "1.348.2.2");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1388,6 +1388,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     this->UnGrabFocus();
     this->Initialized = 1;
     }
+  else
+    {
+    this->GetPVWindow()->UpdateEnableState();
+    }
 
   window->GetMenuView()->CheckRadioButton(
                                   window->GetMenuView(), "Radio", 2);
@@ -1491,6 +1495,10 @@ void vtkPVSource::DeleteCallback()
 
     this->Script("update");   
     this->Initialized = 1;
+    }
+  else
+    {
+    this->GetPVWindow()->UpdateEnableState();
     }
   
   if (this->GetNumberOfPVConsumers() > 0 )
