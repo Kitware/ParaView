@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71.2.1");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.71.2.2");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -748,11 +748,21 @@ void vtkPVClientServerModule::Exit()
     {
     this->SocketController->TriggerRMI(
       1, vtkMultiProcessController::BREAK_RMI_TAG);
+#ifdef _WIN32
+    // if you start client server mode with mpi the server
+    // never gets the break rmi unless this sleep is here.
+    Sleep(1000);
+#endif
     }
   if(this->RenderServerSocket)
     {
     this->RenderServerSocket->TriggerRMI(
       1, vtkMultiProcessController::BREAK_RMI_TAG);
+#ifdef _WIN32
+    // if you start client server mode with mpi the server
+    // never gets the break rmi unless this sleep is here.
+    Sleep(1000);
+#endif
     }
   // Break RMI for MPI controller is in Init method.
 }

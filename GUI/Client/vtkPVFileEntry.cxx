@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.79.2.2");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.79.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -882,7 +882,7 @@ vtkPVWidgetProperty* vtkPVFileEntry::CreateAppropriateProperty()
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::ExecuteEvent(vtkObject*, unsigned long event, void*)
 {
-  if ( event == vtkCommand::ModifiedEvent && !this->IgnoreFileListEvents )
+  if ( event == vtkKWEvent::WidgetModifiedEvent && !this->IgnoreFileListEvents )
     {
     this->UpdateTimeStep();
     this->ModifiedCallback();
@@ -955,6 +955,7 @@ void vtkPVFileEntry::UpdateAvailableFiles( int force )
     this->IgnoreFileListEvents = 0;
     }
   files->Delete();
+  this->UpdateTimeStep();
 }
 
 //-----------------------------------------------------------------------------

@@ -26,18 +26,61 @@
 #include <kwsys/Process.h>
 #include <kwsys/stl/string>
 #include <kwsys/stl/vector>
+#include <vtkstd/string>
 
 void ReportCommand(const char* const* command, const char* name);
 int ReportStatus(kwsysProcess* process, const char* name);
 
 
-inline void PauseForServerStart()
+int WaitForAndPrintData(kwsysProcess* process, double timeout, int* foundWaiting )
 {
-#ifdef _WIN32
-  Sleep(1000);
-#else
-  sleep(1);
-#endif
+  if(!process)
+    {
+    return 0;
+    }
+  char* data;
+  int length;
+  // Look for process output.
+  int processPipe = kwsysProcess_WaitForData(process, &data, &length, &timeout);
+  if(processPipe == kwsysProcess_Pipe_STDOUT)
+    {
+    if(foundWaiting)
+      {
+      vtkstd::string str(data, data+length);
+      if(str.find("Waiting") != str.npos)
+        {
+        *foundWaiting = 1;
+        }
+      }
+    cerr.write(data, length);
+    cerr.flush();
+    }
+  else if(processPipe == kwsysProcess_Pipe_STDERR)
+    {
+    cerr.write(data, length);
+    cerr.flush();
+    }
+  
+  return processPipe;
+}
+
+inline void SeparateArguments(const char* str, vtkstd::vector<vtkstd::string>& flags)
+{
+  vtkstd::string arg = str;
+  vtkstd::string::size_type pos1 = 0;
+  vtkstd::string::size_type pos2 = arg.find(" ");
+  if(pos2 == arg.npos)
+    {
+    flags.push_back(str);
+    return;
+    }
+  while(pos2 != arg.npos)
+    {
+    flags.push_back(arg.substr(pos1, pos2-pos1));
+    pos1 = pos2+1;
+    pos2 = arg.find(" ", pos1+1);
+    } 
+  flags.push_back(arg.substr(pos1, pos2-pos1));
 }
 
 //----------------------------------------------------------------------------
@@ -45,15 +88,58 @@ int main(int argc, char* argv[])
 {
   int argStart = 1;
   int testRenderServer = 0;
+  // try to make sure that this timesout before dart so it can kill all the processes
+  double timeOut = DART_TESTING_TIMEOUT - 10.0;
+  if(timeOut < 0)
+    {
+    timeOut = 1500;
+    }
+  
   if(argc > 1)
     {
-    if(strcmp(argv[1], "--test-render-server") == 0)
+    int index = 1;
+    if(strcmp(argv[index], "--test-render-server") == 0)
       {
-      argStart = 2;
+      argStart = index+1;
       testRenderServer = 1;
       fprintf(stderr, "Test Render Server\n");
       }
     }
+  // mpi code
+  vtkstd::string mpiRun;
+  
+  vtkstd::vector<vtkstd::string> mpiFlags;
+  vtkstd::vector<vtkstd::string> mpiPostFlags;
+  vtkstd::string mpiNumProcFlag;
+  vtkstd::string serverNumProcess;
+  vtkstd::string renderServerNumProcess;
+#ifdef VTK_MPIRUN_EXE
+  mpiRun = VTK_MPIRUN_EXE;
+  int serverNumProc = 1;
+  int renderNumProc = 1;
+
+#ifdef VTK_MPI_MAX_NUMPROCS
+  serverNumProc = VTK_MPI_MAX_NUMPROCS;
+  renderNumProc = serverNumProc-1;
+#endif
+# ifdef VTK_MPI_NUMPROC_FLAG
+  mpiNumProcFlag = VTK_MPI_NUMPROC_FLAG;
+# else
+  cerr << "Error VTK_MPI_NUMPROC_FLAG must be defined to run test\n";
+  return -1;
+# endif
+# ifdef VTK_MPI_PREFLAGS
+  SeparateArguments(VTK_MPI_PREFLAGS, mpiFlags);
+# endif
+# ifdef VTK_MPI_POSTFLAGS
+  SeparateArguments(VTK_MPI_POSTFLAGS, mpiPostFlags);
+# endif  
+  char buf[1024];
+  sprintf(buf, "%d", serverNumProc);
+  serverNumProcess = buf;
+  sprintf(buf, "%d", renderNumProc);
+  renderServerNumProcess = buf;
+#endif
   // Allocate process managers.
   kwsysProcess* renderServer = 0;
   if(testRenderServer)
@@ -85,14 +171,29 @@ int main(int argc, char* argv[])
   paraview += "/" CMAKE_INTDIR;
 #endif
   paraview += "/paraview";
-
+  unsigned int i;
   // Construct the render server process command line
   if(renderServer)
     {
     // Construct the server process command line.
     kwsys_stl::vector<const char*> renderServerCommand;
+    if(mpiRun.size())
+      {
+      renderServerCommand.push_back(mpiRun.c_str());
+      renderServerCommand.push_back(mpiNumProcFlag.c_str());
+      renderServerCommand.push_back(renderServerNumProcess.c_str());
+      for(i = 0; i < mpiFlags.size(); ++i)
+        {
+        cout << mpiFlags[i].c_str() << "\n";
+        renderServerCommand.push_back(mpiFlags[i].c_str());
+        }
+      }
     renderServerCommand.push_back(paraview.c_str());
     renderServerCommand.push_back("--render-server");
+    for(i = 0; i < mpiPostFlags.size(); ++i)
+      {
+      renderServerCommand.push_back(mpiPostFlags[i].c_str());
+      }
     renderServerCommand.push_back(0);
     ReportCommand(&renderServerCommand[0], "renderserver");
     kwsysProcess_SetCommand(renderServer, &renderServerCommand[0]);
@@ -100,8 +201,23 @@ int main(int argc, char* argv[])
   
   // Construct the server process command line.
   kwsys_stl::vector<const char*> serverCommand;
+  if(mpiRun.size())
+    {
+    serverCommand.push_back(mpiRun.c_str());
+    serverCommand.push_back(mpiNumProcFlag.c_str());
+    serverCommand.push_back(serverNumProcess.c_str());
+    for(i = 0; i < mpiFlags.size(); ++i)
+      {
+      serverCommand.push_back(mpiFlags[i].c_str());
+      }
+    }
   serverCommand.push_back(paraview.c_str());
   serverCommand.push_back("--server");
+  for(i = 0; i < mpiPostFlags.size(); ++i)
+    {
+    serverCommand.push_back(mpiPostFlags[i].c_str());
+    }
+    
   serverCommand.push_back(0);
   ReportCommand(&serverCommand[0], "server");
   kwsysProcess_SetCommand(server, &serverCommand[0]);
@@ -118,85 +234,58 @@ int main(int argc, char* argv[])
   clientCommand.push_back("--client");
     }
   
-  for(int i=argStart; i < argc; ++i)
+  for(int ii=argStart; ii < argc; ++ii)
     {
-    clientCommand.push_back(argv[i]);
+    clientCommand.push_back(argv[ii]);
     }
   clientCommand.push_back(0);
   ReportCommand(&clientCommand[0], "client");
   kwsysProcess_SetCommand(client, &clientCommand[0]);
 
   // Kill the processes if they are taking too long.
-  kwsysProcess_SetTimeout(server, 1400);
-  kwsysProcess_SetTimeout(client, 1400);
+  kwsysProcess_SetTimeout(server, timeOut);
+  kwsysProcess_SetTimeout(client, timeOut);
+  int foundWaiting = 0;
   if(renderServer)
     {
-    fprintf(stderr, "start render server\n");
-    kwsysProcess_SetTimeout(renderServer, 1400);
+    cerr << "start render server\n";
+    kwsysProcess_SetTimeout(renderServer, timeOut);
     kwsysProcess_Execute(renderServer);
-    PauseForServerStart();
+    while(!foundWaiting)
+      {
+      if(!WaitForAndPrintData(renderServer, 30.0, &foundWaiting))
+        {
+        cerr << "render server never started\n";
+        return -1;
+        }
+      }
+    cerr << "Started Render Server\n";
     }
 
   // Execute the server and then the client.
   kwsysProcess_Execute(server);
-  PauseForServerStart();
+  foundWaiting = 0;
+  while(!foundWaiting)
+    {
+    if(!WaitForAndPrintData(server, 30.0, &foundWaiting))
+      {
+      cerr << "server never started\n";
+      kwsysProcess_Kill(renderServer);
+      return -1;
+      }
+    }
+  cerr << "Started data Server\n";
   kwsysProcess_Execute(client);
 
   // Report the output of the processes.
   int clientPipe = 1;
   int serverPipe = 1;
-  int renderServerPipe = 0;
-  if(renderServer)
-    {
-    renderServerPipe = 1;
-    }
+  int renderServerPipe = 1;
   while(clientPipe || serverPipe || renderServerPipe)
     {
-    char* data;
-    int length;
-    double timeout;
-
-    // Look for client output.
-    timeout = 0.1;
-    clientPipe = kwsysProcess_WaitForData(client, &data, &length, &timeout);
-    if(clientPipe == kwsysProcess_Pipe_STDOUT)
-      {
-      cout.write(data, length);
-      cout.flush();
-      }
-    else if(clientPipe == kwsysProcess_Pipe_STDERR)
-      {
-      cerr.write(data, length);
-      cout.flush();
-      }
-
-    // Look for server output.
-    timeout = 0.1;
-    serverPipe = kwsysProcess_WaitForData(server, &data, &length, &timeout);
-    if(serverPipe == kwsysProcess_Pipe_STDOUT)
-      {
-      cout.write(data, length);
-      cout.flush();
-      }
-    else if(serverPipe == kwsysProcess_Pipe_STDERR)
-      {
-      cerr.write(data, length);
-      cout.flush();
-      }
-    if(renderServer)
-      {
-      renderServerPipe = kwsysProcess_WaitForData(server, &data, &length, &timeout);
-      if(renderServerPipe == kwsysProcess_Pipe_STDOUT)
-        {
-        cout.write(data, length);
-        cout.flush();
-        }
-      else if(renderServerPipe == kwsysProcess_Pipe_STDERR)
-        {
-        cerr.write(data, length);
-        cout.flush();
-        }
-      }
+    clientPipe = WaitForAndPrintData(client, 0.1, 0);
+    serverPipe = WaitForAndPrintData(server, 0.1, 0);
+    renderServerPipe = WaitForAndPrintData(renderServer, 0.1, 0);
     }
 
   // Wait for the client and server to exit.
@@ -242,12 +331,12 @@ int main(int argc, char* argv[])
 //----------------------------------------------------------------------------
 void ReportCommand(const char* const* command, const char* name)
 {
-  cout << "The " << name << " command is:\n";
+  cerr << "The " << name << " command is:\n";
   for(const char* const * c = command; *c; ++c)
     {
-    cout << " \"" << *c << "\"";
+    cerr << " \"" << *c << "\"";
     }
-  cout << "\n";
+  cerr << "\n";
 }
 
 //----------------------------------------------------------------------------
@@ -306,7 +395,7 @@ int ReportStatus(kwsysProcess* process, const char* name)
     case kwsysProcess_State_Exited:
       {
       result = kwsysProcess_GetExitValue(process);
-      cout << "The " << name << " process exited with code "
+      cerr << "The " << name << " process exited with code "
                       << result << "\n";
       } break;
     case kwsysProcess_State_Expired:

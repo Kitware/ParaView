@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.16.2.1");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -691,12 +691,45 @@ void vtkPVAxesWidget::SquareRenderer()
   
   double deltaX = vp[2] - vp[0];
   double newDeltaX = size[1] * deltaX / (double)size[0];
-  vp[2] = vp[0] + newDeltaX;
+  double deltaY = vp[3] - vp[1];
+  double newDeltaY = size[0] * deltaY / (double)size[1];
 
+  if (newDeltaX > 1)
+    {
+    if (newDeltaY > 1)
+      {
+      if (size[0] > size[1])
+        {
+        newDeltaX = size[1] / (double)size[0];
+        newDeltaY = 1;
+        }
+      else
+        {
+        newDeltaX = 1;
+        newDeltaY = size[0] / (double)size[1];
+        }
+      vp[0] = vp[1] = 0;
+      vp[2] = newDeltaX;
+      vp[3] = newDeltaY;
+      }
+    else
+      {
+      vp[3] = vp[1] + newDeltaY;
+      if (vp[3] > 1)
+        {
+        vp[3] = 1;
+        vp[1] = vp[3] - newDeltaY;
+        }
+      }
+    }
+  else
+    {
+  vp[2] = vp[0] + newDeltaX;
   if (vp[2] > 1)
     {
     vp[2] = 1;
     vp[0] = vp[2] - newDeltaX;
+      }
     }
   
   this->Renderer->SetViewport(vp);

@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.9");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.10");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1310,6 +1310,7 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   this->CenterYEntry->SetValue(y);
   this->CenterZEntry->SetValue(z);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
+  this->CameraStyle2D->SetCenterOfRotation(x, y, z);
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "SetPosition" << x << y << z
                   << vtkClientServerStream::End;
