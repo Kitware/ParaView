@@ -22,7 +22,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.7");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.8");
 
 struct vtkSMStringVectorPropertyInternals
 {
@@ -218,4 +218,11 @@ void vtkSMStringVectorProperty::SaveState(
 void vtkSMStringVectorProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "Values: ";
+  for (unsigned int i=0; i<this->GetNumberOfElements(); i++)
+    {
+    os << (this->GetElement(i)?this->GetElement(i):"(nil)") << " ";
+    }
+  os << endl;
 }

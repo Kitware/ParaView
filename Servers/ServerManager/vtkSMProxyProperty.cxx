@@ -26,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.6");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.7");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -229,4 +229,11 @@ void vtkSMProxyProperty::SaveState(
 void vtkSMProxyProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "Values: ";
+  for (unsigned int i=0; i<this->GetNumberOfProxies(); i++)
+    {
+    os << this->GetProxy(i) << " ";
+    }
+  os << endl;
 }
