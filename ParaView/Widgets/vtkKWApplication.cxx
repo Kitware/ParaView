@@ -488,7 +488,8 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
 {
-  if ( !this->BalloonHelpLabel || !this->BalloonHelpWindow )
+  if ( !this->BalloonHelpLabel || !this->BalloonHelpWindow ||
+       !widget->GetParent() )
     {
     return;
     }
@@ -500,7 +501,7 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
     this->SetBalloonHelpPending(NULL);
     return;
     }
-  
+
   // make sure it is really pending
   this->Script("%s configure -text {%s}", 
                this->BalloonHelpLabel->GetWidgetName(), 
@@ -571,6 +572,7 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
     }
   
   this->SetBalloonHelpPending(NULL);
+
 }
 
 
