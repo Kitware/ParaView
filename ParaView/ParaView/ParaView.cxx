@@ -99,7 +99,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     app->SetController(controller);
     app->Script("wm withdraw .");
     app->Start(pvArgs->argc,pvArgs->argv);
-    int status = app->GetExitStatus();
+    *(pvArgs->RetVal) = app->GetExitStatus();
     app->Delete();
     }
   else
