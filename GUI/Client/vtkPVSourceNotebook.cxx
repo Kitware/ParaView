@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.13");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.14");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -413,7 +413,7 @@ void vtkPVSourceNotebook::SetAutoAccept(int val)
     {
     this->AcceptButton->SetText("Auto Accept");
     // Just in case the source is already modified.
-    this->AcceptButtonCallback();
+    this->SetAcceptButtonColorToModified();
     }
   else
     {
