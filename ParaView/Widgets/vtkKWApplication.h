@@ -150,10 +150,12 @@ public:
   // feature (string parameter) is not available in this mode.
   // Also set/Get the name of the Limited Edition Mode, as displayed in the
   // GUI or after the application name in the title bar 
-  // (default to: limited edition). 
+  // (default to: limited edition).
+  //BTX 
   virtual void SetLimitedEditionMode(int arg);
   vtkBooleanMacro(LimitedEditionMode, int);
   vtkGetMacro(LimitedEditionMode, int);
+  //ETX
   virtual int GetLimitedEditionModeAndWarn(const char *feature);
   vtkSetStringMacro(LimitedEditionModeName);
   vtkGetStringMacro(LimitedEditionModeName);
