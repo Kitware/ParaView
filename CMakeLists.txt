@@ -122,12 +122,23 @@ FOREACH(kit ${kits})
     ${ParaView_BINARY_DIR}/VTK/${kit}
     )
 ENDFOREACH(kit)
-SET(VTKZLIB_INCLUDE_DIR
-  ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
-  ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
 SET(VTKEXPAT_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK/Utilities/expat
   ${ParaView_BINARY_DIR}/VTK/Utilities/expat)
+
+IF(VTK_USE_SYSTEM_ZLIB)
+  SET(VTK_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
+  SET(VTK_ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIR})
+  SET(VTKZLIB_INCLUDE_DIR ${ZLIB_INCLUDE_DIR})
+ELSE(VTK_USE_SYSTEM_ZLIB)
+  SET(VTK_ZLIB_LIBRARIES vtkzlib)
+  SET(VTK_ZLIB_INCLUDE_DIRS
+    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
+    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+  SET(VTKZLIB_INCLUDE_DIR
+    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
+    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 #########################################################################
 # Configure HDF5
@@ -136,18 +147,11 @@ IF(PARAVIEW_USE_SYSTEM_HDF5)
 
   INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindHDF5.cmake)
   INCLUDE(${ParaView_SOURCE_DIR}/CMake/FindZLIB.cmake)
-  SET(VTK_USE_SYSTEM_ZLIB 1)
   SET(PARAVIEW_HDF5_LIBRARIES ${HDF5_LIBRARIES})
-  SET(VTK_ZLIB_LIBRARIES ${ZLIB_LIBRARIES})
-  SET(VTK_ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDE_DIR})
 
 ELSE(PARAVIEW_USE_SYSTEM_HDF5)
 
   SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
-  SET(VTK_ZLIB_LIBRARIES vtkzlib)
-  SET(VTK_ZLIB_INCLUDE_DIRS
-    ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
-    ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
   SET(HDF5_INCLUDE_DIR 
     ${ParaView_SOURCE_DIR}/Utilities/hdf5
     ${ParaView_BINARY_DIR}/Utilities/hdf5)
@@ -158,6 +162,7 @@ ENDIF(PARAVIEW_USE_SYSTEM_HDF5)
 
 #########################################################################
 # Configure Xdmf
+SET(XDMF_NOT_INSTALL_INCLUDE_FILES ON)
 SET(XDMF_REGENERATE_YACCLEX OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_REGENERATE_WRAPPERS OFF CACHE INTERNAL "" FORCE)
 SET(XDMF_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
@@ -195,6 +200,9 @@ IF(NOT VTK_USE_ANSI_STDLIB)
   SET(KWSYS_FORCE_OLD_STREAMS 1)
 ENDIF(NOT VTK_USE_ANSI_STDLIB)
 SET(KWSYS_INCLUDE_DIR ${ParaView_BINARY_DIR}/Utilities/KWSys)
+IF(BUILD_SHARED_LIBS)
+  SET(KWSYS_LIBRARY_INSTALL_DIR "/lib")
+ENDIF(BUILD_SHARED_LIBS)
 SUBDIRS(Utilities/KWSys)
 
 #########################################################################
@@ -206,6 +214,7 @@ SUBDIRS(Common)
 
 #########################################################################
 # Configure VTKClientServer wrapping
+SET(KW_INSTALL_LIB_DIR "/lib")
 SET(VTKCLIENTSERVER_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Utilities/VTKClientServer
   ${ParaView_BINARY_DIR}/Utilities/VTKClientServer
