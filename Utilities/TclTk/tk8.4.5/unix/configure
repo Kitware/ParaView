@@ -5124,6 +5124,19 @@ fi
 		esac
 		LDFLAGS="-n32"
 	    fi
+	    # Check to enable 64-bit flags for compiler/linker
+
+	    if test "$do64bit" = "yes" ; then
+	        if test "$GCC" = "yes" ; then
+	            { echo "$as_me:$LINENO: WARNING: 64bit mode not supported by gcc" >&5
+echo "$as_me: WARNING: 64bit mode not supported by gcc" >&2;}
+	        else
+	            do64bit_ok=yes
+	            SHLIB_LD="ld -64 -shared -rdata_shared"
+	            EXTRA_CFLAGS="-64"
+	            LDFLAGS="-64"
+	        fi
+	    fi
 	    ;;
 	IRIX64-6.*)
 	    SHLIB_CFLAGS=""

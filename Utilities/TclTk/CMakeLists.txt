@@ -12,6 +12,11 @@ IF(UNIX)
     ENDIF(EXISTS ${tcltkdir})
   ENDFOREACH(tcltkdir)
 
+  SET(TCLTK_64BIT)
+  IF("${CMAKE_C_FLAGS}" MATCHES "-64")
+    SET(TCLTK_64BIT 1)
+  ENDIF("${CMAKE_C_FLAGS}" MATCHES "-64")
+
   SET(TCLTK_DEBUG_EXT "")
   IF(CMAKE_BUILD_TYPE MATCHES Debug)
     SET(TCLTK_BUILD_DEBUG 1)
@@ -58,8 +63,11 @@ ELSE(UNIX)
     "Path to tcl include" FORCE)
   SET(TK_INCLUDE_PATH ${PV_TCL_DIR}/include CACHE INTERNAL
     "Path to tk include" FORCE)
+
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
   # directory so no paths are needed to run this.
+  # This includes the Tcl/Tk dll, and eventually some support dll
+
   IF (CMAKE_CONFIGURATION_TYPES)
     SET (CONFIG_TYPES ${CMAKE_CONFIGURATION_TYPES})
   ELSE (CMAKE_CONFIGURATION_TYPES)
@@ -74,6 +82,7 @@ ELSE(UNIX)
       ${ParaView_BINARY_DIR}/bin/${config}/tk84.dll
       COPYONLY)
   ENDFOREACH (config)
+
 ENDIF(UNIX)
 
 SET(TCL_TK_COPY_SUPPORT_LIBRARY 1)
@@ -131,6 +140,7 @@ MACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR tcl_support_lib_dir tk_su
   ENDIF (TCL_TK_MAJOR_VERSION AND TCL_TK_MINOR_VERSION)
 
 ENDMACRO (PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR)
+
 PARAVIEW_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR(
   "${TCL_SUPPORT_LIBRARY_PATH}"
   "${TK_SUPPORT_LIBRARY_PATH}"

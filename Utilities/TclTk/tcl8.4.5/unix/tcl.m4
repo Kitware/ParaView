@@ -1084,6 +1084,16 @@ dnl AC_CHECK_TOOL(AR, ar)
 		esac
 		LDFLAGS="-n32"
 	    fi
+	    if test "$do64bit" = "yes" ; then
+	        if test "$GCC" = "yes" ; then
+	            AC_MSG_WARN([64bit mode not supported by gcc])
+	        else
+	            do64bit_ok=yes
+	            SHLIB_LD="ld -64 -shared -rdata_shared"
+	            EXTRA_CFLAGS="-64"
+	            LDFLAGS="-64"
+	        fi
+	    fi
 	    ;;
 	IRIX64-6.*)
 	    SHLIB_CFLAGS=""
