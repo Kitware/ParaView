@@ -110,6 +110,7 @@ vtkPVWindow::vtkPVWindow()
 vtkPVWindow::~vtkPVWindow()
 {
   this->PrepareForDelete();
+
   this->Sources->Delete();
   this->Sources = NULL;
 }
@@ -127,11 +128,6 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->InteractorToolbar->Delete();
     this->InteractorToolbar = NULL;
-    }
-  if (this->Toolbar)
-    {
-    this->Toolbar->Delete();
-    this->Toolbar = NULL;
     }
 
   if (this->FlyInteractor)
@@ -176,6 +172,12 @@ void vtkPVWindow::PrepareForDelete()
     this->GlyphButton = NULL;
     }
   
+  if (this->Toolbar)
+    {
+    this->Toolbar->Delete();
+    this->Toolbar = NULL;
+    }
+
   if (this->ApplicationAreaFrame)
     {
     this->ApplicationAreaFrame->Delete();
@@ -192,12 +194,6 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->MainView->Delete();
     this->MainView = NULL;
-    }
-  
-  if (this->SourceInterfaces)
-    {
-    this->SourceInterfaces->Delete();
-    this->SourceInterfaces = NULL;
     }
   
   if (this->SourceMenu)
@@ -844,7 +840,8 @@ void vtkPVWindow::CalculatorCallback()
 			 pvd->GetVTKDataTclName());
   
   calc->Delete();
-
+  pvd->Delete();
+  
   ++instanceCount;
 }
 
@@ -908,7 +905,8 @@ void vtkPVWindow::ThresholdCallback()
 			 pvd->GetVTKDataTclName());
   
   threshold->Delete();
-
+  pvd->Delete();
+  
   ++instanceCount;
 }
 
@@ -972,7 +970,8 @@ void vtkPVWindow::ContourCallback()
 			 pvd->GetVTKDataTclName());
   
   contour->Delete();
-
+  pvd->Delete();
+  
   ++instanceCount;
 }
 
@@ -1036,7 +1035,8 @@ void vtkPVWindow::GlyphCallback()
 			 pvd->GetVTKDataTclName());
   
   glyph->Delete();
-
+  pvd->Delete();
+  
   ++instanceCount;
 }
 

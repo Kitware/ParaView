@@ -222,9 +222,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->Properties->Delete();
-  this->Properties = NULL;
-  
   this->SetName(NULL);
   
   this->NumCellsLabel->Delete();
@@ -294,9 +291,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->SetActorTclName(NULL);
   this->Actor = NULL;
 
-  pvApp->BroadcastScript("%s Delete", this->LODDeciTclName);
-  this->SetLODDeciTclName(NULL);
-  
   if (this->OutputPortTclName)
     {
     pvApp->BroadcastScript("%s Delete", this->OutputPortTclName);
@@ -349,6 +343,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
+
+  this->Properties->Delete();
+  this->Properties = NULL;
 }
 
 
@@ -619,7 +616,7 @@ void vtkPVActorComposite::UpdateProperties()
         } 
       }
     }
-  // If the current array we are colloring by has disappeared,
+  // If the current array we are coloring by has disappeared,
   // then default back to the property.
   if ( ! currentColorByFound)
     {

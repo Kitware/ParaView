@@ -93,14 +93,16 @@ public:
   int GetNumberOfPoints();
 
   // Description:
-  // We are keeping the forward links.  I have not 
-  // considered deleting objects properly.
-  // These methods are used internally. They are not meant to be called
-  // by the user.
-  void AddPVSourceToUsers(vtkPVSource *s);
-  void RemovePVSourceFromUsers(vtkPVSource *s);
-  vtkPVSourceCollection *GetPVSourceUsers() {return this->PVSourceCollection;}
-
+  // Get the number of consumers
+  vtkGetMacro(NumberOfPVConsumers, int);
+  
+  // Description:
+  // Add, remove, get, or check a consumer.
+  void AddPVConsumer(vtkPVSource *c);
+  void RemovePVConsumer(vtkPVSource *c);
+  vtkPVSource *GetPVConsumer(int i);
+  int IsPVConsumer(vtkPVSource *c);
+  
   // Description:
   // This methiod updates the piece that has been assinged to this process.
   void Update();
@@ -119,9 +121,8 @@ protected:
   vtkPVSource *PVSource;
 
   // Keep a list of sources that are using this data.
-  // We may want to have a list that does not reference
-  // count the sources.
-  vtkPVSourceCollection *PVSourceCollection;
+  vtkPVSource **PVConsumers;
+  int NumberOfPVConsumers;
 };
 
 #endif

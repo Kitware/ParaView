@@ -48,7 +48,8 @@ vtkPVData::vtkPVData()
   this->VTKDataTclName = NULL;
   this->PVSource = NULL;
   
-  this->PVSourceCollection = vtkPVSourceCollection::New();
+  this->NumberOfPVConsumers = 0;
+  this->PVConsumers = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -63,10 +64,8 @@ vtkPVData::~vtkPVData()
     
   this->SetVTKData(NULL, NULL);
   this->SetPVSource(NULL);
-
-  this->PVSourceCollection->Delete();
-  this->PVSourceCollection = NULL;  
   
+  delete [] this->PVConsumers;
 }
 
 //----------------------------------------------------------------------------
@@ -81,7 +80,6 @@ vtkPVData* vtkPVData::New()
   // If the factory was unable to create the object, then create it here.
   return new vtkPVData;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetApplication(vtkPVApplication *pvApp)
@@ -118,15 +116,79 @@ void vtkPVData::SetVTKData(vtkDataSet *data, const char *tclName)
     this->VTKData = data;
     
     // This is why we need a special method.  The actor comoposite can't set its input until
-    // the data tcl name is set.  These dependancies on the order things are set
+    // the data tcl name is set.  These dependencies on the order things are set
     // leads me to think there sould be one initialize method which sets all the variables.
     
     this->SetInput(this);
     }
 }
 
+void vtkPVData::AddPVConsumer(vtkPVSource *c)
+{
+  // make sure it isn't already there
+  if (this->IsPVConsumer(c))
+    {
+    return;
+    }
+  // add it to the list, reallocate memory
+  vtkPVSource **tmp = this->PVConsumers;
+  this->NumberOfPVConsumers++;
+  this->PVConsumers = new vtkPVSource* [this->NumberOfPVConsumers];
+  for (int i = 0; i < (this->NumberOfPVConsumers-1); i++)
+    {
+    this->PVConsumers[i] = tmp[i];
+    }
+  this->PVConsumers[this->NumberOfPVConsumers-1] = c;
+  // free old memory
+  delete [] tmp;
+}
 
+void vtkPVData::RemovePVConsumer(vtkPVSource *c)
+{
+  // make sure it is already there
+  if (!this->IsPVConsumer(c))
+    {
+    return;
+    }
+  // remove it from the list, reallocate memory
+  vtkPVSource **tmp = this->PVConsumers;
+  this->NumberOfPVConsumers--;
+  this->PVConsumers = new vtkPVSource* [this->NumberOfPVConsumers];
+  int cnt = 0;
+  int i;
+  for (i = 0; i <= this->NumberOfPVConsumers; i++)
+    {
+    if (tmp[i] != c)
+      {
+      this->PVConsumers[cnt] = tmp[i];
+      cnt++;
+      }
+    }
+  // free old memory
+  delete [] tmp;
+}
 
+int vtkPVData::IsPVConsumer(vtkPVSource *c)
+{
+  int i;
+  for (i = 0; i < this->NumberOfPVConsumers; i++)
+    {
+    if (this->PVConsumers[i] == c)
+      {
+      return 1;
+      }
+    }
+  return 0;
+}
+
+vtkPVSource *vtkPVData::GetPVConsumer(int i)
+{
+  if (i >= this->NumberOfPVConsumers)
+    {
+    return 0;
+    }
+  return this->PVConsumers[i];
+}
 
 //----------------------------------------------------------------------------
 // Data is expected to be updated.
@@ -246,20 +308,6 @@ void vtkPVData::SetPVSource(vtkPVSource *source)
   this->Modified();
 
   this->PVSource = source;
-}
-
-//----------------------------------------------------------------------------
-// Reference counting here should not be a problem.
-// (Unless we have a circular pipeline.)
-void vtkPVData::AddPVSourceToUsers(vtkPVSource *s)
-{
-  this->PVSourceCollection->AddItem(s);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::RemovePVSourceFromUsers(vtkPVSource *s)
-{
-  this->PVSourceCollection->RemoveItem(s);
 }
 
 //----------------------------------------------------------------------------

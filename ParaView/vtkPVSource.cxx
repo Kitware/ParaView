@@ -103,11 +103,8 @@ vtkPVSource::~vtkPVSource()
   
   for (i = 0; i < this->NumberOfPVOutputs; i++)
     {
-    if (this->PVOutputs[i])
-      {
-      this->PVOutputs[i]->UnRegister(this);
-      this->PVOutputs[i] = NULL;
-      }
+    this->PVOutputs[i]->UnRegister(this);
+    this->PVOutputs[i] = NULL;
     }
   
   if (this->PVOutputs)
@@ -118,22 +115,7 @@ vtkPVSource::~vtkPVSource()
   
   this->NumberOfPVOutputs = 0;
   
-  for (i = 0; i < this->NumberOfPVInputs; i++)
-    {
-    if (this->PVInputs[i])
-      {
-      this->PVInputs[i]->UnRegister(this);
-      this->PVInputs[i] = NULL;
-      }
-    }
-
-  if (this->PVInputs)
-    {
-    delete [] this->PVInputs;
-    this->PVInputs = 0;
-    }
-  
-  this->NumberOfPVInputs = 0;
+  this->RemoveAllPVInputs();
 
   this->SetVTKSource(NULL, NULL);
 
@@ -867,7 +849,7 @@ void vtkPVSource::DeleteCallback()
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
     {
     if (this->PVOutputs[i] && 
-	this->PVOutputs[i]->GetPVSourceUsers()->GetNumberOfItems() > 0)
+	this->PVOutputs[i]->GetNumberOfPVConsumers() > 0)
       { // Button should be deactivated.
       vtkErrorMacro("An output is used.  We cannot delete this source.");
       return;
@@ -879,7 +861,7 @@ void vtkPVSource::DeleteCallback()
     {
     if (this->PVInputs[i])
       {
-      this->PVInputs[i]->RemovePVSourceFromUsers(this);
+      this->PVInputs[i]->RemovePVConsumer(this);
       }
     }
     
@@ -985,7 +967,7 @@ void vtkPVSource::UpdateProperties()
   // Change the state of the delete button based on if there are any useres.
   // Only filters at the end of a pipeline can be deleted.
   if (this->GetPVOutput(0) &&
-      this->GetPVOutput(0)->GetPVSourceUsers()->GetNumberOfItems() > 0)
+      this->GetPVOutput(0)->GetNumberOfPVConsumers() > 0)
       {
       this->Script("%s configure -state disabled",
                    this->DeleteButton->GetWidgetName());
@@ -1094,7 +1076,7 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   
   if (this->PVInputs[idx])
     {
-    this->PVInputs[idx]->RemovePVSourceFromUsers(this);
+    this->PVInputs[idx]->RemovePVConsumer(this);
     this->PVInputs[idx]->UnRegister(this);
     this->PVInputs[idx] = NULL;
     }
@@ -1102,7 +1084,7 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   if (pvd)
     {
     pvd->Register(this);
-    pvd->AddPVSourceToUsers(this);
+    pvd->AddPVConsumer(this);
     this->PVInputs[idx] = pvd;
     }
 

@@ -350,7 +350,7 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
   int numInputs, xMid, yMid, y, i;
   char *result, *tmp;
   int bbox[4], bboxOut[4];
-  vtkPVSourceCollection *outs, *moreOuts;
+//  vtkPVSourceCollection *outs, *moreOuts;
   vtkPVData *moreOut;
   static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
   
@@ -453,80 +453,70 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
   xMid = (int)(0.5 * (bbox[2] + 245));
 
   // Put the outputs in the canvas.
-  outs = NULL;
   outputs = currentSource->GetPVOutputs();
   if (outputs)
     {
     y = 10;
-    //  for (i = 0; i < this->NumberOfPVOutputs; i++)
     if (outputs[0])
       {
-      outs = outputs[0]->GetPVSourceUsers();
-
-      if (outs)
+      for (i = 0; i < outputs[0]->GetNumberOfPVConsumers(); i++)
 	{
-	outs->InitTraversal();
-	while ( (source = outs->GetNextPVSource()) )
-	  {
-	  // Draw the name of the assembly.
-	  this->Script(
-	    "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-	    this->NavigationCanvas->GetWidgetName(), 250, y,
-	    source->GetName(), font);
-	  
-	  result = this->Application->GetMainInterp()->result;
-	  tmp = new char[strlen(result)+1];
-	  strcpy(tmp, result);
-	  this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
-		       this->NavigationCanvas->GetWidgetName(), tmp,
-		       currentSource->GetTclName(), source->GetTclName());
-	  // Get the bounding box for the name. We may need to highlight it.
-	  this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(),
-                        tmp);
-	  delete [] tmp;
-	  tmp = NULL;
-	  result = this->Application->GetMainInterp()->result;
-	  sscanf(result, "%d %d %d %d", bboxOut, bboxOut+1, bboxOut+2,
-                 bboxOut+3);
-	  
-	  // Draw to output.
-	  if (y == 10)
-	    { // first is a special case (single line).
-	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-			 this->NavigationCanvas->GetWidgetName(), bbox[2],
-                         yMid, 245, yMid);
-	    }
-	  else
-	    {
-	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-			 this->NavigationCanvas->GetWidgetName(), xMid, yMid,
-                         xMid, yMid+15);
-	    yMid += 15;
-	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-			 this->NavigationCanvas->GetWidgetName(), xMid, yMid,
-			 245, yMid);
-	    }
-	  if (moreOut = source->GetPVOutput(0))
-	    {
-	    if (moreOuts = moreOut->GetPVSourceUsers())
-	      {
-	      moreOuts->InitTraversal();
-	      if (moreOuts->GetNextPVSource())
-		{
-		this->Script("%s create line %d %d %d %d",
-			     this->NavigationCanvas->GetWidgetName(),
-			     bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
-		this->Script("%s create line %d %d %d %d",
-			     this->NavigationCanvas->GetWidgetName(),
-			     bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
-		this->Script("%s create line %d %d %d %d",
-			     this->NavigationCanvas->GetWidgetName(),
-			     bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
-		}
-	      }
-	    }
-	  y += 15;
-	  }
+        source = outputs[0]->GetPVConsumer(i);
+        
+        // Draw the name of the assembly.
+        this->Script(
+          "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
+          this->NavigationCanvas->GetWidgetName(), 250, y,
+          source->GetName(), font);
+        
+        result = this->Application->GetMainInterp()->result;
+        tmp = new char[strlen(result)+1];
+        strcpy(tmp, result);
+        this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
+                     this->NavigationCanvas->GetWidgetName(), tmp,
+                     currentSource->GetTclName(), source->GetTclName());
+        // Get the bounding box for the name. We may need to highlight it.
+        this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(),
+                      tmp);
+        delete [] tmp;
+        tmp = NULL;
+        result = this->Application->GetMainInterp()->result;
+        sscanf(result, "%d %d %d %d", bboxOut, bboxOut+1, bboxOut+2,
+               bboxOut+3);
+        
+        // Draw to output.
+        if (y == 10)
+          { // first is a special case (single line).
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+                       this->NavigationCanvas->GetWidgetName(), bbox[2],
+                       yMid, 245, yMid);
+          }
+        else
+          {
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
+                       this->NavigationCanvas->GetWidgetName(), xMid, yMid,
+                       xMid, yMid+15);
+          yMid += 15;
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+                       this->NavigationCanvas->GetWidgetName(), xMid, yMid,
+                       245, yMid);
+          }
+        if (moreOut = source->GetPVOutput(0))
+          {
+          if (moreOut->GetNumberOfPVConsumers() > 0)
+            {
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(),
+                         bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(),
+                         bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(),
+                         bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
+            }
+          }
+        y += 15;
 	}
       }
     }
