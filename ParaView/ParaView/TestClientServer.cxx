@@ -41,6 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "TestClientServer.h"
 
+#include "vtkSystemIncludes.h"
+
 #if defined(_WIN32) && !defined(__CYGWIN__)
 # include <windows.h>
 #else
@@ -49,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include <kwsys/Process.h>
-#include <kwsys/std/iostream>
 #include <kwsys/std/string>
 #include <kwsys/std/vector>
 
@@ -63,14 +64,14 @@ int main(int argc, char* argv[])
   kwsysProcess* server = kwsysProcess_New();
   if(!server)
     {
-    kwsys_std::cerr << "Cannot allocate kwsysProcess to run the server.\n";
+    cerr << "Cannot allocate kwsysProcess to run the server.\n";
     return 1;
     }
   kwsysProcess* client = kwsysProcess_New();
   if(!client)
     {
     kwsysProcess_Delete(server);
-    kwsys_std::cerr << "Cannot allocate kwsysProcess to run the client.\n";
+    cerr << "Cannot allocate kwsysProcess to run the client.\n";
     return 1;
     }
 
@@ -129,13 +130,13 @@ int main(int argc, char* argv[])
     clientPipe = kwsysProcess_WaitForData(client, &data, &length, &timeout);
     if(clientPipe == kwsysProcess_Pipe_STDOUT)
       {
-      kwsys_std::cout.write(data, length);
-      kwsys_std::cout.flush();
+      cout.write(data, length);
+      cout.flush();
       }
     else if(clientPipe == kwsysProcess_Pipe_STDERR)
       {
-      kwsys_std::cerr.write(data, length);
-      kwsys_std::cout.flush();
+      cerr.write(data, length);
+      cout.flush();
       }
 
     // Look for server output.
@@ -143,13 +144,13 @@ int main(int argc, char* argv[])
     serverPipe = kwsysProcess_WaitForData(client, &data, &length, &timeout);
     if(serverPipe == kwsysProcess_Pipe_STDOUT)
       {
-      kwsys_std::cout.write(data, length);
-      kwsys_std::cout.flush();
+      cout.write(data, length);
+      cout.flush();
       }
     else if(serverPipe == kwsysProcess_Pipe_STDERR)
       {
-      kwsys_std::cerr.write(data, length);
-      kwsys_std::cout.flush();
+      cerr.write(data, length);
+      cout.flush();
       }
     }
 
@@ -180,12 +181,12 @@ int main(int argc, char* argv[])
 //----------------------------------------------------------------------------
 void ReportCommand(const char* const* command, const char* name)
 {
-  kwsys_std::cout << "The " << name << " command is:\n";
+  cout << "The " << name << " command is:\n";
   for(const char* const * c = command; *c; ++c)
     {
-    kwsys_std::cout << " \"" << *c << "\"";
+    cout << " \"" << *c << "\"";
     }
-  kwsys_std::cout << "\n";
+  cout << "\n";
 }
 
 //----------------------------------------------------------------------------
@@ -196,64 +197,64 @@ int ReportStatus(kwsysProcess* process, const char* name)
     {
     case kwsysProcess_State_Starting:
       {
-      kwsys_std::cerr << "Never started " << name << " process.\n";
+      cerr << "Never started " << name << " process.\n";
       } break;
     case kwsysProcess_State_Error:
       {
-      kwsys_std::cerr << "Error executing " << name << " process: "
+      cerr << "Error executing " << name << " process: "
            << kwsysProcess_GetErrorString(process)
            << "\n";
       } break;
     case kwsysProcess_State_Exception:
       {
-      kwsys_std::cerr << "The " << name
+      cerr << "The " << name
                       << " process exited with an exception: ";
       switch(kwsysProcess_GetExitException(process))
         {
         case kwsysProcess_Exception_None:
           {
-          kwsys_std::cerr << "None";
+          cerr << "None";
           } break;
         case kwsysProcess_Exception_Fault:
           {
-          kwsys_std::cerr << "Segmentation fault";
+          cerr << "Segmentation fault";
           } break;
         case kwsysProcess_Exception_Illegal:
           {
-          kwsys_std::cerr << "Illegal instruction";
+          cerr << "Illegal instruction";
           } break;
         case kwsysProcess_Exception_Interrupt:
           {
-          kwsys_std::cerr << "Interrupted by user";
+          cerr << "Interrupted by user";
           } break;
         case kwsysProcess_Exception_Numerical:
           {
-          kwsys_std::cerr << "Numerical exception";
+          cerr << "Numerical exception";
           } break;
         case kwsysProcess_Exception_Other:
           {
-          kwsys_std::cerr << "Unknown";
+          cerr << "Unknown";
           } break;
         }
-      kwsys_std::cerr << "\n";
+      cerr << "\n";
       } break;
     case kwsysProcess_State_Executing:
       {
-      kwsys_std::cerr << "Never terminated " << name << " process.\n";
+      cerr << "Never terminated " << name << " process.\n";
       } break;
     case kwsysProcess_State_Exited:
       {
       result = kwsysProcess_GetExitValue(process);
-      kwsys_std::cout << "The " << name << " process exited with code "
+      cout << "The " << name << " process exited with code "
                       << result << "\n";
       } break;
     case kwsysProcess_State_Expired:
       {
-      kwsys_std::cerr << "Killed " << name << " process due to timeout.\n";
+      cerr << "Killed " << name << " process due to timeout.\n";
       } break;
     case kwsysProcess_State_Killed:
       {
-      kwsys_std::cerr << "Killed " << name << " process.\n";
+      cerr << "Killed " << name << " process.\n";
       } break;
     }
   return result;
