@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWidget.h"
 #include "vtkCommand.h"
+#include "vtkKWText.h"
 
 #include "vtkString.h"
 
@@ -93,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.8");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -110,6 +111,8 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->StartTimeEntry = vtkKWLabeledEntry::New();
   this->EndTimeEntry = vtkKWLabeledEntry::New();
   this->TimeRange = vtkKWRange::New();
+  this->ScriptEditor = vtkKWText::New();
+  this->DummyFrame = vtkKWFrame::New();
 
   this->PVSource = 0;
   this->Script = 0;
@@ -126,6 +129,8 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
 
   this->SaveStateScript = 0;
   this->SaveStateObject = 0;
+
+  this->TimeScriptEntryFrame = vtkKWFrame::New();
 
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
@@ -202,13 +207,23 @@ void vtkPVAnimationInterfaceEntry::SetCurrentIndex(int idx)
 void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 {
   this->SourceMethodFrame->Create(pvApp, 0);
-  this->SourceLabel->SetParent(this->SourceMethodFrame->GetFrame());
-  this->SourceMenuButton->SetParent(this->SourceMethodFrame->GetFrame());
-  this->MethodLabel->SetParent(this->SourceMethodFrame->GetFrame());
-  this->MethodMenuButton->SetParent(this->SourceMethodFrame->GetFrame());
-  this->StartTimeEntry->SetParent(this->SourceMethodFrame->GetFrame());
-  this->EndTimeEntry->SetParent(this->SourceMethodFrame->GetFrame());
-  this->TimeRange->SetParent(this->SourceMethodFrame->GetFrame());
+  vtkKWFrame* frame = vtkKWFrame::New();
+  frame->SetParent(this->SourceMethodFrame->GetFrame());
+  frame->Create(pvApp, 0);
+
+  this->SourceLabel->SetParent(frame->GetFrame());
+  this->SourceMenuButton->SetParent(frame->GetFrame());
+  this->MethodLabel->SetParent(frame->GetFrame());
+  this->MethodMenuButton->SetParent(frame->GetFrame());
+
+  this->TimeScriptEntryFrame->SetParent(this->SourceMethodFrame->GetFrame());
+  this->TimeScriptEntryFrame->Create(pvApp, 0);
+
+  this->StartTimeEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->EndTimeEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->TimeRange->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->ScriptEditor->SetParent(this->TimeScriptEntryFrame->GetFrame());
+  this->DummyFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
 
   this->SourceMenuButton->GetMenu()->SetTearOff(0);
   this->MethodMenuButton->GetMenu()->SetTearOff(0);
@@ -219,9 +234,12 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->SourceMenuButton->Create(pvApp, 0);
   this->MethodLabel->Create(pvApp, 0);
   this->MethodMenuButton->Create(pvApp, 0);
+
   this->StartTimeEntry->Create(pvApp, 0);
   this->EndTimeEntry->Create(pvApp, 0);
   this->TimeRange->Create(pvApp, 0);
+  this->ScriptEditor->Create(pvApp, "-height 5");
+  this->DummyFrame->Create(pvApp, "-height 1");
 
   this->StartTimeEntry->SetLabel("Start value");
   this->EndTimeEntry->SetLabel("End value");
@@ -248,23 +266,24 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
     this->SourceMenuButton->SetButtonText("None");
     }
 
-
   this->SourceLabel->SetLabel("Source");
   this->MethodLabel->SetLabel("Method");
   pvApp->Script("grid %s %s -sticky news -pady 2 -padx 2", 
     this->SourceLabel->GetWidgetName(), this->SourceMenuButton->GetWidgetName());
   pvApp->Script("grid %s %s -sticky news -pady 2 -padx 2", 
     this->MethodLabel->GetWidgetName(), this->MethodMenuButton->GetWidgetName());
-  pvApp->Script("grid %s - -sticky news -pady 2 -padx 2", 
-    this->StartTimeEntry->GetWidgetName());
-  pvApp->Script("grid %s - -sticky news -pady 2 -padx 2", 
-    this->EndTimeEntry->GetWidgetName());
+
   /*
   pvApp->Script("grid %s - - - -sticky news -pady 2 -padx 2", 
   this->TimeRange->GetWidgetName());
   */
 
-  vtkKWWidget* w = this->SourceMethodFrame->GetFrame();
+  pvApp->Script("pack %s -fill x -expand 1", 
+    frame->GetWidgetName());
+  pvApp->Script("pack %s -fill x -expand 1", 
+    this->TimeScriptEntryFrame->GetWidgetName());
+
+  vtkKWWidget* w = frame->GetFrame();
   pvApp->Script(
     "grid columnconfigure %s 0 -weight 0\n"
     "grid columnconfigure %s 1 -weight 1\n",
@@ -272,13 +291,19 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
     w->GetWidgetName(),
     w->GetWidgetName(),
     w->GetWidgetName());
+  frame->Delete();
   this->UpdateStartEndValueToEntry();
   this->SetupBinds();
+
+  this->SwitchScriptTime(-1);
 }
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 {
+  this->ScriptEditor->Delete();
+  this->DummyFrame->Delete();
+  this->TimeScriptEntryFrame->Delete();
   this->SetPVSource(0);
   this->Observer->Delete();
   this->TimeRange->Delete();
@@ -296,6 +321,35 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 
   this->SetSaveStateObject(0);
   this->SetSaveStateScript(0);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
+{
+  cout << "SwitchScriptTime: " << i << endl;
+  vtkKWApplication* pvApp = this->StartTimeEntry->GetApplication();
+  pvApp->Script("pack forget %s %s %s %s",
+    this->DummyFrame->GetWidgetName(),
+    this->ScriptEditor->GetWidgetName(),
+    this->StartTimeEntry->GetWidgetName(),
+    this->EndTimeEntry->GetWidgetName());
+  if ( i > 0)
+    {
+    pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
+      this->StartTimeEntry->GetWidgetName());
+    pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
+      this->EndTimeEntry->GetWidgetName());
+    }
+  else if ( ! i )
+    {
+    pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
+      this->ScriptEditor->GetWidgetName());
+    }
+  else
+    {
+    pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
+      this->DummyFrame->GetWidgetName());
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -356,7 +410,20 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
   this->SetScript(0);
   this->UpdateMethodMenu();
   this->Parent->UpdateNewScript();
+  this->SwitchScriptTime(-1);
 }
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
+{
+  this->Dirty = 1;
+  this->SetCurrentMethod(0);
+  this->UpdateMethodMenu();
+  this->Parent->UpdateNewScript();
+  this->SwitchScriptTime(0);
+  this->GetMethodMenuButton()->SetButtonText("Script");
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
 {
@@ -389,6 +456,8 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
   char methodAndArgs[1024];
   sprintf(methodAndArgs, "NoMethodCallback");
   menu->AddCommand("None", this, methodAndArgs, 0,"");
+  sprintf(methodAndArgs, "ScriptMethodCallback");
+  menu->AddCommand("Script", this, methodAndArgs, 0,"");
 
   if ( samesource && this->GetCurrentMethod() )
     {
@@ -524,6 +593,8 @@ void vtkPVAnimationInterfaceEntry::RemoveBinds()
   this->StartTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
   this->EndTimeEntry->GetEntry()->UnsetBind("<FocusOut>");
   this->EndTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
+  this->ScriptEditor->UnsetBind("<FocusOut>");
+  this->ScriptEditor->UnsetBind("<KeyPress>");
 }
 
 //-----------------------------------------------------------------------------
@@ -537,6 +608,19 @@ void vtkPVAnimationInterfaceEntry::SetupBinds()
     "UpdateStartEndValueFromEntry");
   this->EndTimeEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
     "UpdateStartEndValueFromEntry"); 
+  this->ScriptEditor->SetBind(this, "<FocusOut>",
+    "ScriptEditorCallback");
+  this->ScriptEditor->SetBind(this, "<KeyPress>",
+    "ScriptEditorCallback");
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::ScriptEditorCallback()
+{
+  this->Dirty = 1;
+  this->SetScript(this->ScriptEditor->GetValue());
+  this->Parent->UpdateNewScript();
+  this->Parent->ShowEntryInFrame(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -590,6 +674,7 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
 void vtkPVAnimationInterfaceEntry::Update()
 {
   //cout << "Type is: " << this->TypeIsInt << endl;
+  this->SwitchScriptTime(1);
   this->Parent->UpdateNewScript();
   this->Parent->ShowEntryInFrame(this);
 }
@@ -611,6 +696,29 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
         }
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SetScript(const char* scr)
+{
+  cout << "SetScript: " << scr << endl;
+  if ( vtkString::Equals(scr, this->Script) )
+    {
+    return;
+    }
+  if ( this->Script )
+    {
+    delete [] this->Script;
+    this->Script = 0;
+    }
+  this->Script = vtkString::Duplicate(scr);
+
+  if ( !this->ScriptEditor->IsCreated() )
+    {
+    return;
+    }
+  cout << "SetScriptEditor: " << scr << endl;
+  this->ScriptEditor->SetValue(scr);
 }
 
 //-----------------------------------------------------------------------------

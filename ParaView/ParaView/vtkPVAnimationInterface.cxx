@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.75");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.76");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1530,7 +1530,7 @@ void vtkPVAnimationInterface::ShowEntryInFrame(
     this->DeleteItemButton->EnabledOff();
     return;
     }
-  this->Script("pack %s -side top -expand 1 -fill x -fill y", entry->GetWidgetName());
+  this->Script("pack %s -side top -expand 1 -fill both", entry->GetWidgetName());
   int idx = in_idx;
   if ( idx < 0 )
     {
