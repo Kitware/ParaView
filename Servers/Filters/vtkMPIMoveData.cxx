@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.5");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.6");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -77,6 +77,15 @@ vtkMPIMoveData::~vtkMPIMoveData()
   this->SetClientDataServerSocketController(0);
   this->SetMPIMToNSocketConnection(0);
   this->ClearBuffer();
+}
+
+//-----------------------------------------------------------------------------
+int vtkMPIMoveData::CreateOutput(vtkInformation* request,
+                                 vtkInformationVector** inputVector,
+                                 vtkInformationVector* outputVector)
+{
+  this->Superclass::CreateOutput(request, inputVector, outputVector);
+  return 1;
 }
 
 //-----------------------------------------------------------------------------

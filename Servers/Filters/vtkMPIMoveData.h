@@ -93,6 +93,12 @@ protected:
   vtkMPIMoveData();
   ~vtkMPIMoveData();
 
+  // This is called by the superclass.
+  // This is the method you should override.
+  virtual int CreateOutput(vtkInformation* request, 
+                           vtkInformationVector** inputVector, 
+                           vtkInformationVector* outputVector);
+
   vtkMultiProcessController* Controller;
   vtkSocketController* ClientDataServerSocketController;
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
