@@ -52,8 +52,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWWidget_h
 
 #include "vtkKWObject.h"
+
 class vtkKWWindow;
 class vtkKWWidgetCollection;
+
+//BTX
+template<class DataType> class vtkLinkedList;
+template<class DataType> class vtkLinkedListIterator;
+//ETX
 
 class VTK_EXPORT vtkKWWidget : public vtkKWObject
 {
@@ -159,14 +165,16 @@ public:
   vtkGetStringMacro(BalloonHelpString);
 
   // Description:
-  // Get the RGB description of a TCL color
-  void GetRGBColor(const char* color, int *r, int *g, int *b);
-  
-  // Description:
-  // Get the current background color of the widget (either as 0 -> 255 int, or
-  // normalized 0.0 -> 1.0 float).
+  // Convenience method to Set/Get the current background and foreground colors
+  // of the widget (either using 0 -> 255 int, or normalized 0.0 -> 1.0 float).
   void GetBackgroundColor(int *r, int *g, int *b);
+  void SetBackgroundColor(int r, int g, int b);
   void GetBackgroundColor(float *r, float *g, float *b);
+  void SetBackgroundColor(float r, float g, float b);
+  void GetForegroundColor(int *r, int *g, int *b);
+  void SetForegroundColor(int r, int g, int b);
+  void GetForegroundColor(float *r, float *g, float *b);
+  void SetForegroundColor(float r, float g, float b);
   
   // Description:
   // Query if widget has Tk configuration option, and get the option as int
@@ -174,16 +182,20 @@ public:
   int GetConfigurationOptionAsInt(const char* option);
   
   // Description:
-  // Query if widget is "alive"
+  // Query if widget is "alive" (i.e. is created and 'winfo exists')
   int IsAlive();
+  
+  // Description:
+  // Query if widget is mapped (on screen)
+  int IsMapped();
   
   // Description:
   // Query if widget is packed
   int IsPacked();
   int GetNumberOfPackedChildren();
-  
+
   // Description:
-  // Unpack widget, unpack siblings (slave's of parent widget)
+  // Unpack widget, unpack siblings (slave's of parent widget), unpack children
   void Unpack();
   void UnpackSiblings();
   void UnpackChildren();
@@ -214,6 +226,46 @@ public:
   // this method to work.  The parent also has to be able to be initialized.
   virtual int InitializeTrace();
 
+  // Description:
+  // Enable/disable Drag and Drop.
+  virtual void SetEnableDragAndDrop(int);
+  vtkBooleanMacro(EnableDragAndDrop, int);
+  vtkGetMacro(EnableDragAndDrop, int);
+
+  // Description:
+  // Add a Drag & Drop target. Set its callbacks/commands.
+  // You have to add a target before settings its commands.
+  // The StartCommand of all targets is called when Drag & Drop is initiated.
+  // The PerformCommand of all targets is called while Drag & Drop is performed.
+  // The EndCommand of all targets that contain the drop coordinates is called
+  // when Drag & Drop is ended
+  // Note that the each command is passed the absolute/screen (x,y) mouse 
+  // coordinates, the current widget and the DragAndDropAnchor (which are the
+  // same most of the times), i.e. the last 4 parameters are: int, int, 
+  // vtkKWWidget*, vtkKWWidget*). Additionally, EndCommand is passed a 5th 
+  // parameter, the target (vtkKWWidget *).
+  virtual int AddDragAndDropTarget(vtkKWWidget *target);
+  virtual int SetDragAndDropStartCommand(
+    vtkKWWidget *target, vtkKWObject *object, const char *method);
+  virtual int SetDragAndDropPerformCommand(
+    vtkKWWidget *target, vtkKWObject *object, const char *method);
+  virtual int SetDragAndDropEndCommand(
+    vtkKWWidget *target, vtkKWObject *object, const char *method);
+
+  // Description:
+  // Set/Get the Drag and Drop anchor. This is the actual widget (or part of)
+  // that the user drags and drops. It defaults to the current widget (this),
+  // but can be used to specify that a sub-part of the widget is the real
+  // anchor.
+  virtual void SetDragAndDropAnchor(vtkKWWidget*);
+  vtkGetObjectMacro(DragAndDropAnchor, vtkKWWidget);
+
+  // Description:
+  // Drag and Drop callbacks
+  virtual void DragAndDropStartCallback(int x, int y);
+  virtual void DragAndDropPerformCallback(int x, int y);
+  virtual void DragAndDropEndCallback(int x, int y);
+
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
@@ -224,9 +276,9 @@ protected:
   vtkKWWidgetCollection *Children; 
   int DeletingChildren;
 
-//BTX
+  //BTX
   friend class vtkKWFrame;
-//ETX
+  //ETX
   vtkSetStringMacro(WidgetName);
 
   // Ballon help
@@ -241,7 +293,44 @@ protected:
   char *TraceName;
   int Enabled;
 
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
   virtual void UpdateEnableState();
+
+  // Drag and Drop
+
+  //BTX
+
+  class DragAndDropTarget
+  {
+  public:
+    vtkKWWidget *Target;
+    char *StartCommand;
+    char *PerformCommand;
+    char *EndCommand;
+
+    void SetStartCommand(const char*);
+    void SetEndCommand(const char*);
+    void SetPerformCommand(const char*);
+
+    DragAndDropTarget();
+    ~DragAndDropTarget();
+  };
+
+  typedef vtkLinkedList<DragAndDropTarget*> DragAndDropTargetsContainer;
+  typedef vtkLinkedListIterator<DragAndDropTarget*> DragAndDropTargetsContainerIterator;
+  DragAndDropTargetsContainer *DragAndDropTargets;
+
+  DragAndDropTarget* GetDragAndDropTarget(vtkKWWidget *target);
+
+  //ETX
+
+  int EnableDragAndDrop;
+  vtkKWWidget *DragAndDropAnchor;
+
+  virtual void SetDragAndDropBindings();
+  virtual void RemoveDragAndDropBindings();
+  virtual void DeleteDragAndDropTargets();
 
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented

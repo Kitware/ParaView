@@ -45,12 +45,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
+#include "vtkLinkedList.txx"
+#include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.60");
+vtkCxxRevisionMacro(vtkKWWidget, "1.61");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -62,7 +64,9 @@ vtkKWWidget::vtkKWWidget()
   this->Parent                   = NULL;
   this->CommandFunction          = vtkKWWidgetCommand;
   this->Children                 = vtkKWWidgetCollection::New();
+
   // Make tracking memory leaks easier.
+
   this->Children->Register(this);
   this->Children->Delete();
   this->DeletingChildren         = 0;
@@ -72,11 +76,24 @@ vtkKWWidget::vtkKWWidget()
   this->Enabled                  = 1;
 
   this->TraceName = NULL;
+
+  // Drag and Drop
+
+  this->DragAndDropTargets = NULL;
+  this->EnableDragAndDrop = 0;
+  this->DragAndDropAnchor = this;
 }
 
 //------------------------------------------------------------------------------
 vtkKWWidget::~vtkKWWidget()
 {
+  this->DragAndDropAnchor = NULL;
+  if (this->DragAndDropTargets)
+    {
+    this->DeleteDragAndDropTargets();
+    this->DragAndDropTargets->Delete();
+    }
+
   if (this->BalloonHelpString)
     {
     this->SetBalloonHelpString(NULL);
@@ -329,7 +346,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.60 $");
+  this->ExtractRevision(os,"$Revision: 1.61 $");
 }
 
 //------------------------------------------------------------------------------
@@ -459,16 +476,6 @@ void vtkKWWidget::UpdateEnableState()
 }
 
 //------------------------------------------------------------------------------
-void vtkKWWidget::GetRGBColor(const char* color,
-                              int *rr, int *gg, int *bb)
-{
-  vtkKWTkUtilities::GetRGBColor(this->Application->GetMainInterp(),
-                                this->GetWidgetName(), 
-                                color, 
-                                rr, gg, bb);
-}
-
-//------------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
 {
   vtkKWTkUtilities::GetBackgroundColor(this->Application->GetMainInterp(),
@@ -477,15 +484,68 @@ void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
 }
 
 //------------------------------------------------------------------------------
+void vtkKWWidget::SetBackgroundColor(int r, int g, int b)
+{
+  char color[10];
+  sprintf(color, "#%02x%02x%02x", r, g, b);
+  this->Script("%s config -bg %s", this->GetWidgetName(), color);
+}
+
+//------------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(float *r, float *g, float *b)
 {
   int ir, ig, ib;
-  vtkKWTkUtilities::GetBackgroundColor(this->Application->GetMainInterp(),
-                                       this->GetWidgetName(), 
-                                       &ir, &ig, &ib);
+  this->GetBackgroundColor(&ir, &ig, &ib);
+
   *r = (float)ir / 255.0;
   *g = (float)ig / 255.0;
   *b = (float)ib / 255.0;
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWidget::SetBackgroundColor(float r, float g, float b)
+{
+  char color[10];
+  sprintf(color, "#%02x%02x%02x", 
+          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+  this->Script("%s config -bg %s", this->GetWidgetName(), color);
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWidget::GetForegroundColor(int *r, int *g, int *b)
+{
+  vtkKWTkUtilities::GetOptionColor(this->Application->GetMainInterp(),
+                                   this->GetWidgetName(), 
+                                   "-fg",
+                                   r, g, b);
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWidget::SetForegroundColor(int r, int g, int b)
+{
+  char color[10];
+  sprintf(color, "#%02x%02x%02x", r, g, b);
+  this->Script("%s config -fg %s", this->GetWidgetName(), color);
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWidget::GetForegroundColor(float *r, float *g, float *b)
+{
+  int ir, ig, ib;
+  this->GetForegroundColor(&ir, &ig, &ib);
+
+  *r = (float)ir / 255.0;
+  *g = (float)ig / 255.0;
+  *b = (float)ib / 255.0;
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWidget::SetForegroundColor(float r, float g, float b)
+{
+  char color[10];
+  sprintf(color, "#%02x%02x%02x", 
+          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
+  this->Script("%s config -fg %s", this->GetWidgetName(), color);
 }
 
 //------------------------------------------------------------------------------
@@ -517,6 +577,13 @@ int vtkKWWidget::IsAlive()
     }
 
   return atoi(this->Script("winfo exists %s", this->GetWidgetName()));
+}
+
+//------------------------------------------------------------------------------
+int vtkKWWidget::IsMapped()
+{
+  return this->IsAlive() && this->Application->EvaluateBooleanExpression(
+    "winfo ismapped %s", this->GetWidgetName());
 }
 
 //------------------------------------------------------------------------------
@@ -569,6 +636,459 @@ void vtkKWWidget::AddChild(vtkKWWidget *w)
   this->Children->AddItem(w);
 }
 
+// ---------------------------------------------------------------------------
+void vtkKWWidget::SetEnableDragAndDrop(int arg)
+{
+  if (this->EnableDragAndDrop == arg)
+    {
+    return;
+    }
+
+  this->EnableDragAndDrop = arg;
+  this->Modified();
+
+  if (arg)
+    {
+    this->SetDragAndDropBindings();
+    }
+  else
+    {
+    this->RemoveDragAndDropBindings();
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::SetDragAndDropAnchor(vtkKWWidget *arg)
+{
+  if (this->DragAndDropAnchor == arg)
+    {
+    return;
+    }
+
+  this->RemoveDragAndDropBindings();
+
+  this->DragAndDropAnchor = arg;
+  this->Modified();
+
+  this->SetDragAndDropBindings();
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::SetDragAndDropBindings()
+{
+  if (!this->DragAndDropAnchor || !this->DragAndDropAnchor->IsCreated())
+    {
+    return;
+    }
+  
+  this->Script("bind %s <Button-1> {+ %s DragAndDropStartCallback %%X %%Y}",
+               this->DragAndDropAnchor->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <B1-Motion> {+ %s DragAndDropPerformCallback %%X %%Y}",
+               this->DragAndDropAnchor->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <ButtonRelease-1> {+ %s DragAndDropEndCallback %%X %%Y}",
+               this->DragAndDropAnchor->GetWidgetName(), this->GetTclName());
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::RemoveDragAndDropBindings()
+{
+  if (!this->DragAndDropAnchor || !this->DragAndDropAnchor->IsCreated())
+    {
+    return;
+    }
+
+  this->Script("bind %s <Button-1> {}",
+               this->DragAndDropAnchor->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <B1-Motion> {}",
+               this->DragAndDropAnchor->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <ButtonRelease-1> {}",
+               this->DragAndDropAnchor->GetWidgetName(), this->GetTclName());
+}
+
+// ---------------------------------------------------------------------------
+vtkKWWidget::DragAndDropTarget::DragAndDropTarget()
+{
+  this->Target = 0;
+  this->StartCommand = 0;
+  this->PerformCommand = 0;
+  this->EndCommand = 0;
+}
+
+// ---------------------------------------------------------------------------
+vtkKWWidget::DragAndDropTarget::~DragAndDropTarget()
+{
+  this->Target = 0;
+  this->SetStartCommand(0);
+  this->SetPerformCommand(0);
+  this->SetEndCommand(0);
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::DragAndDropTarget::SetStartCommand(const char *arg)
+{
+  if ((this->StartCommand == NULL && arg == NULL) ||
+      (this->StartCommand && arg && (!strcmp(this->StartCommand,arg))))
+    { 
+    return;
+    }
+
+  if (this->StartCommand) 
+    { 
+    delete [] this->StartCommand; 
+    }
+
+  if (arg)
+    {
+    this->StartCommand = new char[strlen(arg) + 1];
+    strcpy(this->StartCommand, arg);
+    }
+   else
+    {
+    this->StartCommand = NULL;
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::DragAndDropTarget::SetPerformCommand(const char *arg)
+{
+  if ((this->PerformCommand == NULL && arg == NULL) ||
+      (this->PerformCommand && arg && (!strcmp(this->PerformCommand,arg))))
+    { 
+    return;
+    }
+
+  if (this->PerformCommand) 
+    { 
+    delete [] this->PerformCommand; 
+    }
+
+  if (arg)
+    {
+    this->PerformCommand = new char[strlen(arg) + 1];
+    strcpy(this->PerformCommand, arg);
+    }
+   else
+    {
+    this->PerformCommand = NULL;
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::DragAndDropTarget::SetEndCommand(const char *arg)
+{
+  if ((this->EndCommand == NULL && arg == NULL) ||
+      (this->EndCommand && arg && (!strcmp(this->EndCommand,arg))))
+    { 
+    return;
+    }
+
+  if (this->EndCommand) 
+    { 
+    delete [] this->EndCommand; 
+    }
+
+  if (arg)
+    {
+    this->EndCommand = new char[strlen(arg) + 1];
+    strcpy(this->EndCommand, arg);
+    }
+   else
+    {
+    this->EndCommand = NULL;
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::DeleteDragAndDropTargets()
+{
+  if (!this->DragAndDropTargets)
+    {
+    return;
+    }
+
+  vtkKWWidget::DragAndDropTarget *target = NULL;
+  vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
+    this->DragAndDropTargets->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(target) == VTK_OK)
+      {
+      delete target;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+}
+
+// ---------------------------------------------------------------------------
+vtkKWWidget::DragAndDropTarget*
+vtkKWWidget::GetDragAndDropTarget(vtkKWWidget *widget)
+{
+  if (!this->DragAndDropTargets)
+    {
+    return NULL;
+    }
+
+  vtkKWWidget::DragAndDropTarget *target = NULL;
+  vtkKWWidget::DragAndDropTarget *found = NULL;
+  vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
+    this->DragAndDropTargets->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(target) == VTK_OK && target->Target == widget)
+      {
+      found = target;
+      break;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found;
+}
+
+// ---------------------------------------------------------------------------
+int vtkKWWidget::AddDragAndDropTarget(vtkKWWidget *widget)
+{
+  vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(widget);
+  if (found)
+    {
+    vtkErrorMacro("The Drag & Drop target already exists.");
+    return 0;
+    }
+
+  if (!this->DragAndDropTargets)
+    {
+    this->DragAndDropTargets = vtkKWWidget::DragAndDropTargetsContainer::New();
+    }
+
+  vtkKWWidget::DragAndDropTarget *target = new vtkKWWidget::DragAndDropTarget;
+  if (this->DragAndDropTargets->AppendItem(target) != VTK_OK)
+    {
+    vtkErrorMacro("Error while adding a Drag & Drop target to the widget.");
+    delete target;
+    return 0;
+    }
+
+  target->Target = widget;
+
+  return 1;
+}
+
+// ---------------------------------------------------------------------------
+int vtkKWWidget::SetDragAndDropStartCommand(vtkKWWidget *target, 
+                                            vtkKWObject *object, 
+                                            const char *method)
+{
+  if (!target || !object || !method || !method[0])
+    {
+    return 0;
+    }
+
+  vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(target);
+  if (!found)
+    {
+    return 0;
+    }
+
+  ostrstream command;
+  command << object->GetTclName() << " " << method << ends;
+  found->SetStartCommand(command.str());
+  command.rdbuf()->freeze(0);
+
+  return 1;
+}
+
+// ---------------------------------------------------------------------------
+int vtkKWWidget::SetDragAndDropPerformCommand(vtkKWWidget *target, 
+                                              vtkKWObject *object, 
+                                              const char *method)
+{
+  if (!target || !object || !method || !method[0])
+    {
+    return 0;
+    }
+
+  vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(target);
+  if (!found)
+    {
+    return 0;
+    }
+
+  ostrstream command;
+  command << object->GetTclName() << " " << method << ends;
+  found->SetPerformCommand(command.str());
+  command.rdbuf()->freeze(0);
+
+  return 1;
+}
+
+// ---------------------------------------------------------------------------
+int vtkKWWidget::SetDragAndDropEndCommand(vtkKWWidget *target, 
+                                          vtkKWObject *object, 
+                                          const char *method)
+{
+  if (!target || !object || !method || !method[0])
+    {
+    return 0;
+    }
+
+  vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(target);
+  if (!found)
+    {
+    return 0;
+    }
+
+  ostrstream command;
+  command << object->GetTclName() << " " << method << ends;
+  found->SetEndCommand(command.str());
+  command.rdbuf()->freeze(0);
+
+  return 1;
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::DragAndDropStartCallback(int x, int y)
+{
+  if (!this->EnableDragAndDrop)
+    {
+    return;
+    }
+
+  // Set the cursor and invert foreground/background to better show what
+  // is dragged
+
+  if (this->DragAndDropAnchor && this->DragAndDropAnchor->IsCreated())
+    {
+    this->Script("[winfo toplevel %s] config -cursor hand2", 
+                 this->DragAndDropAnchor->GetWidgetName());
+
+    if (this->DragAndDropAnchor->HasConfigurationOption("-fg") &&
+        this->DragAndDropAnchor->HasConfigurationOption("-bg"))
+      {
+      int fr, fg, fb, br, bg, bb;
+      this->DragAndDropAnchor->GetForegroundColor(&fr, &fg, &fb);
+      this->DragAndDropAnchor->GetBackgroundColor(&br, &bg, &bb);
+      this->DragAndDropAnchor->SetForegroundColor(br, bg, bb);
+      this->DragAndDropAnchor->SetBackgroundColor(fr, fg, fb);
+      }
+    }
+
+  // Call each target's StartCommand
+
+  if (this->DragAndDropTargets)
+    {
+    vtkKWWidget::DragAndDropTarget *target = NULL;
+    vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
+      this->DragAndDropTargets->NewIterator();
+
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      if (it->GetData(target) == VTK_OK && target->StartCommand)
+        {
+        this->Script("eval %s %d %d %s %s", 
+                     target->StartCommand, x, y, 
+                     this->GetTclName(), this->DragAndDropAnchor->GetTclName());
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::DragAndDropPerformCallback(int x, int y)
+{
+  if (!this->EnableDragAndDrop)
+    {
+    return;
+    }
+
+  // Call each target's PerformCommand
+
+  if (this->DragAndDropTargets)
+    {
+    vtkKWWidget::DragAndDropTarget *target = NULL;
+    vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
+      this->DragAndDropTargets->NewIterator();
+
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      if (it->GetData(target) == VTK_OK && target->PerformCommand)
+        {
+        this->Script("eval %s %d %d %s %s", 
+                     target->PerformCommand, x, y, 
+                     this->GetTclName(), this->DragAndDropAnchor->GetTclName());
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWWidget::DragAndDropEndCallback(int x, int y)
+{
+  if (!this->EnableDragAndDrop)
+    {
+    return;
+    }
+
+  // Reset the cursor and the background/foreground colors
+
+  if (this->DragAndDropAnchor && this->DragAndDropAnchor->IsCreated())
+    {
+    this->Script("[winfo toplevel %s] config -cursor {}", 
+                 this->DragAndDropAnchor->GetWidgetName());
+
+    if (this->DragAndDropAnchor->HasConfigurationOption("-fg") &&
+        this->DragAndDropAnchor->HasConfigurationOption("-bg"))
+      {
+      int fr, fg, fb, br, bg, bb;
+      this->DragAndDropAnchor->GetForegroundColor(&fr, &fg, &fb);
+      this->DragAndDropAnchor->GetBackgroundColor(&br, &bg, &bb);
+      this->DragAndDropAnchor->SetForegroundColor(br, bg, bb);
+      this->DragAndDropAnchor->SetBackgroundColor(fr, fg, fb);
+      }
+    }
+
+  // Find if the cursor is in a target, and call its EndCommand
+
+  if (this->DragAndDropTargets)
+    {
+    vtkKWWidget::DragAndDropTarget *target = NULL;
+    vtkKWWidget::DragAndDropTargetsContainerIterator *it = 
+      this->DragAndDropTargets->NewIterator();
+
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      if (it->GetData(target) == VTK_OK && target->EndCommand && 
+          target->Target && 
+          target->Target->IsCreated() &&
+          vtkKWTkUtilities::ContainsCoordinates(
+            target->Target->GetApplication()->GetMainInterp(),
+            target->Target->GetWidgetName(),
+            x, y))
+        {
+          
+        this->Script("eval %s %d %d %s %s %s", 
+                     target->EndCommand, x, y, 
+                     this->GetTclName(), this->DragAndDropAnchor->GetTclName(),
+                     target->Target->GetTclName());
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
+}
+
 //----------------------------------------------------------------------------
 void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
@@ -582,4 +1102,7 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TraceName: " << (this->TraceName?this->TraceName:"none") 
      << endl;
   os << indent << "Enabled: " << (this->Enabled ? "on" : "off") << endl;
+  os << indent << "EnableDragAndDrop: " 
+     << (this->EnableDragAndDrop ? "On" : "Off") << endl;
+  os << indent << "DragAndDropAnchor: " << this->DragAndDropAnchor << endl;
 }
