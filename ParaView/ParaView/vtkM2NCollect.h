@@ -21,6 +21,7 @@
 #define __vtkM2NCollect_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
+class vtkMPIMToNSocketConnection;
 
 
 class VTK_EXPORT vtkM2NCollect : public vtkPolyDataToPolyDataFilter
@@ -43,7 +44,17 @@ protected:
   int ShuffleSizes(int size);
   void Shuffle(int inSize, char* inBuf, int outSize, char* outBuf);
 
+  vtkSetMacro(ServerMode, int);
+  vtkGetMacro(ServerMode, int);
+  vtkSetMacro(RenderServerMode, int);
+  vtkGetMacro(RenderServerMode, int);
+  vtkSetMacro(ClientMode, int);
+  vtkGetMacro(ClientMode, int);
 private:
+  vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
+  int ServerMode;
+  int RenderServerMode;
+  int ClientMode;
   vtkM2NCollect(const vtkM2NCollect&); // Not implemented
   void operator=(const vtkM2NCollect&); // Not implemented
 };

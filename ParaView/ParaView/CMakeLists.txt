@@ -18,6 +18,7 @@ SET( ParaViewServer_SRCS
   vtkCompleteArrays.cxx
   vtkExtractCTHPart.cxx
   vtkMPIMToNSocketConnection.cxx
+  vtkM2NCollect.cxx
   vtkMultiDisplayManager.cxx
   vtkPVDReader.cxx
   vtkPVServerArraySelection.cxx

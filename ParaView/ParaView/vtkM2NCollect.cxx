@@ -41,6 +41,9 @@ vtkM2NCollect::vtkM2NCollect()
 {
   // Client has no inputs.
   this->NumberOfRequiredInputs = 0;
+  this->ServerMode =0;
+  this->RenderServerMode =0;
+  this->ClientMode = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -155,12 +158,36 @@ void vtkM2NCollect::Execute()
 //-----------------------------------------------------------------------------
 int vtkM2NCollect::ShuffleSizes(int size)
 {
+ //  if(server)
+//     {
+//     rsSocket->Send(size);
+//     return 0;
+//     }
+//   if(renderServer)
+//     {
+//     rsSocket->Receive(val);
+//     return val;
+//     }
+//   return 0;
+//   // if I am a server process size will have a non-zero value
+//   // need to send that to the render server process if there is one
+//   // render server process returns the one it gets from the receive
   return 0;
 }
 
 //-----------------------------------------------------------------------------
 void vtkM2NCollect::Shuffle(int inSize, char* inBuf, int outSize, char* outBuf)
 {
+//   if(server)
+//     {
+//     rsSocket->Send(inBuf, inSize);
+//     return;
+//     }
+//   if(renderServer)
+//     {
+//     rsSocket->Receive(outSize, outBuf);
+//     return;
+//     }
 }
 
 //-----------------------------------------------------------------------------
