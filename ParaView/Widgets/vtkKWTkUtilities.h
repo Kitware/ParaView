@@ -88,6 +88,13 @@ public:
                          const char *photo_name,
                          vtkImageData *image, 
                          const char *blend_with_name = 0);
+
+  static int GetPhotoHeight(Tcl_Interp *interp,
+                            const char *photo_name);
+
+  static int GetPhotoWidth(Tcl_Interp *interp,
+                           const char *photo_name);
+
   //ETX
 
 protected:
