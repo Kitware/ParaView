@@ -457,7 +457,7 @@ void vtkPVProbe::AcceptCallback()
     char tempArray[32];
 
     // label needs to be initialized so strcat doesn't fail
-    sprintf(label, "\0");
+    label[0] = '\0';
     
     for (i = 0; i < numArrays; i++)
       {
