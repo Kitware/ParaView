@@ -6,78 +6,169 @@
   Date:      $Date$
   Version:   $Revision$
 
-Copyright (c) 1998-1999 Kitware Inc. 469 Clifton Corporate Parkway,
-Clifton Park, NY, 12065, USA.
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-All rights reserved. No part of this software may be reproduced, distributed,
-or modified, in any form or by any means, without permission in writing from
-Kitware Inc.
-
-IN NO EVENT SHALL THE AUTHORS OR DISTRIBUTORS BE LIABLE TO ANY PARTY FOR
-DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT
-OF THE USE OF THIS SOFTWARE, ITS DOCUMENTATION, OR ANY DERIVATIVES THEREOF,
-EVEN IF THE AUTHORS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-THE AUTHORS AND DISTRIBUTORS SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING,
-BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
-"AS IS" BASIS, AND THE AUTHORS AND DISTRIBUTORS HAVE NO OBLIGATION TO PROVIDE
-MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+// .NAME vtkClientServerStream -
+// .SECTION Description
+// vtkClientServerStream
+
 #ifndef __vtkClientServerStream_h
 #define __vtkClientServerStream_h
 
-#include "vtkObject.h"
+#include "vtkClientServerID.h"
 
-#include <vector>
-
-struct vtkClientServerArrayInformation;
-
-struct vtkClientServerID
-{
-  int operator<(const vtkClientServerID& i) const
-    {
-      return this->ID < i.ID;
-    }
-  int operator==(const vtkClientServerID& i) const
-    {
-      return this->ID == i.ID;
-    }
-  unsigned long ID;
-};
-
+class vtkClientServerStreamInternals;
 
 class VTK_EXPORT vtkClientServerStream
 {
 public:
-  enum Commands { New, Invoke, Delete, AssignResult, Reply, EndOfCommands};
-  enum Types { float_value, float_array, 
-               double_value, double_array,
-               int_value, int_array,
-               unsigned_int_value, unsigned_int_array,
-               short_value, short_array,
-               unsigned_short_value, unsigned_short_array,
-               long_value, long_array,
-               unsigned_long_value, unsigned_long_array,
-               char_value, char_array,
-               unsigned_char_value, unsigned_char_array,
-               vtk_object_pointer, string_value, string_array, 
-               id_value, 
-               boolean_value, event_value, End
-  };
-  static const char* GetTypeString(unsigned int);
-  static unsigned int GetTypeFromString(const char*);
+  vtkClientServerStream();
+  ~vtkClientServerStream();
+  vtkClientServerStream(const vtkClientServerStream&);
+  vtkClientServerStream& operator=(const vtkClientServerStream&);
   
-  static int GetCommandSize() { return sizeof(Commands); }
-  // stream operators for special types
-  vtkClientServerStream & operator << (vtkClientServerStream::Types t);
-  vtkClientServerStream & operator << (vtkClientServerStream::Commands t);
-  vtkClientServerStream & operator << (vtkClientServerArrayInformation);
-  vtkClientServerStream & operator << (vtkClientServerID i);
-  vtkClientServerStream & operator << (vtkObjectBase *obj);
-
-  // stream operators for native types
+  enum { BigEndian, LittleEndian };
+  enum Commands { New, Invoke, Delete, AssignResult,
+                  Reply, Error, EndOfCommands};
+  enum Types {
+    int8_value, int8_array,
+    int16_value, int16_array,
+    int32_value, int32_array,
+    int64_value, int64_array,
+    uint8_value, uint8_array,
+    uint16_value, uint16_array,
+    uint32_value, uint32_array,
+    uint64_value, uint64_array,
+    float32_value, float32_array,
+    float64_value, float64_array,
+    string_value,
+    id_value,
+    vtk_object_pointer,
+    End
+  };
+  
+  struct Array
+  {
+    Types Type;
+    vtkTypeUInt32 Length;
+    vtkTypeUInt32 Size;
+    const void* Data;
+  };
+  
+  struct Argument
+  {
+    const unsigned char* Data;
+    size_t Size;
+  };
+  
+  // Description:
+  // Get the number of complete messages currently stored in the
+  // stream.
+  int GetNumberOfMessages() const;
+  
+  // Description:
+  // Get the command in the message with the given index.  Returns
+  // EndOfCommands if the given index is out of range.
+  vtkClientServerStream::Commands GetCommand(int message) const;
+  
+  // Description:
+  // Get the number of arguments in the message with the given index.
+  // Returns a value less than 0 if the given index is out of range.
+  int GetNumberOfArguments(int message) const;
+  
+  // Description:
+  // Get the type of the given argument in the given message.  Returns
+  // End if either index is out of range.
+  vtkClientServerStream::Types GetArgumentType(int message, int argument) const;
+  
+  // Description:
+  // Get the value of the given argument in the given message.
+  // Returns whether the argument could be converted to the requested
+  // type.
+  int GetArgument(int message, int argument, signed char* value) const;
+  int GetArgument(int message, int argument, char* value) const;
+  int GetArgument(int message, int argument, short* value) const;
+  int GetArgument(int message, int argument, int* value) const;
+  int GetArgument(int message, int argument, long* value) const;
+  int GetArgument(int message, int argument, unsigned char* value) const;
+  int GetArgument(int message, int argument, unsigned short* value) const;
+  int GetArgument(int message, int argument, unsigned int* value) const;
+  int GetArgument(int message, int argument, unsigned long* value) const;
+  int GetArgument(int message, int argument, float* value) const;
+  int GetArgument(int message, int argument, double* value) const;
+#ifdef VTK_TYPE_INT64_NOT_STANDARD
+  int GetArgument(int message, int argument, vtkTypeInt64* value) const;
+  int GetArgument(int message, int argument, vtkTypeUInt64* value) const;
+#endif
+  int GetArgument(int message, int argument, signed char* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, char* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, short* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, int* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, long* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, unsigned char* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, unsigned short* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, unsigned int* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, unsigned long* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, float* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, double* value, vtkTypeUInt32 length) const;
+#ifdef VTK_TYPE_INT64_NOT_STANDARD
+  int GetArgument(int message, int argument, vtkTypeInt64* value, vtkTypeUInt32 length) const;
+  int GetArgument(int message, int argument, vtkTypeUInt64* value, vtkTypeUInt32 length) const;
+#endif
+  int GetArgument(int message, int argument, const char** value) const;
+  int GetArgument(int message, int argument, char** value) const;
+  int GetArgument(int message, int argument, vtkClientServerID* value) const;
+  int GetArgument(int message, int argument, vtkObjectBase** value) const;
+  
+  // Description:
+  // Get the length of an argument of an array type.  Returns whether
+  // the argument is really an array type.
+  int GetArgumentLength(int message, int argument, vtkTypeUInt32* length) const;
+  
+  // Description:
+  // Get the given argument in the given message as an object of a
+  // particular vtkObjectBase type.  Returns whether the argument is
+  // really of the requested type.
+  int GetArgumentObject(int message, int argument, vtkObjectBase** value,
+                        const char* type) const;
+  
+  // Description:
+  // Get the given argument of the given message in a form that can be
+  // sent to another stream.  Returns an empty argument if it either
+  // index is out of range.
+  vtkClientServerStream::Argument GetArgument(int message, int argument) const;
+  
+  // Description:
+  // Copy the stream contents from another stream.
+  void Copy(const vtkClientServerStream* source);  
+  
+  // Description:
+  // Ask the stream to allocate at least the given size in memory to
+  // avoid too many reallocations during stream construction.
+  void Reserve(size_t size);
+  
+  // Description:
+  // Reset the stream to an empty state.
+  void Reset();
+  
+  // Description:
+  // Stream operators for special types.
+  vtkClientServerStream & operator << (vtkClientServerStream::Commands);
+  vtkClientServerStream & operator << (vtkClientServerStream::Types);
+  vtkClientServerStream & operator << (vtkClientServerStream::Argument);
+  vtkClientServerStream & operator << (vtkClientServerStream::Array);
+  vtkClientServerStream & operator << (vtkClientServerID);
+  vtkClientServerStream & operator << (vtkObjectBase*);
+  
+  // Description:
+  // Stream operators for native types.
   vtkClientServerStream & operator << (short x) ; // integers
   vtkClientServerStream & operator << (unsigned short x) ; // integers
   vtkClientServerStream & operator << (int x) ; // integers
@@ -89,55 +180,98 @@ public:
   vtkClientServerStream & operator << (float fl ) ;  // floats
   vtkClientServerStream & operator << (double dbl);  // double floats
   vtkClientServerStream & operator << (const char *str);   // strings
-
   
-  // allow arrays to be passed
-  static vtkClientServerArrayInformation InsertArray(float *, int );
-  static vtkClientServerArrayInformation InsertArray(double *, int );
-  static vtkClientServerArrayInformation InsertArray(short *, int );
-  static vtkClientServerArrayInformation InsertArray(int *, int );
-  static vtkClientServerArrayInformation InsertArray(long *, int );
-  static vtkClientServerArrayInformation InsertArray(char *, int );
-  static vtkClientServerArrayInformation InsertArray(unsigned short *, int );
-  static vtkClientServerArrayInformation InsertArray(unsigned int *, int );
-  static vtkClientServerArrayInformation InsertArray(unsigned long *, int );
-  static vtkClientServerArrayInformation InsertArray(unsigned char *, int );
-    
-  // return a unique ID
-  vtkClientServerID GetUniqueID();
-  
-  vtkClientServerStream();
-  ~vtkClientServerStream();
-
-  // reset the stream to an empty state
-  void Reset();
-  
-  // get the data as an array and size
-  void GetData(const unsigned char **res, size_t *resLength);
-
   // Description:
-  // Get master node ID.
-  vtkClientServerID GetMasterNodeId();
-
-  // Description:
-  // Get error msg ID.
-  vtkClientServerID GetErrorMessageId();
-
-  // use the last result as an argument
-  vtkClientServerID GetLastResult() { return this->LastResult; }
+  // Allow arrays to be passed into the stream.
+  static vtkClientServerStream::Array InsertArray(const char*, int);
+  static vtkClientServerStream::Array InsertArray(const short*, int);
+  static vtkClientServerStream::Array InsertArray(const int*, int);
+  static vtkClientServerStream::Array InsertArray(const long*, int);
+  static vtkClientServerStream::Array InsertArray(const unsigned char*, int);
+  static vtkClientServerStream::Array InsertArray(const unsigned short*, int);
+  static vtkClientServerStream::Array InsertArray(const unsigned int*, int);
+  static vtkClientServerStream::Array InsertArray(const unsigned long*, int);
+  static vtkClientServerStream::Array InsertArray(const float*, int);
+  static vtkClientServerStream::Array InsertArray(const double*, int);
   
-  // ask the container to reserve some space to avoid too many
-  // memory allocations
-  void Reserve(size_t len);
-
-protected:  
-  void InternalWrite(vtkClientServerStream::Types t, const unsigned char *ptr, 
-                     size_t size);
-  vtkstd::vector<unsigned char> Data;
-  size_t DataSize;
-
-  vtkClientServerID UniqueID;
-  vtkClientServerID LastResult;
+  // Description:
+  // Construct the entire stream from the given data.  This destroys
+  // any data already in the stream.  Returns whether the stream is
+  // deemed valid.  In the case of 0, the stream will have been reset.
+  int SetData(const unsigned char* data, size_t length);
+  
+  // Description:
+  // Get a pointer to the stream data and its length.  The values are
+  // suitable for passing to another stream's SetData method, but are
+  // invalidated when any further writing to the stream is done.
+  // Returns whether the stream is currently valid.
+  int GetData(const unsigned char** data, size_t* length) const;
+  
+  // Description:
+  // Get a string describing the given type.
+  const char* GetStringFromType(vtkClientServerStream::Types type) const;
+  
+  // Description:
+  // Get the type named by the given string.
+  vtkClientServerStream::Types GetTypeFromString(const char* name) const;
+  
+  // Description:
+  // Print the contents of the stream in a human-readable form.
+  void Print(ostream&) const;
+protected:
+  // Write arbitrary data to the stream.  Used internally.
+  vtkClientServerStream& Write(const void* data, size_t length);
+  
+  // Data parsing utilities for SetData.
+  int ParseData();
+  unsigned char* ParseCommand(int order, unsigned char* data,
+                              unsigned char* begin, unsigned char* end);
+  void ParseEnd();
+  unsigned char* ParseType(int order, unsigned char* data,
+                           unsigned char* begin, unsigned char* end,
+                           vtkClientServerStream::Types* type);
+  unsigned char* ParseValue(int order, unsigned char* data,
+                            unsigned char* end, unsigned int wordSize);
+  unsigned char* ParseArray(int order, unsigned char* data,
+                            unsigned char* end, unsigned int wordSize);
+  unsigned char* ParseString(int order, unsigned char* data,
+                             unsigned char* end);
+  
+  // Byte swap data in the given byte order to match the current
+  // machine's byte order.
+  void PerformByteSwap(int dataByteOrder, unsigned char* data,
+                       unsigned int numWords, unsigned int wordSize);
+  
+  // Get a pointer to the given value within the given message.
+  // Returns 0 if either index is out of range.
+  const unsigned char* GetValue(int message, int value) const;
+  
+  // Get the number of values in the given message.  The count
+  // includes the Command and End portions of the message.  Returns 0
+  // if the given index is out of range.
+  int GetNumberOfValues(int message) const;
+private:
+  vtkClientServerStreamInternals* Internal;
+  friend class vtkClientServerStreamInternals;
 };
+
+// Description:
+// Get the given argument of the given message as a pointer to a
+// vtkObjectBase instance of a specific type.  Returns whether the
+// argument was really of the requested type.
+template <class T>
+int
+vtkClientServerStreamGetArgumentObject(const vtkClientServerStream& msg,
+                                       int message, int argument,
+                                       T** result, const char* type)
+{
+  vtkObjectBase* obj;
+  if(msg.GetArgumentObject(message, argument, &obj, type))
+    {
+    *result = reinterpret_cast<T*>(obj);
+    return 1;
+    }
+  return 0;
+}
 
 #endif

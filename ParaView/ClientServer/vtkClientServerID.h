@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkClientServerArrayInformation.h
+  Module:    vtkClientServerID.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -15,18 +15,26 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+// .NAME vtkClientServerID -
+// .SECTION Description
+// vtkClientServerID
 
-#ifndef __vtkClientServerArrayInformation_h
-#define __vtkClientServerArrayInformation_h
+#ifndef __vtkClientServerID_h
+#define __vtkClientServerID_h
 
-#include "vtkClientServerStream.h"
+#include "vtkType.h"
 
-
-struct vtkClientServerArrayInformation
+struct vtkClientServerID
 {
-  vtkClientServerStream::Types Type;
-  unsigned int Size;
-  const unsigned char *Data;
+  int operator<(const vtkClientServerID& i) const
+    {
+    return this->ID < i.ID;
+    }
+  int operator==(const vtkClientServerID& i) const
+    {
+    return this->ID == i.ID;
+    }
+  vtkTypeUInt32 ID;
 };
 
 #endif

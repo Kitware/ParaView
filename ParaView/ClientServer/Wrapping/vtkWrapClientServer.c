@@ -92,71 +92,6 @@ void output_temp(FILE *fp, int i, int aType, char *Id, int count)
   fprintf(fp,";\n");
 }
 
-void checkClientServerType(int i, int aType, char *Id, int count, FILE *fp)
-{
-  static char tmp[256];
-  int is_array = 0;
-  int n_size = 0;
-
-  (void)Id;
-  
-  tmp[0] = '\0';
-  
-  if (aType == 309)
-    {
-    fprintf(fp,"&&\n      msg->ArgumentTypes[%i] == vtkClientServerStream::vtk_object_pointer ",i+2);
-    return;
-    }
-  
-  if (aType%1000 == 303)
-    {
-    fprintf(fp,"&&\n      msg->ArgumentTypes[%i] == vtkClientServerStream::string_value ",i+2);
-    return;
-    }
-
-  if ((aType%100)/10 == 1)
-    {
-    strcat(tmp,"unsigned_");
-    }
-  
-  switch (aType%10)
-    {
-    case 1: strcat(tmp,"float"); n_size = sizeof(float); break;
-    case 7: strcat(tmp,"double"); n_size = sizeof(double); break;
-    case 4: strcat(tmp,"int"); n_size = sizeof(int); break;
-    case 5: strcat(tmp,"short");n_size = sizeof(short);  break;
-    case 6: strcat(tmp,"long"); n_size = sizeof(long); break;
-    case 2: strcat(tmp,"void"); break;
-    case 3: strcat(tmp,"char"); n_size = sizeof(char); break;
-    case 9: strcat(tmp,"id"); break;
-    }
-
-  switch ((aType%1000)/100)
-    {
-    case 0: strcat(tmp,"_value"); break;
-    case 3: strcat(tmp,"_array"); is_array = 1; break; 
-/*    case 2: fprintf(fp, "&&"); break; */
-/*    case 3: fprintf(fp, " *"); break; */
-/*    case 4: fprintf(fp, "&*"); break; */
-/*    case 5: fprintf(fp, "*&"); break; */
-/*    case 7: fprintf(fp, "**"); break; */
-    default: break;
-    }
-
-  /* handle array arguements */
-  if (count > 1)
-    {
-/*    strcat(tmp,"_array"); */
-    }
-
-  fprintf(fp," &&\n      msg->ArgumentTypes[%i] == vtkClientServerStream::%s",i+2,tmp);
-  if (is_array)
-    {
-    fprintf(fp," &&\n      msg->ArgumentSizes[%i] == %i",
-            i+2, n_size*count);
-    }
-}
-
 /* when the cpp file doesn't have enough info use the hint file */
 void use_hints(FILE *fp)
 {
@@ -166,7 +101,8 @@ void use_hints(FILE *fp)
     case 301: case 307:  
     case 304: case 305: case 306: 
     case 313: case 314: case 315: case 316:
-      fprintf(fp,"    *resultStream << vtkClientServerStream::Reply << vtkClientServerStream::InsertArray(temp%i,%i) << vtkClientServerStream::End;\n", MAX_ARGS, currentFunction->HintSize);
+      fprintf(fp,
+              "      resultStream << vtkClientServerStream::Reply << vtkClientServerStream::InsertArray(temp%i,%i) << vtkClientServerStream::End;\n", MAX_ARGS, currentFunction->HintSize);
       break;
     }
 }
@@ -179,16 +115,22 @@ void return_result(FILE *fp)
       break;
     case 1: case 3: case 4: case 5: case 6: case 7: 
     case 13: case 14: case 15: case 16:
-      fprintf(fp,"    *resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
+      fprintf(fp,
+              "      resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
               MAX_ARGS); 
       break;
     case 303:
-      fprintf(fp,"    if (temp%i)\n      {\n      *resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",MAX_ARGS,MAX_ARGS); 
-      fprintf(fp,"      }\n");
+      fprintf(fp,
+              "      if (temp%i)\n"
+              "        {\n"
+              "        resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n"
+              "        }\n",
+              MAX_ARGS,MAX_ARGS); 
       break;
     case 109:
     case 309:  
-      fprintf(fp,"    *resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i << vtkClientServerStream::End;\n",MAX_ARGS);
+      fprintf(fp,
+              "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i << vtkClientServerStream::End;\n",MAX_ARGS);
       break;
 
     /* handle functions returning vectors */
@@ -226,53 +168,23 @@ void get_args(FILE *fp, int i)
   switch (currentFunction->ArgTypes[i]%1000)
     {
     case 1:  
-      fprintf(fp,"    temp%i = *(float *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;
     case 7:
-      fprintf(fp,"    temp%i = *(double *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 4:
-      fprintf(fp,"    temp%i = *(int *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 5:
-      fprintf(fp,"    temp%i = *(short *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 6:
-      fprintf(fp,"    temp%i = *(long *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 3:
-      fprintf(fp,"    temp%i = *(char *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 13:
-      fprintf(fp,"    temp%i = *(unsigned char *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 14:
-      fprintf(fp,"    temp%i = *(unsigned int *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 15:
-      fprintf(fp,"    temp%i = *(unsigned short *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 16:
-      fprintf(fp,"    temp%i = *(unsigned long *)msg->Arguments[%i];\n", i, 
-              start_arg);
-      break;      
     case 303:
-      fprintf(fp,"    temp%i = vtkClientServerInterpreter::GetString(msg,%i);\n",
-              i,start_arg);
+      fprintf(fp, "msg.GetArgument(0, %i, &temp%i)", i+2, i);
       break;
     case 109:
     case 309:
       fprintf(fp,
-              "    temp%i = (%s *)(arlu->GetObjectFromMessage(msg,%i,1));\n",i,currentFunction->ArgClasses[i],start_arg);
+              "vtkClientServerStreamGetArgumentObject(msg, 0, %i, &temp%i, \"%s\")",
+              i+2, i, currentFunction->ArgClasses[i]);
       break;
     case 2:    
     case 9:
@@ -285,39 +197,12 @@ void get_args(FILE *fp, int i)
           case 1: case 7:
           case 4: case 5: case 6: 
           case 13: case 14: case 15: case 16: 
-            fprintf(fp,"    memcpy(temp%i,msg->Arguments[%i],msg->ArgumentSizes[%i]);\n", 
-                    i, start_arg, start_arg);
+            fprintf(fp, "msg.GetArgument(0, %i, temp%i, %i)",
+                    i+2, i, currentFunction->ArgCounts[i]);
             break;
           }
         }
       
-    }
-}
-
-void free_args(FILE *fp, int i)
-{
-  int j;
-  int start_arg = 2;
-  
-  /* what arg do we start with */
-  for (j = 0; j < i; j++)
-    {
-    start_arg = start_arg + 
-      (currentFunction->ArgCounts[j] ? currentFunction->ArgCounts[j] : 1);
-    }
-  
-  /* ignore void */
-  if (((currentFunction->ArgTypes[i] % 10) == 2)&&
-      (!((currentFunction->ArgTypes[i]%1000)/100)))
-    {
-    return;
-    }
-  
-  switch (currentFunction->ArgTypes[i]%1000)
-    {
-    case 303:
-      fprintf(fp,"    delete [] temp%i;\n",i);
-      break;
     }
 }
 
@@ -400,17 +285,9 @@ void outputFunction(FILE *fp, FileInfo *data)
       strcmp(data->ClassName,currentFunction->Name) &&
       strcmp(data->ClassName,currentFunction->Name + 1))
     {
-    fprintf(fp,"  if (!strcmp(\"%s\",method) && msg->NumberOfArguments == %i ",
-            currentFunction->Name, currentFunction->NumberOfArguments + 2);
-
-    /* check the arg types as well */
-    for (i = 0; i < currentFunction->NumberOfArguments; ++i)
-      {
-      checkClientServerType(i, currentFunction->ArgTypes[i],
-                   currentFunction->ArgClasses[i], 
-                   currentFunction->ArgCounts[i], fp);
-      }
-    fprintf(fp,")\n    {\n");
+    fprintf(fp,"  if (!strcmp(\"%s\",method) && msg.GetNumberOfArguments(0) == %i)\n",
+            currentFunction->Name, currentFunction->NumberOfArguments+2);
+    fprintf(fp, "    {\n");
     
     /* process the args */
     for (i = 0; i < currentFunction->NumberOfArguments; i++)
@@ -422,22 +299,30 @@ void outputFunction(FILE *fp, FileInfo *data)
     output_temp(fp, MAX_ARGS,currentFunction->ReturnType,
                 currentFunction->ReturnClass, 0);
     
-    /* now get the required args from the stack */
-    for (i = 0; i < currentFunction->NumberOfArguments; i++)
+    if(currentFunction->NumberOfArguments > 0)
       {
-      get_args(fp,i);
+      const char* amps = "    if(";
+      /* now get the required args from the stack */
+      for (i = 0; i < currentFunction->NumberOfArguments; i++)
+        {
+        fprintf(fp, "%s", amps);
+        amps = " &&\n      ";
+        get_args(fp,i);
+        }
+      fprintf(fp, ")\n");
       }
+    fprintf(fp, "      {\n");
     
     switch (currentFunction->ReturnType%1000)
       {
       case 2:
-        fprintf(fp,"    op->%s(",currentFunction->Name);
+        fprintf(fp,"      op->%s(",currentFunction->Name);
         break;
       case 109:
-        fprintf(fp,"    temp%i = &(op)->%s(",MAX_ARGS,currentFunction->Name);
+        fprintf(fp,"      temp%i = &(op)->%s(",MAX_ARGS,currentFunction->Name);
         break;
       default:
-        fprintf(fp,"    temp%i = (op)->%s(",MAX_ARGS,currentFunction->Name);
+        fprintf(fp,"      temp%i = (op)->%s(",MAX_ARGS,currentFunction->Name);
       }
     for (i = 0; i < currentFunction->NumberOfArguments; i++)
       {
@@ -456,11 +341,8 @@ void outputFunction(FILE *fp, FileInfo *data)
       }
     fprintf(fp,");\n");
     return_result(fp);
-    for (i = 0; i < currentFunction->NumberOfArguments; i++)
-      {
-      free_args(fp,i);
-      }
-    fprintf(fp,"    return 0;\n");
+    fprintf(fp,"      return 0;\n");
+    fprintf(fp,"      }\n");
     fprintf(fp,"    }\n");
     
     wrappedFunctions[numberOfWrappedFunctions] = currentFunction;
@@ -470,8 +352,8 @@ void outputFunction(FILE *fp, FileInfo *data)
 #if 0
   if (!strcmp("vtkObject",data->ClassName))
     {
-    fprintf(fp,"  if (!strcmp(\"AddProgressObserver\",method) && msg->NumberOfArguments == 3 &&\n");
-    fprintf(fp,"      msg->ArgumentTypes[2] == vtkClietnServerStream::string_value)\n");
+    fprintf(fp,"  if (!strcmp(\"AddProgressObserver\",method) && msg.NumberOfArguments == 3 &&\n");
+    fprintf(fp,"      msg.ArgumentTypes[2] == vtkClietnServerStream::string_value)\n");
     fprintf(fp,"    {\n");
     fprintf(fp,"    vtkClientServerProgressObserver *apo = vtkClientServerProgressObserver::New();\n");
     fprintf(fp,"    vtkObject* obj = arlu->GetObjectFromMessage(msg, 0, 1);\n");
@@ -493,12 +375,11 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
   int i;
   
   fprintf(fp,"// ClientServer wrapper for %s object\n//\n",data->ClassName);
+  fprintf(fp,"#define VTK_STREAMS_FWD_ONLY\n");
   fprintf(fp,"#include \"vtkSystemIncludes.h\"\n");
   fprintf(fp,"#include \"%s.h\"\n",data->ClassName);
   fprintf(fp,"#include \"vtkClientServerInterpreter.h\"\n");
   fprintf(fp,"#include \"vtkClientServerStream.h\"\n\n");
-  fprintf(fp,"#include \"vtkClientServerMessage.h\"\n\n");
-  fprintf(fp,"#include \"vtkClientServerArrayInformation.h\"\n\n");
 #if 0
   if (!strcmp("vtkObject",data->ClassName))
     {
@@ -514,11 +395,22 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
   for (i = 0; i < data->NumberOfSuperClasses; i++)
     {
       {
-      fprintf(fp,"int %sCommand(vtkClientServerInterpreter *, vtkObjectBase *, const char *, vtkClientServerMessage *, vtkClientServerStream* resultStream);\n",data->SuperClasses[i]);
+      fprintf(fp,
+              "int %sCommand(vtkClientServerInterpreter*, vtkObjectBase*,"
+              " const char*, const vtkClientServerStream&,"
+              " vtkClientServerStream& resultStream);\n",
+              data->SuperClasses[i]);
       }
     }
   
-  fprintf(fp,"\nint VTKClientServer_EXPORT %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob, const char *method, vtkClientServerMessage *msg, vtkClientServerStream* resultStream)\n{\n",data->ClassName);
+  fprintf(fp,
+          "\n"
+          "int VTKClientServer_EXPORT"
+          " %sCommand(vtkClientServerInterpreter *arlu, vtkObjectBase *ob,"
+          " const char *method, const vtkClientServerStream& msg,"
+          " vtkClientServerStream& resultStream)\n"
+          "{\n",
+          data->ClassName);
   
   if(strcmp(data->ClassName, "vtkObjectBase") == 0)
     {
@@ -530,6 +422,8 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
     fprintf(fp,"  %s *op = %s::SafeDownCast(ob);\n", 
             data->ClassName, data->ClassName);
     }
+  
+  fprintf(fp, "  (void)arlu;\n");
   
 
   /*fprintf(fp,"  vtkClientServerStream resultStream;\n");*/
@@ -549,6 +443,16 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
     fprintf(fp,"    {\n    return 0;\n    }\n");
     }
   
-  fprintf(fp,"  vtkGenericWarningMacro(\"Object type: %s, could not find requested method: \" << method << \"\\nor the method was called with incorrect arguments.\\n\");\n", data->ClassName);
-  fprintf(fp,"  return 1;\n}\n");
+  fprintf(fp,
+          "  vtkOStrStreamWrapper vtkmsg;\n"
+          "  vtkmsg << \"Object type: %s, could not find requested method: \\\"\"\n"
+          "         << method << \"\\\"\\nor the method was called with incorrect arguments.\\n\";\n"
+          "  resultStream.Reset();\n"
+          "  resultStream << vtkClientServerStream::Error\n"
+          "               << vtkmsg.str() << vtkClientServerStream::End;\n"
+          "  vtkmsg.rdbuf()->freeze(0);\n",
+          data->ClassName);
+  fprintf(fp,
+          "  return 1;\n"
+          "}\n");
 }

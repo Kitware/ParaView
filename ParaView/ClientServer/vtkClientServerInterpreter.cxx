@@ -28,54 +28,64 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkClientServerInterpreter.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkProcessObject.h"
-#include "vtkVector.txx"
+#include "vtkCommand.h"
+#include "vtkDataSet.h"
 #include "vtkHashMap.txx"
 #include "vtkObjectFactory.h"
-#include "vtkCommand.h"
-#include "vtkTimerLog.h"
-#include "vtkDataSet.h"
+#include "vtkProcessObject.h"
 #include "vtkSource.h"
-#include "vtkClientServerMessage.h"
+#include "vtkTimerLog.h"
+
+#include <vtkstd/vector>
 
 #include <numeric>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.2");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.3");
 
-template class vtkHashMap<unsigned long, vtkClientServerMessage *>;
-template class vtkHashMap<const char *, vtkClientServerCommandFunction>;
-template class vtkVector<unsigned char>;
-
-static inline void vtkContainerDeleteMethod(vtkClientServerCommandFunction) {}
-static inline vtkClientServerCommandFunction 
+//----------------------------------------------------------------------------
+// Internal container instantiations.
+static inline vtkClientServerCommandFunction
 vtkContainerCreateMethod(vtkClientServerCommandFunction d1)
-{ return vtkContainerDefaultCreate(d1); }
+{
+  return vtkContainerDefaultCreate(d1);
+}
+static inline void vtkContainerDeleteMethod(vtkClientServerCommandFunction) {}
 
+template class vtkHashMap<vtkTypeUInt32, vtkClientServerStream*>;
+template class vtkHashMap<const char*, vtkClientServerCommandFunction>;
 
+//----------------------------------------------------------------------------
+class vtkClientServerInterpreterInternals
+{
+public:
+  typedef vtkstd::vector<vtkClientServerNewInstanceFunction> NewInstanceFunctionsType;
+  NewInstanceFunctionsType NewInstanceFunctions;
+};
+
+//----------------------------------------------------------------------------
 vtkClientServerInterpreter::vtkClientServerInterpreter()
 {
-  this->IDToMessageMap = vtkHashMap<unsigned long,vtkClientServerMessage *>::New();
-  this->ClassToFunctionMap = 
-    vtkHashMap<const char *,vtkClientServerCommandFunction>::New();
-  this->LastResultMessage = 0;
-
-  this->MessageBufferSize = 0;
-  this->MessageBuffer = 0;
-  this->AllocateMessageBuffer(10);
+  this->Internal = new vtkClientServerInterpreterInternals;
+  this->IDToMessageMap = IDToMessageMapType::New();
+  this->ClassToFunctionMap = ClassToFunctionMapType::New();
+  this->LastResultMessage = new vtkClientServerStream;
+  this->LogStream = 0;
+  
   this->ServerProgressTimer = vtkTimerLog::New();
   this->ClientProgressTimer = vtkTimerLog::New();
 }
 
+//----------------------------------------------------------------------------
 vtkClientServerInterpreter::~vtkClientServerInterpreter()
-{
-  // delete any remaining messages
-  vtkHashMapIterator<unsigned long,vtkClientServerMessage *> *hi = 
+{  
+  // Delete any remaining messages.
+  vtkHashMapIterator<vtkTypeUInt32, vtkClientServerStream*>* hi = 
     this->IDToMessageMap->NewIterator();
-  vtkClientServerMessage *tmp;
-  while (!hi->IsDoneWithTraversal())
+  vtkClientServerStream* tmp;
+  while(!hi->IsDoneWithTraversal())
     {
-    hi->GetData(tmp);
+    hi->GetData(tmp);    
     delete tmp;
     hi->GoToNextItem();
     }
@@ -83,349 +93,55 @@ vtkClientServerInterpreter::~vtkClientServerInterpreter()
   
   this->IDToMessageMap->Delete();
   this->ClassToFunctionMap->Delete();
-  if (this->LastResultMessage)
-    {
-    delete this->LastResultMessage;
-    this->LastResultMessage = NULL;
-    }
-
-  delete[] this->MessageBuffer;
-
+  
+  delete this->LastResultMessage;
+  
   this->ServerProgressTimer->Delete();
   this->ClientProgressTimer->Delete();
+  
+  delete this->Internal;
 }
 
-int vtkClientServerInterpreter::AssignResultToID(vtkClientServerMessage *msg)
+//----------------------------------------------------------------------------
+vtkObjectBase*
+vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id)
 {
-  if (!this->LastResultMessage)
+  // Get the message corresponding to this ID.
+  if(const vtkClientServerStream* tmp = this->GetMessageFromID(id))
     {
-    vtkGenericWarningMacro("Attempt to assign a result to an ID when there is no result");
-    return 1;
-    }
-  
-  // take the last result and assign it to an id
-  vtkClientServerID id;
-  id.ID = *reinterpret_cast<const unsigned int *>(msg->Arguments[0]);
-  
-  // copy the last result
-  vtkClientServerMessage *newmsg = new vtkClientServerMessage;
-  newmsg->Copy(this->LastResultMessage);
-  
-  // add the new entry to the hash table
-  return this->NewValue(newmsg,id);
-}
-
-int vtkClientServerInterpreter::ProcessMessage(vtkClientServerStream *str)
-{
-  const unsigned char *msg;
-  size_t msgLength;
-  str->GetData(&msg,&msgLength);
-  int retVal = this->ProcessMessage(msg, msgLength);
-  return retVal;
-}
-
-int vtkClientServerInterpreter::ProcessMessage(const unsigned char* msg, size_t msgLength)
-{
-  int ret = 0;
-  
-  // break the message into pieces to be executed
-  const unsigned char *pos = msg;
-  const unsigned char *nextPos = msg;
-  do
-    {
-    vtkClientServerMessage *amsg = vtkClientServerMessage::GetMessage(pos,msgLength - (pos - msg),
-                                                    &nextPos);
-    if (!amsg)
+    // Retrieve the object from the message.
+    vtkObjectBase* obj = 0;
+    if(tmp->GetNumberOfArguments(0) == 1 && tmp->GetArgument(0, 0, &obj))
       {
-      return 1;
-      }
-    ret = this->ProcessOneMessage(amsg);
-    if (ret)
-      {
-      delete amsg;
-      return ret;
-      }
-    pos = nextPos;
-    delete amsg;
-    }
-  while (nextPos < msg+msgLength);
-  
-  return ret;
-}
-
-int vtkClientServerInterpreter::ProcessOneMessage(vtkClientServerMessage *amsg)
-{
-  int ret = 1;
-  vtkDebugMacro("ProcessOneMessage: ");
-  
-  /* look for known messages */
-  if (amsg->Command == vtkClientServerStream::New)
-    {
-    if(this->NewInstanceFunctions.size() == 0)
-      {
-      vtkGenericWarningMacro(
-        "Attempt to use vtkClientServerInterpreter with no NewInstanceFunctions set");
-      return ret;
-      }
-
-    if (amsg->NumberOfArguments == 2 &&
-        amsg->ArgumentTypes[0] == vtkClientServerStream::string_value &&
-        amsg->ArgumentTypes[1] == vtkClientServerStream::id_value)
-      {
-      char *type = vtkClientServerInterpreter::GetString(amsg,0);
-      vtkClientServerID id;
-      id.ID =
-        *reinterpret_cast<const unsigned long *>(amsg->Arguments[1]);
-      for(vtkstd::vector<vtkClientServerNewInstanceFunction>::iterator 
-            it = this->NewInstanceFunctions.begin();
-          it != this->NewInstanceFunctions.end(); ++it)
-        {
-        ret = (*(*it))(this, type, id);
-        if(ret == 0)
-          {
-          break;
-          }
-        }
-      if (ret)
-        {
-        vtkGenericWarningMacro("Attempt to create unsupported type " << type);
-        }
-      else
-        {
-        vtkClientServerInterpreter::NewCallbackInfo info;
-        info.Type = type;
-        info.ID = id.ID;
-        this->InvokeEvent(vtkCommand::UserEvent+1, &info);
-        }
-      delete [] type;
-      }
-    return ret;
-    }
-  
-  if (amsg->Command == vtkClientServerStream::Invoke)
-    {
-    if (amsg->NumberOfArguments >= 2 &&
-        amsg->ArgumentTypes[0] == vtkClientServerStream::id_value &&
-        amsg->ArgumentTypes[1] == vtkClientServerStream::string_value)
-      {
-      ret = this->InvokeMethod(amsg);
-      }
-    return ret;
-    }
-  
-  if (amsg->Command == vtkClientServerStream::Delete)
-    {
-    if (amsg->NumberOfArguments == 1 &&
-        amsg->ArgumentTypes[0] == vtkClientServerStream::id_value)
-      {
-      ret = this->DeleteValue(amsg);
-      }
-    return ret;
-    }
-  
-  if (amsg->Command == vtkClientServerStream::AssignResult)
-    {
-    if (amsg->NumberOfArguments == 1 &&
-        amsg->ArgumentTypes[0] == vtkClientServerStream::id_value)
-      {
-      ret = this->AssignResultToID(amsg);
-      }
-    return ret;
-    }
-
-  vtkGenericWarningMacro("Received unknown messgae type");
-  return ret;
-}
-
-vtkClientServerMessage *vtkClientServerInterpreter::ExpandMessage(vtkClientServerMessage *msg)
-{
-  vtkClientServerMessage *amsg = new vtkClientServerMessage;
-  amsg->NumberOfArguments = 0;
-  amsg->Command = msg->Command;
-
-  // find out how many arguments the expanded message will have
-  unsigned int i;
-  for (i = 0; i < msg->NumberOfArguments; ++i)
-    {
-    // is this argument an id?
-    if (msg->ArgumentTypes[i] == vtkClientServerStream::id_value)
-      {
-      // look up the id to get the message
-      vtkClientServerID id;
-      id.ID = *(unsigned long *)msg->Arguments[i];
-      vtkClientServerMessage *tmp = this->GetMessageFromID(id);
-      if (tmp)
-        {
-        amsg->NumberOfArguments += tmp->NumberOfArguments;
-        }
-      else
-        {
-        vtkGenericWarningMacro("Tried to expand argument but failed to find id");
-        amsg->NumberOfArguments++;
-        }
+      return obj;
       }
     else
       {
-      amsg->NumberOfArguments++;
+      vtkGenericWarningMacro("attempt to get an object for an ID whose message does not contain only an object");
+      return 0;
       }
     }
-  
-  // allocate storage and fill in the structure
-  if (amsg->NumberOfArguments)
+  else
     {
-    amsg->ArgumentTypes = 
-      new vtkClientServerStream::Types [amsg->NumberOfArguments];
-    amsg->ArgumentSizes = new unsigned int [amsg->NumberOfArguments];
-    amsg->Arguments = 
-      new const unsigned char * [amsg->NumberOfArguments];
-
-    unsigned int count = 0;
-    for (i = 0; i < msg->NumberOfArguments; ++i)
-      {
-      // is this argument an id?
-      if (msg->ArgumentTypes[i] == vtkClientServerStream::id_value)
-        {
-        // look up the id to get the message
-        vtkClientServerID id;
-        id.ID = *(unsigned long *)msg->Arguments[i];
-        vtkClientServerMessage *tmp = this->GetMessageFromID(id);
-        if (tmp)
-          {
-          // copy over the arguments
-          unsigned int j;
-          for (j = 0; j < tmp->NumberOfArguments; ++j)
-            {
-            amsg->ArgumentTypes[count] = tmp->ArgumentTypes[j];
-            amsg->ArgumentSizes[count] = tmp->ArgumentSizes[j];
-            amsg->Arguments[count] = tmp->Arguments[j];
-            count++;
-            }
-          }
-        else
-          {
-          amsg->ArgumentTypes[count] = msg->ArgumentTypes[i];
-          amsg->ArgumentSizes[count] = msg->ArgumentSizes[i];
-          amsg->Arguments[count] = msg->Arguments[i];
-          count++;
-          }
-        }
-      else
-        {
-        amsg->ArgumentTypes[count] = msg->ArgumentTypes[i];
-        amsg->ArgumentSizes[count] = msg->ArgumentSizes[i];
-        amsg->Arguments[count] = msg->Arguments[i];
-        count++;
-        }
-      }
+    vtkGenericWarningMacro("attempt to get an object for an ID that is not in the hash table" << id.ID);
+    return 0;
     }
-  
-  return amsg;
 }
 
-int vtkClientServerInterpreter::NewValue(vtkClientServerMessage *ptr, vtkClientServerID id)
+//----------------------------------------------------------------------------
+vtkClientServerID
+vtkClientServerInterpreter::GetIDFromObject(vtkObjectBase* key)
 {
-  // put the new instance into the hash tables
-  // first make sure it isn't already there
-  vtkClientServerMessage *tmp;
-  if (this->IDToMessageMap->GetItem(id.ID,tmp) == VTK_OK)
-    {
-    vtkGenericWarningMacro("attempt to create an ID that is already in the hash table: " << id.ID);
-    return 1;
-    }
-  this->IDToMessageMap->SetItem(id.ID,ptr);
-  //cout << "NewValue(" << id.ID << ")" << endl;
-  return 0;
-}
-
-int vtkClientServerInterpreter::NewInstance(vtkObjectBase *ptr, vtkClientServerID id)
-{
-  vtkClientServerMessage *msg = new vtkClientServerMessage;
-  msg->NumberOfArguments = 1;
-  msg->ArgumentTypes = new vtkClientServerStream::Types [1];
-  msg->ArgumentSizes = new unsigned int [1];
-  msg->Arguments = new const unsigned char *[1];
-  const int pointerSize = sizeof(vtkObject *);
-  msg->ArgumentTypes[0] = vtkClientServerStream::vtk_object_pointer;
-  msg->ArgumentSizes[0] = pointerSize;
-  msg->ArgumentData = new unsigned char [pointerSize];
-  memcpy(msg->ArgumentData,&ptr,pointerSize);
-  msg->Arguments[0] = msg->ArgumentData;
-  return this->NewValue(msg,id);
-}
-
-int vtkClientServerInterpreter::DeleteValue(vtkClientServerMessage *msg)
-{
-  // find the info first
-  unsigned long id = 
-    *reinterpret_cast<const unsigned long *>(msg->Arguments[0]);
-  
-  // put the new instance into the hash tables
-  // first make sure it isn;t already there
-  vtkClientServerMessage *tmp;
-  if (this->IDToMessageMap->GetItem(id,tmp) != VTK_OK)
-    {
-    vtkGenericWarningMacro("attempt to delete an ID that is not in the hash table"
-                           << id);
-    return 1;
-    }
-  
-  // if it was a vtkObject then we must do a Delete
-  if (tmp->NumberOfArguments > 0 && 
-      tmp->ArgumentTypes[0] == vtkClientServerStream::vtk_object_pointer)
-    {
-    vtkObject *op = this->GetObjectFromMessage(tmp,0,1);
-    if (!op)
-      {
-      vtkGenericWarningMacro("error in deleting a vtkObject");
-      return 1;
-      }
-
-    vtkClientServerInterpreter::NewCallbackInfo info;
-    info.Type = op->GetClassName();
-    info.ID = id;
-    this->InvokeEvent(vtkCommand::UserEvent+2, &info);
-
-    op->Delete();
-    }
-  
-  this->IDToMessageMap->RemoveItem(id);
-
-  delete tmp;
-  return 0;
-}
-
-void vtkClientServerInterpreter::AddCommandFunction(const char *cname, 
-                                    vtkClientServerCommandFunction func)
-{
-  this->ClassToFunctionMap->SetItem(cname,func);
-}
-
-vtkObject *vtkClientServerInterpreter::GetObjectFromMessage(vtkClientServerMessage *msg, 
-                                            int num,
-                                            int verbose)
-{
-  if (msg->ArgumentTypes[num] == vtkClientServerStream::vtk_object_pointer)
-    {
-    return *(vtkObject **)(msg->Arguments[num]);
-    }
-  if (verbose)
-    {
-    vtkGenericWarningMacro("attempt to get an object for a bad message type");
-    }
-  return NULL;
-}
-
-unsigned long vtkClientServerInterpreter::GetIDFromObject(vtkObject *key)
-{
-  vtkHashMapIterator<unsigned long,vtkClientServerMessage *> *hi = 
+  // Search the hash table for the given object.
+  vtkHashMapIterator<vtkTypeUInt32, vtkClientServerStream*>* hi = 
     this->IDToMessageMap->NewIterator();
-  vtkClientServerMessage *msg;
-  unsigned long id = 0;
+  vtkClientServerStream* msg;
+  vtkTypeUInt32 id = 0;
   while (!hi->IsDoneWithTraversal())
     {
     hi->GetData(msg);
-    vtkObject* obj = this->GetObjectFromMessage(msg, 0, 0);
-    if (obj == key)
+    vtkObjectBase* obj;
+    if(msg->GetArgument(0, 0, &obj) && obj == key)
       {
       hi->GetKey(id);
       break;
@@ -433,129 +149,329 @@ unsigned long vtkClientServerInterpreter::GetIDFromObject(vtkObject *key)
     hi->GoToNextItem();
     }
   hi->Delete();
-  return id;
+  
+  // Convert the result to an ID object.
+  vtkClientServerID result = {id};
+  return result;
 }
 
-vtkClientServerMessage *vtkClientServerInterpreter::GetMessageFromID(vtkClientServerID id)
+//----------------------------------------------------------------------------
+int vtkClientServerInterpreter::ProcessStream(const unsigned char* msg,
+                                              size_t msgLength)
 {
-  // look for special LastReturnMessage
-  if (id.ID == 0)
+  vtkClientServerStream css;
+  css.SetData(msg, msgLength);
+  return this->ProcessStream(css);
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerInterpreter::ProcessStream(const vtkClientServerStream& css)
+{
+  for(int i=0; i < css.GetNumberOfMessages(); ++i)
+    {
+    if(!this->ProcessOneMessage(css, i))
+      {
+      /* TODO: Diagnostics and debugging display.  */
+      return 0;
+      }
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int
+vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
+                                              int message)
+{
+  // Look for known commands in the message.
+  switch(css.GetCommand(message))
+    {
+    case vtkClientServerStream::New:
+      return this->ProcessCommandNew(css, message);
+    case vtkClientServerStream::Invoke:
+      return this->ProcessCommandInvoke(css, message);
+    case vtkClientServerStream::Delete:
+      return this->ProcessCommandDelete(css, message);
+    case vtkClientServerStream::AssignResult:
+      return this->ProcessCommandAssignResult(css, message);
+    default:
+      break;
+    }
+  
+  vtkGenericWarningMacro("Received unknown messgae type");
+  return 0;
+}
+
+
+//----------------------------------------------------------------------------
+int
+vtkClientServerInterpreter
+::ProcessCommandNew(const vtkClientServerStream& css, int midx)
+{
+  // Make sure we have some instance creation functions registered.
+  if(this->Internal->NewInstanceFunctions.size() == 0)
+    {
+    vtkGenericWarningMacro(
+      "Attempt to use vtkClientServerInterpreter with no NewInstanceFunctions set");
+    return 0;
+    }
+  
+  // Get the class name and desired ID for the instance.
+  const char* cname = 0;
+  vtkClientServerID id;
+  if(css.GetNumberOfArguments(midx) == 2 &&
+     css.GetArgument(midx, 0, &cname) && css.GetArgument(midx, 1, &id))
+    {
+    // Find a NewInstance function that knows about the class.
+    int created = 0;
+    for(vtkClientServerInterpreterInternals::NewInstanceFunctionsType::iterator
+          it = this->Internal->NewInstanceFunctions.begin();
+        !created && it != this->Internal->NewInstanceFunctions.end(); ++it)
+      {
+      if((*(*it))(this, cname, id) == 0)
+        {
+        created = 1;
+        }
+      }
+    if(created)
+      {
+      vtkClientServerInterpreter::NewCallbackInfo info;
+      info.Type = cname;
+      info.ID = id.ID;
+      this->InvokeEvent(vtkCommand::UserEvent+1, &info);
+      return 1;
+      }
+    else
+      {
+      vtkGenericWarningMacro("Attempt to create unsupported type " << cname);
+      }
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int
+vtkClientServerInterpreter
+::ProcessCommandInvoke(const vtkClientServerStream& css, int midx)
+{
+  // Create a message with all known id_value arguments expanded.
+  vtkClientServerStream msg;
+  this->ExpandMessage(css, midx, msg);
+  
+  // Get the object and method to be invoked.
+  vtkObjectBase* obj;
+  const char* method;
+  if(msg.GetNumberOfArguments(0) >= 2 &&
+     msg.GetArgument(0, 0, &obj) && msg.GetArgument(0, 1, &method))
+    {
+    // Log the invocation.
+    if(this->LogStream)
+      {
+      *this->LogStream << "----------------------------------------------\n";
+      msg.Print(*this->LogStream);
+      }
+    
+    // Find the command function for this object's type.
+    if(vtkClientServerCommandFunction func = this->GetCommandFunction(obj))
+      {
+      // Try to invoke the method.
+      this->LastResultMessage->Reset();
+      if(func(this, obj, method, msg, *this->LastResultMessage) != 0)
+        {
+        const char* errorMessage;
+        if(this->LastResultMessage->GetNumberOfMessages() > 0 &&
+           this->LastResultMessage->GetCommand(0) ==
+           vtkClientServerStream::Error &&
+           this->LastResultMessage->GetArgument(0, 0, &errorMessage))
+          {
+          vtkErrorMacro(<< errorMessage);
+          }
+        return 0;
+        }
+      if(this->LogStream)
+        {
+        this->LastResultMessage->Print(*this->LogStream);
+        }
+      return 1;
+      }
+    }  
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int
+vtkClientServerInterpreter
+::ProcessCommandDelete(const vtkClientServerStream& msg, int midx)
+{
+  vtkClientServerID id;
+  if(msg.GetNumberOfArguments(midx) == 1 && msg.GetArgument(midx, 0, &id))
+    {
+    // If the value is an object, invoke the event callback.
+    if(vtkObjectBase* obj = this->GetObjectFromID(id))
+      {
+      vtkClientServerInterpreter::NewCallbackInfo info;
+      info.Type = obj->GetClassName();
+      info.ID = id.ID;
+      this->InvokeEvent(vtkCommand::UserEvent+2, &info);
+      }
+    
+    // Remove the ID from the map.
+    vtkClientServerStream* item;
+    this->IDToMessageMap->GetItem(id.ID, item);
+    this->IDToMessageMap->RemoveItem(id.ID);
+    delete item;
+    return 1;
+    }
+  
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int
+vtkClientServerInterpreter
+::ProcessCommandAssignResult(const vtkClientServerStream& msg, int midx)
+{
+  vtkClientServerID id;
+  if(msg.GetNumberOfArguments(midx) == 1 && msg.GetArgument(midx, 0, &id))
+    {
+    return this->AssignResultToID(id);
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
+                                              int inIndex,
+                                              vtkClientServerStream& out)
+{
+  // Reset the output and make sure we have input.
+  out.Reset();
+  if(inIndex < 0 || inIndex >= in.GetNumberOfMessages())
+    {
+    return 0;
+    }
+  
+  // Copy the command.
+  out << in.GetCommand(inIndex);
+  
+  // Copy all arguments while expanding id_value arguments.
+  for(int a=0; a < in.GetNumberOfArguments(inIndex); ++a)
+    {
+    if(in.GetArgumentType(inIndex, a) == vtkClientServerStream::id_value)
+      {
+      vtkClientServerID id;
+      in.GetArgument(inIndex, a, &id);
+      
+      // If the ID is in the map, expand it.  Otherwise, leave it.
+      const vtkClientServerStream* tmp = this->GetMessageFromID(id);
+      if(tmp)
+        {
+        for(int b=0; b < tmp->GetNumberOfArguments(0); ++b)
+          {
+          out << tmp->GetArgument(0, b);
+          }
+        }
+      else
+        {
+        out << in.GetArgument(inIndex, a);
+        }
+      }
+    else
+      {
+      out << in.GetArgument(inIndex, a);
+      }
+    }
+  
+  // End the message.
+  out << vtkClientServerStream::End;
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerInterpreter::AssignResultToID(vtkClientServerID id)
+{
+  // Make sure the ID doesn't exist.
+  vtkClientServerStream* tmp;
+  if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
+    {
+    vtkGenericWarningMacro(
+      "attempt to create an ID that is already in the hash table: " << id.ID);
+    return 0;
+    }
+  
+  // Copy the result to store it in the map.
+  vtkClientServerStream& lrm = *this->LastResultMessage;
+  vtkClientServerStream* copy = new vtkClientServerStream(lrm);
+  this->IDToMessageMap->SetItem(id.ID, copy);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream*
+vtkClientServerInterpreter::GetMessageFromID(vtkClientServerID id)
+{
+  // Look for special LastReturnMessage.
+  if(id.ID == 0)
     {
     return this->LastResultMessage;
     }
   
-  vtkClientServerMessage *tmp;
-  if (this->IDToMessageMap->GetItem(id.ID,tmp) != VTK_OK)
+  // Find the message in the map.
+  vtkClientServerStream* tmp;
+  if(this->IDToMessageMap->GetItem(id.ID, tmp) != VTK_OK)
     {
-    vtkGenericWarningMacro("attempt to get an ID that is not in the hash table: "
-                           << id.ID);
+    vtkGenericWarningMacro(
+      "attempt to get an ID that is not in the hash table: " << id.ID);
     return 0;
     }
   return tmp;
 }
 
-vtkObject *vtkClientServerInterpreter::GetObjectFromID(vtkClientServerID id)
+//----------------------------------------------------------------------------
+int vtkClientServerInterpreter::NewInstance(vtkObjectBase* obj,
+                                            vtkClientServerID id)
 {
-  vtkClientServerMessage *tmp = this->GetMessageFromID(id);
-  if (!tmp)
-    {
-    vtkGenericWarningMacro("attempt to get an object for an ID that is not in the hash table" << id.ID);
-    return NULL;
-    }
+  // Store the object in the last result.
+  vtkClientServerStream& lrm = *this->LastResultMessage;
+  lrm.Reset();
+  lrm << vtkClientServerStream::Reply << obj << vtkClientServerStream::End;
   
-  // verify the type
-  if (tmp->NumberOfArguments != 1 || 
-      tmp->ArgumentTypes[0] != vtkClientServerStream::vtk_object_pointer)
-    {
-    vtkGenericWarningMacro("attempt to get an object an ID that is not in the hash table" << id.ID);
-    return NULL;
-    }
+  // Last result holds a reference.  Remove reference from ::New()
+  // call in generated code.
+  obj->Delete();
   
-  return *(vtkObject **)(tmp->Arguments[0]);
+  // Enter the last result into the map with the given id.
+  return this->AssignResultToID(id);
 }
 
-vtkClientServerCommandFunction vtkClientServerInterpreter::GetCommandFunction(vtkObject *obj)
+//----------------------------------------------------------------------------
+void
+vtkClientServerInterpreter
+::AddCommandFunction(const char* cname, vtkClientServerCommandFunction func)
 {
-  // look up the function
+  this->ClassToFunctionMap->SetItem(cname, func);
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerCommandFunction
+vtkClientServerInterpreter::GetCommandFunction(vtkObjectBase* obj)
+{
+  // Lookup the function for this object's class.
   vtkClientServerCommandFunction res = 0;
-  const char *cname = obj->GetClassName();
-  this->ClassToFunctionMap->GetItem(cname,res);
-  if (!res)
+  const char* cname = obj->GetClassName();
+  this->ClassToFunctionMap->GetItem(cname, res);
+  if(!res)
     {
-    vtkGenericWarningMacro("attempt to get a function that is not in the hash table");
+    vtkErrorMacro("Cannot find command function for \"" << cname << "\".");
     }
   return res;
 }
 
-int vtkClientServerInterpreter::InvokeMethod(vtkClientServerMessage *inmsg)
+//----------------------------------------------------------------------------
+void
+vtkClientServerInterpreter
+::AddNewInstanceFunction(vtkClientServerNewInstanceFunction f)
 {
-  // first expand the message
-  vtkClientServerMessage *msg = this->ExpandMessage(inmsg);
-  
-  // get the function and pointer
-  vtkObject *tmp = *(vtkObject **)(msg->Arguments[0]);
-  if (!tmp || msg->ArgumentTypes[0] != vtkClientServerStream::vtk_object_pointer)
-    {
-    vtkGenericWarningMacro("attempt to invoke a method on an ID that is not in the hash table");
-    delete msg;
-    return 1;
-    }
-
-  vtkClientServerCommandFunction func = vtkClientServerInterpreter::GetCommandFunction(tmp);
-  char *method = vtkClientServerInterpreter::GetString(msg,1);
-
-  // now invoke the method
-  const unsigned char *result = NULL;
-  size_t resultLen = 0;
-  vtkClientServerStream resultStream;
-  int ret = func(this, tmp,method,msg,&resultStream);
-  resultStream.GetData(&result, &resultLen);
-
-  // store the last result
-  if (resultLen > 0 && result)
-    {
-    if (this->LastResultMessage)
-      {
-      delete this->LastResultMessage;
-      this->LastResultMessage = NULL;
-      }
-    const unsigned char *nextPos;
-    this->LastResultMessage = vtkClientServerMessage::GetMessage(result,resultLen,
-                                                        &nextPos);
-    if ( this->LastResultMessage )
-      {
-      // store the data with this message, we need to keep it around.
-      this->LastResultMessage->SetArgumentData(result, resultLen);
-      this->LastResultMessage->ArgumentDataLength = resultLen;
-      }
-    else
-      {
-      cout << "Resulting message returned 0" << endl;
-      }
-    }
-  
-  delete [] method;
-  delete msg;
-  return ret;
+  this->Internal->NewInstanceFunctions.push_back(f);
 }
-  
-char *vtkClientServerInterpreter::GetString(vtkClientServerMessage *amsg, int arg)
-{
-  char *method =
-    new char [amsg->ArgumentSizes[arg]+1];
-  memcpy(method, amsg->Arguments[arg], amsg->ArgumentSizes[arg]);
-  method[amsg->ArgumentSizes[arg]] = '\0';
-  return method;
-}
-
-
-void vtkClientServerInterpreter::AllocateMessageBuffer(vtkIdType len)
-{
-  if (len > this->MessageBufferSize)
-    {
-    delete[] this->MessageBuffer;
-    this->MessageBuffer = new unsigned char[len];
-    this->MessageBufferSize = len;
-    }
-}
-

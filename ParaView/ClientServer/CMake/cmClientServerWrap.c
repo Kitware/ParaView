@@ -69,7 +69,7 @@ static void CreateInitFile(cmLoadedCommandInfo *info,
   fprintf(fout,"\n\nstatic int %s_NewInstance(vtkClientServerInterpreter *arlu, const char *type, vtkClientServerID id);\n",kitName);
   for (i = 0; i < numConcrete; i++)
     {
-    fprintf(fout,"int %sCommand(vtkClientServerInterpreter *, vtkObjectBase *, const char *, vtkClientServerMessage *, vtkClientServerStream* resultStrem);\n",concrete[i]);
+    fprintf(fout,"int %sCommand(vtkClientServerInterpreter *, vtkObjectBase *, const char *, const vtkClientServerStream&, vtkClientServerStream& resultStrem);\n",concrete[i]);
     fprintf(fout,"vtkObjectBase *%sNewCommand();\n",concrete[i]);
     }
   

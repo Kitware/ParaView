@@ -1,7 +1,5 @@
 #include "vtkClientServerInterpreter.h"
-#include "vtkClientServerMessage.h"
 #include "vtkClientServerStream.h"
-#include "vtkClientServerArrayInformation.h"
 
 
 class Server
@@ -28,7 +26,13 @@ public:
     {
       this->server = s;
     }
-  vtkClientServerMessage* GetResultMessage();
+  const vtkClientServerStream* GetResultMessage();
+  vtkClientServerID GetUniqueID()
+    {
+    static vtkClientServerID id = {3};
+    ++id.ID;
+    return id;
+    }
   void RunTests();
   vtkClientServerStream stream;
   Server* server;
@@ -49,21 +53,17 @@ void Server::GetResultMessageData(const unsigned char** data, size_t* len)
 { 
   vtkClientServerID id;
   id.ID=0;
-  vtkClientServerMessage* ames = this->ClientServerInterpreter->GetMessageFromID(id);
-  if(!ames)
+  const vtkClientServerStream* ames = this->ClientServerInterpreter->GetMessageFromID(id);
+  if(!(ames && ames->GetNumberOfMessages() > 0 && ames->GetData(data, len)))
     {
     *data  = 0;
     *len = 0;
-    return;
     }
-  this->ServerStream.Reset();
-  this->ServerStream << ames << vtkClientServerStream::End;
-  this->ServerStream.GetData(data, len);
 }
 
 void Server::ProcessMessage(const unsigned char* msg, size_t length)
 {
-  if(this->ClientServerInterpreter->ProcessMessage(msg, length))
+  if(!this->ClientServerInterpreter->ProcessStream(msg, length))
     {
     cerr << "error in process message\n";
     }
@@ -74,25 +74,22 @@ void Server::PrintObjects()
 {
 }
 
-vtkClientServerMessage* ClientManager::GetResultMessage()
+const vtkClientServerStream* ClientManager::GetResultMessage()
 {
   const unsigned char* data;
   size_t len;
   // simulate getting a message over a socket from the server
   server->GetResultMessageData(&data, &len);
   
-  // now create a message on the client and print it out
-  const unsigned char *nextPos;
-  vtkClientServerMessage* ames
-    = vtkClientServerMessage::GetMessage(data,len, &nextPos);
-  return ames;
+  // now create a message on the client
+  vtkClientServerStream* result = new vtkClientServerStream;
+  result->SetData(data, len);
+  return result;
 }
-
-
 
 void ClientManager::RunTests()
 {
-  vtkClientServerID instance_id = this->stream.GetUniqueID();
+  vtkClientServerID instance_id = this->GetUniqueID();
   stream << vtkClientServerStream::New << "vtkObject" << instance_id << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << instance_id << "DebugOn" << vtkClientServerStream::End;
   const unsigned char* data;
@@ -103,10 +100,10 @@ void ClientManager::RunTests()
   stream << vtkClientServerStream::Invoke << instance_id << "GetClassName" << vtkClientServerStream::End;
   stream.GetData(&data, &len);
   server->ProcessMessage(data, len);
-  vtkstd::string name;
-  if(this->GetResultMessage()->GetArgument(0, &name))
+  const char* name;
+  if(this->GetResultMessage()->GetArgument(0, 0, &name))
     {
-    cerr << name.c_str() << "\n";
+    cerr << name << "\n";
     }
   stream.Reset();
   stream << vtkClientServerStream::Invoke << instance_id << "SetReferenceCount" << 10 << vtkClientServerStream::End;
@@ -117,10 +114,15 @@ void ClientManager::RunTests()
   stream.GetData(&data, &len);
   server->ProcessMessage(data, len);
   int refcount;
-  if(this->GetResultMessage()->GetArgument(0, &refcount))
+  if(this->GetResultMessage()->GetArgument(0, 0, &refcount))
     {
     cerr << refcount << "\n";
     }
+  stream.Reset();
+  stream << vtkClientServerStream::Invoke << instance_id << "SetReferenceCount" << 1 << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Delete << instance_id << vtkClientServerStream::End;
+  stream.GetData(&data, &len);
+  server->ProcessMessage(data, len);
 }
 
 int main()

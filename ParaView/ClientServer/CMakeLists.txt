@@ -1,12 +1,13 @@
 
 SET(ClientServer_SRCS 
-  vtkClientServerMessage.cxx
-  vtkClientServerMessage.h
-  vtkClientServerArrayInformation.h 
-  vtkClientServerStream.cxx
+  vtkClientServerID.h
   vtkClientServerInterpreter.cxx 
+  vtkClientServerInterpreter.h
+  vtkClientServerStream.cxx
   vtkClientServerStream.h
-  vtkClientServerInterpreter.h)
+  vtkType.h
+  vtkTypeFromNative.h
+  )
 
 ADD_LIBRARY(vtkClientServer ${ClientServer_SRCS})
 TARGET_LINK_LIBRARIES(vtkClientServer vtkKWCommonTCL vtkCommon)

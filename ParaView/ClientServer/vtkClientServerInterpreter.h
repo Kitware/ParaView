@@ -30,12 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkObject.h"
 
-#include "vtkClientServerStream.h" // Needed for vtkClientServerID
-#include "vtkSmartPointer.h" // Needed for InformationMap
-
-#include <vector> // Needed for inlined container
-#include <map> // Needed for inlined container
-#include <string> // Needed for inlined container
+#include "vtkClientServerID.h" // Needed for vtkClientServerID.
 
 #ifdef WIN32
 #define VTKClientServer_EXPORT __declspec( dllexport )
@@ -43,8 +38,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define VTKClientServer_EXPORT
 #endif
 
-class vtkClientServerMessage;
 class vtkClientServerInterpreter;
+class vtkClientServerInterpreterInternals;
 class vtkClientServerStream;
 class vtkTimerLog;
 
@@ -52,10 +47,11 @@ class vtkTimerLog;
 template<class KeyType, class DataType> class vtkHashMap;
 //ETX
 
-typedef int (*vtkClientServerCommandFunction)(vtkClientServerInterpreter *,
-                                              vtkObjectBase *ptr, const char *method, 
-                                              vtkClientServerMessage *msg,
-                                              vtkClientServerStream*);
+typedef int (*vtkClientServerCommandFunction)(vtkClientServerInterpreter*,
+                                              vtkObjectBase* ptr,
+                                              const char* method, 
+                                              const vtkClientServerStream& msg,
+                                              vtkClientServerStream& result);
 
 typedef int (*vtkClientServerNewInstanceFunction)(vtkClientServerInterpreter*,
                                                   const char* name,
@@ -63,88 +59,110 @@ typedef int (*vtkClientServerNewInstanceFunction)(vtkClientServerInterpreter*,
 
 class VTK_EXPORT vtkClientServerInterpreter : public vtkObject
 {
-public:
-  
+public:  
+  static vtkClientServerInterpreter* New();
   vtkTypeRevisionMacro(vtkClientServerInterpreter, vtkObject);
-
+  
   // Description:
-  static vtkClientServerInterpreter *New();
-
-  // expand all the id_value arguments of a message
-  vtkClientServerMessage *ExpandMessage(vtkClientServerMessage *msg);
+  // Process all messages in a given vtkClientServerStream.  Return 1
+  // if all messages succeeded, and 0 otherwise.
+  int ProcessStream(const unsigned char* msg, size_t msgLength);
+  int ProcessStream(const vtkClientServerStream& css);
   
-  // return a message for an ID, handle the special zero ID
-  vtkClientServerMessage *GetMessageFromID(vtkClientServerID id);
-    
-  // return an pointer to a vtkObject for a message argument
-  vtkObject *GetObjectFromMessage(vtkClientServerMessage *msg, int num, int verbose);
+  // Description:
+  // Process the message with the given index in the given stream.
+  // Returns 1 for success, 0 for failure.
+  int ProcessOneMessage(const vtkClientServerStream& css, int message);
   
-  // get a vtk object * for an id
-  vtkObject *GetObjectFromID(vtkClientServerID id);
-
-  // return an ID given a pointer to a vtkObject (or 0 if
-  // object is not found)
-  unsigned long GetIDFromObject(vtkObject *key);
-
-  // add a command function for a class
-  void AddCommandFunction(const char *cname, vtkClientServerCommandFunction func);
+  // Description:
+  // Get the message for an ID.  Special id 0 retrieves the result of
+  // the last command.
+  const vtkClientServerStream* GetMessageFromID(vtkClientServerID id);
   
-  // get a command function for a vtkObject *
-  vtkClientServerCommandFunction GetCommandFunction(vtkObject *ptr);
+  // Description:
+  // Return a pointer to a vtkObjectBase for an ID whose message
+  // contains only the one object.
+  vtkObjectBase* GetObjectFromID(vtkClientServerID id);
   
-  // get an argument as a string, you must delete [] the result
-  static char *GetString(vtkClientServerMessage *msg, int argNum);
-
-  // process a message from a ClientServerStream
-  int ProcessMessage(const unsigned char* msg, size_t msgLength);
-  int ProcessMessage(vtkClientServerStream *str);
-  int ProcessOneMessage(vtkClientServerMessage *msg);
-
-  // assign the last result to an ID
-  int AssignResultToID(vtkClientServerMessage *msg);
+  // Description:
+  // Return an ID given a pointer to a vtkObjectBase (or 0 if object
+  // is not found)
+  vtkClientServerID GetIDFromObject(vtkObjectBase* key);
   
-  // invoke a method on an existing instance
-  int InvokeMethod(vtkClientServerMessage *msg);
-
-  // create a new instance and setup the hash table entries
-  int NewInstance(vtkObjectBase *ptr, vtkClientServerID id);
-  int NewValue(vtkClientServerMessage *ptr, vtkClientServerID id);
+  // Description:
+  // Get/Set a stream to which an execution log is written.
+  vtkSetMacro(LogStream, ostream*);
+  vtkGetMacro(LogStream, ostream*);  
   
-  // delete an existing instance 
-  int DeleteValue(vtkClientServerMessage *msg);  
+  // Description:
+  // Called by generated code to register a new class instance.  Do
+  // not call directly.
+  int NewInstance(vtkObjectBase* obj, vtkClientServerID id);
   
-  // Set the function used to create new objects
-  void AddNewInstanceFunction(vtkClientServerNewInstanceFunction f) 
-    {this->NewInstanceFunctions.push_back(f);}
-
+  // Description:
+  // Add a command function for a class.
+  void AddCommandFunction(const char* cname,
+                          vtkClientServerCommandFunction func);
+  
+  // Description:
+  // Get the command function for an object's class.
+  vtkClientServerCommandFunction GetCommandFunction(vtkObjectBase* obj);  
+  
+  // Description:
+  // Add a function used to create new objects.
+  void AddNewInstanceFunction(vtkClientServerNewInstanceFunction f);
+  
   struct NewCallbackInfo
   {
     const char* Type;
     unsigned long ID;
   };
+  
 protected:
-  vtkHashMap<unsigned long, vtkClientServerMessage *> *IDToMessageMap;
-  vtkHashMap<const char *, vtkClientServerCommandFunction> *ClassToFunctionMap;
-
+  // Map from ID to message stream.
+  typedef vtkHashMap<vtkTypeUInt32, vtkClientServerStream*> IDToMessageMapType;
+  IDToMessageMapType *IDToMessageMap;
+  
+  // Map from class name to command function.
+  typedef vtkHashMap<const char*, vtkClientServerCommandFunction>
+          ClassToFunctionMapType;
+  ClassToFunctionMapType* ClassToFunctionMap;
+  
   // constructor and destructor
   vtkClientServerInterpreter();
-  ~vtkClientServerInterpreter();
-
-  unsigned char* MessageBuffer;
-
-  void AllocateMessageBuffer(vtkIdType len);
+  ~vtkClientServerInterpreter();  
 
   vtkTimerLog* ServerProgressTimer;
   vtkTimerLog* ClientProgressTimer;
+  
+  // A stream to which a log is written.
+  ostream* LogStream;
+  
+  // Internal message processing functions.
+  int ProcessCommandNew(const vtkClientServerStream& css, int midx);
+  int ProcessCommandInvoke(const vtkClientServerStream& css, int midx);
+  int ProcessCommandDelete(const vtkClientServerStream& css, int midx);
+  int ProcessCommandAssignResult(const vtkClientServerStream& css, int midx);
+
+  // Expand all the id_value arguments of a message.
+  int ExpandMessage(const vtkClientServerStream& in, int inIndex,
+                    vtkClientServerStream& out);
+  
+  // Assign the last result to the given ID.  Returns 1 for success, 0
+  // for failure.
+  int AssignResultToID(vtkClientServerID id);
 
 private:
-  vtkClientServerMessage *LastResultMessage;
+  
+  // Message containing the result of the last command.
+  vtkClientServerStream* LastResultMessage;
+  
+  // Internal implementation details.
+  vtkClientServerInterpreterInternals* Internal;
 
+private:
   vtkClientServerInterpreter(const vtkClientServerInterpreter&);  // Not implemented.
   void operator=(const vtkClientServerInterpreter&);  // Not implemented.
-
-  vtkIdType MessageBufferSize;
-  vtkstd::vector<vtkClientServerNewInstanceFunction> NewInstanceFunctions;
 };
 
 #endif
