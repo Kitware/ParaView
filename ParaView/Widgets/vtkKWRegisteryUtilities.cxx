@@ -152,7 +152,11 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
 				       char *value)
 {
   int res = 1;
-  int open = 0;
+  int open = 0;  
+  if ( ! value )
+    {
+    return 0;
+    }
   if ( !this->Opened )
     {
     if ( !this->Open(this->GetTopLevel(), subkey, 
@@ -162,6 +166,7 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
       }
     open = 1;
     }
+  *value = 0;
   res = this->ReadValueInternal(key, value);
 
   if ( open )

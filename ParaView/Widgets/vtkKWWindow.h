@@ -211,7 +211,7 @@ protected:
 			      vtkKWObject *taret, 
 			      const char *command);
   void UpdateRecentMenu(char *key);
-  void StoreRecentMenuToRegistry(char *key);
+  void StoreRecentMenuToRegistery(char *key);
 
   unsigned int NumberOfRecentFiles;
   

@@ -41,9 +41,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWApplication.h"
 #include "vtkKWWindowCollection.h"
+#include "vtkKWRegisteryUtilities.h"
 #ifdef _WIN32
 #include <htmlhelp.h>
-#include "vtkKWWin32RegisteryUtilities.h"
 #endif
 #include "vtkKWObject.h"
 #include "vtkTclUtil.h"
@@ -114,6 +114,7 @@ vtkKWApplication::vtkKWApplication()
 
   this->ExitStatus = 0;
 
+  this->Registery = 0;
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -135,6 +136,10 @@ vtkKWApplication::~vtkKWApplication()
     this->TraceFile->close();
     delete this->TraceFile;
     this->TraceFile = NULL;
+    }
+  if (this->Registery )
+    {
+    this->Registery->Delete();
     }
 }
 
@@ -413,9 +418,8 @@ void vtkKWApplication::DisplayHelp()
 #ifdef _WIN32
   char temp[1024];
   char loc[1024];
-  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
   sprintf(temp, "%i", this->GetApplicationKey());
-  reg->SetTopLevel( temp );
+  vtkKWRegisteryUtilities *reg = this->GetRegistery(temp);
   if ( reg->ReadValue( "Inst", "Loc", loc ) )
     {
     sprintf(temp,"%s/%s.chm::/Introduction/Introduction.htm",
@@ -426,7 +430,6 @@ void vtkKWApplication::DisplayHelp()
     sprintf(temp,"%s.chm::/Introduction/Introduction.htm",
 	    this->ApplicationName);
     }
-  reg->Delete();
   
   HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
 #else
@@ -609,4 +612,19 @@ void vtkKWApplication::AddTraceEntry(const char *format, ...)
   va_end(var_args);
 
   *(this->TraceFile) << event << endl;
+}
+
+vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery( const char*toplevel )
+{
+  this->Registery->SetTopLevel( toplevel );
+  return this->Registery;
+}
+
+vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery()
+{
+  if ( !this->Registery )
+    {
+    this->Registery = vtkKWRegisteryUtilities::New();
+    }
+  return this->Registery;
 }
