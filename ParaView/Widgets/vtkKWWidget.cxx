@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.74");
+vtkCxxRevisionMacro(vtkKWWidget, "1.75");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -347,7 +347,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.74 $");
+  this->ExtractRevision(os,"$Revision: 1.75 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1260,6 +1260,40 @@ void vtkKWWidget::SetImageOption(const unsigned char* data,
                this->GetWidgetName(), image_option, image_name.str());
 
   image_name.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::Grab()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->Script("grab %s", this->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidget::ReleaseGrab()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  this->Script("grab release %s", this->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWidget::IsGrabbed()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+
+  const char *res = this->Script("grab status %s", this->GetWidgetName());
+  return (!strcmp(res, "none") ? 0 : 1);
 }
 
 //----------------------------------------------------------------------------

@@ -317,6 +317,12 @@ public:
                               const char *blend_color_option = 0,
                               const char *image_option = 0);
   
+  // Description:
+  // Grab the widget (locally)
+  virtual void Grab();
+  virtual void ReleaseGrab();
+  virtual int IsGrabbed();
+
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
