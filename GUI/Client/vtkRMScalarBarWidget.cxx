@@ -52,7 +52,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkRMScalarBarWidget);
-vtkCxxRevisionMacro(vtkRMScalarBarWidget, "1.1");
+vtkCxxRevisionMacro(vtkRMScalarBarWidget, "1.2");
 
 #define VTK_PV_COLOR_MAP_RED_HUE 0.0
 #define VTK_PV_COLOR_MAP_RED_SATURATION 1.0
@@ -167,7 +167,7 @@ vtkRMScalarBarWidget::~vtkRMScalarBarWidget()
     }
 }
 //----------------------------------------------------------------------------
-void vtkRMScalarBarWidget::ExecuteEvent(vtkObject* wdg, unsigned long event,  
+void vtkRMScalarBarWidget::ExecuteEvent(vtkObject* , unsigned long event,  
                             void* calldata)
 {
     switch ( event )
@@ -177,7 +177,6 @@ void vtkRMScalarBarWidget::ExecuteEvent(vtkObject* wdg, unsigned long event,
     case vtkCommand::EndInteractionEvent:
       vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
       double *pos1 = sact->GetPositionCoordinate()->GetValue();
-      double *pos2 = sact->GetPosition2Coordinate()->GetValue();
 
       // Synchronize the server scalar bar.
       vtkPVProcessModule* pm = this->PVProcessModule;
