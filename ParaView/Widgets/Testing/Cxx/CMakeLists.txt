@@ -11,4 +11,3 @@ LINK_LIBRARIES(
     vtkCommon
 )
 
-LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg )
