@@ -808,18 +808,6 @@ void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
 
 void vtkPVRenderView::Save(ofstream *file)
 {
-  *file << "vtkRenderer " << this->RendererTclName << "\n"
-        << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
-        << this->RenderWindowTclName << " AddRenderer "
-        << this->RendererTclName << "\n"
-        << "vtkRenderWindowInteractor iren\n\t"
-        << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
-}
-
-void vtkPVRenderView::AddActorsToFile(ofstream *file)
-{
-  int i;
-  char *result;
   vtkCamera *camera;
   float position[3];
   float focalPoint[3];
@@ -827,20 +815,12 @@ void vtkPVRenderView::AddActorsToFile(ofstream *file)
   float viewAngle;
   float clippingRange[2];
 
-  *file << "# assign actors to the renderer\n";
-  
-  for (i = 0; i < this->GetRenderer()->GetActors()->GetNumberOfItems(); i++)
-    {
-    this->Script("set tempValue [[%s GetActors] GetItemAsObject %d]",
-                 this->RendererTclName, i);
-    result = this->Application->GetMainInterp()->result;
-    if (strncmp(result, "vtkTemp", 7) != 0)
-      {
-      *file << this->RendererTclName << " AddActor ";
-      *file << result << "\n";
-      }
-    }
-  *file << "\n";
+  *file << "vtkRenderer " << this->RendererTclName << "\n"
+        << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
+        << this->RenderWindowTclName << " AddRenderer "
+        << this->RendererTclName << "\n"
+        << "vtkRenderWindowInteractor iren\n\t"
+        << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
   
   camera = this->GetRenderer()->GetActiveCamera();
   camera->GetPosition(position);
@@ -861,4 +841,44 @@ void vtkPVRenderView::AddActorsToFile(ofstream *file)
         << "camera SetClippingRange " << clippingRange[0] << " "
         << clippingRange[1] << "\n"
         << this->RendererTclName << " SetActiveCamera camera\n\n";
+}
+
+void vtkPVRenderView::AddActorsToFile(ofstream *file)
+{
+  int i;
+  char *result;
+  char tclName[100];
+  
+  *file << "# assign actors to the renderer\n";
+  
+  for (i = 0; i < this->GetRenderer()->GetActors()->GetNumberOfItems(); i++)
+    {
+    this->Script("set tempValue [[%s GetActors] GetItemAsObject %d]",
+                 this->RendererTclName, i);
+    result = this->Application->GetMainInterp()->result;
+    if (strncmp(result, "vtkTemp", 7) != 0)
+      {
+      *file << this->RendererTclName << " AddActor ";
+      *file << result << "\n";
+      }
+    }
+  for (i = 0; i < this->GetRenderer()->GetActors2D()->GetNumberOfItems(); i++)
+    {
+    this->Script("set tempValue [[%s GetActors2D] GetItemAsObject %d]",
+                 this->RendererTclName, i);
+    result = this->Application->GetMainInterp()->result;
+    sprintf(tclName, result);
+    if (strncmp(result, "vtkTemp", 7) != 0)
+      {
+      this->Script("set vis [%s GetVisibility]", result);
+      result = this->Application->GetMainInterp()->result;
+      if (strncmp(result, "1", 1) == 0)
+        {
+        *file << this->RendererTclName << " AddActor ";
+        *file << tclName << "\n";
+        }
+      }
+    }
+  
+  *file << "\n";
 }

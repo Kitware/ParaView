@@ -192,6 +192,14 @@ public:
   // Needed to render.
   vtkPVRenderView *GetPVRenderView();
 
+  // Description:
+  // Get the name of the scalar bar actor.
+  vtkGetStringMacro(ScalarBarTclName);
+  
+  // Description:
+  // Get the name of the cube axes actor.
+  vtkGetStringMacro(CubeAxesTclName);
+  
 protected:
 
   vtkPVActorComposite();
@@ -274,11 +282,13 @@ protected:
   vtkTimeStamp UpdateTime;
   
   vtkKWCheckButton *ScalarBarCheck;
-  vtkScalarBarActor *ScalarBar;
   vtkKWCheckButton *ScalarBarOrientationCheck;
+  char* ScalarBarTclName;
+  vtkSetStringMacro(ScalarBarTclName);
   
   vtkKWCheckButton *CubeAxesCheck;
-  vtkCubeAxesActor2D *CubeAxes;
+  char* CubeAxesTclName;
+  vtkSetStringMacro(CubeAxesTclName);
 };
 
 #endif

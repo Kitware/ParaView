@@ -159,6 +159,10 @@ public:
   // vtk objects.  This should eliminate circular references.
   void PrepareForDelete();
   
+  // Description:
+  // Get the tcl name of the renderer.
+  vtkGetStringMacro(RendererTclName);
+  
 protected:
 
   vtkPVRenderView();

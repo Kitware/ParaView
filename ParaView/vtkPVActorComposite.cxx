@@ -64,7 +64,7 @@ int vtkPVActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVActorComposite::vtkPVActorComposite()
 {
   static int instanceCount = 0;
-
+  
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;
@@ -124,16 +124,9 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->OutputPortTclName = NULL;
   this->AppendPolyDataTclName = NULL;
   
-  this->ScalarBar = vtkScalarBarActor::New();  
-  this->ScalarBar->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
-  this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
-  this->ScalarBar->SetOrientationToVertical();
-  this->ScalarBar->SetWidth(0.13);
-  this->ScalarBar->SetHeight(0.5);
-  
-  this->CubeAxes = vtkCubeAxesActor2D::New();
-  this->CubeAxes->SetFlyModeToOuterEdges();
-  this->CubeAxes->GetProperty()->SetColor(1, 1, 1);
+  this->ScalarBarTclName = NULL;
+
+  this->CubeAxesTclName = NULL;
 }
 
 
@@ -158,7 +151,20 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetMapperTclName(tclName);
   pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->MapperTclName);
   
-  this->ScalarBar->SetLookupTable(this->Mapper->GetLookupTable());
+  sprintf(tclName, "ScalarBar%d", this->InstanceCount);
+  this->SetScalarBarTclName(tclName);
+  this->Script("vtkScalarBarActor %s", this->GetScalarBarTclName());
+  this->Script("[%s GetPositionCoordinate] SetCoordinateSystemToNormalizedViewport",
+               this->GetScalarBarTclName());
+  this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
+               this->GetScalarBarTclName());
+  this->Script("%s SetOrientationToVertical",
+               this->GetScalarBarTclName());
+  this->Script("%s SetWidth 0.13", this->GetScalarBarTclName());
+  this->Script("%s SetHeight 0.5", this->GetScalarBarTclName());
+  
+  this->Script("%s SetLookupTable [%s GetLookupTable]",
+               this->GetScalarBarTclName(), this->MapperTclName);
   
   sprintf(tclName, "LODDeci%d", this->InstanceCount);
   pvApp->MakeTclObject("vtkQuadricClustering", tclName);
@@ -171,7 +177,9 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
-  this->ScalarBar->SetLookupTable(this->Mapper->GetLookupTable());
+
+  this->Script("%s SetLookupTable [%s GetLookupTable]",
+               this->GetScalarBarTclName(), this->MapperTclName);
   pvApp->BroadcastScript("%s SetLookupTable [%s GetLookupTable]", 
                          this->LODMapperTclName, this->MapperTclName);
  
@@ -260,11 +268,11 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
   this->SetInput(NULL);
     
-  this->ScalarBar->Delete();
-  this->ScalarBar = NULL;
+  delete [] this->ScalarBarTclName;
+  this->ScalarBarTclName = NULL;
   
-  this->CubeAxes->Delete();
-  this->CubeAxes = NULL;
+  delete [] this->CubeAxesTclName;
+  this->CubeAxesTclName = NULL;
   
   pvApp->BroadcastScript("%s Delete", this->MapperTclName);
   this->SetMapperTclName(NULL);
@@ -739,7 +747,7 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
   pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
                          this->LODMapperTclName, name, comp);
 
-  this->ScalarBar->SetTitle(name);
+  this->Script("%s SetTitle %s", this->GetScalarBarTclName(), name);
   
   this->ResetColorRange();
   this->GetPVRenderView()->EventuallyRender();
@@ -762,7 +770,7 @@ void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
   pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
                          this->LODMapperTclName, name, comp);
 
-  this->ScalarBar->SetTitle(name);  
+  this->Script("%s SetTitle %s", this->GetScalarBarTclName(), name);
   
   this->ResetColorRange();
   this->GetPVRenderView()->EventuallyRender();
@@ -873,6 +881,8 @@ void vtkPVActorComposite::Initialize()
   vtkPVApplication *pvApp = this->GetPVApplication();
   float bounds[6];
   vtkDataArray *array;
+  char *tclName;
+  char newTclName[100];
   
   if (this->PVData->GetVTKData()->IsA("vtkPolyData"))
     {
@@ -960,8 +970,21 @@ void vtkPVActorComposite::Initialize()
     bounds[5] += 0.05 * (bounds[5] - bounds[4]);
     }
   
-  this->CubeAxes->SetBounds(bounds);
-  this->CubeAxes->SetCamera(this->GetView()->GetRenderer()->GetActiveCamera());
+  tclName = this->GetPVRenderView()->GetRendererTclName();
+  
+  sprintf(newTclName, "");
+  sprintf(newTclName, "CubeAxes%d", this->InstanceCount);
+  this->SetCubeAxesTclName(newTclName);
+  this->Script("vtkCubeAxesActor2D %s", this->GetCubeAxesTclName());
+  this->Script("%s SetFlyModeToOuterEdges", this->GetCubeAxesTclName());
+  this->Script("[%s GetProperty] SetColor 1 1 1",
+               this->GetCubeAxesTclName());
+  
+  this->Script("%s SetBounds %f %f %f %f %f %f",
+               this->GetCubeAxesTclName(), bounds[0], bounds[1], bounds[2],
+               bounds[3], bounds[4], bounds[5]);
+  this->Script("%s SetCamera [%s GetActiveCamera]",
+               this->GetCubeAxesTclName(), tclName);
   
   if (array = this->PVData->GetVTKData()->GetPointData()->GetActiveScalars())
     {
@@ -1201,6 +1224,7 @@ void vtkPVActorComposite::SetMode(int mode)
 void vtkPVActorComposite::SetScalarBarVisibility(int val)
 {
   vtkRenderer *ren;
+  char *tclName;
   
   if (!this->GetView())
     {
@@ -1208,7 +1232,8 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
     }
   
   ren = this->GetView()->GetRenderer();
-
+  tclName = this->GetPVRenderView()->GetRendererTclName();
+  
   if (ren == NULL)
     {
     return;
@@ -1226,11 +1251,11 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
     {
     if (val)
       {
-      ren->AddActor(this->ScalarBar);
+      this->Script("%s AddActor %s", tclName, this->GetScalarBarTclName());
       }
     else
       {
-      ren->RemoveActor(this->ScalarBar);
+      this->Script("%s RemoveActor %s", tclName, this->GetScalarBarTclName());
       }
     }
 }
@@ -1238,6 +1263,7 @@ void vtkPVActorComposite::SetScalarBarVisibility(int val)
 void vtkPVActorComposite::SetCubeAxesVisibility(int val)
 {
   vtkRenderer *ren;
+  char *tclName;
   
   if (!this->GetView())
     {
@@ -1245,7 +1271,8 @@ void vtkPVActorComposite::SetCubeAxesVisibility(int val)
     }
   
   ren = this->GetView()->GetRenderer();
-
+  tclName = this->GetPVRenderView()->GetRendererTclName();
+  
   if (ren == NULL)
     {
     return;
@@ -1263,11 +1290,11 @@ void vtkPVActorComposite::SetCubeAxesVisibility(int val)
     {
     if (val)
       {
-      ren->AddProp(this->CubeAxes);
+      this->Script("%s AddProp %s", tclName, this->GetCubeAxesTclName());
       }
     else
       {
-      ren->RemoveProp(this->CubeAxes);
+      this->Script("%s RemoveProp %s", tclName, this->GetCubeAxesTclName());
       }
     }
 }
@@ -1291,17 +1318,19 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
   
   if (state)
     {
-    this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
-    this->ScalarBar->SetOrientationToVertical();
-    this->ScalarBar->SetHeight(0.5);
-    this->ScalarBar->SetWidth(0.13);
+    this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
+                 this->GetScalarBarTclName());
+    this->Script("%s SetOrietationToVertical", this->GetScalarBarTclName());
+    this->Script("%s SetHeight 0.5", this->GetScalarBarTclName());
+    this->Script("%s SetWidth 0.13", this->GetScalarBarTclName());
     }
   else
     {
-    this->ScalarBar->GetPositionCoordinate()->SetValue(0.25, 0.13);
-    this->ScalarBar->SetOrientationToHorizontal();
-    this->ScalarBar->SetHeight(0.13);
-    this->ScalarBar->SetWidth(0.5);
+    this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.13",
+                 this->GetScalarBarTclName());
+    this->Script("%s SetOrientationToHorizontal", this->GetScalarBarTclName());
+    this->Script("%s SetHeight 0.13", this->GetScalarBarTclName());
+    this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
     }
   this->GetPVRenderView()->EventuallyRender();
 }
@@ -1310,11 +1339,13 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
 {
   char* charFound;
   int pos;
-  float range[2];
+  float range[2], position[2];
   const char* scalarMode;
   static int readerNum = -1;
   static int outputNum;
   int newReaderNum;
+  char* result;
+  char* tclName;
   
   if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
     {
@@ -1432,4 +1463,63 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
         << this->Actor->GetProperty()->GetInterpolationAsString() << "\n\t"
         << this->ActorTclName << " SetVisibility "
         << this->Actor->GetVisibility() << "\n\n";
+  
+  if (this->ScalarBarCheck->GetState())
+    {
+    *file << "vtkScalarBarActor " << this->ScalarBarTclName << "\n\t"
+          << "[" << this->ScalarBarTclName
+          << " GetPositionCoordinate] SetCoordinateSystemToNormalizedViewport\n\t"
+          << "[" << this->ScalarBarTclName
+          << " GetPositionCoordinate] SetValue ";
+    this->Script("set tempResult [[%s GetPositionCoordinate] GetValue]",
+                 this->ScalarBarTclName);
+    result = this->GetPVApplication()->GetMainInterp()->result;
+    sscanf(result, "%f %f", &position[0], &position[1]);
+    *file << position[0] << " " << position[1] << "\n\t"
+          << this->ScalarBarTclName << " SetOrientationTo";
+    this->Script("set tempResult [%s GetOrientation]",
+                 this->ScalarBarTclName);
+    result = this->GetPVApplication()->GetMainInterp()->result;
+    if (strncmp(result, "0", 1) == 0)
+      {
+      *file << "Horizontal\n\t";
+      }
+    else
+      {
+      *file << "Vertical\n\t";
+      }
+    *file << this->ScalarBarTclName << " SetWidth ";
+    this->Script("set tempResult [%s GetWidth]",
+                 this->ScalarBarTclName);
+    result = this->GetPVApplication()->GetMainInterp()->result;
+    *file << result << "\n\t";
+    *file << this->ScalarBarTclName << " SetHeight ";
+    this->Script("set tempResult [%s GetHeight]",
+                 this->ScalarBarTclName);
+    result = this->GetPVApplication()->GetMainInterp()->result;
+    *file << result << "\n\t"
+          << this->ScalarBarTclName << " SetLookupTable ["
+          << this->MapperTclName << " GetLookupTable]\n\t"
+          << this->ScalarBarTclName << " SetTitle ";
+    this->Script("set tempResult [%s GetTitle]",
+                 this->ScalarBarTclName);
+    result = this->GetPVApplication()->GetMainInterp()->result;
+    *file << result << "\n\n";
+    }
+
+  if (this->CubeAxesCheck->GetState())
+    {
+    *file << "vtkCubeAxesActor2D " << this->CubeAxesTclName << "\n\t"
+          << this->CubeAxesTclName << " SetFlyModeToOuterEdges\n\t"
+          << "[" << this->CubeAxesTclName << " GetProperty] SetColor 1 1 1\n\t"
+          << this->CubeAxesTclName << " SetBounds ";
+    this->Script("set tempResult [%s GetBounds]", this->CubeAxesTclName);
+    result = this->GetPVApplication()->GetMainInterp()->result;
+    *file << result << "\n\t"
+          << this->CubeAxesTclName << " SetCamera [";
+
+    tclName = this->GetPVRenderView()->GetRendererTclName();
+    
+    *file << tclName << " GetActiveCamera]\n\n";
+    }
 }
