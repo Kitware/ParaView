@@ -211,12 +211,17 @@ protected:
   void PrepareForDelete();
 
   void ReadSourceInterfaces();
+  void ReadSourceInterfacesFromString(const char*);
   void ReadSourceInterfacesFromFile(const char*);
   int ReadSourceInterfacesFromDirectory(const char*);
   
   vtkCollection *SourceInterfaces;
   
   vtkPVData *CurrentPVData;
+  
+private:
+  static const char* StandardSourceInterfaces;
+  static const char* StandardFilterInterfaces;
 };
 
 
