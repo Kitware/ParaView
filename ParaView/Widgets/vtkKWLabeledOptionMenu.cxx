@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledOptionMenu);
-vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.5");
+vtkCxxRevisionMacro(vtkKWLabeledOptionMenu, "1.6");
 
 int vtkKWLabeledOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -59,6 +59,7 @@ vtkKWLabeledOptionMenu::vtkKWLabeledOptionMenu()
   this->CommandFunction = vtkKWLabeledOptionMenuCommand;
 
   this->PackHorizontally = 1;
+  this->ExpandOptionMenu = 0;
 
   this->OptionMenu = vtkKWOptionMenu::New();
 }
@@ -122,7 +123,8 @@ void vtkKWLabeledOptionMenu::Pack()
              << " -side left -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->OptionMenu->GetWidgetName() 
-           << " -side left -anchor nw -fill both" << endl;
+           << " -side left -anchor nw -fill both -expand " 
+           << (this->ExpandOptionMenu ? "y" : "n") << endl;
     }
   else
     {
@@ -132,7 +134,8 @@ void vtkKWLabeledOptionMenu::Pack()
              << " -side top -anchor nw" << endl;
       }
     tk_cmd << "pack " << this->OptionMenu->GetWidgetName() 
-           << " -side top -anchor nw -padx 10 -fill both" << endl;
+           << " -side top -anchor nw -padx 10 -fill both -expand "
+           << (this->ExpandOptionMenu ? "y" : "n") << endl;
     }
   
   tk_cmd << ends;
@@ -148,6 +151,19 @@ void vtkKWLabeledOptionMenu::SetPackHorizontally(int _arg)
     return;
     }
   this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWLabeledOptionMenu::SetExpandOptionMenu(int _arg)
+{
+  if (this->ExpandOptionMenu == _arg)
+    {
+    return;
+    }
+  this->ExpandOptionMenu = _arg;
   this->Modified();
 
   this->Pack();
@@ -195,4 +211,7 @@ void vtkKWLabeledOptionMenu::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "PackHorizontally: " 
      << (this->PackHorizontally ? "On" : "Off") << endl;
+
+  os << indent << "ExpandOptionMenu: " 
+     << (this->ExpandOptionMenu ? "On" : "Off") << endl;
 }

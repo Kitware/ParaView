@@ -75,6 +75,12 @@ public:
   vtkGetMacro(PackHorizontally, int);
 
   // Description:
+  // Set the option menu to auto-expand (does not by default).
+  virtual void SetExpandOptionMenu(int);
+  vtkBooleanMacro(ExpandOptionMenu, int);
+  vtkGetMacro(ExpandOptionMenu, int);
+
+  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);
@@ -87,6 +93,7 @@ protected:
   vtkKWOptionMenu *OptionMenu;
 
   int PackHorizontally;
+  int ExpandOptionMenu;
 
   // Pack or repack the widget
 
