@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.22");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.23");
 
 //===========================================================================
 //***************************************************************************
@@ -217,6 +217,11 @@ void vtkPVRenderModule::StartRenderEvent()
       this->Renderer->GetActiveCamera()->GetFocalPoint());
     this->Renderer2D->GetActiveCamera()->SetViewUp(
       this->Renderer->GetActiveCamera()->GetViewUp());
+
+    this->Renderer2D->GetActiveCamera()->SetParallelProjection(
+      this->Renderer->GetActiveCamera()->GetParallelProjection());
+    this->Renderer2D->GetActiveCamera()->SetParallelScale(
+      this->Renderer->GetActiveCamera()->GetParallelScale());
     }
 }
 
