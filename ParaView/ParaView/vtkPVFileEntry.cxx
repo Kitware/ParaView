@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.20");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -224,7 +224,7 @@ void vtkPVFileEntry::Accept()
 
   if (this->ModifiedFlag)
     {  
-    this->AddTraceEntry("$kw(%s) SetValue %s", this->GetTclName(), 
+    this->AddTraceEntry("$kw(%s) SetValue \"%s\"", this->GetTclName(), 
                          this->GetValue());
     }
 
