@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4.2.1");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -65,8 +65,8 @@ vtkPVCameraIcon::vtkPVCameraIcon()
 {
   this->RenderView = 0;
   this->Camera = 0;
-  this->Width = 60;
-  this->Height = 50;
+  // Let's make it square so that they can be used as icons later on...
+  this->Width = this->Height = 48; 
 }
 
 //----------------------------------------------------------------------------
@@ -84,21 +84,37 @@ vtkPVCameraIcon::~vtkPVCameraIcon()
 void vtkPVCameraIcon::Create(vtkKWApplication *pvApp)
 {
   this->Superclass::Create(pvApp, 0);
-  this->Script("%s configure -relief raised", this->GetWidgetName());
-  this->Script("%s configure -padx 0 -pady 0 -anchor center", 
-               this->GetWidgetName());
-  
-  //this->Script("%s configure -width %d -height %d", 
-  //             this->GetWidgetName(), this->Width, this->Height);
-  this->Script("%s configure -anchor s", this->GetWidgetName());
+
   this->SetBind(this, "<Button-1>", "RestoreCamera");
   this->SetBind(this, "<Button-3>", "StoreCamera");
   this->SetBalloonHelpString(
     "Left mouse button retrieve camera; Right mouse button store camera");
-  vtkKWIcon *icon = vtkKWIcon::New();
-  icon->SetImageData(vtkKWIcon::ICON_EMPTY);
-  this->SetImageData(icon);
-  icon->Delete();
+
+  // Get the size of the label, and try to adjust the padding so that
+  // its width/height match the expect icon size (cannot be done
+  // through the -width and -height Tk option since the unit is a char)
+  // The should work up to 1 pixel accuracy (since padding is all around,
+  // the total added pad will be an even nb of pixels).
+
+  this->SetLabel("Empty");
+  this->Script("%s configure -relief raised -anchor center", 
+               this->GetWidgetName());
+
+  int rw, rh, padx, pady, bd;
+  this->Script("concat [winfo reqwidth %s] [winfo reqheight %s] "
+               "[%s cget -padx] [%s cget -pady] [%s cget -bd]",
+               this->GetWidgetName(), this->GetWidgetName(), 
+               this->GetWidgetName(), this->GetWidgetName(), 
+               this->GetWidgetName());
+
+  sscanf(this->GetApplication()->GetMainInterp()->result, 
+         "%d %d %d %d %d", 
+         &rw, &rh, &padx, &pady, &bd);
+  
+  this->Script("%s configure -padx %d -pady %d", 
+               this->GetWidgetName(), 
+               padx + (int)ceil((double)(this->Width  - rw) / 2.0) + bd, 
+               pady + (int)ceil((double)(this->Height - rh) / 2.0) + bd);
 }
 
 //----------------------------------------------------------------------------
@@ -180,6 +196,8 @@ void vtkPVCameraIcon::StoreCamera()
     char buff[100];
     sprintf(buff, "%p", this->Camera);
     this->SetLabel(buff);
+    this->Script("%s configure -padx 0 -pady 0 -anchor center", 
+                 this->GetWidgetName());
     }
 }
 
