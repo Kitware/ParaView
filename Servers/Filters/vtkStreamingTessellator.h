@@ -74,9 +74,11 @@
 #ifndef vtkStreamingTessellator_h
 #define vtkStreamingTessellator_h
 
-#include <vtkObject.h>
+#include "vtkObject.h"
 
-class vtkSubdivisionAlgorithm ;
+#undef PARAVIEW_DEBUG_TESSELLATOR
+
+class vtkSubdivisionAlgorithm;
 
 class VTK_EXPORT vtkStreamingTessellator : public vtkObject
 {
@@ -198,7 +200,52 @@ class VTK_EXPORT vtkStreamingTessellator : public vtkObject
     void AdaptivelySample2Facet( double* v1, double* v2, double* v3 ) const ;
     void AdaptivelySample1Facet( double* v1, double* v2 ) const ;
 
+    // Description:
+    // Reset/access the histogram of subdivision cases encountered.
+    // The histogram may be used to examine coverage during testing as well as characterizing the
+    // tessellation algorithm's performance.
+    // You should call ResetCounts() once, at the beginning of a stream of tetrahedra.
+    // It must be called before AdaptivelySample3Facet() to prevent uninitialized memory reads.
+    //
+    // These functions have no effect (and return 0) when PARAVIEW_DEBUG_TESSELLATOR has not been defined.
+    // By default, PARAVIEW_DEBUG_TESSELLATOR is not defined, and your code will be fast and efficient. Really!
+    void ResetCounts()
+    {
+#ifdef PARAVIEW_DEBUG_TESSELLATOR
+      for ( int i=0; i<11; ++i )
+        {
+        this->CaseCounts[i] = 0;
+        for ( int j=0; j<51; ++j )
+          {
+          this->SubcaseCounts[i][j] = 0;
+          }
+        }
+#endif // PARAVIEW_DEBUG_TESSELLATOR
+    }
+    vtkIdType GetCaseCount( int c )
+      {
+#ifdef PARAVIEW_DEBUG_TESSELLATOR
+      return this->CaseCounts[c];
+#else
+      return 0;
+#endif // PARAVIEW_DEBUG_TESSELLATOR
+      }
+    vtkIdType GetSubcaseCount( int casenum, int sub )
+      {
+#ifdef PARAVIEW_DEBUG_TESSELLATOR
+      return this->SubcaseCounts[casenum][sub];
+#else
+      return 0;
+#endif // PARAVIEW_DEBUG_TESSELLATOR
+      }
+
   protected:
+    //BTX
+    static int EdgeCodesToCaseCodesPlusPermutation[64][2];
+    static vtkIdType PermutationsFromIndex[24][14];
+    static vtkIdType TetrahedralDecompositions[];
+    //ETX
+
     void* PrivateData;
     const void* ConstPrivateData;
     vtkSubdivisionAlgorithm* Algorithm;
@@ -206,6 +253,10 @@ class VTK_EXPORT vtkStreamingTessellator : public vtkObject
     EdgeProcessorFunction Callback1;
     TriangleProcessorFunction Callback2;
     TetrahedronProcessorFunction Callback3;
+#ifdef PARAVIEW_DEBUG_TESSELLATOR
+    mutable vtkIdType CaseCounts[11];
+    mutable vtkIdType SubcaseCounts[11][51];
+#endif // PARAVIEW_DEBUG_TESSELLATOR
     //ETX
 
     // Description:
@@ -230,7 +281,7 @@ class VTK_EXPORT vtkStreamingTessellator : public vtkObject
     vtkStreamingTessellator();
     ~vtkStreamingTessellator();
 
-    void AdaptivelySample3Facet( double* v1, double* v2, double* v3, double* v4, int maxDepth, int move=127 ) const ;
+    void AdaptivelySample3Facet( double* v1, double* v2, double* v3, double* v4, int maxDepth ) const ;
     void AdaptivelySample2Facet( double* v1, double* v2, double* v3, int maxDepth, int move=7 ) const ;
     void AdaptivelySample1Facet( double* v1, double* v2, int maxDepth ) const ;
 
