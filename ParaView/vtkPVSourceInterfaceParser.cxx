@@ -216,7 +216,7 @@ int vtkPVSourceInterfaceParser::ParseFile()
       {
       // Part of a line longer than our buffer, clear the fail bit of
       // the stream so that we can continue.
-      fin.clear(fin.rdstate() & ~std::ios::failbit);
+      fin.clear(fin.rdstate() & ~ios::failbit);
       this->Parse(buffer, count);
       if(!this->Parse(buffer, count)) { return 0; }
       }
