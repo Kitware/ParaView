@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSaveImageDialog.h"
 #include "vtkObjectFactory.h"
 
-
+#include "vtkKWMessageDialog.h"
 
 //------------------------------------------------------------------------------
 vtkKWSaveImageDialog* vtkKWSaveImageDialog::New()
@@ -101,7 +101,16 @@ void vtkKWSaveImageDialog::Invoke()
     else
       {
       // unknown file extension
-      this->Script("tk_messageBox -icon error -title \"Save Image Error\" -message \"A valid file extension was not found.\\nPlease use a .bmp, .ppm, or .tif file extension\\nwhen naming your file.\"");
+      vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
+      dlg2->Create(this->Application,"");
+      dlg2->SetText(
+        "A valid file extension was not found.\\n"
+	"Please use a .bmp, .ppm, or .tif file extension\\n"
+	"when naming your file.");
+      dlg2->SetIcon(vtkKWMessageDialog::Error);
+      dlg2->SetTitle("Save Image Error");
+      dlg2->Invoke();
+      dlg2->Delete();
       }
     }
   
