@@ -132,7 +132,8 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
   this->Script("frame %s",wname);
   this->ScaleWidget->Create(app,"scale","-orient horizontal -showvalue no"
                             " -borderwidth 2");
-  this->Script("%s configure %s",this->ScaleWidget->GetWidgetName(),args);
+  this->Script("%s configure %s",this->ScaleWidget->GetWidgetName(),
+               (args?args:""));
   this->Script("%s configure -resolution %f -highlightthickness 0",
                this->ScaleWidget->GetWidgetName(),this->Resolution);
   this->Script("%s configure -from %f -to %f",

@@ -97,11 +97,11 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
   if ( this->LineType == vtkKWLabel::MultiLine )
     {
     this->Script("message %s -text {%s} %s -width %d", 
-                 wname, this->Label, args, this->Width);
+                 wname, this->Label, (args?args:""), this->Width);
     }
   else
     {
-    this->Script("label %s -text {%s} %s", wname, this->Label, args);
+    this->Script("label %s -text {%s} %s", wname, this->Label, (args?args:""));
     }
 }
 
