@@ -100,7 +100,7 @@ The flow integration fitler  integrates the dot product of a point flow vector f
     <Filter class="vtkCTHAMRCellToPointData">
       <Input name="Input"
              class="vtkCTHData">
-        <ArrayRequirement attribute="Cell" components="1"/>
+        <ArrayRequirement attribute="Cell"/>
       </Input>
     </Filter>
 
