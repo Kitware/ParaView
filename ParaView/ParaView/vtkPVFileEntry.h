@@ -143,6 +143,10 @@ public:
   // Description:
   void SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName);
 
+  // Description:
+  // Get the range of files.
+  vtkGetVector2Macro(Range, int);
+
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();
