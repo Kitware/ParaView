@@ -78,17 +78,6 @@ public:
   // Side effect is to turn the modified flag off.
   virtual void Reset() = 0;
 
-//BTX
-  // Description:
-  // Creates and returns a copy of this widget. It will create
-  // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
-  // parameters.
-  virtual vtkPV3DWidget* ClonePrototype(vtkPVSource* pvSource,
-					vtkArrayMap<vtkPVWidget*, 
-					vtkPVWidget*>* map) = 0;
-//ETX
-
   // Description:
   // Set the line visibility.
   void SetVisibility();
@@ -114,7 +103,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)=0;
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 
   friend class vtkPV3DWidgetObserver;
 //ETX

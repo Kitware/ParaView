@@ -167,6 +167,14 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 }
 
 //----------------------------------------------------------------------------
+void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone, 
+				   vtkPVSource* pvSource,
+				   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+{
+  this->Superclass::CopyProperties(clone, pvSource, map);
+}
+
+//----------------------------------------------------------------------------
 void vtkPV3DWidget::SetValueChanged()
 {
   this->ValueChanged = 1;
