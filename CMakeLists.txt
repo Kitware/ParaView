@@ -47,14 +47,14 @@ IF(USE_INCLUDED_TCLTK)
  
     IF (CMAKE_ESCAPES_SC)
       ADD_CUSTOM_TARGET(maketcl ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix\; make )
+        cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix\; $(MAKE) )
       ADD_CUSTOM_TARGET(maketk ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix\; make )
+        cd ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix\; $(MAKE) )
     ELSE (CMAKE_ESCAPES_SC)
       ADD_CUSTOM_TARGET(maketcl ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix; make )
+        cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix; $(MAKE) )
       ADD_CUSTOM_TARGET(maketk ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix; make )
+        cd ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix; $(MAKE) )
     ENDIF (CMAKE_ESCAPES_SC)
   
   ELSE(UNIX)
