@@ -38,6 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkPVSource;
 class vtkPolyDataMapper;
 
+
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_TAG 1120
@@ -68,13 +69,11 @@ public:
 //ETX
   void RemoteSimpleScript(int remoteId, char *str);
   void BroadcastSimpleScript(char *str);
-
-  
   
   // Description:
   // We need to keep the controller in a prominent spot because there is no more 
   // "RegisterAndGetGlobalController" method.
-  vtkSetObjectMacro(Controller, vtkMultiProcessController);
+  void SetController(vtkMultiProcessController *c);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
   
   // Description:
@@ -112,12 +111,24 @@ public:
   void SendDataNumberOfPoints(vtkDataSet *data);
   void SendMapperColorRange(vtkPolyDataMapper *mapper);
   
+  // Description:
+  // Methods that will create a text log file.
+  // I do not know what kind of login I will be doing, (multi threading ...)
+  // So I will keep the interface generic.
+  void StartLog(char *filename);
+  void StopLog();
+  void AddLogEntry(char *tag, float value);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
   vtkPVApplication(const vtkPVApplication&) {};
   void operator=(const vtkPVApplication&) {};
   
+  void *Log;
+  char *LogFileName;
+  vtkSetStringMacro(LogFileName);
+
   void CreateButtonPhotos();
   void CreatePhoto(char *name, unsigned char *data, int width, int height);
   int CheckRegistration();

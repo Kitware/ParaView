@@ -43,8 +43,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWRotateViewButton.h"
 #include "vtkKWTranslateViewButton.h"
 #include "vtkKWPickCenterButton.h"
+#include "vtkTimerLog.h"
+#include "vtkPVOutputWindow.h"
 #include "vtkOutputWindow.h"
-
 
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
@@ -95,8 +96,9 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationName("ParaView");
 
   this->Controller = NULL;
+  this->Log = NULL;
+  this->LogFileName = NULL;
 
-  vtkOutputWindow::GetInstance()->PromptUserOff();
 
   // For some reason "GetObjectFromPointer" is returning vtkTemp0 instead
   /// of Application.  Lets force it.
@@ -108,10 +110,50 @@ vtkPVApplication::vtkPVApplication()
   //strcpy(this->TclName,"Application");
 }
 
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetController(vtkMultiProcessController *c)
+{
+  if (this->Controller == c)
+    {
+    return;
+    }
+
+  if (c)
+    {
+    c->Register(this);
+    if (c->GetNumberOfProcesses() > 1)
+      {
+      // Use the most primative error messages.
+      // The only other alternative is to use the file output window (mutiple procs?)
+      vtkOutputWindow *ow = vtkPVOutputWindow::New();
+      ow->PromptUserOff();
+      vtkOutputWindow::SetInstance(ow);
+      ow->Delete();
+      }
+    }
+  if (this->Controller)
+    {
+    this->Controller->UnRegister(this);
+    }
+
+  this->Controller = c;
+}
+
+
+
+
+
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
   this->SetController(NULL);
+  if (this->Log)
+    {
+    this->StopLog();
+    }
 }
 
 
@@ -387,6 +429,39 @@ void vtkPVApplication::CreatePhoto(char *name, unsigned char *data,
 
 }
 
+
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::StartLog(char *filename)
+{
+  if (this->Log)
+    {
+    this->StopLog();
+    }
+  this->Log = (void *)(vtkTimerLog::New());
+  this->SetLogFileName(filename);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::StopLog()
+{
+  if (this->Log)
+    {
+    ((vtkTimerLog*)this->Log)->DumpLog(this->LogFileName);
+    ((vtkTimerLog*)this->Log)->Delete();
+    this->Log = NULL;
+    this->SetLogFileName(NULL);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::AddLogEntry(char *tag, float val)
+{
+  if (this->Log)
+    {
+    ((vtkTimerLog*)this->Log)->FormatAndMarkEvent("%s: %f", tag, val);
+    }
+}
 
 //============================================================================
 // Make instances of sources.
