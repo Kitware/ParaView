@@ -17,8 +17,6 @@
 #include "vtkKWApplication.h"
 #include "vtkKWResourceUtilities.h"
 
-#include "vtkPNGWriter.h"
-#include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 
 #include "vtkWindows.h"
@@ -43,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.44");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.45");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -2000,35 +1998,30 @@ int vtkKWTkUtilities::TakeScreenDump(Tcl_Interp *interp,
     }
 
 
-  vtkImageData* id = vtkImageData::New();
-  id->SetDimensions(ww, hh, 1);
-  id->SetScalarTypeToUnsignedChar();
-  id->SetNumberOfScalarComponents(3);
-  id->AllocateScalars();
+  unsigned long stride = ww * 3;
+  unsigned long buffer_length = stride * hh;
+  unsigned char *buffer = new unsigned char [buffer_length];
+  unsigned char *ptr = buffer + buffer_length - stride;
 
-  unsigned char* ptr = (unsigned char*) id->GetScalarPointer();
   int x, y;
   for (y = 0; y < hh; y++) 
     {
     for (x = 0; x < ww; x++) 
       {
       double red, green, blue;
-      vtkKWTkUtilitiesTkImageGetColor(&cdata, XGetPixel(ximage, x, hh-y-1),
-        &red, &green, &blue);
-      ptr[0] = (unsigned char)(255 * red);
-      ptr[1] = (unsigned char)(255 * green);
-      ptr[2] = (unsigned char)(255 * blue);
-      ptr += 3;
+      vtkKWTkUtilitiesTkImageGetColor(
+        &cdata, XGetPixel(ximage, x, hh - y - 1), &red, &green, &blue);
+      *ptr++ = (unsigned char)(255 * red);
+      *ptr++ = (unsigned char)(255 * green);
+      *ptr++ = (unsigned char)(255 * blue);
       }
+    ptr -= stride;
+    ptr -= stride;
     }
-  vtkPNGWriter *writer = vtkPNGWriter::New();
-  writer->SetInput(id);
-  writer->SetFileName(fname);
-  writer->Write();
-  writer->Delete();
-  id->Delete();
 
-  cout << "Writing dump to: " << fname << endl;
+  vtkKWResourceUtilities::WritePNGImage(fname, ww, hh, 3, buffer);
+
+  delete [] buffer;
 
   XDestroyImage(ximage);
 
