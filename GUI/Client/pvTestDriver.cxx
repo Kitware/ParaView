@@ -43,7 +43,7 @@ pvTestDriver::pvTestDriver()
 
 int pvTestDriver::WaitForAndPrintData(kwsysProcess* process,
                                       double timeout, int* foundWaiting,
-                                      std::string* output)
+                                      vtkstd::string* output)
 {
   if(!process)
     {
@@ -354,28 +354,28 @@ int pvTestDriver::Main(int argc, char* argv[])
   int clientPipe = 1;
   int serverPipe = 1;
   int renderServerPipe = 1;
-  std::string output;
+  vtkstd::string output;
   int mpiError = 0;
   while(clientPipe || serverPipe || renderServerPipe)
     {
     clientPipe = WaitForAndPrintData(client, 0.1, 0, &output);
     if(output.find("error") != output.npos)
       {
-      std::cerr << "Client had an MPI error in the output, test failed.\n";
+      cerr << "Client had an MPI error in the output, test failed.\n";
       mpiError = 1;
       }
     output = "";
     serverPipe = WaitForAndPrintData(server, 0.1, 0, &output);
     if(output.find("error") != output.npos)
       {
-      std::cerr << "Server had an MPI error in the output, test failed.\n";
+      cerr << "Server had an MPI error in the output, test failed.\n";
       mpiError = 1;
       }
     output = "";
     renderServerPipe = WaitForAndPrintData(renderServer, 0.1, 0, &output);
     if(output.find("error") != output.npos)
       {
-      std::cerr << "Render Server had an MPI error in the output, test failed.\n";
+      cerr << "Render Server had an MPI error in the output, test failed.\n";
       mpiError = 1;
       }
     output = "";
@@ -429,7 +429,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
   if(mpiError)
     {
-    std::cerr << "MPI Error, pvTestDriver returning " << mpiError << "\n";
+    cerr << "MPI Error, pvTestDriver returning " << mpiError << "\n";
     return mpiError;
     }
   // if both servers are fine return the client result
