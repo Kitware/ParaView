@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.6");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.7");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -170,7 +170,7 @@ void vtkPVApplicationSettingsInterface::Update()
 {
   this->Superclass::Update();
 
-  if (!this->IsCreated())
+  if (!this->IsCreated() || !this->Window)
     {
     return;
     }
