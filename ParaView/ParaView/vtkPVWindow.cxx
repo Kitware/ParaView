@@ -115,7 +115,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.365");
+vtkCxxRevisionMacro(vtkPVWindow, "1.366");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1965,7 +1965,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
         if ( it->GetData(rm) == VTK_OK && rm && rm->GetDescription() )
           {
           ostrstream str;
-          str << rm->GetDescription() << " reader" << ends;
+          str << rm->GetDescription() << " Reader" << ends;
           listbox->AppendUnique(str.str());
           str.rdbuf()->freeze(0);
           }
@@ -3604,7 +3604,26 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   this->FileDescriptions = newStr;
   newStr = NULL;
 
-  this->ReaderList->AppendItem(prototype);
+  int found=0;
+  vtkLinkedListIterator<vtkPVReaderModule*>* it = 
+    this->ReaderList->NewIterator();
+  while(!it->IsDoneWithTraversal())
+    {
+    vtkPVReaderModule* rm = 0;
+    int retVal = it->GetData(rm);
+    if ( rm == prototype )
+      {
+      found = 1;
+      break;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  if (!found)
+    {
+    this->ReaderList->AppendItem(prototype);
+    }
   this->MenuFile->SetState("Open Data File", vtkKWMenu::Normal);
 }
 
@@ -3720,7 +3739,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.365 $");
+  this->ExtractRevision(os,"$Revision: 1.366 $");
 }
 
 //----------------------------------------------------------------------------
