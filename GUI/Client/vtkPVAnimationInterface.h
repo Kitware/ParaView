@@ -163,7 +163,12 @@ public:
   // Save images or geometry for replay.
   void SaveImagesCallback();
   void SaveImages(const char* fileRoot, const char* ext,
-                  int width, int height, int aspectRatio = 0);
+                  int width, int height, int aspectRatio);
+  void SaveImages(const char* fileRoot, const char* ext,
+                  int width, int height)
+    {
+    this->SaveImages(fileRoot, ext, width, height, 0);
+    }
   void SaveGeometryCallback();
   void SaveGeometry(const char* fileRoot, int numParititons);
 
