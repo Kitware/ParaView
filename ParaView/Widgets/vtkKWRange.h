@@ -271,6 +271,13 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Turn on/off the automatic clamping of the end values when the 
+  // user types a value beyond the range. Default is on.
+  vtkSetMacro(ClampRange, int);
+  vtkGetMacro(ClampRange, int);
+  vtkBooleanMacro(ClampRange, int);
+
 protected:
   vtkKWRange();
   ~vtkKWRange();
@@ -300,6 +307,8 @@ protected:
   int   InInteraction;
   int   StartInteractionPos;
   float StartInteractionRange[2];
+
+  int ClampRange;
 
   char  *Command;
   char  *StartCommand;
