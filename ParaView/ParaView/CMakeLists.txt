@@ -115,6 +115,7 @@ SET( ParaView_SRCS
   vtkPVProbe.cxx
   vtkPVProcessModule.cxx
   vtkPVPushButton.cxx
+  vtkPVRawReaderModule.cxx
   vtkPVReaderModule.cxx
 #  vtkPVRenderGroupDialog.cxx
   vtkPVRenderModule.cxx
