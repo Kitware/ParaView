@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.14");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.15");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -97,11 +97,6 @@ int vtkPVAdvancedReaderModule::ReadFileInformation(const char* fname)
     {
     return retVal;
     }
-  
-  // Update the reader's information on node 0 so that the widgets can
-  // get the correct initial values.
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->ServerScript("%s UpdateInformation", this->GetVTKSourceTclName());
   
   // We need to update the widgets.
   vtkPVWidgetProperty *pvwProp;
