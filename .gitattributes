@@ -2,7 +2,6 @@
 
 *.bat           -crlf
 *.dsp           -crlf
-*.dsw           -crlf
 browse           crlf=input
 configure        crlf=input
 configure.in     crlf=input
