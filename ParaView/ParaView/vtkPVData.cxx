@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.241");
+vtkCxxRevisionMacro(vtkPVData, "1.242");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2741,7 +2741,10 @@ void vtkPVData::SaveState(ofstream *file)
     {
     *file << "$kw(" << this->GetTclName() << ") SetActorOrigin "
           << f1 << " " << f2 << " " << f3 << endl;
-    }  
+    }
+  
+  *file << "$kw(" << this->GetTclName() << ") SetVisibility "
+        << this->GetVisibility() << endl;
 }
 
 //----------------------------------------------------------------------------
