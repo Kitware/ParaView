@@ -54,6 +54,7 @@ set kw(vtkTemp309) [$kw(vtkTemp300) GetPVWidget {Orient}]
 $kw(vtkTemp309) SetCurrentValue {Off}
 $kw(vtkTemp300) AcceptCallback
 
+
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp260)
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp300)
 set kw(vtkTemp308) [$kw(vtkTemp300) GetPVWidget {Scale Mode}]

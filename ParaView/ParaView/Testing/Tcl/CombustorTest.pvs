@@ -112,6 +112,7 @@ $pvExtract AcceptCallback
 [$pvExtract GetPVOutput] SetVisibility 1
 
 [$pvGlyph GetPVOutput] SetVisibility 1
+[$pvGlyph GetPVOutput] ColorByProperty
 
 $camera SetPosition 36.8437 -0.196199 53.7392
 $camera SetFocalPoint -5.92921 -0.324064 18.022

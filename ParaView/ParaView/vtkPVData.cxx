@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.6");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.7");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1426,15 +1426,22 @@ void vtkPVData::UpdateProperties()
     return;
     }
 
-  char tmp[350], cmd[1024];
+  char tmp[350], cmd[1024], defCmd[350];
   float bounds[6];
   int i, j, numArrays, numComps;
-  vtkFieldData *fieldData;
+  vtkDataSetAttributes *fieldData;
   vtkPVApplication *pvApp = this->GetPVApplication();  
   vtkDataArray *array;
   char *currentColorBy;
   int currentColorByFound = 0;
   vtkPVWindow *window;
+  int defPoint = 0;
+  const char* defArrayName;
+
+  // Default is the scalars to use when current color is not found.
+  // This is sort of a mess, and should be handled by a color selection widget.
+  defCmd[0] = '\0'; 
+  defArrayName = NULL;
 
   // Set LOD based on point threshold of render view.
   // This is imperfect because the critera is based on
@@ -1547,6 +1554,12 @@ void vtkPVData::UpdateProperties()
             {
             currentColorByFound = 1;
             }
+          if (fieldData->GetScalars() == array)
+            {
+            strcpy(defCmd, tmp);
+            defPoint = 1;
+            defArrayName = array->GetName();
+            }
           }
         }
       }
@@ -1579,6 +1592,12 @@ void vtkPVData::UpdateProperties()
             {
             currentColorByFound = 1;
             }
+          if (defArrayName == NULL && fieldData->GetScalars() == array)
+            {
+            strcpy(defCmd, tmp);
+            defPoint = 0;
+            defArrayName = array->GetName();
+            }
           }
         }
       }
@@ -1587,10 +1606,24 @@ void vtkPVData::UpdateProperties()
   // then default back to the property.
   if ( ! currentColorByFound)
     {
-    this->ColorMenu->SetValue("Property");
-    this->ColorByPropertyInternal();
+    if (defArrayName != NULL)
+      {
+      this->ColorMenu->SetValue(defCmd);
+      if (defPoint)
+        {
+        this->ColorByPointFieldComponentInternal(defArrayName, 0);
+        }
+      else
+        {
+        this->ColorByCellFieldComponentInternal(defArrayName, 0);
+        }
+      }
+    else
+      {
+      this->ColorMenu->SetValue("Property");
+      this->ColorByPropertyInternal();
+      }
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -2776,7 +2809,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.6 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.7 $");
 }
 
 //----------------------------------------------------------------------------
