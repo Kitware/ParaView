@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.23");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.24");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -211,7 +211,7 @@ void vtkPVSourceList::ChildUpdate(vtkPVSource* current, int NoBind)
   if ( thisy == 0 )
     {
     lasty = y;
-    y = this->UpdateSource(current, y, in, (current == comp), NoBind);
+    y = this->UpdateSource(current, y, in, 1, NoBind);
     thisy = y;
     }
 
@@ -332,9 +332,9 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
   //if (comp->GetPVWindow()->GetCurrentPVSource() == comp)
   if (current)
     {
-    this->Script("%s create rectangle %d %d %d %d -fill %s -outline {}",
+    this->Script("%s create rectangle %d %d %d %d -fill yellow -outline {}",
                  this->Canvas->GetWidgetName(), 
-                 bbox[0], bbox[1], bbox[2], bbox[3], "yellow");
+                 bbox[0], bbox[1], bbox[2], bbox[3]);
     tmp = vtkString::Duplicate(this->Application->GetMainInterp()->result);
     this->Script( "%s lower %s",this->Canvas->GetWidgetName(), tmp);
     delete [] tmp;
