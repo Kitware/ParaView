@@ -357,7 +357,7 @@ int vtkPVLineWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long, void*)
+void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
   vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
   if (!widget)
@@ -376,7 +376,7 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long, void*)
     {
     this->Point2[i]->SetValue(val[i],5);
     }
-  this->ModifiedCallback();
+  this->Superclass::ExecuteEvent(wdg, l, p);
 }
 
 //----------------------------------------------------------------------------

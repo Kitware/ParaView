@@ -27,8 +27,7 @@ set kw(vtkTemp337) [$kw(vtkTemp1) CreatePVSource Clip]
 set kw(vtkTemp351) [$kw(vtkTemp337) GetPVWidget {Clip Function}]
 $kw(vtkTemp351) SetCurrentValue {Sphere}
 set kw(vtkTemp358) [$kw(vtkTemp351) GetPVWidget {Sphere}]
-set kw(vtkTemp359) [$kw(vtkTemp358) GetCenterEntry]
-$kw(vtkTemp359) SetValue 10 0 0
+$kw(vtkTemp358) SetCenter 10 0 0
 $kw(vtkTemp337) AcceptCallback
 set kw(vtkTemp389) [$kw(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 $kw(vtkTemp389) AcceptCallback

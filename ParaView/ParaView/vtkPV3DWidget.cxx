@@ -89,7 +89,8 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->Visibility   = vtkKWCheckButton::New();
   this->Frame        = vtkKWFrame::New();
-  this->ValueChanged = 0;
+  this->ValueChanged = 1;
+  this->ModifiedFlag = 1;
   this->Widget3D = 0;
   this->Visible = 0;
   this->Placed = 0;
@@ -153,7 +154,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 	       this->Visibility->GetWidgetName());
 
   this->ChildCreate(pvApp);
-  
+
   vtkPVGenericRenderWindowInteractor* iren = 
     this->PVSource->GetPVWindow()->GetGenericInteractor();
   if (iren)
@@ -251,10 +252,21 @@ void vtkPV3DWidget::PlaceWidget()
     {
     data = this->PVSource->GetPVInput()->GetVTKData();
     }
-  if (this->Placed || data != this->Widget3D->GetInput())
+  if (!this->Placed || data != this->Widget3D->GetInput())
     {
     this->Widget3D->SetInput(data);
     this->Widget3D->PlaceWidget();
+    this->Placed = 1;
+    this->ModifiedFlag = 1;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::ExecuteEvent(vtkObject*, unsigned long event, void*)
+{
+  if ( event != vtkCommand::PlaceWidgetEvent )
+    {
+    this->ModifiedCallback();
     }
 }
 

@@ -130,7 +130,7 @@ protected:
 
   // Description:
   // Execute event of the 3D Widget.
-  virtual void ExecuteEvent(vtkObject*, unsigned long, void*) = 0;
+  virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
   
   virtual int ReadXMLAttributes(vtkPVXMLElement* element,
 				vtkPVXMLPackageParser* parser);
