@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.1");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.2");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -257,12 +257,19 @@ int vtkTiledDisplaySchedule::SwapIfApproporiate(int pid1, int pid2,
   int max;
   int t1, t2;
 
+  // Process 0 is the user interface (zeroEmpty).
+  if (pid1 == 0 || pid2 == 0)
+    {
+    return 0;
+    }
+
   p1 = this->Processes[pid1];
   p2 = this->Processes[pid2];
 
   // Cannot move processes with composite id 0 because final image needs
   // to end up on the assigned process.
-  if (p1->CompositeId == 0 || p2->CompositeId == 0)
+  // Tile composite Id is actually 1 because of zeroEmpty condition (hardcoded).
+  if (p1->CompositeId == 1 || p2->CompositeId == 1)
     {
     return 0;
     }
@@ -437,7 +444,7 @@ void vtkPVTiledDisplayManager::InitializeSchedule()
     }
 
   // Now shuffle tile schedules into one jumbo schedule.
-  max = 0;
+  max = 1;
   for (pIdx = 0; pIdx < this->NumberOfProcesses; ++pIdx)
     {
     if (totalProcessLengths[pIdx] > max)
@@ -450,7 +457,8 @@ void vtkPVTiledDisplayManager::InitializeSchedule()
     delete this->Schedule;
     this->Schedule = NULL;
     }
-  // Create the schedule and processes (Elements added by shuffle).
+  // Create the schedule and processes 
+  // (Elements added later by shuffle).
   this->Schedule = new vtkTiledDisplaySchedule;
   this->Schedule->NumberOfProcesses = this->NumberOfProcesses;
   this->Schedule->Processes = 
@@ -459,6 +467,12 @@ void vtkPVTiledDisplayManager::InitializeSchedule()
     {
     p = new vtkTiledDisplayProcess;
     this->Schedule->Processes[pIdx] = p;
+    // Hard coded zeroEmpty
+    p->TileId = -1;
+    if (pIdx > 0 && pIdx <= numberOfTiles)
+      {
+      p->TileId = pIdx - 1;
+      }
     p->CompositeId = -1;  // Not used here.
     // Length is the actual number of elements in the process
     // not the length of the array.  No array bounds checking.
@@ -556,6 +570,11 @@ void vtkPVTiledDisplayManager::SetPDataSize(int x, int y)
   int numPixels;
   int numComps;
   int idx;
+
+  if (this->PData == NULL)
+    {
+    this->InitializeBuffers();
+    }
 
   if (x < 0)
     {
@@ -958,10 +977,11 @@ void vtkPVTiledDisplayManager::Composite()
   int numProcs = this->NumberOfProcesses;
   vtkTiledDisplayProcess *tdp;
   vtkTiledDisplayElement *tde;
-  int i, id;
+  int i;
   int uncompressedLength = this->ZData->GetNumberOfTuples();
   int bufSize=0;
   int numComps = this->PData->GetNumberOfComponents();
+  int tileId = this->Schedule->Processes[myId]->TileId;
 
   //this->Timer->StartTimer();
 
@@ -1000,13 +1020,14 @@ void vtkPVTiledDisplayManager::Composite()
     else 
       {
       bufSize = this->TileZData[tde->TileId]->GetNumberOfTuples();
-      this->Controller->Send(&bufSize, 1, id, 98);
-      this->Controller->Send(this->TileZData[tde->TileId]->GetPointer(0), bufSize, id, 99);
+      this->Controller->Send(&bufSize, 1, tde->OtherProcessId, 98);
+      this->Controller->Send(this->TileZData[tde->TileId]->GetPointer(0), 
+                             bufSize, tde->OtherProcessId, 99);
       bufSize = this->TilePData[tde->TileId]->GetNumberOfTuples() * numComps;
-      this->Controller->Send(&bufSize, 1, id, 98);
+      this->Controller->Send(&bufSize, 1, tde->OtherProcessId, 98);
       this->Controller->Send(reinterpret_cast<unsigned char*>
-                             (this->TileZData[tde->TileId]->GetVoidPointer(0)), 
-                             bufSize, id, 99);
+                             (this->TilePData[tde->TileId]->GetVoidPointer(0)), 
+                             bufSize, tde->OtherProcessId, 99);
           
       }
     }
@@ -1015,16 +1036,17 @@ void vtkPVTiledDisplayManager::Composite()
   vtkCommunicator::SetUseCopy(1);
 #endif
 
-  // Just hard code zeroEmpty
-  if (myId > 0 && myId <= this->NumberOfTiles)
+  if (tileId >= 0)
     {
     // Now we want to decompress into the original buffers.
     // Ignore z because it is not used by composite manager.
-    vtkCompressCompositer::Uncompress(this->TileZData[myId], this->TilePData[myId], 
+    vtkCompressCompositer::Uncompress(this->TileZData[tileId], 
+                     this->TilePData[tileId], 
                      this->PData, uncompressedLength);
-    int* windowSize = this->RenderWindow->GetSize();
-    this->RenderWindow->SetPixelData(0, 0, windowSize[0]-1, 
-                                    windowSize[1]-1, this->PData, 0);
+    this->RenderWindow->SetPixelData(0, 0, 
+                                     this->PDataSize[0]-1, 
+                                     this->PDataSize[1]-1, 
+                                     this->PData, 0);
     }
 }
 
@@ -1054,8 +1076,10 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
                       vtkPVTiledDisplayManager::WIN_INFO_TAG);
   renWin->SetDesiredUpdateRate(winInfo.DesiredUpdateRate);
 
-  this->SetPDataSize(winInfo.Size[0], winInfo.Size[1]);
-
+  // We ignore the window size because we are always full screen.
+  int* size = renWin->GetSize();
+  // We may do reduction in the future.
+  this->SetPDataSize(size[0], size[1]);
 
   // Synchronize the renderers.
   rens = renWin->GetRenderers();
@@ -1126,14 +1150,13 @@ void vtkPVTiledDisplayManager::SatelliteStartRender()
         }
       else
         {
-        int front = 1;
-        // All this rendering should be done in the back buffer without any swaps.
+        int front = 0;
+        // All this rendering will be done in the back buffer without any swaps.
         for (int idx = 0; idx < this->NumberOfTiles; ++idx)
           {
           // Figure out the tile indexes.
-          i = this->Controller->GetLocalProcessId() - 1;
-          y = i/this->TileDimensions[0];
-          x = i - y*this->TileDimensions[0];
+          y = idx/this->TileDimensions[0];
+          x = idx - y*this->TileDimensions[0];
 
           cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
                                1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);

@@ -25,8 +25,8 @@
 // .SECTION see also
 // vtkMultiProcessController vtkRenderWindow vtkCompositeManager.
 
-#ifndef __vtkPVTiledDIsplayManager_h
-#define __vtkPVTiledDIsplayManager_h
+#ifndef __vtkPVTiledDisplayManager_h
+#define __vtkPVTiledDisplayManager_h
 
 #include "vtkObject.h"
 
@@ -38,11 +38,11 @@ class vtkTiledDisplaySchedule;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
 
-class VTK_EXPORT vtkPVTiledDIsplayManager : public vtkObject
+class VTK_EXPORT vtkPVTiledDisplayManager : public vtkObject
 {
 public:
-  static vtkPVTiledDIsplayManager *New();
-  vtkTypeRevisionMacro(vtkPVTiledDIsplayManager,vtkObject);
+  static vtkPVTiledDisplayManager *New();
+  vtkTypeRevisionMacro(vtkPVTiledDisplayManager,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -124,12 +124,18 @@ public:
   int ShuffleLevel(int level, int numTiles, 
                    vtkTiledDisplaySchedule** tileSchedules);
 
-
+  // Description:
+  // This flag is ignored (Not used at the moment).
+  // It will switch between compositing the tiled displays
+  // and distributing the polydata to each tile to render.
+  vtkSetMacro(UseCompositing, int);
+  vtkGetMacro(UseCompositing, int);
+  vtkBooleanMacro(UseCompositing, int);
 
 
 protected:
-  vtkPVTiledDIsplayManager();
-  ~vtkPVTiledDIsplayManager();
+  vtkPVTiledDisplayManager();
+  ~vtkPVTiledDisplayManager();
   
   vtkRenderWindow* RenderWindow;
   vtkRenderWindowInteractor* RenderWindowInteractor;
@@ -170,13 +176,14 @@ protected:
   int ZeroEmpty;
 
   // On: Composite, Off, assume geometry copied to all tile procs.
+  int UseCompositing;
   int CompositeFlag;
 
   void Composite();
 
 private:
-  vtkPVTiledDIsplayManager(const vtkPVTiledDIsplayManager&); // Not implemented
-  void operator=(const vtkPVTiledDIsplayManager&); // Not implemented
+  vtkPVTiledDisplayManager(const vtkPVTiledDisplayManager&); // Not implemented
+  void operator=(const vtkPVTiledDisplayManager&); // Not implemented
 };
 
 #endif
