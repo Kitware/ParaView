@@ -786,7 +786,7 @@ void vtkKWView::UnRegister(vtkObject *o)
     {
     // delete the children if we are about to be deleted
     if (this->ReferenceCount == this->Composites->GetNumberOfItems() + 
-        this->Children->GetNumberOfItems() + 1)
+        this->Children->GetNumberOfItems() + 2)
       {
       if (!(this->Composites->IsItemPresent((vtkKWComposite *)o) ||
             this->Children->IsItemPresent((vtkKWWidget *)o)))
@@ -805,6 +805,7 @@ void vtkKWView::UnRegister(vtkObject *o)
           {
           c->SetView(NULL);
           }
+        this->CornerAnnotation->SetView(NULL);
         this->DeletingChildren = 0;
         }
       }
@@ -952,5 +953,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.14 $");
+  this->ExtractRevision(os,"$Revision: 1.15 $");
 }
