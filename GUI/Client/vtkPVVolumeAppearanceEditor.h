@@ -76,12 +76,24 @@ public:
   void VolumePropertyChangingCallback();
   
   // Description
-  // These methods are for reading state files.
+  // These methods are for reading old state files (DEPRECATED).
   void SetScalarOpacityRamp( double scalarStart, double opacityStart,
                              double scalarEnd, double opacityEnd );
   void SetColorRamp( double s1, double r1, double g1, double b1,
                      double s2, double r2, double g2, double b2 );
+
+  // Description
+  // This method can be reused for reading state files
   void SetScalarOpacityUnitDistance(double d);
+
+  // Description
+  // These methods are for adding a point to the respective function (Piecewise/ColorTransfer)
+  void AddColorPoint(double s, double r, double g, double b);
+  void AddScalarOpacityPoint(double scalar, double opacity);
+
+  // Description
+  // Svae State
+  void SaveState(ofstream *file);
 
 protected:
   vtkPVVolumeAppearanceEditor();
@@ -101,6 +113,9 @@ protected:
 // Once the VolumeProperty is done properly with properties should remove this 
   vtkVolumeProperty         *InternalVolumeProperty;
 
+  void VolumePropertyInternalCallback();
+
+private:
   vtkPVVolumeAppearanceEditor(const vtkPVVolumeAppearanceEditor&); // Not implemented
   void operator=(const vtkPVVolumeAppearanceEditor&); // Not implemented
 };

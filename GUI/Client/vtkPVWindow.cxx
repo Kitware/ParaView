@@ -221,7 +221,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.633");
+vtkCxxRevisionMacro(vtkPVWindow, "1.634");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3378,6 +3378,9 @@ void vtkPVWindow::SaveState(const char* filename)
 
   // Save state of the animation interface
   this->AnimationInterface->SaveState(file);
+
+  //  Save state of the Volume Appearance editor
+  this->VolumeAppearanceEditor->SaveState(file);
 
   // Save the center of rotation
   *file << "$kw(" << this->GetTclName() << ") SetCenterOfRotation "
