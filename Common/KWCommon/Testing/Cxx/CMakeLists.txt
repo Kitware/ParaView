@@ -1,10 +1,8 @@
-ADD_EXECUTABLE(TestRegistery TestRegistery.cxx)
 ADD_EXECUTABLE(TestMemory TestMemory.cxx)
 ADD_EXECUTABLE(TestCommandLineArguments TestCommandLineArguments.cxx)
 ADD_EXECUTABLE(TestRemoteProcess TestRemoteProcess.cxx)
 ADD_EXECUTABLE(CommonKWCommonPrintSelf CommonKWCommonPrintSelf.cxx)
 
-ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
 ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)
 ADD_TEST(TestCommandLineArguments
   ${CXX_TEST_PATH}/TestCommandLineArguments
@@ -19,7 +17,6 @@ ADD_TEST(TestCommandLineArguments
 ADD_TEST(CommonKWCommonPrintSelf ${CXX_TEST_PATH}/CommonKWCommonPrintSelf)
 
 
-TARGET_LINK_LIBRARIES(TestRegistery KWCommon)
 TARGET_LINK_LIBRARIES(TestMemory KWCommon)
 TARGET_LINK_LIBRARIES(TestCommandLineArguments KWCommon)
 TARGET_LINK_LIBRARIES(TestRemoteProcess KWCommon)

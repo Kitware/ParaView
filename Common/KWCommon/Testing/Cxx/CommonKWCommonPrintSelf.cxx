@@ -15,29 +15,16 @@
 
 #include "vtkKWArguments.h"
 #include "vtkKWProcessStatistics.h"
-#include "vtkKWRegisteryUtilities.h"
 #include "vtkKWRemoteExecute.h"
 #include "vtkKWSerializer.h"
-
-#ifdef _WIN32
-# include "vtkKWWin32RegisteryUtilities.h"
-#else
-# include "vtkKWUNIXRegisteryUtilities.h"
-#endif
 
 int main(int , char* [])
 {
   vtkObject *c;
   c = vtkKWArguments::New(); c->Print( cout ); c->Delete();
   c = vtkKWProcessStatistics::New(); c->Print( cout ); c->Delete();
-  c = vtkKWRegisteryUtilities::New(); c->Print( cout ); c->Delete();
   c = vtkKWRemoteExecute::New(); c->Print( cout ); c->Delete();
   c = vtkKWSerializer::New(); c->Print( cout ); c->Delete();
-#ifdef _WIN32
-  c = vtkKWWin32RegisteryUtilities::New(); c->Print( cout ); c->Delete();
-#else
-  c = vtkKWUNIXRegisteryUtilities::New(); c->Print( cout ); c->Delete();
-#endif
 
   return 0;
 }

@@ -85,6 +85,7 @@ SET( KWWidgets_SRCS
   vtkKWRadioButton.cxx 
   vtkKWRadioButtonSet.cxx
   vtkKWRange.cxx 
+  vtkKWRegisteryUtilities.cxx
   vtkKWRenderWidget.cxx 
   vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWSaveImageDialog.cxx 
@@ -186,10 +187,15 @@ ENDIF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
 IF (WIN32)
   SET( KWWidgets_SRCS ${KWWidgets_SRCS}
     kwappicon.c
+    vtkKWWin32RegisteryUtilities.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
     kwappicon 
     WRAP_EXCLUDE
+    )
+ELSE (WIN32)
+  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
+    vtkKWUNIXRegisteryUtilities.cxx
     )
 ENDIF (WIN32)
 

@@ -19,7 +19,6 @@ SET( KWCommon_SRCS
   vtkKWArguments.cxx
   vtkKWGenericMovieWriter.cxx
   vtkKWProcessStatistics.cxx
-  vtkKWRegisteryUtilities.cxx
   vtkKWRemoteExecute.cxx
   vtkKWSerializer.cxx
   vtkQueue.cxx
@@ -35,14 +34,10 @@ ENDIF (DEFINED vtkMPEG2Encode_INCLUDE_PATH)
 IF (WIN32)
   SET( KWCommon_SRCS ${KWCommon_SRCS} 
     vtkAVIWriter.cxx
-    vtkKWWin32RegisteryUtilities.cxx
     )
   SET( KWCommon_LINK_LIBS ${KWCommon_LINK_LIBS} vfw32)
 ELSE (WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
-  SET( KWCommon_SRCS ${KWCommon_SRCS}
-    vtkKWUNIXRegisteryUtilities.cxx
-    )
 ENDIF (WIN32)
 
 IF(VTK_ZLIB_INCLUDE_DIRS)

@@ -15,7 +15,7 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.9");
+vtkCxxRevisionMacro(vtkKWWin32RegisteryUtilities, "1.4");
 vtkStandardNewMacro( vtkKWWin32RegisteryUtilities );
 
 #define BUFFER_SIZE 8192
