@@ -41,7 +41,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.19");
+vtkCxxRevisionMacro(vtkPVOptions, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -205,6 +205,12 @@ void vtkPVOptions::Initialize()
   this->AddArgument("--tile-dimensions-y", "-tdy", this->TileDimensions+1, 
                     "Size of tile display in the number of displays in each column of the display.",
                     vtkPVOptions::PVRENDER_SERVER|vtkPVOptions::PVSERVER);
+  
+  // This should be deprecated when I get the time 
+  this->AddArgument("--cave-configuration", "-cc", &this->CaveConfigurationFileName,
+    "Specify the file that defines the displays for a cave. It is used only with CaveRenderModule.");
+  this->AddArgument("--machines", "-m", &this->MachinesFileName, 
+                    "Specify the network configurations file for the render server.");
 }
 
 //----------------------------------------------------------------------------
