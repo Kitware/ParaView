@@ -125,7 +125,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.558");
+vtkCxxRevisionMacro(vtkPVWindow, "1.559");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1735,6 +1735,7 @@ void vtkPVWindow::OpenCallback()
   
   loadDialog->Delete();
   delete [] openFileName;
+  this->UpdateEnableState();  
 }
 
 vtkKWUserInterfaceManager* vtkPVWindow::GetUserInterfaceManager()
