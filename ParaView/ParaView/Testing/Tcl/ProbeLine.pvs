@@ -1,31 +1,62 @@
-if {[info exists argc]} { 
-    set argcm1 [expr $argc - 1]
-    for {set i 0} {$i < $argcm1} {incr i} {
-        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
-		set DataDir [lindex $argv [expr $i + 1]]
-        }
-    }
-} 
-
-
-set pv(vtkTemp1) [Application GetMainWindow]
-set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
-$pv(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
-set pv(vtkTemp100) [$pv(vtkTemp1) GetCurrentPVSource]
-set pv(vtkTemp101) [$pv(vtkTemp100) GetPVOutput]
-$pv(vtkTemp101) DrawWireframe
-$pv(vtkTemp101) ColorByProperty
-set pv(vtkTemp138) [$pv(vtkTemp1) CreatePVSource Probe]
-$pv(vtkTemp138) UseLine
-[$pv(vtkTemp138) GetPVWidget {Scalars}] SetValue scalars
-$pv(vtkTemp138) AcceptCallback
-$pv(vtkTemp138) SetEndPoint1 0.000000 0.000000 1.000000
-$pv(vtkTemp138) SetEndPoint2 2.000000 2.000000 1.000000
-[$pv(vtkTemp138) GetShowXYPlotToggle] SetState 0
-$pv(vtkTemp138) AcceptCallback
+set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp16) [$kw(vtkTemp1) GetMainView]
+set kw(vtkTemp213) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
+$kw(vtkTemp213) AcceptCallback
+set kw(vtkTemp273) [$kw(vtkTemp1) CreatePVSource Probe]
+$kw(vtkTemp273) UseLine
+$kw(vtkTemp273) UpdateScalars
+[$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
+$kw(vtkTemp273) AcceptCallback
+set kw(vtkTemp300) [$kw(vtkTemp273) GetPVOutput]
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+set kw(vtkTemp280) [$kw(vtkTemp273) GetPVWidget {Line}]
+$kw(vtkTemp280) SetVisibility 1
+$kw(vtkTemp280) SetPoint1 -10.00000 -10.00000 -10.00000
+$kw(vtkTemp280) SetPoint2 3.59489 6.26422 6.41830
+$kw(vtkTemp280) SetResolution 10
+$kw(vtkTemp273) UseLine
+$kw(vtkTemp273) UpdateScalars
+[$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
+$kw(vtkTemp273) AcceptCallback
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp273) UseLine
+$kw(vtkTemp273) UpdateScalars
+[$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
+$kw(vtkTemp273) AcceptCallback
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp280) SetPoint1 -10.00000 -10.00000 -10.00000
+$kw(vtkTemp280) SetPoint2 3.59489 6.26422 6.41830
+$kw(vtkTemp280) SetResolution 50
+$kw(vtkTemp273) UseLine
+$kw(vtkTemp273) UpdateScalars
+[$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
+$kw(vtkTemp273) AcceptCallback
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp280) SetVisibility 0
+$kw(vtkTemp273) UseLine
+$kw(vtkTemp273) UpdateScalars
+[$kw(vtkTemp273) GetShowXYPlotToggle] SetState 0
+$kw(vtkTemp273) AcceptCallback
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp273) UseLine
+$kw(vtkTemp273) UpdateScalars
+[$kw(vtkTemp273) GetShowXYPlotToggle] SetState 1
+$kw(vtkTemp273) AcceptCallback
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+$kw(vtkTemp273) UseLine
+$kw(vtkTemp273) UpdateScalars
+[$kw(vtkTemp273) GetShowXYPlotToggle] SetState 0
+$kw(vtkTemp273) AcceptCallback
+$kw(vtkTemp300) ColorByPointFieldComponent {ImageValues} 0
+set kw(vtkTemp314) [$kw(vtkTemp1) CreatePVSource TubeFilter]
+$kw(vtkTemp314) AcceptCallback
+set kw(vtkTemp319) [$kw(vtkTemp314) GetPVWidget {NumberOfSides}]
+$kw(vtkTemp319) SetValue 6
+$kw(vtkTemp314) AcceptCallback
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300
@@ -38,5 +69,5 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
-   
+
 Application Exit
