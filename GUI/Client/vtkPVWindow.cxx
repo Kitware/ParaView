@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.594");
+vtkCxxRevisionMacro(vtkPVWindow, "1.595");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2695,6 +2695,17 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     *file << endl << "$Ren1 UpdateVTKObjects" << endl;
     if (imageFileName && *imageFileName && writerName)
       {
+      *file << "set inBatch 0" << endl;
+      *file << "for {set i  1} {$i < [expr $argc]} {incr i} {" << endl;
+      *file << "  if {[lindex $argv $i] == \"-BV\"} {" << endl;
+      *file << "    set inBatch 1" << endl;
+      *file << "  }" << endl;
+      *file << "}" << endl;
+      *file << "if { $inBatch } {" << endl;
+      *file << "  set xsize [[$Ren1 GetProperty Size] GetElement 0]" << endl;
+      *file << "  set ysize [[$Ren1 GetProperty Size] GetElement 1]" << endl;
+      *file << "  $Ren1 TileWindows [expr $xsize+30] [expr $ysize+30] 2" << endl;
+      *file << "}" << endl;
       *file 
         << "$Ren1 WriteImage {" << imageFileName << "} " << writerName
         << "\n";
