@@ -43,6 +43,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkTimerLog.h"
 #include "vtkPVRenderView.h"
 #include "vtkTreeComposite.h"
+#include "vtkPVSourceInterface.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -1370,17 +1371,20 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
   int newReaderNum;
   char* result;
   char* tclName;
+  char* dataTclName;
   
   if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
     {
     *file << "vtkImageOutlineFilter " << this->OutlineTclName << "\n\t"
           << this->OutlineTclName << " SetInput [" << sourceName
           << " GetOutput";
-    if (strncmp(sourceName, "EnSight", 7) == 0)
+    if (strcmp(this->GetPVData()->GetPVSource()->GetInterface()->
+               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
-      charFound = strrchr(sourceName, 'r');
-      pos = charFound - sourceName + 1;
-      newReaderNum = atoi(sourceName + pos);
+      dataTclName = this->GetPVData()->GetVTKDataTclName();
+      charFound = strrchr(dataTclName, 'O');
+      pos = charFound - dataTclName - 1;
+      newReaderNum = atoi(dataTclName + pos);
       if (newReaderNum != readerNum)
         {
         readerNum = newReaderNum;
@@ -1406,11 +1410,13 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
     *file << "vtkDataSetSurfaceFilter " << this->GeometryTclName << "\n\t"
           << this->GeometryTclName << " SetInput [" << sourceName
           << " GetOutput";
-    if (strncmp(sourceName, "EnSight", 7) == 0)
+    if (strcmp(this->GetPVData()->GetPVSource()->GetInterface()->
+               GetSourceClassName(), "vtkGenericEnSightReader") == 0)
       {
-      charFound = strrchr(sourceName, 'r');
-      pos = charFound - sourceName + 1;
-      newReaderNum = atoi(sourceName + pos);
+      dataTclName = this->GetPVData()->GetVTKDataTclName();
+      charFound = strrchr(dataTclName, 'O');
+      pos = charFound - dataTclName - 1;
+      newReaderNum = atoi(dataTclName + pos);
       if (newReaderNum != readerNum)
         {
         readerNum = newReaderNum;
@@ -1436,11 +1442,13 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
     *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
           << this->MapperTclName << " SetInput [" << sourceName
           << " GetOutput";
-    if (strncmp(sourceName, "EnSight", 7) == 0)
+    if (strcmp(this->GetPVData()->GetPVSource()->GetInterface()->
+               GetSourceClassName(), "vtkGenericEnsightReader") == 0)
       {
-      charFound = strrchr(sourceName, 'r');
-      pos = charFound - sourceName + 1;
-      newReaderNum = atoi(sourceName + pos);
+      dataTclName = this->GetPVData()->GetVTKDataTclName();
+      charFound = strrchr(dataTclName, 'O');
+      pos = charFound - dataTclName - 1;
+      newReaderNum = atoi(dataTclName + pos);
       if (newReaderNum != readerNum)
         {
         readerNum = newReaderNum;

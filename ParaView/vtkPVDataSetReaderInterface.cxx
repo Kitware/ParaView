@@ -49,50 +49,56 @@ vtkPVDataSetReaderInterface* vtkPVDataSetReaderInterface::New()
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 {
-  char tclName[100], outputTclName[100], srcTclName[100];
+  char tclName[100], outputTclName[100];
   vtkDataSet *d;
   vtkPVData *pvd;
   vtkDataSetReader *reader;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   int numOutputs, i;
-
+  char* result;
+  char *extension;
+  int position;
+  char *endingSlash = NULL;
+  char *newTclName;  
+  
   // Create the vtkReader on all processes (through tcl).
-  if (this->GetDataFileName())
+  if (!this->GetDataFileName())
     {
-    char *extension;
-    int position;
-    char *endingSlash = NULL;
-    char *newTclName;
-    
-    extension = strrchr(this->DataFileName, '.');
-    position = extension - this->DataFileName;
-    strncpy(tclName, this->DataFileName, position);
-    tclName[position] = '\0';
+    pvApp->Script("set newFileName [tk_getOpenFile -filetypes {{{VTK Data Sets} {.vtk}} {{All Files} {.*}}}]");
+    result = pvApp->GetMainInterp()->result;
+    if (strcmp(result, "") == 0)
+      {
+      return NULL;
+      }
+    this->SetDataFileName(result);
+    }
+  
+  extension = strrchr(this->DataFileName, '.');
+  position = extension - this->DataFileName;
+  strncpy(tclName, this->DataFileName, position);
+  tclName[position] = '\0';
+  
+  if ((endingSlash = strrchr(tclName, '/')))
+    {
+    position = endingSlash - tclName + 1;
+    newTclName = new char[strlen(tclName) - position + 1];
+    strcpy(newTclName, tclName + position);
+    strcpy(tclName, "");
+    strcat(tclName, newTclName);
+    delete [] newTclName;
+    }
+  if (isdigit(tclName[0]))
+    {
+    // A VTK object names beginning with a digit is invalid.
+    newTclName = new char[strlen(tclName) + 3];
+    sprintf(newTclName, "PV%s", tclName);
+    strcpy(tclName, "");
+    strcat(tclName, newTclName);
+    delete [] newTclName;
+    }
 
-    if ((endingSlash = strrchr(tclName, '/')))
-      {
-      position = endingSlash - tclName + 1;
-      newTclName = new char[strlen(tclName) - position + 1];
-      strcpy(newTclName, tclName + position);
-      strcpy(tclName, "");
-      strcat(tclName, newTclName);
-      delete [] newTclName;
-      }
-    if (isdigit(tclName[0]))
-      {
-      // A VTK object names beginning with a digit is invalid.
-      newTclName = new char[strlen(tclName) + 3];
-      sprintf(newTclName, "PV%s", tclName);
-      strcpy(tclName, "");
-      strcat(tclName, newTclName);
-      delete [] newTclName;
-      }
-    }
-  else
-    {
-    sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
-    }
+  sprintf(tclName, "%s%d", tclName, this->InstanceCount);
   
   reader = (vtkDataSetReader *)
               (pvApp->MakeTclObject(this->SourceClassName, tclName));
@@ -101,15 +107,8 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     vtkErrorMacro("Could not get pointer from object.");
     return NULL;
     }
-  // Use dialog to get file name on just prrocess 0
-  if (!this->GetDataFileName())
-    {
-    pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{VTK Data Sets} {.vtk}} {{All Files} {.*}}}]", tclName);
-    }
-  else
-    {
-    pvApp->Script("%s SetFileName %s", tclName, this->GetDataFileName());
-    }
+
+  pvApp->Script("%s SetFileName %s", tclName, this->GetDataFileName());
   
   // No file name?  Just abort.
   if (strcmp(reader->GetFileName(), "") == 0)
@@ -147,8 +146,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     pvs->CreateProperties();
     this->PVWindow->SetCurrentPVSource(pvs);
     
-    sprintf(srcTclName, "%s_%d", tclName, i+1);
-    pvs->SetName(srcTclName);
+    pvs->SetName(tclName);
     pvs->SetNthPVOutput(0, pvd);
 
     pvs->AcceptCallback();
