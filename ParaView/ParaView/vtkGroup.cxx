@@ -23,7 +23,7 @@
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
 
-vtkCxxRevisionMacro(vtkGroup, "1.2.2.2");
+vtkCxxRevisionMacro(vtkGroup, "1.2.2.3");
 vtkStandardNewMacro(vtkGroup);
 
 //----------------------------------------------------------------------------
@@ -144,6 +144,40 @@ void vtkGroup::ComputeInputUpdateExtents(vtkDataObject *)
     input->SetUpdateExtent( output->GetUpdateExtent() );
     }
 }
+
+
+
+//----------------------------------------------------------------------------
+// Keep the inputs/outputs pipelines separate.
+void vtkGroup::PropagateUpdateExtent(vtkDataObject *output)
+{
+  int idx;
+  vtkDataObject* input;
+
+  // If the user defines a ComputeInputUpdateExtent method,
+  // I want RequestExactUpdateExtent to be off by default (User does nothing else).
+  // Otherwise, the ComputeInputUpdateExtent in this superclass sets
+  // RequestExactExtent to on.  The reason for this initialization here is 
+  // if this sources shares an input with another, we do not want the input's
+  // RequestExactExtent "state" to interfere with each other.
+  for (idx = 0; idx < this->NumberOfOutputs; ++idx)
+    {
+    if (this->GetOutput(idx) == output)
+      {
+      input = this->GetInput(idx);
+      input->RequestExactExtentOff();
+      input->SetUpdatePiece( output->GetUpdatePiece() );
+      input->SetUpdateNumberOfPieces( output->GetUpdateNumberOfPieces() );
+      input->SetUpdateGhostLevel( output->GetUpdateGhostLevel() );
+      input->SetUpdateExtent( output->GetUpdateExtent() );
+      input->PropagateUpdateExtent();
+      }
+    }
+}
+
+
+
+
 
 //----------------------------------------------------------------------------
 // Append data sets into single unstructured grid

@@ -66,6 +66,7 @@ protected:
   // Usual data generation method
   virtual void Execute();
   virtual void ExecuteInformation();
+  virtual void PropagateUpdateExtent(vtkDataObject *output);
 
 private:
 
