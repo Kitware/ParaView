@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.10");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.11");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -146,6 +146,12 @@ void vtkSMProxyProperty::AddUncheckedProxy(vtkSMProxy* proxy)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMProxyProperty::SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy)
+{
+  this->PPInternals->UncheckedProxies[idx] = proxy;
+}
+
+//---------------------------------------------------------------------------
 void vtkSMProxyProperty::RemoveAllUncheckedProxies()
 {
   this->PPInternals->UncheckedProxies.erase(
@@ -179,6 +185,32 @@ int vtkSMProxyProperty::AddProxy(vtkSMProxy* proxy, int modify)
     {
     this->Modified();
     }
+  return 1;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMProxyProperty::SetProxy(unsigned int idx, vtkSMProxy* proxy)
+{
+  if (this->IsReadOnly)
+    {
+    return 0;
+    }
+
+  if ( vtkSMProperty::GetCheckDomains() )
+    {
+    this->SetUncheckedProxy(idx, proxy);
+    
+    if (!this->IsInDomains())
+      {
+      this->RemoveAllUncheckedProxies();
+      return 0;
+      }
+    }
+  this->RemoveAllUncheckedProxies();
+
+  this->PPInternals->Proxies[idx] = proxy;
+  this->Modified();
+
   return 1;
 }
 

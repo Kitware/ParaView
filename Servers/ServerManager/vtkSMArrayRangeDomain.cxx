@@ -21,13 +21,13 @@
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomainIterator.h"
 #include "vtkSMInputArrayDomain.h"
-#include "vtkSMIntVectorProperty.h"
+#include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -43,12 +43,12 @@ vtkSMArrayRangeDomain::~vtkSMArrayRangeDomain()
 void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
 {
   unsigned int numMinMax = 1;
-  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
-  if (ivp)
+  vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(prop);
+  if (dvp)
     {
     // Use the larger of the number of checked and unchecked elements
-    int numElems   = ivp->GetNumberOfElements();
-    int numUnElems = ivp->GetNumberOfUncheckedElements();
+    int numElems   = dvp->GetNumberOfElements();
+    int numUnElems = dvp->GetNumberOfUncheckedElements();
     if ( numElems > numUnElems )
       {
       numMinMax = numElems;
@@ -88,7 +88,12 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
     }
   
   const char* arrayName = array->GetUncheckedElement(0);
-  if (!arrayName)
+  if (!arrayName || arrayName[0] == '\0')
+    {
+    arrayName = array->GetElement(0);
+    }
+
+  if (!arrayName || arrayName[0] == '\0')
     {
     return;
     }

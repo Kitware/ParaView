@@ -7,6 +7,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMDataTypeDomain.cxx
+  vtkSMDisplayWindowProxy.cxx
+  vtkSMDisplayerProxy.cxx
   vtkSMDomain.cxx
   vtkSMDomainIterator.cxx
   vtkSMDoubleRangeDomain.cxx
@@ -24,15 +26,14 @@ SET( ServerManagerCommon_SRCS
   vtkSMObject.cxx
   vtkSMPart.cxx
   vtkSMProperty.cxx
+  vtkSMPropertyAdaptor.cxx
   vtkSMPropertyIterator.cxx
   vtkSMProxy.cxx
-  vtkSMSourceProxy.cxx
-  vtkSMDisplayerProxy.cxx
-  vtkSMDisplayWindowProxy.cxx
   vtkSMProxyGroupDomain.cxx
   vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
+  vtkSMSourceProxy.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx

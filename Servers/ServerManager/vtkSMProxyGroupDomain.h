@@ -64,6 +64,22 @@ public:
   // Returns group with give id. Does not perform bounds check.
   const char* GetGroup(unsigned int idx);
 
+  // Description:
+  // Returns the total number of proxies in the domain.
+  unsigned int GetNumberOfProxies();
+
+  // Description:
+  // Given a name, returns a proxy.
+  vtkSMProxy* GetProxy(const char* name);
+
+  // Description:
+  // Returns the name (in the group) of a proxy.
+  const char* GetProxyName(unsigned int idx);
+
+  // Description:
+  // Returns the name (in the group) of a proxy.
+  const char* GetProxyName(vtkSMProxy* proxy);
+
 protected:
   vtkSMProxyGroupDomain();
   ~vtkSMProxyGroupDomain();

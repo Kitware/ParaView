@@ -42,6 +42,7 @@ public:
   // Description:
   // Add a proxy to the list of proxies.
   int AddProxy(vtkSMProxy* proxy);
+  int SetProxy(unsigned int idx, vtkSMProxy* proxy);
 
   // Description:
   // Add a proxy to the list of proxies without calling Modified
@@ -68,6 +69,7 @@ public:
   // - IsInDomains()
   // @endverbatim
   void AddUncheckedProxy(vtkSMProxy* proxy);
+  void SetUncheckedProxy(unsigned int idx, vtkSMProxy* proxy);
 
   // Description:
   // Removes all unchecked proxies.

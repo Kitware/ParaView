@@ -73,6 +73,20 @@ public:
   vtkSMProxy* GetProxy(const char* name);
 
   // Description:
+  // Returns the number of proxies in a group.
+  unsigned int GetNumberOfProxies(const char* groupname);
+
+  // Description:
+  // Given a group and an index, returns the name of a proxy.
+  // NOTE: This operation is slow.
+  const char* GetProxyName(const char* groupname, unsigned int idx);
+
+  // Description:
+  // Given a group and a proxy, return it's name.
+  // NOTE: This operation is slow.
+  const char* GetProxyName(const char* groupname, vtkSMProxy* proxy);
+  
+  // Description:
   // Is the proxy is in the given group, return it's name, otherwise
   // return null. NOTE: Any following call to proxy manager might make
   // the returned pointer invalid.

@@ -28,7 +28,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.13");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.14");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -130,6 +130,18 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement,
 }
 
 //---------------------------------------------------------------------------
+unsigned int vtkSMProxyManager::GetNumberOfProxies(const char* group)
+{
+  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.find(group);
+  if ( it != this->Internals->RegisteredProxyMap.end() )
+    {
+    return it->second.size();
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
 vtkSMProxy* vtkSMProxyManager::GetProxy(const char* group, const char* name)
 {
   vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
@@ -160,6 +172,63 @@ vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
       return it2->second;
       }
     }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetProxyName(const char* groupname, 
+                                            vtkSMProxy* proxy)
+{
+  if (!groupname || !proxy)
+    {
+    return 0;
+    }
+  
+  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.find(groupname);
+  if ( it != this->Internals->RegisteredProxyMap.end() )
+    {
+    vtkSMProxyManagerProxyMapType::iterator it2 =
+      it->second.begin();
+    for (; it2 != it->second.end(); it2++)
+      {
+      if (proxy == it2->second.GetPointer())
+        {
+        return it2->first.c_str();
+        }
+      }
+    }
+  
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMProxyManager::GetProxyName(const char* groupname,
+                                            unsigned int idx)
+{
+  if (!groupname)
+    {
+    return 0;
+    }
+  
+  unsigned int counter=0;
+
+  vtkSMProxyManagerInternals::ProxyGroupType::iterator it =
+    this->Internals->RegisteredProxyMap.find(groupname);
+  if ( it != this->Internals->RegisteredProxyMap.end() )
+    {
+    vtkSMProxyManagerProxyMapType::iterator it2 =
+      it->second.begin();
+    for (; it2 != it->second.end(); it2++)
+      {
+      if (counter == idx)
+        {
+        return it2->first.c_str();
+        }
+      counter++;
+      }
+    }
+  
   return 0;
 }
 
