@@ -8,6 +8,23 @@
   Date:      $Date$
   Version:   $Revision$
 
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+  Copyright (C) 2003 Sandia Corporation
+  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+  license for use of this work by or on behalf of the U.S. Government.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that this Notice and any statement
+  of authorship are reproduced on all copies.
+
+  Contact: Lee Ann Fisk, lafisk@sandia.gov
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
 =========================================================================*/
 
 // .NAME vtkExtractCells - subset a vtkDataSet to create a vtkUnstructuredGrid
@@ -17,13 +34,9 @@
 //    composed of these cells.  If the cell list is empty when vtkExtractCells 
 //    executes, it will set up the ugrid, point and cell arrays, with no points, 
 //    cells or data.
-//
-// .SECTION See Also
-
-//#include "vtksnlGraphicsWin32Header.h"
 
 #include <vtkDataSetToUnstructuredGridFilter.h>
-#include <set>
+#include <vtkstd/set>     // for the internal cell ID list
 
 class vtkIdList;
 class vtkUnstructuredGrid;
@@ -37,10 +50,29 @@ public:
 
   static vtkExtractCells *New();
 
-  void FreeCellList(); 
+  // Description:
+  // Set the list of cell IDs that the output vtkUnstructuredGrid
+  // will be composed of.  Replaces any other cell ID list supplied
+  // so far.
+
   void SetCellList(vtkIdList *l); 
+
+  // Description:
+  // Add the supplied list of cell IDs to those that will be included
+  // in the output vtkUnstructuredGrid.
+
   void AddCellList(vtkIdList *l);
+
+  // Description:
+  // Add this range of cell IDs to those that will be included
+  // in the output vtkUnstructuredGrid.
+
   void AddCellRange(vtkIdType from, vtkIdType to);
+
+  // Description:
+  //   Release the memory allocated to hold the cell ID list.
+
+  void FreeCellList(); 
 
 protected:
 
