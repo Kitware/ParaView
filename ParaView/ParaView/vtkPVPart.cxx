@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.31");
+vtkCxxRevisionMacro(vtkPVPart, "1.32");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -97,6 +97,9 @@ vtkPVPart::vtkPVPart()
   this->InstanceCount = instanceCount;
   
   this->ClassNameInformation = vtkPVClassNameInformation::New();
+
+  this->VTKSourceIndex = -1;
+  this->VTKOutputIndex = -1;
 }
 
 //----------------------------------------------------------------------------
