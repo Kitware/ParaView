@@ -657,6 +657,11 @@
         number_of_elements="1" />
 
      <StringVectorProperty
+        name="XMLFileName"
+        command="SetXMLFileName"
+        number_of_elements="1" />
+
+     <StringVectorProperty
         name="FilePrefix"
         command="SetFilePrefix"
         number_of_elements="1" />
@@ -692,9 +697,30 @@
         number_of_elements_per_command="2"
         element_types="2 0" /> 
 
+     <IntVectorProperty 
+        name="DisplayType"
+        command="SetDisplayType"
+        number_of_elements="1" />
+
      <StringVectorProperty
         name="BlockArrayStatus"
         command="SetBlockArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="PartArrayStatus"
+        command="SetPartArrayStatus"
+        number_of_elements="2" 
+        repeat_command="1"
+        number_of_elements_per_command="2"
+        element_types="2 0" /> 
+
+     <StringVectorProperty
+        name="MaterialArrayStatus"
+        command="SetMaterialArrayStatus"
         number_of_elements="2" 
         repeat_command="1"
         number_of_elements_per_command="2"
