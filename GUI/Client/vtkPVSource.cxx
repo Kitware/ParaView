@@ -14,21 +14,16 @@
 =========================================================================*/
 #include "vtkPVSource.h"
 
+#include "vtkObjectFactory.h"
 #include "vtkPVColorMap.h"
 #include "vtkArrayMap.txx"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
-#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
-#include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
-#include "vtkKWMessageDialog.h"
 #include "vtkPVSourceNotebook.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
-#include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
@@ -47,25 +42,20 @@
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
 #include "vtkSMInputProperty.h"
-#include "vtkSMPart.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkSMProxyProperty.h"
-#include "vtkSource.h"
 #include "vtkRenderer.h"
-#include "vtkArrayMap.txx"
-#include "vtkStringList.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkSMCubeAxesDisplay.h"
 #include "vtkSMPointLabelDisplay.h"
 #include "vtkDataSetAttributes.h"
-#include "vtkDataSet.h"
 #include <vtkstd/vector>
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.426");
+vtkCxxRevisionMacro(vtkPVSource, "1.427");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -987,7 +977,7 @@ void vtkPVSource::AcceptCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::PreAcceptCallback()
 {
-  if ( ! this->Notebook->GetAcceptButtonRed() )
+  if ( ! this->Notebook->GetAcceptButtonRed())
     {
     return;
     }

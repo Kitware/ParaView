@@ -14,9 +14,7 @@
 =========================================================================*/
 #include "vtkPVWindow.h"
 
-#ifdef PARAVIEW_USE_LOOKMARKS
-#include "vtkPVLookmarkManager.h"
-#endif
+#include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
 #include "vtkCamera.h"
 #include "vtkCollection.h"
@@ -24,10 +22,8 @@
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
 #include "vtkImageData.h"
-#include "vtkInstantiator.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
-#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -39,7 +35,6 @@
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonWithMenu.h"
 #include "vtkKWRadioButton.h"
-#include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTkUtilities.h"
@@ -49,15 +44,11 @@
 #include "vtkKWWindowCollection.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
-#include "vtkMath.h"
-#include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
-#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVColorMap.h"
-#include "vtkPVConfig.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVErrorLogDisplay.h"
@@ -104,9 +95,12 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkKWWidgetCollection.h"
-#include "vtkKWToolbarSet.h"
-
 #include "vtkPVAnimationManager.h"
+
+#include "vtkPVConfig.h"  // Needed for PARAVIEW_USE_LOOKMARKS
+#ifdef PARAVIEW_USE_LOOKMARKS
+#  include "vtkPVLookmarkManager.h"
+#endif
 
 #include "Resources/vtkPVLogoSmall.h"
 
@@ -142,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.676");
+vtkCxxRevisionMacro(vtkPVWindow, "1.677");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

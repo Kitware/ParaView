@@ -24,26 +24,19 @@
 
 #include "vtkKWWidget.h"
 #include "vtkClientServerStream.h"  // needed for vtkClientServerID
+
 class vtkCollection;
-class vtkDataSet;
-class vtkKWEntry;
 class vtkKWFrame;
 class vtkPVSourceNotebook;
-class vtkKWPushButton;
 class vtkKWView;
-class vtkKWWidget;
 class vtkPVApplication;
-class vtkPVInputMenu;
 class vtkPVInputProperty;
 class vtkPVRenderView;
-class vtkPVSourceCollection;
 class vtkPVWidget;
 class vtkPVWidgetCollection;
 class vtkPVWindow;
 class vtkSMSourceProxy;
 class vtkSMPartDisplay;
-class vtkSource;
-class vtkStringList;
 class vtkSMPart;
 class vtkPVDataInformation;
 class vtkPVNumberOfOutputsInformation;
