@@ -8,3 +8,5 @@ LINK_LIBRARIES(
     vtkKWWidgetsTCL
     vtkCommon
 )
+
+LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg )
