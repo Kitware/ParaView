@@ -37,36 +37,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWText.h"
 #include "vtkObjectFactory.h"
 
-
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
-vtkCxxRevisionMacro(vtkKWText, "1.14");
+vtkCxxRevisionMacro(vtkKWText, "1.15");
 
+//----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
 {
   this->ValueString = NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkKWText::~vtkKWText()
 {
   this->SetValueString(NULL);
 }
 
-
-
+//----------------------------------------------------------------------------
 char *vtkKWText::GetValue()
 {
   if ( !this->IsCreated() )
     {
     return 0;
     }
-  this->Script("encoding convertfrom identity [%s get 1.0 {end -1 chars}]", 
-               this->GetWidgetName());
-  this->SetValueString( this->Application->GetMainInterp()->result );
+
+  const char *val = 
+    this->Script("%s get 1.0 {end -1 chars}", this->GetWidgetName());
+  this->SetValueString(this->ConvertTkStringToInternalString(val));
   return this->GetValueString();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWText::SetValue(const char *s)
 {
   if ( !this->IsCreated() )
@@ -76,11 +77,12 @@ void vtkKWText::SetValue(const char *s)
   this->Script("%s delete 1.0 end", this->GetWidgetName());
   if (s)
     {
-    this->Script("%s insert 1.0 [encoding convertfrom utf-8 {%s}]",
-                 this->GetWidgetName(), s);
+    const char *str = this->ConvertInternalStringToTkString(s);
+    this->Script("%s insert 1.0 {%s}", this->GetWidgetName(), str);
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWText::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;

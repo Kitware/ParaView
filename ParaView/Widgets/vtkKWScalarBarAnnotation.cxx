@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.4");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.5");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -882,7 +882,7 @@ void vtkKWScalarBarAnnotation::SendChangedEvent()
 
   vtkXMLScalarBarWidgetWriter *xmlw = vtkXMLScalarBarWidgetWriter::New();
   xmlw->SetObject(this->ScalarBarWidget);
-  xmlw->Write(event);
+  xmlw->WriteToStream(event);
   xmlw->Delete();
 
   event << ends;

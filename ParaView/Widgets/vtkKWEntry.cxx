@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.38");
+vtkCxxRevisionMacro(vtkKWEntry, "1.39");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -117,11 +117,9 @@ char *vtkKWEntry::GetValue()
     {
     return 0;
     }
-  // Normally I guess this should be 'convertto utf-8' (see SetValue), but
-  // don't ask me why only 'convertfrom identity' does the trick
-  this->Script("encoding convertfrom identity [%s get]", 
-               this->Entry->GetWidgetName());
-  this->SetValueString(this->Application->GetMainInterp()->result);
+
+  const char *val = this->Script("%s get", this->Entry->GetWidgetName());
+  this->SetValueString(this->ConvertTkStringToInternalString(val));
   return this->GetValueString();
 }
 
@@ -204,9 +202,8 @@ void vtkKWEntry::SetValue(const char *s)
     this->Script("%s delete 0 end", this->Entry->GetWidgetName());
     if (s)
       {
-      // The input is 8-bit char (ASCII extended), convert to Unicode
-      this->Script("%s insert 0 [encoding convertfrom utf-8 {%s}]", 
-                   this->Entry->GetWidgetName(), s);
+      const char *str = this->ConvertInternalStringToTkString(s);
+      this->Script("%s insert 0 {%s}", this->Entry->GetWidgetName(), str);
       }
     }
 

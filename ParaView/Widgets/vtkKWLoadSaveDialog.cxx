@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.28");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.29");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -86,7 +86,6 @@ void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
 int vtkKWLoadSaveDialog::Invoke()
 {
   this->Application->SetDialogUp(1);
-  char *path = NULL;
   ostrstream command;
 
   int support_choose_dir = this->Application->EvaluateBooleanExpression(
@@ -127,26 +126,15 @@ int vtkKWLoadSaveDialog::Invoke()
     command << " -parent " << window->GetWidgetName();
     }
   command << ends;
-  this->Script(command.str());
+  const char *path = this->Script(command.str());
   command.rdbuf()->freeze(0);
 
   int res = 0;
 
-  // At this point, the string is encoded as UTF-8, which matches ASCII value
-  // up to 0x7F in hexadecimal). Higher values are encoded as two or 3 bytes.
-  // Example: the file Baumann_Gü_0002 becomes Baumann_GÃ¼_0002
-  // convertfrom identity seems to do the trick to convert back to
-  // an ASCII-8 string that can be understood by the system.
-
-  path = this->Application->GetMainInterp()->result;
-
   if (path && strlen(path))
     {
-    this->Script("encoding convertfrom identity {%s}", 
-                 this->Application->GetMainInterp()->result);
-
-    path = this->Application->GetMainInterp()->result;
-
+    path = this->ConvertTkStringToInternalString(path);
+    
     this->SetFileName(path);
     if (this->ChooseDirectory && support_choose_dir)
       {
@@ -162,8 +150,10 @@ int vtkKWLoadSaveDialog::Invoke()
     {
     this->SetFileName(0);
     }
+
   this->Application->SetDialogUp(0);
   this->Script("update");
+
   return res;
 }
 
