@@ -240,8 +240,10 @@ void vtkKWExtent::ExtentSelected()
     this->Extent[4] = this->Extent[5];
     this->ZMinScale->SetValue(this->Extent[4]);    
     }
-  
-  this->Script("eval %s",this->Command);
+  if ( this->Command )
+    {
+    this->Script("eval %s",this->Command);
+    }
 }
 
 
