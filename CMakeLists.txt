@@ -2,9 +2,9 @@ PROJECT(ParaViewComplete)
 SUBDIRS(VTK)
 SUBDIR_DEPENDS(ParaView VTK)
 
-SET (LIBRARY_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin/ CACHE PATH 
+SET (LIBRARY_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin CACHE INTERNAL
       "Single output directory for building all libraries.")
-SET (EXECUTABLE_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin/ CACHE PATH 
+SET (EXECUTABLE_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin CACHE INTERNAL
       "Single output directory for building all executables.")
 
 # force these to be ON by default as they are required by ParaView
