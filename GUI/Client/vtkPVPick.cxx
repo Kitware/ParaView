@@ -14,7 +14,7 @@
 #include "vtkPVPick.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVDisplayGUI.h"
-#include "vtkSMPickDisplay.h"
+#include "vtkSMPointLabelDisplay.h"
 #include "vtkPVApplication.h"
 #include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.11");
+vtkCxxRevisionMacro(vtkPVPick, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -45,7 +45,7 @@ vtkPVPick::vtkPVPick()
   // We cannot process inputs that have more than one part yet.
   this->RequiredNumberOfInputParts = 1;
   
-  this->PickDisplay = vtkSMPickDisplay::New();
+  this->PointLabelDisplay = vtkSMPointLabelDisplay::New();
 
   this->DataFrame = vtkKWWidget::New();
   this->LabelCollection = vtkCollection::New();
@@ -56,12 +56,12 @@ vtkPVPick::~vtkPVPick()
 {  
   if (this->GetPVApplication() && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
     {
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PickDisplay);
+    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PointLabelDisplay);
     }
 
-  this->PickDisplay->SetVisibility(0);
-  this->PickDisplay->Delete();
-  this->PickDisplay = NULL;
+  this->PointLabelDisplay->SetVisibility(0);
+  this->PointLabelDisplay->Delete();
+  this->PointLabelDisplay = NULL;
 
   this->DataFrame->Delete();
   this->DataFrame = NULL;
@@ -74,9 +74,9 @@ vtkPVPick::~vtkPVPick()
 //----------------------------------------------------------------------------
 void vtkPVPick::SetVisibilityNoTrace(int val)
 {
-  if (this->PickDisplay)
+  if (this->PointLabelDisplay)
     {
-    this->PickDisplay->SetVisibility(val);
+    this->PointLabelDisplay->SetVisibility(val);
     }
   this->Superclass::SetVisibilityNoTrace(val);
 }
@@ -86,7 +86,7 @@ void vtkPVPick::SetVisibilityNoTrace(int val)
 void vtkPVPick::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  this->PickDisplay->SetProcessModule(pvApp->GetProcessModule());
+  this->PointLabelDisplay->SetProcessModule(pvApp->GetProcessModule());
 
   this->Superclass::CreateProperties();
 
@@ -107,14 +107,14 @@ void vtkPVPick::AcceptCallbackInternal()
     {
     // Connect to the display.
     // These should be merged.
-    this->PickDisplay->SetInput(this->GetProxy());
-    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PickDisplay);
+    this->PointLabelDisplay->SetInput(this->GetProxy());
+    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PointLabelDisplay);
     this->DisplayHasBeenAddedToTheRenderModule = 1;
     }
 
   // We need to update manually for the case we are probing one point.
-  this->PickDisplay->Update();
-  this->PickDisplay->SetVisibility(1);
+  this->PointLabelDisplay->Update();
+  this->PointLabelDisplay->SetVisibility(1);
   this->Notebook->GetDisplayGUI()->DrawWireframe();
   this->Notebook->GetDisplayGUI()->ColorByProperty();
   this->Notebook->GetDisplayGUI()->ChangeActorColor(0.8, 0.0, 0.2);
@@ -136,7 +136,7 @@ void vtkPVPick::UpdateGUI()
 {
   this->ClearDataLabels();
   // Get the collected data from the display.
-  vtkUnstructuredGrid* d = this->PickDisplay->GetCollectedData();
+  vtkUnstructuredGrid* d = this->PointLabelDisplay->GetCollectedData();
   if (d == 0)
     {
     return;

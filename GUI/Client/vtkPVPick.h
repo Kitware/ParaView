@@ -15,7 +15,7 @@
 // .NAME vtkPVPick - A special PVSource.
 // .SECTION Description
 // This class will set up defaults for thePVData.
-// It will also create a special PickDisplay.
+// It will also create a special PointLabelDisplay.
 // Both of these features should be specified in XML so we
 // can get rid of this special case.
 
@@ -25,7 +25,7 @@
 
 #include "vtkPVSource.h"
 
-class vtkSMPickDisplay;
+class vtkSMPointLabelDisplay;
 
 class vtkCollection;
 class vtkKWFrame;
@@ -55,7 +55,7 @@ protected:
   // only once.  There may be a better check using the Proxy.
   int DisplayHasBeenAddedToTheRenderModule;
   
-  vtkSMPickDisplay* PickDisplay;
+  vtkSMPointLabelDisplay* PointLabelDisplay;
   vtkKWWidget *DataFrame;
 
   vtkCollection* LabelCollection;

@@ -62,8 +62,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMLODPartDisplay.cxx
   vtkSMMultiDisplayPartDisplay.cxx
   vtkSMCubeAxesDisplay.cxx
-  vtkSMPickDisplay.cxx
   vtkSMPlotDisplay.cxx
+  vtkSMPointLabelDisplay.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS

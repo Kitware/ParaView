@@ -61,13 +61,14 @@
 #include "vtkStringList.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkSMCubeAxesDisplay.h"
+#include "vtkSMPointLabelDisplay.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSet.h"
 #include <vtkstd/vector>
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.398");
+vtkCxxRevisionMacro(vtkPVSource, "1.399");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -141,6 +142,8 @@ vtkPVSource::vtkPVSource()
   this->Proxy = 0;
   this->CubeAxesDisplay = vtkSMCubeAxesDisplay::New();
   this->CubeAxesVisibility = 0;
+  this->PointLabelDisplay = vtkSMPointLabelDisplay::New();
+  this->PointLabelVisibility = 0;
   
   this->PVColorMap = 0;  
 }
@@ -201,7 +204,9 @@ vtkPVSource::~vtkPVSource()
   this->SetModuleName(0);
   this->CubeAxesDisplay->Delete();
   this->CubeAxesDisplay = 0;
-  
+  this->PointLabelDisplay->Delete();
+  this->PointLabelDisplay = 0;
+
   this->SetPVColorMap(0);
 }
 
@@ -753,8 +758,6 @@ void vtkPVSource::SetLabel(const char* arg)
   this->GetPVApplication()->AddTraceEntry("$kw(%s) SetLabel {%s}",
                                           this->GetTclName(),
                                           this->Label);
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) LabelEntryCallback",
-                                          this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -813,9 +816,11 @@ void vtkPVSource::SetVisibilityNoTrace(int v)
     }
 
   int cubeAxesVisibility = this->GetCubeAxesVisibility();
+  int pointLabelVisibility = this->GetPointLabelVisibility();
   
   this->PartDisplay->SetVisibility(v);
   this->CubeAxesDisplay->SetVisibility(v && cubeAxesVisibility);
+  this->PointLabelDisplay->SetVisibility(v && pointLabelVisibility);
 
   // Handle visibility of shared colormap.
   if (this->PVColorMap)
@@ -871,6 +876,37 @@ void vtkPVSource::SetCubeAxesVisibilityNoTrace(int val)
   if (this->Notebook)
     {
     this->Notebook->GetDisplayGUI()->UpdateCubeAxesVisibilityCheck();
+    }
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPointLabelVisibility(int val)
+{
+  if (this->PointLabelVisibility == val)
+    {
+    return;
+    }
+  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", this->GetTclName(), val);
+  this->SetPointLabelVisibilityNoTrace(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetPointLabelVisibilityNoTrace(int val)
+{
+  if (this->PointLabelVisibility == val)
+    {
+    return;
+    }
+  this->PointLabelVisibility = val;
+  this->PointLabelDisplay->SetVisibility(this->GetVisibility() && val);
+  
+  if (this->Notebook)
+    {
+    this->Notebook->GetDisplayGUI()->UpdatePointLabelVisibilityCheck();
     }
   if ( this->GetPVRenderView() )
     {
@@ -1040,6 +1076,12 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     this->CubeAxesDisplay->SetInput(this->Proxy);
     this->CubeAxesDisplay->SetVisibility(0);
     rm->AddDisplay(this->CubeAxesDisplay);   
+
+    // Hookup point label display.
+    this->PointLabelDisplay->SetProcessModule(this->GetPVApplication()->GetProcessModule());    
+    this->PointLabelDisplay->SetInput(this->Proxy);
+    this->PointLabelDisplay->SetVisibility(0);
+    rm->AddDisplay(this->PointLabelDisplay);   
     
     // Display GUI is shared. PartDisplay and source of DisplayGUI is set
     // when the source selected as current.
@@ -1424,6 +1466,7 @@ void vtkPVSource::DeleteCallback()
     if (pDisp)
       {
       this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->CubeAxesDisplay);
+      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PointLabelDisplay);
       this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(pDisp);
       }
     }
@@ -1823,6 +1866,9 @@ void vtkPVSource::SaveStateDisplay(ofstream *file)
 
   *file << "$kw(" << this->GetTclName()
         << ") SetCubeAxesVisibility " << this->GetCubeAxesVisibility() << endl; 
+
+  *file << "$kw(" << this->GetTclName()
+        << ") SetPointLabelVisibility " << this->GetPointLabelVisibility() << endl; 
 
   // Make sure the GUI is upto date.  
   *file << "[$kw(" << this->GetTclName()
@@ -2404,4 +2450,5 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     os << "(none)" << endl;
     }
   os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
+  os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
 }

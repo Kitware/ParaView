@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.12");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.13");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -142,6 +142,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
+  this->PointLabelCheck = vtkKWCheckButton::New();
   this->VisibilityCheck = vtkKWCheckButton::New();
 
   this->ResetCameraButton = vtkKWPushButton::New();
@@ -168,9 +169,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
 
   this->ColorSetByUser = 0;
   this->ArraySetByUser = 0;
-  
-  this->PointLabelCheck = vtkKWCheckButton::New();
-  
+    
   this->VolumeRenderMode = 0;
   
   this->VolumeAppearanceEditor = NULL;
@@ -261,6 +260,9 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
 
+  this->PointLabelCheck->Delete();
+  this->PointLabelCheck = NULL;
+
   this->VisibilityCheck->Delete();
   this->VisibilityCheck = NULL;
   
@@ -275,9 +277,6 @@ vtkPVDisplayGUI::~vtkPVDisplayGUI()
   
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
-
-  this->PointLabelCheck->Delete();
-  this->PointLabelCheck = NULL;
 }
 
 
@@ -290,6 +289,10 @@ void vtkPVDisplayGUI::SetVisibility(int v)
 void vtkPVDisplayGUI::SetCubeAxesVisibility(int v)
 {
   this->PVSource->SetCubeAxesVisibility(v);
+}
+void vtkPVDisplayGUI::SetPointLabelVisibility(int v)
+{
+  this->PVSource->SetPointLabelVisibility(v);
 }
 void vtkPVDisplayGUI::SetScalarBarVisibility(int v)
 {
@@ -336,7 +339,10 @@ void vtkPVDisplayGUI::DeleteCallback()
     {
     this->PVSource->SetCubeAxesVisibility(0);
     }
-  this->SetPointLabelVisibility(0);
+  if (this->PVSource)
+    {
+    this->PVSource->SetPointLabelVisibility(0);
+    }
 }
 
 
@@ -1053,13 +1059,8 @@ void vtkPVDisplayGUI::UpdateInternal()
   this->VisibilityCheck->SetState(this->PVSource->GetVisibility());
   // Cube axis visibility
   this->UpdateCubeAxesVisibilityCheck();
-  // This is really messed up.  Should be in PartDisplay.
-  vtkSMLODPartDisplay* pDispLOD 
-    = vtkSMLODPartDisplay::SafeDownCast(pDisp);
-  if (pDispLOD)
-    {
-    this->PointLabelCheck->SetState(pDispLOD->GetPointLabelVisibility());
-    }
+  // Point label visibility
+  this->UpdatePointLabelVisibilityCheck();
   // Colors
   this->UpdateColorGUI();
     
@@ -1131,6 +1132,15 @@ void vtkPVDisplayGUI::UpdateCubeAxesVisibilityCheck()
   if (this->PVSource && this->VisibilityCheck->GetApplication())
     {
     this->CubeAxesCheck->SetState(this->PVSource->GetCubeAxesVisibility());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::UpdatePointLabelVisibilityCheck()
+{
+  if (this->PVSource && this->VisibilityCheck->GetApplication())
+    {
+    this->PointLabelCheck->SetState(this->PVSource->GetPointLabelVisibility());
     }
 }
 
@@ -2182,44 +2192,6 @@ vtkPVApplication* vtkPVDisplayGUI::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDisplayGUI::SetPointLabelVisibility(int val, int changeButtonState)
-{
-  // Point labels should be a display.
-  if (this->PVSource == 0)
-    {
-    return;
-    }
-  int state = this->PointLabelCheck->GetState();
-  
-  if (state != val && changeButtonState)
-    {
-    this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d %d",
-                        this->GetTclName(), val, changeButtonState);
-    this->PointLabelCheck->SetState(val);
-    state = val;
-    }
-  
-  if ((val && !state) || (val && !this->PVSource->GetVisibility()))
-    {
-    return;
-    }
-  
-  vtkSMLODPartDisplay *display;
-  
-  display = vtkSMLODPartDisplay::SafeDownCast(
-              this->PVSource->GetPartDisplay());
-  if (display)
-    {
-    display->SetPointLabelVisibility(val);
-    }
-  
-  if (this->GetPVRenderView())
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVDisplayGUI::ScalarBarCheckCallback()
 {
   if (this->PVSource == 0 || this->PVSource->GetPVColorMap() == 0)
@@ -2253,10 +2225,12 @@ void vtkPVDisplayGUI::CubeAxesCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVDisplayGUI::PointLabelCheckCallback()
 {
-  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d 1",
-                      this->GetTclName(),
+  //law int fixme;  // Loading the trace will not trace the visibility.
+  // Move the tracing into vtkPVSource.
+  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", 
+                      this->PVSource->GetTclName(),
                       this->PointLabelCheck->GetState());
-  this->SetPointLabelVisibility(this->PointLabelCheck->GetState());
+  this->PVSource->SetPointLabelVisibility(this->PointLabelCheck->GetState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2457,6 +2431,7 @@ void vtkPVDisplayGUI::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   os << indent << "PVSource: " << this->GetPVSource() << endl;
   os << indent << "CubeAxesCheck: " << this->CubeAxesCheck << endl;
+  os << indent << "PointLabelCheck: " << this->PointLabelCheck << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
@@ -2899,8 +2874,8 @@ void vtkPVDisplayGUI::UpdateEnableState()
     this->PropagateEnableState(this->OriginThumbWheel[cc]);
     }
   this->PropagateEnableState(this->CubeAxesCheck);
-  this->PropagateEnableState(this->ResetCameraButton);
   this->PropagateEnableState(this->PointLabelCheck);
+  this->PropagateEnableState(this->ResetCameraButton);
   
   if ( this->VolumeRenderMode )
     {

@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.3");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -50,10 +50,6 @@ vtkSMLODPartDisplay::vtkSMLODPartDisplay()
   this->LODMapperProxy = 0;
   this->LODUpdateSuppressorProxy = 0;
 
-  this->PointLabelVisibility = 0;
-  this->PointLabelMapperProxy = 0;
-  this->PointLabelActorProxy = 0;
-  
   this->LODInformationIsValid = 0;
   this->LODInformation = vtkPVLODPartDisplayInformation::New();
   this->LODResolution = 50;
@@ -76,16 +72,6 @@ vtkSMLODPartDisplay::~vtkSMLODPartDisplay()
     {
     this->LODUpdateSuppressorProxy->Delete();
     this->LODUpdateSuppressorProxy = 0;
-    }
-  if (this->PointLabelMapperProxy)
-    {
-    this->PointLabelMapperProxy->Delete();
-    this->PointLabelMapperProxy = 0;
-    }
-  if (this->PointLabelActorProxy)
-    {
-    this->PointLabelActorProxy->Delete();
-    this->PointLabelActorProxy = 0;
     }
 
   this->LODInformation->Delete();
@@ -146,25 +132,9 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
   this->LODMapperProxy->AddProperty("DirectColorFlag", this->DirectColorFlagProperty);
   this->LODMapperProxy->AddProperty("InterpolateColorsFlag", this->InterpolateColorsFlagProperty);
 
-  if ( pm->GetNumberOfPartitions() == 1 && !pm->GetClientMode() )
-    {
-    this->PointLabelMapperProxy = vtkSMProxy::New();
-    this->PointLabelMapperProxy->SetVTKClassName("vtkLabeledDataMapper");
-    this->PointLabelMapperProxy->SetServersSelf(vtkProcessModule::CLIENT);
-    
-    this->PointLabelActorProxy = vtkSMProxy::New();
-    this->PointLabelActorProxy->SetVTKClassName("vtkActor2D");
-    this->PointLabelActorProxy->SetServersSelf(vtkProcessModule::CLIENT);
-    }  
-    
   this->LODDeciProxy->CreateVTKObjects(num);
   this->LODUpdateSuppressorProxy->CreateVTKObjects(num);
   this->LODMapperProxy->CreateVTKObjects(num);
-  if ( pm->GetNumberOfPartitions() == 1 && !pm->GetClientMode() )
-    {
-    this->PointLabelMapperProxy->CreateVTKObjects(num);
-    this->PointLabelActorProxy->CreateVTKObjects(num);
-    }
 
   for (i = 0; i < num; ++i)
     {
@@ -266,17 +236,6 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
       << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-
-    if ( pm->GetNumberOfPartitions() == 1 && !pm->GetClientMode() )
-      {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << this->PointLabelActorProxy->GetID(i) << "SetMapper" << this->PointLabelMapperProxy->GetID(i)
-        << vtkClientServerStream::End;
-      // Sending to client is enough here since this works only for single
-      // node.
-      pm->SendStream(vtkProcessModule::CLIENT);
-      }
 
     // Now that geometry in in this object, we must
     // connect LOD filter to geometry as part of initialization.
@@ -515,58 +474,6 @@ void vtkSMLODPartDisplay::SetInterpolateColorsFlag(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLODPartDisplay::SetPointLabelVisibility(int val)
-{
-  if (val)
-    {
-    val = 1;
-    }
-  if (this->PointLabelVisibility == val)
-    {
-    return;
-    }
-  this->PointLabelVisibility = val;
-  if (!this->PointLabelMapperProxy || !this->PointLabelActorProxy)
-    {
-    return;
-    }
-  vtkPVProcessModule *pm = this->GetProcessModule();
-
-  vtkPVDataInformation* di = this->Source->GetDataInformation();
-  if (di->DataSetTypeIsA("vtkDataSet"))
-    {
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->PointLabelMapperProxy->GetID(0) << "SetInput"
-      << this->Source->GetPart(0)->GetID(0)
-      << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke << this->PointLabelMapperProxy->GetID(0)
-      << "GetLabelTextProperty" << vtkClientServerStream::End;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult << "SetFontSize" << 24
-      << vtkClientServerStream::End;
-    
-    if (val)
-      {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << pm->GetRenderModule()->GetRendererID() << "AddProp"
-        << this->PointLabelActorProxy->GetID(0) << vtkClientServerStream::End;
-      }
-    else
-      {
-      pm->GetStream()
-        << vtkClientServerStream::Invoke
-        << pm->GetRenderModule()->GetRendererID() << "RemoveProp"
-        << this->PointLabelActorProxy->GetID(0) << vtkClientServerStream::End;
-      }
-    pm->SendStream(vtkProcessModule::RENDER_SERVER);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -576,5 +483,4 @@ void vtkSMLODPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LODResolution: " << this->LODResolution << endl;
   os << indent << "LODUpdateSuppressorProxy: " << this->LODUpdateSuppressorProxy
      << endl;
-  os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
 }

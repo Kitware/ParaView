@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPickDisplay.cxx
+  Module:    vtkSMPointLabelDisplay.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkSMPickDisplay.h"
+#include "vtkSMPointLabelDisplay.h"
 #include "vtkObjectFactory.h"
 #include "vtkMPIMoveData.h"
 #include "vtkPVDataInformation.h"
@@ -26,12 +26,12 @@
 #include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkSMPickDisplay);
-vtkCxxRevisionMacro(vtkSMPickDisplay, "1.2");
+vtkStandardNewMacro(vtkSMPointLabelDisplay);
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.1");
 
 
 //----------------------------------------------------------------------------
-vtkSMPickDisplay::vtkSMPickDisplay()
+vtkSMPointLabelDisplay::vtkSMPointLabelDisplay()
 {
   this->ProcessModule = NULL;
 
@@ -56,7 +56,7 @@ vtkSMPickDisplay::vtkSMPickDisplay()
 }
 
 //----------------------------------------------------------------------------
-vtkSMPickDisplay::~vtkSMPickDisplay()
+vtkSMPointLabelDisplay::~vtkSMPointLabelDisplay()
 {
   // This will remove the actor from the renderer.
   this->SetProcessModule(0);
@@ -74,7 +74,7 @@ vtkSMPickDisplay::~vtkSMPickDisplay()
 
 
 //----------------------------------------------------------------------------
-vtkUnstructuredGrid* vtkSMPickDisplay::GetCollectedData()
+vtkUnstructuredGrid* vtkSMPointLabelDisplay::GetCollectedData()
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
   if (pm == 0 || this->DuplicateProxy->GetNumberOfIDs() <= 0)
@@ -94,7 +94,7 @@ vtkUnstructuredGrid* vtkSMPickDisplay::GetCollectedData()
 
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::CreateVTKObjects(int num)
+void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
 {
   vtkPVProcessModule* pm;
   pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
@@ -214,7 +214,7 @@ void vtkSMPickDisplay::CreateVTKObjects(int num)
 
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::SetInput(vtkSMSourceProxy* input)
+void vtkSMPointLabelDisplay::SetInput(vtkSMSourceProxy* input)
 {  
   vtkPVProcessModule* pm;
   pm = this->GetProcessModule();  
@@ -235,7 +235,7 @@ void vtkSMPickDisplay::SetInput(vtkSMSourceProxy* input)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::AddToRenderer(vtkClientServerID rendererID)
+void vtkSMPointLabelDisplay::AddToRenderer(vtkClientServerID rendererID)
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
   if (pm == 0 || pm->GetRenderModule() == 0)
@@ -265,7 +265,7 @@ void vtkSMPickDisplay::AddToRenderer(vtkClientServerID rendererID)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
+void vtkSMPointLabelDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
   if (pm == 0 || pm->GetRenderModule() == 0)
@@ -289,7 +289,7 @@ void vtkSMPickDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
 
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::SetVisibility(int v)
+void vtkSMPointLabelDisplay::SetVisibility(int v)
 {
   if (v)
     {
@@ -314,14 +314,14 @@ void vtkSMPickDisplay::SetVisibility(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::InvalidateGeometry()
+void vtkSMPointLabelDisplay::InvalidateGeometry()
 {
   this->GeometryIsValid = 0;
   // ....
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::Update()
+void vtkSMPointLabelDisplay::Update()
 {
   // Current problem is that there is no input for the UpdateSuppressor object
   if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy != 0 )
@@ -336,7 +336,7 @@ void vtkSMPickDisplay::Update()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::SetProcessModule(vtkPVProcessModule *pm)
+void vtkSMPointLabelDisplay::SetProcessModule(vtkPVProcessModule *pm)
 {
   if (pm == 0)
     {
@@ -359,7 +359,7 @@ void vtkSMPickDisplay::SetProcessModule(vtkPVProcessModule *pm)
 }
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::RemoveAllCaches()
+void vtkSMPointLabelDisplay::RemoveAllCaches()
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
@@ -373,7 +373,7 @@ void vtkSMPickDisplay::RemoveAllCaches()
 //----------------------------------------------------------------------------
 // Assume that this method is only called when the part is visible.
 // This is like the ForceUpdate method, but uses cached values if possible.
-void vtkSMPickDisplay::CacheUpdate(int idx, int total)
+void vtkSMPointLabelDisplay::CacheUpdate(int idx, int total)
 {
   vtkPVProcessModule *pm = this->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
@@ -385,7 +385,7 @@ void vtkSMPickDisplay::CacheUpdate(int idx, int total)
 
 
 //----------------------------------------------------------------------------
-void vtkSMPickDisplay::PrintSelf(ostream& os, vtkIndent indent)
+void vtkSMPointLabelDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Visibility: " << this->Visibility << endl;

@@ -51,6 +51,7 @@ class vtkSMPart;
 class vtkPVDataInformation;
 class vtkPVNumberOfOutputsInformation;
 class vtkSMCubeAxesDisplay;
+class vtkSMPointLabelDisplay;
 class vtkPVColorMap;
 class vtkPVDisplayGUI;
 
@@ -114,6 +115,12 @@ public:
   void SetCubeAxesVisibility(int val);
   void SetCubeAxesVisibilityNoTrace(int val);
   vtkGetMacro(CubeAxesVisibility, int);
+
+  // Description:
+  // Using a display for point labels.
+  void SetPointLabelVisibility(int val);
+  void SetPointLabelVisibilityNoTrace(int val);
+  vtkGetMacro(PointLabelVisibility, int);
 
   // Description:
   // Connect an input to this pvsource. 
@@ -509,6 +516,10 @@ protected:
   // This is the state of the user selection. The CubeAxesDisplay
   // visibility is the value "visibility and CubeAxesVisibility".
   int CubeAxesVisibility;
+  // This is different than the PointLabelDisplay visibility.
+  // This is the state of the user selection. The PointLabelDisplay
+  // visibility is the value "visibility and PointLabelVisibility".
+  int PointLabelVisibility;
 
   vtkKWFrame *ParameterFrame;
   vtkSMPartDisplay*     PartDisplay;
@@ -590,6 +601,7 @@ protected:
   
   // CubeAxes should be moved into a display of its own.
   vtkSMCubeAxesDisplay* CubeAxesDisplay;
+  vtkSMPointLabelDisplay* PointLabelDisplay;
  
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented

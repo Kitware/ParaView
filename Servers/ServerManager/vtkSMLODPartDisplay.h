@@ -76,29 +76,16 @@ public:
   vtkPVLODPartDisplayInformation* GetLODInformation();
   //ETX
 
-  // Description:
-  // Toggle the visibility of the point labels.  This feature only works
-  // in single-process mode.  To be changed/moved when we rework 2D rendering
-  // in ParaView.
-  void SetPointLabelVisibility(int val);
-  vtkGetMacro(PointLabelVisibility,int);
-  
 protected:
   vtkSMLODPartDisplay();
   ~vtkSMLODPartDisplay();
 
   int LODResolution;
-  int PointLabelVisibility;
   
   vtkSMProxy* LODUpdateSuppressorProxy;
   vtkSMProxy* LODMapperProxy;
   vtkSMProxy* LODDeciProxy;
 
-  // Adding point labelling back in.  This only works in single-process mode.
-  // This code will be changed/moved when we rework 2D rendering in ParaView.
-  vtkSMProxy* PointLabelMapperProxy;
-  vtkSMProxy* PointLabelActorProxy;
-  
   // Description:
   // This method should be called immediately after the object is constructed.
   // It create VTK objects which have to exeist on all processes.
