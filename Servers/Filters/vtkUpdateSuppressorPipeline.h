@@ -22,7 +22,7 @@
 
 #include "vtkCompositeDataPipeline.h"
 
-class VTK_FILTERING_EXPORT vtkUpdateSuppressorPipeline : public vtkCompositeDataPipeline
+class VTK_EXPORT vtkUpdateSuppressorPipeline : public vtkCompositeDataPipeline
 {
 public:
   static vtkUpdateSuppressorPipeline* New();
