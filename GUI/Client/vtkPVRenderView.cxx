@@ -136,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.343");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.344");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1685,8 +1685,19 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     }
 
   vtkPVApplication *pvApp = this->GetPVApplication();
-  pvApp->GetProcessModule()->SetGlobalLODFlag(0);
-  pvApp->GetProcessModule()->GetRenderModule()->StillRender();
+  if (pvApp)
+    {
+    vtkPVProcessModule *pm = pvApp->GetProcessModule();
+    if (pm)
+      {
+      pm->SetGlobalLODFlag(0);
+      vtkPVRenderModule* rm = pm->GetRenderModule();
+      if (rm)
+        {
+        rm->StillRender();
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
