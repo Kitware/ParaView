@@ -138,9 +138,11 @@
 #define VTK_PV_TOOLBARS_TOOLS_LABEL       "Tools"
 #define VTK_PV_TOOLBARS_CAMERA_LABEL      "Camera"
 
+#define VTK_PV_ENABLE_OLD_ANIMATION_INTERFACE 0
+
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.665");
+vtkCxxRevisionMacro(vtkPVWindow, "1.666");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -773,20 +775,22 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   delete [] rbv;
 
   // View menu: Shows the animation tool.
+  if (VTK_PV_ENABLE_OLD_ANIMATION_INTERFACE)
+    {
+    rbv = this->GetMenuView()->CreateRadioButtonVariable(
+      this->GetMenuView(),"Radio");
 
-  rbv = this->GetMenuView()->CreateRadioButtonVariable(
-           this->GetMenuView(),"Radio");
-
-  this->GetMenuView()->AddRadioButton(
-    VTK_PV_ANIMATION_MENU_INDEX, 
-    VTK_PV_ANIMATION_MENU_LABEL, 
-    rbv, 
-    this, 
-    "ShowAnimationProperties", 
-    1,
-    "Display the interface for creating animations by varying variables "
-    "in a loop");
-  delete [] rbv;
+    this->GetMenuView()->AddRadioButton(
+      VTK_PV_ANIMATION_MENU_INDEX, 
+      VTK_PV_ANIMATION_MENU_LABEL, 
+      rbv, 
+      this, 
+      "ShowAnimationProperties", 
+      1,
+      "Display the interface for creating animations by varying variables "
+      "in a loop");
+    delete [] rbv;
+    }
 
   // View menu: Shows the V animation tool
   rbv = this->GetMenuView()->CreateRadioButtonVariable(
