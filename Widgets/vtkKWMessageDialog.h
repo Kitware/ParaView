@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWMessageDialog
+// .NAME vtkKWMessageDialog - a message dialog superclass
 // .SECTION Description
 // A generic superclass for MessageDialog boxes.
 

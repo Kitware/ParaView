@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWOptionMenu
+// .NAME vtkKWOptionMenu - an option menu widget
 // .SECTION Description
 // A widget that looks like a button but when pressed provides a list
 // of options that the user can select.

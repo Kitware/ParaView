@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWView
+// .NAME vtkKWView - a view superclass
 // .SECTION Description
 // The view class normally sits within a vtkKWWindow and holds a
 // vtkWindow. Normally you will not create this class but instead use

@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWMenu
+// .NAME vtkKWMenu - a menu widget
 // .SECTION Description
 // This class is the Menu abstraction for the
 // Kitware toolkit. It provides a c++ interface to

@@ -25,9 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWRadioButton
+// .NAME vtkKWRadioButton - a radio button widget
 // .SECTION Description
-// A simple widget representing a radio button.
+// A simple widget representing a radio button. The state can be set or
+// queried.
 
 #ifndef __vtkKWRadioButton_h
 #define __vtkKWRadioButton_h

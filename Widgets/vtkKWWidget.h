@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWWidget
+// .NAME vtkKWWidget - superclass of KW widgets
 // .SECTION Description
 // This class is the superclass of all UI based objects in the
 // Kitware toolkit. It contains common methods such as specifying

@@ -25,6 +25,12 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+// .NAME vtkKWCompositeCollection - a collection of composites
+// .SECTION Description
+// vtkKWCompositeCollection represents and provides methods to manipulate a 
+// list of composites (i.e., vtkKWComposite and subclasses). The list is 
+// unsorted and duplicate entries are not prevented.
+
 
 #ifndef __vtkKWCompositeC_h
 #define __vtkKWCompositeC_h

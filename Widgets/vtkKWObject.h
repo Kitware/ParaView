@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWObject
+// .NAME vtkKWObject - superclass that supports basic Tcl functionality
 // .SECTION Description
 // vtkKWObject is the superclass for most application classes.
 // It is a direct subclass of vtkObject but adds functionality for 

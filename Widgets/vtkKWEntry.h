@@ -25,9 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWEntry
+// .NAME vtkKWEntry - a single line text entry widget
 // .SECTION Description
-// A simple widget used for collecting keyboard input from the user.
+// A simple widget used for collecting keyboard input from the user. This
+// widget provides support for single line input.
 
 #ifndef __vtkKWEntry_h
 #define __vtkKWEntry_h

@@ -25,9 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWWindowCollection
+// .NAME vtkKWWindowCollection - a collection of windows.
 // .SECTION Description
-// A simple colleciton of vtkKWWindows.
+// vtkKWWindowCollection represents and provides methods to manipulate a list 
+// of windows. The list is unsorted and duplicate entries are not prevented.
 
 // .SECTION See Also
 // vtkKWWindow

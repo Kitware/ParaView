@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWWindow
+// .NAME vtkKWWindow - a window superclass which holds one or more views
 // .SECTION Description
 // This class represents a top level window with menu bar and status
 // line. It is designed to hold one or more vtkKWViews in it.

@@ -25,9 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWViewCollection
+// .NAME vtkKWViewCollection - a collection of views
 // .SECTION Description
-// A collection class for vtkKWViews.
+// vtkKWViewCollection represents and provides methods to manipulate a list of
+// views. The list is unsorted and duplicate entries are not prevented.
 
 #ifndef __vtkKWViewC_h
 #define __vtkKWViewC_h

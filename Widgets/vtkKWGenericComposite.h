@@ -25,11 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWGenericComposite
+// .NAME vtkKWGenericComposite - a simple composite with one prop
 // .SECTION Description
 // vtkKWGenericComposite is a subclass of vtkKWComposite designed to 
-// handle images. Its property sheet includes support for probing the image
-// scaling it, adjusting the window and level settings.
+// simply contain one prop. 
 
 #ifndef __vtkKWGenericComposite_h
 #define __vtkKWGenericComposite_h

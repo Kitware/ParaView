@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWCheckButton
+// .NAME vtkKWCheckButton - check button widget
 // .SECTION Description
 // A simple widget that represents a check button. It can be modified 
 // and queried using the GetState and SetState methods.

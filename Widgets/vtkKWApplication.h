@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWApplication
+// .NAME vtkKWApplication - manage all the windows in an application
 // .SECTION Description
 // vtkKWApplication is the overall class that represents the entire 
 // applicaiton. It is a fairly small class that is primarily responsible

@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWComposite
+// .NAME vtkKWComposite - an element in a view containing props / properties
 // .SECTION Description
 // A composite represents an element in the view. It is very similar to
 // the notion of an actor in a renderer. The composite is different in 

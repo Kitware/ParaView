@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWToolbar
+// .NAME vtkKWToolbar - a frame that holds tool buttons
 // .SECTION Description
 // Simply a frame to hold a bunch of tools.  It uses bindings to control
 // the height of the frame.

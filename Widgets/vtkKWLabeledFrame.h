@@ -25,10 +25,11 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWLabeledFrame
+// .NAME vtkKWLabeledFrame - a frame with a grooved border and a label
 // .SECTION Description
-// The LabeledFrame reprsents a tabbed LabeledFrame component where you can
-// add or remove pages.
+// The LabeledFrame creates a frame with a grooved border, and a label
+// embedded in the upper left corner of the grooved border.
+
 
 #ifndef __vtkKWLabeledFrame_h
 #define __vtkKWLabeledFrame_h

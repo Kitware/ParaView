@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWScale
+// .NAME vtkKWScale - a scale (slider) widget
 // .SECTION Description
 // A widget that repsentes a scale (or slider) with options for 
 // a label string and a text entry box.

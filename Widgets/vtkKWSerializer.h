@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWSerializer
+// .NAME vtkKWSerializer - a helper class for serialization
 // .SECTION Description
 // vtkKWSerializer is a helper class that is used by objects to 
 // serialize themselves. Put another way, it helps instances write

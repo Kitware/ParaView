@@ -25,9 +25,9 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWNotebook
+// .NAME vtkKWNotebook - a tabbed notebook of UI pages
 // .SECTION Description
-// The notebook reprsents a tabbed notebook component where you can
+// The notebook represents a tabbed notebook component where you can
 // add or remove pages.
 
 #ifndef __vtkKWNotebook_h

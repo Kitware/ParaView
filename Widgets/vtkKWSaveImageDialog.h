@@ -25,7 +25,7 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWSaveImageDialog
+// .NAME vtkKWSaveImageDialog - a dialog for saving 2D images
 // .SECTION Description
 // A simple dialog for saving a 2D image as a BMP, TIFF, or PNM.
 
