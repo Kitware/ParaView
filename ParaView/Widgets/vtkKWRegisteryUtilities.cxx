@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkKWRegisteryUtilities.h"
+#include "vtkDebugLeaks.h"
 #ifdef _WIN32
 #  include "vtkKWWin32RegisteryUtilities.h"
 #else // _WIN32
@@ -57,6 +58,7 @@ vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
     {
       return static_cast<vtkKWRegisteryUtilities*>(ret);
     }
+  vtkDebugLeaks::DestructClass("vtkKWRegisteryUtilities");
 #ifdef _WIN32
   return vtkKWWin32RegisteryUtilities::New();
 #else // _WIN32
@@ -150,7 +152,8 @@ int vtkKWRegisteryUtilities::Close()
 int vtkKWRegisteryUtilities::ReadValue(const char *subkey, 
 				       const char *key, 
 				       char *value)
-{
+{  
+  *value = 0;
   int res = 1;
   int open = 0;  
   if ( ! value )
@@ -166,9 +169,8 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
       }
     open = 1;
     }
-  *value = 0;
   res = this->ReadValueInternal(key, value);
-
+  
   if ( open )
     {
     if ( !this->Close() )
@@ -176,7 +178,6 @@ int vtkKWRegisteryUtilities::ReadValue(const char *subkey,
       res = 0;
       }
     }
-
   return res;
 }
 
