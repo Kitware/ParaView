@@ -52,6 +52,8 @@ class vtkArrayMapIterator : public vtkAbstractIterator<KeyType,DataType>
   friend class vtkArrayMap<KeyType,DataType>;
 
 public:
+  virtual const char* GetClassName() const { return "vtkArrayMapIterator"; }
+
   // Description:
   // Retrieve the index of the element.
   // This method returns VTK_OK if key was retrieved correctly.

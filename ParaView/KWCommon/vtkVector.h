@@ -55,10 +55,9 @@ class vtkVector : public vtkAbstractList<DType>
 
 public:
   typedef vtkVectorIterator<DType> IteratorType;
-
-  vtkContainerTypeMacro(vtkVector<DType>, vtkAbstractList<DType>);
   
   static vtkVector<DType> *New() { return new vtkVector<DType>(); }  
+  virtual const char* GetClassName() const { return "vtkVector"; }
 
   // Description:
   // Return an iterator to the list. This iterator is allocated using

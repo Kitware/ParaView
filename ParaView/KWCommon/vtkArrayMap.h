@@ -71,21 +71,7 @@ public:
   // The CPP splits that in two and we ae in trouble.
   //vtkContainerTypeMacro((vtkArrayMap<KeyType,DataType>), vtkContainer);
 
-  typedef vtkAbstractMap<KeyType,DataType> Superclass; 
-  virtual const char *GetClassName() const
-    {return "vtkArrayMap";} 
-  static int IsTypeOf(const char *type) 
-  { 
-    if ( !strcmp("vtkArrayMap",type) )
-      { 
-      return 1;
-      }
-    return Superclass::IsTypeOf(type);
-  }
-  virtual int IsA(const char *type)
-  {
-    return this->vtkArrayMap<KeyType,DataType>::IsTypeOf(type);
-  }
+  virtual const char *GetClassName() const {return "vtkArrayMap";} 
 
   static vtkArrayMap<KeyType,DataType> *New() 
     { return new vtkArrayMap<KeyType,DataType>(); }  

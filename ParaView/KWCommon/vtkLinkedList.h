@@ -57,9 +57,8 @@ class vtkLinkedList : public vtkAbstractList<DType>
 public:
   typedef vtkLinkedListIterator<DType> IteratorType;
 
-  vtkContainerTypeMacro(vtkLinkedList<DType>, vtkAbstractList<DType>);
-  
   static vtkLinkedList<DType> *New() { return new vtkLinkedList<DType>(); }  
+  virtual const char* GetClassName() const { return "vtkLinkedList"; }
 
   // Description:
   // Return an iterator to the list. This iterator is allocated using

@@ -55,6 +55,7 @@ class vtkLinkedListIterator : public vtkAbstractIterator<vtkIdType,DType>
   friend class vtkLinkedList<DType>;
 
 public:
+  virtual const char* GetClassName() const { return "vtkLinkedListIterator"; }
   // Description:
   // Retrieve the index of the element.
   // This method returns VTK_OK if key was retrieved correctly.

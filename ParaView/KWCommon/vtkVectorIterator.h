@@ -55,6 +55,8 @@ class vtkVectorIterator : public vtkAbstractIterator<vtkIdType,DType>
   friend class vtkVector<DType>;
 
 public:
+  virtual const char* GetClassName() const { return "vtkVectorIterator"; }
+
   // Description:
   // Retrieve the index of the element.
   // This method returns VTK_OK if key was retrieved correctly.
