@@ -189,6 +189,7 @@ IF(VTK_USE_MPI)
     vtkMergeCells.cxx
     vtkPlanesIntersection.cxx
     vtkPointsProjectedHull.cxx
+    vtkBoxClipDataSet.cxx
     #  vtkAllToNRedistributePolyData.cxx
     #  vtkBalancedRedistributePolyData.cxx
     )
