@@ -5,7 +5,6 @@ SET( ParaViewShared_SRCS
   )
 
 SET( ParaViewSharedNotWrapped_SRCS
-  vtkPVMPIProcessModule.cxx
   vtkPVProgressHandler.cxx
   )
 
@@ -19,6 +18,7 @@ SET(ParaViewSharedNotTclWrapped_SRCS
   vtkPVExtentTranslator.cxx
   vtkPVClientServerModule.cxx
   vtkPVGenericRenderWindowInteractor.cxx
+  vtkPVMPIProcessModule.cxx
   )
 
 SET( ParaViewServer_SRCS
