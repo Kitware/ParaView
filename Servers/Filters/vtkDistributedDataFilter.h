@@ -189,6 +189,20 @@ public:
   virtual void ComputeInputUpdateExtents( vtkDataObject *output );
 
   // Description:
+  //  This class does a great deal of all-to-all communication
+  //  when exchanging portions of data sets and building new sub 
+  //  grids.
+  //  By default it will do fast communication.  It can instead
+  //  use communication routines that use the least possible
+  //  amount of memory, but these are slower.  Set this option
+  //  ON to choose these latter routines.
+
+  vtkBooleanMacro(UseMinimalMemory, int);
+  vtkGetMacro(UseMinimalMemory, int);
+  vtkSetMacro(UseMinimalMemory, int);
+
+
+  // Description:
   //  Turn on collection of timing data
 
   vtkBooleanMacro(Timing, int);
@@ -236,19 +250,6 @@ protected:
   void DivideBoundaryCellsOn();
   void DivideBoundaryCellsOff();
   void SetDivideBoundaryCells(int val);
-
-  // Description:
-  //  This class does a great deal of all-to-all communication
-  //  when exchanging portions of data sets and building new sub 
-  //  grids.
-  //  By default it will do fast communication.  It can instead
-  //  use communication routines that use the least possible
-  //  amount of memory, but these are slower.  Set this option
-  //  ON to choose these latter routines.
-
-  vtkBooleanMacro(UseMinimalMemory, int);
-  vtkGetMacro(UseMinimalMemory, int);
-  vtkSetMacro(UseMinimalMemory, int);
 
   // Description:
   //   Build a vtkUnstructuredGrid for a spatial region from the 
