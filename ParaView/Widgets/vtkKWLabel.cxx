@@ -49,7 +49,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.16");
+vtkCxxRevisionMacro(vtkKWLabel, "1.17");
 
 //-----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -105,13 +105,13 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
   wname = this->GetWidgetName();
   if ( this->LineType == vtkKWLabel::MultiLine )
     {
-    this->Script("message %s -text {%s} %s -width %d", 
-                 wname, this->Label, (args?args:""), this->Width);
+    this->Script("message %s -text {%s} -width %d %s", 
+                 wname, this->Label, this->Width, (args?args:""));
     }
   else
     {
-    this->Script("label %s -text {%s} -justify left %s -width %d", 
-                 wname, this->Label, (args?args:""), this->Width);
+    this->Script("label %s -text {%s} -justify left -width %d %s", 
+                 wname, this->Label, this->Width, (args?args:""));
     }
 
   // Update enable state
