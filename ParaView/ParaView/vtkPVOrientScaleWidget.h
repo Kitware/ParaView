@@ -87,8 +87,8 @@ public:
   // Description:
   // Callbacks
   void ScaleModeMenuCallback();
-  void ScalarsMenuEntryCallback(const char *arrayName);
-  void VectorsMenuEntryCallback(const char *arrayName);
+  void ScalarsMenuEntryCallback();
+  void VectorsMenuEntryCallback();
   
   // Description:
   // This input menu supplies the data set.
@@ -175,9 +175,6 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement *element,
                         vtkPVXMLPackageParser *parser);
   
-  virtual void SaveInBatchScriptForPart(ofstream *file,
-                                        const char *sourceTclName);
-
   vtkPVDataSetAttributesInformation* GetPointDataInformation();
   void UpdateArrayMenus();
   void UpdateScaleFactor();

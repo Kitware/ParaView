@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.4");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -336,7 +336,7 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
       {
       if (ai->GetNumberOfComponents() == 1) // scalars
         {
-        sprintf(methodAndArgs, "ScalarsMenuEntryCallback {%s}", ai->GetName());
+        sprintf(methodAndArgs, "ScalarsMenuEntryCallback");
         this->ScalarsMenu->AddEntryWithCommand(ai->GetName(), 
                                                this, methodAndArgs);
         if (firstScalar == NULL)
@@ -351,7 +351,7 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
         }
       if (ai->GetNumberOfComponents() == 3) // vectors
         {
-        sprintf(methodAndArgs, "VectorsMenuEntryCallback {%s}", ai->GetName());
+        sprintf(methodAndArgs, "VectorsMenuEntryCallback");
         this->VectorsMenu->AddEntryWithCommand(ai->GetName(), 
                                                this, methodAndArgs);
         if (firstVector == NULL)
@@ -605,11 +605,6 @@ int vtkPVOrientScaleWidget::ReadXMLAttributes(vtkPVXMLElement *element,
   return 1;
 }
 
-void vtkPVOrientScaleWidget::SaveInBatchScriptForPart(
-  ofstream *file, const char *sourceTclName)
-{
-}
-
 vtkPVDataSetAttributesInformation* vtkPVOrientScaleWidget::GetPointDataInformation()
 {
   if (!this->InputMenu)
@@ -626,14 +621,14 @@ vtkPVDataSetAttributesInformation* vtkPVOrientScaleWidget::GetPointDataInformati
   return input->GetDataInformation()->GetPointDataInformation();
 }
 
-void vtkPVOrientScaleWidget::ScalarsMenuEntryCallback(const char *arrayName)
+void vtkPVOrientScaleWidget::ScalarsMenuEntryCallback()
 {
   this->UpdateScaleFactor();
     
   this->ModifiedCallback();
 }
 
-void vtkPVOrientScaleWidget::VectorsMenuEntryCallback(const char *arrayName)
+void vtkPVOrientScaleWidget::VectorsMenuEntryCallback()
 {
   this->UpdateScaleFactor();
     
@@ -676,9 +671,9 @@ void vtkPVOrientScaleWidget::ResetInternal()
   this->ScalarsMenu->SetValue(this->Property->GetString(0));
   this->VectorsMenu->SetValue(this->Property->GetString(1));
   this->OrientModeMenu->SetValue(
-    this->OrientModeMenu->GetEntryLabel(scalars[0]));
+    this->OrientModeMenu->GetEntryLabel((int)scalars[0]));
   this->ScaleModeMenu->SetValue(
-    this->ScaleModeMenu->GetEntryLabel(scalars[1]));
+    this->ScaleModeMenu->GetEntryLabel((int)scalars[1]));
   this->ScaleFactorEntry->SetValue(scalars[2]);
  
   if (this->AcceptCalled)
