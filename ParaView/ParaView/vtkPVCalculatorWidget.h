@@ -161,6 +161,9 @@ protected:
   vtkKWPushButton* ButtonAbs;
   vtkKWPushButton* ButtonMag;
   vtkKWPushButton* ButtonNorm;
+  vtkKWPushButton* ButtonIHAT;
+  vtkKWPushButton* ButtonJHAT;
+  vtkKWPushButton* ButtonKHAT;
   vtkKWPushButton* ButtonLeftParenthesis;
   vtkKWPushButton* ButtonRightParenthesis;
   vtkKWMenuButton* ScalarsMenu;

@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.4");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -119,6 +119,9 @@ vtkPVCalculatorWidget::vtkPVCalculatorWidget()
   this->ButtonAbs = vtkKWPushButton::New();
   this->ButtonMag = vtkKWPushButton::New();
   this->ButtonNorm = vtkKWPushButton::New();
+  this->ButtonIHAT = vtkKWPushButton::New();
+  this->ButtonJHAT = vtkKWPushButton::New();
+  this->ButtonKHAT = vtkKWPushButton::New();
   this->ButtonLeftParenthesis = vtkKWPushButton::New();
   this->ButtonRightParenthesis = vtkKWPushButton::New();
   this->ScalarsMenu = vtkKWMenuButton::New();
@@ -208,6 +211,12 @@ vtkPVCalculatorWidget::~vtkPVCalculatorWidget()
   this->ButtonMag = NULL;
   this->ButtonNorm->Delete();
   this->ButtonNorm = NULL;
+  this->ButtonIHAT->Delete();
+  this->ButtonIHAT = NULL;
+  this->ButtonJHAT->Delete();
+  this->ButtonJHAT = NULL;
+  this->ButtonKHAT->Delete();
+  this->ButtonKHAT = NULL;
   this->ButtonLeftParenthesis->Delete();
   this->ButtonLeftParenthesis = NULL;
   this->ButtonRightParenthesis->Delete();
@@ -284,9 +293,25 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
   this->ButtonRightParenthesis->Create(pvApp, "");
   this->ButtonRightParenthesis->SetLabel(")");
   this->ButtonRightParenthesis->SetCommand(this, "UpdateFunction )");
-  this->Script("grid %s %s %s -sticky ew", this->ButtonClear->GetWidgetName(),
+  this->ButtonIHAT->SetParent(this->CalculatorFrame->GetFrame());
+  this->ButtonIHAT->Create(pvApp, "");
+  this->ButtonIHAT->SetLabel("iHat");
+  this->ButtonIHAT->SetCommand(this, "UpdateFunction iHat");
+  this->ButtonJHAT->SetParent(this->CalculatorFrame->GetFrame());
+  this->ButtonJHAT->Create(pvApp, "");
+  this->ButtonJHAT->SetLabel("jhat");
+  this->ButtonJHAT->SetCommand(this, "UpdateFunction jHat");
+  this->ButtonKHAT->SetParent(this->CalculatorFrame->GetFrame());
+  this->ButtonKHAT->Create(pvApp, "");
+  this->ButtonKHAT->SetLabel("khat");
+  this->ButtonKHAT->SetCommand(this, "UpdateFunction kHat");
+  this->Script("grid %s %s %s %s %s %s -sticky ew",
+               this->ButtonClear->GetWidgetName(),
                this->ButtonLeftParenthesis->GetWidgetName(),
-               this->ButtonRightParenthesis->GetWidgetName());
+               this->ButtonRightParenthesis->GetWidgetName(),
+               this->ButtonIHAT->GetWidgetName(),
+               this->ButtonJHAT->GetWidgetName(),
+               this->ButtonKHAT->GetWidgetName());
   
   this->ButtonSin->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonSin->Create(pvApp, "");
