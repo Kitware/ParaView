@@ -288,7 +288,7 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
 	}
     }
 
-    [$pvGlyph GetPVOutput] SetVisibility 1
+
 
     $camera SetPosition 36.8437 -0.196199 53.7392
     $camera SetFocalPoint -5.92921 -0.324064 18.022
@@ -297,9 +297,12 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
     $camera SetClippingRange 15.0904 64.6074
 
     [$pvExtract GetPVWidget {VOI}] SetValue 0 0 0 32 3 20
-    RenWin1 Render
+
+    # RenWin1 Render
     
     .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n\n Vertical plane extracted and glyphs oriented and\n scaled with momentum." -justify left
+
+    [$pvGlyph GetPVOutput] SetVisibility 1
 
     for {set i 1} {$i < 56} {incr i 1} {
 	[$pvExtract GetPVWidget {VOI}] SetValue $i $i 0 32 3 20
@@ -381,6 +384,7 @@ proc BlowMoldingDemoRun { pvWarp pvSub pvNormals } {
     set warpOutput [$pvWarp GetPVOutput]
     [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
     $pvWarp AcceptCallback
+    [$warpOutput GetColorMenu] SetValue "Point thickness1"
     $warpOutput ColorByPointFieldComponent thickness1 0
 
     $warpOutput SetVisibility 1
@@ -390,6 +394,7 @@ proc BlowMoldingDemoRun { pvWarp pvSub pvNormals } {
     for {set i 1} {$i <= 10} {incr i 1} {
 	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
 	$pvWarp AcceptCallback
+	[$warpOutput GetColorMenu] SetValue "Point thickness$i"
 	$warpOutput ColorByPointFieldComponent thickness$i 0
 	RenWin1 Render
 	after 100
