@@ -36,8 +36,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkRenderWindow.h"
 #include "vtkKWRadioButton.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWMenu.h"
 #include "vtkKWChangeColorButton.h"
+#include "vtkTimerLog.h"
 
 class vtkKWApplication;
 
@@ -58,6 +60,10 @@ public:
   // Description:
   // Render the scene.
   virtual void Render();
+
+  // Description:
+  // Reset the Camera.
+  virtual void ResetCamera();
 
   // Description:
   // These are the event handlers that UIs can use or override.
@@ -112,17 +118,6 @@ public:
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   // Description:
-  // Callbacks used to set the print quality
-  void OnPrint1();
-  void OnPrint2();
-  void OnPrint3();
-  
-  // Description:
-  // Methods to indicate when this view is the selected view.
-  virtual void Select(vtkKWWindow *);
-  virtual void Deselect(vtkKWWindow *);
-
-  // Description:
   // Create the properties sheet, called by ShowViewProperties.
   virtual void CreateViewProperties();
 
@@ -130,6 +125,31 @@ public:
   // Set the background color
   void SetBackgroundColor( float r, float g, float b );
 
+  // Description:
+  // View from plus x, plus y, plus z, minus x, minus y, or minus z
+  void SetStandardCameraView( int type );
+
+  // Description:
+  // Are we in motion?
+  // Not part of the public API - should only be used internally
+  vtkSetMacro( InMotion, int );
+  vtkGetMacro( InMotion, int );
+  
+  // Description:
+  // Timer used to measure how long it's been since we've last asked to render
+  // Use internally only.
+  vtkGetObjectMacro( RenderTimer, vtkTimerLog );
+
+  // Description:
+  // The guts of the abort check method. Made public so that it can
+  // be accessed by the render timer callback.
+  int ShouldIAbort();
+  
+  // Description:
+  // The method that is called to do the multipass rendering. Internal
+  // use only.
+  void IdleRenderCallback();
+  
 protected:
   vtkKWRenderView();
   ~vtkKWRenderView();
@@ -145,12 +165,19 @@ protected:
   float            DeltaElevation;
   int              InRender;
   int              InMotion;
+  vtkTimerLog      *RenderTimer;
+  Tcl_TimerToken   TimerToken;
+  
+  vtkKWLabeledFrame      *CameraFrame;
+  vtkKWWidget            *CameraTopFrame;
+  vtkKWWidget            *CameraBottomFrame;
+  vtkKWPushButton        *CameraPlusXButton;
+  vtkKWPushButton        *CameraPlusYButton;
+  vtkKWPushButton        *CameraPlusZButton;
+  vtkKWPushButton        *CameraMinusXButton;
+  vtkKWPushButton        *CameraMinusYButton;
+  vtkKWPushButton        *CameraMinusZButton;
 
-  vtkKWWidget            *GeneralProperties;
-  vtkKWLabeledFrame      *BackgroundFrame;
-  vtkKWChangeColorButton *BackgroundColor;
-
-  vtkKWMenu *PageMenu;
 };
 
 

@@ -31,15 +31,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
-
-#include "vtkTimerLog.h"
+#include "vtkMath.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #else
-#include "vtkMesaRenderWindow.h"
-#include "vtkMesaRenderer.h"
 #include "vtkXRenderWindow.h"
+
+
 
 int vtkKWRenderViewFoundMatch;
 Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
@@ -72,7 +71,6 @@ vtkKWRenderView* vtkKWRenderView::New()
     {
     return (vtkKWRenderView*)ret;
     }
-
   // If the factory was unable to create the object, then create it here.
   return new vtkKWRenderView;
 }
@@ -88,6 +86,17 @@ void KWRenderViewAbortCheckMethod( void *arg )
     return;
     }
 
+  if ( me->ShouldIAbort() == 2 )
+    {
+    me->GetRenderWindow()->SetAbortRender(1);    
+    }
+}
+
+// Return 1 to mean abort but keep trying, 2 to mean hard abort
+int vtkKWRenderView::ShouldIAbort()
+{
+  int flag = 0;
+  
 #ifdef _WIN32
   MSG msg;
 
@@ -96,37 +105,133 @@ void KWRenderViewAbortCheckMethod( void *arg )
 
   if (PeekMessage(&msg,NULL,WM_LBUTTONDOWN,WM_LBUTTONDOWN,PM_NOREMOVE))
     {
-      me->GetRenderWindow()->SetAbortRender(1);
+    flag = 2;
     }
   if (PeekMessage(&msg,NULL,WM_NCLBUTTONDOWN,WM_NCLBUTTONDOWN,PM_NOREMOVE))
     {
-      me->GetRenderWindow()->SetAbortRender(1);
+    flag = 2;
     }
   if (PeekMessage(&msg,NULL,WM_MBUTTONDOWN,WM_MBUTTONDOWN,PM_NOREMOVE))
     {
-      me->GetRenderWindow()->SetAbortRender(1);
+    flag = 2;
     }
   if (PeekMessage(&msg,NULL,WM_RBUTTONDOWN,WM_RBUTTONDOWN,PM_NOREMOVE))
     {
-      me->GetRenderWindow()->SetAbortRender(1);
+    flag = 2;
     }
   if (PeekMessage(&msg,NULL,WM_KEYDOWN,WM_KEYDOWN,PM_NOREMOVE))
     {
-      me->GetRenderWindow()->SetAbortRender(1);
+    flag = 2;
     }
+
+  if ( !flag )
+    {
+    // Check some other events to make sure UI isn't being updated
+    if (PeekMessage(&msg,NULL,WM_SYNCPAINT,WM_SYNCPAINT,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_NCPAINT,WM_NCPAINT,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_PAINT,WM_PAINT,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_ERASEBKGND,WM_ERASEBKGND,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_ACTIVATE,WM_ACTIVATE,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_NCACTIVATE,WM_NCACTIVATE,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    }
+  
 #else
   XEvent report;
   
   vtkKWRenderViewFoundMatch = 0;
-  Display *dpy = ((vtkXRenderWindow*)me->GetRenderWindow())->GetDisplayId();
-  XSync(dpy,false);
+  Display *dpy = ((vtkXRenderWindow*)this->GetRenderWindow())->GetDisplayId();
+  XSync(dpy,0);
   XCheckIfEvent(dpy, &report, vtkKWRenderViewPredProc, NULL);
-  XSync(dpy,false);
+  XSync(dpy,0);
   if (vtkKWRenderViewFoundMatch)
     {
-    me->GetRenderWindow()->SetAbortRender(1);
+    flag = 2;
     }
 #endif
+  
+  return flag;
+}
+
+
+void KWRenderView_IdleRender( ClientData arg )
+{
+  vtkKWRenderView *me = (vtkKWRenderView *)arg;
+
+  me->IdleRenderCallback();
+}
+
+void vtkKWRenderView::IdleRenderCallback()
+{  
+  int rescheduleDelay;
+  int needToRender = 0;
+  int abortFlag;
+  double elapsedTime;
+    
+  this->RenderTimer->StopTimer();
+  
+  elapsedTime = this->RenderTimer->GetElapsedTime();
+  abortFlag = this->ShouldIAbort();
+  
+  // Has enough time passed? Is there anything pending that will
+  // abort this render?
+  if ( elapsedTime > 0.1 && abortFlag == 0 )
+    {
+    for (int i=0; i < this->GetNumberOfStillUpdates(); i++)
+      {
+      this->RenderWindow->SetDesiredUpdateRate(this->GetStillUpdateRate(i));
+      this->RenderWindow->Render();
+      if ( this->RenderWindow->GetAbortRender() ||
+           ( this->MultiPassStillAbortCheckMethod &&
+             this->MultiPassStillAbortCheckMethod
+             ( this->MultiPassStillAbortCheckMethodArg ) ) )
+        {
+        break;
+        }
+      }
+    }
+  else
+    {
+    if ( abortFlag == 1 )
+      {
+      needToRender = 1;
+      rescheduleDelay = 1000;
+      } 
+    else if ( elapsedTime <= 0.1 )
+      {  
+      needToRender = 1;
+      rescheduleDelay = 100;
+      }
+    }
+
+  // If we still need to render, reschedule this callback
+  if ( needToRender )
+    {
+    this->TimerToken = Tcl_CreateTimerHandler(rescheduleDelay, 
+                                              KWRenderView_IdleRender, 
+                                              (ClientData)this);
+    }
+  else
+    {
+    this->TimerToken = NULL;
+    }
 }
 
 int vtkKWRenderViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -146,25 +251,53 @@ vtkKWRenderView::vtkKWRenderView()
   this->CommandFunction = vtkKWRenderViewCommand;
   this->InRender = 0;
   this->InMotion = 0;
+  this->RenderTimer = vtkTimerLog::New();  
 
-  this->GeneralProperties = vtkKWWidget::New();
+  this->CameraFrame = vtkKWLabeledFrame::New();
+  this->CameraFrame->SetParent( this->GeneralProperties );
+  this->CameraTopFrame = vtkKWWidget::New();
+  this->CameraTopFrame->SetParent( this->CameraFrame->GetFrame() );
+  this->CameraBottomFrame = vtkKWWidget::New();
+  this->CameraBottomFrame->SetParent( this->CameraFrame->GetFrame() );
+    
+  this->CameraPlusXButton = vtkKWPushButton::New();
+  this->CameraPlusXButton->SetParent(this->CameraTopFrame);
+  this->CameraPlusYButton = vtkKWPushButton::New();
+  this->CameraPlusYButton->SetParent(this->CameraTopFrame);
+  this->CameraPlusZButton = vtkKWPushButton::New();
+  this->CameraPlusZButton->SetParent(this->CameraTopFrame);
+  this->CameraMinusXButton = vtkKWPushButton::New();
+  this->CameraMinusXButton->SetParent(this->CameraBottomFrame);
+  this->CameraMinusYButton = vtkKWPushButton::New();
+  this->CameraMinusYButton->SetParent(this->CameraBottomFrame);
+  this->CameraMinusZButton = vtkKWPushButton::New();
+  this->CameraMinusZButton->SetParent(this->CameraBottomFrame);
 
-  this->BackgroundFrame = vtkKWLabeledFrame::New();
-  this->BackgroundFrame->SetParent( this->GeneralProperties );
-  this->BackgroundColor = vtkKWChangeColorButton::New();
-  this->BackgroundColor->SetParent( this->BackgroundFrame->GetFrame() );
-
-  this->PageMenu = vtkKWMenu::New();
+  this->TimerToken = NULL;
+  
 }
 
 vtkKWRenderView::~vtkKWRenderView()
 {
   this->RenderWindow->Delete();
   this->Renderer->Delete();
-  this->GeneralProperties->Delete();
-  this->BackgroundFrame->Delete();
-  this->BackgroundColor->Delete();
-  this->PageMenu->Delete();
+  this->CameraFrame->Delete();
+  this->CameraTopFrame->Delete();
+  this->CameraBottomFrame->Delete();
+  this->CameraPlusXButton->Delete();
+  this->CameraPlusYButton->Delete();
+  this->CameraPlusZButton->Delete();
+  this->CameraMinusXButton->Delete();
+  this->CameraMinusYButton->Delete();
+  this->CameraMinusZButton->Delete();
+  this->RenderTimer->Delete();
+  
+  if ( this->TimerToken )
+    {
+    Tcl_DeleteTimerHandler( this->TimerToken );
+    this->TimerToken = NULL;
+    }
+  
 }
 
 void vtkKWRenderView::SetupMemoryRendering(int x, int y, void *cd) 
@@ -176,12 +309,6 @@ void vtkKWRenderView::SetupMemoryRendering(int x, int y, void *cd)
     }
   vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->SetupMemoryRendering(x,y,(HDC)cd);
-#else
-  if (this->RenderWindow->IsA("vtkMesaRenderWindow"))
-    {
-    vtkMesaRenderWindow::
-      SafeDownCast(this->RenderWindow)->SetOffScreenRendering(1);
-    } 
 #endif
 }
 
@@ -190,12 +317,6 @@ void vtkKWRenderView::ResumeScreenRendering()
 #ifdef _WIN32
   vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->ResumeScreenRendering();
-#else
-  if (this->RenderWindow->IsA("vtkMesaRenderWindow"))
-    {
-    vtkMesaRenderWindow::
-      SafeDownCast(this->RenderWindow)->SetOffScreenRendering(0);
-    } 
 #endif
 }
 
@@ -258,10 +379,10 @@ void vtkKWRenderView::Create(vtkKWApplication *app, char *args)
                this->VTKWidget->GetWidgetName(),local);
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
                this->VTKWidget->GetWidgetName());
-  
-  
+
+
   this->RenderWindow->Render();
-  delete local;
+  delete [] local;
 }
 
 void vtkKWRenderView::CreateViewProperties()
@@ -270,26 +391,140 @@ void vtkKWRenderView::CreateViewProperties()
 
   this->vtkKWView::CreateViewProperties();
 
-  this->Notebook->AddPage("General");
-  
-  this->GeneralProperties->SetParent(this->Notebook->GetFrame("General"));
-  this->GeneralProperties->Create(app,"frame","");
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-               this->Notebook->GetWidgetName());
-  this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
-               this->GeneralProperties->GetWidgetName());  
-
-  this->BackgroundFrame->Create( app );
-  this->BackgroundFrame->SetLabel("Background");
+  this->CameraFrame->Create( app );
+  this->CameraFrame->SetLabel( "Viewing Directions" );
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->BackgroundFrame->GetWidgetName());
+               this->CameraFrame->GetWidgetName());
 
-  float c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
-  this->BackgroundColor->SetColor( c );
-  this->BackgroundColor->Create( app, "" );
-  this->BackgroundColor->SetCommand( this, "SetBackgroundColor" );
-  this->Script("pack %s -side top -padx 15 -pady 4 -expand 1 -fill x",
-               this->BackgroundColor->GetWidgetName());
+  this->CameraTopFrame->Create( app, "frame", "" );
+  this->CameraBottomFrame->Create( app, "frame", "" );
+  this->Script("pack %s %s -side top -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->CameraTopFrame->GetWidgetName(),
+               this->CameraBottomFrame->GetWidgetName());
+
+  this->CameraPlusXButton->Create( app, "-text {+X}" );
+  this->CameraPlusXButton->SetCommand( this, "SetStandardCameraView 0" );
+  this->CameraPlusYButton->Create( app, "-text {+Y}" );
+  this->CameraPlusYButton->SetCommand( this, "SetStandardCameraView 1" );
+  this->CameraPlusZButton->Create( app, "-text {+Z}" );
+  this->CameraPlusZButton->SetCommand( this, "SetStandardCameraView 2" );
+  this->Script("pack %s %s %s -side left -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->CameraPlusXButton->GetWidgetName(),
+               this->CameraPlusYButton->GetWidgetName(),
+               this->CameraPlusZButton->GetWidgetName() );
+
+  this->CameraMinusXButton->Create( app, "-text {-X}" );
+  this->CameraMinusXButton->SetCommand( this, "SetStandardCameraView 3" );
+  this->CameraMinusYButton->Create( app, "-text {-Y}" );
+  this->CameraMinusYButton->SetCommand( this, "SetStandardCameraView 4" );
+  this->CameraMinusZButton->Create( app, "-text {-Z}" );
+  this->CameraMinusZButton->SetCommand( this, "SetStandardCameraView 5" );
+  this->Script("pack %s %s %s -side left -padx 2 -pady 2 -fill x -expand yes -anchor w",
+               this->CameraMinusXButton->GetWidgetName(),
+               this->CameraMinusYButton->GetWidgetName(),
+               this->CameraMinusZButton->GetWidgetName() );
+
+}
+
+void vtkKWRenderView::SetStandardCameraView( int type )
+{
+  vtkCamera *c;
+  float     v[3];
+
+  c = this->Renderer->GetActiveCamera();
+  c->GetFocalPoint(v);
+
+  switch ( type ) 
+    {
+    case 0:
+      c->SetPosition( v[0]-1, v[1], v[2] );
+      c->SetViewUp( 0, 1, 0 );
+      break;
+    case 1:
+      c->SetPosition( v[0], v[1]-1, v[2] );
+      c->SetViewUp( 0, 0, 1 );
+      break;
+    case 2:
+      c->SetPosition( v[0], v[1], v[2]-1 );
+      c->SetViewUp( 0, 1, 0 );
+      break;
+    case 3:
+      c->SetPosition( v[0]+1, v[1], v[2] );
+      c->SetViewUp( 0, 1, 0 );
+      break;
+    case 4:
+      c->SetPosition( v[0], v[1]+1, v[2] );
+      c->SetViewUp( 0, 0, 1 );
+      break;
+    case 5:
+      c->SetPosition( v[0], v[1], v[2]+1 );
+      c->SetViewUp( 0, 1, 0 );
+      break;
+    }
+  this->ResetCamera();
+  this->RenderWindow->Render();
+}
+
+void vtkKWRenderView::ResetCamera()
+{
+  float bounds[6];
+  float center[3];
+  float distance;
+  float width;
+  double vn[3], *vup;
+  
+  this->Renderer->ComputeVisiblePropBounds( bounds );
+  if ( bounds[0] == VTK_LARGE_FLOAT )
+    {
+    vtkDebugMacro( << "Cannot reset camera!" );
+    return;
+    }
+
+  this->CurrentCamera = this->Renderer->GetActiveCamera();
+  if ( this->CurrentCamera != NULL )
+    {
+    this->CurrentCamera->GetViewPlaneNormal(vn);
+    }
+  else
+    {
+    vtkErrorMacro(<< "Trying to reset non-existant camera");
+    return;
+    }
+
+  center[0] = (bounds[0] + bounds[1])/2.0;
+  center[1] = (bounds[2] + bounds[3])/2.0;
+  center[2] = (bounds[4] + bounds[5])/2.0;
+
+  width = bounds[3] - bounds[2];
+  if (width < (bounds[1] - bounds[0]))
+    {
+    width = bounds[1] - bounds[0];
+    }
+  if (width < (bounds[5] - bounds[4]))
+    {
+    width = bounds[5] - bounds[4];
+    }
+  distance = 
+    width/tan(this->CurrentCamera->GetViewAngle()*vtkMath::Pi()/360.0);
+
+  // check view-up vector against view plane normal
+  vup = this->CurrentCamera->GetViewUp();
+  if ( fabs(vtkMath::Dot(vup,vn)) > 0.999 )
+    {
+    vtkWarningMacro(<<"Resetting view-up since view plane normal is parallel");
+    this->CurrentCamera->SetViewUp(-vup[2], vup[0], vup[1]);
+    }
+
+  // update the camera
+  this->CurrentCamera->SetFocalPoint(center[0],center[1],center[2]);
+  this->CurrentCamera->SetPosition(center[0]+distance*vn[0],
+                                  center[1]+distance*vn[1],
+                                  center[2]+distance*vn[2]);
+
+  this->Renderer->ResetCameraClippingRange( bounds );
+
+  // setup default parallel scale
+  this->CurrentCamera->SetParallelScale(0.6*width);
 }
 
 void vtkKWRenderView::SetBackgroundColor( float r, float g, float b )
@@ -338,10 +573,6 @@ void vtkKWRenderView::Render()
     return;
     }
   
-  vtkTimerLog  *timer = vtkTimerLog::New();
-  timer->StartTimer();
-  cerr << "Start View Render\n";
-  
   this->InRender = 1;
 
   if (this->CurrentLight)
@@ -352,6 +583,12 @@ void vtkKWRenderView::Render()
 
   if ( this->RenderMode == VTK_KW_INTERACTIVE_RENDER )
     {
+    if ( this->TimerToken )
+      {
+      Tcl_DeleteTimerHandler( this->TimerToken );
+      this->TimerToken = NULL;
+      }
+    
     this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
     this->RenderWindow->Render();
     if ( this->RenderWindow->GetAbortRender() )
@@ -361,21 +598,29 @@ void vtkKWRenderView::Render()
     }
   else if ( this->RenderMode == VTK_KW_STILL_RENDER )
     {
-    for (int i=0; i < this->NumberOfStillUpdates; i++)
+    // If this is a still render do it as an timer callback
+    // Start the timer here. Then, if we don't already have a timer call
+    // going, start one. The timer callback will render only if it has been
+    // at least some length of time since the last time a render request was
+    // made (we keep track of this with the timerlog - we re-start it each 
+    // time a render request is made. The timer will keep rescheduling itself
+    // until it can do its render successfully.
+    this->RenderTimer->StartTimer();
+    if ( !this->TimerToken )
       {
-      this->RenderWindow->SetDesiredUpdateRate(this->StillUpdateRates[i]);
-      this->RenderWindow->Render();
-      if ( this->RenderWindow->GetAbortRender() ||
-	   ( this->MultiPassStillAbortCheckMethod &&
-	     this->MultiPassStillAbortCheckMethod( this->MultiPassStillAbortCheckMethodArg ) ) )
-	{
-	this->InMotion = 0;
-	break;
-	}
+      this->TimerToken = Tcl_CreateTimerHandler(100, 
+                                                KWRenderView_IdleRender, 
+                                                (ClientData)this);
       }
     }
   else if ( this->RenderMode == VTK_KW_SINGLE_RENDER )
     {
+    if ( this->TimerToken )
+      {
+      Tcl_DeleteTimerHandler( this->TimerToken );
+      this->TimerToken = NULL;
+      }
+
     // if we are printing pick a good update rate
     if (this->Printing)
       {
@@ -386,10 +631,6 @@ void vtkKWRenderView::Render()
     this->RenderWindow->Render();
     this->InMotion = 0;
     }
-  
-  timer->StopTimer();
-  cerr << "End View Render: " << timer->GetElapsedTime() << endl;
-  timer->Delete();
   
   this->InRender = 0;
 }
@@ -500,9 +741,8 @@ void vtkKWRenderView::Reset()
 {
   this->Renderer->GetActiveCamera()->SetPosition(0,0,1);
   this->Renderer->GetActiveCamera()->SetFocalPoint(0,0,0);
-  this->Renderer->GetActiveCamera()->ComputeViewPlaneNormal();
   this->Renderer->GetActiveCamera()->SetViewUp(0,1,0);
-  this->Renderer->ResetCamera();
+  this->ResetCamera();
   this->Render();
 }
 
@@ -560,8 +800,6 @@ void vtkKWRenderView::SerializeSelf(ostream& os, vtkIndent indent)
      << cam->GetClippingRange()[1] << endl;
   os << indent << "CameraViewAngle " << cam->GetViewAngle() << endl;
   os << indent << "CameraParallelScale " << cam->GetParallelScale() << endl;
-  os << indent << "BackgroundColor ";
-  this->BackgroundColor->Serialize(os,indent);
 }
 
 void vtkKWRenderView::SerializeToken(istream& is, const char token[1024])
@@ -569,8 +807,6 @@ void vtkKWRenderView::SerializeToken(istream& is, const char token[1024])
   float a,b,c;
   
   // if this file is from an old version then set the colors to the default
-  // we cheat and look for the CornerButton tag which is no longer used
-  // but in vvs file prior to versioning
   if (!this->VersionsLoaded)
     {
     float c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
@@ -616,69 +852,13 @@ void vtkKWRenderView::SerializeToken(istream& is, const char token[1024])
     this->Renderer->GetActiveCamera()->SetParallelScale(a);
     return;
     }
-  if (!strcmp(token,"BackgroundColor"))
-    {
-    this->BackgroundColor->Serialize(is);
-    return;
-    }
   
   vtkKWView::SerializeToken(is,token);
-}
-
-void vtkKWRenderView::OnPrint1() 
-{
-  this->PrintTargetDPI = 100;
-}
-void vtkKWRenderView::OnPrint2() 
-{
-  this->PrintTargetDPI = 150;
-}
-void vtkKWRenderView::OnPrint3() 
-{
-  this->PrintTargetDPI = 300;
-}
-
-void vtkKWRenderView::Select(vtkKWWindow *pw)
-{
-  if (!this->PageMenu->GetParent())
-    {
-    // add render quality setting
-    this->PageMenu->SetParent(pw->GetMenuFile());
-    this->PageMenu->Create(this->Application,"-tearoff 0");
-    
-
-    char* rbv = 
-      this->PageMenu->CreateRadioButtonVariable(this,"PageSetup");
-    // now add our own menu options 
-    this->Script( "set %s 0", rbv );
-    this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint1");
-    this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint2");
-    this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint3");
-    delete [] rbv;
-    }
-  
-  // add the Print option
-#ifdef _WIN32
-  pw->GetMenuFile()->InsertCascade(pw->GetFileMenuIndex(),
-                                     "Page Setup", this->PageMenu,0);
-#endif
-
-  this->vtkKWView::Select(pw);
-}
-
-
-
-void vtkKWRenderView::Deselect(vtkKWWindow *pw)
-{
-#ifdef _WIN32
-  pw->GetMenuFile()->DeleteMenuItem("Page Setup");
-#endif  
-  this->vtkKWView::Deselect(pw);
 }
 
 void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.7 $");
+  this->ExtractRevision(os,"$Revision: 1.8 $");
 }
