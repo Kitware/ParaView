@@ -42,14 +42,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWColorTransferFunctionEditor.h"
 
 #include "vtkColorTransferFunction.h"
-#include "vtkKWLabeledLabel.h"
+#include "vtkKWFrame.h"
 #include "vtkKWImageLabel.h"
+#include "vtkKWLabeledLabel.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkKWRange.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.1");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.2");
+
+#define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
+#define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
 
 //----------------------------------------------------------------------------
 vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
@@ -57,12 +62,20 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
   this->ColorTransferFunction = NULL;
 
   this->ComputePointColorFromValue = 1;
+
+  this->ColorSpaceOptionMenu = vtkKWOptionMenu::New();
 }
 
 //----------------------------------------------------------------------------
 vtkKWColorTransferFunctionEditor::~vtkKWColorTransferFunctionEditor()
 {
   this->SetColorTransferFunction(NULL);
+
+  if (this->ColorSpaceOptionMenu)
+    {
+    this->ColorSpaceOptionMenu->Delete();
+    this->ColorSpaceOptionMenu = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -112,7 +125,7 @@ unsigned long vtkKWColorTransferFunctionEditor::GetFunctionMTime()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::FunctionPointValueIsLocked(int id)
+int vtkKWColorTransferFunctionEditor::FunctionPointValueIsLocked(int)
 {
   return 1;
 }
@@ -294,9 +307,92 @@ void vtkKWColorTransferFunctionEditor::UpdateInfoLabelWithFunctionPoint(int id)
 }
 
 //----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::Create(vtkKWApplication *app, 
+                                               const char *args)
+{
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("ColorTransferFunctionEditor already created");
+    return;
+    }
+
+  // Call the superclass to create the whole widget
+
+  this->Superclass::Create(app, args);
+
+  // Add the color space option menu
+
+  this->ColorSpaceOptionMenu->SetParent(this->InfoFrame);
+  this->ColorSpaceOptionMenu->Create(app, "-padx 1 -pady 1");
+  this->ColorSpaceOptionMenu->IndicatorOff();
+  this->ColorSpaceOptionMenu->AddEntryWithCommand(
+    VTK_KW_CTF_EDITOR_RGB_LABEL, this, "ColorSpaceToRGBCallback");
+  this->ColorSpaceOptionMenu->AddEntryWithCommand(
+    VTK_KW_CTF_EDITOR_HSV_LABEL, this, "ColorSpaceToHSVCallback");
+
+  // Pack the widget
+
+  this->Pack();
+
+  // Update
+
+  this->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Pack the whole widget
+
+  this->Superclass::Pack();
+
+  ostrstream tk_cmd;
+
+  // Add the color space menu
+
+  if (this->ColorSpaceOptionMenu->IsCreated())
+    {
+    tk_cmd << "pack " << this->ColorSpaceOptionMenu->GetWidgetName() 
+           << " -side left -fill x" << endl;
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWColorTransferFunctionEditor::Update()
 {
   this->Superclass::Update();
+
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Update the color space menu the reflect the current color space
+
+  if (this->ColorSpaceOptionMenu && this->ColorTransferFunction)
+    {
+    switch (this->ColorTransferFunction->GetColorSpace())
+      {
+      case VTK_CTF_HSV:
+        this->ColorSpaceOptionMenu->SetValue(VTK_KW_CTF_EDITOR_HSV_LABEL);
+        break;
+      default:
+      case VTK_CTF_RGB:
+        this->ColorSpaceOptionMenu->SetValue(VTK_KW_CTF_EDITOR_RGB_LABEL);
+        break;
+      }
+    }
 
   // Since the 'value' range is multi-dimensional (color), there is no
   // point in changing it
@@ -304,6 +400,17 @@ void vtkKWColorTransferFunctionEditor::Update()
   if (this->ValueRange)
     {
     this->ValueRange->SetEnabled(0);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if (this->ColorSpaceOptionMenu)
+    {
+    this->ColorSpaceOptionMenu->SetEnabled(this->Enabled);
     }
 }
 
@@ -322,7 +429,7 @@ void vtkKWColorTransferFunctionEditor::UpdateInfoLabelWithRange()
     }
 
   char format[1024];
-  sprintf(format, "[%%.%df, %%.%df] x ",
+  sprintf(format, "[%%.%df, %%.%df] x",
           this->ParameterRange->GetEntriesResolution(),
           this->ParameterRange->GetEntriesResolution());
 
@@ -350,6 +457,28 @@ void vtkKWColorTransferFunctionEditor::UpdateInfoLabelWithRange()
   this->InfoLabel->SetLabel2(range);
   this->InfoLabel->GetLabel()->SetImageDataName(
     this->Icons[ICON_AXES]->GetImageDataName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::ColorSpaceToRGBCallback()
+{
+  if (this->ColorTransferFunction)
+    {
+    this->ColorTransferFunction->SetColorSpaceToRGB();
+    this->Update();
+    this->InvokeFunctionChangedCommand();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWColorTransferFunctionEditor::ColorSpaceToHSVCallback()
+{
+  if (this->ColorTransferFunction)
+    {
+    this->ColorTransferFunction->SetColorSpaceToHSV();
+    this->Update();
+    this->InvokeFunctionChangedCommand();
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWParameterValueFunctionEditor.h"
 
 class vtkColorTransferFunction;
+class vtkKWOptionMenu;
 
 class VTK_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueFunctionEditor
 {
@@ -67,14 +68,31 @@ public:
   virtual void SetColorTransferFunction(vtkColorTransferFunction*);
 
   // Description:
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app, const char *args = 0);
+
+  // Description:
   // Update the whole UI depending on the value of the Ivars
   virtual void Update();
+
+  // Description:
+  // Pack the widget
+  virtual void Pack();
+
+  // Description:
+  // Callbacks
+  virtual void ColorSpaceToRGBCallback();
+  virtual void ColorSpaceToHSVCallback();
 
 protected:
   vtkKWColorTransferFunctionEditor();
   ~vtkKWColorTransferFunctionEditor();
 
   vtkColorTransferFunction *ColorTransferFunction;
+
+  // GUI
+
+  vtkKWOptionMenu *ColorSpaceOptionMenu;
 
   // Description:
   // Is point locked ?
@@ -96,6 +114,11 @@ protected:
   // Update the info label according to the current visible parameter and
   // value ranges
   virtual void UpdateInfoLabelWithRange();
+
+  // Description:
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
 
 private:
   vtkKWColorTransferFunctionEditor(const vtkKWColorTransferFunctionEditor&); // Not implemented
