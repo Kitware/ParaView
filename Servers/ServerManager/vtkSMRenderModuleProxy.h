@@ -146,7 +146,7 @@ protected:
   friend class vtkSMCubeAxesDisplayProxy;
   friend class vtkSMXYPlotDisplayProxy;
   friend class vtkSMInteractorObserverProxy;
-  
+  friend class vtkSMPointLabelDisplayProxy;
   
   
   friend class vtkPVCameraIcon; //needs access to Camera proxy.

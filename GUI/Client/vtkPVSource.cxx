@@ -58,13 +58,13 @@
 #include "vtkRenderer.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkSMCubeAxesDisplayProxy.h"
-#include "vtkSMPointLabelDisplay.h"
+#include "vtkSMPointLabelDisplayProxy.h"
 #include "vtkDataSetAttributes.h"
 #include <vtkstd/vector>
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.1");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.2");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -147,7 +147,7 @@ vtkPVSource::vtkPVSource()
   this->Proxy = 0;
   this->CubeAxesDisplayProxy = 0;
   this->CubeAxesVisibility = 0;
-  this->PointLabelDisplay = vtkSMPointLabelDisplay::New();
+  this->PointLabelDisplayProxy = 0;
   this->PointLabelVisibility = 0;
   
   this->PVColorMap = 0;  
@@ -238,8 +238,11 @@ vtkPVSource::~vtkPVSource()
     this->CubeAxesDisplayProxy->Delete();
     this->CubeAxesDisplayProxy = 0;
     }
-  this->PointLabelDisplay->Delete();
-  this->PointLabelDisplay = 0;
+  if (this->PointLabelDisplayProxy)
+    {
+    this->PointLabelDisplayProxy->Delete();
+    this->PointLabelDisplayProxy = 0;
+    }
 
   this->SetPVColorMap(0);
   this->SetSourceList(0);
@@ -855,7 +858,7 @@ void vtkPVSource::SetVisibilityNoTrace(int v)
   this->PartDisplay->SetVisibility(v);
 #endif
   this->CubeAxesDisplayProxy->cmSetVisibility(v && cubeAxesVisibility);
-  this->PointLabelDisplay->SetVisibility(v && pointLabelVisibility);
+  this->PointLabelDisplayProxy->cmSetVisibility(v && pointLabelVisibility);
 
   // Handle visibility of shared colormap.
   if (this->PVColorMap)
@@ -937,7 +940,7 @@ void vtkPVSource::SetPointLabelVisibilityNoTrace(int val)
     return;
     }
   this->PointLabelVisibility = val;
-  this->PointLabelDisplay->SetVisibility(this->GetVisibility() && val);
+  this->PointLabelDisplayProxy->cmSetVisibility(this->GetVisibility() && val);
   
   if (this->Notebook)
     {
@@ -1174,23 +1177,30 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     this->CubeAxesDisplayProxy->cmSetVisibility(0);
     this->AddDisplayToRenderModule(this->CubeAxesDisplayProxy);
 
+    // Create the Point Label Display proxies.
+    this->PointLabelDisplayProxy = vtkSMPointLabelDisplayProxy::SafeDownCast(
+      vtkSMObject::GetProxyManager()
+      ->NewProxy("displays", "PointLabelDisplay"));
+    
     // Hookup point label display.
-    this->PointLabelDisplay->SetProcessModule(this->GetPVApplication()->GetProcessModule());    
-    this->PointLabelDisplay->SetInput(this->Proxy);
-    this->PointLabelDisplay->SetVisibility(0);
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-    rm->AddDisplay(this->PointLabelDisplay);   
-#endif
+    ccpp = vtkSMProxyProperty::SafeDownCast(
+      this->PointLabelDisplayProxy->GetProperty("Input"));
+    if (!ccpp)
+      {
+      vtkErrorMacro("Failed to find property Input on PointLabelDisplayProxy");
+      }
+    else
+      {
+      ccpp->RemoveAllProxies();
+      ccpp->AddProxy(this->Proxy);
+      this->PointLabelDisplayProxy->UpdateVTKObjects();
+      }
+    this->PointLabelDisplayProxy->cmSetVisibility(0);
+    this->AddDisplayToRenderModule(this->PointLabelDisplayProxy);
 
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
     this->SetDisplayProxy(pDisp);
     pDisp->Delete();
-#else
-    // Display GUI is shared. PartDisplay and source of DisplayGUI is set
-    // when the source selected as current.
-    this->SetPartDisplay(pDisp);
-    pDisp->Delete();
-#endif
+
     // Make the last data invisible.
     input = this->GetPVInput(0);
     if (input)
@@ -1799,22 +1809,13 @@ void vtkPVSource::DeleteCallback()
   // Remove all of the actors mappers. from the renderer.
   if (this->Notebook)
     {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
     vtkSMDisplayProxy* pDisp = this->GetDisplayProxy();
     if (pDisp)
       {
       this->RemoveDisplayFromRenderModule(pDisp);
       }
     this->RemoveDisplayFromRenderModule(this->CubeAxesDisplayProxy);
-#else
-    vtkSMPartDisplay* pDisp = this->GetPartDisplay();
-    if (pDisp)
-      {
-      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->CubeAxesDisplay);
-      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PointLabelDisplay);
-      this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(pDisp);
-      }
-#endif
+    this->RemoveDisplayFromRenderModule(this->PointLabelDisplayProxy);
     }
 
   // I doubt this is necessary (may to break a reference loop).

@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.4");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.5");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -175,17 +175,14 @@ void vtkSMXYPlotDisplayProxy::SetupPipeline()
   vtkClientServerStream stream;
   for (unsigned int i=0; i < this->CollectProxy->GetNumberOfIDs(); i++)
     {
-    if (this->CollectProxy)
-      {
-      stream
-        << vtkClientServerStream::Invoke
-        << this->CollectProxy->GetID(i) << "GetPolyDataOutput"
-        << vtkClientServerStream::End
-        << vtkClientServerStream::Invoke
-        << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
-        << vtkClientServerStream::LastResult
-        << vtkClientServerStream::End;
-      }
+    stream
+      << vtkClientServerStream::Invoke
+      << this->CollectProxy->GetID(i) << "GetPolyDataOutput"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->UpdateSuppressorProxy->GetID(i) << "SetInput"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
     }
   if (stream.GetNumberOfMessages() > 0)
     {

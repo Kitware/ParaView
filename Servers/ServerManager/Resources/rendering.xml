@@ -596,6 +596,35 @@
   </ProxyGroup>
 
   <ProxyGroup name="mappers">
+    <SourceProxy name="LabeledDataMapper" class="vtkLabeledDataMapper">
+      <InputProperty name="Input" command="SetInput">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources"/>
+          <Group name="filters"/>
+        </ProxyGroupDomain>
+      </InputProperty>
+      <ProxyProperty
+        name="LabelTextProperty"
+        command="SetLabelTextProperty">
+        <ProxyGroupDomain name="groups">
+          <Group name="properties" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty
+        name="LabelMode"
+        command="SetLabelMode">
+        <EnumerationDomain name="enum">
+          <Entry value="0" text="IDs" />
+          <Entry value="1" text="Scalars" />
+          <Entry value="2" text="Vectors" />
+          <Entry value="3" text="Normals" />
+          <Entry value="4" text="TCoords" />
+          <Entry value="5" text="Tensors" />
+          <Entry value="6" text="FieldData" />
+        </EnumerationDomain>
+      </IntVectorProperty>
+    </SourceProxy>
+    
     <SourceProxy name="PolyDataMapper" class="vtkPolyDataMapper">
       <InputProperty name="Input" command="SetInput">
         <ProxyGroupDomain name="groups">
@@ -718,6 +747,38 @@
   </ProxyGroup>
 
   <ProxyGroup name="props">
+    <Proxy name="Actor2D" class="vtkActor2D">
+      <ProxyProperty
+        name="Mapper"
+        command="SetMapper">
+        <ProxyGroupDomain name="groups">
+          <Group name="mappers" />
+        </ProxyGroupDomain>
+      </ProxyProperty>
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        default_values="1">
+        <BooleanDomain name="bool" />
+      </IntVectorProperty>
+      <DoubleVectorProperty
+        name="Position"
+        command="SetPosition"
+        number_of_elements="2"
+        default_values="0 0">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <DoubleVectorProperty
+        name="Position2"
+        command="SetPosition2"
+        number_of_elements="2"
+        default_values="1 1">
+        <DoubleRangeDomain name="range" />
+      </DoubleVectorProperty>
+      <!-- End of Actor2D -->
+    </Proxy>
+    
     <Proxy name="Actor" class="vtkActor">
       <ProxyProperty
         name="Property"
@@ -844,6 +905,14 @@
         number_of_elements="1"
         default_values="0">
         <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="FontSize"
+        command="SetFontSize"
+        number_of_elements="1"
+        default_values="12">
+        <IntRangeDomain name="range" min="0" />
       </IntVectorProperty>
       <!-- End of TextProperty -->
     </Proxy>
@@ -1084,7 +1153,6 @@
           proxygroup="interactors">
         </Proxy>
       </SubProxy>
-      <!-- Shouldnt there be an interactor as well? -->
     </SimpleRenderModuleProxy>
 
     <LODRenderModuleProxy name="LODRenderModule" base_proxygroup="rendermodules"
@@ -1432,7 +1500,49 @@
   </ProxyGroup>
   
   <ProxyGroup name="displays">
+    <PointLabelDisplayProxy name="PointLabelDisplay">
+      <InputProperty
+        name="Input"
+        command="SetInput-not-used">
+        <ProxyGroupDomain name="groups">
+          <Group name="sources" />
+          <Group name="filters" />
+        </ProxyGroupDomain>
+      </InputProperty>
+      <Property
+        name="Update"
+        command="Update"
+        update_self="1">
+      </Property>
+      <Property
+        name="InvalidateGeometry"
+        command="InvalidateGeometry"
+        update_self="1">
+      </Property>
+      <SubProxy>
+        <Proxy name="UpdateSuppressor"
+          proxygroup="filters" proxyname="UpdateSuppressor">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Property"
+          proxygroup="properties" proxyname="TextProperty">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Actor"
+          proxygroup="props" proxyname="Actor2D">
+        </Proxy>
+      </SubProxy>
+      <SubProxy>
+        <Proxy name="Mapper"
+          proxygroup="mappers" proxyname="LabeledDataMapper">
+        </Proxy>
+      </SubProxy>
+        
+    </PointLabelDisplayProxy>
 
+    
     <ScalarBarWidgetProxy name="ScalarBarWidget" class="vtkScalarBarWidget">
       <IntVectorProperty
         name="Visibility"

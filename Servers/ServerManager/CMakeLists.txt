@@ -99,6 +99,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMCubeAxesDisplayProxy.cxx
   vtkSMPlotDisplay.cxx
   vtkSMPointLabelDisplay.cxx
+  vtkSMPointLabelDisplayProxy.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
   vtkSMXYPlotActorProxy.cxx
   vtkSMXYPlotDisplayProxy.cxx

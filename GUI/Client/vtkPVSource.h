@@ -48,7 +48,7 @@ class vtkSMPart;
 class vtkPVDataInformation;
 class vtkPVNumberOfOutputsInformation;
 class vtkSMCubeAxesDisplayProxy;
-class vtkSMPointLabelDisplay;
+class vtkSMPointLabelDisplayProxy;
 class vtkPVColorMap;
 class vtkPVDisplayGUI;
 
@@ -632,7 +632,7 @@ protected:
   
   // CubeAxes should be moved into a display of its own.
   vtkSMCubeAxesDisplayProxy* CubeAxesDisplayProxy;
-  vtkSMPointLabelDisplay* PointLabelDisplay;
+  vtkSMPointLabelDisplayProxy* PointLabelDisplayProxy;
 
 //BTX
   friend class vtkPVWindow;
