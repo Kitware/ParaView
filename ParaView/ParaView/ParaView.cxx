@@ -131,7 +131,7 @@ int MyMain(int argc, char *argv[])
     app->SetStartGUI(0);
     }
 
-  // Create the process module for initializing the processes.
+  // Create the proper default render module.
   // Only the root server processes args.
   if (app->GetUseTiledDisplay())
     {
@@ -140,18 +140,6 @@ int MyMain(int argc, char *argv[])
       // Think about moving it.
       app->SetRenderModuleName("MultiDisplayRenderModule");
       }
-    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
-    pm = processModule;
-    }
-  else if (app->GetClientMode() || serverMode) 
-    {
-    if (app->GetRenderModuleName() == NULL)
-      { // I do not like this initialization here.
-      // Think about moving it.
-      app->SetRenderModuleName("MPIRenderModule");
-      }
-    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
-    pm = processModule;
     }
   else
     {
@@ -161,13 +149,34 @@ int MyMain(int argc, char *argv[])
       // Think about moving it.
       app->SetRenderModuleName("MPIRenderModule");
       }
-    vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
 #else 
     if (app->GetRenderModuleName() == NULL)
       { // I do not like this initialization here.
       // Think about moving it.
       app->SetRenderModuleName("LODRenderModule");
       }
+#endif
+    }
+
+
+
+  // Create the process module for initializing the processes.
+  // Only the root server processes args.
+  if (app->GetUseTiledDisplay())
+    {
+    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
+    pm = processModule;
+    }
+  else if (app->GetClientMode() || serverMode) 
+    {
+    vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
+    pm = processModule;
+    }
+  else
+    {
+#ifdef VTK_USE_MPI
+    vtkPVMPIProcessModule *processModule = vtkPVMPIProcessModule::New();
+#else 
     vtkPVProcessModule *processModule = vtkPVProcessModule::New();
 #endif
     pm = processModule;
