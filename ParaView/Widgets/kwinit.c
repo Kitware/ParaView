@@ -8436,7 +8436,6 @@ static struct EtFile Et_FileSet[] = {
   { "/ThisIsNotAPath/Tcl/lib/tk8.3/tk.tcl", Et_zFile28, sizeof(Et_zFile28)-1, 0, 0 },
   { "/ThisIsNotAPath/Tcl/lib/tk8.3/tkfbox.tcl", Et_zFile29, sizeof(Et_zFile29)-1, 0, 0 },
   { "/ThisIsNotAPath/Tcl/lib/tk8.3/xmfbox.tcl", Et_zFile30, sizeof(Et_zFile30)-1, 0, 0 },
-  { "D:/Kw/vv.tcl", Et_zFile31, sizeof(Et_zFile31)-1, 0, 0 },
 {0, 0}};
 #else /* HAVE_TCL8_3 */
 static struct EtFile Et_FileSet[] = {
