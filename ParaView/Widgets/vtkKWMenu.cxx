@@ -207,45 +207,48 @@ void  vtkKWMenu::InsertCascade(int position,
 	       label, help);
 }
 
-void  vtkKWMenu::AddCheckButton(const char* label, vtkKWObject* Object, 
+void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
+				vtkKWObject* Object, 
 				const char* MethodAndArgString, const char* help )
 { 
-  this->AddCheckButton(label, Object, MethodAndArgString, -1, help);
+  this->AddCheckButton(label, ButtonVar, Object, MethodAndArgString, -1, help);
 }
  
-void  vtkKWMenu::AddCheckButton(const char* label, vtkKWObject* Object, 
+void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
+				vtkKWObject* Object, 
 				const char* MethodAndArgString, 
 				int underline, const char* help )
 { 
-  static int count = 0;
   ostrstream str;
-  str << "-variable " << this->GetWidgetName() << "TempVar" << count++;
+  str << "-variable " << ButtonVar;
   if ( underline >= 0 )
     {
     str << " -underline " << underline;
     }
   str << ends;
-  this->AddGeneric("checkbutton", label, Object, MethodAndArgString, str.str(), help);
+  this->AddGeneric("checkbutton", label, Object, 
+		   MethodAndArgString, str.str(), help);
   delete [] str.str();
 }
 
 
 void vtkKWMenu::InsertCheckButton(int position, 
-				  const char* label, vtkKWObject* Object, 
+				  const char* label, const char* ButtonVar, 
+				  vtkKWObject* Object, 
 				  const char* MethodAndArgString, const char* help )
 { 
-  this->InsertCheckButton( position, label, Object, MethodAndArgString,
+  this->InsertCheckButton( position, label, ButtonVar, Object, MethodAndArgString,
 			   -1, help );
 }
 
 void vtkKWMenu::InsertCheckButton(int position, 
-				  const char* label, vtkKWObject* Object, 
+				  const char* label, const char* ButtonVar, 
+				  vtkKWObject* Object, 
 				  const char* MethodAndArgString, 
 				  int underline, const char* help )
 { 
-  static int count = 0;
   ostrstream str;
-  str << "-variable " << this->GetWidgetName() << count++ << "TempVar ";
+  str << "-variable " << ButtonVar;
   if ( underline >= 0 )
     {
     str << " -underline " << underline;
@@ -341,6 +344,41 @@ void vtkKWMenu::CheckRadioButton(vtkKWObject* Object,
   delete [] rbv;
 }
 
+char* vtkKWMenu::CreateCheckButtonVariable(vtkKWObject* Object, 
+                                           const char* varname)
+{
+  ostrstream str;
+  str << Object->GetTclName() << varname << ends;
+  return str.str();
+}
+
+  
+  
+int vtkKWMenu::GetCheckButtonValue(vtkKWObject* Object, 
+                                   const char* varname)
+{
+  int res;
+  
+  char *rbv = 
+    this->CreateCheckButtonVariable(Object,varname);
+  this->Script("set %s",rbv);
+  res = this->GetIntegerResult(this->Application);
+  delete [] rbv;
+  return res;
+}
+    
+void vtkKWMenu::CheckCheckButton(vtkKWObject* Object, 
+                                 const char* varname, int id)
+{
+  char *rbv = 
+    this->CreateCheckButtonVariable(Object,varname);
+  this->Script("set %s",rbv);
+  if (this->GetIntegerResult(this->Application) != id)
+    {
+    this->Script("set %s %d",rbv,id);
+    }
+  delete [] rbv;
+}
 
 void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonVar, 
 			       vtkKWObject* Object, 
@@ -505,6 +543,20 @@ void vtkKWMenu::SetEntryCommand(int index, vtkKWObject* object,
   str << this->GetWidgetName() << " entryconfigure "
       << index << " -command {" << object->GetTclName() 
       << " " << MethodAndArgString << "}" << ends;
+  this->Script(str.str());
+  str.rdbuf()->freeze(0);
+}
+
+void vtkKWMenu::SetEntryCommand(const char* item, const char* MethodAndArgString)
+{
+  if ( !this->IsItemPresent(item) )
+    {
+    return;
+    }
+  int index = this->GetIndex(item);
+  ostrstream str;
+  str << this->GetWidgetName() << " entryconfigure "
+      << index << " -command {" << MethodAndArgString << "}" << ends;
   this->Script(str.str());
   str.rdbuf()->freeze(0);
 }

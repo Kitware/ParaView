@@ -66,13 +66,22 @@ public:
   
   // Description: 
   // Append a sub menu to the current menu.
-  void AddCascade(const char* label, vtkKWMenu*, int underline , const char* help = 0);
-  
+  void AddCascade(const char* label, vtkKWMenu*, int underline , 
+		  const char* help = 0);
+
+  // Description:
+  // Copy the radio button variable logic.
+  char* CreateCheckButtonVariable(vtkKWObject* Object, const char* varname);
+  int GetCheckButtonValue(vtkKWObject* Object, const char* varname);
+  void CheckCheckButton(vtkKWObject *Object, const char *varname, int id);
+
   // Description: 
   // Append a CheckButton menu item to the current menu.
-  void AddCheckButton(const char* label, vtkKWObject* Object, 
+  void AddCheckButton(const char* label, const char* ButtonVar, 
+		      vtkKWObject* Object, 
 		      const char* MethodAndArgString , const char* help = 0);
-  void AddCheckButton(const char* label, vtkKWObject* Object, 
+  void AddCheckButton(const char* label, const char* ButtonVar, 
+		      vtkKWObject* Object, 
 		      const char* MethodAndArgString , int underline,
 		      const char* help = 0);
 
@@ -99,15 +108,18 @@ public:
   // Same as add commands, but insert at a given integer position.
   void InsertSeparator(int position);
   
-  void InsertCascade(int position, const char* label,  vtkKWMenu*, int underline, const char* help = 0  );
+  void InsertCascade(int position, const char* label,  vtkKWMenu*, 
+		     int underline, const char* help = 0  );
   
   // Description:
   // Insert a check button at a given position.
   void InsertCheckButton(int position, 
-			 const char* label, vtkKWObject* Object, 
+			 const char* label, const char* ButtonVar, 
+			 vtkKWObject* Object, 
 			 const char* MethodAndArgString , const char* help = 0);
   void InsertCheckButton(int position, 
-			 const char* label, vtkKWObject* Object, 
+			 const char* label, const char* ButtonVar, 
+			 vtkKWObject* Object, 
 			 const char* MethodAndArgString , 
 			 int underline, const char* help = 0);
   
@@ -173,6 +185,7 @@ public:
   // Set command of the menu entry with a given index.
   void SetEntryCommand(int index, vtkKWObject* object, const char* MethodAndArgString);
   void SetEntryCommand(const char* item, vtkKWObject* object, const char* method);
+  void SetEntryCommand(const char* item, const char* method);
 
   // Description:
   // Configure the item at given index.
