@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.113");
+vtkCxxRevisionMacro(vtkKWWindow, "1.114");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -673,7 +673,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint 1 2", 0);
   delete [] rbv;
   // add the Print option
-  this->MenuFile->AddCascade("Page Setup", this->PageMenu,8);
+  this->MenuFile->AddSeparator();
+  this->MenuFile->AddCascade(VTK_KW_PAGE_SETUP_MENU_LABEL, this->PageMenu, 8);
 
   this->MenuFile->AddSeparator();
   this->MenuFile->AddCommand("Close", this, "Close", 0);
@@ -1106,20 +1107,25 @@ void vtkKWWindow::AddRecentFile(const char *key, const char *name, vtkKWObject *
 
 int vtkKWWindow::GetFileMenuIndex()
 {
+  // First find the print-related menu commands
+  if ( this->GetMenuFile()->IsItemPresent(VTK_KW_PAGE_SETUP_MENU_LABEL))
+    {
+    return this->GetMenuFile()->GetIndex(VTK_KW_PAGE_SETUP_MENU_LABEL) - 1;  
+    }
+
+  // Otherwise find Close or Exit if Close was removed
   int clidx;
-  // first find Close
   if ( this->GetMenuFile()->IsItemPresent("Close") )
     {
     clidx = this->GetMenuFile()->GetIndex("Close");  
     }
   else
     {
-    // Close was removed, use Exit instead
     clidx = this->GetMenuFile()->GetIndex("Exit");  
     }
   if (this->NumberOfMRUFiles > 0)
     {
-    return clidx - this->NumberOfMRUFiles - 2;
+    clidx -= this->NumberOfMRUFiles + 1;
     }
   return clidx - 1;  
 }
@@ -1128,7 +1134,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.113 $");
+  this->ExtractRevision(os,"$Revision: 1.114 $");
 }
 
 int vtkKWWindow::ExitDialog()

@@ -71,6 +71,7 @@ template<class DType> class vtkVector;
 //ETX
 
 #define VTK_KW_PREFERENCES_PAGE_LABEL "Preferences"
+#define VTK_KW_PAGE_SETUP_MENU_LABEL "Page Setup"
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
