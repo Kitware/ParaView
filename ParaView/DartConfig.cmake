@@ -19,7 +19,7 @@ SET (CVS_WEB_URL "http://${DROP_SITE}/cgi-bin/cvsweb.cgi/ParaView/")
 SET (CVS_WEB_CVSROOT "ParaView")
 SET (USE_DOXYGEN "On")
 SET (DOXYGEN_URL "${PROJECT_URL}/doc" )
-SET (GNATS_WEB_URL "http://${DROP_SITE}/cgi-bin/gnatsweb.pl/ParaView")
+SET (GNATS_WEB_URL "http://public.kitware.com/Bug/bug.php")
 SET (USE_GNATS "On")
 
 # copy over the testing logo
