@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPlotDisplay);
-vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.4");
+vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -328,7 +328,7 @@ void vtkSMPlotDisplay::SetInput(vtkSMSourceProxy* input)
                       << "SetPlotLabel" << i << arrayName 
                       << vtkClientServerStream::End;
       float r, g, b;
-      vtkMath::HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
+      vtkMath::HSVToRGB(ccolor, 1, 1, &r, &g, &b);
       stream << vtkClientServerStream::Invoke 
                       << this->XYPlotActorProxy->GetID(0) 
                       << "SetPlotColor" << i << r << g << b 
