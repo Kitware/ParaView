@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.520");
+vtkCxxRevisionMacro(vtkPVWindow, "1.521");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1638,6 +1638,7 @@ void vtkPVWindow::PlayDemo()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PlayDemo(int fromDashboard)
 {
+  this->Register(this);
   this->InDemo = 1;
   const char* demoDataPath;
   const char* demoScriptPath;
@@ -1694,6 +1695,7 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
     }
   this->InDemo = 0;
   this->UpdateEnableState();
+  this->UnRegister(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -2990,6 +2992,10 @@ void vtkPVWindow::UpdateSourceMenu()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateFilterMenu()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   if (!this->FilterMenu)
     {
     vtkWarningMacro("Filter menu does not exist. Can not update.");
@@ -3092,6 +3098,10 @@ void vtkPVWindow::UpdateFilterMenu()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DisableFilterMenu()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   this->DisableToolbarButtons();
   this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL,
                        vtkKWMenu::Disabled);
@@ -3307,6 +3317,10 @@ void vtkPVWindow::UpdateSelectMenu()
 // otherwise.
 void vtkPVWindow::EnableSelectMenu()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   int numSources;
   vtkPVSourceCollection* sources = this->GetSourceList("Sources");
   if (sources)
@@ -3341,12 +3355,20 @@ void vtkPVWindow::EnableNavigationWindow()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DisableNavigationWindow()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   this->MainView->GetNavigationFrame()->EnabledOn();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DisableMenus()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   if (this->MenusDisabled)
     {
     return;
@@ -3368,6 +3390,10 @@ void vtkPVWindow::DisableMenus()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::EnableMenus()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   if (!this->MenusDisabled)
     {
     return;
@@ -3380,6 +3406,10 @@ void vtkPVWindow::EnableMenus()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DisableToolbarButtons()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   this->ToolbarButtonsDisabled = 1;
   vtkArrayMapIterator<const char*, vtkKWPushButton*>* it = 
     this->ToolbarButtons->NewIterator();
@@ -3398,6 +3428,10 @@ void vtkPVWindow::DisableToolbarButtons()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButton(const char* buttonName)
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   vtkKWPushButton *button = 0;
   if ( this->ToolbarButtons->GetItem(buttonName, button) == VTK_OK &&
        button )
@@ -3409,6 +3443,10 @@ void vtkPVWindow::EnableToolbarButton(const char* buttonName)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DisableToolbarButton(const char* buttonName)
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   vtkKWPushButton *button = 0;
   if ( this->ToolbarButtons->GetItem(buttonName, button) == VTK_OK &&
        button )
@@ -3420,6 +3458,10 @@ void vtkPVWindow::DisableToolbarButton(const char* buttonName)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::EnableToolbarButtons()
 {
+  if ( this->InDemo )
+    {
+    return;
+    }
   if (this->CurrentPVSource == NULL)
     {
     return;
