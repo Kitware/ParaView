@@ -9,6 +9,10 @@ vtkKWDirectoryUtilities.cxx
 vtkQueue.cxx
 vtkString.cxx
 vtkContainer.cxx
+vtkXMLCameraReader.cxx
+vtkXMLCameraWriter.cxx
+vtkXMLTextPropertyReader.cxx
+vtkXMLTextPropertyWriter.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -44,10 +48,12 @@ vtkImagingTCL
 vtkGraphicsTCL 
 vtkIOTCL
 vtkFilteringTCL   
+vtkRenderingTCL   
 vtkImaging
 vtkGraphics
 vtkIO
 vtkFiltering
+vtkRendering
 ${TCL_LIBRARY}
 ${TK_LIBRARY}
 )
