@@ -84,6 +84,7 @@ public:
   // the resulting string. The method returns 0 if inputs are empty or
   // if there was an error.
   static char* Append(const char* str1, const char* str2);
+  static char* Append(const char* str1, const char* str2, const char* str3);
   
   // Description:
   // Transform the string to lowercase (inplace).

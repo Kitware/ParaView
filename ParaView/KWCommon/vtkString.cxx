@@ -19,7 +19,17 @@
 #include "vtkObjectFactory.h"
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkString, "1.9");
+#if defined( _WIN32 ) && !defined(__CYGWIN__)
+#  if defined(__BORLANDC__)
+#    define STRCASECMP stricmp
+#  else
+#    define STRCASECMP _stricmp
+#  endif
+#else
+#  define STRCASECMP strcasecmp
+#endif
+
+vtkCxxRevisionMacro(vtkString, "1.10");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -136,15 +146,34 @@ char* vtkString::Append(const char* str1, const char* str2)
   return newstr;
 }
 
-#if defined( _WIN32 ) && !defined(__CYGWIN__)
-#  if defined(__BORLANDC__)
-#    define STRCASECMP stricmp
-#  else
-#    define STRCASECMP _stricmp
-#  endif
-#else
-#  define STRCASECMP strcasecmp
-#endif
+//----------------------------------------------------------------------------
+char* vtkString::Append(const char* str1, const char* str2, const char* str3)
+{
+  if ( !str1 && !str2 && !str3 )
+    {
+    return 0;
+    }
+  char *newstr = 
+    new char[ vtkString::Length(str1) + vtkString::Length(str2) + vtkString::Length(str3)+1];
+  if ( !newstr )
+    {
+    return 0;
+    }
+  newstr[0] = 0;
+  if ( str1 )
+    {
+    strcat(newstr, str1);
+    }
+  if ( str2 )
+    {
+    strcat(newstr, str2);
+    }
+  if ( str3 )
+    {
+    strcat(newstr, str3);
+    }
+  return newstr;
+}
 
 //----------------------------------------------------------------------------
 int vtkString::CompareCase(const char* str1, const char* str2)
