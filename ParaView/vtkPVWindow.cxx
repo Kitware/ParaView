@@ -360,10 +360,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CalculatorButton->SetParent(this->Toolbar);
   this->CalculatorButton->Create(app, "-image PVCalculatorButton");
   this->CalculatorButton->SetCommand(this, "CalculatorCallback");
+  this->CalculatorButton->SetBalloonHelpString("Calculator");
   
   this->ThresholdButton->SetParent(this->Toolbar);
-  this->ThresholdButton->Create(app, "-text Threshold");
+  this->ThresholdButton->Create(app, "-image PVThresholdButton");
   this->ThresholdButton->SetCommand(this, "ThresholdCallback");
+  this->ThresholdButton->SetBalloonHelpString("Threshold");
   
   this->ContourButton->SetParent(this->Toolbar);
   this->ContourButton->Create(app, "-text Contour");
