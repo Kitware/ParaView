@@ -816,7 +816,7 @@ void vtkPVWindow::PlayDemo()
     {
     fptr2.close();
     foundData=1;
-    this->Application->Script("set tmpPvDataDir %s/Data", loc);
+    this->Application->Script("set tmpPvDataDir [string map {\\\\ /} {%s/Data}]", loc);
     }
 
   vtkDebugMacro(<<temp1);
