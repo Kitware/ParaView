@@ -183,7 +183,10 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
 
 vtkKWVolumeComposite::~vtkKWVolumeComposite()
 {
-  this->Input->UnRegister(this);
+  if ( this->Input )
+    {
+    this->Input->UnRegister(this);
+    }
   
   this->LODVolume->Delete();
   this->Composite->Delete();
@@ -513,7 +516,7 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.36 $");
+  this->ExtractRevision(os,"$Revision: 1.37 $");
 }
 
 vtkProp *vtkKWVolumeComposite::GetProp() 

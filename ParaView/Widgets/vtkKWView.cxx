@@ -678,7 +678,7 @@ void vtkKWView::Enter(int /*x*/, int /*y*/)
 //  this->Script("focus %s",this->VTKWidget->GetWidgetName());
 }
 
-void vtkKWView::Print()
+void vtkKWView::PrintView()
 {
   this->Printing = 1;
   vtkWindow *vtkWin = this->GetVTKWindow();
@@ -1004,7 +1004,7 @@ void vtkKWView::Select(vtkKWWindow *pw)
     {
     // add the Print option
     pw->GetMenuFile()->InsertCommand(this->ParentWindow->GetFileMenuIndex(),
-                                     "Print", this, "Print", 0);
+                                     "Print", this, "PrintView", 0);
     }
   
 #ifdef _WIN32
@@ -1322,7 +1322,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.65 $");
+  this->ExtractRevision(os,"$Revision: 1.66 $");
 }
 
 void vtkKWView::SetupMemoryRendering(

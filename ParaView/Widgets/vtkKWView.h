@@ -130,8 +130,8 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   virtual void SaveAsImage();
 
   // Description
-  // Print the image. This may pop up a dialog box etc.
-  virtual void Print();
+  // Printthe image. This may pop up a dialog box etc.
+  virtual void PrintView();
   int GetPrinting() {return this->Printing;};
   vtkSetMacro(Printing,int);
   
