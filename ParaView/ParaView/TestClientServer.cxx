@@ -50,7 +50,6 @@ int main(int argc, char* argv[])
 
   // Location of the paraview executable.
   kwsys_std::string paraview = PARAVIEW_BINARY_DIR;
-  paraview += "/bin";
 #ifdef  CMAKE_INTDIR
   paraview += "/" CMAKE_INTDIR;
 #endif
