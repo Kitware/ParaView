@@ -32,7 +32,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkKWApplication.h"
 #include "vtkPVContourFilter.h"
-#include "vtkPVElevationFilter.h"
 #include "vtkPVExtractEdges.h"
 #include "vtkPVColorByProcess.h"
 #include "vtkPVCutter.h"
