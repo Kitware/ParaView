@@ -384,4 +384,6 @@ H5G_ent_debug(H5F_t UNUSED *f, const H5G_entry_t *ent, FILE * stream,
     }
 
     FUNC_LEAVE(SUCCEED);
+
+    f = 0;
 }

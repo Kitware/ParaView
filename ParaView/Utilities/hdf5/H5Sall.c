@@ -963,6 +963,8 @@ H5S_all_select_deserialize (H5S_t *space, const uint8_t UNUSED *buf)
 
 done:
     FUNC_LEAVE (ret_value);
+
+    buf = 0;
 }   /* H5S_all_select_deserialize() */
 
 

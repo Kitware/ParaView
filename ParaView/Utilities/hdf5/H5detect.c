@@ -344,6 +344,7 @@ sigsegv_handler(int UNUSED signo)
 {
     signal(SIGSEGV, sigsegv_handler);
     longjmp(jbuf_g, 1);
+    signo=0;
 }
     
 
@@ -369,6 +370,7 @@ sigbus_handler(int UNUSED signo)
 {
     signal(SIGBUS, sigbus_handler);
     longjmp(jbuf_g, 1);
+    signo=0;
 }
     
 

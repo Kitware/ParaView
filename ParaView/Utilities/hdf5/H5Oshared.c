@@ -190,6 +190,7 @@ H5O_shared_size (H5F_t *f, const void UNUSED *_mesg)
                 H5G_SIZEOF_ENTRY(f));   /*sharing by another obj hdr    */
 
     FUNC_LEAVE (size);
+    _mesg = 0;
 }
 
 

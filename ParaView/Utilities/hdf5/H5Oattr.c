@@ -175,6 +175,7 @@ H5O_attr_decode(H5F_t *f, const uint8_t *p, H5O_shared_t UNUSED *sh)
 #endif 
 
     FUNC_LEAVE(attr);
+    sh = 0;
 }
 
 /*--------------------------------------------------------------------------
@@ -341,6 +342,8 @@ H5O_attr_size(H5F_t UNUSED *f, const void *mesg)
                 attr->data_size;                /*the data itself       */
 
     FUNC_LEAVE(ret_value);
+
+    f = 0;
 }
 
 

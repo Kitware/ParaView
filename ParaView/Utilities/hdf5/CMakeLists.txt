@@ -238,6 +238,7 @@ H5FDfamily.c  H5G.c         H5Oefl.c     H5Smpio.c
 H5FDgass.c    H5Gent.c      H5Ofill.c    H5Snone.c
 H5FDlog.c     H5Gnode.c     H5Olayout.c  H5Spoint.c
 H5FDmpio.c    H5Gstab.c     H5Omtime.c   H5Sselect.c
+H5Vprivate.c
 )
 
 INCLUDE_DIRECTORIES(${VTKHDF5_SOURCE_DIR}

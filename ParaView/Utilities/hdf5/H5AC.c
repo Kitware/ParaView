@@ -979,4 +979,5 @@ H5AC_debug(H5F_t UNUSED *f)
 #endif
 
     FUNC_LEAVE(SUCCEED);
+    f = 0;
 }

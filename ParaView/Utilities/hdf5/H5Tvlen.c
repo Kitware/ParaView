@@ -155,6 +155,8 @@ hssize_t H5T_vlen_seq_mem_getlen(H5F_t UNUSED *f, void *vl_addr)
     ret_value=(hssize_t)vl->len;
 
     FUNC_LEAVE (ret_value);
+  
+    f = 0;
 }   /* end H5T_vlen_seq_mem_getlen() */
 
 
@@ -185,6 +187,8 @@ herr_t H5T_vlen_seq_mem_read(H5F_t UNUSED *f, void *vl_addr, void *buf, size_t l
     HDmemcpy(buf,vl->p,len);
 
     FUNC_LEAVE (SUCCEED);
+  
+    f = 0;
 }   /* end H5T_vlen_seq_mem_read() */
 
 
@@ -236,6 +240,8 @@ herr_t H5T_vlen_seq_mem_write(const H5D_xfer_t *xfer_parms, H5F_t UNUSED *f, voi
     vl->len=seq_len;
 
     FUNC_LEAVE (SUCCEED);
+  
+    f = 0;
 }   /* end H5T_vlen_seq_mem_write() */
 
 
@@ -266,6 +272,8 @@ hssize_t H5T_vlen_str_mem_getlen(H5F_t UNUSED *f, void *vl_addr)
     ret_value=(hssize_t)HDstrlen(s);
 
     FUNC_LEAVE (ret_value);
+  
+    f = 0;
 }   /* end H5T_vlen_str_mem_getlen() */
 
 
@@ -296,6 +304,8 @@ herr_t H5T_vlen_str_mem_read(H5F_t UNUSED *f, void *vl_addr, void *buf, size_t l
     HDmemcpy(buf,s,len);
 
     FUNC_LEAVE (SUCCEED);
+  
+    f = 0;
 }   /* end H5T_vlen_str_mem_read() */
 
 
@@ -338,6 +348,8 @@ herr_t H5T_vlen_str_mem_write(const H5D_xfer_t *xfer_parms, H5F_t UNUSED *f, voi
     (*s)[len]='\0';
 
     FUNC_LEAVE (SUCCEED);
+  
+    f = 0;
 }   /* end H5T_vlen_str_mem_write() */
 
 
@@ -368,6 +380,8 @@ hssize_t H5T_vlen_disk_getlen(H5F_t UNUSED *f, void *vl_addr)
     UINT32DECODE(vl, ret_value);
 
     FUNC_LEAVE (ret_value);
+  
+    f = 0;
 }   /* end H5T_vlen_disk_getlen() */
 
 
@@ -413,6 +427,8 @@ herr_t H5T_vlen_disk_read(H5F_t *f, void *vl_addr, void *buf, size_t UNUSED len)
     } /* end if */
 
     FUNC_LEAVE (SUCCEED);
+  
+    len = 0;
 }   /* end H5T_vlen_disk_read() */
 
 
@@ -460,6 +476,7 @@ herr_t H5T_vlen_disk_write(const H5D_xfer_t UNUSED *xfer_parms, H5F_t *f, void *
     INT32ENCODE(vl,hobjid.idx);
 
     FUNC_LEAVE (SUCCEED);
+    xfer_parms = 0;
 }   /* end H5T_vlen_disk_write() */
 
 
@@ -620,6 +637,9 @@ H5T_vlen_reclaim(void *elem, hid_t type_id, hsize_t UNUSED ndim, hssize_t UNUSED
 done:
 #endif /* LATER */
     FUNC_LEAVE(ret_value);
+
+    ndim = 0;
+    point = 0;
 }   /* end H5T_vlen_reclaim() */
 
 

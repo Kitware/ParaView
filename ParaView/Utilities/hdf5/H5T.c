@@ -1344,6 +1344,7 @@ H5T_unlock_cb (void *_dt, const void UNUSED *key)
         dt->state = H5T_STATE_RDONLY;
     }
     FUNC_LEAVE (0);
+    key = 0;
 }
 
 
@@ -7441,6 +7442,8 @@ H5T_print_stats(H5T_path_t UNUSED *path, int UNUSED *nprint/*in,out*/)
     }
 #endif
     FUNC_LEAVE(SUCCEED);
+    path=0;
+    nprint=0;
 }
 
 /*-------------------------------------------------------------------------

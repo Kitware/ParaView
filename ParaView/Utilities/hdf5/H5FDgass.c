@@ -21,6 +21,10 @@
 
 /* The driver identification number, initialized at runtime */
 static hid_t H5FD_GASS_g = 0;
+hid_t GetH5FD_GASS_g()
+{
+  return H5FD_GASS_g;
+}
 
 #ifdef H5_HAVE_GASS
 

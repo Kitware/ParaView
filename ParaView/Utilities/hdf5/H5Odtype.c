@@ -830,6 +830,8 @@ H5O_dtype_decode(H5F_t *f, const uint8_t *p,
                       "can't decode type");
     }
     FUNC_LEAVE(dt);
+
+    sh = 0;
 }
 
 /*--------------------------------------------------------------------------
@@ -1096,6 +1098,8 @@ H5O_dtype_get_share(H5F_t UNUSED *f, const void *_mesg,
     }
 
     FUNC_LEAVE (SUCCEED);
+
+    f = 0;
 }
 
 
@@ -1128,6 +1132,8 @@ H5O_dtype_set_share (H5F_t UNUSED *f, void *_mesg/*in,out*/,
     dt->state = H5T_STATE_NAMED;
 
     FUNC_LEAVE (SUCCEED);
+
+    f = 0;
 }
 
 /*--------------------------------------------------------------------------

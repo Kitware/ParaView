@@ -14,18 +14,16 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 
+#include "hdf5.h"
+
 #ifdef H5_HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-
-
-#include "hdf5.h"
 
 #ifdef WIN32
 #include <windows.h>
 #include <io.h>
 #endif
-
 
 #ifdef MAX
 #undef MAX

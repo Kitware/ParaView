@@ -326,6 +326,8 @@ H5FD_core_open(const char *name, unsigned UNUSED flags, hid_t fapl_id,
                       fa->increment : H5FD_CORE_INCREMENT;
 
     FUNC_LEAVE((H5FD_t*)file);
+
+    flags = 0;
 }
 
 
@@ -612,6 +614,9 @@ H5FD_core_read(H5FD_t *_file, H5FD_mem_t UNUSED type, hid_t UNUSED dxpl_id, hadd
     }
 
     FUNC_LEAVE(SUCCEED);
+
+    type = 0;
+    dxpl_id = 0;
 }
 
 
@@ -676,4 +681,7 @@ H5FD_core_write(H5FD_t *_file, H5FD_mem_t UNUSED type, hid_t UNUSED dxpl_id, had
     file->dirty = TRUE;
 
     FUNC_LEAVE(SUCCEED);
+
+    type = 0;
+    dxpl_id = 0;
 }

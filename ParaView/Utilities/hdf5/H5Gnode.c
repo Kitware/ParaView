@@ -130,6 +130,7 @@ H5FL_BLK_DEFINE_STATIC(symbol_node);
 static size_t
 H5G_node_sizeof_rkey(H5F_t *f, const void UNUSED *udata)
 {
+    udata = 0;
     return H5F_SIZEOF_SIZE(f);  /*the name offset */
 }
 
@@ -163,6 +164,8 @@ H5G_node_decode_key(H5F_t *f, H5B_t UNUSED *bt, uint8_t *raw, void *_key)
     H5F_DECODE_LENGTH(f, raw, key->offset);
 
     FUNC_LEAVE(SUCCEED);
+
+    bt = 0;
 }
 
 
@@ -195,6 +198,8 @@ H5G_node_encode_key(H5F_t *f, H5B_t UNUSED *bt, uint8_t *raw, void *_key)
     H5F_ENCODE_LENGTH(f, raw, key->offset);
 
     FUNC_LEAVE(SUCCEED);
+
+    bt =0;
 }
 
 
@@ -294,6 +299,8 @@ H5G_node_create(H5F_t *f, H5B_ins_t UNUSED op, void *_lt_key,
     if (rt_key) rt_key->offset = 0;
 
     FUNC_LEAVE(SUCCEED);
+
+    _udata = 0;
 }
 
 
@@ -693,6 +700,9 @@ H5G_node_found(H5F_t *f, haddr_t addr, const void UNUSED *_lt_key,
                       "unable to release symbol table node");
     }
     FUNC_LEAVE(ret_value);
+
+    _lt_key = 0;
+    _rt_key = 0;
 }
 
 
@@ -876,6 +886,9 @@ H5G_node_insert(H5F_t *f, haddr_t addr, void UNUSED *_lt_key,
                       "unable to release symbol table node");
     }
     FUNC_LEAVE(ret_value);
+
+    _lt_key = 0;
+    lt_key_changed = 0;
 }
 
 
@@ -1039,6 +1052,8 @@ H5G_node_remove(H5F_t *f, haddr_t addr, void *_lt_key/*in,out*/,
                       "unable to release symbol table node");
     }
     FUNC_LEAVE(ret_value);
+
+    lt_key_changed = 0;
 }
 
 
@@ -1133,6 +1148,9 @@ H5G_node_iterate (H5F_t *f, void UNUSED *_lt_key, haddr_t addr,
 done:
     name_off = H5MM_xfree (name_off);
     FUNC_LEAVE(ret_value);
+
+    _lt_key = 0;
+    _rt_key = 0;
 }
 
 

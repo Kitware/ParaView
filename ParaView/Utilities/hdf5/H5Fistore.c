@@ -315,6 +315,8 @@ H5F_istore_sizeof_rkey(H5F_t UNUSED *f, const void *_udata)
              4 +                        /*filter mask           */
              udata->mesg.ndims*8;       /*dimension indices     */
 
+    f = 0;
+
     return nbytes;
 }
 
@@ -482,6 +484,7 @@ H5F_istore_cmp2(H5F_t UNUSED *f, void *_lt_key, void *_udata,
     cmp = H5V_vector_cmp_s(udata->mesg.ndims, lt_key->offset, rt_key->offset);
 
     FUNC_LEAVE(cmp);
+    f = 0;
 }
 
 
@@ -538,6 +541,8 @@ H5F_istore_cmp3(H5F_t UNUSED *f, void *_lt_key, void *_udata,
         cmp = 1;
     }
     FUNC_LEAVE(cmp);
+
+    f = 0;
 }
 
 
@@ -684,6 +689,8 @@ H5F_istore_found(H5F_t UNUSED *f, haddr_t addr, const void *_lt_key,
     }
 
     FUNC_LEAVE(SUCCEED);
+
+    _rt_key = 0;
 }
 
 
@@ -875,6 +882,9 @@ H5F_istore_iterate (H5F_t UNUSED *f, void *_lt_key, haddr_t UNUSED addr,
 
     bt_udata->total_storage += lt_key->nbytes;
     FUNC_LEAVE(SUCCEED);
+
+    f = 0;
+    _rt_key = 0;
 }
 
 

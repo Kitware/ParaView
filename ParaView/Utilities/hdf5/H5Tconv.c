@@ -444,6 +444,14 @@ H5T_conv_noop(hid_t UNUSED src_id, hid_t UNUSED dst_id, H5T_cdata_t *cdata,
     }
 
     FUNC_LEAVE(SUCCEED);
+    src_id = 0;
+    dst_id = 0;
+    nelmts = 0;
+    buf_stride = 0;
+    bkg_stride = 0;
+    buf = 0;
+    background = 0;
+    dset_xfer_plist = 0;
 }
 
 /*-------------------------------------------------------------------------
@@ -834,6 +842,9 @@ H5T_conv_order_opt(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     }
 
     FUNC_LEAVE(SUCCEED);
+    bkg_stride = 0;
+    background = 0;
+    dset_xfer_plist = 0;
 }
 
 /*-------------------------------------------------------------------------
@@ -949,6 +960,9 @@ H5T_conv_order(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata, hsize_t nelmts,
     }
 
     FUNC_LEAVE(SUCCEED);
+    bkg_stride = 0;
+    background = 0;
+    dset_xfer_plist = 0;
 }
 
 /*-------------------------------------------------------------------------
@@ -1168,6 +1182,9 @@ H5T_conv_b_b(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata, hsize_t nelmts,
     }
 
     FUNC_LEAVE (SUCCEED);
+    bkg_stride = 0;
+    background = 0;
+    dset_xfer_plist = 0;
 }
             
 
@@ -2165,6 +2182,9 @@ H5T_conv_enum(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata, hsize_t nelmts,
                        "unknown conversion command");
     }
     FUNC_LEAVE(SUCCEED);
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -2892,6 +2912,9 @@ H5T_conv_i_i (hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata, hsize_t nelmts,
     }
 
     FUNC_LEAVE (SUCCEED);
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3342,6 +3365,9 @@ H5T_conv_f_f (hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata, hsize_t nelmts,
     }
 
     FUNC_LEAVE (SUCCEED);
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3585,6 +3611,10 @@ H5T_conv_s_s (hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata, hsize_t nelmts,
  done:
     H5MM_xfree(dbuf);
     FUNC_LEAVE(ret_value);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3614,6 +3644,10 @@ H5T_conv_schar_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_su(SCHAR, UCHAR,
                 signed char, unsigned char);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3644,6 +3678,10 @@ H5T_conv_uchar_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned char, signed char,
                 SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3673,6 +3711,10 @@ H5T_conv_schar_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(SCHAR, SHORT,
                 signed char, short);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3702,6 +3744,10 @@ H5T_conv_schar_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(SCHAR, USHORT,
                 signed char, unsigned short);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3732,6 +3778,10 @@ H5T_conv_uchar_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned char, short,
                 SHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3761,6 +3811,10 @@ H5T_conv_uchar_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(UCHAR, USHORT,
                 unsigned char, unsigned short);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3789,6 +3843,10 @@ H5T_conv_schar_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(SCHAR, INT,
                 signed char, int);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3817,6 +3875,10 @@ H5T_conv_schar_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(SCHAR, UINT,
                 signed char, unsigned);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3846,6 +3908,10 @@ H5T_conv_uchar_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned char, int,
                 INT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3874,6 +3940,10 @@ H5T_conv_uchar_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(UCHAR, UINT,
                 unsigned char, unsigned);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3902,6 +3972,10 @@ H5T_conv_schar_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(SCHAR, LONG,
                 signed char, long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3931,6 +4005,10 @@ H5T_conv_schar_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(SCHAR, ULONG,
                 signed char, unsigned long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3960,6 +4038,10 @@ H5T_conv_uchar_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned char, long,
                 LONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -3989,6 +4071,10 @@ H5T_conv_uchar_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(UCHAR, ULONG,
                 unsigned char, unsigned long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4018,6 +4104,10 @@ H5T_conv_schar_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(SCHAR, LLONG,
                 signed char, long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4047,6 +4137,10 @@ H5T_conv_schar_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(SCHAR, ULLONG,
                 signed char, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4077,6 +4171,10 @@ H5T_conv_uchar_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned char, long_long,
                 LLONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4106,6 +4204,10 @@ H5T_conv_uchar_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(UCHAR, ULLONG,
                 unsigned char, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4136,6 +4238,10 @@ H5T_conv_short_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 short, signed char,
                 SCHAR_MIN, SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4166,6 +4272,10 @@ H5T_conv_short_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 short, unsigned char,
                 UCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4196,6 +4306,10 @@ H5T_conv_ushort_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned short, signed char,
                 SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4226,6 +4340,10 @@ H5T_conv_ushort_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned short, unsigned char,
                 UCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4255,6 +4373,10 @@ H5T_conv_short_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_su(SHORT, USHORT,
                 short, unsigned short);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4285,6 +4407,10 @@ H5T_conv_ushort_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned short, short,
                 SHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4314,6 +4440,10 @@ H5T_conv_short_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(SHORT, INT,
                 short, int);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4343,6 +4473,10 @@ H5T_conv_short_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(SHORT, UINT,
                 short, unsigned);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4373,6 +4507,10 @@ H5T_conv_ushort_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned short, int,
                 INT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4402,6 +4540,10 @@ H5T_conv_ushort_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(USHORT, UINT,
                 unsigned short, unsigned);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4431,6 +4573,10 @@ H5T_conv_short_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(SHORT, LONG,
                 short, long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4460,6 +4606,10 @@ H5T_conv_short_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(SHORT, ULONG,
                 short, unsigned long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4490,6 +4640,10 @@ H5T_conv_ushort_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned short, long,
                 LONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4519,6 +4673,10 @@ H5T_conv_ushort_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(USHORT, ULONG,
                 unsigned short, unsigned long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4548,6 +4706,10 @@ H5T_conv_short_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(SHORT, LLONG,
                 short, long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4577,6 +4739,10 @@ H5T_conv_short_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(SHORT, ULLONG,
                 short, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4607,6 +4773,10 @@ H5T_conv_ushort_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned short, long_long,
                 LLONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4636,6 +4806,10 @@ H5T_conv_ushort_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(USHORT, ULLONG,
                 unsigned short, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4666,6 +4840,10 @@ H5T_conv_int_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 int, signed char,
                 SCHAR_MIN, SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4696,6 +4874,10 @@ H5T_conv_int_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 int, unsigned char,
                 UCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4726,6 +4908,10 @@ H5T_conv_uint_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned, signed char,
                 SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4756,6 +4942,10 @@ H5T_conv_uint_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned, unsigned char,
                 UCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4786,6 +4976,10 @@ H5T_conv_int_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 int, short,
                 SHRT_MIN, SHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4816,6 +5010,10 @@ H5T_conv_int_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 int, unsigned short,
                 USHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4846,6 +5044,10 @@ H5T_conv_uint_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned, short,
                 SHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4876,6 +5078,10 @@ H5T_conv_uint_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned, unsigned short,
                 USHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4904,6 +5110,10 @@ H5T_conv_int_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_su(INT, UINT,
                 int, unsigned);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4933,6 +5143,10 @@ H5T_conv_uint_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned, int,
                 INT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4961,6 +5175,10 @@ H5T_conv_int_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(INT, LONG,
                 int, long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -4989,6 +5207,10 @@ H5T_conv_int_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(INT, LONG,
                 int, unsigned long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5018,6 +5240,10 @@ H5T_conv_uint_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned, long,
                 LONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5046,6 +5272,10 @@ H5T_conv_uint_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(UINT, ULONG,
                 unsigned, unsigned long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5074,6 +5304,10 @@ H5T_conv_int_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(INT, LLONG,
                 int, long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5102,6 +5336,10 @@ H5T_conv_int_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(INT, ULLONG,
                 int, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5131,6 +5369,10 @@ H5T_conv_uint_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned, long_long,
                 LLONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5160,6 +5402,10 @@ H5T_conv_uint_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(UINT, ULLONG,
                 unsigned, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5189,6 +5435,10 @@ H5T_conv_long_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long, signed char,
                 SCHAR_MIN, SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5218,6 +5468,10 @@ H5T_conv_long_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long, unsigned char,
                 UCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5248,6 +5502,10 @@ H5T_conv_ulong_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long, signed char,
                 SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5278,6 +5536,10 @@ H5T_conv_ulong_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long, unsigned char,
                 UCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5307,6 +5569,10 @@ H5T_conv_long_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long, short,
                 SHRT_MIN, SHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5337,6 +5603,10 @@ H5T_conv_long_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long, unsigned short,
                 USHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5366,6 +5636,10 @@ H5T_conv_ulong_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long, short,
                 SHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5396,6 +5670,10 @@ H5T_conv_ulong_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long, unsigned short,
                 USHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5425,6 +5703,10 @@ H5T_conv_long_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long, int,
                 INT_MIN, INT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5454,6 +5736,10 @@ H5T_conv_long_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long, unsigned,
                 UINT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5483,6 +5769,10 @@ H5T_conv_ulong_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long, int,
                 INT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5512,6 +5802,10 @@ H5T_conv_ulong_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long, unsigned,
                 UINT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5540,6 +5834,10 @@ H5T_conv_long_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_su(LONG, ULONG,
                 long, unsigned long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5569,6 +5867,10 @@ H5T_conv_ulong_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long, long,
                 LONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5597,6 +5899,10 @@ H5T_conv_long_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sS(LONG, LLONG,
                 long, long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5626,6 +5932,10 @@ H5T_conv_long_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_sU(LONG, ULLONG,
                 long, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5656,6 +5966,10 @@ H5T_conv_ulong_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long, long_long,
                 LLONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5685,6 +5999,10 @@ H5T_conv_ulong_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_uU(ULONG, ULLONG,
                 unsigned long, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5715,6 +6033,10 @@ H5T_conv_llong_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long_long, signed char,
                 SCHAR_MIN, SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5745,6 +6067,10 @@ H5T_conv_llong_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long_long, unsigned char,
                 UCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5775,6 +6101,10 @@ H5T_conv_ullong_schar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, signed char,
                 SCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5805,6 +6135,10 @@ H5T_conv_ullong_uchar(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, unsigned char,
                 UCHAR_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5835,6 +6169,10 @@ H5T_conv_llong_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long_long, short,
                 SHRT_MIN, SHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5865,6 +6203,10 @@ H5T_conv_llong_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long_long, unsigned short,
                 USHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5895,6 +6237,10 @@ H5T_conv_ullong_short(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, short,
                 SHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5925,6 +6271,10 @@ H5T_conv_ullong_ushort(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, unsigned short,
                 USHRT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5954,6 +6304,10 @@ H5T_conv_llong_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long_long, int,
                 INT_MIN, INT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -5983,6 +6337,10 @@ H5T_conv_llong_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long_long, unsigned,
                 UINT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6012,6 +6370,10 @@ H5T_conv_ullong_int(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, int,
                 INT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6042,6 +6404,10 @@ H5T_conv_ullong_uint(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, unsigned,
                 UINT_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6071,6 +6437,10 @@ H5T_conv_llong_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long_long, long,
                 LONG_MIN, LONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6101,6 +6471,10 @@ H5T_conv_llong_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 long_long, unsigned long,
                 ULONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6131,6 +6505,10 @@ H5T_conv_ullong_long(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, long,
                 LONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6161,6 +6539,10 @@ H5T_conv_ullong_ulong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, unsigned long,
                 ULONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6190,6 +6572,10 @@ H5T_conv_llong_ullong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     H5T_CONV_su(LLONG, ULLONG,
                 long_long, unsigned long_long);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6220,6 +6606,10 @@ H5T_conv_ullong_llong(hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
                 unsigned long_long, long_long,
                 LLONG_MAX);
     FUNC_LEAVE(SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6340,6 +6730,10 @@ H5T_conv_float_double (hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     }
 
     FUNC_LEAVE (SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6471,6 +6865,10 @@ H5T_conv_double_float (hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     }
 
     FUNC_LEAVE (SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }
 
 
@@ -6865,4 +7263,8 @@ H5T_conv_i32le_f64le (hid_t src_id, hid_t dst_id, H5T_cdata_t *cdata,
     }
     
     FUNC_LEAVE (SUCCEED);
+
+    bkg_stride = 0;
+    bkg = 0;
+    dset_xfer_plist = 0;
 }

@@ -153,6 +153,9 @@ H5O_pline_decode(H5F_t UNUSED *f, const uint8_t *p,
         H5FL_FREE(H5O_pline_t,pline);
     }
     FUNC_LEAVE(ret_value);
+
+    f = 0;
+    sh = 0;
 }
 
 
@@ -224,6 +227,8 @@ H5O_pline_encode (H5F_t UNUSED *f, uint8_t *p/*out*/, const void *mesg)
     }
 
     FUNC_LEAVE (SUCCEED);
+
+    f = 0;
 }
 
 
@@ -357,6 +362,8 @@ H5O_pline_size (H5F_t UNUSED *f, const void *mesg)
     }
 
     FUNC_LEAVE (size);
+
+    f = 0;
 }
 
 

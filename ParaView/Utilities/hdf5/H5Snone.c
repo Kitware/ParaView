@@ -100,6 +100,8 @@ H5S_none_select_deserialize (H5S_t *space, const uint8_t UNUSED *buf)
 
 done:
     FUNC_LEAVE (ret_value);
+     
+    buf = 0;
 }   /* H5S_none_select_deserialize() */
 
 
@@ -221,4 +223,6 @@ H5S_none_select_iterate(void UNUSED *buf, hid_t UNUSED type_id, H5S_t UNUSED *sp
     assert(H5I_DATATYPE == H5I_get_type(type_id));
 
     FUNC_LEAVE (ret_value);
+
+    operator_data = 0;
 }   /* H5S_hyper_select_iterate() */

@@ -35,6 +35,10 @@
  * compliant when H5_HAVE_PARALLEL isn't defined)
  */
 static hid_t H5FD_MPIO_g = 0;
+hid_t GetH5FD_MPIO_g()
+{
+  return H5FD_MPIO_g;
+}
 
 #ifdef H5_HAVE_PARALLEL
 

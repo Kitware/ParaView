@@ -191,6 +191,8 @@ H5S_hyper_init (const struct H5O_layout_t UNUSED *layout,
                    space->extent.u.simple.rank);
     
     FUNC_LEAVE (SUCCEED);
+
+    layout = 0;
 }   /* H5S_hyper_init() */
 
 /*-------------------------------------------------------------------------
@@ -5373,6 +5375,8 @@ H5S_hyper_select_iterate_mem_opt(H5S_sel_iter_t UNUSED *iter, void *buf, hid_t t
 
 done:
     FUNC_LEAVE (user_ret);
+
+    iter = 0;
 } /* end H5S_hyper_select_iterate_mem_opt() */
 
 

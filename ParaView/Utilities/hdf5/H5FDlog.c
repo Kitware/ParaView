@@ -660,6 +660,8 @@ H5FD_log_query(const H5FD_t UNUSED *_f, unsigned long *flags /* out */)
     }
 
     FUNC_LEAVE(ret_value);
+    
+    _f = 0;
 }
 
 
@@ -891,6 +893,9 @@ H5FD_log_read(H5FD_t *_file, H5FD_mem_t UNUSED type, hid_t UNUSED dxpl_id, haddr
     file->pos = addr;
     file->op = OP_READ;
     FUNC_LEAVE(SUCCEED);
+
+    type = 0;
+    dxpl_id = 0;
 }
 
 
@@ -991,6 +996,8 @@ H5FD_log_write(H5FD_t *_file, H5FD_mem_t UNUSED type, hid_t UNUSED dxpl_id, hadd
         file->eof = file->pos;
 
     FUNC_LEAVE(SUCCEED);
+
+    dxpl_id = 0;
 }
 
 

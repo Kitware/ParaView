@@ -3065,6 +3065,8 @@ H5D_vlen_get_buf_size(void UNUSED *elem, hid_t type_id, hsize_t UNUSED ndim, hss
 done:
 
     FUNC_LEAVE(ret_value);
+    elem = 0;
+    ndim = 0;
 }   /* end H5D_vlen_get_buf_size() */
 
 
@@ -3204,4 +3206,5 @@ H5Ddebug(hid_t dset_id, unsigned UNUSED flags)
     }
     
     FUNC_LEAVE(SUCCEED);
+    flags = 0;
 }

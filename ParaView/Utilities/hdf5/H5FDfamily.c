@@ -642,6 +642,8 @@ H5FD_family_query(const H5FD_t UNUSED *_f, unsigned long *flags /* out */)
     }
 
     FUNC_LEAVE(ret_value);
+
+    _f = 0;
 }
 
 

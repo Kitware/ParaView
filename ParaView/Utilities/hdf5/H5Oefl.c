@@ -466,6 +466,8 @@ H5O_efl_read (H5F_t UNUSED *f, const H5O_efl_t *efl, haddr_t addr,
  done:
     if (fd>=0) HDclose (fd);
     FUNC_LEAVE (ret_value);
+
+    f = 0;
 }
         
 
@@ -553,6 +555,8 @@ H5O_efl_write (H5F_t UNUSED *f, const H5O_efl_t *efl, haddr_t addr,
  done:
     if (fd>=0) HDclose (fd);
     FUNC_LEAVE (ret_value);
+
+    f = 0;
 }
         
 

@@ -29,6 +29,10 @@
 
 /* The driver identification number, initialized at runtime */
 static hid_t H5FD_DPSS_g = 0;
+hid_t GetH5FD_DPSS_g()
+{
+  return H5FD_DPSS_g;
+}
 
 
 /* compile this only if HDF5 was configured to use the Grid Storage I/O driver */

@@ -151,4 +151,8 @@ done:
     if(outbuf)
         H5F_istore_chunk_free(outbuf);
     FUNC_LEAVE (ret_value);
+    flags = 0;
+    nbytes = 0;
+    buf_size = 0;
+    buf = 0;
 }

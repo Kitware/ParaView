@@ -317,6 +317,7 @@ H5FD_sec2_open(const char *name, unsigned flags, hid_t UNUSED fapl_id,
     file->inode = sb.st_ino;
 #endif
     FUNC_LEAVE((H5FD_t*)file);
+    fapl_id = 0;
 }
 
 
@@ -433,6 +434,7 @@ H5FD_sec2_query(const H5FD_t UNUSED *_f, unsigned long *flags /* out */)
     }
 
     FUNC_LEAVE(ret_value);
+    _f = 0;
 }
 
 
@@ -607,6 +609,8 @@ H5FD_sec2_read(H5FD_t *_file, H5FD_mem_t UNUSED type, hid_t UNUSED dxpl_id, hadd
     file->pos = addr;
     file->op = OP_READ;
     FUNC_LEAVE(SUCCEED);
+    type = 0;
+    dxpl_id = 0;
 }
 
 
@@ -686,6 +690,8 @@ H5FD_sec2_write(H5FD_t *_file, H5FD_mem_t UNUSED type, hid_t UNUSED dxpl_id, had
         file->eof = file->pos;
 
     FUNC_LEAVE(SUCCEED);
+    type = 0;
+    dxpl_id = 0;
 }
 
 
