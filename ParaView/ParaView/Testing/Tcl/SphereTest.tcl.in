@@ -1,0 +1,59 @@
+    set DataDir "@PARAVIEW_DATA_ROOT@"
+
+    # hack to get the window.
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    
+    set sInt [$pvWindow GetSourceInterface "vtkSphereSource"]
+    set pvSphere [$sInt CreateCallback]
+    [$pvSphere GetVTKSource] SetThetaResolution 16
+    $pvSphere UpdateParameterWidgets
+    $pvSphere AcceptCallback
+    
+    set sInt2 [$pvWindow GetSourceInterface "vtkShrinkPolyData"]
+    set pvShrink [$sInt2 CreateCallback]
+    [$pvShrink GetVTKSource] SetShrinkFactor 0.9
+    $pvShrink UpdateParameterWidgets
+    $pvShrink AcceptCallback
+
+    set eInt [$pvWindow GetSourceInterface "vtkElevationFilter"]
+    set pvElevation [$eInt CreateCallback]
+    $pvElevation AcceptCallback
+
+    set eInt2 [$pvWindow GetSourceInterface "vtkExtractEdges"]
+    set pvExtract [$eInt2 CreateCallback]
+    $pvExtract AcceptCallback
+
+    set extractOutput [$pvExtract GetNthPVOutput 0]
+    $extractOutput ColorByProperty
+
+    set elevOutput [$pvElevation GetNthPVOutput 0]
+    $elevOutput SetVisibility 1
+
+
+    set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+    $pvWindow SetCurrentPVSource $pvSphere
+    
+    set camera [Ren1 GetActiveCamera]
+    $camera SetPosition 0 0 3.41078
+    $camera SetFocalPoint 0 0 0
+    $camera SetViewUp 0 1 0
+    $camera SetViewAngle 30
+    $camera SetClippingRange 2.38825 4.70618
+    
+    $elevOutput SetVisibility 1
+    $extractOutput SetVisibility 1
+    
+    for {set i 0} {$i < 100} {incr i 1} {
+	set camera [Ren1 GetActiveCamera]
+	$camera Azimuth 10
+	RenWin1 Render
+	update
+
+    }
+    
+    RenWin1 Render
+
+    source $DataDir/Utility/rtImage.tcl
+    pvImageTest $DataDir/Baseline/SphereTest.png 10
+   
+    Application Exit
