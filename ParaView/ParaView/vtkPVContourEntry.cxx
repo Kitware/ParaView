@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.31");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.32");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ScalarRangeLabel,
                      vtkPVScalarRangeLabel);
@@ -682,4 +682,5 @@ const char* vtkPVContourEntry::GetLabel()
 void vtkPVContourEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ScalarRangeLabel: " << this->ScalarRangeLabel << endl;
 }
