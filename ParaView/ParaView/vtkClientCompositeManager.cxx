@@ -52,7 +52,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.18.2.3");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.18.2.4");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -1494,56 +1494,28 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
                                                vtkUnsignedCharArray *out,
                                                int compress_level)
 {
+
   if (in->GetNumberOfComponents() != 4)
     {
     vtkErrorMacro("Squirt only works with RGBA");
     return;
     }
 
-  unsigned int count=0;
+  int count=0;
   int index=0;
   int comp_index=0;
   int end_index;
   unsigned int current_color;
-  unsigned int compress_mask;
+  unsigned char compress_masks[6][4] = {  {0xFF, 0xFF, 0xFF, 0xFF},
+                                          {0xFE, 0xFF, 0xFE, 0xFF},
+                                          {0xFC, 0xFE, 0xFC, 0xFF},
+                                          {0xF8, 0xFC, 0xF8, 0xFF},
+                                          {0xF0, 0xF8, 0xF0, 0xFF},
+                                          {0xE0, 0xF0, 0xE0, 0xFF}};
 
- // Set bitmask based on compress_level
-  // switch statement is a bit lame
-#ifdef VTK_WORDS_BIGENDIAN
-  switch (compress_level) {
-  case 1: compress_mask = 0xFFFFFF00;
-      break;
-  case 2: compress_mask = 0xFEFFFE00;
-      break;
-  case 3: compress_mask = 0xFCFEFC00;
-      break;
-  case 4: compress_mask = 0xF8FCF800;
-      break;
-  case 5: compress_mask = 0xF0F8F000;
-      break;
-  case 6: compress_mask = 0xE0F0E000;
-      break;
-  default: compress_mask = 0xE0F0E000;
-      break;
-  }
-#else
-  switch (compress_level) {
-  case 0: compress_mask = 0x00FFFFFF;
-      break;
-  case 1: compress_mask = 0x00FEFFFE;
-      break;
-  case 2: compress_mask = 0x00FCFEFC;
-      break;
-  case 3: compress_mask = 0x00F8FCF8;
-      break;
-  case 4: compress_mask = 0x00F0F8F0;
-      break;
-  case 5: compress_mask = 0x00E0F0E0;
-      break;
-  default: compress_mask = 0x00E0F0E0;
-      break;
-  }
-#endif
+  // Set bitmask based on compress_level
+  unsigned int compress_mask;
+  memcpy(&compress_mask, &compress_masks[compress_level], 4);
 
   // Access raw arrays directly
   unsigned int* _rawColorBuffer;
@@ -1551,67 +1523,39 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
   int numPixels = in->GetNumberOfTuples();
   _rawColorBuffer = (unsigned int*)in->GetPointer(0);
   _rawCompressedBuffer = (unsigned int*)out->WritePointer(0,numPixels*4);
-
   end_index = numPixels;
 
   // Go through color buffer and put RLE format into compressed buffer
   while((index < end_index) && (comp_index < end_index)) 
     {
+                
     // Record color
-    current_color = _rawCompressedBuffer[comp_index] = (_rawColorBuffer[index] |
-#ifdef VTK_WORDS_BIGENDIAN
-                                                        0x000000FF
-#else
-                                                        0xFF000000
-#endif
-                                                        );
+    current_color = _rawCompressedBuffer[comp_index] =_rawColorBuffer[index];
     index++;
 
     // Compute Run
-    while(((current_color&compress_mask) ==(_rawColorBuffer[index]&compress_mask)) && 
-          (index<end_index) && (count<255)) 
+    while(((current_color&compress_mask) == (_rawColorBuffer[index]&compress_mask)) &&
+          (index<end_index) && (count<255))
       { 
-      index++; 
-      count++; 
+      index++; count++;   
       }
 
     // Record Run length
-#ifdef VTK_WORDS_BIGENDIAN
-    _rawCompressedBuffer[comp_index] &= (count|0xFFFFFF00);
-#else
-    _rawCompressedBuffer[comp_index] &= (count<<24|0x00FFFFFF);
-#endif
+    *((unsigned char*)_rawCompressedBuffer+comp_index*4+3) =(unsigned char)count;
     comp_index++;
-    
+
     count = 0;
+    
     }
 
-  // Back to vtk arrays :)
-  //ColorBuffer->SetNumberOfTuples(ImageX*ImageY);  
-  out->SetNumberOfTuples(comp_index);
-
-  // Doesn't do much good to keep stats on the server.
-  //static int total_size=0, total_compress=0;
-  //static float max_ratio=0;
-  // Keep stats
-  //total_size += end_index;
-  //total_compress += comp_index;
-  //if (comp_index/(float)end_index > max_ratio) 
-  //  {
-  //  max_ratio = comp_index/(float)end_index;
-  //  }
-
-  // Output stats
-  //vtkTimerLog::FormatAndMarkEvent("Compress ratio: %f", comp_index/(float)end_index);
-  //vtkTimerLog::FormatAndMarkEvent("Compress size: %f", comp_index*4);
-  //vtkTimerLog::FormatAndMarkEvent("Avg ratio: %f", total_compress/(float)total_size);
-  //vtkTimerLog::FormatAndMarkEvent("Max ratio: %f", max_ratio);
+    // Back to vtk arrays :)
+    out->SetNumberOfTuples(comp_index);
+ 
 }
 
-
-//-------------------------------------------------------------------------
+//------------------------------------------------------------
 void vtkClientCompositeManager::SquirtDecompress(vtkUnsignedCharArray *in,
-                                                 vtkUnsignedCharArray *out)
+                                                  vtkUnsignedCharArray *out)
 {
   int count=0;
   int index=0;
@@ -1627,24 +1571,16 @@ void vtkClientCompositeManager::SquirtDecompress(vtkUnsignedCharArray *in,
   _rawCompressedBuffer = (unsigned int*)in->GetPointer(0);
 
   // Go through compress buffer and extract RLE format into color buffer
-  for(int i=0; i<CompSize; i++) 
+  for(int i=0; i<CompSize; i++)
     {
     // Get color and count
     current_color = _rawCompressedBuffer[i];
 
-    // Get first byte as count;
-#ifdef VTK_WORDS_BIGENDIAN
-    count = current_color&0x000000FF;
-#else
-    count = current_color>>24;
-#endif
+    // Get run length count;
+    count = *((unsigned char*)&current_color+3);
 
     // Fixed Alpha
-#ifdef VTK_WORDS_BIGENDIAN
-    current_color |= 0x000000FF;
-#else
-    current_color |= 0xFF000000;
-#endif
+    *((unsigned char*)&current_color+3) = 0xFF;
 
     // Set color
     _rawColorBuffer[index++] = current_color;
@@ -1654,14 +1590,10 @@ void vtkClientCompositeManager::SquirtDecompress(vtkUnsignedCharArray *in,
       _rawColorBuffer[index++] = current_color;
     }
 
-  // Back to vtk arrays :)
-  // Could use index, 
-  // but color buffer should be set to correct length already.
-  //out->SetNumberOfTuples(ImageX*ImageY);
-
-  // Save out compression stats.
-  vtkTimerLog::FormatAndMarkEvent("Squirt ratio: %f", (float)CompSize/(float)index);
+    // Save out compression stats.
+    vtkTimerLog::FormatAndMarkEvent("Squirt ratio: %f", (float)CompSize/(float)index);
 }
+
 
 //-------------------------------------------------------------------------
 void vtkClientCompositeManager::DeltaEncode(vtkUnsignedCharArray *buf)

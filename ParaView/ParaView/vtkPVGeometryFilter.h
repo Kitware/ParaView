@@ -25,7 +25,6 @@
 
 #include "vtkDataSetSurfaceFilter.h"
 
-class vtkCTHData;
 class vtkImageData;
 class vtkStructuredGrid;
 class vtkRectilinearGrid;
@@ -53,7 +52,7 @@ protected:
   ~vtkPVGeometryFilter();
 
   void Execute();
-  void CTHDataExecute(vtkCTHData *input);
+  void DataSetExecute(vtkDataSet *input);
   void ImageDataExecute(vtkImageData *input);
   void StructuredGridExecute(vtkStructuredGrid *input);
   void RectilinearGridExecute(vtkRectilinearGrid *input);

@@ -58,12 +58,8 @@ public:
 
   // Description:
   // Return the name of the property element used inside that tree to
-  // store a property.
+  // store properties.
   static char* GetPropertyElementName();
-
-  // Description:
-  // Return the name of the backface property element used inside that tree to
-  // store a backface property.
   static char* GetBackfacePropertyElementName();
 
 protected:

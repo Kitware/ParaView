@@ -66,15 +66,8 @@ public:
   void Initialize(vtkPVWindow*);
 
 protected:
-  vtkPVInitialize() 
-    {
-    this->StandardFiltersString = 0;
-    this->StandardManipulatorsString = 0;
-    this->StandardReadersString = 0;
-    this->StandardSourcesString = 0;
-    this->StandardWritersString = 0;
-    }
-  ~vtkPVInitialize() {}
+  vtkPVInitialize();
+  ~vtkPVInitialize();
 
   char* GetStandardFiltersInterfaces();
   char* GetStandardManipulatorsInterfaces();

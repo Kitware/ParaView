@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataParser.h"
 #include "vtkXMLUtilities.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectReader, "1.8.4.1");
+vtkCxxRevisionMacro(vtkXMLObjectReader, "1.8.4.2");
 
 //----------------------------------------------------------------------------
 vtkXMLObjectReader::vtkXMLObjectReader()
@@ -136,13 +136,6 @@ int vtkXMLObjectReader::Parse(vtkXMLDataElement *elem)
   if (!elem)
     {
     vtkWarningMacro(<< "Can not parse a NULL XML element!");
-    return 0;
-    }
-
-  // Fail silently if this is not the right root element
-
-  if (strcmp(elem->GetName(), this->GetRootElementName()))
-    {
     return 0;
     }
 

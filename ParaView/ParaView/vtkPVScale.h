@@ -181,6 +181,12 @@ protected:
 
   void UpdateVTKSourceInternal(vtkClientServerID sourceID,
                                float value);
+
+  vtkSetMacro(DefaultValue, float);
+  vtkGetMacro(DefaultValue, float);
+
+  float DefaultValue;
+
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

@@ -48,25 +48,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInitialize);
-vtkCxxRevisionMacro(vtkPVInitialize, "1.3.4.1");
+vtkCxxRevisionMacro(vtkPVInitialize, "1.3.4.2");
+
+//----------------------------------------------------------------------------
+vtkPVInitialize::vtkPVInitialize()
+{
+  this->StandardFiltersString = 0;
+  this->StandardManipulatorsString = 0;
+  this->StandardReadersString = 0;
+  this->StandardSourcesString = 0;
+  this->StandardWritersString = 0;
+}
+
+//----------------------------------------------------------------------------
+vtkPVInitialize::~vtkPVInitialize()
+{
+  this->SetStandardFiltersString(0);
+  this->SetStandardManipulatorsString(0);
+  this->SetStandardReadersString(0);
+  this->SetStandardSourcesString(0);
+  this->SetStandardWritersString(0);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVInitialize::Initialize(vtkPVWindow* win)
 {
-  win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::GetStandardSourcesInterfaces());
-
-  win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::GetStandardFiltersInterfaces());
-
-  win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::GetStandardReadersInterfaces());
-
-  win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::GetStandardManipulatorsInterfaces());
-
-  win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::GetStandardWritersInterfaces());
+  win->ReadSourceInterfacesFromString(this->GetStandardSourcesInterfaces());
+  win->ReadSourceInterfacesFromString(this->GetStandardFiltersInterfaces());
+  win->ReadSourceInterfacesFromString(this->GetStandardReadersInterfaces());
+  win->ReadSourceInterfacesFromString(this->GetStandardManipulatorsInterfaces());
+  win->ReadSourceInterfacesFromString(this->GetStandardWritersInterfaces());
 }
 
 //----------------------------------------------------------------------------

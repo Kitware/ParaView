@@ -58,22 +58,10 @@ public:
 
   // Description:
   // Return the name of the element used inside that tree to
-  // store the handle property.
+  // store the properties.
   static char* GetHandlePropertyElementName();
-
-  // Description:
-  // Return the name of the element used inside that tree to
-  // store the selected handle property.
   static char* GetSelectedHandlePropertyElementName();
-
-  // Description:
-  // Return the name of the element used inside that tree to
-  // store the plane property.
   static char* GetPlanePropertyElementName();
-
-  // Description:
-  // Return the name of the element used inside that tree to
-  // store the selected plane property.
   static char* GetSelectedPlanePropertyElementName();
 
 protected:

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.8.4.1");
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.8.4.2");
 
 //----------------------------------------------------------------------------
 vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
@@ -200,6 +200,7 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
   this->EntriesMap->Delete();
   this->EntriesMap = 0;
   ofs->close();
+  delete ofs;
   res = 1;
   this->SetSubKey(0);
   this->Empty = 1;

@@ -58,12 +58,8 @@ public:
 
   // Description:
   // Return the name of the element used inside that tree to
-  // store the title property.
+  // store the properties.
   static char* GetTitleTextPropertyElementName();
-
-  // Description:
-  // Return the name of the element used inside that tree to
-  // store the label text property.
   static char* GetLabelTextPropertyElementName();
 
 protected:

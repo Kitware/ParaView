@@ -38,11 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkImagePlaneWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty.h"
+#include "vtkTextProperty.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLPropertyWriter.h"
+#include "vtkXMLTextPropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLImagePlaneWidgetWriter);
-vtkCxxRevisionMacro(vtkXMLImagePlaneWidgetWriter, "1.1.4.1");
+vtkCxxRevisionMacro(vtkXMLImagePlaneWidgetWriter, "1.1.4.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLImagePlaneWidgetWriter::GetRootElementName()
@@ -51,27 +53,39 @@ char* vtkXMLImagePlaneWidgetWriter::GetRootElementName()
 }
 
 //----------------------------------------------------------------------------
-char* vtkXMLImagePlaneWidgetWriter::GetHandlePropertyElementName()
+char* vtkXMLImagePlaneWidgetWriter::GetPlanePropertyElementName()
 {
-  return "HandleProperty";
+  return "PlaneProperty";
 }
 
 //----------------------------------------------------------------------------
-char* vtkXMLImagePlaneWidgetWriter::GetSelectedHandlePropertyElementName()
+char* vtkXMLImagePlaneWidgetWriter::GetSelectedPlanePropertyElementName()
 {
-  return "SelectedHandleProperty";
+  return "SelectedPlaneProperty";
 }
 
 //----------------------------------------------------------------------------
-char* vtkXMLImagePlaneWidgetWriter::GetImagePlanePropertyElementName()
+char* vtkXMLImagePlaneWidgetWriter::GetCursorPropertyElementName()
 {
-  return "ImagePlaneProperty";
+  return "CursorProperty";
 }
 
 //----------------------------------------------------------------------------
-char* vtkXMLImagePlaneWidgetWriter::GetSelectedImagePlanePropertyElementName()
+char* vtkXMLImagePlaneWidgetWriter::GetMarginPropertyElementName()
 {
-  return "SelectedImagePlaneProperty";
+  return "MarginProperty";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLImagePlaneWidgetWriter::GetTexturePlanePropertyElementName()
+{
+  return "TexturePlaneProperty";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLImagePlaneWidgetWriter::GetTextPropertyElementName()
+{
+  return "TextProperty";
 }
 
 //----------------------------------------------------------------------------
@@ -95,6 +109,17 @@ int vtkXMLImagePlaneWidgetWriter::AddAttributes(vtkXMLDataElement *elem)
 
   elem->SetVectorAttribute("Point2", 3, obj->GetPoint2());
 
+  elem->SetIntAttribute("ResliceInterpolate", obj->GetResliceInterpolate());
+
+  elem->SetIntAttribute(
+    "RestrictPlaneToVolume", obj->GetRestrictPlaneToVolume());
+
+  elem->SetIntAttribute("TextureInterpolate", obj->GetTextureInterpolate());
+
+  elem->SetIntAttribute("TextureVisibility", obj->GetTextureVisibility());
+
+  elem->SetIntAttribute("DisplayText", obj->GetDisplayText());
+
   return 1;
 }
 //----------------------------------------------------------------------------
@@ -111,6 +136,64 @@ int vtkXMLImagePlaneWidgetWriter::AddNestedElements(vtkXMLDataElement *elem)
     vtkWarningMacro(<< "The ImagePlaneWidget is not set!");
     return 0;
     }
+
+  // Plane Properties
+
+  vtkXMLPropertyWriter *xmlw = vtkXMLPropertyWriter::New();
+  vtkProperty *prop;
+
+  prop = obj->GetPlaneProperty();
+  if (prop)
+    {
+    xmlw->SetObject(prop);
+    xmlw->CreateInNestedElement(elem, this->GetPlanePropertyElementName());
+    }
+ 
+  prop = obj->GetSelectedPlaneProperty();
+  if (prop)
+    {
+    xmlw->SetObject(prop);
+    xmlw->CreateInNestedElement(
+      elem, this->GetSelectedPlanePropertyElementName());
+    }
+
+  prop = obj->GetCursorProperty();
+  if (prop)
+    {
+    xmlw->SetObject(prop);
+    xmlw->CreateInNestedElement(elem, this->GetCursorPropertyElementName());
+    }
+
+  prop = obj->GetMarginProperty();
+  if (prop)
+    {
+    xmlw->SetObject(prop);
+    xmlw->CreateInNestedElement(elem, this->GetMarginPropertyElementName());
+    }
+
+  prop = obj->GetTexturePlaneProperty();
+  if (prop)
+    {
+    xmlw->SetObject(prop);
+    xmlw->CreateInNestedElement(
+      elem, this->GetTexturePlanePropertyElementName());
+    }
+
+  xmlw->Delete();
+
+  // Text properties
+
+  vtkXMLTextPropertyWriter *xmltw = vtkXMLTextPropertyWriter::New();
+  vtkTextProperty *tprop;
+
+  tprop = obj->GetTextProperty();
+  if (tprop)
+    {
+    xmltw->SetObject(tprop);
+    xmltw->CreateInNestedElement(elem, this->GetTextPropertyElementName());
+    }
+
+  xmltw->Delete();
 
   return 1;
 }

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.1.2.4");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.1.2.5");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -67,21 +67,15 @@ vtkPVScalarListWidgetProperty::~vtkPVScalarListWidgetProperty()
     {
     delete [] this->VTKCommands[i];
     }
-  if (this->VTKCommands)
-    {
-    delete [] this->VTKCommands;
-    this->VTKCommands = NULL;
-    }
-  if (this->NumberOfScalarsPerCommand)
-    {
-    delete [] this->NumberOfScalarsPerCommand;
-    this->NumberOfScalarsPerCommand = NULL;
-    }
-  if (this->Scalars)
-    {
-    delete [] this->Scalars;
-    this->Scalars = NULL;
-    }
+
+  delete [] this->VTKCommands;
+  this->VTKCommands = NULL;
+
+  delete [] this->NumberOfScalarsPerCommand;
+  this->NumberOfScalarsPerCommand = NULL;
+
+  delete [] this->Scalars;
+  this->Scalars = NULL;
 }
 
 void vtkPVScalarListWidgetProperty::SetVTKCommands(int numCmds, char **cmd,
@@ -121,15 +115,13 @@ void vtkPVScalarListWidgetProperty::SetVTKCommands(int numCmds, char **cmd,
 
 void vtkPVScalarListWidgetProperty::SetScalars(int num, float *scalars)
 {
-  if (this->Scalars && num > this->NumberOfScalars)
+  if (num > this->NumberOfScalars)
     {
     delete [] this->Scalars;
-    this->Scalars = NULL;
+    this->Scalars = new float[num];
     }
   
-  this->Scalars = new float[num];
   this->NumberOfScalars = num;
-  
   memcpy(this->Scalars, scalars, num*sizeof(float));
 }
 
@@ -141,11 +133,9 @@ void vtkPVScalarListWidgetProperty::AddScalar(float scalar)
     {
     scalars[i] = this->Scalars[i];
     }
-  if (this->Scalars)
-    {
-    delete [] this->Scalars;
-    this->Scalars = NULL;
-    }
+
+  delete [] this->Scalars;
+  this->Scalars = NULL;
   
   this->Scalars = new float[this->NumberOfScalars+1];
   for (i = 0; i < this->NumberOfScalars; i++)
