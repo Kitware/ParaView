@@ -26,7 +26,7 @@ vtkProcessModule* vtkProcessModule::ProcessModule = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.4");
+vtkCxxRevisionMacro(vtkProcessModule, "1.5");
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -106,103 +106,178 @@ void vtkProcessModule::GatherInformationInternal(const char*,
     }
 
   this->TemporaryInformation->CopyFromObject(object);
- }
+}
+vtkTypeUInt32 vtkProcessModule::CreateSendFlag(vtkTypeUInt32 servers)
+{
+  if(servers)
+    {
+    return CLIENT;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule::SendStream(vtkTypeUInt32 server)
+{ 
+  return this->SendStream(server, *this->ClientServerStream);
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule::SendStream(vtkTypeUInt32 servers, 
+                                 vtkClientServerStream& stream,
+                                 bool resetStream)
+{
+  vtkTypeUInt32 sendflag = this->CreateSendFlag(servers);
+  if(sendflag & DATA_SERVER)
+    {
+    this->SendStreamToDataServer(stream);
+    }
+  if(sendflag & RENDER_SERVER)
+    {
+    this->SendStreamToRenderServer(stream);
+    }
+  if(sendflag & DATA_SERVER_ROOT)
+    {
+    this->SendStreamToDataServerRoot(stream);
+    }
+  if(sendflag & RENDER_SERVER_ROOT)
+    {
+    this->SendStreamToRenderServerRoot(stream);
+    }
+  if(sendflag & CLIENT)
+    {
+    this->SendStreamToClient(stream);
+    }
+  if(resetStream)
+    {
+    stream.Reset();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkProcessModule::SendStreamToClient(vtkClientServerStream& stream)
+{
+  this->Interpreter->ProcessStream(stream);
+  return 0;
+}
+
+// send a stream to the data server
+int vtkProcessModule::SendStreamToDataServer(vtkClientServerStream&)
+{
+  vtkErrorMacro("SendStreamToDataServer called on process module that does not implement it");
+  return -1;
+}
+
+// send a stream to the data server root mpi process
+int vtkProcessModule::SendStreamToDataServerRoot(vtkClientServerStream&)
+{
+  vtkErrorMacro(
+    "SendStreamToDataServerRoot called on process module that does not implement it");
+  return -1;
+}
+
+// send a stream to the render server
+int vtkProcessModule::SendStreamToRenderServer(vtkClientServerStream&)
+{
+  vtkErrorMacro(
+    "SendStreamToRenderServer called on process module that does not implement it");
+  return -1;
+}
+
+// send a stream to the render server root mpi process
+int vtkProcessModule::SendStreamToRenderServerRoot(vtkClientServerStream&)
+{
+  vtkErrorMacro(
+    "SendStreamToRenderServerRoot called on process module that does not implement it");
+  return -1;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToClient()
 {
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::CLIENT);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToServerTemp(vtkClientServerStream* stream)
 {
-  this->Interpreter->ProcessStream(*stream);
-  stream->Reset();
+  this->SendStream(vtkProcessModule::DATA_SERVER, *stream);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToServerRootTemp(vtkClientServerStream* stream)
 {
-  this->Interpreter->ProcessStream(*stream);
-  stream->Reset();
+  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT, *stream);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToServer()
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
+  this->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToServerRoot()
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
+  this->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToClientAndServer()
 {
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToClientAndServerRoot()
 {
-  this->SendStreamToServer();
+  this->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::DATA_SERVER_ROOT);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToRenderServerRoot()
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
+  this->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
 }
 
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToRenderServer()
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
+  this->SendStream(vtkProcessModule::RENDER_SERVER);
 }
 
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToRenderServerAndServerRoot()
 { 
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
+  this->SendStream(vtkProcessModule::RENDER_SERVER_ROOT | vtkProcessModule::DATA_SERVER_ROOT);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToRenderServerAndServer()
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset(); 
+  this->SendStream(vtkProcessModule::RENDER_SERVER | vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToClientAndRenderServer()
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset(); 
+  this->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToRenderServerClientAndServer()
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset(); 
+  this->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::SendStreamToClientAndRenderServerRoot()
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset(); 
+  this->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER_ROOT);
 }
 
 //----------------------------------------------------------------------------

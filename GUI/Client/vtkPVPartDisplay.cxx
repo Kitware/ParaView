@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.34");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.35");
 
 
 //----------------------------------------------------------------------------
@@ -346,6 +346,7 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->VolumeOpacityID     = pm->NewStreamObject("vtkPiecewiseFunction");
   this->VolumeColorID       = pm->NewStreamObject("vtkColorTransferFunction");
   this->VolumeFieldFilterID = pm->NewStreamObject("vtkFieldDataToAttributeDataFilter");
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   
   stream << vtkClientServerStream::Invoke << this->VolumeID 
          << "VisibilityOff" << vtkClientServerStream::End;
@@ -368,7 +369,7 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
          << "RemoveAllPoints" << vtkClientServerStream::End;
   
-  pm->SendStreamToClientAndRenderServer();
+  pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
   
   this->Volume = 
     vtkVolume::SafeDownCast(

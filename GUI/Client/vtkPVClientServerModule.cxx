@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.80");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.81");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -676,7 +676,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   this->GetStream() 
     << vtkClientServerStream::Invoke << id << "SetupWaitForConnection"
     << vtkClientServerStream::End;
-  this->SendStreamToRenderServer();
+  this->SendStream(vtkProcessModule::RENDER_SERVER);
   // find out how many processes are running on the render server
   vtkMPIMToNSocketConnectionPortInformation* info = vtkMPIMToNSocketConnectionPortInformation::New();
   this->GatherInformationRenderServer(info, id);
@@ -707,7 +707,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   this->GetStream() 
     << vtkClientServerStream::Invoke << id << "WaitForConnection"
     << vtkClientServerStream::End;
-  this->SendStreamToRenderServer();
+  this->SendStream(vtkProcessModule::RENDER_SERVER);
   
   // now tell the data server to connect
   this->GetStream() 
@@ -864,7 +864,7 @@ void vtkPVClientServerModule::GatherInformationRenderServer(vtkPVInformation* in
     << this->GetProcessModuleID()
     << "GatherInformationInternal" << info->GetClassName() << id
     << vtkClientServerStream::End;
-  this->SendStreamToRenderServer();
+  this->SendStream(vtkProcessModule::RENDER_SERVER);
   this->GatherRenderServer = 1;
   // Gather on the client.
   this->GatherInformationInternal(NULL, NULL);
@@ -1072,171 +1072,139 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
   return *this->LastServerResultStream;
 }
 
+
+vtkTypeUInt32 vtkPVClientServerModule::CreateSendFlag(vtkTypeUInt32 servers)
+{  
+  vtkTypeUInt32 sendflag = 0;  
+
+  // for RenderServer mode keep the bit vector the same
+  // because all servers are different processes
+  if(this->RenderServerMode)
+    {
+    return servers;
+    }
+  // for data server only mode convert all render server calls
+  // into data server calls
+  if(servers & CLIENT)
+    {
+    sendflag |= CLIENT;
+    }
+  if(servers & RENDER_SERVER)
+    {
+    sendflag |= DATA_SERVER;
+    }
+  if(servers & RENDER_SERVER_ROOT)
+    {
+    sendflag |= DATA_SERVER_ROOT;
+    }
+  if(servers & DATA_SERVER)
+    {
+    sendflag |= DATA_SERVER;
+    }
+  if(servers & DATA_SERVER_ROOT)
+    {
+    sendflag |= DATA_SERVER_ROOT;
+    }
+  return sendflag;
+}
+
 //----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendStreamToClient()
-{
+int vtkPVClientServerModule::SendStreamToClient(vtkClientServerStream& stream)
+{ 
   if(!this->ClientMode)
     {
     vtkErrorMacro("Attempt to call SendStreamToClient on server node.");
-    return;
+    return -1;
     }
+
   // Just process the stream locally.
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
+  this->Interpreter->ProcessStream(stream);
+  return 0;
+}
+
+
+//----------------------------------------------------------------------------
+int vtkPVClientServerModule::SendStreamToDataServer(vtkClientServerStream& stream)
+{ 
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToDataServer on server node.");
+    return -1;
+    }
+  if (stream.GetNumberOfMessages() < 1)
+    {
+    return 1;
+    }
+  const unsigned char* data;
+  size_t len;
+  stream.GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len,
+                                     VTK_PV_CLIENTSERVER_RMI_TAG);
+  return 0;
 }
 
 //----------------------------------------------------------------------------
-// This sends the current stream to the server
-void vtkPVClientServerModule::SendStreamToServer()
+int vtkPVClientServerModule::SendStreamToDataServerRoot(vtkClientServerStream& stream)
 {
   if(!this->ClientMode)
     {
-    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
-    return;
+    vtkErrorMacro("Attempt to call SendStreamToDataServerRoot on server node.");
+    return -1;
     }
-  this->SendStreamToServerInternal();
-  this->ClientServerStream->Reset();
+  if (stream.GetNumberOfMessages() < 1)
+    {
+    return 0;
+    }
+  const unsigned char* data;
+  size_t len;
+  stream.GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len,
+                                     VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
+  return 0;
 }
 
-
-
 //----------------------------------------------------------------------------
-// This sends the current stream to the server
-void vtkPVClientServerModule::SendStreamToRenderServerRoot()
+int vtkPVClientServerModule::SendStreamToRenderServer(vtkClientServerStream& stream)
 {  
-  if(!this->ClientMode)
+  if (stream.GetNumberOfMessages() < 1)
     {
-    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
-    return;
+    return 0;
     }
-  this->SendStreamToRenderServerRootInternal();
-  this->ClientServerStream->Reset();
+  if(!this->RenderServerMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToRenderServer when not in renderserver mode.");
+    return -1;
+    }
+
+  const unsigned char* data;
+  size_t len;
+  stream.GetData(&data, &len);
+  this->RenderServerSocket->TriggerRMI(1, (void*)(data), len,
+                                       VTK_PV_CLIENTSERVER_RMI_TAG);
+  return 0;
 }
 
 //----------------------------------------------------------------------------
-// This sends the current stream to the server
-void vtkPVClientServerModule::SendStreamToRenderServer()
-{ 
-  if(!this->ClientMode)
-    {
-    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
-    return;
-    }
-  this->SendStreamToRenderServerInternal();
-  this->ClientServerStream->Reset();
-}
-
-
-//----------------------------------------------------------------------------
-// This sends the current stream to the server
-void vtkPVClientServerModule::SendStreamToRenderServerClientAndServer()
-{ 
-  if(!this->ClientMode)
-    {
-    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
-    return;
-    }
-  if(this->RenderServerMode)
-    {
-    this->SendStreamToRenderServerInternal();
-    }
-  this->SendStreamToServerInternal(); 
-  this->SendStreamToClient();
-}
-
-
-//----------------------------------------------------------------------------
-// This sends the current stream to the server
-void vtkPVClientServerModule::SendStreamToRenderServerAndServerRoot()
+int vtkPVClientServerModule::SendStreamToRenderServerRoot(vtkClientServerStream& stream)
 {
-  if(!this->ClientMode)
+  if (stream.GetNumberOfMessages() < 1)
     {
-    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
-    return;
+    return 0;
     }
-  this->SendStreamToRenderServerRootInternal();
-  this->SendStreamToServerRootInternal();
-  this->ClientServerStream->Reset();
-}
-
-
-//----------------------------------------------------------------------------
-// This sends the current stream to the server
-void vtkPVClientServerModule::SendStreamToClientAndRenderServer()
-{
-  if(!this->ClientMode)
+  if(!this->RenderServerMode)
     {
-    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
-    return;
-    }
-  this->SendStreamToRenderServerInternal();
-  this->SendStreamToClient();
-}
-
-//----------------------------------------------------------------------------
-// This sends the current stream to the server
-void vtkPVClientServerModule::SendStreamToClientAndRenderServerRoot()
-{
-  if(!this->ClientMode)
-    {
-    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
-    return;
-    }
-  this->SendStreamToRenderServerRootInternal();
-  this->SendStreamToClient();
-}
-
-
-//----------------------------------------------------------------------------
-// This sends the current stream to the server
-void vtkPVClientServerModule::SendStreamToRenderServerAndServer()
-{
-  if(!this->ClientMode)
-    {
-    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
-    return;
-    }
-  this->SendStreamToRenderServerInternal();
-  this->SendStreamToServerInternal();
-  this->ClientServerStream->Reset(); 
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendStreamToServerRoot()
-{
-  this->SendStreamToServerRootInternal();
-  this->ClientServerStream->Reset();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendStreamToClientAndServer()
-{
-  if(!this->ClientMode)
-    {
-    vtkErrorMacro("Attempt to call SendStreamToClientAndServer "
-                  "on server node.");
-    return;
+    vtkErrorMacro("Attempt to call SendStreamToRenderServerRoot when not in renderserver mode.");
+    return -1;
     }
 
-  // Send to server first, then to client.
-  this->SendStreamToServerInternal();
-  this->SendStreamToClient();
+  const unsigned char* data;
+  size_t len;
+  stream.GetData(&data, &len);
+  this->RenderServerSocket->TriggerRMI(1, (void*)(data), len,
+                                       VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
+  return 0;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendStreamToClientAndServerRoot()
-{
-  if(!this->ClientMode)
-    {
-    vtkErrorMacro("Attempt to call SendStreamToClientAndServerRoot "
-                  "on server node.");
-    return;
-    }
-
-  // Send to server root first, then to client.
-  this->SendStreamToServerRootInternal();
-  this->SendStreamToClient();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendLastClientServerResult()
@@ -1252,75 +1220,6 @@ void vtkPVClientServerModule::SendLastClientServerResult()
     this->GetSocketController()->Send((char*)(data), length, 1,
                                       VTK_PV_ROOT_RESULT_TAG);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendStreamToRenderServerInternal()
-{
-  if (this->ClientServerStream->GetNumberOfMessages() < 1)
-    {
-    return;
-    }
-
-  if(!this->RenderServerMode)
-    {
-    this->SendStreamToServerInternal();
-    return;
-    }
-  const unsigned char* data;
-  size_t len;
-  this->ClientServerStream->GetData(&data, &len);
-  this->RenderServerSocket->TriggerRMI(1, (void*)(data), len,
-                                       VTK_PV_CLIENTSERVER_RMI_TAG);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendStreamToRenderServerRootInternal()
-{
-  if (this->ClientServerStream->GetNumberOfMessages() < 1)
-    {
-    return;
-    }
-
-  if(!this->RenderServerMode)
-    {
-    this->SendStreamToServerRootInternal();
-    return;
-    }
-  const unsigned char* data;
-  size_t len;
-  this->ClientServerStream->GetData(&data, &len);
-  this->RenderServerSocket->TriggerRMI(1, (void*)(data), len,
-                                     VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendStreamToServerInternal()
-{
-  if (this->ClientServerStream->GetNumberOfMessages() < 1)
-    {
-    return;
-    }
-  const unsigned char* data;
-  size_t len;
-  this->ClientServerStream->GetData(&data, &len);
-  this->SocketController->TriggerRMI(1, (void*)(data), len,
-                                     VTK_PV_CLIENTSERVER_RMI_TAG);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClientServerModule::SendStreamToServerRootInternal()
-{
-  if (this->ClientServerStream->GetNumberOfMessages() < 1)
-    {
-    return;
-    }
-
-  const unsigned char* data;
-  size_t len;
-  this->ClientServerStream->GetData(&data, &len);
-  this->SocketController->TriggerRMI(1, (void*)(data), len,
-                                     VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
 }
 
 //----------------------------------------------------------------------------

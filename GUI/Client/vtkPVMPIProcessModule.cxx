@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.28");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.29");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -214,169 +214,103 @@ int vtkPVMPIProcessModule::GetPartitionId()
   return 0;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToClient()
+vtkTypeUInt32 vtkPVMPIProcessModule::CreateSendFlag(vtkTypeUInt32 servers)
 {
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToServer()
-{
-  this->SendStreamToServerInternal();
-  this->ClientServerStream->Reset();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToServerRootTemp(
-  vtkClientServerStream* stream)
-{
-  this->Superclass::SendStreamToServerRootTemp(stream);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToServerTemp(vtkClientServerStream* stream)
-{
-  this->SendStreamToServerInternal(stream);
-  stream->Reset();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToRenderServer()
-{
-  this->SendStreamToServer();
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToServerRoot()
-{
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToRenderServerRoot()
-{ 
-  this->SendStreamToServer();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToClientAndServer()
-{
-  this->SendStreamToServer();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToClientAndServerRoot()
-{
-  this->SendStreamToServerRoot();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToRenderServerAndServerRoot()
-{
-  this->SendStreamToServerRoot();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToClientAndRenderServerRoot()
-{
-  this->SendStreamToClientAndServerRoot();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToClientAndRenderServer()
-{
-  this->SendStreamToClientAndServer();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToRenderServerAndServer()
-{
-  this->SendStreamToServer();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToRenderServerClientAndServer()
-{
-  this->SendStreamToClientAndServer();
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToServerInternal()
-{
-  // First send the command to the other server nodes.
-  int numPartitions = this->GetNumberOfPartitions();
-  for(int i=1; i < numPartitions; ++i)
+  vtkTypeUInt32 sendflag = 0;
+  // client goes to client
+  if(servers & CLIENT)
     {
-    this->SendStreamToServerNodeInternal(i);
+    sendflag |= CLIENT;
     }
-
-  // Now process the stream locally.
-  this->Interpreter->ProcessStream(*this->ClientServerStream);
+  // data server goes to data server
+  if(servers & DATA_SERVER)
+    {
+    sendflag |= DATA_SERVER;
+    }
+  // render server goes to data server
+  if(servers & RENDER_SERVER)
+    {
+    sendflag |= DATA_SERVER;
+    }
+  // render server root goes to client
+  if(servers & RENDER_SERVER_ROOT)
+    {
+    sendflag |= CLIENT;
+    }
+  // data server root goes to client
+  if(servers & DATA_SERVER_ROOT)
+    {
+    sendflag |= CLIENT;
+    }
+  if(sendflag & CLIENT && sendflag && DATA_SERVER)
+    {
+    sendflag = DATA_SERVER;
+    }
+  
+  return sendflag;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVMPIProcessModule::SendStreamToServerInternal(
-  vtkClientServerStream* stream)
+// send a stream to the client
+int vtkPVMPIProcessModule::SendStreamToClient(vtkClientServerStream& stream)
 {
-  // First send the command to the other server nodes.
+  this->Interpreter->ProcessStream(stream);
+  return 0;
+}
+
+int vtkPVMPIProcessModule::SendStreamToDataServer(vtkClientServerStream& stream)
+{  
+  // First send the command to the other server nodes, so
+  // they can get to work first
   int numPartitions = this->GetNumberOfPartitions();
   for(int i=1; i < numPartitions; ++i)
     {
     this->SendStreamToServerNodeInternal(i, stream);
     }
-
   // Now process the stream locally.
-  this->Interpreter->ProcessStream(*stream);
+  this->Interpreter->ProcessStream(stream);
+  return 0;
 }
 
-//----------------------------------------------------------------------------
-void
-vtkPVMPIProcessModule::SendStreamToServerNodeInternal(int remoteId)
+
+int vtkPVMPIProcessModule::SendStreamToDataServerRoot(vtkClientServerStream&)
 {
-  if (this->ClientServerStream->GetNumberOfMessages() < 1)
-    {
-    return;
-    }
-
-  if(remoteId == this->Controller->GetLocalProcessId())
-    {
-    this->Interpreter->ProcessStream(*this->ClientServerStream);
-    }
-  else
-    {
-    const unsigned char* data;
-    size_t length;
-    this->ClientServerStream->GetData(&data, &length);
-    this->Controller->TriggerRMI(remoteId, (void*)data, length,
-                                 VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
-    }
+  vtkErrorMacro("SendStreamToDataServerRoot should not be called by vtkPVMPIProcessModule");
+  return -1;
 }
+
+int vtkPVMPIProcessModule::SendStreamToRenderServer(vtkClientServerStream&)
+{
+  vtkErrorMacro("SendStreamToRenderServer should not be called by vtkPVMPIProcessModule");
+  return -1;
+}
+
+int vtkPVMPIProcessModule::SendStreamToRenderServerRoot(vtkClientServerStream&)
+{
+  vtkErrorMacro("SendStreamToRenderServerRoot should not be called by vtkPVMPIProcessModule");
+  return -1;
+}
+
+  
 
 //----------------------------------------------------------------------------
 void
 vtkPVMPIProcessModule::SendStreamToServerNodeInternal(
-  int remoteId, vtkClientServerStream* stream)
+  int remoteId, vtkClientServerStream& stream)
 {
-  if (stream->GetNumberOfMessages() < 1)
+  if (stream.GetNumberOfMessages() < 1)
     {
     return;
     }
 
   if(remoteId == this->Controller->GetLocalProcessId())
     {
-    this->Interpreter->ProcessStream(*stream);
+    this->Interpreter->ProcessStream(stream);
     }
   else
     {
     const unsigned char* data;
     size_t length;
-    stream->GetData(&data, &length);
+    stream.GetData(&data, &length);
     this->Controller->TriggerRMI(remoteId, (void*)data, length,
                                  VTK_PV_SLAVE_CLIENTSERVER_RMI_TAG);
     }

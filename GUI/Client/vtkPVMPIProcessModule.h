@@ -53,29 +53,6 @@ public:
   virtual void Exit();
 
   // Description:
-  // Send the current ClientServerStream data to different places and 
-  // combinations of places.  Possible places are the Client, the 
-  // Server (data server), or the RenderServer.  Also the stream
-  // can be sent to the root of the render and data servers.
-  // Most combinations are possible.
-  virtual void SendStreamToClient();
-  virtual void SendStreamToServer();
-  virtual void SendStreamToRenderServer();
-  virtual void SendStreamToServerRoot();
-  virtual void SendStreamToRenderServerRoot(); 
-  virtual void SendStreamToClientAndServerRoot();
-  virtual void SendStreamToRenderServerAndServerRoot();
-  virtual void SendStreamToClientAndRenderServerRoot(); 
-  virtual void SendStreamToClientAndServer();
-  virtual void SendStreamToClientAndRenderServer();
-  virtual void SendStreamToRenderServerAndServer();
-  virtual void SendStreamToRenderServerClientAndServer();
-//BTX
-  virtual void SendStreamToServerRootTemp(vtkClientServerStream* stream);
-  virtual void SendStreamToServerTemp(vtkClientServerStream* stream);
-//ETX
-  
-  // Description:
   // A method for getting generic information from the server.
   virtual void GatherInformationInternal(const char* infoClassName,
                                          vtkObject* object);
@@ -95,12 +72,25 @@ protected:
   vtkPVMPIProcessModule();
   ~vtkPVMPIProcessModule();
 
-  virtual void SendStreamToServerNodeInternal(int remoteId);
-  virtual void SendStreamToServerInternal();
-
+    // Description:
+  // Given the servers that need to receive the stream, create a flag
+  // that will send it to the correct places for this process module and
+  // make sure it only gets sent to each server once.
+  virtual vtkTypeUInt32 CreateSendFlag(vtkTypeUInt32 servers);
+  // send a stream to the client
+  virtual int SendStreamToClient(vtkClientServerStream&);
+  // send a stream to the data server
+  virtual int SendStreamToDataServer(vtkClientServerStream&);
+  // send a stream to the data server root mpi process
+  virtual int SendStreamToDataServerRoot(vtkClientServerStream&);
+  // send a stream to the render server
+  virtual int SendStreamToRenderServer(vtkClientServerStream&);
+  // send a stream to the render server root mpi process
+  virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
+  
+  // send a stream to a node of the mpi group
   virtual void SendStreamToServerNodeInternal(
-    int remoteId, vtkClientServerStream* stream);
-  virtual void SendStreamToServerInternal(vtkClientServerStream* stream);
+    int remoteId, vtkClientServerStream& stream);
 
   // To pass arguments through controller single method.
   int    ArgumentCount;

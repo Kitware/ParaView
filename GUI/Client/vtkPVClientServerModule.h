@@ -127,25 +127,6 @@ public:
   // Process a client server message on the server.
   void ProcessMessage(unsigned char* arg, size_t len);
   
-  // Description:
-  // Send the current ClientServerStream data to different places and 
-  // combinations of places.  Possible places are the Client, the 
-  // Server (data server), or the RenderServer.  Also the stream
-  // can be sent to the root of the render and data servers.
-  // Most combinations are possible.
-  virtual void SendStreamToClient();
-  virtual void SendStreamToServer();
-  virtual void SendStreamToRenderServer();
-  virtual void SendStreamToServerRoot();
-  virtual void SendStreamToRenderServerRoot(); 
-  virtual void SendStreamToClientAndServerRoot();
-  virtual void SendStreamToRenderServerAndServerRoot();
-  virtual void SendStreamToClientAndRenderServerRoot(); 
-  virtual void SendStreamToClientAndServer();
-  virtual void SendStreamToClientAndRenderServer();
-  virtual void SendStreamToRenderServerAndServer();
-  virtual void SendStreamToRenderServerClientAndServer();
-
   //BTX
   // Description:
   // Return a message containing the result of the last SendMessages call.
@@ -167,20 +148,25 @@ protected:
   ~vtkPVClientServerModule();
 
   // Description:
+  // Given the servers that need to receive the stream, create a flag
+  // that will send it to the correct places for this process module and
+  // make sure it only gets sent to each server once.
+  virtual vtkTypeUInt32 CreateSendFlag(vtkTypeUInt32 servers);
+  // send a stream to the client
+  virtual int SendStreamToClient(vtkClientServerStream&);
+  // send a stream to the data server
+  virtual int SendStreamToDataServer(vtkClientServerStream&);
+  // send a stream to the data server root mpi process
+  virtual int SendStreamToDataServerRoot(vtkClientServerStream&);
+  // send a stream to the render server
+  virtual int SendStreamToRenderServer(vtkClientServerStream&);
+  // send a stream to the render server root mpi process
+  virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
+  
+  
+  // Description:
   // Send the last client server result to the client called from an RMI
   void SendLastClientServerResult();
-  // Description:
-  // Actually send a stream to the server with the socket connection.
-  void SendStreamToServerInternal();
-  // Description:
-  // Send a stream to the root node of the server
-  void SendStreamToServerRootInternal();
-  // Description:
-  // Actually send a stream to the server with the socket connection.
-  void SendStreamToRenderServerInternal();
-  // Description:
-  // Send a stream to the root node of the server
-  void SendStreamToRenderServerRootInternal();
   // Description:
   // Connect to servers or clients, this will either set up a wait
   // loop waiting for a connection, or it will create a 

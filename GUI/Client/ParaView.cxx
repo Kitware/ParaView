@@ -60,6 +60,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkPVFiltersInstantiator.h"
 #include "vtkSMInstantiator.h"
 #include "vtkParaViewInstantiator.h"
+#include "vtkClientServerInterpreter.h"
 
 static void ParaViewEnableMSVCDebugHook();
 static void ParaViewEnableWindowsExceptionFilter();
@@ -220,6 +221,21 @@ int MyMain(int argc, char *argv[])
   pm->SetApplication(app);
   app->SetProcessModule(pm);
   pm->InitializeInterpreter();
+  if(getenv("VTK_CLIENT_SERVER_LOG"))
+    {
+    if(app->GetClientMode())
+      {
+      pm->GetInterpreter()->SetLogFile("paraviewClient.log");
+      }
+    if(serverMode)
+      {
+      pm->GetInterpreter()->SetLogFile("paraviewServer.log");
+      }
+    if(renderServerMode)
+      {
+      pm->GetInterpreter()->SetLogFile("paraviewRenderServer.log");
+      }
+    }
   ParaViewInitializeInterpreter(pm);
   
   // Start the application's event loop.  This will enable

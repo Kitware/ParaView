@@ -34,6 +34,21 @@ class vtkClientServerStream;
 class VTK_EXPORT vtkProcessModule : public vtkObject
 {
 public:
+//BTX
+  // Description: 
+  // These flags are used to specify destination servers for the
+  // SendStream function.
+  enum ServerFlags
+  {
+    DATA_SERVER = 0x1,
+    CLIENT = 0x2,
+    RENDER_SERVER = 0x4,
+    DATA_SERVER_ROOT = 0x8,
+    RENDER_SERVER_ROOT = 0x10,
+    CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
+  };
+//ETX
+  
   static vtkProcessModule* New();
   vtkTypeRevisionMacro(vtkProcessModule,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -91,7 +106,19 @@ public:
   // Return a message containing the result of the last call made on
   // the client.
   virtual const vtkClientServerStream& GetLastClientResult();
+  
+   // Description:
+  // Send a vtkClientServerStream to the specified servers.
+  // Servers are specified with a bit vector.   To send to more
+  // than one server use the bitwise or operator to combine servers.
+  // The stream can either be passed in or the current stream will
+  // be used.  If the current stream is used, then the stream is cleared
+  // after the call.  If a stream is passed the resetStream flag determines
+  // if Reset is called on the stream after it is sent.
+  int SendStream(vtkTypeUInt32 server);
+  int SendStream(vtkTypeUInt32 server, vtkClientServerStream&, bool resetStream=true);
 //ETX
+
   
   // Description:
   // Send the current ClientServerStream data to different places and 
@@ -167,6 +194,24 @@ protected:
   vtkProcessModule();
   ~vtkProcessModule();
 
+  // Description:
+  // Given the servers that need to receive the stream, create a flag
+  // that will send it to the correct places for this process module and
+  // make sure it only gets sent to each server once.
+  virtual vtkTypeUInt32 CreateSendFlag(vtkTypeUInt32 servers);
+  // send a stream to the client
+  virtual int SendStreamToClient(vtkClientServerStream&);
+  // send a stream to the data server
+  virtual int SendStreamToDataServer(vtkClientServerStream&);
+  // send a stream to the data server root mpi process
+  virtual int SendStreamToDataServerRoot(vtkClientServerStream&);
+  // send a stream to the render server
+  virtual int SendStreamToRenderServer(vtkClientServerStream&);
+  // send a stream to the render server root mpi process
+  virtual int SendStreamToRenderServerRoot(vtkClientServerStream&);
+
+  
+  
   static void InterpreterCallbackFunction(vtkObject* caller,
                                           unsigned long eid,
                                           void* cd, void* d);
