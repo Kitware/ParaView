@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.286");
+vtkCxxRevisionMacro(vtkPVData, "1.287");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2466,9 +2466,16 @@ void vtkPVData::CenterCamera()
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
+    vtkPVWindow* window = this->GetPVSource()->GetPVWindow();
+    window->SetCenterOfRotation(0.5*(bounds[0]+bounds[1]), 
+                                0.5*(bounds[2]+bounds[3]),
+                                0.5*(bounds[4]+bounds[5]));
+    window->ResetCenterCallback();
+
     ren->ResetCamera(bounds[0], bounds[1], bounds[2], 
                      bounds[3], bounds[4], bounds[5]);
     ren->ResetCameraClippingRange();
+        
     if ( this->GetPVRenderView() )
       {
       this->GetPVRenderView()->EventuallyRender();
