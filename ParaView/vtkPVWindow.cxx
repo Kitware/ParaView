@@ -50,7 +50,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageMandelbrotSource.h"
 
 #include "vtkPVSourceInterface.h"
-
+#include "vtkPVEnSightReaderInterface.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -541,7 +541,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
   sInt = NULL;
-  
+
   // ============= PolyData Sources ==============  
   
   // ---- STL Reader ----
@@ -758,6 +758,28 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->Delete();
   mInt = NULL;
   // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ============= DataSet Sources ==============  
+  
+  // ---- EnSightGoldReader ----.
+  sInt = vtkPVEnSightReaderInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkEnSightGoldReader");
+  sInt->SetRootName("EnSightGoldReader");
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- EnSight6Reader ----.
+  sInt = vtkPVEnSightReaderInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkEnSight6Reader");
+  sInt->SetRootName("EnSight6Reader");
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
   sInt = NULL;
