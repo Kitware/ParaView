@@ -402,7 +402,7 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
 		 this->Icons[this->NumberOfPages]->GetWidgetName(),
 		 this->Buttons[this->NumberOfPages]->GetWidgetName(),
 #ifdef _WIN32
-		 -4, 0
+		 -3, 0
 #else
 		 +1, 1
 #endif
@@ -410,10 +410,6 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
     this->Script("bind %s  <ButtonRelease-1> {%s invoke}",
 		 this->Icons[this->NumberOfPages]->GetWidgetName(),
 		 this->Buttons[this->NumberOfPages]->GetWidgetName());    
-    /*
-    this->Script("bind %s  <Button-1> {puts hi}",
-		 this->Icons[this->NumberOfPages]->GetWidgetName());
-    */
     }
   
   this->NumberOfPages++;

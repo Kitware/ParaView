@@ -47,8 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWImageLabel.h"
 #include "vtkKWIcon.h"
 
-#include "icons.h"
-
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
 
