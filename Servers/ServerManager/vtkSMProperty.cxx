@@ -31,10 +31,11 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.21");
+vtkCxxRevisionMacro(vtkSMProperty, "1.22");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
+vtkCxxSetObjectMacro(vtkSMProperty, InformationProperty, vtkSMProperty);
 
 int vtkSMProperty::CheckDomains = 1;
 int vtkSMProperty::ModifiedAtCreation = 1;

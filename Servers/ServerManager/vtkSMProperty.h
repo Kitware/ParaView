@@ -254,7 +254,7 @@ protected:
 
   vtkSMInformationHelper* InformationHelper;
 
-  vtkSetObjectMacro(InformationProperty, vtkSMProperty);
+  void SetInformationProperty(vtkSMProperty* ip);
   vtkSMProperty* InformationProperty;
 
 private:
