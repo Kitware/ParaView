@@ -50,9 +50,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDirectory.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
-#include "vtkKWSplitFrame.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkKWListBox.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
@@ -61,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
+#include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWToolbar.h"
 #include "vtkLinkedList.txx"
@@ -90,9 +92,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWriter.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 #include "vtkString.h"
 #include "vtkToolkits.h"
-#include "vtkRenderer.h"
 
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
@@ -112,7 +115,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.363");
+vtkCxxRevisionMacro(vtkPVWindow, "1.364");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1828,22 +1831,19 @@ int vtkPVWindow::Open(char *openFileName, int store)
 {
   if (this->CheckIfFileIsReadable(openFileName) != VTK_OK)
     {
-    char* error = new char[vtkString::Length("Can not open file ")
-                           + vtkString::Length(openFileName) 
-                           + vtkString::Length(" for reading.") 
-                          + 2];
-    sprintf(error,"Can not open file %s for reading.", openFileName);
+    ostrstream error;
+    error << "Can not open file " << openFileName << " for reading." << ends;
     if (this->UseMessageDialog)
       {
-      vtkKWMessageDialog::PopupMessage(this->Application, this,
-                                       "Error",  error,
-                                       vtkKWMessageDialog::ErrorIcon);
+      vtkKWMessageDialog::PopupMessage(
+        this->GetApplication(), this, "Open Error", error.str(), 
+        vtkKWMessageDialog::ErrorIcon | vtkKWMessageDialog::Beep);
       }
     else
       {
       vtkErrorMacro(<<error);
       }
-    delete [] error;
+    error.rdbuf()->freeze(0);
     return VTK_ERROR;
     }
 
@@ -1865,25 +1865,14 @@ int vtkPVWindow::Open(char *openFileName, int store)
     {
     vtkPVReaderModule* rm = 0;
     int retVal = it->GetData(rm);
-    if (retVal == VTK_OK && rm->CanReadFile(openFileName))
+    if (retVal == VTK_OK && rm->CanReadFile(openFileName) &&
+        this->OpenWithReader(openFileName, rm) == VTK_OK )
       {
-      vtkPVReaderModule* clone = 0;
-      // Read the file. On success this will return a new source.
-      // Add that source to the list of sources.
-      if (rm->ReadFile(openFileName, clone) == VTK_OK && clone)
-        {
-        this->AddPVSource("Sources", clone);
-        if (clone->GetAcceptAfterRead())
-          {
-          clone->Accept(0);
-          }
-        clone->Delete();
-        }
-      it->Delete();
       if ( store )
         {
         this->AddRecentFile(NULL, openFileName, this, "Open");
         }
+      it->Delete();
       return VTK_OK;
       }
     it->GoToNextItem();
@@ -1896,9 +1885,131 @@ int vtkPVWindow::Open(char *openFileName, int store)
         << openFileName << ends;
   if (this->UseMessageDialog)
     {
-    vtkKWMessageDialog::PopupMessage(
-      this->GetApplication(), this, "Open Error", error.str(), 
-      vtkKWMessageDialog::ErrorIcon);
+    if ( vtkKWMessageDialog::PopupOkCancel(this->Application, this,
+                                           "Open Error",  error.str(),
+                                           vtkKWMessageDialog::ErrorIcon |
+                                           vtkKWMessageDialog::CancelDefault |
+                                           vtkKWMessageDialog::Beep ) )
+      {
+      vtkKWApplication* app = this->Application;
+
+      // Create
+      vtkKWDialog *dialog = vtkKWDialog::New();
+      dialog->Create(app, 0);
+      dialog->SetTitle("Open Data With...");
+      vtkKWLabel* label = vtkKWLabel::New();
+      label->SetParent(dialog);
+      ostrstream str1;
+      str1 << "Open " << openFileName << " with:" << ends;
+      label->SetLabel(str1.str());
+      label->Create(app, 0);
+      str1.rdbuf()->freeze(0);
+
+      vtkKWLabel* label1 = vtkKWLabel::New();
+      label1->SetParent(dialog);
+      label1->SetWidth(300);
+      label1->SetLineType(vtkKWLabel::MultiLine);
+      ostrstream str2;
+      str2 << "Opening file " << openFileName << " with a custom reader "
+           << "may results in unpredictable result such as ParaView may "
+           << "crash. Make sure to pick the right reader." << ends;
+      label1->SetLabel(str2.str());
+      label1->Create(app, 0);
+      str2.rdbuf()->freeze(0);
+
+      vtkKWListBox* listbox = vtkKWListBox::New();
+      listbox->SetParent(dialog);
+      listbox->Create(app, 0);
+      int num = 5;
+      if ( this->ReaderList->GetNumberOfItems() < num )
+        {
+        num = this->ReaderList->GetNumberOfItems();
+        }
+      if ( num < 1 )
+        {
+        num = 1;
+        }
+      listbox->SetHeight(num);      
+      
+      vtkKWFrame* bframe = vtkKWFrame::New();
+      bframe->SetParent(dialog);
+      bframe->Create(app, 0);
+
+      vtkKWPushButton* button = vtkKWPushButton::New();
+      button->SetParent(bframe->GetFrame());
+      button->Create(app, 0);
+      button->SetLabel("Cancel");
+      button->SetCommand(dialog, "Cancel");
+
+      vtkKWPushButton* button1 = vtkKWPushButton::New();
+      button1->SetParent(bframe->GetFrame());
+      button1->Create(app, 0);
+      button1->SetLabel("OK");
+      button1->SetCommand(dialog, "OK");
+
+      this->Script("pack %s %s %s %s -padx 5 -pady 5 -side top", 
+                   label->GetWidgetName(),
+                   listbox->GetWidgetName(),
+                   label1->GetWidgetName(),
+                   bframe->GetWidgetName());
+      this->Script("pack %s %s -padx 5 -pady 5 -side left",
+                   button->GetWidgetName(),
+                   button1->GetWidgetName());
+
+      vtkLinkedListIterator<vtkPVReaderModule*>* it = 
+        this->ReaderList->NewIterator();
+      while(!it->IsDoneWithTraversal())
+        {
+        vtkPVReaderModule* rm = 0;
+        if ( it->GetData(rm) == VTK_OK && rm && rm->GetDescription() )
+          {
+          ostrstream str;
+          str << rm->GetDescription() << " reader" << ends;
+          listbox->AppendUnique(str.str());
+          str.rdbuf()->freeze(0);
+          }
+        it->GoToNextItem();
+        }
+      it->Delete();
+      listbox->SetSelectionIndex(0);
+      listbox->SetDoubleClickCallback(dialog, "OK");
+
+      // invoke
+      int res = dialog->Invoke();
+      if ( res == 1 )
+        {
+        vtkPVReaderModule* reader = 0;
+        if ( this->ReaderList->GetItem(listbox->GetSelectionIndex(),
+                                       reader) == VTK_OK && reader )
+          {
+          if ( this->OpenWithReader(openFileName, reader) != VTK_OK )
+            {
+            ostrstream error;
+            error << "Can not open file " << openFileName << " for reading." << ends;
+            if (this->UseMessageDialog)
+              {
+              vtkKWMessageDialog::PopupMessage(
+                this->GetApplication(), this, "Open Error", error.str(), 
+                vtkKWMessageDialog::ErrorIcon | vtkKWMessageDialog::Beep);
+              }
+            else
+              {
+              vtkErrorMacro(<<error);
+              }
+            error.rdbuf()->freeze(0);
+            }
+          }
+        }
+
+      // Cleanup
+      bframe->Delete();
+      listbox->Delete();
+      button->Delete();
+      button1->Delete();
+      label->Delete();
+      label1->Delete();
+      dialog->Delete();
+      }    
     }
   else
     {
@@ -1907,6 +2018,24 @@ int vtkPVWindow::Open(char *openFileName, int store)
   error.rdbuf()->freeze(0);     
 
   return VTK_ERROR;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVWindow::OpenWithReader(char *fileName, vtkPVReaderModule* reader)
+{
+  vtkPVReaderModule* clone = 0;
+  // Read the file. On success this will return a new source.
+  // Add that source to the list of sources.
+  if (reader->ReadFile(fileName, clone) == VTK_OK && clone)
+    {
+    this->AddPVSource("Sources", clone);
+    if (clone->GetAcceptAfterRead())
+      {
+      clone->Accept(0);
+      }
+    clone->Delete();
+    }
+  return VTK_OK;
 }
 
 //----------------------------------------------------------------------------
@@ -2055,8 +2184,6 @@ void vtkPVWindow::WriteData()
   saveDialog->SetTitle("Save Data");
   saveDialog->SetDefaultExt(defaultExtension);
   saveDialog->SetFileTypes(types);
-  char *filename = 0;
-  
   // Ask the user for the filename.  Default the extension to the
   // first writer supported.
 
@@ -3592,7 +3719,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.363 $");
+  this->ExtractRevision(os,"$Revision: 1.364 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3934,6 +4061,25 @@ void vtkPVWindow::DeleteAllSources()
       break;
       }
     this->DeleteSourceAndOutputs(source);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SetInteraction(int s)
+{
+  vtkPVGenericRenderWindowInteractor* rwi = this->GetGenericInteractor();
+  vtkRenderWindow* rw = this->GetMainView()->GetRenderWindow();
+  if ( !rwi || !rw )
+    {
+    return;
+    }
+  if ( s )
+    {
+    rw->SetDesiredUpdateRate(rwi->GetDesiredUpdateRate());
+    }
+  else
+    {    
+    rw->SetDesiredUpdateRate(rwi->GetStillUpdateRate());
     }
 }
 

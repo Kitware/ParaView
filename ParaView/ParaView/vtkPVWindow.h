@@ -244,6 +244,7 @@ public:
   // recently used files list.
   int Open(char *fileName, int store);
   int Open(char *fileName) { return this->Open(fileName, 0); }
+  int OpenWithReader(char *fileName, vtkPVReaderModule* reader);
 
   // Description:
   // Play the demo.
@@ -449,6 +450,11 @@ public:
   // Description:
   // Callback to handle toolbar settings change
   void OnToolbarSettingsChange();
+
+  // Description:
+  // Go to interaction or back to regular rendering speed.
+  virtual void SetInteraction(int s);
+  vtkBooleanMacro(Interaction,int);
 
 protected:
   vtkPVWindow();
