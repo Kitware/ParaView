@@ -1,93 +1,93 @@
-PROJECT(Widgets)
+PROJECT(KWWidgets)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
 SET( KWWidgets_SRCS
-${VTK_TCL_HOME}/vtktcl.c
-vtkCornerAnnotation.cxx
-vtkKWActorComposite.cxx 
-vtkKWApplication.cxx 
-vtkKWApplicationSettingsInterface.cxx
-vtkKWBWidgets.cxx
-vtkKWCanvas.cxx 
-vtkKWChangeColorButton.cxx 
-vtkKWCheckButton.cxx 
-vtkKWCheckButtonSet.cxx 
-vtkKWCheckButtonWithChangeColor.cxx
-vtkKWComposite.cxx 
-vtkKWCompositeCollection.cxx 
-vtkKWCornerAnnotation.cxx 
-vtkKWDialog.cxx 
-vtkKWEntry.cxx 
-vtkKWExtent.cxx 
-vtkKWFrame.cxx
-vtkKWGenericComposite.cxx 
-vtkKWHeaderAnnotation.cxx 
-vtkKWLabel.cxx
-vtkKWLabeledCheckButton.cxx
-vtkKWLabeledCheckButtonSet.cxx 
-vtkKWLabeledEntry.cxx 
-vtkKWLabeledFrame.cxx 
-vtkKWLabeledLabel.cxx 
-vtkKWLabeledLabelSet.cxx
-vtkKWLabeledLoadSaveButton.cxx
-vtkKWLabeledOptionMenu.cxx 
-vtkKWLabeledPopupButton.cxx 
-vtkKWLabeledPushButton.cxx
-vtkKWLabeledPushButtonSet.cxx 
-vtkKWLabeledRadioButtonSet.cxx 
-vtkKWLabeledScaleSet.cxx 
-vtkKWLabeledText.cxx 
-vtkKWLabeledWidget.cxx 
-vtkKWListBox.cxx 
-vtkKWListSelectOrder.cxx
-vtkKWLoadSaveButton.cxx
-vtkKWLoadSaveDialog.cxx
-vtkKWMenu.cxx 
-vtkKWMenuButton.cxx 
-vtkKWMessageDialog.cxx 
-vtkKWNotebook.cxx 
-vtkKWOKCancelDialog.cxx 
-vtkKWObject.cxx 
-vtkKWOptionMenu.cxx 
-vtkKWPopupButton.cxx 
-vtkKWPopupFrame.cxx 
-vtkKWPopupFrameCheckButton.cxx 
-vtkKWProgressGauge.cxx 
-vtkKWPushButton.cxx 
-vtkKWPushButtonSet.cxx 
-vtkKWRadioButton.cxx 
-vtkKWRadioButtonSet.cxx
-vtkKWRange.cxx 
-vtkKWRenderWidget.cxx 
-vtkKWRenderWidgetCallbackCommand.cxx 
-vtkKWSaveImageDialog.cxx 
-vtkKWScalarBarAnnotation.cxx 
-vtkKWScalarComponentSelectionWidget.cxx
-vtkKWScale.cxx 
-vtkKWScaleSet.cxx 
-vtkKWSegmentedProgressGauge.cxx
-vtkKWSelectionFrame.cxx
-vtkKWSimpleEntryDialog.cxx
-vtkKWSplashScreen.cxx
-vtkKWSplitFrame.cxx
-vtkKWTclInteractor.cxx
-vtkKWText.cxx 
-vtkKWTextProperty.cxx
-vtkKWThumbWheel.cxx
-vtkKWTkUtilities.cxx
-vtkKWToolbar.cxx 
-vtkKWToolbarSet.cxx 
-vtkKWUserInterfaceManager.cxx
-vtkKWUserInterfaceNotebookManager.cxx
-vtkKWUserInterfacePanel.cxx
-vtkKWView.cxx 
-vtkKWViewCollection.cxx 
-vtkKWWidget.cxx 
-vtkKWWidgetCollection.cxx 
-vtkKWWindow.cxx 
-vtkKWWindowCollection.cxx 
-vtkKWXtEmbeddedWidget.cxx 
-)
+  ${VTK_TCL_HOME}/vtktcl.c
+  vtkCornerAnnotation.cxx
+  vtkKWActorComposite.cxx 
+  vtkKWApplication.cxx 
+  vtkKWApplicationSettingsInterface.cxx
+  vtkKWBWidgets.cxx
+  vtkKWCanvas.cxx 
+  vtkKWChangeColorButton.cxx 
+  vtkKWCheckButton.cxx 
+  vtkKWCheckButtonSet.cxx 
+  vtkKWCheckButtonWithChangeColor.cxx
+  vtkKWComposite.cxx 
+  vtkKWCompositeCollection.cxx 
+  vtkKWCornerAnnotation.cxx 
+  vtkKWDialog.cxx 
+  vtkKWEntry.cxx 
+  vtkKWExtent.cxx 
+  vtkKWFrame.cxx
+  vtkKWGenericComposite.cxx 
+  vtkKWHeaderAnnotation.cxx 
+  vtkKWLabel.cxx
+  vtkKWLabeledCheckButton.cxx
+  vtkKWLabeledCheckButtonSet.cxx 
+  vtkKWLabeledEntry.cxx 
+  vtkKWLabeledFrame.cxx 
+  vtkKWLabeledLabel.cxx 
+  vtkKWLabeledLabelSet.cxx
+  vtkKWLabeledLoadSaveButton.cxx
+  vtkKWLabeledOptionMenu.cxx 
+  vtkKWLabeledPopupButton.cxx 
+  vtkKWLabeledPushButton.cxx
+  vtkKWLabeledPushButtonSet.cxx 
+  vtkKWLabeledRadioButtonSet.cxx 
+  vtkKWLabeledScaleSet.cxx 
+  vtkKWLabeledText.cxx 
+  vtkKWLabeledWidget.cxx 
+  vtkKWListBox.cxx 
+  vtkKWListSelectOrder.cxx
+  vtkKWLoadSaveButton.cxx
+  vtkKWLoadSaveDialog.cxx
+  vtkKWMenu.cxx 
+  vtkKWMenuButton.cxx 
+  vtkKWMessageDialog.cxx 
+  vtkKWNotebook.cxx 
+  vtkKWOKCancelDialog.cxx 
+  vtkKWObject.cxx 
+  vtkKWOptionMenu.cxx 
+  vtkKWPopupButton.cxx 
+  vtkKWPopupFrame.cxx 
+  vtkKWPopupFrameCheckButton.cxx 
+  vtkKWProgressGauge.cxx 
+  vtkKWPushButton.cxx 
+  vtkKWPushButtonSet.cxx 
+  vtkKWRadioButton.cxx 
+  vtkKWRadioButtonSet.cxx
+  vtkKWRange.cxx 
+  vtkKWRenderWidget.cxx 
+  vtkKWRenderWidgetCallbackCommand.cxx 
+  vtkKWSaveImageDialog.cxx 
+  vtkKWScalarBarAnnotation.cxx 
+  vtkKWScalarComponentSelectionWidget.cxx
+  vtkKWScale.cxx 
+  vtkKWScaleSet.cxx 
+  vtkKWSegmentedProgressGauge.cxx
+  vtkKWSelectionFrame.cxx
+  vtkKWSimpleEntryDialog.cxx
+  vtkKWSplashScreen.cxx
+  vtkKWSplitFrame.cxx
+  vtkKWTclInteractor.cxx
+  vtkKWText.cxx 
+  vtkKWTextProperty.cxx
+  vtkKWThumbWheel.cxx
+  vtkKWTkUtilities.cxx
+  vtkKWToolbar.cxx 
+  vtkKWToolbarSet.cxx 
+  vtkKWUserInterfaceManager.cxx
+  vtkKWUserInterfaceNotebookManager.cxx
+  vtkKWUserInterfacePanel.cxx
+  vtkKWView.cxx 
+  vtkKWViewCollection.cxx 
+  vtkKWWidget.cxx 
+  vtkKWWidgetCollection.cxx 
+  vtkKWWindow.cxx 
+  vtkKWWindowCollection.cxx 
+  vtkKWXtEmbeddedWidget.cxx 
+  )
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWComposite.cxx
@@ -107,28 +107,28 @@ SET_SOURCE_FILES_PROPERTIES(
 IF (NOT DO_NOT_BUILD_XML_RW)
   INCLUDE_DIRECTORIES(
     ${KWCommon_SOURCE_DIR}/XML
-    ${Widgets_SOURCE_DIR}/XML
-  )
+    ${KWWidgets_SOURCE_DIR}/XML
+    )
   SET (KWWidgets_SRCS ${KWWidgets_SRCS}
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationReader.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationWriter.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetReader.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetWriter.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceManagerReader.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceManagerWriter.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceNotebookManagerReader.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceNotebookManagerWriter.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWWindowReader.cxx
-    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWWindowWriter.cxx
-  )
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationReader.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationWriter.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetReader.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetWriter.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceManagerReader.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceManagerWriter.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceNotebookManagerReader.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceNotebookManagerWriter.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWWindowReader.cxx
+    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWWindowWriter.cxx
+    )
 ELSE (NOT DO_NOT_BUILD_XML_RW)
   SET_SOURCE_FILES_PROPERTIES(
-	vtkKWScalarBarAnnotation.cxx 
+    vtkKWScalarBarAnnotation.cxx 
     vtkKWApplication.cxx 
     vtkKWCornerAnnotation.cxx 
     vtkKWHeaderAnnotation.cxx 
     COMPILE_FLAGS -DDO_NOT_BUILD_XML_RW
-  )
+    )
 ENDIF (NOT DO_NOT_BUILD_XML_RW)
 
 # If needed, copy the Tcl/Tk support files needed for vtkKWApplication
@@ -140,9 +140,9 @@ IF (TCL_TK_COPY_SUPPORT_LIBRARY)
 
     IF (CXX_TEST_PATH)
       VTK_COPY_TCL_TK_SUPPORT_FILES_TO_BUILD_DIR (
-         ${TCL_SUPPORT_LIBRARY_PATH}
-         ${TK_SUPPORT_LIBRARY_PATH}
-         ${CXX_TEST_PATH} "TclTk/lib")
+        ${TCL_SUPPORT_LIBRARY_PATH}
+        ${TK_SUPPORT_LIBRARY_PATH}
+        ${CXX_TEST_PATH} "TclTk/lib")
     ENDIF (CXX_TEST_PATH)
 
     VTK_GET_TCL_TK_VERSION ("TCL_TK_MAJOR_VERSION" "TCL_TK_MINOR_VERSION")
@@ -170,31 +170,31 @@ ENDIF (TCL_TK_COPY_SUPPORT_LIBRARY)
 IF (WIN32)
   SET( KWWidgets_SRCS ${KWWidgets_SRCS}
     kwappicon.c
-  )
+    )
   SET_SOURCE_FILES_PROPERTIES(
     kwappicon 
     WRAP_EXCLUDE
-  )
+    )
 ENDIF (WIN32)
 
 VTK_WRAP_TCL2(vtkKWWidgetsTCL KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
 ADD_LIBRARY(vtkKWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 
 TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL
-vtkKWCommonTCL
-vtkHybridTCL
-vtkHybrid
-)
+  vtkKWCommon
+  vtkHybrid
+  vtkCommonTCL
+  )
 
-IF (VTK_USE_PARALLEL)
+IF (VTK_USE_PARALLEL AND VTK_WRAP_TCL)
   TARGET_LINK_LIBRARIES(vtkKWWidgetsTCL vtkParallelTCL)
-ENDIF (VTK_USE_PARALLEL)
+ENDIF (VTK_USE_PARALLEL AND VTK_WRAP_TCL)
 
-IF (VTK_USE_PATENTED)
+IF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
   TARGET_LINK_LIBRARIES(vtkKWWidgetsTCL vtkPatentedTCL)
-ENDIF (VTK_USE_PATENTED)
+ENDIF (VTK_USE_PATENTED AND VTK_WRAP_TCL)
 
-SET(VTK_WRAP_HINTS ${Widgets_SOURCE_DIR}/hints)
+SET(VTK_WRAP_HINTS ${KWWidgets_SOURCE_DIR}/hints)
 
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
@@ -207,8 +207,8 @@ ENDIF(NOT WIN32)
 OPTION(USE_NOTEBOOK_ICONS "Display Notebook with icons." OFF)
 MARK_AS_ADVANCED(USE_NOTEBOOK_ICONS)
 
-CONFIGURE_FILE(${KWWIDGETS_SOURCE_DIR}/vtkKWWidgetsConfigure.h.in ${KWWIDGETS_BINARY_DIR}/vtkKWWidgetsConfigure.h)
-INCLUDE_DIRECTORIES(${KWWIDGETS_BINARY_DIR})
+CONFIGURE_FILE(${KWWidgets_SOURCE_DIR}/vtkKWWidgetsConfigure.h.in ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
+INCLUDE_DIRECTORIES(${KWWidgets_BINARY_DIR})
 
 IF(BUILD_SHARED_LIBS)
   IF(NOT KW_INSTALL_LIB_DIR)
