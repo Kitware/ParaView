@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.83");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.84");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -265,7 +265,6 @@ void vtkPVClientServerModule::Initialize()
       { 
       this->RenderServerSocket->Receive(&numServerProcs, 1, 1, 8843);
       this->NumberOfRenderServerProcesses = numServerProcs;
-//      this->Interpreter->SetLogFile("./client.log");
       }
 
     // attempt to initialize render server connection to data server
@@ -297,15 +296,6 @@ void vtkPVClientServerModule::Initialize()
   else if (myId == 0)
     { // process 0 of Server
     // send the number of server processes as a handshake. 
-    if(this->RenderServerMode)
-      {
-//      this->Interpreter->SetLogFile("./renderserver.log");
-      }
-    else
-      {
-//      this->Interpreter->SetLogFile("./dataserver.log");
-      }
-    
     this->SocketController->Send(&numProcs, 1, 1, 8843);
 
         //
@@ -651,16 +641,31 @@ void vtkPVClientServerModule::InitializeRenderServer()
     {
     return;
     }
+  int connectingServer;
+  int waitingServer;
   int numberOfRenderNodes = 0;
+  if(this->RenderServerMode == 1)
+    {
+    connectingServer = vtkProcessModule::DATA_SERVER;
+    waitingServer = vtkProcessModule::RENDER_SERVER;
+    }
+  else
+    {
+    waitingServer = vtkProcessModule::DATA_SERVER;
+    connectingServer = vtkProcessModule::RENDER_SERVER;
+    }
   // Create a vtkMPIMToNSocketConnection object on both the 
-  // data and render servers
+  // servers.  This object holds the vtkSocketCommunicator object
+  // for each machine and makes the connections
   vtkClientServerID id = this->NewStreamObject("vtkMPIMToNSocketConnection");
   this->MPIMToNSocketConnectionID = id;
   this->SendStream(vtkProcessModule::RENDER_SERVER|vtkProcessModule::DATA_SERVER);
 
-  vtkMPIMToNSocketConnectionPortInformation* info = vtkMPIMToNSocketConnectionPortInformation::New();
+  vtkMPIMToNSocketConnectionPortInformation* info 
+    = vtkMPIMToNSocketConnectionPortInformation::New();
   // if the data server is going to wait for the render server
   // then we have to tell the data server how many connections to make
+  // if the render server is waiting, it already knows how many to make
   if(this->RenderServerMode == 2)
     {
       // get the number of processes on the render server
@@ -675,8 +680,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
       this->SendStream(vtkProcessModule::DATA_SERVER);
     }
   
-  // now tell the render or data server to find out what ports it is going
-  // to use
+  // now initilaize the waiting server and have it set up the connections
   this->GetStream()  
     << vtkClientServerStream::Invoke
     << this->GetApplicationID() << "GetRenderNodePort" << vtkClientServerStream::End;
@@ -694,14 +698,7 @@ void vtkPVClientServerModule::InitializeRenderServer()
   this->GetStream() 
     << vtkClientServerStream::Invoke << id << "SetupWaitForConnection"
     << vtkClientServerStream::End;
-  if(this->RenderServerMode == 1)
-    {
-    this->SendStream(vtkProcessModule::RENDER_SERVER);
-    }
-  else
-    {
-    this->SendStream(vtkProcessModule::DATA_SERVER);
-    }
+  this->SendStream(waitingServer);
 
   // Get the information about the connection after the call to SetupWaitForConnection
   if(this->RenderServerMode == 1)
@@ -713,22 +710,14 @@ void vtkPVClientServerModule::InitializeRenderServer()
     {
       this->GatherInformation(info, id);
     }
+   // let the connecting server know how many render nodes 
   this->GetStream() 
     << vtkClientServerStream::Invoke << id 
     << "SetNumberOfConnections" << numberOfRenderNodes
     << vtkClientServerStream::End;
-  if(this->RenderServerMode == 1)
-    {
-      this->SendStream(vtkProcessModule::DATA_SERVER);
-    }
-  else
-    {
-      this->SendStream(vtkProcessModule::RENDER_SERVER);
-    }
 
-  
-  // Set up the port information for each process on the data server
-  // to match those found on the render server
+  // set up host/port information for the connecting
+  // server so it will know what machines to connect to
   for(int i=0; i < numberOfRenderNodes; ++i)
     {
     this->GetStream() 
@@ -739,38 +728,20 @@ void vtkPVClientServerModule::InitializeRenderServer()
       << info->GetProcessHostName(i)
       << vtkClientServerStream::End;
     } 
-  if(this->RenderServerMode == 1)
-    {
-      this->SendStream(vtkProcessModule::DATA_SERVER);
-    }
-  else
-    {
-      this->SendStream(vtkProcessModule::RENDER_SERVER);
-    }
-  // now tell the render server to wait for the connection
+  this->SendStream(connectingServer);
+  // all should be ready now to wait and connect
+
+  // tell the waiting server to wait for the connections
   this->GetStream() 
     << vtkClientServerStream::Invoke << id << "WaitForConnection"
     << vtkClientServerStream::End;
-  if(this->RenderServerMode == 1)
-    {
-      this->SendStream(vtkProcessModule::RENDER_SERVER);
-    }
-  else
-    {
-      this->SendStream(vtkProcessModule::DATA_SERVER);
-    }
-  // now tell the data server to connect
+  this->SendStream(waitingServer);
+
+  // tell the connecting server to make the connections
   this->GetStream() 
     << vtkClientServerStream::Invoke << id << "Connect"
     << vtkClientServerStream::End;
-  if(this->RenderServerMode == 1)
-    {
-      this->SendStream(vtkProcessModule::DATA_SERVER);
-    }
-  else
-    {
-      this->SendStream(vtkProcessModule::RENDER_SERVER);
-    }
+  this->SendStream(connectingServer);
   info->Delete();
 }
 

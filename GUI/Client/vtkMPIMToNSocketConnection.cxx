@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.11");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.12");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -129,7 +129,7 @@ void  vtkMPIMToNSocketConnection::SetupWaitForConnection()
     return;
     }
   unsigned int myId = this->Controller->GetLocalProcessId();
-  if(myId >= static_cast<unsigned int>(this->NumberOfConnections))
+  if(myId >= (unsigned int)this->NumberOfConnections)
     {
       return;
     }
@@ -234,7 +234,10 @@ void vtkMPIMToNSocketConnection::SetPortInformation(unsigned int processNumber,
     return;
     }
   this->Internals->ServerInformation[processNumber].PortNumber = port;
-  this->Internals->ServerInformation[processNumber].HostName = host;
+  if(host)
+    {
+      this->Internals->ServerInformation[processNumber].HostName = host;
+    }
 }
 
 
@@ -242,7 +245,18 @@ void vtkMPIMToNSocketConnection::SetPortInformation(unsigned int processNumber,
 void vtkMPIMToNSocketConnection::GetPortInformation(
   vtkMPIMToNSocketConnectionPortInformation* info)
 {
-  info->SetNumberOfConnections(this->Controller->GetNumberOfProcesses()); 
+  // if the number of connections are not set then
+  // use the number of processes for this group
+  // if not, then use the set number of connections
+  // this is for support of connections both ways
+  if(this->NumberOfConnections == -1)
+    {
+      info->SetNumberOfConnections(this->Controller->GetNumberOfProcesses()); 
+    }
+  else
+    {
+      info->SetNumberOfConnections(this->NumberOfConnections); 
+    }
   int myId = this->Controller->GetLocalProcessId();
   // for id = 0 set the port information for process 0 in
   // in the information object, this is because the gather does
