@@ -54,8 +54,6 @@ vtkKWView
 )
 
 
-SUBDIRS(Test)
-
 IF (WIN32)
   SOURCE_FILES( KWWidgets_SRCS vtkKWRegisteryUtilities )
   WRAP_EXCLUDE_FILES(

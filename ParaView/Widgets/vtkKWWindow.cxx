@@ -848,12 +848,12 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.36 $");
+  this->ExtractRevision(os,"$Revision: 1.37 $");
 }
 
 int vtkKWWindow::ExitDialog()
 {
-   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
+  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetStyleToYesNo();
 
   ostrstream title;
