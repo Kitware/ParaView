@@ -5,6 +5,7 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   Example-vtkLocal
   Example-vtkMy
 
+  # These tests do not actually run any VTK code
   PrintSelf-KWWidgets	
   PrintSelf-ParaView
   PrintSelf-PVServer-Common
@@ -17,6 +18,9 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   TestSetObjectMacro-PVServer-Filters
   TestSetObjectMacro-PVServer-ServerManager
   TestSetObjectMacro-PVServer-StreamInterpreter
+  
+  # this one runs python which then runs two program so no memory checking there
+  Sockets-image
   )
 
 SET(CTEST_CUSTOM_WARNING_MATCH
