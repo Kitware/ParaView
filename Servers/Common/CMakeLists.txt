@@ -21,6 +21,7 @@ SET(Common_SRCS
   vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkMPIMToNSocketConnection.cxx
   vtkPVProgressHandler.cxx
+  vtkPVOptions.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -33,6 +34,7 @@ SET_SOURCE_FILES_PROPERTIES(
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVProgressHandler.cxx
   vtkStringList.cxx
+  vtkPVOptions.cxx
   WRAP_EXCLUDE)
 SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
 SET(VTK_BINARY_DIR "${PVCommon_BINARY_DIR}")
@@ -41,6 +43,7 @@ VTK_EXPORT_KIT("PVCommon" "PVFILTERS" "${Common_SRCS}")
 SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 
 INCLUDE_DIRECTORIES(
+  ${KWSYS_INCLUDE_DIR}
   ${PVCommon_BINARY_DIR}
   ${PVCommon_SOURCE_DIR}
   ${KWCOMMON_INCLUDE_DIR}
