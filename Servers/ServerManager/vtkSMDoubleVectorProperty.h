@@ -154,6 +154,14 @@ protected:
   // before a domain check is performed.
   virtual void SetNumberOfUncheckedElements(unsigned int num);
 
+  // Description:
+  // If SetNumberCommand is set, it is called before Command
+  // with the number of arguments as the parameter.
+  vtkSetStringMacro(SetNumberCommand);
+  vtkGetStringMacro(SetNumberCommand);
+
+  char* SetNumberCommand;
+
 private:
   vtkSMDoubleVectorProperty(const vtkSMDoubleVectorProperty&); // Not implemented
   void operator=(const vtkSMDoubleVectorProperty&); // Not implemented

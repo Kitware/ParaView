@@ -22,7 +22,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.14");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.15");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -35,6 +35,7 @@ vtkSMDoubleVectorProperty::vtkSMDoubleVectorProperty()
 {
   this->Internals = new vtkSMDoubleVectorPropertyInternals;
   this->ArgumentIsArray = 0;
+  this->SetNumberCommand = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -50,6 +51,13 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
   if (!this->Command || this->IsReadOnly)
     {
     return;
+    }
+
+  if (this->SetNumberCommand)
+    {
+    *str << vtkClientServerStream::Invoke 
+         << objectId << this->SetNumberCommand << this->GetNumberOfElements()
+         << vtkClientServerStream::End;
     }
 
   if (!this->RepeatCommand)
@@ -347,6 +355,12 @@ int vtkSMDoubleVectorProperty::ReadXMLAttributes(vtkSMProxy* proxy,
   if(retVal) 
     { 
     this->SetArgumentIsArray(arg_is_array); 
+    }
+
+  const char* numCommand = element->GetAttribute("set_number_command");
+  if (numCommand)
+    {
+    this->SetSetNumberCommand(numCommand);
     }
 
   int numElems = this->GetNumberOfElements();
