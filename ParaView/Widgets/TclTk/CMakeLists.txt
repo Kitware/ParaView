@@ -4,9 +4,11 @@ SET (files
   lib/tcl8.4/init.tcl
   lib/tk8.4/tclIndex
   lib/tk8.4/button.tcl
+  lib/tk8.4/comdlg.tcl
   lib/tk8.4/entry.tcl
   lib/tk8.4/listbox.tcl
   lib/tk8.4/menu.tcl
+  lib/tk8.4/optMenu.tcl
   lib/tk8.4/panedwindow.tcl
   lib/tk8.4/scale.tcl
   lib/tk8.4/scrlbar.tcl
