@@ -150,18 +150,18 @@ public:
 
   // Description:
   // Select a point field to use for volume rendering
-  void VolumeRenderPointField(const char *name);
+  virtual void VolumeRenderPointField(const char *name);
 
   // Description:
   // Select a cell field to use for volume rendering
-  void VolumeRenderCellField(const char *name);
+  virtual void VolumeRenderCellField(const char *name);
 
   // Description:
   // Turn on/off volume rendering. This controls which prop is 
   // visible since both geometric and volumetric pipelines exist
   // simultaneously.
-  void VolumeRenderModeOn();
-  void VolumeRenderModeOff();
+  virtual void VolumeRenderModeOn();
+  virtual void VolumeRenderModeOff();
 
   // Description:
   // Return whether volume rendering is on or off.

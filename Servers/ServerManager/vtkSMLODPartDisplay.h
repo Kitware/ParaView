@@ -60,6 +60,14 @@ public:
   virtual void SetInterpolateColorsFlag(int val);
 
   // Description:
+  // Select a point field to use for volume rendering
+  virtual void VolumeRenderPointField(const char *name);
+
+  // Description:
+  // Select a cell field to use for volume rendering
+  virtual void VolumeRenderCellField(const char *name);
+
+  // Description:
   // This method updates the piece that has been assigned to this process.
   // It also gathers the data information.
   virtual void Update();
@@ -85,6 +93,8 @@ protected:
   vtkSMProxy* LODUpdateSuppressorProxy;
   vtkSMProxy* LODMapperProxy;
   vtkSMProxy* LODDeciProxy;
+
+  vtkSMProxy* LODVolumeMapperProxy;
 
   // Description:
   // This method should be called immediately after the object is constructed.

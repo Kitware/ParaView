@@ -26,7 +26,8 @@
 
 #include "vtkVolume.h"
 
-class vtkAbstractVolumeMapper;
+class vtkLODProp3D;
+class vtkMapper;
 
 class VTK_EXPORT vtkPVLODVolume : public vtkVolume
 {
@@ -38,6 +39,7 @@ public:
 
   // Description:
   // This method is used internally by the rendering process.
+  virtual int RenderOpaqueGeometry(vtkViewport *viewport);
   virtual int RenderTranslucentGeometry(vtkViewport *viewport);
 
   // Description:
@@ -47,15 +49,17 @@ public:
   virtual void ReleaseGraphicsResources(vtkWindow *);
 
   // Description:
-  // This sets the low res input.
-  virtual void SetLODMapper(vtkAbstractVolumeMapper*);
-  vtkGetObjectMacro(LODMapper, vtkAbstractVolumeMapper);
+  // Set the high res input.  Overloads the virtual vtkVolume method.
+  virtual void SetMapper(vtkAbstractVolumeMapper *);
 
   // Description:
-  // This is a bit of a hack.  This returns the last mapper used to render.
-  // It does this so that compositing can descide if anything was actually
-  // renderered.
-  virtual vtkAbstractVolumeMapper *GetMapper() {return this->SelectMapper();}
+  // This sets the low res input.
+  virtual void SetLODMapper(vtkAbstractVolumeMapper *);
+  virtual void SetLODMapper(vtkMapper *);
+
+  // Description:
+  // Sets the volume propery.  Overloads the virtual vtkVolume method.
+  virtual void SetProperty(vtkVolumeProperty *property);
 
   // Description:
   // Shallow copy of an LOD actor. Overloads the virtual vtkProp method.
@@ -65,15 +69,24 @@ public:
   // Get the bounds of the current mapper.
   virtual double *GetBounds();
 
+  // Description:
+  // Overloads the virtual vtkProp method.
+  virtual void SetAllocatedRenderTime(double t, vtkViewport *v);
+
 protected:
   vtkPVLODVolume();
   ~vtkPVLODVolume();
-  vtkAbstractVolumeMapper *LODMapper;
 
-  vtkAbstractVolumeMapper *SelectMapper();
+  vtkLODProp3D *LODProp;
+  int HighLODId;
+  int LowLODId;
+
+  int SelectLOD();
 
   double MapperBounds[6];
   vtkTimeStamp BoundsMTime;
+
+  virtual void UpdateLODProperty();
 
 private:
   vtkPVLODVolume(const vtkPVLODVolume&); // Not implemented.

@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.5");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -48,6 +48,7 @@ vtkSMLODPartDisplay::vtkSMLODPartDisplay()
   this->LODDeciProxy = 0;
   this->LODMapperProxy = 0;
   this->LODUpdateSuppressorProxy = 0;
+  this->LODVolumeMapperProxy = 0;
 
   this->LODInformationIsValid = 0;
   this->LODInformation = vtkPVLODPartDisplayInformation::New();
@@ -71,6 +72,11 @@ vtkSMLODPartDisplay::~vtkSMLODPartDisplay()
     {
     this->LODUpdateSuppressorProxy->Delete();
     this->LODUpdateSuppressorProxy = 0;
+    }
+  if (this->LODVolumeMapperProxy)
+    {
+    this->LODVolumeMapperProxy->Delete();
+    this->LODVolumeMapperProxy = 0;
     }
 
   this->LODInformation->Delete();
@@ -134,6 +140,16 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
   this->LODDeciProxy->CreateVTKObjects(num);
   this->LODUpdateSuppressorProxy->CreateVTKObjects(num);
   this->LODMapperProxy->CreateVTKObjects(num);
+
+  // ===== Volume rendering LOD branch (use a surface for low LOD):
+  this->LODVolumeMapperProxy = vtkSMProxy::New();
+  this->LODVolumeMapperProxy->SetVTKClassName("vtkPolyDataMapper");
+  this->LODVolumeMapperProxy->SetServersSelf(  vtkProcessModule::CLIENT
+                                             | vtkProcessModule::RENDER_SERVER);
+  this->LODVolumeMapperProxy->AddProperty("InterpolateColorsFlag",
+                                          this->InterpolateColorsFlagProperty);
+
+  this->LODVolumeMapperProxy->CreateVTKObjects(num);
 
   for (i = 0; i < num; ++i)
     {
@@ -214,6 +230,35 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->PropProxy->GetID(i) << "SetLODMapper" << this->LODMapperProxy->GetID(i)
+      << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+
+    pm->GetStream()
+      << vtkClientServerStream::Invoke 
+      << this->LODVolumeMapperProxy->GetID(i)
+      << "InterpolateScalarsBeforeMappingOn" 
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODVolumeMapperProxy->GetID(i) << "UseLookupTableScalarRangeOn"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODUpdateSuppressorProxy->GetID(i) << "GetPolyDataOutput"
+      << vtkClientServerStream::End
+      << vtkClientServerStream::Invoke
+      << this->LODVolumeMapperProxy->GetID(i) << "SetInput"
+      << vtkClientServerStream::LastResult
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODVolumeMapperProxy->GetID(i) << "SetImmediateModeRendering"
+      << pm->GetUseImmediateMode()
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->VolumeProxy->GetID(i) << "SetLODMapper"
+      << this->LODVolumeMapperProxy->GetID(i)
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
@@ -349,6 +394,70 @@ void vtkSMLODPartDisplay::SetUseImmediateMode(int val)
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
+  if (this->LODVolumeMapperProxy)
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODVolumeMapperProxy->GetID(0) << "SetImmediateModeRendering"
+      << val << vtkClientServerStream::End;
+    pm->SendStream(vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMLODPartDisplay::VolumeRenderPointField(const char *name)
+{
+  vtkPVProcessModule *pm = this->GetProcessModule();
+  if (!pm)
+    {
+    vtkErrorMacro("Set the ProcessModule before you connect.");
+    return;
+    }
+  this->Superclass::VolumeRenderPointField(name);
+
+  vtkClientServerStream &stream = pm->GetStream();
+
+  int i, num;
+  num = this->LODVolumeMapperProxy->GetNumberOfIDs();
+  for (i = 0; i < num; i++)
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->LODVolumeMapperProxy->GetID(i)
+           << "SetScalarModeToUsePointFieldData"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->LODVolumeMapperProxy->GetID(i)
+           << "SelectColorArray" << name << vtkClientServerStream::End;
+    }
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMLODPartDisplay::VolumeRenderCellField(const char *name)
+{
+  vtkPVProcessModule *pm = this->GetProcessModule();
+  if (!pm)
+    {
+    vtkErrorMacro("Set the ProcessModule before you connect.");
+    return;
+    }
+  this->Superclass::VolumeRenderCellField(name);
+
+  vtkClientServerStream &stream = pm->GetStream();
+
+  int i, num;
+  num = this->LODVolumeMapperProxy->GetNumberOfIDs();
+  for (i = 0; i < num; i++)
+    {
+    stream << vtkClientServerStream::Invoke
+           << this->LODVolumeMapperProxy->GetID(i)
+           << "SetScalarModeToUseCellFieldData"
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke
+           << this->LODVolumeMapperProxy->GetID(i)
+           << "SelectColorArray" << name << vtkClientServerStream::End;
+    }
+  pm->SendStream(vtkProcessModule::DATA_SERVER);
 }
 
 //----------------------------------------------------------------------------
@@ -469,6 +578,10 @@ void vtkSMLODPartDisplay::SetInterpolateColorsFlag(int val)
   if (this->LODMapperProxy)
     {
     this->LODMapperProxy->UpdateVTKObjects();
+    }
+  if (this->LODVolumeMapperProxy)
+    {
+    this->LODVolumeMapperProxy->UpdateVTKObjects();
     }
 }
 

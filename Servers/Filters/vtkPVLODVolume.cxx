@@ -15,6 +15,11 @@
 #include "vtkPVLODVolume.h"
 
 #include "vtkAbstractVolumeMapper.h"
+#include "vtkLODProp3D.h"
+#include "vtkMapper.h"
+#include "vtkProperty.h"
+#include "vtkVolumeProperty.h"
+#include "vtkColorTransferFunction.h"
 #include "vtkMath.h"
 #include "vtkMatrix4x4.h"
 #include "vtkObjectFactory.h"
@@ -30,14 +35,18 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODVolume);
-vtkCxxRevisionMacro(vtkPVLODVolume, "1.2");
-
-vtkCxxSetObjectMacro(vtkPVLODVolume, LODMapper, vtkAbstractVolumeMapper);
+vtkCxxRevisionMacro(vtkPVLODVolume, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVLODVolume::vtkPVLODVolume()
 {
-  this->LODMapper = NULL;
+  this->LODProp = vtkLODProp3D::New();
+  this->LODProp->AutomaticLODSelectionOff();
+  this->LODProp->AutomaticPickLODSelectionOff();
+
+  this->HighLODId = -1;
+  this->LowLODId = -1;
+
   this->MapperBounds[0] = this->MapperBounds[1] = this->MapperBounds[2] = 0;
   this->MapperBounds[3] = this->MapperBounds[4] = this->MapperBounds[5] = 0;
 }
@@ -45,85 +54,74 @@ vtkPVLODVolume::vtkPVLODVolume()
 //----------------------------------------------------------------------------
 vtkPVLODVolume::~vtkPVLODVolume()
 {
-  this->SetLODMapper(NULL);
+  this->LODProp->Delete();
 }
 
 //----------------------------------------------------------------------------
-// We use points as the size of the data, because cells cqan mislead.
-// A good example is verts.  One cell can contain any number of verticies.
-vtkAbstractVolumeMapper *vtkPVLODVolume::SelectMapper()
+int vtkPVLODVolume::SelectLOD()
 {
-  if (this->Mapper == NULL || this->Mapper->GetDataSetInput() == NULL)
+  if (this->LowLODId < 0)
     {
-    return this->LODMapper;
+    return this->HighLODId;
     }
-  if (this->LODMapper == NULL || this->LODMapper->GetDataSetInput() == NULL)
+  if (this->HighLODId < 0)
     {
-    return this->Mapper;
+    return this->LowLODId;
     }
 
   if (vtkPVProcessModule::GetGlobalLODFlag())
     {
-    return this->LODMapper;
+    return this->LowLODId;
     }
 
-  return this->Mapper;
+  return this->HighLODId;
 }
-
-
-
 
 
 
 //-----------------------------------------------------------------------------
-int vtkPVLODVolume::RenderTranslucentGeometry(vtkViewport *vp)
+int vtkPVLODVolume::RenderOpaqueGeometry(vtkViewport *vp)
 {
-  vtkRenderer             *ren = static_cast<vtkRenderer*>(vp);
-  vtkAbstractVolumeMapper *mapper = this->SelectMapper();
+  int retval = this->LODProp->RenderOpaqueGeometry(vp);
 
-  if ( !mapper )
-    {
-    vtkErrorMacro(<< "You must specify a mapper!\n");
-    return 0;
-    }
+  this->EstimatedRenderTime = this->LODProp->GetEstimatedRenderTime();
 
-  // If we don't have any input, return silently.
-  if (!mapper->GetDataSetInput())
-    {
-    return 0;
-    }
-
-  // make sure we have a property
-  if (!this->Property)
-    {
-    // force creation of a property
-    this->GetProperty();
-    }
-
-  mapper->Render(ren, this);
-  this->EstimatedRenderTime += mapper->GetTimeToDraw();
-
-  return 1;
+  return retval;
 }
 
+int vtkPVLODVolume::RenderTranslucentGeometry(vtkViewport *vp)
+{
+  int retval = this->LODProp->RenderTranslucentGeometry(vp);
+
+  this->EstimatedRenderTime = this->LODProp->GetEstimatedRenderTime();
+
+  return retval;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVLODVolume::ReleaseGraphicsResources(vtkWindow *renWin)
 {
   this->Superclass::ReleaseGraphicsResources(renWin);
   
   // broadcast the message down to the individual LOD mappers
-  if (this->LODMapper)
-    {
-    this->LODMapper->ReleaseGraphicsResources(renWin);
-    }
+  this->LODProp->ReleaseGraphicsResources(renWin);
 }
 
 
+//-----------------------------------------------------------------------------
 // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax).
 double *vtkPVLODVolume::GetBounds()
 {
   int i,n;
   double *bounds, bbox[24], *fptr;
-  vtkAbstractVolumeMapper *mapper = this->GetMapper();
+
+  int lod = this->SelectLOD();
+  if (lod < 0)
+    {
+    return this->Bounds;
+    }
+
+  vtkAbstractMapper3D *mapper = this->LODProp->GetLODMapper(lod);
 
   vtkDebugMacro( << "Getting Bounds" );
 
@@ -215,7 +213,7 @@ void vtkPVLODVolume::ShallowCopy(vtkProp *prop)
   vtkPVLODVolume *a = vtkPVLODVolume::SafeDownCast(prop);
   if ( a != NULL )
     {
-    this->SetLODMapper(a->GetLODMapper());
+    this->LODProp->ShallowCopy(a->LODProp);
     }
 
   // Now do superclass
@@ -223,12 +221,116 @@ void vtkPVLODVolume::ShallowCopy(vtkProp *prop)
 }
 
 
+//-----------------------------------------------------------------------------
+void vtkPVLODVolume::SetProperty(vtkVolumeProperty *property)
+{
+  this->Superclass::SetProperty(property);
+
+  this->UpdateLODProperty();
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkPVLODVolume::SetMapper(vtkAbstractVolumeMapper *mapper)
+{
+  if (this->HighLODId >= 0)
+    {
+    this->LODProp->RemoveLOD(this->HighLODId);
+    this->HighLODId = -1;
+    }
+
+  if (mapper)
+    {
+    this->HighLODId = this->LODProp->AddLOD(mapper, this->GetProperty(), 1.0);
+    this->UpdateLODProperty();
+    }
+}
+
+void vtkPVLODVolume::SetLODMapper(vtkAbstractVolumeMapper *mapper)
+{
+  if (this->LowLODId >= 0)
+    {
+    this->LODProp->RemoveLOD(this->LowLODId);
+    this->LowLODId = -1;
+    }
+
+  if (mapper)
+    {
+    this->LowLODId = this->LODProp->AddLOD(mapper, this->GetProperty(), 0.0);
+    this->UpdateLODProperty();
+    }
+}
+
+void vtkPVLODVolume::SetLODMapper(vtkMapper *mapper)
+{
+  if (this->LowLODId >= 0)
+    {
+    this->LODProp->RemoveLOD(this->LowLODId);
+    this->LowLODId = -1;
+    }
+
+  if (mapper)
+    {
+    vtkProperty *property = vtkProperty::New();
+    property->SetOpacity(0.5);
+    this->LowLODId = this->LODProp->AddLOD(mapper, property, 0.0);
+    property->Delete();
+    this->UpdateLODProperty();
+    }
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkPVLODVolume::SetAllocatedRenderTime(double t, vtkViewport *v)
+{
+  this->Superclass::SetAllocatedRenderTime(t, v);
+
+  // This is a good time to update the LODProp.
+  this->LODProp->SetUserMatrix(this->GetMatrix());
+
+  int lod = this->SelectLOD();
+  if (lod < 0)
+    {
+    vtkErrorMacro(<< "You must give me a mapper!");
+    }
+  this->LODProp->SetSelectedLODID(lod);
+  this->LODProp->SetSelectedPickLODID(lod);
+
+  this->LODProp->SetAllocatedRenderTime(t, v);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVLODVolume::UpdateLODProperty()
+{
+  if (this->HighLODId >= 0)
+    {
+    this->LODProp->SetLODProperty(this->HighLODId, this->Property);
+    }
+
+  if (this->LowLODId >= 0)
+    {
+    vtkMapper *mapper;
+    this->LODProp->GetLODMapper(this->LowLODId, &mapper);
+    if (mapper)
+      {
+      // This is a surface mapper.  Map the colors of the transfer function
+      // to the surface.
+      mapper->SetLookupTable(this->Property->GetRGBTransferFunction());
+      }
+    else
+      {
+      // This is a volume mapper.  Just share the property.
+      this->LODProp->SetLODProperty(this->LowLODId, this->Property);
+      }
+    }
+}
+
+
 //----------------------------------------------------------------------------
 void vtkPVLODVolume::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  if (this->LODMapper)
-    {
-    os << indent << "LODMapper: " << this->GetLODMapper() << endl;
-    }
+
+  os << indent << "LODProp: " << endl;
+  this->LODProp->PrintSelf(os, indent.GetNextIndent());
 }
