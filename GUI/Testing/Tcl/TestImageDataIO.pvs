@@ -59,8 +59,9 @@ $kw(vtkTemp319) AcceptCallback
 # Fix the size of the image.
 set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
 $RenWin1 SetSize 300 300
-$RenWin1 Render
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
+
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {

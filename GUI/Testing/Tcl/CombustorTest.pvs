@@ -135,7 +135,7 @@ $RenWin1 SetSize 300 300
 
 for {set i 0} {$i < 1} {incr i 1} {
     $camera Azimuth 10
-    $RenWin1 Render
+    [[$Application GetMainWindow] GetMainView] Render
     update
 }
 
@@ -166,7 +166,7 @@ $camera SetClippingRange 15.0904 64.6074
 
 $VOIEntry SetValue 0 0 0 32 3 20
 $pvExtract AcceptCallback
-$RenWin1 Render
+[[$Application GetMainWindow] GetMainView] Render
 
 set extOutput [$pvExtract GetPVOutput]
 $extOutput ColorByPointField {Density} 1
@@ -175,12 +175,15 @@ $extOutput SetScalarBarVisibility 1
 for {set i 55} {$i < 56} {incr i 1} {
     $VOIEntry SetValue $i $i 0 32 3 20
     $pvExtract AcceptCallback
-    $RenWin1 Render
+    [[$Application GetMainWindow] GetMainView] Render
     update
 }
 
 [$pvExtract GetPVOutput] DrawSurface
 update
+
+[[$Application GetMainWindow] GetMainView] ForceRender
+
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
