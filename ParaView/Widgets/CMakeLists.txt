@@ -1,5 +1,6 @@
 SOURCE_FILES( KWWidgets_SRCS
 kwinit
+vtkKWLoadSaveDialog
 vtkKWHashTable
 vtkKWPointerArray
 vtkKWComposite 

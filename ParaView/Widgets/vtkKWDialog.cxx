@@ -76,6 +76,7 @@ vtkKWDialog::~vtkKWDialog()
     {
     delete [] this->Command;
     }
+  this->SetTitleString(0);
 }
 
 int vtkKWDialog::Invoke()

@@ -70,8 +70,8 @@ void vtkKWTclCommand::Execute(vtkObject *caller, unsigned long event,
 //         << "] on event " << event 
 //         << " executing: [" << this->StringCommand 
 //         << "] call data is: " << callData << " (" << str << ")" << endl;
-//      cout << "A: eval " << this->StringCommand << " " << str << " (" 
-//  	 << kwCaller->GetClassName() << ")" << endl;
+    //cout << "A: eval " << this->StringCommand << " " 
+    //   << (str ? str : "") << endl;
     kwCaller->Script("eval %s %s", this->StringCommand, str ? str : "");
     }
 }
