@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.163");
+vtkCxxRevisionMacro(vtkKWWindow, "1.164");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1344,7 +1344,7 @@ void vtkKWWindow::RetrieveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 void vtkKWWindow::SaveColor(int level, const char* key, float rgb[3])
 {
   this->GetApplication()->SetRegisteryValue(
-    level, "RunTime", key, "Color: %f %f %f", rgb[0], rgb[1], rgb[2]);
+    level, "Colors", key, "Color: %f %f %f", rgb[0], rgb[1], rgb[2]);
 }
 
 int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
@@ -1356,7 +1356,7 @@ int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
 
   int ok = 0;
   if (this->GetApplication()->GetRegisteryValue(
-        level, "RunTime", key, buffer) )
+        level, "Colors", key, buffer) )
     {
     if (*buffer)
       {      
