@@ -60,6 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
+#include "vtkKWSplashScreen.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWToolbar.h"
 #include "vtkLinkedList.txx"
@@ -110,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.345");
+vtkCxxRevisionMacro(vtkPVWindow, "1.346");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -847,15 +848,31 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
           this->GetPVApplication()->GetMinorVersion());
   this->SetStatusText(version);
 
+  if (pvApp->GetShowSplashScreen())
+    {
+    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (menus)...");
+    }
   this->InitializeMenus(app);
 
+  if (pvApp->GetShowSplashScreen())
+    {
+    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (toolbars)...");
+    }
   this->InitializeToolbars(app);
 
   // Interface for the preferences.
 
   // Create the main view.
+  if (pvApp->GetShowSplashScreen())
+    {
+    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (main view)...");
+    }
   this->CreateMainView(pvApp);
 
+  if (pvApp->GetShowSplashScreen())
+    {
+    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (interactors)...");
+    }
   this->InitializeInteractorInterfaces(app);
 
   // Initialize a couple of variables in the trace file.
@@ -1101,6 +1118,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->UpdateSourceMenu();
 
   // Update preferences
+  if (pvApp->GetShowSplashScreen())
+    {
+    pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (preferences)...");
+    }
   this->AddPreferencesProperties();
 
   // Update toolbar aspect
@@ -3526,7 +3547,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.345 $");
+  this->ExtractRevision(os,"$Revision: 1.346 $");
 }
 
 //----------------------------------------------------------------------------
