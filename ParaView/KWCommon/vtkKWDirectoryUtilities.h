@@ -115,6 +115,19 @@ public:
   // Return a pointer to the name (i.e. 'name').
   static const char* GetFilenameName(const char *filename, char *name);
 
+  // Description:
+  // Try to locate the file 'filename' in the directory 'dir'.
+  // If 'filename' is a fully qualified path, the basename of the file is
+  // extracted first to check for its existence in 'dir'.
+  // If 'dir' is not a directory, GetFilenamePath() is called on 'dir' to
+  // get the directory (thus, you can pass a filename actually and save
+  // yourself that step).
+  // 'try_fname' is where the fully qualified name/path of the file will be
+  // stored if it is found in 'dir'.
+  // Return a pointer to the file found (i.e. 'try_fname') or 0 if not.
+  static const char* LocateFileInDir(const char *filename, 
+                                     const char *dir, char *try_fname);
+
 protected:
   vtkKWDirectoryUtilities();
   ~vtkKWDirectoryUtilities();

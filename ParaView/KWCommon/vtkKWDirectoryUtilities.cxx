@@ -85,7 +85,7 @@ static inline int Chdir(const char* dir)
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.4");
+vtkCxxRevisionMacro(vtkKWDirectoryUtilities, "1.5");
 vtkStandardNewMacro(vtkKWDirectoryUtilities);
 
 //----------------------------------------------------------------------------
@@ -534,4 +534,51 @@ const char* vtkKWDirectoryUtilities::GetFilenameName(const char *filename,
   strcpy(name, ptr + found);
   
   return name;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWDirectoryUtilities::LocateFileInDir(const char *filename, 
+                                                     const char *dir, 
+                                                     char *try_fname)
+{
+  // Get the basename of 'filename'
+
+  char *filename_base = new char [strlen(filename) + 1];
+  vtkKWDirectoryUtilities::GetFilenameName(filename, filename_base);
+
+  // Check if 'dir' is really a directory
+
+  char *real_dir = 0;
+  if (!vtkKWDirectoryUtilities::FileIsDirectory(dir))
+    {
+    real_dir = new char [strlen(dir) + 1];
+    dir = vtkKWDirectoryUtilities::GetFilenamePath(dir, real_dir);
+    }
+
+  // Try to find the file in 'dir'
+
+  char *res = 0;
+  if (filename_base && dir)
+    {
+    sprintf(try_fname, "%s%s%s", 
+            real_dir, (*real_dir ? "/" : ""), filename_base);
+    if (vtkKWDirectoryUtilities::FileExists(try_fname))
+      {
+      res = try_fname;
+      }
+    }
+    
+  // Free mem
+
+  if (filename_base)
+    {
+    delete [] filename_base;
+    }
+
+  if (real_dir)
+    {
+    delete [] real_dir;
+    }
+
+  return res;
 }
