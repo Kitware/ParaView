@@ -531,8 +531,11 @@ install()
     echo "Running make install ..." &&
     (
         rm -rf Install &&
-        cd "${PROJECT}-${VERSION}-${PLATFORM}" &&
-        ${MAKE} install DESTDIR="${RELEASE_ROOT}/Install"
+        (
+            cd "${PROJECT}-${VERSION}-${PLATFORM}" &&
+            ${MAKE} install DESTDIR="${RELEASE_ROOT}/Install"
+        ) &&
+        rm -rf Install/usr/local/include Install/usr/local/lib/vtk
     ) >Logs/install.log 2>&1 || error_log Logs/install.log
 }
 
