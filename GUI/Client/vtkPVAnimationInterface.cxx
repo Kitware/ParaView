@@ -182,7 +182,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.138");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.139");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1119,7 +1119,7 @@ void vtkPVAnimationInterface::Play()
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::Stop()
-{  
+{
   this->StopFlag = 1;
 }
 
@@ -1335,6 +1335,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 {
   this->SavingData = 1;
   this->GetWindow()->UpdateEnableState();
+  this->StopButton->SetEnabled(1);
   vtkWindowToImageFilter* winToImage;
   vtkImageWriter* writer = 0;
 #ifdef PARAVIEW_PRO_BUILD
@@ -1413,7 +1414,8 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   fileCount = 0;
   
   int i, success = 1;
-  
+  this->StopFlag = 0;
+
   while (t <= this->GetGlobalEnd())
     {
     this->SetCurrentTime(t, 0);
@@ -1452,6 +1454,11 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 
     ++fileCount;
     ++t;
+    this->Script("update");
+    if (this->StopFlag)
+      {
+      break;
+      }
     }
 
   winToImage->Delete();
