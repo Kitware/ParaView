@@ -109,9 +109,9 @@ public:
   
   // Description:
   // Set the widget background color
-  virtual float* GetBackgroundColor();
-  virtual void SetBackgroundColor(float r, float g, float b);
-  virtual void SetBackgroundColor(float *rgb)
+  virtual double* GetBackgroundColor();
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void SetBackgroundColor(double *rgb)
     { this->SetBackgroundColor(rgb[0], rgb[1], rgb[2]); };
 
   // Description:

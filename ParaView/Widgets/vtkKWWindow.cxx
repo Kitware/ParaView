@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.181");
+vtkCxxRevisionMacro(vtkKWWindow, "1.182");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1412,7 +1412,7 @@ void vtkKWWindow::SaveColor(int level, const char* key, float rgb[3])
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
+int vtkKWWindow::RetrieveColor(int level, const char* key, double rgb[3])
 {
   char buffer[1024];
   rgb[0] = -1;
@@ -1425,11 +1425,22 @@ int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
     {
     if (*buffer)
       {      
-      sscanf(buffer, "Color: %f %f %f", rgb, rgb+1, rgb+2);
+      sscanf(buffer, "Color: %lf %lf %lf", rgb, rgb+1, rgb+2);
       ok = 1;
       }
     }
   return ok;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
+{
+  double drgb[3];
+  int res = this->RetrieveColor(level, key, drgb);
+  rgb[0] = drgb[0];
+  rgb[1] = drgb[1];
+  rgb[2] = drgb[2];
+  return res;
 }
 
 //----------------------------------------------------------------------------

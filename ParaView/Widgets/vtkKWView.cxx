@@ -84,7 +84,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.119");
+vtkCxxRevisionMacro(vtkKWView, "1.120");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1550,7 +1550,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.119 $");
+  this->ExtractRevision(os,"$Revision: 1.120 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1604,13 +1604,13 @@ unsigned char *vtkKWView::GetMemoryData()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWView::SetBackgroundColor( float r, float g, float b )
+void vtkKWView::SetBackgroundColor( double r, double g, double b )
 {
   if ( r < 0 || g < 0 || b < 0 )
     {
     return;
     }
-  float *ff = this->Renderer->GetBackground( );
+  double *ff = this->Renderer->GetBackground( );
   if ( ff[0] == r && ff[1] == g && ff[2] == b )
     {
     return;
@@ -1627,15 +1627,15 @@ void vtkKWView::SetBackgroundColor( float r, float g, float b )
 }
 
 //----------------------------------------------------------------------------
-float* vtkKWView::GetBackgroundColor( )
+double* vtkKWView::GetBackgroundColor( )
 {
   return this->Renderer->GetBackground( );
 }
 
 //----------------------------------------------------------------------------
-void vtkKWView::GetBackgroundColor( float *r, float *g, float *b )
+void vtkKWView::GetBackgroundColor( double *r, double *g, double *b )
 {
-  float *ff = this->Renderer->GetBackground( );
+  double *ff = this->Renderer->GetBackground( );
   *r = ff[0];
   *g = ff[1];
   *b = ff[2];

@@ -33,7 +33,7 @@
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.69");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.70");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -717,9 +717,9 @@ void vtkKWRenderWidget::RemoveAllProps()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
+void vtkKWRenderWidget::SetBackgroundColor(double r, double g, double b)
 {
-  float *color = this->GetBackgroundColor();
+  double *color = this->GetBackgroundColor();
   if (!color || (color[0] == r && color[1] == g && color[2] == b))
     {
     return;
@@ -746,7 +746,7 @@ void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
 }
 
 //----------------------------------------------------------------------------
-float* vtkKWRenderWidget::GetBackgroundColor()
+double* vtkKWRenderWidget::GetBackgroundColor()
 {
   vtkRendererCollection *renderers = this->RenderWindow->GetRenderers();
   if (renderers)
