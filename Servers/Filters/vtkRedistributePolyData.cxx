@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.5");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.6");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -2784,17 +2784,24 @@ void vtkRedistributePolyData::ReceiveInputArrays(vtkDataSetAttributes* attr,
       case VTK_UNSIGNED_SHORT:
         array = vtkUnsignedShortArray::New();
         break;
+      case VTK_ID_TYPE:
+        array = vtkIdTypeArray::New();
+        break;
       }
     this->Controller->Receive(&numComps, 1, recFrom, 997246);
-    array->SetNumberOfComponents(numComps);
     this->Controller->Receive(&nameLength, 1, recFrom, 997247);
-    name = new char[nameLength];
-    this->Controller->Receive(name, nameLength, recFrom, 997248);
-    array->SetName(name);
-    delete [] name;
-
-    index = attr->AddArray(array);
-
+    if (array)
+      {
+      array->SetNumberOfComponents(numComps);
+      name = new char[nameLength];
+      this->Controller->Receive(name, nameLength, recFrom, 997248);
+      array->SetName(name);
+      delete [] name;
+      name = NULL;
+      index = attr->AddArray(array);
+      array->Delete();
+      array = NULL;
+      }
     this->Controller->Receive(&attributeType, 1, recFrom, 997249);
     this->Controller->Receive(&copyFlag, 1, recFrom, 997250);
 
@@ -2802,8 +2809,6 @@ void vtkRedistributePolyData::ReceiveInputArrays(vtkDataSetAttributes* attr,
       {
       attr->SetActiveAttribute(index, attributeType);
       }
-
-    array->Delete();
     } // end of loop over arrays.  
 }
 
