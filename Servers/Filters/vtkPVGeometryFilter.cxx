@@ -38,7 +38,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.35");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.36");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -234,19 +234,53 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
     return;
     }
 
-  if (output->GetVerts() && output->GetVerts()->GetNumberOfCells())
-    { // We can deal with these later.
-    return;
+  // Do not generate cell normals if any of the processes
+  // have lines, verts or strips.
+  vtkCellArray* aPrim;
+  int skip = 0;
+  aPrim = output->GetVerts();
+  if (aPrim && aPrim->GetNumberOfCells())
+    {
+    skip = 1;
     }
-  if (output->GetLines() && output->GetLines()->GetNumberOfCells())
-    { // We can deal with these later.
-    return;
+  aPrim = output->GetLines();
+  if (aPrim && aPrim->GetNumberOfCells())
+    {
+    skip = 1;
     }
-  if (output->GetStrips() && output->GetStrips()->GetNumberOfCells())
-    { // We can deal with these later.
+  aPrim = output->GetStrips();
+  if (aPrim && aPrim->GetNumberOfCells())
+    {
+    skip = 1;
+    }
+  // An MPI gather or reduce would be easier ...
+  if (this->Controller->GetLocalProcessId() == 0)  
+    {
+    int tmp, idx;
+    for (idx = 1; idx < this->Controller->GetNumberOfProcesses(); ++idx)
+      {
+      this->Controller->Receive(&tmp, 1, idx, 89743);
+      if (tmp)
+        {
+        skip = 1;
+        }
+      }
+    for (idx = 1; idx < this->Controller->GetNumberOfProcesses(); ++idx)
+      {
+      this->Controller->Send(&skip, 1, idx, 89744);
+      }
+    }
+  else
+    {
+    this->Controller->Send(&skip, 1, 0, 89743);
+    this->Controller->Receive(&skip, 1, 0, 89744);
+    }
+  if (skip)
+    {
     return;
     }
 
+  vtkIdType idx, numCells;
   vtkIdType* endCellPtr;
   vtkIdType* cellPtr;
   vtkIdType *pts = 0;
@@ -256,21 +290,24 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
   cellNormals->SetName("cellNormals");
   cellNormals->SetNumberOfComponents(3);
   cellNormals->Allocate(3*output->GetNumberOfCells());
-  vtkCellArray* aPrim = output->GetPolys();
-  vtkPoints* p = output->GetPoints();
 
-
-  cellPtr = aPrim->GetPointer();
-  endCellPtr = cellPtr+aPrim->GetNumberOfConnectivityEntries();
-
-  while (cellPtr < endCellPtr)
+  aPrim = output->GetPolys();
+  if (aPrim && aPrim->GetNumberOfCells())
     {
-    npts = *cellPtr++;
-    pts = cellPtr;
-    cellPtr += npts;
+    vtkPoints* p = output->GetPoints();
 
-    vtkPolygon::ComputeNormal(p,npts,pts,polyNorm);
-    cellNormals->InsertNextTuple(polyNorm);    
+    cellPtr = aPrim->GetPointer();
+    endCellPtr = cellPtr+aPrim->GetNumberOfConnectivityEntries();
+
+    while (cellPtr < endCellPtr)
+      {
+      npts = *cellPtr++;
+      pts = cellPtr;
+      cellPtr += npts;
+
+      vtkPolygon::ComputeNormal(p,npts,pts,polyNorm);
+      cellNormals->InsertNextTuple(polyNorm);    
+      }
     }
 
   if (cellNormals->GetNumberOfTuples() != output->GetNumberOfCells())
