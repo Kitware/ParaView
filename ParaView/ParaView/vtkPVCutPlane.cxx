@@ -112,8 +112,9 @@ void vtkPVCutPlane::CreateProperties()
   this->AddPVWidget(planeWidget);
   if (this->VTKSourceTclName != NULL)
     {
-    this->Script("%s SetCutFunction %s", this->VTKSourceTclName,
-                 planeWidget->GetPlaneTclName());
+    this->GetPVApplication()->BroadcastScript("%s SetCutFunction %s", 
+                                            this->VTKSourceTclName,
+                                            planeWidget->GetPlaneTclName());
     }
   else
     {

@@ -365,9 +365,12 @@ void vtkPVArrayMenu::Accept()
                            this->InputName,
                            attributeName,
                            this->ArrayName);
-    this->AddTraceEntry("$kw(%s) SetValue %s", 
-                         this->GetTclName(), 
-                         this->ArrayName);
+    if (this->ModifiedFlag)
+      {
+      this->AddTraceEntry("$kw(%s) SetValue %s", 
+                           this->GetTclName(), 
+                           this->ArrayName);
+      }
     }
   else
     {
@@ -375,7 +378,10 @@ void vtkPVArrayMenu::Accept()
                            this->ObjectTclName,
                            this->InputName,
                            attributeName);
-    this->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
+    if (this->ModifiedFlag)
+      {
+      this->AddTraceEntry("$kw(%s) SetValue {}", this->GetTclName());
+      }
     }
 
   if (this->ShowComponentMenu)
@@ -385,13 +391,15 @@ void vtkPVArrayMenu::Accept()
                            this->InputName,
                            attributeName,
                            this->SelectedComponent);
-    this->AddTraceEntry("$kw(%s) SetSelectedComponent %s", 
-                         this->GetTclName(), 
-                         this->ArrayName);
+    if (this->ModifiedFlag)
+      {
+      this->AddTraceEntry("$kw(%s) SetSelectedComponent %s", 
+                           this->GetTclName(), 
+                           this->ArrayName);
+      }
     }
 
-
-  this->vtkPVWidget::Accept();
+  this->ModifiedFlag = 0;
 }
 
 

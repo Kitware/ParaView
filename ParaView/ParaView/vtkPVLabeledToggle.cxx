@@ -128,13 +128,11 @@ void vtkPVLabeledToggle::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if ( ! this->ModifiedFlag)
+  if (this->ModifiedFlag)
     {
-    return;
+    this->AddTraceEntry("$kw(%s) SetState %d", this->GetTclName(), 
+                        this->GetState());
     }
-
-  this->AddTraceEntry("$kw(%s) SetState %d", this->GetTclName(), 
-                       this->GetState());
 
   pvApp->BroadcastScript("%s Set%s %d", this->ObjectTclName, 
                          this->VariableName, this->GetState());

@@ -116,8 +116,9 @@ void vtkPVClipPlane::CreateProperties()
   // the VTKSource is set after the properties are created.
   if (this->VTKSourceTclName != NULL)
     {
-    this->Script("%s SetClipFunction %s", this->VTKSourceTclName,
-                 planeWidget->GetPlaneTclName());
+    this->GetPVApplication()->BroadcastScript("%s SetClipFunction %s", 
+                                              this->VTKSourceTclName,
+                                              planeWidget->GetPlaneTclName());
     }
   else
     {

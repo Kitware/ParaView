@@ -197,9 +197,8 @@ void vtkPVFileEntry::Reset()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->BroadcastScript("%s SetValue [%s Get%s]",
-                         this->Entry->GetTclName(),
-                         this->ObjectTclName, this->VariableName); 
+  pvApp->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(),
+                this->ObjectTclName, this->VariableName); 
 
   // The supper does nothing but turn the modified flag off.
   this->vtkPVWidget::Reset();

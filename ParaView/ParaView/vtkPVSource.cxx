@@ -832,7 +832,7 @@ void vtkPVSource::UpdateVTKSourceParameters()
 
     // We should be calling Accept on the widgets regardless of whether they
     // were modified.
-    if (pvw && pvw->GetModifiedFlag())
+    if (pvw)
       {
       pvw->Accept();
       }
