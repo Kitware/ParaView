@@ -27,7 +27,11 @@ SET( ServerManagerCommon_SRCS
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMBoxProxy.cxx
+  vtkSMCaveRenderModuleProxy.cxx
+  vtkSMCompositeDisplayProxy.cxx
+  vtkSMCompositeRenderModuleProxy.cxx
   vtkSMDataTypeDomain.cxx
+  vtkSMDisplayProxy.cxx
   vtkSMDisplayWindowProxy.cxx
   vtkSMDisplayerProxy.cxx
   vtkSMDomain.cxx
@@ -38,6 +42,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMExtentDomain.cxx
   vtkSMFieldDataDomain.cxx
   vtkSMFixedTypeDomain.cxx
+  vtkSMIceTDesktopRenderModuleProxy.cxx
+  vtkSMIceTRenderModuleProxy.cxx
   vtkSMIdTypeVectorProperty.cxx
   vtkSMImplicitPlaneProxy.cxx
   vtkSMInformationHelper.cxx
@@ -46,6 +52,10 @@ SET( ServerManagerCommon_SRCS
   vtkSMIntRangeDomain.cxx
   vtkSMIntVectorProperty.cxx
   vtkSMLookupTableProxy.cxx
+  vtkSMLODDisplayProxy.cxx
+  vtkSMLODRenderModuleProxy.cxx
+  vtkSMMultiDisplayProxy.cxx
+  vtkSMMultiDisplayRenderModuleProxy.cxx
   vtkSMNumberOfPartsDomain.cxx
   vtkSMObject.cxx
   vtkSMPVDWriterProxy.cxx
@@ -59,11 +69,15 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
+  vtkSMRenderModuleProxy.cxx
   vtkSMScalarBarWidgetProxy.cxx
   vtkSMSimpleIntInformationHelper.cxx
+  vtkSMSimpleDisplayProxy.cxx
   vtkSMSimpleDoubleInformationHelper.cxx
   vtkSMSimpleProxyInformationHelper.cxx
+  vtkSMSimpleRenderModuleProxy.cxx
   vtkSMSimpleStringInformationHelper.cxx
+  vtkSMMPIRenderModuleProxy.cxx
   vtkSMSourceProxy.cxx
   vtkSMStringListDomain.cxx
   vtkSMStringListRangeDomain.cxx
@@ -81,10 +95,11 @@ SET( ServerManagerCommon_SRCS
   vtkSMCompositePartDisplay.cxx
   vtkSMLODPartDisplay.cxx
   vtkSMMultiDisplayPartDisplay.cxx
-  vtkSMCubeAxesDisplay.cxx
+  vtkSMCubeAxesDisplayProxy.cxx
   vtkSMPlotDisplay.cxx
   vtkSMPointLabelDisplay.cxx
   vtkSMXMLPVAnimationWriterProxy.cxx
+  vtkSMXYPlotActorProxy.cxx
   )
 
 SET( ServerManagerNonWrapped_SRCS
@@ -109,10 +124,12 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkSMInteractorObserverProxy.cxx
   vtkSM3DWidgetProxy.cxx
   vtkSMAnimationCueManipulatorProxy.cxx
+  vtkSMDisplayProxy.cxx
   vtkSMDomain.cxx
   vtkSMInformationHelper.cxx
   vtkSMVectorProperty.cxx
   vtkSMDisplay.cxx
+  vtkSMRenderModuleProxy.cxx
   ABSTRACT
   )
 
