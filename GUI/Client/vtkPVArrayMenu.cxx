@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.69");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.70");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -334,7 +334,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
   char methodAndArgs[1024];
 
   // Regenerate the menu, and look for the specified array.
-  this->ArrayMenu->ClearEntries();
+  this->ArrayMenu->DeleteAllEntries();
 
   vtkSMProperty* property = this->GetSMProperty();
   if (property)

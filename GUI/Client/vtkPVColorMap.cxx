@@ -55,7 +55,7 @@
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.106");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.107");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -662,7 +662,7 @@ void vtkPVColorMap::UpdateVectorComponentMenu()
   vectorComponentTitles = this->RMScalarBarWidget->GetVectorComponentTitles();
   vectorComponent = this->RMScalarBarWidget->GetVectorComponent();
 
-  this->VectorComponentMenu->ClearEntries();
+  this->VectorComponentMenu->DeleteAllEntries();
   if ( *(vectorComponentTitles[vectorComponent]) != '\0')
     {
     this->VectorComponentMenu->SetValue(

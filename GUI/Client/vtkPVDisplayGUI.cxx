@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.14");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.15");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1237,7 +1237,7 @@ void vtkPVDisplayGUI::UpdateColorMenu()
     }
       
   // Populate menus
-  this->ColorMenu->ClearEntries();
+  this->ColorMenu->DeleteAllEntries();
   this->ColorMenu->AddEntryWithCommand("Property",
                                        this, "ColorByProperty");
   
@@ -1398,7 +1398,7 @@ void vtkPVDisplayGUI::UpdateVolumeGUI()
   volRenArray = NULL;
   
   const char *currentVolumeField = pDisp->GetVolumeRenderField();
-  this->VolumeScalarsMenu->ClearEntries();
+  this->VolumeScalarsMenu->DeleteAllEntries();
   
   attrInfo = dataInfo->GetPointDataInformation();
   numArrays = attrInfo->GetNumberOfArrays();

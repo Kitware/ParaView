@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.24");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -315,8 +315,8 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
   const char *firstVector = NULL;
 
   // Regenerate the menus, and look for the specified array.
-  this->ScalarsMenu->ClearEntries();
-  this->VectorsMenu->ClearEntries();
+  this->ScalarsMenu->DeleteAllEntries();
+  this->VectorsMenu->DeleteAllEntries();
 
   vtkSMProperty *scalarProp = this->GetSMScalarProperty();
   vtkSMProperty *vectorProp = this->GetSMVectorProperty();

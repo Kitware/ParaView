@@ -40,7 +40,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.38");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -192,7 +192,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
     int cc;
     for ( cc = 0; cc < 9; cc ++ )
       {
-      this->Menus[cc]->ClearEntries();
+      this->Menus[cc]->DeleteAllEntries();
       char command[100];
       for ( it = this->Internals->Manipulators.begin();
         it != this->Internals->Manipulators.end();

@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.67");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.68");
 
 
 //----------------------------------------------------------------------------
@@ -108,7 +108,7 @@ void vtkPVInputMenu::AddSources(vtkPVSourceCollection *sources)
     return;
     }
 
-  this->ClearEntries();
+  this->DeleteAllEntries();
   sources->InitTraversal();
   while ( (o = sources->GetNextItemAsObject()) )
     {
@@ -541,9 +541,9 @@ vtkPVSourceCollection *vtkPVInputMenu::GetSources()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVInputMenu::ClearEntries() 
+void vtkPVInputMenu::DeleteAllEntries() 
 { 
-  this->Menu->ClearEntries();
+  this->Menu->DeleteAllEntries();
 }
 
 //----------------------------------------------------------------------------

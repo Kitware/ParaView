@@ -156,7 +156,7 @@ protected:
 
   // Description:
   // Reset the menu by taking all entries out.
-  void ClearEntries();
+  void DeleteAllEntries();
 
   // Description:
   // Add an entry to the menu.

@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.5");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.6");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -137,7 +137,7 @@ void vtkKWScalarComponentSelectionWidget::Update()
     if (this->SelectedComponentOptionMenu->IsCreated() &&
         menu->GetNumberOfEntries() != this->NumberOfComponents)
       {
-      menu->ClearEntries();
+      menu->DeleteAllEntries();
       for (i = 0; i < this->NumberOfComponents; ++i)
         {
         ostrstream cmd_name, cmd_method;

@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.26");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.27");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -353,7 +353,7 @@ void vtkXDMFReaderModule::UpdateDomains()
     }
 
   // Fill the domain menu with the name of each domain.
-  this->DomainMenu->ClearEntries();
+  this->DomainMenu->DeleteAllEntries();
   for(int i = 0; i < numDomains; ++i)
     {
     pm->GetStream() << vtkClientServerStream::Invoke

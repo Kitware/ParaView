@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.21");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.22");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -276,7 +276,7 @@ void vtkPVFieldMenu::Update()
 
   this->UpdateProperty();
 
-  this->FieldMenu->ClearEntries();
+  this->FieldMenu->DeleteAllEntries();
   if (prop)
     {
     vtkSMEnumerationDomain* edom = vtkSMEnumerationDomain::SafeDownCast(
