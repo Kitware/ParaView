@@ -8,9 +8,9 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 
 set kw(vtkTemp5) [$Application GetMainWindow]
 set kw(vtkTemp19) [$kw(vtkTemp5) GetMainView]
-puts stdout "Loading package ${pvlocal_dir}/PVLocal.xml"
+#puts stdout "Loading package ${pvlocal_dir}/PVLocal.xml"
 if {[$kw(vtkTemp5) OpenPackage "${pvlocal_dir}/PVLocal.xml"] != 1} {
-  puts stderr "Could not open package!"
+#  puts stderr "Could not open package!"
   $Application SetExitStatus 1
   $Application Exit 1
 }
