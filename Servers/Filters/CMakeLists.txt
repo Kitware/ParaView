@@ -48,6 +48,7 @@ SET(Filters_SRCS
   vtkPVClassNameInformation.cxx
   vtkPVArrayInformation.cxx
   vtkPVTreeComposite.cxx
+  vtkProcessModule.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLCollectionReader.cxx
   vtkSelectInputs.cxx
