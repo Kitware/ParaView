@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.2");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.2.2.1");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -57,11 +57,6 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
 
 //----------------------------------------------------------------------------
 vtkKWLookmarkFolder::~vtkKWLookmarkFolder()
-{
-  this->RemoveFolder();
-}
-
-void vtkKWLookmarkFolder::RemoveFolder()
 {
   if(this->NameField)
     {
@@ -96,8 +91,8 @@ void vtkKWLookmarkFolder::RemoveFolder()
     this->NestedSeparatorFrame->Delete();
     this->NestedSeparatorFrame = 0;
     }
-
 }
+
 
 //----------------------------------------------------------------------------
 void vtkKWLookmarkFolder::Create(vtkKWApplication *app)

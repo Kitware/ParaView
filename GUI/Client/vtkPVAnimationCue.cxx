@@ -75,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.13");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.13.2.1");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -596,6 +596,7 @@ void vtkPVAnimationCue::ReplaceKeyFrame(vtkPVKeyFrame* oldFrame,
   newFrame->SetTraceReferenceCommand(sCommand.str());
   sCommand.rdbuf()->freeze(0);
 
+  this->InitializeKeyFrameUsingCurrentState(newFrame);
   newFrame->SetKeyTime(oldFrame->GetKeyTime());
   newFrame->SetKeyValue(oldFrame->GetKeyValue());
   

@@ -26,8 +26,6 @@
 #include "vtkPVStringEntry.h"
 #include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
-#include "vtkPVXMLParser.h"
-#include "vtkPVXMLElement.h"
 #include "vtkPVLookmark.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
@@ -35,18 +33,13 @@
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkPVVectorEntry.h"
-#include "vtkPVContainerWidget.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVScale.h"
-#include "vtkPVClipDataSet.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVBoxWidget.h"
 #include "vtkPVArraySelection.h"
 #include "vtkPVSelectWidget.h"
-#include "vtkPVArrayMenu.h"
 #include "vtkPVCameraIcon.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVSourceCollection.h"
@@ -56,18 +49,14 @@
 #include "vtkPVBasicDSPFilterWidget.h"
 #endif
 
-#include "vtkKWLabeledCheckButton.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWLookmark.h"
 #include "vtkKWLookmarkFolder.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWDirectoryUtilities.h"
 #include "vtkKWLoadSaveDialog.h"
-#include "vtkKWMessageDialog.h"
 #include "vtkKWIcon.h"
 #include "vtkKWText.h"
-#include "vtkKWLabeledRadioButtonSet.h"
-#include "vtkKWRadioButtonSet.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -78,16 +67,13 @@
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWWindow.h"
 #include "vtkKWTclInteractor.h"
-#include "vtkKWRegisteryUtilities.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWSplashScreen.h"
 
 #include "vtkXMLUtilities.h"
 #include "vtkXMLDataParser.h"
 #include "vtkXMLDataElement.h"
 #include "vtkXMLLookmarkElement.h"
-//#include "vtkXMLLookmarkWriter.h"
 
 #include "vtkBase64Utilities.h"
 #include "vtkRenderWindow.h"
@@ -114,18 +100,17 @@
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
 
-#include <vtkstd/string>
-
 #ifndef _WIN32
   #include <sys/wait.h>
   #include <unistd.h>
 #endif
 #include <vtkstd/vector>
+#include <vtkstd/string>
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.6");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.6.2.1");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -1295,7 +1280,7 @@ void vtkPVLookmarkManager::ImportLookmarksInternal(int locationOfLmkItemAmongSib
 void vtkPVLookmarkManager::SetLookmarkIconCommand(vtkKWLookmark *lmkWidget, vtkIdType index)
 {
   ostrstream viewCallback;
-  viewCallback << "ViewLookmarkCallback " << index;
+  viewCallback << "ViewLookmarkCallback " << index << ends;
   lmkWidget->GetLmkIcon()->UnsetBind("<Button-1>");
   lmkWidget->GetLmkIcon()->UnsetBind("<Double-1>");
   lmkWidget->GetLmkIcon()->SetBind(this, "<Button-1>", viewCallback.str());
@@ -3256,6 +3241,8 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
           else if((selectTimeSet = vtkPVSelectTimeSet::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
+            selectTimeSet->SetTimeValueCallback(this->GetStringEntryValue(ptr));
+            selectTimeSet->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
           else if((vectorEntry = vtkPVVectorEntry::SafeDownCast(pvWidget)))
@@ -3273,15 +3260,15 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
           else if((selectionList = vtkPVSelectionList::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
+            val = this->GetIntegerScalarWidgetValue(ptr);
+            selectionList->SetCurrentValue(val);
+            selectionList->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
           else if((stringEntry = vtkPVStringEntry::SafeDownCast(pvWidget)))
             {
+            //  This widget is used
             ptr = strtok(NULL,"\r\n");
-
-            //stringEntry->SetValue(this->GetStringEntryValue(ptr));
-            //stringEntry->ModifiedCallback();
-
             ptr = strtok(NULL,"\r\n");
             }
           else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)))
@@ -3820,7 +3807,7 @@ void vtkPVLookmarkManager::DestroyUnusedLmkWidgets(vtkKWWidget *lmkItem)
     vtkKWLookmarkFolder *oldLmkFolder = vtkKWLookmarkFolder::SafeDownCast(lmkItem);
     if(!this->LmkFolderWidgets->IsItemPresent(oldLmkFolder))
       {
-      oldLmkFolder->RemoveFolder();
+      oldLmkFolder->Delete();
       this->Script("destroy %s", oldLmkFolder->GetWidgetName());
       if(oldLmkFolder)
         {

@@ -20,7 +20,7 @@
 // .NAME vtkPVLookmark - An interface widget for a container of lookmarks in the Lookmark Manager
 // .SECTION Description
 // This class represents a lookmark object and stores several attributes such as name, default dataset,
-// comments, state script, and image data. I separated it from the interface (vtkObject). Although it should probably be a subclass of vtkObject
+// comments, state script, and image data. I separated it from the interface (vtkKWLookmark). Although it should probably be a subclass of vtkLookmark
 // instead of vtkObject to a) be consistent with the naming convention in paraview and b) they both share several attributes. 
 // Each object of this class
 // keeps a collection of the vtkPVSources used to make up the view this lookmark represents. Encapsulating loookmark data

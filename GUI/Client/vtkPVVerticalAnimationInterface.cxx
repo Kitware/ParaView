@@ -40,7 +40,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.7");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.7.2.1");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -461,6 +461,13 @@ void vtkPVVerticalAnimationInterface::RemoveObservers(vtkPVAnimationCue* cue)
 void vtkPVVerticalAnimationInterface::Update()
 {
   int id;
+  if (this->ActiveKeyFrame)
+    {
+    // unpack the old keyframe.
+    this->Script("grid forget %s", this->ActiveKeyFrame->GetWidgetName());
+    this->SetActiveKeyFrame(NULL);
+    }
+
   if (this->AnimationCue == NULL || this->AnimationCue->GetVirtual() ||
     (id = this->AnimationCue->GetTimeLine()->GetSelectedPoint())==-1)
     {
@@ -471,8 +478,8 @@ void vtkPVVerticalAnimationInterface::Update()
   else
     {
     this->IndexScale->SetRange(1, this->AnimationCue->GetNumberOfKeyFrames());
-    this->IndexScale->SetValue(id+1);
     this->ShowKeyFrame(id);
+    this->IndexScale->SetValue(id+1);
     this->UpdateEnableState();
     this->Script("grid forget %s", this->SelectKeyFrameLabel->GetWidgetName());
     this->Script("grid %s - -row 1 -sticky ew", this->PropertiesFrame->GetWidgetName());
@@ -494,11 +501,6 @@ void vtkPVVerticalAnimationInterface::Update()
 void vtkPVVerticalAnimationInterface::ShowKeyFrame(int id)
 {
   vtkPVKeyFrame* pvKeyFrame = this->AnimationCue->GetKeyFrame(id);
-  if (this->ActiveKeyFrame)
-    {
-    // unpack the old keyframe.
-    this->Script("grid forget %s", this->ActiveKeyFrame->GetWidgetName());
-    }
   this->SetActiveKeyFrame(pvKeyFrame);
   if (!pvKeyFrame)
     {

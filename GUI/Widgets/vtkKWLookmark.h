@@ -21,7 +21,7 @@
 // .NAME vtkKWLookmark - An interface widget for a lookmark.
 // .SECTION Description
 //
-// This is the interface widget for lookmarks. It contains a name
+// This is the interface widget for lookmarks. It is made up of a labeled frame, checkbox, icon, and text widget for comments
 // 
 // .SECTION See Also
 // vtkKWLookmarkContainer vtkPVLookmarkManager vtkPVLookmark
@@ -75,9 +75,7 @@ public:
 //  void DragAndDropEndCallback(int x, int y);
 
   // Set/Get methods called from vtkPVLookmarkManager
-//  vtkGetObjectMacro(LmkIcon,vtkPVCameraIcon);
   vtkGetObjectMacro(LmkIcon,vtkKWLabel);
-  // needed in vtkPVLookmarkManager to set turn it enabled/disabled
 
   // Description:
   // The value represents this lookmark widget's packing location among sibling lmk widgets and lmk containers.
@@ -88,10 +86,6 @@ public:
   // Description:
   // If TRUE, use the default dataset when loading lookmark, else use the currently selected one in source list
   int IsLockedToDataset();
-
-  // Description: 
-  // Convenience method for deleting the widget
-  void RemoveLookmark();
   
   // Description:
   // Callback to double-clicking the lookmark widget label. Pressing 'Return' then calls ChangeLookmarkName
@@ -121,7 +115,6 @@ protected:
   vtkKWLabel *LmkDatasetLabel;
   vtkKWLabeledCheckButton *LmkDatasetCheckbox;
   vtkKWFrame *LmkDatasetFrame;
-//  vtkPVCameraIcon *LmkIcon;
   vtkKWLabel *LmkIcon;
   vtkKWText *LmkCommentsText;
   vtkKWText *LmkNameField;
@@ -134,8 +127,6 @@ protected:
   int Height;
   char *Dataset;
   int SelectionFlag;
-
-//  vtkPVLookmark *Lookmark;
 
 private:
   vtkKWLookmark(const vtkKWLookmark&); // Not implemented
