@@ -31,7 +31,7 @@
 
 #include "vtkXMLPDataWriter.h"
 
-class VTK_EXPORT vtkXMLPDataSetWriter : public vtkXMLPDataWriter
+class VTK_ALTIO_EXPORT vtkXMLPDataSetWriter : public vtkXMLPDataWriter
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPDataSetWriter,vtkXMLPDataWriter);

@@ -25,7 +25,7 @@
 
 #include "vtkInputStream.h"
 
-class VTK_EXPORT vtkBase64InputStream : public vtkInputStream
+class VTK_ALTIO_EXPORT vtkBase64InputStream : public vtkInputStream
 {
 public:
   vtkTypeRevisionMacro(vtkBase64InputStream,vtkInputStream);

@@ -28,8 +28,9 @@
 #define __vtkOutputStream_h
 
 #include "vtkObject.h"
+#include "vtkAltIOHeader.h" // For VTK_ALTIO_EXPORT
 
-class VTK_EXPORT vtkOutputStream : public vtkObject
+class VTK_ALTIO_EXPORT vtkOutputStream : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkOutputStream,vtkObject);

@@ -33,7 +33,7 @@
 
 class vtkImageData;
 
-class VTK_EXPORT vtkXMLImageDataWriter : public vtkXMLStructuredDataWriter
+class VTK_ALTIO_EXPORT vtkXMLImageDataWriter : public vtkXMLStructuredDataWriter
 {
 public:
   static vtkXMLImageDataWriter* New();

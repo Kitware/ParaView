@@ -34,7 +34,7 @@
 
 class vtkPolyData;
 
-class VTK_EXPORT vtkXMLPolyDataWriter : public vtkXMLUnstructuredDataWriter
+class VTK_ALTIO_EXPORT vtkXMLPolyDataWriter : public vtkXMLUnstructuredDataWriter
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPolyDataWriter,vtkXMLUnstructuredDataWriter);

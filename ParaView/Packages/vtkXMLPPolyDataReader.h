@@ -33,7 +33,7 @@
 
 class vtkPolyData;
 
-class VTK_EXPORT vtkXMLPPolyDataReader : public vtkXMLPUnstructuredDataReader
+class VTK_ALTIO_EXPORT vtkXMLPPolyDataReader : public vtkXMLPUnstructuredDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPPolyDataReader,vtkXMLPUnstructuredDataReader);

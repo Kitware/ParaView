@@ -34,7 +34,7 @@
 
 class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkXMLPUnstructuredGridWriter : public vtkXMLPUnstructuredDataWriter
+class VTK_ALTIO_EXPORT vtkXMLPUnstructuredGridWriter : public vtkXMLPUnstructuredDataWriter
 {
 public:
   static vtkXMLPUnstructuredGridWriter* New();

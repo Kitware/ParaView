@@ -33,7 +33,7 @@
 
 class vtkRectilinearGrid;
 
-class VTK_EXPORT vtkXMLRectilinearGridWriter : public vtkXMLStructuredDataWriter
+class VTK_ALTIO_EXPORT vtkXMLRectilinearGridWriter : public vtkXMLStructuredDataWriter
 {
 public:
   static vtkXMLRectilinearGridWriter* New();

@@ -26,10 +26,11 @@
 #define __vtkDataCompressor_h
 
 #include "vtkObject.h"
+#include "vtkAltIOHeader.h" // For VTK_ALTIO_EXPORT
 
 class vtkUnsignedCharArray;
 
-class VTK_EXPORT vtkDataCompressor : public vtkObject
+class VTK_ALTIO_EXPORT vtkDataCompressor : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkDataCompressor,vtkObject);

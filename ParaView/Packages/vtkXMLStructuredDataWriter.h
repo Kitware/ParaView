@@ -31,7 +31,7 @@ class vtkExtentTranslator;
 class vtkDataArray;
 class vtkDataSetAttributes;
 
-class VTK_EXPORT vtkXMLStructuredDataWriter : public vtkXMLWriter
+class VTK_ALTIO_EXPORT vtkXMLStructuredDataWriter : public vtkXMLWriter
 {
 public:
   vtkTypeRevisionMacro(vtkXMLStructuredDataWriter,vtkXMLWriter);

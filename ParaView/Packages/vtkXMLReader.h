@@ -25,6 +25,7 @@
 #define __vtkXMLReader_h
 
 #include "vtkSource.h"
+#include "vtkAltIOHeader.h" // For VTK_ALTIO_EXPORT
 
 class vtkCallbackCommand;
 class vtkDataArray;
@@ -34,7 +35,7 @@ class vtkDataSetAttributes;
 class vtkXMLDataElement;
 class vtkXMLDataParser;
 
-class VTK_EXPORT vtkXMLReader : public vtkSource
+class VTK_ALTIO_EXPORT vtkXMLReader : public vtkSource
 {
 public:
   vtkTypeRevisionMacro(vtkXMLReader,vtkSource);

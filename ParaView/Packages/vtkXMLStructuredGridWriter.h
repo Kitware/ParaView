@@ -33,7 +33,7 @@
 
 class vtkStructuredGrid;
 
-class VTK_EXPORT vtkXMLStructuredGridWriter : public vtkXMLStructuredDataWriter
+class VTK_ALTIO_EXPORT vtkXMLStructuredGridWriter : public vtkXMLStructuredDataWriter
 {
 public:
   static vtkXMLStructuredGridWriter* New();

@@ -33,7 +33,7 @@
 
 class vtkImageData;
 
-class VTK_EXPORT vtkXMLImageDataReader : public vtkXMLStructuredDataReader
+class VTK_ALTIO_EXPORT vtkXMLImageDataReader : public vtkXMLStructuredDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLImageDataReader,vtkXMLStructuredDataReader);

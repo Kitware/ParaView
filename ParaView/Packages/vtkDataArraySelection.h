@@ -27,12 +27,13 @@
 #define __vtkDataArraySelection_h
 
 #include "vtkObject.h"
+#include "vtkAltIOHeader.h" // For VTK_ALTIO_EXPORT
 
 //BTX
 template <class DType> class vtkVector;
 //ETX
 
-class VTK_EXPORT vtkDataArraySelection : public vtkObject
+class VTK_ALTIO_EXPORT vtkDataArraySelection : public vtkObject
 {
 public:
   vtkTypeRevisionMacro(vtkDataArraySelection,vtkObject);

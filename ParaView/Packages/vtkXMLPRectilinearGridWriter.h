@@ -34,7 +34,7 @@
 
 class vtkRectilinearGrid;
 
-class VTK_EXPORT vtkXMLPRectilinearGridWriter : public vtkXMLPStructuredDataWriter
+class VTK_ALTIO_EXPORT vtkXMLPRectilinearGridWriter : public vtkXMLPStructuredDataWriter
 {
 public:
   static vtkXMLPRectilinearGridWriter* New();

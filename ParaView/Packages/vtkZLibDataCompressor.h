@@ -25,7 +25,7 @@
 
 #include "vtkDataCompressor.h"
 
-class VTK_EXPORT vtkZLibDataCompressor : public vtkDataCompressor
+class VTK_ALTIO_EXPORT vtkZLibDataCompressor : public vtkDataCompressor
 {
 public:
   vtkTypeRevisionMacro(vtkZLibDataCompressor,vtkDataCompressor);

@@ -26,6 +26,7 @@
 #define __vtkXMLWriter_h
 
 #include "vtkProcessObject.h"
+#include "vtkAltIOHeader.h" // For VTK_ALTIO_EXPORT
 
 class vtkCellData;
 class vtkDataArray;
@@ -36,7 +37,7 @@ class vtkOutputStream;
 class vtkPointData;
 class vtkPoints;
 
-class VTK_EXPORT vtkXMLWriter : public vtkProcessObject
+class VTK_ALTIO_EXPORT vtkXMLWriter : public vtkProcessObject
 {
 public:
   vtkTypeRevisionMacro(vtkXMLWriter,vtkProcessObject);

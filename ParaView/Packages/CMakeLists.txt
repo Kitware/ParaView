@@ -85,8 +85,9 @@ SET_SOURCE_FILES_PROPERTIES(
 # Setup vtkInstantiator registration for this library's classes.
 VTK_MAKE_INSTANTIATOR(vtkAltIOInstantiator AltIOInstantiator_SRCS
                       ${AltIO_SRCS}
-                      EXPORT_MACRO VTK_EXPORT
-                      HEADER_LOCATION ${PVPackages_BINARY_DIR})
+                      EXPORT_MACRO VTK_ALTIO_EXPORT
+                      HEADER_LOCATION ${PVPackages_BINARY_DIR}
+                      INCLUDES vtkAltIOHeader.h)
 ADD_LIBRARY(vtkAltIO SHARED ${AltIO_SRCS} ${AltIOInstantiator_SRCS})
 
 TARGET_LINK_LIBRARIES (vtkAltIO vtkIO)

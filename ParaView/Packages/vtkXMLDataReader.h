@@ -29,7 +29,7 @@
 
 #include "vtkXMLReader.h"
 
-class VTK_EXPORT vtkXMLDataReader : public vtkXMLReader
+class VTK_ALTIO_EXPORT vtkXMLDataReader : public vtkXMLReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLDataReader,vtkXMLReader);

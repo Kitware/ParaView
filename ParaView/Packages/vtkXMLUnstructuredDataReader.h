@@ -32,7 +32,7 @@ class vtkCellArray;
 class vtkUnsignedCharArray;
 class vtkPointSet;
 
-class VTK_EXPORT vtkXMLUnstructuredDataReader : public vtkXMLDataReader
+class VTK_ALTIO_EXPORT vtkXMLUnstructuredDataReader : public vtkXMLDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLUnstructuredDataReader,vtkXMLDataReader);

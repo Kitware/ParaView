@@ -30,7 +30,7 @@
 #include "vtkXMLDataReader.h"
 
 
-class VTK_EXPORT vtkXMLStructuredDataReader : public vtkXMLDataReader
+class VTK_ALTIO_EXPORT vtkXMLStructuredDataReader : public vtkXMLDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLStructuredDataReader,vtkXMLDataReader);

@@ -54,12 +54,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkXMLDataParser_h
 
 #include "vtkXMLParser.h"
+#include "vtkAltIOHeader.h" // For VTK_ALTIO_EXPORT
 
 class vtkXMLDataElement;
 class vtkInputStream;
 class vtkDataCompressor;
 
-class VTK_EXPORT vtkXMLDataParser : public vtkXMLParser
+class VTK_ALTIO_EXPORT vtkXMLDataParser : public vtkXMLParser
 {
 public:
   vtkTypeRevisionMacro(vtkXMLDataParser,vtkXMLParser);

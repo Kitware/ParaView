@@ -29,7 +29,7 @@
 
 class vtkDataSet;
 
-class VTK_EXPORT vtkXMLPDataWriter : public vtkXMLWriter
+class VTK_ALTIO_EXPORT vtkXMLPDataWriter : public vtkXMLWriter
 {
 public:
   vtkTypeRevisionMacro(vtkXMLPDataWriter,vtkXMLWriter);

@@ -25,8 +25,9 @@
 #define __vtkXMLFileReadTester_h
 
 #include "vtkXMLParser.h"
+#include "vtkAltIOHeader.h" // For VTK_ALTIO_EXPORT
 
-class VTK_EXPORT vtkXMLFileReadTester: public vtkXMLParser
+class VTK_ALTIO_EXPORT vtkXMLFileReadTester: public vtkXMLParser
 {
 public:
   vtkTypeRevisionMacro(vtkXMLFileReadTester,vtkXMLParser);

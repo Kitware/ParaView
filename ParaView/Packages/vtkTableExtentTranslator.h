@@ -27,8 +27,9 @@
 #define __vtkTableExtentTranslator_h
 
 #include "vtkExtentTranslator.h"
+#include "vtkAltIOHeader.h" // For VTK_ALTIO_EXPORT
 
-class VTK_EXPORT vtkTableExtentTranslator : public vtkExtentTranslator
+class VTK_ALTIO_EXPORT vtkTableExtentTranslator : public vtkExtentTranslator
 {
 public:
   vtkTypeRevisionMacro(vtkTableExtentTranslator,vtkExtentTranslator);

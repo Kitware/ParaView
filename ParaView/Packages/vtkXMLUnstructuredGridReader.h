@@ -33,7 +33,7 @@
 
 class vtkUnstructuredGrid;
 
-class VTK_EXPORT vtkXMLUnstructuredGridReader : public vtkXMLUnstructuredDataReader
+class VTK_ALTIO_EXPORT vtkXMLUnstructuredGridReader : public vtkXMLUnstructuredDataReader
 {
 public:
   vtkTypeRevisionMacro(vtkXMLUnstructuredGridReader,vtkXMLUnstructuredDataReader);
