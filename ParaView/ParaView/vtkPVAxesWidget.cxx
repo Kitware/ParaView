@@ -41,16 +41,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVAxesWidget.h"
 
+#include "vtkActor2D.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
+#include "vtkCoordinate.h"
 #include "vtkObjectFactory.h"
+#include "vtkPoints.h"
+#include "vtkPolyData.h"
+#include "vtkPolyDataMapper2D.h"
+#include "vtkProperty2D.h"
 #include "vtkPVAxesActor.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.2");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.3");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -96,6 +102,32 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->Moving = 0;
   this->MouseCursorState = vtkPVAxesWidget::Outside;
   this->StartTag = 0;
+  
+  this->Interactive = 1;
+  
+  this->Outline = vtkPolyData::New();
+  this->Outline->Allocate();
+  vtkPoints *points = vtkPoints::New();
+  vtkIdType ptIds[5];
+  ptIds[4] = ptIds[0] = points->InsertNextPoint(1, 1, 0);
+  ptIds[1] = points->InsertNextPoint(2, 1, 0);
+  ptIds[2] = points->InsertNextPoint(2, 2, 0);
+  ptIds[3] = points->InsertNextPoint(1, 2, 0);
+  this->Outline->SetPoints(points);
+  this->Outline->InsertNextCell(VTK_POLY_LINE, 5, ptIds);
+  vtkCoordinate *tcoord = vtkCoordinate::New();
+  tcoord->SetCoordinateSystemToDisplay();
+  vtkPolyDataMapper2D *mapper = vtkPolyDataMapper2D::New();
+  mapper->SetInput(this->Outline);
+  mapper->SetTransformCoordinate(tcoord);
+  this->OutlineActor = vtkActor2D::New();
+  this->OutlineActor->SetMapper(mapper);
+  this->OutlineActor->SetPosition(0, 0);
+  this->OutlineActor->SetPosition2(1, 1);
+  
+  points->Delete();
+  mapper->Delete();
+  tcoord->Delete();
 }
 
 vtkPVAxesWidget::~vtkPVAxesWidget()
@@ -104,6 +136,8 @@ vtkPVAxesWidget::~vtkPVAxesWidget()
   this->SetParentRenderer(NULL);
   this->Renderer->Delete();
   this->AxesActor->Delete();
+  this->OutlineActor->Delete();
+  this->Outline->Delete();
 }
 
 void vtkPVAxesWidget::SetEnabled(int enabling)
@@ -244,6 +278,16 @@ void vtkPVAxesWidget::UpdateCursorIcon()
     {
     this->MouseCursorState = vtkPVAxesWidget::Outside;
     }
+
+  if (this->MouseCursorState == vtkPVAxesWidget::Outside)
+    {
+    this->Renderer->RemoveActor(this->OutlineActor);
+    }
+  else
+    {
+    this->Renderer->AddActor(this->OutlineActor);
+    }
+  this->Interactor->Render();
   
   if (pState == this->MouseCursorState)
     {
@@ -285,6 +329,11 @@ void vtkPVAxesWidget::ProcessEvents(vtkObject* vtkNotUsed(object),
 {
   vtkPVAxesWidget *self =
     reinterpret_cast<vtkPVAxesWidget*>(clientdata);
+
+  if (!self->GetInteractive())
+    {
+    return;
+    }
   
   switch (event)
     {
@@ -660,12 +709,57 @@ void vtkPVAxesWidget::ResizeBottomRight()
 void vtkPVAxesWidget::SquareRenderer()
 {
   int *size = this->Renderer->GetSize();
-  float *vp = this->Renderer->GetViewport();
+  float vp[4];
+  this->Renderer->GetViewport(vp);
   
   float deltaX = vp[2] - vp[0];
   float newDeltaX = size[1] * deltaX / (float)size[0];
   vp[2] = vp[0] + newDeltaX;
+  
   this->Renderer->SetViewport(vp);
+  
+  this->Renderer->NormalizedDisplayToDisplay(vp[0], vp[1]);
+  this->Renderer->NormalizedDisplayToDisplay(vp[2], vp[3]);
+  
+  vtkPoints *points = this->Outline->GetPoints();
+  points->SetPoint(0, vp[0]+1, vp[1]+1, 0);
+  points->SetPoint(1, vp[2]-1, vp[1]+1, 0);
+  points->SetPoint(2, vp[2]-1, vp[3]-1, 0);
+  points->SetPoint(3, vp[0]+1, vp[3]-1, 0);
+}
+
+void vtkPVAxesWidget::SetInteractive(int state)
+{
+  if (this->Interactive != state)
+    {
+    this->Interactive = state;
+    }
+  
+  if (!state)
+    {
+    this->OnButtonRelease();
+    this->MouseCursorState = vtkPVAxesWidget::Outside;
+    this->Renderer->RemoveActor(this->OutlineActor);
+    if (this->Interactor)
+      {
+      this->SetMouseCursor(this->MouseCursorState);
+      this->Interactor->Render();
+      }
+    }
+}
+
+void vtkPVAxesWidget::SetOutlineColor(float r, float g, float b)
+{
+  this->OutlineActor->GetProperty()->SetColor(r, g, b);
+  if (this->Interactor)
+    {
+    this->Interactor->Render();
+    }
+}
+
+float* vtkPVAxesWidget::GetOutlineColor()
+{
+  return this->OutlineActor->GetProperty()->GetColor();
 }
 
 void vtkPVAxesWidget::PrintSelf(ostream& os, vtkIndent indent)
@@ -673,4 +767,5 @@ void vtkPVAxesWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   
   os << indent << "AxesActor: " << this->AxesActor << endl;
+  os << indent << "Interactive: " << this->Interactive << endl;
 }

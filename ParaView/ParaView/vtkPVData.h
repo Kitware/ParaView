@@ -239,11 +239,6 @@ public:
   void SetCubeAxesVisibility(int val);
   void CubeAxesCheckCallback();
   vtkGetObjectMacro(CubeAxesCheck, vtkKWCheckButton);
-  void SetAxesWidgetVisibility(int val);
-  void AxesWidgetCheckCallback();
-  vtkGetObjectMacro(AxesWidgetCheck, vtkKWCheckButton);
-  vtkGetStringMacro(AxesWidgetTclName);
-  
 
   void SetPointLabelVisibility(int val);
   void PointLabelCheckCallback();

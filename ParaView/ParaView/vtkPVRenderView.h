@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWView.h"
 
 class vtkInteractorObserver;
+class vtkKWChangeColorButton;
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
@@ -66,6 +67,7 @@ class vtkKWSplitFrame;
 class vtkLabeledFrame;
 class vtkMultiProcessController;
 class vtkPVApplication;
+class vtkPVAxesWidget;
 class vtkPVCameraIcon;
 class vtkPVData;
 class vtkPVInteractorStyleControl;
@@ -256,12 +258,26 @@ public:
   // Switch to the View Properties menu back and forth
   void SwitchBackAndForthToViewProperties();
 
+  // Description:
+  // Access to the overlay renderer.
   vtkGetObjectMacro(Renderer2D, vtkRenderer);
   
+  // Description:
+  // Add/remove composites to/from the overlay renderer.
   virtual void Add2DComposite(vtkKWComposite *c);
   virtual void Remove2DComposite(vtkKWComposite *c);
 
+  // Description:
+  // Enable the input 3D widget
   void Enable3DWidget(vtkInteractorObserver *o);
+
+  // Description:
+  // Callbacks for the orientation axes.
+  void SetOrientationAxesVisibility(int val);
+  void OrientationAxesCheckCallback();
+  void SetOrientationAxesInteractivity(int val);
+  void OrientationAxesInteractiveCallback();
+  void SetOrientationAxesOutlineColor(float r, float g, float b);
   
 protected:
   vtkPVRenderView();
@@ -287,6 +303,11 @@ protected:
   vtkKWLabeledFrame *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
 
+  vtkKWLabeledFrame *OrientationAxesFrame;
+  vtkKWCheckButton *OrientationAxesCheck;
+  vtkKWCheckButton *OrientationAxesInteractiveCheck;
+  vtkKWChangeColorButton *OrientationAxesOutlineColor;
+  vtkPVAxesWidget *OrientationAxes;
 
   vtkKWSplitFrame *SplitFrame;
 

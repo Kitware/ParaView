@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
-#include "vtkPVAxesWidget.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
@@ -103,7 +102,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.228");
+vtkCxxRevisionMacro(vtkPVData, "1.229");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -122,8 +121,6 @@ vtkPVData::vtkPVData()
   this->PropertiesParent = NULL; 
 
   this->CubeAxesTclName = NULL;
-
-  this->AxesWidgetTclName = NULL;
 
   this->PointLabelMapperTclName = NULL;
   this->PointLabelActorTclName = NULL;
@@ -175,7 +172,6 @@ vtkPVData::vtkPVData()
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
   this->PointLabelCheck = vtkKWCheckButton::New();
-  this->AxesWidgetCheck = vtkKWCheckButton::New();
   
   this->VisibilityCheck = vtkKWCheckButton::New();
   this->Visibility = 1;
@@ -325,21 +321,9 @@ vtkPVData::~vtkPVData()
     this->PointLabelCheck = NULL;
     }
  
-  if (this->AxesWidgetTclName)
-    {
-    if (pvApp)
-      {
-      this->Script("%s Delete", this->AxesWidgetTclName);
-      }
-    this->SetAxesWidgetTclName(NULL);
-    }
-  
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;  
 
-  this->AxesWidgetCheck->Delete();
-  this->AxesWidgetCheck = NULL;
-  
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
   
@@ -454,7 +438,6 @@ void vtkPVData::DeleteCallback()
 {
   this->SetCubeAxesVisibility(0);
   this->SetPointLabelVisibility(0);
-  this->SetAxesWidgetVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -561,12 +544,6 @@ void vtkPVData::CreateProperties()
   this->CubeAxesCheck->SetParent(this->ViewFrame->GetFrame());
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
-  this->AxesWidgetCheck->SetParent(this->ViewFrame->GetFrame());
-  this->AxesWidgetCheck->Create(this->Application, "-text \"Orientation Axes\"");
-  this->AxesWidgetCheck->SetCommand(this, "AxesWidgetCheckCallback");
-  this->AxesWidgetCheck->SetBalloonHelpString(
-    "Toggle the visibility of the orientation axes.");
-  
   this->CubeAxesCheck->SetBalloonHelpString(
     "Toggle the visibility of X,Y,Z scales for this dataset.");
 
@@ -588,10 +565,6 @@ void vtkPVData::CreateProperties()
   this->Script("grid %s -sticky wns",
                this->ScalarBarCheck->GetWidgetName());
   
-  this->Script("grid %s -sticky wns",
-               this->AxesWidgetCheck->GetWidgetName());
-  
-
   this->Script("grid %s -sticky wns",
                this->CubeAxesCheck->GetWidgetName());
 
@@ -2006,13 +1979,6 @@ void vtkPVData::Initialize()
                                         this->GetCubeAxesTclName(), tclName);
   pvApp->GetProcessModule()->RootScript("%s SetInertia 20", this->GetCubeAxesTclName());
   
-  sprintf(newTclName, "AxesWidget%d", this->InstanceCount);
-  this->SetAxesWidgetTclName(newTclName);
-  this->Script("vtkPVAxesWidget %s", this->AxesWidgetTclName);
-  this->Script("%s SetParentRenderer %s", this->AxesWidgetTclName, tclName);
-  this->Script("%s SetInteractor %s",
-               this->AxesWidgetTclName,
-               pvApp->GetMainWindow()->GetInteractorTclName());
   // Choose the representation based on the data.
   // Polydata is always surface.
   // Structured data is surface when 2d, outline when 3d.
@@ -2206,18 +2172,6 @@ void vtkPVData::SetPointLabelVisibility(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetAxesWidgetVisibility(int state)
-{
-  if (this->AxesWidgetCheck->GetState() != state)
-    {
-    this->AddTraceEntry("$kw(%s) SetAxesVisibility %d", this->GetTclName(),
-                        state);
-    this->AxesWidgetCheck->SetState(state);
-    }
-  this->Script("%s SetEnabled %d", this->AxesWidgetTclName, state);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVData::ScalarBarCheckCallback()
 {
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
@@ -2264,18 +2218,6 @@ void vtkPVData::PointLabelCheckCallback()
       {
       this->GetPVRenderView()->EventuallyRender();
       }
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::AxesWidgetCheckCallback()
-{
-  this->AddTraceEntry("$kw(%s) SetAxesWidgetVisibility %d", this->GetTclName(),
-                      this->AxesWidgetCheck->GetState());
-  this->SetAxesWidgetVisibility(this->AxesWidgetCheck->GetState());
-  if (this->GetPVRenderView())
-    {
-    this->GetPVRenderView()->EventuallyRender();
     }
 }
 
@@ -2702,9 +2644,6 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ColorMenu: " << this->ColorMenu << endl;
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   os << indent << "CubeAxesTclName: " << (this->CubeAxesTclName?this->CubeAxesTclName:"none") << endl;
-  os << indent << "AxesWidgetTclName: " << (this->AxesWidgetTclName ?
-                                            this->AxesWidgetTclName : "(none)")
-     << endl;
   os << indent << "PVSource: " << this->GetPVSource() << endl;
   os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
   if (this->PVColorMap)
@@ -2718,7 +2657,6 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertiesCreated: " << this->PropertiesCreated << endl;
   os << indent << "CubeAxesCheck: " << this->CubeAxesCheck << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
-  os << indent << "AxesWidgetCheck: " << this->AxesWidgetCheck << endl;
   os << indent << "PointLabelCheck: " << this->PointLabelCheck << endl;
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
