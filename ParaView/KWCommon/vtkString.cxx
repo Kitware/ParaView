@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkString, "1.8");
+vtkCxxRevisionMacro(vtkString, "1.9");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -232,7 +232,7 @@ char* vtkString::ReplaceChars(char* str, char *toreplace, char replacement)
 }
 
 //----------------------------------------------------------------------------
-int vtkString::CountChar(char* str, char c)
+unsigned int vtkString::CountChar(char* str, char c)
 {
   int count = 0;
 

@@ -100,7 +100,7 @@ public:
 
   // Description:
   // Return the number of occurence of a char.
-  static int CountChar(char* str, char c);
+  static unsigned int CountChar(char* str, char c);
 
 protected:
   vtkString() {};
