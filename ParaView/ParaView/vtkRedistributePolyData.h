@@ -39,59 +39,34 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-/*======================================================================
-// This software and ancillary information known as vtk_ext (and
-// herein called "SOFTWARE") is made available under the terms
-// described below.  The SOFTWARE has been approved for release with
-// associated LA_CC Number 99-44, granted by Los Alamos National
-// Laboratory in July 1999.
-//
-// Unless otherwise indicated, this SOFTWARE has been authored by an
-// employee or employees of the University of California, operator of
-// the Los Alamos National Laboratory under Contract No. W-7405-ENG-36
-// with the United States Department of Energy.
-//
-// The United States Government has rights to use, reproduce, and
-// distribute this SOFTWARE.  The public may copy, distribute, prepare
-// derivative works and publicly display this SOFTWARE without charge,
-// provided that this Notice and any statement of authorship are
-// reproduced on all copies.
-//
-// Neither the U. S. Government, the University of California, nor the
-// Advanced Computing Laboratory makes any warranty, either express or
-// implied, nor assumes any liability or responsibility for the use of
-// this SOFTWARE.
-//
-// If SOFTWARE is modified to produce derivative works, such modified
-// SOFTWARE should be clearly marked, so as not to confuse it with the
-// version available from Los Alamos National Laboratory.
-======================================================================*/
-
-// .NAME vtkRedistributePolyData - redistribute poly cells from other processes (special version to color according to processor)
+// .NAME vtkRedistributePolyData - redistribute poly cells from other processes
+//                        (special version to color according to processor)
 
 #ifndef __vtkRedistributePolyData_h
 #define __vtkRedistributePolyData_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkMultiProcessController.h"
 
-class vtkMultiProcessController;
+//*******************************************************************
 
 class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataToPolyDataFilter 
 {
 public:
   vtkTypeRevisionMacro(vtkRedistributePolyData, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
   static vtkRedistributePolyData *New();
 
   // Description:
   // The filter needs a controller to determine which process it is in.
-  void SetController(vtkMultiProcessController* controller);
+  vtkSetObjectMacro(Controller, vtkMultiProcessController);
   vtkGetObjectMacro(Controller, vtkMultiProcessController); 
 
-  void SetColorProc(int cp) { colorProc = cp; };
-  void SetColorProc() { colorProc = 1; };
-  int GetColorProc() { return colorProc; };
+  void SetColorProc(int cp){colorProc = cp;};
+  void SetColorProc(){colorProc = 1;};
+  int GetColorProc(){return colorProc;};
 
 protected:
   vtkRedistributePolyData();
@@ -103,7 +78,6 @@ protected:
     POINT_COORDS_TAG   = 20,
     NUM_POINTS_TAG     = 30,
     NUM_CELLS_TAG      = 40,
-    POLY_DATA_TAG      = 50,
     BOUNDS_TAG         = 60,
     CNT_SEND_TAG       = 80,
     CNT_REC_TAG        = 90,
@@ -116,15 +90,7 @@ protected:
     CELL_CNT_TAG       = 150,
     CELL_TAG           = 160,
     POINTS_SIZE_TAG    = 170,
-    POINTS_TAG         = 180,
-
-// DATA_ARRAY_SIZE_TAG     = 190,
-    SCALARS_TAG        = 200,
-    VECTORS_TAG        = 210,
-    NORMALS_TAG        = 220,
-    TCOORDS_TAG        = 230,
-    TENSOR_TAG         = 240,
-    FIELDDATA_TAG      = 1250
+    POINTS_TAG         = 180
   };
 
   class VTK_EXPORT vtkCommSched
@@ -132,21 +98,21 @@ protected:
   public:
     vtkCommSched();
     ~vtkCommSched();
-    
+   
     int SendCount;
     int ReceiveCount;
     int* SendTo;
     int* ReceiveFrom;
-    vtkIdType NumberOfCells;
-    vtkIdType* SendNumber;
-    vtkIdType* ReceiveNumber;
-    
-    vtkIdType** SendCellList;
-    vtkIdType* KeepCellList;
-    
+    vtkIdType* NumberOfCells;
+    vtkIdType** SendNumber;
+    vtkIdType** ReceiveNumber;
+   
+    vtkIdType*** SendCellList;
+    vtkIdType** KeepCellList;
+   
   private:
     vtkCommSched(const vtkCommSched&); // Not implemented
-    void operator=(const vtkCommSched&); // Not implemented    
+    void operator=(const vtkCommSched&); // Not implemented
   };
 
 //ETX
@@ -154,48 +120,54 @@ protected:
   virtual void MakeSchedule (vtkCommSched*);
   void OrderSchedule (vtkCommSched*);
 
-  void SendCellSizes (vtkIdType, vtkIdType, vtkPolyData*, int, 
-                      vtkIdType&, vtkIdType&, vtkIdType*); 
-  void CopyCells (vtkIdType,vtkPolyData*, vtkPolyData*, vtkIdType*); 
-  void SendCells (vtkIdType, vtkIdType, vtkPolyData*, vtkPolyData*, 
-                  int, vtkIdType&, vtkIdType&, vtkIdType*); 
-  void ReceiveCells (vtkIdType, vtkIdType, vtkPolyData*, int, 
-                     vtkIdType, vtkIdType, vtkIdType, 
-                     vtkIdType);
+  void SendCellSizes (vtkIdType*, vtkIdType*, vtkPolyData*, int, 
+                      vtkIdType&, vtkIdType*, vtkIdType**); 
+  void CopyCells (vtkIdType*,vtkPolyData*, vtkPolyData*, vtkIdType**); 
+  void SendCells (vtkIdType*, vtkIdType*, vtkPolyData*, vtkPolyData*, 
+                  int, vtkIdType&, vtkIdType*, vtkIdType**); 
+  void ReceiveCells (vtkIdType*, vtkIdType*, vtkPolyData*, int, 
+                     vtkIdType*, vtkIdType*, vtkIdType, vtkIdType);
 
-  void FindMemReq (vtkIdType, vtkPolyData*, vtkIdType&, vtkIdType&);
+  void FindMemReq (vtkIdType*, vtkPolyData*, vtkIdType&, vtkIdType*);
 
-  void AllocateDataArrays (vtkDataSetAttributes*, vtkIdType*, int, int*, 
-                           vtkIdType);
+  void AllocateCellDataArrays (vtkDataSetAttributes*, vtkIdType**, 
+                               int, vtkIdType*);
+  void AllocatePointDataArrays (vtkDataSetAttributes*, vtkIdType*, 
+                                int, vtkIdType);
   void AllocateArrays (vtkDataArray*, vtkIdType);
 
-  void CopyDataArrays(vtkDataSetAttributes* , vtkDataSetAttributes* ,
-                      vtkIdType , vtkIdType*, int);
+  void CopyDataArrays(vtkDataSetAttributes*, vtkDataSetAttributes*,
+                      vtkIdType, vtkIdType*, int);
 
-  void CopyCellBlockDataArrays(vtkDataSetAttributes* , vtkDataSetAttributes* ,
-                               vtkIdType , vtkIdType* , vtkIdType, int);
+  void CopyCellBlockDataArrays(vtkDataSetAttributes* , 
+                               vtkDataSetAttributes* ,
+                               vtkIdType , vtkIdType, 
+                               vtkIdType, int);
 
   void CopyArrays (vtkDataArray*, vtkDataArray*, vtkIdType, vtkIdType*, 
-                   int, int); 
+                   int); 
 
-  void CopyBlockArrays (vtkDataArray*, vtkDataArray*, vtkIdType, vtkIdType, 
-                        int); 
+  void CopyBlockArrays (vtkDataArray*, vtkDataArray*, vtkIdType, 
+                        vtkIdType, vtkIdType, int); 
 
   void SendDataArrays (vtkDataSetAttributes*, vtkDataSetAttributes*,
                        vtkIdType, int, vtkIdType*, int); 
 
-  void SendCellBlockDataArrays (vtkDataSetAttributes*, vtkDataSetAttributes*,
-                                vtkIdType, int, vtkIdType*, vtkIdType); 
+  void SendCellBlockDataArrays (vtkDataSetAttributes*, 
+                                vtkDataSetAttributes*,
+                                vtkIdType, int, vtkIdType, int); 
 
-  void SendArrays (vtkDataArray*, vtkIdType, int,  vtkIdType*, int, int); 
+  void SendArrays (vtkDataArray*, vtkIdType, int, 
+                   vtkIdType*, int); 
 
-  void SendBlockArrays (vtkDataArray*, vtkIdType, int, vtkIdType, int); 
+  void SendBlockArrays (vtkDataArray*, vtkIdType, int, 
+                        vtkIdType, int); 
 
-  void ReceiveDataArrays (vtkDataSetAttributes*, vtkIdType, int, vtkIdType*, 
-                          int); 
+  void ReceiveDataArrays (vtkDataSetAttributes*, vtkIdType, int, 
+                          vtkIdType*, int); 
 
   void ReceiveArrays (vtkDataArray*, vtkIdType, int, 
-                      vtkIdType*, int, int); 
+                      vtkIdType*, int); 
 
   void Execute();
 
@@ -203,12 +175,16 @@ protected:
   void SendCompleteArrays (int);
 
   vtkMultiProcessController *Controller;
+  //vtkPointLocator *Locator;
   int colorProc; // Set to 1 to color data according to processor
 
 private:
   vtkRedistributePolyData(const vtkRedistributePolyData&); // Not implemented
   void operator=(const vtkRedistributePolyData&); // Not implemented
+  
 };
+
+//****************************************************************
 
 #endif
 
