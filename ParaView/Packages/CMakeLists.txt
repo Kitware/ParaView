@@ -1,6 +1,9 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 1.4)
 PROJECT(PVPackages)
 
+INCLUDE_DIRECTORIES(${PVPackages_SOURCE_DIR})
+INCLUDE_DIRECTORIES(${PVPackages_BINARY_DIR})
+
 SET( AltIO_SRCS
   vtkBase64InputStream.cxx
   vtkBase64OutputStream.cxx
@@ -82,7 +85,7 @@ SET_SOURCE_FILES_PROPERTIES(
 VTK_MAKE_INSTANTIATOR(vtkAltIOInstantiator AltIOInstantiator_SRCS
                       ${AltIO_SRCS}
                       EXPORT_MACRO VTK_EXPORT
-                      HEADER_LOCATION ${VTK_BINARY_DIR})
+                      HEADER_LOCATION ${PVPackages_BINARY_DIR})
 ADD_LIBRARY(vtkAltIO SHARED ${AltIO_SRCS} ${AltIOInstantiator_SRCS})
 
 IF (VTK_WRAP_TCL)
