@@ -9,7 +9,7 @@
   install CMake.  Binary and source distributions of CMake can be
   found <a href="http://www.cmake.org/HTML/Download.html">here</a>.
   If it exists for your platform, we highly recommend using a binary
-  distribution.  CMake 1.8.3 or newer is required.
+  distribution.  CMake 2.0.1 or newer is required.
   <p>
   The complete distribution of ParaView contains VTK and Tcl/Tk
   8.4.5.  You do not need to download VTK or Tcl/Tk separately to compile.
@@ -35,47 +35,8 @@
   <h3><a name="compcompun">UNIX/Linux</a></h3><p>
   The following instructions only apply to Unix/Linux systems.  
 
-  First we will give you the quick-and-dirty way to build ParaView:
-  <ol>
-    <li> Extract the ParaView distribution tarball and enter the directory:
-         <blockquote><code>
-           tar xvzf paraview-1.4.2.tar.gz<br>
-           cd paraview-1.4.2
-         </code></blockquote>
-    <li> Run cmake in wizard mode, where you have to answer questions
-         about the build:
-         <blockquote><code>
-           cmake . -i
-         </code></blockquote>
-         <b>OR</b> run the terminal-based interface to cmake to
-         interactively change build options:
-         <blockquote><code>
-           ccmake .
-         </code></blockquote>
-
-    <li> Change build options as necessary.  The defaults should work
-         for most users.  A common option to change is
-         <code>CMAKE_INSTALL_PREFIX</code> which controls the
-         root location of the installation.
-
-    <li> Run a make program to build and install the software:
-         <blockquote><code>
-           make && make install
-         </code></blockquote>
-  </ol>
-
-  It is a very good idea to tell cmake what C and C++ compilers
-  you will be using. This can prevent many build problems.
-  On most systems you can pass this information to CMake in the 
-  following way:
-  <blockquote><code>
-    env CXX=/your/C++/compiler CC=/your/c/compiler ccmake .
-  </code></blockquote>
-  otherwise you must set CXX and CC in your environment and then
-  run <code>ccmake</code> (or <code>cmake -i</code>).
-  <p>
-  A better way to build ParaView is to use a build directory separate
-  from the source.  This has the advantage of allowing more than one
+  ParaView requires that you maintain separate source and build trees.
+  This has the advantage of allowing more than one
   build with different options or on different platforms to share the
   same source tree.  This technique is called an out-of-source build.
   <p>
@@ -86,23 +47,33 @@
   
   On either machine, extract the source tarball:
   <blockquote><code>
-    tar xvzf paraview-1.4.2.tar.gz
+    tar xvzf paraview-2.0.0.tar.gz
   </code></blockquote>
   On the Solaris machine, run
   <blockquote><code>
-    mkdir paraview-1.4.2-solaris<br>
-    cd paraview-1.4.2-solaris<br>
-    ccmake ../paraview-1.4.2<br>
+    mkdir paraview-2.0.0-solaris<br>
+    cd paraview-2.0.0-solaris<br>
+    ccmake ../paraview-2.0.0<br>
     make && make install
   </code></blockquote>
   Then on the IRIX machine, run
   <blockquote><code>
-    mkdir paraview-1.4.2-irix<br>
-    cd paraview-1.4.2-irix<br>
-    ccmake ../paraview-1.4.2<br>
+    mkdir paraview-2.0.0-irix<br>
+    cd paraview-2.0.0-irix<br>
+    ccmake ../paraview-2.0.0<br>
     make && make install
   </code></blockquote>
   <p>  
+  It is a very good idea to tell cmake what C and C++ compilers
+  you will be using. This can prevent many build problems.
+  On most systems you can pass this information to CMake in the 
+  following way:
+  <blockquote><code>
+    env CXX=/your/C++/compiler CC=/your/c/compiler ccmake .
+  </code></blockquote>
+  otherwise you must set CXX and CC in your environment and then
+  run <code>ccmake</code> (or <code>cmake -i</code>).
+  <p>
   Please note that on some platforms, it might be necessary to use the
   GNU Make to compile out-of-source.  This is due to the fact that the
   Tcl/Tk build process uses some features not available on all make
@@ -113,16 +84,14 @@ The Windows build process uses the CMake GUI CMakeSetup.
 <ol>
 
   <li> Install the ParaView source distribution by unzipping into a
-       directory of your choice.  A directory called
-       <code>paraview-1.4.2</code> will be created when the zipfile is
-       extracted.
+       directory of your choice, <code>paraview-2.0.0</code>, for example.
       
   <li> Execute CMakeSetup. This will pop-up a GUI that allows you to
        tailor the build. You'll have to tell CMakeSetup where you've
        placed your ParaView source code, and where to build the object
        code and dll's. The build directory is typically placed next to
-       the <code>paraview-1.4.2</code> source directory and called
-       something like <code>paraview-1.4.2-build</code>.
+       the <code>paraview-2.0.0</code> source directory and called
+       something like <code>paraview-2.0.0-build</code>.
       
   <li> When CMakeSetup completes, start up Visual Studio and load
        ParaView.dsw or ParaView.sln. Select the
@@ -133,7 +102,7 @@ during the link phase.
 <p>
 Currently there is no install support for Windows.  Just run the
 <code>paraview</code> executable from the build tree.  It will be
-located in <code>paraview-1.4.2-build/bin/</code><i>config</i>, where
+located in <code>paraview-2.0.0-build/bin/</code><i>config</i>, where
 <i>config</i> is either <code>Debug</code> or <code>Release</code>
 depending on the configuration you chose when building the ALL_BUILD
 project.
