@@ -34,6 +34,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkInteractorStyleImageExtent.h"
 
 class vtkPVImageData;
+class vtkKWScale;
+class vtkPVSelectionList;
 
 class VTK_EXPORT vtkPVImageSlice : public vtkPVImageToImageFilter
 {
@@ -69,6 +71,11 @@ public:
   virtual void Deselect(vtkKWView *view);
   
   void UseSliceStyle();
+
+  // Description:
+  // A callback from the axis selection list that
+  // changes the rang of the slice scale.
+  void ComputeSliceRange();
   
 protected:
   vtkPVImageSlice();
@@ -78,16 +85,23 @@ protected:
   
   // This is called to update the widgets when the parameters are changed
   // programatically (not through UI).
-  void UpdateProperties();
+  void UpdateVTKSource();
   
   // Keep the parameters here (in addition to the widgets)
   // so they can be set before the properties are created.
   int SliceNumber;
   int SliceAxis;
   
+  // We need to keep a reference to these to change the extent of the scale
+  // when the axis changes.
+
   vtkInteractorStyleImageExtent *SliceStyle;
   vtkKWPushButton *SliceStyleButton;
   int SliceStyleCreated;
+
+  // Axis affects scale.
+  vtkKWScale *SliceScale;
+  vtkPVSelectionList *AxisWidget;
 };
 
 #endif

@@ -155,7 +155,6 @@ void vtkPVImageData::ShiftScale()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVImageShiftScale *f;
-  int ext[6];
 
   f = vtkPVImageShiftScale::New();
   f->Clone(pvApp);    

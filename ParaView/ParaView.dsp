@@ -209,6 +209,14 @@ SOURCE=.\vtkPVActorCompositeTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVAnimation.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVAnimationTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVApplication.cxx
 # End Source File
 # Begin Source File
@@ -813,6 +821,26 @@ SOURCE=.\vtkPVActorComposite.h
 # Begin Custom Build
 InputPath=.\vtkPVActorComposite.h
 InputName=vtkPVActorComposite
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVAnimation.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVAnimation.h
+InputName=vtkPVAnimation
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

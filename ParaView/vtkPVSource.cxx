@@ -485,8 +485,8 @@ int vtkPVSource::GetVisibility()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd, 
-                                   vtkKWObject *o)
+vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd, 
+                                                vtkKWObject *o)
 {
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -534,10 +534,14 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd,
 
   frame->Delete();
   check->Delete();
+
+  // Although it has been deleted, it did not destruct.
+  // We need to change this into a PVWidget.
+  return check;
 }  
 //----------------------------------------------------------------------------
-void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd,
-                                  vtkKWObject *o)
+vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd,
+                                         vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -586,6 +590,10 @@ void vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd,
 
   frame->Delete();
   entry->Delete();
+
+  // Although it has been deleted, it did not destruct.
+  // We need to change this into a PVWidget.
+  return entry;
 }
 
 //----------------------------------------------------------------------------
@@ -1092,9 +1100,9 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
-                           float min, float max, float resolution,
-                           vtkKWObject *o)
+vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
+                                  float min, float max, float resolution,
+                                  vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1141,12 +1149,16 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   frame->Delete();
   labelWidget->Delete();
   slider->Delete();
+
+  // Although it has been deleted, it did not destruct.
+  // We need to change this into a PVWidget.
+  return slider;
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd,
-                              vtkKWObject *o)
+vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd,
+                                             vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1198,6 +1210,10 @@ void vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd,
   sl->Delete();
   labelWidget->Delete();
   frame->Delete();
+
+  // Although it has been deleted, it did not destruct.
+  // We need to change this into a PVWidget.
+  return sl;
 }
 //----------------------------------------------------------------------------
 void vtkPVSource::AddModeListItem(char *name, int value)

@@ -69,6 +69,10 @@ public:
   // This method gets called when the user selects an entry.
   // Use this method if you want to programmatically change the selection.
   void SelectCallback(const char *name, int value);
+
+  // Description:
+  // When set, the command is executed every time the mode is changed.
+  void SetCommand(vtkKWObject *o, const char *method);
   
 protected:
   vtkPVSelectionList();
@@ -77,6 +81,7 @@ protected:
   void operator=(const vtkPVSelectionList&) {};
 
   vtkPVMenuButton *MenuButton;
+  char *Command;
 
   int CurrentValue;
   char *CurrentName;

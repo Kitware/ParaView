@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 
+
 #include "vtkInteractorStylePlaneSource.h"
 
 #include "vtkMath.h"
@@ -49,6 +50,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVSphereSource.h"
+#include "vtkPVAnimation.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -138,10 +140,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CreateMenu->Create(this->Application,"-tearoff 0");
   this->Menu->InsertCascade(2,"Create",this->CreateMenu,0);
 
-  this->CreateMenu->AddCommand("ImageReader", this, "NewVolume");
-  this->CreateMenu->AddCommand("FractalVolume", this, "FractalVolume");
+  this->CreateMenu->AddCommand("ImageReader", this, "NewImageReader");
+  this->CreateMenu->AddCommand("FractalVolume", this, "NewFractalVolume");
   this->CreateMenu->AddCommand("Cone", this, "NewCone");
   this->CreateMenu->AddCommand("Sphere", this, "NewSphere");
+  this->CreateMenu->AddCommand("Animation", this, "NewAnimation");
 
   this->SetStatusText("Version 1.0 beta");
   
@@ -321,7 +324,7 @@ void vtkPVWindow::NewSphere()
 
 //----------------------------------------------------------------------------
 // Setup the pipeline
-void vtkPVWindow::NewVolume()
+void vtkPVWindow::NewImageReader()
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   vtkPVImageReader *reader;
@@ -338,7 +341,7 @@ void vtkPVWindow::NewVolume()
 
 //----------------------------------------------------------------------------
 // Setup the pipeline
-void vtkPVWindow::FractalVolume()
+void vtkPVWindow::NewFractalVolume()
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   vtkPVImageMandelbrotSource *source;
@@ -351,6 +354,33 @@ void vtkPVWindow::FractalVolume()
   this->SetCurrentSource(source);
   
   source->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::NewAnimation()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVAnimation *anim;
+  
+  // Create the pipeline objects in all processes.
+  anim = vtkPVAnimation::New();
+  // Although this does not need to be cloned to implement animations,
+  // we are using the AutoWidgets wich broadcast there callbacks.  The
+  // The clones will just act like dummies.
+  anim->Clone(pvApp);
+  
+  anim->SetName("Animation");
+  
+  // Add the new Source to the View (in all processes).
+  this->MainView->AddComposite(anim);
+  anim->SetObject(this->GetCurrentSource());
+
+  // Select this Source
+  this->SetCurrentSource(anim);
+  
+  // Clean up. (How about on the other processes?)
+  anim->Delete();
+  anim = NULL;
 }
 
 //----------------------------------------------------------------------------

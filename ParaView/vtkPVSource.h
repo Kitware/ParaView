@@ -41,9 +41,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVData.h"
 #include "vtkSource.h"
 
-class vtkPVSelectionList;
 class vtkPVWindow;
 class vtkPVCommandList;
+class vtkKWCheckButton;
+class vtkKWScale;
+class vtkKWEntry;
+class vtkPVSelectionList;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
@@ -123,8 +126,8 @@ public:
   // Description:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
-  void AddLabeledEntry(char *label, char *setCmd, char *getCmd,
-                       vtkKWObject *o = NULL);
+  vtkKWEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,
+                              vtkKWObject *o = NULL);
   
   // Description:
   // Create an entry for items with multiple elements.
@@ -144,17 +147,17 @@ public:
   // Description:
   // Special widget controls (not entries).
   // The methods are called on the object (VTKSource if o=NULL).
-  void AddLabeledToggle(char *label, char *setCmd, char *getCmd,
-                        vtkKWObject *o = NULL);
-  void AddScale(char *label, char *setCmd, char *getCmd, 
-                float min, float max, float resolution,
-                vtkKWObject *o = NULL);
+  vtkKWCheckButton *AddLabeledToggle(char *label, char *setCmd, char *getCmd,
+                                     vtkKWObject *o = NULL);
+  vtkKWScale *AddScale(char *label, char *setCmd, char *getCmd, 
+                       float min, float max, float resolution,
+                       vtkKWObject *o = NULL);
 
   // Description:
   // Creates a list for delecting a mode.
   // The methods are called on the object (VTKSource if o=NULL).
-  void AddModeList(char *label, char *setCmd, char *getCmd,
-                   vtkKWObject *o = NULL);
+  vtkPVSelectionList *AddModeList(char *label, char *setCmd, char *getCmd,
+                                  vtkKWObject *o = NULL);
   void AddModeListItem(char *name, int value);
   
   // Description:

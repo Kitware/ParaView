@@ -39,6 +39,7 @@ vtkPVSelectionList::vtkPVSelectionList()
 
   this->CurrentValue = 0;
   this->CurrentName = NULL;
+  this->Command = NULL;
   
   this->MenuButton = vtkPVMenuButton::New();
 
@@ -54,6 +55,12 @@ vtkPVSelectionList::~vtkPVSelectionList()
   this->MenuButton = NULL;
   this->Names->Delete();
   this->Names = NULL;
+
+  if (this->Command)
+    {
+    delete [] this->Command;
+    this->Command = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -80,6 +87,23 @@ int vtkPVSelectionList::Create(vtkKWApplication *app)
   this->Script("pack %s -side left", this->MenuButton->GetWidgetName());
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::SetCommand(vtkKWObject *o, const char *method)
+{
+  vtkErrorMacro("SetCommand");
+  if (this->Command)
+    {
+    delete [] this->Command;
+    this->Command = NULL;
+    }
+  if (o != NULL || method != NULL)
+    {
+    ostrstream event;
+    event << o->GetTclName() << " " << method << ends;
+    this->Command = event.str();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -124,5 +148,9 @@ void vtkPVSelectionList::SelectCallback(const char *name, int value)
   this->SetCurrentName(name);
   
   this->MenuButton->SetButtonText(name);
+  if (this->Command)
+    {
+    this->Script(this->Command);
+    }
 }
 

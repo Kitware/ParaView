@@ -35,6 +35,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVAssignment.h"
 #include "vtkInteractorStyleImageExtent.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWScale.h"
+#include "vtkPVSelectionList.h"
 
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -45,7 +47,7 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->CommandFunction = vtkPVImageSliceCommand;
   
   this->SliceNumber = 0;
-  this->SliceAxis = 3;
+  this->SliceAxis = 2;
   
   this->SliceStyle = vtkInteractorStyleImageExtent::New();
   this->SliceStyle->ConstrainSpheresOn();
@@ -56,6 +58,9 @@ vtkPVImageSlice::vtkPVImageSlice()
   clip->ClipDataOn();
   this->SetVTKSource(clip);
   clip->Delete();
+
+  this->AxisWidget = NULL;
+  this->SliceScale = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +70,16 @@ vtkPVImageSlice::~vtkPVImageSlice()
   this->SliceStyle = NULL;
   this->SliceStyleButton->Delete();
   this->SliceStyleButton = NULL;
+  if (this->AxisWidget)
+    {
+    this->AxisWidget->UnRegister(this);
+    this->AxisWidget = NULL;
+    }
+  if (this->SliceScale)
+    {
+    this->SliceScale->UnRegister(this);
+    this->SliceScale = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -88,22 +103,71 @@ void vtkPVImageSlice::CreateProperties()
   this->GetSliceStyle()->SetImageData(this->GetImageClip()->GetInput());
   this->GetSliceStyle()->SetExtent(this->GetImageClip()->GetOutputWholeExtent());
   
-  this->AddScale("Slice:","SetSliceNumber","GetSliceNumber", 
-                 0,100,1, this);
-  this->AddModeList("Axis:", "SetSliceAxis","GetSliceAxis", this);
-  this->AddModeListItem("X Axis", 0);
-  this->AddModeListItem("Y Axis", 1);
-  this->AddModeListItem("Z Axis", 2);
+  this->AxisWidget = this->AddModeList("Axis:", "SetSliceAxis","GetSliceAxis", this);
+  this->AxisWidget->Register(this);
+  this->AddModeListItem("X", 0);
+  this->AddModeListItem("Y", 1);
+  this->AddModeListItem("Z", 2);
   
-  this->UpdateProperties();
+  this->SliceScale = this->AddScale("Slice:","SetSliceNumber","GetSliceNumber", 
+                                    0,100,1, this);
+  this->SliceScale->Register(this);
+
+  this->UpdateParameterWidgets();
+  this->ComputeSliceRange();
+  this->AxisWidget->SetCommand(this, "ComputeSliceRange");
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVImageSlice::UpdateProperties()
+void vtkPVImageSlice::UpdateVTKSource()
 {
-  this->UpdateParameterWidgets();
-  this->UpdateNavigationCanvas();  
+  vtkImageClip *clip = this->GetImageClip();
+  int ext[6];
+
+  clip->GetInput()->GetWholeExtent(ext);
+  if (this->SliceAxis == 0)
+    {
+    if (this->SliceNumber < ext[0])
+      {
+      this->SliceNumber = ext[0];
+      }
+    if (this->SliceNumber > ext[1])
+      {
+      this->SliceNumber = ext[1];
+      }
+    ext[0] = ext[1] = this->SliceNumber;
+    }
+  if (this->SliceAxis == 1)
+    {
+    if (this->SliceNumber < ext[2])
+      {
+      this->SliceNumber = ext[2];
+      }
+    if (this->SliceNumber > ext[3])
+      {
+      this->SliceNumber = ext[3];
+      }
+    ext[2] = ext[3] = this->SliceNumber;
+    }
+  if (this->SliceAxis == 2)
+    {
+    if (this->SliceNumber < ext[4])
+      {
+      this->SliceNumber = ext[4];
+      }
+    if (this->SliceNumber > ext[5])
+      {
+      this->SliceNumber = ext[5];
+      }
+    ext[4] = ext[5] = this->SliceNumber;
+    }
+
+  vtkErrorMacro("slice: " << this->SliceNumber << ", axes: " << this->SliceAxis);
+  vtkErrorMacro("ext: " << ext[0] << ", " << ext[1] << ", " << ext[2]
+                << ", " << ext[3] << ", " << ext[4] << ", " << ext[5]);
+
+  clip->SetOutputWholeExtent(ext);
 }
 
 //----------------------------------------------------------------------------
@@ -116,7 +180,7 @@ void vtkPVImageSlice::SetSliceNumber(int num)
   
   this->Modified();
   this->SliceNumber = num;
-  this->UpdateProperties();
+  this->UpdateVTKSource();
 }
 
 //----------------------------------------------------------------------------
@@ -129,7 +193,7 @@ void vtkPVImageSlice::SetSliceAxis(int axis)
   
   this->Modified();
   this->SliceAxis = axis;
-  this->UpdateProperties();
+  this->UpdateVTKSource();
 }
 
 
@@ -139,6 +203,33 @@ void vtkPVImageSlice::UseSliceStyle()
   this->GetWindow()->GetMainView()->SetInteractorStyle(this->SliceStyle);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::ComputeSliceRange()
+{
+  int *ext;
+  int axis, min, max;
+
+  ext = this->GetImageClip()->GetInput()->GetWholeExtent();
+  axis = this->AxisWidget->GetCurrentValue();
+  if (axis == 0)
+    {
+    min = ext[0];
+    max = ext[1];
+    }
+  if (axis == 1)
+    {
+    min = ext[2];
+    max = ext[3];
+    }
+  if (axis == 2)
+    {
+    min = ext[4];
+    max = ext[5];
+    }
+
+  this->SliceScale->SetRange(min, max);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::Select(vtkKWView *view)
