@@ -26,6 +26,7 @@ SET( ParaViewServer_SRCS
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
+  vtkPVServerSelectTimeSet.cxx
   vtkSelectInputs.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVAnimationWriter.cxx

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSelectTimeSet.h"
 
 #include "vtkDataArrayCollection.h"
+#include "vtkFloatArray.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -53,13 +54,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
-#include "vtkTclUtil.h"
 
 #include <vtkstd/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.4");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25.2.5");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -85,11 +85,11 @@ vtkPVSelectTimeSet::vtkPVSelectTimeSet()
   this->FrameLabel = 0;
   
   this->TimeSets = vtkDataArrayCollection::New();
-  this->TimeSetsTclName = 0;
   
   this->Property = 0;
   
   this->SetCommand = 0;
+  this->ServerSideID.ID = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -101,8 +101,13 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
   this->TimeLabel->Delete();
   this->SetFrameLabel(0);
   this->TimeSets->Delete();
-  this->SetTimeSetsTclName(0);
   this->SetSetCommand(0);
+  if(this->ServerSideID.ID)
+    {
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->DeleteStreamObject(this->ServerSideID);
+    pm->SendStreamToServer();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -444,53 +449,49 @@ int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVSelectTimeSet::SetTimeSetsFromReader()
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  this->SetupTimeSetsTclName();
   this->TimeSets->RemoveAllItems();
-  pm->RootScript(
-    "namespace eval ::paraview::vtkPVSelectTimeSet {\n"
-    "  proc GetTimeSets { reader } {\n"
-    "    set rts [$reader GetTimeSets]\n"
-    "    if {$rts == {}} {\n"
-    "      return {}\n"
-    "    }\n"
-    "    set sets {}\n"
-    "    vtkCollectionIterator vtkPVSelectTimeSetTemp\n"
-    "    set iter vtkPVSelectTimeSetTemp\n"
-    "    $iter SetCollection $rts\n"
-    "    while {![$iter IsDoneWithTraversal]} {\n"
-    "      set da [$iter GetObject]\n"
-    "      set s {}\n"
-    "      set n [$da GetNumberOfTuples]\n"
-    "      for {set i 0} {$i < $n} {incr i} {\n"
-    "        lappend s [$da GetTuple1 $i]\n"
-    "      }\n"
-    "      lappend sets $s\n"
-    "      $iter GoToNextItem\n"
-    "    }\n"
-    "    $iter Delete\n"
-    "    return $sets\n"
-    "  }\n"
-    "  GetTimeSets {%s}\n"
-    "}\n",
-    this->PVSource->GetVTKSourceTclName());
-  vtkstd::string settings = pm->GetRootResult();
-  this->Script(
-    "namespace eval ::paraview::vtkPVSelectTimeSet {\n"
-    "  proc ParseTimeSets { ts sets } {\n"
-    "    foreach s $sets {\n"
-    "      vtkFloatArray vtkPVSelectTimeSetTemp\n"
-    "      set n [llength $s]\n"
-    "      vtkPVSelectTimeSetTemp SetNumberOfTuples $n\n"
-    "      for {set i 0} {$i < $n} {incr i} {\n"
-    "        vtkPVSelectTimeSetTemp SetTuple1 $i [lindex $s $i]\n"
-    "      }\n"
-    "      $ts AddItem vtkPVSelectTimeSetTemp\n"
-    "      vtkPVSelectTimeSetTemp Delete\n"
-    "    }\n"
-    "  }\n"
-    "  ParseTimeSets {%s} {%s}\n"
-    "}\n",
-    this->TimeSetsTclName, settings.c_str());
+
+  // Create the server-side helper if necessary.
+  if(!this->ServerSideID.ID)
+    {
+    this->ServerSideID = pm->NewStreamObject("vtkPVServerSelectTimeSet");
+    pm->SendStreamToServer();
+    }
+
+  // Get the time sets from the reader on the server.
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << this->ServerSideID << "GetTimeSets"
+                  << this->PVSource->GetVTKSourceID()
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
+  vtkClientServerStream timeSets;
+  if(!pm->GetLastServerResult().GetArgument(0, 0, &timeSets))
+    {
+    vtkErrorMacro("Error getting time sets from server.");
+    return;
+    }
+
+  // There is one time set per message.
+  for(int m=0; m < timeSets.GetNumberOfMessages(); ++m)
+    {
+    // Each argument in the message is a time set entry.
+    vtkFloatArray* timeSet = vtkFloatArray::New();
+    int n = timeSets.GetNumberOfArguments(m);
+    timeSet->SetNumberOfTuples(n);
+    for(int i=0; i < n; ++i)
+      {
+      float value;
+      if(!timeSets.GetArgument(m, i, &value))
+        {
+        vtkErrorMacro("Error reading time set value.");
+        timeSet->Delete();
+        return;
+        }
+      timeSet->SetTuple1(i, value);
+      }
+    this->TimeSets->AddItem(timeSet);
+    timeSet->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -507,18 +508,6 @@ void vtkPVSelectTimeSet::SaveInBatchScriptForPart(ofstream *file,
   *file << "\t" << "pvTemp" << sourceID
         << " SetTimeValue " << this->GetTimeValue()
         << endl;;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSelectTimeSet::SetupTimeSetsTclName()
-{
-  if(!this->TimeSetsTclName)
-    {
-    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
-                               this->TimeSets, vtkDataArrayCollectionCommand);
-    this->SetTimeSetsTclName(
-      Tcl_GetStringResult(this->Application->GetMainInterp()));
-    }
 }
 
 //-----------------------------------------------------------------------------

@@ -163,12 +163,8 @@ protected:
   char* FrameLabel;
 
   vtkDataArrayCollection* TimeSets;
-  vtkSetStringMacro(TimeSetsTclName);
-  char* TimeSetsTclName;
-  
-  // Set TimeSetsTclName with the tcl name of the TimeSets instance.
-  void SetupTimeSetsTclName();
-  
+  vtkClientServerID ServerSideID;
+
   // Fill the TimeSets collection with that from the actual reader.
   void SetTimeSetsFromReader();
 
