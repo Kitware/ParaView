@@ -92,6 +92,11 @@ public:
   vtkGetMacro(CurrentValue, int);
   void SetCurrentValue(int val);
   vtkGetStringMacro(CurrentName);
+
+  // Description:
+  // Sets the width (in units of character) of the option menu
+  // (should be specified before create)
+  vtkSetMacro(OptionWidth, int);
   
   // Description:
   // This method gets called when the user selects an entry.
@@ -105,7 +110,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVSelectionList* ClonePrototype(vtkPVSource* pvSource,
-				     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -115,6 +120,8 @@ protected:
   vtkKWLabel *Label;
   vtkKWOptionMenu *Menu;
   char *Command;
+
+  int OptionWidth;
 
   int CurrentValue;
   char *CurrentName;
@@ -128,7 +135,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro(vtkPVSelectionList);
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
-		     int argc, char *argv[]);
+                     int argc, char *argv[]);
 
 
 //----------------------------------------------------------------------------
@@ -67,6 +67,8 @@ vtkPVSelectionList::vtkPVSelectionList()
   this->Menu = vtkKWOptionMenu::New();
 
   this->Names = vtkStringList::New();
+
+  this->OptionWidth = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -100,7 +102,16 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
   this->Script("pack %s -side left", this->Label->GetWidgetName());
 
   this->Menu->SetParent(this);
-  this->Menu->Create(app, "");
+  if (this->OptionWidth > 0)
+    {
+    char arg[128];
+    sprintf(arg, "-width %d", this->OptionWidth);
+    this->Menu->Create(app, arg);
+    }
+  else
+    {
+    this->Menu->Create(app, "");
+    }
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
 
   char tmp[1024];
@@ -222,20 +233,21 @@ void vtkPVSelectionList::SelectCallback(const char *name, int value)
 }
 
 vtkPVSelectionList* vtkPVSelectionList::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVSelectionList::SafeDownCast(clone);
 }
 
 void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone, 
-					vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                        vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVSelectionList* pvsl = vtkPVSelectionList::SafeDownCast(clone);
   if (pvsl)
     {
+    pvsl->SetOptionWidth(this->OptionWidth);
     pvsl->SetLabel(this->Label->GetLabel());
     int i, numItems = this->Names->GetLength();
     char *name;
@@ -243,9 +255,9 @@ void vtkPVSelectionList::CopyProperties(vtkPVWidget* clone,
       {
       name = this->Names->GetString(i);
       if (name)
-	{
-	pvsl->Names->SetString(i, name);
-	}
+        {
+        pvsl->Names->SetString(i, name);
+        }
       }
     }
   else 
@@ -259,6 +271,12 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
                                           vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
+  
+  // Option menu width
+  if(!element->GetScalarAttribute("option_width", &this->OptionWidth))
+    {
+    this->OptionWidth = 0;
+    }
   
   // Setup the Label.
   const char* label = element->GetAttribute("label");
@@ -295,6 +313,7 @@ int vtkPVSelectionList::ReadXMLAttributes(vtkPVXMLElement* element,
       }
     this->AddItem(itemName, itemValue);
     }
+
   
   return 1;
 }
