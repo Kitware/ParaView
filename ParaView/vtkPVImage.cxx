@@ -150,7 +150,6 @@ void vtkPVImage::SetImageData(vtkImageData *image)
   vtkImageOutlineFilter *outline;
 
   this->SetData(image);
-  this->ActorComposite->SetApplication(this->Application);
   
   if (this->Assignment)
     {

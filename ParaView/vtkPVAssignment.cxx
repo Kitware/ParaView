@@ -74,13 +74,30 @@ void vtkPVAssignment::Clone(vtkPVApplication *pvApp)
 
   // Clone this object on every other process, and set up the assignment.
   num = pvApp->GetController()->GetNumberOfProcesses();
+  
+  // This was here to debug piece on one processor.
+  //this->Translator->SetPiece(0);
+  //this->Translator->SetNumberOfPieces(2);
+
   this->Translator->SetPiece(0);
-  this->Translator->SetNumberOfPieces(2);
+  this->Translator->SetNumberOfPieces(num);
+  
   for (id = 1; id < num; ++id)
     {
-    //pvApp->RemoteScript(id, "%s %s", this->GetClassName(), this->GetTclName());
-    //pvApp->RemoteScript(id, "%s SetPiece %d %d", this->GetTclName(), id, num);
+    pvApp->RemoteScript(id, "%s %s", this->GetClassName(), this->GetTclName());
+    pvApp->RemoteScript(id, "%s SetPiece %d %d", this->GetTclName(), id, num);
     }
+  
+  // The clones might as well have an application.
+  pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
+			 pvApp->GetTclName());  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAssignment::SetPiece(int piece, int numPieces)
+{
+  this->Translator->SetPiece(piece);
+  this->Translator->SetNumberOfPieces(numPieces);
 }
 
 //----------------------------------------------------------------------------
@@ -92,11 +109,11 @@ void vtkPVAssignment::SetOriginalImage(vtkPVImage *pvImage)
     {
     return;
     }
-  
+
   this->Modified();
   
   pvApp = this->GetPVApplication();
-  if (pvApp->GetController()->GetLocalProcessId() == 0)
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
     pvApp->BroadcastScript("%s SetOriginalImage %s", this->GetTclName(),
 			   pvImage->GetTclName());

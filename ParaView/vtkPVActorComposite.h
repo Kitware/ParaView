@@ -36,7 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWActorComposite.h"
 #include "vtkKWLabel.h"
-#include "vtkKWApplication.h"
+#include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
 
 class vtkPVAssignment;
@@ -50,6 +50,12 @@ public:
   vtkTypeMacro(vtkPVActorComposite, vtkKWActorComposite);
 
   // Description:
+  // This is a parallel object.  A clone will exist in every process.
+  // After the object is constructed, clone should be called to
+  /// create duplicate objects with the same tcl name.
+  void Clone(vtkPVApplication *pvApp);  
+  
+  // Description:
   // Create the properties object, called by UpdateProperties.
   void CreateProperties();
 
@@ -60,8 +66,6 @@ public:
   virtual void SetName(const char *name);
   char* GetName();
   
-  void SetApplication(vtkKWApplication *app);
-
   void Select(vtkKWView *v);
   void Deselect(vtkKWView *v);
   

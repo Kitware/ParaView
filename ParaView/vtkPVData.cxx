@@ -57,7 +57,8 @@ vtkPVData::vtkPVData()
   this->Actor = vtkActor::New();
   this->Assignment = NULL;
   
-  this->ActorComposite = vtkPVActorComposite::New();
+  // This is initialized in "Clone();"
+  this->ActorComposite = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -76,8 +77,11 @@ vtkPVData::~vtkPVData()
   this->Actor->Delete();
   this->Actor = NULL;
   
-  this->ActorComposite->Delete();
-  this->ActorComposite = NULL;
+  if (this->ActorComposite)
+    {
+    this->ActorComposite->UnRegister(this);
+    this->ActorComposite = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -97,6 +101,19 @@ void vtkPVData::Clone(vtkPVApplication *pvApp)
 
   // Clone this object on every other process.
   pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
+  
+  // The clones might as well have an application.
+  pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
+			 pvApp->GetTclName());  
+  
+  // Now create an actor composite with identical tcl names in every process.
+  vtkPVActorComposite *c;
+  c = vtkPVActorComposite::New();
+  c->Clone(pvApp);
+  this->SetActorComposite(c);
+  c->Delete();
+
+  // What about deleting the cloned composites?
 }
 
 
@@ -172,6 +189,45 @@ vtkProp* vtkPVData::GetProp()
   return this->Actor;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorComposite(vtkPVActorComposite *c)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (this->ActorComposite == c)
+    {
+    return;
+    }
+  if (c == NULL)
+    {
+    vtkErrorMacro("You should not be setting a NULL actor compiste.");
+    return;
+    }
+  this->Modified();
+  
+  // Broadcast to all satellite processes.
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetActorComposite %s", this->GetTclName(), 
+			   c->GetTclName());
+    }
+  
+  if (this->ActorComposite)
+    {
+    this->ActorComposite->UnRegister(this);
+    this->ActorComposite = NULL;
+    }
+  c->Register(this);
+  this->ActorComposite = c;
+  
+  // Try to keep all internal relationships consistent.
+  if (this->Assignment)
+    {
+    this->ActorComposite->SetAssignment(this->Assignment);
+    }
+}
+
+//----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVData::GetActorComposite()
 {
   return this->ActorComposite;

@@ -67,6 +67,11 @@ public:
   int GetPiece() { return this->Translator->GetPiece();}
   int GetNumberOfPieces() { return this->Translator->GetNumberOfPieces();}
   int *GetExtent();
+
+  // Description:
+  // An interface to the underlying piece/numPieces.
+  // Not a parallel method, but needed for remote calls.
+  void SetPiece(int piece, int numPieces);  
   
   // Description:
   // Only called locally.  It is not wrapped.

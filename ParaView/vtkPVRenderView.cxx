@@ -374,10 +374,13 @@ void vtkPVRenderView::Clone(vtkPVApplication *pvApp)
   // Clone this object on every other process.
   pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
   
+  // Create wants to set the application in the KW superclasses.
   this->Application = NULL;
 }
 
 //----------------------------------------------------------------------------
+// This is a different way of setting the application.
+// All other parallel objects set the application in the Clone method.
 void vtkPVRenderView::SetApplication(vtkKWApplication *app)
 {
   this->vtkKWView::SetApplication(app);
@@ -661,7 +664,10 @@ void vtkPVRenderView::AddComposite(vtkKWComposite *c)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::AddCompositeHack(vtkKWComposite *c)
 {
-  this->RendererHack->AddProp(c->GetProp());
+  if (c->GetProp() != NULL)
+    {
+    this->RendererHack->AddProp(c->GetProp());
+    }
 }
 
 

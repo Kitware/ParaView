@@ -84,6 +84,10 @@ void vtkPVSource::Clone(vtkPVApplication *pvApp)
 
   // Clone this object on every other process.
   pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
+
+  // The clones might as well have an application.
+  pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
+			 pvApp->GetTclName());  
 }
 
 

@@ -60,6 +60,15 @@ public:
   
   vtkProp* GetProp();
   
+  // Description:
+  // This is a parallel method.  All out satellite datas will get the
+  // equivalent actor composite. The main reason this is here is to allow 
+  // the actor composite to be created in the Clone method rather than
+  // the constructor.
+  void SetActorComposite(vtkPVActorComposite *c);
+  
+  // Description:
+  // This composite actually has an actor that displays the data.
   vtkPVActorComposite* GetActorComposite();
   
   // Description:

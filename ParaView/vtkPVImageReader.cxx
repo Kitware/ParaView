@@ -124,9 +124,16 @@ void vtkPVImageReader::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVImageReader::SetOutput(vtkPVImage *pvi)
 {
-  this->SetPVData(pvi);
+  vtkPVApplication *pvApp = this->GetPVApplication();
 
+  this->SetPVData(pvi);
   pvi->SetImageData(this->ImageReader->GetOutput());
+  
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
+			   pvi->GetTclName());
+    }
 }
 
 //----------------------------------------------------------------------------

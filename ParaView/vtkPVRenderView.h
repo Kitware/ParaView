@@ -68,6 +68,8 @@ public:
   // This is a parallel version of the superclasses method.
   // It makes the assignment in all of the processes.
   // Pass in a vtkPVApplication, or the method will fail.
+  // NOTE: This is a different way of setting the application.
+  // All other parallel objects set the application in the Clone method.
   void SetApplication(vtkKWApplication *app);
   
   // Description:
@@ -117,7 +119,8 @@ public:
   void AddComposite(vtkKWComposite *c);
 
   // Description:
-  // Until we can get the supperclass renderer working ...
+  // Since the supperclass AddComposite creates the properties and we do not
+  // want to deal with UI in the satellite processes ...
   // This is the special call made in the satellite processes.
   void AddCompositeHack(vtkKWComposite *c);
 

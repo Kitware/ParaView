@@ -332,7 +332,7 @@ void vtkPVImageSlice::SetOutput(vtkPVImage *pvi)
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
+    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(),
 			   pvi->GetTclName());
     }  
   

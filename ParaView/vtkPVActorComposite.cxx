@@ -72,6 +72,24 @@ vtkPVActorComposite::~vtkPVActorComposite()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVActorComposite::Clone(vtkPVApplication *pvApp)
+{
+  if (this->Application)
+    {
+    vtkErrorMacro("Application has already been set.");
+    }
+  this->SetApplication(pvApp);
+
+  // Clone this object on every other process.
+  pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
+
+  // The application is needed by the clones to send scalar ranges back.
+  pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
+			 pvApp->GetTclName());
+  
+}
+
+//----------------------------------------------------------------------------
 void vtkPVActorComposite::CreateProperties()
 {
   const char *actorPage;
@@ -123,12 +141,17 @@ void vtkPVActorComposite::GetInputScalarRange(float range[2])
 void vtkPVActorComposite::TransmitInputScalarRange() 
 { 
   float tmp[2];
+  cerr << "TransmitInputScalarRange: " << this << "\n";
   vtkPVApplication *pvApp = this->GetPVApplication();
+  cerr << "pvApp: " << pvApp << endl;
   vtkMultiProcessController *controller = pvApp->GetController();
+  cerr << "controller: " << controller << endl;
   
   this->Mapper->Update();
+  cerr << "Updated\n";
   this->Mapper->GetInput()->GetScalarRange(tmp);
-
+  cerr << " range: " << tmp[0] << ", " << tmp[1] << endl;
+  
   controller->Send(tmp, 2, 0, 99399);
 }
 
@@ -180,11 +203,6 @@ char* vtkPVActorComposite::GetName()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVActorComposite::SetApplication(vtkKWApplication *app)
-{
-  this->Application = app;  
-}
-
 void vtkPVActorComposite::Select(vtkKWView *v)
 {
   // invoke super
@@ -288,6 +306,7 @@ void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVActorComposite::GetPVApplication()
 {
+  cerr << this << "Returning application : " << this->Application << endl;
   if (this->Application == NULL)
     {
     return NULL;
