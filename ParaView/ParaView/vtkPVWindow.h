@@ -608,6 +608,7 @@ protected:
   vtkArrayMap<const char*, vtkPVSourceCollection*>* SourceLists;
   vtkArrayMap<const char*, vtkKWPushButton*>* ToolbarButtons;
   vtkArrayMap<const char*, const char*>* Writers;
+  vtkArrayMap<const char*, int>* MenuState;
   vtkLinkedList<vtkPVReaderModule*>* ReaderList;
   vtkLinkedList<const char*>* PackageNames;
   vtkLinkedList<vtkPVWriter*>* FileWriterList;

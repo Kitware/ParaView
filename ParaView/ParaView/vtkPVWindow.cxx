@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.8");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.9");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -230,6 +230,9 @@ vtkPVWindow::vtkPVWindow()
 
   // The writer modules.
   this->FileWriterList = vtkLinkedList<vtkPVWriter*>::New();
+
+  // This stores the state of a menu during grab.
+  this->MenuState = vtkArrayMap<const char*, int>::New();
 
   // The writers (used in SaveInTclScript) mapped to the extensions
   this->Writers = vtkArrayMap<const char*, const char*>::New();
@@ -343,6 +346,7 @@ vtkPVWindow::~vtkPVWindow()
   this->ReaderList->Delete();
   this->Writers->Delete();
   this->FileWriterList->Delete();
+  this->MenuState->Delete();
 
   if (this->PVColorMaps)
     {
@@ -2950,36 +2954,23 @@ void vtkPVWindow::DisableNavigationWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::DisableMenus()
 {
-  int numMenus;
-  int i;
+  // First store the state of all menu items.
+  vtkKWTkUtilities::StoreMenuState(this->Menu, this->MenuState);
 
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(this->GetPVApplication()->GetMainInterp()->result);
-  
+  int numMenus = this->Menu->GetNumberOfItems();
   // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
+  for (int i = 0; i <= numMenus; i++)
     {
     this->Menu->SetState(i, vtkKWMenu::Disabled);
     }
 }
 
+
 //----------------------------------------------------------------------------
 void vtkPVWindow::EnableMenus()
 {
-  int numMenus;
-  int i;
-
-  this->Script("%s index end", this->Menu->GetWidgetName());
-  numMenus = atoi(this->GetPVApplication()->GetMainInterp()->result);
-  
-  // deactivating menus and toolbar buttons (except the interactors)
-  for (i = 0; i <= numMenus; i++)
-    {
-    this->Menu->SetState(i, vtkKWMenu::Normal);
-    }
-
-  // Disable or enable the menu.
-  this->EnableSelectMenu();
+  // Now restore the state of all menu items
+  vtkKWTkUtilities::RestoreMenuState(this->Menu, this->MenuState);
 }
 
 //----------------------------------------------------------------------------
@@ -3757,7 +3748,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.8 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.9 $");
 }
 
 //----------------------------------------------------------------------------

@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.5");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.6");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -601,7 +601,7 @@ void vtkPVSource::UpdateDescriptionFrame()
 void vtkPVSource::GrabFocus()
 {
   this->SourceGrabbed = 1;
-  //this->Script("grab set %s", this->MainParameterFrame->GetWidgetName());
+
   this->GetPVWindow()->DisableToolbarButtons();
   this->GetPVWindow()->DisableMenus();
   this->GetPVRenderView()->UpdateNavigationWindow(this, 1);
@@ -610,8 +610,7 @@ void vtkPVSource::GrabFocus()
 //----------------------------------------------------------------------------
 void vtkPVSource::UnGrabFocus()
 {
-  //this->Script("grab release %s", 
-  //this->MainParameterFrame->GetWidgetName());    
+
   this->GetPVWindow()->EnableToolbarButtons();
   this->GetPVWindow()->EnableMenus();
   this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
@@ -942,6 +941,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         input->SetVisibilityInternal(0);
         }
       }
+
+    // Remove the local grab
+    this->UnGrabFocus();
+
     // Set the current data of the window.
     if ( ! hideFlag)
       {
@@ -965,8 +968,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       window->GetMainView()->ResetCamera();
       }
 
-    // Remove the local grab
-    this->UnGrabFocus();
     this->Initialized = 1;
     }
 
@@ -985,8 +986,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     }
 
   this->Script("update");  
-
-  window->EnableMenus();
 
 #ifdef _WIN32
   this->Script("%s configure -cursor arrow", window->GetWidgetName());
@@ -1173,7 +1172,6 @@ void vtkPVSource::DeleteCallback()
   // "this" will no longer be valid after the call.
   window->RemovePVSource("Sources", this);
   window->SetCurrentPVSourceCallback(current);
-  window->EnableMenus();
 }
 
 //----------------------------------------------------------------------------
@@ -2080,7 +2078,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.5 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.6 $");
 }
 
 //----------------------------------------------------------------------------
