@@ -40,7 +40,7 @@ set pvSphere [$pvWindow CreatePVSource SphereSource]
 $pvSphere UpdateParameterWidgets
 $pvSphere AcceptCallback
 
-set pvShrink [$pvWindow CreatePVSource ShrinkPolyData]
+set pvShrink [$pvWindow CreatePVSource ShrinkFilter]
 [$pvShrink GetVTKSource] SetShrinkFactor 0.9
 $pvShrink UpdateParameterWidgets
 $pvShrink AcceptCallback

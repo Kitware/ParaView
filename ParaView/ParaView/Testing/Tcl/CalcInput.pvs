@@ -40,14 +40,17 @@ $pv(vtkTemp233) SetValue 12
 $pv(vtkTemp211) AcceptCallback
 $pv(vtkTemp1) ResetCameraCallback
 
-set pv(vtkTemp247) [$pv(vtkTemp1) CreatePVSource ShrinkPolyData]
+set pv(vtkTemp247) [$pv(vtkTemp1) CreatePVSource ShrinkFilter]
 $pv(vtkTemp247) AcceptCallback
+
+set pv(vtkTemp999) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
+$pv(vtkTemp999) AcceptCallback
 
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp182)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp190) [$pv(vtkTemp182) GetPVWidget {Input}]
 [$pv(vtkTemp190) GetCurrentValue] SetVisibility 1
-$pv(vtkTemp190) SetCurrentValue $pv(vtkTemp247)
+$pv(vtkTemp190) SetCurrentValue $pv(vtkTemp999)
 $pv(vtkTemp182) AcceptCallback
 
 # Fix the size of the image.
