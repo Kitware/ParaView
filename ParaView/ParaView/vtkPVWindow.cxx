@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.381");
+vtkCxxRevisionMacro(vtkPVWindow, "1.382");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1884,15 +1884,6 @@ int vtkPVWindow::Open(char *openFileName, int store)
     }
 
 
-  // These should be added manually to regression scripts so that
-  // they don't hang with a dialog up.
-  //  this->GetPVApplication()->AddTraceEntry("$kw(%s) UseMessageDialogOff", 
-  //                                        this->GetTclName());
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) Open \"%s\"", 
-                                          this->GetTclName(), openFileName);
-  //  this->GetPVApplication()->AddTraceEntry("$kw(%s) UseMessageDialogOn", 
-  //                                        this->GetTclName());
-
   // Ask each reader module if it can read the file. This first
   // one which says OK gets to read the file.
   vtkLinkedListIterator<vtkPVReaderModule*>* it = 
@@ -1961,8 +1952,22 @@ int vtkPVWindow::Open(char *openFileName, int store)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVWindow::OpenWithReader(const char *fileName, vtkPVReaderModule* reader, int custom)
+int vtkPVWindow::OpenWithReader(const char *fileName, vtkPVReaderModule* reader,
+                                int custom)
 {
+  if (!custom)
+    {
+    this->GetPVApplication()->AddTraceEntry("$kw(%s) Open \"%s\"", 
+                                            this->GetTclName(), fileName);
+    }
+  else
+    {
+    this->GetPVApplication()->AddTraceEntry("$kw(%s) OpenCustom \"%s\" \"%s\"", 
+                                            this->GetTclName(), 
+                                            reader->GetDescription(),
+                                            fileName);
+    }
+
   vtkPVReaderModule* clone = 0;
   // Read the file. On success this will return a new source.
   // Add that source to the list of sources.
@@ -3779,7 +3784,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.381 $");
+  this->ExtractRevision(os,"$Revision: 1.382 $");
 }
 
 //----------------------------------------------------------------------------
