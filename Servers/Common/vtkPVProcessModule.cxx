@@ -45,7 +45,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.1");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -231,6 +231,7 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
       os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
       }
     } 
+  os << indent << "ProgressEnabled: " << this->ProgressEnabled << endl;
   os << indent << "DemoPath: " << (this->DemoPath?this->DemoPath:"(none)") << endl;
 }
 

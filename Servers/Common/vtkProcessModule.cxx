@@ -42,7 +42,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.1");
+vtkCxxRevisionMacro(vtkProcessModule, "1.2");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -397,6 +397,8 @@ void vtkProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Controller: " << this->Controller << endl;
+  os << indent << "ProgressRequests: " << this->ProgressRequests << endl;
+  os << indent << "ProgressHandler: " << this->ProgressHandler << endl;
   os << indent << "ReportInterpreterErrors: "
      << this->ReportInterpreterErrors << endl;
 }
