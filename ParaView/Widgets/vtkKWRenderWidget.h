@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWEventMap;
 class vtkKWGenericRenderWindowInteractor;
 class vtkKWWindow;
+class vtkCornerAnnotation;
 class vtkProp;
 class vtkRenderer;
 class vtkRenderWindow;
@@ -120,6 +121,7 @@ public:
   vtkGetObjectMacro(VTKWidget, vtkKWWidget);
 
   virtual void AddProp(vtkProp *prop);
+  virtual int  HasProp(vtkProp *prop);
   virtual void RemoveProp(vtkProp *prop);
   virtual void RemoveAllProps();
   
@@ -131,12 +133,18 @@ public:
 
   virtual void Close();
   
+  // Description:
+  // Get the underlying vtkCornerAnnotation.
+  vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
+
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
   
   vtkKWWidget *VTKWidget;
-  
+
+  vtkCornerAnnotation *CornerAnnotation;
+
   vtkRenderer     *Renderer;
   vtkRenderWindow *RenderWindow;
   vtkKWWindow     *ParentWindow;

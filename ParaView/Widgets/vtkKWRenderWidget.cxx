@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.1");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.2");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -399,6 +399,11 @@ void vtkKWRenderWidget::AddProp(vtkProp *prop)
   this->Renderer->AddProp(prop);
 }
 
+int vtkKWRenderWidget::HasProp(vtkProp *prop)
+{
+  return this->Renderer->GetProps()->IsItemPresent(prop);
+}
+
 void vtkKWRenderWidget::RemoveProp(vtkProp *prop)
 {
   this->Renderer->RemoveProp(prop);
@@ -452,4 +457,6 @@ void vtkKWRenderWidget::Close()
 void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "CornerAnnotation: " << this->CornerAnnotation << endl;
 }
