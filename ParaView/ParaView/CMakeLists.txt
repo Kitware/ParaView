@@ -1,5 +1,4 @@
 SET( ParaViewShared_SRCS
-  vtkDesktopDeliveryClient.cxx
   vtkPVApplication.cxx
   vtkPVClientServerModule.cxx
   vtkPVExtentTranslator.cxx
@@ -227,6 +226,10 @@ IF (PARAVIEW_USE_ICE_T)
     vtkIceTRenderManager.cxx
     vtkIceTClientCompositeManager.cxx
     vtkIceTRenderer.cxx
+    )
+  SET( ParaViewShared_SRCS
+    ${ParaViewShared_SRCS}
+    vtkDesktopDeliveryClient.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
     vtkIceTFactory.cxx
