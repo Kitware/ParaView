@@ -29,6 +29,7 @@ SET( ParaViewServer_SRCS
   vtkPVServerProbe.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVSummaryHelper.cxx
+  vtkM2NCollect.cxx
   )
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
