@@ -108,6 +108,13 @@ public:
   vtkGetMacro( BeepType, int );
 
   // Description:
+  // Invoke the dialog centered at the mouse pointer position (default is
+  // either screen center or window center)
+  vtkSetClampMacro(InvokeAtPointer, int, 0, 1);
+  vtkBooleanMacro(InvokeAtPointer, int);
+  vtkGetMacro(InvokeAtPointer, int );
+
+  // Description:
   // Set the title of the dialog. Default is "Kitware Dialog".
   void SetTitle(const char *);
 
@@ -135,6 +142,8 @@ protected:
   int Done;
   int Beep;
   int BeepType;
+  int InvokeAtPointer;
+
 private:
   vtkKWDialog(const vtkKWDialog&); // Not implemented
   void operator=(const vtkKWDialog&); // Not Implemented

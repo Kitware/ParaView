@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.27");
+vtkCxxRevisionMacro(vtkKWDialog, "1.28");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -62,6 +62,7 @@ vtkKWDialog::vtkKWDialog()
   this->Beep = 0;
   this->BeepType = 0;
   this->MasterWindow = 0;
+  this->InvokeAtPointer = 0;
 }
 
 vtkKWDialog::~vtkKWDialog()
@@ -80,45 +81,56 @@ int vtkKWDialog::Invoke()
 
   this->Application->SetDialogUp(1);
 
-  int width, height, x, y;
-  int sw, sh;
-  this->Script("concat [ winfo screenwidth . ] [ winfo screenheight . ]");
-  sscanf(this->GetApplication()->GetMainInterp()->result,
-         "%d %d", &sw, &sh);
-  if ( this->GetMasterWindow() )
+  int width, height;
+
+  int x, y;
+  if (this->InvokeAtPointer)
     {
-    this->Script("wm geometry %s", this->GetMasterWindow()->GetWidgetName());
-    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
-           &width, &height, &x, &y);
-    x += width/2;
-    y += height/2;
-    if ( x > sw - 200 )
-      {
-      x = sw /2;
-      }
-    if ( y > sh - 200 )
-      {
-      y = sh / 2;
-      }
+    sscanf(this->Script("concat [winfo pointerx .] [winfo pointery .]"),
+           "%d %d", &x, &y);
     }
   else
     {
-    x = sw / 2;
-    y = sh / 2;
+    int sw, sh;
+    sscanf(this->Script("concat [winfo screenwidth .] [winfo screenheight .]"),
+           "%d %d", &sw, &sh);
+
+    if (this->GetMasterWindow())
+      {
+      this->Script("wm geometry %s", this->GetMasterWindow()->GetWidgetName());
+      sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
+             &width, &height, &x, &y);
+
+      x += width / 2;
+      y += height / 2;
+
+      if (x > sw - 200)
+        {
+        x = sw / 2;
+        }
+      if (y > sh - 200)
+        {
+        y = sh / 2;
+        }
+      }
+    else
+      {
+      x = sw / 2;
+      y = sh / 2;
+      }
     }
 
-  sscanf(this->Script("winfo reqwidth %s", this->GetWidgetName() ), 
-         "%d", &width);
-  sscanf(this->Script("winfo reqheight %s", this->GetWidgetName()), 
-         "%d", &height);
+  sscanf(this->Script("concat [winfo reqwidth %s] [winfo reqheight %s]", 
+                      this->GetWidgetName(), this->GetWidgetName()), 
+         "%d %d", &width, &height);
 
-  if ( x > width/2 )
+  if (x > width / 2)
     {
-    x -= width/2;
+    x -= width / 2;
     }
-  if ( y > height/2 )
+  if (y > height / 2)
     {
-    y -= height/2;
+    y -= height / 2;
     }
 
   this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
@@ -127,7 +139,6 @@ int vtkKWDialog::Invoke()
   // map the window
   this->Script("wm deiconify %s",this->GetWidgetName());
 
-
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
   this->Script("grab %s",this->GetWidgetName());
@@ -135,7 +146,6 @@ int vtkKWDialog::Invoke()
     {
     this->Script("bell");
     }
-
 
   // do a grab
   // wait for the end
@@ -275,4 +285,5 @@ void vtkKWDialog::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Beep: " << this->GetBeep() << endl;
   os << indent << "BeepType: " << this->GetBeepType() << endl;
+  os << indent << "InvokeAtPointer: " << this->GetInvokeAtPointer() << endl;
 }
