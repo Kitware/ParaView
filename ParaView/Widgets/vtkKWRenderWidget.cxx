@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
-#include "vtkKWRenderWidgetCommand.h"
+#include "vtkKWRenderWidgetCallbackCommand.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.63");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.64");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -108,7 +108,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->OverlayRenderer->SetActiveCamera(cam);
   this->CollapsingRenders = 0;
   
-  this->Observer = vtkKWRenderWidgetCommand::New();
+  this->Observer = vtkKWRenderWidgetCallbackCommand::New();
 }
 
 //----------------------------------------------------------------------------

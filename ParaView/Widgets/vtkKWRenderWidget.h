@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkCamera;
 class vtkCornerAnnotation;
-class vtkKWRenderWidgetCommand;
+class vtkKWRenderWidgetCallbackCommand;
 class vtkKWWindow;
 class vtkProp;
 class vtkRenderWindow;
@@ -286,7 +286,7 @@ protected:
   // Add/remove the observers.
   virtual void AddObservers();
   virtual void RemoveObservers();
-  vtkKWRenderWidgetCommand *Observer;
+  vtkKWRenderWidgetCallbackCommand *Observer;
   
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented

@@ -33,37 +33,37 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWRenderWidgetCommand - a progress callback
+// .NAME vtkKWRenderWidgetCallbackCommand - a progress callback
 // .SECTION Description
 // This class is specific to the render widgets and will call
 // vtkKWRenderWidget::ProcessEvent
 
-#ifndef __vtkKWRenderWidgetCommand_h
-#define __vtkKWRenderWidgetCommand_h
+#ifndef __vtkKWRenderWidgetCallbackCommand_h
+#define __vtkKWRenderWidgetCallbackCommand_h
 
 #include "vtkCommand.h"
 
 class vtkKWRenderWidget;
 
-class VTK_EXPORT vtkKWRenderWidgetCommand : public vtkCommand
+class VTK_EXPORT vtkKWRenderWidgetCallbackCommand : public vtkCommand
 {
 public:
-  static vtkKWRenderWidgetCommand *New() 
-    { return new vtkKWRenderWidgetCommand; };
+  static vtkKWRenderWidgetCallbackCommand *New() 
+    { return new vtkKWRenderWidgetCallbackCommand; };
   
   void Execute(vtkObject *caller, unsigned long event, void *callData);
 
   void SetRenderWidget(vtkKWRenderWidget *RenderWidget);
   
 protected:
-  vtkKWRenderWidgetCommand();
-  ~vtkKWRenderWidgetCommand();
+  vtkKWRenderWidgetCallbackCommand();
+  ~vtkKWRenderWidgetCallbackCommand();
   
   vtkKWRenderWidget  *RenderWidget;
 
 private:
-  vtkKWRenderWidgetCommand(const vtkKWRenderWidgetCommand&); // Not implemented
-  void operator=(const vtkKWRenderWidgetCommand&); // Not implemented
+  vtkKWRenderWidgetCallbackCommand(const vtkKWRenderWidgetCallbackCommand&); // Not implemented
+  void operator=(const vtkKWRenderWidgetCallbackCommand&); // Not implemented
 };
 
 #endif

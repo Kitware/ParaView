@@ -33,24 +33,24 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWRenderWidgetCommand.h"
+#include "vtkKWRenderWidgetCallbackCommand.h"
 
 #include "vtkKWRenderWidget.h"
 
 //----------------------------------------------------------------------------
-vtkKWRenderWidgetCommand::vtkKWRenderWidgetCommand()
+vtkKWRenderWidgetCallbackCommand::vtkKWRenderWidgetCallbackCommand()
 { 
   this->RenderWidget = NULL;
 }
 
 //----------------------------------------------------------------------------
-vtkKWRenderWidgetCommand::~vtkKWRenderWidgetCommand()
+vtkKWRenderWidgetCallbackCommand::~vtkKWRenderWidgetCallbackCommand()
 {
   this->SetRenderWidget(NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidgetCommand::SetRenderWidget(vtkKWRenderWidget *arg)
+void vtkKWRenderWidgetCallbackCommand::SetRenderWidget(vtkKWRenderWidget *arg)
 {
   if (this->RenderWidget != arg)
     {
@@ -67,9 +67,9 @@ void vtkKWRenderWidgetCommand::SetRenderWidget(vtkKWRenderWidget *arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidgetCommand::Execute(vtkObject *caller,
-                                       unsigned long event, 
-                                       void *calldata)
+void vtkKWRenderWidgetCallbackCommand::Execute(vtkObject *caller,
+                                               unsigned long event, 
+                                               void *calldata)
 {  
   if (this->RenderWidget)
     {

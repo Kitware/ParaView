@@ -55,7 +55,7 @@ vtkKWRadioButton.cxx
 vtkKWRadioButtonSet.cxx
 vtkKWRange.cxx 
 vtkKWRenderWidget.cxx 
-vtkKWRenderWidgetCommand.cxx 
+vtkKWRenderWidgetCallbackCommand.cxx 
 vtkKWSaveImageDialog.cxx 
 vtkKWScalarBarAnnotation.cxx 
 vtkKWScalarComponentSelectionWidget.cxx
@@ -95,7 +95,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   ${VTK_TCL_HOME}/vtktcl.c
-  vtkKWRenderWidgetCommand.cxx 
+  vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWTkUtilities.cxx
   WRAP_EXCLUDE
   )
