@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.5");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.6");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4433,7 +4433,6 @@ void vtkPVWindow::StartProgress()
 void vtkPVWindow::EndProgress(int enabled)
 {
   this->ExpectProgress = 0;
-  this->GetProgressGauge()->SetValue(100);
   this->GetProgressGauge()->SetValue(0);
   this->LastProgress = vtkTimerLog::GetCurrentTime();
   this->SetStatusText("");
@@ -4442,6 +4441,7 @@ void vtkPVWindow::EndProgress(int enabled)
 
   if ( !enabled || this->Enabled )
     {
+    this->UpdateEnableState();
     return;
     }
   this->EnabledOn();

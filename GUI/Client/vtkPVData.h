@@ -305,9 +305,10 @@ public:
   virtual void UpdateEnableState();
 
   // Description:
-  // Access to the Set View to Data button from a script
+  // Access to these objects from a script
   vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
   vtkGetObjectMacro(ActorControlFrame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(PVColorMap, vtkPVColorMap);
   
 protected:
   vtkPVData();
@@ -403,6 +404,11 @@ protected:
   double PreviousDiffuse;
   double PreviousSpecular;
   int PreviousWasSolid;
+
+  int MapScalarsVisible;
+  int EditColorMapVisible;
+  int ColorButtonVisible;
+  int ScalarBarVisible;
 
   vtkPVColorMap *PVColorMap;
 

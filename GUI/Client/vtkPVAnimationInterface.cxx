@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.122.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.122.2.2");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -654,6 +654,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *frameArg
   this->CacheGeometryCheck->Create(this->Application, 0);
   this->CacheGeometryCheck->SetText("Cache Geometry");
   this->CacheGeometryCheck->SetCommand(this, "CacheGeometryCheckCallback");
+  this->CacheGeometryCheck->SetState(1);
 
   this->Script("pack %s %s -side top -expand t -fill x -padx 2 -pady 2", 
                this->SaveButtonFrame->GetWidgetName(),

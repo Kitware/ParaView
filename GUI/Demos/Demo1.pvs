@@ -1716,7 +1716,6 @@ proc iso_run {} {
     $iso(vtkTemp106) SetCurrentTime 26 1; DemoAfter 100
     $iso(vtkTemp106) SetCurrentTime 27 1; DemoAfter 100
     $iso(vtkTemp106) SetCurrentTime 28 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 29 1; DemoAfter 100
     if $pvDemoShouldStop {
         return
     }

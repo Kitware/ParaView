@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.261.2.2");
+vtkCxxRevisionMacro(vtkPVData, "1.261.2.3");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -102,6 +102,11 @@ vtkPVData::vtkPVData()
   this->PropertiesParent = NULL; 
 
   this->CubeAxes = NULL;
+
+  this->EditColorMapVisible = 1;
+  this->MapScalarsVisible = 1;
+  this->ColorButtonVisible = 1;
+  this->ScalarBarVisible = 1;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -592,7 +597,7 @@ void vtkPVData::CreateProperties()
   this->Script("grid %s -column 1 -sticky news -padx %d -pady %d",
                this->ColorButton->GetWidgetName(),
                col_1_padx, button_pady);
-  this->ColorButton->EnabledOff();
+  this->ColorButtonVisible = 0;
 
   this->Script("grid %s %s -sticky wns",
                this->MapScalarsCheck->GetWidgetName(),
@@ -601,8 +606,8 @@ void vtkPVData::CreateProperties()
   this->Script("grid %s -sticky news -padx %d -pady %d",
                this->EditColorMapButton->GetWidgetName(),
                col_1_padx, button_pady);
-  this->MapScalarsCheck->EnabledOff();
-  this->EditColorMapButton->EnabledOff();
+  this->MapScalarsVisible = 0;
+  this->EditColorMapVisible = 0;
 
   // Display style
   this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
@@ -1011,6 +1016,7 @@ void vtkPVData::CreateProperties()
   // OK, all done
 
   this->PropertiesCreated = 1;
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -1428,11 +1434,12 @@ void vtkPVData::ColorByPropertyInternal()
 
   this->SetPVColorMap(NULL);
 
-  this->MapScalarsCheck->EnabledOff();
-  this->EditColorMapButton->EnabledOff();
-  this->ScalarBarCheck->EnabledOff();
+  this->MapScalarsVisible = 0;
+  this->EditColorMapVisible = 0;
+  this->ScalarBarVisible = 0;
 
-  this->ColorButton->EnabledOn();
+  this->ColorButtonVisible = 1;
+  this->UpdateEnableState();
 
 
   if (this->GetPVRenderView())
@@ -1491,10 +1498,11 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
     part = this->GetPVSource()->GetPart(idx);
     part->GetPartDisplay()->ColorByArray(this->PVColorMap, VTK_POINT_DATA_FIELD);
     } 
-  this->ColorButton->EnabledOff();
+  this->ColorButtonVisible = 0;
   this->UpdateMapScalarsCheck(
            this->PVSource->GetDataInformation()->GetPointDataInformation(),
            name);
+  this->UpdateEnableState();
 
 
   if ( this->GetPVRenderView() )
@@ -1555,10 +1563,11 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
     part->GetPartDisplay()->ColorByArray(this->PVColorMap, VTK_CELL_DATA_FIELD);
     }
 
-  this->ColorButton->EnabledOff();
+  this->ColorButtonVisible = 0;
   this->UpdateMapScalarsCheck(
            this->PVSource->GetDataInformation()->GetCellDataInformation(),
            name);
+  this->UpdateEnableState();
 
   if ( this->GetPVRenderView() )
     {
@@ -1580,9 +1589,9 @@ void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
       arrayInfo->GetDataType() != VTK_UNSIGNED_CHAR)
     { // Direct mapping not an option.
     this->MapScalarsCheck->SetState(1);
-    this->MapScalarsCheck->EnabledOff();
-    this->ScalarBarCheck->EnabledOn();
-    this->EditColorMapButton->EnabledOn();
+    this->MapScalarsVisible = 1;
+    this->ScalarBarVisible = 1;
+    this->EditColorMapVisible = 1;
     return;
     }
 
@@ -1591,9 +1600,9 @@ void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
     { // I would like to have two as an option also ...
     // One component causes more trouble than it is worth.
     this->MapScalarsCheck->SetState(1);
-    this->MapScalarsCheck->EnabledOff();
-    this->ScalarBarCheck->EnabledOn();
-    this->EditColorMapButton->EnabledOn();
+    this->MapScalarsVisible = 0;
+    this->ScalarBarVisible = 1;
+    this->EditColorMapVisible = 1;
     // Tell all of the part displays to map scalars.
     int num, idx;
     num = this->PVSource->GetNumberOfParts();
@@ -1606,18 +1615,18 @@ void vtkPVData::UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,
     }
 
   // Direct color map is an option.
-  this->MapScalarsCheck->EnabledOn();
+  this->MapScalarsVisible = 1;
 
   // I might like to store the default in another variable.
   if (this->MapScalarsCheck->GetState())
     {
-    this->ScalarBarCheck->EnabledOn();
-    this->EditColorMapButton->EnabledOn();
+    this->ScalarBarVisible = 1;
+    this->EditColorMapVisible = 1;
     }
   else
     {
-    this->ScalarBarCheck->EnabledOff();
-    this->EditColorMapButton->EnabledOff();
+    this->ScalarBarVisible = 0;
+    this->EditColorMapVisible = 0;
     }
     
 }
@@ -2459,13 +2468,13 @@ void vtkPVData::SetMapScalarsFlag(int val)
 
   if (val)
     {
-    this->EditColorMapButton->EnabledOn();
-    this->ScalarBarCheck->EnabledOn();
+    this->EditColorMapVisible = 1;
+    this->ScalarBarVisible = 1;
     }
   else
     {
-    this->EditColorMapButton->EnabledOff();
-    this->ScalarBarCheck->EnabledOff();
+    this->EditColorMapVisible = 0;
+    this->ScalarBarVisible = 0;
     }
 
   int num, idx;
@@ -3404,7 +3413,23 @@ void vtkPVData::UpdateEnableState()
   this->PropagateEnableState(this->ViewFrame);
   this->PropagateEnableState(this->ColorMenuLabel);
   this->PropagateEnableState(this->ColorMenu);
-  if ( this->PVColorMap )
+  if ( this->EditColorMapVisible )
+    {
+    this->PropagateEnableState(this->EditColorMapButton);
+    }
+  else
+    {
+    this->EditColorMapButton->SetEnabled(0);
+    }
+  if ( this->MapScalarsVisible)
+    {
+    this->PropagateEnableState(this->MapScalarsCheck);
+    }
+  else
+    {
+    this->MapScalarsCheck->SetEnabled(0);
+    }
+  if ( this->PVColorMap || !this->ColorButtonVisible )
     {
     this->ColorButton->SetEnabled(0);
     }
@@ -3412,7 +3437,6 @@ void vtkPVData::UpdateEnableState()
     {
     this->PropagateEnableState(this->ColorButton);
     }
-  this->PropagateEnableState(this->EditColorMapButton);
   this->PropagateEnableState(this->RepresentationMenuLabel);
   this->PropagateEnableState(this->RepresentationMenu);
   this->PropagateEnableState(this->InterpolationMenuLabel);
@@ -3422,8 +3446,14 @@ void vtkPVData::UpdateEnableState()
   this->PropagateEnableState(this->LineWidthLabel);
   this->PropagateEnableState(this->LineWidthThumbWheel);
   this->PropagateEnableState(this->VisibilityCheck);
+  if ( this->ScalarBarVisible )
+    {
   this->PropagateEnableState(this->ScalarBarCheck);
-  this->PropagateEnableState(this->MapScalarsCheck);
+    }
+  else
+    {
+    this->ScalarBarCheck->SetEnabled(0);
+    }
   this->PropagateEnableState(this->ActorControlFrame);
   this->PropagateEnableState(this->TranslateLabel);
   this->PropagateEnableState(this->ScaleLabel);
