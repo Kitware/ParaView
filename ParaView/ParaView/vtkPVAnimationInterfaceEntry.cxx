@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.6");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.4.2.7");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -328,12 +328,21 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 {
+  this->SetScript(0);
+  this->SetCurrentMethod(0);
+  this->SetTimeEquation(0);
+  this->SetLabel(0);
+
+  this->SetSaveStateObject(0);
+  this->SetSaveStateScript(0);
+
+  this->SetPVSource(0);
+
   this->ScriptEditor->Delete();
   this->ScriptEditorFrame->Delete();
   this->ScriptEditorScroll->Delete();
   this->DummyFrame->Delete();
   this->TimeScriptEntryFrame->Delete();
-  this->SetPVSource(0);
   this->Observer->Delete();
   this->TimeRange->Delete();
   this->SourceMethodFrame->Delete();
@@ -343,13 +352,6 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
   this->MethodMenuButton->Delete();
   this->StartTimeEntry->Delete();
   this->EndTimeEntry->Delete();
-  this->SetScript(0);
-  this->SetCurrentMethod(0);
-  this->SetTimeEquation(0);
-  this->SetLabel(0);
-
-  this->SetSaveStateObject(0);
-  this->SetSaveStateScript(0);
 }
 
 //-----------------------------------------------------------------------------
