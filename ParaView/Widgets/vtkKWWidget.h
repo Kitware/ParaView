@@ -77,6 +77,7 @@ public:
   // Get the name of the underlying tk widget being used
   // the parent should be set before calling this method.
   const char *GetWidgetName();
+  vtkKWWidget *GetChildWidgetWithName(const char *);
 
   // Description:
   // Set/Get the parent widget for this widget
@@ -216,7 +217,7 @@ public:
   // for GetChildWidget to work.
   vtkSetStringMacro(TraceName);
   vtkGetStringMacro(TraceName);
-  vtkKWWidget *GetChildWidget(const char* traceName);
+  vtkKWWidget *GetChildWidgetWithTraceName(const char* traceName);
 
   // Description:
   // Tracing support specific to widgets.  This method will initialize

@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.65");
+vtkCxxRevisionMacro(vtkKWWidget, "1.66");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -346,7 +346,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.65 $");
+  this->ExtractRevision(os,"$Revision: 1.66 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -365,12 +365,30 @@ vtkKWWindow* vtkKWWidget::GetWindow()
   return win;
 }
 
+//-----------------------------------------------------------------------------
+vtkKWWidget *vtkKWWidget::GetChildWidgetWithName(const char *name)
+{
+  if (name)
+    {
+    vtkKWWidget *child;
+    this->Children->InitTraversal();
+    while ((child = this->Children->GetNextKWWidget()))
+      {
+      const char *wname = child->GetWidgetName();
+      if (wname && !strcmp(wname, name))
+        {
+        return child;
+        }
+      }
+    }
 
-
+  return NULL;
+}
+       
 //-----------------------------------------------------------------------------
 // Methods for tracing.
 
-vtkKWWidget *vtkKWWidget::GetChildWidget(const char *traceName)
+vtkKWWidget *vtkKWWidget::GetChildWidgetWithTraceName(const char *traceName)
 {
   vtkKWWidget *child;
 
