@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.123");
+vtkCxxRevisionMacro(vtkKWApplication, "1.124");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -485,19 +485,23 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
   putenv("TK_LIBRARY=" ET_TK_LIBRARY);
 #else
+  char tcl_library[1024] = "";
+  char tk_library[1024] = "";
   const char *nameofexec = Tcl_GetNameOfExecutable();
   if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
     {
-    char directory[1024], tcl_library[1024], tk_library[1024], buffer[1024];
+    char directory[1024], buffer[1024];
     vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
     util->GetFilenamePath(nameofexec, directory);
     strcpy(directory, util->ConvertToUnixSlashes(directory));
     util->Delete();
 
-    sprintf(buffer, "TCL_LIBRARY=%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
+    sprintf(tcl_library, "%s/TclTk/lib/tcl%s", directory, TCL_VERSION);
+    sprintf(buffer, "TCL_LIBRARY=%s", tcl_library);
     putenv(buffer);
 
-    sprintf(buffer, "TK_LIBRARY=%s/TclTk/lib/tk%s", directory, TK_VERSION);
+    sprintf(tk_library, "%s/TclTk/lib/tk%s", directory, TK_VERSION);
+    sprintf(buffer, "TK_LIBRARY=%s", tk_library);
     putenv(buffer);
     }
 #endif
@@ -518,16 +522,15 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   // It seems the environment is not propagated correctly to the interpreter,
   // so set the env explicitly
 
-  if (getenv("TCL_LIBRARY"))
+  if (tcl_library && *tcl_library)
     {
-    Tcl_SetVar(interp, 
-               "env(TCL_LIBRARY)", getenv("TCL_LIBRARY"), TCL_GLOBAL_ONLY);
+    Tcl_SetVar(interp, "env(TCL_LIBRARY)", tcl_library, TCL_GLOBAL_ONLY);
     }
-  if (getenv("TK_LIBRARY"))
+  if (tk_library && *tk_library)
     {
-    Tcl_SetVar(interp, 
-               "env(TK_LIBRARY)", getenv("TK_LIBRARY"), TCL_GLOBAL_ONLY);
+    Tcl_SetVar(interp, "env(TK_LIBRARY)", tk_library, TCL_GLOBAL_ONLY);
     }
+
 #endif
  
 #if !defined(USE_INSTALLED_TCLTK_PACKAGES) && \
