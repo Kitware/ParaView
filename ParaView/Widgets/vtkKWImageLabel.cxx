@@ -66,7 +66,8 @@ void vtkKWImageLabel::Create(vtkKWApplication *app, const char *args)
 void vtkKWImageLabel::SetImageData(const unsigned char* data, 
 				   int width, int height)
 {
-  this->Script("winfo rgb %s systemButtonFace", this->GetParent()->GetWidgetName());
+  this->Script("winfo rgb %s [ lindex [ %s configure -bg ] end-1 ]", 
+	       this->GetParent()->GetWidgetName(), this->GetParent()->GetWidgetName());
   int r, g, b;
   sscanf( this->Application->GetMainInterp()->result, "%d %d %d",
 	  &r, &g, &b );
