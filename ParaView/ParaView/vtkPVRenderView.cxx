@@ -89,7 +89,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.11");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.12");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1309,64 +1309,67 @@ void vtkPVRenderView::CreateViewProperties()
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(page);
   frame->Create(this->Application, 1);
-  this->Script("pack %s -fill both -expand yes", 
-               frame->GetWidgetName());
+  this->Script("pack %s -fill both -expand yes", frame->GetWidgetName());
+
+  // Camera: standard views
 
   this->StandardViewsFrame->SetParent( frame->GetFrame() );
   this->StandardViewsFrame->ShowHideFrameOn();
   this->StandardViewsFrame->Create(this->Application);
   this->StandardViewsFrame->SetLabel("Standard Views");
 
+  char *views_grid_settings = " -padx 1 -pady 1 -ipadx 5 -sticky ew";
+
   this->XMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->XMaxViewButton->SetLabel("+X");
   this->XMaxViewButton->Create(this->Application, "");
   this->XMaxViewButton->SetCommand(this, "StandardViewCallback 1 0 0");
-  this->Script("grid configure %s -column 0 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->XMaxViewButton->GetWidgetName());
+  this->Script("grid configure %s -column 0 -row 0 %s",
+               this->XMaxViewButton->GetWidgetName(), views_grid_settings);
+
   this->XMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->XMinViewButton->SetLabel("-X");
   this->XMinViewButton->Create(this->Application, "");
   this->XMinViewButton->SetCommand(this, "StandardViewCallback -1 0 0");
-  this->Script("grid configure %s -column 0 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->XMinViewButton->GetWidgetName());
+  this->Script("grid configure %s -column 0 -row 1 %s",
+               this->XMinViewButton->GetWidgetName(), views_grid_settings);
 
   this->YMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->YMaxViewButton->SetLabel("+Y");
   this->YMaxViewButton->Create(this->Application, "");
   this->YMaxViewButton->SetCommand(this, "StandardViewCallback 0 1 0");
-  this->Script("grid configure %s -column 1 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->YMaxViewButton->GetWidgetName());
+  this->Script("grid configure %s -column 1 -row 0 %s",
+               this->YMaxViewButton->GetWidgetName(), views_grid_settings);
+
   this->YMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->YMinViewButton->SetLabel("-Y");
   this->YMinViewButton->Create(this->Application, "");
   this->YMinViewButton->SetCommand(this, "StandardViewCallback 0 -1 0");
-  this->Script("grid configure %s -column 1 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->YMinViewButton->GetWidgetName());
+  this->Script("grid configure %s -column 1 -row 1 %s",
+               this->YMinViewButton->GetWidgetName(), views_grid_settings);
 
   this->ZMaxViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->ZMaxViewButton->SetLabel("+Z");
   this->ZMaxViewButton->Create(this->Application, "");
   this->ZMaxViewButton->SetCommand(this, "StandardViewCallback 0 0 1");
-  this->Script("grid configure %s -column 2 -row 0 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->ZMaxViewButton->GetWidgetName());
+  this->Script("grid configure %s -column 2 -row 0 %s",
+               this->ZMaxViewButton->GetWidgetName(), views_grid_settings);
+
   this->ZMinViewButton->SetParent(this->StandardViewsFrame->GetFrame());
   this->ZMinViewButton->SetLabel("-Z");
   this->ZMinViewButton->Create(this->Application, "");
   this->ZMinViewButton->SetCommand(this, "StandardViewCallback 0 0 -1");
-  this->Script("grid configure %s -column 2 -row 1 -padx 2 -pady 2 -ipadx 5 -sticky ew",
-               this->ZMinViewButton->GetWidgetName());
-  this->ManipulatorControl2D->SetParent(frame->GetFrame());
-  this->ManipulatorControl2D->Create(pvapp, 0);
-  this->ManipulatorControl2D->SetLabel("2D Movements");
-  this->ManipulatorControl3D->SetParent(frame->GetFrame());
-  this->ManipulatorControl3D->Create(pvapp, 0);
-  this->ManipulatorControl3D->SetLabel("3D Movements");
+  this->Script("grid configure %s -column 2 -row 1 %s",
+               this->ZMinViewButton->GetWidgetName(), views_grid_settings);
+
+  // Camera: stored camera position
 
   int cc;
   this->CameraIconsFrame->SetParent(frame->GetFrame());
   this->CameraIconsFrame->ShowHideFrameOn();
   this->CameraIconsFrame->Create(this->Application);
   this->CameraIconsFrame->SetLabel("Stored Camera Positions");
+
   vtkKWWidget* cframe = this->CameraIconsFrame->GetFrame();
   for ( cc = 0; cc < 6; cc ++ )
     {
@@ -1379,17 +1382,27 @@ void vtkPVRenderView::CreateViewProperties()
     y = cc / 3;
 
     this->Script("grid configure %s -column %d -row %d "
-                 "-padx 0 -pady 0 -ipadx 0 -ipady 0 -sticky news",
+                 "-padx 1 -pady 1 -ipadx 0 -ipady 0 -sticky news",
                  this->CameraIcons[cc]->GetWidgetName(),
                  x, y);
                  
     }
 
-  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->StandardViewsFrame->GetWidgetName());
-  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->CameraIconsFrame->GetWidgetName());
-  this->Script("pack %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+  // Camera: manipulators
+
+  this->ManipulatorControl2D->SetParent(frame->GetFrame());
+  this->ManipulatorControl2D->Create(pvapp, 0);
+  this->ManipulatorControl2D->SetLabel("2D Movements");
+
+  this->ManipulatorControl3D->SetParent(frame->GetFrame());
+  this->ManipulatorControl3D->Create(pvapp, 0);
+  this->ManipulatorControl3D->SetLabel("3D Movements");
+
+  // Camera: pack
+
+  this->Script("pack %s %s %s %s -padx 2 -pady 2 -fill x -expand 1 -anchor w",
+               this->StandardViewsFrame->GetWidgetName(),
+               this->CameraIconsFrame->GetWidgetName(),
                this->ManipulatorControl2D->GetWidgetName(),
                this->ManipulatorControl3D->GetWidgetName());
 
@@ -2446,7 +2459,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.11 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.12 $");
 }
 
 //------------------------------------------------------------------------------
