@@ -292,6 +292,10 @@ public:
   // can use this to cleanup properly.
   vtkGetMacro(ApplicationExited, int);
 
+  // Description:
+  // This return 1 when application is exiting.
+  vtkGetMacro(InExit, int);
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
