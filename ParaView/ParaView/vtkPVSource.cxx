@@ -391,7 +391,7 @@ void vtkPVSource::CreateProperties()
   
   this->AcceptButton->SetParent(frame);
   this->AcceptButton->Create(this->Application, "-text Accept -background red1");
-  this->AcceptButton->SetCommand(this, "AcceptCallback");
+  this->AcceptButton->SetCommand(this, "PreAcceptCallback");
   this->AcceptButton->SetBalloonHelpString("Cause the current values in the user interface to take effect");
   this->Script("pack %s -side left -fill x -expand t", 
 	       this->AcceptButton->GetWidgetName());
@@ -551,6 +551,13 @@ int vtkPVSource::GetVisibility()
 
 
 //----------------------------------------------------------------------------
+void vtkPVSource::PreAcceptCallback()
+{
+  this->Script("%s configure -cursor watch", this->GetPVWindow()->GetWidgetName());
+  this->Script("after idle {%s AcceptCallback}", this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()
 {
   this->Accept();
@@ -564,10 +571,6 @@ void vtkPVSource::Accept()
   vtkPVWindow *window;
 
   window = this->GetPVWindow();
-
-  this->Script("update");
-  this->Script("%s configure -cursor watch", window->GetWidgetName());
-  this->Script("update");  
 
 #ifdef _WIN32
   this->Script("%s configure -background SystemButtonFace",

@@ -133,6 +133,7 @@ public:
   // Description:
   // Called when the accept button is pressed.
   virtual void AcceptCallback();
+  virtual void PreAcceptCallback();
 
   // Description:
   // Internal method; called by AcceptCallback
