@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.132");
+vtkCxxRevisionMacro(vtkPVApplication, "1.133");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -587,6 +587,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->Script("option add *Text.background #ffffff");
   this->Script("option add *Button.padX 6");
   this->Script("option add *Button.padY 3");
+  this->Script("option add *selectcolor gray");
 #endif
 
 
