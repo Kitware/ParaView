@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkActor.h"
 #include "vtkArrayMap.txx"
 #include "vtkAxes.h"
+#include "vtkCollection.h"
 #include "vtkDirectory.h"
 #include "vtkGenericRenderWindowInteractor.h"
 #include "vtkKWCheckButton.h"
@@ -68,30 +69,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
+#include "vtkPVColorMap.h"
 #include "vtkPVData.h"
 #include "vtkPVDefaultModules.h"
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVInteractorStyleCenterOfRotation.h"
-#include "vtkPVInteractorStyleFly.h"
 #include "vtkPVInteractorStyle.h"
-#include "vtkPVTrackballRoll.h"
-#include "vtkPVTrackballRotate.h"
-#include "vtkPVTrackballPan.h"
-#include "vtkPVTrackballZoom.h"
+#include "vtkPVInteractorStyleCenterOfRotation.h"
+#include "vtkPVInteractorStyleControl.h"
+#include "vtkPVInteractorStyleFly.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
+#include "vtkPVTrackballPan.h"
+#include "vtkPVTrackballRoll.h"
+#include "vtkPVTrackballRotate.h"
+#include "vtkPVTrackballZoom.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderWindow.h"
-#include "vtkCollection.h"
-#include "vtkPVColorMap.h"
 #include "vtkString.h"
 #include "vtkToolkits.h"
 
@@ -1304,7 +1305,18 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   
   view = vtkPVRenderView::New();
   view->CreateRenderObjects(pvApp);
+  this->MainView = view;
+  this->MainView->SetParent(this->ViewFrame);
+  this->AddView(this->MainView);
+  this->MainView->Create(this->Application,"-width 200 -height 200");
+  this->MainView->MakeSelected();
+  this->MainView->ShowViewProperties();
+  this->MainView->SetupBindings();
+  this->MainView->AddBindings(); // additional bindings in PV not in KW
+  
 
+  vtkPVInteractorStyleControl *iscontrol = view->GetInteractorStyleControl();
+  
   vtkPVCameraManipulator *manipulator;
   vtkPVCenterOfRotationManipulator *rotationManipulator;
   // ----
@@ -1312,6 +1324,8 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   rotationManipulator->SetButton(1);
   this->RotateCameraStyle->AddManipulator(rotationManipulator);
   this->RotationManipulators->AddItem(rotationManipulator);
+  iscontrol->AddManipulator("Rotate", rotationManipulator);
+  iscontrol->SetManipulator(0, 0, "Rotate");
   rotationManipulator->Delete();
   rotationManipulator = NULL;
   // ----
@@ -1320,18 +1334,25 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   rotationManipulator->ShiftOn();
   this->RotateCameraStyle->AddManipulator(rotationManipulator);
   this->RotationManipulators->AddItem(rotationManipulator);
+  iscontrol->AddManipulator("Roll", rotationManipulator);
+  iscontrol->SetManipulator(0, 1, "Roll");
   rotationManipulator->Delete();
   rotationManipulator = NULL;
   // ----
   manipulator = vtkPVTrackballPan::New();
   manipulator->SetButton(2);
   this->RotateCameraStyle->AddManipulator(manipulator);
+  iscontrol->AddManipulator("Pan", manipulator);
+  iscontrol->SetManipulator(1, 0, "Pan");
+  iscontrol->SetManipulator(2, 1, "Pan");
   manipulator->Delete();
   manipulator = NULL;
   // ----
   manipulator = vtkPVTrackballZoom::New();
   manipulator->SetButton(3);
   this->RotateCameraStyle->AddManipulator(manipulator);
+  iscontrol->AddManipulator("Zoom", manipulator);
+  iscontrol->SetManipulator(2, 0, "Zoom");
   manipulator->Delete();
   manipulator = NULL;
   // ----
@@ -1353,15 +1374,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->TranslateCameraStyle->AddManipulator(manipulator);
   manipulator->Delete();
   manipulator = NULL;
-  
-  this->MainView = view;
-  this->MainView->SetParent(this->ViewFrame);
-  this->AddView(this->MainView);
-  this->MainView->Create(this->Application,"-width 200 -height 200");
-  this->MainView->MakeSelected();
-  this->MainView->ShowViewProperties();
-  this->MainView->SetupBindings();
-  this->MainView->AddBindings(); // additional bindings in PV not in KW
+  iscontrol->UpdateMenus();
   
   float rgb[3];
   this->RetrieveColor(2, "RenderViewBG", rgb); 
