@@ -28,7 +28,7 @@ int main(int , char* [])
   
   vtkPickFilter *pick = vtkPickFilter::New();
   
-  int fixme;  // why is this a problem.
+  //law int fixme;  // why is this a problem.
   //pick->SetInput( maze->GetOutput() );
   pick->SetWorldPoint ( maze->GetOutput()->GetCenter() );
   pick->GetWorldPoint ();

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplay);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplay, "1.1");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -59,7 +59,6 @@ vtkSMCubeAxesDisplay::~vtkSMCubeAxesDisplay()
 void vtkSMCubeAxesDisplay::CreateVTKObjects(int num)
 {
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
 
   if (num != 1)
     {
@@ -84,8 +83,6 @@ void vtkSMCubeAxesDisplay::CreateVTKObjects(int num)
 //----------------------------------------------------------------------------
 void vtkSMCubeAxesDisplay::SetInput(vtkSMSourceProxy* input)
 {  
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  
   this->CreateVTKObjects(1);
   input->AddConsumer(0, this);
   

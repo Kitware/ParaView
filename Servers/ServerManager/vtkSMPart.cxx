@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.10");
+vtkCxxRevisionMacro(vtkSMPart, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -337,8 +337,10 @@ void vtkSMPart::CreateTranslatorIfNecessary()
 
 //----------------------------------------------------------------------------
 void vtkSMPart::Update()
+
+
 {
-  int fixme;  // I would like to get rid of this method.
+  //law int fixme;  // I would like to get rid of this method.
   // Do we every need to update just one part?
   if (this->UpdateNeeded)
     {

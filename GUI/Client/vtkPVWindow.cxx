@@ -128,7 +128,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.603");
+vtkCxxRevisionMacro(vtkPVWindow, "1.604");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2182,7 +2182,6 @@ void vtkPVWindow::WriteData()
     return;
     }
 
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVDataInformation* info = part->GetDataInformation();
 
@@ -2351,7 +2350,6 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = 0;
   vtkDataSet* data = NULL;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkSMPart *part = this->GetCurrentPVSource()->GetPart();
   vtkPVDataInformation* info = part->GetDataInformation();
   if (info->DataSetTypeIsA("vtkImageData"))

@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.1");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.2");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1066,11 +1066,8 @@ void vtkPVDisplayGUI::UpdateInternal()
   int i, numArrays, numComps;
   vtkPVDataSetAttributesInformation *attrInfo;
   vtkPVArrayInformation *arrayInfo;
-  const char *inputColorBy = 0;
-  int currentColorByFound = 0, inputColorByFound = 0;
-  int defPoint = 0, inputPoint = 0;
+  int defPoint = 0;
   vtkPVArrayInformation *defArray, *inputArray, *volRenArray;
-  int inputColorSetByUser = 0, inputArraySetByUser = 0;
   int dataType = dataInfo->GetDataSetType();
   
   // Default is the scalars to use when current color is not found.
@@ -1668,7 +1665,6 @@ void vtkPVDisplayGUI::SetRepresentation(const char* repr)
 void vtkPVDisplayGUI::DrawWireframe()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
   if (this->GetPVSource()->GetInitialized())
     {
@@ -1689,7 +1685,6 @@ void vtkPVDisplayGUI::DrawWireframe()
 void vtkPVDisplayGUI::DrawPoints()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   if (this->GetPVSource()->GetInitialized())
     {
@@ -1728,7 +1723,6 @@ void vtkPVDisplayGUI::DrawVolume()
 void vtkPVDisplayGUI::DrawSurface()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   if (this->GetPVSource()->GetInitialized())
     {
@@ -1751,7 +1745,6 @@ void vtkPVDisplayGUI::DrawSurface()
 void vtkPVDisplayGUI::DrawOutline()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   if (this->GetPVSource()->GetInitialized())
     {
@@ -1828,7 +1821,6 @@ void vtkPVDisplayGUI::SetInterpolation(const char* repr)
 void vtkPVDisplayGUI::SetInterpolationToFlat()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   this->AddTraceEntry("$kw(%s) SetInterpolationToFlat", 
                       this->GetTclName());
@@ -1846,7 +1838,6 @@ void vtkPVDisplayGUI::SetInterpolationToFlat()
 void vtkPVDisplayGUI::SetInterpolationToGouraud()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
   this->AddTraceEntry("$kw(%s) SetInterpolationToGouraud", 
                       this->GetTclName());
@@ -1868,7 +1859,6 @@ void vtkPVDisplayGUI::Initialize()
     {
     return;
     }
-  vtkPVApplication *pvApp = this->GetPVApplication();
   double bounds[6];
 
   vtkDebugMacro( << "Initialize --------")
@@ -2004,7 +1994,6 @@ void vtkPVDisplayGUI::SetPointLabelVisibility(int val, int changeButtonState)
     return;
     }
   
-  int numParts = this->GetPVSource()->GetNumberOfParts();
   vtkSMLODPartDisplay *display;
   
   display = vtkSMLODPartDisplay::SafeDownCast(
@@ -2131,7 +2120,6 @@ void vtkPVDisplayGUI::SetPointSize(int size)
 void vtkPVDisplayGUI::ChangePointSize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   this->PVSource->GetPartDisplay()->SetPointSize(this->PointSizeThumbWheel->GetValue());
  
@@ -2169,7 +2157,6 @@ void vtkPVDisplayGUI::SetLineWidth(int width)
 void vtkPVDisplayGUI::ChangeLineWidth()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   this->PVSource->GetPartDisplay()->SetLineWidth(this->LineWidthThumbWheel->GetValue());
 

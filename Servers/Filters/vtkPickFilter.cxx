@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.5");
+vtkCxxRevisionMacro(vtkPickFilter, "1.6");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -219,7 +219,7 @@ void vtkPickFilter::CellExecute()
   vtkIdList* regionCellIds = vtkIdList::New();
   if ( ! this->CompareProcesses(bestDist2) && bestId >= 0)
     {
-    vtkDataSet* input = this->GetInput(this->BestInputIndex);
+    input = this->GetInput(this->BestInputIndex);
     this->InitializePointMap(input->GetNumberOfPoints());
     regionCellIds->InsertNextId(bestId);
     // Insert the cell points.

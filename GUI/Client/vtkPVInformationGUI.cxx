@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.1");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.2");
 
 int vtkPVInformationGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -31,8 +31,6 @@ int vtkPVInformationGUICommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVInformationGUI::vtkPVInformationGUI()
 {
-  static int instanceCount = 0;
-
   this->CommandFunction = vtkPVInformationGUICommand;
 
   this->StatsFrame = vtkKWLabeledFrame::New();

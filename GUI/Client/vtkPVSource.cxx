@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.380");
+vtkCxxRevisionMacro(vtkPVSource, "1.381");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
@@ -933,7 +933,7 @@ void vtkPVSource::Select()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::Deselect(int doPackForget)
+void vtkPVSource::Deselect(int)
 {
   // Save the page to restore when the sources is selected later.
   this->SavedRaisedNotebookPageId = this->Notebook->GetRaisedPageId();
@@ -949,6 +949,7 @@ void vtkPVSource::Deselect(int doPackForget)
   
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
+
     pvWidget = static_cast<vtkPVWidget*>(it->GetObject());
     pvWidget->Deselect();
     it->GoToNextItem();

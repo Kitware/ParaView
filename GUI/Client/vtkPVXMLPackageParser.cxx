@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.42");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.43");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -451,7 +451,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
 {
   vtkPVApplication *pvApp = this->Window->GetPVApplication();
   pvm->SetApplication(pvApp);
-  int fixMe; // Move Source notbook and InformationGUI into window.
+  //law int fixMe; // Move Source notbook and InformationGUI into window.
   pvm->SetNotebook(this->Window->GetMainView()->GetSourceNotebook());
   pvm->SetDisplayGUI(this->Window->GetMainView()->GetDisplayGUI());
   pvm->SetInformationGUI(this->Window->GetMainView()->GetInformationGUI());

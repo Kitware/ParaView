@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.2");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.3");
 
 
 //----------------------------------------------------------------------------s
@@ -1093,6 +1093,8 @@ void vtkSMPartDisplay::SaveGeometryInBatchFile(ofstream *file,
                                                const char* fileName,
                                                int timeIdx) 
 {
+  //law int fixme;  //Make sure this works.  timeIdx is not used.
+  timeIdx = timeIdx;
   *file << "GeometryWriter SetInput [pvTemp" 
         << this->GeometryProxy->GetID(0) << " GetOutput]\n";
   *file << "if {$numberOfProcs > 1} {\n";
@@ -1116,8 +1118,6 @@ void vtkSMPartDisplay::SaveGeometryInBatchFile(ofstream *file,
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::VolumeRenderModeOn()
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
-  
   if ( this->Visibility )
     {
     // This may not be proper to share visibility property.
@@ -1139,8 +1139,6 @@ void vtkSMPartDisplay::VolumeRenderModeOn()
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::VolumeRenderModeOff()
 {
-  vtkPVProcessModule* pm = this->GetProcessModule();
-  
   if ( this->Visibility )
     {
     if ( this->PropProxy )
@@ -1294,8 +1292,8 @@ void vtkSMPartDisplay::SetRepresentation(int rep)
       this->InvalidateGeometry();
       }
     // Handle specularity and lighting. All but surface turns shading off.
-    int diffuse = 0.0;
-    int ambient = 1.0;
+    float diffuse = 0.0;
+    float ambient = 1.0;
     float specularity = 0.0;
     if (rep == VTK_SURFACE)
       {
@@ -1304,6 +1302,7 @@ void vtkSMPartDisplay::SetRepresentation(int rep)
       // Turn on specularity when coloring by property.
       if ( ! this->GetScalarVisibility())
         {
+
         specularity = 0.1;
         }
       }

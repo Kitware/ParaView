@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.14");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.15");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -507,8 +507,6 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
     this->ColorRampRange->SetWholeRange( this->ScalarRange[0], 
                                                  this->ScalarRange[1] );
       
-    vtkSMPart *part = this->PVSource->GetPart(0);
-
     vtkPiecewiseFunction *opacityFunc = 
       vtkPiecewiseFunction::SafeDownCast(
         pvApp->GetProcessModule()->
