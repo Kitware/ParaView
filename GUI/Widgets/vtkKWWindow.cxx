@@ -43,7 +43,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.212");
+vtkCxxRevisionMacro(vtkKWWindow, "1.213");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -443,6 +443,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Status frame : image
 
   this->SetStatusImageName(this->Script("image create photo"));
+  this->CreateStatusImage();
 
   this->StatusImage->SetParent(this->StatusFrame);
   this->StatusImage->Create(app, "-relief sunken -bd 1");

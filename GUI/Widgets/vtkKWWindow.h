@@ -425,6 +425,8 @@ protected:
   char       *StatusImageName;
   vtkSetStringMacro(StatusImageName);
 
+  virtual void CreateStatusImage() {};
+
   vtkKWWidget *PropertiesParent;
   vtkKWFrame *ViewFrame;
   vtkKWToolbarSet *Toolbars;
