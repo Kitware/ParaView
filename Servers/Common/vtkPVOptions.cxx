@@ -41,7 +41,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.26");
+vtkCxxRevisionMacro(vtkPVOptions, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -509,7 +509,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Running as a server\n";
     }
-  if (this->ConnectDataToRender)
+  if (this->ConnectRenderToData)
     {
     os << indent << "Running as a client to a data and render server\n";
     }
@@ -539,6 +539,10 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "Render Node Port: " << this->RenderNodePort << endl;
     os << indent << "Render Server Port: " << this->RenderServerPort << endl;
     os << indent << "Reverse Connection: " << (this->ReverseConnection?"on":"off") << endl;
+    os << indent << "Connect Render Server to Data Server: "
+       << (this->ConnectRenderToData?"on":"off") << endl;
+    os << indent << "Connect Data Server to Render Server: "
+       << (this->ConnectDataToRender?"on":"off") << endl;
     os << indent << "ServerHostName: " << (this->ServerHostName?this->ServerHostName:"(none)") << endl;
     os << indent << "DataServerHostName: " << (this->DataServerHostName?this->DataServerHostName:"(none)") << endl;
     os << indent << "RenderServerHostName: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
