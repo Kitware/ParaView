@@ -293,7 +293,7 @@ void vtkPVArrayMenu::ComponentMenuEntryCallback(int comp)
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::SetValue(const char* name)
 {
-  if (strcmp(name, this->ArrayName) == 0)
+  if (this->ArrayName && strcmp(name, this->ArrayName) == 0)
     {
     return;
     }
