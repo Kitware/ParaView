@@ -25,6 +25,7 @@
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVScalarListWidgetProperty.h"
+#include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkClientServerStream.h"
 
@@ -32,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.36");
+vtkCxxRevisionMacro(vtkPVScale, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -253,6 +254,24 @@ void vtkPVScale::SetValue(float val)
   this->ModifiedCallback();
 }
 
+
+//-----------------------------------------------------------------------------
+void vtkPVScale::SaveInBatchScript(ofstream *file)
+{
+  float scalar, scaleValue = this->GetValue();
+  if(this->Round)
+    {
+    scalar = this->RoundValue(scaleValue);
+    }
+  else
+    {
+    scalar = scaleValue;
+    }
+
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+        <<  " GetProperty " << this->VariableName << "] SetElements1 "
+        << scalar << endl;
+}
 
 
 //----------------------------------------------------------------------------
@@ -507,7 +526,7 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   // I do not like setting the label like this but ...
   sprintf(script, "%s SetObjectVariableToPVTime $pvTime", 
           this->GetTclName());
-  ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
+  ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script, this->GetTraceName());
   ai->SetCurrentProperty(this->Property);
   ai->SetTimeStart(this->GetRangeMin());
   ai->SetTimeEnd(this->GetRangeMax());

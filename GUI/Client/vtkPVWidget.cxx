@@ -41,7 +41,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.43");
+vtkCxxRevisionMacro(vtkPVWidget, "1.44");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -243,7 +243,7 @@ vtkPVApplication *vtkPVWidget::GetPVApplication()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWidget::SaveInBatchScript(ofstream *file)
+void vtkPVWidget::SaveInBatchScript(ofstream *)
 {
   if (this->PVSource == NULL)
     {
@@ -251,13 +251,13 @@ void vtkPVWidget::SaveInBatchScript(ofstream *file)
     return;
     }
 
-  int numSources, sourceIdx;
-  numSources = this->PVSource->GetNumberOfVTKSources();
-  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
-    {
-    this->SaveInBatchScriptForPart(file, 
-                                   this->PVSource->GetVTKSourceID(sourceIdx));
-    }
+//   int numSources, sourceIdx;
+//   numSources = this->PVSource->GetNumberOfVTKSources();
+//   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+//     {
+//     this->SaveInBatchScriptForPart(file, 
+//                                    this->PVSource->GetVTKSourceID(sourceIdx));
+//     }
 }
 
 //-----------------------------------------------------------------------------

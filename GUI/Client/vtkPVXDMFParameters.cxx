@@ -145,7 +145,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.16");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.17");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -430,7 +430,7 @@ void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai
   sprintf(script, "%s SetParameterIndex {%s} $pvTime", this->GetTclName(),
           name);
   vtkPVXDMFParametersInternals::Parameter *p = this->Internals->GetParameter(name);
-  ai->SetLabelAndScript(this->GetTraceName(), script);
+  ai->SetLabelAndScript(this->GetTraceName(), script, this->GetTraceName());
   ai->SetTimeStart(0);
   //ai->SetCurrentTime(p->Value);
   ai->SetTimeEnd(p->Max);
@@ -444,24 +444,25 @@ void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
+void vtkPVXDMFParameters::SaveInBatchScript(ofstream *)
 {
-  if (!this->VTKReaderID.ID)
-    {
-    vtkErrorMacro("VTKReader has not been set.");
-    }
+// TODO fix this
+//   if (!this->VTKReaderID.ID)
+//     {
+//     vtkErrorMacro("VTKReader has not been set.");
+//     }
 
-  vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
-  *file << "\t" << "pvTemp" << this->VTKReaderID.ID << " UpdateInformation" << endl;
-  for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
-    {
-    vtkKWScale* scale = (vtkKWScale*)it->GetObject();
-    const char* label = scale->GetShortLabel();
-    //cout << "Looking at scale: " << label << endl;
-    vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
-    *file << "\t" << "pvTemp" << this->VTKReaderID.ID << " SetParameterIndex {" << label << "} "
-      << p->Value << endl;
-    }
+//   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
+//   *file << "\t" << "pvTemp" << this->VTKReaderID.ID << " UpdateInformation" << endl;
+//   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+//     {
+//     vtkKWScale* scale = (vtkKWScale*)it->GetObject();
+//     const char* label = scale->GetShortLabel();
+//     //cout << "Looking at scale: " << label << endl;
+//     vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
+//     *file << "\t" << "pvTemp" << this->VTKReaderID.ID << " SetParameterIndex {" << label << "} "
+//       << p->Value << endl;
+//     }
 }
 
 //----------------------------------------------------------------------------

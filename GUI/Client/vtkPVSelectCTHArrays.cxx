@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.9");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.10");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -383,12 +383,17 @@ void vtkPVSelectCTHArrays::SaveInBatchScript(ofstream *file)
 
   num = this->SelectedArrayNames->GetNumberOfStrings();
 
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+        << " GetProperty AddVolumeArrayName] SetNumberOfElements "
+        << num << endl;
+
   // Now loop through the input mask setting the selection states.
   for (idx = 0; idx < num; ++idx)
     {
     arrayName = this->SelectedArrayNames->GetString(idx);
-    *file << "\tpvTemp" << this->PVSource->GetVTKSourceID(0) 
-          << " AddVolumeArrayName {" << arrayName << "}\n";  
+    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+          << " GetProperty AddVolumeArrayName] SetElement "
+          << idx << " {" << arrayName << "}\n";  
     }
 }
 

@@ -123,10 +123,6 @@ public:
 
   // Description:
   // Save this widget to a file.
-  // Most widgets do not need to supply this method.
-  // Only widgets which manipulate PV objects need to implement this method.
-  // Widgets which interact with vtk objects can supply a
-  // private "SaveInBatchScriptForPart" method.  
   virtual void SaveInBatchScript(ofstream *file);
 
   // Description:

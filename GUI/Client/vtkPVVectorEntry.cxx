@@ -23,6 +23,7 @@
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVScalarListWidgetProperty.h"
+#include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
@@ -30,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.46");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.47");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -531,17 +532,15 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVectorEntry::SaveInBatchScriptForPart(ofstream *file, 
-                                                vtkClientServerID sourceID)
+void vtkPVVectorEntry::SaveInBatchScript(ofstream *file)
 {
-  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
-  vtkPVScalarListWidgetProperty* prop = this->Property;
   int cc;
-  for ( cc = 0; cc < prop->GetNumberOfScalars(); cc ++ )
+  for ( cc = 0; cc < this->Property->GetNumberOfScalars(); cc ++ )
     {
-    *file << " " << prop->GetScalar(cc);
+    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+          <<  " GetProperty " << this->VariableName << "] SetElement "
+          << cc << " " << this->Property->GetScalar(cc) << endl;
     }
-  *file << endl;
 }
 
 //-----------------------------------------------------------------------------
@@ -568,7 +567,7 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   
   if (this->Entries->GetNumberOfItems() == 1)
     {
-    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL);
+    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL, this->GetTraceName());
     ai->SetCurrentProperty(this->Property);
     if (this->UseWidgetRange)
       {

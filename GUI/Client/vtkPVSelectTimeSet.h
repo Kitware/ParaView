@@ -21,7 +21,7 @@
 #ifndef __vtkPVSelectTimeSet_h
 #define __vtkPVSelectTimeSet_h
 
-#include "vtkPVObjectWidget.h"
+#include "vtkPVWidget.h"
 
 class vtkKWLabel;
 class vtkKWMenu;
@@ -29,11 +29,11 @@ class vtkKWLabeledFrame;
 class vtkDataArrayCollection;
 class vtkPVScalarListWidgetProperty;
 
-class VTK_EXPORT vtkPVSelectTimeSet : public vtkPVObjectWidget
+class VTK_EXPORT vtkPVSelectTimeSet : public vtkPVWidget
 {
 public:
   static vtkPVSelectTimeSet* New();
-  vtkTypeRevisionMacro(vtkPVSelectTimeSet, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVSelectTimeSet, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication *pvApp);
@@ -111,6 +111,10 @@ public:
   vtkSetStringMacro(SetCommand);
   vtkGetStringMacro(SetCommand);
   
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
+ 
 protected:
   vtkPVSelectTimeSet();
   ~vtkPVSelectTimeSet();

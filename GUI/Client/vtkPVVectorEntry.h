@@ -164,6 +164,10 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
  
 protected:
   vtkPVVectorEntry();
@@ -207,10 +211,6 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
-
-  // Description:
-  // An interface for saving a widget into a script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 };
 

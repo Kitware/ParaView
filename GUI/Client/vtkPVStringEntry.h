@@ -94,6 +94,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
+ 
 protected:
   vtkPVStringEntry();
   ~vtkPVStringEntry();
@@ -126,12 +130,6 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
-  // Description:
-  // This widget needs a special "SaveInBatchScript" method
-  // because the string has to be enclosed by brackets.
-  // This method is used internally by PVSources to save
-  // parameters into a VTK Tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 };
 
 #endif

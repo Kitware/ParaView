@@ -26,6 +26,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkClientServerStream.h"
 #include "vtkCollectionIterator.h"
 
@@ -33,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.38");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -177,6 +178,42 @@ int vtkPVSelectWidget::GetModifiedFlag()
   return 0;
 }
   
+//-----------------------------------------------------------------------------
+void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
+{
+  vtkPVWidgetProperty *pvwp;
+  pvwp = (vtkPVWidgetProperty*)(
+    this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
+  pvwp->GetWidget()->SaveInBatchScript(file);
+ 
+  if(this->ElementType == OBJECT)
+    { 
+    vtkPVWidgetProperty *pvwp;
+    pvwp = vtkPVWidgetProperty::SafeDownCast(
+      this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
+    vtkPVObjectWidget* ow = 
+      vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget()); 
+    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+          <<  " GetProperty " << this->VariableName << "] SetProxy ";
+    if (ow)
+      {
+      vtkClientServerID id = ow->GetObjectByName(this->GetCurrentVTKValue());
+      *file << "$pvTemp" << id.ID;
+      }
+    else
+      {
+      *file << "{}" ;
+      }
+    }
+  else
+    {
+    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+          <<  " GetProperty " << this->VariableName << "] SetElements1 ";
+    *file << this->Property->GetString();
+    }
+  *file << endl;
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
 {
@@ -457,47 +494,6 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   pvw->Select();
 
   this->ModifiedCallback();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
-{
-  vtkPVWidgetProperty *pvwp;
-  pvwp = (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-  pvwp->GetWidget()->SaveInBatchScript(file);
- 
-  // Super class loops over parts and calls SaveInBatchScriptForPart.
-  this->Superclass::SaveInBatchScript(file);
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVSelectWidget::SaveInBatchScriptForPart(ofstream *file, 
-                                                 vtkClientServerID sourceID)
-{
-  ostrstream elem;
-  if(this->ElementType == OBJECT)
-    { 
-    vtkPVWidgetProperty *pvwp;
-    pvwp = vtkPVWidgetProperty::SafeDownCast(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
-    vtkPVObjectWidget* ow = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget());
-    if (ow)
-      {
-      vtkClientServerID id
-        = ow->GetObjectByName(this->GetCurrentVTKValue());
-      elem << "pvTemp" << id << ends;
-      }
-    else
-      {
-      elem << "{}" << ends;
-      }
-    }
-  else
-    {
-    elem << this->GetCurrentVTKValue() << ends;
-    }
-  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName
-        << " " << elem.str() <<  endl;
-  elem.rdbuf()->freeze(0);
 }
 
 //-----------------------------------------------------------------------------

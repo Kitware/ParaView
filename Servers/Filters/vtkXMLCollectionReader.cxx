@@ -27,7 +27,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.6");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.7");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -294,12 +294,14 @@ const char* vtkXMLCollectionReader::GetRestriction(const char* name)
 //----------------------------------------------------------------------------
 void vtkXMLCollectionReader::SetRestrictionAsIndex(const char* name, int index)
 {
+  this->UpdateAttributes();
   this->SetRestriction(name, this->GetAttributeValue(name, index));
 }
 
 //----------------------------------------------------------------------------
 int vtkXMLCollectionReader::GetRestrictionAsIndex(const char* name)
 {
+  this->UpdateAttributes();
   return this->GetAttributeValueIndex(name, this->GetRestriction(name));
 }
 

@@ -18,7 +18,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -58,24 +58,25 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceWidget::SaveInBatchScript(ofstream *file)
+void vtkPVSourceWidget::SaveInBatchScript(ofstream *)
 {
-  if (this->SourceID.ID)
-    {
-    return;
-    } 
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->SourceID << "GetClassName" 
-                  << vtkClientServerStream::End;
-  pm->SendStreamToClient();
-  const char* dataClassName;
-  if(pm->GetLastClientResult().GetArgument(0, 0, &dataClassName))
-    {
-    *file << dataClassName << " pvTemp" << this->SourceID.ID << "\n";
-    }
-  // This will loop through all parts and call SaveInBatchScriptForPart.
-  this->Superclass::SaveInBatchScript(file);
+  // TODO Fix this
+//   if (this->SourceID.ID)
+//     {
+//     return;
+//     } 
+//   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+//   pm->GetStream() << vtkClientServerStream::Invoke 
+//                   << this->SourceID << "GetClassName" 
+//                   << vtkClientServerStream::End;
+//   pm->SendStreamToClient();
+//   const char* dataClassName;
+//   if(pm->GetLastClientResult().GetArgument(0, 0, &dataClassName))
+//     {
+//     *file << dataClassName << " pvTemp" << this->SourceID.ID << "\n";
+//     }
+//   // This will loop through all parts and call SaveInBatchScriptForPart.
+//   this->Superclass::SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------

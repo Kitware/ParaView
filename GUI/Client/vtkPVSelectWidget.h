@@ -122,10 +122,6 @@ public:
                                     vtkPVWidget*>* map);
 //ETX
 
-  // Description:
-  // Since sub widgets may hove their own objects ...
-  virtual void SaveInBatchScript(ofstream *file);
-
   //BTX
   // Description:
   // Called when accept button is pushed.
@@ -163,6 +159,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
+ 
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
@@ -196,10 +196,6 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
-
-  // Description:
-  // For saving the widget into a VTK tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 
 private:
   vtkPVSelectWidget(const vtkPVSelectWidget&); // Not implemented
