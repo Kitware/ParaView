@@ -142,6 +142,7 @@ protected:
   vtkKWPushButton* ButtonCeiling;
   vtkKWPushButton* ButtonFloor;
   vtkKWPushButton* ButtonLog;
+  vtkKWPushButton* ButtonLog10;
   vtkKWPushButton* ButtonAbs;
   vtkKWPushButton* ButtonMag;
   vtkKWPushButton* ButtonNorm;
