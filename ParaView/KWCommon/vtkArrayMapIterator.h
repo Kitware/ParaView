@@ -88,6 +88,11 @@ protected:
   virtual ~vtkArrayMapIterator() {}
 
   vtkIdType Index;
+
+  vtkArrayMapIterator(const vtkArrayMapIterator<KeyType,DataType>&); 
+  // Not implemented
+  void operator=(const vtkArrayMapIterator<KeyType,DataType>&); 
+  // Not implemented
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
