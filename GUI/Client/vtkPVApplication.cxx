@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.333");
+vtkCxxRevisionMacro(vtkPVApplication, "1.334");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1331,6 +1331,11 @@ void vtkPVApplication::Exit()
   if (this->TraceFileName)
     {
     unlink(this->TraceFileName);
+    }
+  if (this->SaveRuntimeInfoButton)
+    {
+    this->SaveRuntimeInfoButton->Delete();
+    this->SaveRuntimeInfoButton = 0;
     }
 }
 
