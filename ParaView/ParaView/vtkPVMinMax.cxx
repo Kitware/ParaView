@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.18");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.19");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -209,6 +209,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
   this->MinScale->Create(this->Application, "");
   this->MinScale->SetDisplayEntryAndLabelOnTop(0);
   this->MinScale->DisplayEntry();
+  this->MinScale->SetRange(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
   this->MinScale->SetCommand(this, "MinValueCallback");
   this->Script("pack %s -side left -fill x -expand t -padx 5", 
                this->MinScale->GetWidgetName());
@@ -242,6 +243,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
   this->MaxScale->Create(this->Application, "");
   this->MaxScale->SetDisplayEntryAndLabelOnTop(0);
   this->MaxScale->DisplayEntry();
+  this->MaxScale->SetRange(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
   this->MaxScale->SetCommand(this, "MaxValueCallback");
   this->Script("pack %s -side left -fill x -expand t -padx 5", 
                this->MaxScale->GetWidgetName());

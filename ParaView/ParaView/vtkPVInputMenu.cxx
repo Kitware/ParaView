@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.41");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.42");
 
 
 //----------------------------------------------------------------------------
@@ -146,12 +146,10 @@ void vtkPVInputMenu::AddSources(vtkPVSourceCollection *sources)
       currentFound = 1;
       }
     }
-  // Input should be initialized in VTK and reset will initialze the menu.
+  // Reset will initialze the menu.
   if ( ! currentFound)
     {
-    // Set the default source.
-    sources->InitTraversal();
-    this->SetCurrentValue((vtkPVSource*)(sources->GetNextItemAsObject()));
+    this->SetCurrentValue(NULL);
     this->ModifiedCallback();
     }
 
