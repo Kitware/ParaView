@@ -90,10 +90,6 @@ public:
   vtkPVWindow *GetPVWindow();
   
   // Description:
-  // A way to get the output in the superclass.
-  vtkPVData *GetPVOutput(int idx) { return this->GetNthPVOutput(idx); }
-    
-  // Description:
   // Create the properties object, called by InitializeProperties.
   virtual void CreateProperties();
   
@@ -120,9 +116,16 @@ public:
   virtual vtkPVData* GetPVInput() {return this->GetNthPVInput(0);}
 
   // Description:
-  // Sources are currently setup to have exactly one output.
+  // Set/get the first output of this source. Most source are setup
+  // with only one output.
   void SetPVOutput(vtkPVData *pvd);
   vtkPVData* GetPVOutput() { return this->GetNthPVOutput(0);}
+
+  // Description:
+  // Set/get the nth output of this source. These are not commonly
+  // used since most of the source have only one output.
+  void SetPVOutput(int idx, vtkPVData *pvd) {this->SetNthPVOutput(idx,pvd);}
+  vtkPVData *GetPVOutput(int idx) { return this->GetNthPVOutput(idx); }
 
   // Description:
   // This name is used in the data list to identify the composite.
@@ -275,7 +278,7 @@ public:
 
   // Description:
   // Certain modules are not deletable (for example, glyph sources).
-  // Such modules should be marked as such.
+  // Such modules should be marked as such (IsPermanent = 1)x.
   vtkSetMacro(IsPermanent, int);
   vtkGetMacro(IsPermanent, int);
   vtkBooleanMacro(IsPermanent, int);
@@ -303,9 +306,6 @@ public:
   vtkGetMacro(HideParametersPage, int);
   vtkBooleanMacro(HideParametersPage, int);
 
-  //BTX
-  friend class vtkPVEnSightReaderModule;
-  //ETX
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -345,16 +345,13 @@ protected:
   vtkPVData **PVInputs;
   int NumberOfPVInputs; 
  
-  void SetNthPVInput(int idx, vtkPVData *input);
   vtkPVData *GetNthPVInput(int idx);
   void RemoveAllPVInputs();
   
-  // Description:
-  // Although it looks like there is support for multiple outputs,
-  // there are several implementation details that assume only one output.
   vtkPVData *GetNthPVOutput(int idx);
   void SetNthPVOutput(int idx, vtkPVData *output);
-  
+  void SetNthPVInput(int idx, vtkPVData *input);
+
   vtkKWNotebook *Notebook;
 
   // The name is just for display.

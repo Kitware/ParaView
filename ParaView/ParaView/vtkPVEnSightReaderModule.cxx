@@ -350,7 +350,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname,
     pvd = vtkPVData::New();
     pvd->SetPVApplication(pvApp);
     pvd->SetVTKData(d, outputTclName);
-    pvs->SetNthPVOutput(i, pvd);
+    pvs->SetPVOutput(i, pvd);
     delete [] outputTclName;
 
     if (numOutputs > 1)
@@ -426,7 +426,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname,
   if ( numTimeSets > 0 )
     {
     vtkPVSelectTimeSet* select = vtkPVSelectTimeSet::New();
-    select->SetParent(pvs->ParameterFrame->GetFrame());
+    select->SetParent(pvs->GetParameterFrame()->GetFrame());
     select->SetPVSource(pvs);
     select->SetLabel("Select time value");
     select->Create(pvApp);
