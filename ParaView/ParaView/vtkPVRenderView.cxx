@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.314");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.315");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1585,12 +1585,12 @@ void vtkPVRenderView::EventuallyRenderCallBack()
   abort = this->ShouldIAbort();
   if (abort)
     {
+    this->DoingEventuallyRender = 0;
+    this->EventuallyRenderFlag = 0;
     if (abort == 1)
       {
       this->EventuallyRender();
       }
-    this->DoingEventuallyRender = 0;
-    this->EventuallyRenderFlag = 0;
     return;
     }
 
