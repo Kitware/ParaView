@@ -19,8 +19,10 @@
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
+#include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWRenderWidgetCallbackCommand.h"
 #include "vtkKWWindow.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
 #include "vtkRenderWindow.h"
@@ -33,36 +35,48 @@
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.73");
+vtkStandardNewMacro(vtkKWRenderWidget);
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.74");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
+  // The vtkTkRenderWidget
+
+  this->ParentWindow = NULL;
+  
   this->VTKWidget = vtkKWWidget::New();
   this->VTKWidget->SetParent(this);
-  
+
+  // Create two renderers by default (main one and overlay)
+
   this->Renderer = vtkRenderer::New();
   this->Renderer->SetLayer(0);
+
   this->OverlayRenderer = vtkRenderer::New();
   this->OverlayRenderer->SetLayer(1);
+
+  // Create a render window and add two renderers
+
   this->RenderWindow = vtkRenderWindow::New();
   this->RenderWindow->SetNumberOfLayers(2);
   this->RenderWindow->AddRenderer(this->OverlayRenderer);
   this->RenderWindow->AddRenderer(this->Renderer);
-  
-  this->Printing = 0;
-  this->RenderMode = vtkKWRenderWidget::STILL_RENDER;
-  this->RenderState = 1;
-  
-  this->ParentWindow = NULL;
-  
-  this->EventIdentifier = -1;
-  
-  this->InExpose = 0;
+
+  // Create a default (generic) interactor, which is pretty much
+  // the only way to interact with a VTK Tk render widget
+
+  this->Interactor = vtkKWGenericRenderWindowInteractor::New();
+  this->Interactor->SetRenderWidget(this);  
+  this->Interactor->SetRenderWindow(this->RenderWindow);
+
+  // Corner annotation
 
   this->CornerAnnotation = vtkCornerAnnotation::New();
   this->CornerAnnotation->SetMaximumLineHeight(0.07);
   this->CornerAnnotation->VisibilityOff();
+
+  // Header annotation
 
   this->HeaderAnnotation = vtkTextActor::New();
   this->HeaderAnnotation->SetNonLinearFontScale(0.7,10);
@@ -78,19 +92,32 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->HeaderAnnotation->GetPosition2Coordinate()->SetValue(0.6, 0.1);
   this->HeaderAnnotation->VisibilityOff();
   
+  // Distance units
+
   this->DistanceUnits = NULL;
+
+  // Get the camera, use it in overlay renderer too
 
   vtkCamera *cam = this->GetCurrentCamera();
   if (cam)
     {
     cam->ParallelProjectionOn();
     }
-  this->OverlayRenderer->SetActiveCamera(cam);
-  this->CollapsingRenders = 0;
-  
+  this->GetOverlayRenderer()->SetActiveCamera(cam);
+
+  // The main callback
+
   this->Observer = vtkKWRenderWidgetCallbackCommand::New();
-  
-  this->PreviousRenderMode = vtkKWRenderWidget::STILL_RENDER;
+  this->EventIdentifier = -1;
+
+  // Current state (render mode, in expose, printing, etc)
+
+  this->RenderMode         = vtkKWRenderWidget::STILL_RENDER;
+  this->PreviousRenderMode = this->RenderMode;
+  this->RenderState        = 1;
+  this->CollapsingRenders  = 0;
+  this->InExpose           = 0;
+  this->Printing           = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -121,6 +148,14 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
     }
 
   this->SetParentWindow(NULL);
+
+  if (this->Interactor)
+    {
+    this->Interactor->SetRenderWidget(NULL);
+    this->Interactor->SetInteractorStyle(NULL);
+    this->Interactor->Delete();
+    this->Interactor = NULL;
+    }
 
   if (this->VTKWidget)
     {
@@ -163,6 +198,12 @@ int vtkKWRenderWidget::GetRendererId(vtkRenderer *ren)
     }
 
   return 0;
+}
+
+//----------------------------------------------------------------------------
+vtkRenderer* vtkKWRenderWidget::GetOverlayRenderer()
+{
+  return this->OverlayRenderer;
 }
 
 //----------------------------------------------------------------------------
@@ -225,20 +266,14 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
 
   char *local = new char[(args ? strlen(args) : 0) + 100];
   sprintf(local, "%s -rw Addr=%p", (args ? args : ""), this->RenderWindow);
-
   this->VTKWidget->Create(app, "vtkTkRenderWidget", local);
+  delete [] local;
 
-  this->Script("grid rowconfigure %s 0 -weight 1",
-               this->GetWidgetName());
-
-  this->Script("grid columnconfigure %s 0 -weight 1",
-               this->GetWidgetName());
-
-  this->Script("grid %s -sticky nsew",
-               this->VTKWidget->GetWidgetName());
+  this->Script("grid rowconfigure %s 0 -weight 1", this->GetWidgetName());
+  this->Script("grid columnconfigure %s 0 -weight 1", this->GetWidgetName());
+  this->Script("grid %s -sticky nsew", this->VTKWidget->GetWidgetName());
   
   this->RenderWindow->Render();
-  delete [] local;
 
   // Make the corner annotation visibile
 
@@ -440,6 +475,75 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::MouseMove(int vtkNotUsed(num), int x, int y)
+{
+  this->Interactor->SetEventPositionFlipY(x, y);
+  this->Interactor->MouseMoveEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AButtonPress(int num, int x, int y,
+                                     int ctrl, int shift)
+{
+  this->VTKWidget->Focus();
+  
+  this->Interactor->SetEventInformationFlipY(x, y, ctrl, shift);
+  
+  switch (num)
+    {
+    case 1:
+      this->Interactor->LeftButtonPressEvent();
+      break;
+    case 2:
+      this->Interactor->MiddleButtonPressEvent();
+      break;
+    case 3:
+      this->Interactor->RightButtonPressEvent();
+      break;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AButtonRelease(int num, int x, int y)
+{
+  this->Interactor->SetEventInformationFlipY(x, y, 0, 0);
+  
+  switch (num)
+    {
+    case 1:
+      this->Interactor->LeftButtonReleaseEvent();
+      break;
+    case 2:
+      this->Interactor->MiddleButtonReleaseEvent();
+      break;
+    case 3:
+      this->Interactor->RightButtonReleaseEvent();
+      break;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::AKeyPress(char key, 
+                                  int x, int y,
+                                  int ctrl, int shift,
+                                  char *keysym)
+{
+  this->Interactor->SetEventPositionFlipY(x, y);
+  this->Interactor->SetControlKey(ctrl);
+  this->Interactor->SetShiftKey(shift);
+  this->Interactor->SetKeyCode(key);
+  this->Interactor->SetKeySym(keysym);
+  this->Interactor->KeyPressEvent();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::Configure(int width, int height)
+{
+  this->Interactor->UpdateSize(width, height);
+  this->Interactor->ConfigureEvent();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Exposed()
 {
   if (this->InExpose)
@@ -466,6 +570,96 @@ void vtkKWRenderWidget::FocusOutCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::Reset()
+{
+  /*
+  vtkCamera *c = this->GetCurrentCamera();
+  if (c)
+    {
+    c->SetPosition(0, 0, 1);
+    c->SetFocalPoint(0, 0, 0);
+    c->SetViewUp(0, 1, 0);
+    }
+  */
+
+  this->ResetCamera();
+  this->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::ResetCamera()
+{
+  double bounds[6];
+  double center[3];
+  double distance, width, viewAngle, vn[3], *vup;
+  
+  this->GetRenderer()->ComputeVisiblePropBounds(bounds);
+  if (bounds[0] == VTK_LARGE_FLOAT)
+    {
+    vtkDebugMacro(<< "Cannot reset camera!");
+    return;
+    }
+
+  vtkCamera *cam = this->GetCurrentCamera();
+  if (cam != NULL)
+    {
+    cam->GetViewPlaneNormal(vn);
+    }
+  else
+    {
+    vtkErrorMacro(<< "Trying to reset non-existant camera");
+    return;
+    }
+
+  center[0] = (double)(((double)bounds[0] + (double)bounds[1]) / 2.0);
+  center[1] = (double)(((double)bounds[2] + (double)bounds[3]) / 2.0);
+  center[2] = (double)(((double)bounds[4] + (double)bounds[5]) / 2.0);
+
+  width = (double)bounds[3] - (double)bounds[2];
+  if (width < ((double)bounds[1] - (double)bounds[0]))
+    {
+    width = (double)bounds[1] - (double)bounds[0];
+    }
+  if (width < ((double)bounds[5] - (double)bounds[4]))
+    {
+    width = (double)bounds[5] - (double)bounds[4];
+    }
+  
+  if (cam->GetParallelProjection())
+    {
+    viewAngle = 30;  // the default in vtkCamera
+    }
+  else
+    {
+    viewAngle = cam->GetViewAngle();
+    }
+  
+  distance = width / (double)tan(viewAngle * vtkMath::Pi() / 360.0);
+
+  // Check view-up vector against view plane normal
+
+  vup = cam->GetViewUp();
+  if (fabs(vtkMath::Dot(vup,vn)) > 0.999)
+    {
+    vtkWarningMacro(<<"Resetting view-up since view plane normal is parallel");
+    cam->SetViewUp(-vup[2], vup[0], vup[1]);
+    }
+
+  // Update the camera
+
+  cam->SetFocalPoint(center[0], center[1], center[2]);
+  cam->SetPosition((double)((double)center[0] + distance * vn[0]),
+                   (double)((double)center[1] + distance * vn[1]),
+                   (double)((double)center[2] + distance * vn[2]));
+
+  this->GetRenderer()->ResetCameraClippingRange(bounds);
+
+  // Setup default parallel scale
+
+  cam->SetParallelScale(0.5 * width);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::Render()
 {
   if (this->CollapsingRenders)
@@ -488,7 +682,7 @@ void vtkKWRenderWidget::Render()
 
   if (this->RenderMode != vtkKWRenderWidget::DISABLED_RENDER)
     {
-    this->Renderer->ResetCameraClippingRange();
+    this->GetRenderer()->ResetCameraClippingRange();
     this->RenderWindow->Render();
     }
   
@@ -670,20 +864,20 @@ void vtkKWRenderWidget::ResumeScreenRendering()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddProp(vtkProp *prop)
 {
-  this->Renderer->AddProp(prop);
+  this->GetRenderer()->AddProp(prop);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddOverlayProp(vtkProp *prop)
 {
-  this->OverlayRenderer->AddProp(prop);
+  this->GetOverlayRenderer()->AddProp(prop);
 }
 
 //----------------------------------------------------------------------------
 int vtkKWRenderWidget::HasProp(vtkProp *prop)
 {
-  if (this->Renderer->GetProps()->IsItemPresent(prop) ||
-      this->OverlayRenderer->GetProps()->IsItemPresent(prop))
+  if (this->GetRenderer()->GetProps()->IsItemPresent(prop) ||
+      this->GetOverlayRenderer()->GetProps()->IsItemPresent(prop))
     {
     return 1;
     }
@@ -695,15 +889,15 @@ int vtkKWRenderWidget::HasProp(vtkProp *prop)
 void vtkKWRenderWidget::RemoveProp(vtkProp *prop)
 {
   // safe to call both, vtkViewport does a check first
-  this->Renderer->RemoveProp(prop);
-  this->OverlayRenderer->RemoveProp(prop);
+  this->GetRenderer()->RemoveProp(prop);
+  this->GetOverlayRenderer()->RemoveProp(prop);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveAllProps()
 {
-  this->Renderer->RemoveAllProps();
-  this->OverlayRenderer->RemoveAllProps();
+  this->GetRenderer()->RemoveAllProps();
+  this->GetOverlayRenderer()->RemoveAllProps();
 }
 
 //----------------------------------------------------------------------------
@@ -1081,7 +1275,7 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "RenderMode: " << this->GetRenderModeAsString() << endl;
   os << indent << "RenderState: " << this->RenderState << endl;
-  os << indent << "Renderer: " << this->Renderer << endl;
+  os << indent << "Renderer: " << this->GetRenderer() << endl;
   os << indent << "CollapsingRenders: " << this->CollapsingRenders << endl;
   os << indent << "DistanceUnits: " 
      << (this->DistanceUnits ? this->DistanceUnits : "(none)") << endl;

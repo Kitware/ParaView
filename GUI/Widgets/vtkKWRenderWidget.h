@@ -21,6 +21,7 @@
 
 class vtkCamera;
 class vtkCornerAnnotation;
+class vtkKWGenericRenderWindowInteractor;
 class vtkKWRenderWidgetCallbackCommand;
 class vtkKWWindow;
 class vtkProp;
@@ -32,6 +33,7 @@ class vtkTextMapper;
 class VTK_EXPORT vtkKWRenderWidget : public vtkKWWidget
 {
 public:
+  static vtkKWRenderWidget* New();
   vtkTypeRevisionMacro(vtkKWRenderWidget, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
@@ -82,7 +84,8 @@ public:
 
   // Description:
   // Reset the view/widget (will usually reset the camera too).
-  virtual void Reset() = 0;
+  virtual void Reset();
+  virtual void ResetCamera();
   
   // Description:
   // Close the widget. 
@@ -116,16 +119,13 @@ public:
 
   // Description:
   // Event handlers and useful interactions
-  virtual void MouseMove(int /*num*/, int /*x*/, int /*y*/) {};
-  virtual void AButtonPress(int /*num*/, int /*x*/, int /*y*/, int /*ctrl*/,
-                            int /*shift*/) {};
-  virtual void AButtonRelease(int /*num*/, int /*x*/, int /*y*/) {};
-  virtual void AKeyPress(char /*key*/, int /*x*/, int /*y*/, int /*ctrl*/,
-                         int /*shift*/, char* /*keysym*/) {};
+  virtual void MouseMove(int num, int x, int y);
+  virtual void AButtonPress(int num, int x, int y, int ctrl, int shift);
+  virtual void AButtonRelease(int num, int x, int y);
+  virtual void AKeyPress(char key, int x, int y, int ctrl, int shift, char *keysym);
+  virtual void Configure(int width, int height);
   virtual void Exposed();
-  virtual void Configure(int /*width*/, int /*height*/) {};
   virtual void Enter(int /*x*/, int /*y*/) {};
-
   virtual void FocusInCallback();
   virtual void FocusOutCallback();
 
@@ -190,10 +190,8 @@ public:
   vtkSetMacro(EventIdentifier, int);
   vtkGetMacro(EventIdentifier, int);
 
-  //BTX
   // Description:
-  // Get the renderer and render window
-  vtkGetObjectMacro(Renderer, vtkRenderer);
+  // Get the render window
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
 
   // Description:
@@ -201,9 +199,10 @@ public:
   // GetNthRenderer() gets the Nth renderer (or NULL if it does not exist),
   // GetRendererId() gets the id of a given renderer (or -1 if this renderer
   // does not belong to this widget)
+  virtual vtkRenderer* GetRenderer() { return this->GetNthRenderer(0); }
   virtual vtkRenderer* GetNthRenderer(int id);
   virtual int GetRendererId(vtkRenderer*);
-  //ETX
+  virtual vtkRenderer* GetOverlayRenderer();
 
   // Description:
   // Get the VTK widget
@@ -252,20 +251,17 @@ protected:
   
   vtkKWWidget *VTKWidget;
 
+  vtkRenderWindow *RenderWindow;
+  vtkKWWindow     *ParentWindow;
+  vtkKWGenericRenderWindowInteractor *Interactor;
+
   vtkCornerAnnotation *CornerAnnotation;
   vtkTextActor        *HeaderAnnotation;
   
-  vtkRenderer     *Renderer;
-  vtkRenderer     *OverlayRenderer;
-  vtkRenderWindow *RenderWindow;
-  vtkKWWindow     *ParentWindow;
-  
-  int EventIdentifier;
-
-  int InExpose;
-
-  int RenderState;
   int RenderMode;
+  int PreviousRenderMode;
+  int InExpose;
+  int RenderState;
   int Printing;
   
   char *DistanceUnits;
@@ -285,12 +281,19 @@ protected:
   virtual void AddObservers();
   virtual void RemoveObservers();
   vtkKWRenderWidgetCallbackCommand *Observer;
-  
-  int PreviousRenderMode;
+  int EventIdentifier;
   
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
   void operator=(const vtkKWRenderWidget&);  // Not implemented
+
+  // Put those two in the private section to force subclasses to use
+  // accessors. This will solve case when user-defined renderer 
+  // are setup to replace the default one.
+
+  vtkRenderer     *Renderer;
+  vtkRenderer     *OverlayRenderer;
+
 };
 
 #endif
