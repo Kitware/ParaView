@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.10");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.11");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -224,7 +224,7 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
     // Gather the marshaled data sets from all procs.
     char* allbuffers = new char[sum];
     com->AllGatherV(buf, allbuffers, size, recvLengths, recvOffsets);
-    if (myId == 0)
+    if (myId == 0 && this->SocketController)
       {
       // Send the string to the client.
       this->SocketController->Send(&numProcs, 1, 1, 948344);
@@ -247,12 +247,15 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
 #endif
 
   // Server must be a single process!
-  this->SocketController->Send(&numProcs, 1, 1, 948344);
-  int tmp[2];
-  tmp[0] = size;
-  tmp[1] = 0;
-  this->SocketController->Send(tmp, 2, 1, 948345);
-  this->SocketController->Send(buf, size, 1, 948346);
+  if (this->SocketController)
+    {
+    this->SocketController->Send(&numProcs, 1, 1, 948344);
+    int tmp[2];
+    tmp[0] = size;
+    tmp[1] = 0;
+    this->SocketController->Send(tmp, 2, 1, 948345);
+    this->SocketController->Send(buf, size, 1, 948346);
+    }
   // Degenerate reconstruct output.
   this->GetOutput()->ShallowCopy(input);
 
