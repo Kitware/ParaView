@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.5.2.2");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.5.2.3");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -159,7 +159,17 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
       // ith output (PVData)
       // Create replacement outputs of proper type and replace the
       // current ones.
-      outputTclName = new char[strlen(tclName)+7 + (i%10)+1];
+      int len;
+      if ( i == 0 )
+        {
+        len = strlen(tclName)+ strlen("Output") + 3;
+        }
+      else
+        {
+        len = strlen(tclName)+ strlen("Output") + 
+          static_cast<int>(log10(static_cast<double>(i))) + 3;
+        }
+      outputTclName = new char[len];
       sprintf(outputTclName, "%sOutput%d", tclName, i);
       d = static_cast<vtkDataSet*>(pvApp->MakeTclObject(
         reader->GetOutput(i)->GetClassName(), outputTclName));
@@ -185,7 +195,9 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
         connection->SetParametersParent(
           window->GetMainView()->GetSourceParent());
         connection->SetApplication(pvApp);
-        connectionTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];
+        int len = strlen(tclName)+ 2 + 
+          static_cast<int>(log10(static_cast<double>(i+1))) + 3;
+        connectionTclName = new char[len];
         sprintf(connectionTclName, "%s_%d", tclName, i+1);
         vtkSource* source = static_cast<vtkSource*>(
           pvApp->MakeTclObject("vtkPassThroughFilter", connectionTclName));
@@ -195,7 +207,16 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
         connection->HideParametersPageOn();
         connection->SetTraceInitialized(1);
         
-        outputTclName = new char[strlen(connectionTclName)+7 + (i%10)+1];
+        if ( i == 0 )
+          {
+          len = strlen(connectionTclName)+ strlen("Output") + 3;
+          }
+        else
+          {
+          len = strlen(connectionTclName)+ strlen("Output") + 
+            static_cast<int>(log10(static_cast<double>(i))) + 3;
+          }
+        outputTclName = new char[len];
         sprintf(outputTclName, "%sOutput%d", connectionTclName, i);
         d = static_cast<vtkDataSet*>(pvApp->MakeTclObject(
           reader->GetOutput(i)->GetClassName(), outputTclName));

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8.2.2");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8.2.3");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -189,8 +189,20 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
                          pvd->GetVTKDataTclName());   
 
-  extentTclName = new char[strlen(tclName)+11 + 
-                          (this->PrototypeInstanceCount%10)+1 + 10];
+  int len;
+  if ( this->PrototypeInstanceCount == 0 )
+    {
+    len = strlen(tclName)+ 11 + 2 + 10;
+    }
+  else
+    {
+    len = strlen(tclName) + 11 + 
+      static_cast<int>(
+        log10(static_cast<double>(this->PrototypeInstanceCount))) + 
+      2 + 10;
+    }
+
+  extentTclName = new char[len];
   sprintf(extentTclName, "%s%dTranslator", tclName, 
           this->PrototypeInstanceCount);
   pvApp->BroadcastScript("vtkPVExtentTranslator %s", extentTclName);
