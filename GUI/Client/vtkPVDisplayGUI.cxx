@@ -70,7 +70,6 @@
 #include "vtkToolkits.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPVRenderModuleUI.h"
 #include "vtkVolumeProperty.h"
@@ -86,7 +85,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.3");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.27.2.4");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);

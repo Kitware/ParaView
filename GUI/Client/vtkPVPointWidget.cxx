@@ -24,7 +24,6 @@
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
@@ -36,7 +35,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.46.2.2");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.46.2.3");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

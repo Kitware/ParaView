@@ -535,7 +535,6 @@
         command="SetParallelProjection"
         number_of_elements="1"
         default_values="0">
-        <!-- TODO: verify if this property needs to be exposed-->
         <BooleanDomain name="bool" />
       </IntVectorProperty>
     </Proxy> <!-- end of Camera Proxy -->

@@ -32,7 +32,6 @@
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVScale.h"
@@ -98,6 +97,8 @@
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientServerID.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMDoubleVectorProperty.h"
 
 #include "vtkSMDisplayProxy.h"
 
@@ -111,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.2");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.17.2.3");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -2918,48 +2919,79 @@ void vtkPVLookmarkManager::ViewLookmarkWithCurrentDataset(vtkPVLookmark *oldLook
     this->ParseAndExecuteStateScript(src,temp_script,oldLookmark,0);
 //    this->CreateLookmarkCallback();
 
-    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-    vtkClientServerID rendererID = pm->GetRenderModule()->GetRendererID();
-
-    // create an id for the active camera of the renderer
-    vtkClientServerStream stream;
-    vtkClientServerID activeCamera = pm->GetUniqueID();
-    stream << vtkClientServerStream::Invoke 
-           << rendererID << "GetActiveCamera"
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Assign 
-           << activeCamera << vtkClientServerStream::LastResult 
-           << vtkClientServerStream::End;
-
     // copy the parameters of the current camera for this class
     // into the active camera on the client and server
-    double a[3];
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetParallelScale" << camera->GetParallelScale()
-           << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetViewAngle" << camera->GetViewAngle()
-           << vtkClientServerStream::End;
-    camera->GetClippingRange(a);
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetClippingRange" << vtkClientServerStream::InsertArray(a, 2)
-           << vtkClientServerStream::End;
-    camera->GetFocalPoint(a);
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetFocalPoint" << vtkClientServerStream::InsertArray(a, 3)
-           << vtkClientServerStream::End;
-    camera->GetPosition(a);
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetPosition" << vtkClientServerStream::InsertArray(a, 3)
-           << vtkClientServerStream::End;
-    camera->GetViewUp(a);
-    stream << vtkClientServerStream::Invoke 
-           << activeCamera << "SetViewUp" << vtkClientServerStream::InsertArray(a, 3)
-           << vtkClientServerStream::End;
-    pm->SendStream(
-      vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER, stream);
-    this->GetPVRenderView()->EventuallyRender();
+    vtkSMProxy* renderModuleProxy = this->GetPVApplication()->
+      GetRenderModuleProxy();
+    vtkSMDoubleVectorProperty* dvp;
+ 
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraPosition"));
+    if (dvp)
+      {
+      dvp->SetElements(camera->GetPosition());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraPosition.");
+      }
 
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraFocalPoint"));
+    if (dvp)
+      {
+      dvp->SetElements(camera->GetFocalPoint());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraFocalPoint.");
+      }
+  
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraViewUp"));
+    if (dvp)
+      {
+      dvp->SetElements(camera->GetViewUp());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraFocalPoint.");
+      }
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraViewAngle"));
+    if (dvp)
+      {
+      dvp->SetElement(0, camera->GetViewAngle());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraViewAngle.");
+      }
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraClippingRange"));
+    if (dvp)
+      {
+      dvp->SetElements(camera->GetClippingRange());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraClippingRange.");
+      }
+
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      renderModuleProxy->GetProperty("CameraParallelScale"));
+    if (dvp)
+      {
+      dvp->SetElement(0, camera->GetParallelScale());
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property CameraParallelScale.");
+      }
+    renderModuleProxy->UpdateVTKObjects(); 
+    this->GetPVRenderView()->EventuallyRender();
     camera->Delete();
     }
 

@@ -32,7 +32,6 @@
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
 #include "vtkSMPlotDisplay.h"
-#include "vtkPVRenderModule.h"
 
 #include "vtkSMXYPlotDisplayProxy.h"
 #include "vtkSMRenderModuleProxy.h"
@@ -44,7 +43,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.2");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138.2.3");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -84,9 +83,7 @@ vtkPVProbe::~vtkPVProbe()
     {
     if (this->GetPVApplication() && this->GetPVApplication()->GetRenderModuleProxy())
       {
-      this->GetPVApplication()->GetRenderModuleProxy()->RemoveDisplay(
-        this->PlotDisplayProxy);
-      this->GetPVApplication()->GetRenderModuleProxy()->UpdateVTKObjects();
+      this->RemoveDisplayFromRenderModule(this->PlotDisplayProxy);
       }
 
     if  (this->PlotDisplayProxyName)
@@ -214,10 +211,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     ip->RemoveAllProxies();
     ip->AddProxy(this->GetProxy());
     this->PlotDisplayProxy->UpdateVTKObjects();
-
-    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-    rm->AddDisplay(this->PlotDisplayProxy);
-    rm->UpdateVTKObjects();
+    this->AddDisplayToRenderModule(this->PlotDisplayProxy);
     }
   // We need to update manually for the case we are probing one point.
   int numPts = this->GetDataInformation()->GetNumberOfPoints();

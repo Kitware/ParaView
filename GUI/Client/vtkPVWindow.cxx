@@ -63,7 +63,6 @@
 #include "vtkSMPartDisplay.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSaveBatchScriptDialog.h"
 #include "vtkPVSelectCustomReader.h"
@@ -96,6 +95,7 @@
 #include "vtkSMIntVectorProperty.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkPVAnimationManager.h"
+#include "vtkSMRenderModuleProxy.h"
 
 #include "vtkPVConfig.h"  // Needed for PARAVIEW_USE_LOOKMARKS
 #ifdef PARAVIEW_USE_LOOKMARKS
@@ -134,10 +134,9 @@
 
 #define VTK_PV_ENABLE_OLD_ANIMATION_INTERFACE 0
 
-#include "vtkSMRenderModuleProxy.h"
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.4");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.5");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

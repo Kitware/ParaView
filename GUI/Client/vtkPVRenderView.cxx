@@ -12,16 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkPVConfig.h"
 #include "vtkPVRenderView.h"
 
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  #include "vtkSMRenderModuleProxy.h"
-#else
-
-  #include "vtkPVRenderModule.h"
-#endif
-
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkInstantiator.h"
 #include "vtkBMPWriter.h"
@@ -80,7 +73,8 @@
 #include "vtkToolkits.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkClientServerStream.h"
-#include "vtkPVOptions.h"
+#include "vtkSMRenderModuleProxy.h"
+#include "vtkSMIntVectorProperty.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -136,7 +130,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.1");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.357.2.2");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -146,11 +140,7 @@ int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderView::vtkPVRenderView()
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   this->RenderModuleProxy = 0;
-#else
-  this->RenderModule = NULL;
-#endif
 
   if (getenv("PV_SEPARATE_RENDER_WINDOW") != NULL)
     {
@@ -253,58 +243,34 @@ void vtkPVRenderView::RemoveAnnotationProp(vtkPVCornerAnnotation *c)
 //----------------------------------------------------------------------------
 vtkRenderWindow* vtkPVRenderView::GetRenderWindow()
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   if (this->RenderModuleProxy == 0)
-#else
-  if (this->RenderModule == NULL)
-#endif
     {
     vtkErrorMacro("Missing renderModule.");
     return NULL;
     }
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   return this->RenderModuleProxy->GetRenderWindow();
-#else
-  return this->RenderModule->GetRenderWindow();
-#endif
 }
 
 //----------------------------------------------------------------------------
 vtkRenderer* vtkPVRenderView::GetRenderer()
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   if (this->RenderModuleProxy == 0)
-#else
-  if (this->RenderModule == NULL)
-#endif
     {
     vtkErrorMacro("Missing renderModule.");
     return NULL;
     }
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   return this->RenderModuleProxy->GetRenderer();
-#else
-  return this->RenderModule->GetRenderer();
-#endif
 }
 
 //----------------------------------------------------------------------------
 vtkRenderer* vtkPVRenderView::GetRenderer2D()
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   if (this->RenderModuleProxy == 0)
-#else
-  if (this->RenderModule == NULL)
-#endif
     {
     vtkErrorMacro("Missing renderModule.");
     return NULL;
     }
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   return this->RenderModuleProxy->GetRenderer2D();
-#else
-  return this->RenderModule->GetRenderer2D();
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -366,19 +332,11 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registry)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   if (this->RenderModuleProxy)
     {
     this->RenderModuleProxy->UnRegister(this);
     this->RenderModuleProxy = 0;
     }
-#else
-  if (this->RenderModule)
-    {
-    this->RenderModule->UnRegister(this);
-    this->RenderModule = NULL;
-    }
-#endif
 
   this->InterfaceSettingsFrame->Delete();
   this->Display3DWidgets->Delete();
@@ -523,15 +481,12 @@ void PVRenderViewAbortCheck(vtkObject*, unsigned long, void* arg, void*)
 void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 {
   // Create the call back that looks for events to abort rendering.
-//TODO: AbortCheckEvent must be passed on even in new RenderModule.
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  pvApp->GetProcessModule()->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
+  pvApp->GetRenderModuleProxy()->RemoveObservers(vtkCommand::AbortCheckEvent);
   vtkCallbackCommand* abc = vtkCallbackCommand::New();
   abc->SetCallback(PVRenderViewAbortCheck);
   abc->SetClientData(this);
-  pvApp->GetProcessModule()->GetRenderModule()->AddObserver(vtkCommand::AbortCheckEvent, abc);
+  pvApp->GetRenderModuleProxy()->AddObserver(vtkCommand::AbortCheckEvent, abc);
   abc->Delete();
-#endif
 }
 
 
@@ -633,19 +588,11 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Need to make sure it destructs right before this view does.
   // It's the whole TKRenderWidget destruction pain.
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   if (this->RenderModuleProxy == 0)
     {
     this->RenderModuleProxy = this->GetPVApplication()->GetRenderModuleProxy();
     this->RenderModuleProxy->Register(this);
     }
-#else
-  if (this->RenderModule == NULL)
-    {
-    this->RenderModule = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
-    this->RenderModule->Register(this);
-    }
-#endif
 
   // Create the frames
 
@@ -1045,7 +992,6 @@ void vtkPVRenderView::CreateViewProperties()
                this->ImmediateModeCheck->GetWidgetName());
 
   // Create the render module user interface.
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   this->RenderModuleUI = 0;
   char* rmuiClassName;
   const char* rmname = this->GetPVApplication()->GetRenderModuleProxy()
@@ -1075,33 +1021,6 @@ void vtkPVRenderView::CreateViewProperties()
     }
   delete [] rmuiClassName;
   rmuiClassName = NULL;
-#else
-  char* rmuiClassName;
-  vtkProcessModule* pm = pvapp->GetProcessModule();
-  rmuiClassName = new char[strlen(pm->GetOptions()->GetRenderModuleName()) + 20];
-  sprintf(rmuiClassName, "vtkPV%sUI", pm->GetOptions()->GetRenderModuleName());
-  vtkObject* rmui = vtkInstantiator::CreateInstance(rmuiClassName);
-  vtkPVRenderModuleUI* rmuio = vtkPVRenderModuleUI::SafeDownCast(rmui);
-  if ( rmuio )
-    {
-    this->RenderModuleUI = rmuio;
-    this->RenderModuleUI->SetRenderModule(pm->GetRenderModule());
-    this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
-    this->RenderModuleUI->Create(this->GetApplication(),0);
-    this->RenderModuleUI->SetTraceReferenceObject(this);
-    this->RenderModuleUI->SetTraceReferenceCommand("GetRenderModuleUI");
-    this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-      this->RenderModuleUI->GetWidgetName());
-    // Disable compositing if the server does not support remote rendering.
-    rmuio->Initialize();
-    }
-  else
-    {
-    this->RenderModuleUI = 0;
-    }
-  delete [] rmuiClassName;
-  rmuiClassName = NULL;
-#endif
 
   // Interface settings
 
@@ -1489,11 +1408,8 @@ void vtkPVRenderView::SetRendererBackgroundColor(double r, double g, double b)
   // not invoke the callback, We also trace the view.
   this->AddTraceEntry("$kw(%s) SetRendererBackgroundColor %f %f %f",
                       this->GetTclName(), r, g, b);
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+  //TODO: convert to convienience method.
   pvApp->GetRenderModuleProxy()->SetBackgroundColor(rgb);
-#else
-  pvApp->GetProcessModule()->GetRenderModule()->SetBackgroundColor(r, g, b);
-#endif
   this->EventuallyRender();
 }
 
@@ -1521,11 +1437,7 @@ void vtkPVRenderView::Exposed()
 // logic (see above)
 void vtkPVRenderView::Configured()
 {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-#else
-  vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
-#endif
   if (this->BlockRender)
     {
     this->BlockRender = 2;
@@ -1542,15 +1454,10 @@ void vtkPVRenderView::Configured()
 void vtkPVRenderView::ResetCamera()
 {
   double bds[6];
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   this->GetPVApplication()->GetRenderModuleProxy()->ComputeVisiblePropBounds(bds);
-#else
-
-  this->GetPVApplication()->GetProcessModule()->GetRenderModule()->ComputeVisiblePropBounds(bds);
-#endif
   if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
     {
-    this->GetRenderer()->ResetCamera(bds);
+    this->GetPVApplication()->GetRenderModuleProxy()->ResetCamera(bds);
     }
 }
 
@@ -1612,11 +1519,7 @@ void vtkPVRenderView::ForceRender()
     {
     this->CornerAnnotation->UpdateCornerText();
     pvApp->GetProcessModule()->SetGlobalLODFlag(0);
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
     pvApp->GetRenderModuleProxy()->StillRender();
-#else
-    pvApp->GetProcessModule()->GetRenderModule()->StillRender();
-#endif
     }
 }
 
@@ -1640,11 +1543,7 @@ void vtkPVRenderView::Render()
       }
     return;
     }
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-#else
-  vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
-#endif
   if (rm)
     {
     rm->InteractiveRender();
@@ -1771,11 +1670,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     if (pm)
       {
       pm->SetGlobalLODFlag(0);
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
       vtkSMRenderModuleProxy* rm = pvApp->GetRenderModuleProxy();
-#else
-      vtkPVRenderModule* rm = pm->GetRenderModule();
-#endif
       if (rm)
         {
         rm->StillRender();
@@ -1802,13 +1697,6 @@ void vtkPVRenderView::TriangleStripsCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetUseTriangleStrips(int state)
 {
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  vtkPVWindow *pvWin;
-  vtkPVSourceCollection *sources;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp;
-  int numParts, partIdx;
-
   this->AddTraceEntry("$kw(%s) SetUseTriangleStrips %d", this->GetTclName(),
                       state);
 
@@ -1822,32 +1710,23 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
     this->SetUseImmediateMode(1);
     }
 
-  pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pvWin = this->GetPVWindow();
-  if (pvWin == NULL)
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    rm->GetProperty("UseTriangleStrips"));
+  if (!ivp)
     {
-    vtkErrorMacro("Missing window.");
+    vtkErrorMacro("Failed to find property UseTriangleStrips on "
+      "RenderModuleProxy.");
     return;
     }
-  sources = pvWin->GetSourceList("Sources");
+  ivp->SetElement(0, state);
+  rm->UpdateVTKObjects();
 
-  // It would be nice to get the displays through the render module.  
-  sources->InitTraversal();
-  while ( (pvs = sources->GetNextPVSource()) )
-    {
-    numParts = pvs->GetNumberOfParts();
-    for (partIdx = 0; partIdx < numParts; ++partIdx)
-      {
-      pvs->GetPartDisplay()->SetUseTriangleStrips(state);
-      }
-    }
   // Save this selection on the server manager so new
   // part displays will have it a s a default.
-  pm->SetUseTriangleStrips(state);
+  this->GetPVApplication()->GetProcessModule()->SetUseTriangleStrips(state);
 
   this->EventuallyRender();
-#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1859,7 +1738,17 @@ void vtkPVRenderView::ParallelProjectionOn()
     {
     this->ParallelProjectionCheck->SetState(1);
     }
-  this->GetRenderer()->GetActiveCamera()->ParallelProjectionOn();
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->
+    GetRenderModuleProxy();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    rm->GetProperty("ParallelProjection"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ParallelProjection on RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElement(0, 1);
+  rm->UpdateVTKObjects();
   this->EventuallyRender();
 }
 
@@ -1871,7 +1760,18 @@ void vtkPVRenderView::ParallelProjectionOff()
     {
     this->ParallelProjectionCheck->SetState(0);
     }
-  this->GetRenderer()->GetActiveCamera()->ParallelProjectionOff();
+
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->
+    GetRenderModuleProxy();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    rm->GetProperty("ParallelProjection"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property ParallelProjection on RenderModuleProxy.");
+    return;
+    }
+  ivp->SetElement(0, 0);
+  rm->UpdateVTKObjects();
   this->EventuallyRender();
 }
 
@@ -1909,11 +1809,6 @@ void vtkPVRenderView::ImmediateModeCallback()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetUseImmediateMode(int state)
 {
-  vtkPVWindow *pvWin;
-  vtkPVSourceCollection *sources;
-  vtkPVSource *pvs;
-  int partIdx, numParts;
-
   this->AddTraceEntry("$kw(%s) SetUseImmediateMode %d", this->GetTclName(),
                       state);
 
@@ -1927,26 +1822,19 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
     // When immediate mode is off, triangle strips must be on.
     this->SetUseTriangleStrips(1);
     }
-
-  pvWin = this->GetPVWindow();
-  if (pvWin == NULL)
+ 
+  vtkSMRenderModuleProxy* rm = this->GetPVApplication()->
+    GetRenderModuleProxy();
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    rm->GetProperty("UseImmediateMode"));
+  if (!ivp)
     {
-    vtkErrorMacro("Missing window.");
+    vtkErrorMacro("Failed to find property UseImmediateMode on RenderModuleProxy.");
     return;
     }
-  sources = pvWin->GetSourceList("Sources");
+  ivp->SetElement(0, state);
+  rm->UpdateVTKObjects();
   
-  sources->InitTraversal();
-  while ( (pvs = sources->GetNextPVSource()) )
-    {
-    numParts = pvs->GetNumberOfParts();
-    for (partIdx = 0; partIdx < numParts; ++partIdx)
-      {
-#if !defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-      pvs->GetPartDisplay()->SetUseImmediateMode(state);
-#endif
-      }
-    }
   // Save this selection on the server manager so new
   // part displays will have it a s a default.
   this->GetPVApplication()->GetProcessModule()->SetUseImmediateMode(state);
