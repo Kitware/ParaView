@@ -489,6 +489,16 @@
                         attribute_name="Material"/>
       </Item>
     </SelectWidget>
+	<LabeledToggle label="Apply Displacements"
+                   variable="ApplyDisplacements"
+                   trace_name="apply_displacements"
+                   help="Select whether the reader automatically applies displacements" default_value="1"/>
+	<VectorEntry label="Displacement Scale"
+                 trace_name="DisplacementMagnitude"
+                 variable="DisplacementMagnitude"
+                 type="float"
+                 help="The magnitude of the applied displacement."
+                 default_value="1.0"/>
     <LabeledToggle label="Block Ids"
                    variable="GenerateBlockIdCellArray"
                    trace_name="block_ids"
