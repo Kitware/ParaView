@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.32");
+vtkCxxRevisionMacro(vtkPVScale, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -48,6 +48,7 @@ vtkPVScale::vtkPVScale()
   this->EntryFlag = 0;
   this->EntryAndLabelOnTopFlag = 1;
   this->DisplayValueFlag = 1;
+  this->TraceSliderMovement = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -200,7 +201,11 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
     }
 
   this->Scale->SetCommand(this, "CheckModifiedCallback");
-
+  if (this->TraceSliderMovement)
+    {
+    this->Scale->SetEndCommand(this, "Trace");
+    }
+  
   if (this->EntryFlag)
     {
     this->DisplayEntry();
@@ -281,6 +286,15 @@ void vtkPVScale::AcceptInternal(vtkClientServerID sourceID)
 }
 
 //---------------------------------------------------------------------------
+void vtkPVScale::Trace()
+{
+  if (this->Application && this->Application->GetTraceFile())
+    {
+    this->Trace(this->Application->GetTraceFile());
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkPVScale::Trace(ofstream *file)
 {
   if ( ! this->InitializeTrace(file))
@@ -346,6 +360,7 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvs->SetEntryFlag(this->EntryFlag);
     pvs->SetEntryAndLabelOnTopFlag(this->EntryAndLabelOnTopFlag);
     pvs->SetDisplayValueFlag(this->DisplayValueFlag);
+    pvs->SetTraceSliderMovement(this->GetTraceSliderMovement());
     }
   else 
     {
@@ -440,7 +455,14 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
     this->DisplayValueFlag = atoi(display_value);
     }
   
-  return 1;  
+  
+  const char *slider_movement = element->GetAttribute("trace_slider_movement");
+  if (slider_movement)
+    {
+    this->TraceSliderMovement = atoi(slider_movement);
+    }
+  
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -452,6 +474,7 @@ void vtkPVScale::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "EntryAndLabelOnTopFlag: " << this->EntryAndLabelOnTopFlag
      << endl;
   os << indent << "DisplayValueFlag: " << this->DisplayValueFlag << endl;
+  os << indent << "TraceSliderMovement: " << this->TraceSliderMovement << endl;
 }
 
 //----------------------------------------------------------------------------

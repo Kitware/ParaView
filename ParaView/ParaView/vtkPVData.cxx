@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.245");
+vtkCxxRevisionMacro(vtkPVData, "1.246");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2132,6 +2132,8 @@ void vtkPVData::CenterCamera()
       this->GetPVRenderView()->EventuallyRender();
       }
     }
+  
+  this->AddTraceEntry("$kw(%s) CenterCamera", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -2251,8 +2253,8 @@ void vtkPVData::SetPointLabelVisibility(int val, int changeButtonState)
   
   if (state != val && changeButtonState)
     {
-    this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d",
-                        this->GetTclName(), val);
+    this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d %d",
+                        this->GetTclName(), val, changeButtonState);
     this->PointLabelCheck->SetState(val);
     state = val;
     }
@@ -2308,7 +2310,8 @@ void vtkPVData::CubeAxesCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::PointLabelCheckCallback()
 {
-  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", this->GetTclName(),
+  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d 1",
+                      this->GetTclName(),
                       this->PointLabelCheck->GetState());
   this->SetPointLabelVisibility(this->PointLabelCheck->GetState());
   if ( this->GetPVRenderView() )

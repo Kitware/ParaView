@@ -47,7 +47,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.108");
+vtkCxxRevisionMacro(vtkPVProbe, "1.109");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -203,7 +203,11 @@ void vtkPVProbe::AcceptCallbackInternal()
 {
   int i;
   const char *arrayName = NULL;
-    
+  
+  this->AddTraceEntry("[$kw(%s) GetShowXYPlotToggle] SetState %d",
+                      this->GetTclName(),
+                      this->ShowXYPlotToggle->GetState());
+  
   // call the superclass's method
   this->vtkPVSource::AcceptCallbackInternal();
   

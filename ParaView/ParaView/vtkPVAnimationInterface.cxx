@@ -168,7 +168,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.100");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.101");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1594,6 +1594,8 @@ void vtkPVAnimationInterface::CacheGeometryCheckCallback()
     {
     this->Window->RemoveAllCaches();
     }
+  this->AddTraceEntry("$kw(%s) SetCacheGeometry %d",
+                      this->GetTclName(), this->GetCacheGeometry());
 }
 
 //-----------------------------------------------------------------------------

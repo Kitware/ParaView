@@ -197,6 +197,10 @@ public:
   vtkGetObjectMacro(ManipulatorControl2D, vtkPVInteractorStyleControl);
 
   // Description:
+  // Get the widget that controls the camera.
+  vtkGetObjectMacro(CameraControl, vtkPVCameraControl);
+  
+  // Description:
   // Get the size of the render window.
   int* GetRenderWindowSize();
 

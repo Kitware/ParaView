@@ -117,6 +117,10 @@ public:
   void ChangeArgument(const char* name, const char* widget);
   void ResetWidget(vtkPVCameraManipulator*, const char* name);
 
+  // Description:
+  // Get a widget by name
+  vtkPVWidget* GetWidget(const char* name);
+  
   // Description
   // This is hack to convert the current manipulator to Tcl variable.
   vtkGetObjectMacro(CurrentManipulator, vtkPVCameraManipulator);

@@ -96,7 +96,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.291");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.292");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1207,11 +1207,15 @@ void vtkPVRenderView::CreateViewProperties()
   this->ManipulatorControl2D->SetParent(frame->GetFrame());
   this->ManipulatorControl2D->Create(pvapp, 0);
   this->ManipulatorControl2D->SetLabel("2D Movements");
-
+  this->ManipulatorControl2D->SetTraceReferenceObject(this);
+  this->ManipulatorControl2D->SetTraceReferenceCommand("GetManipulatorControl2D");
+  
   this->ManipulatorControl3D->SetParent(frame->GetFrame());
   this->ManipulatorControl3D->Create(pvapp, 0);
   this->ManipulatorControl3D->SetLabel("3D Movements");
-
+  this->ManipulatorControl3D->SetTraceReferenceObject(this);
+  this->ManipulatorControl3D->SetTraceReferenceCommand("GetManipulatorControl3D");
+  
   // Camera: camera control frame
 
   this->CameraControlFrame->SetParent(frame->GetFrame());
@@ -1225,6 +1229,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->CameraControl->Create(this->Application, 0);
   this->CameraControl->SetInteractorStyle(this->GetPVWindow()->GetCenterOfRotationStyle());
   this->CameraControl->SetRenderView(this);
+  this->CameraControl->SetTraceReferenceObject(this);
+  this->CameraControl->SetTraceReferenceCommand("GetCameraControl");
   
   this->Script("pack %s -side top -fill x -expand y", this->CameraControl->GetWidgetName());
   
@@ -1245,6 +1251,9 @@ void vtkPVRenderView::CreateViewProperties()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::StandardViewCallback(float x, float y, float z)
 {
+  this->AddTraceEntry("$kw(%s) StandardViewCallback %f %f %f",
+                      this->GetTclName(), x, y, z);
+  
   vtkCamera *cam = this->Renderer->GetActiveCamera();
   cam->SetFocalPoint(0.0, 0.0, 0.0);
   cam->SetPosition(x, y, z);
@@ -1507,7 +1516,6 @@ void vtkPVRenderView::TriangleStripsCallback()
     }
 
   this->SetUseTriangleStrips(this->TriangleStripsCheck->GetState());
-  this->AddTraceEntry("$kw(%s) TriangleStripsCallback", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -1518,6 +1526,9 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
   vtkPVSource *pvs;
   vtkPVApplication *pvApp;
   int numParts, partIdx;
+
+  this->AddTraceEntry("$kw(%s) SetUseTriangleStrips %d", this->GetTclName(),
+                      state);
 
   if (this->TriangleStripsCheck->GetState() != state)
     {
@@ -1559,6 +1570,8 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ParallelProjectionOn()
 {
+  this->AddTraceEntry("$kw(%s) ParallelProjectionOn", this->GetTclName());
+
   if (!this->ParallelProjectionCheck->GetState())
     {
     this->ParallelProjectionCheck->SetState(1);
@@ -1570,6 +1583,7 @@ void vtkPVRenderView::ParallelProjectionOn()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ParallelProjectionOff()
 {
+  this->AddTraceEntry("$kw(%s) ParallelProjectionOff", this->GetTclName());
   if (this->ParallelProjectionCheck->GetState())
     {
     this->ParallelProjectionCheck->SetState(0);
@@ -1586,13 +1600,11 @@ void vtkPVRenderView::ParallelProjectionCallback()
     {
     vtkTimerLog::MarkEvent("--- Enable parallel projection.");
     this->ParallelProjectionOn();
-    this->AddTraceEntry("$kw(%s) ParallelProjectionOn", this->GetTclName());
     }
   else
     {
     vtkTimerLog::MarkEvent("--- Disable parallel projection.");
     this->ParallelProjectionOff();
-    this->AddTraceEntry("$kw(%s) ParallelProjectionOff", this->GetTclName());
     }
 }
 
@@ -1609,7 +1621,6 @@ void vtkPVRenderView::ImmediateModeCallback()
     }
   
   this->SetUseImmediateMode(this->ImmediateModeCheck->GetState());
-  this->AddTraceEntry("$kw(%s) ImmediateModeCallback", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -1620,6 +1631,9 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
   vtkPVSource *pvs;
   vtkPVApplication *pvApp;
   int partIdx, numParts;
+
+  this->AddTraceEntry("$kw(%s) SetUseImmediateMode %d", this->GetTclName(),
+                      state);
 
   if (this->ImmediateModeCheck->GetState() != state)
     {
@@ -2027,10 +2041,10 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
   double *color = this->OrientationAxesOutlineColor->GetColor();
   if (r != color[0] || g != color[1] || b != color[2])
     {
-    this->AddTraceEntry("$kw(%s) SetOrientationAxesOutlineColor %lf %lf %lf",
-                        this->GetTclName(), r, g, b);
     this->OrientationAxesOutlineColor->SetColor(r, g, b);
     }
+  this->AddTraceEntry("$kw(%s) SetOrientationAxesOutlineColor %lf %lf %lf",
+                      this->GetTclName(), r, g, b);
   this->OrientationAxes->SetOutlineColor(r, g, b);
   this->GetPVWindow()->SaveColor(2, "OrientationAxesOutline",
                                  this->OrientationAxes->GetOutlineColor());
@@ -2056,4 +2070,5 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->ManipulatorControl3D << endl;
   os << indent << "Renderer2D: " << this->Renderer2D << endl;
   os << indent << "RenderModuleUI: " << this->RenderModuleUI << endl;
+  os << indent << "CameraControl: " << this->CameraControl << endl;
 }

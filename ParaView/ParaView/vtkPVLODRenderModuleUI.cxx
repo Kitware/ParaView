@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.11");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.12");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -459,11 +459,6 @@ void vtkPVLODRenderModuleUI::RenderInterruptsEnabledCheckCallback()
 {
   this->SetRenderInterruptsEnabled(
     this->RenderInterruptsEnabledCheck->GetState());
-  // We use a catch in this trace because the paraview executing
-  // the trace might not have this module
-  this->AddTraceEntry("catch {$kw(%s) SetRenderInterruptsEnabled %d",
-                      this->GetTclName(),
-                      this->RenderInterruptsEnabledCheck->GetState());
 }
 
 //----------------------------------------------------------------------------
@@ -478,6 +473,12 @@ void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
   this->RenderInterruptsEnabled = state;
   
   pvApp->GetRenderModule()->SetRenderInterruptsEnabled(state);
+
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetRenderInterruptsEnabled %d}",
+                      this->GetTclName(),
+                      this->RenderInterruptsEnabledCheck->GetState());
 }
 
 //----------------------------------------------------------------------------

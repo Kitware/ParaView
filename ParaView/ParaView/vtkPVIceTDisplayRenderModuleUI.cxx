@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.5");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.6");
 
 int vtkPVIceTDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -186,7 +186,9 @@ void vtkPVIceTDisplayRenderModuleUI::SetReductionFactor(int factor)
     return;
     }
 
-  this->AddTraceEntry("$kw(%s) SetReductionFactor %d", 
+  // We use a catch in this trace because the paraview executing
+  // the trace might not have this module
+  this->AddTraceEntry("catch {$kw(%s) SetReductionFactor %d}",
                       this->GetTclName(), factor);
   this->ReductionFactor = factor;
 

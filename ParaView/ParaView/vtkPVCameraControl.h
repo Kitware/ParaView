@@ -33,14 +33,30 @@ public:
   vtkTypeRevisionMacro(vtkPVCameraControl, vtkKWWidget);
   void PrintSelf(ostream &os, vtkIndent indent);
   
+  // Description:
+  // Set the center of rotation interactor style.  This is used for getting
+  // the current center of rotation.
   void SetInteractorStyle(vtkPVInteractorStyleCenterOfRotation *style);
+  
+  // Description:
+  // Set the render view to operate in.
   void SetRenderView(vtkPVRenderView *view);
   
+  // Desription:
+  // Create the widget.
   void Create(vtkKWApplication *app, const char *args);
   
+  // Description:
+  // Callbacks for the 3 buttons.
   void ElevationButtonCallback();
   void AzimuthButtonCallback();
   void RollButtonCallback();
+  
+  // Description:
+  // Made public so they can be called from a script
+  void Elevation(double angle);
+  void Azimuth(double angle);
+  void Roll(double angle);
   
 protected:
   vtkPVCameraControl();
@@ -48,10 +64,6 @@ protected:
   
   vtkPVInteractorStyleCenterOfRotation *InteractorStyle;
   vtkPVRenderView *RenderView;
-  
-  void Elevation(double angle);
-  void Azimuth(double angle);
-  void Roll(double angle);
   
   vtkKWPushButton *ElevationButton;
   vtkKWEntry *ElevationEntry;

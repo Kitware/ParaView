@@ -26,7 +26,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.3");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.4");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -81,6 +81,11 @@ void vtkPVCameraControl::Elevation(double angle)
     {
     return;
     }
+
+  if (this->ElevationEntry->GetValueAsFloat() != angle)
+    {
+    this->ElevationEntry->SetValue(angle);
+    }
   
   float *center = this->InteractorStyle->GetCenter();
   cam->OrthogonalizeViewUp();
@@ -103,6 +108,8 @@ void vtkPVCameraControl::Elevation(double angle)
   this->RenderView->Render();
   
   xform->Delete();
+  
+  this->AddTraceEntry("$kw(%s) Elevation %f", this->GetTclName(), angle);
 }
 
 void vtkPVCameraControl::Azimuth(double angle)
@@ -116,6 +123,11 @@ void vtkPVCameraControl::Azimuth(double angle)
   if (!cam)
     {
     return;
+    }
+  
+  if (this->AzimuthEntry->GetValueAsFloat() != angle)
+    {
+    this->AzimuthEntry->SetValue(angle);
     }
   
   float *center = this->InteractorStyle->GetCenter();
@@ -136,6 +148,8 @@ void vtkPVCameraControl::Azimuth(double angle)
   this->RenderView->Render();
   
   xform->Delete();
+
+  this->AddTraceEntry("$kw(%s) Azimuth %f", this->GetTclName(), angle);
 }
 
 void vtkPVCameraControl::Roll(double angle)
@@ -149,6 +163,11 @@ void vtkPVCameraControl::Roll(double angle)
   if (!cam)
     {
     return;
+    }
+
+  if (this->RollEntry->GetValueAsFloat() != angle)
+    {
+    this->RollEntry->SetValue(angle);
     }
   
   float *center = this->InteractorStyle->GetCenter();
@@ -175,6 +194,8 @@ void vtkPVCameraControl::Roll(double angle)
   this->RenderView->Render();
   
   xform->Delete();
+
+  this->AddTraceEntry("$kw(%s) Roll %f", this->GetTclName(), angle);
 }
 
 void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)

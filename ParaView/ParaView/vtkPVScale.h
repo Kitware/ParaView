@@ -99,6 +99,7 @@ public:
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
+  void Trace();
 
   // Description:
   // adds a script to the menu of the animation interface.
@@ -134,6 +135,13 @@ public:
   vtkSetMacro(EntryFlag, int);
   vtkSetMacro(EntryAndLabelOnTopFlag, int);
   vtkSetMacro(DisplayValueFlag, int);
+
+  // Description:
+  // Flag for whether to save each movement of the slider in a trace file.
+  // This is used for vtkPVScales that are not being used to control parameters
+  // of a vtkSource.
+  vtkSetMacro(TraceSliderMovement, int);
+  vtkGetMacro(TraceSliderMovement, int);
   
 protected:
   vtkPVScale();
@@ -173,6 +181,8 @@ protected:
 
   float DefaultValue;
 
+  int TraceSliderMovement;
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

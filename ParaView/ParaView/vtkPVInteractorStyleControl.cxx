@@ -40,7 +40,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.26");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -398,6 +398,9 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
 void vtkPVInteractorStyleControl::SetCurrentManipulator(
   int pos, const char* name)
 {
+  this->AddTraceEntry("$kw(%s) SetCurrentManipulator %d {%s}",
+                      this->GetTclName(), pos, name);
+  
   this->SetManipulator(pos, name);
   if ( pos < 0 || pos > 8 || !this->ManipulatorCollection )
     {
@@ -490,6 +493,7 @@ int vtkPVInteractorStyleControl::SetManipulator(int pos, const char* name)
     {
     return 0;
     }
+  
   this->Menus[pos]->SetValue(name);
   return 1;
 }
@@ -697,6 +701,11 @@ void vtkPVInteractorStyleControl::AddArgument(
   this->WidgetProperties->AddItem(prop);
   prop->Delete();
 
+  char str[512];
+  widget->SetTraceReferenceObject(this);
+  sprintf(str, "GetWidget {%s}", name);
+  widget->SetTraceReferenceCommand(str);
+  
   // find vector of manipulators that respond to this argument
   vtkPVInteractorStyleControl::ArrayStrings* strings = 0;
   if ( this->Arguments->GetItem(name, strings) != VTK_OK || !strings )
@@ -714,6 +723,31 @@ void vtkPVInteractorStyleControl::AddArgument(
     // if not add it.
     strings->AppendItem(manipulator);
     }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidget* vtkPVInteractorStyleControl::GetWidget(const char* name)
+{
+  vtkPVInteractorStyleControl::WidgetsMap::IteratorType *it =
+    this->Widgets->NewIterator();
+  it->InitTraversal();
+
+  vtkPVWidget *widget = 0;
+  const char *widgetName;
+  
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(widget) == VTK_OK && widget &&
+        it->GetKey(widgetName) == VTK_OK && widgetName &&
+        !strcmp(widgetName, name))
+      {
+      it->Delete();
+      return widget;
+      }
+    }
+  
+  it->Delete();
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -785,6 +819,23 @@ void vtkPVInteractorStyleControl::SaveState(ofstream *file)
     it->GoToNextItem();
     }
   it->Delete();
+  
+  if (this->ArgumentsFrame->IsCreated())
+    {
+    vtkPVInteractorStyleControl::WidgetsMap::IteratorType *widgetIt =
+      this->Widgets->NewIterator();
+    widgetIt->InitTraversal();
+    while (!widgetIt->IsDoneWithTraversal())
+      {
+      vtkPVWidget *widget = 0;
+      if (widgetIt->GetData(widget) == VTK_OK && widget)
+        {
+        widget->SaveState(file);
+        }
+      widgetIt->GoToNextItem();
+      }
+    widgetIt->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------

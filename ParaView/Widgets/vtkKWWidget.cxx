@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.89");
+vtkCxxRevisionMacro(vtkKWWidget, "1.90");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -326,7 +326,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.89 $");
+  this->ExtractRevision(os,"$Revision: 1.90 $");
 }
 
 //----------------------------------------------------------------------------
@@ -392,7 +392,8 @@ int vtkKWWidget::InitializeTrace(ofstream* file)
 {
   int dummyInit = 0;
   int *pInit;
-
+  int stateFlag = 0;
+  
   if(this->Application == NULL)
     {
     vtkErrorMacro("Tracing before widget is created.");
@@ -406,6 +407,7 @@ int vtkKWWidget::InitializeTrace(ofstream* file)
     }
   else
     { // Use stateFile and ignore "TraceInitialized"
+    stateFlag = 1;
     pInit = &(dummyInit);
     }
 
@@ -437,6 +439,11 @@ int vtkKWWidget::InitializeTrace(ofstream* file)
   // TraceReferenceObject to the parent, and the TraceReferenceCommand to
   // GetChildWidgetName "this->TraceName".
 
+  if (stateFlag)
+    {
+    return 1;
+    }
+  
   return 0;
 }  
 
