@@ -25,7 +25,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.9");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.10");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -39,14 +39,14 @@ vtkPVTrackballMoveActor::~vtkPVTrackballMoveActor()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnButtonDown(int x, int y, vtkRenderer *,
+void vtkPVTrackballMoveActor::OnButtonDown(int, int, vtkRenderer *,
                                            vtkRenderWindowInteractor *)
 {
 }
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballMoveActor::OnButtonUp(int x, int y, vtkRenderer *,
+void vtkPVTrackballMoveActor::OnButtonUp(int, int, vtkRenderer *,
                                          vtkRenderWindowInteractor *)
 {
 }

@@ -23,7 +23,7 @@
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.14");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.15");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
@@ -52,7 +52,7 @@ vtkPVJoystickFly::~vtkPVJoystickFly()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVJoystickFly::OnButtonDown(int x, int y, vtkRenderer *ren,
+void vtkPVJoystickFly::OnButtonDown(int, int, vtkRenderer *ren,
                                     vtkRenderWindowInteractor* rwi)
 {
   if ( this->In < 0 )
@@ -85,7 +85,7 @@ void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer*,
 }
 
 //-------------------------------------------------------------------------
-void vtkPVJoystickFly::OnMouseMove(int x, int y, vtkRenderer*,
+void vtkPVJoystickFly::OnMouseMove(int, int, vtkRenderer*,
                                    vtkRenderWindowInteractor*)
 {
 }

@@ -22,7 +22,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRoll, "1.6");
+vtkCxxRevisionMacro(vtkPVTrackballRoll, "1.7");
 vtkStandardNewMacro(vtkPVTrackballRoll);
 
 //-------------------------------------------------------------------------
@@ -36,14 +36,14 @@ vtkPVTrackballRoll::~vtkPVTrackballRoll()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRoll::OnButtonDown(int x, int y, vtkRenderer *ren,
+void vtkPVTrackballRoll::OnButtonDown(int, int, vtkRenderer *,
                                       vtkRenderWindowInteractor *)
 {
 }
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRoll::OnButtonUp(int x, int y, vtkRenderer *,
+void vtkPVTrackballRoll::OnButtonUp(int, int, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
 }

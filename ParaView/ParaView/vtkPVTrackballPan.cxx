@@ -21,7 +21,7 @@
 #include "vtkRenderer.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballPan, "1.5");
+vtkCxxRevisionMacro(vtkPVTrackballPan, "1.6");
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
@@ -35,14 +35,14 @@ vtkPVTrackballPan::~vtkPVTrackballPan()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballPan::OnButtonDown(int x, int y, vtkRenderer *,
+void vtkPVTrackballPan::OnButtonDown(int, int, vtkRenderer *,
                                      vtkRenderWindowInteractor *)
 {
 }
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballPan::OnButtonUp(int x, int y, vtkRenderer *,
+void vtkPVTrackballPan::OnButtonUp(int, int, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
 }

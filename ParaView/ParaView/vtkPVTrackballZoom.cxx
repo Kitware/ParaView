@@ -20,7 +20,7 @@
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.5");
+vtkCxxRevisionMacro(vtkPVTrackballZoom, "1.6");
 vtkStandardNewMacro(vtkPVTrackballZoom);
 
 //-------------------------------------------------------------------------
@@ -35,7 +35,7 @@ vtkPVTrackballZoom::~vtkPVTrackballZoom()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballZoom::OnButtonDown(int x, int y, vtkRenderer *ren,
+void vtkPVTrackballZoom::OnButtonDown(int, int, vtkRenderer *ren,
                                       vtkRenderWindowInteractor *)
 {
   int *size = ren->GetSize();
@@ -54,13 +54,14 @@ void vtkPVTrackballZoom::OnButtonDown(int x, int y, vtkRenderer *ren,
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballZoom::OnButtonUp(int x, int y, vtkRenderer *,
+void vtkPVTrackballZoom::OnButtonUp(int, int, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballZoom::OnMouseMove(int x, int y, vtkRenderer *ren,
+void vtkPVTrackballZoom::OnMouseMove(int vtkNotUsed(x), int y,
+                                     vtkRenderer *ren,
                                      vtkRenderWindowInteractor *rwi)
 {
   double dy = rwi->GetLastEventPosition()[1] - y;

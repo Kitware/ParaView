@@ -22,7 +22,7 @@
 #include "vtkRenderWindow.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.8");
+vtkCxxRevisionMacro(vtkPVTrackballRotate, "1.9");
 vtkStandardNewMacro(vtkPVTrackballRotate);
 
 //-------------------------------------------------------------------------
@@ -41,7 +41,7 @@ vtkPVTrackballRotate::~vtkPVTrackballRotate()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRotate::OnButtonDown(int x, int y, vtkRenderer *ren,
+void vtkPVTrackballRotate::OnButtonDown(int, int, vtkRenderer *ren,
                                         vtkRenderWindowInteractor*)
 {
   this->ComputeDisplayCenter(ren);
@@ -49,7 +49,7 @@ void vtkPVTrackballRotate::OnButtonDown(int x, int y, vtkRenderer *ren,
 
 
 //-------------------------------------------------------------------------
-void vtkPVTrackballRotate::OnButtonUp(int x, int y, vtkRenderer *,
+void vtkPVTrackballRotate::OnButtonUp(int, int, vtkRenderer *,
                                     vtkRenderWindowInteractor *)
 {
 }
