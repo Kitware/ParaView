@@ -23,16 +23,16 @@
 #include "vtkPNGWriter.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVWindowToImageFilter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-#include "vtkWindowToImageFilter.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.14");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.15");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -167,8 +167,8 @@ void vtkPVCameraIcon::StoreCamera()
     this->Camera->SetPosition(cam->GetPosition());
     this->Camera->SetViewUp(cam->GetViewUp());
 
-    vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-    w2i->SetInput(this->RenderView->GetRenderWindow());
+    vtkPVWindowToImageFilter *w2i = vtkPVWindowToImageFilter::New();
+    w2i->SetInput(this->RenderView->GetPVApplication()->GetRenderModule());
     w2i->Update();
 
     int* dim = w2i->GetOutput()->GetDimensions();
