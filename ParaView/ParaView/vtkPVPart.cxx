@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.42");
+vtkCxxRevisionMacro(vtkPVPart, "1.43");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -60,8 +60,6 @@ vtkPVPart::vtkPVPart()
 
   // Used to be in vtkPVActorComposite
   static int instanceCount = 0;
-
-  this->GeometryID.ID = 0;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -99,17 +97,6 @@ vtkPVPart::~vtkPVPart()
   this->DataInformation->Delete();
   this->DataInformation = NULL;
 
-  // Used to be in vtkPVActorComposite........
-
-  if (this->GeometryID.ID != 0)
-    {
-    if ( pm )
-      {
-      pm->DeleteStreamObject(this->GeometryID);
-      pm->SendStreamToClientAndServer();
-      }
-    }
-  
   this->ClassNameInformation->Delete();
   this->ClassNameInformation = NULL;
 }
@@ -136,11 +123,6 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->vtkKWObject::SetApplication(pvApp);
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
-  this->GeometryID = pm->NewStreamObject("vtkPVGeometryFilter");
-  stream << vtkClientServerStream::Invoke << this->GeometryID << "SetUseStrips"
-         << pvApp->GetMainView()->GetTriangleStripsCheck()->GetState()
-         << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
   // Keep track of how long each geometry filter takes to execute.
   vtkClientServerStream start;
   start << vtkClientServerStream::Invoke << pm->GetApplicationID() 
@@ -150,17 +132,6 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   end << vtkClientServerStream::Invoke << pm->GetApplicationID() 
       << "LogEndEvent" << "Execute Geometry" 
       << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryID 
-                  << "AddObserver"
-                  << "StartEvent"
-                  << start
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryID 
-                  << "AddObserver"
-                  << "EndEvent"
-                  << end
-                  << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------
@@ -176,7 +147,7 @@ void vtkPVPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
     this->PartDisplay = pDisp;
     this->PartDisplay->Register(this);
     // This is special (why we cannot use a macro).
-    this->PartDisplay->ConnectToGeometry(this->GeometryID);
+    this->PartDisplay->ConnectToData(this->VTKDataID);
     }
 }
 
@@ -270,19 +241,7 @@ void vtkPVPart::GatherDataInformation()
 //----------------------------------------------------------------------------
 void vtkPVPart::SetVTKDataID(vtkClientServerID id)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  if ( !pvApp )
-    {
-    vtkErrorMacro("Set the application before you set the VTKDataID.");
-    return;
-    }
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->VTKDataID = id;
-  vtkClientServerStream& stream = pm->GetStream();
-  stream 
-    << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
-    << this->VTKDataID << vtkClientServerStream::End;
-  pm->SendStreamToServer();
 }
 
 //----------------------------------------------------------------------------

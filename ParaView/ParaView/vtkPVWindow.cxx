@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.528");
+vtkCxxRevisionMacro(vtkPVWindow, "1.529");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2657,6 +2657,7 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
   const char* sourceName;
   int numParts, partIdx;
   vtkPVPart* part;
+  vtkPVPartDisplay* partDisplay;
   char *fileName;
   vtkPVSourceCollection *sources;
   char* fileExt = NULL;
@@ -2704,6 +2705,16 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
       for ( partIdx = 0; partIdx < numParts; ++partIdx)
         {
         part = source->GetPart(partIdx);
+        if (part)
+          {
+          partDisplay = part->GetPartDisplay();
+          }
+        // Sanity check
+        if (part == NULL || partDisplay == NULL)
+          {
+          vtkErrorMacro("Missing part or display.");
+          return;
+          }
         // Create a file name for the geometry (without extension).
         if (numParts == 1 && timeIdx >= 0)
           {
@@ -2725,7 +2736,11 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
           sprintf(fileName, "%s/%s%sP%d", 
                   filePath, fileRoot, sourceName, partIdx);
           }
-        *file << "GeometryWriter SetInput [pvTemp" << part->GetGeometryID() << " GetOutput]\n";
+
+        // fixme
+        // The PartDisplay should be responsible for adding these to the batch file.
+        *file << "GeometryWriter SetInput [pvTemp" 
+              << partDisplay->GetGeometryID() << " GetOutput]\n";
         *file << "if {$numberOfProcs > 1} {\n";
         *file << "\tGeometryWriter SetFileName {" << fileName << ".pvtp}\n";
         *file << "} else {\n";
@@ -2733,7 +2748,8 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
         *file << "}\n";
         *file << "GeometryWriter Write\n";
 
-        *file << "CollectionFilter SetInput [pvTemp" << part->GetGeometryID() << " GetOutput]\n";
+        *file << "CollectionFilter SetInput [pvTemp" 
+              << partDisplay->GetGeometryID() << " GetOutput]\n";
         *file << "[CollectionFilter GetOutput] Update\n";
         *file << "TempPolyData ShallowCopy [CollectionFilter GetOutput]\n";
         *file << "if {$myProcId == 0} {\n";

@@ -138,6 +138,14 @@ public:
   // can stay in sync
   void StartRenderEvent();
 
+  // Description:
+  // Parts displays use this threshold to determine the 
+  // default representation for part displays.  When
+  // The size of a structured grid (in MBytes) is over this threshold,
+  // the default representation becomes an outline.
+  vtkSetMacro(OutlineThreshold,float);
+  vtkGetMacro(OutlineThreshold,float);
+
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
@@ -161,6 +169,7 @@ protected:
 
   //int Interactive;
   int TotalVisibleMemorySizeValid;
+  float OutlineThreshold;
   
   vtkClientServerID RenderWindowID;
   vtkClientServerID RendererID;

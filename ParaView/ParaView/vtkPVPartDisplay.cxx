@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.22");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.23");
 
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,7 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->MapperID.ID = 0;
   this->UpdateSuppressorID.ID = 0;
   this->GeometryIsValid = 0;
+  this->GeometryID.ID = 0;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -102,7 +103,12 @@ vtkPVPartDisplay::~vtkPVPartDisplay()
     {
     pm->SendStreamToClientAndServer();
     }
-
+  if (pm && this->GeometryID.ID != 0)
+    {
+    pm->DeleteStreamObject(this->GeometryID);
+    pm->SendStreamToClientAndServer();
+    }
+  
   this->SetPart(NULL);
   this->SetPVApplication( NULL);
 }
@@ -115,17 +121,20 @@ void vtkPVPartDisplay::InvalidateGeometry()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
+void vtkPVPartDisplay::ConnectToData(vtkClientServerID dataID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  if ( !pvApp )
+    {
+    vtkErrorMacro("Set the application before you connect.");
+    return;
+    }
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
-  stream << vtkClientServerStream::Invoke << geometryID
-         << "GetOutput" << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "SetInput" 
-         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  stream 
+    << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
+    << dataID << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 }
 
 
@@ -134,11 +143,50 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
+
+  // Create the geometry filter.
+  this->GeometryID = pm->NewStreamObject("vtkPVGeometryFilter");
+  stream << vtkClientServerStream::Invoke << this->GeometryID << "SetUseStrips"
+         << pvApp->GetMainView()->GetTriangleStripsCheck()->GetState()
+         << vtkClientServerStream::End;
+  // fixme
+  // I see no reason why this needs to be created on the client.
+  pm->SendStreamToClientAndServer();
+
+  // Keep track of how long each geometry filter takes to execute.
+  vtkClientServerStream start;
+  start << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+        << "LogStartEvent" << "Execute Geometry" 
+        << vtkClientServerStream::End;
+  vtkClientServerStream end;
+  end << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+      << "LogEndEvent" << "Execute Geometry" 
+      << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryID 
+                  << "AddObserver"
+                  << "StartEvent"
+                  << start
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryID 
+                  << "AddObserver"
+                  << "EndEvent"
+                  << end
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+
   // Now create the update supressors which keep the renderers/mappers
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
   // ===== Primary branch:
   this->UpdateSuppressorID = pm->NewStreamObject("vtkPVUpdateSuppressor");
+  // fixme:  get rid of the extra sends.
+  pm->SendStreamToClientAndServer();
+
+  // Connect the geometry to the update suppressor.
+  stream << vtkClientServerStream::Invoke << this->GeometryID
+         << "GetOutput" << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "SetInput" 
+         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
 
   // Now create the mapper.
   if (pvApp->GetUseSoftwareRendering())

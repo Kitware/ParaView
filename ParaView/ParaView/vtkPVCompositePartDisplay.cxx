@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.16");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.17");
 
 
 //----------------------------------------------------------------------------
@@ -77,7 +77,7 @@ vtkPVCompositePartDisplay::~vtkPVCompositePartDisplay()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositePartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
+void vtkPVCompositePartDisplay::ConnectToData(vtkClientServerID dataID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
@@ -85,23 +85,10 @@ void vtkPVCompositePartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
   // The input of course is the geometry filter.
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << geometryID << "GetOutput"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << this->LODDeciID << "SetInput"
-    << vtkClientServerStream::LastResult
+    << this->GeometryID << "SetInput" << dataID
     << vtkClientServerStream::End;
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << geometryID << "GetOutput"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << this->CollectID << "SetInput"
-    << vtkClientServerStream::LastResult
-    << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToServer();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
@@ -278,6 +265,26 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << vtkClientServerStream::End;
     pm->SendStreamToClientAndServer();
     }
+
+  // We need to connect the geometry filter 
+  // now that it is in the part display.
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GeometryID << "GetOutput"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->LODDeciID << "SetInput"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GeometryID << "GetOutput"
+    << vtkClientServerStream::End
+    << vtkClientServerStream::Invoke
+    << this->CollectID << "SetInput"
+    << vtkClientServerStream::LastResult
+    << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 

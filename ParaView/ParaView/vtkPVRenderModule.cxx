@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.24");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.25");
 
 //===========================================================================
 //***************************************************************************
@@ -542,7 +542,7 @@ void vtkPVRenderModule::SetUseTriangleStrips(int val)
       {
       vtkPVProcessModule* pm = pvApp->GetProcessModule();
       vtkClientServerStream& stream = pm->GetStream();
-      stream << vtkClientServerStream::Invoke << pDisp->GetPart()->GetGeometryID()
+      stream << vtkClientServerStream::Invoke << pDisp->GetGeometryID()
              <<  "SetUseStrips" << val << vtkClientServerStream::End;
       pm->SendStreamToClientAndServer();
       }

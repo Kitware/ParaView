@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.115");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.116");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1392,7 +1392,8 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
           vtkPVPart* part = source->GetPart(partIdx);
           vtkClientServerID animCompleteArraysID = pm->NewStreamObject("vtkCompleteArrays");
           arrays.push_back(animCompleteArraysID);
-          pm->GetStream() << vtkClientServerStream::Invoke << part->GetGeometryID()
+          pm->GetStream() << vtkClientServerStream::Invoke 
+                          << part->GetPartDisplay()->GetGeometryID()
                           << "GetOutput"
                           << vtkClientServerStream::End;
           pm->GetStream() << vtkClientServerStream::Invoke << animCompleteArraysID
@@ -1443,7 +1444,8 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
         for(int partIdx = 0; partIdx < numParts; ++partIdx)
           {
           vtkPVPart* part = source->GetPart(partIdx);
-          pm->GetStream() << vtkClientServerStream::Invoke << part->GetGeometryID()
+          pm->GetStream() << vtkClientServerStream::Invoke 
+                          << part->GetPartDisplay()->GetGeometryID()
                           << "GetOutput"
                           << vtkClientServerStream::End;
           pm->GetStream() << vtkClientServerStream::Invoke << pvAnimWriterID

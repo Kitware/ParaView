@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.253");
+vtkCxxRevisionMacro(vtkPVData, "1.254");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1697,10 +1697,11 @@ void vtkPVData::DrawWireframe()
         << "SetRepresentationToWireframe" << vtkClientServerStream::End;
       pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryID().ID != 0)
+    if (part->GetPartDisplay()->GetGeometryID().ID != 0)
       {
        pm->GetStream() 
-         << vtkClientServerStream::Invoke << part->GetGeometryID()
+         << vtkClientServerStream::Invoke 
+         << part->GetPartDisplay()->GetGeometryID()
          << "GetUseOutline" << vtkClientServerStream::End;
        pm->SendStreamToClient();
        int useOutline;
@@ -1708,7 +1709,8 @@ void vtkPVData::DrawWireframe()
        if (useOutline)
          {
          pm->GetStream() 
-           << vtkClientServerStream::Invoke << part->GetGeometryID()
+           << vtkClientServerStream::Invoke 
+           << part->GetPartDisplay()->GetGeometryID()
            << "SetUseOutline" << 0 << vtkClientServerStream::End;
          pm->SendStreamToClientAndServer();
          part->GetPartDisplay()->InvalidateGeometry();
@@ -1767,10 +1769,11 @@ void vtkPVData::DrawPoints()
         << "SetRepresentationToPoints" << vtkClientServerStream::End;
       pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryID().ID != 0)
+    if (part->GetPartDisplay()->GetGeometryID().ID != 0)
       {
       pm->GetStream() 
-        << vtkClientServerStream::Invoke << part->GetGeometryID()
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetGeometryID()
         << "GetUseOutline" << vtkClientServerStream::End;
       pm->SendStreamToClient();
       int useOutline;
@@ -1779,7 +1782,7 @@ void vtkPVData::DrawPoints()
         { 
         pm->GetStream() 
           << vtkClientServerStream::Invoke 
-          << part->GetGeometryID()
+          << part->GetPartDisplay()->GetGeometryID()
           << "SetUseOutline" << 0 << vtkClientServerStream::End;
         pm->SendStreamToClientAndServer();
         part->GetPartDisplay()->InvalidateGeometry();
@@ -1808,6 +1811,9 @@ void vtkPVData::DrawSurface()
     }
   this->RepresentationMenu->SetValue(VTK_PV_SURFACE_LABEL);
 
+  // fixme
+  // It would be better to loop over part displays from the render module.
+
   num = this->GetPVSource()->GetNumberOfParts();
   for (idx = 0; idx < num; ++idx)
     {
@@ -1835,10 +1841,11 @@ void vtkPVData::DrawSurface()
         pm->SendStreamToClientAndServer();
         }
       }
-    if (part->GetGeometryID().ID != 0)
+    if (part->GetPartDisplay()->GetGeometryID().ID != 0)
       {
       pm->GetStream() 
-        << vtkClientServerStream::Invoke << part->GetGeometryID()
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetGeometryID()
         << "GetUseOutline" << vtkClientServerStream::End;
       pm->SendStreamToClient();
       int useOutline;
@@ -1847,7 +1854,7 @@ void vtkPVData::DrawSurface()
         { 
         pm->GetStream() 
           << vtkClientServerStream::Invoke
-          << part->GetGeometryID()
+          << part->GetPartDisplay()->GetGeometryID()
           << "SetUseOutline" << 0 << vtkClientServerStream::End;
         pm->SendStreamToClientAndServer();
         part->GetPartDisplay()->InvalidateGeometry();
@@ -1908,10 +1915,11 @@ void vtkPVData::DrawOutline()
         << "SetRepresentationToSurface" << vtkClientServerStream::End;
       pm->SendStreamToClientAndServer();
       }
-    if (part->GetGeometryID().ID != 0)
+    if (part->GetPartDisplay()->GetGeometryID().ID != 0)
       { 
       pm->GetStream() 
-        << vtkClientServerStream::Invoke <<  part->GetGeometryID()
+        << vtkClientServerStream::Invoke 
+        <<  part->GetPartDisplay()->GetGeometryID()
         << "SetUseOutline" << 1 << vtkClientServerStream::End;
       pm->SendStreamToClientAndServer();
       part->GetPartDisplay()->InvalidateGeometry();
@@ -2524,26 +2532,32 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
         outputCount = 0;
         }
 
-      *file << "vtkPVGeometryFilter pvTemp" << part->GetGeometryID() << "\n\t"
-            << "pvTemp" << part->GetGeometryID() << " SetInput [pvTemp" 
+      *file << "vtkPVGeometryFilter pvTemp" 
+            << part->GetPartDisplay()->GetGeometryID() << "\n\t"
+            << "pvTemp" << part->GetPartDisplay()->GetGeometryID() 
+            << " SetInput [pvTemp" 
             << this->GetPVSource()->GetVTKSourceID(sourceCount) 
             << " GetOutput " << outputCount << "]\n";
       *file << "\t";
       if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
                              VTK_PV_OUTLINE_LABEL) )
         {
-        *file << "pvTemp" << part->GetGeometryID() << " SetUseOutline 1" << endl;
+        *file << "pvTemp" 
+              << part->GetPartDisplay()->GetGeometryID() 
+              << " SetUseOutline 1" << endl;
         }
       else
         {
-        *file << "pvTemp" << part->GetGeometryID() << " SetUseOutline 0" << endl;
+        *file << "pvTemp" << part->GetPartDisplay()->GetGeometryID() 
+              << " SetUseOutline 0" << endl;
         }
       // Move to next output
       ++outputCount;
 
-      *file << "vtkPolyDataMapper pvTemp" << part->GetPartDisplay()->GetMapperID() << "\n\t"
+      *file << "vtkPolyDataMapper pvTemp" 
+            << part->GetPartDisplay()->GetMapperID() << "\n\t"
             << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetInput ["
-            << "pvTemp" << part->GetGeometryID() << " GetOutput]\n\t";
+            << "pvTemp" << part->GetPartDisplay()->GetGeometryID() << " GetOutput]\n\t";
       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetImmediateModeRendering "
             << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
       part->GetPartDisplay()->GetMapper()->GetScalarRange(range);

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.17");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.18");
 
 
 //----------------------------------------------------------------------------
@@ -119,19 +119,18 @@ vtkPVLODPartDisplayInformation* vtkPVLODPartDisplay::GetInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODPartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
+void vtkPVLODPartDisplay::ConnectToData(vtkClientServerID dataID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
   // Superclass connects the full res pipeline.
-  this->Superclass::ConnectToGeometry(geometryID);
+  this->Superclass::ConnectToData(dataID);
   
-  stream << vtkClientServerStream::Invoke << geometryID
-         << "GetOutput" << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->LODDeciID << "SetInput" 
-         << vtkClientServerStream::LastResult << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  stream 
+    << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
+    << dataID << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 }
 
 //----------------------------------------------------------------------------
@@ -255,6 +254,16 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     // node.
     pm->SendStreamToClient();
     }
+
+  // Now that geometry in in this object, we must
+  // connect LOD filter to geometry as part of initialization.
+  pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryID
+    << "GetOutput" << vtkClientServerStream::End;
+  pm->GetStream() 
+    << vtkClientServerStream::Invoke << this->LODDeciID << "SetInput" 
+    << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
+
 }
 
 

@@ -75,8 +75,8 @@ public:
 
   //BTX
   // Description:
-  // Connect the geometry filter to the display pipeline.
-  virtual void ConnectToGeometry(vtkClientServerID );
+  // Connect the VTK data object to the display pipeline.
+  virtual void ConnectToData(vtkClientServerID );
   //ETX
 
   // Description:
@@ -120,6 +120,12 @@ public:
   // PVSource calls this when it gets modified.
   void InvalidateGeometry();
 
+  // Description:
+  // fixme:  does this really need to be here?
+  // Get the tcl name of the vtkPVGeometryFilter.
+  vtkClientServerID GetGeometryID() {return this->GeometryID;}
+ 
+
 protected:
   vtkPVPartDisplay();
   ~vtkPVPartDisplay();
@@ -142,6 +148,7 @@ protected:
   vtkProperty *Property;
   vtkProp *Prop;
 
+  vtkClientServerID GeometryID;
   vtkClientServerID PropID;
   vtkClientServerID PropertyID;
   vtkClientServerID MapperID;

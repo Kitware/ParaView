@@ -86,11 +86,6 @@ public:
   vtkPVApplication *GetPVApplication();
         
   // Description:
-  // Get the tcl name of the vtkPVGeometryFilter.
-  vtkClientServerID GetGeometryID() {return this->GeometryID;}
-  
-
-  // Description:
   // Moving away from direct access to VTK data objects.
   vtkPVDataInformation* GetDataInformation();
   vtkGetObjectMacro(ClassNameInformation, vtkPVClassNameInformation);
@@ -151,7 +146,6 @@ protected:
   
   vtkPVClassNameInformation *ClassNameInformation;
   
-  vtkClientServerID GeometryID;
   vtkClientServerID VTKDataID;
   
   // Here to create unique names.

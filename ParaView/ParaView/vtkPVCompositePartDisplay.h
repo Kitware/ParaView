@@ -48,8 +48,8 @@ public:
 
   //BTX
   // Description:
-  // Connect the geometry filter to the display pipeline.
-  virtual void ConnectToGeometry(vtkClientServerID geometryID);
+  // Connect the VTK data object to the display pipeline.
+  virtual void ConnectToData(vtkClientServerID geometryID);
   //ETX
 
   // Description:
