@@ -1,4 +1,4 @@
-SET CONVERTIMAGE=ConvertImage
+SET CONVERTIMAGE=KWConvertImageToHeader
 SET OPTIONS=ZLIB BASE64 %1
 
 %CONVERTIMAGE% vtkPV3DCursorButton.h PV3DCursorButton.png PV3DCursorButtonActive.png %OPTIONS%
