@@ -103,6 +103,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdarg.h>
 #include <signal.h>
 
+#include "vtkKWDirectoryUtilities.h"
+
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
 
@@ -112,9 +114,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "direct.h"
 #endif
 
+#include <vector>
+#include <string>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.184");
+vtkCxxRevisionMacro(vtkPVApplication, "1.185");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -967,6 +972,27 @@ void vtkPVApplication::Start(int argc, char*argv[])
     return;
     }
 
+  vtkstd::vector<vtkstd::string> open_files;
+  // If any of the arguments has a .pvs extension, load it as a script.
+  int i;
+  for (i=1; i < argc; i++)
+    {
+    if (vtkPVApplication::CheckForExtension(argv[i], ".pvs"))
+      {
+      if ( !vtkKWDirectoryUtilities::FileExists(argv[i]) )
+        {
+        cout << "Cannot find file: " << argv[i] << endl;
+        this->SetExitStatus(1);
+        this->Exit();
+        return;
+        }
+      else
+        {
+        open_files.push_back(argv[i]);
+        }
+      }
+    }
+
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
   // set the font size to be small
@@ -1212,16 +1238,12 @@ void vtkPVApplication::Start(int argc, char*argv[])
                       ui->GetMainView()->GetTclName(), ui->GetTclName());
   ui->GetMainView()->SetTraceInitialized(1);
 
-  // If any of the arguments has a .pvs extension, load it as a script.
-  int i;
-  for (i=1; i < argc; i++)
+  vtkstd::vector<vtkstd::string>::size_type cc;
+  for ( cc = 0; cc < open_files.size(); cc ++ )
     {
-    if (vtkPVApplication::CheckForExtension(argv[i], ".pvs"))
-      {
-      this->RunningParaViewScript = 1;
-      ui->LoadScript(argv[i]);
-      this->RunningParaViewScript = 0;
-      }
+    this->RunningParaViewScript = 1;
+    ui->LoadScript(open_files[cc].c_str());
+    this->RunningParaViewScript = 0;
     }
 
   if (this->PlayDemo)
