@@ -48,7 +48,7 @@
 //----------------------------------------------------------------------------
 // Type string parsing functions.
 #define VTK_CSS_VALUE_FROM_STRING(type, format) \
-  static int ValueFromString(const char* str, type* value) \
+  int vtkClientServerStreamValueFromString(const char* str, type* value) \
   { return sscanf(str, "%" format, value)?1:0; }
 
 VTK_CSS_VALUE_FROM_STRING(vtkTypeInt8, VTK_TYPE_FORMAT_INT8)
@@ -2348,7 +2348,7 @@ int vtkClientServerStreamValueFromString(const char* begin, const char* end,
   ptr[end-begin] = 0;
 
   // Try to convert the value.
-  int result = ValueFromString(ptr, value);
+  int result = vtkClientServerStreamValueFromString(ptr, value);
 
   // Free the buffer.
   if(ptr != buffer)
