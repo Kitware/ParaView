@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.397");
+vtkCxxRevisionMacro(vtkPVSource, "1.398");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -223,7 +223,13 @@ void vtkPVSource::SetPVInputInternal(
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (pvApp == NULL)
+  if (pvs == 0)
+    {
+    vtkErrorMacro("NULL input is not allowed.");
+    return;
+    }
+
+  if (pvApp == 0)
     {
     vtkErrorMacro(
       "No Application. Create the source before setting the input.");
@@ -398,6 +404,10 @@ void vtkPVSource::GatherDataInformation()
 void vtkPVSource::Update()
 {
   this->Proxy->UpdatePipeline();
+  if (this->PVColorMap)
+    {
+    this->PVColorMap->UpdateForSource(this);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -912,6 +922,12 @@ void vtkPVSource::SetPVColorMap(vtkPVColorMap *colorMap)
       this->PVColorMap->IncrementUseCount();
       }
     this->PVColorMap->Register(this);
+    }
+    
+  // Give the color map a chance to change the scalar range.
+  if (this->PVColorMap)
+    {
+    this->PVColorMap->UpdateForSource(this);  
     }
 }
 

@@ -55,7 +55,7 @@
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.104");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.105");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -144,15 +144,19 @@ vtkPVColorMap::vtkPVColorMap()
   this->ColorMapFrame = vtkKWLabeledFrame::New();
   this->ArrayNameLabel = vtkKWLabel::New();
   // Stuff for setting the range of the color map.
-  this->ColorRangeFrame = vtkKWWidget::New();
-  this->ColorRangeLabel = vtkKWLabel::New();
-  this->ColorRangeWidget = vtkKWRange::New();
-  this->ColorRangeWidget->ClampRangeOff();
+  this->ScalarRangeFrame = vtkKWWidget::New();
+  this->ScalarRangeLockCheck = vtkKWCheckButton::New();
+  this->ScalarRangeWidget = vtkKWRange::New();
+  this->ScalarRangeWidget->ClampRangeOff();
   this->NumberOfColorsScale = vtkKWScale::New();  
   this->ColorEditorFrame = vtkKWWidget::New();
   this->StartColorButton = vtkKWChangeColorButton::New();
   this->Map = vtkKWLabel::New();
   this->EndColorButton = vtkKWChangeColorButton::New();
+
+  this->ScalarRange[0] = this->WholeScalarRange[0] = VTK_LARGE_FLOAT;
+  this->ScalarRange[1] = this->WholeScalarRange[1] = -VTK_LARGE_FLOAT;
+  this->ScalarRangeLock = 0;
 
   this->VectorFrame = vtkKWLabeledFrame::New();
   this->VectorModeMenu = vtkKWOptionMenu::New() ;
@@ -213,12 +217,12 @@ vtkPVColorMap::~vtkPVColorMap()
   this->ArrayNameLabel->Delete();
   this->ArrayNameLabel = NULL;
   // Stuff for setting the range of the color map.
-  this->ColorRangeFrame->Delete();
-  this->ColorRangeFrame = NULL;
-  this->ColorRangeLabel->Delete();
-  this->ColorRangeLabel = NULL;
-  this->ColorRangeWidget->Delete();
-  this->ColorRangeWidget = NULL;
+  this->ScalarRangeFrame->Delete();
+  this->ScalarRangeFrame = NULL;
+  this->ScalarRangeLockCheck->Delete();
+  this->ScalarRangeLockCheck = NULL;
+  this->ScalarRangeWidget->Delete();
+  this->ScalarRangeWidget = NULL;
   this->NumberOfColorsScale->Delete();
   this->NumberOfColorsScale = NULL;
 
@@ -306,29 +310,34 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ArrayNameLabel->SetLabel("Parameter: ");
 
   // Color map: range
-  this->ColorRangeFrame->SetParent(this->ColorMapFrame->GetFrame());
-  this->ColorRangeFrame->Create(app, "frame", "");
-  this->ColorRangeLabel->SetParent(this->ColorRangeFrame);
-  this->ColorRangeLabel->SetLabel("Range:");
-  this->ColorRangeLabel->Create(app, "");
+  this->ScalarRangeFrame->SetParent(this->ColorMapFrame->GetFrame());
+  this->ScalarRangeFrame->Create(app, "frame", "");
+  this->ScalarRangeLockCheck->SetParent(this->ScalarRangeFrame);
+  this->ScalarRangeLockCheck->Create(app, "");
+  this->ScalarRangeLockCheck->ConfigureOptions("-image PVUnlockedButton -selectimage PVLockedButton -relief flat");
+  this->ScalarRangeLockCheck->SetState(0);
+  this->ScalarRangeLockCheck->SetIndicator(0);
+  this->ScalarRangeLockCheck->SetBalloonHelpString(
+    "Lock the range so that ParaView will not change it.");
+  this->ScalarRangeLockCheck->SetCommand(this, "LockCheckCallback");
   this->Script("pack %s -side left -expand f",
-               this->ColorRangeLabel->GetWidgetName());
+               this->ScalarRangeLockCheck->GetWidgetName());
 
-  this->ColorRangeWidget->SetParent(this->ColorRangeFrame);
-  this->ColorRangeWidget->Create(app, "");
-  this->ColorRangeWidget->SetWholeRange(
+  this->ScalarRangeWidget->SetParent(this->ScalarRangeFrame);
+  this->ScalarRangeWidget->Create(app, "");
+  this->ScalarRangeWidget->SetWholeRange(
     -VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
-  this->ColorRangeWidget->ShowEntriesOn();
-  this->ColorRangeWidget->ShowLabelOff();
-  this->ColorRangeWidget->GetEntry1()->SetWidth(7);
-  this->ColorRangeWidget->GetEntry2()->SetWidth(7);
-  this->ColorRangeWidget->SetCommand(this, "ColorRangeWidgetCallback");
-  this->ColorRangeWidget->SetEntriesPosition(
+  this->ScalarRangeWidget->ShowEntriesOn();
+  this->ScalarRangeWidget->ShowLabelOff();
+  this->ScalarRangeWidget->GetEntry1()->SetWidth(7);
+  this->ScalarRangeWidget->GetEntry2()->SetWidth(7);
+  this->ScalarRangeWidget->SetCommand(this, "ScalarRangeWidgetCallback");
+  this->ScalarRangeWidget->SetEntriesPosition(
     vtkKWRange::POSITION_ALIGNED);
-  this->ColorRangeWidget->SetBalloonHelpString(
+  this->ScalarRangeWidget->SetBalloonHelpString(
     "Set the minimum and maximum of the values of the color map");
   this->Script("pack %s -side left -fill x -expand t",
-               this->ColorRangeWidget->GetWidgetName());
+               this->ScalarRangeWidget->GetWidgetName());
                
   // Color map: gradient editor
 
@@ -409,7 +418,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->Script("pack %s %s %s %s -side top -expand t -fill x -anchor nw",
                this->ArrayNameLabel->GetWidgetName(),
-               this->ColorRangeFrame->GetWidgetName(),
+               this->ScalarRangeFrame->GetWidgetName(),
                this->ColorEditorFrame->GetWidgetName(),
                this->NumberOfColorsScale->GetWidgetName());
 
@@ -1053,18 +1062,28 @@ void vtkPVColorMap::ScalarBarCheckCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarRange(double min, double max)
+void vtkPVColorMap::LockCheckCallback()
 {
-  this->SetScalarRangeInternal(min, max);
-  this->AddTraceEntry("$kw(%s) SetScalarRange %g %g", this->GetTclName(),
-                      min, max);
+  this->SetScalarRangeLock(this->ScalarRangeLockCheck->GetState());
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVColorMap::SetScalarRangeInternal(double min, double max)
+void vtkPVColorMap::SetScalarRangeLock(int val)
 {
-  this->RMScalarBarWidget->SetScalarRange(min,max);
+  if (this->ScalarRangeLock == val)
+    {
+    return;
+    }
+  this->ScalarRangeLock = val;
+  this->ScalarRangeLockCheck->SetState(val);
+  if ( ! val)
+    {
+    this->ResetScalarRange();
+    }
+
+  // Trace.
+  this->AddTraceEntry("$kw(%s) SetScalarRangeLock %d", 
+                      this->GetTclName(), val);
 }
 
 //----------------------------------------------------------------------------
@@ -1075,167 +1094,12 @@ void vtkPVColorMap::SetVectorComponent(int component)
                       this->GetTclName(), component);
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVColorMap::ResetScalarRange()
 {
   this->ResetScalarRangeInternal();
   this->AddTraceEntry("$kw(%s) ResetScalarRange", this->GetTclName());
 }
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::ResetScalarRangeInternal()
-{
-  double range[2];
-  double tmp[2];
-  vtkPVSourceCollection *sourceList;
-  vtkPVSource *pvs;
-  int component = this->RMScalarBarWidget->GetVectorComponent();
-  if (this->RMScalarBarWidget->GetVectorMode() == vtkRMScalarBarWidget::MAGNITUDE)
-    {
-    component = -1;
-    }
-
-  if (this->GetApplication() == NULL || this->PVRenderView == NULL)
-    {
-    vtkErrorMacro("Trying to reset scalar range without application and view.");
-    return;
-    }
-
-  range[0] = VTK_DOUBLE_MAX;
-  range[1] = -VTK_DOUBLE_MAX;
-
-  // Compute global scalar range ...
-  sourceList = this->PVRenderView->GetPVWindow()->GetSourceList("Sources");
-  sourceList->InitTraversal();
-  while ( (pvs = sourceList->GetNextPVSource()) )
-    {
-    // For point data ...
-    vtkPVArrayInformation *ai;
-    ai = pvs->GetDataInformation()->GetPointDataInformation()->
-      GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
-    if (ai)
-      {
-      ai->GetComponentRange(component, tmp);
-      if (tmp[0] < range[0])
-        {
-        range[0] = tmp[0];
-        }
-      if (tmp[1] > range[1])
-        {
-        range[1] = tmp[1];
-        }
-      }
-    // For cell data ...
-    ai = pvs->GetDataInformation()->GetCellDataInformation()->
-      GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
-    if (ai)
-      {  
-      ai->GetComponentRange(component, tmp);
-      if (tmp[0] < range[0])
-        {
-        range[0] = tmp[0];
-        }
-      if (tmp[1] > range[1])
-        {
-        range[1] = tmp[1];
-        }
-      }
-    }
-
-  if (range[1] < range[0])
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
-    }
-  if (range[0] == range[1])
-    {
-    range[1] = range[0] + 0.001;
-    }
-
-  this->SetScalarRangeInternal(range[0], range[1]);
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVColorMap::ResetScalarRangeInternal(vtkPVSource* pvs)
-{
-  double range[2];
-  double tmp[2];
-
-  int component = this->RMScalarBarWidget->GetVectorComponent();
-  if (this->RMScalarBarWidget->GetVectorMode() == vtkRMScalarBarWidget::MAGNITUDE)
-    {
-    component = -1;
-    }
-
-  if (this->GetApplication() == NULL || this->PVRenderView == NULL)
-    {
-    vtkErrorMacro("Trying to reset scalar range without application and view.");
-    return;
-    }
-
-  range[0] = VTK_DOUBLE_MAX;
-  range[1] = -VTK_DOUBLE_MAX;
-
-  // For point data ...
-  vtkPVArrayInformation *ai;
-  ai = pvs->GetDataInformation()->GetPointDataInformation()->
-    GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
-  if (ai)
-    {
-    ai->GetComponentRange(component, tmp);
-    if (tmp[0] < range[0])
-      {
-      range[0] = tmp[0];
-      }
-    if (tmp[1] > range[1])
-      {
-      range[1] = tmp[1];
-      }
-    }
-  // For cell data ...
-  ai = pvs->GetDataInformation()->GetCellDataInformation()->
-    GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
-  if (ai)
-    {  
-    ai->GetComponentRange(component, tmp);
-    if (tmp[0] < range[0])
-      {
-      range[0] = tmp[0];
-      }
-    if (tmp[1] > range[1])
-      {
-      range[1] = tmp[1];
-      }
-    }
-
-  if (range[1] < range[0])
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
-    }
-  if (range[0] == range[1])
-    {
-    range[1] = range[0] + 0.001;
-    }
-
-  this->SetScalarRangeInternal(range[0], range[1]);
-
-  if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-
-
-
 
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVColorMap::GetPVApplication()
@@ -1390,22 +1254,14 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
   *file << endl;
 }
 
-
-
 //----------------------------------------------------------------------------
-void vtkPVColorMap::ColorRangeWidgetCallback()
+void vtkPVColorMap::ScalarRangeWidgetCallback()
 {
   double range[2];
 
-  this->ColorRangeWidget->GetRange(range);
-  
-  // Avoid the bad range error
-  if (range[1] <= range[0])
-    {
-    range[1] = range[0] + 0.00001;
-    }
-
+  this->ScalarRangeWidget->GetRange(range);
   this->SetScalarRange(range[0], range[1]);
+      
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -1489,6 +1345,7 @@ void vtkPVColorMap::VectorModeMagnitudeCallback()
   this->RMScalarBarWidget->SetVectorModeToMagnitude();
   this->Script("pack forget %s",
                this->VectorComponentMenu->GetWidgetName());
+  this->ResetScalarRangeInternal();
 }
 
 //----------------------------------------------------------------------------
@@ -1505,6 +1362,7 @@ void vtkPVColorMap::VectorModeComponentCallback()
   this->RMScalarBarWidget->SetVectorModeToComponent();
   this->Script("pack %s -side left -expand f -fill both -padx 2",
                this->VectorComponentMenu->GetWidgetName());
+  this->ResetScalarRangeInternal();
 }
 
 //----------------------------------------------------------------------------
@@ -1519,6 +1377,7 @@ void vtkPVColorMap::UpdateMap(int width, int height)
   int size;
   int i, j;
   double *range;
+  double *wholeRange;
   double val, step;
   unsigned char *rgba;  
   unsigned char *ptr;  
@@ -1541,16 +1400,43 @@ void vtkPVColorMap::UpdateMap(int width, int height)
     return;
     }
 
-  range = this->RMScalarBarWidget->GetLookupTable()->GetRange();
-  step = (range[1]-range[0])/(double)(width);
+  range = this->ScalarRange;
+  wholeRange = this->WholeScalarRange;
+
+  //step = (range[1]-range[0])/(double)(width);
+  step = (wholeRange[1]-wholeRange[0])/(double)(width);
   ptr = this->MapData;
   for (j = 0; j < height; ++j)
     {
     for (i = 0; i < width; ++i)
       {
-      val = range[0] + ((double)(i)*step);
-      rgba = this->RMScalarBarWidget->GetLookupTable()->MapValue(val);
+      // This was the original.  Color map takes up the entire width.
+      //val = range[0] + ((double)(i)*step);
+      // Lets have x be constant whole range.
+      // Color map shrinks as map range changes.
+      val = wholeRange[0] + ((double)(i)*step);
+      // Values out of range are background color.
+      //if (val < range[0] || val > range[1])
+      //  {
+      //  ptr[0] = (unsigned char)(191);
+      //  ptr[1] = (unsigned char)(191);
+      //  ptr[2] = (unsigned char)(191);
+      //  ptr += 3;
+      //  }
+      //else
+      //  {
       
+      // Colors clamp to min or max out of color map range.
+      if (val < range[0])
+        {
+        val = range[0];
+        }
+      if (val > range[1])
+        {
+        val = range[1];
+        }
+        
+      rgba = this->RMScalarBarWidget->GetLookupTable()->MapValue(val);
       ptr[0] = rgba[0];
       ptr[1] = rgba[1];
       ptr[2] = rgba[2];
@@ -1612,11 +1498,6 @@ const char* vtkPVColorMap::GetScalarBarLabelFormat()
   return this->RMScalarBarWidget->GetScalarBarLabelFormat();
 }
 //----------------------------------------------------------------------------
-double *vtkPVColorMap::GetScalarRange()
-{
-  return this->RMScalarBarWidget->GetScalarRange();
-}
-//----------------------------------------------------------------------------
 int vtkPVColorMap::GetVectorComponent()
 {
   return this->RMScalarBarWidget->GetVectorComponent();
@@ -1644,7 +1525,7 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
 
       double range[2];
       this->RMScalarBarWidget->GetScalarRange(range);
-      this->ColorRangeWidget->SetRange(range);      
+      this->SetScalarRange(range[0], range[1]);      
       if (this->MapWidth > 0 && this->MapHeight > 0)
           {
           this->UpdateMap(this->MapWidth, this->MapHeight);
@@ -1762,13 +1643,94 @@ void vtkPVColorMap::SaveState(ofstream *file)
     }
 }
 
+
+
 //----------------------------------------------------------------------------
-void vtkPVColorMap::Update()
+void vtkPVColorMap::ResetScalarRangeInternal()
 {
   double range[2];
   double tmp[2];
-  vtkPVSourceCollection *sourceList;
   vtkPVSource *pvs;
+  vtkPVSourceCollection *sourceList;
+
+  if (this->GetApplication() == NULL || this->PVRenderView == NULL)
+    {
+    vtkErrorMacro("Trying to reset scalar range without application and view.");
+    return;
+    }
+
+  // Compute global scalar range ...
+  range[0] = VTK_LARGE_FLOAT;
+  range[1] = -VTK_LARGE_FLOAT;
+  sourceList = this->PVRenderView->GetPVWindow()->GetSourceList("Sources");
+  sourceList->InitTraversal();
+  while ( (pvs = sourceList->GetNextPVSource()) )
+    {    
+    this->ComputeScalarRangeForSource(pvs, tmp);
+    if (range[0] > tmp[0])
+      {
+      range[0] = tmp[0];
+      }
+    if (range[1] < tmp[1])
+      {
+      range[1] = tmp[1];
+      }
+    }
+    
+  // Get the computed range from the whole range.
+  this->SetWholeScalarRange(range[0], range[1]);
+  this->SetScalarRangeInternal(range[0], range[1]);
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ResetScalarRangeInternal(vtkPVSource* pvs)
+{
+  if (this->GetApplication() == NULL || this->PVRenderView == NULL)
+    {
+    vtkErrorMacro("Trying to reset scalar range without application and view.");
+    return;
+    }
+    
+  double range[2];
+  this->ComputeScalarRangeForSource(pvs, range);
+  this->SetScalarRangeInternal(range[0], range[1]);
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::UpdateForSource(vtkPVSource* pvs)
+{
+  double range[2];
+
+  this->ComputeScalarRangeForSource(pvs, range);
+  // Do we need to expand the whole range?
+  if (range[0] > this->WholeScalarRange[0])
+    {
+    range[0] = this->WholeScalarRange[0];
+    }
+  if (range[1] < this->WholeScalarRange[1])
+    {
+    range[1] = this->WholeScalarRange[1];
+    }
+  
+  // This will expand range if not locked.
+  this->SetWholeScalarRange(range[0], range[1]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::ComputeScalarRangeForSource(vtkPVSource* pvs, 
+                                                double* range)
+{
+  double tmp[2];
   int component = this->RMScalarBarWidget->GetVectorComponent();
   if (this->RMScalarBarWidget->GetVectorMode() == vtkRMScalarBarWidget::MAGNITUDE)
     {
@@ -1784,65 +1746,169 @@ void vtkPVColorMap::Update()
   range[0] = VTK_DOUBLE_MAX;
   range[1] = -VTK_DOUBLE_MAX;
 
-  // Compute global scalar range ...
-  sourceList = this->PVRenderView->GetPVWindow()->GetSourceList("Sources");
-  sourceList->InitTraversal();
-  while ( (pvs = sourceList->GetNextPVSource()) )
+  // For point data ...
+  vtkPVArrayInformation *ai;
+  ai = pvs->GetDataInformation()->GetPointDataInformation()->
+    GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
+  if (ai)
     {
-    // For point data ...
-    vtkPVArrayInformation *ai;
-    ai = pvs->GetDataInformation()->GetPointDataInformation()->
-      GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
-    if (ai)
+    ai->GetComponentRange(component, tmp);
+    if (tmp[0] < range[0])
       {
-      ai->GetComponentRange(component, tmp);
-      if (tmp[0] < range[0])
-        {
-        range[0] = tmp[0];
-        }
-      if (tmp[1] > range[1])
-        {
-        range[1] = tmp[1];
-        }
+      range[0] = tmp[0];
       }
-    // For cell data ...
-    ai = pvs->GetDataInformation()->GetCellDataInformation()->
-      GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
-    if (ai)
-      {  
-      ai->GetComponentRange(component, tmp);
-      if (tmp[0] < range[0])
-        {
-        range[0] = tmp[0];
-        }
-      if (tmp[1] > range[1])
-        {
-        range[1] = tmp[1];
-        }
+    if (tmp[1] > range[1])
+      {
+      range[1] = tmp[1];
       }
     }
-
-  if (range[1] < range[0])
-    {
-    range[0] = 0.0;
-    range[1] = 1.0;
+  // For cell data ...
+  ai = pvs->GetDataInformation()->GetCellDataInformation()->
+    GetArrayInformation(this->RMScalarBarWidget->GetArrayName());
+  if (ai)
+    {  
+    ai->GetComponentRange(component, tmp);
+    if (tmp[0] < range[0])
+      {
+      range[0] = tmp[0];
+      }
+    if (tmp[1] > range[1])
+      {
+      range[1] = tmp[1];
+      }
     }
-  if (range[0] == range[1])
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarRange(double min, double max)
+{
+  if (min == this->ScalarRange[0] && max == this->ScalarRange[1])
     {
-    range[1] = range[0] + 0.001;
+    return;
+    }
+  this->SetScalarRangeInternal(min, max);
+  this->AddTraceEntry("$kw(%s) SetScalarRange %g %g", this->GetTclName(),
+                      min, max);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetScalarRangeInternal(double min, double max)
+{
+  // Make sure new whole range does not cause problems. 
+  if (max < min)
+    {
+    min = 0.0;
+    max = 1.0;
+    }
+  if (min == max)
+    {
+    max = min + 0.0001;
     }
 
-  this->ColorRangeWidget->SetWholeRange(range[0], range[1]);
+  // This will terminate any recursion.
+  if (min == this->ScalarRange[0] && max == this->ScalarRange[1])
+    {
+    return;
+    }
+  this->ScalarRange[0] = min;
+  this->ScalarRange[1] = max;
+  this->RMScalarBarWidget->SetScalarRange(min,max);    
+  this->ScalarRangeWidget->SetRange(min,max);    
+  
+  // Expand whole range if necessary.
+  if (min < WholeScalarRange[0] || max > this->WholeScalarRange[1])
+    {
+    if (min > WholeScalarRange[0])
+      {
+      min = WholeScalarRange[0];
+      }
+    if (max < WholeScalarRange[1])
+      {
+      max = WholeScalarRange[1];
+      }
+    this->SetWholeScalarRange(min, max);
+    }
+    
+    
+  // User modified the scalar range.  Lets lock it 
+  // so paraview will not over ride the users slection.
+  // Also lock if user resets to range of data.
+  if (this->ScalarRange[0] > this->WholeScalarRange[0] ||
+      this->ScalarRange[1] < this->WholeScalarRange[1] )
+    {
+    this->ScalarRangeLockCheck->SetState(1);
+    this->ScalarRangeLock = 1;
+    }    
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::SetWholeScalarRange(double min, double max)
+{
+  // Make sure new whole range does not cause problems. 
+  if (max < min)
+    {
+    min = 0.0;
+    max = 1.0;
+    }
+  if (min == max)
+    {
+    max = min + 0.0001;
+    }
+
+  // This will terminate any recursion.
+  if (min == this->WholeScalarRange[0] && max == this->WholeScalarRange[1])
+    {
+    return;
+    }
+    
+  // Do not allow the whole range to shink smaller than a locked range.
+  if (this->ScalarRangeLock)
+    {
+    if (min > this->ScalarRange[0])
+      {
+      min = this->ScalarRange[0];
+      }
+    if (max < this->ScalarRange[1])
+      {
+      max = this->ScalarRange[1];
+      }
+    }  
+  this->WholeScalarRange[0] = min;
+  this->WholeScalarRange[1] = max;
+  this->ScalarRangeWidget->SetWholeRange(min,max);    
+  
+  // We might change the range also.
+  double newRange[2];
+  newRange[0] = this->ScalarRange[0];
+  newRange[1] = this->ScalarRange[1];
+  // Do not let the range outside of the whole range.
+  if (newRange[0] < min)
+    {
+    newRange[0] = min;
+    }
+  if (newRange[1] > max)
+    {
+    newRange[1] = max;
+    }
+    
+  // If the range is not locked by the user,
+  // set the range to the whole rnage.
+  if ( ! this->ScalarRangeLock)
+    { // Expand the range with whole range.
+    newRange[0] = min;
+    newRange[1] = max;
+    }
+    
+  this->SetScalarRangeInternal(newRange[0], newRange[1]);
 
   // Compute an appropriate resolution.
-  double x = range[1]-range[0];
+  double x = max-min;
   x = log10(x);
   // shift place value over 2 (100 divisions).
   int place = (int)(x) - 2;
-  this->ColorRangeWidget->SetResolution(pow(10.0, (double)(place)));
-
-  this->RMScalarBarWidget->GetScalarRange(tmp);
-  this->ColorRangeWidget->SetRange(tmp[0], tmp[1]);
+  this->ScalarRangeWidget->SetResolution(pow(10.0, (double)(place)));
 }
 
 //----------------------------------------------------------------------------
@@ -1872,8 +1938,8 @@ void vtkPVColorMap::UpdateEnableState()
   this->PropagateEnableState(this->TitleTextPropertyWidget);
   this->PropagateEnableState(this->LabelTextPropertyWidget);
   this->PropagateEnableState(this->PresetsMenuButton);
-  this->PropagateEnableState(this->ColorRangeFrame);
-  this->PropagateEnableState(this->ColorRangeWidget);
+  this->PropagateEnableState(this->ScalarRangeFrame);
+  this->PropagateEnableState(this->ScalarRangeWidget);
   this->PropagateEnableState(this->BackButton);
 }
 
@@ -1891,5 +1957,10 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarBarVisibility: " << this->ScalarBarVisibility << endl;
   os << indent << "VisitedFlag: " << this->VisitedFlag << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
+  
+  os << indent << "ScalarRange: " << this->ScalarRange[0] << ", " 
+     << this->ScalarRange[1] << endl;
+  os << indent << "WholeScalarRange: " << this->WholeScalarRange[0] << ", " 
+     << this->WholeScalarRange[1] << endl;
 }
 

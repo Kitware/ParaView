@@ -104,14 +104,7 @@ public:
   // This method should be called immediately after the object is constructed.
   // It create VTK objects which have to exist on all processes.
   void CreateParallelTclObjects(vtkPVApplication *pvApp);
-          
-  // Description:
-  // Sets the color range of all the mappers (all procs) and updates
-  // the user interface as well.
-  void SetScalarRange(double min, double max);
-  void SetScalarRangeInternal(double min, double max);
-  double *GetScalarRange();
-      
+                
   // Description:
   // Looks at all of the data object for a global range.
   // This also sets the color map to automatic.  In the future,
@@ -157,7 +150,12 @@ public:
   // Description:
   // Callbacks.
   void ScalarBarCheckCallback();
-  void ColorRangeWidgetCallback();
+  void ScalarRangeWidgetCallback();
+  void LockCheckCallback();
+
+  // Description:
+  // Access for scripts.
+  void SetScalarRangeLock(int val);
 
   // Description:
   // This method returns the user to the source page.
@@ -235,10 +233,22 @@ public:
   virtual void RenderView();
 
   // Description:
-  // Call this method before you show this GUI so that
-  // the widgets will reflect changes in the data.
-  // Right now it just sets the whole range of the color range widget.
-  virtual void Update();
+  // Call this when a source starts using this map, or
+  // when the source changes.  It expands the whole range to include
+  // the range of the source.
+  void UpdateForSource(vtkPVSource* source);
+
+  // Description:
+  // Sets the whole range of color map slider.
+  void SetWholeScalarRange(double min, double max);
+  vtkGetVector2Macro(WholeScalarRange,double);
+
+  // Description:
+  // Sets the color range of all the mappers (all procs) and updates
+  // the user interface as well.
+  void SetScalarRange(double min, double max);
+  void SetScalarRangeInternal(double min, double max);
+  vtkGetVector2Macro(ScalarRange,double);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -266,6 +276,7 @@ protected:
   void UpdateVectorComponentMenu();
   // Visibility depends on check and UseCount.
   void UpdateInternalScalarBarVisibility();
+  void ComputeScalarRangeForSource(vtkPVSource* pvs, double* range);
 
   void LabToXYZ(double Lab[3], double xyz[3]);
   void XYZToRGB(double xyz[3], double rgb[3]);
@@ -275,14 +286,21 @@ protected:
   int Initialized;
   int ScalarBarVisibility;
   int InternalScalarBarVisibility;
+  int UserModifiedScalarRange;
 
+  // Keep local ivars to avoid depending on widget values.
+  double ScalarRange[2];
+  // WholeScalarRange contain the maximums of the scalarRange widget.
+  double WholeScalarRange[2];
+  int ScalarRangeLock;
+  
   // User interaface.
   vtkKWLabeledFrame* ColorMapFrame;
   vtkKWLabel*        ArrayNameLabel;
   // Stuff for setting the range of the color map.
-  vtkKWWidget*       ColorRangeFrame;
-  vtkKWLabel*        ColorRangeLabel;
-  vtkKWRange*        ColorRangeWidget;
+  vtkKWWidget*       ScalarRangeFrame;
+  vtkKWCheckButton*  ScalarRangeLockCheck;
+  vtkKWRange*        ScalarRangeWidget;
   vtkKWScale*        NumberOfColorsScale;
   // Stuff for selecting start and end colors.
   vtkKWWidget*            ColorEditorFrame;

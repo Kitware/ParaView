@@ -84,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.9");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.10");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -935,7 +935,6 @@ void vtkPVDisplayGUI::EditColorMapCallback()
   this->Script("pack forget [pack slaves %s]",
           this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
           
-  this->PVSource->GetPVColorMap()->Update();
   this->Script("pack %s -side top -fill both -expand t",
           this->PVSource->GetPVColorMap()->GetWidgetName());
 }
