@@ -151,6 +151,7 @@ SET( ParaView_SRCS
   vtkTiledDisplaySchedule.cxx
   vtkVRMLSource.cxx
   vtkWeightedRedistributePolyData.cxx
+  vtkPVXDMFParameters.cxx
   vtkXDMFReaderModule.cxx
   vtkXMLCollectionReader.cxx
   vtkXMLPVCollectionWriter.cxx
