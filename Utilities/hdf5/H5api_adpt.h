@@ -22,15 +22,8 @@
 
 #if defined(WIN32) && !defined(__CYGWIN__)
 
-#if defined (vtkhdf5_EXPORTS)
-#  define _HDF5DLL_
-#else
-#  define _HDF5USEDLL_
-#endif
-
-
 #if defined(_HDF5DLL_)
-#pragma warning(disable: 4273)	/* Disable the dll linkage warnings */
+#pragma warning(disable: 4273)  /* Disable the dll linkage warnings */
 #define H5_DLL __declspec(dllexport)
 #define H5_DLLVAR __declspec(dllexport)
 #elif defined(_HDF5USEDLL_)
@@ -42,7 +35,7 @@
 #endif /* _HDF5DLL_ */
 
 #if defined(_HDF5TESTDLL_)
-#pragma warning(disable: 4273)	/* Disable the dll linkage warnings */
+#pragma warning(disable: 4273)  /* Disable the dll linkage warnings */
 #define H5TEST_DLL __declspec(dllexport)
 #define H5TEST_DLLVAR __declspec(dllexport)
 #elif defined(_HDF5TESTUSEDLL_)

@@ -545,3 +545,15 @@
 #pragma warning ( disable : 4706 )
 #pragma warning ( disable : 4786 )
 #endif
+
+#cmakedefine BUILD_SHARED_LIBS
+#if defined(BUILD_SHARED_LIBS) || defined(H5_BUILD_SHARED_LIBS)
+#  if defined (vtkhdf5_EXPORTS)
+#    define _HDF5DLL_
+#  else
+#    define _HDF5USEDLL_
+#  endif
+#endif
+
+
+
