@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.29");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -452,7 +452,7 @@ void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
   this->ButtonExp->SetCommand(this, "UpdateFunction exp");
   this->ButtonLog->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonLog->Create(pvApp, "");
-  this->ButtonLog->SetLabel("log");
+  this->ButtonLog->SetLabel("ln");
   this->ButtonLog->SetCommand(this, "UpdateFunction log");
   this->ButtonZero->SetParent(this->CalculatorFrame->GetFrame());
   this->ButtonZero->Create(pvApp, "");
