@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
+#include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkKWView.h"
 #include "vtkKWViewCollection.h"
 #include "vtkKWWidgetCollection.h"
@@ -67,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.173");
+vtkCxxRevisionMacro(vtkKWWindow, "1.174");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -537,6 +538,39 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   
   this->TrayImageError->SetBind(this, "<Button-1>", "ProcessErrorClick");
 
+  // If we have a User Interface Manager, it's time to create it
+
+  vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
+  if (uim && !uim->IsCreated())
+    {
+    uim->Create(app);
+    }
+
+  if (this->GetApplication()->HasRegisteryValue(
+        2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY) &&
+      !this->GetIntRegisteryValue(
+        2, "RunTime", VTK_KW_SHOW_MOST_RECENT_PANELS_REG_KEY))
+    {
+    this->ShowMostRecentPanels(0);
+    }
+  else
+    {
+    this->ShowMostRecentPanels(1);
+    }
+
+  vtkKWUserInterfaceNotebookManager *uim_nb = 
+    vtkKWUserInterfaceNotebookManager::SafeDownCast(uim);
+  if (uim_nb)
+    {
+    if (this->GetApplication()->HasRegisteryValue(
+          2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY))
+      {
+      uim_nb->SetEnableDragAndDrop(
+        this->GetIntRegisteryValue(
+          2, "RunTime", VTK_KW_ENABLE_GUI_DRAG_AND_DROP_REG_KEY));
+      }
+    }
+
   // Udpate the enable state
 
   this->UpdateEnableState();
@@ -875,6 +909,24 @@ void vtkKWWindow::ShowApplicationSettingsInterface()
     {
     this->ShowWindowProperties();
     this->GetApplicationSettingsInterface()->Raise();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::ShowMostRecentPanels(int arg)
+{
+  if (arg)
+    {
+    this->Notebook->ShowAllPagesWithSameTagOff();
+    this->Notebook->ShowOnlyPagesWithSameTagOff();
+    this->Notebook->SetNumberOfMostRecentPages(4);
+    this->Notebook->ShowOnlyMostRecentPagesOn();
+    }
+  else
+    {
+    this->Notebook->ShowAllPagesWithSameTagOff();
+    this->Notebook->ShowOnlyMostRecentPagesOff();
+    this->Notebook->ShowOnlyPagesWithSameTagOn();
     }
 }
 

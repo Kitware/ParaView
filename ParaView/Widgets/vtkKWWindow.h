@@ -206,6 +206,7 @@ public:
   // Description:
   // Allow access to the notebook object.
   vtkGetObjectMacro(Notebook,vtkKWNotebook);
+  virtual void ShowMostRecentPanels(int);
 
   // Description:
   // The toolbar container.
