@@ -34,30 +34,38 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Create a Tk widget
+  // Create the widget
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // Set the Range of the Extent, this is the range of
   // acceptable values for the sliders. Specified as 
   // minx maxx miny maxy minz maxz
-  void SetExtentRange(double *);
-  void SetExtentRange(double,double,double,double,double,double);
+  virtual void SetExtentRange(double*);
+  virtual void SetExtentRange(double, double, double, double, double, double);
   
   // Description:
   // Set/Get the Extent.
   vtkGetVector6Macro(Extent,double);
-  void SetExtent(double *);
-  void SetExtent(double,double,double,double,double,double);
+  virtual void SetExtent(double*);
+  virtual void SetExtent(double, double, double, double, double, double);
 
   // Description:
-  // handle the callback, this is called internally when one of the 
+  // Show/Hide part of the extent selectively (x, y, z).
+  vtkGetMacro(ShowXExtent, int);
+  vtkBooleanMacro(ShowXExtent, int);
+  virtual void SetShowXExtent(int);
+  vtkGetMacro(ShowYExtent, int);
+  vtkBooleanMacro(ShowYExtent, int);
+  virtual void SetShowYExtent(int);
+  vtkGetMacro(ShowZExtent, int);
+  vtkBooleanMacro(ShowZExtent, int);
+  virtual void SetShowZExtent(int);
+
+  // Description:
+  // Handle the callback, this is called internally when one of the 
   // sliders has been moved.
   void ExtentSelected();
-
-  vtkKWRange *GetXRange() { return this->XRange; };
-  vtkKWRange *GetYRange() { return this->YRange; };
-  vtkKWRange *GetZRange() { return this->ZRange; };
 
   // Description:
   // A method to set callback functions on objects.  The first argument is
@@ -69,10 +77,10 @@ public:
   // Description:
   // A convenience method to set the start and end method of all the
   // internal ranges.  
-  virtual void SetStartCommand(vtkKWObject* Object, 
-                               const char *MethodAndArgString);
-  virtual void SetEndCommand(vtkKWObject* Object, 
-                             const char *MethodAndArgString);
+  virtual void SetStartCommand(
+    vtkKWObject* Object, const char *MethodAndArgString);
+  virtual void SetEndCommand(
+    vtkKWObject* Object, const char *MethodAndArgString);
 
   // Description:
   // Convenience method to set whether the command should be called or not.
@@ -98,6 +106,12 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Access the internal vtkKWRange's.
+  vtkKWRange *GetXRange() { return this->XRange; };
+  vtkKWRange *GetYRange() { return this->YRange; };
+  vtkKWRange *GetZRange() { return this->ZRange; };
+
 protected:
   vtkKWExtent();
   ~vtkKWExtent();
@@ -108,6 +122,10 @@ protected:
   vtkKWRange  *XRange;
   vtkKWRange  *YRange;
   vtkKWRange  *ZRange;
+
+  int ShowXExtent;
+  int ShowYExtent;
+  int ShowZExtent;
 
   // Pack or repack the widget
 

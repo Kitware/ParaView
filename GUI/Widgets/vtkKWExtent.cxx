@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.28");
+vtkCxxRevisionMacro(vtkKWExtent, "1.29");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -41,6 +41,10 @@ vtkKWExtent::vtkKWExtent()
   this->Extent[3] = 0;
   this->Extent[4] = 0;
   this->Extent[5] = 0;
+
+  this->ShowXExtent = 1;
+  this->ShowYExtent = 1;
+  this->ShowZExtent = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -121,12 +125,29 @@ void vtkKWExtent::Pack()
 
   ostrstream tk_cmd;
 
-  tk_cmd << "pack "
-         << this->XRange->GetWidgetName() << " "
-         << this->YRange->GetWidgetName() << " "
-         << this->ZRange->GetWidgetName() << " "
-         << "-padx 2 -pady 2 -fill both -expand yes -anchor w "
-         << "-side " << (is_horiz ? "top" : "left") << endl;
+  if (this->ShowXExtent)
+    {
+    tk_cmd << "pack "
+           << this->XRange->GetWidgetName() << " "
+           << "-padx 2 -pady 2 -fill both -expand yes -anchor w "
+           << "-side " << (is_horiz ? "top" : "left") << endl;
+    }
+  
+  if (this->ShowYExtent)
+    {
+    tk_cmd << "pack "
+           << this->YRange->GetWidgetName() << " "
+           << "-padx 2 -pady 2 -fill both -expand yes -anchor w "
+           << "-side " << (is_horiz ? "top" : "left") << endl;
+    }
+  
+  if (this->ShowZExtent)
+    {
+    tk_cmd << "pack "
+           << this->ZRange->GetWidgetName() << " "
+           << "-padx 2 -pady 2 -fill both -expand yes -anchor w "
+           << "-side " << (is_horiz ? "top" : "left") << endl;
+    }
   
   tk_cmd << ends;
   this->Script(tk_cmd.str());
@@ -134,7 +155,7 @@ void vtkKWExtent::Pack()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetExtentRange(double *er)
+void vtkKWExtent::SetExtentRange(double er[6])
 {
   this->SetExtentRange(er[0],er[1],er[2],er[3],er[4],er[5]);
 }
@@ -186,9 +207,48 @@ void vtkKWExtent::SetExtent(double x1, double x2,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetExtent(double *er)
+void vtkKWExtent::SetExtent(double er[6])
 {
   this->SetExtent(er[0],er[1],er[2],er[3],er[4],er[5]);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetShowXExtent(int arg)
+{
+  if (this->ShowXExtent == arg)
+    {
+    return;
+    }
+
+  this->ShowXExtent = arg;
+  this->Pack();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetShowYExtent(int arg)
+{
+  if (this->ShowYExtent == arg)
+    {
+    return;
+    }
+
+  this->ShowYExtent = arg;
+  this->Pack();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetShowZExtent(int arg)
+{
+  if (this->ShowZExtent == arg)
+    {
+    return;
+    }
+
+  this->ShowZExtent = arg;
+  this->Pack();
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -397,5 +457,11 @@ void vtkKWExtent::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Extent: " << this->GetExtent() << endl;
+  os << indent << "ShowXExtent: " 
+     << (this->ShowXExtent ? "On" : "Off") << endl;
+  os << indent << "ShowYExtent: " 
+     << (this->ShowYExtent ? "On" : "Off") << endl;
+  os << indent << "ShowZExtent: " 
+     << (this->ShowZExtent ? "On" : "Off") << endl;
 }
 
