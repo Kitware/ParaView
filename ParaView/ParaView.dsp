@@ -313,22 +313,6 @@ SOURCE=.\vtkPVImageDataTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVImageMandelbrotSource.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVImageMandelbrotSourceTcl.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVImageShiftScale.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVImageShiftScaleTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVImageSlice.cxx
 # End Source File
 # Begin Source File
@@ -1035,46 +1019,6 @@ SOURCE=.\vtkPVImageData.h
 # Begin Custom Build
 InputPath=.\vtkPVImageData.h
 InputName=vtkPVImageData
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVImageMandelbrotSource.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVImageMandelbrotSource.h
-InputName=vtkPVImageMandelbrotSource
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVImageShiftScale.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVImageShiftScale.h
-InputName=vtkPVImageShiftScale
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -137,6 +137,13 @@ public:
                            char *ext, vtkKWObject *o = NULL);
 
   // Description:
+  // Formats the command with brackets so that sopaces are preserved.  
+  // Label is put to left of entry.
+  // The methods are called on the object (VTKSource if o=NULL).
+  vtkKWEntry *AddStringEntry(char *label, char *setCmd, char *getCmd,
+                             vtkKWObject *o = NULL);
+ 
+   // Description:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkKWEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,

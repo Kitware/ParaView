@@ -46,6 +46,12 @@ class vtkPVAssignment;
 class vtkPVApplication;
 class vtkPVData;
 
+#define VTK_PV_ACTOR_COMPOSITE_NO_MODE            0
+#define VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE      1
+#define VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE     2
+#define VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE 3
+#define VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE 4
+
 class VTK_EXPORT vtkPVActorComposite : public vtkKWActorComposite
 {
 public:
@@ -72,6 +78,12 @@ public:
   void Select(vtkKWView *v);
   void Deselect(vtkKWView *v);
   
+  // Description:
+  // This method is meant to setup the actor/mapper
+  // to best disply it input.  This will involve setting the scalar range,
+  // and possibly other properties. 
+  void Initialize();
+
   // Description:
   // This flag turns the visibility of the prop on and off.  These methods transmit
   // the state change to all of the satellite processes.
@@ -109,7 +121,25 @@ public:
   void AmbientChanged();
   void SetAmbient(float ambient);
   
+  // Description:
+  // Different modes for displaying the input.
+  void SetMode(int mode);
+  void SetModeToDataSet()
+    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE);}
+  void SetModeToPolyData()
+    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE);}
+  void SetModeToImageOutline()
+    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE);}
+  void SetModeToImageTexture()
+    {this->SetMode(VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE);}
+
+  // Description:
+  // We need our own set input to take any type of data (based on mode).
+  void SetInput(vtkDataSet *input);
+  void SetInput(vtkPolyData *input) {this->SetInput((vtkDataSet*)input);}
+
 protected:
+
   vtkPVActorComposite();
   ~vtkPVActorComposite();
   vtkPVActorComposite(const vtkPVActorComposite&) {};
@@ -128,6 +158,10 @@ protected:
   
   // the data object that owns this composite
   vtkPVData *PVData;
+
+  int Mode;
+  // Super class stores a vtkPolyDataInput, this is a more general input.
+  vtkDataSet *DataSetInput;
 };
 
 #endif

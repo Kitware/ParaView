@@ -128,7 +128,7 @@ void vtkPVAnimation::CreateProperties()
   frame->Delete();
   frame = NULL;
 
-  this->AddLabeledEntry("Method:", "SetMethod", "GetMethod", this);
+  this->AddStringEntry("Method:", "SetMethod", "GetMethod", this);
   this->TimeMin = this->AddLabeledEntry("Start:", "SetStart", "GetStart",this);
   this->TimeMin->Register(this);
   this->TimeMax = this->AddLabeledEntry("End:", "SetEnd", "GetEnd", this);
@@ -164,16 +164,44 @@ void vtkPVAnimation::AcceptCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVAnimation::SetObject(vtkPVSource *object)
+{
+  if (object == this->Object)
+    {
+    return;
+    }
+
+  if (this->Object)
+    {
+    this->Object->UnRegister(this);
+    this->Object = NULL;
+    this->SetMethod(NULL);
+    }
+  if (object)
+    {
+    object->Register(this);
+    this->Object = object;
+    // This is a dirty way to get around formating my own string.
+    this->Script("%s SetMethod {%s SetTime $time}", this->GetTclName(),
+                 this->Object->GetVTKSourceTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVAnimation::SetCurrent(float time)
 {  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   if (this->Current == time)
     {
     return;
     }
 
-  this->Script(this->Method, this->Object->GetTclName(), time);
-  this->GetPVApplication()->BroadcastScript(this->Method, 
-                                              this->Object->GetTclName(), time);
+  this->Script("set time %f", time);
+  pvApp->BroadcastScript("set time %f", time);
+  this->Script(this->Method);
+  pvApp->BroadcastScript(this->Method);
+
   this->TimeScale->SetValue(time);
   this->Current = time;
 }

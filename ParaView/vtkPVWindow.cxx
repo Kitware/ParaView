@@ -43,13 +43,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVAssignment.h"
 #include "vtkPVSource.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVImageMandelbrotSource.h"
 #include "vtkPVImageData.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVAnimation.h"
-#include "vtkPVRunTimeContour.h"
 #include "vtkSuperquadricSource.h"
+#include "vtkRunTimeContour.h"
+#include "vtkImageMandelbrotSource.h"
 
 
 //----------------------------------------------------------------------------
@@ -688,17 +688,45 @@ vtkPVImageSource *vtkPVWindow::CreateImageReader()
 // Setup the pipeline
 void vtkPVWindow::CreateFractalVolume()
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-  vtkPVImageMandelbrotSource *source;
+  static int instanceCount = 0;
+  vtkPVSource *pvs;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkImageMandelbrotSource *ms;
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  pvs = pvApp->MakePVSource("vtkPVImageSource","vtkImageMandelbrotSource",
+                            "Fractal", ++instanceCount);
+  if (pvs == NULL) {return;}
   
-  source = vtkPVImageMandelbrotSource::New();
-  source->Clone(pvApp);
-  
-  source->SetName("fractalVolume");
-  this->MainView->AddComposite(source);
-  this->SetCurrentSource(source);
-  
-  source->Delete();
+  // Set up the defaults.
+  ms = vtkImageMandelbrotSource::SafeDownCast(pvs->GetVTKSource());
+  ms->SetOriginCX(-0.733569, 0.24405, 0.296116, 0.0);
+  ms->SetSampleCX(1.38125e-005, 1.38125e-005, 1.0e-004, 1.0e-004);
+  ms->SetWholeExtent(-50, 50, -50, 50, -50, 50);
+  /* Small values get munged through tcl?
+  this->Script("%s SetOriginCX -0.733569 0.24405 0.296116 0.0253163", 
+               pvs->GetVTKSourceTclName());
+  this->Script("%s SetSampleCX 1.38125e-005 1.38125e-005 1.0e-004 1.0e-004", 
+               pvs->GetVTKSourceTclName());
+  this->Script("%s SetWholeExtent -50 50 -50 50 -50 50", 
+               pvs->GetVTKSourceTclName());
+  */
+  // Add the new Source to the View, and make it current.
+  this->MainView->AddComposite(pvs);
+  this->SetCurrentSource(pvs);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  pvs->AddVector6Entry("Extent:","X",NULL,"Y",NULL,"Z",NULL,"SetWholeExtent","GetWholeExtent");
+  pvs->AddVector3Entry("SubSpace:","X","Y","Z", "SetProjectionAxes", "GetProjectionAxes");
+  pvs->AddVector4Entry("Origin:","Cr","Ci","Xr","Xi","SetOriginCX","GetOriginCX");
+  pvs->AddVector4Entry("Spacing:","Cr","Ci","Xr","Xi","SetSampleCX","GetSampleCX");
+  pvs->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //pvs->Delete();
 }
 
 //----------------------------------------------------------------------------

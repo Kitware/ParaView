@@ -28,7 +28,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageData.h"
 #include "vtkPVImageClip.h"
 #include "vtkPVImageSlice.h"
-#include "vtkPVImageShiftScale.h"
 #include "vtkPVWindow.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkPVAssignment.h"
@@ -42,19 +41,12 @@ int vtkPVImageDataCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVImageData::vtkPVImageData()
 {
-  this->OutlineFlag = 1;
   this->CommandFunction = vtkPVImageDataCommand;
-  this->GeometryFilter = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVImageData::~vtkPVImageData()
 {
-  if (this->GeometryFilter)
-    {
-    this->GeometryFilter->Delete();
-    this->GeometryFilter = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -62,27 +54,6 @@ vtkPVImageData* vtkPVImageData::New()
 {
   return new vtkPVImageData();
 }
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVImageData::SetOutlineFlag(int f)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->OutlineFlag == f)
-    {
-    return;
-    }
-  this->Modified();
-  this->OutlineFlag = f;
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutlineFlag %d", this->GetTclName(), f);
-    }  
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVImageData::Clip()
@@ -114,60 +85,84 @@ void vtkPVImageData::Clip()
 //----------------------------------------------------------------------------
 void vtkPVImageData::Slice()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVImageSlice *slice;
-  
-  slice = vtkPVImageSlice::New();
-  slice->Clone(pvApp);
-
-  slice->SetInput(this);  
-  slice->SetName("slice");
-  
+  static int instanceCount = 0;
+  vtkPVImageSlice *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  this->GetPVSource()->GetView()->AddComposite(slice);
-  
-  window->SetCurrentSource(slice);
-  
+  int *ext, d0, d1, d2;
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVImageSlice::SafeDownCast(
+          pvApp->MakePVSource("vtkPVImageSlice",
+                              "vtkImageClip", "Slice", ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetInput(this);
+
+  this->Script("%s ClipDataOn", f->GetVTKSourceTclName());
+
   // Lets try to setup a good default parameters.
   this->GetImageData()->UpdateInformation();
-  int *ext = this->GetImageData()->GetWholeExtent();
-  if (ext[0] == ext[1])
+  ext = this->GetImageData()->GetWholeExtent();
+  d0 = ext[1] - ext[0] + 1;
+  d1 = ext[3] - ext[2] + 1;
+  d2 = ext[5] - ext[4] + 1;
+  // This seems kind of stupid.
+  if (d0 < d1 && d0 < d2)
     {
-    slice->SetSliceNumber(ext[0]);
-    slice->SetSliceAxis(0);
+    f->SetSliceNumber(ext[0]);
+    f->SetSliceAxis(0);
     }
-  else if (ext[2] == ext[3])
+  else if (d1 < d2)
     {
-    slice->SetSliceNumber(ext[1]);
-    slice->SetSliceAxis(1);
+    f->SetSliceNumber(ext[1]);
+    f->SetSliceAxis(1);
     }
   else
     {
-    slice->SetSliceNumber((int)(((float)(ext[4]) + (float)(ext[5])) * 0.5));
-    slice->SetSliceAxis(2);
+    f->SetSliceNumber((int)(((float)(ext[4]) + (float)(ext[5])) * 0.5));
+    f->SetSliceAxis(2);
     }
   
-  slice->Delete();
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImageData::ShiftScale()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVImageShiftScale *f;
+  static int instanceCount = 0;
+  vtkPVImageToImageFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
 
-  f = vtkPVImageShiftScale::New();
-  f->Clone(pvApp);    
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVImageToImageFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVImageToImageFilter",
+                              "vtkImageShiftScale", "ShiftScale", ++instanceCount));
+  if (f == NULL) {return;}
   f->SetInput(this);
   
-  f->SetName("ShiftScale");
-  
-  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  // Add the new Source to the View, and make it current.
   this->GetPVSource()->GetView()->AddComposite(f);
-  
   window->SetCurrentSource(f);
-  
-  f->Delete();
+
+  // Add some source specific widgets.
+  // Normally these would be added in the CreateProperties method.
+  f->AddLabeledEntry("Shift:", "SetShift", "GetShift");
+  f->AddLabeledEntry("Scale:", "SetScale", "GetScale");
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
+
 }
 
 //----------------------------------------------------------------------------
@@ -190,6 +185,7 @@ void vtkPVImageData::SetData(vtkDataSet *data)
 {
   vtkImageOutlineFilter *outline;
   vtkImageData *image = vtkImageData::SafeDownCast(data);
+  int *ext;
   
   if (data != NULL && image == NULL)
     {
@@ -204,25 +200,23 @@ void vtkPVImageData::SetData(vtkDataSet *data)
     image->SetExtentTranslator(this->Assignment->GetTranslator());
     }
   
-  // This should really be changed to switch mappers.  The flag
-  // could them be turned on and off ...
-  if (this->OutlineFlag)
+  // Mode will tell the actor composite how to create the mapper.
+  this->ActorComposite->SetInput(data);
+
+  // Determine which mode to use.
+  image->UpdateInformation();
+  ext = image->GetWholeExtent();
+  if (ext[1]==ext[0] || ext[3]==ext[2] || ext[5]==ext[4])
     {
-    image->UpdateInformation();
-    outline = vtkImageOutlineFilter::New();
-    outline->SetInput(image);
-    this->ActorComposite->SetInput(outline->GetOutput());
-    outline->Delete();
+    this->ActorComposite->SetModeToDataSet();
+    // Sets the scalar range...
+    this->ActorComposite->Initialize();
     }
   else
     {
-    image->UpdateInformation();
-    if (this->GeometryFilter == NULL)
-      {
-      this->GeometryFilter = vtkGeometryFilter::New();
-      }
-    this->GeometryFilter->SetInput(image);
-    this->ActorComposite->SetInput(this->GeometryFilter->GetOutput());
+    this->ActorComposite->SetModeToImageOutline();
+    // Sets the scalar range...
+    this->ActorComposite->Initialize();
     }
 }
 

@@ -34,6 +34,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVAssignment.h"
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
+#include "vtkImageOutlineFilter.h"
+#include "vtkGeometryFilter.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -71,6 +73,8 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->AmbientScale = vtkKWScale::New();
   
   this->PVData = NULL;
+  this->DataSetInput = NULL;
+  this->Mode = VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE;
 }
 
 //----------------------------------------------------------------------------
@@ -247,6 +251,17 @@ void vtkPVActorComposite::SetPVData(vtkPVData *data)
     data->SetActorComposite(this);
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::Initialize()
+{
+  float range[2];
+
+  this->GetInputScalarRange(range);
+  this->SetScalarRange(range[0], range[1]);
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::GetInputScalarRange(float range[2]) 
@@ -448,3 +463,87 @@ vtkPVApplication* vtkPVActorComposite::GetPVApplication()
     return NULL;
     } 
 }
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetInput(vtkDataSet *input)
+{
+  int save = this->Mode;
+  
+  if (this->DataSetInput)
+    {
+    this->DataSetInput->UnRegister(this);
+    this->DataSetInput = NULL;
+    }
+  if (input)
+    {
+    input->Register(this);
+    this->DataSetInput = input;
+    }
+
+  // So the user can set mode and input in either order.
+  // Force a mode change. This will set the super classes input.
+  this->Mode = VTK_PV_ACTOR_COMPOSITE_NO_MODE;
+  this->SetMode(save);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetMode(int mode)
+{
+  if (this->Mode == mode)
+    {
+    return;
+    }
+
+  this->Mode = mode;
+
+  if (this->DataSetInput == NULL)
+    {
+    return;
+    }
+
+  if (this->DataSetInput->IsA("vtkPolyData"))
+    { // Only one mode for poly data.
+    if (mode != VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
+      {
+      vtkWarningMacro("Use poly data mode for poly data input.");
+      this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
+      }
+    this->vtkKWActorComposite::SetInput((vtkPolyData*)this->DataSetInput);
+    return;
+    }
+
+  if (this->DataSetInput->IsA("vtkImageData"))
+    { // Three possible modes for image data.
+    if (mode == VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE)
+      {
+      vtkWarningMacro("You cannot use poly data mode with an image input.");
+      this->Mode = VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE;
+      }
+    if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
+      {
+      vtkImageOutlineFilter *outline = vtkImageOutlineFilter::New();
+      outline->SetInput((vtkImageData *)(this->DataSetInput));
+      this->vtkKWActorComposite::SetInput(outline->GetOutput());
+      outline->Delete();
+      return;
+      }
+    if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE)
+      {
+      // ???
+      vtkErrorMacro("Textures are not implemented yet.");
+      return;
+      }
+    }
+    
+  // Default to data set mode.
+  if (mode != VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
+    {
+    vtkWarningMacro("Use data set mode.");
+    this->Mode = VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE;
+    }
+  vtkGeometryFilter *geom = vtkGeometryFilter::New();
+  geom->SetInput(this->DataSetInput);
+  this->vtkKWActorComposite::SetInput(geom->GetOutput());
+  geom->Delete();
+}
+

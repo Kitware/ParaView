@@ -92,7 +92,6 @@ int vtkPVSelectionList::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::SetCommand(vtkKWObject *o, const char *method)
 {
-  vtkErrorMacro("SetCommand");
   if (this->Command)
     {
     delete [] this->Command;

@@ -72,7 +72,7 @@ public:
 
   // Description:
   // The object which is bieng manipulated.
-  vtkSetObjectMacro(Object,vtkPVSource);
+  void SetObject(vtkPVSource *object);
   vtkGetObjectMacro(Object,vtkPVSource);
 
   // Description:

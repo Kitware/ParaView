@@ -63,14 +63,6 @@ public:
   int Create(char *args);
   
   // Description:
-  // When this ivar is true, then an outline is used to represent the image.
-  // The Set method is parallel and all clones 
-  // outline flags are set the same way.
-  void SetOutlineFlag(int f);
-  vtkGetMacro(OutlineFlag,int);
-  vtkBooleanMacro(OutlineFlag,int);
-
-  // Description:
   // Through runtime checking, this data must be a vtkImageData.
   void SetData(vtkDataSet *image);
   vtkImageData *GetImageData();
@@ -93,14 +85,10 @@ protected:
   ~vtkPVImageData();
   vtkPVImageData(const vtkPVImageData&) {};
   void operator=(const vtkPVImageData&) {};
-  
-  int OutlineFlag;
-  
+    
   vtkPVImageTextureFilter *TextureFilter;
   vtkTexture *Texture;
-  
-  vtkGeometryFilter *GeometryFilter;
-};
+  };
 
 #endif
 

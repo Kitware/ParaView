@@ -270,7 +270,6 @@ void vtkPVImageClip::ExtentsChanged()
     this->GetExtentStyle()->SetCallbackMethod(ExtentCallback, this);
     pvi = vtkPVImageData::New();
     pvi->Clone(pvApp);
-    pvi->OutlineFlagOff();
     this->SetPVOutput(pvi);
     a = window->GetPreviousSource()->GetPVData()->GetAssignment();
     pvi->SetAssignment(a);

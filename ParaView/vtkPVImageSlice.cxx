@@ -163,8 +163,8 @@ void vtkPVImageSlice::UpdateVTKSource()
     ext[4] = ext[5] = this->SliceNumber;
     }
 
-  vtkErrorMacro("slice: " << this->SliceNumber << ", axes: " << this->SliceAxis);
-  vtkErrorMacro("ext: " << ext[0] << ", " << ext[1] << ", " << ext[2]
+  vtkDebugMacro("slice: " << this->SliceNumber << ", axes: " << this->SliceAxis);
+  vtkDebugMacro("ext: " << ext[0] << ", " << ext[1] << ", " << ext[2]
                 << ", " << ext[3] << ", " << ext[4] << ", " << ext[5]);
 
   clip->SetOutputWholeExtent(ext);
@@ -174,7 +174,8 @@ void vtkPVImageSlice::UpdateVTKSource()
 void vtkPVImageSlice::SetSliceNumber(int num)
 {
   if (this->SliceNumber == num)
-    {
+    { // This is needed in case the user chooses the default values.
+    this->UpdateVTKSource();
     return;
     }
   
