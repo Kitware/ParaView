@@ -14,8 +14,6 @@
 =========================================================================*/
 #include "vtkPVAdvancedReaderModule.h"
 
-#include "vtkCollectionIterator.h"
-#include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -25,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.25");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.26");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

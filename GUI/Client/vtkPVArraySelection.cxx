@@ -14,6 +14,7 @@
 =========================================================================*/
 #include "vtkPVArraySelection.h"
 
+#include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
@@ -23,7 +24,6 @@
 #include "vtkKWLabel.h"
 #include "vtkKWFrameLabeled.h"
 #include "vtkKWPushButton.h"
-#include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
@@ -31,7 +31,6 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkSMStringListRangeDomain.h"
 #include "vtkSMStringVectorProperty.h"
-#include "vtkTclUtil.h"
 
 #include <vtkstd/string>
 #include <vtkstd/set>
@@ -42,7 +41,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.64");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.65");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,

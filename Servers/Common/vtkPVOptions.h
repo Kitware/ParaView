@@ -84,6 +84,7 @@ public:
   vtkGetStringMacro(DataServerHostName);
   vtkGetStringMacro(RenderServerHostName);
   vtkGetStringMacro(ClientHostName);
+
   // Description:
   // Set/Get the type of the process for this set of options.
   // data-server, render-server, combined-server or client.
@@ -119,6 +120,7 @@ public:
   // Pass in the name and the attributes for all tags that are not Options.
   // If it returns 1, then it is successful, and 0 if it failed.
   virtual int ParseExtraXMLTag(const char* , const char** ) {return 1;}
+
   // Description:
   // Is this in render server mode.
   vtkGetMacro(ClientRenderServer, int);
@@ -162,6 +164,7 @@ protected:
   // This method is called when wrong argument is found. If it returns 0, then
   // the parsing will fail.
   virtual int WrongArgument(const char* argument);
+
   // Description:
   // This method is called when a deprecated argument is found. If it returns 0, then
   // the parsing will fail.
@@ -251,5 +254,5 @@ private:
   char** Argv;
 };
 
-#endif // #ifndef __vtkPVOptions_h
+#endif
 

@@ -94,11 +94,12 @@ public:
   // Description:
   // Callback for when the plot moves needs access to this display.
   // Maybe callback should be part of this object?
-  vtkSMProxy* GetXYPlotActorProxy(){return this->XYPlotActorProxy;}
+  vtkGetObjectMacro(XYPlotActorProxy,vtkSMProxy);
 
   //BTX
   // Description:
   // The Probe needs access to this to fill in the UI point values.
+  // Only needed when probing one point only
   vtkPolyData *GetCollectedData();
   //ETX
 

@@ -505,6 +505,7 @@ protected:
   // This is the state of the user selection. The CubeAxesDisplay
   // visibility is the value "visibility and CubeAxesVisibility".
   int CubeAxesVisibility;
+
   // This is different than the PointLabelDisplay visibility.
   // This is the state of the user selection. The PointLabelDisplay
   // visibility is the value "visibility and PointLabelVisibility".
@@ -529,7 +530,7 @@ protected:
   
   vtkPVSourceNotebook *Notebook;
   // Since the notebook is share between all sources,
-  // we remeber the raised page to restore when the source is selected.
+  // we remember the raised page to restore when the source is selected.
   // This ivar is set and used by vtkPVWindow.
   int SavedRaisedNotebookPageId;
 

@@ -14,11 +14,10 @@
 =========================================================================*/
 #include "vtkPVReaderModule.h"
 
-#include "vtkCollectionIterator.h"
-#include "vtkKWFrame.h"
 #include "vtkObjectFactory.h"
+#include "vtkCollectionIterator.h"
 #include "vtkPVApplication.h"
-#include "vtkPVDisplayGUI.h"
+#include "vtkKWFrame.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVScale.h"
 #include "vtkPVProcessModule.h"
@@ -32,7 +31,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.59");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.60");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -349,8 +348,8 @@ void vtkPVReaderModule::SetReaderFileName(const char* fname)
     vtkSMProperty *prop = this->FileEntry->GetSMProperty();
     this->FileEntry->SetValue(fname);
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  // Since this is a reader, it is ok to assume that there is on
-  // VTKSource. Hence, the use of index 0.
+    // Since this is a reader, it is ok to assume that there is on
+    // VTKSource. Hence, the use of index 0.
     if (prop)
       {
       vtkClientServerStream stream;

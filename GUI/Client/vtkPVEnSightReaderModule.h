@@ -27,8 +27,6 @@
 // .SECTION See also
 // vtkPVReadermodule vtkPVEnSightReaderModule vtkPVPLOT3DReaderModule
 
-
-
 #ifndef __vtkPVEnSightReaderModule_h
 #define __vtkPVEnSightReaderModule_h
 
@@ -40,7 +38,7 @@ public:
   static vtkPVEnSightReaderModule* New();
   vtkTypeRevisionMacro(vtkPVEnSightReaderModule, vtkPVAdvancedReaderModule);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+ 
   // Description:
   // If the source is a vtkPVEnSightMasterServerReader, this sets the
   // controller.  In either case, the superclass's implementation of
@@ -51,7 +49,7 @@ public:
   // Save the pipeline to a batch file which can be run without
   // a user interface.
   virtual void SaveInBatchScript(ofstream *file);
-  
+ 
 protected:
   vtkPVEnSightReaderModule();
   ~vtkPVEnSightReaderModule();
@@ -60,7 +58,7 @@ protected:
   // first time.
   virtual int InitializeData();
   virtual void CreateProperties();
-  
+ 
 private:
   vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&); // Not implemented
   void operator=(const vtkPVEnSightReaderModule&); // Not implemented

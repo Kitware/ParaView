@@ -27,7 +27,6 @@ class vtkDataArraySelection;
 class vtkKWLabel;
 class vtkKWFrameLabeled;
 class vtkKWPushButton;
-class vtkKWRadioButton;
 class vtkPVArraySelectionArraySet;
 
 class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
@@ -115,9 +114,9 @@ protected:
   virtual void SetPropertyFromGUI();
 
   char* LabelText;
-  
+ 
   vtkKWFrameLabeled* LabeledFrame;
-  
+ 
   vtkKWWidget* ButtonFrame;
   vtkKWPushButton* AllOnButton;
   vtkKWPushButton* AllOffButton;
@@ -127,11 +126,8 @@ protected:
   vtkKWLabel *NoArraysLabel;
 
   vtkDataArraySelection* Selection;
-  
+ 
   vtkPVArraySelectionArraySet* ArraySet;
-
-  vtkPVArraySelection(const vtkPVArraySelection&); // Not implemented
-  void operator=(const vtkPVArraySelection&); // Not implemented
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
@@ -140,6 +136,10 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+private:
+  vtkPVArraySelection(const vtkPVArraySelection&); // Not implemented
+  void operator=(const vtkPVArraySelection&); // Not implemented
 };
 
 #endif

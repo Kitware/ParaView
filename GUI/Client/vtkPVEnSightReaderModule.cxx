@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVDisplayGUI.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVColorMap.h"
@@ -24,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.55");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.56");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
