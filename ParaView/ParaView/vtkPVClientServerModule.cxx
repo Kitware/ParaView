@@ -112,7 +112,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.7");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.8");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -156,7 +156,7 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
 //----------------------------------------------------------------------------
 // Each server process starts with this method.  One process is designated as
 // "master" to handle communication.  The other processes are slaves.
-void vtkPVClientServerInit(vtkMultiProcessController *controller, void *arg )
+void vtkPVClientServerInit(vtkMultiProcessController *, void *arg )
 { 
   vtkPVClientServerModule *self = (vtkPVClientServerModule*)arg;
   self->Initialize();
@@ -202,7 +202,7 @@ void vtkPVClientServerModule::Initialize()
     //this->Controller->CreateOutputWindow();
 
     // Receive as the hand shake the number of processes available.
-    int numServerProcs;
+    int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
     this->NumberOfServerProcesses = numServerProcs;
    
@@ -279,25 +279,21 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   // and is linked with MPI.
 #ifdef VTK_USE_MPI
   this->Controller = vtkMPIController::New();
+  vtkMultiProcessController::SetGlobalController(this->Controller);
+  this->Controller->Initialize(&argc, &argv, 1);
+  this->ArgumentCount = argc;
+  this->Arguments = argv;
+  this->Controller->SetSingleMethod(vtkPVClientServerInit, (void *)(this));
+  this->Controller->SingleMethodExecute();
+  this->Controller->Finalize();
 #else
   this->Controller = vtkDummyController::New();
   // This would be simpler if vtkDummyController::SingleMethodExecute
   // did its job correctly.
   vtkMultiProcessController::SetGlobalController(this->Controller);
   vtkPVClientServerInit(this->Controller, (void*)this);
-  return this->ReturnValue;
 #endif
 
-  vtkMultiProcessController::SetGlobalController(this->Controller);
-
-  this->Controller->Initialize(&argc, &argv, 1);
-
-  this->ArgumentCount = argc;
-  this->Arguments = argv;
-
-  this->Controller->SetSingleMethod(vtkPVClientServerInit, (void *)(this));
-  this->Controller->SingleMethodExecute();
-  this->Controller->Finalize();
 
   return this->ReturnValue;
 }
@@ -451,7 +447,7 @@ void vtkPVClientServerModule::RemoteSimpleScript(int remoteId, const char *str)
 void vtkPVClientServerModule::RelayScriptRMI(const char *str)
 {
   int id, num;
-  int destination;
+  int destination = 0;
     
   this->SocketController->Receive(&destination, 1, 1, VTK_PV_REMOTE_SCRIPT_DESTINATION_TAG);
   // We count the client as process 0.
@@ -606,7 +602,7 @@ int vtkPVClientServerModule::GetPVDataNumberOfCells(vtkPVData *pvd)
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendDataNumberOfCells(vtkDataSet *data)
 {
-  int numCells;
+  int numCells = 0;
   
   if (this->ClientMode)
     {
@@ -622,7 +618,7 @@ void vtkPVClientServerModule::SendDataNumberOfCells(vtkDataSet *data)
 
   // Only process 0 of the server gets to this point.
   int num, id;
-  float tmp;
+  int tmp = 0;
 
   numCells = data->GetNumberOfCells();
   num = this->Controller->GetNumberOfProcesses();
@@ -658,7 +654,7 @@ int vtkPVClientServerModule::GetPVDataNumberOfPoints(vtkPVData *pvd)
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendDataNumberOfPoints(vtkDataSet *data)
 {
-  int numPoints;
+  int numPoints = 0;
   
   if (this->ClientMode)
     {
@@ -674,7 +670,7 @@ void vtkPVClientServerModule::SendDataNumberOfPoints(vtkDataSet *data)
 
   // Only process 0 of the server gets to this point.
   int num, id;
-  int tmp;
+  int tmp = 0;
 
   numPoints = data->GetNumberOfPoints();
   num = this->Controller->GetNumberOfProcesses();
@@ -930,7 +926,7 @@ void vtkPVClientServerModule::SendCompleteArrays(vtkMapper *mapper)
   int i;
 
   // Info for sends.
-  int num;
+  int num = 0;
   int type;
   int numComps;
   int nameLength;

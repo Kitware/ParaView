@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVProcessModule_h
 
 #include "vtkKWObject.h"
-#include "vtkMultiProcessController.h"
+class vtkMultiProcessController;
 class vtkPVData;
 class vtkPVApplication;
 class vtkMapper;

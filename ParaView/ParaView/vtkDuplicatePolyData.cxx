@@ -23,7 +23,7 @@
 #include "vtkSocketController.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.5");
+vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.6");
 vtkStandardNewMacro(vtkDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -317,6 +317,7 @@ void vtkDuplicatePolyData::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "SocketController: (" << this->SocketController << ")\n";
     os << indent << "ClientFlag: " << this->ClientFlag << endl;
     }
+  os << indent << "Synchronous: " << this->Synchronous << endl;
 
   os << indent << "Schedule:\n";
   indent = indent.GetNextIndent();

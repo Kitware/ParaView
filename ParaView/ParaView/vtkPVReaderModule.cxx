@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.15");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.16");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -237,6 +237,7 @@ const char* vtkPVReaderModule::GetExtension(vtkIdType i)
 void vtkPVReaderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "AcceptAfterRead: " << this->AcceptAfterRead << endl;
-  os << "PackFileEntry: " << this->PackFileEntry << endl;
+  os << indent << "AcceptAfterRead: " << this->AcceptAfterRead << endl;
+  os << indent << "PackFileEntry: " << this->PackFileEntry << endl;
+  os << indent << "FileEntry: " << this->FileEntry << endl;
 }

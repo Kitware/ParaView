@@ -27,8 +27,7 @@
 #define __vtkDuplicatePolyData_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
-#include "vtkSocketController.h"
-
+class vtkSocketController;
 class vtkMultiProcessController;
 
 class VTK_EXPORT vtkDuplicatePolyData : public vtkPolyDataToPolyDataFilter
