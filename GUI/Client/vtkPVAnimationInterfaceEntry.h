@@ -32,7 +32,7 @@ class vtkKWRange;
 class vtkPVAnimationInterfaceEntryObserver;
 class vtkKWText;
 class vtkPVWidgetProperty;
-class vtkKWLabeledRadioButtonSet;
+class vtkKWLabeledOptionMenu;
 class vtkKWScale;
 class vtkKWThumbWheel;
 
@@ -205,9 +205,10 @@ protected:
   vtkKWFrame *TimeScriptEntryFrame;
   vtkKWLabeledEntry *StartTimeEntry;
   vtkKWLabeledEntry *EndTimeEntry;
-  vtkKWLabeledRadioButtonSet *TimeEquationStyleEntry;
+  vtkKWLabeledOptionMenu *TimeEquationStyleEntry;
   vtkKWScale *TimeEquationPhaseEntry;
   vtkKWThumbWheel *TimeEquationFrequencyEntry;
+  vtkKWWidget *TimeEquationFrame;
 
   // Menu Showing all of the possible methods of the selected source.
   vtkKWLabel*        MethodLabel;
