@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.1");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.2");
 vtkStandardNewMacro(vtkPVJoystickFly);
 
 //-------------------------------------------------------------------------
@@ -107,34 +107,29 @@ void vtkPVJoystickFly::OnButtonDown(int x, int y, vtkRenderer *ren,
 
 
 //-------------------------------------------------------------------------
-void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer *ren,
-                                  vtkRenderWindowInteractor *rwi)
+void vtkPVJoystickFly::OnButtonUp(int, int, vtkRenderer*,
+                                  vtkRenderWindowInteractor*)
 {
   this->FlyFlag = 0;
 }
 
 //-------------------------------------------------------------------------
-void vtkPVJoystickFly::OnMouseMove(int x, int y, vtkRenderer *ren,
-                                   vtkRenderWindowInteractor *rwi)
+void vtkPVJoystickFly::OnMouseMove(int x, int y, vtkRenderer*,
+                                   vtkRenderWindowInteractor*)
 {
-  if (ren == NULL)
-    {
-    return;
-    }
-
   this->LastX = x;
   this->LastY = y;
 }
 
 //-------------------------------------------------------------------------
 void vtkPVJoystickFly::Fly(vtkRenderer* ren, vtkRenderWindowInteractor *rwi,
-                           float scale, float ispeed)
+                           float, float ispeed)
 {
   if ( this->FlyFlag || !this->Application )
     {
     return;
     }
-
+  
   this->FlyFlag = 1;
 
   // Need to update the instance variables for mouse position
