@@ -61,7 +61,8 @@ void vtkPVWindow::UpdateStatusImage()
       image_PVLogoSmall, 
       image_PVLogoSmall_width, 
       image_PVLogoSmall_height,
-      image_PVLogoSmall_pixel_size))
+      image_PVLogoSmall_pixel_size,
+      image_PVLogoSmall_buffer_length))
       {
       vtkWarningMacro("Error updating status image!" << this->StatusImageName);
       return;

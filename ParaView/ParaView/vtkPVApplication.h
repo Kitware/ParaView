@@ -265,7 +265,11 @@ protected:
 
   void CreateButtonPhotos();
   void CreateSplashScreen();
-  void CreatePhoto(char *name, unsigned char *data, int width, int height, int pixel_size, char *filename = 0);
+  void CreatePhoto(char *name, 
+                   unsigned char *data, 
+                   int width, int height, int pixel_size, 
+                   unsigned long buffer_length = 0,
+                   char *filename = 0);
   int CheckRegistration();
   int PromptRegistration(char *,char *);
 
