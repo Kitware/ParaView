@@ -2504,7 +2504,7 @@
 }
 {
    <insert a suppression name here>
-   Memcheck:Value1
+   Memcheck:Addr1
    fun:strcmp
    fun:_dl_map_object_internal
 }
