@@ -28,6 +28,7 @@ vtkPVContourEntry.cxx
 vtkPVData.cxx 
 vtkPVDataSetFileEntry.cxx
 vtkPVDataSetReaderModule.cxx
+vtkPVEnSightArraySelection.cxx
 vtkPVEnSightReaderModule.cxx
 vtkPVErrorLogDisplay.cxx
 vtkPVExtentEntry.cxx

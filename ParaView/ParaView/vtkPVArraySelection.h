@@ -100,6 +100,10 @@ public:
   // Save this widget to a file.  
   virtual void SaveInTclScript(ofstream *file);
 
+  // Description:
+  // Get the number of array names listed in this widget.
+  int GetNumberOfArrays();
+  
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -107,7 +111,8 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVArraySelection* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                      vtkArrayMap<vtkPVWidget*,
+                                      vtkPVWidget*>* map);
 //ETX
   
 protected:
@@ -118,7 +123,7 @@ protected:
   char* VTKReaderTclName;
 
   vtkKWLabeledFrame* LabeledFrame;
-
+  
   vtkKWWidget* ButtonFrame;
   vtkKWPushButton* AllOnButton;
   vtkKWPushButton* AllOffButton;
@@ -136,7 +141,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
   int ReadXMLAttributes(vtkPVXMLElement* element,

@@ -1670,7 +1670,10 @@ void vtkPVData::ColorByPropertyInternal()
   this->Script("pack %s -side left",
                this->ColorButton->GetWidgetName());
 
-  this->GetPVRenderView()->EventuallyRender();
+  if (this->GetPVRenderView())
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
 }
 
 
@@ -2608,7 +2611,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.126 $");
+  this->ExtractRevision(os,"$Revision: 1.127 $");
 }
 
 //----------------------------------------------------------------------------

@@ -50,6 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWOKCancelDialog.h"
+#include "vtkPVEnSightArraySelection.h"
+#include "vtkKWOptionMenu.h"
 
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
@@ -76,6 +79,11 @@ vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
 {
   this->CommandFunction = vtkPVEnSightReaderModuleCommand;
 
+  this->NumberOfRequestedPointVariables = 0;
+  this->NumberOfRequestedCellVariables = 0;
+  this->RequestedPointVariables = 0;
+  this->RequestedCellVariables = 0;
+  
   this->VerifierTclName = 0;
 #ifdef VTK_USE_MPI
   this->Verifier = 0;
@@ -86,6 +94,25 @@ vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
 vtkPVEnSightReaderModule::~vtkPVEnSightReaderModule()
 {
   this->DeleteVerifier();
+  
+  int i;
+  for (i = 0; i < this->NumberOfRequestedPointVariables; i++)
+    {
+    delete [] this->RequestedPointVariables[i];
+    }
+  if (this->RequestedPointVariables)
+    {
+    delete [] this->RequestedPointVariables;
+    }
+  
+  for (i = 0; i < this->NumberOfRequestedCellVariables; i++)
+    {
+    delete [] this->RequestedCellVariables[i];
+    }
+  if (this->RequestedCellVariables)
+    {
+    delete [] this->RequestedCellVariables;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -210,6 +237,55 @@ int vtkPVEnSightReaderModule::InitialTimeSelection(
     timeDialog->Delete();
 
     return status;
+}
+
+//----------------------------------------------------------------------------
+// Prompt the user for the first variables loaded
+int vtkPVEnSightReaderModule::InitialVariableSelection(const char* tclName,
+                                                       vtkGenericEnSightReader *reader)
+{
+  vtkKWOKCancelDialog *dialog = vtkKWOKCancelDialog::New();
+  dialog->Create(this->Application, "");
+  dialog->SetMasterWindow(this->GetPVWindow());
+  dialog->SetTitle("Select variables");
+  
+  vtkPVEnSightArraySelection *pointSelect = vtkPVEnSightArraySelection::New();
+  pointSelect->SetParent(dialog);
+  pointSelect->SetAttributeName("Point");
+  pointSelect->SetVTKReaderTclName(tclName);
+  pointSelect->Create(this->Application);
+  pointSelect->AllOnCallback();
+  
+  vtkPVEnSightArraySelection *cellSelect = vtkPVEnSightArraySelection::New();
+  cellSelect->SetParent(dialog);
+  cellSelect->SetAttributeName("Cell");
+  cellSelect->SetVTKReaderTclName(tclName);
+  cellSelect->Create(this->Application);
+  cellSelect->AllOnCallback();
+  
+  if (pointSelect->GetNumberOfArrays() > 0)
+    {
+    this->Script("pack %s -side top -fill x -expand t",
+                 pointSelect->GetWidgetName());
+    }
+  if (cellSelect->GetNumberOfArrays() > 0)
+    {
+    this->Script("pack %s -side top -fill x -expand t",
+                 cellSelect->GetWidgetName());
+    }
+  
+  int status = dialog->Invoke();
+  if (status)
+    {
+    pointSelect->Accept();
+    cellSelect->Accept();
+    }
+  
+  pointSelect->Delete();
+  cellSelect->Delete();
+  dialog->Delete();
+  
+  return status;
 }
 
 //----------------------------------------------------------------------------
@@ -503,6 +579,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
 
   int numTimeSets = reader->GetTimeSets()->GetNumberOfItems();
   float time = timeValue;
+
   if ( numTimeSets > 0 )
     {
     reader->SetTimeValue(reader->GetTimeSets()->GetItem(0)->GetTuple1(0));
@@ -519,16 +596,43 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     pvApp->BroadcastScript("%s SetTimeValue %12.5e", tclName, time);
     }
 
+  pvApp->BroadcastScript("%s ReadAllVariablesOff", tclName);
+  int numVariables = reader->GetNumberOfVariables() +
+    reader->GetNumberOfComplexVariables();
+
+  if (numVariables > 0)
+    {
+    if ( ! pvApp->GetRunningParaViewScript())
+      {
+      if ( this->InitialVariableSelection(tclName, reader) == 0)
+        {
+        pvApp->BroadcastScript("%s Delete", tclName);
+        delete [] tclName;
+        this->DeleteVerifier();
+        return VTK_ERROR;
+        }
+      }
+    else
+      {
+      for (i = 0; i < this->NumberOfRequestedPointVariables; i++)
+        {
+        pvApp->BroadcastScript("%s AddPointVariableName %s",
+                               tclName, this->RequestedPointVariables[i]);
+        }
+      for (i = 0; i < this->NumberOfRequestedCellVariables; i++)
+        {
+        pvApp->BroadcastScript("%s AddCellVariableName %s",
+                               tclName, this->RequestedCellVariables[i]);
+        }
+      }
+    }
+
   ostrstream namestr;
   namestr << "_tmp_ensightreadermodule" << this->PrototypeInstanceCount 
           << ends;
   char* name = namestr.str();
   pvApp->AddTraceEntry("vtkPVEnSightReaderModule %s", name);
-  pvApp->AddTraceEntry("%s ReadFile %s %12.5e Application $kw(%s)", name, 
-                       fname, time, window->GetTclName());
-  pvApp->AddTraceEntry("%s Delete", name);
-  delete[] name;
-
+  
 #ifdef VTK_USE_MPI
   if (masterFile)
     {
@@ -548,6 +652,66 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   pvApp->BroadcastScript("%s Update", tclName);
 #endif
   
+  if (numVariables > 0)
+    {
+    int numNonComplexVariables = reader->GetNumberOfVariables();
+    int numComplexVariables = reader->GetNumberOfComplexVariables();
+    
+    for (i = 0; i < numNonComplexVariables; i++)
+      {
+      switch (reader->GetVariableType(i))
+        {
+        case 0:
+        case 1:
+        case 2:
+        case 6:
+        case 7:
+          if (reader->IsRequestedVariable(reader->GetDescription(i), 0))
+            {
+            pvApp->AddTraceEntry("%s AddPointVariable %s",
+                                 name, reader->GetDescription(i));
+            }
+          break;
+        case 3:
+        case 4:
+        case 5:
+          if (reader->IsRequestedVariable(reader->GetDescription(i), 1))
+            {
+            pvApp->AddTraceEntry("%s AddCellVariable %s",
+                                 name, reader->GetDescription(i));
+            }
+          break;
+        }
+      }
+    for (i = 0; i < numComplexVariables; i++)
+      {
+      switch (reader->GetComplexVariableType(i))
+        {
+        case 8:
+        case 9:
+          if (reader->IsRequestedVariable(reader->GetComplexDescription(i), 0))
+            {
+            pvApp->AddTraceEntry("%s AddPointVariable %s",
+                                 name, reader->GetComplexDescription(i));
+            }
+          break;
+        case 10:
+        case 11:
+          if (reader->IsRequestedVariable(reader->GetComplexDescription(i), 1))
+            {
+            pvApp->AddTraceEntry("%s AddCellVariable %s",
+                                 name, reader->GetComplexDescription(i));
+            }
+          break;
+        }
+      }
+    }
+  
+  pvApp->AddTraceEntry("%s ReadFile %s %12.5e Application $kw(%s)", name, 
+                       fname, time, window->GetTclName());
+  pvApp->AddTraceEntry("%s Delete", name);
+  delete[] name;
+
   numOutputs = reader->GetNumberOfOutputs();
   if (numOutputs < 1)
     {
@@ -721,17 +885,66 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     select->Delete();
     }
 
+  if ( numVariables > 0 )
+    {
+    vtkPVEnSightArraySelection *pointSelect =
+      vtkPVEnSightArraySelection::New();
+    pointSelect->SetParent(pvs->GetParameterFrame()->GetFrame());
+    pointSelect->SetPVSource(pvs);
+    pointSelect->SetVTKReaderTclName(tclName);
+    pointSelect->SetAttributeName("Point");
+    pointSelect->Create(pvApp);
+    pointSelect->SetTraceName("selectPointVariables");
+    pointSelect->SetModifiedCommand(pvs->GetTclName(),
+                                    "SetAcceptButtonColorToRed");
+
+    vtkPVEnSightArraySelection *cellSelect = vtkPVEnSightArraySelection::New();
+    cellSelect->SetParent(pvs->GetParameterFrame()->GetFrame());
+    cellSelect->SetPVSource(pvs);
+    cellSelect->SetVTKReaderTclName(tclName);
+    cellSelect->SetAttributeName("Cell");
+    cellSelect->Create(pvApp);
+    cellSelect->SetTraceName("selectCellVariables");
+    cellSelect->SetModifiedCommand(pvs->GetTclName(),
+                                   "SetAcceptButtonColorToRed");
+
+    if (pointSelect->GetNumberOfArrays() > 0)
+      {
+      pvApp->Script("pack %s -side top -fill x -expand t",
+                    pointSelect->GetWidgetName());
+      }
+    if (cellSelect->GetNumberOfArrays() > 0)
+      {
+      pvApp->Script("pack %s %s -side top -fill x -expand t",
+                    cellSelect->GetWidgetName());
+      }
+    
+    pvs->AddPVWidget(pointSelect);
+    pvs->AddPVWidget(cellSelect);
+    pointSelect->Delete();
+    cellSelect->Delete();
+    }
+  
   window->GetSourceList("Sources")->AddItem(pvs);
   pvs->UpdateParameterWidgets();
+  vtkPVData *pvOutput;
+  
   if (numOutputs > 1)
     {
     pvs->GetPVOutput()->SetVisibilityInternal(0);
-    pvs->GetPVOutput()->GetPVConsumer(0)->GetPVOutput()->ResetColorRange();
+    pvOutput =
+      pvs->GetPVOutput()->GetPVConsumer(0)->GetPVOutput();
+    if (strcmp(pvOutput->GetColorMenu()->GetValue(), "Property") != 0)
+      {
+      pvs->GetPVOutput()->GetPVConsumer(0)->GetPVOutput()->ResetColorRange();
+      }
     }
 
   window->ResetCameraCallback();
   window->GetMainView()->DisableRenderingFlagOff();
-  pvs->Accept(0);
+  // need AcceptCallbackFlag to be set so Reset isn't called when VTK
+  // parameters change during Accept
+  pvs->AcceptCallback();
   window->SetCurrentPVSource(pvs);
   
   pvs->Delete();
@@ -744,3 +957,78 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   return VTK_OK;
 }
 
+void vtkPVEnSightReaderModule::AddPointVariable(const char* variableName)
+{
+  int size = this->NumberOfRequestedPointVariables;
+  int i;
+  
+  char **newNameList = new char *[size]; // temporary array
+  
+  // copy variable names and attribute types to temporary arrays
+  for (i = 0; i < size; i++)
+    {
+    newNameList[i] = new char[strlen(this->RequestedPointVariables[i]) + 1];
+    strcpy(newNameList[i], this->RequestedPointVariables[i]);
+    delete [] this->RequestedPointVariables[i];
+    }
+  if (this->RequestedPointVariables)
+    {
+    delete [] this->RequestedPointVariables;
+    }
+  
+  // make room for new variable names
+  this->RequestedPointVariables = new char *[size+1];
+  
+  // copy existing variables names back to the RequestedPointVariables array
+  for (i = 0; i < size; i++)
+    {
+    this->RequestedPointVariables[i] = new char[strlen(newNameList[i]) + 1];
+    strcpy(this->RequestedPointVariables[i], newNameList[i]);
+    delete [] newNameList[i];
+    }
+  delete [] newNameList;
+  
+  // add new variable name at end of RequestedPointVariables array
+  this->RequestedPointVariables[size] = new char[strlen(variableName) + 1];
+  strcpy(this->RequestedPointVariables[size], variableName);
+  
+  this->NumberOfRequestedPointVariables++;
+}
+
+void vtkPVEnSightReaderModule::AddCellVariable(const char* variableName)
+{
+  int size = this->NumberOfRequestedCellVariables;
+  int i;
+  
+  char **newNameList = new char *[size]; // temporary array
+  
+  // copy variable names and attribute types to temporary arrays
+  for (i = 0; i < size; i++)
+    {
+    newNameList[i] = new char[strlen(this->RequestedCellVariables[i]) + 1];
+    strcpy(newNameList[i], this->RequestedCellVariables[i]);
+    delete [] this->RequestedCellVariables[i];
+    }
+  if (this->RequestedCellVariables)
+    {
+    delete [] this->RequestedCellVariables;
+    }
+  
+  // make room for new variable names
+  this->RequestedCellVariables = new char *[size+1];
+  
+  // copy existing variables names back to the RequestedCellVariables array
+  for (i = 0; i < size; i++)
+    {
+    this->RequestedCellVariables[i] = new char[strlen(newNameList[i]) + 1];
+    strcpy(this->RequestedCellVariables[i], newNameList[i]);
+    delete [] newNameList[i];
+    }
+  delete [] newNameList;
+  
+  // add new variable name at end of RequestedPointVariables array
+  this->RequestedCellVariables[size] = new char[strlen(variableName) + 1];
+  strcpy(this->RequestedCellVariables[size], variableName);
+  
+  this->NumberOfRequestedCellVariables++;
+}

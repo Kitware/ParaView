@@ -89,7 +89,7 @@ public:
   // with MPI support)
   virtual int ReadFile(const char* fname, vtkPVReaderModule*& prm);
   virtual int ReadFile(const char* fname, float timeValue,
-		       vtkPVApplication* pvApp, vtkPVWindow* window);
+                       vtkPVApplication* pvApp, vtkPVWindow* window);
 
   // Description:
   // The EnSight reader can actually be used to check a file to see if it
@@ -98,6 +98,11 @@ public:
   // relevant.
   virtual int CanReadFile(const char* fname);
 
+  // Description:
+  // Access from trace file to specifying which point/cell variables to read
+  void AddPointVariable(const char* variableName);
+  void AddCellVariable(const char* variableName);
+  
 protected:
   vtkPVEnSightReaderModule();
   ~vtkPVEnSightReaderModule();
@@ -111,13 +116,18 @@ protected:
   char* CreateTclName(const char* fname);
   
   // Prompt the user for the time step loaded first.
-  int InitialTimeSelection(const char* tclName, 
-			   vtkGenericEnSightReader* reader, float& time);
+  int InitialTimeSelection(const char* tclName,
+                           vtkGenericEnSightReader* reader, float& time);
 
+  // Prompt the user for the variables loaded first.
+  int InitialVariableSelection(const char* tclName,
+                               vtkGenericEnSightReader* reader);
+  
   // Make sure that all case files in the master file are compatible.
   vtkEnSightReader* VerifyMasterFile(vtkPVApplication* app,
-				     const char* tclName, 
-				     const char* filename);
+                                     const char* tclName,
+                                     const char* filename);
+  
   // Make sure that all time steps are compatible.
   void VerifyTimeSets(vtkPVApplication* app, const char* filename);
   // Make sure that all parts are compatible.
@@ -126,7 +136,11 @@ protected:
   void DeleteVerifier();
   void DisplayErrorMessage(const char* message, int warning);
 
-
+  int NumberOfRequestedPointVariables;
+  int NumberOfRequestedCellVariables;
+  char** RequestedPointVariables;
+  char** RequestedCellVariables;
+  
 private:
   vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&); // Not implemented
   void operator=(const vtkPVEnSightReaderModule&); // Not implemented

@@ -64,7 +64,7 @@ vtkPVArraySelection::vtkPVArraySelection()
   
   this->VTKReaderTclName = NULL;
   this->AttributeName = NULL;
-
+  
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->ButtonFrame = vtkKWWidget::New();
   this->AllOnButton = vtkKWPushButton::New();
@@ -133,7 +133,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
     {
     this->LabeledFrame->SetLabel("Point Arrays");
     }
-  else
+  else if (strcmp(this->AttributeName, "Cell") == 0)
     {
     this->LabeledFrame->SetLabel("Cell Arrays");
     }
@@ -174,16 +174,16 @@ void vtkPVArraySelection::Reset()
 {
   vtkKWCheckButton* checkButton;
   int row = 0;
-
+  
   // See if we need to create new check buttons.
   this->Script("%s GetFileName", this->VTKReaderTclName);
-
+    
   // Filename not set
   if (this->Application->GetMainInterp()->result[0] == '\0')
     {
     return;
     }
-
+  
   if (this->FileName == NULL || 
       strcmp(this->FileName, this->Application->GetMainInterp()->result) != 0)
     {
@@ -364,15 +364,16 @@ void vtkPVArraySelection::SaveInTclScript(ofstream *file)
 }
 
 vtkPVArraySelection* vtkPVArraySelection::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVArraySelection::SafeDownCast(clone);
 }
 
-void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone, 
-					 vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
+                                         vtkPVSource* pvSource,
+                                         vtkArrayMap<vtkPVWidget*,
+                                         vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVArraySelection* pvas = vtkPVArraySelection::SafeDownCast(clone);
@@ -405,6 +406,12 @@ int vtkPVArraySelection::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVArraySelection::GetNumberOfArrays()
+{
+  return this->ArrayCheckButtons->GetNumberOfItems();
 }
 
 //----------------------------------------------------------------------------
