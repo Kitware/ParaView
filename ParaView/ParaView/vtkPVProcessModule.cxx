@@ -73,7 +73,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.3");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.4");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -83,7 +83,7 @@ int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVProcessModule::vtkPVProcessModule()
 {
   this->Controller = NULL;
-  this->TemporaryInformation;  
+  this->TemporaryInformation = NULL;  
 }
 
 //----------------------------------------------------------------------------
@@ -255,6 +255,11 @@ void vtkPVProcessModule::GatherDataInformation(vtkPVDataInformation* info,
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::GatherDataInformation(vtkDataSet *data)
 {
+  if (data == NULL)
+    {
+    vtkErrorMacro("Data Tcl name has not been set correctly.");
+    return;
+    }
   this->TemporaryInformation->CopyFromData(data);
 }
 
