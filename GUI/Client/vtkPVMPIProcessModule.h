@@ -52,28 +52,25 @@ public:
   // This breaks rmi loops and cleans up processes.`                
   virtual void Exit();
 
-  // Send the current vtkClientServerStream contents to the client.
-  // Also reset the vtkClientServerStream object.
+  // Description:
+  // Send the current ClientServerStream data to different places and 
+  // combinations of places.  Possible places are the Client, the 
+  // Server (data server), or the RenderServer.  Also the stream
+  // can be sent to the root of the render and data servers.
+  // Most combinations are possible.
   virtual void SendStreamToClient();
-
-  // Send the current vtkClientServerStream contents to the server.
-  // Also reset the vtkClientServerStream object.
   virtual void SendStreamToServer();
-
-  // Send the current vtkClientServerStream contents to the server
-  // root node.  Also reset the vtkClientServerStream object.
+  virtual void SendStreamToRenderServer();
   virtual void SendStreamToServerRoot();
-
-  // Description:
-  // Send current ClientServerStream data to the server and the client.
-  // Also reset the vtkClientServerStream object.
-  virtual void SendStreamToClientAndServer();
-
-  // Description:
-  // Send current ClientServerStream data to the server root and the client.
-  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToRenderServerRoot(); 
   virtual void SendStreamToClientAndServerRoot();
-
+  virtual void SendStreamToRenderServerAndServerRoot();
+  virtual void SendStreamToClientAndRenderServerRoot(); 
+  virtual void SendStreamToClientAndServer();
+  virtual void SendStreamToClientAndRenderServer();
+  virtual void SendStreamToRenderServerAndServer();
+  virtual void SendStreamToRenderServerClientAndServer();
+  
   // Description:
   // A method for getting generic information from the server.
   virtual void GatherInformationInternal(const char* infoClassName,

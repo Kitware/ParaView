@@ -49,7 +49,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.22");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.23");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -229,10 +229,23 @@ void vtkPVMPIProcessModule::SendStreamToServer()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToRenderServer()
+{
+  this->SendStreamToServer();
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVMPIProcessModule::SendStreamToServerRoot()
 {
   this->Interpreter->ProcessStream(*this->ClientServerStream);
   this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToRenderServerRoot()
+{ 
+  this->SendStreamToServer();
 }
 
 //----------------------------------------------------------------------------
@@ -246,6 +259,38 @@ void vtkPVMPIProcessModule::SendStreamToClientAndServerRoot()
 {
   this->SendStreamToServerRoot();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToRenderServerAndServerRoot()
+{
+  this->SendStreamToServerRoot();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToClientAndRenderServerRoot()
+{
+  this->SendStreamToClientAndServerRoot();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToClientAndRenderServer()
+{
+  this->SendStreamToClientAndServer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToRenderServerAndServer()
+{
+  this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMPIProcessModule::SendStreamToRenderServerClientAndServer()
+{
+  this->SendStreamToClientAndServer();
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVMPIProcessModule::SendStreamToServerInternal()
