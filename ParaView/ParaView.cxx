@@ -153,7 +153,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   if (myId == 0)
     { // The last process is for UI.
     // We need to pass the local controller to the UI process.
-    putenv("DISPLAY=:6.0");
+    //putenv("DISPLAY=:6.0");
     //putenv("DISPLAY=:0.0");
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     vtkPVApplication *app = vtkPVApplication::New();

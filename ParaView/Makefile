@@ -79,6 +79,7 @@ ParaView: Makefile ParaView.o vtktcl.o ${TOOLKIT_DEPENDS}
 	$(CXX) -o ParaView ParaView.o \
 	${TCL_LIB_FILE} ${KIT_LIBS} \
 	$(VIEWSDIR)/Widgets/vtkKWWidgetsTcl$(VTK_LIB_EXT) \
+	$(VIEWSDIR)/Widgets/vtkKWWidgets$(VTK_LIB_EXT) \
 	${USE_PATENTED_LIBS}	\
 	${USE_IMAGING_LIBS}	\
 	${USE_GRAPHICS_LIBS}	\
