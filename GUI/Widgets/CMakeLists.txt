@@ -18,7 +18,6 @@ INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
 
 SET( KWWidgets_SRCS
-  ${VTK_TCL_HOME}/vtktcl.c
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
   vtkKWBWidgets.cxx
@@ -180,7 +179,6 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  ${VTK_TCL_HOME}/vtktcl.c
   vtkKWEvent.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 

@@ -320,7 +320,6 @@ ADD_TEST(OtherTests-ParaView
   ${PARAVIEW_MPI_RUN_ONE} --disable-registry --start-empty
   ${PVClientTests_SOURCE_DIR}/Tcl/Other.pvs
   -D ${PVClientTestData}
-  -A ${VTK_TCL_HOME}
   )
 
 ADD_TEST (AnimationImages-ParaView 

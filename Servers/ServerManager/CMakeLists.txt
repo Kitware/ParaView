@@ -187,14 +187,11 @@ IF (PARAVIEW_BUILD_GUI)
     "${ServerManagerCommon_SRCS};${SMInstantiator_SRCS}"
     ""
     )
-  SET(VTK_TCL_HOME "${ParaView_SOURCE_DIR}/GUI")
   IF(NOT WIN32)
-    # Needed for vtktcl.c
     SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
     ADD_DEFINITIONS(-D_HPUX_SOURCE)
   ENDIF(NOT WIN32)
   ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
-    ${VTK_TCL_HOME}/vtktcl.c
     vtkPVProcessModuleBatchHelper.cxx)
   TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL 
     vtkPVServerCommonTCL vtkPVServerManager vtkCommonTCL)

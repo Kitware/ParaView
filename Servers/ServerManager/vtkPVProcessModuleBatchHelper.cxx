@@ -25,11 +25,11 @@
 
 #include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.7");
+vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.8");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
-extern "C" int Vtktcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvservermanagertcl_Init(Tcl_Interp *interp); 
 extern "C" int Vtkpvservercommontcl_Init(Tcl_Interp *interp); 
 
@@ -152,7 +152,7 @@ static Tcl_Interp *vtkPVProcessModuleBatchHelperInitializeTcl(int argc,
 
   // Initialize VTK
 
-  Vtktcl_Init(interp);
+  Vtkcommontcl_Init(interp);
   Vtkpvservermanagertcl_Init(interp); 
   Vtkpvservercommontcl_Init(interp); 
 

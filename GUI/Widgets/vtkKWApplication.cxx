@@ -60,9 +60,9 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.192");
+vtkCxxRevisionMacro(vtkKWApplication, "1.193");
 
-extern "C" int Vtktcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkcommontcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
 
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -704,7 +704,15 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   // Initialize VTK
 
-  Vtktcl_Init(interp);
+  if (Vtkcommontcl_Init(interp) != TCL_OK) 
+    {
+    if (err)
+        {
+        *err << "Vtkcommontcl_Init error: " 
+             << Tcl_GetStringResult(interp) << endl;
+        }
+    return NULL;
+    }
 
   // Initialize Widgets
 
