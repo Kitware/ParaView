@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.3");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.4");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -115,14 +115,6 @@ void vtkPVInteractorStyle::SetCenterOfRotation(float x, float y, float z)
 //-------------------------------------------------------------------------
 void vtkPVInteractorStyle::OnButtonDown(int button, int shift, int control)
 {
-  if ( control || this->Interactor->GetControlKey() )
-    {
-    cout << "Control key" << endl;
-    }
-  else
-    {
-    cout << "No control key" << endl;
-    }
   vtkPVCameraManipulator *manipulator;
 
   // Must not be processing an interaction to start another.
