@@ -42,25 +42,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVFileEntry.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWEntry.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLoadSaveDialog.h"
+#include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVXMLElement.h"
-#include "vtkStringList.h"
-#include "vtkPVProcessModule.h"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkString.h"
-#include "vtkKWScale.h"
-#include "vtkKWFrame.h"
-#include "vtkPVAnimationInterface.h"
-#include "vtkKWMenu.h"
+#include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.28");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -261,17 +262,25 @@ void vtkPVFileEntry::TimestepChangedCallback()
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::BrowseCallback()
 {
-  if (this->Extension)
+  ostrstream str;
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkKWLoadSaveDialog* loadDialog = pm->NewLoadSaveDialog();
+  loadDialog->Create(this->GetPVApplication(), 0);
+  loadDialog->SetTitle(this->GetLabel()?this->GetLabel():"Select File");
+  if(this->Extension)
     {
-    this->Script(
-      "%s SetValue [tk_getOpenFile -filetypes {{{} {.%s}} "
-      "{{All files} {*.*}}}]", 
-      this->GetTclName(), this->Extension);
+    loadDialog->SetDefaultExtension(this->Extension);
+    str << "{{} {." << this->Extension << "}} ";
     }
-  else
+  str << "{{All files} {*.*}}" << ends;  
+  loadDialog->SetFileTypes(str.str());
+  str.rdbuf()->freeze(0);  
+  if(loadDialog->Invoke())
     {
-    this->Script("%s SetValue [tk_getOpenFile]", this->GetTclName());
+    this->Script("%s SetValue {%s}", this->GetTclName(),
+                 loadDialog->GetFileName());
     }
+  loadDialog->Delete();
 }
 
 //----------------------------------------------------------------------------
