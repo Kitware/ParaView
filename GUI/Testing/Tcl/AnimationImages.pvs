@@ -6,13 +6,16 @@ set kw(vtkTemp43) [$kw(vtkTemp1) GetMainView]
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
-        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
-		set DataDir [lindex $argv [expr $i + 1]]
-        }
-        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
-            set rmui [$pv(vtkTemp43) GetRenderModuleUI]
-            catch {$rmui SetCompositeThreshold 0}
-        }
+       if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+          set DataDir [lindex $argv [expr $i + 1]]
+       }
+       if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+          set rmui [$pv(vtkTemp43) GetRenderModuleUI]
+          catch {$rmui SetCompositeThreshold 0}
+       }
+       if {[lindex $argv $i] == "-T" && $i < $argcm1} {
+          set TempDir [lindex $argv [expr $i + 1]]
+       }
     }
 }
 
@@ -56,19 +59,19 @@ update
 #[[$Application GetMainWindow] GetMainView] ForceRender
 
 # Save animation images
-$kw(vtkTemp164) SaveImages "$DataDir/Baseline/AnimationImages" {png}
+$kw(vtkTemp164) SaveImages "$TempDir/Baseline/AnimationImages" {png}
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [ComparePNG "$DataDir/Baseline/AnimationImages0001"]
+	$Application SetExitStatus [ComparePNG "$TempDir/Baseline/AnimationImages0001"]
     }
 }
 
-file delete "$DataDir/Baseline/AnimationImages0000.png"
-file delete "$DataDir/Baseline/AnimationImages0001.png"
-file delete "$DataDir/Baseline/AnimationImages0002.png"
-file delete "$DataDir/Baseline/AnimationImages0003.png"
+file delete "$TempDir/Baseline/AnimationImages0000.png"
+file delete "$TempDir/Baseline/AnimationImages0001.png"
+file delete "$TempDir/Baseline/AnimationImages0002.png"
+file delete "$TempDir/Baseline/AnimationImages0003.png"
 
 $Application Exit
 
