@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.3");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.4");
 
 #ifdef VTK_USE_MPI
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
@@ -475,6 +475,7 @@ void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
 }
 #endif
 
+#ifdef VTK_USE_MPI
 //----------------------------------------------------------------------------
 static int vtkPVEnSightMasterServerReaderIsSpace(char c)
 {
@@ -610,7 +611,16 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
     return VTK_ERROR;
     }
   
-  // The number of pieces is the number of EnSight servers.
-  this->NumberOfPieces = numServers;
+  // The number of pieces is minimum of the number of EnSight servers
+  // specified in the file and the number of processes to read the
+  // data.
+  int numProcs = this->Controller->GetNumberOfProcesses();
+  this->NumberOfPieces = (numServers < numProcs)? numServers:numProcs;
   return VTK_OK;
 }
+#else
+int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
+{
+  return VTK_ERROR;
+}
+#endif
