@@ -12,6 +12,7 @@ if {[info exists argc]} {
     
 set pv(vtkTemp1) [Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+$pv(vtkTemp43) SetBackgroundColor 0 0 0
 
 set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Extent}]

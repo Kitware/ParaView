@@ -19,6 +19,8 @@ proc AdjustContourValue { cnt val } {
 
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+set pv(vtkTemp43) [$pvWindow GetMainView]
+$pv(vtkTemp43) SetBackgroundColor 0 0 0
 
 #change to rotate camera interactor style
 $pvWindow ChangeInteractorStyle 1

@@ -9,6 +9,7 @@ if {[info exists argc]} {
 
 set kw(vtkTemp1) [Application GetMainWindow]
 set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
+$kw(vtkTemp44) SetBackgroundColor 0 0 0
 set kw(vtkTemp92) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp96) [$kw(vtkTemp1) GetPVSource GlyphSources Cone0]
 set kw(vtkTemp100) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]

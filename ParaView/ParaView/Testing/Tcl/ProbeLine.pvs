@@ -1,5 +1,6 @@
 set kw(vtkTemp1) [Application GetMainWindow]
 set kw(vtkTemp16) [$kw(vtkTemp1) GetMainView]
+$kw(vtkTemp16) SetBackgroundColor 0 0 0
 set kw(vtkTemp213) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
 $kw(vtkTemp213) AcceptCallback
 set kw(vtkTemp273) [$kw(vtkTemp1) CreatePVSource Probe]

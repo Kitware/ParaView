@@ -20,6 +20,7 @@ if { [catch {set fp [open "out.txt" w]}] != 0 } {
 
 set kw(vtkTemp1) [Application GetMainWindow]
 set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
+$kw(vtkTemp44) SetBackgroundColor 0 0 0
 set kw(vtkTemp90) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp94) [$kw(vtkTemp1) GetPVSource GlyphSources Cone0]
 set kw(vtkTemp98) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]
@@ -94,15 +95,19 @@ file delete -force out.txt
 
 # might as well do the image comparison.
 
+$kw(vtkTemp44) SetCameraState -1.425 1.244 7.301  -0.500 0.000 0.000  0.018 0.986 -0.166
+
 # Fix the size of the image.
 RenWin1 SetSize 300 300
 RenWin1 Render
 update
 
-for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-    if {[lindex $argv $i] == "-C"} {
-	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+if {[Application GetExitStatus] == 0} {
+    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+        if {[lindex $argv $i] == "-C"} {
+            source [lindex $argv [expr $i + 1]]
+            $Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+        }
     }
 }
    

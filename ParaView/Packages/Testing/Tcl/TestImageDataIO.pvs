@@ -12,6 +12,9 @@ if {[info exists argc]} {
 
 # Disable popup message dialogs.
 set kw(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$kw(vtkTemp1) GetMainView]
+$pv(vtkTemp43) SetBackgroundColor 0 0 0
+
 $kw(vtkTemp1) SetUseMessageDialog 0
 
 # Open the AltIO package.
