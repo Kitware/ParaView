@@ -67,17 +67,9 @@ public:
   virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
                           vtkRenderWindowInteractor *rwi);
 
-  // Description:
-  // For setting the center of rotation.
-  vtkSetVector3Macro(Center, float);
-  vtkGetVector3Macro(Center, float);
-  
 protected:
   vtkPVJoystickFly();
   ~vtkPVJoystickFly();
-
-  float Center[3];
-  float DisplayCenter[2];
 
   int In;
   int FlyFlag;
