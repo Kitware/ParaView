@@ -673,7 +673,7 @@ const char* vtkPVInitialize::StandardFilterInterfaces=
 "               help=\"Adjusts the parameters of the sphere to cut with.\"/>\n"
 "      </Item>\n"
 "    </SelectWidget>\n"
-"    <ContourEntry label=\"Cut Offset Values\" "
+"    <ContourEntry label=\"Cut Offset Values\" trace_name=\"Cut Values\""
 "                  help=\"List of current offset values. This can be used "
 "to create multiple cut planes/spheres with different centers. Each entry "
 "represents a new cut with center shifted by the offset value.\"/>\n"

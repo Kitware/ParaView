@@ -62,8 +62,6 @@ set pv(vtkTemp368) [$pv(vtkTemp366) GetPVWidget {Clip Function}]
 set pv(vtkTemp367) [$pv(vtkTemp368) GetPVWidget {Plane}]
 $pv(vtkTemp367) SetCenter -1.150 0.650 0.500
 $pv(vtkTemp367) SetNormal -0.54203 0.35221 -0.76299
-set pv(vtkTemp383) [$pv(vtkTemp366) GetPVWidget {Offset}]
-$pv(vtkTemp383) SetValue 0.2
 $pv(vtkTemp366) AcceptCallback
 
 set pv(vtkTemp395) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
