@@ -73,6 +73,7 @@ class VTK_EXPORT vtkKWEvent
     ImageCameraFocalPointAndPositionChangedEvent,
     ImageCameraResetEvent,
     ImageColorMappingEvent,
+    ImageInterpolateEvent,
     ImageCornerAnnotationChangedEvent,
     ImageDistanceVisibilityChangedEvent,
     ImageHeaderAnnotationChangedEvent,
