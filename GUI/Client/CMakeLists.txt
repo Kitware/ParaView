@@ -1,5 +1,5 @@
 PROJECT(PVClient)
-INCLUDE_REGULAR_EXPRESSION("(vtk.*|pv.*)")
+INCLUDE_REGULAR_EXPRESSION("(vtk.*|pv.*|kwsys.*)")
 
 IF (WIN32)
   ADD_DEFINITIONS(-DPARAVIEW_USE_WIN32_RW)
@@ -322,9 +322,13 @@ IF(WIN32 AND VTK_TK_RESOURCE_FILE)
   SET(PVClient_SRCS ${PVClient_SRCS} Resources/ParaView.rc)
 ENDIF(WIN32 AND VTK_TK_RESOURCE_FILE)
 
+SET(PV_EXE_BUILD_LIST paraview pvclient pvTestDriver)
+SET(PV_EXE_INSTALL_LIST paraview pvclient)
 
-ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
-ADD_EXECUTABLE(pvclient WIN32 ${PVClient_SRCS})
+ADD_EXECUTABLE(paraview${PV_EXE_SUFFIX} WIN32 ${ParaViewBinary_SRCS}) 
+ADD_EXECUTABLE(pvclient${PV_EXE_SUFFIX} WIN32 ${PVClient_SRCS})
+
+INSTALL_TARGETS(${PV_EXE_INSTALL} paraview${PV_EXE_SUFFIX} pvclient${PV_EXE_SUFFIX})
 
 SET(PV_TEST_CLEAN_COMMAND "" CACHE STRING
   "Command to run after a failed test to cleanup processes.  Example: \"killall -9 rsh paraview\"")
@@ -334,27 +338,27 @@ CONFIGURE_FILE(${PVGUI_SOURCE_DIR}/Client/pvTestDriverConfig.h.in
   ${PVGUI_BINARY_DIR}/Client/pvTestDriverConfig.h @ONLY IMMEDIATE
   ESCAPE_QUOTES)
 
-ADD_EXECUTABLE(pvTestDriver pvTestDriver.cxx)
-ADD_DEPENDENCIES(pvTestDriver paraview)
-TARGET_LINK_LIBRARIES(pvTestDriver kwsys)
+ADD_EXECUTABLE(pvTestDriver${PV_EXE_SUFFIX} pvTestDriver.cxx)
+ADD_DEPENDENCIES(pvTestDriver${PV_EXE_SUFFIX} paraview${PV_EXE_SUFFIX})
+TARGET_LINK_LIBRARIES(pvTestDriver${PV_EXE_SUFFIX} kwsys)
 
 IF(VTK_USE_CARBON)
   FIND_PROGRAM(VTK_APPLE_RESOURCE Rez /Developer/Tools)
   IF(VTK_APPLE_RESOURCE)
     ADD_CUSTOM_COMMAND(
-      TARGET paraview
+      TARGET paraview${PV_EXE_SUFFIX}
       POST_BUILD
       COMMAND ${VTK_APPLE_RESOURCE}
-      ARGS Carbon.r -o ${EXECUTABLE_OUTPUT_PATH}/paraview
+      ARGS Carbon.r -o ${EXECUTABLE_OUTPUT_PATH}/paraview${PV_EXE_SUFFIX}
       )
   ENDIF(VTK_APPLE_RESOURCE)
 ENDIF(VTK_USE_CARBON)
 
-TARGET_LINK_LIBRARIES (pvclient 
+TARGET_LINK_LIBRARIES (pvclient${PV_EXE_SUFFIX} 
   vtkKWParaViewCS
   vtkClientServer 
   ${PARAVIEW_ADDITIONAL_LIBRARIES})
-TARGET_LINK_LIBRARIES (paraview 
+TARGET_LINK_LIBRARIES (paraview${PV_EXE_SUFFIX} 
   vtkKWParaViewCS
   vtkClientServer 
   ${PARAVIEW_ADDITIONAL_LIBRARIES})
@@ -408,9 +412,23 @@ SET_SOURCE_FILES_PROPERTIES(vtkPVInitialize.cxx PROPERTIES OBJECT_DEPENDS
 INCLUDE (${PVGUI_BINARY_DIR}/Client/LocalUserOptions.cmake OPTIONAL)
 INCLUDE (${PVGUI_SOURCE_DIR}/Client/LocalUserOptions.cmake OPTIONAL)
 
-INSTALL_TARGETS(/bin paraview pvclient)
-
 IF(BUILD_SHARED_LIBS)
-  INSTALL_TARGETS(/lib vtkKWParaViewCS
+  INSTALL_TARGETS(${PV_INSTALL_LIB_DIR} vtkKWParaViewCS
     vtkKWParaView)
 ENDIF(BUILD_SHARED_LIBS)
+
+# Add shared link forwarding executables if necessary.
+IF(PV_NEED_SHARED_FORWARD)
+  FOREACH(pvexe ${PV_EXE_BUILD_LIST})
+    SET(PV_FORWARD_EXE ${pvexe}${PV_EXE_SUFFIX})
+    CONFIGURE_FILE(
+      ${ParaView_SOURCE_DIR}/Servers/Executables/pv-forward.c.in
+      ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c
+      @ONLY IMMEDIATE)
+    ADD_EXECUTABLE(${pvexe} ${CMAKE_CURRENT_BINARY_DIR}/${pvexe}-forward.c)
+    ADD_DEPENDENCIES(${pvexe} ${pvexe}${PV_EXE_SUFFIX})
+  ENDFOREACH(pvexe)
+  FOREACH(pvexe ${PV_EXE_INSTALL_LIST})
+    INSTALL_TARGETS(${PV_INSTALL_BIN_DIR} ${pvexe})
+  ENDFOREACH(pvexe)
+ENDIF(PV_NEED_SHARED_FORWARD)

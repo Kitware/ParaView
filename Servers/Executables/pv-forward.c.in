@@ -1,0 +1,29 @@
+/*=========================================================================
+
+Program:   ParaView
+Module:    pv-forward.c.in
+
+Copyright (c) Kitware, Inc.
+All rights reserved.
+See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#define kwsys_SHARED_FORWARD_DIR_BUILD "@PV_FORWARD_DIR_BUILD@"
+#define kwsys_SHARED_FORWARD_PATH_BUILD @PV_FORWARD_PATH_BUILD@
+#define kwsys_SHARED_FORWARD_PATH_INSTALL @PV_FORWARD_PATH_INSTALL@
+#define kwsys_SHARED_FORWARD_EXE_BUILD "@PV_FORWARD_DIR_BUILD@/@PV_FORWARD_EXE@"
+#define kwsys_SHARED_FORWARD_EXE_INSTALL "@PV_FORWARD_DIR_INSTALL@/@PV_FORWARD_EXE@"
+#define kwsys_SHARED_FORWARD_OPTION_PRINT "--print"
+#define kwsys_SHARED_FORWARD_OPTION_LDD "--ldd"
+
+#include <kwsys/SharedForward.h>
+
+int main(int argc, char** argv)
+{
+  return kwsys_shared_forward_to_real(argc, argv);
+}
