@@ -28,7 +28,7 @@
 
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkLineWidget;
+class vtkPickLineWidget;
 
 class VTK_EXPORT vtkPVLineWidget : public vtkPV3DWidget
 {
@@ -176,6 +176,8 @@ protected:
   vtkKWLabel* CoordinateLabel[3];
   vtkKWLabel* ResolutionLabel;
   vtkKWEntry* ResolutionEntry;
+  vtkKWLabel* LengthLabel;
+  vtkKWLabel* LengthValue;
 
   vtkSetStringMacro(Point1Variable);
   vtkSetStringMacro(Point2Variable);

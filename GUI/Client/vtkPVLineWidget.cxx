@@ -18,7 +18,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkLineWidget.h"
+#include "vtkPickLineWidget.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -40,7 +40,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.54");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.55");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -54,6 +54,8 @@ vtkPVLineWidget::vtkPVLineWidget()
     this->Point1[i] = vtkKWEntry::New();
     this->Point2[i] = vtkKWEntry::New();
     }
+  this->LengthLabel = vtkKWLabel::New();
+  this->LengthValue = vtkKWLabel::New();
   this->ResolutionEntry = vtkKWEntry::New();
   this->Point1Variable = 0;
   this->Point2Variable = 0;
@@ -84,6 +86,11 @@ vtkPVLineWidget::~vtkPVLineWidget()
     }
   this->ResolutionLabel->Delete();
   this->ResolutionEntry->Delete();
+
+  this->LengthLabel->Delete();
+  this->LengthLabel = 0;
+  this->LengthValue->Delete();
+  this->LengthValue = 0;
 
   this->SetPoint1Variable(0);
   this->SetPoint2Variable(0);
@@ -613,18 +620,28 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
   if(l == vtkKWEvent::WidgetModifiedEvent)
     {
-    double pos[3];
+    double pos1[3];
+    double pos2[3];
     int res;
     this->WidgetProxy->UpdateInformation();
-    this->GetPoint1Internal(pos);
-    this->Point1[0]->SetValue(pos[0]);
-    this->Point1[1]->SetValue(pos[1]);
-    this->Point1[2]->SetValue(pos[2]);
+    this->GetPoint1Internal(pos1);
+    this->Point1[0]->SetValue(pos1[0]);
+    this->Point1[1]->SetValue(pos1[1]);
+    this->Point1[2]->SetValue(pos1[2]);
 
-    this->GetPoint2Internal(pos);
-    this->Point2[0]->SetValue(pos[0]);
-    this->Point2[1]->SetValue(pos[1]);
-    this->Point2[2]->SetValue(pos[2]);
+    this->GetPoint2Internal(pos2);
+    this->Point2[0]->SetValue(pos2[0]);
+    this->Point2[1]->SetValue(pos2[1]);
+    this->Point2[2]->SetValue(pos2[2]);
+
+    // Display the length of the line.
+    double d0, d1, d2;
+    d0 = pos2[0]-pos1[0];
+    d1 = pos2[1]-pos1[1];
+    d2 = pos2[2]-pos1[2];    
+    char tmp[1024];
+    sprintf(tmp, "%.5g", sqrt(d0*d0 + d1*d1 + d2*d2));
+    this->LengthValue->SetLabel(tmp);
 
     res = this->GetResolutionInternal();
     this->ResolutionEntry->SetValue(res);
@@ -690,6 +707,20 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
+  // Widget needs the RenderModule for picking
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  unsigned int ui;
+  for (ui=0; ui<this->WidgetProxy->GetNumberOfIDs(); ui++)
+    {
+    vtkPickLineWidget* widget = vtkPickLineWidget::SafeDownCast(
+      pm->GetObjectFromID(this->WidgetProxy->GetID(ui)));
+    if (widget)
+      {
+      widget->SetRenderModule(pm->GetRenderModule());
+      }
+    }
+  
+
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
@@ -724,6 +755,12 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   this->ResolutionEntry->SetParent(this->Frame->GetFrame());
   this->ResolutionEntry->Create(pvApp, "");
   this->ResolutionEntry->SetValue(0);
+  this->LengthLabel->SetParent(this->Frame->GetFrame());
+  this->LengthLabel->Create(pvApp, "");
+  this->LengthLabel->SetLabel("Length:");
+  this->LengthValue->SetParent(this->Frame->GetFrame());
+  this->LengthValue->Create(pvApp, "");
+  this->LengthValue->SetLabel("1.0");
 
   this->Script("grid propagate %s 1",
     this->Frame->GetFrame()->GetWidgetName());
@@ -748,6 +785,9 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
       this->ResolutionLabel->GetWidgetName(),
       this->ResolutionEntry->GetWidgetName());
     }
+  this->Script("grid %s %s - - -sticky w", 
+    this->LengthLabel->GetWidgetName(),
+    this->LengthValue->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
     this->Frame->GetFrame()->GetWidgetName());
