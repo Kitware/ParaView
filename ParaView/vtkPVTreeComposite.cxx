@@ -61,7 +61,7 @@ vtkPVTreeComposite* vtkPVTreeComposite::New()
 // will do every thing.
 #ifdef VTK_USE_MPI
 
-3/-------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 vtkPVTreeComposite::vtkPVTreeComposite()
 {
   this->MPIController = vtkMPIController::SafeDownCast(this->Controller);
