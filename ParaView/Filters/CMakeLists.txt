@@ -32,6 +32,7 @@ SET(Filters_SRCS
   vtkPVWarpVector.cxx
   vtkPlanesIntersection.cxx
   vtkPointsProjectedHull.cxx
+  vtkExtractUserDefinedPiece.cxx
   vtkStructuredCacheFilter.cxx
   vtkVRMLSource.cxx
   vtkXMLPVDWriter.cxx
