@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.282");
+vtkCxxRevisionMacro(vtkPVSource, "1.283");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -108,6 +108,7 @@ vtkPVSource::vtkPVSource()
   // Initialize the data only after  Accept is invoked for the first time.
   // This variable is used to determine that.
   this->Initialized = 0;
+  this->AcceptButtonRed = 0;
 
   // The notebook which holds Parameters, Display and Information pages.
   this->Notebook = vtkKWNotebook::New();
@@ -508,6 +509,12 @@ void vtkPVSource::ForceUpdate(vtkPVApplication* pvApp)
 {
   vtkPVPart *part;
 
+  if (this->UpdateTime > this->PipelineModifiedTime)
+    {
+    return;
+    }
+  this->UpdateTime.Modified();
+
   this->PVParts->InitTraversal();
   while ( (part = (vtkPVPart*)(this->PVParts->GetNextItemAsObject())) )
     {
@@ -525,9 +532,6 @@ void vtkPVSource::Update()
     {
     part->Update();
     }
-  
-  // Now done as a callback.
-  //this->GatherDataInformation();
 }
 
   
@@ -1202,6 +1206,14 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   vtkPVPart *part;
   vtkPVSource *input;
 
+  // vtkPVSource is taking over some of the update descisions because
+  // client does not have a real pipeline.
+  if ( ! this->AcceptButtonRed)
+    {
+    return;
+    } 
+  this->MarkSourcesForUpdate();
+
   window = this->GetPVWindow();
 
   this->SetAcceptButtonColorToWhite();
@@ -1340,6 +1352,20 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   pvd->UpdateProperties();
 
   window->UpdateFilterMenu();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::MarkSourcesForUpdate()
+{
+  int idx;
+  vtkPVSource* consumer;
+
+  this->PipelineModifiedTime.Modified();
+  for (idx = 0; idx < this->NumberOfPVConsumers; ++idx)
+    {
+    consumer = this->GetPVConsumer(idx);
+    consumer->MarkSourcesForUpdate();
+    }  
 }
 
 //----------------------------------------------------------------------------
@@ -2029,17 +2055,19 @@ vtkPVInputProperty* vtkPVSource::GetInputProperty(const char* name)
 }
 
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVSource::SetAcceptButtonColorToRed()
 {
+  this->AcceptButtonRed = 1;
   this->Script("%s configure -background red1",
                this->AcceptButton->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::SetAcceptButtonColorToWhite()
 {
+  this->AcceptButtonRed = 0;
+
 #ifdef _WIN32
   this->Script("%s configure -background SystemButtonFace",
                this->AcceptButton->GetWidgetName());
@@ -2572,7 +2600,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.282 $");
+  this->ExtractRevision(os,"$Revision: 1.283 $");
 }
 
 //----------------------------------------------------------------------------

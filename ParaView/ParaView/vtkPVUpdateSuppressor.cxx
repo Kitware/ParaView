@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.5");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.6");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -74,6 +74,14 @@ void vtkPVUpdateSuppressor::ForceUpdate()
 {
   vtkPolyData *input = this->GetInput();
   vtkPolyData *output = this->GetOutput();
+
+  // Assume the input is the collection filter.
+  // Client needs to modify the collection filter because it is not
+  // connected to a pipeline.
+  if (input && input->GetSource())
+    {
+    input->GetSource()->Modified();
+    }
 
   input->SetUpdatePiece(this->UpdatePiece);
   input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);

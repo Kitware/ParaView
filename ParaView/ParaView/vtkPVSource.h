@@ -94,7 +94,7 @@ public:
   virtual void CreateProperties();
 
   // Description:
-  // This methiod updates the piece that has been assinged to this process.
+  // This method updates the piece that has been assigned to this process.
   // It update all parts and gathers data information.
   void Update();
   void ForceUpdate(vtkPVApplication* pvApp);
@@ -551,6 +551,11 @@ protected:
 
   int VisitedFlag;
 
+  // We have to manaage updates separate from the VTK pipeline.
+  int AcceptButtonRed;
+  vtkTimeStamp PipelineModifiedTime;
+  vtkTimeStamp UpdateTime;
+  void MarkSourcesForUpdate();
 
   // Number of instances cloned from this prototype
   int PrototypeInstanceCount;

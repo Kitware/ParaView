@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.9");
+vtkCxxRevisionMacro(vtkPVPart, "1.10");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -426,15 +426,25 @@ void vtkPVPart::SetCollectionDecision(int v)
     }
   this->CollectionDecision = v;
 
+  if ( this->UpdateSuppressorTclName == NULL )
+    {
+    vtkErrorMacro("Missing Suppressor.");
+    return;
+    }
+
   if (this->CollectTclName)
     {
     if (this->CollectionDecision)
       {
-      pvApp->BroadcastScript("%s SetPassThrough 0", this->CollectTclName);
+      pvApp->BroadcastScript("%s SetPassThrough 0; %s ForceUpdate", 
+                             this->CollectTclName, 
+                             this->UpdateSuppressorTclName);
       }
     else
       {
-      pvApp->BroadcastScript("%s SetPassThrough 1", this->CollectTclName);
+      pvApp->BroadcastScript("%s SetPassThrough 1; %s ForceUpdate", 
+                             this->CollectTclName,
+                             this->UpdateSuppressorTclName);
       }
     }
 }
@@ -450,15 +460,25 @@ void vtkPVPart::SetLODCollectionDecision(int v)
     }
   this->LODCollectionDecision = v;
 
+  if ( this->UpdateSuppressorTclName == NULL )
+    {
+    vtkErrorMacro("Missing Suppressor.");
+    return;
+    }
+
   if (this->LODCollectTclName)
     {
     if (this->LODCollectionDecision)
       {
-      pvApp->BroadcastScript("%s SetPassThrough 0", this->LODCollectTclName);
+      pvApp->BroadcastScript("%s SetPassThrough 0; %s ForceUpdate", 
+                             this->LODCollectTclName,
+                             this->UpdateSuppressorTclName);
       }
     else
       {
-      pvApp->BroadcastScript("%s SetPassThrough 1", this->LODCollectTclName);
+      pvApp->BroadcastScript("%s SetPassThrough 1; %s ForceUpdate", 
+                             this->LODCollectTclName,
+                             this->UpdateSuppressorTclName);
       }
     }
 }
@@ -608,10 +628,10 @@ void vtkPVPart::Update()
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   // The mapper has the assignment for this processor.
-  pvApp->BroadcastScript("[%s GetOutput] SetUpdateExtent [%s GetPiece] [%s GetNumberOfPieces]", 
-                         this->LODDeciTclName, 
-                         this->MapperTclName, this->MapperTclName);
-  pvApp->BroadcastScript("%s Update", this->LODDeciTclName);
+  pvApp->GetProcessModule()->ServerScript(
+      "[%s GetOutput] SetUpdateExtent [%s GetPiece] [%s GetNumberOfPieces]", 
+      this->LODDeciTclName, this->MapperTclName, this->MapperTclName);
+  pvApp->GetProcessModule()->ServerScript("%s Update", this->LODDeciTclName);
 }
 
 
