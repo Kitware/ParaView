@@ -129,6 +129,7 @@ class VTK_EXPORT vtkKWEvent
     MultiPassStillRenderEndEvent,
     MultiPassStillRenderStageChangedEvent,
     ObliqueProbeColorChangedEvent,
+    ObliqueProbeResetEvent,
     ObliqueProbeScalarsVisibilityChangedEvent,
     ObliqueProbeVisibilityChangedEvent,
     PerspectiveViewAngleChangedEvent,
