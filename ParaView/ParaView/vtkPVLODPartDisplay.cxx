@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVConfig.h"
+#include "vtkKWCheckButton.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
@@ -63,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.3");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.4");
 
 
 
@@ -186,7 +187,9 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->LODMapperTclName,
                          this->LODUpdateSuppressorTclName);
-  
+  pvApp->BroadcastScript("%s SetImmediateModeRendering %d", this->LODMapperTclName,
+                  pvApp->GetMainView()->GetImmediateModeCheck()->GetState());
+ 
   pvApp->BroadcastScript("%s SetLODMapper %s", this->PropTclName,
                          this->LODMapperTclName);
   

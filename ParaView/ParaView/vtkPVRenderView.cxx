@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.264");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.265");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1359,6 +1359,7 @@ void vtkPVRenderView::TriangleStripsCallback()
       pvApp->BroadcastScript("%s SetUseStrips %d",
                              pvs->GetPart(partIdx)->GetGeometryTclName(),
                              this->TriangleStripsCheck->GetState());
+      pvs->GetPart(partIdx)->GetPartDisplay()->InvalidateGeometry();
       }
     }
 
@@ -1371,6 +1372,7 @@ void vtkPVRenderView::TriangleStripsCallback()
     vtkTimerLog::MarkEvent("--- Disable triangle strips.");
     }
 
+  this->EventuallyRender();
 }
 
 
@@ -1436,6 +1438,7 @@ void vtkPVRenderView::ImmediateModeCallback()
     {
     vtkTimerLog::MarkEvent("--- Enable display lists.");
     }
+  this->EventuallyRender();
 }
 
 //----------------------------------------------------------------------------

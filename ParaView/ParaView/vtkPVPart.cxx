@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVConfig.h"
 #include "vtkPVRenderView.h"
+#include "vtkKWCheckButton.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
@@ -65,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.23");
+vtkCxxRevisionMacro(vtkPVPart, "1.24");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -148,6 +149,11 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   sprintf(tclName, "Geometry%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
+
+  // Default setting.
+  pvApp->BroadcastScript("%s SetUseStrips %d", tclName,
+    pvApp->GetMainView()->GetTriangleStripsCheck()->GetState());
+
   // Keep track of how long each geometry filter takes to execute.
   pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent "
                          "{Execute Geometry}}", this->GeometryTclName);

@@ -59,10 +59,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkToolkits.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
 
+#include "vtkPVRenderView.h"
+#include "vtkKWCheckButton.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.10");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -173,6 +175,8 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
                          this->UpdateSuppressorTclName);
+  pvApp->BroadcastScript("%s SetImmediateModeRendering %d", this->MapperTclName,
+                  pvApp->GetMainView()->GetImmediateModeCheck()->GetState());
 
   // Create a LOD Actor for the subclasses.
   // I could use just a plain actor for this class.

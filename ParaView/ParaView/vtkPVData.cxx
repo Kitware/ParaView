@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.208");
+vtkCxxRevisionMacro(vtkPVData, "1.209");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1794,8 +1794,6 @@ void vtkPVData::Initialize()
   float bounds[6];
   char *tclName;
   char newTclName[100];
-  vtkPVPart *part;
-  int num, idx;
 
   vtkDebugMacro( << "Initialize --------")
   
@@ -1817,20 +1815,6 @@ void vtkPVData::Initialize()
                this->GetCubeAxesTclName(), tclName);
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
-  int dataType = this->GetPVSource()->GetDataInformation()->GetDataSetType();
-
-  num = this->GetPVSource()->GetNumberOfParts();
-  for (idx = 0; idx < num; ++idx)
-    {
-    part = this->GetPVSource()->GetPart(idx);
-    if (dataType == VTK_POLY_DATA || dataType == VTK_UNSTRUCTURED_GRID)
-      {
-      pvApp->BroadcastScript("%s SetUseStrips %d", part->GetGeometryTclName(),
-                             this->GetPVRenderView()->GetTriangleStripsCheck()->GetState());
-      }
-    part->GetPartDisplay()->SetUseImmediateMode(
-                   this->GetPVRenderView()->GetImmediateModeCheck()->GetState());
-    }
 }
 
 
