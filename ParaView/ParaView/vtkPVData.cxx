@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.11");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.12");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -132,6 +132,7 @@ vtkPVData::vtkPVData()
   this->StatsFrame = vtkKWLabeledFrame::New();
   this->ViewFrame = vtkKWLabeledFrame::New();
   
+  this->TypeLabel = vtkKWLabel::New();
   this->NumCellsLabel = vtkKWLabel::New();
   this->NumPointsLabel = vtkKWLabel::New();
   
@@ -226,6 +227,9 @@ vtkPVData::~vtkPVData()
     this->PropertiesParent = NULL;
     }
     
+  this->TypeLabel->Delete();
+  this->TypeLabel = NULL;
+  
   this->NumCellsLabel->Delete();
   this->NumCellsLabel = NULL;
   
@@ -1127,8 +1131,8 @@ void vtkPVData::CreateProperties()
   this->ColorMenu->Create(this->Application, "");   
 
   this->ColorButton->SetParent(this->ColorFrame->GetFrame());
-  this->ColorButton->Create(this->Application, "");
   this->ColorButton->SetText("Actor Color");
+  this->ColorButton->Create(this->Application, "");
   this->ColorButton->SetCommand(this, "ChangeActorColor");
   
   this->Script("grid %s %s -sticky wns",
@@ -1385,6 +1389,9 @@ void vtkPVData::CreateProperties()
   this->StatsFrame->Create(this->Application);
   this->StatsFrame->SetLabel("Statistics");
 
+  this->TypeLabel->SetParent(this->StatsFrame->GetFrame());
+  this->TypeLabel->Create(this->Application, "");
+
   this->NumCellsLabel->SetParent(this->StatsFrame->GetFrame());
   this->NumCellsLabel->Create(this->Application, "");
 
@@ -1396,9 +1403,10 @@ void vtkPVData::CreateProperties()
   
   this->ExtentDisplay->SetParent(this->InformationFrame->GetFrame());
   this->ExtentDisplay->Create(this->Application);
-  this->ExtentDisplay->SetLabel("Extent");
+  this->ExtentDisplay->SetLabel("Extents");
   
-  this->Script("pack %s %s -side top -anchor nw",
+  this->Script("pack %s %s %s -side top -anchor nw",
+               this->TypeLabel->GetWidgetName(),
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName());
 
@@ -1518,54 +1526,68 @@ void vtkPVData::UpdateProperties()
   this->GetBounds(bounds);
   vtkTimerLog::MarkEndEvent("Create LOD");
 
+  ostrstream type;
+  type << "Type: ";
+
   // Put the data type as the label of the top frame.
   if (this->VTKData)
     {
     if (this->VTKData->IsA("vtkPolyData"))
       {
-      this->StatsFrame->SetLabel("Polygonal");
+      type << "Polygonal";
       this->Script("pack forget %s", 
                    this->ExtentDisplay->GetWidgetName());
       }
-    if (this->VTKData->IsA("vtkUnstructuredGrid"))
+    else if (this->VTKData->IsA("vtkUnstructuredGrid"))
       {
-      this->StatsFrame->SetLabel("Unstructured Grid");
+      type << "Unstructured Grid";
       this->Script("pack forget %s", 
                    this->ExtentDisplay->GetWidgetName());
       }
-    if (this->VTKData->IsA("vtkStructuredGrid"))
+    else if (this->VTKData->IsA("vtkStructuredGrid"))
       {
-      this->StatsFrame->SetLabel("Curvilinear");
+      type << "Curvilinear";
       this->ExtentDisplay->SetExtent(
               ((vtkStructuredGrid*)(this->VTKData))->GetExtent());
       this->Script("pack %s -fill x -expand t -pady 2", 
                    this->ExtentDisplay->GetWidgetName());
       }
-    if (this->VTKData->IsA("vtkRectilinearGrid"))
+    else if (this->VTKData->IsA("vtkRectilinearGrid"))
       {
-      this->StatsFrame->SetLabel("Nonuniform Rectilinear");
+      type << "Nonuniform Rectilinear";
       this->ExtentDisplay->SetExtent(
               ((vtkRectilinearGrid*)(this->VTKData))->GetExtent());
       this->Script("pack %s -fill x -expand t -pady 2", 
                    this->ExtentDisplay->GetWidgetName());
       }
-    if (this->VTKData->IsA("vtkImageData"))
+    else if (this->VTKData->IsA("vtkImageData"))
       {
       int *ext = ((vtkImageData*)(this->VTKData))->GetExtent();
       if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
         {
-        this->StatsFrame->SetLabel("Image (Uniform Rectilinear)");
+        type << "Image (Uniform Rectilinear)";
         }
       else
         {
-        this->StatsFrame->SetLabel("Volume (Uniform Rectilinear)");
+        type << "Volume (Uniform Rectilinear)";
         }
       this->ExtentDisplay->SetExtent(ext);
       this->Script("pack %s -fill x -expand t -pady 2", 
                    this->ExtentDisplay->GetWidgetName());
       }
+    else
+      {
+      type << "Unknown";
+      }
     }
-
+  else
+    {
+    type << "Unknown";
+    }
+  type << ends;
+  this->TypeLabel->SetLabel(type.str());
+  type.rdbuf()->freeze(0);
+  
   sprintf(tmp, "Number of cells: %d", 
           this->GetNumberOfCells());
   this->NumCellsLabel->SetLabel(tmp);
@@ -2874,7 +2896,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.11 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.12 $");
 }
 
 //----------------------------------------------------------------------------
