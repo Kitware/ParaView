@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.40");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.41");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -239,6 +239,10 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
   
   this->RenderWindow->Render();
   delete [] local;
+
+  // Make the corner annotation visibile
+
+  this->SetCornerAnnotationVisibility(1);
 
   // Update enable state
 
@@ -589,13 +593,18 @@ void vtkKWRenderWidget::Close()
 {
   this->RemoveBindings();
 
+  // Clear all corner annotation texts
+
   if (this->GetCornerAnnotation())
     {
     this->GetCornerAnnotation()->ClearAllTexts();
     }
 
+  // Why should I hide those ?
+  /*
   this->SetCornerAnnotationVisibility(0);
   this->SetHeaderAnnotationVisibility(0);
+  */
 }
 
 //----------------------------------------------------------------------------
