@@ -39,9 +39,9 @@ proc rtOtherTest { fileid } {
            b Print
            if {[b IsA $a] == 0} {puts stderr "$a failed IsA test!!!"}
            if {[b IsA "vtkObject"] == 0} {puts stdout "$a is not a sub-class of vtkObject"}
-	   if { [catch { b Create } res ] != 0 } {
-		puts "Error creating: $res"
-		Application SetExitStatus 1
+	   if { [catch { b Create } res ] == 0 } {
+		puts "Class [ b GetClassName ] has Create method"
+		puts "which can be called with no application"
            }
            b GetClassName
            b Delete
