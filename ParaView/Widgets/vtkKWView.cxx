@@ -74,6 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTextProperty.h"
 #include "vtkViewport.h"
 #include "vtkWindowToImageFilter.h"
+#include "vtkKWSegmentedProgressGauge.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -100,7 +101,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.96");
+vtkCxxRevisionMacro(vtkKWView, "1.97");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -150,6 +151,10 @@ vtkKWView::vtkKWView()
   this->SharedPropertiesParent = 0;
   this->Notebook = vtkKWNotebook::New();
 
+  this->UseProgressGauge = 0;
+  this->ProgressGauge = vtkKWSegmentedProgressGauge::New();
+  this->ProgressGauge->SetParent(this->Frame2);
+  
   this->AnnotationProperties = vtkKWFrame::New();
   this->HeaderFrame = vtkKWLabeledFrame::New();
   this->HeaderDisplayFrame = vtkKWWidget::New();
@@ -281,6 +286,8 @@ vtkKWView::~vtkKWView()
     this->PropertiesParent->Delete();
     }
 
+  this->ProgressGauge->Delete();
+  
   delete [] this->StillUpdateRates;
   
   this->SetMenuEntryName(NULL);
@@ -1500,7 +1507,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.96 $");
+  this->ExtractRevision(os,"$Revision: 1.97 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1650,6 +1657,7 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "ParentWindow: " << this->GetParentWindow() << endl;
   os << indent << "Printing: " << this->GetPrinting() << endl;
+  os << indent << "ProgressGauge: " << this->ProgressGauge << endl;
   os << indent << "RenderMode: " << this->GetRenderMode() << endl;
   os << indent << "RenderState: " << this->GetRenderState() << endl;
   os << indent << "RenderWindow: " << this->GetRenderWindow() << endl;
