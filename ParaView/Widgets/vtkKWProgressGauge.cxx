@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.11");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.12");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -74,8 +74,9 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, char *args)
 {
   const char *wname;
 
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("CheckButton already created");
     return;
@@ -98,6 +99,10 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, char *args)
     "%s.display create text [expr 0.5 * %d] [expr 0.5 * %d] "
     "-anchor c -text \"\" -tags value",
     wname, this->Length, this->Height);
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 void vtkKWProgressGauge::SetValue(int value)

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPushButton );
-vtkCxxRevisionMacro(vtkKWPushButton, "1.9");
+vtkCxxRevisionMacro(vtkKWPushButton, "1.10");
 
 
 vtkKWPushButton::vtkKWPushButton()
@@ -64,8 +64,9 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("PushButton already created");
     return;
@@ -84,6 +85,10 @@ void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
     {
     this->Script("button %s %s", wname,(args?args:""));
     }
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 void vtkKWPushButton::SetLabel( const char *name )

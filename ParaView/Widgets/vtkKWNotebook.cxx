@@ -84,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.35");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.36");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -189,6 +189,8 @@ vtkKWNotebook::~vtkKWNotebook()
 //------------------------------------------------------------------------------
 void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
 {
+  // Set the application
+
   if (this->IsCreated())
     {
     vtkErrorMacro("The notebook is already created");
@@ -242,6 +244,10 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
   cmd << ends;
   this->Script(cmd.str());
   cmd.rdbuf()->freeze(0);
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //------------------------------------------------------------------------------

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.17");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.18");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -185,8 +185,9 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("OptionMenu already created");
     return;
@@ -199,6 +200,10 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
   
   this->Script("menubutton %s -textvariable %sValue -indicatoron 1 -menu %s -relief raised -bd 2 -highlightthickness 0 -anchor c -direction flush %s", wname, wname, this->Menu->GetWidgetName(), (args?args:""));
   this->Menu->Create(app,"menu","-tearoff 0");
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWMenuButton );
-vtkCxxRevisionMacro(vtkKWMenuButton, "1.10");
+vtkCxxRevisionMacro(vtkKWMenuButton, "1.11");
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -67,8 +67,9 @@ vtkKWMenuButton::~vtkKWMenuButton()
 
 void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
 { 
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Menu already created");
     return;
@@ -81,7 +82,10 @@ void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
 
   // Should the args be passed through?
   this->Menu->Create(app, "");  
-  
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 void vtkKWMenuButton::SetButtonText(const char *text)
