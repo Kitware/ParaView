@@ -316,12 +316,6 @@ protected:
   // if we ever get more that one renderer, the animation
   // will save out the window with all renderers.
   vtkPVAnimationInterface *AnimationInterface;
-
-  // Interfaces for "special" filters.
-  // The Threshold interface does not actually work.
-  vtkPVSourceInterface *ThresholdInterface;
-  vtkPVSourceInterface *CutPlaneInterface;
-  vtkPVSourceInterface *ClipPlaneInterface;
   
 private:
   static const char* StandardSourceInterfaces;

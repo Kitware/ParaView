@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVContourEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
-#include "vtkContourFilter.h"
 #include "vtkKWListBox.h"
 #include "vtkKWEntry.h"
 #include "vtkKWPushButton.h"
@@ -120,7 +119,6 @@ void vtkPVContourEntry::Create(vtkKWApplication *app)
   
   this->ContourValuesLabel->SetParent(this);
   this->ContourValuesLabel->Create(app, "");
-  this->ContourValuesLabel->SetLabel("Contour Values");
   
   this->ContourValuesList->SetParent(this);
   this->ContourValuesList->Create(app, "");
@@ -227,26 +225,6 @@ void vtkPVContourEntry::Accept()
     return;
     }
 
-  // Here is another way we could see if the widget has been modified.
-  // First lets see if anything has changed.
-  //if (numContours != this->ContourValuesList->GetNumberOfItems());
-  //  {
-  //  modifiedFlag = 1;
-  //  }
-  //for (i = 0; i < numContours && ! modifiedFlag; i++)
-  //  {
-  //  value = atof(this->ContourValuesList->GetItem(i));
-  //  if (value != contour->GetValue(i))
-  //    {
-  //    modifiedFlag = 1;
-  //    }
-  //  }
-  //if (! modifiedFlag)
-  //  {
-  //  return;
-  //  }
-
-
   if (this->ModifiedFlag)
     {  
     pvApp->AddTraceEntry("$pv(%s) RemoveAllValues", 
@@ -267,28 +245,30 @@ void vtkPVContourEntry::Accept()
 }
 
 //----------------------------------------------------------------------------
+// If we had access to the ContourValues object of the filter,
+// this would be much easier.  We would not have to rely on Tcl calls.
 void vtkPVContourEntry::Reset()
 {
   int i;
-  vtkContourFilter* contour;
   int numContours;
-  char newValue[256];
   
   if (this->PVSource == NULL)
     {
     vtkErrorMacro("PVSource not set.");
     return;
     }
-  contour = (vtkContourFilter*)this->PVSource->GetVTKSource();
-  numContours = contour->GetNumberOfContours();  
+  this->Script("%s GetNumberOfContours", 
+               this->PVSource->GetVTKSourceTclName());
+  numContours = this->GetIntegerResult(this->Application);
 
-  // The widget has bee modified.  
+  // The widget has been modified.  
   // Now set the widget back to reflect the contours in the filter.
   this->ContourValuesList->DeleteAll();
   for (i = 0; i < numContours; i++)
     {
-    sprintf(newValue, "%f", contour->GetValue(i));
-    this->ContourValuesList->AppendUnique(newValue);
+    this->Script("%s AppendUnique [%s GetValue %d]", 
+                 this->ContourValuesList->GetTclName(),
+                 this->PVSource->GetVTKSourceTclName(), i);
     }
 
   // Since the widget now matches the fitler, it is no longer modified.

@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVPlaneWidget_h
 
 #include "vtkPVWidget.h"
+class vtkPVSource;
+
 
 class VTK_EXPORT vtkPVPlaneWidget : public vtkPVWidget
 {
@@ -57,6 +59,17 @@ public:
   vtkTypeMacro(vtkPVPlaneWidget, vtkPVWidget);
     
   virtual void Create(vtkKWApplication *app);
+
+  // Description:
+  // This widget needs access to the PVSource for reseting the center to
+  // the middle of the data bounds and getting the camera for setting
+  // the normal to the view plane normal.  If this widget gets used for some 
+  // other purpose, then we might consider changing this reference to a 
+  // render view and data object.
+  // Note: There is no reference counting for fear of reference loops.
+  // The pvSource owns this widget.
+  void SetPVSource(vtkPVSource *pvs) {this->PVSource = pvs;}
+  vtkPVSource *GetPVSource() {return this->PVSource;}
 
   // Description:
   // Callback that set the center to the middle of the bounds.
@@ -82,11 +95,18 @@ public:
   // The Tcl name of the VTK implicit plane.
   vtkGetStringMacro(PlaneTclName);
 
+  // Description:
+  // Access to the widgets is required for tracing and scripting.
+  vtkGetObjectMacro(CenterEntry, vtkPVVectorEntry);
+  vtkGetObjectMacro(NormalEntry, vtkPVVectorEntry);
+
 protected:
   vtkPVPlaneWidget();
   ~vtkPVPlaneWidget();
   vtkPVPlaneWidget(const vtkPVPlaneWidget&) {};
   void operator=(const vtkPVPlaneWidget&) {};
+
+  vtkPVSource *PVSource;
 
   vtkPVVectorEntry *CenterEntry;
   vtkKWPushButton *CenterResetButton;

@@ -195,63 +195,89 @@ void vtkPVPlaneWidget::Create(vtkKWApplication *app)
   this->NormalZButton->SetCommand(this, "NormalZCallback"); 
   this->Script("pack %s -side left -fill x -expand t",
                this->NormalZButton->GetWidgetName());
+
+  // Initialize the center of the plane based on the input bounds.
+  if (this->PVSource)
+    {
+    vtkPVData *input = this->PVSource->GetNthPVInput(0);
+    if (input)
+      {
+      float bds[6];
+      input->GetBounds(bds);
+      this->Script("%s SetOrigin %f %f %f", planeTclName,
+                   0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                   0.5*(bds[4]+bds[5]));
+      }
+    }
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::CenterResetCallback()
 {
-  //vtkPVData *input;
-  //float bds[6];
+  vtkPVData *input;
+  float bds[6];
 
-  //input = this->PVSource->GetNthPVInput(0);
-  //if (input == NULL)
-  //  {
-  //  return;
-  //  }
-  //input->GetBounds(bds);
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("PVSource has not been set.");
+    return;
+    }
 
-  //this->CenterEntry->GetEntry(0)->SetValue(0.5*(bds[0]+bds[1]), 3);
-  //this->CenterEntry->GetEntry(1)->SetValue(0.5*(bds[2]+bds[3]), 3);
-  //this->CenterEntry->GetEntry(2)->SetValue(0.5*(bds[4]+bds[5]), 3);
+  input = this->PVSource->GetNthPVInput(0);
+  if (input == NULL)
+    {
+    return;
+    }
+  input->GetBounds(bds);
 
-  //this->CenterEntry->ModifiedCallback();
+  this->CenterEntry->GetEntry(0)->SetValue(0.5*(bds[0]+bds[1]), 3);
+  this->CenterEntry->GetEntry(1)->SetValue(0.5*(bds[2]+bds[3]), 3);
+  this->CenterEntry->GetEntry(2)->SetValue(0.5*(bds[4]+bds[5]), 3);
+
+  this->CenterEntry->ModifiedCallback();
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::NormalCameraCallback()
 {
-  //vtkKWView *view;
-  //vtkRenderer *ren;
-  //vtkCamera *cam;
-  //double normal[3];
+  vtkKWView *view;
+  vtkRenderer *ren;
+  vtkCamera *cam;
+  double normal[3];
 
-  //view = this->PVSource->GetView();
-  //if (view == NULL)
-  //  {
-  //  vtkErrorMacro("Could not get the view/camera to set the normal.");
-  //  return;
-  //  }
-  //ren = vtkRenderer::SafeDownCast(view->GetViewport());
-  //if (ren == NULL)
-  //  {
-  //  vtkErrorMacro("Could not get the renderer/camera to set the normal.");
-  //  return;
-  //  }
-  //cam = ren->GetActiveCamera();
-  //if (cam == NULL)
-  //  {
-  //  vtkErrorMacro("Could not get the camera to set the normal.");
-  //  return;
-  //  }
-  //cam->GetViewPlaneNormal(normal);
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("PVSource has not been set.");
+    return;
+    }
 
-  //this->NormalEntry->GetEntry(0)->SetValue(-normal[0], 5);
-  //this->NormalEntry->GetEntry(1)->SetValue(-normal[1], 5);
-  //this->NormalEntry->GetEntry(2)->SetValue(-normal[2], 5);
+  view = this->PVSource->GetView();
+  if (view == NULL)
+    {
+    vtkErrorMacro("Could not get the view/camera to set the normal.");
+    return;
+    }
+  ren = vtkRenderer::SafeDownCast(view->GetViewport());
+  if (ren == NULL)
+    {
+    vtkErrorMacro("Could not get the renderer/camera to set the normal.");
+    return;
+    }
+  cam = ren->GetActiveCamera();
+  if (cam == NULL)
+    {
+    vtkErrorMacro("Could not get the camera to set the normal.");
+    return;
+    }
+  cam->GetViewPlaneNormal(normal);
 
-  //this->NormalEntry->ModifiedCallback();
+  this->NormalEntry->GetEntry(0)->SetValue(-normal[0], 5);
+  this->NormalEntry->GetEntry(1)->SetValue(-normal[1], 5);
+  this->NormalEntry->GetEntry(2)->SetValue(-normal[2], 5);
+
+  this->NormalEntry->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -287,14 +313,44 @@ void vtkPVPlaneWidget::NormalZCallback()
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::Reset()
 {
-  this->vtkPVWidget::Reset();
+  this->CenterEntry->Reset();
+  this->NormalEntry->Reset();
+
+  this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::Accept()
 {
-   this->vtkPVWidget::Accept();
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if ( this->CenterEntry->GetModifiedFlag())
+    {
+    if ( ! this->CenterEntry->GetTraceVariableInitialized())
+      {
+      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetCenterEntry]",
+                           this->CenterEntry->GetTclName(), 
+                           this->GetTclName());
+      this->CenterEntry->SetTraceVariableInitialized(1);
+      }
+    this->CenterEntry->Accept();
+    }
+
+  if ( this->NormalEntry->GetModifiedFlag())
+    {
+    if ( ! this->NormalEntry->GetTraceVariableInitialized())
+      {
+      pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetNormalEntry]",
+                           this->NormalEntry->GetTclName(), 
+                           this->GetTclName());
+      this->NormalEntry->SetTraceVariableInitialized(1);
+      }
+    this->NormalEntry->Accept();
+    }
+
+  this->ModifiedFlag = 0;
 }
+
 
 
 

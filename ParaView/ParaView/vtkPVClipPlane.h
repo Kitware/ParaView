@@ -55,48 +55,22 @@ class VTK_EXPORT vtkPVClipPlane : public vtkPVSource
 public:
   static vtkPVClipPlane* New();
   vtkTypeMacro(vtkPVClipPlane, vtkPVSource);
-    
+  
+  // Decription:
+  // VTKSource must be set before this is called.
   void CreateProperties();
-
-  // Description:
-  // Callback that set the center to the middle of the bounds.
-  void CenterResetCallback();
-
-  // Descript:
-  // Callbacks to set the normal.
-  void NormalCameraCallback();
-  void NormalXCallback();
-  void NormalYCallback();
-  void NormalZCallback();
 
   // Description:
   // Also Update the bounds display.
   virtual void UpdateParameterWidgets();
     
-  // Description:
-  // Called when Accept is presed.
-  // Needed to get around a Tcl problem.
-  virtual void AcceptCallback();
-
 protected:
   vtkPVClipPlane();
   ~vtkPVClipPlane();
   vtkPVClipPlane(const vtkPVClipPlane&) {};
   void operator=(const vtkPVClipPlane&) {};
 
-  vtkKWBoundsDisplay *BoundsDisplay;
-
-  vtkPVVectorEntry *CenterEntry;
-  vtkKWPushButton *CenterResetButton;
-
-  vtkPVVectorEntry *NormalEntry;
-  vtkKWWidget *NormalButtonFrame;
-  vtkKWPushButton *NormalCameraButton;
-  vtkKWPushButton *NormalXButton;
-  vtkKWPushButton *NormalYButton;
-  vtkKWPushButton *NormalZButton;
-
-  vtkPVVectorEntry *OffsetEntry;
+  vtkKWBoundsDisplay* BoundsDisplay;
 };
 
 #endif

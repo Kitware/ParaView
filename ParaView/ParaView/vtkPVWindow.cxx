@@ -106,8 +106,6 @@ vtkPVWindow::vtkPVWindow()
 
   this->SetWindowClass("ParaView");
 
-  vtkPVMethodInterface *mInt;
-
   this->CommandFunction = vtkPVWindowCommand;
   this->SourceMenu = vtkKWMenu::New();
   this->FilterMenu = vtkKWMenu::New();
@@ -153,112 +151,6 @@ vtkPVWindow::vtkPVWindow()
 
   // Frame used for animations.
   this->AnimationInterface = vtkPVAnimationInterface::New();
-
-  // Special filters need interfaces also.
-  // For now this is just for animations,
-  // but should also be for serializing the filters.
-  this->ThresholdInterface = vtkPVSourceInterface::New();
-  //this->ThresholdInterface->SetApplication(???):
-  this->ThresholdInterface->SetPVWindow(this);
-  this->ThresholdInterface->SetSourceClassName("vtkThreshold");
-  this->ThresholdInterface->SetRootName("Threshold");
-  this->ThresholdInterface->SetInputClassName("vtkDataSet");
-  this->ThresholdInterface->SetOutputClassName("vtkUnstructuredGrid");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetLabel("ThresholdRange");
-  mInt->SetVariableName("ThresholdBetween");
-  // There is no simple get string.
-  //mInt->SetGetCommand("");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("The range of the scalars to keep.");
-  this->ThresholdInterface->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-
-  // I plan to offload the animation, reseting, synchronization and saving
-  // tasks of the interface to pvSourceWidgets.  Until then,
-  // this is the easiest way to get CutPlane working is with an interface
-  // (even though it is not created with an interface).
-  // The threshold interface above is just an uncompleted experiment.
-  this->CutPlaneInterface = vtkPVSourceInterface::New();
-  //this->CutPlaneInterface->SetApplication(???):
-  this->CutPlaneInterface->SetPVWindow(this);
-  this->CutPlaneInterface->SetSourceClassName("vtkCutPlane");
-  this->CutPlaneInterface->SetRootName("CutPlane");
-  this->CutPlaneInterface->SetInputClassName("vtkDataSet");
-  this->CutPlaneInterface->SetOutputClassName("vtkPolyData");
-  // Offset:
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetLabel("Offset");
-  mInt->SetVariableName("Offset");
-  mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Center:
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Origin");
-  mInt->SetLabel("Origin");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Normal:
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Normal");
-  mInt->SetLabel("Normal");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-
-
-  // I plan to offload the animation, reseting, synchrinization and saving
-  // tasks of the interface to pvSourceWidgets.  Until then,
-  // this is the easiest way to get ClipPlane working is with an interface
-  // (even though it is not created with an interface).
-  // The threshold interface above is just an uncompleted experiment.
-  this->ClipPlaneInterface = vtkPVSourceInterface::New();
-  //this->ClipPlaneInterface->SetApplication(???):
-  this->ClipPlaneInterface->SetPVWindow(this);
-  this->ClipPlaneInterface->SetSourceClassName("vtkClipPlane");
-  this->ClipPlaneInterface->SetRootName("ClipPlane");
-  this->ClipPlaneInterface->SetInputClassName("vtkDataSet");
-  this->ClipPlaneInterface->SetOutputClassName("vtkUnstructuredGrid");
-  // Offset:
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Offset");
-  mInt->SetLabel("Offset");
-  mInt->AddFloatArgument();
-  this->ClipPlaneInterface->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Center:
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Origin");
-  mInt->SetLabel("Origin");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  this->ClipPlaneInterface->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Normal:
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Normal");
-  mInt->SetLabel("Normal");
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  mInt->AddFloatArgument();
-  this->ClipPlaneInterface->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -428,24 +320,6 @@ void vtkPVWindow::PrepareForDelete()
     this->AnimationInterface = NULL;
     }
   
-  if (this->ThresholdInterface)
-    {
-    this->ThresholdInterface->Delete();
-    this->ThresholdInterface = NULL;
-    }
-  
-  if (this->CutPlaneInterface)
-    {
-    this->CutPlaneInterface->Delete();
-    this->CutPlaneInterface = NULL;
-    }
-  
-  if (this->ClipPlaneInterface)
-    {
-    this->ClipPlaneInterface->Delete();
-    this->ClipPlaneInterface = NULL;
-    }
-  
   //if (this->CurrentInteractor != NULL)
   //  {
   //  this->CurrentInteractor->UnRegister(this);
@@ -581,14 +455,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CutPlaneButton->Create(app, "-image PVCutPlaneButton");
   this->CutPlaneButton->SetCommand(this, "CutPlaneCallback");
   this->CutPlaneButton->SetBalloonHelpString("Cut with an implicit plane. It is identical to generating point scalars from an implicit plane, and taking an iso surface. This filter typically reduces the dimensionality of the data.  A 3D input data set will produce an 2D output plane.");
-  this->CutPlaneInterface->SetApplication(app);
   
   this->ClipPlaneButton->SetParent(this->Toolbar);
   //this->ClipPlaneButton->Create(app, "-text Clip");
   this->ClipPlaneButton->Create(app, "-image PVClipPlaneButton");
   this->ClipPlaneButton->SetCommand(this, "ClipPlaneCallback");
   this->ClipPlaneButton->SetBalloonHelpString("Clip with an implicit plane.  Takes a portion of the data set away and does not reduce the dimensionality of the data set.  A 3d input data set will produce a 3d output data set.");
-  this->ClipPlaneInterface->SetApplication(app);
   
   this->ThresholdButton->SetParent(this->Toolbar);
   this->ThresholdButton->Create(app, "-image PVThresholdButton");
@@ -1692,7 +1564,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   // through the tcl name.
   // VTKCutPlane will be going away, and we will create the 
   // implicit function here.
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkCutPlane", tclName));
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkCutter", tclName));
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
@@ -1705,7 +1577,6 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   cutPlane->SetVTKSource(s, tclName);
   cutPlane->SetNthPVInput(0, current);
   cutPlane->SetName(tclName);
-  cutPlane->SetInterface(this->CutPlaneInterface);
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) CutPlaneCallback]", 
                        cutPlane->GetTclName(), this->GetTclName());
@@ -1788,7 +1659,6 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   threshold->SetVTKSource(s, tclName);
   threshold->SetNthPVInput(0, current);
   threshold->SetName(tclName);
-  threshold->SetInterface(this->ThresholdInterface);
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ThresholdCallback]", 
                        threshold->GetTclName(), this->GetTclName());
@@ -1839,7 +1709,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   char tclName[256];
   vtkSource *s;
   vtkDataSet *d;
-  vtkPVClipPlane *clipPlane;
+  vtkPVSource *clipPlane;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   const char* outputDataType;
@@ -1863,7 +1733,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   // through the tcl name.
   // vtkClipPlane will be going away, and we will create the 
   // implicit function here.
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkClipPlane", tclName));
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkClipDataSet", tclName));
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
@@ -1876,7 +1746,6 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   clipPlane->SetVTKSource(s, tclName);
   clipPlane->SetNthPVInput(0, current);
   clipPlane->SetName(tclName);
-  clipPlane->SetInterface(this->ClipPlaneInterface);
 
   pvApp->AddTraceEntry("set pv(%s) [$pv(%s) ClipPlaneCallback]", 
                        clipPlane->GetTclName(), this->GetTclName());

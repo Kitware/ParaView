@@ -56,18 +56,9 @@ public:
   static vtkPVCutPlane* New();
   vtkTypeMacro(vtkPVCutPlane, vtkPVSource);
     
+  // Decription:
+  // VTKSource must be set before this is called.
   void CreateProperties();
-
-  // Description:
-  // Callback that set the center to the middle of the bounds.
-  void CenterResetCallback();
-
-  // Descript:
-  // Callbacks to set the normal.
-  void NormalCameraCallback();
-  void NormalXCallback();
-  void NormalYCallback();
-  void NormalZCallback();
 
   // Description:
   // Also Update the bounds display.
@@ -79,20 +70,9 @@ protected:
   vtkPVCutPlane(const vtkPVCutPlane&) {};
   void operator=(const vtkPVCutPlane&) {};
 
-  vtkKWBoundsDisplay *BoundsDisplay;
-
-  vtkPVVectorEntry *CenterEntry;
-  vtkKWPushButton *CenterResetButton;
-
-  vtkPVVectorEntry *NormalEntry;
-
-  vtkKWWidget *NormalButtonFrame;
-  vtkKWPushButton *NormalCameraButton;
-  vtkKWPushButton *NormalXButton;
-  vtkKWPushButton *NormalYButton;
-  vtkKWPushButton *NormalZButton;
-
-  vtkPVVectorEntry *OffsetEntry;
+  vtkKWBoundsDisplay* BoundsDisplay;
 };
+
+
 
 #endif

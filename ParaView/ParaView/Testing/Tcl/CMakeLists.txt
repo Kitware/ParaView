@@ -31,6 +31,10 @@ ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl)
 
 CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CutContours.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CutContours.tcl)
+
+CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Delete.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Delete.tcl)
 
@@ -105,6 +109,9 @@ ADD_TEST(CombustorTest ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(ConeCubeCylSQ ${PARAVIEW_EXECUTABLE}
                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/ConeCubeCylSQ.tcl)
+
+ADD_TEST(CutContours ${PARAVIEW_EXECUTABLE}
+                 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CutContours.tcl)
 
 ADD_TEST(Delete ${PARAVIEW_EXECUTABLE}
                  ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Delete.tcl)

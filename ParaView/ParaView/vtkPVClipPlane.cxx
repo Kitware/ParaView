@@ -40,16 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVClipPlane.h"
-#include "vtkStringList.h"
-#include "vtkKWBoundsDisplay.h"
-#include "vtkKWView.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWLabel.h"
-#include "vtkPVApplication.h"
-#include "vtkPVWindow.h"
-#include "vtkPVData.h"
+#include "vtkPVPlaneWidget.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkKWBoundsDisplay.h"
+#include "vtkPVWindow.h"
+#include "vtkKWCompositeCollection.h"
+#include "vtkPVData.h"
+#include "vtkObjectFactory.h"
 
 int vtkPVClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -61,18 +58,6 @@ vtkPVClipPlane::vtkPVClipPlane()
 
   this->BoundsDisplay = vtkKWBoundsDisplay::New();
 
-  this->CenterEntry = vtkPVVectorEntry::New();
-  this->CenterResetButton = vtkKWPushButton::New();
-
-  this->NormalEntry = vtkPVVectorEntry::New();
-  this->NormalButtonFrame = vtkKWWidget::New();
-  this->NormalCameraButton = vtkKWPushButton::New();
-  this->NormalXButton = vtkKWPushButton::New();
-  this->NormalYButton = vtkKWPushButton::New();
-  this->NormalZButton = vtkKWPushButton::New();
-
-  this->OffsetEntry = vtkPVVectorEntry::New();
-
   this->ReplaceInputOn();
 }
 
@@ -81,27 +66,6 @@ vtkPVClipPlane::~vtkPVClipPlane()
 {
   this->BoundsDisplay->Delete();
   this->BoundsDisplay = NULL;
-
-  this->CenterEntry->Delete();
-  this->CenterEntry = NULL;
-  this->CenterResetButton->Delete();
-  this->CenterResetButton = NULL;
-
-  this->NormalEntry->Delete();
-  this->NormalEntry = NULL;
-  this->NormalButtonFrame->Delete();
-  this->NormalButtonFrame = NULL;
-  this->NormalCameraButton->Delete();
-  this->NormalCameraButton = NULL;
-  this->NormalXButton->Delete();
-  this->NormalXButton = NULL;
-  this->NormalYButton->Delete();
-  this->NormalYButton = NULL;
-  this->NormalZButton->Delete();
-  this->NormalZButton = NULL;
-
-  this->OffsetEntry->Delete();
-  this->OffsetEntry = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -121,6 +85,9 @@ vtkPVClipPlane* vtkPVClipPlane::New()
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::CreateProperties()
 {
+  vtkPVPlaneWidget *planeWidget;
+  vtkPVVectorEntry *offsetEntry;
+
   this->vtkPVSource::CreateProperties();
  
   this->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
@@ -133,169 +100,48 @@ void vtkPVClipPlane::CreateProperties()
   this->Script("pack %s -side top -fill x",
                this->BoundsDisplay->GetWidgetName());
 
-  this->CenterEntry->SetParent(this->GetParameterFrame()->GetFrame());
-  this->CenterEntry->SetModifiedCommand(this->GetTclName(), 
-                                        "ChangeAcceptButtonColor");
-  this->CenterEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Origin");
-  this->CenterEntry->Create(this->Application, "Center", 3, NULL, NULL);
-  this->Widgets->AddItem(this->CenterEntry);
-  this->Script("pack %s -side top -fill x",
-               this->CenterEntry->GetWidgetName());
-
-  this->CenterResetButton->SetParent(this->GetParameterFrame()->GetFrame());
-  this->CenterResetButton->Create(this->Application, "");
-  this->CenterResetButton->SetLabel("Set Plane Center to Center of Bounds");
-  this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
-  this->Script("pack %s -side top -fill x -padx 2",
-               this->CenterResetButton->GetWidgetName());
-
-  // Normal -------------------------
-  this->NormalEntry->SetParent(this->GetParameterFrame()->GetFrame());
-  this->NormalEntry->SetModifiedCommand(this->GetTclName(), 
-                                        "ChangeAcceptButtonColor");
-  this->NormalEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Normal");
-  this->NormalEntry->Create(this->Application, "Normal", 3, NULL, NULL);
-  this->Widgets->AddItem(this->NormalEntry);
-  this->Script("pack %s -side top -fill x",
-               this->NormalEntry->GetWidgetName());
-
-  this->NormalButtonFrame->SetParent(this->GetParameterFrame()->GetFrame());
-  this->NormalButtonFrame->Create(this->Application, "frame", "");
-  this->Script("pack %s -side top -fill x -padx 2",
-               this->NormalButtonFrame->GetWidgetName());
-
-  this->NormalCameraButton->SetParent(this->NormalButtonFrame);
-  this->NormalCameraButton->Create(this->Application, "");
-  this->NormalCameraButton->SetLabel("Use Camera Normal");
-  this->NormalCameraButton->SetCommand(this, "NormalCameraCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalCameraButton->GetWidgetName());
-  this->NormalXButton->SetParent(this->NormalButtonFrame);
-  this->NormalXButton->Create(this->Application, "");
-  this->NormalXButton->SetLabel("X Normal");
-  this->NormalXButton->SetCommand(this, "NormalXCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalXButton->GetWidgetName());
-  this->NormalYButton->SetParent(this->NormalButtonFrame);
-  this->NormalYButton->Create(this->Application, "");
-  this->NormalYButton->SetLabel("Y Normal");
-  this->NormalYButton->SetCommand(this, "NormalYCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalYButton->GetWidgetName());
-  this->NormalZButton->SetParent(this->NormalButtonFrame);
-  this->NormalZButton->Create(this->Application, "");
-  this->NormalZButton->SetLabel("Z Normal");
-  this->NormalZButton->SetCommand(this, "NormalZCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalZButton->GetWidgetName());
-
+  // The Plane widget makes its owns VTK object (vtkPlane) so we do not
+  // need to make the association.
+  planeWidget = vtkPVPlaneWidget::New();
+  planeWidget->SetParent(this->GetParameterFrame()->GetFrame());
+  planeWidget->SetPVSource(this);
+  planeWidget->SetModifiedCommand(this->GetTclName(),"ChangeAcceptButtonColor");
+  planeWidget->Create(this->Application);
+  this->Script("pack %s -side top -fill x", planeWidget->GetWidgetName());
+  planeWidget->SetName("Plane");
+  this->Widgets->AddItem(planeWidget);
+  // This makes the assumption that the vtkClipDataSet filter 
+  // has already been set.  In the future we could also implement 
+  // the virtual method "SetVTKSource" to catch the condition when
+  // the VTKSource is set after the properties are created.
+  if (this->VTKSourceTclName != NULL)
+    {
+    this->Script("%s SetClipFunction %s", this->VTKSourceTclName,
+                 planeWidget->GetPlaneTclName());
+    }
+  else
+    {
+    vtkErrorMacro("VTKSource must be set before properties are created.");
+    }
+  planeWidget->Delete();
+  planeWidget = NULL;
 
   // Offset -------------------------
-  this->OffsetEntry->SetParent(this->GetParameterFrame()->GetFrame());
-  this->OffsetEntry->SetModifiedCommand(this->GetTclName(), 
-                                        "ChangeAcceptButtonColor");
-  this->OffsetEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Offset");
-  this->OffsetEntry->Create(this->Application, "Offset", 1, NULL,
-                            NULL);
-  this->Widgets->AddItem(this->OffsetEntry);
-  this->Script("pack %s -side top -fill x",
-               this->OffsetEntry->GetWidgetName());
+  offsetEntry = vtkPVVectorEntry::New();
+  offsetEntry->SetParent(this->GetParameterFrame()->GetFrame());
+  offsetEntry->SetObjectVariable(this->GetVTKSourceTclName(), "Value");
+  offsetEntry->SetModifiedCommand(this->GetTclName(), 
+                                  "ChangeAcceptButtonColor");
+  offsetEntry->Create(this->Application, "Offset", 1, NULL, NULL);
+  this->Widgets->AddItem(offsetEntry);
+  this->Script("pack %s -side top -fill x", offsetEntry->GetWidgetName());
+  offsetEntry->Delete();
+  offsetEntry = NULL;
 
   this->UpdateProperties();
   this->UpdateParameterWidgets();
-  this->CenterResetCallback();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVClipPlane::AcceptCallback()
-{
-  this->vtkPVSource::AcceptCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClipPlane::CenterResetCallback()
-{
-  vtkPVData *input;
-  float bds[6];
-
-  input = this->GetNthPVInput(0);
-  if (input == NULL)
-    {
-    return;
-    }
-  input->GetBounds(bds);
-
-  this->CenterEntry->GetEntry(0)->SetValue(0.5*(bds[0]+bds[1]), 3);
-  this->CenterEntry->GetEntry(1)->SetValue(0.5*(bds[2]+bds[3]), 3);
-  this->CenterEntry->GetEntry(2)->SetValue(0.5*(bds[4]+bds[5]), 3);
-
-  this->CenterEntry->ModifiedCallback();
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVClipPlane::NormalCameraCallback()
-{
-  vtkKWView *view = this->GetView();
-  vtkRenderer *ren;
-  vtkCamera *cam;
-  double normal[3];
-
-  if (view == NULL)
-    {
-    vtkErrorMacro("Could not get the view/camera to set the normal.");
-    return;
-    }
-  ren = vtkRenderer::SafeDownCast(view->GetViewport());
-  if (ren == NULL)
-    {
-    vtkErrorMacro("Could not get the renderer/camera to set the normal.");
-    return;
-    }
-  cam = ren->GetActiveCamera();
-  if (cam == NULL)
-    {
-    vtkErrorMacro("Could not get the camera to set the normal.");
-    return;
-    }
-  cam->GetViewPlaneNormal(normal);
-
-  this->NormalEntry->GetEntry(0)->SetValue(-normal[0], 5);
-  this->NormalEntry->GetEntry(1)->SetValue(-normal[1], 5);
-  this->NormalEntry->GetEntry(2)->SetValue(-normal[2], 5);
-
-  this->NormalEntry->ModifiedCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClipPlane::NormalXCallback()
-{
-  this->NormalEntry->GetEntry(0)->SetValue(1.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClipPlane::NormalYCallback()
-{
-  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(1.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVClipPlane::NormalZCallback()
-{
-  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(1.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVClipPlane::UpdateParameterWidgets()
