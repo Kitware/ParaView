@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 #include "vtkXMLDataParser.h"
 
-vtkCxxRevisionMacro(vtkXMLObjectReader, "1.2");
+vtkCxxRevisionMacro(vtkXMLObjectReader, "1.3");
 
 vtkCxxSetObjectMacro(vtkXMLObjectReader, Object, vtkObject);
 
@@ -155,6 +155,94 @@ int vtkXMLObjectReader::Parse(vtkXMLDataElement *elem)
   this->LastParsedElement = elem;
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLObjectReader::ParseInElement(vtkXMLDataElement *parent)
+{
+  if (!parent)
+    {
+    return 0;
+    }
+
+  // Look for the nested element matching the root name
+
+  vtkXMLDataElement *nested_elem = 
+    parent->FindNestedElementWithName(this->GetRootElementName());
+  if (!nested_elem)
+    {
+    return 0;
+    }
+
+  // Parse the nested element
+
+  return this->Parse(nested_elem);
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLObjectReader::IsInElement(vtkXMLDataElement *parent)
+{
+  if (!parent)
+    {
+    return 0;
+    }
+
+  // Look for the nested element matching the root name
+
+  vtkXMLDataElement *nested_elem = 
+    parent->FindNestedElementWithName(this->GetRootElementName());
+  if (!nested_elem)
+    {
+    return 0;
+    }
+
+  // It is in the nested element
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLObjectReader::ParseInNestedElement(vtkXMLDataElement *grandparent,
+                                             const char *name)
+{
+  if (!grandparent || !name || !*name)
+    {
+    return 0;
+    }
+
+  // Look for the nested parent element matching the name
+
+  vtkXMLDataElement *parent = grandparent->FindNestedElementWithName(name);
+  if (!parent)
+    {
+    return 0;
+    }
+
+  // Parse the parent (look for the element inside)
+
+  return this->ParseInElement(parent);
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLObjectReader::IsInNestedElement(vtkXMLDataElement *grandparent,
+                                          const char *name)
+{
+  if (!grandparent || !name || !*name)
+    {
+    return 0;
+    }
+
+  // Look for the nested parent element matching the name
+
+  vtkXMLDataElement *parent = grandparent->FindNestedElementWithName(name);
+  if (!parent)
+    {
+    return 0;
+    }
+
+  // Is it in parent ?
+
+  return this->IsInElement(parent);
 }
 
 //----------------------------------------------------------------------------

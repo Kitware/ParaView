@@ -65,7 +65,7 @@ public:
   vtkGetObjectMacro(Object, vtkObject);
 
   // Description:
-  // Parse an XML tree.
+  // Parse an XML tree and modify the object accordingly.
   // Return 1 on success, 0 on error.
   virtual int Parse(vtkXMLDataElement*);
 
@@ -88,6 +88,28 @@ public:
   // Return the name of the root element of the XML tree this reader
   // is supposed to read and process.
   virtual char* GetRootElementName() = 0;
+
+  // Description:
+  // Convenience method to look in 'parent' for an XML element matching 
+  // the current root name and parse that element accordingly (see Parse()).
+  // IsInElement() does not actually parse, but checks if the
+  // element can be found on the path described previously.
+  // Return 1 on success, 0 on error.
+  virtual int ParseInElement(vtkXMLDataElement *parent);
+  virtual int IsInElement(vtkXMLDataElement *parent);
+
+  // Description:
+  // Convenience method to look in 'grandparent' for an XML 'parent' element
+  // matching the 'name', then look inside 'parent' for an XML element matching
+  // the current root name and parse that element accordingly 
+  // (see ParseInElement()).
+  // IsInNestedElement() does not actually parse, but checks if the
+  // element can be found on the path described previously.
+  // Return 1 on success, 0 on error.
+  virtual int ParseInNestedElement(vtkXMLDataElement *grandparent,
+                                   const char *name);
+  virtual int IsInNestedElement(vtkXMLDataElement *grandparent,
+                                const char *name);
 
 protected:
   vtkXMLObjectReader();
