@@ -93,6 +93,13 @@ public:
   vtkGetMacro(LongFormat, int);
 
   // Description:
+  // Show the label on top (default0, otherwise on left. 
+  // Valid if LongFormat is On.
+  void SetLabelOnTop(int);
+  vtkBooleanMacro(LabelOnTop, int);
+  vtkGetMacro(LabelOnTop, int);
+
+  // Description:
   // Show label.
   void SetShowLabel(int);
   vtkBooleanMacro(ShowLabel, int);
@@ -198,6 +205,7 @@ protected:
   int LongFormat;
 
   int ShowLabel;
+  int LabelOnTop;
   vtkKWLabel *Label;
 
   int ShowColor;

@@ -129,7 +129,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.11");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.12");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -141,6 +141,7 @@ vtkKWTextProperty::vtkKWTextProperty()
   this->Actor2D = NULL;
 
   this->LongFormat = 0;
+  this->LabelOnTop = 1;
 
   this->ShowLabel = 0;
   this->Label = vtkKWLabel::New();
@@ -507,20 +508,33 @@ void vtkKWTextProperty::Pack()
     this->PushButtonSet->GetLabel()->SetLabel("Functions:");
     this->PushButtonSet->ShowLabelOn();
 
-    tk_cmd << "grid " 
-           << this->Label->GetWidgetName() << " -column 0 -sticky nsw" << endl;
+    int row = 0, col = 0;
 
-    const char *options = " -column 0 -sticky nsw -pady 1 -padx 10";
     tk_cmd << "grid " 
-           << this->ChangeColorButton->GetWidgetName() << options << endl
-           << "grid " 
-           << this->FontFamilyOptionMenu->GetWidgetName() << options << endl
-           << "grid " 
-           << this->StylesCheckButtonSet->GetWidgetName() << options << endl
-           << "grid " 
-           << this->OpacityScale->GetWidgetName() << options << endl
-           << "grid " 
-           << this->PushButtonSet->GetWidgetName() << options << endl;
+           << this->Label->GetWidgetName() 
+           << " -sticky nsw -column " << col << " -row " << row << endl;
+
+    if (this->LabelOnTop)
+      {
+      row++;
+      }
+    else
+      {
+      col = 1;
+      }
+
+    const char *options = " -sticky nsw -pady 1 -padx 10";
+    
+    tk_cmd << "grid " << this->ChangeColorButton->GetWidgetName() << options 
+           << " -column " << col << " -row " << row++ << endl;
+    tk_cmd << "grid " << this->FontFamilyOptionMenu->GetWidgetName() << options 
+           << " -column " << col << " -row " << row++ << endl;
+    tk_cmd << "grid " << this->StylesCheckButtonSet->GetWidgetName() << options 
+           << " -column " << col << " -row " << row++ << endl;
+    tk_cmd << "grid " << this->OpacityScale->GetWidgetName() << options 
+             << " -column " << col << " -row " << row++ << endl;
+    tk_cmd  << "grid " << this->PushButtonSet->GetWidgetName() << options 
+           << " -column " << col << " -row " << row++ << endl;
     }
   else
     {
@@ -636,6 +650,19 @@ void vtkKWTextProperty::SetShowLabel(int _arg)
   this->Modified();
 
   this->UpdateLabel();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWTextProperty::SetLabelOnTop(int _arg)
+{
+  if (this->LabelOnTop == _arg)
+    {
+    return;
+    }
+  this->LabelOnTop = _arg;
+  this->Modified();
+
+  this->Pack();
 }
 
 // ----------------------------------------------------------------------------
@@ -1252,6 +1279,7 @@ void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "LongFormat: " << (this->LongFormat ? "On" : "Off") << endl;
   os << indent << "ShowLabel: " << (this->ShowLabel ? "On" : "Off") << endl;
+  os << indent << "LabelOnTop: " << (this->LabelOnTop ? "On" : "Off") << endl;
   os << indent << "ShowColor: " << (this->ShowColor ? "On" : "Off") << endl;
   os << indent << "ShowFontFamily: " 
      << (this->ShowFontFamily ? "On" : "Off") << endl;
