@@ -100,6 +100,11 @@ public:
 
   void UpdateFromMaster();
 
+  
+  // Description:
+  // Get at the underlying vtkCornerAnnotationClass
+  vtkGetObjectMacro(CornerProp,vtkCornerAnnotation);
+  
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
