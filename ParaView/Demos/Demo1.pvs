@@ -3573,48 +3573,43 @@ if ![info exists DemoDir] {
             $rv ParallelProjectionOn
         }
     }
-    if { [info exists pvDemoCommandLine] } {
-        $Application Exit
-    } else {
-        global clip extract iso streams threshold warp
+    global clip extract iso streams threshold warp
 
-        catch {$clip(vtkTemp572) DeleteCallback}
-        catch {$clip(vtkTemp507) DeleteCallback}
-        catch {$clip(vtkTemp384) DeleteCallback}
-        
-        catch {$extract(vtkTemp780) DeleteCallback}
-        catch {$extract(vtkTemp598) DeleteCallback}
-        catch {$extract(vtkTemp478) DeleteCallback}
-        catch {$extract(vtkTemp384) DeleteCallback}
-        
-        catch {$iso(vtkTemp820) DeleteCallback}
-        catch {$iso(vtkTemp739) DeleteCallback}
-        catch {$iso(vtkTemp674) DeleteCallback}
-        catch {$iso(vtkTemp565) DeleteCallback}
-        catch {$iso(vtkTemp449) DeleteCallback}
-        catch {$iso(vtkTemp384) DeleteCallback}
-        
-        catch {$streams(vtkTemp900) DeleteCallback}
-        catch {$streams(vtkTemp786) DeleteCallback}
-        catch {$streams(vtkTemp679) DeleteCallback}
-        catch {$streams(vtkTemp597) DeleteCallback}
-        catch {$streams(vtkTemp478) DeleteCallback}
-        catch {$streams(vtkTemp384) DeleteCallback}
-        
-        catch {$threshold(vtkTemp482) DeleteCallback}
-        catch {$threshold(vtkTemp384) DeleteCallback}
-        
-        catch {$warp(vtkTemp450) DeleteCallback}
-        catch {$warp(vtkTemp384) DeleteCallback}
-        
-        catch {$clip(vtkTemp24) EventuallyRender}
+    catch {$clip(vtkTemp572) DeleteCallback}
+    catch {$clip(vtkTemp507) DeleteCallback}
+    catch {$clip(vtkTemp384) DeleteCallback}
 
-        grab release .control.main.stop
-        wm withdraw .control
+    catch {$extract(vtkTemp780) DeleteCallback}
+    catch {$extract(vtkTemp598) DeleteCallback}
+    catch {$extract(vtkTemp478) DeleteCallback}
+    catch {$extract(vtkTemp384) DeleteCallback}
 
-        wm protocol .paraview WM_DELETE_WINDOW { [$Application GetMainWindow] Exit }
-    }
+    catch {$iso(vtkTemp820) DeleteCallback}
+    catch {$iso(vtkTemp739) DeleteCallback}
+    catch {$iso(vtkTemp674) DeleteCallback}
+    catch {$iso(vtkTemp565) DeleteCallback}
+    catch {$iso(vtkTemp449) DeleteCallback}
+    catch {$iso(vtkTemp384) DeleteCallback}
+
+    catch {$streams(vtkTemp900) DeleteCallback}
+    catch {$streams(vtkTemp786) DeleteCallback}
+    catch {$streams(vtkTemp679) DeleteCallback}
+    catch {$streams(vtkTemp597) DeleteCallback}
+    catch {$streams(vtkTemp478) DeleteCallback}
+    catch {$streams(vtkTemp384) DeleteCallback}
+
+    catch {$threshold(vtkTemp482) DeleteCallback}
+    catch {$threshold(vtkTemp384) DeleteCallback}
+
+    catch {$warp(vtkTemp450) DeleteCallback}
+    catch {$warp(vtkTemp384) DeleteCallback}
+
+    catch {$clip(vtkTemp24) EventuallyRender}
+
+    grab release .control.main.stop
+    wm withdraw .control
+
+    wm protocol .paraview WM_DELETE_WINDOW { [$Application GetMainWindow] Exit }
 
     unset DemoDir
 }
-
