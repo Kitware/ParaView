@@ -44,10 +44,47 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
+#else
+#include "vtkXRenderWindow.h"
+
+int vtkKWViewFoundMatch;
+Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
+			     char *arg)
+{  
+  if (event->type == Expose)
+    {
+    vtkKWViewFoundMatch = 1;
+    }
+  if (event->type == ConfigureNotify)
+    {
+    vtkKWViewFoundMatch = 2;
+    }
+  if (event->type == ButtonPress)
+    {
+    vtkKWViewFoundMatch = 2;
+    }
+  return 0;
+}
 #endif
 
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
+
+void KWViewAbortCheckMethod( void *arg )
+{
+  vtkKWView *me = (vtkKWView *)arg;
+
+  // if we are printing then do not abort
+  if (me->GetPrinting())
+    {
+    return;
+    }
+
+  if ( me->ShouldIAbort() == 2 )
+    {
+    me->GetRenderWindow()->SetAbortRender(1);    
+    }
+}
 
 vtkKWView::vtkKWView()
 {
@@ -191,6 +228,90 @@ vtkKWView::~vtkKWView()
   delete [] this->StillUpdateRates;
   
   this->SetMenuPropertiesName(NULL);
+  
+}
+
+// Return 1 to mean abort but keep trying, 2 to mean hard abort
+int vtkKWView::ShouldIAbort()
+{
+  int flag = 0;
+  
+#ifdef _WIN32
+  MSG msg;
+
+  // Check all four - can't get the range right in one call without
+  // including events we don't want
+
+  if (PeekMessage(&msg,NULL,WM_LBUTTONDOWN,WM_LBUTTONDOWN,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+  if (PeekMessage(&msg,NULL,WM_NCLBUTTONDOWN,WM_NCLBUTTONDOWN,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+  if (PeekMessage(&msg,NULL,WM_MBUTTONDOWN,WM_MBUTTONDOWN,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+  if (PeekMessage(&msg,NULL,WM_RBUTTONDOWN,WM_RBUTTONDOWN,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+  if (PeekMessage(&msg,NULL,WM_WINDOWPOSCHANGING,WM_WINDOWPOSCHANGING,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+  if (PeekMessage(&msg,NULL,WM_WINDOWPOSCHANGED,WM_WINDOWPOSCHANGED,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+  if (PeekMessage(&msg,NULL,WM_SIZE,WM_SIZE,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+
+  if ( !flag )
+    {
+    // Check some other events to make sure UI isn't being updated
+    if (PeekMessage(&msg,NULL,WM_SYNCPAINT,WM_SYNCPAINT,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_NCPAINT,WM_NCPAINT,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_PAINT,WM_PAINT,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_ERASEBKGND,WM_ERASEBKGND,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_ACTIVATE,WM_ACTIVATE,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    if (PeekMessage(&msg,NULL,WM_NCACTIVATE,WM_NCACTIVATE,PM_NOREMOVE))
+      {
+      flag = 1;
+      }
+    }
+  
+#else
+  XEvent report;
+  
+  vtkKWViewFoundMatch = 0;
+  Display *dpy = ((vtkXRenderWindow*)this->GetRenderWindow())->GetDisplayId();
+  XSync(dpy,0);
+  XCheckIfEvent(dpy, &report, vtkKWRenderViewPredProc, NULL);
+  XSync(dpy,0);
+  flag = vtkKWViewFoundMatch;
+#endif
+  
+  return flag;
   
 }
 
@@ -1072,7 +1193,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.34 $");
+  this->ExtractRevision(os,"$Revision: 1.35 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

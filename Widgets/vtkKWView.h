@@ -302,6 +302,11 @@ public:
   // Get the render window used by this widget
   vtkGetObjectMacro(RenderWindow,vtkRenderWindow);
   
+  // Description:
+  // The guts of the abort check method. Made public so that it can
+  // be accessed by the render timer callback.
+  int ShouldIAbort();
+  
 protected:
   vtkKWView();
   ~vtkKWView();
