@@ -80,6 +80,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 
+#include "vtkOutputWindow.h"
+
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 //extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
@@ -325,6 +327,26 @@ int vtkPVApplication::CheckRegistration()
 void vtkPVApplication::Start(int argc, char*argv[])
 {
   
+  vtkOutputWindow::GetInstance()->PromptUserOn();
+
+  // set the font size to be small
+#ifdef _WIN32
+  this->Script("option add *font {{MS Sans Serif} 8}");
+#else
+  this->Script("option add *font -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
+//  this->Script("option add *font -adobe-helvetica-medium-r-normal--11-80-100-100-p-56-iso8859-1");
+  this->Script("option add *highlightThickness 0");
+  this->Script("option add *highlightBackground #ccc");
+  this->Script("option add *activeBackground #eee");
+  this->Script("option add *activeForeground #000");
+  this->Script("option add *background #ccc");
+  this->Script("option add *foreground #000");
+  this->Script("option add *Entry.background #ffffff");
+  this->Script("option add *Text.background #ffffff");
+  this->Script("option add *Button.padX 6");
+  this->Script("option add *Button.padY 3");
+#endif
+
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
 
@@ -340,14 +362,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
     if (!strcmp(argv[1] + strlen(argv[1]) - 4,".tcl"))
       {
       ui->LoadScript(argv[1]);
-      }
-    // otherwise try to load it as a volume
-    else
-      {
-      if (strlen(argv[1]) > 1)
-        {
-        //ui->Open(argv[1]);
-        }
       }
     }
 

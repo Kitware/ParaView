@@ -70,6 +70,10 @@ public:
   // Description:
   // Start running the main application.
   virtual void Start(int argc, char *argv[]);
+  virtual void Start()
+    { this->vtkKWApplication::Start(); }
+  virtual void Start(char* arg)
+    { this->vtkKWApplication::Start(arg); }
 
   
 //BTX
@@ -162,6 +166,12 @@ protected:
   ~vtkPVApplication();
   vtkPVApplication(const vtkPVApplication&) {};
   void operator=(const vtkPVApplication&) {};
+
+  // For locating help (.chm) on Windows.
+  virtual int GetApplicationKey() 
+    {
+      return 15;
+    };
   
   void *Log;
   char *LogFileName;
