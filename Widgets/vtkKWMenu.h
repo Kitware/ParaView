@@ -91,6 +91,7 @@ public:
   // Add a radio button menu item.  You must create a variable to store
   // the value of the button.
   char* CreateRadioButtonVariable(vtkKWObject* Object, const char* varname);
+  int GetRadioButtonValue(vtkKWObject* Object, const char* varname);
   void CheckRadioButton(vtkKWObject *Object, const char *varname, int id);
   void InsertRadioButton(int position, int value, const char* label, 
                          const char* buttonVar, vtkKWObject* Called, 

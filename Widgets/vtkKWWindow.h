@@ -104,6 +104,8 @@ public:
   vtkGetObjectMacro(PropertiesParent,vtkKWWidget);
   vtkSetObjectMacro(PropertiesParent,vtkKWWidget);
   void CreateDefaultPropertiesParent();
+  void HideProperties();
+  void ShowProperties();
   
   // Description::
   // Override Unregister since widgets have loops.

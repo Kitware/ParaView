@@ -371,6 +371,31 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->Menu->AddCascade("Help", this->MenuHelp, 0);
   this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp");
   this->MenuHelp->AddCommand("About", this, "DisplayAbout");
+
+  char *rbv = 
+    this->GetMenuProperties()->CreateRadioButtonVariable(
+      this->GetMenuProperties(),"Radio");
+  this->GetMenuProperties()->AddRadioButton(0,"Hide Properties", 
+                                            rbv, this, "HideProperties");
+  delete [] rbv;
+}
+
+void vtkKWWindow::ShowProperties()
+{
+  this->Script("pack %s -before %s -side left -fill y -anchor nw",
+               this->PropertiesParent->GetWidgetName(), 
+               this->ViewFrame->GetWidgetName());
+}
+
+void vtkKWWindow::HideProperties()
+{
+  // make sure the variable is set, otherwise set it
+  this->GetMenuProperties()->CheckRadioButton(
+    this->GetMenuProperties(),"Radio",0);
+  
+  // forget current props
+  this->Script("pack forget %s",
+               this->PropertiesParent->GetWidgetName());  
 }
 
 void vtkKWWindow::InstallMenu(vtkKWMenu* menu)
@@ -712,5 +737,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.15 $");
+  this->ExtractRevision(os,"$Revision: 1.16 $");
 }

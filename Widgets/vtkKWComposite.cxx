@@ -27,6 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkKWView.h"
 #include "vtkKWApplication.h"
+#include "vtkKWWindow.h"
 
 int vtkKWCompositeCommand(ClientData cd, Tcl_Interp *interp,
 			  int argc, char *argv[]);
@@ -40,6 +41,7 @@ vtkKWComposite::vtkKWComposite()
   this->TopLevel = NULL;
   this->Application = NULL;
   this->View = NULL;
+  this->LastSelectedProperty = -1;
 }
 
 vtkKWComposite::~vtkKWComposite()
@@ -137,6 +139,13 @@ void vtkKWComposite::CreateProperties()
                this->Notebook->GetWidgetName());
 }
 
+void vtkKWComposite::Deselect(vtkKWView *v)
+{
+  this->LastSelectedProperty = 
+    v->GetParentWindow()->GetMenuProperties()->GetRadioButtonValue(
+      v->GetParentWindow()->GetMenuProperties(),"Radio");
+}
+
 void vtkKWComposite::Select(vtkKWView *v)
 {
   // make sure we have an applicaiton
@@ -157,5 +166,5 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.5 $");
+  this->ExtractRevision(os,"$Revision: 1.6 $");
 }
