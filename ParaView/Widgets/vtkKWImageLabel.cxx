@@ -73,7 +73,6 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
 {
   int r, g, b;
   this->GetBackgroundColor(&r, &g, &b);
-  cout << "Color: " << r << ", " << g << ", " << b << endl;
   this->Script("image create photo -height %d -width %d", width, height);
   this->SetImageDataLabel(this->Application->GetMainInterp()->result);
   Tk_PhotoHandle photo;
