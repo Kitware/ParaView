@@ -100,20 +100,27 @@ const char* vtkKWCheckButton::GetText()
 
 int vtkKWCheckButton::GetState()
 {
-  this->Script("set %sValue",this->GetWidgetName());
-  
-  return vtkKWObject::GetIntegerResult(this->Application);
+  if ( this->Application )
+    {
+    this->Script("set %sValue",this->GetWidgetName());
+    
+    return vtkKWObject::GetIntegerResult(this->Application);
+    }
+  return 0;
 }
 
 void vtkKWCheckButton::SetState(int s)
 {
-  if (s)
+  if ( this->Application )
     {
-    this->Script("%s select",this->GetWidgetName());
-    }
-  else
-    {
-    this->Script("%s deselect",this->GetWidgetName());
+    if (s)
+      {
+      this->Script("%s select",this->GetWidgetName());
+      }
+    else
+      {
+      this->Script("%s deselect",this->GetWidgetName());
+      }
     }
 }
 
