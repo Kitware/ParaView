@@ -581,7 +581,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
 					  index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-s",
-					  index) == VTK_OK )
+					  index) == VTK_OK ||
+       getenv("PV_SOFTWARE_RENDERING") )
     {
     this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n"
 			  "_graphics_fact SetUseMesaClasses 1\n"
@@ -589,6 +590,15 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->BroadcastScript("vtkImagingFactory _imaging_fact\n"
 			  "_imaging_fact SetUseMesaClasses 1\n"
 			  "_imaging_fact Delete");
+    if ( getenv("PV_SOFTWARE_RENDERING") )
+      {
+      this->Script("vtkGraphicsFactory _graphics_fact\n"
+		   "_graphics_fact SetUseMesaClasses 0\n"
+		   "_graphics_fact Delete");
+      this->Script("vtkImagingFactory _imaging_fact\n"
+		   "_imaging_fact SetUseMesaClasses 0\n"
+		   "_imaging_fact Delete");
+      }
     }
 #endif
 
