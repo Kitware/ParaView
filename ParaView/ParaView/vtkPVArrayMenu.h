@@ -56,6 +56,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkDataSet.h"
 
+
+class vtkPVInputMenu;
 class vtkCollection;
 
 class VTK_EXPORT vtkPVArrayMenu : public vtkPVWidget
@@ -128,6 +130,11 @@ public:
   vtkSetStringMacro(ObjectTclName);
   vtkGetStringMacro(ObjectTclName);
 
+  // Description:
+  // This input menu supplies the data set.  We do not refernce count it to avoid a reference loop.
+  void SetInputMenu(vtkPVInputMenu *im) { this->InputMenu = im;};
+  
+
   // -----
 
   // Description:
@@ -196,6 +203,9 @@ protected:
 
   int FieldSelection;
   int ShowFieldMenu;
+
+  // This is where we get the data object arrays to populate our menu.
+  vtkPVInputMenu *InputMenu;
 
   // These are options that allow the widget to interact with its associated object.
   char*       InputName;

@@ -320,6 +320,11 @@ protected:
   void SetNthPVOutput(int idx, vtkPVData *output);
  
  
+  // We keep a reference to the input menu (if created) because any
+  // array menu must be dependant on it.
+  // This is a bit of a hack until we represent the dependancey in the XML.
+  vtkPVInputMenu *InputMenu;
+    
   
   // The name is just for display.
   char      *Name;

@@ -112,6 +112,8 @@ vtkPVSource::vtkPVSource()
   this->ExtentTranslatorTclName = NULL;
 
   this->ReplaceInput = 1;
+
+  this->InputMenu = NULL; 
 }
 
 //----------------------------------------------------------------------------
@@ -176,6 +178,12 @@ vtkPVSource::~vtkPVSource()
     this->GetPVApplication()->BroadcastScript("%s Delete", 
                                 this->ExtentTranslatorTclName);
     this->SetExtentTranslatorTclName(NULL);
+    }
+
+  if (this->InputMenu)
+    {
+    this->InputMenu->UnRegister(this);
+    this->InputMenu = NULL;
     }
 }
 
@@ -1284,6 +1292,13 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
   this->Script("pack %s -side top -fill x -expand t",
                inputMenu->GetWidgetName());
   this->AddPVWidget(inputMenu);
+
+  if (this->InputMenu == NULL)
+    {
+    this->InputMenu = inputMenu;
+    inputMenu->Register(this);
+    }
+
   inputMenu->Delete();
   return inputMenu;
 }
@@ -1295,6 +1310,12 @@ vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label,
                                           const char *help)
 {
   vtkPVArrayMenu *arrayMenu;
+
+  if (this->InputMenu == NULL)
+    {
+    vtkErrorMacro("Could not find the input menu.");
+    return NULL;
+    }
 
   arrayMenu = vtkPVArrayMenu::New();
   arrayMenu->SetDataSetCommand(this->GetVTKSourceTclName(), "GetInput");
@@ -1308,6 +1329,10 @@ vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label,
   arrayMenu->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
   arrayMenu->Create(this->Application);
   arrayMenu->SetBalloonHelpString(help);
+
+  // Set up the dependancy so that the array menu updates when the input changes.
+  this->InputMenu->AddDependant(arrayMenu);
+  arrayMenu->SetInputMenu(this->InputMenu);  
 
   this->Script("pack %s -side top -fill x -expand t",
                arrayMenu->GetWidgetName());
