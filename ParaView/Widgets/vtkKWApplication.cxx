@@ -275,10 +275,13 @@ void vtkKWApplication::SetApplicationReleaseName(const char *_arg)
 
 void vtkKWApplication::Close(vtkKWWindow *win)
 {
-  this->Windows->RemoveItem(win);
-  if (this->Windows->GetNumberOfItems() < 1)
+  if ( this->Windows )
     {
-    this->Exit();
+    this->Windows->RemoveItem(win);
+    if (this->Windows->GetNumberOfItems() < 1)
+      {
+      this->Exit();
+      }
     }
 }
 
@@ -302,15 +305,14 @@ void vtkKWApplication::AddWindow(vtkKWWindow *w)
 
 void vtkKWApplication::Exit()
 {
-  vtkKWWindow* win = 0;
-  this->Windows->InitTraversal();
-
   // Avoid a recursive exit.
   if (this->InExit)
     {
     return;
     }
   this->InExit = 1;
+  vtkKWWindow* win = 0;
+  this->Windows->InitTraversal();
   
   while (this->Windows && (win = this->Windows->GetNextKWWindow()))
     {
@@ -333,7 +335,7 @@ void vtkKWApplication::Exit()
     this->BalloonHelpLabel->Delete();
     this->BalloonHelpLabel = NULL;
     }
-  this->SetBalloonHelpPending(NULL);
+//  this->SetBalloonHelpPending(NULL);
 
   this->InExit = 0;
 
@@ -411,7 +413,7 @@ void vtkKWApplication::Start(char *arg)
 }
 void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
-  while (this->Windows->GetNumberOfItems())
+  while (this->Windows && this->Windows->GetNumberOfItems())
     {
     Tcl_DoOneEvent(0);
     }
@@ -474,6 +476,10 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
 {
+  if ( this->InExit )
+    {
+    return;
+    }
   char *result;
 
   // If there is no help string, return
@@ -496,6 +502,10 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
 {
+  if ( this->InExit )
+    {
+    return;
+    }
   if ( !this->BalloonHelpLabel || !this->BalloonHelpWindow ||
        !widget->GetParent() )
     {
@@ -587,6 +597,10 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpCancel()
 {
+  if ( this->InExit )
+    {
+    return;
+    }
   if (this->BalloonHelpPending)
     {
     this->Script("after cancel %s", this->BalloonHelpPending);
@@ -603,6 +617,10 @@ void vtkKWApplication::BalloonHelpCancel()
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpWithdraw()
 {
+  if ( this->InExit )
+    {
+    return;
+    }
   if ( !this->BalloonHelpLabel || !this->BalloonHelpWindow )
     {
     return;
@@ -629,6 +647,10 @@ int vtkKWApplication::GetWidgetVisibility()
 //----------------------------------------------------------------------------
 void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
 {
+  if ( this->InExit )
+    {
+    return;
+    }
   ostrstream str;
   str << "Application : " << this->GetApplicationName() << "\nVersion : " << this->GetApplicationVersionName() << "\nRelease : " << this->GetApplicationReleaseName() << ends;
 
@@ -679,6 +701,10 @@ vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery()
 
 void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
 {
+  if ( this->InExit && widget )
+    {
+    return;
+    }
   if ( this->BalloonHelpWidget )
     {
     this->BalloonHelpWidget->UnRegister(this);
