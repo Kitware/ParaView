@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.154");
+vtkCxxRevisionMacro(vtkKWWindow, "1.155");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -688,7 +688,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
                this->ProgressGauge->GetWidgetName());
 
   this->TrayFrame->Create(app, 0);
-  this->Script("%s configure -borderwidth 0", this->TrayFrame->GetWidgetName());
+  this->Script("%s configure -borderwidth 0", 
+               this->TrayFrame->GetWidgetName());
   this->TrayImage->Create(app, "");
   this->Script("%s configure -relief sunken -bd 2",
                this->TrayImage->GetWidgetName());
@@ -698,10 +699,11 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   ico->Delete();
   this->TrayImage->SetBind(this, "<Button-1>", "ProcessErrorClick");
   
-  // To force the toolbar on top, I am create a separate "MiddleFrame" for the ViewFrame and PropertiesParent
+  // To force the toolbar on top, I am creating a separate "MiddleFrame" 
+  // for the ViewFrame and PropertiesParent
 
   this->MiddleFrame->SetSeparatorSize(0);
-  this->MiddleFrame->SetFrame1MinimumSize(360);
+  this->MiddleFrame->SetFrame1MinimumSize(380);
 
   if (this->Application->HasRegisteryValue(
     2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
@@ -715,7 +717,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
     }
   else
     {
-    this->MiddleFrame->SetFrame1Size(360);
+    this->MiddleFrame->SetFrame1Size(380);
     }
   this->MiddleFrame->Create(app);
   this->Script("pack %s -side bottom -fill both -expand t",
