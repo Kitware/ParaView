@@ -51,9 +51,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStructuredGrid.h"
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkMultiProcessController.h"
 
 #ifdef VTK_USE_MPI
-# include "vtkMPIController.h"
+# include "vtkMPICommunicator.h"
 #endif
 
 #include <vtkstd/string>
@@ -63,24 +64,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.10");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.11");
 
-#ifdef VTK_USE_MPI
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
-                     vtkMPIController);
+                     vtkMultiProcessController);
 vtkMultiProcessController* vtkPVEnSightMasterServerReader::GetController()
 {
   return this->Controller;
 }
-#else
-void vtkPVEnSightMasterServerReader::SetController(vtkMPIController*)
-{
-}
-vtkMultiProcessController* vtkPVEnSightMasterServerReader::GetController()
-{
-  return 0;
-}
-#endif
 
 //----------------------------------------------------------------------------
 class vtkPVEnSightMasterServerReaderInternal
@@ -126,8 +117,8 @@ void vtkPVEnSightMasterServerReader::PrintSelf(ostream& os, vtkIndent indent)
 #ifdef VTK_USE_MPI
 template <class T>
 int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
-                                             int numPieces,
-                                             vtkMPIController* controller)
+                                       int numPieces,
+                                       vtkMultiProcessController* controller)
 {
   // Compare values on all processes that will read real pieces.
   // Returns whether the values match.  If they match, all processes'
@@ -188,10 +179,20 @@ int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
   
   return result;
 }
+#else
+template <class T>
+int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
+                     int numPieces,
+                     vtkMultiProcessController* controller)
+{
+  data = data;
+  numValues = numValues;
+  controller = controller;
+  return VTK_OK;
+}
 #endif
 
 //----------------------------------------------------------------------------
-#ifdef VTK_USE_MPI
 void vtkPVEnSightMasterServerReader::ExecuteInformation()
 {
   int i;
@@ -309,14 +310,8 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     return;
     }
 }
-#else
-void vtkPVEnSightMasterServerReader::ExecuteInformation()
-{
-}
-#endif
 
 //----------------------------------------------------------------------------
-#ifdef VTK_USE_MPI
 void vtkPVEnSightMasterServerReader::Execute()
 {
   int i;
@@ -430,13 +425,6 @@ void vtkPVEnSightMasterServerReader::Execute()
     this->GetOutput(i)->SetExtentTranslator(this->ExtentTranslator);
     }
 }
-#else
-void vtkPVEnSightMasterServerReader::Execute()
-{
-  // Without MPI, all we can do is produce an empty output.
-  this->ExecuteError();
-}
-#endif
 
 //----------------------------------------------------------------------------
 void vtkPVEnSightMasterServerReader::ExecuteError()
@@ -454,7 +442,6 @@ void vtkPVEnSightMasterServerReader::ExecuteError()
 }
 
 //----------------------------------------------------------------------------
-#ifdef VTK_USE_MPI
 void vtkPVEnSightMasterServerReader::SuperclassExecuteInformation()
 {
   // Fake the filename when the superclass uses it.
@@ -465,14 +452,8 @@ void vtkPVEnSightMasterServerReader::SuperclassExecuteInformation()
   this->Superclass::ExecuteInformation();
   this->CaseFileName = temp;
 }
-#else
-void vtkPVEnSightMasterServerReader::SuperclassExecuteInformation()
-{
-}
-#endif
 
 //----------------------------------------------------------------------------
-#ifdef VTK_USE_MPI
 void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
 {
   // Fake the filename when the superclass uses it.
@@ -483,13 +464,7 @@ void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
   this->Superclass::Execute();
   this->CaseFileName = temp;
 }
-#else
-void vtkPVEnSightMasterServerReader::SuperclassExecuteData()
-{
-}
-#endif
 
-#ifdef VTK_USE_MPI
 //----------------------------------------------------------------------------
 static int vtkPVEnSightMasterServerReaderIsSpace(char c)
 {
@@ -699,9 +674,3 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
   
   return VTK_OK;
 }
-#else
-int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
-{
-  return VTK_ERROR;
-}
-#endif
