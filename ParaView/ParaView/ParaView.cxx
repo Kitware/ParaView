@@ -61,8 +61,12 @@ int MyMain(int argc, char *argv[])
   MPI_Comm_rank(MPI_COMM_WORLD,&myId); 
 #endif
   
-  // Don't prompt the user with startup errors.
+  // Don't prompt the user with startup errors on unix.
+#if defined(_WIN32) && !defined(__CYGWIN__)
+  vtkOutputWindow::GetInstance()->PromptUserOn();
+#else
   vtkOutputWindow::GetInstance()->PromptUserOff();
+#endif
   
   // The server is a special case.  We do not initialize Tk for process 0.
   // I would rather have application find this command line option, but
