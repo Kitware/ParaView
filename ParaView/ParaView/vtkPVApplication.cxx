@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.198");
+vtkCxxRevisionMacro(vtkPVApplication, "1.199");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1861,6 +1861,12 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
     {
     this->ProcessModule->RemoteSimpleScript(remoteId, str);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::FindApplicationInstallationDirectory()
+{
+  // Just to fix a halfbaked thing
 }
 
 //----------------------------------------------------------------------------
