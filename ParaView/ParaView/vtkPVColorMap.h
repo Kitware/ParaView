@@ -58,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 class vtkKWEntry;
-class vtkKWImageLabel;
 class vtkKWLabel;
 class vtkKWLabeledEntry;
 class vtkKWLabeledFrame;
@@ -308,7 +307,7 @@ protected:
   // Stuff for selecting start and end colors.
   vtkKWWidget*            ColorEditorFrame;
   vtkKWChangeColorButton* StartColorButton;
-  vtkKWImageLabel*        Map;
+  vtkKWLabel*        Map;
   vtkKWChangeColorButton* EndColorButton;
 
   vtkKWLabeledFrame* VectorFrame;

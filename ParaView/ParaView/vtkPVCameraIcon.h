@@ -45,17 +45,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVCameraIcon_h
 #define __vtkPVCameraIcon_h
 
-#include "vtkKWImageLabel.h"
+#include "vtkKWLabel.h"
 
 class vtkKWPushButton;
 class vtkPVRenderView;
 class vtkCamera;
 
-class VTK_EXPORT vtkPVCameraIcon : public vtkKWImageLabel
+class VTK_EXPORT vtkPVCameraIcon : public vtkKWLabel
 {
 public:
   static vtkPVCameraIcon* New();
-  vtkTypeRevisionMacro(vtkPVCameraIcon, vtkKWImageLabel);
+  vtkTypeRevisionMacro(vtkPVCameraIcon, vtkKWLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication *pvApp, const char *args);

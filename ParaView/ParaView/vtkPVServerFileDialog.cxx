@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
-#include "vtkKWImageLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWListBox.h"
 #include "vtkKWMenu.h"
@@ -65,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.18");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.19");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -146,7 +145,7 @@ vtkPVServerFileDialog::vtkPVServerFileDialog()
   this->DirectoryDisplay = vtkKWLabel::New();
   this->DirectoryMenuButton = vtkKWMenuButton::New();  
 
-  this->DownDirectoryButton = vtkKWImageLabel::New();
+  this->DownDirectoryButton = vtkKWLabel::New();
   this->DownDirectoryIcon = vtkKWIcon::New();
   this->DownDirectoryIcon->SetImageData(image_PVUpDirectoryButton, 
                     image_PVUpDirectoryButton_width,

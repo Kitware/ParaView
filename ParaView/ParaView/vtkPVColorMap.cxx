@@ -46,7 +46,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
-#include "vtkKWImageLabel.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWLabeledFrame.h"
@@ -75,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.56");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.57");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -177,7 +176,7 @@ vtkPVColorMap::vtkPVColorMap()
   this->NumberOfColorsScale = vtkKWScale::New();  
   this->ColorEditorFrame = vtkKWWidget::New();
   this->StartColorButton = vtkKWChangeColorButton::New();
-  this->Map = vtkKWImageLabel::New();
+  this->Map = vtkKWLabel::New();
   this->EndColorButton = vtkKWChangeColorButton::New();
   // Stuff for setting the range of the color map.
   this->ColorRangeFrame = vtkKWWidget::New();

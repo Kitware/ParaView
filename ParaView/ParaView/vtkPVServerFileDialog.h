@@ -57,7 +57,6 @@ class vtkKWLabel;
 class vtkKWListBox;
 class vtkKWWindow;
 class vtkKWMenuButton;
-class vtkKWImageLabel;
 class vtkKWIcon;
 class vtkIntArray;
 class vtkStringList;
@@ -137,7 +136,7 @@ protected:
   vtkKWPushButton*  LoadSaveButton;
   vtkKWPushButton*  CancelButton;
 
-  vtkKWImageLabel*  DownDirectoryButton;
+  vtkKWLabel*       DownDirectoryButton;
   vtkKWIcon*        DownDirectoryIcon;
     
   char*             SelectBoxId;

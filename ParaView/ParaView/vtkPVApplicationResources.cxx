@@ -41,11 +41,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVApplication.h"
 
-#include "vtkKWImageLabel.h"
+#include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWTkUtilities.h"
-#include "vtkKWMessageDialog.h"
-#include "vtkKWFrame.h"
 
 #include "vtkPNGReader.h"
 
@@ -309,10 +309,9 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow* master)
     dlg->SetTitle("About ParaView");
     dlg->SetMasterWindow(master);
     dlg->Create(this,"");
-    vtkKWImageLabel* label = vtkKWImageLabel::New();
+    vtkKWLabel* label = vtkKWLabel::New();
     label->SetParent(dlg->GetTopFrame());
     label->Create(this,0);
-    label->SetImageDataName("PVSplashScreen");
     this->Script("pack %s", label->GetWidgetName());
     dlg->SetText(msg);
     this->AboutDialog = dlg;
