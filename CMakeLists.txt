@@ -94,13 +94,18 @@ IF(NOT PARAVIEW_TESTING_DART_SERVER)
 
 #########################################################################
 # Configure TclTk
-SET(APPLICATION_BINARY_DIR "${ParaView_BINARY_DIR}")
-SET(VTK_TCL_TK_MACROS_MODULE 
+OPTION(PARAVIEW_BUILD_GUI
+  "Build end user applications (ParaView, pvclient, pvbatch)" ON)
+MARK_AS_ADVANCED(PARAVIEW_BUILD_GUI)
+IF (PARAVIEW_BUILD_GUI)
+  SET(APPLICATION_BINARY_DIR "${ParaView_BINARY_DIR}")
+  SET(VTK_TCL_TK_MACROS_MODULE 
     "${ParaView_SOURCE_DIR}/VTK/CMake/vtkTclTkMacros.cmake")
-SET(VTK_TCL_TK_INTERNALS_DIR 
+  SET(VTK_TCL_TK_INTERNALS_DIR 
     "${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/internals")
-SET(VTK_TCL_TK_WRAPPING_DIR "${ParaView_SOURCE_DIR}/VTK/Wrapping/Tcl")
-SUBDIRS(Utilities/TclTk)
+  SET(VTK_TCL_TK_WRAPPING_DIR "${ParaView_SOURCE_DIR}/VTK/Wrapping/Tcl")
+  SUBDIRS(Utilities/TclTk)
+ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
 # Configure VTK
@@ -312,7 +317,9 @@ SUBDIRS(Utilities/VTKClientServer)
 
 #########################################################################
 # Configure Tcl wrapping
-SUBDIRS(Utilities/VTKTclWrapping)
+IF (PARAVIEW_BUILD_GUI)
+  SUBDIRS(Utilities/VTKTclWrapping)
+ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
 # Configure ParaViewPlus
@@ -430,7 +437,9 @@ SUBDIRS(Servers)
 
 #########################################################################
 # Configure GUI
-SUBDIRS(GUI)
+IF (PARAVIEW_BUILD_GUI)
+  SUBDIRS(GUI)
+ENDIF (PARAVIEW_BUILD_GUI)
 
 
 SUBDIRS(Servers/Executables)

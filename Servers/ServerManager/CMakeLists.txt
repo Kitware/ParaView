@@ -161,26 +161,28 @@ ADD_LIBRARY(vtkPVServerManager
 TARGET_LINK_LIBRARIES (vtkPVServerManager vtkPVFiltersCS vtkClientServer)
 
 # Create Tcl wrappers for SM classes.
-SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
-SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
-SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
-INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
-VTK_WRAP_TCL3(
-  vtkPVServerManagerTCL 
-  ServerManagerTCL_SRCS 
-  "${ServerManagerCommon_SRCS};${SMInstantiator_SRCS}"
-  ""
-  )
-SET(VTK_TCL_HOME "${ParaView_SOURCE_DIR}/GUI")
-IF(NOT WIN32)
-  # Needed for vtktcl.c
-  SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
-  ADD_DEFINITIONS(-D_HPUX_SOURCE)
-ENDIF(NOT WIN32)
-ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
-  ${VTK_TCL_HOME}/vtktcl.c
-  vtkPVProcessModuleBatchHelper.cxx)
-TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL vtkPVServerManager vtkCommonTCL)
+IF (PARAVIEW_BUILD_GUI)
+  SET(VTK_WRAP_TCL_EXE ${PARAVIEW_VTK_WRAP_TCL_EXE})
+  SET(VTK_WRAP_TCL_INIT_EXE ${PARAVIEW_VTK_WRAP_TCL_INIT_EXE})
+  SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
+  INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
+  VTK_WRAP_TCL3(
+    vtkPVServerManagerTCL 
+    ServerManagerTCL_SRCS 
+    "${ServerManagerCommon_SRCS};${SMInstantiator_SRCS}"
+    ""
+    )
+  SET(VTK_TCL_HOME "${ParaView_SOURCE_DIR}/GUI")
+  IF(NOT WIN32)
+    # Needed for vtktcl.c
+    SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
+    ADD_DEFINITIONS(-D_HPUX_SOURCE)
+  ENDIF(NOT WIN32)
+  ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
+    ${VTK_TCL_HOME}/vtktcl.c
+    vtkPVProcessModuleBatchHelper.cxx)
+  TARGET_LINK_LIBRARIES (vtkPVServerManagerTCL vtkPVServerManager vtkCommonTCL)
+ENDIF (PARAVIEW_BUILD_GUI)
 
 
 SET(CFG_INIT "/${CMAKE_CFG_INTDIR}")

@@ -25,7 +25,11 @@ TARGET_LINK_LIBRARIES(pvrenderserver ${LIBS})
 ADD_EXECUTABLE(pvdataserver pvdataserver.cxx)
 TARGET_LINK_LIBRARIES(pvdataserver ${LIBS})
 
-ADD_EXECUTABLE(pvbatch pvbatch.cxx)
-TARGET_LINK_LIBRARIES(pvbatch ${LIBS} vtkPVServerManagerTCL vtkCommonTCL)
+INSTALL_TARGETS(/bin pvserver pvrenderserver pvdataserver)
 
-INSTALL_TARGETS(/bin pvserver pvrenderserver pvdataserver pvbatch)
+IF (PARAVIEW_BUILD_GUI)
+  ADD_EXECUTABLE(pvbatch pvbatch.cxx)
+  TARGET_LINK_LIBRARIES(pvbatch ${LIBS} vtkPVServerManagerTCL vtkCommonTCL)
+
+  INSTALL_TARGETS(/bin pvbatch)
+ENDIF (PARAVIEW_BUILD_GUI)
