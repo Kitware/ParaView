@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.58.2.3");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.58.2.4");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -350,6 +350,7 @@ void vtkPVArrayMenu::Update()
         {
         this->SetArrayName(NULL);
         }
+      this->ModifiedFlag = 1;
       }
     }
   this->UpdateProperty();
