@@ -41,7 +41,7 @@ class vtkSocketController;
 class vtkKWApplication;
 class vtkProcessModuleGUIHelper;
 class vtkPVServerInformation;
-
+class vtkPVRenderModule;
 class VTK_EXPORT vtkPVProcessModule : public vtkProcessModule
 {
 public:
@@ -175,6 +175,13 @@ public:
   vtkSetStringMacro(RenderServerHostName);
 
   // Description:
+  // Variable set by command line arguments --client or -c
+  // Client mode tries to connect to a server through a socket.
+  // The client does not have any local partitioned data.
+  vtkSetMacro(UseStereoRendering,int);
+  vtkGetMacro(UseStereoRendering,int);
+
+  // Description:
   // Server information was initially developed to query the
   // server whether it supports remote rendering.
   vtkPVServerInformation* GetServerInformation() { return this->ServerInformation;}
@@ -205,6 +212,25 @@ public:
   // "DISPLAY=amber1"
   virtual void SetProcessEnvironmentVariable(int processId, const char* var);
 
+  // Description:
+  // RenderingModule has the rendering abstraction.  
+  // It creates the render window and any composit manager.  
+  // It also creates part displays which handle level of details.
+  void SetRenderModule(vtkPVRenderModule *module);
+  vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
+  
+  // Description:
+  // This should be eliminated (server information instead) or should
+  // be in render module.
+  vtkSetMacro(UseTiledDisplay,int);
+  vtkGetMacro(UseTiledDisplay,int);
+  vtkSetStringMacro(CaveConfigurationFileName);
+  vtkGetStringMacro(CaveConfigurationFileName);
+  vtkSetMacro(UseTriangleStrips,int);
+  vtkGetMacro(UseTriangleStrips,int);
+  vtkSetMacro(UseImmediateMode,int);
+  vtkGetMacro(UseImmediateMode,int);
+
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
@@ -231,8 +257,14 @@ protected:
   int AlwaysSSH;
   float LogThreshold;
   char* DemoPath;
+  int UseStereoRendering;
   vtkPVServerInformation* ServerInformation;
   vtkProcessModuleGUIHelper* GUIHelper;
+  vtkPVRenderModule *RenderModule;
+  int UseTiledDisplay;
+  char* CaveConfigurationFileName;
+  int UseTriangleStrips;
+  int UseImmediateMode;
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented

@@ -39,7 +39,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkCaveRenderManager, "1.4");
+vtkCxxRevisionMacro(vtkCaveRenderManager, "1.1");
 vtkStandardNewMacro(vtkCaveRenderManager);
 
 // Structures to communicate render info.

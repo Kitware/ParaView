@@ -227,13 +227,6 @@ public:
   // Save the state of the color map in the state file.
   void SaveState(ofstream *file);
 
-//BTX
-  enum VectorModes {
-    MAGNITUDE=0,
-    COMPONENT=1
-  };
-//ETX
-
   // Description:
   // If the PVRenderView is set, render it
   virtual void RenderView();
@@ -246,7 +239,13 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+//BTX 
+  // Description:
+  // This object is the server equivalent of a ColorMap.
+  vtkGetObjectMacro(RMScalarBarWidget,vtkRMScalarBarWidget);
+//ETX
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();

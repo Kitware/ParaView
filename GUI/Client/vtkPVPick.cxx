@@ -24,6 +24,7 @@
 #include "vtkCellData.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkPVProcessModule.h"
 
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -31,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.4");
+vtkCxxRevisionMacro(vtkPVPick, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -51,9 +52,9 @@ vtkPVPick::vtkPVPick()
 
 vtkPVPick::~vtkPVPick()
 {  
-  if (this->GetPVApplication() && this->GetPVApplication()->GetRenderModule())
+  if (this->GetPVApplication() && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
     {
-    this->GetPVApplication()->GetRenderModule()->RemoveDisplay(this->PickDisplay);
+    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PickDisplay);
     }
 
   this->PickDisplay->SetPointLabelVisibility(0);
@@ -83,7 +84,7 @@ void vtkPVPick::SetVisibilityInternal(int val)
 void vtkPVPick::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  this->PickDisplay->SetPVApplication(pvApp);
+  this->PickDisplay->SetProcessModule(pvApp->GetProcessModule());
 
   this->Superclass::CreateProperties();
 
@@ -104,10 +105,10 @@ void vtkPVPick::AcceptCallbackInternal()
     {
     // Connect to the display.
     // These should be merged.
-    this->PickDisplay->SetPart(this->GetPart(0));
-    this->PickDisplay->SetInput(this->GetPart(0));
+    this->PickDisplay->SetPart(this->GetPart(0)->GetSMPart());
+    this->PickDisplay->SetInput(this->GetPart(0)->GetSMPart());
     this->GetPart(0)->AddDisplay(this->PickDisplay);
-    this->GetPVApplication()->GetRenderModule()->AddDisplay(this->PickDisplay);
+    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PickDisplay);
     }
 
   // We need to update manually for the case we are probing one point.

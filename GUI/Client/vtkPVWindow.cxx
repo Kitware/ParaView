@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.592");
+vtkCxxRevisionMacro(vtkPVWindow, "1.593");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -909,7 +909,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
     return;
     }
   // Set the render module on the CenterOfRotationStyle
-  this->CenterOfRotationStyle->SetRenderModule(pvApp->GetRenderModule());
+  this->CenterOfRotationStyle->SetRenderModule(pvApp->GetProcessModule()->GetRenderModule());
   this->CenterOfRotationStyle->SetPVWindow(this);
  
   // Make sure the widget is name appropriately: paraview instead of a number.
@@ -976,10 +976,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->InteractorID = pm->NewStreamObject("vtkPVGenericRenderWindowInteractor");
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderWindow" 
-         << pvApp->GetRenderModule()->GetRenderWindowID()
+         << pm->GetRenderModule()->GetRenderWindowID()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->InteractorID << "SetRenderer" 
-         << pvApp->GetRenderModule()->GetRendererID()
+         << pm->GetRenderModule()->GetRendererID()
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->InteractorID 
          << "SetInteractorStyle" << 0 << vtkClientServerStream::End;
@@ -1113,7 +1113,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
       }
     }
   pm->GetStream() << vtkClientServerStream::Invoke
-                  << pvApp->GetRenderModule()->GetRendererID()
+                  << pm->GetRenderModule()->GetRendererID()
                   << "AddActor" << this->CenterActorID 
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);

@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.334");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.335");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -499,11 +499,11 @@ void PVRenderViewAbortCheck(vtkObject*, unsigned long, void* arg, void*)
 void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 {
   // Create the call back that looks for events to abort rendering.
-  pvApp->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
+  pvApp->GetProcessModule()->GetRenderModule()->RemoveObservers(vtkCommand::AbortCheckEvent);
   vtkCallbackCommand* abc = vtkCallbackCommand::New();
   abc->SetCallback(PVRenderViewAbortCheck);
   abc->SetClientData(this);
-  pvApp->GetRenderModule()->AddObserver(vtkCommand::AbortCheckEvent, abc);
+  pvApp->GetProcessModule()->GetRenderModule()->AddObserver(vtkCommand::AbortCheckEvent, abc);
   abc->Delete();
 }
 
@@ -593,7 +593,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   if (this->RenderModule == NULL)
     {
-    this->RenderModule = this->GetPVApplication()->GetRenderModule();
+    this->RenderModule = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
     this->RenderModule->Register(this);
     }
 
@@ -991,7 +991,7 @@ void vtkPVRenderView::CreateViewProperties()
   if ( rmuio )
     {
     this->RenderModuleUI = rmuio;
-    this->RenderModuleUI->SetRenderModule(pvapp->GetRenderModule());
+    this->RenderModuleUI->SetRenderModule(pvapp->GetProcessModule()->GetRenderModule());
     this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
     this->RenderModuleUI->Create(this->GetApplication(),0);
     this->RenderModuleUI->SetTraceReferenceObject(this);
@@ -1382,7 +1382,7 @@ void vtkPVRenderView::SetRendererBackgroundColor(double r, double g, double b)
   // not invoke the callback, We also trace the view.
   this->AddTraceEntry("$kw(%s) SetRendererBackgroundColor %f %f %f",
                       this->GetTclName(), r, g, b);
-  pvApp->GetRenderModule()->SetBackgroundColor(r, g, b);
+  pvApp->GetProcessModule()->GetRenderModule()->SetBackgroundColor(r, g, b);
   this->EventuallyRender();
 }
 
@@ -1410,7 +1410,7 @@ void vtkPVRenderView::Exposed()
 // logic (see above)
 void vtkPVRenderView::Configured()
 {
-  vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
+  vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
   if (this->BlockRender)
     {
     this->BlockRender = 2;
@@ -1429,7 +1429,7 @@ void vtkPVRenderView::ResetCamera()
   double bds[6];
 
 
-  this->GetPVApplication()->GetRenderModule()->ComputeVisiblePropBounds(bds);
+  this->GetPVApplication()->GetProcessModule()->GetRenderModule()->ComputeVisiblePropBounds(bds);
   if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
     {
     this->GetRenderer()->ResetCamera(bds);
@@ -1499,8 +1499,8 @@ void vtkPVRenderView::ForceRender()
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( pvApp )
     {
-    pvApp->SetGlobalLODFlag(0);
-    pvApp->GetRenderModule()->StillRender();
+    pvApp->GetProcessModule()->SetGlobalLODFlag(0);
+    pvApp->GetProcessModule()->GetRenderModule()->StillRender();
     }
 }
 
@@ -1525,7 +1525,7 @@ void vtkPVRenderView::Render()
     return;
     }
 
-  vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
+  vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
   if (rm)
     {
     rm->InteractiveRender();
@@ -1645,8 +1645,8 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     }
 
   vtkPVApplication *pvApp = this->GetPVApplication();
-  pvApp->SetGlobalLODFlag(0);
-  pvApp->GetRenderModule()->StillRender();
+  pvApp->GetProcessModule()->SetGlobalLODFlag(0);
+  pvApp->GetProcessModule()->GetRenderModule()->StillRender();
 }
 
 //----------------------------------------------------------------------------
@@ -1711,6 +1711,9 @@ void vtkPVRenderView::SetUseTriangleStrips(int state)
       }
     }
   pm->SendStream(vtkProcessModule::DATA_SERVER);
+  // Save this selection on the server manager so new
+  // part displays will have it a s a default.
+  pm->SetUseTriangleStrips(state);
 
   this->EventuallyRender();
 }
@@ -1810,6 +1813,9 @@ void vtkPVRenderView::SetUseImmediateMode(int state)
       pvs->GetPart(partIdx)->GetPartDisplay()->SetUseImmediateMode(state);
       }
     }
+  // Save this selection on the server manager so new
+  // part displays will have it a s a default.
+  this->GetPVApplication()->GetProcessModule()->SetUseImmediateMode(state);
 
   this->EventuallyRender();
 }

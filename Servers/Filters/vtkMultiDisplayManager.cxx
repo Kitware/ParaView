@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.19");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.1");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.

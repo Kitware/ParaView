@@ -21,12 +21,12 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkCamera.h"
 
-#include "vtkPVRenderModuleProxy.h"
+#include "vtkPVRenderModule.h"
 
 
 vtkStandardNewMacro(vtkPickPointWidget);
-vtkCxxRevisionMacro(vtkPickPointWidget, "1.1");
-vtkCxxSetObjectMacro(vtkPickPointWidget,RenderModuleProxy,vtkPVRenderModuleProxy);
+vtkCxxRevisionMacro(vtkPickPointWidget, "1.2");
+vtkCxxSetObjectMacro(vtkPickPointWidget,RenderModule,vtkPVRenderModule);
 
 
 
@@ -34,20 +34,20 @@ vtkCxxSetObjectMacro(vtkPickPointWidget,RenderModuleProxy,vtkPVRenderModuleProxy
 vtkPickPointWidget::vtkPickPointWidget()
 {
   this->EventCallbackCommand->SetCallback(vtkPickPointWidget::ProcessEvents);
-  this->RenderModuleProxy = 0;
+  this->RenderModule = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPickPointWidget::~vtkPickPointWidget()
 {
-  this->SetRenderModuleProxy(NULL);
+  this->SetRenderModule(NULL);
 }
 
 //----------------------------------------------------------------------------
 void vtkPickPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "RenderModuleProxy: (" << this->RenderModuleProxy << ")\n";
+  os << indent << "RenderModule: (" << this->RenderModule << ")\n";
 }
 
 
@@ -96,14 +96,14 @@ void vtkPickPointWidget::OnChar()
 {
   if (this->Interactor->GetKeyCode() == 'p' )
     {
-    if (this->RenderModuleProxy == NULL)
+    if (this->RenderModule == NULL)
       {
       vtkErrorMacro("Cannot pick without a render module.");
       return;
       }
     int X = this->Interactor->GetEventPosition()[0];
     int Y = this->Interactor->GetEventPosition()[1];
-    float z = this->RenderModuleProxy->GetZBufferValue(X, Y);
+    float z = this->RenderModule->GetZBufferValue(X, Y);
     double pt[4];
     this->ComputeDisplayToWorld(double(X),double(Y),double(z),pt);
     this->Cursor3D->SetFocalPoint(pt);

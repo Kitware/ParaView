@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.15");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.16");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -581,7 +581,7 @@ void vtkPVLODRenderModuleUI::SetRenderInterruptsEnabled(int state)
   vtkPVApplication* pvApp = this->GetPVApplication();
   this->RenderInterruptsEnabled = state;
   
-  pvApp->GetRenderModule()->SetRenderInterruptsEnabled(state);
+  pvApp->GetProcessModule()->GetRenderModule()->SetRenderInterruptsEnabled(state);
 
   // We use a catch in this trace because the paraview executing
   // the trace might not have this module
@@ -608,7 +608,7 @@ void vtkPVLODRenderModuleUI::SaveState(ofstream *file)
 
   *file << "catch {$kw(" << this->GetTclName()
         << ") SetRenderInterruptsEnabled "
-        << this->GetPVApplication()->GetRenderModule()->GetRenderInterruptsEnabled()
+        << this->GetPVApplication()->GetProcessModule()->GetRenderModule()->GetRenderInterruptsEnabled()
         << "}" << endl;
 }
 

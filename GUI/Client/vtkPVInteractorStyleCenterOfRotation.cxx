@@ -24,7 +24,7 @@
 #include "vtkPVRenderModule.h"
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.10");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.11");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------
@@ -81,7 +81,7 @@ void vtkPVInteractorStyleCenterOfRotation::Pick()
   
   if ( ! this->Picker->GetRenderModule())
     {
-    this->Picker->SetRenderModule(this->GetRenderModule());
+    this->Picker->SetRenderModule(this->RenderModule);
     }
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];

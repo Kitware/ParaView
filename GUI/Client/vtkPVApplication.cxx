@@ -112,8 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.304");
-vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
+vtkCxxRevisionMacro(vtkPVApplication, "1.305");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -418,10 +417,7 @@ vtkPVApplication::vtkPVApplication()
   this->RunningParaViewScript = 0;
 
   this->ProcessModule = NULL;
-  this->RenderModule = NULL;
   this->RenderModuleName = NULL;
-  // Now initialized in ParaView.cxx
-  //this->SetRenderModuleName("LODRenderModule");
   this->CommandFunction = vtkPVApplicationCommand;
 
   this->NumberOfPipes = 1;
@@ -493,7 +489,6 @@ vtkPVApplication::~vtkPVApplication()
   vtkOutputWindow::SetInstance(0);
 
   this->SetProcessModule(NULL);
-  this->SetRenderModule(NULL);
   this->SetRenderModuleName(NULL);
   if ( this->TraceFile )
     {
@@ -539,6 +534,11 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
     pm->SetReverseConnection(this->GetReverseConnection());
     pm->SetDemoPath(this->GetDemoPath());
     pm->SetServerMode(this->GetServerMode());
+    pm->SetUseStereoRendering(this->GetUseStereoRendering());
+    pm->GetServerInformation()->SetTileDimensions(this->TileDimensions);
+    pm->GetServerInformation()->SetUseOffscreenRendering(this->UseOffscreenRendering);
+    pm->SetUseTiledDisplay(this->UseTiledDisplay);
+    pm->SetCaveConfigurationFileName(this->CaveConfigurationFileName);
     // Juggle the compositing flag to let server in on the decision
     // whether to allow compositing / rendering on the server.
     // Put the flag on the process module.
@@ -1521,25 +1521,33 @@ void vtkPVApplication::Start(int argc, char*argv[])
   sprintf(rmClassName, "vtkPV%s", this->RenderModuleName);
   vtkObject* o = vtkInstantiator::CreateInstance(rmClassName);
   vtkPVRenderModule* rm = vtkPVRenderModule::SafeDownCast(o);
-  if (rm == NULL)
+  if (rm == 0)
     {
     vtkErrorMacro("Could not create render module " << rmClassName);
     this->SetRenderModuleName("RenderModule");
     o = vtkInstantiator::CreateInstance("vtkPVRenderModule");
     rm = vtkPVRenderModule::SafeDownCast(o);
+    if ( rm == 0 )
+      {
+      vtkErrorMacro("Could not create the render module.");
+      return;
+      }
     }
-  this->SetRenderModule(rm);
-  rm->SetPVApplication(this);
+  if (this->ProcessModule == NULL)
+    {
+    vtkErrorMacro("missing ProcessModule");
+    }
+  else
+    { // Looks like a circular reference to me!
+    this->ProcessModule->SetRenderModule(rm);
+    rm->SetProcessModule(this->ProcessModule);
+    }
   o->Delete();
   o = NULL;
   rm = NULL;
 
   delete [] rmClassName;
   rmClassName = NULL;
-  if ( !this->RenderModule )
-    {
-    return;
-    }
 
   vtkstd::vector<vtkstd::string> open_files;
   // If any of the arguments has a .pvs extension, load it as a script.
@@ -1551,7 +1559,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
       if ( !vtkKWDirectoryUtilities::FileExists(argv[i]) )
         {
         vtkErrorMacro("Could not find the script file: " << argv[i]);
-        this->SetRenderModule(NULL);
+        // Break a circular reference.
+        this->ProcessModule->SetRenderModule(NULL);
         this->SetExitStatus(1);
         this->Exit();
         return;
@@ -1732,8 +1741,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
   this->OutputWindow->SetWindowCollection(0);
 
-  // Circular reference.
-  this->SetRenderModule(NULL);
+  // Break a circular reference.
+  this->ProcessModule->SetRenderModule(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -1819,7 +1828,7 @@ void vtkPVApplication::Close(vtkKWWindow *win)
   if (this->Windows->GetNumberOfItems() == 1)
     {
     // Try to get the render window to destruct before the render widget.
-    this->SetRenderModule(NULL);
+    this->ProcessModule->SetRenderModule(NULL);
     }
 
   this->Superclass::Close(win);
@@ -1902,24 +1911,6 @@ void vtkPVApplication::StopRecordingScript()
     this->TraceFile = NULL;
     }
 }
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SetGlobalLODFlag(int val)
-{
-  this->GetProcessModule()->SetGlobalLODFlag(val);
-}
-
- 
-//----------------------------------------------------------------------------
-void vtkPVApplication::SetGlobalLODFlagInternal(int val)
-{
-  vtkPVProcessModule::SetGlobalLODFlagInternal(val);
-}
-
-
-
-
 
 
 //============================================================================
@@ -2410,11 +2401,6 @@ void vtkPVApplication::FindApplicationInstallationDirectory()
     {
     this->ApplicationInstallationDirectory[length - 4] = '\0';
     }
-}
-
-int vtkPVApplication::GetGlobalLODFlag()
-{
-  return vtkPVProcessModule::GetGlobalLODFlag();
 }
 
 //----------------------------------------------------------------------------

@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.368");
+vtkCxxRevisionMacro(vtkPVSource, "1.369");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1245,7 +1245,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       }
 
     pvd->CreateProperties();
-    this->GetPVApplication()->GetRenderModule()->AddPVSource(this);
+    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddSource(this->GetProxy());
 
     // Make the last data invisible.
     input = this->GetPVInput(0);
@@ -1496,7 +1496,7 @@ void vtkPVSource::DeleteCallback()
   // Remove all of the actors mappers. from the renderer.
   if (this->PVOutput)
     {
-    this->GetPVApplication()->GetRenderModule()->RemovePVSource(this);
+    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveSource(this->GetProxy());
     }    
 
   this->SetPVOutput(NULL);
@@ -2417,7 +2417,7 @@ int vtkPVSource::InitializeData()
     {
     vtkSMPart* smpart = this->Proxy->GetPart(i); 
     part = vtkPVPart::New();
-    part->SetPVApplication(pvApp);
+    part->SetProcessModule(pvApp->GetProcessModule());
     part->SetSMPart(smpart);
     this->AddPart(part);
     part->Delete();

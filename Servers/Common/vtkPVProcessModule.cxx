@@ -39,6 +39,7 @@
 #include "vtkTimerLog.h"
 #include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVServerInformation.h"
+#include "vtkPVRenderModule.h"
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
@@ -46,7 +47,8 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.13");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.14");
+vtkCxxSetObjectMacro(vtkPVProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -71,6 +73,12 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->ServerInformation = vtkPVServerInformation::New();
   this->SetRenderServerHostName("localhost");
   this->SetHostName("localhost");
+  this->UseStereoRendering = 0;
+  this->RenderModule = 0;
+  this->UseTiledDisplay = 0;
+  this->CaveConfigurationFileName = 0;
+  this->UseTriangleStrips = 0;
+  this->UseImmediateMode = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -87,6 +95,8 @@ vtkPVProcessModule::~vtkPVProcessModule()
   this->SetDemoPath(0);
   this->FinalizeInterpreter();
   this->ServerInformation->Delete();
+  this->SetRenderModule(0);
+  this->SetCaveConfigurationFileName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -221,6 +231,7 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
        << (this->Username?this->Username:"(none)") << endl;
     os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
     os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+    os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
     }
   if (this->ServerMode)
     {
@@ -256,6 +267,18 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "ServerInformation: NULL\n";
     }
+  os << indent << "UseTiledDisplay: " << this->UseTiledDisplay << endl;
+  if (this->CaveConfigurationFileName)
+    {
+    os << indent << "CaveConfigurationFileName: " 
+       << this->CaveConfigurationFileName << endl;
+    }
+  else
+    {
+    os << indent << "CaveConfigurationFileName: NULL\n";
+    } 
+  os << indent << "UseTriangleStrips: " << this->UseTriangleStrips << endl;
+  os << indent << "UseImmediateMode: " << this->UseImmediateMode << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -53,7 +53,7 @@
 #include "vtkKWEvent.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.97");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.98");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -728,7 +728,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   this->vtkKWObject::SetApplication(pvApp);
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  this->RMScalarBarWidget->Create(pm,pvApp->GetRenderModule()->GetRenderer2DID(),
+  this->RMScalarBarWidget->Create(pm,pm->GetRenderModule()->GetRenderer2DID(),
     this->PVRenderView->GetPVWindow()->GetInteractorID());
 
   //this->ScalarBar = vtkScalarBarWidget::New();
@@ -1265,7 +1265,10 @@ void vtkPVColorMap::UpdateInternalScalarBarVisibility()
     {
     return;
     }
-  vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
+  
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkPVRenderModule* rm = pm->GetRenderModule();
+
   if (rm == NULL)
     {
     return;

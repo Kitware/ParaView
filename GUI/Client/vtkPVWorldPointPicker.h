@@ -33,10 +33,12 @@ public:
   vtkTypeRevisionMacro(vtkPVWorldPointPicker,vtkWorldPointPicker);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+//BTX
   // Description:
   // To use compositied z buffer value, we must have access to the compositer.
   virtual void SetRenderModule(vtkPVRenderModule*);
   vtkGetObjectMacro(RenderModule, vtkPVRenderModule);
+//ETX
 
   // Description:
   // A pick method that uses composited zbuffer.

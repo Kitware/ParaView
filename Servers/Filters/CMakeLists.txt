@@ -2,6 +2,8 @@ PROJECT(PVFilters)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Filters_SRCS
+  vtkMultiDisplayManager.cxx
+  vtkCaveRenderManager.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
@@ -14,7 +16,6 @@ SET(Filters_SRCS
 
   vtkPVLODActor.cxx
   vtkPVGenericRenderWindowInteractor.cxx
-  vtkPVRenderModuleProxy.cxx
   vtkPVRenderViewProxy.cxx
   vtkPVGeometryFilter.cxx
   vtkPVXMLElement.cxx
@@ -74,8 +75,10 @@ SET(Filters_SRCS
 	vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
   )
 
-SET_SOURCE_FILES_PROPERTIES( vtkSubdivisionAlgorithm.cxx 
-  vtkPVRenderModuleProxy.cxx vtkPVRenderViewProxy.cxx ABSTRACT)
+SET_SOURCE_FILES_PROPERTIES( 
+  vtkSubdivisionAlgorithm.cxx 
+  vtkPVRenderViewProxy.cxx
+  ABSTRACT)
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
@@ -90,7 +93,6 @@ ENDIF(VTK_USE_MPI)
 IF (PARAVIEW_USE_ICE_T)
   SET(Filters_SRCS 
     ${Filters_SRCS}
-    #vtkIceTComposite.cxx
     vtkIceTFactory.cxx
     vtkDesktopDeliveryServer.cxx
     vtkDesktopDeliveryClient.cxx

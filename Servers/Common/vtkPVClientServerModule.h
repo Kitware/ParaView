@@ -54,7 +54,6 @@ public:
   // Description:  
   // Start calls this method to continue initialization.
   // This method initializes the sockets and then calls
-  // vtkPVApplication::Start(argc, argv);
   void Initialize();
 
   // Description:

@@ -19,15 +19,14 @@
 #include "vtkCollectionIterator.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkImageData.h"
-#include "vtkKWCheckButton.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVClassNameInformation.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVPartDisplay.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVPartDisplay.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
@@ -41,42 +40,28 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.52");
+vtkCxxRevisionMacro(vtkPVPart, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVPart, SMPart, vtkSMPart);
+vtkCxxSetObjectMacro(vtkPVPart, ProcessModule, vtkPVProcessModule);
 
-int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
-                     int argc, char *argv[]);
 
 
 //----------------------------------------------------------------------------
 vtkPVPart::vtkPVPart()
 {
-  this->CommandFunction = vtkPVPartCommand;
-
-  this->PartDisplay = NULL;
-  this->Displays = vtkCollection::New();
-
   this->Name = NULL;
 
   this->ClassNameInformation = vtkPVClassNameInformation::New();
 
   this->SMPart = 0;
+  this->ProcessModule = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVPart::~vtkPVPart()
 {  
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = 0;
-  if(pvApp)
-    {
-    pm = pvApp->GetProcessModule();
-    }
-
-  this->SetPartDisplay(NULL);
-  this->Displays->Delete();
-  this->Displays = NULL;
+  vtkPVProcessModule *pm = this->GetProcessModule();
 
   this->SetName(NULL);
 
@@ -87,96 +72,86 @@ vtkPVPart::~vtkPVPart()
     {
     this->SMPart->Delete();
     }
+  this->SetProcessModule(0);
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVPart::SetPVApplication(vtkPVApplication *pvApp)
+void vtkPVPart::CreateParallelTclObjects(vtkPVProcessModule *pm)
 {
-  if ( pvApp )
-    {
-    this->CreateParallelTclObjects(pvApp);
-    }
-  this->vtkKWObject::SetApplication(pvApp);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
-{
-  if ( !pvApp )
-    {
-    return;
-    }
-  this->vtkKWObject::SetApplication(pvApp);
+  this->SetProcessModule(pm);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPart::AddDisplay(vtkPVDisplay* disp)
 {
-  if (disp)
+  if (this->SMPart == 0)
     {
-    this->Displays->AddItem(disp);
+    vtkErrorMacro("Missing SMPart.");
+    return;
     }
+  this->SMPart->AddDisplay(disp);
 } 
 
 //----------------------------------------------------------------------------
-void vtkPVPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
+void vtkPVPart::SetPartDisplay(vtkPVPartDisplay* disp)
 {
-  if (this->PartDisplay)
+  if (this->SMPart == 0)
     {
-    this->Displays->RemoveItem(this->PartDisplay);
-    this->PartDisplay->UnRegister(this);
-    this->PartDisplay = NULL;
+    vtkErrorMacro("Missing SMPart.");
+    return;
     }
-  if (pDisp)
+  this->SMPart->SetPartDisplay(disp);
+} 
+
+//----------------------------------------------------------------------------
+vtkPVPartDisplay* vtkPVPart::GetPartDisplay()
+{
+  if (this->SMPart == 0)
     {
-    this->Displays->AddItem(pDisp);
-    this->PartDisplay = pDisp;
-    this->PartDisplay->Register(this);
-    this->PartDisplay->SetInput(this);
+    vtkErrorMacro("Missing SMPart.");
+    return 0;
     }
-}
+  return this->SMPart->GetPartDisplay();
+} 
 
 //----------------------------------------------------------------------------
 void vtkPVPart::Update()
 {
-  vtkCollectionIterator* sit = this->Displays->NewIterator();
-
-  for (sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem())
+  if (this->SMPart == 0)
     {
-    vtkPVDisplay* disp = vtkPVDisplay::SafeDownCast(sit->GetObject());
-    if (disp)
-      {
-      disp->Update();
-      }
+    vtkErrorMacro("Missing SMPart.");
+    return;
     }
-  sit->Delete();
+
+  this->SMPart->Update();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPart::SetVisibility(int v)
 {
-  if (this->PartDisplay)
+  if (this->SMPart == 0)
     {
-    this->PartDisplay->SetVisibility(v);
+    vtkErrorMacro("Missing SMPart.");
+    return;
+    }
+
+  if (this->SMPart->GetPartDisplay())
+    {
+    this->SMPart->GetPartDisplay()->SetVisibility(v);
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPart::MarkForUpdate()
 {
-  vtkCollectionIterator* sit = this->Displays->NewIterator();
-
-  for (sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem())
+  if (this->SMPart == 0)
     {
-    vtkPVDisplay* disp = vtkPVDisplay::SafeDownCast(sit->GetObject());
-    if (disp)
-      {
-      disp->InvalidateGeometry();
-      }
+    vtkErrorMacro("Missing SMPart.");
+    return;
     }
-  sit->Delete();
+
+  this->SMPart->MarkForUpdate();
 }
 
 //----------------------------------------------------------------------------
@@ -192,22 +167,22 @@ vtkPVDataInformation* vtkPVPart::GetDataInformation()
 //----------------------------------------------------------------------------
 void vtkPVPart::GatherDataInformation()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  if ( !pvApp )
+  vtkPVProcessModule *pm = this->GetProcessModule();
+  if ( !pm )
     {
     return;
     }
-  pvApp->GetProcessModule()->SendPrepareProgress();
+  pm->SendPrepareProgress();
 
   // This does nothing if the geometry is already up to date.
-  if (this->PartDisplay)
+  if (this->SMPart && this->SMPart->GetPartDisplay())
     {
-    this->PartDisplay->Update();
+    this->SMPart->GetPartDisplay()->Update();
     }
 
   // Recompute total visibile memory size. !!!!!!!
   // This should really be in vtkPVPartDisplay when it gathers its informantion.
-  pvApp->GetRenderModule()->SetTotalVisibleMemorySizeValid(0);
+  pm->GetRenderModule()->SetTotalVisibleMemorySizeValid(0);
 
   vtkPVDataInformation* info = this->SMPart->GetDataInformation();
 
@@ -253,7 +228,7 @@ void vtkPVPart::GatherDataInformation()
       }    
     this->SetName(str);
     }
-  pvApp->GetProcessModule()->SendCleanupPendingProgress();
+  pm->SendCleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------
@@ -267,24 +242,6 @@ vtkClientServerID vtkPVPart::GetVTKDataID()
   return this->SMPart->GetID(0);
 }
 
-//----------------------------------------------------------------------------
-vtkPVApplication* vtkPVPart::GetPVApplication()
-{
-  if (this->GetApplication() == NULL)
-    {
-    return NULL;
-    }
-  
-  if (this->GetApplication()->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->GetApplication());
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
 
 
 //----------------------------------------------------------------------------

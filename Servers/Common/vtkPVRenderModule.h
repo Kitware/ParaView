@@ -15,16 +15,13 @@
 // .NAME vtkPVRenderModule - Mangages rendering and displaying data.
 // .SECTION Description
 
-// I am in the process of moving features around into new objects.
 // This is a super class for all rendering modules.
 // Subclasses manages creation and manipulation of the render window.  
 // No user interface in this class.
 // Some common camera manipulation (and other render window control)
 // may be moved back into vtkPVRenderView to simplify this module.
-
-// Although I do not intend that this class should be instantiated
-// and used as a rendering module, I am implementing the methods
-// in the most simple way.  No LODs or parallel support.
+// Although som methods are implemented in this class, it is abstract, 
+// and is created only for an API.
 
 #ifndef __vtkPVRenderModule_h
 #define __vtkPVRenderModule_h
@@ -34,10 +31,9 @@
 #include "vtkClientServerID.h" // Needed for RenderWindowID and RendererID
 
 class vtkMultiProcessController;
-class vtkPVApplication;
+class vtkPVProcessModule;
 class vtkPVData;
-class vtkPVSource;
-class vtkPVSourceList;
+class vtkSMSourceProxy;
 class vtkPVWindow;
 class vtkRenderer;
 class vtkRenderWindow;
@@ -49,34 +45,33 @@ class vtkPVRenderModuleObserver;
 class VTK_EXPORT vtkPVRenderModule : public vtkObject
 {
 public:
-  static vtkPVRenderModule* New();
   vtkTypeRevisionMacro(vtkPVRenderModule,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Set the application right after construction.
-  virtual void SetPVApplication(vtkPVApplication *pvApp);
-  vtkGetObjectMacro(PVApplication, vtkPVApplication);
+  virtual void SetProcessModule(vtkPVProcessModule *pm);
+  vtkGetObjectMacro(ProcessModule, vtkPVProcessModule);
 
   // Description:
   // Compute the bounding box of all the visibile props
   // Used in ResetCamera() and ResetCameraClippingRange()
-  void ComputeVisiblePropBounds( double bounds[6] ); 
+  virtual void ComputeVisiblePropBounds( double bounds[6] ) = 0; 
   
   // Description:
   // This method is executed in all processes.
-  void AddPVSource(vtkPVSource *pvs);
-  void RemovePVSource(vtkPVSource *pvs);
+  virtual void AddSource(vtkSMSourceProxy *pvs) = 0;
+  virtual void RemoveSource(vtkSMSourceProxy *pvs) = 0;
 
   // Description:
   // This is used for special plot displays.
   // It is a way to have the render module update displays
-  // that are not part displays created by AddPVSource.
+  // that are not part displays created by AddSource.
   // I do not expect that this will be a permenant method.
   // As we create more types of displays, I will have to
   // find a different way of managing them.
-  void AddDisplay(vtkPVDisplay* disp);
-  void RemoveDisplay(vtkPVDisplay* disp);
+  virtual void AddDisplay(vtkPVDisplay* disp) = 0;
+  virtual void RemoveDisplay(vtkPVDisplay* disp) = 0;
   
   // Description:
   // Renders using Still/FullRes or interactive/LODs
@@ -105,11 +100,11 @@ public:
 
   // Description:
   // Callback for the triangle strips check button
-  void SetUseTriangleStrips(int val);
+  virtual void SetUseTriangleStrips(int val) = 0;
   
   // Description:
   // Callback for the immediate mode rendering check button
-  void SetUseImmediateMode(int val);
+  virtual void SetUseImmediateMode(int val) = 0;
     
   // Description:
   // Change between parallel or perspective camera.
@@ -140,11 +135,11 @@ public:
 
   // Description:
   // Update the cache of all visible part displays. For flip books.
-  void CacheUpdate(int idx, int total);
+  virtual void CacheUpdate(int idx, int total) = 0;
 
   // Description:
   // Calls InvalidateGeometry() on all part displays. For flip books.
-  void InvalidateAllGeometries();
+  virtual void InvalidateAllGeometries() = 0;
   
   // Description:
   // This method is called when the 3D renderer renders so that the 2D window
@@ -157,7 +152,7 @@ protected:
 
   // Subclass can create their own vtkPVPartDisplay object by
   // implementing this method.
-  virtual vtkPVPartDisplay* CreatePartDisplay();
+  virtual vtkPVPartDisplay* CreatePartDisplay() = 0;
 
   // This collection keeps a reference to all PartDisplays created
   // by this module.
@@ -165,9 +160,9 @@ protected:
 
   // This is used before a render to make sure all visible sources
   // have been updated.
-  virtual void UpdateAllDisplays();
+  virtual void UpdateAllDisplays() = 0;
  
-  vtkPVApplication* PVApplication;
+  vtkPVProcessModule* ProcessModule;
   vtkRenderWindow*  RenderWindow;
   vtkRenderer*      Renderer;
   vtkRenderer*      Renderer2D;

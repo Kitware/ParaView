@@ -33,14 +33,14 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPickPointWidget.h"
 #include "vtkRenderer.h"
-#include "vtkPVRenderModuleProxyImplementation.h"
+#include "vtkPVRenderModule.h"
 
 #include "vtkKWEvent.h"
 #include "vtkRMPointWidget.h"
 #include "vtkPVRenderModule.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.34");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -211,11 +211,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
              pm->GetObjectFromID(this->RM3DWidget->GetWidget3DID()));
   if (widget)
     {
-    vtkPVRenderModuleProxyImplementation* rmp 
-      = vtkPVRenderModuleProxyImplementation::New();
-    rmp->SetPVRenderModule(pvApp->GetRenderModule());
-    widget->SetRenderModuleProxy(rmp);
-    rmp->Delete();
+    widget->SetRenderModule(pm->GetRenderModule());
     }
 
   this->SetFrameLabel("Point Widget");

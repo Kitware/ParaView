@@ -37,12 +37,14 @@ public:
   // main loop.  It was created to disable compositing after the 
   // server information in the process module is valid.
   virtual void Initialize() {};
-   
+
+//BTX   
   // Description:
   // The subclass should implement this method and 
   // downcast it to the right type.  It can then access
   // any unique methods of the specific render module.
   virtual void SetRenderModule(vtkPVRenderModule *rm);
+//ETX
 
   // Description:
   // Create the widget.

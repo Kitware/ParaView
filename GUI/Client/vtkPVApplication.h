@@ -64,13 +64,6 @@ public:
   // processes and communication.
   void SetProcessModule(vtkPVProcessModule *module);
   vtkPVProcessModule* GetProcessModule() { return this->ProcessModule;}
-  
-  // Description:
-  // RenderingModule has the rendering abstraction.  
-  // It creates the render window and any composit manager.  
-  // It also creates part displays which handle level of details.
-  void SetRenderModule(vtkPVRenderModule *module);
-  vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
   //ETX
 
   // Description:
@@ -166,15 +159,6 @@ public:
     {
       return 15;
     };
-
-  // Description:
-  // Need to put a global flag that indicates interactive rendering.  All
-  // process must be consistent in choosing LODs because of the
-  // vtkCollectPolydata filter.  This has to be in vtkPVApplication
-  // because we do not create a render module on remote processes.
-  void SetGlobalLODFlag(int val);
-  static int GetGlobalLODFlag();
-  void SetGlobalLODFlagInternal(int val);
 
   // Description:
   // Flag showing whether the commands are being executed from
@@ -420,7 +404,6 @@ protected:
   virtual void FindApplicationInstallationDirectory();
 
   vtkPVProcessModule *ProcessModule;
-  vtkPVRenderModule *RenderModule;
   char* RenderModuleName;
 
   // For running with SGI pipes.

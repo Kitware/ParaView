@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.124");
+vtkCxxRevisionMacro(vtkPVProbe, "1.125");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -119,9 +119,9 @@ vtkPVProbe::vtkPVProbe()
 
 vtkPVProbe::~vtkPVProbe()
 {  
-  if (this->GetPVApplication() && this->GetPVApplication()->GetRenderModule())
+  if (this->GetPVApplication() && this->GetPVApplication()->GetProcessModule()->GetRenderModule())
     {
-    this->GetPVApplication()->GetRenderModule()->RemoveDisplay(this->PlotDisplay);
+    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->RemoveDisplay(this->PlotDisplay);
     }
 
   this->PlotDisplay->Delete();
@@ -158,10 +158,9 @@ vtkPVProbe::~vtkPVProbe()
 void vtkPVProbe::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-
-  this->PlotDisplay->SetPVApplication(pvApp);
-
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  this->PlotDisplay->SetProcessModule(pm);
   this->vtkPVSource::CreateProperties();
   // We do not support probing groups and multi-block objects. Therefore,
   // we use the first VTKSource id.
@@ -292,10 +291,10 @@ void vtkPVProbe::AcceptCallbackInternal()
     {
     // Connect to the display.
     // These should be merged.
-    this->PlotDisplay->SetPart(this->GetPart(0));
-    this->PlotDisplay->SetInput(this->GetPart(0));
+    this->PlotDisplay->SetPart(this->GetPart(0)->GetSMPart());
+    this->PlotDisplay->SetInput(this->GetPart(0)->GetSMPart());
     this->GetPart(0)->AddDisplay(this->PlotDisplay);
-    this->GetPVApplication()->GetRenderModule()->AddDisplay(this->PlotDisplay);
+    this->GetPVApplication()->GetProcessModule()->GetRenderModule()->AddDisplay(this->PlotDisplay);
     }
 
   // We need to update manually for the case we are probing one point.
@@ -383,7 +382,7 @@ void vtkPVProbe::AcceptCallbackInternal()
 
   if (this->ShowXYPlotToggle->GetState() && numPts > 1)
     {
-    vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
+    vtkPVRenderModule* rm = this->GetPVApplication()->GetProcessModule()->GetRenderModule();
     this->XYPlotWidget->SetCurrentRenderer(rm->GetRenderer2D());
     this->GetPVRenderView()->Enable3DWidget(this->XYPlotWidget);
 

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.18");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.19");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -106,7 +106,7 @@ void vtkPVCameraIcon::RestoreCamera()
   if ( this->RenderView && this->Camera )
     {
     vtkPVProcessModule* pm = this->RenderView->GetPVApplication()->GetProcessModule();
-    vtkClientServerID rendererID = this->RenderView->GetPVApplication()->GetRenderModule()
+    vtkClientServerID rendererID = pm->GetRenderModule()
       ->GetRendererID();
     // create an id for the active camera of the renderer
     vtkClientServerID activeCamera = pm->GetUniqueID();

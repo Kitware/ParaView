@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.297");
+vtkCxxRevisionMacro(vtkPVData, "1.298");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1761,7 +1761,8 @@ void vtkPVData::ColorByPointFieldInternal(const char *name, int numComps)
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    part->GetPartDisplay()->ColorByArray(this->PVColorMap, VTK_POINT_DATA_FIELD);
+    part->GetPartDisplay()->ColorByArray(this->PVColorMap->GetRMScalarBarWidget(), 
+                                         VTK_POINT_DATA_FIELD);
     } 
   this->ColorButtonVisible = 0;
   this->InterpolateColorsCheckVisible = 1;
@@ -1827,7 +1828,8 @@ void vtkPVData::ColorByCellFieldInternal(const char *name, int numComps)
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    part->GetPartDisplay()->ColorByArray(this->PVColorMap, VTK_CELL_DATA_FIELD);
+    part->GetPartDisplay()->ColorByArray(this->PVColorMap->GetRMScalarBarWidget(), 
+                                         VTK_CELL_DATA_FIELD);
     }
 
   this->ColorButtonVisible = 0;
@@ -2451,7 +2453,7 @@ void vtkPVData::Initialize()
   
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
 
-  vtkRenderer* ren = pvApp->GetRenderModule()->GetRenderer();
+  vtkRenderer* ren = pvApp->GetProcessModule()->GetRenderModule()->GetRenderer();
   this->CubeAxes = vtkCubeAxesActor2D::New();
   this->CubeAxes->SetFlyModeToOuterEdges();
   this->CubeAxes->GetProperty()->SetColor(1,1,1);
@@ -2506,7 +2508,7 @@ void vtkPVData::Initialize()
 void vtkPVData::CenterCamera()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkRenderer* ren = pvApp->GetRenderModule()->GetRenderer();
+  vtkRenderer* ren = pvApp->GetProcessModule()->GetRenderModule()->GetRenderer();
 
   double bounds[6];
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);

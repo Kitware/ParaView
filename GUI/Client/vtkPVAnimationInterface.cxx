@@ -184,7 +184,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.143");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.144");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -833,7 +833,7 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
   if ( !this->IsCreated() )
     {
@@ -978,7 +978,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
       {
       if (pvApp)
         {
-        pvApp->GetRenderModule()->CacheUpdate(time, this->NumberOfFrames);
+        pvApp->GetProcessModule()->GetRenderModule()->CacheUpdate(time, this->NumberOfFrames);
         }
       if (this->View)
         {
@@ -1887,7 +1887,7 @@ void vtkPVAnimationInterface::CacheGeometryCheckCallback()
     vtkPVApplication* app = this->GetPVApplication();
     if (app)
       {
-      app->GetRenderModule()->InvalidateAllGeometries();
+      app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
       }
     }
   this->AddTraceEntry("$kw(%s) SetCacheGeometry %d",

@@ -35,7 +35,7 @@
 #include "vtkKWEvent.h"
 #include "vtkRM3DWidget.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.55");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.56");
 
 //===========================================================================
 //***************************************************************************
@@ -140,7 +140,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
 
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
 
-  this->RM3DWidget->Create(pm,pvApp->GetRenderModule()->GetRendererID(),
+  this->RM3DWidget->Create(pm,pm->GetRenderModule()->GetRendererID(),
     this->GetPVSource()->GetPVWindow()->GetInteractorID());
 
 

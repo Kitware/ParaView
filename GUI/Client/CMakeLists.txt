@@ -10,12 +10,6 @@ SET( ParaViewSharedNotWrapped_SRCS
 SET(ParaViewSharedNotTclWrapped_SRCS
   vtkPVProcessModuleGUIHelper.cxx
   vtkPVRenderViewProxyImplementation.cxx
-  vtkPVRenderModuleProxyImplementation.cxx
-  )
-
-SET( ParaViewServer_SRCS
-  vtkCaveRenderManager.cxx
-  vtkMultiDisplayManager.cxx
   )
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
@@ -30,17 +24,6 @@ IF(PARAVIEW_BUILD_DEVELOPMENT)
     )
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
-SET( ParaViewServerNonWrapped_SRCS
-  vtkRMObject.cxx
-  vtkRM3DWidget.cxx
-  vtkRMBoxWidget.cxx
-  vtkRMImplicitPlaneWidget.cxx
-  vtkRMLineWidget.cxx
-  vtkRMPointWidget.cxx
-  vtkRMSphereWidget.cxx
-  vtkRMScalarBarWidget.cxx
-  )
-
 SET( ParaViewExtraWrapper_SRCS
   ${PVGUI_SOURCE_DIR}/Widgets/vtkKWApplication.h
   ${PVGUI_SOURCE_DIR}/Widgets/vtkKWObject.h
@@ -54,12 +37,6 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVAxesWidget.cxx
   vtkPVInteractorStyle.cxx
   vtkPVInteractorStyleCenterOfRotation.cxx
-  vtkPVCaveRenderModule.cxx
-  vtkPVCompositeRenderModule.cxx
-  vtkPVMultiDisplayRenderModule.cxx
-  vtkPVLODRenderModule.cxx
-  vtkPVMPIRenderModule.cxx
-  vtkPVRenderModule.cxx
   vtkPVWidgetCollection.cxx
   vtkPVWorldPointPicker.cxx
   vtkPVXMLPackageParser.cxx
@@ -83,7 +60,6 @@ SET( ParaViewClient_SRCS
   vtkPVCameraManipulator.cxx
   vtkPVCaveRenderModuleUI.cxx
   vtkPVColorMap.cxx
-  vtkPVCompositePartDisplay.cxx
   vtkPVCompositeRenderModuleUI.cxx
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
@@ -94,7 +70,6 @@ SET( ParaViewClient_SRCS
   vtkPVDWriter.cxx
   vtkPVData.cxx
   vtkPVDataSetReaderModule.cxx
-  vtkPVDisplay.cxx
   vtkPVDummyWidget.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
@@ -119,23 +94,18 @@ SET( ParaViewClient_SRCS
   vtkPVJoystickFly.cxx
   vtkPVJoystickFlyIn.cxx
   vtkPVJoystickFlyOut.cxx
-  vtkPVLODPartDisplay.cxx
   vtkPVLODRenderModuleUI.cxx
   vtkPVLabeledToggle.cxx
   vtkPVLineSourceWidget.cxx
   vtkPVLineWidget.cxx
   vtkPVMPIRenderModuleUI.cxx
   vtkPVMinMax.cxx
-  vtkPVMultiDisplayPartDisplay.cxx
   vtkPVMultiDisplayRenderModuleUI.cxx
   vtkPVNavigationWindow.cxx
   vtkPVObjectWidget.cxx
   vtkPVOrientScaleWidget.cxx
-  vtkPVPLOT3DReaderModule.cxx
   vtkPVPart.cxx
-  vtkPVPartDisplay.cxx
-  vtkPVPickDisplay.cxx
-  vtkPVPlotDisplay.cxx
+  vtkPVPLOT3DReaderModule.cxx
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx
   vtkPVPick.cxx
@@ -209,12 +179,6 @@ SET(ParaViewBinary_SRCS
   ParaView.cxx)
 
 IF (PARAVIEW_USE_ICE_T)
-  SET( ParaViewClientNotWrapped_SRCS
-    ${ParaViewClientNotWrapped_SRCS}
-    vtkPVDeskTopRenderModule.cxx
-    vtkPVIceTDisplayRenderModule.cxx
-    vtkPVIceTRenderModule.cxx
-    )
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
     vtkPVDeskTopRenderModuleUI.cxx
@@ -231,10 +195,7 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkRMObject.cxx
-  vtkRM3DWidget.cxx
   vtkPV3DWidget
-  vtkPVDisplay
   vtkPVJoystickFly
   vtkPVObjectWidget
   vtkPVSourceWidget

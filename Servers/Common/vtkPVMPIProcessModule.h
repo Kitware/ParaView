@@ -29,7 +29,6 @@
 
 #include "vtkPVProcessModule.h"
 class vtkPVPart;
-class vtkPVApplication;
 class vtkMultiProcessController;
 class vtkMapper;
 class vtkDataSet;
@@ -42,9 +41,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // ParaView.cxx (main) calls this method to setup the processes.
-  // It currently creates the application, but I will try to pass
-  // the application as an argument.  Start calls Initialize
-  // which calls vtkPVApplication::Start();
   virtual int Start(int argc, char **argv);
   void Initialize();
   

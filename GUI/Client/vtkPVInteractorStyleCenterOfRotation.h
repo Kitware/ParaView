@@ -47,10 +47,12 @@ public:
   // Access to the center of rotation values
   vtkGetVector3Macro(Center, float);
 
+//BTX
   // Description:
   // The render module is for picking.
   void SetRenderModule(vtkPVRenderModule* rm);
-  vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
+  //vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
+//ETX
 
   void SetPVWindow(vtkPVWindow* );
   vtkPVWindow* GetPVWindow() { return this->PVWindow;}

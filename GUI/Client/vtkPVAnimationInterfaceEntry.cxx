@@ -31,6 +31,7 @@
 #include "vtkPVApplication.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVSource.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
@@ -76,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.41");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.42");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -547,7 +548,7 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
 }
 
@@ -568,7 +569,7 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
 }
 
@@ -646,7 +647,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeStart(float f)
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
 }
 
@@ -674,7 +675,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEnd(float f)
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
 }
 
@@ -749,7 +750,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEquationStyle(int s)
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
 }
 
@@ -778,7 +779,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEquationPhase(float p)
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
 }
 
@@ -807,7 +808,7 @@ void vtkPVAnimationInterfaceEntry::SetTimeEquationFrequency(float f)
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
 }
 
@@ -1022,7 +1023,7 @@ void vtkPVAnimationInterfaceEntry::MarkScriptEditorDirty()
   vtkPVApplication* app = this->GetPVApplication();
   if (app)
     {
-    app->GetRenderModule()->InvalidateAllGeometries();
+    app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
     }
 
 }
@@ -1043,7 +1044,7 @@ void vtkPVAnimationInterfaceEntry::SetCurrentSMProperty(vtkSMProperty *prop)
       vtkPVApplication *app = this->GetPVApplication();
       if (app)
         {
-        app->GetRenderModule()->InvalidateAllGeometries();
+        app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
         }
       }
     this->Modified();
@@ -1059,7 +1060,7 @@ void vtkPVAnimationInterfaceEntry::SetAnimationElement(int elem)
     vtkPVApplication *app = this->GetPVApplication();
     if (app)
       {
-      app->GetRenderModule()->InvalidateAllGeometries();
+      app->GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
       }
     this->Modified();
     }
