@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.9");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.10");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -489,6 +489,7 @@ void vtkAMRSpyPlotReader::Execute()
     // Hack to handle rectilinear grids. Find average spacing.
     double sumSpacing[3];
     sumSpacing[0] = sumSpacing[1] = sumSpacing[2] = 0.0;
+    double sumBlocks = 0;
   int number_of_blocks;
 
   SPCTH* spcth = 0;
@@ -587,7 +588,6 @@ void vtkAMRSpyPlotReader::Execute()
         // We only really need to do this once ...
         toplevel_spacing[cc] = blockSpacing[cc]
           * pow(static_cast<double>(2), static_cast<double>(level));
-        sumSpacing[cc] += toplevel_spacing[cc];    
         }
       vtkDebugMacro("Spacing: " << toplevel_spacing[0] << " " << toplevel_spacing[1] << " " << toplevel_spacing[2]);
       int dim = 0;
@@ -605,6 +605,10 @@ void vtkAMRSpyPlotReader::Execute()
           toplevel_spacing[cc] = toplevel_spacing[dim];
           }
         }
+      sumSpacing[0] += toplevel_spacing[0];    
+      sumSpacing[1] += toplevel_spacing[1];    
+      sumSpacing[2] += toplevel_spacing[2];    
+      sumBlocks += 1.0;
       vtkDebugMacro("Origin: " << toplevel_origin[0] << " " << toplevel_origin[1] << " " << toplevel_origin[2]);
       vtkDebugMacro("Fixed Spacing: " << toplevel_spacing[0] << " " << toplevel_spacing[1] << " " << toplevel_spacing[2]);
         total_cells += dims[0] * dims[1] * dims[2];
@@ -620,7 +624,6 @@ void vtkAMRSpyPlotReader::Execute()
     int myId = this->Controller->GetLocalProcessId();
     if (myId == 0)
       {
-      double numBlocks = (double)(number_of_blocks);
       // Get all origins to find the smallest.
       for (idx = 1; idx < numProcs; ++idx)
         {
@@ -631,23 +634,23 @@ void vtkAMRSpyPlotReader::Execute()
         sumSpacing[0] += otherOriginSpacingNum[3];
         sumSpacing[1] += otherOriginSpacingNum[4];
         sumSpacing[2] += otherOriginSpacingNum[5];
-        numBlocks += otherOriginSpacingNum[6];
+        sumBlocks += otherOriginSpacingNum[6];
         }
+      toplevel_spacing[0] = sumSpacing[0] / sumBlocks;
+      toplevel_spacing[1] = sumSpacing[1] / sumBlocks;
+      toplevel_spacing[2] = sumSpacing[2] / sumBlocks;
       // Send it back to all processes.
       otherOriginSpacingNum[0] = toplevel_origin[0];
       otherOriginSpacingNum[1] = toplevel_origin[1];
       otherOriginSpacingNum[2] = toplevel_origin[2];
-      otherOriginSpacingNum[3] = otherOriginSpacingNum[3] / otherOriginSpacingNum[6];
-      otherOriginSpacingNum[4] = otherOriginSpacingNum[4] / otherOriginSpacingNum[6];
-      otherOriginSpacingNum[5] = otherOriginSpacingNum[5] / otherOriginSpacingNum[6];
-      for (idx = 1; idx < numProcs; ++idx)
+      otherOriginSpacingNum[3] = toplevel_spacing[0];
+      otherOriginSpacingNum[4] = toplevel_spacing[1];
+      otherOriginSpacingNum[5] = toplevel_spacing[2];
+       for (idx = 1; idx < numProcs; ++idx)
         {
         this->Controller->Send(otherOriginSpacingNum, 6, idx, 288301);
         }
-      toplevel_spacing[0] = otherOriginSpacingNum[3];
-      toplevel_spacing[1] = otherOriginSpacingNum[4];
-      toplevel_spacing[2] = otherOriginSpacingNum[5];
-      }
+       }
     else
       {
       otherOriginSpacingNum[0] = toplevel_origin[0];
@@ -656,7 +659,7 @@ void vtkAMRSpyPlotReader::Execute()
       otherOriginSpacingNum[3] = sumSpacing[0];
       otherOriginSpacingNum[4] = sumSpacing[1];
       otherOriginSpacingNum[5] = sumSpacing[2];
-      otherOriginSpacingNum[6] = (double)(number_of_blocks);
+      otherOriginSpacingNum[6] = sumBlocks;
       this->Controller->Send(otherOriginSpacingNum, 7, 0, 288300);
       this->Controller->Receive(otherOriginSpacingNum, 6, 0, 288301);
       toplevel_origin[0] = otherOriginSpacingNum[0];
