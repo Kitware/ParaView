@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.11");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -58,24 +58,51 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
   this->Superclass::CreateParallelTclObjects(pvApp);
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
+  // pvApp->ClientMode is only set when there is a server.
+
+  // A rather complex mess to set the correct server variable 
+  // on all of the remote duplication filters.
   if(pvApp->GetClientMode())
     {
     // We need this because the socket controller has no way of distinguishing
     // between processes.
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->CollectID << "SetClientFlag" << 1
+      << this->CollectID << "SetServerToClient"
       << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->LODCollectID << "SetClientFlag" << 1
+      << this->LODCollectID << "SetServerToClient"
       << vtkClientServerStream::End;
     pm->SendStreamToClient();
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetServerToDataServer"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetServerToDataServer"
+      << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     }
   else
     {
     vtkErrorMacro("Cannot run tile display without client-server mode.");
     }
+
+  // if running in render server mode
+  if(pvApp->GetRenderServerMode())
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetServerToRenderServer"
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetServerToRenderServer"
+      << vtkClientServerStream::End;
+    pm->SendStreamToRenderServer();
+    }  
 }
 
 //----------------------------------------------------------------------------

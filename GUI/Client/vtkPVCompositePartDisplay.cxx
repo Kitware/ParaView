@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.20");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.21");
 
 
 //----------------------------------------------------------------------------
@@ -173,12 +173,28 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     }
   else if (pvApp->GetUseTiledDisplay())
     { 
-    this->CollectID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
+    this->CollectID = pm->NewStreamObject("vtkMPIMoveData");
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << this->CollectID << "SetPassThrough" << 1
+      << this->CollectID << "SetMoveModeToPassThrough"
       << vtkClientServerStream::End;
+    // Create a temporary input.
+    // This is needed to get the output of the vtkDataSetToDataSetFitler
+    vtkClientServerID id;
+    id = pm->NewStreamObject("vtkPolyData");
+    pm->GetStream() << vtkClientServerStream::Invoke << this->CollectID 
+                    << "SetInput" << id 
+                    <<  vtkClientServerStream::End;
+    pm->DeleteStreamObject(id);
     pm->SendStreamToRenderServerClientAndServer();
+
+    // For the render server feature.
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->CollectID << "SetMPIMToNSocketConnection" 
+      << pm->GetMPIMToNSocketConnectionID()
+      << vtkClientServerStream::End;
+    pm->SendStreamToRenderServerAndServer();
     }
   else
     { 
@@ -217,12 +233,28 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     }
   else if (pvApp->GetUseTiledDisplay())
     { // This should be in subclass.
-    this->LODCollectID = pm->NewStreamObject("vtkMPIDuplicatePolyData");
+    this->LODCollectID = pm->NewStreamObject("vtkMPIMoveData");
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->LODCollectID << "SetPassThrough" << 1
       << vtkClientServerStream::End;
+    // Create a temporary input.
+    // This is needed to get the output of the vtkDataSetToDataSetFitler
+    vtkClientServerID id;
+    id = pm->NewStreamObject("vtkPolyData");
+    pm->GetStream() << vtkClientServerStream::Invoke << this->LODCollectID 
+                    << "SetInput" << id 
+                    <<  vtkClientServerStream::End;
+    pm->DeleteStreamObject(id);
     pm->SendStreamToRenderServerClientAndServer();
+
+    // For the render server feature.
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->LODCollectID << "SetMPIMToNSocketConnection" 
+      << pm->GetMPIMToNSocketConnectionID()
+      << vtkClientServerStream::End;
+    pm->SendStreamToRenderServerAndServer();
     }
   else
     {

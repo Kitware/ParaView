@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.15");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.16");
 
 
 
@@ -74,7 +74,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     << this->CompositeID << "SetTileDimensions"
     << tileDim[0] << tileDim[1]
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
 
   if (pvApp->GetClientMode())
     {
@@ -86,7 +86,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << pm->GetProcessModuleID() << "GetSocketController"
+      << pm->GetProcessModuleID() << "GetRenderServerSocketController"
       << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -97,7 +97,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetZeroEmpty" << 0
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
   else
     {
@@ -105,7 +105,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetZeroEmpty" << 1
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 
   // Have to initialize after ZeroEmpty, and tile dimensions have been set.
@@ -123,7 +123,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     << "SetRenderWindow"
     << this->RenderWindowID
     << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
 }
 
 //----------------------------------------------------------------------------
@@ -398,7 +398,7 @@ void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
       << vtkClientServerStream::Invoke
       << this->CompositeID << "SetUseCompositeCompression" << val
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
 }
 
