@@ -1,6 +1,6 @@
 <ModuleInterfaces>
- <Module name="XMLCollectionReader" class="vtkPVReaderModule"
-         root_name="XMLCollectionReader" module_type="Reader"
+ <Module name="PVDReader" class="vtkPVDReaderModule"
+         root_name="PVDReader" module_type="Reader"
          extensions=".pvd" file_description="ParaView Data Files">
   <Source class="vtkXMLCollectionReader"/>
  </Module>

@@ -46,6 +46,7 @@ SET( ParaView_SRCS
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
   vtkPVContourFilter.cxx
+  vtkPVDReaderModule.cxx
   vtkPVData.cxx 
   vtkPVDataInformation.cxx
   vtkPVDataSetAttributesInformation.cxx
