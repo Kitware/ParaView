@@ -13,3 +13,15 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
            ParaViewRC.h
            )
 ENDIF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
+
+# Test the "make install" procedure on ParaView.
+IF(UNIX)
+  IF("x${CMAKE_INSTALL_PREFIX}" MATCHES "^x${PARAVIEW_BINARY_DIR}/ParaView/Testing/TestInstall")
+    CONFIGURE_FILE(
+      ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/TestInstall.sh.in
+      ${PARAVIEW_BINARY_DIR}/ParaView/Testing/TestInstall.sh
+      @ONLY IMMEDIATE
+      )
+    ADD_TEST(Install /bin/sh ${PARAVIEW_BINARY_DIR}/ParaView/Testing/TestInstall.sh)
+  ENDIF("x${CMAKE_INSTALL_PREFIX}" MATCHES "^x${PARAVIEW_BINARY_DIR}/ParaView/Testing/TestInstall")
+ENDIF(UNIX)
