@@ -84,7 +84,7 @@ vtkPVTrackballRoll.cxx
 vtkPVTrackballRotate.cxx
 vtkPVTrackballZoom.cxx
 vtkPVTreeComposite.cxx 
-vtkPVUpdateSupressor.cxx
+vtkPVUpdateSuppressor.cxx
 vtkPVVectorEntry.cxx
 vtkPVWidget.cxx
 vtkPVWidgetCollection.cxx
