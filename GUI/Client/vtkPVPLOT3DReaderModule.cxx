@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPLOT3DReaderModule);
-vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.19");
+vtkCxxRevisionMacro(vtkPVPLOT3DReaderModule, "1.20");
 
 int vtkPVPLOT3DReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -61,7 +61,7 @@ void vtkPVPLOT3DReaderModule::Accept(int hideFlag, int hideSource)
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   
   pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0) 
-                  << "GetFileName" << vtkClientServerStream::LastResult
+                  << "GetFileName" 
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(0) 
                   << "CanReadBinaryFile" << vtkClientServerStream::LastResult
