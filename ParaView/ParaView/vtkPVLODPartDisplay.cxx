@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.11");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -237,7 +237,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
 
-  if (pm->GetNumberOfPartitions() == 1)
+  if ( pm->GetNumberOfPartitions() == 1 && !pvApp->GetClientMode() )
     {
     this->PointLabelMapperID = pm->NewStreamObject("vtkLabeledDataMapper");
     this->PointLabelActorID = pm->NewStreamObject("vtkActor2D");
@@ -245,6 +245,9 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
       << vtkClientServerStream::Invoke
       << this->PointLabelActorID << "SetMapper" << this->PointLabelMapperID
       << vtkClientServerStream::End;
+    // Sending to client is enough here since this works only for single
+    // node.
+    pm->SendStreamToClient();
     }
 }
 
