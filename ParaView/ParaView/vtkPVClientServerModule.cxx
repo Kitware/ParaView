@@ -207,7 +207,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.32");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.33");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -308,7 +308,7 @@ void vtkPVClientServerModule::Initialize()
       if ( start )
         {
         char numbuffer[100];
-        vtkstd::string runcommand = "eval ${PARAVIEW_SETUP_SCRIPT} && ";
+        vtkstd::string runcommand = "eval ${PARAVIEW_SETUP_SCRIPT} ; ";
         // Add mpi
         if ( this->MultiProcessMode == vtkPVClientServerModule::MPI_MODE )
           {
@@ -321,7 +321,14 @@ void vtkPVClientServerModule::Initialize()
         sprintf(numbuffer, "%d", this->Port);
         runcommand += numbuffer;
         this->RemoteExecution->SetRemoteHost(this->Hostname);
-        this->RemoteExecution->SetSSHUser(this->Username);
+        if ( this->Username && this->Username[0] )
+          {
+          this->RemoteExecution->SetSSHUser(this->Username);
+          }
+        else
+          {
+          this->RemoteExecution->SetSSHUser(0);
+          }
         this->RemoteExecution->RunRemoteCommand(runcommand.c_str());
         start = 0;
         int cc;
