@@ -27,7 +27,6 @@ SET( KWCommon_SRCS
   vtkKWRemoteExecute.cxx
   vtkKWSerializer.cxx
   vtkQueue.cxx
-  vtkString.cxx
   )
 
 # include mpeg2 writer if the mpeg2 lib has been defined
