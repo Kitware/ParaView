@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.106");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.107");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -947,16 +947,26 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
       {
       vtkPVAnimationInterfaceEntry* entry
         = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
-      vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
-      if (prop)
+      if ( entry->GetCustomScript() )
         {
-        this->Script(entry->GetTimeEquation());
-        prop->SetAnimationTime(vtkKWObject::GetFloatResult(pvApp));
-        prop->GetWidget()->ModifiedCallback();
+        if ( entry->GetScript() )
+          {
+          this->Script(entry->GetScript());
+          }
         }
-      if ( entry->GetPVSource() )
+      else
         {
-        entry->GetPVSource()->UpdateVTKSourceParameters();
+        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
+        if (prop)
+          {
+          this->Script(entry->GetTimeEquation());
+          prop->SetAnimationTime(vtkKWObject::GetFloatResult(pvApp));
+          prop->GetWidget()->ModifiedCallback();
+          }
+        if ( entry->GetPVSource() )
+          {
+          entry->GetPVSource()->UpdateVTKSourceParameters();
+          }
         }
       }
       

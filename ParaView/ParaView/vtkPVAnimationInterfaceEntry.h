@@ -143,6 +143,10 @@ public:
   void SetCustomScript(const char* script);
 
   // Description:
+  // Is the entry doing a custom script?
+  vtkGetMacro(CustomScript, int);
+
+  // Description:
   // Prepare to be played or whatever.
   void Prepare();
 

@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.26");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -375,6 +375,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
       this->DummyFrame->GetWidgetName());
     this->GetMethodMenuButton()->SetButtonText("None");
+    this->CustomScript = 1;
     }
 }
 
