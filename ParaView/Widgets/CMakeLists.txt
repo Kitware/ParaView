@@ -62,7 +62,7 @@ IF (WIN32)
   )
 ENDIF (WIN32)
   
-WRAP_EXCLUDE_FILES(kwinit vtktcl vtkKWHashTable)
+WRAP_EXCLUDE_FILES(kwinit vtktcl vtkKWHashTable vtkKWTclCommand)
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
