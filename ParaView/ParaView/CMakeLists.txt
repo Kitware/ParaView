@@ -128,9 +128,22 @@ VTK_MAKE_INSTANTIATOR(vtkParaViewInstantiator PVInstantiator_SRCS
 VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS PVInstantiator_SRCS ParaView_SRCS)
 ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS PVInstantiator_SRCS ParaView_SRCS)
 
-CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
-               ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h
-               ESCAPE_QUOTES)
+TARGET_LINK_LIBRARIES (vtkKWParaViewTCL
+                       vtkKWWidgetsTCL 
+                       vtkKWCommonTCL
+                       vtkParallelTCL
+		       vtkHybridTCL
+                       vtkRenderingTCL)
+
+
+IF (VTK_USE_PATENTED)
+ TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkPatentedTCL)
+ENDIF (VTK_USE_PATENTED)
+
+CONFIGURE_FILE(
+     ${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h.in
+     ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h
+     ESCAPE_QUOTES)
 
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVDemoPaths.h.in
                ${PARAVIEW_BINARY_DIR}/ParaView/vtkPVDemoPaths.h
@@ -142,35 +155,15 @@ CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVConfig.h.in
 
 INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
 
-#  INCLUDE_DIRECTORIES(${VTKEXPAT_SOURCE_DIR})
-
-IF (TK_LIBRARY)
-  LINK_LIBRARIES (${TK_LIBRARY})
-ENDIF (TK_LIBRARY)
-
-IF (WIN32)
-  LINK_LIBRARIES( wsock32 )
-ENDIF (WIN32)
-
 SOURCE_FILES(ParaViewBinary_SRCS
-	ParaView.cxx)
+	     ParaView.cxx)
 
 IF(WIN32)
   SOURCE_FILES(ParaViewBinary_SRCS
-    ParaView.rc)
+               ParaView.rc)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(ParaView WIN32 ParaViewBinary_SRCS) 
-
-LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff )
-
-# add in freetype
-IF (VTK_USE_FREETYPE)
-  LINK_LIBRARIES(
-    vtkftgl
-    vtkfreetype
-  )
-ENDIF (VTK_USE_FREETYPE)
 
 IF (VTK_MANGLE_MESA)
   IF (MESA_INCLUDE_PATH)
@@ -190,38 +183,6 @@ IF (WIN32)
     INCLUDE_DIRECTORIES(${TK_XLIB_PATH})
   ENDIF (TK_XLIB_PATH) 
 ENDIF (WIN32)
-
-LINK_LIBRARIES (vtkKWCommonTCL
-	        vtkKWWidgetsTCL 
-                vtkCommonTCL 
-                vtkFilteringTCL   
-                vtkGraphicsTCL 
-                vtkImagingTCL 
-                vtkRenderingTCL
-                vtkParallelTCL
-		vtkHybridTCL
-                vtkIOTCL
-                vtkCommon 
-                vtkFiltering
-                vtkImaging
-                vtkGraphics
-                vtkIO
-                vtkRendering
-                vtkParallel
-                vtkHybrid
-                ${TCL_LIBRARY} 
-                ${TK_LIBRARY})
-
-
-IF (VTK_USE_PATENTED)
- LINK_LIBRARIES(vtkPatentedTCL vtkPatented)
-ENDIF (VTK_USE_PATENTED)
-
-IF (VTK_USE_VIDEO_FOR_WINDOWS)
-  LINK_LIBRARIES( vfw32 )
-ENDIF (VTK_USE_VIDEO_FOR_WINDOWS)
-
-LINK_LIBRARIES (vtkexpat)
 
 TARGET_LINK_LIBRARIES (ParaView
                        vtkKWParaViewTCL)
