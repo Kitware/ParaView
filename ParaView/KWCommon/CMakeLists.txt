@@ -35,6 +35,8 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLColorTransferFunctionWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLInteractorObserverReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLInteractorObserverWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLLightReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLLightWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionReader.cxx
@@ -61,6 +63,10 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     SET (KWCommon_SRCS ${KWCommon_SRCS}
       ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetReader.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetWriter.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXMLPlaneWidgetReader.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXMLPlaneWidgetWriter.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXMLPolyDataSourceWidgetReader.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXMLPolyDataSourceWidgetWriter.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarWidgetReader.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarWidgetWriter.cxx
     )
