@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
+#include "vtkPVImageSource.h"
 #include "vtkPVApplication.h"
 #include "vtkPVImage.h"
 #include "vtkPVActorComposite.h"
@@ -76,24 +77,29 @@ vtkPVImage *vtkPVImageSource::GetOutput()
 //----------------------------------------------------------------------------
 void vtkPVImageSource::InitializeData()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetWindow();
+  vtkPVImage *pvImage;
+  vtkPVAssignment *a;
+  vtkPVActorComposite *ac;
 
-    pvImage = vtkPVImage::New();
-    pvImage->Clone(pvApp);
-    a = vtkPVAssignment::New();
-    a->Clone(pvApp);
-    
-    this->SetOutput(pvImage);
-    // It is important that the pvImage have its image data befor this call.
-    // The assignments vtk object is vtkPVExtentTranslator which needs the image.
-    // This may get resolved as more functionality of Assignement gets into ExtentTranslator.
-    // Maybe the pvImage should create the vtkIamgeData, and the source will set it as its output.
-    a->SetOriginalImage(pvImage);
-    
-    pvImage->SetAssignment(a);
-    
-    this->CreateDataPage();
+  pvImage = vtkPVImage::New();
+  pvImage->Clone(pvApp);
+  a = vtkPVAssignment::New();
+  a->Clone(pvApp);
   
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
+  this->SetOutput(pvImage);
+  // It is important that the pvImage have its image data befor this call.
+  // The assignments vtk object is vtkPVExtentTranslator which needs the image.
+  // This may get resolved as more functionality of Assignement gets into ExtentTranslator.
+  // Maybe the pvImage should create the vtkIamgeData, and the source will set it as its output.
+  a->SetOriginalImage(pvImage);
+  
+  pvImage->SetAssignment(a);
+  
+  this->CreateDataPage();
+  
+  ac = this->GetPVData()->GetActorComposite();
+  window->GetMainView()->AddComposite(ac);
 }
 

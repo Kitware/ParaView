@@ -45,6 +45,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVConeSource.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVImageReader.h"
+#include "vtkPVImageMandelbrotSource.h"
 #include "vtkPVImage.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
@@ -130,6 +131,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Menu->InsertCascade(2,"Create",this->CreateMenu,0);
 
   this->CreateMenu->AddCommand("Volume", this, "NewVolume");
+  this->CreateMenu->AddCommand("Fractal Volume", this, "FractalVolume");
   this->CreateMenu->AddCommand("Cone", this, "NewCone");
   this->CreateMenu->AddCommand("Sphere", this, "NewSphere");
 
@@ -318,6 +320,24 @@ void vtkPVWindow::NewVolume()
   this->SourceList->Update();
   
   reader->Delete();
+}
+
+//----------------------------------------------------------------------------
+// Setup the pipeline
+void vtkPVWindow::FractalVolume()
+{
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVImageMandelbrotSource *source;
+  
+  source = vtkPVImageMandelbrotSource::New();
+  source->Clone(pvApp);
+  
+  source->SetName("fractal volume");
+  this->MainView->AddComposite(source);
+  this->SetCurrentSource(source);
+  this->SourceList->Update();
+  
+  source->Delete();
 }
 
 //----------------------------------------------------------------------------

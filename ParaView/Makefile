@@ -37,8 +37,10 @@ vtkPVExtentTranslator \
 vtkPVGlyph3D \
 vtkPVImage \
 vtkPVImageClip \
+vtkPVImageMandelbrotSource \
 vtkPVImageReader \
 vtkPVImageSlice \
+vtkPVImageSource \
 vtkPVMenuButton \
 vtkPVPolyData \
 vtkPVPolyDataSource \

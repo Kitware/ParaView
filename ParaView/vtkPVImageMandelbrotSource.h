@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVImageReader.h
+  Module:    vtkPVImageMandelbrotSource.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,57 +26,80 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVImageReader_h
-#define __vtkPVImageReader_h
+#ifndef __vtkPVImageMandelbrotSource_h
+#define __vtkPVImageMandelbrotSource_h
 
 #include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkKWEntry.h"
 #include "vtkKWPushButton.h"
-#include "vtkImageReader.h"
+#include "vtkImageMandelbrotSource.h"
 #include "vtkPVImageSource.h"
 
 class vtkPVImage;
 
 
-class VTK_EXPORT vtkPVImageReader : public vtkPVImageSource
+class VTK_EXPORT vtkPVImageMandelbrotSource : public vtkPVImageSource
 {
 public:
-  static vtkPVImageReader* New();
-  vtkTypeMacro(vtkPVImageReader, vtkPVImageSource);
+  static vtkPVImageMandelbrotSource* New();
+  vtkTypeMacro(vtkPVImageMandelbrotSource, vtkPVImageSource);
 
   // Description:
   // You will need to clone this object before you create it.
   void CreateProperties();
   
   // Description:
-  // This method is used internally to cast the source to a vtkImageReader.
-  vtkImageReader *GetImageReader();
+  // This method is used internally to cast the source to a vtkImageMandelbrotSource.
+  vtkImageMandelbrotSource *GetImageMandelbrotSource();
   
-  void ImageAccepted();
-  void OpenFile();
+  void AcceptParameters();
 
   // Description:
-  // Parallel methods to set the parameters of the reader.
-  // All clones should have the same parameters.
-  void SetDataByteOrder(int o);
-  void SetDataExtent(int xmin,int xmax, int ymin,int ymax, int zmin,int zmax);
-  void SetDataSpacing(float sx, float sy, float sz);
-  void SetFilePrefix(char *prefix);
+  // Parallel methods to set the parameters of the source.
+  // All clones will get the same parameters.
+  void SetDimensions(int dx, int dy, int dz);
+  void SetSpacing(float sc, float sx);
+  void SetCenter(float cReal, float cImage, float xReal, float xImag);
   
 protected:
-  vtkPVImageReader();
-  ~vtkPVImageReader();
-  vtkPVImageReader(const vtkPVImageReader&) {};
-  void operator=(const vtkPVImageReader&) {};
+  vtkPVImageMandelbrotSource();
+  ~vtkPVImageMandelbrotSource();
+  vtkPVImageMandelbrotSource(const vtkPVImageMandelbrotSource&) {};
+  void operator=(const vtkPVImageMandelbrotSource&) {};
   
   vtkKWPushButton *Accept;
-  vtkKWPushButton *Open;
-  vtkKWLabel *XLabel;
+
+  vtkKWLabeledFrame *DimensionsFrame;
+  vtkKWLabel *XDimLabel;
   vtkKWEntry *XDimension;
-  vtkKWLabel *YLabel;
+  vtkKWLabel *YDimLabel;
   vtkKWEntry *YDimension;
-  vtkKWLabel *ZLabel;
+  vtkKWLabel *ZDimLabel;
   vtkKWEntry *ZDimension;
+
+  vtkKWLabeledFrame *CenterFrame;
+  vtkKWLabel *CRealLabel;
+  vtkKWEntry *CRealEntry;
+  vtkKWLabel *CImaginaryLabel;
+  vtkKWEntry *CImaginaryEntry;
+  vtkKWLabel *XRealLabel;
+  vtkKWEntry *XRealEntry;
+  vtkKWLabel *XImaginaryLabel;
+  vtkKWEntry *XImaginaryEntry;
+  
+  vtkKWLabel *CSpacingLabel;
+  vtkKWEntry *CSpacingEntry;
+  
+  vtkKWLabel *XSpacingLabel;
+  vtkKWEntry *XSpacingEntry;
+  
+  
 };
 
 #endif
+
+
+
+
+

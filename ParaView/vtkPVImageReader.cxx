@@ -54,7 +54,9 @@ vtkPVImageReader::vtkPVImageReader()
   this->ZDimension = vtkKWEntry::New();
   this->ZDimension->SetParent(this->Properties);
   
-  this->ImageReader = vtkImageReader::New();
+  vtkImageReader *r = vtkImageReader::New();
+  this->SetImageSource(r);
+  r->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -76,9 +78,6 @@ vtkPVImageReader::~vtkPVImageReader()
   this->ZLabel = NULL;
   this->ZDimension->Delete();
   this->ZDimension = NULL;
-  
-  this->ImageReader->Delete();
-  this->ImageReader = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -125,7 +124,7 @@ void vtkPVImageReader::SetFilePrefix(char *prefix)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->ImageReader->SetFilePrefix(prefix);
+  this->GetImageReader()->SetFilePrefix(prefix);
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
@@ -139,7 +138,7 @@ void vtkPVImageReader::SetDataByteOrder(int o)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->ImageReader->SetDataByteOrder(o);
+  this->GetImageReader()->SetDataByteOrder(o);
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
@@ -153,7 +152,7 @@ void vtkPVImageReader::SetDataExtent(int xmin,int xmax, int ymin,int ymax,
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->ImageReader->SetDataExtent(xmin, xmax, ymin, ymax, zmin, zmax);
+  this->GetImageReader()->SetDataExtent(xmin, xmax, ymin, ymax, zmin, zmax);
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
@@ -167,7 +166,7 @@ void vtkPVImageReader::SetDataSpacing(float sx, float sy, float sz)
 {
  vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->ImageReader->SetDataSpacing(sx, sy, sz);
+  this->GetImageReader()->SetDataSpacing(sx, sy, sz);
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
@@ -176,35 +175,10 @@ void vtkPVImageReader::SetDataSpacing(float sx, float sy, float sz)
     }
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVImageReader::SetOutput(vtkPVImage *pvi)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->SetPVData(pvi);
-  pvi->SetData(this->ImageReader->GetOutput());
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
-			   pvi->GetTclName());
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkPVImage *vtkPVImageReader::GetOutput()
-{
-  return vtkPVImage::SafeDownCast(this->Output);
-}
-
 //----------------------------------------------------------------------------
 void vtkPVImageReader::ImageAccepted()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVImage *pvImage;
-  vtkPVAssignment *a;
-  vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
   
   // Setup the image reader from the UI.
@@ -219,30 +193,9 @@ void vtkPVImageReader::ImageAccepted()
 
   if (this->GetPVData() == NULL)
     {
-    pvImage = vtkPVImage::New();
-    pvImage->Clone(pvApp);
-    a = vtkPVAssignment::New();
-    a->Clone(pvApp);
-    
-    this->SetOutput(pvImage);
-    // It is important that the pvImage have its image data befor this call.
-    // The assignments vtk object is vtkPVExtentTranslator which needs the image.
-    // This may get resolved as more functionality of Assignement gets into ExtentTranslator.
-    // Maybe the pvImage should create the vtkIamgeData, and the source will set it as its output.
-    a->SetOriginalImage(pvImage);
-    
-    pvImage->SetAssignment(a);
-    
-    this->CreateDataPage();
-  
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
+    this->InitializeData();
     }
   
-  if (window->GetPreviousSource() != NULL)
-    {
-    window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
-    }
   window->GetMainView()->SetSelectedComposite(this);
   this->GetView()->Render();
   window->GetMainView()->ResetCamera();
@@ -260,4 +213,10 @@ void vtkPVImageReader::OpenFile()
   path = 
     strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
 	   this->Application->GetMainInterp()->result);
+}
+
+//----------------------------------------------------------------------------
+vtkImageReader *vtkPVImageReader::GetImageReader()
+{
+  return vtkImageReader::SafeDownCast(this->ImageSource);  
 }

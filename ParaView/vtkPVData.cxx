@@ -56,6 +56,7 @@ vtkPVData::vtkPVData()
   this->FiltersMenuButton = vtkPVMenuButton::New();
   
   this->Mapper = vtkDataSetMapper::New();
+  this->Mapper->ImmediateModeRenderingOn();
   this->Actor = vtkActor::New();
   this->Assignment = NULL;
   
@@ -170,8 +171,10 @@ void vtkPVData::Contour()
   
   contour->SetInput(this);
   
+  this->Update();
+  // This should be replaced by a parallel version.
   range = this->Data->GetScalarRange();
-  contour->SetValue(0, (range[1]-range[0])/2.0);
+  contour->SetValue(0, (range[1]+range[0])/2.0);
       
   contour->SetName("contour");
 

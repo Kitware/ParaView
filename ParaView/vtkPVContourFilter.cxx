@@ -51,7 +51,7 @@ vtkPVContourFilter::vtkPVContourFilter()
   this->SourceButton = vtkKWPushButton::New();
   this->SourceButton->SetParent(this->Properties);
   
-  this->Contour = vtkContourFilter::New();  
+  this->Contour = vtkKitwareContourFilter::New();  
 }
 
 //----------------------------------------------------------------------------
@@ -143,6 +143,7 @@ void vtkPVContourFilter::SetValue(int contour, float val)
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
+    //this->ContourValueEntry->SetValue(val, 7);
     pvApp->BroadcastScript("%s SetValue %d %f", this->GetTclName(),
 			   contour, val);
     }

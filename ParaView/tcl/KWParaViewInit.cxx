@@ -68,12 +68,18 @@ ClientData vtkPVImageNewCommand();
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageClipNewCommand();
+int vtkPVImageMandelbrotSourceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageMandelbrotSourceNewCommand();
 int vtkPVImageReaderCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageReaderNewCommand();
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageSliceNewCommand();
+int vtkPVImageSourceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageSourceNewCommand();
 int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMenuButtonNewCommand();
@@ -178,10 +184,14 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVImageCommand);
   vtkTclCreateNew(interp,"vtkPVImageClip", vtkPVImageClipNewCommand,
                   vtkPVImageClipCommand);
+  vtkTclCreateNew(interp,"vtkPVImageMandelbrotSource", vtkPVImageMandelbrotSourceNewCommand,
+                  vtkPVImageMandelbrotSourceCommand);
   vtkTclCreateNew(interp,"vtkPVImageReader", vtkPVImageReaderNewCommand,
                   vtkPVImageReaderCommand);
   vtkTclCreateNew(interp,"vtkPVImageSlice", vtkPVImageSliceNewCommand,
                   vtkPVImageSliceCommand);
+  vtkTclCreateNew(interp,"vtkPVImageSource", vtkPVImageSourceNewCommand,
+                  vtkPVImageSourceCommand);
   vtkTclCreateNew(interp,"vtkPVMenuButton", vtkPVMenuButtonNewCommand,
                   vtkPVMenuButtonCommand);
   vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,

@@ -59,6 +59,7 @@ public:
   virtual void Save();
   virtual void NewCone();
   virtual void NewVolume();
+  virtual void FractalVolume();
   virtual void NewSphere();
   
   // Description:

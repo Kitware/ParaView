@@ -49,7 +49,12 @@ public:
   // the object creation/tcl-names in the other processes.
   void SetOutput(vtkPVImage *pvi);
   vtkPVImage *GetOutput();
-    
+
+  // Description:
+  // This method is called the first time the accept button is pressed.
+  // It creates a PVData and actor composite.
+  void InitializeData();
+  
 protected:
   vtkPVImageSource();
   ~vtkPVImageSource();

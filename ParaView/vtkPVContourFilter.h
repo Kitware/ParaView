@@ -29,7 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVContourFilter_h
 #define __vtkPVContourFilter_h
 
-#include "vtkContourFilter.h"
+#include "vtkKitwareContourFilter.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
@@ -80,7 +80,7 @@ protected:
   vtkKWLabel *ContourValueLabel;
   vtkKWPushButton *SourceButton;
 
-  vtkContourFilter  *Contour;
+  vtkKitwareContourFilter  *Contour;
 };
 
 #endif
