@@ -51,6 +51,8 @@ public:
   // Description:
   vtkSetMacro(AttributeType, unsigned char);
   vtkGetMacro(AttributeType, unsigned char);
+  const char* GetAttributeTypeAsString();
+  virtual void SetAttributeType(const char* type);
 
   // Description:
   vtkSetMacro(NumberOfComponents, int);
@@ -61,7 +63,8 @@ public:
   {
     POINT = 0,
     CELL = 1,
-    ANY = 2
+    ANY = 2,
+    LAST_ATTRIBUTE_TYPE
   };
 //ETX
 

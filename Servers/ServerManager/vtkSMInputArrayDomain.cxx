@@ -23,7 +23,14 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.3");
+
+//---------------------------------------------------------------------------
+static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
+  "POINT",
+  "CELL",
+  "ANY"
+};
 
 //---------------------------------------------------------------------------
 vtkSMInputArrayDomain::vtkSMInputArrayDomain()
@@ -144,7 +151,7 @@ void vtkSMInputArrayDomain::SaveState(
         << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
         << endl;
   *file << indent.GetNextIndent() 
-        << "<InputArray attribute_type=\"" << this->GetAttributeType()
+        << "<InputArray attribute_type=\"" << this->GetAttributeTypeAsString()
         << "\" number_of_components=\"" << this->GetNumberOfComponents()
         << "\"/>" << endl;
   
@@ -183,6 +190,32 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
     }
 
   return 1;
+}
+
+//---------------------------------------------------------------------------
+const char* vtkSMInputArrayDomain::GetAttributeTypeAsString()
+{
+  return vtkSMInputArrayDomainAttributeTypes[this->AttributeType];
+}
+
+//---------------------------------------------------------------------------
+void vtkSMInputArrayDomain::SetAttributeType(const char* type)
+{
+  if ( ! type )
+    {
+    vtkErrorMacro("No type specified");
+    return;
+    }
+  unsigned char cc;
+  for ( cc = 0; cc < vtkSMInputArrayDomain::LAST_ATTRIBUTE_TYPE; cc ++ )
+    {
+    if ( strcmp(type, vtkSMInputArrayDomainAttributeTypes[cc]) == 0 )
+      {
+      this->SetAttributeType(cc);
+      return;
+      }
+    }
+  vtkErrorMacro("No such attribute type: " << type);
 }
 
 //---------------------------------------------------------------------------
