@@ -77,7 +77,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.15");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.16");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -146,7 +146,7 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
 
   // Create the widgets container itself
 
-  this->Frame->Create(app, "frame", "-bd 0 -padx 0 -pady 0");
+  this->Frame->Create(app, "frame", "-bd 0");
 
   // Create a "toolbar separator" for the flat aspect
 
@@ -238,7 +238,7 @@ void vtkKWToolbar::Pack()
 {
   if (this->FlatAspect)
     {
-    this->Script("%s config -relief flat -bd 0 -padx 0", 
+    this->Script("%s config -relief flat -bd 0 -padx 0 -pady 0", 
                  this->GetWidgetName());
     this->Script("pack %s -side left -anchor nw -expand n -fill y -ipadx 2",
                  this->Frame->GetWidgetName());
