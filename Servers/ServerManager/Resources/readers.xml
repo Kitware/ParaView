@@ -751,20 +751,53 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
 
+     <StringVectorProperty 
+        name="XMLFileNameInfo"
+        command="GetXMLFileName"
+        information_only="1"/>
+
      <StringVectorProperty
         name="XMLFileName"
         command="SetXMLFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <StringListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="XMLFileNameInfo" function="XMLFileName"/>
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePrefixInfo"
+        command="GetFilePrefix"
+        information_only="1"/>
 
      <StringVectorProperty
         name="FilePrefix"
         command="SetFilePrefix"
-        number_of_elements="1" />
+        number_of_elements="1" >
+       <StringListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePrefixInfo" function="Prefix"/>
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
+
+     <StringVectorProperty 
+        name="FilePatternInfo"
+        command="GetFilePattern"
+        information_only="1"/>
 
      <StringVectorProperty
         name="FilePattern"
         command="SetFilePattern"
-        number_of_elements="1" />
+        number_of_elements="1" >
+       <StringListDomain name="default_value" optional="1">
+          <RequiredProperties>
+             <Property name="FilePatternInfo" function="Pattern"/>
+          </RequiredProperties>
+       </StringListDomain>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="FileRangeInfo"
@@ -776,19 +809,28 @@
         command="SetFileRange"
         number_of_elements="2" 
         default_values="0 0">
-      <IntRangeDomain name="range">
-         <RequiredProperties>
-            <Property name="FileRangeInfo" function="Range"/>
-         </RequiredProperties>
-      </IntRangeDomain>
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="FileRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
      </IntVectorProperty>
+
+     <IntVectorProperty 
+        name="TimeStepRangeInfo"
+        command="GetTimeStepRange"
+        information_only="1"/>
 
      <IntVectorProperty 
         name="TimeStep"
         command="SetTimeStep"
         number_of_elements="1"
         default_values="0">
-       <IntRangeDomain name="range"/>
+       <IntRangeDomain name="range">
+          <RequiredProperties>
+             <Property name="TimeStepRangeInfo" function="Range"/>
+          </RequiredProperties>
+       </IntRangeDomain>
      </IntVectorProperty>
 
      <StringVectorProperty
