@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 {
   if ( argc < 3 )
     {
-    cerr << "Usage: " << argv[0] << " image.ppm image.h" << endl;
+    cerr << "Usage: " << argv[0] << " image.png image.h" << endl;
     return 1;
     }
 
@@ -32,12 +32,15 @@ int main(int argc, char **argv)
   vtkPNGReader *pr = vtkPNGReader::New();
   pr->SetFileName( argv[1] );
   pr->Update();
-  if ( pr->GetOutput()->GetNumberOfScalarComponents() != 4 )
+
+  if (pr->GetOutput()->GetNumberOfScalarComponents() != 3 &&
+      pr->GetOutput()->GetNumberOfScalarComponents() != 4)
     {
-    cerr << "Can only convert RGBA images" << endl;
+    cerr << "Can only convert RGB or RGBA images" << endl;
     pr->Delete();
     return 4;
     }
+
   vtkImageFlip *flip = vtkImageFlip::New();
   flip->SetInput( pr->GetOutput() );
   flip->SetFilteredAxis( 1 );
@@ -47,9 +50,11 @@ int main(int argc, char **argv)
   int *dim = flip->GetOutput()->GetDimensions();
   int width = dim[0];
   int height = dim[1];
+  int pixelsize = flip->GetOutput()->GetNumberOfScalarComponents();
+
   unsigned long length = width * height;
-  unsigned char *image = new unsigned char[ length * 4 ];
-  memcpy(image, flip->GetOutput()->GetScalarPointer(), length * 4);
+  unsigned char *image = new unsigned char[ length * pixelsize ];
+  memcpy(image, flip->GetOutput()->GetScalarPointer(), length * pixelsize);
   strcpy(buffer, argv[2]);
   buffer[ strlen(buffer)-2 ] = 0;
 
@@ -60,6 +65,7 @@ int main(int argc, char **argv)
   
   out << "#define image_" << buffer << "_width " << width << endl
       << "#define image_" << buffer << "_height " << height << endl
+      << "#define image_" << buffer << "_pixelsize " << pixelsize << endl
       << "static unsigned char image_" << buffer << "[] = {" << endl
       << "  ";
 
@@ -68,25 +74,29 @@ int main(int argc, char **argv)
     {    
     if ( cc % (width) == 0 )
       {
-      out << endl << "/* " << (cc / (width * 4)) << " */ ";
+      out << endl << "/* " << (cc / (width * pixelsize)) << " */ ";
       }
     
-    if ( (unsigned int)image[cc*4+3] > 0 )
-      {
-      out << (unsigned int)image[cc*4] << ", "
-	  << (unsigned int)image[cc*4+1] << ", "
-	  << (unsigned int)image[cc*4+2] << ", "
-	  << (unsigned int)image[cc*4+3];
-      }
-    else
+    if (pixelsize == 4 && (unsigned int)image[cc * pixelsize + 3] == 0)
       {
       out << "0, 0, 0, 0";
       }
+    else
+      {
+      out << (unsigned int)image[cc * pixelsize] << ", "
+          << (unsigned int)image[cc * pixelsize + 1] << ", "
+          << (unsigned int)image[cc * pixelsize + 2];
+      if (pixelsize == 4)
+        {
+        out << ", " << (unsigned int)image[cc * pixelsize + 3];
+        }
+      }
+
     if ( cc != (length)-1 )
       {
       out << ", ";
       }
-    if ( cc % 4 == 11 )
+    if ( cc % pixelsize == 11 )
       {
       out << endl << "  ";
       }
