@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.9");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -43,7 +43,7 @@ public:
 vtkClientServerInterpreter::vtkClientServerInterpreter()
 {
   this->Internal = new vtkClientServerInterpreterInternals;
-  this->LastResultMessage = new vtkClientServerStream;
+  this->LastResultMessage = new vtkClientServerStream(this);
   this->LogStream = 0;
   this->LogFileStream = 0;
 }
@@ -532,7 +532,7 @@ vtkClientServerInterpreter
     // Copy the result to store it in the map.  The result itself
     // remains unchanged.
     vtkClientServerStream* tmp;
-    tmp = new vtkClientServerStream(*this->LastResultMessage);
+    tmp = new vtkClientServerStream(*this->LastResultMessage, this);
     this->Internal->IDToMessageMap[id.ID] = tmp;
     return 1;
     }
@@ -662,7 +662,7 @@ int vtkClientServerInterpreter::NewInstance(vtkObjectBase* obj,
   // that the id does not exist in the map, so the insertion does not
   // have to be checked.
   vtkClientServerStream* entry =
-    new vtkClientServerStream(*this->LastResultMessage);
+    new vtkClientServerStream(*this->LastResultMessage, this);
   this->Internal->IDToMessageMap[id.ID] = entry;
   return 1;
 }

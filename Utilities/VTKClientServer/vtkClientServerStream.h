@@ -34,12 +34,12 @@ public:
   // Description:
   // Constructor/Destructor manage references of vtk objects stored in
   // the stream along with the rest of the stream data.
-  vtkClientServerStream();
+  vtkClientServerStream(vtkObjectBase* owner=0);
   ~vtkClientServerStream();
 
   // Description:
   // Copy constructor and assignment operator copy all stream data.
-  vtkClientServerStream(const vtkClientServerStream&);
+  vtkClientServerStream(const vtkClientServerStream&, vtkObjectBase* owner=0);
   vtkClientServerStream& operator=(const vtkClientServerStream&);
 
   // Description:

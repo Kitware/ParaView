@@ -97,6 +97,13 @@ VTK_CLIENT_SERVER_TYPE_TRAIT(vtkTypeFloat64, float64, vtkTypeFloat64);
 class vtkClientServerStreamInternals
 {
 public:
+  vtkClientServerStreamInternals(vtkObjectBase* owner): Objects(owner) {}
+  vtkClientServerStreamInternals(const vtkClientServerStreamInternals& r,
+                                 vtkObjectBase* owner):
+    Data(r.Data), ValueOffsets(r.ValueOffsets),
+    MessageIndexes(r.MessageIndexes), Objects(r.Objects, owner),
+    StartIndex(r.StartIndex), Invalid(r.Invalid), String(r.String) {}
+
   // Actual binary data in the stream.
   typedef vtkstd::vector<unsigned char> DataType;
   DataType Data;
@@ -111,7 +118,42 @@ public:
   MessageIndexesType MessageIndexes;
 
   // Hold references to vtkObjectBase instances stored in the stream.
-  typedef vtkstd::vector< vtkSmartPointer<vtkObjectBase> > ObjectsType;
+  // The object that owns this stream is passed as the argument to
+  // Register/UnRegister for objects stored in the stream because the
+  // owner of this stream effectively owns those objects.
+  struct ObjectsType: vtkstd::vector<vtkObjectBase*>
+  {
+    typedef vtkstd::vector<vtkObjectBase*> Superclass;
+    ObjectsType(vtkObjectBase* owner): Owner(owner) {}
+    ObjectsType(const ObjectsType& r, vtkObjectBase* owner): Superclass(r),
+                                                             Owner(owner)
+      {
+      for(Superclass::iterator i = this->begin(); i != this->end(); ++i)
+        {
+        (*i)->Register(this->Owner);
+        }
+      }
+    ~ObjectsType() { this->Clear(); }
+    vtkObjectBase* Owner;
+
+    void Insert(vtkObjectBase* obj)
+      {
+      if(obj)
+        {
+        obj->Register(this->Owner);
+        this->push_back(obj);
+        }
+      }
+
+    void Clear()
+      {
+      for(Superclass::iterator i = this->begin(); i != this->end(); ++i)
+        {
+        (*i)->UnRegister(this->Owner);
+        }
+      this->erase(this->begin(), this->end());
+      }
+  };
   ObjectsType Objects;
 
   // Index into ValueOffsets where the last Command started.  Used to
@@ -135,10 +177,10 @@ public:
 };
 
 //----------------------------------------------------------------------------
-vtkClientServerStream::vtkClientServerStream()
+vtkClientServerStream::vtkClientServerStream(vtkObjectBase* owner)
 {
   // Initialize the internal representation of the stream.
-  this->Internal = new vtkClientServerStreamInternals;
+  this->Internal = new vtkClientServerStreamInternals(owner);
   this->Reserve(1024);
   this->Reset();
 }
@@ -150,10 +192,11 @@ vtkClientServerStream::~vtkClientServerStream()
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerStream::vtkClientServerStream(const vtkClientServerStream& r)
+vtkClientServerStream::vtkClientServerStream(const vtkClientServerStream& r,
+                                             vtkObjectBase* owner)
 {
   // Allocate and copy the internal representation of the stream.
-  this->Internal = new vtkClientServerStreamInternals(*r.Internal);
+  this->Internal = new vtkClientServerStreamInternals(*r.Internal, owner);
 }
 
 //----------------------------------------------------------------------------
@@ -208,8 +251,7 @@ void vtkClientServerStream::Reset()
                                      this->Internal->ValueOffsets.end());
   this->Internal->MessageIndexes.erase(this->Internal->MessageIndexes.begin(),
                                        this->Internal->MessageIndexes.end());
-  this->Internal->Objects.erase(this->Internal->Objects.begin(),
-                                this->Internal->Objects.end());
+  this->Internal->Objects.Clear();
 
   // No message has yet been started.
   this->Internal->Invalid = 0;
@@ -304,7 +346,7 @@ vtkClientServerStream::operator << (vtkClientServerStream::Argument a)
       {
       vtkObjectBase* obj;
       memcpy(&obj, a.Data+sizeof(tp), sizeof(obj));
-      this->Internal->Objects.push_back(obj);
+      this->Internal->Objects.Insert(obj);
       }
 
     // Write the data to the stream.
@@ -369,7 +411,7 @@ vtkClientServerStream&
 vtkClientServerStream::operator << (vtkObjectBase* obj)
 {
   // The stream will now hold a reference to the object.
-  this->Internal->Objects.push_back(obj);
+  this->Internal->Objects.Insert(obj);
 
   // Store the vtk_object_pointer type and then the pointer value itself.
   *this << vtkClientServerStream::vtk_object_pointer;
