@@ -219,7 +219,14 @@ void vtkKWApplication::DisplayHelp()
   char temp[1024];
   char fkey[1024];
   char loc[1024];
-  sprintf(fkey,"Software\\Kitware\\%i\\Inst",0);  
+  if ( !(strcmp( this->ApplicationName, "VolView" ) ) )
+    {
+    sprintf(fkey,"Software\\Kitware\\%i\\Inst",0);  
+    }
+  else if ( !(strcmp( this->ApplicationName, "GoFly" ) ) )
+    {
+    sprintf(fkey,"Software\\Kitware\\%i\\Inst",2);  
+    }
   HKEY hKey;
   if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
 		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
