@@ -2485,3 +2485,10 @@
    fun:_XlcSetConverter
    fun:_XlcDefaultLoader
 }
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XtMalloc
+   fun:__XtMalloc
+}
