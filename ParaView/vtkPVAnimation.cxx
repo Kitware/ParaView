@@ -27,6 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVAnimation.h"
+#include "vtkPVApplication.h"
 
 int vtkPVAnimationCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -103,7 +104,7 @@ void vtkPVAnimation::CreateProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimation::SetCurrent(float *time)
+void vtkPVAnimation::SetCurrent(float time)
 {  
   if (this->Current == time)
     {
@@ -111,8 +112,9 @@ void vtkPVAnimation::SetCurrent(float *time)
     }
   else
     {
-    char *command[1024];
-
+    this->Script(this->Method, this->GetTclName(), time);
+    this->GetPVApplication()->BroadcastScript(this->Method, 
+                                              this->GetTclName(), time);
     }
 }
 
