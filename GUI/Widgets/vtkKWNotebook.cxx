@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.67");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.68");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -558,7 +558,7 @@ int vtkKWNotebook::GetVisiblePageId(int idx)
       }
     }
 
-  return NULL;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
