@@ -175,7 +175,8 @@ public:
 
   // Description:
   // Save out the text properties to a file.
-  void SaveInTclScript(ofstream *file, const char *tcl_name = 0);
+  void SaveInTclScript(ofstream *file, const char *tcl_name = 0,
+                       int tabify = 1);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
