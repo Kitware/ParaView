@@ -91,16 +91,6 @@ public:
   vtkSetMacro(AttributeType, int);
   vtkGetMacro(AttributeType, int);
 
-  //BTX
-  // Description:
-  // This is the filter/object that will be modified by the widgtet when the 
-  // selected array gets changed in the menu.  It should have methods like:
-  // SelectInputScalars and GetInputScalarsSelection.
-  // Description:
-  vtkSetMacro(ObjectID,vtkClientServerID);
-  vtkGetMacro(ObjectID,vtkClientServerID);
-  //ETX
-
   // Description:
   // This input menu supplies the data set.
   virtual void SetInputMenu(vtkPVInputMenu*);

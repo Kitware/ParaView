@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.48");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -55,7 +55,6 @@ vtkPVArrayMenu::vtkPVArrayMenu()
 
   this->InputName = NULL;
   this->AttributeType = 0;
-  this->ObjectID.ID = 0;
 
   this->Label = vtkKWLabel::New();
   this->ArrayMenu = vtkKWOptionMenu::New();
@@ -73,7 +72,6 @@ vtkPVArrayMenu::~vtkPVArrayMenu()
   this->SetArrayName(NULL);
 
   this->SetInputName(NULL);
-  this->ObjectID.ID = 0;
 
   this->Label->Delete();
   this->Label = NULL;
@@ -673,7 +671,7 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     pvam->SetFieldSelection(this->FieldSelection);
     pvam->SetAttributeType(this->AttributeType);
     pvam->SetLabel(this->Label->GetLabel());
-    pvam->SetObjectID(pvSource->GetVTKSourceID());
+    // TODO: Why is the first source used? Is this a bug?
     if (this->InputMenu)
       {
       // This will either clone or return a previously cloned
@@ -844,7 +842,6 @@ void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InputName: " << (this->InputName?this->InputName:"none") 
      << endl;
   os << indent << "NumberOfComponents: " << this->GetNumberOfComponents() << endl;
-  os << indent << "ObjectID: " << this->ObjectID << endl;
   os << indent << "SelectedComponent: " << this->GetSelectedComponent() << endl;
   os << indent << "ShowComponentMenu: " << this->GetShowComponentMenu() << endl;
   if (this->InputMenu)
