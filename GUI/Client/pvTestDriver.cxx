@@ -106,6 +106,10 @@ void pvTestDriver::CollectConfiguredOptions()
 # ifdef VTK_MPI_MAX_NUMPROCS
   serverNumProc = VTK_MPI_MAX_NUMPROCS;
   renderNumProc = serverNumProc-1;
+  if ( renderNumProc <= 0 )
+    {
+    renderNumProc = 1;
+    }
 # endif
 # ifdef VTK_MPI_NUMPROC_FLAG
   this->MPINumProcessFlag = VTK_MPI_NUMPROC_FLAG;
