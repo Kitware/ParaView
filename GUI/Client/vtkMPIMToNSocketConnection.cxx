@@ -17,14 +17,13 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkMultiProcessController.h"
-#include "vtkPVDuplicatePolyData.h"
 #include "vtkObjectFactory.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.1");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.2");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
