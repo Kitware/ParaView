@@ -562,6 +562,8 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetCurrentPVSource]",
 		       pvs->GetTclName(), window->GetTclName());
 
+  window->GetMainView()->DisableRenderingFlagOn();
+
   vtkPVSource* connection;
   vtkPVData* connectionOutput;
   char* extentTranslatorName = 0;
@@ -660,7 +662,6 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       window->GetSourceList("Sources")->AddItem(connection);
       connection->UpdateParameterWidgets();
       connection->Accept(0);
-      window->SetCurrentPVSource(connection);
 
       // In the trace, the connection points are named by looking at
       // the outputs/consumers of the reader (CurrentPVSource)
@@ -711,7 +712,11 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   if (numOutputs > 1)
     {
     pvs->GetPVOutput()->SetVisibilityInternal(0);
+    pvs->GetPVOutput()->GetPVConsumer(0)->GetPVOutput()->ResetColorRange();
     }
+
+  window->ResetCameraCallback();
+  window->GetMainView()->DisableRenderingFlagOff();
   pvs->Accept(0);
   window->SetCurrentPVSource(pvs);
   
