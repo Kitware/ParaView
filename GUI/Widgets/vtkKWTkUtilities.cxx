@@ -13,14 +13,18 @@
 =========================================================================*/
 #include "vtkKWTkUtilities.h"
 
-#include "vtkBase64Utilities.h"
-#include "vtkImageData.h"
-#include "vtkImageFlip.h"
-#include "vtkKWIcon.h"
-#include "vtkObjectFactory.h"
-#include "vtkPNGReader.h"
+#include "vtkKWWidget.h"
+#include "vtkKWApplication.h"
+#include "vtkKWResourceUtilities.h"
 
+#include "vtkPNGWriter.h"
+#include "vtkImageData.h"
+#include "vtkBase64Utilities.h"
+#include "vtkObjectFactory.h"
+
+#include "vtkWindows.h"
 #include <kwsys/SystemTools.hxx>
+#include "X11/Xutil.h"
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -38,16 +42,21 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.42");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.43");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
-                                   const char *window, 
+                                   const char *widget, 
                                    const char *color, 
-                                   int *rr, int *gg, int *bb)
+                                   int *r, int *g, int *b)
 {
+  if (!interp || !widget || !color || !r || !g || !b)
+    {
+    return;
+    }
+
   ostrstream command;
-  command << "winfo rgb " << window << " " << color << ends;
+  command << "winfo rgb " << widget << " " << color << ends;
   if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
     {
     vtkGenericWarningMacro(<< "Unable to get RGB color: " << interp->result);
@@ -56,21 +65,42 @@ void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
     }
   command.rdbuf()->freeze(0);     
 
-  int r, g, b;
-  sscanf(interp->result, "%d %d %d", &r, &g, &b);
-  *rr = static_cast<int>((static_cast<float>(r) / 65535.0)*255.0);
-  *gg = static_cast<int>((static_cast<float>(g) / 65535.0)*255.0);
-  *bb = static_cast<int>((static_cast<float>(b) / 65535.0)*255.0); 
+  int rr, gg, bb;
+  sscanf(interp->result, "%d %d %d", &rr, &gg, &bb);
+  *r = static_cast<int>((static_cast<float>(rr) / 65535.0) * 255.0);
+  *g = static_cast<int>((static_cast<float>(gg) / 65535.0) * 255.0);
+  *b = static_cast<int>((static_cast<float>(bb) / 65535.0) * 255.0); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::GetRGBColor(vtkKWWidget *widget, 
+                                   const char *color, 
+                                   int *r, int *g, int *b)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return;
+    }
+  
+  vtkKWTkUtilities::GetRGBColor(widget->GetApplication()->GetMainInterp(),
+                                widget->GetWidgetName(),
+                                color,
+                                r, g, b);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
-                                      const char *window,
+                                      const char *widget,
                                       const char *option,
                                       int *r, int *g, int *b)
 {
+  if (!interp || !widget || !option || !r || !g || !b)
+    {
+    return;
+    }
+
   ostrstream command;
-  command << window << " cget " << option << ends;
+  command << widget << " cget " << option << ends;
   if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
     {
     vtkGenericWarningMacro(
@@ -80,15 +110,89 @@ void vtkKWTkUtilities::GetOptionColor(Tcl_Interp *interp,
     }
   command.rdbuf()->freeze(0);     
 
-  vtkKWTkUtilities::GetRGBColor(interp, window, interp->result, r, g, b);
+  vtkKWTkUtilities::GetRGBColor(interp, widget, interp->result, r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::GetOptionColor(vtkKWWidget *widget, 
+                                      const char *option,
+                                      int *r, int *g, int *b)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return;
+    }
+  
+  vtkKWTkUtilities::GetOptionColor(widget->GetApplication()->GetMainInterp(),
+                                   widget->GetWidgetName(),
+                                   option,
+                                   r, g, b);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetBackgroundColor(Tcl_Interp *interp,
-                                          const char *window,
+                                          const char *widget,
                                           int *r, int *g, int *b)
 {
-  vtkKWTkUtilities::GetOptionColor(interp, window, "-bg", r, g, b);
+  vtkKWTkUtilities::GetOptionColor(interp, widget, "-bg", r, g, b);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWTkUtilities::GetBackgroundColor(vtkKWWidget *widget, 
+                                          int *r, int *g, int *b)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return;
+    }
+
+  vtkKWTkUtilities::GetBackgroundColor(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    r, g, b);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ContainsCoordinates(Tcl_Interp *interp,
+                                          const char *widget, 
+                                          int x, int y)
+{
+  if (!interp || !widget)
+    {
+    return 0;
+    }
+
+  ostrstream geometry;
+  geometry << "concat [winfo width " << widget << "] [winfo height "
+           << widget << "] [winfo rootx " << widget << "] [winfo rooty "
+           << widget << "]" << ends;
+  int res = Tcl_GlobalEval(interp, geometry.str());
+  geometry.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query widget geometry! " << widget);
+    return 0;
+    }
+  
+  int ww, wh, wx, wy;
+  sscanf(interp->result, "%d %d %d %d", &ww, &wh, &wx, &wy);
+
+  return (x >= wx && x < (wx + ww) && y >= wy && y < (wy + wh)) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ContainsCoordinates(vtkKWWidget *widget,
+                                          int x, int y)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+
+  return vtkKWTkUtilities::ContainsCoordinates(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    x, y);
 }
 
 //----------------------------------------------------------------------------
@@ -99,7 +203,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   int pixel_size,
                                   unsigned long buffer_length,
                                   const char *blend_with_name,
-                                  const char *color_option)
+                                  const char *color_option,
+                                  int update_options)
 {
   // Check params
 
@@ -228,22 +333,24 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   sblock.width     = width;
   sblock.height    = height;
   sblock.pixelSize = 3;
-  sblock.pitch     = width * sblock.pixelSize;
+  sblock.pitch     = sblock.width * sblock.pixelSize;
   sblock.offset[0] = 0;
   sblock.offset[1] = 1;
   sblock.offset[2] = 2;
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
   sblock.offset[3] = 0;
 #endif
+  unsigned long sblock_size = sblock.pitch * sblock.height;
 
-  if (pixel_size == 3)
+  unsigned char *pp = NULL;
+
+  if (pixel_size <= 3)
     {
     sblock.pixelPtr = const_cast<unsigned char *>(data_ptr);
     }
   else 
     {
-    unsigned char *pp = sblock.pixelPtr = 
-      new unsigned char[sblock.width * sblock.height * sblock.pixelSize];
+    pp = sblock.pixelPtr = new unsigned char[sblock_size];
 
     // At the moment let's not use the alpha layer inside the photo but 
     // blend with the current background color
@@ -260,7 +367,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
       {
       vtkKWTkUtilities::GetBackgroundColor(interp, ".", &r, &g, &b);
       }
-
+    
     // Create photo pixels
 
     int xx, yy;
@@ -273,11 +380,19 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
         *(pp)     = static_cast<int>(r * (1 - alpha) + *(data_ptr)    * alpha);
         *(pp + 1) = static_cast<int>(g * (1 - alpha) + *(data_ptr+ 1) * alpha);
         *(pp + 2) = static_cast<int>(b * (1 - alpha) + *(data_ptr+ 2) * alpha);
-
+        
         data_ptr += pixel_size;
         pp += 3;
         }
       }
+
+    pp = sblock.pixelPtr;
+    }
+  
+  if (update_options & vtkKWTkUtilities::UPDATE_PHOTO_OPTION_FLIP_V)
+    {
+    sblock.pitch = -sblock.pitch;
+    sblock.pixelPtr += sblock_size + sblock.pitch;
     }
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4) && !defined(USE_COMPOSITELESS_PHOTO_PUT_BLOCK)
@@ -288,9 +403,9 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 
   // Free mem
 
-  if (pixel_size != 3)
+  if (pp)
     {
-    delete [] sblock.pixelPtr;
+    delete [] pp;
     }
 
   if (base64)
@@ -307,58 +422,30 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
+int vtkKWTkUtilities::UpdatePhoto(vtkKWApplication *app,
                                   const char *photo_name,
-                                  vtkImageData *image, 
+                                  const unsigned char *pixels, 
+                                  int width, int height,
+                                  int pixel_size,
+                                  unsigned long buffer_length,
                                   const char *blend_with_name,
-                                  const char *color_option)
+                                  const char *color_option,
+                                  int update_options)
 {
-  vtkImageData *input = image;
-
-  if (!input)
+  if (!app)
     {
-    vtkGenericWarningMacro(<< "No image data specified");
     return 0;
     }
-  input->Update();
-
-#define FLIP 1
-#if FLIP
-  vtkImageFlip *flip = vtkImageFlip::New();
-  flip->SetInput(input);
-  flip->SetFilteredAxis(1);
-  flip->Update();
-  input = flip->GetOutput();
-#endif
-
-  int *ext = input->GetWholeExtent();
-  if ((ext[5] - ext[4]) > 0)
-    {
-    vtkGenericWarningMacro(<< "Can only handle 2D input data");
-#if FLIP
-    flip->Delete();
-#endif
-    return 0;
-    }
-
-  int width = ext[1] - ext[0] + 1;
-  int height = ext[3] - ext[2] + 1;
-  int pixel_size = input->GetNumberOfScalarComponents();
-
-  int res = vtkKWTkUtilities::UpdatePhoto(
-    interp,
+  return vtkKWTkUtilities::UpdatePhoto(
+    app->GetMainInterp(),
     photo_name,
-    static_cast<unsigned char*>(input->GetScalarPointer()),
+    pixels, 
     width, height,
     pixel_size,
-    width * height * pixel_size,
+    buffer_length,
     blend_with_name,
-    color_option);
-
-#if FLIP
-  flip->Delete();
-#endif
-  return res;
+    color_option,
+    update_options);
 }
 
 //----------------------------------------------------------------------------
@@ -376,6 +463,8 @@ int vtkKWTkUtilities::UpdateOrLoadPhoto(Tcl_Interp *interp,
   // Try to find a PNG file with the same name in directory 
   // or directory/Resources
 
+  unsigned char *png_buffer = NULL;
+
   if (directory && file_name)
     {
     char buffer[1024];
@@ -386,29 +475,80 @@ int vtkKWTkUtilities::UpdateOrLoadPhoto(Tcl_Interp *interp,
       sprintf(buffer, "%s/Resources/%s.png", directory, file_name);
       found = kwsys::SystemTools::FileExists(buffer);
       }
-    if (found)
+    if (found && 
+        vtkKWResourceUtilities::ReadPNGImage(
+          buffer, &width, &height, &pixel_size, &png_buffer))
       {
-      vtkPNGReader *png_reader = vtkPNGReader::New();
-      png_reader->SetFileName(buffer);
-      int res = vtkKWTkUtilities::UpdatePhoto(
-        interp,
-        (photo_name ? photo_name : file_name), 
-        png_reader->GetOutput());
-      png_reader->Delete();
-      return res;
+      pixels = png_buffer;
+      buffer_length = 0;
       }
     }
 
   // Otherwise use the provided data
 
-  return vtkKWTkUtilities::UpdatePhoto(interp,
-                                       (photo_name ? photo_name : file_name), 
-                                       pixels, 
-                                       width, height,
-                                       pixel_size,
-                                       buffer_length,
-                                       blend_with_name,
-                                       color_option);
+  int res = vtkKWTkUtilities::UpdatePhoto(
+    interp,
+    (photo_name ? photo_name : file_name), 
+    pixels, 
+    width, height,
+    pixel_size,
+    buffer_length,
+    blend_with_name,
+    color_option);
+  
+  if (png_buffer)
+    {
+    delete [] png_buffer;
+    }
+
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::UpdateOrLoadPhoto(vtkKWApplication *app,
+                                        const char *photo_name,
+                                        const char *file_name,
+                                        const char *directory,
+                                        const unsigned char *pixels, 
+                                        int width, int height,
+                                        int pixel_size,
+                                        unsigned long buffer_length,
+                                        const char *blend_with_name,
+                                        const char *color_option)
+{
+  if (!app)
+    {
+    return 0;
+    }
+  return vtkKWTkUtilities::UpdateOrLoadPhoto(
+    app->GetMainInterp(),
+    photo_name,
+    file_name,
+    directory,
+    pixels, 
+    width, height,
+    pixel_size,
+    buffer_length,
+    blend_with_name,
+    color_option);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::FindPhoto(Tcl_Interp *interp,
+                                const char *photo_name)
+{
+  return Tk_FindPhoto(interp,const_cast<char *>(photo_name)) ? 1 : 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::FindPhoto(vtkKWApplication *app,
+                                     const char *photo_name)
+{
+  if (!app)
+    {
+    return 0;
+    }
+  return vtkKWTkUtilities::FindPhoto(app->GetMainInterp(), photo_name);
 }
 
 //----------------------------------------------------------------------------
@@ -433,6 +573,18 @@ int vtkKWTkUtilities::GetPhotoHeight(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPhotoHeight(vtkKWApplication *app,
+                                     const char *photo_name)
+{
+  if (!app)
+    {
+    return 0;
+    }
+  return vtkKWTkUtilities::GetPhotoHeight(
+    app->GetMainInterp(), photo_name);
+}
+
+//----------------------------------------------------------------------------
 int vtkKWTkUtilities::GetPhotoWidth(Tcl_Interp *interp,
                                     const char *photo_name)
 {
@@ -451,6 +603,18 @@ int vtkKWTkUtilities::GetPhotoWidth(Tcl_Interp *interp,
   int width, height;
   Tk_PhotoGetSize(photo, &width, &height);
   return width;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPhotoWidth(vtkKWApplication *app,
+                                    const char *photo_name)
+{
+  if (!app)
+    {
+    return 0;
+    }
+  return vtkKWTkUtilities::GetPhotoWidth(
+    app->GetMainInterp(), photo_name);
 }
 
 //----------------------------------------------------------------------------
@@ -587,10 +751,36 @@ int vtkKWTkUtilities::ChangeFontWeightToBold(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontWeightToBold(vtkKWWidget *widget)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::ChangeFontWeightToBold(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
 int vtkKWTkUtilities::ChangeFontWeightToNormal(Tcl_Interp *interp,
                                                const char *widget)
 {
   return vtkKWTkUtilities::ChangeFontWeight(interp, widget, 0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontWeightToNormal(vtkKWWidget *widget)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::ChangeFontWeightToNormal(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -727,10 +917,36 @@ int vtkKWTkUtilities::ChangeFontSlantToItalic(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontSlantToItalic(vtkKWWidget *widget)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::ChangeFontSlantToItalic(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
 int vtkKWTkUtilities::ChangeFontSlantToRoman(Tcl_Interp *interp,
                                              const char *widget)
 {
   return vtkKWTkUtilities::ChangeFontSlant(interp, widget, 0);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::ChangeFontSlantToRoman(vtkKWWidget *widget)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::ChangeFontSlantToRoman(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -754,7 +970,23 @@ int vtkKWTkUtilities::GetGridSize(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::GetGridPosition(Tcl_Interp *interp,
+int vtkKWTkUtilities::GetGridSize(vtkKWWidget *widget, 
+                                   int *nb_of_cols,
+                                   int *nb_of_rows)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::GetGridSize(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    nb_of_cols, nb_of_rows);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetPositionInGrid(Tcl_Interp *interp,
                                       const char *widget,
                                       int *col,
                                       int *row)
@@ -787,7 +1019,23 @@ int vtkKWTkUtilities::GetGridPosition(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::GetPackSlavePadding(Tcl_Interp *interp,
+int vtkKWTkUtilities::GetWidgetPositionInGrid(vtkKWWidget *widget, 
+                                       int *col,
+                                       int *row)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::GetWidgetPositionInGrid(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    col, row);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetWidgetPaddingInPack(Tcl_Interp *interp,
                                           const char *widget,
                                           int *ipadx,
                                           int *ipady,
@@ -847,7 +1095,7 @@ int vtkKWTkUtilities::GetPackSlavePadding(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::GetPackSlaveIn(Tcl_Interp *interp,
+int vtkKWTkUtilities::GetMasterInPack(Tcl_Interp *interp,
                                      const char *widget,
                                      ostream &in)
 {
@@ -889,7 +1137,22 @@ int vtkKWTkUtilities::GetPackSlaveIn(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::GetPackSlavesBbox(Tcl_Interp *interp,
+int vtkKWTkUtilities::GetMasterInPack(vtkKWWidget *widget, 
+                                      ostream &in)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+
+  return vtkKWTkUtilities::GetMasterInPack(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    in);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetSlavesBoundingBoxInPack(Tcl_Interp *interp,
                                         const char *widget,
                                         int *width,
                                         int *height)
@@ -955,13 +1218,13 @@ int vtkKWTkUtilities::GetPackSlavesBbox(Tcl_Interp *interp,
 
       if (w == 1 && h == 1)
         {
-        vtkKWTkUtilities::GetPackSlavesBbox(interp, ptr, &w, &h);
+        vtkKWTkUtilities::GetSlavesBoundingBoxInPack(interp, ptr, &w, &h);
         }
 
       // Don't forget the padding
 
       int ipadx = 0, ipady = 0, padx = 0, pady = 0;
-      vtkKWTkUtilities::GetPackSlavePadding(interp, ptr, 
+      vtkKWTkUtilities::GetWidgetPaddingInPack(interp, ptr, 
                                             &ipadx, &ipady, &padx, &pady);
 
       w += 2 * (padx + ipadx);
@@ -986,7 +1249,23 @@ int vtkKWTkUtilities::GetPackSlavesBbox(Tcl_Interp *interp,
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
+int vtkKWTkUtilities::GetSlavesBoundingBoxInPack(vtkKWWidget *widget,
+                                        int *width,
+                                        int *height)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+
+  return vtkKWTkUtilities::GetSlavesBoundingBoxInPack(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    width, height);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetSlaveHorizontalPositionInPack(Tcl_Interp *interp,
                                                      const char *widget,
                                                      const char *slave,
                                                      int *x)
@@ -1039,7 +1318,7 @@ int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
     if (!strcmp(ptr, slave))
       {
       int padx = 0;
-      vtkKWTkUtilities::GetPackSlavePadding(interp, ptr, 0, 0, &padx, 0);
+      vtkKWTkUtilities::GetWidgetPaddingInPack(interp, ptr, 0, 0, &padx, 0);
       pos += padx;
       break;
       }
@@ -1063,13 +1342,13 @@ int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
       if (w == 1)
         {
         int h = 0;
-        vtkKWTkUtilities::GetPackSlavesBbox(interp, ptr, &w, &h);
+        vtkKWTkUtilities::GetSlavesBoundingBoxInPack(interp, ptr, &w, &h);
         }
 
       // Don't forget the padding
 
       int ipadx = 0, padx = 0;
-      vtkKWTkUtilities::GetPackSlavePadding(interp, ptr, &ipadx, 0, &padx, 0);
+      vtkKWTkUtilities::GetWidgetPaddingInPack(interp, ptr, &ipadx, 0, &padx, 0);
       
       pos += w + 2 * (padx + ipadx);
       }
@@ -1082,6 +1361,24 @@ int vtkKWTkUtilities::GetPackSlaveHorizontalPosition(Tcl_Interp *interp,
   *x = pos;
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetSlaveHorizontalPositionInPack(vtkKWWidget *widget, 
+                                                     vtkKWWidget *slave, 
+                                                     int *x)
+{
+  if (!widget || !widget->IsCreated() ||
+      !slave || !slave->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::GetSlaveHorizontalPositionInPack(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    slave->GetWidgetName(),
+    x);
 }
 
 //----------------------------------------------------------------------------
@@ -1318,7 +1615,21 @@ int vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::GetSlaves(
+int vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(vtkKWApplication *app,
+                                                    int nb_of_widgets,
+                                                    const char **widgets,
+                                                    const char *options)
+{
+  if (!app)
+    {
+    return 0;
+    }
+  return vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
+    app->GetMainInterp(), nb_of_widgets, widgets, options);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetSlavesInPack(
   Tcl_Interp *interp,
   const char *widget,
   char ***slaves)
@@ -1394,7 +1705,22 @@ int vtkKWTkUtilities::GetSlaves(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::GetPreviousAndNextSlave(
+int vtkKWTkUtilities::GetSlavesInPack(vtkKWWidget *widget, 
+                                char ***slaves)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::GetSlavesInPack(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    slaves);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetPreviousAndNextSlaveInPack(
   Tcl_Interp *interp,
   const char *widget,
   const char *slave,
@@ -1404,7 +1730,7 @@ int vtkKWTkUtilities::GetPreviousAndNextSlave(
   // Search (and allocate) the slaves
 
   char **slaves = 0;
-  int nb_slaves = vtkKWTkUtilities::GetSlaves(interp, widget, &slaves);
+  int nb_slaves = vtkKWTkUtilities::GetSlavesInPack(interp, widget, &slaves);
   if (!nb_slaves)
     {
     return 0;
@@ -1442,31 +1768,287 @@ int vtkKWTkUtilities::GetPreviousAndNextSlave(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWTkUtilities::ContainsCoordinates(Tcl_Interp *interp,
-                                          const char *window, 
-                                          int x, int y)
+int vtkKWTkUtilities::GetPreviousAndNextSlaveInPack(
+  vtkKWWidget *widget, 
+  vtkKWWidget *slave, 
+  ostream &previous_slave,
+  ostream &next_slave)
 {
-  if (!interp || !window)
+  if (!widget || !widget->IsCreated() ||
+      !slave || !slave->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::GetPreviousAndNextSlaveInPack(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    slave->GetWidgetName(),
+    previous_slave, next_slave);
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * TkImageGetColor --
+ *
+ *  This procedure converts a pixel value to three floating
+ *      point numbers, representing the amount of red, green, and 
+ *      blue in that pixel on the screen.  It makes use of colormap
+ *      data passed as an argument, and should work for all Visual
+ *      types.
+ *
+ *  This implementation is bogus on Windows because the colormap
+ *  data is never filled in.  Instead all postscript generated
+ *  data coming through here is expected to be RGB color data.
+ *  To handle lower bit-depth images properly, XQueryColors
+ *  must be implemented for Windows.
+ *
+ * Results:
+ *  Returns red, green, and blue color values in the range 
+ *      0 to 1.  There are no error returns.
+ *
+ * Side effects:
+ *  None.
+ *
+ *--------------------------------------------------------------
+ */
+
+/*
+ * The following definition is used in generating postscript for images
+ * and windows.
+ */
+
+struct vtkKWTkUtilitiesTkColormapData {  /* Hold color information for a window */
+  int separated;    /* Whether to use separate color bands */
+  int color;      /* Whether window is color or black/white */
+  int ncolors;    /* Number of color values stored */
+  XColor *colors;    /* Pixel value -> RGB mappings */
+  int red_mask, green_mask, blue_mask;  /* Masks and shifts for each */
+  int red_shift, green_shift, blue_shift;  /* color band */
+};
+
+static void
+vtkKWTkUtilitiesTkImageGetColor(vtkKWTkUtilitiesTkColormapData* 
+#ifdef WIN32
+#else
+                           cdata
+#endif
+                           ,
+                           unsigned long pixel, 
+                           double *red, 
+                           double *green, 
+                           double *blue)
+#ifdef WIN32
+
+/*
+ * We could just define these instead of pulling in windows.h.
+#define GetRValue(rgb)  ((BYTE)(rgb))
+#define GetGValue(rgb)  ((BYTE)(((WORD)(rgb)) >> 8))
+#define GetBValue(rgb)  ((BYTE)((rgb)>>16))
+*/
+
+{
+  *red   = (double) GetRValue(pixel) / 255.0;
+  *green = (double) GetGValue(pixel) / 255.0;
+  *blue  = (double) GetBValue(pixel) / 255.0;
+}
+#else
+{
+  if (cdata->separated) {
+    int r = (pixel & cdata->red_mask) >> cdata->red_shift;
+    int g = (pixel & cdata->green_mask) >> cdata->green_shift;
+    int b = (pixel & cdata->blue_mask) >> cdata->blue_shift;
+    *red   = cdata->colors[r].red / 65535.0;
+    *green = cdata->colors[g].green / 65535.0;
+    *blue  = cdata->colors[b].blue / 65535.0;
+  } else {
+    *red   = cdata->colors[pixel].red / 65535.0;
+    *green = cdata->colors[pixel].green / 65535.0;
+    *blue  = cdata->colors[pixel].blue / 65535.0;
+  }
+}
+#endif
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::TakeScreenDump(Tcl_Interp *interp,
+                                     const char* widget, 
+                                     const char* fname,
+                                     int top, int bottom, int left, int right)
+{
+  if (!interp || !fname || !widget)
     {
     return 0;
     }
 
+  cout << "Trying to writing dump to: " << fname << endl;
+
   ostrstream geometry;
-  geometry << "concat [winfo width " << window << "] [winfo height "
-           << window << "] [winfo rootx " << window << "] [winfo rooty "
-           << window << "]" << ends;
+  geometry << "concat [winfo rootx " << widget << "] [winfo rooty "
+           << widget << "] [winfo width " << widget << "] [winfo height "
+           << widget << "]" << ends;
   int res = Tcl_GlobalEval(interp, geometry.str());
   geometry.rdbuf()->freeze(0);
   if (res != TCL_OK)
     {
-    vtkGenericWarningMacro(<< "Unable to query window geometry! " << window);
+    vtkGenericWarningMacro(<< "Unable to query widget geometry! " << widget);
     return 0;
     }
   
-  int ww, wh, wx, wy;
-  sscanf(interp->result, "%d %d %d %d", &ww, &wh, &wx, &wy);
+  int xx, yy, ww, hh;
+  xx = yy = ww = hh = 0;
+  if (sscanf(interp->result, "%d %d %d %d", &xx, &yy, &ww, &hh) != 4)
+    {
+    return 0;
+    }
 
-  return (x >= wx && x < (wx + ww) && y >= wy && y < (wy + wh)) ? 1 : 0;
+  xx -= left;
+  yy -= top;
+  ww += left + right;
+  hh += top + bottom;
+
+  Tk_Window image_window;
+
+  image_window = Tk_MainWindow(interp);
+  Display *dpy = Tk_Display(image_window);
+  int screen = DefaultScreen(dpy);
+  Window win=RootWindow(dpy, screen);
+
+  XImage *ximage = XGetImage(dpy, win, xx, yy,
+    (unsigned int)ww, (unsigned int)hh, AllPlanes, XYPixmap);
+  if ( !ximage )
+    {
+    return 0;
+    }
+  unsigned int buffer_size = ximage->bytes_per_line * ximage->height;
+  if (ximage->format != ZPixmap)
+    {
+    buffer_size = ximage->bytes_per_line * ximage->height * ximage->depth;
+    }
+
+  vtkKWTkUtilitiesTkColormapData cdata;
+  Colormap cmap;
+  Visual *visual;
+  int i, ncolors;
+  cmap = Tk_Colormap(image_window);
+  visual = Tk_Visual(image_window);
+
+  /*
+   * Obtain information about the colormap, ie the mapping between
+   * pixel values and RGB values.  The code below should work
+   * for all Visual types.
+   */
+
+  ncolors = visual->map_entries;
+  cdata.colors = (XColor *) ckalloc(sizeof(XColor) * ncolors);
+  cdata.ncolors = ncolors;
+
+  if (visual->c_class == DirectColor || visual->c_class == TrueColor) 
+    {
+    cdata.separated = 1;
+    cdata.red_mask = visual->red_mask;
+    cdata.green_mask = visual->green_mask;
+    cdata.blue_mask = visual->blue_mask;
+    cdata.red_shift = 0;
+    cdata.green_shift = 0;
+    cdata.blue_shift = 0;
+    while ((0x0001 & (cdata.red_mask >> cdata.red_shift)) == 0)
+      cdata.red_shift ++;
+    while ((0x0001 & (cdata.green_mask >> cdata.green_shift)) == 0)
+      cdata.green_shift ++;
+    while ((0x0001 & (cdata.blue_mask >> cdata.blue_shift)) == 0)
+      cdata.blue_shift ++;
+    for (i = 0; i < ncolors; i ++)
+      cdata.colors[i].pixel =
+        ((i << cdata.red_shift) & cdata.red_mask) |
+        ((i << cdata.green_shift) & cdata.green_mask) |
+        ((i << cdata.blue_shift) & cdata.blue_mask);
+    } 
+  else 
+    {
+    cdata.separated=0;
+    for (i = 0; i < ncolors; i ++)
+      cdata.colors[i].pixel = i;
+    }
+  if (visual->c_class == StaticGray || visual->c_class == GrayScale)
+    {
+    cdata.color = 0;
+    }
+  else
+    {
+    cdata.color = 1;
+    }
+
+  XQueryColors(Tk_Display(image_window), cmap, cdata.colors, ncolors);
+
+  /*
+   * Figure out which color level to use (possibly lower than the 
+   * one specified by the user).  For example, if the user specifies
+   * color with monochrome screen, use gray or monochrome mode instead. 
+   */
+
+  int level = 2;
+  if (!cdata.color && level == 2) 
+    {
+    level = 1;
+    }
+
+  if (!cdata.color && cdata.ncolors == 2) 
+    {
+    level = 0;
+    }
+
+
+  vtkImageData* id = vtkImageData::New();
+  id->SetDimensions(ww, hh, 1);
+  id->SetScalarTypeToUnsignedChar();
+  id->SetNumberOfScalarComponents(3);
+  id->AllocateScalars();
+
+  unsigned char* ptr = (unsigned char*) id->GetScalarPointer();
+  int x, y;
+  for (y = 0; y < hh; y++) 
+    {
+    for (x = 0; x < ww; x++) 
+      {
+      double red, green, blue;
+      vtkKWTkUtilitiesTkImageGetColor(&cdata, XGetPixel(ximage, x, hh-y-1),
+        &red, &green, &blue);
+      ptr[0] = (unsigned char)(255 * red);
+      ptr[1] = (unsigned char)(255 * green);
+      ptr[2] = (unsigned char)(255 * blue);
+      ptr += 3;
+      }
+    }
+  vtkPNGWriter *writer = vtkPNGWriter::New();
+  writer->SetInput(id);
+  writer->SetFileName(fname);
+  writer->Write();
+  writer->Delete();
+  id->Delete();
+
+  cout << "Writing dump to: " << fname << endl;
+
+  XDestroyImage(ximage);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::TakeScreenDump(vtkKWWidget *widget, 
+                                     const char* fname,
+                                     int top, int bottom, int left, int right)
+{
+  if (!widget || !widget->IsCreated())
+    {
+    return 0;
+    }
+  
+  return vtkKWTkUtilities::TakeScreenDump(
+    widget->GetApplication()->GetMainInterp(),
+    widget->GetWidgetName(),
+    fname,
+    top, bottom, left, right);
 }
 
 //----------------------------------------------------------------------------
