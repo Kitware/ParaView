@@ -63,7 +63,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // The bounds display gets its data object from the input menu.

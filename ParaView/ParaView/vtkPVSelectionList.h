@@ -64,7 +64,7 @@ public:
   
   // Description:
   // Creates common widgets.
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
   // Add items to the possible selection.
   // The string name is displayed in the list, and the integer value

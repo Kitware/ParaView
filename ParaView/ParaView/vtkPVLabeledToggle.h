@@ -63,7 +63,7 @@ public:
   void SetLabel(const char *str);
   const char* GetLabel();
 
-  void Create(vtkKWApplication *pvApp);
+  virtual void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.  

@@ -64,7 +64,7 @@ public:
  
   // Description:
   // Creates common widgets.
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Add widgets to the possible selection.  The vtkValue

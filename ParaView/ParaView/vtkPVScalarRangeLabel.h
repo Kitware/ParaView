@@ -64,7 +64,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // The scalar range display gets its array object from the array menu.

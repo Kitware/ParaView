@@ -94,7 +94,7 @@ public:
   
   // Description:
   // Create the TK widgets associated with the view.
-  void Create(vtkKWApplication *app, const char *args);
+  virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // Compute the bounding box of all the visibile props

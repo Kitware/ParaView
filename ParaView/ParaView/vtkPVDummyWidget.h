@@ -58,7 +58,7 @@ public:
   
   // Description:
   // Create the widget.
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
 //BTX
   // Description:

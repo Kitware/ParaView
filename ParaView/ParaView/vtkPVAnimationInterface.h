@@ -65,7 +65,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  void Create(vtkKWApplication *app, char *frameArgs);
+  virtual void Create(vtkKWApplication *app, char *frameArgs);
 
   // Description:
   // Access to the animation parmeters

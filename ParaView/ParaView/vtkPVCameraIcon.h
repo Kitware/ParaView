@@ -58,7 +58,7 @@ public:
   vtkTypeRevisionMacro(vtkPVCameraIcon, vtkKWImageLabel);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Create(vtkKWApplication *pvApp, const char *args);
+  virtual void Create(vtkKWApplication *pvApp, const char *args);
   
   // Description:
   // Set the current render view.

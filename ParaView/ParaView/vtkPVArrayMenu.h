@@ -69,7 +69,7 @@ public:
   
   // Description:
   // Create the widget.
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // Set the label.  The label can be used to get this widget

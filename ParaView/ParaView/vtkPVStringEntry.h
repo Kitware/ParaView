@@ -58,7 +58,7 @@ public:
   vtkTypeRevisionMacro(vtkPVStringEntry, vtkPVObjectWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  void Create(vtkKWApplication *pvApp);
+  virtual void Create(vtkKWApplication *pvApp);
   
   // Description:
   // Called when accept button is pushed.  

@@ -70,7 +70,7 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app);
 
   // Description:
   // This is the name of the VTK reader.
