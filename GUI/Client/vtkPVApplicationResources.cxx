@@ -580,7 +580,7 @@ void vtkPVApplication::CreatePhoto(const char *name,
   if (!vtkKWTkUtilities::UpdateOrLoadPhoto(
         this->GetMainInterp(),
         name, 
-        name,
+        filename ? filename : name,
         dir,
         data, 
         width, height, 
