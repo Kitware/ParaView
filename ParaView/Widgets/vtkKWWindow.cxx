@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.128");
+vtkCxxRevisionMacro(vtkKWWindow, "1.129");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -876,7 +876,7 @@ void vtkKWWindow::CreatePreferencesProperties()
   this->InterfaceSettingsFrame->SetParent(
     this->Notebook->GetFrame(VTK_KW_PREFERENCES_PAGE_LABEL));
   this->InterfaceSettingsFrame->ShowHideFrameOn();
-  this->InterfaceSettingsFrame->Create(this->Application);
+  this->InterfaceSettingsFrame->Create(this->Application, 0);
   this->InterfaceSettingsFrame->SetLabel("Interface Settings");
   
   // Confirm on exit ?
@@ -1300,7 +1300,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.128 $");
+  this->ExtractRevision(os,"$Revision: 1.129 $");
 }
 
 int vtkKWWindow::ExitDialog()

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.19");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.20");
 
 
 
@@ -199,7 +199,7 @@ void vtkKWLabeledFrame::AdjustMargin()
     }
 }
 
-void vtkKWLabeledFrame::Create(vtkKWApplication *app)
+void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
 {
   const char *wname;
   
@@ -214,7 +214,8 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat",wname);
+  this->Script("frame %s -borderwidth 0 -relief flat %s",wname, 
+               (args?args:""));
 
   this->Border->Create(app,"frame","-borderwidth 0 -relief flat");
 
