@@ -6,10 +6,9 @@
 #include "vtkPVWindow.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.2");
-vtkSetObjectImplementationMacro(vtkPVProcessModuleGUIHelper,PVApplication, vtkPVApplication);
-vtkSetObjectImplementationMacro(vtkPVProcessModuleGUIHelper,PVProcessModule, vtkPVProcessModule);
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.3");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
+
 vtkPVProcessModuleGUIHelper::vtkPVProcessModuleGUIHelper()
 {
   this->PVApplication = 0;
@@ -21,6 +20,15 @@ vtkPVProcessModuleGUIHelper::~vtkPVProcessModuleGUIHelper()
   this->SetPVApplication(0);
 }
 
+void vtkPVProcessModuleGUIHelper::SetPVApplication(vtkPVApplication* app)
+{
+  this->PVApplication = app;
+}
+
+void vtkPVProcessModuleGUIHelper::SetPVProcessModule(vtkPVProcessModule* pm)
+{
+  this->PVProcessModule = pm;
+}
 
 void vtkPVProcessModuleGUIHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
