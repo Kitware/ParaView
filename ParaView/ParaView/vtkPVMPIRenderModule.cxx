@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4.2.4");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.4.2.5");
 
 
 
@@ -151,8 +151,12 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       }
     }
 
- // pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
-  //                       this->RenderWindowTclName);
+  pm->GetStream() 
+    << vtkClientServerStream::Invoke
+    <<  this->CompositeID 
+    << "SetRenderWindow"
+    << this->RenderWindowID
+    << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->CompositeID << "InitializeRMIs" << vtkClientServerStream::End;

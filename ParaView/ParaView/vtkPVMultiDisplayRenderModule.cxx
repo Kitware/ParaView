@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6.2.4");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6.2.5");
 
 
 
@@ -86,7 +86,10 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
       (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1))
     {
-//    pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->RenderWindowID 
+                    << "SetMultiSamples" << 0 
+                    << vtkClientServerStream::End;
     }
 
   this->Composite = NULL;
