@@ -208,6 +208,10 @@ void vtkPV3DWidget::SetVisibility()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibility(int visibility)
 {
+  if ( visibility )
+    {
+    this->PlaceWidget();
+    }
   this->Widget3D->SetEnabled(visibility);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
                       this->GetTclName(), visibility);
