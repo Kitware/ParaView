@@ -498,7 +498,7 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.31 $");
+  this->ExtractRevision(os,"$Revision: 1.32 $");
 }
 
 vtkProp *vtkKWVolumeComposite::GetProp() 
@@ -508,8 +508,6 @@ vtkProp *vtkKWVolumeComposite::GetProp()
 
 void vtkKWVolumeComposite::RegisterIntermixIntersectingGeometry()
 {
-  //cout << "vtkKWVolumeComposite::RegisterIntermixIntersectingGeometry()" 
-  //     << endl;
   if ( !this->UseIntermixIntersectingGeometry )
     {
     this->RayCastMapper->IntermixIntersectingGeometryOn();
@@ -522,8 +520,6 @@ void vtkKWVolumeComposite::RegisterIntermixIntersectingGeometry()
 }
 void vtkKWVolumeComposite::DeregisterIntermixIntersectingGeometry()
 {
-  //cout << "vtkKWVolumeComposite::DeregisterIntermixIntersectingGeometry()" 
-  //<< endl;
   if ( this->UseIntermixIntersectingGeometry <= 0 )
     {
     this->UseIntermixIntersectingGeometry = 0;
