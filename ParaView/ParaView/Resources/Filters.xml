@@ -711,7 +711,7 @@
                  variable="UseMaskPoints" default_value="1"
                  help="Create no more than specified maximum number of glyphs" />
   <LabeledToggle label="Random Masking" trace_name="RandomMask" 
-                 variable="RandomMode" default_value="0"
+                 variable="RandomMode" default_value="1"
                  help="Choose points at random to mask" />
 </Module>
 <Module name="Probe" class="vtkPVProbe" root_name="Probe" button_image="PVProbeButton" button_help="Sample data values at a point or along a line" module_type="Filter" long_help="Sample data attributes at a point or along a line.  Probed lines will be displayed in a graph of the attributes." short_help="Sample data values at a point or along a line.">
