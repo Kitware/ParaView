@@ -78,6 +78,31 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   vtkCommunicator::SetUseCopy(1);
 #endif
 
+
+  Tcl_Interp *interp;
+
+  if (myId ==  0)
+    { // The last process is for UI.
+
+    // We need to pass the local controller to the UI process.
+    interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+    
+    // To bypass vtkKWApplicaion assigning vtkKWApplicationCommand
+    // to the tcl command, create the application from tcl.
+    if (Tcl_Eval(interp, "vtkPVApplication Application") != TCL_OK)
+      {
+      cerr << "Error returned from tcl script.\n" << interp->result << endl;
+      }
+    int    error;
+    vtkPVApplication *app = (vtkPVApplication *)(
+      vtkTclGetPointerFromObject("Application","vtkPVApplication",
+                                 interp,error));
+    if (app == NULL)
+      {
+      vtkGenericWarningMacro("Could not get application pointer.");
+      return;
+      }  
+
 #ifdef PV_USE_SGI_PIPES
   int numPipes = numProcs;
   if (myId == 0)
@@ -131,29 +156,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     }
 #endif
 
-  Tcl_Interp *interp;
 
-  if (myId ==  0)
-    { // The last process is for UI.
-
-    // We need to pass the local controller to the UI process.
-    interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
-    
-    // To bypass vtkKWApplicaion assigning vtkKWApplicationCommand
-    // to the tcl command, create the application from tcl.
-    if (Tcl_Eval(interp, "vtkPVApplication Application") != TCL_OK)
-      {
-      cerr << "Error returned from tcl script.\n" << interp->result << endl;
-      }
-    int    error;
-    vtkPVApplication *app = (vtkPVApplication *)(
-      vtkTclGetPointerFromObject("Application","vtkPVApplication",
-                                 interp,error));
-    if (app == NULL)
-      {
-      vtkGenericWarningMacro("Could not get application pointer.");
-      return;
-      }  
 
     //app->SetupTrapsForSignals(myId);   
     app->SetController(controller);
