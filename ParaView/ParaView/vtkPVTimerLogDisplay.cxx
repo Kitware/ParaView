@@ -86,6 +86,7 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   //this->CommandIndex = 0;
   this->MasterWindow = 0;
   this->Threshold = 0.01;
+  this->Writable = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -377,7 +378,41 @@ void vtkPVTimerLogDisplay::Save(const char *fileName)
   delete fptr;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVTimerLogDisplay::EnableWrite()
+{
+  this->Script("%s configure -state normal", 
+               this->DisplayText->GetWidgetName());
+  this->Writable = 1;
+}
 
+//----------------------------------------------------------------------------
+void vtkPVTimerLogDisplay::DisableWrite()
+{
+  this->Writable = 0;
+  this->Script("%s yview end", this->DisplayText->GetWidgetName());
+  // Try to get the scroll bar to initialize properly (show correct portion).
+  this->Script("update");                   
+  this->Script("%s configure -state disabled",
+               this->DisplayText->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimerLogDisplay::Append(const char* msg)
+{
+  int w = this->Writable;
+  if ( !w )
+    {
+    this->EnableWrite();
+    }
+
+  this->Script("%s insert end {%s%c}",
+	       this->DisplayText->GetWidgetName(), msg, '\n');
+  if ( !w )
+    {
+    this->DisableWrite();
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::Update()
@@ -386,8 +421,7 @@ void vtkPVTimerLogDisplay::Update()
   int length;
   char *str;
    
-  this->Script("%s configure -state normal", 
-               this->DisplayText->GetWidgetName());
+  this->EnableWrite();
   this->DisplayText->SetValue("");
 
   length = vtkTimerLog::GetNumberOfEvents() * 40;
@@ -429,8 +463,7 @@ void vtkPVTimerLogDisplay::Update()
         // Set it to an end of string.
         *end = '\0';
         // Add the string.
-        this->Script("%s insert end {%s%c}",
-                     this->DisplayText->GetWidgetName(), start, '\n');
+	this->Append(start);
         // Initialize the search for the next string.
         start = end+1;
         end = start;
@@ -439,13 +472,7 @@ void vtkPVTimerLogDisplay::Update()
 
       delete [] str;
       }
-    }
-
-  this->Script("%s yview end", this->DisplayText->GetWidgetName());
-  // Try to get the scroll bar to initialize properly (show correct portion).
-  this->Script("update");                   
-  this->Script("%s configure -state disabled",
-               this->DisplayText->GetWidgetName());
+    }  
 }
 
 

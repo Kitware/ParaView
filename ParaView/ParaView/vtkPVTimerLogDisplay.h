@@ -99,11 +99,11 @@ public:
   // Description:
   // Saves the current log to a file.
   void Save();
-  void Save(const char* fileName);
+  virtual void Save(const char* fileName);
 
   // Description:
   // Clear all entries from the buffer.
-  void Clear();
+  virtual void Clear();
 
   // Description:
   // Call back from the EnableCheck that will stop or start loging of events.
@@ -113,7 +113,17 @@ protected:
   vtkPVTimerLogDisplay();
   ~vtkPVTimerLogDisplay();
 
-  void Update();
+  virtual void Update();
+
+  // Description:
+  // Open log for writing.
+  void EnableWrite();
+
+  // Description:
+  // Close log for writing
+  void DisableWrite();
+
+  void Append(const char*);
   
   vtkKWWindow*      MasterWindow;
 
@@ -136,6 +146,7 @@ protected:
     
   char*   Title;
   float   Threshold;
+  int     Writable;
 
 private:
   vtkPVTimerLogDisplay(const vtkPVTimerLogDisplay&); // Not implemented
