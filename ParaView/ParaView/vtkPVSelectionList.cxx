@@ -191,6 +191,7 @@ void vtkPVSelectionList::SetCurrentValue(int value)
   name = this->Names->GetString(value);
   if (name)
     {
+    this->Menu->SetValue(name);
     this->SelectCallback(name, value);
     }
 }
