@@ -71,7 +71,6 @@ public:
   // minx maxx miny maxy minz maxz
   void SetExtentRange(float *);
   void SetExtentRange(float,float,float,float,float,float);
-
   
   // Description:
   // Set/Get the Extent.
@@ -98,6 +97,20 @@ public:
   // The calling is done via TCL wrappers for the KWObject.
   virtual void SetCommand(vtkKWObject* Object, const char *MethodAndArgString);
 
+  // Description:
+  // A convenience method to set the start and end method of all the
+  // internal scales.  
+  virtual void SetStartCommand(vtkKWObject* Object, 
+                               const char *MethodAndArgString);
+  virtual void SetEndCommand(vtkKWObject* Object, 
+                             const char *MethodAndArgString);
+
+  // Description:
+  // Set whether the command should be called or not.
+  // This just propagates SetDisableCommands to the internal scales.
+  virtual void SetDisableCommands(int);
+  vtkBooleanMacro(DisableCommands, int);
+
 protected:
   vtkKWExtent();
   ~vtkKWExtent();
@@ -110,12 +123,14 @@ protected:
   vtkKWScale  *YMaxScale;
   vtkKWScale  *ZMinScale;
   vtkKWScale  *ZMaxScale;
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
+
 private:
   vtkKWExtent(const vtkKWExtent&); // Not implemented
   void operator=(const vtkKWExtent&); // Not implemented
 };
 
-
 #endif
-
-

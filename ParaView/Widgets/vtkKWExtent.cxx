@@ -39,22 +39,21 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWExtent.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkKWApplication.h"
 #include "vtkKWScale.h"
+#include "vtkObjectFactory.h"
 
-
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.16");
+vtkCxxRevisionMacro(vtkKWExtent, "1.17");
 
-
-
-
+//----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWExtent::vtkKWExtent()
 {
   this->CommandFunction = vtkKWExtentCommand;
@@ -81,6 +80,7 @@ vtkKWExtent::vtkKWExtent()
   this->Extent[5] = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWExtent::~vtkKWExtent()
 {
   if (this->Command)
@@ -96,6 +96,7 @@ vtkKWExtent::~vtkKWExtent()
   this->ZMaxScale->Delete();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -112,7 +113,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("frame %s %s", wname,args);
+  this->Script("frame %s -bd 0 %s", wname, (args ? args : ""));
 
   this->XMinScale->Create(this->Application,"-length 190");
   this->XMinScale->SetCommand(this, "ExtentSelected");
@@ -158,11 +159,13 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->UpdateEnableState();
 }
 
-
+//----------------------------------------------------------------------------
 void vtkKWExtent::SetExtentRange(float *er)
 {
   this->SetExtentRange(er[0],er[1],er[2],er[3],er[4],er[5]);
 }
+
+//----------------------------------------------------------------------------
 void vtkKWExtent::SetExtentRange(float x1, float x2, float y1, float y2, 
                                  float z1, float z2)
 {
@@ -179,10 +182,20 @@ void vtkKWExtent::SetExtentRange(float x1, float x2, float y1, float y2,
   this->YMaxScale->SetRange(y1,y2);
   this->ZMinScale->SetRange(z1,z2);
   this->ZMaxScale->SetRange(z1,z2);
-  
-  this->SetExtent(x1,x2,y1,y2,z1,z2);
+
+  float ex1, ex2, ey1, ey2, ez1, ez2;
+
+  ex1 = (this->Extent[0] < x1 || this->Extent[0] > x2) ? x1 : this->Extent[0];
+  ex2 = (this->Extent[1] < x1 || this->Extent[1] > x2) ? x2 : this->Extent[1];
+  ey1 = (this->Extent[2] < y1 || this->Extent[2] > y2) ? y1 : this->Extent[2];
+  ey2 = (this->Extent[3] < y1 || this->Extent[3] > y2) ? y2 : this->Extent[3];
+  ez1 = (this->Extent[4] < z1 || this->Extent[4] > z2) ? z1 : this->Extent[4];
+  ez2 = (this->Extent[5] < z1 || this->Extent[5] > z2) ? z2 : this->Extent[5];
+
+  this->SetExtent(ex1, ex2, ey1, ey2, ez1, ez2);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWExtent::SetExtent(float x1, float x2, float y1, float y2, float z1, float z2)
 {
   if (this->Extent[0] == x1 &&
@@ -203,11 +216,13 @@ void vtkKWExtent::SetExtent(float x1, float x2, float y1, float y2, float z1, fl
   this->ZMaxScale->SetValue(z2);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWExtent::SetExtent(float *er)
 {
   this->SetExtent(er[0],er[1],er[2],er[3],er[4],er[5]);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWExtent::ExtentSelected()
 {
   // first check to see if anything changed.
@@ -252,7 +267,7 @@ void vtkKWExtent::ExtentSelected()
     }
 }
 
-
+//----------------------------------------------------------------------------
 void vtkKWExtent::SetCommand(vtkKWObject* CalledObject, const char *CommandString)
 { 
   if (this->Command)
@@ -263,6 +278,146 @@ void vtkKWExtent::SetCommand(vtkKWObject* CalledObject, const char *CommandStrin
   command << CalledObject->GetTclName() << " " << CommandString << ends;
 
   this->Command = command.str();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetStartCommand(vtkKWObject* Object, 
+                                  const char *MethodAndArgString)
+{ 
+  if (this->XMinScale)
+    {
+    this->XMinScale->SetStartCommand(Object, MethodAndArgString);
+    }
+
+  if (this->XMaxScale)
+    {
+    this->XMaxScale->SetStartCommand(Object, MethodAndArgString);
+    }
+
+  if (this->YMinScale)
+    {
+    this->YMinScale->SetStartCommand(Object, MethodAndArgString);
+    }
+
+  if (this->YMaxScale)
+    {
+    this->YMaxScale->SetStartCommand(Object, MethodAndArgString);
+    }
+
+  if (this->ZMinScale)
+    {
+    this->ZMinScale->SetStartCommand(Object, MethodAndArgString);
+    }
+
+  if (this->ZMaxScale)
+    {
+    this->ZMaxScale->SetStartCommand(Object, MethodAndArgString);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetEndCommand(vtkKWObject* Object, 
+                                const char *MethodAndArgString)
+{ 
+  if (this->XMinScale)
+    {
+    this->XMinScale->SetEndCommand(Object, MethodAndArgString);
+    }
+
+  if (this->XMaxScale)
+    {
+    this->XMaxScale->SetEndCommand(Object, MethodAndArgString);
+    }
+
+  if (this->YMinScale)
+    {
+    this->YMinScale->SetEndCommand(Object, MethodAndArgString);
+    }
+
+  if (this->YMaxScale)
+    {
+    this->YMaxScale->SetEndCommand(Object, MethodAndArgString);
+    }
+
+  if (this->ZMinScale)
+    {
+    this->ZMinScale->SetEndCommand(Object, MethodAndArgString);
+    }
+
+  if (this->ZMaxScale)
+    {
+    this->ZMaxScale->SetEndCommand(Object, MethodAndArgString);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetDisableCommands(int v)
+{ 
+  if (this->XMinScale)
+    {
+    this->XMinScale->SetDisableCommands(v);
+    }
+
+  if (this->XMaxScale)
+    {
+    this->XMaxScale->SetDisableCommands(v);
+    }
+
+  if (this->YMinScale)
+    {
+    this->YMinScale->SetDisableCommands(v);
+    }
+
+  if (this->YMaxScale)
+    {
+    this->YMaxScale->SetDisableCommands(v);
+    }
+
+  if (this->ZMinScale)
+    {
+    this->ZMinScale->SetDisableCommands(v);
+    }
+
+  if (this->ZMaxScale)
+    {
+    this->ZMaxScale->SetDisableCommands(v);
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKWExtent::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  if (this->XMinScale)
+    {
+    this->XMinScale->SetEnabled(this->Enabled);
+    }
+
+  if (this->XMaxScale)
+    {
+    this->XMaxScale->SetEnabled(this->Enabled);
+    }
+
+  if (this->YMinScale)
+    {
+    this->YMinScale->SetEnabled(this->Enabled);
+    }
+
+  if (this->YMaxScale)
+    {
+    this->YMaxScale->SetEnabled(this->Enabled);
+    }
+
+  if (this->ZMinScale)
+    {
+    this->ZMinScale->SetEnabled(this->Enabled);
+    }
+
+  if (this->ZMaxScale)
+    {
+    this->ZMaxScale->SetEnabled(this->Enabled);
+    }
 }
 
 //----------------------------------------------------------------------------
