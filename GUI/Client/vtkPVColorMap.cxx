@@ -52,7 +52,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.95.2.1");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.95.2.2");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2576,49 +2576,3 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VisitedFlag: " << this->VisitedFlag << endl;
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
 }
-
-
-
-    /*  char scalarBarTclName[128];
-      sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
-      ostrstream actor;
-
-      //*file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
-      *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
-      actor << scalarBarTclName << ends;
-
-      *file << "\t" << actor.str() << " SetLookupTable pvTemp" 
-            << this->LookupTableID << "\n";
-
-      *file << "\t" << actor.str() << " SetOrientation "
-            << this->ScalarBar->GetScalarBarActor()->GetOrientation() << "\n";
-
-      *file << "\t" << actor.str() << " SetWidth " 
-            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
-
-      *file << "\t" << actor.str() << " SetHeight " 
-            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
-
-      const double *pos = 
-       this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
-      *file << "\t[" << actor.str() << " GetPositionCoordinate] SetValue " 
-            << pos[0] << " " << pos[1] << "\n";
-
-      *file << "\t" << actor.str() << " SetTitle {" 
-            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
-
-      *file << "\t" << actor.str() << " SetLabelFormat {" 
-            << this->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}\n";
-
-      ostrstream ttprop, tlprop;
-      ttprop << "[" << actor.str() << " GetTitleTextProperty]" << ends;
-      this->TitleTextPropertyWidget->SaveInBatchScript(file, ttprop.str());
-      ttprop.rdbuf()->freeze(0);
-
-      tlprop << "[" << actor.str() << " GetLabelTextProperty]" << ends;
-      this->LabelTextPropertyWidget->SaveInBatchScript(file, tlprop.str());
-      tlprop.rdbuf()->freeze(0);
-
-      *file << "Ren1" << " AddActor " << scalarBarTclName << endl;
-
-      actor.rdbuf()->freeze(0);*/
