@@ -31,7 +31,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.17");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.18");
 vtkCxxSetObjectMacro(vtkSMDisplayWindowProxy,RenderModule,vtkPVRenderModule);
 
 struct vtkSMDisplayWindowProxyInternals
@@ -196,9 +196,10 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
   pm->SendStream(this->WindowToImage->Servers, str, 0);
   
   if(this->RenderModule && this->GetSubProxy("interactor") && numObjects > 0)
-    { //set interactor on the render module
-    vtkSMProxy* interactorProxy = this->GetSubProxy("interactor");
-    this->RenderModule->SetInteractorID(interactorProxy->GetID(0));
+    { 
+    //set interactor on the render module
+    this->RenderModule->SetInteractorID(
+      this->GetSubProxy("interactor")->GetID(0));
     }
 }
 

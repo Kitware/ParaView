@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.1");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.2");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -145,7 +145,7 @@ void vtkPVSourceNotebook::Update()
     {
     return;
     }
-  this->UpdateEnableState(this->PVSource);
+  this->UpdateEnableStateWithSource(this->PVSource);
   this->UpdateDescriptionFrame(this->PVSource);
   this->DisplayGUI->Update();
   this->InformationGUI->Update(this->PVSource);
@@ -153,7 +153,21 @@ void vtkPVSourceNotebook::Update()
   
 
 //----------------------------------------------------------------------------
-void vtkPVSourceNotebook::UpdateEnableState(vtkPVSource* pvs)
+void vtkPVSourceNotebook::UpdateEnableStateWithSource(vtkPVSource* pvs)
+{
+  this->UpdateEnableState();
+  
+  if ( pvs->IsDeletable() )
+    {
+    this->PropagateEnableState(this->DeleteButton);
+    }
+  else
+    {
+    this->DeleteButton->SetEnabled(0);
+    }
+}
+
+void vtkPVSourceNotebook::UpdateEnableState()
 {
   this->PropagateEnableState(this->DisplayGUI);
   this->PropagateEnableState(this->InformationGUI);
@@ -166,16 +180,6 @@ void vtkPVSourceNotebook::UpdateEnableState(vtkPVSource* pvs)
   this->PropagateEnableState(this->AcceptButton);
   this->PropagateEnableState(this->AcceptPullDownArrow);
   this->PropagateEnableState(this->ResetButton);
-
-  if ( pvs->IsDeletable() )
-    {
-    this->PropagateEnableState(this->DeleteButton);
-    }
-  else
-    {
-    this->DeleteButton->SetEnabled(0);
-    }
-
 }
 
 //----------------------------------------------------------------------------

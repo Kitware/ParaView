@@ -61,7 +61,8 @@ public:
   // disables the delete button of the source is not deletable.
   // I assume that this works with PropagateSnableState and
   // disables a widget if any parent is disabled.
-  void UpdateEnableState(vtkPVSource* pvs);  
+  void UpdateEnableStateWithSource(vtkPVSource* pvs);  
+  void UpdateEnableState();  
 
   // Description:
   // This is so more specific updates can be called.

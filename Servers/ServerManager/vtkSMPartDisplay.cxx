@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.7");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.8");
 
 
 //----------------------------------------------------------------------------s
@@ -1563,35 +1563,44 @@ void vtkSMPartDisplay::GatherGeometryInformation()
 
 //----------------------------------------------------------------------------
 // This should be handle the same way batch is (in the future).
-void vtkSMPartDisplay::SaveState(ofstream *file, const char* tclName)
+void vtkSMPartDisplay::SaveState(ofstream *file, const char* tclName, 
+                                 vtkIndent indent)
 {
   float rgb[3];
   this->GetColor(rgb);
-  *file << tclName << " SetColor " 
+  *file << indent << tclName << " SetColor " 
         << rgb[0] << " " << rgb[1] << " " << rgb[2] << endl;
      
-  *file << tclName << " SetRepresentation " << this->GetRepresentation() << endl; 
-  *file << tclName << " SetUseImmediateMode " << this->UseImmediateModeProperty->GetElement(0) << endl; 
-  *file << tclName << " SetScalarVisibility " << this->GetScalarVisibility() << endl; 
-  *file << tclName << " SetDirectColorFlag " << this->GetDirectColorFlag() << endl; 
-  *file << tclName << " SetInterpolateColorsFlag " << this->GetInterpolateColorsFlag() << endl; 
-  *file << tclName << " SetInterpolation " << this->GetInterpolation() << endl; 
-  *file << tclName << " SetLineWidth " << this->GetLineWidth() << endl; 
-  *file << tclName << " SetPointSize " << this->GetPointSize() << endl; 
+  *file << indent << tclName << " SetRepresentation " << 
+    this->GetRepresentation() << endl; 
+  *file << indent << tclName << " SetUseImmediateMode " << 
+    this->UseImmediateModeProperty->GetElement(0) << endl; 
+  *file << indent << tclName << " SetScalarVisibility " << 
+    this->GetScalarVisibility() << endl; 
+  *file << indent << tclName << " SetDirectColorFlag " << 
+    this->GetDirectColorFlag() << endl; 
+  *file << indent << tclName << " SetInterpolateColorsFlag " << 
+    this->GetInterpolateColorsFlag() << endl; 
+  *file << indent << tclName << " SetInterpolation " << 
+    this->GetInterpolation() << endl; 
+  *file << indent << tclName << " SetLineWidth " << 
+    this->GetLineWidth() << endl; 
+  *file << indent << tclName << " SetPointSize " << 
+    this->GetPointSize() << endl; 
   double tmp[3];
   this->GetTranslate(tmp);
-  *file << tclName << " SetTranslate " 
+  *file << indent << tclName << " SetTranslate " 
         << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
   this->GetScale(tmp);
-  *file << tclName << " SetScale " 
+  *file << indent << tclName << " SetScale " 
         << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
   this->GetOrientation(tmp);
-  *file << tclName << " SetOrientation " 
+  *file << indent << tclName << " SetOrientation " 
         << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
   this->GetOrigin(tmp);
-    *file << tclName << " SetOrigin " 
+    *file << indent << tclName << " SetOrigin " 
           << tmp[0] << " " << tmp[1] << " " << tmp[2] << endl;
-  *file << tclName << " SetOpacity " << this->GetOpacity() << endl; 
+  *file << indent << tclName << " SetOpacity " << this->GetOpacity() << endl; 
 }
 
 

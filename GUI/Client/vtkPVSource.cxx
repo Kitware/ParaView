@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.390");
+vtkCxxRevisionMacro(vtkPVSource, "1.391");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -406,7 +406,7 @@ void vtkPVSource::UpdateEnableState()
   this->Superclass::UpdateEnableState();
 
   this->PropagateEnableState(this->Notebook);
-  this->Notebook->UpdateEnableState(this);
+  this->Notebook->UpdateEnableStateWithSource(this);
   this->PropagateEnableState(this->PVColorMap);
 
   if ( this->Widgets )
@@ -1866,8 +1866,8 @@ void vtkPVSource::SaveState(ofstream *file)
   sprintf(dispTclName, "$pvDisp(%s)", this->GetTclName());
   *file << "set " << dispTclName+1 
         << " [$kw(" << this->GetTclName() << ") GetPartDisplay]" << endl;
-  this->GetPartDisplay()->SaveState(file, dispTclName);
-  
+  vtkIndent indent;
+  this->GetPartDisplay()->SaveState(file, dispTclName, indent);
 
   // Make sure the GUI is upto date.  
   *file << "[$kw(" << this->GetTclName()

@@ -130,7 +130,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.611");
+vtkCxxRevisionMacro(vtkPVWindow, "1.612");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -941,8 +941,8 @@ void vtkPVWindow::AddToolbarButton(const char* buttonName,
   int index = menu->GetNumberOfItems()-1;
   menu->ConfigureItem(index, opts.str());  
   checkCommand.rdbuf()->freeze(0);
+
   // Clean up.
-  delete [] var;
   opts.rdbuf()->freeze(0);
   button->SetCommand(this, command);
   if (balloonHelp)
