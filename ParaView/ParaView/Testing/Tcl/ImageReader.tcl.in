@@ -1,0 +1,45 @@
+set DataDir "@PARAVIEW_DATA_ROOT@"
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkImageReader]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {FilePrefix}]
+$pv(vtkTemp110) SetValue E:/ParaView/ParaView/data/Data/headsq/quarter
+set pv(vtkTemp120) [$pv(vtkTemp98) GetPVWidget {Extent}]
+$pv(vtkTemp120) SetValue 0 63 0 63 1 64
+$pv(vtkTemp98) AcceptCallback
+
+set pv(vtkTemp187) [$pv(vtkTemp1) ContourCallback]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp187)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp198) [$pv(vtkTemp187) GetPVWidget {Contour Values}]
+$pv(vtkTemp198) RemoveAllValues
+$pv(vtkTemp198) AddValue 600.000000
+set pv(vtkTemp204) [$pv(vtkTemp187) GetPVWidget {Compute Normals}]
+$pv(vtkTemp204) SetState 0
+$pv(vtkTemp187) AcceptCallback
+
+set activeCamera [Ren1 GetActiveCamera]
+$activeCamera SetPosition 31.5 250.821 20.5266
+$activeCamera SetFocalPoint 31.5 31.5 31.5
+$activeCamera SetViewUp 0 -0.049971 -0.998751
+$activeCamera SetViewAngle 30
+$activeCamera SetClippingRange 151.66 305.641
+
+$pv(vtkTemp1) ResetCameraCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/ImageReader.png 10
+   
+Application Exit
