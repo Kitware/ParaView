@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.7");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.8");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -441,11 +441,6 @@ void vtkKWRenderWidget::SetBackgroundColor(float r, float g, float b)
   
   this->Renderer->SetBackground(r, g, b);
   this->Render();
-  float color[3];
-  color[0] = r;
-  color[1] = g;
-  color[2] = b;
-  this->InvokeEvent( vtkKWEvent::BackgroundColorChangedEvent, color );
 }
 
 void vtkKWRenderWidget::GetBackgroundColor(float *r, float *g, float *b)
@@ -466,15 +461,47 @@ void vtkKWRenderWidget::Close()
   this->RemoveBindings();
 }
 
-void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
+void vtkKWRenderWidget::CornerAnnotationOn()
 {
-  this->CornerAnnotation->GetTextProperty()->SetColor(r, g, b);
+  if (this->CornerAnnotation->GetVisibility() &&
+      this->HasProp(this->CornerAnnotation))
+    {
+    return;
+    }
+  this->CornerAnnotation->VisibilityOn();
+  if (!this->HasProp(this->CornerAnnotation))
+    {
+    this->AddProp(this->CornerAnnotation);
+    }
   this->Render();
 }
 
-float* vtkKWRenderWidget::GetCornerTextColor()
+void vtkKWRenderWidget::CornerAnnotationOff()
 {
-  return this->CornerAnnotation->GetTextProperty()->GetColor();
+  if (!this->CornerAnnotation->GetVisibility() ||
+      !this->HasProp(this->CornerAnnotation))
+    {
+    return;
+    }
+  this->CornerAnnotation->VisibilityOff();
+  if (this->HasProp(this->CornerAnnotation))
+    {
+    this->RemoveProp(this->CornerAnnotation);
+    }
+  this->Render();
+}
+
+void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
+{
+  if (this->CornerAnnotation && this->CornerAnnotation->GetTextProperty())
+    {
+    float *rgb = this->CornerAnnotation->GetTextProperty()->GetColor();
+    if (rgb[0] != r || rgb[1] != g || rgb[2] != b)
+      {
+      this->CornerAnnotation->GetTextProperty()->SetColor(r, g, b);
+      this->Render();
+      }
+    }
 }
 
 void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)

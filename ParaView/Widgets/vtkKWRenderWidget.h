@@ -135,12 +135,14 @@ public:
   
   // Description:
   // Get the underlying vtkCornerAnnotation.
+  // Set the annotation visibility.
+  // Set the corner text color.
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
-
-  void SetCornerTextColor(float r, float g, float b);
-  void SetCornerTextColor(float *rgb)
-    { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); }
-  float* GetCornerTextColor();
+  virtual void CornerAnnotationOn();
+  virtual void CornerAnnotationOff();
+  virtual void SetCornerTextColor(float r, float g, float b);
+  virtual void SetCornerTextColor(float *rgb)
+               { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); }
       
 protected:
   vtkKWRenderWidget();
