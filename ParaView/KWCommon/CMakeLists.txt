@@ -1,3 +1,4 @@
+PROJECT(KWCommon)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SOURCE_FILES( KWCommon_SRCS
 vtkKWHashTable
