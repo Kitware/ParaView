@@ -40,12 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.18");
+vtkCxxRevisionMacro(vtkKWListBox, "1.19");
 
 
+//----------------------------------------------------------------------------
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWListBox::vtkKWListBox()
 {   
   this->CurrentSelection = 0;
@@ -61,6 +63,7 @@ vtkKWListBox::vtkKWListBox()
   this->ScrollbarFlag = 1;
 }
 
+//----------------------------------------------------------------------------
 vtkKWListBox::~vtkKWListBox()
 {
   delete [] this->Item;
@@ -72,6 +75,7 @@ vtkKWListBox::~vtkKWListBox()
 }
 
 
+//----------------------------------------------------------------------------
 int vtkKWListBox::GetNumberOfItems()
 {
   if ( !this->IsCreated() )
@@ -83,11 +87,13 @@ int vtkKWListBox::GetNumberOfItems()
   return atoi(result);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::DeleteRange(int start, int end)
 {
   this->Script("%s delete %d %d", this->Listbox->GetWidgetName(), start, end);
 }
 
+//----------------------------------------------------------------------------
 const char* vtkKWListBox::GetItem(int index)
 {
   this->Script("%s get %d", this->Listbox->GetWidgetName(), index);
@@ -97,6 +103,7 @@ const char* vtkKWListBox::GetItem(int index)
   return this->Item;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetSelectionIndex(int sel)
 {
   if ( sel < 0 )
@@ -106,6 +113,7 @@ void vtkKWListBox::SetSelectionIndex(int sel)
   this->Script("%s selection set %d", this->Listbox->GetWidgetName(), sel);
 }
 
+//----------------------------------------------------------------------------
 int vtkKWListBox::GetSelectionIndex()
 {
   if ( !this->IsCreated() )
@@ -123,6 +131,7 @@ int vtkKWListBox::GetSelectionIndex()
 }
 
   
+//----------------------------------------------------------------------------
 const char *vtkKWListBox::GetSelection()
 {
   if ( !this->IsCreated() )
@@ -141,6 +150,7 @@ const char *vtkKWListBox::GetSelection()
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetSelectState(int idx, int state)
 {
   if ( idx < 0 )
@@ -157,6 +167,25 @@ void vtkKWListBox::SetSelectState(int idx, int state)
     }
 }
 
+//----------------------------------------------------------------------------
+int vtkKWListBox::GetItemIndex(const char* item)
+{
+  if ( !item )
+    {
+    return 0;
+    }
+  int cc;
+  for ( cc = 0; cc < this->GetNumberOfItems(); cc ++ )
+    {
+    if ( strcmp(item, this->GetItem(cc)) == 0 )
+      {
+      return cc;
+      }
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWListBox::GetSelectState(int idx)
 {
   if ( idx < 0 )
@@ -170,6 +199,7 @@ int vtkKWListBox::GetSelectState(int idx)
   return result;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::InsertEntry(int index, const char *name)
 {
   this->Script("%s insert %d {%s}", this->Listbox->GetWidgetName(), index, name);
@@ -177,6 +207,7 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
 
 
  
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj, 
                                           const char* methodAndArgs)
 {
@@ -184,6 +215,7 @@ void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj,
                obj->GetTclName(), methodAndArgs);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetSingleClickCallback(vtkKWObject* obj, 
                                           const char* methodAndArgs)
 {
@@ -192,6 +224,7 @@ void vtkKWListBox::SetSingleClickCallback(vtkKWObject* obj,
 }
 
 
+//----------------------------------------------------------------------------
 int vtkKWListBox::AppendUnique(const char* name)
 {
   int size = this->GetNumberOfItems();
@@ -213,6 +246,7 @@ int vtkKWListBox::AppendUnique(const char* name)
 
 
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -255,11 +289,13 @@ void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetWidth(int w)
 {
   this->Script("%s configure -width %d", this->Listbox->GetWidgetName(), w);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetScrollbarFlag(int v)
 {
   this->ScrollbarFlag = v;
@@ -278,17 +314,20 @@ void vtkKWListBox::SetScrollbarFlag(int v)
 
 
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetHeight(int h)
 {
   this->Script("%s configure -height %d", this->Listbox->GetWidgetName(), h);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::DeleteAll()
 {
   int n =  this->GetNumberOfItems();
   this->DeleteRange(0, n);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetBalloonHelpString(const char *str)
 {
   this->Listbox->SetBalloonHelpString( str );
@@ -296,6 +335,7 @@ void vtkKWListBox::SetBalloonHelpString(const char *str)
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWListBox::SetBalloonHelpJustification( int j )
 {
   this->Listbox->SetBalloonHelpJustification( j );

@@ -92,6 +92,10 @@ public:
   // Description: 
   // Get the item at the given index.
   const char* GetItem(int index);
+
+  // Description:
+  // Returns the index of the first given item.
+  int GetItemIndex(const char* item);
   
   // Description:
   // Delete a range of items in the list.
