@@ -19,6 +19,9 @@
 
 #if defined(_WIN32) && !defined(__CYGWIN__)
 # include <windows.h>
+# if defined(_MSC_VER) && !defined(VTK_DISPLAY_WIN32_WARNINGS)
+#  pragma warning ( disable : 4786 )
+# endif //VTK_DISPLAY_WIN32_WARNINGS
 #else
 # include <unistd.h>
 # include <sys/wait.h>
