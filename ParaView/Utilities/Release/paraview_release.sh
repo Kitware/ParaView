@@ -27,7 +27,8 @@ CVS_MODULE=ParaViewComplete
 
 # Release version number.
 TAG="HEAD"
-VERSION="0.7.0"
+PARAVIEW_VERSION="1.0"
+VERSION="${PARAVIEW_VERSION}.0"
 RELEASE="1"
 
 # CVSROOT setting used to check out ParaView.
@@ -55,7 +56,7 @@ RELEASE_UTILITIES_CVS="ParaView/Utilities/Release"
 PREFIX="/usr/local"
 
 # Directory relative to PREFIX where documentation should be placed.
-DOC_DIR="/doc/ParaView-${VERSION}"
+DOC_DIR="/doc/paraview-${PARAVIEW_VERSION}"
 
 # No default compiler.  The config file must provide it.
 CC=""
