@@ -49,7 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 #include "vtkKWGenericComposite.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWLabeledPopupButton.h"
 #include "vtkKWLabeledText.h"
+#include "vtkKWPopupButton.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWScale.h"
 #include "vtkKWSerializer.h"
@@ -58,10 +61,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
+#include "vtkString.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.46");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.47");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -89,23 +93,48 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 
   // GUI
 
+  this->PopupMode = 0;
+  this->PutVisibilityButtonInTitle = 0;
+  this->PopupTextProperty = 0;
+
+  this->PopupButton = NULL;
+
+  this->Frame = vtkKWLabeledFrame::New();
+
   this->CornerVisibilityButton = vtkKWCheckButton::New();
 
   this->CornerFrame = vtkKWFrame::New();
+
   for (int i = 0; i < 4; i++)
     {
     this->CornerText[i] = vtkKWLabeledText::New();
     }
 
+  this->PropertiesFrame = vtkKWFrame::New();
+
   this->MaximumLineHeightScale = vtkKWScale::New();
 
   this->TextPropertyWidget = vtkKWTextProperty::New();
+
+  this->TextPropertyPopupButton = NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
 {
   // GUI
+
+  if (this->PopupButton)
+    {
+    this->PopupButton->Delete();
+    this->PopupButton = NULL;
+    }
+
+  if (this->Frame)
+    {
+    this->Frame->Delete();
+    this->Frame = NULL;
+    }
 
   if (this->CornerVisibilityButton)
     {
@@ -128,6 +157,12 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
       }
     }
 
+  if (this->PropertiesFrame)
+    {
+    this->PropertiesFrame->Delete();
+    this->PropertiesFrame = NULL;
+    }
+
   if (this->MaximumLineHeightScale)
     {
     this->MaximumLineHeightScale->Delete();
@@ -138,6 +173,12 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
     {
     this->TextPropertyWidget->Delete();
     this->TextPropertyWidget = NULL;
+    }
+
+  if (this->TextPropertyPopupButton)
+    {
+    this->TextPropertyPopupButton->Delete();
+    this->TextPropertyPopupButton = NULL;
     }
 
   // CornerProp was either pointing to InternalCornerProp in vtkKWView mode, or
@@ -286,7 +327,7 @@ void vtkKWCornerAnnotation::Close()
 void vtkKWCornerAnnotation::Create(vtkKWApplication *app, 
                                    const char* vtkNotUsed(args))
 {
-  // Check if already created
+  // Set the application
 
   if (this->IsCreated())
     {
@@ -294,25 +335,98 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     return;
     }
 
-  // Call the superclass, this will set the application
+  this->SetApplication(app);
 
-  this->Superclass::Create(app, 0);
+  int put_visibility_button_in_title = 
+    this->PutVisibilityButtonInTitle && !this->PopupMode;
+
+  int popup_text_property = 
+    this->PopupTextProperty && !this->PopupMode;
+
+  // Create the container
+
+  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
+
+  // If in popup mode, create the popup button
+
+  if (this->PopupMode)
+    {
+    if (!this->PopupButton)
+      {
+      this->PopupButton = vtkKWPopupButton::New();
+      }
+    
+    this->PopupButton->SetParent(this);
+    this->PopupButton->Create(app, 0);
+    this->PopupButton->SetLabel("Edit...");
+    }
+
+  // Create the labeled frame
+
+  if (this->PopupMode)
+    {
+    this->Frame->ShowHideFrameOff();
+    this->Frame->SetParent(this->PopupButton->GetPopupFrame());
+    }
+  else
+    {
+    this->Frame->SetParent(this);
+    }
+  this->Frame->Create(app, 0);
+
+  this->Script("pack %s -side top -anchor nw -fill both -expand y",
+               this->Frame->GetWidgetName());
 
   // Annotation visibility
 
-  this->CornerVisibilityButton->SetParent(this->GetFrame());
-  this->CornerVisibilityButton->Create(this->Application, "");
-  this->CornerVisibilityButton->SetText("Display corner annotation");
+  if (this->PopupMode)
+    {
+    this->CornerVisibilityButton->SetParent(this);
+    }
+  else
+    {
+    this->CornerVisibilityButton->SetParent(
+      put_visibility_button_in_title ? this->Frame->GetLabelFrame() 
+                                     : this->Frame->GetFrame());
+    }
+
+  this->CornerVisibilityButton->Create(
+    this->Application, "-bd 0 -highlightthickness 0 -padx 0 -pady 0");
+
+  if (!put_visibility_button_in_title)
+    {
+    this->CornerVisibilityButton->SetText("Display corner annotation");
+    }
+
   this->CornerVisibilityButton->SetBalloonHelpString(
     "Toggle the visibility of the corner annotation text");
+
   this->CornerVisibilityButton->SetCommand(this, "DisplayCornerCallback");
 
-  this->Script("pack %s -side top -padx 2 -anchor nw",
-               this->CornerVisibilityButton->GetWidgetName());
+  if (put_visibility_button_in_title)
+    {
+    this->Script("pack %s -side left -anchor nw -padx 1 -before %s",
+                 this->CornerVisibilityButton->GetWidgetName(),
+                 this->Frame->GetLabel()->GetWidgetName());
+    }
+  else
+    {
+    if (this->PopupMode)
+      {
+      this->Script("pack %s %s -side left -padx 2 -anchor w",
+                   this->CornerVisibilityButton->GetWidgetName(),
+                   this->PopupButton->GetWidgetName());
+      }
+    else
+      {
+      this->Script("pack %s -side top -padx 2 -anchor nw",
+                   this->CornerVisibilityButton->GetWidgetName());
+      }
+    }
 
   // Corners text
 
-  this->CornerFrame->SetParent(this->GetFrame());
+  this->CornerFrame->SetParent(this->Frame->GetFrame());
   this->CornerFrame->Create(app, 0);
 
   this->Script("pack %s -side top -padx 2 -expand t -fill x -anchor nw",
@@ -323,7 +437,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     {
     this->CornerText[i]->SetParent(this->CornerFrame);
     this->CornerText[i]->Create( app, 0);
-    this->Script("%s configure -height 4 -width 10 -wrap none",
+    this->Script("%s configure -height 3 -width 25 -wrap none",
                  this->CornerText[i]->GetText()->GetWidgetName());
     this->Script("bind %s <Return> {%s CornerTextCallback %i}",
                  this->CornerText[i]->GetText()->GetWidgetName(), 
@@ -356,11 +470,11 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     "Set the upper right corner annotation. The text will automatically scale "
     "to fit within the allocated space");
 
-  this->Script("grid %s %s -row 0 -sticky news -padx 2",
+  this->Script("grid %s %s -row 0 -sticky news -padx 2 -pady 0 -ipady 0",
                this->CornerText[2]->GetWidgetName(), 
                this->CornerText[3]->GetWidgetName());
 
-  this->Script("grid %s %s -row 1 -sticky news -padx 2",
+  this->Script("grid %s %s -row 1 -sticky news -padx 2 -pady 0 -ipady 0",
                this->CornerText[0]->GetWidgetName(), 
                this->CornerText[1]->GetWidgetName());
 
@@ -370,9 +484,17 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->Script("grid columnconfigure %s 1 -weight 1",
                this->CornerFrame->GetWidgetName());
 
+  // Properties frame
+
+  this->PropertiesFrame->SetParent(this->Frame->GetFrame());
+  this->PropertiesFrame->Create(app, 0);
+
+  this->Script("pack %s -side top -padx 2 -expand t -fill both -anchor nw",
+               this->PropertiesFrame->GetWidgetName());
+
   // Maximum line height
 
-  this->MaximumLineHeightScale->SetParent(this->GetFrame());
+  this->MaximumLineHeightScale->SetParent(this->PropertiesFrame);
   this->MaximumLineHeightScale->SetRange(0.01, 0.2);
   this->MaximumLineHeightScale->SetResolution(0.01);
   this->MaximumLineHeightScale->PopupScaleOn();
@@ -395,14 +517,41 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->MaximumLineHeightScale->SetEntryCommand(
     this, "MaximumLineHeightEndCallback");
 
-  this->Script("pack %s -padx 2 -pady 2 -side top -anchor w -fill y", 
-               this->MaximumLineHeightScale->GetWidgetName());
+  this->Script("pack %s -padx 2 -pady 2 -side %s -anchor w -fill y", 
+               this->MaximumLineHeightScale->GetWidgetName(),
+               (popup_text_property ? "left" : "top"));
+  
+  // Text property : popup button if needed
+
+  if (popup_text_property)
+    {
+    if (!this->TextPropertyPopupButton)
+      {
+      this->TextPropertyPopupButton = vtkKWLabeledPopupButton::New();
+      }
+    this->TextPropertyPopupButton->SetParent(this->PropertiesFrame);
+    this->TextPropertyPopupButton->Create(this->Application);
+    this->TextPropertyPopupButton->SetLabel("Text properties:");
+    this->TextPropertyPopupButton->SetPopupButtonLabel("Edit...");
+    this->Script("%s configure -bd 2 -relief groove", 
+                 this->TextPropertyPopupButton->GetPopupButton()
+                 ->GetPopupFrame()->GetWidgetName());
+
+    this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
+                 this->TextPropertyPopupButton->GetWidgetName());
+
+    this->TextPropertyWidget->SetParent(
+      this->TextPropertyPopupButton->GetPopupButton()->GetPopupFrame());
+    }
+  else
+    {
+    this->TextPropertyWidget->SetParent(this->PropertiesFrame);
+    }
 
   // Text property
 
-  this->TextPropertyWidget->SetParent(this->GetFrame());
-  this->TextPropertyWidget->LongFormatOff();
-  this->TextPropertyWidget->LabelOnTopOff();
+  this->TextPropertyWidget->LongFormatOn();
+  this->TextPropertyWidget->LabelOnTopOn();
   this->TextPropertyWidget->Create(this->Application);
   this->TextPropertyWidget->ShowLabelOn();
   this->TextPropertyWidget->GetLabel()->SetLabel("Text properties:");
@@ -483,6 +632,33 @@ void vtkKWCornerAnnotation::Update()
         this->CornerProp->GetTextProperty());
       }
     this->TextPropertyWidget->SetActor2D(this->CornerProp);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCornerAnnotation::SetAnnotationName(const char *text) 
+{
+  if (!this->IsCreated() || !text)
+    {
+    return;
+    }
+
+  if (this->Frame)
+    {
+    this->Frame->SetLabel(text);
+    }
+
+  int put_visibility_button_in_title = 
+    this->PutVisibilityButtonInTitle && !this->PopupMode;
+
+  if (this->CornerVisibilityButton && !put_visibility_button_in_title)
+    {
+    char *ltext = vtkString::ToLower(vtkString::Duplicate(text));
+    ostrstream ltext_str;
+    ltext_str << "Display " << ltext << ends;
+    this->CornerVisibilityButton->SetText(ltext_str.str());
+    ltext_str.rdbuf()->freeze(0);
+    delete [] ltext;
     }
 }
 
@@ -759,21 +935,30 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
     return;
     }
 
-  vtkKWLabeledFrame::SerializeToken(is,token);
+  this->Frame->SerializeToken(is,token);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.46 $");
-  vtkKWLabeledFrame::SerializeRevision(os,indent);
+  this->ExtractRevision(os,"$Revision: 1.47 $");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
+
+  if (this->PopupButton)
+    {
+    this->PopupButton->SetEnabled(this->Enabled);
+    }
+
+  if (this->Frame)
+    {
+    this->Frame->SetEnabled(this->Enabled);
+    }
 
   if (this->CornerVisibilityButton)
     {
@@ -794,6 +979,11 @@ void vtkKWCornerAnnotation::UpdateEnableState()
       }
     }
 
+  if (this->PropertiesFrame)
+    {
+    this->PropertiesFrame->SetEnabled(this->Enabled);
+    }
+
   if (this->MaximumLineHeightScale)
     {
     this->MaximumLineHeightScale->SetEnabled(this->Enabled);
@@ -802,6 +992,11 @@ void vtkKWCornerAnnotation::UpdateEnableState()
   if (this->TextPropertyWidget)
     {
     this->TextPropertyWidget->SetEnabled(this->Enabled);
+    }
+
+  if (this->TextPropertyPopupButton)
+    {
+    this->TextPropertyPopupButton->SetEnabled(this->Enabled);
     }
 }
 
@@ -819,4 +1014,6 @@ void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderWidget: " << this->GetRenderWidget() << endl;
   os << indent << "TextPropertyWidget: " << this->TextPropertyWidget << endl;
   os << indent << "MaximumLineHeightScale: " << this->MaximumLineHeightScale << endl;
+  os << indent << "PutVisibilityButtonInTitle: " 
+     << (this->PutVisibilityButtonInTitle ? "On" : "Off") << endl;
 }

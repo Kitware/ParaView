@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWCornerAnnotation_h
 #define __vtkKWCornerAnnotation_h
 
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWWidget.h"
 
 class vtkCornerAnnotation;
 class vtkKWChangeColorButton;
@@ -56,19 +56,30 @@ class vtkKWCheckButton;
 class vtkKWFrame;
 class vtkKWGenericComposite;
 class vtkKWLabel;
-class vtkKWScale;
-class vtkKWRenderWidget;
+class vtkKWLabeledFrame;
+class vtkKWLabeledPopupButton;
 class vtkKWLabeledText;
+class vtkKWPopupButton;
+class vtkKWRenderWidget;
+class vtkKWScale;
 class vtkKWTextProperty;
 class vtkKWView;
 
-class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWLabeledFrame
+class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWWidget
 {
 public:
   static vtkKWCornerAnnotation* New();
-  vtkTypeRevisionMacro(vtkKWCornerAnnotation,vtkKWLabeledFrame);
+  vtkTypeRevisionMacro(vtkKWCornerAnnotation,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  // Description:
+  // Display the visibility check button only, and the rest of the UI as a
+  // popup (default is off).
+  // This has to be called before Create().
+  vtkSetMacro(PopupMode, int);
+  vtkGetMacro(PopupMode, int);
+  vtkBooleanMacro(PopupMode, int);
+  
   // Description:
   // Create the widget.
   virtual void Create(vtkKWApplication *app, const char* args);
@@ -94,20 +105,28 @@ public:
   vtkGetObjectMacro(CornerProp, vtkCornerAnnotation);
   
   // Description:
-  // When used with a vtkKWView, close out and remove any composites/props 
-  // prior to deletion. Has no impact when used with a vtkKWRenderWidget.
-  virtual void Close();
-
+  // Get the internal labeled frame
+  vtkGetObjectMacro(Frame, vtkKWLabeledFrame);
+  
   // Description:
-  // In vtkKWView mode, displays and updates the property ui display
-  virtual void ShowProperties();
-
+  // Convenience method that will both set the frame title and the
+  // check visibility button.
+  virtual void SetAnnotationName(const char *);
+  
   // Description:
   // Set/Get the annotation visibility
   virtual void SetVisibility(int i);
   virtual int  GetVisibility();
   vtkBooleanMacro(Visibility,int);
   virtual void DisplayCornerCallback();
+  vtkGetObjectMacro(CornerVisibilityButton, vtkKWCheckButton);
+
+  // Description:
+  // Put the visibility checkbutton in the frame title (default is off).
+  // This has to be called before Create(). Ignored if PopupMode is true.
+  vtkSetMacro(PutVisibilityButtonInTitle, int);
+  vtkGetMacro(PutVisibilityButtonInTitle, int);
+  vtkBooleanMacro(PutVisibilityButtonInTitle, int);
   
   // Description:
   // Set/Get corner text
@@ -132,9 +151,19 @@ public:
   vtkGetObjectMacro(MaximumLineHeightScale, vtkKWScale);
 
   // Description:
-  // GUI components access
+  // Access to the text property sub-widget.
+  // Also sets if the this part of the UI should be displayed in a popup 
+  // (has to be set before Create() is called).
   vtkGetObjectMacro(TextPropertyWidget, vtkKWTextProperty);
   void TextPropertyCallback();
+
+  // Description:
+  // Makes the text property sub-widget popup (instead of displaying the
+  // whole text property UI, which can be long).
+  // This has to be called before Create(). Ignored if PopupMode is true.
+  vtkSetMacro(PopupTextProperty, int);
+  vtkGetMacro(PopupTextProperty, int);
+  vtkBooleanMacro(PopupTextProperty, int);
 
   // Description:
   // Chaining method to serialize an object and its superclasses.
@@ -159,6 +188,15 @@ public:
   vtkSetMacro(AnnotationChangedEvent, int);
   vtkGetMacro(AnnotationChangedEvent, int);
 
+  // Description:
+  // When used with a vtkKWView, close out and remove any composites/props 
+  // prior to deletion. Has no impact when used with a vtkKWRenderWidget.
+  virtual void Close();
+
+  // Description:
+  // In vtkKWView mode, displays and updates the property ui display
+  virtual void ShowProperties();
+
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
@@ -166,21 +204,29 @@ protected:
   int AnnotationColorChangedEvent;
   int AnnotationChangedEvent;
 
-  vtkCornerAnnotation    *CornerProp;
+  vtkCornerAnnotation     *CornerProp;
 
-  vtkKWRenderWidget      *RenderWidget;
+  vtkKWRenderWidget       *RenderWidget;
 
-  vtkKWView              *View;
-  vtkKWGenericComposite  *InternalCornerComposite;
-  vtkCornerAnnotation    *InternalCornerProp;
+  vtkKWView               *View;
+  vtkKWGenericComposite   *InternalCornerComposite;
+  vtkCornerAnnotation     *InternalCornerProp;
 
   // GUI
 
-  vtkKWCheckButton       *CornerVisibilityButton;
-  vtkKWFrame             *CornerFrame;
-  vtkKWLabeledText       *CornerText[4];
-  vtkKWScale             *MaximumLineHeightScale;
-  vtkKWTextProperty      *TextPropertyWidget;
+  int                     PopupMode;
+  int                     PutVisibilityButtonInTitle;
+  int                     PopupTextProperty;
+
+  vtkKWPopupButton        *PopupButton;
+  vtkKWLabeledFrame       *Frame;
+  vtkKWCheckButton        *CornerVisibilityButton;
+  vtkKWFrame              *CornerFrame;
+  vtkKWLabeledText        *CornerText[4];
+  vtkKWFrame              *PropertiesFrame;
+  vtkKWScale              *MaximumLineHeightScale;
+  vtkKWTextProperty       *TextPropertyWidget;
+  vtkKWLabeledPopupButton *TextPropertyPopupButton;
 
   void Render();
 
