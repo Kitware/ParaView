@@ -9,6 +9,7 @@ vtkKWBWidgets.cxx
 vtkKWChangeColorButton.cxx 
 vtkKWCheckButton.cxx 
 vtkKWCheckButtonSet.cxx 
+vtkKWCheckButtonWithChangeColor.cxx
 vtkKWComposite.cxx 
 vtkKWCompositeCollection.cxx 
 vtkKWCornerAnnotation.cxx 
