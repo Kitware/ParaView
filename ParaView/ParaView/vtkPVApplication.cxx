@@ -114,7 +114,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.178");
+vtkCxxRevisionMacro(vtkPVApplication, "1.179");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -351,10 +351,6 @@ vtkPVApplication::~vtkPVApplication()
     {
     delete this->TraceFile;
     this->TraceFile = 0;
-    }
-  if (this->TraceFileName)
-    {
-    unlink(this->TraceFileName);
     }
   this->SetGroupFileName(0);
   this->SetTraceFileName(0);
@@ -1248,6 +1244,11 @@ void vtkPVApplication::Exit()
     }
 
   this->ProcessModule->Exit();
+
+  if (this->TraceFileName)
+    {
+    unlink(this->TraceFileName);
+    }
 }
 
 //----------------------------------------------------------------------------
