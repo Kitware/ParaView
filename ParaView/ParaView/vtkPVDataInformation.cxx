@@ -32,7 +32,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.22");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.22.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -377,9 +377,22 @@ const char* vtkPVDataInformation::GetDataSetTypeAsString()
 // Need to do this manually.
 int vtkPVDataInformation::DataSetTypeIsA(const char* type)
 {
-  if (strcmp(type, "vtkDataSet") == 0)
-    { // Every type is of type vtkDataSet.
+  if (strcmp(type, "vtkDataObject") == 0)
+    { // Every type is of type vtkDataObject.
     return 1;
+    }
+  if (strcmp(type, "vtkDataSet") == 0)
+    { // Every type is of type vtkDataObject.
+    if (this->DataSetType == VTK_POLY_DATA ||
+        this->DataSetType == VTK_STRUCTURED_GRID ||
+        this->DataSetType == VTK_UNSTRUCTURED_GRID ||
+        this->DataSetType == VTK_IMAGE_DATA ||
+        this->DataSetType == VTK_RECTILINEAR_GRID ||
+        this->DataSetType == VTK_UNSTRUCTURED_GRID ||
+        this->DataSetType == VTK_STRUCTURED_POINTS)
+      {
+    return 1;
+      }
     }
   if (strcmp(type, this->GetDataSetTypeAsString()) == 0)
     { // If class names are the same, then they are of the same type.
