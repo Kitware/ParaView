@@ -129,7 +129,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.9");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.10");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -158,12 +158,6 @@ vtkKWTextProperty::vtkKWTextProperty()
 
   this->ShowOpacity = 1;
   this->OpacityScale = vtkKWScale::New();
-
-  this->ShowHorizontalJustification = 1;
-  this->HorizontalJustificationOptionMenu = vtkKWLabeledOptionMenu::New();
-
-  this->ShowVerticalJustification = 1;
-  this->VerticalJustificationOptionMenu = vtkKWLabeledOptionMenu::New();
 
   this->OnChangeCommand = NULL;
   this->OnColorChangeCommand = NULL;
@@ -209,18 +203,6 @@ vtkKWTextProperty::~vtkKWTextProperty()
     {
     this->OpacityScale->Delete();
     this->OpacityScale = NULL;
-    }
-
-  if (this->HorizontalJustificationOptionMenu)
-    {
-    this->HorizontalJustificationOptionMenu->Delete();
-    this->HorizontalJustificationOptionMenu = NULL;
-    }
-
-  if (this->VerticalJustificationOptionMenu)
-    {
-    this->VerticalJustificationOptionMenu->Delete();
-    this->VerticalJustificationOptionMenu = NULL;
     }
 
   if (this->PushButtonSet)
@@ -594,6 +576,10 @@ void vtkKWTextProperty::UpdateInterface()
   this->UpdateStylesCheckButtonSet();
   this->UpdateOpacityScale();
   this->UpdatePushButtonSet();
+
+  // Now if there is text prop, we might just disable the GUI
+
+  this->SetEnabled(this->TextProperty ? 1 : 0);
 }
 
 // ----------------------------------------------------------------------------
@@ -734,7 +720,10 @@ void vtkKWTextProperty::UpdateColorButton()
 {
   if (this->ChangeColorButton->IsCreated())
     {
-    this->ChangeColorButton->SetColor(this->GetColor());
+    if (this->GetColor())
+      {
+      this->ChangeColorButton->SetColor(this->GetColor());
+      }
 
     this->Script("grid %s %s",
                  (this->ShowColor ? "" : "remove"), 
@@ -1091,28 +1080,6 @@ void vtkKWTextProperty::OpacityEndCallback()
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShowHorizontalJustification(int _arg)
-{
-  if (this->ShowHorizontalJustification == _arg)
-    {
-    return;
-    }
-  this->ShowHorizontalJustification = _arg;
-  this->Modified();
-}
-
-// ----------------------------------------------------------------------------
-void vtkKWTextProperty::SetShowVerticalJustification(int _arg)
-{
-  if (this->ShowVerticalJustification == _arg)
-    {
-    return;
-    }
-  this->ShowVerticalJustification = _arg;
-  this->Modified();
-}
-
-// ----------------------------------------------------------------------------
 void vtkKWTextProperty::SetShowCopy(int _arg)
 {
   if (this->ShowCopy == _arg)
@@ -1205,6 +1172,27 @@ void vtkKWTextProperty::SaveInTclScript(ofstream *file,
 }
 
 //----------------------------------------------------------------------------
+void vtkKWTextProperty::SetEnabled(int e)
+{
+  // Propagate first (since objects can be modified externally, they might
+  // not be in synch with this->Enabled)
+
+  if (this->IsCreated())
+    {
+    this->Label->SetEnabled(e);
+    this->ChangeColorButton->SetEnabled(e);
+    this->FontFamilyOptionMenu->SetEnabled(e);
+    this->StylesCheckButtonSet->SetEnabled(e);
+    this->OpacityScale->SetEnabled(e);
+    }
+
+  // Then call superclass, which will 
+  // update the internal Enabled ivar (although it is not of much use here)
+
+  this->Superclass::SetEnabled(e);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1235,10 +1223,6 @@ void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ShowStyles ? "On" : "Off") << endl;
   os << indent << "ShowOpacity: " 
      << (this->ShowOpacity ? "On" : "Off") << endl;
-  os << indent << "ShowHorizontalJustification: " 
-     << (this->ShowHorizontalJustification ? "On" : "Off") << endl;
-  os << indent << "ShowVerticalJustification: " 
-     << (this->ShowVerticalJustification ? "On" : "Off") << endl;
   os << indent << "ShowCopy: " << (this->ShowCopy ? "On" : "Off") << endl;
   os << indent << "OnChangeCommand: " 
      << (this->OnChangeCommand ? this->OnChangeCommand : "None") << endl;

@@ -124,18 +124,6 @@ public:
   vtkGetMacro(ShowOpacity, int);
 
   // Description:
-  // Show horizontal justification.
-  void SetShowHorizontalJustification(int);
-  vtkBooleanMacro(ShowHorizontalJustification, int);
-  vtkGetMacro(ShowHorizontalJustification, int);
-
-  // Description:
-  // Show vertical justification.
-  void SetShowVerticalJustification(int);
-  vtkBooleanMacro(ShowVerticalJustification, int);
-  vtkGetMacro(ShowVerticalJustification, int);
-
-  // Description:
   // Set/Get the command executed each time a change is made to the
   // text property.
   vtkSetStringMacro(OnChangeCommand);
@@ -182,6 +170,11 @@ public:
   // Save out the text properties to a file.
   void SaveInTclScript(ofstream *file, const char *tcl_name = 0);
 
+  // Description:
+  // Set/Get the enabled state.
+  // Override to pass down to children.
+  virtual void SetEnabled(int);
+
 protected:
   vtkKWTextProperty();
   ~vtkKWTextProperty();
@@ -218,12 +211,6 @@ protected:
   
   int ShowOpacity;
   vtkKWScale *OpacityScale;
-
-  int ShowHorizontalJustification;
-  vtkKWLabeledOptionMenu *HorizontalJustificationOptionMenu;
-
-  int ShowVerticalJustification;
-  vtkKWLabeledOptionMenu *VerticalJustificationOptionMenu;
 
   char *OnChangeCommand;
   char *OnColorChangeCommand;
