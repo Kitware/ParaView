@@ -28,6 +28,9 @@ IF(NOT PARAVIEW_SOURCE_DIR)
     ENDIF (COMPILE_OK)
   ENDIF (COMMAND VTK_WRAP_ClientServer)
   UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer Wrapping vtkWrapClientServer.c)
+  SET(LIBRARY_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for libraries")
+  SET(EXECUTABLE_OUTPUT_PATH ${VTKCS_BINARY_DIR}/bin CACHE PATH "Single output path for executable")
+  SET(BUILD_SHARED_LIBS ${VTK_BUILD_SHARED_LIBS})
   MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
 ENDIF(NOT PARAVIEW_SOURCE_DIR)
 
@@ -49,7 +52,7 @@ ADD_LIBRARY(vtkClientServer
   vtkType.h
   vtkTypeFromNative.h
   )
-TARGET_LINK_LIBRARIES(vtkClientServer vtkKWCommonTCL)
+TARGET_LINK_LIBRARIES(vtkClientServer vtkCommon)
 
 IF(PARAVIEW_SOURCE_DIR)
   IF(BUILD_SHARED_LIBS)
