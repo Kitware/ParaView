@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.24");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.25");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -154,7 +154,8 @@ void vtkPVSourceList::ToggleVisibility(int compIdx, int )
         comp->GetPVOutput(i)->VisibilityOn();
         }
       }
-    comp->GetPVWindow()->SetCurrentPVSourceCallback(comp);
+    comp->GetPVWindow()->SetCurrentPVSourceCallback(
+      comp->GetPVWindow()->GetCurrentPVSource());
     vtkPVRenderView* renderView 
       = vtkPVRenderView::SafeDownCast(comp->GetView());
     if ( renderView )
