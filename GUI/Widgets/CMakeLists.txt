@@ -237,13 +237,7 @@ ELSE(VTK_WRAP_TCL)
   INCLUDE_DIRECTORIES(
     ${KWWidgets_BINARY_DIR}
     ${KWWidgets_SOURCE_DIR}
-    ${VTK_BINARY_DIR}
-    ${VTK_SOURCE_DIR}/Common
-    ${VTK_SOURCE_DIR}/Filtering
-    ${VTK_SOURCE_DIR}/IO
-    ${VTK_SOURCE_DIR}/Imaging
-    ${VTK_SOURCE_DIR}/Rendering
-    ${VTK_SOURCE_DIR}/Hybrid
+    ${VTK_INCLUDE_DIR}
     )
 ENDIF(VTK_WRAP_TCL)
 
