@@ -77,7 +77,7 @@ public:
   virtual void SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag);
     
   // Description:
-  // Tries to read a given file. Return VTK_OK on success, VTK_ERROR
+  // Try to read a given file. Return VTK_OK on success, VTK_ERROR
   // on failure. A new instance of a reader module (which contains the 
   // actual VTK reader to be used) is returned. This should be called
   // only on a prototype. 
@@ -92,9 +92,14 @@ public:
   // EnSight files on all processes are compatible. (Note that the
   // master server files are only supported when ParaView is compiled
   // with MPI support)
-  virtual int ReadFile(const char* fname, vtkPVReaderModule*& prm);
-  virtual int ReadFile(const char* fname, float timeValue,
-                       vtkPVApplication* pvApp, vtkPVWindow* window);
+  virtual int Initialize(const char* fname, vtkPVReaderModule*& clone);
+
+  // Description:
+  // Called on the clone returned by ReadFileInformation(), these
+  // methods complete the reading process. See superclass for more
+  // information.
+  virtual int ReadFileInformation(const char* fname);
+  virtual int Finalize(const char* fname);
 
   // Description:
   // The EnSight reader can actually be used to check a file to see if it
@@ -118,6 +123,19 @@ public:
   vtkSetMacro(ByteOrder, int);
   vtkGetMacro(ByteOrder, int);
   const char *GetByteOrderAsString();
+
+  // Description:
+  // This variable is useful when writing traces. If RunningScript
+  // is on, ReadFileInformation does not create any dialogs. Instead,
+  // it assumes the required parameters are set in the script.
+  vtkSetMacro(RunningScript, int);
+  vtkGetMacro(RunningScript, int);
+  vtkBooleanMacro(RunningScript, int);
+
+  // Description:
+  // Time value to load. Only used when RunningScript is ON.
+  vtkSetMacro(TimeValue, float);
+  vtkGetMacro(TimeValue, float);
 
 //BTX
   enum 
@@ -166,6 +184,12 @@ protected:
 
   int ByteOrder;
   
+  int RunningScript;
+  float TimeValue;
+  int MasterFile;
+  
+  vtkEnSightReader* Reader;
+
 private:
   vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&); // Not implemented
   void operator=(const vtkPVEnSightReaderModule&); // Not implemented

@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.250");
+vtkCxxRevisionMacro(vtkPVSource, "1.251");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1912,6 +1912,7 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
 
   pvd->Delete();
 
+  pvs->PrototypeInstanceCount = this->PrototypeInstanceCount;
   this->PrototypeInstanceCount++;
 
   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* widgetMap =
@@ -2130,7 +2131,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.250 $");
+  this->ExtractRevision(os,"$Revision: 1.251 $");
 }
 
 //----------------------------------------------------------------------------

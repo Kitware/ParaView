@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.11");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -81,8 +81,8 @@ void vtkPVDataSetReaderModule::InitializePrototype()
   this->Superclass::InitializePrototype();
 }
 
-int vtkPVDataSetReaderModule::ReadFile(const char* fname, 
-                                       vtkPVReaderModule*& clone)
+int vtkPVDataSetReaderModule::Initialize(const char* fname, 
+                                         vtkPVReaderModule*& clone)
 {
   clone = 0;
 
@@ -135,18 +135,6 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   pvs->vtkPVSource::CreateProperties();
   this->GetPVWindow()->SetCurrentPVSource(pvs);
   this->GetPVWindow()->ShowCurrentSourceProperties();
-
-  if (pvs)
-    {
-    if (pvs->GetTraceInitialized() == 0)
-      { 
-      vtkPVApplication* pvApp=this->GetPVApplication();
-      pvApp->AddTraceEntry("set kw(%s) [%s GetCurrentPVSource]", 
-                           pvs->GetTclName(), 
-                           pvApp->GetMainWindow()->GetTclName());
-      pvs->SetTraceInitialized(1);
-      }
-    }
 
   // Create the output.
   pvd = vtkPVData::New();

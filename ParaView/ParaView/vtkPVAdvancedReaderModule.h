@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // is only fully loaded when the user presses Accept.
 //
 // .SECTION See also
-// vtkPVReadermodule vtkPVEnSightReaderModule
+// vtkPVReadermodule vtkPVEnSightReaderModule vtkPVPLOT3DReaderModule
 
 
 
@@ -69,11 +69,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
-  // Tries to read a given file. Return VTK_OK on success, VTK_ERROR
-  // on failure. A new instance of a reader module (which contains the 
-  // actual VTK reader to be used) is returned. This should be called
-  // only on a prototype.
-  virtual int ReadFile(const char* fname, vtkPVReaderModule*& prm);
+  // Used mainly by the scripting interface, these three methods are
+  // normally called in order during the file opening process. Given
+  // the reader module name, InitializeReadCustom() returns a clone
+  // which can be passed to ReadFileInformation() and FinalizeRead()
+  // to finish the reading process.
+  virtual int Initialize(const char* fname, vtkPVReaderModule*& newModule);
+  virtual int Finalize  (const char* fname);
+  virtual int ReadFileInformation(const char* fname);
 
 protected:
   vtkPVAdvancedReaderModule();

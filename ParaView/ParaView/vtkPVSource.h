@@ -137,7 +137,9 @@ public:
   vtkPVData *GetNthPVOutput(int idx);
  
   // Description:
-  // This name is used in the data list to identify the composite.
+  // This name is used in the source list to identify this source.
+  // This name is passed to vtkPVWindow::GetPVSource() to get a
+  // particular source.
   virtual void SetName(const char *name);
   char* GetName();
     
@@ -352,6 +354,7 @@ public:
   // Set or get the module name. This name is used to store the
   // prototype in the sources/filters/readers maps. It is passed
   // to CreatePVSource when creating a new instance.
+  vtkSetStringMacro(ModuleName);
   vtkGetStringMacro(ModuleName);
 
   // Description:
@@ -415,8 +418,6 @@ protected:
 
   vtkPVRenderView* GetPVRenderView();
 
-  vtkSetStringMacro(ModuleName);
-  
   // This flag gets set after the user hits accept for the first time.
   int Initialized;
 

@@ -127,7 +127,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.400");
+vtkCxxRevisionMacro(vtkPVWindow, "1.401");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1972,11 +1972,14 @@ int vtkPVWindow::Open(char *openFileName, int store)
     vtkPVReaderModule* rm = 0;
     int retVal = it->GetData(rm);
     if (retVal == VTK_OK && rm->CanReadFile(openFileName) &&
-        this->OpenWithReader(openFileName, rm, 0) == VTK_OK )
+        this->OpenWithReader(openFileName, rm) == VTK_OK )
       {
       if ( store )
         {
-        this->AddRecentFile(NULL, openFileName, this, "Open");
+        ostrstream str;
+        str << "OpenCustom \"" << rm->GetModuleName() << "\"" <<ends;
+        this->AddRecentFile(NULL, openFileName, this, str.str());
+        str.rdbuf()->freeze(0);
         }
       it->Delete();
       return VTK_OK;
@@ -2000,7 +2003,7 @@ int vtkPVWindow::Open(char *openFileName, int store)
       {
       vtkPVSelectCustomReader* dialog = vtkPVSelectCustomReader::New();
       vtkPVReaderModule* reader = dialog->SelectReader(this, openFileName);
-      if ( !reader || this->OpenWithReader(openFileName, reader, 1) != VTK_OK )
+      if ( !reader || this->OpenWithReader(openFileName, reader) != VTK_OK )
         {
         ostrstream error;
         error << "Can not open file " << openFileName << " for reading." << ends;
@@ -2014,7 +2017,14 @@ int vtkPVWindow::Open(char *openFileName, int store)
           {
           vtkErrorMacro(<<error);
           }
-        }      
+        }
+      else if ( store )
+        {
+        ostrstream str;
+        str << "OpenCustom \"" << reader->GetModuleName() << "\"" <<ends;
+        this->AddRecentFile(NULL, openFileName, this, str.str());
+        str.rdbuf()->freeze(0);
+        }
       // Cleanup
       dialog->Delete();
       }    
@@ -2029,46 +2039,82 @@ int vtkPVWindow::Open(char *openFileName, int store)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVWindow::OpenWithReader(const char *fileName, vtkPVReaderModule* reader,
-                                int custom)
+vtkPVReaderModule* vtkPVWindow::InitializeReadCustom(const char* proto,
+                                                     const char* fileName)
 {
-  if (!custom)
+  if ( !proto || vtkString::Length(proto) == 0 || 
+       !fileName || vtkString::Length(fileName) == 0 )
     {
-    this->GetPVApplication()->AddTraceEntry("$kw(%s) Open \"%s\"", 
-                                            this->GetTclName(), fileName);
-    }
-  else
-    {
-    this->GetPVApplication()->AddTraceEntry("$kw(%s) OpenCustom \"%s\" \"%s\"", 
-                                            this->GetTclName(), 
-                                            reader->GetLabel(),
-                                            fileName);
+    return 0;
     }
 
-  vtkPVReaderModule* clone = 0;
-  // Read the file. On success this will return a new source.
-  // Add that source to the list of sources.
-  if (reader->ReadFile(fileName, clone) == VTK_OK && clone)
+  vtkLinkedListIterator<vtkPVReaderModule*>* it = 
+    this->ReaderList->NewIterator();
+  while(!it->IsDoneWithTraversal())
     {
-    this->AddPVSource("Sources", clone);
-    if (clone->GetAcceptAfterRead())
+    vtkPVReaderModule* rm = 0;
+    int retVal = it->GetData(rm);
+    if (retVal == VTK_OK && rm && vtkString::Equals(rm->GetModuleName(), proto))
       {
-      clone->Accept(0);
+      it->Delete();
+      return this->InitializeRead(rm, fileName);
       }
-    clone->Delete();
-    if ( custom )
-      {
-      ostrstream str;
-      str << "OpenCustom \"" << reader->GetLabel() << "\"" <<ends;
-      this->AddRecentFile(NULL, fileName, this, str.str());
-      str.rdbuf()->freeze(0);
-      }
-    else
-      {
-      this->AddRecentFile(NULL, fileName, this, "Open");
-      }
+    it->GoToNextItem();
     }
-  return VTK_OK;
+  it->Delete();
+  return 0;
+
+}
+
+//----------------------------------------------------------------------------
+// N.B. The order in which the traces are added should not be changed.
+// The custom reader modules rely on this order to add their own traces
+// correctly.
+vtkPVReaderModule* vtkPVWindow::InitializeRead(vtkPVReaderModule* proto,
+                                               const char *fileName)
+{
+  vtkPVReaderModule* clone = 0;
+  if (proto->Initialize(fileName, clone) != VTK_OK)
+    {
+    return 0;
+    }
+  this->GetPVApplication()->AddTraceEntry(
+    "set kw(%s) [$kw(%s) InitializeReadCustom \"%s\" \"%s\"]", 
+    clone->GetTclName(), this->GetTclName(), proto->GetModuleName(), fileName);
+
+  return clone;
+}
+
+//----------------------------------------------------------------------------
+// N.B. The order in which the traces are added should not be changed.
+// The custom reader modules rely on this order to add their own traces
+// correctly.
+int vtkPVWindow::ReadFileInformation(vtkPVReaderModule* clone,
+                                     const char *fileName)
+{
+  int retVal = clone->ReadFileInformation(fileName);
+
+  if (retVal == VTK_OK)
+    {
+    this->GetPVApplication()->AddTraceEntry(
+      "$kw(%s) ReadFileInformation $kw(%s) \"%s\"", 
+      this->GetTclName(), clone->GetTclName(), fileName);
+    }
+
+  return retVal;
+}
+
+//----------------------------------------------------------------------------
+// N.B. The order in which the traces are added should not be changed.
+// The custom reader modules rely on this order to add their own traces
+// correctly.
+int vtkPVWindow::FinalizeRead(vtkPVReaderModule* clone, const char *fileName)
+{
+  this->GetPVApplication()->AddTraceEntry(
+    "$kw(%s) FinalizeRead $kw(%s) \"%s\"", 
+    this->GetTclName(), clone->GetTclName(), fileName);
+
+  return clone->Finalize(fileName);
 }
 
 //----------------------------------------------------------------------------
@@ -2085,8 +2131,9 @@ int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
     {
     vtkPVReaderModule* rm = 0;
     int retVal = it->GetData(rm);
-    if (retVal == VTK_OK && rm && vtkString::Equals(rm->GetLabel(), reader) &&
-        this->OpenWithReader(filename, rm, 1) == VTK_OK )
+    if (retVal == VTK_OK && rm && 
+        vtkString::Equals(rm->GetModuleName(), reader) &&
+        this->OpenWithReader(filename, rm) == VTK_OK )
       {
       it->Delete();
       return VTK_OK;
@@ -2095,6 +2142,30 @@ int vtkPVWindow::OpenCustom(const char* reader, const char* filename)
     }
   it->Delete();
   return VTK_ERROR;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVWindow::OpenWithReader(const char *fileName, 
+                                vtkPVReaderModule* reader)
+{
+  vtkPVReaderModule* clone = this->InitializeRead(reader, fileName);
+  if (!clone)
+    {
+    return VTK_ERROR;
+    }
+  int retVal;
+  retVal = this->ReadFileInformation(clone, fileName);
+  if (retVal != VTK_OK)
+    {
+    return retVal;
+    }
+  retVal = this->FinalizeRead(clone, fileName);
+  if (retVal != VTK_OK)
+    {
+    return retVal;
+    }
+  return VTK_OK;
+
 }
 
 //----------------------------------------------------------------------------
@@ -3875,7 +3946,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.400 $");
+  this->ExtractRevision(os,"$Revision: 1.401 $");
 }
 
 //----------------------------------------------------------------------------

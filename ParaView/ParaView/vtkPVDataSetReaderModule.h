@@ -64,7 +64,7 @@ public:
   virtual void InitializePrototype();
 
   // Description:
-  virtual int ReadFile(const char* fname, vtkPVReaderModule*& prm);
+  virtual int Initialize(const char* fname, vtkPVReaderModule*& prm);
 
 protected:
   vtkPVDataSetReaderModule();

@@ -246,11 +246,29 @@ public:
   // Description:
   // Open a data file. Does not prompt the user. Returns VTK_OK on
   // success and VTK_ERROR on failure. Set store to 1 to store to the
-  // recently used files list.
+  // recently used files list. The reader modules are given the
+  // filename and asked if they can read the file, the first module
+  // capable of reading is given the task.
   int Open(char *fileName, int store);
   int Open(char *fileName) { return this->Open(fileName, 0); }
-  int OpenWithReader(const char *fileName, vtkPVReaderModule* reader, int custom);
+
+  // Description:
+  // Open a data file give a filename and a reader module. Unlike
+  // Open(), OpenCustom() does not use CanReadFile() to determine
+  // which module can open the file. Instead, the first module which
+  // matches the name "reader" gets to open the file.
   int OpenCustom(const char* reader, const char* filename);
+
+  // Description:
+  // Used mainly by the scripting interface, these three methods are
+  // normally called in order during the file opening process. Given
+  // the reader module name, InitializeReadCustom() returns a clone
+  // which can be passed to ReadFileInformation() and FinalizeRead()
+  // to finish the reading process.
+  vtkPVReaderModule* InitializeReadCustom(const char* reader, 
+                                          const char* fileName);
+  int FinalizeRead       (vtkPVReaderModule* clone, const char *fileName);
+  int ReadFileInformation(vtkPVReaderModule* clone, const char *fileName);
 
   // Description:
   // Play the demo.
@@ -487,6 +505,10 @@ protected:
   virtual void SerializeToken(istream& is, const char token[1024]);
 
   virtual void AddPreferencesProperties();
+
+  int OpenWithReader(const char *fileName, vtkPVReaderModule* reader);
+  vtkPVReaderModule* InitializeRead(vtkPVReaderModule* proto, 
+                                    const char *fileName);
 
   vtkKWLabeledFrame *ToolbarSettingsFrame;
   vtkKWCheckButton  *ToolbarSettingsFlatFrameCheck;

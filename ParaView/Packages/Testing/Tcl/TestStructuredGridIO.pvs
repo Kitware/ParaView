@@ -21,7 +21,7 @@ $kw(vtkTemp1) SetUseMessageDialog 0
 $kw(vtkTemp1) OpenPackage "$DataDir/Data/vtkAltIOPackage.xml"
 
 # Open a structured grid data set.
-$kw(vtkTemp1) OpenCustom "PLOT3D Files" "$DataDir/Data/combxyz.bin"
+$kw(vtkTemp1) OpenCustom "P3DReader" "$DataDir/Data/combxyz.bin"
 set kw(vtkTemp292) [$kw(vtkTemp1) GetCurrentPVSource]
 set kw(vtkTemp305) [$kw(vtkTemp292) GetPVWidget {QFileName}]
 $kw(vtkTemp305) SetValue "$DataDir/Data/combq.bin"

@@ -40,17 +40,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVReaderModule.h"
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVFileEntry.h"
+
 #include "vtkKWFrame.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVFileEntry.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.16");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.17");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -178,7 +180,7 @@ const char* vtkPVReaderModule::ExtractExtension(const char* fname)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
+int vtkPVReaderModule::Initialize(const char* fname, vtkPVReaderModule*& clone)
 {
   clone = 0;
   if (this->ClonePrototype(1, clone) != VTK_OK)
@@ -188,34 +190,57 @@ int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
     clone = 0;
     return VTK_ERROR;
     }
-  this->Script("%s Set%s {%s}", clone->GetVTKSourceTclName(), 
-               clone->FileEntry->GetVariableName(), fname);
+}
 
-  const char* ext = this->ExtractExtension(fname);
-  if (ext)
+//----------------------------------------------------------------------------
+int vtkPVReaderModule::ReadFileInformation(const char* fname)
+{
+  if (this->FileEntry)
     {
-    clone->FileEntry->SetExtension(ext+1);
-    }
-  clone->UpdateParameterWidgets();
-
-  if (clone)
-    {
-    const char* desc = this->RemovePath(fname);
-    if (desc)
+    this->Script("%s Set%s {%s}", this->GetVTKSourceTclName(), 
+                 this->FileEntry->GetVariableName(), fname);
+    
+    const char* ext = this->ExtractExtension(fname);
+    if (ext)
       {
-      clone->SetLabelNoTrace(desc);
+      this->FileEntry->SetExtension(ext+1);
       }
-    if (clone->GetTraceInitialized() == 0)
-      { 
-      vtkPVApplication* pvApp=this->GetPVApplication();
-      pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetCurrentPVSource]", 
-                           clone->GetTclName(), 
-                           pvApp->GetMainWindow()->GetTclName());
-      clone->SetTraceInitialized(1);
-      }
+    }
+
+  const char* desc = this->RemovePath(fname);
+  if (desc)
+    {
+    this->SetLabelNoTrace(desc);
     }
 
   return VTK_OK;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVReaderModule::FinalizeInternal(const char* fname, 
+                                        int accept)
+{
+  vtkPVWindow* window = this->GetPVApplication()->GetMainWindow();
+  window->AddPVSource("Sources", this);
+  this->Delete();
+
+  if (this->GetTraceInitialized() == 0)
+    { 
+    vtkPVApplication* pvApp=this->GetPVApplication();
+    this->SetTraceInitialized(1);
+    }
+  this->GetPVWindow()->GetMainView()->UpdateNavigationWindow(this, 1);
+  if (accept)
+    {
+    this->Accept(0);
+    }
+  return VTK_OK;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVReaderModule::Finalize(const char* fname)
+{
+  return this->FinalizeInternal(fname, 1);
 }
 
 //----------------------------------------------------------------------------

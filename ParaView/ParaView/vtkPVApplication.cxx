@@ -104,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.165");
+vtkCxxRevisionMacro(vtkPVApplication, "1.166");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -268,7 +268,7 @@ vtkPVApplication::vtkPVApplication()
   this->ProcessModule = NULL;
   this->CommandFunction = vtkPVApplicationCommand;
   this->MajorVersion = 0;
-  this->MinorVersion = 6;
+  this->MinorVersion = 7;
   this->SetApplicationName("ParaView");
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);

@@ -25,7 +25,7 @@ $pv(vtkTemp43) SetBackgroundColor 0 0 0
 #change to rotate camera interactor style
 $pvWindow ChangeInteractorStyle 1
 
-$pvWindow OpenCustom "PLOT3D Files" "$DataDir/Data/combxyz.bin"
+$pvWindow OpenCustom "P3DReader" "$DataDir/Data/combxyz.bin"
 set kw(vtkTemp292) [$pvWindow GetCurrentPVSource]
 set kw(vtkTemp305) [$kw(vtkTemp292) GetPVWidget {QFileName}]
 $kw(vtkTemp305) SetValue "$DataDir/Data/combq.bin"

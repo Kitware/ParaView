@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.6");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -70,8 +70,8 @@ vtkPVAdvancedReaderModule::~vtkPVAdvancedReaderModule()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVAdvancedReaderModule::ReadFile(const char* fname, 
-                                        vtkPVReaderModule*& clone)
+int vtkPVAdvancedReaderModule::Initialize(const char* fname, 
+                                          vtkPVReaderModule*& clone)
 {
   // If the reader has as an output vtkDataSet or vtkPointSet, then we
   // should fix it, but just for the clone process. After the clone
@@ -81,10 +81,9 @@ int vtkPVAdvancedReaderModule::ReadFile(const char* fname,
   if ( ispointsetreader || isdatasetreader )
     {
     char* res = vtkString::Duplicate(
-      this->Script("%s vtkPVAdvancedReaderModuleTemporaryVariable", 
-                   this->SourceClassName));
+      this->Script("%s PVAdvancedReaderTempVar", this->SourceClassName));
 
-    // Change the hardcoded "FileName" to something more elaborated
+    // TODO: Change the hardcoded "FileName" to something more elaborate
     this->Script("%s Set%s %s", res, "FileName", fname);
     this->Script("%s UpdateInformation", res);
     this->SetOutputClassName(this->Script("[ %s GetOutput ] GetClassName", res));
@@ -92,7 +91,7 @@ int vtkPVAdvancedReaderModule::ReadFile(const char* fname,
     delete[] res;
     }
 
-  int retVal = this->Superclass::ReadFile(fname, clone);
+  int retVal = this->Superclass::Initialize(fname, clone);
 
   // If the reader was dataset or pointset reader, then modify the
   // default output class name back to whatever it was before.
@@ -110,12 +109,23 @@ int vtkPVAdvancedReaderModule::ReadFile(const char* fname,
     return retVal;
     }
 
+}
+
+//----------------------------------------------------------------------------
+int vtkPVAdvancedReaderModule::ReadFileInformation(const char* fname)
+{
+  int retVal =  this->Superclass::ReadFileInformation(fname);
+  if (retVal != VTK_OK)
+    {
+    return retVal;
+    }
+
   this->Script("%s UpdateInformation", 
-               clone->GetPVOutput()->GetVTKDataTclName());
+               this->GetPVOutput()->GetVTKDataTclName());
 
   // We called UpdateInformation, we need to update the widgets.
   vtkPVWidget *pvw;
-  vtkPVWidgetCollection* widgets = clone->GetWidgets();
+  vtkPVWidgetCollection* widgets = this->GetWidgets();
   if (widgets)
     {
     widgets->InitTraversal();
@@ -124,12 +134,17 @@ int vtkPVAdvancedReaderModule::ReadFile(const char* fname,
       pvw = widgets->GetNextPVWidget();
       pvw->ModifiedCallback();
       }
-    clone->UpdateParameterWidgets();
+    this->UpdateParameterWidgets();
     }
-
+    
   return VTK_OK;
 }
 
+//----------------------------------------------------------------------------
+int vtkPVAdvancedReaderModule::Finalize(const char* fname)
+{
+  return this->FinalizeInternal(fname, 0);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVAdvancedReaderModule::PrintSelf(ostream& os, vtkIndent indent)

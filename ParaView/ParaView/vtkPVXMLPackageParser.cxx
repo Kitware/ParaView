@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.17");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.18");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -508,6 +508,10 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     }
   
   const char* name = me->GetAttribute("name");
+  if (name)
+    {
+    pvm->SetModuleName(name);
+    }
 
   const char* button_image = me->GetAttribute("button_image");
   if(name && button_image) 

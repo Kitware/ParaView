@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // added to the list of existing sources.
 //
 // .SECTION See also
-// vtkPVAdvancedReaderModule vtkPVEnSightReaderModule
+// vtkPVAdvancedReaderModule vtkPVEnSightReaderModule vtkPVPLOT3DReaderModule
 
 #ifndef __vtkPVReaderModule_h
 #define __vtkPVReaderModule_h
@@ -85,12 +85,16 @@ public:
   virtual int CanReadFile(const char* fname);
 
   // Description:
-  // Tries to read a given file. Return VTK_OK on success, VTK_ERROR
-  // on failure. A new instance of a reader module (which contains the 
-  // actual VTK reader to be used) is returned. This should be called
-  // only on a prototype. (This method replaces ClonePrototype defined
-  // in superclass).
-  virtual int ReadFile(const char* fname, vtkPVReaderModule*& newModule);
+  // Used mainly by the scripting interface, these three methods are
+  // normally called in order during the file opening process. 
+  // InitializeReadCustom() (invoked on the prototype) returns a clone.
+  // ReadFileInformation() and FinalizeRead() are then invoked on
+  // the clone to finish the reading process. These methods can be
+  // changed by custom subclasses which require special handling of
+  // ParaView traces.
+  virtual int Initialize(const char* fname, vtkPVReaderModule*& newModule);
+  virtual int Finalize  (const char* fname);
+  virtual int ReadFileInformation(const char* fname);
 
   // Description:
   // Add extension recognized by the reader. This is displayed in the
@@ -138,6 +142,9 @@ protected:
 
   vtkPVFileEntry* FileEntry;
   int AcceptAfterRead;
+
+  virtual int FinalizeInternal(const char* fname, 
+                               int accept);
 
 //BTX
   vtkVector<const char*>* Extensions;
