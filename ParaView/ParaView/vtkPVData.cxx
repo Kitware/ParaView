@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.170");
+vtkCxxRevisionMacro(vtkPVData, "1.171");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2626,17 +2626,13 @@ void vtkPVData::SetPointSize(int size)
     {
     return;
     }
+  // The following call with trigger the ChangePointSize callback (below)
+  // but won't add a trace entry. Let's do it. A trace entry is also
+  // added by the ChangePointSizeEndCallback but this callback is only
+  // called when the interaction on the scale is stopped.
   this->PointSizeScale->SetValue(size);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::SetLineWidth(int width)
-{
-  if ( this->LineWidthScale->GetValue() == width )
-    {
-    return;
-    }
-  this->LineWidthScale->SetValue(width);
+  this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
+                      (int)(this->PointSizeScale->GetValue()));
 }
 
 //----------------------------------------------------------------------------
@@ -2664,6 +2660,22 @@ void vtkPVData::ChangePointSizeEndCallback()
   this->AddTraceEntry("$kw(%s) SetPointSize %d", this->GetTclName(),
                       (int)(this->PointSizeScale->GetValue()));
 } 
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetLineWidth(int width)
+{
+  if ( this->LineWidthScale->GetValue() == width )
+    {
+    return;
+    }
+  // The following call with trigger the ChangeLineWidth callback (below)
+  // but won't add a trace entry. Let's do it. A trace entry is also
+  // added by the ChangeLineWidthEndCallback but this callback is only
+  // called when the interaction on the scale is stopped.
+  this->LineWidthScale->SetValue(width);
+  this->AddTraceEntry("$kw(%s) SetLineWidth %d", this->GetTclName(),
+                      (int)(this->LineWidthScale->GetValue()));
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::ChangeLineWidth()
@@ -3015,7 +3027,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.170 $");
+  this->ExtractRevision(os,"$Revision: 1.171 $");
 }
 
 //----------------------------------------------------------------------------
