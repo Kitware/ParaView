@@ -62,7 +62,7 @@ vtkPVDataSetToDataSetFilter* vtkPVDataSetToDataSetFilter::New()
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::SetOutput(vtkPVPolyData *pvd)
+void vtkPVDataSetToDataSetFilter::SetOutput(vtkPVData *pvd)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
@@ -71,32 +71,10 @@ void vtkPVDataSetToDataSetFilter::SetOutput(vtkPVPolyData *pvd)
 			   pvd->GetTclName());
     }
   
-  this->SetPVData(pvd);
-  pvd->SetPolyData(this->Filter->GetPolyDataOutput());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::SetOutput(vtkPVImage *pvd)
-{
-  vtkDataSet *ds;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutput %s", this->GetTclName(), 
-			   pvd->GetTclName());
-    }
-  
+  // This is just for reference counting now.
   this->SetPVData(pvd);
   
-  ds = this->Filter->GetOutput();
-  if ( ! ds->IsA("vtkImageData") )
-    {
-    vtkErrorMacro("Expecting an image.");
-    return;
-    }
-  
-  pvd->SetImageData((vtkImageData*)ds);
+  pvd->SetData(this->Filter->GetOutput());
 }
 
 //----------------------------------------------------------------------------
@@ -140,12 +118,12 @@ void vtkPVDataSetToDataSetFilter::InitializeData()
   // Right now, this only deals with polydata.  This needs to be changed.
 
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVPolyData *newData;
+  vtkPVData *newData;
   vtkPVAssignment *a;
   vtkPVWindow *window = this->GetWindow();
   vtkPVActorComposite *ac;
 
-  newData = vtkPVPolyData::New();
+  newData = this->GetInput()->MakeObject();
   newData->Clone(pvApp);
   this->SetOutput(newData);
   a = this->GetInput()->GetAssignment();
@@ -154,6 +132,8 @@ void vtkPVDataSetToDataSetFilter::InitializeData()
   this->CreateDataPage();
   ac = this->GetPVData()->GetActorComposite();
   window->GetMainView()->AddComposite(ac);
+
+  newData->Delete();
 }
 
 //----------------------------------------------------------------------------

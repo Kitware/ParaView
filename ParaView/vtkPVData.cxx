@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkPVContourFilter.h"
 #include "vtkPVElevationFilter.h"
+#include "vtkPVColorByProcess.h"
 #include "vtkPVAssignment.h"
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
@@ -137,8 +138,6 @@ int vtkPVData::Create(char *args)
   this->FiltersMenuButton->SetButtonText("Filters");
   this->FiltersMenuButton->AddCommand("vtkContourFilter", this,
 				      "Contour");
-  this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
-				      "Elevation");
   if (this->Data->GetPointData()->GetScalars() == NULL)
     {
     this->Script("%s entryconfigure 3 -state disabled",
@@ -150,6 +149,10 @@ int vtkPVData::Create(char *args)
 		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
     }
   
+  this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
+				      "Elevation");
+  this->FiltersMenuButton->AddCommand("vtkColorByProcess", this,
+				      "ColorByProcess");
   this->Script("pack %s", this->FiltersMenuButton->GetWidgetName());
 
   return 1;
@@ -216,24 +219,160 @@ void vtkPVData::Elevation()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::ColorByProcess()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVColorByProcess *pvFilter;
+  
+  pvFilter = vtkPVColorByProcess::New();
+  pvFilter->Clone(pvApp);
+  
+  pvFilter->SetInput(this);
+  
+  this->GetPVSource()->GetView()->AddComposite(pvFilter);
+  pvFilter->SetName("color by process");
+  
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  
+  window->SetCurrentSource(pvFilter);
+  window->GetSourceList()->Update();
+  
+  pvFilter->Delete();
+}
+
+
+//----------------------------------------------------------------------------
 vtkProp* vtkPVData::GetProp()
 {
   return this->Actor;
 }
 
 //----------------------------------------------------------------------------
+// This is a bit more complicated than you would expect, because I have to 
+// handle the case when some processes have empty pieces.
 void vtkPVData::GetBounds(float bounds[6])
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
+  vtkMultiProcessController *controller = pvApp->GetController();
+  float tmp[6];
+  float id, num, emptyFlag;
+  
+  // Just some error checking.
+  if (controller->GetLocalProcessId() != 0)
+    {
+    vtkErrorMacro("This method should only be called from processes 0");
+    return;
+    }
+  
+  if (this->Data == NULL)
+    {
+    bounds[0] = bounds[1] = bounds[2] = 0.0;
+    bounds[3] = bounds[4] = bounds[5] = 0.0;
+    }
+  
   pvApp->BroadcastScript("%s TransmitBounds", this->GetTclName());
-  // ...
-
+  
+  if (this->Assignment == NULL)
+    {
+    vtkWarningMacro("Cannot update without Assignment.");
+    }
+  else
+    {
+    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
+				this->Assignment->GetNumberOfPieces());
+    this->Data->Update();
+    }
+  
+  if (this->Data->GetNumberOfCells() > 0)
+    {
+    this->Data->GetBounds(bounds);
+    emptyFlag = 0;
+    }
+  else
+    {
+    emptyFlag = 1;
+    }
+  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    if (emptyFlag)
+      {      
+      controller->Receive(&emptyFlag, 1, id, 993);
+      controller->Receive(bounds, 6, id, 994);
+      }
+    else
+      {
+      controller->Receive(&emptyFlag, 1, id, 993);
+      controller->Receive(tmp, 6, id, 994);
+      if ( ! emptyFlag )
+	{
+	if (tmp[0] < bounds[0])
+	  {
+	  bounds[0] = tmp[0];
+	  }
+	if (tmp[1] > bounds[1])
+	  {
+	  bounds[1] = tmp[1];
+	  }
+	if (tmp[2] < bounds[2])
+	  {
+	  bounds[2] = tmp[2];
+	  }
+	if (tmp[3] > bounds[3])
+	  {
+	  bounds[3] = tmp[3];
+	  }
+	if (tmp[4] < bounds[4])
+	  {
+	  bounds[4] = tmp[4];
+	  }
+	if (tmp[5] > bounds[5])
+	  {
+	  bounds[5] = tmp[5];
+	  }
+	}
+      // emptyFlag was 1 before this block. Restore it.
+      emptyFlag = 1;
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::TransmitBounds()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  float bounds[6];
+  float emptyFlag;
+  
+  // Try to update data.
+  if (this->Assignment == NULL)
+    {
+    vtkWarningMacro("Cannot update without Assignment.");
+    }
+  else
+    {
+    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
+				this->Assignment->GetNumberOfPieces());
+    this->Data->Update();
+    }
+  
+
+  if (this->Data == NULL || this->Data->GetNumberOfCells())
+    {
+    emptyFlag = 1;
+    bounds[0] = bounds[1] = bounds[2] = 0.0;
+    bounds[3] = bounds[4] = bounds[5] = 0.0;
+    }
+  else
+    {
+    this->Data->GetBounds(bounds);
+    emptyFlag = 0;
+    }
+  
+  controller->Send(&emptyFlag, 1, 0, 993);
+  controller->Send(bounds, 6, 0, 994);  
 }
 
 //----------------------------------------------------------------------------

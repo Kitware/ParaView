@@ -49,8 +49,7 @@ public:
   // the object creation/tcl-names in the other processes.  Do not try to
   // set the output before the input has been set.
   // This methods gets called in all processes.
-  void SetOutput(vtkPVPolyData *pvd);
-  void SetOutput(vtkPVImage *pvd);
+  void SetOutput(vtkPVData *pvd);
   vtkPVData *GetOutput();
   vtkPVPolyData *GetPVPolyDataOutput();
   vtkPVImage *GetPVImageOutput();
@@ -74,6 +73,7 @@ protected:
   // This method is called the first time the accept button is pressed.
   // It creates the pvData object, and the actor composite for display.
   void InitializeData();
+  
   
   // Description:
   // A convenience method for setting the filter.

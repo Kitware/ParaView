@@ -45,7 +45,13 @@ extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 {
   Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc,argv);
-  Vtktkrenderwidget_Init(interp);
+  
+  // Why is this here?  Doesn't the superclass initialize this?
+  if (vtkKWApplication::WidgetVisibility)
+    {
+    Vtktkrenderwidget_Init(interp);
+    }
+  
   Vtkkwparaviewtcl_Init(interp);
   
   return interp;

@@ -28,7 +28,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVShrinkPolyData.h"
-#include "vtkPVColorByProcess.h"
 #include "vtkPVConeSource.h"
 #include "vtkPVGlyph3D.h"
 #include "vtkKWView.h"
@@ -113,28 +112,6 @@ void vtkPVPolyData::Glyph()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPolyData::ColorByProcess()
-{
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVColorByProcess *pvFilter;
-  
-  pvFilter = vtkPVColorByProcess::New();
-  pvFilter->Clone(pvApp);
-  
-  pvFilter->SetInput(this);
-  
-  this->GetPVSource()->GetView()->AddComposite(pvFilter);
-  pvFilter->SetName("color by process");
-  
-  vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  
-  window->SetCurrentSource(pvFilter);
-  window->GetSourceList()->Update();
-  
-  pvFilter->Delete();
-}
-
-//----------------------------------------------------------------------------
 int vtkPVPolyData::Create(char *args)
 {
   if (this->vtkPVData::Create(args) == 0)
@@ -144,8 +121,6 @@ int vtkPVPolyData::Create(char *args)
   
   this->FiltersMenuButton->AddCommand("vtkShrinkPolyData", this,
 				      "Shrink");
-  this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
-				      "Elevation");
   this->FiltersMenuButton->AddCommand("vtkGlyph3D", this,
 				      "Glyph");
 
@@ -153,14 +128,22 @@ int vtkPVPolyData::Create(char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPolyData::SetPolyData(vtkPolyData *data)
+void vtkPVPolyData::SetData(vtkDataSet *data)
 {
-  this->SetData(data);
-  this->Mapper->SetInput(data);
+  vtkPolyData *polyData = vtkPolyData::SafeDownCast(data);
+  
+  if (data != NULL && polyData == NULL)
+    {
+    vtkErrorMacro("Expecting a polydata object");
+    return;
+    }
+  
+  this->vtkPVData::SetData(polyData);
+  this->Mapper->SetInput(polyData);
   this->Actor->SetMapper(this->Mapper);
   
   this->ActorComposite->SetApplication(this->Application);
-  this->ActorComposite->SetInput(data);
+  this->ActorComposite->SetInput(polyData);
 }
 
 //----------------------------------------------------------------------------

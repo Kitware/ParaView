@@ -148,7 +148,7 @@ void vtkPVGlyph3D::SetOutput(vtkPVPolyData *pvd)
     }  
   
   this->SetPVData(pvd);  
-  pvd->SetPolyData(this->Glyph->GetOutput());
+  pvd->SetData(this->Glyph->GetOutput());
 }
 
 //----------------------------------------------------------------------------

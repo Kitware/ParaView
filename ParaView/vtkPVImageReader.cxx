@@ -183,7 +183,7 @@ void vtkPVImageReader::SetOutput(vtkPVImage *pvi)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   this->SetPVData(pvi);
-  pvi->SetImageData(this->ImageReader->GetOutput());
+  pvi->SetData(this->ImageReader->GetOutput());
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {

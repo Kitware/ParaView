@@ -95,7 +95,7 @@ void vtkPVColorByProcess::CreateProperties()
   this->Script("pack %s", this->SourceButton->GetWidgetName());
   
   this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "ElevationParameterChanged");
+  this->Accept->SetCommand(this, "ParameterChanged");
   this->Script("pack %s", this->Accept->GetWidgetName());
 }
 

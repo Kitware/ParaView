@@ -125,7 +125,7 @@ void vtkPVSphereSource::SetOutput(vtkPVPolyData *pd)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   this->SetPVData(pd);  
-  pd->SetPolyData(this->SphereSource->GetOutput());
+  pd->SetData(this->SphereSource->GetOutput());
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {

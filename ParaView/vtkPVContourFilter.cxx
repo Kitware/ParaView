@@ -127,7 +127,7 @@ void vtkPVContourFilter::SetOutput(vtkPVPolyData *pvd)
     }  
   
   this->SetPVData(pvd);  
-  pvd->SetPolyData(this->Contour->GetOutput());
+  pvd->SetData(this->Contour->GetOutput());
 }
 
 //----------------------------------------------------------------------------

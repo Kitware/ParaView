@@ -105,7 +105,7 @@ void vtkPVShrinkPolyData::SetOutput(vtkPVPolyData *pvd)
     }  
   
   this->SetPVData(pvd);  
-  pvd->SetPolyData(this->Shrink->GetOutput());
+  pvd->SetData(this->Shrink->GetOutput());
 }
 
 //----------------------------------------------------------------------------

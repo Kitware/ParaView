@@ -53,6 +53,12 @@ public:
   vtkTypeMacro(vtkPVImage,vtkKWWidget);
   
   // Description:
+  // Just like in vtk data objects, this method makes a data object
+  // that is of the same type as the original.  It is used for creating
+  // the output pvData in pvDataSetToDataSetFilters.
+  vtkPVData *MakeObject() {return vtkPVImage::New();}
+
+  // Description:
   // You have to clone this object before you create it.
   int Create(char *args);
   
@@ -64,7 +70,9 @@ public:
   vtkGetMacro(OutlineFlag,int);
   vtkBooleanMacro(OutlineFlag,int);
 
-  void SetImageData(vtkImageData *image);
+  // Description:
+  // Through runtime checking, this data must be a vtkImageData.
+  void SetData(vtkDataSet *image);
   vtkImageData *GetImageData();
   
   void Clip();

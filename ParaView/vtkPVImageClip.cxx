@@ -199,7 +199,7 @@ void vtkPVImageClip::SetOutput(vtkPVImage *pvi)
 {
   this->SetPVData(pvi);
 
-  pvi->SetImageData(this->ImageClip->GetOutput());
+  pvi->SetData(this->ImageClip->GetOutput());
 }
 
 //----------------------------------------------------------------------------

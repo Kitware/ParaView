@@ -125,7 +125,7 @@ void vtkPVConeSource::SetOutput(vtkPVPolyData *pd)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   this->SetPVData(pd);  
-  pd->SetPolyData(this->ConeSource->GetOutput());
+  pd->SetData(this->ConeSource->GetOutput());
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {

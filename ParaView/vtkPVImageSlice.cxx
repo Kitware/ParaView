@@ -351,7 +351,7 @@ void vtkPVImageSlice::SetOutput(vtkPVImage *pvi)
     }  
   
   this->SetPVData(pvi);
-  pvi->SetImageData(this->Slice->GetOutput());
+  pvi->SetData(this->Slice->GetOutput());
 }
 
 //----------------------------------------------------------------------------

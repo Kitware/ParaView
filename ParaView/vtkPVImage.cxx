@@ -166,11 +166,18 @@ int vtkPVImage::Create(char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImage::SetImageData(vtkImageData *image)
+void vtkPVImage::SetData(vtkDataSet *data)
 {
   vtkImageOutlineFilter *outline;
-
-  this->SetData(image);
+  vtkImageData *image = vtkImageData::SafeDownCast(data);
+  
+  if (data != NULL && image == NULL)
+    {
+    vtkErrorMacro("Expecting an image");
+    return;
+    }
+  
+  this->vtkPVData::SetData(data);
   
   if (this->Assignment)
     {

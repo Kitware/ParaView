@@ -46,16 +46,21 @@ public:
   vtkTypeMacro(vtkPVPolyData, vtkKWWidget);
   
   // Description:
+  // Just like in vtk data objects, this method makes a data object
+  // that is of the same type as the original.  It is used for creating
+  // the output pvData in pvDataSetToDataSetFilters.
+  vtkPVData *MakeObject() {return vtkPVPolyData::New();}
+
+  // Description:
   // You have to clone this object before you create it.
   int Create(char *args);
 
   // Description:
   // Source uses this method to set the VTK data object.
-  void SetPolyData(vtkPolyData *data);
+  void SetData(vtkDataSet *data);
   vtkPolyData *GetPolyData();
   
   void Shrink();
-  void ColorByProcess();
   void Glyph();
   
 protected:

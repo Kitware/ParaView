@@ -49,6 +49,12 @@ public:
   vtkTypeMacro(vtkPVData, vtkKWWidget);
   
   // Description:
+  // Just like in vtk data objects, this method makes a data object
+  // that is of the same type as the original.  It is used for creating
+  // the output pvData in pvDataSetToDataSetFilters.
+  virtual vtkPVData *MakeObject() {vtkErrorMacro("No MakeObject");}
+  
+  // Description:
   // This duplicates the object in the satellite processes.
   // They will all have the same tcl name.
   void Clone(vtkPVApplication *app);
@@ -74,6 +80,7 @@ public:
   // Description:
   // General filters that can be applied to vtkDataSet.
   void Contour();
+  void ColorByProcess();
   void Elevation();
 
   // Description:
@@ -107,6 +114,12 @@ public:
   // A Helper method for GetBounds that needs to be wrapped.
   // Do not call this method directly.
   void TransmitBounds();
+
+  // Description:
+  // This is for setting up the links between VTK objects and PV object.
+  // Subclasses overide this method so that they can create special
+  // mappers for the actor composites.  The user should not call this method.
+  vtkSetObjectMacro(Data, vtkDataSet);  
   
 protected:
   vtkPVData();
@@ -115,8 +128,6 @@ protected:
   vtkPVData(const vtkPVData&) {};
   void operator=(const vtkPVData&) {};
   
-  vtkSetObjectMacro(Data, vtkDataSet);
-
   vtkPVMenuButton *FiltersMenuButton;
   vtkDataSet *Data;
   vtkDataSetMapper *Mapper;

@@ -64,10 +64,9 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 
 
 
-// This used to be the fuction that initialized Tcl (not Tk) for the satelite processes.
-// It is not used anymore.  I am keeping it around to remember how I use to intialize
-// Tcl without Tk.  We may need this option in the future.
-void vtkPVSlaveStart(vtkMultiProcessController *controller)
+// The applications Initialize Tcl also initializes Tk and needs a DISPLAY env variable set.
+// This is a temporary solution.
+Tcl_Interp *vtkPVInitializeTcl()
 {
   Tcl_Interp *interp = Tcl_CreateInterp();
 
@@ -108,27 +107,7 @@ void vtkPVSlaveStart(vtkMultiProcessController *controller)
     cerr << "Init KWParaView error\n";
     }
 
-  // Set up the slave object.
-  
-  // We should use the application tcl name in the future.
-  if (Tcl_Eval(interp, "vtkPVApplication Slave") != TCL_OK)
-    {
-    cerr << "Error returned from tcl script.\n" << interp->result << endl;
-    }
-  int    error;
-  vtkPVApplication *slave = (vtkPVApplication *)(vtkTclGetPointerFromObject("Slave","vtkPVApplication",interp,error));
-  //cerr << "Interp: " << interp << " has slave " << slave << endl;
-  
-  if (slave == NULL)
-    {
-    vtkGenericWarningMacro("Could not get slave pointer.");
-    return;
-    }  
-  slave->SetController(controller);
-   
-  controller->AddRMI(vtkPVSlaveScript, (void *)(slave), VTK_PV_SLAVE_SCRIPT_RMI_TAG);  
-  
-  controller->ProcessRMIs();
+  return interp;
 }
 
 
@@ -158,9 +137,12 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   else
     {
     // The slaves try to connect.  In the future, we may not want to initialize Tk.
-    putenv("DISPLAY=:0.0");
+    //putenv("DISPLAY=:0.0");
     //putenv("DISPLAY=www.kitware.com:2.0");
-    Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+    //vtkKWApplication::SetWidgetVisibility(0);
+    //Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+    Tcl_Interp *interp = vtkPVInitializeTcl();
+    
     // We should use the application tcl name in the future.
     // All object in the satellite processes must be created through tcl.
     // (To assign the correct name).
