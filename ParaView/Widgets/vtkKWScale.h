@@ -105,6 +105,7 @@ public:
   void DisplayLabel(const char *l);  
   vtkGetObjectMacro(Label, vtkKWLabel);
   vtkGetObjectMacro(Entry, vtkKWEntry);
+  vtkGetObjectMacro(Scale, vtkKWWidget);
   vtkSetStringMacro(ShortLabel);
   vtkGetStringMacro(ShortLabel);
   

@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.68");
+vtkCxxRevisionMacro(vtkKWScale, "1.69");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1068,6 +1068,7 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Range: " << this->Range[0] << "..." <<  this->Range[1] << endl;
   os << indent << "Label: " << this->Label << endl;
   os << indent << "Entry: " << this->Entry << endl;
+  os << indent << "Scale: " << this->Scale << endl;
   os << indent << "PopupPushButton: " << this->PopupPushButton << endl;
   os << indent << "DisplayEntryAndLabelOnTop: " 
      << (this->DisplayEntryAndLabelOnTop ? "On" : "Off") << endl;
