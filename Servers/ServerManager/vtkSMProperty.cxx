@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.20");
+vtkCxxRevisionMacro(vtkSMProperty, "1.21");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -52,6 +52,7 @@ vtkSMProperty::vtkSMProperty()
   this->Proxy = 0;
   this->InformationOnly = 0;
   this->InformationHelper = 0;
+  this->InformationProperty = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -63,6 +64,7 @@ vtkSMProperty::~vtkSMProperty()
   this->DomainIterator->Delete();
   this->SetProxy(0);
   this->SetInformationHelper(0);
+  this->SetInformationProperty(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -276,6 +278,13 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
     this->SetCommand(command); 
     }
 
+  const char* information_property = 
+    element->GetAttribute("information_property");
+  if(information_property) 
+    { 
+    this->SetInformationProperty(this->NewProperty(information_property));
+    }
+
   int immediate_update;
   int retVal = element->GetScalarAttribute("immediate_update", &immediate_update);
   if(retVal) 
@@ -397,6 +406,7 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InformationOnly:" << this->InformationOnly << endl;
   os << indent << "XMLName:" 
      <<  (this->XMLName ? this->XMLName : "(null)") << endl;
+  os << indent << "InformationProperty: " << this->InformationProperty << endl;
 
   vtkSMSubPropertyIterator* iter = vtkSMSubPropertyIterator::New();
   iter->SetProperty(this);

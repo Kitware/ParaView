@@ -146,6 +146,12 @@ public:
   // get information from server instead of setting values.
   vtkGetMacro(InformationOnly, int);
 
+  // Description:
+  // Get the associated information property. This allows applications
+  // to have access to both the in and out properties. The information
+  // property has to be specified in the xml configuration file.
+  vtkGetObjectMacro(InformationProperty, vtkSMProperty);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -247,6 +253,9 @@ protected:
   int InformationOnly;
 
   vtkSMInformationHelper* InformationHelper;
+
+  vtkSetObjectMacro(InformationProperty, vtkSMProperty);
+  vtkSMProperty* InformationProperty;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented
