@@ -134,10 +134,10 @@ public:
                          const char *title);
   
   // Description:
-  // Show a panel. It will make sure the pages reserved by the manager for 
-  // this panel are shown.
-  // In this concrete implementation, this shows all notebook's pages belonging
-  // to this panel.
+  // Show/Hide a panel. It will make sure the pages reserved by the manager
+  // for this panel are shown/hidden.
+  // In this concrete implementation, this shows/hides all notebook's pages
+  // belonging to this panel.
   // RaisePanel() behaves like ShowPanel(), but it will also try to bring
   // up the first page of the panel to the front (i.e., "select" it).
   // Note that you should use the panel's own API to show a panel: this
@@ -149,6 +149,7 @@ public:
   // panel to be delayed until it is really needed.
   // Return 1 on success, 0 on error.
   virtual int ShowPanel(vtkKWUserInterfacePanel *panel);
+  virtual int HidePanel(vtkKWUserInterfacePanel *panel);
   virtual int RaisePanel(vtkKWUserInterfacePanel *panel);
   
   // Description:

@@ -154,8 +154,8 @@ public:
                          const char *title) = 0;
 
   // Description:
-  // Show a panel. It will make sure the pages reserved by the manager for 
-  // this panel are shown.
+  // Show/Hide a panel. It will make sure the pages reserved by the manager
+  // for this panel are shown/hidden.
   // RaisePanel() behaves like ShowPanel(), but it will also try to bring
   // up the first page of the panel to the front (i.e., "select" it).
   // Note that you should use the panel's own API to show/raise a panel: this
@@ -163,12 +163,14 @@ public:
   // (see vtkKWUserInterfacePanel::Show/Raise()).
   // Return 1 on success, 0 on error.
   virtual int ShowPanel(vtkKWUserInterfacePanel *panel) = 0;
+  virtual int HidePanel(vtkKWUserInterfacePanel *panel) = 0;
   virtual int RaisePanel(vtkKWUserInterfacePanel *panel) 
     { return this->ShowPanel(panel); };
 
   // Description:
-  // Convenience method to show all panels.
+  // Convenience method to show/hide all panels.
   virtual void ShowAllPanels();
+  virtual void HideAllPanels();
 
   // Description:
   // Update a panel according to the manager settings (i.e., it just performs 

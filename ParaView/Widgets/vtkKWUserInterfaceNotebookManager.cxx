@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.15");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.16");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -362,6 +362,43 @@ int vtkKWUserInterfaceNotebookManager::ShowPanel(
   return 1;
 }
 
+//----------------------------------------------------------------------------
+int vtkKWUserInterfaceNotebookManager::HidePanel(
+  vtkKWUserInterfacePanel *panel)
+{
+  if (!this->IsCreated())
+    {
+    vtkErrorMacro("Can not hide pages if the manager has not been created.");
+    return 0;
+    }
+
+  if (!panel)
+    {
+    vtkErrorMacro("Can not hide the pages from a NULL panel.");
+    return 0;
+    }
+  
+  if (!this->HasPanel(panel))
+    {
+    vtkErrorMacro("Can not hide the pages from a panel that is not "
+                  "in the manager.");
+    return 0;
+    }
+
+  // Hide the pages that share the same tag (i.e. the pages that belong to the 
+  // same panel).
+
+  int tag = this->GetPanelId(panel);
+  if (tag < 0)
+    {
+    vtkErrorMacro("Can not access the panel to hide its pages.");
+    return 0;
+    }
+
+  this->Notebook->HidePagesMatchingTag(tag);
+
+  return 1;
+}
 //----------------------------------------------------------------------------
 int vtkKWUserInterfaceNotebookManager::RaisePanel(
   vtkKWUserInterfacePanel *panel)

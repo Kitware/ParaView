@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.11");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.12");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -367,6 +367,25 @@ void vtkKWUserInterfaceManager::ShowAllPanels()
     if (it->GetData(panel_slot) == VTK_OK && panel_slot->Panel)
       {
       this->ShowPanel(panel_slot->Panel);
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceManager::HideAllPanels()
+{
+  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
+  vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
+    this->Panels->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(panel_slot) == VTK_OK && panel_slot->Panel)
+      {
+      this->HidePanel(panel_slot->Panel);
       }
     it->GoToNextItem();
     }
