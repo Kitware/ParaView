@@ -53,9 +53,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkActor2D;
 class vtkKWApplication;
 class vtkKWChangeColorButton;
-class vtkKWCheckButton;
 class vtkKWLabel;
-class vtkKWOptionMenu;
+class vtkKWLabeledCheckButtonSet;
+class vtkKWLabeledOptionMenu;
+class vtkKWLabeledPushButtonSet;
 class vtkKWPushButton;
 class vtkKWScale;
 class vtkTextProperty;
@@ -83,6 +84,13 @@ public:
   // that the vtkActor2D color has to be used instead.
   virtual void SetActor2D(vtkActor2D*);
   vtkGetObjectMacro(Actor2D, vtkActor2D);
+
+  // Description:
+  // Set the widget aspect to be long, i.e. the widgets will be packed on several
+  // rows, with description labels. The default is short (all widgets on a row).
+  void SetLongFormat(int);
+  vtkBooleanMacro(LongFormat, int);
+  vtkGetMacro(LongFormat, int);
 
   // Description:
   // Show label.
@@ -145,7 +153,7 @@ public:
   void SetShowCopy(int);
   vtkBooleanMacro(ShowCopy, int);
   vtkGetMacro(ShowCopy, int);
-  vtkGetObjectMacro(CopyButton, vtkKWPushButton);
+  virtual vtkKWPushButton* GetCopyButton();
 
   // Description:
   // Copy the values from another text widget
@@ -156,16 +164,16 @@ public:
   void SetColor(float, float, float);
   void SetColor(float *v) { this->SetColor(v[0], v[1], v[2]); };
   float* GetColor();
-  void FontFamilyOptionMenuCallback();
+  void FontFamilyCallback();
   void SetFontFamily(int);
-  void BoldCheckButtonCallback();
+  void BoldCallback();
   void SetBold(int);
-  void ItalicCheckButtonCallback();
+  void ItalicCallback();
   void SetItalic(int);
-  void ShadowCheckButtonCallback();
+  void ShadowCallback();
   void SetShadow(int);
-  void OpacityScaleCallback();
-  void OpacityScaleEndCallback();
+  void OpacityCallback();
+  void OpacityEndCallback();
   void SetOpacity(float);
   void SetOpacityNoTrace(float);
   float GetOpacity();
@@ -178,19 +186,23 @@ protected:
   vtkKWTextProperty();
   ~vtkKWTextProperty();
 
+  void Pack();
+
   void UpdateInterface();
   void UpdateLabel();
   void UpdateColorButton();
   void UpdateFontFamilyOptionMenu();
-  void UpdateStylesFrame();
+  void UpdateStylesCheckButtonSet();
   void UpdateBoldCheckButton();
   void UpdateItalicCheckButton();
   void UpdateShadowCheckButton();
   void UpdateOpacityScale();
-  void UpdateCopyButton();
+  void UpdatePushButtonSet();
 
   vtkTextProperty *TextProperty;
   vtkActor2D *Actor2D;
+
+  int LongFormat;
 
   int ShowLabel;
   vtkKWLabel *Label;
@@ -199,28 +211,25 @@ protected:
   vtkKWChangeColorButton *ChangeColorButton;
 
   int ShowFontFamily;
-  vtkKWOptionMenu *FontFamilyOptionMenu;
+  vtkKWLabeledOptionMenu *FontFamilyOptionMenu;
 
   int ShowStyles;
-  vtkKWWidget *StylesFrame;
-  vtkKWCheckButton *BoldCheckButton;
-  vtkKWCheckButton *ItalicCheckButton;
-  vtkKWCheckButton *ShadowCheckButton;
+  vtkKWLabeledCheckButtonSet *StylesCheckButtonSet;
   
   int ShowOpacity;
   vtkKWScale *OpacityScale;
 
   int ShowHorizontalJustification;
-  vtkKWOptionMenu *HorizontalJustificationOptionMenu;
+  vtkKWLabeledOptionMenu *HorizontalJustificationOptionMenu;
 
   int ShowVerticalJustification;
-  vtkKWOptionMenu *VerticalJustificationOptionMenu;
+  vtkKWLabeledOptionMenu *VerticalJustificationOptionMenu;
 
   char *OnChangeCommand;
   char *OnColorChangeCommand;
 
   int ShowCopy;
-  vtkKWPushButton *CopyButton;
+  vtkKWLabeledPushButtonSet *PushButtonSet;
 
 private:
   vtkKWTextProperty(const vtkKWTextProperty&); // Not implemented
