@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.50.2.1");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.50.2.2");
 
 
 
@@ -409,5 +409,7 @@ void vtkKWMessageDialog::PrintSelf(ostream& os, vtkIndent indent)
      << endl;
   os << indent << "TopFrame: " << this->TopFrame << endl;
   os << indent << "BottomFrame: " << this->BottomFrame << endl;
+  os << indent << "OKButton: " << this->OKButton << endl;
+  os << indent << "CancelButton: " << this->CancelButton << endl;
 }
 
