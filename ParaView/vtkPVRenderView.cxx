@@ -307,8 +307,8 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -bg white"); 
   this->Script("pack %s -fill x -expand t -side top", this->NavigationCanvas->GetWidgetName());
 
-  // Application yhas to be set before we can get a tcl name.
-  this->GetPVApplication()->BroadcastScript("%s SetRenderView %s", 
+  // Application has to be set before we can get a tcl name.
+  this->GetPVApplication()->Script("%s SetRenderView %s", 
 					    this->CompositeTclName,
 					    this->GetTclName());
   

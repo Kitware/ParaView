@@ -128,6 +128,8 @@ Tcl_Interp *vtkPVInitializeTcl()
 
 
 
+#include "vtkOutputWindow.h"
+
 
 // Each process starts with this method.  One process is designated as "master" 
 // and starts the application.  The other processes are slaves to the application.
@@ -138,6 +140,8 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
+
+  vtkOutputWindow::GetInstance()->PromptUserOn();
   
   if (myId ==  0)
     { // The last process is for UI.
@@ -171,7 +175,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     // The slaves try to connect.  In the future, we may not want to initialize Tk.
     //putenv("DISPLAY=:0.0");
     //putenv("DISPLAY=www.kitware.com:2.0");
-    
+
     vtkKWApplication::SetWidgetVisibility(0);
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     
@@ -255,7 +259,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
   controller->Initialize(&argc, (char***)(&argv));
-  controller->SetNumberOfProcesses(1);
+  //  controller->SetNumberOfProcesses(1);
 
   pvArgs.argc = argc;
   pvArgs.argv = argv;

@@ -278,27 +278,6 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
 {
   Tcl_Interp *interp;
   
-  if (vtkKWApplication::WidgetVisibility == 0)
-    {
-    interp = Tcl_CreateInterp();
-    // vtkKWApplication depends on this variable being set.
-    Et_Interp = interp;
-    
-    // initialize VTK
-    Vtktcl_Init(interp);
-  
-    if (Tcl_Init(interp) == TCL_ERROR) 
-      {
-      cerr << "Init Tcl error\n";
-      }
-    //if (Vtkkwwidgetstcl_Init(interp) == TCL_ERROR) 
-    //  {
-    //  cerr << "Init KWWidgets error\n";
-    //  }
-
-    return interp;
-    }  
-  
   putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
   putenv("TK_LIBRARY=" ET_TK_LIBRARY);
   
@@ -312,8 +291,11 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
   Vtktcl_Init(interp);
 
   // initialize Widgets
-  Vtkkwwidgetstcl_Init(interp);
-  
+  if (vtkKWApplication::WidgetVisibility)
+    {
+    Vtkkwwidgetstcl_Init(interp);
+    }
+
   return interp;
 }
 

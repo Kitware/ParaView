@@ -53,6 +53,7 @@ extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 {
+
   Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc,argv);
   
   //  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
@@ -65,9 +66,9 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
     {
     Vtktkrenderwidget_Init(interp);
     }
-  
+   
   Vtkkwparaviewtcl_Init(interp);
-  
+ 
   return interp;
 }
 

@@ -423,9 +423,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   button->Delete();
   button = NULL;
 
-  this->GetPVApplication()->BroadcastScript("%s SetInteractor %s",
-                                            this->GetMainView()->GetTclName(),
-                                            this->FlyInteractor->GetTclName());
+  this->Script("%s SetInteractor %s", this->GetMainView()->GetTclName(),
+               this->FlyInteractor->GetTclName());
   
   this->Script( "wm deiconify %s", this->GetWidgetName());  
 }
