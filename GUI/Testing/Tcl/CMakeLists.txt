@@ -1,11 +1,9 @@
 SET(TEST_PATH "ParaView")
 SET(RUN_WITH_MPI 0)
 IF (VTK_USE_MPI)
-  IF (UNIX)
-    IF (VTK_MPIRUN_EXE)
-      SET(RUN_WITH_MPI 1)
-    ENDIF (VTK_MPIRUN_EXE)
-  ENDIF (UNIX)
+  IF (VTK_MPIRUN_EXE)
+    SET(RUN_WITH_MPI 1)
+  ENDIF (VTK_MPIRUN_EXE)
   SEPARATE_ARGUMENTS(VTK_MPI_PREFLAGS)
   SEPARATE_ARGUMENTS(VTK_MPI_POSTFLAGS)
 ENDIF (VTK_USE_MPI)
@@ -87,6 +85,11 @@ IF(RUN_WITH_MPI)
   ENDFOREACH(tfile)
 ENDIF(RUN_WITH_MPI)
 
+SET (PV_MPI_COMMANDS )
+IF(RUN_WITH_MPI)
+# some of the tests crash right now
+#  SET (PV_MPI_COMMANDS "--use-mpi=${VTK_MPIRUN_EXE}")
+ENDIF(RUN_WITH_MPI)
 FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST(${tfile}-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
@@ -104,6 +107,7 @@ FOREACH (tfile ${PROJECT_TESTS})
     -V ${PVClientTestData}/Baseline/${tfile}.png)
   # repeat the test with the client server driver in render server mode
   ADD_TEST("${tfile}RenderServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
+    ${PV_MPI_COMMANDS}
     --test-render-server
     --disable-registry
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
