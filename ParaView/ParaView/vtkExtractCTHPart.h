@@ -55,12 +55,6 @@ public:
   void SetOutput(vtkPolyData* d) { this->SetOutput(0, d); }
 
   // Description:
-  // Turn clipping on or off.  It is off by default.
-  vtkSetMacro(Clipping,int);
-  vtkGetMacro(Clipping,int);
-  vtkBooleanMacro(Clipping,int);
-  
-  // Description:
   // Set, get or maninpulate the implicit clipping plane.
   void SetClipPlane(vtkPlane *clipPlane);
   vtkGetObjectMacro(ClipPlane, vtkPlane);
@@ -81,7 +75,6 @@ protected:
 
   vtkStringList *VolumeArrayNames;
 
-  int Clipping;
   vtkPlane *ClipPlane;
 
 private:

@@ -39,7 +39,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkExtractCTHPart, "1.8");
+vtkCxxRevisionMacro(vtkExtractCTHPart, "1.9");
 vtkStandardNewMacro(vtkExtractCTHPart);
 vtkCxxSetObjectMacro(vtkExtractCTHPart,ClipPlane,vtkPlane);
 
@@ -47,7 +47,6 @@ vtkCxxSetObjectMacro(vtkExtractCTHPart,ClipPlane,vtkPlane);
 vtkExtractCTHPart::vtkExtractCTHPart()
 {
   this->VolumeArrayNames = vtkStringList::New();
-  this->Clipping = 0;
   this->ClipPlane = vtkPlane::New();
   // For consistent references.
   this->ClipPlane->Register(this);
@@ -289,7 +288,7 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
 
   tmp = append1->GetOutput();
   
-  if (this->Clipping && this->ClipPlane)
+  if (this->ClipPlane)
     {
     vtkClipPolyData *clip1, *clip2;
     // We need to append iso and capped surfaces.
@@ -456,22 +455,14 @@ void vtkExtractCTHPart::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "VolumeArrayNames: \n";
   vtkIndent i2 = indent.GetNextIndent();
   this->VolumeArrayNames->PrintSelf(os, i2);
-  if (this->Clipping)
+  if (this->ClipPlane)
     {
-    os << indent << "Clipping: On\n";
-    if (this->ClipPlane)
-      {
-      os << indent << "ClipPlane:\n";
-      this->ClipPlane->PrintSelf(os, indent.GetNextIndent());
-      }
-    else  
-      {
-      os << indent << "ClipPlane: NULL\n";
-      }
+    os << indent << "ClipPlane:\n";
+    this->ClipPlane->PrintSelf(os, indent.GetNextIndent());
     }
   else  
     {
-    os << indent << "Clipping: Off\n";
+    os << indent << "ClipPlane: NULL\n";
     }
 }
 
