@@ -220,6 +220,14 @@ public:
   // Methods called when item chosen from RepresentationMenu
   void SetInterpolationToFlat();
   void SetInterpolationToGouraud();
+
+  // Description:
+  // Get the representation menu.
+  vtkGetObjectMacro(RepresentationMenu, vtkKWOptionMenu);
+
+  // Description:
+  // Get the interpolation menu.
+  vtkGetObjectMacro(InterpolationMenu, vtkKWOptionMenu);
     
   // Description:
   // Callback for the ResetColorRange button.
