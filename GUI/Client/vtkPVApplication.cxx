@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.331");
+vtkCxxRevisionMacro(vtkPVApplication, "1.332");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -416,7 +416,6 @@ vtkPVApplication::vtkPVApplication()
   sprintf(patch, "%d", PARAVIEW_VERSION_PATCH);
   this->SetApplicationReleaseName(patch);
 
-
   this->Display3DWidgets = 0;
 
   this->ProcessModule = NULL;
@@ -451,6 +450,8 @@ vtkPVApplication::vtkPVApplication()
 
 
   this->SMApplication = vtkSMApplication::New();
+
+  this->SaveRuntimeInfoButton = NULL;
 }
 
 //----------------------------------------------------------------------------

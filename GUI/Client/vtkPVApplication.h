@@ -25,6 +25,7 @@ class vtkPVProcessModule;
 
 class vtkDataSet;
 class vtkKWMessageDialog;
+class vtkKWPushButton;
 class vtkMapper;
 class vtkMultiProcessController;
 class vtkSocketController;
@@ -288,12 +289,20 @@ public:
   // Push/Pop deferred garbage collection.
   void DeferredGarbageCollectionPush();
   void DeferredGarbageCollectionPop();
+
+  // Description:
+  // Save to a file the information available in the "About ParaView" dialog.
+  void SaveRuntimeInformation();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
 
   virtual void CreateSplashScreen();
+  virtual void ConfigureAbout();
   virtual void AddAboutText(ostream &);
+
+  vtkKWPushButton *SaveRuntimeInfoButton;
 
   void CreateButtonPhotos();
   void CreatePhoto(const char *name, 

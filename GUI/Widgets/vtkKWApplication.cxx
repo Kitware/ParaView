@@ -61,7 +61,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.180");
+vtkCxxRevisionMacro(vtkKWApplication, "1.181");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1121,7 +1121,7 @@ void vtkKWApplication::ConfigureAbout()
         this->AboutDialog->SetTextWidth(w);
         }
 
-      this->Script("pack %s -side left -padx 2 -expand 1 -fill both",
+      this->Script("pack %s -side top -padx 2 -expand 1 -fill both",
                    this->AboutRuntimeInfo->GetWidgetName());
       this->Script("pack %s -side bottom",  // -expand 1 -fill both
                    this->AboutDialog->GetMessageDialogFrame()->GetWidgetName());

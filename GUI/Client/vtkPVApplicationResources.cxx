@@ -16,12 +16,17 @@
 
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWSplashScreen.h"
+#include "vtkKWText.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWWindow.h"
 
 #include "vtkPNGReader.h"
 #include "vtkPVOptions.h"
+#include "vtkPVWindow.h"
 
 #include <sys/stat.h>
 #include <vtkstd/string>
@@ -417,6 +422,63 @@ void vtkPVApplication::CreateSplashScreen()
     }
   this->SplashScreen->SetProgressMessageVerticalOffset(-17);
   this->SplashScreen->SetImageName("PVSplashScreen");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::ConfigureAbout()
+{
+  this->Superclass::ConfigureAbout();
+
+  if (this->HasSplashScreen && this->SplashScreen)
+    {
+    if (!this->SaveRuntimeInfoButton)
+      {
+      this->SaveRuntimeInfoButton = vtkKWPushButton::New();
+      }
+    if (!this->SaveRuntimeInfoButton->IsCreated())
+      {
+      this->SaveRuntimeInfoButton->SetParent(
+        this->AboutDialog->GetBottomFrame());
+      this->SaveRuntimeInfoButton->SetLabel("Save Information");
+      this->SaveRuntimeInfoButton->Create(this, "-width 16");
+      this->SaveRuntimeInfoButton->SetCommand(this, "SaveRuntimeInformation");
+      }
+    this->Script("pack %s -side bottom",
+                 this->SaveRuntimeInfoButton->GetWidgetName());
+    this->AboutRuntimeInfo->SetHeight(16);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SaveRuntimeInformation()
+{
+  vtkKWWindow *window = this->GetMainWindow();
+  vtkKWLoadSaveDialog *dialog = vtkKWLoadSaveDialog::New();
+  window->RetrieveLastPath(dialog, "RuntimeInformationPath");
+  dialog->SaveDialogOn();
+  dialog->SetParent(this->AboutDialog);
+  dialog->SetTitle("Save Runtime Information");
+  dialog->SetFileTypes("{{text file} {.txt}}");
+  dialog->Create(this, 0);
+
+  if (dialog->Invoke() &&
+      strlen(dialog->GetFileName()) > 0)
+    {
+    const char *filename = dialog->GetFileName();
+    ofstream file;
+    file.open(filename, ios::out);
+    if (file.fail())
+      {
+      vtkErrorMacro("Could not write file " << filename);
+      dialog->Delete();
+      return;
+      }
+    this->AddAboutText(file);
+    file << endl;
+    this->AddAboutCopyrights(file);
+    window->SaveLastPath(dialog, "RuntimeInformationPath");
+    }
+  dialog->Delete();
 }
 
 //----------------------------------------------------------------------------
