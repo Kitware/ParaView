@@ -16,7 +16,11 @@
 #include "vtkImageFlip.h"
 #include "vtkPNGReader.h"
 
-#include <vtk_zlib.h>
+#if ((VTK_MAJOR_VERSION <= 4) && (VTK_MINOR_VERSION <= 4))
+#include "zlib.h" // needed for TIFF
+#else
+#include "vtk_zlib.h" // needed for TIFF
+#endif
 
 #include <sys/stat.h>
 

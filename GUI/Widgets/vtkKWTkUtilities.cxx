@@ -29,11 +29,15 @@
 #endif
 
 #include "vtkTk.h"
-#include "vtk_zlib.h"
+#if ((VTK_MAJOR_VERSION <= 4) && (VTK_MINOR_VERSION <= 4))
+#include "zlib.h" // needed for TIFF
+#else
+#include "vtk_zlib.h" // needed for TIFF
+#endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.39");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.40");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
