@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.21.2.1");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -537,6 +537,7 @@ void vtkPVServerFileDialog::LoadSaveCallback()
     this->ConvertLastPath();
     this->Update();
     newdir.rdbuf()->freeze(0);
+    this->SetSelectedDirectory(0);
     return;
     } 
 
