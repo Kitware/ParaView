@@ -72,7 +72,23 @@ public:
     this->SetCurrentTime(time, 1);
     }
   void SetCurrentTime(int time, int trace);
+
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+  // Avoid windows name mangling.
+# define GetTickCount() GetCurrentTime()
+#endif
+
+  // Description:
+  // Get the current animation time step.
   int GetCurrentTime();
+
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef GetTickCount
+  //BTX
+  // Define possible mangled names.
+  int GetTickCount();
+  //ETX
+#endif
 
   // Description:
   // Callback that starts an animation.

@@ -176,7 +176,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.170");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.171");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -900,6 +900,16 @@ void vtkPVAnimationInterface::SetScriptCheckButtonState(int val)
   this->ScriptCheckButton->SetState(val);
   this->ScriptCheckButtonCallback();
 }
+
+//----------------------------------------------------------------------------
+#ifdef VTK_WORKAROUND_WINDOWS_MANGLE
+# undef GetCurrentTime
+// Define possible mangled names.
+int vtkPVAnimationInterface::GetTickCount()
+{
+  return this->GetCurrentTime();
+}
+#endif
 
 //-----------------------------------------------------------------------------
 int vtkPVAnimationInterface::GetCurrentTime()
