@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRadioButton );
-vtkCxxRevisionMacro(vtkKWRadioButton, "1.9");
+vtkCxxRevisionMacro(vtkKWRadioButton, "1.10");
 
 //------------------------------------------------------------------------------
 void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
@@ -66,6 +66,10 @@ void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
   this->Script("radiobutton %s -value 1", wname);
   this->Configure();
   this->Script("%s configure %s", wname, (args?args:""));
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
