@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.3");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.4");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -404,4 +404,7 @@ void vtkKWPushButtonSet::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "PackHorizontally: " 
      << (this->PackHorizontally ? "On" : "Off") << endl;
+
+  os << indent << "MaximumNumberOfWidgetInPackingDirection: " 
+     << (this->MaximumNumberOfWidgetInPackingDirection ? "On" : "Off") << endl;
 }
