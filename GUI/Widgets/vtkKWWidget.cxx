@@ -11,8 +11,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 #include "vtkKWWidget.h"
 
+#include "vtkImageData.h"
 #include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
 #include "vtkKWTkUtilities.h"
@@ -21,16 +23,15 @@
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
-
-#include "vtkImageData.h"
 #include "vtkPNGWriter.h"
+#include "vtkString.h"
+#include "vtkWindows.h"
 
 #include "X11/Xutil.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.108");
+vtkCxxRevisionMacro(vtkKWWidget, "1.109");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -467,7 +468,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.108 $");
+  this->ExtractRevision(os,"$Revision: 1.109 $");
 }
 
 //----------------------------------------------------------------------------
