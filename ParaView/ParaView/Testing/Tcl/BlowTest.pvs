@@ -47,7 +47,6 @@ $RenWin1 SetSize 300 300
 for {set i 1} {$i <= 2} {incr i 1} {
 	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
         $pvWarp AcceptCallback
-	#RenWin1 Render
 	update
 
 }
@@ -66,10 +65,12 @@ for {set i 8} {$i <= 10} {incr i 1} {
     [$warpOutput GetColorMenu] SetValue "Point thickness$i"
     $warpOutput ColorByPointField thickness$i 1
     $pvWarp AcceptCallback
-    #RenWin1 Render
     update
 
 }
+
+update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {

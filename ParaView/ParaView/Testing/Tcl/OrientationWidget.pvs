@@ -17,6 +17,7 @@ $kw(vtkTemp22) SetEventInformationFlipY 300 250 0 0 0 0 0
 $kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
 $kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 #Resize widget from lower left corner
 $kw(vtkTemp22) SetEventInformationFlipY 298 352 0 0 0 0 0
@@ -26,6 +27,7 @@ $kw(vtkTemp22) SetEventInformationFlipY 200 400 0 0 0 0 0
 $kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
 $kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 #Rotate
 $kw(vtkTemp22) SetEventInformationFlipY 200 200 0 0 0 0 0
@@ -35,6 +37,7 @@ $kw(vtkTemp22) SetEventInformationFlipY 300 150 0 0 0 0 0
 $kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
 $kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 #Resize widget from upper left corner
 $kw(vtkTemp22) SetEventInformationFlipY 199 231 0 0 0 0 0
@@ -44,6 +47,7 @@ $kw(vtkTemp22) SetEventInformationFlipY 279 254 0 0 0 0 0
 $kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
 $kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 #Resize widget from upper right corner
 $kw(vtkTemp22) SetEventInformationFlipY 423 324 0 0 0 0 0
@@ -53,6 +57,7 @@ $kw(vtkTemp22) SetEventInformationFlipY 449 298 0 0 0 0 0
 $kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
 $kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 #Resize widget from lower right corner
 $kw(vtkTemp22) SetEventInformationFlipY 452 469 0 0 0 0 0
@@ -62,6 +67,7 @@ $kw(vtkTemp22) SetEventInformationFlipY 516 510 0 0 0 0 0
 $kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
 $kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 #Move widget to upper right corner
 $kw(vtkTemp22) SetEventInformationFlipY 384 442 0 0 0 0 0
@@ -71,12 +77,13 @@ $kw(vtkTemp22) SetEventInformationFlipY 405 102 0 0 0 0 0
 $kw(vtkTemp22) InvokeEvent "MouseMoveEvent"
 $kw(vtkTemp22) InvokeEvent "LeftButtonReleaseEvent"
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 # Fix the size of the image.
 set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
 $RenWin1 SetSize 300 300
-$RenWin1 Render
 update
+[[$Application GetMainWindow] GetMainView] ForceRender
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
