@@ -34,7 +34,7 @@
 #define TIMER(s) if (this->Timing){ this->TimerLog->MarkStartEvent(s); }
 #define TIMERDONE(s) if (this->Timing){ this->TimerLog->MarkEndEvent(s); }
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.1.2.1");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.1.2.2");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -156,14 +156,14 @@ void vtkDistributedDataFilter::Execute()
   }
 
   if (this->MemInfo){
-#ifndef WIN32
-    if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
-    this->MemInfoReader->Update();
-    cout << "vtkDistributedDataFilter, Execute()" << endl;
-    this->MemInfoReader->PrintSelf(cout, 2);
-#else
+    //#ifndef WIN32
+    //if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
+    //this->MemInfoReader->Update();
+    //cout << "vtkDistributedDataFilter, Execute()" << endl;
+    //this->MemInfoReader->PrintSelf(cout, 2);
+    //#else
     cout << "Memory info not available." << endl;
-#endif
+    //#endif
   }
 
   // Stage (1) - use vtkPKdTree to...
@@ -198,14 +198,14 @@ void vtkDistributedDataFilter::Execute()
     return;
   }
   if (this->MemInfo){
-#ifndef WIN32
-    if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
-    this->MemInfoReader->Update();
-    cout << "vtkDistributedDataFilter, after build of k-d tree, tables,  and cell lists" << endl;
-    this->MemInfoReader->PrintSelf(cout, 2);
-#else
+    //#ifndef WIN32
+    //if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
+    //this->MemInfoReader->Update();
+    //cout << "vtkDistributedDataFilter, after build of k-d tree, tables,  and cell lists" << endl;
+    //this->MemInfoReader->PrintSelf(cout, 2);
+    //#else
     cout << "Memory info not available." << endl;
-#endif
+    //#endif
   }
 
   // Stage (2) - Redistribute data, so that each process gets a ugrid
@@ -225,14 +225,14 @@ void vtkDistributedDataFilter::Execute()
   TIMERDONE("Redistribute data among processors");
 
   if (this->MemInfo){
-#ifndef WIN32
-    if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
-    this->MemInfoReader->Update();
-    cout << "vtkDistributedDataFilter, after redistribution of data set" << endl;
-    this->MemInfoReader->PrintSelf(cout, 2);
-#else
+    //#ifndef WIN32
+    //if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
+    //this->MemInfoReader->Update();
+    //cout << "vtkDistributedDataFilter, after redistribution of data set" << endl;
+    //this->MemInfoReader->PrintSelf(cout, 2);
+    //#else
     cout << "Memory info not available." << endl;
-#endif
+    //#endif
   }
 
   if (fail){
@@ -246,14 +246,14 @@ void vtkDistributedDataFilter::Execute()
     this->Kdtree = NULL;
   }
   if (this->MemInfo){
-#ifndef WIN32
-    if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
-    this->MemInfoReader->Update();
-    cout << "vtkDistributedDataFilter, Execute() completed" << endl;
-    this->MemInfoReader->PrintSelf(cout, 2);
-#else
+    //#ifndef WIN32
+    //if (this->MemInfoReader == NULL) this->MemInfoReader = vtkLinuxResources::New();
+    //this->MemInfoReader->Update();
+    //cout << "vtkDistributedDataFilter, Execute() completed" << endl;
+    //this->MemInfoReader->PrintSelf(cout, 2);
+    //#else
     cout << "Memory info not available." << endl;
-#endif
+    //#endif
   }
 
   return;

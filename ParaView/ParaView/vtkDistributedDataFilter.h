@@ -41,9 +41,9 @@
 #include <vtkDataSetToUnstructuredGridFilter.h>
 #include <vtkVersion.h>
 #include <vtkTimerLog.h>
-#ifndef WIN32
-#include <vtkLinuxResources.h>
-#endif
+//#ifndef WIN32
+//#include <vtkLinuxResources.h>
+//#endif
 
 class vtkPointData;
 class vtkCellData;
@@ -171,8 +171,8 @@ private:
   int MemInfo;
 
   vtkTimerLog *TimerLog;
-#ifndef WIN32
-  vtkLinuxResources *MemInfoReader;
-#endif
+  //#ifndef WIN32
+  //vtkLinuxResources *MemInfoReader;
+  //#endif
 };
 #endif
