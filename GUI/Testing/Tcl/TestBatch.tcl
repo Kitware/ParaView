@@ -19,7 +19,7 @@ if { ![$Application GetExitStatus] } {
         update
 
         $Application LoadScript "$batchName.pvb"
-        catch { file delete -force "$batchName.pvb" }
+#        catch { file delete -force "$batchName.pvb" }
         $Application ExitOnReturnOn
 
         for {set i  1} {$i < [expr $argc - 1]} {incr i} {

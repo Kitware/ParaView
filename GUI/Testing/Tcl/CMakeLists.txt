@@ -75,6 +75,13 @@ SET(PROJECT_TESTS
   XdmfRead
   )
 
+IF(PARAVIEW_USE_EXODUS)
+  SET(PROJECT_TESTS
+    ${PROJECT_TESTS}
+    TestExodus
+    )
+ENDIF(PARAVIEW_USE_EXODUS)
+
 # some tests require MPI because the classes do not get built otherwise
 IF(VTK_USE_MPI)
   SET(PROJECT_TESTS ${PROJECT_TESTS} D3)

@@ -16,6 +16,15 @@ proc Compare {Application argv argc} {
    }
 
    if { ! $didRegression } {
+       set colorMaps [[$Application GetMainWindow] GetPVColorMaps]
+       $colorMaps InitTraversal
+       while { 1 } {
+           set colorMap [$colorMaps GetNextItemAsObject]
+           if { $colorMap == {} } {
+               break
+           }
+           $colorMap SetScalarBarVisibility 0
+       }
       for {set i  1} {$i < [expr $argc - 1]} {incr i} {
          if {[lindex $argv $i] == "-BT"} {
             source [lindex $argv [expr $i + 1]]
