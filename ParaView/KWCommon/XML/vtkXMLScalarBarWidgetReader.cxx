@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLScalarBarActorReader.h"
 
 vtkStandardNewMacro(vtkXMLScalarBarWidgetReader);
-vtkCxxRevisionMacro(vtkXMLScalarBarWidgetReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLScalarBarWidgetReader, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLScalarBarWidgetReader::GetRootElementName()
@@ -73,22 +73,22 @@ int vtkXMLScalarBarWidgetReader::Parse(vtkXMLDataElement *elem)
 
   // Get nested elements
   
-  vtkXMLDataElement *nested_elem;
-  
   // Scalar bar actor
 
-  vtkScalarBarActor *scalarbara = obj->GetScalarBarActor();
-  if (scalarbara)
+  vtkXMLScalarBarActorReader *xmlr = vtkXMLScalarBarActorReader::New();
+  if (xmlr->IsInElement(elem))
     {
-    vtkXMLScalarBarActorReader *xmlr = vtkXMLScalarBarActorReader::New();
-    nested_elem = elem->FindNestedElementWithName(xmlr->GetRootElementName());
-    if (nested_elem)
+    vtkScalarBarActor *scalarbara = obj->GetScalarBarActor();
+    if (!scalarbara)
       {
-      xmlr->SetObject(scalarbara);
-      xmlr->Parse(nested_elem);
+      scalarbara = vtkScalarBarActor::New();
+      obj->SetScalarBarActor(scalarbara);
+      scalarbara->Delete();
       }
-    xmlr->Delete();
+    xmlr->SetObject(scalarbara);
+    xmlr->ParseInElement(elem);
     }
+  xmlr->Delete();
 
   return 1;
 }

@@ -67,11 +67,6 @@ protected:
   ~vtkXMLScalarBarWidgetWriter() {};  
   
   // Description:
-  // Add the root element attributes.
-  // Return 1 on success, 0 otherwise.
-  virtual int AddAttributes(vtkXMLDataElement *elem);
-
-  // Description:
   // Add the root element internal/nested elements
   // Return 1 on success, 0 otherwise.
   virtual int AddNestedElements(vtkXMLDataElement *elem);

@@ -48,30 +48,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLScalarBarActorWriter.h"
 
 vtkStandardNewMacro(vtkXMLScalarBarWidgetWriter);
-vtkCxxRevisionMacro(vtkXMLScalarBarWidgetWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLScalarBarWidgetWriter, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLScalarBarWidgetWriter::GetRootElementName()
 {
   return "ScalarBarWidget";
-}
-
-//----------------------------------------------------------------------------
-int vtkXMLScalarBarWidgetWriter::AddAttributes(vtkXMLDataElement *elem)
-{
-  if (!this->Superclass::AddAttributes(elem))
-    {
-    return 0;
-    }
-
-  vtkScalarBarWidget *obj = vtkScalarBarWidget::SafeDownCast(this->Object);
-  if (!obj)
-    {
-    vtkWarningMacro(<< "The ScalarBarWidget is not set!");
-    return 0;
-    }
-
-  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -94,12 +76,9 @@ int vtkXMLScalarBarWidgetWriter::AddNestedElements(vtkXMLDataElement *elem)
   vtkScalarBarActor *scalarbara = obj->GetScalarBarActor();
   if (scalarbara)
     {
-    vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
-    elem->AddNestedElement(nested_elem);
-    nested_elem->Delete();
     vtkXMLScalarBarActorWriter *xmlw = vtkXMLScalarBarActorWriter::New();
     xmlw->SetObject(scalarbara);
-    xmlw->Create(nested_elem);
+    xmlw->CreateInElement(elem);
     xmlw->Delete();
     }
  
