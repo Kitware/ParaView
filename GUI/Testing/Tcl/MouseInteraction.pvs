@@ -11,6 +11,9 @@ set MainView [[$Application GetMainWindow] GetMainView]
 $MainView SetRenderWindowSize 300 300
 update
 
+# Hide the animation toolbar since takes up too much space
+[$Application GetMainWindow]  SetToolbarVisibility animation 0
+
 $kw(vtkTemp18) SetOrientationAxesVisibility 0
 
 # create superquadric

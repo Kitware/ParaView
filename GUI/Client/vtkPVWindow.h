@@ -554,6 +554,13 @@ public:
   //ETX
 #endif
 
+  // Description:
+  // Method to change toolbar state in tcl scripts.
+  // identifier: "animation" : animation toolbar.
+  //             "interaction" : interaction toolbar
+  //             "tools"       : tools toolbar
+  //             "camera"      : camera toolbar.
+  void SetToolbarVisibility(const char* identifier, int state);
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

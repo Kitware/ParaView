@@ -3,6 +3,9 @@ $Application ExitOnReturnOn
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
 
+# Hide the animation toolbar since takes up too much space
+[$Application GetMainWindow]  SetToolbarVisibility animation 0
+
 $kw(vtkTemp21) SetOrientationAxesVisibility 1
 $kw(vtkTemp21) SetOrientationAxesInteractivity 1
 $kw(vtkTemp21) SetOrientationAxesOutlineColor 1 0 0
