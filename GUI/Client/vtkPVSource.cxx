@@ -61,7 +61,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.376");
+vtkCxxRevisionMacro(vtkPVSource, "1.377");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1531,6 +1531,27 @@ void vtkPVSource::UpdateParameterWidgets()
 void vtkPVSource::RaiseSourcePage()
 {
   this->Notebook->Raise("Source");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateVTKObjects()
+{
+ if (this->Proxy)
+    {
+    this->Proxy->UpdateVTKObjects();
+    }
+
+  vtkCollectionIterator *it = this->Widgets->NewIterator();
+  while( !it->IsDoneWithTraversal() )
+    {
+    vtkPVWidget* pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    if (pvw)
+      {
+      pvw->UpdateVTKObjects();
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------

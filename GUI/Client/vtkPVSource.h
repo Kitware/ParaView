@@ -483,6 +483,10 @@ public:
 
   // Description:
   void RegisterProxy(const char* sourceList, vtkPVSource* clone);
+
+  // Description:
+  // Calls UpdateVTKObjects on the proxy as well as on all widgets.
+  virtual void UpdateVTKObjects();
   
 protected:
   vtkPVSource();
