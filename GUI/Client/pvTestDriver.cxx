@@ -282,7 +282,7 @@ int pvTestDriver::OutputStringHasError(vtkstd::string& output)
       {
       cerr << "***** Test will fail, because the string: \"" << possibleMPIErrors[i] 
            << "\"\n***** was found in the following output from the program:\n\"" 
-           << output << "\"\n";
+           << output.c_str() << "\"\n";
       return 1;
       }
     }
