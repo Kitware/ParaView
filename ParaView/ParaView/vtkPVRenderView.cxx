@@ -273,10 +273,6 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 #ifdef VTK_USE_MPI
   // Create the compositer.
   this->Composite = static_cast<vtkPVTreeComposite*>(pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
-  if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") )
-    {
-    this->Composite->EnableAbortOff();
-    }
 
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
@@ -285,6 +281,12 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
 			 this->RenderWindowTclName);
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
+
+  if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") )
+    {
+    pvApp->BroadcastScript("%s EnableAbortOff", this->CompositeTclName);
+    }
+
   if ( getenv("PV_OFFSCREEN") )
     {
     pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
@@ -374,16 +376,13 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // Application has to be set before we can get a tcl name.
   // Otherwise I would have done this in "CreateRenderObjects".
   // Create the compositer.
-  if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") == NULL)
+  if (this->Composite)
     {
-    if (this->Composite)
-      {
-      // Since the render view is only on process 0, do not broadcast.
-      this->GetPVApplication()->Script("%s SetRenderView %s", 
+    // Since the render view is only on process 0, do not broadcast.
+    this->GetPVApplication()->Script("%s SetRenderView %s", 
 				       this->CompositeTclName, this->GetTclName());
-      }
     }
-
+  
   // create the frame
   wname = this->GetWidgetName();
   this->Script("frame %s -bd 0 %s",wname,args);
@@ -481,7 +480,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterruptRenderCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->InterruptRenderCheck->Create(this->Application, "-text \"Allow Rendering Interrupts\"");
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
-  this->InterruptRenderCheck->SetState(1);
+  this->InterruptRenderCheck->SetState(this->Composite->GetEnableAbort());
   this->InterruptRenderCheck->SetBalloonHelpString("Toggle the use of asynchronous MPI calls to interrupt renders. When off, renders can not be interrupted.");
   
   this->UseCharCheck->SetParent(this->RenderParametersFrame->GetFrame());
