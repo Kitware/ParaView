@@ -17,6 +17,10 @@ if [ "x@TCLTK_BUILD_DEBUG@" = "x1" ]; then
   EXTRAFLAGS="$EXTRAFLAGS --enable-symbols"
 fi
 
+if [ "x@TCLTK_64BIT@" = "x1" ]; then
+  EXTRAFLAGS="$EXTRAFLAGS --enable-64bit"
+fi
+
 if [ "x$build_tcl" = "xtrue" ]; then
   cd "@TclTk_BINARY_DIR@/tcl8.4.5/unix"
   "@TclTk_SOURCE_DIR@/tcl8.4.5/unix/configure" --disable-shared ${EXTRAFLAGS} || exit 1
