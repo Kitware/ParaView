@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPointLabelDisplay);
-vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.1");
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -216,6 +216,9 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
 //----------------------------------------------------------------------------
 void vtkSMPointLabelDisplay::SetInput(vtkSMSourceProxy* input)
 {  
+  vtkPVDataInformation *di=input->GetDataInformation();
+  if(!di->DataSetTypeIsA("vtkGenericDataSet"))
+    {
   vtkPVProcessModule* pm;
   pm = this->GetProcessModule();  
   
@@ -232,6 +235,7 @@ void vtkSMPointLabelDisplay::SetInput(vtkSMSourceProxy* input)
                   << vtkClientServerStream::End;
   // Only the server has data.
   pm->SendStream(vtkProcessModule::DATA_SERVER);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -326,11 +330,14 @@ void vtkSMPointLabelDisplay::Update()
   // Current problem is that there is no input for the UpdateSuppressor object
   if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy != 0 )
     {
-    vtkPVProcessModule *pm = this->GetProcessModule();
-    vtkClientServerStream& stream = pm->GetStream();
-    stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(0) 
-           << "ForceUpdate" << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+    if(this->UpdateSuppressorProxy->GetNumberOfIDs()>0)
+      {
+      vtkPVProcessModule *pm = this->GetProcessModule();
+      vtkClientServerStream& stream = pm->GetStream();
+      stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(0) 
+             << "ForceUpdate" << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+      }
     this->GeometryIsValid = 1;
     }
 }
