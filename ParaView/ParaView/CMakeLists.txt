@@ -68,6 +68,7 @@ SET( ParaView_SRCS
   vtkPVGhostLevelDialog.cxx
   vtkPVGlyphFilter.cxx
   vtkPVGroupInputsWidget.cxx
+  vtkPVImageCacheFilter.cxx
   vtkPVImageContinuousDilate3D.cxx
   vtkPVImageContinuousErode3D.cxx
   vtkPVImageGradient.cxx
