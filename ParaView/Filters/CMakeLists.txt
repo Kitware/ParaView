@@ -36,7 +36,7 @@ SET(Filters_SRCS
 IF(VTK_USE_MPI)
   SET(Filters_SRCS
     ${Filters_SRCS}
-    #vtkAllToNRedistributePolyData.cxx
+    vtkAllToNRedistributePolyData.cxx
     #vtkBalancedRedistributePolyData.cxx
     vtkDistributedDataFilter.cxx
     vtkExtractCells.cxx
@@ -45,6 +45,8 @@ IF(VTK_USE_MPI)
     vtkPKdTree.cxx
     vtkPlanesIntersection.cxx
     vtkPointsProjectedHull.cxx
+    vtkRedistributePolyData.cxx
+    vtkWeightedRedistributePolyData.cxx
     )
 ENDIF(VTK_USE_MPI)
 

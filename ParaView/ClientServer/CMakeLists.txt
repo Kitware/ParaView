@@ -20,122 +20,111 @@ CONFIGURE_FILE(
   )
 
 SET (ClientServer_WRAP_CLASSES
-#
- vtkObjectBase
- vtkObject
-#
- vtkSource
- vtkProcessObject
- vtkPolyDataSource
- vtkSphereSource
-#
- vtkActor2D
- vtkProp
-#
- vtkPolyDataToPolyDataFilter
- vtkShrinkPolyData
-#
- vtkDecimatePro
-#
- vtkDataSetSource
- vtkDataSetToDataSetFilter
- vtkPieceScalars
-#
- vtkGraphicsFactory
-#
- vtkDataSetReader
- vtkDataReader
-#
- vtkStreamTracer
- vtkDataSetToPolyDataFilter
-#
- vtkExtractGrid
- vtkStructuredGridToStructuredGridFilter
- vtkStructuredGridSource
-#
- vtkStructuredGridOutlineFilter
- vtkStructuredGridToPolyDataFilter
-#
- vtkGeometryFilter
-#
- vtkLineSource
- vtkConeSource
-
-#
- vtkTubeFilter
-#
- vtkLineWidget
- vtk3DWidget
- vtkInteractorObserver
-
-
- vtkActor
- vtkMapper
- vtkAbstractMapper
- vtkAbstractMapper3D
- vtkPolyDataMapper
- vtkRenderer
- vtkRenderWindow
- vtkRenderWindowInteractor
- vtkOpenGLRenderer
- vtkOpenGLRenderWindow
- vtkOpenGLActor
- vtkOpenGLPolyDataMapper
- vtkWindow
- vtkViewport
- vtkProp3D
- vtkProperty
-vtkPolyData
-vtkDataSet
-vtkDataObject
-vtkDataSetSurfaceFilter
-vtkArrowSource
-vtkExtentTranslator
-vtkOpenGLProperty
-vtkPointSet
-vtkPlane
-vtkImplicitFunction
-vtkImplicitPlaneWidget
-vtkPolyDataSourceWidget
-vtkSphereWidget
-vtkSphere
-vtkBoxWidget
-vtkPlanes
-vtkTransform
-vtkMatrix4x4
-vtkPlaneWidget
-vtkPointSource
-vtkPointWidget
-vtkCompositer
-vtkCompositeManager
-vtkLinearTransform
-vtkHomogeneousTransform
-vtkAbstractTransform
-vtkAxes
-
-# paraview classes
-vtkGenericRenderWindowInteractor
-vtkPVArrowSource
-vtkPVExtentTranslator
-vtkPVGenericRenderWindowInteractor
-vtkPVGeometryFilter
-vtkPVUpdateSuppressor
-vtkPVLODActor
-vtkClientCompositeManager
-vtkPVApplication
-vtkPVProcessModule
-vtkPVClientServerModule
-vtkPVClipDataSet
-vtkClipDataSet
-vtkDataSetToUnstructuredGridFilter
-vtkUnstructuredGridSource
-vtkPVMPIProcessModule
-vtkKWObject
-vtkKWApplication
-vtkPVTreeComposite
-vtkCompressCompositer
-vtkMultiDisplayManager
-)
+  vtk3DWidget
+  vtkAbstractMapper
+  vtkAbstractMapper3D
+  vtkAbstractTransform
+  vtkActor
+  vtkActor2D
+  vtkAllToNRedistributePolyData
+  vtkArrowSource
+  vtkAxes
+  vtkBoxWidget
+  vtkClientCompositeManager
+  vtkClipDataSet
+  vtkCollectPolyData
+  vtkCompositeManager
+  vtkCompositer
+  vtkCompressCompositer
+  vtkConeSource
+  vtkDataObject
+  vtkDataReader
+  vtkDataSet
+  vtkDataSetReader
+  vtkDataSetSource
+  vtkDataSetSurfaceFilter
+  vtkDataSetToDataSetFilter
+  vtkDataSetToPolyDataFilter
+  vtkDataSetToUnstructuredGridFilter
+  vtkDecimatePro
+  vtkExtentTranslator
+  vtkExtractGrid
+  vtkGenericRenderWindowInteractor
+  vtkGeometryFilter
+  vtkGraphicsFactory
+  vtkHomogeneousTransform
+  vtkImplicitFunction
+  vtkImplicitPlaneWidget
+  vtkInteractorObserver
+  vtkKWApplication
+  vtkKWObject
+  vtkLineSource
+  vtkLineWidget
+  vtkLinearTransform
+  vtkLookupTable
+  vtkMapper
+  vtkMatrix4x4
+  vtkMultiDisplayManager
+  vtkObject
+  vtkObjectBase
+  vtkOpenGLActor
+  vtkOpenGLPolyDataMapper
+  vtkOpenGLProperty
+  vtkOpenGLRenderWindow
+  vtkOpenGLRenderer
+  vtkPVApplication
+  vtkPVArrowSource
+  vtkPVClientServerModule
+  vtkPVClipDataSet
+  vtkPVDuplicatePolyData
+  vtkPVExtentTranslator
+  vtkPVGenericRenderWindowInteractor
+  vtkPVGeometryFilter
+  vtkPVLODActor
+  vtkPVMPIProcessModule
+  vtkPVProcessModule
+  vtkPVTreeComposite
+  vtkPVUpdateSuppressor
+  vtkPieceScalars
+  vtkPlane
+  vtkPlaneWidget
+  vtkPlanes
+  vtkPointSet
+  vtkPointSource
+  vtkPointWidget
+  vtkPolyData
+  vtkPolyDataMapper
+  vtkPolyDataSource
+  vtkPolyDataSourceWidget
+  vtkPolyDataToPolyDataFilter
+  vtkProcessObject
+  vtkProp
+  vtkProp3D
+  vtkProperty
+  vtkQuadricClustering
+  vtkRedistributePolyData
+  vtkRenderWindow
+  vtkRenderWindowInteractor
+  vtkRenderer
+  vtkScalarsToColors
+  vtkShrinkPolyData
+  vtkSource
+  vtkSphere
+  vtkSphereSource
+  vtkSphereWidget
+  vtkStreamTracer
+  vtkStructuredGridOutlineFilter
+  vtkStructuredGridSource
+  vtkStructuredGridToPolyDataFilter
+  vtkStructuredGridToStructuredGridFilter
+  vtkTransform
+  vtkTreeCompositer
+  vtkTubeFilter
+  vtkUnstructuredGridSource
+  vtkViewport
+  vtkWeightedRedistributePolyData
+  vtkWindow
+  )
 
 
 

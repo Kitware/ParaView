@@ -163,7 +163,6 @@ SET( ParaView_SRCS
   vtkSelectInputs.cxx
   vtkStringList.cxx 
   vtkTiledDisplaySchedule.cxx
-#  vtkWeightedRedistributePolyData.cxx
   vtkPVXDMFParameters.cxx
   vtkXDMFReaderModule.cxx
   vtkXMLCollectionReader.cxx
