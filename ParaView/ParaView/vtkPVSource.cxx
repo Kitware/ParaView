@@ -967,7 +967,6 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   
   if (this->PVInputs[idx])
     {
-    this->PVInputs[idx]->SetVisibilityInternal(1);
     this->PVInputs[idx]->RemovePVConsumer(this);
     this->PVInputs[idx]->UnRegister(this);
     this->PVInputs[idx] = NULL;
@@ -1202,7 +1201,6 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
 
   inputMenu = vtkPVInputMenu::New();
   inputMenu->SetPVSource(this);
-  inputMenu->SetCurrentValue(this->GetPVWindow()->GetCurrentPVSource());
   inputMenu->SetSources(sources);
   inputMenu->SetParent(this->ParameterFrame->GetFrame());
   inputMenu->SetLabel(label);
@@ -1211,6 +1209,7 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
   inputMenu->SetInputName(inputName);
   inputMenu->SetInputType(inputType);
   inputMenu->SetBalloonHelpString(help);
+  inputMenu->Reset();
 
   this->Script("pack %s -side top -fill x -expand t",
                inputMenu->GetWidgetName());
