@@ -38,7 +38,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.34");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.35");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -147,6 +147,18 @@ int vtkPVGeometryFilter::CheckAttributes(vtkDataObject* input)
     iter->Delete();
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::ExecuteInformation()
+{
+  vtkDataObject *output = this->GetOutput();
+
+  if (output)
+    { // Execute synchronizes (communicates among processes), so we need
+    // all procs to call Execute.
+    output->SetMaximumNumberOfPieces(-1);
+    }
 }
 
 //----------------------------------------------------------------------------
