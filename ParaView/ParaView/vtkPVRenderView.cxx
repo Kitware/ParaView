@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.2");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.3");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -775,12 +775,16 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationWindowButton->SetCommand(
     this, "ShowNavigationWindowCallback 1");
 
-  this->NavigationFrame->SetMargin(this->NavigationFrame->GetMargin() + 2);
-
-  this->Script("pack %s %s -side left -anchor w -before %s -padx 1 -pady 2",
+  this->Script("pack %s %s -side left -anchor w -before %s -padx 1",
                this->SelectionWindowButton->GetWidgetName(),
                this->NavigationWindowButton->GetWidgetName(),
                this->NavigationFrame->GetLabel()->GetWidgetName());
+
+  // We have just added icons to the LabelFrame site of a LabeledFrame,
+  // now force the margin to adjust itself (not automatically done since
+  // the widget is a mix of 'pack' and 'place').
+
+  this->NavigationFrame->AdjustMargin();
 
   if (this->Application->GetRegisteryValue(2, 
                                            "SourcesBrowser", 
@@ -2343,7 +2347,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.2 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.3 $");
 }
 
 //------------------------------------------------------------------------------
