@@ -469,24 +469,29 @@
            range_source="TimeStepRange" />
     <Source class="vtkPExodusReader"/>
     <ArraySelection trace_name="cell_array_sel"
-                    attribute_name="Cell" />
+                    attribute_name="Cell"
+					label_text="Element Variables" />
     <ArraySelection trace_name="point_array_sel"
-                    attribute_name="Point" />
+                    attribute_name="Point"
+					label_text="Node Variables" />
 
     <SelectWidget type="int" 
                   variable="DisplayType"
                   trace_name="DisplayType">
       <Item label="Blocks" value="1">
         <ArraySelection trace_name="block_sel"
-                        attribute_name="Block"/>
+                        attribute_name="Block"
+						label_text="Blocks"/>
       </Item>
       <Item label="Parts" value="2">
         <ArraySelection trace_name="part_sel"
-                        attribute_name="Part"/>
+                        attribute_name="Part"
+						label_text="Parts"/>
       </Item>
       <Item label="Materials" value="3">
         <ArraySelection trace_name="material_sel"
-                        attribute_name="Material"/>
+                        attribute_name="Material"
+						label_text="Materials"/>
       </Item>
     </SelectWidget>
 	<LabeledToggle label="Apply Displacements"
