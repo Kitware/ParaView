@@ -64,6 +64,10 @@ public:
   void InitializeProperties();
 
   // Description:
+  // Displays and/or updates the property ui display
+  virtual void ShowProperties() {};
+
+  // Description:
   // Create the properties object, called by InitializeProperties.
   virtual void CreateProperties();
 

@@ -152,6 +152,7 @@ public:
   // Description:
   // Render the image.
   virtual void Render() {this->GetVTKWindow()->Render();};
+  virtual void Reset() {};
 	
   // Description:
   // Return the tk widget used for the vtkWindow. This widget

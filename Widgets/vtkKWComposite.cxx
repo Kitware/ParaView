@@ -151,4 +151,3 @@ void vtkKWComposite::Select(vtkKWView *v)
       }
     }
 }
-
