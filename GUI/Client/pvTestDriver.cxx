@@ -18,6 +18,8 @@
 #include "pvTestDriver.h"
 #include "pvTestDriverConfig.h"
 
+#include <kwsys/SystemTools.hxx>
+
 #if !defined(_WIN32) || defined(__CYGWIN__)
 # include <unistd.h>
 # include <sys/wait.h>
@@ -287,22 +289,49 @@ int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output
     "Failed",
     0
   };
+
+  const char* nonErrors[] = {
+    "Memcheck, a memory error detector for x86-linux",
+    "error in locking authority file",
+    0
+  };
+  (void)nonErrors;
   
   if(this->AllowErrorInOutput)
     {
     return 0;
     }
 
-  for(int i =0; possibleMPIErrors[i]; ++i)
+  vtkstd::vector<vtkstd::string> lines;
+  vtkstd::vector<vtkstd::string>::iterator it;
+  kwsys::SystemTools::Split(output.c_str(), lines);
+
+  int i, j;
+
+  for ( it = lines.begin(); it != lines.end(); ++ it )
     {
-    if(output.find(possibleMPIErrors[i]) != output.npos)
+    for(i =0; possibleMPIErrors[i]; ++i)
       {
-      cerr << "pvTestDriver: ***** Test will fail, because the string: \"" 
-           << possibleMPIErrors[i] 
-           << "\"\npvTestDriver: ***** was found in the following output from the " 
-           << pname << ":\n\"" 
-           << output.c_str() << "\"\n";
-      return 1;
+      if(it->find(possibleMPIErrors[i]) != it->npos)
+        {
+        int found = 0;
+        for (j = 0; nonErrors[j]; ++ j)
+          {
+          if ( it->find(nonErrors[j]) != it->npos )
+            {
+            found = 1;
+            }
+          }
+        if ( !found )
+          {
+          cerr << "pvTestDriver: ***** Test will fail, because the string: \"" 
+            << possibleMPIErrors[i] 
+            << "\"\npvTestDriver: ***** was found in the following output from the " 
+            << pname << ":\n\"" 
+            << it->c_str() << "\"\n";
+          return 1;
+          }
+        }
       }
     }
   return 0;
