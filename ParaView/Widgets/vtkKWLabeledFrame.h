@@ -69,6 +69,12 @@ public:
   // Get the vtkKWWidget for the internal frame.
   vtkKWWidget *GetFrame() {return this->Frame;};
 
+  // Description:
+  // Show or hide the frame.
+  void ShowHideFrame();
+  static void AllowShowHideOn();
+  static void AllowShowHideOff();
+
 protected:
   vtkKWLabeledFrame();
   ~vtkKWLabeledFrame();
@@ -80,6 +86,9 @@ protected:
   vtkKWWidget *Frame;
   vtkKWWidget *Groove;
   vtkKWWidget *Label;
+  vtkKWWidget *Icon;
+  int Displayed;
+  static int AllowShowHide;
 };
 
 

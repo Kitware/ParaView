@@ -68,10 +68,14 @@ vtkKWLabeledFrame::vtkKWLabeledFrame()
   this->Frame->SetParent(this->Groove);
   this->Label = vtkKWWidget::New();
   this->Label->SetParent(this);
+  this->Icon = vtkKWWidget::New();
+  this->Icon->SetParent(this);
+  this->Displayed = 1;
 }
 
 vtkKWLabeledFrame::~vtkKWLabeledFrame()
 {
+  this->Icon->Delete();
   this->Label->Delete();
   this->Frame->Delete();
   this->Border->Delete();
@@ -107,6 +111,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   this->Groove->Create(app,"frame","-borderwidth 2 -relief groove");
   this->Border2->Create(app,"frame","-height 10 -borderwidth 0 -relief flat");
   this->Frame->Create(app,"frame","-borderwidth 0 -relief flat");
+  this->Icon->Create(app,"label","-bitmap error");
   
   this->Script("pack %s -fill x -side top", this->Border->GetWidgetName());
   this->Script("pack %s -fill x -side top", this->Groove->GetWidgetName());
@@ -114,7 +119,42 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   this->Script("pack %s -fill both -expand yes",this->Frame->GetWidgetName());
   this->Script("place %s -relx 0 -x 5 -y 0 -anchor nw",
                this->Label->GetWidgetName());
+
   this->Script("raise %s", this->Label->GetWidgetName());
+
+  if ( vtkKWLabeledFrame::AllowShowHide )
+    {
+    this->Script("place %s -relx 1 -x -5 -y 0 -anchor ne",
+		 this->Icon->GetWidgetName());    
+    this->Script("bind %s <ButtonRelease-1> { %s ShowHideFrame }",
+		 this->Icon->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("raise %s", this->Icon->GetWidgetName());
+    }
 }
 
+void vtkKWLabeledFrame::ShowHideFrame()
+{
+  if ( this->Displayed )
+    {
+    this->Script("pack forget %s", this->Frame->GetWidgetName());
+    this->Displayed = 0;
+    }
+  else
+    {
+    this->Script("pack %s -fill both -expand yes",
+		 this->Frame->GetWidgetName());
+    this->Displayed = 1;
+   }
+}
 
+int vtkKWLabeledFrame::AllowShowHide = 0;
+
+void vtkKWLabeledFrame::AllowShowHideOn() 
+{ 
+  vtkKWLabeledFrame::AllowShowHide = 1; 
+}
+void vtkKWLabeledFrame::AllowShowHideOff() 
+{ 
+  vtkKWLabeledFrame::AllowShowHide = 0; 
+}

@@ -445,8 +445,10 @@ void vtkKWView::CreateViewProperties()
   this->Notebook->SetParent(this->GetPropertiesParent());
   this->Notebook->Create(this->Application,"");
 
-  this->Notebook->AddPage("General");
-  this->Notebook->AddPage("Annotate");
+  this->Notebook->AddPage(
+    "General", "Set the general properties of the image view");
+  this->Notebook->AddPage(
+    "Annotate", "Set the header and corner annotation");
   
   this->AnnotationProperties->SetParent
     (this->Notebook->GetFrame("Annotate"));
@@ -1285,7 +1287,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.54 $");
+  this->ExtractRevision(os,"$Revision: 1.55 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

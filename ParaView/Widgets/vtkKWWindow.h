@@ -213,17 +213,22 @@ public:
 //BTX
   //Description:
   // Set or get the registery value for the application.
-  // When storing multiple arguments, separate with spaces
-  int SetRegisteryValue(const char* subkey, const char* key, 
+  // When storing multiple arguments, separate with spaces.
+  // If the level is lower than current registery level, operation 
+  // will be successfull.
+  int SetRegisteryValue(int level, const char* subkey, const char* key, 
 			const char* format, ...);
-  int GetRegisteryValue(const char* subkey, const char* key, 
+  int GetRegisteryValue(int level, const char* subkey, const char* key, 
 			char*value);
-  int DeleteRegisteryValue(const char* subkey, const char* key);
+  int DeleteRegisteryValue(int level, const char* subkey, const char* key);
   
   // Description:
   // Get float registery value (zero if not found).
-  float GetFloatRegisteryValue(const char* subkey, const char* key);
-  int   GetIntRegisteryValue(const char* subkey, const char* key);
+  // If the level is lower than current registery level, operation 
+  // will be successfull.
+  float GetFloatRegisteryValue(int level, const char* subkey, 
+			       const char* key);
+  int   GetIntRegisteryValue(int level, const char* subkey, const char* key);
 //ETX
   
 protected:

@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
-
+#include "bitmaps.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
@@ -174,6 +174,19 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   this->Icon->Create(app,"label","-width 0 -pady 0 -padx 0 -borderwidth 0");
   this->Script("pack %s -side left -fill y",
 	       this->Icon->GetWidgetName());
+  this->Script("pack forget %s", this->Icon->GetWidgetName());
+
+  
+  Tcl_Interp * interp = this->GetApplication()->GetMainInterp();
+  if ( interp )
+    {
+    Tk_DefineBitmap(interp, "KWError", (char *)error_bits,
+		    error_width, error_height);
+    Tk_DefineBitmap(interp, "KWQuestion", (char *)question_bits,
+		    question_width, question_height);
+    Tk_DefineBitmap(interp, "KWWarning", (char *)warning_bits,
+		    warning_width, warning_height);
+    }
 }
 
 void vtkKWMessageDialog::SetText(const char *txt)
@@ -207,12 +220,18 @@ void vtkKWMessageDialog::SetIcon( int ico )
     {
     this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
 		 this->Icon->GetWidgetName());
+    this->Script("pack forget %s", this->Icon->GetWidgetName());
     return;
     }
-  char icon_array[][9] = { "", "error", "warning", "question", "info" };
-  this->Script("%s configure -bitmap {%s} -anchor n -pady 4 -padx 4 -borderwidth 4",
+  char icon_array[][11] = { "", "KWError", "KWWarning", 
+			    "KWQuestion", "info" };
+  this->Script("%s configure -bitmap {%s} -anchor n "
+	       "-pady 10 -padx 4 -borderwidth 4 -fg %s",
 	       this->Icon->GetWidgetName(),
-	       icon_array[ico]);
+	       icon_array[ico],
+	       "red");
+  this->Script("pack %s -pady 17 -side left -fill y", 
+	       this->Icon->GetWidgetName());
 }
 
 void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,

@@ -868,16 +868,16 @@ void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
     {
     sprintf(KeyNameP, "File%d", i);
     sprintf(CmdNameP, "File%dCmd", i);
-    this->DeleteRegisteryValue( "MRU", KeyNameP );
-    this->DeleteRegisteryValue( "MRU", CmdNameP );    
+    this->DeleteRegisteryValue( 1, "MRU", KeyNameP );
+    this->DeleteRegisteryValue( 1, "MRU", CmdNameP );    
     if ( this->RecentFiles )
       {
       vtkKWWindowMenuEntry *vp = reinterpret_cast<vtkKWWindowMenuEntry *>(
 	this->RecentFiles->Lookup(i) );
       if ( vp )
 	{
-	this->SetRegisteryValue("MRU", KeyNameP, vp->GetFullFile());
-	this->SetRegisteryValue("MRU", CmdNameP, vp->GetCommand());
+	this->SetRegisteryValue(1, "MRU", KeyNameP, vp->GetFullFile());
+	this->SetRegisteryValue(1, "MRU", CmdNameP, vp->GetCommand());
 	}
       }
     }
@@ -898,9 +898,9 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
     {
     sprintf(KeyNameP, "File%d", i);
     sprintf(CmdNameP, "File%dCmd", i);
-    if ( this->GetRegisteryValue("MRU", KeyNameP, File) )
+    if ( this->GetRegisteryValue(1, "MRU", KeyNameP, File) )
       {
-      if ( this->GetRegisteryValue("MRU", CmdNameP, Cmd) )
+      if ( this->GetRegisteryValue(1, "MRU", CmdNameP, Cmd) )
 	{
 	if (strlen(File) > 1)
 	  {
@@ -949,7 +949,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.63 $");
+  this->ExtractRevision(os,"$Revision: 1.64 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1119,9 +1119,15 @@ void vtkKWWindow::PrintRecentFiles()
 }
 
 
-int vtkKWWindow::SetRegisteryValue(const char* subkey, const char* key, 
+int vtkKWWindow::SetRegisteryValue(int level, const char* subkey, 
+				   const char* key, 
 				   const char* format, ...)
 {
+  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
+       this->GetApplication()->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
   int res = 0;
   char buffer[100];
   char value[16000];
@@ -1142,8 +1148,14 @@ int vtkKWWindow::SetRegisteryValue(const char* subkey, const char* key,
   return res;
 }
 
-int vtkKWWindow::DeleteRegisteryValue(const char* subkey, const char* key)
+int vtkKWWindow::DeleteRegisteryValue(int level, const char* subkey, 
+				      const char* key)
 {
+  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
+       this->GetApplication()->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
   int res = 0;
   char buffer[100];
   sprintf(buffer, "%s\\%s", 
@@ -1158,12 +1170,17 @@ int vtkKWWindow::DeleteRegisteryValue(const char* subkey, const char* key)
   return res;
 }
 
-int vtkKWWindow::GetRegisteryValue(const char* subkey, const char* key, 
-				   char* value)
+int vtkKWWindow::GetRegisteryValue(int level, const char* subkey, 
+				   const char* key, char* value)
 {
   int res = 0;
   char buff[1024];
   *value = 0;
+  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
+       this->GetApplication()->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
   char buffer[100];
   sprintf(buffer, "%s\\%s", 
 	  this->GetApplication()->GetApplicationVersionName(),
@@ -1181,22 +1198,35 @@ int vtkKWWindow::GetRegisteryValue(const char* subkey, const char* key,
   return res;
 }
 
-float vtkKWWindow::GetFloatRegisteryValue(const char* subkey, const char* key)
+float vtkKWWindow::GetFloatRegisteryValue(int level, const char* subkey, 
+					  const char* key)
 {
+  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
+       this->GetApplication()->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
   float res = 0;
   char buffer[1024];
-  if ( this->GetRegisteryValue( subkey, key, buffer ) )
+  if ( this->GetRegisteryValue( level, subkey, key, buffer ) )
     {
     res = atof(buffer);
     }
   return res;
 }
 
-int vtkKWWindow::GetIntRegisteryValue(const char* subkey, const char* key)
+int vtkKWWindow::GetIntRegisteryValue(int level, const char* subkey, 
+				      const char* key)
 {
+  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
+       this->GetApplication()->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
+
   int res = 0;
   char buffer[1024];
-  if ( this->GetRegisteryValue( subkey, key, buffer ) )
+  if ( this->GetRegisteryValue( level, subkey, key, buffer ) )
     {
     res = atoi(buffer);
     }

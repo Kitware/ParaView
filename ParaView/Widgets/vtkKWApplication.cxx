@@ -117,10 +117,12 @@ vtkKWApplication::vtkKWApplication()
   this->ExitStatus = 0;
 
   this->Registery = 0;
+  this->RegisteryLevel = 10;
 }
 
 vtkKWApplication::~vtkKWApplication()
 {
+  this->SetBalloonHelpWidget(0);
   if (this->Windows)
     {
     this->Windows->Delete();
@@ -461,7 +463,7 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
     }
   
   this->BalloonHelpCancel();
-  this->BalloonHelpWidget = widget;
+  this->SetBalloonHelpWidget(widget);
   this->Script("after %d {catch {%s BalloonHelpDisplay %s}}", 
 	       this->BalloonHelpDelay * 1000,
                this->GetTclName(), widget->GetTclName());
@@ -473,6 +475,10 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
 {
+  if ( !this->BalloonHelpLabel || !this->BalloonHelpWindow )
+    {
+    return;
+    }
   int x, y;
 
   // If there is no help string, return
@@ -563,14 +569,21 @@ void vtkKWApplication::BalloonHelpCancel()
     this->Script("after cancel %s", this->BalloonHelpPending);
     this->SetBalloonHelpPending(NULL);
     }
-  this->Script("wm withdraw %s",this->BalloonHelpWindow->GetWidgetName());
-  this->BalloonHelpWidget = 0;
+  if ( this->BalloonHelpWindow )
+    {
+    this->Script("wm withdraw %s",this->BalloonHelpWindow->GetWidgetName());
+    }
+  this->SetBalloonHelpWidget(0);
 }
 
 
 //----------------------------------------------------------------------------
 void vtkKWApplication::BalloonHelpWithdraw()
 {
+  if ( !this->BalloonHelpLabel || !this->BalloonHelpWindow )
+    {
+    return;
+    }
   this->Script("wm withdraw %s",this->BalloonHelpWindow->GetWidgetName());
   if ( this->BalloonHelpWidget )
     {
@@ -639,4 +652,18 @@ vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery()
     this->Registery = vtkKWRegisteryUtilities::New();
     }
   return this->Registery;
+}
+
+void vtkKWApplication::SetBalloonHelpWidget( vtkKWWidget *widget )
+{
+  if ( this->BalloonHelpWidget )
+    {
+    this->BalloonHelpWidget->UnRegister(this);
+    this->BalloonHelpWidget = 0;
+    }
+  if ( widget )
+    {
+    this->BalloonHelpWidget = widget;
+    this->BalloonHelpWidget->Register(this);
+    }  
 }
