@@ -60,10 +60,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
+#include "vtkKWListSelectOrder.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.61");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.62");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -85,6 +86,8 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->Range[0] = this->Range[1] = 0;
   
   this->Property = NULL;
+
+  this->FileListSelect = vtkKWListSelectOrder::New();
 }
 
 //----------------------------------------------------------------------------
@@ -104,6 +107,8 @@ vtkPVFileEntry::~vtkPVFileEntry()
   this->SetPrefix(0);
   this->SetExt(0);
   this->SetPath(0);
+  this->FileListSelect->Delete();
+  this->FileListSelect = 0;
   
   this->SetProperty(NULL);
 }
@@ -230,6 +235,10 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   this->Timestep->DisplayEntry();
   this->Timestep->SetEndCommand(this, "TimestepChangedCallback");
   this->Timestep->SetEntryCommand(this, "TimestepChangedCallback");
+
+  this->FileListSelect->SetParent(this);
+  this->FileListSelect->Create(pvApp, 0);
+  //this->Script("pack %s", this->FileListSelect->GetWidgetName());
 }
 
 
@@ -437,6 +446,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     int cnt = 0;
     for ( cc = 0; cc < files->GetLength(); cc ++ )
       {
+      this->FileListSelect->AddElement(files->GetString(cc));
       if ( vtkString::StartsWith(files->GetString(cc), file ) &&
         vtkString::EndsWith(files->GetString(cc), ext) )
         {

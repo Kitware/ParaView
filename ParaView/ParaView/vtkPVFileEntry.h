@@ -54,6 +54,7 @@ class vtkPVSource;
 class vtkKWScale;
 class vtkKWFrame;
 class vtkPVFileEntryProperty;
+class vtkKWListSelectOrder;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
@@ -173,6 +174,8 @@ protected:
   vtkKWFrame *TimestepFrame;
   vtkKWScale *Timestep;
   int TimeStep;
+
+  vtkKWListSelectOrder* FileListSelect;
 
   vtkSetStringMacro(Format);
   vtkSetStringMacro(Prefix);
