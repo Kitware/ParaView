@@ -234,6 +234,27 @@
    <!-- End CleanUnstructuredGrid -->
    </SourceProxy>
 
+   <SourceProxy name="Delaunay2D" class="vtkDelaunay2D">
+      <InputProperty
+         name="Input"
+         command="SetInput">
+           <ProxyGroupDomain name="groups">
+             <Group name="sources"/>
+             <Group name="filters"/>
+           </ProxyGroupDomain>
+           <DataTypeDomain name="input_type">
+             <DataType value="vtkPolyData"/>
+           </DataTypeDomain>
+      </InputProperty>
+      <IntVectorProperty 
+        name="ProjectionPlaneMode" 
+        command="SetProjectionPlaneMode" 
+        number_of_elements="1"
+        default_values="0"> 
+       <IntRangeDomain name="range" min="0" max="2"/>
+     </IntVectorProperty>
+   </SourceProxy>
+
    <SourceProxy name="PVConnectivityFilter" class="vtkPVConnectivityFilter">
       <InputProperty
          name="Input"

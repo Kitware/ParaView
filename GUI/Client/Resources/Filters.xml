@@ -15,6 +15,110 @@
 The Balance filter is available when ParaView is run in parallel. It does load-balancing so that all processes have the same number of cells. It operates on polygonal data sets and produces polygonal output.
     </Documentation>
   </Module>
+  <Module name="Delaunay2D"
+          root_name="Delaunay2D" module_type="Filter"
+          long_help="Perform 2D Delaunay triangulation."
+          short_help="Delaunay 2D triangulation.">
+    <Filter class="vtkDelaunay2D">
+      <Input name="Input"
+             class="vtkPolyData"/>
+    </Filter>
+    <InputMenu trace_name="Input" label="Input" property="Input"
+               help="Input"
+               input_name="Input"/>
+    <SelectionList property="ProjectionPlaneMode"
+                   trace_name="ProjectionPlaneMode"
+                   label="ProjectionPlaneMode"
+                   help="Select ProjectionPlaneMode">
+      <Item name="VTK_XY_PLANE"
+            value="0"/>
+      <Item name="VTK_SET_TRANSFORM_PLANE"
+            value="1"/>
+      <Item name="VTK_BEST_FITTING_PLANE"
+            value="2"/>
+    </SelectionList>
+    <Documentation>
+vtkDelaunay2D is a filter that constructs a 2D Delaunay triangulation from
+a list of input points. These points may be represented by any dataset of
+type vtkPointSet and subclasses. The output of the filter is a polygonal
+dataset. Usually the output is a triangle mesh, but if a non-zero alpha
+distance value is specified (called the "alpha" value), then only
+triangles, edges, and vertices lying within the alpha radius are
+output. In other words, non-zero alpha values may result in arbitrary
+combinations of triangles, lines, and vertices. (The notion of alpha value
+is derived from Edelsbrunner's work on "alpha shapes".) Also, it is
+possible to generate "constrained triangulations" using this filter.
+A constrained triangulation is one where edges and loops (i.e., polygons)
+can be defined and the triangulation will preserve them (read on for 
+more information).
+
+The 2D Delaunay triangulation is defined as the triangulation that 
+satisfies the Delaunay criterion for n-dimensional simplexes (in this case
+n=2 and the simplexes are triangles). This criterion states that a 
+circumsphere of each simplex in a triangulation contains only the n+1 
+defining points of the simplex. (See "The Visualization Toolkit" text 
+for more information.) In two dimensions, this translates into an optimal 
+triangulation. That is, the maximum interior angle of any triangle is less 
+than or equal to that of any possible triangulation.
+
+Delaunay triangulations are used to build topological structures
+from unorganized (or unstructured) points. The input to this filter
+is a list of points specified in 3D, even though the triangulation
+is 2D. Thus the triangulation is constructed in the x-y plane, and
+the z coordinate is ignored (although carried through to the
+output). If you desire to triangulate in a different plane, you
+can use the vtkTransformFilter to transform the points into and
+out of the x-y plane or you can specify a transform to the Delaunay2D
+directly.  In the latter case, the input points are transformed, the
+transformed points are triangulated, and the output will use the
+triangulated topology for the original (non-transformed) points.  This
+avoids transforming the data back as would be required when using the
+vtkTransformFilter method.  Specifying a transform directly also allows
+any transform to be used: rigid, non-rigid, non-invertible, etc.
+
+If an input transform is used, then alpha values are applied (for the
+most part) in the original data space.  The exception is when
+BoundingTriangulation is on.  In this case, alpha values are applied in
+the original data space unless a cell uses a bounding vertex.  
+
+The Delaunay triangulation can be numerically sensitive in some cases. To
+prevent problems, try to avoid injecting points that will result in
+triangles with bad aspect ratios (1000:1 or greater). In practice this
+means inserting points that are "widely dispersed", and enables smooth
+transition of triangle sizes throughout the mesh. (You may even want to
+add extra points to create a better point distribution.) If numerical
+problems are present, you will see a warning message to this effect at
+the end of the triangulation process.
+
+To create constrained meshes, you must define an additional
+input. This input is an instance of vtkPolyData which contains
+lines, polylines, and/or polygons that define constrained edges and
+loops. Only the topology of (lines and polygons) from this second
+input are used.  The topology is assumed to reference points in the
+input point set (the one to be triangulated). In other words, the
+lines and polygons use point ids from the first input point
+set. Lines and polylines found in the input will be mesh edges in
+the output. Polygons define a loop with inside and outside
+regions. The inside of the polygon is determined by using the
+right-hand-rule, i.e., looking down the z-axis a polygon should be
+ordered counter-clockwise. Holes in a polygon should be ordered
+clockwise. If you choose to create a constrained triangulation, the
+final mesh may not satisfy the Delaunay criterion. (Noted: the
+lines/polygon edges must not intersect when projected onto the 2D
+plane.  It may not be possible to recover all edges due to not
+enough points in the triangulation, or poorly defined edges
+(coincident or excessively long).  The form of the lines or
+polygons is a list of point ids that correspond to the input point
+ids used to generate the triangulation.)
+
+If an input transform is used, constraints are defined in the
+"transformed" space.  So when the right hand rule is used for a
+polygon constraint, that operation is applied using the transformed
+points.  Since the input transform can be any transformation (rigid
+or non-rigid), care must be taken in constructing constraints when
+an input transform is used.
+    </Documentation>
+  </Module>
   <Module name="AllToN"
           root_name="AllToN" module_type="Filter" menu_name="All to N"
           multiprocess_support="multiple_processes"
