@@ -48,7 +48,8 @@ public:
 
   // Description:
   // Set/Get the current color
-  void SetColor(float c[3]);
+  void SetColor(float c[3]) {this->SetColor(c[0], c[1], c[2]);};
+  void SetColor(float r, float g, float b);
   virtual float *GetColor() {return this->Color;};
 
   // Description:

@@ -77,19 +77,24 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
   this->Label2->Delete();
 }
 
-void vtkKWChangeColorButton::SetColor(float c[3])
+void vtkKWChangeColorButton::SetColor(float r, float g, float b)
 {
-  this->Color[0] = c[0];
-  this->Color[1] = c[1];
-  this->Color[2] = c[2];
+  if ( this->Color[0] == r && this->Color[1] == g && this->Color[2] == b )
+    {
+    return;
+    }
+
+  this->Color[0] = r;
+  this->Color[1] = g;
+  this->Color[2] = b;
 
   if ( this->Application )
     {
     this->Script( "%s configure -bg {#%02x%02x%02x}", 
                   this->Label2->GetWidgetName(),
-		  (int)(c[0]*255.5), 
-		  (int)(c[1]*255.5), 
-		  (int)(c[2]*255.5) );
+		  (int)(r*255.5), 
+		  (int)(g*255.5), 
+		  (int)(b*255.5) );
     this->Script( "update idletasks");
     }
 }
@@ -249,5 +254,5 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.4 $");
+  this->ExtractRevision(os,"$Revision: 1.5 $");
 }
