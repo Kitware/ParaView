@@ -168,6 +168,7 @@ public:
   void TogglePageVisibility(const char *title);
   int  CanBeHidden(int id);
   int  CanBeHidden(const char *title);
+  void HideAllPages();
 
   // Description:
   // Return the number of visible pages in the notebook.
@@ -382,6 +383,7 @@ protected:
   char* GetPageTitle(Page*);
 
   int AddToMostRecentPages(Page*);
+  int RemoveFromMostRecentPages(Page*);
   int PutOnTopOfMostRecentPages(Page*);
 
   // Update the tab frame color of a page given a selection status

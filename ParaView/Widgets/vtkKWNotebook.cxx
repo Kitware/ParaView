@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.47");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.48");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -762,6 +762,13 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
     return 0;
     }
 
+  // Hide the page
+
+  this->UnpinPage(page);
+  this->HidePage(page);
+
+  // Remove the page from the container
+
   vtkIdType pos = 0;
   if (this->Pages->FindItem(page, pos) != VTK_OK)
     {
@@ -770,36 +777,14 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
     return 0;
     }
 
-  // Remove the page from the container
-
   if (this->Pages->RemoveItem(pos) != VTK_OK)
     {
     vtkErrorMacro("Error while removing a page from the notebook.");
     return 0;
     }
 
-  // If the page to delete is selected, select another one among
-  // the visible one (which will be different than the current one since
-  // we just removed it from the pool).
-  // if no other one, set current selection to nothing (-1)
+  // Delete the page
 
-  if (page->Id == this->CurrentId)
-    {
-    vtkKWNotebook::Page *new_page = this->GetFirstVisiblePage();
-    if (new_page)
-      {
-      this->RaisePage(new_page);
-      }
-    else
-      {
-      this->CurrentId = -1;
-      }
-    }
-
-  // Unpack the widgets, delete the page
-
-  this->Script("pack forget %s %s", 
-               page->TabFrame->GetWidgetName(), page->Frame->GetWidgetName());
   page->Delete();
   delete page;
 
@@ -1224,10 +1209,15 @@ void vtkKWNotebook::HidePage(vtkKWNotebook::Page *page)
     }
 
   // If tab to hide was packed, unpack it
+  // and dequeue it from the most recent pages list.
   
   if (page->TabFrame->IsPacked())
     {
     this->Script("pack forget %s", page->TabFrame->GetWidgetName());
+    if (this->ShowOnlyMostRecentPages)
+      {
+      this->RemoveFromMostRecentPages(page);
+      }
     }
 
   // Bring or remove more pages depending on options
@@ -1316,6 +1306,24 @@ void vtkKWNotebook::TogglePageVisibility(vtkKWNotebook::Page *page)
     {
     this->ShowPage(page);
     }
+}
+
+//------------------------------------------------------------------------------
+void vtkKWNotebook::HideAllPages()
+{
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK)
+      {
+      this->HidePage(page);
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
 }
 
 //------------------------------------------------------------------------------
@@ -1422,19 +1430,26 @@ int vtkKWNotebook::AddToMostRecentPages(vtkKWNotebook::Page *page)
 }
 
 //------------------------------------------------------------------------------
-int vtkKWNotebook::PutOnTopOfMostRecentPages(vtkKWNotebook::Page *page)
+int vtkKWNotebook::RemoveFromMostRecentPages(vtkKWNotebook::Page *page)
 {
   if (page == NULL)
     {
     return 0;
     }
 
-  vtkIdType idx = 0;
-  if (this->MostRecentPages->FindItem(page, idx) == VTK_OK)
+  vtkIdType idx;
+  while (this->MostRecentPages->FindItem(page, idx) == VTK_OK)
     {
     this->MostRecentPages->RemoveItem(idx);
     }
 
+  return 1;
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::PutOnTopOfMostRecentPages(vtkKWNotebook::Page *page)
+{
+  this->RemoveFromMostRecentPages(page);
   return this->AddToMostRecentPages(page);
 }
 
