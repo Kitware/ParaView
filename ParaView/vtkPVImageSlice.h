@@ -35,10 +35,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkPVSource.h"
+#include "vtkInteractorStyleImageExtent.h"
 
 class vtkPVImage;
-
-
 
 class VTK_EXPORT vtkPVImageSlice : public vtkPVSource
 {
@@ -92,6 +91,18 @@ public:
   // Get the underlying vtkImageSlice
   vtkGetObjectMacro(Slice, vtkImageClip);
   
+  vtkGetObjectMacro(SliceStyle, vtkInteractorStyleImageExtent);
+  
+  // Description:
+  // overriding the Select/Deselect methods in the superclass so that we can
+  // add / remove the slice style button from the toolbar when this filter is
+  // selected / deselected
+  virtual void Select(vtkKWView *view);
+  virtual void Deselect(vtkKWView *view);
+  
+  void UseSliceStyle();
+  vtkGetObjectMacro(SliceEntry, vtkKWEntry);
+  
 protected:
   vtkPVImageSlice();
   ~vtkPVImageSlice();
@@ -117,8 +128,9 @@ protected:
   int SliceAxis;
   
   vtkImageClip  *Slice;
+  vtkInteractorStyleImageExtent *SliceStyle;
+  vtkKWPushButton *SliceStyleButton;
+  int SliceStyleCreated;
 };
 
 #endif
-
-

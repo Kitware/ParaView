@@ -104,7 +104,6 @@ vtkInteractorStyleExtent::vtkInteractorStyleExtent()
   this->Constraint0 = VTK_INTERACTOR_STYLE_EXTENT_NONE;
   this->Constraint1 = VTK_INTERACTOR_STYLE_EXTENT_NONE;
   this->Constraint2 = VTK_INTERACTOR_STYLE_EXTENT_NONE;
-
 }
 
 //----------------------------------------------------------------------------
@@ -267,7 +266,6 @@ void vtkInteractorStyleExtent::DefaultCallback(char *type)
     this->CurrentRenderer->GetRenderWindow()->Render();
     }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkInteractorStyleExtent::OnMouseMove(int vtkNotUsed(ctrl), 
@@ -669,8 +667,6 @@ void vtkInteractorStyleExtent::ComputeDisplayToExtentMapping()
 
 }
 
-
-
 //----------------------------------------------------------------------------
 // This method handles display of hot spots.
 // When the mouse is passively being moved over objects, this will
@@ -754,7 +750,6 @@ void vtkInteractorStyleExtent::HandleIndicator(int x, int y)
     }
 }
 
-
 //----------------------------------------------------------------------------
 void vtkInteractorStyleExtent::OnLeftButtonDown(int ctrl, int shift, 
                                                 int x, int y) 
@@ -808,6 +803,7 @@ void vtkInteractorStyleExtent::OnMiddleButtonDown(int ctrl, int shift,
     {
     }
 }
+
 //----------------------------------------------------------------------------
 void vtkInteractorStyleExtent::OnMiddleButtonUp(int ctrl, int shift, 
                                                 int X, int Y) 
@@ -841,12 +837,6 @@ void vtkInteractorStyleExtent::OnRightButtonDown(int ctrl, int shift,
     }
 }
 
-
-
-
-
-
-
 //----------------------------------------------------------------------------
 void vtkInteractorStyleExtent::OnRightButtonUp(int ctrl, int shift, int X, int Y) 
 {
@@ -861,9 +851,6 @@ void vtkInteractorStyleExtent::OnRightButtonUp(int ctrl, int shift, int X, int Y
     {
     }
 }
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkInteractorStyleExtent::PrintSelf(ostream& os, vtkIndent indent)

@@ -33,6 +33,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVAssignment.h"
+#include "vtkInteractorStyleImageExtent.h"
+#include "vtkKWToolbar.h"
 
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -64,6 +66,10 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->PropertiesCreated = 0;
   this->SliceNumber = 0;
   this->SliceAxis = 3;
+  
+  this->SliceStyle = vtkInteractorStyleImageExtent::New();
+  this->SliceStyleButton = vtkKWPushButton::New();
+  this->SliceStyleCreated = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -87,6 +93,11 @@ vtkPVImageSlice::~vtkPVImageSlice()
   
   this->Slice->Delete();
   this->Slice = NULL;
+  
+  this->SliceStyle->Delete();
+  this->SliceStyle = NULL;
+  this->SliceStyleButton->Delete();
+  this->SliceStyleButton = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -104,6 +115,11 @@ void vtkPVImageSlice::CreateProperties()
     return;
     }
   this->PropertiesCreated = 1;
+ 
+  this->GetSliceStyle()->
+    SetImageData((vtkImageData*)this->GetInput()->GetData());
+  this->GetSliceStyle()->
+    SetExtent(this->GetSlice()->GetOutputWholeExtent());
   
   // must set the application
   this->vtkPVSource::CreateProperties();
@@ -135,13 +151,13 @@ void vtkPVImageSlice::CreateProperties()
   this->UpdateProperties();
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SelectXCallback()
 {
   this->YDimension->SetState(0);
   this->ZDimension->SetState(0);
+  this->GetSliceStyle()->SetConstraint1ToNone();
+  this->GetSliceStyle()->SetConstraint2ToNone();
 }
 
 //----------------------------------------------------------------------------
@@ -149,6 +165,8 @@ void vtkPVImageSlice::SelectYCallback()
 {
   this->XDimension->SetState(0);
   this->ZDimension->SetState(0);
+  this->GetSliceStyle()->SetConstraint0ToNone();
+  this->GetSliceStyle()->SetConstraint2ToNone();
 }
 
 //----------------------------------------------------------------------------
@@ -156,8 +174,9 @@ void vtkPVImageSlice::SelectZCallback()
 {
   this->XDimension->SetState(0);
   this->YDimension->SetState(0);
+  this->GetSliceStyle()->SetConstraint0ToNone();
+  this->GetSliceStyle()->SetConstraint1ToNone();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::UpdateProperties()
@@ -175,14 +194,17 @@ void vtkPVImageSlice::UpdateProperties()
   if (this->SliceAxis == 0)
     {
     this->XDimension->SetState(1);
+    this->GetSliceStyle()->SetConstraint0ToCollapse();
     }
   if (this->SliceAxis == 1)
     {
     this->YDimension->SetState(1);
+    this->GetSliceStyle()->SetConstraint1ToCollapse();
     }
   if (this->SliceAxis == 2)
     {
     this->ZDimension->SetState(1);
+    this->GetSliceStyle()->SetConstraint2ToCollapse();
     }
 }
 
@@ -198,7 +220,6 @@ void vtkPVImageSlice::SetSliceNumber(int num)
   this->SliceNumber = num;
   this->UpdateProperties();
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::SetSliceAxis(int axis)
@@ -249,6 +270,37 @@ void EndImageSliceProgress(void *arg)
   vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
   me->GetWindow()->SetStatusText("");
   me->GetWindow()->GetProgressGauge()->SetValue(0);
+}
+
+//----------------------------------------------------------------------------
+void SliceCallback(void *arg)
+{
+  vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
+  int *extent = new int[6];
+  
+  me->GetSliceStyle()->DefaultCallback(me->GetSliceStyle()->GetCallbackType());
+  
+  extent = me->GetSliceStyle()->GetExtent();
+  if (me->GetSliceStyle()->GetConstraint0())
+    {
+    me->GetSliceEntry()->SetValue(extent[0]);
+    }
+  else if (me->GetSliceStyle()->GetConstraint1())
+    {
+    me->GetSliceEntry()->SetValue(extent[2]);
+    }
+  else
+    {
+    me->GetSliceEntry()->SetValue(extent[4]);
+    }
+  
+  me->SliceChanged();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::UseSliceStyle()
+{
+  this->GetWindow()->GetMainView()->SetInteractorStyle(this->SliceStyle);
 }
 
 //----------------------------------------------------------------------------
@@ -318,7 +370,7 @@ void vtkPVImageSlice::SliceChanged()
       }
     this->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3],
 			       this->SliceNumber, this->SliceNumber);
-    }  
+    }
   
   // Create the data if this is the first accept.
   if (this->GetPVData() == NULL)
@@ -326,6 +378,7 @@ void vtkPVImageSlice::SliceChanged()
     this->GetSlice()->SetStartMethod(StartImageSliceProgress, this);
     this->GetSlice()->SetProgressMethod(ImageSliceProgress, this);
     this->GetSlice()->SetEndMethod(EndImageSliceProgress, this);
+    this->GetSliceStyle()->SetCallbackMethod(SliceCallback, this);
     pvi = vtkPVImage::New();
     pvi->Clone(pvApp);
     pvi->OutlineFlagOff();
@@ -346,6 +399,14 @@ void vtkPVImageSlice::SliceChanged()
     }
 
   window->GetMainView()->SetSelectedComposite(this);
+  
+  if (!this->SliceStyleCreated)
+    {
+    this->SliceStyleCreated = 1;
+    this->Script("%s configure -state normal",
+		 this->SliceStyleButton->GetWidgetName());
+    }
+  
   this->GetView()->Render();  
 }
 
@@ -386,3 +447,32 @@ vtkPVImage *vtkPVImageSlice::GetOutput()
   return vtkPVImage::SafeDownCast(this->Output);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::Select(vtkKWView *view)
+{
+  // invoke super
+  this->vtkPVSource::Select(view);
+  
+  if (!this->SliceStyleCreated)
+    {
+    this->SliceStyleButton->SetParent(this->GetWindow()->GetToolbar());
+    this->SliceStyleButton->Create(this->Application, "");
+    this->SliceStyleButton->SetLabel("Slice");
+    this->SliceStyleButton->SetCommand(this, "UseSliceStyle");
+    this->Script("%s configure -state disabled",
+		 this->SliceStyleButton->GetWidgetName());
+    }
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+	       this->SliceStyleButton->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageSlice::Deselect(vtkKWView *view)
+{
+  // invoke super
+  this->vtkPVSource::Deselect(view);
+  
+  // unpack extent style button and reset interactor style to trackball camera
+  this->Script("pack forget %s", this->SliceStyleButton->GetWidgetName());
+  this->GetWindow()->UseCameraStyle();
+}

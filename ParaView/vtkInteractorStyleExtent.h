@@ -182,7 +182,6 @@ protected:
 
   // Implement the constraints.
   void Constrain();
-
 };
 
 #endif
