@@ -351,7 +351,7 @@ public:
   
   // Description:
   // This method collects data information from all processes.
-  // This needs to be called before this parts information\
+  // This needs to be called before this parts information
   // is valid.
   void GatherDataInformation();
 
