@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.13");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.14");
 
 
 //----------------------------------------------------------------------------
@@ -567,8 +567,19 @@ float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
     return this->Superclass::GetZBufferValue(x,y);
     }
 
-  // If client-server...
+  // Only MPI has a pointer to a composite.
   vtkPVProcessModule* pm = this->ProcessModule;
+  if(this->CompositeID.ID)
+    {
+    vtkPVTreeComposite *composite = 
+      vtkPVTreeComposite::SafeDownCast( pm->GetObjectFromID( this->CompositeID ));
+    if( composite ) // we know this is a vtkPVTreeComposite
+      {
+      return composite->GetZ(x, y);
+      }
+    }
+
+  // If client-server...
   if (pm->GetOptions()->GetClientMode())
     {
     vtkClientServerStream stream;
