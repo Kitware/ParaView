@@ -59,10 +59,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkIntArray.h"
 #include "vtkStringList.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkKWDirectoryUtilities.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.1");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.2");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -855,7 +856,12 @@ void vtkPVServerFileDialog::Update()
   char* name;
   int *dirMask;
   char* result;
-
+  if(!this->LastPath)
+    {
+    vtkKWDirectoryUtilities* du = vtkKWDirectoryUtilities::New();
+    this->SetLastPath(du->GetCWD());
+    du->Delete();
+    }
   this->GetPVApplication()->GetProcessModule()->RootScript(
                    "%s Open {%s}", this->DirectoryToolTclName, this->LastPath);
   result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
