@@ -1,5 +1,5 @@
 PROJECT(ParaViewComplete)
-SUBDIRS(VTK ParaView)
+SUBDIRS(VTK)
 SUBDIR_DEPENDS(ParaView VTK)
 
 SET (LIBRARY_OUTPUT_PATH ${ParaViewComplete_BINARY_DIR}/bin/ CACHE PATH 
@@ -13,6 +13,18 @@ OPTION (VTK_USE_PARALLEL "Build the parallel directory classes" ON)
 OPTION (VTK_WRAP_TCL "wrap classes into the TCL intepreted language" ON)
 
 OPTION (USE_INCLUDED_TCLTK "Should Tcl/Tk included in ParaViewComplete be used. Turn this off if you want to use your own Tcl/Tk. Note that you need version 8.3.2" ON)
+
+OPTION (PARAVIEW_LINK_XDMF "Build ParaView complete using included Xdmf library" OFF)
+IF(PARAVIEW_LINK_XDMF)
+  SET(XDMF_BUILD_VTK 1)
+  SET(XDMF_WRAP_PYTHON 0)
+  SET(XDMF_WRAP_TCL 0)
+  SET(VTK_DIR ${ParaViewComplete_BINARY_DIR}/VTK)
+  SET(VTK_NO_LIBRARY_DEPENDS 1)
+  SUBDIRS(Xdmf)
+ENDIF(PARAVIEW_LINK_XDMF)
+
+SUBDIRS(ParaView)
 
 IF(USE_INCLUDED_TCLTK)
   IF(UNIX)

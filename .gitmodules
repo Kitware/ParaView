@@ -7,3 +7,6 @@
 [submodule "VTK"]
 	path = VTK
 	url = git://vtk.org/VTK.git
+[submodule "Xdmf1"]
+	path = Xdmf
+	url = git://paraview.org/Xdmf.git
