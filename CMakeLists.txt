@@ -2,6 +2,12 @@ CMAKE_MINIMUM_REQUIRED (VERSION 1.8)
 PROJECT(ParaView)
 
 #########################################################################
+# Disallow in-source build
+IF("x${ParaView_SOURCE_DIR}x" MATCHES "^x${ParaView_BINARY_DIR}x$")
+  MESSAGE(FATAL_ERROR "ParaView requiers out of source Build. Please create a separate binary directory and run CMake there.")
+ENDIF("x${ParaView_SOURCE_DIR}x" MATCHES "^x${ParaView_BINARY_DIR}x$")
+
+#########################################################################
 # Common settings
 #
 # ParaView version number.  An even minor number corresponds to releases.
@@ -82,6 +88,9 @@ SET(VTK_USE_PARALLEL_ISSET ON)
 SET(VTK_USE_VOLUMEPRO_ISSET OFF)
 SET(VTK_USE_GL2PS_ISSET OFF)
 SET(VTK_USE_ANSI_STDLIB ${PARAVIEW_USE_ANSI_STDLIB})
+SET(VTK_HEADER_TESTING_PY "${ParaView_SOURCE_DIR}/VTK/Common/Testing/HeaderTesting.py")
+SET(VTK_PRINT_SELF_CHECK_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/PrintSelfCheck.tcl")
+SET(VTK_FIND_STRING_TCL "${ParaView_SOURCE_DIR}/VTK/Common/Testing/Tcl/FindString.tcl")
 
 SET(VTK_USE_RENDERING ON CACHE INTERNAL "" FORCE)
 SET(VTK_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
