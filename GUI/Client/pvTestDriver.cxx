@@ -40,6 +40,10 @@ pvTestDriver::pvTestDriver()
   this->ReverseConnection = 0;
 }
 
+pvTestDriver::~pvTestDriver()
+{
+}
+
 // now implement the pvTestDriver class
 
 void pvTestDriver::SeparateArguments(const char* str, 
@@ -406,7 +410,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
   if(this->ReverseConnection)
     {
-    if(!this->StartServer(client, "Client reverse ",
+    if(!this->StartServer(client, "client",
                           ClientStdOut, ClientStdErr))
       {
       cerr << "pvTestDriver: Reverse connection client never started.\n";
@@ -426,14 +430,14 @@ int pvTestDriver::Main(int argc, char* argv[])
   else
     {
     // Start the render server if there is one
-    if(!this->StartServer(renderServer, "Render Server",
+    if(!this->StartServer(renderServer, "renderserver",
                           RenderServerStdOut, RenderServerStdErr))
       {
       cerr << "pvTestDriver: Render server never started.\n";
       return -1;
       }
     // Start the data server if there is one
-    if(!this->StartServer(server, "Server",
+    if(!this->StartServer(server, "server",
                           ServerStdOut, ServerStdErr))
       {
       cerr << "pvTestDriver: Server never started.\n";
@@ -466,9 +470,9 @@ int pvTestDriver::Main(int argc, char* argv[])
       }
     output = "";
     renderServerPipe =
-      this->WaitForAndPrintLine("renderServer", renderServer, output, 0.1,
+      this->WaitForAndPrintLine("renderserver", renderServer, output, 0.1,
                                 RenderServerStdOut, RenderServerStdErr, 0);
-    if(!mpiError && this->OutputStringHasError("renderServer", output))
+    if(!mpiError && this->OutputStringHasError("renderserver", output))
       {
       mpiError = 1;
       }
@@ -518,7 +522,6 @@ int pvTestDriver::Main(int argc, char* argv[])
     {
     kwsysProcess_Delete(renderServer);
     }
-
   // Report the server return code if it is nonzero.  Otherwise report
   // the client return code.
   if(serverResult)
@@ -728,11 +731,15 @@ int pvTestDriver::WaitForLine(kwsysProcess* process, vtkstd::string& line,
 //----------------------------------------------------------------------------
 void pvTestDriver::PrintLine(const char* pname, const char* line)
 {
-  cerr << "\n-------------- " << pname
-       << " output line begin --------------\n";
-  cerr << line;
-  cerr << "\n-------------- " << pname
-       << " output line end   --------------\n";
+  // if the name changed then the line is output from a different process
+  if(this->CurrentPrintLineName != pname)
+    {
+    cerr << "-------------- " << pname
+         << " output --------------\n";
+    // save the current pname
+    this->CurrentPrintLineName = pname;
+    }
+  cerr << line << "\n";
   cerr.flush();
 }
 

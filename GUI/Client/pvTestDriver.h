@@ -31,6 +31,7 @@ class pvTestDriver
 public:
   int Main(int argc, char* argv[]);
   pvTestDriver();
+  ~pvTestDriver();
 protected:
   void SeparateArguments(const char* str, 
                          vtkstd::vector<vtkstd::string>& flags);
@@ -66,6 +67,7 @@ private:
   vtkstd::string MPIClientNumProcessFlag;
   vtkstd::string MPIServerNumProcessFlag;
   vtkstd::string MPIRenderServerNumProcessFlag;
+  vtkstd::string CurrentPrintLineName;
   int RenderServerNumProcesses;
   double TimeOut;
   int TestRenderServer;
