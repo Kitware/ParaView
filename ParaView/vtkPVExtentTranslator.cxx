@@ -95,7 +95,8 @@ int vtkPVExtentTranslator::PieceToExtent()
   //     << this->Extent[2] << ", " << this->Extent[3] << ", " 
   //     << this->Extent[4] << ", " << this->Extent[5] << endl;
   
-  if (this->SplitExtent(this->Piece, this->NumberOfPieces, this->Extent) == 0)
+  if (this->SplitExtent(this->Piece, this->NumberOfPieces, this->Extent,
+			this->GetSplitMode()) == 0)
     {
     //cerr << "Split thinks nothing is in the piece" << endl;
     //cerr << this << " Split: " << this->Extent[0] << ", " << this->Extent[1] << ", " 

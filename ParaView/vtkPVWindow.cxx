@@ -1561,12 +1561,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("VOI");
   mInt->SetSetCommand("SetVOI");
   mInt->SetGetCommand("GetVOI");
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
-  mInt->AddIntegerArgument();
+  mInt->SetWidgetTypeToExtent();
   mInt->SetBalloonHelp("Set the min/max values of the volume of interest (VOI)");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
@@ -1642,6 +1637,28 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // ---- ImageClip ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkImageClip");
+  sInt->SetRootName("ImageClip");
+  sInt->SetInputClassName("vtkImageData");
+  sInt->SetOutputClassName("vtkImageData");
+  //Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("OutputWholeExtent");
+  mInt->SetSetCommand("SetOutputWholeExtent");
+  mInt->SetGetCommand("GetOutputWholeExtent");
+  mInt->SetWidgetTypeToExtent();
+  mInt->SetBalloonHelp("Set the min/max extents in each dimension of the output");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+  
   // ---- LinearExtrusion ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);

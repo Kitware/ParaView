@@ -182,6 +182,15 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 	pvs->AddModeListItem(l->GetString(i), i);
 	}
       }
+    else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)
+      {
+      this->Script("eval %s SetOutputWholeExtent [[%s GetInput] GetWholeExtent]",
+		   pvs->GetVTKSourceTclName(), pvs->GetVTKSourceTclName());
+      pvs->AddVector6Entry(mInt->GetVariableName(), "", "", "", "", "", "",
+			   mInt->GetSetCommand(),
+			   mInt->GetGetCommand(),
+                           mInt->GetBalloonHelp());      
+      }
     else if (mInt->GetNumberOfArguments() == 1)
       {
       if (mInt->GetArgumentType(0) == VTK_STRING)

@@ -45,6 +45,7 @@ class vtkStringList;
 #define VTK_PV_METHOD_WIDGET_TOGGLE     1
 #define VTK_PV_METHOD_WIDGET_SELECTION  2
 #define VTK_PV_METHOD_WIDGET_FILE       3
+#define VTK_PV_METHOD_WIDGET_EXTENT     4
 
 class VTK_EXPORT vtkPVMethodInterface : public vtkObject
 {
@@ -102,6 +103,10 @@ public:
   // Description:
   // Displays a button that brings up a file selection dialog.
   void SetWidgetTypeToFile() { this->SetWidgetType(VTK_PV_METHOD_WIDGET_FILE);}  
+  // Description:
+  // Displays an extent entry widget.
+  void SetWidgetTypeToExtent() { this->SetWidgetType(VTK_PV_METHOD_WIDGET_EXTENT); }
+  
   vtkSetStringMacro(FileExtension);
   vtkGetStringMacro(FileExtension);
   

@@ -41,6 +41,7 @@ vtkPVContour \
 vtkPVData \
 vtkPVDataSetReaderInterface \
 vtkPVEnSightReaderInterface \
+vtkPVExtentTranslator \
 vtkPVGlyph3D \
 vtkPVInputMenu \
 vtkPVMethodInterface \
