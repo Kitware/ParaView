@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.35");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.35.2.1");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -61,10 +61,13 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
   this->LabelOutsideButton = 0;
 
   this->Text = NULL;
+  this->DialogText = 0;
   this->SetText("Set Color");
 
   this->ColorButton = vtkKWWidget::New();
   this->MainFrame = vtkKWWidget::New();
+  
+  this->ButtonDown = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -76,6 +79,7 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
     }
 
   this->SetText(0);
+  this->SetDialogText(0);
 
   if (this->ColorButton)
     {
@@ -123,7 +127,7 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 
   // Create the container frame
 
-  this->Script("frame %s -relief flat -bd 0 -highlightthickness	0 %s", 
+  this->Script("frame %s -relief flat -bd 0 -highlightthickness 0 %s", 
                this->GetWidgetName(), args ? args : "");
 
   // Create the main frame
@@ -309,6 +313,7 @@ void vtkKWChangeColorButton::UnBind()
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::ButtonPressCallback(int /*x*/, int /*y*/)
 {  
+  this->ButtonDown = 1;
   this->Script("%s configure -relief sunken", 
                this->MainFrame->GetWidgetName());  
 }
@@ -316,6 +321,13 @@ void vtkKWChangeColorButton::ButtonPressCallback(int /*x*/, int /*y*/)
 //----------------------------------------------------------------------------
 void vtkKWChangeColorButton::ButtonReleaseCallback(int x, int y)
 {  
+  if (!this->ButtonDown)
+    {
+    return;
+    }
+  
+  this->ButtonDown = 0;
+  
   this->Script("%s configure -relief raised", 
                this->MainFrame->GetWidgetName());  
 
@@ -400,10 +412,12 @@ void vtkKWChangeColorButton::QueryUserForColor()
   this->Application->SetDialogUp(1);
 
   this->Script(
-     "tk_chooseColor -initialcolor {#%02x%02x%02x} -title {Choose Color}",
+     "tk_chooseColor -initialcolor {#%02x%02x%02x} -title {%s} -parent %s",
      (int)(this->Color[0] * 255.5), 
      (int)(this->Color[1] * 255.5), 
-     (int)(this->Color[2] * 255.5) );
+     (int)(this->Color[2] * 255.5),
+     (this->DialogText?this->DialogText:"Chose Color"),
+     this->GetWidgetName() );
 
   result = this->Application->GetMainInterp()->result;
 
@@ -485,7 +499,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.35 $");
+  this->ExtractRevision(os,"$Revision: 1.35.2.1 $");
 }
 
 //----------------------------------------------------------------------------

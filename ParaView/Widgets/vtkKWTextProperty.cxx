@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.21");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.21.2.1");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -232,6 +232,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->ChangeColorButton->Create(this->Application, "");
   this->ChangeColorButton->SetCommand(this, "ChangeColorButtonCallback");
   this->ChangeColorButton->SetBalloonHelpString("Select the text color.");
+  this->ChangeColorButton->SetDialogText("Text Color");
 
   // Font Family
 

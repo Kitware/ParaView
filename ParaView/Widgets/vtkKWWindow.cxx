@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.160");
+vtkCxxRevisionMacro(vtkKWWindow, "1.160.2.1");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -464,6 +464,11 @@ void vtkKWWindow::Exit()
 // invoke the apps close when selected
 void vtkKWWindow::Close()
 {
+  if (this->Application->GetDialogUp())
+    {
+    this->Script("bell");
+    return;
+    }
   if ( this->PromptBeforeClose &&
        this->Application->GetWindows()->GetNumberOfItems() <= 1 )
     {

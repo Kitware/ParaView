@@ -65,6 +65,11 @@ public:
   vtkGetStringMacro(Text);
  
   // Description:
+  // Set the text that will be used on the title of the color selection dialog.
+  vtkSetStringMacro(DialogText);
+  vtkGetStringMacro(DialogText);
+
+  // Description:
   // Set the command that is called when the color is changed - the object is
   // the KWObject that will have the method called on it.  The second argument
   // is the name of the method to be called and any arguments in string form.
@@ -114,6 +119,7 @@ protected:
 
   char        *Command;
   char        *Text;
+  char        *DialogText;
   float       Color[3];
   int         LabelAfterColor;
   int         LabelOutsideButton;
@@ -130,6 +136,8 @@ protected:
   // internal widgets.
   virtual void UpdateEnableState();
 
+  int ButtonDown;
+  
 private:
   vtkKWChangeColorButton(const vtkKWChangeColorButton&); // Not implemented
   void operator=(const vtkKWChangeColorButton&); // Not implemented

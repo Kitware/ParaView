@@ -62,14 +62,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.3");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.43.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
 {
   this->LabelWidget = vtkKWLabel::New();
   this->Entry = vtkKWEntry::New();
-  this->Entry->PullDownOn();
+  //this->Entry->PullDownOn();
   this->BrowseButton = vtkKWPushButton::New();
   this->Extension = NULL;
   this->SuppressReset = 1;

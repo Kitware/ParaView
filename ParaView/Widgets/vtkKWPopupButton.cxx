@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.3");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.3.2.1");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -113,7 +113,8 @@ void vtkKWPopupButton::Create(vtkKWApplication *app, const char *args)
   tk_cmd << "wm withdraw " << this->PopupTopLevel->GetWidgetName() << endl
          << "wm title " << this->PopupTopLevel->GetWidgetName() 
          << " [wm title [winfo toplevel " << this->GetWidgetName() << "]]"<< endl
-         << "wm transient " << this->PopupTopLevel->GetWidgetName() << endl
+         << "wm transient " << this->PopupTopLevel->GetWidgetName() 
+         << " " << this->GetWidgetName() << endl
          << "wm protocol " << this->PopupTopLevel->GetWidgetName()
          << " WM_DELETE_WINDOW {" 
          << this->GetTclName() << " WithdrawPopupCallback}" << endl;
@@ -207,6 +208,11 @@ void vtkKWPopupButton::DisplayPopupCallback()
 // ---------------------------------------------------------------------------
 void vtkKWPopupButton::WithdrawPopupCallback()
 {
+  if ( this->Application->GetDialogUp() )
+    {
+    this->Script("bell");
+    return;
+    }
   if (!this->IsCreated())
     {
     return;
