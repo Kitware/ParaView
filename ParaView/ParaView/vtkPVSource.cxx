@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.328");
+vtkCxxRevisionMacro(vtkPVSource, "1.329");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -852,6 +852,9 @@ void vtkPVSource::CreateProperties()
                this->AcceptButton->GetWidgetName(), 
                this->ResetButton->GetWidgetName(), 
                this->DeleteButton->GetWidgetName());
+  this->Script("bind %s <Enter> {+focus %s}",
+               this->AcceptButton->GetWidgetName(),
+               this->AcceptButton->GetWidgetName());
 
   frame->Delete();  
  

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.30");
+vtkCxxRevisionMacro(vtkPVScale, "1.31");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -205,8 +205,6 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
     {
     this->DisplayEntry();
     this->Script("bind %s <KeyPress> {%s CheckModifiedCallback}",
-                 this->Scale->GetEntry()->GetWidgetName(), this->GetTclName());
-    this->Script("bind %s <FocusOut> {%s EntryCheckModifiedCallback}",
                  this->Scale->GetEntry()->GetWidgetName(), this->GetTclName());
     }
   this->SetDisplayEntryAndLabelOnTop(this->EntryAndLabelOnTopFlag);
