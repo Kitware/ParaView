@@ -25,7 +25,7 @@
 #include "vtkXMLTextActorReader.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetReader);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetReader, "1.9");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetReader, "1.10");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetReader::GetRootElementName()
@@ -55,7 +55,7 @@ int vtkXMLKWRenderWidgetReader::Parse(vtkXMLDataElement *elem)
 
   if (elem->GetVectorAttribute("BackgroundColor", 3, dbuffer3) == 3)
     {
-    obj->SetBackgroundColor(dbuffer3);
+    obj->SetBackgroundColor(dbuffer3[0], dbuffer3[1], dbuffer3[2]);
     }
 
   cptr = elem->GetAttribute("DistanceUnits");
