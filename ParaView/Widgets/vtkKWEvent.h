@@ -59,6 +59,7 @@ class VTK_EXPORT vtkKWEvent
     AmbientChangedEvent,
     AngleVisibilityChangedEvent,
     AnnotationColorChangedEvent,
+    ApplicationAreaChangedEvent,
     BackgroundColorChangedEvent,
     ChangeMouseOperationsEvent,
     ChangePrinterDPIEvent,

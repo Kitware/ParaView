@@ -50,6 +50,7 @@ static const char *vtkKWEventStrings[] = {
   "AmbientChangedEvent",
   "AngleVisibilityChangedEvent",
   "AnnotationColorChangedEvent",
+  "ApplicationAreaChangedEvent",
   "BackgroundColorChangedEvent",
   "ChangeMouseOperationsEvent",
   "ChangePrinterDPIEvent",
