@@ -233,27 +233,11 @@ SOURCE=.\vtkPVAssignmentTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVColorByProcess.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVColorByProcessTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVCommandList.cxx
 # End Source File
 # Begin Source File
 
 SOURCE=.\vtkPVCommandListTcl.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVContourFilter.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVContourFilterTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -297,14 +281,6 @@ SOURCE=.\vtkPVExtentTranslatorTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVExtractEdges.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVExtractEdgesTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVGetRemoteGhostCells.cxx
 # End Source File
 # Begin Source File
@@ -342,14 +318,6 @@ SOURCE=.\vtkPVImageMandelbrotSource.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVImageMandelbrotSourceTcl.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVImageReader.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVImageReaderTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -470,6 +438,14 @@ SOURCE=.\vtkPVWindow.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVWindowTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkRunTimeContour.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkRunTimeContourTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -870,26 +846,6 @@ InputName=vtkPVAssignment
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVColorByProcess.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVColorByProcess.h
-InputName=vtkPVColorByProcess
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVCommandList.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -899,26 +855,6 @@ SOURCE=.\vtkPVCommandList.h
 # Begin Custom Build
 InputPath=.\vtkPVCommandList.h
 InputName=vtkPVCommandList
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVContourFilter.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVContourFilter.h
-InputName=vtkPVContourFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -1030,26 +966,6 @@ InputName=vtkPVExtentTranslator
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVExtractEdges.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVExtractEdges.h
-InputName=vtkPVExtractEdges
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVGetRemoteGhostCells.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -1139,26 +1055,6 @@ SOURCE=.\vtkPVImageMandelbrotSource.h
 # Begin Custom Build
 InputPath=.\vtkPVImageMandelbrotSource.h
 InputName=vtkPVImageMandelbrotSource
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVImageReader.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVImageReader.h
-InputName=vtkPVImageReader
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -1477,6 +1373,26 @@ InputName=vtkPVWindow
 # Begin Custom Build
 InputPath=.\vtkPVWindow.h
 InputName=vtkPVWindow
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkRunTimeContour.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkRunTimeContour.h
+InputName=vtkRunTimeContour
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
