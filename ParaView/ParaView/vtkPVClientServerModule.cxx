@@ -79,7 +79,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkKWRemoteExecute.h"
 #include "vtkPVWindow.h"
+
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -207,7 +210,7 @@ private:
   void operator=(const vtkPVClientServerModuleConnectDialog&);
 };
 vtkStandardNewMacro(vtkPVClientServerModuleConnectDialog);
-vtkCxxRevisionMacro(vtkPVClientServerModuleConnectDialog, "1.27");
+vtkCxxRevisionMacro(vtkPVClientServerModuleConnectDialog, "1.28");
 //============================================================================
 //----------------------------------------------------------------------------
 
@@ -312,7 +315,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.27");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.28");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
