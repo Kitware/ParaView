@@ -20,7 +20,7 @@
 #include <queue>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPKdTree, "1.1.2.3");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -783,7 +783,7 @@ void vtkPKdTree::_select(int L, int R, int K, int dim)
 
       N = R - L + 1;
       I = K - L + 1;
-      Z = log(N); 
+      Z = log(float(N)); 
       S = static_cast<int>(.5 * exp(2*Z/3));
       SD = static_cast<int>(.5 * sqrt(Z*S*(N-S)/N) * sign(1 - N/2));
       LL = max(L, K - (I*S/N) + SD);
