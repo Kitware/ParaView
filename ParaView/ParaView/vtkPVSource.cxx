@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.333");
+vtkCxxRevisionMacro(vtkPVSource, "1.334");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1310,21 +1310,13 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     pvd->CreateProperties();
     this->GetPVApplication()->GetRenderModule()->AddPVSource(this);
 
-    // I need to update the data before 
-    // UpdateFilterMenu which is called by SetCurrentPVSource.
-    // Although tis fixes my problem,  I should not have to actually update.
-    // All I need is the data type from the information which should be
-    // obtainable after initialize data ...
-    // The bug I was fixing is the ExtractGrid button was active
-    // for a polydata and imagedata collection.
-    this->Update();
-    
-
     // Make the last data invisible.
     input = this->GetPVInput(0);
     if (input)
       {
-      if (this->ReplaceInput && input->GetPVOutput()->GetPropertiesCreated() && hideSource)
+      if (this->ReplaceInput && 
+          input->GetPVOutput()->GetPropertiesCreated() && 
+          hideSource)
         {
         input->SetVisibilityInternal(0);
         }
