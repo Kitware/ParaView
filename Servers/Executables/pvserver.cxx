@@ -217,10 +217,6 @@ int main(int argc, char *argv[])
   pm->SetOptions(options);
   FindDemoPath(pm, argv[0]);
 
-  options->SetServerMode(1);
-  options->SetClientMode(0);
-  options->SetHostName("localhost");
-  options->SetPort(11111);
   pm->InitializeInterpreter();
   pm->GetProgressHandler()->SetServerMode(1);
   vtkProcessModule::SetProcessModule(pm);

@@ -43,15 +43,12 @@ public:
   vtkGetMacro(RenderServerMode, int);
   vtkGetMacro(ConnectID, int);
   vtkGetMacro(UseOffscreenRendering, int);
-  vtkGetMacro(PlayDemoFlag, int);
-  vtkGetMacro(DisableRegistry, int);
   vtkGetMacro(UseStereoRendering, int);
   vtkGetMacro(ClientMode, int);
   vtkGetMacro(ClientRenderServer, int);
   vtkGetMacro(Port, int);
   vtkGetMacro(RenderNodePort, int);
   vtkGetMacro(RenderServerPort, int);
-  vtkGetMacro(CrashOnErrors, int);
   vtkGetMacro(DisableComposite, int);
   vtkGetMacro(UseSoftwareRendering, int);
   vtkGetMacro(UseSatelliteSoftwareRendering, int);
@@ -59,29 +56,15 @@ public:
   vtkGetMacro(ReverseConnection, int);
   vtkGetMacro(AlwaysSSH, int);
   vtkGetMacro(UseTiledDisplay, int);
-  vtkGetMacro(StartEmpty, int);
   vtkGetMacro(UseRenderingGroup, int);
-
   vtkGetVector2Macro(TileDimensions, int);
-
   vtkGetStringMacro(RenderModuleName);
   vtkGetStringMacro(CaveConfigurationFileName);
-  vtkGetStringMacro(BatchScriptName);
   vtkGetStringMacro(Username);
   vtkGetStringMacro(HostName);
   vtkGetStringMacro(RenderServerHostName);
   vtkGetStringMacro(MachinesFileName);
   vtkGetStringMacro(GroupFileName);
-
-
-  // Description:
-  // Some variables need to be overwritten
-  vtkSetStringMacro(HostName);
-  vtkSetStringMacro(Username);
-  vtkSetClampMacro(Port, int, 0, 65535);
-  vtkSetClampMacro(ServerMode, int, 0, 1);
-  vtkSetClampMacro(ClientMode, int, 0, 1);
-
 
   // Description:
   // In case of unknown argument, set this variable with the unknown argument.
@@ -101,6 +84,12 @@ protected:
   virtual ~vtkPVOptions();
 
   // Description:
+  // Add option.
+  void AddBooleanArgument(const char* longarg, const char* shortarg, int* var, const char* help);
+  void AddArgument(const char* longarg, const char* shortarg, int* var, const char* help);
+  void AddArgument(const char* longarg, const char* shortarg, char** var, const char* help);
+
+  // Description:
   // Initialize arguments.
   virtual void Initialize();
 
@@ -109,25 +98,40 @@ protected:
   virtual int PostProcess();
 
   // Description:
-  // This method is called when wrong argument is found. If it returns 0, then the parsing will fail.
+  // This method is called when wrong argument is found. If it returns 0, then
+  // the parsing will fail.
   virtual int WrongArgument(const char* argument);
 
-  // Options:
+  vtkSetStringMacro(UnknownArgument);
+  char* UnknownArgument;
+
+  vtkSetStringMacro(ErrorMessage);
+  char* ErrorMessage;
+
+  // Description:
+  // Subclasses may need to access these
+  vtkSetStringMacro(Username);
+  char* Username;
+
+  vtkSetStringMacro(HostName);
+  char* HostName;
+
+  int Port;
+
   int ServerMode;
+  int ClientMode;
+
+private:
+  // Options:
   int RenderServerMode;
   int ConnectID;
   int UseOffscreenRendering;
-  int PlayDemoFlag;
-  int DisableRegistry;
   int UseStereoRendering;
-  int ClientMode;
   int ClientRenderServer;
   int ConnectRenderToData;
   int ConnectDataToRender;
-  int Port;
   int RenderNodePort;
   int RenderServerPort;
-  int CrashOnErrors;
   int DisableComposite;
   int UseSoftwareRendering;
   int UseSatelliteSoftwareRendering;
@@ -135,7 +139,6 @@ protected:
   int ReverseConnection;
   int AlwaysSSH;
   int UseTiledDisplay;
-  int StartEmpty;
   int TileDimensions[2];
   int UseRenderingGroup;
 
@@ -145,13 +148,6 @@ protected:
   vtkSetStringMacro(CaveConfigurationFileName);
   char* CaveConfigurationFileName;
 
-  vtkSetStringMacro(BatchScriptName);
-  char* BatchScriptName;
-
-  char* Username;
-
-  char* HostName;
-
   vtkSetStringMacro(RenderServerHostName);
   char* RenderServerHostName;
 
@@ -160,12 +156,6 @@ protected:
 
   vtkSetStringMacro(GroupFileName);
   char* GroupFileName;
-
-  vtkSetStringMacro(UnknownArgument);
-  char* UnknownArgument;
-
-  vtkSetStringMacro(ErrorMessage);
-  char* ErrorMessage;
 
 private:
   vtkPVOptions(const vtkPVOptions&); // Not implemented

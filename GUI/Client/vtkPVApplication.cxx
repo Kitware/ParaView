@@ -92,7 +92,7 @@
 #include "vtkPVProgressHandler.h"
 #include "vtkKWDirectoryUtilities.h"
 
-#include "vtkPVOptions.h"
+#include "vtkPVGUIClientOptions.h"
 
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.312");
+vtkCxxRevisionMacro(vtkPVApplication, "1.313");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -419,7 +419,6 @@ vtkPVApplication::vtkPVApplication()
 
 
   this->Display3DWidgets = 0;
-  this->RunningParaViewScript = 0;
 
   this->ProcessModule = NULL;
   this->CommandFunction = vtkPVApplicationCommand;
@@ -817,16 +816,8 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->SetArgv0(argv[0]);
     }
 
-  for (i=1; i < argc; i++)
-    {
-    if ( vtkPVApplication::CheckForExtension(argv[i], ".pvs") )
-      {
-      this->RunningParaViewScript = 1;
-      break;
-      }
-    }
-
-  if (!this->RunningParaViewScript)
+  if (!this->Options->GetParaViewScriptName() &&
+    !this->Options->GetBatchScriptName())
     {
     for (i=1; i < argc; i++)
       {
@@ -901,6 +892,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->OutputWindow->CrashOnErrorsOn();
     }
 
+  this->Print(cout);
   return 0;
 }
 
@@ -1071,29 +1063,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
 
 
-  vtkstd::vector<vtkstd::string> open_files;
-  // If any of the arguments has a .pvs extension, load it as a script.
-  int i;
-  for (i=1; i < argc; i++)
-    {
-    if (vtkPVApplication::CheckForExtension(argv[i], ".pvs"))
-      {
-      if ( !vtkKWDirectoryUtilities::FileExists(argv[i]) )
-        {
-        vtkErrorMacro("Could not find the script file: " << argv[i]);
-        // Break a circular reference.
-        this->ProcessModule->SetRenderModule(NULL);
-        this->SetExitStatus(1);
-        this->Exit();
-        return;
-        }
-      else
-        {
-        open_files.push_back(argv[i]);
-        }
-      }
-    }
-
   // Splash screen ?
 
   if (this->ShowSplashScreen)
@@ -1162,7 +1131,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   // If there is already an existing trace file, ask the
   // user what she wants to do with it.
-  if (foundTrace && ! this->RunningParaViewScript) 
+  if (foundTrace && ! this->Options->GetParaViewScriptName()) 
     {
     vtkPVTraceFileDialog *dlg2 = vtkPVTraceFileDialog::New();
     dlg2->SetMasterWindow(ui);
@@ -1241,17 +1210,11 @@ void vtkPVApplication::Start(int argc, char*argv[])
                       ui->GetMainView()->GetTclName(), ui->GetTclName());
   ui->GetMainView()->SetTraceInitialized(1);
 
-  vtkstd::vector<vtkstd::string>::size_type cc;
-  for ( cc = 0; cc < open_files.size(); cc ++ )
-    {
-    this->RunningParaViewScript = 1;
-    // Some scripts were hanging due to event loop issues.
-    // This update prevents such problems.
-    this->Script("update");
-    this->LoadScript(open_files[cc].c_str());
-    this->RunningParaViewScript = 0;
-    }
-  
+  // Some scripts were hanging due to event loop issues.
+  // This update prevents such problems.
+  this->Script("update");
+  this->LoadScript(this->Options->GetParaViewScriptName());
+
   if (this->Options->GetPlayDemoFlag())
     {
     this->Script("set pvDemoCommandLine 1");
@@ -1581,8 +1544,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "ProcessModule: " << this->ProcessModule << endl;;
-  os << indent << "RunningParaViewScript: " 
-     << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
   os << indent << "StartGUI: " << this->StartGUI << endl;
 
@@ -1941,7 +1902,19 @@ const char* vtkPVApplication::GetStringFromClient()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SetOptions(vtkPVOptions* op)
+vtkPVGUIClientOptions* vtkPVApplication::GetGUIClientOptions()
+{
+  return this->Options;
+}
+
+//----------------------------------------------------------------------------
+vtkPVOptions* vtkPVApplication::GetOptions()
+{
+  return this->Options;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetOptions(vtkPVGUIClientOptions* op)
 {
   this->Options = op;
 }

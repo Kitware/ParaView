@@ -286,7 +286,7 @@ void vtkPVApplication::AddAboutText(ostream &os)
 
   ostrstream str;
   vtkIndent indent;
-  this->Options->PrintSelf( str, indent.GetNextIndent() );
+  this->GetOptions()->PrintSelf( str, indent.GetNextIndent() );
   str << ends;
   vtkstd::string tmp = str.str();
   os << endl << tmp.substr( tmp.find( "Runtime information:" ) ).c_str();

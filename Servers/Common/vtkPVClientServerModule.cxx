@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.16");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.17");
 
 
 //----------------------------------------------------------------------------
@@ -169,7 +169,6 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->RemoteExecution = vtkKWRemoteExecute::New();
 
   this->Enabled = 1;
-  this->ConnectID = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -254,7 +253,8 @@ void vtkPVClientServerModule::Initialize()
       }
   
     // The client sends the connect id to data server
-    this->SocketController->Send(&this->ConnectID, 1, 1, 8843);
+    int cid = this->Options->GetConnectID();
+    this->SocketController->Send(&cid, 1, 1, 8843);
     int dsmatch = 1, rsmatch = 1;
     // Check if it matched
     this->SocketController->Receive(&dsmatch, 1, 1, 8843);
@@ -293,7 +293,8 @@ void vtkPVClientServerModule::Initialize()
     if(this->Options->GetRenderServerMode())
       { 
       // The client sends the connect id to data server
-      this->RenderServerSocket->Send(&this->ConnectID, 1, 1, 8843);
+      int cid = this->Options->GetConnectID();
+      this->RenderServerSocket->Send(&cid, 1, 1, 8843);
       // Check if it matched
       this->RenderServerSocket->Receive(&rsmatch, 1, 1, 8843);
       if (!rsmatch)
@@ -362,7 +363,7 @@ void vtkPVClientServerModule::Initialize()
     // Receive the connect id from client
     this->SocketController->Receive(&connectID, 1, 1, 8843);
     int match = 1;
-    if ( (this->ConnectID != 0) && (connectID != this->ConnectID) )
+    if ( (this->Options->GetConnectID() != 0) && (connectID != this->Options->GetConnectID()) )
       {
       // If the ids do not match, disable all rmis by setting
       // this->Enabled to 0.
@@ -1153,7 +1154,6 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
   os << indent << "MultiProcessMode: " << this->MultiProcessMode << endl;
   os << indent << "NumberOfServerProcesses: " << this->NumberOfServerProcesses << endl;
-  os << indent << "ConnectID: " << this->ConnectID << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
 }
 

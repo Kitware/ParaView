@@ -39,6 +39,7 @@ class vtkPVApplicationObserver;
 class vtkPVProgressHandler;
 class vtkKWLoadSaveDialog;
 class vtkSMApplication;
+class vtkPVGUIClientOptions;
 class vtkPVOptions;
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
@@ -54,7 +55,7 @@ public:
   // Return error (1) if the arguments are not formed properly.
   // Returns 0 if all went well.
   int ParseCommandLineArguments(int argc, char*argv[]);
-  virtual void SetOptions(vtkPVOptions* op);
+  virtual void SetOptions(vtkPVGUIClientOptions* op);
 
   // Description:
   // Returns the server manager application.
@@ -169,12 +170,6 @@ public:
     };
 
   // Description:
-  // Flag showing whether the commands are being executed from
-  // a ParaView script.
-  vtkSetMacro(RunningParaViewScript, int);
-  vtkGetMacro(RunningParaViewScript, int);
-
-  // Description:
   // Tells the process modules whether to start the main
   // event loop. Mainly used by command line argument parsing code
   // when an argument requires not starting the GUI
@@ -283,7 +278,8 @@ public:
   //BTX
   // Description:
   // Get application options.
-  vtkGetObjectMacro(Options, vtkPVOptions);
+  vtkPVGUIClientOptions* GetGUIClientOptions();
+  vtkPVOptions* GetOptions();
   //ETX
 
 protected:
@@ -313,9 +309,6 @@ protected:
 
   int StartGUI;
 
-  // Command line arguments.
-  int RunningParaViewScript;
-  
   vtkPVOutputWindow *OutputWindow;
 
   static int CheckForExtension(const char* arg, const char* ext);
@@ -351,7 +344,7 @@ protected:
 
   vtkSMApplication* SMApplication;
 
-  vtkPVOptions* Options;
+  vtkPVGUIClientOptions* Options;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTclUtil.h"
 #include "vtkTimerLog.h"
 
-#include "vtkPVOptions.h"
+#include "vtkPVGUIClientOptions.h"
 
 /*
  * Make sure all the kits register their classes with vtkInstantiator.
@@ -119,7 +119,7 @@ int MyMain(int argc, char *argv[])
 #endif
 
   int display_help = 0;
-  vtkPVOptions* options = vtkPVOptions::New();
+  vtkPVGUIClientOptions* options = vtkPVGUIClientOptions::New();
   if ( !options->Parse(argc, argv) )
     {
     cerr << "Problem parsing command line arguments" << endl;
@@ -198,9 +198,6 @@ int MyMain(int argc, char *argv[])
   if (options->GetClientMode() || options->GetServerMode() || options->GetRenderServerMode()) 
     {
     vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
-
-    processModule->SetConnectID(options->GetConnectID());
-
     pm = processModule;
     }
   else

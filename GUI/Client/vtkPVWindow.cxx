@@ -100,7 +100,7 @@
 #include "vtkTimerLog.h"
 #include "vtkPVPluginsDialog.h"
 #include "vtkPVRenderViewProxyImplementation.h"
-#include "vtkPVOptions.h"
+#include "vtkPVGUIClientOptions.h"
 #include <vtkstd/map>
 
 #ifdef _WIN32
@@ -128,7 +128,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.598");
+vtkCxxRevisionMacro(vtkPVWindow, "1.599");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3861,9 +3861,9 @@ void vtkPVWindow::LoadScript(const char *name)
 
   this->AddRecentFile(name, this, "LoadScript");
 
-  pvApp->SetRunningParaViewScript(1);
+  pvApp->GetGUIClientOptions()->SetParaViewScriptName("tmp");
   this->vtkKWWindow::LoadScript(name);
-  pvApp->SetRunningParaViewScript(0);
+  pvApp->GetGUIClientOptions()->SetParaViewScriptName(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -4181,7 +4181,7 @@ void vtkPVWindow::ErrorMessage(const char* message)
   this->ErrorLogDisplay->AppendError(message);
   this->SetErrorIcon(2);
   cout << "ErrorMessage end" << endl;
-  if ( this->GetPVApplication()->GetOptions()->GetCrashOnErrors() )
+  if ( this->GetPVApplication()->GetGUIClientOptions()->GetCrashOnErrors() )
     {
     vtkPVApplication::Abort();
     }

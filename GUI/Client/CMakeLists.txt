@@ -168,6 +168,7 @@ ENDIF(VTK_USE_MPI)
 
 
 SET(ParaViewBinary_SRCS
+  vtkPVGUIClientOptions.cxx
   ParaView.cxx)
 
 IF (PARAVIEW_USE_ICE_T)
