@@ -253,11 +253,17 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
     }
   argv[argc] = 0;
 
-  vtkMultiProcessController *controller = vtkMultiProcessController::New();
-  controller->Initialize(&argc, (char***)(&argv));
-
-#ifndef VTK_USE_MPI
-  controller->SetNumberOfProcesses(1);
+#ifdef VTK_USE_MPI
+// This is here to avoid false leak messages from vtkDebugLeaks when
+// using mpich. It appears that the root process which spawns all the
+// main processes waits in MPI_Init() and calls exit() when
+// the others are done, causing apparent memory leaks for any objects
+// created before MPI_Init().
+  MPI_Init(&argc, &argv);
+  vtkMultiProcessController *controller = vtkMultiProcessController::New();  
+  controller->Initialize(&argc, &argv, 1);
+#else
+  vtkDummyController *controller = vtkDummyController::New();  
 #endif
   
   if (controller->GetNumberOfProcesses() > 1)
