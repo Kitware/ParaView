@@ -100,7 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.153");
+vtkCxxRevisionMacro(vtkPVApplication, "1.154");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -283,7 +283,10 @@ vtkPVApplication::vtkPVApplication()
     this->TraceFile = NULL;
     }
 
+  // GUI style & consistency
+
   vtkKWLabeledFrame::AllowShowHideOn();
+  vtkKWLabeledFrame::SetLabelCaseToLowercaseFirst();
   
   // The following is necessary to make sure that the tcl object
   // created has the right command function. Without this,
@@ -585,7 +588,7 @@ int vtkPVApplication::IsParaViewScriptFile(const char* arg)
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::SetEnvironmentVariable(const char* str)
-{
+{ 
   char* envstr = vtkString::Duplicate(str);
   putenv(envstr);
 }
