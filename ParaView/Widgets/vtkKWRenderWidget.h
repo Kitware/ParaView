@@ -169,7 +169,7 @@ public:
   
   // Description:
   // Set/Get the units that pixel sizes are measured in
-  vtkSetStringMacro(Units);
+  virtual void SetUnits(const char*);
   vtkGetStringMacro(Units);
   
   // Description:
@@ -261,6 +261,8 @@ protected:
   int CollapsingRendersCount;
 
   vtkKWRenderWidgetObserver *Observer;
+
+  virtual void UpdateAccordingToUnits() {};
   
 private:
   vtkKWRenderWidget(const vtkKWRenderWidget&);  // Not implemented
