@@ -41,6 +41,9 @@ ClientData vtkKWGenericCompositeNewCommand();
 int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWLabelNewCommand();
+int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWLabeledEntryNewCommand();
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWLabeledFrameNewCommand();
@@ -59,6 +62,9 @@ ClientData vtkKWNotebookNewCommand();
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWObjectNewCommand();
+int vtkKWOKCancelDialogCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWOKCancelDialogNewCommand();
 int vtkKWOptionMenuCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWOptionMenuNewCommand();
@@ -163,6 +169,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWGenericCompositeCommand);
   vtkTclCreateNew(interp,"vtkKWLabel", vtkKWLabelNewCommand,
                   vtkKWLabelCommand);
+  vtkTclCreateNew(interp,"vtkKWLabeledEntry", vtkKWLabeledEntryNewCommand,
+                  vtkKWLabeledEntryCommand);
   vtkTclCreateNew(interp,"vtkKWLabeledFrame", vtkKWLabeledFrameNewCommand,
                   vtkKWLabeledFrameCommand);
   vtkTclCreateNew(interp,"vtkKWListBox", vtkKWListBoxNewCommand,
@@ -175,6 +183,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWNotebookCommand);
   vtkTclCreateNew(interp,"vtkKWObject", vtkKWObjectNewCommand,
                   vtkKWObjectCommand);
+  vtkTclCreateNew(interp,"vtkKWOKCancelDialog", vtkKWOKCancelDialogNewCommand,
+                  vtkKWOKCancelDialogCommand);
   vtkTclCreateNew(interp,"vtkKWOptionMenu", vtkKWOptionMenuNewCommand,
                   vtkKWOptionMenuCommand);
   vtkTclCreateNew(interp,"vtkKWProgressGauge", vtkKWProgressGaugeNewCommand,

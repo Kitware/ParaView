@@ -80,12 +80,18 @@ ClientData vtkPVImageSliceNewCommand();
 int vtkPVImageSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageSourceNewCommand();
+int vtkPVImageTextureFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVImageTextureFilterNewCommand();
 int vtkPVImageToImageFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVImageToImageFilterNewCommand();
 int vtkPVMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMenuButtonNewCommand();
+int vtkPVMethodInterfaceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVMethodInterfaceNewCommand();
 int vtkPVParallelDecimateCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVParallelDecimateNewCommand();
@@ -210,10 +216,14 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVImageSliceCommand);
   vtkTclCreateNew(interp,"vtkPVImageSource", vtkPVImageSourceNewCommand,
                   vtkPVImageSourceCommand);
+  vtkTclCreateNew(interp,"vtkPVImageTextureFilter", vtkPVImageTextureFilterNewCommand,
+                  vtkPVImageTextureFilterCommand);
   vtkTclCreateNew(interp,"vtkPVImageToImageFilter", vtkPVImageToImageFilterNewCommand,
                   vtkPVImageToImageFilterCommand);
   vtkTclCreateNew(interp,"vtkPVMenuButton", vtkPVMenuButtonNewCommand,
                   vtkPVMenuButtonCommand);
+  vtkTclCreateNew(interp,"vtkPVMethodInterface", vtkPVMethodInterfaceNewCommand,
+                  vtkPVMethodInterfaceCommand);
   vtkTclCreateNew(interp,"vtkPVParallelDecimate", vtkPVParallelDecimateNewCommand,
                   vtkPVParallelDecimateCommand);
   vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,

@@ -100,9 +100,11 @@ public:
 
   // Description:
   // These methods are callbacks from the sliders that control the
-  // height and width of the PVScalarBar.
+  // height, width, X position, and Y position of the PVScalarBar.
   void SetScalarBarHeight();
   void SetScalarBarWidth();
+  void SetScalarBarXPosition();
+  void SetScalarBarYPosition();
   
 protected:
   vtkPVScalarBar();
@@ -119,11 +121,12 @@ protected:
   vtkKWLabeledEntry *TitleEntry;
   vtkKWScale *WidthScale;
   vtkKWScale *HeightScale;
+  vtkKWScale *XPositionScale;
+  vtkKWScale *YPositionScale;
   vtkKWWidget *Properties;
   
   // The vtkPVData object that owns this vtkPVScalarBar object.
   vtkPVData *PVData;
-}
-;
+};
 
 #endif
