@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.356");
+vtkCxxRevisionMacro(vtkPVWindow, "1.357");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1009,8 +1009,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->GenericInteractor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
   int *windowSize = this->MainView->GetRenderWindowSize();
-  // I do not know why this was here, but it caused the render window to be the wrong size.
-  //this->Configure(windowSize[0], windowSize[1]);
+
+  // Configure the window, i.e. setup the interactors
+  this->Configure(windowSize[0], windowSize[1]);
  
   // set up bindings for the interactor  
   const char *wname = this->MainView->GetVTKWidget()->GetWidgetName();
@@ -3583,7 +3584,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.356 $");
+  this->ExtractRevision(os,"$Revision: 1.357 $");
 }
 
 //----------------------------------------------------------------------------
