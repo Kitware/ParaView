@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.94");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.95");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2141,9 +2141,9 @@ void vtkPVColorMap::LabToXYZ(double Lab[3], double xyz[3])
 void vtkPVColorMap::XYZToRGB(double xyz[3], double rgb[3])
 {
   
-  double ref_X =  95.047;        //Observer = 2° Illuminant = D65
-  double ref_Y = 100.000;
-  double ref_Z = 108.883;
+  //double ref_X =  95.047;        //Observer = 2° Illuminant = D65
+  //double ref_Y = 100.000;
+  //double ref_Z = 108.883;
  
   double var_X = xyz[0] / 100;        //X = From 0 to ref_X
   double var_Y = xyz[1] / 100;        //Y = From 0 to ref_Y
