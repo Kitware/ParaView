@@ -46,7 +46,7 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkProcessModule, "1.16");
+vtkCxxRevisionMacro(vtkProcessModule, "1.17");
 vtkCxxSetObjectMacro(vtkProcessModule, RenderModule, vtkPVRenderModule);
 
 //----------------------------------------------------------------------------
@@ -144,14 +144,14 @@ void vtkProcessModule::SetProcessModule(vtkProcessModule* pm)
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::GatherInformationRenderServer(vtkPVInformation* ,
-                                                       vtkClientServerID )
+                                                     vtkClientServerID )
 {
   vtkErrorMacro("This should only be called from the client of a client render server mode paraview");
 }
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::GatherInformation(vtkPVInformation* info,
-                                           vtkClientServerID id)
+                                         vtkClientServerID id)
 {
   // Just a simple way of passing the information object to the next
   // method.
@@ -170,7 +170,7 @@ void vtkProcessModule::GatherInformation(vtkPVInformation* info,
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::GatherInformationInternal(const char*,
-                                                   vtkObject* object)
+                                                 vtkObject* object)
 {
   // This class is used only for one processes.
   if (this->TemporaryInformation == NULL)
@@ -180,7 +180,7 @@ void vtkProcessModule::GatherInformationInternal(const char*,
     }
   if (object == NULL)
     {
-    vtkErrorMacro("Object tcl name must be wrong.");
+    vtkErrorMacro("Object id name must be wrong.");
     return;
     }
 
@@ -438,7 +438,8 @@ void vtkProcessModule::InitializeInterpreter()
 
   // Setup a callback for the interpreter to report errors.
   this->InterpreterObserver = vtkCallbackCommand::New();
-  this->InterpreterObserver->SetCallback(&vtkProcessModule::InterpreterCallbackFunction);
+  this->InterpreterObserver->SetCallback(
+    &vtkProcessModule::InterpreterCallbackFunction);
   this->InterpreterObserver->SetClientData(this);
   this->Interpreter->AddObserver(vtkCommand::UserEvent,
     this->InterpreterObserver);
@@ -506,8 +507,8 @@ void vtkProcessModule::FinalizeInterpreter()
 
 //----------------------------------------------------------------------------
 void vtkProcessModule::InterpreterCallbackFunction(vtkObject*,
-                                                     unsigned long eid,
-                                                     void* cd, void* d)
+                                                   unsigned long eid,
+                                                   void* cd, void* d)
 {
   reinterpret_cast<vtkProcessModule*>(cd)->InterpreterCallback(eid, d);
 }
@@ -604,13 +605,15 @@ void vtkProcessModule::ProgressEvent(vtkObject *o, int val, const char* str)
 }
 
 //----------------------------------------------------------------------------
-void vtkProcessModule::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
+void vtkProcessModule::ExecuteEvent(
+  vtkObject *o, unsigned long event, void* calldata)
 {
   switch ( event ) 
     {
   case vtkCommand::ProgressEvent:
       {
-      int progress = static_cast<int>(*reinterpret_cast<double*>(calldata)* 100.0);
+      int progress = 
+        static_cast<int>(*reinterpret_cast<double*>(calldata)* 100.0);
       this->ProgressEvent(o, progress, 0);
       }
     break;
@@ -624,7 +627,9 @@ void vtkProcessModule::ExecuteEvent(vtkObject *o, unsigned long event, void* cal
       memcpy(&tag, ptr, sizeof(tag));
       if ( tag != vtkProcessModule::PROGRESS_EVENT_TAG )
         {
-        vtkErrorMacro("Internal ParaView Error: Socket Communicator received wrong tag: " << tag);
+        vtkErrorMacro("Internal ParaView Error: "
+                      "Socket Communicator received wrong tag: " 
+                      << tag);
         abort();
         return;
         }
