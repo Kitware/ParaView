@@ -6,7 +6,7 @@
    <insert creating.jpg>
 
 3. Set the theta resolution (in Parameters window) of the sphere  
-   to 16 and click accept.
+   to 16 and click Accept.
 
    <insert changeres.jpg>
 
@@ -15,12 +15,12 @@
 
    <insert shrink.jpg>
 
-5. Set the shrink factor (in Parameters window) to 0.8 and click accept.
+5. Set the shrink factor (in Parameters window) to 0.8 and click Accept.
 
    <insert result.jpg>
 
 6. Select Sphere1 from the Navigation window, in the  Parameters windows,
-   set set the starting phi angle to 30 and click accept.
+   set set the starting phi angle to 30 and click Accept.
 
    <insert changeangle.jpg>
 

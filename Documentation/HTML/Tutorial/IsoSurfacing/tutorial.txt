@@ -1,11 +1,11 @@
 1. Start ParaView (see <link> for information on how to launch ParaView)
 
 2. Create a test source by selecting RTAnalyticSource from VTK -> Sources
-   menu. Click accept.
+   menu. Click Accept.
 
    <insert source.jpg>
 
-3. Click the contour button on the toolbar.
+3. Click the Contour button on the toolbar.
 
    <insert toolbar-contour.jpg>
 
@@ -17,7 +17,7 @@
 5. Next add a iso-surface with a value of 200.
 
 6. To be able to see both contours, you can clip the data. Click
-   the clip button on the toolbar. Click "Use Camera Normal" on the
+   the Clip button on the toolbar. Click "Use Camera Normal" on the
    properties notebook and click Accept.
 
    <insert toolbar-clip.jpg>
