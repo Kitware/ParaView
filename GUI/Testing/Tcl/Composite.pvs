@@ -1,20 +1,8 @@
-$Application ExitOnReturnOn
-
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp20) [$kw(vtkTemp1) GetMainView]
 
-if {[info exists argc]} { 
-    set argcm1 [expr $argc - 1]
-    for {set i 0} {$i < $argcm1} {incr i} {
-        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
-		set DataDir [lindex $argv [expr $i + 1]]
-        }
-        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
-            set rmui [$kw(vtkTemp20) GetRenderModuleUI]
-            catch {$rmui SetCompositeThreshold 0}
-        }
-    }
-}
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp20) $argv $argc
     
 $kw(vtkTemp1) Open "$DataDir/Data/iron protein.vtk"
 set kw(vtkTemp276) [vtkTemp1 GetCurrentPVSource]
@@ -287,5 +275,3 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 }
    
 $Application Exit
-
-

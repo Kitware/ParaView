@@ -1,20 +1,8 @@
-$Application ExitOnReturnOn
-
 set pvWindow [$Application GetMainWindow]
 set pv(vtkTemp43) [$pvWindow GetMainView]
 
-if {[info exists argc]} { 
-    set argcm1 [expr $argc - 1]
-    for {set i 0} {$i < $argcm1} {incr i} {
-        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
-		set DataDir [lindex $argv [expr $i + 1]]
-        }
-        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
-            set kw(vtkTemp92) [$pv(vtkTemp43) GetRenderModuleUI]
-            catch {$kw(vtkTemp92) SetCompositeThreshold 0}
-        }
-    }
-} 
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $pv(vtkTemp43) $argv $argc
 
 $pv(vtkTemp43) SetOrientationAxesVisibility 0
 $pv(vtkTemp43) SetRendererBackgroundColor 0 0 0
@@ -37,9 +25,6 @@ $MainView SetCameraState 143.632 4.67034 -39.8384 2 12 4.1578e-15 0.270701 -0.00
 
 [$pvWarp GetPVWidget {Vectors}] SetValue displacement1
 $pvWarp AcceptCallback
-
-set MainView [[$Application GetMainWindow] GetMainView]
-$MainView SetRenderWindowSize 300 300
 
 for {set i 1} {$i <= 2} {incr i 1} {
 	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
@@ -66,25 +51,7 @@ for {set i 8} {$i <= 10} {incr i 1} {
 
 }
 
-update
-[[$Application GetMainWindow] GetMainView] ForceRender
-
-set didRegression 0
-
-for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-    if {[lindex $argv $i] == "-C"} {
-	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
-       set didRegression 1
-    }
-}
-
-if { ! $didRegression } {
-    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-        if {[lindex $argv $i] == "-BT"} {
-            source [lindex $argv [expr $i + 1]]
-        }
-    }
-}
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
 
 $Application Exit

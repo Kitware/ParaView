@@ -1,20 +1,8 @@
-$Application ExitOnReturnOn
-
 set pvWindow [$Application GetMainWindow]
 set pv(vtkTemp43) [$pvWindow GetMainView]
 
-if {[info exists argc]} { 
-    set argcm1 [expr $argc - 1]
-    for {set i 0} {$i < $argcm1} {incr i} {
-        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
-		set DataDir [lindex $argv [expr $i + 1]]
-        }
-        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
-            set rmui [$pv(vtkTemp43) GetRenderModuleUI]
-            catch {$rmui SetCompositeThreshold 0}
-        }
-    }
-} 
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $pv(vtkTemp43) $argv $argc
 
 $pv(vtkTemp43) SetOrientationAxesVisibility 0
 $pv(vtkTemp43) SetRendererBackgroundColor 0 0 0
@@ -497,28 +485,7 @@ $kw(vtkTemp18) SetCameraState -1.752 -8.856 11.230  0.285 0.141 0.087  0.924 0.1
 
 update
 
-# Fix the size of the image.
-set MainView [[$Application GetMainWindow] GetMainView]
-$MainView SetRenderWindowSize 300 300
-update
-[[$Application GetMainWindow] GetMainView] ForceRender
-
-set didRegression 0
-
-for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-    if {[lindex $argv $i] == "-C"} {
-	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
-       set didRegression 1
-    }
-}
-
-if { ! $didRegression } {
-    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-        if {[lindex $argv $i] == "-BT"} {
-            source [lindex $argv [expr $i + 1]]
-        }
-    }
-}
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
 
 $Application Exit

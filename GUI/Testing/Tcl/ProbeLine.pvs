@@ -1,17 +1,8 @@
-$Application ExitOnReturnOn
-
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp16) [$kw(vtkTemp1) GetMainView]
 
-if {[info exists argc]} { 
-    set argcm1 [expr $argc - 1]
-    for {set i 0} {$i < $argcm1} {incr i} {
-        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
-            set rmui [$kw(vtkTemp16) GetRenderModuleUI]
-            catch {$rmui SetCompositeThreshold 0}
-        }
-    }
-} 
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp16) $argv $argc
 
 $kw(vtkTemp16) SetOrientationAxesVisibility 0
 $kw(vtkTemp16) SetRendererBackgroundColor 0 0 0
@@ -72,28 +63,7 @@ $kw(vtkTemp314) AcceptCallback
 #     source "[$Application GetTraceFileName]"
 #  }
 
-# Fix the size of the image.
-set MainView [[$Application GetMainWindow] GetMainView]
-$MainView SetRenderWindowSize 300 300
-update
-[[$Application GetMainWindow] GetMainView] ForceRender
-
-set didRegression 0
-
-for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-    if {[lindex $argv $i] == "-C"} {
-	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
-       set didRegression 1
-    }
-}
-
-if { ! $didRegression } {
-    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-        if {[lindex $argv $i] == "-BT"} {
-            source [lindex $argv [expr $i + 1]]
-        }
-    }
-}
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
 
 $Application Exit

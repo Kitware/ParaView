@@ -1,20 +1,8 @@
-$Application ExitOnReturnOn
-
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp22) [$kw(vtkTemp1) GetMainView]
 
-if {[info exists argc]} { 
-    set argcm1 [expr $argc - 1]
-    for {set i 0} {$i < $argcm1} {incr i} {
-        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
-		set DataDir [lindex $argv [expr $i + 1]]
-        }
-        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
-            set rmui [$kw(vtkTemp22) GetRenderModuleUI]
-            catch {$rmui SetCompositeThreshold 0}
-        }
-    }
-} 
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp22) $argv $argc
 
 # Disable popup message dialogs.
 $kw(vtkTemp1) SetUseMessageDialog 0
