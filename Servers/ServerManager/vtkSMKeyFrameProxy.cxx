@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMKeyFrameProxy, "1.2");
 vtkStandardNewMacro(vtkSMKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -30,6 +30,12 @@ vtkSMKeyFrameProxy::vtkSMKeyFrameProxy()
 
 //----------------------------------------------------------------------------
 vtkSMKeyFrameProxy::~vtkSMKeyFrameProxy()
+{
+}
+
+//----------------------------------------------------------------------------
+void vtkSMKeyFrameProxy::UpdateValue(double vtkNotUsed(currenttime), 
+  vtkSMAnimationCueProxy* vtkNotUsed(cueProxy), vtkSMKeyFrameProxy* vtkNotUsed(next))
 {
 }
 

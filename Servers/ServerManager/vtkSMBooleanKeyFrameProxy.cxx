@@ -18,7 +18,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMProperty.h"
 #include "vtkSMAnimationCueProxy.h"
-vtkCxxRevisionMacro(vtkSMBooleanKeyFrameProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMBooleanKeyFrameProxy, "1.2");
 vtkStandardNewMacro(vtkSMBooleanKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -35,8 +35,8 @@ vtkSMBooleanKeyFrameProxy::~vtkSMBooleanKeyFrameProxy()
 // remeber that currenttime is 0 at the KeyTime of this key frame
 // and 1 and the KeyTime of the next key frame. Hence,
 // currenttime belongs to the interval [0,1).
-void vtkSMBooleanKeyFrameProxy::UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next)
+void vtkSMBooleanKeyFrameProxy::UpdateValue(double ,
+    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* )
 {
   vtkSMDomain *domain = cueProxy->GetAnimatedDomain();
   vtkSMProperty *property = cueProxy->GetAnimatedProperty();

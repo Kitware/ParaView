@@ -39,7 +39,7 @@
 #include "vtkKWCheckButton.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.1");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.2");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 0
@@ -510,8 +510,7 @@ void vtkPVVerticalAnimationInterface::ShowKeyFrame(int id)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::ExecuteEvent(vtkObject* obg,
-  unsigned long event, void* calldata)
+void vtkPVVerticalAnimationInterface::ExecuteEvent(vtkObject*, unsigned long, void* )
 {
   this->Update();
 }
@@ -580,9 +579,8 @@ void vtkPVVerticalAnimationInterface::UpdateEnableState()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::SaveState(ofstream* file)
+void vtkPVVerticalAnimationInterface::SaveState(ofstream* )
 {
-  vtkNotUsed(file);
 }
 
 //-----------------------------------------------------------------------------

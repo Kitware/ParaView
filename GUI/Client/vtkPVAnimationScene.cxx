@@ -62,7 +62,7 @@
 
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.1");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.2");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 //*****************************************************************************
@@ -628,7 +628,7 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationScene::ExecuteEvent(vtkObject* obj, unsigned long event,
+void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
   void* calldata)
 {
   if (event == vtkKWEvent::ErrorMessageEvent)

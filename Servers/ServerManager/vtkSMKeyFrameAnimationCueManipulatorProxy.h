@@ -126,7 +126,7 @@ protected:
   //BTX
   friend class vtkSMKeyFrameAnimationCueManipulatorProxyObserver;
   vtkSMKeyFrameAnimationCueManipulatorProxyObserver* Observer;
-  void ExecuteEvent(vtkObject* obj, unsigned long event, void* calldata);
+  void ExecuteEvent(vtkObject* obj, unsigned long event, void* );
   //ETX
   int SendEndEvent;
 private:

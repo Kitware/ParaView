@@ -188,7 +188,7 @@ protected:
 
   void SaveGeometry(double time);
 
-  virtual void ExecuteEvent(vtkObject* obg, unsigned long event, void* calldata);
+  virtual void ExecuteEvent(vtkObject* , unsigned long event, void* calldata);
 //BTX
   vtkPVAnimationSceneObserver* Observer;
   friend class vtkPVAnimationSceneObserver;

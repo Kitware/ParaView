@@ -55,7 +55,7 @@ public:
   // currenttime is normalized to the time range between
   // this key frame and the next key frame.
   virtual void UpdateValue(double currenttime,
-    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next){ };
+    vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
 
   vtkClientServerID GetID() { return this->SelfID; }
 protected:

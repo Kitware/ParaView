@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.1");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -374,10 +374,9 @@ void vtkPVAnimationCueTree::SetExpanded(int expand)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCueTree::DrawChildConnections(vtkPVAnimationCue* child)
+void vtkPVAnimationCueTree::DrawChildConnections(vtkPVAnimationCue* )
 {
   // can be done at a later stage if needed. 
-  
 }
 
 //-----------------------------------------------------------------------------

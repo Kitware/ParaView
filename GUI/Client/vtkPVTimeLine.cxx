@@ -18,7 +18,7 @@
 #include "vtkKWEvent.h"
 #include "vtkPVAnimationCue.h"
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.1");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -146,7 +146,7 @@ int vtkPVTimeLine::InterpolateFunctionPointValues(double parameter,
 }
 
 //----------------------------------------------------------------------------
-int vtkPVTimeLine::AddFunctionPoint(double parameter, const double* values,
+int vtkPVTimeLine::AddFunctionPoint(double vtkNotUsed(parameter), const double* values,
   int *id)
 {
   double keyframe_time = values[0];
@@ -162,8 +162,9 @@ int vtkPVTimeLine::AddFunctionPoint(double parameter, const double* values,
 
 //----------------------------------------------------------------------------
 int vtkPVTimeLine::SetFunctionPoint(int id, double parameter, 
-  const double* values)
+  const double* vtkNotUsed(values))
 {
+
   if (id < 0 || id >= this->GetFunctionSize()) {return 0;}
   this->AnimationCue->SetKeyFrameTime(id, parameter);
   return 1;

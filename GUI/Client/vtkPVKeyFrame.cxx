@@ -41,7 +41,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIdTypeVectorProperty.h"
 
-vtkCxxRevisionMacro(vtkPVKeyFrame, "1.1");
+vtkCxxRevisionMacro(vtkPVKeyFrame, "1.2");
 //*****************************************************************************
 class vtkPVKeyFrameObserver : public vtkCommand
 {
@@ -488,8 +488,7 @@ double vtkPVKeyFrame::GetRelativeTime(double ntime)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVKeyFrame::ExecuteEvent(vtkObject* obj, unsigned long event, 
-  void* )
+void vtkPVKeyFrame::ExecuteEvent(vtkObject* , unsigned long event, void* )
 {
   switch(event)
     {

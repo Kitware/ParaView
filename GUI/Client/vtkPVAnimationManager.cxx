@@ -57,7 +57,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.1");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.2");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -139,7 +139,7 @@ vtkPVAnimationManager::~vtkPVAnimationManager()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* args)
+void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
 {
   if (this->IsCreated())
     {
@@ -612,7 +612,7 @@ const char* vtkPVAnimationManager::GetSubSourceName(const char* proxyname)
 }
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::ExecuteEvent(vtkObject* obj, unsigned long event,
-  void* calldata)
+  void* )
 {
   vtkPVAnimationCue* cue = vtkPVAnimationCue::SafeDownCast(obj);
   if (cue)

@@ -105,7 +105,7 @@ protected:
 //BTX
   friend class vtkPVKeyFrameObserver;
   vtkPVKeyFrameObserver* Observer;
-  virtual void ExecuteEvent(vtkObject* obj, unsigned long event, void*calldata);
+  virtual void ExecuteEvent(vtkObject* , unsigned long event, void*);
 //ETX
   void CreateValueWidget();  
 

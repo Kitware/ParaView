@@ -19,7 +19,7 @@
 #include "vtkCommand.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.2");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -350,7 +350,7 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::SaveInBatchScript(ofstream* file
 
 //----------------------------------------------------------------------------
 void vtkSMKeyFrameAnimationCueManipulatorProxy::ExecuteEvent(
-  vtkObject* obj, unsigned long event, void* calldata)
+  vtkObject* obj, unsigned long event, void* )
 {
   vtkSMKeyFrameProxy* keyframe = vtkSMKeyFrameProxy::SafeDownCast(obj);
 

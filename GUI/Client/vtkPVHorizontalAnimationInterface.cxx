@@ -30,7 +30,7 @@
 #include "vtkPVAnimationManager.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.1");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.2");
 
 //*****************************************************************************
 class vtkPVHorizontalAnimationInterfaceObserver : public vtkCommand
@@ -199,7 +199,7 @@ void vtkPVHorizontalAnimationInterface::InitializeObservers(
 
 //-----------------------------------------------------------------------------
 void vtkPVHorizontalAnimationInterface::ExecuteEvent(vtkObject* obj,
-  unsigned long event, void* calldata)
+  unsigned long event, void* )
 {
   vtkPVAnimationCue* cue = vtkPVAnimationCue::SafeDownCast(obj);
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
