@@ -83,7 +83,7 @@ public:
   // Description:
   // This is the parallel method.  SetSliceAxis ... should really be parallel,
   // but this is easier since the accept method makes this call.
-  // This call should nopt be called externally because the
+  // This call should not be called externally because the
   // output whole extent is computed from the SliceAxis ...
   void SetOutputWholeExtent(int xmin, int xmax, int ymin, int ymax,
 			    int zmin, int zmax);

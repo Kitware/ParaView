@@ -77,7 +77,7 @@ public:
   virtual void Deselect(vtkKWView *);
 
   // Description:
-  // This flage turns the visibility of the prop on and off.  These methods transmit
+  // This flag turns the visibility of the prop on and off.  These methods transmit
   // the state change to all of the satellite processes.
   void SetVisibility(int v);
   int GetVisibility();

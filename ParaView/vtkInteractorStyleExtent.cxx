@@ -246,7 +246,7 @@ void vtkInteractorStyleExtent::DefaultCallback(char *type)
     return;
     }
 
-  // Handle hot spot.  Show a sphere when a sopt is active.
+  // Handle hot spot.  Show a sphere when a spot is active.
   if (strcmp(type, "ActiveSpotChanged") == 0)
     {
     if (this->OldSpotId == -1)

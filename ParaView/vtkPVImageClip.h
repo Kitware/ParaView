@@ -33,6 +33,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageClip.h"
 #include "vtkKWEntry.h"
 #include "vtkPVSource.h"
+#include "vtkInteractorStyleImageExtent.h"
 
 class vtkPVImage;
 
@@ -43,6 +44,12 @@ class VTK_EXPORT vtkPVImageClip : public vtkPVSource
 public:
   static vtkPVImageClip* New();
   vtkTypeMacro(vtkPVImageClip, vtkPVSource);
+
+  // Description:
+  // need to override the superclass's Select/Deselect methods so we can pack/
+  // pack forget the image extent button when this PVSource is deselected
+  virtual void Select(vtkKWView *view);
+  virtual void Deselect(vtkKWView *view);  
 
   // Description:
   // You have to clone this object before you create its UI.
@@ -66,6 +73,19 @@ public:
   void GetSource();
 
   vtkGetObjectMacro(ImageClip, vtkImageClip);
+  vtkGetObjectMacro(ExtentStyle, vtkInteractorStyleImageExtent);
+
+  // Description:
+  // need to be able to access the entry widgets from the interactor style's
+  // callback
+  vtkGetObjectMacro(ClipXMinEntry, vtkKWEntry);
+  vtkGetObjectMacro(ClipXMaxEntry, vtkKWEntry);
+  vtkGetObjectMacro(ClipYMinEntry, vtkKWEntry);
+  vtkGetObjectMacro(ClipYMaxEntry, vtkKWEntry);
+  vtkGetObjectMacro(ClipZMinEntry, vtkKWEntry);
+  vtkGetObjectMacro(ClipZMaxEntry, vtkKWEntry);
+  
+  void UseExtentStyle();
   
 protected:
   vtkPVImageClip();
@@ -88,7 +108,11 @@ protected:
   vtkKWEntry *ClipZMaxEntry;
   vtkKWLabel *ClipZMaxLabel;
 
+  vtkKWPushButton *ExtentStyleButton;
+  
   vtkImageClip  *ImageClip;
+  vtkInteractorStyleImageExtent *ExtentStyle;
+  int ExtentStyleCreated;
 };
 
 #endif

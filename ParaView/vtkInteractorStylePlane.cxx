@@ -426,23 +426,29 @@ void vtkInteractorStylePlane::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::ShowCrosshair()
 {
-  // need to call FindPokedRenderer to make sure CurrentRenderer isn't NULL
-  this->FindPokedRenderer(0, 0);
-  if (!this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
+  if (this->Interactor)
+    {
+    this->FindPokedRenderer(0, 0);
+    if (!this->CurrentRenderer->GetActors()->
+	IsItemPresent(this->CrossHairActor))
       {
       this->CurrentRenderer->AddActor(this->CrossHairActor);
       }
-  this->CurrentRenderer->GetRenderWindow()->Render();
+    this->CurrentRenderer->GetRenderWindow()->Render();
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkInteractorStylePlane::HideCrosshair()
 {
-  // need to call FindPokedRenderer to make sure CurrentRenderer isn't NULL
-  this->FindPokedRenderer(0, 0);
-  if (this->CurrentRenderer->GetActors()->IsItemPresent(this->CrossHairActor))
+  if (this->Interactor)
+    {
+    this->FindPokedRenderer(0, 0);
+    if (this->CurrentRenderer->GetActors()->
+	IsItemPresent(this->CrossHairActor))
       {
       this->CurrentRenderer->RemoveActor(this->CrossHairActor);
       }
-  this->CurrentRenderer->GetRenderWindow()->Render();
+    this->CurrentRenderer->GetRenderWindow()->Render();
+    }
 }

@@ -32,6 +32,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVAssignment.h"
+#include "vtkKWToolbar.h"
 
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
 			  int argc, char *argv[]);
@@ -73,8 +74,13 @@ vtkPVImageClip::vtkPVImageClip()
   this->ClipZMaxLabel = vtkKWLabel::New();
   this->ClipZMaxLabel->SetParent(this->Properties);
   
+  this->ExtentStyleButton = vtkKWPushButton::New();
+  
   this->ImageClip = vtkImageClip::New();
   this->ImageClip->ClipDataOn();
+  
+  this->ExtentStyle = vtkInteractorStyleImageExtent::New();
+  this->ExtentStyleCreated = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -112,8 +118,14 @@ vtkPVImageClip::~vtkPVImageClip()
   this->ClipZMaxLabel->Delete();
   this->ClipZMaxLabel = NULL;
   
+  this->ExtentStyleButton->Delete();
+  this->ExtentStyleButton = NULL;
+  
   this->ImageClip->Delete();
   this->ImageClip = NULL;
+  
+  this->ExtentStyle->Delete();
+  this->ExtentStyle = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -131,6 +143,10 @@ void vtkPVImageClip::CreateProperties()
   this->vtkPVSource::CreateProperties();
 
   extents = this->GetImageClip()->GetOutputWholeExtent();
+
+  this->GetExtentStyle()->
+    SetImageData((vtkImageData*)this->GetInput()->GetData());
+  this->GetExtentStyle()->SetExtent(extents);
   
   this->ClipXMinLabel->Create(this->Application, "");
   this->ClipXMinLabel->SetLabel("X Min.:");
@@ -188,7 +204,7 @@ void vtkPVImageClip::SetInput(vtkPVImage *pvi)
     {
     pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
 			   pvi->GetTclName());
-    }  
+    }
   
   this->GetImageClip()->SetInput(pvi->GetImageData());
   this->Input = pvi;
@@ -248,6 +264,31 @@ void EndImageClipProgress(void *arg)
 }
 
 //----------------------------------------------------------------------------
+void ExtentCallback(void *arg)
+{
+  vtkPVImageClip *me = (vtkPVImageClip*)arg;
+  int *extent = new int[6];
+
+  me->GetExtentStyle()->DefaultCallback(me->GetExtentStyle()->GetCallbackType());
+  
+  extent = me->GetExtentStyle()->GetExtent();
+  me->GetClipXMinEntry()->SetValue(extent[0]);
+  me->GetClipXMaxEntry()->SetValue(extent[1]);
+  me->GetClipYMinEntry()->SetValue(extent[2]);
+  me->GetClipYMaxEntry()->SetValue(extent[3]);
+  me->GetClipZMinEntry()->SetValue(extent[4]);
+  me->GetClipZMaxEntry()->SetValue(extent[5]);
+  
+  me->ExtentsChanged();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageClip::UseExtentStyle()
+{
+  this->GetWindow()->GetMainView()->SetInteractorStyle(this->ExtentStyle);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageClip::ExtentsChanged()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
@@ -268,6 +309,7 @@ void vtkPVImageClip::ExtentsChanged()
     this->GetImageClip()->SetStartMethod(StartImageClipProgress, this);
     this->GetImageClip()->SetProgressMethod(ImageClipProgress, this);
     this->GetImageClip()->SetEndMethod(EndImageClipProgress, this);
+    this->GetExtentStyle()->SetCallbackMethod(ExtentCallback, this);
     pvi = vtkPVImage::New();
     pvi->Clone(pvApp);
     pvi->OutlineFlagOff();
@@ -281,14 +323,16 @@ void vtkPVImageClip::ExtentsChanged()
     ac = this->GetPVData()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
     }
-  
-//  window->GetPreviousSource()->GetPVData()->GetActorComposite()->VisibilityOff();
-  this->ImageClip->Modified();
-  this->ImageClip->Update();
-  
-  this->GetView()->Render();
   window->GetMainView()->SetSelectedComposite(this);
-  window->GetMainView()->ResetCamera();
+
+  if (!this->ExtentStyleCreated)
+    {
+    this->ExtentStyleCreated = 1;
+    this->Script("%s configure -state normal",
+		 this->ExtentStyleButton->GetWidgetName());
+    }
+
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -300,4 +344,34 @@ void vtkPVImageClip::GetSource()
   this->GetInput()->GetActorComposite()->VisibilityOn();
   this->GetView()->Render();
   this->GetWindow()->GetMainView()->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageClip::Deselect(vtkKWView *view)
+{
+  // invoke super
+  this->vtkPVSource::Deselect(view);
+  
+  // unpack extent style button and reset interactor style to trackball camera
+  this->Script("pack forget %s", this->ExtentStyleButton->GetWidgetName());
+  this->GetWindow()->UseCameraStyle();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVImageClip::Select(vtkKWView *view)
+{
+  // invoke super
+  this->vtkPVSource::Select(view);
+  
+  if (!this->ExtentStyleCreated)
+    {
+    this->ExtentStyleButton->SetParent(this->GetWindow()->GetToolbar());
+    this->ExtentStyleButton->Create(this->Application, "");
+    this->ExtentStyleButton->SetLabel("Image Extent");
+    this->ExtentStyleButton->SetCommand(this, "UseExtentStyle");
+    this->Script("%s configure -state disabled",
+		 this->ExtentStyleButton->GetWidgetName());
+    }
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+	       this->ExtentStyleButton->GetWidgetName());
 }

@@ -347,12 +347,8 @@ void vtkPVCutter::CutterChanged()
   if (!this->PlaneStyleCreated)
     {
     this->PlaneStyleCreated = 1;
-    this->PlaneStyleButton->SetParent(this->GetWindow()->GetToolbar());
-    this->PlaneStyleButton->Create(this->Application, "");
-    this->PlaneStyleButton->SetLabel("Plane");
-    this->PlaneStyleButton->SetCommand(this, "UsePlaneStyle");
-    this->Script("pack %s -side left -pady 0 -fill none -expand no",
-		 this->PlaneStyleButton->GetWidgetName());    
+    this->Script("%s configure -state normal",
+		 this->PlaneStyleButton->GetWidgetName());
     }
   
   this->GetView()->Render();
@@ -392,6 +388,18 @@ void vtkPVCutter::Select(vtkKWView *view)
 {
   // invoke super
   this->vtkPVSource::Select(view);
+  
+  if (!this->PlaneStyleCreated)
+    {
+    this->PlaneStyleButton->SetParent(this->GetWindow()->GetToolbar());
+    this->PlaneStyleButton->Create(this->Application, "");
+    this->PlaneStyleButton->SetLabel("Plane");
+    this->PlaneStyleButton->SetCommand(this, "UsePlaneStyle");
+    this->Script("%s configure -state disabled",
+		 this->PlaneStyleButton->GetWidgetName());
+    }
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+	       this->PlaneStyleButton->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
