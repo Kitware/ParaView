@@ -123,6 +123,8 @@ protected:
   vtkKWLabeledEntry *X2Entry;
   vtkKWLabeledEntry *Y2Entry;
   vtkKWLabeledEntry *Z2Entry;
+  vtkKWLabeledEntry *DivisionsEntry;
+  
   vtkKWPushButton *SetPointButton;
   
   vtkKWSelectPointInteractor *Interactor;

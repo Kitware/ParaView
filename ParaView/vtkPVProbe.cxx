@@ -66,6 +66,9 @@ vtkPVProbe::vtkPVProbe()
   this->X2Entry = vtkKWLabeledEntry::New();
   this->Y2Entry = vtkKWLabeledEntry::New();
   this->Z2Entry = vtkKWLabeledEntry::New();
+  
+  this->DivisionsEntry = vtkKWLabeledEntry::New();
+  
   this->SetPointButton = vtkKWPushButton::New();
   
   this->ProbeFrame = vtkKWWidget::New();
@@ -307,6 +310,11 @@ void vtkPVProbe::CreateProperties()
                this->X2Entry->GetWidgetName(), this->Y2Entry->GetWidgetName(),
                this->Z2Entry->GetWidgetName());
   
+  this->DivisionsEntry->SetParent(this->ProbeFrame);
+  this->DivisionsEntry->Create(pvApp);
+  this->DivisionsEntry->SetLabel("Number of Line Divisions:");
+  this->DivisionsEntry->SetValue(10);
+  
   this->AcceptCommands->AddString("%s UpdateProbe",
                                   this->GetTclName());
   
@@ -454,7 +462,8 @@ void vtkPVProbe::UpdateProbe()
                            this->X2Entry->GetValueAsFloat(),
                            this->Y2Entry->GetValueAsFloat(),
                            this->Z2Entry->GetValueAsFloat());
-    pvApp->BroadcastScript("line SetResolution 10");
+    pvApp->BroadcastScript("line SetResolution %d",
+			   this->DivisionsEntry->GetValueAsInt());
     pvApp->BroadcastScript("%s SetInput [line GetOutput]",
                            this->GetVTKSourceTclName());
     pvApp->BroadcastScript("line Delete");
@@ -529,10 +538,11 @@ void vtkPVProbe::UseLine()
   this->Dimensionality = 1;
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ProbeFrame->GetWidgetName());
-  this->Script("pack %s %s %s",
+  this->Script("pack %s %s %s %s",
                this->EndPointMenuFrame->GetWidgetName(),
                this->EndPoint1Frame->GetWidgetName(),
-               this->EndPoint2Frame->GetWidgetName());
+               this->EndPoint2Frame->GetWidgetName(),
+	       this->DivisionsEntry->GetWidgetName());
 }
 
 void vtkPVProbe::UsePlane()
