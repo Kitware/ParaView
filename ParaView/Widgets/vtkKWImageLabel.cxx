@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkKWLabel.h
+  Module:    vtkKWImageLabel.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,66 +39,73 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWLabel - label widget
-// .SECTION Description
-// A simple widget that represents a label. The label can be set with 
-// the SetLabel method.
+#include "vtkKWApplication.h"
+#include "vtkKWImageLabel.h"
+#include "vtkObjectFactory.h"
 
-#ifndef __vtkKWLabel_h
-#define __vtkKWLabel_h
 
-#include "vtkKWWidget.h"
-class vtkKWApplication;
 
-class VTK_EXPORT vtkKWLabel : public vtkKWWidget
+//------------------------------------------------------------------------------
+vtkStandardNewMacro( vtkKWImageLabel );
+
+vtkKWImageLabel::vtkKWImageLabel()
 {
-public:
-  static vtkKWLabel* New();
-  vtkTypeMacro(vtkKWLabel,vtkKWWidget);
+  this->ImageDataLabel = 0;
+}
 
-  // Description:
-  // Create a Tk widget
-  virtual void Create(vtkKWApplication *app, const char *args);
-  
-  const char* GetLabel() 
+vtkKWImageLabel::~vtkKWImageLabel()
+{
+  this->SetImageDataLabel(0);
+}
+
+void vtkKWImageLabel::Create(vtkKWApplication *app, const char *args)
+{
+  this->vtkKWLabel::Create(app, args);
+}
+
+void vtkKWImageLabel::SetImageData(const unsigned char* data, 
+				   int width, int height)
+{
+  this->Script("image create photo -height %d -width %d", width, height);
+  this->SetImageDataLabel(this->Application->GetMainInterp()->result);
+  Tk_PhotoHandle photo;
+  Tk_PhotoImageBlock block;
+
+  block.width = width;
+  block.height = height;
+  block.pixelSize = 4;
+  block.pitch = block.width*block.pixelSize;
+  block.offset[0] = 0;
+  block.offset[1] = 1;
+  block.offset[2] = 2;
+  block.pixelPtr = new unsigned char [block.pitch*block.height];
+
+  photo = Tk_FindPhoto(this->Application->GetMainInterp(),
+		       this->ImageDataLabel);
+
+  unsigned char *pp = block.pixelPtr;
+  const unsigned char *dd = data;
+  int cc;
+  for ( cc=0; cc < block.width * block.height; cc++ )
     {
-      return this->Label;
+    /*
+    cout << "Color: " << (unsigned int)*(pp) << ", " 
+	 << (unsigned int)*(pp) << ", " << (unsigned int)*(pp) << ", " 
+	 << (unsigned int)*(pp) << endl;
+    */
+    if ( *(dd+3) > 0 )
+      {
+      *(pp)   = *(dd);
+      *(pp+1) = *(dd+1);
+      *(pp+2) = *(dd+2);
+      *(pp+3) = *(dd+3);
+      }
+    pp+=4;
+    dd+=4;
     }
-
-  // Description:
-  // Set the text on the label.
-  void SetLabel(const char*);
-
-  // Description:
-  // Set the way label treats long text. 
-  // Multiline will wrap text. You have to specify width
-  // when using multiline label.
-  void SetLineType(int type);
-
-  // Description:
-  // Set/Get width of the label when in multiline mode.
-  vtkSetMacro(Width, int);
-  vtkGetMacro(Width, int);
-
-//BTX
-  enum {
-    SingleLine,
-    MultiLine
-  };
-//ETX
-
-protected:
-  vtkKWLabel();
-  ~vtkKWLabel();
-  vtkKWLabel(const vtkKWLabel&) {};
-  void operator=(const vtkKWLabel&) {};
-private:
-  char* Label;
-  int LineType;
-  int Width;
-};
-
-
-#endif
-
+  Tk_PhotoPutBlock(photo, &block, 0, 0, block.width, block.height);
+  delete [] block.pixelPtr;
+  this->Script("%s configure -image %s", this->GetWidgetName(),
+	       this->ImageDataLabel);
+}
 

@@ -19,6 +19,7 @@ vtkKWFindPath
 vtkKWGenericComposite 
 vtkKWHashTable
 vtkKWHashTableIterator
+vtkKWImageLabel
 vtkKWLabel 
 vtkKWLabeledEntry 
 vtkKWLabeledFrame 

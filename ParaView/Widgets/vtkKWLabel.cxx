@@ -50,8 +50,10 @@ vtkStandardNewMacro( vtkKWLabel );
 
 vtkKWLabel::vtkKWLabel()
 {
-  this->Label = new char[1];
+  this->Label    = new char[1];
   this->Label[0] = 0;
+  this->LineType = vtkKWLabel::SingleLine;
+  this->Width    = 0;
 }
 
 vtkKWLabel::~vtkKWLabel()
@@ -92,6 +94,42 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("label %s -text {%s} %s", wname, this->Label, args);
+  if ( this->LineType == vtkKWLabel::MultiLine )
+    {
+    this->Script("message %s -text {%s} %s -width %d", 
+		 wname, this->Label, args, this->Width);
+    }
+  else
+    {
+    this->Script("label %s -text {%s} %s", wname, this->Label, args);
+    }
 }
+
+void vtkKWLabel::SetLineType( int type )
+{
+  if ( this->Application )
+    {
+    if ( this->LineType != type )
+      {
+      this->Script("lindex [ %s configure -text ] 4", 
+		   this->GetWidgetName());
+      char *str = this->Application->GetMainInterp()->result;
+      this->Script("destroy %s", this->GetWidgetName());
+      if ( this->LineType == vtkKWLabel::MultiLine )
+	{
+	this->Script("message %s -text {%s} -width %d", 
+		     this->GetWidgetName(), str, this->Width);
+	}
+      else
+	{
+	this->Script("label %s -text {%s}", 
+		     this->GetWidgetName(), str);
+	}		   
+      }
+    }
+  this->LineType = type;
+}
+
+
+
 

@@ -43,7 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
-#include "bitmaps.h"
+#include "vtkKWImageLabel.h"
+#include "icons.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
@@ -74,7 +75,7 @@ vtkKWMessageDialog::vtkKWMessageDialog()
   //this->CancelButton->SetParent(this->ButtonFrame);
   this->CancelButton->SetParent(this->CancelFrame);
   this->Style = vtkKWMessageDialog::Message;
-  this->Icon = vtkKWWidget::New();
+  this->Icon = vtkKWImageLabel::New();
   this->Icon->SetParent(this);
   this->Default = NoneDefault;
 }
@@ -171,22 +172,10 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                this->Label->GetWidgetName());
   this->Script("pack %s -side right -fill both -expand true -pady 4",
 	       this->MessageDialogFrame->GetWidgetName());
-  this->Icon->Create(app,"label","-width 0 -pady 0 -padx 0 -borderwidth 0");
+  this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -borderwidth 0");
   this->Script("pack %s -side left -fill y",
 	       this->Icon->GetWidgetName());
   this->Script("pack forget %s", this->Icon->GetWidgetName());
-
-  
-  Tcl_Interp * interp = this->GetApplication()->GetMainInterp();
-  if ( interp )
-    {
-    Tk_DefineBitmap(interp, "KWError", (char *)error_bits,
-		    error_width, error_height);
-    Tk_DefineBitmap(interp, "KWQuestion", (char *)question_bits,
-		    question_width, question_height);
-    Tk_DefineBitmap(interp, "KWWarning", (char *)warning_bits,
-		    warning_width, warning_height);
-    }
 }
 
 void vtkKWMessageDialog::SetText(const char *txt)
@@ -216,20 +205,30 @@ int vtkKWMessageDialog::Invoke()
 
 void vtkKWMessageDialog::SetIcon( int ico )
 {
-  if( ico <= vtkKWMessageDialog::NoIcon || ico > vtkKWMessageDialog::Info )
+  switch ( ico )
     {
-    this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
-		 this->Icon->GetWidgetName());
-    this->Script("pack forget %s", this->Icon->GetWidgetName());
-    return;
-    }
-  char icon_array[][11] = { "", "KWError", "KWWarning", 
-			    "KWQuestion", "info" };
-  this->Script("%s configure -bitmap {%s} -anchor n "
-	       "-pady 10 -padx 4 -borderwidth 4 -fg %s",
-	       this->Icon->GetWidgetName(),
-	       icon_array[ico],
-	       "red");
+    case vtkKWMessageDialog::Error:
+      this->Icon->SetImageData(image_error, 
+			       image_error_width, image_error_height);
+      break;
+    case vtkKWMessageDialog::Question:
+      this->Icon->SetImageData(image_question, 
+			       image_question_width, image_question_height);
+      break;
+    case vtkKWMessageDialog::Warning:
+      this->Icon->SetImageData(image_warning, 
+			       image_warning_width, image_warning_height);
+      break;
+    default:
+      this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
+		   this->Icon->GetWidgetName());
+      this->Script("pack forget %s", this->Icon->GetWidgetName());
+      return;
+    }  
+
+  this->Script("%s configure -anchor n "
+	       "-pady 10 -padx 4 -borderwidth 4",
+	       this->Icon->GetWidgetName());
   this->Script("pack %s -pady 17 -side left -fill y", 
 	       this->Icon->GetWidgetName());
 }

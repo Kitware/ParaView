@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkKWLabel.h
+  Module:    vtkKWImageLabel.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,63 +39,42 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkKWLabel - label widget
+// .NAME vtkKWImageLabel - label widget
 // .SECTION Description
 // A simple widget that represents a label. The label can be set with 
 // the SetLabel method.
 
-#ifndef __vtkKWLabel_h
-#define __vtkKWLabel_h
+#ifndef __vtkKWImageLabel_h
+#define __vtkKWImageLabel_h
 
-#include "vtkKWWidget.h"
+#include "vtkKWLabel.h"
 class vtkKWApplication;
 
-class VTK_EXPORT vtkKWLabel : public vtkKWWidget
+class VTK_EXPORT vtkKWImageLabel : public vtkKWLabel
 {
 public:
-  static vtkKWLabel* New();
-  vtkTypeMacro(vtkKWLabel,vtkKWWidget);
+  static vtkKWImageLabel* New();
+  vtkTypeMacro(vtkKWImageLabel,vtkKWLabel);
 
   // Description:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app, const char *args);
+
+  // Description:
+  // Set image data.
+  void SetImageData(const unsigned char* data, int width, int height);
   
-  const char* GetLabel() 
-    {
-      return this->Label;
-    }
-
-  // Description:
-  // Set the text on the label.
-  void SetLabel(const char*);
-
-  // Description:
-  // Set the way label treats long text. 
-  // Multiline will wrap text. You have to specify width
-  // when using multiline label.
-  void SetLineType(int type);
-
-  // Description:
-  // Set/Get width of the label when in multiline mode.
-  vtkSetMacro(Width, int);
-  vtkGetMacro(Width, int);
-
-//BTX
-  enum {
-    SingleLine,
-    MultiLine
-  };
-//ETX
-
 protected:
-  vtkKWLabel();
-  ~vtkKWLabel();
-  vtkKWLabel(const vtkKWLabel&) {};
-  void operator=(const vtkKWLabel&) {};
+  vtkKWImageLabel();
+  ~vtkKWImageLabel();
+  vtkKWImageLabel(const vtkKWImageLabel&) {};
+  void operator=(const vtkKWImageLabel&) {};
+
+  vtkSetStringMacro(ImageDataLabel);
+  vtkGetStringMacro(ImageDataLabel);
+
 private:
-  char* Label;
-  int LineType;
-  int Width;
+  char *ImageDataLabel;
 };
 
 
