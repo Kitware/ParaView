@@ -112,7 +112,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.3");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.4");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1080,10 +1080,10 @@ void vtkPVClientServerModule::SendCompleteArrays(vtkMapper *mapper)
           this->SocketController->Send(&numComps, 1, 1, 987246);
           this->Controller->Receive(&nameLength, 1, i, 987247);
           this->SocketController->Send(&nameLength, 1, 1, 987247);
-          name = new char[nameLength+1];
-          this->Controller->Receive(const_cast<char*>(name), nameLength, i, 987248);
-          this->SocketController->Send(const_cast<char*>(name), nameLength, 1, 987248);
-          delete [] name;
+          char *buffer = new char[nameLength+1];
+          this->Controller->Receive(const_cast<char*>(buffer), nameLength, i, 987248);
+          this->SocketController->Send(const_cast<char*>(buffer), nameLength, 1, 987248);
+          delete [] buffer;
           }
         this->Controller->Receive(activeAttributes, 5, i, 987258);
         this->SocketController->Send(activeAttributes, 5, 1, 987258);
@@ -1409,10 +1409,10 @@ void vtkPVClientServerModule::SendCompleteArrays(vtkDataSet *data)
           this->SocketController->Send(&numComps, 1, 1, 987246);
           this->Controller->Receive(&nameLength, 1, i, 987247);
           this->SocketController->Send(&nameLength, 1, 1, 987247);
-          name = new char[nameLength+1];
-          this->Controller->Receive(const_cast<char*>(name), nameLength, i, 987248);
-          this->SocketController->Send(const_cast<char*>(name), nameLength, 1, 987248);
-          delete [] name;
+          char *buffer = new char[nameLength+1];
+          this->Controller->Receive(const_cast<char*>(buffer), nameLength, i, 987248);
+          this->SocketController->Send(const_cast<char*>(buffer), nameLength, 1, 987248);
+          delete [] buffer;
           }
         this->Controller->Receive(activeAttributes, 5, i, 987258);
         this->SocketController->Send(activeAttributes, 5, 1, 987258);
