@@ -98,17 +98,18 @@ public:
   //BTX
   enum 
   {
-    RememberYes    = 0x00002,
-    RememberNo     = 0x00004,
-    ErrorIcon      = 0x00008,
-    WarningIcon    = 0x00010,
-    QuestionIcon   = 0x00020,
-    YesDefault     = 0x00040,
-    NoDefault      = 0x00080,
-    OkDefault      = 0x00100,
-    CancelDefault  = 0x00200,
-    Beep           = 0x00400,
-    PackVertically = 0x00800
+    RememberYes     = 0x00002,
+    RememberNo      = 0x00004,
+    ErrorIcon       = 0x00008,
+    WarningIcon     = 0x00010,
+    QuestionIcon    = 0x00020,
+    YesDefault      = 0x00040,
+    NoDefault       = 0x00080,
+    OkDefault       = 0x00100,
+    CancelDefault   = 0x00200,
+    Beep            = 0x00400,
+    PackVertically  = 0x00800,
+    InvokeAtPointer = 0x01000
   };
   //ETX
   vtkSetMacro(Options, int);

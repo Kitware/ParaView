@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.57");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.58");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -337,7 +337,11 @@ int vtkKWMessageDialog::Invoke()
       this->OtherButton->SetBind("<Left>",  "focus [ tk_focusPrev %W ]");
       }
     }
-  
+  if (this->Options & vtkKWMessageDialog::YesDefault)
+    {
+    this->InvokeAtPointerOn();
+    }
+
   this->Script("wm resizable %s 0 0", this->GetWidgetName());
 
   int res = vtkKWDialog::Invoke();
