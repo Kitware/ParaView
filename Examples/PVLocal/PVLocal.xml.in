@@ -8,17 +8,18 @@
          long_help="3D cone of a given radius and height."
          short_help="Create a 3D cone of a given radius and height">
   <Source class="vtkLocalConeSource"/>
-  <Scale variable="Resolution" trace_name="Resolution"
+  <Scale variable="Resolution" trace_name="Resolution" property="Resolution"
          default_value="6" resolution="1" range="0 512"
          display_entry="1" display_value="0" entry_and_label_on_top="0"
          help="Set the number of faces on this cone" />
-  <ThumbWheel variable="Radius" trace_name="Radius"
+  <ThumbWheel variable="Radius" trace_name="Radius" property="Radius"
               resolution="0.01" minimum_value="0" default_value="0.5"
               help="Set the radius of the widget part of the cone" />
-  <ThumbWheel variable="Height" trace_name="Height"
+  <ThumbWheel variable="Height" trace_name="Height" property="Height"
               resolution="0.01" minimum_value="0" default_value="1"
               help="Set the height of the cone" />
-  <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"
+  <LabeledToggle variable="Capping" trace_name="Capping" 
+                 property="Capping" default_value="1"
                  help="Set whether to draw the base of the cone" />
   <Documentation>
 The Cone source can be used to add a polygonal cone to the 3D scene. The Cone source has the following parameters:
