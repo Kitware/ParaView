@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.2");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.3");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1902,7 +1902,7 @@ char* vtkPVApplication::GetDemoPath()
 
   vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
   const char* selfPath = util->FindSelfPath(
-    this->GetPVApplication()->GetArgv0());
+    this->GetArgv0());
   const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
   char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
   sprintf(newPath, "%s/%s", selfPath, relPath);
