@@ -1,9 +1,4 @@
 SOURCE_FILES( ParaView_SRCS
-#vtkPVDataSetReaderInterface 
-#vtkPVEnSightReaderInterface 
-#vtkPVMethodInterface 
-#vtkPVSourceInterface 
-#vtkPVSourceInterfaceParser
 vtkAllToNPoly
 vtkBalancePoly
 vtkCommSched
@@ -78,6 +73,10 @@ vtkPVXMLPackageParser
 vtkPVXMLParser
 vtkStringList 
 )
+
+IF (VTK_USE_MPI)
+  SOURCE_FILES( ParaView_SRCS vtkPVEnSightVerifier )
+ENDIF (VTK_USE_MPI)
 
 ABSTRACT_FILES(
 vtkPVObjectWidget
