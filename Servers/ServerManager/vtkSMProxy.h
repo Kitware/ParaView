@@ -127,6 +127,12 @@ public:
   vtkSMProperty* GetConsumerProperty(unsigned int idx);
 
   // Description:
+  // Assigned by the XML parser. The name assigned in the XML
+  // configuration. Can be used to figure out the origin of the
+  // proxy.
+  vtkGetStringMacro(XMLName);
+
+  // Description:
   // Updates all property informations by calling the method
   // and populating the values.
   virtual void UpdateInformation();
