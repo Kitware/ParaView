@@ -31,10 +31,11 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.19");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.20");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
+#define VTK_KW_CTFE_HSV_NO_WRAP_LABEL "HSVNoWrap"
 
 #define VTK_KW_CTFE_NB_ENTRIES 3
 
@@ -468,7 +469,10 @@ void vtkKWColorTransferFunctionEditor::UpdateColorSpaceOptionMenu()
     switch (this->ColorTransferFunction->GetColorSpace())
       {
       case VTK_CTF_HSV:
-        this->ColorSpaceOptionMenu->SetValue(VTK_KW_CTFE_HSV_LABEL);
+        if (this->ColorTransferFunction->GetHSVWrap())
+          this->ColorSpaceOptionMenu->SetValue(VTK_KW_CTFE_HSV_LABEL);
+        else
+          this->ColorSpaceOptionMenu->SetValue(VTK_KW_CTFE_HSV_NO_WRAP_LABEL);
         break;
       default:
       case VTK_CTF_RGB:
@@ -537,14 +541,15 @@ void vtkKWColorTransferFunctionEditor::CreateColorSpaceOptionMenu(
     this->ColorSpaceOptionMenu->SetBalloonHelpString(
       "Change the interpolation color space to RGB or HSV.");
 
-    char callback[128];
-    sprintf(callback, "ColorSpaceCallback %d", VTK_CTF_RGB);
+    const char callback[] = "ColorSpaceCallback";
     this->ColorSpaceOptionMenu->AddEntryWithCommand(
       VTK_KW_CTFE_RGB_LABEL, this, callback);
     
-    sprintf(callback, "ColorSpaceCallback %d", VTK_CTF_HSV);
     this->ColorSpaceOptionMenu->AddEntryWithCommand(
       VTK_KW_CTFE_HSV_LABEL, this, callback);
+
+    this->ColorSpaceOptionMenu->AddEntryWithCommand(
+      VTK_KW_CTFE_HSV_NO_WRAP_LABEL, this, callback);
 
     this->UpdateColorSpaceOptionMenu();
     }
@@ -701,10 +706,9 @@ void vtkKWColorTransferFunctionEditor::Update()
 
   // No selection, disable value entries
 
-  int i;
   if (!this->HasSelection())
     {
-    for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
+    for (int i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
       this->ValueEntries[i]->SetEnabled(0);
       }
@@ -721,8 +725,7 @@ void vtkKWColorTransferFunctionEditor::UpdateEnableState()
     this->ColorSpaceOptionMenu->SetEnabled(this->Enabled);
     }
 
-  int i;
-  for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
+  for (int i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
     {
     if (this->ValueEntries[i])
       {
@@ -737,18 +740,54 @@ void vtkKWColorTransferFunctionEditor::UpdateEnableState()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWColorTransferFunctionEditor::ColorSpaceCallback(int v)
+void vtkKWColorTransferFunctionEditor::ColorSpaceCallback()
 {
-  if (this->ColorTransferFunction &&
-      this->ColorTransferFunction->GetColorSpace() != v)
+  if (this->ColorTransferFunction)
     {
-    this->ColorTransferFunction->SetColorSpace(v);
-    this->Update();
-    if (this->HasSelection())
+    const char * value = this->ColorSpaceOptionMenu->GetValue();
+    if( strcmp(value, VTK_KW_CTFE_RGB_LABEL) == 0)
       {
-      this->UpdatePointEntries(this->SelectedPoint);
+      if( this->ColorTransferFunction->GetColorSpace() != VTK_CTF_RGB )
+        {
+        this->ColorTransferFunction->SetColorSpace( VTK_CTF_RGB );
+        this->Update();
+        if (this->HasSelection())
+          {
+          this->UpdatePointEntries(this->SelectedPoint);
+          }
+        this->InvokeFunctionChangedCommand();
+        }
       }
-    this->InvokeFunctionChangedCommand();
+    else if( strcmp(value, VTK_KW_CTFE_HSV_LABEL) == 0)
+      {
+      if( this->ColorTransferFunction->GetColorSpace() != VTK_CTF_HSV ||
+          !this->ColorTransferFunction->GetHSVWrap() )
+        {
+        this->ColorTransferFunction->SetColorSpace( VTK_CTF_HSV );
+        this->ColorTransferFunction->HSVWrapOn();
+        this->Update();
+        if (this->HasSelection())
+          {
+          this->UpdatePointEntries(this->SelectedPoint);
+          }
+        this->InvokeFunctionChangedCommand();
+        }
+      }
+    else if( strcmp(value, VTK_KW_CTFE_HSV_NO_WRAP_LABEL ) == 0)
+      {
+      if( this->ColorTransferFunction->GetColorSpace() != VTK_CTF_HSV ||
+          this->ColorTransferFunction->GetHSVWrap() )
+        {
+        this->ColorTransferFunction->SetColorSpace( VTK_CTF_HSV );
+        this->ColorTransferFunction->HSVWrapOff();
+        this->Update();
+        if (this->HasSelection())
+          {
+          this->UpdatePointEntries(this->SelectedPoint);
+          }
+        this->InvokeFunctionChangedCommand();
+        }
+      }
     }
 }
 

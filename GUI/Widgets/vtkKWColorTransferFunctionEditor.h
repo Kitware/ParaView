@@ -129,7 +129,7 @@ public:
 
   // Description:
   // Callbacks
-  virtual void ColorSpaceCallback(int v);
+  virtual void ColorSpaceCallback();
   virtual void ValueEntriesCallback();
 
   // Description:
