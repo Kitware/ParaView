@@ -79,8 +79,7 @@ public:
   // not. It was necessary to add this option to work around some
   // Tk packing problems.
   virtual void Select();
-  virtual void Deselect() { this->Deselect(1); }
-  virtual void Deselect(int doPackForget);
+  virtual void Deselect(int doPackForget = 1);
   virtual void Pack();
 
   // Description: 
