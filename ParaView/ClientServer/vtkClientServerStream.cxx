@@ -1036,7 +1036,7 @@ int vtkClientServerStream::GetArgument(int message, int argument,
       case vtkClientServerStream::id_value:
         {
         // Copy the value out of the stream.
-        vtkClientServerID id;
+        vtkClientServerID id = { 0 };
         memcpy(&id.ID, data, sizeof(id.ID));
         // ID value 0 can be converted to a NULL pointer.
         if(id.ID == 0)
