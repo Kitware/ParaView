@@ -512,7 +512,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
 
   // create the top level
+
   this->MenuFile->InsertCommand(0, "Open Data File", this, "Open");
+  // Save current data in VTK format
+  this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData");
+  
   this->MenuFile->InsertCommand(2, "Export Tcl Script", this, "SaveInTclScript");
   //this->MenuFile->InsertCommand(3, "Save Workspace", this, "SaveWorkspace");
   
@@ -520,9 +524,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->InsertCommand(4, "Open Log File", this, "StartLog");
   this->MenuFile->InsertCommand(5, "Close Log File", this, "StopLog");
 
-  // Save current data in VTK format
-  this->MenuFile->InsertCommand(6, "Save Data", this, "WriteData");
-  
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
   this->Menu->InsertCascade(2, "Select", this->SelectMenu, 0);
