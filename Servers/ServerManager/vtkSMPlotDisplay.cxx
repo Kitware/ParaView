@@ -14,23 +14,12 @@
 =========================================================================*/
 #include "vtkSMPlotDisplay.h"
 
-#include "vtkPVRenderModule.h"
-#include "vtkImageData.h"
 #include "vtkObjectFactory.h"
-#include "vtkProp3D.h"
-#include "vtkPVProcessModule.h"
+#include "vtkPVRenderModule.h"
 #include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVConfig.h"
 #include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkProperty.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkStructuredGrid.h"
-#include "vtkTimerLog.h"
-#include "vtkToolkits.h"
-#include "vtkFieldDataToAttributeDataFilter.h"
 #include "vtkClientServerStream.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -43,8 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPlotDisplay);
-vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.6");
-
+vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.7");
 
 //----------------------------------------------------------------------------
 vtkSMPlotDisplay::vtkSMPlotDisplay()
@@ -89,8 +77,7 @@ vtkPolyData* vtkSMPlotDisplay::GetCollectedData()
     {
     return NULL;
     }
-  vtkMPIMoveData* dp;
-  dp = vtkMPIMoveData::SafeDownCast(
+  vtkMPIMoveData* dp = vtkMPIMoveData::SafeDownCast(
       pm->GetObjectFromID(this->DuplicateProxy->GetID(0)));
   if (dp == NULL)
     {
@@ -104,8 +91,8 @@ vtkPolyData* vtkSMPlotDisplay::GetCollectedData()
 //----------------------------------------------------------------------------
 void vtkSMPlotDisplay::CreateVTKObjects(int num)
 {
-  vtkPVProcessModule* pm;
-  pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkPVProcessModule* pm = 
+    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
   vtkClientServerStream stream;
 
   if (num != 1)
@@ -403,17 +390,15 @@ void vtkSMPlotDisplay::RemoveFromRenderer(vtkPVRenderModule* rm)
 
   // There will be only one, but this is more general and protects
   // against the user calling this method before "MakeVTKObjects".
-  int i, num;
-  num = this->XYPlotActorProxy->GetNumberOfIDs();
+  int num = this->XYPlotActorProxy->GetNumberOfIDs();
   vtkClientServerStream stream;
-  for (i = 0; i < num; ++i)
+  for (int i = 0; i < num; ++i)
     {
     // Enable XYPlotActor on server for tiled display.
-    stream << vtkClientServerStream::Invoke 
-                    << rendererID
-                    << "RemoveActor"
-                    << this->XYPlotActorProxy->GetID(i) 
-                    << vtkClientServerStream::End;
+    stream 
+      << vtkClientServerStream::Invoke << rendererID << "RemoveActor"
+      << this->XYPlotActorProxy->GetID(i) 
+      << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
 }
