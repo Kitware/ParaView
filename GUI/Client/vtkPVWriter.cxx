@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.19");
+vtkCxxRevisionMacro(vtkPVWriter, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -148,44 +148,47 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
   if(this->Parallel)
     {
     pm->GetStream() << vtkClientServerStream::Invoke
-                    << writerID << "SetNumberOfPieces" << numProcs
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke
                     << writerID << "SetGhostLevel" << ghostLevel
                     << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << pm->GetProcessModuleID() << "GetPartitionId"
-                    << vtkClientServerStream::End
-                    << vtkClientServerStream::Invoke
-                    << writerID << "SetStartPiece"
-                    << vtkClientServerStream::LastResult
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << pm->GetProcessModuleID() << "GetPartitionId"
-                    << vtkClientServerStream::End
-                    << vtkClientServerStream::Invoke
-                    << writerID << "SetEndPiece"
-                    << vtkClientServerStream::LastResult
-                    << vtkClientServerStream::End;
-
-    // Tell each process's writer whether it should write the summary
-    // file.  This assumes that the writer is a vtkXMLWriter.  When we
-    // add more writers, we will need a separate writer module.
-    vtkClientServerID helperID = pm->NewStreamObject("vtkPVSummaryHelper");
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << helperID << "SetWriter" << writerID
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << pm->GetProcessModuleID() << "GetController"
-                    << vtkClientServerStream::End
-                    << vtkClientServerStream::Invoke
-                    << helperID << "SetController"
-                    << vtkClientServerStream::LastResult
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke
-                    << helperID << "SynchronizeSummaryFiles"
-                    << vtkClientServerStream::End;
-    pm->DeleteStreamObject(helperID);
+    if (strstr(this->WriterClassName, "XMLP"))
+      {
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << writerID << "SetNumberOfPieces" << numProcs
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << pm->GetProcessModuleID() << "GetPartitionId"
+                      << vtkClientServerStream::End
+                      << vtkClientServerStream::Invoke
+                      << writerID << "SetStartPiece"
+                      << vtkClientServerStream::LastResult
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << pm->GetProcessModuleID() << "GetPartitionId"
+                      << vtkClientServerStream::End
+                      << vtkClientServerStream::Invoke
+                      << writerID << "SetEndPiece"
+                      << vtkClientServerStream::LastResult
+                      << vtkClientServerStream::End;
+  
+      // Tell each process's writer whether it should write the summary
+      // file.  This assumes that the writer is a vtkXMLWriter.  When we
+      // add more writers, we will need a separate writer module.
+      vtkClientServerID helperID = pm->NewStreamObject("vtkPVSummaryHelper");
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << helperID << "SetWriter" << writerID
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << pm->GetProcessModuleID() << "GetController"
+                      << vtkClientServerStream::End
+                      << vtkClientServerStream::Invoke
+                      << helperID << "SetController"
+                      << vtkClientServerStream::LastResult
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << helperID << "SynchronizeSummaryFiles"
+                      << vtkClientServerStream::End;
+      pm->DeleteStreamObject(helperID);
+      }
     }
 
   // Write the data.
