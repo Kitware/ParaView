@@ -71,9 +71,9 @@ public:
                        void* calldata)
     {
       if ( this->PV3DWidget )
-	{
-	this->PV3DWidget->ExecuteEvent(wdg, event, calldata);
-	}
+        {
+        this->PV3DWidget->ExecuteEvent(wdg, event, calldata);
+        }
     }
 
   vtkPV3DWidget* PV3DWidget;
@@ -138,12 +138,12 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   this->LabeledFrame->SetLabel("3D Widget");
 
   this->Script("pack %s -fill both -expand 1", 
-	       this->LabeledFrame->GetWidgetName());
+               this->LabeledFrame->GetWidgetName());
 
   this->Frame->SetParent(this->LabeledFrame->GetFrame());
   this->Frame->Create(pvApp, 0);
   this->Script("pack %s -fill both -expand 1", 
-	       this->Frame->GetWidgetName());
+               this->Frame->GetWidgetName());
   
   this->Visibility->SetParent(this->LabeledFrame->GetFrame());
   this->Visibility->Create(pvApp, "");
@@ -152,7 +152,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
   this->Visibility->EnabledOff();
     
   this->Script("pack %s -fill x -expand 1",
-	       this->Visibility->GetWidgetName());
+               this->Visibility->GetWidgetName());
 
   this->ChildCreate(pvApp);
 
@@ -162,9 +162,9 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
     {
     this->Widget3D->SetInteractor(iren);
     this->Widget3D->AddObserver(vtkCommand::InteractionEvent, 
-				this->Observer);
+                                this->Observer);
     this->Widget3D->AddObserver(vtkCommand::PlaceWidgetEvent, 
-				this->Observer);
+                                this->Observer);
     this->Widget3D->EnabledOff();
     }
   this->Observer->Execute(this->Widget3D, vtkCommand::InteractionEvent, 0);
@@ -172,8 +172,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone, 
-				   vtkPVSource* pvSource,
-				   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                   vtkPVSource* pvSource,
+                                   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
 }
@@ -212,7 +212,7 @@ void vtkPV3DWidget::SetVisibility(int visibility)
 {
   this->Widget3D->SetEnabled(visibility);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
-		      this->GetTclName(), visibility);
+                      this->GetTclName(), visibility);
   this->Visibility->SetState(visibility);
   this->Visible = visibility;
 }
@@ -285,9 +285,10 @@ void vtkPV3DWidget::ExecuteEvent(vtkObject*, unsigned long event, void*)
 }
 
 //----------------------------------------------------------------------------
-int vtkPV3DWidget::ReadXMLAttributes(vtkPVXMLElement*,
-				     vtkPVXMLPackageParser*)
+int vtkPV3DWidget::ReadXMLAttributes(vtkPVXMLElement* element,
+                                     vtkPVXMLPackageParser* parser)
 {
+  if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
   return 1;
 }
 

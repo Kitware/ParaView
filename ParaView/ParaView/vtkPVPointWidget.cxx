@@ -78,8 +78,6 @@ vtkPVPointWidget::vtkPVPointWidget()
     this->CoordinateLabel[cc] = vtkKWLabel::New();
    }
   this->PositionResetButton = vtkKWPushButton::New();
-  this->PositionVariable = 0;
-  this->PositionObject   = 0;
   point->AllOff();
 }
 
@@ -95,8 +93,6 @@ vtkPVPointWidget::~vtkPVPointWidget()
     this->CoordinateLabel[i]->Delete();
     }
   this->PositionResetButton->Delete();
-  this->SetPositionVariable(0);
-  this->SetPositionObject(0);
 }
 
 //----------------------------------------------------------------------------
@@ -118,8 +114,8 @@ void vtkPVPointWidget::PositionResetCallback()
     }
   input->GetBounds(bds);
   this->SetPosition(0.5*(bds[0]+bds[1]),
-		  0.5*(bds[2]+bds[3]),
-		  0.5*(bds[4]+bds[5]));
+                  0.5*(bds[2]+bds[3]),
+                  0.5*(bds[4]+bds[5]));
 
   this->SetPosition();
 }
@@ -133,11 +129,11 @@ void vtkPVPointWidget::Reset()
     return;
     }
   // Reset point
-  if ( this->PositionVariable && this->PositionObject )
+  if ( this->VariableName && this->ObjectTclName )
     {
     this->Script("eval %s SetPosition [ %s Get%s ]",
-		 this->GetTclName(), this->PositionObject, 
-		 this->PositionVariable);
+                 this->GetTclName(), this->ObjectTclName, 
+                 this->VariableName);
     }
   this->Superclass::Reset();
 }
@@ -145,38 +141,37 @@ void vtkPVPointWidget::Reset()
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::Accept()  
 {
-  if ( ! this->ModifiedFlag)
+  if ( this->ModifiedFlag)
     {
-    return;
-    }
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  ofstream *traceFile = pvApp->GetTraceFile();
-  int traceFlag = 0;
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream *traceFile = pvApp->GetTraceFile();
+    int traceFlag = 0;
 
-  // Start the trace entry and the accept command.
-  if (traceFile && this->InitializeTrace())
-    {
-    traceFlag = 1;
-    }
+    // Start the trace entry and the accept command.
+    if (traceFile && this->InitializeTrace())
+      {
+      traceFlag = 1;
+      }
 
-  if (traceFlag)
-    {
-    *traceFile << "$kw(" << this->GetTclName() << ") SetPosition "
-	       << this->PositionEntry[0]->GetValue() << " "
-	       << this->PositionEntry[1]->GetValue() << " "
-	       << this->PositionEntry[2]->GetValue() << endl;
-    }
+    if (traceFlag)
+      {
+      *traceFile << "$kw(" << this->GetTclName() << ") SetPosition "
+                 << this->PositionEntry[0]->GetValue() << " "
+                 << this->PositionEntry[1]->GetValue() << " "
+                 << this->PositionEntry[2]->GetValue() << endl;
+      }
     
-  // Accept point
-  char acceptCmd[1024];
-  if ( this->PositionVariable && this->PositionObject )
-    {    
-    sprintf(acceptCmd, "%s Set%s %f %f %f", this->PositionObject, 
-	    this->PositionVariable,
-	    this->PositionEntry[0]->GetValueAsFloat(),
-	    this->PositionEntry[1]->GetValueAsFloat(),
-	    this->PositionEntry[2]->GetValueAsFloat());
-    pvApp->Script(acceptCmd);
+    // Accept point
+    char acceptCmd[1024];
+    if ( this->VariableName && this->ObjectTclName )
+      {    
+      sprintf(acceptCmd, "%s Set%s %f %f %f", this->ObjectTclName, 
+              this->VariableName,
+              this->PositionEntry[0]->GetValueAsFloat(),
+              this->PositionEntry[1]->GetValueAsFloat(),
+              this->PositionEntry[2]->GetValueAsFloat());
+      pvApp->Script(acceptCmd);
+      }
     }
   this->Superclass::Accept();
 }
@@ -195,7 +190,7 @@ void vtkPVPointWidget::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 vtkPVPointWidget* vtkPVPointWidget::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVPointWidget::SafeDownCast(clone);
@@ -227,45 +222,45 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
     }
 
   this->Script("grid propagate %s 1",
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
 
   this->Script("grid x %s %s %s -sticky ew",
-	       this->CoordinateLabel[0]->GetWidgetName(),
-	       this->CoordinateLabel[1]->GetWidgetName(),
-	       this->CoordinateLabel[2]->GetWidgetName());
+               this->CoordinateLabel[0]->GetWidgetName(),
+               this->CoordinateLabel[1]->GetWidgetName(),
+               this->CoordinateLabel[2]->GetWidgetName());
   this->Script("grid %s %s %s %s -sticky ew",
-	       this->Labels[0]->GetWidgetName(),
-	       this->PositionEntry[0]->GetWidgetName(),
-	       this->PositionEntry[1]->GetWidgetName(),
-	       this->PositionEntry[2]->GetWidgetName());
+               this->Labels[0]->GetWidgetName(),
+               this->PositionEntry[0]->GetWidgetName(),
+               this->PositionEntry[1]->GetWidgetName(),
+               this->PositionEntry[2]->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 2 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
   this->Script("grid columnconfigure %s 3 -weight 2", 
-	       this->Frame->GetFrame()->GetWidgetName());
+               this->Frame->GetFrame()->GetWidgetName());
 
   for (i=0; i<3; i++)
     {
     this->Script("bind %s <Key> {%s SetValueChanged}",
-		 this->PositionEntry[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->PositionEntry[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <FocusOut> {%s SetPosition}",
-		 this->PositionEntry[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->PositionEntry[i]->GetWidgetName(),
+                 this->GetTclName());
     this->Script("bind %s <KeyPress-Return> {%s SetPosition}",
-		 this->PositionEntry[i]->GetWidgetName(),
-		 this->GetTclName());
+                 this->PositionEntry[i]->GetWidgetName(),
+                 this->GetTclName());
     }
   this->PositionResetButton->SetParent(this->Frame->GetFrame());
   this->PositionResetButton->Create(pvApp, "");
   this->PositionResetButton->SetLabel("Set Point Position to Center of Bounds");
   this->PositionResetButton->SetCommand(this, "PositionResetCallback"); 
   this->Script("grid %s - - - - -sticky ew", 
-	       this->PositionResetButton->GetWidgetName());
+               this->PositionResetButton->GetWidgetName());
   // Initialize the center of the point based on the input bounds.
   if (this->PVSource)
     {
@@ -326,13 +321,6 @@ void vtkPVPointWidget::SetPosition(float x, float y, float z)
     {
     iren->Render();
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPointWidget::SetPositionMethod(const char* wname, const char* varname)
-{
-  this->SetPositionObject(wname);
-  this->SetPositionVariable(varname);
 }
 
 //----------------------------------------------------------------------------

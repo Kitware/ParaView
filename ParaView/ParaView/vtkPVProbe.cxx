@@ -474,7 +474,7 @@ void vtkPVProbe::CreateProperties()
   this->AddPVWidget(this->PointWidget);
   this->PointWidget->SetModifiedCommand(this->GetTclName(),
                                        "SetAcceptButtonColorToRed");
-  this->PointWidget->SetPositionMethod(this->GetTclName(), "PointPosition");
+  this->PointWidget->SetObjectVariable(this->GetTclName(), "PointPosition");
   
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
 
