@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.47");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.48");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -80,7 +80,7 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated() != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
     return;
