@@ -97,8 +97,26 @@ public:
   virtual void SetCommand( vtkKWObject* Object, const char* MethodAndArgString);
   
   // Description:
-  // A method to set binding on the object
-  void SetBind(vtkKWObject* CalledObject, const char *Event, const char *CommandString);
+  // A method to set binding on the object.
+  // This method sets binding:
+  // bind this->GetWidgetName() event { object->GetTclName() command }
+  void SetBind(vtkKWObject* object, const char *event, const char *command);
+
+  // Description:
+  // A method to set binding on the object.
+  // This method sets binding:
+  // bind this->GetWidgetName() event { command }  
+  void SetBind(const char *event, const char *command);
+
+  // Description:
+  // A method to set binding on the object.
+  // This method sets binding:
+  // bind this->GetWidgetName() event { widget command }  
+  void SetBind(const char *event, const char *widget, const char *command);
+
+  // Description:
+  // Set focus to this widget.
+  void Focus();
 
   // Description: a method to create a callback string from a KWObject.
   // The caller is resposible for deleting the returned string.  
