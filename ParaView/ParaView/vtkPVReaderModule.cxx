@@ -104,11 +104,7 @@ void vtkPVReaderModule::CreateProperties()
 
 }
 
-void vtkPVReaderModule::InitializePrototype()
-{
-  this->Superclass::InitializePrototype();
-}
-
+//----------------------------------------------------------------------------
 int vtkPVReaderModule::ClonePrototype(int makeCurrent, 
 				      vtkPVReaderModule*& clone )
 {
@@ -123,6 +119,7 @@ int vtkPVReaderModule::ClonePrototype(int makeCurrent,
   return retVal;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVReaderModule::CanReadFile(const char* fname)
 {
   const char* ext = this->ExtractExtension(fname);
@@ -140,16 +137,19 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
   return 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVReaderModule::AddExtension(const char* ext)
 {
   this->Extensions->AppendItem(ext);
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPVReaderModule::ExtractExtension(const char* fname)
 {
   return strrchr(fname, '.');
 }
 
+//----------------------------------------------------------------------------
 int vtkPVReaderModule::ReadFile(const char* fname, vtkPVReaderModule*& clone)
 {
   clone = 0;

@@ -39,8 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVSelectTimeSet -
+// .NAME vtkPVSelectTimeSet - Special time selection widget used by PVEnSightReaderModule
 // .SECTION Description
+// This is a PVWidget specially designed to be used with PVEnSightReaderModule.
+// It provides support for multiple sets. The time value selected by
+// the user is passed to the EnSight reader with a SetTimeValue() call.
 
 #ifndef __vtkPVSelectTimeSet_h
 #define __vtkPVSelectTimeSet_h
@@ -77,15 +80,27 @@ public:
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
 					 vtkPVAnimationInterface *ai);
 
+  // Description:
+  // This is the labeled frame around the timeset tree.
   vtkGetObjectMacro(Frame, vtkKWLabeledFrame);
 
+  // Description:
+  // Label displayed on the labeled frame.
   void SetLabel(const char* label);
   const char* GetLabel();
 
-  void SetTimeValueCallback(const char* item);
+  // Description:
+  // Updates the time value label and the time ivar.
   void SetTimeValue(float time);
   vtkGetMacro(TimeValue, float);
 
+  // Description:
+  // Calls this->SetTimeValue () and Reader->SetTimeValue()
+  // with currently selected time value.
+  void SetTimeValueCallback(const char* item);
+
+  // Description:
+  // The reader is set by the EnSightReader module.
   void SetReader(vtkGenericEnSightReader* reader);
   vtkGetObjectMacro(Reader, vtkGenericEnSightReader);
 
