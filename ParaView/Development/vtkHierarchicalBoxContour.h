@@ -31,8 +31,7 @@
 class vtkContourFilter;
 class vtkDataObject;
 
-class VTK_EXPORT vtkHierarchicalBoxContour : 
-  public vtkHierarchicalBoxToPolyDataFilter
+class VTK_EXPORT vtkHierarchicalBoxContour : public vtkHierarchicalBoxToPolyDataFilter
 {
 public:
   static vtkHierarchicalBoxContour *New();

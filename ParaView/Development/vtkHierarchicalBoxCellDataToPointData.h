@@ -30,8 +30,7 @@
 
 class vtkDataObject;
 
-class VTK_EXPORT vtkHierarchicalBoxCellDataToPointData : 
-  public vtkHierarchicalBoxToHierarchicalBoxFilter
+class VTK_EXPORT vtkHierarchicalBoxCellDataToPointData : public vtkHierarchicalBoxToHierarchicalBoxFilter
 {
 public:
   static vtkHierarchicalBoxCellDataToPointData *New();

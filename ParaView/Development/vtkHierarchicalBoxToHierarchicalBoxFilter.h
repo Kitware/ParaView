@@ -28,8 +28,7 @@
  
 class vtkHierarchicalBoxDataSet;
 
-class VTK_EXPORT vtkHierarchicalBoxToHierarchicalBoxFilter : 
-  public vtkHierarchicalBoxSource
+class VTK_EXPORT vtkHierarchicalBoxToHierarchicalBoxFilter : public vtkHierarchicalBoxSource
 {
 public:
   vtkTypeRevisionMacro(vtkHierarchicalBoxToHierarchicalBoxFilter,
@@ -46,10 +45,8 @@ protected:
   ~vtkHierarchicalBoxToHierarchicalBoxFilter() {};
   
 private:
-  vtkHierarchicalBoxToHierarchicalBoxFilter(
-    const vtkHierarchicalBoxToHierarchicalBoxFilter&);  // Not implemented.
-  void operator=(
-    const vtkHierarchicalBoxToHierarchicalBoxFilter&);  // Not implemented.
+  vtkHierarchicalBoxToHierarchicalBoxFilter(const vtkHierarchicalBoxToHierarchicalBoxFilter&);  // Not implemented.
+  void operator=(const vtkHierarchicalBoxToHierarchicalBoxFilter&);  // Not implemented.
 };
 
 #endif

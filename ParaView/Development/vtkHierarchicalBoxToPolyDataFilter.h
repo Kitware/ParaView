@@ -45,10 +45,8 @@ protected:
   ~vtkHierarchicalBoxToPolyDataFilter() {};
   
 private:
-  vtkHierarchicalBoxToPolyDataFilter(
-    const vtkHierarchicalBoxToPolyDataFilter&);  // Not implemented.
-  void operator=(
-    const vtkHierarchicalBoxToPolyDataFilter&);  // Not implemented.
+  vtkHierarchicalBoxToPolyDataFilter(const vtkHierarchicalBoxToPolyDataFilter&);  // Not implemented.
+  void operator=(const vtkHierarchicalBoxToPolyDataFilter&);  // Not implemented.
 };
 
 #endif

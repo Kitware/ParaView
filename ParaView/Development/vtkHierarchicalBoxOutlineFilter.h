@@ -30,8 +30,7 @@
 
 class vtkDataObject;
 
-class VTK_EXPORT vtkHierarchicalBoxOutlineFilter : 
-  public vtkHierarchicalBoxToPolyDataFilter
+class VTK_EXPORT vtkHierarchicalBoxOutlineFilter : public vtkHierarchicalBoxToPolyDataFilter
 {
 public:
   static vtkHierarchicalBoxOutlineFilter *New();

@@ -31,8 +31,7 @@
 
 class vtkHierarchicalBoxDataSet;
 
-class VTK_EXPORT vtkHierarchicalBoxApplyFilterCommand : 
-  public vtkApplyFilterCommand
+class VTK_EXPORT vtkHierarchicalBoxApplyFilterCommand : public vtkApplyFilterCommand
 {
 public:
   static vtkHierarchicalBoxApplyFilterCommand *New(); 
