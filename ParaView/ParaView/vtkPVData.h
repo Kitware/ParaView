@@ -225,12 +225,14 @@ public:
   
   // Description:
   // Methods called when item chosen from RepresentationMenu
+  void SetRepresentation(const char*);
   void DrawWireframe();
   void DrawSurface();
   void DrawPoints();
   
   // Description:
   // Methods called when item chosen from RepresentationMenu
+  void SetInterpolation(const char*);
   void SetInterpolationToFlat();
   void SetInterpolationToGouraud();
 
@@ -353,8 +355,10 @@ public:
 protected:
   vtkPVData();
   ~vtkPVData();
+
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
+  virtual void SerializeToken(istream& is, const char token[1024]);
   
   vtkDataSet *VTKData;
   char *VTKDataTclName;
