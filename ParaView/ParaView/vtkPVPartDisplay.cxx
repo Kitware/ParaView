@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.5");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.6");
 
 
 //----------------------------------------------------------------------------
@@ -399,8 +399,9 @@ void vtkPVPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
   // Turn off the specualr so it does not interfere with data.
   stream << vtkClientServerStream::Invoke << this->PropertyID
          << "SetSpecular" << 0.0 << vtkClientServerStream::End;
-//  stream << vtkClientServerStream::Invoke << this->MapperID
-//         << "SetLookupTable" << colorMap->GetLookupTableID() << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke << this->MapperID
+         << "SetLookupTable" << colorMap->GetLookupTableID()
+         << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->MapperID
          << "ScalarVisibilityOn" << vtkClientServerStream::End;
 
