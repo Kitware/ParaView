@@ -21,7 +21,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMSinusoidKeyFrameProxy, "1.2");
 vtkStandardNewMacro(vtkSMSinusoidKeyFrameProxy);
 
 //----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ void vtkSMSinusoidKeyFrameProxy::UpdateValue(double currenttime,
     }
 
   // ( start + (end-start)*sin( 2*pi* (freq*t + phase/360) )/2 )
-  double t = sin ( 8.0 * atan(1) *  
+  double t = sin ( 8.0 * atan(static_cast<double>(1.0)) *  
     (this->Frequency* currenttime + this->Phase/360.0)) /  2.0;
 
   double vmin = this->GetKeyValue();
