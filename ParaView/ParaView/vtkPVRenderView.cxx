@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.192");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.193");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1528,7 +1528,7 @@ void vtkPVRenderView::UpdateAllPVData()
       {
       source = static_cast<vtkPVSource*>(it->GetObject());
       vtkPVData* data = source->GetPVOutput();
-      if ( source->GetInitialized() )
+      if ( source->GetInitialized() && source->GetVisibility() )
         {
         data->ForceUpdate(pvApp);
         }
@@ -2277,7 +2277,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.192 $");
+  this->ExtractRevision(os,"$Revision: 1.193 $");
 }
 
 //------------------------------------------------------------------------------
