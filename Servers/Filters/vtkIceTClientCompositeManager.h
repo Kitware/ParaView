@@ -110,6 +110,13 @@ public:
   vtkSetVector2Macro(TiledDimensions,int);
   vtkGetVector2Macro(TiledDimensions,int);
 
+  
+  // Description:
+  // This parameter is used when user want to specify explicitely the size of
+  // each tile display. Useful for testing.
+  vtkSetVector2Macro(TileSize,int);
+  vtkGetVector2Macro(TileSize,int);
+
 //BTX
   enum Tags {
     RENDER_RMI_TAG   = 12721,
@@ -151,6 +158,7 @@ protected:
 
   int Tiled;
   int TiledDimensions[2];
+  int TileSize[2];  //dimension of each tile display
 
   int ClientFlag;
   unsigned long StartTag;

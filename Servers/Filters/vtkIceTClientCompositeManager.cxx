@@ -45,7 +45,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.14");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.15");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -107,7 +107,8 @@ vtkIceTClientCompositeManager::vtkIceTClientCompositeManager()
 
   this->Tiled = 1;
   this->TiledDimensions[0] = this->TiledDimensions[1] = 1;
-
+  // default value for testing framework:
+  this->TileSize[0] = this->TileSize[1] = 300;
 
   this->UseCompositing = 0;
   this->IceTManager = NULL;
@@ -492,7 +493,10 @@ void vtkIceTClientCompositeManager::SetRenderWindow(vtkRenderWindow *renWin)
       }
      if (this->Tiled && this->ClientFlag == 0)
       { 
-      renWin->FullScreenOn();
+      renWin->FullScreenOn(); //This is the default
+      //this->TileSize[0] /= this->IceTManager->GetTileDimensions()[0];
+      //this->TileSize[1] /= this->IceTManager->GetTileDimensions()[1];
+      //renWin->SetSize( this->TileSize );
       }
     }
 }
