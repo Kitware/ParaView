@@ -231,7 +231,29 @@
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="The limit on computational iterations. Values less than 2.0 after this many iterations are considered in the set."/>
 </Module>
-
+<Module name="MazeSource" menu_name="Maze" root_name="Maze" 
+        module_type="Source" 
+        long_help="2D Maze of lines." 
+        short_help="Random maze">
+  <Source class="vtkMazeSource"/>
+  <VectorEntry variable="XSize" trace_name="XSize" 
+               type="int" default_value="20" 
+               help="Width of the maze." />
+  <VectorEntry variable="YSize" trace_name="YSize" 
+               type="int" default_value="20" 
+               help="Height of the maze." />
+  <VectorEntry variable="RunFactor" trace_name="RunLength" 
+               type="int" default_value="20" 
+               help="A value that influences the run length and branching of the maze." />
+  <VectorEntry variable="MagnetFactor" trace_name="MagnetFactor" 
+               type="int" default_value="4" 
+               help="When this value is larger than 1, new paths are preferentially formed adjacent to existing paths." />
+  <VectorEntry variable="RandomSeed" trace_name="RandomSeed" 
+               type="int" default_value="111" 
+               help="Initializes the random number generator." />
+  <LabeledToggle variable="ShowSolution" trace_name="ShowSolution" default_value="0"
+               help="Show the solution path." />
+</Module>
 <Module name="PlaneSource" menu_name="Plane" root_name="Plane" 
         module_type="Source" 
         long_help="Parallelogram given an origin and two points. The resolution indicates the number of division along each axis of the plane." 
