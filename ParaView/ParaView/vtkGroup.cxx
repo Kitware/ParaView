@@ -23,7 +23,7 @@
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
 
-vtkCxxRevisionMacro(vtkGroup, "1.2.2.1");
+vtkCxxRevisionMacro(vtkGroup, "1.2.2.2");
 vtkStandardNewMacro(vtkGroup);
 
 //----------------------------------------------------------------------------
@@ -121,6 +121,29 @@ void vtkGroup::ExecuteInformation()
     } 
 }
 
+
+
+//----------------------------------------------------------------------------
+// Copy the update information across
+void vtkGroup::ComputeInputUpdateExtents(vtkDataObject *)
+{
+  int idx;
+  int num;
+  vtkDataSet *input;
+  vtkDataSet *output;
+
+  num = this->NumberOfInputs;
+  for (idx = 0; idx < num; ++idx)
+    {
+    input = this->GetInput(idx);
+    output = this->GetOutput(idx);
+
+    input->SetUpdatePiece( output->GetUpdatePiece() );
+    input->SetUpdateNumberOfPieces( output->GetUpdateNumberOfPieces() );
+    input->SetUpdateGhostLevel( output->GetUpdateGhostLevel() );
+    input->SetUpdateExtent( output->GetUpdateExtent() );
+    }
+}
 
 //----------------------------------------------------------------------------
 // Append data sets into single unstructured grid
