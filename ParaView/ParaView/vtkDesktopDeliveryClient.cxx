@@ -29,7 +29,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.6");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.7");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -116,9 +116,11 @@ void vtkDesktopDeliveryClient::PreRenderProcessing()
       vtkRenderer *ren;
       int i;
       for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
-    {
-    ren->SetViewport(this->Viewports->GetTuple(i));
-    }
+        {
+        // TODO: Revert back once ren->SetViewport() takes double.
+        double *vp = this->Viewports->GetTuple(i);
+        ren->SetViewport(vp[0], vp[1], vp[2], vp[3]);
+        }
       }
     }
 }
