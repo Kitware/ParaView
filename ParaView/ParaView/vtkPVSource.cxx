@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.332");
+vtkCxxRevisionMacro(vtkPVSource, "1.333");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -110,7 +110,6 @@ vtkPVSource::vtkPVSource()
 
   // The underlying VTK objects. PVSource supports multiple VTK sources/filters.
   this->VTKSourceIDs = new vtkClientServerIDList;
-  this->VTKSourceOuputIDs = new vtkClientServerIDList;
   
   
   // The frame which contains the parameters related to the data source
@@ -165,7 +164,6 @@ vtkPVSource::vtkPVSource()
 //----------------------------------------------------------------------------
 vtkPVSource::~vtkPVSource()
 {
-  delete this->VTKSourceOuputIDs;
   this->SetPVOutput(NULL);  
   this->RemoveAllPVInputs();
 
@@ -629,17 +627,10 @@ void vtkPVSourceEndProgress(void* vtkNotUsed(arg))
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVSource::AddVTKSource(vtkClientServerID id)
 {
   this->VTKSourceIDs->push_back(id);
-}
-
-//----------------------------------------------------------------------------
-// Tcl does the reference counting, so we are not going to put an 
-// additional reference of the data.
-void vtkPVSource::AddVTKSource(const char*)
-{
-  vtkErrorMacro("No longer supported.");
 }
 
 //----------------------------------------------------------------------------
