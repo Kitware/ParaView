@@ -439,6 +439,12 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_EXECUTABLE(paraview WIN32 ${ParaViewBinary_SRCS}) 
+CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/TestClientServer.h.in
+  ${PARAVIEW_BINARY_DIR}/ParaView/TestClientServer.h
+  ESCAPE_QUOTES)
+
+ADD_EXECUTABLE(TestClientServer TestClientServer.cxx) 
+TARGET_LINK_LIBRARIES(TestClientServer vtkCommon)
 IF(VTK_USE_CARBON)
   FIND_PROGRAM(VTK_APPLE_RESOURCE Rez /Developer/Tools)
   IF(VTK_APPLE_RESOURCE)

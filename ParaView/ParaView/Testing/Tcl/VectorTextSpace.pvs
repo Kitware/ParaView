@@ -58,7 +58,12 @@ if { [catch {set fp [open "out.txt" w]}] == 0 } {
 
   source $DataDir/Utility/rtText.tcl
   pvFileTest $DataDir/Baseline/VectorTextSpace.txt
-  file delete -force out.txt
+  # if the compare fails, try the client server version of the file
+  if {[$Application GetExitStatus]} {
+    $Application SetExitStatus 0
+    pvFileTest $DataDir/Baseline/VectorTextSpaceClientServer.txt
+  }
+#  file delete -force out.txt
   if {[$Application GetExitStatus]} {
     $Application Exit
   }

@@ -546,6 +546,8 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
 
     // Unsafe conversions:
     VTK_CSS_GET_ARGUMENT_CASE(uint32_value, vtkTypeUInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(int64_value, vtkTypeInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
     VTK_CSS_GET_ARGUMENT_CASE(float32_value, vtkTypeFloat32);
     default: return 0;
     };
@@ -634,6 +636,8 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
     VTK_CSS_GET_ARGUMENT_CASE(int8_value, vtkTypeInt8);
     VTK_CSS_GET_ARGUMENT_CASE(int16_value, vtkTypeInt16);
     VTK_CSS_GET_ARGUMENT_CASE(int32_value, vtkTypeInt32);
+    VTK_CSS_GET_ARGUMENT_CASE(int64_value, vtkTypeInt64);
+    VTK_CSS_GET_ARGUMENT_CASE(uint64_value, vtkTypeUInt64);
     VTK_CSS_GET_ARGUMENT_CASE(float32_value, vtkTypeFloat32);
     default: return 0;
     };

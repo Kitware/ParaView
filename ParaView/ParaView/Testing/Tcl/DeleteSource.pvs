@@ -37,14 +37,10 @@ set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
 set pvSphere [$pvWindow CreatePVSource SphereSource]
 set pm [$Application GetProcessModule]
-set id [$pvSphere GetVTKSourceIDAsInt 0]
-[$pm GetObjectFromIntID $id] SetThetaResolution 16
 $pvSphere UpdateParameterWidgets
 $pvSphere AcceptCallback
 
 set pvShrink [$pvWindow CreatePVSource ShrinkFilter]
-set id [$pvShrink GetVTKSourceIDAsInt 0]
-[$pm GetObjectFromIntID $id] SetShrinkFactor 0.9
 $pvShrink UpdateParameterWidgets
 $pvShrink AcceptCallback
 
