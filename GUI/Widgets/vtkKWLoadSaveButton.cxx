@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLoadSaveButton);
-vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.3");
+vtkCxxRevisionMacro(vtkKWLoadSaveButton, "1.4");
 
 int vtkKWLoadSaveButtonCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
@@ -167,7 +167,6 @@ void vtkKWLoadSaveButton::UpdateFileName()
     }
   else
     {
-    size_t fname_len = strlen(fname);
     kwsys_stl::string new_fname; 
     if (this->TrimPathFromFileName)
       {
