@@ -1438,7 +1438,7 @@ void vtkPVWindow::OpenCallback()
     }
 
   this->Script("set openFileName [tk_getOpenFile -initialdir {%s} "
-	       "-filetypes {{{ParaView Files} {%s}} %s}]", 
+	       "-filetypes {{{ParaView Files} {%s}} %s {{All Files} {*}}}]", 
                buffer, this->FileExtensions, this->FileDescriptions);
 
   openFileName = new char[
@@ -2015,7 +2015,8 @@ void vtkPVWindow::UpdateFilterMenu()
   this->FilterMenu->DeleteAllMenuItems();
 
   if (this->CurrentPVData && this->CurrentPVSource &&
-      !this->CurrentPVSource->GetIsPermanent())
+      !this->CurrentPVSource->GetIsPermanent() && 
+      !this->CurrentPVSource->GetHideDisplayPage() )
     {
     // Add all the appropriate filters to the filter menu.
     vtkArrayMapIterator<const char*, vtkPVSource*>* it = 
