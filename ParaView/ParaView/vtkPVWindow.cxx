@@ -78,18 +78,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
 #include "vtkPVInteractorStyleFly.h"
-#include "vtkPVJoystickFlyIn.h"
-#include "vtkPVJoystickFlyOut.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
-#include "vtkPVTrackballPan.h"
-#include "vtkPVTrackballRoll.h"
-#include "vtkPVTrackballRotate.h"
-#include "vtkPVTrackballZoom.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkString.h"
@@ -1000,6 +994,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
                this->GetWidgetName(), this->GetTclName());
 
+  if ( this->MainView )
+    {
+    this->MainView->SetupCameraManipulators();     
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1292,57 +1290,6 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   vtkPVInteractorStyleControl *iscontrol2D = view->GetManipulatorControl2D();
   iscontrol2D->SetManipulatorCollection(
     this->CameraStyle2D->GetCameraManipulators());
-  
-  vtkPVCameraManipulator *manipulator;
-  // ----
-  manipulator = vtkPVTrackballRotate::New();
-  iscontrol3D->AddManipulator("Rotate", manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballRoll::New();
-  iscontrol2D->AddManipulator("Roll", manipulator);
-  iscontrol3D->AddManipulator("Roll", manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballPan::New();
-  iscontrol2D->AddManipulator("Pan", manipulator);
-  iscontrol3D->AddManipulator("Pan", manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVTrackballZoom::New();
-  iscontrol2D->AddManipulator("Zoom", manipulator);
-  iscontrol3D->AddManipulator("Zoom", manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVJoystickFlyIn::New();
-  iscontrol3D->AddManipulator("FlyIn", manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-  manipulator = vtkPVJoystickFlyOut::New();
-  iscontrol3D->AddManipulator("FlyOut", manipulator);
-  manipulator->Delete();
-  manipulator = NULL;
-  // ----
-
-  iscontrol3D->SetCurrentManipulator(0, 0, "Rotate");
-  iscontrol3D->SetCurrentManipulator(0, 1, "Roll");
-  iscontrol3D->SetCurrentManipulator(1, 0, "Pan");
-  iscontrol3D->SetCurrentManipulator(2, 1, "Pan");
-  iscontrol3D->SetCurrentManipulator(2, 0, "Zoom");
-  iscontrol3D->SetDefaultManipulator("Rotate");
-  iscontrol3D->UpdateMenus();
-
-  iscontrol2D->SetCurrentManipulator(0, 1, "Roll");
-  iscontrol2D->SetCurrentManipulator(1, 0, "Pan");
-  iscontrol2D->SetCurrentManipulator(2, 1, "Pan");
-  iscontrol2D->SetCurrentManipulator(2, 0, "Zoom");
-  iscontrol2D->SetDefaultManipulator("Pan");
-  iscontrol2D->UpdateMenus();
   
   float rgb[3];
   this->RetrieveColor(2, "RenderViewBG", rgb); 
@@ -3131,6 +3078,91 @@ void vtkPVWindow::LoadSessionFile(const char* path)
   fptr = new ifstream(path, ios::in);
   this->Serialize(*fptr);
   delete fptr;
+}
+
+#include "vtkPVCameraManipulator.h"
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::AddManipulator(const char* rotypes, const char* name, 
+                                 vtkPVCameraManipulator* pcm)
+{
+  if ( !pcm || !this->MainView )
+    {
+    return;
+    }
+
+  char *types = vtkString::Duplicate(rotypes);
+  char t[100];
+  int res = 1;
+
+  istrstream str(types);
+  str.width(100);
+  while(str >> t)
+    {
+    if ( vtkString::Equals(t, "2D") )
+      {
+      this->MainView->GetManipulatorControl2D()->AddManipulator(name, pcm);
+      }
+    else if (vtkString::Equals(t, "3D") )
+      {
+      this->MainView->GetManipulatorControl3D()->AddManipulator(name, pcm);
+      }
+    else
+      {
+      vtkErrorMacro("Unknonwn type of manipulator: " << name << " - " << t);
+      res = 0;
+      break;
+      }
+    str.width(100);
+    }
+  delete [] types;
+  if ( res )
+    {
+    this->MainView->UpdateCameraManipulators();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::AddManipulatorArgument(const char* rotypes, const char* name, 
+                                         const char* variable, 
+                                         vtkPVWidget* widget)
+{
+  if ( !rotypes || !name || !variable || !widget || !this->MainView )
+    {
+    return;
+    }
+
+  char *types = vtkString::Duplicate(rotypes);
+  char t[100];
+  int res = 1;
+
+  istrstream str(types);
+  str.width(100);
+  while(str >> t)
+    {
+    if ( vtkString::Equals(t, "2D") )
+      {
+      this->MainView->GetManipulatorControl2D()->AddArgument(variable, 
+                                                             name, widget);
+      }
+    else if (vtkString::Equals(t, "3D") )
+      {
+      this->MainView->GetManipulatorControl3D()->AddArgument(variable, 
+                                                             name, widget);
+      }
+    else
+      {
+      vtkErrorMacro("Unknonwn type of manipulator: " << name << " - " << t);
+      res = 0;
+      break;
+      }
+    str.width(100);
+    }
+  delete [] types;
+  if ( res )
+    {
+    this->MainView->UpdateCameraManipulators();
+    }
 }
 
 //----------------------------------------------------------------------------

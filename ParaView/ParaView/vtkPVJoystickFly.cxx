@@ -50,14 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFly, "1.4");
+vtkCxxRevisionMacro(vtkPVJoystickFly, "1.5");
 
 //-------------------------------------------------------------------------
 vtkPVJoystickFly::vtkPVJoystickFly()
 {
   this->In = -1;
   this->FlyFlag = 0;
-  this->Speed = 20.0;
+  this->FlySpeed = 20.0;
   this->LastRenderTime = 0.1;
 
   this->CameraXAxis[0] = 1.0;
@@ -101,7 +101,7 @@ void vtkPVJoystickFly::OnButtonDown(int x, int y, vtkRenderer *ren,
   this->LastY = y;
 
   double *range = ren->GetActiveCamera()->GetClippingRange();
-  this->Fly(ren, rwi, range[1], (this->In?1:-1)*this->Speed);
+  this->Fly(ren, rwi, range[1], (this->In?1:-1)*this->FlySpeed);
 }
 
 
@@ -297,6 +297,12 @@ void vtkPVJoystickFly::ComputeCameraAxes(vtkRenderer* ren)
 
   vtkMath::Cross(this->CameraYAxis, this->CameraZAxis, this->CameraXAxis);
 }
+
+//void vtkPVJoystickFly::SetFlySpeed(double d)
+//{
+//  this->FlySpeed = d;
+//  cout << this << ": Set flyspeed to " << d << endl;
+//}
 
 //-------------------------------------------------------------------------
 void vtkPVJoystickFly::PrintSelf(ostream& os, vtkIndent indent)

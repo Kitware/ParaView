@@ -39,10 +39,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVJoystickFly - Rotates camera with xy mouse movement.
+// .NAME vtkPVJoystickFly - Fly camera towards or away from the object
 // .SECTION Description
-// vtkPVJoystickFly allows the user to interactively
-// manipulate the camera, the viewpoint of the scene.
+// vtkPVJoystickFly allows the user to interactively manipulate the
+// camera, the viewpoint of the scene.
 
 #ifndef __vtkPVJoystickFly_h
 #define __vtkPVJoystickFly_h
@@ -67,6 +67,12 @@ public:
   virtual void OnButtonUp(int x, int y, vtkRenderer *ren,
                           vtkRenderWindowInteractor *rwi);
 
+  // Description:
+  // Set and get the speed of flying.
+  //virtual void SetFlySpeed(double);
+  vtkSetClampMacro(FlySpeed, double, 1, 30);  
+  vtkGetMacro(FlySpeed, double);  
+
 protected:
   vtkPVJoystickFly();
   ~vtkPVJoystickFly();
@@ -74,7 +80,7 @@ protected:
   int In;
   int FlyFlag;
 
-  double Speed;
+  double FlySpeed;
   double Scale;
   double LastRenderTime;
   double CameraXAxis[3];

@@ -1566,22 +1566,64 @@ int* vtkPVRenderView::GetRenderWindowSize()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::UpdateCameraManipulators()
+{
+  vtkPVInteractorStyleControl *iscontrol3D = this->GetManipulatorControl3D();
+  vtkPVInteractorStyleControl *iscontrol2D = this->GetManipulatorControl2D();
+  iscontrol3D->UpdateMenus();
+  iscontrol2D->UpdateMenus();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SetupCameraManipulators()
+{
+  vtkPVInteractorStyleControl *iscontrol3D = this->GetManipulatorControl3D();
+  vtkPVInteractorStyleControl *iscontrol2D = this->GetManipulatorControl2D();
+
+  iscontrol3D->SetCurrentManipulator(0, 0, "Rotate");
+  iscontrol3D->SetCurrentManipulator(0, 1, "Roll");
+  iscontrol3D->SetCurrentManipulator(1, 0, "Pan");
+  iscontrol3D->SetCurrentManipulator(2, 1, "Pan");
+  iscontrol3D->SetCurrentManipulator(2, 0, "Zoom");
+  iscontrol3D->SetCurrentManipulator(0, 2, "FlyIn");
+  iscontrol3D->SetCurrentManipulator(2, 2, "FlyOut");
+  iscontrol3D->SetDefaultManipulator("Rotate");
+  iscontrol3D->UpdateMenus();
+
+  iscontrol2D->SetCurrentManipulator(0, 1, "Roll");
+  iscontrol2D->SetCurrentManipulator(1, 0, "Pan");
+  iscontrol2D->SetCurrentManipulator(2, 1, "Pan");
+  iscontrol2D->SetCurrentManipulator(2, 0, "Zoom");
+  iscontrol2D->SetDefaultManipulator("Pan");
+  iscontrol2D->UpdateMenus();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ImmediateModeCheck: " << this->GetImmediateModeCheck() << endl;
-  os << indent << "InteractiveCompositeTime: " << this->GetInteractiveCompositeTime() << endl;
-  os << indent << "InteractiveRenderTime: " << this->GetInteractiveRenderTime() << endl;
-  os << indent << "NavigationFrame: " << this->GetNavigationFrame() << endl;
+  os << indent << "ImmediateModeCheck: " 
+     << this->GetImmediateModeCheck() << endl;
+  os << indent << "InteractiveCompositeTime: " 
+     << this->GetInteractiveCompositeTime() << endl;
+  os << indent << "InteractiveRenderTime: " 
+     << this->GetInteractiveRenderTime() << endl;
+  os << indent << "NavigationFrame: " 
+     << this->GetNavigationFrame() << endl;
   os << indent << "RendererTclName: " 
      << (this->GetRendererTclName()?this->GetRendererTclName():"<none>") << endl;
-  os << indent << "StillCompositeTime: " << this->GetStillCompositeTime() << endl;
+  os << indent << "StillCompositeTime: " 
+     << this->GetStillCompositeTime() << endl;
   os << indent << "StillRenderTime: " << this->GetStillRenderTime() << endl;
-  os << indent << "TriangleStripsCheck: " << this->GetTriangleStripsCheck() << endl;
-  os << indent << "UseReductionFactor: " << this->GetUseReductionFactor() << endl;
+  os << indent << "TriangleStripsCheck: " 
+     << this->GetTriangleStripsCheck() << endl;
+  os << indent << "UseReductionFactor: " 
+     << this->GetUseReductionFactor() << endl;
   os << indent << "DisableRenderingFlag: " 
      << (this->DisableRenderingFlag ? "on" : "off") << endl;
-  os << indent << "ManipulatorControl2D: " << this->ManipulatorControl2D << endl;
-  os << indent << "ManipulatorControl3D: " << this->ManipulatorControl3D << endl;
+  os << indent << "ManipulatorControl2D: " 
+     << this->ManipulatorControl2D << endl;
+  os << indent << "ManipulatorControl3D: " 
+     << this->ManipulatorControl3D << endl;
 }
 

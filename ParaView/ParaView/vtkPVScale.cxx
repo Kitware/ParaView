@@ -54,15 +54,15 @@ vtkStandardNewMacro(vtkPVScale);
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
 {
+  this->EntryLabel = 0;
   this->LabelWidget = vtkKWLabel::New();
-  this->LabelWidget->SetParent(this);
   this->Scale = vtkKWScale::New();
-  this->Scale->SetParent(this);
 }
 
 //----------------------------------------------------------------------------
 vtkPVScale::~vtkPVScale()
 {
+  this->SetEntryLabel(0);
   this->Scale->Delete();
   this->Scale = NULL;
   this->LabelWidget->Delete();
@@ -182,10 +182,10 @@ void vtkPVScale::Accept()
 
   if (this->ObjectTclName && this->VariableName)
     {
-    pvApp->BroadcastScript("%s Set%s %d", 
-                           this->ObjectTclName,
-                           this->VariableName, 
-                           this->GetValue());
+    pvApp->Script("%s Set%s %d", 
+                  this->ObjectTclName,
+                  this->VariableName, 
+                  this->GetValue());
     }
 
   this->ModifiedFlag = 0;
@@ -209,14 +209,14 @@ void vtkPVScale::Reset()
 }
 
 vtkPVScale* vtkPVScale::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVScale::SafeDownCast(clone);
 }
 
 void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVScale* pvs = vtkPVScale::SafeDownCast(clone);
@@ -242,7 +242,7 @@ float vtkPVScale::GetValue()
 
 //----------------------------------------------------------------------------
 int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
-				  vtkPVXMLPackageParser* parser)
+                                  vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }
 
@@ -250,8 +250,12 @@ int vtkPVScale::ReadXMLAttributes(vtkPVXMLElement* element,
   const char* label = element->GetAttribute("label");
   if(!label)
     {
-    vtkErrorMacro("No label attribute.");
-    return 0;
+    label = element->GetAttribute("variable");
+    if (!label )
+      {
+      vtkErrorMacro("No label attribute.");
+      return 0;
+      }
     }
   this->SetLabel(label);
 

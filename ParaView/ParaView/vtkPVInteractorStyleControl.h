@@ -51,14 +51,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkCollection;
 class vtkKWApplication;
+class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWOptionMenu;
 class vtkPVCameraManipulator;
+class vtkPVWidget;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
 template<class KeyType,class DataType> class vtkArrayMapIterator;
+template<class DataType> class vtkVector;
 //ETX
 
 class VTK_EXPORT vtkPVInteractorStyleControl : public vtkKWWidget
@@ -126,6 +129,19 @@ public:
   vtkSetStringMacro(RegisteryName);
   vtkGetStringMacro(RegisteryName);
 
+  // Description:
+  // Add argument that can be modified for specific manipulator.
+  void AddArgument(const char* name, const char* manipulator,
+                   vtkPVWidget* widget);
+
+  // Description:
+  // Callback for widget to call when user modifies UI.
+  void ChangeArgument(const char* name, const char* widget);
+
+  // Description
+  // This is hack to convert it to Tcl.
+  vtkGetObjectMacro(CurrentManipulator, vtkPVCameraManipulator);
+
 protected:
   vtkPVInteractorStyleControl();
   ~vtkPVInteractorStyleControl();
@@ -133,15 +149,30 @@ protected:
   vtkKWLabeledFrame *LabeledFrame;
   vtkKWLabel *Labels[6];
   vtkKWOptionMenu *Menus[9];
+  vtkKWFrame *ArgumentsFrame;
+  vtkKWFrame *MenusFrame;
+
+
   vtkCollection *ManipulatorCollection;
   char* DefaultManipulator;
   char* RegisteryName;
 
 //BTX
+  typedef vtkVector<const char*> ArrayStrings;
   typedef vtkArrayMap<const char*,vtkPVCameraManipulator*> ManipulatorMap;
-  typedef vtkArrayMapIterator<const char*,vtkPVCameraManipulator*> ManipulatorMapIterator;
-  vtkPVInteractorStyleControl::ManipulatorMap* Manipulators;
+  typedef vtkArrayMapIterator<const char*,vtkPVCameraManipulator*> 
+    ManipulatorMapIterator;
+  typedef vtkArrayMap<const char*,vtkPVWidget*> WidgetsMap;
+  typedef vtkArrayMap<const char*,vtkPVInteractorStyleControl::ArrayStrings*>
+    MapStringToArrayStrings;
+
+  vtkPVInteractorStyleControl::ManipulatorMap*          Manipulators;
+  vtkPVInteractorStyleControl::WidgetsMap*              Widgets;
+  vtkPVInteractorStyleControl::MapStringToArrayStrings* Arguments;
 //ETX
+
+  // This is hack to get tcl name;
+  vtkPVCameraManipulator *CurrentManipulator;
 
 private:
   vtkPVInteractorStyleControl(const vtkPVInteractorStyleControl&); // Not implemented

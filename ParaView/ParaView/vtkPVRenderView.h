@@ -264,7 +264,16 @@ public:
   // Description:
   // Get the size of the render window.
   int* GetRenderWindowSize();
-    
+
+  // Description:
+  // Setup camera manipulators by populating the control and setting
+  // initial values.
+  void SetupCameraManipulators();
+
+  // Description:
+  // Update manipulators after they were added to control.
+  void UpdateCameraManipulators();
+
 protected:
   vtkPVRenderView();
   ~vtkPVRenderView();

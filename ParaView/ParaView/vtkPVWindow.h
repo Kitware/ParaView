@@ -82,6 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkActor;
 class vtkAxes;
+class vtkCollection;
 class vtkGenericRenderWindowInteractor;
 class vtkKWCheckButton;
 class vtkKWEntry;
@@ -96,22 +97,23 @@ class vtkKWTclInteractor;
 class vtkKWToolbar;
 class vtkPVAnimationInterface;
 class vtkPVApplication;
+class vtkPVCameraManipulator;
+class vtkPVColorMap;
 class vtkPVData;
 class vtkPVErrorLogDisplay;
 class vtkPVGenericRenderWindowInteractor;
+class vtkPVInteractorStyle;
 class vtkPVInteractorStyleCenterOfRotation;
 class vtkPVInteractorStyleFly;
-class vtkPVInteractorStyle;
 class vtkPVReaderModule;
 class vtkPVRenderView;
 class vtkPVSource;
 class vtkPVSourceCollection;
 class vtkPVTimerLogDisplay;
+class vtkPVTrackballRoll;
+class vtkPVWidget;
 class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
-class vtkCollection;
-class vtkPVColorMap;
-class vtkPVTrackballRoll;
 
 //BTX
 template <class key, class data> 
@@ -331,6 +333,16 @@ public:
   // Adds package name. These names are later used when writing
   // VTK scripts.
   void AddPackageName(const char* name);
+
+  // Description:
+  // Adds manipulator to the list of available manipulators.
+  void AddManipulator(const char* type, const char* name, 
+                      vtkPVCameraManipulator*);
+  
+  // Description:
+  // Adds manipulators variable and the widget to the list.
+  void AddManipulatorArgument(const char* type, const char* name, 
+                              const char* variable, vtkPVWidget* widget);
 
   // Description:
   // Whether to parse and create the default interfaces at startup

@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVCameraManipulator.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -55,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.5");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.6");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -216,6 +217,10 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
                       << "\"");
         }
       }
+    else if(strcmp(name, "Manipulator") == 0)
+      {
+      this->CreateManipulator(element);
+      }
     else if(strcmp(name, "Library") == 0)
       {
       if(!this->LoadLibrary(element))
@@ -248,6 +253,10 @@ void vtkPVXMLPackageParser::CreateReaderModule(vtkPVXMLElement* me)
     if(!pvm)
       {
       vtkErrorMacro("Cannot create Module class \"" << className << "\"");
+      if(object)
+        {
+        object->Delete();
+        }
       return;
       }
     }
@@ -324,6 +333,10 @@ void vtkPVXMLPackageParser::CreateSourceModule(vtkPVXMLElement* me)
     if(!pvm)
       {
       vtkErrorMacro("Cannot create Module class \"" << className << "\"");
+      if(object)
+        {
+        object->Delete();
+        }
       return;
       }
     }
@@ -366,6 +379,10 @@ void vtkPVXMLPackageParser::CreateFilterModule(vtkPVXMLElement* me)
     if(!pvm)
       {
       vtkErrorMacro("Cannot create Module class \"" << className << "\"");
+      if(object)
+        {
+        object->Delete();
+        }
       return;
       }
     }
@@ -438,7 +455,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     ostrstream command;
     command << "CreatePVSource " << name << ends;
     this->Window->AddToolbarButton(name, button_image, button_image_file,
-				   command.str(), button_help);
+                                   command.str(), button_help);
     command.rdbuf()->freeze(0);
     }
 
@@ -449,26 +466,26 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
       {
 #ifdef VTK_USE_MPI
       vtkMultiProcessController* controller =
-	this->Window->GetPVApplication()->GetController();
+        this->Window->GetPVApplication()->GetController();
       if (controller && controller->GetNumberOfProcesses() > 1)
-	{
-	return 0;
-	}
+        {
+        return 0;
+        }
 #endif
       }
     else if (strcmp(multiprocess_support, "multiple_processes") == 0)
       {
 #ifdef VTK_USE_MPI
       vtkMultiProcessController* controller =
-	this->Window->GetPVApplication()->GetController();
+        this->Window->GetPVApplication()->GetController();
       if (!controller)
-	{
-	return 0;
-	}
+        {
+        return 0;
+        }
       if (controller->GetNumberOfProcesses() == 1)
-	{
-	return 0;
-	}
+        {
+        return 0;
+        }
 #else
       return 0;
 #endif
@@ -476,7 +493,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     else if (strcmp(multiprocess_support, "both") != 0)
       {
       vtkErrorMacro("Unrecognized multiprocess_support attribute value: "
-		    << multiprocess_support << ".");
+                    << multiprocess_support << ".");
       }
     }
   
@@ -511,7 +528,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
       if(widget)
         {
         pvm->AddPVWidget(widget);
-	widget->Delete();
+        widget->Delete();
         }
       else
         {
@@ -550,3 +567,70 @@ int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
   
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVXMLPackageParser::CreateManipulator(vtkPVXMLElement* ma)
+{
+  // Get the name of the manipulator.
+  const char* name = ma->GetAttribute("name");
+  if(!name)
+    {
+    vtkErrorMacro("Manipulator missing name attribute.");
+    return;
+    }
+
+  // Get the type of the manipulator.
+  const char* types = ma->GetAttribute("types");
+  if(!types)
+    {
+    vtkErrorMacro("Manipulator \"" << name << "\" missing types attribute.");
+    return;
+    }
+
+  vtkPVCameraManipulator* pcm = 0;
+  const char* className = ma->GetAttribute("class");
+  if(className)
+    {
+    vtkObject* object = vtkInstantiator::CreateInstance(className);
+    pcm = vtkPVCameraManipulator::SafeDownCast(object);
+    if(!pcm)
+      {
+      vtkErrorMacro("Cannot create Manipulator class \"" << className << "\"");
+      if(object)
+        {
+        object->Delete();
+        }
+      return;
+      }
+    }
+  else
+    {
+    vtkErrorMacro("Manipulator \"" <<name<< "\" does not define a class name.");
+    }
+
+  // Add the source prototype.
+  this->Window->AddManipulator(types, name, pcm);
+
+  unsigned int i;
+  for( i=0; i < ma->GetNumberOfNestedElements(); i++ )
+    {
+    vtkPVXMLElement* element = ma->GetNestedElement(i);
+    const char* variable = element->GetAttribute("variable");
+    vtkPVWidget* widget = this->GetPVWidget(element);
+    if(widget && variable)
+      {
+      this->Window->AddManipulatorArgument(types, name, variable, widget);
+      }
+    else
+      {
+      vtkErrorMacro("Error creating widget " << name);
+      }
+    if ( widget )
+      {
+      widget->Delete();
+      }
+    }
+
+  pcm->Delete();
+}
+
