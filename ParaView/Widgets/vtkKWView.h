@@ -182,6 +182,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // This attachment point may be obtained from the parent window
   // if it has been set.
   virtual vtkKWWidget *GetPropertiesParent();
+  void SetPropertiesParent(vtkKWWidget*);
 
   // Description:
   // Make the properties show up in the view instead of the window

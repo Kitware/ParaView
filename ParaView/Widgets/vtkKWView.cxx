@@ -41,7 +41,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWView.h"
 
-#include "vtkActor2D.h"
 #include "vtkBMPWriter.h"
 #include "vtkJPEGWriter.h"
 #include "vtkKWApplication.h"
@@ -49,44 +48,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCheckButton.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWCornerAnnotation.h"
-#include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
+#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWGenericComposite.h"
 #include "vtkKWIcon.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
-#include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
-#include "vtkKWProgressGauge.h"
 #include "vtkKWSaveImageDialog.h"
 #include "vtkKWSerializer.h"
-#include "vtkKWText.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
 #include "vtkPostScriptWriter.h"
 #include "vtkProperty2D.h"
-#include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkString.h"
 #include "vtkTIFFWriter.h"
 #include "vtkTextActor.h"
+#include "vtkTextMapper.h"
 #include "vtkViewport.h"
-#include "vtkWindow.h"
-#include "vtkWindow.h"
 #include "vtkWindowToImageFilter.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #else
 #include "vtkXOpenGLRenderWindow.h"
-
-vtkCxxRevisionMacro(vtkKWView, "1.77");
-
 int vtkKWViewFoundMatch;
-
-//----------------------------------------------------------------------------
 Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
                              char * vtkNotUsed(arg))
 {  
@@ -106,6 +96,9 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
+vtkCxxRevisionMacro(vtkKWView, "1.78");
+
+//----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
 
@@ -418,49 +411,6 @@ void vtkKWView::Close()
 }
 
 //----------------------------------------------------------------------------
-vtkKWWidget *vtkKWView::GetPropertiesParent()
-{
-  // if already set then return
-  if (this->PropertiesParent)
-    {
-    return this->PropertiesParent;
-    }
-  
-  // if the window has defined one then use it
-  if (this->ParentWindow && 
-      this->ParentWindow->GetPropertiesParent())
-    {
-    // if the views props have not been defined the define them now
-    this->PropertiesParent = vtkKWWidget::New();
-    this->PropertiesParent->SetParent
-      (this->ParentWindow->GetPropertiesParent());
-    this->PropertiesParent->Create(this->Application,"frame","-bd 0");
-    this->SharedPropertiesParent = 1;
-    }
-  return this->PropertiesParent;
-}
-
-//----------------------------------------------------------------------------
-// if you are not using window based properties then you are probably 
-// using view based properties
-void vtkKWView::CreateDefaultPropertiesParent()
-{
-  if (!this->PropertiesParent)
-    {
-    this->PropertiesParent = vtkKWWidget::New();
-    this->PropertiesParent->SetParent(this);
-    this->PropertiesParent->Create(this->Application,"frame","-bd 0");
-    this->Script("pack %s -before %s -fill y -side left -anchor nw",
-                 this->PropertiesParent->GetWidgetName(),
-                 this->Frame->GetWidgetName());
-    }
-  else
-    {
-    vtkDebugMacro("Properties Parent Already Set for view");
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWView::CreateViewProperties()
 {
   vtkKWApplication *app = this->Application;
@@ -593,6 +543,69 @@ void vtkKWView::GetHeaderTextColor( float *r, float *g, float *b )
   *r = ff[0];
   *g = ff[1];
   *b = ff[2];
+}
+
+
+//----------------------------------------------------------------------------
+void vtkKWView::SetPropertiesParent(vtkKWWidget *args)
+{
+  if (this->PropertiesParent != args)
+    {
+    if (this->PropertiesParent != NULL)
+      { 
+      this->PropertiesParent->UnRegister(this);
+      }
+    this->PropertiesParent = args;
+    if (this->PropertiesParent != NULL)
+      { 
+      this->PropertiesParent->Register(this); 
+      }
+    this->Modified();
+    this->SharedPropertiesParent = 0;
+    }                                                           
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget *vtkKWView::GetPropertiesParent()
+{
+  // if already set then return
+  if (this->PropertiesParent)
+    {
+    return this->PropertiesParent;
+    }
+  
+  // if the window has defined one then use it
+  if (this->ParentWindow && 
+      this->ParentWindow->GetPropertiesParent())
+    {
+    // if the views props have not been defined the define them now
+    this->PropertiesParent = vtkKWWidget::New();
+    this->PropertiesParent->SetParent
+      (this->ParentWindow->GetPropertiesParent());
+    this->PropertiesParent->Create(this->Application,"frame","-bd 0");
+    this->SharedPropertiesParent = 1;
+    }
+  return this->PropertiesParent;
+}
+
+//----------------------------------------------------------------------------
+// if you are not using window based properties then you are probably 
+// using view based properties
+void vtkKWView::CreateDefaultPropertiesParent()
+{
+  if (!this->PropertiesParent)
+    {
+    this->PropertiesParent = vtkKWWidget::New();
+    this->PropertiesParent->SetParent(this);
+    this->PropertiesParent->Create(this->Application,"frame","-bd 0");
+    this->Script("pack %s -before %s -fill y -side left -anchor nw",
+                 this->PropertiesParent->GetWidgetName(),
+                 this->Frame->GetWidgetName());
+    }
+  else
+    {
+    vtkDebugMacro("Properties Parent Already Set for view");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1374,7 +1387,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.77 $");
+  this->ExtractRevision(os,"$Revision: 1.78 $");
 }
 
 //----------------------------------------------------------------------------
