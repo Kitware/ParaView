@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.172");
+vtkCxxRevisionMacro(vtkKWApplication, "1.173");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1107,6 +1107,9 @@ void vtkKWApplication::ConfigureAbout()
         {
         this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
         this->AboutRuntimeInfo->Create(this, "-setgrid true -width 60 -height 8 -wrap word -state disabled");
+        double r, g, b;
+        this->AboutRuntimeInfo->GetParent()->GetBackgroundColor(&r, &g, &b);
+        this->AboutRuntimeInfo->SetBackgroundColor(r, g, b);
         }
 
       if (!this->AboutScrollBar)
@@ -1137,9 +1140,9 @@ void vtkKWApplication::ConfigureAbout()
       this->Script("%s configure -yscrollcommand \"%s set\"",
                    this->AboutRuntimeInfo->GetWidgetName(),
                    this->AboutScrollBar->GetWidgetName() );
-      this->Script("pack %s -side left -expand 1 -fill both",
+      this->Script("pack %s -side left -padx 2 -expand 1 -fill both",
                    this->AboutRuntimeInfo->GetWidgetName());
-      this->Script("pack %s -side left -expand 0 -fill y",
+      this->Script("pack %s -side left -padx 2 -expand 0 -fill y",
                    this->AboutScrollBar->GetWidgetName());
       this->Script("pack %s -side bottom",  // -expand 1 -fill both
                    this->AboutDialog->GetMessageDialogFrame()->GetWidgetName());
