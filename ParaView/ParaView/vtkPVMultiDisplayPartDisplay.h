@@ -33,7 +33,12 @@ public:
   // Description:
   // Override super class so that the LOD is always collected.
   virtual void SetLODCollectionDecision(int val);
-    
+
+  // Description:
+  // Update like normal, but make sure the LOD is collected.
+  // I encountered a bug. First render was missing the LOD on the client.
+  void Update();
+  
 protected:
   vtkPVMultiDisplayPartDisplay();
   ~vtkPVMultiDisplayPartDisplay();
