@@ -39,16 +39,16 @@
 #include "vtkKWCheckButton.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.3");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.4");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
-#define VTK_PV_RAMP_INDEX 0
+#define VTK_PV_RAMP_INDEX 1
 #define VTK_PV_RAMP_LABEL "Ramp"
-#define VTK_PV_STEP_INDEX 1
+#define VTK_PV_STEP_INDEX 2
 #define VTK_PV_STEP_LABEL "Step"
-#define VTK_PV_EXPONENTIAL_INDEX 2
+#define VTK_PV_EXPONENTIAL_INDEX 3
 #define VTK_PV_EXPONENTIAL_LABEL "Exponential"
-#define VTK_PV_SINUSOID_INDEX 3
+#define VTK_PV_SINUSOID_INDEX 4
 #define VTK_PV_SINUSOID_LABEL "Sinusoid"
 
 //*****************************************************************************
