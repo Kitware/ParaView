@@ -69,6 +69,8 @@ public:
 
   vtkGetObjectMacro( VolumeProMapper, vtkVolumeProMapper );
 
+  vtkGetObjectMacro( VolumeProperty, vtkVolumeProperty );
+
 
 protected:
   vtkKWVolumeComposite();
