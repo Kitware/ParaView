@@ -112,7 +112,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.1");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.2");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -283,7 +283,13 @@ int vtkPVClientServerModule::Start(int argc, char **argv)
   // First we initialize the mpi controller.
   // We are assuming that the client has been started with one process
   // and is linked with MPI.
-  this->Controller = vtkMultiProcessController::New();
+#ifdef VTK_USE_MPI
+  this->Controller = vtkMPIController::New();
+#else
+  this->Controller = vtkDummyController::New();
+#endif
+  vtkMultiProcessController::SetGlobalController(this->Controller);
+
   this->Controller->Initialize(&argc, &argv, 1);
 
   this->ArgumentCount = argc;

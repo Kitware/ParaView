@@ -85,7 +85,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.1");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.2");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -164,15 +164,13 @@ void vtkPVMPIProcessModule::Initialize()
 }
 
 
-
-
-
 //----------------------------------------------------------------------------
 int vtkPVMPIProcessModule::Start(int argc, char **argv)
 {
   // Initialize the MPI controller.
   this->Controller = vtkMultiProcessController::New();
   this->Controller->Initialize(&argc, &argv, 1);
+  vtkMultiProcessController::SetGlobalController(this->Controller);
 
   if (this->Controller->GetNumberOfProcesses() > 1)
     { // !!!!! For unix, this was done when MPI was defined (even for 1 process). !!!!!
