@@ -76,6 +76,7 @@ IF(RUN_WITH_MPI)
       -D ${PARAVIEW_SOURCE_DIR}/Data
       -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
       -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
+      -T ${PARAVIEW_BINARY_DIR}/Testing/Temporary
       ${PARAVIEW_MPI_POSTFLAGS})
     IF (PARAVIEW_TEST_COMPOSITING)
       ADD_TEST(${tfile}-COMPOSITE-MPI ${VTK_MPIRUN_EXE} ${PARAVIEW_MPI_PREFLAGS}
@@ -85,6 +86,7 @@ IF(RUN_WITH_MPI)
         -D ${PARAVIEW_SOURCE_DIR}/Data
         -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
         -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
+        -T ${PARAVIEW_BINARY_DIR}/Testing/Temporary
         ${PARAVIEW_MPI_POSTFLAGS})
     ENDIF (PARAVIEW_TEST_COMPOSITING)
   ENDFOREACH(tfile)
@@ -94,6 +96,7 @@ FOREACH (tfile ${PROJECT_TESTS})
   ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE} --disable-registry
     ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
     -D ${PARAVIEW_SOURCE_DIR}/Data
+    -T ${PARAVIEW_BINARY_DIR}/Testing/Temporary
     -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
     -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
   # repeat the test with the client server driver
@@ -101,6 +104,7 @@ FOREACH (tfile ${PROJECT_TESTS})
     --disable-registry
     ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
     -D ${PARAVIEW_SOURCE_DIR}/Data
+    -T ${PARAVIEW_BINARY_DIR}/Testing/Temporary
     -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
     -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
@@ -133,4 +137,5 @@ ADD_TEST (AnimationImages ${PARAVIEW_EXECUTABLE} --disable-registry
   ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/AnimationImages.pvs
   -D ${PARAVIEW_SOURCE_DIR}/Data
   -C ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ComparePNGs.tcl
+  -T ${PARAVIEW_BINARY_DIR}/Testing/Temporary
   -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/AnimationImages.png)
