@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.5");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.6");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -101,8 +101,6 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
 //----------------------------------------------------------------------------
 vtkKWScalarBarAnnotation::~vtkKWScalarBarAnnotation()
 {
-  this->SetVolumeProperty(NULL);
-
   // GUI
 
   if (this->ComponentSelectionWidget)
@@ -170,8 +168,6 @@ vtkKWScalarBarAnnotation::~vtkKWScalarBarAnnotation()
     this->NumberOfLabelsScale->Delete();
     this->NumberOfLabelsScale = NULL;
     }
-
-  this->SetScalarBarWidget(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -182,18 +178,7 @@ void vtkKWScalarBarAnnotation::SetScalarBarWidget(vtkScalarBarWidget *_arg)
     return;
     }
 
-  if (this->ScalarBarWidget != NULL) 
-    { 
-    this->ScalarBarWidget->UnRegister(this); 
-    }
-
   this->ScalarBarWidget = _arg;
-
-  if (this->ScalarBarWidget != NULL) 
-    { 
-    this->ScalarBarWidget->Register(this); 
-    }
-
   this->Modified();
 
   // Update the GUI. Test if it is alive because we might be in the middle
