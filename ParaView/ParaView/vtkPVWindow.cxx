@@ -45,21 +45,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkAxes.h"
 #include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 #include "vtkDirectory.h"
-#include "vtkGenericRenderWindowInteractor.h"
-#include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
-#include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWSplitFrame.h"
 #include "vtkKWToolbar.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
@@ -67,14 +66,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
-#include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVData.h"
 #include "vtkPVDefaultModules.h"
 #include "vtkPVDemoPaths.h"
 #include "vtkPVErrorLogDisplay.h"
-#include "vtkPVFileEntry.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
@@ -94,7 +91,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVTrackballZoom.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
-#include "vtkRenderWindow.h"
 #include "vtkString.h"
 #include "vtkToolkits.h"
 
@@ -876,7 +872,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   
   this->GenericInteractor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
-  int *windowSize = this->MainView->GetRenderWindow()->GetSize();
+  int *windowSize = this->MainView->GetRenderWindowSize();
   this->Configure(windowSize[0], windowSize[1]);
  
   // set up bindings for the interactor  
@@ -1252,16 +1248,21 @@ vtkPVSource *vtkPVWindow::GetPVSource(const char* listname, char* sourcename)
 {
   vtkPVSourceCollection* col = this->GetSourceList(listname);
   if (col)
-    {
+    {    
     vtkPVSource *pvs;
-    col->InitTraversal();
-    while ( (pvs = col->GetNextPVSource()) )
+    vtkCollectionIterator *it = col->NewIterator();
+    it->InitTraversal();
+    while ( !it->IsDoneWithTraversal() )
       {
+      pvs = static_cast<vtkPVSource*>( it->GetObject() );
       if (strcmp(sourcename, pvs->GetName()) == 0)
         {
+        it->Delete();
         return pvs;
         }
+      it->GoToNextItem();
       }
+    it->Delete();
     }
   return 0;
 }
@@ -1898,15 +1899,19 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
 
   // Mark all sources as not visited.
   while( !it->IsDoneWithTraversal() )
-    {
+    {    
     vtkPVSourceCollection* col = 0;
     if (it->GetData(col) == VTK_OK && col)
       {
-      col->InitTraversal();
-      while ( (pvs = col->GetNextPVSource()) ) 
+      vtkCollectionIterator *cit = col->NewIterator();
+      cit->InitTraversal();
+      while ( !cit->IsDoneWithTraversal() )
         {
+        pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
         pvs->SetVisitedFlag(0);
+        cit->GoToNextItem();
         }
+      cit->Delete();
       }
     it->GoToNextItem();
     }
@@ -1914,11 +1919,15 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
 
   // Loop through sources saving the visible sources.
   vtkPVSourceCollection* modules = this->GetSourceList("Sources");
-  modules->InitTraversal();
-  while ( (pvs = modules->GetNextPVSource()) ) 
+  vtkCollectionIterator* cit = modules->NewIterator();
+  cit->InitTraversal();
+  while ( !cit->IsDoneWithTraversal() )
     {
+    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
     pvs->SaveInTclScript(file);
+    cit->GoToNextItem();
     }
+  cit->Delete();
 
   *file << "vtkCompositeManager compManager\n\t";
   *file << "compManager SetRenderWindow RenWin1 \n\t";
@@ -2295,9 +2304,11 @@ void vtkPVWindow::UpdateSelectMenu()
   vtkPVSourceCollection* glyphSources = this->GetSourceList("GlyphSources");
   if (glyphSources)
     {
-    glyphSources->InitTraversal();
-    while ( (source = glyphSources->GetNextPVSource()) )
+    vtkCollectionIterator *it = glyphSources->NewIterator();
+    it->InitTraversal();
+    while ( !it->IsDoneWithTraversal() )
       {
+      source = static_cast<vtkPVSource*>(it->GetObject());
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
       this->GlyphMenu->AddCommand(source->GetName(), this, methodAndArg,
@@ -2305,24 +2316,33 @@ void vtkPVWindow::UpdateSelectMenu()
                                   source->GetVTKSource()->GetClassName()+3
                                   : 0);
       numGlyphs++;
+      it->GoToNextItem();
       }
+    it->Delete();
     }
 
 
   vtkPVSourceCollection* sources = this->GetSourceList("Sources");
-  sources->InitTraversal();
-  int numSources = 0;
-  while ( (source = sources->GetNextPVSource()) )
+  if ( sources )
     {
-    sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
-            source->GetTclName());
-    this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
-                                 source->GetVTKSource() ?
-                                 source->GetVTKSource()->GetClassName()+3
-                                 : 0);
-    numSources++;
+    vtkCollectionIterator *it = sources->NewIterator();
+    it->InitTraversal();
+    while ( !it->IsDoneWithTraversal() )
+      {
+      int numSources = 0;
+      source = static_cast<vtkPVSource*>(it->GetObject());
+      sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
+              source->GetTclName());
+      this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
+                                   source->GetVTKSource() ?
+                                   source->GetVTKSource()->GetClassName()+3
+                                   : 0);
+      numSources++;
+      it->GoToNextItem();
+      }
+    it->Delete();
     }
-
+  
   if (numGlyphs > 0)
     {
     this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
@@ -2540,8 +2560,8 @@ void vtkPVWindow::ShowCurrentSourceProperties()
     }
   
   this->Script("pack %s -side top -fill x -expand t",
-               this->GetCurrentPVSource()->GetNotebook()->GetWidgetName());
-  this->GetCurrentPVSource()->GetNotebook()->Raise("Source");
+               this->GetCurrentPVSource()->GetNotebookWidgetName());
+  this->GetCurrentPVSource()->RaiseSourcePage();
 }
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationProperties()
@@ -3079,15 +3099,20 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
     return NULL;
     }
 
-  this->PVColorMaps->InitTraversal();
-  while ( (cm = (vtkPVColorMap*)(this->PVColorMaps->GetNextItemAsObject())) )
+  vtkCollectionIterator* it = this->PVColorMaps->NewIterator();
+  it->InitTraversal();
+  while ( !it->IsDoneWithTraversal() )
     {
+    cm = static_cast<vtkPVColorMap*>(it->GetObject());
     if (vtkString::Equals(parameterName, cm->GetName()))
       {
+      it->Delete();
       return cm;
       }
+    it->GoToNextItem();
     }
-
+  it->Delete();
+  
   cm = vtkPVColorMap::New();
   cm->SetPVApplication(this->GetPVApplication());
   cm->SetPVRenderView(this->GetMainView());
@@ -3113,7 +3138,6 @@ void vtkPVWindow::LoadSessionFile(const char* path)
 {
   istream *fptr;
   fptr = new ifstream(path, ios::in);
-  vtkIndent indent;
   this->Serialize(*fptr);
   delete fptr;
 }
