@@ -144,7 +144,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.54");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.55");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -474,11 +474,11 @@ void vtkPVClientServerModule::Connect()
     {
     if ( this->ClientMode )
       {
-      cout << "Waing for server..." << endl;
+      cout << "Waiting for server..." << endl;
       }
     else
       {
-      cout << "Waing for client..." << endl;
+      cout << "Waiting for client..." << endl;
       }
     this->SocketController = vtkSocketController::New();
     this->SocketController->Initialize();
