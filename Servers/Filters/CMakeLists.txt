@@ -15,6 +15,7 @@ SET(Filters_SRCS
   vtkCTHFractal.cxx
   vtkCTHOutlineFilter.cxx
   vtkCTHSource.cxx
+  vtkCVGeometryCache.cxx
   vtkCaveRenderManager.cxx
   vtkCellCenterDepthSort.cxx
   vtkCleanUnstructuredGrid.cxx
