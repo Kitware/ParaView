@@ -15,7 +15,6 @@ SET(Filters_SRCS
   vtkPVClipDataSet.cxx
   vtkPVConnectivityFilter.cxx
   vtkPVContourFilter.cxx
-  vtkPVDuplicatePolyData.cxx
   vtkPVEnSightMasterServerReader.cxx
   vtkPVEnSightMasterServerTranslator.cxx
   vtkPVGlyphFilter.cxx
@@ -38,6 +37,7 @@ SET(Filters_SRCS
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
+    vtkPVDuplicatePolyData.cxx
     vtkTiledDisplaySchedule.cxx
     vtkBoxClipDataSet.cxx
     vtkKdTree.cxx

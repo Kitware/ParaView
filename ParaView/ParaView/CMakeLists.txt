@@ -16,7 +16,6 @@ SET( ParaViewServer_SRCS
   vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
   vtkExtractCTHPart.cxx
-  vtkMultiDisplayManager.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
@@ -27,16 +26,22 @@ SET( ParaViewServer_SRCS
   vtkXMLPVAnimationWriter.cxx
   )
 
+IF(VTK_USE_MPI)
+  SET( ParaViewServer_SRCS
+    ${ParaViewServer_SRCS}
+    vtkMultiDisplayManager.cxx
+    )
+ENDIF(VTK_USE_MPI)
 IF(PARAVIEW_BUILD_DEVELOPMENT)
-SET( ParaViewServer_SRCS
-  ${ParaViewServer_SRCS}
-  vtkCTHData.cxx
-  vtkCTHDataToPolyDataFilter.cxx
-  vtkCTHExtractAMRPart.cxx
-  vtkCTHFractal.cxx
-  vtkCTHOutlineFilter.cxx
-  vtkCTHSource.cxx
-  )
+  SET( ParaViewServer_SRCS
+    ${ParaViewServer_SRCS}
+    vtkCTHData.cxx
+    vtkCTHDataToPolyDataFilter.cxx
+    vtkCTHExtractAMRPart.cxx
+    vtkCTHFractal.cxx
+    vtkCTHOutlineFilter.cxx
+    vtkCTHSource.cxx
+    )
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
 SET( ParaViewServerNonWrapped_SRCS
@@ -45,7 +50,7 @@ SET( ParaViewServerNonWrapped_SRCS
 SET( ParaViewExtraWrapper_SRCS
   ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWApplication.h
   ${PARAVIEW_SOURCE_DIR}/Widgets/vtkKWObject.h
-)
+  )
 
 IF(XDMF_FOUND)
   SET(ParaViewServer_SRCS ${ParaViewServer_SRCS}
@@ -195,7 +200,7 @@ SET( ParaViewClient_SRCS
   vtkPVXMLPackageParser.cxx
   vtkPVXMLParser.cxx
   vtkXDMFReaderModule.cxx
-#  vtkPVRenderGroupDialog.cxx
+  #  vtkPVRenderGroupDialog.cxx
   )
 
 SET(ParaViewBinary_SRCS
@@ -323,9 +328,9 @@ TARGET_LINK_LIBRARIES(vtkParaViewServerCS vtkPVFiltersCS vtkKWWidgetsTCL vtkKWPa
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
   FIND_LIBRARY(PARAVIEW_BLT_LIBRARY BLT
-               PATHS /usr/lib /usr/local/lib
-               DOC "Optional BLT library. This might be used for a graph widget in the future."
-               )
+    PATHS /usr/lib /usr/local/lib
+    DOC "Optional BLT library. This might be used for a graph widget in the future."
+    )
   MARK_AS_ADVANCED(PARAVIEW_BLT_LIBRARY)
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
