@@ -42,5 +42,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWViewCollection.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWView.h"
 
 vtkStandardNewMacro( vtkKWViewCollection );
+
+void vtkKWViewCollection::AddItem(vtkKWView *a) 
+{
+  this->vtkCollection::AddItem((vtkObject *)a);
+}
+
+void vtkKWViewCollection::RemoveItem(vtkKWView *a) 
+{
+  this->vtkCollection::RemoveItem((vtkObject *)a);
+}
+
+int vtkKWViewCollection::IsItemPresent(vtkKWView *a) 
+{
+  return this->vtkCollection::IsItemPresent((vtkObject *)a);
+}
+
+vtkKWView *vtkKWViewCollection::GetNextKWView() 
+{ 
+  return vtkKWView::SafeDownCast(this->GetNextItemAsObject());
+}
+
+vtkKWView *vtkKWViewCollection::GetLastKWView() 
+{ 
+  if ( this->Bottom == NULL )
+    {
+    return NULL;
+    }
+  else
+    {
+    return vtkKWView::SafeDownCast(this->Bottom->Item);
+    }
+}

@@ -50,7 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWCompositeC_h
 
 #include "vtkCollection.h"
-#include "vtkKWComposite.h"
+
+class vtkKWComposite;
 
 class VTK_EXPORT vtkKWCompositeCollection : public vtkCollection
 {
@@ -87,38 +88,6 @@ private:
   vtkKWCompositeCollection(const vtkKWCompositeCollection&); // Not implemented
   void operator=(const vtkKWCompositeCollection&); // Not Implemented
 };
-
-inline void vtkKWCompositeCollection::AddItem(vtkKWComposite *a) 
-{
-  this->vtkCollection::AddItem((vtkObject *)a);
-}
-
-inline void vtkKWCompositeCollection::RemoveItem(vtkKWComposite *a) 
-{
-  this->vtkCollection::RemoveItem((vtkObject *)a);
-}
-
-inline int vtkKWCompositeCollection::IsItemPresent(vtkKWComposite *a) 
-{
-  return this->vtkCollection::IsItemPresent((vtkObject *)a);
-}
-
-inline vtkKWComposite *vtkKWCompositeCollection::GetNextKWComposite() 
-{ 
-  return vtkKWComposite::SafeDownCast(this->GetNextItemAsObject());
-}
-
-inline vtkKWComposite *vtkKWCompositeCollection::GetLastKWComposite() 
-{ 
-  if ( this->Bottom == NULL )
-    {
-    return NULL;
-    }
-  else
-    {
-    return vtkKWComposite::SafeDownCast(this->Bottom->Item);
-    }
-}
 
 #endif
 

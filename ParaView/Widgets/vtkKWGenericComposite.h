@@ -49,11 +49,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkKWComposite.h"
-#include "vtkProp.h"
 
 class vtkKWApplication;
 class vtkKWView;
 class vtkStructuredPoints;
+class vtkProp;
 
 class VTK_EXPORT vtkKWGenericComposite : public vtkKWComposite
 {
@@ -64,7 +64,7 @@ public:
   // Description:
   // Get the prop for this composite
   virtual vtkProp *GetProp() {return this->Prop;};
-  vtkSetObjectMacro(Prop,vtkProp);
+  void SetProp(vtkProp *);
   
 protected:
   vtkKWGenericComposite();

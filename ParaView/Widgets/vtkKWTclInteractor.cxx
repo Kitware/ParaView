@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWText.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWLabel.h"
+#include "vtkKWEntry.h"
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );

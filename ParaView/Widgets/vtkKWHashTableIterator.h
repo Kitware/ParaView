@@ -68,6 +68,7 @@ private:
   vtkKWHashTableIterator();
   ~vtkKWHashTableIterator();
   vtkKWHashTableIterator(const vtkKWHashTableIterator&);  // Not implemented.
+  void operator=(const vtkKWHashTableIterator&);  // Not implemented.
 
   vtkKWHashTable *HashTable;
   unsigned int Bucket;

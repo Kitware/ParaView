@@ -48,8 +48,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWLabeledEntry_h
 #define __vtkKWLabeledEntry_h
 
-#include "vtkKWLabel.h"
-#include "vtkKWEntry.h"
+#include "vtkKWWidget.h"
+
+class vtkKWLabel;
+class vtkKWEntry;
 
 class vtkKWApplication;
 

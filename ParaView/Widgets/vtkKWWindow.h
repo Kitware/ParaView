@@ -132,7 +132,8 @@ public:
   // will create an attachment point for the properties at
   // the window level.
   vtkGetObjectMacro(PropertiesParent,vtkKWWidget);
-  vtkSetObjectMacro(PropertiesParent,vtkKWWidget);
+  void SetPropertiesParent(vtkKWWidget*);
+  
   void CreateDefaultPropertiesParent();
   void HideProperties();
   void ShowProperties();

@@ -42,6 +42,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWCompositeCollection.h"
 #include "vtkObjectFactory.h"
 
-
+#include "vtkKWComposite.h"
 
 vtkStandardNewMacro( vtkKWCompositeCollection );
+
+void vtkKWCompositeCollection::AddItem(vtkKWComposite *a) 
+{
+  this->vtkCollection::AddItem((vtkObject *)a);
+}
+
+void vtkKWCompositeCollection::RemoveItem(vtkKWComposite *a) 
+{
+  this->vtkCollection::RemoveItem((vtkObject *)a);
+}
+
+int vtkKWCompositeCollection::IsItemPresent(vtkKWComposite *a) 
+{
+  return this->vtkCollection::IsItemPresent((vtkObject *)a);
+}
+
+vtkKWComposite *vtkKWCompositeCollection::GetNextKWComposite() 
+{ 
+  return vtkKWComposite::SafeDownCast(this->GetNextItemAsObject());
+}
+
+vtkKWComposite *vtkKWCompositeCollection::GetLastKWComposite() 
+{ 
+  if ( this->Bottom == NULL )
+    {
+    return NULL;
+    }
+  else
+    {
+    return vtkKWComposite::SafeDownCast(this->Bottom->Item);
+    }
+}

@@ -51,7 +51,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWWindowC_h
 
 #include "vtkCollection.h"
-#include "vtkKWWindow.h"
+
+class vtkKWWindow;
 
 class VTK_EXPORT vtkKWWindowCollection : public vtkCollection
 {
@@ -88,37 +89,6 @@ private:
   void operator=(const vtkKWWindowCollection&); // Not implemented
 };
 
-inline void vtkKWWindowCollection::AddItem(vtkKWWindow *a) 
-{
-  this->vtkCollection::AddItem((vtkObject *)a);
-}
-
-inline void vtkKWWindowCollection::RemoveItem(vtkKWWindow *a) 
-{
-  this->vtkCollection::RemoveItem((vtkObject *)a);
-}
-
-inline int vtkKWWindowCollection::IsItemPresent(vtkKWWindow *a) 
-{
-  return this->vtkCollection::IsItemPresent((vtkObject *)a);
-}
-
-inline vtkKWWindow *vtkKWWindowCollection::GetNextKWWindow() 
-{ 
-  return vtkKWWindow::SafeDownCast(this->GetNextItemAsObject());
-}
-
-inline vtkKWWindow *vtkKWWindowCollection::GetLastKWWindow() 
-{ 
-  if ( this->Bottom == NULL )
-    {
-    return NULL;
-    }
-  else
-    {
-    return vtkKWWindow::SafeDownCast(this->Bottom->Item);
-    }
-}
 
 #endif
 

@@ -43,6 +43,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
+#include "vtkActor.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkKWRadioButton.h"
+#include "vtkKWOptionMenu.h"
 
 
 
@@ -90,5 +94,12 @@ void vtkKWActorComposite::CreateProperties()
   this->vtkKWComposite::CreateProperties();
 }
 
+vtkPolyData *vtkKWActorComposite::GetInput() 
+{
+  return this->Mapper->GetInput();
+}
 
-
+vtkProp *vtkKWActorComposite::GetProp() 
+{
+  return this->Actor;
+}

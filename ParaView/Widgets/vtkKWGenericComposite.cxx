@@ -43,13 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkProp.h"
 
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWGenericComposite );
 
-
+vtkSetObjectImplementationMacro(vtkKWGenericComposite, Prop, vtkProp);
 
 
 

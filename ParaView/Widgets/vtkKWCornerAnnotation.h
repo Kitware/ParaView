@@ -48,13 +48,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWCornerAnnotation_h
 #define __vtkKWCornerAnnotation_h
 
-#include "vtkKWCheckButton.h"
-#include "vtkKWEntry.h"
-#include "vtkKWGenericComposite.h"
 #include "vtkKWLabeledFrame.h"
-#include "vtkKWChangeColorButton.h"
-#include "vtkKWView.h"
-#include "vtkCornerAnnotation.h"
+
+class vtkKWChangeColorButton;
+class vtkKWCheckButton;
+class vtkKWText;
+class vtkCornerAnnotation;
+class vtkKWGenericComposite;
+class vtkKWView;
 
 class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWLabeledFrame
 {
@@ -76,13 +77,13 @@ public:
 
   // Description:
   // Set/Get the composite that owns this annotation
-  vtkSetObjectMacro(View,vtkKWView);
+  void SetView(vtkKWView*);
   vtkGetObjectMacro(View,vtkKWView);
 
   // Description:
   // Callback functions used by the pro sheet
   virtual void SetCornerText(const char *txt, int corner);
-  virtual char *GetCornerText(int i){return this->CornerText[i]->GetValue();};
+  virtual char *GetCornerText(int i);
   virtual void CornerChanged(int i);
   virtual void OnDisplayCorner();
   virtual void SetVisibility(int i);
@@ -100,7 +101,7 @@ public:
   void SetTextColor(float r, float g, float b);
   void SetTextColor(float *rgb)
     { this->SetTextColor(rgb[0], rgb[1], rgb[2]); }
-  float *GetTextColor() {return this->CornerProp->GetProperty()->GetColor();};
+  float *GetTextColor();
 
   
   // Description:

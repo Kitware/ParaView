@@ -49,13 +49,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWActorComposite_h
 
 #include "vtkKWComposite.h"
-#include "vtkActor.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkKWRadioButton.h"
-#include "vtkKWOptionMenu.h"
+
 class vtkKWApplication;
 class vtkKWView;
 class vtkPolyData;
+class vtkActor;
+class vtkPolyData;
+class vtkPolyDataMapper;
 
 class VTK_EXPORT vtkKWActorComposite : public vtkKWComposite
 {
@@ -70,11 +70,11 @@ public:
   // Description:
   // Set the input data for this Actor
   virtual void SetInput(vtkPolyData *input);
-  vtkPolyData *GetInput() {return this->Mapper->GetInput();};
+  vtkPolyData *GetInput();
   
   // Description:
   // Get the prop for this composite
-  virtual vtkProp *GetProp() {return this->Actor;};
+  virtual vtkProp *GetProp();
   virtual vtkActor *GetActor() {return this->Actor;};
   
   // Description:

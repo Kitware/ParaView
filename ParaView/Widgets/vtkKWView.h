@@ -54,26 +54,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_DISABLED_RENDER     2
 #define VTK_KW_SINGLE_RENDER       3
 
+#include "vtkKWWidget.h"
 
-#include "vtkKWCompositeCollection.h"
 class vtkKWApplication;
 class vtkKWWindow;
 class vtkViewport;
 class vtkKWCornerAnnotation;
 class vtkKWMenu;
-#include "vtkWindow.h"
-#include "vtkKWNotebook.h"
-#include "vtkKWEntry.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWGenericComposite.h"
-#include "vtkTextMapper.h"
-#include "vtkScaledTextActor.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWText.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWChangeColorButton.h"
-#include "vtkRenderer.h"
-#include "vtkRenderWindow.h"
+class vtkKWWindow;
+class vtkWindow;
+class vtkViewport;
+class vtkKWComposite;
+class vtkKWCompositeCollection;
+class vtkKWNotebook;
+class vtkKWChangeColorButton;
+class vtkKWCheckButton;
+class vtkKWEntry;
+class vtkKWCornerAnnotation;
+class vtkKWLabeledFrame;
+class vtkRenderer;
+class vtkRenderWindow;
+class vtkTextMapper;
+class vtkKWGenericComposite;
+class vtkScaledTextActor;
+class vtkKWText;
 
 class VTK_EXPORT vtkKWView : public vtkKWWidget
 {
@@ -144,11 +148,11 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
 
   // Description:
   // Return the RenderWindow or ImageWindow as appropriate.
-  virtual vtkWindow *GetVTKWindow() { return this->RenderWindow; }
+  virtual vtkWindow *GetVTKWindow();
 
   // Description:
   // Return the Renderer or Imager as appropriate.
-  virtual vtkViewport *GetViewport() { return this->Renderer; }
+  virtual vtkViewport *GetViewport();
 
   // Description:
   // Methods to support off screen rendering.
@@ -185,7 +189,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   
   // Description:
   // Render the image.
-  virtual void Render() {this->GetVTKWindow()->Render();};
+  virtual void Render();
   virtual void Reset() {};
 	
   // Description:

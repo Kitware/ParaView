@@ -39,6 +39,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+
 #include "vtkKWApplication.h"
 #include "vtkKWWindow.h"
 #include "vtkKWView.h"
@@ -56,6 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPointerArray.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
+#include "vtkKWWidgetCollection.h"
+
+vtkSetObjectImplementationMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
 {
@@ -940,7 +944,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.69 $");
+  this->ExtractRevision(os,"$Revision: 1.70 $");
 }
 
 int vtkKWWindow::ExitDialog()

@@ -48,7 +48,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWViewC_h
 
 #include "vtkCollection.h"
-#include "vtkKWView.h"
+
+class vtkKWView;
 
 class VTK_EXPORT vtkKWViewCollection : public vtkCollection
 {
@@ -86,37 +87,6 @@ private:
   void operator=(const vtkKWViewCollection&); // Not implemented
 };
 
-inline void vtkKWViewCollection::AddItem(vtkKWView *a) 
-{
-  this->vtkCollection::AddItem((vtkObject *)a);
-}
-
-inline void vtkKWViewCollection::RemoveItem(vtkKWView *a) 
-{
-  this->vtkCollection::RemoveItem((vtkObject *)a);
-}
-
-inline int vtkKWViewCollection::IsItemPresent(vtkKWView *a) 
-{
-  return this->vtkCollection::IsItemPresent((vtkObject *)a);
-}
-
-inline vtkKWView *vtkKWViewCollection::GetNextKWView() 
-{ 
-  return vtkKWView::SafeDownCast(this->GetNextItemAsObject());
-}
-
-inline vtkKWView *vtkKWViewCollection::GetLastKWView() 
-{ 
-  if ( this->Bottom == NULL )
-    {
-    return NULL;
-    }
-  else
-    {
-    return vtkKWView::SafeDownCast(this->Bottom->Item);
-    }
-}
 
 #endif
 

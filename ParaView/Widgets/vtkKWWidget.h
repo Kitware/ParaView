@@ -52,8 +52,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWWidget_h
 
 #include "vtkKWObject.h"
-#include "vtkKWWidgetCollection.h"
 class vtkKWWindow;
+class vtkKWWidgetCollection;
 
 class VTK_EXPORT vtkKWWidget : public vtkKWObject
 {
@@ -77,9 +77,9 @@ public:
 
   // Description:
   // Add/Remove/Get a child to this Widget
-  void AddChild(vtkKWWidget *w) {this->Children->AddItem(w);};
+  void AddChild(vtkKWWidget *w);
   void RemoveChild(vtkKWWidget *w);
-  vtkKWWidgetCollection *GetChildren() {return this->Children;};
+  vtkGetObjectMacro(Children,vtkKWWidgetCollection);
   
   // Description::
   // Override Unregister since widgets have loops.
@@ -89,12 +89,14 @@ public:
   // Get the net reference count of this widget. That is the
   // reference count of this widget minus its children.
   virtual int  GetNetReferenceCount();
+
   // Description:
   // A method to set callback functions on objects.  The first argument is
   // the KWObject that will have the method called on it.  The second is the
   // name of the method to be called and any arguments in string form.
   // The calling is done via TCL wrappers for the KWObject.
-  virtual void SetCommand( vtkKWObject* Object, const char* MethodAndArgString);
+  virtual void SetCommand( vtkKWObject* Object, 
+			   const char* MethodAndArgString);
   
   // Description:
   // A method to set binding on the object.
@@ -147,7 +149,9 @@ public:
   // Description:
   // Get the RGB description of a TCL color
   void GetRGBColor(const char* color, int *r, int *g, int *b);
-
+  
+  // Description:
+  // Get the current background color of the widget.
   void GetBackgroundColor(int *r, int *g, int *b);
   
   // Description:

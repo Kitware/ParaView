@@ -46,12 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
+#include "vtkKWText.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWChangeColorButton.h"
+#include "vtkKWGenericComposite.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
 
-
-
+vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
 				int argc, char *argv[]);
@@ -343,6 +346,16 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.20 $");
+  this->ExtractRevision(os,"$Revision: 1.21 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
+}
+
+char *vtkKWCornerAnnotation::GetCornerText(int i)
+{
+  return this->CornerText[i]->GetValue();
+}
+
+float *vtkKWCornerAnnotation::GetTextColor() 
+{
+  return this->CornerProp->GetProperty()->GetColor();
 }

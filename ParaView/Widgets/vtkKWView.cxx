@@ -61,6 +61,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenu.h"
 #include "vtkKWEvent.h"
 #include "vtkKWIcon.h"
+#include "vtkWindow.h"
+#include "vtkKWCompositeCollection.h"
+#include "vtkKWWidgetCollection.h"
+#include "vtkScaledTextActor.h"
+#include "vtkKWText.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWChangeColorButton.h"
+#include "vtkKWEntry.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -1292,7 +1300,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.56 $");
+  this->ExtractRevision(os,"$Revision: 1.57 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
@@ -1381,4 +1389,19 @@ void vtkKWView::SetCornerTextColor( float rgb[3] )
 float *vtkKWView::GetCornerTextColor()
 {
   return this->CornerAnnotation->GetTextColor();
+}
+
+vtkWindow *vtkKWView::GetVTKWindow() 
+{ 
+  return this->RenderWindow; 
+}
+
+vtkViewport *vtkKWView::GetViewport() 
+{ 
+  return this->Renderer; 
+}
+
+void vtkKWView::Render() 
+{
+  this->GetVTKWindow()->Render();
 }

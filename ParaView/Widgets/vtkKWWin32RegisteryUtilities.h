@@ -43,7 +43,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWWin32RegisteryUtilities_h
 #define __vtkKWWin32RegisteryUtilities_h
 
-#include "vtkKWObject.h"
 #include "vtkKWRegisteryUtilities.h"
 
 class VTK_EXPORT vtkKWWin32RegisteryUtilities : public vtkKWRegisteryUtilities
@@ -81,6 +80,8 @@ class VTK_EXPORT vtkKWWin32RegisteryUtilities : public vtkKWRegisteryUtilities
   virtual ~vtkKWWin32RegisteryUtilities();
 
   private:
+  vtkKWWin32RegisteryUtilities(const vtkKWWin32RegisteryUtilities&);
+  void operator=(const vtkKWWin32RegisteryUtilities&);
   HKEY HKey;
 };
 

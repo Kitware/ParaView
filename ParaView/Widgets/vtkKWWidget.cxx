@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
-
+#include "vtkKWWidgetCollection.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
@@ -307,7 +307,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.27 $");
+  this->ExtractRevision(os,"$Revision: 1.28 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()
@@ -420,4 +420,9 @@ void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
   this->Script(str.str());
   this->GetRGBColor(this->Application->GetMainInterp()->result, r, g, b);
   str.rdbuf()->freeze(0);
+}
+
+void vtkKWWidget::AddChild(vtkKWWidget *w) 
+{
+  this->Children->AddItem(w);
 }
