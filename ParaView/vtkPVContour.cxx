@@ -288,7 +288,14 @@ void vtkPVContour::UpdateScalars()
   this->vtkPVSource::UpdateScalars();
   
   this->GetDataArrayRange(range);
-  sprintf(label, "Data Range: %f to %f", range[0], range[1]);
+  if (range[0] == 1.0 && range[1] == 0.0)
+    {
+    sprintf(label, "Invalid Data Range");
+    }
+  else
+    {
+    sprintf(label, "Data Range: %f to %f", range[0], range[1]);
+    }
   this->ScalarRangeLabel->SetLabel(label);
 }
 
@@ -298,6 +305,13 @@ void vtkPVContour::GetDataArrayRange(float range[2])
   vtkMultiProcessController *controller = pvApp->GetController();
   int id, num;
   float temp[2];
+  
+  if (! this->DefaultScalarsName)
+    {
+    range[0] = 1.0;
+    range[1] = 0.0;
+    return;
+    }
   
   pvApp->BroadcastScript("Application SendDataArrayRange %s %s",
                          this->GetNthPVInput(0)->GetVTKDataTclName(),
