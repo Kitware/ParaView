@@ -42,7 +42,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.1");
+vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.2");
 vtkStandardNewMacro(vtkBoxClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -511,8 +511,8 @@ void vtkBoxClipDataSet::WedgeToTetra(vtkIdType *wedgeId, vtkIdType *cellIds,vtkC
 {
   int i;
   int id;
-  int xmin;
-  int newCellId;
+  vtkIdType xmin;
+  vtkIdType newCellId;
   vtkIdType tab[4];
   vtkIdType tabpyram[5];
 
@@ -568,9 +568,8 @@ void vtkBoxClipDataSet::WedgeToTetra(vtkIdType *wedgeId, vtkIdType *cellIds,vtkC
 //
 void  vtkBoxClipDataSet::PyramidToTetra(vtkIdType *pyramId, vtkIdType *cellIds,vtkCellArray *newCellArray)
 {
-     
-  int xmin;
-  int newCellId;
+  vtkIdType xmin;
+  vtkIdType newCellId;
   unsigned i,j,idpy;
   vtkIdType tab[4];
 
@@ -704,8 +703,8 @@ void vtkBoxClipDataSet::TetraGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *
   vtkIdType tab[4];
   vtkIdType tabp[5];
   vtkIdType ptstetra = 4;
-  int      newCellId;
-  int      xmin;  
+  vtkIdType newCellId;
+  vtkIdType xmin;  
   unsigned i,j;
   unsigned id   =0;
   unsigned idpy =0;
@@ -1102,8 +1101,8 @@ void vtkBoxClipDataSet::CreateTetra(vtkIdType npts,vtkIdType *cellIds,vtkCellArr
   unsigned id =0;
   unsigned idpy;
 
-  int xmin;
-  int newCellId;
+  vtkIdType xmin;
+  vtkIdType newCellId;
         
   if (npts == 6) 
     { 
@@ -1440,8 +1439,8 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
   unsigned allInside;
   unsigned ind[3];
 
-  int edges[6][2] = { {0,1}, {1,2}, {2,0},
-            {0,3}, {1,3}, {2,3} };  /* Edges Tetrahedron */
+  vtkIdType edges[6][2] = { {0,1}, {1,2}, {2,0},
+                            {0,3}, {1,3}, {2,3} };  /* Edges Tetrahedron */
   float value,deltaScalar;
   float t, *p1, *p2;
   float v[3],x[3];
@@ -1518,7 +1517,7 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
     if ( allInside )
       {   
         // Tetrahedron inside.
-        int newCellId = tets->InsertNextCell(4,iid);
+        vtkIdType newCellId = tets->InsertNextCell(4,iid);
         outCD->CopyData(inCD,cellId,newCellId);
         continue;
       }
@@ -1565,7 +1564,7 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
                {1,0,2}}; 
       
     vtkCellArray *cellarray = vtkCellArray::New();
-    int newCellId = cellarray->InsertNextCell(4,iid);
+    vtkIdType newCellId = cellarray->InsertNextCell(4,iid);
 
             // Test Cell intersection with each plane of box
     for (unsigned planes = 0; planes < 6; planes++) 
@@ -1937,7 +1936,8 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
   unsigned allInside;
   unsigned ind[3];
 
-  int edges[6][2] = { {0,1}, {1,2}, {2,0}, {0,3}, {1,3}, {2,3} };  /* Edges Tetrahedron */
+  vtkIdType edges[6][2] = { {0,1}, {1,2}, {2,0}, 
+                            {0,3}, {1,3}, {2,3} };  /* Edges Tetrahedron */
   float deltaScalar;
   float t, *p1, *p2;
   float v[3],x[3];
@@ -2016,7 +2016,7 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
 
       if ( allInside )
         {  
-        int newCellId = tets->InsertNextCell(4,iid);     // Tetrahedron inside.
+        vtkIdType newCellId = tets->InsertNextCell(4,iid);     // Tetrahedron inside.
         outCD->CopyData(inCD,cellId,newCellId);
         continue;
         }
@@ -2061,7 +2061,7 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
                {1,0,2}}; 
       
       vtkCellArray *cellarray = vtkCellArray::New();
-      int newCellId = cellarray->InsertNextCell(4,iid);
+      vtkIdType newCellId = cellarray->InsertNextCell(4,iid);
 
       // Test Cell intersection with each plane of box
       for (unsigned planes = 0; planes < 6; planes++) 
