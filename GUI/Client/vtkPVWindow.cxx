@@ -140,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.660");
+vtkCxxRevisionMacro(vtkPVWindow, "1.661");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -859,13 +859,11 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->MenuFile->InsertSeparator(clidx++);
 
   this->MenuFile->InsertCommand(clidx++, "Save Animation", this,
-    "SaveAnimation", 5, "Save animation as a movie or images. "
-    "(Only saves animations created using the Keyframe Interface).");
+    "SaveAnimation", 5, "Save animation as a movie or images.");
   
   this->MenuFile->InsertCommand(clidx++, "Save Geometry", this,
     "SaveGeometry", 5, "Save geometry from each frame. This will create "
-    "a series of .vtp files. (Only saves animation geometry created using "
-    "the Keyframe Interface).");
+    "a series of .vtp files.");
   
   this->MenuFile->InsertSeparator(clidx++);
 
@@ -3637,6 +3635,13 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVWindow::AddDefaultAnimation(vtkPVSource* pvSource)
+{
+  this->AnimationManager->Update();
+  this->AnimationManager->AddDefaultAnimation(pvSource);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVWindow::AddPVSource(const char* listname, vtkPVSource *pvs)
 {
   if (pvs == NULL)
@@ -3648,9 +3653,6 @@ void vtkPVWindow::AddPVSource(const char* listname, vtkPVSource *pvs)
   if (col && col->IsItemPresent(pvs) == 0)
     {
     col->AddItem(pvs);
-    this->AnimationManager->Update();
-    this->AnimationManager->AddDefaultAnimation(pvs);
-
     vtkPVReaderModule* clone = vtkPVReaderModule::SafeDownCast(pvs);
     int numOfTimeSteps;
     if (this->AnimationInterface && clone && (numOfTimeSteps = clone->GetNumberOfTimeSteps()) > 1)

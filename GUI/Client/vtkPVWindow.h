@@ -584,6 +584,11 @@ public:
   // Description:
   // Access to the vtkKWToolbarSet for the Lower toolbars.
   vtkGetObjectMacro(LowerToolbars, vtkKWToolbarSet);
+
+  // Description:
+  // Called to add a default animation for a source.
+  // vtkPVSource calls this when the source is initialized.
+  void AddDefaultAnimation(vtkPVSource* pvSource);
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

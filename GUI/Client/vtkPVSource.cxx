@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.415");
+vtkCxxRevisionMacro(vtkPVSource, "1.416");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1161,6 +1161,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // I put it at the end so the InputFixedTypeRequirement will work.
     this->UnGrabFocus();
     this->SetDefaultColorParameters();
+    window->AddDefaultAnimation(this);
     // One may be tempted to move this to the start of this if condition,
     // to avoid badly behaving PVWidgets reset calls to lead to
     // modification of the Accept button state, but that leads to 
