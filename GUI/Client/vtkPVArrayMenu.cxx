@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.52");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.53");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -418,10 +418,11 @@ void vtkPVArrayMenu::ResetInternal()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
-                                              vtkClientServerID sourceID)
+void vtkPVArrayMenu::SaveInBatchScript(ofstream *file)
 {
   const char* attributeName;
+
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
 
   attributeName = vtkDataSetAttributes::GetAttributeTypeAsString(
     this->AttributeType);
@@ -433,24 +434,29 @@ void vtkPVArrayMenu::SaveInBatchScriptForPart(ofstream *file,
     return;
     }
 
+  ostrstream cmd_with_warning_C4701;
+  cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
+                         << "Select" << this->InputName << attributeName
+                         << "] SetElement 0 " ;
   if (this->ArrayName)
     {
-    *file << "\t";
-    *file << "pvTemp" << sourceID << " Select" << this->InputName
-          << attributeName << " {" << this->ArrayName << "}\n";
+    cmd_with_warning_C4701 << "{" << this->ArrayName << "}" << endl;
     }
   else
     {
-    *file << "\t";
-    *file << "pvTemp" << sourceID << " Select" << this->InputName
-          << attributeName << " {}\n";
+    cmd_with_warning_C4701 << "{}"<< endl;
     }
+
   if (this->ShowComponentMenu)
     {
-    *file << "\t";
-    *file << "pvTemp" << sourceID << " Select" << this->InputName
-          << attributeName << "Component "  << this->SelectedComponent << endl;
+    cmd_with_warning_C4701 << "  [$pvTemp" << sourceID << " GetProperty "
+                           << "Select" << this->InputName << attributeName
+                           << "Component] SetElement 0 "
+                           << this->SelectedComponent << endl;
     }
+  cmd_with_warning_C4701 << ends;
+  *file << cmd_with_warning_C4701.str();
+  delete[] cmd_with_warning_C4701.str();
 }
 
 //----------------------------------------------------------------------------
