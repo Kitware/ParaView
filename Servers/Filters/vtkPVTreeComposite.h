@@ -12,14 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVTreeComposite - An interruptable version of vtkTreeComposite
+// .NAME vtkPVTreeComposite - An interruptable version of vtkCompositeRenderManager
 //
 // .SECTION Description
-// vtkPVTreeComposite is a subclass of tree composite that has methods that 
+// vtkPVTreeComposite is a subclass of composite render manager that has methods that 
 // interrupt rendering. This functionality requires an MPI controller.
 //
 // .SECTION see also
-// vtkMultiProcessController vtkRenderWindow vtkTreeComposite
+// vtkMultiProcessController vtkRenderWindow vtkCompositeRenderManager
 
 #include "vtkToolkits.h" // Needed for VTK_USE_MPI
 #ifndef __vtkPVTreeComposite_h
