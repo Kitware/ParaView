@@ -199,6 +199,12 @@
              number_of_elements="3"
              default_values="0 0 0">
           </DoubleVectorProperty>
+          <DoubleVectorProperty
+             name="Viewport"
+             command="SetViewport"
+             number_of_elements="4"
+             default_values="0 0 1 1">
+          </DoubleVectorProperty>
        </Proxy>
      </SubProxy>
 
