@@ -173,7 +173,7 @@ public:
   // Description:
   // For flip books.
   void RemoveAllCaches();
-  void CacheUpdate(int idx);
+  void CacheUpdate(int idx, int total);
 
 protected:
   vtkPVPart();

@@ -22,7 +22,7 @@
 #include "vtkPolyData.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.7");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.8");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -34,14 +34,14 @@ vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
   this->UpdatePiece = 0;
   this->UpdateNumberOfPieces = 1;
 
-  this->CachedGeometry = vtkCollection::New();
+  this->CachedGeometry = NULL;
+  this->CachedGeometryLength = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
-  this->CachedGeometry->Delete();
-  this->CachedGeometry = NULL;
+  this->RemoveAllCaches();
 }
 
 //----------------------------------------------------------------------------
@@ -113,23 +113,58 @@ void vtkPVUpdateSuppressor::Execute()
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::RemoveAllCaches()
 {
-  this->CachedGeometry->RemoveAllItems();
+  int idx;
+
+  for (idx = 0; idx < this->CachedGeometryLength; ++idx)
+    {
+    if (this->CachedGeometry[idx])
+      {
+      this->CachedGeometry[idx]->Delete();
+      this->CachedGeometry[idx] = NULL;
+      }
+    }
+
+  if (this->CachedGeometry)
+    {
+    delete [] this->CachedGeometry;
+    this->CachedGeometry = NULL;
+    }
+  this->CachedGeometryLength = 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::CacheUpdate(int idx)
+void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
 {
   vtkPolyData *pd;
   vtkPolyData *output;
+  int j;
+
+  if (idx < 0 || idx >= num)
+    {
+    vtkErrorMacro("Bad cache index: " << idx << " of " << num);
+    return;
+    }
+
+  if (num != this->CachedGeometryLength)
+    {
+    this->RemoveAllCaches();
+    this->CachedGeometry = new vtkPolyData*[num];
+    for (j = 0; j < num; ++j)
+      {
+      this->CachedGeometry[j] = NULL;
+      }
+    this->CachedGeometryLength = num;
+    }
 
   output = this->GetOutput();
-  pd = static_cast<vtkPolyData*>(this->CachedGeometry->GetItemAsObject(idx));
+  pd = this->CachedGeometry[idx];
   if (pd == NULL)
     { // we need to update and save.
     this->ForceUpdate();
     pd = vtkPolyData::New();
     pd->ShallowCopy(output);
-    this->CachedGeometry->ReplaceItem(idx, pd);
+    this->CachedGeometry[idx] = pd;
+    pd->Register(this);
     pd->Delete();
     }
   else

@@ -23,7 +23,6 @@
 #define __vtkPVUpdateSuppressor_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
-class vtkCollection;
 
 class VTK_EXPORT vtkPVUpdateSuppressor : public vtkPolyDataToPolyDataFilter
 {
@@ -38,8 +37,9 @@ public:
   // Description:
   // Methods for saving, clearing and updating flip books.
   // Cache update will update and save cache or just use previous cache.
+  // "idx" is the time index, "total" is the number of time steps.
   void RemoveAllCaches();
-  void CacheUpdate(int idx);
+  void CacheUpdate(int idx, int total);
 
   // Description:
   // Return the mtime also considering the locator and clip function.
@@ -77,7 +77,8 @@ protected:
 
   vtkTimeStamp UpdateTime;
 
-  vtkCollection* CachedGeometry;
+  vtkPolyData** CachedGeometry;
+  int CachedGeometryLength;
 
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.12");
+vtkCxxRevisionMacro(vtkPVPart, "1.13");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -436,17 +436,22 @@ void vtkPVPart::SetCollectionDecision(int v)
     {
     if (this->CollectionDecision)
       {
-      pvApp->BroadcastScript("%s SetPassThrough 0; %s ForceUpdate", 
-                             this->CollectTclName, 
+      pvApp->BroadcastScript("%s SetPassThrough 0; %s RemoveAllCaches; %s ForceUpdate", 
+                             this->CollectTclName,
+                             this->UpdateSuppressorTclName,
                              this->UpdateSuppressorTclName);
       }
     else
       {
-      pvApp->BroadcastScript("%s SetPassThrough 1; %s ForceUpdate", 
+      pvApp->BroadcastScript("%s SetPassThrough 1; %s RemoveAllCaches; %s ForceUpdate", 
                              this->CollectTclName,
+                             this->UpdateSuppressorTclName,
                              this->UpdateSuppressorTclName);
       }
     }
+
+  this->GetPVApplication()->BroadcastScript(
+             "%s RemoveAllCaches", this->UpdateSuppressorTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -470,17 +475,20 @@ void vtkPVPart::SetLODCollectionDecision(int v)
     {
     if (this->LODCollectionDecision)
       {
-      pvApp->BroadcastScript("%s SetPassThrough 0; %s ForceUpdate", 
+      pvApp->BroadcastScript("%s SetPassThrough 0; %s RemoveAllCaches; %s ForceUpdate", 
                              this->LODCollectTclName,
-                             this->UpdateSuppressorTclName);
+                             this->LODUpdateSuppressorTclName,
+                             this->LODUpdateSuppressorTclName);
       }
     else
       {
-      pvApp->BroadcastScript("%s SetPassThrough 1; %s ForceUpdate", 
+      pvApp->BroadcastScript("%s SetPassThrough 1; %s RemoveAllCaches; %s ForceUpdate", 
                              this->LODCollectTclName,
-                             this->UpdateSuppressorTclName);
+                             this->LODUpdateSuppressorTclName,
+                             this->LODUpdateSuppressorTclName);
       }
     }
+
 }
 
 
@@ -718,7 +726,7 @@ vtkPVApplication* vtkPVPart::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVPart::RemoveAllCaches()
 {
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
+  this->GetPVApplication()->BroadcastScript(
              "%s RemoveAllCaches; %s RemoveAllCaches",
              this->UpdateSuppressorTclName, this->LODUpdateSuppressorTclName);
 }
@@ -727,12 +735,12 @@ void vtkPVPart::RemoveAllCaches()
 //----------------------------------------------------------------------------
 // Assume that this method is only called when the part is visible.
 // This is like the ForceUpdate method, but uses cached values if possible.
-void vtkPVPart::CacheUpdate(int idx)
+void vtkPVPart::CacheUpdate(int idx, int total)
 {
-  this->GetPVApplication()->GetProcessModule()->ServerScript(
-             "%s CacheUpdate %d; %s CacheUpdate %d",
-             this->UpdateSuppressorTclName, idx,
-             this->LODUpdateSuppressorTclName, idx);
+  this->GetPVApplication()->BroadcastScript(
+             "%s CacheUpdate %d %d; %s CacheUpdate %d %d",
+             this->UpdateSuppressorTclName, idx, total,
+             this->LODUpdateSuppressorTclName, idx, total);
 }
 
 

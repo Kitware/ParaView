@@ -126,7 +126,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.38");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -996,13 +996,10 @@ float vtkPVAnimationInterface::GetCurrentTime()
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetCurrentTime(float time)
-{  
+{
+  int total = (int)(floor(0.5 +(this->GetTimeEnd()-this->GetTimeStart())/this->GetTimeStep())) + 1;
+  int timeIdx = (int)(floor(0.5 + (time-this->GetTimeStart())/this->GetTimeStep()));
   this->TimeScale->SetValue(time);
-
-  if (this->PVSource)
-    {
-    this->PVSource->MarkSourcesForUpdate(1);
-    }
 
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (pvApp)
@@ -1015,7 +1012,10 @@ void vtkPVAnimationInterface::SetCurrentTime(float time)
       this->ControlledWidget->ModifiedCallback();
       this->ControlledWidget->Reset();
       }
-
+    
+    // Generate the cache, or use previous cache.
+    this->Window->CacheUpdate(timeIdx, total);
+  
     if (this->View)
       {
       this->View->EventuallyRender();

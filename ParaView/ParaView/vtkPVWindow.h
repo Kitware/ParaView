@@ -501,7 +501,7 @@ public:
   // Description:
   // For flip books. These methods should really be in a render module.
   void RemoveAllCaches();
-  void CacheUpdate(int idx);
+  void CacheUpdate(int idx, int total);
 
 protected:
   vtkPVWindow();

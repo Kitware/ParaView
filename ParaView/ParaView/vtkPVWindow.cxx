@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.427");
+vtkCxxRevisionMacro(vtkPVWindow, "1.428");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4013,7 +4013,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.427 $");
+  this->ExtractRevision(os,"$Revision: 1.428 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -4390,9 +4390,27 @@ void vtkPVWindow::RemoveAllCaches()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::CacheUpdate(int idx)
+void vtkPVWindow::CacheUpdate(int idx, int total)
 {
-  // Loop through all visible parts.
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVSourceCollection* col = this->GetSourceList("Sources");
+  vtkPVSource* pvs;
+  vtkPVPart* pvp;
+  int partIdx, numParts;
+
+  col->InitTraversal();
+  while ( (pvs=col->GetNextPVSource()) )
+    {
+    if (pvs->GetVisibility())
+      {
+      numParts = pvs->GetNumberOfPVParts();
+      for (partIdx = 0; partIdx < numParts; ++partIdx)
+        {
+        pvp = pvs->GetPVPart(partIdx);
+        pvp->CacheUpdate(idx, total);
+        }
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

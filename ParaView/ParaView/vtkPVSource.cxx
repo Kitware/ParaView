@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.287");
+vtkCxxRevisionMacro(vtkPVSource, "1.288");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -653,6 +653,10 @@ void vtkPVSource::RemoveAllVTKSources()
 //----------------------------------------------------------------------------
 int vtkPVSource::GetNumberOfVTKSources()
 {
+  if (this->VTKSources == NULL)
+    {
+    return 0;
+    }
   return this->VTKSources->GetNumberOfItems();
 }
 
@@ -1367,6 +1371,15 @@ void vtkPVSource::MarkSourcesForUpdate(int flag)
   if (flag)
     {
     this->PipelineModifiedTime.Modified();
+    // Get rid of caches.
+    int idx, numParts;
+    vtkPVPart *part;
+    numParts = this->GetNumberOfPVParts();
+    for (idx = 0; idx < numParts; ++idx)
+      {
+      part = this->GetPVPart(idx);
+      part->RemoveAllCaches();
+      }
     }
   else
     {
@@ -2612,7 +2625,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.287 $");
+  this->ExtractRevision(os,"$Revision: 1.288 $");
 }
 
 //----------------------------------------------------------------------------
