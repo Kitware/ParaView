@@ -52,7 +52,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.16");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.17");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -98,7 +98,7 @@ struct vtkClientRendererInfo
 //-------------------------------------------------------------------------
 vtkClientCompositeManager::vtkClientCompositeManager()
 {
-  this->UseSquirt = 0;
+  this->UseSquirt = 1;
   this->RenderWindow = NULL;
   this->CompositeController = vtkMultiProcessController::GetGlobalController();
   if (this->CompositeController)
@@ -1504,8 +1504,26 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
   unsigned int current_color;
   unsigned int compress_mask;
 
-  // Set bitmask based on compress_level
+ // Set bitmask based on compress_level
   // switch statement is a bit lame
+#ifdef VTK_WORDS_BIGENDIAN
+  switch (compress_level) {
+  case 0: compress_mask = 0xFFFFFF00;
+      break;
+  case 1: compress_mask = 0xFEFFFE00;
+      break;
+  case 2: compress_mask = 0xFCFEFC00;
+      break;
+  case 3: compress_mask = 0xF8FCF800;
+      break;
+  case 4: compress_mask = 0xF0F8F000;
+      break;
+  case 5: compress_mask = 0xE0F0E000;
+      break;
+  default: compress_mask = 0xE0F0E000;
+      break;
+  }
+#else
   switch (compress_level) {
   case 0: compress_mask = 0x00FFFFFF;
       break;
@@ -1522,6 +1540,7 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
   default: compress_mask = 0x00E0F0E0;
       break;
   }
+#endif
 
   // Access raw arrays directly
   unsigned int* _rawColorBuffer;
@@ -1536,7 +1555,13 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
   while((index < end_index) && (comp_index < end_index)) 
     {
     // Record color
-    current_color = _rawCompressedBuffer[comp_index] = _rawColorBuffer[index];
+    current_color = _rawCompressedBuffer[comp_index] = (_rawColorBuffer[index] |
+#ifdef VTK_WORDS_BIGENDIAN
+                                                        0x000000FF
+#else
+                                                        0xFF000000
+#endif
+                                                        );
     index++;
 
     // Compute Run
@@ -1548,7 +1573,11 @@ void vtkClientCompositeManager::SquirtCompress(vtkUnsignedCharArray *in,
       }
 
     // Record Run length
+#ifdef VTK_WORDS_BIGENDIAN
+    _rawCompressedBuffer[comp_index] &= (count|0xFFFFFF00);
+#else
     _rawCompressedBuffer[comp_index] &= (count<<24|0x00FFFFFF);
+#endif
     comp_index++;
     
     count = 0;
@@ -1601,10 +1630,18 @@ void vtkClientCompositeManager::SquirtDecompress(vtkUnsignedCharArray *in,
     current_color = _rawCompressedBuffer[i];
 
     // Get first byte as count;
+#ifdef VTK_WORDS_BIGENDIAN
+    count = current_color&0x000000FF;
+#else
     count = current_color>>24;
+#endif
 
     // Fixed Alpha
+#ifdef VTK_WORDS_BIGENDIAN
+    current_color |= 0x000000FF;
+#else
     current_color |= 0xFF000000;
+#endif
 
     // Set color
     _rawColorBuffer[index++] = current_color;
