@@ -19,6 +19,7 @@ ldAix            crlf=input
 mkLinks          crlf=input
 newalpha         crlf=input
 newversion       crlf=input
+repair.tcl       crlf=input
 rmt              crlf=input
 rolodex          crlf=input
 square           crlf=input
