@@ -53,7 +53,8 @@ int vtkVector<DType>::AppendItem(DType a)
     this->Array = newArray;
     }
   
-  vtkAbstractList<DType>::CreateFunction(this->Array[this->NumberOfItems], a);
+  this->Array[this->NumberOfItems] 
+    = static_cast<DType>( vtkContainerCreateMethod(a) );
   
   this->NumberOfItems++;
   return VTK_OK;
@@ -115,7 +116,8 @@ int vtkVector<DType>::InsertItem(vtkIdType loc, DType a)
       this->Array[i] = this->Array[i-1];
       }
     }
-  vtkAbstractList<DType>::CreateFunction(this->Array[loc], a);
+  this->Array[loc] 
+    = static_cast<DType>( vtkContainerCreateMethod(a) );
   this->NumberOfItems++;
   return VTK_OK;
 }
@@ -145,8 +147,9 @@ int vtkVector<DType>::SetItem(vtkIdType loc, DType a)
 template <class DType>
 void vtkVector<DType>::SetItemNoCheck(vtkIdType loc, DType a)
 {
-  vtkAbstractList<DType>::DeleteFunction(this->Array[loc]);
-  vtkAbstractList<DType>::CreateFunction(this->Array[loc], a);
+  vtkContainerDeleteMethod(this->Array[loc]);
+  this->Array[loc] 
+    = static_cast<DType>( vtkContainerCreateMethod(a) );
 }
 
 // Description:
@@ -189,7 +192,7 @@ int vtkVector<DType>::RemoveItem(vtkIdType id)
       this->Array[i] = this->Array[i+1];
       }
     }
-  vtkAbstractList<DType>::DeleteFunction(dt);
+  vtkContainerDeleteMethod(dt);
   return VTK_OK;
 }
   
@@ -224,7 +227,7 @@ int vtkVector<DType>::FindItem(DType a, vtkIdType &res)
   vtkIdType i;
   for (i = 0; i < this->NumberOfItems; ++i)
     {
-    if (vtkAbstractList<DType>::CompareFunction(this->Array[i], a) == 0 )
+    if (vtkContainerCompareMethod(this->Array[i], a) == 0 )
       {
       res = i;
       return VTK_OK;
@@ -265,7 +268,7 @@ void vtkVector<DType>::RemoveAllItems()
     vtkIdType cc;
     for ( cc = 0; cc < this->NumberOfItems; cc ++ )
       {
-      vtkAbstractList<DType>::DeleteFunction(this->Array[cc]);
+      vtkContainerDeleteMethod(this->Array[cc]);
       }
     delete [] this->Array;
     }
@@ -281,7 +284,7 @@ vtkVector<DType>::~vtkVector()
     vtkIdType cc;
     for ( cc = 0; cc < this->NumberOfItems; cc ++ )
       {
-      vtkAbstractList<DType>::DeleteFunction(this->Array[cc]);
+      vtkContainerDeleteMethod(this->Array[cc]);
       }
     delete [] this->Array;
     }

@@ -36,7 +36,8 @@ int vtkArrayMap<KeyType,DataType>::SetItem(const KeyType& key,
   vtkAbstractMapItem<KeyType,DataType> *item = this->FindDataItem(key);
   if ( item )
     {
-    vtkAbstractMap<KeyType,DataType>::DataCreateFunction(item->Data, data);
+    vtkContainerDeleteMethod(item->Data);
+    item->Data = static_cast<DataType>(vtkContainerCreateMethod(data));
     return VTK_OK;
     }
   if ( !this->Array )
@@ -48,8 +49,8 @@ int vtkArrayMap<KeyType,DataType>::SetItem(const KeyType& key,
     return VTK_ERROR;
     }
   item = new vtkAbstractMapItem<KeyType,DataType>;
-  vtkAbstractMap<KeyType,DataType>::KeyCreateFunction(item->Key, key);
-  vtkAbstractMap<KeyType,DataType>::DataCreateFunction(item->Data, data);
+  item->Key  = static_cast<KeyType>(vtkContainerCreateMethod(key));
+  item->Data = static_cast<DataType>(vtkContainerCreateMethod(data));
   this->Array->AppendItem(item);
   return VTK_OK;
   
@@ -70,12 +71,11 @@ int vtkArrayMap<KeyType,DataType>::RemoveItem(const KeyType& key)
   for ( cc = 0; cc <= this->Array->GetNumberOfItems(); cc ++ )
     {
     this->Array->GetItemNoCheck(cc, item);
-    if ( vtkAbstractMap<KeyType,DataType>::KeyCompareFunction(key, item->Key) 
-	 == 0 )
+    if ( vtkContainerCompareMethod(key, item->Key) == 0 )
       {
       this->Array->RemoveItem(cc);
-      vtkAbstractMap<KeyType,DataType>::KeyDeleteFunction(item->Key);
-      vtkAbstractMap<KeyType,DataType>::DataDeleteFunction(item->Data);
+      vtkContainerDeleteMethod(item->Key);
+      vtkContainerDeleteMethod(item->Data);
       delete item;
       return VTK_OK;
       }
@@ -95,8 +95,8 @@ void vtkArrayMap<KeyType,DataType>::RemoveAllItems()
       {
       vtkAbstractMapItem<KeyType,DataType> *item;
       this->Array->GetItemNoCheck(cc, item);
-      vtkAbstractMap<KeyType,DataType>::KeyDeleteFunction(item->Key);
-      vtkAbstractMap<KeyType,DataType>::DataDeleteFunction(item->Data);
+      vtkContainerDeleteMethod(item->Key);
+      vtkContainerDeleteMethod(item->Data);
       delete item;
       }
     this->Array->Delete(); 
@@ -131,8 +131,7 @@ vtkArrayMap<KeyType,DataType>::FindDataItem(KeyType key)
   for ( cc = 0; cc < this->Array->GetNumberOfItems(); cc ++ )
     {
     this->Array->GetItemNoCheck(cc, item);
-    if ( vtkAbstractMap<KeyType,DataType>::KeyCompareFunction(key, item->Key) 
-	 == 0 )
+    if ( vtkContainerCompareMethod(key, item->Key) == 0 )
       {
       return item;
       }
@@ -160,8 +159,8 @@ vtkArrayMap<KeyType,DataType>::~vtkArrayMap()
       {
       vtkAbstractMapItem<KeyType,DataType> *item;
       this->Array->GetItemNoCheck(cc, item);
-      vtkAbstractMap<KeyType,DataType>::KeyDeleteFunction(item->Key);
-      vtkAbstractMap<KeyType,DataType>::DataDeleteFunction(item->Data);
+      vtkContainerDeleteMethod(item->Key);
+      vtkContainerDeleteMethod(item->Data);
       delete item;
       }
     this->Array->Delete(); 

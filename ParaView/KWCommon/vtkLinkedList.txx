@@ -36,6 +36,7 @@ public:
   }
   void DeleteAll()
     {
+      vtkContainerDeleteMethod(this->Data);
       if ( this->Next )
 	{
 	this->Next->DeleteAll();
@@ -65,8 +66,8 @@ int vtkLinkedList<DType>::AppendItem(DType a)
   if ( !node )
     {
     return VTK_ERROR;
-    }
-  node->Data = a;
+    }  
+  node->Data = static_cast<DType>( vtkContainerCreateMethod(a) );
   this->Tail->Next = node;
   this->Tail = node;
   this->NumberOfItems ++;
@@ -83,7 +84,7 @@ int vtkLinkedList<DType>::PrependItem(DType a)
     {
     return VTK_ERROR;
     }
-  node->Data = a;
+  node->Data = static_cast<DType>( vtkContainerCreateMethod(a) );
   node->Next = this->Head;
   this->Head = node;
   if ( !this->Tail )
@@ -120,7 +121,7 @@ int vtkLinkedList<DType>::InsertItem(vtkIdType loc, DType a)
       return VTK_ERROR;      
       }
     node->Next = curr->Next;
-    node->Data = a;
+    node->Data = static_cast<DType>( vtkContainerCreateMethod(a) );
     curr->Next = node;
     this->NumberOfItems++;
     return VTK_OK;
@@ -140,7 +141,8 @@ int vtkLinkedList<DType>::SetItem(vtkIdType loc, DType a)
     {
     return VTK_ERROR;
     }
-  curr->Data = a;
+  vtkContainerDeleteMethod(curr->Data);
+  curr->Data = static_cast<DType>( vtkContainerCreateMethod(a) );
   return VTK_OK;
 }
 
@@ -150,7 +152,9 @@ int vtkLinkedList<DType>::SetItem(vtkIdType loc, DType a)
 template <class DType>
 void vtkLinkedList<DType>::SetItemNoCheck(vtkIdType loc, DType a)
 {
-  this->FindNode(loc)->Data = a;
+  vtkLinkedListNode<DType> *curr = this->FindNode(loc);
+  vtkContainerDeleteMethod(curr->Data);
+  curr->Data = static_cast<DType>( vtkContainerCreateMethod(a) );
 }
 
 // Description:
@@ -161,6 +165,7 @@ int vtkLinkedList<DType>::RemoveItem(vtkIdType id)
   vtkLinkedListNode<DType> *curr = 0;
   if ( !this->Head )
     {
+    //cout << "List is empty" << endl;
     return VTK_ERROR;
     }
   if ( id == 0 )
@@ -168,6 +173,7 @@ int vtkLinkedList<DType>::RemoveItem(vtkIdType id)
     // Fast delete from front
     curr = this->Head;
     this->Head = this->Head->Next;
+    vtkContainerDeleteMethod(curr->Data);
     delete curr;
     if ( !this->Head )
       {
@@ -180,6 +186,7 @@ int vtkLinkedList<DType>::RemoveItem(vtkIdType id)
   curr = this->FindNode(id-1);
   if ( ! curr || ! curr->Next )
     {
+    //cout << "Cannot find this node" << endl;
     return VTK_ERROR;
     }
   // Set it to point to id+1 node
@@ -191,6 +198,7 @@ int vtkLinkedList<DType>::RemoveItem(vtkIdType id)
     this->Tail = curr;
     }
   // And delete id node
+  vtkContainerDeleteMethod(tmp->Data);
   delete tmp;
   this->NumberOfItems --;
   return VTK_OK;
@@ -220,7 +228,7 @@ int vtkLinkedList<DType>::FindItem(DType a, vtkIdType &res)
   vtkLinkedListNode<DType> *curr;
   for ( curr = this->Head; curr; curr = curr->Next )
     {
-    if ( curr->Data == a )
+    if ( vtkContainerCompareMethod(curr->Data, a) == 0 )
       {
       res = cc;
       return VTK_OK;
