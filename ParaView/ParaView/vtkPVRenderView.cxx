@@ -1040,7 +1040,9 @@ void vtkPVRenderView::TriangleStripsCallback()
   for (i = 0; i < numComps; i++)
     {
     comp = vtkPVActorComposite::SafeDownCast(this->Composites->GetNextKWComposite());
-    if (comp)
+    if (comp &&
+        (comp->GetPVData()->GetVTKData()->IsA("vtkPolyData") ||
+         comp->GetPVData()->GetVTKData()->IsA("vtkUnstructuredGrid")))
       {
       pvApp->BroadcastScript("%s SetUseStrips %d",
                              comp->GetGeometryTclName(),

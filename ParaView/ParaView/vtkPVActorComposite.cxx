@@ -1374,8 +1374,12 @@ void vtkPVActorComposite::Initialize()
     this->ColorMenu->SetValue("Property");
     }
   
-  pvApp->BroadcastScript("%s SetUseStrips %d", this->GeometryTclName,
-                         ((vtkPVRenderView*)this->GetView())->GetTriangleStripsCheck()->GetState());
+  if (this->GetPVData()->GetVTKData()->IsA("vtkPolyData") ||
+      this->GetPVData()->GetVTKData()->IsA("vtkUnstructuredGrid"))
+    {
+    pvApp->BroadcastScript("%s SetUseStrips %d", this->GeometryTclName,
+                           ((vtkPVRenderView*)this->GetView())->GetTriangleStripsCheck()->GetState());
+    }
   pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
                          this->MapperTclName,
                          ((vtkPVRenderView*)this->GetView())->GetImmediateModeCheck()->GetState());
