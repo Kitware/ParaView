@@ -39,11 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkKWRenderWidget_h
 #define __vtkKWRenderWidget_h
 
-#define VTK_KW_INTERACTIVE_RENDER  0
-#define VTK_KW_STILL_RENDER        1
-#define VTK_KW_DISABLED_RENDER     2
-#define VTK_KW_SINGLE_RENDER       3
-
 #include "vtkKWWidget.h"
 
 class vtkCamera;
@@ -83,17 +78,29 @@ public:
   
   // Description:
   // Set/get the rendering mode
+  //BTX
+  enum
+  {
+    INTERACTIVE_RENDER = 0,
+    STILL_RENDER       = 1,
+    DISABLED_RENDER    = 2,
+    SINGLE_RENDER      = 3
+  };
+  //ETX
+
   vtkSetClampMacro(RenderMode, int, 
-                   VTK_KW_INTERACTIVE_RENDER, VTK_KW_SINGLE_RENDER);
+                   vtkKWRenderWidget::INTERACTIVE_RENDER, 
+                   vtkKWRenderWidget::SINGLE_RENDER);
   vtkGetMacro(RenderMode, int);
   virtual void SetRenderModeToInteractive() 
-    { this->RenderMode = VTK_KW_INTERACTIVE_RENDER; };
+    { this->SetRenderMode(vtkKWRenderWidget::INTERACTIVE_RENDER); };
   virtual void SetRenderModeToStill() 
-    { this->RenderMode = VTK_KW_STILL_RENDER; };
+    { this->SetRenderMode(vtkKWRenderWidget::STILL_RENDER); };
   virtual void SetRenderModeToSingle() 
-    { this->RenderMode = VTK_KW_SINGLE_RENDER; };
+    { this->SetRenderMode(vtkKWRenderWidget::SINGLE_RENDER); };
   virtual void SetRenderModeToDisabled() 
-    { this->RenderMode = VTK_KW_DISABLED_RENDER; };
+    { this->SetRenderMode(vtkKWRenderWidget::DISABLED_RENDER); };
+  virtual const char *GetRenderModeAsString();
 
   // Description:
   // Reset the view/widget (will usually reset the camera too).

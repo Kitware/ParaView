@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.54");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.55");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -91,7 +91,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->RenderWindow->AddRenderer(this->Renderer);
   
   this->Printing = 0;
-  this->RenderMode = VTK_KW_STILL_RENDER;
+  this->RenderMode = vtkKWRenderWidget::STILL_RENDER;
   this->RenderState = 1;
   
   this->ParentWindow = NULL;
@@ -447,13 +447,31 @@ void vtkKWRenderWidget::Render()
     }
   static_in_render = 1;
 
-  if (this->RenderMode != VTK_KW_DISABLED_RENDER)
+  if (this->RenderMode != vtkKWRenderWidget::DISABLED_RENDER)
     {
     this->Renderer->ResetCameraClippingRange();
     this->RenderWindow->Render();
     }
   
   static_in_render = 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWRenderWidget::GetRenderModeAsString()
+{
+  switch (this->RenderMode)
+    {
+    case vtkKWRenderWidget::INTERACTIVE_RENDER:
+      return "Interactive";
+    case vtkKWRenderWidget::STILL_RENDER:
+      return "Still";
+    case vtkKWRenderWidget::SINGLE_RENDER:
+      return "Single";
+    case vtkKWRenderWidget::DISABLED_RENDER:
+      return "Disabled";
+    default:
+      return "Unknown (error)";
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -895,7 +913,7 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
-  os << indent << "RenderMode: " << this->RenderMode << endl;
+  os << indent << "RenderMode: " << this->GetRenderModeAsString() << endl;
   os << indent << "RenderState: " << this->RenderState << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
   os << indent << "CollapsingRenders: " << this->CollapsingRenders << endl;
