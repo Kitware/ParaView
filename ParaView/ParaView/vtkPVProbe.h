@@ -56,6 +56,7 @@ class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkPVArrayMenu;
 class vtkPVLineWidget;
+class vtkPVPointWidget;
 
 class VTK_EXPORT vtkPVProbe : public vtkPVSource
 {
@@ -88,6 +89,7 @@ public:
   // Description:
   // Callbacks for Dimensionality menu
   void UsePoint();
+  void UseNewPoint();
   void UseLine();
 
   // Description:
@@ -108,7 +110,16 @@ public:
     this->SetEndPoint2(p);
     }
   vtkGetVector3Macro(EndPoint1, float);
-  vtkGetVector3Macro(EndPoint2, float);  
+  vtkGetVector3Macro(EndPoint2, float);
+
+  void SetPointPosition(float point[3]);
+  void SetPointPosition(float x, float y, float z)
+    {
+    float p[3];
+    p[0] = x; p[1] = y; p[2] = z;
+    this->SetPointPosition(p);
+    }
+  vtkGetVector3Macro(PointPosition, float);
 
   // Description:
   // Get the dimensionality of the input to vtkProbeFilter.
@@ -168,7 +179,9 @@ protected:
   vtkKWLabeledEntry *End2ZEntry;
   vtkKWCheckButton *ShowXYPlotToggle;
   vtkKWLabeledEntry *DivisionsEntry;
+
   vtkPVLineWidget *LineWidget;
+  vtkPVPointWidget *PointWidget;
   
   int Dimensionality; // point = 0, line = 1
   
@@ -180,6 +193,8 @@ protected:
   float EndPoint1[3];
   float EndPoint2[3];
   int NumberOfLineDivisions;
+
+  float PointPosition[3];
 
   vtkPVProbe(const vtkPVProbe&); // Not implemented
   void operator=(const vtkPVProbe&); // Not implemented

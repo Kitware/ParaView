@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVLineWidget.h"
+#include "vtkPVPointWidget.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPolyData.h"
@@ -105,6 +106,7 @@ vtkPVProbe::vtkPVProbe()
   this->ShowXYPlotToggle = vtkKWCheckButton::New();
 
   this->LineWidget = vtkPVLineWidget::New();
+  this->PointWidget = vtkPVPointWidget::New();
   
   this->ProbeFrame = vtkKWWidget::New();
 
@@ -164,6 +166,7 @@ vtkPVProbe::~vtkPVProbe()
   this->EndPoint2Frame = NULL;
   
   this->LineWidget->Delete();
+  this->PointWidget->Delete();
   
   this->DivisionsEntry->Delete();
   this->DivisionsEntry = NULL;
@@ -277,6 +280,7 @@ void vtkPVProbe::CreateProperties()
   this->DimensionalityMenu->Create(pvApp, "");
   this->DimensionalityMenu->AddEntryWithCommand("Point", this, "UsePoint");
   this->DimensionalityMenu->AddEntryWithCommand("Line", this, "UseLine");
+  this->DimensionalityMenu->AddEntryWithCommand("NewPoint", this, "UseNewPoint");
   this->DimensionalityMenu->SetValue("Point");
   
   this->Script("pack %s %s -side left",
@@ -467,6 +471,14 @@ void vtkPVProbe::CreateProperties()
   this->LineWidget->SetPoint1Method(this->GetTclName(), "EndPoint1");
   this->LineWidget->SetPoint2Method(this->GetTclName(), "EndPoint2");
   this->LineWidget->SetResolutionMethod(this->GetTclName(), "NumberOfLineDivisions");
+
+  this->PointWidget->SetPVSource(this);
+  this->PointWidget->SetParent(this->ProbeFrame);
+  this->PointWidget->Create(pvApp);
+  this->AddPVWidget(this->PointWidget);
+  this->PointWidget->SetModifiedCommand(this->GetTclName(),
+				       "SetAcceptButtonColorToRed");
+  this->PointWidget->SetPositionMethod(this->GetTclName(), "PointPosition");
   
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
 
@@ -484,8 +496,12 @@ void vtkPVProbe::CreateProperties()
 
   this->SetEndPoint1(bounds[0], bounds[2], bounds[4]);
   this->SetEndPoint2(bounds[1], bounds[3], bounds[5]);
+  this->SetPointPosition((bounds[0]+bounds[1])/2, 
+			 (bounds[2]+bounds[3])/2, 
+			 (bounds[4]+bounds[5])/2);
   this->SetNumberOfLineDivisions(10);
   this->LineWidget->PlaceWidget();
+  this->PointWidget->PlaceWidget();
 }
 
 //----------------------------------------------------------------------------
@@ -496,6 +512,7 @@ void vtkPVProbe::AcceptCallback()
   int component;
   
   this->LineWidget->Accept();
+  this->PointWidget->Accept();
 
   // This can't be an accept command because this calls SetInput for the
   // vtkProbeFilter, and vtkPVSource::AcceptCallback expects that the
@@ -656,9 +673,9 @@ void vtkPVProbe::UpdateProbe()
     pvApp->BroadcastScript("vtkPoints points");
     pvApp->BroadcastScript("points Allocate 1 1");
     pvApp->BroadcastScript("points InsertNextPoint %f %f %f",
-                           this->SelectedXEntry->GetValueAsFloat(),
-                           this->SelectedYEntry->GetValueAsFloat(),
-                           this->SelectedZEntry->GetValueAsFloat());
+                           this->PointPosition[0],
+			   this->PointPosition[1],
+			   this->PointPosition[2]);
     pvApp->BroadcastScript("probeInput Allocate 1 1");
     pvApp->BroadcastScript("probeInput SetPoints points");
     pvApp->BroadcastScript("probeInput InsertNextCell 1 pointList");
@@ -682,6 +699,27 @@ void vtkPVProbe::UpdateProbe()
     pvApp->BroadcastScript("%s SetInput [line GetOutput]",
                            this->GetVTKSourceTclName());
     pvApp->BroadcastScript("line Delete");  
+    }
+  else
+    {
+    pvApp->BroadcastScript("vtkPolyData probeInput");
+    pvApp->BroadcastScript("vtkIdList pointList");
+    pvApp->BroadcastScript("pointList Allocate 1 1");
+    pvApp->BroadcastScript("pointList InsertNextId 0");
+    pvApp->BroadcastScript("vtkPoints points");
+    pvApp->BroadcastScript("points Allocate 1 1");
+    pvApp->BroadcastScript("points InsertNextPoint %f %f %f",
+                           this->PointPosition[0],
+			   this->PointPosition[1],
+			   this->PointPosition[2]);
+    pvApp->BroadcastScript("probeInput Allocate 1 1");
+    pvApp->BroadcastScript("probeInput SetPoints points");
+    pvApp->BroadcastScript("probeInput InsertNextCell 1 pointList");
+    pvApp->BroadcastScript("%s SetInput probeInput",
+                           this->GetVTKSourceTclName());
+    pvApp->BroadcastScript("pointList Delete");
+    pvApp->BroadcastScript("points Delete");
+    pvApp->BroadcastScript("probeInput Delete");
     }
   
   this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
@@ -764,9 +802,10 @@ void vtkPVProbe::UsePoint()
   this->Dimensionality = 0;
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ProbeFrame->GetWidgetName());
-  this->Script("pack %s %s",
+  this->Script("pack %s %s %s",
                this->SelectedPointFrame->GetWidgetName(),
-               this->PointDataLabel->GetWidgetName());
+               this->PointDataLabel->GetWidgetName(),
+	       this->PointWidget->GetWidgetName());
   this->Script("pack forget %s", this->ScalarArrayMenu->GetWidgetName());
   this->SetAcceptButtonColorToRed();
 }
@@ -785,9 +824,26 @@ void vtkPVProbe::UseLine()
 
   this->Script("pack %s %s",
                this->ShowXYPlotToggle->GetWidgetName(),
-	       this->LineWidget->GetWidgetName());
+	       this->LineWidget->GetWidgetName());    
+  this->SetAcceptButtonColorToRed();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::UseNewPoint()
+{
+  this->Dimensionality = 3;
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->ProbeFrame->GetWidgetName());
+
+  this->Script("pack %s %s",
+               this->SelectedPointFrame->GetWidgetName(),
+               this->PointDataLabel->GetWidgetName());
+  this->ScalarArrayMenu->Update();
+
+  this->Script("pack %s %s",
+               this->ShowXYPlotToggle->GetWidgetName(),
+	       this->PointWidget->GetWidgetName());
     
-  this->LineWidget->Reset();
   this->SetAcceptButtonColorToRed();
 }
 
@@ -939,6 +995,19 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
     }
   
   this->GetPVOutput(0)->SaveInTclScript(file);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::SetPointPosition(float point[3])
+{
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->PointPosition[cc] = point[cc];
+    }
+  this->SelectedXEntry->SetValue(point[0], 3);
+  this->SelectedYEntry->SetValue(point[1], 3);
+  this->SelectedZEntry->SetValue(point[2], 3);
 }
 
 //----------------------------------------------------------------------------
