@@ -18,7 +18,10 @@ IF (WIN32)
    INCLUDE_DIRECTORIES(${HTML_HELP_PATH})
  ELSE (HTML_HELP_PATH)
    SET (PARAVIEW_CAN_BUILD 0)
-   MESSAGE("ParaView requires htmlhelp to build. Please set HTML_HELP_LIBRARY")
+   MESSAGE("ParaView requires htmlhelp to build. Please install html help." 
+           "You can find html help on the msdn web site here:\n"
+           "http://msdn.microsoft.com/\n"
+"http://msdn.microsoft.com/library/default.asp?url=/library/en-us/htmlhelp/html/vsconwhtshw.asp")
  ENDIF (HTML_HELP_PATH)
 
 
