@@ -223,6 +223,12 @@ public:
   // Get the VTK widget
   vtkGetObjectMacro(VTKWidget, vtkKWWidget);
   
+  // Description:
+  // Are we printing ?
+  virtual void SetPrinting(int arg);
+  vtkBooleanMacro(Printing, int);
+  vtkGetMacro(Printing, int);
+  
 #ifdef _WIN32
   void SetupPrint(RECT &rcDest, HDC ghdc,
                   int printerPageSizeX, int printerPageSizeY,
@@ -230,14 +236,15 @@ public:
                   float scaleX, float scaleY,
                   int screenSizeX, int screenSizeY);
 #endif
+
   // Description:
-  // Are we printing ?
-  vtkSetMacro(Printing, int);
-  vtkGetMacro(Printing, int);
-  
-  virtual void SetupMemoryRendering(int width, int height, void *cd);
-  virtual void ResumeScreenRendering();
+  // Get memory device context (when rendering to memory)
   virtual void* GetMemoryDC();
+
+  // Description:
+  // Setup offscreen rendering (e.g., for screenshots)
+  vtkBooleanMacro(OffScreenRendering, int);
+  virtual void SetOffScreenRendering(int);
   
   // Description:
   // Method that processes the events
@@ -253,14 +260,6 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
-  // Description:
-  // Setup offscreen rendering (e.g., for screenshots)
-  void SetupOffScreenRendering();
-  
-  // Description:
-  // Return to normal rendering after rendering offscreen
-  virtual void ResumeNormalRendering();
-  
 protected:
   vtkKWRenderWidget();
   ~vtkKWRenderWidget();
@@ -290,6 +289,11 @@ protected:
 
   virtual void UpdateAccordingToUnits() {};
 
+  // Description:
+  // Setup memory rendering
+  virtual void SetupMemoryRendering(int width, int height, void *cd);
+  virtual void ResumeScreenRendering();
+  
   // Description:
   // Add/remove the observers.
   virtual void AddObservers();

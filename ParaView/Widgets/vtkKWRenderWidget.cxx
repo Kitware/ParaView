@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.65");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.66");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -520,6 +520,70 @@ const char* vtkKWRenderWidget::GetRenderModeAsString()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
+{
+  if (this->ParentWindow == window)
+    {
+    return;
+    }
+
+  // Remove old observers 
+  // (some of them may use the parent window, to display progress for example)
+
+  if (this->ParentWindow)
+    {
+    this->RemoveObservers();
+    }
+
+  this->ParentWindow = window;
+
+  // Reinstall observers
+
+  if (this->ParentWindow)
+    {
+    this->AddObservers();
+    }
+  
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetOffScreenRendering(int val)
+{
+  if (this->GetRenderWindow())
+    {
+    this->GetRenderWindow()->SetOffScreenRendering(val);
+    }
+  this->SetPrinting(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetPrinting(int arg)
+{
+  if (arg == this->Printing)
+    {
+    return;
+    }
+
+  this->Printing = arg;
+  this->Modified();
+
+  if (this->Printing)
+    {
+    this->PreviousRenderMode = this->GetRenderMode();
+    this->SetRenderModeToSingle();
+    }
+  else
+    {
+    this->SetRenderMode(this->PreviousRenderMode);
+
+    // SetupPrint will call SetupMemoryRendering().
+    // As convenience, let's call ResumeScreenRendering()
+    this->ResumeScreenRendering();
+    }
+}
+
+//----------------------------------------------------------------------------
 #ifdef _WIN32
 void vtkKWRenderWidget::SetupPrint(RECT &rcDest, HDC ghdc,
                                    int printerPageSizeX, int printerPageSizeY,
@@ -569,34 +633,6 @@ void vtkKWRenderWidget::SetupPrint(RECT &rcDest, HDC ghdc,
                              rcDest.top/scale*scaleY, ghdc);
 }
 #endif
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetParentWindow(vtkKWWindow *window)
-{
-  if (this->ParentWindow == window)
-    {
-    return;
-    }
-
-  // Remove old observers 
-  // (some of them may use the parent window, to display progress for example)
-
-  if (this->ParentWindow)
-    {
-    this->RemoveObservers();
-    }
-
-  this->ParentWindow = window;
-
-  // Reinstall observers
-
-  if (this->ParentWindow)
-    {
-    this->AddObservers();
-    }
-  
-  this->Modified();
-}
 
 //----------------------------------------------------------------------------
 void* vtkKWRenderWidget::GetMemoryDC()
@@ -1007,23 +1043,6 @@ void vtkKWRenderWidget::UpdateEnableState()
     {
     this->RemoveInteractionBindings();
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetupOffScreenRendering()
-{
-  this->PreviousRenderMode = this->GetRenderMode();
-  this->SetRenderModeToSingle();
-  this->SetPrinting(1);
-  this->GetRenderWindow()->SetOffScreenRendering(1);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::ResumeNormalRendering()
-{
-  this->SetPrinting(0);
-  this->GetRenderWindow()->SetOffScreenRendering(0);
-  this->SetRenderMode(this->PreviousRenderMode);
 }
 
 //----------------------------------------------------------------------------
