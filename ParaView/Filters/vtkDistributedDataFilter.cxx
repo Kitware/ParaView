@@ -23,6 +23,7 @@
 //
 // .SECTION See Also
 
+#include "vtkToolkits.h"
 #include "vtkDistributedDataFilter.h"
 #include "vtkExtractCells.h"
 #include "vtkMergeCells.h"
@@ -91,7 +92,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.11");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.12");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -540,7 +541,7 @@ void vtkDistributedDataFilter::Execute()
 
   if (mpiContr)
     {
-    finalGrid = this->MPIRedistribute(mpiContr, inputPlus);   // faster
+    finalGrid = this->MPIRedistribute(inputPlus);   // faster
     }
   else
     {
@@ -874,10 +875,7 @@ int vtkDistributedDataFilter::PairWiseDataExchange(int *yourSize,
   return 0;
 }
 
-#ifdef VTK_USE_MPI
-vtkUnstructuredGrid *vtkDistributedDataFilter::MPIRedistribute(
-  vtkMPIController *vtkNotUsed(mpiContr),
-  vtkDataSet *in)
+vtkUnstructuredGrid *vtkDistributedDataFilter::MPIRedistribute(vtkDataSet *in)
 {
   int proc;
   int me = this->MyId;
@@ -1096,7 +1094,6 @@ vtkUnstructuredGrid *vtkDistributedDataFilter::MPIRedistribute(
 
   return newGrid;
 }
-#endif
 
 char *vtkDistributedDataFilter::MarshallDataSet(vtkUnstructuredGrid *extractedGrid, int &len)
 {

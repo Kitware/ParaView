@@ -45,8 +45,6 @@
 
 #include <vtkDataSetToUnstructuredGridFilter.h>
 
-#include <vtkToolkits.h>    // for VTK_USE_MPI
-
 class vtkUnstructuredGrid;
 class vtkPKdTree;
 class vtkMultiProcessController;
@@ -56,10 +54,6 @@ class vtkIntArray;
 class vtkIdList;
 class vtkUnstructuredGrid;
 #include <map>
-
-#ifdef VTK_USE_MPI
-class vtkMPIController;
-#endif
 
 class VTK_EXPORT vtkDistributedDataFilter: public vtkDataSetToUnstructuredGridFilter
 {
@@ -210,10 +204,7 @@ private:
   vtkUnstructuredGrid *ExtractTwoGhostLevels(int proc, vtkDataSet *in);
   vtkUnstructuredGrid *ExtractOneGhostLevel( vtkIntArray *regions, vtkDataSet *in);
 
-#ifdef VTK_USE_MPI
-  vtkUnstructuredGrid *MPIRedistribute(vtkMPIController *mpiContr,
-                                       vtkDataSet *in);
-#endif
+  vtkUnstructuredGrid *MPIRedistribute(vtkDataSet *in);
   int PairWiseDataExchange(int *yourSize, char **yourData, int tag);
 
   char *MarshallDataSet(vtkUnstructuredGrid *extractedGrid, int &size);
