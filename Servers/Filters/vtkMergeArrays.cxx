@@ -20,7 +20,7 @@
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
 
-vtkCxxRevisionMacro(vtkMergeArrays, "1.4");
+vtkCxxRevisionMacro(vtkMergeArrays, "1.5");
 vtkStandardNewMacro(vtkMergeArrays);
 
 //----------------------------------------------------------------------------
@@ -220,7 +220,7 @@ void vtkMergeArrays::PrintSelf(ostream& os, vtkIndent indent)
       os << indent << "No Input\n";
       }
     } 
-  if( ( output = this->GetOutput() ) )
+  if( num && ( output = this->GetOutput() ) )
     {
     os << indent << "Output: (" << output << ")\n";
     }
