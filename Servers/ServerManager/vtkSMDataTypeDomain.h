@@ -12,10 +12,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMDataTypeDomain -
+// .NAME vtkSMDataTypeDomain - restricts the input proxies to one or more data types
 // .SECTION Description
+// vtkSMDataTypeDomain restricts the input proxies to one or more data types.
+// These data types are specified in the XML with the <DataType> element.
+// VTK class names are used. It is possible to specify a superclass
+// (i.e. vtkDataSet) for a more general domain. Works with vtkSMSourceProxy
+// only.
 // .SECTION See Also
-// vtkSMDomain 
+// vtkSMDomain  vtkSMSourceProxy
 
 #ifndef __vtkSMDataTypeDomain_h
 #define __vtkSMDataTypeDomain_h
@@ -46,9 +51,11 @@ public:
   int IsInDomain(vtkSMSourceProxy* proxy);
 
   // Description:
+  // Returns the number of acceptable data types.
   unsigned int GetNumberOfDataTypes();
 
   // Description:
+  // Returns a data type.
   const char* GetDataType(unsigned int idx);
 
 protected:

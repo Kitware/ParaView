@@ -12,10 +12,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMFieldDataDomain -
+// .NAME vtkSMFieldDataDomain - enumeration with point and cell data entries
 // .SECTION Description
+// vtkSMFieldDataDomain is a sub-class vtkSMEnumerationDomain that looks at 
+// the input in Update() and populates the entry list based on whether
+// there are valid arrays in point or cell data. At most it consists of two
+// entries: ("Point Data", vtkDataSet::POINT_DATA_FIELD) and 
+// ("Cell Data",  vtkDataSet::CELL_DATA_FIELD).
+// It requires Input (vtkSMProxyProperty) property.
 // .SECTION See Also
-// vtkSMDomain 
+// vtkSMEnumerationDomain vtkSMProxyProperty
 
 #ifndef __vtkSMFieldDataDomain_h
 #define __vtkSMFieldDataDomain_h
@@ -35,11 +41,16 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // Check the input and appropriate fields (point data or cell data)
+  // to the enumeration. This uses the Input property with a
+  // vtkSMInputArrayDomain.
   virtual void Update(vtkSMProperty* prop);
 
 protected:
   vtkSMFieldDataDomain();
   ~vtkSMFieldDataDomain();
+
+private:
 
   // Description:
   // Utility functions called by Update()
@@ -49,7 +60,6 @@ protected:
   void Update(vtkSMSourceProxy* sp, vtkSMInputArrayDomain* iad);
   void Update(vtkSMProxyProperty* pp, vtkSMSourceProxy* sp);
 
-private:
   vtkSMFieldDataDomain(const vtkSMFieldDataDomain&); // Not implemented
   void operator=(const vtkSMFieldDataDomain&); // Not implemented
 };

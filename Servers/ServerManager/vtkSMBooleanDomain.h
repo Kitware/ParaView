@@ -12,10 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMBooleanDomain -
+// .NAME vtkSMBooleanDomain - a domain with two values: true or false
 // .SECTION Description
+// vtkSMBooleanDomain does not really restrict the values of the property
+// that contains it. All integer values are valid. Rather, it is used to
+// specified that the property represents a true/false state. This domains
+// works with only vtkSMIntVectorProperty.
 // .SECTION See Also
-// vtkSMDomain 
+// vtkSMDomain vtkSMIntVectorProperty
 
 #ifndef __vtkSMBooleanDomain_h
 #define __vtkSMBooleanDomain_h

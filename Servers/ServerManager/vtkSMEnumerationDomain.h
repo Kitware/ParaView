@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMEnumerationDomain -
+// .NAME vtkSMEnumerationDomain - list of integers with associated strings
 // .SECTION Description
+// vtkSMEnumerationDomain represents an enumeration of integer values
+// with associated descriptive strings.
 // .SECTION See Also
 // vtkSMDomain 
 
@@ -46,18 +48,23 @@ public:
   int IsInDomain(int val, unsigned int& idx);
 
   // Description:
+  // Returns the number of entries in the enumeration.
   unsigned int GetNumberOfEntries();
 
   // Description:
+  // Returns the integer value of an enumeration entry.
   int GetEntryValue(unsigned int idx);
 
   // Description:
+  // Returns the descriptive string of an enumeration entry.
   const char* GetEntryText(unsigned int idx);
 
   // Description:
+  // Add a new enumeration entry. text cannot be null.
   void AddEntry(const char* text, int value);
 
   // Description:
+  // Clear all entries.
   void RemoveAllEntries();
 
 protected:

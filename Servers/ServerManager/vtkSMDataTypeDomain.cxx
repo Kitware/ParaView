@@ -27,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMDataTypeDomain);
-vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMDataTypeDomain, "1.3");
 
 struct vtkSMDataTypeDomainInternals
 {
@@ -117,6 +117,9 @@ int vtkSMDataTypeDomain::IsInDomain(vtkSMSourceProxy* proxy)
     return 0;
     }
 
+  // Get an actual instance of the same type as the data represented
+  // by the information object. This is later used to check match
+  // with IsA. See the vtkProcessModule for more information.
   vtkDataObject* dobj = pm->GetDataObjectOfType(info->GetDataClassName());
   if (!dobj)
     {

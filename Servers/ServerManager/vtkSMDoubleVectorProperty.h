@@ -15,7 +15,7 @@
 // .NAME vtkSMDoubleVectorProperty - property representing a vector of doubles
 // .SECTION Description
 // vtkSMDoubleVectorProperty is a concrete sub-class of vtkSMVectorProperty
-// representing a vector of double.
+// representing a vector of doubles.
 // .SECTION See Also
 // vtkSMVectorProperty vtkSMIntVectorProperty vtkSMStringVectorProperty
 

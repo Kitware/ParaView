@@ -15,7 +15,7 @@
 // .NAME vtkSMIdTypeVectorProperty - property representing a vector of integers
 // .SECTION Description
 // vtkSMIdTypeVectorProperty is a concrete sub-class of vtkSMVectorProperty
-// representing a vector of integers.
+// representing a vector of integers (vtkIdType, possibly 64 bit).
 // .SECTION See Also
 // vtkSMVectorProperty vtkSMDoubleVectorProperty vtkSMStringVectorProperty
 

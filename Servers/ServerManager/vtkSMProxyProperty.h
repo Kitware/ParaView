@@ -120,14 +120,17 @@ protected:
   virtual void SaveState(const char* name,  ofstream* file, vtkIndent indent);
 
   // Previous proxies are used by the ProxyProperty internally.
-  // 
+  // All proxies added with AddProxy() will become "consumers" of
+  // the proxy passed to AppendCommandToStream().
+  // Proxies that were added previous but that are no longer in the list
+  // (removed) are no longer consumers of the proxy therefore RemoveProxy
+  // is called on them. This requires keeping track of previous proxies.
   // Description:
   void AddPreviousProxy(vtkSMProxy* proxy);
-
-  // Description:
   void RemoveAllPreviousProxies();
 
   // Description:
+  // Given a proxy, remove all previous proxies from it's consumer list.
   void RemoveConsumers(vtkSMProxy* proxy);
 
   vtkSMProxyPropertyInternals* PPInternals;

@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -46,6 +46,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
   vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(prop);
   if (ivp)
     {
+    // Use the larger of the number of checked and unchecked elements
     int numElems   = ivp->GetNumberOfElements();
     int numUnElems = ivp->GetNumberOfUncheckedElements();
     if ( numElems > numUnElems )
@@ -60,6 +61,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
 
   this->RemoveAllMinima();
   this->RemoveAllMaxima();
+  // This creates numMinMax entries but leaves them unset (no min or max)
   this->SetNumberOfEntries(numMinMax);
 
   vtkSMProxyProperty* ip = 0;
@@ -72,6 +74,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
     ip = pp;
     }
 
+  // Get the array name for the array selection
   vtkSMStringVectorProperty* sp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetRequiredProperty("ArraySelection"));
   if (sp)
@@ -94,6 +97,7 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
   unsigned int numProxs = ip->GetNumberOfUncheckedProxies();
   for (i=0; i<numProxs; i++)
     {
+    // Use the first input
     vtkSMSourceProxy* source = 
       vtkSMSourceProxy::SafeDownCast(ip->GetUncheckedProxy(i));
     if (source)
@@ -129,6 +133,8 @@ void vtkSMArrayRangeDomain::Update(const char* arrayName,
   di->Begin();
   while (!di->IsAtEnd())
     {
+    // We have to figure out whether we are working with cell data,
+    // point data or both.
     vtkSMInputArrayDomain* iad = vtkSMInputArrayDomain::SafeDownCast(
       di->GetDomain());
     if (iad)
