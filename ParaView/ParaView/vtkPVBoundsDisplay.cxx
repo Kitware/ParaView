@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.9.2.1");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.9.2.2");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
@@ -106,6 +106,7 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
                this->Widget->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVBoundsDisplay::SetLabel(const char* label)
 {
   this->SetFrameLabel(label);
@@ -115,6 +116,7 @@ void vtkPVBoundsDisplay::SetLabel(const char* label)
     }
 }
 
+//----------------------------------------------------------------------------
 const char* vtkPVBoundsDisplay::GetLabel()
 {
   return this->GetFrameLabel();
@@ -124,6 +126,8 @@ const char* vtkPVBoundsDisplay::GetLabel()
 //----------------------------------------------------------------------------
 void vtkPVBoundsDisplay::Update()
 {
+  this->Superclass::Update();
+
   vtkPVData *input;
   float bds[6];
 
@@ -156,6 +160,7 @@ void vtkPVBoundsDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Widget: " << this->GetWidget();
 }
 
+//----------------------------------------------------------------------------
 vtkPVBoundsDisplay* vtkPVBoundsDisplay::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -163,6 +168,7 @@ vtkPVBoundsDisplay* vtkPVBoundsDisplay::ClonePrototype(vtkPVSource* pvSource,
   return vtkPVBoundsDisplay::SafeDownCast(clone);
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidget* vtkPVBoundsDisplay::ClonePrototypeInternal(vtkPVSource* pvSource,
                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -207,9 +213,10 @@ vtkPVWidget* vtkPVBoundsDisplay::ClonePrototypeInternal(vtkPVSource* pvSource,
   return pvWidget;
 }
 
-void vtkPVBoundsDisplay::CopyProperties(vtkPVWidget* clone, 
-                                        vtkPVSource* pvSource,
-                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+//----------------------------------------------------------------------------
+void vtkPVBoundsDisplay::CopyProperties(
+  vtkPVWidget* clone, vtkPVSource* pvSource,
+  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVBoundsDisplay* pvbd = vtkPVBoundsDisplay::SafeDownCast(clone);
