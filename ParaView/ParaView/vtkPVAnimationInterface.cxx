@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.105");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.106");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1190,7 +1190,6 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   saveDialog->SaveDialogOn();
   saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Images");
-  saveDialog->SetDefaultExtension(".jpg");
   saveDialog->SetFileTypes("{{jpeg} {.jpg}} {{tiff} {.tif}} {{Portable Network Graphics} {.png}}");
 
   if ( saveDialog->Invoke() &&
@@ -1329,7 +1328,6 @@ void vtkPVAnimationInterface::SaveGeometryCallback()
   saveDialog->SaveDialogOn();
   saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Geometry");
-  saveDialog->SetDefaultExtension(".pvd");
   saveDialog->SetFileTypes("{{ParaView Data Files} {.pvd}}");
   if(saveDialog->Invoke() && (strlen(saveDialog->GetFileName()) > 0))
     {

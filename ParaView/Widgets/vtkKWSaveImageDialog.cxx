@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.22");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.23");
 
 int vtkKWSaveImageDialogCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -43,7 +43,6 @@ int vtkKWSaveImageDialog::Invoke()
                      "{{PNG Images} {.png}} "
                      "{{Binary PPM} {.ppm}} "
                      "{{TIFF Images} {.tif}}");
-  this->SetDefaultExtension(".bmp");
 
   int done = 0;
   while (!done)
