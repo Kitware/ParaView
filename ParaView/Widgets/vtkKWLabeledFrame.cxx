@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.29");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.30");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -248,7 +248,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
   this->LabelFrame->Create(app, "");
 
   this->Label->SetParent(this->LabelFrame);
-  this->Label->Create(app, "-bd 0 -pady 0 -padx 2");
+  this->Label->Create(app, "-bd 0");
 
   this->Script("%s config -bd 1 -pady 0 -padx 0", 
                this->GetLabel()->GetWidgetName());
@@ -279,8 +279,9 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
   this->Script("pack %s -fill x -side top", this->Border2->GetWidgetName());
   this->Script("pack %s -padx 2 -pady 2 -fill both -expand yes",
                this->Frame->GetWidgetName());
-  this->Script("pack %s -anchor nw -side left -fill both -expand y",
-               this->Label->GetWidgetName());
+  this->Script(
+    "pack %s -anchor nw -side left -fill both -expand y -padx 2 -pady 0",
+    this->Label->GetWidgetName());
   this->Script("place %s -relx 0 -x 5 -y 0 -anchor nw",
                this->LabelFrame->GetWidgetName());
 
