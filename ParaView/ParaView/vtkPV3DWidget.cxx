@@ -90,16 +90,20 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->Visibility   = vtkKWCheckButton::New();
   this->Frame        = vtkKWFrame::New();
   this->ValueChanged = 0;
+  this->Widget3D = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPV3DWidget::~vtkPV3DWidget()
 {
-  if (this->Widget3D->GetEnabled())
+  if ( this->Widget3D )
     {
-    this->Widget3D->EnabledOff();
+    if (this->Widget3D->GetEnabled())
+      {
+      this->Widget3D->EnabledOff();
+      }
+    this->Widget3D->Delete();
     }
-  this->Widget3D->Delete();
   this->Observer->Delete();
   this->Visibility->Delete();
   this->LabeledFrame->Delete();
@@ -128,7 +132,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->Create(pvApp);
-  this->LabeledFrame->SetLabel("Line Widget");
+  this->LabeledFrame->SetLabel("3D Widget");
 
   this->Script("pack %s -fill both -expand 1", 
 	       this->LabeledFrame->GetWidgetName());
@@ -185,4 +189,20 @@ void vtkPV3DWidget::SetVisibility()
 {
   int visibility = this->Visibility->GetState();
   this->Widget3D->SetEnabled(visibility);
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::SetFrameLabel(const char* label)
+{
+  if ( this->LabeledFrame )
+    {
+    this->LabeledFrame->SetLabel(label);
+    } 
+}
+
+//----------------------------------------------------------------------------
+int vtkPV3DWidget::ReadXMLAttributes(vtkPVXMLElement*,
+				     vtkPVXMLPackageParser*)
+{
+  return 1;
 }

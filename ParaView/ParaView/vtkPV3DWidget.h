@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPV3DWidget_h
 #define __vtkPV3DWidget_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
 
 class vtkKWCheckButton;
 class vtkKWLabeledFrame;
@@ -59,10 +59,10 @@ class vtk3DWidget;
 class vtkPV3DWidgetObserver;
 class vtkKWFrame;
 
-class VTK_EXPORT vtkPV3DWidget : public vtkPVWidget
+class VTK_EXPORT vtkPV3DWidget : public vtkPVObjectWidget
 {
 public:
-  vtkTypeMacro(vtkPV3DWidget, vtkPVWidget);
+  vtkTypeMacro(vtkPV3DWidget, vtkPVObjectWidget);
 
   void Create(vtkKWApplication *pvApp);
   
@@ -94,6 +94,10 @@ protected:
   vtkPV3DWidgetObserver* Observer;
 
   // Description:
+  // Set label of the frame
+  void SetFrameLabel(const char* label);
+
+  // Description:
   // Call creation on the child.
   virtual void ChildCreate(vtkPVApplication*) = 0;
 
@@ -113,7 +117,7 @@ protected:
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*) = 0;
   
   virtual int ReadXMLAttributes(vtkPVXMLElement* element,
-				vtkPVXMLPackageParser* parser) = 0;
+				vtkPVXMLPackageParser* parser);
 
   vtkKWFrame*        Frame;
   vtkKWLabeledFrame* LabeledFrame;
