@@ -66,37 +66,7 @@ IF(PARAVIEW_SOURCE_DIR)
   INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkClientServer)
 ENDIF(PARAVIEW_SOURCE_DIR)
 
-# Macro to create ClientServer wrappers classes in a single VTK kit.
-MACRO(PV_WRAP_VTK_CS kit ukit deps)
-  SET(vtk${kit}CS_HEADERS)
-  INCLUDE(${VTK_KITS_DIR}/vtk${kit}Kit.cmake)
-  FOREACH(class ${VTK_${ukit}_CLASSES})
-    SET(full_name "${VTK_${ukit}_HEADER_DIR}/${class}.h")
-    IF("${class}" MATCHES "^(\\/|.\\/|.\\\\|.:\\/|.:\\\\)")
-      # handle full paths
-      SET(full_name "${class}.h")
-    ENDIF("${class}" MATCHES "^(\\/|.\\/|.\\\\|.:\\/|.:\\\\)")
-    IF(NOT VTK_CLASS_WRAP_EXCLUDE_${class})
-      IF(VTK_CLASS_ABSTRACT_${class})
-        SET_SOURCE_FILES_PROPERTIES(${full_name}
-          PROPERTIES ABSTRACT 1)
-      ENDIF(VTK_CLASS_ABSTRACT_${class})
-        SET(vtk${kit}CS_HEADERS ${vtk${kit}CS_HEADERS}
-          ${full_name})
-    ENDIF(NOT VTK_CLASS_WRAP_EXCLUDE_${class})
-  ENDFOREACH(class)
-  VTK_WRAP_ClientServer(vtk${kit}CS vtk${kit}CS_SRCS ${vtk${kit}CS_HEADERS})
-  ADD_LIBRARY(vtk${kit}CS ${vtk${kit}CS_SRCS})
-  TARGET_LINK_LIBRARIES(vtk${kit}CS vtkClientServer vtk${kit})
-  FOREACH(dep ${deps})
-    TARGET_LINK_LIBRARIES(vtk${kit}CS vtk${dep}CS)
-  ENDFOREACH(dep)
-  IF(PARAVIEW_SOURCE_DIR)
-    IF(BUILD_SHARED_LIBS)
-      INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtk${kit}CS)
-    ENDIF(BUILD_SHARED_LIBS)
-  ENDIF(PARAVIEW_SOURCE_DIR)
-ENDMACRO(PV_WRAP_VTK_CS)
+INCLUDE(${VTKCS_SOURCE_DIR}/vtkClientServer.cmake)
 
 # Build the vtkClientServer wrapping utility first.
 SUBDIRS(Wrapping)
