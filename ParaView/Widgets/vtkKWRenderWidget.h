@@ -149,21 +149,23 @@ public:
   // Description:
   // Get and control the corner annotation.
   virtual void SetCornerAnnotationVisibility(int v);
-  virtual void SetCornerTextColor(float r, float g, float b);
-  virtual void SetCornerTextColor(float *rgb)
-    { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); };
+  virtual int  GetCornerAnnotationVisibility();
+  virtual void SetCornerAnnotationColor(float r, float g, float b);
+  virtual void SetCornerAnnotationColor(float *rgb)
+    { this->SetCornerAnnotationColor(rgb[0], rgb[1], rgb[2]); };
+  virtual float* GetCornerAnnotationColor();
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
 
   // Description:
   // Get and control the header annotation.
   virtual void SetHeaderAnnotationVisibility(int v);
   virtual int  GetHeaderAnnotationVisibility();
-  virtual void SetHeaderTextColor(float r, float g, float b);
-  virtual void SetHeaderTextColor(float *rgb)
-    { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); };
-  virtual float* GetHeaderTextColor();
-  virtual void SetHeaderText(const char*);
-  virtual char* GetHeaderText();
+  virtual void SetHeaderAnnotationColor(float r, float g, float b);
+  virtual void SetHeaderAnnotationColor(float *rgb)
+    { this->SetHeaderAnnotationColor(rgb[0], rgb[1], rgb[2]); };
+  virtual float* GetHeaderAnnotationColor();
+  virtual void SetHeaderAnnotationText(const char*);
+  virtual char* GetHeaderAnnotationText();
   
   // Description:
   // Set/Get the units that pixel sizes are measured in

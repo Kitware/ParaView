@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.26");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.27");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -117,11 +117,13 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->HeaderProp = vtkTextActor::New();
   this->HeaderProp->GetTextProperty()->SetJustificationToCentered();
   this->HeaderProp->GetTextProperty()->SetVerticalJustificationToTop();
-  this->HeaderProp->GetTextProperty()->SetFontSize(15);
   this->HeaderProp->GetTextProperty()->ShadowOff();
   this->HeaderProp->ScaledTextOn();
-  this->HeaderProp->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
+  this->HeaderProp->GetPositionCoordinate()
+    ->SetCoordinateSystemToNormalizedViewport();
   this->HeaderProp->GetPositionCoordinate()->SetValue(0.2, 0.88);
+  this->HeaderProp->GetPosition2Coordinate()
+    ->SetCoordinateSystemToNormalizedViewport();
   this->HeaderProp->GetPosition2Coordinate()->SetValue(0.6, 0.1);
   
   this->Units = NULL;
@@ -619,40 +621,44 @@ void vtkKWRenderWidget::Close()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWRenderWidget::GetCornerAnnotationVisibility()
+{
+  return (this->CornerAnnotation &&
+          this->HasProp(this->CornerAnnotation) && 
+          this->CornerAnnotation->GetVisibility());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetCornerAnnotationVisibility(int v)
 {
+  if (!this->CornerAnnotation ||
+      this->GetCornerAnnotationVisibility() == v)
+    {
+    return;
+    }
+
   if (v)
     {
-    if (this->CornerAnnotation->GetVisibility() &&
-        this->HasProp(this->CornerAnnotation))
-      {
-      return;
-      }
     this->CornerAnnotation->VisibilityOn();
     if (!this->HasProp(this->CornerAnnotation))
       {
       this->AddProp(this->CornerAnnotation);
       }
-    this->Render();
     }
   else
     {
-    if (!this->CornerAnnotation->GetVisibility() ||
-        !this->HasProp(this->CornerAnnotation))
-      {
-      return;
-      }
     this->CornerAnnotation->VisibilityOff();
     if (this->HasProp(this->CornerAnnotation))
       {
       this->RemoveProp(this->CornerAnnotation);
       }
-    this->Render();
     }
+
+  this->Render();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
+void vtkKWRenderWidget::SetCornerAnnotationColor(float r, float g, float b)
 {
   if (this->CornerAnnotation && this->CornerAnnotation->GetTextProperty())
     {
@@ -666,9 +672,34 @@ void vtkKWRenderWidget::SetCornerTextColor(float r, float g, float b)
 }
 
 //----------------------------------------------------------------------------
+float* vtkKWRenderWidget::GetCornerAnnotationColor()
+{
+  if (!this->CornerAnnotation ||
+      !this->CornerAnnotation->GetTextProperty())
+    {
+    return 0;
+    }
+  float *color = this->CornerAnnotation->GetTextProperty()->GetColor();
+  if (color[0] < 0 || color[1] < 0 || color[2] < 0)
+    {
+    color = this->CornerAnnotation->GetProperty()->GetColor();
+    }
+  return color;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWRenderWidget::GetHeaderAnnotationVisibility()
+{
+  return (this->HeaderProp && 
+          this->HasProp(this->HeaderProp) && 
+          this->HeaderProp->GetVisibility());
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 {
-  if (this->GetHeaderAnnotationVisibility() == v)
+  if (!this->HeaderProp || 
+      this->GetHeaderAnnotationVisibility() == v)
     {
     return;
     }
@@ -694,26 +725,29 @@ void vtkKWRenderWidget::SetHeaderAnnotationVisibility(int v)
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRenderWidget::GetHeaderAnnotationVisibility()
+void vtkKWRenderWidget::SetHeaderAnnotationColor(float r, float g, float b)
 {
-  return (this->HasProp(this->HeaderProp) && this->HeaderProp->GetVisibility());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetHeaderTextColor(float r, float g, float b)
-{
-  this->HeaderProp->GetTextProperty()->SetColor(r, g, b);
-  if (this->GetHeaderAnnotationVisibility())
+  if (this->HeaderProp && this->HeaderProp->GetTextProperty())
     {
-    this->Render();
+    float *rgb = this->HeaderProp->GetTextProperty()->GetColor();
+    if (rgb[0] != r || rgb[1] != g || rgb[2] != b)
+      {
+      this->HeaderProp->GetTextProperty()->SetColor(r, g, b);
+      this->Render();
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-float* vtkKWRenderWidget::GetHeaderTextColor()
+float* vtkKWRenderWidget::GetHeaderAnnotationColor()
 {
+  if (!this->HeaderProp ||
+      !this->HeaderProp->GetTextProperty())
+    {
+    return 0;
+    }
   float *color = this->HeaderProp->GetTextProperty()->GetColor();
-  if (color[0] == -1 && color[1] == -1 && color[2] == -1)
+  if (color[0] < 0 || color[1] < 0 || color[2] < 0)
     {
     color = this->HeaderProp->GetProperty()->GetColor();
     }
@@ -721,19 +755,26 @@ float* vtkKWRenderWidget::GetHeaderTextColor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetHeaderText(const char *text)
+void vtkKWRenderWidget::SetHeaderAnnotationText(const char *text)
 {
-  this->HeaderProp->SetInput(text);
-  if (this->GetHeaderAnnotationVisibility())
+  if (this->HeaderProp)
     {
-    this->Render();
+    this->HeaderProp->SetInput(text);
+    if (this->GetHeaderAnnotationVisibility())
+      {
+      this->Render();
+      }
     }
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWRenderWidget::GetHeaderText()
+char* vtkKWRenderWidget::GetHeaderAnnotationText()
 {
-  return this->HeaderProp->GetInput();
+  if (this->HeaderProp)
+    {
+    return this->HeaderProp->GetInput();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
