@@ -1178,6 +1178,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetScaleFactor");
   mInt->SetGetCommand("GetScaleFactor");
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the size of the axes");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1186,9 +1187,10 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Origin");
   mInt->SetSetCommand("SetOrigin");
   mInt->SetGetCommand("GetOrigin");
-  mInt->AddFloatArgument();  
-  mInt->AddFloatArgument();  
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the x, y, z coordinates of the origin of the axes");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1198,6 +1200,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetSymmetric");
   mInt->SetGetCommand("GetSymmetric");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to display the negative axes");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1218,7 +1221,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Text");
   mInt->SetSetCommand("SetText");
   mInt->SetGetCommand("GetText");
-  mInt->AddStringArgument();  
+  mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Enter the text to display");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1279,6 +1283,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetFirstValue");
   mInt->SetGetCommand("GetFirstValue");
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the contour value");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1288,6 +1293,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetComputeNormals");
   mInt->SetGetCommand("GetComputeNormals");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to compute normals");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1297,6 +1303,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetComputeGradients");
   mInt->SetGetCommand("GetComputeGradients");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to compute gradients");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1306,6 +1313,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetComputeScalars");
   mInt->SetGetCommand("GetComputeScalars");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to compute scalars");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1330,6 +1338,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the x, y, z coordinates of the origin of the plane");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1341,6 +1350,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the normal vector to the plane");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1350,6 +1360,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetGenerateCutScalars");
   mInt->SetGetCommand("GetGenerateCutScalars");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to generate scalars from the implicit function values or from the input scalar data");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1372,6 +1383,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetMaterialArrayName");
   mInt->SetGetCommand("GetMaterialArrayName");
   mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Enter the array name of the cell array containing the material values");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1381,6 +1393,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetMaterial");
   mInt->SetGetCommand("GetMaterial");
   mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the value of the material to probe");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1390,6 +1403,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetArrayName");
   mInt->SetGetCommand("GetArrayName");
   mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Set the array name of the array to cut");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1401,6 +1415,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Specify the normal vector of the plane to cut by");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1427,6 +1442,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the origin of the clipping plane");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1438,6 +1454,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the normal of the clipping plane");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1447,6 +1464,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetValue");
   mInt->SetGetCommand("GetValue");
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the clipping value of the implicit plane");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1456,6 +1474,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetInsideOut");
   mInt->SetGetCommand("GetInsideOut");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select which \"side\" of the data set to clip away");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1465,6 +1484,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetGenerateClipScalars");
   mInt->SetGetCommand("GetGenerateClipScalars");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("If this flag is enabled, then the output scalar values will be interpolated from the implicit function values, and not the input scalar data");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1488,6 +1508,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetValue");
   mInt->SetGetCommand("GetValue");
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the scalar value to clip by");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1497,6 +1518,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetInsideOut");
   mInt->SetGetCommand("GetInsideOut");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select which \"side\" of the data set to clip away");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1519,6 +1541,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetShrinkFactor");
   mInt->SetGetCommand("GetShrinkFactor");
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the amount to shrink by");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1541,6 +1564,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetNumberOfStreamDivisions");
   mInt->SetGetCommand("GetNumberOfStreamDivisions");
   mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the number of pieces to divide the data set into for streaming");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1578,6 +1602,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddFloatArgument();  
   mInt->AddFloatArgument();  
   mInt->AddFloatArgument();  
+  mInt->SetBalloonHelp("Set the spacing of the bins in each dimension");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1587,6 +1612,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetUseInputPoints");
   mInt->SetGetCommand("GetUseInputPoints");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to use points from the input in the output or to calculate optimum representative points for each bin");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1596,6 +1622,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetUseFeatureEdges");
   mInt->SetGetCommand("GetUseFeatureEdges");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to use feature edge quadrics to match up the boundaries between pieces");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1605,6 +1632,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetUseFeaturePoints");
   mInt->SetGetCommand("GetUseFeaturePoints");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to use feature point quadrics to align piece boundaries");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1627,6 +1655,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetNumberOfSides");
   mInt->SetGetCommand("GetNumberOfSides");
   mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the number of sides for the tube");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1636,6 +1665,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetCapping");
   mInt->SetGetCommand("GetCapping");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to draw endcaps on the tube");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;  
@@ -1645,6 +1675,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetRadius");
   mInt->SetGetCommand("GetRadius");
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the radius of the tube");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1657,6 +1688,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddSelectionEntry(0, "Off");
   mInt->AddSelectionEntry(1, "ByScalar");
   mInt->AddSelectionEntry(2, "ByVector");
+  mInt->SetBalloonHelp("Select whether/how to vary the radius of the tube");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;  
@@ -1666,6 +1698,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetRadiusFactor");
   mInt->SetGetCommand("GetRadiusFactor");
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the maximum tube radius in terms of a multiple of the minimum radius");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1688,6 +1721,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetCapping");
   mInt->SetGetCommand("GetCapping");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to draw endcaps");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1697,6 +1731,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetScaleFactor");
   mInt->SetGetCommand("GetScaleFactor");
   mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the extrusion scale factor");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1707,7 +1742,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetVector");
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the direction for the extrusion");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1730,6 +1766,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetCreateGhostCells");
   mInt->SetGetCommand("GetCreateGhostCells");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to generate ghost cells");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1753,6 +1790,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetCreateGhostCells");
   mInt->SetGetCommand("GetCreateGhostCells");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to generate ghost cells");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1782,6 +1820,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the min/max values of the volume of interest (VOI)");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1793,6 +1832,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the sampling rate for each dimension");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1802,6 +1842,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetIncludeBoundary");
   mInt->SetGetCommand("GetIncludeBoundary");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to always include the boundary of the grid in the output");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1832,6 +1873,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the min/max extents of the grid");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1857,6 +1899,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetRandomMode");
   mInt->SetGetCommand("GetRandomMode");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Select whether to use random colors for the various pieces");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1881,6 +1924,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();  
+  mInt->SetBalloonHelp("Set the minimum point for the elevation");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1891,7 +1935,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetHighPoint");
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the maximum point for the elevation");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1901,7 +1946,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetScalarRange");
   mInt->SetGetCommand("GetScalarRange");
   mInt->AddFloatArgument();
-  mInt->AddFloatArgument(); 
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the range of scalar values to generate");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1937,6 +1983,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetWidgetTypeToSelection();
   mInt->AddSelectionEntry(0, "Scalars");
   mInt->AddSelectionEntry(1, "Vectors");
+  mInt->SetBalloonHelp("Select whether the array contains scalars or vectors");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1945,7 +1992,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Field Name");
   mInt->SetSetCommand("SetFieldName");
   mInt->SetGetCommand("GetFieldName");
-  mInt->AddStringArgument();  
+  mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Set the name of the array containing the data to operate on");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1970,6 +2018,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetFileName");
   mInt->SetWidgetTypeToFile();
   mInt->SetFileExtension("pop");
+  mInt->SetBalloonHelp("Select the file for the data set");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1978,16 +2027,15 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Radius");
   mInt->SetSetCommand("SetRadius");
   mInt->SetGetCommand("GetRadius");
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the radius of the data set");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
-  mInt = NULL;
-  
+  mInt = NULL;  
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
   sInt = NULL;
-
 }
 
 

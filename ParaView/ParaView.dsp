@@ -808,10 +808,6 @@ InputName=vtkKWCenterOfRotation
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkKWFlyButton.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkKWFlyInteractor.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -852,10 +848,6 @@ InputName=vtkKWInteractor
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkKWPickCenterButton.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkKWRenderView.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -873,10 +865,6 @@ InputName=vtkKWRenderView
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkKWResetViewButton.h
 # End Source File
 # Begin Source File
 
@@ -900,10 +888,6 @@ InputName=vtkKWRotateCameraInteractor
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkKWRotateViewButton.h
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkKWTranslateCameraInteractor.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -921,10 +905,6 @@ InputName=vtkKWTranslateCameraInteractor
 
 !ENDIF 
 
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkKWTranslateViewButton.h
 # End Source File
 # Begin Source File
 
