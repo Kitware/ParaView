@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.54");
+vtkCxxRevisionMacro(vtkKWWidget, "1.55");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -329,7 +329,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.54 $");
+  this->ExtractRevision(os,"$Revision: 1.55 $");
 }
 
 //------------------------------------------------------------------------------
@@ -450,26 +450,11 @@ void vtkKWWidget::SetEnabled(int e)
 //------------------------------------------------------------------------------
 void vtkKWWidget::UpdateEnableState()
 {
-  if (this->IsCreated())
+  if (this->IsAlive() && this->HasConfigurationOption("-state"))
     {
-    const char* type = this->GetType();
-    if (type && type[0] &&
-        !vtkString::Equals(type, "Frame") && 
-        !vtkString::Equals(type, "Menu")  && 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 3)
-        !vtkString::Equals(type, "Label")  &&
-#endif 
-        !vtkString::Equals(type, "Canvas") && 
-        !vtkString::Equals(type, "Scrollbar") && 
-        !vtkString::Equals(type, "Listbox") && 
-        !vtkString::Equals(type, "Toplevel") &&
-        !vtkString::Equals(type, "Tree") &&
-        !vtkString::Equals(type, "None"))
-      {
-      this->Script("%s configure -state %s", 
-                   this->GetWidgetName(), 
-                   (this->Enabled ? "normal" : "disabled"));
-      }
+    this->Script("%s configure -state %s", 
+                 this->GetWidgetName(), 
+                 (this->Enabled ? "normal" : "disabled"));
     }
 }
 
@@ -506,9 +491,10 @@ void vtkKWWidget::GetBackgroundColor(float *r, float *g, float *b)
 //------------------------------------------------------------------------------
 int vtkKWWidget::HasConfigurationOption(const char* option)
 {
-  return !this->Application->EvaluateBooleanExpression(
-    "catch {%s cget %s}",
-    this->GetWidgetName(), option);
+  return (this->Application && 
+          !this->Application->EvaluateBooleanExpression(
+            "catch {%s cget %s}",
+            this->GetWidgetName(), option));
 }
 
 //------------------------------------------------------------------------------
