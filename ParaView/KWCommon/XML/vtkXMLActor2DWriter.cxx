@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLProperty2DWriter.h"
 
 vtkStandardNewMacro(vtkXMLActor2DWriter);
-vtkCxxRevisionMacro(vtkXMLActor2DWriter, "1.4");
+vtkCxxRevisionMacro(vtkXMLActor2DWriter, "1.5");
 
 //----------------------------------------------------------------------------
 char* vtkXMLActor2DWriter::GetRootElementName()
@@ -54,12 +54,6 @@ char* vtkXMLActor2DWriter::GetRootElementName()
 char* vtkXMLActor2DWriter::GetPropertyElementName()
 {
   return "Property";
-}
-
-//----------------------------------------------------------------------------
-vtkXMLActor2DWriter::vtkXMLActor2DWriter()
-{
-  this->DoNotOutputPosition = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -79,25 +73,22 @@ int vtkXMLActor2DWriter::AddAttributes(vtkXMLDataElement *elem)
 
   elem->SetIntAttribute("LayerNumber", obj->GetLayerNumber());
 
-  if (!this->DoNotOutputPosition)
+  vtkCoordinate *coord = obj->GetPositionCoordinate();
+  if (coord)
     {
-    vtkCoordinate *coord = obj->GetPositionCoordinate();
-    if (coord)
-      {
-      int sys = coord->GetCoordinateSystem();
-      coord->SetCoordinateSystemToNormalizedViewport();
-      elem->SetVectorAttribute("Position", 2, coord->GetValue());
-      coord->SetCoordinateSystem(sys);
-      }
+    int sys = coord->GetCoordinateSystem();
+    coord->SetCoordinateSystemToNormalizedViewport();
+    elem->SetVectorAttribute("Position", 2, coord->GetValue());
+    coord->SetCoordinateSystem(sys);
+    }
 
-    coord = obj->GetPosition2Coordinate();
-    if (coord)
-      {
-      int sys = coord->GetCoordinateSystem();
-      coord->SetCoordinateSystemToNormalizedViewport();
-      elem->SetVectorAttribute("Position2", 2, coord->GetValue());
-      coord->SetCoordinateSystem(sys);
-      }
+  coord = obj->GetPosition2Coordinate();
+  if (coord)
+    {
+    int sys = coord->GetCoordinateSystem();
+    coord->SetCoordinateSystemToNormalizedViewport();
+    elem->SetVectorAttribute("Position2", 2, coord->GetValue());
+    coord->SetCoordinateSystem(sys);
     }
 
   return 1;
@@ -130,13 +121,4 @@ int vtkXMLActor2DWriter::AddNestedElements(vtkXMLDataElement *elem)
     }
  
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkXMLActor2DWriter::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-
-  os << indent << "DoNotOutputPosition: "
-     << (this->DoNotOutputPosition ? "On" : "Off") << endl;
 }

@@ -50,7 +50,6 @@ class VTK_EXPORT vtkXMLActor2DWriter : public vtkXMLPropWriter
 public:
   static vtkXMLActor2DWriter* New();
   vtkTypeRevisionMacro(vtkXMLActor2DWriter,vtkXMLPropWriter);
-  void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
   // Return the name of the root element of the XML tree this writer
@@ -62,18 +61,10 @@ public:
   // store a property.
   static char* GetPropertyElementName();
 
-  // Description:
-  // Do not output the actor position (default: no).
-  vtkSetClampMacro(DoNotOutputPosition, int, 0, 1);
-  vtkBooleanMacro(DoNotOutputPosition,int);
-  vtkGetMacro(DoNotOutputPosition, int);
-
 protected:
-  vtkXMLActor2DWriter();
+  vtkXMLActor2DWriter() {};
   ~vtkXMLActor2DWriter() {};  
   
-  int DoNotOutputPosition;
-
   // Description:
   // Add the root element attributes.
   // Return 1 on success, 0 otherwise.
