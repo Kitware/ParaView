@@ -20,15 +20,15 @@
 #ifndef __vtkM2NCollect_h
 #define __vtkM2NCollect_h
 
-#include "vtkPolyDataToPolyDataFilter.h"
+#include "vtkCollectPolyData.h"
 class vtkMPIMToNSocketConnection;
 
 
-class VTK_EXPORT vtkM2NCollect : public vtkPolyDataToPolyDataFilter
+class VTK_EXPORT vtkM2NCollect : public vtkCollectPolyData
 {
 public:
   static vtkM2NCollect *New();
-  vtkTypeRevisionMacro(vtkM2NCollect, vtkPolyDataToPolyDataFilter);
+  vtkTypeRevisionMacro(vtkM2NCollect, vtkCollectPolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   
@@ -37,9 +37,9 @@ protected:
   ~vtkM2NCollect();
 
   // Data generation method
-  void ComputeInputUpdateExtents(vtkDataObject *output);
-  void Execute();
-  void ExecuteInformation();
+  virtual void ComputeInputUpdateExtents(vtkDataObject *output);
+  virtual void ExecuteData(vtkDataObject* outData);
+  virtual void ExecuteInformation();
 
   int ShuffleSizes(int size);
   void Shuffle(int inSize, char* inBuf, int outSize, char* outBuf);
