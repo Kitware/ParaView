@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.396");
+vtkCxxRevisionMacro(vtkPVSource, "1.397");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -632,6 +632,8 @@ void vtkPVSource::Select()
     it->GoToNextItem();
     }
   it->Delete();
+  this->Notebook->ShowPage("Display");
+  this->Notebook->ShowPage("Information");
 }
 
 //----------------------------------------------------------------------------
