@@ -37,7 +37,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.37");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.38");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -232,9 +232,6 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
     else if(strcmp(name, "Writer") == 0)
       {
       this->CreateWriter(element);
-      }
-    else if(strcmp(name, "ServerManagerFile") == 0)
-      {
       }
     else if(strcmp(name, "Library") == 0)
       {
