@@ -266,6 +266,13 @@ IF(PARAVIEW_USE_SAF)
       ${SAF_SOURCE_DIR}/../Filtering/vtkPVBasicDSPFilterWidget.cxx )
   INCLUDE_DIRECTORIES(${SAF_SOURCE_DIR}/../Filtering/)
 
+ELSE(PARAVIEW_USE_SAF)
+  IF(PARAVIEW_USE_EXODUS)
+    SET( ParaViewClient_SRCS
+      ${ParaViewClient_SRCS}
+      ${EXODUS_SOURCE_DIR}/../Filtering/vtkPVBasicDSPFilterWidget.cxx )
+    INCLUDE_DIRECTORIES(${EXODUS_SOURCE_DIR}/../Filtering/)
+  ENDIF(PARAVIEW_USE_EXODUS)
 ENDIF(PARAVIEW_USE_SAF)
 
 
