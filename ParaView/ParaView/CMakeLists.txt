@@ -81,7 +81,6 @@ vtkPVMPIProcessModule.cxx
 vtkPVMinMax.cxx
 vtkPVNavigationWindow.cxx
 vtkPVObjectWidget.cxx
-vtkPVPLOT3DReaderModule.cxx
 vtkPVPart.cxx
 vtkPVPLOT3DReaderModule.cxx
 vtkPVPivotManipulator.cxx
@@ -101,7 +100,6 @@ vtkPVSelectCustomReader.cxx
 vtkPVSelectTimeSet.cxx
 vtkPVSelectWidget.cxx 
 vtkPVSelectionList.cxx
-vtkPVSelectTimeSet.cxx
 vtkPVServerFileDialog.cxx
 vtkPVSource.cxx 
 vtkPVSourceCollection.cxx
