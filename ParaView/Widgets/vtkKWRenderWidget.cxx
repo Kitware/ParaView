@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.4");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -462,8 +462,15 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Printing: " << this->Printing << endl;
   os << indent << "VTKWidget: " << this->VTKWidget << endl;
   os << indent << "RenderWindow: " << this->RenderWindow << endl;
-  os << indent << "ParentWindow: "
-     << (this->ParentWindow ? this->ParentWindow : "(none)") << endl;
+  os << indent << "ParentWindow: ";
+  if (this->ParentWindow)
+    {
+    os << this->ParentWindow << endl;
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
   os << indent << "RenderMode: " << this->RenderMode << endl;
   os << indent << "RenderState: " << this->RenderState << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
