@@ -41,25 +41,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWActorComposite.h"
 #include "vtkKWWidget.h"
-#include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkActor.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWOptionMenu.h"
 
-
-
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWActorComposite );
-vtkCxxRevisionMacro(vtkKWActorComposite, "1.9");
+vtkCxxRevisionMacro(vtkKWActorComposite, "1.10");
 
-
-
-
+//------------------------------------------------------------------------------
 int vtkKWActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
 
+//------------------------------------------------------------------------------
 vtkKWActorComposite::vtkKWActorComposite()
 {
   this->CommandFunction = vtkKWActorCompositeCommand;
@@ -69,6 +65,7 @@ vtkKWActorComposite::vtkKWActorComposite()
   this->Actor->SetMapper(this->Mapper);
 }
 
+//------------------------------------------------------------------------------
 vtkKWActorComposite::~vtkKWActorComposite()
 {
   if (this->Actor)
@@ -84,22 +81,26 @@ vtkKWActorComposite::~vtkKWActorComposite()
     }
 }
 
+//------------------------------------------------------------------------------
 void vtkKWActorComposite::SetInput(vtkPolyData *input)
 {
   this->Mapper->SetInput(input); 
 }
 
+//------------------------------------------------------------------------------
 void vtkKWActorComposite::CreateProperties()
 {
   // invoke superclass always
   this->vtkKWComposite::CreateProperties();
 }
 
+//------------------------------------------------------------------------------
 vtkPolyData *vtkKWActorComposite::GetInput() 
 {
   return this->Mapper->GetInput();
 }
 
+//------------------------------------------------------------------------------
 vtkProp *vtkKWActorComposite::GetProp() 
 {
   return this->Actor;
