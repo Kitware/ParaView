@@ -237,13 +237,16 @@ void vtkPVApplication::CreateButtonPhotos()
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateSplashScreen()
 {
-  this->SplashScreen->Create(this, "-bg #FFFFFF");
-  vtkKWImageLabel *image = this->SplashScreen->GetImage();
-  image->SetImageData(image_PVSplashScreen,
-                      image_PVSplashScreen_width, 
-                      image_PVSplashScreen_height,
-                      image_PVSplashScreen_pixel_size);
-  this->SplashScreen->Show();
+  this->CreatePhoto("PVSplashScreen", 
+                    image_PVSplashScreen, 
+                    image_PVSplashScreen_width, 
+                    image_PVSplashScreen_height,
+                    image_PVSplashScreen_pixel_size);
+
+  this->SplashScreen->Create(this, "");
+  this->SplashScreen->SetProgressMessageVerticalOffset(-17);
+  this->SplashScreen->SetImageName("PVSplashScreen");
+  // this->SplashScreen->Show();
 }
 
 //----------------------------------------------------------------------------
@@ -266,10 +269,7 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow* master)
     vtkKWImageLabel* label = vtkKWImageLabel::New();
     label->SetParent(dlg->GetMessageDialogFrame());
     label->Create(this,0);
-    label->SetImageData(image_PVSplashScreen,
-                        image_PVSplashScreen_width, 
-                        image_PVSplashScreen_height,
-                        image_PVSplashScreen_pixel_size);
+    label->SetImageDataName("PVSplashScreen");
     this->Script("pack %s", label->GetWidgetName());
     dlg->SetText(msg);
     this->AboutDialog = dlg;
