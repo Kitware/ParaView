@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.211");
+vtkCxxRevisionMacro(vtkPVData, "1.212");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1144,12 +1144,15 @@ void vtkPVData::UpdatePropertiesInternal()
   this->TypeLabel->SetLabel(type.str());
   type.rdbuf()->freeze(0);
   
-  sprintf(tmp, "Number of cells: %d", 
-          dataInfo->GetNumberOfCells());
-  this->NumCellsLabel->SetLabel(tmp);
-  sprintf(tmp, "Number of points: %d", 
-          dataInfo->GetNumberOfPoints());
-  this->NumPointsLabel->SetLabel(tmp);
+  ostrstream numcells;
+  numcells << "Number of cells: " << dataInfo->GetNumberOfCells() << ends;
+  this->NumCellsLabel->SetLabel(numcells.str());
+  numcells.rdbuf()->freeze(0);
+
+  ostrstream numpts;
+  numcells << "Number of points: " << dataInfo->GetNumberOfPoints() << ends;
+  this->NumPointsLabel->SetLabel(numpts.str());
+  numpts.rdbuf()->freeze(0);
   
   dataInfo->GetBounds(bounds);
   this->BoundsDisplay->SetBounds(bounds);
