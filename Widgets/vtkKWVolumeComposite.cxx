@@ -87,6 +87,7 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   directionEncoder  = vtkRecursiveSphereDirectionEncoder::New();
 
   gradientEstimator->SetDirectionEncoder( directionEncoder );
+  gradientEstimator->ZeroPadOff();
   this->RayCastMapper->SetGradientEstimator( gradientEstimator );
   this->HiResTextureMapper->SetGradientEstimator( gradientEstimator );
 
@@ -238,6 +239,8 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
     this->LowResResampler->Update();
     this->LowResTextureMapper->SetInput( this->LowResResampler->GetOutput() );
     
+    this->LowResTextureMapper->GetGradientEstimator()->ZeroPadOff();
+    
     this->LowResTextureID = 
       this->LODVolume->AddLOD( this->LowResTextureMapper,
 			       this->VolumeProperty, 0.0 );
@@ -303,6 +306,8 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
     this->MedResResampler->Update();
     this->MedResTextureMapper->SetInput( this->MedResResampler->GetOutput() );
 
+    this->MedResTextureMapper->GetGradientEstimator()->ZeroPadOff();
+    
     this->MedResTextureID = 
       this->LODVolume->AddLOD( this->MedResTextureMapper,
 			       this->VolumeProperty, 0.0 );
@@ -343,5 +348,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.5 $");
+  this->ExtractRevision(os,"$Revision: 1.6 $");
 }
