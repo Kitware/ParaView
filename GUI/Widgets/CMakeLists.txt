@@ -20,6 +20,7 @@ SET( KWWidgets_SRCS
   vtkKWCornerAnnotation.cxx 
   vtkKWDialog.cxx 
   vtkKWEntry.cxx 
+  vtkKWEntrySet.cxx 
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
   vtkKWGenericComposite.cxx 
