@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.11");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.12");
 
 
 
@@ -67,8 +67,10 @@ vtkKWLabeledFrame::vtkKWLabeledFrame()
   this->Border2->SetParent(this->Groove);
   this->Frame = vtkKWWidget::New();
   this->Frame->SetParent(this->Groove);
+  this->LabelFrame = vtkKWWidget::New();
+  this->LabelFrame->SetParent(this);
   this->Label = vtkKWWidget::New();
-  this->Label->SetParent(this);
+  this->Label->SetParent(this->LabelFrame);
   this->Icon = vtkKWImageLabel::New();
   this->Icon->SetParent(this);
   this->IconData = vtkKWIcon::New();
@@ -83,6 +85,7 @@ vtkKWLabeledFrame::~vtkKWLabeledFrame()
   this->IconData->Delete();
   this->Label->Delete();
   this->Frame->Delete();
+  this->LabelFrame->Delete();
   this->Border->Delete();
   this->Border2->Delete();
   this->Groove->Delete();
@@ -112,10 +115,11 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   this->Script("frame %s -borderwidth 0 -relief flat",wname);
 
   this->Border->Create(app,"frame","-height 10 -borderwidth 0 -relief flat");
-  this->Label->Create(app,"label","");
   this->Groove->Create(app,"frame","-borderwidth 2 -relief groove");
   this->Border2->Create(app,"frame","-height 10 -borderwidth 0 -relief flat");
   this->Frame->Create(app,"frame","-borderwidth 0 -relief flat");
+  this->LabelFrame->Create(app,"frame","-borderwidth 0 -relief flat");
+  this->Label->Create(app,"label","");
   this->Icon->Create(app,"");
   this->Icon->SetImageData(this->IconData);
   this->Icon->SetBalloonHelpString("Shrink or expand the frame");
@@ -124,8 +128,10 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   this->Script("pack %s -fill x -side top", this->Groove->GetWidgetName());
   this->Script("pack %s -fill x -side top", this->Border2->GetWidgetName());
   this->Script("pack %s -fill both -expand yes",this->Frame->GetWidgetName());
-  this->Script("place %s -relx 0 -x 5 -y 0 -anchor nw",
+  this->Script("pack %s -anchor nw -side left -fill both -expand y",
                this->Label->GetWidgetName());
+  this->Script("place %s -relx 0 -x 5 -y 0 -anchor nw",
+               this->LabelFrame->GetWidgetName());
 
   this->Script("raise %s", this->Label->GetWidgetName());
 
@@ -174,4 +180,7 @@ void vtkKWLabeledFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ShowHideFrame: " << this->GetShowHideFrame() << endl;
+  os << indent << "Frame: " << this->Frame << endl;
+  os << indent << "LabelFrame: " << this->LabelFrame << endl;
+  os << indent << "Label: " << this->Label << endl;
 }

@@ -70,8 +70,16 @@ public:
   void SetLabel(const char *);
   
   // Description:
-  // Get the vtkKWWidget for the internal frame.
-  vtkKWWidget *GetFrame() {return this->Frame;};
+  // Get the internal frame.
+  vtkGetObjectMacro(Frame, vtkKWWidget);
+
+  // Description:
+  // Get the internal frame containing the label.
+  vtkGetObjectMacro(LabelFrame, vtkKWWidget);
+
+  // Description:
+  // Get the label.
+  vtkGetObjectMacro(Label, vtkKWWidget);
 
   // Description:
   // Show or hide the frame.
@@ -96,6 +104,7 @@ protected:
   vtkKWWidget *Border;
   vtkKWWidget *Border2;
   vtkKWWidget *Frame;
+  vtkKWWidget *LabelFrame;
   vtkKWWidget *Groove;
   vtkKWWidget *Label;
   vtkKWImageLabel *Icon;
