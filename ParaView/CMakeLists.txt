@@ -95,7 +95,6 @@ LINK_LIBRARIES (vtkKWWidgetsTCL
                 vtkImagingTCL 
                 vtkRenderingTCL
                 vtkParallelTCL
-                vtkPatentedTCL 
 		vtkHybridTCL
                 vtkIOTCL
                 vtkCommon 
@@ -105,10 +104,14 @@ LINK_LIBRARIES (vtkKWWidgetsTCL
                 vtkIO
                 vtkRendering
                 vtkParallel
-                vtkPatented
                 vtkHybrid
                 ${TCL_LIBRARY} 
                 ${TK_LIBRARY})
+
+
+IF (VTK_USE_PATENTED)
+ LINK_LIBRARIES(vtkPatentedTcl vtkPatented)
+ENDIF (VTK_USE_PATENTED)
 
 LINK_LIBRARIES (Expat)
 
