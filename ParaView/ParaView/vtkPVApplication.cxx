@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.9");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.10");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1147,20 +1147,20 @@ void vtkPVApplication::Start(int argc, char*argv[])
     vtkPVProcessModule* pm = this->GetProcessModule();
     vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory");
     pm->GetStream() << vtkClientServerStream::Invoke
-                    << gf << "SetUseMesaClasses"
+                    << gf << "SetUseMesaClasses" << 1
                     << vtkClientServerStream::End;
     pm->DeleteStreamObject(gf);
     vtkClientServerID imf = pm->NewStreamObject("vtkImagingFactory");
     pm->GetStream() << vtkClientServerStream::Invoke
-                    << imf << "SetUseMesaClasses"
+                    << imf << "SetUseMesaClasses" << 1
                     << vtkClientServerStream::End;
     pm->DeleteStreamObject(imf);
     pm->SendStreamToClientAndServer();
 
     if (this->UseSatelliteSoftware)
       {
-      vtkGraphicsFactory::SetUseMesaClasses();
-      vtkImagingFactory::SetUseMesaClasses();
+      vtkGraphicsFactory::SetUseMesaClasses(1);
+      vtkImagingFactory::SetUseMesaClasses(1);
       }
     }
 #endif
