@@ -27,7 +27,7 @@
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.1.2.1");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.1.2.2");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -184,64 +184,7 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
   vtkPolyData* pd;
   int ret, idx;
   int sum;
-  int myId;
-  
-  // Lets just experiment with the Alltoall call.
-  /*
-  char* send_buffer = new char[100]; //[1];
-  int* send_counts = new int[numProcs];
-  int* send_displacements = new int[numProcs];
-  char* recv_buffer = new char[100];
-  int* recv_counts = new int[numProcs];
-  int* recv_displacements = new int[numProcs];
-  
-  myId = this->Controller->GetLocalProcessId();
-
-  if (myId == 0)
-    {
-    strcpy(send_buffer, "abcdefghijklmnopqrstuvwxyz");
-    send_displacements[0] = 0;
-    send_counts[0] = 10;
-    send_displacements[1] = 0;
-    send_counts[1] = 10;
-    }
-  else
-    {
-    strcpy(send_buffer, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-    send_displacements[0] = 0;
-    send_counts[0] = 10;
-    send_displacements[1] = 0;
-    send_counts[1] = 10;
-    }
-  
-  recv_displacements[0] = 0;
-  recv_counts[0] = 10;
-  recv_displacements[1] = 10;
-  recv_counts[1] = 10;
-  
-  
-  com->AllToAllV(send_buffer, send_counts, send_displacements, 
-                 recv_buffer, recv_counts, recv_displacements);  
-  */
-
-  // Test code.
-  /*
-  myId = this->Controller->GetLocalProcessId();
-  int size;
-  char* buf;
-  if (myId == 0)
-    {
-    size = 10;
-    buf = new char[26];    
-    strncpy(buf, "abcdefghijklmnopqrstuvwxyz", 26);
-    }
-  else
-    {
-    size = 10;
-    buf = new char[26];    
-    strncpy(buf, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 26);
-    }
-  */
+  int myId = this->Controller->GetLocalProcessId();
   
   // First marshal our input.
   input = this->GetInput();
@@ -259,9 +202,11 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
   
   // Compute the degenerate input offsets and lengths.
   // Broadcast our size to all other processes.
-  int* recvLengths = new int[numProcs];
+  int* recvLengths = new int[numProcs * 2];
+  // Use a single array for lengths and offsets to avoid
+  // another send to the client.
+  int* recvOffsets = recvLengths+numProcs;
   com->AllGather(&size, recvLengths, 1);
-  int* recvOffsets = new int[numProcs];
   sum = 0;
   for (idx = 0; idx < numProcs; ++idx)
     {
@@ -273,14 +218,47 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
   char* allbuffers = new char[sum];
   com->AllGatherV(buf, size, allbuffers, recvLengths, recvOffsets);
 
+  if (myId == 0)
+    {
+    // Send the string to the client.
+    this->SocketController->Send(&numProcs, 1, 0, 948344);
+    this->SocketController->Send(recvLengths, numProcs*2, 0, 948345);
+    this->SocketController->Send(allbuffers, sum, 0, 948346);
+    }
+
+  this->ReconstructOutput(reader, allbuffers, 
+                          recvLengths, recvOffsets);
+
+  delete [] buf;
+  buf = NULL;
+  delete [] allbuffers;
+  allbuffers = NULL;
+  delete [] recvLengths;
+  recvLengths = NULL;
+  // recvOffsets is part of the recvLengths array.
+  recvOffsets = NULL;
+}
+
+
+
+//-----------------------------------------------------------------------------
+void vtkMPIDuplicatePolyData::ReconstructOutput(vtkPolyDataReader* reader,
+                                char* recv, int* recvLengths, int* recvOffsets)
+{
+  int numProcs;
+  numProcs = this->Controller->GetNumberOfProcesses();
+  vtkPolyData* output;
+  vtkPolyData* pd;
+  int idx;
+
   // Reconstruct the poly datas and append them together.
   vtkAppendPolyData *append = vtkAppendPolyData::New();
   // First append the input from this process.
-  for (idx = 0; 0, idx < numProcs; ++idx) // SKip for debugging !!!!!!!
+  for (idx = 0; 0, idx < numProcs; ++idx)
     {
     // vtkCharArray should not delete the string when it's done.
     reader->Modified();
-    reader->GetInputArray()->SetArray(allbuffers+recvOffsets[idx],
+    reader->GetInputArray()->SetArray(recv+recvOffsets[idx],
                                       recvLengths[idx], 1);
     output = reader->GetOutput();
     output->Update();
@@ -291,14 +269,6 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
     append->AddInput(pd);
     pd->Delete();
     }
-  delete [] buf;
-  buf = NULL;
-  delete [] allbuffers;
-  allbuffers = NULL;
-  delete [] recvLengths;
-  recvLengths = NULL;
-  delete [] recvOffsets;
-  recvOffsets = NULL;
 
   // Append
   output = append->GetOutput();
@@ -315,28 +285,35 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkMPICommunicator* com,
 //-----------------------------------------------------------------------------
 void vtkMPIDuplicatePolyData::ClientExecute(vtkPolyDataReader* reader)
 {
-  /*
-  int size;
-  char* buf;
-  vtkPolyData* output;
-  vtkPolyData* pd;
+  int numProcs;
+  int* recvLengths;
+  int* recvOffsets;
+  int totalLength, idx;
+  char* buffers;
 
-  this->SocketController->Receive(&size, 1, 1, 199292);
-  buf = new char [size];
-  this->SocketController->Receive(buf, size, 1, 199293);
-  
-  // Read the string to get the final poly data.
-  // vtkCharArray should not delete the string when it's done.
-  reader->GetInputArray()->SetArray(buf, size, 1);
-  output = reader->GetOutput();
-  output->Update();
-  pd = this->GetOutput();
-  pd->CopyStructure(output);
-  pd->GetPointData()->PassData(output->GetPointData());
-  pd->GetCellData()->PassData(output->GetCellData());
-  delete [] buf;
-  buf = NULL;
-  */
+  // Receive the numer of processes.
+  this->SocketController->Receive(&numProcs, 1, 0, 948344);
+
+  // Receive information about the lengths/offsets of each marshaled data set.
+  recvLengths = new int[numProcs*2];
+  recvOffsets = recvLengths + numProcs;
+  this->SocketController->Receive(recvLengths, numProcs*2, 0, 948345);
+
+  // Receive the actual buffers.
+  totalLengths = 0;
+  for (idx = 0; idx < numProcs; ++idx)
+    {
+    totalLengths += recvLengths[idx];
+    }
+  buffers = new char[totalLength];
+  this->SocketController->Receive(allbuffers, totalLengths, 0, 948346);
+
+  this->ReconstructOutput(reader, buffers, 
+                          recvLengths, recvOffsets);
+  delete [] recvLengths;
+  recvLengths = NULL;
+  delete [] buffers;
+  buffers = NULL;
 }
 
 
