@@ -75,7 +75,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     
   pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
 			 reader->GetCaseFileName());
-  reader->Update();
+  pvApp->BroadcastScript("%s Update", tclName);
   
   numOutputs = reader->GetNumberOfOutputs();
   

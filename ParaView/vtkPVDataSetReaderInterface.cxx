@@ -55,11 +55,10 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   int numOutputs, i;
   
-  // Create the vtkSource.
+  // Create the vtkReader on all processes (through tcl).
   sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
-  // Create the object through tcl on all processes.
   reader = (vtkDataSetReader *)
-    (pvApp->MakeTclObject(this->SourceClassName, tclName));
+              (pvApp->MakeTclObject(this->SourceClassName, tclName));
   if (reader == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
@@ -79,7 +78,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   pvApp->BroadcastScript("%s SetFileName %s", tclName,
 			 reader->GetFileName());
   // Let the reader create its outputs.
-  reader->Update();
+  pvApp->BroadcastScript("%s Update", tclName);
   
   // Create dummy source for each output.
   numOutputs = reader->GetNumberOfOutputs();
