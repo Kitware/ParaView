@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.65");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.66");
 
 
 //----------------------------------------------------------------------------
@@ -355,8 +355,8 @@ void vtkPVInputMenu::Accept()
   else
     {
     this->Script("%s SetPVInput %s %d {}", 
-                 this->InputName,
                  this->PVSource->GetTclName(), 
+                 this->InputName,
                  this->GetPVInputIndex());
     }
 

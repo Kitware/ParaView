@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.388");
+vtkCxxRevisionMacro(vtkPVSource, "1.389");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -2037,7 +2037,6 @@ void vtkPVSource::SetAcceptButtonColorToModified()
 //----------------------------------------------------------------------------
 int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
 {
-
   int retVal = this->ClonePrototypeInternal(clone);
   if (retVal != VTK_OK)
     {
@@ -2054,6 +2053,8 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
     clone = 0;
     return retVal;
     }
+
+  clone->SetAcceptButtonColorToModified();
 
   return VTK_OK;
 }
