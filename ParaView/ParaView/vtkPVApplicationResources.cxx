@@ -280,9 +280,9 @@ void vtkPVApplication::CreateButtonPhotos()
 void vtkPVApplication::CreateSplashScreen()
 {
   unsigned char *buffer = new unsigned char [ image_PVSplashScreen_buffer_length ];
-  memcpy(buffer, image_PVSplashScreen1, sizeof(image_PVSplashScreen1));
-  memcpy(buffer+sizeof(image_PVSplashScreen1), image_PVSplashScreen2, 
-    sizeof(image_PVSplashScreen2));
+  memcpy(buffer, image_PVSplashScreen1, sizeof(image_PVSplashScreen1)-1);
+  memcpy(buffer+sizeof(image_PVSplashScreen1)-1, image_PVSplashScreen2, 
+    sizeof(image_PVSplashScreen2)-1);
   this->CreatePhoto("PVSplashScreen", 
                     buffer, 
                     image_PVSplashScreen_width, 
