@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.37");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -317,4 +317,8 @@ void vtkPVContourEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ArrayMenu: " << this->GetArrayMenu() << endl;
+  os << indent << "SetContourCommand: "
+     << (this->SetContourCommand ? this->SetContourCommand : "(none)") << endl;
+  os << indent << "SetNumberCommand: "
+     << (this->SetNumberCommand ? this->SetNumberCommand : "(none)") << endl;
 }
