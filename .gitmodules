@@ -1,6 +1,9 @@
 [submodule "ParaViewData1"]
 	path = ParaView/ParaView/data
 	url = git://paraview.org/ParaViewData.git
+[submodule "TclTk-8-2-3"]
+	path = TclTk8.2.3Win
+	url = git://paraview.org/ParaViewTclTk.git
 [submodule "VTK"]
 	path = VTK
 	url = git://vtk.org/VTK.git
