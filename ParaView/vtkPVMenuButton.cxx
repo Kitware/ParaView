@@ -83,7 +83,7 @@ void vtkPVMenuButton::SetButtonText(char *text)
 
 void vtkPVMenuButton::AddCommand(const char* label, vtkKWObject* Object,
 				 const char* MethodAndArgString,
-				 const char* help = 0)
+				 const char* help)
 {
   this->Menu->AddCommand(label, Object, MethodAndArgString, help);
 }

@@ -33,9 +33,17 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVWindow.h"
+#include "vtkKWApplication.h"
+
+
+int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
+		                     int argc, char *argv[]);
+
 
 vtkPVPolyData::vtkPVPolyData()
 {
+  this->CommandFunction = vtkPVPolyDataCommand;
+
   this->PolyData = NULL;
 
   this->Label = vtkKWLabel::New();
