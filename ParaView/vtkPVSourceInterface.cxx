@@ -72,6 +72,7 @@ vtkPVSourceInterface* vtkPVSourceInterface::New()
 vtkPVSource *vtkPVSourceInterface::CreateCallback()
 {
   char tclName[100];
+  const char *outputDataType;
   vtkDataSet *d;
   vtkPVData *pvd;
   vtkSource *s;
@@ -79,6 +80,19 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVMethodInterface *mInt;
   
+  // Before we do anything, let see if we can determine the output type.
+  outputDataType = this->GetOutputClassName();
+  if (strcmp(outputDataType, "vtkDataSet") == 0)
+    { // Output will be the same as the input.
+    vtkPVData *current = this->PVWindow->GetCurrentPVData();
+    if (current == NULL)
+      {
+      vtkErrorMacro("Cannot determine output type.");
+      return NULL;
+      }
+    outputDataType = current->GetVTKData()->GetClassName();
+    }
+
   // Create the vtkSource.
   sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
   // Create the object through tcl on all processes.
@@ -89,18 +103,27 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     return NULL;
     }
   
-  
   pvs = vtkPVSource::New();
   pvs->SetApplication(pvApp);
   pvs->SetInterface(this);
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);
 
+
+  // Set the input if necessary.
+  if (this->InputClassName)
+    {
+    vtkPVData *current = this->PVWindow->GetCurrentPVData();
+    pvs->SetNthPVInput(0, current);
+    }
+  
+
+  // Create the output.
   pvd = vtkPVData::New();
   pvd->SetApplication(pvApp);
   sprintf(tclName, "%sOutput%d", this->RootName, this->InstanceCount);
   // Create the object through tcl on all processes.
-  d = (vtkDataSet *)(pvApp->MakeTclObject(this->OutputClassName, tclName));
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
@@ -110,13 +133,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());   
-  
-  // Set the input if necessary.
-  if (this->InputClassName)
-    {
-    vtkPVData *current = this->PVWindow->GetCurrentPVData();
-    pvs->SetNthPVInput(0, current);
-    }
   
   // Add the new Source to the View, and make it current.
   this->PVWindow->GetMainView()->AddComposite(pvs);
@@ -145,7 +161,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_SELECTION)
       {
-      int i, num;
+      int i;
       vtkStringList *l;
       pvs->AddModeList(mInt->GetVariableName(),
 		       mInt->GetSetCommand(),
@@ -224,8 +240,6 @@ vtkPVApplication *vtkPVSourceInterface::GetPVApplication()
 //----------------------------------------------------------------------------
 int vtkPVSourceInterface::GetIsValidInput(vtkPVData *pvd)
 {
-  const char *pvName;
-  const char *dataName;
   vtkDataObject *data;
   
   if (this->InputClassName == NULL)

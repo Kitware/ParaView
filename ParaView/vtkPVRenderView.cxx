@@ -287,12 +287,8 @@ void vtkPVRenderView::Update()
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
-{
-  float tmp[6];
-  int id, num;
-  
+{  
   this->GetRenderer()->ComputeVisiblePropBounds(bounds);
-
 }
 
 //----------------------------------------------------------------------------

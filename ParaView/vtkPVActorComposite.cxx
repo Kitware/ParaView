@@ -77,12 +77,9 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ZRangeLabel = vtkKWLabel::New();
   this->ScalarRangeLabel = vtkKWLabel::New();
   
-  this->DataNotebookButton = vtkKWPushButton::New();
   this->AmbientScale = vtkKWScale::New();
 
-  this->ArrayNameMenu = vtkKWOptionMenu::New();
-  this->ArrayComponentEntry = vtkKWLabeledEntry::New();
-  this->AcceptButton = vtkKWPushButton::New();
+  this->ColorMenu = vtkKWOptionMenu::New();
   
   this->PVData = NULL;
   this->DataSetInput = NULL;
@@ -167,21 +164,11 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->ScalarRangeLabel->Delete();
   this->ScalarRangeLabel = NULL;
   
-  this->ColorByCellCheck->Delete();
-  this->ColorByCellCheck = NULL;  
-  
-  this->DataNotebookButton->Delete();
-  this->DataNotebookButton = NULL;
-  
   this->AmbientScale->Delete();
   this->AmbientScale = NULL;
   
-  this->ArrayNameMenu->Delete();
-  this->ArrayNameMenu = NULL;
-  this->ArrayComponentEntry->Delete();
-  this->ArrayComponentEntry = NULL;
-  this->AcceptButton->Delete();
-  this->AcceptButton = NULL;
+  this->ColorMenu->Delete();
+  this->ColorMenu = NULL;
   
   this->SetInput(NULL);
   
@@ -213,21 +200,13 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
 }
 
+
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::CreateProperties()
 {
   const char *actorPage;
-  char tmp[350];
-  float bounds[6];
-  float range[2];
-  int i, numPointFDArrays = 0, numCellFDArrays = 0;
-  vtkFieldData *pointFieldData, *cellFieldData;
   vtkPVApplication *pvApp = this->GetPVApplication();  
-  
-  pvApp->BroadcastScript("%s Update", this->MapperTclName);
-  this->GetPVData()->GetBounds(bounds);
-  this->GetPVData()->GetScalarRange(range);
-  
+    
   // invoke superclass always
   this->vtkKWActorComposite::CreateProperties();
   
@@ -240,133 +219,200 @@ void vtkPVActorComposite::CreateProperties()
   
   this->NumCellsLabel->SetParent(this->Properties);
   this->NumCellsLabel->Create(this->Application, "");
-  sprintf(tmp, "number of cells: %d", 
-	  this->GetPVData()->GetNumberOfCells());
-  this->NumCellsLabel->SetLabel(tmp);
   this->BoundsLabel->SetParent(this->Properties);
   this->BoundsLabel->Create(this->Application, "");
   this->BoundsLabel->SetLabel("bounds:");
   this->XRangeLabel->SetParent(this->Properties);
   this->XRangeLabel->Create(this->Application, "");
-  sprintf(tmp, "x range: %f to %f", bounds[0], bounds[1]);
-  this->XRangeLabel->SetLabel(tmp);
   this->YRangeLabel->SetParent(this->Properties);
   this->YRangeLabel->Create(this->Application, "");
-  sprintf(tmp, "y range: %f to %f", bounds[2], bounds[3]);
-  this->YRangeLabel->SetLabel(tmp);
   this->ZRangeLabel->SetParent(this->Properties);
   this->ZRangeLabel->Create(this->Application, "");
-  sprintf(tmp, "z range: %f to %f", bounds[4], bounds[5]);
-  this->ZRangeLabel->SetLabel(tmp);
   this->ScalarRangeLabel->SetParent(this->Properties);
   this->ScalarRangeLabel->Create(this->Application, "");
-  sprintf(tmp, " Scalar Range: %f to %f", range[0], range[1]);
-  this->ScalarRangeLabel->SetLabel(tmp);
   
-  this->ColorByCellCheck->SetParent(this->Properties);
-  this->ColorByCellCheck->Create(this->Application, "-text {Color By Cell Data:}");
-  this->ColorByCellCheck->SetCommand(this, "ColorByCellCheckCallBack");
+  //this->ColorByCellCheck->SetParent(this->Properties);
+  //this->ColorByCellCheck->Create(this->Application, "-text {Color By Cell Data:}");
+  //this->ColorByCellCheck->SetCommand(this, "ColorByCellCheckCallBack");
   
-  
-//  this->DataNotebookButton->SetParent(this->Properties);
-//  this->DataNotebookButton->Create(this->Application, "");
-//  this->DataNotebookButton->SetLabel("Return to Data Notebook");
-//  this->DataNotebookButton->SetCommand(this, "ShowDataNotebook");
   this->AmbientScale->SetParent(this->Properties);
   this->AmbientScale->Create(this->Application, "-showvalue 1");
   this->AmbientScale->DisplayLabel("Ambient Light");
   this->AmbientScale->SetRange(0.0, 1.0);
   this->AmbientScale->SetResolution(0.1);
-  this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
   this->AmbientScale->SetCommand(this, "AmbientChanged");
   
-  this->Script("pack %s %s %s %s %s %s %s %s",
-	       this->NumCellsLabel->GetWidgetName(),
-	       this->BoundsLabel->GetWidgetName(),
-	       this->XRangeLabel->GetWidgetName(),
-	       this->YRangeLabel->GetWidgetName(),
-	       this->ZRangeLabel->GetWidgetName(),
-	       this->ScalarRangeLabel->GetWidgetName(),
-	       this->ColorByCellCheck->GetWidgetName(),
-	       this->AmbientScale->GetWidgetName());
+  this->ColorMenu->SetParent(this->Properties);
+  this->ColorMenu->Create(this->Application, "");    
 
-  pointFieldData = 
-    this->GetPVData()->GetVTKData()->GetPointData()->GetFieldData();
-  cellFieldData =
-    this->GetPVData()->GetVTKData()->GetCellData()->GetFieldData();
-  if (pointFieldData)
-    {
-    numPointFDArrays += pointFieldData->GetNumberOfArrays();
-    }
-  if (cellFieldData)
-    {
-    numCellFDArrays += cellFieldData->GetNumberOfArrays();
-    }
-  if (numPointFDArrays + numCellFDArrays > 0)
-    {
-    this->ArrayNameMenu->SetParent(this->Properties);
-    this->ArrayNameMenu->Create(this->Application, "");
+  this->Script("pack %s",
+	       this->NumCellsLabel->GetWidgetName());
+  this->Script("pack %s",
+	       this->BoundsLabel->GetWidgetName());
+  this->Script("pack %s",
+	       this->XRangeLabel->GetWidgetName());
+  this->Script("pack %s",
+	       this->YRangeLabel->GetWidgetName());
+  this->Script("pack %s",
+	       this->ZRangeLabel->GetWidgetName());
+  this->Script("pack %s",
+	       this->ScalarRangeLabel->GetWidgetName());
+  this->Script("pack %s",
+               this->ColorMenu->GetWidgetName());
     
-    for (i = 0; i < numPointFDArrays; i++)
-      {
-      this->ArrayNameMenu->AddEntryWithCommand(pointFieldData->GetArrayName(i),
-					       this, "SetMapperToUsePointFieldData");
-      }
-    
-    for (i = 0; i < numCellFDArrays; i++)
-      {
-      this->ArrayNameMenu->AddEntryWithCommand(cellFieldData->GetArrayName(i),
-					       this, "SetMapperToUseCellFieldData");
-      }
-    
-    this->ArrayComponentEntry->SetParent(this->Properties);
-    this->ArrayComponentEntry->Create(this->Application);
-    this->ArrayComponentEntry->SetLabel("Component Number:");
-    
-    this->AcceptButton->SetParent(this->Properties);
-    this->AcceptButton->Create(this->Application, "");
-    this->AcceptButton->SetLabel("Accept");
-    this->AcceptButton->SetCommand(this, "SelectArrayComponent");
-    
-    this->Script("pack %s %s %s",
-		 this->ArrayNameMenu->GetWidgetName(),
-		 this->ArrayComponentEntry->GetWidgetName(),
-		 this->AcceptButton->GetWidgetName());
-    }
-    
-//	       this->DataNotebookButton->GetWidgetName());
-  
-}
-
-void vtkPVActorComposite::SetMapperToUsePointFieldData()
-{
-  this->Mapper->SetScalarModeToUsePointFieldData();
-}
-
-void vtkPVActorComposite::SetMapperToUseCellFieldData()
-{
-  this->Mapper->SetScalarModeToUseCellFieldData();
+  this->UpdateProperties();  
 }
 
 
 //----------------------------------------------------------------------------
-void vtkPVActorComposite::ColorByCellCheckCallBack()
+void vtkPVActorComposite::UpdateProperties()
 {
-  int val;
-  vtkPVApplication *pvApp = this->GetPVApplication();
+  char tmp[350], cmd[1024];
+  float bounds[6];
+  float range[2];
+  int i, j, numArrays, numComps;
+  vtkFieldData *fieldData;
+  vtkPVApplication *pvApp = this->GetPVApplication();  
+  vtkDataArray *array;
+
+  pvApp->BroadcastScript("%s Update", this->MapperTclName);
+  this->GetPVData()->GetBounds(bounds);
+  this->GetPVData()->GetScalarRange(range);
+      
+  sprintf(tmp, "number of cells: %d", 
+	  this->GetPVData()->GetNumberOfCells());
+  this->NumCellsLabel->SetLabel(tmp);
+
+  sprintf(tmp, "x range: %f to %f", bounds[0], bounds[1]);
+  this->XRangeLabel->SetLabel(tmp);
+  sprintf(tmp, "y range: %f to %f", bounds[2], bounds[3]);
+  this->YRangeLabel->SetLabel(tmp);
+  sprintf(tmp, "z range: %f to %f", bounds[4], bounds[5]);
+  this->ZRangeLabel->SetLabel(tmp);
+  sprintf(tmp, " Scalar Range: %f to %f", range[0], range[1]);
+  this->ScalarRangeLabel->SetLabel(tmp);
   
-  val = this->ColorByCellCheck->GetState();
-  if (val)
+    
+  this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
+
+  this->ColorMenu->AddEntryWithCommand("Property",
+	                               this, "ColorByProperty");
+  if (this->GetPVData()->GetVTKData()->GetPointData()->GetScalars())
     {
-    pvApp->BroadcastScript("%s SetScalarModeToUseCellData",
-			   this->MapperTclName);
+    this->ColorMenu->AddEntryWithCommand("Point Scalars",
+					     this, "ColorByPointScalars");
     }
-  else
+  if (this->GetPVData()->GetVTKData()->GetCellData()->GetScalars())
     {
-    pvApp->BroadcastScript("%s SetScalarModeToUsePointData",
-			   this->MapperTclName);
+    this->ColorMenu->AddEntryWithCommand("Cell Scalars",
+					     this, "ColorByCellScalars");
     }
-  this->GetView()->Render();  
+  fieldData = this->GetPVData()->GetVTKData()->GetPointData()->GetFieldData();
+  if (fieldData)
+    {
+    numArrays = fieldData->GetNumberOfArrays();
+    for (i = 0; i < numArrays; i++)
+      {
+      array = fieldData->GetArray(i);
+      numComps = array->GetNumberOfComponents();
+      for (j = 0; j < numComps; ++j)
+        {
+        sprintf(cmd, "ColorByPointFieldComponent %s %d",
+                fieldData->GetArrayName(i), j);
+        if (numComps == 1)
+          {
+          sprintf(tmp, "Point %s", fieldData->GetArrayName(i));
+          } 
+        else
+          {
+          sprintf(tmp, "Point %s %d", fieldData->GetArrayName(i), j);
+          }
+        this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+        } 
+      }
+    }
+  fieldData = this->GetPVData()->GetVTKData()->GetCellData()->GetFieldData();
+  if (fieldData)
+    {
+    numArrays = fieldData->GetNumberOfArrays();
+    for (i = 0; i < numArrays; i++)
+      {
+      array = fieldData->GetArray(i);
+      numComps = array->GetNumberOfComponents();
+      for (j = 0; j < numComps; ++j)
+        {
+        sprintf(cmd, "ColorByCellFieldComponent %s %d",
+                fieldData->GetArrayName(i), j);
+        if (numComps == 1)
+          {
+          sprintf(tmp, "Cell %s", fieldData->GetArrayName(i));
+          } 
+        else
+          {
+          sprintf(tmp, "Cell %s %d", fieldData->GetArrayName(i), j);
+          }
+        this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+        } 
+      }
+    }
+
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByProperty()
+{
+  vtkErrorMacro("CBProp");
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
+  this->GetView()->Render();
+}
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByPointScalars()
+{
+  vtkErrorMacro("CBPtScalars");
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
+  pvApp->BroadcastScript("%s SetScalarModeToUsePointData",
+                         this->MapperTclName);
+  this->GetView()->Render();
+}
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByCellScalars()
+{
+  vtkErrorMacro("CBCellScalars");
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
+  pvApp->BroadcastScript("%s SetScalarModeToUseCellData",
+                         this->MapperTclName);
+  this->GetView()->Render();
+}
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
+{
+  vtkErrorMacro("CBPtField " << name << " " << comp);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
+  pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
+                         this->MapperTclName, name, comp);
+  this->GetView()->Render();
+}
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
+{
+  vtkErrorMacro("CBCellField " << name << " " << comp);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
+  pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
+                         this->MapperTclName, name, comp);
+  this->GetView()->Render();
 }
 
 
@@ -395,18 +441,7 @@ void vtkPVActorComposite::ShowDataNotebook()
   this->GetPVData()->GetPVSource()->ShowProperties();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::SelectArrayComponent()
-{
-  char *arrayName;
-  int arrayComponent;
-  
-  arrayName = this->ArrayNameMenu->GetValue();
-  arrayComponent = this->ArrayComponentEntry->GetValueAsInt();
-  
-  this->Mapper->ColorByArrayComponent(arrayName, arrayComponent);
-  this->Mapper->SetScalarRange(this->Mapper->GetColors()->GetRange());
-}
+
 
 
 //----------------------------------------------------------------------------
@@ -492,8 +527,6 @@ void vtkPVActorComposite::ResetScalarRange()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::GetInputScalarRange(float range[2]) 
 { 
-  float tmp[2];
-  int idx;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkMultiProcessController *controller = pvApp->GetController();
   int numProcs = controller->GetNumberOfProcesses();

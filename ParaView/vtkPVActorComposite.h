@@ -40,6 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWLabeledEntry.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
@@ -64,6 +65,7 @@ public:
   // Create the properties object, called by UpdateProperties.
   void CreateProperties();
   void ShowProperties();
+  void UpdateProperties();
   
   // Description:
   // This method should be called immediately after the object is constructed.
@@ -111,13 +113,6 @@ public:
   vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
   
   void ShowDataNotebook();
-
-  // Description:
-  // Callbacks to set the mapper correctly to color by a given component of a field
-  // data array.
-  void SelectArrayComponent();
-  void SetMapperToUsePointFieldData();
-  void SetMapperToUseCellFieldData();
   
   // Description:
   // to change the ambient component of the light
@@ -147,7 +142,11 @@ public:
   
   // Description:
   // This method is called when the ColorByCellCheck is pressed.
-  void ColorByCellCheckCallBack();
+  void ColorByProperty();
+  void ColorByPointScalars();
+  void ColorByCellScalars();
+  void ColorByPointFieldComponent(char *name, int comp);
+  void ColorByCellFieldComponent(char *name, int comp);
   
 protected:
 
@@ -164,15 +163,10 @@ protected:
   vtkKWLabel *YRangeLabel;
   vtkKWLabel *ZRangeLabel;
   vtkKWLabel *ScalarRangeLabel;
-  vtkKWCheckButton *ColorByCellCheck;
-  vtkKWLabeledEntry *ColorByArrayNameEntry;
   
-  vtkKWPushButton *DataNotebookButton;
   vtkKWScale *AmbientScale;
   
-  vtkKWOptionMenu *ArrayNameMenu;
-  vtkKWLabeledEntry *ArrayComponentEntry;
-  vtkKWPushButton *AcceptButton;
+  vtkKWOptionMenu *ColorMenu;
   
   // the data object that owns this composite
   vtkPVData *PVData;

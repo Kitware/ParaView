@@ -1052,5 +1052,119 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // UnstructuredGrid to UnstructuredGrid Filters
+
+  // ---- ExtractPolyDataPiece ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkExtractUnstructuredGridPiece");
+  sInt->SetRootName("Piece");
+  sInt->SetInputClassName("vtkUnstructuredGrid");
+  sInt->SetOutputClassName("vtkUnstructuredGrid");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("GhostCells");
+  mInt->SetSetCommand("SetCreateGhostCells");
+  mInt->SetGetCommand("GetCreateGhostCells");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+
+  // DataSet to DataSet Filters
+  
+  // ---- ExtractEdges ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkElevationFilter");
+  sInt->SetRootName("Elevation");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("LowPoint");
+  mInt->SetSetCommand("SetLowPoint");
+  mInt->SetGetCommand("GetLowPoint");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("HighPoint");
+  mInt->SetSetCommand("SetHighPoint");
+  mInt->SetGetCommand("GetHighPoint");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ScalarRange");
+  mInt->SetSetCommand("SetScalarRange");
+  mInt->SetGetCommand("GetScalarRange");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument(); 
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- FieldDataToAttributeDataFilter ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkSimpleFieldDataToAttributeDataFilter");
+  sInt->SetRootName("FieldToAttr");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("AttributeType");
+  mInt->SetSetCommand("SetAttributeType");
+  mInt->SetGetCommand("GetAttributeType");
+  mInt->SetWidgetTypeToSelection();
+  mInt->AddSelectionEntry(0, "Point");
+  mInt->AddSelectionEntry(1, "Cell");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;  
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Attribute");
+  mInt->SetSetCommand("SetAttribute");
+  mInt->SetGetCommand("GetAttribute");
+  mInt->SetWidgetTypeToSelection();
+  mInt->AddSelectionEntry(0, "Scalars");
+  mInt->AddSelectionEntry(1, "Vectors");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Field Name");
+  mInt->SetSetCommand("SetFieldName");
+  mInt->SetGetCommand("GetFieldName");
+  mInt->AddStringArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
 }
 

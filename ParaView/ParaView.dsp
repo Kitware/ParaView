@@ -221,6 +221,14 @@ SOURCE=.\vtkPVData.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVDataSetReaderInterface.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVDataSetReaderInterfaceTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVDataTcl.cxx
 # End Source File
 # Begin Source File
@@ -297,11 +305,11 @@ SOURCE=.\vtkPVWindowTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkRunTimeContour.cxx
+SOURCE=.\vtkSimpleFieldDataToAttributeDataFilter.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkRunTimeContourTcl.cxx
+SOURCE=.\vtkSimpleFieldDataToAttributeDataFilterTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -681,6 +689,26 @@ InputName=vtkPVData
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVDataSetReaderInterface.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVDataSetReaderInterface.h
+InputName=vtkPVDataSetReaderInterface
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVEnSightReaderInterface.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -868,6 +896,26 @@ InputName=vtkPVWindow
 # Begin Custom Build
 InputPath=.\vtkPVWindow.h
 InputName=vtkPVWindow
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkSimpleFieldDataToAttributeDataFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkSimpleFieldDataToAttributeDataFilter.h
+InputName=vtkSimpleFieldDataToAttributeDataFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -62,6 +62,9 @@ ClientData vtkPVSourceListNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
+int vtkSimpleFieldDataToAttributeDataFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkSimpleFieldDataToAttributeDataFilterNewCommand();
 int vtkSingleContourFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkSingleContourFilterNewCommand();
@@ -140,6 +143,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVWindowCommand);
   vtkTclCreateNew(interp,(char *) "vtkSingleContourFilter", vtkSingleContourFilterNewCommand,
                   vtkSingleContourFilterCommand);
+  vtkTclCreateNew(interp,(char *) "vtkSimpleFieldDataToAttributeDataFilter", vtkSimpleFieldDataToAttributeDataFilterNewCommand,
+                  vtkSimpleFieldDataToAttributeDataFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkStringList", vtkStringListNewCommand,
                   vtkStringListCommand);
   return TCL_OK;

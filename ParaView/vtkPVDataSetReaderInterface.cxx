@@ -47,13 +47,12 @@ vtkPVDataSetReaderInterface* vtkPVDataSetReaderInterface::New()
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 {
-  char tclName[100], outputTclName[100], srcTclName[100], fileName[100];
+  char tclName[100], outputTclName[100], srcTclName[100];
   vtkDataSet *d;
   vtkPVData *pvd;
   vtkDataSetReader *reader;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVMethodInterface *mInt;
   int numOutputs, i;
   
   // Create the vtkSource.
