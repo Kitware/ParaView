@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.2");
 
 
 
@@ -74,15 +74,20 @@ vtkPVIceTDisplayRenderModule::vtkPVIceTDisplayRenderModule()
 vtkPVIceTDisplayRenderModule::~vtkPVIceTDisplayRenderModule()
 {
   vtkPVApplication *pvApp = this->PVApplication;
-  vtkPVProcessModule * pm = pvApp->GetProcessModule();
+  
+  vtkPVProcessModule * pm = 0;
+  if ( pvApp )
+    {
+    pm = pvApp->GetProcessModule();
+    }
 
   // Tree Composite
-  if (this->CompositeTclName && pvApp)
+  if (this->CompositeTclName && pvApp && pm)
     {
     pm->ServerScript("%s Delete", this->DisplayManagerTclName);
     this->SetDisplayManagerTclName(NULL);
     }
-  if (this->CompositeTclName && pvApp)
+  if (this->CompositeTclName && pvApp && pm)
     {
     pm->Script("%s Delete", this->CompositeTclName);
     pm->RootScript("%s Delete", this->CompositeTclName);
