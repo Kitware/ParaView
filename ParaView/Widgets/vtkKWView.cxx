@@ -46,6 +46,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSaveImageDialog.h"
 #include "vtkBMPWriter.h"
 #include "vtkPNMWriter.h"
+#include "vtkPNGWriter.h"
+#include "vtkJPEGWriter.h"
 #include "vtkTIFFWriter.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkViewport.h"
@@ -821,13 +823,29 @@ void vtkKWView::SaveAsImage()
     tif->Write();
     tif->Delete();
     }
-  else if (!strcmp(path + strlen(path) - 4,".pnm"))
+  else if (!strcmp(path + strlen(path) - 4,".ppm"))
     {
     vtkPNMWriter *pnm = vtkPNMWriter::New();
     pnm->SetInput(w2i->GetOutput());
     pnm->SetFileName((char *)path);
     pnm->Write();
     pnm->Delete();
+    }
+  else if (!strcmp(path + strlen(path) - 4,".png"))
+    {
+    vtkPNGWriter *png = vtkPNGWriter::New();
+    png->SetInput(w2i->GetOutput());
+    png->SetFileName((char *)path);
+    png->Write();
+    png->Delete();
+    }
+  else if (!strcmp(path + strlen(path) - 4,".jpg"))
+    {
+    vtkJPEGWriter *jpg = vtkJPEGWriter::New();
+    jpg->SetInput(w2i->GetOutput());
+    jpg->SetFileName((char *)path);
+    jpg->Write();
+    jpg->Delete();
     }
 
   w2i->Delete();
@@ -1208,7 +1226,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.39.2.1 $");
+  this->ExtractRevision(os,"$Revision: 1.39.2.2 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

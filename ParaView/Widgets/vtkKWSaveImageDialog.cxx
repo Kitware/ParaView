@@ -78,7 +78,7 @@ void vtkKWSaveImageDialog::Invoke()
   
   while (!done)
     {
-    this->Script("tk_getSaveFile -title {Save As Image} -defaultextension {.bmp} -filetypes {{{Windows Bitmap} {.bmp}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
+    this->Script("tk_getSaveFile -title {Save As Image} -defaultextension {.bmp} -filetypes {{{Windows Bitmap} {.bmp}} {{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
     if (path)
       {
       free(path);
@@ -92,7 +92,9 @@ void vtkKWSaveImageDialog::Invoke()
       }  
     else if (!strcmp(path + strlen(path) - 4,".bmp") ||
 	     !strcmp(path + strlen(path) - 4,".tif") ||
-	     !strcmp(path + strlen(path) - 4,".pnm"))
+	     !strcmp(path + strlen(path) - 4,".png") ||
+	     !strcmp(path + strlen(path) - 4,".jpg") ||
+	     !strcmp(path + strlen(path) - 4,".ppm"))
       {
       done = 1;
       }
