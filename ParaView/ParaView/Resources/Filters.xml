@@ -655,7 +655,7 @@
 // Do not change the tracename of the array menu, it is used by vtkPVContour
   <ArrayMenu id="am" input_name="Input" attribute_type="Scalars" label="Scalars" trace_name="Scalars" input_menu="im" number_of_components="1" help="Choose which scalar array you want to contour."/>
   <ScalarRangeLabel id="srl" trace_name="ScalarRangeLabel" array_menu="am"/>
-  <ContourEntry label="Contour Values" trace_name="Contour Values" help="List of current contour values." scalar_range="srl" array_menu="am"/>
+  <ContourEntry label="Contour Values" trace_name="Contour Values" help="List of current contour values." array_menu="am"/>
   <LabeledToggle label="Compute Normals" variable="ComputeNormals" help="Select whether to compute normals" default_value="1"/>
   <LabeledToggle label="Compute Gradients" variable="ComputeGradients" help="Select whether to compute gradients" default_value="0"/>
   <LabeledToggle label="Compute Scalars" variable="ComputeScalars" help="Select whether to compute scalars" default_value="0"/>
