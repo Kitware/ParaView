@@ -126,6 +126,7 @@ int SetApplicationIconCmd(ClientData clientdata,
                     0);
   if (hIcon == NULL)
     {
+#if 0
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                   FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                   NULL,
@@ -136,6 +137,7 @@ int SetApplicationIconCmd(ClientData clientdata,
                   NULL);
     sprintf(interp->result, "%s", (LPCTSTR)lpMsgBuf);
     LocalFree(lpMsgBuf);
+#endif
     return TCL_ERROR;
     }
 
