@@ -31,7 +31,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.12");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.12.2.1");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -280,6 +280,27 @@ int vtkXMLCollectionReader::FillOutputPortInformation(int, vtkInformation *info)
 }
 
 
+int vtkXMLCollectionReader::ProcessRequest(vtkInformation* request,
+                                  vtkInformationVector** inputVector,
+                                  vtkInformationVector* outputVector)
+{
+  if(request->Has(vtkDemandDrivenPipeline::REQUEST_DATA_NOT_GENERATED()))
+    {
+    // Mark all outputs as not generated so that the executive does
+    // not try to handle initialization/finalization of the outputs.
+    // We will do it here.
+    int i;
+    for(i=0; i < outputVector->GetNumberOfInformationObjects(); ++i)
+      {
+      vtkInformation* outInfo = outputVector->GetInformationObject(i);
+      outInfo->Set(vtkDemandDrivenPipeline::DATA_NOT_GENERATED(), 1);
+      }
+
+    }
+  return this->Superclass::ProcessRequest(request, inputVector, outputVector);
+}
+
+
 //----------------------------------------------------------------------------
 int vtkXMLCollectionReader::RequestDataObject(
   vtkInformation *vtkNotUsed(request), 
@@ -448,6 +469,51 @@ void vtkXMLCollectionReader::SetupOutput(const char* filePath, int index,
     // We do not have a reader for this output, remove it.
     this->GetExecutive()->SetOutputData(index, 0);
     }
+}
+
+
+//----------------------------------------------------------------------------
+// This method overloads the method in vtkXMLReader.  The ReadXMLInformation
+// call is made in RequestDataObject (UpdateData is done at the beginning of
+// the UpdateInformation pass, before RequestInformation on the algorithm)
+int vtkXMLCollectionReader::RequestInformation(vtkInformation *request,
+  vtkInformationVector **vtkNotUsed(inputVector), vtkInformationVector *outputVector)
+{
+  this->InformationError = 0;
+  int outputPort = -1;
+
+  // not even sure that a request is going to come through for a particular
+  // port, but check
+  if ( request->Has(vtkDemandDrivenPipeline::FROM_OUTPUT_PORT()) )
+    {
+    outputPort = request->Get( vtkDemandDrivenPipeline::FROM_OUTPUT_PORT() );
+    }
+
+  if (outputPort < 0)
+    {
+    int i, numberOfOutputs = this->GetNumberOfOutputPorts();
+
+    for (i = 0; i < numberOfOutputs; i++)
+      {
+      // We already did the RequestInformation/UpdateInformation on the
+      // individual readers during the ReqeustDataObject pass for the
+      // vtkXMLCollectionReader, in SetupOutput; now, we need to copy relevant
+      // keys that were setup in the child readers to the outputs of this
+      // reader
+      this->Internal->Readers[i]->CopyOutputInformation(
+        outputVector->GetInformationObject(i), 0);
+      this->SetupOutputInformation( outputVector->GetInformationObject(i) );
+      }
+    }
+  else
+    {
+    this->Internal->Readers[outputPort]->CopyOutputInformation(
+      outputVector->GetInformationObject(outputPort), 0);
+    this->SetupOutputInformation( 
+      outputVector->GetInformationObject(outputPort) );
+    }
+
+  return !this->InformationError;
 }
 
 //----------------------------------------------------------------------------

@@ -120,10 +120,21 @@ protected:
   virtual int ReadPrimaryElement(vtkXMLDataElement* ePrimary);
   virtual void SetupEmptyOutput();
   virtual int FillOutputPortInformation(int, vtkInformation* info);
+
+  virtual int ProcessRequest(vtkInformation *request,
+                             vtkInformationVector **inputVector,
+                             vtkInformationVector *outputVector);
+
   virtual int RequestDataObject(vtkInformation *request,
                                 vtkInformationVector **inputVector,
                                 vtkInformationVector *outputVector);
   void SetupOutput(const char* filePath, int index, vtkInformation *outInfo);
+
+  // Overload of vtkXMLReader function, so we can handle updating the
+  // information on multiple outputs
+  virtual int RequestInformation(vtkInformation *request,
+    vtkInformationVector **inputVector, vtkInformationVector *outputVector);
+
   void ReadXMLData();
   
   // Callback registered with the InternalProgressObserver.
