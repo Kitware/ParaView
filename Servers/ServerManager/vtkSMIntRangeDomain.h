@@ -94,6 +94,13 @@ public:
   void RemoveAllMaxima();
 
   // Description:
+  // Returns the number of entries in the internal
+  // maxima/minima list. No maxima/minima exists beyond
+  // this index. Maxima/minima below this number may or
+  // may not exist.
+  unsigned int GetNumberOfEntries();
+
+  // Description:
   // Update self checking the "unchecked" values of all required
   // properties. Overwritten by sub-classes.
   virtual void Update(vtkSMProperty*);
@@ -120,7 +127,6 @@ protected:
 
   // Internal use only.
   // Set/Get the number of min/max entries.
-  unsigned int GetNumberOfEntries();
   void SetNumberOfEntries(unsigned int size);
 
   vtkSMIntRangeDomainInternals* IRInternals;

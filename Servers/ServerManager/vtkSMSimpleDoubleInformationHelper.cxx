@@ -20,7 +20,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleDoubleInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMSimpleDoubleInformationHelper, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleDoubleInformationHelper::vtkSMSimpleDoubleInformationHelper()
@@ -44,6 +44,7 @@ void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
     return;
     }
 
+  // Invoke property's method on the root node of the server
   vtkClientServerStream str;
   str << vtkClientServerStream::Invoke 
       << objectId << prop->GetCommand()
@@ -52,6 +53,7 @@ void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
 
+  // Get the result
   const vtkClientServerStream& res =     
     pm->GetLastResult(vtkProcessModule::GetRootId(serverIds));
 
@@ -70,6 +72,7 @@ void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
 
   int argType = res.GetArgumentType(0, 0);
 
+  // If single value, both float and double works
   if (argType == vtkClientServerStream::float64_value ||
       argType == vtkClientServerStream::float32_value)
     {
@@ -83,6 +86,7 @@ void vtkSMSimpleDoubleInformationHelper::UpdateProperty(
     dvp->SetNumberOfElements(1);
     dvp->SetElement(0, ires);
     }
+  // If array, handle 32 bit and 64 bit separately
   else if (argType == vtkClientServerStream::float64_array)
     {
     vtkTypeUInt32 length;

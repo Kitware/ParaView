@@ -20,6 +20,10 @@
 // this state to the vtk object it refers to. vtkSMPropery only supports
 // methods with no arguments. Sub-classes support methods with different
 // arguments types and numbers.
+// A property can also be marked as an "information" property in which case
+// it's values are obtained from the server with the UpdateInformation()
+// call. This call is forwarded to an information helper. The type of
+// the information helper used is specified in the XML file.
 // Each property can have one or more sub-properties. The sub-properties
 // can be accessed using an iterator. It is possible to create composite
 // properties of any depth this way.
@@ -30,6 +34,7 @@
 // .SECTION See Also
 // vtkSMProxyProperty vtkSMInputProperty vtkSMVectorProperty
 // vtkSMDoubleVectorPropery vtkSMIntVectorPropery vtkSMStringVectorProperty
+// vtkSMDomain vtkSMInformationHelper
 
 #ifndef __vtkSMProperty_h
 #define __vtkSMProperty_h
@@ -107,6 +112,11 @@ public:
   // as well as all dependant domains. This is usually called
   // after SetUncheckedXXX() to tell all dependant domains to
   // update themselves according to the new value.
+  // Note that when calling Update() on domains contained by
+  // this property, a NULL is passed as the argument. This is
+  // because the domain does not really "depend" on the property.
+  // When calling Update() on dependent domains, the property
+  // passes itself as the argument.
   void UpdateDependentDomains();
 
   // Description:
@@ -158,8 +168,7 @@ protected:
   // Description:
   // If this is an information property (InformationOnly is true),
   // this method fills the vector with the values obtained from
-  // the server using the Command (using the provided server id
-  // -only root node- and object id).
+  // the server. This work is forwarded to the information helper.
   virtual void UpdateInformation(int serverids, vtkClientServerID objectId);
   //ETX
 
@@ -211,6 +220,11 @@ protected:
   // Save the state in XML.
   virtual void SaveState(const char* name, ostream* file, vtkIndent indent);
 
+  // Description:
+  // Set from the XML file, information helpers fill in the property
+  // values with information obtained from server.
+  void SetInformationHelper(vtkSMInformationHelper* helper);
+
   char* Command;
 
   vtkSMPropertyInternals* PInternals;
@@ -232,7 +246,6 @@ protected:
   vtkSetMacro(InformationOnly, int);
   int InformationOnly;
 
-  void SetInformationHelper(vtkSMInformationHelper* helper);
   vtkSMInformationHelper* InformationHelper;
 
 private:

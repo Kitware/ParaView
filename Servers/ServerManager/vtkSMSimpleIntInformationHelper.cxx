@@ -20,7 +20,7 @@
 #include "vtkSMIntVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleIntInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMSimpleIntInformationHelper, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleIntInformationHelper::vtkSMSimpleIntInformationHelper()
@@ -44,6 +44,7 @@ void vtkSMSimpleIntInformationHelper::UpdateProperty(
     return;
     }
 
+  // Invoke property's method on the root node of the server
   vtkClientServerStream str;
   str << vtkClientServerStream::Invoke 
       << objectId << prop->GetCommand()
@@ -52,6 +53,7 @@ void vtkSMSimpleIntInformationHelper::UpdateProperty(
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
 
+  // Get the result
   const vtkClientServerStream& res = 
     pm->GetLastResult(vtkProcessModule::GetRootId(serverIds));
 
@@ -69,6 +71,7 @@ void vtkSMSimpleIntInformationHelper::UpdateProperty(
 
   int argType = res.GetArgumentType(0, 0);
 
+  // If single value, all int types
   if (argType == vtkClientServerStream::int32_value ||
       argType == vtkClientServerStream::int16_value ||
       argType == vtkClientServerStream::int8_value)
@@ -83,6 +86,7 @@ void vtkSMSimpleIntInformationHelper::UpdateProperty(
     ivp->SetNumberOfElements(1);
     ivp->SetElement(0, ires);
     }
+  // if array, only 32 bit ints work
   else if (argType == vtkClientServerStream::int32_array)
     {
     vtkTypeUInt32 length;

@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.8");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.9");
 
 struct vtkSMStringListDomainInternals
 {
@@ -157,7 +157,11 @@ void vtkSMStringListDomain::Update(vtkSMProperty* prop)
 //---------------------------------------------------------------------------
 int vtkSMStringListDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element)
 {
-  this->Superclass::ReadXMLAttributes(prop, element);
+  int retVal = this->Superclass::ReadXMLAttributes(prop, element);
+  if (!retVal)
+    {
+    return 0;
+    }
 
   // Loop over the top-level elements.
   unsigned int i;

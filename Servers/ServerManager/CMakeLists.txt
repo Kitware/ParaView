@@ -4,6 +4,8 @@ SET( ServerManagerCommon_SRCS
   vtkSMApplication.cxx
   vtkSMArrayListDomain.cxx
   vtkSMArrayRangeDomain.cxx
+  vtkSMArraySelectionDomain.cxx
+  vtkSMArraySelectionInformationHelper.cxx
   vtkSMBooleanDomain.cxx
   vtkSMBoundsDomain.cxx
   vtkSMDataTypeDomain.cxx
@@ -39,8 +41,11 @@ SET( ServerManagerCommon_SRCS
   vtkSMSimpleStringInformationHelper.cxx
   vtkSMSourceProxy.cxx
   vtkSMStringListDomain.cxx
+  vtkSMStringListRangeDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
+  vtkSMXDMFInformationHelper.cxx
+  vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
   )
 

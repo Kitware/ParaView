@@ -133,8 +133,10 @@ public:
   vtkGetStringMacro(XMLName);
 
   // Description:
-  // Updates all property informations by calling the method
-  // and populating the values.
+  // Updates all property informations by calling UpdateInformation()
+  // and populating the values. It also calls UpdateDependentDomains()
+  // on all properties to make sure that domains that depend on the
+  // information are updated.
   virtual void UpdateInformation();
   
 protected:

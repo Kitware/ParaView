@@ -12,9 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMSimpleDoubleInformationHelper -
+// .NAME vtkSMSimpleDoubleInformationHelper - populates vtkSMDoubleVectorProperty with the results of it's command
 // .SECTION Description
+// vtkSMSimpleDoubleInformationHelper only works with 
+// vtkSMDoubleVectorProperties. It calls the property's Command on the
+// root node of the associated server and populates the property using
+// the values returned.
 // .SECTION See Also
+// vtkSMInformationHelper vtkSMDoubleVectorProperty
 
 #ifndef __vtkSMSimpleDoubleInformationHelper_h
 #define __vtkSMSimpleDoubleInformationHelper_h
@@ -33,6 +38,9 @@ public:
 
   //BTX
   // Description:
+  // Updates the property using values obtained for server. Calls
+  // property's Command on the root node of the server and uses the
+  // return value(s).
   virtual void UpdateProperty(
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop);
   //ETX

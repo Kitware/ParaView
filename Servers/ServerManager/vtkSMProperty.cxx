@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.19");
+vtkCxxRevisionMacro(vtkSMProperty, "1.20");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -323,7 +323,10 @@ int vtkSMProperty::ReadXMLAttributes(vtkSMProxy* proxy,
         }
       else if (ih)
         {
-        this->SetInformationHelper(ih);
+        if (ih->ReadXMLAttributes(this, domainEl))
+          {
+          this->SetInformationHelper(ih);
+          }
         }
       else
         {

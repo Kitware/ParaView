@@ -20,7 +20,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMSimpleStringInformationHelper);
-vtkCxxRevisionMacro(vtkSMSimpleStringInformationHelper, "1.1");
+vtkCxxRevisionMacro(vtkSMSimpleStringInformationHelper, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMSimpleStringInformationHelper::vtkSMSimpleStringInformationHelper()
@@ -43,6 +43,8 @@ void vtkSMSimpleStringInformationHelper::UpdateProperty(
                   "passed when vtkSMStringVectorProperty was needed.");
     return;
     }
+
+  // Invoke property's method on the root node of the server
   vtkClientServerStream str;
   str << vtkClientServerStream::Invoke 
       << objectId << prop->GetCommand()
@@ -51,6 +53,7 @@ void vtkSMSimpleStringInformationHelper::UpdateProperty(
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   pm->SendStream(vtkProcessModule::GetRootId(serverIds), str, 0);
 
+  // Get the result
   const vtkClientServerStream& res =     
     pm->GetLastResult(vtkProcessModule::GetRootId(serverIds));
 

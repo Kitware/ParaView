@@ -12,9 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMInformationHelper -
+// .NAME vtkSMInformationHelper - abstract superclass of all information helpers
 // .SECTION Description
+// Information helpers are used by information property to obtain
+// information from the server. Since there can be more than way
+// to populate an information property, this functionality was moved
+// to a separate hierarchy of helper classes.
+// Each information property has an associated information helper that
+// is specified in the XML configuration file.
 // .SECTION See Also
+// vtkSMSimpleIntInformationHelper vtkSMSimpleDoubleInformationHelper 
+// vtkSMSimpleStringInformationHelper
 
 #ifndef __vtkSMInformationHelper_h
 #define __vtkSMInformationHelper_h
@@ -22,6 +30,7 @@
 #include "vtkSMObject.h"
 #include "vtkClientServerID.h" // needed for vtkClientServerID
 
+class vtkPVXMLElement;
 class vtkSMProperty;
 
 class VTK_EXPORT vtkSMInformationHelper : public vtkSMObject
@@ -32,6 +41,8 @@ public:
 
   //BTX
   // Description:
+  // Fill in the property with values obtained from server. The
+  // way in which the information is obtained depends on the sub-class.
   virtual void UpdateProperty(
     int serverIds, vtkClientServerID objectId, vtkSMProperty* prop) = 0;
   //ETX
@@ -39,6 +50,18 @@ public:
 protected:
   vtkSMInformationHelper();
   ~vtkSMInformationHelper();
+
+//BTX
+  friend class vtkSMProperty;
+//ETX
+
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkSMProperty*, vtkPVXMLElement*) 
+    {
+      return 1;
+    };
 
 private:
   vtkSMInformationHelper(const vtkSMInformationHelper&); // Not implemented

@@ -60,8 +60,8 @@ public:
 
   // Description:
   // Returns the index of an element with a particular value.
-  // Returns -1 if no element has that value.
-  int GetElementIndex(const char *value);
+  // exists is set to false if element does not exist.
+  unsigned int GetElementIndex(const char *value, int& exists);
   
   // Description:
   // Set the cast type used when passing a value to the stream.

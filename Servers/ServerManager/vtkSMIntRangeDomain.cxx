@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.9");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.10");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -229,7 +229,7 @@ void vtkSMIntRangeDomain::SaveState(
   *file << indent 
         << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
         << endl;
-  unsigned int size = this->IRInternals->Entries.size();
+  unsigned int size = this->GetNumberOfEntries();
   unsigned int i;
   for(i=0; i<size; i++)
     {
