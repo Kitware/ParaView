@@ -26,19 +26,25 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVAnimationInterface.h"
-#include "vtkPVApplication.h"
+
+#include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
-#include "vtkKWScale.h"
-#include "vtkKWPushButton.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWView.h"
-#include "vtkKWLabeledEntry.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkKWMenuButton.h"
-#include "vtkPVWindow.h"
-#include "vtkPVWidget.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWScale.h"
+#include "vtkKWText.h"
+#include "vtkKWView.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
+#include "vtkPVWidget.h"
 #include "vtkPVWidgetCollection.h"
+#include "vtkPVWindow.h"
 
 // We need to:
 // Format min/max/resolution entries better.
@@ -46,6 +52,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 // Handle methods with multiple entries.
 // Handle special sources (contour, probe, threshold).
 
+vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
 int vtkPVAnimationInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);

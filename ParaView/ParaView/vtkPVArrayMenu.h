@@ -52,13 +52,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVArrayMenu_h
 
 #include "vtkPVWidget.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWLabel.h"
-#include "vtkPVInputMenu.h"
 
 class vtkPVInputMenu;
 class vtkCollection;
 class vtkDataArray;
+class vtkKWOptionMenu;
+class vtkKWLabel;
+class vtkPVInputMenu;
 
 class VTK_EXPORT vtkPVArrayMenu : public vtkPVWidget
 {
@@ -75,7 +75,7 @@ public:
   // Set the label.  The label can be used to get this widget
   // from a script.
   void SetLabel (const char* label);
-  const char* GetLabel() {return this->Label->GetLabel();}
+  const char* GetLabel();
 
   // Description:
   // This option shows a menu that lets the user select which field to use:
@@ -133,7 +133,7 @@ public:
 
   // Description:
   // This input menu supplies the data set.
-  vtkSetObjectMacro(InputMenu, vtkPVInputMenu);
+  virtual void SetInputMenu(vtkPVInputMenu*);
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
   
   // Description:

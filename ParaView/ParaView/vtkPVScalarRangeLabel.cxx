@@ -39,13 +39,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkPVScalarRangeLabel.h"
+
+#include "vtkKWApplication.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVData.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPVArrayMenu.h"
+
+vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
 //----------------------------------------------------------------------------
 vtkPVScalarRangeLabel* vtkPVScalarRangeLabel::New()

@@ -39,12 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkPVExtentTranslator.h"
+
+#include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
 #include "vtkSource.h"
-
-
 
 //------------------------------------------------------------------------------
 vtkPVExtentTranslator* vtkPVExtentTranslator::New()
@@ -58,6 +57,8 @@ vtkPVExtentTranslator* vtkPVExtentTranslator::New()
   // If the factory was unable to create the object, then create it here.
   return new vtkPVExtentTranslator;
 }
+
+vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
 
 
 //----------------------------------------------------------------------------

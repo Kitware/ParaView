@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVLODActor.h"
 
+#include "vtkMapper.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkProperty.h"
@@ -49,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTimerLog.h"
 
 #include <math.h>
+
+vtkCxxSetObjectMacro(vtkPVLODActor, LODMapper, vtkMapper);
 
 //-----------------------------------------------------------------------------
 vtkPVLODActor* vtkPVLODActor::New()

@@ -39,22 +39,27 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkPVWizard.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVWindow.h"
-#include "vtkPVFileEntry.h"
-#include "vtkPVSelectionList.h"
-#include "vtkPVAnimationInterface.h"
+
+#include "vtkCollection.h"
+#include "vtkKWApplication.h"
+#include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWCheckButton.h"
-#include "vtkCollection.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterface.h"
+#include "vtkPVFileEntry.h"
+#include "vtkPVSelectionList.h"
+#include "vtkPVWindow.h"
+#include "vtkRectilinearGrid.h"
+
 #include <ctype.h>
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVWizard );
+
+vtkCxxSetObjectMacro(vtkPVWizard,Data, vtkRectilinearGrid);
 
 int vtkPVWizardCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

@@ -49,6 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkPVXMLElement.h"
 
+vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
+
 //----------------------------------------------------------------------------
 vtkPVArrayMenu* vtkPVArrayMenu::New()
 {
@@ -865,6 +867,13 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
   
   return 1;
 }
+
+//----------------------------------------------------------------------------
+const char* vtkPVArrayMenu::GetLabel() 
+{
+  return this->Label->GetLabel();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)

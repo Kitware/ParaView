@@ -40,12 +40,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVExtentEntry.h"
-#include "vtkPVAnimationInterface.h"
-#include "vtkObjectFactory.h"
+
+#include "vtkArrayMap.txx"
 #include "vtkKWEntry.h"
 #include "vtkKWMenu.h"
-#include "vtkArrayMap.txx"
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterface.h"
 #include "vtkPVData.h"
+#include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------

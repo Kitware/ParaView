@@ -42,16 +42,19 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVAnimationInterface_h
 #define __vtkPVAnimationInterface_h
 
-#include "vtkPVSource.h"
-#include "vtkPVRenderView.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWText.h"
 #include "vtkPVWidget.h"
+
+class vtkKWCheckButton;
+class vtkKWLabel;
 class vtkKWLabeledEntry;
+class vtkKWLabeledFrame;
 class vtkKWMenuButton;
-class vtkPVWindow;
+class vtkKWPushButton;
 class vtkKWScale;
+class vtkKWText;
+class vtkPVRenderView;
+class vtkPVSource;
+class vtkPVWindow;
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {
@@ -102,20 +105,20 @@ public:
 
   // Description:
   // Access to the render view. Needed to  render.
-  void SetView(vtkPVRenderView *renderView);
+  virtual void SetView(vtkPVRenderView *renderView);
   vtkGetObjectMacro(View, vtkPVRenderView);
 
   // Description:
   // Access to the render view. Needed to build up the source list.
   // SetWindow can't be an object macro because that sets up a circular
   // reference.
-  void SetWindow(vtkPVWindow *window);
+  virtual void SetWindow(vtkPVWindow *window);
   vtkGetObjectMacro(Window, vtkPVWindow);
 
   // Description:
   // The object which is being manipulated to produce the animation.
   // No reference counting here because of loops (leak).
-  void SetPVSource(vtkPVSource *source);
+  virtual void SetPVSource(vtkPVSource *source);
   vtkGetObjectMacro(PVSource,vtkPVSource);
 
   // Description:
@@ -152,7 +155,7 @@ public:
   // If the animation is controlling a specific PVWidget, then
   // this widget will be updated to reflect the new value.
   // The menu sets it here.
-  vtkSetObjectMacro(ControlledWidget, vtkPVWidget);
+  virtual void SetControlledWidget(vtkPVWidget*);
   vtkGetObjectMacro(ControlledWidget, vtkPVWidget);
 
 protected:

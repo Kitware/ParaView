@@ -53,6 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
+#include "vtkPVRenderView.h"
+
+vtkCxxSetObjectMacro(vtkPVTreeComposite, RenderView, vtkPVRenderView);
 
 //-------------------------------------------------------------------------
 vtkPVTreeComposite* vtkPVTreeComposite::New()

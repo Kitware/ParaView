@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVTreeComposite.h"
 #include "vtkRenderer.h"
 
 //----------------------------------------------------------------------------
@@ -59,6 +60,7 @@ vtkPVWorldPointPicker* vtkPVWorldPointPicker::New()
   return new vtkPVWorldPointPicker;
 }
 
+vtkCxxSetObjectMacro(vtkPVWorldPointPicker, Composite, vtkPVTreeComposite);
 
 //----------------------------------------------------------------------------
 vtkPVWorldPointPicker::vtkPVWorldPointPicker()

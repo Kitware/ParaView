@@ -49,10 +49,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVScalarRangeLabel_h
 
 #include "vtkPVWidget.h"
-#include "vtkPVArrayMenu.h"
-#include "vtkKWLabeledFrame.h"
 
 class vtkKWApplication;
+class vtkKWLabel;
+class vtkKWLabeledFrame;
+class vtkPVArrayMenu;
 
 class VTK_EXPORT vtkPVScalarRangeLabel : public vtkPVWidget
 {
@@ -67,7 +68,7 @@ public:
 
   // Description:
   // The scalar range display gets its array object from the array menu.
-  vtkSetObjectMacro(ArrayMenu, vtkPVArrayMenu);
+  virtual void SetArrayMenu(vtkPVArrayMenu*);
   vtkGetObjectMacro(ArrayMenu, vtkPVArrayMenu);
 
   // Description:
@@ -75,18 +76,16 @@ public:
   virtual void Update();
 
   // Description:
-  // Access to the range values.
-  // This is used in a regression test.
+  // Access to the range values.  This is used in a regression test.
   vtkGetVector2Macro(Range, float);
 
 //BTX
   // Description:
-  // Creates and returns a copy of this widget. It will create
-  // a new instance of the same type as the current object
-  // using NewInstance() and then copy some necessary state 
-  // parameters.
+  // Creates and returns a copy of this widget. It will create a new
+  // instance of the same type as the current object using
+  // NewInstance() and then copy some necessary state parameters.
   vtkPVScalarRangeLabel* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+					vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -98,8 +97,6 @@ protected:
 
   float Range[2];
 
-  vtkPVScalarRangeLabel(const vtkPVScalarRangeLabel&); // Not implemented
-  void operator=(const vtkPVScalarRangeLabel&); // Not implemented
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
@@ -108,6 +105,10 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+private:
+  vtkPVScalarRangeLabel(const vtkPVScalarRangeLabel&); // Not implemented
+  void operator=(const vtkPVScalarRangeLabel&); // Not implemented
 };
 
 

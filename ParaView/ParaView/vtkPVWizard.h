@@ -47,14 +47,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVWizard_h
 
 #include "vtkKWWidget.h"
-#include "vtkRectilinearGrid.h"
-class vtkKWApplication;
-class vtkKWWindow;
-class vtkPVWindow;
-class vtkPVFileEntry;
-class vtkKWPushButton;
-class vtkKWLabel;
+
 class vtkCollection;
+class vtkKWApplication;
+class vtkKWLabel;
+class vtkKWPushButton;
+class vtkKWWindow;
+class vtkPVFileEntry;
+class vtkPVWindow;
+class vtkRectilinearGrid;
 
 class VTK_EXPORT vtkPVWizard : public vtkKWWidget
 {
@@ -99,7 +100,7 @@ public:
 
   // Description:
   // A hack to get the data from the reader through Tcl.
-  vtkSetObjectMacro(Data, vtkRectilinearGrid);
+  virtual void SetData(vtkRectilinearGrid*);
   vtkGetObjectMacro(Data, vtkRectilinearGrid);
   vtkSetStringMacro(String);
   vtkGetStringMacro(String);

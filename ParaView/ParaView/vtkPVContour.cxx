@@ -40,19 +40,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVContour.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVScalarRangeLabel.h"
-#include "vtkPVContourEntry.h"
-#include "vtkPVLabeledToggle.h"
-#include "vtkPVApplication.h"
+
 #include "vtkContourFilter.h"
-#include "vtkPVData.h"
-#include "vtkPVApplication.h"
-#include "vtkKWMessageDialog.h"
-#include "vtkPVWindow.h"
 #include "vtkKWCompositeCollection.h"
-#include "vtkObjectFactory.h"
 #include "vtkKWFrame.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVApplication.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkPVContourEntry.h"
+#include "vtkPVData.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVLabeledToggle.h"
+#include "vtkPVScalarRangeLabel.h"
+#include "vtkPVWindow.h"
 
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

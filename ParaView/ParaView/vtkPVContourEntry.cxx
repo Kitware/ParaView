@@ -40,16 +40,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVContourEntry.h"
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWListBox.h"
-#include "vtkKWEntry.h"
-#include "vtkKWPushButton.h"
-#include "vtkPVXMLElement.h"
 
-#include "vtkKWMenu.h"
-#include "vtkPVAnimationInterface.h"
 #include "vtkArrayMap.txx"
+#include "vtkKWEntry.h"
+#include "vtkKWListBox.h"
+#include "vtkKWMenu.h"
+#include "vtkKWPushButton.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterface.h"
+#include "vtkPVApplication.h"
+#include "vtkPVSource.h"
+#include "vtkPVXMLElement.h"
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

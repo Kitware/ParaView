@@ -53,7 +53,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVLODActor_h
 
 #include "vtkActor.h"
-#include "vtkPolyDataMapper.h"
+
+class vtkMapper;
 
 class VTK_EXPORT vtkPVLODActor : public vtkActor
 {
@@ -81,7 +82,7 @@ public:
 
   // Description:
   // This sets the low res input.
-  vtkSetObjectMacro(LODMapper, vtkMapper);
+  virtual void SetLODMapper(vtkMapper*);
   vtkGetObjectMacro(LODMapper, vtkMapper);
 
   // Description:

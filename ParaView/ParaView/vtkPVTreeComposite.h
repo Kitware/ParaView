@@ -56,8 +56,8 @@ class vtkMPIController;
 #endif
 
 #include "vtkCompositeManager.h"
-#include "vtkPVRenderView.h"
 
+class vtkPVRenderView;
 
 class VTK_EXPORT vtkPVTreeComposite : public vtkCompositeManager
 {
@@ -74,7 +74,7 @@ public:
   
   // Description:
   // The RenderView has methods for checking for events.
-  vtkSetObjectMacro(RenderView, vtkPVRenderView);
+  virtual void SetRenderView(vtkPVRenderView*);
   vtkGetObjectMacro(RenderView, vtkPVRenderView);
   
   // Description:
