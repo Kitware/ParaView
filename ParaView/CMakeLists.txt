@@ -116,4 +116,7 @@ LINK_LIBRARIES (Expat)
 TARGET_LINK_LIBRARIES (ParaView
                        vtkKWParaViewTCL)
 
+INCLUDE (${PARAVIEW_BINARY_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
+INCLUDE (${PARAVIEW_SOURCE_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
+
 
