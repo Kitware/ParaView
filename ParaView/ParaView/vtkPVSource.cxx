@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.335");
+vtkCxxRevisionMacro(vtkPVSource, "1.336");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1234,8 +1234,6 @@ void vtkPVSource::AcceptCallbackInternal()
 void vtkPVSource::Accept(int hideFlag, int hideSource)
 {
   vtkPVWindow *window;
-  int idx, num;
-  vtkPVPart *part;
   vtkPVSource *input;
 
   // vtkPVSource is taking over some of the update descisions because
