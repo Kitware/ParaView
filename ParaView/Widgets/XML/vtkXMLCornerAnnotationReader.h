@@ -49,13 +49,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkXMLCornerAnnotationReader_h
 #define __vtkXMLCornerAnnotationReader_h
 
-#include "vtkXMLObjectReader.h"
+#include "vtkXMLActor2DReader.h"
 
-class VTK_EXPORT vtkXMLCornerAnnotationReader : public vtkXMLObjectReader
+class VTK_EXPORT vtkXMLCornerAnnotationReader : public vtkXMLActor2DReader
 {
 public:
   static vtkXMLCornerAnnotationReader* New();
-  vtkTypeRevisionMacro(vtkXMLCornerAnnotationReader, vtkXMLObjectReader);
+  vtkTypeRevisionMacro(vtkXMLCornerAnnotationReader, vtkXMLActor2DReader);
 
   // Description:
   // Parse an XML tree.

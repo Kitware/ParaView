@@ -48,12 +48,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLTextPropertyWriter.h"
 
 vtkStandardNewMacro(vtkXMLCornerAnnotationWriter);
-vtkCxxRevisionMacro(vtkXMLCornerAnnotationWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLCornerAnnotationWriter, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLCornerAnnotationWriter::GetRootElementName()
 {
   return "CornerAnnotation";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLCornerAnnotationWriter::GetTextPropertyElementName()
+{
+  return "TextProperty";
 }
 
 //----------------------------------------------------------------------------
@@ -71,8 +77,6 @@ int vtkXMLCornerAnnotationWriter::AddAttributes(vtkXMLDataElement *elem)
     return 0;
     }
 
-  elem->SetIntAttribute("Visibility", obj->GetVisibility());
-
   for (int i = 0; i < 4; i++)
     {
     ostrstream text_name;
@@ -88,6 +92,8 @@ int vtkXMLCornerAnnotationWriter::AddAttributes(vtkXMLDataElement *elem)
   elem->SetFloatAttribute("LevelShift", obj->GetLevelShift());
 
   elem->SetFloatAttribute("LevelScale", obj->GetLevelScale());
+
+  elem->SetFloatAttribute("ShowSliceAndImage", obj->GetShowSliceAndImage());
 
   return 1;
 }
@@ -112,14 +118,11 @@ int vtkXMLCornerAnnotationWriter::AddNestedElements(vtkXMLDataElement *elem)
   vtkTextProperty *tprop = obj->GetTextProperty();
   if (tprop)
     {
-    vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
-    elem->AddNestedElement(nested_elem);
-    nested_elem->Delete();
     vtkXMLTextPropertyWriter *xmlw = vtkXMLTextPropertyWriter::New();
     xmlw->SetObject(tprop);
-    xmlw->Create(nested_elem);
+    xmlw->CreateInNestedElement(elem, this->GetTextPropertyElementName());
     xmlw->Delete();
     }
-  
+ 
   return 1;
 }
