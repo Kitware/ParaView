@@ -312,7 +312,7 @@
   <Source class="vtkPExodusReader"/>
   <ArraySelection attribute_name="Cell" />
   <ArraySelection attribute_name="Point" />
-  <FileEntry variable="FilePrefix" extension="*" label="File prefix" 
+  <StringEntry variable="FilePrefix" extension="*" label="File prefix" 
                help="Set the file root. Used with file pattern to format a file name." />
 
   <StringEntry variable="FilePattern" label="File Pattern" 
@@ -321,11 +321,8 @@
   <VectorEntry variable="FileRange" label="Range of files" type="int"
                length="2" help="Range of files that are loaded" />
 
-  <VectorEntry variable="TimeStep" type="int" label="Time step"
-               help="Set the current timestep." />
-
-  <VectorEntry variable="NumberOfTimeSteps" type="int" readonly="1"
-               label="Number of time steps" help="Number of time steps." />
+  <Scale variable="TimeStep" type="int" label="Time step"
+               help="Set the current timestep." range_source="TimeStepRange" />
 
  </Module>
 #endif
