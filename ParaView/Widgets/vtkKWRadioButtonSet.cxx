@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.9");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.10");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -339,6 +339,7 @@ int vtkKWRadioButtonSet::IsButtonSelected(int id)
 int vtkKWRadioButtonSet::IsAnyButtonSelected()
 {
   vtkKWRadioButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWRadioButtonSet::ButtonSlot *found = NULL;
   vtkKWRadioButtonSet::ButtonsContainerIterator *it = 
     this->Buttons->NewIterator();
 
@@ -349,14 +350,15 @@ int vtkKWRadioButtonSet::IsAnyButtonSelected()
       {
       if (this->IsButtonSelected(button_slot->Id))
         {
-        return 1;
+        found = button_slot;
+        break;
         }
       }
     it->GoToNextItem();
     }
   it->Delete();
 
-  return 0;
+  return found ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
