@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.44");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.45");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -687,9 +687,10 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
       this->GetTclName(), ai->GetTclName());
     }
 
-  sprintf(script, "%s SetFileName [ lindex $%s_files [expr round($pvTime)] ]",
+  sprintf(script, "%s SetFileName [ lindex $%s_files [expr round($pvTime)-%d] ]",
     this->GetPVSource()->GetVTKSourceTclName(),
-    this->GetPVSource()->GetVTKSourceTclName());
+    this->GetPVSource()->GetVTKSourceTclName(),
+    this->Range[0]);
   ai->SetLabelAndScript(this->GetTraceName(), script);
   ai->SetTimeStart(this->Range[0]);
 
