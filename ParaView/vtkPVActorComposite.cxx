@@ -995,6 +995,7 @@ void vtkPVActorComposite::Initialize()
                bounds[3], bounds[4], bounds[5]);
   this->Script("%s SetCamera [%s GetActiveCamera]",
                this->GetCubeAxesTclName(), tclName);
+  this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
   if (array = this->PVData->GetVTKData()->GetPointData()->GetActiveScalars())
     {
@@ -1552,6 +1553,7 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
 
     tclName = this->GetPVRenderView()->GetRendererTclName();
     
-    *file << tclName << " GetActiveCamera]\n\n";
+    *file << tclName << " GetActiveCamera]\n\t"
+          << this->CubeAxesTclName << " SetInertia 20\n\n";
     }
 }
