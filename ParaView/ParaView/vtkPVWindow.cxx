@@ -125,7 +125,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.17");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.18");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1546,7 +1546,8 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 
-  //this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
+  this->MenuHelp->AddSeparator();
+  this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
 }
 
 
@@ -1554,10 +1555,8 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 void vtkPVWindow::PlayDemo()
 {
   int found=0;
-  int foundData=0;
 
   char temp1[1024];
-  char temp2[1024];
 
   struct stat fs;
 
@@ -1572,20 +1571,12 @@ void vtkPVWindow::PlayDemo()
   reg->SetTopLevel(temp);
   if (reg->ReadValue("Inst", loc, "Loc"))
     {
-    sprintf(temp1,"%s/Demos/Demo1.pvs",loc);
-    sprintf(temp2,"%s/Data/blow.vtk",loc);
-    }
-
-  // first make sure the file exists, this prevents an empty file from
-  // being created on older compilers
-  if (stat(temp2, &fs) == 0) 
-    {
-    foundData=1;
-    this->Application->Script("set tmpPvDataDir [string map {\\\\ /} {%s/Data}]", loc);
+    sprintf(temp1,"%s/Demo1.pvs",loc);
     }
 
   if (stat(temp1, &fs) == 0) 
     {
+    this->Script("set DemoDir %s", loc);
     this->LoadScript(temp1);
     found=1;
     }
@@ -1593,26 +1584,13 @@ void vtkPVWindow::PlayDemo()
 #endif // _WIN32  
 
   // Look in binary and installation directories
-
   const char** dir;
-  for(dir=VTK_PV_DEMO_PATHS; !foundData && *dir; ++dir)
-    {
-    if (!foundData)
-      {
-      sprintf(temp2, "%s/Data/blow.vtk", *dir);
-      if (stat(temp2, &fs) == 0) 
-        {
-        foundData=1;
-        this->Application->Script("set tmpPvDataDir %s/Data", *dir);
-        }
-      }
-    }
-
   for(dir=VTK_PV_DEMO_PATHS; !found && *dir; ++dir)
     {
-    sprintf(temp1, "%s/Demos/Demo1.pvs", *dir);
+    sprintf(temp1, "%s/Demo1.pvs", *dir);
     if (stat(temp1, &fs) == 0) 
       {
+      this->Script("set DemoDir %s", *dir);
       this->LoadScript(temp1);
       found=1;
       }
@@ -3854,7 +3832,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.17 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.18 $");
 }
 
 //----------------------------------------------------------------------------

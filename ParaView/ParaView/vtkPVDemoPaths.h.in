@@ -2,9 +2,9 @@
 #define VTK_DEMO_PATHS
 
 #ifdef _WIN32  
-static const char* VTK_PV_DEMO_PATHS[] = { "${PARAVIEW_BINARY_DIR}", 0};
+static const char* VTK_PV_DEMO_PATHS[] = { "${PARAVIEW_SOURCE_DIR}/Demos", 0};
 #else
-static const char* VTK_PV_DEMO_PATHS[] = { "${PARAVIEW_BINARY_DIR}", "${CMAKE_INSTALL_PREFIX}/share/ParaView", 0};
+static const char* VTK_PV_DEMO_PATHS[] = { "${PARAVIEW_SOURCE_DIR}/Demos", "${CMAKE_INSTALL_PREFIX}/share/ParaView/Demos", 0};
 #endif // _WIN32  
 
 #endif
