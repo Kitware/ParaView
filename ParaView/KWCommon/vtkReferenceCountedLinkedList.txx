@@ -227,7 +227,7 @@ void vtkReferenceCountedLinkedList<DType>::DebugList()
 // this knowledge to have easier acces for its members. This
 // method returns either NULL or the object.
 template <class DType>
-DType vtkReferenceCountedLinkedList<DType>::GetItem(vtkIdType id)
+DType vtkReferenceCountedLinkedList<DType>::GetPointerItem(vtkIdType id)
 {
   DType a = 0;
   if ( this->GetItem(id, a) == VTK_OK )
