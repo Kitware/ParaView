@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.55");
+vtkCxxRevisionMacro(vtkKWScale, "1.56");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -214,7 +214,6 @@ void vtkKWScale::Create(vtkKWApplication *app, const char *args)
                  this->TopLevel->GetWidgetName());
     this->Script("wm withdraw %s", 
                  this->TopLevel->GetWidgetName());
-
     this->PopupPushButton = vtkKWPushButton::New();
     this->PopupPushButton->SetParent(this);
     this->PopupPushButton->Create(app, "-padx 0 -pady 0");
@@ -564,6 +563,9 @@ void vtkKWScale::DisplayPopupScaleCallback()
                this->TopLevel->GetWidgetName());
   this->Script("raise %s", 
                this->TopLevel->GetWidgetName());
+  this->Script("wm transient %s %s", 
+               this->TopLevel->GetWidgetName(),
+               this->GetWidgetName());
 }
 
 // ---------------------------------------------------------------------------

@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.33");
+vtkCxxRevisionMacro(vtkKWEntry, "1.34");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -249,6 +249,8 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
     this->TopLevel = vtkKWWidget::New();
     this->TopLevel->Create(app, "toplevel", "-bg black -bd 1 -relief flat");
     //this->TopLevel->SetBind(this, "<Leave>", "WithdrawPopupCallback");
+    this->Script("wm transient %s %s", 
+                 this->TopLevel->GetWidgetName(), this->GetWidgetName());
     this->Script("wm overrideredirect %s 1", 
                  this->TopLevel->GetWidgetName());
     this->Script("wm withdraw %s", 

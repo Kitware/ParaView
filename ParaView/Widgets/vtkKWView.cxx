@@ -101,7 +101,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.112");
+vtkCxxRevisionMacro(vtkKWView, "1.113");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -497,6 +497,7 @@ void vtkKWView::CreateViewProperties()
   this->HeaderColor->SetCommand( this, "SetHeaderTextColor" );
   this->HeaderColor->SetBalloonHelpJustificationToRight();
   this->HeaderColor->SetBalloonHelpString("Change the color of the header text");
+  this->HeaderColor->SetDialogText("Header Text Color");
   this->Script("pack %s -side left -padx 2 -pady 4 -anchor nw",
                this->HeaderButton->GetWidgetName());
   this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
@@ -544,6 +545,7 @@ void vtkKWView::CreateViewProperties()
   this->BackgroundColor->Create( app, "" );
   this->BackgroundColor->SetCommand( this, "SetBackgroundColor" );
   this->BackgroundColor->SetBalloonHelpString("Set the background color");
+  this->BackgroundColor->SetDialogText("Background Color");
   this->Script("pack %s -side top -padx 15 -pady 4 -expand 1 -fill x",
                this->BackgroundColor->GetWidgetName());
 
@@ -1524,7 +1526,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.112 $");
+  this->ExtractRevision(os,"$Revision: 1.113 $");
 }
 
 //----------------------------------------------------------------------------

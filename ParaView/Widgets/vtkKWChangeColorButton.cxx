@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.36");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.37");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -61,6 +61,7 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
   this->LabelOutsideButton = 0;
 
   this->Text = NULL;
+  this->DialogText = 0;
   this->SetText("Set Color");
 
   this->ColorButton = vtkKWWidget::New();
@@ -78,6 +79,7 @@ vtkKWChangeColorButton::~vtkKWChangeColorButton()
     }
 
   this->SetText(0);
+  this->SetDialogText(0);
 
   if (this->ColorButton)
     {
@@ -410,10 +412,12 @@ void vtkKWChangeColorButton::QueryUserForColor()
   this->Application->SetDialogUp(1);
 
   this->Script(
-     "tk_chooseColor -initialcolor {#%02x%02x%02x} -title {Choose Color}",
+     "tk_chooseColor -initialcolor {#%02x%02x%02x} -title {%s} -parent %s",
      (int)(this->Color[0] * 255.5), 
      (int)(this->Color[1] * 255.5), 
-     (int)(this->Color[2] * 255.5) );
+     (int)(this->Color[2] * 255.5),
+     (this->DialogText?this->DialogText:"Chose Color"),
+     this->GetWidgetName() );
 
   result = this->Application->GetMainInterp()->result;
 
@@ -495,7 +499,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.36 $");
+  this->ExtractRevision(os,"$Revision: 1.37 $");
 }
 
 //----------------------------------------------------------------------------

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.9");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.10");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -210,6 +210,9 @@ void vtkKWThumbWheel::Create(vtkKWApplication *app,
     this->TopLevel = vtkKWWidget::New();
     this->TopLevel->Create(
       app, "toplevel", "-bg black -bd 2 -relief flat");
+    this->Script("wm transient %s %s", 
+                 this->TopLevel->GetWidgetName(),
+                 this->GetWidgetName());
     this->Script("wm overrideredirect %s 1", 
                  this->TopLevel->GetWidgetName());
     this->Script("wm withdraw %s", 
