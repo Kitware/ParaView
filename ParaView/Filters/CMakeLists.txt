@@ -23,6 +23,7 @@ SET(Filters_SRCS
   vtkPVImageGradientMagnitude.cxx
   vtkPVImageMedian3D.cxx
   vtkPVLinearExtrusionFilter.cxx
+  vtkProcessModule.cxx
   vtkPVRibbonFilter.cxx
   vtkPVThresholdFilter.cxx
   vtkPVUpdateSuppressor.cxx
@@ -68,7 +69,7 @@ CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/Filters/vtkPVFiltersConfig.h.in
 
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommonTCL vtkHybrid vtkParallel)
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommonTCL vtkClientServer vtkHybrid vtkParallel)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)
