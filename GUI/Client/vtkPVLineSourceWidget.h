@@ -71,8 +71,6 @@ protected:
   ~vtkPVLineSourceWidget();
   
   vtkSMSourceProxy *SourceProxy;
-  char* SourceProxyName;
-  vtkSetStringMacro(SourceProxyName);
 
   vtkPVLineSourceWidget(const vtkPVLineSourceWidget&); // Not implemented
   void operator=(const vtkPVLineSourceWidget&); // Not implemented

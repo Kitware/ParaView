@@ -153,10 +153,6 @@ protected:
 
   vtkSMProxy *BoxProxy; //The Implicit function proxy
   vtkSMProxy *BoxTransformProxy;
-  char *BoxProxyName;
-  char *BoxTransformProxyName;
-  vtkSetStringMacro(BoxProxyName);
-  vtkSetStringMacro(BoxTransformProxyName);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
     vtkPVXMLPackageParser* parser);

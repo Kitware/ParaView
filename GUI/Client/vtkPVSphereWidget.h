@@ -148,8 +148,6 @@ protected:
   vtkPVInputMenu* InputMenu;
 
   vtkSMProxy *ImplicitFunctionProxy;
-  char *ImplicitFunctionProxyName;
-  vtkSetStringMacro(ImplicitFunctionProxyName);
 
   // Description:
   // For saving the widget into a VTK tcl script.

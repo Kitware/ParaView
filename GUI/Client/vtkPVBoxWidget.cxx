@@ -15,42 +15,32 @@
 #include "vtkPVBoxWidget.h"
 
 #include "vtkArrayMap.txx"
-#include "vtkCamera.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
+#include "vtkKWFrame.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWScale.h"
+#include "vtkKWThumbWheel.h"
 #include "vtkKWView.h"
+#include "vtkMatrix4x4.h" 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
-#include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderer.h"
-
-#include "vtkKWFrame.h"
-#include "vtkKWThumbWheel.h"
-#include "vtkKWScale.h"
-#include "vtkPVRenderView.h"
-#include "vtkCommand.h"
-#include "vtkPVProcessModule.h"
-
 #include "vtkSMBoxWidgetProxy.h"
-#include "vtkKWEvent.h"
-#include "vtkMatrix4x4.h" 
-
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSMProxyProperty.h"
+#include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.45");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.46");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -78,8 +68,6 @@ vtkPVBoxWidget::vtkPVBoxWidget()
   this->BoxProxy = 0; // This is the implicit function proxy
   this->BoxTransformProxy = 0;
   
-  this->BoxProxyName = 0;
-  this->BoxTransformProxyName = 0;
   this->SetWidgetProxyXMLName("BoxWidgetProxy");
 }
 
@@ -99,26 +87,38 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
     this->ScaleThumbWheel[cc]->Delete();
     this->OrientationScale[cc]->Delete();
     }
-  if (this->BoxProxyName)
+  if(this->BoxProxy)
     {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("implicit_functions",
-                                                    this->BoxProxyName);
-    }
-  this->SetBoxProxyName(0);
-  if (this->BoxProxy)
-    {
+    vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+    const char* proxyName 
+      = proxyM->GetProxyName("implicit_functions", this->BoxProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("implicit_functions", proxyName);
+      }
+    proxyName = proxyM->GetProxyName("animateable", this->BoxProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
     this->BoxProxy->Delete();
     this->BoxProxy = 0;
     }
-  
-  if (this->BoxTransformProxyName)
+
+  if(this->BoxTransformProxy)
     {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("transforms",
-                                                    this->BoxTransformProxyName);
-    }
-  this->SetBoxTransformProxyName(0);
-  if (this->BoxTransformProxy)
-    {
+    vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+    const char* proxyName 
+      = proxyM->GetProxyName("transforms", this->BoxTransformProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("transforms", proxyName);
+      }
+    proxyName = proxyM->GetProxyName("animateable", this->BoxTransformProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
     this->BoxTransformProxy->Delete();
     this->BoxTransformProxy = 0;
     }
@@ -367,10 +367,7 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 void vtkPVBoxWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "BoxProxyName: " << (this->BoxProxyName? this->BoxProxyName: "None") << endl;
   os << indent << "BoxProxy: " << this->BoxProxy << endl;
-  os << indent << "BoxTransformProxyName: " 
-    << (this->BoxTransformProxyName? this->BoxTransformProxyName : "None" )<< endl;
   os << indent << "BoxTransformProxy: " << this->BoxTransformProxy << endl;
   os << indent << "InputMenu: " << this->InputMenu << endl;
 
@@ -613,17 +610,45 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
   this->BoxProxy = pm->NewProxy("implicit_functions", "Box");
   ostrstream str1;
   str1 << "vtkPVBoxWidget_Box" << instanceCount << ends;
-  this->SetBoxProxyName(str1.str());
-  pm->RegisterProxy("implicit_functions", this->BoxProxyName, this->BoxProxy);
-  str1.rdbuf()->freeze(0);
+  pm->RegisterProxy("implicit_functions", str1.str(), this->BoxProxy);
+  delete[] str1.str();
+  if (this->PVSource)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ";Box" << ends;
+        pm->RegisterProxy("animateable", animName.str(), this->BoxProxy);
+        delete[] animName.str();
+        }
+      }
+    }
 
   this->BoxTransformProxy = pm->NewProxy("transforms", "Transform2");
   ostrstream str2;
   str2 << "vtkPVBoxWidget_BoxTransform" << instanceCount << ends;
-  this->SetBoxTransformProxyName(str2.str());
-  pm->RegisterProxy("transforms", this->BoxTransformProxyName,
-    this->BoxTransformProxy);
-  str2.rdbuf()->freeze(0);
+  pm->RegisterProxy("transforms", str2.str(), this->BoxTransformProxy);
+  delete[] str2.str();
+  if (this->PVSource)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ";BoxTransform" << ends;
+        pm->RegisterProxy(
+          "animateable", animName.str(), this->BoxTransformProxy);
+        delete[] animName.str();
+        }
+      }
+    }
 
   instanceCount++;
 }

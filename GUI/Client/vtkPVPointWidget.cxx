@@ -14,34 +14,29 @@
 =========================================================================*/
 #include "vtkPVPointWidget.h"
 
-#include "vtkCamera.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVDisplayGUI.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVRenderModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
-#include "vtkRenderer.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPickPointWidget.h"
-
-#include "vtkKWEvent.h"
-#include "vtkPVRenderModule.h"
-#include "vtkSMSourceProxy.h"
-#include "vtkSMPointWidgetProxy.h"
+#include "vtkRenderer.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMPointWidgetProxy.h"
+#include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.41");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.42");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

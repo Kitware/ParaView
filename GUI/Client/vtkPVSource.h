@@ -605,7 +605,11 @@ protected:
   // CubeAxes should be moved into a display of its own.
   vtkSMCubeAxesDisplay* CubeAxesDisplay;
   vtkSMPointLabelDisplay* PointLabelDisplay;
- 
+
+//BTX
+  friend class vtkPVWindow;
+//ETX 
+
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented
   void operator=(const vtkPVSource&); // Not implemented

@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.410");
+vtkCxxRevisionMacro(vtkPVSource, "1.411");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -2220,25 +2220,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   pvs->SetVTKMultipleInputsFlag(this->GetVTKMultipleInputsFlag());
 
   pvs->SetSourceClassName(this->SourceClassName);
-  // Copy the VTK input stuff.
-  vtkIdType numItems = this->GetNumberOfInputProperties();
-  vtkIdType id;
-  vtkPVInputProperty *inProp;
-  for(id=0; id<numItems; id++)
-    {
-    inProp = this->GetInputProperty(id);
-    pvs->GetInputProperty(inProp->GetName())->Copy(inProp);
-    }
-
-  pvs->SetModuleName(this->ModuleName);
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(pvs->GetApplication());
-  if (!pvApp)
-    {
-    vtkErrorMacro("vtkPVApplication is not set properly. Aborting clone.");
-    pvs->Delete();
-    return VTK_ERROR;
-    }
 
   // Create a (unique) name for the PVSource.
   // Beware: If two prototypes have the same name, the name 
@@ -2256,23 +2237,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     return VTK_ERROR;
     }
   pvs->SetName(tclName);
-
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  
-  // We need oue source for each part.
-  int numSources = 1;
-  // Set the input if necessary.
-  if (this->GetNumberOfInputProperties() > 0)
-    {
-    vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
-    numSources = input->GetNumberOfParts();
-    }
-  // If the VTK filter takes multiple inputs (vtkAppendPolyData)
-  // then we create only one filter with each part as an input.
-  if (this->GetVTKMultipleInputsFlag())
-    {
-    numSources = 1;
-    }
 
   vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
 
@@ -2298,6 +2262,42 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     pvs->Delete();
     return VTK_ERROR;
     }
+  this->RegisterProxy(this->SourceList, pvs);
+
+
+  // Copy the VTK input stuff.
+  vtkIdType numItems = this->GetNumberOfInputProperties();
+  vtkIdType id;
+  vtkPVInputProperty *inProp;
+  for(id=0; id<numItems; id++)
+    {
+    inProp = this->GetInputProperty(id);
+    pvs->GetInputProperty(inProp->GetName())->Copy(inProp);
+    }
+
+  pvs->SetModuleName(this->ModuleName);
+
+  vtkPVApplication* pvApp = 
+    vtkPVApplication::SafeDownCast(pvs->GetApplication());
+
+
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  // We need oue source for each part.
+  int numSources = 1;
+  // Set the input if necessary.
+  if (this->GetNumberOfInputProperties() > 0)
+    {
+    vtkPVSource *input = this->GetPVWindow()->GetCurrentPVSource();
+    numSources = input->GetNumberOfParts();
+    }
+  // If the VTK filter takes multiple inputs (vtkAppendPolyData)
+  // then we create only one filter with each part as an input.
+  if (this->GetVTKMultipleInputsFlag())
+    {
+    numSources = 1;
+    }
+
   // Force the proxy to create numSources objects
   pvs->Proxy->GetID(numSources-1);
 

@@ -42,7 +42,7 @@
 #include "vtkSMProxy.h"
 #include "vtkSMSourceProxy.h" 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.50");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -67,7 +67,6 @@ vtkPVSphereWidget::vtkPVSphereWidget()
   this->CenterResetButton = vtkKWPushButton::New();
   
   this->ImplicitFunctionProxy = 0;
-  this->ImplicitFunctionProxyName = 0;
   this->SetWidgetProxyXMLName("SphereWidgetProxy");
 }
 
@@ -87,14 +86,20 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
   this->RadiusEntry->Delete();
   this->CenterResetButton->Delete();
   
-  if(this->ImplicitFunctionProxyName)
+  if (this->ImplicitFunctionProxy)
     {
-  vtkSMObject::GetProxyManager()->UnRegisterProxy("source",
-      this->ImplicitFunctionProxyName);
-    }
-  this->SetImplicitFunctionProxyName(0);
-  if(this->ImplicitFunctionProxy)
-    {
+    vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+    const char* proxyName = proxyM->GetProxyName(
+      "implicit_functions", this->ImplicitFunctionProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("implicit_functions", proxyName);
+      }
+    proxyName = proxyM->GetProxyName("animateable", this->ImplicitFunctionProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
     this->ImplicitFunctionProxy->Delete();
     this->ImplicitFunctionProxy = 0;
     }
@@ -323,8 +328,6 @@ void vtkPVSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ImplicitFunctionProxy: " << this->ImplicitFunctionProxy << endl;
-  os << indent << "ImplicitFunctionProxyName: " << 
-    (this->ImplicitFunctionProxyName? this->ImplicitFunctionProxyName: "None") << endl;
   os << indent << "InputMenu: " << this->InputMenu << endl;
 
 }
@@ -533,10 +536,25 @@ void vtkPVSphereWidget::Create( vtkKWApplication *app)
   ostrstream str;
   str << "Sphere" << proxyNum << ends;
   proxyNum++;
-  this->SetImplicitFunctionProxyName(str.str());
-  pm->RegisterProxy("implicit_functions", this->ImplicitFunctionProxyName,
-    this->ImplicitFunctionProxy);
-  str.rdbuf()->freeze(0);
+  pm->RegisterProxy("implicit_functions",str.str(),this->ImplicitFunctionProxy);
+  delete[] str.str();
+
+  if (this->PVSource)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ";Sphere" << ends;
+        pm->RegisterProxy(
+          "animateable", animName.str(), this->ImplicitFunctionProxy);
+        delete[] animName.str();
+        }
+      }
+    }
 }
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)

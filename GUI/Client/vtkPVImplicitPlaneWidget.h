@@ -186,8 +186,6 @@ protected:
   vtkKWLabel* CoordinateLabel[3];
 
   vtkSMProxy *ImplicitFunctionProxy;
-  char *ImplicitFunctionProxyName;
-  vtkSetStringMacro(ImplicitFunctionProxyName);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

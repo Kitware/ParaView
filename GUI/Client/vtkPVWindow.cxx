@@ -215,7 +215,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.644");
+vtkCxxRevisionMacro(vtkPVWindow, "1.645");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4216,7 +4216,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 
   if ( this->Prototypes->GetItem(moduleName, pvs) == VTK_OK ) 
     {
-
+    pvs->SetSourceList(sourceList);
     // Make the cloned source current only if it is going into
     // the Sources list.
     if (sourceList && strcmp(sourceList, "Sources") != 0)
@@ -4243,8 +4243,6 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
       this->UpdateEnableState();
       return 0;
       }
-
-    pvs->RegisterProxy(sourceList, clone);
 
     if (grabFocus)
       {

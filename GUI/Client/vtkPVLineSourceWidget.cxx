@@ -28,7 +28,7 @@
 #include "vtkSM3DWidgetProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.29");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.30");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -39,7 +39,6 @@ vtkCxxSetObjectMacro(vtkPVLineSourceWidget, InputMenu, vtkPVInputMenu);
 vtkPVLineSourceWidget::vtkPVLineSourceWidget()
 {
   this->CommandFunction = vtkPVLineSourceWidgetCommand;
-  this->SourceProxyName = 0;
   this->SourceProxy = 0;
   this->InputMenu = NULL;
 }
@@ -47,14 +46,19 @@ vtkPVLineSourceWidget::vtkPVLineSourceWidget()
 //----------------------------------------------------------------------------
 vtkPVLineSourceWidget::~vtkPVLineSourceWidget()
 {
-  if(this->SourceProxyName)
-    {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("source",
-      this->SourceProxyName);
-    }
-  this->SetSourceProxyName(0);
   if(this->SourceProxy)
     {
+    vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+    const char* proxyName = proxyM->GetProxyName("sources", this->SourceProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("sources", proxyName);
+      }
+    proxyName = proxyM->GetProxyName("animateable", this->SourceProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
     this->SourceProxy->Delete();
     this->SourceProxy = 0;
     }
@@ -64,24 +68,39 @@ vtkPVLineSourceWidget::~vtkPVLineSourceWidget()
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
 {
-  // Call the superclass to create the widget and set the appropriate flags
-  this->Superclass::Create(app);
-  
   static int proxyNum = 0;
   vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
   this->SourceProxy = vtkSMSourceProxy::SafeDownCast(
     pm->NewProxy("sources", "LineSource"));
   ostrstream str;
   str << "LineSource" << proxyNum << ends;
-  this->SetSourceProxyName(str.str());
-  pm->RegisterProxy("sources", this->SourceProxyName, this->SourceProxy);
+  pm->RegisterProxy("sources", str.str(), this->SourceProxy);
+  if (this->PVSource)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ";LineSource" << ends;
+        pm->RegisterProxy("animateable", animName.str(), this->SourceProxy);
+        delete[] animName.str();
+        }
+      }
+    }
   proxyNum++;
-  str.rdbuf()->freeze(0);
+  delete[] str.str();
+
+  // Call the superclass to create the widget and set the appropriate flags
+  this->Superclass::Create(app);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Initialize()
 {
+  
   this->PlaceWidget();
 
   this->Accept();
@@ -264,8 +283,6 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 void vtkPVLineSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "SourceProxyName: " << 
-    (this->SourceProxyName? this->SourceProxyName: "None") << endl;
   os << indent << "SourceProxy: " << this->SourceProxy << endl;
 }
 

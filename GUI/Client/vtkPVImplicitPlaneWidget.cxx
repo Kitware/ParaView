@@ -17,40 +17,35 @@
 #include "vtkArrayMap.txx"
 #include "vtkCamera.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWView.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkProperty.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
-#include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProperty.h"
 #include "vtkRenderer.h"
-
-#include "vtkKWEvent.h"
-#include "vtkSMImplicitPlaneWidgetProxy.h"
-
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
+#include "vtkSMImplicitPlaneWidgetProxy.h"
 #include "vtkSMIntVectorProperty.h"
-#include "vtkSMProxyManager.h"
 #include "vtkSMProxy.h"
+#include "vtkSMProxyManager.h"
+#include "vtkSMSourceProxy.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.44");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -82,7 +77,6 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
   this->NormalZButton = vtkKWPushButton::New();
 
   this->ImplicitFunctionProxy = 0;
-  this->ImplicitFunctionProxyName = 0;
   this->SetWidgetProxyXMLName("ImplicitPlaneWidgetProxy");
 }
 
@@ -108,14 +102,20 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
   this->NormalYButton->Delete();
   this->NormalZButton->Delete();
   
-  if (this->ImplicitFunctionProxyName)
-    {
-    vtkSMObject::GetProxyManager()->UnRegisterProxy("implicit_functions",
-                                                    this->ImplicitFunctionProxyName);
-    }
-  this->SetImplicitFunctionProxyName(0);
   if (this->ImplicitFunctionProxy)
     {
+    vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+    const char* proxyName = proxyM->GetProxyName(
+      "implicit_functions", this->ImplicitFunctionProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("implicit_functions", proxyName);
+      }
+    proxyName = proxyM->GetProxyName("animateable", this->ImplicitFunctionProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
     this->ImplicitFunctionProxy->Delete();
     this->ImplicitFunctionProxy = 0;
     }
@@ -430,9 +430,9 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 void vtkPVImplicitPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ImplicitFunctionProxyName: " 
-    << (this->ImplicitFunctionProxyName? this->ImplicitFunctionProxyName: "None") << endl;
-  os << indent << "ImplicitFunctionProxy: " << this->ImplicitFunctionProxy << endl;
+  os << indent 
+     << "ImplicitFunctionProxy: " << this->ImplicitFunctionProxy 
+     << endl;
   os << indent << "InputMenu: " << this->InputMenu << endl;
 }
 
@@ -701,10 +701,25 @@ void vtkPVImplicitPlaneWidget::Create(vtkKWApplication *app)
   ostrstream str;
   str << "Plane" << proxyNum << ends;
   proxyNum++;
-  this->SetImplicitFunctionProxyName(str.str());
-  pm->RegisterProxy("implicit_functions", this->ImplicitFunctionProxyName,
-    this->ImplicitFunctionProxy);
-  str.rdbuf()->freeze(0);
+  pm->RegisterProxy("implicit_functions",str.str(),this->ImplicitFunctionProxy);
+  delete[] str.str();
+
+  if (this->PVSource)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ";Plane" << ends;
+        pm->RegisterProxy(
+          "animateable", animName.str(), this->ImplicitFunctionProxy);
+        delete[] animName.str();
+        }
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
