@@ -27,7 +27,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.13");
+vtkCxxRevisionMacro(vtkSMProxy, "1.14");
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -522,6 +522,8 @@ void vtkSMProxy::UpdateVTKObjects()
     {
     it2->second.GetPointer()->UpdateVTKObjects();
     }
+
+  this->MarkConsumersAsModified();
 }
 
 //---------------------------------------------------------------------------
@@ -678,6 +680,20 @@ vtkSMProxy* vtkSMProxy::GetConsumerProxy(unsigned int idx)
 vtkSMProperty* vtkSMProxy::GetConsumerProperty(unsigned int idx)
 {
   return this->Internals->Consumers[idx].Property;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMProxy::MarkConsumersAsModified()
+{
+  unsigned int numConsumers = this->GetNumberOfConsumers();
+  for (unsigned int i=0; i<numConsumers; i++)
+    {
+    vtkSMProxy* cons = this->GetConsumerProxy(i);
+    if (cons)
+      {
+      cons->MarkConsumersAsModified();
+      }
+    }
 }
 
 //---------------------------------------------------------------------------

@@ -91,6 +91,15 @@ public:
   virtual void UnRegister(vtkObjectBase* obj);
 
   // Description:
+  // Returns the id of a server object.
+  vtkClientServerID GetID(unsigned int idx);
+
+  // Description:
+  // Returns the number of server ids (same as the number of server objects
+  // if CreateVTKObjects() has already been called)
+  unsigned int GetNumberOfIDs();
+
+  // Description:
   // Returns a new (initialized) iterator of the properties.
   vtkSMPropertyIterator* NewPropertyIterator();
 
@@ -160,11 +169,6 @@ protected:
   // can not be set.
 
   // Description:
-  // Returns the number of server ids (same as the number of server objects
-  // if CreateVTKObjects() has already been called)
-  unsigned int GetNumberOfIDs();
-
-  // Description:
   // Add an ID to be managed by the proxy. In this case, the proxy
   // takes control of the reference (it unassigns the ID in destructor).
   // One easy of creating an empty proxy and assigning IDs to it is:
@@ -173,10 +177,6 @@ protected:
   // proxy->SetID(0, id1);
   // proxy->SetID(1, id2);
   void SetID(unsigned int idx, vtkClientServerID id);
-
-  // Description:
-  // Returns the id of a server object.
-  vtkClientServerID GetID(unsigned int idx);
 
   // Server IDs determine on which server(s) the VTK objects are
   // instantiated. Use the following methods to set/get the server
@@ -270,6 +270,9 @@ protected:
 
   // Description:
   void RemoveAllConsumers();
+
+  // Description:
+  virtual void MarkConsumersAsModified();
 
   char* VTKClassName;
   char* XMLGroup;
