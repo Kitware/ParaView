@@ -15,6 +15,7 @@ vtkKWCompositeCollection
 vtkKWCornerAnnotation 
 vtkKWDialog 
 vtkKWEntry 
+vtkKWEventNotifier
 vtkKWExtent 
 vtkKWGenericComposite 
 vtkKWLabel 
