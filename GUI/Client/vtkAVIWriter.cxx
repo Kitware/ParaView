@@ -38,7 +38,7 @@ public:
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkAVIWriter);
-vtkCxxRevisionMacro(vtkAVIWriter, "1.1.2.2");
+vtkCxxRevisionMacro(vtkAVIWriter, "1.1.2.3");
 
 vtkAVIWriter::vtkAVIWriter()
 {
@@ -118,7 +118,7 @@ void vtkAVIWriter::Start()
 
   // need to setup opts
   opts.fccType = 0;
-  opts.fccHandler=mmioFOURCC('i','v','5','0');
+  opts.fccHandler=mmioFOURCC('m','s','v','c');
   opts.dwQuality = 10000;
   opts.dwBytesPerSecond = 0;
   opts.dwFlags = 8;
