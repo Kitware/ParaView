@@ -2460,3 +2460,28 @@
    fun:malloc
    fun:__cxa_get_globals
 }
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:XtMalloc
+   fun:_XtMalloc
+   fun:_XtDependencies
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:_Znwj
+   fun:_Z15vtkTclCreateNewP10Tcl_InterpPKcPFPvvEPFiS3_S0_iPPcE
+   fun:Vtkcommontcl_Init
+   fun:Tcl_AppInit
+   fun:Tk_MainEx
+   fun:main
+}
+{
+   <insert a suppression name here>
+   Memcheck:Leak
+   fun:malloc
+   fun:_XlcSetConverter
+   fun:_XlcDefaultLoader
+}
