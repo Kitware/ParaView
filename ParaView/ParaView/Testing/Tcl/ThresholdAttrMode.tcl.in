@@ -5,7 +5,7 @@ set pv(vtkTemp44) [$pv(vtkTemp1) GetMainView]
 set pv(vtkTemp90) [$pv(vtkTemp1) GetGlyphSource Arrow]
 set pv(vtkTemp94) [$pv(vtkTemp1) GetGlyphSource Cone]
 set pv(vtkTemp98) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp101) [$pv(vtkTemp1) Open E:/ParaView/Data/Data/vox8_bin.vtk]
+set pv(vtkTemp101) [$pv(vtkTemp1) Open $DataDir/Data/vox8_bin.vtk]
 set pv(vtkTemp129) [$pv(vtkTemp1) ThresholdCallback]
 set pv(vtkTemp137) [$pv(vtkTemp129) GetAttributeModeMenu]
 $pv(vtkTemp137) SetValue "Cell Data"
