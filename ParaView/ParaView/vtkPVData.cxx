@@ -173,6 +173,17 @@ vtkPVData::vtkPVData()
   this->VisibilityCheck = vtkKWCheckButton::New();
 
   this->ResetCameraButton = vtkKWPushButton::New();
+
+  this->ActorControlFrame = vtkKWLabeledFrame::New();
+  this->TranslateLabel = vtkKWLabel::New();
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->TranslateEntry[cc] = vtkKWEntry::New();
+    }
+  this->TransparencyLabel = vtkKWLabel::New();
+  this->Transparency = vtkKWScale::New();
+  
   
   this->PreviousAmbient = 0.15;
   this->PreviousSpecular = 0.1;
@@ -283,6 +294,16 @@ vtkPVData::~vtkPVData()
   this->DisplayScalesFrame->Delete();
   this->DisplayScalesFrame = NULL;
 
+  this->ActorControlFrame->Delete();
+  this->TranslateLabel->Delete();
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->TranslateEntry[cc]->Delete();
+    }
+  this->TransparencyLabel->Delete();
+  this->Transparency->Delete();
+ 
   if (this->CubeAxesTclName)
     {
     if ( pvApp )
@@ -1251,6 +1272,55 @@ void vtkPVData::CreateProperties()
     this->Script("pack %s -fill both -expand yes -side top",
                  this->Properties->GetWidgetName());
     }
+
+  this->ActorControlFrame->SetParent(this->Properties->GetFrame());
+  this->ActorControlFrame->Create(this->Application);
+  this->ActorControlFrame->SetLabel("Actor Control");
+
+  this->TranslateLabel->SetParent(this->ActorControlFrame->GetFrame());
+  this->TranslateLabel->Create(this->Application, 0);
+  this->TranslateLabel->SetLabel("Translate");
+
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->TranslateEntry[cc]->SetParent(this->ActorControlFrame->GetFrame());
+    this->TranslateEntry[cc]->Create(this->Application, 0);
+    this->TranslateEntry[cc]->SetValue(0, 4);
+    this->Script("bind %s <Key-Return> { %s SetActorTranslate }",
+                 this->TranslateEntry[cc]->GetWidgetName(),
+                 this->GetTclName());
+    }
+  this->TransparencyLabel->SetParent(this->ActorControlFrame->GetFrame());
+  this->TransparencyLabel->Create(this->Application, 0);
+  this->TransparencyLabel->SetLabel("Opacity");
+  this->Transparency->SetParent(this->ActorControlFrame->GetFrame());
+  this->Transparency->Create(this->Application, 0);
+  this->Transparency->SetRange(0, 1);
+  this->Transparency->SetResolution(0.1);
+  this->Transparency->SetValue(1);
+  this->Transparency->SetCommand(this, "TransparencyChangedCallback");
+
+  this->Script("grid %s %s %s %s -sticky ew",
+               this->TranslateLabel->GetWidgetName(),
+               this->TranslateEntry[0]->GetWidgetName(),
+               this->TranslateEntry[1]->GetWidgetName(),
+               this->TranslateEntry[2]->GetWidgetName());
+  this->Script("grid %s %s - -  -sticky ew",
+               this->TransparencyLabel->GetWidgetName(),
+               this->Transparency->GetWidgetName());
+
+  this->Script("grid columnconfigure %s 0 -weight 0", 
+               this->ActorControlFrame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 1 -weight 2", 
+               this->ActorControlFrame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 2 -weight 2", 
+               this->ActorControlFrame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 3 -weight 2", 
+               this->ActorControlFrame->GetFrame()->GetWidgetName());
+
+  this->Script("pack %s -fill x -expand yes -side top", 
+               this->ActorControlFrame->GetWidgetName());
 
   this->PropertiesCreated = 1;
 
@@ -2471,6 +2541,58 @@ void vtkPVData::ScalarBarOrientationCallback()
     this->AddTraceEntry("$kw(%s) SetScalarBarOrientationToHorizontal", this->GetTclName());
     }
   this->GetPVRenderView()->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::TransparencyChangedCallback()
+{
+  float val = this->Transparency->GetValue();
+  this->SetTransparency(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetTransparency(float val)
+{  
+  this->Transparency->SetValue(val);
+  this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
+                                            this->PropTclName, val);
+  this->AddTraceEntry("$kw(%s) SetTransparency %f", this->GetTclName(),
+                      val);
+  this->GetPVRenderView()->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorTranslate()
+{
+  float point[3];
+  this->GetActorTranslate(point);
+  this->SetActorTranslate(point);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorTranslate(float* point)
+{
+  this->SetActorTranslate(point[0], point[1], point[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorTranslate(float x, float y, float z)
+{
+  this->TranslateEntry[0]->SetValue(x, 4);
+  this->TranslateEntry[1]->SetValue(y, 4);
+  this->TranslateEntry[2]->SetValue(z, 4);
+  this->GetPVApplication()->BroadcastScript("%s SetPosition %f %f %f",
+                                            this->PropTclName, x, y, z);
+  this->AddTraceEntry("$kw(%s) SetActorTranslate %f %f %f",
+                      this->GetTclName(), x, y, z);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::GetActorTranslate(float* point)
+{
+  point[0] = this->TranslateEntry[0]->GetValueAsFloat();
+  point[1] = this->TranslateEntry[1]->GetValueAsFloat();
+  point[2] = this->TranslateEntry[2]->GetValueAsFloat();
 }
 
 //----------------------------------------------------------------------------

@@ -58,6 +58,7 @@ class vtkKWBoundsDisplay;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 class vtkKWCheckButton;
+class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWLabel;
 class vtkKWLabeledEntry;
@@ -65,16 +66,16 @@ class vtkKWLabeledFrame;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
-class vtkPVApplication;
-class vtkPVRenderView;
-class vtkPVSource;
-class vtkProp;
-class vtkProperty;
-class vtkPolyDataMapper;
-class vtkPVSource;
 class vtkKWView;
 class vtkKWWidget;
+class vtkPVApplication;
 class vtkPVColorMap;
+class vtkPVRenderView;
+class vtkPVSource;
+class vtkPVSource;
+class vtkPolyDataMapper;
+class vtkProp;
+class vtkProperty;
 
 class VTK_EXPORT vtkPVData : public vtkKWObject
 {
@@ -159,8 +160,20 @@ public:
   
   //===================
 
+  // Description:
+  // Translate the actor to the specified location. Also modify the
+  // entry widget that controles the translation.
+  void SetActorTranslate(float* p);
+  void SetActorTranslate(float x, float y, float z);
+  void GetActorTranslate(float* p);
+  void SetActorTranslate();
+  
+  // Description:
+  // Set the transparency of the actor.
+  void SetTransparency(float f);
+  void TransparencyChangedCallback();
 
-    // Description:
+  // Description:
   // Create the properties object, called by UpdateProperties.
   void CreateProperties();
   void UpdateProperties();
@@ -454,6 +467,13 @@ protected:
   vtkKWPushButton *ColorRangeResetButton;
   vtkKWLabeledEntry *ColorRangeMinEntry;
   vtkKWLabeledEntry *ColorRangeMaxEntry;
+
+  // For translating actor
+  vtkKWLabeledFrame* ActorControlFrame;
+  vtkKWLabel* TranslateLabel;
+  vtkKWEntry* TranslateEntry[3];
+  vtkKWScale* Transparency;
+  vtkKWLabel* TransparencyLabel;
 
   vtkKWCheckButton *CubeAxesCheck;
   char* CubeAxesTclName;
