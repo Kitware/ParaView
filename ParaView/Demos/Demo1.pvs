@@ -1123,6 +1123,8 @@ proc iso_init {} {
     set iso(vtkTemp457) [$iso(vtkTemp449) GetPVWidget {Contour Values}]
     $iso(vtkTemp457) RemoveAllValues
     $iso(vtkTemp457) AddValue 0.000000
+    set iso(vtkTemp450) [$iso(vtkTemp449) GetPVWidget {Compute Scalars}]
+    $iso(vtkTemp450) SetState 1
     $iso(vtkTemp449) AcceptCallback
 
     if $pvDemoShouldStop {
@@ -1172,6 +1174,8 @@ proc iso_init {} {
     $iso(vtkTemp828) AddValue 1.200000
     $iso(vtkTemp828) AddValue 1.400000
     $iso(vtkTemp828) AddValue 1.600000
+    set iso(vtkTemp830) [$iso(vtkTemp820) GetPVWidget {Compute Scalars}]
+    $iso(vtkTemp830) SetState 1
     $iso(vtkTemp820) AcceptCallback
     set iso(vtkTemp852) [$iso(vtkTemp820) GetPVOutput]
     $iso(vtkTemp852) SetActorTranslate 3.000000 0.000000 0.000000
