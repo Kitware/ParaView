@@ -150,7 +150,17 @@ char* vtkPVEnSightReaderModule::CreateTclName(const char* fname)
     }
   
   // Append the instance count to the name.
-  tmp = new char[strlen(tclName)+1 + (this->PrototypeInstanceCount%10)+1];
+  int len;
+  if ( this->PrototypeInstanceCount > 0 )
+    {
+    len = static_cast<int>(
+      log10(static_cast<double>(this->PrototypeInstanceCount)));
+    }
+  else
+    {
+    len = 1;
+    }
+  tmp = new char[strlen(tclName) + 1 + len + 1];
   sprintf(tmp, "%s%d", tclName, this->PrototypeInstanceCount);
   delete [] tclName;
   tclName = new char[strlen(tmp)+1];
@@ -521,7 +531,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     }
 
   ostrstream namestr;
-  namestr << "_tmp_ensightreadermodule" << this->PrototypeInstanceCount++ 
+  namestr << "_tmp_ensightreadermodule" << this->PrototypeInstanceCount 
 	  << ends;
   char* name = namestr.str();
   pvApp->AddTraceEntry("vtkPVEnSightReaderModule %s", name);
