@@ -1,0 +1,137 @@
+'\"
+'\" Copyright (c) 1999 Scriptics Corporation
+'\" Copyright (c) 1998 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH Threads 3 "8.1" Tcl "Tcl Library Procedures"
+.BS
+.SH NAME
+Tcl_ConditionNotify, Tcl_ConditionWait, Tcl_GetThreadData, Tcl_MutexLock, Tcl_MutexUnlock \- Tcl thread support.
+.SH SYNOPSIS
+.nf
+\fB#include <tcl.h>\fR
+.sp
+void
+\fBTcl_ConditionNotify\fR(\fIcondPtr\fR)
+.sp
+void
+\fBTcl_ConditionWait\fR(\fIcondPtr, mutexPtr, timePtr\fR)
+.sp
+Void *
+\fBTcl_GetThreadData\fR(\fIkeyPtr, size\fR)
+.sp
+void
+\fBTcl_MutexLock\fR(\fImutexPtr\fR)
+.sp
+void
+\fBTcl_MutexUnlock\fR(\fImutexPtr\fR)
+.SH ARGUMENTS
+.AS Tcl_ThreadDataKey *keyPtr
+.AP Tcl_Condition *condPtr in
+A condition variable, which must be associated with a mutex lock.
+.AP Tcl_Condition *mutexPtr in
+A mutex lock.
+.AP Tcl_Time *timePtr in
+A time limit on the condition wait.  NULL to wait forever.
+Note that a polling value of 0 seconds doesn't make much sense.
+.AP Tcl_ThreadDataKey *keyPtr in
+This identifies a block of thread local storage.  The key should be
+static and process-wide, yet each thread will end up associating
+a different block of storage with this key.
+.AP int *size in
+The size of the thread local storage block.  This amount of data
+is allocated and initialized to zero the first time each thread
+calls \fBTcl_GetThreadData\fR.
+.BE
+.SH INTRODUCTION
+Beginning with the 8.1 release, the Tcl core is thread safe, which
+allows you to incorporate Tcl into multithreaded applications without
+customizing the Tcl core.  To enable Tcl multithreading support,
+you must include the \fB--enable-threads\fR option to \fBconfigure\fR
+when you configure and compile your Tcl core.
+.PP
+An important contstraint of the Tcl threads implementation is that
+\fIonly the thread that created a Tcl interpreter can use that
+interpreter\fR.  In other words, multiple threads can not access
+the same Tcl interpreter.  (However, as was the case in previous
+releases, a single thread can safely create and use multiple
+interpreters.)
+.PP
+Tcl provides no special API for creating
+threads.  When writing multithreaded applications incorporating Tcl,
+use the standard POSIX threads APIs on Unix systems and the standard
+Win32 threads APIs on Windows systems.
+.PP
+Tcl does provide \fBTcl_ExitThread\fR and \fBTcl_FinalizeThread\fR
+for terminating threads and invoking optional per-thread exit
+handlers.  See the \fBTcl_Exit\fR page for more information on these
+procedures.
+.PP
+Tcl provides \fBTcl_ThreadQueueEvent\fR and \fBTcl_ThreadAlert\fR
+for handling event queueing in multithreaded applications.  See
+the \fBNotifier\fR manual page for more information on these procedures.
+.PP
+In this release, the Tcl language itself provides no support for
+creating multithreaded scripts (for example, scripts that could spawn
+a Tcl interpreter in a separate thread).  If you need to add this
+feature at this time, see the \fItclThreadTest.c\fR
+file in the Tcl source distribution for an experimental implementation
+of a Tcl "Thread" package implementing thread creation and management
+commands at the script level.
+.SH DESCRIPTION
+A mutex is a lock that is used to serialize all threads through a piece
+of code by calling \fBTcl_MutexLock\fR and \fBTcl_MutexUnlock\fR.
+If one thread holds a mutex, any other thread calling \fBTcl_MutexLock\fR will
+block until \fBTcl_MutexUnlock\fR is called.
+.VS
+The result of locking a mutex twice from the same thread is undefined.
+On some platforms it will result in a deadlock.
+.VE
+\fBTcl_MutexLock\fR and \fBTcl_MutexUnlock\fR
+procedures are defined as empty macros if not compiling with threads enabled.
+.PP
+A condition variable is used as a signaling mechanism:
+a thread can lock a mutex and then wait on a condition variable
+with \fBTcl_ConditionWait\fR.  This atomically releases the mutex lock
+and blocks the waiting thread until another thread calls
+\fBTcl_ConditionNotify\fR.  The caller of \fBTcl_ConditionNotify\fR should
+have the associated mutex held by previously calling \fBTcl_MutexLock\fR,
+but this is not enforced.  Notifying the
+condition variable unblocks all threads waiting on the condition variable,
+but they do not proceed until the mutex is released with \fBTcl_MutexUnlock\fR.
+The implementation of \fBTcl_ConditionWait\fR automatically locks
+the mutex before returning.
+.PP
+The caller of \fBTcl_ConditionWait\fR should be prepared for spurious
+notifications by calling \fBTcl_ConditionWait\fR within a while loop
+that tests some invariant.
+.PP
+The \fBTcl_GetThreadData\fR call returns a pointer to a block of
+thread-private data.  Its argument is a key that is shared by all threads
+and a size for the block of storage.  The storage is automatically 
+allocated and initialized to all zeros the first time each thread asks for it.
+The storage is automatically deallocated by \fBTcl_FinalizeThread\fR.
+.SH INITIALIZATION
+.PP
+All of these synchronization objects are self initializing.
+They are implemented as opaque pointers that should be NULL
+upon first use.
+The mutexes and condition variables are
+cleaned up by process exit handlers.  Thread local storage is
+reclaimed during \fBTcl_FinalizeThread\fR.
+.SH CREATING THREADS
+The API to create threads is not finalized at this time.
+There are private facilities to create threads that contain a new
+Tcl interpreter, and to send scripts among threads.
+Dive into tclThreadTest.c and tclThread.c for examples.
+.SH "SEE ALSO"
+Tcl_GetCurrentThread, Tcl_ThreadQueueEvent, Tcl_ThreadAlert,
+Tcl_ExitThread, Tcl_FinalizeThread,
+Tcl_CreateThreadExitHandler, Tcl_DeleteThreadExitHandler
+.SH KEYWORDS
+thread, mutex, condition variable, thread local storage

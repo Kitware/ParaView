@@ -1,0 +1,78 @@
+Tcl 8.2 for Macintosh
+
+by Ray Johnson
+Scriptics Corporation
+rjohnson@scriptics.com
+with major help from
+Jim Ingham
+Cygnus Solutions
+jingham@cygnus.com
+
+RCS: @(#) Id
+
+1. Introduction
+---------------
+
+This is the README file for the Macintosh version of the Tcl
+scripting language.  The home page for the Macintosh releases is
+	http://www.scriptics.com/mac/
+
+A summary of what's new in this release is at
+	http://www.scriptics.com/software/whatsnew82.html
+
+A summary of Macintosh-specific features is at
+	http://www.scriptics.com/mac/features.html
+
+
+2. The Distribution
+-------------------
+
+Macintosh Tcl is distributed in three different forms.  This 
+should make it easier to only download what you need.  The 
+packages are as follows:
+
+mactk8.2.sea.hqx
+
+    This distribution is a "binary" only release.  It contains an
+    installer program that will install a 68k, PowerPC, or Fat
+    version of the "Tcl Shell" and "Wish" applications.  In addition,
+    it installs the Tcl & Tk libraries in the Extensions folder inside
+    your System Folder.
+
+mactcltk-full-8.2.sea.hqx
+
+    This release contains the full release of Tcl and Tk for the
+    Macintosh plus the More Files packages which Macintosh Tcl and Tk
+    rely on.
+
+mactcl-source-8.2.sea.hqx
+
+    This release contains the complete source for Tcl 8.2.  In
+    addition, Metrowerks CodeWarrior libraries and project files
+    are included.  However, you must already have the More Files
+    package to compile this code.
+
+The "html" subdirectory contains reference documentation in
+in the HTML format.  You may also find these pages at:
+
+	http://www.scriptics.com/man/tcl8.2/contents.html
+
+3. Compiling Tcl
+----------------
+
+In order to compile Macintosh Tcl you must have the 
+following items:
+
+	CodeWarrior Pro 2 or 3
+	Mac Tcl (source)
+	More Files 1.4.3
+
+The included project files should work fine.  However, for
+current release notes please check this page:
+
+	http://www.scriptics.com/support/howto/compile.html#mac
+
+If you have comments or Bug reports send them to:
+Jim Ingham
+jingham@cygnus.com
+

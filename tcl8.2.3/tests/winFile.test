@@ -1,0 +1,79 @@
+# This file tests the tclWinFile.c file.
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+test winFile-1.1 {TclpGetUserHome} {pcOnly} {
+    list [catch {glob ~nosuchuser} msg] $msg
+} {1 {user "nosuchuser" doesn't exist}}
+test winFile-1.2 {TclpGetUserHome} {nt nonPortable} {
+    # The administrator account should always exist.
+
+    catch {glob ~administrator}
+} {0}
+test winFile-1.2 {TclpGetUserHome} {95} {
+    # Find some user in system.ini and then see if they have a home.
+
+    set f [open $::env(windir)/system.ini]
+    set x 0
+    while {![eof $f]} {
+	set line [gets $f]
+	if {$line == "\[Password Lists]"} {
+	    gets $f
+	    set name [lindex [split [gets $f] =] 0]
+	    if {$name != ""} {
+		set x [catch {glob ~$name}]
+		break
+	    }
+	}
+    }
+    close $f
+    set x
+} {0}
+test winFile-1.3 {TclpGetUserHome} {nt nonPortable} {
+    catch {glob ~stanton@workgroup}
+} {0}
+
+test winFile-2.1 {TclpMatchFiles: case sensitivity} {pcOnly} {
+    makeFile {} GlobCapS
+    set result [list [glob -nocomplain GlobC*] [glob -nocomplain globc*]]
+    removeFile GlobCapS
+    set result
+} {GlobCapS GlobCapS}
+
+test winFile-2.2 {TclpMatchFiles: case sensitivity} {pcOnly} {
+    makeFile {} globlower
+    set result [list [glob -nocomplain globl*] [glob -nocomplain gLOBl*]]
+    removeFile globlower
+    set result
+} {globlower globlower}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+

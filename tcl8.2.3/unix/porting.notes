@@ -1,0 +1,11 @@
+RCS: @(#) Id
+
+This file used to contain a collection of notes that various people
+had provided about porting Tcl to various machines and operating
+systems.  This information is now available in the Tcl porting
+database at the following location:
+
+    http://www.scriptics.com/software/install.html#Database
+
+If you port Tcl or Tk to a new platform, you can share any information
+you might have by adding a new entry to this database.

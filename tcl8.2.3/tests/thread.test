@@ -1,0 +1,247 @@
+# Commands covered:  (test)thread
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+# Some tests require the testthread command
+
+set ::tcltest::testConstraints(testthread) \
+	[expr {[info commands testthread] != {}}]
+
+if {$::tcltest::testConstraints(testthread)} {
+
+    testthread errorproc ThreadError
+
+    proc ThreadError {id info} {
+	global threadError
+	set threadError $info
+    }
+
+    proc ThreadNullError {id info} {
+	# ignore
+    }
+}
+
+
+test thread-1.1 {Tcl_ThreadObjCmd: no args} {testthread} {
+    list [catch {testthread} msg] $msg
+} {1 {wrong # args: should be "testthread option ?args?"}}
+
+test thread-1.2 {Tcl_ThreadObjCmd: bad option} {testthread} {
+    list [catch {testthread foo} msg] $msg
+} {1 {bad option "foo": must be create, exit, id, names, send, wait, or errorproc}}
+
+test thread-1.3 {Tcl_ThreadObjCmd: initial thread list} {testthread} {
+    list [threadReap] [llength [testthread names]]
+} {1 1}
+
+test thread-1.4 {Tcl_ThreadObjCmd: thread create } {testthread} {
+    threadReap
+    set serverthread [testthread create]
+    update
+    set numthreads [llength [testthread names]]
+    threadReap
+    set numthreads
+} {2}
+
+test thread-1.5 {Tcl_ThreadObjCmd: thread create one shot} {testthread} {
+    threadReap
+    testthread create {set x 5}
+    foreach try {0 1 2 4 5 6} {
+	# Try various ways to yeild
+	update
+	after 10
+	set l [llength [testthread names]]
+	if {$l == 1} {
+	    break
+	}
+    }
+    threadReap
+    set l
+} {1}
+
+test thread-1.6 {Tcl_ThreadObjCmd: thread exit} {testthread} {
+    threadReap
+    testthread create {testthread exit}
+    update
+    after 10
+    set result [llength [testthread names]]
+    threadReap
+    set result
+} {1}
+
+test thread-1.7 {Tcl_ThreadObjCmd: thread id args} {testthread} {
+    set x [catch {testthread id x} msg]
+    list $x $msg
+} {1 {wrong # args: should be "testthread id"}}
+
+test thread-1.8 {Tcl_ThreadObjCmd: thread id} {testthread} {
+    string compare [testthread id] $::tcltest::mainThread
+} {0}
+
+test thread-1.9 {Tcl_ThreadObjCmd: thread names args} {testthread} {
+    set x [catch {testthread names x} msg]
+    list $x $msg
+} {1 {wrong # args: should be "testthread names"}}
+
+test thread-1.10 {Tcl_ThreadObjCmd: thread id} {testthread} {
+    string compare [testthread names] $::tcltest::mainThread
+} {0}
+
+test thread-1.11 {Tcl_ThreadObjCmd: send args} {testthread} {
+    set x [catch {testthread send} msg]
+    list $x $msg
+} {1 {wrong # args: should be "testthread send ?-async? id script"}}
+
+test thread-1.12 {Tcl_ThreadObjCmd: send nonint} {testthread} {
+    set x [catch {testthread send abc command} msg]
+    list $x $msg
+} {1 {expected integer but got "abc"}}
+
+test thread-1.13 {Tcl_ThreadObjCmd: send args} {testthread} {
+    threadReap
+    set serverthread [testthread create]
+    set five [testthread send $serverthread {set x 5}]
+    threadReap
+    set five
+} 5
+
+test thread-1.14 {Tcl_ThreadObjCmd: send bad id} {testthread} {
+    set tid [expr $::tcltest::mainThread + 10]
+    set x [catch {testthread send $tid {set x 5}} msg]
+    list $x $msg
+} {1 {invalid thread id}}
+
+test thread-1.15 {Tcl_ThreadObjCmd: wait} {testthread} {
+    threadReap
+    set serverthread [testthread create {set z 5 ; testthread wait}]
+    set five [testthread send $serverthread {set z}]
+    threadReap
+    set five
+} 5
+
+test thread-1.16 {Tcl_ThreadObjCmd: errorproc args} {testthread} {
+    set x [catch {testthread errorproc foo bar} msg]
+    list $x $msg
+} {1 {wrong # args: should be "testthread errorproc proc"}}
+
+test thread-1.17 {Tcl_ThreadObjCmd: errorproc change} {testthread} {
+    testthread errorproc foo
+    testthread errorproc ThreadError
+} {}
+
+# The tests above also cover:
+# TclCreateThread, except when pthread_create fails
+# NewThread, safe and regular
+# ThreadErrorProc, except for printing to standard error
+
+test thread-2.1 {ListUpdateInner and ListRemove} {testthread} {
+    threadReap
+    catch {unset tid}
+    foreach t {0 1 2} {
+	upvar #0 t$t tid
+	set tid [testthread create]
+    }
+    threadReap
+} 1
+
+test thread-3.1 {TclThreadList} {testthread} {
+    threadReap
+    catch {unset tid}
+    set len [llength [testthread names]]
+    set l1  {}
+    foreach t {0 1 2} {
+	lappend l1 [testthread create]
+    }
+    set l2 [testthread names]
+    list $l1 $l2
+    set c [string compare \
+	    [lsort -integer [concat $::tcltest::mainThread $l1]] \
+	    [lsort -integer $l2]]
+    threadReap
+    list $len $c
+} {1 0}
+
+test thread-4.1 {TclThreadSend to self} {testthread} {
+    catch {unset x}
+    testthread send [testthread id] {
+	set x 4
+    }
+    set x
+} {4}
+
+test thread-4.2 {TclThreadSend -async} {testthread} {
+    threadReap
+    set len [llength [testthread names]]
+    set serverthread [testthread create]
+    testthread send -async $serverthread {
+	after 1000
+	testthread exit
+    }
+    set two [llength [testthread names]]
+    after 1500 {set done 1}
+    vwait done
+    threadReap
+    list $len [llength [testthread names]] $two
+} {1 1 2}
+
+test thread-4.3 {TclThreadSend preserve errorInfo} {testthread} {
+    threadReap
+    set len [llength [testthread names]]
+    set serverthread [testthread create]
+    set x [catch {testthread send $serverthread {set undef}} msg]
+    threadReap
+    list $len $x $msg $errorInfo
+} {1 1 {can't read "undef": no such variable} {can't read "undef": no such variable
+    while executing
+"set undef"
+    invoked from within
+"testthread send $serverthread {set undef}"}}
+
+test thread-4.4 {TclThreadSend preserve code} {testthread} {
+    threadReap
+    set len [llength [testthread names]]
+    set serverthread [testthread create]
+    set x [catch {testthread send $serverthread {break}} msg]
+    threadReap
+    list $len $x $msg $errorInfo
+} {1 3 {} {}}
+
+test thread-4.5 {TclThreadSend preserve errorCode} {testthread} {
+    threadReap
+    set ::tcltest::mainThread [testthread names]
+    set serverthread [testthread create]
+    set x [catch {testthread send $serverthread {error ERR INFO CODE}} msg]
+    threadReap
+    list $x $msg $errorCode
+} {1 ERR CODE}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+

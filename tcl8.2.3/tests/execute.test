@@ -1,0 +1,615 @@
+# This file contains tests for the tclExecute.c source file. Tests appear
+# in the same order as the C code that they test. The set of tests is
+# currently incomplete since it currently includes only new tests for
+# code changed for the addition of Tcl namespaces. Other execution-
+# related tests appear in several other test files including
+# namespace.test, basic.test, eval.test, for.test, etc.
+#
+# Sourcing this file into Tcl runs the tests and generates output for
+# errors. No output means no errors were found.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+catch {eval namespace delete [namespace children :: test_ns_*]}
+catch {rename foo ""}
+catch {unset x}
+catch {unset y}
+catch {unset msg}
+
+set ::tcltest::testConstraints(testobj) \
+	[expr {[info commands testobj] != {} \
+	&& [info commands testdoubleobj] != {} \
+	&& [info commands teststringobj] != {} \
+	&& [info commands testobj] != {}}]
+
+# Tests for the omnibus TclExecuteByteCode function:
+
+# INST_DONE not tested
+# INST_PUSH1 not tested
+# INST_PUSH4 not tested
+# INST_POP not tested
+# INST_DUP not tested
+# INST_CONCAT1 not tested
+# INST_INVOKE_STK4 not tested
+# INST_INVOKE_STK1 not tested
+# INST_EVAL_STK not tested
+# INST_EXPR_STK not tested
+
+# INST_LOAD_SCALAR1
+
+test execute-1.1 {TclExecuteByteCode, INST_LOAD_SCALAR1, small opnd} {
+    proc foo {} {
+	set x 1
+	return $x
+    }
+    foo
+} 1
+test execute-1.2 {TclExecuteByteCode, INST_LOAD_SCALAR1, large opnd} {
+    # Bug: 2243
+    set body {}
+    for {set i 0} {$i < 129} {incr i} {
+	append body "set x$i x\n"
+    }
+    append body {
+	set y 1
+	return $y
+    }
+
+    proc foo {} $body
+    foo
+} 1
+test execute-1.3 {TclExecuteByteCode, INST_LOAD_SCALAR1, error} {
+    proc foo {} {
+	set x 1
+	unset x
+	return $x
+    }
+    list [catch {foo} msg] $msg
+} {1 {can't read "x": no such variable}}
+
+
+# INST_LOAD_SCALAR4
+
+test execute-2.1 {TclExecuteByteCode, INST_LOAD_SCALAR4, simple case} {
+    set body {}
+    for {set i 0} {$i < 256} {incr i} {
+	append body "set x$i x\n"
+    }
+    append body {
+	set y 1
+	return $y
+    }
+
+    proc foo {} $body
+    foo
+} 1
+test execute-2.2 {TclExecuteByteCode, INST_LOAD_SCALAR4, error} {
+    set body {}
+    for {set i 0} {$i < 256} {incr i} {
+	append body "set x$i x\n"
+    }
+    append body {
+	set y 1
+	unset y
+	return $y
+    }
+
+    proc foo {} $body
+    list [catch {foo} msg] $msg
+} {1 {can't read "y": no such variable}}
+
+
+# INST_LOAD_SCALAR_STK not tested
+# INST_LOAD_ARRAY4 not tested
+# INST_LOAD_ARRAY1 not tested
+# INST_LOAD_ARRAY_STK not tested
+# INST_LOAD_STK not tested
+# INST_STORE_SCALAR4 not tested
+# INST_STORE_SCALAR1 not tested
+# INST_STORE_SCALAR_STK not tested
+# INST_STORE_ARRAY4 not tested
+# INST_STORE_ARRAY1 not tested
+# INST_STORE_ARRAY_STK not tested
+# INST_STORE_STK not tested
+# INST_INCR_SCALAR1 not tested
+# INST_INCR_SCALAR_STK not tested
+# INST_INCR_STK not tested
+# INST_INCR_ARRAY1 not tested
+# INST_INCR_ARRAY_STK not tested
+# INST_INCR_SCALAR1_IMM not tested
+# INST_INCR_SCALAR_STK_IMM not tested
+# INST_INCR_STK_IMM not tested
+# INST_INCR_ARRAY1_IMM not tested
+# INST_INCR_ARRAY_STK_IMM not tested
+# INST_JUMP1 not tested
+# INST_JUMP4 not tested
+# INST_JUMP_TRUE4 not tested
+# INST_JUMP_TRUE1 not tested
+# INST_JUMP_FALSE4 not tested
+# INST_JUMP_FALSE1 not tested
+# INST_LOR not tested
+# INST_LAND not tested
+# INST_EQ not tested
+# INST_NEQ not tested
+# INST_LT not tested
+# INST_GT not tested
+# INST_LE not tested
+# INST_GE not tested
+# INST_MOD not tested
+# INST_LSHIFT not tested
+# INST_RSHIFT not tested
+# INST_BITOR not tested
+# INST_BITXOR not tested
+# INST_BITAND not tested
+
+# INST_ADD is partially tested:
+test execute-3.1 {TclExecuteByteCode, INST_ADD, op1 is int} {testobj} {
+    set x [testintobj set 0 1]
+    expr {$x + 1}
+} 2
+test execute-3.2 {TclExecuteByteCode, INST_ADD, op1 is double} {testobj} {
+    set x [testdoubleobj set 0 1]
+    expr {$x + 1}
+} 2.0
+test execute-3.3 {TclExecuteByteCode, INST_ADD, op1 is double with string} {testobj} {
+    set x [testintobj set 0 1]
+    testobj convert 0 double
+    expr {$x + 1}
+} 2
+test execute-3.4 {TclExecuteByteCode, INST_ADD, op1 is string int} {testobj} {
+    set x [teststringobj set 0 1]
+    expr {$x + 1}
+} 2
+test execute-3.5 {TclExecuteByteCode, INST_ADD, op1 is string double} {testobj} {
+    set x [teststringobj set 0 1.0]
+    expr {$x + 1}
+} 2.0
+test execute-3.6 {TclExecuteByteCode, INST_ADD, op1 is non-numeric} {testobj} {
+    set x [teststringobj set 0 foo]
+    list [catch {expr {$x + 1}} msg] $msg
+} {1 {can't use non-numeric string as operand of "+"}}
+test execute-3.7 {TclExecuteByteCode, INST_ADD, op2 is int} {testobj} {
+    set x [testintobj set 0 1]
+    expr {1 + $x}
+} 2
+test execute-3.8 {TclExecuteByteCode, INST_ADD, op2 is double} {testobj} {
+    set x [testdoubleobj set 0 1]
+    expr {1 + $x}
+} 2.0
+test execute-3.9 {TclExecuteByteCode, INST_ADD, op2 is double with string} {testobj} {
+    set x [testintobj set 0 1]
+    testobj convert 0 double
+    expr {1 + $x}
+} 2
+test execute-3.10 {TclExecuteByteCode, INST_ADD, op2 is string int} {testobj} {
+    set x [teststringobj set 0 1]
+    expr {1 + $x}
+} 2
+test execute-3.11 {TclExecuteByteCode, INST_ADD, op2 is string double} {testobj} {
+    set x [teststringobj set 0 1.0]
+    expr {1 + $x}
+} 2.0
+test execute-3.12 {TclExecuteByteCode, INST_ADD, op2 is non-numeric} {testobj} {
+    set x [teststringobj set 0 foo]
+    list [catch {expr {1 + $x}} msg] $msg
+} {1 {can't use non-numeric string as operand of "+"}}
+
+# INST_SUB is partially tested:
+test execute-3.13 {TclExecuteByteCode, INST_SUB, op1 is int} {testobj} {
+    set x [testintobj set 0 1]
+    expr {$x - 1}
+} 0
+test execute-3.14 {TclExecuteByteCode, INST_SUB, op1 is double} {testobj} {
+    set x [testdoubleobj set 0 1]
+    expr {$x - 1}
+} 0.0
+test execute-3.15 {TclExecuteByteCode, INST_SUB, op1 is double with string} {testobj} {
+    set x [testintobj set 0 1]
+    testobj convert 0 double
+    expr {$x - 1}
+} 0
+test execute-3.16 {TclExecuteByteCode, INST_SUB, op1 is string int} {testobj} {
+    set x [teststringobj set 0 1]
+    expr {$x - 1}
+} 0
+test execute-3.17 {TclExecuteByteCode, INST_SUB, op1 is string double} {testobj} {
+    set x [teststringobj set 0 1.0]
+    expr {$x - 1}
+} 0.0
+test execute-3.18 {TclExecuteByteCode, INST_SUB, op1 is non-numeric} {testobj} {
+    set x [teststringobj set 0 foo]
+    list [catch {expr {$x - 1}} msg] $msg
+} {1 {can't use non-numeric string as operand of "-"}}
+test execute-3.19 {TclExecuteByteCode, INST_SUB, op2 is int} {testobj} {
+    set x [testintobj set 0 1]
+    expr {1 - $x}
+} 0
+test execute-3.20 {TclExecuteByteCode, INST_SUB, op2 is double} {testobj} {
+    set x [testdoubleobj set 0 1]
+    expr {1 - $x}
+} 0.0
+test execute-3.21 {TclExecuteByteCode, INST_SUB, op2 is double with string} {testobj} {
+    set x [testintobj set 0 1]
+    testobj convert 0 double
+    expr {1 - $x}
+} 0
+test execute-3.22 {TclExecuteByteCode, INST_SUB, op2 is string int} {testobj} {
+    set x [teststringobj set 0 1]
+    expr {1 - $x}
+} 0
+test execute-3.23 {TclExecuteByteCode, INST_SUB, op2 is string double} {testobj} {
+    set x [teststringobj set 0 1.0]
+    expr {1 - $x}
+} 0.0
+test execute-3.24 {TclExecuteByteCode, INST_SUB, op2 is non-numeric} {testobj} {
+    set x [teststringobj set 0 foo]
+    list [catch {expr {1 - $x}} msg] $msg
+} {1 {can't use non-numeric string as operand of "-"}}
+
+# INST_MULT is partially tested:
+test execute-3.25 {TclExecuteByteCode, INST_MULT, op1 is int} {testobj} {
+    set x [testintobj set 1 1]
+    expr {$x * 1}
+} 1
+test execute-3.26 {TclExecuteByteCode, INST_MULT, op1 is double} {testobj} {
+    set x [testdoubleobj set 1 2.0]
+    expr {$x * 1}
+} 2.0
+test execute-3.27 {TclExecuteByteCode, INST_MULT, op1 is double with string} {testobj} {
+    set x [testintobj set 1 2]
+    testobj convert 1 double
+    expr {$x * 1}
+} 2
+test execute-3.28 {TclExecuteByteCode, INST_MULT, op1 is string int} {testobj} {
+    set x [teststringobj set 1 1]
+    expr {$x * 1}
+} 1
+test execute-3.29 {TclExecuteByteCode, INST_MULT, op1 is string double} {testobj} {
+    set x [teststringobj set 1 1.0]
+    expr {$x * 1}
+} 1.0
+test execute-3.30 {TclExecuteByteCode, INST_MULT, op1 is non-numeric} {testobj} {
+    set x [teststringobj set 1 foo]
+    list [catch {expr {$x * 1}} msg] $msg
+} {1 {can't use non-numeric string as operand of "*"}}
+test execute-3.31 {TclExecuteByteCode, INST_MULT, op2 is int} {testobj} {
+    set x [testintobj set 1 1]
+    expr {1 * $x}
+} 1
+test execute-3.32 {TclExecuteByteCode, INST_MULT, op2 is double} {testobj} {
+    set x [testdoubleobj set 1 2.0]
+    expr {1 * $x}
+} 2.0
+test execute-3.33 {TclExecuteByteCode, INST_MULT, op2 is double with string} {testobj} {
+    set x [testintobj set 1 2]
+    testobj convert 1 double
+    expr {1 * $x}
+} 2
+test execute-3.34 {TclExecuteByteCode, INST_MULT, op2 is string int} {testobj} {
+    set x [teststringobj set 1 1]
+    expr {1 * $x}
+} 1
+test execute-3.35 {TclExecuteByteCode, INST_MULT, op2 is string double} {testobj} {
+    set x [teststringobj set 1 1.0]
+    expr {1 * $x}
+} 1.0
+test execute-3.36 {TclExecuteByteCode, INST_MULT, op2 is non-numeric} {testobj} {
+    set x [teststringobj set 1 foo]
+    list [catch {expr {1 * $x}} msg] $msg
+} {1 {can't use non-numeric string as operand of "*"}}
+
+# INST_DIV is partially tested:
+test execute-3.37 {TclExecuteByteCode, INST_DIV, op1 is int} {testobj} {
+    set x [testintobj set 1 1]
+    expr {$x / 1}
+} 1
+test execute-3.38 {TclExecuteByteCode, INST_DIV, op1 is double} {testobj} {
+    set x [testdoubleobj set 1 2.0]
+    expr {$x / 1}
+} 2.0
+test execute-3.39 {TclExecuteByteCode, INST_DIV, op1 is double with string} {testobj} {
+    set x [testintobj set 1 2]
+    testobj convert 1 double
+    expr {$x / 1}
+} 2
+test execute-3.40 {TclExecuteByteCode, INST_DIV, op1 is string int} {testobj} {
+    set x [teststringobj set 1 1]
+    expr {$x / 1}
+} 1
+test execute-3.41 {TclExecuteByteCode, INST_DIV, op1 is string double} {testobj} {
+    set x [teststringobj set 1 1.0]
+    expr {$x / 1}
+} 1.0
+test execute-3.42 {TclExecuteByteCode, INST_DIV, op1 is non-numeric} {testobj} {
+    set x [teststringobj set 1 foo]
+    list [catch {expr {$x / 1}} msg] $msg
+} {1 {can't use non-numeric string as operand of "/"}}
+test execute-3.43 {TclExecuteByteCode, INST_DIV, op2 is int} {testobj} {
+    set x [testintobj set 1 1]
+    expr {2 / $x}
+} 2
+test execute-3.44 {TclExecuteByteCode, INST_DIV, op2 is double} {testobj} {
+    set x [testdoubleobj set 1 1.0]
+    expr {2 / $x}
+} 2.0
+test execute-3.45 {TclExecuteByteCode, INST_DIV, op2 is double with string} {testobj} {
+    set x [testintobj set 1 1]
+    testobj convert 1 double
+    expr {2 / $x}
+} 2
+test execute-3.46 {TclExecuteByteCode, INST_DIV, op2 is string int} {testobj} {
+    set x [teststringobj set 1 1]
+    expr {2 / $x}
+} 2
+test execute-3.47 {TclExecuteByteCode, INST_DIV, op2 is string double} {testobj} {
+    set x [teststringobj set 1 1.0]
+    expr {2 / $x}
+} 2.0
+test execute-3.48 {TclExecuteByteCode, INST_DIV, op2 is non-numeric} {testobj} {
+    set x [teststringobj set 1 foo]
+    list [catch {expr {1 / $x}} msg] $msg
+} {1 {can't use non-numeric string as operand of "/"}}
+
+# INST_UPLUS is partially tested:
+test execute-3.49 {TclExecuteByteCode, INST_UPLUS, op is int} {testobj} {
+    set x [testintobj set 1 1]
+    expr {+ $x}
+} 1
+test execute-3.50 {TclExecuteByteCode, INST_UPLUS, op is double} {testobj} {
+    set x [testdoubleobj set 1 1.0]
+    expr {+ $x}
+} 1.0
+test execute-3.51 {TclExecuteByteCode, INST_UPLUS, op is double with string} {testobj} {
+    set x [testintobj set 1 1]
+    testobj convert 1 double
+    expr {+ $x}
+} 1
+test execute-3.52 {TclExecuteByteCode, INST_UPLUS, op is string int} {testobj} {
+    set x [teststringobj set 1 1]
+    expr {+ $x}
+} 1
+test execute-3.53 {TclExecuteByteCode, INST_UPLUS, op is string double} {testobj} {
+    set x [teststringobj set 1 1.0]
+    expr {+ $x}
+} 1.0
+test execute-3.54 {TclExecuteByteCode, INST_UPLUS, op is non-numeric} {testobj} {
+    set x [teststringobj set 1 foo]
+    list [catch {expr {+ $x}} msg] $msg
+} {1 {can't use non-numeric string as operand of "+"}}
+
+# INST_UMINUS is partially tested:
+test execute-3.55 {TclExecuteByteCode, INST_UMINUS, op is int} {testobj} {
+    set x [testintobj set 1 1]
+    expr {- $x}
+} -1
+test execute-3.56 {TclExecuteByteCode, INST_UMINUS, op is double} {testobj} {
+    set x [testdoubleobj set 1 1.0]
+    expr {- $x}
+} -1.0
+test execute-3.57 {TclExecuteByteCode, INST_UMINUS, op is double with string} {testobj} {
+    set x [testintobj set 1 1]
+    testobj convert 1 double
+    expr {- $x}
+} -1
+test execute-3.58 {TclExecuteByteCode, INST_UMINUS, op is string int} {testobj} {
+    set x [teststringobj set 1 1]
+    expr {- $x}
+} -1
+test execute-3.59 {TclExecuteByteCode, INST_UMINUS, op is string double} {testobj} {
+    set x [teststringobj set 1 1.0]
+    expr {- $x}
+} -1.0
+test execute-3.60 {TclExecuteByteCode, INST_UMINUS, op is non-numeric} {testobj} {
+    set x [teststringobj set 1 foo]
+    list [catch {expr {- $x}} msg] $msg
+} {1 {can't use non-numeric string as operand of "-"}}
+
+# INST_LNOT is partially tested:
+test execute-3.61 {TclExecuteByteCode, INST_LNOT, op is int} {testobj} {
+    set x [testintobj set 1 2]
+    expr {! $x}
+} 0
+test execute-3.62 {TclExecuteByteCode, INST_LNOT, op is int} {testobj} {
+    set x [testintobj set 1 0]
+    expr {! $x}
+} 1
+test execute-3.63 {TclExecuteByteCode, INST_LNOT, op is double} {testobj} {
+    set x [testdoubleobj set 1 1.0]
+    expr {! $x}
+} 0
+test execute-3.64 {TclExecuteByteCode, INST_LNOT, op is double} {testobj} {
+    set x [testdoubleobj set 1 0.0]
+    expr {! $x}
+} 1
+test execute-3.65 {TclExecuteByteCode, INST_LNOT, op is double with string} {testobj} {
+    set x [testintobj set 1 1]
+    testobj convert 1 double
+    expr {! $x}
+} 0
+test execute-3.66 {TclExecuteByteCode, INST_LNOT, op is double with string} {testobj} {
+    set x [testintobj set 1 0]
+    testobj convert 1 double
+    expr {! $x}
+} 1
+test execute-3.67 {TclExecuteByteCode, INST_LNOT, op is string int} {testobj} {
+    set x [teststringobj set 1 1]
+    expr {! $x}
+} 0
+test execute-3.68 {TclExecuteByteCode, INST_LNOT, op is string int} {testobj} {
+    set x [teststringobj set 1 0]
+    expr {! $x}
+} 1
+test execute-3.69 {TclExecuteByteCode, INST_LNOT, op is string double} {testobj} {
+    set x [teststringobj set 1 1.0]
+    expr {! $x}
+} 0
+test execute-3.70 {TclExecuteByteCode, INST_LNOT, op is string double} {testobj} {
+    set x [teststringobj set 1 0.0]
+    expr {! $x}
+} 1
+test execute-3.71 {TclExecuteByteCode, INST_LNOT, op is non-numeric} {testobj} {
+    set x [teststringobj set 1 foo]
+    list [catch {expr {! $x}} msg] $msg
+} {1 {can't use non-numeric string as operand of "!"}}
+
+# INST_BITNOT not tested
+# INST_CALL_BUILTIN_FUNC1 not tested
+# INST_CALL_FUNC1 not tested
+
+# INST_TRY_CVT_TO_NUMERIC is partially tested:
+test execute-3.72 {TclExecuteByteCode, INST_TRY_CVT_TO_NUMERIC, op is int} {testobj} {
+    set x [testintobj set 1 1]
+    expr {$x}
+} 1
+test execute-3.73 {TclExecuteByteCode, INST_TRY_CVT_TO_NUMERIC, op is double} {testobj} {
+    set x [testdoubleobj set 1 1.0]
+    expr {$x}
+} 1.0
+test execute-3.74 {TclExecuteByteCode, INST_TRY_CVT_TO_NUMERIC, op is double with string} {testobj} {
+    set x [testintobj set 1 1]
+    testobj convert 1 double
+    expr {$x}
+} 1
+test execute-3.75 {TclExecuteByteCode, INST_TRY_CVT_TO_NUMERIC, op is string int} {testobj} {
+    set x [teststringobj set 1 1]
+    expr {$x}
+} 1
+test execute-3.76 {TclExecuteByteCode, INST_TRY_CVT_TO_NUMERIC, op is string double} {testobj} {
+    set x [teststringobj set 1 1.0]
+    expr {$x}
+} 1.0
+test execute-3.77 {TclExecuteByteCode, INST_TRY_CVT_TO_NUMERIC, op is non-numeric} {testobj} {
+    set x [teststringobj set 1 foo]
+    expr {$x}
+} foo
+
+# INST_BREAK not tested
+# INST_CONTINUE not tested
+# INST_FOREACH_START4 not tested
+# INST_FOREACH_STEP4 not tested
+# INST_BEGIN_CATCH4 not tested
+# INST_END_CATCH not tested
+# INST_PUSH_RESULT not tested
+# INST_PUSH_RETURN_CODE not tested
+
+test execute-4.1 {Tcl_GetCommandFromObj, convert to tclCmdNameType} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {unset x}
+    catch {unset y}
+    namespace eval test_ns_1 {
+        namespace export cmd1
+        proc cmd1 {args} {return "cmd1: $args"}
+        proc cmd2 {args} {return "cmd2: $args"}
+    }
+    namespace eval test_ns_1::test_ns_2 {
+        namespace import ::test_ns_1::*
+    }
+    set x "test_ns_1::"
+    set y "test_ns_2::"
+    list [namespace which -command ${x}${y}cmd1] \
+         [catch {namespace which -command ${x}${y}cmd2} msg] $msg \
+         [catch {namespace which -command ${x}${y}:cmd2} msg] $msg
+} {::test_ns_1::test_ns_2::cmd1 0 {} 0 {}}
+test execute-4.2 {Tcl_GetCommandFromObj, check if cached tclCmdNameType is invalid} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {rename foo ""}
+    catch {unset l}
+    proc foo {} {
+        return "global foo"
+    }
+    namespace eval test_ns_1 {
+        proc whichFoo {} {
+            return [namespace which -command foo]
+        }
+    }
+    set l ""
+    lappend l [test_ns_1::whichFoo]
+    namespace eval test_ns_1 {
+        proc foo {} {
+            return "namespace foo"
+        }
+    }
+    lappend l [test_ns_1::whichFoo]
+    set l
+} {::foo ::test_ns_1::foo}
+test execute-4.3 {Tcl_GetCommandFromObj, command never found} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {rename foo ""}
+    namespace eval test_ns_1 {
+        proc foo {} {
+            return "namespace foo"
+        }
+    }
+    namespace eval test_ns_1 {
+        proc foo {} {
+            return "namespace foo"
+        }
+    }
+    list [namespace eval test_ns_1 {namespace which -command foo}] \
+         [rename test_ns_1::foo ""] \
+         [catch {namespace eval test_ns_1 {namespace which -command foo}} msg] $msg
+} {::test_ns_1::foo {} 0 {}}
+
+test execute-5.1 {SetCmdNameFromAny, set cmd name to empty heap string if NULL} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {unset l}
+    proc {} {} {return {}}
+    {}
+    set l {}
+    lindex {} 0
+    {}
+} {}
+
+test execute-6.1 {UpdateStringOfCmdName: called for duplicate of empty cmdName object} {
+    proc {} {} {}
+    proc { } {} {}
+    proc p {} {
+        set x {}
+        $x
+        append x { }
+        $x
+    }
+    p
+} {}
+
+# cleanup
+catch {eval namespace delete [namespace children :: test_ns_*]}
+catch {rename foo ""}
+catch {rename p ""}
+catch {rename {} ""}
+catch {rename { } ""}
+catch {unset x}
+catch {unset y}
+catch {unset msg}
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

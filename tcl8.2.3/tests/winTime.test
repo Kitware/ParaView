@@ -1,0 +1,50 @@
+# This file tests the tclWinTime.c file.
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+# The next two tests will crash on Windows if the check for negative
+# clock values is not done properly.
+
+test winTime-1.1 {TclpGetDate} {pcOnly} {
+    set ::env(TZ) JST-9
+    set result [clock format -1 -format %Y]
+    unset ::env(TZ)
+    set result
+} {1970}
+test winTime-1.2 {TclpGetDate} {pcOnly} {
+    set ::env(TZ) PST8
+    set result [clock format 1 -format %Y]
+    unset ::env(TZ)
+    set result
+} {1969}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,1487 @@
+# The file tests the tclCmdAH.c file.
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1996-1998 by Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+global env
+set cmdAHwd [pwd]
+catch {set platform [testgetplatform]}
+
+test cmdAH-0.1 {Tcl_BreakObjCmd, errors} {
+    list [catch {break foo} msg] $msg
+} {1 {wrong # args: should be "break"}}
+test cmdAH-0.2 {Tcl_BreakObjCmd, success} {
+    list [catch {break} msg] $msg
+} {3 {}}
+
+# Tcl_CaseObjCmd is tested in case.test
+
+test cmdAH-1.1 {Tcl_CatchObjCmd, errors} {
+    list [catch {catch} msg] $msg
+} {1 {wrong # args: should be "catch command ?varName?"}}
+test cmdAH-1.2 {Tcl_CatchObjCmd, errors} {
+    list [catch {catch foo bar baz} msg] $msg
+} {1 {wrong # args: should be "catch command ?varName?"}}
+
+test cmdAH-2.1 {Tcl_CdObjCmd} {
+    list [catch {cd foo bar} msg] $msg
+} {1 {wrong # args: should be "cd ?dirName?"}}
+test cmdAH-2.2 {Tcl_CdObjCmd} {
+    file delete -force foo
+    file mkdir foo
+    cd foo
+    set result [file tail [pwd]]
+    cd ..
+    file delete foo
+    set result
+} foo
+test cmdAH-2.3 {Tcl_CdObjCmd} {
+    global env
+    set oldpwd [pwd]
+    set temp $env(HOME)
+    set env(HOME) $oldpwd
+    file delete -force foo
+    file mkdir foo
+    cd foo
+    cd ~
+    set result [string match [pwd] $oldpwd]
+    file delete foo
+    set env(HOME) $temp
+    set result
+} 1
+test cmdAH-2.4 {Tcl_CdObjCmd} {
+    global env
+    set oldpwd [pwd]
+    set temp $env(HOME)
+    set env(HOME) $oldpwd
+    file delete -force foo
+    file mkdir foo
+    cd foo
+    cd
+    set result [string match [pwd] $oldpwd]
+    file delete foo
+    set env(HOME) $temp
+    set result
+} 1
+test cmdAH-2.5 {Tcl_CdObjCmd} {
+    list [catch {cd ~~} msg] $msg
+} {1 {user "~" doesn't exist}}
+test cmdAH-2.6 {Tcl_CdObjCmd} {
+    list [catch {cd _foobar} msg] $msg
+} {1 {couldn't change working directory to "_foobar": no such file or directory}}
+
+test cmdAH-2.7 {Tcl_ConcatObjCmd} {
+    concat
+} {}
+test cmdAH-2.8 {Tcl_ConcatObjCmd} {
+    concat a
+} a
+test cmdAH-2.9 {Tcl_ConcatObjCmd} {
+    concat a {b c}
+} {a b c}
+
+test cmdAH-3.1 {Tcl_ContinueObjCmd, errors} {
+    list [catch {continue foo} msg] $msg
+} {1 {wrong # args: should be "continue"}}
+test cmdAH-3.2 {Tcl_ContinueObjCmd, success} {
+    list [catch {continue} msg] $msg
+} {4 {}}
+
+test cmdAH-4.1 {Tcl_EncodingObjCmd} {
+    list [catch {encoding} msg] $msg
+} {1 {wrong # args: should be "encoding option ?arg ...?"}}
+test cmdAH-4.2 {Tcl_EncodingObjCmd} {
+    list [catch {encoding foo} msg] $msg
+} {1 {bad option "foo": must be convertfrom, convertto, names, or system}}
+test cmdAH-4.3 {Tcl_EncodingObjCmd} {
+    list [catch {encoding convertto} msg] $msg
+} {1 {wrong # args: should be "encoding convertto ?encoding? data"}}
+test cmdAH-4.4 {Tcl_EncodingObjCmd} {
+    list [catch {encoding convertto foo bar} msg] $msg
+} {1 {unknown encoding "foo"}}
+test cmdAH-4.5 {Tcl_EncodingObjCmd} {
+    set system [encoding system]
+    encoding system jis0208
+    set x [encoding convertto \u4e4e]
+    encoding system $system
+    set x
+} 8C
+test cmdAH-4.6 {Tcl_EncodingObjCmd} {
+    set system [encoding system]
+    encoding system identity
+    set x [encoding convertto jis0208 \u4e4e]
+    encoding system $system
+    set x
+} 8C
+test cmdAH-4.7 {Tcl_EncodingObjCmd} {
+    list [catch {encoding convertfrom} msg] $msg
+} {1 {wrong # args: should be "encoding convertfrom ?encoding? data"}}
+test cmdAH-4.8 {Tcl_EncodingObjCmd} {
+    list [catch {encoding convertfrom foo bar} msg] $msg
+} {1 {unknown encoding "foo"}}
+test cmdAH-4.9 {Tcl_EncodingObjCmd} {
+    set system [encoding system]
+    encoding system jis0208
+    set x [encoding convertfrom 8C]
+    encoding system $system
+    set x
+} \u4e4e
+test cmdAH-4.10 {Tcl_EncodingObjCmd} {
+    set system [encoding system]
+    encoding system identity
+    set x [encoding convertfrom jis0208 8C]
+    encoding system $system
+    set x
+} \u4e4e
+test cmdAH-4.11 {Tcl_EncodingObjCmd} {
+    list [catch {encoding names foo} msg] $msg
+} {1 {wrong # args: should be "encoding names"}}
+test cmdAH-4.12 {Tcl_EncodingObjCmd} {
+    list [catch {encoding system foo bar} msg] $msg
+} {1 {wrong # args: should be "encoding system ?encoding?"}}
+test cmdAH-4.13 {Tcl_EncodingObjCmd} {
+    set system [encoding system]
+    encoding system identity
+    set x [encoding system]
+    encoding system $system
+    set x
+} identity
+
+test cmdAH-5.1 {Tcl_FileObjCmd} {
+    list [catch file msg] $msg
+} {1 {wrong # args: should be "file option ?arg ...?"}}
+test cmdAH-5.2 {Tcl_FileObjCmd} {
+    list [catch {file x} msg] $msg
+} {1 {bad option "x": must be atime, attributes, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, lstat, mtime, mkdir, nativename, owned, pathtype, readable, readlink, rename, rootname, size, split, stat, tail, type, volumes, or writable}}
+test cmdAH-5.3 {Tcl_FileObjCmd} {
+    list [catch {file atime} msg] $msg
+} {1 {wrong # args: should be "file atime name"}}
+
+
+#volume
+
+test cmdAH-6.1 {Tcl_FileObjCmd: volumes} {
+    list [catch {file volumes x} msg] $msg	
+} {1 {wrong # args: should be "file volumes"}}
+test cmdAH-6.2 {Tcl_FileObjCmd: volumes} {
+	set volumeList [file volumes]
+	if { [llength $volumeList] == 0 } {
+		set result 0
+	} else {
+		set result 1
+	}	
+} {1}
+test cmdAH-6.3 {Tcl_FileObjCmd: volumes} {macOrUnix} {
+    set volumeList [file volumes]
+    catch [list glob -nocomplain [lindex $volumeList 0]*]
+} {0}
+test cmdAH-6.4 {Tcl_FileObjCmd: volumes} {pcOnly} {
+    set volumeList [string tolower [file volumes]]
+    list [catch {lsearch $volumeList "c:/"} element] [expr $element != -1] [catch {list glob -nocomplain [lindex $volumeList $element]*}]
+} {0 1 0}
+
+# attributes
+
+test cmdAH-7.1 {Tcl_FileObjCmd - file attrs} {
+    catch {file delete -force foo.file}
+    close [open foo.file w]
+    list [catch {file attributes foo.file}] [file delete -force foo.file]
+} {0 {}}
+
+# dirname
+
+if {[info commands testsetplatform] == {}} {
+    puts "This application hasn't been compiled with the \"testsetplatform\""
+    puts "command, so I can't test Tcl_FileObjCmd etc."
+} else {
+test cmdAH-8.1 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname a b} msg] $msg
+} {1 {wrong # args: should be "file dirname name"}}
+test cmdAH-8.2 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    file dirname /a/b
+} /a
+test cmdAH-8.3 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    file dirname {}
+} .
+test cmdAH-8.4 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    file dirname {}
+} :
+test cmdAH-8.5 {Tcl_FileObjCmd: dirname} {
+    testsetplatform win
+    file dirname {}
+} .
+test cmdAH-8.6 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    file dirname .def
+} .
+test cmdAH-8.7 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    file dirname a
+} :
+test cmdAH-8.8 {Tcl_FileObjCmd: dirname} {
+    testsetplatform win
+    file dirname a
+} .
+test cmdAH-8.9 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    file dirname a/b/c.d
+} a/b
+test cmdAH-8.10 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    file dirname a/b.c/d
+} a/b.c
+test cmdAH-8.11 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    file dirname /.
+} /
+test cmdAH-8.12 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname /} msg] $msg
+} {0 /}
+test cmdAH-8.13 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname /foo} msg] $msg
+} {0 /}
+test cmdAH-8.14 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname //foo} msg] $msg
+} {0 /}
+test cmdAH-8.15 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname //foo/bar} msg] $msg
+} {0 /foo}
+test cmdAH-8.16 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname {//foo\/bar/baz}} msg] $msg
+} {0 {/foo\/bar}}
+test cmdAH-8.17 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname {//foo\/bar/baz/blat}} msg] $msg
+} {0 {/foo\/bar/baz}}
+test cmdAH-8.18 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname /foo//} msg] $msg
+} {0 /}
+test cmdAH-8.19 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname ./a} msg] $msg
+} {0 .}
+test cmdAH-8.20 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname a/.a} msg] $msg
+} {0 a}
+test cmdAH-8.21 {Tcl_FileObjCmd: dirname} {
+    testsetplatform windows
+    list [catch {file dirname c:foo} msg] $msg
+} {0 c:}
+test cmdAH-8.22 {Tcl_FileObjCmd: dirname} {
+    testsetplatform windows
+    list [catch {file dirname c:} msg] $msg
+} {0 c:}
+test cmdAH-8.23 {Tcl_FileObjCmd: dirname} {
+    testsetplatform windows
+    list [catch {file dirname c:/} msg] $msg
+} {0 c:/}
+test cmdAH-8.24 {Tcl_FileObjCmd: dirname} {
+    testsetplatform windows
+    list [catch {file dirname {c:\foo}} msg] $msg
+} {0 c:/}
+test cmdAH-8.25 {Tcl_FileObjCmd: dirname} {
+    testsetplatform windows
+    list [catch {file dirname {//foo/bar/baz}} msg] $msg
+} {0 //foo/bar}
+test cmdAH-8.26 {Tcl_FileObjCmd: dirname} {
+    testsetplatform windows
+    list [catch {file dirname {//foo/bar}} msg] $msg
+} {0 //foo/bar}
+test cmdAH-8.27 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname :} msg] $msg
+} {0 :}
+test cmdAH-8.28 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname :Foo} msg] $msg
+} {0 :}
+test cmdAH-8.29 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname Foo:} msg] $msg
+} {0 Foo:}
+test cmdAH-8.30 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname Foo:bar} msg] $msg
+} {0 Foo:}
+test cmdAH-8.31 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname :Foo:bar} msg] $msg
+} {0 :Foo}
+test cmdAH-8.32 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname ::} msg] $msg
+} {0 :}
+test cmdAH-8.33 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname :::} msg] $msg
+} {0 ::}
+test cmdAH-8.34 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname /foo/bar/} msg] $msg
+} {0 foo:}
+test cmdAH-8.35 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname /foo/bar} msg] $msg
+} {0 foo:}
+test cmdAH-8.36 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname /foo} msg] $msg
+} {0 foo:}
+test cmdAH-8.37 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname foo} msg] $msg
+} {0 :}
+test cmdAH-8.38 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname ~/foo} msg] $msg
+} {0 ~}
+test cmdAH-8.39 {Tcl_FileObjCmd: dirname} {
+    testsetplatform unix
+    list [catch {file dirname ~bar/foo} msg] $msg
+} {0 ~bar}
+test cmdAH-8.40 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname ~bar/foo} msg] $msg
+} {0 ~bar:}
+test cmdAH-8.41 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname ~/foo} msg] $msg
+} {0 ~:}
+test cmdAH-8.42 {Tcl_FileObjCmd: dirname} {
+    testsetplatform mac
+    list [catch {file dirname ~:baz} msg] $msg
+} {0 ~:}
+test cmdAH-8.43 {Tcl_FileObjCmd: dirname} {
+    global env
+    set temp $env(HOME)
+    set env(HOME) "/home/test"
+    testsetplatform unix
+    set result [list [catch {file dirname ~} msg] $msg]
+    set env(HOME) $temp
+    set result
+} {0 /home}
+test cmdAH-8.44 {Tcl_FileObjCmd: dirname} {
+    global env
+    set temp $env(HOME)
+    set env(HOME) "~"
+    testsetplatform unix
+    set result [list [catch {file dirname ~} msg] $msg]
+    set env(HOME) $temp
+    set result
+} {0 ~}
+test cmdAH-8.45 {Tcl_FileObjCmd: dirname} {
+    global env
+    set temp $env(HOME)
+    set env(HOME) "/home/test"
+    testsetplatform windows
+    set result [list [catch {file dirname ~} msg] $msg]
+    set env(HOME) $temp
+    set result
+} {0 /home}
+test cmdAH-8.46 {Tcl_FileObjCmd: dirname} {
+    global env
+    set temp $env(HOME)
+    set env(HOME) "/home/test"
+    testsetplatform mac
+    set result [list [catch {file dirname ~} msg] $msg]
+    set env(HOME) $temp
+    set result
+} {0 home:}
+
+# tail
+
+test cmdAH-9.1 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    list [catch {file tail a b} msg] $msg
+} {1 {wrong # args: should be "file tail name"}}
+test cmdAH-9.2 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail /a/b
+} b
+test cmdAH-9.3 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail {}
+} {}
+test cmdAH-9.4 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail {}
+} {}
+test cmdAH-9.5 {Tcl_FileObjCmd: tail} {
+    testsetplatform win
+    file tail {}
+} {}
+test cmdAH-9.6 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail .def
+} .def
+test cmdAH-9.7 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail a
+} a
+test cmdAH-9.8 {Tcl_FileObjCmd: tail} {
+    testsetplatform win
+    file tail a
+} a
+test cmdAH-9.9 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file ta a/b/c.d
+} c.d
+test cmdAH-9.10 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail a/b.c/d
+} d
+test cmdAH-9.11 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail /.
+} .
+test cmdAH-9.12 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail /
+} {}
+test cmdAH-9.13 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail /foo
+} foo
+test cmdAH-9.14 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail //foo
+} foo
+test cmdAH-9.15 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail //foo/bar
+} bar
+test cmdAH-9.16 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail {//foo\/bar/baz}
+} baz
+test cmdAH-9.17 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail {//foo\/bar/baz/blat}
+} blat
+test cmdAH-9.18 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail /foo//
+} foo
+test cmdAH-9.19 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail ./a
+} a
+test cmdAH-9.20 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail a/.a
+} .a
+test cmdAH-9.21 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail c:foo
+} foo
+test cmdAH-9.22 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail c:
+} {}
+test cmdAH-9.23 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail c:/
+} {}
+test cmdAH-9.24 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail {c:\foo}
+} foo
+test cmdAH-9.25 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail {//foo/bar/baz}
+} baz
+test cmdAH-9.26 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail {//foo/bar}
+} {}
+test cmdAH-9.27 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail :
+} :
+test cmdAH-9.28 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail :Foo
+} Foo
+test cmdAH-9.29 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail Foo:
+} {}
+test cmdAH-9.30 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail Foo:bar
+} bar
+test cmdAH-9.31 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail :Foo:bar
+} bar
+test cmdAH-9.32 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail ::
+} ::
+test cmdAH-9.33 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail :::
+} ::
+test cmdAH-9.34 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail /foo/bar/
+} bar
+test cmdAH-9.35 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail /foo/bar
+} bar
+test cmdAH-9.36 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail /foo
+} {}
+test cmdAH-9.37 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail foo
+} foo
+test cmdAH-9.38 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail ~:foo
+} foo
+test cmdAH-9.39 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail ~bar:foo
+} foo
+test cmdAH-9.40 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail ~bar/foo
+} foo
+test cmdAH-9.41 {Tcl_FileObjCmd: tail} {
+    testsetplatform mac
+    file tail ~/foo
+} foo
+test cmdAH-9.42 {Tcl_FileObjCmd: tail} {
+    global env
+    set temp $env(HOME)
+    set env(HOME) "/home/test"
+    testsetplatform unix
+    set result [file tail ~]
+    set env(HOME) $temp
+    set result
+} test
+test cmdAH-9.43 {Tcl_FileObjCmd: tail} {
+    global env
+    set temp $env(HOME)
+    set env(HOME) "~"
+    testsetplatform unix
+    set result [file tail ~]
+    set env(HOME) $temp
+    set result
+} {}
+test cmdAH-9.44 {Tcl_FileObjCmd: tail} {
+    global env
+    set temp $env(HOME)
+    set env(HOME) "/home/test"
+    testsetplatform windows
+    set result [file tail ~]
+    set env(HOME) $temp
+    set result
+} test
+test cmdAH-9.45 {Tcl_FileObjCmd: tail} {
+    global env
+    set temp $env(HOME)
+    set env(HOME) "/home/test"
+    testsetplatform mac
+    set result [file tail ~]
+    set env(HOME) $temp
+    set result
+} test
+test cmdAH-9.46 {Tcl_FileObjCmd: tail} {
+    testsetplatform unix
+    file tail {f.oo\bar/baz.bat}
+} baz.bat
+test cmdAH-9.47 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail c:foo
+} foo
+test cmdAH-9.48 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail c:
+} {}
+test cmdAH-9.49 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail c:/foo
+} foo
+test cmdAH-9.50 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail {c:/foo\bar}
+} bar
+test cmdAH-9.51 {Tcl_FileObjCmd: tail} {
+    testsetplatform windows
+    file tail {foo\bar}
+} bar
+
+# rootname
+
+test cmdAH-10.1 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    list [catch {file rootname a b} msg] $msg
+} {1 {wrong # args: should be "file rootname name"}}
+test cmdAH-10.2 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file rootname {}
+} {}
+test cmdAH-10.3 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file ro foo
+} foo
+test cmdAH-10.4 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file rootname foo.
+} foo
+test cmdAH-10.5 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file rootname .foo
+} {}
+test cmdAH-10.6 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file rootname abc.def
+} abc
+test cmdAH-10.7 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file rootname abc.def.ghi
+} abc.def
+test cmdAH-10.8 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file rootname a/b/c.d
+} a/b/c
+test cmdAH-10.9 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file rootname a/b.c/d
+} a/b.c/d
+test cmdAH-10.10 {Tcl_FileObjCmd: rootname} {
+    testsetplatform unix
+    file rootname a/b.c/
+} a/b.c/
+test cmdAH-10.11 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file ro foo
+} foo
+test cmdAH-10.12 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname {}
+} {}
+test cmdAH-10.13 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname foo.
+} foo
+test cmdAH-10.14 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname .foo
+} {}
+test cmdAH-10.15 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname abc.def
+} abc
+test cmdAH-10.16 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname abc.def.ghi
+} abc.def
+test cmdAH-10.17 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname a:b:c.d
+} a:b:c
+test cmdAH-10.18 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname a:b.c:d
+} a:b.c:d
+test cmdAH-10.19 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname a/b/c.d
+} a/b/c
+test cmdAH-10.20 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname a/b.c/d
+} a/b.c/d
+test cmdAH-10.21 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname /a.b
+} /a
+test cmdAH-10.22 {Tcl_FileObjCmd: rootname} {
+    testsetplatform mac
+    file rootname foo.c:
+} foo.c:
+test cmdAH-10.23 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname {}
+} {}
+test cmdAH-10.24 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file ro foo
+} foo
+test cmdAH-10.25 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname foo.
+} foo
+test cmdAH-10.26 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname .foo
+} {}
+test cmdAH-10.27 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname abc.def
+} abc
+test cmdAH-10.28 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname abc.def.ghi
+} abc.def
+test cmdAH-10.29 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname a/b/c.d
+} a/b/c
+test cmdAH-10.30 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname a/b.c/d
+} a/b.c/d
+test cmdAH-10.31 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname a\\b.c\\
+} a\\b.c\\
+test cmdAH-10.32 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname a\\b\\c.d
+} a\\b\\c
+test cmdAH-10.33 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname a\\b.c\\d
+} a\\b.c\\d
+test cmdAH-10.34 {Tcl_FileObjCmd: rootname} {
+    testsetplatform windows
+    file rootname a\\b.c\\
+} a\\b.c\\
+set num 35
+foreach outer { {} a .a a. a.a } {
+  foreach inner { {} a .a a. a.a } {
+    set thing [format %s/%s $outer $inner]
+;   test cmdAH-6.$num {Tcl_FileObjCmd: rootname and extension options} {
+	testsetplatform unix
+	format %s%s [file rootname $thing] [file ext $thing]
+    } $thing
+    set num [expr $num+1]
+  }
+}
+
+# extension
+
+test cmdAH-11.1 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    list [catch {file extension a b} msg] $msg
+} {1 {wrong # args: should be "file extension name"}}
+test cmdAH-11.2 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file extension {}
+} {}
+test cmdAH-11.3 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file ext foo
+} {}
+test cmdAH-11.4 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file extension foo.
+} .
+test cmdAH-11.5 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file extension .foo
+} .foo
+test cmdAH-11.6 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file extension abc.def
+} .def
+test cmdAH-11.7 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file extension abc.def.ghi
+} .ghi
+test cmdAH-11.8 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file extension a/b/c.d
+} .d
+test cmdAH-11.9 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file extension a/b.c/d
+} {}
+test cmdAH-11.10 {Tcl_FileObjCmd: extension} {
+    testsetplatform unix
+    file extension a/b.c/
+} {}
+test cmdAH-11.11 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file ext foo
+} {}
+test cmdAH-11.12 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension {}
+} {}
+test cmdAH-11.13 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension foo.
+} .
+test cmdAH-11.14 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension .foo
+} .foo
+test cmdAH-11.15 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension abc.def
+} .def
+test cmdAH-11.16 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension abc.def.ghi
+} .ghi
+test cmdAH-11.17 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension a:b:c.d
+} .d
+test cmdAH-11.18 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension a:b.c:d
+} {}
+test cmdAH-11.19 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension a/b/c.d
+} .d
+test cmdAH-11.20 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension a/b.c/d
+} {}
+test cmdAH-11.21 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension /a.b
+} .b
+test cmdAH-11.22 {Tcl_FileObjCmd: extension} {
+    testsetplatform mac
+    file extension foo.c:
+} {}
+test cmdAH-11.23 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension {}
+} {}
+test cmdAH-11.24 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file ext foo
+} {}
+test cmdAH-11.25 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension foo.
+} .
+test cmdAH-11.26 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension .foo
+} .foo
+test cmdAH-11.27 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension abc.def
+} .def
+test cmdAH-11.28 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension abc.def.ghi
+} .ghi
+test cmdAH-11.29 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension a/b/c.d
+} .d
+test cmdAH-11.30 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension a/b.c/d
+} {}
+test cmdAH-11.31 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension a\\b.c\\
+} {}
+test cmdAH-11.32 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension a\\b\\c.d
+} .d
+test cmdAH-11.33 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension a\\b.c\\d
+} {}
+test cmdAH-11.34 {Tcl_FileObjCmd: extension} {
+    testsetplatform windows
+    file extension a\\b.c\\
+} {}
+set num 35
+foreach value {a..b a...b a.c..b ..b} result {.b .b .b .b} {
+    foreach p {unix mac windows} {
+;	test cmdAH-7.$num {Tcl_FileObjCmd: extension} "
+	    testsetplatform $p
+	    file extension $value
+	" $result
+	incr num
+    }
+}
+
+# pathtype
+
+test cmdAH-12.1 {Tcl_FileObjCmd: pathtype} {
+    testsetplatform unix
+    list [catch {file pathtype a b} msg] $msg
+} {1 {wrong # args: should be "file pathtype name"}}
+test cmdAH-12.2 {Tcl_FileObjCmd: pathtype} {
+    testsetplatform unix
+    file pathtype /a
+} absolute
+test cmdAH-12.3 {Tcl_FileObjCmd: pathtype} {
+    testsetplatform unix
+    file p a
+} relative
+test cmdAH-12.4 {Tcl_FileObjCmd: pathtype} {
+    testsetplatform windows
+    file pathtype c:a
+} volumerelative
+
+# split
+
+test cmdAH-13.1 {Tcl_FileObjCmd: split} {
+    testsetplatform unix
+    list [catch {file split a b} msg] $msg
+} {1 {wrong # args: should be "file split name"}}
+test cmdAH-13.2 {Tcl_FileObjCmd: split} {
+    testsetplatform unix
+    file split a
+} a
+test cmdAH-13.3 {Tcl_FileObjCmd: split} {
+    testsetplatform unix
+    file split a/b
+} {a b}
+
+# join
+
+test cmdAH-14.1 {Tcl_FileObjCmd: join} {
+    testsetplatform unix
+    file join a
+} a
+test cmdAH-14.2 {Tcl_FileObjCmd: join} {
+    testsetplatform unix
+    file join a b
+} a/b
+test cmdAH-14.3 {Tcl_FileObjCmd: join} {
+    testsetplatform unix
+    file join a b c d
+} a/b/c/d
+
+# error handling of Tcl_TranslateFileName
+
+test cmdAH-15.1 {Tcl_FileObjCmd} {
+    testsetplatform unix
+    list [catch {file atime ~_bad_user} msg] $msg
+} {1 {user "_bad_user" doesn't exist}}
+
+testsetplatform $platform
+}
+
+# readable
+
+if {[info commands testchmod] == {}} {
+    puts "This application hasn't been compiled with the \"testchmod\""
+    puts "command, so I can't test Tcl_FileObjCmd etc."
+} else {
+makeFile abcde gorp.file
+makeDirectory dir.file
+
+test cmdAH-16.1 {Tcl_FileObjCmd: readable} {
+    list [catch {file readable a b} msg] $msg
+} {1 {wrong # args: should be "file readable name"}}
+testchmod 444 gorp.file
+test cmdAH-16.2 {Tcl_FileObjCmd: readable} {
+    file readable gorp.file
+} 1
+testchmod 333 gorp.file
+test cmdAH-16.3 {Tcl_FileObjCmd: readable} {unixOnly notRoot} {
+    file reada gorp.file
+} 0
+
+# writable
+
+test cmdAH-17.1 {Tcl_FileObjCmd: writable} {
+    list [catch {file writable a b} msg] $msg
+} {1 {wrong # args: should be "file writable name"}}
+testchmod 555 gorp.file
+test cmdAH-17.2 {Tcl_FileObjCmd: writable} {notRoot} {
+    file writable gorp.file
+} 0
+testchmod 222 gorp.file
+test cmdAH-17.3 {Tcl_FileObjCmd: writable} {
+    file writable gorp.file
+} 1
+
+# executable
+
+file delete -force dir.file gorp.file
+file mkdir dir.file
+makeFile abcde gorp.file
+
+test cmdAH-18.1 {Tcl_FileObjCmd: executable} {
+    list [catch {file executable a b} msg] $msg
+} {1 {wrong # args: should be "file executable name"}}
+test cmdAH-18.2 {Tcl_FileObjCmd: executable} {
+    file executable gorp.file
+} 0
+test cmdAH-18.3 {Tcl_FileObjCmd: executable} {unixOnly} {
+    # Only on unix will setting the execute bit on a regular file
+    # cause that file to be executable.   
+    
+    testchmod 775 gorp.file
+    file exe gorp.file
+} 1
+
+test cmdAH-18.4 {Tcl_FileObjCmd: executable} {macOnly} {
+    # On mac, the only executable files are of type APPL.
+
+    set x [file exe gorp.file]    
+    file attrib gorp.file -type APPL
+    lappend x [file exe gorp.file]
+} {0 1}
+test cmdAH-18.5 {Tcl_FileObjCmd: executable} {pcOnly} {
+    # On pc, must be a .exe, .com, etc.
+    
+    set x [file exe gorp.file]
+    makeFile foo gorp.exe
+    lappend x [file exe gorp.exe]
+    file delete gorp.exe
+    set x
+} {0 1}
+test cmdAH-18.6 {Tcl_FileObjCmd: executable} {
+    # Directories are always executable.
+    
+    file exe dir.file
+} 1
+
+file delete -force dir.file  
+file delete gorp.file
+file delete link.file
+}
+
+# exists
+
+test cmdAH-19.1 {Tcl_FileObjCmd: exists} {
+    list [catch {file exists a b} msg] $msg
+} {1 {wrong # args: should be "file exists name"}}
+test cmdAH-19.2 {Tcl_FileObjCmd: exists} {file exists gorp.file} 0
+test cmdAH-19.3 {Tcl_FileObjCmd: exists} {
+    file exists [file join dir.file gorp.file]
+} 0
+catch {
+    makeFile abcde gorp.file
+    makeDirectory dir.file
+    makeFile 12345 [file join dir.file gorp.file]
+}
+test cmdAH-19.4 {Tcl_FileObjCmd: exists} {
+    file exists gorp.file
+} 1
+test cmdAH-19.5 {Tcl_FileObjCmd: exists} {
+    file exists [file join dir.file gorp.file]
+} 1
+
+# nativename
+if {[info commands testsetplatform] == {}} {
+    puts "This application hasn't been compiled with the \"testsetplatform\""
+    puts "command, so I can't test Tcl_FileObjCmd etc."
+} else {
+test cmdAH-19.6 {Tcl_FileObjCmd: nativename} {
+    testsetplatform unix
+    list [catch {file nativename a/b} msg] $msg [testsetplatform $platform]
+} {0 a/b {}}
+test cmdAH-19.7 {Tcl_FileObjCmd: nativename} {
+    testsetplatform windows
+    list [catch {file nativename a/b} msg] $msg [testsetplatform $platform]
+} {0 {a\b} {}}
+test cmdAH-19.8 {Tcl_FileObjCmd: nativename} {
+    testsetplatform mac
+    list [catch {file nativename a/b} msg] $msg [testsetplatform $platform]
+} {0 :a:b {}}
+}
+
+test cmdAH-19.9 {Tcl_FileObjCmd: ~ : exists} {
+    file exists ~nOsUcHuSeR
+} 0
+test cmdAH-19.10 {Tcl_FileObjCmd: ~ : nativename} {
+    # should probably be 0 in fact...
+    catch {file nativename ~nOsUcHuSeR}
+} 1
+
+# The test below has to be done in /tmp rather than the current
+# directory in order to guarantee (?) a local file system:  some
+# NFS file systems won't do the stuff below correctly.
+
+test cmdAH-19.11 {Tcl_FileObjCmd: exists} {unixOnly notRoot} {
+    removeFile /tmp/tcl.foo.dir/file
+    removeDirectory /tmp/tcl.foo.dir
+    makeDirectory /tmp/tcl.foo.dir
+    makeFile 12345 /tmp/tcl.foo.dir/file
+    exec chmod 000 /tmp/tcl.foo.dir
+
+    set result [file exists /tmp/tcl.foo.dir/file]
+
+    exec chmod 775 /tmp/tcl.foo.dir
+    removeFile /tmp/tcl.foo.dir/file
+    removeDirectory /tmp/tcl.foo.dir
+    set result
+} 0
+
+# Stat related commands
+
+catch {testsetplatform $platform}
+file delete gorp.file
+makeFile "Test string" gorp.file
+catch {exec chmod 765 gorp.file}
+
+# atime
+
+test cmdAH-20.1 {Tcl_FileObjCmd: atime} {
+    list [catch {file atime a b} msg] $msg
+} {1 {wrong # args: should be "file atime name"}}
+test cmdAH-20.2 {Tcl_FileObjCmd: atime} {
+    catch {unset stat}
+    file stat gorp.file stat
+    list [expr {[file mtime gorp.file] == $stat(mtime)}] \
+	    [expr {[file atime gorp.file] == $stat(atime)}]
+} {1 1}
+test cmdAH-20.3 {Tcl_FileObjCmd: atime} {
+    string tolower [list [catch {file atime _bogus_} msg] \
+	    $msg $errorCode]
+} {1 {could not read "_bogus_": no such file or directory} {posix enoent {no such file or directory}}}
+
+# isdirectory
+
+test cmdAH-21.1 {Tcl_FileObjCmd: isdirectory} {
+    list [catch {file isdirectory a b} msg] $msg
+} {1 {wrong # args: should be "file isdirectory name"}}
+test cmdAH-21.2 {Tcl_FileObjCmd: isdirectory} {
+    file isdirectory gorp.file
+} 0
+test cmdAH-21.3 {Tcl_FileObjCmd: isdirectory} {
+    file isd dir.file
+} 1
+
+# isfile
+
+test cmdAH-22.1 {Tcl_FileObjCmd: isfile} {
+    list [catch {file isfile a b} msg] $msg
+} {1 {wrong # args: should be "file isfile name"}}
+test cmdAH-22.2 {Tcl_FileObjCmd: isfile} {file isfile gorp.file} 1
+test cmdAH-22.3 {Tcl_FileObjCmd: isfile} {file isfile dir.file} 0
+
+# lstat and readlink:  don't run these tests everywhere, since not all
+# sites will have symbolic links
+
+catch {exec ln -s gorp.file link.file}
+test cmdAH-23.1 {Tcl_FileObjCmd: lstat} {
+    list [catch {file lstat a} msg] $msg
+} {1 {wrong # args: should be "file lstat name varName"}}
+test cmdAH-23.2 {Tcl_FileObjCmd: lstat} {
+    list [catch {file lstat a b c} msg] $msg
+} {1 {wrong # args: should be "file lstat name varName"}}
+test cmdAH-23.3 {Tcl_FileObjCmd: lstat} {unixOnly nonPortable} {
+    catch {unset stat}
+    file lstat link.file stat
+    lsort [array names stat]
+} {atime ctime dev gid ino mode mtime nlink size type uid}
+test cmdAH-23.4 {Tcl_FileObjCmd: lstat} {unixOnly nonPortable} {
+    catch {unset stat}
+    file lstat link.file stat
+    list $stat(nlink) [expr $stat(mode)&0777] $stat(type)
+} {1 511 link}
+test cmdAH-23.5 {Tcl_FileObjCmd: lstat errors} {nonPortable} {
+    string tolower [list [catch {file lstat _bogus_ stat} msg] \
+	    $msg $errorCode]
+} {1 {could not read "_bogus_": no such file or directory} {posix enoent {no such file or directory}}}
+test cmdAH-23.6 {Tcl_FileObjCmd: lstat errors} {
+    catch {unset x}
+    set x 44
+    list [catch {file lstat gorp.file x} msg] $msg $errorCode
+} {1 {can't set "x(dev)": variable isn't array} NONE}
+catch {unset stat}
+
+# mtime 
+
+test cmdAH-24.1 {Tcl_FileObjCmd: mtime} {
+    list [catch {file mtime a b} msg] $msg
+} {1 {wrong # args: should be "file mtime name"}}
+test cmdAH-24.2 {Tcl_FileObjCmd: mtime} {
+    set old [file mtime gorp.file]
+    after 2000
+    set f [open gorp.file w]
+    puts $f "More text"
+    close $f
+    set new [file mtime gorp.file]
+    expr {($new > $old) && ($new <= ($old+5))}
+} {1}
+test cmdAH-24.3 {Tcl_FileObjCmd: mtime} {
+    catch {unset stat}
+    file stat gorp.file stat
+    list [expr {[file mtime gorp.file] == $stat(mtime)}] \
+	    [expr {[file atime gorp.file] == $stat(atime)}]
+} {1 1}
+test cmdAH-24.4 {Tcl_FileObjCmd: mtime} {
+    string tolower [list [catch {file mtime _bogus_} msg] $msg \
+	    $errorCode]
+} {1 {could not read "_bogus_": no such file or directory} {posix enoent {no such file or directory}}}
+test cmdAH-24.5 {Tcl_FileObjCmd: mtime} {
+    # Under Unix, use a file in /tmp to avoid clock skew due to NFS.
+    # On other platforms, just use a file in the local directory.
+
+    if {$tcl_platform(platform) == "unix"} {
+	 set name /tmp/tcl.test
+    } else {
+	set name tf
+    }
+
+    # Make sure that a new file's time is correct.  10 seconds variance 
+    # is allowed used due to slow networks or clock skew on a network drive.
+
+    file delete -force $name
+    close [open $name w]
+    set a [expr abs([clock seconds]-[file mtime $name])<10]
+    file delete $name
+    set a
+} {1}
+
+
+# owned
+
+test cmdAH-25.1 {Tcl_FileObjCmd: owned} {
+    list [catch {file owned a b} msg] $msg
+} {1 {wrong # args: should be "file owned name"}}
+test cmdAH-25.2 {Tcl_FileObjCmd: owned} {
+    file owned gorp.file
+} 1
+test cmdAH-25.3 {Tcl_FileObjCmd: owned} {unixOnly notRoot} {
+    file owned /
+} 0
+
+# readlink
+
+test cmdAH-26.1 {Tcl_FileObjCmd: readlink} {
+    list [catch {file readlink a b} msg] $msg
+} {1 {wrong # args: should be "file readlink name"}}
+test cmdAH-26.2 {Tcl_FileObjCmd: readlink} {unixOnly nonPortable} {
+    file readlink link.file
+} gorp.file
+test cmdAH-26.3 {Tcl_FileObjCmd: readlink errors} {unixOnly nonPortable} {
+    list [catch {file readlink _bogus_} msg] [string tolower $msg] \
+	    [string tolower $errorCode]
+} {1 {could not readlink "_bogus_": no such file or directory} {posix enoent {no such file or directory}}}
+test cmdAH-26.4 {Tcl_FileObjCmd: readlink errors} {macOnly nonPortable} {
+    list [catch {file readlink _bogus_} msg] [string tolower $msg] \
+	    [string tolower $errorCode]
+} {1 {could not readlink "_bogus_": no such file or directory} {posix enoent {no such file or directory}}}
+test cmdAH-26.5 {Tcl_FileObjCmd: readlink errors} {pcOnly nonPortable} {
+    list [catch {file readlink _bogus_} msg] [string tolower $msg] \
+	    [string tolower $errorCode]
+} {1 {could not readlink "_bogus_": invalid argument} {posix einval {invalid argument}}}
+
+# size
+
+test cmdAH-27.1 {Tcl_FileObjCmd: size} {
+    list [catch {file size a b} msg] $msg
+} {1 {wrong # args: should be "file size name"}}
+test cmdAH-27.2 {Tcl_FileObjCmd: size} {
+    set oldsize [file size gorp.file]
+    set f [open gorp.file a]
+    fconfigure $f -translation lf -eofchar {}
+    puts $f "More text"
+    close $f
+    expr {[file size gorp.file] - $oldsize}
+} {10}
+test cmdAH-27.3 {Tcl_FileObjCmd: size} {
+    string tolower [list [catch {file size _bogus_} msg] $msg \
+	    $errorCode]
+} {1 {could not read "_bogus_": no such file or directory} {posix enoent {no such file or directory}}}
+
+# stat
+
+catch {testsetplatform $platform}
+makeFile "Test string" gorp.file
+catch {exec chmod 765 gorp.file}
+
+test cmdAH-28.1 {Tcl_FileObjCmd: stat} {
+    list [catch {file stat _bogus_} msg] $msg $errorCode
+} {1 {wrong # args: should be "file stat name varName"} NONE}
+test cmdAH-28.2 {Tcl_FileObjCmd: stat} {
+    list [catch {file stat _bogus_ a b} msg] $msg $errorCode
+} {1 {wrong # args: should be "file stat name varName"} NONE}
+test cmdAH-28.3 {Tcl_FileObjCmd: stat} {
+    catch {unset stat}
+    file stat gorp.file stat
+    lsort [array names stat]
+} {atime ctime dev gid ino mode mtime nlink size type uid}
+test cmdAH-28.4 {Tcl_FileObjCmd: stat} {
+    catch {unset stat}
+    file stat gorp.file stat
+    list $stat(nlink) $stat(size) $stat(type)
+} {1 12 file}
+test cmdAH-28.5 {Tcl_FileObjCmd: stat} {unixOnly} {
+    catch {unset stat}
+    file stat gorp.file stat
+    expr $stat(mode)&0777
+} {501}
+test cmdAH-28.6 {Tcl_FileObjCmd: stat} {
+    string tolower [list [catch {file stat _bogus_ stat} msg] \
+	    $msg $errorCode]
+} {1 {could not read "_bogus_": no such file or directory} {posix enoent {no such file or directory}}}
+test cmdAH-28.7 {Tcl_FileObjCmd: stat} {
+    catch {unset x}
+    set x 44
+    list [catch {file stat gorp.file x} msg] $msg $errorCode
+} {1 {can't set "x(dev)": variable isn't array} NONE}
+test cmdAH-28.8 {Tcl_FileObjCmd: stat} {
+    # Sign extension of purported unsigned short to int.
+
+    close [open foo.test w]
+    file stat foo.test stat
+    set x [expr {$stat(mode) > 0}]
+    file delete foo.test
+    set x
+} 1
+test cmdAH-28.9 {Tcl_FileObjCmd: stat} {pcOnly} {
+    # stat of root directory was failing.
+    # don't care about answer, just that test runs.
+
+    # relative paths that resolve to root
+    set old [pwd]
+    cd c:/
+    file stat c: stat	    
+    file stat c:. stat
+    file stat . stat
+    cd $old
+
+    file stat / stat
+    file stat c:/ stat
+    file stat c:/. stat
+} {}
+test cmdAH-28.10 {Tcl_FileObjCmd: stat} {pcOnly nonPortable} {
+    # stat of root directory was failing.
+    # don't care about answer, just that test runs.
+
+    file stat //pop/$env(USERNAME) stat
+    file stat //pop/$env(USERNAME)/ stat
+    file stat //pop/$env(USERNAME)/. stat
+} {}    
+test cmdAH-28.11 {Tcl_FileObjCmd: stat} {pcOnly nonPortable} {
+    # stat of network directory was returning id of current local drive.
+
+    set old [pwd]
+    cd c:/
+
+    file stat //pop/$env(USERNAME) stat
+    cd $old
+    expr {$stat(dev) == 2}
+} 0
+test cmdAH-28.12 {Tcl_FileObjCmd: stat} {
+    # stat(mode) with S_IFREG flag was returned as a negative number
+    # if mode_t was a short instead of an unsigned short.
+
+    close [open foo.test w]
+    file stat foo.test stat
+    file delete foo.test
+    expr {$stat(mode) > 0}
+} 1
+catch {unset stat}
+
+# type
+
+file delete link.file
+
+test cmdAH-29.1 {Tcl_FileObjCmd: type} {
+    list [catch {file size a b} msg] $msg
+} {1 {wrong # args: should be "file size name"}}
+test cmdAH-29.2 {Tcl_FileObjCmd: type} {
+    file type dir.file
+} directory
+test cmdAH-29.3 {Tcl_FileObjCmd: type} {
+    file type gorp.file
+} file
+test cmdAH-29.4 {Tcl_FileObjCmd: type} {unixOnly nonPortable} {
+    exec ln -s a/b/c link.file
+    set result [file type link.file]
+    file delete link.file
+    set result
+} link
+test cmdAH-29.5 {Tcl_FileObjCmd: type} {
+    string tolower [list [catch {file type _bogus_} msg] $msg $errorCode]
+} {1 {could not read "_bogus_": no such file or directory} {posix enoent {no such file or directory}}}
+
+# Error conditions
+
+test cmdAH-30.1 {Tcl_FileObjCmd: error conditions} {
+    list [catch {file gorp x} msg] $msg
+} {1 {bad option "gorp": must be atime, attributes, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, lstat, mtime, mkdir, nativename, owned, pathtype, readable, readlink, rename, rootname, size, split, stat, tail, type, volumes, or writable}}
+test cmdAH-30.2 {Tcl_FileObjCmd: error conditions} {
+    list [catch {file ex x} msg] $msg
+} {1 {ambiguous option "ex": must be atime, attributes, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, lstat, mtime, mkdir, nativename, owned, pathtype, readable, readlink, rename, rootname, size, split, stat, tail, type, volumes, or writable}}
+test cmdAH-30.3 {Tcl_FileObjCmd: error conditions} {
+    list [catch {file is x} msg] $msg
+} {1 {ambiguous option "is": must be atime, attributes, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, lstat, mtime, mkdir, nativename, owned, pathtype, readable, readlink, rename, rootname, size, split, stat, tail, type, volumes, or writable}}
+test cmdAH-30.4 {Tcl_FileObjCmd: error conditions} {
+    list [catch {file z x} msg] $msg
+} {1 {bad option "z": must be atime, attributes, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, lstat, mtime, mkdir, nativename, owned, pathtype, readable, readlink, rename, rootname, size, split, stat, tail, type, volumes, or writable}}
+test cmdAH-30.5 {Tcl_FileObjCmd: error conditions} {
+    list [catch {file read x} msg] $msg
+} {1 {ambiguous option "read": must be atime, attributes, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, lstat, mtime, mkdir, nativename, owned, pathtype, readable, readlink, rename, rootname, size, split, stat, tail, type, volumes, or writable}}
+test cmdAH-30.6 {Tcl_FileObjCmd: error conditions} {
+    list [catch {file s x} msg] $msg
+} {1 {ambiguous option "s": must be atime, attributes, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, lstat, mtime, mkdir, nativename, owned, pathtype, readable, readlink, rename, rootname, size, split, stat, tail, type, volumes, or writable}}
+test cmdAH-30.7 {Tcl_FileObjCmd: error conditions} {
+    list [catch {file t x} msg] $msg
+} {1 {ambiguous option "t": must be atime, attributes, copy, delete, dirname, executable, exists, extension, isdirectory, isfile, join, lstat, mtime, mkdir, nativename, owned, pathtype, readable, readlink, rename, rootname, size, split, stat, tail, type, volumes, or writable}}
+test cmdAH-30.8 {Tcl_FileObjCmd: error conditions} {
+    list [catch {file dirname ~woohgy} msg] $msg
+} {1 {user "woohgy" doesn't exist}}
+
+# cleanup
+catch {testsetplatform $platform}
+catch {unset platform}
+
+# Tcl_ForObjCmd is tested in for.test
+
+catch {exec chmod 777 dir.file}
+file delete -force dir.file
+file delete gorp.file
+file delete link.file
+
+cd $cmdAHwd
+
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

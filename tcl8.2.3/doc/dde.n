@@ -1,0 +1,131 @@
+'\"
+'\" Copyright (c) 1997 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH dde n 8.1 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+dde \- Execute a Dynamic Data Exchange command
+.SH SYNOPSIS
+.sp
+\fBpackage require dde 1.1\fR
+.sp
+\fBdde \fIservername \fR?\fItopic\fR?
+.sp
+\fBdde ?\-async?\fR \fIcommand service topic \fR?\fIdata\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+This command allows an application to send Dynamic Data Exchange (DDE)
+command when running under Microsoft Windows. Dynamic Data Exchange is
+a mechanism where applications can exchange raw data. Each DDE
+transaction needs a \fIservice name\fR and a \fItopic\fR. Both the
+\fIservice name\fR and \fItopic\fR are application defined; Tcl uses
+the service name \fBTclEval\fR, while the topic name is the name of the
+interpreter given by \fBdde servername\fR. Other applications have their
+own \fIservice names\fR and \fItopics\fR. For instance, Microsoft Excel
+has the service name \fBExcel\fR.
+.PP
+The only option to the \fBdde\fR command is:
+.TP
+\fB\-async\fR
+Requests asynchronous invocation.  This is valid only for the
+\fBexecute\fR subcommand. Normally, the \fBdde execute\fR subcommand
+waits until the command completes, returning appropriate error
+messages. When the \fB\-async\fR option is used, the command returns
+immediately, and no error information is available.
+.SH "DDE COMMANDS"
+.PP
+The following commands are a subset of the full Dynamic Data Exchange
+set of commands.
+.TP
+\fBdde servername \fR?\fItopic\fR?
+\fBdde servername\fR registers the interpreter as a DDE server with
+the service name TclEval and the topic name specified byt \fItopic\fR.
+If no \fItopic\fR is given, \fBdde servername\fR returns the name
+of the current topic or the empty string if it is not registered as a service.
+.TP
+\fBdde execute \fIservice topic data\fR
+\fBdde execute\fR takes the \fIdata\fR and sends it to the server
+indicated by \fIservice\fR with the topic indicated by
+\fItopic\fR. Typically, \fIservice\fR is the name of an application,
+and \fItopic\fR is a file to work on.  The \fIdata\fR field is given
+to the remote application. Typically, the application treats the
+\fIdata\fR field as a script, and the script is run in the
+application. The command returns an error if the script did not
+run. If the \fB\-async\fR flag was used, the command
+returns immediately with no error.
+.TP
+\fBdde poke \fIservice topic data\fR
+\fBdde poke\fR takes the \fIdata\fR and sends it to the server
+indicated by \fIservice\fR with the topic indicated by
+\fItopic\fR. Typically, \fIservice\fR is the name of an application,
+and \fItopic\fR is a file to work on.  The \fIdata\fR field is given
+to the remote application.
+.TP
+\fBdde request \fIservice topic item\fR
+\fBdde request\fR is typically used to get the value of something; the
+value of a cell in Microsoft Excel or the text of a selection in
+Microsoft Word. \fIservice\fR is typically the name of an application,
+\fItopic\fR is typically the name of the file, and \fIitem\fR is
+application-specific. The command returns the value of \fIitem\fR as
+defined in the application.
+.TP
+\fBdde services \fIservice topic\fR
+\fBdde services\fR returns a list of service-topic pairs that
+currently exist on the machine. If \fIservice\fR and \fItopic\fR are
+both null strings ({}), then all service-topic pairs currently
+available on the system are returned. If \fIservice\fR is null and
+\fItopic\fR is not, then all services with the specified topic are
+returned. If \fIservice\fR is not null and \fItopic\fR is, all topics
+for a given service are returned. If both are not null, if that
+service-topic pair currently exists, it is returned; otherwise, null
+is returned.
+.TP
+\fBdde eval \fItopic cmd \fR?\fIarg arg ...\fR?
+\fBdde eval\fR evaluates a command and its arguments using the
+interpreter specified by \fItopic\fR. The DDE service must be the
+"TclEval" service.  This command can be used to replace send on Windows.
+.SH "DDE AND TCL"
+A Tcl interpreter always has a service name of "TclEval". Each
+different interp of all running Tcl applications should a unique
+name specified by \fBdde servername\fR. Each interp is available as a
+DDE topic only if the \fBdde servername\fR command was used to set the
+name of the topic for each interp. So a \fBdde services TclEval {}\fR
+command will return a list of service-topic pairs, where each of the
+currently running interps will be a topic.
+.PP
+When Tcl processes a \fBdde execute\fR command, the data for the
+execute is run as a script in the interp named by the topic of the
+\fBdde execute\fR command.
+.PP
+When Tcl processes a \fBdde request\fR command, it returns the value of
+the variable given in the dde command in the context of the interp
+named by the dde topic. Tcl reserves the variable "$TCLEVAL$EXECUTE$RESULT"
+for internal use, and \fBdde request\fR commands for that variable
+will give unpredictable results.
+.PP
+An external application which wishes to run a script in Tcl should have
+that script store its result in a variable, run the \fBdde execute\fR
+command, and the run \fBdde request\fR to get the value of the
+variable.
+.PP
+When using DDE, be careful to ensure that the event queue is flushed
+using either \fBupdate\fR or \fBvwait\fR.  This happens by default
+when using \fBwish\fR unless a blocking command is called (such as \fBexec\fR
+without adding the \fB&\fR to place the process in the background).
+If for any reason the event queue is not flushed, DDE commands may
+hang until the event queue is flushed.  This can create a deadlock
+situation.
+.SH KEYWORDS
+application, dde, name, remote execution
+.SH "SEE ALSO"
+tk, winfo, send
+

@@ -1,0 +1,23 @@
+Porting Notes
+-------------
+
+RCS: @(#) Id
+
+Currently, the Macintosh version Tcl only compilies with the
+CodeWarrior C compilier from MetroWerks.  It should be straight
+forward to port the Tcl source to MPW.
+
+Tcl on the Mac no longer requires the use of GUSI.  It should now
+be easier to port Tcl/Tk to other compiliers such as Symantic C
+and MPW C.
+
+If you attempt to port Tcl to other Macintosh compiliers please
+let me know.  I would be glad to help with advice and encouragement.
+If your efforts are succesfull I wold also be interested in puting
+those changes into the core distribution.  Furthermore, please feel
+free to send me any notes you might make about your porting
+experience so I may include them in this file for others to reference.
+
+Ray Johnson
+ray.johnson@eng.sun.com
+

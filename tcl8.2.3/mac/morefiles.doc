@@ -1,0 +1,74 @@
+Notes about MoreFiles, dnr.c & other non-Tcl source files
+---------------------------------------------------------
+
+RCS: @(#) Id
+
+The Macintosh distribution uses several source files that don't
+actually ship with Tcl.  This sometimes causes problems or confusion
+to developers.  This document should help clear up a few things.
+
+dnr.c
+-----
+
+We have found a way to work around some bugs in dnr.c that 
+Apple has never fixed even though we sent in numerous bug reports.
+The file tclMacDNR.c simply set's some #pragma's and the includes
+the Apple dnr.c file.  This should work the problems that many of
+you have reported with dnr.c.
+
+More Files
+----------
+
+Macintosh Tcl/Tk also uses Jim Luther's very useful package called
+More Files.  More Files fixes many of the broken or underfunctional
+parts of the file system.
+
+More Files can be found on the MetroWerks CD and Developer CD from
+Apple.  You can also down load the latest version from:
+
+	ftp://members.aol.com/JumpLong/
+
+The package can also be found at the home of Tcl/Tk for the mac:
+
+	ftp://ftp.sunlabs.com/pub/tcl/mac/
+
+I used to just link the More Files library in the Tcl projects.  
+However, this caused problems when libraries wern't matched correctly.
+I'm now including the files in the Tcl project directly.  This
+solves the problem of missmatched libraries - but may not always
+compile.
+
+If you get a compiliation error in MoreFiles you need to contact
+Jim Luther.  His email address:
+
+	JumpLong@aol.com
+
+The version of More Files that we use with Tcl/Tk is 1.4.3.  Early
+version may work as well..
+
+Unfortunantly, there is one bug in his library (in 1.4.3).  The bug is
+in the function FSpGetFullPath found in the file FullPath.c.  After
+the call to PBGetCatInfoSync you need to change the line:
+
+    if ( result == noErr )
+
+	to:
+
+    if ( (result == noErr) || (result == fnfErr) )
+
+
+The latest version of More Files is 1.4.6.  Unfortunantly, this
+version has a bug that keeps it from working with shared libraries
+right out of the box.  If you want to use 1.4.6 you can but you will
+need to make the following fix:
+
+	In the file "Opimization.h" in the More Files package you
+	need to remove the line "#pragma internal on".  And in the
+	file "OptimazationEnd.h" you need to remove the line
+	"#pragma internal reset".
+
+Note: the version of MoreFile downloaded from the Sun Tcl/Tk site
+will have the fix included.  (If you want you can send email to
+Jim Luther suggesting that he use Tcl for regression testing!)
+
+Ray Johnson

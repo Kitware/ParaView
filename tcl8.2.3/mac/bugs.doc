@@ -1,0 +1,32 @@
+Known bug list for Tcl 8.0 for Macintosh
+
+by Ray Johnson
+Sun Microsystems Laboratories
+rjohnson@eng.sun.com
+
+RCS: @(#) Id
+
+This was a new feature as of Tcl7.6b1 and as such I'll started with
+a clean slate.  I currently know of no reproducable bugs.  I often
+get vague reports - but nothing I've been able to confirm.  Let
+me know what bugs you find!
+
+The Macintosh version of Tcl passes most all tests in the Tcl
+test suite.  Slower Macs may fail some tests in event.test whose
+timing constraints are too tight.  If other tests fail please report
+them.
+
+Ray
+
+Known bugs in the current release.
+
+* With the socket code you can't use the "localhost" host name.  This
+  is actually a known bug in Apple's MacTcp stack.  However, you can
+  use [info hostname] whereever you would have used "localhost" to 
+  achive the same effect.
+
+* Most socket bugs have been fixed.  We do have a couple of test cases
+  that will hang the Mac, however, and we are still working on them.
+  If you find additional test cases that show crashes please let us
+  know!
+

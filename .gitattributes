@@ -1,4 +1,9 @@
 .git*            export-ignore
 
+*.bat           -crlf
 *.dsp           -crlf
 *.dsw           -crlf
+configure        crlf=input
+install-sh       crlf=input
+ldAix            crlf=input
+mkLinks          crlf=input

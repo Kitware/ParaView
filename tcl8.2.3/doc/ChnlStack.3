@@ -1,0 +1,102 @@
+'\"
+'\" Copyright (c) 1999 Scriptics Corporation
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\"
+'\" RCS: @(#) Id
+.so man.macros
+.TH Tcl_StackChannel 3 8.2 Tcl "Tcl Library Procedures"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+Tcl_StackChannel, Tcl_UnstackChannel \- stack an I/O channel on top of another, and undo it
+.SH SYNOPSIS
+.nf
+.nf
+\fB#include <tcl.h>\fR
+.sp
+Tcl_Channel
+\fBTcl_StackChannel\fR(\fIinterp, typePtr, clientData, mask, channel\fR)
+.sp
+void
+\fBTcl_UnstackChannel\fR(\fIinterp, channel\fR)
+.sp
+Tcl_Channel
+\fBTcl_GetStackedChannel\fR(\fIchannel\fR)
+.sp
+.SH ARGUMENTS
+.AS Tcl_ChannelType
+.AP Tcl_Interp *interp in
+Interpreter for error reporting - can be NULL.
+.AP Tcl_ChannelType *typePtr in
+The new channel I/O procedures to use for \fIchannel\fP.
+.AP ClientData clientData in
+Arbitrary one-word value to pass to channel I/O procedures.
+.AP int mask in
+Conditions under which \fIchannel\fR will be used: OR-ed combination of
+\fBTCL_READABLE\fR, \fBTCL_WRITABLE\fR and \fBTCL_EXCEPTION\fR.
+This can be a subset of the operations currently allowed on \fIchannel\fP.
+.AP Tcl_Channel channel in
+An existing Tcl channel such as returned by \fBTcl_CreateChannel\fR.
+.BE
+
+.SH DESCRIPTION
+.PP
+These functions are for use by extensions that add processing
+layers to Tcl I/O channels.  Examples include compression
+and encryption modules.  These functions transparently stack and unstack
+a new channel on top of an existing one.
+Any number of channels can be stacked together.
+.PP
+\fBTcl_StackChannel\fR
+replaces an existing \fIchannel\fP with a new channel by
+the same name that was registered for \fIchannel\fP
+with \fBTcl_RegisterChannel\fP.
+.PP
+\fBTcl_StackChannel\fR
+works by creating a new channel structure under the existing
+\fIchannel\fP and pushing the existing channel functions
+down to the newly created channel.
+The hidden channel does no buffering, newline translations,
+or character set encoding.
+Instead, 
+the buffering, newline translations, and
+encoding functions all remain at the top of the channel stack.
+The top-most channel gets changed to use the 
+I/O channel functions
+defined in \fItypePtr\fP, and the channel functions are passed
+the new \fIclientData\fP.
+The existing \fIchannel\fP structure is modified in place,
+so C applications that continue to use \fIchannel\fP will
+also see the effects of the new processing module.
+A pointer to a new channel structure is returned,
+although this new data structure is the one that has been
+pushed down below the top of the channel module stack.
+(This pointer can also be obtained with the
+\fBTcl_GetStackedChannel\fP call.)
+If an error occurs when stacking the channel,
+NULL is returned instead. 
+.PP
+The \fImask\fP parameter specifies the operations that
+are allowed on the new channel.
+These can be a subset of the operations allowed on the original channel.
+For example, a read-write channel may become
+read-only after the \fBTcl_StackChannel\fR call.
+.PP
+Closing a channel closes the channels stacked below it.
+The close of stacked channels is executed in a way that
+allows buffered data to be properly flushed.
+.PP
+\fBTcl_UnstackChannel\fP reverses the process.
+The old channel is associated with the channel name,
+and the processing module added by
+\fBTcl_StackChannel\fR is destroyed.
+If there is no old channel, then \fBTcl_UnstackChannel\fP 
+is equivalent to \fBTcl_Close\fP .
+
+.SH "SEE ALSO"
+Notifier(3), Tcl_CreateChannel(3), Tcl_OpenFileChannel(3), vwait(n).
+
+.SH KEYWORDS
+channel, compression

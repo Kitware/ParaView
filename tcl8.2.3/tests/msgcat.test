@@ -1,0 +1,315 @@
+# Commands covered: ::msgcat::mc ::msgcat::mclocale
+#                   ::msgcat::mcpreferences ::msgcat::mcload
+#                   ::msgcat::mcset ::msgcat::mcunknown
+#
+# This file contains a collection of tests for the msgcat script library.
+# Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1998 Mark Harrison.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+if {[catch {package require msgcat 1.0}]} {
+    if {[info exist msgcat1]} {
+	catch {puts "Cannot load msgcat 1.0 package"}
+	return
+    } else {
+	catch {puts "Running msgcat 1.0 tests in slave interp"}
+	set interp [interp create msgcat1]
+	$interp eval [list set msgcat1 "running"]
+	$interp eval [list source [info script]]
+	interp delete $interp
+	return
+    }
+}
+
+set oldlocale [::msgcat::mclocale]
+
+# some tests fail in tne environment variable LANG exists and is not C
+
+if {[info exists env(LANG)] && ($env(LANG) != "C")} {
+    set ::tcltest::testConstraints(LANGisC) 0
+} else {
+    set ::tcltest::testConstraints(LANGisC) 1
+}
+
+#
+# Test the various permutations of mclocale
+# and mcpreferences.
+#
+
+test msgcat-1.1 {::msgcat::mclocale default} {LANGisC} {
+    ::msgcat::mclocale
+} {c}
+test msgcat-1.2 {::msgcat::mcpreferences, single element} {LANGisC} {
+    ::msgcat::mcpreferences
+} {c}
+test msgcat-1.3 {::msgcat::mclocale, single element} {
+    ::msgcat::mclocale en
+} {en}
+test msgcat-1.4 {::msgcat::mclocale, single element} {
+    ::msgcat::mclocale
+} {en}
+test msgcat-1.5 {::msgcat::mcpreferences, single element} {
+    ::msgcat::mcpreferences
+} {en}
+test msgcat-1.6 {::msgcat::mclocale, two elements} {
+    ::msgcat::mclocale en_US
+} {en_us}
+test msgcat-1.7 {::msgcat::mclocale, two elements} {
+    ::msgcat::mclocale en_US
+    ::msgcat::mclocale
+} {en_us}
+test msgcat-1.8 {::msgcat::mcpreferences, two elements} {
+    ::msgcat::mcpreferences
+} {en_us en}
+test msgcat-1.9 {::msgcat::mclocale, three elements} {
+    ::msgcat::mclocale en_US_funky
+} {en_us_funky}
+test msgcat-1.10 {::msgcat::mclocale, three elements} {
+    ::msgcat::mclocale
+} {en_us_funky}
+test msgcat-1.11 {::msgcat::mcpreferences, three elements} {
+    ::msgcat::mcpreferences
+} {en_us_funky en_us en}
+
+#
+# Test mcset and mcc, ensuring that namespace partitioning
+# is working.
+#
+
+test msgcat-2.1 {::msgcat::mcset, global scope} {
+    ::msgcat::mcset  foo_BAR text1 text2
+} {text2}
+test msgcat-2.2 {::msgcat::mcset, global scope, default} {
+    ::msgcat::mcset  foo_BAR text3
+} {text3}
+test msgcat-2.2 {::msgcat::mcset, namespace overlap} {
+    namespace eval bar {::msgcat::mcset  foo_BAR con1 con1bar}
+    namespace eval baz {::msgcat::mcset  foo_BAR con1 con1baz}
+} {con1baz}
+test msgcat-2.3 {::msgcat::mcset, namespace overlap} {
+    ::msgcat::mclocale foo_BAR
+    namespace eval bar {::msgcat::mc con1}
+} {con1bar}
+test msgcat-2.4 {::msgcat::mcset, namespace overlap} {
+    ::msgcat::mclocale foo_BAR
+    namespace eval baz {::msgcat::mc con1}
+} {con1baz}
+
+#
+# Test mcset and mc, ensuring that more specific locales
+# (e.g. "en_UK") will search less specific locales
+# (e.g. "en") for translation strings.
+#
+# Do this for the 12 permutations of
+#     locales: {foo foo_BAR foo_BAR_baz}
+#     strings: {ov1 ov2 ov3 ov4}
+#     locale foo         defines ov1, ov2, ov3
+#     locale foo_BAR     defines      ov2, ov3
+#     locale foo_BAR_BAZ defines           ov3
+#     (ov4 is defined in none)
+# So,
+#     ov3 should be resolved in foo, foo_BAR, foo_BAR_baz
+#     ov2 should be resolved in foo, foo_BAR
+#     ov2 should resolve to foo_BAR in foo_BAR_baz
+#     ov1 should be resolved in foo
+#     ov1 should resolve to foo in foo_BAR, foo_BAR_baz
+#     ov4 should be resolved in none, and call mcunknown
+#
+
+test msgcat-3.1 {::msgcat::mcset, overlap} {
+    ::msgcat::mcset foo ov1 ov1_foo
+    ::msgcat::mcset foo ov2 ov2_foo
+    ::msgcat::mcset foo ov3 ov3_foo
+    ::msgcat::mcset foo_BAR ov2 ov2_foo_BAR
+    ::msgcat::mcset foo_BAR ov3 ov3_foo_BAR
+    ::msgcat::mcset foo_BAR_baz ov3 ov3_foo_BAR_baz
+} {ov3_foo_BAR_baz}
+# top level, locale foo
+test msgcat-3.2 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo
+    ::msgcat::mc ov1
+} {ov1_foo}
+test msgcat-3.3 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo
+    ::msgcat::mc ov2
+} {ov2_foo}
+test msgcat-3.4 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo
+    ::msgcat::mc ov3
+} {ov3_foo}
+test msgcat-3.5 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo
+    ::msgcat::mc ov4
+} {ov4}
+# second level, locale foo_BAR
+test msgcat-3.6 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo_BAR
+    ::msgcat::mc ov1
+} {ov1_foo}
+test msgcat-3.7 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo_BAR
+    ::msgcat::mc ov2
+} {ov2_foo_BAR}
+test msgcat-3.8 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo_BAR
+    ::msgcat::mc ov3
+} {ov3_foo_BAR}
+test msgcat-3.9 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo_BAR
+    ::msgcat::mc ov4
+} {ov4}
+# third level, locale foo_BAR_baz
+test msgcat-3.10 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo_BAR_baz
+    ::msgcat::mc ov1
+} {ov1_foo}
+test msgcat-3.11 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo_BAR_baz
+    ::msgcat::mc ov2
+} {ov2_foo_BAR}
+test msgcat-3.12 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo_BAR_baz
+    ::msgcat::mc ov3
+} {ov3_foo_BAR_baz}
+test msgcat-3.13 {::msgcat::mcset, overlap} {
+    ::msgcat::mclocale foo_BAR_baz
+    ::msgcat::mc ov4
+} {ov4}
+
+#
+# Test mcunknown, first the default operation
+# and then with an overridden definition.
+#
+
+test msgcat-4.1 {::msgcat::mcunknown, default} {
+    ::msgcat::mcset foo unk1 "unknown 1"
+} {unknown 1}
+test msgcat-4.2 {::msgcat::mcunknown, default} {
+    ::msgcat::mclocale foo
+    ::msgcat::mc unk1
+} {unknown 1}
+test msgcat-4.3 {::msgcat::mcunknown, default} {
+    ::msgcat::mclocale foo
+    ::msgcat::mc unk2
+} {unk2}
+test msgcat-4.4 {::msgcat::mcunknown, overridden} {
+    rename ::msgcat::mcunknown oldproc
+    proc ::msgcat::mcunknown {dom s} {
+        return "unknown:$dom:$s"
+    }
+    ::msgcat::mclocale foo
+    set result [::msgcat::mc unk1]
+    rename ::msgcat::mcunknown {}
+    rename oldproc ::msgcat::mcunknown
+    set result
+} {unknown 1}
+test msgcat-4.5 {::msgcat::mcunknown, overridden} {
+    rename ::msgcat::mcunknown oldproc
+    proc ::msgcat::mcunknown {dom s} {
+        return "unknown:$dom:$s"
+    }
+    ::msgcat::mclocale foo
+    set result [::msgcat::mc unk2]
+    rename ::msgcat::mcunknown {}
+    rename oldproc ::msgcat::mcunknown
+    set result
+} {unknown:foo:unk2}
+test msgcat-4.6 {::msgcat::mcunknown, uplevel context} {
+    rename ::msgcat::mcunknown oldproc
+    proc ::msgcat::mcunknown {dom s} {
+        return "unknown:$dom:$s:[info level]"
+    }
+    ::msgcat::mclocale foo
+    set result [::msgcat::mc unk2]
+    rename ::msgcat::mcunknown {}
+    rename oldproc ::msgcat::mcunknown
+    set result
+} {unknown:foo:unk2:1}
+    
+
+#
+# Test mcload.  Need to set up an environment for
+# these tests by creating a temporary directory and
+# message files.
+#
+
+set locales {en en_US en_US_funky}
+
+catch {file mkdir msgdir}
+foreach l $locales {
+    set fd [open [string tolower [file join msgdir $l.msg]] w]
+    puts $fd "::msgcat::mcset $l abc abc-$l"
+    close $fd
+}
+
+test msgcat-5.1 {::msgcat::mcload} {
+    ::msgcat::mclocale en
+    ::msgcat::mcload msgdir
+} {1}
+test msgcat-5.2 {::msgcat::mcload} {
+    ::msgcat::mclocale en_US
+    ::msgcat::mcload msgdir
+} {2}
+test msgcat-5.3 {::msgcat::mcload} {
+    ::msgcat::mclocale en_US_funky
+    ::msgcat::mcload msgdir
+} {3}
+
+# Even though en_US_notexist does not exist,
+# en_US and en should be loaded.
+
+test msgcat-5.4 {::msgcat::mcload} {
+    ::msgcat::mclocale en_US_notexist
+    ::msgcat::mcload msgdir
+} {2}
+test msgcat-5.5 {::msgcat::mcload} {
+    ::msgcat::mclocale no_FI_notexist
+    ::msgcat::mcload msgdir
+} {0}
+test msgcat-5.6 {::msgcat::mcload} {
+    ::msgcat::mclocale en
+    ::msgcat::mc abc
+} {abc-en}
+test msgcat-5.7 {::msgcat::mcload} {
+    ::msgcat::mclocale en_US
+    ::msgcat::mc abc
+} {abc-en_US}
+test msgcat-5.8 {::msgcat::mcload} {
+    ::msgcat::mclocale en_US_funky
+    ::msgcat::mc abc
+} {abc-en_US_funky}
+test msgcat-5.9 {::msgcat::mcload} {
+    rename ::msgcat::mcunknown oldproc
+    proc ::msgcat::mcunknown {dom s} {
+        return "unknown:$dom:$s"
+    }
+    ::msgcat::mclocale no_FI_notexist
+    set result [::msgcat::mc abc]
+    rename ::msgcat::mcunknown {}
+    rename oldproc ::msgcat::mcunknown
+    set result
+} {unknown:no_fi_notexist:abc}
+
+# cleanup
+foreach l $locales {
+    file delete [string tolower [file join msgdir $l.msg]]
+}
+
+# Clean out the msg catalogs
+::msgcat::mclocale $oldlocale
+file delete msgdir
+
+::tcltest::cleanupTests
+return
