@@ -302,6 +302,12 @@ public:
   // This return 1 when application is exiting.
   vtkGetMacro(InExit, int);
 
+  // Descrition:
+  // Get those application settings that are stored in the registery
+  // Should be called once the application name is known (and the registery
+  // level set).
+  virtual void GetApplicationSettingsFromRegistery();
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -362,8 +368,6 @@ protected:
   int ShowSplashScreen;
 
   int SaveWindowGeometry;
-
-  virtual void GetApplicationSettingsFromRegistery();
 
   // About dialog
 
