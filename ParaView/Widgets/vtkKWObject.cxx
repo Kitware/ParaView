@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.37");
+vtkCxxRevisionMacro(vtkKWObject, "1.38");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -113,7 +113,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.37 $");
+  this->ExtractRevision(os,"$Revision: 1.38 $");
 }
 
 //----------------------------------------------------------------------------
@@ -492,6 +492,7 @@ int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
             } break;
           case 'e':
           case 'f':
+          case 'g':
             {
             // Assume the argument contributes no more than 64 characters.
             length += 64;
