@@ -51,7 +51,7 @@ public:
 
   // Description:
   // Create a RenderView
-  void Create(vtkKWApplication *app, char *args);
+  void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // Get the render window used by this widget

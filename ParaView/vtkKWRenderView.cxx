@@ -123,6 +123,18 @@ int vtkKWRenderView::ShouldIAbort()
     {
     flag = 2;
     }
+  if (PeekMessage(&msg,NULL,WM_WINDOWPOSCHANGING,WM_WINDOWPOSCHANGING,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+  if (PeekMessage(&msg,NULL,WM_WINDOWPOSCHANGED,WM_WINDOWPOSCHANGED,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
+  if (PeekMessage(&msg,NULL,WM_SIZE,WM_SIZE,PM_NOREMOVE))
+    {
+    flag = 2;
+    }
 
   if ( !flag )
     {
@@ -179,7 +191,7 @@ void KWRenderView_IdleRender( ClientData arg )
 }
 
 void vtkKWRenderView::IdleRenderCallback()
-{
+{  
   int rescheduleDelay;
   int needToRender = 0;
   int abortFlag;
@@ -338,7 +350,7 @@ unsigned char *vtkKWRenderView::GetMemoryData()
   return NULL;
 }
 
-void vtkKWRenderView::Create(vtkKWApplication *app, char *args)
+void vtkKWRenderView::Create(vtkKWApplication *app, const char *args)
 {
   char *local;
   const char *wname;
@@ -860,5 +872,5 @@ void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.9 $");
+  this->ExtractRevision(os,"$Revision: 1.10 $");
 }
