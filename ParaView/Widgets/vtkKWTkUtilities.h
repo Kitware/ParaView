@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObject.h"
 
 class vtkImageData;
+class vtkKWIcon;
 struct Tcl_Interp;
 
 class VTK_EXPORT vtkKWTkUtilities : public vtkObject
@@ -107,6 +108,15 @@ public:
                          vtkImageData *image, 
                          const char *blend_with_name = 0,
                          const char *color_option = 0);
+
+  // Description:
+  // Set the -image option of 'widget' using the data stored in 'icon'.
+  // Since a Tk image is created, it needs a name, created from the widget
+  // name and a 'suffix'.
+  static int SetImageOption(Tcl_Interp *interp,
+                            const char *widget,
+                            vtkKWIcon *icon, 
+                            const char *image_name_suffix);
 
   // Description:
   // Quick way to get a photo height/width.
