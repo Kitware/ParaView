@@ -43,6 +43,7 @@ public:
   static vtkPVSourceNotebook* New();
   vtkTypeRevisionMacro(vtkPVSourceNotebook,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
+  void Close();
     
   // Description:
   // Create the widget

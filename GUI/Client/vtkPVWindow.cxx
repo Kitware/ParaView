@@ -221,7 +221,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.632");
+vtkCxxRevisionMacro(vtkPVWindow, "1.633");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -593,6 +593,12 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->PVColorMaps->Delete();
     this->PVColorMaps = NULL;
+    }
+
+  if ( this->VolumeAppearanceEditor )
+    {
+    this->VolumeAppearanceEditor->Delete();
+    this->VolumeAppearanceEditor = NULL;
     }
 
   if (this->CurrentPVSource)

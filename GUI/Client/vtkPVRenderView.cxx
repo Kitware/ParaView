@@ -136,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.346");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.347");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -578,6 +578,7 @@ void vtkPVRenderView::PrepareForDelete()
     this->SelectionWindow->Delete();
     this->SelectionWindow = 0;
     }
+//----------------------------------------------------------------------------
   int cc;
   for ( cc = 0; cc < 6; cc ++ )
     {
@@ -595,6 +596,7 @@ void vtkPVRenderView::PrepareForDelete()
 void vtkPVRenderView::Close()
 {
   this->PrepareForDelete();
+  this->SourceNotebook->Close();
   vtkKWView::Close();
 }  
 
@@ -2492,6 +2494,7 @@ void vtkPVRenderView::PrintView()
   this->Printing = 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();

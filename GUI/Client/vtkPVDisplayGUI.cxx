@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.16");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.17");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -310,6 +310,12 @@ vtkPVColorMap* vtkPVDisplayGUI::GetPVColorMap()
     return this->PVSource->GetPVColorMap();
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDisplayGUI::Close()
+{
+  this->VolumeAppearanceEditor->Close();
 }
 
 //----------------------------------------------------------------------------
@@ -2372,9 +2378,10 @@ void vtkPVDisplayGUI::SetVolumeOpacityUnitDistance( double d )
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
-    << this->PVSource->GetPartDisplay()->GetVolumePropertyProxy()->GetID(0)
+    << volume->GetID(0)
     << "SetScalarOpacityUnitDistance" << d << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
@@ -2384,9 +2391,10 @@ void vtkPVDisplayGUI::ClearVolumeOpacity()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
-    << this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0)
+    << volume->GetID(0)
     << "RemoveAllPoints" << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
@@ -2396,9 +2404,10 @@ void vtkPVDisplayGUI::AddVolumeOpacity( double scalar, double opacity )
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
-    << this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy()->GetID(0)
+    << volume->GetID(0)
     << "AddPoint" << scalar << opacity << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
@@ -2408,10 +2417,11 @@ void vtkPVDisplayGUI::ClearVolumeColor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
 
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
-    << this->PVSource->GetPartDisplay()->GetVolumeColorProxy()->GetID(0)
+    << volume->GetID(0)
     << "RemoveAllPoints" << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
@@ -2421,10 +2431,11 @@ void vtkPVDisplayGUI::AddVolumeColor( double scalar, double r, double g, double 
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
 
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
-    << this->PVSource->GetPartDisplay()->GetVolumeColorProxy()->GetID(0)
+    << volume->GetID(0)
     << "AddRGBPoint" << scalar << r << g << b << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }

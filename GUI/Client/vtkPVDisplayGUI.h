@@ -64,6 +64,7 @@ public:
   void SetPointLabelVisibility(int v);
   void SetScalarBarVisibility(int v);
   vtkPVColorMap* GetPVColorMap();
+  void Close();
   
   // Description:
   // Just like in vtk data objects, this method makes a data object

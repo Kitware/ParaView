@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.5");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.6");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -136,6 +136,11 @@ void vtkPVSourceNotebook::SetPVSource(vtkPVSource* pvs)
     {
     this->DisplayGUI->SetPVSource(pvs);
     }
+}
+//----------------------------------------------------------------------------
+void vtkPVSourceNotebook::Close()
+{
+  this->DisplayGUI->Close();
 }
 //----------------------------------------------------------------------------
 void vtkPVSourceNotebook::Update()

@@ -78,7 +78,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.54");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -1312,7 +1312,7 @@ void vtkPVAnimationInterfaceEntry::PrintSelf(ostream& os, vtkIndent indent)
       os << "Triangle" << endl;
       break;
     case 2:
-      os << "Sinusiod" << endl;
+      os << "Sinusoid" << endl;
       break;
     default:
       os << "(Unknown! Danger Will Robinson!)" << endl;

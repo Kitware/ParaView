@@ -21,22 +21,14 @@
 #ifndef __vtkPVVolumeAppearanceEditor_h
 #define __vtkPVVolumeAppearanceEditor_h
 
-
 #include "vtkKWWidget.h"
 
 class vtkKWPushButton;
-class vtkKWApplication;
 class vtkPVRenderView;
-class vtkKWRange;
-class vtkKWLabeledFrame;
-class vtkPVArrayInformation;
 class vtkPVSource;
-class vtkKWLabel;
-class vtkKWScale;
-class vtkKWChangeColorButton;
-class vtkKWOptionMenu;
-class vtkKWMenuButton;
-class vtkKWWidget;
+class vtkPVArrayInformation;
+class vtkPVVolumePropertyWidget;
+class vtkVolumeProperty; //FIXME: Need a proxy/property instead
 
 class VTK_EXPORT vtkPVVolumeAppearanceEditor : public vtkKWWidget
 {
@@ -56,19 +48,17 @@ public:
   virtual vtkPVVolumeAppearanceEditor *MakeObject()
     { vtkErrorMacro("No MakeObject"); return NULL;}
       
-
   // Description:
   // This method returns the user to the source page.
   // I would eventually like to replace this by 
   // a more general back/forward ParaView navigation.
   void BackButtonCallback();
 
-  void ColorButtonCallback( float r, float g, float b );
-  
   // Description:
   // Reference to the view is needed for the back callback
   void SetPVRenderView(vtkPVRenderView *view);
-  vtkPVRenderView* GetPVRenderView() { return this->PVRenderView;}
+
+  void Close();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -79,74 +69,30 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
-  void SetPVSourceAndArrayInfo( vtkPVSource *source,
-                                vtkPVArrayInformation *arrayInfo );
+  void SetPVSourceAndArrayInfo(vtkPVSource *source,
+                               vtkPVArrayInformation *arrayInfo );
   
-  void ScalarOpacityRampChanged();
-  void SetScalarOpacityRamp( double scalarStart, double opacityStart,
-                             double scalarEnd,   double opacityEnd );
-  void SetScalarOpacityRampInternal( double scalarStart, double opacityStart,
-                                     double scalarEnd,   double opacityEnd );
-  
-  void ScalarOpacityUnitDistanceChanged();
-  void SetScalarOpacityUnitDistance(double d);
-  void SetScalarOpacityUnitDistanceInternal(double d);
-
-  void ColorRampChanged();
-  void SetColorRamp( double s1, double r1, 
-                     double g1, double b1,
-                     double s2, double r2, 
-                     double g2, double b2 );
-  void SetColorRampInternal( double s1, double r1, 
-                             double g1, double b1,
-                             double s2, double r2, 
-                             double g2, double b2 );
-  
-
-  void ColorMapLabelConfigureCallback(int width, int height);
+  void VolumePropertyChangedCallback();
+  void VolumePropertyChangingCallback();
   
 protected:
   vtkPVVolumeAppearanceEditor();
   ~vtkPVVolumeAppearanceEditor();
 
-  vtkKWLabeledFrame      *ScalarOpacityFrame;
-  vtkKWLabeledFrame      *ColorFrame;
   vtkKWPushButton        *BackButton;
-  
-  vtkKWLabel             *ScalarOpacityRampLabel;
-  vtkKWRange             *ScalarOpacityRampRange;
-  vtkKWLabel             *ScalarOpacityStartValueLabel;
-  vtkKWScale             *ScalarOpacityStartValueScale;
-  vtkKWLabel             *ScalarOpacityEndValueLabel;
-  vtkKWScale             *ScalarOpacityEndValueScale;
-  vtkKWLabel             *ScalarOpacityUnitDistanceLabel;
-  vtkKWScale             *ScalarOpacityUnitDistanceScale;
-  
-  vtkKWLabel             *ColorRampLabel;
-  vtkKWRange             *ColorRampRange;
-  vtkKWWidget            *ColorEditorFrame;
-  vtkKWChangeColorButton *ColorStartValueButton;
-  vtkKWChangeColorButton *ColorEndValueButton;
-  vtkKWLabel             *ColorMapLabel;
-  
-  unsigned char          *MapData;
-  int                     MapDataSize;
-  int                     MapWidth;
-  int                     MapHeight;
-  
-  void                    UpdateMap(int width, int height);
   
   vtkPVRenderView        *PVRenderView;
 
-  double                  ScalarRange[2];
-  float                   StartOpacity;
-  float                   EndOpacity;
-  
   vtkPVSource            *PVSource;
   vtkPVArrayInformation  *ArrayInfo;
 
   void                    RenderView();
-  
+
+  vtkPVVolumePropertyWidget *VolumePropertyWidget;
+//FIXME:
+// Once the VolumeProperty is done properly with properties should remove this 
+  vtkVolumeProperty         *InternalVolumeProperty;
+
   vtkPVVolumeAppearanceEditor(const vtkPVVolumeAppearanceEditor&); // Not implemented
   void operator=(const vtkPVVolumeAppearanceEditor&); // Not implemented
 };
