@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.27");
+vtkCxxRevisionMacro(vtkKWText, "1.28");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
@@ -122,11 +122,11 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
 
     // First find the closest known marker
 
-    char *closest_marker = NULL;
+    const char *closest_marker = NULL;
     int i, closest_marker_id = -1;
     for (i = 0; i < nb_markers; i++)
       {
-      char *find_marker = strstr(str.c_str(), markertag[i * 2]);
+      const char *find_marker = strstr(str.c_str(), markertag[i * 2]);
       if (find_marker && (!closest_marker || find_marker < closest_marker))
         {
         closest_marker = find_marker;
@@ -139,7 +139,7 @@ void vtkKWText::AppendValue(const char *s, const char *tag)
     if (closest_marker)
       {
       int len_marker = strlen(markertag[closest_marker_id * 2]);
-      char *end_marker = 
+      const char *end_marker = 
         strstr(closest_marker + len_marker, markertag[closest_marker_id * 2]);
       if (end_marker)
         {
