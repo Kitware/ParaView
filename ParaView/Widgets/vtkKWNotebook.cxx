@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.46");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.47");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -1446,7 +1446,7 @@ int vtkKWNotebook::GetMostRecentPageId(int idx)
     return -1;
     }
 
-  vtkKWNotebook::Page *page;
+  vtkKWNotebook::Page *page = NULL;
   if (this->MostRecentPages->GetItem(idx, page) != VTK_OK)
     {
     return -1;
@@ -1467,7 +1467,7 @@ void vtkKWNotebook::PinPage(const char *title)
   this->PinPage(this->GetPage(title));
 }
 
-//------------------------------------------------------------------------------
+//--------------------------------------------------------------------------1----
 void vtkKWNotebook::PinPage(vtkKWNotebook::Page *page)
 {
   if (page == NULL || !this->IsCreated())
