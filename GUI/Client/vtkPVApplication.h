@@ -232,13 +232,23 @@ public:
   vtkGetMacro(ServerMode,int);
 
   // Description:
+  // Variable set if the separate render server and data server
+  // are being used.
+  vtkGetMacro(RenderServerMode,int);
+
+  // Description:
   // Get the host command line option. (--host=localhost).
+  vtkGetStringMacro(RenderServerHostName);
   vtkGetStringMacro(HostName);
   vtkGetStringMacro(Username);
 
   // Description:
   // The the port for the client/server socket connection.
   vtkGetMacro(Port,int);
+
+  // Description:
+  // The the port for the client/render server socket connection.
+  vtkGetMacro(RenderServerPort,int);
 
   // Description:
   // The default behavior is for the server to wait and for the client 
@@ -399,13 +409,17 @@ protected:
   vtkGetStringMacro(BatchScriptName);
 
   // Command line arguments.
-  int ClientMode;
-  int ServerMode;
+  int ClientMode;  // true if this is the client
+  int ServerMode;  // true if this is the server or data server
+  int RenderServerMode;  // true if this uses the render server
   char* HostName;
+  char* RenderServerHostName;
+  vtkSetStringMacro(RenderServerHostName);
   vtkSetStringMacro(HostName);
   char* Username;
   vtkSetStringMacro(Username);
   int Port;
+  int RenderServerPort;
   int AlwaysSSH;
   int ReverseConnection;
   int UseSoftwareRendering;

@@ -73,6 +73,14 @@ public:
   // Description:
   // Flag that differentiates between clinet and server programs.
   vtkGetMacro(ClientMode, int);
+  
+  // Description:
+  // Flag to determine if the render server is being used.
+  // If this is on and ClientMode is on, then the client
+  // will be connecting to both a render and data server.
+  // If this flag is on and ClientMode is off, then this is 
+  // a render server.
+  vtkGetMacro(RenderServerMode, int);
 
   // Description:
   // This is a socket controller used to communicate
@@ -132,6 +140,22 @@ public:
   // Send current ClientServerStream data to the server root and the client.
   virtual void SendStreamToClientAndServerRoot();
 
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToRenderServerRoot();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToRenderServer();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToRenderServerAndServerRoot();
+
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToRenderServerAndServer();
+
   //BTX
   // Description:
   // Return a message containing the result of the last SendMessages call.
@@ -162,6 +186,12 @@ protected:
   // Send a stream to the root node of the server
   void SendStreamToServerRootInternal();
   // Description:
+  // Actually send a stream to the server with the socket connection.
+  void SendStreamToRenderServerInternal();
+  // Description:
+  // Send a stream to the root node of the server
+  void SendStreamToRenderServerRootInternal();
+  // Description:
   // Connect to servers or clients, this will either set up a wait
   // loop waiting for a connection, or it will create a 
   void Connect();
@@ -187,6 +217,8 @@ protected:
   int NumberOfServerProcesses;
   int ClientMode;
   vtkSocketController* SocketController;
+  int RenderServerMode;
+  vtkSocketController* RenderServerSocket;
 
   // To pass arguments through controller single method.
   int    ArgumentCount;
@@ -197,6 +229,9 @@ protected:
   vtkSetStringMacro(Username);
   char* Hostname;
   char* Username;
+  vtkSetStringMacro(RenderServerHostName);
+  char* RenderServerHostName;
+  int RenderServerPort;
   int Port;
   int MultiProcessMode;
   int NumberOfProcesses;

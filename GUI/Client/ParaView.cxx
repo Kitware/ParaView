@@ -100,6 +100,7 @@ int MyMain(int argc, char *argv[])
   // I could clean this up if I separate the initialization of Tk and Tcl.
   // I do not do this because it would affect other applications.
   int serverMode = 0;
+  int renderServerMode = 0;
   int idx;
   for (idx = 0; idx < argc; ++idx)
     {
@@ -107,11 +108,15 @@ int MyMain(int argc, char *argv[])
       {
       serverMode = 1;
       }
+    if (strcmp(argv[idx],"--render-server") == 0 || strcmp(argv[idx],"-rs") == 0)
+      {
+      renderServerMode = 1;
+      }
     }
 
   // Initialize Tcl/Tk.
   Tcl_Interp *interp;
-  if (serverMode || myId > 0)
+  if (renderServerMode || serverMode || myId > 0)
     { // DO not initialize Tk.
     vtkKWApplication::SetWidgetVisibility(0);
     }
@@ -192,7 +197,7 @@ int MyMain(int argc, char *argv[])
 
     // Create the process module for initializing the processes.
     // Only the root server processes args.
-    if (app->GetClientMode() || serverMode) 
+    if (app->GetClientMode() || serverMode || renderServerMode) 
       {
       vtkPVClientServerModule *processModule = vtkPVClientServerModule::New();
       pm = processModule;
