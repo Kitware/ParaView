@@ -53,7 +53,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.20");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -65,12 +65,14 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->UseTriangleStrips = 0;
   this->UseImmediateMode = 1;
   this->Options = 0;
+  this->ApplicationInstallationDirectory = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::~vtkPVProcessModule()
 { 
   this->SetDemoPath(0);
+  this->SetApplicationInstallationDirectory(0);
   this->FinalizeInterpreter();
   this->ServerInformation->Delete();
 }

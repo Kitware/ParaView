@@ -178,6 +178,10 @@ public:
   char* GetMachinesFileName();
   int GetClientMode();
 
+  // Description:
+  // Get and Set the application installation directory
+  vtkSetStringMacro(ApplicationInstallationDirectory);
+  vtkGetStringMacro(ApplicationInstallationDirectory);
 
 protected:
   vtkPVProcessModule();
@@ -195,6 +199,7 @@ protected:
   vtkPVServerInformation* ServerInformation;
   int UseTriangleStrips;
   int UseImmediateMode;
+  char* ApplicationInstallationDirectory;
 
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
