@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309.2.5");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.6");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1328,11 +1328,14 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       {
       float bds[6];
       this->GetDataInformation()->GetBounds(bds);
-      window->SetCenterOfRotation(0.5*(bds[0]+bds[1]), 
-                                  0.5*(bds[2]+bds[3]),
-                                  0.5*(bds[4]+bds[5]));
-      window->ResetCenterCallback();
-      window->GetMainView()->GetRenderer()->ResetCamera(bds);
+      if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
+        {
+        window->SetCenterOfRotation(0.5*(bds[0]+bds[1]), 
+                                    0.5*(bds[2]+bds[3]),
+                                    0.5*(bds[4]+bds[5]));
+        window->ResetCenterCallback();
+        window->GetMainView()->GetRenderer()->ResetCamera(bds);
+        }
       }
 
     pvd->Initialize();
