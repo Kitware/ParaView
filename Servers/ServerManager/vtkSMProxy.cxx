@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.24");
+vtkCxxRevisionMacro(vtkSMProxy, "1.25");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -653,10 +653,11 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
     vtkClientServerID objectId = pm->NewStreamObject(this->VTKClassName, stream);
 
     this->Internals->IDs.push_back(objectId);
-    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-      << "RegisterProgressEvent"
-      << objectId << objectId.ID
-      << vtkClientServerStream::End;
+    // This broke render server.
+    //pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
+    //  << "RegisterProgressEvent"
+    //  << objectId << objectId.ID
+    //  << vtkClientServerStream::End;
     }
   if (stream.GetNumberOfMessages() > 0)
     {
