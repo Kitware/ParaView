@@ -181,7 +181,7 @@ void vtkPVContour::CreateProperties()
                                     "SetComputeNormals", "GetComputeNormals",
                                     "Select whether to compute normals",
                                     this->GetVTKSourceTclName());
-  this->ComputeNormalsCheck->GetCheckButton()->SetState(1);
+  this->ComputeNormalsCheck->SetState(1);
   this->Widgets->AddItem(this->ComputeNormalsCheck);
 
   this->ComputeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
@@ -192,7 +192,7 @@ void vtkPVContour::CreateProperties()
                                       "GetComputeGradients",
                                       "Select whether to compute gradients",
                                       this->GetVTKSourceTclName());
-  this->ComputeGradientsCheck->GetCheckButton()->SetState(0);
+  this->ComputeGradientsCheck->SetState(0);
   this->Widgets->AddItem(this->ComputeGradientsCheck);
   
   this->ComputeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
@@ -202,7 +202,7 @@ void vtkPVContour::CreateProperties()
                                     "SetComputeScalars", "GetComputeScalars",
                                     "Select whether to compute scalars",
                                     this->GetVTKSourceTclName());
-  this->ComputeScalarsCheck->GetCheckButton()->SetState(1);
+  this->ComputeScalarsCheck->SetState(1);
   this->Widgets->AddItem(this->ComputeScalarsCheck);
 
   this->Script("pack %s %s %s %s -anchor w -padx 10",
@@ -441,11 +441,11 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
     }
 
   *file << this->VTKSourceTclName << " SetComputeNormals "
-        << this->ComputeNormalsCheck->GetCheckButton()->GetState() << "\n\t"
+        << this->ComputeNormalsCheck->GetState() << "\n\t"
         << this->VTKSourceTclName << " SetComputeGradients "
-        << this->ComputeGradientsCheck->GetCheckButton()->GetState() << "\n\t"
+        << this->ComputeGradientsCheck->GetState() << "\n\t"
         << this->VTKSourceTclName << " SetComputeScalars "
-        << this->ComputeScalarsCheck->GetCheckButton()->GetState() << "\n\n";
+        << this->ComputeScalarsCheck->GetState() << "\n\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }

@@ -63,13 +63,14 @@ class vtkPVLabeledToggle;
 class vtkPVFileEntry;
 class vtkPVStringEntry;
 class vtkPVVectorEntry;
-class vtkKWScale;
+class vtkPVScale;
 class vtkKWEntry;
 class vtkPVSelectionList;
 class vtkPVSourceInterface;
 class vtkPVRenderView;
 class vtkKWLabeledFrame;
 class vtkKWLabel;
+class vtkPVWidget;
 
 class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
@@ -79,7 +80,7 @@ public:
   
   // Description:
   // Get the Window for this class.
-  vtkPVWindow *GetWindow();
+  vtkPVWindow *GetPVWindow();
   
   // Description:
   // A way to get the output in the superclass.
@@ -119,12 +120,6 @@ public:
   vtkPVData *GetNthPVOutput(int idx);
   vtkGetMacro(NumberOfPVOutputs, int);
   void SetNthPVOutput(int idx, vtkPVData *output);
-
-  // Description:
-  // Tcl callback to change the input to this source.
-  void CreateInputList(const char *inputType);
-  void UpdateInputList();
-  void ChangeInput(const char *inputTclName);
   
   // Description:
   // If this VTK source operates on scalars, pack the menu to choose which
@@ -183,6 +178,9 @@ public:
   // This is a poor way to create widgets.  Another method that integrates
   // with vtkPVMethodInterfaces should be created.
   
+  vtkPVInputMenu *AddInputMenu(char *label, char *inputName, char *inputType,
+                               char *help, vtkCollection *sources);
+
   // Description:
   // Create an entry for a filename.
   vtkPVFileEntry *AddFileEntry(char *label, char *setCmd, char *getCmd,
@@ -226,7 +224,7 @@ public:
   vtkPVLabeledToggle *AddLabeledToggle(char *label, char *setCmd,
                                        char *getCmd, char* help,
                                        vtkKWObject *o = NULL);
-  vtkKWScale *AddScale(char *label, char *setCmd, char *getCmd, 
+  vtkPVScale *AddScale(char *label, char *setCmd, char *getCmd, 
                        float min, float max, float resolution,
                        char* help, vtkKWObject *o = NULL);
   
@@ -291,6 +289,10 @@ public:
   virtual void      UpdateScalars();
   void              UpdateVectors();
 
+  // Description:
+  // Access to PVWidgets indexed by their name.
+  vtkPVWidget *GetPVWidget(const char *name);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -332,8 +334,6 @@ protected:
   vtkKWPushButton *ResetButton;
   vtkKWPushButton *DeleteButton;
   vtkPVInputMenu *InputMenu;
-  vtkKWLabel *InputMenuLabel;
-  vtkKWWidget *InputMenuFrame;
   vtkKWWidget *ScalarOperationFrame;
   vtkPVArraySelection *ScalarOperationMenu;
   vtkKWWidget *VectorOperationFrame;

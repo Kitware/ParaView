@@ -33,6 +33,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkKWPushButton.h"
+#include "vtkObjectFactory.h"
 #include "vtkKWView.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWLabel.h"
@@ -223,6 +224,13 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
 //----------------------------------------------------------------------------
 vtkPVAnimationInterface* vtkPVAnimationInterface::New()
 {
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVAnimationInterface");
+  if(ret)
+    {
+    return (vtkPVAnimationInterface*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
   return new vtkPVAnimationInterface();
 }
 

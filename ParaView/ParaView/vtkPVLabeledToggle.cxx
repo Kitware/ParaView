@@ -89,6 +89,9 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *label,
     vtkErrorMacro("PVSource must be set before calling create");
     return;
     }
+
+  // For getting the widget in a script.
+  this->SetName(label);
   
   this->SetApplication(pvApp);
   
@@ -110,7 +113,7 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *label,
   
   // Now the check button
   this->CheckButton->Create(pvApp, "");
-  this->CheckButton->SetCommand(this->PVSource, "ChangeAcceptButtonColor");
+  this->CheckButton->SetCommand(this, "ModifiedCallback");
   if (help)
     {
     this->CheckButton->SetBalloonHelpString(help);
@@ -124,8 +127,49 @@ void vtkPVLabeledToggle::Create(vtkKWApplication *pvApp, char *label,
   // Format a command to move value from widget to vtkObjects (on all
   // processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
-                                  this->PVSource->GetTclName(), tclName,
-                                  setCmd, this->CheckButton->GetTclName()); 
+  //this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
+  //                                this->PVSource->GetTclName(), tclName,
+  //                                setCmd, this->CheckButton->GetTclName()); 
+  this->AcceptCommands->AddString("%s %s [%s GetState]",
+                              tclName, setCmd, this->CheckButton->GetTclName()); 
 }
+
+
+void vtkPVLabeledToggle::SetState(int val)
+{
+  int oldVal;
+  
+  oldVal = this->CheckButton->GetState();
+  if (val == oldVal)
+    {
+    return;
+    }
+
+  this->CheckButton->SetState(val); 
+  this->ModifiedCallback();
+}
+
+
+
+void vtkPVLabeledToggle::Accept()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (this->ModifiedFlag && this->PVSource)
+    {  
+    if ( ! this->TraceInitialized)
+      {
+      pvApp->AddTraceEntry("set trace(%s) [$trace(%s) GetPVWidget {%s}]",
+                           this->GetTclName(), this->PVSource->GetTclName(),
+                           this->Name);
+      this->TraceInitialized = 1;
+      }
+
+    pvApp->AddTraceEntry("$trace(%s) SetState %d", this->GetTclName(), 
+                         this->CheckButton->GetState());
+    }
+
+  this->vtkPVWidget::Accept();
+}
+
 

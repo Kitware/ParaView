@@ -242,7 +242,7 @@ void vtkPVArrayCalculator::CreateProperties()
                                "SetResultArrayName", "GetResultArrayName",
                                "Set the name of the array to hold the results of this computation",
                                this->GetVTKSourceTclName());
-  this->ArrayNameEntry->GetEntry()->SetValue("resultArray");
+  this->ArrayNameEntry->SetValue("resultArray");
   this->Script("pack %s -side top -fill x",
                this->ArrayNameEntry->GetWidgetName());
   

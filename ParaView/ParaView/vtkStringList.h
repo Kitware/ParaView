@@ -63,6 +63,10 @@ public:
 //ETX
   
   // Description:
+  // Initialize to empty.
+  void RemoveAllItems();
+
+  // Description:
   // Random access.
   void SetString(int idx, const char *str);
 

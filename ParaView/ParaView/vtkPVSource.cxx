@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVApplication.h"
 #include "vtkKWView.h"
-#include "vtkKWScale.h"
+#include "vtkPVScale.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPVSelectionList.h"
@@ -99,9 +99,6 @@ vtkPVSource::vtkPVSource()
   this->AcceptButton = vtkKWPushButton::New();
   this->ResetButton = vtkKWPushButton::New();
   this->DeleteButton = vtkKWPushButton::New();
-  this->InputMenuFrame = vtkKWWidget::New();
-  this->InputMenuLabel = vtkKWLabel::New();
-  this->InputMenu = vtkPVInputMenu::New();
   this->ScalarOperationFrame = vtkKWWidget::New();
   this->ScalarOperationMenu = vtkPVArraySelection::New();
   this->VectorOperationFrame = vtkKWWidget::New();
@@ -164,16 +161,7 @@ vtkPVSource::~vtkPVSource()
   
   this->DeleteButton->Delete();
   this->DeleteButton = NULL;
-  
-  this->InputMenuLabel->Delete();
-  this->InputMenuLabel = NULL;
-  
-  this->InputMenu->Delete();
-  this->InputMenu = NULL;
-  
-  this->InputMenuFrame->Delete();
-  this->InputMenuFrame = NULL;
-
+      
   this->ScalarOperationMenu->Delete();
   this->ScalarOperationMenu = NULL;
   
@@ -342,7 +330,7 @@ void vtkPVSource::SetInterface(vtkPVSourceInterface *pvsi)
 }
 
 //----------------------------------------------------------------------------
-vtkPVWindow* vtkPVSource::GetWindow()
+vtkPVWindow* vtkPVSource::GetPVWindow()
 {
   if (this->View == NULL || this->View->GetParentWindow() == NULL)
     {
@@ -383,7 +371,7 @@ void vtkPVSource::CreateProperties()
   // Set up the pages of the notebook.
   this->Notebook->AddPage("Parameters");
   this->Notebook->AddPage("Display");
-//  this->Notebook->SetMinimumHeight(500);
+  //  this->Notebook->SetMinimumHeight(500);
   this->Properties->SetParent(this->Notebook->GetFrame("Parameters"));
   this->Properties->Create(this->Application,"frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
@@ -428,27 +416,7 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s -side left -fill x -expand t",
                this->DeleteButton->GetWidgetName());
 
-  frame->Delete();
-  
-  if (this->GetNumberOfPVInputs() > 0)
-    {
-    this->InputMenuFrame->SetParent(this->ParameterFrame->GetFrame());
-    this->InputMenuFrame->Create(this->Application, "frame", "");
-    this->Script("pack %s -side top -fill x -expand t",
-                 this->InputMenuFrame->GetWidgetName());
-    
-    this->InputMenuLabel->SetParent(this->InputMenuFrame);
-    this->InputMenuLabel->Create(this->Application, "");
-    this->InputMenuLabel->SetLabel("Input: ");
-    this->InputMenuLabel->SetBalloonHelpString("Choose which data set to use as input to this filter");
-    
-    this->InputMenu->SetParent(this->InputMenuFrame);
-    this->InputMenu->Create(this->Application, "");
-    this->InputMenu->SetBalloonHelpString("Choose which data set to use as input to this filter");
-    this->Script("pack %s %s -side left -fill x",
-                 this->InputMenuLabel->GetWidgetName(),
-                 this->InputMenu->GetWidgetName());
-    }
+  frame->Delete();  
 
   this->ScalarOperationFrame->SetParent(this->ParameterFrame->GetFrame());
   this->ScalarOperationFrame->Create(this->Application, "frame", "");    
@@ -481,6 +449,7 @@ void vtkPVSource::CreateProperties()
   this->UpdateParameterWidgets();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::PackScalarsMenu()
 {
   this->ScalarOperationMenu->FillMenu();
@@ -488,6 +457,7 @@ void vtkPVSource::PackScalarsMenu()
                this->ScalarOperationMenu->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVSource::PackVectorsMenu()
 {
   this->VectorOperationMenu->FillMenu();
@@ -615,64 +585,6 @@ void vtkPVSource::UpdateVectors()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::CreateInputList(const char *inputType)
-{
-  if (this->NumberOfPVInputs == 0)
-    {
-    return;
-    }  
-  
-  this->InputMenu->SetInputType(inputType);
-
-  this->UpdateInputList();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::UpdateInputList()
-{
-  char* inputType = this->InputMenu->GetInputType();
-
-  if (inputType == NULL || this->NumberOfPVInputs == 0)
-    {
-    return;
-    }
-  
-  int i;
-  vtkKWCompositeCollection *sources = this->GetWindow()->GetSources();
-  vtkPVSource *currentSource;
-  char *tclName;
-  char methodAndArgs[256];
-  
-  this->InputMenu->ClearEntries();
-  for (i = 0; i < sources->GetNumberOfItems(); i++)
-    {
-    currentSource = (vtkPVSource*)sources->GetItemAsObject(i);
-    if (currentSource->GetNthPVOutput(0))
-      {
-      if (currentSource->GetNthPVOutput(0)->GetVTKData()->IsA(inputType))
-        {
-        tclName = currentSource->GetNthPVOutput(0)->GetVTKDataTclName();
-        sprintf(methodAndArgs, "ChangeInput %s",
-                currentSource->GetNthPVOutput(0)->GetTclName());
-        this->InputMenu->AddEntryWithCommand(tclName, this,
-                                             methodAndArgs);
-        }
-      }
-    }
-  this->InputMenu->SetValue(this->GetNthPVInput(0)->GetVTKDataTclName());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::ChangeInput(const char *inputTclName)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  this->ChangeAcceptButtonColor();
-  
-  pvApp->Script("%s SetNthPVInput 0 %s", this->GetTclName(), inputTclName);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSource::Select(vtkKWView *v)
 {
   vtkPVData *data;
@@ -790,7 +702,7 @@ void vtkPVSource::AcceptCallback()
 {
   vtkPVWindow *window;
 
-  window = this->GetWindow();
+  window = this->GetPVWindow();
 
   this->Script("update");
   this->Script("%s configure -cursor watch", window->GetWidgetName());
@@ -889,6 +801,10 @@ void vtkPVSource::AcceptCallback()
 #else
   this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
 #endif  
+
+
+  this->GetPVApplication()->AddTraceEntry("$trace(%s) AcceptCallback",
+                                          this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -919,7 +835,7 @@ void vtkPVSource::DeleteCallback()
   vtkPVData *ac;
   vtkPVSource *prev;
   int i;
-  vtkPVWindow *window = this->GetWindow();
+  vtkPVWindow *window = this->GetPVWindow();
 
   // Just in case cursor was left in a funny state.
 #ifdef _WIN32
@@ -945,6 +861,10 @@ void vtkPVSource::DeleteCallback()
       }
     }
   
+  // Save this action in the trace file.
+  this->GetPVApplication()->AddTraceEntry("$trace(%s) DeleteCallback",
+                                          this->GetTclName());
+
   // Remove this source from the inputs users collection.
   for (i = 0; i < this->GetNumberOfPVInputs(); i++)
     {
@@ -955,8 +875,8 @@ void vtkPVSource::DeleteCallback()
     }
     
   // Look for a source to make current.
-  prev = this->GetWindow()->GetPreviousPVSource();
-  this->GetWindow()->SetCurrentPVSource(prev);
+  prev = this->GetPVWindow()->GetPreviousPVSource();
+  this->GetPVWindow()->SetCurrentPVSource(prev);
   if (prev)
     {
     prev->GetPVOutput(0)->VisibilityOn();
@@ -970,8 +890,8 @@ void vtkPVSource::DeleteCallback()
     }
       
   // We need to remove this source from the SelectMenu
-  this->GetWindow()->GetSources()->RemoveItem(this);
-  this->GetWindow()->UpdateSelectMenu();
+  this->GetPVWindow()->GetSources()->RemoveItem(this);
+  this->GetPVWindow()->UpdateSelectMenu();
   
   // Remove all of the actors mappers. from the renderer.
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
@@ -979,7 +899,7 @@ void vtkPVSource::DeleteCallback()
     if (this->PVOutputs[i])
       {
       ac = this->GetPVOutput(i);
-      this->GetWindow()->GetMainView()->RemoveComposite(ac);
+      this->GetPVWindow()->GetMainView()->RemoveComposite(ac);
       }
     }    
   
@@ -995,19 +915,19 @@ void vtkPVSource::DeleteCallback()
   
   this->GetPVRenderView()->EventuallyRender();
 
-  this->GetWindow()->EnableMenus();
+  this->GetPVWindow()->EnableMenus();
   
   // This should delete this source.
-  this->GetWindow()->GetMainView()->RemoveComposite(this);
+  this->GetPVWindow()->GetMainView()->RemoveComposite(this);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateParameterWidgets()
 {
-  int num, i, j, numStrings;
+  int num, i;
   char *cmd;
   vtkKWWidget *widget;
-  vtkStringList *resetCommands;
+  vtkPVWidget *pvw;
 
   // Copy the ivars from the vtk object to the UI.
   num = this->ResetCommands->GetLength();
@@ -1024,25 +944,23 @@ void vtkPVSource::UpdateParameterWidgets()
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
     widget = this->Widgets->GetNextKWWidget();
-    if (widget->IsA("vtkPVWidget"))
+    pvw = vtkPVWidget::SafeDownCast(widget);
+    if (pvw)
       {
-      resetCommands = ((vtkPVWidget*)widget)->GetResetCommands();
-      numStrings = resetCommands->GetNumberOfStrings();
-      for (j = 0; j < numStrings; j++)
-        {
-        this->Script(resetCommands->GetString(j));
-        }
+      pvw->Reset();
       }
     }
 }
 
 
 //----------------------------------------------------------------------------
+// This should be apart of AcceptCallback.
 void vtkPVSource::UpdateVTKSourceParameters()
 {
-  int i, j, numStrings;
+  int i;
   vtkKWWidget *widget;
-  vtkStringList *acceptCommands;
+  vtkPVWidget *pvw;
+
   // Call the commands to set ivars from widget values.
   for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
     {
@@ -1050,18 +968,15 @@ void vtkPVSource::UpdateVTKSourceParameters()
     // care of the broadcast.
     this->Script(this->AcceptCommands->GetString(i));
     }
+  
   this->Widgets->InitTraversal();
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
     widget = this->Widgets->GetNextKWWidget();
-    if (widget->IsA("vtkPVWidget"))
+    pvw = vtkPVWidget::SafeDownCast(widget); 
+    if (pvw)
       {
-      acceptCommands = ((vtkPVWidget*)widget)->GetAcceptCommands();
-      numStrings = acceptCommands->GetNumberOfStrings();
-      for (j = 0; j < numStrings; j++)
-        {
-        this->Script(acceptCommands->GetString(j));
-        }
+      pvw->Accept();
       }
     }
 }
@@ -1102,7 +1017,7 @@ void vtkPVSource::UpdateProperties()
                    this->DeleteButton->GetWidgetName());
       }
   
-  this->GetWindow()->GetMainView()->UpdateNavigationWindow(this);
+  this->GetPVWindow()->GetMainView()->UpdateNavigationWindow(this);
   
   // Make sure all the inputs are up to date.
   //num = this->GetNumberOfPVInputs();
@@ -1142,12 +1057,7 @@ void vtkPVSource::SelectSource(vtkPVSource *source)
 {
   if (source)
     {
-    this->GetWindow()->SetCurrentPVSource(source);
-    source->UpdateInputList();
-    if (source->IsA("vtkPVGlyph3D"))
-      {
-      ((vtkPVGlyph3D*)source)->UpdateSourceMenu();
-      }
+    this->GetPVWindow()->SetCurrentPVSource(source);
     source->ShowProperties();
     source->GetNotebook()->Raise(0);
     }
@@ -1222,6 +1132,7 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   
   if (this->PVInputs[idx])
     {
+    this->PVInputs[idx]->SetVisibility(1);
     this->PVInputs[idx]->RemovePVConsumer(this);
     this->PVInputs[idx]->UnRegister(this);
     this->PVInputs[idx] = NULL;
@@ -1229,6 +1140,11 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   
   if (pvd)
     {
+    if (this->ReplaceInput)
+      {
+      pvd->SetVisibility(0);
+      pvd->GetVisibilityCheck()->SetState(0);
+      }
     pvd->Register(this);
     pvd->AddPVConsumer(this);
     this->PVInputs[idx] = pvd;
@@ -1522,6 +1438,28 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
 }
 
 
+//----------------------------------------------------------------------------
+vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *inputType,
+                                          char *help, vtkCollection *sources)
+{
+  vtkPVInputMenu *inputMenu;
+
+  inputMenu = vtkPVInputMenu::New();
+  inputMenu->SetPVSource(this);
+  inputMenu->SetSources(sources);
+  inputMenu->SetParent(this->ParameterFrame->GetFrame());
+  inputMenu->SetLabel(label);
+  inputMenu->Create(this->Application);
+  inputMenu->SetInputName(inputName);
+  inputMenu->SetInputType(inputType);
+  inputMenu->SetBalloonHelpString(help);
+  this->Script("pack %s -side top -fill x -expand t",
+               inputMenu->GetWidgetName());
+  this->Widgets->AddItem(inputMenu);
+  inputMenu->Delete();
+  return inputMenu;
+}
+
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
@@ -1540,6 +1478,7 @@ vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
   toggle->SetParent(this->ParameterFrame->GetFrame());
   toggle->SetPVSource(this);
   toggle->Create(this->Application, label, setCmd, getCmd, help, tclName);
+
   this->Script("pack %s -fill x -expand t", toggle->GetWidgetName());
   
   toggle->Delete();
@@ -1567,6 +1506,7 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd,
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetPVSource(this);
   entry->Create(this->Application, label, setCmd, getCmd, ext, help, tclName);
+
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
   entry->Delete();
@@ -1594,6 +1534,7 @@ vtkPVStringEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetPVSource(this);
   entry->Create(this->Application, label, setCmd, getCmd, help, tclName);
+
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 
   entry->Delete();
@@ -1656,6 +1597,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   entry->SetPVSource(this);
   entry->Create(this->Application, label, 2, subLabels, setCmd, getCmd, help,
                 tclName);
+
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
   
@@ -1696,6 +1638,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2,
   entry->SetPVSource(this);
   entry->Create(this->Application, label, 3, subLabels, setCmd, getCmd, help,
                 tclName);
+
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
   
@@ -1740,6 +1683,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2,
   entry->SetPVSource(this);
   entry->Create(this->Application, label, 4, subLabels, setCmd, getCmd, help,
                 tclName);
+
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
   
@@ -1791,6 +1735,7 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
   entry->SetPVSource(this);
   entry->Create(this->Application, label, 6, subLabels, setCmd, getCmd, help,
                 tclName);
+
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
   entry->Delete();
   
@@ -1804,13 +1749,11 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
 
 
 //----------------------------------------------------------------------------
-vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
+vtkPVScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
                                   float min, float max, float resolution,
                                   char* help, vtkKWObject *o)
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-  vtkKWScale *slider;
+  vtkPVScale *scale;
 
   // Find the Tcl name of the object whose methods will be called.
   const char *tclName = this->GetVTKSourceTclName();
@@ -1819,53 +1762,19 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
     tclName = o->GetTclName();
     }
 
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
+  scale = vtkPVScale::New();
+  this->Widgets->AddItem(scale);
+  scale->SetParent(this->ParameterFrame->GetFrame());
+  scale->SetPVSource(this);
+  scale->Create(this->Application, label, min, max, resolution, 
+                setCmd, getCmd, help);
 
-  // Now a label
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "-width 18 -justify right");
-  labelWidget->SetLabel(label);
-  if (help)
-    {
-    labelWidget->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
+  this->Script("pack %s -fill x -expand t", scale->GetWidgetName());
 
-  slider = vtkKWScale::New();
-  this->Widgets->AddItem(slider);
-  slider->SetParent(frame);
-  slider->Create(this->Application, "-showvalue 1");
-  slider->SetCommand(this, "ChangeAcceptButtonColor");
-  slider->SetRange(min, max);
-  slider->SetResolution(resolution);
-  if (help)
-    {
-    slider->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left -fill x -expand t", slider->GetWidgetName());
-
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetValue [%s %s]",
-                                 slider->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
-                  this->GetTclName(), tclName, setCmd, slider->GetTclName());
-
-  frame->Delete();
-  labelWidget->Delete();
-  slider->Delete();
+  scale->Delete();
 
   // Although it has been deleted, it did not destruct.
-  // We need to change this into a PVWidget.
-  return slider;
+  return scale;
 }
 
 //----------------------------------------------------------------------------
@@ -1873,54 +1782,19 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd,
                                              char *getCmd, char *help,
                                              vtkKWObject *o)
 {
-  vtkKWWidget *frame;
-  vtkKWLabel *labelWidget;
-
-  // Find the Tcl name of the object whose methods will be called.
-  const char *tclName = this->GetVTKSourceTclName();
-  if (o)
-    {
-    tclName = o->GetTclName();
-    }
-
-  // First a frame to hold the other widgets.
-  frame = vtkKWWidget::New();
-  this->Widgets->AddItem(frame);
-  frame->SetParent(this->ParameterFrame->GetFrame());
-  frame->Create(this->Application, "frame", "");
-  this->Script("pack %s -fill x -expand t", frame->GetWidgetName());
-
-  // Now a label
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "-width 18 -justify right");
-  labelWidget->SetLabel(label);
-  if (help)
-    {
-    labelWidget->SetBalloonHelpString(help);
-    }
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
   this->Widgets->AddItem(sl);
-  sl->SetParent(frame);
+  sl->SetParent(this->ParameterFrame->GetFrame());
+  sl->SetLabel(label);
+  sl->SetPVSource(this);
   sl->Create(this->Application);
-  sl->SetCommand(this, "ChangeAcceptButtonColor");
+  sl->SetAccessMethods(setCmd, getCmd);
   if (help)
     {
     sl->SetBalloonHelpString(help);
     }
-  this->Script("pack %s -fill x -expand t", sl->GetWidgetName());
-    
-  // Command to update the UI.
-  this->ResetCommands->AddString("%s SetCurrentValue [%s %s]",
-                                 sl->GetTclName(), tclName, getCmd); 
-  // Format a command to move value from widget to vtkObjects (on all processes).
-  // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetCurrentValue]",
-                   this->GetTclName(), tclName, setCmd, sl->GetTclName());
-    
+  this->Script("pack %s -fill x -expand t", sl->GetWidgetName());    
+
   // Save this selection list so the user can add items to it.
   if (this->LastSelectionList)
     {
@@ -1930,8 +1804,6 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd,
   this->LastSelectionList = sl;
 
   sl->Delete();
-  labelWidget->Delete();
-  frame->Delete();
 
   // Although it has been deleted, it did not destruct.
   // We need to change this into a PVWidget.
@@ -1960,6 +1832,26 @@ void vtkPVSource::ChangeAcceptButtonColor()
 void vtkPVSource::EntryChanged(float vtkNotUsed(f1), float vtkNotUsed(f2))
 {
   this->ChangeAcceptButtonColor();
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
+{
+  vtkObject *o;
+  vtkPVWidget *pvw;
+  this->Widgets->InitTraversal();
+
+  while ( (o = this->Widgets->GetNextItemAsObject()) )
+    {
+    pvw = vtkPVWidget::SafeDownCast(o);
+    if (pvw && strcmp(pvw->GetName(), name) == 0)
+      {
+      return pvw;
+      }
+    }
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------

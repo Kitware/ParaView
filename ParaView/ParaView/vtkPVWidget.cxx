@@ -59,6 +59,11 @@ vtkPVWidget::vtkPVWidget()
 {
   this->AcceptCommands = vtkStringList::New();
   this->ResetCommands = vtkStringList::New();
+
+  this->TraceInitialized = 0;
+  this->ModifiedFlag = 0;
+  this->Name = NULL;
+  this->PVSource = NULL;
 }
 
 vtkPVWidget::~vtkPVWidget()
@@ -67,9 +72,49 @@ vtkPVWidget::~vtkPVWidget()
   this->AcceptCommands = NULL;
   this->ResetCommands->Delete();
   this->ResetCommands = NULL;
+  this->PVSource = NULL;
 }
 
 void vtkPVWidget::SetPVSource(vtkPVSource *source)
 {
   this->PVSource = source;
 }
+
+
+void vtkPVWidget::Accept()
+{
+  int num, i;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  num = this->AcceptCommands->GetNumberOfStrings();
+  for (i = 0; i < num; i++)
+    {
+    pvApp->BroadcastScript(this->AcceptCommands->GetString(i));
+    }
+
+  this->ModifiedFlag = 0;
+}
+
+void vtkPVWidget::Reset()
+{
+  int num, i;
+  num = this->ResetCommands->GetNumberOfStrings();
+  for (i = 0; i < num; i++)
+    {
+    this->Script(this->ResetCommands->GetString(i));
+    }
+
+  // We want the modifiedCallbacks to occur before we reset this flag.
+  this->Script("update");
+  this->ModifiedFlag = 0;
+}
+
+void vtkPVWidget::ModifiedCallback()
+{
+  this->ModifiedFlag = 1;
+  if (this->PVSource)
+    {
+    this->PVSource->EntryChanged(0, 0);
+    }
+}
+

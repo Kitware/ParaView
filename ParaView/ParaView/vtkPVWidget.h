@@ -39,8 +39,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVWidget -
+// .NAME vtkPVWidget - Intelligent widget for building source interfaces.
 // .SECTION Description
+// vtkPVWidget is a superclass for widgets that can be used to build
+// interfaces for vtkPVSources.  These widgets combine the UI of vtkKWWidgets,
+// but can synchronize themselves with vtkObjects.  When the "Accept" method
+// is called, this widgets sets the vtkObjects ivars based on the widgets
+// value.  When the "Reset" method is called, the vtkObjects state is used to 
+// set the widgets value.  When the widget has been modified, and the "Accept"
+// method is called,  the widget will save the transition in the trace file.
 
 #ifndef __vtkPVWidget_h
 #define __vtkPVWidget_h
@@ -48,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 #include "vtkStringList.h"
 #include "vtkPVSource.h"
+#include "vtkPVApplication.h"
 
 class VTK_EXPORT vtkPVWidget : public vtkKWWidget
 {
@@ -55,13 +63,32 @@ public:
   static vtkPVWidget* New();
   vtkTypeMacro(vtkPVWidget, vtkKWWidget);
 
-  vtkGetObjectMacro(AcceptCommands, vtkStringList);
-  vtkGetObjectMacro(ResetCommands, vtkStringList);
+  // Description:
+  // The methods get called by the source when 
+  // the Accept or Reset buttons are pressed.
+  virtual void Accept();
+  virtual void Reset();
+
+  // Description:
+  // This method gets called when the user changes the widgets value,
+  // or a script changes the widgets value.  
+  virtual void ModifiedCallback();
   
   // Description:
   // Set the vtkPVSource associated with this vtkPVWidget
   void SetPVSource(vtkPVSource *source);
   vtkGetObjectMacro(PVSource, vtkPVSource);
+
+  // Description:
+  // With this name, you can get this widget from the PVSource.
+  // It is to allow access to this widget from a script.
+  vtkSetStringMacro(Name);
+  vtkGetStringMacro(Name);
+
+  // Description:
+  // Conveniance method that casts the application to a PV application.
+  vtkPVApplication *GetPVApplication() 
+    {return vtkPVApplication::SafeDownCast(this->Application);}
 
 protected:
   vtkPVWidget();
@@ -73,6 +100,16 @@ protected:
   vtkStringList *ResetCommands;
   
   vtkPVSource *PVSource;
+
+  // This flag indicates that a variable has been defined in the 
+  // trace file for this widget.
+  int TraceInitialized;
+  // This flag indicates that the widget has changed and should be
+  // added to the trace file.
+  int ModifiedFlag;
+
+  // This name allows access to this widget from a script.
+  char *Name;
 };
 
 #endif

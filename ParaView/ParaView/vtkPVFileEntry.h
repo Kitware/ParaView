@@ -60,10 +60,20 @@ public:
   void Create(vtkKWApplication *pvApp, char *label, char *setCmd,
               char *getCmd, char *ext, char *help, const char *tclName);
   
-  vtkGetObjectMacro(Label, vtkKWLabel);
-  vtkGetObjectMacro(Entry, vtkKWEntry);
-  vtkGetObjectMacro(PushButton, vtkKWPushButton);
+  // Description:
+  // Called when accept button is pushed.  Just adds to trace
+  // file and calls supperclass accept.
+  virtual void Accept();
   
+  // Description:
+  // This method allows scripts to modify the widgets value.
+  void SetValue(const char* fileName);
+  const char* GetValue() {return this->Entry->GetValue();}
+
+  // Description:
+  // Callback needed to detect modify.
+  void XScrollCallback(float vtkNotUsed(x), float vtkNotUsed(y));
+
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();

@@ -60,12 +60,31 @@ public:
               char **subLabels, char *setCmd, char *getCmd, char *help,
               const char *tclName);
   
+  // Description:
+  // This accept call adds a line to the trace file if the widget has changed.
+  virtual void Accept();
+
+  // Description:
+  // This is bound to the xscroll event in the entries.
+  // It indicates the widget has changed.
+  void XScrollCallback(float vtkNotUsed(x), float vtkNotUsed(y));
+
   vtkGetObjectMacro(Label, vtkKWLabel);
   vtkGetObjectMacro(SubLabels, vtkKWWidgetCollection);
   vtkGetObjectMacro(Entries, vtkKWWidgetCollection);
   
   vtkKWLabel* GetSubLabel(int idx);
   vtkKWEntry* GetEntry(int idx);
+
+  // Description:
+  // Methods to set this widgets value from a script.
+  void SetValue(char* v);
+  void SetValue(char* v1, char* v2);
+  void SetValue(char* v1, char* v2, char* v3);
+  void SetValue(char* v1, char* v2, char* v3, char* v4);
+  void SetValue(char* v1, char* v2, char* v3, char* v4, char* v5);
+  void SetValue(char* v1, char* v2, char* v3, char* v4, char* v5, char* v6);
+  void SetValue(char** vals, int num);
   
 protected:
   vtkPVVectorEntry();

@@ -55,13 +55,10 @@ vtkPVGlyph3D::vtkPVGlyph3D()
 {
   this->CommandFunction = vtkPVGlyph3DCommand;
   
-  this->GlyphSourceTclName = NULL;
+  this->GlyphSource = NULL;
   this->GlyphScaleMode = NULL;
   this->GlyphVectorMode = NULL;
   
-  this->GlyphSourceFrame = vtkKWWidget::New();
-  this->GlyphSourceLabel = vtkKWLabel::New();
-  this->GlyphSourceMenu = vtkPVInputMenu::New();
   this->ScaleModeFrame = vtkKWWidget::New();
   this->ScaleModeLabel = vtkKWLabel::New();
   this->ScaleModeMenu = vtkKWOptionMenu::New();
@@ -79,10 +76,10 @@ vtkPVGlyph3D::vtkPVGlyph3D()
 //----------------------------------------------------------------------------
 vtkPVGlyph3D::~vtkPVGlyph3D()
 {
-  if (this->GlyphSourceTclName)
+  if (this->GlyphSource)
     {
-    delete [] this->GlyphSourceTclName;
-    this->GlyphSourceTclName = NULL;
+    this->GlyphSource->UnRegister(this);
+    this->GlyphSource = NULL;
     }
   if (this->GlyphScaleMode)
     {
@@ -94,13 +91,9 @@ vtkPVGlyph3D::~vtkPVGlyph3D()
     delete [] this->GlyphVectorMode;
     this->GlyphVectorMode = NULL;
     }
+ 
+ 
   
-  this->GlyphSourceLabel->Delete();
-  this->GlyphSourceLabel = NULL;
-  this->GlyphSourceMenu->Delete();
-  this->GlyphSourceMenu = NULL;
-  this->GlyphSourceFrame->Delete();
-  this->GlyphSourceFrame = NULL;
   this->ScaleModeLabel->Delete();
   this->ScaleModeLabel = NULL;
   this->ScaleModeMenu->Delete();
@@ -135,41 +128,53 @@ vtkPVGlyph3D* vtkPVGlyph3D::New()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVGlyph3D::SetGlyphSource(vtkPVData *source)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (source)
+    {
+    source->Register(this);
+    pvApp->BroadcastScript("%s SetSource %s", this->GetVTKSourceTclName(),
+                          source->GetVTKDataTclName());
+    }
+  else
+    {
+    pvApp->BroadcastScript("%s SetSource {}", this->GetVTKSourceTclName());
+    }
+  if (this->GlyphSource)
+    {
+    this->GlyphSource->UnRegister(this);
+    }
+  this->GlyphSource = source;
+}
+
+//----------------------------------------------------------------------------
+vtkPVData* vtkPVGlyph3D::GetGlyphSource()
+{
+  return this->GlyphSource;
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVGlyph3D::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   
   this->vtkPVSource::CreateProperties();
-  
-  this->GlyphSourceFrame->SetParent(this->GetParameterFrame()->GetFrame());
-  this->GlyphSourceFrame->Create(pvApp, "frame", "");
-  this->Script("pack %s -side top -fill x",
-               this->GlyphSourceFrame->GetWidgetName());
-  
-  this->GlyphSourceLabel->SetParent(this->GlyphSourceFrame);
-  this->GlyphSourceLabel->Create(pvApp, "");
-  this->GlyphSourceLabel->SetLabel("Glyph Source:");
-  this->GlyphSourceLabel->SetBalloonHelpString("Select the data set to use as a glyph");
-  
-  this->GlyphSourceMenu->SetParent(this->GlyphSourceFrame);
-  this->GlyphSourceMenu->Create(pvApp, "");
-  this->GlyphSourceMenu->SetInputType("vtkPolyData");
-  this->GlyphSourceMenu->SetBalloonHelpString("Select the data set to use as a glyph");
-  this->UpdateSourceMenu();
-  if (this->GlyphSourceTclName)
-    {
-    this->GlyphSourceMenu->SetValue(this->GlyphSourceTclName);
-    }
-  this->AcceptCommands->AddString("%s ChangeSource",
-                                  this->GetTclName());
-  this->ResetCommands->AddString("%s SetValue %s",
-                                 this->GlyphSourceMenu->GetTclName(),
-                                 this->GetGlyphSourceTclName());
-  
-  this->Script("pack %s %s -side left",
-               this->GlyphSourceLabel->GetWidgetName(),
-                this->GlyphSourceMenu->GetWidgetName());
-  
+    
+  this->AddInputMenu("Input", "NthPVInput 0", "vtkPolyData",
+                     "Select the input for the filter.", 
+                     this->GetPVWindow()->GetSources());                            
+
+  this->AddInputMenu("Glyph", "GlyphSource", "vtkPolyData",
+                     "Select the data set to use as the glyph geometry.", 
+                     this->GetPVWindow()->GetGlyphSources());
+
+  // Set the default so Reset behaves properly.  There are other options.
+  //this->GetPVWindow()->GetGlyphSources()->InitTraversal();
+  //this->SetGlyphSource(((vtkPVSource*)(this->GetPVWindow()->GetGlyphSources()->GetNextItemAsObject()))->GetNthPVOutput(0));
+                                      
   this->ScaleModeFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->ScaleModeFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",
@@ -241,7 +246,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->OrientCheck->Create(pvApp, "Orient", "SetOrient", "GetOrient",
                             "Select whether to orient the glyphs",
                             this->GetVTKSourceTclName());
-  this->OrientCheck->GetCheckButton()->SetState(1);
+  this->OrientCheck->SetState(1);
   this->Widgets->AddItem(this->OrientCheck);
   
   this->ScaleCheck->SetParent(this->GetParameterFrame()->GetFrame());
@@ -249,7 +254,7 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleCheck->Create(pvApp, "Scale", "SetScaling", "GetScaling",
                            "Select whether to scale the glyphs",
                            this->GetVTKSourceTclName());
-  this->ScaleCheck->GetCheckButton()->SetState(1);
+  this->ScaleCheck->SetState(1);
   this->Widgets->AddItem(this->ScaleCheck);
   
   this->ScaleEntry->SetParent(this->GetParameterFrame()->GetFrame());
@@ -328,48 +333,6 @@ void vtkPVGlyph3D::ChangeVectorMode()
     }
 }
 
-void vtkPVGlyph3D::UpdateSourceMenu()
-{
-  int i;
-  vtkKWCompositeCollection *sources = this->GetWindow()->GetGlyphSources();
-  vtkPVSource *source;
-  char *tclName = NULL;
-  
-  this->GlyphSourceMenu->ClearEntries();
-  for (i = 0; i < sources->GetNumberOfItems(); i++)
-    {
-    source = (vtkPVSource*)sources->GetItemAsObject(i);
-    if (source->GetNthPVOutput(0))
-      {
-      if (source->GetNthPVOutput(0)->GetVTKData()->IsA("vtkPolyData"))
-        {
-        tclName = source->GetNthPVOutput(0)->GetVTKDataTclName();
-        if (!this->GlyphSourceTclName)
-          {
-          this->SetGlyphSourceTclName(tclName);
-          }
-        this->GlyphSourceMenu->AddEntryWithCommand(tclName, this,
-                                                   "ChangeAcceptButtonColor");
-        }
-      }
-    }
-}
-
-void vtkPVGlyph3D::ChangeSource()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  char *tclName;
-  
-  tclName = this->GlyphSourceMenu->GetValue();
-  this->SetGlyphSourceTclName(tclName);
-  
-  if (strcmp(this->GlyphSourceTclName, "") != 0)
-    {
-    pvApp->BroadcastScript("%s SetSource %s",
-                           this->GetVTKSourceTclName(), tclName);
-    }
-}
-
 void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
 {
   char sourceName[30];
@@ -427,21 +390,21 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
     *file << "\n";
     }
 
-  if (strcmp(this->GlyphSourceTclName, "pvGlyphArrowOutput") == 0)
-    {
-    sprintf(sourceName, "pvGlyphArrow%d", this->InstanceCount);
-    *file << "vtkArrowSource " << sourceName << "\n\n";
-    }
-  else if (strcmp(this->GlyphSourceTclName, "pvGlyphConeOutput") == 0)
-    {
-    sprintf(sourceName, "pvGlyphCone%d", this->InstanceCount);
-    *file << "vtkConeSource " << sourceName << "\n\n";
-    }
-  else if (strcmp(this->GlyphSourceTclName, "pvGlyphSphereOutput") == 0)
-    {
-    sprintf(sourceName, "pvGlyphSphere%d", this->InstanceCount);
-    *file << "vtkSphereSource " << sourceName << "\n\n";
-    }
+  //if (strcmp(this->GlyphSourceTclName, "pvGlyphArrowOutput") == 0)
+  //  {
+  //  sprintf(sourceName, "pvGlyphArrow%d", this->InstanceCount);
+  //  *file << "vtkArrowSource " << sourceName << "\n\n";
+  //  }
+  //else if (strcmp(this->GlyphSourceTclName, "pvGlyphConeOutput") == 0)
+  //  {
+  //  sprintf(sourceName, "pvGlyphCone%d", this->InstanceCount);
+  //  *file << "vtkConeSource " << sourceName << "\n\n";
+  //  }
+  //else if (strcmp(this->GlyphSourceTclName, "pvGlyphSphereOutput") == 0)
+  //  {
+  //  sprintf(sourceName, "pvGlyphSphere%d", this->InstanceCount);
+  //  *file << "vtkSphereSource " << sourceName << "\n\n";
+  //  }
   
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n";
@@ -515,9 +478,9 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
     }
   
   *file << this->VTKSourceTclName << " SetOrient "
-        << this->OrientCheck->GetCheckButton()->GetState() << "\n\t";
+        << this->OrientCheck->GetState() << "\n\t";
   *file << this->VTKSourceTclName << " SetScaling "
-        << this->ScaleCheck->GetCheckButton()->GetState() << "\n\t";
+        << this->ScaleCheck->GetState() << "\n\t";
   *file << this->VTKSourceTclName << " SetScaleFactor "
         << this->ScaleEntry->GetEntry(0)->GetValueAsFloat() << "\n\n";
   

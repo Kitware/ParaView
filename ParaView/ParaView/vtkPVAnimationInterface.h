@@ -50,6 +50,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkKWLabeledEntry;
 class vtkKWMenuButton;
 class vtkPVWindow;
+class vtkKWScale;
 
 class VTK_EXPORT vtkPVAnimationInterface : public vtkKWWidget
 {

@@ -524,7 +524,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->InsertCommand(2, "Export VTK Script", this, "SaveInTclScript");
   //this->MenuFile->InsertCommand(3, "Save Workspace", this, "SaveWorkspace");
   
-  // Log stuff
+  // Log stuff (not traced)
   this->MenuFile->InsertCommand(4, "Open Log File", this, "StartLog");
   this->MenuFile->InsertCommand(5, "Close Log File", this, "StopLog");
 
@@ -603,7 +603,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->ContourButton->SetBalloonHelpString("Contour");
 
   this->GlyphButton->SetParent(this->Toolbar);
-//  this->GlyphButton->Create(app, "-text Glyph");
   this->GlyphButton->Create(app, "-image PVGlyphButton");
   this->GlyphButton->SetCommand(this, "GlyphCallback");
   this->GlyphButton->SetBalloonHelpString("Glyph");
@@ -621,7 +620,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
                this->ContourButton->GetWidgetName(),
                this->GlyphButton->GetWidgetName(),
                this->ProbeButton->GetWidgetName());
-
+  
+  // No trace
   this->FrameRateScale->SetParent(this->GetToolbarFrame());
   this->FrameRateScale->Create(app, "-resolution 0.1 -orient horizontal");
   this->FrameRateScale->SetRange(0, 50);
@@ -638,6 +638,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s -side right -fill none -expand no",
                this->FrameRateLabel->GetWidgetName());
 
+  // No trace
   this->ReductionCheck->SetParent(this->GetToolbarFrame());
   this->ReductionCheck->Create(app, "-text Reduction");
   this->ReductionCheck->SetState(1);
@@ -646,21 +647,13 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s -side right -fill none -expand no",
                this->ReductionCheck->GetWidgetName());
   
-  // This button doesn't do anything useful right now.  It was put in originally
-  // so we could switch between interactor styles.
-//  this->CameraStyleButton->SetParent(this->Toolbar);
-//  this->CameraStyleButton->Create(app, "");
-//  this->CameraStyleButton->SetLabel("Camera");
-//  this->CameraStyleButton->SetCommand(this, "UseCameraStyle");
-//  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
-//	       this->SourceListButton->GetWidgetName(),
-//	       this->CameraStyleButton->GetWidgetName());
   this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
                this->InteractorToolbar->GetWidgetName(),
                this->Toolbar->GetWidgetName());
   
   this->CreateDefaultPropertiesParent();
   
+  // The notebook does not create trace entries.
   this->Notebook->SetParent(this->GetPropertiesParent());
   this->Notebook->Create(this->Application,"");
   this->Notebook->AddPage("Preferences");
@@ -690,6 +683,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   pushButton = NULL;
 
   // set up the interactors
+  // The interactors (selection and events) add no trace entries.
   interactor = this->FlyInteractor;
   interactor->SetParent(this->GetToolbarFrame());
   interactor->SetRenderView(this->GetMainView());
@@ -904,6 +898,9 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   char *endingSlash = NULL;
   char *newRootName;
   
+  this->GetPVApplication()->AddTraceEntry("$trace(%s) Open {%s}",
+                                          this->GetTclName(), openFileName);
+
   extension = strrchr(openFileName, '.');
   position = extension - openFileName;
   rootName = new char[position + 1];
@@ -970,6 +967,68 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVWindow::WriteVTKFile(char *filename)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (!this->CurrentPVData)
+    {
+    return;
+    }
+
+  pvApp->AddTraceEntry("$trace(%s) WriteVTKFile %s", this->GetTclName(),
+                       filename);
+ 
+  pvApp->MakeTclObject("vtkDataSetWriter", "writer");
+  pvApp->BroadcastScript("writer SetFileName %s", filename);
+  pvApp->BroadcastScript("writer SetInput %s",
+                         this->GetCurrentPVData()->GetVTKDataTclName());
+  pvApp->BroadcastScript("writer SetFileTypeToBinary");
+  pvApp->BroadcastScript("writer Write");
+  pvApp->BroadcastScript("writer Delete");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::WritePVTKFile(char *filename, int ghostLevel)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int numProcs;
+  int idx;
+
+  if (!this->CurrentPVData)
+    {
+    return;
+    }
+
+  numProcs = 1;
+  if (pvApp->GetController())
+    {
+    numProcs = pvApp->GetController()->GetNumberOfProcesses();
+    }
+
+  pvApp->AddTraceEntry("$trace(%s) WritePVTKFile %s", this->GetTclName(),
+                       filename, ghostLevel);
+
+  pvApp->BroadcastScript("vtkPDataSetWriter writer");
+  pvApp->BroadcastScript("writer SetFileName %s", filename);
+  pvApp->BroadcastScript("writer SetInput %s",
+                         this->GetCurrentPVData()->GetVTKDataTclName());
+  pvApp->BroadcastScript("writer SetFileTypeToBinary");
+  pvApp->BroadcastScript("writer SetNumberOfPieces %d", numProcs);
+  pvApp->BroadcastScript("writer SetGhostLevel %d", ghostLevel);
+  this->Script("writer SetStartPiece 0");
+  this->Script("writer SetEndPiece 0");
+  for (idx = 1; idx < numProcs; ++idx)
+    {
+    pvApp->RemoteScript(idx, "writer SetStartPiece %d", idx);
+    pvApp->RemoteScript(idx, "writer SetEndPiece %d", idx);
+    }
+  pvApp->BroadcastScript("writer Write");
+  pvApp->BroadcastScript("writer Delete");
+}
+
+//----------------------------------------------------------------------------
 void vtkPVWindow::WriteData()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -999,19 +1058,11 @@ void vtkPVWindow::WriteData()
       delete [] filename;
       return;
       }
-  
-    pvApp->MakeTclObject("vtkDataSetWriter", "writer");
-    pvApp->BroadcastScript("writer SetFileName %s", filename);
-    pvApp->BroadcastScript("writer SetInput %s",
-                           this->GetCurrentPVData()->GetVTKDataTclName());
-    pvApp->BroadcastScript("writer SetFileTypeToBinary");
-    pvApp->BroadcastScript("writer Write");
-    pvApp->BroadcastScript("writer Delete");
+    this->WriteVTKFile(filename);
     }
   else
     {
     int ghostLevel;
-    int idx;
 
     this->Script("tk_getSaveFile -filetypes {{{PVTK files} {.pvtk}}} -defaultextension .pvtk -initialfile data.pvtk");
     filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
@@ -1031,22 +1082,7 @@ void vtkPVWindow::WriteData()
       return;
       }
 
-    pvApp->BroadcastScript("vtkPDataSetWriter writer");
-    pvApp->BroadcastScript("writer SetFileName %s", filename);
-    pvApp->BroadcastScript("writer SetInput %s",
-                           this->GetCurrentPVData()->GetVTKDataTclName());
-    pvApp->BroadcastScript("writer SetFileTypeToBinary");
-    pvApp->BroadcastScript("writer SetNumberOfPieces %d", numProcs);
-    pvApp->BroadcastScript("writer SetGhostLevel %d", ghostLevel);
-    this->Script("writer SetStartPiece 0");
-    this->Script("writer SetEndPiece 0");
-    for (idx = 1; idx < numProcs; ++idx)
-      {
-      pvApp->RemoteScript(idx, "writer SetStartPiece %d", idx);
-      pvApp->RemoteScript(idx, "writer SetEndPiece %d", idx);
-      }
-    pvApp->BroadcastScript("writer Write");
-    pvApp->BroadcastScript("writer Delete");
+    this->WritePVTKFile(filename, ghostLevel);
     }
   
   delete [] filename;
@@ -1314,10 +1350,14 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
   this->MainView->SetSelectedComposite(comp);  
   if (comp)
     {
+    this->GetPVApplication()->AddTraceEntry("$trace(%s) SetCurrentPVSource $trace(%s)", 
+                        this->GetTclName(), comp->GetTclName());
     this->SetCurrentPVData(comp->GetNthPVOutput(0));
     }
   else
     {
+    this->GetPVApplication()->AddTraceEntry("$trace(%s) SetCurrentPVSource NULL", 
+                        this->GetTclName());
     this->SetCurrentPVData(NULL);
     }
   
@@ -1326,14 +1366,10 @@ void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
     this->Sources->AddItem(comp);
     }
   
-  // update the input list and (if this source is a glyph) the source list
+  // This will update the parameters.  
+  // I doubt the conditional is still necessary.
   if (comp)
     {
-    comp->UpdateInputList();
-    if (comp->IsA("vtkPVGlyph3D"))
-      {
-      ((vtkPVGlyph3D*)comp)->UpdateSourceMenu();
-      }
     this->ShowCurrentSourceProperties();
     }
 }
@@ -1359,6 +1395,9 @@ vtkKWCompositeCollection* vtkPVWindow::GetGlyphSources()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ResetCameraCallback()
 {
+  this->GetPVApplication()->AddTraceEntry("$trace(%s) ResetCameraCallback", 
+                                          this->GetTclName());
+
   this->MainView->ResetCamera();
   this->MainView->EventuallyRender();
 }
@@ -1504,7 +1543,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   vtkPVData *pvd;
   vtkPVData *current;
   const char* outputDataType;
-  
+
   // Before we do anything, let's see if we can determine the output type.
   current = this->GetCurrentPVData();
   if (current == NULL)
@@ -1531,9 +1570,14 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   calc->SetNthPVInput(0, this->GetCurrentPVData());
   calc->SetName(tclName);  
 
+  pvApp->AddTraceEntry("set trace(%s) [$trace(%s) CalculatorCallback]", 
+                      calc->GetTclName(), this->GetTclName());
+
   this->GetMainView()->AddComposite(calc);
   calc->CreateProperties();
-  calc->CreateInputList("vtkDataSet");
+  calc->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                     "Set the input to this filter.", 
+                     this->GetSources());
   this->SetCurrentPVSource(calc);
 
   // Create the output.
@@ -1615,9 +1659,15 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   cutPlane->SetName(tclName);
   cutPlane->SetInterface(this->CutPlaneInterface);
 
+  pvApp->AddTraceEntry("set trace(%s) [$trace(%s) CutPlaneCallback]", 
+                       cutPlane->GetTclName(), this->GetTclName());
+
   this->GetMainView()->AddComposite(cutPlane);
   cutPlane->CreateProperties();
-  cutPlane->CreateInputList("vtkDataSet");
+  cutPlane->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                         "Set the input to this filter.",
+                         this->GetSources());
+
   this->SetCurrentPVSource(cutPlane);
 
   // Create the output.
@@ -1695,10 +1745,15 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   threshold->SetName(tclName);
   threshold->SetInterface(this->ThresholdInterface);
 
+  pvApp->AddTraceEntry("set trace(%s) [$trace(%s) ThresholdCallback]", 
+                       threshold->GetTclName(), this->GetTclName());
+
   this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
   threshold->PackScalarsMenu();
-  threshold->CreateInputList("vtkDataSet");
+  threshold->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                         "Set the input to this filter.",
+                         this->GetSources());
   this->SetCurrentPVSource(threshold);
 
   // Create the output.
@@ -1781,9 +1836,14 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   clipPlane->SetName(tclName);
   clipPlane->SetInterface(this->ClipPlaneInterface);
 
+  pvApp->AddTraceEntry("set trace(%s) [$trace(%s) ClipPlaneCallback]", 
+                       clipPlane->GetTclName(), this->GetTclName());
+
   this->GetMainView()->AddComposite(clipPlane);
   clipPlane->CreateProperties();
-  clipPlane->CreateInputList("vtkDataSet");
+  clipPlane->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                         "Set the input to this filter.",
+                         this->GetSources());
   this->SetCurrentPVSource(clipPlane);
 
   // Create the output.
@@ -1864,10 +1924,15 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   contour->SetNthPVInput(0, current);
   contour->SetName(tclName);
 
+  pvApp->AddTraceEntry("set trace(%s) [$trace(%s) ContourCallback]", 
+                       contour->GetTclName(), this->GetTclName());
+
   this->GetMainView()->AddComposite(contour);
   contour->CreateProperties();
   contour->PackScalarsMenu();
-  contour->CreateInputList("vtkDataSet");
+  contour->AddInputMenu("Input", "NthPVInput 0", "vtkDataSet",
+                         "Set the input to this filter.",
+                         this->GetSources());
   this->SetCurrentPVSource(contour);
 
   // Create the output.
@@ -1910,9 +1975,9 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
 {
   static int instanceCount = 1;
   char tclName[256];
-  vtkSource *s;
+  vtkGlyph3D *glyph;
   vtkDataSet *d;
-  vtkPVGlyph3D *glyph;
+  vtkPVGlyph3D *pvGlyph;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVData *pvd;
   vtkPVData *current;
@@ -1930,28 +1995,30 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   // Create the vtkSource.
   sprintf(tclName, "%s%d", "Glyph", instanceCount);
   // Create the object through tcl on all processes.
-  s = (vtkSource *)(pvApp->MakeTclObject("vtkGlyph3D", tclName));
-  if (s == NULL)
+  glyph = (vtkGlyph3D *)(pvApp->MakeTclObject("vtkGlyph3D", tclName));
+  if (glyph == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
     return NULL;
     }
-  
-  glyph = vtkPVGlyph3D::New();
-  glyph->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
-  glyph->SetApplication(pvApp);
-  glyph->SetVTKSource(s, tclName);
-  glyph->SetNthPVInput(0, current);
-  glyph->SetName(tclName);
 
-  this->GetMainView()->AddComposite(glyph);
-  glyph->CreateProperties();
-  glyph->GetScalarOperationMenu()->SetLabel("Scalar Arrays:");
-  glyph->PackScalarsMenu();
-  glyph->GetVectorOperationMenu()->SetLabel("Vector Arrays:");
-  glyph->PackVectorsMenu();
-  glyph->CreateInputList("vtkDataSet");
-  this->SetCurrentPVSource(glyph);
+  pvGlyph = vtkPVGlyph3D::New();
+  pvGlyph->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  pvGlyph->SetApplication(pvApp);
+  pvGlyph->SetVTKSource(glyph, tclName);
+  pvGlyph->SetNthPVInput(0, current);
+  pvGlyph->SetName(tclName);
+
+  pvApp->AddTraceEntry("set trace(%s) [$trace(%s) GlyphCallback]", 
+                       pvGlyph->GetTclName(), this->GetTclName());
+
+  this->GetMainView()->AddComposite(pvGlyph);
+  pvGlyph->CreateProperties();
+  pvGlyph->GetScalarOperationMenu()->SetLabel("Scalar Arrays:");
+  pvGlyph->PackScalarsMenu();
+  pvGlyph->GetVectorOperationMenu()->SetLabel("Vector Arrays:");
+  pvGlyph->PackVectorsMenu();
+  this->SetCurrentPVSource(pvGlyph);
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1963,8 +2030,8 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   pvd->SetVTKData(d, tclName);
 
   // Connect the source and data.
-  glyph->SetNthPVOutput(0, pvd);
-  pvApp->BroadcastScript("%s SetOutput %s", glyph->GetVTKSourceTclName(),
+  pvGlyph->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", pvGlyph->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
   // Push along the extent translator (for consistent pieces).
@@ -1974,9 +2041,9 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
     // What A pain.  we need this until we remove that drat FieldDataToAttributeDataFilter.
     pvApp->BroadcastScript(
       "[%s GetInput] SetExtentTranslator [%s GetExtentTranslator]",
-      glyph->GetVTKSourceTclName(), current->GetVTKDataTclName());
+      pvGlyph->GetVTKSourceTclName(), current->GetVTKDataTclName());
 
-  glyph->Delete();
+  pvGlyph->Delete();
   pvd->Delete();
   
   ++instanceCount;
@@ -1984,7 +2051,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   this->DisableMenus();
   this->DisableFilterButtons();
 
-  return glyph;
+  return pvGlyph;
 }
 
 //----------------------------------------------------------------------------
@@ -2027,6 +2094,9 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   probe->SetProbeSourceTclName(current->GetVTKDataTclName());
   probe->SetPVProbeSource(current);
   probe->SetName(tclName);
+
+  pvApp->AddTraceEntry("set trace(%s) [$trace(%s) ProbeCallback]", 
+                       probe->GetTclName(), this->GetTclName());
 
   this->GetMainView()->AddComposite(probe);
   probe->CreateProperties();
@@ -2085,6 +2155,9 @@ void vtkPVWindow::ShowWindowProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
+  this->GetPVApplication()->AddTraceEntry("$trace(%s) ShowCurrentSourceProperties",
+                                          this->GetTclName());
+
   this->ShowProperties();
   
   // We need to update the properties-menu radio button too!
@@ -2101,12 +2174,7 @@ void vtkPVWindow::ShowCurrentSourceProperties()
     return;
     }
   
-  this->GetCurrentPVSource()->UpdateInputList();
-  if (this->GetCurrentPVSource()->IsA("vtkPVGlyph3D"))
-    {
-    ((vtkPVGlyph3D*)this->GetCurrentPVSource())->UpdateSourceMenu();
-    }
-
+  this->GetCurrentPVSource()->UpdateParameterWidgets();
   this->Script("pack %s -side top -fill x",
                this->GetCurrentPVSource()->GetNotebook()->GetWidgetName());
   this->GetCurrentPVSource()->GetNotebook()->Raise("Source");
@@ -2115,6 +2183,9 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationProperties()
 {
+  this->GetPVApplication()->AddTraceEntry("$trace(%s) ShowAnimationProperties",
+                                          this->GetTclName());
+
   this->AnimationInterface->UpdateSourceMenu();
 
   // Try to find a good default value for the source.
@@ -2187,6 +2258,24 @@ vtkPVSourceInterface *vtkPVWindow::GetSourceInterface(const char *className)
     }
   return NULL;
 }
+
+//----------------------------------------------------------------------------
+vtkPVSource *vtkPVWindow::CreatePVSource(const char *className)
+{
+  vtkPVSourceInterface *sInt;
+  vtkPVSource *pvs;
+
+  sInt = this->GetSourceInterface(className);
+  if (sInt == NULL)
+    {
+    vtkErrorMacro("Could not create source: " << className);
+    return NULL;
+    }
+  pvs = sInt->CreateCallback();
+
+  return pvs;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ReadSourceInterfaces()

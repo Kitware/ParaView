@@ -132,7 +132,7 @@ void vtkPVCutPlane::CreateProperties()
 
   this->CenterEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->CenterEntry->SetPVSource(this);
-  this->CenterEntry->Create(this->Application, "Center:", 3, NULL, "SetOrigin",
+  this->CenterEntry->Create(this->Application, "Center", 3, NULL, "SetOrigin",
                             "GetOrigin", NULL, this->GetVTKSourceTclName());
   this->Widgets->AddItem(this->CenterEntry);
   this->Script("pack %s -side top -fill x",
@@ -148,7 +148,7 @@ void vtkPVCutPlane::CreateProperties()
   // Normal -------------------------
   this->NormalEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->NormalEntry->SetPVSource(this);
-  this->NormalEntry->Create(this->Application, "Normal:", 3, NULL, "SetNormal",
+  this->NormalEntry->Create(this->Application, "Normal", 3, NULL, "SetNormal",
                             "GetNormal", NULL, this->GetVTKSourceTclName());
   this->Widgets->AddItem(this->NormalEntry);
   this->Script("pack %s -side top -fill x",
@@ -187,7 +187,7 @@ void vtkPVCutPlane::CreateProperties()
   // Offset -------------------------
   this->OffsetEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->OffsetEntry->SetPVSource(this);
-  this->OffsetEntry->Create(this->Application, "Offset:", 1, NULL, "SetOffset",
+  this->OffsetEntry->Create(this->Application, "Offset", 1, NULL, "SetOffset",
                             "GetOffset", NULL, this->VTKSourceTclName);
   this->Widgets->AddItem(this->OffsetEntry);
   this->Script("pack %s -side top -fill x",

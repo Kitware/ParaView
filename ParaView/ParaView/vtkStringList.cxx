@@ -67,6 +67,12 @@ vtkStringList::vtkStringList()
 //----------------------------------------------------------------------------
 vtkStringList::~vtkStringList()
 {
+  this->RemoveAllItems();
+}
+
+//----------------------------------------------------------------------------
+void vtkStringList::RemoveAllItems()
+{
   int i;
 
   for (i = 0; i < this->NumberOfStrings; ++i)
@@ -85,7 +91,6 @@ vtkStringList::~vtkStringList()
     this->StringArrayLength = 0;
     }
 }
-
 
 //----------------------------------------------------------------------------
 char *vtkStringList::GetString(int idx)

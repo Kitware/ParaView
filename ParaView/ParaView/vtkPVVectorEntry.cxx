@@ -98,6 +98,9 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     return;
     }
   
+  // For getting the widget in a script.
+  this->SetName(label);
+
   this->SetApplication(pvApp);
   
   // create the top level
@@ -116,8 +119,9 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     this->Script("pack %s -side left", this->Label->GetWidgetName());
     }
   
-  sprintf(acceptCmd, "%s AcceptHelper2 %s %s \"",
-          this->PVSource->GetTclName(), tclName, setCmd);
+  //sprintf(acceptCmd, "%s AcceptHelper2 %s %s \"",
+  //        this->PVSource->GetTclName(), tclName, setCmd);
+  sprintf(acceptCmd, "eval %s %s ", tclName, setCmd);
   
   // Now the sublabels and entries
   for (i = 0; i < vectorLength; i++)
@@ -136,8 +140,8 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     entry = vtkKWEntry::New();
     entry->SetParent(this);
     entry->Create(pvApp, "-width 2");
-    this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-                 entry->GetWidgetName(), this->PVSource->GetTclName());
+    this->Script("%s configure -xscrollcommand {%s XScrollCallback}",
+                 entry->GetWidgetName(), this->GetTclName());
     if (help)
       { 
       entry->SetBalloonHelpString(help);
@@ -158,8 +162,44 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp, char *label,
     entry->Delete();
     }
   
-  strcat(acceptCmd, "\"");
+  strcat(acceptCmd, "");
   this->AcceptCommands->AddString(acceptCmd);
+}
+
+void vtkPVVectorEntry::XScrollCallback(float x, float y)
+{
+  this->ModifiedCallback();
+}
+
+void vtkPVVectorEntry::Accept()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  ofstream *traceFile = pvApp->GetTraceFile();
+
+  if (this->ModifiedFlag && this->PVSource && traceFile)
+    {
+    vtkKWEntry *entry;
+    int num, idx;
+  
+    if ( ! this->TraceInitialized)
+      {
+      pvApp->AddTraceEntry("set trace(%s) [$trace(%s) GetPVWidget {%s}]",
+                           this->GetTclName(), this->PVSource->GetTclName(),
+                           this->Name);
+      this->TraceInitialized = 1;
+      }
+
+    *traceFile << "$trace(" << this->GetTclName() << ") SetValue";
+    num = this->Entries->GetNumberOfItems();
+    for (idx = 0; idx < num; ++idx)
+      {
+      entry = this->GetEntry(idx);
+      *traceFile << " " << entry->GetValue();
+      }
+    *traceFile << endl;
+    }
+
+  this->vtkPVWidget::Accept();
 }
 
 vtkKWLabel* vtkPVVectorEntry::GetSubLabel(int idx)
@@ -179,3 +219,82 @@ vtkKWEntry* vtkPVVectorEntry::GetEntry(int idx)
     }
   return ((vtkKWEntry*)this->Entries->GetItemAsObject(idx));
 }
+
+
+void vtkPVVectorEntry::SetValue(char** values, int num)
+{
+  int idx;
+  vtkKWEntry *entry;
+
+  if (num != this->Entries->GetNumberOfItems())
+    {
+    vtkErrorMacro("Componenet mismatch.");
+    return;
+    }
+  for (idx = 0; idx < num; ++idx)
+    {
+    entry = this->GetEntry(idx);
+    entry->SetValue(values[idx]);
+    }
+  this->ModifiedCallback();
+}
+
+
+void vtkPVVectorEntry::SetValue(char *v0)
+{
+  char* vals[1];
+  vals[0] = v0;
+  this->SetValue(vals, 1);
+}
+
+void vtkPVVectorEntry::SetValue(char *v0, char *v1)
+{
+  char* vals[2];
+  vals[0] = v0;
+  vals[1] = v1;
+  this->SetValue(vals, 2);
+}
+
+void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2)
+{
+  char* vals[3];
+  vals[0] = v0;
+  vals[1] = v1;
+  vals[2] = v2;
+  this->SetValue(vals, 3);
+}
+
+void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3)
+{
+  char* vals[4];
+  vals[0] = v0;
+  vals[1] = v1;
+  vals[2] = v2;
+  vals[3] = v3;
+  this->SetValue(vals, 4);
+}
+
+void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, char *v3, char *v4)
+{
+  char* vals[5];
+  vals[0] = v0;
+  vals[1] = v1;
+  vals[2] = v2;
+  vals[3] = v3;
+  vals[4] = v4;
+  this->SetValue(vals, 5);
+}
+
+void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2, 
+                                char *v3, char *v4, char *v5)
+{
+  char* vals[6];
+  vals[0] = v0;
+  vals[1] = v1;
+  vals[2] = v2;
+  vals[3] = v3;
+  vals[4] = v4;
+  vals[5] = v5;
+  this->SetValue(vals, 6);
+}
+

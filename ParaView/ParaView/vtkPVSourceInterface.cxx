@@ -160,6 +160,10 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvs->SetVTKSource(s, tclName);
   pvs->SetName(tclName);  
   
+  pvApp->AddTraceEntry("set trace(%s) [$trace(%s) CreatePVSource %s]", 
+                       pvs->GetTclName(), this->PVWindow->GetTclName(),
+                       this->SourceClassName);
+
   // Set the input if necessary.
   if (this->InputClassName)
     {
@@ -178,14 +182,12 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     pvs->PackVectorsMenu();
     }
 
-  if (! this->InputClassName)
+  if (this->InputClassName)
     {
-    pvs->CreateInputList(NULL);
+    pvs->AddInputMenu("Input", "NthPVInput 0", this->InputClassName,
+                      "Set the input to this filter.", this->PVWindow->GetSources());
     }
-  else
-    {
-    pvs->CreateInputList(pvs->GetNthPVInput(0)->GetVTKData()->GetClassName());
-    }
+
   this->PVWindow->SetCurrentPVSource(pvs);
 
   // Create the output.

@@ -187,8 +187,16 @@ public:
   void StartLog();
   void StopLog();
   
-  // Write current data to a VTK file
+  // Description:
+  // Callback fronm the file menus "SaveData" entry.
+  // It pops up a dialog to get the filename.
   void WriteData();
+
+  // Description:
+  // Methods that can be used from scripts to save data to files.
+  void WriteVTKFile(char *filename);
+  void WritePVTKFile(char *filename, int ghostLevel);
+
 
   vtkGetObjectMacro(CalculatorButton, vtkKWPushButton);
   vtkGetObjectMacro(CutPlaneButton, vtkKWPushButton);
@@ -203,6 +211,7 @@ public:
   // Get a source interface from the class name.
   // Useful for writing scripts that create sources.
   vtkPVSourceInterface *GetSourceInterface(const char *className);
+  vtkPVSource *CreatePVSource(const char *className);
   
   // Description:
   // Access to the RotateCamera interactor for thinks like setting its center of roation.

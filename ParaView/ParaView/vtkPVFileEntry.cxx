@@ -94,6 +94,8 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
     return;
     }
   
+  // For getting the widget in a script.
+  this->SetName(label);
   this->SetApplication(pvApp);
   
   // create the top level
@@ -114,8 +116,8 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
   
   // Now the entry
   this->Entry->Create(pvApp, "");
-  this->Script("%s configure -xscrollcommand {%s EntryChanged}",
-               this->Entry->GetWidgetName(), this->PVSource->GetTclName());
+  this->Script("%s configure -xscrollcommand {%s XScrollCallback}",
+               this->Entry->GetWidgetName(), this->GetTclName());
   if (help)
     { 
     this->Entry->SetBalloonHelpString(help);
@@ -148,7 +150,62 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label, char *setCmd,
   // Format a command to move value from widget to vtkObjects (on all
   // processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
-                                  this->PVSource->GetTclName(), tclName,
-                                  setCmd, this->Entry->GetTclName());
+  //this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
+  //                                this->PVSource->GetTclName(), tclName,
+  //                                setCmd, this->Entry->GetTclName());
+  this->AcceptCommands->AddString("%s %s [%s GetValue]",
+                                  tclName, setCmd, this->Entry->GetTclName());
 }
+
+
+void vtkPVFileEntry::XScrollCallback(float x, float y)
+{
+  this->ModifiedCallback();
+}
+
+
+void vtkPVFileEntry::SetValue(const char* fileName)
+{
+  const char *old;
+  
+  if (fileName == NULL)
+    {
+    fileName = "";
+    }
+
+  old = this->Entry->GetValue();
+  if (strcmp(old, fileName) == 0)
+    {
+    return;
+    }
+
+  this->Entry->SetValue(fileName); 
+  this->ModifiedCallback();
+}
+
+
+
+void vtkPVFileEntry::Accept()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (this->ModifiedFlag && this->PVSource)
+    {  
+    if ( ! this->TraceInitialized)
+      {
+      pvApp->AddTraceEntry("set trace(%s) [$trace(%s) GetPVWidget {%s}]",
+                           this->GetTclName(), this->PVSource->GetTclName(),
+                           this->Name);
+      this->TraceInitialized = 1;
+      }
+
+    pvApp->AddTraceEntry("$trace(%s) SetValue {%s}", this->GetTclName(), 
+                         this->GetValue());
+    }
+
+  this->vtkPVWidget::Accept();
+}
+
+
+
+

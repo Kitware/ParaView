@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRotateViewButton.h"
 #include "vtkKWTranslateViewButton.h"
 #include "vtkKWPickCenterButton.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVCalculatorButton.h"
 #include "vtkPVThresholdButton.h"
 #include "vtkPVContourButton.h"
@@ -84,7 +85,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
-//extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
 
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 {
@@ -190,7 +190,7 @@ vtkPVApplication::~vtkPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVApplication::RemoteScript(int id, char *format, ...)
 {
-  static char event[16000];
+  char event[16000];
   
   va_list var_args;
   va_start(var_args, format);
@@ -244,7 +244,7 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, const char *str)
 //----------------------------------------------------------------------------
 void vtkPVApplication::BroadcastScript(char *format, ...)
 {
-  static char event[16000];
+  char event[16000];
   
   va_list var_args;
   va_start(var_args, format);
@@ -296,7 +296,6 @@ void vtkPVApplication::BroadcastSimpleScript(const char *str)
   // Do reverse order, because 0 will block.
   this->SimpleScript(str);
 }
-
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::AcceptLicense()
@@ -357,6 +356,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->CreateButtonPhotos();
   ui->Create(this,"");
+
+  this->AddTraceEntry("set trace(%s) [Application GetMainWindow]",
+                      ui->GetTclName());
+  // We have to set this variable after the window variable is set,
+  // so it has to be done here.
+  this->AddTraceEntry("set trace(%s) [$trace(%s) GetMainView]",
+                       ui->GetMainView()->GetTclName(), ui->GetTclName());
 
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();

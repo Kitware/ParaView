@@ -59,9 +59,16 @@ public:
   void Create(vtkKWApplication *pvApp, char *label, char *setCmd,
               char *getCmd, char *help, const char *tclName);
   
-  vtkGetObjectMacro(Label, vtkKWLabel);
-  vtkGetObjectMacro(CheckButton, vtkKWCheckButton);
+  // Description:
+  // Called when accept button is pushed.  Just adds to trace
+  // file and calls supperclass accept.
+  virtual void Accept();
   
+  // Description:
+  // This method allows scripts to modify the widgets value.
+  void SetState(int val);
+  int GetState() { return this->CheckButton->GetState(); }
+
 protected:
   vtkPVLabeledToggle();
   ~vtkPVLabeledToggle();

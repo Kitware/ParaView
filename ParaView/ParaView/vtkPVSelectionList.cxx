@@ -53,8 +53,8 @@ vtkPVSelectionList::vtkPVSelectionList()
 
   this->CurrentValue = 0;
   this->CurrentName = NULL;
-  this->Command = NULL;
   
+  this->Label = vtkKWLabel::New();
   this->MenuButton = vtkKWMenuButton::New();
 
   this->Names = vtkStringList::New();
@@ -65,16 +65,12 @@ vtkPVSelectionList::~vtkPVSelectionList()
 {
   this->SetCurrentName(NULL);
   
+  this->Label->Delete();
+  this->Label = NULL;
   this->MenuButton->Delete();
   this->MenuButton = NULL;
   this->Names->Delete();
   this->Names = NULL;
-
-  if (this->Command)
-    {
-    delete [] this->Command;
-    this->Command = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -92,9 +88,13 @@ int vtkPVSelectionList::Create(vtkKWApplication *app)
     return 0;
     }
   this->SetApplication(app);
-  
+
   // create the top level
   this->Script("frame %s", this->GetWidgetName());
+
+  this->Label->SetParent(this);
+  this->Label->Create(app, "-width 18 -justify right");
+  this->Script("pack %s -side left", this->Label->GetWidgetName());
 
   this->MenuButton->SetParent(this);
   this->MenuButton->Create(app, "");
@@ -103,21 +103,72 @@ int vtkPVSelectionList::Create(vtkKWApplication *app)
   return 1;
 }
 
+
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::SetCommand(vtkKWObject *o, const char *method)
+void vtkPVSelectionList::SetLabel(const char* label) 
 {
-  if (this->Command)
-    {
-    delete [] this->Command;
-    this->Command = NULL;
-    }
-  if (o != NULL || method != NULL)
-    {
-    ostrstream event;
-    event << o->GetTclName() << " " << method << ends;
-    this->Command = event.str();
-    }
+  // For getting the widget in a script.
+  this->SetName(label);
+  this->Label->SetLabel(label);
 }
+  
+
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::SetAccessMethods(const char* setCmd, 
+                                          const char* getCmd)
+{
+  this->ResetCommands->RemoveAllItems();
+  this->AcceptCommands->RemoveAllItems();
+  
+  if (this->PVSource == NULL)
+    {
+    vtkErrorMacro("PVSource not set.");
+    return;
+    }
+
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Create widget before setting access methods.");
+    return;
+    }
+
+  // Command to update the UI.
+  this->ResetCommands->AddString("%s SetCurrentValue [%s %s]",
+                                 this->GetTclName(), 
+                                 this->PVSource->GetVTKSourceTclName(), 
+                                 getCmd); 
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects do not yet have to have the same Tcl name!
+  this->AcceptCommands->AddString("%s %s [%s GetCurrentValue]",
+                                  this->PVSource->GetVTKSourceTclName(),
+                                  setCmd,
+                                  this->GetTclName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::Accept()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (this->ModifiedFlag && this->PVSource)
+    {  
+    if ( ! this->TraceInitialized)
+      {
+      pvApp->AddTraceEntry("set trace(%s) [$trace(%s) GetPVWidget {%s}]",
+                           this->GetTclName(), this->PVSource->GetTclName(),
+                           this->Name);
+      this->TraceInitialized = 1;
+      }
+
+    pvApp->AddTraceEntry("$trace(%s) SetCurrentValue {%d}", this->GetTclName(), 
+                         this->GetCurrentValue());
+    }
+
+  this->vtkPVWidget::Accept();
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::AddItem(const char *name, int value)
@@ -145,7 +196,7 @@ void vtkPVSelectionList::SetCurrentValue(int value)
     {
     return;
     }
-  this->Modified();
+
   this->CurrentValue = value;
   name = this->Names->GetString(value);
   if (name)
@@ -161,9 +212,6 @@ void vtkPVSelectionList::SelectCallback(const char *name, int value)
   this->SetCurrentName(name);
   
   this->MenuButton->SetButtonText(name);
-  if (this->Command)
-    {
-    this->Script(this->Command);
-    }
+  this->ModifiedCallback();
 }
 

@@ -64,23 +64,15 @@ public:
   void CreateProperties();
 
   // Description:
+  // Set the second input.
+  void SetGlyphSource(vtkPVData *source);
+  vtkPVData* GetGlyphSource();
+
+  // Description:
   // Tcl callback for the scale and vector mode option menus
   void ChangeScaleMode();
   void ChangeVectorMode();
-
-  // Description:
-  // Fill in the source menu
-  void UpdateSourceMenu();
-  
-  // Description:
-  // Tcl callback for the source menu
-  void ChangeSource();
-  
-  // Description:
-  // Set/Get the tcl name of the current glyph source
-  vtkSetStringMacro(GlyphSourceTclName);
-  vtkGetStringMacro(GlyphSourceTclName);
-  
+    
   // Description:
   // Set/Get the current glyph scale mode
   vtkSetStringMacro(GlyphScaleMode);
@@ -105,13 +97,10 @@ protected:
   vtkPVGlyph3D(const vtkPVGlyph3D&) {};
   void operator=(const vtkPVGlyph3D&) {};
 
-  char *GlyphSourceTclName;
+  vtkPVData *GlyphSource;
   char *GlyphScaleMode;
   char *GlyphVectorMode;
   
-  vtkKWWidget *GlyphSourceFrame;
-  vtkKWLabel *GlyphSourceLabel;
-  vtkPVInputMenu *GlyphSourceMenu;
   vtkKWWidget *ScaleModeFrame;
   vtkKWLabel *ScaleModeLabel;
   vtkKWOptionMenu *ScaleModeMenu;

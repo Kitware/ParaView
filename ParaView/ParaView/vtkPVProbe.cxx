@@ -217,7 +217,7 @@ void vtkPVProbe::CreateProperties()
                this->DimensionalityLabel->GetWidgetName(),
                this->DimensionalityMenu->GetWidgetName());
   
-  this->SelectPointButton->SetParent(this->GetWindow()->GetInteractorToolbar());
+  this->SelectPointButton->SetParent(this->GetPVWindow()->GetInteractorToolbar());
   this->SelectPointButton->Create(pvApp, "-indicatoron 0 -image PV3DCursorButton -selectimage PVActive3DCursorButton -bd 0");
   this->SelectPointButton->SetBalloonHelpString("3D Cursor");
   this->SelectPointButton->SetCommand(this, "SetInteractor");
@@ -407,12 +407,12 @@ void vtkPVProbe::CreateProperties()
 
 void vtkPVProbe::SetInteractor()
 {
-  vtkPVRenderView *view = this->GetWindow()->GetMainView();
+  vtkPVRenderView *view = this->GetPVWindow()->GetMainView();
   
   if (!this->Interactor)
     {
     this->Interactor = 
-      vtkKWSelectPointInteractor::SafeDownCast(this->GetWindow()->
+      vtkKWSelectPointInteractor::SafeDownCast(this->GetPVWindow()->
                                                GetSelectPointInteractor());
     this->Interactor->SetPVProbe(this);
     this->Interactor->SetToolbarButton(this->SelectPointButton);
@@ -439,7 +439,7 @@ void vtkPVProbe::AcceptCallback()
   // call the superclass's method
   this->vtkPVSource::AcceptCallback();
   
-  vtkPVWindow *window = this->GetWindow();
+  vtkPVWindow *window = this->GetPVWindow();
   vtkPVApplication *pvApp = this->GetPVApplication();
   
   if (this->Dimensionality == 0)
@@ -673,7 +673,7 @@ void vtkPVProbe::UpdateProbe()
 
 void vtkPVProbe::Select(vtkKWView *view)
 {
-  vtkPVRenderView *renderView = this->GetWindow()->GetMainView();
+  vtkPVRenderView *renderView = this->GetPVWindow()->GetMainView();
   
   this->Script("pack %s -padx 2 -pady 2",
                this->SelectPointButton->GetWidgetName());
@@ -706,9 +706,9 @@ void vtkPVProbe::Deselect(vtkKWView *view)
     }
   
   this->Script("pack forget %s", this->SelectPointButton->GetWidgetName());
-  if (this->GetWindow()->GetMainView()->GetInteractor() == this->Interactor)
+  if (this->GetPVWindow()->GetMainView()->GetInteractor() == this->Interactor)
     {
-    this->GetWindow()->GetMainView()->SetInteractor(this->PreviousInteractor);
+    this->GetPVWindow()->GetMainView()->SetInteractor(this->PreviousInteractor);
     }
   
   if (this->Interactor)

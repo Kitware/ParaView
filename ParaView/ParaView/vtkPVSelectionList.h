@@ -50,22 +50,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVSelectionList_h
 #define __vtkPVSelectionList_h
 
-#include "vtkKWWidget.h"
+#include "vtkPVWidget.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
 
 class vtkStringList;
 
-class VTK_EXPORT vtkPVSelectionList : public vtkKWWidget
+class VTK_EXPORT vtkPVSelectionList : public vtkPVWidget
 {
 public:
   static vtkPVSelectionList* New();
-  vtkTypeMacro(vtkPVSelectionList, vtkKWWidget);
+  vtkTypeMacro(vtkPVSelectionList, vtkPVWidget);
   
   // Description:
   // Creates common widgets.
   // Returns 0 if there was an error.
   int Create(vtkKWApplication *app);
+
+  // Description:
+  // Set the method names that will be used during Reset and Accept.
+  void SetAccessMethods(const char* setCmd, const char* getCmd);
 
   // Add items to the possible selection.
   // The string name is displayed in the list, and the integer value
@@ -73,7 +77,17 @@ public:
   void AddItem(const char *name, int value);
   
   // Description:
-  // This is how the user can query the stat of the selection.
+  // Set the label of the menu.
+  void SetLabel(const char *label);
+  const char *GetLabel() {return this->Label->GetLabel();}
+
+  // Description:
+  // Called when accept button is pushed.  Just adds to trace
+  // file and calls supperclass accept.
+  virtual void Accept();
+
+  // Description:
+  // This is how the user can query the state of the selection.
   // Warning:  Setting the current value will not change vtk ivar.
   vtkGetMacro(CurrentValue, int);
   void SetCurrentValue(int val);
@@ -83,10 +97,6 @@ public:
   // This method gets called when the user selects an entry.
   // Use this method if you want to programmatically change the selection.
   void SelectCallback(const char *name, int value);
-
-  // Description:
-  // When set, the command is executed every time the mode is changed.
-  void SetCommand(vtkKWObject *o, const char *method);
   
 protected:
   vtkPVSelectionList();
@@ -94,6 +104,7 @@ protected:
   vtkPVSelectionList(const vtkPVSelectionList&) {};
   void operator=(const vtkPVSelectionList&) {};
 
+  vtkKWLabel *Label;
   vtkKWMenuButton *MenuButton;
   char *Command;
 

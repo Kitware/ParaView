@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVThreshold.h"
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVSourceInterface.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
@@ -84,6 +85,12 @@ vtkPVThreshold::~vtkPVThreshold()
 //----------------------------------------------------------------------------
 vtkPVThreshold* vtkPVThreshold::New()
 {
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVThreshold");
+  if(ret)
+    {
+    return (vtkPVThreshold*)ret;
+    }
   return new vtkPVThreshold();
 }
 
@@ -171,7 +178,7 @@ void vtkPVThreshold::CreateProperties()
                                 "GetAllScalars", "If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.",
                                 this->GetVTKSourceTclName());
   this->Widgets->AddItem(this->AllScalarsCheck);
-  this->AllScalarsCheck->GetCheckButton()->SetState(1);
+  this->AllScalarsCheck->SetState(1);
 
   this->Script("pack %s %s %s",
                this->UpperValueScale->GetWidgetName(),
@@ -387,7 +394,7 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
         << this->LowerValueScale->GetValue() << " "
         << this->UpperValueScale->GetValue() << "\n\t"
         << this->VTKSourceTclName << " SetAllScalars "
-        << this->AllScalarsCheck->GetCheckButton()->GetState() << "\n\n";
+        << this->AllScalarsCheck->GetState() << "\n\n";
   
   this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
 }
