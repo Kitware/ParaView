@@ -1631,6 +1631,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
   this->GetMainView()->AddComposite(calc);
   calc->CreateProperties();
   this->AddPVSource(calc);
+  this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1713,6 +1714,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
   cutPlane->CreateProperties();
 
   this->AddPVSource(cutPlane);
+  this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1790,6 +1792,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
   this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
   this->AddPVSource(threshold);
+  this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1872,6 +1875,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
   this->GetMainView()->AddComposite(clipPlane);
   clipPlane->CreateProperties();
   this->AddPVSource(clipPlane);
+  this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -1956,6 +1960,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   contour->CreateProperties();
   contour->SetPVInput(current);
   this->AddPVSource(contour);
+  this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -2034,6 +2039,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
   this->GetMainView()->AddComposite(pvGlyph);
   pvGlyph->CreateProperties();
   this->AddPVSource(pvGlyph);
+  this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -2111,6 +2117,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   this->GetMainView()->AddComposite(probe);
   probe->CreateProperties();
   this->AddPVSource(probe);
+  this->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();

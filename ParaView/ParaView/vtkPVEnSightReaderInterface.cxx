@@ -201,6 +201,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     sprintf(srcTclName, "%s_%d", tclName, i+1);
     pvs->SetName(srcTclName);
     this->PVWindow->AddPVSource(pvs);
+    this->PVWindow->ShowCurrentSourceProperties();
     pvs->SetPVOutput(pvd);
     pvs->Accept();
     

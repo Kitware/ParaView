@@ -163,6 +163,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   this->PVWindow->GetMainView()->AddComposite(pvs);
   pvs->CreateProperties();
   this->PVWindow->AddPVSource(pvs);
+  this->PVWindow->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();

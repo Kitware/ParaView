@@ -192,6 +192,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     }
 
   this->PVWindow->AddPVSource(pvs);
+  this->PVWindow->ShowCurrentSourceProperties();
 
   // Create the output.
   pvd = vtkPVData::New();
