@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVGUIClientOptions.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.8");
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.9");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
@@ -147,6 +147,11 @@ int vtkPVProcessModuleGUIHelper::OpenConnectionDialog(int* start)
   if(!pm)
     {
     vtkErrorMacro("Attempt to call OpenConnectionDialog without using a vtkPVClientServerModule");
+    return 0;
+    }
+  if(!pvApp)
+    {
+    vtkErrorMacro("Attempt to call OpenConnectionDialog without using a vtkPVApplication");
     return 0;
     }
     
