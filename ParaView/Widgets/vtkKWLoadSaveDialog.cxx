@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.17");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.18");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -119,6 +119,7 @@ int vtkKWLoadSaveDialog::Invoke()
     {
     this->SetFileName(path);
     this->GenerateLastPath(path);
+    res = 1;
     }
   else
     {
