@@ -90,6 +90,9 @@ protected:
   virtual ~vtkVectorIterator() {}
 
   vtkIdType Index;
+
+  vtkVectorIterator(const vtkVectorIterator&); // Not implemented
+  void operator=(const vtkVectorIterator&); // Not implemented
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION

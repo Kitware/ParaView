@@ -91,6 +91,9 @@ protected:
   virtual ~vtkLinkedListIterator() {}
 
   vtkLinkedListNode<DType> *Pointer;
+
+  vtkLinkedListIterator(const vtkLinkedListIterator&); // Not implemented
+  void operator=(const vtkLinkedListIterator&); // Not implemented
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
