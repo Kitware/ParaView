@@ -94,7 +94,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.17.2.2");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.17.2.3");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -1747,14 +1747,6 @@ void vtkRedistributePolyData::SendCells
         }
       }
 
-    inputNumCells = 0;
-    if (inputCellArrays[type])
-      {
-      inputNumCells = inputCellArrays[type]->GetNumberOfCells();
-      }
-    cellOffset += inputNumCells;
-
-
     // ... output needed for flags only (assumes flags are the same 
     //   on all processors) ...
 
@@ -1771,6 +1763,14 @@ void vtkRedistributePolyData::SendCells
       this->SendDataArrays (inputCellData, outputCellData, 
                             numCells[type],sendTo, fromIds, typetag);
       }
+
+    inputNumCells = 0;
+    if (inputCellArrays[type])
+      {
+      inputNumCells = inputCellArrays[type]->GetNumberOfCells();
+      }
+    cellOffset += inputNumCells;
+
     delete [] fromIds; // this array was allocated above in 
     // this case
     }
