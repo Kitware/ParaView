@@ -160,6 +160,10 @@ public:
   // i > 0 - time
   void SwitchScriptTime(int i);
 
+  // Description:
+  // Set custom script
+  void SetCustomScript(const char* script);
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();

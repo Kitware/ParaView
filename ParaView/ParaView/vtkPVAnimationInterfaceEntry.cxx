@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.11");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -436,6 +436,7 @@ void vtkPVAnimationInterfaceEntry::SetPVSource(vtkPVSource* src)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::NoMethodCallback()
 {
+  this->AddTraceEntry("$kw(%s) NoMethodCallback", this->GetTclName());
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->SetScript(0);
@@ -448,6 +449,7 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
 {
+  this->AddTraceEntry("$kw(%s) ScriptMethodCallback", this->GetTclName());
   this->Dirty = 1;
   this->SetCurrentMethod(0);
   this->UpdateMethodMenu();
@@ -661,17 +663,25 @@ void vtkPVAnimationInterfaceEntry::SetupBinds()
     "UpdateStartEndValueFromEntry"); 
   this->ScriptEditor->SetBind(this, "<FocusOut>",
     "ScriptEditorCallback");
-  this->ScriptEditor->SetBind(this, "<KeyPress>",
+  this->ScriptEditor->SetBind(this, "<KeyPress-Return>",
     "ScriptEditorCallback");
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::SetCustomScript(const char* script)
+{
+  this->Dirty = 1;
+  this->SetScript(script);
+  this->AddTraceEntry("$kw(%s) SetCustomScript {%s}", this->GetTclName(),
+    script);
+  this->Parent->UpdateNewScript();
+  this->Parent->ShowEntryInFrame(this);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::ScriptEditorCallback()
 {
-  this->Dirty = 1;
-  this->SetScript(this->ScriptEditor->GetValue());
-  this->Parent->UpdateNewScript();
-  this->Parent->ShowEntryInFrame(this);
+  this->SetCustomScript(this->ScriptEditor->GetValue());
 }
 
 //-----------------------------------------------------------------------------
