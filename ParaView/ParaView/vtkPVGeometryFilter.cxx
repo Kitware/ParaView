@@ -38,7 +38,7 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.19");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.20");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
@@ -136,7 +136,6 @@ void vtkPVGeometryFilter::Execute()
     vtkDataSet *ds = static_cast<vtkDataSet*>(input);
     if (!ds->GetNumberOfPoints())
       {
-      vtkErrorMacro("No input points");
       return;
       }
     }
