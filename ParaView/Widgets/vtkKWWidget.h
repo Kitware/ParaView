@@ -234,6 +234,8 @@ protected:
   char *TraceName;
   int Enabled;
 
+  void UpdateEnableState();
+
 private:
   vtkKWWidget(const vtkKWWidget&); // Not implemented
   void operator=(const vtkKWWidget&); // Not implemented

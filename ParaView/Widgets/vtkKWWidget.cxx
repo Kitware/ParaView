@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.50");
+vtkCxxRevisionMacro(vtkKWWidget, "1.51");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -153,29 +153,17 @@ const char *vtkKWWidget::GetWidgetName()
 void vtkKWWidget::Create(vtkKWApplication *app, const char *name, 
                          const char *args)
 {
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("widget already created");
     return;
     }
-  this->SetApplication(app);
-  this->Script("%s %s %s",name,this->GetWidgetName(),(args?args:""));
 
-  const char* type = this->GetType();
-  if ( !vtkString::Equals(type, "Frame") && 
-       !vtkString::Equals(type, "Menu")  && 
-       !vtkString::Equals(type, "Label")  && 
-       !vtkString::Equals(type, "Canvas") && 
-       !vtkString::Equals(type, "Scrollbar") && 
-       !vtkString::Equals(type, "Listbox") && 
-       !vtkString::Equals(type, "Toplevel") &&
-       !vtkString::Equals(type, "Tree"))
-    {
-    this->Script("%s configure -state %s", 
-                 this->GetWidgetName(),
-                 (this->Enabled ? "normal" : "disabled"));
-    }
+  this->SetApplication(app);
+
+  this->Script("%s %s %s", name, this->GetWidgetName(), (args ? args : ""));
+
+  this->UpdateEnableState();
 }
 
 //------------------------------------------------------------------------------
@@ -341,7 +329,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.50 $");
+  this->ExtractRevision(os,"$Revision: 1.51 $");
 }
 
 //------------------------------------------------------------------------------
@@ -455,23 +443,32 @@ void vtkKWWidget::SetEnabled(int e)
     }
   this->Enabled = e;
 
-  if ( this->Application )
+  this->UpdateEnableState();
+  this->Modified();
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWidget::UpdateEnableState()
+{
+  if (this->IsCreated())
     {
     const char* type = this->GetType();
-
-    if ( !vtkString::Equals(type, "Frame") && 
-         !vtkString::Equals(type, "Menu")  && 
-         !vtkString::Equals(type, "Canvas") && 
-         !vtkString::Equals(type, "Label") && 
-         !vtkString::Equals(type, "Scrollbar") && 
-         !vtkString::Equals(type, "Listbox") && 
-         !vtkString::Equals(type, "Toplevel"))
+    if (!vtkString::Equals(type, "Frame") && 
+        !vtkString::Equals(type, "Menu")  && 
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 3)
+        !vtkString::Equals(type, "Label")  &&
+#endif 
+        !vtkString::Equals(type, "Canvas") && 
+        !vtkString::Equals(type, "Scrollbar") && 
+        !vtkString::Equals(type, "Listbox") && 
+        !vtkString::Equals(type, "Toplevel") &&
+        !vtkString::Equals(type, "Tree"))
       {
-      this->Script("%s configure -state %s", this->GetWidgetName(),
+      this->Script("%s configure -state %s", 
+                   this->GetWidgetName(), 
                    (this->Enabled ? "normal" : "disabled"));
       }
     }
-  this->Modified();
 }
 
 //------------------------------------------------------------------------------
