@@ -60,7 +60,7 @@ static int tet_edges[6][2] = { {0,1}, {1,2}, {2,0},
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.1");
+vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.2");
 vtkStandardNewMacro(vtkProjectedTetrahedraMapper);
 
 vtkCxxSetObjectMacro(vtkProjectedTetrahedraMapper,
@@ -193,15 +193,10 @@ void vtkProjectedTetrahedraMapper::Render(vtkRenderer *renderer,
       }
     glBindTexture(GL_TEXTURE_2D, this->OpacityTexture);
 
-//     // This is weird, but for some reason the blending leaves the object
-//     // looking more vacuous than it should.  If I double the attenuation,
-//     // it looks about right.  I can do the equivalent by simply scaling the
-//     // unit distance.
-//     float unit_distance = 0.5*volume->GetProperty()->GetScalarOpacityUnitDistance();
     float unit_distance = volume->GetProperty()->GetScalarOpacityUnitDistance();
 
 #define TEXRES  258
-    float *texture = new float[TEXRES*TEXRES];
+    float *texture = new float[4*TEXRES*TEXRES];
     for (int depthi = 0; depthi < TEXRES; depthi++)
       {
       if (renderer->GetRenderWindow()->CheckAbortStatus())
@@ -213,17 +208,23 @@ void vtkProjectedTetrahedraMapper::Render(vtkRenderer *renderer,
 //       for (int opacityi = 0; opacityi < TEXRES; opacityi++)
 //         {
 //         float opacity = (float)opacityi/(TEXRES-1);
-//         texture[depthi*TEXRES + opacityi]
-//           = CorrectOpacityForDepth(opacity, depth/unit_distance);
+//         float alpha = CorrectOpacityForDepth(opacity, depth/unit_distance);
+//         texture[4*(depthi*TEXRES + opacityi) + 0] = alpha;
+//         texture[4*(depthi*TEXRES + opacityi) + 1] = alpha;
+//         texture[4*(depthi*TEXRES + opacityi) + 2] = alpha;
+//         texture[4*(depthi*TEXRES + opacityi) + 3] = alpha;
 //         }
       for (int attenuationi = 0; attenuationi < TEXRES; attenuationi++)
         {
         float attenuation = (float)attenuationi/(TEXRES);
-        texture[depthi*TEXRES + attenuationi]
-          = 1 - (float)exp(-attenuation*depth/unit_distance);
+        float alpha = 1 - (float)exp(-attenuation*depth/unit_distance);
+        texture[4*(depthi*TEXRES + attenuationi) + 0] = alpha;
+        texture[4*(depthi*TEXRES + attenuationi) + 1] = alpha;
+        texture[4*(depthi*TEXRES + attenuationi) + 2] = alpha;
+        texture[4*(depthi*TEXRES + attenuationi) + 3] = alpha;
         }
       }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_INTENSITY, TEXRES, TEXRES, 1, GL_RED,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TEXRES, TEXRES, 1, GL_RGBA,
                  GL_FLOAT, texture);
     delete[] texture;
 
