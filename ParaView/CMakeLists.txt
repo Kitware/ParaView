@@ -217,7 +217,7 @@ IF (PARAVIEW_CAN_BUILD)
                   ${PARAVIEW_BINARY_DIR}/Widgets
                   ${PARAVIEW_BINARY_DIR}/ParaView)
 
- SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/ParaView)
+ SET (PARAVIEW_EXECUTABLE ${EXECUTABLE_OUTPUT_PATH}/paraview)
 
 # Include the standard Dart testing module
  INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
