@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVComponentSelection);
-vtkCxxRevisionMacro(vtkPVComponentSelection, "1.9");
+vtkCxxRevisionMacro(vtkPVComponentSelection, "1.9.4.1");
 
 //---------------------------------------------------------------------------
 vtkPVComponentSelection::vtkPVComponentSelection()
@@ -61,6 +61,7 @@ vtkPVComponentSelection::vtkPVComponentSelection()
   this->ObjectTclName = NULL;
   this->VariableName = NULL;
   this->NumberOfComponents = 0;
+  this->LastAcceptedState = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -69,6 +70,11 @@ vtkPVComponentSelection::~vtkPVComponentSelection()
   this->CheckButtons->Delete();
   this->SetObjectTclName(NULL);
   this->SetVariableName(NULL);
+  if (this->LastAcceptedState)
+    {
+    delete [] this->LastAcceptedState;
+    this->LastAcceptedState = NULL;
+    }
 }
 
 //---------------------------------------------------------------------------
@@ -91,6 +97,8 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
+
+  this->LastAcceptedState = new unsigned char[this->NumberOfComponents];
   
   for (i = 0; i <= this->NumberOfComponents; i++)
     {
@@ -106,6 +114,7 @@ void vtkPVComponentSelection::Create(vtkKWApplication *app)
                            this->VariableName, i, i);
     this->Script("pack %s", button->GetWidgetName());
     button->Delete();
+    this->LastAcceptedState[i] = 1;
     }
 }
 
@@ -150,6 +159,7 @@ void vtkPVComponentSelection::AcceptInternal(const char* sourceTclName)
                                sourceTclName, this->VariableName,
                                i, -1);
         }
+      this->LastAcceptedState[i] = this->GetState(i);
       }
     }
   
@@ -158,7 +168,7 @@ void vtkPVComponentSelection::AcceptInternal(const char* sourceTclName)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVComponentSelection::ResetInternal(const char* sourceTclName)
+void vtkPVComponentSelection::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
@@ -175,9 +185,7 @@ void vtkPVComponentSelection::ResetInternal(const char* sourceTclName)
 
   for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
     {
-    this->Script("%s SetState %d [expr [%s GetValue %d]+1]",
-                 this->GetTclName(), i, sourceTclName,
-                 i);
+    this->SetState(i, this->LastAcceptedState[i]);
     }
   
   this->ModifiedFlag = 0;

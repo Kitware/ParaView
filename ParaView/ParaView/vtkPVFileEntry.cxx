@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.52");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -83,6 +83,8 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->Ext = 0;
   this->Path = 0;
   this->Range[0] = this->Range[1] = 0;
+  
+  this->LastAcceptedFileName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -102,6 +104,8 @@ vtkPVFileEntry::~vtkPVFileEntry()
   this->SetPrefix(0);
   this->SetExt(0);
   this->SetPath(0);
+  
+  this->SetLastAcceptedFileName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -574,6 +578,7 @@ void vtkPVFileEntry::AcceptInternal(const char* sourceTclName)
 
   pvApp->BroadcastScript("%s Set%s {%s}",
                          sourceTclName, this->VariableName, fname);
+  this->SetLastAcceptedFileName(fname);  
 
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
   if (rm && fname && fname[0])
@@ -590,12 +595,13 @@ void vtkPVFileEntry::AcceptInternal(const char* sourceTclName)
 
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::ResetInternal(const char* sourceTclName)
+void vtkPVFileEntry::ResetInternal()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  pvApp->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(),
-                sourceTclName, this->VariableName); 
+//  pvApp->Script("%s SetValue [%s Get%s]", this->Entry->GetTclName(),
+//                sourceTclName, this->VariableName); 
+  this->SetValue(this->LastAcceptedFileName);
 
   this->ModifiedFlag = 0;
 }

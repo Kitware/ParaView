@@ -85,7 +85,7 @@ public:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

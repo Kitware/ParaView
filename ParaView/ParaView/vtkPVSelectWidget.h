@@ -163,7 +163,7 @@ public:
   // Description:
   // Called when reset button is pushed.
   // Sets UI current value from objects variable.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
@@ -172,7 +172,6 @@ public:
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
-
 
   int FindIndex(const char* str, vtkStringList *list);
   void SetCurrentIndex(int idx);
@@ -192,6 +191,9 @@ protected:
   int CurrentIndex;
   int UseWidgetCommand;
 
+  char* LastAcceptedValue;
+  vtkSetStringMacro(LastAcceptedValue);
+  
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

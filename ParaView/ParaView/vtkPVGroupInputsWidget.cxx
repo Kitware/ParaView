@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.13.4.1");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -112,7 +112,7 @@ void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGroupInputsWidget::ResetInternal(const char*)
+void vtkPVGroupInputsWidget::ResetInternal()
 {
   int idx;
   vtkPVWindow *pvWin;

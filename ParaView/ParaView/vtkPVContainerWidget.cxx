@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.14.4.1");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -183,7 +183,7 @@ void vtkPVContainerWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::ResetInternal(const char* sourceTclName)
+void vtkPVContainerWidget::ResetInternal()
 {
 
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
@@ -194,7 +194,7 @@ void vtkPVContainerWidget::ResetInternal(const char* sourceTclName)
     it->GetData(widget);
     if (widget)
       {
-      widget->ResetInternal(sourceTclName);
+      widget->ResetInternal();
       }
     it->GoToNextItem();
     }

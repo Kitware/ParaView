@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.3.4.1");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -77,7 +77,8 @@ vtkPVFieldMenu::vtkPVFieldMenu()
   this->FieldMenu = vtkKWOptionMenu::New();
   this->Value = vtkDataSet::POINT_DATA_FIELD;
   
-  this->SuppressReset = 1;
+  this->LastAcceptedAttributeMode = 0;
+  this->AcceptedValueInitialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -217,6 +218,8 @@ void vtkPVFieldMenu::AcceptInternal(const char* sourceTclName)
     pvApp->BroadcastScript("%s SetAttributeMode %d", 
                            sourceTclName, this->Value);
     }
+  
+  this->SetLastAcceptedAttributeMode(this->Value);
 
   this->ModifiedFlag = 0;
 }
@@ -238,12 +241,13 @@ void vtkPVFieldMenu::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVFieldMenu::ResetInternal(const char* sourceTclName)
+void vtkPVFieldMenu::ResetInternal()
 {
   // Get the selected array form the VTK filter.
-  this->Script("%s SetValue [%s GetAttributeMode]",
-               this->GetTclName(), 
-               sourceTclName);
+//  this->Script("%s SetValue [%s GetAttributeMode]",
+//               this->GetTclName(), 
+//               sourceTclName);
+  this->SetValue(this->LastAcceptedAttributeMode);
 
   this->ModifiedFlag = 0;
   // Do we really need to update?
@@ -335,6 +339,12 @@ void vtkPVFieldMenu::Update()
     this->FieldMenu->SetCurrentEntry("Cell Data");
     }
 
+  if (!this->AcceptedValueInitialized)
+    {
+    this->SetLastAcceptedAttributeMode(this->Value);
+    this->AcceptedValueInitialized = 1;
+    }
+  
   // This updates any array menu dependent on this widget.
   this->vtkPVWidget::Update();
 }

@@ -78,7 +78,7 @@ public:
   
   // Description:
   // This method resets the widget values from the VTK filter.
-  virtual void ResetInternal(const char* vtkSourceTclName);
+  virtual void ResetInternal();
 
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.

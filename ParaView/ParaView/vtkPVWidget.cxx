@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.2");
+vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.3");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -185,11 +185,10 @@ void vtkPVWidget::Reset()
     return;
     }
   this->ResetInternal();
-  this->ResetInternal(this->PVSource->GetVTKSourceTclName(0));
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWidget::ResetInternal(const char*)
+void vtkPVWidget::ResetInternal()
 {
   // Get rid of this eventually.  Display widgets (label) do not really
   // need to implement this method.

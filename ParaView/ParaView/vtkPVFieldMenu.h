@@ -113,7 +113,7 @@ public:
   // Called when the accept or reset button is pressed.
   // This internal version is passed VTK source name,
   virtual void AcceptInternal(const char* sourceTclName);
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
 protected:
   vtkPVFieldMenu();
@@ -135,7 +135,11 @@ protected:
   vtkPVInputProperty* GetInputProperty();
 
   int Value;
-
+  
+  int LastAcceptedAttributeMode;
+  vtkSetMacro(LastAcceptedAttributeMode, int);
+  int AcceptedValueInitialized;
+  
 //BTX
   virtual vtkPVWidget* ClonePrototypeInternal(vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

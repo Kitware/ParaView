@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.3.4.1");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -300,7 +300,7 @@ void vtkPVSelectCTHArrays::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectCTHArrays::ResetInternal(const char*)
+void vtkPVSelectCTHArrays::ResetInternal()
 {
   if (this->Active)
     {

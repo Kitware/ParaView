@@ -241,8 +241,7 @@ public:
   // Most subclasses implement these methods to move state from VTK objects
   // to the widget.  The Tcl name of the VTK object is supplied as a parameter.
   virtual void AcceptInternal(const char* sourceTclName);
-  virtual void ResetInternal(const char* sourceTclName);
-  virtual void ResetInternal() {}
+  virtual void ResetInternal();
 
 protected:
   vtkPVWidget();

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.17");
+vtkCxxRevisionMacro(vtkPVScale, "1.17.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -62,6 +62,8 @@ vtkPVScale::vtkPVScale()
   this->LabelWidget = vtkKWLabel::New();
   this->Scale = vtkKWScale::New();
   this->Round = 0;
+  this->LastAcceptedValue = 0;
+  this->AcceptedValueInitialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -218,7 +220,14 @@ void vtkPVScale::SetValue(float val)
     return;
     }
 
-  this->Scale->SetValue(newVal); 
+  this->Scale->SetValue(newVal);
+  
+  if (!this->AcceptedValueInitialized)
+    {
+    this->SetLastAcceptedValue(newVal);
+    this->AcceptedValueInitialized = 1;
+    }
+  
   this->ModifiedCallback();
 }
 
@@ -237,6 +246,7 @@ void vtkPVScale::AcceptInternal(const char* sourceTclName)
                              sourceTclName,
                              this->VariableName, 
                              this->RoundValue(this->GetValue()));
+      this->SetLastAcceptedValue(this->RoundValue(this->GetValue()));
       }
     else
       {
@@ -244,6 +254,7 @@ void vtkPVScale::AcceptInternal(const char* sourceTclName)
                              sourceTclName,
                              this->VariableName, 
                              this->GetValue());
+      this->SetLastAcceptedValue(this->GetValue());
       }
     }
 
@@ -264,13 +275,14 @@ void vtkPVScale::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVScale::ResetInternal(const char* sourceTclName)
+void vtkPVScale::ResetInternal()
 {
-  if (sourceTclName && this->VariableName)
-    {
-    this->Script("%s SetValue [%s Get%s]", this->Scale->GetTclName(),
-                  this->ObjectTclName, this->VariableName);
-    }
+//  if (sourceTclName && this->VariableName)
+//    {
+//    this->Script("%s SetValue [%s Get%s]", this->Scale->GetTclName(),
+//                  this->ObjectTclName, this->VariableName);
+//    }
+  this->SetValue(this->LastAcceptedValue);
 
   this->ModifiedFlag = 0;
 }

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.1");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.2");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -74,6 +74,8 @@ vtkPVSelectWidget::vtkPVSelectWidget()
   this->CurrentIndex = -1;
   this->EntryLabel = 0;
   this->UseWidgetCommand = 0;
+  
+  this->LastAcceptedValue = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -90,6 +92,7 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
   this->Widgets->Delete();
   this->Widgets = NULL;
   this->SetEntryLabel(0);
+  this->SetLastAcceptedValue(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -148,8 +151,8 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
     {
     this->Menu->SetValue(this->Labels->GetString(0));
     this->SetCurrentIndex(0);
+    this->SetLastAcceptedValue(this->GetVTKValue(0));
     }
-
 }
 
 
@@ -203,7 +206,9 @@ void vtkPVSelectWidget::AcceptInternal(const char* sourceTclName)
     pvApp->BroadcastScript("%s Set%s %s",
                            sourceTclName,
                            this->VariableName,
-                           this->GetCurrentVTKValue()); 
+                           this->GetCurrentVTKValue());
+
+    this->SetLastAcceptedValue(this->GetCurrentVTKValue());
     }
 
   if (this->CurrentIndex >= 0)
@@ -236,20 +241,19 @@ void vtkPVSelectWidget::Trace(ofstream *file)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSelectWidget::ResetInternal(const char* sourceTclName)
+void vtkPVSelectWidget::ResetInternal()
 {
   int index=-1, i;
   int num = this->Values->GetNumberOfStrings();
   const char* value;
-  const char* tmp;
   char* currentValue;
 
-  this->Script("%s Get%s",sourceTclName,this->VariableName);
-  tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
-  if (tmp && strlen(tmp) > 0)
+//  this->Script("%s Get%s",sourceTclName,this->VariableName);
+//  tmp = Tcl_GetStringResult(this->Application->GetMainInterp());
+  if (this->LastAcceptedValue && strlen(this->LastAcceptedValue) > 0)
     {
-    currentValue = new char[strlen(tmp)+1];
-    strcpy(currentValue, tmp);
+    currentValue = new char[strlen(this->LastAcceptedValue)+1];
+    strcpy(currentValue, this->LastAcceptedValue);
     for (i = 0; i < num; ++i)
       {
       value = this->GetVTKValue(i);
@@ -279,7 +283,6 @@ void vtkPVSelectWidget::ResetInternal(const char* sourceTclName)
     vtkPVWidget *pvw;
     pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
     pvw->ResetInternal();
-    pvw->ResetInternal(sourceTclName);
     }
 }
 
@@ -296,7 +299,7 @@ void vtkPVSelectWidget::SetCurrentValue(const char *val)
     return;
     }
   this->Menu->SetValue(val);
-  this->SetCurrentIndex(idx);
+  this->SetCurrentIndex(idx);  
 }
 
 //-----------------------------------------------------------------------------
