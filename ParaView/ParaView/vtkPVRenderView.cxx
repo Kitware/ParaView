@@ -735,28 +735,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::PackProperties()
-{
-  // make sure the view is packed if necc
-  if (this->SharedPropertiesParent)
-    {
-    // if the windows prop is not currently this views prop
-    this->Script("pack slaves %s",
-                 this->PropertiesParent->GetParent()->GetWidgetName());
-    if (strcmp(this->Application->GetMainInterp()->result,
-               this->PropertiesParent->GetWidgetName()))
-      {
-      // forget current props
-      this->Script("pack forget [pack slaves %s]",
-                   this->PropertiesParent->GetParent()->GetWidgetName());  
-      this->Script("pack %s -side left -anchor nw -fill both -expand t",
-                   this->PropertiesParent->GetWidgetName());
-      }
-    }
-}
-
-
-//----------------------------------------------------------------------------
 vtkKWWidget *vtkPVRenderView::GetSourceParent()
 {
   return this->SplitFrame->GetFrame2();
@@ -2257,7 +2235,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.188 $");
+  this->ExtractRevision(os,"$Revision: 1.189 $");
 }
 
 //------------------------------------------------------------------------------
