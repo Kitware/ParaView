@@ -69,7 +69,9 @@ void vtkKWSaveImageDialog::Invoke()
       {
       free(path);
       }
-    path = strdup(this->Application->GetMainInterp()->result);
+    path =  
+      strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
+	     this->Application->GetMainInterp()->result);
     if (strlen(path) == 0)
       {
       done = 1;

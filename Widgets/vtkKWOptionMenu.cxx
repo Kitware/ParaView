@@ -73,7 +73,9 @@ char *vtkKWOptionMenu::GetValue()
     {
     delete [] this->CurrentValue;
     }
-  this->CurrentValue = strdup(this->Application->GetMainInterp()->result);
+  this->CurrentValue = 
+    strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
+	   this->Application->GetMainInterp()->result);
   return this->CurrentValue;  
 }
 

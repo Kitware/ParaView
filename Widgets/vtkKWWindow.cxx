@@ -2603,7 +2603,9 @@ void vtkKWWindow::LoadScript()
   char *path = NULL;
 
   this->Script("tk_getOpenFile -title \"Load Script\" -filetypes {{{Tcl Script} {.tcl}}}");
-  path = strdup(this->Application->GetMainInterp()->result);
+  path = 
+    strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
+	   this->Application->GetMainInterp()->result);
   if (strlen(path) != 0)
     {
     FILE *fin = fopen(path,"r");
@@ -2853,5 +2855,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.12 $");
+  this->ExtractRevision(os,"$Revision: 1.13 $");
 }

@@ -577,7 +577,9 @@ void vtkKWView::Print()
   w2i->Update();
   
   this->Script("tk_getSaveFile -title \"Save Postscript\" -filetypes {{{Postscript} {.ps}}}");
-  char *path = strdup(this->Application->GetMainInterp()->result);
+  char* path = 
+    strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
+	   this->Application->GetMainInterp()->result);
   if (strlen(path) != 0)
     {
     vtkPostScriptWriter *psw = vtkPostScriptWriter::New();
@@ -1054,5 +1056,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.5 $");
+  this->ExtractRevision(os,"$Revision: 1.6 $");
 }

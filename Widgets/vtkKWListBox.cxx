@@ -77,6 +77,7 @@ const char* vtkKWListBox::GetItem(int index)
 {
   this->Script("%s.list get %d", this->GetWidgetName(), index);
   char* result = this->Application->GetMainInterp()->result;
+  delete [] this->Item;
   this->Item = strcpy(new char[strlen(result)+1], result);
   return this->Item;
 }

@@ -57,6 +57,11 @@ vtkKWLabel::~vtkKWLabel()
 
 void vtkKWLabel::SetLabel(const char* l)
 {
+  if(!l)
+    {
+    l = "";
+    }
+  
   delete [] this->Label;
   this->Label = strcpy(new char[strlen(l)+1], l);
   if(this->Application)
