@@ -83,8 +83,8 @@ ENDIF (VTK_BINARY_DIR )
 
 IF (PARAVIEW_CAN_BUILD)
 
- SUBDIRS(Widgets ParaView)
- SUBDIR_DEPENDS(ParaView Widgets)
+ SUBDIRS(Widgets Utilities/Expat ParaView)
+ SUBDIR_DEPENDS(ParaView Widgets Utilities/Expat)
 
  OPTION(BUILD_SHARED_LIBS "Build ParaView with shared libraries." OFF)
  OPTION(BUILD_EXAMPLES "Build VTK examples." OFF)
