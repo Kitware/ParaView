@@ -18,7 +18,7 @@
 #include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVConnectivityFilter, "1.4");
+vtkCxxRevisionMacro(vtkPVConnectivityFilter, "1.5");
 vtkStandardNewMacro(vtkPVConnectivityFilter);
 
 vtkPVConnectivityFilter::vtkPVConnectivityFilter()
@@ -32,7 +32,11 @@ void vtkPVConnectivityFilter::Execute()
   this->Superclass::Execute();
   if (this->ColorRegions)
     {
-    this->GetOutput()->GetPointData()->GetScalars()->SetName("RegionId");
+    vtkDataArray* scalars = this->GetOutput()->GetPointData()->GetScalars();
+    if (scalars)
+      {
+      scalars->SetName("RegionId");
+      }
     }
 }
 
