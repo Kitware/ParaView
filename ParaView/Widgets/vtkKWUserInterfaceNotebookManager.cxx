@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.8");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.9");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -512,7 +512,7 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanel(
 //----------------------------------------------------------------------------
 void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
   int x, int y, 
-  vtkKWWidget *widget, vtkKWWidget *anchor, vtkKWWidget *target)
+  vtkKWWidget *widget, vtkKWWidget *vtkNotUsed(anchor), vtkKWWidget *target)
 {
   if (!this->Notebook || this->Notebook != target)
     {

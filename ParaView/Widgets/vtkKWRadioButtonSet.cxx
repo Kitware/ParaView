@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWRadioButtonSet);
-vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.4");
+vtkCxxRevisionMacro(vtkKWRadioButtonSet, "1.5");
 
 int vtkvtkKWRadioButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -231,7 +231,7 @@ int vtkKWRadioButtonSet::AddButton(int id,
 
   if (this->Buttons->GetNumberOfItems())
     {
-    vtkKWRadioButtonSet::ButtonSlot *first_slot;
+    vtkKWRadioButtonSet::ButtonSlot *first_slot = 0;
     if (this->Buttons->GetItem(0, first_slot) == VTK_OK)
       {
       button_slot->Button->SetVariableName(
