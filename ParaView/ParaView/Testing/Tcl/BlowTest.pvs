@@ -58,7 +58,7 @@ $normalsOutput ColorByPointFieldComponent thickness1 0
 
 RenWin1 SetSize 300 300
 
-for {set i 1} {$i <= 10} {incr i 1} {
+for {set i 1} {$i <= 2} {incr i 1} {
 	[$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
 	$normalsOutput ColorByPointFieldComponent thickness$i 0
     $pvWarp AcceptCallback
@@ -78,7 +78,7 @@ $pvWarp AcceptCallback
 
 $warpOutput SetVisibility 1
 
-for {set i 1} {$i <= 10} {incr i 1} {
+for {set i 8} {$i <= 10} {incr i 1} {
     [$pvWarp GetPVWidget {Vectors}] SetValue displacement$i
     [$warpOutput GetColorMenu] SetValue "Point thickness$i"
     $warpOutput ColorByPointFieldComponent thickness$i 0
