@@ -26,7 +26,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.15");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.16");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -349,7 +349,6 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
                              int x0, int x3, int y0, int y3, int z0, int z3)
 {
   double bds[6];
-  int dim = this->Dimensions;
   int x1, x2, y1, y2, z1, z2;
   
   if (this->TwoDimensional)
@@ -490,7 +489,6 @@ void vtkCTHFractal::AddVectorArray()
   vtkCTHData* output = this->GetOutput();
   int numCells = output->GetNumberOfCells();
   int numBlocks = output->GetNumberOfBlocks();
-  int numCellsPerBlock;
   vtkDoubleArray* array = vtkDoubleArray::New();
   int blockId;
   double* arrayPtr;
@@ -714,5 +712,6 @@ void vtkCTHFractal::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "FractalValue: " << this->FractalValue << endl;
   os << indent << "MaximumLevel: " << this->MaximumLevel << endl;
   os << indent << "GhostLevels: " << this->GhostLevels << endl;
+  os << indent << "Asymetric: " << this->Asymetric << endl;
 }
 
