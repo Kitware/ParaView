@@ -25,7 +25,7 @@
 #include "vtkCellData.h"
 
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.1");
+vtkCxxRevisionMacro(vtkPickFilter, "1.2");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -332,7 +332,11 @@ void vtkPickFilter::GetInputLayerPoints(vtkPoints* pts, int level,
 }
 
 //-----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 void vtkPickFilter::GatherPoints(vtkPoints* pts)
+#else
+void vtkPickFilter::GatherPoints(vtkPoints*)
+#endif
 {
 #ifdef VTK_USE_MPI
   vtkMPICommunicator* com = NULL;
@@ -390,7 +394,7 @@ void vtkPickFilter::GatherPoints(vtkPoints* pts)
     vtkErrorMacro("I only handle double and float points.");
     } 
   delete [] recvLengths;
-#endif VTK_USE_MPI
+#endif // VTK_USE_MPI
 }
 
 //-----------------------------------------------------------------------------
