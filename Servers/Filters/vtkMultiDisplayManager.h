@@ -87,9 +87,9 @@ public:
 
 //BTX
   enum Tags {
-    ROOT_RENDER_RMI_TAG=12721,
-    SATELLITE_RENDER_RMI_TAG=12722,
-    INFO_TAG=22135
+    ROOT_RENDER_RMI_TAG      = 12721,
+    SATELLITE_RENDER_RMI_TAG = 12722,
+    INFO_TAG                 = 22135
   };
 //ETX
 

@@ -42,7 +42,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.2");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.3");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 // Structures to communicate render info.
@@ -68,17 +68,17 @@ vtkPVMultiDisplayInfo::vtkPVMultiDisplayInfo()
 {
   this->UseCompositing = 0.0;
   this->ImageReductionFactor = 1.0;
-  this->CameraPosition[0] = 0.0;               
-  this->CameraPosition[1] = 0.0;               
-  this->CameraPosition[2] = 0.0;               
-  this->CameraFocalPoint[0] = 0.0;    
-  this->CameraFocalPoint[1] = 0.0;    
-  this->CameraFocalPoint[2] = 0.0;    
-  this->CameraViewUp[0] = 0.0;  
-  this->CameraViewUp[1] = 0.0;  
-  this->CameraViewUp[2] = 0.0;  
-  this->CameraClippingRange[0] = 0.0; 
-  this->CameraClippingRange[1] = 0.0; 
+  this->CameraPosition[0] = 0.0;
+  this->CameraPosition[1] = 0.0;
+  this->CameraPosition[2] = 0.0;
+  this->CameraFocalPoint[0] = 0.0;
+  this->CameraFocalPoint[1] = 0.0;
+  this->CameraFocalPoint[2] = 0.0;
+  this->CameraViewUp[0] = 0.0;
+  this->CameraViewUp[1] = 0.0;
+  this->CameraViewUp[2] = 0.0;
+  this->CameraClippingRange[0] = 0.0;
+  this->CameraClippingRange[1] = 0.0;
   this->LightPosition[0] = 0.0;
   this->LightPosition[1] = 0.0;
   this->LightPosition[2] = 0.0;
@@ -88,10 +88,10 @@ vtkPVMultiDisplayInfo::vtkPVMultiDisplayInfo()
   this->Background[0] = 0.0;
   this->Background[1] = 0.0;
   this->Background[2] = 0.0;
-  this->ParallelScale = 0.0;                         
-  this->CameraViewAngle = 0.0;                       
+  this->ParallelScale = 0.0;
+  this->CameraViewAngle = 0.0;
 }
-  
+
 
 
 //-------------------------------------------------------------------------
@@ -128,7 +128,9 @@ vtkMultiDisplayManager::vtkMultiDisplayManager()
   this->TileBufferArrayLength = 0;
 }
 
-  
+vtkCxxSetObjectMacro(vtkMultiDisplayManager,Controller,vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkMultiDisplayManager,SocketController,vtkSocketController);
+
 //-------------------------------------------------------------------------
 vtkMultiDisplayManager::~vtkMultiDisplayManager()
 {
@@ -903,45 +905,6 @@ void vtkMultiDisplayManager::SetRenderWindow(vtkRenderWindow *renWin)
                               (y+1.0)*(1.0/(float)(this->TileDimensions[1])));
       }
     }
-}
-
-
-//-------------------------------------------------------------------------
-void vtkMultiDisplayManager::SetController(vtkMultiProcessController *mpc)
-{
-  if (this->Controller == mpc)
-    {
-    return;
-    }
-  if (mpc)
-    {
-    mpc->Register(this);
-    }
-  if (this->Controller)
-    {
-    this->Controller->UnRegister(this);
-    }
-  this->Controller = mpc;
-}
-
-
-
-//-------------------------------------------------------------------------
-void vtkMultiDisplayManager::SetSocketController(vtkSocketController *mpc)
-{
-  if (this->SocketController == mpc)
-    {
-    return;
-    }
-  if (mpc)
-    {
-    mpc->Register(this);
-    }
-  if (this->SocketController)
-    {
-    this->SocketController->UnRegister(this);
-    }
-  this->SocketController = mpc;
 }
 
 

@@ -80,7 +80,7 @@ public:
 
   // Description:
   // This flag is needed to differentiate between client and server,
-  // since the socket controller allways thinks it is node 0.
+  // since the socket controller always thinks it is node 0.
   vtkSetMacro(ClientFlag, int);
   vtkGetMacro(ClientFlag, int);
 
@@ -112,12 +112,12 @@ public:
 
 //BTX
   enum Tags {
-    RENDER_RMI_TAG=12721,
-    WIN_INFO_TAG=22134,
-    REN_INFO_TAG=22135,
-    GATHER_Z_RMI_TAG=987987,
-    SERVER_Z_TAG=88771,
-    CLIENT_Z_TAG=88772
+    RENDER_RMI_TAG   = 12721,
+    WIN_INFO_TAG     = 22134,
+    REN_INFO_TAG     = 22135,
+    GATHER_Z_RMI_TAG = 987987,
+    SERVER_Z_TAG     = 88771,
+    CLIENT_Z_TAG     = 88772
   };
 //ETX
 
