@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMultiProcessController.h"
 #include "vtkPVApplication.h"
 #include "vtkTclUtil.h"
+#include "vtkToolkits.h"
 //#include "kwinit.h"
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
