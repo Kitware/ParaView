@@ -45,14 +45,14 @@ public:
 //BTX
   // Description: 
   // These flags are used to specify destination servers for the
-  // SendStream function.
+  // SendStream function. 
   enum ServerFlags
   {
     DATA_SERVER = 0x1,
-    CLIENT = 0x2,
+    DATA_SERVER_ROOT = 0x2,
     RENDER_SERVER = 0x4,
-    DATA_SERVER_ROOT = 0x8,
-    RENDER_SERVER_ROOT = 0x10,
+    RENDER_SERVER_ROOT = 0x8,
+    CLIENT = 0x10,
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
   };
 
@@ -60,6 +60,17 @@ public:
     {
     PROGRESS_EVENT_TAG = 31415
     };
+
+  static inline ServerFlags GetRootId(ServerFlags serverId)
+    {
+      if (serverId > RENDER_SERVER)
+        {
+        vtkGenericWarningMacro("Server ID correspond to either data or "
+                               "render server");
+        return  static_cast<ServerFlags>(0);
+        }
+      return static_cast<ServerFlags>(serverId << 1);
+    }
 //ETX
   
   vtkTypeRevisionMacro(vtkProcessModule,vtkObject);
