@@ -71,12 +71,9 @@ public:
   void SetLabel(const char *);
   
   // Description:
-  // get the internal label
-  vtkKWLabel *GetLabel() { return this->Label; }
-  
-  // Description:
-  // get the internal entry
-  vtkKWEntry *GetEntry() { return this->Entry; }
+  // Get the internal objects
+  vtkGetObjectMacro(Label, vtkKWLabel);
+  vtkGetObjectMacro(Entry, vtkKWEntry);
   
   // Description:
   // Set/Get the value of the entry in a few different formats.

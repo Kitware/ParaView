@@ -47,41 +47,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledEntry );
-vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.7");
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.8");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWLabeledEntry::vtkKWLabeledEntry()
 {
   this->CommandFunction = vtkKWLabeledEntryCommand;
 
   this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
   this->Entry = vtkKWEntry::New();
-  this->Entry->SetParent(this);
 }
 
+//----------------------------------------------------------------------------
 vtkKWLabeledEntry::~vtkKWLabeledEntry()
 {
   this->Label->Delete();
   this->Label = NULL;
+
   this->Entry->Delete();
   this->Entry = NULL;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWLabeledEntry::SetLabel(const char *text)
 {
   this->Script("%s configure -text {%s}",
                this->Label->GetWidgetName(), text);  
 }
 
+//----------------------------------------------------------------------------
 void vtkKWLabeledEntry::Create(vtkKWApplication *app)
 {
-  const char *wname;
-  
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("LabeledEntry already created");
     return;
@@ -89,11 +89,15 @@ void vtkKWLabeledEntry::Create(vtkKWApplication *app)
 
   this->SetApplication(app);
 
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat",wname);
+  // Create the top level
 
+  const char *wname = this->GetWidgetName();
+  this->Script("frame %s -borderwidth 0 -relief flat", wname);
+
+  this->Label->SetParent(this);
   this->Label->Create(app, "");
+
+  this->Entry->SetParent(this);
   this->Entry->Create(app, "");
 
   // Usually you will want the entry to expand itself
@@ -105,51 +109,69 @@ void vtkKWLabeledEntry::Create(vtkKWApplication *app)
                this->Entry->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkKWLabeledEntry::SetValue(const char *value)
 {
   this->Entry->SetValue(value);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWLabeledEntry::SetValue(int a)
 {
   this->Entry->SetValue(a);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWLabeledEntry::SetValue(float f,int size)
 {
   this->Entry->SetValue(f, size);
 }
 
+//----------------------------------------------------------------------------
 char *vtkKWLabeledEntry::GetValue()
 {
   return this->Entry->GetValue();
 }
 
+//----------------------------------------------------------------------------
 int vtkKWLabeledEntry::GetValueAsInt()
 {
   return this->Entry->GetValueAsInt();
 }
 
+//----------------------------------------------------------------------------
 float vtkKWLabeledEntry::GetValueAsFloat()
 {
   return this->Entry->GetValueAsFloat();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWLabeledEntry::SetEnabled(int e)
 {
-  if ( this->Enabled == e )
+  // Propagate first (since objects can be modified externally, they might
+  // not be in synch with this->Enabled)
+
+  if (this->IsCreated())
+    {
+    this->Entry->SetEnabled(e);
+    this->Label->SetEnabled(e);
+    }
+
+  // Then update internal Enabled ivar, although it is not of much use here
+
+  if (this->Enabled == e)
     {
     return;
     }
+
   this->Enabled = e;
   this->Modified();
-
-  this->Entry->SetEnabled(e);
-  this->Label->SetEnabled(e);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWLabeledEntry::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Label: " << this->Label << endl;
+  os << indent << "Entry: " << this->Entry << endl;
 }
