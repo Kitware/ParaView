@@ -103,6 +103,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedShortArray.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientServerInterpreter.h"
+#include "vtkGraphicsFactory.h"
+#include "vtkImagingFactory.h"
 
 // #include "vtkPVRenderGroupDialog.h"
 
@@ -126,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.8");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.9");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
