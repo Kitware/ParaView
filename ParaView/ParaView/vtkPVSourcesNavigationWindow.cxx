@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.3");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.4");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -64,7 +64,7 @@ vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
   this->Canvas    = vtkKWWidget::New();
   this->ScrollBar = vtkKWWidget::New();
   this->PopupMenu = vtkKWMenu::New();
-  this->ShowNameAndDescription = 0;
+  this->AlwaysShowName = 0;
   this->CreateSelectionBindings = 1;
 }
 
@@ -266,14 +266,14 @@ void vtkPVSourcesNavigationWindow::SetHeight(int height)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVSourcesNavigationWindow::SetShowNameAndDescription(int val)
+void vtkPVSourcesNavigationWindow::SetAlwaysShowName(int val)
 {
-  if (this->ShowNameAndDescription == val)
+  if (this->AlwaysShowName == val)
     {
     return;
     }
 
-  this->ShowNameAndDescription = val;
+  this->AlwaysShowName = val;
   this->Modified();
 
   if (this->Application)
@@ -380,7 +380,7 @@ char* vtkPVSourcesNavigationWindow::GetTextRepresentation(vtkPVSource* comp)
     }
   else
     {
-    if (this->ShowNameAndDescription && comp->GetName() && *comp->GetName())
+    if (this->AlwaysShowName && comp->GetName() && *comp->GetName())
       {
       buffer = new char [strlen(comp->GetDescription())
                         + 2
@@ -403,6 +403,6 @@ void vtkPVSourcesNavigationWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Canvas: " << this->GetCanvas() << endl;
-  os << indent << "ShowNameAndDescription: " << this->ShowNameAndDescription << endl;
+  os << indent << "AlwaysShowName: " << this->AlwaysShowName << endl;
  os << indent << "CreateSelectionBindings: " << this->CreateSelectionBindings << endl;
 }

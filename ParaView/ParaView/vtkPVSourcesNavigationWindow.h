@@ -100,11 +100,11 @@ public:
   virtual void Reconfigure();
  
   // Description:
-  // Enable/disable the fact that the source name will be displayed
+  // Enable/disable the fact that the source name will always be displayed
   // even if the description is not empty.
-  virtual void SetShowNameAndDescription(int);
-  vtkGetMacro(ShowNameAndDescription, int);
-  vtkBooleanMacro(ShowNameAndDescription, int);
+  virtual void SetAlwaysShowName(int);
+  vtkGetMacro(AlwaysShowName, int);
+  vtkBooleanMacro(AlwaysShowName, int);
  
   // Description:
   // Enable/disable the fact that selection bindings are set for each entry
@@ -154,7 +154,7 @@ protected:
   vtkKWWidget* ScrollBar;
   vtkKWMenu* PopupMenu;
 
-  int ShowNameAndDescription;
+  int AlwaysShowName;
   int CreateSelectionBindings;
 
 private:
