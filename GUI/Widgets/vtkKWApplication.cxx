@@ -59,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.165");
+vtkCxxRevisionMacro(vtkKWApplication, "1.166");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -246,7 +246,13 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     char directory[1024];
     vtkKWDirectoryUtilities::GetFilenamePath(nameofexec, directory);
     // remove the /bin from the end
-    directory[strlen(directory) - 4] = '\0';
+    // What the h??? no, do not *do* that: first it breaks all the apps 
+    // relying on this method to find where the binary is installed 
+    // (hello plugins ?), second this is completely hard-coded, what
+    // about msdev path, bin/release, bin/debug, etc.!
+    // If you need to remove whatever dir, just copy the result of this
+    // method and strip it yourself.
+    // directory[strlen(directory) - 4] = '\0';
     vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
     this->SetApplicationInstallationDirectory(
       util->ConvertToUnixSlashes(directory));
