@@ -18,7 +18,6 @@ SET(Filters_SRCS
   vtkPVImageGradient.cxx
   vtkPVImageGradientMagnitude.cxx
   vtkPVImageMedian3D.cxx
-  vtkPVProbe.cxx
   vtkPVRibbonFilter.cxx
   vtkPVThresholdFilter.cxx
   vtkPVUpdateSuppressor.cxx
@@ -30,6 +29,7 @@ SET(Filters_SRCS
   )
 
 SET( ParaView_SRCS
+  vtkPVProbe.cxx
   vtkClientCompositeManager.cxx
   vtkCompleteArrays.cxx
   vtkCompositeProp.cxx
@@ -229,7 +229,10 @@ IF (VTK_USE_PATENTED)
 ENDIF (VTK_USE_PATENTED)
 
 IF(NOT PARAVIEW_NO_HDF5)
-  SET(Filters_SRCS ${Filters_SRCS} vtkHDF5RawImageReader.cxx)
+  SET(Filters_SRCS 
+    ${Filters_SRCS} 
+    vtkHDF5RawImageReader.cxx
+    )
 ENDIF(NOT PARAVIEW_NO_HDF5)
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -317,6 +320,13 @@ TARGET_LINK_LIBRARIES(vtkPVFiltersTCL
 IF(VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFiltersTCL vtkPatentedTCL)
 ENDIF(VTK_USE_PATENTED)
+IF(NOT PARAVIEW_NO_HDF5)
+  TARGET_LINK_LIBRARIES(vtkPVFiltersTCL ${PARAVIEW_HDF5_LIBRARIES})
+ENDIF(NOT PARAVIEW_NO_HDF5)
+
+
+ADD_EXECUTABLE(vtkPVFiltersTest dummy.cxx)
+TARGET_LINK_LIBRARIES(vtkPVFiltersTest vtkPVFiltersTCL)
 
 VTK_MAKE_INSTANTIATOR2(vtkParaViewInstantiator PVInstantiator_SRCS
   ${ParaView_SRCS}
@@ -396,10 +406,6 @@ IF(UNIX)
 ENDIF(UNIX)
 
 
-IF(NOT PARAVIEW_NO_HDF5)
-  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${PARAVIEW_HDF5_LIBRARIES})
-ENDIF(NOT PARAVIEW_NO_HDF5)
-
 ADD_EXECUTABLE(ProcessXML ProcessXML.cxx)
 TARGET_LINK_LIBRARIES(ProcessXML vtkCommon)
 
@@ -460,6 +466,7 @@ INCLUDE (${PARAVIEW_BINARY_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
 INCLUDE (${PARAVIEW_SOURCE_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
 
 IF(BUILD_SHARED_LIBS)
+  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkPVFiltersTCL)
   INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWParaViewTCL)
 ENDIF(BUILD_SHARED_LIBS)
 
