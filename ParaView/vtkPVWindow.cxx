@@ -42,17 +42,15 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkSuperquadricSource.h"
 #include "vtkImageMandelbrotSource.h"
 
-#include "vtkPVAssignment.h"
 #include "vtkPVSource.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVImageData.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
-#include "vtkPVScalarBar.h"
-#include "vtkPVAnimation.h"
 #include "vtkSuperquadricSource.h"
-#include "vtkRunTimeContour.h"
 #include "vtkImageMandelbrotSource.h"
+
+#include "vtkPVSourceInterface.h"
 
 
 //----------------------------------------------------------------------------
@@ -91,6 +89,8 @@ vtkPVWindow::vtkPVWindow()
   this->SourceList->SetParent(this->ApplicationAreaFrame->GetFrame());
   
   this->CameraStyle = vtkInteractorStyleTrackballCamera::New();
+  
+  this->SourceInterfaces = vtkCollection::New();
 }
 
 //----------------------------------------------------------------------------
@@ -116,14 +116,26 @@ vtkPVWindow::~vtkPVWindow()
   
   this->CameraStyle->Delete();
   this->CameraStyle = NULL;
+  
+  this->MainView->Delete();
+  this->MainView = NULL;
+  
+  this->SourceInterfaces->Delete();
+  this->SourceInterfaces = NULL;
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 {
+  vtkPVSourceInterface *sInt;
+  
   // invoke super method first
   this->vtkKWWindow::Create(app,"");
 
+  // We need an application before we can read the interface.
+  this->ReadSourceInterfaces();
+  
   this->Script("wm geometry %s 900x700+0+0",
                       this->GetWidgetName());
   
@@ -140,27 +152,23 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->InsertCommand(2, "Save Camera", this, "Save");
   this->MenuFile->InsertCommand(2, "Save", this, "SavePipeline");
 
+  
   // Create the menu for creating data sources.  
   this->CreateMenu->SetParent(this->GetMenu());
   this->CreateMenu->Create(this->Application,"-tearoff 0");
-  this->Menu->InsertCascade(2,"Create",this->CreateMenu,0);
-
-  this->CreateMenu->AddCommand("ImageReader", this, "CreateImageReader");
-  this->CreateMenu->AddCommand("FractalVolume", this, "CreateFractalVolume");
-  this->CreateMenu->AddCommand("STLReader", this, "CreateSTLReader");
-  this->CreateMenu->AddCommand("RunTimeContour", this, "CreateRunTimeContour");
-  this->CreateMenu->AddCommand("Cone", this, "CreateCone");
-  this->CreateMenu->AddCommand("Sphere", this, "CreateSphere");
-  this->CreateMenu->AddCommand("Axes", this, "CreateAxes");
-  this->CreateMenu->AddCommand("Cube", this, "CreateCube");
-  this->CreateMenu->AddCommand("Cylinder", this, "CreateCylinder");
-  this->CreateMenu->AddCommand("Disk", this, "CreateDisk");
-  this->CreateMenu->AddCommand("Line", this, "CreateLine");
-  this->CreateMenu->AddCommand("Plane", this, "CreatePlane");
-  this->CreateMenu->AddCommand("Points", this, "CreatePoints");
-  this->CreateMenu->AddCommand("Superquadric", this, "CreateSuperQuadric");
-  this->CreateMenu->AddCommand("Animation", this, "CreateAnimation");
-
+  this->Menu->InsertCascade(2,"Create",this->CreateMenu,0);  
+  
+  // Create all of the mehu items for sources with no inputs.
+  this->SourceInterfaces->InitTraversal();
+  while ( (sInt = (vtkPVSourceInterface*)(this->SourceInterfaces->GetNextItemAsObject())))
+    {
+    if (sInt->GetInputClassName() == NULL)
+      {
+      // Remove "vtk" from the class name to get the menu item name.
+      this->CreateMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
+      }
+    }
+  
   this->SetStatusText("Version 1.0 beta");
   
   this->Script( "wm withdraw %s", this->GetWidgetName());
@@ -229,21 +237,18 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 //----------------------------------------------------------------------------
 void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
 {
-  static int instanceCount = 0;
-  char tclName[20];
+  vtkPVRenderView *view;
   
-  // Create a name.
-  sprintf(tclName, "View%d", ++instanceCount);
-  this->MainView = vtkPVRenderView::SafeDownCast(
-                       pvApp->MakeTclObject("vtkPVRenderView",tclName));
-  this->MainView->Clone(pvApp);
+  view = vtkPVRenderView::New();
+  view->CreateRenderObjects(pvApp);
+  
+  this->MainView = view;
   this->MainView->SetParent(this->ViewFrame);
   this->MainView->Create(this->Application,"-width 200 -height 200");
   this->AddView(this->MainView);
   this->MainView->MakeSelected();
   this->MainView->ShowViewProperties();
   this->MainView->SetupBindings();
-  this->MainView->Delete();
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 }
@@ -268,6 +273,275 @@ void vtkPVWindow::SetCurrentSource(vtkPVSource *comp)
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVWindow::NewWindow()
+{
+  vtkPVWindow *nw = vtkPVWindow::New();
+  nw->Create(this->Application,"");
+  this->Application->AddWindow(nw);  
+  nw->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::Save()
+{
+  // Save out the camera parameters.  These are the ones used for the run-time
+  // simulation.  We may need to add other parameters later.
+  FILE *cameraFile;
+  vtkCamera *camera = this->GetMainView()->GetRenderer()->GetActiveCamera();
+  float position[3];
+  float focalPoint[3];
+  float viewUp[3];
+  float viewAngle;
+  float clippingRange[2];
+  
+  if ((cameraFile = fopen("camera.pv", "w")) == NULL)
+    {
+    vtkErrorMacro("Couldn't open file: camera.pv");
+    return;
+    }
+
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
+  camera->GetViewUp(viewUp);
+  viewAngle = camera->GetViewAngle();
+  camera->GetClippingRange(clippingRange);
+  
+  fprintf(cameraFile, "position %.6f %.6f %.6f\n", position[0], position[1],
+	  position[2]);
+  fprintf(cameraFile, "focal_point %.6f %.6f %.6f\n", focalPoint[0],
+	  focalPoint[1], focalPoint[2]);
+  fprintf(cameraFile, "view_up %.6f %.6f %.6f\n", viewUp[0], viewUp[1],
+	  viewUp[2]);
+  fprintf(cameraFile, "view_angle %.6f\n", viewAngle);
+  fprintf(cameraFile, "clipping_range %.6f %.6f", clippingRange[0],
+	  clippingRange[1]);
+
+  fclose (cameraFile);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SavePipeline()
+{
+  ofstream *file;
+  vtkCollection *sources;
+  vtkPVSource *pvs;
+
+  file = new ofstream("pipeline.pv", ios::out);
+  if (file->fail())
+    {
+    vtkErrorMacro("Could not open file pipeline.pv");
+    delete file;
+    file = NULL;
+    return;
+    }
+
+  *file << "<ParaView Version= 0.1>\n";
+  // Loop through sources ...
+  sources = this->SourceList->GetSources();
+  sources->InitTraversal();
+  while ( (pvs=(vtkPVSource*)(sources->GetNextItemAsObject())) )
+    {
+    pvs->Save(file);
+    }
+  *file << "</ParaView>\n";
+
+  if (file)
+    {
+    file->close();
+    delete file;
+    file = NULL;
+    }
+
+}
+
+//----------------------------------------------------------------------------
+// Description:
+// Chaining method to serialize an object and its superclasses.
+void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  // invoke superclass
+  this->vtkKWWindow::SerializeSelf(os,indent);
+
+  os << indent << "MainView ";
+  this->MainView->Serialize(os,indent);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
+{
+  if (!strcmp(token,"MainView"))
+    {
+    this->MainView->Serialize(is);
+    return;
+    }
+
+  vtkKWWindow::SerializeToken(is,token);
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVWindow::GetCurrentSource()
+{
+  return vtkPVSource::SafeDownCast(this->GetMainView()->GetSelectedComposite());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::NextSource()
+{
+  vtkPVSource *composite = this->GetNextSource();
+  int i;
+  
+  if (composite != NULL)
+    {
+    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
+      {
+      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOff();
+      }
+    this->SetCurrentSource(composite);
+    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
+      {
+      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOn();
+      }
+    }
+  
+  this->MainView->Render();
+  this->SourceList->Update();
+  this->MainView->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::PreviousSource()
+{
+  vtkPVSource *composite = this->GetPreviousSource();
+  int i;
+  
+  if (composite != NULL)
+    {
+    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
+      {
+      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOff();
+      }
+    this->SetCurrentSource(composite);
+    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
+      {
+      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOn();
+      }
+    }
+  
+  this->MainView->Render();
+  this->SourceList->Update();
+  this->MainView->ResetCamera();
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVWindow::GetNextSource()
+{
+  int pos = this->Sources->IsItemPresent(this->GetCurrentSource());
+  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos));
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVWindow::GetPreviousSource()
+{
+  int pos = this->Sources->IsItemPresent(this->GetCurrentSource());
+  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-2));
+}
+
+//----------------------------------------------------------------------------
+vtkKWCompositeCollection* vtkPVWindow::GetSources()
+{
+  return this->Sources;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ResetCameraCallback()
+{
+  this->MainView->ResetCamera();
+  this->MainView->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ShowWindowProperties()
+{
+  this->ShowProperties();
+  
+  // make sure the variable is set, otherwise set it
+  this->GetMenuProperties()->CheckRadioButton(
+    this->GetMenuProperties(),"Radio",1);
+
+  // forget current props
+  this->Script("pack forget [pack slaves %s]",
+               this->Notebook->GetParent()->GetWidgetName());  
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+vtkPVApplication *vtkPVWindow::GetPVApplication()
+{
+  return vtkPVApplication::SafeDownCast(this->Application);
+}
+
+
+//----------------------------------------------------------------------------
+// Lets experiment with an interface prototype.
+// We will eventually read these from a file.
+void vtkPVWindow::ReadSourceInterfaces()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVMethodInterface *mInt;
+  vtkPVSourceInterface *sInt;
+
+  // Sphere source.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkSphereSource");
+  sInt->SetRootName("Sphere");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Center");
+  mInt->SetSetCommand("SetCenter");
+  mInt->SetGetCommand("GetCenter");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Radius");
+  mInt->SetSetCommand("SetRadius");
+  mInt->SetGetCommand("GetRadius");
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  //this->CreateMenu->AddCommand("ImageReader", this, "CreateImageReader");
+  //this->CreateMenu->AddCommand("FractalVolume", this, "CreateFractalVolume");
+  //this->CreateMenu->AddCommand("STLReader", this, "CreateSTLReader");
+  //this->CreateMenu->AddCommand("Cone", this, "CreateCone");
+  //this->CreateMenu->AddCommand("Sphere", this, "CreateSphere");
+  //this->CreateMenu->AddCommand("Axes", this, "CreateAxes");
+  //this->CreateMenu->AddCommand("Cube", this, "CreateCube");
+  //this->CreateMenu->AddCommand("Cylinder", this, "CreateCylinder");
+  //this->CreateMenu->AddCommand("Disk", this, "CreateDisk");
+  //this->CreateMenu->AddCommand("Line", this, "CreateLine");
+  //this->CreateMenu->AddCommand("Plane", this, "CreatePlane");
+  //this->CreateMenu->AddCommand("Points", this, "CreatePoints");
+  //this->CreateMenu->AddCommand("Superquadric", this, "CreateSuperQuadric");
+}
+
+
+/*
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateCone()
 {
@@ -300,81 +574,36 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCone()
 }
 
 //----------------------------------------------------------------------------
-vtkPVRunTimeContour *vtkPVWindow::CreateRunTimeContour()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkKWPushButton *button = vtkKWPushButton::New();
-  vtkKWScale *scale;
-  char command[50];
-  vtkRunTimeContour *rtc;
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource.
-  // Link the PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVRunTimeContour", "vtkRunTimeContour",
-			    "RunTimeContour", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Set the default file name
-  pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{} {.vtk}}}]",
-                pvs->GetVTKSourceTclName());
-
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddFileEntry("FileName:", "SetFileName", "GetFileName", "vtk");
-  rtc = vtkRunTimeContour::SafeDownCast(pvs->GetVTKSource());
-  scale = pvs->AddScale("ContourValue:", "SetContourValue", "GetContourValue", 
-			0, 1, 0.1);
-  rtc->SetContourScale(scale);
-  scale = pvs->AddScale("XSlice:", "SetXSlice", "GetXSlice", 
-			0, 100, 1);
-  rtc->SetXScale(scale);
-  scale = pvs->AddScale("YSlice:", "SetYSlice", "GetYSlice", 
-			0, 100, 1);
-  rtc->SetYScale(scale);
-  scale = pvs->AddScale("ZSlice:", "SetZSlice", "GetZSlice", 
-			0, 100, 1);
-  rtc->SetZScale(scale);
-  pvs->UpdateParameterWidgets();
-  
-  pvs->GetWidgets()->AddItem(button);
-  button->SetParent(pvs->GetParameterFrame()->GetFrame());
-  button->Create(pvApp, "");
-  button->SetLabel("Update");
-  sprintf(command, "{%s UpdateWidgets}", pvs->GetVTKSourceTclName());
-  this->Script("%s configure -command %s", button->GetWidgetName(), command);
-  this->Script("pack %s -side left", button->GetWidgetName());
-  
-  button->Delete();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVRunTimeContour::SafeDownCast(pvs);
-}
-
-//----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateSphere()
 {
   static int instanceCount = 0;
-  vtkPVSource *pvs;
+  char sourceTclName[100];
+  vtkSource *s;
+  vtkPVPolyDataSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkSphereSource",
-                            "Sphere",++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
 
+  ++instanceCount;
+  
+  // Create the vtkSource.
+  sprintf(sourceTclName, "%s%d", "Sphere", instanceCount);
+  // Create the object through tcl on process 0.
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkSphereSource", sourceTclName));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return NULL;
+    }
+  
+  pvs = vtkPVPolyDataSource::New();
+  pvs->SetApplication(pvApp);
+  pvs->SetVTKSource(s);
+  pvs->SetVTKSourceTclName(sourceTclName);
+  pvs->SetName(sourceTclName);
+
+  // Add the new Source to the View, and make it current.
+  this->MainView->AddComposite(pvs);  
+  this->SetCurrentSource(pvs);
+  
   // Add some source specific widgets.
   // Normally these would be added in the create method.
   pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
@@ -387,9 +616,10 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSphere()
   pvs->AddLabeledEntry("End Phi:", "SetEndPhi", "GetEndPhi");
   pvs->UpdateParameterWidgets();
 
-  // Clean up. (How about on the other processes?)
+  // Clean up. (How about the VTK object?)
   // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
+  pvs->Delete();
+
   return vtkPVPolyDataSource::SafeDownCast(pvs);
 } 
 
@@ -734,14 +964,14 @@ vtkPVImageSource *vtkPVWindow::CreateFractalVolume()
   ms->SetSampleCX(0.025, 0.025, 0.025, 0.025);
   ms->SetWholeExtent(-50, 50, -50, 50, 0, 100);
   ms->SetProjectionAxes(2, 3, 1);
-  /* Small values get munged through tcl?
-  this->Script("%s SetOriginCX -0.733569 0.24405 0.296116 0.0253163", 
-               pvs->GetVTKSourceTclName());
-  this->Script("%s SetSampleCX 1.38125e-005 1.38125e-005 1.0e-004 1.0e-004", 
-               pvs->GetVTKSourceTclName());
-  this->Script("%s SetWholeExtent -50 50 -50 50 -50 50", 
-               pvs->GetVTKSourceTclName());
-  */
+  // Small values get munged through tcl?
+  //this->Script("%s SetOriginCX -0.733569 0.24405 0.296116 0.0253163", 
+  //             pvs->GetVTKSourceTclName());
+  //this->Script("%s SetSampleCX 1.38125e-005 1.38125e-005 1.0e-004 1.0e-004", 
+  //             pvs->GetVTKSourceTclName());
+  //this->Script("%s SetWholeExtent -50 50 -50 50 -50 50", 
+  //             pvs->GetVTKSourceTclName());
+  //
   // Add the new Source to the View, and make it current.
   this->MainView->AddComposite(pvs);
   this->SetCurrentSource(pvs);
@@ -764,236 +994,6 @@ vtkPVImageSource *vtkPVWindow::CreateFractalVolume()
 //----------------------------------------------------------------------------
 void vtkPVWindow::CreateAnimation()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVAnimation *anim;
-  
-  // Create the pipeline objects in all processes.
-  anim = vtkPVAnimation::New();
-  // Although this does not need to be cloned to implement animations,
-  // we are using the AutoWidgets wich broadcast there callbacks.  The
-  // The clones will just act like dummies.
-  anim->Clone(pvApp);
-  
-  anim->SetName("Animation");
-  
-  // Add the new Source to the View (in all processes).
-  this->MainView->AddComposite(anim);
-  anim->SetObject(this->GetCurrentSource());
-
-  // Select this Source
-  this->SetCurrentSource(anim);
-  
-  // Clean up. (How about on the other processes?)
-  anim->Delete();
-  anim = NULL;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVWindow::NewWindow()
-{
-  vtkPVWindow *nw = vtkPVWindow::New();
-  nw->Create(this->Application,"");
-  this->Application->AddWindow(nw);  
-  nw->Delete();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::Save()
-{
-  // Save out the camera parameters.  These are the ones used for the run-time
-  // simulation.  We may need to add other parameters later.
-  FILE *cameraFile;
-  vtkCamera *camera = this->GetMainView()->GetRenderer()->GetActiveCamera();
-  float position[3];
-  float focalPoint[3];
-  float viewUp[3];
-  float viewAngle;
-  float clippingRange[2];
-  
-  if ((cameraFile = fopen("camera.pv", "w")) == NULL)
-    {
-    vtkErrorMacro("Couldn't open file: camera.pv");
-    return;
-    }
-
-  camera->GetPosition(position);
-  camera->GetFocalPoint(focalPoint);
-  camera->GetViewUp(viewUp);
-  viewAngle = camera->GetViewAngle();
-  camera->GetClippingRange(clippingRange);
-  
-  fprintf(cameraFile, "position %.6f %.6f %.6f\n", position[0], position[1],
-	  position[2]);
-  fprintf(cameraFile, "focal_point %.6f %.6f %.6f\n", focalPoint[0],
-	  focalPoint[1], focalPoint[2]);
-  fprintf(cameraFile, "view_up %.6f %.6f %.6f\n", viewUp[0], viewUp[1],
-	  viewUp[2]);
-  fprintf(cameraFile, "view_angle %.6f\n", viewAngle);
-  fprintf(cameraFile, "clipping_range %.6f %.6f", clippingRange[0],
-	  clippingRange[1]);
-
-  fclose (cameraFile);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::SavePipeline()
-{
-  ofstream *file;
-  vtkCollection *sources;
-  vtkPVSource *pvs;
-
-  file = new ofstream("pipeline.pv", ios::out);
-  if (file->fail())
-    {
-    vtkErrorMacro("Could not open file pipeline.pv");
-    delete file;
-    file = NULL;
-    return;
-    }
-
-  *file << "<ParaView Version= 0.1>\n";
-  // Loop through sources ...
-  sources = this->SourceList->GetSources();
-  sources->InitTraversal();
-  while ( (pvs=(vtkPVSource*)(sources->GetNextItemAsObject())) )
-    {
-    pvs->Save(file);
-    }
-  *file << "</ParaView>\n";
-
-  if (file)
-    {
-    file->close();
-    delete file;
-    file = NULL;
-    }
-
-}
-
-//----------------------------------------------------------------------------
-// Description:
-// Chaining method to serialize an object and its superclasses.
-void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
-{
-  // invoke superclass
-  this->vtkKWWindow::SerializeSelf(os,indent);
-
-  os << indent << "MainView ";
-  this->MainView->Serialize(os,indent);
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
-{
-  if (!strcmp(token,"MainView"))
-    {
-    this->MainView->Serialize(is);
-    return;
-    }
-
-  vtkKWWindow::SerializeToken(is,token);
-}
-
-//----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetCurrentSource()
-{
-  return vtkPVSource::SafeDownCast(this->GetMainView()->GetSelectedComposite());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::NextSource()
-{
-  vtkPVSource *composite = this->GetNextSource();
-  int i;
-  
-  if (composite != NULL)
-    {
-    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
-      {
-      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOff();
-      }
-    this->SetCurrentSource(composite);
-    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
-      {
-      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOn();
-      }
-    }
-  
-  this->MainView->Render();
-  this->SourceList->Update();
-  this->MainView->ResetCamera();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::PreviousSource()
-{
-  vtkPVSource *composite = this->GetPreviousSource();
-  int i;
-  
-  if (composite != NULL)
-    {
-    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
-      {
-      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOff();
-      }
-    this->SetCurrentSource(composite);
-    for (i = 0; i < this->GetCurrentSource()->GetNumberOfPVOutputs(); i++)
-      {
-      this->GetCurrentSource()->GetPVOutput(i)->GetActorComposite()->VisibilityOn();
-      }
-    }
-  
-  this->MainView->Render();
-  this->SourceList->Update();
-  this->MainView->ResetCamera();
-}
-
-//----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetNextSource()
-{
-  int pos = this->Sources->IsItemPresent(this->GetCurrentSource());
-  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos));
-}
-
-//----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetPreviousSource()
-{
-  int pos = this->Sources->IsItemPresent(this->GetCurrentSource());
-  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-2));
-}
-
-//----------------------------------------------------------------------------
-vtkKWCompositeCollection* vtkPVWindow::GetSources()
-{
-  return this->Sources;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::ResetCameraCallback()
-{
-  this->MainView->ResetCamera();
-  this->MainView->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::ShowWindowProperties()
-{
-  this->ShowProperties();
-  
-  // make sure the variable is set, otherwise set it
-  this->GetMenuProperties()->CheckRadioButton(
-    this->GetMenuProperties(),"Radio",1);
-
-  // forget current props
-  this->Script("pack forget [pack slaves %s]",
-               this->Notebook->GetParent()->GetWidgetName());  
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-               this->Notebook->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-vtkPVApplication *vtkPVWindow::GetPVApplication()
-{
-  return vtkPVApplication::SafeDownCast(this->Application);
-}
+*/

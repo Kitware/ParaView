@@ -30,7 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWDialog.h"
 #include "vtkKWWindowCollection.h"
 
-#include "vtkPVPolyDataSource.h"
 #include "vtkMultiProcessController.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
@@ -110,6 +109,12 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
 {
   int length;
 
+  if (this->Controller->GetLocalProcessId() == remoteId)
+    {
+    this->SimpleScript(str);
+    return;
+    }
+  
   // send string to evaluate.
   length = strlen(str) + 1;
   if (length <= 1)
@@ -117,13 +122,9 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
     return;
     }
 
-  // cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
+  cerr << "---- RemoteScript, id = " << remoteId << ", str = " << str << endl;
   
-  //cerr << "      >>>> Broadcast : " << str << endl;
-  //sleep(1);  
   this->Controller->TriggerRMI(remoteId, str, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
-  //sleep(1);
-  //cerr << "      <<<< Finished Broadcast : " << str << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -143,6 +144,9 @@ void vtkPVApplication::BroadcastScript(char *format, ...)
 void vtkPVApplication::BroadcastSimpleScript(char *str)
 {
   int id, num;
+  
+  
+  this->SimpleScript(str);
   
   num = this->Controller->GetNumberOfProcesses();
   for (id = 1; id < num; ++id)
@@ -251,39 +255,7 @@ vtkPVSource *vtkPVApplication::MakePVSource(const char *pvsClassName,
                                             const char *tclRoot,
                                             int instanceNum)
 {
-  char pvsName[1000];
-  char *sName;
-  vtkSource *s;
-  vtkPVSource *pvs;
-
-  // Format the names.
-  sprintf(pvsName, "pv%s%d", tclRoot, instanceNum);
-  sName = pvsName + 2;
-
-  // Create the vtkSource.
-  s = (vtkSource *)(this->MakeTclObject(sClassName, sName));
-  // on the other processes as well
-  this->BroadcastScript("%s %s", sClassName, sName); 
-
-  if (s == NULL)
-    {
-    vtkErrorMacro("Could not get pointer from object.");
-    return NULL;
-    }
-
-  // Create and initialize the PVSource.
-  pvs = (vtkPVSource *)(this->MakeTclObject(pvsClassName, pvsName));
-  pvs->Clone(this);
-  pvs->SetVTKSource(s);
-  pvs->SetVTKSourceTclName(sName);
-  pvs->SetName(sName);
-  this->BroadcastScript("%s SetVTKSource %s", pvsName, sName);
-  
-  // We cannot create an object in tcl and delete it in C++.
-  //s->Delete();
-  // How do we clean up on the other processes?
-
-  return pvs;
+  return NULL;
 }
 
 
@@ -294,9 +266,14 @@ vtkObject *vtkPVApplication::MakeTclObject(const char *className,
   vtkObject *o;
   int error;
 
-  this->Script("%s %s", className, tclName);
+  this->BroadcastScript("%s %s", className, tclName);
   o = (vtkObject *)(vtkTclGetPointerFromObject(tclName,
                                   "vtkObject", this->GetMainInterp(), error));
+  
+  if (o == NULL)
+    {
+    vtkErrorMacro("Could not get object from pointer.");
+    }
   
   return o;
 }

@@ -35,7 +35,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkMultiProcessController.h"
 
-class vtkPVPolyDataSource;
 class vtkPVSource;
 
 

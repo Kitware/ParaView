@@ -31,8 +31,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageData.h"
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
-#include "vtkPVScalarBar.h"
-#include "vtkPVAssignment.h"
 #include "vtkKWToolbar.h"
 
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
@@ -163,12 +161,8 @@ void vtkPVImageClip::SetPVInput(vtkPVImageData *pvi)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  // Handle parallelism.
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetPVInput %s", this->GetTclName(),
-			   pvi->GetTclName());
-    }
+  //pvApp->BroadcastScript("%s SetPVInput %s", this->GetTclName(),
+  //pvi->GetTclName());
 
   this->GetImageClip()->SetInput(pvi->GetImageData());
   this->vtkPVSource::SetNthPVInput(0, pvi);
@@ -199,11 +193,8 @@ void vtkPVImageClip::SetOutputWholeExtent(int xMin, int xMax,
 {  
   vtkPVApplication *pvApp = this->GetPVApplication();
   
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutputWholeExtent %d %d %d %d %d %d", 
-			   this->GetTclName(), xMin,xMax, yMin,yMax, zMin,zMax);
-    }  
+  //pvApp->BroadcastScript("%s SetOutputWholeExtent %d %d %d %d %d %d", 
+  //			   this->GetTclName(), xMin,xMax, yMin,yMax, zMin,zMax);
 
   this->ImageClip->SetOutputWholeExtent(xMin, xMax, yMin, yMax, zMin, zMax);
 }
@@ -263,7 +254,6 @@ void vtkPVImageClip::ExtentsChanged()
   vtkPVImageData *pvi;
   vtkPVActorComposite *ac;
   vtkPVWindow *window = this->GetWindow();
-  vtkPVAssignment *a;
   
   this->ImageClip->SetOutputWholeExtent(this->ClipXMinEntry->GetValueAsInt(),
 					this->ClipXMaxEntry->GetValueAsInt(),
@@ -281,12 +271,9 @@ void vtkPVImageClip::ExtentsChanged()
     pvi = vtkPVImageData::New();
     pvi->Clone(pvApp);
     this->SetNthPVOutput(0, pvi);
-    a = window->GetPreviousSource()->GetPVOutput(0)->GetAssignment();
-    pvi->SetAssignment(a);
     this->GetPVOutput()->GetData()->
       SetUpdateExtent(this->GetPVOutput()->GetData()->GetWholeExtent());
     this->GetPVInput()->GetActorComposite()->VisibilityOff();
-    this->GetPVInput()->GetPVScalarBar()->VisibilityOff();
     this->CreateDataPage(0);
     ac = this->GetPVOutput()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);

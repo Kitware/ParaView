@@ -34,9 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSourceCollection.h"
 
 class vtkPVActorComposite;
-class vtkPVScalarBar;
 class vtkPVSource;
-class vtkPVAssignment;
 class vtkPVApplication;
 class vtkKWMenuButton;
 
@@ -46,6 +44,11 @@ class VTK_EXPORT vtkPVData : public vtkKWWidget
 public:
   static vtkPVData* New();
   vtkTypeMacro(vtkPVData, vtkKWWidget);
+
+  // Description:
+  // Call this after the object has been constructed.  We need this
+  // because the constructor does not take an argument.
+  void CreateParallelTclObjects(vtkPVApplication *pvApp);
   
   // Description:
   // Just like in vtk data objects, this method makes a data object
@@ -54,31 +57,14 @@ public:
   virtual vtkPVData *MakeObject(){vtkErrorMacro("No MakeObject");return NULL;}
   
   // Description:
-  // This duplicates the object in the satellite processes.
-  // They will all have the same tcl name.
-  void Clone(vtkPVApplication *app);
-  
-  // Description:
   // Creates common widgets.
   // Returns 0 if there was an error.
   virtual int Create(char *args);
   
   // Description:
-  // This is a parallel method.  All out satellite datas will get the
-  // equivalent actor composite. The main reason this is here is to allow 
-  // the actor composite to be created in the Clone method rather than
-  // the constructor.
-  void SetActorComposite(vtkPVActorComposite *c);
-  
-  // Description:
   // This composite actually has an actor that displays the data.
   vtkPVActorComposite* GetActorComposite();
   
-  // Description:
-  // Set/Get the scalar bar associated with this data object.
-  void SetPVScalarBar(vtkPVScalarBar *sb);
-  vtkPVScalarBar *GetPVScalarBar();
-                    
   // Description:
   // General filters that can be applied to vtkDataSet.
   void Contour();
@@ -94,17 +80,12 @@ public:
   vtkGetObjectMacro(PVSource, vtkPVSource);
   
   // Description:
-  // Like update extent, but an object tells which piece to assign this process.
-  virtual void SetAssignment(vtkPVAssignment *a);
-  vtkPVAssignment *GetAssignment() {return this->Assignment;}
-  
-  // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
 
   // Description:
   // A generic way of getting the data.
-  vtkGetObjectMacro(Data,vtkDataSet);
+  vtkGetObjectMacro(VTKData,vtkDataSet);
 
   // Description:
   // Uses the assignment to set the extent, then updates the data.
@@ -132,10 +113,13 @@ public:
   // This is for setting up the links between VTK objects and PV object.
   // Subclasses overide this method so that they can create special
   // mappers for the actor composites.  The user should not call this method.
-  vtkSetObjectMacro(Data, vtkDataSet);  
+  vtkSetObjectMacro(VTKData, vtkDataSet);  
+  
+  // Description:
+  // The tcl name of the vtk data object.
+  vtkGetStringMacro(VTKDataTclName);  
   
   void ShowActorComposite();
-  void ShowScalarBarParameters();
   
   // Description:
   // We are keeping the forward links.  I have not 
@@ -154,16 +138,15 @@ protected:
   void operator=(const vtkPVData&) {};
   
   vtkKWMenuButton *FiltersMenuButton;
-  vtkDataSet *Data;
-
+  vtkDataSet *VTKData;
+  char *VTKDataTclName;
+  vtkSetStringMacro(VTKDataTclName);
+  
   vtkPVActorComposite *ActorComposite;
   vtkKWPushButton *ActorCompositeButton;
-  vtkPVScalarBar *PVScalarBar;
-  vtkKWPushButton *ScalarBarButton;
   
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;
-  vtkPVAssignment *Assignment;
 
   // Keep a list of sources that are using this data.
   // We may want to have a list that does not reference

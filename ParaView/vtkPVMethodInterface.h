@@ -25,11 +25,16 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+// .NAME vtkPVMethodInterface - Every thing needed to define a widget for a method.
+// .SECTION Description
+// The intent is that subclasses will be createdthe specifically define widgets.
+
 
 #ifndef __vtkPVMethodInterface_h
 #define __vtkPVMethodInterface_h
 
 #include "vtkObject.h"
+#include "vtkIdList.h"
 
 #define VTK_STRING 13
 
@@ -39,14 +44,29 @@ public:
   static vtkPVMethodInterface* New();
   vtkTypeMacro(vtkPVMethodInterface, vtkObject);
   
+  // Description:
+  // This will be used to label the UI.
   vtkSetStringMacro(VariableName);
   vtkGetStringMacro(VariableName);
+
+  // Description:
+  // Most commands can be derived from the names ...
+  vtkSetStringMacro(SetCommand);
+  vtkGetStringMacro(SetCommand);
+  vtkSetStringMacro(GetCommand);
+  vtkGetStringMacro(GetCommand);
   
-  vtkSetMacro(ArgumentType, int);
-  vtkGetMacro(ArgumentType, int);
+  // Description:
+  // Add the argument types one by one.
+  void AddArgumentType(int type);
+  void AddFloatArgument() {this->AddArgumentType(VTK_FLOAT);}
+  void AddIntArgument() {this->AddArgumentType(VTK_INT);}
+  void AddStringArgument() {this->AddArgumentType(VTK_STRING);}
   
-  vtkSetMacro(NumberOfArguments, int);
-  vtkGetMacro(NumberOfArguments, int);
+  // Description:
+  // Accessing the arguments.
+  int GetNumberOfArguments() {return this->ArgumentTypes->GetNumberOfIds();}
+  int GetArgumentType(int i) {return this->ArgumentTypes->GetId(i);}
   
 protected:
   vtkPVMethodInterface();
@@ -55,8 +75,10 @@ protected:
   void operator=(const vtkPVMethodInterface&) {};
 
   char *VariableName;
-  int ArgumentType;
-  int NumberOfArguments;
+  char *SetCommand;
+  char *GetCommand;
+
+  vtkIdList *ArgumentTypes;
 };
 
 #endif

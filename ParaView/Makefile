@@ -14,7 +14,6 @@ ABSTRACT = \
 vtkInteractorStyleExtent 
 
 CONCRETE = \
-vtkColorByProcess \
 vtkDummyRenderWindowInteractor \
 vtkImageOutlineFilter \
 vtkInteractorStyleCamera \
@@ -23,39 +22,21 @@ vtkInteractorStyleImageExtent \
 vtkInteractorStylePlane \
 vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
-vtkParallelDecimate \
 vtkPVActorComposite \
-vtkPVAnimation \
 vtkPVApplication \
-vtkPVAssignment \
 vtkPVCommandList \
-vtkPVCutter \
 vtkPVData \
-vtkPVDataSetToDataSetFilter \
-vtkPVDataSetToPolyDataFilter \
-vtkPVExtentTranslator \
 vtkPVGetRemoteGhostCells \
-vtkPVGlyph3D \
 vtkPVImageData \
-vtkPVImageClip \
-vtkPVImageSlice \
-vtkPVImageSource \
-vtkPVImageTextureFilter \
-vtkPVImageToImageFilter \
 vtkPVMethodInterface \
-vtkPVParallelDecimate \
 vtkPVPolyData \
-vtkPVPolyDataSource \
-vtkPVPolyDataToPolyDataFilter \
 vtkPVRenderView \
-vtkPVRunTimeContour \
-vtkPVScalarBar \
 vtkPVSelectionList \
 vtkPVSource \
 vtkPVSourceCollection \
+vtkPVSourceInterface \
 vtkPVSourceList \
 vtkPVWindow \
-vtkRunTimeContour \
 vtkSingleContourFilter 
 
 
@@ -97,7 +78,7 @@ vtktcl.o: ${VTKSRC}/tcl/vtktcl.c
 	$(CC) -I${VTKBIN}/common $(CC_FLAGS) -c -o vtktcl.o $(VTKSRC)/tcl/vtktcl.c
 
 ParaView: Makefile ParaView.o vtktcl.o ${TOOLKIT_DEPENDS} 
-	$(CXX) -o ParaView ParaView.o \
+	echo ${TCL_LIB_FILE}; $(CXX) -o ParaView ParaView.o \
 	${TCL_LIB_FILE} ${KIT_LIBS} \
 	$(VIEWSDIR)/ParaView/vtkKWParaViewTcl$(VTK_LIB_EXT) \
 	$(VIEWSDIR)/Widgets/vtkKWWidgetsTcl$(VTK_LIB_EXT) \

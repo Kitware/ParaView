@@ -26,11 +26,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVImageData.h"
-#include "vtkPVImageClip.h"
-#include "vtkPVImageSlice.h"
+#include "vtkPVImageToImageFilter.h"
+//#include "vtkPVImageClip.h"
+//#include "vtkPVImageSlice.h"
 #include "vtkPVWindow.h"
 #include "vtkImageOutlineFilter.h"
-#include "vtkPVAssignment.h"
 #include "vtkGeometryFilter.h"
 #include "vtkKWMenuButton.h"
 #include "vtkPVActorComposite.h"
@@ -58,81 +58,11 @@ vtkPVImageData* vtkPVImageData::New()
 //----------------------------------------------------------------------------
 void vtkPVImageData::Clip()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVImageClip *clip;
-  int ext[6];
-
-  clip = vtkPVImageClip::New();
-  clip->Clone(pvApp);
-  
-  this->GetImageData()->GetWholeExtent(ext);
-  ext[5] = (ext[4] + ext[5])/2;
-  ext[4] = ext[5];
-  
-  clip->SetPVInput(this);
-  clip->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-  
-  clip->SetName("clip");
-  
-  vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  this->GetPVSource()->GetView()->AddComposite(clip);
-  
-  window->SetCurrentSource(clip);
-  clip->AddPVInputList();
-  
-  clip->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImageData::Slice()
 {
-  static int instanceCount = 0;
-  vtkPVImageSlice *f;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  int *ext, d0, d1, d2;
-
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Link the PVSource to the vtkSource.
-  f = vtkPVImageSlice::SafeDownCast(
-          pvApp->MakePVSource("vtkPVImageSlice",
-                              "vtkImageClip", "Slice", ++instanceCount));
-  if (f == NULL) {return;}
-  f->SetPVInput(this);
-
-  this->Script("%s ClipDataOn", f->GetVTKSourceTclName());
-
-  // Lets try to setup a good default parameters.
-  this->GetImageData()->UpdateInformation();
-  ext = this->GetImageData()->GetWholeExtent();
-  d0 = ext[1] - ext[0] + 1;
-  d1 = ext[3] - ext[2] + 1;
-  d2 = ext[5] - ext[4] + 1;
-  // This seems kind of stupid.
-  if (d0 < d1 && d0 < d2)
-    {
-    f->SetSliceNumber(ext[0]);
-    f->SetSliceAxis(0);
-    }
-  else if (d1 < d2)
-    {
-    f->SetSliceNumber(ext[1]);
-    f->SetSliceAxis(1);
-    }
-  else
-    {
-    f->SetSliceNumber((int)(((float)(ext[4]) + (float)(ext[5])) * 0.5));
-    f->SetSliceAxis(2);
-    }
-  
-  // Add the new Source to the View, and make it current.
-  this->GetPVSource()->GetView()->AddComposite(f);
-  window->SetCurrentSource(f);
-  f->AddPVInputList();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -175,15 +105,13 @@ int vtkPVImageData::Create(char *args)
     return 0;
     }
   
-  this->FiltersMenuButton->AddCommand("vtkImageClip", this, "Clip");
-  this->FiltersMenuButton->AddCommand("ImageSlice", this, "Slice");
   this->FiltersMenuButton->AddCommand("ShiftScale", this, "ShiftScale");
   
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageData::SetData(vtkDataSet *data)
+void vtkPVImageData::SetVTKData(vtkDataSet *data)
 {
   vtkImageData *image = vtkImageData::SafeDownCast(data);
   int *ext;
@@ -195,15 +123,10 @@ void vtkPVImageData::SetData(vtkDataSet *data)
     return;
     }
   
-  this->vtkPVData::SetData(data);
-  
-  if (this->Assignment)
-    {
-    image->SetExtentTranslator(this->Assignment->GetTranslator());
-    }
+  this->vtkPVData::SetVTKData(data);
   
   // Mode will tell the actor composite how to create the mapper.
-  this->ActorComposite->SetInput(data);
+  //this->ActorComposite->SetInput(data);
   
   // Determine which mode to use.
   image->UpdateInformation();
@@ -221,42 +144,23 @@ void vtkPVImageData::SetData(vtkDataSet *data)
 
 
 //----------------------------------------------------------------------------
-vtkImageData* vtkPVImageData::GetImageData()
+vtkImageData* vtkPVImageData::GetVTKImageData()
 {
-  return (vtkImageData*)this->Data;
+  return (vtkImageData*)this->VTKData;
 }
-
-//----------------------------------------------------------------------------
-void vtkPVImageData::SetAssignment(vtkPVAssignment *a)
-{
-  // This will take care of broadcasting the method
-  this->vtkPVData::SetAssignment(a);
-  
-  if (a && this->GetImageData())
-    {
-    this->GetImageData()->SetExtentTranslator(a->GetTranslator());
-    }
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVImageData::Update()
 {
   vtkImageData *image;
 
-  if (this->Data == NULL)
+  if (this->VTKData == NULL)
     {
     vtkErrorMacro("No data object to update.");
     }
 
-  image = this->GetImageData();
+  image = this->GetVTKImageData();
   image->UpdateInformation();
-  if (this->Assignment)
-    {
-    this->Assignment->SetWholeExtent(image->GetWholeExtent());
-    image->SetUpdateExtent(this->Assignment->GetExtent());
-    }
-
   image->Update();
 }
 

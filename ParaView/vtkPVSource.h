@@ -55,11 +55,6 @@ public:
   vtkTypeMacro(vtkPVSource,vtkKWComposite);
   
   // Description:
-  // This duplicates the object in the satellite processes.
-  // They will all have the same tcl name.
-  virtual void Clone(vtkPVApplication *app);
-  
-  // Description:
   // Get the Window for this class.
   vtkPVWindow *GetWindow();
   
@@ -118,7 +113,7 @@ public:
   // Creates the output and assignment.
   // If there is an input, it uses its assignement. 
   // Otherwise, it creates a new one.
-  virtual void InitializePVOutput(int idx) {};
+  virtual void InitializePVOutput(int idx);
   
   // Description:
   // Called when the accept button is pressed.
@@ -224,10 +219,6 @@ protected:
   ~vtkPVSource();
   vtkPVSource(const vtkPVSource&) {};
   void operator=(const vtkPVSource&) {};
-  
-  // Description:
-  // Mangages the double pointer and reference counting.
-  virtual void SetNthPVOutput(int idx, vtkPVData *output);
   
   void AddPVOutput(vtkPVData *output);
   void RemovePVOutput(vtkPVData *output);

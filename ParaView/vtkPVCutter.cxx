@@ -51,15 +51,12 @@ void PlaneCallback(void *arg)
   
   me->SetOrigin(orig[0], orig[1], orig[2]);
   me->SetNormal(norm[0], norm[1], norm[2]);
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOrigin %f %f %f",
-			   me->GetTclName(), orig[0], orig[1], orig[2]);
-    pvApp->BroadcastScript("%s SetNormal %f %f %f",
-			   me->GetTclName(), norm[0], norm[1], norm[2]);
+  //pvApp->BroadcastScript("%s SetOrigin %f %f %f",
+//			   me->GetTclName(), orig[0], orig[1], orig[2]);
+  //   pvApp->BroadcastScript("%s SetNormal %f %f %f",
+//			   me->GetTclName(), norm[0], norm[1], norm[2]);
 
-    me->UpdateParameterWidgets();
-    }
+//    me->UpdateParameterWidgets();
 }
 
 //----------------------------------------------------------------------------

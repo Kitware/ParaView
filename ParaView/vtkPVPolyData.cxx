@@ -27,9 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVGetRemoteGhostCells.h"
 #include "vtkPVGlyph3D.h"
-#include "vtkPVParallelDecimate.h"
 #include "vtkKWView.h"
 #include "vtkKWEventNotifier.h"
 
@@ -39,10 +37,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 
 #include "vtkPVApplication.h"
+#include "vtkPVActorComposite.h"
 #include "vtkKWMenuButton.h"
 #include "vtkDataSetMapper.h"
-#include "vtkParallelDecimate.h"
-#include "vtkPVActorComposite.h"
+
+#include "vtkPVPolyDataToPolyDataFilter.h"
 
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 		                     int argc, char *argv[]);
@@ -57,13 +56,37 @@ vtkPVPolyData::vtkPVPolyData()
   this->LocalRepresentation = NULL;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVPolyData::CreateParallelTclObjects(vtkPVApplication *pvApp)
+{
+  static int instanceCount = 0;
+  char tclName[100];
+  
+  // The output numbers may not match the source numbers but so what.
+  ++instanceCount;
+  // Make a tcl object.
+  sprintf(tclName, "PolyData%d", instanceCount);
+  this->VTKData = (vtkPolyData*)pvApp->MakeTclObject("vtkPolyData", tclName);
+  this->SetVTKDataTclName(tclName);
+  
+  // Create and hook up the ActorComposite.
+  this->vtkPVData::CreateParallelTclObjects(pvApp);
+}
+
+
 //----------------------------------------------------------------------------
 vtkPVPolyData::~vtkPVPolyData()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
   this->DecimateButton->Delete();
   this->DecimateButton = NULL;
   
   this->SetLocalRepresentation(NULL);
+  
+  // Even though this ivar is in the superclass:  I created it, so I will delete it.
+  pvApp->BroadcastScript("%s Delete", this->GetVTKDataTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -374,45 +397,43 @@ void vtkPVPolyData::QuadricClustering()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::GetGhostCells()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVGetRemoteGhostCells *rgc;
-  vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  
-  rgc = vtkPVGetRemoteGhostCells::New();
-  rgc->Clone(pvApp);
-  
-  rgc->SetPVInput(this);
-  
-  rgc->SetName("get ghost cells");
-  
-  this->GetPVSource()->GetView()->AddComposite(rgc);
-  
-  window->SetCurrentSource(rgc);
-  rgc->AddPVInputList();
 
-  rgc->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::ParallelDecimate()
 {
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPolyData::PieceScalars()
+{
+  static int instanceCount = 0;
+  vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVParallelDecimate *paraDeci;
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Link the PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
+          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
+                              "vtkPieceScalars", "PieceScalars", 
+			      ++instanceCount));
+  if (f == NULL) {return;}
+  f->SetPVInput(this);
   
-  paraDeci = vtkPVParallelDecimate::New();
-  paraDeci->Clone(pvApp);
-  
-  paraDeci->SetPVInput(this);
-  
-  paraDeci->SetName("parallel decimate");
-  
-  this->GetPVSource()->GetView()->AddComposite(paraDeci);
-  
-  window->SetCurrentSource(paraDeci);
-  paraDeci->AddPVInputList();
-  
-  paraDeci->Delete();
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the CreateProperties method.
+  f->AddPVInputList();
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  // We cannot create an object in tcl and delete it in C++.
+  //f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -439,8 +460,8 @@ int vtkPVPolyData::Create(char *args)
 				      "PolyDataNormals");
   this->FiltersMenuButton->AddCommand("TubeFilter", this,
 				      "TubeFilter");
-  this->FiltersMenuButton->AddCommand("ParallelDecimate", this,
-				      "ParallelDecimate");
+  this->FiltersMenuButton->AddCommand("PieceScalars", this,
+				      "PieceScalars");
   
   this->DecimateButton->SetParent(this);
   this->DecimateButton->Create(this->Application, "-text Decimate");
@@ -448,27 +469,6 @@ int vtkPVPolyData::Create(char *args)
   this->Script("pack %s", this->DecimateButton->GetWidgetName());
   
   return 1;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVPolyData::SetData(vtkDataSet *data)
-{
-  vtkPolyData *polyData = vtkPolyData::SafeDownCast(data);
-  
-  if (data != NULL && polyData == NULL)
-    {
-    vtkErrorMacro("Expecting a polydata object");
-    return;
-    }
-  
-  this->vtkPVData::SetData(polyData);
-
-  if (this->ActorComposite)
-    {
-    this->ActorComposite->SetApplication(this->Application);
-    this->ActorComposite->SetInput(polyData);
-    }
 }
 
 
@@ -487,8 +487,8 @@ void vtkPVPolyData::SetLocalRepresentation(vtkPVPolyData *data)
   
   if (myId == 0)
     {
-    pvApp->BroadcastScript("%s SetLocalRepresentation %s",
-			   this->GetTclName(), data->GetTclName());
+    //pvApp->BroadcastScript("%s SetLocalRepresentation %s",
+    //		   this->GetTclName(), data->GetTclName());
     
     // Manage callbacks.
     if (this->LocalRepresentation && data == NULL)
@@ -532,15 +532,12 @@ void vtkPVPolyData::InteractiveOnCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   int myId = pvApp->GetController()->GetLocalProcessId();
   
-  if (myId == 0)
-    {
-    pvApp->BroadcastScript("%s InteractiveOnCallback", this->GetTclName());
-    }
+  //pvApp->BroadcastScript("%s InteractiveOnCallback", this->GetTclName());
   
   if (this->LocalRepresentation)
     {
     this->GetActorComposite()->GetMapper()->
-      SetInput(this->LocalRepresentation->GetPolyData());
+      SetInput(this->LocalRepresentation->GetVTKPolyData());
     }
 }
 
@@ -550,17 +547,14 @@ void vtkPVPolyData::InteractiveOffCallback()
   vtkPVApplication *pvApp = this->GetPVApplication();
   int myId = pvApp->GetController()->GetLocalProcessId();
   
-  if (myId == 0)
-    {
-    pvApp->BroadcastScript("%s InteractiveOffCallback", this->GetTclName());
-    }
+  //pvApp->BroadcastScript("%s InteractiveOffCallback", this->GetTclName());
   
-  this->GetActorComposite()->GetMapper()->SetInput(this->GetPolyData());
+  this->GetActorComposite()->GetMapper()->SetInput(this->GetVTKPolyData());
 }
 
 //----------------------------------------------------------------------------
-vtkPolyData *vtkPVPolyData::GetPolyData()
+vtkPolyData *vtkPVPolyData::GetVTKPolyData()
 {
-  return (vtkPolyData*)this->Data;
+  return (vtkPolyData*)this->VTKData;
 }
 

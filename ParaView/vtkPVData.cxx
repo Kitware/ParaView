@@ -32,15 +32,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkKWApplication.h"
 #include "vtkPVCutter.h"
-#include "vtkPVAssignment.h"
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
-#include "vtkPVScalarBar.h"
 #include "vtkKWMenuButton.h"
 #include "vtkElevationFilter.h"
 #include "vtkSingleContourFilter.h"
 #include "vtkExtractEdges.h"
-#include "vtkPVDataSetToDataSetFilter.h"
+
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -51,28 +49,29 @@ vtkPVData::vtkPVData()
 {
   this->CommandFunction = vtkPVDataCommand;
 
-  this->Data = NULL;
+  this->VTKData = NULL;
+  this->VTKDataTclName = NULL;
   this->PVSource = NULL;
   
   this->FiltersMenuButton = vtkKWMenuButton::New();
-  
-  this->Assignment = NULL;
-
   this->ActorCompositeButton = vtkKWPushButton::New();
-  this->ScalarBarButton = vtkKWPushButton::New();
-
-  // This is initialized in "Clone();"
-  this->ActorComposite = NULL;
-  this->PVScalarBar = NULL;
-
   this->PVSourceCollection = vtkPVSourceCollection::New();
+
+  // Has an initialization component in CreateParallelTclObjects.
+  this->ActorComposite = vtkPVActorComposite::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
+{
+  this->ActorComposite->CreateParallelTclObjects(pvApp);
+  this->ActorComposite->SetInput(this);
 }
 
 //----------------------------------------------------------------------------
 vtkPVData::~vtkPVData()
 {
-  this->SetAssignment(NULL);
-  this->SetData(NULL);
+  this->SetVTKDataTclName(NULL);
   this->SetPVSource(NULL);
 
   this->FiltersMenuButton->Delete();
@@ -80,22 +79,13 @@ vtkPVData::~vtkPVData()
   
   if (this->ActorComposite)
     {
-    this->ActorComposite->UnRegister(this);
+    this->ActorComposite->Delete();
     this->ActorComposite = NULL;
     }
   
   this->ActorCompositeButton->Delete();
   this->ActorCompositeButton = NULL;
 
-  if (this->PVScalarBar)
-    {
-    this->PVScalarBar->Delete();
-    this->PVScalarBar = NULL;
-    }
-  
-  this->ScalarBarButton->Delete();
-  this->ScalarBarButton = NULL;
-  
   this->PVSourceCollection->Delete();
   this->PVSourceCollection = NULL;  
 }
@@ -106,52 +96,13 @@ vtkPVData* vtkPVData::New()
   return new vtkPVData();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVData::Clone(vtkPVApplication *pvApp)
-{
-  if (this->Application)
-    {
-    vtkErrorMacro("Application has already been set.");
-    }
-  this->SetApplication(pvApp);
-
-  // Clone this object on every other process.
-  pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
-  
-  // The clones might as well have an application.
-  pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
-			 pvApp->GetTclName());  
-  
-  // Now create an actor composite with identical tcl names in every process.
-  vtkPVActorComposite *c;
-  char *tclName;
-  tclName = new char[strlen(this->GetTclName())+strlen("ActorComposite")+1];
-  sprintf(tclName, "%sActorComposite", this->GetTclName());
-  c = vtkPVActorComposite::SafeDownCast(
-             pvApp->MakeTclObject("vtkPVActorComposite", tclName));
-  delete [] tclName;
-  tclName = NULL;
-  
-  c->Clone(pvApp);
-  this->SetActorComposite(c);
-  c->Delete();
-
-  vtkPVScalarBar *sb;
-  sb = vtkPVScalarBar::New();
-  sb->Clone(pvApp);
-  this->SetPVScalarBar(sb);
-  sb->Delete();
-
-  // What about deleting the cloned composites?
-}
-
 
 //----------------------------------------------------------------------------
 int vtkPVData::Create(char *args)
 {
   if (this->Application == NULL)
     {
-    vtkErrorMacro("Object has not been cloned yet.");
+    vtkErrorMacro("Application has not been set yet.");
     return 0;
     }
   
@@ -166,13 +117,10 @@ int vtkPVData::Create(char *args)
   this->FiltersMenuButton->SetButtonText("Filters");
   this->FiltersMenuButton->AddCommand("ContourFilter", this,
 				      "Contour");
-  if (this->Data->GetPointData()->GetScalars() == NULL)
+  if (this->VTKData->GetPointData()->GetScalars() == NULL)
     {
     this->Script("%s entryconfigure 3 -state disabled",
 		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
-    // If there are not point scalars, the scalar bar should not be
-    // visible either.
-    this->GetPVScalarBar()->VisibilityOff();
     }
   else
     {
@@ -194,12 +142,7 @@ int vtkPVData::Create(char *args)
   this->ActorCompositeButton->Create(this->Application, "");
   this->ActorCompositeButton->SetLabel("Get Actor Composite");
   this->ActorCompositeButton->SetCommand(this, "ShowActorComposite");
-  this->ScalarBarButton->SetParent(this);
-  this->ScalarBarButton->Create(this->Application, "");
-  this->ScalarBarButton->SetLabel("Get Scalar Bar Parameters");
-  this->ScalarBarButton->SetCommand(this, "ShowScalarBarParameters");
-  this->Script("pack %s %s", this->ActorCompositeButton->GetWidgetName(),
-               this->ScalarBarButton->GetWidgetName());
+  this->Script("pack %s", this->ActorCompositeButton->GetWidgetName());
 
   return 1;
 }
@@ -210,21 +153,16 @@ void vtkPVData::ShowActorComposite()
   this->GetActorComposite()->ShowProperties();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVData::ShowScalarBarParameters()
-{
-  this->GetPVScalarBar()->ShowProperties();
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVData::Contour()
 {
+  /*
   static int instanceCount = 0;
   vtkPVDataSetToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  float *range = this->GetData()->GetScalarRange();
+  float *range = this->GetVTKData()->GetScalarRange();
   
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Link the PVSource to the vtkSource.
@@ -256,6 +194,7 @@ void vtkPVData::Contour()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
@@ -264,7 +203,6 @@ void vtkPVData::Cutter()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVCutter *cutter = vtkPVCutter::New();
   
-  cutter->Clone(pvApp);
   cutter->SetPVInput(this);
   
   cutter->SetOrigin(0, 0, 0);
@@ -284,11 +222,12 @@ void vtkPVData::Cutter()
 //----------------------------------------------------------------------------
 void vtkPVData::Elevation()
 {
+  /*
   static int instanceCount = 0;
   vtkPVDataSetToDataSetFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  float *bounds = this->GetData()->GetBounds();
+  float *bounds = this->GetVTKData()->GetBounds();
   
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Link the PVSource to the vtkSource.
@@ -318,11 +257,13 @@ void vtkPVData::Elevation()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::ExtractEdges()
 {
+  /*
   static int instanceCount = 0;
   vtkPVDataSetToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -349,11 +290,13 @@ void vtkPVData::ExtractEdges()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByProcess()
 {
+  /*
   static int instanceCount = 0;
   vtkPVDataSetToDataSetFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -380,6 +323,7 @@ void vtkPVData::ColorByProcess()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
+  */
 }
 
 
@@ -400,30 +344,30 @@ void vtkPVData::GetBounds(float bounds[6])
     return;
     }
   
-  if (this->Data == NULL)
+  if (this->VTKData == NULL)
     {
     bounds[0] = bounds[1] = bounds[2] = 0.0;
     bounds[3] = bounds[4] = bounds[5] = 0.0;
     }
   
-  pvApp->BroadcastScript("%s TransmitBounds", this->GetTclName());
+  //pvApp->BroadcastScript("%s TransmitBounds", this->GetTclName());
   
-  if (this->Assignment == NULL)
+  if (0)
     {
     vtkWarningMacro("Cannot update without Assignment.");
     }
   
   else
     {
-    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
-				this->Assignment->GetNumberOfPieces(),
-				0);
-    this->Data->Update();
+    //this->VTKData->SetUpdateExtent(this->Assignment->GetPiece(),
+    //				this->Assignment->GetNumberOfPieces(),
+    //				0);
+    this->VTKData->Update();
     }
   
-  if (this->Data->GetNumberOfCells() > 0)
+  if (this->VTKData->GetNumberOfCells() > 0)
     {
-    this->Data->GetBounds(bounds);
+    this->VTKData->GetBounds(bounds);
     emptyFlag = 0;
     }
   else
@@ -485,19 +429,19 @@ void vtkPVData::TransmitBounds()
   float emptyFlag;
   
   // Try to update data.
-  if (this->Assignment == NULL)
+  if (0)
     {
     vtkWarningMacro("Cannot update without Assignment.");
     }
   else
     {
-    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
-				this->Assignment->GetNumberOfPieces(),
-				0);
-    this->Data->Update();
+    //this->VTKData->SetUpdateExtent(this->Assignment->GetPiece(),
+    //  this->Assignment->GetNumberOfPieces(),
+    //  0);
+    this->VTKData->Update();
     }  
 
-  if (this->Data == NULL || this->Data->GetNumberOfCells() == 0)
+  if (this->VTKData == NULL || this->VTKData->GetNumberOfCells() == 0)
     {
     emptyFlag = 1;
     bounds[0] = bounds[1] = bounds[2] = 0.0;
@@ -505,7 +449,7 @@ void vtkPVData::TransmitBounds()
     }
   else
     {
-    this->Data->GetBounds(bounds);
+    this->VTKData->GetBounds(bounds);
     emptyFlag = 0;
     }
   
@@ -528,24 +472,24 @@ int vtkPVData::GetNumberOfCells()
     return -1;
     }
   
-  if (this->Data == NULL)
+  if (this->VTKData == NULL)
     {
     numCells = 0;
     }
   
-  pvApp->BroadcastScript("%s TransmitNumberOfCells", this->GetTclName());
+  //pvApp->BroadcastScript("%s TransmitNumberOfCells", this->GetTclName());
   
-  if (this->Assignment == NULL)
+  if (0)
     {
     vtkWarningMacro("Cannot update without Assignment.");
     }
   else
     {
-    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
-				this->Assignment->GetNumberOfPieces(),
-				0);
-    this->Data->Update();
-    numCells = this->Data->GetNumberOfCells();
+    //this->VTKData->SetUpdateExtent(this->Assignment->GetPiece(),
+    //  this->Assignment->GetNumberOfPieces(),
+    //  0);
+    this->VTKData->Update();
+    numCells = this->VTKData->GetNumberOfCells();
     }
   
   num = controller->GetNumberOfProcesses();
@@ -566,105 +510,27 @@ void vtkPVData::TransmitNumberOfCells()
   int numCells;
   
   // Try to update data.
-  if (this->Assignment == NULL)
+  if (0)
     {
     vtkWarningMacro("Cannot update without Assignment.");
     }
   else
     {
-    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
-				this->Assignment->GetNumberOfPieces(),
-				0);
-    this->Data->Update();
+    //this->VTKData->SetUpdateExtent(this->Assignment->GetPiece(),
+    //  this->Assignment->GetNumberOfPieces(),
+    //  0);
+    this->VTKData->Update();
     }
 
-  numCells = this->Data->GetNumberOfCells();
+  numCells = this->VTKData->GetNumberOfCells();
   
   controller->Send((int*)(&numCells), 1, 0, 994);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::SetActorComposite(vtkPVActorComposite *c)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->ActorComposite == c)
-    {
-    return;
-    }
-  if (c == NULL)
-    {
-    vtkErrorMacro("You should not be setting a NULL actor composite.");
-    return;
-    }
-  this->Modified();
-  
-  // Broadcast to all satellite processes.
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetActorComposite %s", this->GetTclName(), 
-			   c->GetTclName());
-    }
-  
-  if (this->ActorComposite)
-    {
-    this->ActorComposite->UnRegister(this);
-    this->ActorComposite = NULL;
-    }
-  c->Register(this);
-  this->ActorComposite = c;
-  this->ActorComposite->SetPVData(this);
-  
-  // Try to keep all internal relationships consistent.
-  if (this->Assignment)
-    {
-    this->ActorComposite->SetAssignment(this->Assignment);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::SetPVScalarBar(vtkPVScalarBar *sb)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->PVScalarBar == sb)
-    {
-    return;
-    }
-  if (sb == NULL)
-    {
-    vtkErrorMacro("You should not be setting a NULL scalar bar.");
-    return;
-    }
-  this->Modified();
-  
-  // Broadcast to all satellite processes.
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetPVScalarBar %s", this->GetTclName(), 
-			   sb->GetTclName());
-    }
-  
-  if (this->PVScalarBar)
-    {
-    this->PVScalarBar->UnRegister(this);
-    this->PVScalarBar = NULL;
-    }
-  sb->Register(this);
-  this->PVScalarBar = sb;
-  this->PVScalarBar->SetPVData(this);
 }
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVData::GetActorComposite()
 {
   return this->ActorComposite;
-}
-
-//----------------------------------------------------------------------------
-vtkPVScalarBar *vtkPVData::GetPVScalarBar()
-{
-  return this->PVScalarBar;
 }
 
 //----------------------------------------------------------------------------
@@ -712,60 +578,17 @@ void vtkPVData::SetPVSource(vtkPVSource *source)
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetAssignment(vtkPVAssignment *a)
-{
-  if (this->Assignment == a)
-    {
-    return;
-    }
-
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetAssignment %s", this->GetTclName(), 
-			   a->GetTclName());
-    }
-  
-  this->ActorComposite->SetAssignment(a);
-  
-  if (this->Assignment)
-    {
-    this->Assignment->UnRegister(NULL);
-    this->Assignment = NULL;
-    }
-
-  if (a)
-    {
-    this->Assignment = a;
-    a->Register(this);
-    }
-}
-
-  
-//----------------------------------------------------------------------------
 void vtkPVData::Update()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int myId = pvApp->GetController()->GetLocalProcessId();
-  
-  if (myId == 0)
-    {
-    pvApp->BroadcastScript("%s Update", this->GetTclName());
-    }
-  
-  if (this->Data == NULL)
+
+  if (this->VTKDataTclName == NULL)
     {
     vtkErrorMacro("No data object to update.");
-    }
-
-  if (this->Assignment)
-    {
-    this->Data->SetUpdateExtent(this->Assignment->GetPiece(),
-                                this->Assignment->GetNumberOfPieces(),
-				0);
+    return;
     }
   
-  this->Data->Update();
+  pvApp->BroadcastScript("%s Update", this->VTKDataTclName);
 }
 
 

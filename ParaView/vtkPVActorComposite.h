@@ -42,8 +42,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
 
-class vtkPVImageTextureFilter;
-class vtkPVAssignment;
+//class vtkPVImageTextureFilter;
 class vtkPVApplication;
 class vtkPVData;
 
@@ -60,16 +59,14 @@ public:
   vtkTypeMacro(vtkPVActorComposite, vtkKWActorComposite);
 
   // Description:
-  // This is a parallel object.  A clone will exist in every process.
-  // After the object is constructed, clone should be called to
-  /// create duplicate objects with the same tcl name.
-  void Clone(vtkPVApplication *pvApp);  
-  
-  // Description:
   // Create the properties object, called by UpdateProperties.
   void CreateProperties();
-
   void ShowProperties();
+  
+  // Description:
+  // This method should be called immediately after the object is constructed.
+  // It create VTK objects which have to exeist on all processes.
+  void CreateParallelTclObjects(vtkPVApplication *pvApp);
   
   // Description:
   // This name is used in the data list to identify the composite.
@@ -93,14 +90,9 @@ public:
   vtkBooleanMacro(Visibility, int);
     
   // Description:
-  // The mapper needs to know what the assignment is.
-  void SetAssignment(vtkPVAssignment *a);
-  vtkPVAssignment *GetAssignment() { return this->Assignment;}
-
-  // Description:
   // ONLY SET THIS IF YOU ARE A PVDATA!
   // The actor composite needs to know which PVData it belongs to.
-  void SetPVData(vtkPVData *data);
+  void SetInput(vtkPVData *data);
   vtkGetObjectMacro(PVData, vtkPVData);
   
   // Description:
@@ -137,9 +129,13 @@ public:
 
   // Description:
   // We need our own set input to take any type of data (based on mode).
-  void SetInput(vtkDataSet *input);
-  void SetInput(vtkPolyData *input) {this->SetInput((vtkDataSet*)input);}
+  //void SetInput(vtkDataSet *input);
+  //void SetInput(vtkPolyData *input) {this->SetInput((vtkDataSet*)input);}
 
+  // Description:
+  // Tcl name of the actor across all processes.
+  vtkGetStringMacro(ActorTclName);
+  
 protected:
 
   vtkPVActorComposite();
@@ -161,12 +157,18 @@ protected:
   // the data object that owns this composite
   vtkPVData *PVData;
   
-  vtkPVAssignment *Assignment;
-  vtkPVImageTextureFilter *TextureFilter;
+  //vtkPVImageTextureFilter *TextureFilter;
   
   int Mode;
   // Super class stores a vtkPolyDataInput, this is a more general input.
   vtkDataSet *DataSetInput;
+
+  char *ActorTclName;
+  vtkSetStringMacro(ActorTclName);
+  
+  char *MapperTclName;
+  vtkSetStringMacro(MapperTclName);
+  
 };
 
 #endif

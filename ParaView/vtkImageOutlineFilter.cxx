@@ -230,5 +230,4 @@ void vtkImageOutlineFilter::ExecuteInformation()
   this->vtkSource::ExecuteInformation();
 
   this->OutlineSource->UpdateInformation();
-  output->SetMaximumNumberOfPieces(10000);
 }

@@ -25,26 +25,26 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-
 #include "vtkPVMethodInterface.h"
 
-//int vtkPVMethodInterfaceCommand(ClientData cd, Tcl_Interp *interp,
-//			       int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVMethodInterface::vtkPVMethodInterface()
 {
   this->VariableName = NULL;
-  this->ArgumentType = VTK_FLOAT;
-  this->NumberOfArguments = 1;
-  
-  //  this->CommandFunction = vtkPVMethodInterfaceCommand;
+  this->SetCommand = NULL;
+  this->GetCommand = NULL;
+  this->ArgumentTypes = vtkIdList::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVMethodInterface::~vtkPVMethodInterface()
 {
   this->SetVariableName(NULL);
+  this->SetSetCommand(NULL);
+  this->SetGetCommand(NULL);
+  this->ArgumentTypes->Delete();
+  this->ArgumentTypes = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -52,4 +52,11 @@ vtkPVMethodInterface* vtkPVMethodInterface::New()
 {
   return new vtkPVMethodInterface();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVMethodInterface::AddArgumentType(int type)
+{
+  this->ArgumentTypes->InsertNextId(type);
+}
+
 

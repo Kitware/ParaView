@@ -43,7 +43,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWView.h"
 #include "vtkInteractorStyle.h"
+#include "vtkTreeComposite.h"
 #include "vtkRenderWindowInteractor.h"
+#include "vtkPVRenderView.h"
 
 class vtkPVApplication;
 
@@ -55,24 +57,13 @@ public:
   vtkTypeMacro(vtkPVRenderView,vtkKWView);
 
   // Description:
-  // Duplicate this object in the satellite processes.  Clones will
-  // have the same tcl name.  Unlike other parallel objects in
-  // ParaView, this one does not use Clone to set the application.
-  // That is still done in the method "Create" (for superclass reasons).
-  void Clone(vtkPVApplication *pvApp);
+  // Set the application right after construction.
+  void CreateRenderObjects(vtkPVApplication *pvApp);
   
   // Description:
   // Create the TK widgets associated with the view.
   void Create(vtkKWApplication *app, const char *args);
 
-  // Description:
-  // This is a parallel version of the superclasses method.
-  // It makes the assignment in all of the processes.
-  // Pass in a vtkPVApplication, or the method will fail.
-  // NOTE: This is a different way of setting the application.
-  // All other parallel objects set the application in the Clone method.
-  void SetApplication(vtkKWApplication *app);
-  
   // Description:
   // The events will be forwarded to this style object,
   void SetInteractorStyle(vtkInteractorStyle *style);
@@ -106,24 +97,8 @@ public:
   void ResetCameraClippingRange();
 
   // Description:
-  // This method is called in the satellite renderers to compute the bounds of
-  // the actors.
-  void TransmitBounds();
-
-  // Description:
-  // This method is called in the satellite renderers to render and composite
-  // the results.
-  void RenderHack();
-  
-  // Description:
   // This method is executed in all processes.
   void AddComposite(vtkKWComposite *c);
-
-  // Description:
-  // Since the superclass AddComposite creates the properties and we do not
-  // want to deal with UI in the satellite processes ...
-  // This is the special call made in the satellite processes.
-  void AddCompositeHack(vtkKWComposite *c);
 
   // Description:
   // Casts to vtkPVApplication.
@@ -163,8 +138,18 @@ protected:
   vtkRenderWindowInteractor *Interactor;
 
   int Interactive;
+
+  vtkTreeComposite *Composite;
+  char *CompositeTclName;
+  vtkSetStringMacro(CompositeTclName);
+
+  char *RendererTclName;
+  vtkSetStringMacro(RendererTclName);  
+   
+  char *RenderWindowTclName;
+  vtkSetStringMacro(RenderWindowTclName);  
   
-  //vtkRenderWindow *RenderWindow;
+ //vtkRenderWindow *RenderWindow;
   //vtkRenderer *Renderer;
 };
 

@@ -65,8 +65,8 @@ public:
   
   // Description:
   // Through runtime checking, this data must be a vtkImageData.
-  void SetData(vtkDataSet *image);
-  vtkImageData *GetImageData();
+  void SetVTKData(vtkDataSet *image);
+  vtkImageData *GetVTKImageData();
   
   void Clip();
   void Slice();
@@ -75,11 +75,6 @@ public:
   // Description:
   // Uses the assignment to set the extent, then updates the data.
   void Update();
-  
-  // Description: 
-  // The geometry filter needs to know how to break up the extent.
-  // Maybe we should just make the geometry filter a PVFilter.
-  void SetAssignment(vtkPVAssignment *a);
   
   // I know these are supposed to be protected, but vtkPVRunTimeContour needs
   // them to be public.

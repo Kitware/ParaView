@@ -36,16 +36,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
-#include "vtkPVPolyDataSource.h"
-#include "vtkPVImageSource.h"
 #include "vtkPVSourceList.h"
 #include "vtkInteractorStyleTrackballCamera.h"
-#include "vtkPVRunTimeContour.h"
 
 class vtkKWNotebook;
 class vtkKWToolbar;
 class vtkKWScale;
 class vtkKWPushButton;
+
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -57,24 +55,6 @@ public:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app, char *args);
 
-  // Description:
-  // These create new sources.
-  vtkPVImageSource *CreateImageReader();
-  vtkPVImageSource *CreateFractalVolume();
-  vtkPVPolyDataSource *CreateCone();
-  vtkPVPolyDataSource *CreateSTLReader();
-  vtkPVRunTimeContour *CreateRunTimeContour();
-  vtkPVPolyDataSource *CreateSphere();
-  vtkPVPolyDataSource *CreateAxes();
-  vtkPVPolyDataSource *CreateCube();
-  vtkPVPolyDataSource *CreateCylinder();
-  vtkPVPolyDataSource *CreateDisk();
-  vtkPVPolyDataSource *CreateLine();
-  vtkPVPolyDataSource *CreatePlane();
-  vtkPVPolyDataSource *CreatePoints();
-  vtkPVPolyDataSource *CreateSuperQuadric();
-  void CreateAnimation();
-  
   // Description:
   // I assume this creates a new applciation window.
   void NewWindow();
@@ -153,6 +133,9 @@ protected:
 
   // Separating out creation of the main view.
   void CreateMainView(vtkPVApplication *pvApp);
+  
+  void ReadSourceInterfaces();
+  vtkCollection *SourceInterfaces;
 };
 
 

@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVImageTextureFilter_h
 
 #include "vtkSource.h"
-#include "vtkPVAssignment.h"
 class vtkOutlineSource;
 class vtkImageData;
 class vtkPolyData;
@@ -88,11 +87,6 @@ public:
   // Select which portion of the input we need.
   void ComputeInputUpdateExtents( vtkDataObject *output);
 
-  // Description:
-  // Assignment to a process is encoded in this object.
-  vtkSetObjectMacro(Assignment, vtkPVAssignment);
-  vtkGetObjectMacro(Assignment, vtkPVAssignment);
-  
 protected:
   vtkPVImageTextureFilter();
   ~vtkPVImageTextureFilter();
@@ -101,8 +95,6 @@ protected:
   
   void Execute();
 
-  vtkPVAssignment *Assignment;
-  
   vtkImageData *IntermediateImage;
   vtkImageClip *Clip;
   vtkPlaneSource *PlaneSource;

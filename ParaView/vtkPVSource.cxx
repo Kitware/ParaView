@@ -31,8 +31,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
 #include "vtkPVActorComposite.h"
-#include "vtkPVScalarBar.h"
-#include "vtkPVAssignment.h"
 #include "vtkKWView.h"
 #include "vtkKWScale.h"
 #include "vtkPVRenderView.h"
@@ -40,6 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSelectionList.h"
 #include "vtkPVCommandList.h"
 #include "vtkCollection.h"
+#include "vtkPVPolyData.h"
 #include "vtkPVMethodInterface.h"
 
 
@@ -161,23 +160,6 @@ vtkPVSource::~vtkPVSource()
 vtkPVSource* vtkPVSource::New()
 {
   return new vtkPVSource();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::Clone(vtkPVApplication *pvApp)
-{
-  if (this->Application)
-    {
-    vtkErrorMacro("Application has already been set.");
-    }
-  this->SetApplication(pvApp);
-
-  // Clone this object on every other process.
-  pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
-
-  // The clones might as well have an application.
-  pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
-			 pvApp->GetTclName());  
 }
 
 //----------------------------------------------------------------------------
@@ -352,8 +334,6 @@ void vtkPVSource::CreateProperties()
                this->DeleteButton->GetWidgetName());
   
   // Every source has a name.
-  this->AddLabeledEntry("Name:", "SetName", "GetName", this);
-  // Every Source has an output.
   this->AddMethodInterface("Output", VTK_STRING, 1);
 
   this->UpdateNavigationCanvas();
@@ -488,10 +468,7 @@ void vtkPVSource::SetVisibility(int v)
   
   pvApp = (vtkPVApplication*)(this->Application);
   
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);
-    }
+  //pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);
 }
 
   
@@ -1463,23 +1440,19 @@ void vtkPVSource::AcceptCallback()
   
   // Initialize the output if necessary.
   if (this->GetPVOutput(0) == NULL && this->GetVTKSource())
-    { // This is the first time, initialize data.  
+    { // This is the first time, initialize data.    
     vtkPVData *input;
     vtkPVActorComposite *ac;
-    vtkPVScalarBar *sb;
     
     input = this->GetNthPVInput(0);
     this->InitializePVOutput(0);
     this->CreateDataPage(0);
     ac = this->GetPVOutput(0)->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
-    sb = this->GetPVOutput(0)->GetPVScalarBar();
-    window->GetMainView()->AddComposite(sb);
     // Make the last data invisible.
     if (input)
       {
       input->GetActorComposite()->SetVisibility(0);
-      input->GetPVScalarBar()->SetVisibility(0);
       }
     window->GetMainView()->ResetCamera();
     }
@@ -1525,10 +1498,7 @@ void vtkPVSource::CancelCallback()
     // Delete the source on the other processes.  Removing it from the
     // view's list of composites amounts to deleting the source on the
     // local processor because it's the last thing that has a reference to it.
-    if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-      {
-      pvApp->BroadcastScript("%s Delete", this->GetTclName());
-      }
+    //pvApp->BroadcastScript("%s Delete", this->GetTclName());
     this->GetWindow()->GetMainView()->RemoveComposite(this);
     pvApp->Script("%s Delete", this->GetTclName());
     }
@@ -1578,19 +1548,25 @@ void vtkPVSource::DeleteCallback()
     // Delete the source on the other processes.  Removing it from the
     // view's list of composites amounts to deleting the source on the
     // local processor because it's the last thing that has a reference to it.
-    if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-      {
-      pvApp->BroadcastScript("%s Delete", this->GetTclName());
-      pvApp->BroadcastScript("%s Delete", this->GetVTKSourceTclName());
-      }
+    //pvApp->BroadcastScript("%s Delete", this->GetTclName());
+    //  pvApp->BroadcastScript("%s Delete", this->GetVTKSourceTclName());
+
     this->GetVTKSource()->Delete();
     this->PVOutputs[0]->GetActorComposite()->VisibilityOff();
-    this->PVOutputs[0]->GetPVScalarBar()->VisibilityOff();
     if (prev)
       {
       prev->GetPVOutput(0)->GetActorComposite()->VisibilityOn();
       }
-    this->SetNthPVOutput(0, NULL);
+    
+    for (i = 0; i < this->NumberOfPVOutputs; ++i)
+      {
+      if (this->PVOutputs[i])
+	{
+	this->PVOutputs[i]->UnRegister(this);
+	this->PVOutputs[i] = NULL;
+	}
+      }
+    
     this->GetView()->Render();
     this->GetWindow()->GetMainView()->RemoveComposite(this);
     pvApp->Script("%s Delete", this->GetTclName());
@@ -1883,21 +1859,24 @@ void vtkPVSource::SetNumberOfPVInputs(int num)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::SetNthPVInput(int idx, vtkPVData *input)
+void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
   if (idx < 0)
     {
     vtkErrorMacro(<< "SetNthPVInput: " << idx << ", cannot set input. ");
     return;
     }
+  
   // Expand array if necessary.
   if (idx >= this->NumberOfPVInputs)
     {
     this->SetNumberOfPVInputs(idx + 1);
     }
   
-  // does this change anything?
-  if (input == this->PVInputs[idx])
+  // Does this change anything?  Yes, it keeps the object from being modified.
+  if (pvd == this->PVInputs[idx])
     {
     return;
     }
@@ -1908,17 +1887,13 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *input)
     this->PVInputs[idx]->UnRegister(this);
     this->PVInputs[idx] = NULL;
     }
-  else
-    {
-    this->PVInputs[idx] = vtkPVData::New();
-    }
   
-  if (input)
+  if (pvd)
     {
-    input->Register(this);
+    pvd->Register(this);
+    this->PVInputs[idx] = pvd;
     }
 
-  this->PVInputs[idx] = input;
   this->Modified();
 }
 
@@ -2091,51 +2066,6 @@ void vtkPVSource::SetNumberOfPVOutputs(int num)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *output)
-{
-  if (idx < 0)
-    {
-    vtkErrorMacro(<< "SetNthPVOutput: " << idx << ", cannot set output. ");
-    return;
-    }
-  // Expand array if necessary.
-  if (idx >= this->NumberOfPVOutputs)
-    {
-    this->SetNumberOfPVOutputs(idx + 1);
-    }
-  
-  // does this change anything?
-  if (output == this->PVOutputs[idx])
-    {
-    return;
-    }
-  
-  if (this->PVOutputs[idx])
-    {
-    // extra careful for circular references
-    vtkPVData *tmp = this->PVOutputs[idx];
-    this->PVOutputs[idx] = NULL;
-    // Manage double pointer.
-    tmp->SetPVSource(NULL);
-    tmp->UnRegister(this);
-    }
-  else
-    {
-    this->PVOutputs[idx] = vtkPVData::New();
-    }
-  
-  if (output)
-    {
-    this->PVOutputs[idx] = output;
-    output->Register(this);
-    // Manage double pointer.
-    output->SetPVSource(this);
-    }
-
-  this->Modified();
-}
-
-//---------------------------------------------------------------------------
 void vtkPVSource::AddPVOutput(vtkPVData *output)
 {
   int idx;
@@ -2228,14 +2158,66 @@ void vtkPVSource::Save(ofstream *file)
 
 
 //----------------------------------------------------------------------------
+// Obsolete.
 void vtkPVSource::AddMethodInterface(char *var, int argType, int numArgs)
 {
   vtkPVMethodInterface *mInterface = vtkPVMethodInterface::New();
 
   mInterface->SetVariableName(var);
-  mInterface->SetArgumentType(argType);
-  mInterface->SetNumberOfArguments(numArgs);
+  //mInterface->SetArgumentType(argType);
+  //mInterface->SetNumberOfArguments(numArgs);
   this->Interface->AddItem(mInterface);
   mInterface->Delete();
   mInterface = NULL;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSource::InitializePVOutput(int idx)
+{
+  // I imagine these will be passed in and will match the idx.
+  char *setCmd = "SetOutput";
+  char *getCmd = "GetOutput";
+  char *result;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *input;
+  vtkPVPolyData *pvd;
+  
+  if (this->VTKSourceTclName == NULL)
+    {
+    vtkErrorMacro("VTK object does not exist");
+    return;
+    }
+
+  // Expand array if necessary.
+  if (idx >= this->NumberOfPVOutputs)
+    {
+    this->SetNumberOfPVOutputs(idx + 1);
+    }
+  
+  if (this->PVOutputs[idx])
+    {
+    vtkErrorMacro("A PVOutput already exists.");
+    return;
+    }  
+  
+  // Get the type of the output.
+  this->Script("[%s %s] GetClassName", this->VTKSourceTclName, getCmd);
+  result = pvApp->GetMainInterp()->result;
+  if (strcmp(result, "vtkPolyData") == 0)
+    {
+    // Create the PVData object.
+    pvd = vtkPVPolyData::New();
+    }
+  
+  pvd->CreateParallelTclObjects(pvApp);
+  pvd->SetApplication(pvApp);
+  
+  this->PVOutputs[idx] = pvd;
+  pvd->Register(this);
+  // Manage double pointer.
+  pvd->SetPVSource(this);
+  pvApp->BroadcastScript("%s SetOutput %s", this->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());    
+
+}
+

@@ -42,8 +42,12 @@ class VTK_EXPORT vtkPVPolyData : public vtkPVData
 {
 public:
   static vtkPVPolyData* New();
-//  vtkTypeMacro(vtkPVPolyData, vtkKWWidget);
   vtkTypeMacro(vtkPVPolyData, vtkPVData);
+  
+  // Description:
+  // This method should be called immediately after the object is constructed.
+  // It create VTK objects which have to exeist on all processes.
+  void CreateParallelTclObjects(vtkPVApplication *pvApp);
   
   // Description:
   // Just like in vtk data objects, this method makes a data object
@@ -57,8 +61,7 @@ public:
 
   // Description:
   // Source uses this method to set the VTK data object.
-  void SetData(vtkDataSet *data);
-  vtkPolyData *GetPolyData();
+  vtkPolyData *GetVTKPolyData();
   
   // Description:
   // If local representation is set, then it used for interactive rendering.
@@ -85,6 +88,7 @@ public:
   void PolyDataNormals();
   void TubeFilter();
   void ParallelDecimate();  
+  void PieceScalars();
   
 protected:
   vtkPVPolyData();

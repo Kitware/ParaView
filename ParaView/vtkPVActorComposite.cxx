@@ -31,14 +31,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
 #include "vtkPVApplication.h"
-#include "vtkPVAssignment.h"
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkGeometryFilter.h"
-#include "vtkPVImageTextureFilter.h"
+//#include "vtkPVImageTextureFilter.h"
 #include "vtkTexture.h"
-#include "vtkPVScalarBar.h"
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVActorComposite::New()
@@ -79,13 +77,64 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->DataSetInput = NULL;
   this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
   
-  this->Assignment = NULL;
-  this->TextureFilter = NULL;
+  //this->TextureFilter = NULL;
+  
+  this->ActorTclName = NULL;
+  this->MapperTclName = NULL;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
+{
+  int numProcs, id;
+  static int instanceCount = 0;
+  char tclName[100];
+  
+  this->SetApplication(pvApp);
+  ++instanceCount;
+  
+  // Get rid of previous object created by the superclass.
+  if (this->Mapper)
+    {
+    this->Mapper->Delete();
+    this->Mapper = NULL;
+    }
+  // Make a new tcl object.
+  sprintf(tclName, "Mapper%d", instanceCount);
+  this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
+  this->MapperTclName = NULL;
+  this->SetMapperTclName(tclName);
+  
+  // Get rid of previous object created by the superclass.
+  if (this->Actor)
+    {
+    this->Actor->Delete();
+    this->Actor = NULL;
+    }
+  // Make a new tcl object.
+  sprintf(tclName, "Actor%d", instanceCount);
+  this->Actor = (vtkActor*)pvApp->MakeTclObject("vtkActor", tclName);
+  this->ActorTclName = NULL;
+  this->SetActorTclName(tclName);
+  
+  pvApp->BroadcastScript("%s SetMapper %s", this->ActorTclName, 
+			this->MapperTclName);
+  
+  // Hard code assignment based on processes.
+  numProcs = pvApp->GetController()->GetNumberOfProcesses() ;
+  for (id = 0; id < numProcs; ++id)
+    {
+    pvApp->RemoteScript(id, "%s SetNumberOfPieces %d", this->MapperTclName, numProcs);
+    pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
+    }
 }
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite::~vtkPVActorComposite()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   this->Properties->Delete();
   this->Properties = NULL;
   
@@ -109,32 +158,21 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->AmbientScale->Delete();
   this->AmbientScale = NULL;
   
-  this->SetPVData(NULL);
+  this->SetInput(NULL);
   
-  this->SetAssignment(NULL);
-  if (this->TextureFilter != NULL)
-    {
-    this->TextureFilter->Delete();
-    this->TextureFilter = NULL;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::Clone(vtkPVApplication *pvApp)
-{
-  if (this->Application)
-    {
-    vtkErrorMacro("Application has already been set.");
-    }
-  this->SetApplication(pvApp);
-
-  // Clone this object on every other process.
-  pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
-
-  // The application is needed by the clones to send scalar ranges back.
-  pvApp->BroadcastScript("%s SetApplication %s", this->GetTclName(),
-			 pvApp->GetTclName());
+  //if (this->TextureFilter != NULL)
+  //{
+  // this->TextureFilter->Delete();
+  //this->TextureFilter = NULL;
+  //}
   
+  pvApp->BroadcastScript("%s Delete", this->MapperTclName);
+  this->SetMapperTclName(NULL);
+  this->Mapper = NULL;
+
+  pvApp->BroadcastScript("%s Delete", this->ActorTclName);
+  this->SetActorTclName(NULL);
+  this->Actor = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -216,10 +254,8 @@ void vtkPVActorComposite::AmbientChanged()
   vtkPVApplication *pvApp = this->GetPVApplication();
   float ambient = this->AmbientScale->GetValue();
   
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetAmbient %f", this->GetTclName(), ambient);
-    }
+  //pvApp->BroadcastScript("%s SetAmbient %f", this->GetTclName(), ambient);
+
   
   this->SetAmbient(ambient);
   this->GetView()->Render();
@@ -238,8 +274,11 @@ void vtkPVActorComposite::ShowDataNotebook()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVActorComposite::SetPVData(vtkPVData *data)
+void vtkPVActorComposite::SetInput(vtkPVData *data)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  char *vtkDataTclName = NULL;
+  
   if (this->PVData == data)
     {
     return;
@@ -251,8 +290,6 @@ void vtkPVActorComposite::SetPVData(vtkPVData *data)
     // extra careful for circular references
     vtkPVData *tmp = this->PVData;
     this->PVData = NULL;
-    // Manage double pointer.
-    tmp->SetActorComposite(NULL);
     tmp->UnRegister(this);
     }
   
@@ -260,9 +297,10 @@ void vtkPVActorComposite::SetPVData(vtkPVData *data)
     {
     this->PVData = data;
     data->Register(this);
-    // Manage double pointer.
-    data->SetActorComposite(this);
+    vtkDataTclName = data->GetVTKDataTclName();
     }
+    
+  pvApp->BroadcastScript("%s SetInput %s", this->MapperTclName, vtkDataTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -321,13 +359,7 @@ void vtkPVActorComposite::SetScalarRange(float min, float max)
 { 
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetScalarRange %f %f", this->GetTclName(), 
-			   min, max);
-    }
-  
-  this->Mapper->SetScalarRange(min, max);
+  //pvApp->BroadcastScript("%s SetScalarRange %f %f", this->GetTclName(), min, max);
 }
 
 //----------------------------------------------------------------------------
@@ -428,11 +460,7 @@ void vtkPVActorComposite::SetVisibility(int v)
   
   pvApp = (vtkPVApplication*)(this->Application);
   
-  // Make the assignment in all of the processes.
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);
-    }
+  //pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);
 }
   
 //----------------------------------------------------------------------------
@@ -446,35 +474,6 @@ int vtkPVActorComposite::GetVisibility()
     }
   
   return p->GetVisibility();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::SetAssignment(vtkPVAssignment *a)
-{
-  if (a == this->Assignment)
-    {  
-    return;
-    }
-  
-  this->Modified();
-  
-  if (this->TextureFilter)
-    {
-    this->TextureFilter->SetAssignment(a);
-    }
-
-  if (this->Assignment)
-    {
-    this->Assignment->UnRegister(this);
-    this->Assignment = NULL;
-    }
-  if (a)
-    {
-    this->Assignment = a;
-    a->Register(this);
-    this->Mapper->SetPiece(a->GetPiece());
-    this->Mapper->SetNumberOfPieces(a->GetNumberOfPieces());
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -497,28 +496,7 @@ vtkPVApplication* vtkPVActorComposite::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVActorComposite::SetInput(vtkDataSet *input)
-{
-  int save = this->Mode;
-  
-  if (this->DataSetInput)
-    {
-    this->DataSetInput->UnRegister(this);
-    this->DataSetInput = NULL;
-    }
-  if (input)
-    {
-    input->Register(this);
-    this->DataSetInput = input;
-    }
-
-  // So the user can set mode and input in either order.
-  // Force a mode change. This will set the super classes input.
-  this->Mode = VTK_PV_ACTOR_COMPOSITE_NO_MODE;
-  this->SetMode(save);
-}
-
-//----------------------------------------------------------------------------
+// Not used.
 void vtkPVActorComposite::SetMode(int mode)
 {
   if (this->Mode == mode)
@@ -562,23 +540,21 @@ void vtkPVActorComposite::SetMode(int mode)
     // Empty texture segfaults.
     if (0 && this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE)
       {
-      if (this->TextureFilter)
-	{
-	this->TextureFilter->Delete();
-	}
-      this->TextureFilter = vtkPVImageTextureFilter::New();
-      this->TextureFilter->SetAssignment(this->Assignment);
-      this->TextureFilter->SetInput((vtkImageData *)(this->DataSetInput));
-      this->vtkKWActorComposite::SetInput(this->TextureFilter->GetGeometryOutput());
+      //if (this->TextureFilter)
+      //{
+      //this->TextureFilter->Delete();
+      //}
+      // this->TextureFilter = vtkPVImageTextureFilter::New();
+      //this->TextureFilter->SetInput((vtkImageData *)(this->DataSetInput));
+      //this->vtkKWActorComposite::SetInput(this->TextureFilter->GetGeometryOutput());
 
-      vtkTexture *texture = vtkTexture::New();
-      texture->SetInput(this->TextureFilter->GetTextureOutput());
-      this->GetActor()->SetTexture(texture);
-      texture->Delete();
-      texture = NULL;
+      //vtkTexture *texture = vtkTexture::New();
+      //texture->SetInput(this->TextureFilter->GetTextureOutput());
+      //this->GetActor()->SetTexture(texture);
+      //texture->Delete();
+      //texture = NULL;
       
-      this->GetPVData()->GetPVScalarBar()->UpdateLookupTable();
-      
+      vtkErrorMacro("Texture disabled");
       return;
       }
     }
