@@ -89,7 +89,6 @@ public:
   // Description:
   // Callbacks for Dimensionality menu
   void UsePoint();
-  void UseNewPoint();
   void UseLine();
 
   // Description:

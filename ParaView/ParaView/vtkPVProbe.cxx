@@ -280,7 +280,6 @@ void vtkPVProbe::CreateProperties()
   this->DimensionalityMenu->Create(pvApp, "");
   this->DimensionalityMenu->AddEntryWithCommand("Point", this, "UsePoint");
   this->DimensionalityMenu->AddEntryWithCommand("Line", this, "UseLine");
-  this->DimensionalityMenu->AddEntryWithCommand("NewPoint", this, "UseNewPoint");
   this->DimensionalityMenu->SetValue("Point");
   
   this->Script("pack %s %s -side left",
@@ -700,28 +699,7 @@ void vtkPVProbe::UpdateProbe()
                            this->GetVTKSourceTclName());
     pvApp->BroadcastScript("line Delete");  
     }
-  else
-    {
-    pvApp->BroadcastScript("vtkPolyData probeInput");
-    pvApp->BroadcastScript("vtkIdList pointList");
-    pvApp->BroadcastScript("pointList Allocate 1 1");
-    pvApp->BroadcastScript("pointList InsertNextId 0");
-    pvApp->BroadcastScript("vtkPoints points");
-    pvApp->BroadcastScript("points Allocate 1 1");
-    pvApp->BroadcastScript("points InsertNextPoint %f %f %f",
-                           this->PointPosition[0],
-			   this->PointPosition[1],
-			   this->PointPosition[2]);
-    pvApp->BroadcastScript("probeInput Allocate 1 1");
-    pvApp->BroadcastScript("probeInput SetPoints points");
-    pvApp->BroadcastScript("probeInput InsertNextCell 1 pointList");
-    pvApp->BroadcastScript("%s SetInput probeInput",
-                           this->GetVTKSourceTclName());
-    pvApp->BroadcastScript("pointList Delete");
-    pvApp->BroadcastScript("points Delete");
-    pvApp->BroadcastScript("probeInput Delete");
-    }
-  
+
   this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
                this->GetPVRenderView()->GetRendererTclName(),
                this->XYPlotTclName);
@@ -807,6 +785,9 @@ void vtkPVProbe::UsePoint()
                this->PointDataLabel->GetWidgetName(),
 	       this->PointWidget->GetWidgetName());
   this->Script("pack forget %s", this->ScalarArrayMenu->GetWidgetName());
+  this->LineWidget->Deselect();
+  this->PointWidget->Select();
+  this->DimensionalityMenu->SetCurrentEntry("Point");
   this->SetAcceptButtonColorToRed();
 }
 
@@ -825,25 +806,9 @@ void vtkPVProbe::UseLine()
   this->Script("pack %s %s",
                this->ShowXYPlotToggle->GetWidgetName(),
 	       this->LineWidget->GetWidgetName());    
-  this->SetAcceptButtonColorToRed();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProbe::UseNewPoint()
-{
-  this->Dimensionality = 3;
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->ProbeFrame->GetWidgetName());
-
-  this->Script("pack %s %s",
-               this->SelectedPointFrame->GetWidgetName(),
-               this->PointDataLabel->GetWidgetName());
-  this->ScalarArrayMenu->Update();
-
-  this->Script("pack %s %s",
-               this->ShowXYPlotToggle->GetWidgetName(),
-	       this->PointWidget->GetWidgetName());
-    
+  this->PointWidget->Deselect();
+  this->LineWidget->Select();
+  this->DimensionalityMenu->SetCurrentEntry("Line");
   this->SetAcceptButtonColorToRed();
 }
 
