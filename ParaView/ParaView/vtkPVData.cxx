@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.10");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.11");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -588,8 +588,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //
   // ===== LOD branch:
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
-  this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper",
-                                                          tclName);
+  pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
   pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->LODMapperTclName);
@@ -2875,7 +2874,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.10 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.11 $");
 }
 
 //----------------------------------------------------------------------------
