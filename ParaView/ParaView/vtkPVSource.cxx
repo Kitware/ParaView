@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.267");
+vtkCxxRevisionMacro(vtkPVSource, "1.268");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1800,14 +1800,14 @@ void vtkPVSource::SaveState(ofstream *file)
   // We may not have a input menu to set it for us.
   if (this->GetPVInput(0))
     {
-    *file << "$pv(" << this->GetPVWindow()->GetTclName() << ") "
-          << "SetCurrentPVSource $pv("
+    *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
+          << "SetCurrentPVSource $kw("
           << this->GetPVInput(0)->GetPVSource()->GetTclName() << ")\n";
     }
 
   // Save the object in the script.
-  *file << "set pv(" << this->GetTclName() << ") "
-        << "[$pv(" << this->GetPVWindow()->GetTclName() << ") "
+  *file << "set kw(" << this->GetTclName() << ") "
+        << "[$kw(" << this->GetPVWindow()->GetTclName() << ") "
         << "CreatePVSource " << this->GetModuleName() << "]" << endl;
 
   // Let the PVWidgets set up the object.
@@ -1817,15 +1817,12 @@ void vtkPVSource::SaveState(ofstream *file)
     widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
     if (widget)
       {
-      *file << "set pv(" << widget->GetTclName() << ") "
-            << "[$pv(" << this->GetTclName() << ") GetPVWidget {"
-            << widget->GetTraceName() << "}]" << endl;
       widget->SaveState(file);
       }
     }
 
   // Call accept.
-  *file << "$pv(" << this->GetTclName() << ") AcceptCallback" << endl;
+  *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
   // What about visibility?  
   // A second pass to set visibility?
@@ -2505,7 +2502,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.267 $");
+  this->ExtractRevision(os,"$Revision: 1.268 $");
 }
 
 //----------------------------------------------------------------------------

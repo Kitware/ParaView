@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.418");
+vtkCxxRevisionMacro(vtkPVWindow, "1.419");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2745,9 +2745,9 @@ void vtkPVWindow::SaveState(const char* filename)
   *file << endl << endl;
   */
 
-  *file << "set pv(" << this->GetTclName() << ") [$Application GetMainWindow]" << endl;
-  *file << "set pv(" << this->GetMainView()->GetTclName() 
-        << ") [$pv(" << this->GetTclName() << ") GetMainView]" << endl;
+  *file << "set kw(" << this->GetTclName() << ") [$Application GetMainWindow]" << endl;
+  *file << "set kw(" << this->GetMainView()->GetTclName() 
+        << ") [$kw(" << this->GetTclName() << ") GetMainView]" << endl;
 
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
     this->SourceLists->NewIterator();
@@ -4047,7 +4047,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.418 $");
+  this->ExtractRevision(os,"$Revision: 1.419 $");
 }
 
 //-----------------------------------------------------------------------------

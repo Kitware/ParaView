@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.239");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.240");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2550,7 +2550,7 @@ void vtkPVRenderView::SaveState(ofstream* file)
   float *color;
 
   color = this->Renderer->GetBackground();
-  *file << "$pv(" << this->GetTclName() << ") SetBackgroundColor " 
+  *file << "$kw(" << this->GetTclName() << ") SetBackgroundColor " 
         << color[0] << " " << color[1] << " " << color[2] << endl;
 
   camera = this->GetRenderer()->GetActiveCamera();
@@ -2558,7 +2558,7 @@ void vtkPVRenderView::SaveState(ofstream* file)
   camera->GetFocalPoint(focalPoint);
   camera->GetViewUp(viewUp);
   
-  *file << "$pv(" << this->GetTclName() << ") SetCameraState " 
+  *file << "$kw(" << this->GetTclName() << ") SetCameraState " 
         << position[0] << " " << position[1] << " " << position[2] << " "
         << focalPoint[0] << " " << focalPoint[1] << " " << focalPoint[2] << " "
         << viewUp[0] << " " << viewUp[1] << " " << viewUp[2] << endl; 
@@ -2655,7 +2655,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.239 $");
+  this->ExtractRevision(os,"$Revision: 1.240 $");
 }
 
 //------------------------------------------------------------------------------

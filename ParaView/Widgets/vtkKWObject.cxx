@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.32");
+vtkCxxRevisionMacro(vtkKWObject, "1.33");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -119,7 +119,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.32 $");
+  this->ExtractRevision(os,"$Revision: 1.33 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -371,6 +371,7 @@ const char *vtkKWObject::GetVersion(const char *cname)
 //-----------------------------------------------------------------------------
 int vtkKWObject::InitializeTrace(ofstream* file)
 {
+  int stateFlag = 0;
   int dummyInit = 0;
   int* pInit;
 
@@ -389,6 +390,7 @@ int vtkKWObject::InitializeTrace(ofstream* file)
     }
   else
     { // Saving state: Ignore trace initialization.
+    stateFlag = 1;
     pInit = &(dummyInit);
     }
 
@@ -411,6 +413,13 @@ int vtkKWObject::InitializeTrace(ofstream* file)
       *pInit = 1;
       }
     }
+
+  // Hack to get state working.
+  if (stateFlag)
+    {  // Tracing relies on sources being initialized outside of this call.
+    return 1;
+    }
+
   return *pInit;
 }  
 
