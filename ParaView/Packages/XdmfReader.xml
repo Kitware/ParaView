@@ -4,7 +4,7 @@
    output="vtkDataSet" 
    class="vtkXDMFReaderModule" module_type="Reader" extensions=".xmf" 
    file_description="Xdmf Reader">
-  <Source class="vtkMyXdmfReader"/>
+  <Source class="vtkXdmfReader"/>
   <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
   <ArraySelection trace_name="cell_array_sel" attribute_name="Point" />
   <VectorEntry label="Stride" trace_name="stride" variable="Stride" type="int" 
