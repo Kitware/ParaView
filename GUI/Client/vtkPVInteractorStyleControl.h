@@ -14,7 +14,7 @@
 =========================================================================*/
 // .NAME vtkPVInteractorStyleControl - a control widget for manipulators
 // .SECTION Description
-// This widget defines a user interface for controling interactor
+// This widget defines a user interface for controlling interactor
 // style. It defines nine menus for different button and keyboard
 // combinations and bind a manipulator for each one of them. It also
 // provides a simple user interface for some manipulators.

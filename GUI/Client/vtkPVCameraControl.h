@@ -12,8 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVCameraControl
+// .NAME vtkPVCameraControl - a control widget for manipulating camera
+//
 // .SECTION Description
+// This widget defines a user interface for controlling the camera.
 
 #ifndef __vtkPVCameraControl_h
 #define __vtkPVCameraControl_h
