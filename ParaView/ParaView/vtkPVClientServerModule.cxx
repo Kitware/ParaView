@@ -144,7 +144,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.62");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.63");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -814,6 +814,7 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SocketController: " << this->SocketController << endl;;
   os << indent << "RenderServerSocket: " << this->RenderServerSocket << endl;;
   os << indent << "ClientMode: " << this->ClientMode << endl;
+  os << indent << "RenderServerMode: " << this->RenderServerMode << endl;
 }
 
 //----------------------------------------------------------------------------

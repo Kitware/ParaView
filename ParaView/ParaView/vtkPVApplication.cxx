@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.256");
+vtkCxxRevisionMacro(vtkPVApplication, "1.257");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2048,6 +2048,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
   os << indent << "CrashOnErrors: " << (this->CrashOnErrors?"on":"off") << endl;
+  os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
