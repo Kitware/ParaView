@@ -360,16 +360,16 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
 
 #ifdef VTK_USE_MPI
-  sprintf(tclName, "Collect%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  this->SetCollectTclName(tclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->CollectTclName, this->GeometryTclName);
+  //sprintf(tclName, "Collect%d", this->InstanceCount);
+  //pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+  //this->SetCollectTclName(tclName);
+  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+  //                       this->CollectTclName, this->GeometryTclName);
 
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
-			 "{Execute Collect}}", this->CollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
-			 "{Execute Collect}}", this->CollectTclName);
+  //pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
+  //			 "{Execute Collect}}", this->CollectTclName);
+  //pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
+  //			 "{Execute Collect}}", this->CollectTclName);
 #endif
 
   // Get rid of previous object created by the superclass.
@@ -430,15 +430,15 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          this->LODDeciTclName);
 
 #ifdef VTK_USE_MPI
-  sprintf(tclName, "LODCollect%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  this->SetLODCollectTclName(tclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
-			 "{Execute LODCollect}}", this->LODCollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
-			 "{Execute LODCollect}}", this->LODCollectTclName);
+  //sprintf(tclName, "LODCollect%d", this->InstanceCount);
+  //pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+  //this->SetLODCollectTclName(tclName);
+  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+  //                       this->LODCollectTclName, this->LODDeciTclName);
+  //pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
+  //                       "{Execute LODCollect}}", this->LODCollectTclName);
+  //pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
+  //                       "{Execute LODCollect}}", this->LODCollectTclName);
 #endif
 
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
