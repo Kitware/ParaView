@@ -184,7 +184,7 @@ public:
     // Description:
     //   Get one of the data sets included in spatial paritioning
 
-    vtkDataSet *GetDataSet(int i){return this->DataSets[i];}
+    vtkDataSet *GetDataSet(int i){return this->DataSet?this->DataSets[i]:0;}
     vtkDataSet *GetDataSet(){ return this->GetDataSet(0); }
 
     // Description:
