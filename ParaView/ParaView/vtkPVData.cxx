@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.176");
+vtkCxxRevisionMacro(vtkPVData, "1.177");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1399,6 +1399,7 @@ void vtkPVData::CreateProperties()
     this->ScaleThumbWheel[cc]->SetValue(1.0);
     this->ScaleThumbWheel[cc]->SetMinimumValue(0.0);
     this->ScaleThumbWheel[cc]->ClampMinimumValueOn();
+    this->ScaleThumbWheel[cc]->SetResolution(0.05);
     this->ScaleThumbWheel[cc]->Create(this->Application, 0);
     this->ScaleThumbWheel[cc]->DisplayEntryOn();
     this->ScaleThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
@@ -3368,7 +3369,6 @@ void vtkPVData::UpdateActorControlResolutions()
       res = (oneh > log10(half) ? half : pow(10, floor(oneh)));
       // cout << "up i: " << i << ", bounds: " << (bounds[i * 2 + 1] - bounds[i * 2]) << ", oneh: " << oneh << ", half: " << half << ", res: " << res << endl;
       this->TranslateThumbWheel[i]->SetResolution(res);
-      this->ScaleThumbWheel[i]->SetResolution(res);
       this->OriginThumbWheel[i]->SetResolution(res);
       }
     }
@@ -3419,7 +3419,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.176 $");
+  this->ExtractRevision(os,"$Revision: 1.177 $");
 }
 
 //----------------------------------------------------------------------------
