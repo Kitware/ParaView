@@ -124,24 +124,26 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
   
+
+  Sleep(20000);
+
   // Create the compositer.
-  str = getenv("PV_ENABLE_COMPOSITE_INTERRUPTS");
+  str = getenv("PV_DISABLE_COMPOSITE_INTERRUPTS");
+  if ( str != NULL)
     {
-    if ( str != NULL)
-      {
-      this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1");
-      }
-    else
-      {
-      this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkTreeComposite", "TreeComp1");
-      }
+    this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkTreeComposite", "TreeComp1");
     }
+  else
+    {
+    this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1");
+    }
+
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
 
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
 			 this->RendererTclName);
-  pvApp->BroadcastScript("catch {%s SetRenderWindow %s}", this->CompositeTclName,
+  pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
 			 this->RenderWindowTclName);
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
   pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
@@ -306,6 +308,16 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     }
   this->SetApplication(app);
 
+  // Application has to be set before we can get a tcl name.
+  // Otherwise I would have done this in "CreateRenderObjects".
+  // Create the compositer.
+  if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") == NULL)
+    {
+    // Since the render view is only on process 0, do not broadcast.
+    this->GetPVApplication()->Script("%s SetRenderView %s", 
+			                          this->CompositeTclName, this->GetTclName());
+    }
+
   // create the frame
   wname = this->GetWidgetName();
   this->Script("frame %s -bd 0 %s",wname,args);
@@ -356,11 +368,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -width 356 -bg white"); 
   this->Script("pack %s -fill x -expand t -side top", this->NavigationCanvas->GetWidgetName());
 
-  // Application has to be set before we can get a tcl name.
-  this->GetPVApplication()->Script("%s SetRenderView %s", 
-					    this->CompositeTclName,
-					    this->GetTclName());
-  
   this->EventuallyRender();
   delete [] local;
 }

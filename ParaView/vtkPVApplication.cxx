@@ -46,8 +46,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVCalculatorButton.h"
 #include "vtkPVThresholdButton.h"
 #include "vtkTimerLog.h"
-#include "vtkPVOutputWindow.h"
-#include "vtkOutputWindow.h"
 #include "vtkProbeFilter.h"
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
@@ -126,15 +124,6 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
   if (c)
     {
     c->Register(this);
-    if (c->GetNumberOfProcesses() > 1)
-      {
-      // Use the most primative error messages.
-      // The only other alternative is to use the file output window (mutiple procs?)
-      vtkOutputWindow *ow = vtkPVOutputWindow::New();
-      ow->PromptUserOff();
-      vtkOutputWindow::SetInstance(ow);
-      ow->Delete();
-      }
     }
   if (this->Controller)
     {

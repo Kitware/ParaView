@@ -108,12 +108,7 @@ void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::CheckForAbortRender()
-{
-  if (!this->RenderView)
-    {
-    return;
-    }
-  
+{  
   if ( ! this->Initialized)
     {
     // Never abort while printing.
@@ -144,7 +139,7 @@ void vtkPVTreeComposite::CheckForAbortRender()
 int vtkPVTreeComposite::CheckForAbortComposite()
 {
   int abort;
-  
+
   // Check for abort render has to be called at least once.
   if ( ! this->Initialized)
     {
@@ -265,6 +260,11 @@ void vtkPVTreeComposite::RootAbortCheck()
   //sleep(5);
   int abort;
 
+  if (!this->RenderView)
+    {
+    return;
+    }
+
   // If the render has already been aborted, then we need do nothing else.
   if (this->RenderAborted)
     {
@@ -273,7 +273,7 @@ void vtkPVTreeComposite::RootAbortCheck()
 
   // This checks for events to decide whether to abort.
   abort = this->RenderView->ShouldIAbort();
-  if ( ! this->Printing && this->RenderView && abort)
+  if ( ! this->Printing && abort)
     { // Yes, abort.
     int idx;
     int message;
