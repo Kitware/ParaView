@@ -2,6 +2,7 @@ PROJECT(Filters)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Filters_SRCS
+  vtkBoxClipDataSet.cxx
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkGroup.cxx
