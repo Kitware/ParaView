@@ -105,6 +105,14 @@ SOURCE=.\vtkDummyRenderWindowInteractorTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkImageOutlineFilter.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkImageOutlineFilterTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkInteractorStyleCamera.cxx
 # End Source File
 # Begin Source File
@@ -343,6 +351,35 @@ InputName=vtkDummyRenderWindowInteractor
 # Begin Custom Build
 InputPath=.\vtkDummyRenderWindowInteractor.h
 InputName=vtkDummyRenderWindowInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkImageOutlineFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkImageOutlineFilter.h
+InputName=vtkImageOutlineFilter
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkImageOutlineFilter.h
+InputName=vtkImageOutlineFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
