@@ -385,6 +385,8 @@ void vtkPVApplication::Exit()
   num = this->Controller->GetNumberOfProcesses();
   myId = this->Controller->GetLocalProcessId();
   
+  this->vtkKWApplication::Exit();
+
   for (id = 0; id < num; ++id)
     {
     if (id != myId)
@@ -393,7 +395,6 @@ void vtkPVApplication::Exit()
       }
     }
 
-  this->vtkKWApplication::Exit();
 }
 
 
