@@ -51,7 +51,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -195,6 +195,7 @@ void vtkPVBoxWidget::Accept()
       matrix->DeepCopy(matProperty->GetElements());
       matrix->Invert();
       transProperty->SetElements(reinterpret_cast<double*>(matrix->Element));
+      matrix->Delete();
       }
     else
       {

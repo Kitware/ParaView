@@ -28,7 +28,7 @@
 
 
 vtkStandardNewMacro(vtkSMBoxWidgetProxy);
-vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMBoxWidgetProxy, "1.2");
 
 //----------------------------------------------------------------------------
 vtkSMBoxWidgetProxy::vtkSMBoxWidgetProxy()
@@ -228,7 +228,9 @@ double* vtkSMBoxWidgetProxy::GetMatrix()
       this->Matrix[x][y] = mat->Element[x][y];
       }
     }
+  mat->Delete();
   return &this->Matrix[0][0];
+  
 }
 
 //----------------------------------------------------------------------------
@@ -237,6 +239,7 @@ void vtkSMBoxWidgetProxy::Update()
   vtkMatrix4x4* mat = vtkMatrix4x4::New();
   this->GetMatrix(mat);
   this->SetMatrix(mat);
+  mat->Delete();
 }
 
 //----------------------------------------------------------------------------
