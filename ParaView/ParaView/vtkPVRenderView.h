@@ -467,6 +467,8 @@ protected:
 
   vtkPVRenderViewObserver* Observer;
 
+  vtkKWPushButton *PropertiesButton;
+
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented
 };
