@@ -137,7 +137,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.341");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.342");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -537,6 +537,20 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 // Here we are going to change only the satellite procs.
 void vtkPVRenderView::PrepareForDelete()
 {
+  // Get rid of the bindings.
+  // We do not want methods called by tcl after this object has been deleted.
+  // I was getting intermittent crashes from the expose binding.
+  // Expose
+  this->Script("bind %s <Expose> {}", 
+               this->GetTclName(), this->GetTclName());
+  // Configure
+  this->Script("bind %s <Configure> {}", 
+               this->GetTclName(), this->GetTclName());
+  // I do not know if this is neccesary, but I intend to remove all 
+  // pending events for this object before it gets deleted.
+  this->Script("update");
+
+
   vtkPVApplication* pvapp = this->GetPVApplication();
   if (pvapp)
     {
@@ -697,12 +711,10 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                this->VTKWidget->GetWidgetName());
   
   // Expose
-
   this->Script("bind %s <Expose> {%s Exposed}", 
                this->GetTclName(), this->GetTclName());
 
   // Configure
-
   this->Script("bind %s <Configure> {%s Configured}", 
                this->GetTclName(), this->GetTclName());
 
