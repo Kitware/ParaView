@@ -20,7 +20,7 @@
 #include "vtkClientServerID.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.5");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -82,9 +82,18 @@ vtkSMKeyFrameAnimationCueManipulatorProxy::~vtkSMKeyFrameAnimationCueManipulator
 }
 
 //----------------------------------------------------------------------------
-void vtkSMKeyFrameAnimationCueManipulatorProxy::Initialize()
+void vtkSMKeyFrameAnimationCueManipulatorProxy::Initialize(vtkSMAnimationCueProxy*)
 {
   this->SendEndEvent = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMKeyFrameAnimationCueManipulatorProxy::Finalize(vtkSMAnimationCueProxy* cue)
+{
+  if (this->SendEndEvent)
+    {
+    this->UpdateValue(1.0, cue);
+    }
 }
 
 //----------------------------------------------------------------------------

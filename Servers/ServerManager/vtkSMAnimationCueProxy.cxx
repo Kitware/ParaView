@@ -23,7 +23,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkClientServerID.h"
 
-vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMAnimationCueProxy, "1.3");
 vtkStandardNewMacro(vtkSMAnimationCueProxy);
 
 vtkCxxSetObjectMacro(vtkSMAnimationCueProxy, AnimatedProxy, vtkSMProxy);
@@ -175,7 +175,7 @@ void vtkSMAnimationCueProxy::StartCueInternal(
   if (this->Manipulator)
     {
     // let the manipulator know that the cue has been restarted.
-    this->Manipulator->Initialize();
+    this->Manipulator->Initialize(this);
     }
   this->InvokeEvent(vtkCommand::StartAnimationCueEvent, info);
 }
@@ -184,6 +184,11 @@ void vtkSMAnimationCueProxy::StartCueInternal(
 void vtkSMAnimationCueProxy::EndCueInternal(
   void* info)
 {
+  if (this->Manipulator)
+    {
+    // let the manipulator know that the cue has ended.
+    this->Manipulator->Finalize(this);
+    }
   this->InvokeEvent(vtkCommand::EndAnimationCueEvent, info);
 }
 

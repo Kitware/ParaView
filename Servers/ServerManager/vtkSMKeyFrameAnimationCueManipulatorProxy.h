@@ -111,7 +111,9 @@ protected:
   // frame we pretend that the current time coincides with that of the last key frame and let
   // it update the properties. This is done only once per Animation cycle. The Initialize method
   // is used to indicate that a new animation cycle has begun.
-  virtual void Initialize();
+  virtual void Initialize(vtkSMAnimationCueProxy*);
+
+  virtual void Finalize(vtkSMAnimationCueProxy*);
 
   vtkSMKeyFrameAnimationCueManipulatorProxyInternals* Internals;
   // Description:
