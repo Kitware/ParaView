@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.17");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.18");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2378,7 +2378,7 @@ void vtkPVDisplayGUI::SetVolumeOpacityUnitDistance( double d )
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumePropertyProxy();
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
     << volume->GetID(0)
@@ -2391,7 +2391,7 @@ void vtkPVDisplayGUI::ClearVolumeOpacity()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy();
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
     << volume->GetID(0)
@@ -2404,7 +2404,7 @@ void vtkPVDisplayGUI::AddVolumeOpacity( double scalar, double opacity )
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumeOpacityProxy();
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
     << volume->GetID(0)
@@ -2417,7 +2417,7 @@ void vtkPVDisplayGUI::ClearVolumeColor()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumeColorProxy();
 
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
@@ -2431,7 +2431,7 @@ void vtkPVDisplayGUI::AddVolumeColor( double scalar, double r, double g, double 
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  vtkSMProxy *volume = this->PVSource->GetPartDisplay();
+  vtkSMProxy *volume = this->PVSource->GetPartDisplay()->GetVolumeColorProxy();
 
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
