@@ -65,7 +65,7 @@ SET(PROJECT_TESTS
 
 IF(RUN_WITH_MPI)
   FOREACH (tfile ${PROJECT_TESTS})
-    ADD_TEST(${tfile}-ParaView-MPI ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS}
+    ADD_TEST(${tfile}-ParaView ${VTK_MPIRUN_EXE} ${VTK_MPI_PREFLAGS}
       ${PARAVIEW_EXECUTABLE} --disable-registry
       ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
       -D ${PVClientTestData}
@@ -85,33 +85,36 @@ IF(RUN_WITH_MPI)
         ${PARAVIEW_MPI_POSTFLAGS})
     ENDIF (PARAVIEW_TEST_COMPOSITING)
   ENDFOREACH(tfile)
-ENDIF(RUN_WITH_MPI)
 
-FOREACH (tfile ${PROJECT_TESTS})
-  ADD_TEST(${tfile}-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
-    ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
-    -D ${PVClientTestData}
-    -C ${PVCompareImages}
-    -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    -V ${PVClientTestData}/Baseline/${tfile}.png)
-  # repeat the test with the client server driver
-  ADD_TEST("${tfile}ClientServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
-    --disable-registry
-    ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
-    -D ${PVClientTestData}
-    -C ${PVCompareImages}
-    -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    -V ${PVClientTestData}/Baseline/${tfile}.png)
-  # repeat the test with the client server driver in render server mode
-  ADD_TEST("${tfile}RenderServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
-    --test-render-server
-    --disable-registry
-    ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
-    -D ${PVClientTestData}
-    -C ${PVCompareImages}
-    -T ${ParaView_BINARY_DIR}/Testing/Temporary
-    -V ${PVClientTestData}/Baseline/${tfile}.png)
-ENDFOREACH (tfile)
+ELSE(RUN_WITH_MPI)
+
+  FOREACH (tfile ${PROJECT_TESTS})
+    ADD_TEST(${tfile}-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
+      ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}.png)
+    # repeat the test with the client server driver
+    ADD_TEST("${tfile}ClientServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
+      --disable-registry
+      ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}.png)
+    # repeat the test with the client server driver in render server mode
+    ADD_TEST("${tfile}RenderServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
+      --test-render-server
+      --disable-registry
+      ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}.png)
+  ENDFOREACH (tfile)
+
+ENDIF(RUN_WITH_MPI)
 
 IF(VTK_PRINT_SELF_CHECK_TCL)
   ADD_TEST(PrintSelf-${TEST_PATH} ${TCL_TCLSH}
