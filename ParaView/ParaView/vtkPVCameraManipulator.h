@@ -98,11 +98,18 @@ public:
   void SetApplication(vtkKWApplication*);
   vtkGetObjectMacro(Application, vtkKWApplication);
 
+  // Description:
+  // Set and get the manipulator name.
+  vtkSetStringMacro(ManipulatorName);
+  vtkGetStringMacro(ManipulatorName);
+
 protected:
   vtkPVCameraManipulator();
   ~vtkPVCameraManipulator();
 
   void ResetLights();
+
+  char* ManipulatorName;
 
   int Button;
   int Shift;
