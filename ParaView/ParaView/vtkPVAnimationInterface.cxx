@@ -30,6 +30,8 @@
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVData.h"
+#include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
@@ -168,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.102");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.103");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -218,7 +220,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->NumberOfFramesEntry = vtkKWLabeledEntry::New();
 
   this->TimeScale = vtkKWScale::New();
-  this->AnimationSpeedScale = vtkKWScale::New();
+  this->AnimationDelayScale = vtkKWScale::New();
   this->TimeRange = vtkKWRange::New();
 
   // Action and script editing
@@ -306,10 +308,10 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
     this->TimeScale->Delete();
     this->TimeScale = NULL;
     }
-  if (this->AnimationSpeedScale)
+  if (this->AnimationDelayScale)
     {
-    this->AnimationSpeedScale->Delete();
-    this->AnimationSpeedScale = 0;
+    this->AnimationDelayScale->Delete();
+    this->AnimationDelayScale = 0;
     }
   if (this->TimeFrame)
     {
@@ -546,15 +548,15 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *frameArg
   //this->Script("pack %s -side top -expand t -fill x", 
   //             this->TimeRange->GetWidgetName());
 
-  this->AnimationSpeedScale->SetParent(this->ControlFrame->GetFrame());
-  this->AnimationSpeedScale->Create(this->Application, "");
-  this->AnimationSpeedScale->DisplayEntry();
-  this->AnimationSpeedScale->DisplayEntryAndLabelOnTopOff();
-  this->AnimationSpeedScale->DisplayLabel("Speed:");
-  this->AnimationSpeedScale->SetRange(0, 5000);
+  this->AnimationDelayScale->SetParent(this->ControlFrame->GetFrame());
+  this->AnimationDelayScale->Create(this->Application, "");
+  this->AnimationDelayScale->DisplayEntry();
+  this->AnimationDelayScale->DisplayEntryAndLabelOnTopOff();
+  this->AnimationDelayScale->DisplayLabel("Delay:");
+  this->AnimationDelayScale->SetRange(0, 500);
 
   this->Script("pack %s -side top -expand t -fill x", 
-               this->AnimationSpeedScale->GetWidgetName());
+               this->AnimationDelayScale->GetWidgetName());
   // New Interface ----------------------------------------------------
   this->AnimationEntriesFrame->SetParent(this->TopFrame->GetFrame());
   this->AnimationEntriesFrame->ShowHideFrameOn();
@@ -684,8 +686,9 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *frameArg
     "Current frame of the animation.");
   this->NumberOfFramesEntry->SetBalloonHelpString(
     "Total number of frames for the animation.");
-  this->AnimationSpeedScale->SetBalloonHelpString(
-    "Set the speed of animation.");
+  this->AnimationDelayScale->SetBalloonHelpString(
+    "Set the delay between each frame (in ms). This delay does not include "
+    "the computation and rendering times.");
   this->AnimationEntriesMenu->SetBalloonHelpString(
     "Select an animation action to edit.");
   this->AddItemButton->SetBalloonHelpString(
@@ -824,6 +827,10 @@ void vtkPVAnimationInterface::UpdateInterface()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetNumberOfFrames(int t)
 {
+  if (t==this->NumberOfFrames)
+    {
+    return;
+    }
   //cout << "Set NumberOfFrames: " << t << endl;
   this->NumberOfFrames= t;
   this->NumberOfFramesEntry->GetEntry()->SetValue(t);
@@ -833,11 +840,17 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
   this->TimeRange->SetRange(range[0], t);
   this->TimeScale->GetRange(range);
   this->TimeScale->SetRange(0, t-1);
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
   if ( !this->IsCreated() )
     {
     return;
     }
   this->AddTraceEntry("$kw(%s) SetNumberOfFrames %d", this->GetTclName(), t);
+
 }
 
 //-----------------------------------------------------------------------------
@@ -950,10 +963,28 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
     // Generate the cache, or use previous cache.
     if (this->GetCacheGeometry())
       {
-      this->Window->CacheUpdate(time, this->NumberOfFrames);
+      if (pvApp)
+        {
+        pvApp->GetRenderModule()->CacheUpdate(time, this->NumberOfFrames);
+        }
       if (this->View)
         {
         this->View->EventuallyRender();
+        }
+      // This is a hack. Calling prop->GetWidget()->ModifiedCallback() has
+      // the side effect of making the Accept button red. Here is we
+      // set to white again. Ideally, we should only work with properties.
+      // TODO: Fix this.
+      vtkCollectionIterator* it = this->AnimationEntriesIterator;
+      for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
+        {
+        vtkPVAnimationInterfaceEntry* entry
+          = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
+        if ( entry->GetPVSource() )
+          {
+          entry->GetPVSource()->SetAcceptButtonColorToWhite();
+          }
         }
       }
     else
@@ -1048,19 +1079,8 @@ void vtkPVAnimationInterface::Play()
       this->SetCurrentTime(t);
       // The stop button can be used here because SetCurrentTime()
       // makes a call to "update"
-      int speed = static_cast<int>(this->AnimationSpeedScale->GetValue());
-      int dev = 10;
-      if ( speed < dev && speed > 0 ) 
-        {
-        if ( cc % (dev - speed) == 0 )
-          {
-          Tcl_Sleep(1);
-          }
-        }
-      else
-        {
-        Tcl_Sleep(speed/dev);
-        }
+      int delay = static_cast<int>(this->AnimationDelayScale->GetValue());
+      Tcl_Sleep(delay);
       cc ++;
       }
     } while (this->Loop && !this->StopFlag);
@@ -1592,7 +1612,11 @@ void vtkPVAnimationInterface::CacheGeometryCheckCallback()
 {
   if ( ! this->GetCacheGeometry())
     {
-    this->Window->RemoveAllCaches();
+    vtkPVApplication* app = this->GetPVApplication();
+    if (app)
+      {
+      app->GetRenderModule()->InvalidateAllGeometries();
+      }
     }
   this->AddTraceEntry("$kw(%s) SetCacheGeometry %d",
                       this->GetTclName(), this->GetCacheGeometry());

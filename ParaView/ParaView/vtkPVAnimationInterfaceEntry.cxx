@@ -15,20 +15,21 @@
 #include "vtkPVAnimationInterfaceEntry.h"
 
 #include "vtkCollection.h"
-#include "vtkKWMenuButton.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVSource.h"
-#include "vtkKWLabeledEntry.h"
+#include "vtkCommand.h"
 #include "vtkKWEntry.h"
-#include "vtkPVAnimationInterface.h"
-#include "vtkKWRange.h"
-#include "vtkPVApplication.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWMenu.h"
-#include "vtkPVWidget.h"
-#include "vtkCommand.h"
+#include "vtkKWMenuButton.h"
+#include "vtkKWRange.h"
 #include "vtkKWText.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterface.h"
+#include "vtkPVApplication.h"
+#include "vtkPVRenderModule.h"
+#include "vtkPVSource.h"
+#include "vtkPVWidget.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkString.h"
 
@@ -67,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.25");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -435,6 +436,12 @@ void vtkPVAnimationInterfaceEntry::NoMethodCallback()
   this->SetScript(0);
   this->SetLabelAndScript(0, 0);
   this->SwitchScriptTime(-1);
+
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -450,6 +457,12 @@ void vtkPVAnimationInterfaceEntry::ScriptMethodCallback()
     }
   this->Parent->UpdateNewScript();
   this->SwitchScriptTime(0);
+
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -516,6 +529,12 @@ void vtkPVAnimationInterfaceEntry::SetTimeStart(float f)
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
   this->Parent->UpdateNewScript();
+
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -538,6 +557,12 @@ void vtkPVAnimationInterfaceEntry::SetTimeEnd(float f)
   //cout << __LINE__ << " Dirty" << endl;
   this->Dirty = 1;
   this->Parent->UpdateNewScript();
+
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -664,6 +689,13 @@ void vtkPVAnimationInterfaceEntry::MarkScriptEditorDirty()
 { 
   //cout << "MarkScriptEditorDirty" << endl;
   this->ScriptEditorDirty = 1;
+
+  vtkPVApplication* app = this->GetPVApplication();
+  if (app)
+    {
+    app->GetRenderModule()->InvalidateAllGeometries();
+    }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -725,7 +757,7 @@ void vtkPVAnimationInterfaceEntry::SetLabelAndScript(const char* label,
       "# first frame, 1 at the last frame).\n"
       "\n"
       "# The source modified is: ";
-    new_script += this->GetPVSource()->GetName();
+    new_script += this->GetPVSource()->GetTclName();
     new_script += "\n";
     }
   if ( script )
@@ -826,6 +858,12 @@ void vtkPVAnimationInterfaceEntry::Prepare()
     {
     this->ScriptEditorCallback();
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVApplication* vtkPVAnimationInterfaceEntry::GetPVApplication()
+{
+  return vtkPVApplication::SafeDownCast(this->Application);
 }
 
 //-----------------------------------------------------------------------------

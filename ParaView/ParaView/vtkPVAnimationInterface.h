@@ -225,7 +225,7 @@ protected:
   vtkKWWidget *TimeFrame;
   vtkKWLabeledEntry *NumberOfFramesEntry;
   vtkKWRange        *TimeRange;
-  vtkKWScale *AnimationSpeedScale;
+  vtkKWScale *AnimationDelayScale;
 
   void EntryCallback();
 
