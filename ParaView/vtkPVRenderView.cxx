@@ -79,6 +79,23 @@ vtkPVRenderView::vtkPVRenderView()
 }
 
 //----------------------------------------------------------------------------
+void PVRenderViewAbortCheck(void *arg)
+{
+  vtkPVRenderView *me = (vtkPVRenderView*)arg;
+
+  // if we are printing then do not abort
+  if (me->GetPrinting())
+    {
+    return;
+    }
+  
+  if (me->ShouldIAbort() == 2)
+    {
+    me->GetRenderWindow()->SetAbortRender(1);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 {
   // Get rid of renderer created by the superclass
@@ -92,6 +109,7 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow = (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
   this->RenderWindowTclName = NULL;
   this->SetRenderWindowTclName("RenWin1");
+  this->RenderWindow->SetAbortCheckMethod(PVRenderViewAbortCheck, (void*)this);
   
   // Create the compositer.
   this->Composite = (vtkTreeComposite*)pvApp->MakeTclObject("vtkTreeComposite", "TreeComp1");
@@ -702,6 +720,29 @@ void vtkPVRenderView::RemoveComposite(vtkKWComposite *c)
   this->Composites->RemoveItem(c);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::StartRender()
+{
+  float renderTime = this->Renderer->GetAllocatedRenderTime();
+  int *windowSize = this->RenderWindow->GetSize();
+  int area, reductionFactor;
+  float timePerPixel;
+  float getBuffersTime, setBuffersTime, transmitTime;
+  float newReductionFactor;
+  
+  renderTime *= 0.5;
+  area = windowSize[0] * windowSize[1];
+  reductionFactor = this->GetComposite()->GetReductionFactor();
+  getBuffersTime = this->GetComposite()->GetGetBuffersTime();
+  setBuffersTime = this->GetComposite()->GetSetBuffersTime();
+  transmitTime = this->GetComposite()->GetTransmitTime();
+  
+  timePerPixel = (getBuffersTime + setBuffersTime +
+		  (transmitTime * reductionFactor * reductionFactor)) / area;
+
+  newReductionFactor = sqrt(area * timePerPixel / renderTime);
+  this->GetComposite()->SetReductionFactor(newReductionFactor);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Render()
@@ -711,8 +752,10 @@ void vtkPVRenderView::Render()
   this->Update();
 
   //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
-    
+  this->RenderWindow->SetDesiredUpdateRate(0.000001);
+  this->StartRender();
   this->RenderWindow->Render();
+  this->RenderWindow->SetDesiredUpdateRate(10.0);
 }
 
 void vtkPVRenderView::Save(ofstream *file)

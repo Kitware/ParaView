@@ -163,14 +163,11 @@ public:
   void ResetColorRange();
   
   // Description:
-  // This is an experiment with decimation.  
-  // Turning this on will cause the geometry to be decimated
-  // before being mapped.  The intent is to eventualy select
-  // decimated models for interactive rendering.
-  void SetDecimate(int val);
-  vtkGetMacro(Decimate, int)
-  vtkBooleanMacro(Decimate, int);
-  void DecimateCheckCallback();
+  // Turn tree compositing on/off.
+  void SetComposite(int val);
+  vtkGetMacro(Composite, int)
+  vtkBooleanMacro(Composite, int);
+  void CompositeCheckCallback();
 
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
@@ -206,7 +203,7 @@ protected:
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
 
-  vtkKWCheckButton *DecimateCheck;
+  vtkKWCheckButton *CompositeCheck;
 
   vtkKWCheckButton *VisibilityCheck;
   
@@ -217,8 +214,8 @@ protected:
   
   //vtkPVImageTextureFilter *TextureFilter;
   
-  // An experiment with decimation.
-  int Decimate;
+  // An experiment with compositing.
+  int Composite;
 
   // How to convert data set to polydata.
   int Mode;
@@ -231,9 +228,12 @@ protected:
   char *MapperTclName;
   vtkSetStringMacro(MapperTclName);
 
-  char *DeciTclName;
-  vtkSetStringMacro(DeciTclName);
-
+  char *LODMapperTclName;
+  vtkSetStringMacro(LODMapperTclName);
+  
+  char *LODDeciTclName;
+  vtkSetStringMacro(LODDeciTclName);
+  
   char *OutlineTclName;
   vtkSetStringMacro(OutlineTclName);
   

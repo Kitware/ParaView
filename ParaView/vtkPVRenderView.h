@@ -107,6 +107,10 @@ public:
   vtkPVApplication *GetPVApplication();
 
   // Description:
+  // Computes the reduction factor to use in compositing.
+  void StartRender();
+  
+  // Description:
   // Composites
   void Render();
   

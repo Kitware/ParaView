@@ -2,6 +2,9 @@
 int vtkClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkClipPlaneNewCommand();
+int vtkCutMaterialCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkCutMaterialNewCommand();
 int vtkCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkCutPlaneNewCommand();
@@ -44,6 +47,9 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVArrayCalculatorNewCommand();
+int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVContourNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
@@ -53,6 +59,12 @@ ClientData vtkPVDataSetReaderInterfaceNewCommand();
 int vtkPVEnSightReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVEnSightReaderInterfaceNewCommand();
+int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVGlyph3DNewCommand();
+int vtkPVInputMenuCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVInputMenuNewCommand();
 int vtkPVMethodInterfaceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMethodInterfaceNewCommand();
@@ -74,6 +86,9 @@ ClientData vtkPVSourceInterfaceNewCommand();
 int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSourceListNewCommand();
+int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVThresholdNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
@@ -116,6 +131,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
   vtkTclCreateNew(interp,(char *) "vtkClipPlane", vtkClipPlaneNewCommand,
                   vtkClipPlaneCommand);
+  vtkTclCreateNew(interp,(char *) "vtkCutMaterial", vtkCutMaterialNewCommand,
+                  vtkCutMaterialCommand);
   vtkTclCreateNew(interp,(char *) "vtkCutPlane", vtkCutPlaneNewCommand,
                   vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
@@ -136,20 +153,26 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkInteractorStylePlaneSourceCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractorStyleSphere", vtkInteractorStyleSphereNewCommand,
                   vtkInteractorStyleSphereCommand);
-  vtkTclCreateNew(interp,(char *) "vtkPVActorComposite", vtkPVActorCompositeNewCommand,
-                  vtkPVActorCompositeCommand);
   vtkTclCreateNew(interp,(char *) "vtkPOPReader", vtkPOPReaderNewCommand,
                   vtkPOPReaderCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVActorComposite", vtkPVActorCompositeNewCommand,
+                  vtkPVActorCompositeCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVApplication", vtkPVApplicationNewCommand,
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVArrayCalculator", vtkPVArrayCalculatorNewCommand,
                   vtkPVArrayCalculatorCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVContour", vtkPVContourNewCommand,
+                  vtkPVContourCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVDataSetReaderInterface", vtkPVDataSetReaderInterfaceNewCommand,
                   vtkPVDataSetReaderInterfaceCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVEnSightReaderInterface", vtkPVEnSightReaderInterfaceNewCommand,
                   vtkPVEnSightReaderInterfaceCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVGlyph3D", vtkPVGlyph3DNewCommand,
+                  vtkPVGlyph3DCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVInputMenu", vtkPVInputMenuNewCommand,
+                  vtkPVInputMenuCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVMethodInterface", vtkPVMethodInterfaceNewCommand,
                   vtkPVMethodInterfaceCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVRenderView", vtkPVRenderViewNewCommand,
@@ -164,6 +187,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSourceInterfaceCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVSourceList", vtkPVSourceListNewCommand,
                   vtkPVSourceListCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVThreshold", vtkPVThresholdNewCommand,
+                  vtkPVThresholdCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
   vtkTclCreateNew(interp,(char *) "vtkSimpleFieldDataToAttributeDataFilter", vtkSimpleFieldDataToAttributeDataFilterNewCommand,
