@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.2");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.3");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -45,7 +45,8 @@ vtkPVVCRControl::vtkPVVCRControl()
   this->GoToPreviousCommand=0;
   this->GoToNextCommand=0;
   this->LoopCheckCommand=0;
-
+  this->RecordCheckCommand=0;
+  this->RecordStateCommand=0;
 }
 
 //-----------------------------------------------------------------------------
