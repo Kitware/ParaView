@@ -50,7 +50,6 @@
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVClientServerModule.h"
 #include "vtkPVConfig.h"
-#include "vtkPVData.h"
 #include "vtkPVHelpPaths.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVProcessModuleGUIHelper.h"
@@ -111,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.319");
+vtkCxxRevisionMacro(vtkPVApplication, "1.320");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
