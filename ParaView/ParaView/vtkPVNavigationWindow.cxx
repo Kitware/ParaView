@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWApplication.h"
 #include "vtkKWLabeledFrame.h"
+#include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
@@ -55,10 +56,11 @@ vtkStandardNewMacro( vtkPVNavigationWindow );
 
 vtkPVNavigationWindow::vtkPVNavigationWindow()
 {
-  this->Width  = -1;
-  this->Height = -1;
-  this->Canvas = vtkKWWidget::New();
+  this->Width     = -1;
+  this->Height    = -1;
+  this->Canvas    = vtkKWWidget::New();
   this->ScrollBar = vtkKWWidget::New();
+  this->PopupMenu = vtkKWMenu::New();
 }
 
 vtkPVNavigationWindow::~vtkPVNavigationWindow()
@@ -70,6 +72,10 @@ vtkPVNavigationWindow::~vtkPVNavigationWindow()
   if (this->ScrollBar)
     {
     this->ScrollBar->Delete();
+    }
+  if ( this->PopupMenu )
+    {
+    this->PopupMenu->Delete();
     }
 }
 
@@ -126,6 +132,10 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
 			       this->Canvas->GetWidgetName(), 170, 10, 
 			       currentSource->GetName(),
 			       font);
+  this->Script("%s bind %s <ButtonPress-3> "
+	       "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+	       this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+	       currentSource->GetTclName());
   // Get the bounding box for the name.
   this->CalculateBBox(this->Canvas, tmp, bboxSource);
   delete [] tmp;
@@ -160,6 +170,10 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
 	this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
 		     this->Canvas->GetWidgetName(), tmp,
 		     this->GetTclName(), tmp);
+	this->Script("%s bind %s <ButtonPress-3> "
+		     "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+		     this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+		     source->GetTclName());
         
         delete [] tmp;
         tmp = 0;
@@ -242,7 +256,11 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
 		     this->GetTclName(), tmp);
 	this->Script("%s bind %s <Leave> {%s HighlightObject %s 0}",
 		     this->Canvas->GetWidgetName(), tmp,
-		     this->GetTclName(), tmp);
+		     this->GetTclName(), tmp); 
+	this->Script("%s bind %s <ButtonPress-3> "
+		     "{ %s DisplayModulePopupMenu %s %%X %%Y }",
+		     this->Canvas->GetWidgetName(), tmp, this->GetTclName(), 
+		     source->GetTclName());
         delete [] tmp;
         tmp = NULL;
         
@@ -363,7 +381,10 @@ void vtkPVNavigationWindow::Create(vtkKWApplication *app, const char *args)
 	       this->ScrollBar->GetWidgetName());
 
   this->Script("pack %s -fill both -expand t -side left", this->Canvas->GetWidgetName());
-  
+  this->PopupMenu->SetParent(this);
+  this->PopupMenu->Create(this->Application, "-tearoff 0");
+  this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
+			      "Delete current widget");
 }
 
 void vtkPVNavigationWindow::SetWidth(int width)
@@ -405,6 +426,33 @@ void vtkPVNavigationWindow::HighlightObject(const char* widget, int onoff)
   this->Script("%s itemconfigure %s -fill %s", 
 	       this->Canvas->GetWidgetName(), widget,
 	       (onoff ? "red" : "blue") );
+}
+
+//----------------------------------------------------------------------------
+void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module, int x, int y)
+{
+  cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
+  ostrstream str;
+  if ( this->Application->EvaluateBooleanExpression("%s DeleteCheck", module) )
+    {
+    str << "ExecuteCommandOnModule " << module << " DeleteCallback" << ends;
+    this->PopupMenu->SetEntryCommand("Delete", this, str.str());
+    this->PopupMenu->SetState("Delete", vtkKWMenu::Normal);
+    }
+  else
+    {
+    this->PopupMenu->SetState("Delete", vtkKWMenu::Disabled);
+    }
+  this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
+  str.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVNavigationWindow::ExecuteCommandOnModule(
+  const char* module, const char* command)
+{
+  cout << "Executing: " << command << " on module: " << module << endl;
+  this->Script("%s %s", module, command);
 }
 
 //----------------------------------------------------------------------------

@@ -53,6 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkKWApplication;
 class vtkKWWidget;
 class vtkPVSource;
+class vtkKWMenu;
 
 class VTK_EXPORT vtkPVNavigationWindow : public vtkKWWidget
 {
@@ -78,10 +79,17 @@ public:
   // Regenerate the display and re-assign bindings.
   void Update(vtkPVSource *currentSource);
 
-
   // Description:
   // Highlight the object.
   void HighlightObject(const char* widget, int onoff);
+
+  // Description:
+  // Display the module popup menu
+  void DisplayModulePopupMenu(const char*, int x, int y);
+
+  // Description:
+  // Execute a command on module.
+  void ExecuteCommandOnModule(const char* module, const char* command);
   
 protected:
   vtkPVNavigationWindow();
@@ -98,6 +106,7 @@ protected:
   vtkKWWidget* Canvas;
   vtkKWWidget* ScratchCanvas;
   vtkKWWidget* ScrollBar;
+  vtkKWMenu* PopupMenu;
 
 private:
   vtkPVNavigationWindow(const vtkPVNavigationWindow&); // Not implemented
