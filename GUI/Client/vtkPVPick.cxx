@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.2");
+vtkCxxRevisionMacro(vtkPVPick, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -114,6 +114,9 @@ void vtkPVPick::AcceptCallbackInternal()
   this->PickDisplay->Update();
   this->PickDisplay->SetPointLabelVisibility(1);
   this->GetPVOutput()->DrawWireframe();
+  this->GetPVOutput()->ColorByProperty();
+  this->GetPVOutput()->ChangeActorColor(0.8, 0.0, 0.2);
+  this->GetPVOutput()->SetLineWidth(2);
 
   this->ClearDataLabels();
   // Get the collected data from the display.
