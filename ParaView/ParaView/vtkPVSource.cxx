@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWSerializer.h"
+#include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -70,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.2");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.3");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -461,6 +462,9 @@ void vtkPVSource::CreateProperties()
                this->NameLabel->GetLabel1()->GetWidgetName());
   this->Script("pack %s -fill x -expand t", 
                this->NameLabel->GetLabel2()->GetWidgetName());
+  vtkKWTkUtilities::ChangeFontToBold(
+    this->Application->GetMainInterp(),
+    this->NameLabel->GetLabel2()->GetWidgetName());
 
   this->TypeLabel->SetParent(this->DescriptionFrame);
   this->TypeLabel->Create(this->Application);
@@ -2063,7 +2067,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.2 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.3 $");
 }
 
 //----------------------------------------------------------------------------
