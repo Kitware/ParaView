@@ -596,8 +596,10 @@ void vtkPVActorComposite::UpdateProperties()
   sprintf(tmp, "z range: %f to %f", bounds[4], bounds[5]);
   this->ZRangeLabel->SetLabel(tmp);
   
-    
-  this->AmbientScale->SetValue(this->Property->GetAmbient());
+  
+  // This doesn't need to be set currently because we're not packing
+  // the AmbientScale.
+//  this->AmbientScale->SetValue(this->Property->GetAmbient());
 
 
   currentColorBy = this->ColorMenu->GetValue();
@@ -921,14 +923,16 @@ void vtkPVActorComposite::SetInterpolationToGouraud()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::AmbientChanged()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
+  // This doesn't currently need to do anything since we aren't actually
+  //packing the ambient scale.
+/*  vtkPVApplication *pvApp = this->GetPVApplication();
   float ambient = this->AmbientScale->GetValue();
   
   //pvApp->BroadcastScript("%s SetAmbient %f", this->GetTclName(), ambient);
 
   
   this->SetAmbient(ambient);
-  this->GetPVRenderView()->EventuallyRender();
+  this->GetPVRenderView()->EventuallyRender(); */
 }
 
 //----------------------------------------------------------------------------

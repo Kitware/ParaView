@@ -797,7 +797,7 @@ void vtkPVRenderView::EventuallyRenderCallBack()
 {
   int abort;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
+
   // sanity check
   if (this->EventuallyRenderFlag == 0)
     {
