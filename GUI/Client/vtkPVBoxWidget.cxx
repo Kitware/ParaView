@@ -16,7 +16,6 @@
 
 #include "vtkArrayMap.txx"
 #include "vtkCamera.h"
-#include "vtkKWCompositeCollection.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -51,7 +50,7 @@
 #include "vtkSMProxyProperty.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.44");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 

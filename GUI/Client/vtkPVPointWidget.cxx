@@ -15,7 +15,6 @@
 #include "vtkPVPointWidget.h"
 
 #include "vtkCamera.h"
-#include "vtkKWCompositeCollection.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -42,7 +41,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.40");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.41");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
