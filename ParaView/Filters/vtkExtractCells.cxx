@@ -21,7 +21,6 @@
 
 #include "vtkCellArray.h"
 #include "vtkIntArray.h"
-#include "vtkIdType.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkCell.h"
@@ -32,7 +31,7 @@
 #include <algorithm>
 #include <vtkstd/set>
 
-vtkCxxRevisionMacro(vtkExtractCells, "1.9");
+vtkCxxRevisionMacro(vtkExtractCells, "1.10");
 vtkStandardNewMacro(vtkExtractCells);
 
 vtkExtractCells::vtkExtractCells()
