@@ -59,6 +59,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkParaViewInstantiator.h"
 
 static void ParaViewEnableMSVCDebugHook();
+static void ParaViewEnableWindowsExceptionFilter();
 static void ParaViewInitializeInterpreter(vtkPVProcessModule* pm);
 
 //----------------------------------------------------------------------------
@@ -70,6 +71,7 @@ int MyMain(int argc, char *argv[])
   vtkPVProcessModule *pm;
   vtkPVApplication *app;
   ParaViewEnableMSVCDebugHook();
+  ParaViewEnableWindowsExceptionFilter();
 
 #ifdef VTK_USE_MPI
   // This is here to avoid false leak messages from vtkDebugLeaks when
@@ -362,6 +364,27 @@ void ParaViewEnableMSVCDebugHook()
 }
 #else
 void ParaViewEnableMSVCDebugHook()
+{
+}
+#endif
+
+#if defined(_WIN32) && !defined(__CYGWIN__)
+# include <windows.h>
+static LONG __stdcall
+ParaViewUnhandledExceptionFilter(EXCEPTION_POINTERS* e)
+{
+  ExitProcess(e->ExceptionRecord->ExceptionCode);
+  return 0;
+}
+static void ParaViewEnableWindowsExceptionFilter()
+{
+  if(getenv("DART_TEST_FROM_DART"))
+    {
+    SetUnhandledExceptionFilter(&ParaViewUnhandledExceptionFilter);    
+    }
+}
+#else
+static void ParaViewEnableWindowsExceptionFilter()
 {
 }
 #endif
