@@ -116,8 +116,8 @@ public:
 
   // Description:
   // Update the GUI according to the value of the ivars
-  void Update();
-
+  virtual void Update();
+  
   // Description:
   // When used with a vtkKWView, close out and remove any composites/props 
   // prior to deletion. Has no impact when used with a vtkKWRenderWidget.

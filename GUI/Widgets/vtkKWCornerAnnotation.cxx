@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.81");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.82");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -369,11 +369,10 @@ void vtkKWCornerAnnotation::Update()
 
   // If no widget or view, let's disable everything
 
-// TODO: temporary
-//   if (!this->RenderWidget)
-//     {
-//     this->SetEnabled(0);
-//     }
+  if (!this->RenderWidget)
+    {
+    this->SetEnabled(0);
+    }
 
   if (!this->IsCreated())
     {
@@ -407,6 +406,11 @@ void vtkKWCornerAnnotation::Update()
       this->CornerAnnotation ? this->CornerAnnotation->GetTextProperty():NULL);
     this->TextPropertyWidget->SetActor2D(this->CornerAnnotation);
     this->TextPropertyWidget->Update();
+    }
+
+  if (this->CheckButton)
+    {
+    this->CheckButton->SetState(this->CornerAnnotation->GetVisibility());
     }
 }
 
