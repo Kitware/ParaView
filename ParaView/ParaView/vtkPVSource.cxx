@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309.2.7");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.8");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2421,7 +2421,16 @@ int vtkPVSource::InitializeData()
     {
     sourceTclName = this->GetVTKSourceTclName(sourceIdx);
     pm->RootScript("%s GetNumberOfOutputs", sourceTclName);
-    numOutputs = atoi(pm->GetRootResult());
+    const char* result = pm->GetRootResult();
+    if(result)
+      {
+      numOutputs = atoi(result);
+      }
+    else 
+      {
+      vtkErrorMacro("GetRootResult is null");
+      numOutputs = 0;
+      }
 
     for (idx = 0; idx < numOutputs; ++idx)
       {
