@@ -23,7 +23,6 @@
 
 class vtkKWCheckButton;
 class vtkKWLabel;
-class vtkKWLabel;
 class vtkKWOptionMenu;
 class vtkKWWidget;
 class vtkXYPlotWidget;

@@ -14,32 +14,18 @@
 =========================================================================*/
 #include "vtkPVProbe.h"
 
-#include "vtkIdTypeArray.h"
+#include "vtkObjectFactory.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkObjectFactory.h"
-#include "vtkPProbeFilter.h"
-#include "vtkSMSourceProxy.h"
 #include "vtkPVApplication.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVArrayMenu.h"
-#include "vtkPVClientServerModule.h"
-#include "vtkPVDisplayGUI.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkSMPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
-#include "vtkProperty2D.h"
-#include "vtkSocketController.h"
-#include "vtkSource.h"
-#include "vtkSystemIncludes.h"
 #include "vtkXYPlotActor.h"
 #include "vtkXYPlotWidget.h"
 #include "vtkSMPlotDisplay.h"
@@ -50,7 +36,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.137");
+vtkCxxRevisionMacro(vtkPVProbe, "1.138");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
