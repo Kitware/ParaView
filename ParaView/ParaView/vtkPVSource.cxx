@@ -359,6 +359,9 @@ void vtkPVSource::CreateProperties()
   // invoke super
   this->vtkKWComposite::CreateProperties();  
 
+  // Here until I check in my next changes.
+  this->Script("pack forget %s", this->Notebook->GetWidgetName());
+
   // Set up the pages of the notebook.
   this->Notebook->AddPage("Parameters");
   this->Notebook->AddPage("Display");
