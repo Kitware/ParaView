@@ -45,7 +45,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.200");
+vtkCxxRevisionMacro(vtkKWWindow, "1.201");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1752,6 +1752,12 @@ void vtkKWWindow::UpdateEnableState()
 void vtkKWWindow::UpdateMenuState()
 {
   int menu_enabled = this->Enabled ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
+
+  if (this->Menu)
+    {
+    this->Menu->SetEnabled(this->Enabled);
+    this->Menu->SetState(menu_enabled);
+    }
 
   // Most Recent Files
 
