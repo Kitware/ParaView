@@ -125,7 +125,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.5");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.6");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -3501,7 +3501,7 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
         strcat(srcLabel,"-");
         }    
       vtkKWLookmark *lmkWidget;
-      int k;
+      vtkIdType k;
       this->PVLookmarks->FindItem(lmk,k);
       this->KWLookmarks->GetItem(k,lmkWidget);
     
