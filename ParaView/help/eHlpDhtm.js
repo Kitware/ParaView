@@ -8,7 +8,7 @@
 /// Section Begin - General (JavaScript 1.0)
 
 //{{HH_SYMBOL_SECTION
-var HH_ChmFilename = "C:\\Views\\ParaView\\ParaViewHelp\\ParaView.chm";
+var HH_ChmFilename = "C:\\Views\\ParaView\\help\\ParaView.chm";
 var HH_WindowName = "NewWindow";
 var HH_GlossaryFont = "";
 var HH_Glossary = "0";
