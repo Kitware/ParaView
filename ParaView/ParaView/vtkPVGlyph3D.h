@@ -95,6 +95,10 @@ public:
   // Save this source to a file.
   void SaveInTclScript(ofstream *file);
   
+  // Description:
+  // For scripting. Reset does not work for scale mode.
+  vtkGetObjectMacro(ScaleModeMenu, vtkKWOptionMenu);
+
 protected:
   vtkPVGlyph3D();
   ~vtkPVGlyph3D();

@@ -255,18 +255,20 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // This allows us to debug the parallel features of the
   // application and VTK on only one process.
   int debugNum = numProcs;
+  int debugStart = 0;
   if (getenv("PV_DEBUG_HALF") != NULL)
     {
     debugNum *= 2;
+    debugStart = numProcs;
     }
   for (id = 0; id < numProcs; ++id)
     {
     pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
 			this->MapperTclName, debugNum);
-    pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id);
+    pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id+debugStart);
     pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
 			this->LODMapperTclName, debugNum);
-    pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id);
+    pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id+debugStart);
     }
 }
 
@@ -1559,10 +1561,10 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
     }
   else
     {
-    this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.13",
+    this->Script("[%s GetPositionCoordinate] SetValue 0.25 0.05",
                  this->GetScalarBarTclName());
     this->Script("%s SetOrientationToHorizontal", this->GetScalarBarTclName());
-    this->Script("%s SetHeight 0.13", this->GetScalarBarTclName());
+    this->Script("%s SetHeight 0.12", this->GetScalarBarTclName());
     this->Script("%s SetWidth 0.5", this->GetScalarBarTclName());
     }
   this->GetPVRenderView()->EventuallyRender();
