@@ -35,10 +35,12 @@
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkClientServerStream.h"
+#include "vtkCollection.h"
+#include "vtkCollectionIterator.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.46");
+vtkCxxRevisionMacro(vtkPVPart, "1.47");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -51,6 +53,7 @@ vtkPVPart::vtkPVPart()
   this->CommandFunction = vtkPVPartCommand;
 
   this->PartDisplay = NULL;
+  this->Displays = vtkCollection::New();
 
   this->Name = NULL;
 
@@ -82,6 +85,9 @@ vtkPVPart::~vtkPVPart()
     }
 
   this->SetPartDisplay(NULL);
+  this->Displays->Delete();
+  this->Displays = NULL;
+
   // Get rid of the circular reference created by the extent translator.
   // We have a problem with ExtractPolyDataPiece also.
   if (this->VTKDataID.ID != 0)
@@ -124,19 +130,71 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPart::AddDisplay(vtkPVDisplay* disp)
+{
+  if (disp)
+    {
+    this->Displays->AddItem(disp);
+    }
+} 
+
+//----------------------------------------------------------------------------
 void vtkPVPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
 {
   if (this->PartDisplay)
     {
+    this->Displays->RemoveItem(this->PartDisplay);
     this->PartDisplay->UnRegister(this);
     this->PartDisplay = NULL;
     }
   if (pDisp)
     {
+    this->Displays->AddItem(pDisp);
     this->PartDisplay = pDisp;
     this->PartDisplay->Register(this);
     this->PartDisplay->SetInput(this);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPart::Update()
+{
+  vtkCollectionIterator* sit = this->Displays->NewIterator();
+
+  for (sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem())
+    {
+    vtkPVDisplay* disp = vtkPVDisplay::SafeDownCast(sit->GetObject());
+    if (disp)
+      {
+      disp->Update();
+      }
+    }
+  sit->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPart::SetVisibility(int v)
+{
+  if (this->PartDisplay)
+    {
+    this->PartDisplay->SetVisibility(v);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPart::MarkForUpdate()
+{
+  vtkCollectionIterator* sit = this->Displays->NewIterator();
+
+  for (sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem())
+    {
+    vtkPVDisplay* disp = vtkPVDisplay::SafeDownCast(sit->GetObject());
+    if (disp)
+      {
+      disp->InvalidateGeometry();
+      }
+    }
+  sit->Delete();
 }
 
 //----------------------------------------------------------------------------

@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.7");
 
 //int vtkPVLODRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -101,7 +101,7 @@ vtkPVPartDisplay* vtkPVLODRenderModule::CreatePartDisplay()
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModule::InteractiveRender()
 {
-  this->UpdateAllPVData();
+  this->UpdateAllDisplays();
 
   // Used in subclass for window subsampling, but not really necessary here.
   //this->RenderWindow->SetDesiredUpdateRate(this->InteractiveUpdateRate);
@@ -142,8 +142,8 @@ void vtkPVLODRenderModule::SetLODResolution(int resolution)
 
   this->LODResolution = resolution;
 
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     partDisp = vtkPVLODPartDisplay::SafeDownCast(object);
     if (partDisp)
@@ -164,8 +164,8 @@ void vtkPVLODRenderModule::ComputeTotalVisibleMemorySize()
 
   this->TotalVisibleGeometryMemorySize = 0;
   this->TotalVisibleLODMemorySize = 0;
-  this->PartDisplays->InitTraversal();
-  while ( (object=this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object=this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVLODPartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
