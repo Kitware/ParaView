@@ -69,12 +69,10 @@ class VTK_EXPORT vtkTempTessellatorFilter : public vtkDataSetToUnstructuredGridF
     static vtkTempTessellatorFilter* New();
 
     virtual void SetTessellator( vtkStreamingTessellator* );
-    vtkStreamingTessellator* GetTessellator();
-    const vtkStreamingTessellator* GetTessellator() const;
+    vtkGetObjectMacro(Tessellator, vtkStreamingTessellator);
 
     virtual void SetSubdivider( vtkDataSetSubdivisionAlgorithm* );
-    vtkDataSetSubdivisionAlgorithm* GetSubdivider();
-    const vtkDataSetSubdivisionAlgorithm* GetSubdivider() const;
+    vtkGetObjectMacro(Subdivider, vtkDataSetSubdivisionAlgorithm);
 
     virtual unsigned long GetMTime();
 
@@ -151,12 +149,6 @@ class VTK_EXPORT vtkTempTessellatorFilter : public vtkDataSetToUnstructuredGridF
 };
 
 //BTX
-inline vtkStreamingTessellator* vtkTempTessellatorFilter::GetTessellator() { return this->Tessellator; }
-inline const vtkStreamingTessellator* vtkTempTessellatorFilter::GetTessellator() const { return this->Tessellator; }
-
-inline vtkDataSetSubdivisionAlgorithm* vtkTempTessellatorFilter::GetSubdivider() { return this->Subdivider; }
-inline const vtkDataSetSubdivisionAlgorithm* vtkTempTessellatorFilter::GetSubdivider() const { return this->Subdivider; }
-
 inline int vtkTempTessellatorFilter::GetOutputDimension() const { return this->OutputDimension; }
 //ETX
 
