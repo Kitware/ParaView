@@ -430,7 +430,8 @@ public:
   // Description:
   // This method returns a color map for a specific global parameter
   // (e.g. Temperature).
-  vtkPVColorMap* GetPVColorMap(const char* parameterName);
+  vtkPVColorMap* GetPVColorMap(const char* parameterName, 
+                               int numberOfComponents);
 
   // Description:
   // Propagates the center to the manipulators.

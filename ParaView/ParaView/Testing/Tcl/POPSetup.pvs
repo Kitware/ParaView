@@ -50,7 +50,7 @@ $pvExtractGrid AcceptCallback
 # Setup color map to show temperature.
 set pvExtractGridOutput [$pvExtractGrid GetNthPVOutput 0]
 [$pvExtractGridOutput GetColorMenu] SetValue {Point Temperature}
-$pvExtractGridOutput ColorByPointFieldComponent Temperature 0
+$pvExtractGridOutput ColorByPointField Temperature
 [$pvExtractGridOutput GetColorMapMenu] SetValue {Blue to Red}
 $pvExtractGridOutput ChangeColorMap
 
@@ -73,7 +73,7 @@ $pvContour AcceptCallback
 # Setup color map to show temperature.
 set pvContourOutput [$pvContour GetNthPVOutput 0]
 [$pvContourOutput GetColorMenu] SetValue {Point Temperature}
-$pvContourOutput ColorByPointFieldComponent Temperature 0
+$pvContourOutput ColorByPointField Temperature
 [$pvContourOutput GetColorMapMenu] SetValue {Blue to Red}
 $pvContourOutput ChangeColorMap
 

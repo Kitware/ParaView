@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.163");
+vtkCxxRevisionMacro(vtkPVData, "1.164");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1512,7 +1512,7 @@ void vtkPVData::UpdateProperties()
 
   char tmp[350], cmd[1024], defCmd[350];
   float bounds[6];
-  int i, j, numArrays, numComps;
+  int i, numArrays, numComps;
   vtkDataSetAttributes *fieldData;
   vtkPVApplication *pvApp = this->GetPVApplication();  
   vtkDataArray *array;
@@ -1683,29 +1683,26 @@ void vtkPVData::UpdateProperties()
         {
         array = fieldData->GetArray(i);
         numComps = array->GetNumberOfComponents();
-        for (j = 0; j < numComps; ++j)
+        sprintf(cmd, "ColorByPointField {%s}", fieldData->GetArrayName(i));
+        if (array->GetNumberOfComponents() > 1)
           {
-          sprintf(cmd, "ColorByPointFieldComponent {%s} %d",
-                  fieldData->GetArrayName(i), j);
-          if (numComps == 1)
-            {
-            sprintf(tmp, "Point %s", fieldData->GetArrayName(i));
-            }
-          else
-            {
-            sprintf(tmp, "Point %s %d", fieldData->GetArrayName(i), j);
-            }
-          this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-          if (strcmp(tmp, currentColorBy) == 0)
-            {
-            currentColorByFound = 1;
-            }
-          if (fieldData->GetScalars() == array)
-            {
-            strcpy(defCmd, tmp);
-            defPoint = 1;
-            defArrayName = array->GetName();
-            }
+          sprintf(tmp, "Point %s (%d)", fieldData->GetArrayName(i),
+                  array->GetNumberOfComponents());
+          }
+        else
+          {
+          sprintf(tmp, "Point %s", fieldData->GetArrayName(i));
+          }
+        this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+        if (strcmp(tmp, currentColorBy) == 0)
+          {
+          currentColorByFound = 1;
+          }
+        if (fieldData->GetScalars() == array)
+          {
+          strcpy(defCmd, tmp);
+          defPoint = 1;
+          defArrayName = array->GetName();
           }
         }
       }
@@ -1720,30 +1717,26 @@ void vtkPVData::UpdateProperties()
       if (fieldData->GetArrayName(i))
         {
         array = fieldData->GetArray(i);
-        numComps = array->GetNumberOfComponents();
-        for (j = 0; j < numComps; ++j)
+        sprintf(cmd, "ColorByCellField {%s}", fieldData->GetArrayName(i));
+        if (array->GetNumberOfComponents() > 1)
           {
-          sprintf(cmd, "ColorByCellFieldComponent {%s} %d",
-                  fieldData->GetArrayName(i), j);
-          if (numComps == 1)
-            {
-            sprintf(tmp, "Cell %s", fieldData->GetArrayName(i));
-            } 
-          else
-            {
-            sprintf(tmp, "Cell %s %d", fieldData->GetArrayName(i), j);
-            }
-          this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-          if (strcmp(tmp, currentColorBy) == 0)
-            {
-            currentColorByFound = 1;
-            }
-          if (defArrayName == NULL && fieldData->GetScalars() == array)
-            {
-            strcpy(defCmd, tmp);
-            defPoint = 0;
-            defArrayName = array->GetName();
-            }
+          sprintf(tmp, "Cell %s (%d)", fieldData->GetArrayName(i),
+                  array->GetNumberOfComponents());
+          }
+        else
+          {
+          sprintf(tmp, "Cell %s", fieldData->GetArrayName(i));
+          }
+        this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+        if (strcmp(tmp, currentColorBy) == 0)
+          {
+          currentColorByFound = 1;
+          }
+        if (defArrayName == NULL && fieldData->GetScalars() == array)
+          {
+          strcpy(defCmd, tmp);
+          defPoint = 0;
+          defArrayName = array->GetName();
           }
         }
       }
@@ -1757,11 +1750,11 @@ void vtkPVData::UpdateProperties()
       this->ColorMenu->SetValue(defCmd);
       if (defPoint)
         {
-        this->ColorByPointFieldComponentInternal(defArrayName, 0);
+        this->ColorByPointFieldInternal(defArrayName);
         }
       else
         {
-        this->ColorByCellFieldComponentInternal(defArrayName, 0);
+        this->ColorByCellFieldInternal(defArrayName);
         }
       }
     else
@@ -1887,53 +1880,27 @@ void vtkPVData::ColorByPropertyInternal()
 
 
 //----------------------------------------------------------------------------
-void vtkPVData::ColorByPointFieldComponent(const char *name, int comp)
+void vtkPVData::ColorByPointField(const char *name)
 {
-  const char *current;
-  current = this->ColorMenu->GetValue();
-  char newLabel[300];
-
-  // In case this is called from a script.
-  vtkDataArray *array = NULL;
-  if (this->VTKData)
-    {
-    array = this->VTKData->GetPointData()->GetArray(name);
-    }
-  if (array && array->GetNumberOfComponents() > 1)
-    {
-    sprintf(newLabel, "Point %s %d", name, comp);
-    }
-  else
-    {  
-    sprintf(newLabel, "Point %s", name);
-    }
-  if (strncmp(current, newLabel, strlen(newLabel)) != 0)
-    {
-    this->ColorMenu->SetValue(newLabel);
-    }
-
-  this->AddTraceEntry("$kw(%s) ColorByPointFieldComponent {%s} %d", 
-                      this->GetTclName(), name, comp);
-  this->ColorByPointFieldComponentInternal(name, comp);
+  this->AddTraceEntry("$kw(%s) ColorByPointField {%s}", 
+                      this->GetTclName(), name);
+  this->ColorByPointFieldInternal(name);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::ColorByPointFieldComponentInternal(const char *name, 
-                                                             int comp)
+void vtkPVData::ColorByPointFieldInternal(const char *name)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  // I would like to make this an argument, but not right now.
-  int numComps;
   vtkDataArray *a = this->VTKData->GetPointData()->GetArray(name);
   if (a == NULL)
     {
     vtkErrorMacro("Could not find array.");
     return;
     }
-  numComps = a->GetNumberOfComponents();
 
-  this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name));
+  this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name, 
+                                                a->GetNumberOfComponents()));
   if (this->PVColorMap == NULL)
     {
     vtkErrorMacro("Could not get the color map.");
@@ -1950,7 +1917,7 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
                          this->MapperTclName);
   pvApp->BroadcastScript("%s SelectColorArray {%s}",
                          this->MapperTclName, name);
-  this->PVColorMap->SetVectorComponent(comp, numComps);
+  //this->PVColorMap->SetVectorComponent(comp, numComps);
 
   pvApp->BroadcastScript("%s SetLookupTable %s", this->LODMapperTclName,
                          this->PVColorMap->GetLookupTableTclName());
@@ -1975,8 +1942,12 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::ColorByCellFieldComponent(const char *name, int comp)
+void vtkPVData::ColorByCellField(const char *name)
 {
+  this->AddTraceEntry("$kw(%s) ColorByCellField {%s}", 
+                      this->GetTclName(), name);
+  this->ColorByCellFieldInternal(name);
+  /*
   const char *current;
   current = this->ColorMenu->GetValue();
   char newLabel[300];
@@ -2003,26 +1974,23 @@ void vtkPVData::ColorByCellFieldComponent(const char *name, int comp)
   this->AddTraceEntry("$kw(%s) ColorByCellFieldComponent {%s} %d", 
                       this->GetTclName(), name, comp);
   this->ColorByCellFieldComponentInternal(name, comp);
+  */
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::ColorByCellFieldComponentInternal(const char *name, 
-                                                            int comp)
+void vtkPVData::ColorByCellFieldInternal(const char *name)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  // I would like to make this an argument, but not right now.
-  int numComps;
   vtkDataArray *a = this->VTKData->GetCellData()->GetArray(name);
   if (a == NULL)
     {
     //vtkErrorMacro("Could not find array.");
     return;
     }
-  numComps = a->GetNumberOfComponents();
 
-
-  this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name));
+  this->SetPVColorMap(pvApp->GetMainWindow()->GetPVColorMap(name,
+                                                  a->GetNumberOfComponents()));
   if (this->PVColorMap == NULL)
     {
     vtkErrorMacro("Could not get the color map.");
@@ -2039,7 +2007,7 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
                          this->MapperTclName);
   pvApp->BroadcastScript("%s SelectColorArray {%s}",
                          this->MapperTclName, name);
-  this->PVColorMap->SetVectorComponent(comp, numComps);
+  //this->PVColorMap->SetVectorComponent(comp, numComps);
 
   pvApp->BroadcastScript("%s SetLookupTable %s", this->LODMapperTclName,
                          this->PVColorMap->GetLookupTableTclName());
@@ -2358,7 +2326,7 @@ void vtkPVData::Initialize()
     // Order is important here because Internal method check for consistent
     // menu value and arrays.
     this->ColorMenu->SetValue(tmp);
-    this->ColorByPointFieldComponentInternal(arrayName, 0);
+    this->ColorByPointFieldInternal(arrayName);
     }
   else if ((array =
             this->Mapper->GetInput()->GetCellData()->GetScalars()) &&
@@ -2370,7 +2338,7 @@ void vtkPVData::Initialize()
     // Order is important here because Internal method check for consistent
     // menu value and arrays.
     this->ColorMenu->SetValue(tmp);
-    this->ColorByCellFieldComponentInternal(arrayName, 0);
+    this->ColorByCellFieldInternal(arrayName);
     }
   else
     {
@@ -3001,7 +2969,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.163 $");
+  this->ExtractRevision(os,"$Revision: 1.164 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3179,7 +3147,7 @@ void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
     return;
     }
 
-  array->GetRange(range, 0);  
+  array->GetRange(range, component);  
 
   pvApp->BroadcastScript("$Application SendDataArrayRange %s %d {%s} %d",
                          this->GetVTKDataTclName(),

@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.158");
+vtkCxxRevisionMacro(vtkPVApplication, "1.159");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -597,7 +597,7 @@ int vtkPVApplication::CheckForTraceFile(char* name, unsigned int maxlen)
       }
     int retVal = 0;
     int numFiles = dir->GetNumberOfFiles();
-    int len = strlen("ParaViewTrace");
+    int len = (int)(strlen("ParaViewTrace"));
     for(int i=0; i<numFiles; i++)
       {
       const char* fname = dir->GetFile(i);

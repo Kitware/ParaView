@@ -63,6 +63,7 @@ class vtkKWLabel;
 class vtkKWLabeledEntry;
 class vtkKWLabeledFrame;
 class vtkKWMenu;
+class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
 class vtkKWTextProperty;
@@ -101,10 +102,14 @@ public:
   const char* GetScalarBarTitle() {return this->ScalarBarTitle;}
 
   // Description:
-  // The single (for now) parameter that is handled by this map.
+  // This map is used for arrays with this name 
+  // and this number of components.  In the future, they may
+  // handle more than one type of array.
   void SetArrayName(const char* name);
   const char* GetArrayName() { return this->ArrayName;}
-  int MatchArrayName(const char* name);
+  int MatchArrayName(const char* name, int numberOfComponents);
+  void SetNumberOfVectorComponents(int num);
+  vtkGetMacro(NumberOfVectorComponents, int);
 
   // Description:
   // The format of the scalar bar labels.
@@ -155,7 +160,7 @@ public:
 
   // Description:
   // Choose which component to color with.
-  void SetVectorComponent(int component, int numberOfComponents);
+  void SetVectorComponent(int component);
   vtkGetMacro(VectorComponent, int);
 
   // Description:
@@ -182,6 +187,12 @@ public:
   // Description:
   // This method is called when the user changes the name of the scalar bar.
   void ScalarBarTitleEntryCallback();
+
+  // Description:
+  // For setting the title suffix for vectors.
+  void ScalarBarVectorTitleEntryCallback();
+  void SetScalarBarVectorTitle(const char* name);
+  void SetScalarBarVectorTitleNoTrace(const char* name);
 
   // Description:
   // This method is called when the user changes the format of the scalar bar
@@ -225,21 +236,37 @@ public:
   vtkGetObjectMacro(TitleTextProperty, vtkKWTextProperty);
   vtkGetObjectMacro(LabelTextProperty, vtkKWTextProperty);
 
+  // Call backs from the vector mode frame.
+  void VectorModeMagnitudeCallback();
+  void VectorModeComponentCallback();
+  void VectorComponentCallback(int component);
+
+//BTX
+  enum VectorModes {
+    MAGNITUDE=0,
+    COMPONENT=1
+  };
+//ETX
+
 protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
 
   char* ArrayName;
+  int NumberOfVectorComponents;
   char* ScalarBarTitle;
   char* ScalarBarLabelFormat;
+
+  char *VectorMagnitudeTitle;
+  char **VectorComponentTitles;
     
   // Here to create unique Tcl names.
   int InstanceCount;
 
   int NumberOfColors;
   float ScalarRange[2];
+  int VectorMode;
   int VectorComponent;
-  int NumberOfVectorComponents;
 
   float StartHSV[3];
   float EndHSV[3];
@@ -248,6 +275,7 @@ protected:
   vtkScalarBarWidgetObserver* ScalarBarObserver;
 
   void UpdateScalarBarTitle();
+  void UpdateVectorComponentMenu();
   void UpdateScalarBarLabelFormat();
   void UpdateLookupTable();
   void RGBToHSV(float rgb[3], float hsv[3]);
@@ -269,6 +297,11 @@ protected:
   vtkKWChangeColorButton* StartColorButton;
   vtkKWImageLabel*        Map;
   vtkKWChangeColorButton* EndColorButton;
+
+  vtkKWLabeledFrame* VectorFrame;
+  vtkKWOptionMenu*   VectorModeMenu;
+  vtkKWOptionMenu*   VectorComponentMenu;
+  vtkKWEntry*        ScalarBarVectorTitleEntry;
 
   vtkKWLabeledFrame* ScalarBarFrame;
   vtkKWCheckButton*  ScalarBarCheck;

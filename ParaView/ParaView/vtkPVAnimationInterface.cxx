@@ -125,7 +125,7 @@ static unsigned char image_goto_end[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.29");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -952,6 +952,7 @@ void vtkPVAnimationInterface::SetScriptCheckButtonState(int val)
 }
 
 //----------------------------------------------------------------------------
+// Actually does the work.
 void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
 {
   if (source == this->PVSource)
@@ -976,8 +977,11 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
     //source->Register(this);
     this->PVSource = source;
     this->SourceMenuButton->SetButtonText(this->PVSource->GetName());
-    this->AddTraceEntry("$kw(%s) SetPVSource $kw(%s)", this->GetTclName(), 
-                        source->GetTclName());
+    if (source->InitializeTrace())
+      {
+      this->AddTraceEntry("$kw(%s) SetPVSource $kw(%s)", this->GetTclName(), 
+                          source->GetTclName());
+      }
     }
   else
     {
@@ -1179,11 +1183,14 @@ void vtkPVAnimationInterface::SetLabelAndScript(const char* label,
 {
   this->SetScript(script);
   this->MethodMenuButton->SetButtonText(label);
-  if (this->Application)
-    {
-    this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", 
-                        this->GetTclName(), label, script);
-    }
+
+  // Tracing here is no good because the script has specific VTK object names.
+  // Tracng is now done in widget callback methods that call this method.
+  //if (this->Application)
+  //  {
+  //  this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", 
+  //                      this->GetTclName(), label, script);
+  //  }
 }
 
 //----------------------------------------------------------------------------

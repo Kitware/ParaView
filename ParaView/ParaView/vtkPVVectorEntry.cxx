@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.27");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.28");
 
 //---------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -536,21 +536,38 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   
   if (this->Entries->GetNumberOfItems() == 1)
     {
+    sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+    menu->AddCommand(this->LabelWidget->GetLabel(), this, methodAndArgs, 0, "");
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
+{
+  char script[500];
+  
+  if (ai->InitializeTrace())
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+                        this->GetTclName(), ai->GetTclName());
+    }
+  
+  if (this->Entries->GetNumberOfItems() == 1)
+    {
     // I do not like setting the label like this but ...
     if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
       {
-      sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s Set%s [expr int($pvTime)]}", 
-              this->LabelWidget->GetLabel(), this->ObjectTclName, 
-              this->VariableName);
+      sprintf(script, "%s Set%s [expr int($pvTime)]", 
+              this->ObjectTclName, this->VariableName);
       }
     else
       {
-      sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s Set%s $pvTime}", 
-              this->LabelWidget->GetLabel(), this->ObjectTclName, 
-              this->VariableName);
+      sprintf(script, "%s Set%s $pvTime", 
+              this->ObjectTclName, this->VariableName);
       }
-    menu->AddCommand(this->LabelWidget->GetLabel(), ai, methodAndArgs, 0, "");
+    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
     }
+  // What if there are more than one entry?
 }
 
 //----------------------------------------------------------------------------

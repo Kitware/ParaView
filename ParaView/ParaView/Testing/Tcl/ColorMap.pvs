@@ -18,7 +18,7 @@ $kw(vtkTemp999) SetPoint1 0 0 0
 $kw(vtkTemp999) SetPoint2 0 0 1
 $kw(vtkTemp260) AcceptCallback
 set kw(vtkTemp294) [$kw(vtkTemp260) GetPVOutput]
-set kw(vtkTemp336) [$kw(vtkTemp1) GetPVColorMap {Elevation}]
+set kw(vtkTemp336) [$kw(vtkTemp1) GetPVColorMap {Elevation} 1]
 $kw(vtkTemp336) SetColorSchemeToBlueRed
 $kw(vtkTemp336) SetColorSchemeToGrayscale
 $kw(vtkTemp336) SetColorSchemeToRedBlue
@@ -32,7 +32,7 @@ $kw(vtkTemp294) SetInterpolationToFlat
 $kw(vtkTemp294) SetInterpolationToGouraud
 $kw(vtkTemp294) ColorByProperty
 $kw(vtkTemp294) ChangeActorColor 1.000000 0.070588 1.000000
-$kw(vtkTemp294) ColorByPointFieldComponent {Elevation} 0
+$kw(vtkTemp294) ColorByPointField {Elevation}
 $kw(vtkTemp294) SetColorRange 0.100000 0.433010
 $kw(vtkTemp294) SetColorRange 0.200000 0.433010
 $kw(vtkTemp294) SetColorRange 0.000000 0.433010

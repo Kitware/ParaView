@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.29");
+vtkCxxRevisionMacro(vtkKWMenu, "1.30");
 
 
 
@@ -244,8 +244,8 @@ void vtkKWMenu::SetCascade(int index, const char* menu)
   // (i.e. the parent + '.' + at least a letter)
   // If not, clone it.
 
-  int parent_length = strlen(wname);
-  int child_length = strlen(menu);
+  int parent_length = (int)(strlen(wname));
+  int child_length = (int)(strlen(menu));
 
   if (child_length < (parent_length + 2) || 
       strncmp(wname, menu, parent_length) ||

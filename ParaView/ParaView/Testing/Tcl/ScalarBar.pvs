@@ -15,7 +15,7 @@ $kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
 set kw(vtkTemp285) [$kw(vtkTemp1) CreatePVSource DataSetTriangleFilter]
 $kw(vtkTemp285) AcceptCallback
 
-set kw(vtkTemp321) [$kw(vtkTemp1) GetPVColorMap {scalars}]
+set kw(vtkTemp321) [$kw(vtkTemp1) GetPVColorMap {scalars} 1]
 $kw(vtkTemp321) SetScalarBarVisibility 1
 $kw(vtkTemp321) SetScalarBarPosition1 0.593485 0.250000
 $kw(vtkTemp321) SetScalarBarPosition2 0.406515 0.500000

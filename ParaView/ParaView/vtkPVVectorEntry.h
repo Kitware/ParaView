@@ -128,6 +128,11 @@ public:
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterface *ai);
 
   // Description:
+  // Called when menu item (above) is selected.  Neede for tracing.
+  // Would not be necessary if menus traced invocations.
+  void AnimationMenuCallback(vtkPVAnimationInterface *ai);
+
+  // Description:
   // This is the data type the vtk object is expecting.
   vtkSetMacro(DataType, int); 
   vtkGetMacro(DataType, int); 

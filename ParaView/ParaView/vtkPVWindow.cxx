@@ -125,7 +125,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.392");
+vtkCxxRevisionMacro(vtkPVWindow, "1.393");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3781,7 +3781,8 @@ void vtkPVWindow::ProcessErrorClick()
 }
 
 //----------------------------------------------------------------------------
-vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
+vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName, 
+                                          int numberOfComponents)
 {
   vtkPVColorMap *cm;
 
@@ -3796,7 +3797,7 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
   while ( !it->IsDoneWithTraversal() )
     {
     cm = static_cast<vtkPVColorMap*>(it->GetObject());
-    if (cm->MatchArrayName(parameterName))
+    if (cm->MatchArrayName(parameterName, numberOfComponents))
       {
       it->Delete();
       return cm;
@@ -3808,11 +3809,12 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName)
   cm = vtkPVColorMap::New();
   cm->SetParent(this->GetMainView()->GetPropertiesParent());
   cm->SetPVRenderView(this->GetMainView());
+  cm->SetArrayName(parameterName);
+  cm->SetNumberOfVectorComponents(numberOfComponents);
   cm->Create(this->GetPVApplication());
   cm->SetTraceReferenceObject(this);
-  cm->SetArrayName(parameterName);
   cm->SetScalarBarTitle(parameterName);
-
+  cm->ResetScalarRange();
 
   this->PVColorMaps->AddItem(cm);
   cm->Delete();
@@ -3854,7 +3856,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.392 $");
+  this->ExtractRevision(os,"$Revision: 1.393 $");
 }
 
 //----------------------------------------------------------------------------

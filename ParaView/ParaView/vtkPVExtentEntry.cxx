@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.10");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.11");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -357,6 +357,13 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
   char script[500];
   int ext[6];
 
+  if (ai->InitializeTrace())
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s) %d", 
+                        this->GetTclName(), ai->GetTclName(), mode);
+    }
+  
+  
   // Get the whole extent to set up defaults.
   // Now I can imagine that we will need a more flexible way of getting 
   // the whole extent from sources (in the future.

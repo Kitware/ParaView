@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.10");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.11");
 
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -343,11 +343,35 @@ void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 {
   char methodAndArgs[500];
 
-  sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s SetTimeValue $pvTime}", 
-          this->GetTraceName(), this->PVSource->GetVTKSourceTclName());
-
-  menu->AddCommand(this->GetTraceName(), ai, methodAndArgs, 0, "");
+  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+  // I do not under stand why the trace name is used for the
+  // menu entry, but Berk must know.
+  menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0, "");
 }
+
+
+//----------------------------------------------------------------------------
+// What a pain.  I need this method for tracing.
+// Maybe the animation should call PVwidget methods and not vtk object methods.
+void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterface *ai)
+{
+  char script[500];
+  int ext[6];
+
+  if (ai->InitializeTrace())
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+                        this->GetTclName(), ai->GetTclName());
+    }
+  
+  // I do not under stand why the trace name is used for the
+  // menu entry, but Berk must know.
+  sprintf(script, "%s SetTimeValue $pvTime", 
+          this->PVSource->GetVTKSourceTclName());
+  ai->SetLabelAndScript(this->GetTraceName(), script);
+}
+
+
 
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet* vtkPVSelectTimeSet::ClonePrototype(vtkPVSource* pvSource,

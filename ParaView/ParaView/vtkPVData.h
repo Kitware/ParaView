@@ -304,8 +304,8 @@ public:
   // Description:
   // Callback methods when item chosen from ColorMenu
   void ColorByProperty();
-  void ColorByPointFieldComponent(const char *name, int comp);
-  void ColorByCellFieldComponent(const char *name, int comp);
+  void ColorByPointField(const char *name);
+  void ColorByCellField(const char *name);
 
   // Description:
   // Get the tcl name of the vtkPVGeometryFilter.
@@ -380,10 +380,14 @@ protected:
   //==================================================================
   // Internal versions that do not add to the trace.
   void ColorByPropertyInternal();
-  void ColorByPointFieldComponentInternal(const char *name, int comp);
-  void ColorByCellFieldComponentInternal(const char *name, int comp);
+  void ColorByPointFieldInternal(const char *name);
+  void ColorByCellFieldInternal(const char *name);
   void SetColorRangeInternal(float min, float max);
   void SetActorColor(float r, float g, float b);
+
+  // A flag that helps UpdateProperties determine 
+  // whether tho set the default color.
+  int ColorSetByUser;
 
   // Problems with vtkLODActor led me to use these.
   vtkProperty *Property;

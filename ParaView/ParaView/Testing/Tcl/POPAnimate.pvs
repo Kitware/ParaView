@@ -31,7 +31,7 @@ $pvExtractGridOutput SetScalarBarOrientationToHorizontal
 
 # Setup color map to show Salinity.
 [$pvExtractGridOutput GetColorMenu] SetValue {Point Salinity}
-$pvExtractGridOutput ColorByPointFieldComponent Salinity 0
+$pvExtractGridOutput ColorByPointField Salinity
 [$pvExtractGridOutput GetColorMapMenu] SetValue {Red to Blue}
 $pvExtractGridOutput ChangeColorMap
 $pvExtractGridOutput SetScalarRange 0.03 0.04
@@ -59,7 +59,7 @@ update
 # Setup color map to show temperature.
 set pvExtractGridOutput [$pvExtractGrid GetNthPVOutput 0]
 [$pvExtractGridOutput GetColorMenu] SetValue {Point Temperature}
-$pvExtractGridOutput ColorByPointFieldComponent Temperature 0
+$pvExtractGridOutput ColorByPointField Temperature
 $pvExtractGrid UpdateParameterWidgets
 [$pvExtractGridOutput GetColorMapMenu] SetValue {Blue to Red}
 $pvExtractGridOutput ChangeColorMap

@@ -100,6 +100,11 @@ public:
                                          vtkPVAnimationInterface *ai);
 
   // Description:
+  // We need to make the callback here so the animation selection
+  // can be traced properly.
+  void AnimationMenuCallback(vtkPVAnimationInterface *ai);
+
+  // Description:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);

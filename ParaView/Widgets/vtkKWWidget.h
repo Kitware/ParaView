@@ -197,6 +197,14 @@ public:
   vtkGetStringMacro(TraceName);
   vtkKWWidget *GetChildWidget(const char* traceName);
 
+  // Description:
+  // Tracing support specific to widgets.  This method will initialize
+  // a widget useing its parent as reference.  This method returns 1
+  // if the widget was initialized successfully.  This widget needs
+  // a TraceName unique between the children of the parent in order for
+  // this method to work.  The parent also has to be able to be initialized.
+  virtual int InitializeTrace();
+
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
@@ -218,12 +226,6 @@ protected:
   int   BalloonHelpInitialized;
   void  SetUpBalloonHelpBindings();
   
-  // Tracing support specific to widgets.  This method will initialize
-  // a widget useing its parent as reference.  This method returns 1
-  // if the widget was initialized successfully.  This widget needs
-  // a TraceName unique between the children of the parent in order for
-  // this method to work.  The parent also has to be able to be initialized.
-  virtual int InitializeTrace();
   // We need a unique way to get the widget from the parent.  This
   // is unfortunate, but necessary.  With out this name set, the
   // trace cannot be initialized for this widget.

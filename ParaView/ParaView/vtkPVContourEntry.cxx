@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.17");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.18");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -380,11 +380,26 @@ void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
                                                   vtkPVAnimationInterface *ai)
 {
   char methodAndArgs[500];
+  
+  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+  menu->AddCommand(this->GetTraceName(), this, methodAndArgs, 0,"");
+}
 
-  sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s SetValue 0 $pvTime}", 
-          this->GetTraceName(), this->PVSource->GetVTKSourceTclName());
+//----------------------------------------------------------------------------
+void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
+{
+  char script[500];
+  
+  if (ai->InitializeTrace())
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
+                        this->GetTclName(), ai->GetTclName());
+    }
+  
+  sprintf(script, "%s SetValue 0 $pvTime", 
+          this->PVSource->GetVTKSourceTclName());
 
-  menu->AddCommand(this->GetTraceName(), ai, methodAndArgs, 0, "");
+  ai->SetLabelAndScript(this->GetTraceName(), script);
 }
 
 //----------------------------------------------------------------------------

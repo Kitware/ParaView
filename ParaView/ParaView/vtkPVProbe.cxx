@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.80");
+vtkCxxRevisionMacro(vtkPVProbe, "1.81");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -372,10 +372,10 @@ void vtkPVProbe::AcceptCallbackInternal()
       // The menu's not changing, but It is going to replaced soon.
       // For now I will put this here.
       char tmp[256];
-      sprintf(tmp, "Point %s %d", arrayName, component);
+      sprintf(tmp, "Point %s", arrayName);
       this->GetPVOutput()->GetColorMenu()->SetValue(tmp);
       }
-    this->GetPVOutput()->ColorByPointFieldComponent(arrayName, component);
+    this->GetPVOutput()->ColorByPointField(arrayName);
     
     if ( numArrays > 1 )
       {
