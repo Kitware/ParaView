@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.13");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.14");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -963,9 +963,20 @@ void vtkRedistributePolyData::CopyArrays
     case VTK_UNSIGNED_SHORT:
       vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for copy")
         break;
-    case VTK_SHORT:
-      vtkErrorMacro("VTK_SHORT not allowed for copy");
+    case VTK_SHORT:  
+      {
+      short* sArrayFrom = ((vtkShortArray*)DataFrom)->GetPointer(0);
+      short* sArrayTo = ((vtkShortArray*)DataTo)->GetPointer(0);
+      for (i = 0; i < numToCopy; i++)
+        {
+        for (j = 0; j < numComps; j++)
+          {
+          sArrayTo[numComps*i+j]=
+            sArrayFrom[numComps*fromId[i]+j];
+          }
+        }
       break;
+      }
     case VTK_UNSIGNED_INT:
       vtkErrorMacro("VTK_UNSIGNED_INT not allowed for copy");
       break;
@@ -1059,9 +1070,13 @@ void vtkRedistributePolyData::CopyBlockArrays
     case VTK_UNSIGNED_SHORT:
       vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for copy");
       break;
-    case VTK_SHORT:
-      vtkErrorMacro("VTK_SHORT not allowed for copy");
+    case VTK_SHORT: 
+      {
+      short* sArrayFrom = ((vtkShortArray*)DataFrom)->GetPointer(fromOffset);
+      short* sArrayTo = ((vtkShortArray*)DataTo)->GetPointer(toOffset);
+      for (i=start; i<stop; i++) { sArrayTo[i] = sArrayFrom[i]; }
       break;
+      }
     case VTK_UNSIGNED_INT:
       vtkErrorMacro("VTK_UNSIGNED_INT not allowed for copy");
       break;
@@ -1982,9 +1997,15 @@ void vtkRedistributePolyData::AllocateArrays
         vtkErrorMacro
           ("VTK_UNSIGNED_SHORT not allowed for Data Arrays");
         break;
-      case VTK_SHORT:
-        vtkErrorMacro("VTK_SHORT not allowed for Data Arrays");
+      case VTK_SHORT: 
+        {
+        if (((vtkShortArray*)Data)->
+            WritePointer(0,numToCopyTotal*numComp) ==0)
+          {
+          vtkErrorMacro("Error: can't alloc mem for data array");
+          }
         break;
+        }
       case VTK_UNSIGNED_INT:
         vtkErrorMacro
           ("VTK_UNSIGNED_INT not allowed for Data Arrays");
@@ -2269,8 +2290,25 @@ void vtkRedistributePolyData::SendArrays
     case VTK_UNSIGNED_SHORT:
       vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for send");
       break;
-    case VTK_SHORT:
-      vtkErrorMacro("VTK_SHORT not allowed for send");
+    case VTK_SHORT: 
+      {
+      short* sArray = ((vtkShortArray*)Data)->GetPointer(0);
+      dataSize = sizeof(short);
+      sc = (char*)new short[numToCopy*dataSize*numComps];
+      short* ss = (short*)sc;
+      for (i = 0; i < numToCopy; i++)
+        {
+        for (j = 0; j < numComps; j++)
+          {
+          ss[numComps*i+j] = sArray[numComps*fromId[i]+j];
+          }
+        }
+
+      this->Controller->
+        Send(sc, numToCopy*numComps*dataSize, sendTo, sendTag);
+      delete [] sc;
+      break;
+      }
       break;
     case VTK_UNSIGNED_INT:
       vtkErrorMacro("VTK_UNSIGNED_INT not allowed for send");
@@ -2362,9 +2400,14 @@ void vtkRedistributePolyData::SendBlockArrays
     case VTK_UNSIGNED_SHORT:
       vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for send");
       break;
-    case VTK_SHORT:
-      vtkErrorMacro("VTK_SHORT not allowed for send");
+    case VTK_SHORT: 
+      {
+      short* sArray = ((vtkShortArray*)Data)->GetPointer(0);
+      dataSize = sizeof(short);
+      this->Controller->
+        Send((char*)&sArray[start], size*dataSize, sendTo, sendTag);
       break;
+      }
     case VTK_UNSIGNED_INT:
       vtkErrorMacro("VTK_UNSIGNED_INT not allowed for send");
       break;
@@ -2585,8 +2628,25 @@ void vtkRedistributePolyData::ReceiveArrays
       vtkErrorMacro("VTK_UNSIGNED_SHORT not allowed for receive");
       break;
     case VTK_SHORT:
-      vtkErrorMacro("VTK_SHORT not allowed for receive");
+      {
+      short* sArray = ((vtkShortArray*)Data)->GetPointer(0);
+      dataSize = sizeof(short);
+      sc = (char*)new short[numToCopy*numComps*dataSize];
+      short* ss = (short*)sc;
+
+      this->Controller->
+        Receive(sc, numToCopy*numComps*dataSize, recFrom, recTag);
+      for (i = 0; i < numToCopy; i++)
+        {
+        for (j = 0; j < numComps; j++)
+          {
+          sArray[toId[i]*numComps+j] = ss[numComps*i+j];
+          }
+        }
+
+      delete [] sc;
       break;
+      }
     case VTK_UNSIGNED_INT:
       vtkErrorMacro("VTK_UNSIGNED_INT not allowed for receive");
       break;
