@@ -5,6 +5,7 @@ vtkKWIcon.cxx
 vtkKWProcessStatistics.cxx
 vtkKWRegisteryUtilities.cxx
 vtkKWSerializer.cxx
+vtkKWDirectoryUtilities.cxx
 )
 
 #ABSTRACT_FILES(
