@@ -14,10 +14,12 @@
   The complete distribution of ParaView contains VTK and Tcl/Tk
   8.3.2.  You do not have to download VTK or Tcl/Tk separately to compile.
   <p>
+
   Once CMake is installed, you are ready to build ParaView. We highly
-  recommend reading the CMake documentation if you are not familiar with CMake:
-  <a href = "http://www.cmake.org/HTML/Documentation.html">http://www.cmake.org/HTML/Documentation.html</a>.
-  (You can skip the Developer's Guide.)
+  recommend reading the CMake
+  <a href="http://www.cmake.org/HTML/Documentation.html">documentation</a>
+  if you are not familiar with CMake (You can skip the Developer's Guide).
+  <p>
   Here is a summary of the ParaView Complete build:<ol>
     <li> Run one of the CMake user interfaces.</li>
     <li> Change configuration options.</li>
@@ -120,7 +122,7 @@ The Windows build process uses the CMake GUI CMakeSetup.
        placed your ParaView source code, and where to build the object
        code and dll's. The build directory is typically placed next to
        the <code>paraview-1.0.0</code> source directory and called
-       something like <code>paraview-1.0.0-bin</code>.
+       something like <code>paraview-1.0.0-build</code>.
       
   <li> When CMakeSetup completes, start up Visual Studio and load
        ParaViewComplete.dsw or ParaViewComplete.sln. Select the
@@ -128,6 +130,13 @@ The Windows build process uses the CMake GUI CMakeSetup.
 </ol>
 We recommend a 300MByte minimum swap size or you might have trouble
 during the link phase.
+<p>
+Currently there is no install support for Windows.  Just run the
+<code>paraview</code> executable from the build tree.  It will be
+located in <code>paraview-1.0.0-build/bin/</code><i>config</i>, where
+<i>config</i> is either <code>Debug</code> or <code>Release</code>
+depending on the configuration you chose when building the ALL_BUILD
+project.
 </td></tr></table>
 </body>
 </html>
