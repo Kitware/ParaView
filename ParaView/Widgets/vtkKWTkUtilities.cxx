@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWTkUtilities.h"
 
-#include "vtkBase64Utility.h"
+#include "vtkBase64Utilities.h"
 #include "vtkImageData.h"
 #include "vtkImageFlip.h"
 #include "vtkObjectFactory.h"
@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.16");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.17");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -205,8 +205,8 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
     if (data_ptr[0] != 0x78 || data_ptr[1] != 0xDA)
       {
       base64_buffer = new unsigned char [buffer_length];
-      buffer_length = vtkBase64Utility::Decode(data_ptr, 0, 
-                                               base64_buffer, buffer_length);
+      buffer_length = vtkBase64Utilities::Decode(data_ptr, 0, 
+                                                 base64_buffer, buffer_length);
       if (buffer_length == 0)
         {
         vtkGenericWarningMacro(<< "Error decoding base64 stream");
