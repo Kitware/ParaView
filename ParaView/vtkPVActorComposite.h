@@ -171,7 +171,8 @@ public:
 
   void SetScalarBarVisibility(int val);  
   void ScalarBarCheckCallback();
-
+  void ScalarBarOrientationCallback();
+  
   // Description:
   // Temporary intoerface for seting the compositing reduction.
   void ReductionCallback();
@@ -256,6 +257,7 @@ protected:
 
   vtkKWCheckButton *ScalarBarCheck;
   vtkScalarBarActor *ScalarBar;
+  vtkKWCheckButton *ScalarBarOrientationCheck;
 };
 
 #endif

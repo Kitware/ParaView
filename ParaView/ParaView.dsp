@@ -433,6 +433,14 @@ SOURCE=.\vtkPVWindowTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVWorldPointPicker.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVWorldPointPickerTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkSimpleFieldDataToAttributeDataFilter.cxx
 # End Source File
 # Begin Source File
@@ -1344,6 +1352,26 @@ InputName=vtkPVWindow
 # Begin Custom Build
 InputPath=.\vtkPVWindow.h
 InputName=vtkPVWindow
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVWorldPointPicker.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVWorldPointPicker.h
+InputName=vtkPVWorldPointPicker
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

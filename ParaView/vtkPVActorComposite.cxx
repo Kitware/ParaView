@@ -88,6 +88,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->CompositeCheck = vtkKWCheckButton::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
+  this->ScalarBarOrientationCheck = vtkKWCheckButton::New();
   this->ReductionEntry = vtkKWEntry::New();
 
   this->VisibilityCheck = vtkKWCheckButton::New();
@@ -255,6 +256,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;
   
+  this->ScalarBarOrientationCheck->Delete();
+  this->ScalarBarOrientationCheck = NULL;
+  
   this->ReductionEntry->Delete();
   this->ReductionEntry = NULL;
   
@@ -338,6 +342,11 @@ void vtkPVActorComposite::CreateProperties()
                             this->ScalarBarCheck->GetWidgetName(),
                             this->GetTclName());
 
+  this->ScalarBarOrientationCheck->SetParent(this->Properties);
+  this->ScalarBarOrientationCheck->Create(this->Application, "-text \"Vertical (scalar bar orientation)\"");
+  this->ScalarBarOrientationCheck->SetState(1);
+  this->ScalarBarOrientationCheck->SetCommand(this, "ScalarBarOrientationCallback");
+  
   this->ReductionEntry->SetParent(this->Properties);
   this->ReductionEntry->Create(this->Application, "-text CompositeReduction");
   this->ReductionEntry->SetValue(1);
@@ -374,6 +383,8 @@ void vtkPVActorComposite::CreateProperties()
                this->CompositeCheck->GetWidgetName());
   this->Script("pack %s",
                this->ScalarBarCheck->GetWidgetName());
+  this->Script("pack %s",
+               this->ScalarBarOrientationCheck->GetWidgetName());
   this->Script("pack %s",
                this->ReductionEntry->GetWidgetName());
   this->Script("pack %s",
@@ -1054,6 +1065,27 @@ void vtkPVActorComposite::ScalarBarCheckCallback()
 {
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
   this->GetView()->Render();  
+}
+
+void vtkPVActorComposite::ScalarBarOrientationCallback()
+{
+  int state = this->ScalarBarOrientationCheck->GetState();
+  
+  if (state)
+    {
+    this->ScalarBar->GetPositionCoordinate()->SetValue(0.87, 0.25);
+    this->ScalarBar->SetOrientationToVertical();
+    this->ScalarBar->SetHeight(0.5);
+    this->ScalarBar->SetWidth(0.13);
+    }
+  else
+    {
+    this->ScalarBar->GetPositionCoordinate()->SetValue(0.25, 0.13);
+    this->ScalarBar->SetOrientationToHorizontal();
+    this->ScalarBar->SetHeight(0.13);
+    this->ScalarBar->SetWidth(0.5);
+    }
+  this->GetView()->Render();
 }
 
 void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
