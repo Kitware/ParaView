@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPointLabelDisplay);
-vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.5");
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.5.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -165,9 +165,23 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
   // from updating the pipeline.  These are here to ensure that all
   // processes get updated at the same time.
 
+  stream << vtkClientServerStream::Invoke 
+         << this->DuplicateProxy->GetID(0) << "GetUnstructuredGridOutput"
+         << vtkClientServerStream::End
+         << vtkClientServerStream::Invoke 
+         << this->UpdateSuppressorProxy->GetID(0)
+         << "SetInput" << vtkClientServerStream::LastResult
+         << vtkClientServerStream::End;
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
+
   stream << vtkClientServerStream::Invoke
          << this->PointLabelActorProxy->GetID(0) << "SetMapper" 
          << this->PointLabelMapperProxy->GetID(0)
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << this->UpdateSuppressorProxy->GetID(0) 
+         << "SetOutputType"
+         << "vtkUnstructuredGrid"
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke 
          << this->UpdateSuppressorProxy->GetID(0) << "GetUnstructuredGridOutput"
@@ -178,15 +192,6 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
          << vtkClientServerStream::End;
   pm->SendStream(
     vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
-
-  stream << vtkClientServerStream::Invoke 
-         << this->DuplicateProxy->GetID(0) << "GetUnstructuredGridOutput"
-         << vtkClientServerStream::End
-         << vtkClientServerStream::Invoke 
-         << this->UpdateSuppressorProxy->GetID(0)
-         << "SetInput" << vtkClientServerStream::LastResult
-         << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 
   // Tell the update suppressor to produce the correct partition.
   stream << vtkClientServerStream::Invoke
