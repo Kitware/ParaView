@@ -22,6 +22,7 @@
 
 #include "vtkSMProxy.h"
 
+class vtkPVClassNameInformation;
 class vtkPVDataInformation;
 class vtkSMPartDisplay;
 class vtkSMDisplay;
@@ -68,6 +69,7 @@ protected:
   vtkSMPart(const vtkSMPart&); // Not implemented
   void operator=(const vtkSMPart&); // Not implemented
 
+  vtkPVClassNameInformation* ClassNameInformation;
   vtkPVDataInformation* DataInformation;
   int DataInformationValid;
 

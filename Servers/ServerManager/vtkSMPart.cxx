@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVClassNameInformation.h"
 #include "vtkPVDataInformation.h"
 #include "vtkProcessModule.h"
 #include "vtkCollection.h"
@@ -24,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.11");
+vtkCxxRevisionMacro(vtkSMPart, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -32,6 +33,7 @@ vtkSMPart::vtkSMPart()
 {
   this->SetVTKClassName("vtkDataObject");
 
+  this->ClassNameInformation = vtkPVClassNameInformation::New();
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
   this->UpdateNeeded = 1;
@@ -39,7 +41,8 @@ vtkSMPart::vtkSMPart()
 
 //----------------------------------------------------------------------------
 vtkSMPart::~vtkSMPart()
-{  
+{
+  this->ClassNameInformation->Delete();
   this->DataInformation->Delete();
 }
 
@@ -133,7 +136,10 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
   // The vtkData object will be moved to the output of the piece filter.
-  const char *className = this->GetDataInformation()->GetDataSetTypeAsString();
+  // This must use class name information and not data information
+  // to avoid executing the filter early.
+  pm->GatherInformation(this->ClassNameInformation, this->GetID(0));
+  const char *className = this->ClassNameInformation->GetVTKClassName();
   vtkClientServerStream stream;
   vtkClientServerID tempDataPiece = {0};
   if (className == NULL)
@@ -287,7 +293,10 @@ void vtkSMPart::CreateTranslatorIfNecessary()
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
   // The vtkData object will be moved to the output of the piece filter.
-  const char *className = this->GetDataInformation()->GetDataSetTypeAsString();
+  // This must use class name information and not data information
+  // to avoid executing the filter early.
+  pm->GatherInformation(this->ClassNameInformation, this->GetID(0));
+  const char *className = this->ClassNameInformation->GetVTKClassName();
   if (className == NULL)
     {
     vtkErrorMacro("Missing data information.");
