@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.9");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.10");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2955,7 +2955,7 @@ void vtkPVWindow::DisableNavigationWindow()
 void vtkPVWindow::DisableMenus()
 {
   // First store the state of all menu items.
-  vtkKWTkUtilities::StoreMenuState(this->Menu, this->MenuState);
+  this->Menu->StoreMenuState(this->MenuState);
 
   int numMenus = this->Menu->GetNumberOfItems();
   // deactivating menus and toolbar buttons (except the interactors)
@@ -2970,7 +2970,7 @@ void vtkPVWindow::DisableMenus()
 void vtkPVWindow::EnableMenus()
 {
   // Now restore the state of all menu items
-  vtkKWTkUtilities::RestoreMenuState(this->Menu, this->MenuState);
+  this->Menu->RestoreMenuState(this->MenuState);
 }
 
 //----------------------------------------------------------------------------
@@ -3748,7 +3748,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.9 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.10 $");
 }
 
 //----------------------------------------------------------------------------
