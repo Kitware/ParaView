@@ -24,9 +24,15 @@
 int main(int , char* [])
 {
   vtkMazeSource *maze = vtkMazeSource::New();
+  maze->Update(); //For GetCenter
   
   vtkPickFilter *pick = vtkPickFilter::New();
   pick->SetInput( maze->GetOutput() );
+  pick->SetWorldPoint ( maze->GetOutput()->GetCenter() );
+  pick->GetWorldPoint ();
+  pick->SetPickCell ( 1 );
+  pick->SetNumberOfLayers ( 1 );
+  pick->GenerateLayerAttributeOn ();
   pick->Update();
 
   vtkMPIDuplicatePolyData *duplicate = vtkMPIDuplicatePolyData::New();
@@ -46,6 +52,7 @@ int main(int , char* [])
   move->Update();
 
   maze->Delete();
+  pick->Delete();
   duplicate->Delete();
   connect->Delete();
   dupUns->Delete();
