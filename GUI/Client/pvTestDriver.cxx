@@ -42,7 +42,8 @@ pvTestDriver::pvTestDriver()
 
 // now implement the pvTestDriver class
 
-int pvTestDriver::WaitForAndPrintData(kwsysProcess* process,
+int pvTestDriver::WaitForAndPrintData(const char* pname, 
+                                      kwsysProcess* process,
                                       double timeout, int* foundWaiting,
                                       vtkstd::string* output)
 {
@@ -55,34 +56,28 @@ int pvTestDriver::WaitForAndPrintData(kwsysProcess* process,
   // Look for process output.
   int processPipe = kwsysProcess_WaitForData(process, &data, 
                                              &length, &timeout);
-  if(processPipe == kwsysProcess_Pipe_STDOUT)
+  if(processPipe == kwsysProcess_Pipe_STDOUT ||
+     processPipe == kwsysProcess_Pipe_STDERR)
     {
     vtkstd::string str(data, data+length);
     if(output)
       {
       *output += str;
       }
-    if(foundWaiting)
+    if(foundWaiting && processPipe == kwsysProcess_Pipe_STDOUT)
       {
       if(str.find("Waiting") != str.npos)
         {
         *foundWaiting = 1;
         }
       }
+    cerr << "\n-------------- " << pname
+         << " output chunk begin --------------\n";
     cerr.write(data, length);
+    cerr << "\n-------------- " << pname
+         << " output chunk end   --------------\n\n";
     cerr.flush();
     }
-  else if(processPipe == kwsysProcess_Pipe_STDERR)
-    {
-    if(output)
-      {
-      vtkstd::string str(data, data+length);
-      *output += str;
-      }
-    cerr.write(data, length);
-    cerr.flush();
-    }
-  
   return processPipe;
 }
 
@@ -238,24 +233,24 @@ int pvTestDriver::StartServer(kwsysProcess* server, const char* name)
     {
     return 1;
     }
-  cerr << "starting " << name << "\n";
+  cerr << "pvTestDirver: starting process " << name << "\n";
   kwsysProcess_SetTimeout(server, this->TimeOut);
   kwsysProcess_Execute(server);
   int foundWaiting = 0;
   while(!foundWaiting)
     {
-    if(!WaitForAndPrintData(server, 30.0, &foundWaiting))
+    if(!WaitForAndPrintData("server", server, 30.0, &foundWaiting))
       {
-      cerr << name << " never started.\n";
+      cerr << "pvTestDirver: " << name << " never started.\n";
       kwsysProcess_Kill(server);
       return 0;
       }
     }
-  cerr << name << " started.\n";
+  cerr << "pvTestDirver: " << name << " sucessfully started.\n";
   return 1;
 }
 
-int pvTestDriver::OutputStringHasError(vtkstd::string& output)
+int pvTestDriver::OutputStringHasError(const char* pname, vtkstd::string& output)
 {
   const char* possibleMPIErrors[] = {
     "error",
@@ -280,8 +275,10 @@ int pvTestDriver::OutputStringHasError(vtkstd::string& output)
     {
     if(output.find(possibleMPIErrors[i]) != output.npos)
       {
-      cerr << "***** Test will fail, because the string: \"" << possibleMPIErrors[i] 
-           << "\"\n***** was found in the following output from the program:\n\"" 
+      cerr << "pvTestDriver: ***** Test will fail, because the string: \"" 
+           << possibleMPIErrors[i] 
+           << "\"\npvTestDriver: ***** was found in the following output from the " 
+           << pname << ":\n\"" 
            << output.c_str() << "\"\n";
       return 1;
       }
@@ -305,7 +302,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     renderServer = kwsysProcess_New();
     if(!renderServer)
       {
-      cerr << "Cannot allocate kwsysProcess to run the render server.\n";
+      cerr << "pvTestDriver: Cannot allocate kwsysProcess to run the render server.\n";
       return 1;
       }
     }
@@ -315,7 +312,7 @@ int pvTestDriver::Main(int argc, char* argv[])
     server = kwsysProcess_New();
     if(!server)
       {
-      cerr << "Cannot allocate kwsysProcess to run the server.\n";
+      cerr << "pvTestDriver: Cannot allocate kwsysProcess to run the server.\n";
       return 1;
       }
     }
@@ -323,7 +320,7 @@ int pvTestDriver::Main(int argc, char* argv[])
   if(!client)
     {
     kwsysProcess_Delete(server);
-    cerr << "Cannot allocate kwsysProcess to run the client.\n";
+    cerr << "pvTestDriver: Cannot allocate kwsysProcess to run the client.\n";
     return 1;
     }
 
@@ -383,13 +380,13 @@ int pvTestDriver::Main(int argc, char* argv[])
   // Start the render server if there is one
   if(!this->StartServer(renderServer, "Render Server"))
     {
-    cerr << "render server never started\n";
+    cerr << "pvTestDriver: Render server never started.\n";
     return -1;
     }
   // Start the data server if there is one
   if(!this->StartServer(server, "Server"))
     {
-    cerr << "Server never started\n";
+    cerr << "pvTestDriver: Server never started.\n";
     return -1;
     }
   // Now run the client
@@ -403,24 +400,21 @@ int pvTestDriver::Main(int argc, char* argv[])
   int mpiError = 0;
   while(clientPipe || serverPipe || renderServerPipe)
     {
-    clientPipe = WaitForAndPrintData(client, 0.1, 0, &output);
-    if(this->OutputStringHasError(output))
+    clientPipe = WaitForAndPrintData("client", client, 0.1, 0, &output);
+    if(!mpiError && this->OutputStringHasError("client", output))
       {
-      cerr << "Client had an MPI error in the output, test failed.\n";
       mpiError = 1;
       }
     output = "";
-    serverPipe = WaitForAndPrintData(server, 0.1, 0, &output);
-    if(this->OutputStringHasError(output))
+    serverPipe = WaitForAndPrintData("server", server, 0.1, 0, &output);
+    if(!mpiError && this->OutputStringHasError("server", output))
       {
-      cerr << "Server had an MPI error in the output, test failed.\n";
       mpiError = 1;
       }
     output = "";
-    renderServerPipe = WaitForAndPrintData(renderServer, 0.1, 0, &output);
-    if(this->OutputStringHasError(output))
+    renderServerPipe = WaitForAndPrintData("renderServer", renderServer, 0.1, 0, &output);
+    if(!mpiError && this->OutputStringHasError("renderServer", output))
       {
-      cerr << "Render Server had an MPI error in the output, test failed.\n";
       mpiError = 1;
       }
     output = "";
@@ -474,7 +468,8 @@ int pvTestDriver::Main(int argc, char* argv[])
     }
   if(mpiError)
     {
-    cerr << "MPI Error, pvTestDriver returning " << mpiError << "\n";
+    cerr << "pvTestDriver: Error string found in ouput, pvTestDriver returning " 
+         << mpiError << "\n";
     return mpiError;
     }
   // if both servers are fine return the client result
@@ -484,7 +479,7 @@ int pvTestDriver::Main(int argc, char* argv[])
 //----------------------------------------------------------------------------
 void pvTestDriver::ReportCommand(const char* const* command, const char* name)
 {
-  cerr << "The " << name << " command is:\n";
+  cerr << "pvTestDriver: " << name << " command is:\n";
   for(const char* const * c = command; *c; ++c)
     {
     cerr << " \"" << *c << "\"";
@@ -500,17 +495,17 @@ int pvTestDriver::ReportStatus(kwsysProcess* process, const char* name)
     {
     case kwsysProcess_State_Starting:
       {
-      cerr << "Never started " << name << " process.\n";
+      cerr << "pvTestDriver: Never started " << name << " process.\n";
       } break;
     case kwsysProcess_State_Error:
       {
-      cerr << "Error executing " << name << " process: "
+      cerr << "pvTestDriver: Error executing " << name << " process: "
            << kwsysProcess_GetErrorString(process)
            << "\n";
       } break;
     case kwsysProcess_State_Exception:
       {
-      cerr << "The " << name
+      cerr << "pvTestDriver: " << name
                       << " process exited with an exception: ";
       switch(kwsysProcess_GetExitException(process))
         {
@@ -543,21 +538,21 @@ int pvTestDriver::ReportStatus(kwsysProcess* process, const char* name)
       } break;
     case kwsysProcess_State_Executing:
       {
-      cerr << "Never terminated " << name << " process.\n";
+      cerr << "pvTestDriver: Never terminated " << name << " process.\n";
       } break;
     case kwsysProcess_State_Exited:
       {
       result = kwsysProcess_GetExitValue(process);
-      cerr << "The " << name << " process exited with code "
+      cerr << "pvTestDriver: " << name << " process exited with code "
                       << result << "\n";
       } break;
     case kwsysProcess_State_Expired:
       {
-      cerr << "Killed " << name << " process due to timeout.\n";
+      cerr << "pvTestDriver: killed " << name << " process due to timeout.\n";
       } break;
     case kwsysProcess_State_Killed:
       {
-      cerr << "Killed " << name << " process.\n";
+      cerr << "pvTestDriver: killed " << name << " process.\n";
       } break;
     }
   return result;
