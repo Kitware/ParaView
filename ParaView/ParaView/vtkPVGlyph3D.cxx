@@ -110,7 +110,6 @@ vtkPVData* vtkPVGlyph3D::GetGlyphSource()
   return this->GlyphSource;
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::CreateProperties()
 {
@@ -120,33 +119,23 @@ void vtkPVGlyph3D::CreateProperties()
 void vtkPVGlyph3D::InitializePrototype()
 {
   vtkPVInputMenu *inputMenu;
-
-  inputMenu = vtkPVInputMenu::New();
-  inputMenu->SetPVSource(this);
-  inputMenu->SetSources(this->GetPVWindow()->GetSourceList("Source"));
-  inputMenu->SetParent(this->ParameterFrame->GetFrame());
-  inputMenu->SetLabel("Input");
-  inputMenu->Create(this->Application);
-  inputMenu->SetBalloonHelpString("Select the input for the filter.");
-  inputMenu->SetInputName("PVInput"); 
-  inputMenu->SetInputType("vtkDataSet");
+  
+  inputMenu = this->AddInputMenu(
+    "Input", "PVInput", "vtkDataSet",
+    "Select the input for the filter.",
+    this->GetPVWindow()->GetSourceList("Sources"));
   inputMenu->SetVTKInputName("Input");
-  this->AddPVWidget(inputMenu);
-  inputMenu->Delete();
+  inputMenu->SetModifiedCommand(this->GetTclName(), 
+                                "SetAcceptButtonColorToRed");
 
-  inputMenu = vtkPVInputMenu::New();
-  inputMenu->SetPVSource(this);
-  inputMenu->SetSources(this->GetPVWindow()->GetSourceList("GlyphSources"));
-  inputMenu->SetParent(this->ParameterFrame->GetFrame());
-  inputMenu->SetLabel("Glyph");
-  inputMenu->Create(this->Application);
-  inputMenu->SetBalloonHelpString("Select the data set to use as the glyph geometry.");
-  inputMenu->SetInputName("GlyphSource"); 
-  inputMenu->SetInputType("vtkPolyData");
+  inputMenu = this->AddInputMenu(
+    "Glyph", "GlyphSource", "vtkPolyData",
+    "Select the data set to use as the glyph geometry.",
+    this->GetPVWindow()->GetSourceList("GlyphSources"));
   inputMenu->SetVTKInputName("Source");
-  this->AddPVWidget(inputMenu);
-  inputMenu->Delete();
-
+  inputMenu->SetModifiedCommand(this->GetTclName(), 
+                                "SetAcceptButtonColorToRed");
+    
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->SetLabel("Scale Mode");
@@ -169,7 +158,7 @@ void vtkPVGlyph3D::InitializePrototype()
   sl->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
   sl->Create(this->Application);
   sl->SetBalloonHelpString("Select what to use as vectors for "
-			   "scaling/rotation");
+                           "scaling/rotation");
   sl->AddItem("Vector", 0);
   sl->AddItem("Normal", 1);
   sl->AddItem("Vector RotationOff", 2);
@@ -206,8 +195,6 @@ void vtkPVGlyph3D::InitializePrototype()
   entry->Create(this->Application);
   this->AddPVWidget(entry);
   entry->Delete();
-
-
 }
 
 
