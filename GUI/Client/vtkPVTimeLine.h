@@ -77,6 +77,16 @@ public:
   // Must be called if the keyframes are changed externally. 
   // This will redraw the timeline.
   void ForceUpdate();
+
+  // Description:
+  // Most of these callbacks are overridden only to save
+  // the trace appropriately.
+  virtual void StartInteractionCallback(int x, int y);
+  virtual void MovePointCallback(int x, int y, int shift);
+  virtual void EndInteractionCallback(int x, int y);
+  virtual void ParameterCursorStartInteractionCallback(int x);
+  virtual void ParameterCursorEndInteractionCallback();
+  virtual void ParameterCursorMoveCallback(int x);
 protected:
   vtkPVTimeLine();
   ~vtkPVTimeLine();

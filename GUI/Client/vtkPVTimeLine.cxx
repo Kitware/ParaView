@@ -18,7 +18,7 @@
 #include "vtkKWEvent.h"
 #include "vtkPVAnimationCue.h"
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.2");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -280,6 +280,58 @@ void vtkPVTimeLine::InvokeSelectionChangedCommand()
   this->Superclass::InvokeSelectionChangedCommand();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVTimeLine::StartInteractionCallback(int x, int y)
+{
+  this->AddTraceEntry("$kw(%s) StartInteractionCallback %d %d", 
+    this->GetTclName(), x, y);
+  this->Superclass::StartInteractionCallback(x,y);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimeLine::MovePointCallback(int x, int y, int shift)
+{
+  this->AddTraceEntry("$kw(%s) MovePointCallback %d %d %d",
+    this->GetTclName(), x, y, shift);
+  this->Superclass::MovePointCallback(x, y, shift);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimeLine::EndInteractionCallback(int x, int y)
+{
+  this->AddTraceEntry("$kw(%s) EndInteractionCallback %d %d",
+    this->GetTclName(), x, y);
+  this->Superclass::EndInteractionCallback(x, y);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimeLine::ParameterCursorStartInteractionCallback(int x)
+{
+  this->AddTraceEntry("$kw(%s) ParameterCursorStartInteractionCallback %d",
+    this->GetTclName(), x);
+  this->Superclass::ParameterCursorStartInteractionCallback(x);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimeLine::ParameterCursorMoveCallback(int x)
+{
+  this->AddTraceEntry("$kw(%s) ParameterCursorMoveCallback %d",
+    this->GetTclName(), x);
+  this->Superclass::ParameterCursorMoveCallback(x);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimeLine::ParameterCursorEndInteractionCallback()
+{
+  this->AddTraceEntry("$kw(%s) ParameterCursorEndInteractionCallback",
+    this->GetTclName());
+  this->Superclass::ParameterCursorEndInteractionCallback();
+}
+
+
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::PrintSelf(ostream& os, vtkIndent indent)
 {

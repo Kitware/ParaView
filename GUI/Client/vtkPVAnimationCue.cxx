@@ -74,7 +74,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.7");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.8");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -374,7 +374,7 @@ void vtkPVAnimationCue::SetKeyFrameTime(int id, double time)
 {
   if (id < 0 || id >= this->GetNumberOfKeyFrames())
     {
-    vtkErrorMacro("Id beyond range");
+    vtkErrorMacro("Id beyond range: " << id << ", " << time);
     return;
     }
   if (this->Virtual)
@@ -395,8 +395,6 @@ void vtkPVAnimationCue::SetKeyFrameTime(int id, double time)
       }
      keyframe->SetKeyTime(time);
     }
-  this->AddTraceEntry("$kw(%s) SetKeyFrameTime %d %f", this->GetTclName(),
-    id, time);
 }
 
 //-----------------------------------------------------------------------------
@@ -437,8 +435,6 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
   // domain and property values.
   pvAM->SetCurrentTime(time);
 
-  this->AddTraceEntry("$kw(%s) CreateAndAddKeyFrame %f %d",
-    this->GetTclName(), time, type);
   
   static int num_objects = 0;
   ostrstream str ;
@@ -522,8 +518,6 @@ int vtkPVAnimationCue::RemoveKeyFrame(int id)
     vtkPVKeyFrame* keyframe = this->GetKeyFrame(id);
     this->RemoveKeyFrame(keyframe);
     }
-  this->AddTraceEntry("$kw(%s) RemoveKeyFrame %d",
-    this->GetTclName(), id);
   return 1;
 }
 
