@@ -40,8 +40,8 @@ public:
   // Description:
   // Set the range for this scale.
   virtual void SetRange(double min, double max);
-  virtual void SetRange(float *range) { this->SetRange(range[0], range[1]); };
-  virtual void SetRange(double *range) { this->SetRange(range[0], range[1]); };
+  virtual void SetRange(const float *range) { this->SetRange(range[0], range[1]); };
+  virtual void SetRange(const double *range) { this->SetRange(range[0], range[1]); };
   vtkGetVector2Macro(Range, double);
   virtual void GetRange(float &min, float &max) {
     min = (float)this->GetRange()[0];
