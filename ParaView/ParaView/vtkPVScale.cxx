@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.22");
+vtkCxxRevisionMacro(vtkPVScale, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -439,6 +439,7 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   sprintf(script, "%s Set%s $pvTime", 
           this->ObjectTclName, this->VariableName);
   ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
+  ai->SetCurrentProperty(this->Property);
   ai->SetTimeStart(this->GetRangeMin());
   ai->SetTimeEnd(this->GetRangeMax());
   ai->SetTypeToInt();
