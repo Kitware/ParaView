@@ -23,7 +23,7 @@
 #include <vtkstd/vector>
 
 
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.2");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnection, "1.3");
 vtkStandardNewMacro(vtkMPIMToNSocketConnection);
 
 vtkCxxSetObjectMacro(vtkMPIMToNSocketConnection,Controller, vtkMultiProcessController);
@@ -100,13 +100,17 @@ void vtkMPIMToNSocketConnection::WaitForConnection()
     vtkErrorMacro("WaitForConnection called more than once");
     return;
     }
-  this->SocketCommunicator = vtkSocketCommunicator::New();
   int myId = this->Controller->GetLocalProcessId();
-  cerr << "WaitForConnection: id :" << myId << "  host: " << this->HostName << "  Port:" << this->PortNumber << "\n";
+  if(myId >= this->NumberOfConnections)
+    {
+    return;
+    }
+  this->SocketCommunicator = vtkSocketCommunicator::New();
+  cout << "WaitForConnection: id :" << myId << "  host: " << this->HostName << "  Port:" << this->PortNumber << "\n";
   this->SocketCommunicator->WaitForConnection(this->PortNumber);
   int data;
   this->SocketCommunicator->Receive(&data, 1, 1, 1238);
-  cerr << "Received Hello from process " << data << "\n";
+  cout << "Received Hello from process " << data << "\n";
 } 
 
 void vtkMPIMToNSocketConnection::Connect()
@@ -116,13 +120,13 @@ void vtkMPIMToNSocketConnection::Connect()
     vtkErrorMacro("Connect called more than once");
     return;
     }
-  this->SocketCommunicator = vtkSocketCommunicator::New();
   unsigned int myId = this->Controller->GetLocalProcessId();
   if(myId >= this->Internals->ServerInformation.size())
     {
     return;
     }
-  cerr << "Connect: id :" << myId << "  host: " 
+  this->SocketCommunicator = vtkSocketCommunicator::New();
+  cout << "Connect: id :" << myId << "  host: " 
        << this->Internals->ServerInformation[myId].HostName.c_str() 
        << "  Port:" 
        << this->Internals->ServerInformation[myId].PortNumber 

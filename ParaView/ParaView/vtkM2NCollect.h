@@ -31,6 +31,13 @@ public:
   vtkTypeRevisionMacro(vtkM2NCollect, vtkCollectPolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+  void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
+  vtkSetMacro(ServerMode, int);
+  vtkGetMacro(ServerMode, int);
+  vtkSetMacro(RenderServerMode, int);
+  vtkGetMacro(RenderServerMode, int);
+  vtkSetMacro(ClientMode, int);
+  vtkGetMacro(ClientMode, int);
   
 protected:
   vtkM2NCollect();
@@ -44,14 +51,7 @@ protected:
   int ExchangeSizes(int size);
   void ExchangeData(int inSize, char* inBuf, int outSize, char* outBuf);
 
-  void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
-  
-  vtkSetMacro(ServerMode, int);
-  vtkGetMacro(ServerMode, int);
-  vtkSetMacro(RenderServerMode, int);
-  vtkGetMacro(RenderServerMode, int);
-  vtkSetMacro(ClientMode, int);
-  vtkGetMacro(ClientMode, int);
+
 private:
   vtkMPIMToNSocketConnection* MPIMToNSocketConnection;
   int ServerMode;

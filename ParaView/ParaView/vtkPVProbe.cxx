@@ -50,7 +50,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.118");
+vtkCxxRevisionMacro(vtkPVProbe, "1.119");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -271,7 +271,7 @@ void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
                       << vtkClientServerStream::LastResult 
                       << "SetValue" << pos2[0] << pos2[1]
                       << vtkClientServerStream::End;
-      pm->SendStreamToServer();
+      pm->SendStreamToRenderServer();
 
       break;
     }
@@ -394,7 +394,7 @@ void vtkPVProbe::AcceptCallbackInternal()
                     << "AddActor"
                     << this->PlotDisplay->GetXYPlotActorID() 
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStreamToRenderServer();
     }
   else
     {

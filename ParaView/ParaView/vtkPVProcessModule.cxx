@@ -47,14 +47,15 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.44");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVProcessModule, Application, vtkKWApplication);
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
-  this->Application = 0;
+  this->Application = 0; 
+  this->MPIMToNSocketConnectionID.ID = 0;
 }
 
 //----------------------------------------------------------------------------

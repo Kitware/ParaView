@@ -32,7 +32,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.47");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.48");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -148,7 +148,7 @@ void vtkPVLineWidget::SetPoint1Internal(double x, double y, double z)
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
                   << "SetAlignToNone" <<  vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->Render();
 }
 
@@ -193,7 +193,7 @@ void vtkPVLineWidget::SetPoint2Internal(double x, double y, double z)
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
                   << "SetAlignToNone" <<  vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->Render();
 }
 
@@ -269,7 +269,7 @@ void vtkPVLineWidget::SetResolution(int i)
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
                   << "SetResolution" << res
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->Render();
 }
 
@@ -406,7 +406,7 @@ void vtkPVLineWidget::ActualPlaceWidget()
                   << "PlaceWidget" 
                   <<  bds[0] << bds[1] << bds[2] << bds[3] << bds[4] << bds[5] 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->UpdateVTKObject(this->ObjectID);
 }
 
@@ -578,7 +578,7 @@ void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
                   << "SetPoint2" << val[0] << val[1] <<  val[2]
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->Superclass::ExecuteEvent(wdg, l, p);
 }
 
@@ -640,7 +640,7 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Widget3DID = pm->NewStreamObject("vtkLineWidget");
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
                   << "SetAlignToNone" << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");

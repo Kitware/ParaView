@@ -89,7 +89,6 @@ public:
   // when in client mode and calling this from tcl where vtkClientServerID
   // is not wrapped.
   virtual vtkObjectBase* GetObjectFromIntID(unsigned int);
-
   //BTX
   // Description:
   // Return the vtk object associated with the given id for the client.
@@ -106,6 +105,7 @@ public:
   // Description:
   // Used internally.  Do not call.  Use LoadModule instead.
   virtual int LoadModuleInternal(const char* name);
+  vtkClientServerID GetMPIMToNSocketConnectionID() { return this->MPIMToNSocketConnectionID;}
 
   // Description:
   // Initialize/Finalize the process module's
@@ -124,8 +124,8 @@ protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
 
+  vtkClientServerID MPIMToNSocketConnectionID;
   vtkKWApplication* Application;
-
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented

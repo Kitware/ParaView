@@ -33,7 +33,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NCollect, "1.7");
+vtkCxxRevisionMacro(vtkM2NCollect, "1.8");
 vtkStandardNewMacro(vtkM2NCollect);
 
 vtkCxxSetObjectMacro(vtkM2NCollect,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -144,12 +144,17 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
   if (this->ServerMode && controller && 
       controller->GetNumberOfProcesses() > numConnections)
     {
+    vtkPolyData* inputCopy = vtkPolyData::New();
+    inputCopy->ShallowCopy(input);
     AllToN = vtkAllToNRedistributePolyData::New();
     AllToN->SetController(controller);
     AllToN->SetNumberOfProcesses(numConnections);
-    AllToN->SetInput(input);
-    AllToN->Update();
+    AllToN->SetInput(inputCopy);
+    inputCopy->Delete();
     input = AllToN->GetOutput();
+    input->SetUpdateNumberOfPieces(this->GetOutput()->GetUpdateNumberOfPieces());
+    input->SetUpdatePiece(this->GetOutput()->GetUpdatePiece());
+    input->Update();
     }
 #endif
 
@@ -170,7 +175,8 @@ void vtkM2NCollect::ExecuteData(vtkDataObject* outData)
     // Get string.
     bufSize = writer->GetOutputStringLength();
     buf = writer->RegisterAndGetOutputString();
-    // Get rid of writer and copy of input.
+    
+// Get rid of writer and copy of input.
     writer->Delete();
     writer = NULL;
     pd->Delete();
@@ -267,13 +273,20 @@ void vtkM2NCollect::ExchangeData(int inSize, char* inBuf, int outSize, char* out
     {
     return;
     }
+
   if(this->ServerMode)
      {
-     socket->Send(inBuf, inSize, 1, 38723);
+     if(inSize)
+       {
+       socket->Send(inBuf, inSize, 1, 38723);
+       }
      }
   if(this->RenderServerMode)
     {
-    socket->Receive(outBuf, outSize, 1, 38723);
+    if(outSize)
+      {
+      socket->Receive(outBuf, outSize, 1, 38723);
+      }
     }
   return;
 }

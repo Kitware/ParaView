@@ -87,6 +87,11 @@ public:
   // between the client and process 0 of the server.
   vtkGetObjectMacro(SocketController, vtkSocketController);
 
+  // Description:
+  // Return the socket to the RenderServer, if this is not
+  // set, return the SocketController.
+  vtkSocketController* GetRenderServerSocketController();
+
   //BTX
   // Description:
   // Module dependant method for collecting data information from all procs.

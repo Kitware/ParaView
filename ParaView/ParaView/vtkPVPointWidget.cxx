@@ -35,7 +35,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.27");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -209,7 +209,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
   this->Widget3DID = pm->NewStreamObject("vtkPointWidget");
   pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "AllOff" 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -333,7 +333,7 @@ void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
     {
     pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
                     << "SetPosition" << x << y << z << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    pm->SendStreamToClientAndRenderServer();
     }
   this->Render();
 }

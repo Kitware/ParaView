@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.8");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.9");
 
 
 
@@ -55,7 +55,7 @@ vtkPVDeskTopRenderModule::~vtkPVDeskTopRenderModule()
   if (this->DisplayManagerID.ID && pvApp && pm)
     {
     pm->DeleteStreamObject(this->DisplayManagerID);
-    pm->SendStreamToServer(); 
+    pm->SendStreamToRenderServer(); 
     this->DisplayManagerID.ID = 0;
     }
   if (this->CompositeID.ID && pvApp && pm)
@@ -63,7 +63,7 @@ vtkPVDeskTopRenderModule::~vtkPVDeskTopRenderModule()
     pm->DeleteStreamObject(this->CompositeID);
     pm->SendStreamToClient();
     pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStreamToServerRoot();
+    pm->SendStreamToRenderServerRoot();
     this->CompositeID.ID = 0;
     }
 }
@@ -96,7 +96,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->RendererID = pm->NewStreamObject("vtkIceTRenderer");
   this->Renderer2DID = pm->NewStreamObject("vtkRenderer");
   this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   this->Renderer = 
     vtkRenderer::SafeDownCast(
       pm->GetObjectFromID(this->RendererID));
@@ -129,7 +129,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->RenderWindowID << "AddRenderer" << this->Renderer2DID
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToClientAndRenderServer();
   
   this->DisplayManagerID = pm->NewStreamObject("vtkIceTRenderManager");
   pm->GetStream() << vtkClientServerStream::Invoke
@@ -154,7 +154,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << this->DisplayManagerID 
                   << "InitializeRMIs"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToRenderServer();
 
   // **********************************************************
 
@@ -165,7 +165,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   // the same id
   pm->GetStream() << vtkClientServerStream::New << "vtkDesktopDeliveryServer"
                   <<  this->CompositeID <<  vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToRenderServerRoot();
 
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
@@ -178,13 +178,13 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   vtkClientServerStream tmp = pm->GetStream();
   pm->SendStreamToClient();
   pm->GetStream() = tmp;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToRenderServerRoot();
   
 
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetParallelRenderManager" << this->DisplayManagerID
                   << vtkClientServerStream::End;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToRenderServerRoot();
 
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetRenderWindow"
@@ -199,7 +199,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   tmp = pm->GetStream();
   pm->SendStreamToClient();
   pm->GetStream() = tmp;
-  pm->SendStreamToServerRoot();
+  pm->SendStreamToRenderServerRoot();
 }
 
 //----------------------------------------------------------------------------

@@ -64,6 +64,9 @@ public:
   //ETX
     
 protected:
+  // Create the CollectID object
+  vtkClientServerID CreateCollectionFilter(vtkPVApplication*);
+  
   vtkPVCompositePartDisplay();
   ~vtkPVCompositePartDisplay();
   
