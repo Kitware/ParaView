@@ -1,0 +1,325 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkExtractCTHPart.cxx
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#include "vtkExtractCTHPart.h"
+#include "vtkObjectFactory.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkPolyData.h"
+#include "vtkClipPolyData.h"
+#include "vtkCutter.h"
+#include "vtkAppendPolyData.h"
+#include "vtkDataSetSurfaceFilter.h"
+#include "vtkPlane.h"
+#include "vtkFloatArray.h"
+#include "vtkContourFilter.h"
+
+#include <math.h>
+
+vtkCxxRevisionMacro(vtkExtractCTHPart, "1.1");
+vtkStandardNewMacro(vtkExtractCTHPart);
+vtkCxxSetObjectMacro(vtkExtractCTHPart,ClipPlane,vtkPlane);
+
+//------------------------------------------------------------------------------
+vtkExtractCTHPart::vtkExtractCTHPart()
+{
+  this->InputScalarsSelection = NULL;
+  this->Clipping = 0;
+  this->ClipPlane = vtkPlane::New();
+  // For consistent references.
+  this->ClipPlane->Register(this);
+  this->ClipPlane->Delete();
+}
+
+//------------------------------------------------------------------------------
+vtkExtractCTHPart::~vtkExtractCTHPart()
+{
+  this->SetInputScalarsSelection(NULL);
+  this->SetClipPlane(NULL);
+}
+
+//------------------------------------------------------------------------------
+// Overload standard modified time function. If clip plane is modified,
+// then this object is modified as well.
+unsigned long vtkExtractCTHPart::GetMTime()
+{
+  unsigned long mTime=this->Superclass::GetMTime();
+  unsigned long time;
+
+  if (this->ClipPlane)
+    {
+    time = this->ClipPlane->GetMTime();
+    mTime = ( time > mTime ? time : mTime );
+    }
+
+  return mTime;
+}
+
+//--------------------------------------------------------------------------
+void vtkExtractCTHPart::ComputeInputUpdateExtents(vtkDataObject *output)
+{
+  vtkDataSet *input = this->GetInput();
+  int piece = output->GetUpdatePiece();
+  int numPieces = output->GetUpdateNumberOfPieces();
+  int ghostLevel = output->GetUpdateGhostLevel();
+
+  if (input == NULL)
+    {
+    return;
+    }
+
+  input->SetUpdateExtent(piece, numPieces, ghostLevel+1);
+  // Force input to clip.
+  // We could deal with larger extents if we create a 
+  // rectilinear grid synchronized templates.
+  input->RequestExactExtentOn();
+}
+
+
+//------------------------------------------------------------------------------
+void vtkExtractCTHPart::Execute()
+{
+  vtkRectilinearGrid* input = this->GetInput();
+  vtkRectilinearGrid* data = vtkRectilinearGrid::New();
+  vtkPolyData* output;
+  vtkPolyData* tmp;
+  vtkDataArray* cellVolumeFraction;
+  vtkFloatArray* pointVolumeFraction;
+  vtkClipPolyData *clip0;
+  vtkDataSetSurfaceFilter *surface;
+  vtkAppendPolyData *append1;
+  vtkAppendPolyData *append2 = NULL;
+  int* dims;
+
+  // First things first.
+  // Convert Cell data array to point data array.
+  // Pass cell data.
+  data->CopyStructure(input);
+  data->GetCellData()->PassData(input->GetCellData());
+  // Only convert single volume fraction array to point data.
+  // Other attributes will have to be viewed as cell data.
+  cellVolumeFraction = input->GetCellData()->GetScalars(this->InputScalarsSelection);
+  if (cellVolumeFraction->GetDataType() != VTK_FLOAT)
+    {
+    vtkErrorMacro("Expecting volume fraction to be of type float.");
+    data->Delete();
+    }
+  pointVolumeFraction = vtkFloatArray::New();
+  dims = input->GetDimensions();
+  pointVolumeFraction->SetNumberOfTuples(dims[0]*dims[1]*dims[2]);
+  this->ExecuteCellDataToPointData(cellVolumeFraction, 
+                                   pointVolumeFraction, dims);
+  data->GetPointData()->SetScalars(pointVolumeFraction);
+
+  // Create the contour surface.
+  vtkContourFilter *contour = vtkContourFilter::New();
+  contour->SetInput(data);
+  contour->SetValue(0, 0.5);
+
+  // Create the capping surface for the contour and append.
+  append1 = vtkAppendPolyData::New();
+  append1->AddInput(contour->GetOutput());
+  surface = vtkDataSetSurfaceFilter::New();
+  surface->SetInput(data);
+  tmp = surface->GetOutput();
+  tmp->Update();
+  // Clip surface less than volume fraction 0.5.
+  clip0 = vtkClipPolyData::New();
+  clip0->SetInput(surface->GetOutput());
+  clip0->SetValue(0.5);
+  tmp = clip0->GetOutput();
+  tmp->Update();
+  append1->AddInput(clip0->GetOutput());
+
+  append1->Update();
+  tmp = append1->GetOutput();
+  
+  if (this->Clipping && this->ClipPlane)
+    {
+    vtkClipPolyData *clip1, *clip2;
+    // We need to append iso and capped surfaces.
+    append2 = vtkAppendPolyData::New();
+    // Clip the volume fraction iso surface.
+    clip1 = vtkClipPolyData::New();
+    clip1->SetInput(tmp);
+    clip1->SetClipFunction(this->ClipPlane);
+    append2->AddInput(clip1->GetOutput());
+    // We need to create a capping surface.
+    vtkCutter *cut = vtkCutter::New();
+    cut->SetInput(data);
+    cut->SetCutFunction(this->ClipPlane);
+    cut->SetValue(0, 0.0);
+    clip2 = vtkClipPolyData::New();
+    clip2->SetInput(cut->GetOutput());
+    clip2->SetValue(0.5);
+    append2->AddInput(clip2->GetOutput());
+    append2->Update();
+    tmp = append2->GetOutput();
+    clip1->Delete();
+    clip1 = NULL;
+    cut->Delete();
+    cut = NULL;
+    clip2->Delete();
+    clip2 = NULL;
+    }
+
+  output = this->GetOutput();
+  output->CopyStructure(tmp);
+  output->GetCellData()->PassData(tmp->GetCellData());
+
+  // Get rid of extra ghost levels.
+  output->RemoveGhostCells(output->GetUpdateGhostLevel()+1);
+
+  data->Delete();
+  contour->Delete();
+  surface->Delete();
+  clip0->Delete();
+  append1->Delete();
+  if (append2)
+    {
+    append2->Delete();
+    }
+  pointVolumeFraction->Delete();
+}
+
+//------------------------------------------------------------------------------
+void vtkExtractCTHPart::ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
+                                  vtkFloatArray *pointVolumeFraction, int *dims)
+{
+  int count;
+  int i, j, k;
+  int iEnd, jEnd, kEnd;
+  int jInc, kInc;
+  float *pPoint;
+  float *pCell;
+
+  pointVolumeFraction->SetName(cellVolumeFraction->GetName());
+
+  iEnd = dims[0]-1;
+  jEnd = dims[1]-1;
+  kEnd = dims[2]-1;
+  // Increments are for the point array.
+  jInc = dims[0];
+  kInc = (dims[1]) * jInc;
+  
+  pPoint = pointVolumeFraction->GetPointer(0);
+  pCell = (float*)(cellVolumeFraction->GetVoidPointer(0));
+
+  // Initialize the point data to 0.
+  memset(pPoint, 0,  dims[0]*dims[1]*dims[2]*sizeof(float));
+
+  // Loop thorugh the cells.
+  for (k = 0; k < kEnd; ++k)
+    {
+    for (j = 0; j < jEnd; ++j)
+      {
+      for (i = 0; i < iEnd; ++i)
+        {
+        // Add cell value to all points of cell.
+        *pPoint += *pCell;
+        pPoint[1] += *pCell;
+        pPoint[jInc] += *pCell;
+        pPoint[1+jInc] += *pCell;
+        pPoint[kInc] += *pCell;
+        pPoint[kInc+1] += *pCell;
+        pPoint[kInc+jInc] += *pCell;
+        pPoint[kInc+jInc+1] += *pCell;
+
+        // Increment pointers
+        ++pPoint;
+        ++pCell;
+        }
+      // Skip over last point to the start of the next row.
+      ++pPoint;
+      }
+    // Skip over the last row to the start of the next plane.
+    pPoint += jInc;
+    }
+
+  // Now a second pass to normalize the point values.
+  // Loop through the points.
+  count = 1;
+  pPoint = pointVolumeFraction->GetPointer(0);
+  for (k = 0; k <= kEnd; ++k)
+    {
+    // Just a fancy fast way to compute the number of cell neighbors of a point.
+    if (k == 1)
+      {
+      count = count << 1;
+      }
+    if (k == kEnd)
+      {
+      count = count >> 1;
+      }
+    for (j = 0; j <= jEnd; ++j)
+      {
+      // Just a fancy fast way to compute the number of cell neighbors of a point.
+      if (j == 1)
+        {
+        count = count << 1;
+        }
+      if (j == jEnd)
+        {
+        count = count >> 1;
+        }
+      for (i = 0; i <= iEnd; ++i)
+        {
+        // Just a fancy fast way to compute the number of cell neighbors of a point.
+        if (i == 1)
+          {
+          count = count << 1;
+          }
+        if (i == iEnd)
+          {
+          count = count >> 1;
+          }
+        *pPoint = *pPoint / (float)(count);
+        ++pPoint;
+        }
+      }
+    }
+}
+
+
+//------------------------------------------------------------------------------
+void vtkExtractCTHPart::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+
+  if (this->InputScalarsSelection)
+    {
+    os << indent << "InputScalarsSelection: " 
+       << this->InputScalarsSelection << endl;
+    }
+  if (this->Clipping)
+    {
+    os << indent << "Clipping: On\n";
+    if (this->ClipPlane)
+      {
+      os << indent << "ClipPlane:\n";
+      this->ClipPlane->PrintSelf(os, indent.GetNextIndent());
+      }
+    else  
+      {
+      os << indent << "ClipPlane: NULL\n";
+      }
+    }
+  else  
+    {
+    os << indent << "Clipping: Off\n";
+    }
+}
+
