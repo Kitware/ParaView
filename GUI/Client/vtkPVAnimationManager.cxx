@@ -59,7 +59,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.18");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.19");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1174,6 +1174,7 @@ void vtkPVAnimationManager::AddDefaultAnimation(vtkPVSource* pvSource)
         {
         child->AddNewKeyFrame(0.0);
         child->AddNewKeyFrame(1.0);
+        this->AnimationScene->ShowAnimationToolbar();
         break;
         }
       }

@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.16");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.17");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -318,7 +318,7 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
     "the animation (in seconds).");
   this->DurationThumbWheel->GetEntry()->BindCommand(this, 
     "DurationChangedCallback");
-  this->SetDuration(60.0);
+  this->SetDuration(10.0);
   this->Script("grid %s %s -sticky ew",
     this->DurationLabel->GetWidgetName(),
     this->DurationThumbWheel->GetWidgetName());
@@ -341,10 +341,12 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->FrameRateThumbWheel->SetEndCommand(this, "FrameRateChangedCallback");
   this->FrameRateThumbWheel->GetEntry()->BindCommand(this,
     "FrameRateChangedCallback");
+  this->FrameRateThumbWheel->SetBalloonHelpString("Adjust the frame rate for the "
+    "animation.");
   this->Script("grid %s %s -sticky ew",
     this->FrameRateLabel->GetWidgetName(),
     this->FrameRateThumbWheel->GetWidgetName());
-  this->SetFrameRate(1.0);
+  this->SetFrameRate(15.0);
 
   // Animation Control: Play Mode
   this->PlayModeLabel->SetParent(this);
@@ -352,6 +354,8 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->PlayModeLabel->SetLabel("Play Mode:" );
   this->PlayModeMenuButton->SetParent(this);
   this->PlayModeMenuButton->Create(app, 0);
+  this->PlayModeMenuButton->SetBalloonHelpString("Change the mode in which the "
+    "animation is played.");
   this->PlayModeMenuButton->AddCommand(VTK_PV_PLAYMODE_SEQUENCE_TITLE, this,
     "SetPlayMode 0", "Plays the animation as a sequence of images.");
   this->PlayModeMenuButton->AddCommand(VTK_PV_PLAYMODE_REALTIME_TITLE, this,
@@ -1091,6 +1095,13 @@ void vtkPVAnimationScene::SaveInBatchScript(ofstream* file)
     {
     this->AnimationSceneProxy->SaveInBatchScript(file);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::SetAnimationToolbarVisibility(int visible)
+{
+  this->Window->SetLowerToolbarVisibility(this->VCRToolbar, 
+    VTK_PV_TOOLBARS_ANIMATION_LABEL, visible);
 }
 
 //-----------------------------------------------------------------------------

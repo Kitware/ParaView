@@ -157,6 +157,12 @@ public:
 
   void InvalidateAllGeometries();
 
+  // Description:
+  // Helper methods to show/hide the animation toolbar.
+  void ShowAnimationToolbar() { this->SetAnimationToolbarVisibility(1); }
+  void HideAnimationToolbar() { this->SetAnimationToolbarVisibility(0); }
+  void SetAnimationToolbarVisibility(int visible);
+
 protected:
   vtkPVAnimationScene();
   ~vtkPVAnimationScene();
