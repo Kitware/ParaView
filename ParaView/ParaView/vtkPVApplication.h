@@ -299,6 +299,13 @@ public:
   vtkGetMacro(UseSatelliteSoftware,int);
 
   // Description:
+  // Set by the command line arguments --use-offscreen-rendering or -os
+  // Requires that ParaView is linked with mangled mesa or that sofware
+  // rendering is enabled on Unix.
+  // Satellite processes render offscreen.
+  vtkGetMacro(UseOffscreenRendering,int);
+
+  // Description:
   // Set by the command line arguments --start-empty or -e
   // This flag is set when ParaView was started without the default modules.
   vtkGetMacro(StartEmpty,int);
@@ -375,6 +382,7 @@ protected:
   int StartEmpty;
   int PlayDemo;
   int UseRenderingGroup;
+  int UseOffscreenRendering;
   char* GroupFileName;
   vtkSetStringMacro(GroupFileName);
   int UseTiledDisplay;

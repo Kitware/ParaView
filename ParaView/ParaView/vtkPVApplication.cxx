@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.207");
+vtkCxxRevisionMacro(vtkPVApplication, "1.208");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -326,6 +326,7 @@ vtkPVApplication::vtkPVApplication()
   this->UseSoftwareRendering = 0;
   this->UseSatelliteSoftware = 0;
   this->UseStereoRendering = 0;
+  this->UseOffscreenRendering = 0;
   this->StartEmpty = 0;
   this->PlayDemo = 0;
 
@@ -563,10 +564,12 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "--batch", "-b", 
   "Load and run the batch script specified.", 
 #ifdef VTK_USE_MPI
+/* Temporarily disabling - for release
   "--use-rendering-group", "-p",
   "Use a subset of processes to render.",
   "--group-file", "-gf",
   "--group-file=fname where fname is the name of the input file listing number of processors to render on.",
+*/
   "--use-tiled-display", "-td",
   "Duplicate the final data to all nodes and tile node displays 1-N into one large display.",
   "--tile-dimensions-x", "-tdx",
@@ -580,6 +583,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "--use-satellite-software", "-s", 
   "Use software (Mesa) rendering (supports off-screen rendering) only on satellite processes.", 
 #endif
+  "--use-offscreen-rendering", "-os", 
+  "Render offscreen on the satellite processes. This option only works with software rendering or mangled mesa on Unix", 
   "--play-demo", "-pd",
   "Run the ParaView demo.",
   "--help", "",
@@ -1021,6 +1026,15 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       }
     }
 #endif
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--offscreen-rendering",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-os",
+                                          index) == VTK_OK ||
+       getenv("PV_OFFSCREEN") )
+    {
+    this->UseOffscreenRendering = 1;
+    }
 
   return 0;
 }

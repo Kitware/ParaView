@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.1");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.2");
 
 
 
@@ -141,7 +141,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     pvApp->BroadcastScript("%s EnableAbortOff", this->CompositeTclName);
     }
 
-  if ( getenv("PV_OFFSCREEN") )
+  if ( pvApp->GetUseOffscreenRendering() )
     {
     pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
     }
