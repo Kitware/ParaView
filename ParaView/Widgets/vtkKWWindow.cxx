@@ -415,7 +415,10 @@ void vtkKWWindow::Exit()
     this->PromptBeforeClose = 0;
     this->Application->Exit();
     }
-  this->InExit = 0;
+  else
+    {
+    this->InExit = 0;
+    }
 }
 
 // invoke the apps close when selected
@@ -956,7 +959,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.73 $");
+  this->ExtractRevision(os,"$Revision: 1.74 $");
 }
 
 int vtkKWWindow::ExitDialog()
