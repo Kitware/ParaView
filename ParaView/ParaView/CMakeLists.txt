@@ -19,6 +19,7 @@ SET( ParaViewServer_SRCS
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
+  vtkPVServerProbe.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVSummaryHelper.cxx
   vtkSelectInputs.cxx

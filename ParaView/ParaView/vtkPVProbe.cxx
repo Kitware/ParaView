@@ -20,9 +20,14 @@
 #include "vtkKWLabel.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkPProbeFilter.h"
 #include "vtkPVApplication.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVArrayMenu.h"
+#include "vtkPVClientServerModule.h"
 #include "vtkPVData.h"
+#include "vtkPVDataInformation.h"
+#include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
@@ -31,6 +36,7 @@
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkProperty2D.h"
+#include "vtkSocketController.h"
 #include "vtkSource.h"
 #include "vtkString.h"
 #include "vtkSystemIncludes.h"
@@ -41,10 +47,12 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.105");
+vtkCxxRevisionMacro(vtkPVProbe, "1.106");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
+
+#define PV_TAG_PROBE_OUTPUT 759362
 
 //----------------------------------------------------------------------------
 vtkPVProbe::vtkPVProbe()
@@ -79,11 +87,19 @@ vtkPVProbe::vtkPVProbe()
   // Special ivar in vtkPVSource just for this subclass.
   // We cannot process inputs that have more than one part.
   this->RequiredNumberOfInputParts = 1;
+  
+  this->ServerSideID.ID = 0;
 }
-
 
 vtkPVProbe::~vtkPVProbe()
 {
+  if (this->ServerSideID.ID)
+    {
+    vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
+    pm->DeleteStreamObject(this->ServerSideID);
+    pm->SendStreamToServerRoot();
+    }
+  
   if ( this->XYPlotWidget )
     {
     this->XYPlotWidget->SetEnabled(0);
@@ -104,8 +120,7 @@ vtkPVProbe::~vtkPVProbe()
   this->ShowXYPlotToggle = NULL;
   
   this->ProbeFrame->Delete();
-  this->ProbeFrame = NULL;
-  
+  this->ProbeFrame = NULL;  
 }
 
 //----------------------------------------------------------------------------
@@ -200,48 +215,74 @@ void vtkPVProbe::AcceptCallbackInternal()
     }
   
   // Get the probe filter's output from the root node's process.
-  vtkPolyData* probeOutput = vtkPolyData::New();
-// ******
-//   if (!pm->ReceiveRootPolyData(
-//     this->GetPart(0)->GetVTKDataTclName(), probeOutput))
-//     {
-//     probeOutput->Delete();
-//     vtkErrorMacro("Failed to receive probe output from root node process.");
-//     this->XYPlotWidget->SetEnabled(0);
-//     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
-//     return;
-//     }
+  vtkPolyData* probeOutput = NULL;
 
+  vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
+  vtkPVClientServerModule *csm = vtkPVClientServerModule::SafeDownCast(pm);
+
+  if (csm)
+    {
+    probeOutput = vtkPolyData::New();
+    if (!this->ServerSideID.ID)
+      {
+      this->ServerSideID = pm->NewStreamObject("vtkPVServerProbe");
+      pm->GetStream() << vtkClientServerStream::Invoke
+                      << this->ServerSideID << "SetProcessModule"
+                      << pm->GetProcessModuleID()
+                      << vtkClientServerStream::End;
+      }
+    
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ServerSideID << "SendPolyDataOutput"
+                    << this->GetVTKSourceID(0)
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServerRoot();
+  
+    csm->GetSocketController()->Receive(probeOutput, 1, PV_TAG_PROBE_OUTPUT);
+    }
+  else
+    {
+    vtkPProbeFilter *probeFilter = vtkPProbeFilter::SafeDownCast(
+      pm->GetObjectFromID(this->GetVTKSourceID(0)));
+    probeOutput = probeFilter->GetPolyDataOutput();
+    probeOutput->Register(NULL);
+    }
+  
   vtkPointData *pd = probeOutput->GetPointData();
   
   int arrayCount;
-  int numArrays = pd->GetNumberOfArrays();
   vtkDataArray *array;
+  vtkPVArrayInformation *arrayInfo;
+
+  vtkPVDataInformation *di = this->GetPart()->GetDataInformation();
+  vtkPVDataSetAttributesInformation *pdi = di->GetPointDataInformation();
   
-  if (probeOutput->GetNumberOfPoints() == 1)
+  int numPts = this->GetPart()->GetDataInformation()->GetNumberOfPoints();
+  int numArrays = pdi->GetNumberOfArrays();
+  
+  if (numPts == 1)
     {
     // update the ui to see the point data for the probed point
     
     vtkIdType j, numComponents;
 
-    // use vtkstd::string since 'label' can grow in lenght arbitrarily
+    // use vtkstd::string since 'label' can grow in length arbitrarily
     vtkstd::string label;
     vtkstd::string arrayData;
     vtkstd::string tempArray;
-
-    // used to read data values to a vtkstd::string using arbitrary length buffer
 
     this->XYPlotWidget->SetEnabled(0);
 
     for (i = 0; i < numArrays; i++)
       {
       array = pd->GetArray(i);
-      numComponents = array->GetNumberOfComponents();
+      arrayInfo = pdi->GetArrayInformation(i);
+      numComponents = arrayInfo->GetNumberOfComponents();
       if (numComponents > 1)
         {
         // make sure we fill buffer from the beginning
         ostrstream arrayStrm;
-        arrayStrm << array->GetName() << ": ( " << ends;
+        arrayStrm << arrayInfo->GetName() << ": ( " << ends;
         arrayData = arrayStrm.str();
         arrayStrm.rdbuf()->freeze(0);
 
@@ -286,7 +327,7 @@ void vtkPVProbe::AcceptCallbackInternal()
     this->PointDataLabel->SetLabel( label.c_str() );
     this->Script("pack %s", this->PointDataLabel->GetWidgetName());
     }
-  else if (probeOutput->GetNumberOfPoints() > 1)
+  else if (numPts > 1)
     {
     this->Script("pack forget %s", this->PointDataLabel->GetWidgetName());
 
@@ -305,9 +346,9 @@ void vtkPVProbe::AcceptCallbackInternal()
     arrayCount = 0;
     for ( i = 0; i < numArrays; i++)
       {
-      array = pd->GetArray(i);
-      arrayName = array->GetName();
-      if (array->GetNumberOfComponents() == 1)
+      arrayInfo = pdi->GetArrayInformation(i);
+      arrayName = arrayInfo->GetName();
+      if (arrayInfo->GetNumberOfComponents() == 1)
         {
         xyp->AddInput(probeOutput, arrayName, 0);
         xyp->SetPlotLabel(i, arrayName);
@@ -341,7 +382,6 @@ void vtkPVProbe::AcceptCallbackInternal()
     window->GetMainView()->Render();
     }
   
-  // Free reference produced by ReceiveRootPolyData.
   probeOutput->Delete();
 }
  

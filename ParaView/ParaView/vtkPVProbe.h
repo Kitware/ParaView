@@ -84,6 +84,8 @@ protected:
   int GetDimensionality();
 
   int InstanceCount;
+  
+  vtkClientServerID ServerSideID;
 
   void HSVtoRGB(float h, float s, float v, float *r, float *g, float *b);
 
