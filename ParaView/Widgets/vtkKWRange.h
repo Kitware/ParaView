@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWEntry;
 class vtkKWFrame;
+class vtkKWPushButtonSet;
 
 class VTK_EXPORT vtkKWRange : public vtkKWLabeledWidget
 {
@@ -121,7 +122,6 @@ public:
   virtual void SetInverted(int);
   vtkBooleanMacro(Inverted, int);
   vtkGetMacro(Inverted, int);
-  
 
   // Description:
   // Set/Get the desired narrow dimension of the widget. For horizontal widget
@@ -216,7 +216,22 @@ public:
     { this->SetEntriesPosition(vtkKWRange::POSITION_SIDE2); };
   vtkBooleanMacro(EntriesPosition, int);
   vtkGetMacro(EntriesPosition, int);
+  virtual void SetZoomButtonsPosition(int);
+  virtual void SetZoomButtonsPositionToAligned()
+    { this->SetZoomButtonsPosition(vtkKWRange::POSITION_ALIGNED); };
+  virtual void SetZoomButtonsPositionToSide1()
+    { this->SetZoomButtonsPosition(vtkKWRange::POSITION_SIDE1); };
+  virtual void SetZoomButtonsPositionToSide2()
+    { this->SetZoomButtonsPosition(vtkKWRange::POSITION_SIDE2); };
+  vtkBooleanMacro(ZoomButtonsPosition, int);
+  vtkGetMacro(ZoomButtonsPosition, int);
 
+  // Description:
+  // Show/Hide the zoom buttons
+  virtual void SetShowZoomButtons(int);
+  vtkBooleanMacro(ShowZoomButtons, int);
+  vtkGetMacro(ShowZoomButtons, int);
+  
   // Description:
   // Set commands.
   virtual void SetCommand(vtkKWObject* object, const char *method);
@@ -253,6 +268,8 @@ public:
   //ETX
   virtual void ConfigureCallback();
   virtual void MaximizeRangeCallback();
+  virtual void EnlargeRangeCallback();
+  virtual void ShrinkRangeCallback();
   virtual void EntriesUpdateCallback(int i);
   virtual void StartInteractionCallback(int x, int y);
   virtual void EndInteractionCallback();
@@ -280,11 +297,13 @@ protected:
   float RangeColor[3];
   float RangeInteractionColor[3];
   int   ShowEntries;
-  int   EntriesPosition;
   int   LabelPosition;
+  int   EntriesPosition;
+  int   ZoomButtonsPosition;
   int   EntriesResolution;
   int   EntriesWidth;
   int   SliderCanPush;
+  int   ShowZoomButtons;
 
   int   InInteraction;
   int   StartInteractionPos;
@@ -295,11 +314,13 @@ protected:
   char  *EndCommand;
   char  *EntriesCommand;
 
-  vtkKWFrame  *CanvasFrame;
-  vtkKWWidget *Canvas;
-  vtkKWEntry  *Entries[2];
+  vtkKWFrame         *CanvasFrame;
+  vtkKWWidget        *Canvas;
+  vtkKWEntry         *Entries[2];
+  vtkKWPushButtonSet *ZoomButtons;
 
   virtual void CreateEntries();
+  virtual void CreateZoomButtons();
   virtual void UpdateEntriesResolution();
   virtual void ConstraintResolution();
 

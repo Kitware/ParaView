@@ -41,16 +41,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWRange.h"
 
-#include "vtkKWEntry.h"
 #include "vtkKWApplication.h"
-#include "vtkKWImageLabel.h"
+#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
-#include "vtkMath.h"
+#include "vtkKWIcon.h"
+#include "vtkKWImageLabel.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWPushButtonSet.h"
 #include "vtkKWTkUtilities.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.14");
+vtkCxxRevisionMacro(vtkKWRange, "1.15");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -80,24 +83,26 @@ vtkKWRange::vtkKWRange()
 {
   int i;
 
-  this->WholeRange[0]      = 0;
-  this->WholeRange[1]      = 1;  
-  this->Range[0]           = this->WholeRange[0];
-  this->Range[1]           = this->WholeRange[1];  
-  this->Resolution         = (this->WholeRange[1]-this->WholeRange[0]) / 100.0;
-  this->AdjustResolution   = 0;
-  this->Thickness          = 19;
-  this->InternalThickness  = 0.5;
-  this->Orientation        = vtkKWRange::ORIENTATION_HORIZONTAL;
-  this->Inverted           = 0;
-  this->SliderSize         = 3;
-  this->ShowEntries        = 0;
-  this->LabelPosition      = vtkKWRange::POSITION_SIDE1;
-  this->EntriesPosition    = vtkKWRange::POSITION_SIDE1;
-  this->EntriesResolution  = 2;
-  this->EntriesWidth       = 10;
-  this->SliderCanPush      = 0;
-  this->DisableCommands    = 0;
+  this->WholeRange[0]       = 0;
+  this->WholeRange[1]       = 1;  
+  this->Range[0]            = this->WholeRange[0];
+  this->Range[1]            = this->WholeRange[1];  
+  this->Resolution          = (this->WholeRange[1]-this->WholeRange[0])/100.0;
+  this->AdjustResolution    = 0;
+  this->Thickness           = 19;
+  this->InternalThickness   = 0.5;
+  this->Orientation         = vtkKWRange::ORIENTATION_HORIZONTAL;
+  this->Inverted            = 0;
+  this->SliderSize          = 3;
+  this->ShowEntries         = 0;
+  this->LabelPosition       = vtkKWRange::POSITION_SIDE1;
+  this->EntriesPosition     = vtkKWRange::POSITION_SIDE1;
+  this->ZoomButtonsPosition = vtkKWRange::POSITION_SIDE1;
+  this->EntriesResolution   = 2;
+  this->EntriesWidth        = 10;
+  this->SliderCanPush       = 0;
+  this->DisableCommands     = 0;
+  this->ShowZoomButtons     = 0;
 
   this->InInteraction            = 0;
   this->StartInteractionPos      = 0;
@@ -112,18 +117,20 @@ vtkKWRange::vtkKWRange()
   this->RangeInteractionColor[1] = 0.63;
   this->RangeInteractionColor[2] = 0.82;
 
-  this->Command            = NULL;
-  this->StartCommand       = NULL;
-  this->EndCommand         = NULL;
-  this->EntriesCommand     = NULL;
+  this->Command             = NULL;
+  this->StartCommand        = NULL;
+  this->EndCommand          = NULL;
+  this->EntriesCommand      = NULL;
 
-  this->CanvasFrame        = vtkKWFrame::New();
-  this->Canvas             = vtkKWWidget::New();
+  this->CanvasFrame         = vtkKWFrame::New();
+  this->Canvas              = vtkKWWidget::New();
 
   for (i = 0; i < VTK_KW_RANGE_NB_ENTRIES; i++)
     {
-    this->Entries[i]       = NULL;
+    this->Entries[i]        = NULL;
     }
+
+  this->ZoomButtons         = NULL;
 
   this->ConstraintRanges();
 
@@ -177,6 +184,12 @@ vtkKWRange::~vtkKWRange()
       this->Entries[i] = NULL;
       }
     }
+
+  if (this->ZoomButtons)
+    {
+    this->ZoomButtons->Delete();
+    this->ZoomButtons = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -208,6 +221,18 @@ void vtkKWRange::Create(vtkKWApplication *app, const char *args)
   this->Script("bind %s <Configure> {%s ConfigureCallback}",
                this->CanvasFrame->GetWidgetName(), this->GetTclName());
 
+  // Create more stuff
+
+  if (this->ShowEntries)
+    {
+    this->CreateEntries();
+    }
+
+  if (this->ShowZoomButtons)
+    {
+    this->CreateZoomButtons();
+    }
+
   // Pack the widget
 
   this->Pack();
@@ -231,7 +256,7 @@ void vtkKWRange::CreateEntries()
       this->Entries[i] = vtkKWEntry::New();
       }
 
-    if (!this->Entries[i]->IsCreated())
+    if (!this->Entries[i]->IsCreated() && this->IsCreated())
       {
       this->Entries[i]->SetParent(this);
       this->Entries[i]->Create(this->Application, "");
@@ -245,6 +270,54 @@ void vtkKWRange::CreateEntries()
     }
 
   this->UpdateEntriesResolution();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRange::CreateZoomButtons()
+{
+  if (!this->ZoomButtons)
+    {
+    this->ZoomButtons = vtkKWPushButtonSet::New();
+    }
+
+  if (!this->ZoomButtons->IsCreated() && this->IsCreated())
+    {
+    this->ZoomButtons->SetParent(this);
+    this->ZoomButtons->Create(this->Application, "");
+
+    vtkKWPushButton *button;
+
+    this->ZoomButtons->AddButton(
+      0, "+", this, "EnlargeRangeCallback",
+      "Enlarge the range");
+
+    button = this->ZoomButtons->GetButton(0);
+    if (button)
+      {
+      vtkKWIcon *icon = vtkKWIcon::New();
+      icon->SetImageData(vtkKWIcon::ICON_PLUS);
+      vtkKWTkUtilities::SetImageOption(this->Application->GetMainInterp(), 
+                                       button->GetWidgetName(), icon, ".plus");
+      icon->Delete();
+      }
+
+    this->ZoomButtons->AddButton(
+      1, "-", this, "ShrinkRangeCallback",
+      "Shrink the range");
+
+    button = this->ZoomButtons->GetButton(1);
+    if (button)
+      {
+      vtkKWIcon *icon = vtkKWIcon::New();
+      icon->SetImageData(vtkKWIcon::ICON_MINUS);
+      vtkKWTkUtilities::SetImageOption(this->Application->GetMainInterp(), 
+                                       button->GetWidgetName(), icon,".minus");
+      icon->Delete();
+      }
+
+    this->ZoomButtons->SetBorderWidth(0);
+    this->ZoomButtons->SetPadding(0, 0);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -276,11 +349,11 @@ void vtkKWRange::Pack()
      SIDE2:     [--------------]               [--------------]
                        L                       E1            E2
 
-             0 1  2      3       4  5
-         +----------------------------
-        0|        E0     L       E1
-        1|   L E0 [--------------]  E1
-        2|        E0     L       E1
+             0 1  2      3      4  5 6  7
+         +-------------------------------
+        0|        E0     L      Z E1 
+        1|   L E0 [----------------] E1 Z
+        2|        E0     L      Z E1
   */
 
   // We need a 6x3 grid
@@ -318,7 +391,7 @@ void vtkKWRange::Pack()
     row = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 
       (this->EntriesPosition == vtkKWRange::POSITION_SIDE1 ? 0 : 2);
     int col0 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 2;
-    int col1 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 5 : 4;
+    int col1 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 6 : 5;
     tk_cmd << "grid " << this->Entries[this->Inverted ? 1 : 0]->GetWidgetName()
            << o_row << row << o_col << col0
            << " -sticky " << (is_horiz ? "w" : "n") << endl;
@@ -330,7 +403,7 @@ void vtkKWRange::Pack()
   // Canvas
 
   tk_cmd << "grid " << this->CanvasFrame->GetWidgetName() 
-         << o_row << 1 << o_col << 2 << stickydir << o_span << 3;
+         << o_row << 1 << o_col << 2 << stickydir << o_span << 4;
   if (this->ShowEntries)
     {
     if (this->EntriesPosition == vtkKWRange::POSITION_ALIGNED)
@@ -344,9 +417,22 @@ void vtkKWRange::Pack()
     }
   tk_cmd << endl;
 
+  // Zoom buttons
+
+  if (this->ShowZoomButtons)
+    {
+    this->ZoomButtons->SetPackHorizontally(is_horiz ? 1 : 0);
+    row = this->ZoomButtonsPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 
+      (this->ZoomButtonsPosition == vtkKWRange::POSITION_SIDE1 ? 0 : 2);
+    col = this->ZoomButtonsPosition == vtkKWRange::POSITION_ALIGNED ? 7 : 4;
+    tk_cmd << "grid " << this->ZoomButtons->GetWidgetName() 
+           << o_row << row << o_col << col
+           << " -sticky " << (is_horiz ? "e" : "s") << endl;
+    }
+
   // Make sure it will resize properly
 
-  for (int i = 2; i <= 4; i++)
+  for (int i = 2; i <= 5; i++)
     {
     tk_cmd << "grid " << colconfig
            << this->CanvasFrame->GetParent()->GetWidgetName() << " " << i
@@ -771,6 +857,24 @@ void vtkKWRange::SetShowEntries(int _arg)
 }
 
 // ----------------------------------------------------------------------------
+void vtkKWRange::SetShowZoomButtons(int _arg)
+{
+  if (this->ShowZoomButtons == _arg)
+    {
+    return;
+    }
+  this->ShowZoomButtons = _arg;
+  this->Modified();
+
+  if (this->ShowZoomButtons)
+    {
+    this->CreateZoomButtons();
+    }
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
 void vtkKWRange::SetLabelPosition(int _arg)
 {
   if (this->LabelPosition == _arg)
@@ -791,6 +895,19 @@ void vtkKWRange::SetEntriesPosition(int _arg)
     return;
     }
   this->EntriesPosition = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWRange::SetZoomButtonsPosition(int _arg)
+{
+  if (this->ZoomButtonsPosition == _arg)
+    {
+    return;
+    }
+  this->ZoomButtonsPosition = _arg;
   this->Modified();
 
   this->Pack();
@@ -1189,6 +1306,11 @@ void vtkKWRange::UpdateEnableState()
       {
       this->Entries[i]->SetEnabled(this->Enabled);
       }
+    }
+
+  if (this->ZoomButtons)
+    {
+    this->ZoomButtons->SetEnabled(this->Enabled);
     }
 
   if (this->Enabled)
@@ -1908,6 +2030,24 @@ void vtkKWRange::MaximizeRangeCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWRange::EnlargeRangeCallback()
+{
+  float *range = this->GetRange();
+  float delta2 = ((range[1] - range[0]) / 2.0) * 2.0;
+  float center = (range[1] + range[0]) / 2.0;
+  this->SetRange(center - delta2, center + delta2);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRange::ShrinkRangeCallback()
+{
+  float *range = this->GetRange();
+  float delta2 = ((range[1] - range[0]) / 2.0) / 2.0;
+  float center = (range[1] + range[0]) / 2.0;
+  this->SetRange(center - delta2, center + delta2);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWRange::StartInteractionCallback(int x, int y)
 {
   if (this->InInteraction)
@@ -2089,8 +2229,11 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
      << this->RangeInteractionColor[2] << ")" << endl;
   os << indent << "ShowEntries: " 
      << (this->ShowEntries ? "On" : "Off") << endl;
+  os << indent << "ShowZoomButtons: " 
+     << (this->ShowZoomButtons ? "On" : "Off") << endl;
   os << indent << "LabelPosition: " << this->LabelPosition << endl;
   os << indent << "EntriesPosition: " << this->EntriesPosition << endl;
+  os << indent << "ZoomButtonsPosition: " << this->ZoomButtonsPosition << endl;
   os << indent << "EntriesWidth: " << this->EntriesWidth << endl;
   os << indent << "SliderCanPush: "
      << (this->SliderCanPush ? "On" : "Off") << endl;
