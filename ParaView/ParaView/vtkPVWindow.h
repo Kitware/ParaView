@@ -390,6 +390,7 @@ public:
   void CenterEntryCloseCallback();
   void CenterEntryCallback();
   void ResetCenterCallback();
+  void HideCenterCallback();
 
   // Description
   // Access to these widgets from outside vtkPVWindow
@@ -485,6 +486,7 @@ protected:
   vtkKWToolbar *PickCenterToolbar;
   vtkKWPushButton *PickCenterButton;
   vtkKWPushButton *ResetCenterButton;
+  vtkKWPushButton *HideCenterButton;
   vtkKWPushButton *CenterEntryOpenButton;
   vtkKWPushButton *CenterEntryCloseButton;
   vtkKWWidget *CenterEntryFrame;

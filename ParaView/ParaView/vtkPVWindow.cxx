@@ -156,6 +156,7 @@ vtkPVWindow::vtkPVWindow()
   this->PickCenterToolbar = vtkKWToolbar::New();
   this->PickCenterButton = vtkKWPushButton::New();
   this->ResetCenterButton = vtkKWPushButton::New();
+  this->HideCenterButton = vtkKWPushButton::New();
   this->CenterEntryOpenButton = vtkKWPushButton::New();
   this->CenterEntryCloseButton = vtkKWPushButton::New();
   this->CenterEntryFrame = vtkKWWidget::New();
@@ -426,6 +427,12 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->ResetCenterButton->Delete();
     this->ResetCenterButton = NULL;
+    }
+
+  if (this->HideCenterButton)
+    {
+    this->HideCenterButton->Delete();
+    this->HideCenterButton = NULL;
     }
   
   if (this->CenterEntryOpenButton)
@@ -814,15 +821,22 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->ResetCenterButton->SetLabel("Reset");
   this->ResetCenterButton->SetCommand(this, "ResetCenterCallback");
   this->ResetCenterButton->SetBalloonHelpString("Reset the center of rotation to the center of the current data set.");
+
+  this->HideCenterButton->SetParent(this->PickCenterToolbar);
+  this->HideCenterButton->Create(app, "-bd 1");
+  this->HideCenterButton->SetLabel("Hide");
+  this->HideCenterButton->SetCommand(this, "HideCenterCallback");
+  this->HideCenterButton->SetBalloonHelpString("Hide the center of rotation to the center of the current data set.");
   
   this->CenterEntryOpenButton->SetParent(this->PickCenterToolbar);
   this->CenterEntryOpenButton->Create(app, "-bd 1");
   this->CenterEntryOpenButton->SetLabel(">");
   this->CenterEntryOpenButton->SetCommand(this, "CenterEntryOpenCallback");
   
-  this->Script("pack %s %s %s -side left -expand no -fill none -pady 2",
+  this->Script("pack %s %s %s %s -side left -expand no -fill none -pady 2",
                this->PickCenterButton->GetWidgetName(),
                this->ResetCenterButton->GetWidgetName(),
+               this->HideCenterButton->GetWidgetName(),
                this->CenterEntryOpenButton->GetWidgetName());
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar);
@@ -1114,6 +1128,24 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   this->CenterZEntry->SetValue(z, 4);
   this->CameraStyle3D->SetCenterOfRotation(x, y, z);
   this->CenterActor->SetPosition(x, y, z);
+  this->MainView->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::HideCenterCallback()
+{
+  if (this->CenterActor->GetVisibility())
+    {
+    this->Script("%s configure -text Show", 
+                 this->HideCenterButton->GetWidgetName() );
+    this->CenterActor->VisibilityOff();
+    }
+  else
+    {
+    this->Script("%s configure -text Hide", 
+                 this->HideCenterButton->GetWidgetName() );
+    this->CenterActor->VisibilityOn();
+    }
   this->MainView->EventuallyRender();
 }
 
@@ -2159,8 +2191,17 @@ void vtkPVWindow::UpdateFilterMenu()
           char methodAndArgs[150];
           it->GetKey(key);
           sprintf(methodAndArgs, "CreatePVSource %s", key);
-          // Remove "vtk" from the class name to get the menu item name.
-          this->FilterMenu->AddCommand(key, this, methodAndArgs);
+
+          if (numSources % 30 == 0 )
+            {
+            this->FilterMenu->AddGeneric("command", key, this, methodAndArgs,
+                                         "-columnbreak 1", 0);
+            }
+          else
+            {
+            this->FilterMenu->AddGeneric("command", key, this, methodAndArgs,
+                                         0, 0);
+            }
           this->EnableToolbarButton(key);
           }
         }
@@ -3246,7 +3287,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.336 $");
+  this->ExtractRevision(os,"$Revision: 1.337 $");
 }
 
 //----------------------------------------------------------------------------
