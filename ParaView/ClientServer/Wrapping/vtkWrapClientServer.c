@@ -140,11 +140,23 @@ void return_result(FILE *fp)
     case 313: case 314: case 315: case 316:
       use_hints(fp);
       break;
+    case 9:
+      {
+      /* Handle some objects of known type.  */
+      if(strcmp(currentFunction->ReturnClass, "vtkClientServerStream") == 0)
+        {
+        fprintf(fp,
+                "      resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
+                MAX_ARGS);
+        break;
+        }
+      }
     default:
       fprintf(fp,
               "      resultStream << vtkClientServerStream::Reply\n"
-              "                   << \"unable to return result.\"\n"
-              "                   << vtkClientServerStream::End;\n");
+              "                   << \"unable to return result of type(%d %%1000 = %d).\"\n"
+              "                   << vtkClientServerStream::End;\n",
+              currentFunction->ReturnType, currentFunction->ReturnType%1000);
       break;
     }
 }
