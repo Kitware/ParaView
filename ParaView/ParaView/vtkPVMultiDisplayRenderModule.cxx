@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.14");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.15");
 
 
 
@@ -86,10 +86,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << pm->GetApplicationID() << "GetProcessModule"
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult << "GetSocketController"
+      << pm->GetProcessModuleID() << "GetSocketController"
       << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke

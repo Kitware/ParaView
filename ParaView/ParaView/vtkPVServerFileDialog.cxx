@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.29");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.30");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -774,28 +774,19 @@ void vtkPVServerFileDialog::UpdateExtensionsMenu()
   this->FileTypeStrings->RemoveAllItems();
   this->ExtensionsMenuButton->GetMenu()->DeleteAllMenuItems();
   
-  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
-                             this->FileTypeStrings, vtkStringListCommand);
-  char* stringsTcl = vtkString::Duplicate(
-    Tcl_GetStringResult(this->Application->GetMainInterp()));
-  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
-                             this->FileTypeDescriptions, vtkStringListCommand);
-  char* descriptionsTcl = vtkString::Duplicate(
-    Tcl_GetStringResult(this->Application->GetMainInterp()));
+  this->FileTypeDescriptions->RemoveAllItems();
+  this->FileTypeStrings->RemoveAllItems();
+
   this->Script(
-    "namespace eval ::paraview::vtkPVServerFileDialog {\n"
-    "  proc ParseFileTypes {types extensions descriptions} {\n"
-    "    $extensions RemoveAllItems\n"
-    "    $descriptions RemoveAllItems\n"
+    "namespace eval ::paraview::vtkPVSeverFileDialog {\n"
+    "  proc ParseFileTypes {types dialog} {\n"
     "    foreach t $types {\n"
-    "      $descriptions AddString [lindex $t 0]\n"
-    "      $extensions AddString [lindex $t 1]\n"
+    "      $dialog AddDescriptionString [lindex $t 0]\n"
+    "      $dialog AddExtensionString [lindex $t 1]\n"
     "    }\n"
     "  }\n"
-    "  ParseFileTypes {%s} %s %s\n"
-    "}\n", this->FileTypes, stringsTcl, descriptionsTcl);
-  delete [] stringsTcl;
-  delete [] descriptionsTcl;
+    "  ParseFileTypes {%s} %s\n"
+    "}\n", this->FileTypes, this->GetTclName());
   
   const unsigned int maxExtensionsLength = 16;
   for(int i=0; i < this->FileTypeStrings->GetNumberOfStrings(); ++i)
@@ -1149,6 +1140,17 @@ void vtkPVServerFileDialog::CalculateBBox(vtkKWWidget* canvas,
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVServerFileDialog::AddDescriptionString(const char* str)
+{
+  this->FileTypeDescriptions->AddString(str);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVServerFileDialog::AddExtensionString(const char* str)
+{
+  this->FileTypeStrings->AddString(str);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::PrintSelf(ostream& os, vtkIndent indent)

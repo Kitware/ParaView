@@ -77,10 +77,12 @@ public:
   vtkGetMacro(LODMapperID,vtkClientServerID);
   vtkGetMacro(LODDeciID,vtkClientServerID);
   
+  //BTX
   // Description:
   // Returns an up to data information object.
   // Do not keep a reference to this object.
   vtkPVLODPartDisplayInformation* GetInformation();
+  //ETX
 
   // Description:
   // Toggle the visibility of the point labels.  This feature only works

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.54");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.55");
 
 
 //----------------------------------------------------------------------------
@@ -483,6 +483,22 @@ void vtkPVInputMenu::UpdateEnableState()
 
   this->PropagateEnableState(this->Label);
   this->PropagateEnableState(this->Menu);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVInputMenu::GetNumberOfSources()
+{
+  return this->Sources->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+vtkPVSource* vtkPVInputMenu::GetSource(int i)
+{
+  if ( i < 0 || i >= this->GetNumberOfSources() )
+    {
+    return 0;
+    }
+  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(i));
 }
 
 //----------------------------------------------------------------------------

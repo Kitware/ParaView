@@ -43,10 +43,12 @@ public:
   // Enable the 3D widget.
   virtual void SetEnabled(int);
 
+  //BTX
   // Description:
   // Set the renderer this 3D widget will be contained in.
   void SetParentRenderer(vtkRenderer *ren);
   vtkRenderer* GetParentRenderer();
+  //ETX
   
   // Description:
   // Callback to keep the camera for the axes actor up to date with the

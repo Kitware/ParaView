@@ -86,11 +86,13 @@ public:
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
-        
+  
+  //BTX
   // Description:
   // Moving away from direct access to VTK data objects.
   vtkPVDataInformation* GetDataInformation();
   vtkGetObjectMacro(ClassNameInformation, vtkPVClassNameInformation);
+  //ETX
   
   // Description:
   // This method collects data information from all processes.

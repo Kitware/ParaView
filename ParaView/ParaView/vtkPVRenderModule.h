@@ -87,11 +87,13 @@ public:
   // Are we currently in interactive mode?
   //int IsInteractive() { return this->Interactive; }
   
+  //BTX
   // Description:
   // It would be nice to keep renderers private.
   vtkRenderWindow *GetRenderWindow();
   vtkRenderer *GetRenderer();
   vtkRenderer *GetRenderer2D();
+  //ETX
   vtkClientServerID GetRenderWindowID() { return this->RenderWindowID;}
   vtkClientServerID GetRendererID() { return this->RendererID;}
   vtkClientServerID GetRenderer2DID() { return this->Renderer2DID;}

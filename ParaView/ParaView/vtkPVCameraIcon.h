@@ -46,9 +46,11 @@ public:
   // view.
   virtual void RestoreCamera();
 
+  //BTX
   // Description:
   // Get the stored camera as vtkCamera.
   vtkGetObjectMacro(Camera, vtkCamera);
+  //ETX
 
 protected:
   vtkPVCameraIcon();

@@ -75,6 +75,7 @@ public:
   virtual void GatherInformationRenderServer(vtkPVInformation* info,
                                              vtkClientServerID id);
   //ETX
+
   virtual void GatherInformationInternal(const char* infoClassName,
                                          vtkObject* object);
   

@@ -90,6 +90,7 @@ public:
   // For flip books.
   virtual void CacheUpdate(int idx, int total);  
 
+  //BTX
   // Description:
   // Return a pointer to the mapper (on the client side)
   vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
@@ -101,6 +102,7 @@ public:
   // Description:
   // Return a pointer to the actor (on the client side)
   vtkProp *GetProp() { return this->Prop;}
+  //ETX
 
   // Description:
   // Return the id of the actor (on the server side)
@@ -118,9 +120,11 @@ public:
   // Return the id of the volume (on the server side)
   vtkGetMacro(VolumeID, vtkClientServerID);
 
+  //BTX
   // Description:
   // Return the vtkVolume
   vtkVolume *GetVolume() { return this->Volume; };
+  //ETX
   
   // Description:
   // Not referenced counted.  I might get rid of this reference later.

@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.64");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.65");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -759,10 +759,7 @@ void vtkPVClientServerModule::GatherInformation(vtkPVInformation* info,
   // Gather on the server.
   this->GetStream()
     << vtkClientServerStream::Invoke
-    << this->GetApplicationID() << "GetProcessModule"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << vtkClientServerStream::LastResult
+    << this->GetProcessModuleID()
     << "GatherInformationInternal" << info->GetClassName() << id
     << vtkClientServerStream::End;
   this->SendStreamToServer();
@@ -782,10 +779,7 @@ void vtkPVClientServerModule::GatherInformationRenderServer(vtkPVInformation* in
   // Gather on the server.
   this->GetStream()
     << vtkClientServerStream::Invoke
-    << this->GetApplicationID() << "GetProcessModule"
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Invoke
-    << vtkClientServerStream::LastResult
+    << this->GetProcessModuleID()
     << "GatherInformationInternal" << info->GetClassName() << id
     << vtkClientServerStream::End;
   this->SendStreamToRenderServer();

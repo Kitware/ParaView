@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.259");
+vtkCxxRevisionMacro(vtkPVApplication, "1.260");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -154,8 +154,6 @@ private:
 
 //----------------------------------------------------------------------------
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
-extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkpvfilterstcl_Init(Tcl_Interp *interp);
 #if defined(PARAVIEW_BUILD_DEVELOPMENT) && defined(PARAVIEW_BLT_LIBRARY)
 extern "C" int Blt_Init(Tcl_Interp *interp);
 #endif
@@ -164,8 +162,13 @@ extern "C" int Blt_Init(Tcl_Interp *interp);
 extern "C" int Vtkpvdevelopmenttcl_Init(Tcl_Interp *interp);
 #endif
 
+extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
+
+#ifndef PARAVIEW_NEW_SOURCE_ORGANIZATION
+extern "C" int Vtkpvfilterstcl_Init(Tcl_Interp *interp);
 #ifdef PARAVIEW_LINK_XDMF
 extern "C" int Vtkxdmftcl_Init(Tcl_Interp *interp);
+#endif
 #endif
 
 vtkPVApplication* vtkPVApplication::MainApplication = 0;
@@ -359,7 +362,10 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
     return interp;
     }
 
+#ifndef PARAVIEW_NEW_SOURCE_ORGANIZATION
   Vtkpvfilterstcl_Init(interp);
+#endif
+
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
   Vtkpvdevelopmenttcl_Init(interp);
 #endif
@@ -373,9 +379,10 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
     }
    
   Vtkkwparaviewtcl_Init(interp);
-
+#ifndef PARAVIEW_NEW_SOURCE_ORGANIZATION
 #ifdef PARAVIEW_LINK_XDMF
   Vtkxdmftcl_Init(interp);
+#endif
 #endif
   char* script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
@@ -2236,6 +2243,18 @@ void vtkPVApplication::PrepareProgress()
 void vtkPVApplication::CleanupPendingProgress()
 {
   this->ProgressHandler->CleanupPendingProgress(this);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVApplication::GetNumberOfPartitions()
+{
+  return this->GetProcessModule()->GetNumberOfPartitions();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendStringToClientAndServer(const char* str)
+{
+  this->GetProcessModule()->SendStringToClientAndServer(str);
 }
 
 //----------------------------------------------------------------------------

@@ -48,8 +48,10 @@ public:
   // I will eventually remove access to internal widgets once I figure
   // out how to get the vectors value in Tcl with any number of componenets.
   vtkGetObjectMacro(LabelWidget, vtkKWLabel);
+  //BTX
   vtkGetObjectMacro(SubLabels, vtkKWWidgetCollection);
   vtkGetObjectMacro(Entries, vtkKWWidgetCollection);
+  //ETX
   vtkKWLabel* GetSubLabel(int idx);
   vtkKWEntry* GetEntry(int idx);
 

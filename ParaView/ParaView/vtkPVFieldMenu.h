@@ -60,10 +60,12 @@ public:
   void SetValue(int field);
   vtkGetMacro(Value,int);
 
+  //BTX
   // Description:
   // A convenience method that returns information 
   // of the data attribute selected.
   vtkPVDataSetAttributesInformation* GetFieldInformation();
+  //ETX
 
   // Description:
   // This is called to update the menus if something (InputMenu) changes.

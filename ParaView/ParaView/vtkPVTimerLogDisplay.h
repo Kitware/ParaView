@@ -84,7 +84,11 @@ public:
   // Call back from the EnableCheck that will stop or start loging of events.
   void EnableCheckCallback();
 
+  //BTX
+  // Description:
+  // Get the timer information.
   vtkPVTimerInformation* GetTimerInformation();
+  //ETX
 
   // Description:
   // A convience method to cast KWApplication to PVApplication.

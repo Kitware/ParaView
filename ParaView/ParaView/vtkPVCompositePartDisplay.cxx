@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.18");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.19");
 
 
 //----------------------------------------------------------------------------
@@ -221,7 +221,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
   // Handle collection setup with client server.
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << pm->GetApplicationID() << "GetSocketController"
+    << pm->GetProcessModuleID() << "GetSocketController"
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
     << this->CollectID << "SetSocketController"
@@ -229,7 +229,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke
-    << pm->GetApplicationID() << "GetSocketController"
+    << pm->GetProcessModuleID() << "GetSocketController"
     << vtkClientServerStream::End
     << vtkClientServerStream::Invoke
     << this->LODCollectID << "SetSocketController"
