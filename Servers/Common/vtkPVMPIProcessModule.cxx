@@ -20,7 +20,6 @@
 #include "vtkToolkits.h"
 #include "vtkPVConfig.h"
 #include "vtkMultiProcessController.h"
-#include "vtkPVApplication.h"
 #include "vtkDataSet.h"
 #include "vtkSource.h"
 #include "vtkFloatArray.h"
@@ -39,8 +38,7 @@
 #include "vtkMPIGroup.h"
 #endif
 
-#include "vtkPVPart.h"
-#include "vtkPVPartDisplay.h"
+#include "vtkProcessModuleGUIHelper.h"
 #include "vtkPVInformation.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientServerInterpreter.h"
@@ -49,11 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.30");
-
-int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
-                            int argc, char *argv[]);
-
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.1");
 
 
 // external global variable.
@@ -131,24 +125,8 @@ void vtkPVMPIProcessModule::Initialize()
 
   if (myId ==  0)
     { // The last process is for UI.
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    // This is for the SGI pipes option.
-    pvApp->SetNumberOfPipes(numProcs);
-
-#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-    pvApp->SetupTrapsForSignals(myId);
-#endif // PV_HAVE_TRAPS_FOR_SIGNALS
-
-    if (pvApp->GetStartGUI())
-      {
-      pvApp->Script("wm withdraw .");
-      pvApp->Start(this->ArgumentCount,this->Arguments);
-      }
-    else
-      {
-      pvApp->Exit();
-      }
-    this->ReturnValue = pvApp->GetExitStatus();
+    this->ReturnValue = this->GUIHelper->
+      RunGUIStart(this->ArgumentCount,this->Arguments, numProcs, myId);
     }
   else
     {
@@ -157,7 +135,6 @@ void vtkPVMPIProcessModule::Initialize()
     this->Controller->ProcessRMIs();
     }
 }
-
 //----------------------------------------------------------------------------
 int vtkPVMPIProcessModule::Start(int argc, char **argv)
 {

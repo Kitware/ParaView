@@ -61,9 +61,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkSMInstantiator.h"
 #include "vtkParaViewInstantiator.h"
 #include "vtkClientServerInterpreter.h"
-
-static void ParaViewEnableMSVCDebugHook();
-static void ParaViewEnableWindowsExceptionFilter();
 static void ParaViewInitializeInterpreter(vtkPVProcessModule* pm);
 
 //----------------------------------------------------------------------------
@@ -74,8 +71,6 @@ int MyMain(int argc, char *argv[])
   int myId = 0;
   vtkPVProcessModule *pm;
   vtkPVApplication *app;
-  ParaViewEnableMSVCDebugHook();
-  ParaViewEnableWindowsExceptionFilter();
 
 #ifdef PARAVIEW_ENABLE_FPE    
 #if defined(_MSC_VER)
@@ -179,7 +174,7 @@ int MyMain(int argc, char *argv[])
       { // The render module has not been set by the user.  Choose a default.
       if (app->GetUseTiledDisplay())
         {
-#ifdef PARAVIEW_USE_ICE_T
+#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
         app->SetRenderModuleName("IceTRenderModule");
 #else
         app->SetRenderModuleName("MultiDisplayRenderModule");
@@ -187,7 +182,7 @@ int MyMain(int argc, char *argv[])
         }
       else if (app->GetClientMode())
         { // Client server, no tiled display.
-#ifdef PARAVIEW_USE_ICE_T
+#if defined(PARAVIEW_USE_ICE_T) && defined(VTK_USE_MPI)
         app->SetRenderModuleName("DeskTopRenderModule");
 #else
         app->SetRenderModuleName("MPIRenderModule");
@@ -221,7 +216,6 @@ int MyMain(int argc, char *argv[])
     pm = processModule;
     }
   
-  pm->SetApplication(app);
   app->SetProcessModule(pm);
   pm->InitializeInterpreter();
   bool needLog = false;
@@ -398,49 +392,6 @@ int main(int argc, char *argv[])
 }
 #endif
 
-// For a DEBUG build on MSVC, add a hook to prevent error dialogs when
-// being run from DART.
-#if defined(_MSC_VER) && defined(_DEBUG)
-# include <crtdbg.h>
-static int ParaViewDebugReport(int, char* message, int*)
-{
-  fprintf(stderr, message);
-  exit(1);
-  return 0;
-}
-void ParaViewEnableMSVCDebugHook()
-{
-  if(getenv("DART_TEST_FROM_DART"))
-    {
-    _CrtSetReportHook(ParaViewDebugReport);
-    }
-}
-#else
-void ParaViewEnableMSVCDebugHook()
-{
-}
-#endif
-
-#if defined(_WIN32) && !defined(__CYGWIN__)
-# include <windows.h>
-static LONG __stdcall
-ParaViewUnhandledExceptionFilter(EXCEPTION_POINTERS* e)
-{
-  ExitProcess(e->ExceptionRecord->ExceptionCode);
-  return 0;
-}
-static void ParaViewEnableWindowsExceptionFilter()
-{
-  if(getenv("DART_TEST_FROM_DART"))
-    {
-    SetUnhandledExceptionFilter(&ParaViewUnhandledExceptionFilter);    
-    }
-}
-#else
-static void ParaViewEnableWindowsExceptionFilter()
-{
-}
-#endif
 
 //----------------------------------------------------------------------------
 // ClientServer wrapper initialization functions.
@@ -455,6 +406,7 @@ extern "C" void vtkParallelCS_Initialize(vtkClientServerInterpreter*);
 #ifdef VTK_USE_PATENTED
 extern "C" void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
 #endif
+extern "C" void vtkPVCommonCS_Initialize(vtkClientServerInterpreter*);
 extern "C" void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 
 #ifdef PARAVIEW_NEW_SOURCE_ORGANIZATION
@@ -485,6 +437,7 @@ void ParaViewInitializeInterpreter(vtkPVProcessModule* pm)
 #ifdef VTK_USE_PATENTED
   vtkPatentedCS_Initialize(pm->GetInterpreter());
 #endif
+  vtkPVCommonCS_Initialize(pm->GetInterpreter());
   vtkPVFiltersCS_Initialize(pm->GetInterpreter());
 
 #ifdef PARAVIEW_NEW_SOURCE_ORGANIZATION

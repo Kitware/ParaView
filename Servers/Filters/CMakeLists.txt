@@ -43,39 +43,26 @@ SET(Filters_SRCS
   vtkTiledDisplaySchedule.cxx
   vtkVRMLSource.cxx
   vtkXMLPVDWriter.cxx
+  vtkDataSetSubdivisionAlgorithm.cxx
+  vtkStreamingTessellator.cxx
+  vtkStreamingTessellator.cxx
+  vtkSubdivisionAlgorithm.cxx
+  vtkMPIMoveData.cxx
 
   vtkCompleteArrays.cxx
-  vtkPVInformation.cxx
   vtkClientCompositeManager.cxx
   vtkPVDReader.cxx
   vtkPVCompositeUtilities.cxx
-  vtkPVNumberOfOutputsInformation.cxx
-  vtkPVLODPartDisplayInformation.cxx
-  vtkPVDataSetAttributesInformation.cxx
-  vtkPVDataInformation.cxx
   vtkPVCompositeBuffer.cxx
-  vtkPVClassNameInformation.cxx
-  vtkPVArrayInformation.cxx
   vtkPVTreeComposite.cxx
-  vtkProcessModule.cxx
   vtkXMLPVAnimationWriter.cxx
   vtkXMLCollectionReader.cxx
   vtkSelectInputs.cxx
   vtkExtractCTHPart.cxx
-  vtkStringList.cxx # Should go out
 	vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
-
-  vtkPVProgressHandler.cxx
   )
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkStringList.cxx
-  vtkPVProgressHandler.cxx
-  WRAP_EXCLUDE)
-
-SET_SOURCE_FILES_PROPERTIES(
-  vtkProcessModule.cxx
-  ABSTRACT)
+SET_SOURCE_FILES_PROPERTIES( vtkSubdivisionAlgorithm.cxx ABSTRACT)
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
@@ -119,10 +106,6 @@ IF (PARAVIEW_USE_ICE_T)
     )
 ENDIF (PARAVIEW_USE_ICE_T)
 
-SET_SOURCE_FILES_PROPERTIES(
-  vtkPVInformation
-  ABSTRACT
-  )
 
 IF (VTK_USE_PATENTED)
   SET(Filters_SRCS ${Filters_SRCS} vtkPVKitwareContourFilter.cxx)
@@ -161,7 +144,7 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
 
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkHybridCS vtkParallelCS vtkKWCommon)
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkPVCommonCS vtkHybridCS vtkParallelCS vtkKWCommon)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)

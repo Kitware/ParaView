@@ -177,26 +177,6 @@ public:
   void SetGlobalLODFlagInternal(int val);
 
   // Description:
-  // For loggin from Tcl start and end execute events.  We do not have c
-  // pointers to all filters.
-  void LogStartEvent(char* str);
-  void LogEndEvent(char* str);
-  void RegisterProgressEvent(vtkProcessObject* po, int id);
-
-  // Description:
-  // More timer log access methods.  Static methods are not accessible 
-  // from tcl.  We need a timer object on all procs.
-  void SetLogBufferLength(int length);
-  void ResetLog();
-  void SetEnableLog(int flag);
-
-  // Description:
-  // Time threshold for event (start-end) when getting the log with indents.
-  // We do not have a timer object on all procs.  Statics do not work with Tcl.
-  vtkSetMacro(LogThreshold, float);
-  vtkGetMacro(LogThreshold, float);
-
-  // Description:
   // Flag showing whether the commands are being executed from
   // a ParaView script.
   vtkSetMacro(RunningParaViewScript, int);
@@ -477,10 +457,6 @@ protected:
   int TileDimensions[2];
   int DisableComposite;
 
-  // Need to put a global flag that indicates interactive rendering.
-  // All process must be consistent in choosing LODs because
-  // of the vtkCollectPolydata filter.
-  static int GlobalLODFlag;
 
   int RunningParaViewScript;
   
@@ -516,8 +492,6 @@ protected:
 
   char* DemoPath;
   vtkSetStringMacro(DemoPath);
-
-  float LogThreshold;
 
   int CrashOnErrors;
 

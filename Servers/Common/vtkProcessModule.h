@@ -230,7 +230,9 @@ public:
   // Description:
   // Set the local progress. Subclass should overwrite it.
   virtual void SetLocalProgress(const char* filter, int progress) = 0;
-
+  vtkGetMacro(ProgressRequests, int);
+  vtkSetMacro(ProgressRequests, int);
+  vtkGetObjectMacro(ProgressHandler, vtkPVProgressHandler);
 protected:
   vtkProcessModule();
   ~vtkProcessModule();

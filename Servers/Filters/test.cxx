@@ -37,6 +37,8 @@
 #include "vtkStructuredCacheFilter.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLPVDWriter.h"
+#include "vtkDataSetSubdivisionAlgorithm.h"
+#include "vtkStreamingTessellator.h"
 
 #ifdef VTK_USE_PATENTED
 # include "vtkPVKitwareContourFilter.h"
@@ -55,6 +57,8 @@
 int main()
 {
   vtkObject *c;
+  c = vtkDataSetSubdivisionAlgorithm::New(); c->Print(cout); c->Delete();
+  c = vtkStreamingTessellator::New(); c->Print(cout); c->Delete();
   c = vtkCleanUnstructuredGrid::New(); c->Print(cout); c->Delete();
   c = vtkColorByPart::New(); c->Print(cout); c->Delete();
   c = vtkGroup::New(); c->Print(cout); c->Delete();

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.26");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.27");
 
 
 //----------------------------------------------------------------------------
@@ -130,7 +130,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // Keep track of how long each decimation filter takes to execute.
   vtkClientServerStream cmd;
   cmd << vtkClientServerStream::Invoke
-      << pm->GetApplicationID() << "LogStartEvent" << "Execute Decimate"
+      << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Decimate"
       << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke
@@ -138,7 +138,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::End;
   cmd.Reset();
   cmd << vtkClientServerStream::Invoke
-      << pm->GetApplicationID() << "LogEndEvent" << "Execute Decimate"
+      << pm->GetProcessModuleID() << "LogEndEvent" << "Execute Decimate"
       << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke
@@ -146,7 +146,7 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::End;
   pm->GetStream() 
     << vtkClientServerStream::Invoke 
-    << pm->GetApplicationID() << "RegisterProgressEvent"
+    << pm->GetProcessModuleID() << "RegisterProgressEvent"
     << this->LODDeciID << this->LODDeciID.ID
     << vtkClientServerStream::End;
   pm->GetStream()

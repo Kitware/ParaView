@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.2");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.1");
 vtkCxxSetObjectMacro(vtkPVProgressHandler, SocketController, vtkSocketController);
 
 //----------------------------------------------------------------------------

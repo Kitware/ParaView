@@ -29,7 +29,6 @@ class vtkPolyData;
 class vtkKWLoadSaveDialog;
 class vtkMapper;
 class vtkMultiProcessController;
-class vtkPVApplication;
 class vtkPVInformation;
 class vtkPVPart;
 class vtkPVPartDisplay;
@@ -40,6 +39,7 @@ class vtkClientServerInterpreter;
 class vtkClientServerStream;
 class vtkSocketController;
 class vtkKWApplication;
+class vtkProcessModuleGUIHelper;
 
 class VTK_EXPORT vtkPVProcessModule : public vtkProcessModule
 {
@@ -57,15 +57,6 @@ public:
   // This breaks rmi loops and cleans up processes.`                
   virtual void Exit();
 
-  // Description:
-  // Access to the subclass PVApplication store in the superclass
-  // as a generic vtkKWApplication.
-  vtkPVApplication *GetPVApplication();
-
-  // Description:
-  // Set the application instance for this class.
-  virtual void SetApplication (vtkKWApplication* arg);
-  
   // Description:
   // Get a directory listing for the given directory.  Returns 1 for
   // success, and 0 for failure (when the directory does not exist).
@@ -107,8 +98,6 @@ public:
   // between the client and process 0 of the server.
   vtkSocketController* GetSocketController() { return 0; }
 
-  vtkClientServerID GetApplicationID();
-
   // Description:
   virtual void SendPrepareProgress();
   virtual void SendCleanupPendingProgress();
@@ -116,14 +105,120 @@ public:
   // Description:
   // Set the local progress
   void SetLocalProgress(const char* filter, int progress);
+
+  
+  // Description:
+  // For loggin from Tcl start and end execute events.  We do not have c
+  // pointers to all filters.
+  void LogStartEvent(char* str);
+  void LogEndEvent(char* str);
+
+  // Description:
+  // More timer log access methods.  Static methods are not accessible 
+  // from tcl.  We need a timer object on all procs.
+  void SetLogBufferLength(int length);
+  void ResetLog();
+  void SetEnableLog(int flag);
+
+  // Description:
+  // Time threshold for event (start-end) when getting the log with indents.
+  // We do not have a timer object on all procs.  Statics do not work with Tcl.
+  vtkSetMacro(LogThreshold, float);
+  vtkGetMacro(LogThreshold, float);
+
+  // Ivars copied from vtkPVApplication in SetProcessModule method
+  
+  // Description:
+  // This is used by the render server only.
+  vtkGetStringMacro(MachinesFileName);
+  vtkSetStringMacro(MachinesFileName);
+
+  // The the portb*c  for the client/render server socket connection.
+  vtkGetMacro(ReverseConnection,int);
+  vtkSetMacro(ReverseConnection,int);
+
+  //Description:
+  // The port used by the render node.
+  vtkGetMacro(RenderNodePort,int);
+  vtkSetMacro(RenderNodePort,int);
+  
+  // Description:
+  // Flag that differentiates between clinet and server programs.
+  vtkGetMacro(ClientMode, int);
+  vtkSetMacro(ClientMode, int);
+
+  // Description:
+  // Flag to determine if the render server is being used.
+  // If this is on and ClientMode is on, then the client
+  // will be connecting to both a render and data server.
+  // If this flag is on and ClientMode is off, then this is 
+  // a render server.
+  vtkGetMacro(RenderServerMode, int);
+  vtkSetMacro(RenderServerMode, int);
+
+  vtkGetMacro(ServerMode, int);
+  vtkSetMacro(ServerMode, int);
+  
+  vtkSetClampMacro(AlwaysSSH, int, 0, 1);
+  vtkBooleanMacro(AlwaysSSH, int);
+  vtkGetMacro(AlwaysSSH, int);  
+
+  // Description:
+  // The the port for the client/server socket connection.
+  vtkGetMacro(Port,int);
+  vtkSetMacro(Port,int);
+  vtkGetMacro(RenderServerPort,int);
+  vtkSetMacro(RenderServerPort,int);
+  vtkSetStringMacro(HostName);
+  vtkSetStringMacro(Username);
+  vtkSetStringMacro(RenderServerHostName);
+
+  // Description:
+  // We need to get the data path for the demo on the server.
+  const char* GetDemoPath();
+
+  vtkSetStringMacro(DemoPath);
+
+  // Description:
+  // Need to put a global flag that indicates interactive rendering.  All
+  // process must be consistent in choosing LODs because of the
+  // vtkCollectPolydata filter.  This has to be in vtkPVApplication
+  // because we do not create a render module on remote processes.
+  void SetGlobalLODFlag(int val);
+  static int GetGlobalLODFlag();
+  static void SetGlobalLODFlagInternal(int val);
+  
+  void SetGUIHelper(vtkProcessModuleGUIHelper*);
+  vtkSetMacro(ProgressEnabled, int);
+  vtkGetMacro(ProgressEnabled, int);
+  
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
 
   vtkClientServerID MPIMToNSocketConnectionID;
-  vtkKWApplication* Application;
 
+  // Need to put a global flag that indicates interactive rendering.
+  // All process must be consistent in choosing LODs because
+  // of the vtkCollectPolydata filter.
+  static int GlobalLODFlag;
+  
+  char* MachinesFileName;
+  int RenderNodePort;
+  int ReverseConnection;
   int ProgressEnabled;
+  char* HostName; 
+  char* Username;
+  char* RenderServerHostName;
+  int RenderServerPort;
+  int Port;
+  int ServerMode;
+  int RenderServerMode;
+  int ClientMode;
+  int AlwaysSSH;
+  float LogThreshold;
+  char* DemoPath;
+  vtkProcessModuleGUIHelper* GUIHelper;
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented

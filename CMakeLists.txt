@@ -303,6 +303,9 @@ SET(PVFILTERS_INCLUDE_DIR
 SET(PVSERVERMANAGER_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/ServerManager)
+SET(PVSERVERCOMMON_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/Servers/Common
+  ${ParaView_BINARY_DIR}/Servers/Common)
 
 SUBDIRS(Servers)
 

@@ -30,7 +30,7 @@
 
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkStreamingTessellator,"1.2");
+vtkCxxRevisionMacro(vtkStreamingTessellator,"1.1");
 vtkStandardNewMacro(vtkStreamingTessellator);
 
 void vtkStreamingTessellator::PrintSelf( ostream& os, vtkIndent indent )

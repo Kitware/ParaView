@@ -34,7 +34,7 @@ public:
 
 
 vtkStandardNewMacro(vtkMPIMToNSocketConnectionPortInformation);
-vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.5");
+vtkCxxRevisionMacro(vtkMPIMToNSocketConnectionPortInformation, "1.1");
 
 //----------------------------------------------------------------------------
 vtkMPIMToNSocketConnectionPortInformation::vtkMPIMToNSocketConnectionPortInformation()

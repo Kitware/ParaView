@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.365");
+vtkCxxRevisionMacro(vtkPVSource, "1.366");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2275,11 +2275,11 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     filterName_with_warning_C4701 << "Execute " << this->SourceClassName
                                   << " id: " << sourceId.ID << ends;
     vtkClientServerStream start;
-    start << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+    start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
           << "LogStartEvent" << filterName_with_warning_C4701.str()
           << vtkClientServerStream::End;
     vtkClientServerStream end;
-    end << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+    end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
         << "LogEndEvent" << filterName_with_warning_C4701.str()
         << vtkClientServerStream::End;
     delete[] filterName_with_warning_C4701.str();
@@ -2294,7 +2294,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
                     << "EndEvent"
                     << end
                     << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
+    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
                     << "RegisterProgressEvent"
                     << sourceId << sourceId.ID
                     << vtkClientServerStream::End;

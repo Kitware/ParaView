@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.12");
 
 
 
@@ -77,7 +77,7 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
       << "SetClientController" << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     pm->GetStream()
-      << vtkClientServerStream::Invoke << pm->GetApplicationID()
+      << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
       << "GetClientMode" << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke << this->CompositeID << "SetClientFlag"

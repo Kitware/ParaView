@@ -61,6 +61,7 @@ INCLUDE_DIRECTORIES(
   ${ParaView_SOURCE_DIR}/Common/KWCommon
   ${ParaView_BINARY_DIR}/Common/KWCommon
   ${ParaView_SOURCE_DIR}/Servers/Filters
+  ${ParaView_SOURCE_DIR}/Servers/Common
   ${ParaView_SOURCE_DIR}/Servers/ServerManager
   ${ParaView_BINARY_DIR}/Servers/ServerManager
 )

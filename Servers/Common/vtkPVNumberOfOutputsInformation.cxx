@@ -19,7 +19,7 @@
 #include "vtkSource.h"
 
 vtkStandardNewMacro(vtkPVNumberOfOutputsInformation);
-vtkCxxRevisionMacro(vtkPVNumberOfOutputsInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVNumberOfOutputsInformation, "1.1");
 
 //----------------------------------------------------------------------------
 vtkPVNumberOfOutputsInformation::vtkPVNumberOfOutputsInformation()

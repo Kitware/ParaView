@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.25");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.26");
 
 
 //----------------------------------------------------------------------------
@@ -186,7 +186,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
 
   vtkClientServerStream cmd;
   cmd << vtkClientServerStream::Invoke
-      << pm->GetApplicationID() << "LogStartEvent" << "Execute Collect"
+      << pm->GetProcessModuleID() << "LogStartEvent" << "Execute Collect"
       << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke
@@ -194,7 +194,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     << vtkClientServerStream::End;
   cmd.Reset();
   cmd << vtkClientServerStream::Invoke
-      << pm->GetApplicationID() << "LogEndEvent" << "Execute Collect"
+      << pm->GetProcessModuleID() << "LogEndEvent" << "Execute Collect"
       << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke
@@ -255,7 +255,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     << vtkClientServerStream::End;
   cmd.Reset();
   cmd << vtkClientServerStream::Invoke
-      << pm->GetApplicationID() << "LogStartEvent" << "Execute LODCollect"
+      << pm->GetProcessModuleID() << "LogStartEvent" << "Execute LODCollect"
       << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke
@@ -263,7 +263,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
     << vtkClientServerStream::End;
   cmd.Reset();
   cmd << vtkClientServerStream::Invoke
-      << pm->GetApplicationID() << "LogEndEvent" << "Execute LODCollect"
+      << pm->GetProcessModuleID() << "LogEndEvent" << "Execute LODCollect"
       << vtkClientServerStream::End;
   pm->GetStream()
     << vtkClientServerStream::Invoke

@@ -14,7 +14,7 @@
 =========================================================================*/
 #include "vtkPVInformation.h"
 
-vtkCxxRevisionMacro(vtkPVInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVInformation, "1.1");
 
 //----------------------------------------------------------------------------
 vtkPVInformation::vtkPVInformation()

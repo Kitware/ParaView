@@ -20,20 +20,14 @@
 #include "vtkDummyController.h"
 #include "vtkFloatArray.h"
 #include "vtkInstantiator.h"
-#include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
-#include "vtkKWMessageDialog.h"
 #include "vtkLongArray.h"
 #include "vtkMapper.h"
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include "vtkPVApplication.h"
 #include "vtkPVConfig.h"
 #include "vtkPVInformation.h"
-#include "vtkPVServerFileDialog.h"
-#include "vtkPVWindow.h"
 #include "vtkShortArray.h"
 #include "vtkSocketCommunicator.h"
 #include "vtkSocketController.h"
@@ -42,21 +36,18 @@
 #include "vtkString.h"
 #include "vtkStringList.h"
 #include "vtkStringList.h"
-#include "vtkTclUtil.h"
-#include "vtkTclUtil.h"
 #include "vtkToolkits.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkPVProgressHandler.h"
-
 #include "vtkCallbackCommand.h"
 #include "vtkKWRemoteExecute.h"
-#include "vtkPVConnectDialog.h"
 #ifndef _WIN32
 #include <unistd.h>
 #endif
 #include <vtkstd/string>
+#include "vtkProcessModuleGUIHelper.h"
+#include "vtkPVProgressHandler.h"
 
 #ifdef VTK_USE_MPI
 #include "vtkMPIController.h"
@@ -64,15 +55,10 @@
 #include "vtkMPIGroup.h"
 #endif
 
-#include "vtkPVPart.h"
-#include "vtkPVPartDisplay.h"
-
 #include "vtkClientServerStream.h"
 #include "vtkClientServerInterpreter.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
 
-int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
-                         int argc, char *argv[]);
 
 #define VTK_PV_CLIENTSERVER_RMI_TAG          938531
 #define VTK_PV_CLIENTSERVER_ROOT_RMI_TAG     938532
@@ -146,10 +132,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.88");
-
-int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
-                            int argc, char *argv[]);
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.1");
 
 
 //----------------------------------------------------------------------------
@@ -167,7 +150,7 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->ReturnValue = 0;
 
   this->RenderServerHostName = 0;
-  this->Hostname = 0;
+  this->HostName = 0;
   this->Username = 0;
   this->Port = 0;
   this->RenderServerPort = 0;
@@ -202,7 +185,7 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
   this->ReturnValue = 0;
 
   this->SetRenderServerHostName(0);
-  this->SetHostname(0);
+  this->SetHostName(0);
   this->SetUsername(0);
 
   this->RemoteExecution->Delete();
@@ -244,7 +227,6 @@ void vtkPVClientServerModule::ErrorCallback(vtkObject *vtkNotUsed(caller),
 // to simplify it. !!!!!
 void vtkPVClientServerModule::Initialize()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   int myId = this->Controller->GetLocalProcessId();
   int numProcs = this->Controller->GetNumberOfProcesses();
   int id;
@@ -256,7 +238,13 @@ void vtkPVClientServerModule::Initialize()
     } 
 
   if (this->ClientMode)
-    { 
+    {  
+    if(!this->GUIHelper)
+      {
+      vtkErrorMacro("GUIHelper must be set, for vtkPVProcessModule to be able to run a gui.");
+      return;
+      }
+  
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
@@ -271,28 +259,10 @@ void vtkPVClientServerModule::Initialize()
     // attempt to initialize render server connection to data server
     this->InitializeRenderServer();
       
-
-    // Start the application (UI). 
-    // For SGI pipe option.
-    pvApp->SetNumberOfPipes(numServerProcs);
-
-#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-    pvApp->SetupTrapsForSignals(myId);   
-#endif // PV_HAVE_TRAPS_FOR_SIGNALS
-
-    if (pvApp->GetStartGUI())
-      {
-      pvApp->Script("wm withdraw .");
-      pvApp->Start(this->ArgumentCount,this->Arguments);
-      }
-    else
-      {
-      pvApp->Exit();
-      }
+    this->ReturnValue = this->GUIHelper->
+      RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
     cout << "Exit Client\n";
     cout.flush();
-    // Exiting:  CLean up.
-    this->ReturnValue = pvApp->GetExitStatus();
     }
   else if (myId == 0)
     { // process 0 of Server
@@ -347,56 +317,28 @@ void vtkPVClientServerModule::Initialize()
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::ShouldWaitForConnection()
 {  
-  vtkPVApplication *pvApp = this->GetPVApplication();
   // if client mode then return reverse connection
   if(this->ClientMode)
     {
     // if in client mode, it should not wait for a connection
     // unless reverse is 1, so just return reverse connection value
-    return pvApp->GetReverseConnection();
+    return this->GetReverseConnection();
     }
   // if server mode, then by default wait for the connection
   // so return not getreverseconnection
-  return !pvApp->GetReverseConnection();
+  return !this->GetReverseConnection();
   
 }
 
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::OpenConnectionDialog(int* start)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  char servers[1024];
-  servers[0] = 0;
-  pvApp->GetRegisteryValue(2, "RunTime", "Servers", servers);
-  pvApp->Script("wm withdraw .");
-  vtkPVConnectDialog* dialog = 
-    vtkPVConnectDialog::New();
-  dialog->SetHostname(this->Hostname);
-  dialog->SetSSHUser(this->Username);
-  dialog->SetPort(this->Port);
-  dialog->SetNumberOfProcesses(this->NumberOfProcesses);
-  dialog->SetMultiProcessMode(this->MultiProcessMode);
-  dialog->Create(this->GetPVApplication(), 0);
-  dialog->SetListOfServers(servers);
-  int res = dialog->Invoke();
-  if ( res )
+{ 
+  if(!this->GUIHelper)
     {
-    this->SetHostname(dialog->GetHostName());
-    this->SetUsername(dialog->GetSSHUser());
-    this->Port = dialog->GetPort();
-    this->NumberOfProcesses = dialog->GetNumberOfProcesses();
-    this->MultiProcessMode = dialog->GetMultiProcessMode();
-    *start = 1;
+      vtkErrorMacro("GUIHelper must be set, for OpenConnectionDialog to work.");
+      return 0;
     }
-  pvApp->SetRegisteryValue(2, "RunTime", "Servers",
-                           dialog->GetListOfServers());
-  dialog->Delete();
-  
-  if ( !res )
-    {
-    return 0;
-    }
-  return 1;
+  return this->GUIHelper->OpenConnectionDialog(start);
 }
 
 //----------------------------------------------------------------------------
@@ -415,7 +357,7 @@ int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
   runcommand += "eval ${PARAVIEW_EXECUTABLE} --server --port=";
   sprintf(numbuffer, "%d", this->Port);
   runcommand += numbuffer;
-  this->RemoteExecution->SetRemoteHost(this->Hostname);
+  this->RemoteExecution->SetRemoteHost(this->HostName);
   if ( this->Username && this->Username[0] )
     {
     this->RemoteExecution->SetSSHUser(this->Username);
@@ -439,7 +381,7 @@ int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
       cc = max_try;
       break;
       }
-    if (comm->ConnectTo(this->Hostname, this->Port))
+    if (comm->ConnectTo(this->HostName, this->Port))
       {
       break;
       }
@@ -456,8 +398,6 @@ int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::ConnectToRemote()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   // according to the cvs logs this stops a memory leak
   vtkSocketController* dummy = vtkSocketController::New();
   dummy->Initialize();
@@ -468,9 +408,6 @@ void vtkPVClientServerModule::ConnectToRemote()
   vtkSocketCommunicator *commRenderServer = vtkSocketCommunicator::New();
   
   // Get the host name from the command line arguments
-  this->SetRenderServerHostName(pvApp->GetRenderServerHostName());
-  this->SetHostname(pvApp->GetHostName());
-  this->SetUsername(pvApp->GetUsername());
   vtkCallbackCommand* cb = vtkCallbackCommand::New();
   cb->SetCallback(vtkPVClientServerModule::ErrorCallback);
   cb->SetClientData(this);
@@ -478,15 +415,13 @@ void vtkPVClientServerModule::ConnectToRemote()
   cb->Delete();
 
   // Get the port from the command line arguments
-  this->Port = pvApp->GetPort();
-  this->RenderServerPort = pvApp->GetRenderServerPort();
   // Establish connection
   int start = 0;
-  if ( pvApp->GetAlwaysSSH() )
+  if ( this->GetAlwaysSSH() )
     {
     start = 1;
     }
-  while (!comm->ConnectTo(this->Hostname, this->Port))
+  while (!comm->ConnectTo(this->HostName, this->Port))
     {  
     // Do not bother trying to start the client if reverse connection is specified.
     // only try the ConnectTo once if it is a server in reverse mode
@@ -495,10 +430,17 @@ void vtkPVClientServerModule::ConnectToRemote()
       // This is the "reverse-connection" server condition.  
       // For now just fail if connection is not found.
       vtkErrorMacro("Server error: Could not connect to the client. " 
-                    << this->Hostname << " " << this->Port);
+                    << this->HostName << " " << this->Port);
       comm->Delete();
       commRenderServer->Delete();
-      pvApp->Exit();
+      if(this->GUIHelper)
+        {
+        this->GUIHelper->ExitApplication();
+        }
+      else
+        {
+        vtkErrorMacro("No GUIHelper set, can not exit application");
+        }
       this->ReturnValue = 1;
       return;
       }
@@ -522,7 +464,14 @@ void vtkPVClientServerModule::ConnectToRemote()
         vtkErrorMacro("Client error: Could not connect to the server.");
         comm->Delete();
         commRenderServer->Delete();
-        pvApp->Exit();
+        if(this->GUIHelper)
+          {
+          this->GUIHelper->ExitApplication();
+          }  
+        else
+          {
+          vtkErrorMacro("No GUIHelper set, can not exit application");
+          }
         this->ReturnValue = 1;
         return;
         }
@@ -542,7 +491,14 @@ void vtkPVClientServerModule::ConnectToRemote()
                     << " Port: " << this->RenderServerPort); 
       comm->Delete();
       commRenderServer->Delete();
-      pvApp->Exit();
+      if(this->GUIHelper)
+        {
+        this->GUIHelper->ExitApplication();
+        }  
+      else
+        {
+        vtkErrorMacro("No GUIHelper set, can not exit application");
+        }
       this->ReturnValue = 1;
       return;
       }
@@ -560,16 +516,15 @@ void vtkPVClientServerModule::ConnectToRemote()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SetupWaitForConnection()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   this->SocketController = vtkSocketController::New();
   this->SocketController->Initialize();
   this->ProgressHandler->SetSocketController(this->SocketController);
   vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
   
-  int port= pvApp->GetPort();
+  int port= this->GetPort();
   if(this->RenderServerMode)
     {
-    port = pvApp->GetRenderServerPort();
+    port = this->GetRenderServerPort();
     }
   if ( this->ClientMode )
     {
@@ -611,14 +566,11 @@ void vtkPVClientServerModule::SetupWaitForConnection()
 void vtkPVClientServerModule::Connect()
 {
   int myId = this->Controller->GetLocalProcessId();
-  vtkPVApplication *pvApp = this->GetPVApplication();
  
 #ifdef MPIPROALLOC
   vtkCommunicator::SetUseCopy(1);
 #endif
 
-  this->ClientMode = pvApp->GetClientMode();
-  this->RenderServerMode = pvApp->GetRenderServerMode();
 
   // Do not try to connect sockets on MPI processes other than root.
   if (myId > 0)
@@ -686,14 +638,14 @@ void vtkPVClientServerModule::InitializeRenderServer()
   // now initilaize the waiting server and have it set up the connections
   this->GetStream()  
     << vtkClientServerStream::Invoke
-    << this->GetApplicationID() << "GetRenderNodePort" << vtkClientServerStream::End;
+    << this->GetProcessModuleID() << "GetRenderNodePort" << vtkClientServerStream::End;
   this->GetStream()
     << vtkClientServerStream::Invoke << id << "SetPortNumber"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
   this->GetStream()  
     << vtkClientServerStream::Invoke
-    << this->GetApplicationID() << "GetMachinesFileName" << vtkClientServerStream::End;
+    << this->GetProcessModuleID() << "GetMachinesFileName" << vtkClientServerStream::End;
   this->GetStream()
     << vtkClientServerStream::Invoke << id << "SetMachinesFileName"
     << vtkClientServerStream::LastResult
@@ -911,7 +863,7 @@ vtkPVClientServerModule::GatherInformationInternal(const char* infoClassName,
 {
   vtkClientServerStream css;
   
-  if(this->GetPVApplication()->GetClientMode())
+  if(this->GetClientMode())
     {
     vtkSocketController* controller = this->SocketController;
     if(this->GatherRenderServer)
@@ -1060,17 +1012,6 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
 {
-  if(!this->GetPVApplication())
-    {
-    vtkErrorMacro("Missing application object.");
-    this->LastServerResultStream->Reset();
-    *this->LastServerResultStream
-      << vtkClientServerStream::Error
-      << "vtkPVClientServerModule missing Application object."
-      << vtkClientServerStream::End;
-    return *this->LastServerResultStream;
-    }
-
   if(!this->ClientMode)
     {
     vtkErrorMacro("GetLastServerResult() should not be called on the server.");

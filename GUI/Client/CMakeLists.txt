@@ -9,14 +9,11 @@ SET( ParaViewSharedNotWrapped_SRCS
 
 SET(ParaViewSharedNotTclWrapped_SRCS
   vtkPickPointWidget.cxx
-  vtkPVProcessModule.cxx
+  vtkPVProcessModuleGUIHelper.cxx
   vtkPVLODActor.cxx
   vtkPVTimerInformation.cxx
-  vtkMPIMToNSocketConnection.cxx
   vtkPVExtentTranslator.cxx
-  vtkPVClientServerModule.cxx
   vtkPVGenericRenderWindowInteractor.cxx
-  vtkPVMPIProcessModule.cxx
   )
 
 SET( ParaViewServer_SRCS
@@ -28,7 +25,6 @@ SET( ParaViewServer_SRCS
   vtkPVServerProbe.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVSummaryHelper.cxx
-  vtkMPIMoveData.cxx
   vtkPVServerXDMFParameters.cxx
   )
 
@@ -68,7 +64,6 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVRenderModule.cxx
   vtkPVWidgetCollection.cxx
   vtkPVWorldPointPicker.cxx
-  vtkMPIMToNSocketConnectionPortInformation.cxx
   vtkPVXMLPackageParser.cxx
   )
 
@@ -197,6 +192,7 @@ SET( ParaViewClient_SRCS
 
 INCLUDE_DIRECTORIES(
   ${KWSYS_INCLUDE_DIR}
+  ${PVSERVERCOMMON_INCLUDE_DIR}
   ${PVFILTERS_INCLUDE_DIR}
   ${PVGUI_BINARY_DIR}/Client
   ${PVGUI_SOURCE_DIR}/Client
@@ -341,7 +337,7 @@ SET(VTK_BINARY_DIR "${PVClient_BINARY_DIR}")
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
 VTK_EXPORT_KIT("KWParaView" "PVSERVER" "${ParaViewServer_SRCS};${ParaViewShared_SRCS};${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWApplication.cxx;${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWObject.cxx;${ParaViewSharedNotTclWrapped_SRCS}")
 
-SET(KIT_WRAP_DEPS PVFilters)
+SET(KIT_WRAP_DEPS PVFilters PVCommon)
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/GUI/Client/Utilities")
 PV_WRAP_VTK_CS(KWParaView PVSERVER "${KIT_WRAP_DEPS}")
 

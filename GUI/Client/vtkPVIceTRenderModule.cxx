@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.13");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.14");
 
 
 
@@ -199,7 +199,7 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetClientController" << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID() << "GetClientMode"
+  pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID() << "GetClientMode"
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetClientFlag" << vtkClientServerStream::LastResult

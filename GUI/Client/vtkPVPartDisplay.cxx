@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.38");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.39");
 
 
 //----------------------------------------------------------------------------
@@ -248,11 +248,11 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   // Keep track of how long each geometry filter takes to execute.
   vtkClientServerStream start;
-  start << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+  start << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
         << "LogStartEvent" << "Execute Geometry" 
         << vtkClientServerStream::End;
   vtkClientServerStream end;
-  end << vtkClientServerStream::Invoke << pm->GetApplicationID() 
+  end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
       << "LogEndEvent" << "Execute Geometry" 
       << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->GeometryID 

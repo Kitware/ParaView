@@ -2,16 +2,34 @@ PROJECT(PVCommon)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Common_SRCS
-  vtkDataSetSubdivisionAlgorithm.cxx
-  vtkStreamingTessellator.cxx
-  vtkSubdivisionAlgorithm.cxx
+  vtkPVProcessModule.cxx
+  vtkPVMPIProcessModule.cxx
+  vtkPVClientServerModule.cxx
+  vtkProcessModule.cxx
+  vtkProcessModuleGUIHelper.cxx
+  vtkStringList.cxx  
+  vtkPVInformation.cxx
+  vtkPVNumberOfOutputsInformation.cxx
+  vtkPVLODPartDisplayInformation.cxx
+  vtkPVDataSetAttributesInformation.cxx
+  vtkPVDataInformation.cxx
+  vtkPVArrayInformation.cxx
+  vtkPVClassNameInformation.cxx
+  vtkMPIMToNSocketConnectionPortInformation.cxx
+  vtkMPIMToNSocketConnection.cxx
+  vtkPVProgressHandler.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkSubdivisionAlgorithm
+  vtkProcessModuleGUIHelper
+  vtkProcessModule
+  vtkPVInformation
   ABSTRACT
   )
-
+SET_SOURCE_FILES_PROPERTIES(
+  vtkPVProgressHandler.cxx
+  vtkStringList.cxx
+  WRAP_EXCLUDE)
 SET(_VTK_BINARY_DIR "${VTK_BINARY_DIR}")
 SET(VTK_BINARY_DIR "${PVCommon_BINARY_DIR}")
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
@@ -41,9 +59,6 @@ IF (VTK_USE_PATENTED)
 ENDIF (VTK_USE_PATENTED)
 TARGET_LINK_LIBRARIES(vtkPVCommon ${PARAVIEW_HDF5_LIBRARIES})
 TARGET_LINK_LIBRARIES(vtkPVCommon vtkClientServer)
-
-ADD_EXECUTABLE(vtkTestCommon test.cxx)
-TARGET_LINK_LIBRARIES(vtkTestCommon vtkPVCommonCS)
 
 # load the ClientServer command
 INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)

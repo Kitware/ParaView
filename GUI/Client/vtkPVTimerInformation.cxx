@@ -18,12 +18,12 @@
 #include "vtkQuadricClustering.h"
 #include "vtkByteSwap.h"
 #include "vtkTimerLog.h"
-#include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTimerInformation);
-vtkCxxRevisionMacro(vtkPVTimerInformation, "1.6");
+vtkCxxRevisionMacro(vtkPVTimerInformation, "1.7");
 
 
 
@@ -122,13 +122,13 @@ void vtkPVTimerInformation::CopyFromObject(vtkObject* o)
   ostrstream *fptr;
   int length;
   char *str;
-  vtkPVApplication* pvApp;
+  vtkPVProcessModule* pm;
   float threshold = 0.001;
 
-  pvApp = vtkPVApplication::SafeDownCast(o);
-  if (pvApp)
+  pm = vtkPVProcessModule::SafeDownCast(o);
+  if (pm)
     {
-    threshold = pvApp->GetLogThreshold();
+    threshold = pm->GetLogThreshold();
     }
   
   length = vtkTimerLog::GetNumberOfEvents() * 40;

@@ -12,7 +12,7 @@
 #include <vtkDataSetAttributes.h>
 #include <vtkMatrix4x4.h>
 
-vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.4");
+vtkCxxRevisionMacro(vtkSubdivisionAlgorithm,"1.1");
 
 void vtkSubdivisionAlgorithm::PrintSelf( ostream& os, vtkIndent indent )
 {
@@ -51,7 +51,6 @@ int vtkSubdivisionAlgorithm::PassField( int sourceId, int sourceSize, vtkStreami
     this->FieldIds[ this->NumberOfFields ] = sourceId;
     off = this->FieldOffsets[ this->NumberOfFields ];
     t->SetFieldSize( -1, this->FieldOffsets[ ++this->NumberOfFields ] = off + sourceSize );
-    //vtkstd::cerr << "Field " << sourceId << " output " << this->NumberOfFields - 1 << " offset " << off << vtkstd::endl;
     this->Modified();
     }
   else

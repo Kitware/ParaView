@@ -53,6 +53,7 @@
 #include "vtkPVData.h"
 #include "vtkPVHelpPaths.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVProcessModuleGUIHelper.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
@@ -72,7 +73,6 @@
 #include "vtkShortArray.h"
 #include "vtkString.h"
 #include "vtkTclUtil.h"
-#include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
@@ -90,7 +90,7 @@
 #include <sys/stat.h>
 #include <stdarg.h>
 #include <signal.h>
-
+#include "vtkPVProgressHandler.h"
 #include "vtkKWDirectoryUtilities.h"
 
 #ifdef _WIN32
@@ -109,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.294");
+vtkCxxRevisionMacro(vtkPVApplication, "1.295");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -203,9 +203,6 @@ static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
   //cout << "# " << str.str() << endl;
   str.rdbuf()->freeze(0);
 }
-
-// initialze the class variables
-int vtkPVApplication::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 // Output window which prints out the process id
@@ -505,7 +502,6 @@ vtkPVApplication::vtkPVApplication()
   this->ShowSourcesLongHelp = 1;
   this->DemoPath = NULL;
 
-  this->LogThreshold = 0.01;
 
   this->SMApplication = vtkSMApplication::New();
 }
@@ -543,6 +539,31 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 {
   this->ProcessModule = pm;
   vtkPVProcessModule::SetProcessModule(pm);
+  if(pm)
+    {  
+    // copy all the command line settings from the application
+    // to the process module
+    pm->SetAlwaysSSH(this->GetAlwaysSSH());
+    pm->SetPort(this->GetPort());
+    pm->SetHostName(this->GetHostName());
+    pm->SetUsername(this->GetUsername());
+    pm->SetRenderServerHostName(this->GetRenderServerHostName());
+    pm->SetClientMode(this->GetClientMode());
+    pm->SetRenderServerPort(this->GetRenderServerPort());
+    pm->SetRenderServerMode(this->GetRenderServerMode());
+    pm->SetRenderNodePort(this->GetRenderNodePort());
+    pm->SetMachinesFileName(this->GetMachinesFileName());
+    pm->SetReverseConnection(this->GetReverseConnection());
+    pm->SetDemoPath(this->GetDemoPath());
+    pm->SetServerMode(this->GetServerMode());
+    vtkPVProcessModuleGUIHelper* helper = vtkPVProcessModuleGUIHelper::New();
+    helper->SetPVApplication(this);
+    helper->SetPVProcessModule(pm);
+    pm->SetGUIHelper(helper);
+    helper->Delete();
+    pm->GetProgressHandler()->SetClientMode(this->GetClientMode());
+    pm->GetProgressHandler()->SetServerMode(this->GetServerMode());
+    }
 }
   
 //----------------------------------------------------------------------------
@@ -1905,35 +1926,19 @@ void vtkPVApplication::StopRecordingScript()
 //----------------------------------------------------------------------------
 void vtkPVApplication::SetGlobalLODFlag(int val)
 {
-  if (vtkPVApplication::GlobalLODFlag == val)
-    {
-    return;
-    }
-  vtkPVProcessModule* pm = this->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke
-                  << pm->GetApplicationID()
-                  << "SetGlobalLODFlagInternal"
-                  << val
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  this->GetProcessModule()->SetGlobalLODFlag(val);
 }
 
  
 //----------------------------------------------------------------------------
 void vtkPVApplication::SetGlobalLODFlagInternal(int val)
 {
-  vtkPVApplication::GlobalLODFlag = val;
+  vtkPVProcessModule::SetGlobalLODFlagInternal(val);
 }
 
 
 
 
-
-//----------------------------------------------------------------------------
-int vtkPVApplication::GetGlobalLODFlag()
-{
-  return vtkPVApplication::GlobalLODFlag;
-}
 
 
 //============================================================================
@@ -1951,23 +1956,6 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
   dlg->Delete();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVApplication::LogStartEvent(char* str)
-{
-  vtkTimerLog::MarkStartEvent(str);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::RegisterProgressEvent(vtkProcessObject* po, int id)
-{
-  this->GetProcessModule()->RegisterProgressEvent(po, id);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::LogEndEvent(char* str)
-{
-  vtkTimerLog::MarkEndEvent(str);
-}
 
 #ifdef PV_HAVE_TRAPS_FOR_SIGNALS
 //----------------------------------------------------------------------------
@@ -2087,24 +2075,6 @@ void vtkPVApplication::ErrorExit()
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::SetLogBufferLength(int length)
-{
-  vtkTimerLog::SetMaxEntries(length);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::ResetLog()
-{
-  vtkTimerLog::ResetLog();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SetEnableLog(int flag)
-{
-  vtkTimerLog::SetLogging(flag);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -2190,7 +2160,6 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SourcesBrowserAlwaysShowName: " 
      << (this->SourcesBrowserAlwaysShowName?"on":"off") << endl;
 
-  os << indent << "LogThreshold: " << this->LogThreshold << endl;
   os << indent << "CrashOnErrors: " << (this->CrashOnErrors?"on":"off") << endl;
   os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
   os << indent << "MachinesFileName: " 
@@ -2356,7 +2325,7 @@ void vtkPVApplication::PlayDemo(int fromDashboard)
   // Server path
   vtkPVProcessModule* pm = this->GetProcessModule();
   pm->GetStream() << vtkClientServerStream::Invoke
-                  << pm->GetApplicationID() << "GetDemoPath"
+                  << pm->GetProcessModuleID() << "GetDemoPath"
                   << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::DATA_SERVER_ROOT);
   if(!pm->GetLastServerResult().GetArgument(0, 0, &demoDataPath))
@@ -2465,3 +2434,9 @@ void vtkPVApplication::FindApplicationInstallationDirectory()
     this->ApplicationInstallationDirectory[length - 4] = '\0';
     }
 }
+
+int vtkPVApplication::GetGlobalLODFlag()
+{
+  return vtkPVProcessModule::GetGlobalLODFlag();
+}
+

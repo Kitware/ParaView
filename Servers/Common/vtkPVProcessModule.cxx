@@ -24,89 +24,79 @@
 #include "vtkMapper.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
 #include "vtkPVConfig.h"
-#include "vtkPVInformation.h"
-#include "vtkPVPart.h"
-#include "vtkPVPartDisplay.h"
-#include "vtkPVPartDisplay.h"
-#include "vtkPVWindow.h"
 #include "vtkPolyData.h"
 #include "vtkShortArray.h"
 #include "vtkSource.h"
 #include "vtkString.h"
 #include "vtkStringList.h"
-#include "vtkTclUtil.h"
 #include "vtkToolkits.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientServerInterpreter.h"
-#include "vtkPVProgressHandler.h"
+#include "vtkTimerLog.h"
+#include "vtkProcessModuleGUIHelper.h"
+
+// initialze the class variables
+int vtkPVProcessModule::GlobalLODFlag = 0;
+
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.51");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.1");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
-  this->Application = 0; 
+  this->ProgressRequests = 0;
+  this->GUIHelper = 0;
   this->MPIMToNSocketConnectionID.ID = 0;
   this->ProgressEnabled = 0;
+  this->LogThreshold = 0.01;
+  this->ClientMode = 0;
+  this->ServerMode = 0;
+  this->RenderServerMode = 0;
+  this->HostName = NULL;
+  this->RenderServerHostName = NULL;
+  this->SetRenderServerHostName("localhost");
+  this->SetHostName("localhost");
+  this->Port = 11111;
+  this->RenderServerPort = 22221;
+  this->RenderNodePort = 0;
+  this->ReverseConnection = 0;
+  this->Username = 0;
+  this->MachinesFileName =0;
+  this->DemoPath = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::~vtkPVProcessModule()
-{
-  // Free Interpreter and ClientServerStream.
+{ 
   this->FinalizeInterpreter();
-  if (this->Application)
-    {
-    this->Application->Delete();
-    }
 }
 
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::Start(int argc, char **argv)
 {
+  if(!this->GUIHelper)
+    {
+    vtkErrorMacro("GUIHelper must be set, for vtkPVProcessModule to be able to run a gui.");
+    return -1;
+    }
+  
   if (this->Controller == NULL)
     {
     this->Controller = vtkDummyController::New();
     vtkMultiProcessController::SetGlobalController(this->Controller);
     }
-
-  vtkPVApplication *app = this->GetPVApplication();
-  // For SGI pipes option.
-  app->SetNumberOfPipes(1);
-
-#ifdef PV_HAVE_TRAPS_FOR_SIGNALS
-  app->SetupTrapsForSignals(myId);
-#endif // PV_HAVE_TRAPS_FOR_SIGNALS
-  app->SetProcessModule(this);
-
-  if (app->GetStartGUI())
-    {
-    app->Script("wm withdraw .");
-    app->Start(argc,argv);
-    }
-  else
-    {
-    app->Exit();
-    }
-  return app->GetExitStatus();
+  return this->GUIHelper->RunGUIStart(argc, argv, 1, 0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::Exit()
 {
-}
-
-//----------------------------------------------------------------------------
-vtkPVApplication* vtkPVProcessModule::GetPVApplication()
-{
-  return vtkPVApplication::SafeDownCast(this->Application);
 }
 
 //----------------------------------------------------------------------------
@@ -199,17 +189,49 @@ vtkObjectBase* vtkPVProcessModule::GetObjectFromIntID(unsigned int idin)
   return this->GetObjectFromID(id);
 }
 
-//----------------------------------------------------------------------------
-vtkClientServerID vtkPVProcessModule::GetApplicationID()
-{
-  vtkClientServerID id = {1};
-  return id;
-}
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "LogThreshold: " << this->LogThreshold << endl;
+  os << indent << "MachinesFileName: " 
+     << (this->MachinesFileName?this->MachinesFileName:"(null)") << endl;
+  if (this->ClientMode)
+    {
+    os << indent << "Running as a client\n";
+    os << indent << "Port: " << this->Port << endl;
+    os << indent << "RenderNodePort: " << this->RenderNodePort << endl;
+    os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
+    os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
+    os << indent << "Render Host: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
+    os << indent << "Username: " 
+       << (this->Username?this->Username:"(none)") << endl;
+    os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
+    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+    }
+  if (this->ServerMode)
+    {
+    os << indent << "Running as a server\n";
+    os << indent << "Port: " << this->Port << endl;
+    os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
+    os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+    }
+  if (this->RenderServerMode)
+    {
+    if(this->ClientMode)
+      {
+      os << indent << "Running as a client connectd to a render server\n";
+      }
+    else
+      {
+      os << indent << "Running as a render server\n";
+      os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
+      os << indent << "Port: " << this->Port << endl;
+      os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
+      }
+    } 
+  os << indent << "DemoPath: " << (this->DemoPath?this->DemoPath:"(none)") << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -222,14 +244,6 @@ void vtkPVProcessModule::InitializeInterpreter()
 
   this->Superclass::InitializeInterpreter();
 
-  // Create the interpreter and supporting stream.
-  // Assign standard IDs.
-  vtkPVApplication *app = this->GetPVApplication();
-  vtkClientServerStream css;
-  css << vtkClientServerStream::Assign
-      << this->GetApplicationID() << app
-      << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(css);
 }
 
 //----------------------------------------------------------------------------
@@ -239,13 +253,6 @@ void vtkPVProcessModule::FinalizeInterpreter()
     {
     return;
     }
-
-  // Delete the standard IDs.
-  vtkClientServerStream css;
-  css << vtkClientServerStream::Delete
-      << this->GetApplicationID()
-      << vtkClientServerStream::End;
-  this->Interpreter->ProcessStream(css);
 
   this->Superclass::FinalizeInterpreter();
 }
@@ -278,15 +285,13 @@ int vtkPVProcessModule::LoadModuleInternal(const char* name,
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::SendPrepareProgress()
-{
-  if (!this->ProgressRequests)
+{ 
+  if(!this->GUIHelper)
     {
-    this->GetPVApplication()->GetMainWindow()->StartProgress();
+    vtkErrorMacro("GUIHelper must be set, for SendPrepareProgress.");
+    return;
     }
-  if ( this->ProgressRequests == 0 )
-    {
-    this->ProgressEnabled = this->GetPVApplication()->GetMainWindow()->GetEnabled();
-    }
+  this->GUIHelper->SendPrepareProgress();
   this->Superclass::SendPrepareProgress();
 }
 
@@ -298,32 +303,93 @@ void vtkPVProcessModule::SendCleanupPendingProgress()
     {
     return;
     }
-  this->GetPVApplication()->GetMainWindow()->EndProgress(this->ProgressEnabled);
+ if(!this->GUIHelper)
+    {
+    vtkErrorMacro("GUIHelper must be set, for SendCleanupPendingProgress.");
+    return;
+    }
+  this->GUIHelper->SendCleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::SetLocalProgress(const char* filter, int progress)
 {
-  if ( !filter )
+ if(!this->GUIHelper)
     {
-    vtkPVApplication::Abort();
-    }
-  if(!this->GetPVApplication()->GetMainWindow())
-    {
+    vtkErrorMacro("GUIHelper must be set, for SetLocalProgress.");
     return;
     }
-  this->GetPVApplication()->GetMainWindow()->SetProgress(filter, progress);
+ this->GUIHelper->SetLocalProgress(filter, progress);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::LogStartEvent(char* str)
+{
+  vtkTimerLog::MarkStartEvent(str);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::SetApplication(vtkKWApplication* app)
+void vtkPVProcessModule::LogEndEvent(char* str)
 {
-  vtkSetObjectBodyMacro(Application, vtkKWApplication, app);
-  vtkPVApplication* mapp = vtkPVApplication::SafeDownCast(app);
-  if ( mapp )
+  vtkTimerLog::MarkEndEvent(str);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetLogBufferLength(int length)
+{
+  vtkTimerLog::SetMaxEntries(length);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::ResetLog()
+{
+  vtkTimerLog::ResetLog();
+}
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetEnableLog(int flag)
+{
+  vtkTimerLog::SetLogging(flag);
+}
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetGlobalLODFlag(int val)
+{
+  if (vtkPVProcessModule::GlobalLODFlag == val)
     {
-    this->ProgressHandler->SetClientMode(mapp->GetClientMode());
-    this->ProgressHandler->SetServerMode(mapp->GetServerMode());
+    return;
     }
+  this->GetStream() << vtkClientServerStream::Invoke
+                  << this->GetProcessModuleID()
+                  << "SetGlobalLODFlagInternal"
+                  << val
+                  << vtkClientServerStream::End;
+  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+}
+
+ 
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetGlobalLODFlagInternal(int val)
+{
+  vtkPVProcessModule::GlobalLODFlag = val;
+}
+
+
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::GetGlobalLODFlag()
+{
+  return vtkPVProcessModule::GlobalLODFlag;
+}
+
+
+const char* vtkPVProcessModule::GetDemoPath()
+{
+  return this->DemoPath;
+}
+
+void vtkPVProcessModule::SetGUIHelper(vtkProcessModuleGUIHelper* h)
+{
+  this->GUIHelper = h;
+  h->Register(this);
 }
 

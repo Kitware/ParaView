@@ -33,7 +33,6 @@ class vtkKWRemoteExecute;
 class vtkMapper;
 class vtkMapper;
 class vtkMultiProcessController;
-class vtkPVApplication;
 class vtkPVPart;
 class vtkSocketController;
 class vtkSource;
@@ -69,19 +68,13 @@ public:
   // Description:
   // Get the number of processes participating in sharing the data.
   virtual int GetNumberOfPartitions();
+  vtkGetMacro(NumberOfProcesses, int);
+  vtkSetMacro(NumberOfProcesses, int);
+  vtkGetMacro(MultiProcessMode, int);
+  vtkSetMacro(MultiProcessMode, int);
+  vtkGetMacro(NumberOfServerProcesses, int);
+  vtkSetMacro(NumberOfServerProcesses, int);
   
-  // Description:
-  // Flag that differentiates between clinet and server programs.
-  vtkGetMacro(ClientMode, int);
-  
-  // Description:
-  // Flag to determine if the render server is being used.
-  // If this is on and ClientMode is on, then the client
-  // will be connecting to both a render and data server.
-  // If this flag is on and ClientMode is off, then this is 
-  // a render server.
-  vtkGetMacro(RenderServerMode, int);
-
   // Description:
   // This is a socket controller used to communicate
   // between the client and process 0 of the server.
@@ -191,9 +184,7 @@ protected:
   void InitializeRenderServer();
   
   int NumberOfServerProcesses;
-  int ClientMode;
   vtkSocketController* SocketController;
-  int RenderServerMode;
   vtkSocketController* RenderServerSocket;
   int NumberOfRenderServerProcesses;
   // To pass arguments through controller single method.
@@ -201,14 +192,6 @@ protected:
   char** Arguments;
   int    ReturnValue;
 
-  vtkSetStringMacro(Hostname);
-  vtkSetStringMacro(Username);
-  char* Hostname;
-  char* Username;
-  vtkSetStringMacro(RenderServerHostName);
-  char* RenderServerHostName;
-  int RenderServerPort;
-  int Port;
   int MultiProcessMode;
   int NumberOfProcesses;
   int GatherRenderServer;
