@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.148");
+vtkCxxRevisionMacro(vtkPVApplication, "1.149");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -800,8 +800,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
   window->SetWindowCollection( this->Windows );
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
-
-  Sleep(15000);
 
   if (this->ShowSplashScreen)
     {
