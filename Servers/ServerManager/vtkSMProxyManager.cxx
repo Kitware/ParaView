@@ -27,7 +27,7 @@
 
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.4");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.5");
 
 struct vtkSMProxyManagerInternals
 {
@@ -50,8 +50,8 @@ vtkSMProxyManager::vtkSMProxyManager()
 //---------------------------------------------------------------------------
 vtkSMProxyManager::~vtkSMProxyManager()
 {
-  delete this->Internals;
   this->UnRegisterProxies();
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
