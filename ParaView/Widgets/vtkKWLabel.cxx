@@ -49,7 +49,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.22");
+vtkCxxRevisionMacro(vtkKWLabel, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -258,4 +258,13 @@ void vtkKWLabel::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Width: " << this->GetWidth() << endl;
   os << indent << "AdjustWrapLengthToWidth: " 
      << (this->AdjustWrapLengthToWidth ? "On" : "Off") << endl;
+  os << indent << "Label: ";
+  if (this->Label)
+    {
+    os << this->Label << endl;
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
 }
