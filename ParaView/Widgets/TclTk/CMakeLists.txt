@@ -7,6 +7,7 @@ SET (files
   lib/tcl8.4/encoding/iso8859-1.enc
   lib/tk8.4/tclIndex
   lib/tk8.4/button.tcl
+  lib/tk8.4/clrpick.tcl
   lib/tk8.4/comdlg.tcl
   lib/tk8.4/entry.tcl
   lib/tk8.4/focus.tcl
