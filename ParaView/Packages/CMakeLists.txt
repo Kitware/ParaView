@@ -47,6 +47,7 @@ SET( AltIO_SRCS
 
   vtkDataArraySelection.cxx
   vtkXMLDataSetWriter.cxx
+  vtkXMLFileReadTester.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(

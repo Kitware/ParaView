@@ -16,17 +16,19 @@
 
 =========================================================================*/
 #include "vtkXMLReader.h"
-#include "vtkObjectFactory.h"
-#include "vtkXMLDataParser.h"
-#include "vtkXMLDataElement.h"
-#include "vtkInstantiator.h"
-#include "vtkDataCompressor.h"
+
 #include "vtkDataArray.h"
+#include "vtkDataCompressor.h"
 #include "vtkDataSet.h"
+#include "vtkInstantiator.h"
+#include "vtkObjectFactory.h"
+#include "vtkXMLDataElement.h"
+#include "vtkXMLDataParser.h"
+#include "vtkXMLFileReadTester.h"
 
 #include <sys/stat.h>
 
-vtkCxxRevisionMacro(vtkXMLReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLReader, "1.2");
 
 //----------------------------------------------------------------------------
 vtkXMLReader::vtkXMLReader()
@@ -298,80 +300,6 @@ vtkDataArray* vtkXMLReader::CreateDataArray(vtkXMLDataElement* da)
 }
 
 //----------------------------------------------------------------------------
-
-// Helper class for CanReadFile.
-class vtkXMLReaderTryReadFile: public vtkXMLParser
-{
-public:
-  vtkTypeMacro(vtkXMLReaderTryReadFile,vtkXMLParser);
-  static vtkXMLReaderTryReadFile* New();
-  
-  int TryReadingFile(const char* name)
-    {
-    ifstream inFile(name);
-    if(!inFile) { return 0; }
-    this->SetStream(&inFile);
-    this->Done = 0;
-    this->Parse();
-    return 1;
-    }
-  
-  vtkGetStringMacro(FileDataType);
-  vtkGetStringMacro(FileVersion);
-  
-protected:
-  vtkXMLReaderTryReadFile()
-    {
-    this->FileDataType = 0;
-    this->FileVersion = 0;
-    }
-  ~vtkXMLReaderTryReadFile()
-    {
-    this->SetFileDataType(0);
-    this->SetFileVersion(0);
-    }
-  
-  void StartElement(const char* name, const char** atts)
-    {
-    this->Done = 1;
-    if(strcmp(name, "VTKFile") == 0)
-      {      
-      unsigned int i;
-      for(i=0; atts[i] && atts[i+1]; i+=2)
-        {
-        if(strcmp(atts[i], "type") == 0)
-          {
-          this->SetFileDataType(atts[i+1]);
-          }
-        else if(strcmp(atts[i], "version") == 0)
-          {
-          this->SetFileVersion(atts[i+1]);
-          }
-        }
-      }
-    }
-  int ParsingComplete() { return (this->Done? 1:0); }
-  void ReportStrayAttribute(const char*, const char*, const char*) {}
-  void ReportMissingAttribute(const char*, const char*) {}
-  void ReportBadAttribute(const char*, const char*, const char*) {}
-  void ReportUnknownElement(const char*) {}
-  void ReportXmlParseError() {}
-  
-  char* FileDataType;
-  char* FileVersion;
-  int Done;
-  
-  vtkSetStringMacro(FileDataType);
-  vtkSetStringMacro(FileVersion);
-  
-private:
-  vtkXMLReaderTryReadFile(const vtkXMLReaderTryReadFile&);  // Not implemented.
-  void operator=(const vtkXMLReaderTryReadFile&);  // Not implemented.
-};
-
-vtkStandardNewMacro(vtkXMLReaderTryReadFile);
-
-//----------------------------------------------------------------------------
 int vtkXMLReader::CanReadFile(const char* name)
 {
   // First make sure the file exists.  This prevents an empty file
@@ -381,10 +309,11 @@ int vtkXMLReader::CanReadFile(const char* name)
   
   // Test if the file with the given name is a VTKFile with the given
   // type.
-  vtkXMLReaderTryReadFile* tester = vtkXMLReaderTryReadFile::New();
+  vtkXMLFileReadTester* tester = vtkXMLFileReadTester::New();
+  tester->SetFileName(name);
   
   int result = 0;
-  if(tester->TryReadingFile(name) && tester->GetFileDataType())
+  if(tester->TestReadFile() && tester->GetFileDataType())
     {
     if(strcmp(tester->GetFileDataType(), this->GetDataSetName()) == 0)
       {

@@ -43,7 +43,7 @@ public:
   // Description:
   // Test whether the file with the given name can be read by this
   // reader.
-  int CanReadFile(const char* name);
+  virtual int CanReadFile(const char* name);
   
 protected:
   vtkXMLReader();
