@@ -305,7 +305,7 @@ IF(PARAVIEW_USE_SAF)
 ENDIF(PARAVIEW_USE_SAF)
 
 SET(ParaView_SRCS ${ParaView_SRCS} ${ParaViewShared_SRCS}
-  ${ParaViewClient_SRCS} ${ParaViewClientNotWrapped_SRCS})
+  ${ParaViewClient_SRCS} ${ParaViewClientNotWrapped_SRCS} ${ParaViewSharedNotTclWrapped_SRCS})
 
 # Setup vtkInstantiator registration for this library's classes.
 INCLUDE(${ParaView_SOURCE_DIR}/VTK/CMake/vtkMakeInstantiator.cmake)
@@ -335,7 +335,6 @@ VTK_WRAP_TCL3(vtkKWParaView ParaViewTCL_SRCS "${ParaViewShared_SRCS};${ParaViewC
 ADD_LIBRARY(vtkKWParaView ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaViewServer_SRCS} 
   ${ParaViewServerNonWrapped_SRCS}
-  ${ParaViewSharedNotTclWrapped_SRCS}
   ${ParaViewSharedNotWrapped_SRCS}
   ${ParaView_SRCS})
 TARGET_LINK_LIBRARIES(vtkKWParaView vtkKWWidgetsTCL vtkPVServerManagerTCL)
