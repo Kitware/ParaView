@@ -96,3 +96,4 @@ TARGET_LINK_LIBRARIES (vtkAltIO
 vtkIO
 )
 
+SUBDIRS(Testing)

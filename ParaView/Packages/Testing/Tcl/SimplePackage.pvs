@@ -1,0 +1,49 @@
+Application ExitOnReturnOn
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+    }
+} 
+
+# hack to get the window.
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
+if { [catch {
+  $pvWindow OpenPackage "$DataDir/Data/Package.xml"
+  set cone [ $pvWindow CreatePVSource testConeSource]
+  $cone AcceptCallback
+  [ $cone GetPVOutput ] CenterCamera
+  [ $cone GetPVOutput ] SetCubeAxesVisibility 0
+  [ $cone GetPVOutput ] SetCubeAxesVisibility 1
+  [ $cone GetPVOutput ] SetCubeAxesVisibility 0
+  [ $cone GetPVOutput ] SetCubeAxesVisibility 1
+  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetState 1
+  [ $cone GetPVOutput ] CubeAxesCheckCallback
+  [ [ $cone GetPVOutput ] GetScalarBarCheck ] SetState 1
+  [ $cone GetPVOutput ] ScalarBarCheckCallback
+  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetState 0
+  [ $cone GetPVOutput ] CubeAxesCheckCallback
+  [ [ $cone GetPVOutput ] GetScalarBarCheck ] SetState 0
+  [ $cone GetPVOutput ] ScalarBarCheckCallback
+  [ [ $cone GetPVOutput ] GetCubeAxesCheck ] SetState 1
+  [ $cone GetPVOutput ] CubeAxesCheckCallback
+  [ [ $cone GetPVOutput ] GetScalarBarCheck ] SetState 1
+  [ $cone GetPVOutput ] ScalarBarCheckCallback
+  [ $cone GetPVOutput ] CenterCamera
+  $pvWindow SaveInTclScript vtkParaViewWriteTest.tcl 1 1
+  file delete -force vtkParaViewWriteTest.tcl 
+  Application Print
+  if { [ Application SelfTest ] == 0 } {
+	Application SetExitStatus 0
+  }
+} result ]  != 0 } {
+	puts "Script failed..."
+	puts $result	
+	Application SetExitStatus 1
+}
+
+Application Exit
