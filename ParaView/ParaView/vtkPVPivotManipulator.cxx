@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderModule.h"
 
 vtkStandardNewMacro(vtkPVPivotManipulator);
-vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.7");
+vtkCxxRevisionMacro(vtkPVPivotManipulator, "1.8");
 
 //-------------------------------------------------------------------------
 vtkPVPivotManipulator::vtkPVPivotManipulator()
@@ -112,7 +112,7 @@ void vtkPVPivotManipulator::OnMouseMove(int x, int y, vtkRenderer* ren,
 //-------------------------------------------------------------------------
 void vtkPVPivotManipulator::Pick(vtkRenderer* ren, int x, int y)
 {
-  float center[3];
+  double center[3];
   
   
   this->Picker->Pick(x, y, 0.0, ren);

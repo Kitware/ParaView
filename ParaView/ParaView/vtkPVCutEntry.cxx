@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutEntry);
-vtkCxxRevisionMacro(vtkPVCutEntry, "1.2");
+vtkCxxRevisionMacro(vtkPVCutEntry, "1.3");
 
 vtkCxxSetObjectMacro(vtkPVCutEntry, InputMenu, vtkPVInputMenu);
 
@@ -84,7 +84,7 @@ int vtkPVCutEntry::ComputeWidgetRange()
     return 0;
     }
   
-  float bounds[6];
+  double bounds[6];
   input->GetDataInformation()->GetBounds(bounds);
   float length = sqrt(
     static_cast<double>(

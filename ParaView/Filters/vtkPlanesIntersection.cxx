@@ -2,27 +2,27 @@
 
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:  vtkPlanesIntersection.cxx
-  Language:  C++
-  Date:    $Date$
-  Version:   $Revision$
-  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
-  All rights reserved.
-  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+Program:   Visualization Toolkit
+Module:  vtkPlanesIntersection.cxx
+Language:  C++
+Date:    $Date$
+Version:   $Revision$
+Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen
+All rights reserved.
+See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
 
-  Copyright (C) 2003 Sandia Corporation
-  Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
-  license for use of this work by or on behalf of the U.S. Government.
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that this Notice and any statement
-  of authorship are reproduced on all copies.
+Copyright (C) 2003 Sandia Corporation
+Under the terms of Contract DE-AC04-94AL85000, there is a non-exclusive
+license for use of this work by or on behalf of the U.S. Government.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that this Notice and any statement
+of authorship are reproduced on all copies.
 
-  Contact: Lee Ann Fisk, lafisk@sandia.gov
+Contact: Lee Ann Fisk, lafisk@sandia.gov
 
-     This software is distributed WITHOUT ANY WARRANTY; without even
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-     PURPOSE.  See the above copyright notice for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
 
@@ -36,7 +36,7 @@
 #include "vtkCell.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPlanesIntersection, "1.6");
+vtkCxxRevisionMacro(vtkPlanesIntersection, "1.7");
 vtkStandardNewMacro(vtkPlanesIntersection);
 
 // Experiment shows that we get plane equation values on the
@@ -87,27 +87,13 @@ void vtkPlanesIntersection::SetRegionVertices(vtkPoints *v)
     int npts = v->GetNumberOfPoints();
     this->regionPts->SetNumberOfPoints(npts);
 
-    float *pt;
+    double *pt;
     for (i=0; i<npts; i++)
       {
       pt = v->GetPoint(i);
-      regionPts->SetPoint(i, (double)pt[0], (double)pt[1], (double)pt[2]);
+      regionPts->SetPoint(i, pt[0], pt[1], pt[2]);
       }
     }
-}
-void vtkPlanesIntersection::SetRegionVertices(float *v, int nvertices)
-{
-  int i;
-  double *dv = new double[nvertices*3];
-
-  for (i=0; i<nvertices*3; i++)
-    {
-    dv[i] = v[i];
-    }
-
-  this->SetRegionVertices(dv, nvertices);
-
-  delete [] dv;
 }
 void vtkPlanesIntersection::SetRegionVertices(double *v, int nvertices)
 {
@@ -122,22 +108,6 @@ void vtkPlanesIntersection::SetRegionVertices(double *v, int nvertices)
     {
     this->regionPts->SetPoint(i, v + (i*3));
     }
-}
-int vtkPlanesIntersection::GetRegionVertices(float *v, int nvertices)
-{
-  int i;
-  double *dv = new double[nvertices*3];
-
-  int npts = this->GetRegionVertices(dv, nvertices);
-
-  for (i=0; i<npts*3; i++)
-    {
-    v[i] = (float)dv[i];
-    }
-
-  delete [] dv;
-
-  return npts;
 }
 int vtkPlanesIntersection::GetRegionVertices(double *v, int nvertices)
 {
@@ -264,26 +234,26 @@ int vtkPlanesIntersection::IntersectsRegion(vtkPoints *R)
 
   else
     {
-     if (this->Plane == NULL) this->SetPlaneEquations(); 
+    if (this->Plane == NULL) this->SetPlaneEquations(); 
 
-     allInside = 1;
+    allInside = 1;
 
-     for (plane=0; plane < nplanes; plane++)
+    for (plane=0; plane < nplanes; plane++)
       {
-       where[plane] = this->EvaluateFacePlane(plane, R);
+      where[plane] = this->EvaluateFacePlane(plane, R);
 
-       if (allInside &&  (where[plane] != Inside))
-         {
-         allInside = 0;
-         }
+      if (allInside &&  (where[plane] != Inside))
+        {
+        allInside = 0;
+        }
 
-       if (where[plane] == Outside)
-         {
-         intersects = 0;
+      if (where[plane] == Outside)
+        {
+        intersects = 0;
 
-         break;
-         }
-       }
+        break;
+        }
+      }
     }
 
   if (intersects == -1)
@@ -328,7 +298,7 @@ int vtkPlanesIntersection::IntersectsRegion(vtkPoints *R)
 // it is assumed "pts" represents a planar polygon
 //
 
-int vtkPlanesIntersection::PolygonIntersectsBBox(float bounds[6], vtkPoints *pts)
+int vtkPlanesIntersection::PolygonIntersectsBBox(double bounds[6], vtkPoints *pts)
 {
   // a bogus vtkPlanesIntersection object containing only one plane
 
@@ -379,16 +349,16 @@ int vtkPlanesIntersection::PolygonIntersectsBBox(float bounds[6], vtkPoints *pts
 
     // find 3 points that are not co-linear and compute a normal
 
-    float nvec[3];
+    double nvec[3];
 
     int npts = pts->GetNumberOfPoints();
 
     for (int p = 2; p < npts; p++)
       {
-      vtkPlanesIntersection::computeNormal(pts->GetPoint(0), pts->GetPoint(1),
-                                       pts->GetPoint(p), nvec);
+      vtkPlanesIntersection::ComputeNormal(pts->GetPoint(0), pts->GetPoint(1),
+                                           pts->GetPoint(p), nvec);
 
-      if (vtkPlanesIntersection::goodNormal(nvec))
+      if (vtkPlanesIntersection::GoodNormal(nvec))
         {
         break;
         }
@@ -453,7 +423,7 @@ int vtkPlanesIntersection::PolygonIntersectsBBox(float bounds[6], vtkPoints *pts
 //  
 
 vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorld(vtkRenderer *ren,
-                      double x0, double x1, double y0, double y1)
+                                                                    double x0, double x1, double y0, double y1)
 {
   vtkPlanesIntersection *planes;
     
@@ -470,12 +440,12 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorld(vtkRenderer 
 }
 
 vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldPerspective(
-                      vtkRenderer *ren,
-                      double xmin, double xmax, double ymin, double ymax)
+  vtkRenderer *ren,
+  double xmin, double xmax, double ymin, double ymax)
 {
   int i;
   float planeEq[24];
-  float worldN[3], newPt[3];
+  double worldN[3], newPt[3];
 
   int *winsize = ren->GetRenderWindow()->GetSize();
 
@@ -506,83 +476,88 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldPerspective(
 
     newNormals->SetTuple(i, worldN);
 
-    pointOnPlane(plane[0], plane[1], plane[2], plane[3], newPt);
+    vtkPlanesIntersection::PointOnPlane(
+      plane[0], plane[1], plane[2], plane[3], newPt);
 
     newPts->SetPoint(i, newPt);
     }
   // Then the left, right, lower, and upper frustum planes.
   // Get three points on each plane, so we can get a normal.
 
-  float ulFront[3], urFront[3], llFront[3], lrFront[3];
-  float lrBack[3], ulBack[3];
+  double ulFront[3], urFront[3], llFront[3], lrFront[3];
+  double lrBack[3], ulBack[3];
 
   // Need a sensible z (took me 3 days to figure that out)
 
-  float sensibleZ = sensibleZcoordinate(ren);
+  double sensibleZ = vtkPlanesIntersection::SensibleZCoordinate(ren);
+
+  int fixme;
 
   // upper left
   ulFront[0] = xmin; ulFront[1] = ymax; ulFront[2] = sensibleZ;
-  ren->ViewToWorld(ulFront[0], ulFront[1], ulFront[2]);
+  ren->ViewToWorld((float)ulFront[0], (float)ulFront[1], (float)ulFront[2]);
 
   // upper right      
   urFront[0] = xmax; urFront[1] = ymax; urFront[2] = sensibleZ;
-  ren->ViewToWorld(urFront[0], urFront[1], urFront[2]);
+  ren->ViewToWorld((float)urFront[0], (float)urFront[1], (float)urFront[2]);
   
   // lower left
   llFront[0] = xmin; llFront[1] = ymin; llFront[2] = sensibleZ;
-  ren->ViewToWorld(llFront[0], llFront[1], llFront[2]);
+  ren->ViewToWorld((float)llFront[0], (float)llFront[1], (float)llFront[2]);
   
   // lower right
   lrFront[0] = xmax; lrFront[1] = ymin; lrFront[2] = sensibleZ;
-  ren->ViewToWorld(lrFront[0], lrFront[1], lrFront[2]);
+  ren->ViewToWorld((float)lrFront[0], (float)lrFront[1], (float)lrFront[2]);
   
   //  We need second, different reasonable z value for back points
   
   double *dir = ren->GetActiveCamera()->GetDirectionOfProjection();
   
-  float dx = dir[0] * .01;
-  float dy = dir[1] * .01;
-  float dz = dir[2] * .01;
+  double dx = dir[0] * .01;
+  double dy = dir[1] * .01;
+  double dz = dir[2] * .01;
   
   ulBack[0] = ulFront[0] + dx;
   ulBack[1] = ulFront[1] + dy;
   ulBack[2] = ulFront[2] + dz;
   
-  ren->WorldToView(ulBack[0], ulBack[1], ulBack[2]);
+  int fixme2;
+
+  ren->WorldToView((float)ulBack[0], (float)ulBack[1], (float)ulBack[2]);
   ulBack[0] = xmin;
   ulBack[1] = ymax;
-  ren->ViewToWorld(ulBack[0], ulBack[1], ulBack[2]);
+  ren->ViewToWorld((float)ulBack[0], (float)ulBack[1], (float)ulBack[2]);
     
   lrBack[0] = lrFront[0] + dx;
   lrBack[1] = lrFront[1] + dy;
   lrBack[2] = lrFront[2] + dz;
     
-  ren->WorldToView(lrBack[0], lrBack[1], lrBack[2]);
+  ren->WorldToView((float)lrBack[0], (float)lrBack[1], (float)lrBack[2]);
   lrBack[0] = xmax;
   lrBack[1] = ymin;
-  ren->ViewToWorld(lrBack[0], lrBack[1], lrBack[2]);
+  ren->ViewToWorld((float)lrBack[0], (float)lrBack[1], (float)lrBack[2]);
 
   // left plane
   
-  computeNormal(ulBack, ulFront, llFront, worldN);
+  vtkPlanesIntersection::ComputeNormal(ulBack, ulFront, llFront, worldN);
   newNormals->SetTuple(0, worldN);
   newPts->SetPoint(0, ulFront);
   
   // right plane
 
-  computeNormal(lrBack, lrFront, urFront, worldN);
+  vtkPlanesIntersection::ComputeNormal(lrBack, lrFront, urFront, worldN);
   newNormals->SetTuple(1, worldN);
   newPts->SetPoint(1, urFront);
 
   // lower plane
 
-  computeNormal(llFront, lrFront, lrBack, worldN);
+  vtkPlanesIntersection::ComputeNormal(llFront, lrFront, lrBack, worldN);
   newNormals->SetTuple(2, worldN);
   newPts->SetPoint(2, lrFront);
 
   // upper plane
 
-  computeNormal(urFront, ulFront, ulBack, worldN);
+  vtkPlanesIntersection::ComputeNormal(urFront, ulFront, ulBack, worldN);
   newNormals->SetTuple(3, worldN);
   newPts->SetPoint(3, urFront);
 
@@ -596,11 +571,11 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldPerspective(
   return planes;
 }
 vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldParallel(
-                      vtkRenderer *ren,
-                      double xmin, double xmax, double ymin, double ymax)
+  vtkRenderer *ren,
+  double xmin, double xmax, double ymin, double ymax)
 {
   float planeEq[24];
-  float newPt[3], worldN[3];
+  double newPt[3], worldN[3];
   int i;
 
   int *winsize = ren->GetRenderWindow()->GetSize();
@@ -614,7 +589,7 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldParallel(
   vtkPoints *newPts = vtkPoints::New();
   newPts->SetNumberOfPoints(6);
 
-  float sensibleZ = sensibleZcoordinate(ren);
+  double sensibleZ = vtkPlanesIntersection::SensibleZCoordinate(ren);
 
   float *plane = planeEq;
 
@@ -658,11 +633,12 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldParallel(
           newPt[2] = sensibleZ;
           break;
         }
-      ren->ViewToWorld(newPt[0], newPt[1], newPt[2]);
+      ren->ViewToWorld((float)newPt[0], (float)newPt[1], (float)newPt[2]);
       } 
     else
       {
-      pointOnPlane(plane[0], plane[1], plane[2], plane[3], newPt);
+      vtkPlanesIntersection::PointOnPlane(
+        plane[0], plane[1], plane[2], plane[3], newPt);
       }
     plane += 4; 
     newPts->SetPoint(i, newPt);
@@ -701,13 +677,13 @@ vtkPlanesIntersection *vtkPlanesIntersection::Convert3DCell(vtkCell *cell)
     
     vtkPoints *facePts = face->GetPoints();
     
-    float *p1 = facePts->GetPoint(0);
-    float *p2 = facePts->GetPoint(1);
-    float *p3 = facePts->GetPoint(2);
+    double *p1 = facePts->GetPoint(0);
+    double *p2 = facePts->GetPoint(1);
+    double *p3 = facePts->GetPoint(2);
     
-    float n[3];
+    double n[3];
     
-    vtkPlanesIntersection::computeNormal(p3, p2, p1, n);
+    vtkPlanesIntersection::ComputeNormal(p3, p2, p1, n);
     
     origins->SetPoint(i, p2);
     normals->SetTuple(i, n);
@@ -725,7 +701,7 @@ vtkPlanesIntersection *vtkPlanesIntersection::Convert3DCell(vtkCell *cell)
   
   for (i=0; i < nfaces; i++)
     {
-    float ns[3], xs[3];
+    double ns[3], xs[3];
     double n[3], x[3], p[4];
     
     normals->GetTuple(i, ns);
@@ -746,11 +722,11 @@ vtkPlanesIntersection *vtkPlanesIntersection::Convert3DCell(vtkCell *cell)
     double insideVal = vtkPlanesIntersection::EvaluatePlaneEquation(inside, p);
 
     double normalDirection =
-       vtkPlanesIntersection::EvaluatePlaneEquation(outside, p);
+      vtkPlanesIntersection::EvaluatePlaneEquation(outside, p);
 
     int sameSide =
-         ( (insideVal < 0) && (normalDirection < 0)) ||
-         ( (insideVal > 0) && (normalDirection > 0));
+      ( (insideVal < 0) && (normalDirection < 0)) ||
+      ( (insideVal > 0) && (normalDirection > 0));
 
     if (sameSide)
       {
@@ -777,10 +753,10 @@ vtkPlanesIntersection *vtkPlanesIntersection::Convert3DCell(vtkCell *cell)
 
 //--------------------------------------------------------------------------
 
-void vtkPlanesIntersection::computeNormal(float *p1, float *p2, float *p3,
-                                          float normal[3])
+void vtkPlanesIntersection::ComputeNormal(double *p1, double *p2, double *p3,
+                                          double normal[3])
 {
-  float v1[3], v2[3];
+  double v1[3], v2[3];
 
   v1[0] = p1[0] - p2[0]; v1[1] = p1[1] - p2[1]; v1[2] = p1[2] - p2[2];
   v2[0] = p3[0] - p2[0]; v2[1] = p3[1] - p2[1]; v2[2] = p3[2] - p2[2];
@@ -789,7 +765,7 @@ void vtkPlanesIntersection::computeNormal(float *p1, float *p2, float *p3,
     
   return;
 }
-int vtkPlanesIntersection::goodNormal(float *n)
+int vtkPlanesIntersection::GoodNormal(double *n)
 {
   if ( (n[0] < VTK_SMALL_DOUBLE) || (n[0] > VTK_SMALL_DOUBLE) ||
        (n[1] < VTK_SMALL_DOUBLE) || (n[1] > VTK_SMALL_DOUBLE) ||
@@ -802,11 +778,12 @@ int vtkPlanesIntersection::goodNormal(float *n)
     return 0;
     } 
 }      
-void vtkPlanesIntersection::pointOnPlane(float a, float b, float c, float d, float pt[3])
+void vtkPlanesIntersection::PointOnPlane(
+  double a, double b, double c, double d, double pt[3])
 {   
-  float px = ( a > 0.0) ? a : -a;
-  float py = ( b > 0.0) ? b : -b;
-  float pz = ( c > 0.0) ? c : -c;
+  double px = ( a > 0.0) ? a : -a;
+  double py = ( b > 0.0) ? b : -b;
+  double pz = ( c > 0.0) ? c : -c;
     
   pt[0] = pt[1] = pt[2] = 0.0;
       
@@ -824,12 +801,12 @@ void vtkPlanesIntersection::pointOnPlane(float a, float b, float c, float d, flo
     }
   return;
 } 
-float vtkPlanesIntersection::sensibleZcoordinate(vtkRenderer *ren)
+double vtkPlanesIntersection::SensibleZCoordinate(vtkRenderer *ren)
 { 
-  float FP[3];
+  double FP[3];
 
   ren->GetActiveCamera()->GetFocalPoint(FP);
-  ren->WorldToView(FP[0], FP[1], FP[2]);
+  ren->WorldToView((float)FP[0], (float)FP[1], (float)FP[2]);
   return FP[2];
 }
 
@@ -839,10 +816,10 @@ double vtkPlanesIntersection::EvaluatePlaneEquation(double *x, double *p)
 }                                         
 void vtkPlanesIntersection::PlaneEquation(double *n, double *x, double *p)
 {
-    p[0] = n[0];
-    p[1] = n[1];
-    p[2] = n[2];
-    p[3] = -(n[0]*x[0] + n[1]*x[1] + n[2]*x[2]);
+  p[0] = n[0];
+  p[1] = n[1];
+  p[2] = n[2];
+  p[3] = -(n[0]*x[0] + n[1]*x[1] + n[2]*x[2]);
 }
 
 // The plane equations ***********************************************
@@ -861,7 +838,7 @@ void vtkPlanesIntersection::SetPlaneEquations()
 
   for (i=0; i<nplanes; i++)
     {
-    float n[3], x[3];
+    double n[3], x[3];
 
     this->Points->GetPoint(i, x);
     this->Normals->GetTuple(i, n);
@@ -894,7 +871,7 @@ void vtkPlanesIntersection::ComputeRegionVertices()
   if (nplanes <= 3)
     {
     vtkErrorMacro( << 
-      "vtkPlanesIntersection::ComputeRegionVertices invalid region");
+                   "vtkPlanesIntersection::ComputeRegionVertices invalid region");
     return;
     }
 
@@ -916,25 +893,25 @@ void vtkPlanesIntersection::ComputeRegionVertices()
       {
       for (k=j+1; k < nplanes; k++)
         {
-         this->planesMatrix(i, j, k, M);
+        this->planesMatrix(i, j, k, M);
 
-         int notInvertible = this->Invert3x3(M);
+        int notInvertible = this->Invert3x3(M);
 
-         if (notInvertible) continue;
+        if (notInvertible) continue;
 
-         this->planesRHS(i, j, k, rhs);
+        this->planesRHS(i, j, k, rhs);
 
-         vtkMath::Multiply3x3(M, rhs, testv);
+        vtkMath::Multiply3x3(M, rhs, testv);
 
-         if (duplicate(testv)) continue;
+        if (duplicate(testv)) continue;
 
-         int outside = this->outsideRegion(testv);
+        int outside = this->outsideRegion(testv);
 
-         if (!outside)
+        if (!outside)
           {
-           this->regionPts->InsertPoint(nvertices, testv);
-           nvertices++;
-           }
+          this->regionPts->InsertPoint(nvertices, testv);
+          nvertices++;
+          }
         }
       }
     }
@@ -961,9 +938,9 @@ void vtkPlanesIntersection::planesMatrix(int p1, int p2, int p3, double M[3][3])
   int i;
   for (i=0; i<3; i++)
     {
-     M[0][i] = this->Plane[p1*4 + i];
-     M[1][i] = this->Plane[p2*4 + i];
-     M[2][i] = this->Plane[p3*4 + i];
+    M[0][i] = this->Plane[p1*4 + i];
+    M[1][i] = this->Plane[p2*4 + i];
+    M[2][i] = this->Plane[p3*4 + i];
     }
 }
 void vtkPlanesIntersection::planesRHS(int p1, int p2, int p3, double r[3]) const
@@ -1008,7 +985,7 @@ int vtkPlanesIntersection::Invert3x3(double M[3][3])
     {
     for (j=0; j<3; j++)
       {
-       M[i][j] = temp[i][j];
+      M[i][j] = temp[i][j];
       }
     }
 
@@ -1019,7 +996,7 @@ int vtkPlanesIntersection::Invert3x3(double M[3][3])
 
 int vtkPlanesIntersection::IntersectsBoundingBox(vtkPoints *R)
 {
-float BoxBounds[6], RegionBounds[6];
+  double BoxBounds[6], RegionBounds[6];
   
   R->GetBounds(BoxBounds);
 
@@ -1038,7 +1015,7 @@ float BoxBounds[6], RegionBounds[6];
 }
 int vtkPlanesIntersection::EnclosesBoundingBox(vtkPoints *R)
 {
-float BoxBounds[6], RegionBounds[6];
+  double BoxBounds[6], RegionBounds[6];
 
   R->GetBounds(BoxBounds);
 
@@ -1059,7 +1036,7 @@ float BoxBounds[6], RegionBounds[6];
 int vtkPlanesIntersection::EvaluateFacePlane(int plane, vtkPoints *R)
 {
   int i;
-  float n[3], bounds[6]; 
+  double n[3], bounds[6]; 
   double withN[3], oppositeN[3];
 
   R->GetBounds(bounds);
@@ -1111,7 +1088,7 @@ int vtkPlanesIntersection::EvaluateFacePlane(int plane, vtkPoints *R)
 }
 int vtkPlanesIntersection::IntersectsProjection(vtkPoints *R, int dir)
 {
-int intersects;
+  int intersects;
 
   switch (dir)
     {
@@ -1149,8 +1126,8 @@ void vtkPlanesIntersection::PrintSelf(ostream& os, vtkIndent indent)
 
     for (i=0; i<npts; i++)
       {
-      float *pt = this->Points->GetPoint(i);
-      float *n = this->Normals->GetTuple(i);
+      double *pt = this->Points->GetPoint(i);
+      double *n = this->Normals->GetTuple(i);
 
       os << indent << "Origin " <<  pt[0] << " " << pt[1] << " " << pt[2] << " " ;
 
@@ -1164,7 +1141,7 @@ void vtkPlanesIntersection::PrintSelf(ostream& os, vtkIndent indent)
 
     for (i=0; i<npts; i++)
       {
-      float *pt = this->regionPts->GetPoint(i);
+      double *pt = this->regionPts->GetPoint(i);
 
       os << indent << "Vertex " <<  pt[0] << " " << pt[1] << " " << pt[2] << endl;
       }

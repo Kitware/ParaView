@@ -38,7 +38,7 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.20");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.21");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 //----------------------------------------------------------------------------
@@ -224,10 +224,10 @@ void vtkPVGeometryFilter::DataSetSurfaceExecute(vtkDataSet *input)
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
 {
-  float *spacing;
-  float *origin;
+  double *spacing;
+  double *origin;
   int *ext;
-  float bounds[6];
+  double bounds[6];
   vtkPolyData *output = this->GetOutput();
 
   ext = input->GetWholeExtent();
@@ -353,7 +353,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid* input)
   vtkPolyData *output = this->GetOutput();
   
   this->OutlineFlag = 1;
-  float bounds[6];
+  double bounds[6];
   input->GetBounds(bounds);
   
   vtkOutlineSource *outline = vtkOutlineSource::New();
@@ -396,7 +396,7 @@ void vtkPVGeometryFilter::PolyDataExecute(vtkPolyData *input)
     }
   
   this->OutlineFlag = 1;
-  float bounds[6];
+  double bounds[6];
   input->GetBounds(bounds);
   
   vtkOutlineSource *outline = vtkOutlineSource::New();

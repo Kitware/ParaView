@@ -42,7 +42,7 @@
 #include <math.h>
 #include <stdio.h>
 
-vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.2");
+vtkCxxRevisionMacro(vtkBoxClipDataSet, "1.3");
 vtkStandardNewMacro(vtkBoxClipDataSet);
 
 //----------------------------------------------------------------------------
@@ -328,9 +328,9 @@ void vtkBoxClipDataSet::CreateDefaultLocator()
 // Set the box for clipping
 // for each plane, specify the normal and one vertex on the plane. 
 //
-void vtkBoxClipDataSet::SetBoxClip(float *n0,float *o0,float *n1,float *o1,
-                                   float *n2,float *o2,float *n3,float *o3,
-                                   float *n4,float *o4,float *n5,float *o5)
+void vtkBoxClipDataSet::SetBoxClip(double *n0,double *o0,double *n1,double *o1,
+                                   double *n2,double *o2,double *n3,double *o3,
+                                   double *n4,double *o4,double *n5,double *o5)
 {
   int i;
 
@@ -368,9 +368,9 @@ void vtkBoxClipDataSet::SetBoxClip(float *n0,float *o0,float *n1,float *o1,
 
 //----------------------------------------------------------------------------
 // Specify the bounding box for clipping
-void vtkBoxClipDataSet::SetBoxClip(float xmin,float xmax,
-                                   float ymin,float ymax,
-                                   float zmin,float zmax)
+void vtkBoxClipDataSet::SetBoxClip(double xmin,double xmax,
+                                   double ymin,double ymax,
+                                   double zmin,double zmax)
 {
   SetOrientation(0);
   BoundBoxClip[0][0] = xmin;
@@ -1441,11 +1441,11 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
 
   vtkIdType edges[6][2] = { {0,1}, {1,2}, {2,0},
                             {0,3}, {1,3}, {2,3} };  /* Edges Tetrahedron */
-  float value,deltaScalar;
-  float t, *p1, *p2;
-  float v[3],x[3];
-  float vf[4];
-  float v_tetra[4][3];
+  double value,deltaScalar;
+  double t, *p1, *p2;
+  double v[3],x[3];
+  double vf[4];
+  double v_tetra[4][3];
 
   for (i=0; i<npts; i++)
     {
@@ -1488,7 +1488,7 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
         continue;                         // Tetrahedron is outside.
       }
 
-    float  *pPtr = (float *)cellPts->GetVoidPointer(0);   
+    double  *pPtr = (double *)cellPts->GetVoidPointer(0);   
     for (allInside=1, i=0; i<4; i++)
       {
         ptId = cellIds->GetId(v_id[i]);
@@ -1522,9 +1522,9 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
         continue;
       }
 
-    float  pc[3];
-    float *pc1  , *pc2;
-    float *pedg1,*pedg2;
+    double  pc[3];
+    double *pc1  , *pc2;
+    double *pedg1,*pedg2;
 
       // tab4: tetrahedron intersection in 4 edges.see (2)
 
@@ -1601,7 +1601,7 @@ void vtkBoxClipDataSet::ClipBox(vtkPoints *newPoints,
         unsigned num_inter = 0;
         unsigned edges_inter = 0;
         unsigned i0,i1;
-        float p_inter[4][3];   
+        double p_inter[4][3];   
         vtkIdType p_id[4];
         cellarray->GetNextCell(npts,v_id);
         
@@ -1938,11 +1938,11 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
 
   vtkIdType edges[6][2] = { {0,1}, {1,2}, {2,0}, 
                             {0,3}, {1,3}, {2,3} };  /* Edges Tetrahedron */
-  float deltaScalar;
-  float t, *p1, *p2;
-  float v[3],x[3];
-  float p[6];
-  float v_tetra[4][3];
+  double deltaScalar;
+  double t, *p1, *p2;
+  double v[3],x[3];
+  double p[6];
+  double v_tetra[4][3];
 
   for (i=0; i<npts; i++)
     {
@@ -1988,7 +1988,7 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
         continue;                         // Tetrahedron is outside.
         }
      
-      float  *pPtr = (float *)cellPts->GetVoidPointer(0);   
+      double  *pPtr = (double *)cellPts->GetVoidPointer(0);   
       for (allInside=1, i=0; i<4; i++)
         {
         ptId = cellIds->GetId(v_id[i]);
@@ -2021,9 +2021,9 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
         continue;
         }
 
-      float  pc[3];
-      float *pc1  , *pc2;
-      float *pedg1,*pedg2;
+      double  pc[3];
+      double *pc1  , *pc2;
+      double *pedg1,*pedg2;
 
       unsigned tab4[6][6] = { {0,1,1,2,3,3},   // Tetrahedron Intersection Cases
               {2,0,0,3,2,1},
@@ -2094,7 +2094,7 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
         for (idcellnew = 0 ; idcellnew < totalnewcells; idcellnew++) 
           {
           unsigned i0,i1;
-          float p_inter[4][3];   
+          double p_inter[4][3];   
           unsigned num_inter = 0;
           unsigned edges_inter = 0;
           vtkIdType p_id[4];
@@ -2125,8 +2125,8 @@ void vtkBoxClipDataSet::ClipHexahedron(vtkPoints *newPoints,
         
             p1 = v_tetra[verts[0]];
             p2 = v_tetra[verts[1]];
-            float s1 = p[verts[0]];
-            float s2 = p[verts[1]];    
+            double s1 = p[verts[0]];
+            double s2 = p[verts[1]];    
             if ( (s1 * s2) <=0)
               {
               deltaScalar = s2 - s1;

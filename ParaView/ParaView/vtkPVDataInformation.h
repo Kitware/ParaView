@@ -91,7 +91,6 @@ public:
   vtkGetMacro(NumberOfCells, vtkIdType);
   vtkGetMacro(MemorySize, int);
   vtkGetVector6Macro(Bounds, double);
-  void GetBounds(float* bds);
 
   // Description:
   // Of course Extent is only valid for structured data sets.

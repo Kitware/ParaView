@@ -96,7 +96,7 @@ public:
 
   // Description:
   // Get the bounds for this Actor as (Xmin,Xmax,Ymin,Ymax,Zmin,Zmax). (The
-  // method GetBounds(float bounds[6]) is available from the superclass.)
+  // method GetBounds(double bounds[6]) is available from the superclass.)
   void GetBounds(float bounds[6]);
   float *GetBounds();
 

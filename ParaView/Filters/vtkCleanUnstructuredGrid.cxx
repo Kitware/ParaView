@@ -27,7 +27,7 @@
 #include "vtkCollection.h"
 #include "vtkPointLocator.h"
 
-vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.2");
+vtkCxxRevisionMacro(vtkCleanUnstructuredGrid, "1.3");
 vtkStandardNewMacro(vtkCleanUnstructuredGrid);
 
 vtkCleanUnstructuredGrid::vtkCleanUnstructuredGrid()
@@ -77,7 +77,7 @@ void vtkCleanUnstructuredGrid::Execute()
   vtkIdType id;
   vtkIdType newId;
   vtkIdType* ptMap = new vtkIdType[num];
-  float pt[3];
+  double pt[3];
 
   this->Locator->SetTolerance(0.00001*input->GetLength());
   this->Locator->InitPointInsertion(newPts, input->GetBounds(), num);

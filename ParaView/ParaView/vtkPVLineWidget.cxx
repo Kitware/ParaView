@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.42");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.43");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -405,7 +405,7 @@ void vtkPVLineWidget::UpdateVTKObject(vtkClientServerID sourceID)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ActualPlaceWidget()
 {
-  float bds[6];
+  double bds[6];
   float x, y, z;
 
   if ( this->PVSource->GetPVInput(0) )

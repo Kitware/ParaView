@@ -66,9 +66,9 @@ public:
 
   // Description:
   // Set the bounds to display.
-  void SetBounds(float bounds[6]);
+  void SetBounds(double bounds[6]);
   void SetExtent(int ext[6]); 
-  vtkGetVector6Macro(Bounds, float);
+  vtkGetVector6Macro(Bounds, double);
 
   // Description:
   // I want to use this widget to display an extent (int values).
@@ -88,7 +88,7 @@ protected:
   vtkKWLabel *YRangeLabel;
   vtkKWLabel *ZRangeLabel;
 
-  float Bounds[6];
+  double Bounds[6];
   int Extent[6];
   int ExtentMode;
 

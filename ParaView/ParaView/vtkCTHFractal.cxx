@@ -29,7 +29,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.7");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.8");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ void vtkCTHFractal::Execute()
 
 int vtkCTHFractal::LineTest2(float x0, float y0, float z0,
                              float x1, float y1, float z1, 
-                             float bds[6]) 
+                             double bds[6]) 
 {
   // intersect line with plane.
   float x, y, z;
@@ -195,7 +195,7 @@ int vtkCTHFractal::LineTest2(float x0, float y0, float z0,
 
 int vtkCTHFractal::LineTest(float x0, float y0, float z0, 
                             float x1, float y1, float z1,
-                            float bds[6], int level, int target) 
+                            double bds[6], int level, int target) 
 {
   if (level >= target)
     {
@@ -209,8 +209,8 @@ int vtkCTHFractal::LineTest(float x0, float y0, float z0,
 
   // If the line intersects our neighbor, then our levels cannot differ by more than one.
   // Assume that our neighbor is half our size.
-  float bds2[6];
-  memcpy(bds2, bds, 6*sizeof(float));
+  double bds2[6];
+  memcpy(bds2, bds, 6*sizeof(double));
   target = target - 1;
   float size;
 
@@ -252,7 +252,7 @@ void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output,
                              int x0, int y0, int z0)
 {
   int ext[6];
-  float bds[6];
+  double bds[6];
   int dim = this->Dimensions;
 
   // Compute cell extent.
@@ -308,8 +308,8 @@ void vtkCTHFractal::AddFractalArray()
   vtkDataArray* fractal;
   float* fractalPtr;
   vtkImageMandelbrotSource* fractalSource = vtkImageMandelbrotSource::New();
-  float* spacing;
-  float* origin;
+  double* spacing;
+  double* origin;
   int dims[3];
 
   array->Allocate(numCells);
@@ -401,7 +401,7 @@ void vtkCTHFractal::AddDepthArray()
   vtkIntArray* depthArray = vtkIntArray::New();
   int blockId;
   int blockCellId;
-  float *spacing;
+  double *spacing;
   int depth;
 
   depthArray->Allocate(numCells);

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.5");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.6");
 
 vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
 
@@ -94,10 +94,10 @@ void vtkPVScaleFactorEntry::UpdateScaleFactor()
   
   this->Input = input;
   
-  float bnds[6];
+  double bnds[6];
   input->GetDataInformation()->GetBounds(bnds);
   
-  float maxBnds = bnds[1] - bnds[0];
+  double maxBnds = bnds[1] - bnds[0];
   maxBnds = (bnds[3] - bnds[2] > maxBnds) ? (bnds[3] - bnds[2]) : maxBnds;
   maxBnds = (bnds[5] - bnds[4] > maxBnds) ? (bnds[5] - bnds[4]) : maxBnds;
   maxBnds *= this->ScaleFactor;

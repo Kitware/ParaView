@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.19");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -71,8 +71,8 @@ vtkPVDataInformation::vtkPVDataInformation()
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->MemorySize = 0;
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
+  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation = vtkPVDataSetAttributesInformation::New();
@@ -123,24 +123,14 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVDataInformation::GetBounds(float *bds)
-{
-  int idx;
-  for (idx = 0; idx < 6; ++idx)
-    {
-    bds[idx] = (float)(this->Bounds[idx]);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVDataInformation::Initialize()
 {
   this->DataSetType = -1;
   this->NumberOfPoints = 0;
   this->NumberOfCells = 0;
   this->MemorySize = 0;
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
+  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = VTK_LARGE_INTEGER;
   this->Extent[1] = this->Extent[3] = this->Extent[5] = -VTK_LARGE_INTEGER;
   this->PointDataInformation->Initialize();
@@ -212,7 +202,7 @@ void vtkPVDataInformation::CopyFromCompositeDataSet(vtkCompositeDataSet*)
 void vtkPVDataInformation::CopyFromDataSet(vtkDataSet* data)
 {
   int idx;
-  float *bds;
+  double *bds;
   int *ext = NULL;
 
   this->DataSetType = data->GetDataObjectType();

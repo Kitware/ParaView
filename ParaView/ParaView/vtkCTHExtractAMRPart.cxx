@@ -45,7 +45,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.6");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.7");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -668,19 +668,19 @@ float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList
 {
   // hack
   int* dims = input->GetBlockPointDimensions(0);
-  float* spacing;
-  float sum = 0.0;
-  float weight;
-  float sumWeight = 0.0;
-  float epsilon;
-  float* origin;
-  float outside[3];
+  double* spacing;
+  double sum = 0.0;
+  double weight;
+  double sumWeight = 0.0;
+  double epsilon;
+  double* origin;
+  double outside[3];
   int numPtsPerBlock = input->GetNumberOfPointsPerBlock();
   int numCellsPerBlock = input->GetNumberOfCellsPerBlock();
   int i, id, num;
   int x0, x1, y0, y1, z0, z1;
-  float dx, dy, dz;
-  float pt[3];
+  double dx, dy, dz;
+  double pt[3];
   int pMaxX = dims[0]-1;
   int pMaxY = dims[1]-1;
   int pMaxZ = dims[2]-1;
@@ -739,9 +739,9 @@ float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList
   // Next find all the block that share the point.
   // Compute point in world space.
   origin = input->GetBlockOrigin(blockId);
-  pt[0] = origin[0] + (float)x * spacing[0];
-  pt[1] = origin[1] + (float)y * spacing[1];
-  pt[2] = origin[2] + (float)z * spacing[2];
+  pt[0] = origin[0] + (double)x * spacing[0];
+  pt[1] = origin[1] + (double)y * spacing[1];
+  pt[2] = origin[2] + (double)z * spacing[2];
   epsilon = spacing[0] / 1000.0;
 
   num = blockList->GetNumberOfIds();
@@ -754,9 +754,9 @@ float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList
       {
       spacing = input->GetBlockSpacing(id);
       weight = 1.0/spacing[0];
-      outside[0] = origin[0] + spacing[0]*(float)(dims[0]-1);
-      outside[1] = origin[1] + spacing[1]*(float)(dims[1]-1);
-      outside[2] = origin[2] + spacing[2]*(float)(dims[2]-1);
+      outside[0] = origin[0] + spacing[0]*(double)(dims[0]-1);
+      outside[1] = origin[1] + spacing[1]*(double)(dims[1]-1);
+      outside[2] = origin[2] + spacing[2]*(double)(dims[2]-1);
       if (pt[0] < outside[0]+epsilon && pt[1] < outside[1]+epsilon &&
           pt[2] < outside[2]+epsilon)
         { // Point is contained in block.
@@ -774,9 +774,9 @@ float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList
         // we do not use the remainder for interpolation.
         // We just assume that offgrid point fall in middle
         // (0.5) of faces.
-        dx = pt[0] - origin[0] - (spacing[0] * (float)x);
-        dy = pt[1] - origin[1] - (spacing[1] * (float)y);
-        dz = pt[2] - origin[2] - (spacing[2] * (float)z);
+        dx = pt[0] - origin[0] - (spacing[0] * (double)x);
+        dy = pt[1] - origin[1] - (spacing[1] * (double)y);
+        dz = pt[2] - origin[2] - (spacing[2] * (double)z);
 
         // This assumes neighbor blocks differ only by one level.
         // Here is where we force points to obey linear interpolation
@@ -1003,13 +1003,13 @@ void vtkCTHExtractAMRPart::FindPointCells(vtkCTHData* self, vtkIdType ptId,
 // Note, this only works with no ghost levels.
 void vtkCTHExtractAMRPart::FindBlockNeighbors(vtkCTHData* self, int blockId, vtkIdList* blockList)
 {
-  float *origin;
-  float *spacing;
+  double *origin;
+  double *spacing;
   int *dims;
-  float bds0[6];
-  float bds1[6];
+  double bds0[6];
+  double bds1[6];
   vtkIdType id, num;
-  float e;
+  double e;
 
   blockList->Initialize();
   // hack
@@ -1017,11 +1017,11 @@ void vtkCTHExtractAMRPart::FindBlockNeighbors(vtkCTHData* self, int blockId, vtk
   origin = self->GetBlockOrigin(blockId);
   spacing = self->GetBlockSpacing(blockId);
   bds0[0] = origin[0];
-  bds0[1] = origin[0]+spacing[0]*(float)(dims[0]-1);
+  bds0[1] = origin[0]+spacing[0]*(double)(dims[0]-1);
   bds0[2] = origin[1];
-  bds0[3] = origin[1]+spacing[1]*(float)(dims[1]-1);
+  bds0[3] = origin[1]+spacing[1]*(double)(dims[1]-1);
   bds0[4] = origin[2];
-  bds0[5] = origin[2]+spacing[2]*(float)(dims[2]-1);
+  bds0[5] = origin[2]+spacing[2]*(double)(dims[2]-1);
   // Tolerance
   e = (spacing[0]+spacing[1]+spacing[2]) / 1000.0;
 
@@ -1033,11 +1033,11 @@ void vtkCTHExtractAMRPart::FindBlockNeighbors(vtkCTHData* self, int blockId, vtk
       origin = self->GetBlockOrigin(id);
       spacing = self->GetBlockSpacing(id);
       bds1[0] = origin[0];
-      bds1[1] = origin[0]+spacing[0]*(float)(dims[0]-1);
+      bds1[1] = origin[0]+spacing[0]*(double)(dims[0]-1);
       bds1[2] = origin[1];
-      bds1[3] = origin[1]+spacing[1]*(float)(dims[1]-1);
+      bds1[3] = origin[1]+spacing[1]*(double)(dims[1]-1);
       bds1[4] = origin[2];
-      bds1[5] = origin[2]+spacing[2]*(float)(dims[2]-1);
+      bds1[5] = origin[2]+spacing[2]*(double)(dims[2]-1);
       // Intersection of bounds
       if (bds1[0]<bds0[0]) {bds1[0] = bds0[0];}
       if (bds1[1]>bds0[1]) {bds1[1] = bds0[1];}

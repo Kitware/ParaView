@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.10");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -526,7 +526,7 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
     return;
     }
   
-  float bnds[6];
+  double bnds[6];
   vtkPVDataInformation *dInfo = input->GetDataInformation();
   dInfo->GetBounds(bnds);
   vtkPVDataSetAttributesInformation *pdInfo = dInfo->GetPointDataInformation();

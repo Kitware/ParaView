@@ -92,7 +92,7 @@ static char * makeEntry(char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.5");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.6");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -972,7 +972,7 @@ void vtkDistributedDataFilter::ClipCellsToSpatialRegion(vtkUnstructuredGrid *gri
   // Decompose it into convex sub-regions.  These sub-regions
   // are axis aligned boxes
   
-  float *bounds;
+  double *bounds;
   
   int numSubRegions = kd->MinimalNumberOfConvexSubRegions(
                             myRegions, &bounds);

@@ -41,7 +41,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.8");
+vtkCxxRevisionMacro(vtkCTHData, "1.9");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -105,7 +105,7 @@ void vtkCTHData::Initialize()
 //----------------------------------------------------------------------------
 void vtkCTHData::GetBlock(int blockId, vtkImageData* block)
 {
-  float *tmp;
+  double *tmp;
   int numCellsPerBlock = this->GetNumberOfCellsPerBlock();
   int numPointsPerBlock = this->GetNumberOfPointsPerBlock();
 
@@ -182,8 +182,8 @@ void vtkCTHData::SetNumberOfBlocks(int num)
   this->BlockLevels->SetNumberOfTuples(num);
   this->BlockCellExtents->SetNumberOfTuples(num);
 
-  memset(this->BlockOrigins->GetPointer(0), 0, num*3*sizeof(float));
-  memset(this->BlockSpacings->GetPointer(0), 0, num*3*sizeof(float));
+  memset(this->BlockOrigins->GetPointer(0), 0, num*3*sizeof(double));
+  memset(this->BlockSpacings->GetPointer(0), 0, num*3*sizeof(double));
   memset(this->BlockLevels->GetPointer(0), 0, num*sizeof(int));
   memset(this->BlockCellExtents->GetPointer(0), 0, num*6*sizeof(int));
 }
@@ -197,8 +197,8 @@ int vtkCTHData::GetNumberOfBlocks()
 //----------------------------------------------------------------------------
 int vtkCTHData::InsertNextBlock()
 {
-  float t[3];
-  float e[6];
+  double t[3];
+  double e[6];
   t[0] = t[1] = t[2] = 0.0;
   this->BlockOrigins->InsertNextTuple(t);
   this->BlockSpacings->InsertNextTuple(t);
@@ -210,22 +210,22 @@ int vtkCTHData::InsertNextBlock()
 
 
 //----------------------------------------------------------------------------
-void vtkCTHData::CellExtentToBounds(int level, int ext[6], float bds[6])
+void vtkCTHData::CellExtentToBounds(int level, int ext[6], double bds[6])
 {
   int spacingFactor = 1;
-  float spacing[3];
+  double spacing[3];
   spacingFactor = spacingFactor << level;
   
-  spacing[0] = this->TopLevelSpacing[0] / (float)(spacingFactor);
-  spacing[1] = this->TopLevelSpacing[1] / (float)(spacingFactor);
-  spacing[2] = this->TopLevelSpacing[2] / (float)(spacingFactor);
+  spacing[0] = this->TopLevelSpacing[0] / (double)(spacingFactor);
+  spacing[1] = this->TopLevelSpacing[1] / (double)(spacingFactor);
+  spacing[2] = this->TopLevelSpacing[2] / (double)(spacingFactor);
 
-  bds[0] = this->TopLevelOrigin[0] + (float)(ext[0]) * spacing[0];
-  bds[1] = this->TopLevelOrigin[0] + (float)(ext[1]+1) * spacing[0];
-  bds[2] = this->TopLevelOrigin[1] + (float)(ext[2]) * spacing[1];
-  bds[3] = this->TopLevelOrigin[1] + (float)(ext[3]+1) * spacing[1];
-  bds[4] = this->TopLevelOrigin[2] + (float)(ext[4]) * spacing[2];
-  bds[5] = this->TopLevelOrigin[2] + (float)(ext[5]+1) * spacing[2];
+  bds[0] = this->TopLevelOrigin[0] + (double)(ext[0]) * spacing[0];
+  bds[1] = this->TopLevelOrigin[0] + (double)(ext[1]+1) * spacing[0];
+  bds[2] = this->TopLevelOrigin[1] + (double)(ext[2]) * spacing[1];
+  bds[3] = this->TopLevelOrigin[1] + (double)(ext[3]+1) * spacing[1];
+  bds[4] = this->TopLevelOrigin[2] + (double)(ext[4]) * spacing[2];
+  bds[5] = this->TopLevelOrigin[2] + (double)(ext[5]+1) * spacing[2];
 }
 
 
@@ -239,23 +239,23 @@ void vtkCTHData::SetBlockCellExtent(int blockId, int level, int *extent)
     }
 
   this->BlockLevels->InsertValue(blockId, level);
-  // Dumb to convert to float.
-  float dumb[6];
+  // Dumb to convert to double.
+  double dumb[6];
   dumb[0] = extent[0];  dumb[1] = extent[1];  dumb[2] = extent[2];
   dumb[3] = extent[3];  dumb[4] = extent[4];  dumb[5] = extent[5];
   this->BlockCellExtents->InsertTuple(blockId, dumb);
   // Compute origin and spacing.
-  float bds[6];
-  float origin[3];
-  float spacing[3];
+  double bds[6];
+  double origin[3];
+  double spacing[3];
 
   this->CellExtentToBounds(level, extent, bds);
   origin[0] = bds[0];
   origin[1] = bds[2];
   origin[2] = bds[4];
-  spacing[0] = (bds[1]-bds[0])/(float)(extent[1]-extent[0]+1);
-  spacing[1] = (bds[3]-bds[2])/(float)(extent[3]-extent[2]+1);
-  spacing[2] = (bds[5]-bds[4])/(float)(extent[5]-extent[4]+1);
+  spacing[0] = (bds[1]-bds[0])/(double)(extent[1]-extent[0]+1);
+  spacing[1] = (bds[3]-bds[2])/(double)(extent[3]-extent[2]+1);
+  spacing[2] = (bds[5]-bds[4])/(double)(extent[5]-extent[4]+1);
 
   this->BlockSpacings->InsertTuple(blockId, spacing);
   this->BlockOrigins->InsertTuple(blockId, origin);
@@ -362,7 +362,7 @@ int* vtkCTHData::GetBlockCellDimensions(int blockId)
 
 
 //----------------------------------------------------------------------------
-float* vtkCTHData::GetBlockOrigin(int blockId)
+double* vtkCTHData::GetBlockOrigin(int blockId)
 {
   if (blockId < 0 || blockId >= this->GetNumberOfBlocks())
     {
@@ -373,7 +373,7 @@ float* vtkCTHData::GetBlockOrigin(int blockId)
 }
 
 //----------------------------------------------------------------------------
-float* vtkCTHData::GetBlockSpacing(int blockId)
+double* vtkCTHData::GetBlockSpacing(int blockId)
 {
   if (blockId < 0 || blockId >= this->GetNumberOfBlocks())
     {
@@ -449,9 +449,9 @@ void vtkCTHData::GetPointCells(vtkIdType ptId, vtkIdList *cellIds)
 
 
 //----------------------------------------------------------------------------
-void vtkCTHData::GetPoint(vtkIdType id, float x[3])
+void vtkCTHData::GetPoint(vtkIdType id, double x[3])
 {
-  float *p=this->GetPoint(id);
+  double *p=this->GetPoint(id);
   x[0] = p[0]; x[1] = p[1]; x[2] = p[2];
 }
 
@@ -548,12 +548,12 @@ vtkCell *vtkCTHData::GetCell(vtkIdType cellId)
   // hack
   int *dims = this->GetBlockPointDimensions(0);
   int d01 = dims[0]*dims[1];
-  float x[3];
+  double x[3];
   int cellsPerBlock = this->GetNumberOfCellsPerBlock();
   int blockId = cellId / cellsPerBlock;
   int blockCellId = cellId - (blockId*cellsPerBlock);
-  float *origin = this->GetBlockOrigin(blockId);
-  float *spacing = this->GetBlockSpacing(blockId);
+  double *origin = this->GetBlockOrigin(blockId);
+  double *spacing = this->GetBlockSpacing(blockId);
 
   iMin = iMax = jMin = jMax = kMin = kMax = 0;
   
@@ -661,9 +661,9 @@ void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
   int blockPointOffset;
   int blockId = cellId / cellsPerBlock;
   int blockCellId = cellId - (blockId*cellsPerBlock);
-  float *origin = this->GetBlockOrigin(blockId);
-  float *spacing = this->GetBlockSpacing(blockId);
-  float x[3];
+  double *origin = this->GetBlockOrigin(blockId);
+  double *spacing = this->GetBlockSpacing(blockId);
+  double x[3];
 
   iMin = iMax = jMin = jMax = kMin = kMax = 0;
   
@@ -761,15 +761,15 @@ void vtkCTHData::GetCell(vtkIdType cellId, vtkGenericCell *cell)
 //----------------------------------------------------------------------------
 // Fast implementation of GetCellBounds().  Bounds are calculated without
 // constructing a cell.
-void vtkCTHData::GetCellBounds(vtkIdType cellId, float bounds[6])
+void vtkCTHData::GetCellBounds(vtkIdType cellId, double bounds[6])
 {
   int loc[3], iMin, iMax, jMin, jMax, kMin, kMax;
-  float x[3];
+  double x[3];
   int cellsPerBlock = this->GetNumberOfCellsPerBlock();
   int blockId = cellId / cellsPerBlock;
   int blockCellId = cellId - (blockId*cellsPerBlock);
-  float *origin = this->GetBlockOrigin(blockId);
-  float *spacing = this->GetBlockSpacing(blockId);
+  double *origin = this->GetBlockOrigin(blockId);
+  double *spacing = this->GetBlockSpacing(blockId);
   // hack
   int *dims = this->GetBlockPointDimensions(0);
 
@@ -838,8 +838,8 @@ void vtkCTHData::GetCellBounds(vtkIdType cellId, float bounds[6])
     }
 
 
-  bounds[0] = bounds[2] = bounds[4] =  VTK_LARGE_FLOAT;
-  bounds[1] = bounds[3] = bounds[5] = -VTK_LARGE_FLOAT;
+  bounds[0] = bounds[2] = bounds[4] =  VTK_DOUBLE_MAX;
+  bounds[1] = bounds[3] = bounds[5] = -VTK_DOUBLE_MAX;
   
   // Extract point coordinates
   for (loc[2]=kMin; loc[2]<=kMax; loc[2]++)
@@ -863,15 +863,15 @@ void vtkCTHData::GetCellBounds(vtkIdType cellId, float bounds[6])
 }
 
 //----------------------------------------------------------------------------
-float *vtkCTHData::GetPoint(vtkIdType ptId)
+double *vtkCTHData::GetPoint(vtkIdType ptId)
 {
-  static float x[3];
+  static double x[3];
   int i, loc[3];
   int pointsPerBlock = this->GetNumberOfPointsPerBlock();
   int blockId = ptId / pointsPerBlock;
   ptId = ptId - (blockId*pointsPerBlock);
-  float *origin = this->GetBlockOrigin(blockId);
-  float *spacing = this->GetBlockSpacing(blockId);
+  double *origin = this->GetBlockOrigin(blockId);
+  double *spacing = this->GetBlockSpacing(blockId);
   // hack
   int *dims = this->GetBlockPointDimensions(0);
 
@@ -941,15 +941,15 @@ float *vtkCTHData::GetPoint(vtkIdType ptId)
 
 //----------------------------------------------------------------------------
 // Find the closest point.
-vtkIdType vtkCTHData::FindPoint(float x[3])
+vtkIdType vtkCTHData::FindPoint(double x[3])
 {
   int numPointsPerBlock = this->GetNumberOfPointsPerBlock();
   int blockId, numBlocks, bestBlock, bestBlockPtId;
   int i, loc[3];
-  float d;
-  float dist, bestDist;
-  float *origin;
-  float *spacing;
+  double d;
+  double dist, bestDist;
+  double *origin;
+  double *spacing;
   int *dims;
 
   // But force.
@@ -993,22 +993,22 @@ vtkIdType vtkCTHData::FindPoint(float x[3])
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkCTHData::FindCell(float x[3], vtkCell *vtkNotUsed(cell), 
+vtkIdType vtkCTHData::FindCell(double x[3], vtkCell *vtkNotUsed(cell), 
                                  vtkGenericCell *vtkNotUsed(gencell),
                                  vtkIdType vtkNotUsed(cellId), 
-                                  float vtkNotUsed(tol2), 
-                                  int& subId, float pcoords[3], 
-                                  float *weights)
+                                  double vtkNotUsed(tol2), 
+                                  int& subId, double pcoords[3], 
+                                  double *weights)
 {
   return
     this->FindCell( x, (vtkCell *)NULL, 0, 0.0, subId, pcoords, weights );
 }
 
 //----------------------------------------------------------------------------
-vtkIdType vtkCTHData::FindCell(float x[3], vtkCell *vtkNotUsed(cell), 
+vtkIdType vtkCTHData::FindCell(double x[3], vtkCell *vtkNotUsed(cell), 
                                  vtkIdType vtkNotUsed(cellId),
-                                 float vtkNotUsed(tol2), 
-                                 int& subId, float pcoords[3], float *weights)
+                                 double vtkNotUsed(tol2), 
+                                 int& subId, double pcoords[3], double *weights)
 {
   int loc[3];
   //hack
@@ -1034,24 +1034,24 @@ vtkIdType vtkCTHData::FindCell(float x[3], vtkCell *vtkNotUsed(cell),
 }
 
 //----------------------------------------------------------------------------
-vtkCell *vtkCTHData::FindAndGetCell(float x[3],
+vtkCell *vtkCTHData::FindAndGetCell(double x[3],
                                       vtkCell *vtkNotUsed(cell),
                                       vtkIdType vtkNotUsed(cellId),
-                                      float vtkNotUsed(tol2), int& subId, 
-                                      float pcoords[3], float *weights)
+                                      double vtkNotUsed(tol2), int& subId, 
+                                      double pcoords[3], double *weights)
 {
   int i, j, k, loc[3];
   vtkIdType npts, idx;
   // hack
   int *dims = this->GetBlockPointDimensions(0);
   vtkIdType d01 = dims[0]*dims[1];
-  float xOut[3];
+  double xOut[3];
   int iMax = 0;
   int jMax = 0;
   int kMax = 0;;
   vtkCell *cell = NULL;
-  float *origin;
-  float *spacing;
+  double *origin;
+  double *spacing;
   int blockId, numBlocks;
 
   numBlocks = this->GetNumberOfBlocks();
@@ -1181,9 +1181,9 @@ int vtkCTHData::GetCellType(vtkIdType vtkNotUsed(cellId))
 //----------------------------------------------------------------------------
 void vtkCTHData::ComputeBounds()
 {
-  float bds[6];
-  float *origin;
-  float *spacing;
+  double bds[6];
+  double *origin;
+  double *spacing;
   int *dims;
   int blockId, numBlocks;
   
@@ -1229,13 +1229,13 @@ void vtkCTHData::ComputeBounds()
 // in the cell are specified with pcoords[3]. The function returns a 0 if the
 // point x is outside of the volume, and a 1 if inside the volume.
 int vtkCTHData::ComputeStructuredCoordinates(int blockId,
-                                             float x[3], int ijk[3], 
-                                             float pcoords[3])
+                                             double x[3], int ijk[3], 
+                                             double pcoords[3])
 {
   int i;
-  float d, floatLoc;
-  float *origin = this->GetBlockOrigin(blockId);
-  float *spacing = this->GetBlockSpacing(blockId);
+  double d, doubleLoc;
+  double *origin = this->GetBlockOrigin(blockId);
+  double *spacing = this->GetBlockSpacing(blockId);
   int *dims = this->GetBlockPointDimensions(blockId);
   
   //
@@ -1244,12 +1244,12 @@ int vtkCTHData::ComputeStructuredCoordinates(int blockId,
   for (i=0; i<3; i++) 
     {
     d = x[i] - origin[i];
-    floatLoc = d / spacing[i];
+    doubleLoc = d / spacing[i];
     // Floor for negtive indexes.
-    ijk[i] = (int) (floor(floatLoc));
+    ijk[i] = (int) (floor(doubleLoc));
     if ( ijk[i] >= 0 && ijk[i] < dims[i]-1 )
       {
-      pcoords[i] = floatLoc - (float)ijk[i];
+      pcoords[i] = doubleLoc - (double)ijk[i];
       }
 
     else if ( ijk[i] < 0 || ijk[i] >= dims[i] ) 
@@ -1284,8 +1284,8 @@ void vtkCTHData::PrintSelf(ostream& os, vtkIndent indent)
   // hack
   //int *dims = this->GetBlockPointDimensions(0);
   int numBlocks = this->GetNumberOfBlocks();
-  float* origin;
-  float* spacing;
+  double* origin;
+  double* spacing;
   int *e;    
 
   os << indent << "TopLevelSpacing: (" << this->TopLevelSpacing[0] << ", "

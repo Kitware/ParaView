@@ -333,16 +333,16 @@ private:
 
   int WhoHas(int pos);
   int _whoHas(int L, int R, int pos);
-  float *GetLocalVal(int pos);
-  float *GetLocalValNext(int pos);
-  void SetLocalVal(int pos, float *val);
+  double *GetLocalVal(int pos);
+  double *GetLocalValNext(int pos);
+  void SetLocalVal(int pos, double *val);
   void ExchangeVals(int pos1, int pos2);
   void ExchangeLocalVals(int pos1, int pos2);
 
-  float *PtArray;
-  float *PtArray2;
-  float *CurrentPtArray;
-  float *NextPtArray;
+  double *PtArray;
+  double *PtArray2;
+  double *CurrentPtArray;
+  double *NextPtArray;
   int PtArraySize;
 
   int *SelectBuffer;
@@ -351,17 +351,17 @@ private:
 
   int AllCheckForFailure(int rc, char *where, char *how);
   void AllCheckParameters();
-  float *VolumeBounds();
+  double *VolumeBounds();
   int DivideTest(int L, int R, int level);
   int DivideRegion(vtkKdNode *kd, int L, int level, int tag);
-  int BreadthFirstDivide(float *bounds);
+  int BreadthFirstDivide(double *bounds);
   void enQueueNode(vtkKdNode *kd, int L, int level, int tag);
 
   int Select(int dim, int L, int R);
   void _select(int L, int R, int K, int dim);
   void DoTransfer(int from, int to, int fromIndex, int toIndex, int count);
   int PartitionAboutMyValue(int L, int R, int K, int dim);
-  int PartitionAboutOtherValue(int L, int R, float T, int dim);
+  int PartitionAboutOtherValue(int L, int R, double T, int dim);
   int PartitionSubArray(int L, int R, int K, int dim, int p1, int p2);
 
   int CompleteTree();
@@ -372,13 +372,13 @@ private:
   void BroadcastData(vtkKdNode *kd);
 #endif
 
-  float *DataBounds(int L, int K, int R);
-  void GetLocalMinMax(int L, int R, int me, float *min, float *max);
+  double *DataBounds(int L, int K, int R);
+  void GetLocalMinMax(int L, int R, int me, double *min, double *max);
 
   static int FillOutTree(vtkKdNode *kd, int level);
   static int ComputeDepth(vtkKdNode *kd);
-  static void PackData(vtkKdNode *kd, float *data);
-  static void UnpackData(vtkKdNode *kd, float *data);
+  static void PackData(vtkKdNode *kd, double *data);
+  static void UnpackData(vtkKdNode *kd, double *data);
   static void CheckFixRegionBoundaries(vtkKdNode *tree);
 
   // list management

@@ -28,7 +28,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkMultiOut2, "1.1");
+vtkCxxRevisionMacro(vtkMultiOut2, "1.2");
 vtkStandardNewMacro(vtkMultiOut2);
 
 //------------------------------------------------------------------------------
@@ -83,7 +83,7 @@ void vtkMultiOut2::Execute()
   // Add an extra array (RTData) so we can contour.
   vtkFloatArray *rtArray = vtkFloatArray::New();
   int idx, num;
-  float *pt;
+  double *pt;
   num = pd->GetNumberOfPoints();
   for (idx = 0; idx < num; ++idx)
     {

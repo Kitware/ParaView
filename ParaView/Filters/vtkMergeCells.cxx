@@ -53,7 +53,7 @@
 #include <stdlib.h>
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkMergeCells, "1.5");
+vtkCxxRevisionMacro(vtkMergeCells, "1.6");
 vtkStandardNewMacro(vtkMergeCells);
 
 vtkCxxSetObjectMacro(vtkMergeCells, UnstructuredGrid, vtkUnstructuredGrid);
@@ -475,7 +475,7 @@ vtkIdType *vtkMergeCells::MapPointsToIds(vtkDataSet *set)
 
   for (vtkIdType oldId=0; oldId<npoints; oldId++)
     {
-    float *id = globalIds->GetTuple(oldId);
+    double *id = globalIds->GetTuple(oldId);
     vtkIdType globalId = (vtkIdType)*id;
 
     vtkstd::pair<vtkstd::map<vtkIdType, vtkIdType>::iterator, bool> inserted =

@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.43");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.44");
 
 //===========================================================================
 //***************************************************************************
@@ -338,7 +338,7 @@ void vtkPV3DWidget::ActualPlaceWidget()
   //  data = this->PVSource->GetPVInput()->GetPVPart()->GetVTKData();
   //  }
   //this->Widget3D->SetInput(data);
-  float bds[6];
+  double bds[6];
   this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
   vtkPVApplication *pvApp = this->GetPVApplication();
 

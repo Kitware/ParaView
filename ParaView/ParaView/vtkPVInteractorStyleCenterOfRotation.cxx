@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderModule.h"
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.7");
+vtkCxxRevisionMacro(vtkPVInteractorStyleCenterOfRotation, "1.8");
 vtkStandardNewMacro(vtkPVInteractorStyleCenterOfRotation);
 
 //-------------------------------------------------------------------------
@@ -90,7 +90,7 @@ void vtkPVInteractorStyleCenterOfRotation::Pick()
     return;
     }
   
-  float center[3];
+  double center[3];
   
   if ( ! this->Picker->GetRenderModule())
     {

@@ -103,7 +103,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.232");
+vtkCxxRevisionMacro(vtkPVData, "1.233");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1054,7 +1054,7 @@ void vtkPVData::UpdatePropertiesInternal()
 
   vtkPVDataInformation* dataInfo = source->GetDataInformation();
   char tmp[350], cmd[1024], defCmd[350];
-  float bounds[6];
+  double bounds[6];
   int i, numArrays, numComps;
   vtkPVDataSetAttributesInformation *attrInfo;
   vtkPVArrayInformation *arrayInfo;
@@ -1177,7 +1177,8 @@ void vtkPVData::UpdatePropertiesInternal()
   this->BoundsDisplay->SetBounds(bounds);
   if (this->CubeAxes)
     {
-    this->CubeAxes->SetBounds(bounds);
+    this->CubeAxes->SetBounds(bounds[0], bounds[1], bounds[2],
+                              bounds[3], bounds[4], bounds[5]);
     }
 
   currentColorBy = this->ColorMenu->GetValue();
@@ -1993,7 +1994,7 @@ void vtkPVData::SetAmbient(float ambient)
 void vtkPVData::Initialize()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  float bounds[6];
+  double bounds[6];
 
   vtkDebugMacro( << "Initialize --------")
   
@@ -2003,7 +2004,8 @@ void vtkPVData::Initialize()
   this->CubeAxes = vtkCubeAxesActor2D::New();
   this->CubeAxes->SetFlyModeToOuterEdges();
   this->CubeAxes->GetProperty()->SetColor(1,1,1);
-  this->CubeAxes->SetBounds(bounds);
+  this->CubeAxes->SetBounds(bounds[0], bounds[1], bounds[2], 
+                            bounds[3], bounds[4], bounds[5]);
   this->CubeAxes->SetCamera(ren->GetActiveCamera());
   this->CubeAxes->SetInertia(20);
 
@@ -2055,11 +2057,12 @@ void vtkPVData::CenterCamera()
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkRenderer* ren = pvApp->GetRenderModule()->GetRenderer();
 
-  float bounds[6];
+  double bounds[6];
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
   if (bounds[0]<=bounds[1] && bounds[2]<=bounds[3] && bounds[4]<=bounds[5])
     {
-    ren->ResetCamera(bounds);
+    ren->ResetCamera(bounds[0], bounds[1], bounds[2], 
+                     bounds[3], bounds[4], bounds[5]);
     ren->ResetCameraClippingRange();
     if ( this->GetPVRenderView() )
       {
@@ -3078,7 +3081,7 @@ void vtkPVData::ActorOriginEndCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::UpdateActorControlResolutions()
 {
-  float bounds[6];
+  double bounds[6];
   this->GetPVSource()->GetDataInformation()->GetBounds(bounds);
 
   float res, oneh, half;

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.10");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.11");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -63,8 +63,8 @@ vtkKWBoundsDisplay::vtkKWBoundsDisplay()
   this->YRangeLabel = vtkKWLabel::New();
   this->ZRangeLabel = vtkKWLabel::New();
 
-  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_LARGE_FLOAT;
-  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_LARGE_FLOAT;
+  this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = VTK_DOUBLE_MAX;
+  this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -VTK_DOUBLE_MAX;
   this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
   this->Extent[1] = this->Extent[3] = this->Extent[5] = 0;
 
@@ -116,7 +116,7 @@ void vtkKWBoundsDisplay::Create(vtkKWApplication *app,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWBoundsDisplay::SetBounds(float bounds[6])
+void vtkKWBoundsDisplay::SetBounds(double bounds[6])
 {
   int i;
 

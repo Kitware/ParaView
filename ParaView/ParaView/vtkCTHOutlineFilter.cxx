@@ -30,7 +30,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.2");
+vtkCxxRevisionMacro(vtkCTHOutlineFilter, "1.3");
 vtkStandardNewMacro(vtkCTHOutlineFilter);
 
 //----------------------------------------------------------------------------
@@ -50,9 +50,9 @@ void vtkCTHOutlineFilter::Execute()
   vtkCTHData* input = this->GetInput();
   vtkOutlineSource* outlineSource;
   vtkAppendPolyData *append = vtkAppendPolyData::New();  
-  float bounds[6];
-  float *origin;
-  float *spacing;
+  double bounds[6];
+  double *origin;
+  double *spacing;
   int *dimensions;
   int ghostLevels;
   

@@ -36,7 +36,7 @@
 #include <hdf5.h>
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.7");
+vtkCxxRevisionMacro(vtkHDF5RawImageReader, "1.8");
 vtkStandardNewMacro(vtkHDF5RawImageReader);
 
 //----------------------------------------------------------------------------
@@ -249,7 +249,7 @@ void vtkHDF5RawImageReader::ExecuteInformation()
   
   this->SetDataArraySelections(this->PointDataArraySelection);
   
-  float spacing[3] = {this->Stride[0], this->Stride[1], this->Stride[2]};
+  double spacing[3] = {this->Stride[0], this->Stride[1], this->Stride[2]};
   this->GetOutput()->SetWholeExtent(this->WholeExtent);
   this->GetOutput()->SetSpacing(spacing);
   this->InformationError = 0;

@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -140,7 +140,7 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
 void vtkPVImplicitPlaneWidget::CenterResetCallback()
 {
   vtkPVSource *input;
-  float bds[6];
+  double bds[6];
 
   if (this->PVSource == NULL)
     {
@@ -616,7 +616,7 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     vtkPVSource *input = this->PVSource->GetPVInput(0);
     if (input)
       {
-      float bds[6];
+      double bds[6];
       input->GetDataInformation()->GetBounds(bds);
       pm->GetStream() << vtkClientServerStream::Invoke << this->PlaneID << "SetOrigin"
                       << 0.5*(bds[0]+bds[1]) << 0.5*(bds[2]+bds[3]) << 0.5*(bds[4]+bds[5])
@@ -666,7 +666,7 @@ void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, voi
   vtkImplicitPlaneWidget *widget = vtkImplicitPlaneWidget::SafeDownCast(wdg);
   if ( widget )
     {
-    float val[3];
+    double val[3];
     widget->GetOrigin(val); 
     this->SetCenterInternal(val[0], val[1], val[2]);
     widget->GetNormal(val);
@@ -801,7 +801,7 @@ void vtkPVImplicitPlaneWidget::Update()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVSource *input;
-  float bds[6];
+  double bds[6];
 
   this->Superclass::Update();
 

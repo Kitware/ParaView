@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.325");
+vtkCxxRevisionMacro(vtkPVSource, "1.326");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1366,7 +1366,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // the camera when the first source is created.
     if (window->GetSourceList("Sources")->GetNumberOfItems() == 1)
       {
-      float bds[6];
+      double bds[6];
       this->GetDataInformation()->GetBounds(bds);
       if (bds[0] <= bds[1] && bds[2] <= bds[3] && bds[4] <= bds[5])
         {
@@ -1374,7 +1374,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
                                     0.5*(bds[2]+bds[3]),
                                     0.5*(bds[4]+bds[5]));
         window->ResetCenterCallback();
-        window->GetMainView()->GetRenderer()->ResetCamera(bds);
+        window->GetMainView()->GetRenderer()->ResetCamera(
+          bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
         }
       }
 

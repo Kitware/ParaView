@@ -32,7 +32,7 @@
 #include "vtkPointsProjectedHull.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.7");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.8");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -145,7 +145,7 @@ VTK_GETSIZECCWHULL(Z, 2);
 #define VTK_RECTANGLEINTERSECTION(which, dim) \
 int vtkPointsProjectedHull::rectangleIntersection##which(vtkPoints *R) \
 {                                                                      \
-  float bounds[6];                                             \
+  double bounds[6];                                            \
   R->Modified();                                               \
   R->GetBounds(bounds);                                        \
   double hmin, hmax, vmin, vmax;                               \

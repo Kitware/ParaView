@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.16");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -270,7 +270,7 @@ void vtkPVBoxWidget::UpdateVTKObject(const char*)
 void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 {
   *file << "vtkPlanes " << "pvTemp" << this->BoxID.ID << endl;
-  float bds[6];
+  double bds[6];
   *file << "vtkBoxWidget " << "pvTemp" << this->Widget3DID << endl;
   this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
   *file << "\t" << this->Widget3DID << " SetPlaceFactor 1.0" << endl;
@@ -383,7 +383,6 @@ void vtkPVBoxWidget::SetBalloonHelpString(const char *str)
 void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  static int instanceCount = 0;
 
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
       this->TraceNameState == vtkPVWidget::Default) )

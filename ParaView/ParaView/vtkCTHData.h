@@ -68,21 +68,21 @@ public:
   vtkIdType GetNumberOfPoints();
   vtkIdType GetNumberOfCellsPerBlock();
   vtkIdType GetNumberOfPointsPerBlock();
-  float *GetPoint(vtkIdType ptId);
-  void GetPoint(vtkIdType id, float x[3]);
+  double *GetPoint(vtkIdType ptId);
+  void GetPoint(vtkIdType id, double x[3]);
   vtkCell *GetCell(vtkIdType cellId);
   void GetCell(vtkIdType cellId, vtkGenericCell *cell);
-  void GetCellBounds(vtkIdType cellId, float bounds[6]);
-  vtkIdType FindPoint(float x, float y, float z) { return this->vtkDataSet::FindPoint(x, y, z);};
-  vtkIdType FindPoint(float x[3]);
-  vtkIdType FindCell(float x[3], vtkCell *cell, vtkIdType cellId, float tol2, 
-                     int& subId, float pcoords[3], float *weights);
-  vtkIdType FindCell(float x[3], vtkCell *cell, vtkGenericCell *gencell,
-                     vtkIdType cellId, float tol2, int& subId, 
-                     float pcoords[3], float *weights);
-  vtkCell *FindAndGetCell(float x[3], vtkCell *cell, vtkIdType cellId, 
-                          float tol2, int& subId, float pcoords[3],
-                          float *weights);
+  void GetCellBounds(vtkIdType cellId, double bounds[6]);
+  vtkIdType FindPoint(double x, double y, double z) { return this->vtkDataSet::FindPoint(x, y, z);};
+  vtkIdType FindPoint(double x[3]);
+  vtkIdType FindCell(double x[3], vtkCell *cell, vtkIdType cellId, double tol2, 
+                     int& subId, double pcoords[3], double *weights);
+  vtkIdType FindCell(double x[3], vtkCell *cell, vtkGenericCell *gencell,
+                     vtkIdType cellId, double tol2, int& subId, 
+                     double pcoords[3], double *weights);
+  vtkCell *FindAndGetCell(double x[3], vtkCell *cell, vtkIdType cellId, 
+                          double tol2, int& subId, double pcoords[3],
+                          double *weights);
   int GetCellType(vtkIdType cellId);
   void GetCellPoints(vtkIdType cellId, vtkIdList *ptIds);
   void GetPointCells(vtkIdType ptId, vtkIdList *cellIds);
@@ -92,17 +92,17 @@ public:
   // Dimensions:
   // Specify blocks relative to this top level block.
   // For now this has to be set before the blocks are defined.
-  vtkSetVector3Macro(TopLevelSpacing, float);
-  vtkGetVector3Macro(TopLevelSpacing, float);
-  vtkSetVector3Macro(TopLevelOrigin, float);
-  vtkGetVector3Macro(TopLevelOrigin, float);
+  vtkSetVector3Macro(TopLevelSpacing, double);
+  vtkGetVector3Macro(TopLevelSpacing, double);
+  vtkSetVector3Macro(TopLevelOrigin, double);
+  vtkGetVector3Macro(TopLevelOrigin, double);
 
   // Description:
   // Convenience function computes the structured coordinates for a point x[3].
   // The voxel is specified by the array ijk[3], and the parametric coordinates
   // in the cell are specified with pcoords[3]. The function returns a 0 if the
   // point x is outside of the volume, and a 1 if inside the volume.
-  int ComputeStructuredCoordinates(int blockId, float x[3], int ijk[3], float pcoords[3]);
+  int ComputeStructuredCoordinates(int blockId, double x[3], int ijk[3], double pcoords[3]);
   
   // Description:
   // Return the dimensionality of the data.
@@ -121,11 +121,11 @@ public:
   // Setting the number of blocks initializes the spacings and origins.
   void SetNumberOfBlocks(int num);
   int GetNumberOfBlocks();
-  float* GetBlockSpacing(int blockId);
+  double* GetBlockSpacing(int blockId);
 
   // I am going to get rid of this origin, because
   // all blocks now share the same origin.
-  float* GetBlockOrigin(int blockId);
+  double* GetBlockOrigin(int blockId);
 
   // Description:
   // Level is an integer value that specifies the number of refinements
@@ -156,7 +156,7 @@ public:
 
   // Description:
   // Convenience method that computes bounds from level and extent.
-  void CellExtentToBounds(int level, int* ext, float bds[6]);
+  void CellExtentToBounds(int level, int* ext, double bds[6]);
 
   // Description:
   // A way to add blocks if you do not know how many there will
@@ -197,8 +197,8 @@ protected:
   int DataDescription;
 
   // New method of specifing blocks.
-  float TopLevelSpacing[3];
-  float TopLevelOrigin[3];
+  double TopLevelSpacing[3];
+  double TopLevelOrigin[3];
 
   vtkIntArray* BlockCellExtents;
   vtkFloatArray* BlockOrigins;

@@ -64,8 +64,24 @@ public:
   // If the box is not parallel to axis, you need to especify  
   // normal vector of each plane and a point on the plane. 
   
-  void SetBoxClip(float xmin,float xmax,float ymin,float ymax,float zmin,float zmax);
-  void SetBoxClip(float *n0,float *o0,float *n1,float *o1,float *n2,float *o2,float *n3,float *o3,float *n4,float *o4,float *n5,float *o5);
+  void SetBoxClip(double xmin,
+                  double xmax,
+                  double ymin,
+                  double ymax,
+                  double zmin,
+                  double zmax);
+  void SetBoxClip(double *n0,
+                  double *o0,
+                  double *n1,
+                  double *o1,
+                  double *n2,
+                  double *o2,
+                  double *n3,
+                  double *o3,
+                  double *n4,
+                  double *o4,
+                  double *n5,
+                  double *o5);
   
 
   // Description:
@@ -81,8 +97,8 @@ public:
   // the vertices of cells. This tolerance is used to prevent the generation
   // of degenerate primitives. Note that only 3D cells actually use this
   // instance variable.
-  vtkSetClampMacro(MergeTolerance,float,0.0001,0.25);
-  vtkGetMacro(MergeTolerance,float);
+  vtkSetClampMacro(MergeTolerance,double,0.0001,0.25);
+  vtkGetMacro(MergeTolerance,double);
   
   // Description:
   // Return the Clipped output.
@@ -117,9 +133,16 @@ public:
   unsigned int GetOrientation()
           {return  Orientation;};
   void MinEdgeF(unsigned int *id_v, vtkIdType *cellIds,unsigned int *edgF );
-  void PyramidToTetra(vtkIdType *pyramId, vtkIdType *cellIds,vtkCellArray *newCellArray);
-  void WedgeToTetra(vtkIdType *wedgeId, vtkIdType *cellIds,vtkCellArray *newCellArray);
-  void TetraGrid(vtkIdType typeobj, vtkIdType npts, vtkIdType *cellIds,vtkCellArray *newCellArray);
+  void PyramidToTetra(vtkIdType *pyramId, 
+                      vtkIdType *cellIds,
+                      vtkCellArray *newCellArray);
+  void WedgeToTetra(vtkIdType *wedgeId, 
+                    vtkIdType *cellIds,
+                    vtkCellArray *newCellArray);
+  void TetraGrid(vtkIdType typeobj, 
+                 vtkIdType npts, 
+                 vtkIdType *cellIds,
+                 vtkCellArray *newCellArray);
   void CreateTetra(vtkIdType npts,vtkIdType *cellIds,vtkCellArray *newCellArray);
   void ClipBox(vtkPoints *newPoints,vtkGenericCell *cell, 
                vtkPointLocator *locator, vtkCellArray *tets,vtkPointData *inPD, 
@@ -139,15 +162,15 @@ protected:
   vtkPointLocator *Locator;
   int GenerateClipScalars;
 
-  float MergeTolerance;
+  double MergeTolerance;
 
   char *InputScalarsSelection;
   vtkSetStringMacro(InputScalarsSelection);
 
-  float    BoundBoxClip[3][2];
+  double    BoundBoxClip[3][2];
   unsigned int Orientation;
-  float    n_pl[6][3];
-  float    o_pl[6][3];
+  double    n_pl[6][3];
+  double    o_pl[6][3];
 
 private:
   vtkBoxClipDataSet(const vtkBoxClipDataSet&);  // Not implemented.
