@@ -52,7 +52,7 @@
 #ifndef __vtkContainer_h
 #define __vtkContainer_h
 
-class VTK_COMMON_EXPORT vtkContainer : public vtkObjectBase
+class VTK_EXPORT vtkContainer : public vtkObjectBase
 {
 public:
   // Description:
