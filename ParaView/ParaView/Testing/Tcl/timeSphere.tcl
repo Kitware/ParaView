@@ -1,5 +1,5 @@
-package require vtk
-package require vtkinteraction
+#package require vtk
+#package require vtkinteraction
 
 wm withdraw .
 

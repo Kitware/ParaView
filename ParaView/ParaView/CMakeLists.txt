@@ -6,6 +6,7 @@ SET( ParaViewShared_SRCS
   vtkPVGeometryFilter.cxx
   vtkPVLODActor.cxx
   vtkPVMPIProcessModule.cxx
+  vtkPVPolyDataMapper.cxx
   vtkPVProcessModule.cxx
   vtkPVTreeComposite.cxx
   vtkStringList.cxx
