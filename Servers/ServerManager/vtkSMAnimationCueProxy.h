@@ -28,7 +28,6 @@ class vtkAnimationCue;
 class vtkSMProperty;
 class vtkSMDomain;
 class vtkSMAnimationCueManipulatorProxy;
-struct vtkClientServerID;
 
 class VTK_EXPORT vtkSMAnimationCueProxy : public vtkSMProxy
 {
@@ -79,8 +78,9 @@ public:
   vtkSMDomain* GetAnimatedDomain();
 
   vtkGetObjectMacro(AnimationCue, vtkAnimationCue);
-
+//BTX
   vtkClientServerID GetID() { return this->SelfID; }
+//ETX
 protected:
   vtkSMAnimationCueProxy();
   ~vtkSMAnimationCueProxy();

@@ -56,8 +56,9 @@ public:
   // this key frame and the next key frame.
   virtual void UpdateValue(double currenttime,
     vtkSMAnimationCueProxy* cueProxy, vtkSMKeyFrameProxy* next);
-
+//BTX
   vtkClientServerID GetID() { return this->SelfID; }
+//ETX
 protected:
   vtkSMKeyFrameProxy();
   ~vtkSMKeyFrameProxy();

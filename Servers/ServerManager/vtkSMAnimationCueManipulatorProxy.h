@@ -30,8 +30,9 @@ class VTK_EXPORT vtkSMAnimationCueManipulatorProxy : public vtkSMProxy
 public:
   vtkTypeRevisionMacro(vtkSMAnimationCueManipulatorProxy, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
-
+//BTX
   vtkClientServerID GetID() {return this->SelfID;}
+//ETX
 
   virtual void SaveInBatchScript(ofstream* file);
 protected:
