@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.7");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.8");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3046,9 +3046,9 @@ void vtkPVWindow::UpdateFilterMenu()
                                      methodAndArgs.c_str(), 0,
                                      vi->second->GetShortHelp());
         }
-      if (
-        !vi->second->GetInputProperty(0)->GetIsValidInput(
-          this->CurrentPVSource, vi->second) )
+      if (!vi->second->GetInputProperty(0)->GetIsValidInput(
+            this->CurrentPVSource, vi->second) ||
+          !vi->second->GetNumberOfProcessorsValid())
         {
         this->FilterMenu->SetState(ki->first.c_str(), vtkKWMenu::Disabled);
         }

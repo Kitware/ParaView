@@ -34,7 +34,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.31");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.31.2.1");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -469,17 +469,11 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     {
     if (strcmp(multiprocess_support, "single_process") == 0)
       {
-      if ( pvApp->GetProcessModule()->GetNumberOfPartitions() > 1)
-        {
-        return 0;
-        }
+      pvm->SetVTKMultipleProcessFlag(0);
       }
     else if (strcmp(multiprocess_support, "multiple_processes") == 0)
       {
-      if ( pvApp->GetProcessModule()->GetNumberOfPartitions() == 1)
-        {
-        return 0;
-        }
+      pvm->SetVTKMultipleProcessFlag(1);
       }
     else if (strcmp(multiprocess_support, "both") != 0)
       {

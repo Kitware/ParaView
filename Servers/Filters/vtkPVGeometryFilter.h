@@ -83,7 +83,8 @@ protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
 
-  void Execute();
+  virtual void Execute();
+  virtual void ExecuteInformation();
   void DataSetExecute(vtkDataSet *input);
   void ImageDataExecute(vtkImageData *input);
   void StructuredGridExecute(vtkStructuredGrid *input);

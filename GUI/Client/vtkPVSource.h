@@ -360,6 +360,22 @@ public:
   vtkGetMacro(VTKMultipleInputsFlag, int);
 
   // Description:
+  // Option set by the xml filter input element "multiprocess_support".
+  // When 0 (xml: single_process), the VTK source only runs in a single
+  // process.
+  // If 1, (xml: multiple_processes), the VTK source only runs in parallel.
+  // If 2, (xml: both), the VTK source runs in either mode.
+  vtkSetMacro(VTKMultipleProcessFlag, int);
+  vtkGetMacro(VTKMultipleProcessFlag, int);
+  
+  // Description:
+  // Determine whether the single- or multi-process support for this filter
+  // matches the current state of ParaView.
+  // Returns 1 if this source can run with the current number of processors;
+  // if not, returns 0.
+  int GetNumberOfProcessorsValid();
+  
+  // Description:
   // Certain modules are not deletable (for example, glyph sources).
   // Such modules should be marked as such (IsPermanent = 1).
   vtkSetMacro(IsPermanent, int);
@@ -592,6 +608,8 @@ protected:
   int VTKMultipleInputsFlag;
   vtkCollection* InputProperties;
 
+  int VTKMultipleProcessFlag;
+  
   // Taking responsibility of saving inputs away from input menu.
   void SetInputsInBatchScript(ofstream *file);
 

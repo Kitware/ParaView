@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.348.2.2");
+vtkCxxRevisionMacro(vtkPVSource, "1.348.2.3");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -144,6 +144,8 @@ vtkPVSource::vtkPVSource()
   this->VTKMultipleInputsFlag = 0;
   this->InputProperties = vtkCollection::New();
 
+  this->VTKMultipleProcessFlag = 2;
+  
   this->IsPermanent = 0;
 
   this->HideDisplayPage = 0;
@@ -2182,6 +2184,38 @@ vtkPVRenderView* vtkPVSource::GetPVRenderView()
 }
 
 //----------------------------------------------------------------------------
+int vtkPVSource::GetNumberOfProcessorsValid()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if (!pvApp)
+    {
+    return 0;
+    }
+  int numProcs = pvApp->GetProcessModule()->GetNumberOfPartitions();
+  
+  switch (this->VTKMultipleProcessFlag)
+    {
+    case 0:
+      if (numProcs > 1)
+        {
+        return 0;
+        }
+      break;
+    case 1:
+      if (numProcs == 1)
+        {
+        return 0;
+        }
+      break;
+    case 2:
+      break;
+    default:
+      return 0;
+    }
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
 {
 
@@ -2492,6 +2526,8 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfParts: " << this->GetNumberOfParts() << endl;
 
   os << indent << "VTKMultipleInputsFlag: " << this->VTKMultipleInputsFlag << endl;
+  os << indent << "VTKMultipleProcessFlag: " << this->VTKMultipleProcessFlag
+     << endl;
   os << indent << "InputProperties: \n";
   vtkIndent i2 = indent.GetNextIndent();
   int num, idx;
@@ -2504,5 +2540,3 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << this->NumberOfOutputsInformation << endl;
   os << indent << "SourceGrabbed: " << (this->SourceGrabbed?"on":"off") << endl;
 }
-
-
