@@ -1,26 +1,20 @@
 PROJECT(KWCommon)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
+
 SET( KWCommon_SRCS
 vtkKWIcon.cxx
 vtkKWProcessStatistics.cxx
+vtkContainer.cxx
+vtkKWDirectoryUtilities.cxx
 vtkKWRegisteryUtilities.cxx
 vtkKWSerializer.cxx
-vtkKWDirectoryUtilities.cxx
 vtkQueue.cxx
 vtkString.cxx
-vtkContainer.cxx
-vtkXMLCameraReader.cxx
-vtkXMLCameraWriter.cxx
-vtkXMLPropertyReader.cxx
-vtkXMLPropertyWriter.cxx
-vtkXMLStack.cxx
-vtkXMLTextPropertyReader.cxx
-vtkXMLTextPropertyWriter.cxx
 )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkQueue
   vtkContainer
+  vtkQueue
   WRAP_EXCLUDE
   )
 
@@ -67,7 +61,7 @@ IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
 
-SUBDIRS(Utilities)
+SUBDIRS(XML Utilities)
 
 OPTION(USE_NOTEBOOK_ICONS "Display Notebook with icons." OFF)
 MARK_AS_ADVANCED(USE_NOTEBOOK_ICONS)
