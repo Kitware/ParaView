@@ -50,6 +50,11 @@ public:
   // Overwrite UpdateData so that it will not propagate update.
   void UpdateData(vtkDataObject *output);
 
+  // Description:
+  // Set number of pieces and piece on the data.
+  virtual void SetUpdateNumberOfPieces(int);
+  virtual void SetUpdatePiece(int);
+
 protected:
   vtkPVUpdateSupressor();
   ~vtkPVUpdateSupressor();

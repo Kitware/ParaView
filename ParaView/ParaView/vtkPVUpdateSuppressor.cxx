@@ -20,7 +20,7 @@
 #include "vtkCommand.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSupressor, "1.1");
+vtkCxxRevisionMacro(vtkPVUpdateSupressor, "1.2");
 vtkStandardNewMacro(vtkPVUpdateSupressor);
 
 //----------------------------------------------------------------------------
@@ -49,6 +49,7 @@ void vtkPVUpdateSupressor::ForceUpdate()
    vtkPolyData *input = this->GetInput();
    if ( input )
      {
+     //cout << "Do update on: " << input << endl;
      input->Update();
      }
 }
@@ -73,6 +74,7 @@ void vtkPVUpdateSupressor::UpdateData(vtkDataObject *output)
     {
     if (this->Inputs[0] != NULL)
       {
+      // Do not update input
       //this->Inputs[0]->UpdateData();
       }
     }
@@ -85,6 +87,7 @@ void vtkPVUpdateSupressor::UpdateData(vtkDataObject *output)
       if (this->SortedInputs[idx] != NULL)
         {
         this->SortedInputs[idx]->PropagateUpdateExtent();
+	// Do not update input
         //this->SortedInputs[idx]->UpdateData();
         }
       }
@@ -175,6 +178,26 @@ void vtkPVUpdateSupressor::Execute()
     return;
     }  
   output->ShallowCopy(input);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVUpdateSupressor::SetUpdateNumberOfPieces(int p)
+{
+  vtkPolyData *input = this->GetInput();
+  if ( input )
+    {
+    input->SetUpdateNumberOfPieces(p);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVUpdateSupressor::SetUpdatePiece(int p)
+{
+  vtkPolyData *input = this->GetInput();
+  if ( input )
+    {
+    input->SetUpdatePiece(p);
+    }
 }
 
 //----------------------------------------------------------------------------
