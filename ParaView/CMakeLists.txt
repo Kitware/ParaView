@@ -81,6 +81,7 @@ IF (PARAVIEW_CAN_BUILD)
 
  SUBDIRS(Widgets Utilities/Expat ParaView Demos)
  SUBDIR_DEPENDS(ParaView Widgets Utilities/Expat)
+ SUBDIRS(Config)
 
  OPTION(BUILD_SHARED_LIBS "Build ParaView with shared libraries." OFF)
  OPTION(BUILD_EXAMPLES "Build VTK examples." OFF)

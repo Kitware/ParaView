@@ -117,3 +117,8 @@ INCLUDE (${PARAVIEW_BINARY_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
 INCLUDE (${PARAVIEW_SOURCE_DIR}/ParaView/LocalUserOptions.cmake OPTIONAL)
 
 
+INSTALL_TARGETS(/lib vtkKWParaViewTCL)
+INSTALL_TARGETS(/bin ParaView)
+
+INSTALL_FILES(/share/ParaView/Data .bin data/Data/combq data/Data/combxyz)
+INSTALL_FILES(/share/ParaView/Data .vtk data/Data/blow)
