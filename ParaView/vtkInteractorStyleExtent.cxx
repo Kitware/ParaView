@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCellPicker.h"
 #include "vtkSphereSource.h"
 #include "vtkObjectFactory.h"
+#include "vtkCommand.h"
 
 //----------------------------------------------------------------------------
 vtkInteractorStyleExtent* vtkInteractorStyleExtent::New()
@@ -796,9 +797,9 @@ void vtkInteractorStyleExtent::OnMiddleButtonDown(int ctrl, int shift,
   this->UpdateInternalState(ctrl, shift, X, Y);
   //
   this->FindPokedCamera(X, Y);
-  if (this->MiddleButtonPressMethod) 
+  if (this->HasObserver(vtkCommand::MiddleButtonPressEvent)) 
     {
-    (*this->MiddleButtonPressMethod)(this->MiddleButtonPressMethodArg);
+    this->InvokeEvent(vtkCommand::MiddleButtonPressEvent,NULL);
     }
   else 
     {
@@ -812,9 +813,9 @@ void vtkInteractorStyleExtent::OnMiddleButtonUp(int ctrl, int shift,
   //
   this->UpdateInternalState(ctrl, shift, X, Y);
   //
-  if (this->MiddleButtonReleaseMethod) 
+  if (this->HasObserver(vtkCommand::MiddleButtonReleaseEvent)) 
     {
-    (*this->MiddleButtonReleaseMethod)(this->MiddleButtonReleaseMethodArg);
+    this->InvokeEvent(vtkCommand::MiddleButtonReleaseEvent,NULL);
     }
   else 
     {
@@ -829,9 +830,9 @@ void vtkInteractorStyleExtent::OnRightButtonDown(int ctrl, int shift,
   this->UpdateInternalState(ctrl, shift, X, Y);
   //
   this->FindPokedCamera(X, Y);
-  if (this->RightButtonPressMethod) 
+  if (this->HasObserver(vtkCommand::RightButtonPressEvent)) 
     {
-    (*this->RightButtonPressMethod)(this->RightButtonPressMethodArg);
+    this->InvokeEvent(vtkCommand::RightButtonPressEvent,NULL);
     }
   else 
     {
@@ -845,9 +846,9 @@ void vtkInteractorStyleExtent::OnRightButtonUp(int ctrl, int shift, int X,
   //
   this->UpdateInternalState(ctrl, shift, X, Y);
   //
-  if (this->RightButtonReleaseMethod) 
+  if (this->HasObserver(vtkCommand::RightButtonReleaseEvent)) 
     {
-    (*this->RightButtonReleaseMethod)(this->RightButtonReleaseMethodArg);
+    this->InvokeEvent(vtkCommand::RightButtonReleaseEvent,NULL);
     }
   else 
     {
