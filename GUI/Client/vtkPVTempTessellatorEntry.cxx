@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.2");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.3");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -349,7 +349,8 @@ void vtkPVTempTessellatorEntry::PointDataSelectedCallback()
     }
 }
 
-void vtkPVTempTessellatorEntry::AddAnimationScriptsToMenu( vtkKWMenu* menu, vtkPVAnimationInterfaceEntry* ai )
+void vtkPVTempTessellatorEntry::AddAnimationScriptsToMenu( 
+  vtkKWMenu* , vtkPVAnimationInterfaceEntry* )
 {
 }
 
