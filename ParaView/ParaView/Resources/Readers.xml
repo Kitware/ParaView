@@ -327,7 +327,6 @@
          extensions=".e .ex2 .exo .gen .0 .00 .000" 
          file_description="Exodus">
   <Source class="vtkPExodusReader"/>
-  <ArraySelection trace_name="block_sel" attribute_name="Block"/>
   <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
   <ArraySelection trace_name="cell_array_sel" attribute_name="Point" />
   <StringEntry variable="FilePrefix" extension="*" label="File prefix" 
