@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.39");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.40");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -449,22 +449,21 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     vtkErrorMacro("VTKReader has not been set.");
     }
 
-  int firstOff = 1;
-  
   this->SetLocalSelectionsFromReader();
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
 
   int numElems=0;
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
-    if(!this->Selection->ArrayIsEnabled(check->GetText()))
-      {
-      numElems++;
-      }
+    numElems++;
     }
   if (numElems > 0)
     {
+    // Need to update information before setting array selections.
+    *file << "  " 
+          << "$pvTemp" << this->VTKReaderID << " UpdateVTKObjects\n";
+    *file << "  " 
+          << "$pvTemp" << this->VTKReaderID << " UpdateInformation\n";
     *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
           << this->AttributeName << "ArrayStatus ] SetNumberOfElements " 
           << 2*numElems << endl;
@@ -474,23 +473,25 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     {
     vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
     // Since they default to on.
-    if(!this->Selection->ArrayIsEnabled(check->GetText()))
+    if(this->Selection->ArrayIsEnabled(check->GetText()))
       {
-      if (firstOff)
-        {
-        // Need to update information before setting array selections.
-        *file << "  " 
-              << "$pvTemp" << this->VTKReaderID << " UpdateInformation\n";
-        firstOff = 0;
-        }
+      *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
+            << this->AttributeName << "ArrayStatus ] SetElement " 
+            << 2*numElems << " {" << check->GetText() << "}" << endl;
+      *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
+            << this->AttributeName << "ArrayStatus ] SetElement " 
+            << 2*numElems+1 << " " << 1 << endl;
+      }
+    else
+      {
       *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
             << this->AttributeName << "ArrayStatus ] SetElement " 
             << 2*numElems << " {" << check->GetText() << "}" << endl;
       *file << "  [$pvTemp" << this->VTKReaderID << " GetProperty "
             << this->AttributeName << "ArrayStatus ] SetElement " 
             << 2*numElems+1 << " " << 0 << endl;
-      numElems++;
       }
+    numElems++;
     }
    it->Delete();
 }
