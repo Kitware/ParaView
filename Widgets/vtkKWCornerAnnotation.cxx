@@ -91,7 +91,10 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 
 vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
 {
-  this->Application->GetEventNotifier()->RemoveCallbacks(this);
+  if (this->Application)
+    {
+    this->Application->GetEventNotifier()->RemoveCallbacks(this);
+    }
   this->SetMasterCornerAnnotation(NULL);
   
   this->CornerDisplayFrame->Delete();
@@ -386,6 +389,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.10 $");
+  this->ExtractRevision(os,"$Revision: 1.11 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
