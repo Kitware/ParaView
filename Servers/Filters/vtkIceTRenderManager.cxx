@@ -48,7 +48,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.18");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.19");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -654,7 +654,6 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
 void vtkIceTRenderManager::PreRenderProcessing()
 {
   vtkDebugMacro("PreRenderProcessing");
-  vtkCamera* cam;
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkRendererCollection *rens = renWin->GetRenderers();
   vtkRenderer* ren;
