@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSaveImageDialog );
-vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.18");
+vtkCxxRevisionMacro(vtkKWSaveImageDialog, "1.19");
 
 
 
@@ -77,10 +77,6 @@ void vtkKWSaveImageDialog::Invoke()
     this->Script(command.str());
     command.rdbuf()->freeze(0);
     
-    if (path)
-      {
-      free(path);
-      }
     path =  
       strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
              this->Application->GetMainInterp()->result);
@@ -120,7 +116,7 @@ void vtkKWSaveImageDialog::Invoke()
     {
     this->SetFileName(NULL);
     }
-  free(path);
+  delete[] path;
   this->Application->SetDialogUp(0);
 }
 
