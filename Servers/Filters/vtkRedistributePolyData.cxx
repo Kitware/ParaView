@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.3");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.4");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -76,8 +76,11 @@ void vtkRedistributePolyData::Execute()
   timerInfo8.timer->StartTimer();
 #endif
 
-  vtkPolyData *input = this->GetInput();
+  vtkPolyData *tmp = this->GetInput();
   vtkPolyData *output = this->GetOutput();
+  vtkPolyData* input = vtkPolyData::New();
+  input->ShallowCopy(input);
+  this->CompleteInputArrays(input);
 
   int myId;
   if (!this->Controller)
@@ -88,6 +91,7 @@ void vtkRedistributePolyData::Execute()
   if (!this->Controller)
     {
     vtkErrorMacro("need controller to redistribute cells");
+    input->Delete();
     return;
     }
   myId = this->Controller->GetLocalProcessId();
@@ -245,7 +249,7 @@ void vtkRedistributePolyData::Execute()
 
     if (sendArrayInfo) 
       {
-      this->SendCompleteArrays(sendTo[i]);
+      //this->SendCompleteArrays(sendTo[i]);
       }
   }
 
@@ -254,7 +258,7 @@ void vtkRedistributePolyData::Execute()
 
   if (cntRec>0 && getArrayInfo) 
     {
-    this->CompleteArrays(recFrom[0]);
+    //this->CompleteArrays(recFrom[0]);
     }
 
 
@@ -611,6 +615,10 @@ void vtkRedistributePolyData::Execute()
     
     if (scntr>=cntSend && rcntr>=cntRec) { finished = 1;}
     }
+
+  input->Delete();
+  input = NULL;
+
 //eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 
 #if VTK_REDIST_DO_TIMING
@@ -2652,11 +2660,82 @@ void vtkRedistributePolyData::ReceiveArrays
     }
 }
 
+
+
 //--------------------------------------------------------------------
-void vtkRedistributePolyData::CompleteArrays(int recFrom)
+// I am using no points as the indicator that arrays need completetion.
+// It is possible that no cells could also cause trouble.
+void vtkRedistributePolyData::CompleteInputArrays(vtkPolyData* input)
+{
+  if (this->Controller == NULL)
+    {
+    vtkErrorMacro("Missing controller.");
+    return;
+    }
+  int myId = this->Controller->GetLocalProcessId();
+  int numProc = this->Controller->GetNumberOfProcesses();
+  int* msg = new int[numProcs];
+  int numPts = input->GetNumberOfPoints();
+  int idx;
+  if (myId > 0)
+    {
+    // First send the number of points to process zero.
+    this->Controller->Send(&numPts, 1, 0, 87873);
+    // Just a broadcast.  Receive num points from all procs.
+    this->Controller->Receive(msg, numProcs, 0, 87874);
+    }
+  else
+    {
+    msg[0] = numPts; 
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Receive(&numPts, 1, idx, 87873);
+      msg[idx] = numPts;
+      }
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Send(msg, numProcs, idx, 87874);
+      }
+    }
+
+  // Who is sending?
+  int sendProc = -1;
+  for (idx = 0; idx < numProcs; ++idx)
+    {
+    if (msg[idx] > 0)
+      {
+      sendProc = idx;
+      }
+    }
+  if (sendProc == -1)
+    { // No proc has data.
+    delete [] msg;
+    return;
+    }
+  if (myId == sendProc)
+    {
+    for (idx = 0; idx < numProcs; ++idx)
+      {
+      if (msg[idx] == 0)
+        {
+        this->SendInputArrays(input->GetPointData(), idx);
+        this->SendInputArrays(input->GetCellData(), idx);
+        }
+      }
+    }
+
+  if (msg[myId] == 0)
+    {
+    this->ReceiveInputArrays(input->GetPointData(), sendProc);
+    this->ReceiveInputArrays(input->GetCellData(), sendProc);
+    }
+}
+
+//--------------------------------------------------------------------
+void vtkRedistributePolyData::ReceiveInputArrays(vtkAttributeData* attr,
+                                                 int recFrom)
 {
   int j;
-
   int num = 0;
   vtkDataArray *array = 0;
   char *name;
@@ -2667,10 +2746,7 @@ void vtkRedistributePolyData::CompleteArrays(int recFrom)
   int attributeType = 0;
   int copyFlag = 0;
 
-  vtkPolyData* output = this->GetOutput();
-
-
-  // First Point data.
+  attr->Initialize();
 
   this->Controller->Receive(&num, 1, recFrom, 997244);
   for (j = 0; j < num; ++j)
@@ -2717,87 +2793,23 @@ void vtkRedistributePolyData::CompleteArrays(int recFrom)
     array->SetName(name);
     delete [] name;
 
-    index = output->GetPointData()->AddArray(array);
+    index = attr->AddArray(array);
 
     this->Controller->Receive(&attributeType, 1, recFrom, 997249);
     this->Controller->Receive(&copyFlag, 1, recFrom, 997250);
 
     if (attributeType != -1 && copyFlag)
       {
-      output->GetPointData()->
-        SetActiveAttribute(index, attributeType);
+      attr->SetActiveAttribute(index, attributeType);
       }
 
     array->Delete();
-    } // end of loop over point arrays.
-
-
-  // Next Cell data.
-
-  this->Controller->Receive(&num, 1, recFrom, 997244);
-  for (j = 0; j < num; ++j)
-  {
-    this->Controller->Receive(&type, 1, recFrom, 997245);
-    switch (type)
-      {
-      case VTK_INT:
-        array = vtkIntArray::New();
-        break;
-      case VTK_FLOAT:
-        array = vtkFloatArray::New();
-        break;
-      case VTK_DOUBLE:
-        array = vtkDoubleArray::New();
-        break;
-      case VTK_CHAR:
-        array = vtkCharArray::New();
-        break;
-      case VTK_LONG:
-        array = vtkLongArray::New();
-        break;
-      case VTK_SHORT:
-        array = vtkShortArray::New();
-        break;
-      case VTK_UNSIGNED_CHAR:
-        array = vtkUnsignedCharArray::New();
-        break;
-      case VTK_UNSIGNED_INT:
-        array = vtkUnsignedIntArray::New();
-        break;
-      case VTK_UNSIGNED_LONG:
-        array = vtkUnsignedLongArray::New();
-        break;
-      case VTK_UNSIGNED_SHORT:
-        array = vtkUnsignedShortArray::New();
-        break;
-      }
-    this->Controller->Receive(&numComps, 1, recFrom, 997246);
-    array->SetNumberOfComponents(numComps);
-    this->Controller->Receive(&nameLength, 1, recFrom, 997247);
-    name = new char[nameLength];
-    this->Controller->Receive(name, nameLength, recFrom, 997248);
-    array->SetName(name);
-    delete [] name;
-    index = output->GetCellData()->AddArray(array);
-
-    this->Controller->Receive(&attributeType, 1, recFrom, 997249);
-    this->Controller->Receive(&copyFlag, 1, recFrom, 997250);
-
-    if (attributeType != -1 && copyFlag)
-      {
-      output->GetCellData()->
-        SetActiveAttribute(index, attributeType);
-      }
-
-    array->Delete();
-  } // end of loop over cell arrays.
-  
+    } // end of loop over arrays.  
 }
 
-
-
 //-----------------------------------------------------------------------
-void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
+void vtkRedistributePolyData::SendInputArrays(vtkAttributeData* attr,
+                                              int sendTo)
 {
   int num;
   int i;
@@ -2809,14 +2821,11 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
   int attributeType; 
   int copyFlag;
 
-  vtkPolyData* input = this->GetInput();
-
-  // First point data.
-  num = input->GetPointData()->GetNumberOfArrays();
+  num = attr->GetNumberOfArrays();
   this->Controller->Send(&num, 1, sendTo, 997244);
   for (i = 0; i < num; ++i)
     {
-    array = input->GetPointData()->GetArray(i);
+    array = attr->GetArray(i);
     type = array->GetDataType();
 
     this->Controller->Send(&type, 1, sendTo, 997245);
@@ -2834,7 +2843,7 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
     this->Controller->Send(const_cast<char*>(name), nameLength, 
                            sendTo, 997248);
 
-    attributeType = input->GetPointData()->IsArrayAnAttribute(i);
+    attributeType = attr->IsArrayAnAttribute(i);
     copyFlag = -1;
     if (attributeType != -1) 
       {
@@ -2844,83 +2853,23 @@ void vtkRedistributePolyData::SendCompleteArrays (int sendTo)
       switch (attributeType)
         {
         case vtkDataSetAttributes::SCALARS:
-          copyFlag = input->GetPointData()->GetCopyScalars();
+          copyFlag = attr->GetCopyScalars();
           break;
 
         case vtkDataSetAttributes::VECTORS: 
-          copyFlag = input->GetPointData()->GetCopyVectors(); 
+          copyFlag = attr->GetCopyVectors(); 
           break;
 
         case vtkDataSetAttributes::NORMALS:
-          copyFlag = input->GetPointData()->GetCopyNormals();
+          copyFlag = attr->GetCopyNormals();
           break;
 
         case vtkDataSetAttributes::TCOORDS:
-          copyFlag = input->GetPointData()->GetCopyTCoords();
+          copyFlag = attr->GetCopyTCoords();
           break;
 
         case vtkDataSetAttributes::TENSORS:
-          copyFlag = input->GetPointData()->GetCopyTensors();
-          break;
-
-        default:
-          copyFlag = 0;
-
-        }
-      }
-    this->Controller->Send(&attributeType, 1, sendTo, 997249);
-    this->Controller->Send(&copyFlag, 1, sendTo, 997250);
-
-    }
-
-  // Next cell data.
-  num = input->GetCellData()->GetNumberOfArrays();
-  this->Controller->Send(&num, 1, sendTo, 997244);
-  for (i = 0; i < num; ++i)
-    {
-    array = input->GetCellData()->GetArray(i);
-    type = array->GetDataType();
-
-    this->Controller->Send(&type, 1, sendTo, 997245);
-    numComps = array->GetNumberOfComponents();
-
-    this->Controller->Send(&numComps, 1, sendTo, 997246);
-    name = array->GetName();
-    if (name == NULL)
-      {
-      name = "";
-      }
-    nameLength = (int)strlen(name+1);
-    this->Controller->Send(&nameLength, 1, sendTo, 997247);
-    this->Controller->Send(const_cast<char*>(name), nameLength, 
-                           sendTo, 997248);
-    attributeType = input->GetCellData()->IsArrayAnAttribute(i);
-    copyFlag = -1;
-    if (attributeType != -1) 
-      {
-      // ... Note: this would be much simpler if there was a 
-      //    GetCopyAttributeFlag function or if the variable 
-      //    wasn't protected. ...
-      switch (attributeType)
-        {
-        case vtkDataSetAttributes::SCALARS:
-          copyFlag = input->GetCellData()->GetCopyScalars();
-          break;
-
-        case vtkDataSetAttributes::VECTORS: 
-          copyFlag = input->GetCellData()->GetCopyVectors(); 
-          break;
-
-        case vtkDataSetAttributes::NORMALS:
-          copyFlag = input->GetCellData()->GetCopyNormals();
-          break;
-
-        case vtkDataSetAttributes::TCOORDS:
-          copyFlag = input->GetCellData()->GetCopyTCoords();
-          break;
-
-        case vtkDataSetAttributes::TENSORS:
-          copyFlag = input->GetCellData()->GetCopyTensors();
+          copyFlag = attr->GetCopyTensors();
           break;
 
         default:
