@@ -41,11 +41,34 @@ $kw(vtkTemp187) SetTimeEnd 200.000000
 puts $TempDir/AnimationImages
 $kw(vtkTemp164) SaveImages "$TempDir/AnimationImages" {png} 300 300
 
+set didRegression 0
+
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
 	$Application SetExitStatus [ComparePNG "$TempDir/AnimationImages0001"]
+        set didRegression 1
     }
+}
+
+if { ! $didRegression } {
+    set colorMaps [[$Application GetMainWindow] GetPVColorMaps]
+    $colorMaps InitTraversal
+    while { 1 } {
+        set colorMap [$colorMaps GetNextItemAsObject]
+        if { $colorMap == {} } {
+            break
+        }
+        $colorMap SetScalarBarVisibility 0
+    }
+   for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+      if {[lindex $argv $i] == "-BT"} {
+         source [lindex $argv [expr $i + 1]]
+         file delete "$TempDir/AnimationImagesbatch00000.png"
+         file delete "$TempDir/AnimationImagesbatch00001.png"
+         file delete "$TempDir/AnimationImagesbatch00002.png"
+      }
+   }
 }
 
 file delete "$TempDir/AnimationImages0000.png"

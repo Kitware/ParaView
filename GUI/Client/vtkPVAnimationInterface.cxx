@@ -184,7 +184,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.141");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.142");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1809,17 +1809,20 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         }
       else
         {
-        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
-        if (prop)
+        vtkSMDomain *dom = entry->GetCurrentSMDomain();
+        if (dom)
           {
           this->Script(entry->GetTimeEquation());
-          prop->SetAnimationTimeInBatch(
-            file, vtkKWObject::GetFloatResult(pvApp));
+          dom->SetAnimationValueInBatch(
+            file, entry->GetCurrentSMProperty(),
+            entry->GetPVSource()->GetVTKSourceID(0),
+            entry->GetAnimationElement(),
+            vtkKWObject::GetFloatResult(pvApp));
           }
         }
       }
 
-    *file << "$Ren1 UpdateVTKObjects" << endl;
+    *file << "  $Ren1 UpdateVTKObjects" << endl;
     
     if (imageFileName)
       {
@@ -1840,7 +1843,7 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
         {
         *ext = '\0';
         ++ext;
-        *file << "$Ren1 WriteImage {" << root << countStr
+        *file << "  $Ren1 WriteImage {" << root << countStr
               << "." << ext << "} " << writerName << "\n";
          }
        else

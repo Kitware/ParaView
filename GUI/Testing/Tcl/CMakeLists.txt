@@ -274,6 +274,21 @@ ADD_TEST (AnimationImages-ParaView
   -V ${PVClientTestData}/Baseline/AnimationImages.png
   )
 
+# Test animation in batch.
+ADD_TEST(AnimationImages-batch-ParaView
+  ${PARAVIEW_EXECUTABLE}
+  ${TIMEOUT}
+  ${PARAVIEW_MPI_RUN_ONE}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
+  -D ${PVClientTestData}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
+  -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
+  -B ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch
+  -V ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch.png
+  )
+
 ADD_TEST(VolumeRenderVox8-ParaView 
   ${PARAVIEW_EXECUTABLE} 
   ${TIMEOUT}

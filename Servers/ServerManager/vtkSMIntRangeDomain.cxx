@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.10");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.11");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -328,6 +328,22 @@ void vtkSMIntRangeDomain::SetAnimationValue(vtkSMProperty *property, int idx,
     {
     ivp->SetElement(idx, (int)(floor(value)));
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntRangeDomain::SetAnimationValueInBatch(
+  ofstream *file, vtkSMProperty *property, vtkClientServerID sourceID,
+  int idx, double value)
+{
+  if (!file || !property || !sourceID.ID)
+    {
+    return;
+    }
+
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
+        << property->GetXMLName() << "] SetElement " << idx << " "
+        << (int)(floor(value)) << endl;
+  *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
 }
 
 //---------------------------------------------------------------------------

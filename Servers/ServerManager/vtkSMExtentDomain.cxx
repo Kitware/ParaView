@@ -21,7 +21,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMExtentDomain);
-vtkCxxRevisionMacro(vtkSMExtentDomain, "1.2");
+vtkCxxRevisionMacro(vtkSMExtentDomain, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMExtentDomain::vtkSMExtentDomain()
@@ -112,6 +112,57 @@ void vtkSMExtentDomain::SetAnimationValue(vtkSMProperty *property, int idx,
         break;
       }
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMExtentDomain::SetAnimationValueInBatch(
+  ofstream *file, vtkSMProperty *property, vtkClientServerID sourceID,
+  int idx, double value)
+{
+  if (!file || !property || !sourceID.ID)
+    {
+    return;
+    }
+  
+  vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(property);
+  if (!ivp)
+    {
+    return;
+    }
+  
+  int animValue = (int)(floor(value));
+  int compare;
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
+        << property->GetXMLName() << "] SetElement " << idx << " "
+        << animValue << endl;
+  
+  switch (idx)
+    {
+    case 0:
+    case 2:
+    case 4:
+      compare = ivp->GetElement(idx+1);
+      if (animValue > compare)
+        {
+        *file << "  [$pvTemp" << sourceID << " GetProperty "
+              << property->GetXMLName() << "] SetElement " << idx+1 << " "
+              << animValue << endl;
+        }
+      break;
+    case 1:
+    case 3:
+    case 5:
+      compare = ivp->GetElement(idx-1);
+      if (animValue < compare)
+        {
+        *file << "  [$pvTemp" << sourceID << " GetProperty "
+              << property->GetXMLName() << "] SetElement " << idx-1 << " "
+              << animValue << endl;
+        }
+      break;
+    }
+  
+  *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
 }
 
 //---------------------------------------------------------------------------

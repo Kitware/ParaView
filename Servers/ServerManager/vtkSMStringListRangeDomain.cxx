@@ -22,7 +22,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMStringListRangeDomain);
-vtkCxxRevisionMacro(vtkSMStringListRangeDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMStringListRangeDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMStringListRangeDomain::vtkSMStringListRangeDomain()
@@ -257,6 +257,24 @@ void vtkSMStringListRangeDomain::SetAnimationValue(
     sprintf(val, "%d", static_cast<int>(floor(value)));
     svp->SetElement(2*idx+1, val);
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringListRangeDomain::SetAnimationValueInBatch(
+  ofstream *file, vtkSMProperty *property, vtkClientServerID sourceID,
+  int idx, double value)
+{
+  if (!file || !property || !sourceID.ID)
+    {
+    return;
+    }
+  
+  char val[128];
+  sprintf(val, "%d", static_cast<int>(floor(value)));
+  *file << "  [$pvTemp" << sourceID << " GetProperty "
+        << property->GetXMLName() << "] SetElement " << 2*idx+1 << " " << val
+        << endl;
+  *file << "  $pvTemp" << sourceID << " UpdateVTKObjects" << endl;
 }
 
 //---------------------------------------------------------------------------

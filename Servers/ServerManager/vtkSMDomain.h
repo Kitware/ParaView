@@ -27,6 +27,7 @@
 #define __vtkSMDomain_h
 
 #include "vtkSMObject.h"
+#include "vtkClientServerID.h" // needed for saving animation in batch script
 
 class vtkSMProperty;
 class vtkPVXMLElement;
@@ -53,6 +54,13 @@ public:
   // Description:
   // Set the value of an element of a property from the animation editor.
   virtual void SetAnimationValue(vtkSMProperty*, int, double) {}
+
+  // Description:
+  // Set the value of an element of a property from the animation editor in
+  // a batch script.
+  virtual void SetAnimationValueInBatch(ofstream*, vtkSMProperty*,
+                                        vtkClientServerID,
+                                        int, double) {}
 
   // Description:
   // Assigned by the XML parser. The name assigned in the XML

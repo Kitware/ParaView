@@ -110,6 +110,14 @@ public:
   virtual void SetAnimationValue(vtkSMProperty *property, int idx,
                                  double value);
 
+  // Description:
+  // Set the value of an element of a property from the animation editor in
+  // a batch script.
+  virtual void SetAnimationValueInBatch(ofstream *file,
+                                        vtkSMProperty *property,
+                                        vtkClientServerID sourceID,
+                                        int idx, double value);
+
 protected:
   vtkSMIntRangeDomain();
   ~vtkSMIntRangeDomain();
