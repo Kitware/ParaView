@@ -26,7 +26,7 @@
 #include "vtkSMProxyInternals.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMProxy, "1.11");
 
 //---------------------------------------------------------------------------
 // Observer for modified event of the property
@@ -489,9 +489,6 @@ void vtkSMProxy::SetPropertyModifiedFlag(const char* name, int flag)
 //---------------------------------------------------------------------------
 void vtkSMProxy::UpdateVTKObjects()
 {
-  this->CreateVTKObjects(1);
-  int numObjects = this->Internals->IDs.size();
-
   vtkClientServerStream str;
 
   // Make each property push their values to each VTK object
@@ -517,17 +514,14 @@ void vtkSMProxy::UpdateVTKObjects()
           {
           this->PushProperty(it->first.c_str(), this->SelfID, 0);
           }
-        else
-          {
-          for (int i=0; i<numObjects; i++)
-            {
-            prop->AppendCommandToStream(&str, this->Internals->IDs[i]);
-            }
-          }
         it->second.ModifiedFlag = 0;
         }
       }
     }
+
+  this->CreateVTKObjects(1);
+  int numObjects = this->Internals->IDs.size();
+
   for (it  = this->Internals->Properties.begin();
        it != this->Internals->Properties.end();
        ++it)
