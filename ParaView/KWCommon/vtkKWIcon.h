@@ -63,8 +63,11 @@ public:
 
   // Description:
   // Set image data.
-  void SetImageData(const unsigned char* data, int width, int height);
   void SetImageData(vtkImageData*);
+
+  // Description:
+  // Select an icon based on the icon name.
+  void SetImageData(int image);
 
 //BTX
   // Description:
@@ -94,10 +97,6 @@ public:
     LAST_ICON
   };
 //ETX
-
-  // Description:
-  // Select an icon based on the icon name.
-  void SetImageData(int image);
 
   // Description:
   // Set icon to the custom data.
