@@ -1,5 +1,4 @@
 <ModuleInterfaces>
-<!-- Removed until these filters are fixed
   <Module name="Balance"
           root_name="Balance" module_type="Filter"
           multiprocess_support="multiple_processes"
@@ -36,7 +35,6 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
 The All to N filter is available when ParaView is run in parallel. It redistributes the data so that it is located on the number of processes specified in the Number of Processes entry box. It also does load-balancing of the data among these processes. This filter operates on polygonal data and produces polygonal output.
     </Documentation>
   </Module>
--->
   <Module name="AppendAttributes"
           menu_name="Append Attributes"
           root_name="AppendAttr"
