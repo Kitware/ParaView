@@ -190,6 +190,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
+  pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->LODMapperTclName);
 
   this->Script("%s SetLookupTable [%s GetLookupTable]",
                this->GetScalarBarTclName(), this->MapperTclName);
@@ -556,11 +557,13 @@ void vtkPVActorComposite::UpdateProperties()
   timer->StopTimer();
 
   time = timer->GetElapsedTime();
-  if (time > 0.0)
+  if (time > 0.05)
     {
     sprintf(tmp, "%s : took %f seconds", 
             this->PVData->GetVTKDataTclName(), time); 
     this->GetView()->GetParentWindow()->SetStatusText(tmp);
+    pvApp->AddLogEntry(this->PVData->GetVTKDataTclName(), time);
+    pvApp->AddLogEntry("NumCells", this->PVData->GetVTKData()->GetNumberOfCells());
     }
 
   vtkDebugMacro(<< "Stop timer : " << this->PVData->GetVTKDataTclName() << " : took " 
@@ -664,7 +667,7 @@ void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
     return;
     }
   
-  pvApp->BroadcastScript("%s GetProperty SetColor %f %f %f",
+  pvApp->BroadcastScript("%s SetColor %f %f %f",
                          this->PropertyTclName, r, g, b);
   this->GetPVRenderView()->EventuallyRender();
 }
@@ -673,6 +676,7 @@ void vtkPVActorComposite::ChangeColorMap()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
+  // LODMapper shares a lookup table with Mapper.
   if (strcmp(this->ColorMapMenu->GetValue(), "Red to Blue") == 0)
     {
     pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0.666667",
@@ -769,6 +773,7 @@ void vtkPVActorComposite::ColorByProperty()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s ScalarVisibilityOff", this->MapperTclName);
+  pvApp->BroadcastScript("%s ScalarVisibilityOff", this->LODMapperTclName);
   float *color;
   
   color = this->ColorButton->GetColor();
