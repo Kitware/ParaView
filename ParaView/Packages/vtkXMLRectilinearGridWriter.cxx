@@ -20,7 +20,7 @@
 #include "vtkRectilinearGrid.h"
 #include "vtkExtentTranslator.h"
 
-vtkCxxRevisionMacro(vtkXMLRectilinearGridWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLRectilinearGridWriter, "1.2");
 vtkStandardNewMacro(vtkXMLRectilinearGridWriter);
 
 //----------------------------------------------------------------------------
@@ -66,6 +66,12 @@ void vtkXMLRectilinearGridWriter::GetInputExtent(int* extent)
 const char* vtkXMLRectilinearGridWriter::GetDataSetName()
 {
   return "RectilinearGrid";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLRectilinearGridWriter::GetDefaultFileExtension()
+{
+  return "vtr";
 }
 
 //----------------------------------------------------------------------------

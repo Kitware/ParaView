@@ -38,6 +38,10 @@ public:
   void SetInput(vtkStructuredGrid* input);
   vtkStructuredGrid* GetInput();
   
+  // Description:
+  // Get the default file extension for files written by this writer.
+  const char* GetDefaultFileExtension();
+  
 protected:
   vtkXMLStructuredGridWriter();
   ~vtkXMLStructuredGridWriter();  

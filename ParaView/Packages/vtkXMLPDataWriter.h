@@ -86,6 +86,7 @@ protected:
   char* PathName;
   char* FileNameBase;
   char* FileNameExtension;
+  char* PieceFileNameExtension;
   
 private:
   vtkXMLPDataWriter(const vtkXMLPDataWriter&);  // Not implemented.

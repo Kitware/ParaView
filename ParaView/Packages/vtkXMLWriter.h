@@ -101,6 +101,10 @@ public:
   vtkBooleanMacro(EncodeAppendedData, int);
   
   // Description:
+  // Get the default file extension for files written by this writer.
+  virtual const char* GetDefaultFileExtension()=0;
+  
+  // Description:
   // Invoke the writer.  Returns 1 for success, 0 for failure.
   virtual int Write();
   

@@ -20,7 +20,7 @@
 #include "vtkXMLRectilinearGridWriter.h"
 #include "vtkRectilinearGrid.h"
 
-vtkCxxRevisionMacro(vtkXMLPRectilinearGridWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPRectilinearGridWriter, "1.2");
 vtkStandardNewMacro(vtkXMLPRectilinearGridWriter);
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,12 @@ vtkRectilinearGrid* vtkXMLPRectilinearGridWriter::GetInput()
 const char* vtkXMLPRectilinearGridWriter::GetDataSetName()
 {
   return "PRectilinearGrid";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLPRectilinearGridWriter::GetDefaultFileExtension()
+{
+  return "pvtr";
 }
 
 //----------------------------------------------------------------------------

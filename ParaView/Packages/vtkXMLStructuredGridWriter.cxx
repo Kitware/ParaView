@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkStructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkXMLStructuredGridWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLStructuredGridWriter, "1.2");
 vtkStandardNewMacro(vtkXMLStructuredGridWriter);
 
 //----------------------------------------------------------------------------
@@ -66,6 +66,12 @@ void vtkXMLStructuredGridWriter::GetInputExtent(int* extent)
 const char* vtkXMLStructuredGridWriter::GetDataSetName()
 {
   return "StructuredGrid";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLStructuredGridWriter::GetDefaultFileExtension()
+{
+  return "vts";
 }
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "vtkXMLStructuredGridWriter.h"
 #include "vtkStructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkXMLPStructuredGridWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPStructuredGridWriter, "1.2");
 vtkStandardNewMacro(vtkXMLPStructuredGridWriter);
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,12 @@ vtkStructuredGrid* vtkXMLPStructuredGridWriter::GetInput()
 const char* vtkXMLPStructuredGridWriter::GetDataSetName()
 {
   return "PStructuredGrid";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLPStructuredGridWriter::GetDefaultFileExtension()
+{
+  return "pvts";
 }
 
 //----------------------------------------------------------------------------

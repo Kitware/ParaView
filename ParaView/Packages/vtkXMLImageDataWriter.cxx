@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkXMLImageDataWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLImageDataWriter, "1.2");
 vtkStandardNewMacro(vtkXMLImageDataWriter);
 
 //----------------------------------------------------------------------------
@@ -65,6 +65,12 @@ void vtkXMLImageDataWriter::GetInputExtent(int* extent)
 const char* vtkXMLImageDataWriter::GetDataSetName()
 {
   return "ImageData";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLImageDataWriter::GetDefaultFileExtension()
+{
+  return "vti";
 }
 
 //----------------------------------------------------------------------------

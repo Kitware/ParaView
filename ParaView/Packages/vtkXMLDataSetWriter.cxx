@@ -30,7 +30,7 @@
 #include "vtkXMLStructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 
-vtkCxxRevisionMacro(vtkXMLDataSetWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLDataSetWriter, "1.3");
 vtkStandardNewMacro(vtkXMLDataSetWriter);
 
 //----------------------------------------------------------------------------
@@ -143,4 +143,10 @@ int vtkXMLDataSetWriter::WriteData()
 const char* vtkXMLDataSetWriter::GetDataSetName()
 {
   return "DataSet";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLDataSetWriter::GetDefaultFileExtension()
+{
+  return "vtk";
 }

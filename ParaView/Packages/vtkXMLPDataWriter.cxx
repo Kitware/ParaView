@@ -18,7 +18,7 @@
 #include "vtkXMLPDataWriter.h"
 #include "vtkDataSet.h"
 
-vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.5");
+vtkCxxRevisionMacro(vtkXMLPDataWriter, "1.6");
 
 //----------------------------------------------------------------------------
 vtkXMLPDataWriter::vtkXMLPDataWriter()
@@ -33,6 +33,7 @@ vtkXMLPDataWriter::vtkXMLPDataWriter()
   this->PathName = 0;
   this->FileNameBase = 0;
   this->FileNameExtension = 0;
+  this->PieceFileNameExtension = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -41,6 +42,7 @@ vtkXMLPDataWriter::~vtkXMLPDataWriter()
   if(this->PathName) { delete [] this->PathName; }
   if(this->FileNameBase) { delete [] this->FileNameBase; }
   if(this->FileNameExtension) { delete [] this->FileNameExtension; }
+  if(this->PieceFileNameExtension) { delete [] this->PieceFileNameExtension; }
 }
 
 //----------------------------------------------------------------------------
@@ -225,7 +227,8 @@ char* vtkXMLPDataWriter::CreatePieceFileName(int index, const char* path)
   ostrstream fn;
   if(path) { fn << path; }
   fn << this->FileNameBase << index;
-  if(this->FileNameExtension) { fn << this->FileNameExtension; }
+  if(this->PieceFileNameExtension) { fn << this->PieceFileNameExtension; }
+  //if(this->FileNameExtension) { fn << this->FileNameExtension; }
   fn << ends;
   return fn.str();
 }
@@ -248,13 +251,23 @@ int vtkXMLPDataWriter::WritePieces()
 //----------------------------------------------------------------------------
 int vtkXMLPDataWriter::WritePiece(int index)
 {
-  // Construct the output filename.
-  char* fileName = this->CreatePieceFileName(index, this->PathName);
-  
   // Create the writer for the piece.  Its configuration should match
   // our own writer.
   vtkXMLWriter* pWriter = this->CreatePieceWriter(index);
+  
+  // Set the file name.
+  if(!this->PieceFileNameExtension)
+    {
+    const char* ext = pWriter->GetDefaultFileExtension();
+    this->PieceFileNameExtension = new char[strlen(ext)+2];
+    this->PieceFileNameExtension[0] = '.';
+    strcpy(this->PieceFileNameExtension+1, ext);
+    }
+  char* fileName = this->CreatePieceFileName(index, this->PathName);
   pWriter->SetFileName(fileName);
+  delete [] fileName;
+  
+  // Copy the writer settings.
   pWriter->SetCompressor(this->Compressor);
   pWriter->SetDataMode(this->DataMode);
   pWriter->SetByteOrder(this->ByteOrder);
@@ -265,7 +278,6 @@ int vtkXMLPDataWriter::WritePiece(int index)
   
   // Cleanup.
   pWriter->Delete();
-  delete [] fileName;
   
   return result;
 }

@@ -20,7 +20,7 @@
 #include "vtkXMLPolyDataWriter.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkXMLPPolyDataWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPPolyDataWriter, "1.2");
 vtkStandardNewMacro(vtkXMLPPolyDataWriter);
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,12 @@ vtkPolyData* vtkXMLPPolyDataWriter::GetInput()
 const char* vtkXMLPPolyDataWriter::GetDataSetName()
 {
   return "PPolyData";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLPPolyDataWriter::GetDefaultFileExtension()
+{
+  return "pvtp";
 }
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "vtkXMLImageDataWriter.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkXMLPImageDataWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPImageDataWriter, "1.2");
 vtkStandardNewMacro(vtkXMLPImageDataWriter);
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,12 @@ vtkImageData* vtkXMLPImageDataWriter::GetInput()
 const char* vtkXMLPImageDataWriter::GetDataSetName()
 {
   return "PImageData";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLPImageDataWriter::GetDefaultFileExtension()
+{
+  return "pvti";
 }
 
 //----------------------------------------------------------------------------

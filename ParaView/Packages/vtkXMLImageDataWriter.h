@@ -38,6 +38,10 @@ public:
   void SetInput(vtkImageData* input);
   vtkImageData* GetInput();
   
+  // Description:
+  // Get the default file extension for files written by this writer.
+  const char* GetDefaultFileExtension();
+  
 protected:
   vtkXMLImageDataWriter();
   ~vtkXMLImageDataWriter();  

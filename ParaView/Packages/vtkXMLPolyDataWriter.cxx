@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkXMLPolyDataWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLPolyDataWriter, "1.3");
 vtkStandardNewMacro(vtkXMLPolyDataWriter);
 
 //----------------------------------------------------------------------------
@@ -55,11 +55,16 @@ vtkPolyData* vtkXMLPolyDataWriter::GetInput()
   return static_cast<vtkPolyData*>(this->Inputs[0]);
 }
 
-
 //----------------------------------------------------------------------------
 const char* vtkXMLPolyDataWriter::GetDataSetName()
 {
   return "PolyData";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLPolyDataWriter::GetDefaultFileExtension()
+{
+  return "vtp";
 }
 
 //----------------------------------------------------------------------------

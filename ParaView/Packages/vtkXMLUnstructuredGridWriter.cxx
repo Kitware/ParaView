@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkXMLUnstructuredGridWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLUnstructuredGridWriter, "1.2");
 vtkStandardNewMacro(vtkXMLUnstructuredGridWriter);
 
 //----------------------------------------------------------------------------
@@ -59,6 +59,12 @@ vtkUnstructuredGrid* vtkXMLUnstructuredGridWriter::GetInput()
 const char* vtkXMLUnstructuredGridWriter::GetDataSetName()
 {
   return "UnstructuredGrid";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLUnstructuredGridWriter::GetDefaultFileExtension()
+{
+  return "vtu";
 }
 
 //----------------------------------------------------------------------------

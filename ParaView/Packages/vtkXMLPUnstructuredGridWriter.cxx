@@ -20,7 +20,7 @@
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkXMLPUnstructuredGridWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLPUnstructuredGridWriter, "1.2");
 vtkStandardNewMacro(vtkXMLPUnstructuredGridWriter);
 
 //----------------------------------------------------------------------------
@@ -60,6 +60,12 @@ vtkUnstructuredGrid* vtkXMLPUnstructuredGridWriter::GetInput()
 const char* vtkXMLPUnstructuredGridWriter::GetDataSetName()
 {
   return "PUnstructuredGrid";
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLPUnstructuredGridWriter::GetDefaultFileExtension()
+{
+  return "pvtu";
 }
 
 //----------------------------------------------------------------------------

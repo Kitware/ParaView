@@ -47,6 +47,7 @@ protected:
   // Dummies to satisfy pure virtuals from superclass.
   int WriteData();
   const char* GetDataSetName();
+  const char* GetDefaultFileExtension();
   
 private:
   vtkXMLDataSetWriter(const vtkXMLDataSetWriter&);  // Not implemented.

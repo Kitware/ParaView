@@ -38,6 +38,10 @@ public:
   void SetInput(vtkPolyData* input);
   vtkPolyData* GetInput();
   
+  // Description:
+  // Get the default file extension for files written by this writer.
+  const char* GetDefaultFileExtension();
+  
 protected:
   vtkXMLPolyDataWriter();
   ~vtkXMLPolyDataWriter();  

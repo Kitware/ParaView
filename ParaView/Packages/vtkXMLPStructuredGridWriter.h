@@ -43,6 +43,7 @@ protected:
   ~vtkXMLPStructuredGridWriter();
   
   const char* GetDataSetName();
+  const char* GetDefaultFileExtension();
   vtkXMLStructuredDataWriter* CreateStructuredPieceWriter(); 
   
 private:

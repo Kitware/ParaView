@@ -38,6 +38,10 @@ public:
   void SetInput(vtkRectilinearGrid* input);
   vtkRectilinearGrid* GetInput();
   
+  // Description:
+  // Get the default file extension for files written by this writer.
+  const char* GetDefaultFileExtension();
+  
 protected:
   vtkXMLPRectilinearGridWriter();
   ~vtkXMLPRectilinearGridWriter();
