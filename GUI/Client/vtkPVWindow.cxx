@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.617");
+vtkCxxRevisionMacro(vtkPVWindow, "1.618");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4972,7 +4972,7 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PVLookmarkManager: ";
   if( this->PVLookmarkManager )
     {
-    this->PVLookmarkManager->Print( os << endl, indent.GetNextIndent() );
+    this->PVLookmarkManager->PrintSelf( os << endl, indent.GetNextIndent() );
     }
   else
     {
