@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.59");
+vtkCxxRevisionMacro(vtkPVScale, "1.60");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -219,12 +219,19 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVScale::SetValue(double val)
 {
+  this->SetValueInternal(val);
+  this->ModifiedCallback();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVScale::SetValueInternal(double val)
+{
   double newVal;
   double oldVal;
-  
+
   vtkSMIntVectorProperty *ivp = vtkSMIntVectorProperty::SafeDownCast(
     this->GetSMProperty());
-  
+
   if(ivp || this->Round)
     {
     newVal = this->RoundValue(val);
@@ -233,17 +240,18 @@ void vtkPVScale::SetValue(double val)
     {
     newVal = val;
     }
-  
-  oldVal = this->Scale->GetValue();
+
+/*  oldVal = this->Scale->GetValue();
   if (newVal == oldVal)
     {
     this->Scale->SetValue(newVal); // to keep the entry in sync with the scale
     return;
     }
-
-  this->Scale->SetValue(newVal);
-  
-  this->ModifiedCallback();
+*/
+  int old_disable = this->Scale->GetDisableCommands();
+  this->Scale->SetDisableCommands(1);
+  this->Scale->SetValue(newVal); 
+  this->Scale->SetDisableCommands(old_disable);
 }
 
 //-----------------------------------------------------------------------------
@@ -377,11 +385,11 @@ void vtkPVScale::Initialize()
 
   if (dvp)
     {
-    this->SetValue(dvp->GetElement(0));
+    this->SetValueInternal(dvp->GetElement(0));
     }
   else if (ivp)
     {
-    this->SetValue(ivp->GetElement(0));
+    this->SetValueInternal(ivp->GetElement(0));
     }
 
 }

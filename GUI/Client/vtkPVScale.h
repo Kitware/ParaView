@@ -167,6 +167,7 @@ protected:
   vtkPVScale(const vtkPVScale&); // Not implemented
   void operator=(const vtkPVScale&); // Not implemented
 
+  void SetValueInternal(double val);
   vtkSetStringMacro(EntryLabel);
   vtkGetStringMacro(EntryLabel);
   char* EntryLabel;
