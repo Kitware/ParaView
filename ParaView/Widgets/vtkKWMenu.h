@@ -107,6 +107,9 @@ public:
                       vtkKWObject* Called, 
                       const char* MethodAndArgString, int underline,  
                       const char* help = 0);
+  void AddRadioButtonImage(int value, const char* imgname, 
+                           const char* buttonVar, vtkKWObject* Called, 
+                           const char* MethodAndArgString, const char* help = 0);
 
   // Description:
   // Same as add commands, but insert at a given integer position.

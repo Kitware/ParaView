@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.33");
+vtkCxxRevisionMacro(vtkKWMenu, "1.34");
 
 
 
@@ -533,7 +533,9 @@ void vtkKWMenu::CheckCheckButton(vtkKWObject* Object,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonVar, 
+void vtkKWMenu::AddRadioButton(int value, 
+                               const char* label, 
+                               const char* buttonVar, 
                                vtkKWObject* Object, 
                                const char* MethodAndArgString,
                                int underline, 
@@ -561,6 +563,24 @@ void vtkKWMenu::AddRadioButton(int value, const char* label, const char* buttonV
                        -1, help);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::AddRadioButtonImage(int value, 
+                                    const char* imgname, 
+                                    const char* buttonVar, 
+                                    vtkKWObject* Object, 
+                                    const char* MethodAndArgString,
+                                    const char* help)
+{
+  ostrstream str;
+  str << "-image " << imgname 
+      << " -value " << value 
+      << " -variable " << buttonVar
+      << ends;
+  this->AddGeneric("radiobutton", "", Object,
+                   MethodAndArgString, str.str(), help);
+  delete [] str.str();
+}
 
 //----------------------------------------------------------------------------
 void vtkKWMenu::InsertRadioButton(int position, int value, const char* label, 
