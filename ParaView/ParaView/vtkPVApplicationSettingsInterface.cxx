@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.14");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.15");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -87,7 +87,7 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
   frame = this->InterfaceSettingsFrame->GetFrame();
 
   // --------------------------------------------------------------
-  // Interface settings : show sources description
+  // Interface settings : show source descriptions
 
   if (!this->ShowSourcesDescriptionCheckButton)
     {
@@ -96,11 +96,11 @@ void vtkPVApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   this->ShowSourcesDescriptionCheckButton->SetParent(frame);
   this->ShowSourcesDescriptionCheckButton->Create(app, 0);
-  this->ShowSourcesDescriptionCheckButton->SetText("Show sources description");
+  this->ShowSourcesDescriptionCheckButton->SetText("Show source descriptions");
   this->ShowSourcesDescriptionCheckButton->SetCommand(
     this, "ShowSourcesDescriptionCallback");
   this->ShowSourcesDescriptionCheckButton->SetBalloonHelpString(
-    "This advanced option adjusts whether the sources description "
+    "This advanced option adjusts whether the source descriptions "
     "are shown in the parameters page.");
 
   tk_cmd << "pack " << this->ShowSourcesDescriptionCheckButton->GetWidgetName()
