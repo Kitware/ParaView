@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.317");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.318");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1556,11 +1556,14 @@ void vtkPVRenderView::EndBlockingRender()
 
 
 //----------------------------------------------------------------------------
+extern "C" { void PVRenderView_IdleRender(ClientData arg); }
+
 void PVRenderView_IdleRender(ClientData arg)
 {
   vtkPVRenderView *me = (vtkPVRenderView *)arg;
   me->EventuallyRenderCallBack();
 }
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRender()
 {
