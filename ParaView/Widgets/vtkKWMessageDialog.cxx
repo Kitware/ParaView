@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.38.2.1");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.38.2.2");
 
 
 
@@ -108,6 +108,8 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
     }
   this->SetDialogName(0);
   this->SetDialogText(0);
+  this->SetOKButtonText(0);
+  this->SetCancelButtonText(0);
 }
 
 void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
