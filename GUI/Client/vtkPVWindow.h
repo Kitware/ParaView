@@ -189,6 +189,7 @@ public:
   // Description:
   // Save the state of the server manager.
   void SaveSMState();
+  void SaveSMState(const char *filename);
 
   // Description:
   // Display the plug-in window.

@@ -128,7 +128,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.604");
+vtkCxxRevisionMacro(vtkPVWindow, "1.605");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2414,12 +2414,18 @@ void vtkPVWindow::SaveSMState()
   if ( exportDialog->Invoke() && 
        vtkString::Length(exportDialog->GetFileName())>0)
     {
-    vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
-    proxm->SaveState(exportDialog->GetFileName());
+    this->SaveSMState(exportDialog->GetFileName());
     this->SaveLastPath(exportDialog, "SaveSMStatePath");
     }
   this->SetEnabled(enabled);
   exportDialog->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::SaveSMState(const char *filename)
+{
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+  proxm->SaveState(filename);
 }
 
 //-----------------------------------------------------------------------------
