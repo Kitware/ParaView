@@ -290,6 +290,9 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   const char* help = element->GetAttribute("help");
   if(help) { this->SetBalloonHelpString(help); }
   
+  const char* trace_name = element->GetAttribute("trace_name");
+  if (trace_name) { this->SetTraceName(trace_name); }
+
   const char* deps = element->GetAttribute("dependents");
   if(deps)
     {
@@ -331,7 +334,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.23 $");
+  this->ExtractRevision(os,"$Revision: 1.24 $");
 }
 
 //----------------------------------------------------------------------------
