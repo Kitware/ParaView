@@ -4,6 +4,7 @@ ELSE (EXECUTABLE_OUTPUT_PATH)
   SET (VTK_EXECUTABLE ${VTK_BINARY_DIR}/Wrapping/Tcl/${CMAKE_CFG_INTDIR}/vtk)
 ENDIF (EXECUTABLE_OUTPUT_PATH)
 
+SET(TEST_PATH "Packages")
 SET(RUN_WITH_MPI 0)
 IF (VTK_USE_MPI)
   IF (UNIX)
@@ -13,33 +14,32 @@ IF (VTK_USE_MPI)
   ENDIF (UNIX)
 ENDIF (VTK_USE_MPI)
 
-FOREACH (tfile
-	SimplePackage
-         )
-  IF(RUN_WITH_MPI)
+SET(PROJECT_TESTS 
+		 SimpleTest)
+
+IF(RUN_WITH_MPI)
+  FOREACH (tfile ${PROJECT_TESTS})
     ADD_TEST(${tfile}-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
-             ${PARAVIEW_SOURCE_DIR}/Packages/Testing/Tcl/${tfile}.pvs
+             ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
                -D ${PARAVIEW_SOURCE_DIR}/Data 
                -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
                -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
                   ${MPI_POSTFLAGS})
-  ELSE(RUN_WITH_MPI)
-    ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE}
-             ${PARAVIEW_SOURCE_DIR}/Packages/Testing/Tcl/${tfile}.pvs
-               -D ${PARAVIEW_SOURCE_DIR}/Data 
-               -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
-               -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
-  ENDIF(RUN_WITH_MPI)
+  ENDFOREACH(tfile)
+ENDIF(RUN_WITH_MPI)
+FOREACH (tfile ${PROJECT_TESTS})
+  ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE}
+           ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
+             -D ${PARAVIEW_SOURCE_DIR}/Data 
+             -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
+             -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
-ADD_TEST(PrintSelf-Packages ${TCL_TCLSH}
+ADD_TEST(PrintSelf-${TEST_PATH} ${TCL_TCLSH}
          ${VTK_SOURCE_DIR}/Common/Testing/Tcl/PrintSelfCheck.tcl  
-         ${PARAVIEW_SOURCE_DIR}/Packages)
+         ${PARAVIEW_SOURCE_DIR}/${TEST_PATH})
 
-#ADD_TEST(TestWrongArgument ${PARAVIEW_EXECUTABLE} -bla)
-
-ADD_TEST(TestSetObjectMacro-Packages ${TCL_TCLSH}
+ADD_TEST(TestSetObjectMacro-${TEST_PATH} ${TCL_TCLSH}
          ${KWCommon_SOURCE_DIR}/Testing/Tcl/FindString.tcl
-         "${PARAVIEW_SOURCE_DIR}/Packages/vtk\\\\*.h"
+         "${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/vtk\\\\*.h"
          "vtkSetObjectMacro")
-
