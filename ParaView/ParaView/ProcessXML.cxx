@@ -74,6 +74,7 @@ public:
       }
     this->Stream << "\\n\";" << endl;
     fclose(fp);
+    return VTK_OK;
     }
 };
 
@@ -104,7 +105,11 @@ int main(int argc, char* argv[])
     {
     vtkstd::string fname = input + "/" + argv[cc] + ".xml";
 
-    ot.ProcessFile(fname.c_str(), argv[cc]);
+    if ( ot.ProcessFile(fname.c_str(), argv[cc]) != VTK_OK )
+      {
+      cout << "Problem generating header file from XML file: " << fname.c_str() << endl;
+      return 1;
+      }
     }
   ot.Stream << "" << endl
     << "#endif" << endl;
