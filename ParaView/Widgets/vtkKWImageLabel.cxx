@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.17");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.18");
 
 vtkKWImageLabel::vtkKWImageLabel()
 {
@@ -74,8 +74,11 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
                                    int width, int height,
                                    int pixel_size)
 {
-  this->Script("image create photo -width %d -height %d", width, height);
-  this->SetImageDataName(this->Application->GetMainInterp()->result);
+  if (!this->ImageDataName)
+    {
+    this->Script("image create photo -width %d -height %d", width, height);
+    this->SetImageDataName(this->Application->GetMainInterp()->result);
+    }
 
   if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
                                      this->ImageDataName,
@@ -86,11 +89,44 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
     vtkWarningMacro("Error updating Tk photo " << this->ImageDataName);
     return;
     }
-
-  this->Script("%s configure -image %s", 
-               this->GetWidgetName(), 
-               this->ImageDataName);
 }
+
+void vtkKWImageLabel::SetImageDataName (const char* _arg)
+{
+  if (this->ImageDataName == NULL && _arg == NULL) 
+    { 
+    return;
+    }
+
+  if (this->ImageDataName && _arg && (!strcmp(this->ImageDataName, _arg))) 
+    {
+    return;
+    }
+
+  if (this->ImageDataName) 
+    { 
+    delete [] this->ImageDataName; 
+    }
+
+  if (_arg)
+    {
+    this->ImageDataName = new char[strlen(_arg)+1];
+    strcpy(this->ImageDataName, _arg);
+    }
+  else
+    {
+    this->ImageDataName = NULL;
+    }
+
+  this->Modified();
+
+  if (this->Application)
+    {
+    this->Script("%s configure -image %s", 
+                 this->GetWidgetName(), 
+                 this->ImageDataName);
+    }
+} 
 
 //----------------------------------------------------------------------------
 void vtkKWImageLabel::PrintSelf(ostream& os, vtkIndent indent)

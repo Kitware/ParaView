@@ -69,16 +69,13 @@ public:
   void SetImageData(const unsigned char* data, int width, int height, int pixel_size = 4);
   
   // Description:
-  // Get the TK name of the image.
+  // Set/Get the TK name of the image.
   vtkGetStringMacro(ImageDataName);
+  virtual void SetImageDataName(const char*);
 
 protected:
   vtkKWImageLabel();
   ~vtkKWImageLabel();
-
-  // Description:
-  // Set the TK name of the image.
-  vtkSetStringMacro(ImageDataName);
 
 private:
   char *ImageDataName;
