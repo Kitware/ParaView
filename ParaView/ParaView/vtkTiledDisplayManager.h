@@ -81,6 +81,14 @@ public:
   vtkSetVector2Macro(TileDimensions, int);
   vtkGetVector2Macro(TileDimensions, int);
 
+  // Description:
+  // This ivar is to help control the rescaling of the tiled display.
+  // If the tiled display has an overall aspect ratio different that
+  // each of its displays, then you may need to customize the display size.
+  // Large scales make objects look bigger.
+  vtkSetMacro(Scale, float);
+  vtkGetMacro(Scale, float);
+
 //BTX
   enum Tags {
     RENDER_RMI_TAG=12721,
@@ -110,6 +118,8 @@ protected:
   vtkObject *RenderView;
 
   int TileDimensions[2];
+
+  float Scale;
   
 private:
   vtkTiledDisplayManager(const vtkTiledDisplayManager&); // Not implemented

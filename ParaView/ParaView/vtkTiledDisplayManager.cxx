@@ -41,7 +41,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.4.2.1");
+vtkCxxRevisionMacro(vtkTiledDisplayManager, "1.4.2.2");
 vtkStandardNewMacro(vtkTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkTiledDisplayManager, RenderView, vtkObject);
@@ -102,6 +102,8 @@ vtkTiledDisplayManager::vtkTiledDisplayManager()
   this->TileDimensions[0] = 1;
   this->TileDimensions[1] = 1;
   this->RenderView = NULL;
+
+  this->Scale = 1.0;
 }
 
   
@@ -376,7 +378,7 @@ void vtkTiledDisplayManager::SatelliteStartRender()
 
       cam->SetWindowCenter(1.0-(double)(this->TileDimensions[0]) + 2.0*(double)x,
                            1.0-(double)(this->TileDimensions[1]) + 2.0*(double)y);
-      cam->SetViewAngle(asin(sin(renInfo.CameraViewAngle*3.1415926/360.0)/(double)(this->TileDimensions[0])) * 360.0 / 3.1415926);
+      cam->SetViewAngle(asin(sin(renInfo.CameraViewAngle*3.1415926/360.0)/((double)(this->TileDimensions[0])*this->Scale)) * 360.0 / 3.1415926);
       cam->SetPosition(renInfo.CameraPosition);
       cam->SetFocalPoint(renInfo.CameraFocalPoint);
       cam->SetViewUp(renInfo.CameraViewUp);
@@ -384,7 +386,7 @@ void vtkTiledDisplayManager::SatelliteStartRender()
       if (renInfo.ParallelScale != 0.0)
         {
         cam->ParallelProjectionOn();
-        cam->SetParallelScale(renInfo.ParallelScale/(double)(this->TileDimensions[0]));
+        cam->SetParallelScale(renInfo.ParallelScale/((double)(this->TileDimensions[0])*this->Scale));
         }
       else
         {
