@@ -38,7 +38,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.7");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.8");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -123,7 +123,7 @@ void vtkIceTRenderer::DeviceRender()
     }
 
   //ICE-T works much better if it knows the bounds of the geometry.
-  float allBounds[6];
+  double allBounds[6];
   this->ComputeVisiblePropBounds(allBounds);
   //Try to detect when bounds are empty and try to let ICE-T know that
   //nothing is in bounds.
@@ -258,7 +258,7 @@ int vtkIceTRenderer::UpdateGeometry()
   bool *visible = new bool[this->PropArrayCount];
   for (i = 0; i < this->PropArrayCount; i++)
     {
-    float *bounds = this->PropArray[i]->GetBounds();
+    double *bounds = this->PropArray[i]->GetBounds();
 
     // I do not know why, but this prop can return a null bounds.
     // It may be the scalar bar.
