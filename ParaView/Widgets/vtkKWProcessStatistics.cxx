@@ -17,13 +17,16 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.2");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.3");
 
-#ifndef _WIN32
+#ifdef __linux
 #include <sys/procfs.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#elif __hpux
+#include <sys/param.h>
+#include <sys/pstat.h>
 #endif
 
 #include "vtkObjectFactory.h"
