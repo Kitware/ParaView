@@ -48,7 +48,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.17");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.18");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -440,6 +440,16 @@ char* vtkPVProcessModule::GetMachinesFileName()
     return 0;
     }
   return this->Options->GetMachinesFileName();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::GetClientMode()
+{
+  if ( !this->Options )
+    {
+    return 0;
+    }
+  return this->Options->GetClientMode();
 }
 
 //----------------------------------------------------------------------------

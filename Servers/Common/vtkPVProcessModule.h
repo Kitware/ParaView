@@ -181,6 +181,7 @@ public:
   // Propagate from the options so that it is available in CS
   int GetRenderNodePort();
   char* GetMachinesFileName();
+  int GetClientMode();
 
 
 protected:
