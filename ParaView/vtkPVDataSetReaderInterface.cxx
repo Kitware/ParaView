@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVDataSetReaderInterface.h"
 #include "vtkDataSetReader.h"
+#include <ctype.h>
 
 int vtkPVDataSetReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 				       int argc, char *argv[]);

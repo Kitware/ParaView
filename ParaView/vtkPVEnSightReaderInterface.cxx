@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVEnSightReaderInterface.h"
 #include "vtkGenericEnSightReader.h"
+#include <ctype.h>
 
 int vtkPVEnSightReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 				       int argc, char *argv[]);
