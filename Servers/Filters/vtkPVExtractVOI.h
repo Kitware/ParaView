@@ -56,6 +56,15 @@ public:
   vtkGetVectorMacro(SampleRate, int, 3);
 
   // Description:
+  // Set/get the individual components of the sample rate.
+  void SetSampleRateI(int ratei);
+  void SetSampleRateJ(int ratej);
+  void SetSampleRateK(int ratek);
+  int GetSampleRateI() { return this->SampleRate[0]; }
+  int GetSampleRateJ() { return this->SampleRate[1]; }
+  int GetSampleRateK() { return this->SampleRate[2]; }
+  
+  // Description:
   // Control whether to enforce that the "boundary" of the grid is output in
   // the subsampling process. (This ivar only has effect when the SampleRate
   // in any direction is not equal to 1.) When this ivar IncludeBoundary is
