@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.13");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -64,7 +64,7 @@ vtkPVAxesWidget::vtkPVAxesWidget()
   this->Observer->AxesWidget = this;
   this->Renderer = vtkRenderer::New();
   this->Renderer->SetViewport(0.0, 0.0, 0.2, 0.2);
-  this->Renderer->SetLayer(0);
+  this->Renderer->SetLayer(1);
   this->Renderer->InteractiveOff();
   this->Priority = 0.55;
   this->AxesActor = vtkPVAxesActor::New();
@@ -144,8 +144,10 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
                    this->EventCallbackCommand, this->Priority);
     
     this->ParentRenderer->GetRenderWindow()->AddRenderer(this->Renderer);
-    this->ParentRenderer->SetLayer(1);
-    this->ParentRenderer->GetRenderWindow()->SetNumberOfLayers(2);
+    if (this->ParentRenderer->GetRenderWindow()->GetNumberOfLayers() < 2)
+      {
+      this->ParentRenderer->GetRenderWindow()->SetNumberOfLayers(2);
+      }
     this->AxesActor->SetVisibility(1);
     this->ParentRenderer->GetRenderWindow()->Render();
     this->ParentRenderer->AddObserver(vtkCommand::StartEvent, this->Observer);

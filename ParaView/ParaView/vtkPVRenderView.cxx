@@ -95,7 +95,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.294");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.295");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -455,12 +455,12 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   this->RenderWindow = pvApp->GetRenderModule()->GetRenderWindow();
   this->RenderWindow->Register(this);
   this->RenderWindow->AddRenderer(this->Renderer2D);
+  this->RenderWindow->SetNumberOfLayers(3);
+  this->Renderer2D->SetLayer(2);
   
   // the 2d renderer must be kept in sync with the main renderer
   this->Renderer->AddObserver(
     vtkCommand::StartEvent, this->Observer);  
-  this->RenderWindow->SetNumberOfLayers(2);
-  this->Renderer->SetLayer(1);
 
   this->RenderWindow->AddObserver(
     vtkCommand::CursorChangedEvent, this->Observer);
