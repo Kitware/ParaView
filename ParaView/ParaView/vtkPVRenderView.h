@@ -250,10 +250,17 @@ public:
   // Switch to the View Properties menu back and forth
   void SwitchBackAndForthToViewProperties();
 
+  //BTX
   // Description:
   // Access to VTK renderer and render window.
   vtkRenderWindow *GetRenderWindow();
   vtkRenderer *GetRenderer();
+  //ETX
+  
+  // Description:
+  // This method resizes the render window size but the actuall window stays
+  // the same
+  void SetRenderWindowSize(int x, int y);
 
   // Description:
   // Enable the input 3D widget
@@ -299,8 +306,10 @@ public:
   vtkGetObjectMacro(StandardViewsFrame, vtkKWLabeledFrame);
   vtkGetObjectMacro(CameraIconsFrame, vtkKWLabeledFrame);
   vtkGetObjectMacro(CameraControlFrame, vtkKWLabeledFrame);
-  vtkGetObjectMacro(OrientationAxes, vtkPVAxesWidget);
   vtkGetObjectMacro(OrientationAxesFrame, vtkKWLabeledFrame);
+  //BTX
+  vtkGetObjectMacro(OrientationAxes, vtkPVAxesWidget);
+  //ETX
   
 protected:
   vtkPVRenderView();
