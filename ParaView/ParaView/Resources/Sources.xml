@@ -157,17 +157,14 @@ The output of the Axes source is polygonal data. This polygonal data has a scala
         long_help="3D box with specified X, Y, and Z lengths." 
         short_help="Create a box with specified X, Y, and Z lengths.">
   <Source class="vtkCubeSource"/>
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry label="X length" trace_name="XLength" variable="XLength" 
-               type="float" default_value="1.0"
+  <ThumbWheel label="X length" trace_name="XLength" variable="XLength"
+               resolution="0.01" minimum_value="0" default_value="1"
                help="The length of the cube in the x direction." />
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry label="Y length" trace_name="YLength" variable="YLength" 
-               type="float" default_value="1.0"
+  <ThumbWheel label="Y length" trace_name="YLength" variable="YLength"
+               resolution="0.01" minimum_value="0" default_value="1"
                help="The length of the cube in the y direction." />
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry label="Z length" trace_name="ZLength" variable="ZLength" 
-               type="float" default_value="1.0"
+  <ThumbWheel label="Z length" trace_name="ZLength" variable="ZLength"
+               resolution="0.01" minimum_value="0" default_value="1"
                help="The length of the cube in the z direction." />
   <VectorEntry variable="Center" trace_name="Center" length="3" 
                type="float" default_value="0.0 0.0 0.0"
@@ -191,14 +188,12 @@ The output of the Box source is polygonal data containing both normals and textu
                default_value="6" resolution="1" range="0 512"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the number of faces on this cone" />
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry variable="Radius" trace_name="Radius"
-               type="float" default_value="0.5"
-               help="Set the radius of the widest part of the cone" />
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry variable="Height" trace_name="Height"
-               type="float" default_value="1.0"
-               help="Set the height of the cone" />
+  <ThumbWheel variable="Radius" trace_name="Radius"
+              resolution="0.01" minimum_value="0" default_value="0.5"
+              help="Set the radius of the widget part of the cone" />
+  <ThumbWheel variable="Height" trace_name="Height"
+              resolution="0.01" minimum_value="0" default_value="1"
+              help="Set the height of the cone" />
   <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"
                  help="Set whether to draw the base of the cone" />
   <Documentation>
@@ -220,14 +215,12 @@ The output of the Cone source is polygonal data.
                default_value="6" resolution="1" range="2 512"
                display_entry="1" entry_and_label_on_top="0" display_value="0"
                help="The number of facets used to define the cylinder." />
-<!-- should keep value that keeps value non-negative -->
-  <VectorEntry variable="Height" trace_name="Height"
-               type="float" default_value="1.0"
+  <ThumbWheel variable="Height" trace_name="Height"
+               resolution="0.01" minimum_value="0" default_value="1"
                help="The height of the cylinder (along the y axis)." />
-<!-- should keep value that keeps value non-negative -->
-  <VectorEntry variable="Radius" trace_name="Radius"
-               type="float" default_value="0.5"
-               help="The radius of the cylinder." />
+  <ThumbWheel variable="Radius" trace_name="Radius"
+              resolution="0.01" minimum_value="0" default_value="0.5"
+              help="The radius of the cylinder." />
   <VectorEntry variable="Center" trace_name="Center" type="float" length="3"
                default_value="0.0 0.0 0.0" 
                help="Set the center of the cylinder." />
@@ -254,10 +247,9 @@ The output of the Cylinder source is polygonal data containing both normals and 
               point1_label="Point 1" point2_label="Point 2"
               show_resolution="0"
               help="Set the start and end point for the line"/>
-<!-- should use widget that keeps value positive -->
-  <VectorEntry variable="Resolution" trace_name="Resolution" 
-               type="int" default_value="1"
-               help="The number of pieces that divide the line into." />
+  <ThumbWheel variable="Resolution" trace_name="Resolution"
+              resolution="1" minimum_value="1" default_value="1"
+              help="The number of pieces to divide the line into." />
   <Documentation>
 The Line source can be used to interactively (using a 3D widget) or manually (using the entries on the user interface) add a line to the 3D scene. The Line source has the following parameters:
 Point 1: These three values indicate the coordinates of one of the two end points of the line. Moving one of the end points of the 3D widget will change these values. The default coordinates of Point 1 are (-0.5, 0, 0).
@@ -305,19 +297,19 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
         long_help="2D Maze of lines." 
         short_help="Random maze">
   <Source class="vtkMazeSource"/>
-  <VectorEntry variable="XSize" trace_name="XSize" 
-               type="int" default_value="20" 
-               help="Width of the maze." />
-  <VectorEntry variable="YSize" trace_name="YSize" 
-               type="int" default_value="20" 
-               help="Height of the maze." />
-  <VectorEntry variable="RunFactor" trace_name="RunLength" 
-               type="int" default_value="20" 
-               help="A value that influences the run length and branching of the maze." />
-  <VectorEntry variable="MagnetFactor" trace_name="MagnetFactor" 
+  <ThumbWheel label="X Size" variable="XSize" trace_name="XSize"
+              resolution="1" minimum_value="1" default_value="20"
+              help="Width of the maze." />
+  <ThumbWheel label="Y Size" variable="YSize" trace_name="YSize"
+              resolution="1" minimum_value="1" default_value="20"
+              help="Height of the maze." />
+  <ThumbWheel label="Run Factor" variable="RunFactor" trace_name="RunLength"
+              resolution="1" minimum_value="1" default_value="20"
+              help="A value that influences the run length and branching of the maze." />
+  <VectorEntry label="Magnet Factor" variable="MagnetFactor" trace_name="MagnetFactor" 
                type="int" default_value="4" 
                help="When this value is larger than 1, new paths are preferentially formed adjacent to existing paths." />
-  <VectorEntry variable="RandomSeed" trace_name="RandomSeed" 
+  <VectorEntry label="Random Seed" variable="RandomSeed" trace_name="RandomSeed" 
                type="int" default_value="111" 
                help="Initializes the random number generator." />
   <LabeledToggle variable="ShowSolution" trace_name="ShowSolution" default_value="0"
@@ -347,14 +339,14 @@ The output of the Maze source is polygonal data.
   <VectorEntry label="Second point" variable="Point2" trace_name="Point2" 
                type="float" length="3" default_value="-0.5 0.5 0.0"
                help="Set the position of the point defining the second axis."/>
-<!-- should use widget that keeps value positive -->
-  <VectorEntry label="X resolution" trace_name="XResolution"
-               variable="XResolution" type="int" default_value="1"
-               help="The number of x pieces that divide the plane into."/>
-<!-- should use widget that keeps value positive -->
-  <VectorEntry label="Y resolution" trace_name="YResolution"
-               variable="YResolution" type="int" default_value="1"
-               help="The number of y pieces that divide the plane into."/>
+  <ThumbWheel label="X resolution" trace_name="XResolution"
+              variable="XResolution"
+              resolution="1" minimum_value="1" default_value="1"
+              help="The number os x pieces to divide the plane into."/>
+  <ThumbWheel label="Y resolution" trace_name="YResolution"
+              variable="YResolution"
+              resolution="1" minimum_value="1" default_value="1"
+              help="The number of y pieces to divide the plane into."/>
   <Documentation>
 The Plane source can be used to add a polygonal parallelogram to the 3D scene. Unlike the sphere, cone, and cylinder sources, the parallelogram is exactly represented at the lowest resolution, but higher resolutions may be desired if this plane is to be used as an input to a filter. The Plane source has the following parameters:
 Origin: The origin is the location of one of the corners of the parallelogram. By default this coordinate is (-0.5, -0.5, 0).
@@ -374,10 +366,9 @@ The output of the Plane source is polygonal data.
   <VectorEntry variable="Center" trace_name="Center" type="float" length="3"
                default_value="0.0 0.0 0.0" 
                help="Set the coordinates for the center of the sphere." />
-<!-- should use widget that keeps value non-negative -->
-  <VectorEntry variable="Radius" trace_name="Radius"
-               type="float" default_value="0.5"
-               help="Set the radius of the sphere" />
+  <ThumbWheel variable="Radius" trace_name="Radius"
+              resolution="0.01" minimum_value="0" default_value="0.5"
+              help="Set the radius of the sphere" />
   <Scale label="Theta Resolution" trace_name="Theta Resolution" 
                variable="ThetaResolution"
                default_value="8" resolution="1" range="3 1024" 
