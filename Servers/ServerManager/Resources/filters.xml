@@ -935,6 +935,16 @@
         default_values="0" > 
        <BooleanDomain/>
      </IntVectorProperty>
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1" /> 
+     <DoubleVectorProperty
+        name="Value"
+        command="SetValue"
+        number_of_elements="1"
+        default_values="0.0" >
+     </DoubleVectorProperty>
    <!-- End Clip -->
    </SourceProxy>
 

@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.348");
+vtkCxxRevisionMacro(vtkPVSource, "1.348.2.1");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2112,9 +2112,9 @@ void vtkPVSource::SetAcceptButtonColorToRed()
     return;
     }
   this->AcceptButtonRed = 1;
-  this->Script("%s configure -background red1",
+  this->Script("%s configure -background #17b27e",
                this->AcceptButton->GetWidgetName());
-  this->Script("%s configure -activebackground red1",
+  this->Script("%s configure -activebackground #17b27e",
                this->AcceptButton->GetWidgetName());
 }
 

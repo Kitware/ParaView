@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.3");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.4");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -664,14 +664,9 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->MenuFile->InsertCommand(
     clidx++, VTK_PV_SAVE_DATA_MENU_LABEL, this, "WriteData",0);
 
-  // Add advanced file options
-
-  this->MenuFile->InsertCommand(clidx++, "Save Batch Script", this,
-                                "SaveBatchScript", 7,
-                                "Write a script which can run "
-                                "in batch by ParaView");
-
   this->MenuFile->InsertSeparator(clidx++);
+
+  // Add advanced file options
 
   this->MenuFile->InsertCommand(clidx++, "Load Session", this, 
                                 "LoadScript", 0,
@@ -685,6 +680,10 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                 "SaveTrace", 3,
                                 "Save a trace of every action "
                                 "since start up.");
+  this->MenuFile->InsertCommand(clidx++, "Save Batch Script", this,
+                                "SaveBatchScript", 7,
+                                "Write a script which can run "
+                                "in batch by ParaView");
   this->MenuFile->InsertCommand(clidx++,
                                 "Import Package", this, 
                                 "OpenPackage", 3,
@@ -3033,10 +3032,9 @@ void vtkPVWindow::UpdateFilterMenu()
     int numFilters = 0;
     while(ki != filterKeys.end())
       {
-      ++numFilters;
       methodAndArgs = "CreatePVSource ";
       methodAndArgs += ki->second;
-      if (numFilters % 25 == 0 )
+      if (numFilters % 25 == 0 && numFilters > 0)
         {
         this->FilterMenu->AddGeneric("command", ki->first.c_str(), this,
                                      methodAndArgs.c_str(), "-columnbreak 1",
@@ -3048,12 +3046,19 @@ void vtkPVWindow::UpdateFilterMenu()
                                      methodAndArgs.c_str(), 0,
                                      vi->second->GetShortHelp());
         }
-      if(vi->second->GetToolbarModule())
+      if (
+        !vi->second->GetInputProperty(0)->GetIsValidInput(
+          this->CurrentPVSource, vi->second) )
+        {
+        this->FilterMenu->SetState(ki->first.c_str(), vtkKWMenu::Disabled);
+        }
+      else if (vi->second->GetToolbarModule())
         {
         this->EnableToolbarButton(ki->second.c_str());
         }
       ++ki;
       ++vi;
+      ++numFilters;
       }
 
   // If there are no sources, disable the menu.

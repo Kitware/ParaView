@@ -130,13 +130,13 @@ protected:
   void CopyCellBlockDataArrays(vtkDataSetAttributes* , 
                                vtkDataSetAttributes* ,
                                vtkIdType , vtkIdType, 
-                               vtkIdType, int);
+                               vtkIdType, vtkIdType, int);
 
   void CopyArrays (vtkDataArray*, vtkDataArray*, vtkIdType, vtkIdType*, 
                    int); 
 
   void CopyBlockArrays (vtkDataArray*, vtkDataArray*, vtkIdType, 
-                        vtkIdType, vtkIdType, int); 
+                        vtkIdType, vtkIdType, vtkIdType, int); 
 
   void SendDataArrays (vtkDataSetAttributes*, vtkDataSetAttributes*,
                        vtkIdType, int, vtkIdType*, int); 

@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.267.2.2");
+vtkCxxRevisionMacro(vtkPVApplication, "1.267.2.3");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -214,7 +214,31 @@ public:
   
   static vtkPVOutputWindow* New();
 
+
+  void DisplayDebugText(const char* t)
+    {
+      this->PVDisplayText(t);
+    }
+  
+  void DisplayWarningText(const char* t)
+    {
+      this->PVDisplayText(t);
+    }
+  
+  void DisplayErrorText(const char* t)
+    {
+      this->PVDisplayText(t, 1);
+    }
+  
+  void DisplayGenericWarningText(const char* t)
+    {
+      this->PVDisplayText(t);
+    }
   void DisplayText(const char* t)
+  {
+    this->PVDisplayText(t, 0);
+  }
+  void PVDisplayText(const char* t, int error = 0)
   {
 #ifdef _WIN32
     // if this is a windows application, then always
@@ -235,11 +259,6 @@ public:
       sscanf(t, "%[^:]: In %[^,], line %d", type, file, &line);
       if ( message )
         {
-        int error = 0;
-        if ( !strncmp(t, "ERROR", 5) )
-          {
-          error = 1;
-          }
         message += 3;
         char *rmessage = vtkString::Duplicate(message);
         int last = vtkString::Length(rmessage)-1;
@@ -286,26 +305,8 @@ public:
     {
       if ( this->Errors.size() > 0 )
         {
-#ifdef WIN32
-        ostrstream str;
-        this->FlushErrors(str);
-        str << ends;
-        char *vtkmsg = new char [strlen(str.str()) + 100];
-        strcpy(vtkmsg,str.str());
-#ifdef UNICODE
-        wchar_t *wmsg = new wchar_t [mbstowcs(NULL, vtkmsg, 32000)];
-        mbstowcs(wmsg, vtkmsg, 32000);
-        MessageBox(NULL, wmsg, L"Error", MB_ICONERROR | MB_OK);
-        delete [] wmsg;
-#else
-        MessageBox(NULL, vtkmsg, "Error", MB_ICONERROR | MB_OK);
-#endif
-        delete [] vtkmsg;
-        str.rdbuf()->freeze(0);
-#else
         cerr << "Errors while exiting ParaView:" << endl;
         this->FlushErrors(cerr);
-#endif
         }
     }
   

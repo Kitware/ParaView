@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.261");
+vtkCxxRevisionMacro(vtkPVData, "1.261.2.1");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -605,7 +605,6 @@ void vtkPVData::CreateProperties()
   this->EditColorMapButton->EnabledOff();
 
   // Display style
-
   this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
   this->DisplayStyleFrame->ShowHideFrameOn();
   this->DisplayStyleFrame->Create(this->Application, 0);
@@ -633,9 +632,6 @@ void vtkPVData::CreateProperties()
                                                 "DrawWireframe");
   this->RepresentationMenu->AddEntryWithCommand(VTK_PV_POINTS_LABEL, this,
                                                 "DrawPoints");
-// Remove this option for 1.4 release
-//  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
-//                                                "DrawVolume");
 
   this->RepresentationMenu->SetBalloonHelpString(
     "Choose what geometry should be used to represent the dataset.");
@@ -1698,9 +1694,12 @@ void vtkPVData::DrawWireframe()
       {
       if (this->PreviousWasSolid)
         {
-        this->PreviousAmbient = part->GetPartDisplay()->GetProperty()->GetAmbient();
-        this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
-        this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
+        this->PreviousAmbient = 
+          part->GetPartDisplay()->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = 
+          part->GetPartDisplay()->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = 
+          part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0;
       pm->GetStream() 
@@ -1785,9 +1784,12 @@ void vtkPVData::DrawPoints()
       {
       if (this->PreviousWasSolid)
         {
-        this->PreviousAmbient = part->GetPartDisplay()->GetProperty()->GetAmbient();
-        this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
-        this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
+        this->PreviousAmbient = 
+          part->GetPartDisplay()->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = 
+          part->GetPartDisplay()->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = 
+          part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0;
       pm->GetStream() 
@@ -1920,19 +1922,23 @@ void vtkPVData::DrawSurface()
         pm->GetStream() 
           << vtkClientServerStream::Invoke 
           << part->GetPartDisplay()->GetPropertyID()
-          << "SetAmbient" << this->PreviousAmbient << vtkClientServerStream::End;
+          << "SetAmbient" << this->PreviousAmbient 
+          << vtkClientServerStream::End;
         pm->GetStream() 
           << vtkClientServerStream::Invoke 
           << part->GetPartDisplay()->GetPropertyID()
-          << "SetDiffuse" << this->PreviousDiffuse << vtkClientServerStream::End;
+          << "SetDiffuse" << this->PreviousDiffuse 
+          << vtkClientServerStream::End;
         pm->GetStream() 
           << vtkClientServerStream::Invoke
           << part->GetPartDisplay()->GetPropertyID()
-          << "SetSpecular" << this->PreviousSpecular << vtkClientServerStream::End;
+          << "SetSpecular" << this->PreviousSpecular 
+          << vtkClientServerStream::End;
         pm->GetStream() 
           << vtkClientServerStream::Invoke 
           << part->GetPartDisplay()->GetPropertyID()
-          << "SetRepresentationToSurface" << vtkClientServerStream::End;
+          << "SetRepresentationToSurface" 
+          << vtkClientServerStream::End;
         pm->SendStreamToClientAndRenderServer();
         }
       }
@@ -2002,9 +2008,12 @@ void vtkPVData::DrawOutline()
       {
       if (this->PreviousWasSolid)
         {
-        this->PreviousAmbient = part->GetPartDisplay()->GetProperty()->GetAmbient();
-        this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
-        this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
+        this->PreviousAmbient = 
+          part->GetPartDisplay()->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = 
+          part->GetPartDisplay()->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = 
+          part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0; 
       pm->GetStream() 
@@ -2610,7 +2619,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << endl;
     *file << "  $pvTemp" <<  partD->GetGeometryID() << " SetInput 0 "
           << "$pvTemp" << this->GetPVSource()->GetVTKSourceID(0)
-          << " SetInput"
+          << " SetInput 0"
           << endl;
 
     *file << "  $Ren1 AddDisplay $pvTemp" << partD->GetGeometryID() << endl;
@@ -2635,6 +2644,11 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
     *file << "  [$pvTemp" << partD->GetGeometryID() 
           << " GetProperty ScalarVisibility] SetElements1 "  
           << part->GetPartDisplay()->GetMapper()->GetScalarVisibility()
+          << endl;
+    
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty ColorMode] SetElements1 "  
+          << part->GetPartDisplay()->GetMapper()->GetColorMode()
           << endl;
     
     *file << "  [$pvTemp" << partD->GetGeometryID() 
@@ -2690,7 +2704,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << this->OpacityScale->GetValue() << endl;
     
     double propColor[3];
-    part->GetPartDisplay()->GetProperty()->GetColor(propColor);
+    part->GetPartDisplay()->GetProperty()->GetDiffuseColor(propColor);
     *file << "  [$pvTemp" << partD->GetGeometryID() 
           << " GetProperty Color] SetElements3 "  
           << propColor[0] << " " << propColor[1] << " " << propColor[2]
