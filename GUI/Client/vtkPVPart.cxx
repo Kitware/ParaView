@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.51");
+vtkCxxRevisionMacro(vtkPVPart, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVPart, SMPart, vtkSMPart);
 
@@ -197,7 +197,7 @@ void vtkPVPart::GatherDataInformation()
     {
     return;
     }
-  pvApp->SendPrepareProgress();
+  pvApp->GetProcessModule()->SendPrepareProgress();
 
   // This does nothing if the geometry is already up to date.
   if (this->PartDisplay)
@@ -253,7 +253,7 @@ void vtkPVPart::GatherDataInformation()
       }    
     this->SetName(str);
     }
-  pvApp->SendCleanupPendingProgress();
+  pvApp->GetProcessModule()->SendCleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------

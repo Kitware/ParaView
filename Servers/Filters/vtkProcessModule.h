@@ -31,9 +31,13 @@ class vtkCallbackCommand;
 class vtkClientServerInterpreter;
 class vtkClientServerStream;
 class vtkDataObject;
+class vtkPVProgressHandler;
+class vtkProcessObject;
 //BTX
 struct vtkProcessModuleInternals;
 //ETX
+
+class vtkProcessModuleObserver;
 
 class VTK_EXPORT vtkProcessModule : public vtkObject
 {
@@ -51,9 +55,13 @@ public:
     RENDER_SERVER_ROOT = 0x10,
     CLIENT_AND_SERVERS = DATA_SERVER | CLIENT | RENDER_SERVER
   };
+
+  enum ProgressEventEnum
+    {
+    PROGRESS_EVENT_TAG = 31415
+    };
 //ETX
   
-  static vtkProcessModule* New();
   vtkTypeRevisionMacro(vtkProcessModule,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
@@ -194,6 +202,35 @@ public:
   static vtkProcessModule* GetProcessModule();
   static void SetProcessModule(vtkProcessModule* pm);
 
+  // Description:
+  // Register object with progress handler.
+  void RegisterProgressEvent(vtkProcessObject* po, int id);
+
+  // Description:
+  virtual void SendPrepareProgress();
+  virtual void SendCleanupPendingProgress();
+
+  // Description:
+  // This method is called before progress reports start comming.
+  void PrepareProgress();
+
+  // Description:
+  // This method is called after force update to clenaup all the pending
+  // progresses.
+  void CleanupPendingProgress();
+
+  // Description:
+  // Execute event on callback
+  void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
+
+  // Description:
+  // Get the observer.
+  vtkCommand* GetObserver();
+
+  // Description:
+  // Set the local progress. Subclass should overwrite it.
+  virtual void SetLocalProgress(const char* filter, int progress) = 0;
+
 protected:
   vtkProcessModule();
   ~vtkProcessModule();
@@ -233,6 +270,13 @@ protected:
   static vtkProcessModule* ProcessModule;
 
   vtkProcessModuleInternals* Internals;
+
+  void ProgressEvent(vtkObject *o, int val, const char* filter);
+
+  vtkPVProgressHandler* ProgressHandler;
+  int ProgressRequests;
+
+  vtkProcessModuleObserver* Observer;
 
 private:
   vtkProcessModule(const vtkProcessModule&); // Not implemented

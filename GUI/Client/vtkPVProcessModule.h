@@ -109,12 +109,21 @@ public:
 
   vtkClientServerID GetApplicationID();
 
+  // Description:
+  virtual void SendPrepareProgress();
+  virtual void SendCleanupPendingProgress();
+
+  // Description:
+  // Set the local progress
+  void SetLocalProgress(const char* filter, int progress);
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
 
   vtkClientServerID MPIMToNSocketConnectionID;
   vtkKWApplication* Application;
+
+  int ProgressEnabled;
 private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented

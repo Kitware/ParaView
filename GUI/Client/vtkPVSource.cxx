@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.364");
+vtkCxxRevisionMacro(vtkPVSource, "1.365");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1196,7 +1196,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     return;
     } 
 
-  this->GetPVApplication()->SendPrepareProgress();
+  this->GetPVApplication()->GetProcessModule()->SendPrepareProgress();
 
   window = this->GetPVWindow();
 
@@ -1230,7 +1230,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       { // I suppose we should try and delete the source.
       vtkErrorMacro("Could not get output.");
       this->DeleteCallback();    
-      this->GetPVApplication()->SendCleanupPendingProgress();
+      this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress();
       return;
       }
 
@@ -1332,7 +1332,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // causes the filter to execute.
   pvd->UpdateProperties();
   
-  this->GetPVApplication()->SendCleanupPendingProgress();
+  this->GetPVApplication()->GetProcessModule()->SendCleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------

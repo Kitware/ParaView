@@ -64,11 +64,18 @@ SET(Filters_SRCS
   vtkExtractCTHPart.cxx
   vtkStringList.cxx # Should go out
 	vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
+
+  vtkPVProgressHandler.cxx
   )
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkStringList.cxx
+  vtkPVProgressHandler.cxx
   WRAP_EXCLUDE)
+
+SET_SOURCE_FILES_PROPERTIES(
+  vtkProcessModule.cxx
+  ABSTRACT)
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}

@@ -23,6 +23,8 @@
 #include "vtkPVInformation.h"
 #include "vtkInstantiator.h"
 #include "vtkToolkits.h"
+#include "vtkPVProgressHandler.h"
+#include "vtkProcessObject.h"
 
 #include <vtkstd/map>
 
@@ -40,8 +42,41 @@ struct vtkProcessModuleInternals
 };
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkProcessModule);
-vtkCxxRevisionMacro(vtkProcessModule, "1.9");
+vtkCxxRevisionMacro(vtkProcessModule, "1.10");
+
+//----------------------------------------------------------------------------
+//****************************************************************************
+class vtkProcessModuleObserver: public vtkCommand
+{
+public:
+  static vtkProcessModuleObserver *New() 
+    {return new vtkProcessModuleObserver;};
+
+  vtkProcessModuleObserver()
+    {
+    this->PM = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+    void* calldata)
+    {
+    if ( this->PM )
+      {
+      this->PM->ExecuteEvent(wdg, event, calldata);
+      }
+    this->AbortFlagOn();
+    }
+
+  void SetPM(vtkProcessModule* pm)
+    {
+    this->PM = pm;
+    }
+
+private:
+  vtkProcessModule* PM;
+};
+//****************************************************************************
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 vtkProcessModule::vtkProcessModule()
@@ -54,11 +89,19 @@ vtkProcessModule::vtkProcessModule()
   this->InterpreterObserver = 0;
   this->ReportInterpreterErrors = 1;
   this->Internals = new vtkProcessModuleInternals;
+  this->Observer = vtkProcessModuleObserver::New();
+  this->Observer->SetPM(this);
+
+  this->ProgressRequests = 0;
+  this->ProgressHandler = vtkPVProgressHandler::New();
 }
 
 //----------------------------------------------------------------------------
 vtkProcessModule::~vtkProcessModule()
 {
+  this->ProgressHandler->Cleanup();
+  this->ProgressHandler->Delete();
+  this->ProgressHandler = 0;
   // Free Interpreter and ClientServerStream.
   this->FinalizeInterpreter();
 
@@ -68,6 +111,8 @@ vtkProcessModule::~vtkProcessModule()
     this->Controller->Delete();
     this->Controller = NULL;
     }
+  this->Observer->Delete();
+  this->Observer = 0;
 
   delete this->Internals;
 }
@@ -513,3 +558,105 @@ const char* vtkProcessModule::GetStringFromClient()
 {
   return this->GetLastClientResult().StreamToString();
 }
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::RegisterProgressEvent(vtkProcessObject* po, int id)
+{
+  po->AddObserver(vtkCommand::ProgressEvent, this->Observer);
+  this->ProgressHandler->RegisterProgressEvent(po, id);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SendPrepareProgress()
+{
+  vtkClientServerStream& stream = this->GetStream();
+  stream << vtkClientServerStream::Invoke << this->GetProcessModuleID()
+    << "PrepareProgress" << vtkClientServerStream::End;
+  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+  this->ProgressRequests ++;
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::SendCleanupPendingProgress()
+{
+  if ( this->ProgressRequests < 0 )
+    {
+    vtkErrorMacro("Internal ParaView Error: Progress requests went below zero");
+    abort();
+    }
+  this->ProgressRequests --;
+  if ( this->ProgressRequests > 0 )
+    {
+    return;
+    }
+  vtkClientServerStream& stream = this->GetStream();
+  stream << vtkClientServerStream::Invoke << this->GetProcessModuleID()
+         << "CleanupPendingProgress" << vtkClientServerStream::End;
+  this->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::PrepareProgress()
+{
+  this->ProgressHandler->PrepareProgress(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::CleanupPendingProgress()
+{
+  this->ProgressHandler->CleanupPendingProgress(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::ProgressEvent(vtkObject *o, int val, const char* str)
+{
+  this->ProgressHandler->InvokeProgressEvent(this, o, val, str);
+}
+
+//----------------------------------------------------------------------------
+void vtkProcessModule::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
+{
+  switch ( event ) 
+    {
+  case vtkCommand::ProgressEvent:
+      {
+      int progress = static_cast<int>(*reinterpret_cast<double*>(calldata)* 100.0);
+      this->ProgressEvent(o, progress, 0);
+      }
+    break;
+  case vtkCommand::WrongTagEvent:
+      {
+      int tag = -1;
+      int len = -1;
+      char val = -1;
+      const char* data = reinterpret_cast<const char*>(calldata);
+      const char* ptr = data;
+      memcpy(&tag, ptr, sizeof(tag));
+      if ( tag != vtkProcessModule::PROGRESS_EVENT_TAG )
+        {
+        vtkErrorMacro("Internal ParaView Error: Socket Communicator received wrong tag: " << tag);
+        abort();
+        return;
+        }
+      ptr += sizeof(tag);
+      memcpy(&len, ptr, sizeof(len));
+      ptr += sizeof(len);
+      val = *ptr;
+      ptr ++;
+      if ( val < 0 || val > 100 )
+        {
+        vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
+        return;
+        }
+      this->ProgressEvent(o, val, ptr);
+      }
+    break;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkCommand* vtkProcessModule::GetObserver()
+{
+  return this->Observer;
+}
+

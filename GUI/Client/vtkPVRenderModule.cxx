@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.33");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.34");
 
 //===========================================================================
 //***************************************************************************
@@ -512,7 +512,7 @@ void vtkPVRenderModule::UpdateAllDisplays()
   vtkObject* object;
   vtkPVPartDisplay* pDisp;
   vtkPVApplication* pvApp = this->GetPVApplication();
-  pvApp->SendPrepareProgress();
+  pvApp->GetProcessModule()->SendPrepareProgress();
 
   this->Displays->InitTraversal();
   while ( (object = this->Displays->GetNextItemAsObject()) )
@@ -523,7 +523,7 @@ void vtkPVRenderModule::UpdateAllDisplays()
       pDisp->Update();
       }
     }
-  pvApp->SendCleanupPendingProgress();
+  pvApp->GetProcessModule()->SendCleanupPendingProgress();
 }
 
 //----------------------------------------------------------------------------

@@ -16,9 +16,8 @@
 
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVWindow.h"
+#include "vtkProcessModule.h"
+#include "vtkProcessModule.h"
 #include "vtkSocketController.h"
 #include "vtkTimerLog.h"
 #include "vtkClientServerInterpreter.h"
@@ -28,14 +27,13 @@
 #include "vtkMPICommunicator.h" // Needed for vtkMPICommunicator::Request
 #endif 
 
-#define PVAPPLICATION_PROGRESS_TAG 31415
-
 #include <vtkstd/map>
 #include <vtkstd/vector>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.9");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.1");
+vtkCxxSetObjectMacro(vtkPVProgressHandler, SocketController, vtkSocketController);
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -60,7 +58,7 @@ public:
 vtkPVProgressHandler::vtkPVProgressHandler()
 {
   this->Internals = new vtkPVProgressHandlerInternal;
-  this->Application = 0;
+  this->ProcessModule = 0;
   this->ProgressType = vtkPVProgressHandler::NotSet;
   this->ProgressPending = 0;
   this->MinimumProgressInterval = 0.5;
@@ -72,11 +70,17 @@ vtkPVProgressHandler::vtkPVProgressHandler()
   this->SocketController = 0;
 
   this->ReceivingProgressReports = 0;
+
+  this->ClientMode = 0;
+  this->ServerMode = 0;
+  this->LocalProcessID = -1;
+  this->NumberOfProcesses = -1;
 }
 
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::~vtkPVProgressHandler()
 {
+  this->SetSocketController(0);
 #ifdef VTK_USE_MPI
   if (this->ProgressPending)
     {
@@ -94,7 +98,7 @@ void vtkPVProgressHandler::RegisterProgressEvent(vtkObject* po, int id)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::DetermineProgressType(vtkPVApplication* app)
+void vtkPVProgressHandler::DetermineProgressType(vtkProcessModule* app)
 {
   if ( this->ProgressType != vtkPVProgressHandler::NotSet )
     {
@@ -102,20 +106,10 @@ void vtkPVProgressHandler::DetermineProgressType(vtkPVApplication* app)
     }
   vtkDebugMacro("Determine progress type");
 
-  int client = app->GetClientMode();
-  int server = app->GetServerMode();
-  int local_process = 0;
-  int num_processes = 1;
-#ifdef VTK_USE_MPI
-  this->MPIController = vtkMPIController::SafeDownCast(
-    app->GetProcessModule()->GetController());
-  if ( this->MPIController )
-    {
-    local_process = this->MPIController->GetLocalProcessId();
-    num_processes = this->MPIController->GetNumberOfProcesses();
-    }
-#endif
-  this->SocketController = app->GetSocketController();
+  int client = this->ClientMode;
+  int server = this->ServerMode;
+  int local_process = app->GetPartitionId();
+  int num_processes = app->GetNumberOfPartitions();
 
   if ( client )
     {
@@ -163,13 +157,13 @@ void vtkPVProgressHandler::DetermineProgressType(vtkPVApplication* app)
   if ( this->ProgressType == vtkPVProgressHandler::NotSet )
     {
     vtkErrorMacro("Internal ParaView errorr. Progress is not set.");
-    vtkPVApplication::Abort();
+    abort();
     }
   this->Modified();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::InvokeProgressEvent(vtkPVApplication* app,
+void vtkPVProgressHandler::InvokeProgressEvent(vtkProcessModule* app,
   vtkObject *o, int val, const char* filter)
 {
   this->DetermineProgressType(app);
@@ -214,28 +208,20 @@ void vtkPVProgressHandler::InvokeProgressEvent(vtkPVApplication* app,
     break;
   default:
     vtkErrorMacro("Internal ParaView error. Progress type is set to some unknown value");
-    vtkPVApplication::Abort();
+    abort();
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::LocalDisplayProgress(
-  vtkPVApplication* app, const char* filter, int progress)
+  vtkProcessModule* app, const char* filter, int progress)
 {
-  if ( !filter )
-    {
-    abort();
-    }
-  if(!app->GetMainWindow())
-    {
-    return;
-    }
-  app->GetMainWindow()->SetProgress(filter, progress);
+  app->SetLocalProgress(filter, progress);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::InvokeRootNodeProgressEvent(
-  vtkPVApplication* app, vtkObject* o, int myprogress)
+  vtkProcessModule* app, vtkObject* o, int myprogress)
 {
   int id = -1;
   int progress = -1;
@@ -245,26 +231,24 @@ void vtkPVProgressHandler::InvokeRootNodeProgressEvent(
     {
     this->HandleProgress(0, it->second, myprogress);
     }
-  while ( this->ReceiveProgressFromSatellite(&id, &progress) )
+  while ( this->ReceiveProgressFromSatellite(&id, &progress) );
+  vtkClientServerID nid;
+  nid.ID = id;
+  vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
+  if ( base )
     {
-    vtkClientServerID nid;
-    nid.ID = id;
-    vtkObjectBase* base = app->GetProcessModule()->GetInterpreter()->GetObjectFromID(nid);
-    if ( base )
-      {
-      this->LocalDisplayProgress(app, base->GetClassName(), progress);
-      }
-    else
-      {
-      //vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
-      //vtkPVApplication::Abort();
-      }
+    this->LocalDisplayProgress(app, base->GetClassName(), progress);
+    }
+  else
+    {
+    //vtkErrorMacro("Internal ParaView error. Got progress from unknown object id" << id << ".");
+    //vtkPVApplication::Abort();
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
-  vtkPVApplication* app, vtkObject* o, int myprogress)
+  vtkProcessModule* app, vtkObject* o, int myprogress)
 {
   int id = -1;
   int progress = -1;
@@ -285,7 +269,7 @@ void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
     buffer[0] = progress;
     sprintf(buffer+1, "%s", base->GetClassName());
     int len = strlen(buffer+1) + 2;
-    this->SocketController->Send(buffer, len, 1, PVAPPLICATION_PROGRESS_TAG);
+    this->SocketController->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
     }
   else
     {
@@ -296,7 +280,7 @@ void vtkPVProgressHandler::InvokeRootNodeServerProgressEvent(
 
 //----------------------------------------------------------------------------
 void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
-  vtkPVApplication*, vtkObject* o, int progress)
+  vtkProcessModule*, vtkObject* o, int progress)
 {
 #ifdef VTK_USE_MPI
   if (this->ProgressPending && this->Internals->ProgressRequest.Test())
@@ -318,13 +302,13 @@ void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
       if ( it != this->Internals->ObjectIdsMap.end() )
         {
 #ifdef VTK_USE_MPI
-        this->Progress[0] = this->MPIController->GetLocalProcessId();
+        this->Progress[0] = app->GetPartitionId();
         this->Progress[1] = it->second;
         this->Progress[2] = progress;
 
         this->MPIController->NoBlockSend(
           this->Progress, 
-          3, 0, PVAPPLICATION_PROGRESS_TAG, 
+          3, 0, vtkProcessModule::PROGRESS_EVENT_TAG, 
           this->Internals->ProgressRequest);
 #endif
         this->ProgressPending=1;
@@ -332,7 +316,7 @@ void vtkPVProgressHandler::InvokeSatelliteProgressEvent(
       else
         {
         vtkErrorMacro("Internal ParaView error: Got progresss from something not observed.");
-        vtkPVApplication::Abort();
+        abort();
         }
       }
     }
@@ -349,7 +333,7 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellite(int *id, int* progress)
       {
       this->MPIController->NoBlockReceive(this->Progress, 3, 
         vtkMultiProcessController::ANY_SOURCE,
-        PVAPPLICATION_PROGRESS_TAG, 
+        vtkProcessModule::PROGRESS_EVENT_TAG, 
         this->Internals->ProgressRequest);
       }
     if (this->Internals->ProgressRequest.Test() )
@@ -360,7 +344,7 @@ int vtkPVProgressHandler::ReceiveProgressFromSatellite(int *id, int* progress)
       rec ++;
       this->MPIController->NoBlockReceive(this->Progress, 3, 
         vtkMultiProcessController::ANY_SOURCE, 
-        PVAPPLICATION_PROGRESS_TAG, 
+        vtkProcessModule::PROGRESS_EVENT_TAG, 
         this->Internals->ProgressRequest);
       }
     this->ProgressPending=1;
@@ -396,7 +380,7 @@ void vtkPVProgressHandler::HandleProgress(int processid, int filterid, int progr
   vtkPVProgressHandlerInternal::VectorOfInts* vect 
     = &this->Internals->ProgressMap[filterid];
 #ifdef VTK_USE_MPI
-  vect->resize(this->MPIController->GetNumberOfProcesses());
+  vect->resize(this->ProcessModule->GetNumberOfPartitions());
 #else
   vect->resize(processid < (int)vect->size()?vect->size():processid+1);
 #endif
@@ -404,7 +388,7 @@ void vtkPVProgressHandler::HandleProgress(int processid, int filterid, int progr
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::PrepareProgress(vtkPVApplication* app)
+void vtkPVProgressHandler::PrepareProgress(vtkProcessModule* app)
 {
   vtkDebugMacro("Prepare progress receiving");
   this->DetermineProgressType(app);
@@ -427,12 +411,12 @@ void vtkPVProgressHandler::PrepareProgress(vtkPVApplication* app)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProgressHandler::CleanupPendingProgress(vtkPVApplication* app)
+void vtkPVProgressHandler::CleanupPendingProgress(vtkProcessModule* app)
 {
   if ( !this->ReceivingProgressReports )
     {
     vtkErrorMacro("Internal ParaView Error: Got request for cleanup pending progress after being cleaned up");
-    vtkPVApplication::Abort();
+    abort();
     }
   vtkDebugMacro("Cleanup all pending progress events");
   int id = -1;
@@ -459,7 +443,7 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkPVApplication* app)
             buffer[0] = progress;
             sprintf(buffer+1, "%s", base->GetClassName());
             int len = strlen(buffer+1) + 2;
-            this->SocketController->Send(buffer, len, 1, PVAPPLICATION_PROGRESS_TAG);
+            this->SocketController->Send(buffer, len, 1, vtkProcessModule::PROGRESS_EVENT_TAG);
             }
           }
         }

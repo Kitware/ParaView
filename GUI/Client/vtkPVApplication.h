@@ -395,20 +395,6 @@ public:
   // Execute event on callback
   void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
 
-
-  // Description:
-  void SendPrepareProgress();
-  void SendCleanupPendingProgress();
-
-  // Description:
-  // This method is called before progress reports start comming.
-  void PrepareProgress();
-
-  // Description:
-  // This method is called after force update to clenaup all the pending
-  // progresses.
-  void CleanupPendingProgress();
-
   // Description:
   // Get number of partitions.
   int GetNumberOfPartitions();
@@ -434,8 +420,6 @@ protected:
 
   virtual void CreateSplashScreen();
   virtual void AddAboutText(ostream &);
-
-  void ProgressEvent(vtkObject *o, int val, const char* filter);
 
   void CreateButtonPhotos();
   void CreatePhoto(const char *name, 
@@ -536,9 +520,6 @@ protected:
   int CrashOnErrors;
 
   vtkPVApplicationObserver* Observer;
-  vtkPVProgressHandler* ProgressHandler;
-  int ProgressEnabled;
-  int ProgressRequests;
 
   int ApplicationInitialized;
 

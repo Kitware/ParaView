@@ -5,7 +5,6 @@ SET( ParaViewShared_SRCS
   )
 
 SET( ParaViewSharedNotWrapped_SRCS
-  vtkPVProgressHandler.cxx
   )
 
 SET(ParaViewSharedNotTclWrapped_SRCS

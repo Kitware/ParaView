@@ -83,7 +83,6 @@
 #include "vtkImagingFactory.h"
 #include "vtkSocketController.h"
 #include "vtkMPIMToNSocketConnectionPortInformation.h"
-#include "vtkPVProgressHandler.h"
 #include "vtkProcessModule.h"
 // #include "vtkPVRenderGroupDialog.h"
 #include "vtkKWLoadSaveDialog.h"
@@ -110,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.287");
+vtkCxxRevisionMacro(vtkPVApplication, "1.288");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -420,11 +419,8 @@ vtkPVApplication::vtkPVApplication()
   this->ApplicationInitialized = 0;
   this->MachinesFileName = 0;
   this->CaveConfigurationFileName = 0;
-  this->ProgressEnabled = 0;
-  this->ProgressRequests = 0;
   this->Observer = vtkPVApplicationObserver::New();
   this->Observer->SetApplication(this);
-  this->ProgressHandler = vtkPVProgressHandler::New();
   vtkPVApplication::MainApplication = this;
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   this->OutputWindow = window;
@@ -517,7 +513,6 @@ vtkPVApplication::vtkPVApplication()
 //----------------------------------------------------------------------------
 vtkPVApplication::~vtkPVApplication()
 {
-  this->ProgressHandler->Cleanup();
   this->SetProcessModule(NULL);
   this->SetRenderModule(NULL);
   this->SetRenderModuleName(NULL);
@@ -535,8 +530,6 @@ vtkPVApplication::~vtkPVApplication()
   this->SetDemoPath(NULL);
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
-  this->ProgressHandler->Delete();
-  this->ProgressHandler = 0;
   this->Observer->Delete();
   this->Observer = 0;
   this->SetBatchScriptName(0);
@@ -1369,7 +1362,7 @@ void vtkPVApplication::Initialize()
     {
     vtkDebugMacro("Setup observer for progress");
     sc->GetCommunicator()->AddObserver(
-      vtkCommand::WrongTagEvent, this->Observer);
+      vtkCommand::WrongTagEvent, this->GetProcessModule()->GetObserver());
     }
   // Find the installation directory (now that we have the app name)
   this->FindApplicationInstallationDirectory();
@@ -1966,8 +1959,7 @@ void vtkPVApplication::LogStartEvent(char* str)
 //----------------------------------------------------------------------------
 void vtkPVApplication::RegisterProgressEvent(vtkProcessObject* po, int id)
 {
-  po->AddObserver(vtkCommand::ProgressEvent, this->Observer);
-  this->ProgressHandler->RegisterProgressEvent(po, id);
+  this->GetProcessModule()->RegisterProgressEvent(po, id);
 }
 
 //----------------------------------------------------------------------------
@@ -2316,99 +2308,6 @@ void vtkPVApplication::Abort()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
-{
-  switch ( event ) 
-    {
-  case vtkCommand::ProgressEvent:
-      {
-      int progress = static_cast<int>(*reinterpret_cast<double*>(calldata)* 100.0);
-      this->ProgressEvent(o, progress, 0);
-      }
-    break;
-  case vtkCommand::WrongTagEvent:
-      {
-      int tag = -1;
-      int len = -1;
-      char val = -1;
-      const char* data = reinterpret_cast<const char*>(calldata);
-      const char* ptr = data;
-      memcpy(&tag, ptr, sizeof(tag));
-      if ( tag != PVAPPLICATION_PROGRESS_TAG )
-        {
-        vtkErrorMacro("Internal ParaView Error: Socket Communicator received wrong tag: " << tag);
-        abort();
-        return;
-        }
-      ptr += sizeof(tag);
-      memcpy(&len, ptr, sizeof(len));
-      ptr += sizeof(len);
-      val = *ptr;
-      ptr ++;
-      if ( val < 0 || val > 100 )
-        {
-        vtkErrorMacro("Received progres not in the range 0 - 100: " << (int)val);
-        return;
-        }
-      this->ProgressEvent(o, val, ptr);
-      }
-    break;
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendPrepareProgress()
-{
-  if (!this->ProgressRequests)
-    {
-    this->GetMainWindow()->StartProgress();
-    }
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
-  stream << vtkClientServerStream::Invoke << pm->GetApplicationID()
-    << "PrepareProgress" << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
-  if ( this->ProgressRequests == 0 )
-    {
-    this->ProgressEnabled = this->GetMainWindow()->GetEnabled();
-    }
-  this->ProgressRequests ++;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::SendCleanupPendingProgress()
-{
-  if ( this->ProgressRequests < 0 )
-    {
-    vtkErrorMacro("Internal ParaView Error: Progress requests went below zero");
-    vtkPVApplication::Abort();
-    }
-  this->ProgressRequests --;
-  if ( this->ProgressRequests > 0 )
-    {
-    return;
-    }
-  vtkPVProcessModule *pm = this->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
-  stream << vtkClientServerStream::Invoke << pm->GetApplicationID()
-         << "CleanupPendingProgress" << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::DATA_SERVER);
-  this->GetMainWindow()->EndProgress(this->ProgressEnabled);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::PrepareProgress()
-{
-  this->ProgressHandler->PrepareProgress(this);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::CleanupPendingProgress()
-{
-  this->ProgressHandler->CleanupPendingProgress(this);
-}
-
-//----------------------------------------------------------------------------
 int vtkPVApplication::GetNumberOfPartitions()
 {
   return this->GetProcessModule()->GetNumberOfPartitions();
@@ -2421,10 +2320,15 @@ void vtkPVApplication::SendStringToClientAndServer(const char* str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::ProgressEvent(vtkObject *o, int val, const char* str)
+void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
 {
-  this->ProgressHandler->InvokeProgressEvent(this, o, val, str);
+  switch ( event ) 
+    {
+    vtkPVApplication::Abort();
+    break;
+    }
 }
+
 
 //-----------------------------------------------------------------------------
 void vtkPVApplication::PlayDemo(int fromDashboard)

@@ -48,6 +48,7 @@
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+#include "vtkPVProgressHandler.h"
 
 #include "vtkCallbackCommand.h"
 #include "vtkKWRemoteExecute.h"
@@ -145,7 +146,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.87");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.88");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -551,6 +552,7 @@ void vtkPVClientServerModule::ConnectToRemote()
   // was made.
   this->SocketController = vtkSocketController::New();
   this->SocketController->SetCommunicator(comm);
+  this->ProgressHandler->SetSocketController(this->SocketController);
   comm->Delete();
   commRenderServer->Delete();
 }
@@ -561,6 +563,7 @@ void vtkPVClientServerModule::SetupWaitForConnection()
   vtkPVApplication *pvApp = this->GetPVApplication();
   this->SocketController = vtkSocketController::New();
   this->SocketController->Initialize();
+  this->ProgressHandler->SetSocketController(this->SocketController);
   vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
   
   int port= pvApp->GetPort();

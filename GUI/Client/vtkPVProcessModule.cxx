@@ -43,18 +43,18 @@
 #include "vtkUnsignedShortArray.h"
 #include "vtkClientServerStream.h"
 #include "vtkClientServerInterpreter.h"
+#include "vtkPVProgressHandler.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.50");
-
-vtkCxxSetObjectMacro(vtkPVProcessModule, Application, vtkKWApplication);
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.51");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
   this->Application = 0; 
   this->MPIMToNSocketConnectionID.ID = 0;
+  this->ProgressEnabled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -275,3 +275,55 @@ int vtkPVProcessModule::LoadModuleInternal(const char* name,
   const char* paths[] = {directory, 0};
   return this->Interpreter->Load(name, paths);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendPrepareProgress()
+{
+  if (!this->ProgressRequests)
+    {
+    this->GetPVApplication()->GetMainWindow()->StartProgress();
+    }
+  if ( this->ProgressRequests == 0 )
+    {
+    this->ProgressEnabled = this->GetPVApplication()->GetMainWindow()->GetEnabled();
+    }
+  this->Superclass::SendPrepareProgress();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendCleanupPendingProgress()
+{
+  this->Superclass::SendCleanupPendingProgress();
+  if ( this->ProgressRequests > 0 )
+    {
+    return;
+    }
+  this->GetPVApplication()->GetMainWindow()->EndProgress(this->ProgressEnabled);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetLocalProgress(const char* filter, int progress)
+{
+  if ( !filter )
+    {
+    vtkPVApplication::Abort();
+    }
+  if(!this->GetPVApplication()->GetMainWindow())
+    {
+    return;
+    }
+  this->GetPVApplication()->GetMainWindow()->SetProgress(filter, progress);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SetApplication(vtkKWApplication* app)
+{
+  vtkSetObjectBodyMacro(Application, vtkKWApplication, app);
+  vtkPVApplication* mapp = vtkPVApplication::SafeDownCast(app);
+  if ( mapp )
+    {
+    this->ProgressHandler->SetClientMode(mapp->GetClientMode());
+    this->ProgressHandler->SetServerMode(mapp->GetServerMode());
+    }
+}
+

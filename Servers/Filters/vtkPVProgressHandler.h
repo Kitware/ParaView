@@ -25,7 +25,7 @@
 
 #include "vtkObject.h"
 
-class vtkPVApplication;
+class vtkProcessModule;
 class vtkPVWindow;
 class vtkTimerLog;
 class vtkMPIController;
@@ -41,16 +41,16 @@ public:
 
 
   // Description:
-  // Set the application that will drive progress
-  virtual void SetPVApplication(vtkPVApplication *pvApp)
+  // Set the process module that will drive progress
+  virtual void SetProcessModule(vtkProcessModule *pvApp)
     {
-    this->Application = pvApp;
+    this->ProcessModule = pvApp;
     }
 
   // Description:
   // Invoke the progress event.
   virtual void InvokeProgressEvent(
-    vtkPVApplication* pvApp,
+    vtkProcessModule* pvApp,
     vtkObject* object,
     int val,
     const char* str);
@@ -63,22 +63,31 @@ public:
   // Description:
   // This method resets all the progress counters and prepares progress
   // reporting. All progress events before this call are ignored.
-  virtual void PrepareProgress(vtkPVApplication* app);
+  virtual void PrepareProgress(vtkProcessModule* app);
 
   // Description:
   // This method collects all outstanding progress messages. All progress
   // events after this call are ignored.
-  virtual void CleanupPendingProgress(vtkPVApplication* app);
+  virtual void CleanupPendingProgress(vtkProcessModule* app);
 
   // Description:
   // This method register object to be observed.
   virtual void RegisterProgressEvent(vtkObject* po, int id);
+
+  // Description:
+  // Set the socket controller.
+  virtual void SetSocketController(vtkSocketController* soc);
+
+  // Description:
+  // Set client and server mode
+  vtkSetMacro(ClientMode, int);
+  vtkSetMacro(ServerMode, int);
   
 protected:
   vtkPVProgressHandler();
   ~vtkPVProgressHandler();
 
-  vtkPVApplication* Application;
+  vtkProcessModule* ProcessModule;
 
   int ReceivingProgressReports;
 
@@ -99,14 +108,19 @@ protected:
   };
   //ETX
   
-  void DetermineProgressType(vtkPVApplication* app);
+  void DetermineProgressType(vtkProcessModule* app);
   int ProgressType;
 
-  void InvokeSatelliteProgressEvent(vtkPVApplication*, vtkObject*, int val);
-  void InvokeRootNodeProgressEvent(vtkPVApplication*, vtkObject*, int val);
-  void InvokeRootNodeServerProgressEvent(vtkPVApplication*, vtkObject*, int val);
+  int ClientMode;
+  int ServerMode;
+  int LocalProcessID;
+  int NumberOfProcesses;
+
+  void InvokeSatelliteProgressEvent(vtkProcessModule*, vtkObject*, int val);
+  void InvokeRootNodeProgressEvent(vtkProcessModule*, vtkObject*, int val);
+  void InvokeRootNodeServerProgressEvent(vtkProcessModule*, vtkObject*, int val);
   int ReceiveProgressFromSatellite(int* id, int* progress);
-  void LocalDisplayProgress(vtkPVApplication* app, const char* filter, int progress);
+  void LocalDisplayProgress(vtkProcessModule* app, const char* filter, int progress);
   void HandleProgress(int processid, int filterid, int progress);
 
   double MinimumProgressInterval;
