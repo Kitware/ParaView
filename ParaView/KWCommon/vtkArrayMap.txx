@@ -146,6 +146,10 @@ vtkArrayMap<KeyType,DataType>::FindDataItem(KeyType key)
 template<class KeyType, class DataType>
 vtkIdType vtkArrayMap<KeyType,DataType>::GetNumberOfItems()
 {
+  if ( !this->Array )
+    {
+    return 0;
+    }
   return this->Array->GetNumberOfItems();
 }
 
