@@ -46,7 +46,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkTimerLog.h"
 #include "vtkPVOutputWindow.h"
 #include "vtkOutputWindow.h"
-
+#include "vtkProbeFilter.h"
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
@@ -328,6 +328,27 @@ void vtkPVApplication::SendDataBounds(vtkDataSet *data)
   this->Controller->Send(bounds, 6, 0, 1967);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendProbeData(vtkProbeFilter *source)
+{
+  if (this->Controller->GetLocalProcessId() == 0)
+    {
+    return;
+    }
+  
+  vtkDataSet *output = source->GetOutput();
+  float bounds[6];
+  
+  source->GetSource()->GetBounds(bounds);
+  
+  vtkIdType numPoints = source->GetValidPoints()->GetMaxId() + 1;
+  this->Controller->Send(&numPoints, 1, 0, 1970);
+  if (numPoints > 0)
+    {
+    this->Controller->Send(source->GetValidPoints(), 0, 1971);
+    this->Controller->Send(output, 0, 1972);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::SendDataNumberOfCells(vtkDataSet *data)

@@ -37,7 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 class vtkPVSource;
 class vtkPolyDataMapper;
-
+class vtkProbeFilter;
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -110,6 +110,7 @@ public:
   void SendDataNumberOfCells(vtkDataSet *data);
   void SendDataNumberOfPoints(vtkDataSet *data);
   void SendMapperColorRange(vtkPolyDataMapper *mapper);
+  void SendProbeData(vtkProbeFilter *source);
   
   // Description:
   // Methods that will create a text log file.

@@ -1164,6 +1164,8 @@ void vtkPVWindow::ProbeCallback()
     vtkErrorMacro("Could not get pointer from object.");
     return;
     }
+
+  pvApp->BroadcastScript("%s SetSpatialMatch 2", tclName);
   
   probe = vtkPVProbe::New();
   probe->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());

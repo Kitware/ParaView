@@ -82,7 +82,6 @@ public:
   // Callbacks for Dimensionality menu
   void UsePoint();
   void UseLine();
-  void UsePlane();
 
   // Description:
   // Callback for SetPoint button
@@ -115,14 +114,14 @@ protected:
   vtkKWWidget *EndPointMenuFrame;
   vtkKWWidget *EndPoint1Frame;
   vtkKWLabel *EndPoint1Label;
-  vtkKWLabeledEntry *X1Entry;
-  vtkKWLabeledEntry *Y1Entry;
-  vtkKWLabeledEntry *Z1Entry;
+  vtkKWLabeledEntry *End1XEntry;
+  vtkKWLabeledEntry *End1YEntry;
+  vtkKWLabeledEntry *End1ZEntry;
   vtkKWWidget *EndPoint2Frame;
   vtkKWLabel *EndPoint2Label;
-  vtkKWLabeledEntry *X2Entry;
-  vtkKWLabeledEntry *Y2Entry;
-  vtkKWLabeledEntry *Z2Entry;
+  vtkKWLabeledEntry *End2XEntry;
+  vtkKWLabeledEntry *End2YEntry;
+  vtkKWLabeledEntry *End2ZEntry;
   vtkKWLabeledEntry *DivisionsEntry;
   
   vtkKWPushButton *SetPointButton;
@@ -132,7 +131,7 @@ protected:
   float SelectedPoint[3];
   float EndPoint1[3];
   float EndPoint2[3];
-  int Dimensionality; // point = 0, line = 1, plane = 2
+  int Dimensionality; // point = 0, line = 1
 
   vtkPVData *PVProbeSource;
 };

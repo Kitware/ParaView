@@ -321,6 +321,3 @@ void vtkPVData::Update()
 			 this->MapperTclName, this->MapperTclName);
   pvApp->BroadcastScript("%s Update", this->VTKDataTclName);
 }
-
-
-
