@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -461,7 +461,9 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
   maxBnds = (bnds[5] - bnds[4] > maxBnds) ? (bnds[5] - bnds[4]) : maxBnds;
   maxBnds *= 0.1;
 
+  double absMaxRange = 0;
   const char* scaleMode = this->ScaleModeMenu->GetValue();
+
   if (!strcmp(scaleMode, "Scalar"))
     {
     const char *arrayName = this->ScalarsMenu->GetValue();
@@ -471,10 +473,9 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       if (aInfo)
         {
         double *range = aInfo->GetComponentRange(0);
-        if (range[0]+range[1] != 0)
-          {
-          maxBnds /= (range[1] + range[0])*0.5;
-          }
+        absMaxRange = abs(range[0]);
+        absMaxRange = (abs(range[1]) > absMaxRange) ? abs(range[1]) :
+          absMaxRange;
         }
       }
     }
@@ -486,18 +487,10 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       aInfo = pdInfo->GetArrayInformation(arrayName);
       if (aInfo)
         {
-        double *range0 = aInfo->GetComponentRange(0);
-        double *range1 = aInfo->GetComponentRange(1);
-        double *range2 = aInfo->GetComponentRange(2);
-        double avg[3];
-        avg[0] = (range0[0] + range0[1]) * 0.5;
-        avg[1] = (range1[0] + range1[1]) * 0.5;
-        avg[2] = (range2[0] + range2[1]) * 0.5;
-        if (avg[0] != 0 || avg[1] != 0 || avg[2] != 0)
-          {
-          double mag = sqrt(avg[0]*avg[0] + avg[1]*avg[1] + avg[2]*avg[2]);
-          maxBnds /= mag;
-          }
+        double *range = aInfo->GetComponentRange(-1);
+        absMaxRange = abs(range[0]);
+        absMaxRange = (abs(range[1]) > absMaxRange) ? abs(range[1]) :
+          absMaxRange;
         }
       }
     }
@@ -512,18 +505,26 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
         double *range0 = aInfo->GetComponentRange(0);
         double *range1 = aInfo->GetComponentRange(1);
         double *range2 = aInfo->GetComponentRange(2);
-        double avg[3];
-        avg[0] = (range0[0] + range0[1]) * 0.5;
-        avg[1] = (range1[0] + range1[1]) * 0.5;
-        avg[2] = (range2[0] + range2[1]) * 0.5;
-        if (avg[0] + avg[1] + avg[2] != 0)
-          {
-          maxBnds /= (avg[0] + avg[1] + avg[2])/3.0;
-          }
+        absMaxRange = abs(range0[0]);
+        absMaxRange = (abs(range0[1]) > absMaxRange) ? abs(range0[1]) :
+          absMaxRange;
+        absMaxRange = (abs(range1[0]) > absMaxRange) ? abs(range1[0]) :
+          absMaxRange;
+        absMaxRange = (abs(range1[1]) > absMaxRange) ? abs(range1[1]) :
+          absMaxRange;
+        absMaxRange = (abs(range2[0]) > absMaxRange) ? abs(range2[0]) :
+          absMaxRange;
+        absMaxRange = (abs(range2[1]) > absMaxRange) ? abs(range2[1]) :
+          absMaxRange;
         }
       }
     }
   
+  if (absMaxRange != 0)
+    {
+    maxBnds /= absMaxRange;
+    }
+
   this->ScaleFactorEntry->SetValue(maxBnds);
   if (!this->AcceptCalled)
     {
