@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.25.2.7");
+vtkCxxRevisionMacro(vtkPVPart, "1.25.2.8");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -222,7 +222,7 @@ void vtkPVPart::GatherDataInformation()
 
   // I would like to have all sources generate names and all filters
   // Pass the field data, but until all is working well, this is a default.
-  if (this->Name == NULL)
+  if (this->Name == NULL || this->Name[0] == '\0')
     {
     char str[100];
     if (this->DataInformation->GetDataSetType() == VTK_POLY_DATA)
@@ -342,11 +342,17 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
       }
     else
       {
-      pm->ServerSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
+      pm->ServerSimpleScript("vtkDistributedDataFilter pvTemp");
       pm->ServerSimpleScript(
-        "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute TransmitUGrid}}");
+        "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute D3}}");
       pm->ServerSimpleScript(
-        "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitUGrid}}");
+        "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute D3}}");
+
+      //pm->ServerSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
+      //pm->ServerSimpleScript(
+      //  "pvTemp AddObserver StartEvent {$Application LogStartEvent {Execute TransmitUGrid}}");
+      //pm->ServerSimpleScript(
+      //  "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitUGrid}}");
       }
     }
     else if((pm->RootScript("%s IsA vtkImageData", this->VTKDataTclName),
