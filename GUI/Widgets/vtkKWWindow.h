@@ -35,11 +35,7 @@ class vtkKWTclInteractor;
 class vtkKWToolbarSet;
 class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
-
-//BTX
-class vtkKWRecentFileEntry;
-template<class DType> class vtkVector;
-//ETX
+class vtkKWMostRecentFilesUtilities;
 
 #define VTK_KW_PAGE_SETUP_MENU_LABEL      "Page Setup"
 #define VTK_KW_RECENT_FILES_MENU_LABEL    "Open Recent File"
@@ -262,11 +258,6 @@ public:
   // Call render on all views
   virtual void Render();
 
-  //Description:
-  // Set/Get Number of recent files in the menu.
-  virtual void SetNumberOfRecentFiles(vtkIdType);
-  vtkGetMacro(NumberOfRecentFiles, vtkIdType);
-
   //BTX
   //Description:
   // Set or get the registery value for the application.
@@ -367,22 +358,10 @@ protected:
     vtkKWWidget* target, const char* command);
 
   void SetToolbarVisibilityInternal(vtkKWToolbar* toolbar,const char* name, int flag);
+
   // Recent files
 
-  //BTX
-  // Description:
-  // This vector holds the list of most recently used files.
-  vtkVector<vtkKWRecentFileEntry*> *RecentFilesVector;
-  //ETX
-
-  vtkKWMenu *MenuRecentFiles;
-
-  void InsertRecentFile(
-    const char *filename, vtkKWObject *target, const char *command);
-  void UpdateRecentFilesMenu();
-  void StoreRecentFilesToRegistery();
-
-  vtkIdType NumberOfRecentFiles;
+  vtkKWMostRecentFilesUtilities *MostRecentFilesUtilities;
 
   // Description:
   // Display the exit dialog.

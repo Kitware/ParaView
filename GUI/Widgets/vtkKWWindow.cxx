@@ -23,6 +23,7 @@
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
+#include "vtkKWMostRecentFilesUtilities.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWSplitFrame.h"
@@ -34,8 +35,6 @@
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkVector.txx"
-#include "vtkVectorIterator.txx"
 
 #include <kwsys/SystemTools.hxx>
 
@@ -43,84 +42,8 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.214");
+vtkCxxRevisionMacro(vtkKWWindow, "1.215");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
-
-#define VTK_KW_RECENT_FILES_MAX 20
-
-//----------------------------------------------------------------------------
-class vtkKWRecentFileEntry
-{
-public:
-  vtkKWRecentFileEntry();
-  ~vtkKWRecentFileEntry();
-
-  char *GetFileName() { return this->FileName; }
-  void SetFileName(const char *file);
-  char *GetCommand() { return this->Command; }
-  void SetCommand(const char *command);
-  vtkKWObject *GetTarget() { return this->Target; }
-  void SetTarget(vtkKWObject *target) { this->Target = target; }
-
-  int Same(const char *filename, vtkKWObject *target, const char *command);
-  
-private:
-
-  char *FileName;
-  char *Command;
-  vtkKWObject *Target;  
-};
-
-vtkKWRecentFileEntry::vtkKWRecentFileEntry()
-{
-  this->FileName = 0;
-  this->Target   = 0;
-  this->Command  = 0;
-}
-
-vtkKWRecentFileEntry::~vtkKWRecentFileEntry()
-{
-  if (this->FileName)
-    {
-    delete [] this->FileName;
-    }
-  if (this->Command)
-    {
-    delete [] this->Command;
-    }
-}
-
-void vtkKWRecentFileEntry::SetFileName(const char *file)
-{
-  if (this->FileName)
-    {
-    delete [] this->FileName;
-    this->FileName = 0;
-    }
-  if (file)
-    {
-    this->FileName = kwsys::SystemTools::DuplicateString(file);
-    }
-}
-
-void vtkKWRecentFileEntry::SetCommand(const char *command)
-{
-  if (this->Command)
-    {
-    delete [] this->Command;
-    this->Command = 0;
-    }
-  if (command)
-    {
-    this->Command = kwsys::SystemTools::DuplicateString(command);
-    }
-}
-
-int vtkKWRecentFileEntry::Same(
-  const char *filename, vtkKWObject *vtkNotUsed(target), const char *vtkNotUsed(command))
-{
-  return (this->FileName && filename && !strcmp(filename, this->FileName));
-}
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWWindow );
@@ -137,7 +60,7 @@ vtkKWWindow::vtkKWWindow()
   this->MenuFile              = vtkKWMenu::New();
   this->MenuHelp              = vtkKWMenu::New();
   this->PageMenu              = vtkKWMenu::New();
-  this->MenuRecentFiles       = NULL;
+
   this->MenuEdit              = NULL;
   this->MenuView              = NULL;
   this->MenuWindow            = NULL;
@@ -174,12 +97,12 @@ vtkKWWindow::vtkKWWindow()
   this->WindowClass           = NULL;
   this->Title                 = NULL;
   this->PromptBeforeClose     = 1;
-  this->RecentFilesVector     = 0;
-  this->NumberOfRecentFiles   = 10;
   this->ScriptExtension       = 0;
   this->ScriptType            = 0;
 
   this->InExit                = 0;
+
+  this->MostRecentFilesUtilities = vtkKWMostRecentFilesUtilities::New();
 
   this->SetWindowClass("KitwareWidget");
   this->SetScriptExtension(".tcl");
@@ -193,23 +116,6 @@ vtkKWWindow::~vtkKWWindow()
     {
     this->TclInteractor->Delete();
     this->TclInteractor = NULL;
-    }
-
-  if (this->RecentFilesVector)
-    {
-    vtkVectorIterator<vtkKWRecentFileEntry *> *it = 
-      this->RecentFilesVector->NewIterator();
-    while (!it->IsDoneWithTraversal())
-      {
-      vtkKWRecentFileEntry *rfe = 0;
-      if (it->GetData(rfe) == VTK_OK && rfe)
-        {
-        delete rfe;
-        }
-      it->GoToNextItem();
-      }
-    it->Delete();
-    this->RecentFilesVector->Delete();
     }
 
   this->Notebook->Delete();
@@ -228,10 +134,6 @@ vtkKWWindow::~vtkKWWindow()
   this->Menu->Delete();
   this->PageMenu->Delete();
   this->MenuFile->Delete();
-  if (this->MenuRecentFiles)
-    {
-    this->MenuRecentFiles->Delete();
-    }
   this->MenuHelp->Delete();
   this->Toolbars->Delete();
   this->MenuBarSeparatorFrame->Delete();
@@ -268,6 +170,7 @@ vtkKWWindow::~vtkKWWindow()
   this->SetTitle(0);
   this->SetScriptExtension(0);
   this->SetScriptType(0);
+  this->MostRecentFilesUtilities->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -334,6 +237,8 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
 
   this->MenuFile->AddCommand("Close", this, "Close", 0);
   this->MenuFile->AddCommand("Exit", this, "Exit", 1);
+
+  this->MostRecentFilesUtilities->SetApplication(app);
 
   // Menu : Window : Properties panel
 
@@ -1068,77 +973,24 @@ void vtkKWWindow::LoadScript(const char *path)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::SetNumberOfRecentFiles(vtkIdType _arg)
-{
-  if (this->NumberOfRecentFiles == _arg ||
-      _arg < 4 || _arg > VTK_KW_RECENT_FILES_MAX)
-    {
-    return;
-    }
-
-  this->NumberOfRecentFiles = _arg;
-  this->Modified();
-
-  this->UpdateRecentFilesMenu();
-  this->StoreRecentFilesToRegistery();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::StoreRecentFilesToRegistery()
-{
-  char KeyNameP[20], CmdNameP[20];
-
-  // Store all recent files (remove all others, up to the max)
-
-  unsigned int i;
-  for (i = 0; i < VTK_KW_RECENT_FILES_MAX; i++)
-    {
-    sprintf(KeyNameP, "File%d", i);
-    sprintf(CmdNameP, "File%dCmd", i);
-
-    int delete_key = 1;
-    if (this->RecentFilesVector)
-      {
-      vtkKWRecentFileEntry *rfe = 0;
-      if (this->RecentFilesVector->GetItem(i, rfe) == VTK_OK && rfe)
-        {
-        this->GetApplication()->SetRegisteryValue(
-          1, "MRU", KeyNameP, rfe->GetFileName());
-        this->GetApplication()->SetRegisteryValue(
-          1, "MRU", CmdNameP, rfe->GetCommand());
-        delete_key = 0;
-        }
-      }
-
-    if (delete_key)
-      {
-      this->GetApplication()->DeleteRegisteryValue(1, "MRU", KeyNameP);
-      this->GetApplication()->DeleteRegisteryValue(1, "MRU", CmdNameP);
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindow::AddRecentFilesMenu(
   const char *menuEntry, vtkKWObject *target, const char *label, int underline)
 {
-  if (!this->IsCreated() || !label || !this->MenuFile)
+  if (!this->IsCreated() || !label || !this->MenuFile || 
+      !this->MostRecentFilesUtilities)
     {
     return;
     }
 
   // Create the menu if not done already
 
-  if (!this->MenuRecentFiles)
+  vtkKWMenu *mrf_menu = 
+    this->MostRecentFilesUtilities->GetMostRecentFilesMenu();
+  if (!mrf_menu->IsCreated())
     {
-    this->MenuRecentFiles = vtkKWMenu::New();
-    }
-
-  if (!this->MenuRecentFiles->IsCreated())
-    {
-    this->MenuRecentFiles->SetParent(this->MenuFile);
-    this->MenuRecentFiles->SetTearOff(0);
-    this->MenuRecentFiles->Create(this->GetApplication(), "");
+    mrf_menu->SetParent(this->MenuFile);
+    mrf_menu->SetTearOff(0);
+    mrf_menu->Create(this->GetApplication(), NULL);
     }
 
   // Remove the menu if already there (in case that function was used to
@@ -1160,125 +1012,25 @@ void vtkKWWindow::AddRecentFilesMenu(
     {
     insert_idx = this->MenuFile->GetIndex(menuEntry) - 1;
     }
-  
-  this->MenuFile->InsertCascade(
-    insert_idx, label, this->MenuRecentFiles, underline);
+  this->MenuFile->InsertCascade(insert_idx, label, mrf_menu, underline);
 
   // Fill the recent files vector with recent files stored in registery
+  // this will also update the menu
 
-  char KeyNameP[20], CmdNameP[20], FileName[1024], Command[1024];
-
-  int i;
-  for (i = VTK_KW_RECENT_FILES_MAX - 1; i >= 0; i--)
-    {
-    sprintf(KeyNameP, "File%d", i);
-    sprintf(CmdNameP, "File%dCmd", i);
-    if (this->GetApplication()->GetRegisteryValue(
-          1, "MRU", KeyNameP, FileName) &&
-        this->GetApplication()->GetRegisteryValue(
-          1, "MRU", CmdNameP, Command) &&
-        strlen(FileName) >= 1)
-      {
-      this->InsertRecentFile(FileName, target, Command);
-      }
-    }
-
-  // Build the menu
-
-  this->UpdateRecentFilesMenu();
+  this->MostRecentFilesUtilities->SetDefaultTargetObject(target);
+  this->MostRecentFilesUtilities->LoadMostRecentFilesFromRegistry();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::UpdateRecentFilesMenu()
-{ 
-  if (!this->MenuRecentFiles || !this->RecentFilesVector)
-    {
-    return;
-    }
-  
-  this->MenuRecentFiles->DeleteAllMenuItems();
-
-  // Fill the menu
-
-  vtkIdType cc, idx = 0;
-  for (cc = 0; cc < this->NumberOfRecentFiles; cc++)
-    {
-    vtkKWRecentFileEntry *rfe = 0;
-    if (this->RecentFilesVector->GetItem(cc, rfe) == VTK_OK && rfe &&
-        rfe->GetFileName() && rfe->GetTarget() && rfe->GetCommand())
-      {
-      kwsys_stl::string short_file = 
-        kwsys::SystemTools::CropString(rfe->GetFileName(), 40);
-      ostrstream label;
-      ostrstream cmd;
-      label << idx << " " << short_file.c_str() << ends;
-      cmd << rfe->GetCommand() << " {" << rfe->GetFileName() << "}" << ends;
-      this->MenuRecentFiles->AddCommand(
-        label.str(), rfe->GetTarget(), cmd.str(), (idx < 10 ? 0 : -1),
-        rfe->GetFileName());
-      idx++;
-      label.rdbuf()->freeze(0);
-      cmd.rdbuf()->freeze(0);
-      }
-    }
-
-  // Update the menu state to disable/enable this menu
-
-  this->UpdateMenuState();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::AddRecentFile(const char *name, vtkKWObject *target,
+void vtkKWWindow::AddRecentFile(const char *name, 
+                                vtkKWObject *target,
                                 const char *command)
 {  
-  const char* filename = this->GetApplication()->ExpandFileName(name);
-  this->InsertRecentFile(filename, target, command);
-  this->UpdateRecentFilesMenu();
-  this->StoreRecentFilesToRegistery();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::InsertRecentFile(const char *filename, 
-                                   vtkKWObject *target, 
-                                   const char *command)
-{
-  // If not vector yet, create it
-
-  if (!this->RecentFilesVector)
+  if (this->MostRecentFilesUtilities)
     {
-    this->RecentFilesVector = vtkVector<vtkKWRecentFileEntry*>::New();
+    this->MostRecentFilesUtilities->AddMostRecentFile(name, target, command);
+    this->MostRecentFilesUtilities->SaveMostRecentFilesToRegistry();
     }
-
-  // Find if already inserted (and delete it)
-
-  vtkKWRecentFileEntry *found = 0;
-
-  vtkIdType cc;
-  for (cc = 0; cc < this->RecentFilesVector->GetNumberOfItems(); cc++)
-    {
-    vtkKWRecentFileEntry *rfe = 0;
-    if (this->RecentFilesVector->GetItem(cc, rfe) == VTK_OK && rfe &&
-        rfe->Same(filename, target, command))
-      {
-      found = rfe;
-      this->RecentFilesVector->RemoveItem(cc);
-      break;
-      }
-    }
-
-  // Not found, create new one
-
-  if (!found)
-    {
-    found = new vtkKWRecentFileEntry;
-    found->SetFileName(filename);
-    found->SetTarget(target);
-    found->SetCommand(command) ;
-   }
-
-  // Prepend it to array  
-
-  this->RecentFilesVector->PrependItem(found);
 }
 
 //----------------------------------------------------------------------------
@@ -1728,24 +1480,11 @@ void vtkKWWindow::UpdateMenuState()
 
   // Most Recent Files
 
-  if (this->MenuRecentFiles)
+  if (this->MostRecentFilesUtilities)
     {
-    this->MenuRecentFiles->SetEnabled(this->Enabled);
-    if (this->MenuRecentFiles->IsCreated())
-      {
-      vtkKWMenu *parent = 
-        vtkKWMenu::SafeDownCast(this->MenuRecentFiles->GetParent());
-      if (parent)
-        {
-        int index = parent->GetCascadeIndex(this->MenuRecentFiles);
-        if (index >= 0)
-          {
-          int nb_items = this->MenuRecentFiles->GetNumberOfItems();
-          parent->SetState(
-            index,  nb_items ? menu_enabled :vtkKWMenu::Disabled);
-          }
-        }
-      }
+    this->MostRecentFilesUtilities->GetMostRecentFilesMenu()->SetEnabled(
+      this->Enabled);
+    this->MostRecentFilesUtilities->UpdateMostRecentFilesMenuStateInParent();
     }
 
   // Update the About entry, since the pretty name also depends on the
@@ -1772,8 +1511,6 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Menu: " << this->GetMenu() << endl;
   os << indent << "MenuFile: " << this->GetMenuFile() << endl;
   os << indent << "Notebook: " << this->GetNotebook() << endl;
-  os << indent << "NumberOfRecentFiles: " << this->GetNumberOfRecentFiles() 
-     << endl;
   os << indent << "PrintTargetDPI: " << this->GetPrintTargetDPI() << endl;
   os << indent << "ProgressGauge: " << this->GetProgressGauge() << endl;
   os << indent << "PromptBeforeClose: " << this->GetPromptBeforeClose() 
