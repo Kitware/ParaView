@@ -42,13 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledText.h"
 
-#include "vtkKWLabel.h"
+#include "vtkKWImageLabel.h"
 #include "vtkKWText.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledText);
-vtkCxxRevisionMacro(vtkKWLabeledText, "1.3");
+vtkCxxRevisionMacro(vtkKWLabeledText, "1.4");
 
 int vtkKWLabeledTextCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);

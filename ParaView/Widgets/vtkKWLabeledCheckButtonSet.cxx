@@ -43,12 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledCheckButtonSet.h"
 
 #include "vtkKWCheckButtonSet.h"
-#include "vtkKWLabel.h"
+#include "vtkKWImageLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledCheckButtonSet);
-vtkCxxRevisionMacro(vtkKWLabeledCheckButtonSet, "1.3");
+vtkCxxRevisionMacro(vtkKWLabeledCheckButtonSet, "1.4");
 
 int vtkKWLabeledCheckButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                       int argc, char *argv[]);

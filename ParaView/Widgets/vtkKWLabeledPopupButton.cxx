@@ -42,13 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWLabeledPopupButton.h"
 
-#include "vtkKWLabel.h"
+#include "vtkKWImageLabel.h"
 #include "vtkKWPopupButton.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledPopupButton);
-vtkCxxRevisionMacro(vtkKWLabeledPopupButton, "1.1");
+vtkCxxRevisionMacro(vtkKWLabeledPopupButton, "1.2");
 
 int vtkKWLabeledPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
