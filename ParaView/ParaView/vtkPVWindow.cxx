@@ -67,6 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
+#include "vtkKWTclInteractor.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
@@ -143,7 +144,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.492");
+vtkCxxRevisionMacro(vtkPVWindow, "1.493");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1721,10 +1722,13 @@ void vtkPVWindow::OpenCallback()
   loadDialog->SetDefaultExtension(".vtp");
   loadDialog->SetFileTypes(str.str());
   str.rdbuf()->freeze(0);  
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
   if ( loadDialog->Invoke() )
     {
     openFileName = vtkString::Duplicate(loadDialog->GetFileName());
     }
+  this->SetEnabled(enabled);
   
   // Store last path
   if ( openFileName && vtkString::Length(openFileName) > 0 )
@@ -2191,6 +2195,8 @@ void vtkPVWindow::WriteData()
 
   delete [] types;
 
+  int enabled = this->GetEnabled();
+  this->SetEnabled(0);
   if ( saveDialog->Invoke() &&
        vtkString::Length(saveDialog->GetFileName())>0 )
     {
@@ -2234,6 +2240,7 @@ void vtkPVWindow::WriteData()
     this->WriteVTKFile(filename, ghostLevel, timeSeries);
     this->SaveLastPath(saveDialog, "SaveDataFile");
     }
+  this->SetEnabled(enabled);
   saveDialog->Delete();
 }
 
