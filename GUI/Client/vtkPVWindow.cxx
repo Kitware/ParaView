@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.616");
+vtkCxxRevisionMacro(vtkPVWindow, "1.617");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4964,4 +4964,20 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationInterface: " << this->AnimationInterface << endl;
   os << indent << "InteractorID: " << this->InteractorID << endl;
   os << indent << "InDemo: " << this->InDemo << endl;
+
+  // Lookmarks part:
+#ifdef PARAVIEW_USE_LOOKMARKS
+  os << indent << "HideSourcePanel: " << this->HideSourcePanel << endl;
+  os << indent << "SaveVisibleSourcesOnlyFlag: " << this->SaveVisibleSourcesOnlyFlag << endl;
+  os << indent << "PVLookmarkManager: ";
+  if( this->PVLookmarkManager )
+    {
+    this->PVLookmarkManager->Print( os << endl, indent.GetNextIndent() );
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+#endif //PARAVIEW_USE_LOOKMARKS
 }
+

@@ -53,7 +53,7 @@
 
 #include "vtkClientServerID.h" // Needed for InteractorID
 
-#include "vtkPVConfig.h"
+#include "vtkPVConfig.h" // Needed for PARAVIEW_USE_LOOKMARKS
 #ifdef PARAVIEW_USE_LOOKMARKS
 class vtkPVLookmarkManager;
 #endif
