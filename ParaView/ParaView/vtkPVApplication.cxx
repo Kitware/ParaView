@@ -101,7 +101,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.247");
+vtkCxxRevisionMacro(vtkPVApplication, "1.247.2.1");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -233,32 +233,29 @@ public:
 
   ~vtkPVOutputWindow()
     {
-    if ( this->Errors.size() > 0 )
-      {
-      cout << "Errors while exiting ParaView:" << endl;
-      }
+      if ( this->Errors.size() > 0 )
+        {
 #ifdef WIN32
-    ostrstream str;
-    this->FlushErrors(str);
-    str << ends;
-    char *vtkmsg = new char [strlen(str.str()) + 100];
+        ostrstream str;
+        this->FlushErrors(str);
+        str << ends;
+        char *vtkmsg = new char [strlen(str.str()) + 100];
+        strcpy(vtkmsg,str.str());
 #ifdef UNICODE
-    wchar_t *wmsg = new wchar_t [mbstowcs(NULL, vtkmsg, 32000)];
-    mbstowcs(wmsg, vtkmsg, 32000);
-    delete [] wmsg;
+        wchar_t *wmsg = new wchar_t [mbstowcs(NULL, vtkmsg, 32000)];
+        mbstowcs(wmsg, vtkmsg, 32000);
+        MessageBox(NULL, wmsg, L"Error", MB_ICONERROR | MB_OK);
+        delete [] wmsg;
 #else
-    if (MessageBox(NULL, vtkmsg, "Error",
-        MB_ICONERROR | MB_OKCANCEL) == IDCANCEL) 
-      { 
-      vtkObject::GlobalWarningDisplayOff(); 
-      }
+        MessageBox(NULL, vtkmsg, "Error", MB_ICONERROR | MB_OK);
 #endif
-    delete [] vtkmsg;
-
-    str.rdbuf()->freeze(0);
+        delete [] vtkmsg;
+        str.rdbuf()->freeze(0);
 #else
-    this->FlushErrors(cout);
+        cout << "Errors while exiting ParaView:" << endl;
+       this->FlushErrors(cout);
 #endif
+        }
     }
   
   void FlushErrors(ostream& os)
