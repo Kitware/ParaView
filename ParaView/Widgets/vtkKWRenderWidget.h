@@ -163,9 +163,9 @@ public:
   vtkGetObjectMacro(HeaderAnnotation, vtkTextActor);
   
   // Description:
-  // Set/Get the units that pixel sizes are measured in
-  virtual void SetUnits(const char*);
-  vtkGetStringMacro(Units);
+  // Set/Get the distance units that pixel sizes are measured in
+  virtual void SetDistanceUnits(const char*);
+  vtkGetStringMacro(DistanceUnits);
   
   // Description:
   // Get the current camera
@@ -246,7 +246,7 @@ protected:
   int RenderMode;
   int Printing;
   
-  char *Units;
+  char *DistanceUnits;
 
   int CollapsingRenders;
   int CollapsingRendersCount;

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLTextActorWriter.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetWriter);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.5");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.6");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetWriter::GetRootElementName()
@@ -89,7 +89,7 @@ int vtkXMLKWRenderWidgetWriter::AddAttributes(vtkXMLDataElement *elem)
 
   elem->SetVectorAttribute("BackgroundColor", 3, obj->GetBackgroundColor());
 
-  elem->SetAttribute("Units", obj->GetUnits());
+  elem->SetAttribute("DistanceUnits", obj->GetDistanceUnits());
 
   return 1;
 }

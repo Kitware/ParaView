@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.53");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.54");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -117,7 +117,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->HeaderAnnotation->GetPosition2Coordinate()->SetValue(0.6, 0.1);
   this->HeaderAnnotation->VisibilityOff();
   
-  this->Units = NULL;
+  this->DistanceUnits = NULL;
 
   vtkCamera *cam = this->GetCurrentCamera();
   if (cam)
@@ -151,7 +151,7 @@ vtkKWRenderWidget::~vtkKWRenderWidget()
 
   this->HeaderAnnotation->Delete();
   
-  this->SetUnits(NULL);
+  this->SetDistanceUnits(NULL);
   
   this->Observer->Delete();
   this->Observer = NULL;
@@ -192,31 +192,31 @@ vtkCamera* vtkKWRenderWidget::GetCurrentCamera()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRenderWidget::SetUnits(const char* _arg)
+void vtkKWRenderWidget::SetDistanceUnits(const char* _arg)
 {
-  if (this->Units == NULL && _arg == NULL) 
+  if (this->DistanceUnits == NULL && _arg == NULL) 
     { 
     return;
     }
 
-  if (this->Units && _arg && (!strcmp(this->Units, _arg))) 
+  if (this->DistanceUnits && _arg && (!strcmp(this->DistanceUnits, _arg))) 
     {
     return;
     }
 
-  if (this->Units) 
+  if (this->DistanceUnits) 
     { 
-    delete [] this->Units; 
+    delete [] this->DistanceUnits; 
     }
 
   if (_arg)
     {
-    this->Units = new char[strlen(_arg)+1];
-    strcpy(this->Units, _arg);
+    this->DistanceUnits = new char[strlen(_arg)+1];
+    strcpy(this->DistanceUnits, _arg);
     }
   else
     {
-    this->Units = NULL;
+    this->DistanceUnits = NULL;
     }
 
   this->Modified();
@@ -899,7 +899,8 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderState: " << this->RenderState << endl;
   os << indent << "Renderer: " << this->Renderer << endl;
   os << indent << "CollapsingRenders: " << this->CollapsingRenders << endl;
-  os << indent << "Units: " << (this->Units ? this->Units : "(none)") << endl;
+  os << indent << "DistanceUnits: " 
+     << (this->DistanceUnits ? this->DistanceUnits : "(none)") << endl;
   os << indent << "EventIdentifier: " << this->EventIdentifier << endl;
 }
 
