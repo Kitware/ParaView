@@ -204,6 +204,8 @@ IF (PARAVIEW_USE_ICE_T)
     vtkCompositeRenderManager.cxx
     vtkPVIceTDisplayRenderModuleUI.cxx
     vtkPVIceTDisplayRenderModule.cxx
+    vtkPVIceTRenderModuleUI.cxx
+    vtkPVIceTRenderModule.cxx
     vtkIceTClientCompositeManager.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
