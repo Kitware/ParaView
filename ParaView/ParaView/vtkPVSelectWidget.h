@@ -71,12 +71,11 @@ public:
 
   // Description:
   // Add widgets to the possible selection.
-  void AddItem(const char* label, vtkPVWidget *pvw, const char* value);
+  void AddItem(const char* labelVal, vtkPVWidget *pvw, const char* vtkVal);
   
   // Description:
   // Set the label of the menu.
   void SetLabel(const char *label);
-  const char *GetLabel();
 
   // Description:
   // Called when accept button is pushed.
@@ -93,12 +92,23 @@ public:
   // The value is the label of the widget item.
   const char* GetCurrentValue();
   void SetCurrentValue(const char* val);
+
+  // Description:
+  // This method gets called when the menu changes.
+  void MenuCallback();
     
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();
   vtkPVSelectWidget(const vtkPVSelectWidget&) {};
   void operator=(const vtkPVSelectWidget&) {};
+
+  // Description:
+  // Methods used internally by accept and reset to look up the vtk value.
+  const char* GetCurrentVTKValue();
+  void SetCurrentVTKValue(const char* val);
+  int FindIndex(const char* str, vtkStringList *list);
+  void SetCurrentIndex(int idx);
 
   vtkKWLabeledFrame *LabeledFrame;
   vtkKWOptionMenu *Menu;
@@ -108,8 +118,7 @@ protected:
   vtkStringList *Values;
   vtkCollection *Widgets;
 
-  vtkSetMacro(CurrentLabel);
-  char *CurrentLabel;
+  int CurrentIndex;
 };
 
 #endif

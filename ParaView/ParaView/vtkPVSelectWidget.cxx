@@ -41,7 +41,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVSelectWidget.h"
 #include "vtkStringList.h"
-#include "vtkKWLabel.h"
+#include "vtkCollection.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 
@@ -54,21 +55,19 @@ vtkPVSelectWidget::vtkPVSelectWidget()
 {
   this->CommandFunction = vtkPVSelectWidgetCommand;
 
-  this->CurrentLabel = NULL;
-  
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->Menu = vtkKWOptionMenu::New();
 
   this->Labels = vtkStringList::New();
   this->Values = vtkStringList::New();
   this->Widgets = vtkCollection::New();
+
+  this->CurrentIndex = -1;
 }
 
 //----------------------------------------------------------------------------
 vtkPVSelectWidget::~vtkPVSelectWidget()
 {
-  this->SetCurrentName(NULL);
-  
   this->LabeledFrame->Delete();
   this->LabeledFrame = NULL;
   this->Menu->Delete();
@@ -128,12 +127,6 @@ void vtkPVSelectWidget::SetLabel(const char* label)
 }
   
 //----------------------------------------------------------------------------
-const char *vtkPVSelectWidget::GetLabel()
-{
-  return this->LabeledFrame->GetLabel();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVSelectWidget::Accept()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -148,7 +141,14 @@ void vtkPVSelectWidget::Accept()
   pvApp->BroadcastScript("%s Set%s {%s}",
                          this->ObjectTclName,
                          this->VariableName,
-                         this->CurrentLabel); 
+                         this->GetCurrentVTKValue()); 
+
+  if (this->CurrentIndex >= 0)
+    {
+    vtkPVWidget *pvw;
+    pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+    pvw->Accept();
+    }
 
   this->ModifiedFlag = 0;
 }
@@ -158,46 +158,144 @@ void vtkPVSelectWidget::Accept()
 void vtkPVSelectWidget::Reset()
 {
 
-  this->Script("%s SetCurrentValue [%s Get%s]",
+  this->Script("%s SetCurrentVTKValue [%s Get%s]",
                this->GetTclName(),
                this->ObjectTclName,
                this->VariableName);
 
+  if (this->CurrentIndex >= 0)
+    {
+    vtkPVWidget *pvw;
+    pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+    pvw->Reset();
+    }
+
   this->ModifiedFlag = 0;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVSelectWidget::SetCurrentValue(const char *val)
 {
-  char *name;
+  int idx;
+  
+  idx = this->FindIndex(val, this->Labels);
+  if (idx < 0 || idx == this->CurrentIndex)
+    {
+    return;
+    }
+  this->Menu->SetValue(val);
+  this->SetCurrentIndex(idx);
+}
 
-  if (strcmp(this->CurrentLabel, val) == 0)
+//----------------------------------------------------------------------------
+const char* vtkPVSelectWidget::GetCurrentValue()
+{
+  return this->Menu->GetValue();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::SetCurrentVTKValue(const char *val)
+{
+  int idx;
+  
+  idx = this->FindIndex(val, this->Values);
+  if (idx < 0 || idx == this->CurrentIndex)
     {
     return;
     }
 
-  this->SetCurrentLabel(val);
-  if (val)
+  this->Menu->SetValue(this->Labels->GetString(idx));
+  this->SetCurrentIndex(idx);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVSelectWidget::GetCurrentVTKValue()
+{
+  if (this->CurrentIndex < 0)
     {
-    this->Menu->SetValue(val);
-    this->ModifiedCallback();
+    return NULL;
+    }
+  return this->Values->GetString(this->CurrentIndex);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw, 
+                                const char* vtkVal)
+{
+  this->Labels->AddString(labelVal);
+  this->Values->AddString(vtkVal);
+  this->Widgets->AddItem(pvw);
+
+  // So we get the modified callbacks of these widgets.
+  pvw->AddDependant(this);
+
+  this->Menu->AddEntryWithCommand(labelVal, this, "MenuCallback");
+  if (this->Application && this->Menu->GetValue() == NULL)
+    {
+    this->Menu->SetValue(labelVal);
+    this->SetCurrentIndex(0);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectWidget::AddItem(const char* label, vtkPVWidget *pvw, 
-                                const char* value)
+void vtkPVSelectWidget::MenuCallback()
 {
-  this->Labels->AddString(label);
-  this->Values->AddString(value);
+  int idx;
 
-  sprintf(tmp, "SelectCallback {%s} %d", name, value);
-  this->Menu->AddEntryWithCommand(name, this, "ModifiedCallback");
-  
-  if (value == this->CurrentValue)
+  idx = this->FindIndex(this->Menu->GetValue(), this->Labels);
+  if (idx < 0 )
     {
-    this->Menu->SetValue(name);
+    vtkErrorMacro("Could not find value.");
+    return;
     }
+
+  this->SetCurrentIndex(idx);
 }
 
+//----------------------------------------------------------------------------
+int vtkPVSelectWidget::FindIndex(const char* str, vtkStringList *list)
+{
+  int idx, num;
+
+  if (str == NULL)
+    {
+    vtkErrorMacro("Null value.");
+    return -1;
+    }
+
+  num = list->GetNumberOfStrings();
+  for (idx = 0; idx < num; ++idx)
+    {
+    if (strcmp(str, list->GetString(idx)) == 0)
+      {
+      return idx;
+      }
+    }
+   
+  vtkErrorMacro("Could not find value " << str);
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::SetCurrentIndex(int idx)
+{
+  vtkPVWidget *pvw;
+
+  if (this->CurrentIndex == idx)
+    {
+    return;
+    }
+  // Unpack the old widget.
+  if (this->CurrentIndex >= 0)
+    {
+    pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+    this->Script("pack forget %s", pvw->GetWidgetName());
+    }
+  // Pack the new widget.
+  pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+  this->Script("pack %s -side top -fill both -expand t", pvw->GetWidgetName());
+
+  this->CurrentIndex = idx;
+
+  this->ModifiedCallback();
+}

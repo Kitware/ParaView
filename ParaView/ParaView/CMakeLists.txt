@@ -39,7 +39,8 @@ vtkPVProbe
 vtkPVRenderView 
 vtkPVScalarRangeLabel 
 vtkPVScale 
-vtkPVSelectionList 
+vtkPVSelectionList
+vtkPVSelectWidget 
 vtkPVSource 
 vtkPVSourceInterface 
 vtkPVSourceInterfaceParser
