@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.49");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.50");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -69,6 +69,11 @@ int vtkPVEnSightReaderModule::InitializeData()
 //----------------------------------------------------------------------------
 void vtkPVEnSightReaderModule::SaveInBatchScript(ofstream *file)
 {
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+
   this->SaveFilterInBatchScript(file);
   *file << "  $pvTemp" <<  this->GetVTKSourceID(0)
         << " Update" 
