@@ -291,7 +291,6 @@ void vtkPVContourEntry::SaveInTclScript(ofstream *file)
   int i;
   float value;
   int numContours;
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
   numContours = this->ContourValuesList->GetNumberOfItems();
 
