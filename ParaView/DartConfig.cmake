@@ -10,6 +10,9 @@ SET (DROP_SITE_PASSWORD "public")
 SET (TRIGGER_SITE 
        "http://${DROP_SITE}/cgi-bin/Submit-ParaView-TestingResults.pl")
 
+# Project Home Page
+SET (PROJECT_URL "http://www.paraview.org/")
+
 # Dart server configuration 
 SET (ROLLUP_URL "http://${DROP_SITE}/cgi-bin/paraview-rollup-dashboard.sh")
 SET (CVS_WEB_URL "http://${DROP_SITE}/cgi-bin/cvsweb.cgi/ParaView/")
