@@ -40,16 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkKWCornerAnnotation.h"
-#include "vtkKWWindow.h"
-#include "vtkKWView.h"
-#include "vtkObjectFactory.h"
+
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
-#include "vtkKWEvent.h"
-#include "vtkKWText.h"
-#include "vtkKWCheckButton.h"
 #include "vtkKWChangeColorButton.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWEvent.h"
 #include "vtkKWGenericComposite.h"
+#include "vtkKWText.h"
+#include "vtkKWView.h"
+#include "vtkKWWindow.h"
+#include "vtkObjectFactory.h"
+#include "vtkProperty2D.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
@@ -349,7 +351,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.23 $");
+  this->ExtractRevision(os,"$Revision: 1.24 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 

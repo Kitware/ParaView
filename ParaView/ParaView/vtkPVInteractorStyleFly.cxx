@@ -50,8 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
+#include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.4");
+vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.5");
 vtkStandardNewMacro(vtkPVInteractorStyleFly);
 
 //-------------------------------------------------------------------------

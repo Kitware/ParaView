@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkKWDialog.h"
 #include "vtkKWWindowCollection.h"
-
+#include "vtkTimerLog.h"
 #include "vtkMultiProcessController.h"
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
