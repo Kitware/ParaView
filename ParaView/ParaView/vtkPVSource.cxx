@@ -148,6 +148,10 @@ vtkPVSource::~vtkPVSource()
 
   this->SetName(NULL);
 
+  // This is necessary in order to make the parent frame release it's
+  // reference to the widgets. Otherwise, the widgets get deleted only
+  // when the parent (usually the parameters notebook page) is deleted.
+  this->Notebook->SetParent(0);
   this->Notebook->Delete();
   this->Notebook = NULL;
 
