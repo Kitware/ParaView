@@ -3474,12 +3474,16 @@ if $foundFiles {
     iso_init
     threshold_init
     warp_init
-    stream_init
+    if {[[$Application GetController] GetNumberOfProcesses] == 1} {
+        stream_init
+    }
 
     while {1} {
         iso_run
         warp_run
-        stream_run
+        if {[[$Application GetController] GetNumberOfProcesses] == 1} {
+            stream_run
+        }
         extract_run
         clip_run
         threshold_run
