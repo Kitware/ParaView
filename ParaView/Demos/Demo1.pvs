@@ -3481,6 +3481,7 @@ if ![info exists DemoDir] {
         if {![winfo exists .control]} {
             toplevel .control
             wm withdraw .control
+	    wm protocol .control WM_DELETE_WINDOW {StopDemo}
             wm title .control "demo control panel"
             frame .control.main -width 350 -height 200
             label .control.main.info  -wraplength 300
