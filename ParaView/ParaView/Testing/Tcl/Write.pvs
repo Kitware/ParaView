@@ -30,8 +30,19 @@ if { [catch {
   $pvWindow EnableMenus
   $pvWindow WriteVTKFile vtkParaViewWriteTest.$ext
   $pvWindow WriteVTKFile vtkParaViewWriteTestGhost.$ext 3
+  
   file delete -force vtkParaViewWriteTest.$ext
   file delete -force vtkParaViewWriteTestGhost.$ext
+
+  
+  if {$nprocs > 1} {
+    # Delete the temporary file's pieces.
+    for {set i 0} { $i < $nprocs } { incr i } {
+      catch { file delete -force "vtkParaViewWriteTest.$i.vtk" }
+      catch { file delete -force "vtkParaViewWriteTestGhost.$i.vtk" }
+    }
+  }
+
   $pvWindow SaveInTclScript vtkParaViewWriteTest.tcl 1 1
   file delete -force vtkParaViewWriteTest.tcl
 } res ] != 0 } {
