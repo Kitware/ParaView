@@ -70,6 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTIFFWriter.h"
 #include "vtkTextActor.h"
 #include "vtkTextMapper.h"
+#include "vtkTextProperty.h"
 #include "vtkViewport.h"
 #include "vtkWindowToImageFilter.h"
 
@@ -98,7 +99,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.92");
+vtkCxxRevisionMacro(vtkKWView, "1.93");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -156,11 +157,13 @@ vtkKWView::vtkKWView()
   this->HeaderColor = vtkKWChangeColorButton::New();
   this->HeaderLabel = vtkKWWidget::New();
   this->HeaderEntry = vtkKWEntry::New();
+
   this->HeaderMapper = vtkTextMapper::New();
-  this->HeaderMapper->SetJustificationToCentered();
-  this->HeaderMapper->SetVerticalJustificationToTop();
-  this->HeaderMapper->SetFontSize(15);  
-  this->HeaderMapper->ShadowOff();  
+  this->HeaderMapper->GetTextProperty()->SetJustificationToCentered();
+  this->HeaderMapper->GetTextProperty()->SetVerticalJustificationToTop();
+  this->HeaderMapper->GetTextProperty()->SetFontSize(15);  
+  this->HeaderMapper->GetTextProperty()->ShadowOff();  
+
   this->HeaderProp = vtkTextActor::New();
   this->HeaderProp->ScaledTextOn();
   this->HeaderProp->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
@@ -1491,7 +1494,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.92 $");
+  this->ExtractRevision(os,"$Revision: 1.93 $");
 }
 
 //----------------------------------------------------------------------------
