@@ -371,22 +371,22 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
   this->Script( "winfo pointery %s", widget->GetWidgetName());
   y = vtkKWObject::GetIntegerResult(this);
 
-  // Get the position of the mouse in the renderer.
-  this->Script( "winfo rootx %s", widget->GetWidgetName());
+  // Get the position of the parent widget of the one needing help
+  this->Script( "winfo rootx %s", widget->GetParent()->GetWidgetName());
   int xw = vtkKWObject::GetIntegerResult(this);
-  this->Script( "winfo rooty %s", widget->GetWidgetName());
+  this->Script( "winfo rooty %s", widget->GetParent()->GetWidgetName());
   int yw = vtkKWObject::GetIntegerResult(this);
 
-  // get the size and of the window
+  // get the size of the balloon window
   this->Script( "winfo reqwidth %s", this->BalloonHelpLabel->GetWidgetName());
   int dx = vtkKWObject::GetIntegerResult(this);
   this->Script( "winfo reqheight %s", this->BalloonHelpLabel->GetWidgetName());
   int dy = vtkKWObject::GetIntegerResult(this);
   
-  // get the size and of the window
-  this->Script( "winfo width %s", widget->GetWidgetName());
+  // get the size of the parent window of the one needing help
+  this->Script( "winfo width %s", widget->GetParent()->GetWidgetName());
   int dxw = vtkKWObject::GetIntegerResult(this);
-  this->Script( "winfo height %s", widget->GetWidgetName());
+  this->Script( "winfo height %s", widget->GetParent()->GetWidgetName());
   int dyw = vtkKWObject::GetIntegerResult(this);
   
   // Set the position of the window relative to the mouse.
@@ -404,12 +404,12 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
   // help from going past the right edge of the widget
   else
     {
-    // if it goes too far right
+     // if it goes too far right
     if (x + dx > xw + dxw)
       {
       // move it to the left
       x = xw + dxw - dx;
-      // but not past the left edge of the widget
+      // but not past the left edge of the parent widget
       if (x < xw)
         {
         x = xw;
@@ -426,7 +426,12 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
     {
     this->Script("wm deiconify %s", this->BalloonHelpWindow->GetWidgetName());
     this->Script("raise %s", this->BalloonHelpWindow->GetWidgetName());
+    
+    // remove the balloon help if the mouse moves
+    this->Script("bind %s <Motion> {%s BalloonHelpCancel; bind %s <Motion> {} }", 
+                 widget->GetWidgetName(), this->GetTclName(), widget->GetWidgetName() );
     }
+  
   this->SetBalloonHelpPending(NULL);
 }
 

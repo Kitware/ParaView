@@ -221,6 +221,8 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
                  this->GetTclName());
     this->Script("bind %s <ButtonPress> {%s BalloonHelpCancel}", 
                  this->GetWidgetName(), this->Application->GetTclName());
+    this->Script("bind %s <KeyPress> {%s BalloonHelpCancel}", 
+                 this->GetWidgetName(), this->Application->GetTclName());
     this->Script("bind %s <Leave> {%s BalloonHelpCancel}", 
                  this->GetWidgetName(), this->Application->GetTclName());
     }
@@ -228,6 +230,8 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     { // Turning balloon help off.
     this->Script("catch {bind %s <Enter> {}}", this->GetWidgetName());
     this->Script("catch {bind %s <ButtonPress> {}}", this->GetWidgetName());
+    this->Script("catch {bind %s <KeyPress> {}}", this->GetWidgetName());
+    this->Script("catch {bind %s <Motion> {}}", this->GetWidgetName());
     this->Script("catch {bind %s <Leave> {}}", this->GetWidgetName());
     }
 
@@ -248,7 +252,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.11 $");
+  this->ExtractRevision(os,"$Revision: 1.12 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()

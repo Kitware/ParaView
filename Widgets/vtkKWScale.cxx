@@ -254,3 +254,37 @@ void vtkKWScale::SetCommand(vtkKWObject* CalledObject, const char *CommandString
   command << CalledObject->GetTclName() << " " << CommandString << ends;
   this->Command = command.str();
 }
+
+void vtkKWScale::SetBalloonHelpString( const char *string )
+{
+  if ( !this->Application )
+    {
+    vtkErrorMacro("Must set application before setting balloon help string");
+    return;
+    }
+  
+  this->ScaleWidget->SetBalloonHelpString( string );
+  if ( this->Entry )
+    {
+    this->Entry->SetBalloonHelpString( string );
+    }
+  if ( this->ScaleLabel )
+    {
+    this->ScaleLabel->SetBalloonHelpString( string );
+    }
+  
+}
+
+void vtkKWScale::SetBalloonHelpJustification( int j )
+{
+  this->ScaleWidget->SetBalloonHelpJustification( j );
+  if ( this->Entry )
+    {
+    this->Entry->SetBalloonHelpJustification( j );
+    }
+  if ( this->ScaleLabel )
+    {
+    this->ScaleLabel->SetBalloonHelpJustification( j );
+    }
+  
+}

@@ -81,6 +81,12 @@ public:
   virtual void SetStartCommand(vtkKWObject* Object, const char *MethodAndArgString);
   virtual void SetEndCommand(vtkKWObject* Object, const char *MethodAndArgString);
 
+  // Description:
+  // Setting this string enables balloon help for this widget.
+  // Override to pass down to children for cleaner behavior
+  virtual void SetBalloonHelpString(const char *str);
+  virtual void SetBalloonHelpJustification( int j );
+
 protected:
   vtkKWScale();
   ~vtkKWScale();

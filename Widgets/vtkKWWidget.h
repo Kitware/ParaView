@@ -87,7 +87,7 @@ public:
 
   // Description:
   // Setting this string enables balloon help for this widget.
-  void SetBalloonHelpString(const char *str);
+  virtual void SetBalloonHelpString(const char *str);
   vtkGetStringMacro(BalloonHelpString);
   
   // Description:
