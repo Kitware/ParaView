@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.4");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.5");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -455,7 +455,7 @@ void vtkAMRSpyPlotReader::UpdateMetaData(const char* fname)
   vtkDebugMacro("Number of Cell Fields: " << num_cell_fields);
   for(field=0; field< num_cell_fields; ++field)
     {
-    const char* fieldName = spcth_getCellFieldName(spcth, field);
+    const char* fieldName = spcth_getCellFieldDescription(spcth, field);
     vtkDebugMacro("Cell Field Name -- Description(" << field << "): " << fieldName << " -- " << spcth_getCellFieldDescription(spcth, field));
     if ( !this->CellDataArraySelection->ArrayExists(fieldName) )
       {
@@ -617,7 +617,7 @@ void vtkAMRSpyPlotReader::Execute()
   int numFields = spcth_getNumberOfCellFields(spcth);
   for ( field = 0; field < numFields; ++ field )
     {
-    const char* fname = spcth_getCellFieldName(spcth, field);
+    const char* fname = spcth_getCellFieldDescription(spcth, field);
     if ( !this->CellDataArraySelection->ArrayIsEnabled(fname) )
       {
       continue;
@@ -674,7 +674,7 @@ void vtkAMRSpyPlotReader::Execute()
         vtkDebugMacro("Executing block: " << block);
         for ( field = 0; field < numFields; field ++ )
           {
-          const char* fname = spcth_getCellFieldName(spcth, field);
+          const char* fname = spcth_getCellFieldDescription(spcth, field);
           if ( !this->CellDataArraySelection->ArrayIsEnabled(fname) )
             {
             continue;

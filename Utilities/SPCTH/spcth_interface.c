@@ -233,11 +233,21 @@ const char* spcth_getCellFieldName(SPCTH* spcth, int index)
  ********************************************************************/
 const char* spcth_getCellFieldDescription(SPCTH* spcth, int index) 
 {
+  static char buffer[80]; 
+  int mat_index;
   int spcth_index = getFieldSPCTHIndex(spcth, index);
 
   if (isMaterialIndex(spcth_index)) 
     {
-    return spcth->Spy->stm_data.MField_comment[getMaterialIndex(spcth_index)];
+    /* This logic is a long story. There are 5 'categories' */
+    /* of materials. The MField_id array contains those     */
+    /* categories. The index is based on hundreds... so     */
+    /* 100 = VOLM, 200 = M, 300 = PM, etc...                */
+    /* We append the material number to the category.       */
+    /* Example VOLM - 1                                     */
+    mat_index = getMaterialIndex(spcth_index);
+    sprintf(buffer, "%s - %d", spcth->Spy->stm_data.MField_comment[mat_index], getMaterialSubIndex(spcth_index));
+    return buffer;
     }
   else
     {
