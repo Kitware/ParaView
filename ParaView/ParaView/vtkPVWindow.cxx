@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.472");
+vtkCxxRevisionMacro(vtkPVWindow, "1.473");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2614,6 +2614,17 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     }
   *file << "vtkCommand DeleteAllObjects\n";
 
+  file->flush();
+  if (file->fail())
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Write Error",
+      "There is insufficient disk space to save this batch script. The file "
+      "will be deleted.");
+    file->close();
+    unlink(filename);
+    }
+  
   dialog->Delete();
   dialog = NULL;
   delete file;
@@ -2832,6 +2843,17 @@ void vtkPVWindow::SaveState(const char* filename)
   // Save state of the animation interface
   this->AnimationInterface->SaveState(file);
 
+  file->flush();
+  if (file->fail())
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Write Error",
+      "There is insufficient disk space to save the session state. The file "
+      "will be deleted.");
+    file->close();
+    unlink(filename);
+    }
+  
   delete file;
   file = NULL;
 }
@@ -3545,6 +3567,18 @@ int vtkPVWindow::SaveTrace(const char* filename)
     {
     trace->open(pvApp->GetTraceFileName(), ios::in | ios::app );
     }
+  
+  newTrace.flush();
+  if (newTrace.fail())
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Write Error",
+      "There is insufficient disk space to save this session trace. The file "
+      "will be deleted.");
+    newTrace.close();
+    unlink(filename);
+    }
+  
   return 1;
 }
 

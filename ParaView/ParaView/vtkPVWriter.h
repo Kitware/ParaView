@@ -112,8 +112,8 @@ protected:
   vtkPVWriter();
   ~vtkPVWriter();
   
-  void WriteOneFile(const char* fileName, vtkPVSource* pvs,
-                    int numProcs, int ghostLevel);
+  int WriteOneFile(const char* fileName, vtkPVSource* pvs,
+                   int numProcs, int ghostLevel);
   
   char* InputClassName;
   char* WriterClassName;

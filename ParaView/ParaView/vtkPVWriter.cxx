@@ -42,18 +42,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWriter.h"
 
 #include "vtkDataSet.h"
+#include "vtkErrorCode.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
+#include "vtkPVWindow.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.9");
+vtkCxxRevisionMacro(vtkPVWriter, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -131,7 +134,10 @@ void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
       name += buf;
       name += ext;
       rm->SetRequestedTimeStep(i);
-      this->WriteOneFile(name.c_str(), pvs, numProcs, ghostLevel);
+      if (!this->WriteOneFile(name.c_str(), pvs, numProcs, ghostLevel))
+        {
+        return;
+        }
       }
     }
   else
@@ -141,12 +147,14 @@ void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
-                               int numProcs, int ghostLevel)
+int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
+                              int numProcs, int ghostLevel)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   const char* dataTclName = pvs->GetPart()->GetVTKDataTclName();
+  int success = 1;
+  
   if(!this->Parallel)
     {
     // Create the writer and configure it.
@@ -160,7 +168,17 @@ void vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
     
     // Write the data.
     pm->ServerScript("writer Write");
-    
+    pm->ServerScript("writer GetErrorCode");
+    int retVal = vtkKWObject::GetIntegerResult(pvApp);
+    if (retVal == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      vtkKWMessageDialog::PopupMessage(
+        pvApp, pvApp->GetMainWindow(),
+        "Write Error", "There is insufficient disk space to save this data. "
+        "The file(s) already written will be deleted.");
+      success = 0;
+      }
+
     // Cleanup.
     pm->ServerScript("writer Delete");
     }
@@ -193,8 +211,19 @@ void vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
     
     // Write the data.
     pm->ServerScript("writer Write");
+    pm->ServerScript("writer GetErrorCode");
+    int retVal = vtkKWObject::GetIntegerResult(pvApp);
+    if (retVal == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      vtkKWMessageDialog::PopupMessage(
+        pvApp, pvApp->GetMainWindow(),
+        "Write Error", "There is insufficient disk space to save this data. "
+        "The file(s) already written will be deleted.");
+      success = 0;
+      }
     
     // Cleanup.
     pm->ServerScript("writer Delete");
     }
+  return success;
 }

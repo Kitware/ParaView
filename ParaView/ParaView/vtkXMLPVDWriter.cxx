@@ -18,6 +18,7 @@
 #include "vtkXMLPVDWriter.h"
 
 #include "vtkCallbackCommand.h"
+#include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -47,6 +48,10 @@ int vtkXMLPVDWriterMakeDirectory(const char* dirname)
 {
   return (_mkdir(dirname) >= 0)?1:0;
 }
+int vtkXMLPVDWriterRemoveDirectory(const char* dirname)
+{
+  return (_rmdir(dirname) >= 0)?1:0;
+}
 #else
 # include <sys/stat.h>
 # include <sys/types.h>
@@ -54,11 +59,15 @@ int vtkXMLPVDWriterMakeDirectory(const char* dirname)
 {
   return (mkdir(dirname, 00755) >= 0)?1:0;
 }
+int vtkXMLPVDWriterRemoveDirectory(const char* dirname)
+{
+  return (mkdir(dirname, 00755) >= 0)?1:0;
+}
 #endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVDWriter);
-vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLPVDWriter, "1.3");
 
 class vtkXMLPVDWriterInternals
 {
@@ -165,7 +174,7 @@ int vtkXMLPVDWriter::WriteInternal()
   this->MakeDirectory(subdir.c_str());
   
   // Write each input.
-  int i;
+  int i, j;
   this->DeleteAllEntries();
   for(i=0; i < this->GetNumberOfInputs(); ++i)
     {
@@ -191,6 +200,20 @@ int vtkXMLPVDWriter::WriteInternal()
         << "\" file=\"" << fname.c_str() << "\"/>" << ends;
       this->AppendEntry(entry_with_warning_C4701.str());
       entry_with_warning_C4701.rdbuf()->freeze(0);
+      
+      if (w->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+        {
+        for (j = 0; j < i; j++)
+          {
+          vtkstd::string fname = this->Internal->CreatePieceFileName(i);
+          vtkstd::string full = this->Internal->FilePath;
+          full += fname;
+          unlink(full.c_str());
+          }
+        this->RemoveDirectory(subdir.c_str());
+        this->SetErrorCode(vtkErrorCode::OutOfDiskSpaceError);
+        return 0;
+        }
       }
     }
   
@@ -225,9 +248,7 @@ int vtkXMLPVDWriter::WriteData()
   
   // Close the primary element.
   os << indent << "</" << this->GetDataSetName() << ">\n";
-  this->EndFile();
-  
-  return 1;
+  return this->EndFile();
 }
 
 //----------------------------------------------------------------------------
@@ -255,6 +276,12 @@ int vtkXMLPVDWriter::WriteCollectionFileIfRequested()
 void vtkXMLPVDWriter::MakeDirectory(const char* name)
 {
   vtkXMLPVDWriterMakeDirectory(name);  
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLPVDWriter::RemoveDirectory(const char* name)
+{
+  vtkXMLPVDWriterRemoveDirectory(name);
 }
 
 //----------------------------------------------------------------------------

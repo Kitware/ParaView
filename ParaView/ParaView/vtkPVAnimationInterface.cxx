@@ -27,6 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkPVAnimationInterface.h"
 
+#include "vtkErrorCode.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -35,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
@@ -173,7 +175,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.84");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.85");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1215,6 +1217,9 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   // Loop through all of the time steps.
   t = this->GetGlobalStart();
   fileCount = 0;
+  
+  int i, success = 1;
+  
   while (t <= this->GetGlobalEnd())
     {
     this->SetCurrentTime(t);
@@ -1226,7 +1231,16 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     writer->SetFileName(fileName);
     winToImage->Modified();
     writer->Write();
-    
+    if (writer->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      for (i = 0; i < fileCount; i++)
+        {
+        sprintf(fileName, "%s%04d.%s", fileRoot, i, ext);
+        unlink(fileName);
+        }
+      success = 0;
+      break;
+      }
     ++fileCount;
     ++t;
     }
@@ -1237,6 +1251,14 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   writer = NULL;
   delete [] fileName;
   fileName = NULL;
+  
+  if (!success)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this->Window, "Write Error",
+      "There is insufficient disk space to save the images for this "
+      "animation. The file(s) already written will be deleted.");
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1333,6 +1355,9 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
   // Start the animation.
   pm->ServerScript("pvAnimWriter Start");
   
+  int retVal, success = 1;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
   // Loop through all of the time steps.
   for(int t = this->GetGlobalStart(); t <= this->GetGlobalEnd(); ++t)
     {
@@ -1343,10 +1368,34 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
     
     // Write this time step.
     pm->ServerScript("pvAnimWriter WriteTime {%d}", t);
+    
+    pm->ServerScript("pvAnimWriter GetErrorCode");
+    retVal = vtkKWObject::GetIntegerResult(pvApp);
+    if (retVal == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      vtkKWMessageDialog::PopupMessage(
+        pvApp, pvApp->GetMainWindow(),
+        "Write Error", "There is insufficient disk space to save the geometry "
+        "for this animation. The file(s) already written will be deleted.");
+      break;
+      }
     }
   
-  // Finish the animation.
-  pm->ServerScript("pvAnimWriter Finish");
+  if (success)
+    {
+    // Finish the animation.
+    pm->ServerScript("pvAnimWriter Finish");
+    pm->ServerScript("pvAnimWriter GetErrorCode");
+    retVal = vtkKWObject::GetIntegerResult(pvApp);
+    if (retVal == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      vtkKWMessageDialog::PopupMessage(
+        pvApp, pvApp->GetMainWindow(),
+        "Write Error", "There is insufficient disk space to save the geometry "
+        "for this animation. The file(s) already written will be deleted.");
+      }
+    }
   
   // Cleanup the writer pipeline.
   pm->ServerScript("pvAnimWriter Delete");

@@ -70,6 +70,12 @@ protected:
   
   // Internal implementation details.
   vtkXMLPVAnimationWriterInternals* Internal;
+
+  char **FileNamesCreated;
+  int NumberOfFileNamesCreated;
+  void AddFileName(const char *fileName);
+  void DeleteFileNames();
+  void DeleteFiles();
   
 private:
   vtkXMLPVAnimationWriter(const vtkXMLPVAnimationWriter&);  // Not implemented.

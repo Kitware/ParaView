@@ -18,6 +18,7 @@
 #include "vtkXMLPVAnimationWriter.h"
 
 #include "vtkDataSet.h"
+#include "vtkErrorCode.h"
 #include "vtkObjectFactory.h"
 #include "vtkSmartPointer.h"
 #include "vtkXMLWriter.h"
@@ -28,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVAnimationWriter);
-vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLPVAnimationWriter, "1.3");
 
 //----------------------------------------------------------------------------
 class vtkXMLPVAnimationWriterInternals
@@ -68,12 +69,15 @@ vtkXMLPVAnimationWriter::vtkXMLPVAnimationWriter()
   this->Internal = new vtkXMLPVAnimationWriterInternals;
   this->StartCalled = 0;
   this->FinishCalled = 0;
+  this->FileNamesCreated = 0;
+  this->NumberOfFileNamesCreated = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkXMLPVAnimationWriter::~vtkXMLPVAnimationWriter()
 {
   delete this->Internal;
+  this->DeleteFileNames();
 }
 
 //----------------------------------------------------------------------------
@@ -166,6 +170,9 @@ void vtkXMLPVAnimationWriter::Start()
   // Clear the animation entries from any previous run.
   this->DeleteAllEntries();
   
+  // Clear the file names from any previous run.
+  this->DeleteFileNames();
+  
   // Split the file name into a directory and file prefix.
   this->SplitFileName();
   
@@ -227,8 +234,19 @@ void vtkXMLPVAnimationWriter::WriteTime(double time)
       vtkstd::string fullName = this->GetFilePath();
       fullName += fname;
       writer->SetFileName(fullName.c_str());
+      this->AddFileName(fullName.c_str());
       writer->Write();
-      }    
+      if (writer->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+        {
+        this->SetErrorCode(vtkErrorCode::OutOfDiskSpaceError);
+        break;
+        }
+      }
+    }
+  
+  if (this->ErrorCode == vtkErrorCode::OutOfDiskSpaceError)
+    {
+    this->DeleteFiles();
     }
 }
 
@@ -246,6 +264,11 @@ void vtkXMLPVAnimationWriter::Finish()
   
   // Just write the output file with the current set of entries.
   this->Write();
+
+  if (this->ErrorCode == vtkErrorCode::OutOfDiskSpaceError)
+    {
+    this->DeleteFiles();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -298,4 +321,60 @@ vtkXMLPVAnimationWriterInternals::CreateFileName(int index,
   vtkstd::string fname = fn_with_warning_C4701.str();
   fn_with_warning_C4701.rdbuf()->freeze(0);
   return fname;
+}
+
+void vtkXMLPVAnimationWriter::AddFileName(const char *fileName)
+{
+  int size = this->NumberOfFileNamesCreated;
+  char **newFileNameList = new char *[size];
+  
+  int i;
+  for (i = 0; i < size; i++)
+    {
+    newFileNameList[i] = new char[strlen(this->FileNamesCreated[i]) + 1];
+    strcpy(newFileNameList[i], this->FileNamesCreated[i]);
+    delete [] this->FileNamesCreated[i];
+    }
+  delete [] this->FileNamesCreated;
+  
+  this->FileNamesCreated = new char *[size+1];
+  
+  for (i = 0; i < size; i++)
+    {
+    this->FileNamesCreated[i] = new char[strlen(newFileNameList[i]) + 1];
+    strcpy(this->FileNamesCreated[i], newFileNameList[i]);
+    delete [] newFileNameList[i];
+    }
+  delete [] newFileNameList;
+  
+  this->FileNamesCreated[size] = new char[strlen(fileName) + 1];
+  strcpy(this->FileNamesCreated[size], fileName);
+  this->NumberOfFileNamesCreated++;
+}
+
+void vtkXMLPVAnimationWriter::DeleteFileNames()
+{
+  int i;
+  if (this->FileNamesCreated)
+    {
+    for (i = 0; i < this->NumberOfFileNamesCreated; i++)
+      {
+      delete [] this->FileNamesCreated[i];
+      }
+    delete [] this->FileNamesCreated;
+    this->FileNamesCreated = 0;
+    }
+  this->NumberOfFileNamesCreated = 0;
+}
+
+void vtkXMLPVAnimationWriter::DeleteFiles()
+{
+  for (int i = 0; i < this->NumberOfFileNamesCreated; i++)
+    {
+    this->DeleteFile(this->FileNamesCreated[i]);
+    }
+  this->DeleteFile(this->FileName);
+  vtkstd::string subdir = this->GetFilePath();
+  subdir += this->GetFilePrefix();
+  this->RemoveDirectory(subdir.c_str());
 }

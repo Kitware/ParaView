@@ -42,16 +42,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDWriter.h"
 
 #include "vtkDataSet.h"
+#include "vtkErrorCode.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVSource.h"
+#include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.2");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -151,6 +154,15 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     
     // Just write the current data.
     pm->ServerScript("writer Write");
+    pm->ServerScript("writer GetErrorCode");
+    int retVal = vtkKWObject::GetIntegerResult(pvApp);
+    if (retVal == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      vtkKWMessageDialog::PopupMessage(
+        pvApp, pvApp->GetMainWindow(),
+        "Write Error", "There is insufficient disk space to save this data. "
+        "The file(s) already written will be deleted.");
+      }
     }
   
   // Delete the writer.

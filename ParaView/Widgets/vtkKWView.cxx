@@ -36,6 +36,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWView.h"
 
 #include "vtkBMPWriter.h"
+#include "vtkErrorCode.h"
 #include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
 #include "vtkKWApplication.h"
@@ -51,6 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
+#include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWSaveImageDialog.h"
 #include "vtkKWSegmentedProgressGauge.h"
@@ -101,7 +103,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.113");
+vtkCxxRevisionMacro(vtkKWView, "1.114");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1019,12 +1021,18 @@ void vtkKWView::SaveAsImage(const char* filename)
   w2i->SetInput(vtkWin);
   w2i->Update();
   
+  int success = 1;
+  
   if (!strcmp(filename + strlen(filename) - 4,".bmp"))
     {
     vtkBMPWriter *bmp = vtkBMPWriter::New();
     bmp->SetInput(w2i->GetOutput());
     bmp->SetFileName((char *)filename);
     bmp->Write();
+    if (bmp->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
     bmp->Delete();
     }
   else if (!strcmp(filename + strlen(filename) - 4,".tif"))
@@ -1033,6 +1041,10 @@ void vtkKWView::SaveAsImage(const char* filename)
     tif->SetInput(w2i->GetOutput());
     tif->SetFileName((char *)filename);
     tif->Write();
+    if (tif->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
     tif->Delete();
     }
   else if (!strcmp(filename + strlen(filename) - 4,".ppm"))
@@ -1041,6 +1053,10 @@ void vtkKWView::SaveAsImage(const char* filename)
     pnm->SetInput(w2i->GetOutput());
     pnm->SetFileName((char *)filename);
     pnm->Write();
+    if (pnm->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
     pnm->Delete();
     }
   else if (!strcmp(filename + strlen(filename) - 4,".png"))
@@ -1049,6 +1065,10 @@ void vtkKWView::SaveAsImage(const char* filename)
     png->SetInput(w2i->GetOutput());
     png->SetFileName((char *)filename);
     png->Write();
+    if (png->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
     png->Delete();
     }
   else if (!strcmp(filename + strlen(filename) - 4,".jpg"))
@@ -1057,10 +1077,22 @@ void vtkKWView::SaveAsImage(const char* filename)
     jpg->SetInput(w2i->GetOutput());
     jpg->SetFileName((char *)filename);
     jpg->Write();
+    if (jpg->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      success = 0;
+      }
     jpg->Delete();
     }
 
   w2i->Delete();
+  
+  if (!success)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this->ParentWindow, "Write Error",
+      "There is insufficient disk space to save this image. The file will be "
+      "deleted.");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1526,7 +1558,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.113 $");
+  this->ExtractRevision(os,"$Revision: 1.114 $");
 }
 
 //----------------------------------------------------------------------------
