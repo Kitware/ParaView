@@ -4,6 +4,7 @@ a Delete
 
 set exceptions {
   vtkLODProp3D-GetPickLODID
+  vtkObject-GetSuperClassName
   vtkPropAssembly-GetBounds
   vtkRenderWindow-GetEventPending
   vtkXOpenGLRenderWindow-GetEventPending
@@ -79,6 +80,7 @@ set classExceptions {
   vtkImageDataToTkPhoto
   vtkViewRays
   vtkWin32OutputWindow
+  vtkWin32ProcessOutputWindow
   vtkXMLFileOutputWindow
   vtkKWApplication
   vtkPVApplication
@@ -91,7 +93,7 @@ proc rtSetGetTest { fileid } {
   foreach a $all {
     if {[lsearch $classExceptions $a] == -1} {
 # test some set get methods
-#puts "Testing -- $a"
+      puts "Testing -- $a"
       TestOne $a
     }
   }
