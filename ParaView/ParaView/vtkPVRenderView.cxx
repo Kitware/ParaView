@@ -533,8 +533,10 @@ void vtkPVRenderView::CreateViewProperties()
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->RenderParametersFrame->GetWidgetName());
 
-  this->TriangleStripsCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->TriangleStripsCheck->Create(this->Application, "-text \"Use Triangle Strips\"");
+  this->TriangleStripsCheck->SetParent(
+    this->RenderParametersFrame->GetFrame());
+  this->TriangleStripsCheck->Create(this->Application, 
+				    "-text \"Use Triangle Strips\"");
   if (pvapp && pvwindow && 
       pvapp->GetRegisteryValue(2, "RunTime", "UseStrips", 0))
     {
@@ -546,10 +548,12 @@ void vtkPVRenderView::CreateViewProperties()
     this->TriangleStripsCheck->SetState(0);
     }
   this->TriangleStripsCheck->SetCommand(this, "TriangleStripsCallback");
-  this->TriangleStripsCheck->SetBalloonHelpString("Toggle the use of triangle strips when rendering polygonal data");
+  this->TriangleStripsCheck->SetBalloonHelpString(
+    "Toggle the use of triangle strips when rendering polygonal data");
   
   this->ImmediateModeCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->ImmediateModeCheck->Create(this->Application, "-text \"Use Immediate Mode Rendering\"");
+  this->ImmediateModeCheck->Create(this->Application, 
+				   "-text \"Use Immediate Mode Rendering\"");
   if (pvapp && pvwindow && 
       pvapp->GetRegisteryValue(2, "RunTime", "UseImmediateMode", 0))
     {
@@ -576,7 +580,9 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->ReductionCheck->SetState(1);
     }
-  this->ReductionCheck->SetBalloonHelpString("If selected, tree compositing will scale the size of the render window based on how long the previous render took.");
+  this->ReductionCheck->SetBalloonHelpString(
+    "If selected, tree compositing will scale the size of the render window "
+    "based on how long the previous render took.");
 
   this->FrameRateFrame->SetParent(this->RenderParametersFrame->GetFrame());
   this->FrameRateFrame->Create(this->Application, "frame", "");
@@ -585,7 +591,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->FrameRateLabel->Create(this->Application, "");
   this->FrameRateLabel->SetLabel("Frame Rate");
   this->FrameRateScale->SetParent(this->FrameRateFrame);
-  this->FrameRateScale->Create(this->Application, "-resolution 0.1 -orient horizontal");
+  this->FrameRateScale->Create(this->Application, 
+			       "-resolution 0.1 -orient horizontal");
   this->FrameRateScale->SetRange(0, 50);
   if (pvapp && pvwindow &&
       pvapp->GetRegisteryValue(2, "RunTime", "FrameRate", 0))
@@ -599,14 +606,17 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->FrameRateScale->SetCommand(this, "FrameRateScaleCallback");
   this->FrameRateScale->SetBalloonHelpString(
-    "This slider adjusts the desired frame rate for interaction.  The level of detail is adjusted to achieve the desired rate.");
+    "This slider adjusts the desired frame rate for interaction.  "
+    "The level of detail is adjusted to achieve the desired rate.");
   this->Script("pack %s %s -side left -fill x",
                this->FrameRateLabel->GetWidgetName(),
                this->FrameRateScale->GetWidgetName());
   
 #ifdef VTK_USE_MPI
-  this->InterruptRenderCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->InterruptRenderCheck->Create(this->Application, "-text \"Allow Rendering Interrupts\"");
+  this->InterruptRenderCheck->SetParent(
+    this->RenderParametersFrame->GetFrame());
+  this->InterruptRenderCheck->Create(this->Application, 
+				     "-text \"Allow Rendering Interrupts\"");
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
 
   if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
@@ -620,57 +630,72 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->InterruptRenderCheck->SetState(this->Composite->GetEnableAbort());
     }
-  this->InterruptRenderCheck->SetBalloonHelpString("Toggle the use of asynchronous MPI calls to interrupt renders. When off, renders can not be interrupted.");
+  this->InterruptRenderCheck->SetBalloonHelpString(
+    "Toggle the use of asynchronous MPI calls to interrupt renders. "
+    "When off, renders can not be interrupted.");
   
-  this->CompositeWithFloatCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->CompositeWithFloatCheck->Create(this->Application, "-text \"Composite With Floats\"");
-  this->CompositeWithRGBACheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->CompositeWithRGBACheck->Create(this->Application, "-text \"Composite RGBA\"");
-  this->CompositeCompressionCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->CompositeCompressionCheck->Create(this->Application, "-text \"Composite Compression\"");
+  this->CompositeWithFloatCheck->SetParent(
+    this->RenderParametersFrame->GetFrame());
+  this->CompositeWithFloatCheck->Create(this->Application, 
+					"-text \"Composite With Floats\"");
+  this->CompositeWithRGBACheck->SetParent(
+    this->RenderParametersFrame->GetFrame());
+  this->CompositeWithRGBACheck->Create(this->Application, 
+				       "-text \"Composite RGBA\"");
+  this->CompositeCompressionCheck->SetParent(
+    this->RenderParametersFrame->GetFrame());
+  this->CompositeCompressionCheck->Create(this->Application, 
+					  "-text \"Composite Compression\"");
   
   this->CompositeWithFloatCheck->SetCommand(this, "CompositeWithFloatCallback");
-  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
-                                                    "UseFloatInComposite", 0))
+  if (pvwindow && pvapp && 
+      pvapp->GetRegisteryValue(2, "RunTime", "UseFloatInComposite", 0))
     {
-    this->CompositeWithFloatCheck->SetState(pvwindow->GetIntRegisteryValue(
-      2, "RunTime", "UseFloatInComposite"));
+    this->CompositeWithFloatCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseFloatInComposite"));
     this->CompositeWithFloatCallback();
     }
   else
     {
     this->CompositeWithFloatCheck->SetState(0);
     }
-  this->CompositeWithFloatCheck->SetBalloonHelpString("Toggle the use of char/float values when compositing. If rendering defects occur, try turning this on.");
+  this->CompositeWithFloatCheck->SetBalloonHelpString(
+    "Toggle the use of char/float values when compositing. "
+    "If rendering defects occur, try turning this on.");
   
   this->CompositeWithRGBACheck->SetCommand(this, "CompositeWithRGBACallback");
   if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
                                                     "UseRGBAInComposite", 0))
     {
-    this->CompositeWithRGBACheck->SetState(pvwindow->GetIntRegisteryValue(
-      2, "RunTime", "UseRGBAInComposite"));
+    this->CompositeWithRGBACheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseRGBAInComposite"));
     this->CompositeWithRGBACallback();
     }
   else
     {
     this->CompositeWithRGBACheck->SetState(0);
     }
-  this->CompositeWithRGBACheck->SetBalloonHelpString("Toggle the use of RGB/RGBA values when compositing. This is here to bypass some bugs in some graphics card drivers.");
+  this->CompositeWithRGBACheck->SetBalloonHelpString(
+    "Toggle the use of RGB/RGBA values when compositing. "
+    "This is here to bypass some bugs in some graphics card drivers.");
 
-  this->CompositeCompressionCheck->SetState(1);
-  this->CompositeCompressionCheck->SetCommand(this, "CompositeCompressionCallback");
-  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
-                                                    "UseCompressionInComposite", 0))
+  this->CompositeCompressionCheck->SetCommand(this, 
+					      "CompositeCompressionCallback");
+  if (pvwindow && pvapp && 
+      pvapp->GetRegisteryValue(2, "RunTime",  "UseCompressionInComposite", 0))
     {
-    this->CompositeCompressionCheck->SetState(pvwindow->GetIntRegisteryValue(
-      2, "RunTime", "UseCompressionInComposite"));
+    this->CompositeCompressionCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "UseCompressionInComposite"));
+    this->CompositeCompressionCallback();
     }
   else
     {
-    this->CompositeCompressionCheck->SetState(0);
-    this->CompositeCompressionCallback();
+    this->CompositeCompressionCheck->SetState(1);
     }
-  this->CompositeCompressionCheck->SetBalloonHelpString("Toggle the use of run length encoding when compositing. This is here to compare performance.  It should not change the final rendered image.");
+  this->CompositeCompressionCheck->SetBalloonHelpString(
+    "Toggle the use of run length encoding when compositing. "
+    "This is here to compare performance.  "
+    "It should not change the final rendered image.");
 
   
   this->Script("pack %s %s %s %s %s %s %s %s -side top -anchor w",
