@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.277");
+vtkCxxRevisionMacro(vtkPVData, "1.278");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1178,7 +1178,8 @@ void vtkPVData::UpdatePropertiesInternal()
   defCmd[0] = '\0'; 
   defArray = NULL;
   inputArray = NULL;
-
+  volRenArray = NULL;
+  
   if (this->PVColorMap)
     {
     if (this->PVColorMap->GetScalarBarVisibility())
@@ -1450,7 +1451,7 @@ void vtkPVData::UpdatePropertiesInternal()
     {
       this->RepresentationMenu->DeleteEntry( VTK_PV_VOLUME_LABEL );
     }
-  if (dataType == VTK_UNSTRUCTURED_GRID)
+  if (dataType == VTK_UNSTRUCTURED_GRID && volRenArray)
     {
     this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
                                                   "DrawVolume");
