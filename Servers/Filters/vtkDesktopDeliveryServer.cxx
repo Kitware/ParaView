@@ -41,7 +41,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.11");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.12");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -133,8 +133,8 @@ void vtkDesktopDeliveryServer
       ren = rens->GetNextItem();
       if (ren)
         {
-        rens->RemoveObserver(this->StartRenderTag);
-        rens->RemoveObserver(this->EndRenderTag);
+        ren->RemoveObserver(this->StartRenderTag);
+        ren->RemoveObserver(this->EndRenderTag);
         this->ObservingRenderWindow = false;
         }
       }
