@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.49");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.50");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -249,10 +249,12 @@ void vtkPVFileEntry::SetTimeStep(int ts)
     }
   char* name = new char [ this->FileNameLength ];
   sprintf(name, this->Format, this->Path, this->Prefix, ts, this->Ext);
+  /*
   if ( !vtkKWDirectoryUtilities::FileExists(name) )
     {
     vtkErrorMacro("File " << name << " does not exists. Something went wrong.");
     }
+    */
   this->SetValue(name);
   delete [] name;
 }
