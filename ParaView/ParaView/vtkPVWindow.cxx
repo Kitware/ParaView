@@ -122,7 +122,7 @@ vtkPVWindow::vtkPVWindow()
   this->SourceMenu = vtkKWMenu::New();
   this->FilterMenu = vtkKWMenu::New();
   this->SelectMenu = vtkKWMenu::New();
-  this->VTKMenu = vtkKWMenu::New();
+  this->AdvancedMenu = vtkKWMenu::New();
   this->InteractorToolbar = vtkKWToolbar::New();
 
   this->FlyInteractor = vtkKWFlyInteractor::New();
@@ -168,6 +168,7 @@ vtkPVWindow::vtkPVWindow()
   this->TclInteractor = NULL;
 
   this->SetScriptExtension(".pvs");
+
 }
 
 //----------------------------------------------------------------------------
@@ -338,10 +339,10 @@ void vtkPVWindow::PrepareForDelete()
     this->SelectMenu = NULL;
     }
   
-  if (this->VTKMenu)
+  if (this->AdvancedMenu)
     {
-    this->VTKMenu->Delete();
-    this->VTKMenu = NULL;
+    this->AdvancedMenu->Delete();
+    this->AdvancedMenu = NULL;
     }
 
   if (this->AnimationInterface)
@@ -401,35 +402,30 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   char *rbv = 
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(2, "  Source",
+  this->GetMenuProperties()->AddRadioButton(2, " Source",
                                             rbv, this,
-                                            "ShowCurrentSourceProperties");
+                                            "ShowCurrentSourceProperties", 1);
   delete [] rbv;
 
   rbv = this->GetMenuProperties()->CreateRadioButtonVariable(
            this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(3, "  Animation",
+  this->GetMenuProperties()->AddRadioButton(3, " Animation",
                                             rbv, this,
-                                            "ShowAnimationProperties");
+                                            "ShowAnimationProperties", 1);
   delete [] rbv;
 
 
   // create the top level
 
-  this->MenuFile->InsertCommand(0, "Open Data File", this, "OpenCallback");
+  this->MenuFile->DeleteMenuItem("Close");
+  this->MenuFile->InsertCommand(0, "Open Data File", this, "OpenCallback",0);
   // Save current data in VTK format
-  this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData");
+  this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData",0);
   
-  this->MenuFile->InsertCommand(2, "Export VTK Script", this, "SaveInTclScript");
   //this->MenuFile->InsertCommand(3, "Save Workspace", this, "SaveWorkspace");
   this->MenuFile->InsertCommand(3, "Save Trace File", this, "SaveTrace");
   
-  this->MenuFile->InsertCommand(4, "Command Prompt", this,
-                                "DisplayCommandPrompt");
   
-  // Log stuff (not traced)
-  this->MenuFile->InsertCommand(5, "Open Log File", this, "StartLog");
-  this->MenuFile->InsertCommand(6, "Close Log File", this, "StopLog");
 
   this->SelectMenu->SetParent(this->GetMenu());
   this->SelectMenu->Create(this->Application, "-tearoff 0");
@@ -437,21 +433,30 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("%s entryconfigure Select -state disabled",
 	       this->Menu->GetWidgetName());
   
-  this->VTKMenu->SetParent(this->GetMenu());
-  this->VTKMenu->Create(this->Application, "-tearoff 0");
-  this->Menu->InsertCascade(3, "VTK", this->VTKMenu, 0);
+  this->AdvancedMenu->SetParent(this->GetMenu());
+  this->AdvancedMenu->Create(this->Application, "-tearoff 0");
+  this->Menu->InsertCascade(3, "Advanced", this->AdvancedMenu, 0);
+
+  this->AdvancedMenu->InsertCommand(4, "Command Prompt", this,
+			       "DisplayCommandPrompt",8);
+  this->AdvancedMenu->AddCommand("Load Script", this, "LoadScript", 0);
+  this->AdvancedMenu->InsertCommand(2, "Export VTK Script", this,
+			       "SaveInTclScript", 7);
+  // Log stuff (not traced)
+  this->AdvancedMenu->InsertCommand(5, "Open Log File", this, "StartLog");
+  this->AdvancedMenu->InsertCommand(6, "Close Log File", this, "StopLog");
   
   // Create the menu for creating data sources.  
-  this->SourceMenu->SetParent(this->VTKMenu);
+  this->SourceMenu->SetParent(this->AdvancedMenu);
   this->SourceMenu->Create(this->Application, "-tearoff 0");
-  this->VTKMenu->AddCascade("Sources", this->SourceMenu, 0);  
+  this->AdvancedMenu->AddCascade("VTK Sources", this->SourceMenu, 4);  
   
   // Create the menu for creating data sources.  
-  this->FilterMenu->SetParent(this->VTKMenu);
+  this->FilterMenu->SetParent(this->AdvancedMenu);
   this->FilterMenu->Create(this->Application, "-tearoff 0");
-  this->VTKMenu->AddCascade("Filters", this->FilterMenu, 0);  
-  this->Script("%s entryconfigure Filters -state disabled",
-	       this->VTKMenu->GetWidgetName());
+  this->AdvancedMenu->AddCascade("VTK Filters", this->FilterMenu, 4);  
+  this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
+	       this->AdvancedMenu->GetWidgetName());
   
   // Create all of the menu items for sources with no inputs.
   this->SourceInterfaces->InitTraversal();
@@ -791,9 +796,9 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 
-  this->MenuFile->InsertCommand(this->MenuFile->GetIndex("Close"), 
+  this->MenuFile->InsertCommand(this->MenuFile->GetIndex("Exit"), 
 				"Play Demo", this, "PlayDemo");
-  this->MenuFile->InsertSeparator(this->MenuFile->GetIndex("Close"));
+  this->MenuFile->InsertSeparator(this->MenuFile->GetIndex("Exit"));
 }
 
 
@@ -1363,14 +1368,14 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
         this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
         }
       }
-    this->Script("%s entryconfigure Filters -state normal",
-		 this->VTKMenu->GetWidgetName());
+    this->Script("%s entryconfigure \"VTK Filters\" -state normal",
+		 this->AdvancedMenu->GetWidgetName());
     }
   else
     {
     this->DisableFilterButtons();
-    this->Script("%s entryconfigure Filters -state disabled",
-		 this->VTKMenu->GetWidgetName());
+    this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
+		 this->AdvancedMenu->GetWidgetName());
 
     }
 }
@@ -1491,7 +1496,10 @@ void vtkPVWindow::UpdateSelectMenu()
     {
     source = (vtkPVSource*)this->GetSources()->GetItemAsObject(i);
     sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
-    this->GetSelectMenu()->AddCommand(source->GetName(), this, methodAndArg);
+    this->GetSelectMenu()->AddCommand(source->GetName(), this, methodAndArg,
+				      source->GetVTKSource() ?
+				      source->GetVTKSource()->GetClassName()+3
+				      : 0);
     }
 
   // Disable or enable the menu.

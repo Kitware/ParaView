@@ -277,7 +277,7 @@ protected:
   vtkKWMenu *SourceMenu;
   vtkKWMenu *FilterMenu;
   vtkKWMenu *SelectMenu;
-  vtkKWMenu *VTKMenu;
+  vtkKWMenu *AdvancedMenu;
   
   vtkInteractorStyleTrackballCamera *CameraStyle;
   
