@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.6");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.7");
 
 //----------------------------------------------------------------------------
 //****************************************************************************
@@ -77,6 +77,10 @@ vtkPVProgressHandler::vtkPVProgressHandler()
 //----------------------------------------------------------------------------
 vtkPVProgressHandler::~vtkPVProgressHandler()
 {
+  if (this->ProgressPending)
+    {
+    this->Internals->ProgressRequest.Cancel();
+    }
   this->ProgressTimer->Delete();
   delete this->Internals;
 }
