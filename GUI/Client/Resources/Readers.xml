@@ -521,6 +521,8 @@
                    property="ExodusModelMetadata"
                    trace_name="metadata"
                    help="Turn this ON if you plan to write Exodus or EnSight files"/>
+    <BasicDSPFilterWidget trace_name="Apply basic time filtering"
+                      help="Apply basic time filtering"/>
   </Module>
 #else
     <Module name="byureader"
