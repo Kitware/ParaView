@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.3.2.2");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.3.2.3");
 
 
 
@@ -148,8 +148,6 @@ void vtkPVMPIRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 void vtkPVMPIRenderModule::SetUseCompositeCompression(int val)
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
-
   if (this->CompositeTclName)
     {
     vtkPVApplication *pvApp = this->GetPVApplication();

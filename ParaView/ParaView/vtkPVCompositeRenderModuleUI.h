@@ -126,7 +126,7 @@ protected:
   vtkKWCheckButton* ReductionCheck;
   vtkKWScale*       ReductionFactorScale;
   vtkKWLabel*       ReductionFactorLabel;
-  float             ReductionFactor;
+  int               ReductionFactor;
 
   vtkKWLabel*       SquirtLabel;
   vtkKWCheckButton* SquirtCheck;

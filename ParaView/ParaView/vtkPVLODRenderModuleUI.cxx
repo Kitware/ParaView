@@ -90,7 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.3");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.4");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -109,6 +109,7 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
  
   this->LODScalesFrame = vtkKWWidget::New();
   this->LODThresholdLabel = vtkKWLabel::New();
+  this->LODCheck = vtkKWCheckButton::New();
   this->LODThresholdScale = vtkKWScale::New();
   this->LODThresholdValue = vtkKWLabel::New();
   this->LODResolutionLabel = vtkKWLabel::New();
@@ -156,6 +157,8 @@ vtkPVLODRenderModuleUI::~vtkPVLODRenderModuleUI()
 
   this->LODResolutionLabel->Delete();
   this->LODResolutionLabel = NULL;
+  this->LODCheck->Delete();
+  this->LODCheck = NULL;
   this->LODResolutionScale->Delete();
   this->LODResolutionScale = NULL;
   this->LODResolutionValue->Delete();
@@ -219,11 +222,16 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
   this->LODThresholdLabel->Create(this->Application, "-anchor w");
   this->LODThresholdLabel->SetLabel("LOD threshold:");
 
+  this->LODCheck->SetParent(this->LODScalesFrame);
+  this->LODCheck->Create(this->Application, "");
+  this->LODCheck->SetCommand(this, "LODCheckCallback");
+
   this->LODThresholdScale->SetParent(this->LODScalesFrame);
   this->LODThresholdScale->Create(this->Application, 
                                   "-resolution 0.1 -orient horizontal");
   this->LODThresholdScale->SetRange(0.0, 100.0);
   this->LODThresholdScale->SetResolution(0.1);
+
 
   this->LODThresholdValue->SetParent(this->LODScalesFrame);
   this->LODThresholdValue->Create(this->Application, "-anchor w");
@@ -250,6 +258,8 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
                 this->LODThresholdValue->GetWidgetName(), row++);
   pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
                 this->LODThresholdLabel->GetWidgetName(), row);
+  pvapp->Script("grid %s -row %d -column 1 -sticky nes", 
+                this->LODCheck->GetWidgetName(), row);
   pvapp->Script("grid %s -row %d -column 2 -sticky news", 
                 this->LODThresholdScale->GetWidgetName(), row++);
   
@@ -332,61 +342,62 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::LODThresholdScaleCallback()
 {
-  float value = this->LODThresholdScale->GetValue();
-  float threshold;
+  float threshold = this->LODThresholdScale->GetValue();
+  this->SetLODThreshold(threshold);
+}
 
-  // Value should be between 0 and 18.
-  // producing threshold between 65Mil and 1.
-  //threshold = static_cast<int>(exp(18.0 - value));
-  threshold = value;  
 
-  // Use internal method so we do not reset the slider.
-  // I do not know if it would cause a problem, but ...
-  this->SetLODThresholdInternal(threshold);
-
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", 
-                                  threshold);
-  this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
-                      this->GetTclName(), threshold);
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::LODCheckCallback()
+{
+  if (this->LODCheck->GetState())
+    {
+    float threshold = this->LODThresholdScale->GetValue();
+    this->SetLODThreshold(threshold);
+    }
+  else
+    {
+    this->SetLODThreshold(VTK_LARGE_FLOAT);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::SetLODThreshold(float threshold)
 {
-  float value;
-  
-  //if (threshold <= 0.0)
-  //  {
-  //  value = VTK_LARGE_FLOAT;
-  //  }
-  //else
-  //  {
-  //  value = 18.0 - log((double)(threshold));
-  //  }
-  value = threshold;
-  this->LODThresholdScale->SetValue(value);
-
-  this->SetLODThresholdInternal(threshold);
+  if (threshold == VTK_LARGE_FLOAT)
+    {
+    this->LODThresholdValue->SetLabel("Disabled");
+    this->LODThresholdScale->EnabledOff();
+    this->LODThresholdScale->SetWidth(2);
+    this->LODThresholdValue->EnabledOff();
+    this->LODResolutionLabel->EnabledOff();
+    this->LODResolutionScale->EnabledOff();
+    this->LODResolutionValue->EnabledOff();
+    this->LODCheck->SetState(0);
+    }
+  else
+    {
+    char str[256];
+    sprintf(str, "%.1f MBytes", threshold);
+    this->LODThresholdValue->SetLabel(str);
+    this->LODThresholdScale->EnabledOn();
+    this->LODThresholdScale->SetWidth(15);
+    this->LODThresholdValue->EnabledOn();
+    this->LODResolutionLabel->EnabledOn();
+    this->LODResolutionScale->EnabledOn();
+    this->LODResolutionValue->EnabledOn();
+    this->LODCheck->SetState(1);
+    this->LODThresholdScale->SetValue(threshold);
+    }
+    
+  this->LODRenderModule->SetLODThreshold(threshold);
+  this->LODThreshold = threshold;
 
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %d.", 
                                   threshold);
   this->AddTraceEntry("$kw(%s) SetLODThreshold %d",
                       this->GetTclName(), threshold);
 }
-
-//----------------------------------------------------------------------------
-void vtkPVLODRenderModuleUI::SetLODThresholdInternal(float threshold)
-{
-  char str[256];
-
-  sprintf(str, "%.1f MBytes", threshold);
-  this->LODThresholdValue->SetLabel(str);
-  this->LODRenderModule->SetLODThreshold(threshold);
-
-  this->LODThreshold = threshold;
-}
-
-
 
 
 //----------------------------------------------------------------------------

@@ -95,11 +95,7 @@ public:
   // Description:
   // Threshold for individual actors as number of points.
   void LODThresholdScaleCallback();
-
-  // Description:
-  // This method sets the threshold without tracing or
-  // changing the UI scale.
-  void SetLODThresholdInternal(float threshold);
+  void LODCheckCallback();
 
   // Description:
   // This methods can be used from a script.  
@@ -137,17 +133,18 @@ protected:
   vtkKWLabeledFrame *LODFrame;
   vtkKWCheckButton *RenderInterruptsEnabledCheck;
 
-  vtkKWWidget *LODScalesFrame;
-  vtkKWLabel *LODResolutionLabel;
-  vtkKWScale *LODResolutionScale;
-  vtkKWLabel *LODResolutionValue;
-  vtkKWLabel *LODThresholdLabel;
-  vtkKWScale *LODThresholdScale;
-  vtkKWLabel *LODThresholdValue;
+  vtkKWWidget*      LODScalesFrame;
+  vtkKWLabel*       LODResolutionLabel;
+  vtkKWScale*       LODResolutionScale;
+  vtkKWLabel*       LODResolutionValue;
+  vtkKWLabel*       LODThresholdLabel;
+  vtkKWCheckButton* LODCheck;
+  vtkKWScale*       LODThresholdScale;
+  vtkKWLabel*       LODThresholdValue;
 
   float LODThreshold;
-  int LODResolution;
-  int RenderInterruptsEnabled;
+  int   LODResolution;
+  int   RenderInterruptsEnabled;
 
   vtkPVLODRenderModuleUI(const vtkPVLODRenderModuleUI&); // Not implemented
   void operator=(const vtkPVLODRenderModuleUI&); // Not implemented

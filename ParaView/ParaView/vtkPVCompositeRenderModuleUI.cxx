@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.2");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.3");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -103,7 +103,7 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
 //----------------------------------------------------------------------------
 vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
 {
-  // Save UI values in registry.
+  // Save UI values in registery.
   vtkPVApplication* pvapp = this->GetPVApplication();
   if (pvapp)
     {
@@ -295,7 +295,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
         pvapp->GetRegisteryValue(2, "RunTime", "ReductionFactor", 0))
       {
       this->SetReductionFactor(
-        pvapp->GetFloatRegisteryValue(2, "RunTime", "ReductionFactor"));
+        pvapp->GetIntRegisteryValue(2, "RunTime", "ReductionFactor"));
       }
     else
       {
@@ -337,7 +337,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
         pvapp->GetRegisteryValue(2, "RunTime", "SquirtLevel", 0))
       {
       this->SquirtLevel = 
-        pvapp->GetFloatRegisteryValue(2, "RunTime", "SquirtLevel");
+        pvapp->GetIntRegisteryValue(2, "RunTime", "SquirtLevel");
       }
 
     if (pvapp->GetClientMode() && ! pvapp->GetUseTiledDisplay())
@@ -492,6 +492,7 @@ void vtkPVCompositeRenderModuleUI::SetCollectThreshold(float threshold)
     {
     this->CollectCheck->SetState(0);
     this->CollectThresholdScale->EnabledOff();
+    this->CollectThresholdScale->SetWidth(2);    
     this->CollectThresholdLabel->EnabledOff();
     this->CollectThresholdLabel->SetLabel("0 MBytes");
     }
@@ -500,6 +501,7 @@ void vtkPVCompositeRenderModuleUI::SetCollectThreshold(float threshold)
     char str[256];
     this->CollectCheck->SetState(1);
     this->CollectThresholdScale->EnabledOn();
+    this->CollectThresholdScale->SetWidth(15);    
     this->CollectThresholdLabel->EnabledOn();
     this->CollectThresholdScale->SetValue(threshold);
     sprintf(str, "%.1f MBytes", threshold);
@@ -621,8 +623,6 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback()
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   this->AddTraceEntry("$kw(%s) CompositeCompressionCallback %d", 
                       this->GetTclName(), val);
 
@@ -650,7 +650,7 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::SquirtLevelScaleCallback()
 {
-  int val = this->SquirtLevelScale->GetValue();
+  int val = (int)(this->SquirtLevelScale->GetValue());
   this->SetSquirtLevel(val);
 }
 
@@ -660,7 +660,7 @@ void vtkPVCompositeRenderModuleUI::SquirtCheckCallback()
   int val = this->SquirtCheck->GetState();
   if (val)
     {
-    val = this->SquirtLevelScale->GetValue();
+    val = (int)(this->SquirtLevelScale->GetValue());
     }
   this->SetSquirtLevel(val);
 }
@@ -680,6 +680,7 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
   if (level == 0)
     {
     this->SquirtLevelScale->EnabledOff();
+    this->SquirtLevelScale->SetWidth(2);    
     this->SquirtLevelLabel->EnabledOff();
     this->SquirtCheck->SetState(0);
     this->SquirtLevelLabel->SetLabel("24 Bits-disabled");
@@ -688,6 +689,7 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
   else
     {
     this->SquirtLevelScale->EnabledOn();
+    this->SquirtLevelScale->SetWidth(15);    
     this->SquirtLevelLabel->EnabledOn();
     this->SquirtLevelScale->SetValue(level);
     this->SquirtCheck->SetState(1);
@@ -727,7 +729,7 @@ void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::ReductionFactorScaleCallback()
 {
-  int val = this->ReductionFactorScale->GetValue();
+  int val = (int)(this->ReductionFactorScale->GetValue());
   this->SetReductionFactor(val);
 }
 
@@ -737,7 +739,7 @@ void vtkPVCompositeRenderModuleUI::ReductionCheckCallback()
   int val = this->ReductionCheck->GetState();
   if (val)
     {
-    val = this->ReductionFactorScale->GetValue();
+    val = (int)(this->ReductionFactorScale->GetValue());
     }
   else
     { // value of 1 is disabled.
@@ -761,13 +763,15 @@ void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
   if (factor == 1)
     {
     this->ReductionFactorScale->EnabledOff();
-    this->ReductionFactorLabel->EnabledOff();
+    this->ReductionFactorScale->SetWidth(2);    
+    this->ReductionFactorScale->EnabledOff();
     this->ReductionCheck->SetState(0);
     vtkTimerLog::MarkEvent("--- Reduction disabled.");
     }
   else
     {
     this->ReductionFactorScale->EnabledOn();
+    this->ReductionFactorScale->SetWidth(15);    
     this->ReductionFactorLabel->EnabledOn();
     this->ReductionFactorScale->SetValue(factor);
     this->ReductionCheck->SetState(1);
