@@ -69,8 +69,8 @@ Section "Dummy Section" SecDummy
   File "${PV_BIN}\bin\pvbatch.exe"
   File "${PV_BIN}\bin\pvserver.exe"
   File "${PV_BIN}\bin\*.dll"
-  File "C:\martink\msvcr71.dll"
-  File "C:\martink\msvcp71.dll"
+  File "C:\msvcr71.dll"
+  File "C:\msvcp71.dll"
   
   SetOutPath "$INSTDIR"
   File /r "${PV_BIN}\lib"
