@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.199");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.200");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -991,9 +991,31 @@ void vtkPVRenderView::CreateViewProperties()
                 this->LODResolutionScale->GetWidgetName(),
                 this->LODResolutionValue->GetWidgetName());
 
-  this->Script("pack %s %s -side top -anchor w",
+  this->InterruptRenderCheck->SetParent(
+    this->LODFrame->GetFrame());
+  this->InterruptRenderCheck->Create(this->Application, 
+                                     "-text \"Allow Rendering Interrupts\"");
+  this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
+  
+  if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
+                                                    "InterruptRender", 0))
+    {
+    this->InterruptRenderCheck->SetState(
+      pvwindow->GetIntRegisteryValue(2, "RunTime", "InterruptRender"));
+    }
+  else
+    {
+    this->InterruptRenderCheck->SetState(1);
+    }
+  this->InterruptRenderCallback();
+  this->InterruptRenderCheck->SetBalloonHelpString(
+    "Toggle the use of  render interrupts (when using MPI, this uses "
+    "asynchronous messaging). When off, renders can not be interrupted.");
+
+  this->Script("pack %s %s %s -side top -anchor w",
                this->LODResolutionFrame->GetWidgetName(),
-               this->LODThresholdFrame->GetWidgetName());
+               this->LODThresholdFrame->GetWidgetName(),
+               this->InterruptRenderCheck->GetWidgetName());
 
   if (pvapp->GetController()->GetNumberOfProcesses() > 1)
     {
@@ -1025,8 +1047,7 @@ void vtkPVRenderView::CreateViewProperties()
       "rendering.  "
       "Threshold critera is based on size of model in mega bytes.  "
       "Left: Always leave models distributed. Right: Move even large models to "
-      "process 0.");
-    pvapp->Script("pack %s %s %s -side left", 
+      "process 0.");    pvapp->Script("pack %s %s %s -side left", 
                   this->CollectThresholdLabel->GetWidgetName(), 
                   this->CollectThresholdScale->GetWidgetName(),
                   this->CollectThresholdValue->GetWidgetName());
@@ -1046,26 +1067,6 @@ void vtkPVRenderView::CreateViewProperties()
     this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                  this->ParallelRenderParametersFrame->GetWidgetName());
 
-    this->InterruptRenderCheck->SetParent(
-      this->ParallelRenderParametersFrame->GetFrame());
-    this->InterruptRenderCheck->Create(this->Application, 
-                                       "-text \"Allow Rendering Interrupts\"");
-    this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
-
-    if (pvwindow && pvapp && pvapp->GetRegisteryValue(2, "RunTime", 
-                                                      "InterruptRender", 0))
-      {
-      this->InterruptRenderCheck->SetState(
-           pvwindow->GetIntRegisteryValue(2, "RunTime", "InterruptRender"));
-      this->InterruptRenderCallback();
-      }
-    else
-      {
-      this->InterruptRenderCheck->SetState(this->Composite->GetEnableAbort());
-      }
-    this->InterruptRenderCheck->SetBalloonHelpString(
-      "Toggle the use of asynchronous MPI calls to interrupt renders. "
-      "When off, renders can not be interrupted.");
   
     this->CompositeWithFloatCheck->SetParent(
       this->ParallelRenderParametersFrame->GetFrame());
@@ -1132,8 +1133,7 @@ void vtkPVRenderView::CreateViewProperties()
       "This is here to compare performance.  "
       "It should not change the final rendered image.");
   
-    this->Script("pack %s %s %s %s -side top -anchor w",
-                 this->InterruptRenderCheck->GetWidgetName(),
+    this->Script("pack %s %s %s -side top -anchor w",
                  this->CompositeWithFloatCheck->GetWidgetName(),
                  this->CompositeWithRGBACheck->GetWidgetName(),
                  this->CompositeCompressionCheck->GetWidgetName());
@@ -2045,9 +2045,25 @@ void vtkPVRenderView::InterruptRenderCallback()
 {
   if (this->Composite)
     {
-    this->GetPVApplication()->BroadcastScript("%s SetEnableAbort %d",
-                                              this->CompositeTclName,
-                                              this->InterruptRenderCheck->GetState());
+    vtkPVApplication* pvApp = this->GetPVApplication();
+    if (pvApp->GetController()->GetNumberOfProcesses() > 1 )
+      {
+      pvApp->BroadcastScript(
+        "%s SetEnableAbort %d",this->CompositeTclName,
+        this->InterruptRenderCheck->GetState());
+      }
+    else
+      {
+      if (this->InterruptRenderCheck->GetState())
+        {
+        this->RenderWindow->SetAbortCheckMethod(
+          PVRenderViewAbortCheck, (void*)this);
+        }
+      else
+        {
+        this->RenderWindow->SetAbortCheckMethod(0, 0);
+        }
+      }
     }
 }
 
@@ -2354,7 +2370,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.199 $");
+  this->ExtractRevision(os,"$Revision: 1.200 $");
 }
 
 //------------------------------------------------------------------------------
