@@ -23,7 +23,7 @@
 #include "vtkPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.15");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.16");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -73,8 +73,6 @@ int vtkPVGlyphFilter::RequestData(
   vtkInformationVector *outputVector)
 {
   vtkInformation *outInfo = outputVector->GetInformationObject(0);
-  vtkPolyData *output = vtkPolyData::SafeDownCast(
-    outInfo->Get(vtkDataObject::DATA_OBJECT()));
 
   if (this->UseMaskPoints)
     {
