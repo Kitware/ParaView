@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOptionMenu );
-vtkCxxRevisionMacro(vtkKWOptionMenu, "1.20");
+vtkCxxRevisionMacro(vtkKWOptionMenu, "1.21");
 
 //-----------------------------------------------------------------------------
 vtkKWOptionMenu::vtkKWOptionMenu()
@@ -105,6 +105,34 @@ void vtkKWOptionMenu::SetCurrentImageEntry(const char *image_name)
 { 
   this->Script("%s configure -image %s", this->GetWidgetName(), image_name);
   this->SetValue(image_name);
+}
+ 
+//-----------------------------------------------------------------------------
+const char* vtkKWOptionMenu::GetEntryLabel(int index)
+{ 
+  if (this->IsCreated())
+    {
+    if (index >= 0 && index < this->GetNumberOfEntries())
+      {
+      return this->Script("%s entrycget %d -label", 
+                          this->Menu->GetWidgetName(), index);
+      }
+    }
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+int vtkKWOptionMenu::GetNumberOfEntries()
+{ 
+  if (this->IsCreated())
+    {
+    const char *end = this->Script("%s index end", this->Menu->GetWidgetName());
+    if (strcmp(end, "none"))
+      {
+      return atoi(end) + 1;
+      }
+    }
+  return 0;
 }
  
 //-----------------------------------------------------------------------------
@@ -166,7 +194,10 @@ void vtkKWOptionMenu::AddImageEntryWithCommand(const char *imageName,
 //-----------------------------------------------------------------------------
 void vtkKWOptionMenu::DeleteEntry(const char* name)
 { 
-  this->Script("%s delete {%s}", this->Menu->GetWidgetName(), name);
+  if (name && *name)
+    {
+    this->Script("%s delete {%s}", this->Menu->GetWidgetName(), name);
+    }
 }
 
 //-----------------------------------------------------------------------------

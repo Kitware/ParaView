@@ -62,9 +62,11 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Set/Get the state of the option menu
-  void SetValue(const char *);
+  // Set/Get the current entry of this optionmenu
   const char *GetValue();
+  void SetValue(const char *);
+  void SetCurrentEntry(const char *name);
+  void SetCurrentImageEntry(const char *image_name);
 
   // Description:
   // Get the menu.
@@ -91,16 +93,16 @@ public:
   // Description:
   // Has entry ?
   int HasEntry(const char *name);
+  int GetNumberOfEntries();
+
+  // Description:
+  // Get entry label
+  const char *GetEntryLabel(int index);
   
   // Description:
   // Remove all entries from the option menu.
   void ClearEntries();
   
-  // Description:
-  // Set the current entry of this optionmenu
-  void SetCurrentEntry(const char *name);
-  void SetCurrentImageEntry(const char *image_name);
-
   // Description
   // Set the indicator On/Off. To be called after creation.
   void IndicatorOn();
