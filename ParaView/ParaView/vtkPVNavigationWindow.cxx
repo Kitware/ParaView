@@ -487,8 +487,9 @@ void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module,
     }
   str.rdbuf()->freeze(0);
   ostrstream str1;
-  if ( 1 /* Something that berk will do */ )
+  if ( !app->EvaluateBooleanExpression("%s GetHideDisplayPage", module) )
     {
+    this->PopupMenu->SetState("Visibility", vtkKWMenu::Normal);
     char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
     str1 << "[ " << module << " GetPVOutput ] SetVisibility $" 
 	 << var << ";"
@@ -505,6 +506,10 @@ void vtkPVNavigationWindow::DisplayModulePopupMenu(const char* module,
       this->Script("set %s 0", var);
       }
     delete [] var;
+    }
+  else
+    {
+    this->PopupMenu->SetState("Visibility", vtkKWMenu::Disabled);
     }
   this->Script("tk_popup %s %d %d", this->PopupMenu->GetWidgetName(), x, y);
   str1.rdbuf()->freeze(0);
