@@ -1,12 +1,12 @@
 PROJECT(KWCommon)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SOURCE_FILES( KWCommon_SRCS
-vtkKWHashTable
-vtkKWHashTableIterator
-vtkKWIcon
-vtkKWProcessStatistics
-vtkKWRegisteryUtilities
-vtkKWSerializer 
+vtkKWHashTable.cxx
+vtkKWHashTableIterator.cxx
+vtkKWIcon.cxx
+vtkKWProcessStatistics.cxx
+vtkKWRegisteryUtilities.cxx
+vtkKWSerializer.cxx
 )
 
 #ABSTRACT_FILES(
@@ -15,7 +15,7 @@ vtkKWSerializer
 
 IF (WIN32)
   SOURCE_FILES( KWCommon_SRCS 
-    vtkKWWin32RegisteryUtilities
+    vtkKWWin32RegisteryUtilities.cxx
   )
   WRAP_EXCLUDE_FILES(
     vtkKWWin32RegisteryUtilities
@@ -23,7 +23,7 @@ IF (WIN32)
 ELSE (WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
   SOURCE_FILES( KWCommon_SRCS 
-    vtkKWUNIXRegisteryUtilities
+    vtkKWUNIXRegisteryUtilities.cxx
   )
   WRAP_EXCLUDE_FILES(
     vtkKWUNIXRegisteryUtilities

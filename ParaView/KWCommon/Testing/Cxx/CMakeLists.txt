@@ -1,6 +1,6 @@
-ADD_EXECUTABLE( TestRegistery TestRegistery )
-ADD_EXECUTABLE( TestMemory TestMemory )
-ADD_EXECUTABLE( ConvertImage ConvertImage )
+ADD_EXECUTABLE( TestRegistery TestRegistery.cxx )
+ADD_EXECUTABLE( TestMemory TestMemory.cxx )
+ADD_EXECUTABLE( ConvertImage ConvertImage.cxx )
 
 ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
 ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)

@@ -1,81 +1,81 @@
 SOURCE_FILES( ParaView_SRCS
-vtkAllToNPoly
-vtkBalancePoly
-vtkCommSched
-vtkDummyRenderWindow
-vtkDummyRenderer
-vtkRedistributePoly
-vtkWeightedPoly
-vtkKWBoundsDisplay
-vtkKWExtractGeometryByScalar
-vtkPassThroughFilter
-vtkPV3DWidget
-vtkPVAdvancedReaderModule
-vtkPVAnimationInterface
-vtkPVApplication 
-vtkPVArrayCalculator 
-vtkPVArrayMenu 
-vtkPVArraySelection
-vtkPVBoundsDisplay
-vtkPVColorMap
-vtkPVComponentSelection
-vtkPVConnectivityFilter
-vtkPVContainerWidget
-vtkPVContour 
-vtkPVContourEntry 
-vtkPVData 
-vtkPVDataSetFileEntry
-vtkPVDataSetReaderModule
-vtkPVEnSightReaderModule
-vtkPVErrorLogDisplay
-vtkPVExtentEntry
-vtkPVExtentTranslator 
-vtkPVExtractGeometryByScalar
-vtkPVFileEntry
-vtkPVGenericRenderWindowInteractor
-vtkPVGlyph3D 
-vtkPVInputMenu 
-vtkPVInteractorStyleCenterOfRotation
-vtkPVInteractorStyleFly
-vtkPVInteractorStyleRotateCamera
-vtkPVInteractorStyleTranslateCamera
-vtkPVLODActor
-vtkPVLabel
-vtkPVLabeledToggle
-vtkPVLineWidget
-vtkPVMinMax
-vtkPVNavigationWindow
-vtkPVObjectWidget
-vtkPVPlaneWidget
-vtkPVProbe
-vtkPVReaderModule
-vtkPVRenderView 
-vtkPVScalarRangeLabel 
-vtkPVScale 
-vtkPVSelectWidget 
-vtkPVSelectionList
-vtkPVSelectTimeSet
-vtkPVSource 
-vtkPVSourceCollection
-vtkPVSphereWidget
-vtkPVStringEntry
-vtkPVThreshold 
-vtkPVTimerLogDisplay
-vtkPVTreeComposite 
-vtkPVVectorEntry
-vtkPVWidget
-vtkPVWidgetCollection
-vtkPVWindow 
-vtkPVWizard
-vtkPVWorldPointPicker 
-vtkPVXMLElement
-vtkPVXMLPackageParser
-vtkPVXMLParser
-vtkStringList 
+vtkAllToNPoly.cxx
+vtkBalancePoly.cxx
+vtkCommSched.cxx
+vtkDummyRenderWindow.cxx
+vtkDummyRenderer.cxx
+vtkRedistributePoly.cxx
+vtkWeightedPoly.cxx
+vtkKWBoundsDisplay.cxx
+vtkKWExtractGeometryByScalar.cxx
+vtkPassThroughFilter.cxx
+vtkPV3DWidget.cxx
+vtkPVAdvancedReaderModule.cxx
+vtkPVAnimationInterface.cxx
+vtkPVApplication.cxx 
+vtkPVArrayCalculator.cxx 
+vtkPVArrayMenu.cxx 
+vtkPVArraySelection.cxx
+vtkPVBoundsDisplay.cxx
+vtkPVColorMap.cxx
+vtkPVComponentSelection.cxx
+vtkPVConnectivityFilter.cxx
+vtkPVContainerWidget.cxx
+vtkPVContour.cxx 
+vtkPVContourEntry.cxx 
+vtkPVData.cxx 
+vtkPVDataSetFileEntry.cxx
+vtkPVDataSetReaderModule.cxx
+vtkPVEnSightReaderModule.cxx
+vtkPVErrorLogDisplay.cxx
+vtkPVExtentEntry.cxx
+vtkPVExtentTranslator.cxx 
+vtkPVExtractGeometryByScalar.cxx
+vtkPVFileEntry.cxx
+vtkPVGenericRenderWindowInteractor.cxx
+vtkPVGlyph3D.cxx 
+vtkPVInputMenu.cxx 
+vtkPVInteractorStyleCenterOfRotation.cxx
+vtkPVInteractorStyleFly.cxx
+vtkPVInteractorStyleRotateCamera.cxx
+vtkPVInteractorStyleTranslateCamera.cxx
+vtkPVLODActor.cxx
+vtkPVLabel.cxx
+vtkPVLabeledToggle.cxx
+vtkPVLineWidget.cxx
+vtkPVMinMax.cxx
+vtkPVNavigationWindow.cxx
+vtkPVObjectWidget.cxx
+vtkPVPlaneWidget.cxx
+vtkPVProbe.cxx
+vtkPVReaderModule.cxx
+vtkPVRenderView.cxx 
+vtkPVScalarRangeLabel.cxx 
+vtkPVScale.cxx 
+vtkPVSelectWidget.cxx 
+vtkPVSelectionList.cxx
+vtkPVSelectTimeSet.cxx
+vtkPVSource.cxx 
+vtkPVSourceCollection.cxx
+vtkPVSphereWidget.cxx
+vtkPVStringEntry.cxx
+vtkPVThreshold.cxx 
+vtkPVTimerLogDisplay.cxx
+vtkPVTreeComposite.cxx 
+vtkPVVectorEntry.cxx
+vtkPVWidget.cxx
+vtkPVWidgetCollection.cxx
+vtkPVWindow.cxx 
+vtkPVWizard.cxx
+vtkPVWorldPointPicker.cxx 
+vtkPVXMLElement.cxx
+vtkPVXMLPackageParser.cxx
+vtkPVXMLParser.cxx
+vtkStringList.cxx 
 )
 
 IF (VTK_USE_MPI)
-  SOURCE_FILES( ParaView_SRCS vtkPVEnSightVerifier )
+  SOURCE_FILES( ParaView_SRCS vtkPVEnSightVerifier.cxx )
 ENDIF (VTK_USE_MPI)
 
 ABSTRACT_FILES(
@@ -116,7 +116,7 @@ IF (WIN32)
   LINK_LIBRARIES( wsock32 )
 ENDIF (WIN32)
 
-ADD_EXECUTABLE(ParaView WIN32 ParaView) 
+ADD_EXECUTABLE(ParaView WIN32 ParaView.cxx) 
 
 LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff )
 
