@@ -42,7 +42,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.18");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -355,7 +355,7 @@ void vtkPVBoxWidget::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
 {
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
       this->TraceNameState == vtkPVWidget::Default) )

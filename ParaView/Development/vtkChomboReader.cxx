@@ -21,7 +21,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkUniformGrid.h"
 
-vtkCxxRevisionMacro(vtkChomboReader, "1.5");
+vtkCxxRevisionMacro(vtkChomboReader, "1.6");
 vtkStandardNewMacro(vtkChomboReader);
 
 //----------------------------------------------------------------------------
@@ -472,7 +472,7 @@ void vtkChomboReader::ExecuteData(vtkDataObject* doOutput)
 
       hid_t memSpace = H5Screate_simple( 1, &numItems, 0 );
 
-      int fixme;
+      // int fixme;
       vtkDataArray* array;
       if ( this->RealType == vtkChomboReader::FLOAT )
         {
