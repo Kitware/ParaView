@@ -59,7 +59,9 @@ vtkStandardNewMacro(vtkPVLineWidget);
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
 {
-  this->Widget3D = vtkLineWidget::New();
+  vtkLineWidget *line = vtkLineWidget::New();
+  line->SetAlignToNone();
+  this->Widget3D = line;
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();
   this->ResolutionLabel = vtkKWLabel::New();
@@ -138,6 +140,7 @@ void vtkPVLineWidget::SetPoint1(float x, float y, float z)
   vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
   line->SetPoint1(pos);
   line->SetAlignToNone();
+  this->ModifiedFlag = 1;
   vtkPVGenericRenderWindowInteractor* iren = 
     this->PVSource->GetPVWindow()->GetGenericInteractor();
   if(iren)
@@ -162,6 +165,7 @@ void vtkPVLineWidget::SetPoint2(float x, float y, float z)
   vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
   line->SetPoint2(pos);
   line->SetAlignToNone();
+  this->ModifiedFlag = 1;
   vtkPVGenericRenderWindowInteractor* iren = 
     this->PVSource->GetPVWindow()->GetGenericInteractor();
   if(iren)
@@ -268,7 +272,7 @@ void vtkPVLineWidget::Accept()
 
   char acceptCmd[1024];
   if ( this->Point1Variable && this->Point1Object )
-    {
+    {    
     sprintf(acceptCmd, "%s Set%s %f %f %f", this->Point1Object, 
 	    this->Point1Variable,
 	    this->Point1[0]->GetValueAsFloat(),
