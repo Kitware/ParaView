@@ -1,0 +1,436 @@
+/* src/H5config.h.  Generated automatically by configure.  */
+/* src/H5config.h.in.  Generated automatically from configure.in by autoheader.  */
+
+/* Define to empty if the keyword does not work.  */
+#cmakedefine H5_const ${H5_const}
+
+/* Define if your struct tm has tm_zone.  */
+#cmakedefine H5_HAVE_TM_ZONE ${HAVE_TM_ZONE}
+
+/* Define if you don't have tm_zone but do have the external array
+   tzname.  */
+#cmakedefine H5_HAVE_TZNAME ${HAVE_TZNAME}
+
+/* Define as __inline if that's what the C compiler calls it.  */
+#cmakedefine H5_inline ${inline}
+
+/* Define to `long' if <sys/types.h> doesn't define.  */
+#cmakedefine H5_off_t ${H5_off_t}
+
+/* Define to `unsigned' if <sys/types.h> doesn't define.  */
+#cmakedefine H5_size_t ${H5_size_t}
+
+/* Define if you have the ANSI C header files.  */
+#cmakedefine H5_STDC_HEADERS ${H5_STDC_HEADERS}
+
+/* Define if you can safely include both <sys/time.h> and <time.h>.  */
+#cmakedefine H5_TIME_WITH_SYS_TIME ${H5_TIME_WITH_SYS_TIME}
+
+/* Define if your <sys/time.h> declares struct tm.  */
+#cmakedefine H5_TM_IN_SYS_TIME ${H5_TM_IN_SYS_TIME}
+
+/* Define if your processor stores words with the most significant
+   byte first (like Motorola and SPARC, unlike Intel and VAX).  */
+#cmakedefine H5_WORDS_BIGENDIAN ${H5_WORDS_BIGENDIAN}
+
+/* Define if the __attribute__(()) extension is present */
+#cmakedefine H5_HAVE_ATTRIBUTE ${H5_HAVE_ATTRIBUTE}
+
+/* Define if the compiler understands the __FUNCTION__ keyword. */
+#cmakedefine H5_HAVE_FUNCTION ${H5_HAVE_FUNCTION}
+
+/* Define if we have parallel support */
+#cmakedefine H5_HAVE_PARALLEL ${H5_HAVE_PARALLEL}
+
+/* Define if we have thread safe support */
+#cmakedefine H5_HAVE_THREADSAFE ${H5_HAVE_THREADSAFE}
+
+/* Define if it's safe to use `long long' for hsize_t and hssize_t */
+#cmakedefine H5_HAVE_LARGE_HSIZET ${H5_HAVE_LARGE_HSIZET}
+
+/* Define if the HDF5 v1.2 compatibility functions are to be compiled in */
+#cmakedefine H5_WANT_H5_V1_2_COMPAT ${H5_WANT_H5_V1_2_COMPAT}
+
+/* Width for printf() for type `long long' or `__int64', us. `ll' */
+#cmakedefine H5_PRINTF_LL_WIDTH ${H5_PRINTF_LL_WIDTH}
+
+/* Define if `tm_gmtoff' is a member of `struct tm' */
+#cmakedefine H5_HAVE_TM_GMTOFF ${H5_HAVE_TM_GMTOFF}
+
+/* Define if `__tm_gmtoff' is a member of `struct tm' */
+#cmakedefine H5_HAVE___TM_GMTOFF ${H5_HAVE___TM_GMTOFF}
+
+/* Define if `timezone' is a global variable */
+#cmakedefine H5_HAVE_TIMEZONE ${H5_HAVE_TIMEZONE}
+
+/* Define if `struct timezone' is defined */
+#cmakedefine H5_HAVE_STRUCT_TIMEZONE ${H5_HAVE_TIMEZONE}
+
+/* Define if `struct stat' has the `st_blocks' field */
+#cmakedefine H5_HAVE_STAT_ST_BLOCKS ${H5_HAVE_STAT_ST_BLOCKS}
+
+/* Define if `struct text_info' is defined */
+#cmakedefine H5_HAVE_STRUCT_TEXT_INFO ${H5_HAVE_STRUCT_TEXT_INFO}
+
+/* Define if `struct videoconfig' is defined */
+#cmakedefine H5_HAVE_STRUCT_VIDEOCONFIG ${H5_HAVE_STRUCT_VIDEOCONFIG}
+
+/* Define if the ioctl TIOCGETD is defined */
+#cmakedefine H5_HAVE_TIOCGETD ${H5_HAVE_TIOCGETD}
+
+/* Define if the ioctl TIOCGWINSZ is defined */
+#cmakedefine H5_HAVE_TIOCGWINSZ ${H5_HAVE_TIOCGWINSZ}
+
+/* Define if the Globus GASS is defined */
+#cmakedefine H5_HAVE_GASS ${H5_HAVE_GASS}
+
+/* Define if the SRB is defined */
+#cmakedefine H5_HAVE_SRB ${H5_HAVE_SRB}
+
+/* Define if the Grid Storage is defined */
+#cmakedefine H5_HAVE_GRIDSTORAGE ${H5_HAVE_GRIDSTORAGE}
+
+/* Define if the stream virtual file driver should be compiled */
+#cmakedefine H5_HAVE_STREAM ${H5_HAVE_STREAM}
+
+/* Define if `socklen_t' is defined */
+#cmakedefine H5_HAVE_SOCKLEN_T ${H5_HAVE_SOCKLEN_T}
+
+/* The number of bytes in a __int64.  */
+#cmakedefine H5_SIZEOF___INT64 ${H5_SIZEOF___INT64}
+
+/* The number of bytes in a char.  */
+#cmakedefine H5_SIZEOF_CHAR ${H5_SIZEOF_CHAR}
+
+/* The number of bytes in a double.  */
+#cmakedefine H5_SIZEOF_DOUBLE ${H5_SIZEOF_DOUBLE}
+
+/* The number of bytes in a float.  */
+#cmakedefine H5_SIZEOF_FLOAT ${H5_SIZEOF_FLOAT}
+
+/* The number of bytes in a int.  */
+#cmakedefine H5_SIZEOF_INT ${H5_SIZEOF_INT}
+
+/* The number of bytes in a int16_t.  */
+#cmakedefine H5_SIZEOF_INT16_T ${H5_SIZEOF_INT16_T}
+
+/* The number of bytes in a int32_t.  */
+#cmakedefine H5_SIZEOF_INT32_T ${H5_SIZEOF_INT32_T}
+
+/* The number of bytes in a int64_t.  */
+#cmakedefine H5_SIZEOF_INT64_T ${H5_SIZEOF_INT64_T}
+
+/* The number of bytes in a int8_t.  */
+#cmakedefine H5_SIZEOF_INT8_T ${H5_SIZEOF_INT8_T}
+
+/* The number of bytes in a int_fast16_t.  */
+#cmakedefine H5_SIZEOF_INT_FAST16_T ${H5_SIZEOF_INT_FAST16_T}
+
+/* The number of bytes in a int_fast32_t.  */
+#cmakedefine H5_SIZEOF_INT_FAST32_T ${H5_SIZEOF_INT_FAST32_T}
+
+/* The number of bytes in a int_fast64_t.  */
+#cmakedefine H5_SIZEOF_INT_FAST64_T ${H5_SIZEOF_INT_FAST64_T}
+
+/* The number of bytes in a int_fast8_t.  */
+#cmakedefine H5_SIZEOF_INT_FAST8_T ${H5_SIZEOF_INT_FAST8_T}
+
+/* The number of bytes in a int_least16_t.  */
+#cmakedefine H5_SIZEOF_INT_LEAST16_T ${H5_SIZEOF_INT_LEAST16_T}
+
+/* The number of bytes in a int_least32_t.  */
+#cmakedefine H5_SIZEOF_INT_LEAST32_T ${H5_SIZEOF_INT_LEAST32_T}
+
+/* The number of bytes in a int_least64_t.  */
+#cmakedefine H5_SIZEOF_INT_LEAST64_T ${H5_SIZEOF_INT_LEAST64_T}
+
+/* The number of bytes in a int_least8_t.  */
+#cmakedefine H5_SIZEOF_INT_LEAST8_T ${H5_SIZEOF_INT_LEAST8_T}
+
+/* The number of bytes in a long.  */
+#cmakedefine H5_SIZEOF_LONG ${H5_SIZEOF_LONG}
+
+/* The number of bytes in a long double.  */
+#cmakedefine H5_SIZEOF_LONG_DOUBLE ${H5_SIZEOF_LONG_DOUBLE}
+
+/* The number of bytes in a long long.  */
+#cmakedefine H5_SIZEOF_LONG_LONG ${H5_SIZEOF_LONG_LONG}
+
+/* The number of bytes in a off_t.  */
+#cmakedefine H5_SIZEOF_OFF_T ${H5_SIZEOF_OFF_T}
+
+/* The number of bytes in a short.  */
+#cmakedefine H5_SIZEOF_SHORT ${H5_SIZEOF_SHORT}
+
+/* The number of bytes in a size_t.  */
+#cmakedefine H5_SIZEOF_SIZE_T ${H5_SIZEOF_SIZE_T}
+
+/* The number of bytes in a ssize_t.  */
+#cmakedefine H5_SIZEOF_SSIZE_T ${H5_SIZEOF_SSIZE_T}
+
+/* The number of bytes in a uint16_t.  */
+#cmakedefine H5_SIZEOF_UINT16_T ${H5_SIZEOF_UINT16_T}
+
+/* The number of bytes in a uint32_t.  */
+#cmakedefine H5_SIZEOF_UINT32_T ${H5_SIZEOF_UINT32_T}
+
+/* The number of bytes in a uint64_t.  */
+#cmakedefine H5_SIZEOF_UINT64_T ${H5_SIZEOF_UINT64_T}
+
+/* The number of bytes in a uint8_t.  */
+#cmakedefine H5_SIZEOF_UINT8_T ${H5_SIZEOF_UINT8_T}
+
+/* The number of bytes in a uint_fast16_t.  */
+#cmakedefine H5_SIZEOF_UINT_FAST16_T ${H5_SIZEOF_UINT_FAST16_T}
+
+/* The number of bytes in a uint_fast32_t.  */
+#cmakedefine H5_SIZEOF_UINT_FAST32_T ${H5_SIZEOF_UINT_FAST32_T}
+
+/* The number of bytes in a uint_fast64_t.  */
+#cmakedefine H5_SIZEOF_UINT_FAST64_T ${H5_SIZEOF_UINT_FAST64_T}
+
+/* The number of bytes in a uint_fast8_t.  */
+#cmakedefine H5_SIZEOF_UINT_FAST8_T ${H5_SIZEOF_UINT_FAST8_T}
+
+/* The number of bytes in a uint_least16_t.  */
+#cmakedefine H5_SIZEOF_UINT_LEAST16_T ${H5_SIZEOF_UINT_LEAST16_T}
+
+/* The number of bytes in a uint_least32_t.  */
+#cmakedefine H5_SIZEOF_UINT_LEAST32_T ${H5_SIZEOF_UINT_LEAST32_T}
+
+/* The number of bytes in a uint_least64_t.  */
+#cmakedefine H5_SIZEOF_UINT_LEAST64_T ${H5_SIZEOF_UINT_LEAST64_T}
+
+/* The number of bytes in a uint_least8_t.  */
+#cmakedefine H5_SIZEOF_UINT_LEAST8_T ${H5_SIZEOF_UINT_LEAST8_T}
+
+/* Define if you have the BSDgettimeofday function.  */
+#cmakedefine H5_HAVE_BSDGETTIMEOFDAY ${H5_HAVE_BSDGETTIMEOFDAY}
+
+/* Define if you have the GetConsoleScreenBufferInfo function.  */
+#cmakedefine H5_HAVE_GETCONSOLESCREENBUFFERINFO ${H5_HAVE_GETCONSOLESCREENBUFFERINFO}
+
+/* Define if you have the _getvideoconfig function.  */
+#cmakedefine H5_HAVE__GETVIDEOCONFIG ${H5_HAVE__GETVIDEOCONFIG}
+
+/* Define if you have the _scrsize function.  */
+#cmakedefine H5_HAVE__SCRSIZE ${H5_HAVE__SCRSIZE}
+
+/* Define if you have the compress2 function.  */
+#cmakedefine H5_HAVE_COMPRESS2 ${H5_HAVE_COMPRESS2}
+
+/* Define if you have the difftime function.  */
+#cmakedefine H5_HAVE_DIFFTIME ${H5_HAVE_DIFFTIME}
+
+/* Define if you have the fork function.  */
+#cmakedefine H5_HAVE_FORK ${H5_HAVE_FORK}
+
+/* Define if you have the fseek64 function.  */
+#cmakedefine H5_HAVE_FSEEK64 ${H5_HAVE_FSEEK64}
+
+/* Define if you have the getdents64 function.  */
+#cmakedefine H5_HAVE_GETDENTS64 ${H5_HAVE_GETDENTS64}
+
+/* Define if you have the gethostname function.  */
+#cmakedefine H5_HAVE_GETHOSTNAME ${H5_HAVE_GETHOSTNAME}
+
+/* Define if you have the getpwuid function.  */
+#cmakedefine H5_HAVE_GETPWUID ${H5_HAVE_GETPWUID}
+
+/* Define if you have the getrusage function.  */
+#cmakedefine H5_HAVE_GETRUSAGE ${H5_HAVE_GETRUSAGE}
+
+/* Define if you have the gettextinfo function.  */
+#cmakedefine H5_HAVE_GETTEXTINFO ${H5_HAVE_GETTEXTINFO}
+
+/* Define if you have the gettimeofday function.  */
+#cmakedefine H5_HAVE_GETTIMEOFDAY ${H5_HAVE_GETTIMEOFDAY}
+
+/* Define if you have the ioctl function.  */
+#cmakedefine H5_HAVE_IOCTL ${H5_HAVE_IOCTL}
+
+/* Define if you have the longjmp function.  */
+#cmakedefine H5_HAVE_LONGJMP ${H5_HAVE_LONGJMP}
+
+/* Define if you have the lseek64 function.  */
+#cmakedefine H5_HAVE_LSEEK64 ${H5_HAVE_LSEEK64}
+
+/* Define if you have the setsysinfo function.  */
+#cmakedefine H5_HAVE_SETSYSINFO ${H5_HAVE_SETSYSINFO}
+
+/* Define if you have the sigaction function.  */
+#cmakedefine H5_HAVE_SIGACTION ${H5_HAVE_SIGACTION}
+
+/* Define if you have the signal function.  */
+#cmakedefine H5_HAVE_SIGNAL ${H5_HAVE_SIGNAL}
+
+/* Define if you have the snprintf function.  */
+#cmakedefine H5_HAVE_SNPRINTF ${H5_HAVE_SNPRINTF}
+
+/* Define if you have the strdup function.  */
+#cmakedefine H5_HAVE_STRDUP ${H5_HAVE_STRDUP}
+
+/* Define if you have the system function.  */
+#cmakedefine H5_HAVE_SYSTEM ${H5_HAVE_SYSTEM}
+
+/* Define if you have the vsnprintf function.  */
+#cmakedefine H5_HAVE_VSNPRINTF ${H5_HAVE_VSNPRINTF}
+
+/* Define if you have the waitpid function.  */
+#cmakedefine H5_HAVE_WAITPID ${H5_HAVE_WAITPID}
+
+/* Define if you have the <globus_common.h> header file.  */
+#cmakedefine H5_HAVE_GLOBUS_COMMON_H ${H5_HAVE_GLOBUS_COMMON_H}
+
+/* Define if you have the <grid_storage_file.h> header file.  */
+#cmakedefine H5_HAVE_GRID_STORAGE_FILE_H ${H5_HAVE_GRID_STORAGE_FILE_H}
+
+/* Define if you have the <io.h> header file.  */
+#cmakedefine H5_HAVE_IO_H ${H5_HAVE_IO_H}
+
+/* Define if you have the <mfhdf.h> header file.  */
+#cmakedefine H5_HAVE_MFHDF_H ${H5_HAVE_MFHDF_H}
+
+/* Define if you have the <netinet/tcp.h> header file.  */
+#cmakedefine H5_HAVE_NETINET_TCP_H ${H5_HAVE_NETINET_TCP_H}
+
+/* Define if you have the <pdb.h> header file.  */
+#cmakedefine H5_HAVE_PDB_H ${H5_HAVE_PDB_H}
+
+/* Define if you have the <pthread.h> header file.  */
+#cmakedefine H5_HAVE_PTHREAD_H ${H5_HAVE_PTHREAD_H}
+
+/* Define if you have the <setjmp.h> header file.  */
+#cmakedefine H5_HAVE_SETJMP_H ${H5_HAVE_SETJMP_H}
+
+/* Define if you have the <srbClient.h> header file.  */
+#cmakedefine H5_HAVE_SRBCLIENT_H ${H5_HAVE_SRBCLIENT_H}
+
+/* Define if you have the <stddef.h> header file.  */
+#cmakedefine H5_HAVE_STDDEF_H ${H5_HAVE_STDDEF_H}
+
+/* Define if you have the <stdint.h> header file.  */
+#cmakedefine H5_HAVE_STDINT_H ${H5_HAVE_STDINT_H}
+
+/* Define if you have the <sys/filio.h> header file.  */
+#cmakedefine H5_HAVE_SYS_FILIO_H ${H5_HAVE_SYS_FILIO_H}
+
+/* Define if you have the <sys/ioctl.h> header file.  */
+#cmakedefine H5_HAVE_SYS_IOCTL_H ${H5_HAVE_SYS_IOCTL_H}
+
+/* Define if you have the <sys/proc.h> header file.  */
+#cmakedefine H5_HAVE_SYS_PROC_H ${H5_HAVE_SYS_PROC_H}
+
+/* Define if you have the <sys/resource.h> header file.  */
+#cmakedefine H5_HAVE_SYS_RESOURCE_H ${H5_HAVE_SYS_RESOURCE_H}
+
+/* Define if you have the <sys/socket.h> header file.  */
+#cmakedefine H5_HAVE_SYS_SOCKET_H ${H5_HAVE_SYS_SOCKET_H}
+
+/* Define if you have the <sys/stat.h> header file.  */
+#cmakedefine H5_HAVE_SYS_STAT_H ${H5_HAVE_SYS_STAT_H}
+
+/* Define if you have the <sys/sysinfo.h> header file.  */
+#cmakedefine H5_HAVE_SYS_SYSINFO_H ${H5_HAVE_SYS_SYSINFO_H}
+
+/* Define if you have the <sys/time.h> header file.  */
+#cmakedefine H5_HAVE_SYS_TIME_H ${H5_HAVE_SYS_TIME_H}
+
+/* Define if you have the <sys/timeb.h> header file.  */
+#cmakedefine H5_HAVE_SYS_TIMEB_H ${H5_HAVE_SYS_TIMEB_H}
+
+/* Define if you have the <sys/types.h> header file.  */
+#cmakedefine H5_HAVE_SYS_TYPES_H ${H5_HAVE_SYS_TYPES_H}
+
+/* Define if you have the <unistd.h> header file.  */
+#cmakedefine H5_HAVE_UNISTD_H ${H5_HAVE_UNISTD_H}
+
+/* Define if you have the <winsock.h> header file.  */
+#cmakedefine H5_HAVE_WINSOCK_H ${H5_HAVE_WINSOCK_H}
+
+/* Define if you have the <zlib.h> header file.  */
+#cmakedefine H5_HAVE_ZLIB_H ${H5_HAVE_ZLIB_H}
+
+/* Define if you have the SrbClient library (-lSrbClient).  */
+#cmakedefine H5_HAVE_LIBSRBCLIENT ${H5_HAVE_LIBSRBCLIENT}
+
+/* Define if you have the crypto library (-lcrypto).  */
+#cmakedefine H5_HAVE_LIBCRYPTO ${H5_HAVE_LIBCRYPTO}
+
+/* Define if you have the df library (-ldf).  */
+#cmakedefine H5_HAVE_LIBDF ${H5_HAVE_LIBDF}
+
+/* Define if you have the elf library (-lelf).  */
+#cmakedefine H5_HAVE_LIBELF ${H5_HAVE_LIBELF}
+
+/* Define if you have the globus_common library (-lglobus_common).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_COMMON ${H5_HAVE_LIBGLOBUS_COMMON}
+
+/* Define if you have the globus_gaa library (-lglobus_gaa).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_GAA ${H5_HAVE_LIBGLOBUS_GAA}
+
+/* Define if you have the globus_gass_cache library (-lglobus_gass_cache).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_GASS_CACHE ${H5_HAVE_LIBGLOBUS_GASS_CACHE}
+
+/* Define if you have the globus_gass_file library (-lglobus_gass_file).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_GASS_FILE ${H5_HAVE_LIBGLOBUS_GASS_FILE}
+
+/* Define if you have the globus_gass_transfer library (-lglobus_gass_transfer).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_GASS_TRANSFER ${H5_HAVE_LIBGLOBUS_GASS_TRANSFER}
+
+/* Define if you have the globus_gass_transfer_assist library (-lglobus_gass_transfer_assist).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_GASS_TRANSFER_ASSIST ${H5_HAVE_LIBGLOBUS_GASS_TRANSFER_ASSIST}
+
+/* Define if you have the globus_gss library (-lglobus_gss).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_GSS ${H5_HAVE_LIBGLOBUS_GSS}
+
+/* Define if you have the globus_gss_assist library (-lglobus_gss_assist).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_GSS_ASSIST ${H5_HAVE_LIBGLOBUS_GSS_ASSIST}
+
+/* Define if you have the globus_io library (-lglobus_io).  */
+#cmakedefine H5_HAVE_LIBGLOBUS_IO ${H5_HAVE_LIBGLOBUS_IO}
+
+/* Define if you have the grid_storage_client library (-lgrid_storage_client).  */
+#cmakedefine H5_HAVE_LIBGRID_STORAGE_CLIENT ${H5_HAVE_LIBGRID_STORAGE_CLIENT}
+
+/* Define if you have the grid_storage_file library (-lgrid_storage_file).  */
+#cmakedefine H5_HAVE_LIBGRID_STORAGE_FILE ${H5_HAVE_LIBGRID_STORAGE_FILE}
+
+/* Define if you have the jpeg library (-ljpeg).  */
+#cmakedefine H5_HAVE_LIBJPEG ${H5_HAVE_LIBJPEG}
+
+/* Define if you have the m library (-lm).  */
+#cmakedefine H5_HAVE_LIBM ${H5_HAVE_LIBM}
+
+/* Define if you have the mfhdf library (-lmfhdf).  */
+#cmakedefine H5_HAVE_LIBMFHDF ${H5_HAVE_LIBMFHDF}
+
+/* Define if you have the mpi library (-lmpi).  */
+#cmakedefine H5_HAVE_LIBMPI ${H5_HAVE_LIBMPI}
+
+/* Define if you have the mpich library (-lmpich).  */
+#cmakedefine H5_HAVE_LIBMPICH ${H5_HAVE_LIBMPICH}
+
+/* Define if you have the mpio library (-lmpio).  */
+#cmakedefine H5_HAVE_LIBMPIO ${H5_HAVE_LIBMPIO}
+
+/* Define if you have the nsl library (-lnsl).  */
+#cmakedefine H5_HAVE_LIBNSL ${H5_HAVE_LIBNSL}
+
+/* Define if you have the pdb library (-lpdb).  */
+#cmakedefine H5_HAVE_LIBPDB ${H5_HAVE_LIBPDB}
+
+/* Define if you have the pthread library (-lpthread).  */
+#cmakedefine H5_HAVE_LIBPTHREAD ${H5_HAVE_LIBPTHREAD}
+
+/* Define if you have the silo library (-lsilo).  */
+#cmakedefine H5_HAVE_LIBSILO ${H5_HAVE_LIBSILO}
+
+/* Define if you have the socket library (-lsocket).  */
+#cmakedefine H5_HAVE_LIBSOCKET ${H5_HAVE_LIBSOCKET}
+
+/* Define if you have the ssl library (-lssl).  */
+#cmakedefine H5_HAVE_LIBSSL ${H5_HAVE_LIBSSL}
+
+/* Define if you have the z library (-lz).  */
+#cmakedefine H5_HAVE_LIBZ ${H5_HAVE_LIBZ}
