@@ -80,6 +80,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
+#elif __APPLE_CC__
+#include "vtkCarbonRenderWindow.h"
+#include "vtkKWMessageDialog.h"
 #else
 #include "vtkXOpenGLRenderWindow.h"
 #include "vtkKWMessageDialog.h"
@@ -104,7 +107,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.107");
+vtkCxxRevisionMacro(vtkKWView, "1.108");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -366,7 +369,8 @@ int vtkKWView::ShouldIAbort()
       flag = 1;
       }
     }
-  
+#elif __APPLE_CC__
+ 
 #else
   XEvent report;
   
@@ -1526,7 +1530,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.107 $");
+  this->ExtractRevision(os,"$Revision: 1.108 $");
 }
 
 //----------------------------------------------------------------------------
