@@ -87,8 +87,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
-#include "vtkPVWizard.h"
-#include "vtkPVWizard.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderWindow.h"
@@ -521,7 +519,7 @@ void vtkPVWindow::PrepareForDelete()
     {
     // At exit, save the background colour in the registery.
     this->SaveColor(2, "RenderViewBG", 
-		    this->MainView->GetBackgroundColor());
+                    this->MainView->GetBackgroundColor());
     
     this->MainView->Delete();
     this->MainView = NULL;
@@ -613,7 +611,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->GlyphMenu->SetParent(this->SelectMenu);
   this->GlyphMenu->Create(this->Application, "-tearoff 0");
   this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
-				 "Select one of the glyph sources.");  
+                                 "Select one of the glyph sources.");  
 
   // Advanced stuff like saving VTK scripts, loading packages etc.
   this->AdvancedMenu->SetParent(this->GetMenu());
@@ -621,44 +619,44 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->Menu->InsertCascade(3, "Advanced", this->AdvancedMenu, 0);
 
   this->AdvancedMenu->InsertCommand(4, "Command Prompt", this,
-				    "DisplayCommandPrompt",8,
-				    "Display a prompt to interact "
+                                    "DisplayCommandPrompt",8,
+                                    "Display a prompt to interact "
     "with the ParaView engine");
   this->AdvancedMenu->AddCommand("Load ParaView Script", this, "LoadScript", 0,
-				 "Load ParaView Script (.pvs)");
+                                 "Load ParaView Script (.pvs)");
   this->AdvancedMenu->InsertCommand(2, "Export VTK Script", this,
-				    "ExportVTKScript", 7,
-				    "Write a script which can be "
-				    "parsed by the vtk executable");
+                                    "ExportVTKScript", 7,
+                                    "Write a script which can be "
+                                    "parsed by the vtk executable");
   
   // Log stuff (not traced)
   this->AdvancedMenu->InsertCommand(5, "Show Timer Log", this, "ShowTimerLog", 
-				    2, "Show log of render events and timing");
+                                    2, "Show log of render events and timing");
               
   // Log stuff (not traced)
   this->AdvancedMenu->InsertCommand(5, "Show Error Log", this, "ShowErrorLog", 
-				    2, "Show log of all errors and warnings");
+                                    2, "Show log of all errors and warnings");
               
 
   this->AdvancedMenu->InsertCommand(7, "Open Package", this, "OpenPackage", 2,
-				    "Open a ParaView package and load the "
-				    "contents");
+                                    "Open a ParaView package and load the "
+                                    "contents");
   
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->AdvancedMenu);
   this->SourceMenu->Create(this->Application, "-tearoff 0");
   this->AdvancedMenu->AddCascade("VTK Sources", this->SourceMenu, 4,
-				 "Choose a source from a list of "
-				 "VTK sources");  
+                                 "Choose a source from a list of "
+                                 "VTK sources");  
   
   // Create the menu for creating data sources (filters).  
   this->FilterMenu->SetParent(this->AdvancedMenu);
   this->FilterMenu->Create(this->Application, "-tearoff 0");
   this->AdvancedMenu->AddCascade("VTK Filters", this->FilterMenu, 4,
-				 "Choose a filter from a list of "
-				 "VTK filters");  
+                                 "Choose a filter from a list of "
+                                 "VTK filters");  
   this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
-	       this->AdvancedMenu->GetWidgetName());
+               this->AdvancedMenu->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -673,7 +671,7 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
   this->Script("pack %s -side left -pady 0 -anchor n -fill none -expand no",
                this->InteractorToolbar->GetWidgetName());
   this->Script("pack  %s -side left -pady 0 -fill both -expand yes",
-	       this->Toolbar->GetWidgetName()); 
+               this->Toolbar->GetWidgetName()); 
 }
 
 //----------------------------------------------------------------------------
@@ -767,7 +765,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Put the version in the status bar.
   char version[128];
   sprintf(version,"Version %d.%d", this->GetPVApplication()->GetMajorVersion(),
-	  this->GetPVApplication()->GetMinorVersion());
+          this->GetPVApplication()->GetMinorVersion());
   this->SetStatusText(version);
 
   this->InitializeMenus(app);
@@ -920,7 +918,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
   this->Script("%s entryconfigure \"Open Data File\" -state disabled",
-	       this->MenuFile->GetWidgetName());
+               this->MenuFile->GetWidgetName());
 
   if (this->InitializeDefaultInterfaces)
     {
@@ -933,8 +931,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     
     // Create the extract grid button
     this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 
-			   "ExtractGridCallback",
-			   "Extract a sub grid from a structured data set.");
+                           "ExtractGridCallback",
+                           "Extract a sub grid from a structured data set.");
 
     vtkPVSource *pvs=0;
     
@@ -1001,11 +999,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // Make the 3D View Settings the current one.
   this->Script("%s invoke \" 3D View Settings\"", 
-	       this->MenuProperties->GetWidgetName());
+               this->MenuProperties->GetWidgetName());
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
-	       this->GetWidgetName(), this->GetTclName());
+               this->GetWidgetName(), this->GetTclName());
 
 }
 
@@ -1029,9 +1027,9 @@ void vtkPVWindow::AddPackageName(const char* name)
 // Keep a list of the toolbar buttons so that they can be 
 // disabled/enabled in certain situations.
 void vtkPVWindow::AddToolbarButton(const char* buttonName, 
-				   const char* imageName, 
-				   const char* command,
-				   const char* balloonHelp)
+                                   const char* imageName, 
+                                   const char* command,
+                                   const char* balloonHelp)
 {
   vtkKWPushButton* button = vtkKWPushButton::New();
   button->SetParent(this->Toolbar->GetFrame());
@@ -1264,9 +1262,9 @@ vtkPVSource *vtkPVWindow::GetPVSource(const char* listname, char* sourcename)
     while ( (pvs = col->GetNextPVSource()) )
       {
       if (strcmp(sourcename, pvs->GetName()) == 0)
-	{
-	return pvs;
-	}
+        {
+        return pvs;
+        }
       }
     }
   return 0;
@@ -1355,10 +1353,10 @@ void vtkPVWindow::PlayDemo()
       {
       sprintf(temp2, "%s/Data/blow.vtk", *dir);
       if (stat(temp2, &fs) == 0) 
-	{
-	foundData=1;
-	this->Application->Script("set tmpPvDataDir %s/Data", *dir);
-	}
+        {
+        foundData=1;
+        this->Application->Script("set tmpPvDataDir %s/Data", *dir);
+        }
       }
     }
 
@@ -1377,18 +1375,18 @@ void vtkPVWindow::PlayDemo()
     if (this->UseMessageDialog)
       {
       vtkKWMessageDialog::PopupMessage(
-	this->Application, this,
-	"Warning", 
-	"Could not find Demo1.pvs in the installation or\n"
-	"build directory. Please make sure that ParaView\n"
-	"is installed properly.",
-	vtkKWMessageDialog::WarningIcon);
+        this->Application, this,
+        "Warning", 
+        "Could not find Demo1.pvs in the installation or\n"
+        "build directory. Please make sure that ParaView\n"
+        "is installed properly.",
+        vtkKWMessageDialog::WarningIcon);
       }
     else
       {
       vtkWarningMacro("Could not find Demo1.pvs in the installation or "
-		      "build directory. Please make sure that ParaView "
-		      "is installed properly.");
+                      "build directory. Please make sure that ParaView "
+                      "is installed properly.");
       }
     }
 }
@@ -1413,7 +1411,7 @@ void vtkPVWindow::OpenCallback()
   char buffer[1024];
   // Retrieve old path from the registery
   if ( !this->GetApplication()->GetRegisteryValue(
-	 2, "RunTime", "OpenPath", buffer) )
+         2, "RunTime", "OpenPath", buffer) )
     {
     sprintf(buffer, ".");
     }
@@ -1429,8 +1427,8 @@ void vtkPVWindow::OpenCallback()
     if (this->UseMessageDialog)
       {
       vtkKWMessageDialog::PopupMessage(this->Application, this,
-				       "Error",  error,
-				       vtkKWMessageDialog::ErrorIcon);
+                                       "Error",  error,
+                                       vtkKWMessageDialog::ErrorIcon);
       }
     else
       {
@@ -1440,7 +1438,7 @@ void vtkPVWindow::OpenCallback()
     }
 
   this->Script("set openFileName [tk_getOpenFile -initialdir {%s} "
-	       "-filetypes {{{ParaView Files} {%s}} %s {{All Files} {*}}}]", 
+               "-filetypes {{{ParaView Files} {%s}} %s {{All Files} {*}}}]", 
                buffer, this->FileExtensions, this->FileDescriptions);
 
   openFileName 
@@ -1482,15 +1480,15 @@ int vtkPVWindow::Open(char *openFileName)
   if (this->CheckIfFileIsReadable(openFileName) != VTK_OK)
     {
     char* error = new char[vtkString::Length("Can not open file ")
-			   + vtkString::Length(openFileName) 
-			   + vtkString::Length(" for reading.") 
-			  + 2];
+                           + vtkString::Length(openFileName) 
+                           + vtkString::Length(" for reading.") 
+                          + 2];
     sprintf(error,"Can not open file %s for reading.", openFileName);
     if (this->UseMessageDialog)
       {
       vtkKWMessageDialog::PopupMessage(this->Application, this,
-				       "Error",  error,
-				       vtkKWMessageDialog::ErrorIcon);
+                                       "Error",  error,
+                                       vtkKWMessageDialog::ErrorIcon);
       }
     else
       {
@@ -1504,11 +1502,11 @@ int vtkPVWindow::Open(char *openFileName)
 // These should be added manually to regression scripts so that
 // they don't hang with a dialog up.
 //  this->GetPVApplication()->AddTraceEntry("$kw(%s) UseMessageDialogOff", 
-//					  this->GetTclName());
+//                                        this->GetTclName());
   this->GetPVApplication()->AddTraceEntry("$kw(%s) Open \"%s\"", 
-					  this->GetTclName(), openFileName);
+                                          this->GetTclName(), openFileName);
 //  this->GetPVApplication()->AddTraceEntry("$kw(%s) UseMessageDialogOn", 
-//					  this->GetTclName());
+//                                        this->GetTclName());
 
   // Ask each reader module if it can read the file. This first
   // one which says OK gets to read the file.
@@ -1524,14 +1522,14 @@ int vtkPVWindow::Open(char *openFileName)
       // Read the file. On success this will return a new source.
       // Add that source to the list of sources.
       if (rm->ReadFile(openFileName, clone) == VTK_OK && clone)
-	{
-	this->GetSourceList("Sources")->AddItem(clone);
-	if (clone->GetAcceptAfterRead())
-	  {
-	  clone->Accept(0);
-	  }
-	clone->Delete();
-	}
+        {
+        this->GetSourceList("Sources")->AddItem(clone);
+        if (clone->GetAcceptAfterRead())
+          {
+          clone->Accept(0);
+          }
+        clone->Delete();
+        }
       it->Delete();
       this->AddRecentFile(NULL, openFileName, this, "Open");
       return VTK_OK;
@@ -1543,7 +1541,7 @@ int vtkPVWindow::Open(char *openFileName)
   
   ostrstream error;
   error << "Could not find an appropriate reader for file "
-	<< openFileName << ends;
+        << openFileName << ends;
   if (this->UseMessageDialog)
     {
     vtkKWMessageDialog::PopupMessage(
@@ -1718,7 +1716,7 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::SaveInTclScript(const char* filename,
-				  int vtkFlag, int askFlag)
+                                  int vtkFlag, int askFlag)
 {
   ofstream *file;
   vtkPVSource *pvs;
@@ -1737,7 +1735,7 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
     }
 
   *file << "# ParaView Version " << this->GetPVApplication()->GetMajorVersion()
-	   << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
+           << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
   if (this->PackageNames->GetNumberOfItems() > 0)
     {
@@ -1747,9 +1745,9 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
       {
       const char* name = 0;
       if (it->GetData(name) == VTK_OK && name)
-	{
-	*file << "::paraview::load_component " << name << endl;
-	}
+        {
+        *file << "::paraview::load_component " << name << endl;
+        }
       it->GoToNextItem();
       }
     it->Delete();
@@ -1774,9 +1772,9 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
   if (script && vtkString::Length(script) > 0 && !askFlag)
     {
     if (vtkKWMessageDialog::PopupYesNo(
-	  this->Application, this, "Animation", 
-	  "Do you want your script to generate an animation?", 
-	  vtkKWMessageDialog::QuestionIcon))
+          this->Application, this, "Animation", 
+          "Do you want your script to generate an animation?", 
+          vtkKWMessageDialog::QuestionIcon))
       {
       animationFlag = 1;
       }
@@ -1785,9 +1783,9 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
   if (animationFlag == 0 && !askFlag)
     {
     if (vtkKWMessageDialog::PopupYesNo(
-	  this->Application, this, "Image", 
-	  "Do you want your script to save an image?", 
-	  vtkKWMessageDialog::QuestionIcon))
+          this->Application, this, "Image", 
+          "Do you want your script to save an image?", 
+          vtkKWMessageDialog::QuestionIcon))
       {
       imageFlag = 1;
       }
@@ -1807,31 +1805,31 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
     if ( !extension)
       {
       vtkKWMessageDialog::PopupMessage(this->Application, this,
-				       "Error",  "Filename has no extension."
-				       " Can not requested identify file"
-				       " format."
-				       " No image file will be generated.",
-				       vtkKWMessageDialog::ErrorIcon);
+                                       "Error",  "Filename has no extension."
+                                       " Can not requested identify file"
+                                       " format."
+                                       " No image file will be generated.",
+                                       vtkKWMessageDialog::ErrorIcon);
       }
     else
       {
       if ( this->Writers->GetItem(extension, writerName) != VTK_OK )
-	{
-	writerName = 0;
-	ostrstream err;
-	err << "Unrecognized extension: " << extension << "." 
-	    << " No image file will be generated." << ends;
-	vtkKWMessageDialog::PopupMessage(this->Application, this,
-					 "Error",  err.str(),
-					 vtkKWMessageDialog::ErrorIcon);
-	err.rdbuf()->freeze(0);
-	}
+        {
+        writerName = 0;
+        ostrstream err;
+        err << "Unrecognized extension: " << extension << "." 
+            << " No image file will be generated." << ends;
+        vtkKWMessageDialog::PopupMessage(this->Application, this,
+                                         "Error",  err.str(),
+                                         vtkKWMessageDialog::ErrorIcon);
+        err.rdbuf()->freeze(0);
+        }
       }
 
     if (extension && writerName &&
-	vtkKWMessageDialog::PopupYesNo(this->Application, this, "Offscreen", 
-				       "Do you want offscreen rendering?", 
-				       vtkKWMessageDialog::QuestionIcon))
+        vtkKWMessageDialog::PopupYesNo(this->Application, this, "Offscreen", 
+                                       "Do you want offscreen rendering?", 
+                                       vtkKWMessageDialog::QuestionIcon))
       {
       offScreenFlag = 1;
       }
@@ -1850,9 +1848,9 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
       {
       col->InitTraversal();
       while ( (pvs = col->GetNextPVSource()) ) 
-	{
-	pvs->SetVisitedFlag(0);
-	}
+        {
+        pvs->SetVisitedFlag(0);
+        }
       }
     it->GoToNextItem();
     }
@@ -1892,16 +1890,16 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
       *file << "if {$myProcId != 0} {compManager RenderRMI} else {\n\t";
       *file << "RenWin1 Render\n\t";
       if ( extension && writerName)
-	{
-	*file << "Writer SetFileName {" << path << "}\n\t";
-	*file << "Writer Write\n";
-	*file << "}\n\n";
-	}
+        {
+        *file << "Writer SetFileName {" << path << "}\n\t";
+        *file << "Writer Write\n";
+        *file << "}\n\n";
+        }
       }
     if (animationFlag)
       {
       *file << "# prevent the tk window from showing up then start "
-	"the event loop\n";
+        "the event loop\n";
       *file << "wm withdraw .\n\n\n";
       int length = vtkString::Length(path);
       char* newPath = vtkString::Duplicate(path);
@@ -1909,14 +1907,14 @@ void vtkPVWindow::SaveInTclScript(const char* filename,
       // own interface.
       if ( newPath[length-4] == '.')
         {
-	char* tmpStr = new char[length-3];
-	strncpy(tmpStr, newPath, length-4);
-	tmpStr[length-4] = '\0';
-	delete [] newPath;
-	newPath = tmpStr;
+        char* tmpStr = new char[length-3];
+        strncpy(tmpStr, newPath, length-4);
+        tmpStr[length-4] = '\0';
+        delete [] newPath;
+        newPath = tmpStr;
         }
       this->AnimationInterface->SaveInTclScript(file, newPath, extension,
-						writerName);
+                                                writerName);
       delete [] newPath;
       }
     delete [] path;
@@ -1976,13 +1974,13 @@ void vtkPVWindow::UpdateSourceMenu()
       // Check if this is a source. We do not want to add filters
       // to the source lists.
       if (proto && !proto->GetInputClassName())
-	{
-	numFilters++;
-	char methodAndArgs[150];
-	it->GetKey(key);
-	sprintf(methodAndArgs, "CreatePVSource %s", key);
-	this->SourceMenu->AddCommand(key, this, methodAndArgs);
-	}
+        {
+        numFilters++;
+        char methodAndArgs[150];
+        it->GetKey(key);
+        sprintf(methodAndArgs, "CreatePVSource %s", key);
+        this->SourceMenu->AddCommand(key, this, methodAndArgs);
+        }
       }
     it->GoToNextItem();
     }
@@ -1992,12 +1990,12 @@ void vtkPVWindow::UpdateSourceMenu()
   if (numFilters > 0)
     {
     this->Script("%s entryconfigure \"VTK Sources\" -state normal",
-		 this->AdvancedMenu->GetWidgetName());
+                 this->AdvancedMenu->GetWidgetName());
     }
   else
     {
     this->Script("%s entryconfigure \"VTK Sources\" -state disabled",
-		 this->AdvancedMenu->GetWidgetName());
+                 this->AdvancedMenu->GetWidgetName());
     }
 }
 
@@ -2027,19 +2025,19 @@ void vtkPVWindow::UpdateFilterMenu()
       {
       proto = 0;
       if (it->GetData(proto) == VTK_OK)
-	{
-	// Check if this is an appropriate filter by comparing
-	// it's input type with the current data object's type.
-	if (proto && proto->GetIsValidInput(this->CurrentPVData))
-	  {
-	  numSources++;
-	  char methodAndArgs[150];
-	  it->GetKey(key);
-	  sprintf(methodAndArgs, "CreatePVSource %s", key);
-	  // Remove "vtk" from the class name to get the menu item name.
-	  this->FilterMenu->AddCommand(key, this, methodAndArgs);
-	  }
-	}
+        {
+        // Check if this is an appropriate filter by comparing
+        // it's input type with the current data object's type.
+        if (proto && proto->GetIsValidInput(this->CurrentPVData))
+          {
+          numSources++;
+          char methodAndArgs[150];
+          it->GetKey(key);
+          sprintf(methodAndArgs, "CreatePVSource %s", key);
+          // Remove "vtk" from the class name to get the menu item name.
+          this->FilterMenu->AddCommand(key, this, methodAndArgs);
+          }
+        }
       it->GoToNextItem();
       }
     it->Delete();
@@ -2048,12 +2046,12 @@ void vtkPVWindow::UpdateFilterMenu()
     if (numSources > 0)
       {
       this->Script("%s entryconfigure \"VTK Filters\" -state normal",
-		   this->AdvancedMenu->GetWidgetName());
+                   this->AdvancedMenu->GetWidgetName());
       }
     else
       {
       this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
-		   this->AdvancedMenu->GetWidgetName());
+                   this->AdvancedMenu->GetWidgetName());
       }
     this->EnableToolbarButtons();
     }
@@ -2062,7 +2060,7 @@ void vtkPVWindow::UpdateFilterMenu()
     // If there is no current data, disable the menu.
     this->DisableToolbarButtons();
     this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
-		 this->AdvancedMenu->GetWidgetName());
+                 this->AdvancedMenu->GetWidgetName());
     }
   
 }
@@ -2107,8 +2105,8 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
     if (pvs->InitializeTrace())
       {
       this->GetPVApplication()->AddTraceEntry(
-	"$kw(%s) SetCurrentPVSourceCallback $kw(%s)", 
-	this->GetTclName(), pvs->GetTclName());
+        "$kw(%s) SetCurrentPVSourceCallback $kw(%s)", 
+        this->GetTclName(), pvs->GetTclName());
       }
     }
   else
@@ -2249,11 +2247,11 @@ void vtkPVWindow::UpdateSelectMenu()
     while ( (source = glyphSources->GetNextPVSource()) )
       {
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
-	      source->GetTclName());
+              source->GetTclName());
       this->GlyphMenu->AddCommand(source->GetName(), this, methodAndArg,
-				  source->GetVTKSource() ?
-				  source->GetVTKSource()->GetClassName()+3
-				  : 0);
+                                  source->GetVTKSource() ?
+                                  source->GetVTKSource()->GetClassName()+3
+                                  : 0);
       numGlyphs++;
       }
     }
@@ -2265,18 +2263,18 @@ void vtkPVWindow::UpdateSelectMenu()
   while ( (source = sources->GetNextPVSource()) )
     {
     sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
-	    source->GetTclName());
+            source->GetTclName());
     this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
-				 source->GetVTKSource() ?
-				 source->GetVTKSource()->GetClassName()+3
-				 : 0);
+                                 source->GetVTKSource() ?
+                                 source->GetVTKSource()->GetClassName()+3
+                                 : 0);
     numSources++;
     }
 
   if (numGlyphs > 0)
     {
     this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
-				 "Select one of the glyph sources.");  
+                                 "Select one of the glyph sources.");  
     }
 
   // Disable or enable the menu.
@@ -2411,10 +2409,10 @@ void vtkPVWindow::EnableToolbarButtons()
     {
     vtkKWPushButton* button = 0;
     if (this->ToolbarButtons->GetItem("ExtractGrid", button) == VTK_OK && 
-	button)
+        button)
       {
       this->Script("%s configure -state disabled",
-		   button->GetWidgetName());
+                   button->GetWidgetName());
       }
     }
 
@@ -2599,7 +2597,7 @@ void vtkPVWindow::SaveTrace()
 // Create a new data object/source by cloning a module prototype.
 vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
                                          const char* sourceList,
-					 int addTraceEntry)
+                                         int addTraceEntry)
 {
   vtkPVSource *pvs = 0;
   vtkPVSource* clone = 0;
@@ -2621,7 +2619,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
     if (success != VTK_OK)
       {
       vtkErrorMacro("Cloning operation for " << className
-		    << " failed.");
+                    << " failed.");
       return 0;
       }
 
@@ -2633,23 +2631,23 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
     if (addTraceEntry)
       {
       if (clone->GetTraceInitialized() == 0)
-	{ 
-	if (sourceList)
-	  {
-	  this->GetPVApplication()->AddTraceEntry(
-	    "set kw(%s) [$kw(%s) CreatePVSource %s %s]", 
-	    clone->GetTclName(), this->GetTclName(),
-	    className, sourceList);
-	  }
-	else
-	  {
-	  this->GetPVApplication()->AddTraceEntry(
-	    "set kw(%s) [$kw(%s) CreatePVSource %s]", 
-	    clone->GetTclName(), this->GetTclName(),
-	    className);
-	  }
-	clone->SetTraceInitialized(1);
-	}
+        { 
+        if (sourceList)
+          {
+          this->GetPVApplication()->AddTraceEntry(
+            "set kw(%s) [$kw(%s) CreatePVSource %s %s]", 
+            clone->GetTclName(), this->GetTclName(),
+            className, sourceList);
+          }
+        else
+          {
+          this->GetPVApplication()->AddTraceEntry(
+            "set kw(%s) [$kw(%s) CreatePVSource %s]", 
+            clone->GetTclName(), this->GetTclName(),
+            className);
+          }
+        clone->SetTraceInitialized(1);
+        }
       }
 
     clone->UpdateParameterWidgets();
@@ -2671,8 +2669,8 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
     else
       {
       vtkWarningMacro("The specified source list (" 
-		      << (sourceList ? sourceList : "Sources") 
-		      << ") could not be found.")
+                      << (sourceList ? sourceList : "Sources") 
+                      << ") could not be found.")
       }
     clone->Delete();
     }
@@ -2711,7 +2709,7 @@ int vtkPVWindow::OpenPackage()
   char buffer[1024];
   // Retrieve old path from the registery
   if ( !this->GetApplication()->GetRegisteryValue(
-	 2, "RunTime", "PackagePath", buffer) )
+         2, "RunTime", "PackagePath", buffer) )
     {
     sprintf(buffer, ".");
     }
@@ -2865,7 +2863,7 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
     if((extPos > 0) && vtkString::Equals(file+extPos, ".xml"))
       {
       char* fullPath 
-	= new char[vtkString::Length(file)+vtkString::Length(directory)+2];
+        = new char[vtkString::Length(file)+vtkString::Length(directory)+2];
       strcpy(fullPath, directory);
       strcat(fullPath, "/");
       strcat(fullPath, file);
@@ -2899,7 +2897,7 @@ void vtkPVWindow::WizardCallback()
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::AddFileType(const char *description, const char *ext,
-			      vtkPVReaderModule* prototype)
+                              vtkPVReaderModule* prototype)
 {
   int length = 0;
   char *newStr;
@@ -2972,7 +2970,7 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
 
   this->ReaderList->AppendItem(prototype);
   this->Script("%s entryconfigure \"Open Data File\" -state normal",
-	       this->MenuFile->GetWidgetName());
+               this->MenuFile->GetWidgetName());
 
 }
 
