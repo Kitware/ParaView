@@ -165,6 +165,9 @@ IF (PARAVIEW_CAN_BUILD)
 
 # Add the testing directories
  IF(BUILD_TESTING)
+   OPTION (PARAVIEW_HAVE_XDMF "Perform testing of ParaView with XDMF" OFF)
+   MARK_AS_ADVANCED(PARAVIEW_HAVE_XDMF)
+
    ENABLE_TESTING()
    SUBDIRS(ParaView/Testing)
    SUBDIR_DEPENDS(ParaView/Testing ParaView)
