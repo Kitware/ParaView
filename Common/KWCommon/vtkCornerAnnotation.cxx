@@ -13,12 +13,12 @@
 =========================================================================*/
 #include "vtkCornerAnnotation.h"
 
+#include "vtkAlgorithmOutput.h"
 #include "vtkImageActor.h"
 #include "vtkImageData.h"
 #include "vtkImageMapToWindowLevelColors.h"
 #include "vtkObjectFactory.h"
 #include "vtkPropCollection.h"
-#include "vtkSource.h"
 #include "vtkTextMapper.h"
 #include "vtkTextProperty.h"
 #include "vtkViewport.h"
@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.2");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.3");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -255,7 +255,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
       if (ia->GetInput() && !wl)
         {
         wl = vtkImageMapToWindowLevelColors::SafeDownCast(
-          ia->GetInput()->GetSource());
+          ia->GetInput()->GetProducerPort()->GetProducer());
         }
       break;
       }
