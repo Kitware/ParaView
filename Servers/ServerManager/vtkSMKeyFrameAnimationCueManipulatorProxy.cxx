@@ -20,7 +20,7 @@
 #include "vtkClientServerID.h"
 
 #include <vtkstd/vector>
-vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.3");
+vtkCxxRevisionMacro(vtkSMKeyFrameAnimationCueManipulatorProxy, "1.4");
 vtkStandardNewMacro(vtkSMKeyFrameAnimationCueManipulatorProxy);
 
 //****************************************************************************
@@ -90,9 +90,6 @@ void vtkSMKeyFrameAnimationCueManipulatorProxy::Initialize()
 //----------------------------------------------------------------------------
 int vtkSMKeyFrameAnimationCueManipulatorProxy::AddKeyFrame(vtkSMKeyFrameProxy* keyframe)
 {
-  vtkSMKeyFrameAnimationCueManipulatorProxyInternals::DoubleToKeyFrameVector::
-    iterator iter;
-
   int index = this->AddKeyFrameInternal(keyframe);
   if (index != -1)
     {
