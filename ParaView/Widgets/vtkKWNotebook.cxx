@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.44");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.45");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -495,6 +495,36 @@ unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
   it->Delete();
 
   return count;
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::GetVisiblePageId(int idx)
+{
+  // As a convenience, if ShowOnlyMostRecentPages is On, return the 
+  // GetMostRecentPageId, since it provides a better clue about the tab ordering.
+
+  if (this->ShowOnlyMostRecentPages)
+    {
+    return this->GetMostRecentPageId(idx);
+    }
+
+  vtkIdType found = -1;
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Visibility && !idx--)
+      {
+      found = page->Id;
+      break;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found;
 }
 
 //------------------------------------------------------------------------------
@@ -1388,6 +1418,23 @@ int vtkKWNotebook::PutOnTopOfMostRecentPages(vtkKWNotebook::Page *page)
 }
 
 //------------------------------------------------------------------------------
+int vtkKWNotebook::GetMostRecentPageId(int idx)
+{
+  if (idx < 0 || idx >= this->MostRecentPages->GetNumberOfItems())
+    {
+    return -1;
+    }
+
+  vtkKWNotebook::Page *page;
+  if (this->MostRecentPages->GetItem(idx, page) != VTK_OK)
+    {
+    return -1;
+    }
+
+  return page->Id;
+}
+
+//------------------------------------------------------------------------------
 void vtkKWNotebook::PinPage(int id)
 {
   this->PinPage(this->GetPage(id));
@@ -1466,6 +1513,30 @@ void vtkKWNotebook::TogglePagePinned(vtkKWNotebook::Page *page)
 }
 
 //------------------------------------------------------------------------------
+int vtkKWNotebook::GetPagePinned(int id)
+{
+  return this->GetPagePinned(this->GetPage(id));
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::GetPagePinned(const char *title)
+{
+  return this->GetPagePinned(this->GetPage(title));
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::GetPagePinned(vtkKWNotebook::Page *page)
+{
+  if (page == NULL || !this->IsCreated())
+    {
+    vtkErrorMacro("Can not query page pinned status.");
+    return 0;
+    }
+
+  return page->Pinned;
+}
+
+//------------------------------------------------------------------------------
 unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
 {
   unsigned int count = 0;
@@ -1484,6 +1555,28 @@ unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
   it->Delete();
 
   return count;
+}
+
+//------------------------------------------------------------------------------
+int vtkKWNotebook::GetPinnedPageId(int idx)
+{
+  vtkIdType found = -1;
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Pinned && !idx--)
+      {
+      found = page->Id;
+      break;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found;
 }
 
 //------------------------------------------------------------------------------

@@ -162,17 +162,25 @@ public:
   void HidePage(const char *title);
   void SetPageVisibility(int id, int flag);
   void SetPageVisibility(const char *title, int flag);
-  int GetPageVisibility(int id);
-  int GetPageVisibility(const char *title);
+  int  GetPageVisibility(int id);
+  int  GetPageVisibility(const char *title);
   void TogglePageVisibility(int id);
   void TogglePageVisibility(const char *title);
-  int CanBeHidden(int id);
-  int CanBeHidden(const char *title);
+  int  CanBeHidden(int id);
+  int  CanBeHidden(const char *title);
 
   // Description:
   // Return the number of visible pages in the notebook.
   unsigned int GetNumberOfVisiblePages();
 
+  // Description:
+  // Get the n-th visible page id (starting at index 0, i.e. the first visible 
+  // page is at index 0, although it does not necessary reflects the way
+  // the page tab are packed/ordered in the tab row).
+  // Return -1 if the index is out of the range, or if there is no visible
+  // page for that index.
+  int GetVisiblePageId(int idx);
+  
   // Description:
   // Convenience methods provided to show/hide all page tabs matching or not
   // matching a given tag. ShowPagesMatchingTagReverse processes pages starting
@@ -199,7 +207,7 @@ public:
   vtkBooleanMacro(ShowOnlyPagesWithSameTag, int);
   
   // Description:
-  // Make the notebook automatically maintain a list of most recently shown
+  // Make the notebook automatically maintain a list of most recently used
   // page. The size of this list can be set (defaults to 4). Once it is full,
   // any new shown page will make the least recent page hidden.
   // It is suggested that ShowAllPagesWithSameTag and ShowOnlyPagesWithSameTag
@@ -211,6 +219,13 @@ public:
   vtkGetMacro(NumberOfMostRecentPages, int);
 
   // Description:
+  // Get the n-th most recent page id. Most recent pages indexes start at 0 
+  // (i.e. the most recent page is at index 0).
+  // Return -1 if the index is out of the range, or if there is no most
+  // recent page for that index.
+  int GetMostRecentPageId(int idx);
+
+  // Description:
   // Pin/unpin a page tab. A pinned page tab can not be hidden.
   // If a page title is provided instead of a page id, the first page matching
   // that title is considered.
@@ -220,6 +235,8 @@ public:
   void UnpinPage(const char *title);
   void TogglePagePinned(int id);
   void TogglePagePinned(const char *title);
+  int  GetPagePinned(int id);
+  int  GetPagePinned(const char *title);
   
   // Description:
   // Allow pages to be pinned.
@@ -230,6 +247,13 @@ public:
   // Description:
   // Return the number of pinned pages in the notebook.
   unsigned int GetNumberOfPinnedPages();
+
+  // Description:
+  // Get the n-th pinned page id (starting at index 0, i.e. the first pinned page
+  // is at index 0).
+  // Return -1 if the index is out of the range, or if there is no pinned
+  // page for that index.
+  int GetPinnedPageId(int idx);
   
   // Description:
   // The notebook will automatically resize itself to fit its
@@ -300,16 +324,17 @@ protected:
   {
   public:
     void Delete();
-    int Id;
-    char *Title;
+
+    int             Id;
+    int             Visibility;
+    int             Pinned;
+    int             Tag;
+    char            *Title;
     vtkKWFrame      *Frame;
     vtkKWFrame      *TabFrame;
     vtkKWLabel      *Label;
     vtkKWImageLabel *ImageLabel;
     vtkKWIcon       *Icon;
-    int             Visibility;
-    int             Pinned;
-    int             Tag;
   };
 
   // The pages container and its iterator
@@ -343,16 +368,17 @@ protected:
   void ShowPageTab(Page*);
   void ShowPageTabAsLow(Page*);
   void LowerPage(Page*);
-  int RemovePage(Page*);
+  int  RemovePage(Page*);
   void ShowPage(Page*);
   void HidePage(Page*);
   void PinPage(Page*);
   void UnpinPage(Page*);
   void TogglePagePinned(Page*);
-  int GetPageVisibility(Page*);
+  int  GetPageVisibility(Page*);
   void TogglePageVisibility(Page*);
-  int CanBeHidden(Page*);
-  int GetPageTag(Page*);
+  int  CanBeHidden(Page*);
+  int  GetPageTag(Page*);
+  int  GetPagePinned(Page*);
   char* GetPageTitle(Page*);
 
   int AddToMostRecentPages(Page*);
