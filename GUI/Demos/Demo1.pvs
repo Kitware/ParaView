@@ -117,6 +117,7 @@ proc clip_run {} {
 
     ChangeDemoText "Running Clip Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only) "
 
+    $clip(vtkTemp1) SetCurrentPVSourceCallback $clip(vtkTemp572)
     $clip(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
     $clip(vtkTemp572) SetVisibility 1
@@ -1274,12 +1275,12 @@ proc extract_run {} {
       }
    }
 
-    set extract(vtkTemp656) [$extract(vtkTemp598) GetPVOutput]
-    $extract(vtkTemp656) SetVisibility 0
+    $extract(vtkTemp598) SetVisibility 0
 
 
     ChangeDemoText "Running Glyph Demo:\n Vectors fields can be inspected by applying glyphs (currently arrows -vector arrows-, cones and spheres) to the points in a dataset. The glyphs can be scaled by scalars, vector component or vector magnitude and can be oriented using a vector field."
 
+    $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp780)
     $extract(vtkTemp780) SetVisibility 1
     set extract(vtkTemp807) [$extract(vtkTemp780) GetPVOutput]
     $extract(vtkTemp807) ChangeActorColor 0.996078 0.117647 0.125490
@@ -4336,6 +4337,8 @@ proc threshold_run {} {
 
     ChangeDemoText "Running Threshold Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
 
+
+    $threshold(vtkTemp1) SetCurrentPVSourceCallback $threshold(vtkTemp482)
     $threshold(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
     $threshold(vtkTemp384) SetVisibility 1
@@ -4344,7 +4347,6 @@ proc threshold_run {} {
     $threshold(vtkTemp1) HideProperties
 
     $threshold(vtkTemp24) SetCameraState -19.320 29.194 60.286  0.000 0.000 0.000  0.073 0.907 -0.416
-    [$threshold(vtkTemp384) GetPVOutput] SetVisibility 1
     ForceRender
    for {set i 20} {$i < 260} {incr i [expr 10 * $speed]} {
         $threshold(vtkTemp492) SetMinValue $i
@@ -4402,6 +4404,7 @@ proc warp_run {} {
 
     ChangeDemoText "Running Warp Demo :\n The points in a dataset can be warped (displaced) with scalars (given a user defined displacement vector) or with vectors (unavailable for rectilinear grids)."
 
+    $warp(vtkTemp1) SetCurrentPVSourceCallback $warp(vtkTemp450)
     $warp(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
     $warp(vtkTemp24) SetCameraState 91.248 12.000 0.000  -56.063 12.000 0.000  0.000 -0.004 -1.000
@@ -4418,7 +4421,7 @@ proc warp_run {} {
         $warp(vtkTemp469) ColorByPointField "thickness$i" 1
         $warp(vtkTemp462) SetValue "displacement$i"
         $warp(vtkTemp450) AcceptCallback
-        $warp(vtkTemp469) SetVisibility 1
+        $warp(vtkTemp450) SetVisibility 1
         update
         ForceRender
         if $pvDemoShouldStop {
