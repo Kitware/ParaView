@@ -26,10 +26,11 @@
 #include <vtkDoubleArray.h>
 #include <vtkUnsignedCharArray.h>
 #include "vtkMultiProcessController.h"
+#include "vtkDoubleArray.h"
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.8");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.9");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
