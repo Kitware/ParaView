@@ -1,17 +1,7 @@
 MACRO(CS_INITIALIZE_WRAP)
   IF (COMMAND VTK_WRAP_ClientServer)
   ELSE (COMMAND VTK_WRAP_ClientServer)
-    TRY_COMPILE(COMPILE_OK
-      ${VTKCS_BINARY_DIR}/CMake
-      ${VTKCS_SOURCE_DIR}/CMake
-      ClientServer_LOADED_COMMANDS OUTPUT_VARIABLE TRYOUT)
-    IF (COMPILE_OK)
-      LOAD_COMMAND(VTK_WRAP_ClientServer
-        ${VTKCS_BINARY_DIR}/CMake
-        ${VTKCS_BINARY_DIR}/CMake/Debug)
-    ELSE (COMPILE_OK)
-      MESSAGE("failed to compile ParaView ClientServer extensions to CMake:\n${TRYOUT}")
-    ENDIF (COMPILE_OK)
+    INCLUDE (${VTKCS_SOURCE_DIR}/CMake/vtkWrapClientServer.cmake)
   ENDIF (COMMAND VTK_WRAP_ClientServer)
   UTILITY_SOURCE(VTK_WRAP_ClientServer_EXE vtkWrapClientServer 
     Wrapping vtkWrapClientServer.c)
@@ -42,7 +32,7 @@ MACRO(PV_WRAP_VTK_CS kit ukit deps)
           ${full_name})
     ENDIF(NOT VTK_CLASS_WRAP_EXCLUDE_${class})
   ENDFOREACH(class)
-  VTK_WRAP_ClientServer(vtk${kit}CS vtk${kit}CS_SRCS ${vtk${kit}CS_HEADERS})
+  VTK_WRAP_ClientServer(vtk${kit}CS vtk${kit}CS_SRCS "${vtk${kit}CS_HEADERS}")
   ADD_LIBRARY(vtk${kit}CS ${vtk${kit}CS_SRCS})
   TARGET_LINK_LIBRARIES(vtk${kit}CS vtkClientServer vtk${kit})
   FOREACH(dep ${deps})
