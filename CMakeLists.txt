@@ -33,9 +33,23 @@ IF(USE_INCLUDED_TCLTK)
      "Path to tk library")
     SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.2.3/generic 
         CACHE PATH "Path to tk include")
-  
-    ADD_CUSTOM_TARGET(maketcl ALL cd ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix; make )
-    ADD_CUSTOM_TARGET(maketk ALL cd ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix; make )
+    IF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
+      IF (CMAKE_MINOR_VERSION MATCHES [3-9][0-9]*)
+        SET(CMAKE_ESCAPES_SC 1)
+      ENDIF (CMAKE_MINOR_VERSION MATCHES [3-9][0-9]*)
+    ENDIF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
+ 
+    IF (CMAKE_ESCAPES_SC)
+      ADD_CUSTOM_TARGET(maketcl ALL 
+        cd ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix\; make )
+      ADD_CUSTOM_TARGET(maketk ALL 
+        cd ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix\; make )
+    ELSE (CMAKE_ESCAPES_SC)
+      ADD_CUSTOM_TARGET(maketcl ALL 
+        cd ${ParaViewComplete_BINARY_DIR}/tcl8.2.3/unix; make )
+      ADD_CUSTOM_TARGET(maketk ALL 
+        cd ${ParaViewComplete_BINARY_DIR}/tk8.2.3/unix; make )
+    ENDIF (CMAKE_ESCAPES_SC)
   
   ELSE(UNIX)
     SET(TCL_LIBRARY ${ParaViewComplete_SOURCE_DIR}/TclTk8.2.3Win/lib/tcl82.lib
