@@ -122,7 +122,9 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 	   (int)(this->Color[2]*255.5) );
 
   this->Script("frame %s -relief raised -bd 2 %s", wname, args);
-  this->Label1->Create(this->Application,"label","-text {Set Color}");
+  char textarg[1024];
+  sprintf( textarg, "-text {%s}", this->Text );
+  this->Label1->Create(this->Application,"label", textarg);
   this->Label2->Create(this->Application,
                        "label","-width 2 -height 1");
   this->Script("pack %s -padx 3 -pady 3 -ipadx 2 -side right",this->Label2->GetWidgetName());
@@ -255,5 +257,5 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.9 $");
+  this->ExtractRevision(os,"$Revision: 1.10 $");
 }
