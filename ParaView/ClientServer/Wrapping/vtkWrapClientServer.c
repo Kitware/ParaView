@@ -102,6 +102,7 @@ void use_hints(FILE *fp)
     case 304: case 305: case 306:
     case 313: case 314: case 315: case 316:
       fprintf(fp,
+              "      resultStream.Reset();\n"
               "      resultStream << vtkClientServerStream::Reply << vtkClientServerStream::InsertArray(temp%i,%i) << vtkClientServerStream::End;\n", MAX_ARGS, currentFunction->HintSize);
       break;
     }
@@ -116,11 +117,13 @@ void return_result(FILE *fp)
     case 1: case 3: case 4: case 5: case 6: case 7:
     case 13: case 14: case 15: case 16:
       fprintf(fp,
+              "      resultStream.Reset();\n"
               "      resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
               MAX_ARGS);
       break;
     case 303:
       fprintf(fp,
+              "      resultStream.Reset();\n"
               "      if (temp%i)\n"
               "        {\n"
               "        resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n"
@@ -133,12 +136,14 @@ void return_result(FILE *fp)
       if(strcmp(currentFunction->ReturnClass, "vtkClientServerStream") == 0)
         {
         fprintf(fp,
+                "      resultStream.Reset();\n"
                 "      resultStream << vtkClientServerStream::Reply << *temp%i << vtkClientServerStream::End;\n",
                 MAX_ARGS);
         }
       else
         {
         fprintf(fp,
+                "      resultStream.Reset();\n"
                 "      resultStream << vtkClientServerStream::Reply << (vtkObjectBase *)temp%i << vtkClientServerStream::End;\n",MAX_ARGS);
         }
       break;
@@ -156,6 +161,7 @@ void return_result(FILE *fp)
       if(strcmp(currentFunction->ReturnClass, "vtkClientServerStream") == 0)
         {
         fprintf(fp,
+                "      resultStream.Reset();\n"
                 "      resultStream << vtkClientServerStream::Reply << temp%i << vtkClientServerStream::End;\n",
                 MAX_ARGS);
         break;
@@ -163,6 +169,7 @@ void return_result(FILE *fp)
       }
     default:
       fprintf(fp,
+              "      resultStream.Reset();\n"
               "      resultStream << vtkClientServerStream::Reply\n"
               "                   << \"unable to return result of type(%d %%1000 = %d).\"\n"
               "                   << vtkClientServerStream::End;\n",
@@ -450,6 +457,17 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
     {
     fprintf(fp,"  %s *op = %s::SafeDownCast(ob);\n",
             data->ClassName, data->ClassName);
+    fprintf(fp,
+            "  if(!op)\n"
+            "    {\n"
+            "    vtkOStrStreamWrapper vtkmsg;\n"
+            "    vtkmsg << \"Cannot cast \" << ob->GetClassName() << \" object to %s.  \"\n"
+            "           << \"This probably means the class specifies the incorrect superclass in vtkTypeRevisionMacro.\";\n"
+            "    resultStream.Reset();\n"
+            "    resultStream << vtkClientServerStream::Error\n"
+            "                 << vtkmsg.str() << 0 << vtkClientServerStream::End;\n"
+            "    return 0;\n"
+            "    }\n", data->ClassName);
     }
 
   fprintf(fp, "  (void)arlu;\n");
@@ -503,6 +521,13 @@ void vtkParseOutput(FILE *fp, FileInfo *data)
             "    }\n");
     }
   fprintf(fp,
+          "  if(resultStream.GetNumberOfMessages() > 0 &&\n"
+          "     resultStream.GetCommand(0) == vtkClientServerStream::Error &&\n"
+          "     resultStream.GetNumberOfArguments(0) > 1)\n"
+          "    {\n"
+          "    /* A superclass wrapper prepared a special message. */\n"
+          "    return 0;\n"
+          "    }\n"
           "  vtkOStrStreamWrapper vtkmsg;\n"
           "  vtkmsg << \"Object type: %s, could not find requested method: \\\"\"\n"
           "         << method << \"\\\"\\nor the method was called with incorrect arguments.\\n\";\n"
