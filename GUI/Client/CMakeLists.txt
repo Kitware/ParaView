@@ -42,6 +42,7 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVWorldPointPicker.cxx
   vtkPVXMLPackageParser.cxx
   vtkPVGUIClientOptions.cxx
+  ${ExtraParaViewClientNonWrapped_SRCS}
   )
 
 SET( ParaViewClient_SRCS
@@ -149,6 +150,7 @@ SET( ParaViewClient_SRCS
   vtkXDMFReaderModule.cxx
   vtkPVPluginsDialog.cxx
   #  vtkPVRenderGroupDialog.cxx
+  ${ExtraParaViewClient_SRCS}
   )
 
 INCLUDE_DIRECTORIES(
