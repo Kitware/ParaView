@@ -43,6 +43,12 @@ public:
   vtkPolyData* GetOutput(int idx);
   vtkPolyData* GetOutput() { return this->GetOutput(0);}
 
+  // Description: 
+  // Descided whether to generate color arrays or not.
+  vtkSetMacro(Color,int);
+  vtkGetMacro(Color,int);
+  vtkBooleanMacro(Color,int);
+
 protected:
   vtkVRMLSource();
   ~vtkVRMLSource();
@@ -53,6 +59,7 @@ protected:
 
   char* FileName;
   vtkVRMLImporter *Importer;
+  int Color;
 
 private:
   vtkVRMLSource(const vtkVRMLSource&);  // Not implemented.

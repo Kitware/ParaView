@@ -1,7 +1,3 @@
-
-
-
-
 /*=========================================================================
 
   Program:   Visualization Toolkit
@@ -22,6 +18,7 @@
 #include "vtkVRMLSource.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
+#include "vtkProperty.h"
 #include "vtkActorCollection.h"
 #include "vtkActor.h"
 #include "vtkPointData.h"
@@ -29,9 +26,12 @@
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
 #include "vtkVRMLImporter.h"
+#include "vtkTransformPolyDataFilter.h"
+#include "vtkTransform.h"
+#include "vtkUnsignedCharArray.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.3");
+vtkCxxRevisionMacro(vtkVRMLSource, "1.4");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ vtkVRMLSource::vtkVRMLSource()
 {
   this->FileName = NULL;
   this->Importer = NULL;
+  this->Color = 1;
 }
 
 //------------------------------------------------------------------------------
@@ -136,6 +137,7 @@ void vtkVRMLSource::CopyImporterToOutputs()
   vtkDataArray* array;
   int arrayCount = 0;
   char name[256];
+  int ptIdx;
 
   if (this->Importer == NULL)
     {
@@ -154,6 +156,13 @@ void vtkVRMLSource::CopyImporterToOutputs()
       input = mapper->GetInput();
       input->Update();
       output = this->GetOutput(idx);
+      vtkTransformPolyDataFilter *tf = vtkTransformPolyDataFilter::New();
+      vtkTransform *trans = vtkTransform::New();
+      tf->SetInput(input);
+      tf->SetTransform(trans);
+      trans->SetMatrix(actor->GetMatrix());
+      input = tf->GetOutput();
+      input->Update();
       output->CopyStructure(input);
       // Only copy well formed arrays.
       numPoints = input->GetNumberOfPoints();
@@ -187,7 +196,33 @@ void vtkVRMLSource::CopyImporterToOutputs()
           output->GetCellData()->AddArray(array);
           } 
         }
+      if (this->Color)
+        {
+        vtkUnsignedCharArray *colorArray = vtkUnsignedCharArray::New();
+        unsigned char r, g, b;
+        float* actorColor;
+     
+        actorColor = actor->GetProperty()->GetColor();
+        r = static_cast<unsigned char>(actorColor[0]*255.0);
+        g = static_cast<unsigned char>(actorColor[1]*255.0);
+        b = static_cast<unsigned char>(actorColor[2]*255.0);
+        colorArray->SetName("VRMLColor");
+        colorArray->SetNumberOfComponents(3);
+        for (ptIdx = 0; ptIdx < numPoints; ++ptIdx)
+          {
+          colorArray->InsertNextValue(r);
+          colorArray->InsertNextValue(g);
+          colorArray->InsertNextValue(b);
+          }
+        output->GetPointData()->SetScalars(colorArray);
+        colorArray->Delete();
+        colorArray = NULL;
+        }
       ++idx;
+      tf->Delete();
+      tf = NULL;
+      trans->Delete();
+      trans = NULL;
       }
     }
 }

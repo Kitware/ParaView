@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.16");
+vtkCxxRevisionMacro(vtkPVPart, "1.17");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -376,7 +376,7 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->MapperTclName);
-  pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
+  //pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
                          this->UpdateSuppressorTclName);
   //
