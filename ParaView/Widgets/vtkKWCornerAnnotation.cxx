@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.71");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.72");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -786,7 +786,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.71 $");
+  this->ExtractRevision(os,"$Revision: 1.72 $");
 }
 
 //----------------------------------------------------------------------------
@@ -863,8 +863,12 @@ void vtkKWCornerAnnotation::SaveState(ofstream *file)
   int i;
   for (i = 0; i < 4; i++)
     {
-    *file << "$kw(" << this->GetTclName() << ") SetCornerText {"
-          << this->GetCornerText(i) << "} " << i << endl;
+    *file << "$kw(" << this->GetTclName() << ") SetCornerText {";
+    if (this->GetCornerText(i))
+      {
+      *file << this->GetCornerText(i);
+      }
+    *file << "} " << i << endl;
     }
   
   *file << "$kw(" << this->GetTclName() << ") SetMaximumLineHeight "
