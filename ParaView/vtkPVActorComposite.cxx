@@ -887,6 +887,58 @@ void vtkPVActorComposite::Initialize()
   this->UpdateProperties();
   
   this->PVData->GetBounds(bounds);
+  if (bounds[0] < 0)
+    {
+    bounds[0] += 0.05 * (bounds[1] - bounds[0]);
+    if (bounds[1] > 0)
+      {
+      bounds[1] += 0.05 * (bounds[1] - bounds[0]);
+      }
+    else
+      {
+      bounds[1] -= 0.05 * (bounds[1] - bounds[0]);
+      }
+    }
+  else
+    {
+    bounds[0] -= 0.05 * (bounds[1] - bounds[0]);
+    bounds[1] += 0.05 * (bounds[1] - bounds[0]);
+    }
+  if (bounds[2] < 0)
+    {
+    bounds[2] += 0.05 * (bounds[3] - bounds[2]);
+    if (bounds[3] > 0)
+      {
+      bounds[3] += 0.05 * (bounds[3] - bounds[2]);
+      }
+    else
+      {
+      bounds[3] -= 0.05 * (bounds[3] - bounds[2]);
+      }
+    }
+  else
+    {
+    bounds[2] -= 0.05 * (bounds[3] - bounds[2]);
+    bounds[3] += 0.05 * (bounds[3] - bounds[2]);
+    }
+  if (bounds[4] < 0)
+    {
+    bounds[4] += 0.05 * (bounds[5] - bounds[4]);
+    if (bounds[5] > 0)
+      {
+      bounds[5] += 0.05 * (bounds[5] - bounds[4]);
+      }
+    else
+      {
+      bounds[5] -= 0.05 * (bounds[5] - bounds[4]);
+      }
+    }
+  else
+    {
+    bounds[4] -= 0.05 * (bounds[5] - bounds[4]);
+    bounds[5] += 0.05 * (bounds[5] - bounds[4]);
+    }
+  
   this->CubeAxes->SetBounds(bounds);
   this->CubeAxes->SetCamera(this->GetView()->GetRenderer()->GetActiveCamera());
   
