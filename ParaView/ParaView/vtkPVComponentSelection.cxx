@@ -156,7 +156,7 @@ void vtkPVComponentSelection::Reset()
   for (i = 0; i < this->CheckButtons->GetNumberOfItems(); i++)
     {
     this->Script("%s SetState %d [%s GetValue %d]",
-                 this->GetTclName, i, this->PVSource->GetVTKSourceTclName(),
+                 this->GetTclName(), i, this->PVSource->GetVTKSourceTclName(),
                  i);
     }
   
