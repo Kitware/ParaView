@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVFileEntry.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkVector.txx"
@@ -52,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.26");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.27");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -224,8 +225,9 @@ int vtkPVReaderModule::ReadFileInformation(const char* fname)
   if (this->FileEntry)
     {
     this->FileEntry->SetValue(fname);
-    this->Script("%s Set%s {%s}", this->GetVTKSourceTclName(), 
-                 this->FileEntry->GetVariableName(), fname);
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->RootScript("%s Set%s {%s}", this->GetVTKSourceTclName(), 
+                   this->FileEntry->GetVariableName(), fname);
     
     const char* ext = this->ExtractExtension(fname);
     if (ext)

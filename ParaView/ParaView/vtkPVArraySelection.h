@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 class vtkCollection;
+class vtkDataArraySelection;
 class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkKWPushButton;
@@ -124,6 +125,8 @@ protected:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  void ResetLocalSelectionInstance();
+  
   char* AttributeName;
   char* VTKReaderTclName;
 
@@ -137,6 +140,10 @@ protected:
   vtkCollection* ArrayCheckButtons;
   vtkKWLabel *NoArraysLabel;
 
+  vtkDataArraySelection* Selection;
+  vtkSetStringMacro(SelectionTclName);
+  char* SelectionTclName;
+  
   // Description:
   // Stores the file name to descide when to rebuild the array check list.
   vtkSetStringMacro(FileName);

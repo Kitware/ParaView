@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkArrayMap.txx"
 #include "vtkCollection.h"
+#include "vtkDataArraySelection.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -50,12 +51,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkTclUtil.h"
+
+#include <string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.24");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.25");
+
+int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
+                                 int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -79,6 +87,8 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->FileName = NULL;
 
   this->NoArraysLabel = vtkKWLabel::New();
+  this->Selection = vtkDataArraySelection::New();
+  this->SelectionTclName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -109,6 +119,8 @@ vtkPVArraySelection::~vtkPVArraySelection()
   this->NoArraysLabel = 0;
 
   this->SetFileName(NULL);
+  this->Selection->Delete();
+  this->SetSelectionTclName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -182,46 +194,97 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVArraySelection::ResetLocalSelectionInstance()
+{
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  if(!this->SelectionTclName)
+    {
+    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(),
+                               this->Selection, vtkDataArraySelectionCommand);
+    this->SetSelectionTclName(
+      Tcl_GetStringResult(this->Application->GetMainInterp()));
+    }
+  this->Selection->RemoveAllArrays();
+  if(this->VTKReaderTclName)
+    {
+    pm->RootScript(
+      "namespace eval ::paraview::vtkPVArraySelection {\n"
+      "  proc GetArraySettings { reader type } {\n"
+      "    $reader UpdateInformation\n"
+      "    set n [$reader GetNumberOf${type}Arrays]\n"
+      "    set settings {}\n"
+      "    for {set i 0} {$i < $n} {incr i} {\n"
+      "      set name [$reader Get${type}ArrayName $i]\n"
+      "      set status [$reader Get${type}ArrayStatus $name]\n"
+      "      lappend settings [list $name $status]\n"
+      "    }\n"
+      "    return $settings\n"
+      "  }\n"
+      "  GetArraySettings {%s} {%s}\n"
+      "}\n",
+      this->VTKReaderTclName, this->AttributeName);
+    vtkstd::string settings = pm->GetRootResult();
+    this->Script(
+      "namespace eval ::paraview::vtkPVArraySelection {\n"
+      "  proc ParseArraySettings { selection settings } {\n"
+      "    foreach a $settings {\n"
+      "      set name [lindex $a 0]\n"
+      "      set value [lindex $a 1]\n"
+      "      if {$value} {\n"
+      "        $selection EnableArray $name\n"
+      "      } else {\n"
+      "        $selection DisableArray $name\n"
+      "      }\n"
+      "    }\n"
+      "  }\n"
+      "  ParseArraySettings {%s} {%s}\n"
+      "}\n",
+      this->SelectionTclName, settings.c_str());
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVArraySelection::Reset()
 {
   vtkKWCheckButton* checkButton;
   int row = 0;
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   
   // See if we need to create new check buttons.
-  this->Script("%s GetFileName", this->VTKReaderTclName);
+  pm->RootScript("%s GetFileName", this->VTKReaderTclName);
+  vtkstd::string fileName = pm->GetRootResult();
     
   // Filename not set
-  if (this->Application->GetMainInterp()->result[0] == '\0')
+  if (fileName.length() == 0)
     {
     return;
-    }
+    }  
   
-  if (this->FileName == NULL || 
-      strcmp(this->FileName, this->Application->GetMainInterp()->result) != 0)
+  // Update our local vtkDataArraySelection instance with the reader's
+  // settings.
+  this->ResetLocalSelectionInstance();
+  
+  if (this->FileName == NULL || (fileName != this->FileName))
     {
-    this->SetFileName(this->Application->GetMainInterp()->result);
+    this->SetFileName(fileName.c_str());
 
     // Clear out any old check buttons.
     this->Script("catch {eval pack forget [pack slaves %s]}",
                  this->CheckFrame->GetWidgetName());
     this->ArrayCheckButtons->RemoveAllItems();
-      
+    
     // Create new check buttons.
     if (this->VTKReaderTclName)
       {
       int numArrays, idx;
-      this->Script("%s UpdateInformation", this->VTKReaderTclName);
-      this->Script("%s GetNumberOf%sArrays", 
-                   this->VTKReaderTclName, this->AttributeName);
-      numArrays = this->GetIntegerResult(this->Application);
+      numArrays = this->Selection->GetNumberOfArrays();
       for (idx = 0; idx < numArrays; ++idx)
         {
         checkButton = vtkKWCheckButton::New();
         checkButton->SetParent(this->CheckFrame);
         checkButton->Create(this->Application, "");
-        this->Script("%s SetText [%s Get%sArrayName %d]", 
-                     checkButton->GetTclName(), 
-                     this->VTKReaderTclName, this->AttributeName, idx);
+        this->Script("%s SetText {%s}", checkButton->GetTclName(), 
+                     this->Selection->GetArrayName(idx));
         this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);
         ++row;
         checkButton->SetCommand(this, "ModifiedCallback");
@@ -234,18 +297,14 @@ void vtkPVArraySelection::Reset()
         }
       }
     }
-
+  
   // Now set the state of the check buttons.
   this->ArrayCheckButtons->InitTraversal();
   while ( (checkButton = (vtkKWCheckButton*)(
              this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    //this->Script("%s SetState [%s Get%sArrayStatus {%s}]", 
-    //             checkButton->GetTclName(), this->VTKReaderTclName,
-    //             this->AttributeName, checkButton->GetText());
-    this->Script("%s Get%sArrayStatus {%s}", this->VTKReaderTclName,
-                 this->AttributeName, checkButton->GetText());
-    checkButton->SetState(this->GetIntegerResult(this->Application));
+    checkButton->SetState(
+      this->Selection->ArrayIsEnabled(checkButton->GetText()));
     }
 }
 
@@ -285,14 +344,13 @@ void vtkPVArraySelection::Accept()
     return;
     }
 
+  this->ResetLocalSelectionInstance();
   this->ArrayCheckButtons->InitTraversal();
   while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    // This is only here to try to avoid extra lines in the trace file.
-    // We could make every check button a pv widget.
-    this->Script("%s Get%sArrayStatus {%s}", this->VTKReaderTclName,
-                 this->AttributeName, check->GetText());
-    if (this->GetIntegerResult(this->Application) != check->GetState())
+    // This is only here to try to avoid extra lines in the trace
+    // file.  We could make every check button a pv widget.
+    if(this->Selection->ArrayIsEnabled(check->GetText()) != check->GetState())
       {
       pvApp->BroadcastScript("%s Set%sArrayStatus {%s} %d", 
                              this->VTKReaderTclName, this->AttributeName, 
@@ -381,12 +439,11 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     vtkErrorMacro("VTKReader has not been set.");
     }
 
+  this->ResetLocalSelectionInstance();
   this->ArrayCheckButtons->InitTraversal();
   while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    this->Script("%s Get%sArrayStatus {%s}", this->VTKReaderTclName,
-                 this->AttributeName, check->GetText());
-    state = this->GetIntegerResult(this->Application);
+    state = this->Selection->ArrayIsEnabled(check->GetText());
     // Since they default to on.
     if (state == 0)
       {
