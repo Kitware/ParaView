@@ -203,19 +203,6 @@ void vtkPVWidget::SaveInTclScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "ModifiedFlag: " << this->GetModifiedFlag() << endl;
-  os << indent << "ModifiedCommandObjectTclName: "
-     << (this->ModifiedCommandObjectTclName ?
-         this->ModifiedCommandObjectTclName : "(none)") << endl;
-  os << indent << "ModifiedCommandMethod: "
-     << (this->ModifiedCommandMethod ? this->ModifiedCommandMethod : "(none)")
-     << endl;
-}
-
-//----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::ClonePrototypeInternal(vtkPVSource* pvSource,
                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -344,7 +331,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.22 $");
+  this->ExtractRevision(os,"$Revision: 1.23 $");
 }
 
 //----------------------------------------------------------------------------
@@ -364,4 +351,17 @@ vtkPVWidget* vtkPVWidget::GetPVWidgetFromParser(vtkPVXMLElement* element,
 vtkPVWindow* vtkPVWidget::GetPVWindowFormParser(vtkPVXMLPackageParser* parser)
 {
   return parser->GetPVWindow();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "ModifiedFlag: " << this->GetModifiedFlag() << endl;
+  os << indent << "ModifiedCommandMethod: " 
+     << (this->ModifiedCommandMethod?this->ModifiedCommandMethod:"(none)") 
+     << endl;
+  os << indent << "ModifiedCommandObjectTclName: " 
+     << (this->ModifiedCommandObjectTclName?
+         this->ModifiedCommandObjectTclName:"(none)") << endl;
 }
