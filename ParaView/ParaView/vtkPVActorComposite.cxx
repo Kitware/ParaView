@@ -264,15 +264,18 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   int debugNum = numProcs;
   if (getenv("PV_DEBUG_ZERO") != NULL)
     {
-    for (id = 0; id < numProcs; ++id)
+    this->Script("%s SetNumberOfPieces 0",this->MapperTclName);
+    this->Script("%s SetPiece 0", this->MapperTclName);
+    this->Script("%s SetNumberOfPieces 0", this->LODMapperTclName);
+    this->Script("%s SetPiece 0", this->LODMapperTclName);
+    for (id = 1; id < numProcs; ++id)
       {
       pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-			  this->MapperTclName, debugNum-1);
+                          this->MapperTclName, debugNum-1);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->MapperTclName, id-1);
       pvApp->RemoteScript(id, "%s SetNumberOfPieces %d",
-			  this->LODMapperTclName, debugNum-1);
+                          this->LODMapperTclName, debugNum-1);
       pvApp->RemoteScript(id, "%s SetPiece %d", this->LODMapperTclName, id-1);
-      vtkErrorMacro("Piece: " << (id-1) << " of " << (debugNum-1));
       }
     }
   else {
