@@ -24,6 +24,9 @@ proc rtOtherTest { fileid } {
       if {$a == "vtkPVApplication"} {
         continue
       }
+      if {$a == "vtkObjectBase"} {
+        continue
+      }
       puts -nonewline "$a "
       catch {
         puts -nonewline "Cr "
