@@ -94,7 +94,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.17");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.18");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -388,9 +388,18 @@ void vtkRedistributePolyData::Execute()
       stopCell[type] = startCell[type]+sendNum[type][i]-1;
       prevStopCell[type] = stopCell[type];
       }
-    this->SendCellSizes (startCell, stopCell, input, sendTo[i], 
-                         numPointsSend[i], cellArraySize[i], 
-                         sendCellList[i]);
+    if (sendCellList)
+      {
+      this->SendCellSizes (startCell, stopCell, input, sendTo[i], 
+                           numPointsSend[i], cellArraySize[i], 
+                           sendCellList[i]);
+      }
+    else
+      {
+      this->SendCellSizes (startCell, stopCell, input, sendTo[i], 
+                           numPointsSend[i], cellArraySize[i], 
+                           NULL);
+      }
 
     } // end of list of processors to send to
 
