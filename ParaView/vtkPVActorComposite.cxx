@@ -486,6 +486,8 @@ void vtkPVActorComposite::UpdateProperties()
   vtkFieldData *fieldData;
   vtkPVApplication *pvApp = this->GetPVApplication();  
   vtkDataArray *array;
+  char *currentColorBy;
+  int currentColorByFound = 0;
 
   
   if (this->UpdateTime > this->PVData->GetVTKData()->GetMTime())
@@ -523,6 +525,8 @@ void vtkPVActorComposite::UpdateProperties()
     
   this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
 
+
+  currentColorBy = this->ColorMenu->GetValue();
   this->ColorMenu->ClearEntries();
   this->ColorMenu->AddEntryWithCommand("Property",
 	                               this, "ColorByProperty");
@@ -547,6 +551,10 @@ void vtkPVActorComposite::UpdateProperties()
           sprintf(tmp, "Point %s %d", fieldData->GetArrayName(i), j);
           }
         this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+        if (strcmp(tmp, currentColorBy) == 0)
+          {
+          currentColorByFound = 1;
+          }
         } 
       }
     }
@@ -571,10 +579,20 @@ void vtkPVActorComposite::UpdateProperties()
           sprintf(tmp, "Cell %s %d", fieldData->GetArrayName(i), j);
           }
         this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+        if (strcmp(tmp, currentColorBy) == 0)
+          {
+          currentColorByFound = 1;
+          }
         } 
       }
     }
-
+  // If the current array we are colloring by has disappeared,
+  // then default back to the property.
+  if ( ! currentColorByFound)
+    {
+    this->ColorMenu->SetValue("Property");
+    this->ColorByProperty();
+    }
 }
 
 void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
@@ -948,8 +966,10 @@ void vtkPVActorComposite::Initialize()
   if (array = this->PVData->GetVTKData()->GetPointData()->GetActiveScalars())
     {
     char *arrayName = (char*)array->GetName();
+    char tmp[350];
+    sprintf(tmp, "Point %s", arrayName);
     this->ColorByPointFieldComponent(arrayName, 0);
-    this->ColorMenu->SetValue(arrayName);
+    this->ColorMenu->SetValue(tmp);
     }
   else
     {
