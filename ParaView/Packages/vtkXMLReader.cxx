@@ -32,7 +32,7 @@
 
 #include <sys/stat.h>
 
-vtkCxxRevisionMacro(vtkXMLReader, "1.5");
+vtkCxxRevisionMacro(vtkXMLReader, "1.6");
 
 //----------------------------------------------------------------------------
 vtkXMLReader::vtkXMLReader()
@@ -102,8 +102,23 @@ int vtkXMLReader::OpenVTKFile()
     vtkErrorMacro("File already open.");
     return 1;
     }
+  
+  // First make sure the file exists.  This prevents an empty file
+  // from being created on older compilers.
+  struct stat fs;
+  if(stat(this->FileName, &fs) != 0)
+    {
+    vtkErrorMacro("Error opening file " << this->FileName);
+    return 0;
+    }
+  
   this->FileStream = new ifstream;
-  this->FileStream->open(this->FileName);
+  
+#ifdef _WIN32
+  this->FileStream->open(this->FileName, ios::binary | ios::in);
+#else
+  this->FileStream->open(this->FileName, ios::in);
+#endif
   
   if(!(*this->FileStream))
     {
