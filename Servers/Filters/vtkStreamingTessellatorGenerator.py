@@ -878,7 +878,7 @@ void vtkStreamingTessellator::AdaptivelySample3Facet( double* v0, double* v1, do
     double permlen[6]; // permuted edge lengths
     int C = vtkStreamingTessellator::EdgeCodesToCaseCodesPlusPermutation[ edgeCode ][0];
     int P = vtkStreamingTessellator::EdgeCodesToCaseCodesPlusPermutation[ edgeCode ][1];
-    int i, j, k;
+    int i;
 
     // 1. Permute the tetrahedron into our canonical configuration
     for ( i=0; i<4; ++i )
