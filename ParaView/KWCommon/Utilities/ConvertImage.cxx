@@ -14,59 +14,6 @@
 #endif
 
 //----------------------------------------------------------------------------
-#if 0
-
-#define PNGFILE "PVSplashScreen.png"
-#define B64FILE "PVSplashScreen2.txt"
-#define BINFILE "PVSplashScreen2.bin"
-
-void test ()
-{
-  // Encode PNG to Base64
-
-  vtkPNGReader *pr = vtkPNGReader::New();
-  pr->SetFileName(PNGFILE);
-  pr->Update();
-  int *dim = pr->GetOutput()->GetDimensions();
-  unsigned long nb_of_bytes = 
-    dim[0] * dim[1] * pr->GetOutput()->GetNumberOfScalarComponents();
- 
-  unsigned char *encoded_buffer = new unsigned char [nb_of_bytes * 2];
-
-  unsigned long nb_of_bytes_encoded = vtkBase64Utilities::Encode(
-    (unsigned char *)(pr->GetOutput()->GetScalarPointer()),
-    nb_of_bytes,
-    encoded_buffer);
-  cout << "Encoded: " << nb_of_bytes << " to " << nb_of_bytes_encoded << " bytes\n";
-
-  ofstream encoded_output_file(B64FILE, ios::out);
-  encoded_output_file.write(reinterpret_cast<char*>(encoded_buffer), 
-                            nb_of_bytes_encoded);
-  encoded_output_file.close();
-
-  pr->Delete();
-
-  // Decode Base64 to Binary
-
-  unsigned char *decoded_buffer = new unsigned char [nb_of_bytes];
-
-  unsigned long nb_of_bytes_decoded = vtkBase64Utilities::Decode(
-    const_cast<const unsigned char *>(encoded_buffer), 
-    nb_of_bytes, decoded_buffer);
-  cout << "Decoded: " << nb_of_bytes_decoded << " bytes (expecting " << nb_of_bytes << ")\n";
-
-  ofstream decoded_output_file(BINFILE, ios::out | ios::binary);
-  decoded_output_file.write(reinterpret_cast<char*>(decoded_buffer), 
-                            nb_of_bytes_decoded);
-  decoded_output_file.close();
-
-  delete [] encoded_buffer;
-  delete [] decoded_buffer;
-}
-
-#endif
-
-//----------------------------------------------------------------------------
 int file_exists(const char *filename)
 {
   struct stat fs;
@@ -106,7 +53,7 @@ int main(int argc, char **argv)
 
   if (argc < 3)
     {
-    cerr << "Usage: " << argv[0] << " header.h image.png [image.png image.png...] [UPDATE] [ZLIB] [BASE64]" << endl;
+    cerr << "Usage: " << argv[0] << " header.h image.png [image.png image.png...] [UPDATE] [ZLIB] [BASE64] [NOFLIP]" << endl;
     return 1;
     }
 
@@ -120,6 +67,7 @@ int main(int argc, char **argv)
   int update     = 0;
   int zlib       = 0;
   int base64     = 0;
+  int noflip     = 0;
 
   int has_params;
   do
@@ -136,6 +84,10 @@ int main(int argc, char **argv)
     else if (!strcmp(argv[argc - 1], "BASE64"))
       {
       base64 = has_params = 1;
+      }
+    else if (!strcmp(argv[argc - 1], "NOFLIP"))
+      {
+      noflip = has_params = 1;
       }
     if (has_params)
       {
@@ -198,24 +150,27 @@ int main(int argc, char **argv)
     pr->SetFileName(argv[i]);
     pr->Update();
 
+    vtkImageData *output = pr->GetOutput();
+
     // Flip image (in VTK, [0,0] is lower left)
 
     vtkImageFlip *flip = vtkImageFlip::New();
-    flip->SetInput(pr->GetOutput());
-    flip->SetFilteredAxis(1);
-    flip->Update();
+    if (!noflip)
+      {
+      flip->SetInput(pr->GetOutput());
+      flip->SetFilteredAxis(1);
+      flip->Update();
+      output = flip->GetOutput();
+      }
 
-    unsigned char *flip_ptr = 
-      (unsigned char *)(flip->GetOutput()->GetScalarPointer());
-
-    unsigned char *data_ptr = flip_ptr;
+    unsigned char *data_ptr = (unsigned char *)(output->GetScalarPointer());
 
     // Image info
 
-    int *dim = flip->GetOutput()->GetDimensions();
+    int *dim = output->GetDimensions();
     int width = dim[0];
     int height = dim[1];
-    int pixel_size = flip->GetOutput()->GetNumberOfScalarComponents();
+    int pixel_size = output->GetNumberOfScalarComponents();
     unsigned long nb_of_pixels = width * height;
     unsigned long nb_of_bytes = nb_of_pixels * pixel_size;
 
@@ -234,6 +189,7 @@ int main(int argc, char **argv)
         cerr << "Error: zlib encoding failed." << endl;
         delete [] zlib_buffer;
         pr->Delete();
+        flip->Delete();
         continue;
         }
       data_ptr = zlib_buffer;
@@ -257,6 +213,7 @@ int main(int argc, char **argv)
           }
         delete [] base64_buffer;
         pr->Delete();
+        flip->Delete();
         continue;
         }
       data_ptr = base64_buffer;
@@ -270,9 +227,13 @@ int main(int argc, char **argv)
 
     if (base64 || zlib)
       {
-      out << " (" << (zlib ? "zlib" : "") 
-          << (zlib && base64 ? ", " : "") 
-          << (base64 ? "base64" : "") << ")";
+      out << " (" 
+          << (zlib ? "zlib" : "") 
+          << " "
+          << (base64 ? "base64" : "") 
+          << " "
+          << (noflip ? "noflip" : "") 
+          << ")";
       }
 
     out << endl << " */" << endl;
