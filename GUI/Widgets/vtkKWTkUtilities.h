@@ -74,12 +74,28 @@ public:
                          unsigned long buffer_length = 0,
                          const char *blend_with_name = 0,
                          const char *color_option = 0);
-
   static int UpdatePhoto(Tcl_Interp *interp,
                          const char *photo_name,
                          vtkImageData *image, 
                          const char *blend_with_name = 0,
                          const char *color_option = 0);
+
+  // Description:
+  // Update a photo given a pixel structure. 
+  // If a file 'file_name.png' is found in 'directory' or 
+  // 'directory/Resources' then this file is loaded first, otherwise the
+  // remaining parameters will be used to update a photo (see UpdatePhoto)
+  // If photo_name is NULL, file_name will be used instead.
+  static int UpdateOrLoadPhoto(Tcl_Interp *interp,
+                               const char *photo_name,
+                               const char *file_name,
+                               const char *directory,
+                               const unsigned char *pixels, 
+                               int width, int height,
+                               int pixel_size,
+                               unsigned long buffer_length = 0,
+                               const char *blend_with_name = 0,
+                               const char *color_option = 0);
 
   // Description:
   // Quick way to get a photo height/width.

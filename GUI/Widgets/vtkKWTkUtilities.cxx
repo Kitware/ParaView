@@ -18,6 +18,8 @@
 #include "vtkImageFlip.h"
 #include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGReader.h"
+#include "vtkKWDirectoryUtilities.h"
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -31,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.37");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.38");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -352,6 +354,56 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   flip->Delete();
 #endif
   return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::UpdateOrLoadPhoto(Tcl_Interp *interp,
+                                        const char *photo_name,
+                                        const char *file_name,
+                                        const char *directory,
+                                        const unsigned char *pixels, 
+                                        int width, int height,
+                                        int pixel_size,
+                                        unsigned long buffer_length,
+                                        const char *blend_with_name,
+                                        const char *color_option)
+{
+  // Try to find a PNG file with the same name in directory 
+  // or directory/Resources
+
+  if (directory && file_name)
+    {
+    char buffer[1024];
+    sprintf(buffer, "%s/%s.png", directory, file_name);
+    int found = vtkKWDirectoryUtilities::FileExists(buffer);
+    if (!found)
+      {
+      sprintf(buffer, "%s/Resources/%s.png", directory, file_name);
+      found = vtkKWDirectoryUtilities::FileExists(buffer);
+      }
+    if (found)
+      {
+      vtkPNGReader *png_reader = vtkPNGReader::New();
+      png_reader->SetFileName(buffer);
+      int res = vtkKWTkUtilities::UpdatePhoto(
+        interp,
+        (photo_name ? photo_name : file_name), 
+        png_reader->GetOutput());
+      png_reader->Delete();
+      return res;
+      }
+    }
+
+  // Otherwise use the provided data
+
+  return vtkKWTkUtilities::UpdatePhoto(interp,
+                                       (photo_name ? photo_name : file_name), 
+                                       pixels, 
+                                       width, height,
+                                       pixel_size,
+                                       buffer_length,
+                                       blend_with_name,
+                                       color_option);
 }
 
 //----------------------------------------------------------------------------
