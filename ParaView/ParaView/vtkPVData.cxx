@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.219");
+vtkCxxRevisionMacro(vtkPVData, "1.220");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1165,7 +1165,7 @@ void vtkPVData::UpdatePropertiesInternal()
   
   ostrstream memsize;
   memsize << "Memory: " << ((float)(dataInfo->GetMemorySize())/1000.0) << " MBytes" << ends;
-  this->NumCellsLabel->SetLabel(memsize.str());
+  this->MemorySizeLabel->SetLabel(memsize.str());
   memsize.rdbuf()->freeze(0);
 
   dataInfo->GetBounds(bounds);
