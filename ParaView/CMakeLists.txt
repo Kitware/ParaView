@@ -51,10 +51,8 @@ ABSTRACT_FILES(
 vtkInteractorStyleExtent 
 )
 
-ADD_LIBRARY(vtkKWParaView ParaView_SRCS)
-
 VTK_WRAP_TCL(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
-ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS)
+ADD_LIBRARY(vtkKWParaViewTCL ParaViewTCL_SRCS ParaView_SRCS)
 TARGET_LINK_LIBRARIES (vtkKWParaViewTCL vtkKWWidgetsTCL vtkCommonTCL 
                        vtkFilteringTCL   
                        vtkGraphicsTCL 
@@ -75,8 +73,6 @@ vtkRendering
 vtkParallel
 vtkPatented
 vtkHybrid
-vtkKWWidgets
-vtkKWParaView 
 )
 
 IF (TK_LIBRARY)

@@ -48,14 +48,13 @@ vtkKWComposite
 vtkKWView 
 )
 
-ADD_LIBRARY(vtkKWWidgets KWWidgets_SRCS)
-
 WRAP_EXCLUDE_FILES(kwinit)
 
 VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
-ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS)
+ADD_LIBRARY(vtkKWWidgetsTCL KWWidgetsTCL_SRCS KWWidgets_SRCS)
 TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL vtkCommonTCL vtkFilteringTCL   
-                       vtkGraphicsTCL vtkImagingTCL vtkRenderingTCL vtkIOTCL)
+                       vtkGraphicsTCL vtkImagingTCL vtkRenderingTCL vtkIOTCL
+		       vtkHybridTcl ${TCL_LIBRARY}  ${TK_LIBRARY})
 
 LINK_LIBRARIES (
 vtkCommon 
@@ -64,6 +63,9 @@ vtkImaging
 vtkGraphics
 vtkIO
 vtkRendering
-vtkKWWidgets 
+vtkHybrid
+vtkKWWidgets
+${TCL_LIBRARY}
+${TK_LIBRARY}
 )
 
