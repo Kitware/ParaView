@@ -156,6 +156,7 @@ static const char *vtkKWEventStrings[] = {
   "SurfacePropertyChangedEvent",
   "SurfacePropertyChangingEvent",
   "SwitchToVolumeProEvent",
+  "TimeChangedEvent",
   "TransferFunctionsChangedEvent",
   "TransferFunctionsChangingEvent",
   "UserInterfaceVisibilityChangedEvent",

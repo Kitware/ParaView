@@ -166,6 +166,7 @@ class VTK_EXPORT vtkKWEvent
     SurfacePropertyChangedEvent,
     SurfacePropertyChangingEvent,
     SwitchToVolumeProEvent,
+    TimeChangedEvent,
     TransferFunctionsChangedEvent,
     TransferFunctionsChangingEvent,
     UserInterfaceVisibilityChangedEvent,
