@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.76");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.77");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -1199,9 +1199,10 @@ void vtkKWRenderWidget::ProcessEvent(vtkObject *caller,
         if (event == vtkCommand::CreateTimerEvent)
           {
           this->InteractorTimerToken = 
-            Tcl_CreateTimerHandler(10, 
-                                   vtkKWRenderWidget_InteractorTimer, 
-                                   (ClientData)caller);
+            Tcl_CreateTimerHandler(
+              10, 
+              (Tcl_TimerProc*)vtkKWRenderWidget_InteractorTimer, 
+              (ClientData)caller);
           }
         break;
       }
