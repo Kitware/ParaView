@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.6");
+vtkCxxRevisionMacro(vtkKWFrame, "1.6.2.1");
 
 vtkKWFrame::vtkKWFrame()
 {
@@ -91,7 +91,8 @@ void vtkKWFrame::Create(vtkKWApplication *app, int scrollable)
     this->ScrollFrame = vtkKWWidget::New();
 
     this->ScrollFrame->SetParent(this);
-    this->ScrollFrame->Create(this->Application, "ScrollableFrame", "-height 1024");
+    this->ScrollFrame->Create(this->Application, 
+                              "ScrollableFrame", "-height 1024");
     this->Script("%s setwidget %s", this->GetWidgetName(),
                  this->ScrollFrame->GetWidgetName());
 
@@ -100,7 +101,8 @@ void vtkKWFrame::Create(vtkKWApplication *app, int scrollable)
     this->Script("%s getframe", this->ScrollFrame->GetWidgetName());
     this->Frame->SetWidgetName(this->Application->GetMainInterp()->result);
 
-    this->Script("%s configure -constrainedwidth 1", this->ScrollFrame->GetWidgetName());
+    this->Script("%s configure -constrainedwidth 1", 
+                 this->ScrollFrame->GetWidgetName());
 
     }
   else
