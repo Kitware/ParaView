@@ -45,7 +45,7 @@ int vtkPVAnimationWriterMakeDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationWriter);
-vtkCxxRevisionMacro(vtkPVAnimationWriter, "1.1.2.4");
+vtkCxxRevisionMacro(vtkPVAnimationWriter, "1.1.2.5");
 
 //----------------------------------------------------------------------------
 
@@ -128,6 +128,7 @@ void vtkPVAnimationWriter::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "NumberOfPieces: " << this->NumberOfPieces << endl;
   os << indent << "Piece: " << this->Piece << endl;
+  os << indent << "WriteAnimationFile: " << this->WriteAnimationFile << endl;
   
   if(this->GetNumberOfInputs() > 0)
     {

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSummaryHelper);
-vtkCxxRevisionMacro(vtkPVSummaryHelper, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVSummaryHelper, "1.1.2.4");
 
 vtkCxxSetObjectMacro(vtkPVSummaryHelper, Writer, vtkXMLWriter);
 vtkCxxSetObjectMacro(vtkPVSummaryHelper, Controller,
@@ -87,6 +87,7 @@ void vtkPVSummaryHelper::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Controller: " << this->Controller << "\n";
+  os << indent << "Writer: " << this->Writer << "\n";
 }
 
 //----------------------------------------------------------------------------
