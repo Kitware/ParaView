@@ -82,7 +82,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.140");
+vtkCxxRevisionMacro(vtkKWApplication, "1.141");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1481,6 +1481,64 @@ void vtkKWApplication::SetCharacterEncoding(int val)
 #endif
 
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::CheckForArgument(
+  int argc, char* argv[], const char *arg, int &index)
+{
+  if (!argc || !argv || !arg)
+    {
+    return VTK_ERROR;
+    }
+
+  // Check each arg
+  // Be careful with valued argument (should not be, but who knows)
+
+  int i;
+  for (i = 0; i < argc; i++)
+    {
+    if (argv[i])
+      {
+      const char *equal = strchr(argv[i], '=');
+      if (equal)
+        {
+        size_t part = equal - argv[i];
+        if (strlen(arg) == part && !strncmp(arg, argv[i], part))
+          {
+          index = i;
+          return VTK_OK;
+          }
+        }
+      else
+        {
+        if (!strcmp(arg, argv[i]))
+          {
+          index = i;
+          return VTK_OK;
+          }
+        }
+      }
+    }
+
+  return VTK_ERROR;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::CheckForValuedArgument(
+  int argc, char* argv[], const char *arg, int &index, int &value_pos)
+{
+  int found = vtkKWApplication::CheckForArgument(argc, argv, arg, index);
+  if (found == VTK_OK)
+    {
+    const char *equal = strchr(argv[index], '=');
+    if (equal)
+      {
+      value_pos = (equal - argv[index]) + 1;
+      return VTK_OK;
+      }
+    }
+  return VTK_ERROR;
 }
 
 //----------------------------------------------------------------------------

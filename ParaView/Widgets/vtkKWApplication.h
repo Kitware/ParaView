@@ -405,6 +405,23 @@ protected:
 
   int CharacterEncoding;
 
+  // Description:
+  // Check for an argument (example: --foo, /C, -bar, etc).
+  // Return VTK_OK if found and set 'index' to the position of the 
+  // argument in argv[].
+  // Return VTK_ERROR if not found.
+  static int CheckForArgument(
+    int argc, char* argv[], const char *arg, int &index);
+
+  // Description:
+  // Check for a valued argument (example: --foo=bar, /C=bar, -bar=foo, etc).
+  // Return VTK_OK if found and set 'index' to the position of the 
+  // argument in argv[], 'value_pos' to the position right after the '='
+  // in that argument.
+  // Return VTK_ERROR if not found.
+  static int CheckForValuedArgument(
+    int argc, char* argv[], const char *arg, int &index, int &value_pos);
+
 private:
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.
   void operator=(const vtkKWApplication&);  // Not implemented.
