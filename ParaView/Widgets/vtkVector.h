@@ -44,8 +44,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkContainer.h"
 
 template <class T>
-class KW_WIDGETS_EXPORT vtkVector : public vtkContainer
+class VTK_COMMON_EXPORT vtkVector : public vtkContainer
 {
+  // Description:
+  // This is a prototype for a compare function. It has to
+  // return true if objects are the same and false if not.
+  typedef int (*CompareFunction)(T item1, T item2);
+
 public:
   static vtkVector<T> *New() { return new vtkVector<T>(); }  
   
@@ -96,11 +101,12 @@ public:
   
   // Description:
   // Return an item that was previously added to this vector. 
-  T GetItem(unsigned long id) 
+  int GetItem(unsigned long id, T& ret) 
     {
       if (id < this->NumberOfItems)
         {
-        return this->Array[id];
+        ret = this->Array[id];
+	return 1;
         }
       return 0;
     }
@@ -114,6 +120,24 @@ public:
       for (i = 0; i < this->NumberOfItems; ++i)
         {
         if (this->Array[i] == a)
+          {
+          res = i;
+          return 1;
+          }
+        }
+      return 0;
+    }
+
+  // Description:
+  // Find an item in the vector using a comparison routine. 
+  // Return one if it was found, zero if it was
+  // not found. The location of the item is returned in res.
+  int Find(T a, CompareFunction compare, unsigned long &res) 
+    {
+      int i;
+      for (i = 0; i < this->NumberOfItems; ++i)
+        {
+        if ( compare(this->Array[i], a) )
           {
           res = i;
           return 1;
