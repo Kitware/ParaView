@@ -44,8 +44,9 @@
 
 #include "vtkPVDemoPaths.h"
 
-#include "vtkKWDirectoryUtilities.h"
 #include <sys/stat.h>
+
+#include <kwsys/SystemTools.hxx>
 
 // initialze the class variables
 int vtkPVProcessModule::GlobalLODFlag = 0;
@@ -53,7 +54,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.26");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.27");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -407,14 +408,13 @@ const char* vtkPVProcessModule::GetDemoPath()
     {
     return 0;
     }
-  vtkKWDirectoryUtilities* util = vtkKWDirectoryUtilities::New();
-  const char* selfPath = util->FindSelfPath(
-    this->Options->GetArgv0());
-  if (selfPath)
+  kwsys_stl::string selfPath, errorMsg;
+  if (kwsys::SystemTools::FindProgramPath(
+        this->Options->GetArgv0(), selfPath, errorMsg))
     {
     const char* relPath = "../share/paraview-" PARAVIEW_VERSION "/Demos";
-    char* newPath = new char[strlen(selfPath)+strlen(relPath)+2];
-    sprintf(newPath, "%s/%s", selfPath, relPath);
+    char* newPath = new char[selfPath.size()+strlen(relPath)+2];
+    sprintf(newPath, "%s/%s", selfPath.c_str(), relPath);
 
     char* demoFile = new char[strlen(newPath)+strlen("/Demo1.pvs")+1];
     sprintf(demoFile, "%s/Demo1.pvs", newPath);

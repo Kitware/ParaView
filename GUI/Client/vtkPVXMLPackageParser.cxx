@@ -15,7 +15,6 @@
 #include "vtkPVXMLPackageParser.h"
 
 #include "vtkArrayMap.txx"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -36,8 +35,9 @@
 #include "vtkStringList.h"
 
 #include <ctype.h>
+#include <kwsys/SystemTools.hxx>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.46");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.47");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -682,20 +682,12 @@ int vtkPVXMLPackageParser::LoadServerManagerFile(vtkPVXMLElement* le)
     }
 
   // Check if a directory is specified.
-  char* tmpDir = 0;
+  kwsys_stl::string tmpDir;
   const char* directory = le->GetAttribute("directory");
   if (!directory)
     {
-    if (this->GetFileName())
-      {
-      tmpDir = new char[strlen(this->GetFileName())+1];
-      }
-    else
-      {
-      tmpDir = new char[2];
-      }
-    vtkKWDirectoryUtilities::GetFilenamePath(this->GetFileName(), tmpDir);
-    directory = tmpDir;
+    tmpDir = kwsys::SystemTools::GetFilenamePath(this->GetFileName());
+    directory = tmpDir.c_str();
     }
 
   // Load the module on the server nodes.
@@ -704,13 +696,11 @@ int vtkPVXMLPackageParser::LoadServerManagerFile(vtkPVXMLElement* le)
   if(!sma->ParseConfigurationFile(name, directory))
     {
     vtkErrorMacro("Error loading server manager configuraiton file: " << name);
-    delete[] tmpDir;
     return 0;
     }
 
   sma->AddConfigurationFile(name, directory);
 
-  delete[] tmpDir;
   return 1;
 }
 

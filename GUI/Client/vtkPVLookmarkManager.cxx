@@ -53,7 +53,6 @@
 #include "vtkKWLookmark.h"
 #include "vtkKWLookmarkFolder.h"
 #include "vtkKWWidgetCollection.h"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWIcon.h"
 #include "vtkKWText.h"
@@ -110,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.11");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.12");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------

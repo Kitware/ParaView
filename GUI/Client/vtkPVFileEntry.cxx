@@ -15,7 +15,6 @@
 #include "vtkPVFileEntry.h"
 
 #include "vtkArrayMap.txx"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -39,6 +38,8 @@
 #include "vtkKWEvent.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
+
+#include <kwsys/SystemTools.hxx>
 
 #define MAX_FILES_ON_THE_LIST 500
 
@@ -72,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.100");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.101");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -343,13 +344,11 @@ void vtkPVFileEntry::BrowseCallback()
     }
   if (fname && fname[0])
     {
-    char* path   = new char [ strlen(fname) + 1];
-    vtkKWDirectoryUtilities::GetFilenamePath(fname, path);
-    if (path[0])
+    kwsys_stl::string path = kwsys::SystemTools::GetFilenamePath(fname);
+    if (path.size())
       {
-      loadDialog->SetLastPath( path );
+      loadDialog->SetLastPath(path.c_str());
       }
-    delete[] path;
     }
   else
     {
@@ -422,17 +421,15 @@ void vtkPVFileEntry::SetValue(const char* fileName)
   int already_set = 0;
   int cc;
 
-  char* prefix = 0;
+  const char* prefix = 0;
   char* format = 0;
   already_set = dom->GetNumberOfStrings();
 
-  char* path   = new char [ strlen(fileName) + 1];
-  vtkKWDirectoryUtilities::GetFilenamePath(fileName, path);
-
-  if ( !this->Path || strcmp(this->Path, path) != 0 )
+  kwsys_stl::string path = kwsys::SystemTools::GetFilenamePath(fileName);
+  if ( !this->Path || strcmp(this->Path, path.c_str()) != 0 )
     {
     already_set = 0;
-    this->SetPath(path);
+    this->SetPath(path.c_str());
     }
 
   if ( already_set )
@@ -440,7 +437,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     // Already set, so just return
     this->InSetValue = 0;
     this->ModifiedCallback();
-    delete [] path;
     return;
     }
 
@@ -452,24 +448,24 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* files = vtkStringList::New();
-  char* file   = new char [ strlen(fileName) + 1];
-  char* ext    = new char [ strlen(fileName) + 1];
+
   char* number = new char [ strlen(fileName) + 1];
-  vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
-  vtkKWDirectoryUtilities::GetFilenameExtension(fileName, ext);
+
+  kwsys_stl::string file = kwsys::SystemTools::GetFilenameName(fileName);
+  kwsys_stl::string ext = kwsys::SystemTools::GetFilenameExtension(fileName);
 
   int in_ext = 1;
   int in_num = 0;
 
   int fnameLength = 0;
 
-  if (strcmp(ext, "h5") == 0)
+  if (strcmp(ext.c_str(), "h5") == 0)
     {
-    file[strlen(file)-1] = 'f';
+    file[file.size()-1] = 'f';
     }
 
   int ncnt = 0;
-  for ( cc = (int)(strlen(file))-1; cc >= 0; cc -- )
+  for ( cc = (int)(file.size())-1; cc >= 0; cc -- )
     {
     if ( file[cc] >= '0' && file[cc] <= '9' )
       {
@@ -487,12 +483,12 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       {
       break;
       }
-    file[cc] = 0;
+    file.erase(cc, file.size() - cc);
     }
 
-  if ( path[0] )
+  if (path.size())
     {
-    prefix = file;
+    prefix = file.c_str();
     number[ncnt] = 0;
     for ( cc = 0; cc < ncnt/2; cc ++ )
       {
@@ -505,7 +501,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     sprintf(firstformat, "%%s/%%s%%0%dd.%%s", ncnt);
     sprintf(secondformat, "%%s/%%s%%d.%%s");
     this->Entry->DeleteAllValues();
-    pm->GetDirectoryListing(path, 0, files, 0);
+    pm->GetDirectoryListing(path.c_str(), 0, files, 0);
     int cnt = 0;
     for ( cc = 0; cc < files->GetLength(); cc ++ )
       {
@@ -513,8 +509,8 @@ void vtkPVFileEntry::SetValue(const char* fileName)
         {
         this->FileListSelect->AddSourceElement(files->GetString(cc));
         }
-      if ( vtkString::StartsWith(files->GetString(cc), file ) &&
-        vtkString::EndsWith(files->GetString(cc), ext) )
+      if ( vtkString::StartsWith(files->GetString(cc), file.c_str() ) &&
+        vtkString::EndsWith(files->GetString(cc), ext.c_str()) )
         {
         cnt ++;
         }
@@ -527,8 +523,8 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     int foundone = 0;
     for ( cc = med-cnt; cc < med+cnt; cc ++ )
       {
-      sprintf(rfname, firstformat, path, file, cc, ext);
-      if ( files->GetIndex(rfname+strlen(path)+1) >= 0 )
+      sprintf(rfname, firstformat, path.c_str(), file.c_str(), cc, ext.c_str());
+      if ( files->GetIndex(rfname+path.size()+1) >= 0 )
         {
         this->Entry->AddValue(rfname);
         if ( max < cc )
@@ -558,8 +554,8 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     int smax = med-cnt;
     for ( cc = med-cnt; cc < med+cnt; cc ++ )
       {
-      sprintf(rfname, secondformat, path, file, cc, ext);
-      if ( files->GetIndex(rfname+strlen(path)+1) >= 0 )
+      sprintf(rfname, secondformat, path.c_str(), file.c_str(), cc, ext.c_str());
+      if ( files->GetIndex(rfname+path.size()+1) >= 0 )
         {
         this->Entry->AddValue(rfname);
         if ( smax < cc )
@@ -599,25 +595,23 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     if ( max - min < MAX_FILES_ON_THE_LIST )
       {
       char* name = new char [ fnameLength ];
-      char* shname = new char [ fnameLength ];
       for ( cc = min; cc <= max; cc ++ )
         {
-        sprintf(name, format, path, prefix, cc, ext);
-        vtkKWDirectoryUtilities::GetFilenameName(name, shname);
-        if ( files->GetIndex(shname) >= 0 )
+        sprintf(name, format, path.c_str(), prefix, cc, ext.c_str());
+        kwsys_stl::string shname = kwsys::SystemTools::GetFilenameName(name);
+        if ( files->GetIndex(shname.c_str()) >= 0 )
           {
-          this->FileListSelect->AddFinalElement(shname, 1);
+          this->FileListSelect->AddFinalElement(shname.c_str(), 1);
           }
         }
       delete [] name;
-      delete [] shname;
       }
     }
 
   if ( !this->FileListSelect->GetNumberOfElementsOnFinalList() )
     {
-    vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
-    this->FileListSelect->AddFinalElement(file, 1);
+    file = kwsys::SystemTools::GetFilenameName(fileName);
+    this->FileListSelect->AddFinalElement(file.c_str(), 1);
     }
 
   if ( !this->Initialized )
@@ -636,10 +630,9 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       dom->AddString(str.str());
       str.rdbuf()->freeze(0);
       }
-    char* cfile = new char[ strlen(fileName) + 1];
-    vtkKWDirectoryUtilities::GetFilenameName(fileName, cfile);
+    kwsys_stl::string cfile = kwsys::SystemTools::GetFilenameName(fileName);
     ostrstream fullPath;
-    fullPath << this->Path << "/" << cfile << ends;
+    fullPath << this->Path << "/" << cfile.c_str() << ends;
     unsigned int i;
     for ( i = 0; i < dom->GetNumberOfStrings(); i ++ )
       {
@@ -651,14 +644,10 @@ void vtkPVFileEntry::SetValue(const char* fileName)
         }
       }
     fullPath.rdbuf()->freeze(0);
-    delete [] cfile;
     this->Initialized = 1;
     }
 
   files->Delete();
-  delete [] path;
-  delete [] file;
-  delete [] ext;
   delete [] number;
 
   this->UpdateTimeStep();
@@ -751,12 +740,14 @@ void vtkPVFileEntry::UpdateTimesteps()
   int max_elems = this->FileListSelect->GetNumberOfElementsOnFinalList();
   int cc;
   int is_present = 0;
-  char *filename = new char[strlen(fullfilename)+32];
-  vtkKWDirectoryUtilities::GetFilenameName(fullfilename, filename);
+
+  kwsys_stl::string filename = 
+    kwsys::SystemTools::GetFilenameName(fullfilename);
   
   for (cc = 0; cc < max_elems; cc++)
     {
-    if (strcmp(filename, this->FileListSelect->GetElementFromFinalList(cc))==0)
+    if (strcmp(filename.c_str(), 
+               this->FileListSelect->GetElementFromFinalList(cc))==0)
       {
       is_present = 1;
       break;
@@ -764,15 +755,13 @@ void vtkPVFileEntry::UpdateTimesteps()
     }
   if (is_present)
     {
-    delete [] filename;
     return;
     }
   // clear the file entries.
   this->IgnoreFileListEvents = 1;
   this->FileListSelect->RemoveItemsFromFinalList();
-  this->FileListSelect->AddFinalElement(filename);
+  this->FileListSelect->AddFinalElement(filename.c_str());
   this->IgnoreFileListEvents = 0;
-  delete [] filename;
 }
 
 //----------------------------------------------------------------------------
@@ -795,10 +784,9 @@ void vtkPVFileEntry::Initialize()
       unsigned int cc;
       for ( cc = 0; cc < sld->GetNumberOfStrings(); cc ++ )
         {
-        char *filename = new char[strlen(sld->GetString(cc))+1];
-        vtkKWDirectoryUtilities::GetFilenameName(sld->GetString(cc), filename);
-        this->FileListSelect->AddFinalElement(filename, 1);
-        delete [] filename;
+        kwsys_stl::string filename = 
+          kwsys::SystemTools::GetFilenameName(sld->GetString(cc));
+        this->FileListSelect->AddFinalElement(filename.c_str(), 1);
         }
       }
     else
@@ -810,10 +798,8 @@ void vtkPVFileEntry::Initialize()
   const char* fileName = this->Entry->GetValue();
   if ( fileName && fileName[0] )
     {
-    char *file = new char[ strlen(fileName) + 1 ];
-    vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
-    this->FileListSelect->AddFinalElement(file, 1);
-    delete [] file;
+    kwsys_stl::string file = kwsys::SystemTools::GetFilenameName(fileName);
+    this->FileListSelect->AddFinalElement(file.c_str(), 1);
     }
 
   this->IgnoreFileListEvents = 0;
@@ -1063,14 +1049,13 @@ void vtkPVFileEntry::UpdateTimeStep()
     }
 
   this->IgnoreFileListEvents = 1;
-  char* file = new char[ strlen(fileName) + 1 ];
-  vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
-  this->FileListSelect->AddFinalElement(file, 1);
-  int ts = this->FileListSelect->GetElementIndexFromFinalList(file);
+  kwsys_stl::string file = kwsys::SystemTools::GetFilenameName(fileName);
+  this->FileListSelect->AddFinalElement(file.c_str(), 1);
+  int ts = this->FileListSelect->GetElementIndexFromFinalList(file.c_str());
   if ( ts < 0 )
     {
     cerr << "This should not have happended" << endl;
-    cerr << "Cannot find \"" << file << "\" on the list" << endl;
+    cerr << "Cannot find \"" << file.c_str() << "\" on the list" << endl;
     int cc;
     for ( cc = 0; cc < this->FileListSelect->GetNumberOfElementsOnFinalList(); cc ++ )
       {
@@ -1078,7 +1063,6 @@ void vtkPVFileEntry::UpdateTimeStep()
       }
     vtkPVApplication::Abort();
     }
-  delete [] file;
   this->Timestep->SetValue(ts);
   if ( this->FileListSelect->GetNumberOfElementsOnFinalList() > 1 )
     {

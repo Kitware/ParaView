@@ -21,11 +21,12 @@
 #include "vtkSMProperty.h"
 #include "vtkSMProxyManager.h"
 #include "vtkTclUtil.h"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkString.h"
 #include "vtkWindows.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.5");
+#include <kwsys/SystemTools.hxx>
+
+vtkCxxRevisionMacro(vtkPVProcessModuleBatchHelper, "1.6");
 vtkStandardNewMacro(vtkPVProcessModuleBatchHelper);
 
 EXTERN void TclSetLibraryPath _ANSI_ARGS_((Tcl_Obj * pathPtr));
@@ -74,23 +75,24 @@ static Tcl_Interp *vtkPVProcessModuleBatchHelperInitializeTcl(int argc,
   if (!has_tcllibpath_env || !has_tklibpath_env)
     {
     const char *nameofexec = Tcl_GetNameOfExecutable();
-    if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
+    if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
       {
-      char dir[1024], dir_unix[1024], buffer[1024];
-      vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-      util->GetFilenamePath(nameofexec, dir);
-      strcpy(dir_unix, util->ConvertToUnixSlashes(dir));
+      char dir_unix[1024], buffer[1024];
+      kwsys_stl::string dir = kwsys::SystemTools::GetFilenamePath(nameofexec);
+      kwsys::SystemTools::ConvertToUnixSlashes(dir);
+      strcpy(dir_unix, dir.c_str());
 
       // Installed KW application, otherwise build tree/windows
       sprintf(buffer, "%s/../lib/TclTk", dir_unix);
-      int exists = vtkKWDirectoryUtilities::FileExists(buffer);
+      int exists = kwsys::SystemTools::FileExists(buffer);
       if (!exists)
         {
         sprintf(buffer, "%s/TclTk", dir_unix);
-        exists = vtkKWDirectoryUtilities::FileExists(buffer);
+        exists = kwsys::SystemTools::FileExists(buffer);
         }
-      sprintf(buffer, util->CollapseDirectory(buffer));
-      util->Delete();
+      kwsys_stl::string collapsed = 
+        kwsys::SystemTools::CollapseFullPath(buffer);
+      sprintf(buffer, collapsed.c_str());
       if (exists)
         {
         // Also prepend our Tcl Tk lib path to the library paths
@@ -106,7 +108,7 @@ static Tcl_Interp *vtkPVProcessModuleBatchHelperInitializeTcl(int argc,
         {
         char tcl_library[1024] = "";
         sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
-        if (vtkKWDirectoryUtilities::FileExists(tcl_library))
+        if (kwsys::SystemTools::FileExists(tcl_library))
           {
           if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
                           TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))

@@ -16,7 +16,6 @@
 
 #include "vtkDirectory.h"
 #include "vtkIntArray.h"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWCanvas.h"
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
@@ -39,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.35");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.36");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
