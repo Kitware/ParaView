@@ -233,7 +233,8 @@ void vtkKWApplication::Script(const char *format, ...)
 
   if (Tcl_GlobalEval(this->MainInterp, event) != TCL_OK)
     {
-    vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error: \n"  
+    vtkErrorMacro("\n    Script: \n" << event << "\n    Returned Error on line "
+		  << this->MainInterp->errorLine << ": \n"  
 		  << this->MainInterp->result << endl);
     }
 }
