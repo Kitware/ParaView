@@ -75,6 +75,9 @@ IF(USE_INCLUDED_TCLTK)
   # copy the tcl/tk dll's to Release Debug MinSizeRel and RelWithDebInfo bin 
   # directory so no paths are needed to run this.
     CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/tcl83.dll 
+                   COPYONLY)
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
                    ${ParaViewComplete_BINARY_DIR}/bin/Debug/tcl83.dll 
                    COPYONLY)
     CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
@@ -86,6 +89,8 @@ IF(USE_INCLUDED_TCLTK)
     CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tcl83.dll
                    ${ParaViewComplete_BINARY_DIR}/bin/RelWithDebInfo/tcl83.dll
                     COPYONLY)
+    CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
+                   ${ParaViewComplete_BINARY_DIR}/bin/tk83.dll COPYONLY)
     CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
                    ${ParaViewComplete_BINARY_DIR}/bin/Debug/tk83.dll COPYONLY)
     CONFIGURE_FILE(${ParaViewComplete_SOURCE_DIR}/TclTk8.3.2Win/bin/tk83.dll
