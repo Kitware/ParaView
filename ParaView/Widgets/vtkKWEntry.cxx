@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.30");
+vtkCxxRevisionMacro(vtkKWEntry, "1.31");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -135,20 +135,19 @@ void vtkKWEntry::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  if (this->Application == NULL)
+  if (this->Entry && this->Entry != this)
     {
-    return;
+    this->Entry->SetEnabled(this->Enabled);
     }
 
-  if (this->Enabled)
+  if (this->TopLevel)
     {
-    this->Script("%s configure -foreground black", this->GetWidgetName());
-    this->Script("%s configure -background white", this->GetWidgetName());
+    this->TopLevel->SetEnabled(this->Enabled);
     }
-  else
+
+  if (this->List)
     {
-    this->Script("%s configure -foreground grey60", this->GetWidgetName());
-    this->Script("%s configure -background grey75", this->GetWidgetName());
+    this->List->SetEnabled(this->Enabled);
     }
 }
 
@@ -277,6 +276,7 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
     }
 
   // Update enable state
+
   this->UpdateEnableState();
 }
 
