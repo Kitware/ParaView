@@ -29,7 +29,7 @@
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.8");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.9");
 
 //-------------------------------------------------------------------
 
@@ -200,7 +200,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
           }
         else
           {
-          goalNumCells[type][id] = 0.0;
+          goalNumCells[type][id] = 0;
           }
         numCellsLeftToDivideUp -= goalNumCells[type][id];
         weightTotalOfRemainingProcesses -= Weights[id];
