@@ -174,7 +174,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   sprintf(tclName, "Geometry%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
-  pvApp->BroadcastScript("%s UseStripsOn", tclName);
+  pvApp->BroadcastScript("%s UseStripsOff", tclName);
   this->SetGeometryTclName(tclName);
   
   // Get rid of previous object created by the superclass.

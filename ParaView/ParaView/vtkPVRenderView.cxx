@@ -466,7 +466,7 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->TriangleStripsCheck->SetParent(this->RenderParametersFrame->GetFrame());
   this->TriangleStripsCheck->Create(this->Application, "-text \"Use Triangle Strips\"");
-  this->TriangleStripsCheck->SetState(1);
+  this->TriangleStripsCheck->SetState(0);
   this->TriangleStripsCheck->SetCommand(this, "TriangleStripsCallback");
   this->TriangleStripsCheck->SetBalloonHelpString("Toggle the use of triangle strips when rendering polygonal data");
   
