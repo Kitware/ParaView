@@ -71,20 +71,18 @@ vtkPVImageData *vtkPVImageSource::GetPVOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImageSource::InitializeAssignment()
+void vtkPVImageSource::InitializeOutput()
 {
+  vtkPVImageData *output;
+  vtkPVActorComposite *ac;
   vtkPVData *input;
-  vtkPVData *output;
-  vtkPVAssignment *assignment;
-  
-  input = this->Input;
-  output = this->PVOutput;
-  if (output == NULL)
-    {
-    vtkErrorMacro("No output for filter.");
-    return;
-    }
-  
+  vtkPVAssignment *assignment;  
+
+  output = vtkPVImageData::New();
+  output->Clone(this->GetPVApplication());
+  this->SetPVOutput(output);
+
+  input = this->Input;  
   if (input != NULL)
     {
     assignment = input->GetAssignment();
@@ -97,40 +95,6 @@ void vtkPVImageSource::InitializeAssignment()
     }
   
   output->SetAssignment(assignment);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSource::AcceptCallback()
-{
-  vtkPVWindow *window = this->GetWindow();
- 
-  this->vtkPVSource::AcceptCallback();
-  
-  if (this->GetPVData() == NULL)
-    { // This is the first time, initialize data.  
-    vtkPVImageData *pvi;
-    vtkPVActorComposite *ac;
-
-    pvi = vtkPVImageData::New();
-    pvi->Clone(this->GetPVApplication());
-    this->SetPVOutput(pvi);
-    this->InitializeAssignment();
-    
-    this->CreateDataPage();
-  
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    // Make the last data invisible.
-    if (this->GetInput())
-      {
-      this->GetInput()->GetActorComposite()->SetVisibility(0);
-      }
-    window->GetMainView()->ResetCamera();
-    }
-
-  window->GetMainView()->SetSelectedComposite(this);  
-  this->GetView()->Render();
-  window->GetSourceList()->Update();
 }
 
 //----------------------------------------------------------------------------

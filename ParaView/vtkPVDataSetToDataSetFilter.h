@@ -46,15 +46,12 @@ public:
 
   // Description:
   // This method gets called when the accept button is pressed
-  // for the first time.  It creates a pvData and an actor composite
-  // to display the data.
-  void AcceptCallback();  
+  // for the first time.  It creates a pvData and its assignement.
+  void InitializeOutput();  
   
   // Description:
-  // For now you have to set the output explicitly.  This allows you to manage
-  // the object creation/tcl-names in the other processes.  Do not try to
-  // set the output before the input has been set.
-  // This methods gets called in all processes.
+  // Although the data is created in the initialize method,
+  // this method is needed in the satellite processes to set the data.
   void SetPVOutput(vtkPVData *pvd);
   vtkPVData *GetPVOutput();
   vtkPVPolyData *GetPVPolyDataOutput();

@@ -29,10 +29,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
+#include "vtkPVActorComposite.h"
 #include "vtkPVAssignment.h"
 #include "vtkKWView.h"
 #include "vtkKWScale.h"
-#include "vtkKWRenderView.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 
 
@@ -205,34 +206,6 @@ void vtkPVSource::SetPVData(vtkPVData *data)
     // Manage double pointer.
     data->SetPVSource(this);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::InitializeAssignment()
-{
-  vtkPVData *input;
-  vtkPVData *output;
-  vtkPVAssignment *assignment;
-  
-  input = this->Input;
-  output = this->PVOutput;
-  if (output == NULL)
-    {
-    vtkErrorMacro("No output for filter.");
-    return;
-    }
-  
-  if (input != NULL)
-    {
-    assignment = input->GetAssignment();
-    }
-  else
-    {
-    assignment = vtkPVAssignment::New();
-    assignment->Clone(this->GetPVApplication());
-    }
-  
-  output->SetAssignment(assignment);
 }
 
 //----------------------------------------------------------------------------
@@ -479,13 +452,18 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
   this->Script("pack %s", frame->GetWidgetName());
 
   // Now a label
-  vtkKWLabel *labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(label);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-
+  if (label && label[0] != '\0')
+    {
+    vtkKWLabel *labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(label);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  
   // Now the check button
   vtkKWCheckButton *check = vtkKWCheckButton::New();
   this->Widgets->AddItem(check);
@@ -505,12 +483,11 @@ void vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd)
   this->Script("pack %s -side left", check->GetWidgetName());
 
   frame->Delete();
-  labelWidget->Delete();
   check->Delete();
 }  
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l1,
+void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 				  char *setCmd, char *getCmd)
 {
   vtkKWWidget *frame;
@@ -525,25 +502,30 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l1,
   this->Script("pack %s", frame->GetWidgetName());
 
   // Now a label
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(label);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (label && label[0] != '\0')
+    {  
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(label);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  
   // Min
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l1);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l1 && l1[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l1);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
   minEntry = vtkKWEntry::New();
   this->Widgets->AddItem(minEntry);
   minEntry->SetParent(frame);
@@ -551,15 +533,17 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l1,
   this->Script("pack %s -side left", minEntry->GetWidgetName());
 
   // Max
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l2);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l2 && l2[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l2);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }  
   maxEntry = vtkKWEntry::New();
   this->Widgets->AddItem(maxEntry);
   maxEntry->SetParent(frame);
@@ -599,25 +583,30 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Script("pack %s", frame->GetWidgetName());
 
   // Now a label
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(label);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (label && label[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(label);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  
   // X
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l1);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l1 && l1[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l1);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
   xEntry = vtkKWEntry::New();
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
@@ -625,15 +614,17 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Script("pack %s -side left", xEntry->GetWidgetName());
 
   // Y
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l2);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l2 && l2[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l2);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
   yEntry = vtkKWEntry::New();
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
@@ -641,15 +632,17 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Script("pack %s -side left", yEntry->GetWidgetName());
 
   // Z
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l3);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l3 && l3[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l3);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
   zEntry = vtkKWEntry::New();
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
@@ -693,25 +686,30 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Script("pack %s", frame->GetWidgetName());
 
   // Now a label
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(label);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (label && label[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(label);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  
   // X
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l1);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l1 && l1[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l1);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
   xEntry = vtkKWEntry::New();
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
@@ -719,15 +717,17 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Script("pack %s -side left", xEntry->GetWidgetName());
 
   // Y
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l2);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l2 && l2[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l2);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
   yEntry = vtkKWEntry::New();
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
@@ -735,15 +735,17 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Script("pack %s -side left", yEntry->GetWidgetName());
 
   // Z
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l3);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l3 && l3[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l3);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
   zEntry = vtkKWEntry::New();
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
@@ -751,15 +753,17 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Script("pack %s -side left", zEntry->GetWidgetName());
 
   // W
-  labelWidget = vtkKWLabel::New();
-  this->Widgets->AddItem(labelWidget);
-  labelWidget->SetParent(frame);
-  labelWidget->Create(this->Application, "");
-  labelWidget->SetLabel(l4);
-  this->Script("pack %s -side left", labelWidget->GetWidgetName());
-  labelWidget->Delete();
-  labelWidget = NULL;
-
+  if (l4 && l4[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l4);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
   wEntry = vtkKWEntry::New();
   this->Widgets->AddItem(wEntry);
   wEntry->SetParent(frame);
@@ -787,6 +791,175 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   yEntry->Delete();
   zEntry->Delete();
   wEntry->Delete();
+}
+
+//----------------------------------------------------------------------------
+// It might make sence here to store the labels in an array 
+// so that a loop can be used to create the widgets.
+void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
+				  char *l4, char *l5, char *l6,
+				  char *setCmd, char *getCmd)
+{
+  vtkKWWidget *frame;
+  vtkKWLabel *labelWidget;
+  vtkKWEntry  *uEntry, *vEntry, *wEntry, *xEntry, *yEntry, *zEntry;
+
+  // First a frame to hold the other widgets.
+  frame = vtkKWWidget::New();
+  this->Widgets->AddItem(frame);
+  frame->SetParent(this->ParameterFrame->GetFrame());
+  frame->Create(this->Application, "frame", "");
+  this->Script("pack %s", frame->GetWidgetName());
+
+  // Now a label
+  if (label && label[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(label);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  
+  // U
+  if (l1 && l1[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l1);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  uEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(uEntry);
+  uEntry->SetParent(frame);
+  uEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", uEntry->GetWidgetName());
+
+  // V
+  if (l2 && l2[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l2);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  vEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(vEntry);
+  vEntry->SetParent(frame);
+  vEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", vEntry->GetWidgetName());
+
+  // W
+  if (l3 && l3[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l3);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  wEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(wEntry);
+  wEntry->SetParent(frame);
+  wEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", wEntry->GetWidgetName());
+
+  // X
+  if (l4 && l4[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l4);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  xEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(xEntry);
+  xEntry->SetParent(frame);
+  xEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", xEntry->GetWidgetName());
+
+  // Y
+  if (l5 && l5[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l5);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  yEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(yEntry);
+  yEntry->SetParent(frame);
+  yEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", yEntry->GetWidgetName());
+
+  // Z
+  if (l6 && l6[0] != '\0')
+    {
+    labelWidget = vtkKWLabel::New();
+    this->Widgets->AddItem(labelWidget);
+    labelWidget->SetParent(frame);
+    labelWidget->Create(this->Application, "");
+    labelWidget->SetLabel(l6);
+    this->Script("pack %s -side left", labelWidget->GetWidgetName());
+    labelWidget->Delete();
+    labelWidget = NULL;
+    }
+  zEntry = vtkKWEntry::New();
+  this->Widgets->AddItem(zEntry);
+  zEntry->SetParent(frame);
+  zEntry->Create(this->Application, "-width 4");
+  this->Script("pack %s -side left", zEntry->GetWidgetName());
+
+  // Get initial value from the vtk source.
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 0]", 
+               uEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 1]", 
+               vEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 2]", 
+               wEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 3]", 
+               xEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 4]", 
+               yEntry->GetTclName(), this->GetTclName(), getCmd); 
+  this->Script("%s SetValue [lindex [[%s GetVTKSource] %s] 5]", 
+               zEntry->GetTclName(), this->GetTclName(), getCmd); 
+
+  // Format a command to move value from widget to vtkObjects (on all processes).
+  // The VTK objects are going to have to have the same Tcl name!
+  this->AddAcceptCommand("%s AcceptHelper %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+			 this->GetTclName(), setCmd, uEntry->GetTclName(), 
+			 vEntry->GetTclName(), wEntry->GetTclName(),
+			 xEntry->GetTclName(), yEntry->GetTclName(), zEntry->GetTclName());
+
+  frame->Delete();
+  uEntry->Delete();
+  vEntry->Delete();
+  wEntry->Delete();
+  xEntry->Delete();
+  yEntry->Delete();
+  zEntry->Delete();
 }
 
 
@@ -839,12 +1012,38 @@ void vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
 void vtkPVSource::AcceptCallback()
 {
   int i;
+  vtkPVWindow *window;
 
+  window = this->GetWindow();
+  
   // Call the commands to set ivars from widget values.
   for (i = 0; i < this->NumberOfAcceptCommands; ++i)
     {
     this->Script(this->AcceptCommands[i]);
     }  
+  
+  // Initialize the output if necessary.
+  if (this->GetPVData() == NULL)
+    { // This is the first time, initialize data.  
+    vtkPVData *input;
+    vtkPVActorComposite *ac;
+    
+    input = this->GetInput();
+    this->InitializeOutput();
+    this->CreateDataPage();
+    ac = this->GetPVData()->GetActorComposite();
+    window->GetMainView()->AddComposite(ac);
+    // Make the last data invisible.
+    if (input)
+      {
+      input->GetActorComposite()->SetVisibility(0);
+      }
+    window->GetMainView()->ResetCamera();
+    }
+
+  window->GetMainView()->SetSelectedComposite(this);  
+  this->GetView()->Render();
+  window->GetSourceList()->Update();
 }
 
 

@@ -70,37 +70,28 @@ vtkPVPolyData *vtkPVPolyDataSource::GetPVOutput()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPolyDataSource::AcceptCallback()
+void vtkPVPolyDataSource::InitializeOutput()
 {
-  vtkPVWindow *window = this->GetWindow();
- 
-  this->vtkPVSource::AcceptCallback();
+  vtkPVData *input;
+  vtkPVPolyData *output;
+  vtkPVAssignment *assignment;
   
-  if (this->GetPVData() == NULL)
-    { // This is the first time, initialize data.  
-    vtkPVPolyData *pvd;
-    vtkPVActorComposite *ac;
-
-    pvd = vtkPVPolyData::New();
-    pvd->Clone(this->GetPVApplication());
-    this->SetPVOutput(pvd);
-    this->InitializeAssignment();
-    
-    this->CreateDataPage();
+  input = this->Input;
+  output = vtkPVPolyData::New();
+  output->Clone(this->GetPVApplication());
+  this->SetPVOutput(output);
   
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    // Make the last data invisible.
-    if (this->GetInput())
-      {
-      this->GetInput()->GetActorComposite()->SetVisibility(0);
-      }
-    window->GetMainView()->ResetCamera();
+  if (input != NULL)
+    {
+    assignment = input->GetAssignment();
     }
-
-  window->GetMainView()->SetSelectedComposite(this);  
-  this->GetView()->Render();
-  window->GetSourceList()->Update();
+  else
+    {
+    assignment = vtkPVAssignment::New();
+    assignment->Clone(this->GetPVApplication());
+    }
+  
+  output->SetAssignment(assignment);
 }
 
 //----------------------------------------------------------------------------

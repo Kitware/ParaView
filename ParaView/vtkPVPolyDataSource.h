@@ -46,22 +46,20 @@ public:
   vtkTypeMacro(vtkPVPolyDataSource, vtkPVSource);
 
   // Description:
-  // This method gets called when the accept button is pressed
-  // for the first time.  It creates a pvData and an actor composite
-  // to display the data.
-  void AcceptCallback();
-
-  // Description:
   // This method is called when the GetSource button is pressed.
   // It makes the input source the current source.
   void SelectInputSource();
   
   // Description:
-  // The user has to set the output explicitly.
-  // This is executed in all processes.
+  // This method gets called when the accept button is pressed
+  // for the first time.  It creates a pvData and assignment.
+  void InitializeOutput();
+
+  // Description:
+  // Although the data is created in the initialize method,
+  // this method is needed in the satellite processes to set the data.
   void SetPVOutput(vtkPVPolyData *pvd);
   vtkPVPolyData *GetPVOutput();
-  
   
 protected:
   vtkPVPolyDataSource();

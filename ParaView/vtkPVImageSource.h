@@ -42,18 +42,14 @@ public:
   vtkTypeMacro(vtkPVImageSource, vtkPVSource);
 
   // Description:
-  // This method gets called when the accept button is pressed
-  // for the first time.  It creates a pvData and an actor composite
-  // to display the data.
-  void AcceptCallback();
-
+  // This is called the first time the accept button is pressed.
+  // It creates the output and assignement.  
+  // The assignement is important for structured data.
+  void InitializeOutput();
+    
   // Description:
-  // We need to set the original image.
-  void InitializeAssignment();
-  
-  // Description:
-  // For now you have to set the output explicitly.  This allows you to manage
-  // the object creation/tcl-names in the other processes.
+  // Although the data is created in the initialize method,
+  // this method is needed in the satellite processes to set the data.
   void SetPVOutput(vtkPVImageData *pvi);
   vtkPVImageData *GetPVOutput();
 

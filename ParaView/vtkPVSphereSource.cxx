@@ -54,7 +54,7 @@ void vtkPVSphereSource::CreateProperties()
   this->vtkPVPolyDataSource::CreateProperties();
 
   this->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  this->AddXYZEntry("Center", "SetCenter", "GetCenter");
+  this->AddVector3Entry("Center", "X","Y","Z", "SetCenter", "GetCenter");
   this->AddLabeledEntry("Phi Resolution:", "SetPhiResolution", "GetPhiResolution");
   this->AddLabeledEntry("Theta Resolution:", "SetThetaResolution", "GetThetaResolution");
   this->AddLabeledEntry("Start Theta:", "SetStartTheta", "GetStartTheta");

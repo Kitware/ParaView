@@ -53,8 +53,11 @@ void vtkPVElevationFilter::CreateProperties()
 { 
   this->vtkPVDataSetToDataSetFilter::CreateProperties();
   
-  this->AddXYZEntry("LowPoint:", "SetLowPoint", "GetLowPoint");
-  this->AddXYZEntry("HighPoint:", "SetHighPoint", "GetHighPoint");
-  this->AddRangeEntry("ScalarRange:", "SetScalarRange", "GetScalarRange");
+  this->AddVector3Entry("LowPoint:", "X", "Y", "Z", 
+			"SetLowPoint", "GetLowPoint");
+  this->AddVector3Entry("HighPoint:", "X", "Y", "Z", 
+			"SetHighPoint", "GetHighPoint");
+  this->AddVector2Entry("ScalarRange:", "Min", "Max", 
+			"SetScalarRange", "GetScalarRange");
 }
 

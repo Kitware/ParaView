@@ -51,53 +51,36 @@ vtkPVDataSetToDataSetFilter* vtkPVDataSetToDataSetFilter::New()
 
 
 //----------------------------------------------------------------------------
-void vtkPVDataSetToDataSetFilter::AcceptCallback()
+void vtkPVDataSetToDataSetFilter::InitializeOutput()
 {
-  vtkPVWindow *window = this->GetWindow();
- 
-  this->vtkPVSource::AcceptCallback();
+  vtkPVData *input;
+  vtkPVData *output;
+  vtkPVAssignment *assignment;
   
-  if (this->GetPVData() == NULL)
-    { // This is the first time, initialize data.  
-    vtkPVData *pvd;
-    vtkPVData *input;
-    vtkPVActorComposite *ac;
-
-    input = this->GetInput();
-    if (input == NULL)
-      {
-      vtkErrorMacro("Input not set.");
-      return;
-      }
-    if (input->IsA("vtkPVPolyData"))
-      {
-      pvd = vtkPVPolyData::New();
-      }
-    else if (input->IsA("vtkPVImageData"))
-      {
-      pvd = vtkPVImageData::New();
-      }
-    else
-      {
-      vtkErrorMacro("Cannot determine type of input: " << input->GetClassName());
-      return;
-      }
-    pvd->Clone(this->GetPVApplication());
-    this->SetPVOutput(pvd);
-    this->InitializeAssignment();
-    
-    this->CreateDataPage();
-  
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    // Make the last data invisible.
-    this->GetInput()->GetActorComposite()->SetVisibility(0);
-    window->GetMainView()->ResetCamera();
+  input = this->GetInput();
+  if (input == NULL)
+    {
+    vtkErrorMacro("Input not set.");
+    return;
     }
-
-  window->GetMainView()->SetSelectedComposite(this);  
-  this->GetView()->Render();
-  window->GetSourceList()->Update();
+  if (input->IsA("vtkPVPolyData"))
+    {
+    output = vtkPVPolyData::New();
+    }
+  else if (input->IsA("vtkPVImageData"))
+    {
+    output = vtkPVImageData::New();
+    }
+  else
+    {
+    vtkErrorMacro("Cannot determine type of input: " << input->GetClassName());
+    return;
+    }
+  output->Clone(this->GetPVApplication());
+  this->SetPVOutput(output);
+  
+  assignment = input->GetAssignment();
+  output->SetAssignment(assignment);
 }
 
 //----------------------------------------------------------------------------

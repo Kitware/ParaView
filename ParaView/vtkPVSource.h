@@ -100,14 +100,14 @@ public:
   vtkProp *GetProp() {return NULL;}  
 
   // Description:
-  // Sets the assignement for the output.  
+  // Creates the output and assignment.
   // If there is an input, it uses its assignement. 
   // Otherwise, it creates a new one.
-  virtual void InitializeAssignment();
+  virtual void InitializeOutput() {};
   
   // Description:
   // Called when the accept button is pressed.
-  virtual void AcceptCallback();
+  void AcceptCallback();
   
   // Description:
   // A method used to broadcast changes resulting from widgets.
@@ -126,6 +126,9 @@ public:
   void AddVector3Entry(char *label, char *l1, char *l2, char *l3,
 		       char *setCmd, char *getCmd);
   void AddVector4Entry(char *label, char *l1, char *l2, char *l3, char *l4,
+		       char *setCmd, char *getCmd);
+  void AddVector6Entry(char *label, char *l1, char *l2, char *l3, 
+		       char *l4, char *l5, char *l6,
 		       char *setCmd, char *getCmd);
   
   // Description:
