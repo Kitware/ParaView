@@ -24,9 +24,6 @@ int main()
   
   vtkArrayMap<int,char*> *am 
     = vtkArrayMap<int,char*>::New();
-  int x;
-  vtkAbstractMapDefaultCreateFunction(x,x);
-  
 
   for ( cc = 9; cc >= 0; cc -- )
     {
@@ -56,7 +53,6 @@ int main()
 
   vtkArrayMap<const char*,char*> *sam 
     = vtkArrayMap<const char*,char*>::New();
-  vtkAbstractMapKeyIsString(sam);
   for ( cc = 9; cc >= 0; cc -- )
     {
     char *nkey = vtkString::Duplicate(names[cc]);
@@ -117,8 +113,7 @@ int main()
 
   vtkArrayMap<const char*, vtkActor*> *soam 
     = vtkArrayMap<const char*, vtkActor*>::New();
-  vtkAbstractMapKeyIsString(soam);
-  vtkAbstractMapDataIsReferenceCounted(soam);
+
   char name[20];
   for( cc = 0; cc < 10; cc ++ )
     {
