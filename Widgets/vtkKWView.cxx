@@ -40,6 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPostScriptWriter.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWCornerAnnotation.h"
+#include "vtkRenderWindow.h"
 
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -120,6 +121,10 @@ vtkKWView::vtkKWView()
   
   this->MenuPropertiesName = NULL;
   this->SetMenuPropertiesName(" View");
+  
+  this->Renderer = vtkRenderer::New();
+  this->RenderWindow = vtkRenderWindow::New();
+  this->RenderWindow->AddRenderer(this->Renderer);
 }
 
 vtkKWView::~vtkKWView()
@@ -170,6 +175,9 @@ vtkKWView::~vtkKWView()
   delete [] this->StillUpdateRates;
   
   this->SetMenuPropertiesName(NULL);
+  
+  this->Renderer->Delete();
+  this->RenderWindow->Delete();
 }
 
 void vtkKWView::SetStillUpdateRates( int count, float *rates )
@@ -1050,5 +1058,43 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.28 $");
+  this->ExtractRevision(os,"$Revision: 1.29 $");
+}
+
+void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
+{
+#ifdef _WIN32
+  if (!cd)
+    {
+    cd = this->RenderWindow->GetGenericContext();
+    }
+  vtkWin32OpenGLRenderWindow::
+    SafeDownCast(this->RenderWindow)->SetupMemoryRendering(x,y,(HDC)cd);
+#endif
+}
+
+void vtkKWView::ResumeScreenRendering() 
+{
+#ifdef _WIN32
+  vtkWin32OpenGLRenderWindow::
+    SafeDownCast(this->RenderWindow)->ResumeScreenRendering();
+#endif
+}
+
+void *vtkKWView::GetMemoryDC()
+{
+#ifdef _WIN32	
+  return (void *)vtkWin32OpenGLRenderWindow::
+    SafeDownCast(this->RenderWindow)->GetMemoryDC();
+#endif
+  return NULL;
+}
+
+unsigned char *vtkKWView::GetMemoryData()
+{
+#ifdef _WIN32	
+  return vtkWin32OpenGLRenderWindow::
+    SafeDownCast(this->RenderWindow)->GetMemoryData();
+#endif
+  return NULL;
 }

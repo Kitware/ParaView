@@ -58,6 +58,8 @@ class vtkKWMenu;
 #include "vtkKWText.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWChangeColorButton.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 
 class VTK_EXPORT vtkKWView : public vtkKWWidget
 {
@@ -66,7 +68,7 @@ public:
 
   // Description:
   // Create a View
-  virtual void Create(vtkKWApplication *app, const char *args) = 0;
+  virtual void Create(vtkKWApplication *app, const char *args) {}
 
   // Description:
   // Sets up some default event handlers to allow
@@ -117,18 +119,18 @@ public:
 
   // Description:
   // Return the RenderWindow or ImageWindow as appropriate.
-  virtual vtkWindow *GetVTKWindow() = 0;
+  virtual vtkWindow *GetVTKWindow() { return this->RenderWindow; }
 
   // Description:
   // Return the Renderer or Imager as appropriate.
-  virtual vtkViewport *GetViewport() = 0;
+  virtual vtkViewport *GetViewport() { return this->Renderer; }
 
   // Description:
   // Methods to support off screen rendering.
-  virtual void SetupMemoryRendering(int width,int height, void *cd) = 0;
-  virtual void ResumeScreenRendering() = 0;
-  virtual unsigned char *GetMemoryData() = 0;
-  virtual void *GetMemoryDC() = 0;
+  virtual void SetupMemoryRendering(int width,int height, void *cd);
+  virtual void ResumeScreenRendering();
+  virtual unsigned char *GetMemoryData();
+  virtual void *GetMemoryDC();
   
   // Description:
   // Add/Get/Remove the composites.
@@ -294,6 +296,11 @@ public:
   // Get the control frame to put custom controls within
   vtkGetObjectMacro( ControlFrame, vtkKWWidget );
   
+  vtkGetObjectMacro(Renderer, vtkRenderer);
+  
+  // Description:
+  // Get the render window used by this widget
+  vtkGetObjectMacro(RenderWindow,vtkRenderWindow);
   
 protected:
   vtkKWView();
@@ -335,6 +342,9 @@ protected:
   vtkKWLabeledFrame      *BackgroundFrame;
   vtkKWChangeColorButton *BackgroundColor;
 
+  vtkRenderer            *Renderer;
+  vtkRenderWindow        *RenderWindow;
+  
   int              PropertiesCreated;
 
   float            InteractiveUpdateRate;
