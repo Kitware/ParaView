@@ -74,7 +74,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkRedistributePolyData_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
-#include "vtkMultiProcessController.h"
 
 //*******************************************************************
 class vtkDataArray;
@@ -92,7 +91,7 @@ public:
 
   // Description:
   // The filter needs a controller to determine which process it is in.
-  vtkSetObjectMacro(Controller, vtkMultiProcessController);
+  virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController); 
 
   void SetColorProc(int cp){colorProc = cp;};

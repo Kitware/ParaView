@@ -116,7 +116,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.370");
+vtkCxxRevisionMacro(vtkPVWindow, "1.371");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3740,7 +3740,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.370 $");
+  this->ExtractRevision(os,"$Revision: 1.371 $");
 }
 
 //----------------------------------------------------------------------------
@@ -4132,4 +4132,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InitializeDefaultInterfaces: " 
      << this->InitializeDefaultInterfaces << endl;
   os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
+  os << indent << "Interaction: " << (this->Interaction?"on":"off") << endl;
 }

@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.143");
+vtkCxxRevisionMacro(vtkPVApplication, "1.144");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -924,7 +924,7 @@ vtkMultiProcessController *vtkPVApplication::NewController(int minId, int maxId)
 }
 #else
 //----------------------------------------------------------------------------
-vtkMultiProcessController *vtkPVApplication::NewController(int minId, int maxId)
+vtkMultiProcessController *vtkPVApplication::NewController(int, int)
 {
   return NULL;
 }
@@ -1597,6 +1597,8 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "Current Process Id: " << this->ProcessId << endl;
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
+  os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off") << endl;
+  os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

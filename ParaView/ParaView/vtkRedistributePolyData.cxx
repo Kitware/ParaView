@@ -94,10 +94,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.13");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.14");
 
-//vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
-//                     vtkMultiProcessController);
+vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
+                     vtkMultiProcessController);
 
 #undef VTK_REDIST_DO_TIMING 
 #define NUM_CELL_TYPES 4 
