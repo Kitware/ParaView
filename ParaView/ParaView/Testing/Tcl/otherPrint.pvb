@@ -1,0 +1,76 @@
+vtkDebugLeaks rtDebugLeaks
+rtDebugLeaks PromptUserOff
+rtDebugLeaks Delete
+
+vtkObject a
+a GlobalWarningDisplayOff
+a Delete
+
+proc rtOtherTest { fileid } {
+#actual test
+  set all [lsort [info command vtk*]]
+    foreach a $all {
+      if {$a == "vtkIndent"} {
+        continue
+      }
+      if {$a == "vtkOutputPort"} {
+        continue
+      }
+      if {$a == "vtkTimeStamp"} {
+        continue
+      }
+      if {$a == "vtkOutputWindow"} {
+        continue
+      }
+      if {$a == "vtkKWApplication"} {
+        continue
+      }
+      if {$a == "vtkPVApplication"} {
+        continue
+      }
+      puts -nonewline "$a "
+      catch {
+        puts -nonewline "Cr "
+        $a b
+        puts -nonewline "1  "
+        puts -nonewline "Prt "
+        b Print
+        puts -nonewline "1  "
+        puts -nonewline "IASf "
+        if {[b IsA $a] == 0} {puts stderr "$a failed IsA test!!!"}
+        puts -nonewline "1  "
+        puts -nonewline "IAVObj "
+        if {[b IsA "vtkObject"] == 0} {puts stdout "$a is not a sub-class of vtkObject"}
+        puts -nonewline "1  "
+        puts -nonewline "GCName "
+        b GetClassName
+        puts -nonewline "1  "
+        puts -nonewline "Del "
+        b Delete
+        puts -nonewline "1  "
+      }
+      catch {
+        puts -nonewline "SDCast "
+        $a b 
+        $a c 
+        set d [b SafeDownCast c]
+        b Delete
+        c Delete
+        puts -nonewline "1  "
+      }
+      catch {
+        puts -nonewline "EDel "
+        b Delete
+        c Delete
+        puts -nonewline "1  "
+      }
+      puts "Done"
+    }
+}
+
+# All tests should end with the following...
+
+rtOtherTest stdout
+
+exit
+
