@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.11");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.12");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -181,13 +181,11 @@ int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
 }
 #else
 template <class T>
-int vtkPVEnSightMasterServerReaderSyncValues(T* data, int numValues,
-                     int numPieces,
-                     vtkMultiProcessController* controller)
+int vtkPVEnSightMasterServerReaderSyncValues(T*, 
+                                             int,
+                                             int,
+                                             vtkMultiProcessController*)
 {
-  data = data;
-  numValues = numValues;
-  controller = controller;
   return VTK_OK;
 }
 #endif
