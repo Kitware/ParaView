@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.15");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.16");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -100,23 +100,22 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->TemporaryInformation = NULL;
   this->RootResult = NULL;
   this->ClientServerStream = 0;
-  this->ClientInterpreter = 0;
+  this->Interpreter = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::~vtkPVProcessModule()
 {
+  // Free Interpreter and ClientServerStream.
+  this->FinalizeInterpreter();
+
+  // Other cleanup.
   if (this->Controller)
     {
     this->Controller->Delete();
     this->Controller = NULL;
     }
   this->SetRootResult(NULL);
-  if(this->ClientInterpreter)
-    {
-    this->ClientInterpreter->Delete();
-    }
-  delete this->ClientServerStream;
 }
 
 //----------------------------------------------------------------------------
@@ -138,31 +137,10 @@ int vtkPVProcessModule::Start(int argc, char **argv)
   app->SetProcessModule(this);
   app->Script("wm withdraw .");
 
-  this->ClientServerStream = new vtkClientServerStream;
-  this->ClientInterpreter = vtkClientServerInterpreter::New();
-  this->ClientInterpreter->SetLogFile("pvClient.out");
-  vtkPVProcessModule::InitializeInterpreter(this->ClientInterpreter);
-  this->GetStream()
-    << vtkClientServerStream::Assign
-    << this->GetApplicationID() << app
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Assign
-    << this->GetProcessModuleID() << this
-    << vtkClientServerStream::End;
-  this->ClientInterpreter->ProcessStream(this->GetStream());
-  this->GetStream().Reset();
-
+  this->InitializeInterpreter();
+  this->Interpreter->SetLogFile("pvClient.out");
   app->Start(argc,argv);
-
-  this->GetStream()
-    << vtkClientServerStream::Delete
-    << this->GetApplicationID()
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Delete
-    << this->GetProcessModuleID()
-    << vtkClientServerStream::End;
-  this->ClientInterpreter->ProcessStream(this->GetStream());
-  this->GetStream().Reset();
+  this->FinalizeInterpreter();
 
   return app->GetExitStatus();
 }
@@ -525,7 +503,7 @@ void vtkPVProcessModule::SendStreamToClient()
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::SendStreamToServer()
 {
-  this->ClientInterpreter->ProcessStream(*this->ClientServerStream);
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
   this->ClientServerStream->Reset();
 }
 
@@ -547,7 +525,7 @@ vtkClientServerID vtkPVProcessModule::NewStreamObject(const char* type)
 
 vtkObjectBase* vtkPVProcessModule::GetObjectFromID(vtkClientServerID id)
 {
-  return this->ClientInterpreter->GetObjectFromID(id);
+  return this->Interpreter->GetObjectFromID(id);
 }
 
 
@@ -562,7 +540,7 @@ void vtkPVProcessModule::DeleteStreamObject(vtkClientServerID id)
 //----------------------------------------------------------------------------
 const vtkClientServerStream& vtkPVProcessModule::GetLastServerResult()
 {
-  return this->ClientInterpreter->GetLastResult();
+  return this->Interpreter->GetLastResult();
 }
 
 //----------------------------------------------------------------------------
@@ -572,9 +550,9 @@ const vtkClientServerStream& vtkPVProcessModule::GetLastClientResult()
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerInterpreter* vtkPVProcessModule::GetLocalInterpreter()
+vtkClientServerInterpreter* vtkPVProcessModule::GetInterpreter()
 {
-  return this->ClientInterpreter;
+  return this->Interpreter;
 }
 
 //----------------------------------------------------------------------------
@@ -609,6 +587,7 @@ void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
     }
 }
 
+//----------------------------------------------------------------------------
 // ClientServer wrapper initialization functions.
 extern void vtkCommonCS_Initialize(vtkClientServerInterpreter*);
 extern void vtkFilteringCS_Initialize(vtkClientServerInterpreter*);
@@ -625,20 +604,70 @@ extern void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
 
 //----------------------------------------------------------------------------
-void
-vtkPVProcessModule::InitializeInterpreter(vtkClientServerInterpreter* interp)
+void vtkPVProcessModule::InitializeInterpreter()
 {
-  vtkCommonCS_Initialize(interp);
-  vtkFilteringCS_Initialize(interp);
-  vtkImagingCS_Initialize(interp);
-  vtkGraphicsCS_Initialize(interp);
-  vtkIOCS_Initialize(interp);
-  vtkRenderingCS_Initialize(interp);
-  vtkHybridCS_Initialize(interp);
-  vtkParallelCS_Initialize(interp);
+  if(this->Interpreter)
+    {
+    return;
+    }
+
+  // Create the interpreter and supporting stream.
+  this->Interpreter = vtkClientServerInterpreter::New();
+  this->ClientServerStream = new vtkClientServerStream;
+
+  // Initialize built-in wrapper modules.
+  vtkCommonCS_Initialize(this->Interpreter);
+  vtkFilteringCS_Initialize(this->Interpreter);
+  vtkImagingCS_Initialize(this->Interpreter);
+  vtkGraphicsCS_Initialize(this->Interpreter);
+  vtkIOCS_Initialize(this->Interpreter);
+  vtkRenderingCS_Initialize(this->Interpreter);
+  vtkHybridCS_Initialize(this->Interpreter);
+  vtkParallelCS_Initialize(this->Interpreter);
 #ifdef VTK_USE_PATENTED
-  vtkPatentedCS_Initialize(interp);
+  vtkPatentedCS_Initialize(this->Interpreter);
 #endif
-  vtkPVFiltersCS_Initialize(interp);
-  vtkParaViewServerCS_Initialize(interp);
+  vtkPVFiltersCS_Initialize(this->Interpreter);
+  vtkParaViewServerCS_Initialize(this->Interpreter);
+
+  // Assign standard IDs.
+  vtkPVApplication *app = this->GetPVApplication();
+  vtkClientServerStream css;
+  css << vtkClientServerStream::Assign
+      << this->GetApplicationID() << app
+      << vtkClientServerStream::End;
+  css << vtkClientServerStream::Assign
+      << this->GetProcessModuleID() << this
+      << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(css);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::FinalizeInterpreter()
+{
+  if(!this->Interpreter)
+    {
+    return;
+    }
+
+  // Delete the standard IDs.
+  vtkClientServerStream css;
+  css << vtkClientServerStream::Delete
+      << this->GetApplicationID()
+      << vtkClientServerStream::End;
+  css << vtkClientServerStream::Delete
+      << this->GetProcessModuleID()
+      << vtkClientServerStream::End;
+  this->Interpreter->ProcessStream(css);
+
+  // Free the interpreter and supporting stream.
+  delete this->ClientServerStream;
+  this->Interpreter->Delete();
+  this->Interpreter = 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVProcessModule::LoadModule(const char* name)
+{
+  return this->Interpreter->Load(name);
 }

@@ -209,9 +209,14 @@ public:
 
   //BTX
   // Description:
-  // Get the interpreter actually used on the local process.
-  virtual vtkClientServerInterpreter* GetLocalInterpreter();
+  // Get the interpreter used on the local process.
+  virtual vtkClientServerInterpreter* GetInterpreter();
   //ETX
+
+  // Description:
+  // Load a ClientServer wrapper module dynamically in the current
+  // process.  Returns 1 for success and 0 for failure.
+  int LoadModule(const char* name);
 
   vtkClientServerID GetUniqueID();
   vtkClientServerID GetApplicationID();
@@ -220,15 +225,15 @@ protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
 
-  void InitializeTclMethodImplementations();
-  static void InitializeInterpreter(vtkClientServerInterpreter* interp);
+  virtual void InitializeInterpreter();
+  virtual void FinalizeInterpreter();
 
   vtkMultiProcessController *Controller;
   vtkPVInformation *TemporaryInformation;
 
   char *RootResult;
 
-  vtkClientServerInterpreter* ClientInterpreter;
+  vtkClientServerInterpreter* Interpreter;
   vtkClientServerStream* ClientServerStream;
   vtkClientServerID UniqueID;
 private:

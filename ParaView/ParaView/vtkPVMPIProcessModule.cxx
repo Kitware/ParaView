@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.6");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.7");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -200,19 +200,8 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
   this->ArgumentCount = argc;
   this->Arguments = argv;
 
-  this->ClientServerStream = new vtkClientServerStream;
-  this->ClientInterpreter = vtkClientServerInterpreter::New();
-  this->ClientInterpreter->SetLogFile("pvClient.out");
-  vtkPVProcessModule::InitializeInterpreter(this->ClientInterpreter);
-  this->GetStream()
-    << vtkClientServerStream::Assign
-    << this->GetApplicationID() << this->GetPVApplication()
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Assign
-    << this->GetProcessModuleID() << this
-    << vtkClientServerStream::End;
-  this->ClientInterpreter->ProcessStream(this->GetStream());
-  this->GetStream().Reset();
+  this->InitializeInterpreter();
+  this->Interpreter->SetLogFile("pvClient.out");
 
   // Go through the motions.
   // This indirection is not really necessary and is just to mimick the
@@ -222,16 +211,7 @@ int vtkPVMPIProcessModule::Start(int argc, char **argv)
 
   this->Controller->Finalize();
 
-  this->GetStream()
-    << vtkClientServerStream::Delete
-    << this->GetApplicationID()
-    << vtkClientServerStream::End
-    << vtkClientServerStream::Delete
-    << this->GetProcessModuleID()
-    << vtkClientServerStream::End;
-  this->ClientInterpreter->ProcessStream(this->GetStream());
-  this->GetStream().Reset();
-
+  this->FinalizeInterpreter();
   return this->ReturnValue;
 }
 

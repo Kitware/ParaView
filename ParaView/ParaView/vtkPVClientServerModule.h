@@ -176,10 +176,6 @@ public:
 
   //BTX
   // Description:
-  // Get the interpreter actually used on the local process.
-  virtual vtkClientServerInterpreter* GetLocalInterpreter();
-
-  // Description:
   // Return a message containing the result of the last SendMessages call.
   // In client/server mode this causes a round trip to the server.
   virtual const vtkClientServerStream& GetLastServerResult();
@@ -198,6 +194,7 @@ protected:
   // Send the last client server result to the client called from an RMI
   void SendLastClientServerResult();
 
+  void SendStreamToServerInternal();
   void Connect();
 
   int NumberOfServerProcesses;
@@ -218,7 +215,6 @@ protected:
   int NumberOfProcesses;
   
   vtkClientServerStream* LastServerResultStream;
-  vtkClientServerInterpreter* ServerInterpreter;
   
   vtkKWRemoteExecute* RemoteExecution;
 private:  

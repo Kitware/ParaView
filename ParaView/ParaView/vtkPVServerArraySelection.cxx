@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.1.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVServerArraySelection::vtkPVServerArraySelection()
@@ -83,7 +83,7 @@ vtkPVServerArraySelection::GetArraySettings(vtkSource* source, int point)
     {
     // Get the local process interpreter.
     vtkClientServerInterpreter* interp =
-      this->ProcessModule->GetLocalInterpreter();
+      this->ProcessModule->GetInterpreter();
 
     // Get the ID for the reader.
     vtkClientServerID readerID = interp->GetIDFromObject(source);

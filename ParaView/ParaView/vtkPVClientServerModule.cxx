@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.13");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.14");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -269,8 +269,6 @@ int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVClientServerModule::vtkPVClientServerModule()
 {
-  this->ServerInterpreter = 0;
-  this->ClientServerStream = new vtkClientServerStream;
   this->LastServerResultStream = new vtkClientServerStream;
   this->Controller = NULL;
   this->SocketController = NULL;
@@ -352,8 +350,13 @@ void vtkPVClientServerModule::Initialize()
     return;
     } 
 
+  // Setup the interpreter for this process.
+  this->InitializeInterpreter();
+
   if (this->ClientMode)
     {
+    this->Interpreter->SetLogFile("pvClient.out");
+
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
     this->SocketController->Receive(&numServerProcs, 1, 1, 8843);
@@ -382,6 +385,7 @@ void vtkPVClientServerModule::Initialize()
     }
   else if (myId == 0)
     { // process 0 of Server
+    this->Interpreter->SetLogFile("pvServer.out");
 
     // send the number of server processes as a handshake.
     this->SocketController->Send(&numProcs, 1, 1, 8843);
@@ -429,6 +433,9 @@ void vtkPVClientServerModule::Initialize()
     this->Controller->ProcessRMIs();    
     // Now we are exiting.
     }
+
+  // Delete the interpreter for this process.
+  this->FinalizeInterpreter();
 }
 
 
@@ -444,36 +451,6 @@ void vtkPVClientServerModule::Connect()
 #endif
 
   this->ClientMode = pvApp->GetClientMode();
-  if(this->ClientMode)
-    {
-    this->ClientInterpreter = vtkClientServerInterpreter::New();
-    this->ClientInterpreter->SetLogFile("pvClient.out");
-    vtkPVProcessModule::InitializeInterpreter(this->ClientInterpreter);
-    this->GetStream()
-      << vtkClientServerStream::Assign
-      << this->GetApplicationID() << this->GetPVApplication()
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Assign
-      << this->GetProcessModuleID() << this
-      << vtkClientServerStream::End;
-    this->ClientInterpreter->ProcessStream(this->GetStream());
-    this->GetStream().Reset();
-    }
-  else
-    {
-    this->ServerInterpreter = vtkClientServerInterpreter::New();
-    this->ServerInterpreter->SetLogFile("pvServer.out");
-    vtkPVProcessModule::InitializeInterpreter(this->ServerInterpreter);
-    this->GetStream()
-      << vtkClientServerStream::Assign
-      << this->GetApplicationID() << this->GetPVApplication()
-      << vtkClientServerStream::End
-      << vtkClientServerStream::Assign
-      << this->GetProcessModuleID() << this
-      << vtkClientServerStream::End;
-    this->ServerInterpreter->ProcessStream(this->GetStream());
-    this->GetStream().Reset();
-    }
 
   // Do not try to connect sockets on MPI processes other than root.
   if (myId > 0)
@@ -1171,12 +1148,12 @@ int vtkPVClientServerModule::ReceiveRootPolyData(const char* tclName,
 
 void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
 {
-  this->ServerInterpreter->ProcessStream(msg, len);
+  this->Interpreter->ProcessStream(msg, len);
 }
 
 const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
 {
-  return this->ClientInterpreter->GetLastResult();
+  return this->Interpreter->GetLastResult();
 }
 
 const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
@@ -1223,8 +1200,13 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
 
 void vtkPVClientServerModule::SendStreamToClient()
 {
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToClient on server node.");
+    return;
+    }
   // Just process the stream locally.
-  this->ClientInterpreter->ProcessStream(*this->ClientServerStream);
+  this->Interpreter->ProcessStream(*this->ClientServerStream);
   this->ClientServerStream->Reset();
 }
 
@@ -1232,30 +1214,34 @@ void vtkPVClientServerModule::SendStreamToClient()
 // This sends the current stream to the server
 void vtkPVClientServerModule::SendStreamToServer()
 {
-  const unsigned char* data;
-  size_t len;
-  this->ClientServerStream->GetData(&data, &len);
-  this->SocketController->TriggerRMI(1, (void*)(data), len, VTK_PV_CLIENTSERVER_RMI_TAG);
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToServer on server node.");
+    return;
+    }
+  this->SendStreamToServerInternal();
   this->ClientServerStream->Reset();
 }
 
 void vtkPVClientServerModule::SendStreamToClientAndServer()
 {
-  // copy from SendStreamToServer but leave out the stream Reset
-  const unsigned char* data;
-  size_t len;
-  this->ClientServerStream->GetData(&data, &len);
-  this->SocketController->TriggerRMI(1, (void*)(data), len, VTK_PV_CLIENTSERVER_RMI_TAG);
-  // now process the stream locally
-  this->ClientInterpreter->ProcessStream(*this->ClientServerStream);
-  this->ClientServerStream->Reset();
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToClientAndServer "
+                  "on server node.");
+    return;
+    }
+
+  // Send to server first, then to client.
+  this->SendStreamToServerInternal();
+  this->SendStreamToClient();
 }
 
 void vtkPVClientServerModule::SendLastClientServerResult()
 {
   const unsigned char* data;
   size_t length = 0;
-  this->ServerInterpreter->GetLastResult().GetData(&data, &length);
+  this->Interpreter->GetLastResult().GetData(&data, &length);
   int len = static_cast<int>(length);
   this->GetSocketController()->Send(&len, 1, 1,
                                     VTK_PV_ROOT_RESULT_LENGTH_TAG);
@@ -1267,14 +1253,11 @@ void vtkPVClientServerModule::SendLastClientServerResult()
 }
 
 //----------------------------------------------------------------------------
-vtkClientServerInterpreter* vtkPVClientServerModule::GetLocalInterpreter()
+void vtkPVClientServerModule::SendStreamToServerInternal()
 {
-  if(this->ClientMode)
-    {
-    return this->ClientInterpreter;
-    }
-  else
-    {
-    return this->ServerInterpreter;
-    }
+  const unsigned char* data;
+  size_t len;
+  this->ClientServerStream->GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len,
+                                     VTK_PV_CLIENTSERVER_RMI_TAG);
 }

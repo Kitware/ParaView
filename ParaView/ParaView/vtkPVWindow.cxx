@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.17");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.18");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2432,6 +2432,7 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
         << this->GetPVApplication()->GetMajorVersion()
         << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
+#ifdef PV_NOT_SUPPORTING_BATCH_SCRIPTS_WITH_COMPONENTS
   if (this->PackageNames->GetNumberOfItems() > 0)
     {
     *file << vtkPVApplication::LoadComponentProc << endl;
@@ -2448,7 +2449,7 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     it->Delete();
     }
   *file << endl << endl;
-
+#endif
 
   const char* extension = 0;
   const char* writerName = 0;

@@ -252,7 +252,6 @@ public:
   vtkGetMacro(StartGUI, int);
 
   //BTX
-  static const char* const LoadComponentProc;
   static const char* const ExitProc;
   //ETX
 

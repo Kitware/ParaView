@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.10");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.11");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -298,20 +298,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 #ifdef PARAVIEW_LINK_XDMF
   Vtkxdmftcl_Init(interp);
 #endif
-  
-  // Create the component loader procedure in Tcl.
-  char* script = vtkString::Duplicate(vtkPVApplication::LoadComponentProc);  
-  if (Tcl_GlobalEval(interp, script) != TCL_OK)
-    {
-    if (err)
-      {
-      *err << Tcl_GetStringResult(interp) << endl;
-      }
-    // ????
-    }  
-  delete [] script;
-
-  script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
+  char* script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
     if (err)
@@ -335,7 +322,9 @@ vtkPVApplication::vtkPVApplication()
   char name[128];
   sprintf(name, "ParaView%d.%d", this->MajorVersion, this->MinorVersion);
   this->SetApplicationVersionName(name);
-  this->SetApplicationReleaseName("1");
+  char patch[128];
+  sprintf(patch, "%d", PARAVIEW_VERSION_PATCH);
+  this->SetApplicationReleaseName(patch);
 
 
   this->Display3DWidgets = 0;
@@ -1975,66 +1964,8 @@ void vtkPVApplication::DisplayTCLError(const char* message)
 }
 
 //----------------------------------------------------------------------------
-const char* const vtkPVApplication::LoadComponentProc =
-"namespace eval ::paraview {\n"
-"    proc load_component {name {optional_paths {}}} {\n"
-"        \n"
-"        global tcl_platform auto_path env\n"
-"        \n"
-"        # First dir is empty, to let Tcl try in the current dir\n"
-"        \n"
-"        set dirs $optional_paths\n"
-"        set dirs [concat $dirs {\"\"}]\n"
-"        set ext [info sharedlibextension]\n"
-"        if {$tcl_platform(platform) == \"unix\"} {\n"
-"            set prefix \"lib\"\n"
-"            # Help Unix a bit by browsing into $auto_path and /usr/lib...\n"
-"            set dirs [concat $dirs /usr/local/lib /usr/local/lib/vtk $auto_path]\n"
-"            if {[info exists env(LD_LIBRARY_PATH)]} {\n"
-"                set dirs [concat $dirs [split $env(LD_LIBRARY_PATH) \":\"]]\n"
-"            }\n"
-"            if {[info exists env(PATH)]} {\n"
-"                set dirs [concat $dirs [split $env(PATH) \":\"]]\n"
-"            }\n"
-"        } else {\n"
-"            set prefix \"\"\n"
-"            if {$tcl_platform(platform) == \"windows\"} {\n"
-"                if {[info exists env(PATH)]} {\n"
-"                    set dirs [concat $dirs [split $env(PATH) \";\"]]\n"
-"                }\n"
-"            }\n"
-"        }\n"
-"        \n"
-"        foreach dir $dirs {\n"
-"            set libname [file join $dir ${prefix}${name}${ext}]\n"
-"            if {[file exists $libname]} {\n"
-"                if {![catch {load $libname} errormsg]} {\n"
-"                    # WARNING: it HAS to be \"\" so that pkg_mkIndex work (since\n"
-"                    # while evaluating a package ::paraview::load_component won't\n"
-"                    # exist and will default to the unknown() proc that \n"
-"                    # returns \"\"\n"
-"                    return \"\"\n"
-"                } else {\n"
-"                    # If not loaded but file was found, oops\n"
-"                    error $errormsg\n"
-"                }\n"
-"            }\n"
-"        }\n"
-"        \n"
-"        error \"::paraview::load_component: $name could not be found.\"\n"
-"        \n"
-"        return 1\n"
-"    }\n"
-"    namespace export load_component\n"
-"}\n";
-
-
-
-//----------------------------------------------------------------------------
 const char* const vtkPVApplication::ExitProc =
 "proc exit {} { global Application; $Application Exit }";
-
-
 
 //============================================================================
 // Stuff that is a part of render-process module.
