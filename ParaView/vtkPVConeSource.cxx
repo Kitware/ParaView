@@ -125,9 +125,9 @@ void vtkPVConeSource::ConeParameterChanged()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetWindow();
  
-  this->GetConeSource()->SetRadius(this->RadiusEntry->GetValueAsFloat());
-  this->GetConeSource()->SetHeight(this->HeightEntry->GetValueAsFloat());
-  this->GetConeSource()->SetResolution(this->ResolutionEntry->GetValueAsInt());
+  this->SetRadius(this->RadiusEntry->GetValueAsFloat());
+  this->SetHeight(this->HeightEntry->GetValueAsFloat());
+  this->SetResolution(this->ResolutionEntry->GetValueAsInt());
 
   if (this->GetPVData() == NULL)
     { // This is the first time, initialize data.  

@@ -123,9 +123,9 @@ void vtkPVSphereSource::SphereParameterChanged()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetWindow();
  
-  this->GetSphereSource()->SetRadius(this->RadiusEntry->GetValueAsFloat());
-  this->GetSphereSource()->SetPhiResolution(this->PhiResolutionEntry->GetValueAsInt());
-  this->GetSphereSource()->SetThetaResolution(this->ThetaResolutionEntry->GetValueAsInt());
+  this->SetRadius(this->RadiusEntry->GetValueAsFloat());
+  this->SetPhiResolution(this->PhiResolutionEntry->GetValueAsInt());
+  this->SetThetaResolution(this->ThetaResolutionEntry->GetValueAsInt());
 
   if (this->GetPVData() == NULL)
     { // This is the first time, initialize data.  
