@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
 
-vtkCxxRevisionMacro(vtkPVRenderViewProxyImplementation, "1.1");
+vtkCxxRevisionMacro(vtkPVRenderViewProxyImplementation, "1.2");
 vtkStandardNewMacro(vtkPVRenderViewProxyImplementation);
 
 
@@ -25,6 +25,7 @@ vtkPVRenderViewProxyImplementation::vtkPVRenderViewProxyImplementation()
   this->PVRenderView = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVRenderViewProxyImplementation::~vtkPVRenderViewProxyImplementation()
 {
 }
@@ -39,7 +40,7 @@ void vtkPVRenderViewProxyImplementation::SetPVRenderView(vtkPVRenderView *view)
     }
 } 
 
-
+//----------------------------------------------------------------------------
 void vtkPVRenderViewProxyImplementation::EventuallyRender()
 {
   if(this->PVRenderView)
@@ -48,6 +49,7 @@ void vtkPVRenderViewProxyImplementation::EventuallyRender()
     }
 }
 
+//----------------------------------------------------------------------------
 vtkRenderWindow* vtkPVRenderViewProxyImplementation::GetRenderWindow()
 {
   if(this->PVRenderView)
@@ -57,6 +59,7 @@ vtkRenderWindow* vtkPVRenderViewProxyImplementation::GetRenderWindow()
   return 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderViewProxyImplementation::Render()
 { 
   if(this->PVRenderView)
@@ -65,8 +68,9 @@ void vtkPVRenderViewProxyImplementation::Render()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderViewProxyImplementation::PrintSelf(ostream& os, vtkIndent indent)
 { 
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "PVRenderView: " << this->GetPVRenderView() << endl;
+  os << indent << "PVRenderView: " << this->PVRenderView << "\n";
 }

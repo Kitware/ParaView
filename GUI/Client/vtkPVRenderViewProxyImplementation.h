@@ -22,7 +22,6 @@
 
 #include "vtkPVRenderViewProxy.h"
 
-class vtkRenderer;
 class vtkPVRenderView;
 
 class VTK_EXPORT vtkPVRenderViewProxyImplementation : public vtkPVRenderViewProxy
@@ -31,6 +30,7 @@ public:
   static vtkPVRenderViewProxyImplementation *New();
   vtkTypeRevisionMacro(vtkPVRenderViewProxyImplementation, vtkPVRenderViewProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
+
   // Description:
   // Forward these calls to an actual vtkPVRenderView in a sub class.
   virtual void EventuallyRender();
@@ -41,12 +41,15 @@ public:
   // Set/Get the PVRenderView.
   void SetPVRenderView(vtkPVRenderView *view);
   vtkGetObjectMacro(PVRenderView, vtkPVRenderView);
+
 protected:
   vtkPVRenderViewProxyImplementation();
   ~vtkPVRenderViewProxyImplementation();
+
 private:
   vtkPVRenderViewProxyImplementation(const vtkPVRenderViewProxyImplementation&); // Not implemented
   void operator=(const vtkPVRenderViewProxyImplementation&); // Not implemented
+
   vtkPVRenderView* PVRenderView;
 };
 
