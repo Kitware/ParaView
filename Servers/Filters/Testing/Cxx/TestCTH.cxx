@@ -24,24 +24,28 @@
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRegressionTestImage.h"
+#include "vtkClipDataSet.h"
 
 int main(int argc, char * argv[])
 {
   vtkCTHFractal *fractal = vtkCTHFractal::New();
   fractal->SetDimensions( 10 );
   fractal->SetFractalValue( 9.5 );
-  fractal->SetMaximumLevel( 5 );
+  fractal->SetMaximumLevel( 3 );
   fractal->SetGhostLevels( 0 );
-  fractal->Update();
+  fractal->Update();  //this seems to be needed
   
-  vtkCTHData* data = fractal->GetOutput();
-
-  // Just for coverage:
-  data->Print( cout );
+  vtkCTHData* data = vtkCTHData::New();
+  data->ShallowCopy( fractal->GetOutput() );
   
   vtkPlane *clipPlane = vtkPlane::New();
-  clipPlane->SetNormal ( -1, -1, -1);
-  clipPlane->SetOrigin ( 0, 0, 0 );
+  clipPlane->SetNormal ( 1, 1, 1);
+  clipPlane->SetOrigin ( -0.5, 0, 1 );
+
+  vtkClipDataSet* clip = vtkClipDataSet::New();
+  clip->SetInput( data );
+  clip->SetClipFunction( clipPlane );
+  clip->Update(); //discard
 
   vtkCTHExtractAMRPart *extract = vtkCTHExtractAMRPart::New();
   extract->SetInput( fractal->GetOutput());
@@ -88,7 +92,9 @@ int main(int argc, char * argv[])
 
   // Clean up
   fractal->Delete();
+  data->Delete();
   clipPlane->Delete();
+  clip->Delete();
   extract->Delete();
   outline->Delete();
   outlineMapper->Delete();
