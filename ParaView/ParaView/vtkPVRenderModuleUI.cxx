@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.2");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.3");
 
 int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -88,7 +88,7 @@ vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
 //----------------------------------------------------------------------------
 void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
 {
-  vtkErrorMacro("SetRenderModule has not been implemented.");
+  //vtkErrorMacro("SetRenderModule has not been implemented.");
 }
 
 
