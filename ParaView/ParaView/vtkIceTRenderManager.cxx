@@ -45,7 +45,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.11");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.12");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -553,7 +553,6 @@ void vtkIceTRenderManager::PreRenderProcessing()
   vtkRenderWindow* renWin = this->RenderWindow;
   vtkRendererCollection *rens = renWin->GetRenderers();
   vtkRenderer* ren;
-  int i;
 
   rens->InitTraversal();
   ren = rens->GetNextItem();
@@ -592,7 +591,6 @@ void vtkIceTRenderManager::PreRenderProcessing()
   // Only composite the first frame.
   rens->InitTraversal();
   ren = rens->GetNextItem();
-  i == 0;
   //for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
     {
     vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
