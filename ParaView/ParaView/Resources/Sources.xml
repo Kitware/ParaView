@@ -139,7 +139,7 @@
     <Item name="float" value="10"/>
     <Item name="double" value="11"/>
   </SelectionList>
-  <SelectionList label="Byte order" trace_name="DataByteOrder" variable="DataByteOrder" help="Select the byte order of the binary file">
+  <SelectionList label="Byte order" trace_name="DataByteOrder" variable="DataByteOrder" help="Select the byte order of the binary file" suppress_reset="1">
     <Item name="big endian" value="0"/>
     <Item name="little endian" value="1"/>
   </SelectionList>
