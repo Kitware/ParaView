@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -370,7 +370,8 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
   this->MapperProxy->CreateVTKObjects(numObjects);
 
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  for (int i=0; i<numObjects; i++)
+  int i;
+  for (i=0; i<numObjects; i++)
     {
     str << vtkClientServerStream::Invoke 
         << this->MapperProxy->GetID(i)
@@ -400,7 +401,7 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
   // Create the actor proxy and connect it to the mapper proxy (this)
   this->ActorProxy->SetVTKClassName("vtkActor");
   this->ActorProxy->CreateVTKObjects(numObjects);
-  for (int i=0; i<numObjects; i++)
+  for (i=0; i<numObjects; i++)
     {
     str << vtkClientServerStream::Invoke 
         << this->ActorProxy->GetID(i)
@@ -412,7 +413,7 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
   // Create the property proxy and connect it to the actor proxy
   this->PropertyProxy->SetVTKClassName("vtkProperty");
   this->PropertyProxy->CreateVTKObjects(1);
-  for (int i=0; i<numObjects; i++)
+  for (i=0; i<numObjects; i++)
     {
     str << vtkClientServerStream::Invoke 
         << this->ActorProxy->GetID(i) 
@@ -421,7 +422,7 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
         << vtkClientServerStream::End;
     }
 
-  for (int i=0; i<numObjects; i++)
+  for (i=0; i<numObjects; i++)
     {
     str << vtkClientServerStream::Invoke 
         << this->MapperProxy->GetID(i) 
