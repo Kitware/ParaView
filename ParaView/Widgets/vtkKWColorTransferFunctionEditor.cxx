@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.6");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.7");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -174,11 +174,12 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointCanvasCoordinates(
   double factors[2] = {0.0, 0.0};
   this->GetCanvasScalingFactors(factors);
 
-  float *v_w_range = this->GetWholeValueRange();
   float parameter = this->ColorTransferFunction->GetDataPointer()[id * 4];
 
   // Since the 'value' range is multi-dimensional (color), just place
   // the point in the middle of the current value range
+
+  float *v_w_range = this->GetWholeValueRange();
 
   x = vtkMath::Round(parameter * factors[0]);
   y = vtkMath::Round((double)(v_w_range[1] - v_w_range[0]) * 0.5 * factors[1]);
@@ -208,10 +209,8 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   // Add the point and redraw if a point was really added
 
   int old_size = this->GetFunctionSize();
-
   id = this->ColorTransferFunction->AddRGBPoint(
     parameter, rgb[0], rgb[1], rgb[2]);
-
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);
@@ -237,10 +236,8 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtParameter(
   // Add the point and redraw if a point was really added
 
   int old_size = this->GetFunctionSize();
-
   id = this->ColorTransferFunction->AddRGBPoint(
     parameter, rgb[0], rgb[1], rgb[2]);
-
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);
@@ -262,21 +259,26 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   double factors[2] = {0.0, 0.0};
   this->GetCanvasScalingFactors(factors);
 
+  float *point = this->ColorTransferFunction->GetDataPointer() + id * 4;
+
   // Since the 'value' range is multi-dimensional (color), just move
   // the point in the 'parameter' range (ignore the 'y')
 
-  float *point = this->ColorTransferFunction->GetDataPointer() + id * 4;
-  float parameter = point[0];
   float rgb[3];
   rgb[0] = point[1];
   rgb[1] = point[2];
   rgb[2] = point[3];
 
+  // Get current param if point param is locked, or new param given the x coord
+
+  float parameter = point[0];
   if (!this->FunctionPointParameterIsLocked(id))
     {
     this->ColorTransferFunction->RemovePoint(parameter);
     parameter = (float)((double)x / factors[0]);
     }
+
+  // Add a point at this parameter/value (will be updated if already exist)
 
   int new_id = this->ColorTransferFunction->AddRGBPoint(
     parameter, rgb[0], rgb[1], rgb[2]);
@@ -297,6 +299,62 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToCanvasCoordinates(
 }
 
 //----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::MoveFunctionPointToParameter(
+  int id, float parameter, int interpolate)
+{
+  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
+      this->FunctionPointParameterIsLocked(id))
+    {
+    return 0;
+    }
+
+  float *point = this->ColorTransferFunction->GetDataPointer() + id * 4;
+
+  float old_parameter = point[0];
+  if (parameter == old_parameter)
+    {
+    return 0;
+    }
+
+  // Get current value if point value is locked or no interpolation
+
+  float rgb[3];
+  if (!interpolate || this->FunctionPointValueIsLocked(id))
+    {
+    rgb[0] = point[1];
+    rgb[1] = point[2];
+    rgb[2] = point[3];
+    }
+  else
+    {
+    this->ColorTransferFunction->GetColor(parameter, rgb);
+    }
+
+  // Remove the old point
+
+  this->ColorTransferFunction->RemovePoint(old_parameter);
+
+  // Add new point at this parameter/value
+
+  int new_id = this->ColorTransferFunction->AddRGBPoint(
+    parameter, rgb[0], rgb[1], rgb[2]);
+
+  // If the point was selected and the new point does not match (which
+  // should not happen anyway), reselect the new point
+
+  if (this->SelectedPoint >= 0 && this->SelectedPoint == id && id != new_id)
+    {
+    this->SelectPoint(new_id);
+    }
+  else
+    {
+    this->RedrawCanvasPoint(new_id);
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
 {
   if (!this->IsCreated() || 
@@ -306,6 +364,8 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
     return 0;
     }
 
+  // If selected, deselect first
+
   if (id == this->SelectedPoint)
     {
     this->ClearSelection();
@@ -314,10 +374,8 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
   // Remove the point and redraw if a point was really removed
 
   int old_size = this->GetFunctionSize();
-
   this->ColorTransferFunction->RemovePoint(
     this->ColorTransferFunction->GetDataPointer()[id * 4]);
-
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);

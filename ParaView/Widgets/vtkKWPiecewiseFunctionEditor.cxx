@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledLabel.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.4");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -132,8 +132,9 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointColor(int id, float rgb[3])
     return this->Superclass::GetFunctionPointColor(id, rgb);
     }
   
-  float *v_w_range = this->GetWholeValueRange();
   float value = this->PiecewiseFunction->GetDataPointer()[id * 2 + 1];
+
+  float *v_w_range = this->GetWholeValueRange();
   float gray = (value - v_w_range[0]) / (v_w_range[1] - v_w_range[0]);
   rgb[0] = rgb[1] = rgb[2] = gray;
   
@@ -167,8 +168,9 @@ int vtkKWPiecewiseFunctionEditor::GetFunctionPointCanvasCoordinates(
   double factors[2] = {0.0, 0.0};
   this->GetCanvasScalingFactors(factors);
 
-  float *v_w_range = this->GetWholeValueRange();
   float *point = this->PiecewiseFunction->GetDataPointer() + id * 2;
+
+  float *v_w_range = this->GetWholeValueRange();
 
   x = vtkMath::Round(point[0] * factors[0]);
   y = vtkMath::Round((double)(v_w_range[1] - point[1]) * factors[1]);
@@ -191,15 +193,14 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   // Get the parameter/value given the canvas coords and scaling factor
 
   float *v_w_range = this->GetWholeValueRange();
+
   float parameter = (float)((double)x / factors[0]);
   float value = (float)(v_w_range[1] - ((double)y / factors[1]));
 
   // Add the point and redraw if a point was really added
 
   int old_size = this->GetFunctionSize();
-
   id = this->PiecewiseFunction->AddPoint(parameter, value);
-
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);
@@ -224,9 +225,7 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtParameter(
   // Add the point and redraw if a point was really added
 
   int old_size = this->GetFunctionSize();
-
   id = this->PiecewiseFunction->AddPoint(parameter, value);
-
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);
@@ -249,7 +248,8 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   this->GetCanvasScalingFactors(factors);
 
   float *point = this->PiecewiseFunction->GetDataPointer() + id * 2;
-  float parameter = point[0];
+
+  // Get current value if point value is locked, or new value given the y coord
 
   float value;
   if (this->FunctionPointValueIsLocked(id))
@@ -262,11 +262,16 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToCanvasCoordinates(
     value = (float)(v_w_range[1] - ((double)y / factors[1]));
     }
 
+  // Get current param if point param is locked, or new param given the x coord
+
+  float parameter = point[0];
   if (!this->FunctionPointParameterIsLocked(id))
     {
     this->PiecewiseFunction->RemovePoint(parameter);
     parameter = (float)((double)x / factors[0]);
     }
+
+  // Add a point at this parameter/value (will be updated if already exist)
 
   int new_id = this->PiecewiseFunction->AddPoint(parameter, value);
 
@@ -282,7 +287,70 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToCanvasCoordinates(
     this->RedrawCanvasPoint(new_id);
     }
 
-  // In window-level mode, the first and second point are constrained
+  // In window-level mode, the first and second point are value-constrained
+
+  if (this->WindowLevelMode && new_id <= 1)
+    {
+    float constrained_parameter = this->PiecewiseFunction->GetDataPointer()[ 
+      (new_id == 0 ? 1 : 0) * 2];
+    this->RedrawCanvasPoint(
+      this->PiecewiseFunction->AddPoint(constrained_parameter, value));
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToParameter(
+  int id, float parameter, int interpolate)
+{
+  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
+      this->FunctionPointParameterIsLocked(id))
+    {
+    return 0;
+    }
+
+  float *point = this->PiecewiseFunction->GetDataPointer() + id * 2;
+
+  float old_parameter = point[0];
+  if (parameter == old_parameter)
+    {
+    return 0;
+    }
+
+  // Get current value if point value is locked or no interpolation
+
+  float value;
+  if (!interpolate || this->FunctionPointValueIsLocked(id))
+    {
+    value = point[1];
+    }
+  else
+    {
+    value = this->PiecewiseFunction->GetValue(old_parameter);
+    }
+
+  // Remove the old point
+
+  this->PiecewiseFunction->RemovePoint(old_parameter);
+
+  // Add new point at this parameter/value
+
+  int new_id = this->PiecewiseFunction->AddPoint(parameter, value);
+
+  // If the point was selected and the new point does not match (which
+  // should not happen anyway), reselect the new point
+
+  if (this->SelectedPoint >= 0 && this->SelectedPoint == id && id != new_id)
+    {
+    this->SelectPoint(new_id);
+    }
+  else
+    {
+    this->RedrawCanvasPoint(new_id);
+    }
+
+  // In window-level mode, the first and second point are value-constrained
 
   if (this->WindowLevelMode && new_id <= 1)
     {
@@ -305,6 +373,8 @@ int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
     return 0;
     }
 
+  // If selected, deselect first
+
   if (id == this->SelectedPoint)
     {
     this->ClearSelection();
@@ -313,10 +383,8 @@ int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
   // Remove the point and redraw if a point was really removed
 
   int old_size = this->GetFunctionSize();
-
   this->PiecewiseFunction->RemovePoint(
     this->PiecewiseFunction->GetDataPointer()[id * 2]);
-
   if (old_size != this->GetFunctionSize())
     {
     this->RedrawCanvasPoint(id);
