@@ -1,3 +1,3 @@
 ADD_EXECUTABLE(ServersCommonPrintSelf ServersCommonPrintSelf.cxx)
 ADD_TEST(ServersCommonPrintSelf ${CXX_TEST_PATH}/ServersCommonPrintSelf )
-TARGET_LINK_LIBRARIES(ServersCommonPrintSelf vtkPVFilters)
+TARGET_LINK_LIBRARIES(ServersCommonPrintSelf vtkPVCommon)
