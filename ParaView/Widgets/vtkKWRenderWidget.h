@@ -145,14 +145,23 @@ public:
   virtual void Enter(int /*x*/, int /*y*/) {}
 
   // Description:
-  // Get the underlying vtkCornerAnnotation.
-  // Set the annotation visibility.
-  // Set the corner text color.
+  // Get and control the corner annotation.
   virtual void SetCornerAnnotationVisibility(int v);
   virtual void SetCornerTextColor(float r, float g, float b);
   virtual void SetCornerTextColor(float *rgb)
     { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); };
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
+
+  // Description:
+  // Get and control the header annotation.
+  virtual void SetHeaderAnnotationVisibility(int v) {};
+  virtual int  GetHeaderAnnotationVisibility() { return 0; };
+  virtual void SetHeaderTextColor(float r, float g, float b) {};
+  virtual void SetHeaderTextColor(float *rgb)
+    { this->SetCornerTextColor(rgb[0], rgb[1], rgb[2]); };
+  virtual float* GetHeaderTextColor() { return 0; };
+  virtual void SetHeaderText(const char*) {};
+  virtual char* GetHeaderText() { return 0; };
       
   // Description:
   // Set/Get the units that pixel sizes are measured in
