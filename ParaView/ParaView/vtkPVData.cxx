@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.250");
+vtkCxxRevisionMacro(vtkPVData, "1.251");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2787,6 +2787,7 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
+  os << indent << "ActorControlFrame: " << this->ActorControlFrame << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
   os << indent << "ArraySetByUser: " << this->ArraySetByUser << endl;
   os << indent << "ColorSetByUser: " << this->ColorSetByUser << endl;

@@ -304,6 +304,7 @@ public:
   // Description:
   // Access to the Set View to Data button from a script
   vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
+  vtkGetObjectMacro(ActorControlFrame, vtkKWLabeledFrame);
   
 protected:
   vtkPVData();
