@@ -49,8 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWLabeledFrame_h
 
 #include "vtkKWWidget.h"
-#include "vtkKWImageLabel.h"
+
+class vtkKWImageLabel;
 class vtkKWApplication;
+class vtkKWIcon;
 
 class VTK_EXPORT vtkKWLabeledFrame : public vtkKWWidget
 {

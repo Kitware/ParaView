@@ -71,9 +71,9 @@ public:
   
   virtual vtkKWApplication *GetApplication()  { return this;  }
   virtual void SetApplication (vtkKWApplication*) 
-  { 
-  vtkErrorMacro( << "Do not set the Application on an Application" << endl ); 
-  }
+    { 
+    vtkErrorMacro( << "Do not set the Application on an Application" << endl ); 
+    }
   
   
   // Description:

@@ -51,29 +51,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkKWObject.h"
-#include "vtkKWChangeColorButton.h"
-#include "vtkKWLabel.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWScale.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWMenuButton.h"
-#include "vtkKWOptionMenu.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkPVApplication.h"
-#include "vtkDataSetMapper.h"
-#include "vtkKWView.h"
-#include "vtkDataSet.h"
 
 class vtkCubeAxesActor2D;
+class vtkDataSet;
 class vtkKWBoundsDisplay;
+class vtkKWChangeColorButton;
+class vtkKWCheckButton;
 class vtkKWCheckButton;
 class vtkKWFrame;
+class vtkKWLabel;
+class vtkKWLabeledEntry;
+class vtkKWLabeledFrame;
+class vtkKWOptionMenu;
+class vtkKWPushButton;
+class vtkKWScale;
 class vtkPVApplication;
 class vtkPVRenderView;
 class vtkPVSource;
 class vtkProp;
 class vtkProperty;
 class vtkScalarBarActor;
+class vtkPolyDataMapper;
+class vtkPVSource;
+class vtkKWView;
+class vtkKWWidget;
 
 class VTK_EXPORT vtkPVData : public vtkKWObject
 {
@@ -295,7 +296,7 @@ public:
   vtkGetStringMacro(LODMapperTclName);
   
   // I shall want to get rid of this.
-  vtkSetObjectMacro(View, vtkKWView);
+  virtual void SetView(vtkKWView*);
   vtkGetObjectMacro(View, vtkKWView);
   vtkKWView *View;
 

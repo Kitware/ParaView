@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
+#include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"

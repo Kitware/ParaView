@@ -39,14 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkPVRenderView.h"
 
 #include "vtkCamera.h"
 #include "vtkDummyRenderWindow.h"
 #include "vtkDummyRenderer.h"
+#include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCornerAnnotation.h"
+#include "vtkKWLabel.h"
+#include "vtkKWScale.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"

@@ -39,15 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
-#include "vtkPVSource.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVData.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVSourceCollection.h"
+
 #include "vtkArrayMap.txx"
-#include "vtkPVXMLElement.h"
+#include "vtkDataSet.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVData.h"
+#include "vtkPVSource.h"
+#include "vtkPVSourceCollection.h"
 #include "vtkPVWindow.h"
+#include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkPVInputMenu* vtkPVInputMenu::New()

@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVDataSetReaderModule.h"
+
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
 #include "vtkPVWindow.h"
@@ -47,6 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPDataSetReader.h"
 #include "vtkPVDataSetFileEntry.h"
 #include "vtkKWFrame.h"
+#include "vtkPVApplication.h"
 
 #include <ctype.h>
 

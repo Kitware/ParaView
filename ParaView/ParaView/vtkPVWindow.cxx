@@ -41,67 +41,61 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVWindow.h"
 
-#include "vtkPVApplication.h"
-#include "vtkKWToolbar.h"
-#include "vtkObjectFactory.h"
+#include "vtkActor.h"
+#include "vtkArrayMap.txx"
+#include "vtkAxes.h"
+#include "vtkDirectory.h"
+#include "vtkGenericRenderWindowInteractor.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWEvent.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWCheckButton.h"
 #include "vtkKWRadioButton.h"
+#include "vtkKWScale.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTclInteractor.h"
-
-#include "vtkToolkits.h"
-#include "vtkDirectory.h"
-#include "vtkMath.h"
-#include "vtkKWEvent.h"
-
-#include "vtkPVSource.h"
-#include "vtkPVData.h"
-#include "vtkPVSourceCollection.h"
-#include "vtkPVReaderModule.h"
-#include "vtkPVSourceInterfaceDirectories.h"
-#include "vtkPVAnimationInterface.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVFileEntry.h"
-#include "vtkPVWizard.h"
-#include "vtkPVXMLPackageParser.h"
-#include "vtkPVTimerLogDisplay.h"
-#include "vtkPVErrorLogDisplay.h"
-
-#include "vtkPVDemoPaths.h"
-
-#include "vtkPVSourceInterfaceDirectories.h"
-#include "vtkPVAnimationInterface.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVFileEntry.h"
-#include "vtkPVWizard.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkGenericRenderWindowInteractor.h"
-#include "vtkPVInteractorStyleTranslateCamera.h"
-#include "vtkPVInteractorStyleRotateCamera.h"
-#include "vtkPVInteractorStyleCenterOfRotation.h"
-//#include "vtkInteractorStyleTrackballCamera.h"
-#include "vtkPVInteractorStyleFly.h"
-
-#include "vtkAxes.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
-
-#include "vtkArrayMap.txx"
+#include "vtkKWToolbar.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
-
-#include <ctype.h>
-#include <sys/stat.h>
+#include "vtkMath.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterface.h"
+#include "vtkPVAnimationInterface.h"
+#include "vtkPVApplication.h"
+#include "vtkPVData.h"
+#include "vtkPVDefaultModules.h"
+#include "vtkPVDemoPaths.h"
+#include "vtkPVErrorLogDisplay.h"
+#include "vtkPVFileEntry.h"
+#include "vtkPVFileEntry.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkPVInteractorStyleCenterOfRotation.h"
+#include "vtkPVInteractorStyleFly.h"
+#include "vtkPVInteractorStyleRotateCamera.h"
+#include "vtkPVInteractorStyleTranslateCamera.h"
+#include "vtkPVReaderModule.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
+#include "vtkPVSourceCollection.h"
+#include "vtkPVSourceInterfaceDirectories.h"
+#include "vtkPVSourceInterfaceDirectories.h"
+#include "vtkPVTimerLogDisplay.h"
+#include "vtkPVWizard.h"
+#include "vtkPVWizard.h"
+#include "vtkPVXMLPackageParser.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkToolkits.h"
 
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
 #endif
 
-#include "vtkPVDefaultModules.h"
-
+#include <ctype.h>
+#include <sys/stat.h>
 
 #ifndef VTK_USE_ANSI_STDLIB
 #define PV_NOCREATE | ios::nocreate

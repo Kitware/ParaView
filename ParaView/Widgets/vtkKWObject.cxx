@@ -39,13 +39,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include <stdarg.h>
-#include "vtkTclUtil.h"
+#include "vtkKWObject.h"
+
 #include "vtkKWApplication.h"
 #include "vtkKWEvent.h"
-#include "vtkKWObject.h"
+#include "vtkKWSerializer.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkTclUtil.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
@@ -113,7 +113,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.17 $");
+  this->ExtractRevision(os,"$Revision: 1.18 $");
 }
 
 void vtkKWObject::Serialize(istream& is)

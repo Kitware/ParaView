@@ -49,11 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVBoundsDisplay_h
 
 #include "vtkPVWidget.h"
-#include "vtkKWBoundsDisplay.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkPVInputMenu.h"
 
 class vtkKWApplication;
+class vtkKWBoundsDisplay;
+class vtkPVInputMenu;
 
 class VTK_EXPORT vtkPVBoundsDisplay : public vtkPVWidget
 {
@@ -68,7 +67,7 @@ public:
 
   // Description:
   // The bounds display gets its data object from the input menu.
-  vtkSetObjectMacro(InputMenu, vtkPVInputMenu);
+  virtual void SetInputMenu(vtkPVInputMenu*);
   vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
 
   // Description:
@@ -77,7 +76,7 @@ public:
 
   // Description:
   // Access to the KWWidget.  
-  vtkSetObjectMacro(Widget, vtkKWBoundsDisplay);
+  virtual void SetWidget(vtkKWBoundsDisplay*);
   vtkGetObjectMacro(Widget, vtkKWBoundsDisplay);
 
   // Description:
@@ -97,8 +96,9 @@ public:
   // a new instance of the same type as the current object
   // using NewInstance() and then copy some necessary state 
   // parameters.
-  vtkPVBoundsDisplay* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  vtkPVBoundsDisplay* 
+    ClonePrototype(vtkPVSource* pvSource,
+		   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:

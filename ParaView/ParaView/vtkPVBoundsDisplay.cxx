@@ -39,15 +39,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkPVBoundsDisplay.h"
-#include "vtkKWLabel.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVData.h"
-#include "vtkPVSource.h"
-#include "vtkObjectFactory.h"
+
 #include "vtkArrayMap.txx"
+#include "vtkKWApplication.h"
+#include "vtkKWBoundsDisplay.h"
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVData.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+
+vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
+vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
 
 //----------------------------------------------------------------------------
 vtkPVBoundsDisplay* vtkPVBoundsDisplay::New()

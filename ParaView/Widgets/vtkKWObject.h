@@ -55,15 +55,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class vtkKWApplication;
 #include "vtkObject.h"
-#include "vtkKWSerializer.h"
-
-// var args
-#ifndef _WIN32
-#include <unistd.h>
-#endif
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
 #include "tcl.h"
 
 class VTK_EXPORT vtkKWObject : public vtkObject

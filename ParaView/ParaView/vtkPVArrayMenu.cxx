@@ -39,15 +39,20 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-
 #include "vtkPVArrayMenu.h"
-#include "vtkObjectFactory.h"
-#include "vtkKWMessageDialog.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVData.h"
-#include "vtkPVSource.h"
+
 #include "vtkArrayMap.txx"
+#include "vtkDataSet.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVApplication.h"
+#include "vtkPVData.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkDataArray.h"
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu,InputMenu, vtkPVInputMenu);
 

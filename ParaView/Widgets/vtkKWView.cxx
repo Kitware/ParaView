@@ -39,37 +39,39 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWView.h"
-#include "vtkKWWindow.h"
-#include "vtkWindow.h"
-#include "vtkKWSaveImageDialog.h"
-#include "vtkBMPWriter.h"
-#include "vtkPNMWriter.h"
-#include "vtkPNGWriter.h"
-#include "vtkJPEGWriter.h"
-#include "vtkTIFFWriter.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkViewport.h"
-#include "vtkKWGenericComposite.h"
+
 #include "vtkActor2D.h"
-#include "vtkPostScriptWriter.h"
-#include "vtkKWMessageDialog.h"
+#include "vtkBMPWriter.h"
+#include "vtkJPEGWriter.h"
+#include "vtkKWApplication.h"
+#include "vtkKWChangeColorButton.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWCompositeCollection.h"
 #include "vtkKWCornerAnnotation.h"
+#include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
+#include "vtkKWGenericComposite.h"
+#include "vtkKWIcon.h"
+#include "vtkKWMenu.h"
+#include "vtkKWMessageDialog.h"
+#include "vtkKWProgressGauge.h"
+#include "vtkKWSaveImageDialog.h"
+#include "vtkKWSerializer.h"
+#include "vtkKWText.h"
+#include "vtkKWWidgetCollection.h"
+#include "vtkKWWindow.h"
+#include "vtkPNGWriter.h"
+#include "vtkPNMWriter.h"
+#include "vtkPostScriptWriter.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
-#include "vtkKWProgressGauge.h"
-#include "vtkKWMenu.h"
-#include "vtkKWEvent.h"
-#include "vtkKWIcon.h"
-#include "vtkWindow.h"
-#include "vtkKWCompositeCollection.h"
-#include "vtkKWWidgetCollection.h"
+#include "vtkTIFFWriter.h"
 #include "vtkTextActor.h"
-#include "vtkKWText.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWChangeColorButton.h"
-#include "vtkKWEntry.h"
+#include "vtkViewport.h"
+#include "vtkWindow.h"
+#include "vtkWindow.h"
+#include "vtkWindowToImageFilter.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -1322,7 +1324,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.66 $");
+  this->ExtractRevision(os,"$Revision: 1.67 $");
 }
 
 void vtkKWView::SetupMemoryRendering(

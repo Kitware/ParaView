@@ -40,13 +40,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVExtractGeometryByScalar.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVComponentSelection.h"
-#include "vtkPVWindow.h"
+
+#include "vtkDataSet.h"
 #include "vtkKWCompositeCollection.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkPVData.h"
 #include "vtkKWFrame.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVComponentSelection.h"
+#include "vtkPVData.h"
+#include "vtkPVWindow.h"
 
 int vtkPVExtractGeometryByScalarCommand(ClientData cd, Tcl_Interp *interp,
                                         int argc, char *argv[]);

@@ -41,22 +41,27 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVData.h"
 
-#include "vtkKWMenuButton.h"
-#include "vtkKWView.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVApplication.h"
-#include "vtkPVSource.h"
-#include "vtkPVWindow.h"
-
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkKWBoundsDisplay.h"
+#include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWMenuButton.h"
 #include "vtkKWNotebook.h"
+#include "vtkKWOptionMenu.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWScale.h"
+#include "vtkKWView.h"
 #include "vtkKWWidget.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSource.h"
+#include "vtkPVWindow.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProperty.h"
 #include "vtkScalarBarActor.h"
@@ -66,6 +71,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
+
+vtkCxxSetObjectMacro(vtkPVData,View, vtkKWView);
 
 
 //----------------------------------------------------------------------------

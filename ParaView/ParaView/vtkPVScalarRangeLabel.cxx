@@ -41,13 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVScalarRangeLabel.h"
 
+#include "vtkDataArray.h"
 #include "vtkKWApplication.h"
-#include "vtkPVInputMenu.h"
-#include "vtkPVData.h"
 #include "vtkKWLabel.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
-#include "vtkPVXMLElement.h"
+#include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
+#include "vtkPVData.h"
+#include "vtkPVInputMenu.h"
+#include "vtkPVXMLElement.h"
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 

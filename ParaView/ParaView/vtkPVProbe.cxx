@@ -44,6 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkArrayMap.txx"
 #include "vtkIdTypeArray.h"
 #include "vtkKWCompositeCollection.h"
+#include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWToolbar.h"
 #include "vtkObjectFactory.h"

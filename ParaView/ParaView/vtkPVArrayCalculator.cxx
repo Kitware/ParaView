@@ -40,16 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVArrayCalculator.h"
-#include "vtkPVApplication.h"
-#include "vtkStringList.h"
-#include "vtkPVData.h"
-#include "vtkKWLabel.h"
-#include "vtkKWPushButton.h"
-#include "vtkPVWindow.h"
-#include "vtkObjectFactory.h"
+
 #include "vtkKWFrame.h"
-#include "vtkPVSourceCollection.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWPushButton.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
+#include "vtkPVSourceCollection.h"
+#include "vtkPVWindow.h"
+#include "vtkStringList.h"
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
