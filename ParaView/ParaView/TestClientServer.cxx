@@ -24,8 +24,8 @@
 #endif
 
 #include <kwsys/Process.h>
-#include <kwsys/std/string>
-#include <kwsys/std/vector>
+#include <kwsys/stl/string>
+#include <kwsys/stl/vector>
 
 void ReportCommand(const char* const* command, const char* name);
 int ReportStatus(kwsysProcess* process, const char* name);
@@ -49,14 +49,14 @@ int main(int argc, char* argv[])
     }
 
   // Location of the paraview executable.
-  kwsys_std::string paraview = PARAVIEW_BINARY_DIR;
+  kwsys_stl::string paraview = PARAVIEW_BINARY_DIR;
 #ifdef  CMAKE_INTDIR
   paraview += "/" CMAKE_INTDIR;
 #endif
   paraview += "/paraview";
 
   // Construct the server process command line.
-  kwsys_std::vector<const char*> serverCommand;
+  kwsys_stl::vector<const char*> serverCommand;
   serverCommand.push_back(paraview.c_str());
   serverCommand.push_back("--server");
   serverCommand.push_back(0);
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   kwsysProcess_SetCommand(server, &serverCommand[0]);
 
   // Construct the client process command line.
-  kwsys_std::vector<const char*> clientCommand;
+  kwsys_stl::vector<const char*> clientCommand;
   clientCommand.push_back(paraview.c_str());
   clientCommand.push_back("--client");
   for(int i=1; i < argc; ++i)
