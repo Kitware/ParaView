@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.15");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.16");
 
 
 //----------------------------------------------------------------------------
@@ -121,7 +121,6 @@ void vtkPVPartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
 
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
-  stream.Reset();
   stream << vtkClientServerStream::Invoke << geometryID
          << "GetOutput" << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID << "SetInput" 

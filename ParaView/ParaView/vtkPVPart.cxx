@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.37");
+vtkCxxRevisionMacro(vtkPVPart, "1.38");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -91,12 +91,11 @@ vtkPVPart::~vtkPVPart()
   if (this->VTKDataID.ID != 0)
     {
     vtkClientServerStream& stream = pm->GetStream();
-    stream.Reset();
     stream << vtkClientServerStream::Invoke << this->VTKDataID << "SetExtentTranslator" << 0 
            << vtkClientServerStream::End;
     pm->SendStreamToServer();
-    }  
-    
+    }
+
   this->SetName(NULL);
 
   this->DataInformation->Delete();
