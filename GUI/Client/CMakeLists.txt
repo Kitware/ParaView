@@ -88,6 +88,7 @@ SET( ParaViewClient_SRCS
   vtkPVExponentialKeyFrame.cxx
   vtkPVSinusoidKeyFrame.cxx
   vtkPVAnimationManager.cxx
+  vtkPVComparativeVisManager.cxx
   vtkPVHorizontalAnimationInterface.cxx
   vtkPVVerticalAnimationInterface.cxx
   vtkPVAnimationInterfaceEntry.cxx
