@@ -1,5 +1,6 @@
 PROJECT(Widgets)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
+
 SET( KWWidgets_SRCS
 ${VTK_TCL_HOME}/vtktcl.c
 vtkCornerAnnotation.cxx
@@ -91,6 +92,21 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE
   )
 
+IF (NOT DO_NOT_BUILD_XML_RW)
+  INCLUDE_DIRECTORIES(
+    ${KWCommon_SOURCE_DIR}/XML
+    ${Widgets_SOURCE_DIR}/XML
+  )
+  SET (KWWidgets_SRCS ${KWWidgets_SRCS}
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationReader.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationWriter.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetReader.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetWriter.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWWindowReader.cxx
+    ${Widgets_SOURCE_DIR}/XML/vtkXMLKWWindowWriter.cxx
+  )
+ENDIF (NOT DO_NOT_BUILD_XML_RW)
+
 OPTION(USE_INSTALLED_TCLTK_PACKAGES "Use the intalled Tcl/Tk packages instead of kwinit." OFF)
 MARK_AS_ADVANCED(USE_INSTALLED_TCLTK_PACKAGES)
 
@@ -114,7 +130,7 @@ IF (WIN32)
   )
 ENDIF (WIN32)
 
-VTK_WRAP_TCL(vtkKWWidgetsTCL KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
+VTK_WRAP_TCL2(vtkKWWidgetsTCL KWWidgetsTCL_SRCS ${KWWidgets_SRCS})
 ADD_LIBRARY(vtkKWWidgetsTCL ${KWWidgetsTCL_SRCS} ${KWWidgets_SRCS})
 
 TARGET_LINK_LIBRARIES (vtkKWWidgetsTCL
@@ -150,7 +166,3 @@ CONFIGURE_FILE(${KWWIDGETS_SOURCE_DIR}/vtkKWWidgetsConfigure.h.in ${KWWIDGETS_BI
 INCLUDE_DIRECTORIES(${KWWIDGETS_BINARY_DIR})
 
 INSTALL_TARGETS(/lib vtkKWWidgetsTCL)
-
-IF (NOT DO_NOT_BUILD_XML_RW)
-  SUBDIRS(XML)
-ENDIF (NOT DO_NOT_BUILD_XML_RW)

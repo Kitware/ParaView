@@ -18,6 +18,44 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE
   )
 
+IF (NOT DO_NOT_BUILD_XML_RW)
+  INCLUDE_DIRECTORIES(
+    ${KWCommon_SOURCE_DIR}/XML
+  )
+  SET (KWCommon_SRCS ${KWCommon_SRCS}
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLCameraReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLCameraWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLColorTransferFunctionReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLColorTransferFunctionWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLInteractorObserverReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLInteractorObserverWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropertyReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropertyWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarsToColorsReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarsToColorsWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLUtilities.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLVolumePropertyReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLVolumePropertyWriter.cxx
+  )
+  IF (VTK_USE_HYBRID)
+    SET (KWCommon_SRCS ${KWCommon_SRCS}
+      ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetReader.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetWriter.cxx
+    )
+  ENDIF (VTK_USE_HYBRID)
+  SET_SOURCE_FILES_PROPERTIES(
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
+    ABSTRACT
+  )
+ENDIF (NOT DO_NOT_BUILD_XML_RW)
+
 IF (WIN32)
   SET( KWCommon_SRCS ${KWCommon_SRCS}
     vtkKWWin32RegisteryUtilities.cxx
@@ -37,7 +75,7 @@ ELSE (WIN32)
     )
 ENDIF (WIN32)
 
-VTK_WRAP_TCL(vtkKWCommonTCL KWCommonTCL_SRCS ${KWCommon_SRCS})
+VTK_WRAP_TCL2(vtkKWCommonTCL KWCommonTCL_SRCS ${KWCommon_SRCS})
 ADD_LIBRARY(vtkKWCommonTCL ${KWCommonTCL_SRCS} ${KWCommon_SRCS})
 
 TARGET_LINK_LIBRARIES (vtkKWCommonTCL
@@ -55,6 +93,15 @@ ${TCL_LIBRARY}
 ${TK_LIBRARY}
 )
 
+IF (NOT DO_NOT_BUILD_XML_RW)
+  IF (VTK_USE_HYBRID)
+    TARGET_LINK_LIBRARIES (vtkKWCommonTCL
+      vtkHybridTCL 
+      vtkHybrid
+    )
+  ENDIF (VTK_USE_HYBRID)
+ENDIF (NOT DO_NOT_BUILD_XML_RW)
+
 INSTALL_TARGETS(/lib vtkKWCommonTCL)
 
 IF(BUILD_TESTING)
@@ -62,10 +109,6 @@ IF(BUILD_TESTING)
 ENDIF(BUILD_TESTING)
 
 SUBDIRS(Utilities)
-
-IF (NOT DO_NOT_BUILD_XML_RW)
-  SUBDIRS(XML)
-ENDIF (NOT DO_NOT_BUILD_XML_RW)
 
 OPTION(USE_NOTEBOOK_ICONS "Display Notebook with icons." OFF)
 MARK_AS_ADVANCED(USE_NOTEBOOK_ICONS)
