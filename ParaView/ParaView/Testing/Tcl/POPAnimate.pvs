@@ -99,8 +99,7 @@ $pvExtractGrid AcceptCallback
 
 
 #Rotate the camera
-set Ren1 [[[$Application GetMainWindow] GetMainView] GetRenderer]
-set cam [$Ren1 GetActiveCamera]
+set MainView [[$Application GetMainWindow] GetMainView]
 $cam SetFocalPoint 0 0 0
 
 for {set i 0} {$i < 360} { set i [expr $i + $RotationStep]} {

@@ -627,8 +627,8 @@ $kw(vtkTemp200) SetEventPosition 103 280
 $kw(vtkTemp100) OnRightButtonUp
 
 # Fix the size of the image.
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 

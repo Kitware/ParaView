@@ -51,8 +51,8 @@ $kw(vtkTemp1190) ColorByPointField {phi} 1
 $kw(vtkTemp18) SetCameraState 10.542 21.511 -16.692  4.000 4.000 4.000  0.972 -0.153 0.178
 
 # Fix the size of the image.
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 

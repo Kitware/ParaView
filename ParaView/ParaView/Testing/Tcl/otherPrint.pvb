@@ -1,7 +1,3 @@
-vtkDebugLeaks rtDebugLeaks
-rtDebugLeaks PromptUserOff
-rtDebugLeaks Delete
-
 vtkObject a
 a GlobalWarningDisplayOff
 a Delete

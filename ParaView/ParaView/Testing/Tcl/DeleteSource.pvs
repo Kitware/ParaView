@@ -40,7 +40,6 @@ proc decipadString { str before total } {
 
 
 set pvSphere [$pvWindow CreatePVSource SphereSource]
-set pm [$Application GetProcessModule]
 $pvSphere UpdateParameterWidgets
 $pvSphere AcceptCallback
 
@@ -63,8 +62,8 @@ if {[catch {set channel [open test.tmp w]}] == 0 } {
    source "[$Application GetTraceFileName]"
 }
 
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 250 250
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 250 250
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 $Application Exit

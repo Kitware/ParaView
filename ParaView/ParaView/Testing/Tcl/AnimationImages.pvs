@@ -48,8 +48,8 @@ $kw(vtkTemp187) SetTimeStart 20.000000
 $kw(vtkTemp187) SetTimeEnd 200.000000
 
 # Fix the size of the image
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 update
 #[[$Application GetMainWindow] GetMainView] ForceRender
 

@@ -128,8 +128,8 @@ if {[$Application GetExitStatus]} {
 $kw(vtkTemp44) SetCameraState -1.425 1.244 7.301  -0.500 0.000 0.000  0.018 0.986 -0.166
 
 # Fix the size of the image.
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 

@@ -150,8 +150,8 @@ if {[catch {set channel [open test.tmp w]}] == 0 } {
 }
 
 # Fix the size of the image.
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 [[$Application GetMainWindow] GetMainView] Render
 update
 

@@ -46,13 +46,8 @@ $elevOutput SetVisibility 1
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 $pvWindow SetCurrentPVSource $pvSphere
 
-set Ren1 [[[$Application GetMainWindow] GetMainView] GetRenderer]
-set camera [$Ren1 GetActiveCamera]
-$camera SetPosition 0 0 3.41078
-$camera SetFocalPoint 0 0 0
-$camera SetViewUp 0 1 0
-$camera SetViewAngle 30
-$camera SetClippingRange 2.38825 4.70618
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetCameraState 0 0 3.41078 0 0 0 0 1 0
 
 $elevOutput SetVisibility 1
 $extractOutput SetVisibility 1
@@ -69,13 +64,11 @@ if {[catch {set channel [open test.tmp w]}] == 0 } {
 }
 
 # Fix the size of the image.
-set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
-$RenWin1 SetSize 300 300
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
 update
-set Ren1 [[[$Application GetMainWindow] GetMainView] GetRenderer]
 for {set i 0} {$i < 100} {incr i 1} {
-	set camera [$Ren1 GetActiveCamera]
-	$camera Azimuth 10
+	[ $MainView GetCameraControl ] Azimuth 10
 	update
         [[$Application GetMainWindow] GetMainView] Render
 }
