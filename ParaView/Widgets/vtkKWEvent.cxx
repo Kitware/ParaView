@@ -85,6 +85,7 @@ static const char *vtkKWEventStrings[] = {
   "GradientOpacityFunctionPresetApplyEvent",
   "GradientOpacityStateChangedEvent",
   "GrayScaleImageEvent",
+  "HistogramChangedEvent",
   "ImageAngleVisibilityChangedEvent",
   "ImageBackgroundColorChangedEvent",
   "ImageCameraFocalPointAndPositionChangedEvent",

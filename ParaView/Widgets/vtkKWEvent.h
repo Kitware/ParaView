@@ -94,6 +94,7 @@ class VTK_EXPORT vtkKWEvent
     GradientOpacityFunctionPresetApplyEvent,
     GradientOpacityStateChangedEvent,
     GrayScaleImageEvent,
+    HistogramChangedEvent,
     ImageAngleVisibilityChangedEvent,
     ImageBackgroundColorChangedEvent,
     ImageCameraFocalPointAndPositionChangedEvent,
