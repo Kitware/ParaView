@@ -40,12 +40,31 @@ public:
   // properties. Overwritten by sub-classes.
   virtual void Update(vtkSMProperty*);
 
+  // Description:
+  vtkSetClampMacro(Mode, int, 0, 1);
+  vtkGetMacro(Mode, int);
+
+//BTX
+  enum Modes
+  {
+    NORMAL,
+    MAGNITUDE
+  };
+//ETX
+
 protected:
   vtkSMBoundsDomain();
   ~vtkSMBoundsDomain();
 
   void Update(vtkSMProxyProperty *pp);
+
+  // Description:
+  // Set the appropriate ivars from the xml element. Should
+  // be overwritten by subclass if adding ivars.
+  virtual int ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element);
   
+  int Mode;
+
 private:
   vtkSMBoundsDomain(const vtkSMBoundsDomain&); // Not implemented
   void operator=(const vtkSMBoundsDomain&); // Not implemented

@@ -17,11 +17,12 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
+#include "vtkProcessModule.h"
 
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.13");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.14");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -96,6 +97,95 @@ void vtkSMDoubleVectorProperty::AppendCommandToStream(
       *str << vtkClientServerStream::End;
       }
     }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDoubleVectorProperty::UpdateInformation( vtkClientServerID objectId )
+{
+  if (!this->InformationOnly)
+    {
+    return;
+    }
+
+  vtkClientServerStream str;
+  str << vtkClientServerStream::Invoke 
+      << objectId << this->Command
+      << vtkClientServerStream::End;
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(vtkProcessModule::DATA_SERVER, str, 0);
+
+  const vtkClientServerStream& res = pm->GetLastServerResult();
+
+  int numMsgs = res.GetNumberOfMessages();
+  if (numMsgs < 1)
+    {
+    return;
+    }
+
+  int numArgs = res.GetNumberOfArguments(0);
+  if (numArgs < 1)
+    {
+    return;
+    }
+
+  int argType = res.GetArgumentType(0, 0);
+
+  if (argType == vtkClientServerStream::float64_value ||
+      argType == vtkClientServerStream::float32_value)
+    {
+    double ires;
+    int retVal = res.GetArgument(0, 0, &ires);
+    if (!retVal)
+      {
+      vtkErrorMacro("Error getting argument.");
+      return;
+      }
+    this->SetNumberOfElements(1);
+    this->SetElement(0, ires);
+    }
+  else if (argType == vtkClientServerStream::float64_array)
+    {
+    vtkTypeUInt32 length;
+    res.GetArgumentLength(0, 0, &length);
+    if (length >= 128)
+      {
+      vtkErrorMacro("Only arguments of length 128 or less are supported");
+      return;
+      }
+    double values[128];
+    int retVal = res.GetArgument(0, 0, values, length);
+    if (!retVal)
+      {
+      vtkErrorMacro("Error getting argument.");
+      return;
+      }
+    this->SetNumberOfElements(length);
+    this->SetElements(values);
+    }
+  else if (argType == vtkClientServerStream::float32_array)
+    {
+    vtkTypeUInt32 length;
+    res.GetArgumentLength(0, 0, &length);
+    if (length >= 128)
+      {
+      vtkErrorMacro("Only arguments of length 128 or less are supported");
+      return;
+      }
+    float values[128];
+    int retVal = res.GetArgument(0, 0, values, length);
+    if (!retVal)
+      {
+      vtkErrorMacro("Error getting argument.");
+      return;
+      }
+    this->SetNumberOfElements(length);
+    for (unsigned int i=0; i<length; i++)
+      {
+      this->SetElement(i, values[i]);
+      }
+    }
+
 }
 
 //---------------------------------------------------------------------------

@@ -1702,6 +1702,11 @@
         repeat_command="1"
         number_of_elements_per_command="1"
         use_index="1">
+          <BoundsDomain name="range" mode="magnitude">
+            <RequiredProperties>
+              <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </BoundsDomain>
      </DoubleVectorProperty>
    <!-- End Cut -->
    </SourceProxy>
@@ -1751,7 +1756,7 @@
         command="SetValue"
         number_of_elements="1"
         default_values="0.0" >
-          <ArrayRangeDomain name="array_range">
+          <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
@@ -1807,7 +1812,7 @@
         name="ThresholdBetween" 
         command="ThresholdBetween"
         number_of_elements="2">
-          <ArrayRangeDomain name="array_range">
+          <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>
@@ -1862,7 +1867,7 @@
         repeat_command="1"
         number_of_elements_per_command="1"
         use_index="1">
-          <ArrayRangeDomain name="array_range">
+          <ArrayRangeDomain name="range">
             <RequiredProperties>
                <Property name="Input" function="Input"/>
                <Property name="SelectInputScalars" function="ArraySelection"/>

@@ -137,6 +137,9 @@ protected:
   // modified properties.
   virtual void AppendCommandToStream(
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
+
+  // Description:
+  virtual void UpdateInformation(vtkClientServerID objectId);
 //ETX
 
   vtkSMDoubleVectorPropertyInternals* Internals;

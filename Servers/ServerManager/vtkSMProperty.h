@@ -148,6 +148,9 @@ protected:
   // modified properties.
   virtual void AppendCommandToStream(
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
+
+  // Description:
+  virtual void UpdateInformation(vtkClientServerID) {};
   //ETX
 
   // Description:
@@ -222,6 +225,10 @@ protected:
   // Set during xml parsing only. Do not use outside ReadXMLAttributes().
   vtkSMProxy* Proxy;
   void SetProxy(vtkSMProxy* proxy);
+
+  vtkSetMacro(InformationOnly, int);
+  vtkGetMacro(InformationOnly, int);
+  int InformationOnly;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

@@ -45,7 +45,7 @@ public:
 
   // Description:
   // Calls UpdateInformation() on all sources.
-  void UpdateInformation();
+  virtual void UpdateInformation();
 
   // Description:
   // Calls Update() on all sources. 
