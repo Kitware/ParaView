@@ -146,10 +146,16 @@ ELSE(VTK_USE_SYSTEM_ZLIB)
   SET(VTK_ZLIB_LIBRARIES vtkzlib)
   SET(VTK_ZLIB_INCLUDE_DIRS
     ${ParaView_SOURCE_DIR}/VTK/Utilities
-    ${ParaView_BINARY_DIR}/VTK/Utilities)
+    ${ParaView_BINARY_DIR}/VTK/Utilities
+    ${ParaView_SOURCE_DIR}/VTK
+    ${ParaView_BINARY_DIR}/VTK
+    )
   SET(VTKZLIB_INCLUDE_DIR
     ${ParaView_SOURCE_DIR}/VTK/Utilities
-    ${ParaView_BINARY_DIR}/VTK/Utilities)
+    ${ParaView_BINARY_DIR}/VTK/Utilities
+    ${ParaView_SOURCE_DIR}/VTK
+    ${ParaView_BINARY_DIR}/VTK
+    )
 ENDIF(VTK_USE_SYSTEM_ZLIB)
 
 #########################################################################
@@ -164,6 +170,7 @@ IF(PARAVIEW_USE_SYSTEM_HDF5)
 ELSE(PARAVIEW_USE_SYSTEM_HDF5)
 
   SET(PARAVIEW_HDF5_LIBRARIES vtkhdf5)
+  SET(HDF5_ZLIB_HEADER "vtk_zlib.h")
   SET(HDF5_INCLUDE_DIR 
     ${ParaView_SOURCE_DIR}/Utilities/hdf5
     ${ParaView_BINARY_DIR}/Utilities/hdf5)
