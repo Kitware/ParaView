@@ -25,6 +25,7 @@
 #include "vtkHierarchicalBoxDataSet.h"
 #include "vtkHierarchicalBoxOutlineFilter.h"
 #include "vtkImageData.h"
+#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutlineSource.h"
 #include "vtkPointData.h"
@@ -36,8 +37,10 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.27");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.28");
 vtkStandardNewMacro(vtkPVGeometryFilter);
+
+vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
 
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::vtkPVGeometryFilter ()
@@ -49,6 +52,11 @@ vtkPVGeometryFilter::vtkPVGeometryFilter ()
   this->NumberOfRequiredInputs = 0;
   this->DataSetSurfaceFilter = vtkDataSetSurfaceFilter::New();
   this->HierarchicalBoxOutline = vtkHierarchicalBoxOutlineFilter::New();
+
+  this->Controller = 0;
+  this->SetController(vtkMultiProcessController::GetGlobalController());
+
+  this->OutlineSource = vtkOutlineSource::New();
 }
 
 //----------------------------------------------------------------------------
@@ -56,6 +64,8 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter ()
 {
   this->DataSetSurfaceFilter->Delete();
   this->HierarchicalBoxOutline->Delete();
+  this->OutlineSource->Delete();
+  this->SetController(0);
 }
 
 //----------------------------------------------------------------------------
@@ -410,16 +420,64 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid* input)
   vtkPolyData *output = this->GetOutput();
   
   this->OutlineFlag = 1;
-  double bounds[6];
-  input->GetBounds(bounds);
-  
-  vtkOutlineSource *outline = vtkOutlineSource::New();
-  outline->SetBounds(bounds);
-  outline->Update();
-  
-  output->SetPoints(outline->GetOutput()->GetPoints());
-  output->SetLines(outline->GetOutput()->GetLines());
-  outline->Delete();
+
+  double bds[6];
+  int procid = 0;
+  int numProcs = 1;
+
+  if (this->Controller )
+    {
+    procid = this->Controller->GetLocalProcessId();
+    numProcs = this->Controller->GetNumberOfProcesses();
+    }
+
+  input->GetBounds(bds);
+
+  if ( procid )
+    {
+    // Satellite node
+    this->Controller->Send(bds, 6, 0, 792390);
+    }
+  else
+    {
+    int idx;
+    double tmp[6];
+
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Receive(tmp, 6, idx, 792390);
+      if (tmp[0] < bds[0])
+        {
+        bds[0] = tmp[0];
+        }
+      if (tmp[1] > bds[1])
+        {
+        bds[1] = tmp[1];
+        }
+      if (tmp[2] < bds[2])
+        {
+        bds[2] = tmp[2];
+        }
+      if (tmp[3] > bds[3])
+        {
+        bds[3] = tmp[3];
+        }
+      if (tmp[4] < bds[4])
+        {
+        bds[4] = tmp[4];
+        }
+      if (tmp[5] > bds[5])
+        {
+        bds[5] = tmp[5];
+        }
+      }
+    // only output in process 0.
+    this->OutlineSource->SetBounds(bds);
+    this->OutlineSource->Update();
+    
+    output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
+    output->SetLines(this->OutlineSource->GetOutput()->GetLines());
+    }
 }
 
 //----------------------------------------------------------------------------

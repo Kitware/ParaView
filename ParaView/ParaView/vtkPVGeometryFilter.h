@@ -31,6 +31,8 @@ class vtkImageData;
 class vtkStructuredGrid;
 class vtkRectilinearGrid;
 class vtkUnstructuredGrid;
+class vtkOutlineSource;
+class vtkMultiProcessController;
 
 class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataSource
 {
@@ -71,6 +73,11 @@ public:
   vtkGetMacro(GenerateCellNormals, int);
   vtkBooleanMacro(GenerateCellNormals, int);
 
+  // Description:
+  // Set and get the controller.
+  virtual void SetController(vtkMultiProcessController*);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
@@ -91,6 +98,8 @@ protected:
   int UseStrips;
   int GenerateCellNormals;
 
+  vtkMultiProcessController* Controller;
+  vtkOutlineSource *OutlineSource;
   vtkDataSetSurfaceFilter* DataSetSurfaceFilter;
   vtkHierarchicalBoxOutlineFilter* HierarchicalBoxOutline;
 
