@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.21");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.22");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -612,6 +612,9 @@ extern void vtkPatentedCS_Initialize(vtkClientServerInterpreter*);
 #endif
 extern void vtkPVFiltersCS_Initialize(vtkClientServerInterpreter*);
 extern void vtkParaViewServerCS_Initialize(vtkClientServerInterpreter*);
+#ifdef PARAVIEW_LINK_XDMF
+extern void vtkXdmfCS_Initialize(vtkClientServerInterpreter *);
+#endif
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::InitializeInterpreter()
@@ -639,6 +642,9 @@ void vtkPVProcessModule::InitializeInterpreter()
 #endif
   vtkPVFiltersCS_Initialize(this->Interpreter);
   vtkParaViewServerCS_Initialize(this->Interpreter);
+#ifdef PARAVIEW_LINK_XDMF
+  vtkXdmfCS_Initialize(this->Interpreter);
+#endif
 
   // Assign standard IDs.
   vtkPVApplication *app = this->GetPVApplication();

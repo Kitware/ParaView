@@ -39,17 +39,8 @@ SET( ParaViewExtraWrapper_SRCS
 )
 
 IF(XDMF_FOUND)
-  SET(XDMF_READER_HEADER)
-  FOREACH(dir ${XDMF_INCLUDE_DIRS})
-    IF(NOT XDMF_READER_HEADER)
-      IF(EXISTS ${dir}/vtkXdmfReader.h)
-        SET(XDMF_READER_HEADER ${dir}/vtkXdmfReader.h)
-      ENDIF(EXISTS ${dir}/vtkXdmfReader.h)
-    ENDIF(NOT XDMF_READER_HEADER)
-  ENDFOREACH(dir)
   SET(ParaViewServer_SRCS ${ParaViewServer_SRCS}
     vtkPVServerXDMFParameters.cxx
-    ${XDMF_READER_HEADER}
     )
 ENDIF(XDMF_FOUND)
 
@@ -394,7 +385,7 @@ ENDIF(PARAVIEW_USE_EXODUS)
 
 TARGET_LINK_LIBRARIES (vtkKWParaViewTCL vtkPVFiltersTCL vtkParaViewServerCS)
 IF(XDMF_FOUND)
-  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmfTCL)
+  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmfTCL vtkXdmfCS)
 ENDIF(XDMF_FOUND)
 IF(PARAVIEW_USE_ICE_T)
   TARGET_LINK_LIBRARIES(vtkKWParaViewTCL icet icet_mpi icet_strategies)
