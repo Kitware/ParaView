@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.111");
+vtkCxxRevisionMacro(vtkKWWindow, "1.112");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -928,23 +928,33 @@ void vtkKWWindow::UnRegister(vtkObjectBase *o)
 
 void vtkKWWindow::LoadScript()
 {
-  char *path = NULL;
+  vtkKWLoadSaveDialog* loadScriptDialog = vtkKWLoadSaveDialog::New();
+  this->RetrieveLastPath(loadScriptDialog, "LoadScriptLastPath");
+  loadScriptDialog->Create(this->Application,"");
+  loadScriptDialog->SaveDialogOff();
+  loadScriptDialog->SetTitle("Load Script");
+  loadScriptDialog->SetDefaultExt(this->ScriptExtension);
+  ostrstream filetypes;
+  filetypes << "{{" << this->ScriptType << " Scripts} {" 
+            << this->ScriptExtension << "}} {{All Files} {.*}}" << ends;
+  loadScriptDialog->SetFileTypes(filetypes.str());
+  filetypes.rdbuf()->freeze(0);
 
-  this->Script("tk_getOpenFile -title \"Load Script\" -filetypes {{{%s Script} {%s}}}", this->ScriptType, this->ScriptExtension);
-  path = vtkString::Duplicate(this->Application->GetMainInterp()->result);
-  if (vtkString::Length(path))
+  if (loadScriptDialog->Invoke() && 
+      vtkString::Length(loadScriptDialog->GetFileName()) > 0)
     {
-    FILE *fin = fopen(path,"r");
+    FILE *fin = fopen(loadScriptDialog->GetFileName(), "r");
     if (!fin)
       {
       vtkWarningMacro("Unable to open script file!");
       }
     else
       {
-      this->LoadScript(path);
+      this->SaveLastPath(loadScriptDialog, "LoadScriptLastPath");
+      this->LoadScript(loadScriptDialog->GetFileName());
       }
-    delete [] path;
     }
+  loadScriptDialog->Delete();
 }
 
 void vtkKWWindow::LoadScript(const char *path)
@@ -1118,7 +1128,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.111 $");
+  this->ExtractRevision(os,"$Revision: 1.112 $");
 }
 
 int vtkKWWindow::ExitDialog()
