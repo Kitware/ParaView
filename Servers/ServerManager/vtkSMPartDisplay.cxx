@@ -45,10 +45,9 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.16");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.17");
 
-
-//----------------------------------------------------------------------------s
+//----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
 {
   this->ProcessModule = NULL;
@@ -296,7 +295,8 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
 {
   int i;
   // hack until input uses proxy input.
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkPVProcessModule* pm =
+    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
   if ( !pm )
     {
     vtkErrorMacro("Set the ProcessModule before you connect.");
@@ -542,18 +542,19 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
     vtkWarningMacro("Trying to set a NULL input.");
     return;
     }
-    
+
   if (this->Source)
     {
     vtkErrorMacro("Input set already");
     return;
     }  
-    
+
   input->AddConsumer(0, this);  
   this->SetSource(input);
 
   // We need some flags (client flag) from process module subclass.
-  vtkPVProcessModule* pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkPVProcessModule* pm = 
+    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
   if ( !pm )
     {
     vtkErrorMacro("Set the ProcessModule before you connect.");
@@ -577,7 +578,7 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
            << input->GetPart(i)->GetID(0) << vtkClientServerStream::End;
     }
   pm->SendStream(vtkProcessModule::DATA_SERVER);
-  
+
   for (i = 0; i < num; ++i)
     {
     vtkPVClassNameInformation* cnInfo =
@@ -684,7 +685,6 @@ void vtkSMPartDisplay::SetColor(float r, float g, float b)
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }  
 
-
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::Update()
 {
@@ -724,8 +724,6 @@ void vtkSMPartDisplay::SetProcessModule(vtkPVProcessModule* pm)
   this->ProcessModule->Register(this);
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkSMPartDisplay::RemoveAllCaches()
 {
@@ -735,7 +733,6 @@ void vtkSMPartDisplay::RemoveAllCaches()
          << "RemoveAllCaches" << vtkClientServerStream::End; 
   pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
 }
-
 
 //----------------------------------------------------------------------------
 // Assume that this method is only called when the part is visible.

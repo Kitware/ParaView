@@ -21,7 +21,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.5");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -143,36 +143,13 @@ void vtkSMLookupTableProxy::Build()
 }
 
 //----------------------------------------------------------------------------
-void vtkSMLookupTableProxy::SetArrayName(const char* str)
-{
-  if (this->ArrayName == NULL && str == NULL)
-    {
-    return;
-    }
-  if (this->ArrayName && str && (!strcmp(this->ArrayName,str)))
-    {
-    return;
-    }
-  if (this->ArrayName)
-    {
-    delete [] this->ArrayName;
-    this->ArrayName = NULL;
-    }
-  if (str)
-    {
-    this->ArrayName = new char[strlen(str) + 1];
-    strcpy(this->ArrayName,str);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMLookupTableProxy::LabToXYZ(double Lab[3], double xyz[3])
+void vtkSMLookupTableProxy::LabToXYZ(double lab[3], double xyz[3])
 {
   
   //LAB to XYZ
-  double var_Y = ( Lab[0] + 16 ) / 116;
-  double var_X = Lab[1] / 500 + var_Y;
-  double var_Z = var_Y - Lab[2] / 200;
+  double var_Y = ( lab[0] + 16 ) / 116;
+  double var_X = lab[1] / 500 + var_Y;
+  double var_Z = var_Y - lab[2] / 200;
     
   if ( pow(var_Y,3) > 0.008856 ) var_Y = pow(var_Y,3);
   else var_Y = ( var_Y - 16 / 116 ) / 7.787;

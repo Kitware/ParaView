@@ -22,7 +22,7 @@
 #ifndef __vtkSMPartDisplay_h
 #define __vtkSMPartDisplay_h
 
-// A couple of additional represntations that vtkProperty does not handle.
+// A couple of additional representations that vtkProperty does not handle.
 #define VTK_OUTLINE 111
 #define VTK_VOLUME 222
 
@@ -206,7 +206,7 @@ public:
   // Saves the pipeline in a ParaView script.  This is similar
   // to saveing a trace, except only the last state is stored.
   virtual void SavePVState(ostream *file, const char* tclName, 
-                         vtkIndent indent);
+                           vtkIndent indent);
 
 protected:
   vtkSMPartDisplay();

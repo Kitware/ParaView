@@ -53,7 +53,7 @@ public:
   // This used to be in the ScalarBarWidget. However,
   // since it is used almost everytime Lookup table is needed,
   // I put ArrayName as an Ivar in this class. 
-  virtual void SetArrayName(const char* name);
+  vtkSetStringMacro(ArrayName);
   vtkGetStringMacro(ArrayName);
  
   virtual void SaveInBatchScript(ofstream* file);
