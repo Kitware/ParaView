@@ -80,36 +80,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWindow.h"
 
-class vtkPVRenderView;
+class vtkActor;
+class vtkAxes;
+class vtkGenericRenderWindowInteractor;
+class vtkInteractorStyleTrackballCamera;
+class vtkKWCheckButton;
+class vtkKWEntry;
+class vtkKWLabel;
+class vtkKWLabeledFrame;
 class vtkKWNotebook;
-class vtkKWToolbar;
-class vtkKWScale;
 class vtkKWPushButton;
 class vtkKWRadioButton;
-class vtkKWLabel;
-class vtkKWCheckButton;
-class vtkPVAnimationInterface;
 class vtkKWRotateCameraInteractor;
+class vtkKWScale;
 class vtkKWTclInteractor;
-class vtkPVTimerLogDisplay;
+class vtkKWToolbar;
+class vtkPVAnimationInterface;
+class vtkPVApplication;
+class vtkPVData;
+class vtkPVErrorLogDisplay;
 class vtkPVGenericRenderWindowInteractor;
-class vtkGenericRenderWindowInteractor;
-class vtkPVInteractorStyleTranslateCamera;
-class vtkPVInteractorStyleRotateCamera;
-class vtkInteractorStyleTrackballCamera;
 class vtkPVInteractorStyleCenterOfRotation;
 class vtkPVInteractorStyleFly;
-class vtkAxes;
-class vtkActor;
-class vtkPolyDataMapper;
-class vtkPVSourceCollection;
-class vtkPVXMLPackageParser;
+class vtkPVInteractorStyleRotateCamera;
+class vtkPVInteractorStyleTranslateCamera;
 class vtkPVReaderModule;
+class vtkPVRenderView;
 class vtkPVSource;
-class vtkPVData;
-class vtkKWLabeledFrame;
-class vtkPVApplication;
-class vtkKWEntry;
+class vtkPVSourceCollection;
+class vtkPVTimerLogDisplay;
+class vtkPVXMLPackageParser;
+class vtkPolyDataMapper;
 
 //BTX
 template <class key, class data> 
@@ -229,7 +230,8 @@ public:
   // Description:
 
   // Stuff for creating a log file for times.
-  void ShowLog();
+  void ShowTimerLog();
+  void ShowErrorLog();
   
   // Description:
   // Callback fronm the file menus "SaveData" entry.
@@ -369,6 +371,14 @@ public:
   // Return the main render window interactor.
   vtkGetObjectMacro(GenericInteractor, vtkPVGenericRenderWindowInteractor);
 
+  // Description:
+  // Popup the vtk warning message
+  virtual void WarningMessage(const char* message);
+  
+  // Description:
+  // Popup the vtk error message
+  virtual void ErrorMessage(const char* message);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -455,6 +465,7 @@ protected:
 
   vtkKWTclInteractor *TclInteractor;
   vtkPVTimerLogDisplay *TimerLogDisplay;
+  vtkPVErrorLogDisplay *ErrorLogDisplay;
 
   // Description:
   // This method gives the window an opportunity to get rid
@@ -492,11 +503,16 @@ protected:
   // Whether or not to read the default interfaces.
   int InitializeDefaultInterfaces;
 
+  // Description:
   // Utility function which return the position of the first '.'
   // from the right. Note that this returns a pointer offset
   // from the original pointer. DO NOT DELETE THE ORIGINAL POINTER
   // while using the extension.
   const char* ExtractFileExtension(const char* fname);
+
+  // Description:
+  // Create error log display.
+  void CreateErrorLogDisplay();
 
 private:
   static const char* StandardReaderInterfaces;

@@ -67,6 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWizard.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPVTimerLogDisplay.h"
+#include "vtkPVErrorLogDisplay.h"
 
 #include "vtkPVDemoPaths.h"
 
@@ -208,6 +209,7 @@ vtkPVWindow::vtkPVWindow()
   this->AnimationInterface->SetTraceReferenceCommand("GetAnimationInterface");
 
   this->TimerLogDisplay = NULL;
+  this->ErrorLogDisplay = NULL;
   this->TclInteractor = NULL;
 
   // Set the extension and the type (name) of the script for
@@ -310,6 +312,12 @@ vtkPVWindow::~vtkPVWindow()
     this->TimerLogDisplay = NULL;
     }
 
+  if (this->ErrorLogDisplay)
+    {
+    this->ErrorLogDisplay->Delete();
+    this->ErrorLogDisplay = NULL;
+    }
+
   if (this->TclInteractor)
     {
     this->TclInteractor->Delete();
@@ -339,6 +347,13 @@ void vtkPVWindow::CloseNoPrompt()
     this->TimerLogDisplay->SetMasterWindow(NULL);
     this->TimerLogDisplay->Delete();
     this->TimerLogDisplay = NULL;
+    }
+
+  if (this->ErrorLogDisplay )
+    {
+    this->ErrorLogDisplay->SetMasterWindow(NULL);
+    this->ErrorLogDisplay->Delete();
+    this->ErrorLogDisplay = NULL;
     }
 
   if (this->TclInteractor )
@@ -613,8 +628,12 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication *app)
 				    "parsed by the vtk executable");
   
   // Log stuff (not traced)
-  this->AdvancedMenu->InsertCommand(5, "Show Log", this, "ShowLog", 2,
-				    "Show log of render events and timing");
+  this->AdvancedMenu->InsertCommand(5, "Show Timer Log", this, "ShowTimerLog", 
+				    2, "Show log of render events and timing");
+              
+  // Log stuff (not traced)
+  this->AdvancedMenu->InsertCommand(5, "Show Error Log", this, "ShowErrorLog", 
+				    2, "Show log of all errors and warnings");
               
 
   this->AdvancedMenu->InsertCommand(7, "Open Package", this, "OpenPackage", 2,
@@ -2501,7 +2520,7 @@ vtkPVApplication *vtkPVWindow::GetPVApplication()
 
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ShowLog()
+void vtkPVWindow::ShowTimerLog()
 {
   if ( ! this->TimerLogDisplay )
     {
@@ -2512,6 +2531,25 @@ void vtkPVWindow::ShowLog()
     }
   
   this->TimerLogDisplay->Display();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ShowErrorLog()
+{
+  this->CreateErrorLogDisplay();  
+  this->ErrorLogDisplay->Display();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::CreateErrorLogDisplay()
+{
+  if ( ! this->ErrorLogDisplay )
+    {
+    this->ErrorLogDisplay = vtkPVErrorLogDisplay::New();
+    this->ErrorLogDisplay->SetTitle("Error Log");
+    this->ErrorLogDisplay->SetMasterWindow(this);
+    this->ErrorLogDisplay->Create(this->GetPVApplication());
+    }  
 }
 
 //----------------------------------------------------------------------------
@@ -2929,6 +2967,20 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   this->Script("%s entryconfigure \"Open Data File\" -state normal",
 	       this->MenuFile->GetWidgetName());
 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::WarningMessage(const char* message)
+{
+  this->CreateErrorLogDisplay();
+  this->ErrorLogDisplay->AppendError(message);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ErrorMessage(const char* message)
+{
+  this->CreateErrorLogDisplay();
+  this->ErrorLogDisplay->AppendError(message);
 }
 
 
