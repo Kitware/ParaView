@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
+#include "vtkPVPolyData.h"
 
 int vtkPVContourFilterCommand(ClientData cd, Tcl_Interp *interp,
 			      int argc, char *argv[]);
@@ -47,6 +48,11 @@ vtkPVContourFilter::vtkPVContourFilter()
   this->ContourValueLabel->SetParent(this);
   
   this->Contour = vtkContourFilter::New();
+  
+  vtkPVPolyData *pd = vtkPVPolyData::New();
+  pd->SetPolyData(this->Contour->GetOutput());
+  this->SetDataWidget(pd);
+  pd->Delete();
 }
 
 vtkPVContourFilter::~vtkPVContourFilter()
@@ -94,54 +100,6 @@ void vtkPVContourFilter::Create(vtkKWApplication *app, char *args)
 	       this->ContourValueEntry->GetWidgetName());
 }
 
-
-void vtkPVContourFilter::SetInput(vtkPVData *data)
-{
-  if (this->Input)
-    {
-    this->Input->UnRegister(this);
-    this->Input = NULL;
-    }
-  if (data)
-    {
-    data->Register(this);
-    this->Input = data;
-    }
-}
-
-
-// We need to look at our input to make our output.
-//  I was originally thinking of MakeObject, but this will do for now.
-vtkPVData *vtkPVContourFilter::GetDataWidget()
-{
-  if (this->DataWidget == NULL)
-    {
-    if (this->Input == NULL)
-      {
-      vtkErrorMacro("You must set the input before you get the output.");
-      return;
-      }
-    if (this->Input->IsA("vtkPVPolyData"))
-      {
-      vtkPVPolyData *pd = vtkPVPolyData::New();
-      pd->SetPolyData(this->Elevation->GetPolyDataOutput());
-      this->SetDataWidget(pd);
-      pd->Delete();
-      return this->DataWidget;    
-      }
-    if (this->Input->IsA("vtkPVImage"))
-      {
-      vtkPVImage *d = vtkPVImage::New();
-      d->SetImageData(this->Elevation->GetImageDataOutput());
-      this->SetDataWidget(d);
-      d->Delete();
-      return this->DataWidget;    
-      }
-    vtkErrorMacro("Have not implemented make object " << this->Input->GetClassName());
-  }
-
-  return this->DataWidget;
-}
 
 void vtkPVContourFilter::ContourValueChanged()
 {  

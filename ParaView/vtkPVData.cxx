@@ -81,8 +81,7 @@ void vtkPVData::Contour()
   float *range;
   
   contour = vtkPVContourFilter::New();
-  contour->SetInput(this);
-  // This should be eliminated.
+  // I would like to be seting a PVData as input to PVSource ...
   contour->GetContour()->SetInput(this->GetData());
   
   range = this->GetData()->GetScalarRange();

@@ -52,7 +52,6 @@ vtkPVImage* vtkPVImage::New()
 void vtkPVImage::Clip()
 {
   vtkPVImageClip *clip;
-  vtkPVImage *id;
   vtkPVComposite *newComp;
   int *extents;
   
@@ -67,12 +66,7 @@ void vtkPVImage::Clip()
   clip->GetImageClip()->SetOutputWholeExtent(extents);
   clip->GetImageClip()->Update();
 
-  id = vtkPVImage::New();
-  id->SetImageData(clip->GetImageClip()->GetOutput());
-  id->GetImageData()->Update();
-  
   newComp = vtkPVComposite::New();
-  newComp->SetData(id);
   newComp->SetSource(clip);
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
@@ -85,9 +79,8 @@ void vtkPVImage::Clip()
   
   window->SetCurrentDataComposite(newComp);
   
-  id->GetComposite()->GetView()->Render();
+  this->GetComposite()->GetView()->Render();
   
-  id->Delete();
   newComp->Delete();
   clip->Delete();
 }
@@ -95,7 +88,6 @@ void vtkPVImage::Clip()
 void vtkPVImage::Slice()
 {
   vtkPVImageSlice *slice;
-  vtkPVImage *id;
   vtkPVComposite *newComp;
   int *extents;
   
@@ -112,12 +104,7 @@ void vtkPVImage::Slice()
   slice->GetSlice()->SetOutputWholeExtent(extents);
   slice->GetSlice()->Update();
 
-  id = vtkPVImage::New();
-  id->SetImageData(slice->GetSlice()->GetOutput());
-  id->GetImageData()->Update();
-  
   newComp = vtkPVComposite::New();
-  newComp->SetData(id);
   newComp->SetSource(slice);
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
@@ -130,9 +117,8 @@ void vtkPVImage::Slice()
   
   window->SetCurrentDataComposite(newComp);
   
-  id->GetComposite()->GetView()->Render();
+  this->GetComposite()->GetView()->Render();
   
-  id->Delete();
   newComp->Delete();
   slice->Delete();
 }

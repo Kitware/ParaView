@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
+#include "vtkPVImage.h"
 
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -54,6 +55,11 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->ZDimension->SetParent(this);
   
   this->Slice = vtkImageClip::New();
+
+  vtkPVImage *d = vtkPVImage::New();
+  d->SetImageData(this->Slice->GetOutput());
+  this->SetDataWidget(d);
+  d->Delete();
 }
 
 vtkPVImageSlice::~vtkPVImageSlice()

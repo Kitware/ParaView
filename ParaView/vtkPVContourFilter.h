@@ -48,14 +48,6 @@ public:
 
   vtkGetObjectMacro(Contour, vtkContourFilter);
 
-  // Description:
-  // Set the input PVData.
-  void SetInput(vtkPVData *pvData);
-
-  // Description:
-  // Should be called pvOutput.
-  vtkPVData *GetDataWidget();
-  
 protected:
   vtkPVContourFilter();
   ~vtkPVContourFilter();

@@ -101,7 +101,7 @@ void vtkPVSlave::SimpleScript(char *event)
   vtkOutputWindow::GetInstance()->DisplayText("\n");
 #endif
   
-  //cerr << this->Controller->GetLocalProcessId() << ": interp (" << this->Interp << "): " << event << endl;  
+  cerr << this->Controller->GetLocalProcessId() << ": interp (" << this->Interp << "): " << event << endl;  
   
   if (Tcl_Eval(this->Interp, event) != TCL_OK)
     {

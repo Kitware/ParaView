@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
+#include "vtkPVImage.h"
 
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
 			  int argc, char *argv[]);
@@ -69,6 +70,11 @@ vtkPVImageClip::vtkPVImageClip()
   this->ClipZMaxLabel->SetParent(this);
   
   this->ImageClip = vtkImageClip::New();
+
+  vtkPVImage *d = vtkPVImage::New();
+  d->SetImageData(this->ImageClip->GetOutput());
+  this->SetDataWidget(d);
+  d->Delete();
 }
 
 vtkPVImageClip::~vtkPVImageClip()
