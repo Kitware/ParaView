@@ -27,12 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.1");
-
-
-
-//***************************************************************************
-//===========================================================================
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.2");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModule::vtkPVIceTRenderModule()
@@ -48,20 +43,20 @@ vtkPVIceTRenderModule::~vtkPVIceTRenderModule()
   vtkPVProcessModule * pm = this->ProcessModule;
 
   // Tree Composite
-   if (this->DisplayManagerID.ID && pm)
-     {
-     pm->DeleteStreamObject(this->DisplayManagerID);
-     pm->SendStream(vtkProcessModule::RENDER_SERVER);
-     this->DisplayManagerID.ID = 0;
-     }
-   if (this->CompositeID.ID && pm)
-     {
-     pm->DeleteStreamObject(this->CompositeID);
-     pm->SendStream(vtkProcessModule::CLIENT);
-     pm->DeleteStreamObject(this->CompositeID);
-     pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
-     this->CompositeID.ID = 0;
-     }
+  if (this->DisplayManagerID.ID && pm)
+    {
+    pm->DeleteStreamObject(this->DisplayManagerID);
+    pm->SendStream(vtkProcessModule::RENDER_SERVER);
+    this->DisplayManagerID.ID = 0;
+    }
+  if (this->CompositeID.ID && pm)
+    {
+    pm->DeleteStreamObject(this->CompositeID);
+    pm->SendStream(vtkProcessModule::CLIENT);
+    pm->DeleteStreamObject(this->CompositeID);
+    pm->SendStream(vtkProcessModule::RENDER_SERVER_ROOT);
+    this->CompositeID.ID = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
