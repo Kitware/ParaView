@@ -67,7 +67,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkPKdTree, "1.12");
+vtkCxxRevisionMacro(vtkPKdTree, "1.13");
 vtkStandardNewMacro(vtkPKdTree);
 
 const int vtkPKdTree::NoRegionAssignment = 0;   // default
@@ -728,6 +728,7 @@ int vtkPKdTree::DivideTest(int L, int R, int level)
 
   return 1;
 }
+
 int vtkPKdTree::DivideRegion(vtkKdNode *kd, int L, int level, int tag)
 {
   int R = L + kd->GetNumberOfCells() - 1;
@@ -753,22 +754,16 @@ int vtkPKdTree::DivideRegion(vtkKdNode *kd, int L, int level, int tag)
     // couldn't divide along maxdim - all points we're at same location
     // should probably try a different direction
 
+    kd->SetDim(3);  // indicates region is not divided 
     FreeItem(this->SubGroup);
     return 0;
     }
 
   float *newDataBounds = this->DataBounds(L, midpt, R);
-
-  if (newDataBounds == NULL)
-    {
-    FreeItem(this->SubGroup);
-    return -1;
-    }
-
   vtkKdNode *left = new vtkKdNode();
   vtkKdNode *right = new vtkKdNode();
 
-  int fail = ( (left == NULL) || (right == NULL) );
+  int fail = ( (newDataBounds == NULL) || (left == NULL) || (right == NULL) );
 
   if (this->AllCheckForFailure(fail, "Divide Region", "memory allocation"))
     {
@@ -1819,12 +1814,13 @@ void vtkPKdTree::CheckFixRegionBoundaries(vtkKdNode *tree)
     
   for (int dim=0; dim<3; dim++)
     {
+    if ((left->Min[dim] - tree->Min[dim]) != 0.0)  left->Min[dim] = tree->Min[dim];
+    if ((right->Max[dim] - tree->Max[dim]) != 0.0) right->Max[dim] = tree->Max[dim];
+
     if (dim != nextDim)  // the dimension I did *not* divide along
       {
-      if ((left->Min[dim] - tree->Min[dim]) != 0.0)  left->Min[dim] = tree->Min[dim];
       if ((left->Max[dim] - tree->Max[dim]) != 0.0)  left->Max[dim] = tree->Max[dim];
       if ((right->Min[dim] - tree->Min[dim]) != 0.0) right->Min[dim] = tree->Min[dim];
-      if ((right->Max[dim] - tree->Max[dim]) != 0.0) right->Max[dim] = tree->Max[dim];
       }
     else
       {
