@@ -64,11 +64,15 @@ public:
 
   static inline int GetRootId(int serverId)
     {
-      if (serverId > RENDER_SERVER)
+      if (serverId > CLIENT)
         {
         vtkGenericWarningMacro("Server ID correspond to either data or "
                                "render server");
         return 0;
+        }
+      if (serverId == CLIENT)
+        {
+        return CLIENT;
         }
       return serverId << 1;
     }
