@@ -71,32 +71,45 @@ vtkPVSourceInterface* vtkPVSourceInterface::New()
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVSourceInterface::CreateCallback()
 {
-  char sourceTclName[100];
+  char tclName[100];
+  vtkDataSet *d;
+  vtkPVData *pvd;
   vtkSource *s;
-  //vtkPVPolyDataSource *pvs;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVMethodInterface *mInt;
   
-  
   // Create the vtkSource.
-  sprintf(sourceTclName, "%s%d", this->RootName, this->InstanceCount);
-  ++this->InstanceCount;
-  // Create the object through tcl on process 0.
-  s = (vtkSource *)(pvApp->MakeTclObject(this->SourceClassName, sourceTclName));
+  sprintf(tclName, "%s%d", this->RootName, this->InstanceCount);
+  // Create the object through tcl on all processes.
+  s = (vtkSource *)(pvApp->MakeTclObject(this->SourceClassName, tclName));
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
     return NULL;
     }
   
+  
   pvs = vtkPVSource::New();
   pvs->SetApplication(pvApp);
   pvs->SetInterface(this);
   pvs->SetVTKSource(s);
-  pvs->SetVTKSourceTclName(sourceTclName);
-  pvs->SetName(sourceTclName);
+  pvs->SetVTKSourceTclName(tclName);
+  pvs->SetName(tclName);
 
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  sprintf(tclName, "%sOutput%d", this->RootName, this->InstanceCount);
+  // Create the object through tcl on all processes.
+  d = (vtkDataSet *)(pvApp->MakeTclObject(this->OutputClassName, tclName));
+  pvd ->SetVTKData(d);
+  pvd->SetVTKDataTclName(tclName);
+  
+  pvs->SetNthPVOutput(0, pvd);
+  pvd->SetPVSource(pvs);
+  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());   
+  
   // Set the input if necessary.
   if (this->InputClassName)
     {
@@ -178,6 +191,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   
   pvs->Delete();
 
+  ++this->InstanceCount;
   return pvs;
 } 
 

@@ -50,6 +50,8 @@ vtkPVSource::vtkPVSource()
 {
   this->CommandFunction = vtkPVSourceCommand;
   this->Name = NULL;
+
+  this->Initialized = 0;
   
   this->PVInputs = NULL;
   this->NumberOfPVInputs = 0;
@@ -1365,11 +1367,6 @@ void vtkPVSource::AddModeListItem(char *name, int value)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AddPVInputList()
-{
-  // We are going to have to figure out how the user can select an input.
-}
-//----------------------------------------------------------------------------
 void vtkPVSource::AcceptCallback()
 {
   int i;
@@ -1384,17 +1381,16 @@ void vtkPVSource::AcceptCallback()
     }  
   
   // Initialize the output if necessary.
-  if (this->GetPVOutput(0) == NULL && this->GetVTKSource())
+  if ( ! this->Initialized)
     { // This is the first time, initialize data.    
     vtkPVData *input;
     vtkPVActorComposite *ac;
     
-    input = this->GetNthPVInput(0);
-    this->InitializePVOutput(0);
     ac = this->GetPVOutput(0)->GetActorComposite();
     ac->ResetScalarRange();
     window->GetMainView()->AddComposite(ac);
     // Make the last data invisible.
+    input = this->GetNthPVInput(0);
     if (input)
       {
       input->GetActorComposite()->SetVisibility(0);
@@ -1406,6 +1402,7 @@ void vtkPVSource::AcceptCallback()
     
     // Remove the local grab
     this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
+    this->Initialized = 1;
     }
 
   window->GetMainView()->SetSelectedComposite(this);  
@@ -1824,100 +1821,6 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::AddPVInput(vtkPVData *input)
-{
-  int idx;
-  
-  if (input)
-    {
-    input->Register(this);
-    }
-  this->Modified();
-  
-  for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
-    {
-    if (this->PVInputs[idx] == NULL)
-      {
-      this->PVInputs[idx] = input;
-      return;
-      }
-    }
-  
-  this->SetNumberOfPVInputs(this->NumberOfPVInputs + 1);
-  this->PVInputs[this->NumberOfPVInputs - 1] = input;
-}
-
-//---------------------------------------------------------------------------
-void vtkPVSource::RemovePVInput(vtkPVData *input)
-{
-  int idx, loc;
-  
-  if (!input)
-    {
-    return;
-    }
-  
-  // find the input in the list of inputs
-  loc = -1;
-  for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
-    {
-    if (this->PVInputs[idx] == input)
-      {
-      loc = idx;
-      }
-    }
-  if (loc == -1)
-    {
-    vtkDebugMacro("tried to remove an input that was not in the list");
-    return;
-    }
-  
-  this->PVInputs[loc]->UnRegister(this);
-  this->PVInputs[loc] = NULL;
-
-  // if that was the last input, then shrink the list
-  if (loc == this->NumberOfPVInputs - 1)
-    {
-    this->SetNumberOfPVInputs(this->NumberOfPVInputs - 1);
-    }
-  
-  this->Modified();
-}
-
-//---------------------------------------------------------------------------
-void vtkPVSource::SqueezePVInputArray()
-{
-  int idx, loc;
-  
-  // move NULL entries to the end
-  for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
-    {
-    if (this->PVInputs[idx] == NULL)
-      {
-      for (loc = idx+1; loc < this->NumberOfPVInputs; loc++)
-        {
-        this->PVInputs[loc-1] = this->PVInputs[loc];
-        }
-      this->PVInputs[this->NumberOfPVInputs -1] = NULL;
-      }
-    }
-
-  // adjust the size of the array
-  loc = -1;
-  for (idx = 0; idx < this->NumberOfPVInputs; ++idx)
-    {
-    if (loc == -1 && this->PVInputs[idx] == NULL)
-      {
-      loc = idx;
-      }
-    }
-  if (loc > 0)
-    {
-    this->SetNumberOfPVInputs(loc);
-    }
-}
-
-//---------------------------------------------------------------------------
 void vtkPVSource::RemoveAllPVInputs()
 {
   if ( this->PVInputs )
@@ -1992,62 +1895,44 @@ void vtkPVSource::SetNumberOfPVOutputs(int num)
 }
 
 //---------------------------------------------------------------------------
-void vtkPVSource::AddPVOutput(vtkPVData *output)
+void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *pvd)
 {
-  int idx;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
-  if (output)
+  if (idx < 0)
     {
-    output->Register(this);
-    }
-  this->Modified();
-  
-  for (idx = 0; idx < this->NumberOfPVOutputs; ++idx)
-    {
-    if (this->PVOutputs[idx] == NULL)
-      {
-      this->PVOutputs[idx] = output;
-      return;
-      }
+    vtkErrorMacro(<< "SetNthPVOutput: " << idx << ", cannot set output. ");
+    return;
     }
   
-  this->SetNumberOfPVOutputs(this->NumberOfPVOutputs + 1);
-  this->PVOutputs[this->NumberOfPVOutputs - 1] = output;
-}
-
-//---------------------------------------------------------------------------
-void vtkPVSource::RemovePVOutput(vtkPVData *output)
-{
-  int idx, loc;
+  if (this->NumberOfPVOutputs <= idx)
+    {
+    this->SetNumberOfPVOutputs(idx+1);
+    }
   
-  if (!output)
+  // Does this change anything?  Yes, it keeps the object from being modified.
+  if (pvd == this->PVOutputs[idx])
     {
     return;
     }
   
-  // find the input in the list of inputs
-  loc = -1;
-  for (idx = 0; idx < this->NumberOfPVOutputs; ++idx)
+  if (this->PVOutputs[idx])
     {
-    if (this->PVOutputs[idx] == output)
-      {
-      loc = idx;
-      }
-    }
-  if (loc == -1)
-    {
-    vtkDebugMacro("tried to remove an output that was not in the list");
-    return;
+    this->PVOutputs[idx]->UnRegister(this);
+    this->PVOutputs[idx] = NULL;
     }
   
-  this->PVOutputs[loc]->UnRegister(this);
-  this->PVOutputs[loc] = NULL;
-
-  // if that was the last output, then shrink the list
-  if (loc == this->NumberOfPVOutputs - 1)
+  if (pvd)
     {
-    this->SetNumberOfPVOutputs(this->NumberOfPVOutputs - 1);
+    pvd->Register(this);
+    this->PVOutputs[idx] = pvd;
     }
+
+  // This is done in vtkPVSourceINterface::CreateCallback()
+  // Relay the change to the VTK objects.  
+  // This is where we will need a SetCommand from the interface ...
+  //pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
+  //			 pvd->GetVTKDataTclName());
   
   this->Modified();
 }
@@ -2067,56 +1952,4 @@ vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
 void vtkPVSource::Save(ofstream *file)
 {
 }
-
-//----------------------------------------------------------------------------
-void vtkPVSource::InitializePVOutput(int idx)
-{
-  // I imagine these will be passed in and will match the idx.
-  char *setCmd = "SetOutput";
-  char *getCmd = "GetOutput";
-  char *result;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVData *input;
-  vtkPVPolyData *pvd;
-  
-  if (this->VTKSourceTclName == NULL)
-    {
-    vtkErrorMacro("VTK object does not exist");
-    return;
-    }
-
-  // Expand array if necessary.
-  if (idx >= this->NumberOfPVOutputs)
-    {
-    this->SetNumberOfPVOutputs(idx + 1);
-    }
-  
-  if (this->PVOutputs[idx])
-    {
-    vtkErrorMacro("A PVOutput already exists.");
-    return;
-    }  
-  
-  // Get the type of the output.
-  this->Script("[%s %s] GetClassName", this->VTKSourceTclName, getCmd);
-  result = pvApp->GetMainInterp()->result;
-  if (strcmp(result, "vtkPolyData") == 0)
-    {
-    // Create the PVData object.
-    pvd = vtkPVPolyData::New();
-    }
-  
-  pvd->CreateParallelTclObjects(pvApp);
-  pvd->SetApplication(pvApp);
-  
-  this->PVOutputs[idx] = pvd;
-  pvd->Register(this);
-  // Manage double pointer.
-  pvd->SetPVSource(this);
-  pvApp->BroadcastScript("%s SetOutput %s", this->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());    
-
-}
-
-
 

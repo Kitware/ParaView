@@ -46,9 +46,9 @@ public:
   vtkTypeMacro(vtkPVData, vtkKWWidget);
 
   // Description:
-  // Call this after the object has been constructed.  We need this
-  // because the constructor does not take an argument.
-  void CreateParallelTclObjects(vtkPVApplication *pvApp);
+  // This also creates the parallel vtk objects for the composite.
+  // (actor, mapper, ...)
+  void SetApplication(vtkPVApplication *pvApp);
   
   // Description:
   // Just like in vtk data objects, this method makes a data object
@@ -76,9 +76,21 @@ public:
   vtkPVApplication *GetPVApplication();
 
   // Description:
-  // A generic way of getting the data.
-  vtkGetObjectMacro(VTKData,vtkDataSet);
+  // This is for setting up the links between VTK objects and PV object.
+  // This call also sets the input to the mapper.
+  // SetVTKData should be called after the application has been set, but before
+  // PVData is used as input a filter or output of a source.
+  // We could change the object so that it creates its own data (durring initialization), 
+  // but then we would have to tell it what type of data to create.
+  vtkSetObjectMacro(VTKData,vtkDataSet);  
+  vtkGetObjectMacro(VTKData,vtkDataSet);  
 
+  // Description:
+  // The tcl name of the vtk data object.  This should be the primary method of 
+  // manipulating the data since it exists on all processes.
+  void SetVTKDataTclName(const char *name);
+  vtkGetStringMacro(VTKDataTclName);  
+  
   // Description:
   // Uses the assignment to set the extent, then updates the data.
   virtual void Update();
@@ -101,16 +113,6 @@ public:
   // Do not call this method directly.
   void TransmitNumberOfCells();
   
-  // Description:
-  // This is for setting up the links between VTK objects and PV object.
-  // Subclasses overide this method so that they can create special
-  // mappers for the actor composites.  The user should not call this method.
-  vtkSetObjectMacro(VTKData, vtkDataSet);  
-  
-  // Description:
-  // The tcl name of the vtk data object.
-  vtkGetStringMacro(VTKDataTclName);  
-  
   void ShowActorComposite();
   
   // Description:
@@ -131,7 +133,6 @@ protected:
   
   vtkDataSet *VTKData;
   char *VTKDataTclName;
-  vtkSetStringMacro(VTKDataTclName);
   
   vtkPVActorComposite *ActorComposite;
   vtkKWPushButton *ActorCompositeButton;

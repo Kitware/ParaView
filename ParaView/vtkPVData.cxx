@@ -56,13 +56,6 @@ vtkPVData::vtkPVData()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
-{
-  this->ActorComposite->CreateParallelTclObjects(pvApp);
-  this->ActorComposite->SetInput(this);
-}
-
-//----------------------------------------------------------------------------
 vtkPVData::~vtkPVData()
 {
   this->SetVTKDataTclName(NULL);
@@ -86,6 +79,45 @@ vtkPVData* vtkPVData::New()
 {
   return new vtkPVData();
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetApplication(vtkPVApplication *pvApp)
+{
+  this->ActorComposite->CreateParallelTclObjects(pvApp);
+  this->vtkKWWidget::SetApplication(pvApp);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetVTKDataTclName(const char *tclName)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (pvApp == NULL)
+    {
+    vtkErrorMacro("Set the application before you set the VTKDataTclName.");
+    return;
+    }
+  
+  if (this->VTKDataTclName)
+    {
+    delete [] this->VTKDataTclName;
+    this->VTKDataTclName = NULL;
+    }
+  if (tclName)
+    {
+    this->VTKDataTclName = new char[strlen(tclName) + 1];
+    strcpy(this->VTKDataTclName, tclName);
+
+    // This is why we need a special method.  The actor comoposite can't set its input until
+    // the data tcl name is set.  These dependancies on the order things are set
+    // leads me to think there sould be one initialize method which sets all the variables.
+    
+    this->ActorComposite->SetInput(this);
+    }
+}
+
+
 
 
 //----------------------------------------------------------------------------

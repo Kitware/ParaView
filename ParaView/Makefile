@@ -25,9 +25,7 @@ vtkInteractorStyleSphere \
 vtkPVActorComposite \
 vtkPVApplication \
 vtkPVData \
-vtkPVImageData \
 vtkPVMethodInterface \
-vtkPVPolyData \
 vtkPVRenderView \
 vtkPVSelectionList \
 vtkPVSource \

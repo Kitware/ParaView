@@ -32,15 +32,9 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
-int vtkPVImageDataCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVImageDataNewCommand();
 int vtkPVMethodInterfaceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVMethodInterfaceNewCommand();
-int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVPolyDataNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
@@ -118,12 +112,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
-  vtkTclCreateNew(interp,(char *) "vtkPVImageData", vtkPVImageDataNewCommand,
-                  vtkPVImageDataCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVMethodInterface", vtkPVMethodInterfaceNewCommand,
                   vtkPVMethodInterfaceCommand);
-  vtkTclCreateNew(interp,(char *) "vtkPVPolyData", vtkPVPolyDataNewCommand,
-                  vtkPVPolyDataCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVSelectionList", vtkPVSelectionListNewCommand,

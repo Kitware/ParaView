@@ -95,12 +95,12 @@ public:
   vtkPVData **GetPVInputs() { return this->PVInputs; };
   vtkPVData *GetNthPVInput(int idx);
   vtkGetMacro(NumberOfPVInputs, int);
-  void SqueezePVInputArray();
   void RemoveAllPVInputs();
   
   vtkPVData **GetPVOutputs() { return this->PVOutputs; };
   vtkPVData *GetNthPVOutput(int idx);
   vtkGetMacro(NumberOfPVOutputs, int);
+  void SetNthPVOutput(int idx, vtkPVData *output);
   
   // Description:
   // This just returns the application typecast correctly.
@@ -110,12 +110,6 @@ public:
   // Sources have no props.
   vtkProp *GetProp() {return NULL;}  
 
-  // Description:
-  // Creates the output and assignment.
-  // If there is an input, it uses its assignement. 
-  // Otherwise, it creates a new one.
-  virtual void InitializePVOutput(int idx);
-  
   // Description:
   // Called when the accept button is pressed.
   virtual void AcceptCallback();
@@ -187,11 +181,6 @@ public:
   void AddModeListItem(char *name, int value);
 
   // Description:
-  // This will add a selection list that allows the user to select an input.
-  // It does not work right now.  It does add a method interface however.
-  void AddPVInputList();
-  
-  // Description:
   // Set the vtk source that will be a part of the pipeline.
   // The pointer to this class is used as little as possible.
   // (VTKSourceTclName is used instead.)
@@ -232,28 +221,22 @@ protected:
   ~vtkPVSource();
   vtkPVSource(const vtkPVSource&) {};
   void operator=(const vtkPVSource&) {};
-  
-  void AddPVOutput(vtkPVData *output);
-  void RemovePVOutput(vtkPVData *output);
-  
-  vtkPVData **PVOutputs;
-  int NumberOfPVOutputs;
-  
-  // Called to allocate the output array.  Copies old outputs.
-  void SetNumberOfPVOutputs(int num);
+
+  // This flag gets set after the user hits accept for the first time.
+  int Initialized;
   
   vtkSource *VTKSource;
   char *VTKSourceTclName;
 
-  vtkPVData **PVInputs;
-  int NumberOfPVInputs;
+  // Called to allocate the output array.  Copies old outputs.
+  void SetNumberOfPVOutputs(int num);
+  vtkPVData **PVOutputs;
+  int NumberOfPVOutputs;  
   
   // Called to allocate the input array.  Copies old inputs.
   void SetNumberOfPVInputs(int num);
-  
-  // protected methods for setting inputs.
-  void AddPVInput(vtkPVData *input);
-  void RemovePVInput(vtkPVData *input);
+  vtkPVData **PVInputs;
+  int NumberOfPVInputs;
   
   // The name is just for display.
   char      *Name;
