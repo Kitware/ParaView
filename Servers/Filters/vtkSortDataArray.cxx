@@ -34,7 +34,7 @@
 // -------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSortDataArray);
-vtkCxxRevisionMacro(vtkSortDataArray,"1.1");
+vtkCxxRevisionMacro(vtkSortDataArray,"1.2");
 
 vtkSortDataArray::vtkSortDataArray()
 {
@@ -52,8 +52,8 @@ void vtkSortDataArray::PrintSelf(ostream &os, vtkIndent indent)
 // Sorting templates -------------------------------------------------------
 
 template<class TKey, class TValue>
-static inline void swap(TKey *keys, TValue *values, int tupleSize,
-                        vtkIdType index1, vtkIdType index2)
+inline void vtkSortDataArraySwap(TKey *keys, TValue *values, int tupleSize,
+                                 vtkIdType index1, vtkIdType index2)
 {
   TKey tmpkey;
   TValue tmpvalue;
@@ -74,32 +74,32 @@ static inline void swap(TKey *keys, TValue *values, int tupleSize,
     }
 }
 template<class TKey, class TValue>
-static void bubble_sort(TKey *keys, TValue *values,
-                        vtkIdType size, int tupleSize)
+void vtkSortDataArrayBubbleSort(TKey *keys, TValue *values,
+                                vtkIdType size, int tupleSize)
 {
   for (int i = 1; i < size; i++)
     {
     for (int j = i; (j > 0) && (keys[j] < keys[j-1]); j--)
       {
-      swap(keys, values, tupleSize, j, j-1);
+      vtkSortDataArraySwap(keys, values, tupleSize, j, j-1);
       }
     }
 }
 template<class TKey, class TValue>
-static void quick_sort(TKey *keys, TValue *values,
-                       vtkIdType size, int tupleSize)
+void vtkSortDataArrayQuickSort(TKey *keys, TValue *values,
+                               vtkIdType size, int tupleSize)
 {
   while (1)
     {
     if (size < 8)
       {
-      bubble_sort(keys, values, size, tupleSize);
+      vtkSortDataArrayBubbleSort(keys, values, size, tupleSize);
       return;
       }
 
     vtkIdType pivot = (vtkIdType)(vtkMath::Random(0, size));
     //vtkIdType pivot = size/2;
-    swap(keys, values, tupleSize, 0, pivot);
+    vtkSortDataArraySwap(keys, values, tupleSize, 0, pivot);
     // Pivot now stored at index 0.
 
     vtkIdType left = 1;
@@ -109,27 +109,28 @@ static void quick_sort(TKey *keys, TValue *values,
       while ((left <= right) && (keys[left] <= keys[0])) left++;
       while ((left <= right) && (keys[right] >= keys[0])) right--;
       if (left > right) break;
-      swap(keys, values, tupleSize, left, right);
+      vtkSortDataArraySwap(keys, values, tupleSize, left, right);
       }
 
     // Place the pivot back in the middle
-    swap(keys, values, tupleSize, 0, left-1);
+    vtkSortDataArraySwap(keys, values, tupleSize, 0, left-1);
 
     // Recurse
-    quick_sort(keys + left, values + left*tupleSize, size-left, tupleSize);
+    vtkSortDataArrayQuickSort(keys + left, values + left*tupleSize,
+                              size-left, tupleSize);
     size = left-1;
     }
 }
 
 template<class TKey, class TValue>
-static inline void arraysort00(TKey *keys, TValue *values,
-                               vtkIdType array_size, int tuple_size)
+inline void vtkSortDataArraySort00(TKey *keys, TValue *values,
+                                   vtkIdType array_size, int tuple_size)
 {
-  quick_sort(keys, values, array_size, tuple_size);
+  vtkSortDataArrayQuickSort(keys, values, array_size, tuple_size);
 }
 
 template<class TKey>
-static void arraysort01(TKey *keys, vtkDataArray *values, int array_size)
+void vtkSortDataArraySort01(TKey *keys, vtkDataArray *values, int array_size)
 {
   if (array_size != values->GetNumberOfTuples())
     {
@@ -139,14 +140,15 @@ static void arraysort01(TKey *keys, vtkDataArray *values, int array_size)
 
   switch (values->GetDataType())
     {
-    vtkTemplateMacro4(arraysort00, keys, (VTK_TT *)values->GetVoidPointer(0),
-                      array_size, values->GetNumberOfComponents());
+    vtkTemplateMacro(
+      vtkSortDataArraySort00(keys, (VTK_TT *)values->GetVoidPointer(0),
+                             array_size, values->GetNumberOfComponents()));
     }
 }
 
 template<class TValue>
-static void arraysort10(vtkDataArray *keys, TValue *values,
-                        int array_size, int tuple_size)
+void vtkSortDataArraySort10(vtkDataArray *keys, TValue *values,
+                            int array_size, int tuple_size)
 {
   if (array_size != keys->GetNumberOfTuples())
     {
@@ -162,21 +164,23 @@ static void arraysort10(vtkDataArray *keys, TValue *values,
 
   switch (keys->GetDataType())
     {
-    vtkTemplateMacro4(arraysort00, (VTK_TT*)keys->GetVoidPointer(0), values,
-                      array_size, tuple_size);
+    vtkTemplateMacro(
+      vtkSortDataArraySort00((VTK_TT*)keys->GetVoidPointer(0), values,
+                             array_size, tuple_size));
     }
 }
 
-static void arraysort11(vtkDataArray *keys, vtkDataArray *values)
+void vtkSortDataArraySort11(vtkDataArray *keys, vtkDataArray *values)
 {
   switch (values->GetDataType())
     {
-    vtkTemplateMacro4(arraysort10, keys, (VTK_TT *)values->GetVoidPointer(0),
-                      values->GetNumberOfTuples(),
-                      values->GetNumberOfComponents());
+    vtkTemplateMacro(
+      vtkSortDataArraySort10(keys, (VTK_TT *)values->GetVoidPointer(0),
+                             values->GetNumberOfTuples(),
+                             values->GetNumberOfComponents()));
     //Template macro does not contain Id type?
     case VTK_ID_TYPE:
-      arraysort10(keys, (vtkIdType *)values->GetVoidPointer(0),
+      vtkSortDataArraySort10(keys, (vtkIdType *)values->GetVoidPointer(0),
                   values->GetNumberOfTuples(),
                   values->GetNumberOfComponents());
       break;
@@ -192,10 +196,6 @@ void vtkSortDataArray::Sort(vtkIdList *keys)
   vtkstd::sort(data, data + numKeys);
 }
 
-// There is no vtkTemplateMacro2, so we hack a macro to make a 2 argument
-// function look like a three argument function
-#define FUNC2TO3(func, arg1, arg2) func(arg1, arg2)
-
 void vtkSortDataArray::Sort(vtkDataArray *keys)
 {
   if (keys->GetNumberOfComponents() != 1)
@@ -209,8 +209,7 @@ void vtkSortDataArray::Sort(vtkDataArray *keys)
 
   switch (keys->GetDataType())
     {
-    vtkTemplateMacro3(FUNC2TO3,
-                      vtkstd::sort, (VTK_TT *)data, ((VTK_TT *)data) + numKeys);
+    vtkTemplateMacro(vtkstd::sort((VTK_TT *)data, ((VTK_TT *)data) + numKeys));
     }
 }
 
@@ -223,20 +222,21 @@ void vtkSortDataArray::Sort(vtkIdList *keys, vtkIdList *values)
     return;
     }
 
-  arraysort00(keys->GetPointer(0), values->GetPointer(0), size, 1);
+  vtkSortDataArraySort00(keys->GetPointer(0), values->GetPointer(0), size, 1);
 }
 
 void vtkSortDataArray::Sort(vtkIdList *keys, vtkDataArray *values)
 {
-  arraysort01(keys->GetPointer(0), values, keys->GetNumberOfIds());
+  vtkSortDataArraySort01(keys->GetPointer(0), values, keys->GetNumberOfIds());
 }
 
 void vtkSortDataArray::Sort(vtkDataArray *keys, vtkIdList *values)
 {
-  arraysort10(keys, values->GetPointer(0), values->GetNumberOfIds(), 1);
+  vtkSortDataArraySort10(keys, values->GetPointer(0),
+                         values->GetNumberOfIds(), 1);
 }
 
 void vtkSortDataArray::Sort(vtkDataArray *keys, vtkDataArray *values)
 {
-  arraysort11(keys, values);
+  vtkSortDataArraySort11(keys, values);
 }
