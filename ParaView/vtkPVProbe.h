@@ -33,6 +33,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVProbe_h
 
 #include "vtkPVSource.h"
+#include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWSelectPointInteractor.h"
 #include "vtkKWLabeledEntry.h"
@@ -76,6 +77,16 @@ public:
   // Description:
   // Called when the delete button is pressed.
   virtual void DeleteCallback();
+
+  // Description:
+  // Callbacks for Dimensionality menu
+  void UsePoint();
+  void UseLine();
+  void UsePlane();
+
+  // Description:
+  // Callback for SetPoint button
+  void SetPoint();
   
 protected:
   vtkPVProbe();
@@ -85,14 +96,39 @@ protected:
 
   char *ProbeSourceTclName;
   
+  vtkKWLabel *DimensionalityLabel;
+  vtkKWOptionMenu *DimensionalityMenu;
+  vtkKWPushButton *SelectPointButton;
+  vtkKWWidget *ProbeFrame;
+
+  vtkKWWidget *SelectedPointFrame;
   vtkKWLabel *SelectedPointLabel;
+  vtkKWLabeledEntry *SelectedXEntry;
+  vtkKWLabeledEntry *SelectedYEntry;
+  vtkKWLabeledEntry *SelectedZEntry;  
   vtkKWLabel *PointDataLabel;
   
-  vtkKWPushButton *SelectPointsButton;
+  vtkKWLabel *EndPointLabel;
+  vtkKWOptionMenu *EndPointMenu;
+  vtkKWWidget *EndPointMenuFrame;
+  vtkKWWidget *EndPoint1Frame;
+  vtkKWLabel *EndPoint1Label;
+  vtkKWLabeledEntry *X1Entry;
+  vtkKWLabeledEntry *Y1Entry;
+  vtkKWLabeledEntry *Z1Entry;
+  vtkKWWidget *EndPoint2Frame;
+  vtkKWLabel *EndPoint2Label;
+  vtkKWLabeledEntry *X2Entry;
+  vtkKWLabeledEntry *Y2Entry;
+  vtkKWLabeledEntry *Z2Entry;
+  vtkKWPushButton *SetPointButton;
   
   vtkKWSelectPointInteractor *Interactor;
   
   float SelectedPoint[3];
+  float EndPoint1[3];
+  float EndPoint2[3];
+  int Dimensionality; // point = 0, line = 1, plane = 2
 };
 
 #endif

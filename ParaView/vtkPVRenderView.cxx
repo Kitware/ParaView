@@ -811,7 +811,7 @@ void vtkPVRenderView::EventuallyRender()
 
   // Keep track of whether there is a render pending so that if a render is
   // pending when this object is deleted, we can cancel the "after" command.
-  // We don't want to have this object register itself to because this can
+  // We don't want to have this object register itself because this can
   // cause leaks if we exit before EventuallyRenderCallBack is called.
   this->Script("after idle {%s EventuallyRenderCallBack}",this->GetTclName());
   this->SetRenderPending(this->Application->GetMainInterp()->result);
