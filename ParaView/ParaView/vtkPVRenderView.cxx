@@ -116,7 +116,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.269.2.1");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.269.2.2");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1734,4 +1734,5 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
      << this->ManipulatorControl2D << endl;
   os << indent << "ManipulatorControl3D: " 
      << this->ManipulatorControl3D << endl;
+  os << indent << "Renderer2D: " << this->Renderer2D << endl;
 }

@@ -141,7 +141,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.4");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.5");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4288,6 +4288,9 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PickCenterToolbar: " << this->GetPickCenterToolbar() << endl;
 //  os << indent << "FlySpeedToolbar: " << this->GetFlySpeedToolbar() << endl;
   os << indent << "Interactor: " << this->Interactor << endl;
+  os << indent << "InteractorTclName: " << (this->InteractorTclName ?
+                                            this->InteractorTclName : "(none)")
+     << endl;
   os << indent << "GlyphMenu: " << this->GlyphMenu << endl;
   os << indent << "InitializeDefaultInterfaces: " 
      << this->InitializeDefaultInterfaces << endl;

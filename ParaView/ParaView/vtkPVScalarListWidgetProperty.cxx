@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.1.2.2");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -189,4 +189,5 @@ void vtkPVScalarListWidgetProperty::AcceptInternal()
 void vtkPVScalarListWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "NumberOfScalars: " << this->NumberOfScalars << endl;
 }

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVIndexWidgetProperty);
-vtkCxxRevisionMacro(vtkPVIndexWidgetProperty, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVIndexWidgetProperty, "1.1.2.2");
 
 vtkPVIndexWidgetProperty::vtkPVIndexWidgetProperty()
 {
@@ -71,5 +71,8 @@ void vtkPVIndexWidgetProperty::PrintSelf(ostream &os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   
   os << indent << "Index: " << this->Index << endl;
+  os << indent << "VTKCommand: " << (this->VTKCommand ? this->VTKCommand :
+                                     "(none)")
+     << endl;
 }
 

@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVWidgetProperty);
-vtkCxxRevisionMacro(vtkPVWidgetProperty, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVWidgetProperty, "1.1.2.2");
 
 vtkPVWidgetProperty::vtkPVWidgetProperty()
 {
@@ -112,4 +112,7 @@ void vtkPVWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << "(none)" << endl;
     }
+  os << indent << "VTKSourceTclName: " << (this->VTKSourceTclName ?
+                                           this->VTKSourceTclName : "(none)")
+     << endl;
 }

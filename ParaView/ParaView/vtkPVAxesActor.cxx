@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkPVAxesActor, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVAxesActor, "1.1.2.2");
 vtkStandardNewMacro(vtkPVAxesActor);
 
 vtkCxxSetObjectMacro( vtkPVAxesActor, UserDefinedTip, vtkPolyData );
@@ -678,4 +678,49 @@ void vtkPVAxesActor::UpdateProps()
 void vtkPVAxesActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  
+  os << indent << "UserDefinedShaft: ";
+  if (this->UserDefinedShaft)
+    {
+    os << this->UserDefinedShaft << endl;
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  
+  os << indent << "UserDefinedTip: ";
+  if (this->UserDefinedTip)
+    {
+    os << this->UserDefinedTip << endl;
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+  
+  os << indent << "XAxisLabelText: " << (this->XAxisLabelText ?
+                                         this->XAxisLabelText : "(none)")
+     << endl;
+  os << indent << "YAxisLabelText: " << (this->YAxisLabelText ?
+                                         this->YAxisLabelText : "(none)")
+     << endl;
+  os << indent << "ZAxisLabelText: " << (this->ZAxisLabelText ?
+                                         this->ZAxisLabelText : "(none)")
+     << endl;
+  os << indent << "XAxisLabelPosition: " << this->XAxisLabelPosition << endl;
+  os << indent << "YAxisLabelPosition: " << this->YAxisLabelPosition << endl;
+  os << indent << "ZAxisLabelPosition: " << this->ZAxisLabelPosition << endl;
+  
+  os << indent << "SphereRadius: " << this->SphereRadius << endl;
+  os << indent << "SphereResolution: " << this->SphereResolution << endl;
+  os << indent << "CylinderRadius: " << this->CylinderRadius << endl;
+  os << indent << "CylinderResolution: " << this->CylinderResolution << endl;
+  os << indent << "ConeRadius: " << this->ConeRadius << endl;
+  os << indent << "ConeResolution: " << this->ConeResolution << endl;
+  
+  os << indent << "NormalizedShaftLength: " << this->NormalizedShaftLength
+     << endl;
+  os << indent << "NormalizedTipLength: " << this->NormalizedTipLength << endl;
+  os << indent << "TotalLength: " << this->TotalLength << endl;
 }
