@@ -39,6 +39,7 @@ SET(PROJECT_TESTS
   CTH
   CutContours
   Data
+  DefaultAnimation
   Delete
   DeleteSource
   EnSight
@@ -57,6 +58,7 @@ SET(PROJECT_TESTS
   ProbeLine
   ProbePoint
   ReadPVD
+  RecordAnimation
   ScalarBar
   ScalarRangeLabel
   ScalarSelection
@@ -246,7 +248,9 @@ ADD_TEST("ArrowServer-ParaView-rc"
 # remove the following for the batch tests
 SET (PROJECT_TESTS_NO_BATCH 
   #Animation
+  DefaultAnimation
   MouseInteraction
+  RecordAnimation
   TestDemo
   TestPackage
   Write

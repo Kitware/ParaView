@@ -1,0 +1,31 @@
+set kw(vtkTemp4) [$Application GetMainWindow]
+set kw(vtkTemp22) [$kw(vtkTemp4) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp22) $argv $argc
+
+set kw(vtkTemp658) [$kw(vtkTemp4) InitializeReadCustom "XMLStructuredGridReader" "$DataDir/Data/multicomb_0.vts"]
+$kw(vtkTemp4) ReadFileInformation $kw(vtkTemp658) "$DataDir/Data/multicomb_0.vts"
+$kw(vtkTemp4) FinalizeRead $kw(vtkTemp658) "$DataDir/Data/multicomb_0.vts"
+set kw(vtkTemp667) [$kw(vtkTemp658) GetPVWidget {Filename}]
+$kw(vtkTemp667) SetValue "$DataDir/Data/multicomb_0.vts"
+set kw(vtkTemp662) [$kw(vtkTemp658) GetPVWidget {PointSelection}]
+$kw(vtkTemp662) SetArrayStatus {Density} 1
+$kw(vtkTemp662) SetArrayStatus {Momentum} 1
+$kw(vtkTemp662) SetArrayStatus {StagnationEnergy} 1
+set kw(vtkTemp666) [$kw(vtkTemp658) GetPVWidget {CellSelection}]
+$kw(vtkTemp4) SetCenterOfRotation 3.457902 0.000000 28.223000
+$kw(vtkTemp4) SetCenterOfRotation 3.457902 0.000000 28.223000
+set kw(vtkTemp678) [$kw(vtkTemp4) GetPVColorMap {Density} 1]
+$kw(vtkTemp678) SetScalarBarTitle {Density}
+$kw(vtkTemp658) AcceptCallback
+
+set kw(vtkTemp750) [$kw(vtkTemp4) GetAnimationManager]
+set kw(vtkTemp481) [$kw(vtkTemp750) GetAnimationScene]
+$kw(vtkTemp481) SetCurrentTime 1.000000
+update
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit
