@@ -84,7 +84,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.22");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.22.2.1");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -153,7 +153,7 @@ int vtkPVProcessModule::GetPartitionId()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::BroadcastScript(char *format, ...)
+void vtkPVProcessModule::BroadcastScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
@@ -188,7 +188,7 @@ void vtkPVProcessModule::BroadcastScript(char *format, ...)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::ServerScript(char *format, ...)
+void vtkPVProcessModule::ServerScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
@@ -238,7 +238,7 @@ void vtkPVProcessModule::ServerSimpleScript(const char *str)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::RemoteScript(int id, char *format, ...)
+void vtkPVProcessModule::RemoteScript(int id, const char* format, ...)
 {
   char event[1600];
   char* buffer = event;
@@ -333,7 +333,7 @@ void vtkPVProcessModule::GatherInformationInternal(char*, vtkObject* object)
 
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::RootScript(char *format, ...)
+void vtkPVProcessModule::RootScript(const char* format, ...)
 {
   char event[1600];
   char* buffer = event;

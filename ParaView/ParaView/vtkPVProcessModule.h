@@ -86,18 +86,18 @@ public:
   // Description:
   // Script which is executed in the remot processes.
   // If a result string is passed in, the results are place in it. 
-  void RemoteScript(int remoteId, char *EventString, ...);
+  void RemoteScript(int remoteId, const char *EventString, ...);
 
   // Description:
   // Can only be called by process 0.  It executes a script on every
   // process.
-  void BroadcastScript(char *EventString, ...);
+  void BroadcastScript(const char *EventString, ...);
 
   // Description:
   // Can only be called by process 0.  
   // It executes a script on every server process.
   // This is needed because we only connect pipeline on server (not client).
-  void ServerScript(char *EventString, ...);
+  void ServerScript(const char *EventString, ...);
 
 
 //ETX
@@ -127,7 +127,7 @@ public:
   // This executes a script on process 0 of the server.
   // Used mainly for client server operation.
 //BTX
-  void  RootScript(char *EventString, ...);
+  void  RootScript(const char *EventString, ...);
 //ETX
   virtual void  RootSimpleScript(const char *str);
   virtual const char* GetRootResult();
