@@ -498,7 +498,7 @@ void vtkPVRenderView::CreateViewProperties()
                this->InterruptRenderCheck->GetWidgetName(),
                this->UseCharCheck->GetWidgetName());
 #else
-  this->Script("pack %s %s %s %s -side top -anchor w",
+  this->Script("pack %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName());
 
