@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.46");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -122,21 +122,24 @@ void vtkPVContourEntry::AcceptInternal(vtkClientServerID sourceID)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVContourEntry::SaveInBatchScriptForPart(ofstream *file,
-                                                 vtkClientServerID sourceID)
+void vtkPVContourEntry::SaveInBatchScript(ofstream *file)
 {
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
   int i;
   float value;
   int numContours;
 
   numContours = (this->Property->GetNumberOfScalars() - 1) / 2;
 
+  *file << "  [$pvTemp" << sourceID.ID << " GetProperty ContourValues] "
+        << "SetNumberOfElements " << numContours << endl;
   for (i = 0; i < numContours; i++)
     {
     value = this->Property->GetScalar(2*(i+1));
-    *file << "\t";
-    *file << "pvTemp" << sourceID << " SetValue " 
-          << i << " " << value << endl;
+    *file << "  ";
+    *file << "[$pvTemp" << sourceID.ID << " GetProperty ContourValues] "
+          << "SetElement " << i << " " << value << endl;
     }
 }
 
@@ -182,7 +185,7 @@ void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
                         this->GetTclName(), ai->GetTclName());
     }
   
-  ai->SetLabelAndScript(this->GetTraceName(), NULL);
+  ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
   ai->SetCurrentProperty(this->Property);
   if (this->UseWidgetRange)
     {

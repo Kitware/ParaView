@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.78");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.79");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -780,12 +780,12 @@ int vtkPVFileEntry::GetNumberOfFiles()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file,
-                                              vtkClientServerID sourceID)
+void vtkPVFileEntry::SaveInBatchScript(ofstream* file)
 {
   if ( this->Property->GetNumberOfFiles() > 1 )
     {
-    *file << "\tset " << "pvTemp" << sourceID << "_files {";
+    *file << "set " 
+          << "pvTemp" << this->PVSource->GetVTKSourceID(0) << "_files {";
     int cc;
     for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
       {
@@ -793,16 +793,17 @@ void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file,
       }
     *file << "}" << endl;
 
-    *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName 
-          << " [ lindex $" << "pvTemp" << sourceID << "_files " 
-          << this->TimeStep 
-          << "]\n";
+    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+          <<  " GetProperty " << this->VariableName << "] SetElement 0 "
+          << " [ lindex $" << "pvTemp" << this->PVSource->GetVTKSourceID(0)  
+          << "_files " << this->TimeStep << "]" << endl;
+
     }
   else
     {
-    *file << "\t" << "pvTemp" << sourceID
-          << " Set" << this->VariableName << " {" 
-          << this->Entry->GetValue() << "}\n";
+    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+          <<  " GetProperty " << this->VariableName << "] SetElement 0 {"
+          << this->Entry->GetValue() << "}" << endl;
     }
 }
 
@@ -829,7 +830,7 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
       this->GetTclName(), ai->GetTclName());
     }
 
-  ai->SetLabelAndScript(this->GetTraceName(), NULL);
+  ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
   ai->SetCurrentProperty(this->Property);
   ai->SetTimeStart(0);
   ai->SetTimeEnd(this->Property->GetNumberOfFiles()-1);

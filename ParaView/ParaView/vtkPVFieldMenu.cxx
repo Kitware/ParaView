@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.10");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.11");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -225,17 +225,18 @@ void vtkPVFieldMenu::ResetInternal()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFieldMenu::SaveInBatchScriptForPart(ofstream *file,
-                                              vtkClientServerID sourceID)
+void vtkPVFieldMenu::SaveInBatchScript(ofstream *file)
 {
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
   if (sourceID.ID == 0)
     {
     vtkErrorMacro("Sanity check failed. ");
     return;
     }
 
-  *file << "\t";
-  *file << "pvTemp" << sourceID << " SetAttributeMode " << this->Value << endl;
+  *file << "  [$pvTemp" << sourceID 
+        << " GetProperty AttributeMode] SetElements1 " << this->Value << endl;
 }
 
 //----------------------------------------------------------------------------

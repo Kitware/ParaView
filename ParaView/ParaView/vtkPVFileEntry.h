@@ -120,13 +120,6 @@ public:
   void SetTimeStep(int ts);
 
   // Description:
-  // Used internally. Method to save widget parameters into vtk tcl script.
-  void SaveInBatchScriptForPart(ofstream* file, vtkClientServerID);
-
-  // Description:
-  // Get the range of files.
-
-  // Description:
   // Set/get the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
   virtual vtkPVWidgetProperty* GetProperty();
@@ -156,6 +149,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
+ 
 protected:
   vtkPVFileEntry();
   ~vtkPVFileEntry();

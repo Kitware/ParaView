@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.256");
+vtkCxxRevisionMacro(vtkPVData, "1.257");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2594,163 +2594,131 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveInBatchScript(ofstream *file)
 {
-  double range[2];
-  const char* scalarMode;
-  vtkPVPart *part;
-  int partIdx, numParts;
-  int sourceCount;
-  int numSources;
-  int outputCount;
-  int numOutputs;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-
-  vtkClientServerID renID = this->GetPVApplication()->GetRenderModule()->GetRendererID();
   if (this->GetVisibility())
     {
     if (this->PVColorMap)
       {
       this->PVColorMap->SaveInBatchScript(file);
       }
-    numSources = this->GetPVSource()->GetNumberOfVTKSources();
-    // Easier to initialize the output traversal this way.
-    // We want to exaust each sources output, then move to the next source.
-    sourceCount = -1;
-    numOutputs = 0;
-    outputCount = 0;
-    numParts = this->GetPVSource()->GetNumberOfParts();
-    for (partIdx = 0; partIdx < numParts; ++partIdx)
+    vtkPVPart *part = this->GetPVSource()->GetPart(0);
+    vtkPVPartDisplay *partD = part->GetPartDisplay();
+    *file << endl;
+    *file << "set pvTemp" <<  partD->GetGeometryID()
+          << " [$proxyManager NewProxy rendering DefaultDisplayer]"
+          << endl;
+    *file << "  $pvTemp" <<  partD->GetGeometryID() << " SetInput 0 "
+          << "$pvTemp" << this->GetPVSource()->GetVTKSourceID(0)
+          << " SetInput"
+          << endl;
+
+    *file << "  $Ren1 AddDisplay $pvTemp" << partD->GetGeometryID() << endl;
+    
+    if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
+                           VTK_PV_OUTLINE_LABEL) )
       {
-      part = this->GetPVSource()->GetPart(partIdx);
-      // Get the next output from the sequence of sources/outputs.
-      if (outputCount >= numOutputs)
-        { // Move to next source
-        ++sourceCount;
-        if (sourceCount >= numSources)
-          { // sanity check
-          vtkErrorMacro("We ran out of sources.");
-          return;
-          }
-        vtkPVSource *source = this->GetPVSource();
-        pm->GatherInformation(source->GetNumberOfOutputsInformation(),
-                              source->GetVTKSourceID(sourceCount));
-        numOutputs =
-          source->GetNumberOfOutputsInformation()->GetNumberOfOutputs();
-        outputCount = 0;
-        }
+      *file << "  [$pvTemp" << partD->GetGeometryID() 
+            << " GetProperty DisplayAsOutline] SetElements1 1"  << endl;
+      }
+    else
+      {
+      *file << "  [$pvTemp" << partD->GetGeometryID() 
+            << " GetProperty DisplayAsOutline] SetElements1 0"  << endl;
+      }
+    
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty ImmediateModeRendering] SetElements1 "  
+          << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering()
+          << endl;
+    
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty ScalarVisibility] SetElements1 "  
+          << part->GetPartDisplay()->GetMapper()->GetScalarVisibility()
+          << endl;
+    
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty Representation] SetElements1 "  
+          << part->GetPartDisplay()->GetProperty()->GetRepresentation()
+          << endl;
+    
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty Interpolation] SetElements1 "  
+          << part->GetPartDisplay()->GetProperty()->GetInterpolation()
+          << endl;
+    
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty LineWidth] SetElements1 "  
+          << part->GetPartDisplay()->GetProperty()->GetLineWidth()
+          << endl;
+    
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty PointSize] SetElements1 "  
+          << part->GetPartDisplay()->GetProperty()->GetPointSize()
+          << endl;
+    
+    double propColor[3];
+    part->GetPartDisplay()->GetProperty()->GetColor(propColor);
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty Color] SetElements3 "  
+          << propColor[0] << " " << propColor[1] << " " << propColor[2]
+          << endl;
 
-      *file << "vtkPVGeometryFilter pvTemp" 
-            << part->GetPartDisplay()->GetGeometryID() << "\n\t"
-            << "pvTemp" << part->GetPartDisplay()->GetGeometryID() 
-            << " SetInput [pvTemp" 
-            << this->GetPVSource()->GetVTKSourceID(sourceCount) 
-            << " GetOutput " << outputCount << "]\n";
-      *file << "\t";
-      if ( vtkString::Equals(this->RepresentationMenu->GetValue(),
-                             VTK_PV_OUTLINE_LABEL) )
-        {
-        *file << "pvTemp" 
-              << part->GetPartDisplay()->GetGeometryID() 
-              << " SetUseOutline 1" << endl;
-        }
-      else
-        {
-        *file << "pvTemp" << part->GetPartDisplay()->GetGeometryID() 
-              << " SetUseOutline 0" << endl;
-        }
-      // Move to next output
-      ++outputCount;
+    if (this->PVColorMap)
+      {
+      *file << "  [$pvTemp" << partD->GetGeometryID() 
+            << " GetProperty LookupTable] SetProxy $pvTemp" 
+            << this->PVColorMap->GetLookupTableID() << endl;
+      }
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty ScalarMode] SetElement 0 " 
+          << part->GetPartDisplay()->GetMapper()->GetScalarMode()
+          << endl;
 
-      *file << "vtkPolyDataMapper pvTemp" 
-            << part->GetPartDisplay()->GetMapperID() << "\n\t"
-            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetInput ["
-            << "pvTemp" << part->GetPartDisplay()->GetGeometryID() << " GetOutput]\n\t";
-      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetImmediateModeRendering "
-            << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
-      part->GetPartDisplay()->GetMapper()->GetScalarRange(range);
-      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarRange "
-            << range[0] << " " << range[1] << "\n\t";
-      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " UseLookupTableScalarRangeOn\n\t";
-      *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarVisibility "
-            << part->GetPartDisplay()->GetMapper()->GetScalarVisibility() << "\n\t"
-            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarModeTo";
-      scalarMode = part->GetPartDisplay()->GetMapper()->GetScalarModeAsString();
-      *file << scalarMode << "\n";
-      if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
-          strcmp(scalarMode, "UseCellFieldData") == 0)
-        {
-        *file << "\t" << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SelectColorArray {"
-              << part->GetPartDisplay()->GetMapper()->GetArrayName() << "}\n";
-        }
-      if (this->PVColorMap)
-        {
-        *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetLookupTable pvTemp" 
-              << this->PVColorMap->GetLookupTableID() << endl;
-        }
+    *file << "  [$pvTemp" << partD->GetGeometryID() 
+          << " GetProperty ColorArray] SetElement 0 {" 
+          << part->GetPartDisplay()->GetMapper()->GetArrayName()
+          << "}" << endl;
+
+    *file << "  $pvTemp" << partD->GetGeometryID() << " UpdateVTKObjects" 
+          << endl;
+
+    }
+
+  // TODO implement this
+
+//       part->GetPartDisplay()->GetMapper()->GetScalarRange(range);
+//       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarRange "
+//             << range[0] << " " << range[1] << "\n\t";
+//       *file << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " UseLookupTableScalarRangeOn\n\t";
+//             << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SetScalarModeTo";
+//       scalarMode = part->GetPartDisplay()->GetMapper()->GetScalarModeAsString();
+//       *file << scalarMode << "\n";
+//       if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
+//           strcmp(scalarMode, "UseCellFieldData") == 0)
+//         {
+//         *file << "\t" << "pvTemp" << part->GetPartDisplay()->GetMapperID() << " SelectColorArray {"
+//               << part->GetPartDisplay()->GetMapper()->GetArrayName() << "}\n";
+//         }
+//   if (this->CubeAxesCheck->GetState())
+//     {
+//     char cubeAxesBatchName[128];
+//     double bounds[6];
+//     this->CubeAxes->GetBounds(bounds);
+//     sprintf(cubeAxesBatchName, "cubeAxes%d", this->InstanceCount);
+//     *file << "vtkCubeAxesActor2D " << cubeAxesBatchName << "\n\t"
+//           << cubeAxesBatchName << " SetFlyModeToOuterEdges\n\t"
+//           << "[" << cubeAxesBatchName << " GetProperty] SetColor 1 1 1\n\t"
+//           << cubeAxesBatchName << " SetBounds "
+//           << bounds[0] << " " << bounds[1] << " " << bounds[2] << " "
+//           << bounds[3] << " " << bounds[4] << " " << bounds[5] << "\n\t";
+//     *file << cubeAxesBatchName << " SetCamera [";
+//     *file << "pvTemp" << renID.ID << " GetActiveCamera]\n\t"
+//           << cubeAxesBatchName << " SetInertia 20\n";
+//     *file << "pvTemp" << renID.ID << " AddProp " << cubeAxesBatchName << "\n";
+//     }
   
-      *file << "vtkActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n\t"
-            << "pvTemp" << part->GetPartDisplay()->GetPropID() << " SetMapper " 
-            << "pvTemp" << part->GetPartDisplay()->GetMapperID() << "\n\t"
-            << "[ pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetRepresentationTo"
-            << part->GetPartDisplay()->GetProperty()->GetRepresentationAsString() << "\n\t"
-            << "[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetInterpolationTo"
-            << part->GetPartDisplay()->GetProperty()->GetInterpolationAsString() << "\n";
-
-      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetAmbient "
-            << part->GetPartDisplay()->GetProperty()->GetAmbient() << "\n";
-      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetDiffuse "
-            << part->GetPartDisplay()->GetProperty()->GetDiffuse() << "\n";
-      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecular "
-            << part->GetPartDisplay()->GetProperty()->GetSpecular() << "\n";
-      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularPower "
-            << part->GetPartDisplay()->GetProperty()->GetSpecularPower() << "\n";
-      double *color = part->GetPartDisplay()->GetProperty()->GetSpecularColor();
-      *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetSpecularColor "
-            << color[0] << " " << color[1] << " " << color[2] << "\n";
-      if (part->GetPartDisplay()->GetProperty()->GetLineWidth() > 1)
-        {
-        *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetLineWidth "
-            << part->GetPartDisplay()->GetProperty()->GetLineWidth() << "\n";
-        }
-      if (part->GetPartDisplay()->GetProperty()->GetPointSize() > 1)
-        {
-        *file << "\t[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetPointSize "
-            << part->GetPartDisplay()->GetProperty()->GetPointSize() << "\n";
-        }
-
-      if (!part->GetPartDisplay()->GetMapper()->GetScalarVisibility())
-        {
-        double propColor[3];
-        part->GetPartDisplay()->GetProperty()->GetColor(propColor);
-        *file << "[pvTemp" << part->GetPartDisplay()->GetPropID() << " GetProperty] SetColor "
-              << propColor[0] << " " << propColor[1] << " " << propColor[2]
-              << "\n";
-        }
-
-      *file << "Ren1" << " AddActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n";
-      }  
-    }
-
-  if (this->CubeAxesCheck->GetState())
-    {
-    char cubeAxesBatchName[128];
-    double bounds[6];
-    this->CubeAxes->GetBounds(bounds);
-    sprintf(cubeAxesBatchName, "cubeAxes%d", this->InstanceCount);
-    *file << "vtkCubeAxesActor2D " << cubeAxesBatchName << "\n\t"
-          << cubeAxesBatchName << " SetFlyModeToOuterEdges\n\t"
-          << "[" << cubeAxesBatchName << " GetProperty] SetColor 1 1 1\n\t"
-          << cubeAxesBatchName << " SetBounds "
-          << bounds[0] << " " << bounds[1] << " " << bounds[2] << " "
-          << bounds[3] << " " << bounds[4] << " " << bounds[5] << "\n\t";
-    *file << cubeAxesBatchName << " SetCamera [";
-    *file << "pvTemp" << renID.ID << " GetActiveCamera]\n\t"
-          << cubeAxesBatchName << " SetInertia 20\n";
-    *file << "pvTemp" << renID.ID << " AddProp " << cubeAxesBatchName << "\n";
-    }
-  
-  if (this->PointLabelCheck->GetState())
-    {
-    }
+//   if (this->PointLabelCheck->GetState())
+//     {
+//     }
 }
 
 //----------------------------------------------------------------------------

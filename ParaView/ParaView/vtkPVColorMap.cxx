@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.81");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.82");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1698,67 +1698,82 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
     }
   this->VisitedFlag = 1;
 
-  *file << "vtkLookupTable pvTemp" << this->LookupTableID << endl;
-  *file << "\tpvTemp" << this->LookupTableID << " SetNumberOfTableValues " 
+  *file << endl;
+  *file << "set pvTemp" <<  this->LookupTableID
+        << " [$proxyManager NewProxy lookup_tables LookupTable]"
+        << endl;
+  *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
+        << "NumberOfTableValues] SetElements1 "
         << this->NumberOfColors << endl;
-  *file << "\tpvTemp" << this->LookupTableID << " SetHueRange " 
+  *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
+        << "HueRange] SetElements2 "
         << this->StartHSV[0] << " " << this->EndHSV[0] << endl;
-  *file << "\tpvTemp" << this->LookupTableID << " SetSaturationRange " 
+  *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
+        << "SaturationRange] SetElements2 "
         << this->StartHSV[1] << " " << this->EndHSV[1] << endl;
-  *file << "\tpvTemp" << this->LookupTableID << " SetValueRange " 
+  *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
+        << "ValueRange] SetElements2 "
         << this->StartHSV[2] << " " << this->EndHSV[2] << endl;
-  *file << "\tpvTemp" << this->LookupTableID << " SetTableRange "
+  *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
+        << "ScalarRange] SetElements2 "
         << this->ScalarRange[0] << " " << this->ScalarRange[1] << endl;
-  *file << "\tpvTemp" << this->LookupTableID << " SetVectorComponent " 
+  *file << "  [$pvTemp" << this->LookupTableID << " GetProperty "
+        << "VectorComponent] SetElements1 "
         << this->VectorComponent << endl;
-  *file << "\tpvTemp" << this->LookupTableID << " Build" << endl;
+  *file << "  $pvTemp" << this->LookupTableID << " UpdateVTKObjects"
+        << endl;
+  *file << "  $pvTemp" << this->LookupTableID << " Build"
+        << endl;
+  *file << endl;
 
-  if (this->ScalarBarVisibility)
-    {
-    char scalarBarTclName[128];
-    sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
-    ostrstream actor;
+// TODO implement all this
 
-    //*file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
-    *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
-    actor << scalarBarTclName << ends;
+//    if (this->ScalarBarVisibility)
+//      {
+//      char scalarBarTclName[128];
+//      sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
+//      ostrstream actor;
 
-    *file << "\t" << actor.str() << " SetLookupTable pvTemp" 
-          << this->LookupTableID << "\n";
+//      //*file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
+//      *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
+//      actor << scalarBarTclName << ends;
 
-    *file << "\t" << actor.str() << " SetOrientation "
-          << this->ScalarBar->GetScalarBarActor()->GetOrientation() << "\n";
+//      *file << "\t" << actor.str() << " SetLookupTable pvTemp" 
+//            << this->LookupTableID << "\n";
 
-    *file << "\t" << actor.str() << " SetWidth " 
-          << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
+//      *file << "\t" << actor.str() << " SetOrientation "
+//            << this->ScalarBar->GetScalarBarActor()->GetOrientation() << "\n";
 
-    *file << "\t" << actor.str() << " SetHeight " 
-          << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
+//      *file << "\t" << actor.str() << " SetWidth " 
+//            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
 
-    const double *pos = 
-     this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
-    *file << "\t[" << actor.str() << " GetPositionCoordinate] SetValue " 
-          << pos[0] << " " << pos[1] << "\n";
+//      *file << "\t" << actor.str() << " SetHeight " 
+//            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
 
-    *file << "\t" << actor.str() << " SetTitle {" 
-          << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
+//      const double *pos = 
+//       this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
+//      *file << "\t[" << actor.str() << " GetPositionCoordinate] SetValue " 
+//            << pos[0] << " " << pos[1] << "\n";
 
-    *file << "\t" << actor.str() << " SetLabelFormat {" 
-          << this->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}\n";
+//      *file << "\t" << actor.str() << " SetTitle {" 
+//            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
 
-    ostrstream ttprop, tlprop;
-    ttprop << "[" << actor.str() << " GetTitleTextProperty]" << ends;
-    this->TitleTextPropertyWidget->SaveInTclScript(file, ttprop.str());
-    ttprop.rdbuf()->freeze(0);
+//      *file << "\t" << actor.str() << " SetLabelFormat {" 
+//            << this->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}\n";
 
-    tlprop << "[" << actor.str() << " GetLabelTextProperty]" << ends;
-    this->LabelTextPropertyWidget->SaveInTclScript(file, tlprop.str());
-    tlprop.rdbuf()->freeze(0);
+//      ostrstream ttprop, tlprop;
+//      ttprop << "[" << actor.str() << " GetTitleTextProperty]" << ends;
+//      this->TitleTextPropertyWidget->SaveInTclScript(file, ttprop.str());
+//      ttprop.rdbuf()->freeze(0);
 
-    *file << "Ren1" << " AddActor " << scalarBarTclName << endl;
+//      tlprop << "[" << actor.str() << " GetLabelTextProperty]" << ends;
+//      this->LabelTextPropertyWidget->SaveInTclScript(file, tlprop.str());
+//      tlprop.rdbuf()->freeze(0);
 
-    actor.rdbuf()->freeze(0);
-    }
+//      *file << "Ren1" << " AddActor " << scalarBarTclName << endl;
+
+//      actor.rdbuf()->freeze(0);
+//      }
 }
 
 //----------------------------------------------------------------------------

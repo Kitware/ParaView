@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.21");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -278,6 +278,7 @@ void vtkPVContainerWidget::AddPVWidget(vtkPVWidget *pvw)
   pvw->SetTraceReferenceCommand(str); 
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidget* vtkPVContainerWidget::GetPVWidget(vtkIdType i)
 {
   vtkPVWidget* widget = 0;
@@ -294,6 +295,7 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(vtkIdType i)
   return widget;
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
 {
   if (!traceName)
@@ -344,6 +346,7 @@ void vtkPVContainerWidget::SaveInBatchScript(ofstream *file)
   it->Delete();
 }
 
+//----------------------------------------------------------------------------
 vtkPVContainerWidget* vtkPVContainerWidget::ClonePrototype(
   vtkPVSource* pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {

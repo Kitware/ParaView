@@ -29,7 +29,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.19");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -94,23 +94,26 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
   float rad;
   float num;
   
-  if (this->SourceID.ID == 0 || this->PointWidget == NULL)
+  if (this->OutputID.ID == 0 || this->PointWidget == NULL)
     {
     vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "vtkPointSource " << "pvTemp" << this->SourceID.ID << "\n";
+  *file << endl;
+  *file << "set pvTemp" <<  this->OutputID.ID
+        << " [$proxyManager NewProxy source PointSource]"
+        << endl;
   this->PointWidget->GetPosition(pt);
-  *file << "\t" << "pvTemp" << this->SourceID.ID << " SetCenter " 
-        << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
-
+  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Center] "
+        << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
   this->NumberOfPointsWidget->GetValue(&num, 1);
-  *file << "\t" << "pvTemp" << this->SourceID.ID << " SetNumberOfPoints " 
-        << (int)(num) << endl; 
+  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty NumberOfPoints] "
+        << "SetElements1 " << static_cast<int>(num) << endl;
   this->RadiusWidget->GetValue(&rad, 1);
-  *file << "\t" << "pvTemp" << this->SourceID.ID << " SetRadius " 
-        << rad << endl; 
+  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Radius] "
+        << "SetElements1 " << rad << endl;
+  *file << endl;
 }
 
 //-----------------------------------------------------------------------------

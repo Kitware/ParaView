@@ -131,6 +131,10 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
+
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
  
 protected:
   vtkPVLineWidget();
@@ -189,10 +193,6 @@ protected:
   vtkSetVector3Macro(LastAcceptedPoint2, double);
   vtkSetMacro(LastAcceptedResolution, double);
   
-  // Description:
-  // Used internally. Method to save widget parameters into vtk tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
-
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented
   void operator=(const vtkPVLineWidget&); // Not implemented

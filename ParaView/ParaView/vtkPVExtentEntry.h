@@ -128,7 +128,11 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
+  
 protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();

@@ -111,13 +111,13 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
+
 protected:
   vtkPVFieldMenu();
   ~vtkPVFieldMenu();
-
-  // For saving batch scripts.
-  void SaveInBatchScriptForPart(ofstream *file,
-                                vtkClientServerID);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

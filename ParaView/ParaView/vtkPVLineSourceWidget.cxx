@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.14");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -144,21 +144,25 @@ void vtkPVLineSourceWidget::SaveInBatchScript(ofstream *file)
 {
   double pt[3];
   
-  if (this->SourceID.ID == 0 || this->LineWidget == NULL)
+  if (this->OutputID.ID == 0 || this->LineWidget == NULL)
     {
     vtkErrorMacro(<< this->GetClassName() << " must not have SaveInBatchScript method.");
     return;
     } 
 
-  *file << "vtkLineSource " << "pvTemp" << this->SourceID.ID << "\n";
+  *file << endl;
+  *file << "set pvTemp" <<  this->OutputID.ID
+        << " [$proxyManager NewProxy source LineSource]"
+        << endl;
   this->LineWidget->GetPoint1(pt);
-  *file << "\t" << this->SourceID << " SetPoint1 " 
-        << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
+  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Point1] "
+        << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
   this->LineWidget->GetPoint2(pt);
-  *file << "\t" << this->SourceID << " SetPoint2 " 
-        << pt[0] << " " << pt[1] << " " << pt[2] << endl; 
-  *file << "\t" << this->SourceID << " SetResolution " 
-        << this->LineWidget->GetResolution() << endl; 
+  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Point2] "
+        << "SetElements3 " << pt[0] << " " << pt[1] << " " << pt[2] << endl;
+  *file << "  [$pvTemp" << this->OutputID.ID << " GetProperty Resolution] "
+        << "SetElements1 " << this->LineWidget->GetResolution() << endl;
+  *file << endl;
 }
 
 //----------------------------------------------------------------------------

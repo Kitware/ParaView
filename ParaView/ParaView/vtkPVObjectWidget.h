@@ -62,6 +62,10 @@ public:
   virtual vtkClientServerID GetObjectByName(const char*){ vtkClientServerID id = {0}; return id;}
 //ETX
 
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file) = 0;
+
 protected:
   vtkPVObjectWidget();
   ~vtkPVObjectWidget();
@@ -80,9 +84,6 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 
-  // Description:
-  // An interface for saving a widget into a script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
 };
 
 #endif

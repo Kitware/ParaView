@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.19");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -669,8 +669,6 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
   
   this->NumberOfScalarVariables++;
   
-  this->AddTraceEntry("$kw(%s) AddScalarVariable {%s} {%s} {%d}",
-                       this->GetTclName(), variableName, arrayName, component);
 }
 
 int vtkPVCalculatorWidget::ScalarVariableExists(const char *variableName,
@@ -749,8 +747,6 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
   
   this->NumberOfVectorVariables++;
   
-  this->AddTraceEntry("$kw(%s) AddVectorVariable {%s} {%s}",
-                       this->GetTclName(), variableName, arrayName);
 }
 
 int vtkPVCalculatorWidget::VectorVariableExists(const char *variableName,
@@ -953,47 +949,73 @@ void vtkPVCalculatorWidget::SetFunctionLabel(char *function)
 //----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::SaveInBatchScript(ofstream *file)
 {
-  int i;
-  int numSources, sourceIdx;
-
-  numSources = this->PVSource->GetNumberOfVTKSources();
-  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+  if (this->PVSource == NULL)
     {
-    // This suff is what should be in PVWidgets.
-    *file << "\t" << this->PVSource->GetVTKSourceID(sourceIdx) 
-          << " SetAttributeModeToUse";
-    if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
-      {
-      *file << "PointData\n\t";
-      }
-    else
-      {
-      *file << "CellData\n\t";
-      }
-  
-    for (i = 0; i < this->NumberOfScalarVariables; i++)
-      {
-      *file << "pvTemp" << this->PVSource->GetVTKSourceID(sourceIdx) 
-            << " AddScalarVariable {"
-            << this->ScalarVariableNames[i] << "} {"
-            << this->ScalarArrayNames[i] 
-            << "} " << this->ScalarComponents[i]
-            << "\n\t";
-      }
-    for (i = 0; i < this->NumberOfVectorVariables; i++)
-      {
-      *file << "pvTemp" << this->PVSource->GetVTKSourceID(sourceIdx) 
-            << " AddVectorVariable {"
-            << this->VectorVariableNames[i] << "} {"
-            << this->VectorArrayNames[i]
-            << "} 0 1 2\n\t";
-      }  
+    vtkErrorMacro("SaveInBatchScript requires a PVSource.")
+    return;
+    }
 
-    if ( this->FunctionLabel->IsCreated() )
-      {
-      *file << "\t" << "pvTemp" << this->PVSource->GetVTKSourceID(sourceIdx) << " SetFunction {"  
-            << this->FunctionLabel->GetLabel() << "}\n";
-      }
+  int i;
+
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
+  *file << "  [$pvTemp" << sourceID.ID 
+        << " GetProperty AttributeMode] SetElement 0 ";
+  if (strcmp(this->AttributeModeMenu->GetValue(), "Point Data") == 0)
+    {
+    *file << 1;
+    }
+  else
+    {
+    *file << 2;
+    }
+  *file << endl;
+
+  *file << "  [$pvTemp" << sourceID.ID 
+        << " GetProperty AddScalarVariable] SetNumberOfElements " 
+        << this->NumberOfScalarVariables*3 << endl;
+  for (i = 0; i < this->NumberOfScalarVariables; i++)
+    {
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty AddScalarVariable] SetElement " << i*3
+          << " {" <<  this->ScalarVariableNames[i] << "}" << endl;
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty AddScalarVariable] SetElement " << i*3+1
+          << " {" <<  this->ScalarArrayNames[i] << "}" << endl;
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty AddScalarVariable] SetElement " << i*3+2
+          << " " << this->ScalarComponents[i] << endl;
+    }
+
+  *file << "  [$pvTemp" << sourceID.ID 
+        << " GetProperty AddVectorVariable] SetNumberOfElements " 
+        << this->NumberOfVectorVariables*5 << endl;
+  for (i = 0; i < this->NumberOfVectorVariables; i++)
+    {
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty AddVectorVariable] SetElement " << i*3
+          << " {" <<  this->VectorVariableNames[i] << "}" << endl;
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty AddVectorVariable] SetElement " << i*3+1
+          << " {" <<  this->VectorArrayNames[i] << "}" << endl;
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty AddScalarVariable] SetElement " << i*3+2
+          << " 0" << endl;
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty AddScalarVariable] SetElement " << i*3+3
+          << " 1" << endl;
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty AddScalarVariable] SetElement " << i*3+4
+          << " 2" << endl;
+    }
+
+
+  if ( this->FunctionLabel->IsCreated() )
+    {
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty Function] SetElement 0 "
+          <<  "{" << this->FunctionLabel->GetLabel() << "}"
+          << endl;
     }
 }
 

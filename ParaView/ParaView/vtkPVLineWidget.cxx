@@ -32,7 +32,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.47");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -411,62 +411,36 @@ void vtkPVLineWidget::ActualPlaceWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::SaveInBatchScriptForPart(ofstream *file,
-                                               vtkClientServerID sourceID)
+void vtkPVLineWidget::SaveInBatchScript(ofstream *file)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
 
   // Point1
   if (this->Point1Variable)
     {  
-    *file << "\t" << "pvTemp" << sourceID << " Set" << this->Point1Variable;
-    ostrstream str;
-    str << "Get" << this->Point1Variable << ends;
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                    << str.str()
-                    << vtkClientServerStream::End; 
-    ostrstream result;
-    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
-    result << ends;
-    *file << " " << result.str() << "\n"; 
-    delete [] result.str();
-    delete [] str.str();
+    *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+          << this->Point1Variable << "] SetElements3 "
+          << this->Point1[0]->GetValueAsFloat() << " "
+          << this->Point1[1]->GetValueAsFloat() << " "
+          << this->Point1[2]->GetValueAsFloat() << endl;
     }
   // Point2
   if (this->Point2Variable)
     {
-    *file << "\t" << "pvTemp" << sourceID << " Set" << this->Point2Variable; 
-    ostrstream str;
-    str << "Get" << this->Point2Variable << ends;
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                    << str.str()
-                    << vtkClientServerStream::End; 
-    pm->SendStreamToClient();
-    ostrstream result;
-    pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
-    result << ends;
-    *file << " " << result.str() << "\n";
-    delete [] result.str();
-    delete [] str.str();
+    *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+          << this->Point2Variable << "] SetElements3 "
+          << this->Point2[0]->GetValueAsFloat() << " "
+          << this->Point2[1]->GetValueAsFloat() << " "
+          << this->Point2[2]->GetValueAsFloat() << endl;
+
     }
 
   // Resolution
   if (this->ResolutionVariable)
     {
-    *file << "\t" << "pvTemp" << sourceID << " Set" << this->ResolutionVariable;
-    ostrstream str;
-    str << "Get" << this->ResolutionVariable << ends;
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                    << str.str()
-                    << vtkClientServerStream::End; 
-    pm->SendStreamToClient();
-    ostrstream result;
-    pm->GetLastClientResult().PrintArgumentValue(result, 0,0); 
-    result << ends;
-   *file << " " << result.str() << "\n";
-    delete [] result.str();
-    delete [] str.str();
+    *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+          << this->ResolutionVariable << "] SetElements1 "
+          << this->ResolutionEntry->GetValueAsFloat() << endl;
     }
 }
 

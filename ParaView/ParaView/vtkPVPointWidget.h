@@ -62,10 +62,6 @@ public:
   void GetPosition(double pt[3]);
 
   // Description:
-  // For saving the widget into a VTK tcl script.
-  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
-
-  // Description:
   // Called when the PVSources reset button is called.
   virtual void ResetInternal();
 
@@ -78,6 +74,10 @@ public:
   // Description:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
+
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
 
 protected:
   vtkPVPointWidget();
