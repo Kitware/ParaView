@@ -12,7 +12,7 @@ if {[info exists argc]} {
         if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
             set rmui [$pv(vtkTemp43) GetRenderModuleUI]
             catch {$rmui SetCompositeThreshold 0}
-        }1
+        }
     }
 } 
 
