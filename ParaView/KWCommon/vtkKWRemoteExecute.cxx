@@ -78,7 +78,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRemoteExecute );
-vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.3");
+vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWRemoteExecute::vtkKWRemoteExecute()
@@ -116,7 +116,7 @@ int vtkKWRemoteExecute::Detach()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWRemoteExecute::RunRemoteCommand(const char* command, 
+int vtkKWRemoteExecute::RunRemoteCommand(const char*, 
   const char* args[])
 {
   if ( !this->RemoteHost )
