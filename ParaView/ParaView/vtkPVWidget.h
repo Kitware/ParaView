@@ -214,7 +214,7 @@ public:
   //BTX
   // Description:
   // Most subclasses implement these methods to move state from VTK objects
-  // to the widget.  The Tcl name of the VTK object is supplied as a parameter.
+  // to the widget.  The id of the VTK object is supplied as a parameter.
   virtual void AcceptInternal(vtkClientServerID);
   virtual void ResetInternal();
   //ETX
