@@ -44,6 +44,8 @@ protected:
   int ShuffleSizes(int size);
   void Shuffle(int inSize, char* inBuf, int outSize, char* outBuf);
 
+  void SetMPIMToNSocketConnection(vtkMPIMToNSocketConnection*);
+  
   vtkSetMacro(ServerMode, int);
   vtkGetMacro(ServerMode, int);
   vtkSetMacro(RenderServerMode, int);
