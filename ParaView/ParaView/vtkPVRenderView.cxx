@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.203");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.204");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2356,7 +2356,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.203 $");
+  this->ExtractRevision(os,"$Revision: 1.204 $");
 }
 
 //------------------------------------------------------------------------------
@@ -2442,6 +2442,15 @@ void vtkPVRenderView::SerializeToken(istream& is, const char token[1024])
     this->Superclass::SerializeToken(is,token);  
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SaveAsImage(const char* filename) 
+{
+  this->EventuallyRender();
+  this->Script("update");
+  this->Superclass::SaveAsImage(filename);
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ExecuteEvent(vtkObject*, unsigned long event, void* par)

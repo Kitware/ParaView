@@ -126,6 +126,11 @@ public:
   void RemovePVData(vtkPVData *pvc);
 
   // Description:
+  // Make snapshot of the render window.
+  virtual void SaveAsImage() { this->Superclass::SaveAsImage(); }
+  virtual void SaveAsImage(const char* filename) ;
+  
+  // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
 
