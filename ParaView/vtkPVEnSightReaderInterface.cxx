@@ -72,7 +72,9 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
     pvApp->BroadcastScript("%s Delete", tclName);
     return NULL;
     }
-    
+
+  pvApp->BroadcastScript("%s SetFilePath %s", tclName,
+			 reader->GetFilePath());
   pvApp->BroadcastScript("%s SetCaseFileName %s", tclName,
 			 reader->GetCaseFileName());
   pvApp->BroadcastScript("%s Update", tclName);
