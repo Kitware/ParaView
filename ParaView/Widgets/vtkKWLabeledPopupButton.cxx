@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWLabeledPopupButton);
-vtkCxxRevisionMacro(vtkKWLabeledPopupButton, "1.4");
+vtkCxxRevisionMacro(vtkKWLabeledPopupButton, "1.5");
 
 int vtkKWLabeledPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -196,5 +196,7 @@ void vtkKWLabeledPopupButton::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "PopupButton: " << this->PopupButton << endl;
+  os << indent << "PackLabelLast: " 
+     << (this->PackLabelLast ? "On" : "Off") << endl;
 }
 
