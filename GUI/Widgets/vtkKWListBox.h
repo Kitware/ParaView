@@ -16,6 +16,9 @@
 // A widget that can have a list of items with a scroll bar. 
 // It uses a scrollbar (yscroll only) and listbox
 // You can configure it into: single, browse, multiple, or extended
+// Another important configuration option is: -exportselection 0
+// Therefore it does not collide with let say tk_getSaveFile 
+// selection
 
 #ifndef __vtkKWListBox_h
 #define __vtkKWListBox_h
