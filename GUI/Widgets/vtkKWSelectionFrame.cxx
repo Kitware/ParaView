@@ -23,7 +23,7 @@
 #include "vtkKWToolbarSet.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.22");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.23");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -509,6 +509,11 @@ void vtkKWSelectionFrame::SelectionListCallback(const char *menuItem)
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SelectCallback()
 {
+  if (this->GetSelected())
+    {
+    return;
+    }
+
   this->SelectedOn();
 
   if (this->SelectCommand)
