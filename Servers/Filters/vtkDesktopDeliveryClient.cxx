@@ -33,7 +33,7 @@
 
 //#include "vtkRef.h"
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.17");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.18");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -43,6 +43,7 @@ vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
   this->SquirtCompressionLevel = 5;
   this->SquirtBuffer = vtkUnsignedCharArray::New();
   this->UseCompositing = 0;
+  this->UseTileDisplay = 0;
 }
 
 vtkDesktopDeliveryClient::~vtkDesktopDeliveryClient()

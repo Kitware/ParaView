@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.9");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVIceTRenderModule::vtkPVIceTRenderModule()
@@ -190,6 +190,11 @@ void vtkPVIceTRenderModule::SetProcessModule(vtkProcessModule *pm)
   // **********************************************************
 
   this->CompositeID = pvm->NewStreamObject("vtkDesktopDeliveryClient");
+  if (tileDim[0])
+    {
+    stream << vtkClientServerStream::Invoke << this->CompositeID
+           << "UseTileDisplayOn" << vtkClientServerStream::End;
+    }
   pvm->SendStream(vtkProcessModule::CLIENT);
   // Create a vtkDesktopDeliveryServer on the server, but use the same id.
   stream << vtkClientServerStream::New << "vtkDesktopDeliveryServer"

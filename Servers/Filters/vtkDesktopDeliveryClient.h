@@ -43,7 +43,7 @@ public:
   static vtkDesktopDeliveryClient *New();
 
   // For ParaView
-  void SetUseCompositing(int v) {this->UseCompositing = v; this->SetParallelRendering(v);}
+  void SetUseCompositing(int v) {this->UseCompositing = v; if (!this->UseTileDisplay) {this->SetParallelRendering(v);}}
   void SetRenderManager(vtkParallelRenderManager*) {};
 
   // Description:
@@ -109,6 +109,10 @@ public:
 
   virtual void SetImageReductionFactorForUpdateRate(double DesiredUpdateRate);
 
+  vtkSetMacro(UseTileDisplay, int);
+  vtkGetMacro(UseTileDisplay, int);
+  vtkBooleanMacro(UseTileDisplay, int);
+
 protected:
   vtkDesktopDeliveryClient();
   virtual ~vtkDesktopDeliveryClient();
@@ -135,7 +139,8 @@ protected:
   void SquirtDecompress(vtkUnsignedCharArray *in, vtkUnsignedCharArray *out);
 
   int UseCompositing;
-
+  int UseTileDisplay;
+  
 private:
   vtkDesktopDeliveryClient(const vtkDesktopDeliveryClient &); //Not implemented
   void operator=(const vtkDesktopDeliveryClient &);    //Not implemented
