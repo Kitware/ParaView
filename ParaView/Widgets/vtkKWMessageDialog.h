@@ -66,13 +66,13 @@ public:
         OkCancel};
 
   enum {RememberYes  = 0x00002,
-	RememberNo   = 0x00004,
+        RememberNo   = 0x00004,
         ErrorIcon    = 0x00008,
-	WarningIcon  = 0x00010,
-	QuestionIcon = 0x00020,
-	YesDefault   = 0x00040,
-	NoDefault    = 0x00080,
-	Beep         = 0x00100};
+        WarningIcon  = 0x00010,
+        QuestionIcon = 0x00020,
+        YesDefault   = 0x00040,
+        NoDefault    = 0x00080,
+        Beep         = 0x00100};
   //ETX
   
   // Description:
@@ -114,18 +114,18 @@ public:
   // used for the registery. message is the text message displayed
   // in the dialog.
   static void PopupMessage(vtkKWApplication *app, vtkKWWindow *masterWin,
-			   const char* title, 
-			   const char* message, int options = 0);
+                           const char* title, 
+                           const char* message, int options = 0);
   static int PopupYesNo(vtkKWApplication *app,  vtkKWWindow *masterWin,
-			const char* title, 
-			const char* message, int options = 0);
+                        const char* title, 
+                        const char* message, int options = 0);
   static int PopupYesNo(vtkKWApplication *app,  vtkKWWindow *masterWin, 
-			const char* name, 
-			const char* title, const char* message, 
-			int options = 0);
+                        const char* name, 
+                        const char* title, const char* message, 
+                        int options = 0);
   static int PopupOkCancel(vtkKWApplication *app, vtkKWWindow *masterWin,
-			   const char* title, 
-			   const char* message, int options = 0);
+                           const char* title, 
+                           const char* message, int options = 0);
 
 protected:
   vtkKWMessageDialog();

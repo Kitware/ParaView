@@ -67,7 +67,7 @@ public:
   // Description: 
   // Append a sub menu to the current menu.
   void AddCascade(const char* label, vtkKWMenu*, int underline , 
-		  const char* help = 0);
+                  const char* help = 0);
 
   // Description:
   // Copy the radio button variable logic.
@@ -78,58 +78,58 @@ public:
   // Description: 
   // Append a CheckButton menu item to the current menu.
   void AddCheckButton(const char* label, const char* ButtonVar, 
-		      vtkKWObject* Object, 
-		      const char* MethodAndArgString , const char* help = 0);
+                      vtkKWObject* Object, 
+                      const char* MethodAndArgString , const char* help = 0);
   void AddCheckButton(const char* label, const char* ButtonVar, 
-		      vtkKWObject* Object, 
-		      const char* MethodAndArgString , int underline,
-		      const char* help = 0);
+                      vtkKWObject* Object, 
+                      const char* MethodAndArgString , int underline,
+                      const char* help = 0);
 
   // Description: 
   // Append a standard menu item and command to the current menu.
   void AddCommand(const char* label, vtkKWObject* Object,
-		  const char* MethodAndArgString , const char* help = 0);
+                  const char* MethodAndArgString , const char* help = 0);
   void AddCommand(const char* label, vtkKWObject* Object,
-		  const char* MethodAndArgString , int underline, 
-		  const char* help = 0);
+                  const char* MethodAndArgString , int underline, 
+                  const char* help = 0);
 
   // Description: 
   // Append a radio menu item and command to the current menu.
   // The radio group is specified by the buttonVar value.
   void AddRadioButton(int value, const char* label, const char* buttonVar, 
-		      vtkKWObject* Called, 
-		      const char* MethodAndArgString, const char* help = 0);
+                      vtkKWObject* Called, 
+                      const char* MethodAndArgString, const char* help = 0);
   void AddRadioButton(int value, const char* label, const char* buttonVar, 
-		      vtkKWObject* Called, 
-		      const char* MethodAndArgString, int underline,  
-		      const char* help = 0);
+                      vtkKWObject* Called, 
+                      const char* MethodAndArgString, int underline,  
+                      const char* help = 0);
 
   // Description:
   // Same as add commands, but insert at a given integer position.
   void InsertSeparator(int position);
   
   void InsertCascade(int position, const char* label,  vtkKWMenu*, 
-		     int underline, const char* help = 0  );
+                     int underline, const char* help = 0  );
   
   // Description:
   // Insert a check button at a given position.
   void InsertCheckButton(int position, 
-			 const char* label, const char* ButtonVar, 
-			 vtkKWObject* Object, 
-			 const char* MethodAndArgString , const char* help = 0);
+                         const char* label, const char* ButtonVar, 
+                         vtkKWObject* Object, 
+                         const char* MethodAndArgString , const char* help = 0);
   void InsertCheckButton(int position, 
-			 const char* label, const char* ButtonVar, 
-			 vtkKWObject* Object, 
-			 const char* MethodAndArgString , 
-			 int underline, const char* help = 0);
+                         const char* label, const char* ButtonVar, 
+                         vtkKWObject* Object, 
+                         const char* MethodAndArgString , 
+                         int underline, const char* help = 0);
   
   // Description:
   // Insert a menu item at a given position.
   void InsertCommand(int position, const char* label, vtkKWObject* Object,
-		     const char* MethodAndArgString , const char* help = 0);
+                     const char* MethodAndArgString , const char* help = 0);
   void InsertCommand(int position, const char* label, vtkKWObject* Object,
-		     const char* MethodAndArgString , 
-		     int underline, const char* help = 0);
+                     const char* MethodAndArgString , 
+                     int underline, const char* help = 0);
   
   // Description: 
   // Add a radio button menu item.  You must create a variable to store
@@ -139,11 +139,11 @@ public:
   void CheckRadioButton(vtkKWObject *Object, const char *varname, int id);
   void InsertRadioButton(int position, int value, const char* label, 
                          const char* buttonVar, vtkKWObject* Called, 
-			 const char* MethodAndArgString, const char* help = 0);
+                         const char* MethodAndArgString, const char* help = 0);
   void InsertRadioButton(int position, int value, const char* label, 
                          const char* buttonVar, vtkKWObject* Called, 
-			 const char* MethodAndArgString, 
-			 int underline, const char* help = 0);
+                         const char* MethodAndArgString, 
+                         int underline, const char* help = 0);
 
   // Description:
   // Call the menu item callback at the given index
@@ -207,10 +207,10 @@ protected:
   ~vtkKWMenu();
 
   void AddGeneric(const char* addtype, const char* label, vtkKWObject* Object,
-		  const char* MethodAndArgString, const char* extra, const char* help);
+                  const char* MethodAndArgString, const char* extra, const char* help);
   void InsertGeneric(int position, const char* addtype, const char* label, 
-		     vtkKWObject* Object,
-		     const char* MethodAndArgString, const char* extra, const char* help);
+                     vtkKWObject* Object,
+                     const char* MethodAndArgString, const char* extra, const char* help);
 
   int TearOff;
   

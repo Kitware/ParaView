@@ -112,8 +112,8 @@ public:
 protected:
   vtkKWListBox();
   ~vtkKWListBox();
-  char* CurrentSelection;	// store last call of CurrentSelection
-  char* Item;			// store last call of GetItem
+  char* CurrentSelection;       // store last call of CurrentSelection
+  char* Item;                   // store last call of GetItem
   
   vtkKWWidget *Scrollbar;
   vtkKWWidget *Listbox;

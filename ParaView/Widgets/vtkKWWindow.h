@@ -255,9 +255,9 @@ public:
   // will be successfull.
   /*
   int SetWindowRegisteryValue(int level, const char* subkey, const char* key, 
-			const char* format, ...);
+                        const char* format, ...);
   int GetWindowRegisteryValue(int level, const char* subkey, const char* key, 
-			char*value);
+                        char*value);
   int DeleteRegisteryValue(int level, const char* subkey, const char* key);
   */
   
@@ -266,7 +266,7 @@ public:
   // If the level is lower than current registery level, operation 
   // will be successfull.
   float GetFloatRegisteryValue(int level, const char* subkey, 
-			       const char* key);
+                               const char* key);
   int   GetIntRegisteryValue(int level, const char* subkey, const char* key);
 
   // Description:
@@ -294,8 +294,8 @@ protected:
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   void InsertRecentFileToMenu(const char *filename, 
-			      vtkKWObject *taret, 
-			      const char *command);
+                              vtkKWObject *taret, 
+                              const char *command);
   void UpdateRecentMenu(char *key);
   void StoreRecentMenuToRegistery(char *key);
   void PrintRecentFiles();

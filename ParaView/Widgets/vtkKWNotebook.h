@@ -89,7 +89,7 @@ public:
   // Add new page to the notebook. By setting balloon string, 
   // the page will have balloon help.
   void AddPage(const char *title, const char* balloon, 
-	       vtkKWIcon *icon);
+               vtkKWIcon *icon);
   void AddPage(const char *title, const char* balloon);
   void AddPage(const char *title);
   

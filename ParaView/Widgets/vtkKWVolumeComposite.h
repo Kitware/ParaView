@@ -107,8 +107,8 @@ public:
   // Description:
   // What are we using to render?
   vtkSetClampMacro( RenderMethod, int, 
-		    VTK_VOLUMECOMPOSITE_SOFTWARE_METHOD,
-		    VTK_VOLUMECOMPOSITE_VOLUMEPRO_METHOD );
+                    VTK_VOLUMECOMPOSITE_SOFTWARE_METHOD,
+                    VTK_VOLUMECOMPOSITE_VOLUMEPRO_METHOD );
   vtkGetMacro( RenderMethod, int );
   virtual void SetRenderMethodToSoftware(); 
   virtual void SetRenderMethodToVolumePro();
