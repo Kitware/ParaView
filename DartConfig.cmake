@@ -21,7 +21,7 @@ SET (PROJECT_URL "http://www.paraview.org")
 
 # Dart server configuration 
 SET (ROLLUP_URL "http://${DROP_SITE}/cgi-bin/paraview-rollup-dashboard.sh")
-SET (CVS_WEB_URL "http://${DROP_SITE}/cgi-bin/cvsweb.cgi/ParaView/")
+SET (CVS_WEB_URL "http://${DROP_SITE}/cgi-bin/viewcvs.cgi/")
 SET (CVS_WEB_CVSROOT "ParaView")
 SET (USE_DOXYGEN "On")
 SET (DOXYGEN_URL "${PROJECT_URL}/doc" )
@@ -37,7 +37,7 @@ SET (CONTINUOUS_BASE_URL "${PROJECT_URL}/Testing")
 SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_TEST_FAILURES ON)
 SET (DELIVER_BROKEN_BUILD_EMAIL "Continuous Nightly")
 SET (EMAIL_FROM "paraview-dashboard@public.kitware.com")
-SET (DARTBOARD_BASE_URL "http://www.paraview.org/Testing")
+SET (DARTBOARD_BASE_URL "${PROJECT_URL}/Testing")
 
 SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_CONFIGURE_FAILURES 1)
 SET (DELIVER_BROKEN_BUILD_EMAIL_WITH_BUILD_ERRORS 1)
