@@ -218,15 +218,13 @@ public:
 
   // Description:
   // Set the vtk source that will be a part of the pipeline.
-  // The pointer to this class is used as little as possible.
+  // The pointer to this class is not used.
   // (VTKSourceTclName is used instead.)
-  void AddVTKSource(vtkSource *source, const char *tclName);
+  void AddVTKSource(const char *tclName);
   void RemoveAllVTKSources();
   int GetNumberOfVTKSources();
-  vtkSource *GetVTKSource(int idx);
   const char *GetVTKSourceTclName(int idx);
   // Legacy
-  vtkSource *GetVTKSource() {return this->GetVTKSource(0);}
   const char *GetVTKSourceTclName() {return this->GetVTKSourceTclName(0);}
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
@@ -487,7 +485,6 @@ protected:
   // for this source. Used by sources like Glyphs
   int HideInformationPage;
 
-  vtkCollection *VTKSources;
   vtkStringList *VTKSourceTclNames;
 
   // One output. Now used only to hold UI

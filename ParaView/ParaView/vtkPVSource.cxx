@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.2");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.3");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -125,7 +125,6 @@ vtkPVSource::vtkPVSource()
 
   // The underlying VTK object. This will change. PVSource will
   // support multiple VTK sources/filters.
-  this->VTKSources = vtkCollection::New();
   this->VTKSourceTclNames = vtkStringList::New();
 
   // The frame which contains the parameters related to the data source
@@ -199,7 +198,6 @@ vtkPVSource::~vtkPVSource()
 
   // We need to delete the Tcl object too.  This call does it.
   this->RemoveAllVTKSources();
-  this->VTKSources->Delete();
   this->VTKSourceTclNames->Delete();
 
   // Do not use SetName() or SetLabel() here. These make
@@ -605,7 +603,7 @@ void vtkPVSourceEndProgress(void* vtkNotUsed(arg))
 //----------------------------------------------------------------------------
 // Tcl does the reference counting, so we are not going to put an 
 // additional reference of the data.
-void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
+void vtkPVSource::AddVTKSource(const char *tclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -622,7 +620,6 @@ void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
 
   // I hate having two collections: one for the vtk object, and one for its
   // Tcl name.  I should probably create an object to contain both.
-//  this->VTKSources->AddItem(source);
   this->VTKSourceTclNames->AddString(tclName);
     
 //  pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
@@ -653,23 +650,16 @@ void vtkPVSource::RemoveAllVTKSources()
     }
 
   this->VTKSourceTclNames->RemoveAllItems();
-  this->VTKSources->RemoveAllItems();
 }
 
 //----------------------------------------------------------------------------
 int vtkPVSource::GetNumberOfVTKSources()
 {
-  if (this->VTKSources == NULL)
+  if (this->VTKSourceTclNames == NULL)
     {
     return 0;
     }
   return this->VTKSourceTclNames->GetNumberOfStrings();
-}
-
-//----------------------------------------------------------------------------
-vtkSource* vtkPVSource::GetVTKSource(int idx)
-{
-  return static_cast<vtkSource*>(this->VTKSources->GetItemAsObject(idx));
 }
 
 //----------------------------------------------------------------------------
@@ -2335,7 +2325,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     // Create a vtkSource
     pvApp->MakeServerTclObject(this->SourceClassName, tclName);
     
-    pvs->AddVTKSource(NULL, tclName);
+    pvs->AddVTKSource(tclName);
     }
 
   pvs->SetView(this->GetPVWindow()->GetMainView());
