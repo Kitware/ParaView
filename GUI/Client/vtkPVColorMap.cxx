@@ -54,7 +54,7 @@
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.100");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.101");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -84,7 +84,7 @@ public:
 
   vtkRMScalarBarWidgetObserver()
     {
-      this->PVColorMap = 0;
+    this->PVColorMap = 0;
     }
 
   virtual void Execute(vtkObject* wdg, unsigned long event,  
@@ -665,39 +665,39 @@ void vtkPVColorMap::UpdateVectorComponentMenu()
 {
   int idx;
   char numStr[5];
-  int NumberOfVectorComponents;
-  char **VectorComponentTitles;
-  int VectorComponent;
+  int numberOfVectorComponents;
+  char **vectorComponentTitles;
+  int vectorComponent;
 
-  NumberOfVectorComponents = this->RMScalarBarWidget->GetNumberOfVectorComponents();
-  if (NumberOfVectorComponents  == 1)
+  numberOfVectorComponents = this->RMScalarBarWidget->GetNumberOfVectorComponents();
+  if (numberOfVectorComponents  == 1)
     {
     return;
     }
 
-  VectorComponentTitles = this->RMScalarBarWidget->GetVectorComponentTitles();
-  VectorComponent = this->RMScalarBarWidget->GetVectorComponent();
+  vectorComponentTitles = this->RMScalarBarWidget->GetVectorComponentTitles();
+  vectorComponent = this->RMScalarBarWidget->GetVectorComponent();
 
   this->VectorComponentMenu->ClearEntries();
-  if ( *(VectorComponentTitles[VectorComponent]) != '\0')
+  if ( *(vectorComponentTitles[vectorComponent]) != '\0')
     {
     this->VectorComponentMenu->SetValue(
-                         VectorComponentTitles[VectorComponent]);
+                         vectorComponentTitles[vectorComponent]);
     }
   else
     {
-    sprintf(numStr, "%d", VectorComponent + 1);
+    sprintf(numStr, "%d", vectorComponent + 1);
     this->VectorComponentMenu->SetValue(numStr);
     } 
 
-  for (idx = 0; idx < NumberOfVectorComponents; ++idx)
+  for (idx = 0; idx < numberOfVectorComponents; ++idx)
     {
     char command[64];
     sprintf(command, "VectorComponentCallback %d", idx);
-    if (*(VectorComponentTitles[idx]) != '\0')
+    if (*(vectorComponentTitles[idx]) != '\0')
       {                                       
       this->VectorComponentMenu->AddEntryWithCommand(
-                                           VectorComponentTitles[idx], 
+                                           vectorComponentTitles[idx], 
                                            this, command);
       }
     else
