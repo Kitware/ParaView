@@ -50,7 +50,6 @@ SET( AltIO_SRCS
   vtkXMLPPolyDataWriter.cxx
   vtkXMLPPolyDataReader.cxx
 
-  vtkDataArraySelection.cxx
   vtkXMLDataSetWriter.cxx
   vtkXMLPDataSetWriter.cxx
   vtkXMLFileReadTester.cxx
