@@ -83,10 +83,6 @@ public:
   virtual void Deselect(int doPackForget);
 
   // Description:
-  // Called when the accept button is pressed.
-  virtual void AcceptCallback();
-  
-  // Description:
   // Callbacks for Dimensionality menu
   void UsePoint();
   void UseLine();
@@ -148,10 +144,13 @@ protected:
   // Description:
   // Create a menu to select the input.
   virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
-				       char* inputType, char* help, 
-				       vtkPVSourceCollection* sources);
+                                       char* inputType, char* help, 
+                                       vtkPVSourceCollection* sources);
   vtkPVInputMenu* InputMenu;
   virtual void SetInputMenu(vtkPVInputMenu* im);
+  
+  // The real AcceptCallback method.
+  virtual void AcceptCallbackInternal();  
 
   vtkKWLabel *DimensionalityLabel;
   vtkKWOptionMenu *DimensionalityMenu;

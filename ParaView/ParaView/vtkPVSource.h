@@ -138,7 +138,7 @@ public:
 
   // Description:
   // Called when the accept button is pressed.
-  virtual void AcceptCallback();
+  void AcceptCallback();
   virtual void PreAcceptCallback();
 
   // Description:
@@ -149,7 +149,7 @@ public:
   virtual int IsDeletable();
 
   // Description:
-  // Internal method; called by AcceptCallback.
+  // Internal method; called by AcceptCallbackInternal.
   // Hide flag is used for hidding creation of 
   // the glyph sources from the user.
   virtual void Accept() { this->Accept(0); }
@@ -167,6 +167,12 @@ public:
   // This method resets the UI values (Widgets added with the following
   // methods).  It uses the GetCommand supplied to the interface.
   virtual void UpdateParameterWidgets();
+  
+  // Description:
+  // The SetVTKSource method registers a ModifiedEvent observer with
+  // the vtkSource to call this method.  This is used to keep the GUI
+  // up to date as the vtkSource changes.
+  void VTKSourceModifiedMethod();
   
   // Description:
   // This method gets called to set the VTK source parameters
@@ -314,8 +320,8 @@ protected:
   // Description:
   // Create a menu to select the input.
   virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 
-				       char* inputType, char* help, 
-				       vtkPVSourceCollection* sources);
+                                       char* inputType, char* help, 
+                                       vtkPVSourceCollection* sources);
 
   vtkPVRenderView* GetPVRenderView();
   
@@ -352,7 +358,10 @@ protected:
   vtkPVData *GetNthPVOutput(int idx);
   void SetNthPVOutput(int idx, vtkPVData *output);
   void SetNthPVInput(int idx, vtkPVData *input);
-
+  
+  // The real AcceptCallback method.
+  virtual void AcceptCallbackInternal();
+  
   vtkKWNotebook *Notebook;
 
   // The name is just for display.
@@ -389,6 +398,9 @@ protected:
   int PrototypeInstanceCount;
 
   int IsPermanent;
+  
+  // Flag for whether we are currently in AcceptCallback.
+  int AcceptCallbackFlag;
 
   virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
 };

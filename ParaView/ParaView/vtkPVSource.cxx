@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro(vtkPVSource);
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
-			   int argc, char *argv[]);
+                           int argc, char *argv[]);
 
 vtkCxxSetObjectMacro(vtkPVSource, View, vtkKWView);
 
@@ -129,6 +129,8 @@ vtkPVSource::vtkPVSource()
 
   this->HideDisplayPage = 0;
   this->HideParametersPage = 0;
+  
+  this->AcceptCallbackFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -290,7 +292,7 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
   if (this->VTKSourceTclName)
     {
     pvApp->BroadcastScript("if {[info command %s] != \"\"} { %s Delete }", 
-			   this->VTKSourceTclName, this->VTKSourceTclName);
+                           this->VTKSourceTclName, this->VTKSourceTclName);
     delete [] this->VTKSourceTclName;
     this->VTKSourceTclName = NULL;
     this->VTKSource = NULL;
@@ -304,7 +306,10 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
     //source->SetStartMethod(vtkPVSourceStartProgress, this);
     //source->SetProgressMethod(vtkPVSourceReportProgress, this);
     //source->SetEndMethod(vtkPVSourceEndProgress, this);
-
+    
+    pvApp->Script("%s AddObserver ModifiedEvent {%s VTKSourceModifiedMethod}",
+                  tclName, this->GetTclName());
+    
     pvApp->BroadcastScript(
       "%s SetStartMethod {Application LogStartEvent {Execute %s}}", 
       tclName, tclName);
@@ -379,7 +384,7 @@ void vtkPVSource::CreateProperties()
   if (!this->HideParametersPage)
     {
     this->Script("pack %s -pady 2 -fill x -expand yes",
-		 this->Parameters->GetWidgetName());
+                 this->Parameters->GetWidgetName());
     }
 
   // For initializing the trace of the notebook.
@@ -394,7 +399,7 @@ void vtkPVSource::CreateProperties()
     if ( this->GetVTKSource() )
       {
       sprintf(displayName, "Name: %s Type: %s", this->GetName(),
-	      this->GetVTKSource()->GetClassName()+3);
+              this->GetVTKSource()->GetClassName()+3);
       }
     else
       {
@@ -412,18 +417,18 @@ void vtkPVSource::CreateProperties()
   this->MainParameterFrame->SetParent(this->Parameters);
   this->MainParameterFrame->Create(this->Application, "frame", "");
   this->Script("pack %s -fill both -expand t -side top", 
-	       this->MainParameterFrame->GetWidgetName());
+               this->MainParameterFrame->GetWidgetName());
 
   this->ButtonFrame->SetParent(this->MainParameterFrame);
   this->ButtonFrame->Create(this->Application, "frame", "");
   this->Script("pack %s -fill both -expand t -side top", 
-	       this->ButtonFrame->GetWidgetName());
+               this->ButtonFrame->GetWidgetName());
 
   this->ParameterFrame->SetParent(this->MainParameterFrame);
 
   this->ParameterFrame->Create(this->Application, 1);
   this->Script("pack %s -fill both -expand t -side top", 
-	       this->ParameterFrame->GetWidgetName());
+               this->ParameterFrame->GetWidgetName());
 
   vtkKWWidget *frame = vtkKWWidget::New();
   frame->SetParent(this->ButtonFrame);
@@ -432,12 +437,12 @@ void vtkPVSource::CreateProperties()
   
   this->AcceptButton->SetParent(frame);
   this->AcceptButton->Create(this->Application, 
-			     "-text Accept -background red1");
+                             "-text Accept -background red1");
   this->AcceptButton->SetCommand(this, "PreAcceptCallback");
   this->AcceptButton->SetBalloonHelpString(
     "Cause the current values in the user interface to take effect");
   this->Script("pack %s -side left -fill x -expand t", 
-	       this->AcceptButton->GetWidgetName());
+               this->AcceptButton->GetWidgetName());
 
   this->ResetButton->SetParent(frame);
   this->ResetButton->Create(this->Application, "-text Reset");
@@ -446,7 +451,7 @@ void vtkPVSource::CreateProperties()
     "Revert to the previous parameters of current module.  "
     "If no values have been set, remove it.");
   this->Script("pack %s -side left -fill x -expand t", 
-	       this->ResetButton->GetWidgetName());
+               this->ResetButton->GetWidgetName());
 
   this->DeleteButton->SetParent(frame);
   this->DeleteButton->Create(this->Application, "-text Delete");
@@ -594,15 +599,27 @@ void vtkPVSource::SetVisibility(int v)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSource::AcceptCallback()
+{
+  // This method is purposely not virtual.  The AcceptCallbackFlag
+  // must be 1 for the duration of the accept callback no matter what
+  // subclasses might do.  All of the real AcceptCallback funcionality
+  // should be implemented in AcceptCallbackInternal.
+  this->AcceptCallbackFlag = 1;
+  this->AcceptCallbackInternal();
+  this->AcceptCallbackFlag = 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSource::PreAcceptCallback()
 {
-  this->Script("%s configure -cursor watch", 
-	       this->GetPVWindow()->GetWidgetName());
+  this->Script("%s configure -cursor watch",
+               this->GetPVWindow()->GetWidgetName());
   this->Script("after idle {%s AcceptCallback}", this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::AcceptCallback()
+void vtkPVSource::AcceptCallbackInternal()
 {
   // I had trouble with this object destructing too early
   // in this method, because of an unregistered reference ...
@@ -718,7 +735,7 @@ void vtkPVSource::Accept(int hideFlag)
 
     // Remove the local grab
     this->Script("grab release %s", 
-		 this->MainParameterFrame->GetWidgetName());    
+                 this->MainParameterFrame->GetWidgetName());    
     this->Initialized = 1;
     }
 
@@ -785,7 +802,7 @@ void vtkPVSource::DeleteCallback()
     {
     // Remove the local grab
     this->Script("grab release %s", 
-		 this->MainParameterFrame->GetWidgetName()); 
+                 this->MainParameterFrame->GetWidgetName()); 
     this->Script("update");   
     this->Initialized = 1;
     }
@@ -809,13 +826,13 @@ void vtkPVSource::DeleteCallback()
        {
        int numCons2= output->GetNumberOfPVConsumers();
        for (int j=0; j<numCons2; j++)
-	 {
-	 vtkPVSource* consumer = output->GetPVConsumer(j);
-	 if ( consumer )
-	   {
-	   consumer->DeleteCallback();
-	   }
-	 }
+         {
+         vtkPVSource* consumer = output->GetPVConsumer(j);
+         if ( consumer )
+           {
+           consumer->DeleteCallback();
+           }
+         }
        }
      }
    }
@@ -858,13 +875,13 @@ void vtkPVSource::DeleteCallback()
     {
     // Unpack the properties.  This is required if prev is NULL.
     this->Script("catch {eval pack forget [pack slaves %s]}",
-		 this->ParametersParent->GetWidgetName());
+                 this->ParametersParent->GetWidgetName());
 
     // Show the 3D View settings
     vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
     vtkPVWindow *window = pvApp->GetMainWindow();
     this->Script("%s invoke \" 3D View Settings\"", 
-		 window->GetMenuProperties()->GetWidgetName());    
+                 window->GetMenuProperties()->GetWidgetName());    
     }
   else
     {
@@ -895,10 +912,18 @@ void vtkPVSource::DeleteCallback()
   this->GetPVRenderView()->EventuallyRender();
 
   this->GetPVWindow()->EnableMenus();
-  
   // This should delete this source.
   this->GetPVWindow()->RemovePVSource("Sources", this);
   this->GetPVWindow()->RemovePVSource("RenderingSources", this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::VTKSourceModifiedMethod()
+{
+  if(!this->AcceptCallbackFlag)
+    {
+    this->UpdateParameterWidgets();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -911,13 +936,13 @@ void vtkPVSource::UpdateParameterWidgets()
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
     pvw = this->Widgets->GetNextPVWidget();
-    pvw->Reset();
+    pvw->ForceReset();
     }
 }
 
 
 //----------------------------------------------------------------------------
-// This should be apart of AcceptCallback.
+// This should be apart of AcceptCallbackInternal.
 void vtkPVSource::UpdateVTKSourceParameters()
 {
   int i;
@@ -953,13 +978,13 @@ int vtkPVSource::GetNumberOfPVConsumers()
        {
        int numCons2= output->GetNumberOfPVConsumers();
        for (int j=0; j<numCons2; j++)
-	 {
-	 vtkPVSource* consumer = output->GetPVConsumer(j);
-	 if ( consumer )
-	   {
-	   numConsumers += consumer->GetNumberOfPVConsumers();
-	   }
-	 }
+         {
+         vtkPVSource* consumer = output->GetPVConsumer(j);
+         if ( consumer )
+           {
+           numConsumers += consumer->GetNumberOfPVConsumers();
+           }
+         }
        }
      }
    return numConsumers;
@@ -1382,8 +1407,8 @@ vtkPVRenderView* vtkPVSource::GetPVRenderView()
 }
 
 vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, 
-					  char *inputType, char *help, 
-					  vtkPVSourceCollection *sources)
+                                          char *inputType, char *help, 
+                                          vtkPVSourceCollection *sources)
 {
   vtkPVInputMenu *inputMenu;
 
@@ -1393,7 +1418,7 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName,
   inputMenu->SetParent(this->ParameterFrame->GetFrame());
   inputMenu->SetLabel(label);
   inputMenu->SetModifiedCommand(this->GetTclName(), 
-				"SetAcceptButtonColorToRed");
+                                "SetAcceptButtonColorToRed");
   inputMenu->Create(this->Application);
   inputMenu->SetInputName(inputName);
   inputMenu->SetInputType(inputType);
@@ -1453,7 +1478,7 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
   // Create a vtkSource with the same name as the PVSource
   vtkSource* vtksource = 
     static_cast<vtkSource *>(pvApp->MakeTclObject(this->SourceClassName, 
-						  tclName));
+                                                  tclName));
   if (vtksource == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");
@@ -1518,25 +1543,25 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
   
   // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());   
+                         pvd->GetVTKDataTclName());   
 
   // Create the extent translator
   if (pvs->InputClassName)
     {
     pvApp->BroadcastScript("%s SetExtentTranslator [%s GetExtentTranslator]",
-			   pvd->GetVTKDataTclName(), 
-			   current->GetVTKDataTclName());
+                           pvd->GetVTKDataTclName(), 
+                           current->GetVTKDataTclName());
     }
   else
     {
     sprintf(otherTclName, "%sTranslator", tclName);
     pvApp->BroadcastScript("vtkPVExtentTranslator %s", otherTclName);
     pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
-			   otherTclName, 
-			   pvs->GetVTKSourceTclName());
+                           otherTclName, 
+                           pvs->GetVTKSourceTclName());
     pvApp->BroadcastScript("%s SetExtentTranslator %s",
-			   pvd->GetVTKDataTclName(), 
-			   otherTclName);
+                           pvd->GetVTKDataTclName(), 
+                           otherTclName);
     // Hold onto name so it can be deleted.
     pvs->SetExtentTranslatorTclName(otherTclName);
     }
@@ -1559,7 +1584,7 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
     clonedWidget->SetParent(pvs->ParameterFrame->GetFrame());
     clonedWidget->Create(pvApp);
     pvApp->Script("pack %s -side top -fill x -expand t", 
-		  clonedWidget->GetWidgetName());
+                  clonedWidget->GetWidgetName());
     pvs->AddPVWidget(clonedWidget);
     clonedWidget->Delete();
     }
