@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.9");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.10");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -77,6 +77,8 @@ vtkPVSelectWidget::vtkPVSelectWidget()
   this->EntryLabel = 0;
 
   this->Property = NULL;
+
+  this->ElementType = vtkPVSelectWidget::STRING;
 }
 
 //-----------------------------------------------------------------------------
@@ -684,5 +686,5 @@ vtkPVWidgetProperty* vtkPVSelectWidget::CreateAppropriateProperty()
 void vtkPVSelectWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "ElementType" << this->ElementType;
+  os << indent << "ElementType: " << this->ElementType << "\n";
 }
