@@ -2571,39 +2571,6 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- Smooth ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkSmoothPolyDataFilter");
-  sInt->SetRootName("Smooth");
-  sInt->SetInputClassName("vtkPolyData");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("NumberOfIterations");
-  mInt->SetSetCommand("SetNumberOfIterations");
-  mInt->SetGetCommand("GetNumberOfIterations");
-  mInt->AddIntegerArgument();
-  mInt->SetBalloonHelp("More iterations produces better smoothing.");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("Convergence");
-  mInt->SetSetCommand("SetConvergence");
-  mInt->SetGetCommand("GetConvergence");
-  mInt->AddFloatArgument();
-  mInt->SetBalloonHelp("Smooting factor (0->1).");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
   // ---- Stream ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -2805,6 +2772,39 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
   
+  // ---- Smooth ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkSmoothPolyDataFilter");
+  sInt->SetRootName("Smooth");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("NumberOfIterations");
+  mInt->SetSetCommand("SetNumberOfIterations");
+  mInt->SetGetCommand("GetNumberOfIterations");
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("More iterations produces better smoothing.");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Convergence");
+  mInt->SetSetCommand("SetConvergence");
+  mInt->SetGetCommand("GetConvergence");
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Smooting factor (0->1).");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- Geometry ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
