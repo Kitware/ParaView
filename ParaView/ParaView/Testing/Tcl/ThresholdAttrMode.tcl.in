@@ -1,28 +1,26 @@
 set DataDir "@PARAVIEW_DATA_ROOT@"
 
 set pv(vtkTemp1) [Application GetMainWindow]
-set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
-set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
-set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
-set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
-set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkSphereSource]
-$pv(vtkTemp98) AcceptCallback
-set pv(vtkTemp180) [$pv(vtkTemp1) CreatePVSource vtkElevationFilter]
-set pv(vtkTemp194) [$pv(vtkTemp180) GetPVWidget {LowPoint}]
-$pv(vtkTemp194) SetValue 0 0 -1
-$pv(vtkTemp180) AcceptCallback
-set pv(vtkTemp214) [$pv(vtkTemp1) CreatePVSource vtkPointDataToCellData]
-set pv(vtkTemp227) [$pv(vtkTemp214) GetPVWidget {PassPointData}]
-$pv(vtkTemp227) SetState 1
-$pv(vtkTemp214) AcceptCallback
-set pv(vtkTemp237) [$pv(vtkTemp1) ThresholdCallback]
-set pv(vtkTemp247) [$pv(vtkTemp237) GetAttributeModeMenu]
-$pv(vtkTemp247) SetValue "Cell Data"
-$pv(vtkTemp237) ChangeAttributeMode cell
-set pv(vtkTemp251) [$pv(vtkTemp237) GetPVWidget {Lower Threshold}]
-$pv(vtkTemp251) SetMinValue 0.350250
-$pv(vtkTemp251) SetMaxValue 0.607100
-$pv(vtkTemp237) AcceptCallback
+set pv(vtkTemp44) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp90) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp94) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp98) [$pv(vtkTemp1) GetGlyphSource Sphere]
+set pv(vtkTemp101) [$pv(vtkTemp1) Open E:/ParaView/Data/Data/vox8_bin.vtk]
+set pv(vtkTemp129) [$pv(vtkTemp1) ThresholdCallback]
+set pv(vtkTemp137) [$pv(vtkTemp129) GetAttributeModeMenu]
+$pv(vtkTemp137) SetValue "Cell Data"
+$pv(vtkTemp129) ChangeAttributeMode cell
+set pv(vtkTemp135) [$pv(vtkTemp129) GetPVWidget {Input}]
+$pv(vtkTemp135) SetCurrentValue $pv(vtkTemp101)
+set pv(vtkTemp141) [$pv(vtkTemp129) GetPVWidget {Lower Threshold}]
+$pv(vtkTemp141) SetMinValue 0.048000
+$pv(vtkTemp141) SetMaxValue 0.400000
+set pv(vtkTemp146) [$pv(vtkTemp129) GetPVWidget {AllScalars}]
+$pv(vtkTemp129) AcceptCallback
+set pv(vtkTemp158) [$pv(vtkTemp1) CreatePVSource vtkDataSetSurfaceFilter]
+set pv(vtkTemp164) [$pv(vtkTemp158) GetPVWidget {Input}]
+$pv(vtkTemp164) SetCurrentValue $pv(vtkTemp129)
+$pv(vtkTemp158) AcceptCallback
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300
