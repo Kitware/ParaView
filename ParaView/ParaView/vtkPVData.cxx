@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.165");
+vtkCxxRevisionMacro(vtkPVData, "1.166");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2404,6 +2404,7 @@ void vtkPVData::SetVisibility(int v)
 {
   this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
   this->SetVisibilityInternal(v);
+  this->Script("%s SetVisibility %d", this->GetCubeAxesTclName(), v);
 }
   
 //----------------------------------------------------------------------------
@@ -2988,7 +2989,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.165 $");
+  this->ExtractRevision(os,"$Revision: 1.166 $");
 }
 
 //----------------------------------------------------------------------------
