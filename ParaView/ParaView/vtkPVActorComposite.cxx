@@ -1439,7 +1439,6 @@ void vtkPVActorComposite::Select(vtkKWView *v)
 void vtkPVActorComposite::Deselect(vtkKWView *v)
 {
   this->SetScalarBarVisibility(0);
-  this->SetCubeAxesVisibility(0);
 
   // invoke super
   this->vtkKWComposite::Deselect(v);
