@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.33");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -1133,6 +1133,7 @@ void vtkPVCalculatorWidget::UpdateEnableState()
   this->PropagateEnableState(this->ButtonCeiling);
   this->PropagateEnableState(this->ButtonFloor);
   this->PropagateEnableState(this->ButtonLog);
+  this->PropagateEnableState(this->ButtonLog10);
   this->PropagateEnableState(this->ButtonAbs);
   this->PropagateEnableState(this->ButtonMag);
   this->PropagateEnableState(this->ButtonNorm);
