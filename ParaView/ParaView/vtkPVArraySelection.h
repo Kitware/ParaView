@@ -39,18 +39,18 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVArraySelection - widget to select data arrays
+// .NAME vtkPVArraySelection - widget to select a set of data arrays.
 // .SECTION Description
-// vtkPVArraySelection is used for selecting data arrays to use in filters
-// in ParaView.
+// vtkPVArraySelection is used for selecting which set of data arrays to 
+// load when a reader has the ability to selectively load arrays.
 
 #ifndef __vtkPVArraySelection_h
 #define __vtkPVArraySelection_h
 
-#include "vtkKWOptionMenu.h"
 #include "vtkDataSet.h"
 #include "vtkKWLabel.h"
 #include "vtkPVWidget.h"
+#include "vtkKWLabeledFrame.h"
 
 class vtkKWRadioButton;
 class vtkPVData;
@@ -62,76 +62,51 @@ public:
   vtkTypeMacro(vtkPVArraySelection, vtkPVWidget);
   
   // Description:
-  // The array selection list is taken from this data.
-  // This is not reference counted for fear of loops.
-  // Try reference counting in the future.
-  // Note: In the future, I would like to use the vtkPVData or vtkData instead of the vtkPVSource.
-  void SetPVSource(vtkPVSource *pvs) {this->PVSource = pvs;}
-  vtkPVSource *GetPVSource() { return this->PVSource;}
+  // This specifies whether to ues Cell or Point data.
+  // Options are "Cell" or "Point".  Possible "Field" in the future.
+  vtkSetStringMacro(AttributeName);
+  vtkGetStringMacro(AttributeName);
 
   // Description:
   // Create a Tk widget
   void Create(vtkKWApplication *app);
-  
-  // Description:
-  // Set the number of components in the arrays listed in the menu.
-  // Defaults to 1.
-  vtkSetMacro(NumberOfComponents, int);
-  vtkGetMacro(NumberOfComponents, int);
 
   // Description:
-  // If the vtkPVSource does not have PVInputs (e.g., vtkPVProbe), set
-  // the vtkDataSet to get the data arrays from.
-  void SetVTKData(vtkDataSet *VTKData);
-  vtkGetObjectMacro(VTKData, vtkDataSet);
-  
+  // This is the name of the VTK reader.
+  vtkSetStringMacro(VTKReaderTclName);
+  vtkGetStringMacro(VTKReaderTclName);
+    
   // Description:
-  // Flag to determine whether to use point data or cell data.
-  // Defaults to UsePointDataOn.
-  void SetUsePointData(int val);
-  vtkGetMacro(UsePointData, int);
-  vtkBooleanMacro(UsePointData, int);
+  // Methods for setting the value of the VTKReader from the widget.
+  // User internally when user hits Accept.
+  virtual void Accept();
 
   // Description:
-  // Set the command to call when a menu entry is selected.
-  // This command needs to be a method of the PVSource that has been set.
-  void SetMenuEntryCommand(const char *methodString);
-  
-  // Description:
-  // Fill the menu with array names
-  void FillMenu();
-  
-  // Description:
-  // Set/Get the value of the current menu entry
-  void SetValue(const char* value) {this->ArraySelectionMenu->SetValue(value);}
-  char* GetValue() { return this->ArraySelectionMenu->GetValue(); }
+  // Methods for setting the value of the widget from the VTKReader.
+  // User internally when user hits Reset.
+  virtual void Reset();
 
   // Description:
-  // Set the label for the array menu.
-  void SetLabel(const char *label)
-    { this->ArraySelectionLabel->SetLabel(label); }
-  const char* GetLabel() { return this->ArraySelectionLabel->GetLabel(); }
-  
+  // Callback for the AllOn and AllOff buttons.
+  void AllOnCallback();
+  void AllOffCallback();
+
 protected:
   vtkPVArraySelection();
   ~vtkPVArraySelection();
   vtkPVArraySelection(const vtkPVArraySelection&) {};
   void operator=(const vtkPVArraySelection&) {};
 
+  char* AttributeName;
+  char* VTKReaderTclName;
 
+  vtkKWLabeledFrame* LabeledFrame;
 
-  int NumberOfComponents;
-  int UsePointData;
-  
-  char *EntryCallback;
-  vtkDataSet *VTKData;
-  vtkPVSource *PVSource;
-    
-  vtkSetStringMacro(EntryCallback);
-  
-  vtkKWWidget *ArraySelectionFrame;
-  vtkKWLabel *ArraySelectionLabel;
-  vtkKWOptionMenu *ArraySelectionMenu;
+  vtkKWWidget* ButtonFrame;
+  vtkKWPushButton* AllOnButton;
+  vtkKWPushButton* AllOffButton;
+
+  vtkCollection* ArrayCheckButtons;
 };
 
 #endif

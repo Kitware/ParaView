@@ -81,8 +81,8 @@ public:
 
   // Description:
   // Methods to call when this pv source is selected/deselected
-  void Select(vtkKWView *view);
-  void Deselect(vtkKWView *view);
+  void Select();
+  void Deselect();
 
   // Description:
   // Called when the accept button is pressed.

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVData.h"
-#include "vtkKWCompositeCollection.h"
+#include "vtkPVWindow.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -63,7 +63,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDummyRenderer.h"
 
 #include "vtkTimerLog.h"
-#include "vtkPVActorComposite.h"
 #include "vtkKWCornerAnnotation.h"
 
 
@@ -567,9 +566,9 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
 	  leftOverlap = 1;
 	  }
 
-        this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
+        this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSource %s}",
                      this->NavigationCanvas->GetWidgetName(), tmp,
-                     currentSource->GetTclName(), source->GetTclName());
+                     this->GetParentWindow()->GetTclName(), source->GetTclName());
         
         delete [] tmp;
         tmp = NULL;
@@ -593,9 +592,9 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
 	  strcpy(tmp,result);
 	  this->CalculateBBox(tmp, bboxLine);
 
-	  this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
+	  this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSource %s}",
 		       this->NavigationCanvas->GetWidgetName(), tmp,
-		       currentSource->GetTclName(), source->GetTclName());
+		       this->GetParentWindow()->GetTclName(), source->GetTclName());
 	  
 	  delete [] tmp;
 	  tmp = NULL;
@@ -672,9 +671,9 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
 	  strcpy(tmp,result);
 	  this->CalculateBBox(tmp, bboxOut);
 	  }
-        this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
+        this->Script("%s bind %s <ButtonPress-1> {%s SetCurrentPVSource %s}",
                      this->NavigationCanvas->GetWidgetName(), tmp,
-                     currentSource->GetTclName(), source->GetTclName());
+                     this->GetParentWindow()->GetTclName(), source->GetTclName());
         delete [] tmp;
         tmp = NULL;
         
@@ -874,25 +873,16 @@ vtkPVApplication* vtkPVRenderView::GetPVApplication()
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AddComposite(vtkKWComposite *c)
+void vtkPVRenderView::AddPVData(vtkPVData *pvc)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVActorComposite *pvc = vtkPVActorComposite::SafeDownCast(c);
   
   if (pvc == NULL)
     {
-    // Default
-    this->vtkKWView::AddComposite(c);
     return;
-    }
-  
-  c->SetView(this);
-  // never allow a composite to be added twice
-  if (this->Composites->IsItemPresent(c))
-    {
-    return;
-    }
-  this->Composites->AddItem(c);
+    }  
+
+  pvc->SetView(this);
   if (pvc->GetPropTclName() != NULL)
     {
     pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
@@ -901,25 +891,21 @@ void vtkPVRenderView::AddComposite(vtkKWComposite *c)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::RemoveComposite(vtkKWComposite *c)
+void vtkPVRenderView::RemovePVData(vtkPVData *pvc)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVActorComposite *pvc = vtkPVActorComposite::SafeDownCast(c);
 
   if (pvc == NULL)
     {
-    // Default
-    this->vtkKWView::RemoveComposite(c);
     return;
     }
-  
-  c->SetView(NULL);
+
+  pvc->SetView(NULL);
   if (pvc->GetPropTclName() != NULL)
     {
     pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
 			   pvc->GetPropTclName());
     }
-  this->Composites->RemoveItem(c);
 }
 
 //----------------------------------------------------------------------------
@@ -1114,46 +1100,56 @@ void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::TriangleStripsCallback()
 {
-  int numComps = this->Composites->GetNumberOfItems();
-  int i;
-  vtkPVActorComposite *comp;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  this->Composites->InitTraversal();
-  
-  for (i = 0; i < numComps; i++)
+  vtkPVWindow *pvWin;
+  vtkCollection *sources;
+  vtkPVSource *pvs;
+  vtkPVData *pvd;
+  vtkPVApplication *pvApp;
+
+  pvApp = this->GetPVApplication();
+  pvWin = this->GetPVWindow();
+  if (pvWin == NULL)
     {
-    comp = vtkPVActorComposite::SafeDownCast(this->Composites->GetNextKWComposite());
-    if (comp &&
-        (comp->GetPVData()->GetVTKData()->IsA("vtkPolyData") ||
-         comp->GetPVData()->GetVTKData()->IsA("vtkUnstructuredGrid")))
-      {
-      pvApp->BroadcastScript("%s SetUseStrips %d",
-                             comp->GetGeometryTclName(),
-                             this->TriangleStripsCheck->GetState());
-      }
+    vtkErrorMacro("Missing window.");
+    return;
+    }
+  sources = pvWin->GetSources();
+  
+  sources->InitTraversal();
+  while ( (pvs = (vtkPVSource*)(sources->GetNextItemAsObject())) )
+    {
+    pvd = pvs->GetPVOutput();
+    pvApp->BroadcastScript("%s SetUseStrips %d",
+                           pvd->GetMapperTclName(),
+                           this->TriangleStripsCheck->GetState());
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ImmediateModeCallback()
 {
-  int numComps = this->Composites->GetNumberOfItems();
-  int i;
-  vtkPVActorComposite *comp;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  this->Composites->InitTraversal();
-  
-  for (i = 0; i < numComps; i++)
+  vtkPVWindow *pvWin;
+  vtkCollection *sources;
+  vtkPVSource *pvs;
+  vtkPVData *pvd;
+  vtkPVApplication *pvApp;
+
+  pvApp = this->GetPVApplication();
+  pvWin = this->GetPVWindow();
+  if (pvWin == NULL)
     {
-    comp = vtkPVActorComposite::SafeDownCast(this->Composites->GetNextKWComposite());
-    if (comp)
-      {
-      pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
-                             comp->GetMapperTclName(),
-                             this->ImmediateModeCheck->GetState());
-      }
+    vtkErrorMacro("Missing window.");
+    return;
+    }
+  sources = pvWin->GetSources();
+  
+  sources->InitTraversal();
+  while ( (pvs = (vtkPVSource*)(sources->GetNextItemAsObject())) )
+    {
+    pvd = pvs->GetPVOutput();
+    pvApp->BroadcastScript("%s SetImmediateModeRendering %d",
+                           pvd->GetMapperTclName(),
+                           this->ImmediateModeCheck->GetState());
     }
 }
 
@@ -1177,6 +1173,15 @@ void vtkPVRenderView::UseCharCallback()
                                               this->CompositeTclName,
                                               this->UseCharCheck->GetState());
     }
+}
+
+
+//----------------------------------------------------------------------------
+vtkPVWindow *vtkPVRenderView::GetPVWindow()
+{
+  vtkPVWindow *pvWin = vtkPVWindow::SafeDownCast(this->GetParentWindow());
+
+  return pvWin;
 }
 
 //----------------------------------------------------------------------------

@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkPVArraySelection.h"
 #include "vtkToolkits.h"
 
 #include "vtkDirectory.h"
@@ -154,8 +153,8 @@ vtkPVWindow::vtkPVWindow()
   this->ReductionLabel = vtkKWLabel::New();
   this->ReductionCheck = vtkKWCheckButton::New();
   
-  this->Sources = vtkKWCompositeCollection::New();
-  this->GlyphSources = vtkKWCompositeCollection::New();
+  this->Sources = vtkCollection::New();
+  this->GlyphSources = vtkCollection::New();
   
   this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
   
@@ -163,7 +162,7 @@ vtkPVWindow::vtkPVWindow()
   
   this->SourceInterfaces = vtkCollection::New();
   this->CurrentPVData = NULL;
-  //this->CurrentInteractor = NULL;
+  this->CurrentPVSource = NULL;
 
   // Allow the user to interactively resize the properties parent.
   this->MiddleFrame->SetSeparatorWidth(6);
@@ -216,7 +215,16 @@ void vtkPVWindow::CloseNoPrompt()
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
-  this->SetCurrentPVData(NULL);
+  if (this->CurrentPVData)
+    {
+    this->CurrentPVData->UnRegister(this);
+    this->CurrentPVData = NULL;
+    }
+  if (this->CurrentPVSource)
+    {
+    this->CurrentPVSource->UnRegister(this);
+    this->CurrentPVSource = NULL;
+    }
 
   if (this->SourceInterfaces)
     {
@@ -381,11 +389,6 @@ void vtkPVWindow::PrepareForDelete()
     this->AnimationInterface = NULL;
     }
   
-  //if (this->CurrentInteractor != NULL)
-  //  {
-  //  this->CurrentInteractor->UnRegister(this);
-  //  this->CurrentInteractor = NULL;
-  //  }
 }
 
 
@@ -429,18 +432,16 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   char *rbv = 
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(2, " Source",
-                                            rbv, this,
-                                            "ShowCurrentSourceProperties", 1,
+  this->GetMenuProperties()->AddRadioButton(2, " Source", rbv, this,
+                                    "ShowCurrentSourcePropertiesCallback", 1,
 					    "Display the properties of the "
     "current data source or filter");
   delete [] rbv;
 
   rbv = this->GetMenuProperties()->CreateRadioButtonVariable(
            this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(3, " Animation",
-                                            rbv, this,
-                                            "ShowAnimationProperties", 1,
+  this->GetMenuProperties()->AddRadioButton(3, " Animation", rbv, this,
+                                     "ShowAnimationProperties", 1,
 					    "Display the interface for "
     "creating animations by varying variables in a loop");
   delete [] rbv;
@@ -510,8 +511,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
     {
     if (sInt->GetInputClassName() == NULL)
       {
+      char methodAndArgs[150];
+      sprintf(methodAndArgs, "CreatePVSource %s", sInt->GetSourceClassName());
       // Remove "vtk" from the class name to get the menu item name.
-      this->SourceMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback {}");
+      this->SourceMenu->AddCommand(sInt->GetSourceClassName()+3, this, methodAndArgs);
       }
     }
 
@@ -732,25 +735,22 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // Create the sources that can be used for glyphing.
   // ===== Arrow
   sInt = this->GetSourceInterface("vtkArrowSource");
-  pvs = sInt->CreateCallback("GlyphArrow");
+  pvs = sInt->CreateCallback("GlyphArrow", this->GlyphSources);
   pvs->Accept(1);
-  this->GlyphSources->AddItem(pvs);
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetGlyphSource GlyphArrow]", 
-                       pvs->GetTclName(), this->GetTclName());
-  pvs->SetTraceInitialized(1);
+  pvs->SetTraceReferenceObject(this);
+  pvs->SetTraceReferenceCommand("GetGlyphSource GlyphArrow");
   // ===== Cone
   sInt = this->GetSourceInterface("vtkConeSource");
-  pvs = sInt->CreateCallback("GlyphCone");
+  pvs = sInt->CreateCallback("GlyphCone", this->GlyphSources);
   pvs->Accept(1);
-  this->GlyphSources->AddItem(pvs);
-  pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetGlyphSource GlyphCone]", 
-                       pvs->GetTclName(), this->GetTclName());
-  pvs->SetTraceInitialized(1);
+  pvs->SetTraceReferenceObject(this);
+  pvs->SetTraceReferenceCommand("GetGlyphSource GlyphCone");
   // ===== Sphere
   sInt = this->GetSourceInterface("vtkSphereSource");
-  pvs = sInt->CreateCallback("GlyphSphere");
+  pvs = sInt->CreateCallback("GlyphSphere", this->GlyphSources);
   pvs->Accept(1);
-  this->GlyphSources->AddItem(pvs);
+  pvs->SetTraceReferenceObject(this);
+  pvs->SetTraceReferenceCommand("GetGlyphSource GlyphSphere");
 
   // Show glyph sources in menu.
   this->UpdateSelectMenu();
@@ -1021,7 +1021,7 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   
   delete [] rootName;
 
-  pvs = sInt->CreateCallback(NULL);
+  pvs = sInt->CreateCallback(NULL, this->Sources);
   this->GetPVApplication()->AddTraceEntry("set kw(%s) [$kw(%s) Open %s]",
                                           pvs->GetTclName(),
                                           this->GetTclName(), openFileName);
@@ -1032,6 +1032,8 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     // Store MRU
     this->AddRecentFile(NULL, openFileName, this, "OpenRecentFile");
     }
+
+  this->SetCurrentPVSource(pvs);
 
   return pvs;
 }
@@ -1200,7 +1202,6 @@ void vtkPVWindow::ExportVTKScript()
 void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
 {
   ofstream *file;
-  vtkCollection *sources;
   vtkPVSource *pvs;
       
   file = new ofstream(filename, ios::out);
@@ -1227,45 +1228,28 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
     }
 
   this->GetMainView()->SaveInTclScript(file, vtkFlag);
-  
-  // Loop through sources ...
-  sources = this->GetSources();
-  sources->InitTraversal();
 
-  int numSources = sources->GetNumberOfItems();
-  int sourceCount = 0;
-
-  while (sourceCount < numSources)
+  // Mark all sources as not visited.
+  this->GlyphSources->InitTraversal();
+  while ( (pvs = (vtkPVSource*)(this->GlyphSources->GetNextItemAsObject())) )
     {
-    pvs = (vtkPVSource*)sources->GetItemAsObject(sourceCount);
-    if (pvs->IsA("vtkPVArrayCalculator"))
-      {
-      ((vtkPVArrayCalculator*)pvs)->SaveInTclScript(file);
-      }
-    else if (pvs->IsA("vtkPVContour"))
-      {
-      ((vtkPVContour*)pvs)->SaveInTclScript(file);
-      }
-    else if (pvs->IsA("vtkPVGlyph3D"))
-      {
-      ((vtkPVGlyph3D*)pvs)->SaveInTclScript(file);
-      }
-    else if (pvs->IsA("vtkPVThreshold"))
-      {
-      ((vtkPVThreshold*)pvs)->SaveInTclScript(file);
-      }
-    else if (pvs->IsA("vtkPVProbe"))
-      {
-      ((vtkPVProbe*)pvs)->SaveInTclScript(file);
-      }
-    else
+    pvs->SetVisitedFlag(0);
+    }
+  this->Sources->InitTraversal();
+  while ( (pvs = (vtkPVSource*)(this->Sources->GetNextItemAsObject())) )
+    {
+    pvs->SetVisitedFlag(0);
+    }
+  
+  // Loop through sources saving the visible sources.
+  this->Sources->InitTraversal();
+  while ( (pvs = (vtkPVSource*)(this->Sources->GetNextItemAsObject())) )
+    {
+    if (pvs->GetPVOutput()->GetVisibility())
       {
       pvs->SaveInTclScript(file);
       }
-    sourceCount++;
     }
-
-  this->GetMainView()->AddActorsToTclScript(file);
     
   if (vtkFlag)
     {
@@ -1427,7 +1411,10 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
       {
       if (sInt->GetIsValidInput(pvd))
         {
-        this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback {}");
+        char methodAndArgs[150];
+        sprintf(methodAndArgs, "CreatePVSource %s", sInt->GetSourceClassName());
+        this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, 
+                                     this, methodAndArgs);
         }
       }
     this->Script("%s entryconfigure \"VTK Filters\" -state normal",
@@ -1438,7 +1425,6 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
     this->DisableFilterButtons();
     this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
 		 this->AdvancedMenu->GetWidgetName());
-
     }
 }
 
@@ -1450,25 +1436,74 @@ vtkPVSource* vtkPVWindow::GetPreviousPVSource(int idx)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::SetCurrentPVSource(vtkPVSource *comp)
+void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
 {
-  this->MainView->SetSelectedComposite(comp);  
-  if (comp)
+  this->SetCurrentPVSource(pvs);
+
+
+  if (pvs)
     {
-    this->GetPVApplication()->AddTraceEntry("$kw(%s) SetCurrentPVSource $kw(%s)", 
-                        this->GetTclName(), comp->GetTclName());
-    this->SetCurrentPVData(comp->GetPVOutput());
+    if (pvs->InitializeTrace())
+      {
+      this->GetPVApplication()->AddTraceEntry("$kw(%s) SetCurrentPVSourceCallback $kw(%s)", 
+                          this->GetTclName(), pvs->GetTclName());
+      }
     }
   else
     {
-    this->GetPVApplication()->AddTraceEntry("$kw(%s) SetCurrentPVSource NULL", 
+    this->GetPVApplication()->AddTraceEntry("$kw(%s) SetCurrentPVSourceCallback NULL", 
                         this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SetCurrentPVSource(vtkPVSource *pvs)
+{
+  // I am commenting this out because selecting the composite should 
+  // still pack the source parent.  I do not knwo where this is done.
+  // It might be in Select of the new PVSource.
+  //if (this->CurrentPVSource == pvs)
+  //  {
+  //  return;
+  //  }
+
+  // Handle selection.
+  if (this->CurrentPVSource)
+    {
+    this->CurrentPVSource->Deselect();
+    }
+  if (pvs)
+    {
+    pvs->Select();
+    }
+
+  // Handle reference counting
+  if (pvs)
+    {
+    pvs->Register(this);
+    }
+  if (this->CurrentPVSource)
+    {
+    this->CurrentPVSource->UnRegister(this);
+    this->CurrentPVSource = NULL;
+    }
+
+  // Set variable.
+  this->CurrentPVSource = pvs;
+
+  // Other stuff
+  if (pvs)
+    {
+    this->SetCurrentPVData(pvs->GetPVOutput());
+    }
+  else
+    {
     this->SetCurrentPVData(NULL);
     }
 
   // This will update the parameters.  
   // I doubt the conditional is still necessary.
-  if (comp)
+  if (pvs)
     {
     this->ShowCurrentSourceProperties();
     }
@@ -1486,26 +1521,26 @@ void vtkPVWindow::AddPVSource(vtkPVSource *pvs)
     {
     this->Sources->AddItem(pvs);
     }
+  }
 
-  this->MainView->SetSelectedComposite(pvs);  
-  this->SetCurrentPVData(pvs->GetPVOutput());  
+//----------------------------------------------------------------------------
+void vtkPVWindow::RemovePVSource(vtkPVSource *pvs)
+{ 
+  if (pvs)
+    { 
+    this->Sources->RemoveItem(pvs);
+    }
 }
 
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetCurrentPVSource()
-{
-  return vtkPVSource::SafeDownCast(this->GetMainView()->GetSelectedComposite());
-}
-
-//----------------------------------------------------------------------------
-vtkKWCompositeCollection* vtkPVWindow::GetSources()
+vtkCollection* vtkPVWindow::GetSources()
 {
   return this->Sources;
 }
 
 //----------------------------------------------------------------------------
-vtkKWCompositeCollection* vtkPVWindow::GetGlyphSources()
+vtkCollection* vtkPVWindow::GetGlyphSources()
 {
   return this->GlyphSources;
 }
@@ -1552,7 +1587,7 @@ void vtkPVWindow::UpdateSelectMenu()
   for (i = 0; i < numSources; i++)
     {
     source = (vtkPVSource*)this->GlyphSources->GetItemAsObject(i);
-    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
+    sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", source->GetTclName());
     this->GlyphMenu->AddCommand(source->GetName(), this, methodAndArg,
 				      source->GetVTKSource() ?
 				      source->GetVTKSource()->GetClassName()+3
@@ -1566,7 +1601,7 @@ void vtkPVWindow::UpdateSelectMenu()
   for (i = 0; i < numSources; i++)
     {
     source = (vtkPVSource*)this->GetSources()->GetItemAsObject(i);
-    sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
+    sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", source->GetTclName());
     this->SelectMenu->AddCommand(source->GetName(), this, methodAndArg,
 				      source->GetVTKSource() ?
 				      source->GetVTKSource()->GetClassName()+3
@@ -1699,6 +1734,7 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
     }
   
   calc = vtkPVArrayCalculator::New();
+  calc->SetView(this->GetMainView());
   calc->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   calc->SetApplication(pvApp);
   calc->SetVTKSource(s, tclName);
@@ -1709,9 +1745,9 @@ vtkPVSource *vtkPVWindow::CalculatorCallback()
                       calc->GetTclName(), this->GetTclName());
   calc->SetTraceInitialized(1);
 
-  this->GetMainView()->AddComposite(calc);
   calc->CreateProperties();
   this->AddPVSource(calc);
+  this->SetCurrentPVSource(calc);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
@@ -1782,6 +1818,7 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
     }
   
   cutPlane = vtkPVCutPlane::New();
+  cutPlane->SetView(this->GetMainView());
   cutPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   cutPlane->SetApplication(pvApp);
   cutPlane->SetVTKSource(s, tclName);
@@ -1792,10 +1829,10 @@ vtkPVSource *vtkPVWindow::CutPlaneCallback()
                        cutPlane->GetTclName(), this->GetTclName());
   cutPlane->SetTraceInitialized(1);
 
-  this->GetMainView()->AddComposite(cutPlane);
   cutPlane->CreateProperties();
 
   this->AddPVSource(cutPlane);
+  this->SetCurrentPVSource(cutPlane);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
@@ -1862,6 +1899,7 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
     }
   
   threshold = vtkPVThreshold::New();
+  threshold->SetView(this->GetMainView());
   threshold->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   threshold->SetApplication(pvApp);
   threshold->SetVTKSource(s, tclName);
@@ -1872,9 +1910,9 @@ vtkPVSource *vtkPVWindow::ThresholdCallback()
                        threshold->GetTclName(), this->GetTclName());
   threshold->SetTraceInitialized(1);
 
-  this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
   this->AddPVSource(threshold);
+  this->SetCurrentPVSource(threshold);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
@@ -1946,6 +1984,7 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
     }
   
   clipPlane = vtkPVClipPlane::New();
+  clipPlane->SetView(this->GetMainView());
   clipPlane->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   clipPlane->SetApplication(pvApp);
   clipPlane->SetVTKSource(s, tclName);
@@ -1956,9 +1995,9 @@ vtkPVSource *vtkPVWindow::ClipPlaneCallback()
                        clipPlane->GetTclName(), this->GetTclName());
   clipPlane->SetTraceInitialized(1);
 
-  this->GetMainView()->AddComposite(clipPlane);
   clipPlane->CreateProperties();
   this->AddPVSource(clipPlane);
+  this->SetCurrentPVSource(clipPlane);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
@@ -2032,6 +2071,7 @@ vtkPVSource *vtkPVWindow::ContourCallback()
   s->SetNumberOfContours(0);
 
   contour = vtkPVContour::New();
+  contour->SetView(this->GetMainView());
   contour->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   contour->SetApplication(pvApp);
   contour->SetVTKSource(s, tclName);
@@ -2041,10 +2081,10 @@ vtkPVSource *vtkPVWindow::ContourCallback()
                        contour->GetTclName(), this->GetTclName());
   contour->SetTraceInitialized(1);
 
-  this->GetMainView()->AddComposite(contour);
   contour->CreateProperties();
   contour->SetPVInput(current);
   this->AddPVSource(contour);
+  this->SetCurrentPVSource(contour);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
@@ -2111,6 +2151,7 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
     }
 
   pvGlyph = vtkPVGlyph3D::New();
+  pvGlyph->SetView(this->GetMainView());
   pvGlyph->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   pvGlyph->SetApplication(pvApp);
   pvGlyph->SetVTKSource(glyph, tclName);
@@ -2121,9 +2162,9 @@ vtkPVSource *vtkPVWindow::GlyphCallback()
                        pvGlyph->GetTclName(), this->GetTclName());
   pvGlyph->SetTraceInitialized(1);
 
-  this->GetMainView()->AddComposite(pvGlyph);
   pvGlyph->CreateProperties();
   this->AddPVSource(pvGlyph);
+  this->SetCurrentPVSource(pvGlyph);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
@@ -2190,6 +2231,7 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
   pvApp->BroadcastScript("%s SetSpatialMatch 2", tclName);
   
   probe = vtkPVProbe::New();
+  probe->SetView(this->GetMainView());
   probe->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   probe->SetApplication(pvApp);
   probe->SetVTKSource(s, tclName);
@@ -2200,9 +2242,9 @@ vtkPVSource *vtkPVWindow::ProbeCallback()
                        probe->GetTclName(), this->GetTclName());
   probe->SetTraceInitialized(1);
 
-  this->GetMainView()->AddComposite(probe);
   probe->CreateProperties();
   this->AddPVSource(probe);
+  this->SetCurrentPVSource(probe);
   this->ShowCurrentSourceProperties();
 
   // Create the output.
@@ -2252,11 +2294,17 @@ void vtkPVWindow::ShowWindowProperties()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ShowCurrentSourceProperties()
+void vtkPVWindow::ShowCurrentSourcePropertiesCallback()
 {
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) ShowCurrentSourceProperties",
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) ShowCurrentSourcePropertiesCallback",
                                           this->GetTclName());
 
+  this->ShowCurrentSourceProperties();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ShowCurrentSourceProperties()
+{
   this->ShowProperties();
   
   // We need to update the properties-menu radio button too!
@@ -2278,7 +2326,6 @@ void vtkPVWindow::ShowCurrentSourceProperties()
                this->GetCurrentPVSource()->GetNotebook()->GetWidgetName());
   this->GetCurrentPVSource()->GetNotebook()->Raise("Source");
 }
-
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowAnimationProperties()
 {
@@ -2412,7 +2459,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char *className)
     vtkErrorMacro("Could not create source: " << className);
     return NULL;
     }
-  pvs = sInt->CreateCallback(NULL);
+  pvs = sInt->CreateCallback(NULL, this->Sources);
 
   return pvs;
 }

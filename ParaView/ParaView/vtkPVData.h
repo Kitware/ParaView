@@ -39,24 +39,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkPVData - Object to represent the output of a PVSource.
+// .SECTION Description
+// This object combines methods for accessing parallel VTK data, and also an 
+// interface for changing the view of the data.  The interface used to be in a 
+// superclass called vtkPVActorComposite.  I want to separate the interface 
+// from this object, but a superclass is not the way to do it.
 
 #ifndef __vtkPVData_h
 #define __vtkPVData_h
 
-#include "vtkPVActorComposite.h"
+
+#include "vtkKWObject.h"
+#include "vtkKWChangeColorButton.h"
+#include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWScale.h"
+#include "vtkKWLabeledEntry.h"
+#include "vtkKWMenuButton.h"
+#include "vtkKWOptionMenu.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkPVApplication.h"
+#include "vtkDataSetMapper.h"
+#include "vtkKWView.h"
 #include "vtkDataSet.h"
 
 class vtkPVSource;
-class vtkKWView;
 class vtkPVApplication;
-class vtkKWMenuButton;
+class vtkPVRenderView;
+class vtkKWCheckButton;
+class vtkKWBoundsDisplay;
+class vtkScalarBarActor;
+class vtkCubeAxesActor2D;
 
 
-class VTK_EXPORT vtkPVData : public vtkPVActorComposite
+
+class VTK_EXPORT vtkPVData : public vtkKWObject
 {
 public:
   static vtkPVData* New();
-  vtkTypeMacro(vtkPVData, vtkPVActorComposite);
+  vtkTypeMacro(vtkPVData, vtkKWObject);
 
   // Description:
   // This also creates the parallel vtk objects for the composite.
@@ -132,10 +154,161 @@ public:
   // expense of initial generation (reading) of the data.
   void InsertExtractPiecesIfNecessary();
   
+  //===================
+
+
+    // Description:
+  // Create the properties object, called by UpdateProperties.
+  void CreateProperties();
+  void UpdateProperties();
+  
+  // Description:
+  // This method should be called immediately after the object is constructed.
+  // It create VTK objects which have to exeist on all processes.
+  void CreateParallelTclObjects(vtkPVApplication *pvApp);
+      
+  // Description:
+  // This method is meant to setup the actor/mapper
+  // to best disply it input.  This will involve setting the scalar range,
+  // and possibly other properties. 
+  void Initialize();
+
+  // Description:
+  // This flag turns the visibility of the prop on and off.  These methods transmit
+  // the state change to all of the satellite processes.
+  void SetVisibility(int v);
+  int GetVisibility();
+  vtkBooleanMacro(Visibility, int);
+  void VisibilityCheckCallback();
+    
+  // Description:
+  // Sets the color range of all the mappers (all procs) and updates
+  // the user interface as well.
+  void SetColorRange(float min, float max);
+
+  // Description:
+  // This computes the union of the range of the data (current color by)
+  // across all process. Of cousre it returns the range.
+  void GetColorRange(float range[2]);
+  
+  // Description:
+  // Casts to vtkPVApplication.
+  vtkPVApplication *GetPVApplication();
+
+  vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
+  
+  // Description:
+  // to change the ambient component of the light
+  void AmbientChanged();
+  void SetAmbient(float ambient);
+
+  // Description:
+  // Tcl name of the actor across all processes.
+  vtkGetStringMacro(PropTclName);  
+  
+  // Description:
+  // Methods called when item chosen from RepresentationMenu
+  void DrawWireframe();
+  void DrawSurface();
+  void DrawPoints();
+  
+  // Description:
+  // Methods called when item chosen from RepresentationMenu
+  void SetInterpolationToFlat();
+  void SetInterpolationToGouraud();
+    
+  // Description:
+  // Callback for the ResetColorRange button.
+  void ResetColorRange();
+
+  // Set the color range from the entry widgets.
+  void ColorRangeEntryCallback();
+  
+  void SetScalarBarVisibility(int val);  
+  void ScalarBarCheckCallback();
+  void ScalarBarOrientationCallback();
+  void SetScalarBarOrientationToVertical();
+  void SetScalarBarOrientationToHorizontal();
+  
+  void SetCubeAxesVisibility(int val);
+  void CubeAxesCheckCallback();
+
+  void CenterCamera();
+  
+  // Description:
+  // Save out the mapper and actor to a file.
+  void SaveInTclScript(ofstream *file);
+  
+  // Description:
+  // Callback for the change color button.
+  void ChangeActorColor(float r, float g, float b);
+  
+  // Description:
+  // Needed to render.
+  vtkPVRenderView *GetPVRenderView();
+
+  // Description:
+  // Get the name of the scalar bar actor.
+  vtkGetStringMacro(ScalarBarTclName);
+  
+  // Description:
+  // Get the name of the cube axes actor.
+  vtkGetStringMacro(CubeAxesTclName);
+
+  // Description:
+  // Access to pointSize for scripting.
+  void SetPointSize(int size);
+  void SetLineWidth(int width);
+  
+  // Description:
+  // Callbacks for point size and line width sliders.
+  void ChangePointSize();
+  void ChangeLineWidth();
+
+  // Description:
+  // Access to option menus for scripting.
+  vtkGetObjectMacro(ColorMenu, vtkKWOptionMenu);
+  vtkGetObjectMacro(ColorMapMenu, vtkKWOptionMenu);
+
+  // Description:
+  // Callback methods when item chosen from ColorMenu
+  void ColorByProperty();
+  void ColorByPointFieldComponent(const char *name, int comp);
+  void ColorByCellFieldComponent(const char *name, int comp);
+
+  // Description:
+  // Callback for color map menu.
+  void ChangeColorMapToRedBlue();
+  void ChangeColorMapToBlueRed();
+  void ChangeColorMapToGrayscale();
+
+  // Description:
+  // Get the tcl name of the vtkPVGeometryFilter.
+  vtkGetStringMacro(GeometryTclName);
+
+  // Description:
+  // Get the tcl name of the mapper
+  vtkGetStringMacro(MapperTclName);
+  
+  // I shall want to get rid of this.
+  vtkSetObjectMacro(View, vtkKWView);
+  vtkGetObjectMacro(View, vtkKWView);
+  vtkKWView *View;
+
+  // Description:
+  // This allows you to set the propertiesParent to any widget you like.  
+  // If you do not specify a parent, then the views->PropertyParent is used.  
+  // If the composite does not have a view, then a top level window is created.
+  void SetPropertiesParent(vtkKWWidget *parent);
+  vtkGetObjectMacro(PropertiesParent, vtkKWWidget);
+  vtkKWWidget *PropertiesParent;
+
+
+
+
 protected:
   vtkPVData();
   ~vtkPVData();
-  
   vtkPVData(const vtkPVData&) {};
   void operator=(const vtkPVData&) {};
   
@@ -148,6 +321,115 @@ protected:
   // Keep a list of sources that are using this data.
   vtkPVSource **PVConsumers;
   int NumberOfPVConsumers;
+
+
+  //==================================================================
+  // Internal versions that do not add to the trace.
+  void ColorByPropertyInternal();
+  void ColorByPointFieldComponentInternal(const char *name, int comp);
+  void ColorByCellFieldComponentInternal(const char *name, int comp);
+  void SetColorRangeInternal(float min, float max);
+
+  // Problems with vtkLODActor led me to use these.
+  vtkProperty *Property;
+  vtkProp *Prop;
+  
+  // Not properties does not mean the same thing as vtk.
+  vtkKWWidget *Properties;
+  vtkKWLabel *NumCellsLabel;
+  vtkKWLabel *NumPointsLabel;
+  vtkKWBoundsDisplay *BoundsDisplay;
+  
+  vtkKWScale *AmbientScale;
+  
+  vtkKWLabeledFrame *ScalarBarFrame;
+  vtkKWLabeledFrame *ColorFrame;
+  vtkKWLabeledFrame *DisplayStyleFrame;
+  vtkKWWidget *StatsFrame;
+  vtkKWLabeledFrame *ViewFrame;
+  
+  vtkKWLabel *ColorMenuLabel;
+  vtkKWOptionMenu *ColorMenu;
+
+  vtkKWChangeColorButton *ColorButton;
+
+  vtkKWLabel *ColorMapMenuLabel;
+  vtkKWOptionMenu *ColorMapMenu;
+  
+  vtkKWWidget *RepresentationMenuFrame;
+  vtkKWLabel *RepresentationMenuLabel;
+  vtkKWOptionMenu *RepresentationMenu;
+  vtkKWWidget *InterpolationMenuFrame;
+  vtkKWLabel *InterpolationMenuLabel;
+  vtkKWOptionMenu *InterpolationMenu;
+
+  vtkKWWidget *DisplayScalesFrame;
+  vtkKWLabel *PointSizeLabel;
+  vtkKWScale *PointSizeScale;
+  vtkKWLabel *LineWidthLabel;
+  vtkKWScale *LineWidthScale;
+  
+  vtkKWCheckButton *VisibilityCheck;
+    
+  char *PropTclName;
+  vtkSetStringMacro(PropTclName);
+  
+  char *PropertyTclName;
+  vtkSetStringMacro(PropertyTclName);
+  
+  char *MapperTclName;
+  vtkSetStringMacro(MapperTclName);
+
+  char *LODMapperTclName;
+  vtkSetStringMacro(LODMapperTclName);
+  
+  char *LODDeciTclName;
+  vtkSetStringMacro(LODDeciTclName);
+  
+  char *OutlineTclName;
+  vtkSetStringMacro(OutlineTclName);
+  
+  char *GeometryTclName;
+  vtkSetStringMacro(GeometryTclName);
+  
+  char *OutputPortTclName;
+  vtkSetStringMacro(OutputPortTclName);
+  
+  char *AppendPolyDataTclName;
+  vtkSetStringMacro(AppendPolyDataTclName);
+  
+  // Here to create unique names.
+  int InstanceCount;
+
+  // If the data changes, we need to change to.
+  vtkTimeStamp UpdateTime;
+  
+  vtkKWWidget *ScalarBarCheckFrame;
+  vtkKWCheckButton *ScalarBarCheck;
+  vtkKWCheckButton *ScalarBarOrientationCheck;
+  char* ScalarBarTclName;
+  vtkSetStringMacro(ScalarBarTclName);
+  
+  // Stuff for setting the range of the color map.
+  vtkKWWidget *ColorRangeFrame;
+  vtkKWPushButton *ColorRangeResetButton;
+  vtkKWLabeledEntry *ColorRangeMinEntry;
+  vtkKWLabeledEntry *ColorRangeMaxEntry;
+
+  vtkKWCheckButton *CubeAxesCheck;
+  char* CubeAxesTclName;
+  vtkSetStringMacro(CubeAxesTclName);
+
+  vtkKWPushButton *ResetCameraButton;
+
+  float PreviousAmbient;
+  float PreviousDiffuse;
+  float PreviousSpecular;
+  int PreviousWasSolid;
+
+  vtkPolyDataMapper *Mapper;
+
+
 };
 
 #endif

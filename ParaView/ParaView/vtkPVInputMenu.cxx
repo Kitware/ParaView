@@ -67,6 +67,9 @@ vtkPVInputMenu::vtkPVInputMenu()
 
   this->Label = vtkKWLabel::New();
   this->Menu = vtkKWOptionMenu::New();
+  this->VTKInputName = NULL;
+  // Default name.
+  this->SetVTKInputName("Input");
 }
 
 //----------------------------------------------------------------------------
@@ -78,6 +81,7 @@ vtkPVInputMenu::~vtkPVInputMenu()
     this->InputType = NULL;
     }
   this->SetInputName(NULL);
+  this->SetVTKInputName(NULL);
   this->Sources = NULL;
 
   this->Label->Delete();
@@ -244,6 +248,23 @@ vtkDataSet *vtkPVInputMenu::GetVTKData()
   return pvs->GetPVOutput()->GetVTKData();
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::SaveInTclScript(ofstream *file)
+{
+  if (this->CurrentValue == NULL)
+    {
+    return;
+    }
+  *file << "\t";
+  // This is a bit of a hack to get the input name.
+  *file << this->PVSource->GetVTKSourceTclName() << " Set" 
+        << this->VTKInputName << " ["
+        << this->CurrentValue->GetVTKSourceTclName() << " GetOutput]\n";
+}
+
+
+
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::ModifiedCallback()
 {
@@ -263,7 +284,7 @@ void vtkPVInputMenu::Accept()
     {
     this->Script("%s Set%s %s", this->PVSource->GetTclName(), this->InputName,
                  this->CurrentValue->GetPVOutput()->GetTclName());
-    if (this->ModifiedFlag)
+    if (this->ModifiedFlag && this->CurrentValue->InitializeTrace())
       {
       this->AddTraceEntry("$kw(%s) SetCurrentValue $kw(%s)", 
                            this->GetTclName(), 

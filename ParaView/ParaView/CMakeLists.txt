@@ -10,7 +10,6 @@ vtkKWInteractor
 vtkKWRotateCameraInteractor 
 vtkKWSelectPointInteractor
 vtkKWTranslateCameraInteractor 
-vtkPVActorComposite 
 vtkPVAnimationInterface
 vtkPVApplication 
 vtkPVArrayCalculator 
@@ -22,6 +21,7 @@ vtkPVCutPlane
 vtkPVContour 
 vtkPVContourEntry 
 vtkPVData 
+vtkPVDataSetFileEntry
 vtkPVDataSetReaderInterface 
 vtkPVEnSightReaderInterface 
 vtkPVExtentTranslator 

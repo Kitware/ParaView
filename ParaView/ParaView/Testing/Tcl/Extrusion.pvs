@@ -20,13 +20,9 @@ rInt SetSourceClassName vtkPDataSetReader
 rInt SetApplication Application
 rInt SetPVWindow $pv(vtkTemp1)
 set pv(vtkTemp100) [rInt CreateCallback]
-
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp100)
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp100) AcceptCallback
+
 set pv(vtkTemp157) [$pv(vtkTemp1) CreatePVSource vtkRotationalExtrusionFilter]
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp157)
-$pv(vtkTemp1) ShowCurrentSourceProperties
 set pv(vtkTemp175) [$pv(vtkTemp157) GetPVWidget {Angle}]
 $pv(vtkTemp175) SetValue 90
 set pv(vtkTemp178) [$pv(vtkTemp157) GetPVWidget {Translation}]
@@ -34,6 +30,7 @@ $pv(vtkTemp178) SetValue 10
 set pv(vtkTemp181) [$pv(vtkTemp157) GetPVWidget {DeltaRadius}]
 $pv(vtkTemp181) SetValue 15
 $pv(vtkTemp157) AcceptCallback
+
 $pv(vtkTemp1) ResetCameraCallback
 
 # Fix the size of the image.

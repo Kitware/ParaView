@@ -63,6 +63,7 @@ class vtkPVApplication;
 class vtkKWInteractor;
 class vtkLabeledFrame;
 class vtkPVTreeComposite;
+class vtkPVWindow;
 
 class VTK_EXPORT vtkPVRenderView : public vtkKWView
 {
@@ -99,8 +100,8 @@ public:
 
   // Description:
   // This method is executed in all processes.
-  void AddComposite(vtkKWComposite *c);
-  void RemoveComposite(vtkKWComposite *c);
+  void AddPVData(vtkPVData *pvc);
+  void RemovePVData(vtkPVData *pvc);
 
   // Description:
   // Casts to vtkPVApplication.
@@ -221,6 +222,10 @@ public:
   // Description:
   // Get the immediate mode rendering check button.
   vtkGetObjectMacro(ImmediateModeCheck, vtkKWCheckButton);
+
+  // Description:
+  // A convience method to get the PVWindow.
+  vtkPVWindow *GetPVWindow();
   
 protected:
 

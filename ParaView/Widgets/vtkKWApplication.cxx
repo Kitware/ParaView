@@ -321,13 +321,6 @@ vtkKWWindowCollection *vtkKWApplication::GetWindows()
   return this->Windows;
 }
 
-//----------------------------------------------------------------------------
-vtkKWWindow *vtkKWApplication::GetMainWindow()
-{
-  this->Windows->InitTraversal();
-  return (vtkKWWindow*)(this->Windows->GetNextItemAsObject());
-}
-
 
 void vtkKWApplication::AddWindow(vtkKWWindow *w)
 {

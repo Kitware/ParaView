@@ -66,7 +66,7 @@ public:
 
   // Description:
   // An interface for saving a widget into a script.
-  virtual void SaveInTclScript(ofstream *file, const char *sourceName);
+  virtual void SaveInTclScript(ofstream *file);
 
 protected:
   vtkPVObjectWidget();

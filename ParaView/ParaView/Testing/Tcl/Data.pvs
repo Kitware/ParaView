@@ -13,7 +13,6 @@ set kw(vtkTemp92) [$kw(vtkTemp1) GetGlyphSource Arrow]
 set kw(vtkTemp96) [$kw(vtkTemp1) GetGlyphSource Cone]
 set kw(vtkTemp100) [$kw(vtkTemp1) GetGlyphSource Sphere]
 set kw(vtkTemp101) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
-$kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp111) [$kw(vtkTemp101) GetPVWidget {Center}]
 $kw(vtkTemp111) SetValue 0 0 2
 $kw(vtkTemp101) AcceptCallback
@@ -21,11 +20,9 @@ set kw(vtkTemp137) [$kw(vtkTemp101) GetPVOutput]
 $kw(vtkTemp137) SetLineWidth 1
 $kw(vtkTemp137) SetPointSize 1
 $kw(vtkTemp137) ChangeActorColor 0.501961 1.000000 0.000000
-$kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp171) [$kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"]
 $kw(vtkTemp1) ResetCameraCallback
 set kw(vtkTemp186) [$kw(vtkTemp1) ContourCallback]
-$kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp193) [$kw(vtkTemp186) GetPVWidget {Scalars}]
 $kw(vtkTemp193) SetValue scalars
 set kw(vtkTemp196) [$kw(vtkTemp186) GetPVWidget {Contour Values}]
@@ -44,7 +41,6 @@ $kw(vtkTemp214) SetPointSize 1
 $kw(vtkTemp214) ColorByCellFieldComponent scalars 0
 $kw(vtkTemp214) ColorByCellFieldComponent ramp1 0
 set kw(vtkTemp220) [$kw(vtkTemp1) CreatePVSource vtkCubeSource]
-$kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp239) [$kw(vtkTemp220) GetPVWidget {Center}]
 $kw(vtkTemp239) SetValue 0 2 2
 $kw(vtkTemp220) AcceptCallback
@@ -56,7 +52,6 @@ $kw(vtkTemp245) SetLineWidth 2
 $kw(vtkTemp245) SetLineWidth 3
 $kw(vtkTemp245) SetLineWidth 4
 set kw(vtkTemp251) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
-$kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp261) [$kw(vtkTemp251) GetPVWidget {Center}]
 $kw(vtkTemp261) SetValue 2 0 2
 $kw(vtkTemp251) AcceptCallback

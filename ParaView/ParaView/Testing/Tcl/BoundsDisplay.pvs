@@ -26,10 +26,8 @@ set kw(vtkTemp98) [$kw(vtkTemp1) GetGlyphSource Sphere]
 
 
 set kw(vtkTemp99) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
-$kw(vtkTemp1) ShowCurrentSourceProperties
 $kw(vtkTemp99) AcceptCallback
 set kw(vtkTemp167) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
-$kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp177) [$kw(vtkTemp167) GetPVWidget {Center}]
 $kw(vtkTemp177) SetValue 1.5 0 0
 set kw(vtkTemp182) [$kw(vtkTemp167) GetPVWidget {Radius}]
@@ -42,7 +40,6 @@ $kw(vtkTemp167) AcceptCallback
 $kw(vtkTemp1) ResetCameraCallback
 
 set kw(vtkTemp209) [$kw(vtkTemp1) ClipPlaneCallback]
-$kw(vtkTemp1) ShowCurrentSourceProperties
 
 $kw(vtkTemp44) SetBackgroundColor 1.000000 0.000000 0.501961
 

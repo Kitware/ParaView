@@ -135,10 +135,9 @@ void vtkPVWidget::ModifiedCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWidget::SaveInTclScript(ofstream *file, const char *sourceName)
+void vtkPVWidget::SaveInTclScript(ofstream *file)
 {
   file = file;
-  sourceName = sourceName;
 }
 
 

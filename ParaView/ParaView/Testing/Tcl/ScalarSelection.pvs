@@ -266,7 +266,7 @@ set pv(vtkTemp316) [$pv(vtkTemp1) CreatePVSource vtkLoopSubdivisionFilter]
 set pv(vtkTemp322) [$pv(vtkTemp316) GetPVWidget {Input}]
 $pv(vtkTemp322) SetCurrentValue $pv(vtkTemp282)
 set pv(vtkTemp327) [$pv(vtkTemp316) GetPVWidget {NumberOfSubdivisions}]
-$pv(vtkTemp327) SetValue 5
+$pv(vtkTemp327) SetValue 4
 $pv(vtkTemp316) AcceptCallback
 set pv(vtkTemp336) [$pv(vtkTemp1) CreatePVSource vtkWarpScalar]
 set pv(vtkTemp342) [$pv(vtkTemp336) GetPVWidget {Input}]

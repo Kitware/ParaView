@@ -166,6 +166,12 @@ vtkPVApplication::vtkPVApplication()
 }
 
 
+//----------------------------------------------------------------------------
+vtkPVWindow *vtkPVApplication::GetMainWindow()
+{
+  this->Windows->InitTraversal();
+  return (vtkPVWindow*)(this->Windows->GetNextItemAsObject());
+}
 
 
 //----------------------------------------------------------------------------

@@ -72,7 +72,8 @@ vtkPVEnSightReaderInterface* vtkPVEnSightReaderInterface::New()
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback(const char* name)
+vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback(const char* name,
+                                                    vtkCollection* sourceList)
 {
   char *tclName, *outputTclName, *srcTclName, *tmp;
   vtkDataSet *d;
@@ -192,7 +193,7 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback(const char* name)
     pvs->SetApplication(pvApp);
     pvs->SetInterface(this);
 
-    this->PVWindow->GetMainView()->AddComposite(pvs);
+    pvs->SetView(this->PVWindow->GetMainView());
     pvs->CreateProperties();
 
     // Now this is a bit of a hack to get tcl variables of these multiple sources.
@@ -206,11 +207,12 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback(const char* name)
     srcTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];
     sprintf(srcTclName, "%s_%d", tclName, i+1);
     pvs->SetName(srcTclName);
-    this->PVWindow->AddPVSource(pvs);
-    this->PVWindow->ShowCurrentSourceProperties();
     pvs->SetPVOutput(pvd);
-    pvs->Accept(0);
     
+    sourceList->AddItem(pvs);
+    pvs->Accept(0);
+    this->PVWindow->SetCurrentPVSource(pvs);
+
     pvs->Delete();
     pvd->Delete();
     delete [] outputTclName;

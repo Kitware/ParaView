@@ -53,6 +53,7 @@ class vtkPVSource;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
 class vtkMapper;
+class vtkPVWindow;
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -162,6 +163,9 @@ public:
   void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
   void SendCompleteArrays(vtkMapper *mapper);
 
+  // Description:
+  // Since ParaView has only one window, we might as well provide access to it.
+  vtkPVWindow *GetMainWindow();
 
   // Description:
   // ParaView version is always MajorVersion.MinorVersion.

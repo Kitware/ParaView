@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWToolbar.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
-#include "vtkPVArraySelection.h"
 #include "vtkPVInputMenu.h"
 #include "vtkKWCompositeCollection.h"
 
@@ -786,7 +785,7 @@ void vtkPVProbe::UpdateProbe()
   remoteProbeOutput->Delete();
 }
 
-void vtkPVProbe::Select(vtkKWView *view)
+void vtkPVProbe::Select()
 {
   vtkPVRenderView *renderView = this->GetPVWindow()->GetMainView();
   
@@ -803,10 +802,10 @@ void vtkPVProbe::Select(vtkKWView *view)
     this->Interactor->SetCursorVisibility(1);
     }
   
-  this->vtkPVSource::Select(view);
+  this->vtkPVSource::Select();
 }
 
-void vtkPVProbe::Deselect(vtkKWView *view)
+void vtkPVProbe::Deselect()
 {
   this->Script("set isPresent [[%s GetProps] IsItemPresent %s]",
 	       this->GetPVRenderView()->GetRendererTclName(),
@@ -831,7 +830,7 @@ void vtkPVProbe::Deselect(vtkKWView *view)
     this->Interactor->SetCursorVisibility(0);
     }
   
-  this->vtkPVSource::Deselect(view);
+  this->vtkPVSource::Deselect();
 }
 
 void vtkPVProbe::UsePoint()
@@ -1120,5 +1119,5 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
       }
     }
   
-  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
+  this->GetPVOutput(0)->SaveInTclScript(file);
 }

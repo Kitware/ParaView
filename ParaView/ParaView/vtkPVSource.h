@@ -49,10 +49,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVSource_h
 #define __vtkPVSource_h
 
-#include "vtkKWComposite.h"
+#include "vtkKWObject.h"
+#include "vtkKWView.h"
 
 class vtkKWPushButton;
-class vtkPVArraySelection;
 class vtkPVApplication;
 class vtkPVInputMenu;
 class vtkPVArrayMenu;
@@ -76,14 +76,15 @@ class vtkPVBoundsDisplay;
 class vtkPVScalarRangeLabel;
 class vtkCollection;
 
-class VTK_EXPORT vtkPVSource : public vtkKWComposite
+class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
 public:
   static vtkPVSource* New();
-  vtkTypeMacro(vtkPVSource,vtkKWComposite);
+  vtkTypeMacro(vtkPVSource,vtkKWObject);
   
   // Description:
-  // Get the Window for this class.
+  // Get the Window for this class.  This is used for creating input menus.
+  // The PVSource list is in the window.
   vtkPVWindow *GetPVWindow();
   
   // Description:
@@ -95,19 +96,14 @@ public:
   virtual void CreateProperties();
   
   // Description:
-  // Methods to indicate when this composite is the selected composite.
-  // These methods are used by subclasses to modify the menu bar
-  // for example. When a volume composite is selected it might 
-  // add an option to the menu bar to view the 2D slices.
-  virtual void Select(vtkKWView *);
-  virtual void Deselect(vtkKWView *);
+  // Methods to indicate when this source is selected in the window..
+  virtual void Select();
+  virtual void Deselect();
 
   // Description:
   // This flag turns the visibility of the prop on and off.  These methods transmit
   // the state change to all of the satellite processes.
   void SetVisibility(int v);
-  int GetVisibility();
-  vtkBooleanMacro(Visibility, int);
 
   // Description:
   // Although not all sources will need or use this input, I want to 
@@ -130,10 +126,6 @@ public:
   vtkPVApplication* GetPVApplication();  
 
   // Description:
-  // Sources have no props.
-  vtkProp *GetProp() {return NULL;}  
-
-  // Description:
   // Called when the accept button is pressed.
   virtual void AcceptCallback();
   virtual void PreAcceptCallback();
@@ -151,11 +143,6 @@ public:
   // Description:
   // Called when the delete button is pressed.
   virtual void DeleteCallback();
-
-  // Description:
-  // A call back method from the Navigation window.
-  // This sets the input source as the selected composite.
-  void SelectSource(vtkPVSource *source);
 
   // Description:
   // This method resets the UI values (Widgets added with the following methods).
@@ -286,6 +273,33 @@ public:
   vtkGetMacro(NumberOfPVOutputs, int);
   vtkPVData **GetPVOutputs() { return this->PVOutputs; };
 
+  // Description:
+  // The notebook that is displayed when the source is selected.
+  vtkGetObjectMacro(Notebook, vtkKWNotebook);
+
+  // I shall want to get rid of this.
+  vtkSetObjectMacro(View, vtkKWView);
+  vtkGetObjectMacro(View, vtkKWView);
+  vtkKWView *View;
+
+  // Description:
+  // This allows you to set the propertiesParent to any widget you like.  
+  // If you do not specify a parent, then the views->PropertyParent is used.  
+  // If the composite does not have a view, then a top level window is created.
+  void SetPropertiesParent(vtkKWWidget *parent);
+  vtkGetObjectMacro(PropertiesParent, vtkKWWidget);
+  vtkKWWidget *PropertiesParent;
+
+  // Desription:
+  // This is just a flag that is used to mark that the source has been saved
+  // into the tcl script (visited) during the recursive saving process.
+  vtkSetMacro(VisitedFlag,int);
+  vtkGetMacro(VisitedFlag,int);
+
+  // Description:
+  // This adds the PVWidget and sets up the callbacks to initialize its trace.
+  void AddPVWidget(vtkPVWidget *pvw);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -334,6 +348,8 @@ protected:
   vtkPVInputMenu *InputMenu;
     
   
+  vtkKWNotebook *Notebook;
+
   // The name is just for display.
   char      *Name;
 
@@ -344,9 +360,6 @@ protected:
   
   vtkKWWidgetCollection *Widgets;
 
-  // Description:
-  // This adds the PVWidget and sets up the callbacks to initialize its trace.
-  void AddPVWidget(vtkPVWidget *pvw);
 
   vtkKWPushButton *AcceptButton;
   vtkKWPushButton *ResetButton;
@@ -361,6 +374,7 @@ protected:
   int ReplaceInput;
 
   int InstanceCount;
+  int VisitedFlag;
 };
 
 #endif

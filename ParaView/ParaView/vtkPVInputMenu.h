@@ -133,6 +133,16 @@ public:
   void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
   vtkPVSource *GetPVSource() { return this->PVSource;}
 
+  // Description:
+  // Save this widget to a file.  
+  virtual void SaveInTclScript(ofstream *file);
+
+  // Description:
+  // This is the name used to set the input in the VTK filter.
+  // It is needed to save tcl scripts.
+  vtkSetStringMacro(VTKInputName);
+  vtkGetStringMacro(VTKInputName);
+
 protected:
   vtkPVInputMenu();
   ~vtkPVInputMenu();
@@ -141,6 +151,8 @@ protected:
 
   char* InputType;
   char* InputName;
+  char *VTKInputName;
+  
   vtkPVSource *CurrentValue;
   vtkCollection *Sources;
   

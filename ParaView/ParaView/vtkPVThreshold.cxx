@@ -47,7 +47,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVData.h"
-#include "vtkPVArraySelection.h"
 #include "vtkPVWindow.h"
 #include "vtkKWCompositeCollection.h"
 
@@ -373,10 +372,10 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
     *file << "CellData\n\t";
     }
   
-  this->MinMaxScale->SaveInTclScript(file, this->VTKSourceTclName);
+  this->MinMaxScale->SaveInTclScript(file);
   *file << "\t";
-  this->AllScalarsCheck->SaveInTclScript(file, this->VTKSourceTclName);
+  this->AllScalarsCheck->SaveInTclScript(file);
   *file << "\n";
   
-  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
+  this->GetPVOutput(0)->SaveInTclScript(file);
 }

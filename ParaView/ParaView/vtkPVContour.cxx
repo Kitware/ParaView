@@ -194,7 +194,7 @@ void vtkPVContour::SetPVInput(vtkPVData *input)
   if (this->ArrayMenu->GetValue() == NULL)
     {
     vtkKWMessageDialog::PopupMessage(this->Application, 
-				     this->Application->GetMainWindow(),
+				     this->GetPVApplication()->GetMainWindow(),
 				     vtkKWMessageDialog::Warning, "Warning", 
 				     "Input does not have scalars to contour.");
     }
@@ -260,5 +260,5 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
           << source->GetValue(i) << "\n\t";
     }
 
-  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
+  this->GetPVOutput(0)->SaveInTclScript(file);
 }

@@ -108,7 +108,8 @@ void vtkPVSourceInterface::SetPVWindow(vtkPVWindow *w)
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name)
+vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name,
+                                                  vtkCollection *sourceList)
 {
   char tclName[100], otherTclName[100];
   const char *outputDataType;
@@ -186,8 +187,9 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name)
     pvs->SetPVInput(current);
     }
   
-  // Add the new Source to the View.
-  this->PVWindow->GetMainView()->AddComposite(pvs);
+  // Add the new Source to the View, and make it current.
+  pvs->SetView(this->PVWindow->GetMainView());
+
   pvs->CreateProperties();
 
   if (this->InputClassName)
@@ -209,7 +211,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name)
 
   if (name == NULL )
     {
-    this->PVWindow->AddPVSource(pvs);
+    this->PVWindow->SetCurrentPVSource(pvs);
     this->PVWindow->ShowCurrentSourceProperties();
     }
 
@@ -359,6 +361,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name)
     }
   pvs->UpdateParameterWidgets();
   
+
+  sourceList->AddItem(pvs);
   pvs->Delete();
   pvd->Delete();
 

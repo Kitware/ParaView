@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVData.h"
+#include "vtkPVDataSetFileEntry.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 #include "vtkPVRenderView.h"
@@ -81,7 +82,8 @@ vtkPVDataSetReaderInterface* vtkPVDataSetReaderInterface::New()
 
 
 //----------------------------------------------------------------------------
-vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback(const char* name)
+vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback(const char* name,
+                                                    vtkCollection *sourceList)
 {
   char *tclName, *extentTclName, *tmp;
   char *outputTclName;
@@ -170,9 +172,8 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback(const char* name)
   this->SetFileName(this->GetDataFileName());
   
   // Add the new Source to the View, and make it current.
-  this->PVWindow->GetMainView()->AddComposite(pvs);
+  pvs->SetView(this->PVWindow->GetMainView());
   pvs->CreateProperties();
-  this->PVWindow->AddPVSource(pvs);
   this->PVWindow->ShowCurrentSourceProperties();
 
   // Create the output.
@@ -226,10 +227,23 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback(const char* name)
   // Hold onto name so it can be deleted.
   pvs->SetExtentTranslatorTclName(extentTclName);
 
-
-  
+  sourceList->AddItem(pvs);
   pvs->Delete();
   pvd->Delete();
+
+  // Add a file entry widget.
+  vtkPVFileEntry *entry;
+  entry = vtkPVDataSetFileEntry::New();
+  entry->SetParent(pvs->GetParameterFrame()->GetFrame());
+  entry->SetObjectVariable(pvs->GetVTKSourceTclName(), "FileName");
+  entry->SetModifiedCommand(pvs->GetTclName(), "ChangeAcceptButtonColor");
+  entry->Create(this->Application, "File Name", "vtk", "New file must have same type of output.");
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  pvs->AddPVWidget(entry);
+  entry->SetValue(this->GetDataFileName()); 
+  entry->Delete();
+  entry = NULL;
+
 
   ++this->InstanceCount;
 

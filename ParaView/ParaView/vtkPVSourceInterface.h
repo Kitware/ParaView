@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVMethodInterface.h"
 
 #include "vtkCollection.h"
-class vtkPVWindow;
+#include "vtkPVWindow.h"
 class vtkPVData;
 
 
@@ -116,9 +116,9 @@ public:
   // This method is called to create another source.
   // Name is usually NULL.  Names are specified for creating glyph sources.
   // In this case, the creation of the source is hidden from the user.
-  virtual vtkPVSource *CreateCallback(const char* name);
-  // Needed for old scripts that did not have name ...
-  vtkPVSource *CreateCallback(){return this->CreateCallback(NULL);}
+  virtual vtkPVSource *CreateCallback(const char* name, vtkCollection* sourceList);
+  vtkPVSource *CreateCallback() 
+    {return this->CreateCallback(NULL, this->PVWindow->GetSources());}
 
   // Description:
   // Save this interface to a file.

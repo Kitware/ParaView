@@ -736,8 +736,8 @@ void vtkPVArrayCalculator::SaveInTclScript(ofstream *file)
           << " 0 1 2\n\t";
     }
 
-  this->ArrayNameEntry->SaveInTclScript(file, this->VTKSourceTclName);
+  this->ArrayNameEntry->SaveInTclScript(file);
   *file << "\n";
   
-  this->GetPVOutput(0)->SaveInTclScript(file, this->VTKSourceTclName);
+  this->GetPVOutput(0)->SaveInTclScript(file);
 }

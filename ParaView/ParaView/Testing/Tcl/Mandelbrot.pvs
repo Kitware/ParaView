@@ -14,8 +14,6 @@ set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
 set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource vtkImageMandelbrotSource]
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp98)
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp98) AcceptCallback
 set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Extent}]
 $pv(vtkTemp110) SetValue 0 250 0 250 80 80

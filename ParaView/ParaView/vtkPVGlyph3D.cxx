@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVSourceInterface.h"
 #include "vtkPVData.h"
+#include "vtkPVInputMenu.h"
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
@@ -118,16 +119,20 @@ vtkPVData* vtkPVGlyph3D::GetGlyphSource()
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::CreateProperties()
 {
+  vtkPVInputMenu *inMenu;
+
   this->vtkPVSource::CreateProperties();
     
   this->AddInputMenu("Input", "PVInput", "vtkDataSet",
                      "Select the input for the filter.", 
                      this->GetPVWindow()->GetSources());                            
 
-  this->AddInputMenu("Glyph", "GlyphSource", "vtkPolyData",
+  inMenu = this->AddInputMenu("Glyph", "GlyphSource", "vtkPolyData",
                      "Select the data set to use as the glyph geometry.", 
                      this->GetPVWindow()->GetGlyphSources());
-  
+  inMenu->SetVTKInputName("Source");
+
+
   this->AddModeList("Scale Mode", "ScaleMode", "Select whether/how to scale the glyphs");
   this->AddModeListItem("Scalar", 0);
   this->AddModeListItem("Vector", 1);

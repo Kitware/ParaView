@@ -102,7 +102,6 @@ public:
   // Add a window to this application.
   void AddWindow(vtkKWWindow *w);
   vtkKWWindowCollection *GetWindows();
-  vtkKWWindow *GetMainWindow();
   
   // Description:
   // Set/Get the ApplicationName

@@ -54,7 +54,7 @@ public:
   static vtkPVEnSightReaderInterface* New();
   vtkTypeMacro(vtkPVEnSightReaderInterface, vtkPVSourceInterface);
 
-  vtkPVSource* CreateCallback(const char* name);
+  vtkPVSource* CreateCallback(const char* name, vtkCollection* sourceList);
 
   void SaveInTclScript(ofstream *file, const char *sourceName);
   

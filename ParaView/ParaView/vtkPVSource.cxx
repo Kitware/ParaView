@@ -63,7 +63,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputMenu.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkUnstructuredGridSource.h"
-#include "vtkPVArraySelection.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVStringEntry.h"
@@ -71,6 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVBoundsDisplay.h"
 #include "vtkPVScalarRangeLabel.h"
 #include "vtkKWEvent.h"
+#include "vtkKWNotebook.h"
 #include "vtkCallbackCommand.h"
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -90,6 +90,8 @@ vtkPVSource::vtkPVSource()
 
   this->Initialized = 0;
   
+  this->Notebook = vtkKWNotebook::New();
+
   this->PVInputs = NULL;
   this->NumberOfPVInputs = 0;
   this->PVOutputs = NULL;
@@ -116,6 +118,11 @@ vtkPVSource::vtkPVSource()
   this->ReplaceInput = 1;
 
   this->InputMenu = NULL; 
+
+  this->PropertiesParent = NULL;
+  this->View = NULL;
+
+  this->VisitedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -145,6 +152,9 @@ vtkPVSource::~vtkPVSource()
   this->SetVTKSource(NULL, NULL);
 
   this->SetName(NULL);
+
+  this->Notebook->Delete();
+  this->Notebook = NULL;
 
   this->Widgets->Delete();
   this->Widgets = NULL;
@@ -187,6 +197,14 @@ vtkPVSource::~vtkPVSource()
     this->InputMenu->UnRegister(this);
     this->InputMenu = NULL;
     }
+
+  if (this->PropertiesParent)
+    {
+    this->PropertiesParent->UnRegister(this);
+    this->PropertiesParent = NULL;
+    }
+  this->SetView(NULL);
+
 }
 
 //----------------------------------------------------------------------------
@@ -323,12 +341,14 @@ void vtkPVSource::SetInterface(vtkPVSourceInterface *pvsi)
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVSource::GetPVWindow()
 {
-  if (this->View == NULL || this->View->GetParentWindow() == NULL)
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if (pvApp == NULL)
     {
     return NULL;
     }
   
-  return vtkPVWindow::SafeDownCast(this->View->GetParentWindow());
+  return pvApp->GetMainWindow();
 }
 
 //----------------------------------------------------------------------------
@@ -356,11 +376,18 @@ void vtkPVSource::CreateProperties()
   char displayName[256];
   vtkPVApplication *app = this->GetPVApplication();
   
-  // invoke super
-  this->vtkKWComposite::CreateProperties();  
 
-  // Here until I check in my next changes.
-  this->Script("pack forget %s", this->Notebook->GetWidgetName());
+  // If the user has not set the properties parent.
+  if (this->PropertiesParent == NULL)
+    {
+    vtkErrorMacro("PropertiesParent has not been set.");
+    }
+
+  this->Notebook->SetParent(this->PropertiesParent);
+  this->Notebook->Create(this->Application,"");
+
+  //this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+  //             this->Notebook->GetWidgetName());
 
   // Set up the pages of the notebook.
   this->Notebook->AddPage("Parameters");
@@ -434,15 +461,12 @@ void vtkPVSource::CreateProperties()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSource::Select(vtkKWView *v)
+void vtkPVSource::Select()
 {
   vtkPVData *data;
   
-  // invoke super
-  this->vtkKWComposite::Select(v); 
-  
   this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->View->GetPropertiesParent()->GetWidgetName());
+               this->PropertiesParent->GetWidgetName());
   this->Script("pack %s -side top -fill x",
                this->GetPVRenderView()->GetNavigationFrame()->GetWidgetName());
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
@@ -455,34 +479,28 @@ void vtkPVSource::Select(vtkKWView *v)
   this->UpdateParameterWidgets();
   
   // This assumes that a source only has one output.
-  data = this->GetNthPVOutput(0);
+  data = this->GetPVOutput();
   if (data)
     {
-    data->Select(v);
+    // Update the Display page.
+    data->UpdateProperties();
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::Deselect(vtkKWView *v)
+void vtkPVSource::Deselect()
 {
-  int idx;
   vtkPVData *data;
 
-  // invoke super
-  this->vtkKWComposite::Deselect(v); 
-  
   this->Script("pack forget %s", this->Notebook->GetWidgetName());
 
-  // Deselect all outputs.
-  for (idx = 0; idx < this->NumberOfPVOutputs; ++idx)
+  data = this->GetPVOutput();
+  if (data)
     {
-    data = this->GetNthPVOutput(idx);
-    if (data)
-      {
-      data->Deselect(v);
-      }
+    data->SetScalarBarVisibility(0);
     }
 }
+
 
 //----------------------------------------------------------------------------
 char* vtkPVSource::GetName()
@@ -540,25 +558,11 @@ void vtkPVSource::SetVisibility(int v)
       {
       ac = this->PVOutputs[i];
       if (ac)
-	{
-	ac->SetVisibility(v);
-	}
+        {
+        ac->SetVisibility(v);
+        }
       }
     }
-}
-
-  
-//----------------------------------------------------------------------------
-int vtkPVSource::GetVisibility()
-{
-  vtkProp *p = this->GetProp();
-  
-  if (p == NULL)
-    {
-    return 0;
-    }
-  
-  return p->GetVisibility();
 }
 
 
@@ -621,7 +625,7 @@ void vtkPVSource::Accept(int hideFlag)
       return;
       }
     
-    window->GetMainView()->AddComposite(ac);
+    window->GetMainView()->AddPVData(ac);
     ac->CreateProperties();
     ac->Initialize();
     // Make the last data invisible.
@@ -631,7 +635,6 @@ void vtkPVSource::Accept(int hideFlag)
       if (this->ReplaceInput)
         {
         input->SetVisibility(0);
-        input->GetVisibilityCheck()->SetState(0);
         }
       }
     // The best test I could come up with to only reset
@@ -662,10 +665,6 @@ void vtkPVSource::Accept(int hideFlag)
     this->Initialized = 1;
     }
 
-  if (hideFlag == 0)
-    {
-    window->GetMainView()->SetSelectedComposite(this);
-    }
   window->GetMenuProperties()->CheckRadioButton(
                                   window->GetMenuProperties(), "Radio", 2);
   this->UpdateProperties();
@@ -761,7 +760,7 @@ void vtkPVSource::DeleteCallback()
       }
     else
       {
-      prev->VisibilityOn();
+      prev->SetVisibility(1);
       }
     }
 
@@ -784,25 +783,21 @@ void vtkPVSource::DeleteCallback()
     {
     // Unpack the properties.  This is required if prev is NULL.
     this->Script("catch {eval pack forget [pack slaves %s]}",
-		 this->View->GetPropertiesParent()->GetWidgetName());
+		 this->PropertiesParent->GetWidgetName());
     }
   else
     {
     //prev->GetPVOutput(0)->VisibilityOn();
     //prev->ShowProperties();
     }
-      
-  // We need to remove this source from the SelectMenu
-  this->GetPVWindow()->GetSources()->RemoveItem(this);
-  this->GetPVWindow()->UpdateSelectMenu();
-  
+        
   // Remove all of the actors mappers. from the renderer.
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
     {
     if (this->PVOutputs[i])
       {
       ac = this->GetPVOutput(i);
-      this->GetPVWindow()->GetMainView()->RemoveComposite(ac);
+      this->GetPVRenderView()->RemovePVData(ac);
       }
     }    
   
@@ -821,7 +816,7 @@ void vtkPVSource::DeleteCallback()
   this->GetPVWindow()->EnableMenus();
   
   // This should delete this source.
-  this->GetPVWindow()->GetMainView()->RemoveComposite(this);
+  this->GetPVWindow()->RemovePVSource(this);
 }
 
 //----------------------------------------------------------------------------
@@ -888,52 +883,35 @@ void vtkPVSource::UpdateProperties()
                    this->DeleteButton->GetWidgetName());
       }
   
-  this->GetPVWindow()->GetMainView()->UpdateNavigationWindow(this);
+  this->GetPVRenderView()->UpdateNavigationWindow(this);
   
-  // Make sure all the inputs are up to date.
-  //num = this->GetNumberOfPVInputs();
-  //for (idx = 0; idx < num; ++idx)
-  //  {
-  //  input = this->GetNthPVInput(idx);
-  //  input->Update();
-  //  }
-
   // I do not know why the inputs have to be updated.
   // I am changing it to output as an experiment.
   // The output might have been already updated elsewhere.
-  if (this->GetPVOutput(0))
+  if (this->GetPVOutput())
     {
-    this->GetPVOutput(0)->Update();
-    }
-
-  //this->UpdateScalarsMenu();
-  //this->UpdateVectorsMenu();
-
-  if (this->Interface)
-    {
-    if (this->Interface->GetDefaultScalars())
-      {
-      // ....
-      }
-    if (this->Interface->GetDefaultScalars())
-      {
-      // ....
-      }
+    // Update the VTK data.
+    this->GetPVOutput()->Update();
     }
 }
-  
-//----------------------------------------------------------------------------
-// Why do we need this.  Isn't show properties and Raise handled by window?
-void vtkPVSource::SelectSource(vtkPVSource *source)
+
+void vtkPVSource::SetPropertiesParent(vtkKWWidget *parent)
 {
-  if (source)
+  if (this->PropertiesParent == parent)
     {
-    this->GetPVWindow()->SetCurrentPVSource(source);
-    source->ShowProperties();
-    source->GetNotebook()->Raise(0);
+    return;
     }
+  if (this->PropertiesParent)
+    {
+    vtkErrorMacro("Cannot reparent properties.");
+    return;
+    }
+  this->PropertiesParent = parent;
+  parent->Register(this);
 }
 
+
+  
 typedef vtkPVData *vtkPVDataPointer;
 //---------------------------------------------------------------------------
 void vtkPVSource::SetNumberOfPVInputs(int num)
@@ -1012,7 +990,6 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
     if (this->ReplaceInput)
       {
       pvd->SetVisibility(0);
-      pvd->GetVisibilityCheck()->SetState(0);
       }
     pvd->Register(this);
     pvd->AddPVConsumer(this);
@@ -1149,99 +1126,65 @@ vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
 //----------------------------------------------------------------------------
 void vtkPVSource::SaveInTclScript(ofstream *file)
 {
-  char tclName[256];
-  char sourceTclName[256];
-  char* tempName;
-  char* extension;
-  int pos, i, numWidgets;
+  int i, numWidgets;
   vtkPVSourceInterface *pvsInterface = NULL;
   vtkPVWidget *widget;
-  
-  if (this->GetPVInput())
+
+  // Detect special sources we do not handle yet.
+  if (this->VTKSource == NULL)
     {
-    pvsInterface = this->GetPVInput()->GetPVSource()->GetInterface();
-    }
-  
-  if (this->VTKSource)
-    {
-    *file << this->VTKSource->GetClassName() << " "
-          << this->VTKSourceTclName << "\n";
-    sprintf(tclName, this->VTKSourceTclName);
-    }
-  else if (strcmp(this->GetInterface()->GetSourceClassName(),
-                  "vtkGenericEnSightReader") == 0)
-    {
-    extension = strrchr(this->Name, '_');
-    pos = extension - this->Name;
-    strncpy(tclName, this->Name, pos);
-    tclName[pos] = '\0';
-    this->Interface->SaveInTclScript(file, tclName);
-    this->GetPVOutput(0)->SaveInTclScript(file, tclName);
     return;
     }
-  else if (strcmp(this->GetInterface()->GetSourceClassName(),
-                  "vtkPDataSetReader") == 0)
+
+  // This should not be needed, but We can check anyway.
+  if (this->VisitedFlag == 2)
     {
-    *file << "vtkPDataSetReader " << this->Name << "\n";
-    sprintf(tclName, this->Name);
+    return;
+    }
+
+  // Special condition to detect loops in the pipeline.
+  // Visited 1 means that source is in stack, 2 means that
+  // the tcl script contains the source.
+  if (this->VisitedFlag == 1)
+    { // This source is already in in the stack, but there is a loop.
+    *file << "\n" << this->VTKSource->GetClassName() << " "
+          << this->VTKSourceTclName << "\n";
+    this->VisitedFlag = 2;
+    return;
+    }
+
+  // This is the recursive part.
+  this->VisitedFlag = 1;
+  // Loop through all of the inputs
+  for (i = 0; i < this->NumberOfPVInputs; ++i)
+    {
+    if (this->PVInputs[i] && this->PVInputs[i]->GetPVSource()->GetVisitedFlag() != 2)
+      {
+      this->PVInputs[i]->GetPVSource()->SaveInTclScript(file);
+      }
     }
   
-  if (this->NumberOfPVInputs > 0)
+  // Save the object in the script.
+  if (this->VisitedFlag != 2)
     {
-    *file << "\t" << tclName << " SetInput [";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
-                               "vtkGenericEnSightReader") == 0)
-      {
-      char *charFound;
-      int pos;
-      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-      
-      charFound = strrchr(dataName, 't');
-      tempName = strtok(dataName, "O");
-      *file << dataName << " GetOutput ";
-      pos = charFound - dataName + 1;
-      *file << dataName+pos << "]\n";
-      delete [] dataName;
-      }
-    else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkPDataSetReader") == 0)
-      {
-      char *dataName = new char[strlen(this->GetPVInput()->GetVTKDataTclName()) + 1];
-      strcpy(dataName, this->GetPVInput()->GetVTKDataTclName());
-      
-      sprintf(sourceTclName, "DataSetReader");
-      tempName = strtok(dataName, "O");
-      strcat(sourceTclName, tempName+7);
-      *file << sourceTclName << " GetOutput]\n";
-      delete [] dataName;
-      }
-    else
-      {
-      *file << this->GetPVInput()->GetPVSource()->GetVTKSourceTclName()
-            << " GetOutput]\n";
-      }
+    *file << "\n" << this->VTKSource->GetClassName() << " "
+          << this->VTKSourceTclName << "\n";
+    this->VisitedFlag = 2;
     }
 
-  if (this->Interface)
-    {
-    this->Interface->SaveInTclScript(file, tclName);
-    }
-
+  // Let the PVWidgets set up the object.
   numWidgets = this->Widgets->GetNumberOfItems();
   for (i = 0; i < numWidgets; i++)
     {
     widget = vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
     if (widget)
       {
-      *file << "\t";
-      widget->SaveInTclScript(file, tclName);
+      widget->SaveInTclScript(file);
       }
     }
-  
-  *file << "\n";
 
-  this->GetPVOutput(0)->SaveInTclScript(file, tclName);
+  // Add the mapper, actor, scalar bar actor ...
+  this->GetPVOutput()->SaveInTclScript(file);
 }
 
 
@@ -1710,5 +1653,5 @@ vtkPVWidget* vtkPVSource::GetPVWidget(const char *name)
 //----------------------------------------------------------------------------
 vtkPVRenderView* vtkPVSource::GetPVRenderView()
 {
-  return vtkPVRenderView::SafeDownCast(this->GetView());
+  return vtkPVRenderView::SafeDownCast(this->View);
 }

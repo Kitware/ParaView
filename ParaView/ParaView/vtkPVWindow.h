@@ -91,13 +91,15 @@ public:
   // The current source ...  Setting the current source also sets the current PVData.
   // It also sets the selected composite to the source.
   void SetCurrentPVSource(vtkPVSource *comp);
-  vtkPVSource *GetCurrentPVSource();
+  void SetCurrentPVSourceCallback(vtkPVSource *comp);
+  vtkPVSource *GetCurrentPVSource() {return this->CurrentPVSource;}
   vtkPVSource *GetPreviousPVSource(int idx = 1);
 
   // Description:
   // This adds a PVSource to the Source collection, and makes it current.
   // No trace entry is added during this call.
   void AddPVSource(vtkPVSource *pvs);
+  void RemovePVSource(vtkPVSource *pvs);
   
   // Description:
   // The current data is the data object that will be used as input to the next filter.
@@ -109,7 +111,7 @@ public:
   
   // Description:
   // This is a special list of precreated sources that can be used to glyph.
-  vtkKWCompositeCollection *GetGlyphSources();
+  vtkCollection *GetGlyphSources();
 
   // Description:
   // This access method is needed for scripts that modify the glyph source.
@@ -132,8 +134,10 @@ public:
   void ShowWindowProperties();
   
   // Description:
-  // Callback to show the page for the current source
+  // Callback to show the page for the current source.
+  // The callback adds to the trace file, the other does not.
   void ShowCurrentSourceProperties();
+  void ShowCurrentSourcePropertiesCallback();
 
   // Description:
   // Callback to show the animation page.
@@ -250,7 +254,7 @@ public:
   // Description:
   // This list contains all the sources created by the user.
   // It is used to create input menus for filters.
-  vtkKWCompositeCollection *GetSources();
+  vtkCollection *GetSources();
 
   // Description:
   // When you add a source to the source list, you sould update the select menu.
@@ -310,9 +314,9 @@ protected:
   vtkKWLabel *ReductionLabel;
   vtkKWCheckButton *ReductionCheck;
   
-  vtkKWCompositeCollection *Sources;
+  vtkCollection *Sources;
   // Special list of static sources that can be used for glyphing.
-  vtkKWCompositeCollection *GlyphSources;
+  vtkCollection *GlyphSources;
   vtkKWLabeledFrame *ApplicationAreaFrame;
 
   // Used internally.  Down casts vtkKWApplication to vtkPVApplication
@@ -331,6 +335,7 @@ protected:
   
   vtkCollection *SourceInterfaces;
   
+  vtkPVSource *CurrentPVSource;
   vtkPVData *CurrentPVData;
 
   // The animation interface. I put it in window because

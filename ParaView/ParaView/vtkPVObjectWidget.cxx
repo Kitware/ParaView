@@ -70,18 +70,19 @@ vtkPVObjectWidget::~vtkPVObjectWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVObjectWidget::SetObjectVariable(const char* objName, const char* varName)
+void vtkPVObjectWidget::SetObjectVariable(const char* objName, 
+                                          const char* varName)
 {
   this->SetObjectTclName(objName);
   this->SetVariableName(varName);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVObjectWidget::SaveInTclScript(ofstream *file, const char *sourceName)
+void vtkPVObjectWidget::SaveInTclScript(ofstream *file)
 {
   char *result;
   
-  *file << sourceName << " Set" << this->VariableName;
+  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName;
   this->Script("set tempValue [%s Get%s]", 
                this->ObjectTclName, this->VariableName);
   result = this->Application->GetMainInterp()->result;

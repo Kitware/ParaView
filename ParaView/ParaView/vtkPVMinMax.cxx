@@ -278,15 +278,15 @@ void vtkPVMinMax::MaxValueCallback()
   this->ModifiedCallback();
 }
 
-void vtkPVMinMax::SaveInTclScript(ofstream *file, const char *sourceName)
+void vtkPVMinMax::SaveInTclScript(ofstream *file)
 {
   char *result;
   
-  *file << sourceName << " " << this->SetCommand;
-  this->Script("set tempValue [%s %s]", sourceName, this->GetMinCommand);
+  *file << this->ObjectTclName << " " << this->SetCommand;
+  this->Script("set tempValue [%s %s]", this->ObjectTclName, this->GetMinCommand);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result;
-  this->Script("set tempValue [%s %s]", sourceName, this->GetMaxCommand);
+  this->Script("set tempValue [%s %s]", this->ObjectTclName, this->GetMaxCommand);
   result = this->Application->GetMainInterp()->result;
   *file << " " << result << "\n";
 }

@@ -74,7 +74,7 @@ public:
   
   // Description:
   // This method allows scripts to modify the widgets value.
-  void SetValue(const char* fileName);
+  virtual void SetValue(const char* fileName);
   const char* GetValue() {return this->Entry->GetValue();}
 
   // Description:

@@ -40,11 +40,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVArraySelection.h"
-#include "vtkKWRadioButton.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWCheckButton.h"
+#include "vtkCollection.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWApplication.h"
-#include "vtkFieldData.h"
-#include "vtkPVData.h"
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection* vtkPVArraySelection::New()
@@ -59,6 +58,7 @@ vtkPVArraySelection* vtkPVArraySelection::New()
   return new vtkPVArraySelection;
 }
 
+//----------------------------------------------------------------------------
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
                                int argc, char *argv[]);
 
@@ -66,35 +66,40 @@ vtkPVArraySelection::vtkPVArraySelection()
 {
   this->CommandFunction = vtkPVArraySelectionCommand;
   
-  this->ArraySelectionFrame = vtkKWWidget::New();
-  this->ArraySelectionFrame->SetParent(this);
-  this->ArraySelectionLabel = vtkKWLabel::New();
-  this->ArraySelectionLabel->SetParent(this->ArraySelectionFrame);
-  this->ArraySelectionMenu = vtkKWOptionMenu::New();
-  this->ArraySelectionMenu->SetParent(this->ArraySelectionFrame);
-  
-  this->NumberOfComponents = 1;
-  this->UsePointData = 1;
-  
-  this->EntryCallback = NULL;
-  this->VTKData = NULL;
+  this->VTKReaderTclName = NULL;
+  this->AttributeName = NULL;
+
+  this->LabeledFrame = vtkKWLabeledFrame::New();
+  this->ButtonFrame = vtkKWWidget::New();
+  this->AllOnButton = vtkKWPushButton::New();
+  this->AllOffButton = vtkKWPushButton::New();
+
+  this->ArrayCheckButtons = vtkCollection::New();
 }
 
+//----------------------------------------------------------------------------
 vtkPVArraySelection::~vtkPVArraySelection()
 {
-  this->ArraySelectionLabel->Delete();
-  this->ArraySelectionLabel = NULL;
-  this->ArraySelectionMenu->Delete();
-  this->ArraySelectionMenu = NULL;
-  this->ArraySelectionFrame->Delete();
-  this->ArraySelectionFrame = NULL;
-  
-  if (this->EntryCallback)
-    {
-    delete [] this->EntryCallback;
-    }
+  this->SetVTKReaderTclName(NULL);
+  this->SetAttributeName(NULL);
+
+  this->LabeledFrame->Delete();
+  this->LabeledFrame = NULL;
+
+  this->ButtonFrame->Delete();
+  this->ButtonFrame = NULL;
+
+  this->AllOnButton->Delete();
+  this->AllOnButton = NULL;
+
+  this->AllOffButton->Delete();
+  this->AllOffButton = NULL;
+
+  this->ArrayCheckButtons->Delete();
+  this->ArrayCheckButtons = NULL;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVArraySelection::Create(vtkKWApplication *app)
 {
   const char *wname;
@@ -117,123 +122,149 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
-  this->ArraySelectionFrame->Create(app, "frame", "");
-  this->ArraySelectionLabel->Create(app, "");
-  this->ArraySelectionLabel->SetLabel("Arrays:");
-  this->ArraySelectionMenu->Create(app, "");
-  app->Script("pack %s -fill x -side top",
-              this->ArraySelectionFrame->GetWidgetName());
-  app->Script("pack %s %s -side left",
-              this->ArraySelectionLabel->GetWidgetName(),
-              this->ArraySelectionMenu->GetWidgetName());
-}
-
-void vtkPVArraySelection::FillMenu()
-{
-  vtkFieldData *fd;
-  int numArrays, i, callbackLength, defaultSet = 0;
-  const char *arrayName, *defaultArrayName;
-  vtkDataArray *dataArray;
-
-  if ( ! this->PVSource)
+  this->LabeledFrame->SetParent(this);
+  if (strcmp(this->AttributeName, "Point") == 0)
     {
-    vtkErrorMacro("Must set PVSource before calling FillMenu");
-    }
-  if ( ! this->EntryCallback)
-    {
-    vtkErrorMacro("Must call SetCommand before FillMenu");
-    return;
-    }
-  
-  vtkPVData *pvInput = this->PVSource->GetPVInput();
-
-  if ( ! pvInput && ! this->VTKData)
-    {
-    vtkErrorMacro("Can't get list of data arrays");
-    return;
-    }
-
-  callbackLength = strlen(this->EntryCallback);
-  
-  this->ArraySelectionMenu->ClearEntries();
-
-  if (this->UsePointData)
-    {
-    if (pvInput)
-      {
-      fd = pvInput->GetVTKData()->GetPointData();
-      }
-    else
-      {
-      fd = this->VTKData->GetPointData();
-      }
+    this->LabeledFrame->SetLabel("Point Arrays");
     }
   else
     {
-    if (pvInput)
+    this->LabeledFrame->SetLabel("Cell Arrays");
+    }
+  this->LabeledFrame->Create(app);
+  app->Script("pack %s -fill x -side top",
+              this->LabeledFrame->GetWidgetName());
+
+  this->ButtonFrame->SetParent(this->LabeledFrame->GetFrame());
+  this->ButtonFrame->Create(app, "frame", "");
+
+  this->AllOnButton->SetParent(this->ButtonFrame);
+  this->AllOnButton->SetLabel("All On");
+  this->AllOnButton->Create(app, "");
+  this->AllOnButton->SetCommand(this, "AllOnCallback");
+  app->Script("pack %s -fill x -side left -expand t",
+              this->AllOnButton->GetWidgetName());
+
+  this->AllOffButton->SetParent(this->ButtonFrame);
+  this->AllOffButton->SetLabel("All On");
+  this->AllOffButton->Create(app, "");
+  this->AllOffButton->SetCommand(this, "AllOffCallback");
+  app->Script("pack %s -fill x -side left -expand t",
+              this->AllOffButton->GetWidgetName());
+
+  // This creates the check buttons and packs the button frame.
+  this->Reset();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::Reset()
+{
+  // Clear out any old check buttons.
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->LabeledFrame->GetWidgetName());
+  this->ArrayCheckButtons->RemoveAllItems();
+  
+  // Create new check buttons.
+  if (this->VTKReaderTclName)
+    {
+    int numArrays, idx;
+    vtkKWCheckButton* checkButton;
+    this->Script("%s GetNumberOf%sArrays", 
+                 this->VTKReaderTclName, this->AttributeName);
+    numArrays = this->GetIntegerResult(this->Application);
+    for (idx = 0; idx < numArrays; ++idx)
       {
-      fd = pvInput->GetVTKData()->GetCellData();
-      }
-    else
-      {
-      fd = this->VTKData->GetCellData();
+      checkButton = vtkKWCheckButton::New();
+      checkButton->SetParent(this->LabeledFrame->GetFrame());
+      checkButton->Create(this->Application, "");
+      this->Script("%s SetLabel [%s GetNameOf%sArray %d]", 
+                   checkButton->GetTclName(), 
+                   this->VTKReaderTclName, this->AttributeName, idx);
+      this->Script("%s SetState [%s Get%sArrayStatus %d]",
+                   checkButton->GetTclName(), 
+                   this->VTKReaderTclName, this->AttributeName, idx);
+      this->Script("pack %s -side top", checkButton->GetWidgetName());
+      checkButton->SetCommand(this, "ModifiedCallback");
+      this->ArrayCheckButtons->AddItem(checkButton);
+      checkButton->Delete();
       }
     }
-  
-  defaultArrayName = this->GetValue();
-  if (defaultArrayName && defaultArrayName[0] != '\0' &&
-      fd->GetArray(defaultArrayName))
+
+  // Pack the button frame.
+  this->Script("pack %s -side top -fill x -expand t", 
+               this->ButtonFrame->GetWidgetName());
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::Accept()
+{
+  vtkKWCheckButton *check;
+  int idx;
+
+  // Create new check buttons.
+  if (this->VTKReaderTclName == NULL)
     {
-    defaultSet = 1;
+    vtkErrorMacro("VTKREader has not been set.");
     }
-  
-  numArrays = fd->GetNumberOfArrays();
-  for (i = 0; i < numArrays; i++)
+
+  this->ArrayCheckButtons->InitTraversal();
+  idx = 0;
+  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    dataArray = fd->GetArray(i);
-    arrayName = fd->GetArrayName(i);
-    if (!arrayName)
-      {
-      continue;
-      }
-    
-    if (dataArray->GetNumberOfComponents() == this->NumberOfComponents)
-      {
-      this->ArraySelectionMenu->AddEntryWithCommand(fd->GetArrayName(i),
-                                                    this->PVSource,
-                                                    this->EntryCallback);
-      if (!defaultSet && arrayName[0] != '\0')
-        {
-        defaultArrayName = arrayName;
-        defaultSet = 1;
-        }
-      }
-    }
-  
-  if (defaultSet)
-    {
-    this->ArraySelectionMenu->SetValue(defaultArrayName);
-    this->Application->Script("%s %s", this->PVSource->GetTclName(),
-                              this->EntryCallback);
+    // I could also do this by array name.
+    this->Script("%s Set%sArrayStatus %d %d", this->VTKReaderTclName,
+                 this->AttributeName, idx, check->GetState());
+    ++idx;
     }
 }
 
-void vtkPVArraySelection::SetMenuEntryCommand(const char *methodString)
-{
-  this->SetEntryCallback(methodString);
-}
 
-void vtkPVArraySelection::SetUsePointData(int val)
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::AllOnCallback()
 {
-  if (val == this->UsePointData)
+  vtkKWCheckButton *check;
+  int modified = 0;;
+
+  this->ArrayCheckButtons->InitTraversal();
+  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    return;
+    if (check->GetState() == 0)
+      {
+      modified = 1;
+      check->SetState(1);
+      }
     }
-  
-  this->UsePointData = val;
+   
+  if (modified)
+    {
+    this->ModifiedCallback();
+    }   
 }
 
-void vtkPVArraySelection::SetVTKData(vtkDataSet *dataSet)
+
+//----------------------------------------------------------------------------
+void vtkPVArraySelection::AllOffCallback()
 {
-  this->VTKData = dataSet;
+  vtkKWCheckButton *check;
+  int modified = 0;;
+
+  this->ArrayCheckButtons->InitTraversal();
+  while ( (check = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+    {
+    if (check->GetState() != 0)
+      {
+      modified = 1;
+      check->SetState(0);
+      }
+    }
+   
+  if (modified)
+    {
+    this->ModifiedCallback();
+    }   
 }
+
+

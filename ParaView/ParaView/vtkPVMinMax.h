@@ -85,7 +85,7 @@ public:
   
   // Description:
   // Save this widget to a file
-  virtual void SaveInTclScript(ofstream *file, const char *sourceName);
+  virtual void SaveInTclScript(ofstream *file);
 
   // Description:
   // Callback for min scale
