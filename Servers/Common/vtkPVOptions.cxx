@@ -31,7 +31,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.8");
+vtkCxxRevisionMacro(vtkPVOptions, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -328,6 +328,7 @@ void vtkPVOptions::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "CrashOnErrors: " << this->CrashOnErrors << endl;
   os << indent << "StartEmpty: " << this->StartEmpty << endl;
   os << indent << "HelpSelected: " << this->HelpSelected << endl;
+  os << indent << "BatchScriptName: " << (this->BatchScriptName?this->BatchScriptName:"(none)" << endl;
   os << indent << "GroupFileName: " << (this->GroupFileName?this->GroupFileName:"(none)") << endl;
 
   // Everything after this line will be showned in Help/About dialog
