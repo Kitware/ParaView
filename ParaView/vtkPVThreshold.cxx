@@ -125,10 +125,10 @@ void vtkPVThreshold::CreateProperties()
   this->UpperValueScale->SetBalloonHelpString("Choose the upper value of the threshold");
   
   // Command to update the UI.
-  this->CancelCommands->AddString("%s SetValue [%s %s]",
-                                  this->UpperValueScale->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "GetUpperThreshold");
+  this->ResetCommands->AddString("%s SetValue [%s %s]",
+                                 this->UpperValueScale->GetTclName(),
+                                 this->GetVTKSourceTclName(),
+                                 "GetUpperThreshold");
 
   this->LowerValueScale->SetParent(this->GetParameterFrame()->GetFrame());
   this->LowerValueScale->Create(pvApp, "-showvalue 1");
@@ -140,10 +140,10 @@ void vtkPVThreshold::CreateProperties()
   this->LowerValueScale->SetBalloonHelpString("Choose the lower value of the threshold");
   
   // Command to update the UI.
-  this->CancelCommands->AddString("%s SetValue [%s %s]",
-                                  this->LowerValueScale->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "GetLowerThreshold");
+  this->ResetCommands->AddString("%s SetValue [%s %s]",
+                                 this->LowerValueScale->GetTclName(),
+                                 this->GetVTKSourceTclName(),
+                                 "GetLowerThreshold");
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
@@ -161,10 +161,10 @@ void vtkPVThreshold::CreateProperties()
   this->AllScalarsCheck->SetBalloonHelpString("If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
   
   // Command to update the UI.
-  this->CancelCommands->AddString("%s SetState [%s %s]",
-                                  this->AllScalarsCheck->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "GetAllScalars");
+  this->ResetCommands->AddString("%s SetState [%s %s]",
+                                 this->AllScalarsCheck->GetTclName(),
+                                 this->GetVTKSourceTclName(),
+                                 "GetAllScalars");
 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!

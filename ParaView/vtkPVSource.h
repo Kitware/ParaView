@@ -127,8 +127,8 @@ public:
   virtual void AcceptCallback();
   
   // Description:
-  // Called when the cancel button is pressed.
-  void CancelCallback();
+  // Called when the reset button is pressed.
+  void ResetCallback();
 
   // Description:
   // Called when the delete button is pressed.
@@ -268,7 +268,7 @@ protected:
   vtkKWWidgetCollection *Widgets;
 
   vtkKWPushButton *AcceptButton;
-  vtkKWPushButton *CancelButton;
+  vtkKWPushButton *ResetButton;
   vtkKWPushButton *DeleteButton;
   vtkPVInputMenu *InputMenu;
   vtkKWLabel *InputMenuLabel;
@@ -289,7 +289,7 @@ protected:
   // Until we find a way to match up widget names and commands to the method interfaces,
   // we will have to keep the generic strings.
   vtkStringList *AcceptCommands;
-  vtkStringList *CancelCommands;
+  vtkStringList *ResetCommands;
 
   vtkPVSourceInterface *Interface;
   

@@ -136,9 +136,9 @@ void vtkPVGlyph3D::CreateProperties()
     }
   this->AcceptCommands->AddString("%s ChangeSource",
                                   this->GetTclName());
-  this->CancelCommands->AddString("%s SetValue %s",
-                                  this->GlyphSourceMenu->GetTclName(),
-                                  this->GetGlyphSourceTclName());
+  this->ResetCommands->AddString("%s SetValue %s",
+                                 this->GlyphSourceMenu->GetTclName(),
+                                 this->GetGlyphSourceTclName());
   
   this->Script("pack %s %s -side left",
                this->GlyphSourceLabel->GetWidgetName(),
@@ -170,9 +170,9 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->AcceptCommands->AddString("%s ChangeScaleMode",
                                   this->GetTclName());
-  this->CancelCommands->AddString("%s SetValue %s",
-                                  this->GetTclName(),
-                                  this->GetGlyphScaleMode());
+  this->ResetCommands->AddString("%s SetValue %s",
+                                 this->GetTclName(),
+                                 this->GetGlyphScaleMode());
   
   this->Script("pack %s %s -side left",
                this->ScaleModeLabel->GetWidgetName(),
@@ -202,9 +202,9 @@ void vtkPVGlyph3D::CreateProperties()
   
   this->AcceptCommands->AddString("%s ChangeVectorMode",
                                   this->GetTclName());
-  this->CancelCommands->AddString("%s SetValue %s",
-                                  this->GetTclName(),
-                                  this->GetGlyphVectorMode());
+  this->ResetCommands->AddString("%s SetValue %s",
+                                 this->GetTclName(),
+                                 this->GetGlyphVectorMode());
   
   this->Script("pack %s %s -side left",
                this->VectorModeLabel->GetWidgetName(),
@@ -216,9 +216,9 @@ void vtkPVGlyph3D::CreateProperties()
   this->OrientCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->OrientCheck->SetBalloonHelpString("Select whether to orient the glyphs");
   
-  this->CancelCommands->AddString("%s SetState [%s GetOrient]",
-                                  this->OrientCheck->GetTclName(),
-                                  this->GetVTKSourceTclName()); 
+  this->ResetCommands->AddString("%s SetState [%s GetOrient]",
+                                 this->OrientCheck->GetTclName(),
+                                 this->GetVTKSourceTclName()); 
   this->AcceptCommands->AddString("%s AcceptHelper2 %s SetOrient [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -230,9 +230,9 @@ void vtkPVGlyph3D::CreateProperties()
   this->ScaleCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ScaleCheck->SetBalloonHelpString("Select whether to scale the glyphs");
   
-  this->CancelCommands->AddString("%s SetState [%s GetScaling]",
-                                  this->ScaleCheck->GetTclName(),
-                                  this->GetVTKSourceTclName()); 
+  this->ResetCommands->AddString("%s SetState [%s GetScaling]",
+                                 this->ScaleCheck->GetTclName(),
+                                 this->GetVTKSourceTclName()); 
   this->AcceptCommands->AddString("%s AcceptHelper2 %s SetScaling [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -247,9 +247,9 @@ void vtkPVGlyph3D::CreateProperties()
                this->GetTclName());
   this->ScaleEntry->SetBalloonHelpString("Select the amount to scale the glyphs by");
   
-  this->CancelCommands->AddString("%s SetValue [%s GetScaleFactor]",
-                                  this->ScaleEntry->GetTclName(),
-                                  this->GetVTKSourceTclName()); 
+  this->ResetCommands->AddString("%s SetValue [%s GetScaleFactor]",
+                                 this->ScaleEntry->GetTclName(),
+                                 this->GetVTKSourceTclName()); 
   this->AcceptCommands->AddString("%s AcceptHelper2 %s SetScaleFactor [%s GetValueAsFloat]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),

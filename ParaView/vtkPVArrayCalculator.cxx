@@ -239,10 +239,10 @@ void vtkPVArrayCalculator::CreateProperties()
                this->ArrayNameEntry->GetWidgetName());
   
   // Command to update the UI.
-  this->CancelCommands->AddString("%s SetValue [%s %s]",
-                                  this->ArrayNameEntry->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "GetResultArrayName");
+  this->ResetCommands->AddString("%s SetValue [%s %s]",
+                                 this->ArrayNameEntry->GetTclName(),
+                                 this->GetVTKSourceTclName(),
+                                 "GetResultArrayName");
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
@@ -266,10 +266,10 @@ void vtkPVArrayCalculator::CreateProperties()
 
   
   // Command to update the UI.
-  this->CancelCommands->AddString("%s SetValue [%s %s]",
-                                  this->FunctionEntry->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "GetFunction");
+  this->ResetCommands->AddString("%s SetValue [%s %s]",
+                                 this->FunctionEntry->GetTclName(),
+                                 this->GetVTKSourceTclName(),
+                                 "GetFunction");
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
   this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",

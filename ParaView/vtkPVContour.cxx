@@ -98,8 +98,8 @@ void vtkPVContour::CreateProperties()
   
   this->AcceptCommands->AddString("%s ContourValuesAcceptCallback",
                                   this->GetTclName());
-  this->CancelCommands->AddString("%s ContourValuesCancelCallback",
-                                  this->GetTclName());
+  this->ResetCommands->AddString("%s ContourValuesResetCallback",
+                                 this->GetTclName());
   
   this->NewValueFrame->SetParent(this->GetParameterFrame()->GetFrame());
   this->NewValueFrame->Create(pvApp, "frame", "");
@@ -139,10 +139,10 @@ void vtkPVContour::CreateProperties()
   this->ComputeNormalsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeNormalsCheck->SetBalloonHelpString("Select whether to compute normals");
   
-  this->CancelCommands->AddString("%s SetState [%s %s]",
-                                  this->ComputeNormalsCheck->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "GetComputeNormals");
+  this->ResetCommands->AddString("%s SetState [%s %s]",
+                                 this->ComputeNormalsCheck->GetTclName(),
+                                 this->GetVTKSourceTclName(),
+                                 "GetComputeNormals");
   this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -155,10 +155,10 @@ void vtkPVContour::CreateProperties()
   this->ComputeGradientsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeGradientsCheck->SetBalloonHelpString("Select whether to compute gradients");
   
-  this->CancelCommands->AddString("%s SetState [%s %s]",
-                                  this->ComputeGradientsCheck->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "GetComputeGradients");
+  this->ResetCommands->AddString("%s SetState [%s %s]",
+                                 this->ComputeGradientsCheck->GetTclName(),
+                                 this->GetVTKSourceTclName(),
+                                 "GetComputeGradients");
   this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -171,10 +171,10 @@ void vtkPVContour::CreateProperties()
   this->ComputeScalarsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeScalarsCheck->SetBalloonHelpString("Select whether to compute scalars");
   
-  this->CancelCommands->AddString("%s SetState [%s %s]",
-                                  this->ComputeScalarsCheck->GetTclName(),
-                                  this->GetVTKSourceTclName(),
-                                  "GetComputeScalars");
+  this->ResetCommands->AddString("%s SetState [%s %s]",
+                                 this->ComputeScalarsCheck->GetTclName(),
+                                 this->GetVTKSourceTclName(),
+                                 "GetComputeScalars");
   this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetState]",
                                   this->GetTclName(),
                                   this->GetVTKSourceTclName(),
@@ -228,7 +228,7 @@ void vtkPVContour::ContourValuesAcceptCallback()
     }
 }
 
-void vtkPVContour::ContourValuesCancelCallback()
+void vtkPVContour::ContourValuesResetCallback()
 {
   int i;
   vtkKitwareContourFilter* contour =

@@ -57,7 +57,7 @@ public:
   // Description:
   // Tcl callback for adding the contour values
   void ContourValuesAcceptCallback();
-  void ContourValuesCancelCallback();
+  void ContourValuesResetCallback();
 
   // Description:
   // Save this source to a file.
