@@ -479,6 +479,7 @@ void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
   this->CenterEntry[0]->SetValue(x, 3);
   this->CenterEntry[1]->SetValue(y, 3);
   this->CenterEntry[2]->SetValue(z, 3); 
+  this->ModifiedFlag = 1;
   if ( this->Widget3D )
     {
     vtkPlaneWidget *plane = static_cast<vtkPlaneWidget*>(this->Widget3D);
@@ -492,6 +493,7 @@ void vtkPVPlaneWidget::SetNormal(float x, float y, float z)
   this->NormalEntry[0]->SetValue(x, 3);
   this->NormalEntry[1]->SetValue(y, 3);
   this->NormalEntry[2]->SetValue(z, 3); 
+  this->ModifiedFlag = 1;
   if ( this->Widget3D )
     {
     vtkPlaneWidget *plane = static_cast<vtkPlaneWidget*>(this->Widget3D);
