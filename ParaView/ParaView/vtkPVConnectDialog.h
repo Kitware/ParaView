@@ -103,10 +103,8 @@ protected:
   int PortInt;
   int MultiProcessMode;
   int NumberOfProcesses;
- 
-  // Result from last RootScript.
-  char* RootResult;
-private:  
+
+private:
   vtkPVConnectDialog(const vtkPVConnectDialog&); // Not implemented
   void operator=(const vtkPVConnectDialog&); // Not implemented
 };
