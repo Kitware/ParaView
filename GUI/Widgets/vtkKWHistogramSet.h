@@ -23,11 +23,7 @@
 class vtkDataArray;
 class vtkKWHistogram;
 class vtkKWHistogramCallback;
-
-//BTX
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
-//ETX
+class vtkKWHistogramSetInternals;
 
 class VTK_EXPORT vtkKWHistogramSet : public vtkObject
 {
@@ -88,8 +84,8 @@ protected:
     virtual ~HistogramSlot();
 
     virtual void SetName(const char *name);
-    virtual char* GetName();
-    virtual vtkKWHistogram * GetHistogram();
+    virtual char* GetName() { return this->Name; }
+    virtual vtkKWHistogram * GetHistogram()  { return this->Histogram; };
     
   protected:
 
@@ -97,9 +93,10 @@ protected:
     vtkKWHistogram *Histogram;
   };
 
-  typedef vtkLinkedList<HistogramSlot*> HistogramsContainer;
-  typedef vtkLinkedListIterator<HistogramSlot*> HistogramsContainerIterator;
-  HistogramsContainer *Histograms;
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWHistogramSetInternals *Internals;
+  friend class vtkKWHistogramSetInternals;
 
   // Helper methods
 

@@ -17,14 +17,25 @@
 #include "vtkCommand.h"
 #include "vtkDataArray.h"
 #include "vtkKWHistogram.h"
-#include "vtkLinkedList.txx"
-#include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
 
-//----------------------------------------------------------------------------
+#include <vtkstd/list>
+#include <vtkstd/algorithm>
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWHistogramSet);
-vtkCxxRevisionMacro(vtkKWHistogramSet, "1.1");
+vtkCxxRevisionMacro(vtkKWHistogramSet, "1.2");
+
+//----------------------------------------------------------------------------
+class vtkKWHistogramSetInternals
+{
+public:
+
+  typedef vtkstd::list<vtkKWHistogramSet::HistogramSlot*> HistogramsContainer;
+  typedef vtkstd::list<vtkKWHistogramSet::HistogramSlot*>::iterator HistogramsContainerIterator;
+
+  HistogramsContainer Histograms;
+};
 
 //----------------------------------------------------------------------------
 class vtkKWHistogramCallback : public vtkCommand
@@ -85,12 +96,6 @@ vtkKWHistogramSet::HistogramSlot::~HistogramSlot()
 }
 
 //----------------------------------------------------------------------------
-char* vtkKWHistogramSet::HistogramSlot::GetName()
-{
-  return this->Name;
-}
-
-//----------------------------------------------------------------------------
 void vtkKWHistogramSet::HistogramSlot::SetName(const char *_arg)
 {
   if (this->Name == NULL && _arg == NULL) 
@@ -120,15 +125,9 @@ void vtkKWHistogramSet::HistogramSlot::SetName(const char *_arg)
 }
 
 //----------------------------------------------------------------------------
-vtkKWHistogram* vtkKWHistogramSet::HistogramSlot::GetHistogram()
-{
-  return this->Histogram;
-}
-
-//----------------------------------------------------------------------------
 vtkKWHistogramSet::vtkKWHistogramSet()
 {
-  this->Histograms = vtkKWHistogramSet::HistogramsContainer::New();
+  this->Internals = new vtkKWHistogramSetInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -137,7 +136,7 @@ vtkKWHistogramSet::~vtkKWHistogramSet()
   // Remove histograms and delete the container
 
   this->RemoveAllHistograms();
-  this->Histograms->Delete();
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -145,88 +144,71 @@ void vtkKWHistogramSet::RemoveAllHistograms()
 {
   // Remove/delete all histograms
 
-  vtkKWHistogramSet::HistogramSlot *histogram_slot = NULL;
-  vtkKWHistogramSet::HistogramsContainerIterator *it = 
-    this->Histograms->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(histogram_slot) == VTK_OK)
+    vtkKWHistogramSetInternals::HistogramsContainerIterator it = 
+      this->Internals->Histograms.begin();
+    vtkKWHistogramSetInternals::HistogramsContainerIterator end = 
+      this->Internals->Histograms.end();
+    for (; it != end; ++it)
       {
-      delete histogram_slot;
+      if (*it)
+        {
+        delete *it;
+        }
       }
-    it->GoToNextItem();
+    this->Internals->Histograms.clear();
     }
-  it->Delete();
-
-  this->Histograms->RemoveAllItems();
 }
 
 //----------------------------------------------------------------------------
 vtkKWHistogramSet::HistogramSlot* 
 vtkKWHistogramSet::GetHistogramSlot(const char *name)
 {
-  if (!name)
+  if (name && this->Internals)
     {
-    return NULL;
-    }
-
-  vtkKWHistogramSet::HistogramSlot *histogram_slot = NULL;
-  vtkKWHistogramSet::HistogramSlot *found = NULL;
-  vtkKWHistogramSet::HistogramsContainerIterator *it = 
-    this->Histograms->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(histogram_slot) == VTK_OK && 
-        !strcmp(histogram_slot->GetName(), name))
+    vtkKWHistogramSetInternals::HistogramsContainerIterator it = 
+      this->Internals->Histograms.begin();
+    vtkKWHistogramSetInternals::HistogramsContainerIterator end = 
+      this->Internals->Histograms.end();
+    for (; it != end; ++it)
       {
-      found = histogram_slot;
-      break;
+      if (*it && (*it)->GetName() && !strcmp((*it)->GetName(), name))
+        {
+        return (*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWHistogramSet::HistogramSlot* 
 vtkKWHistogramSet::GetHistogramSlot(vtkKWHistogram *hist)
 {
-  if (!hist)
+  if (hist && this->Internals)
     {
-    return NULL;
-    }
-
-  vtkKWHistogramSet::HistogramSlot *histogram_slot = NULL;
-  vtkKWHistogramSet::HistogramSlot *found = NULL;
-  vtkKWHistogramSet::HistogramsContainerIterator *it = 
-    this->Histograms->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(histogram_slot) == VTK_OK && 
-        histogram_slot->GetHistogram() == hist)
+    vtkKWHistogramSetInternals::HistogramsContainerIterator it = 
+      this->Internals->Histograms.begin();
+    vtkKWHistogramSetInternals::HistogramsContainerIterator end = 
+      this->Internals->Histograms.end();
+    for (; it != end; ++it)
       {
-      found = histogram_slot;
-      break;
+      if (*it && (*it)->GetHistogram() == hist)
+        {
+        return (*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkIdType vtkKWHistogramSet::GetNumberOfHistograms()
 {
-  return this->Histograms->GetNumberOfItems();
+  return this->Internals ? this->Internals->Histograms.size() : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -270,18 +252,22 @@ int vtkKWHistogramSet::HasHistogram(vtkKWHistogram *hist)
 //----------------------------------------------------------------------------
 vtkKWHistogram* vtkKWHistogramSet::GetNthHistogram(vtkIdType index)
 {
-  if (index < 0 || index >= this->GetNumberOfHistograms())
+  if (this->Internals && index >= 0 && index < this->GetNumberOfHistograms())
     {
-    return NULL;
+    vtkKWHistogramSetInternals::HistogramsContainerIterator it = 
+      this->Internals->Histograms.begin();
+    vtkKWHistogramSetInternals::HistogramsContainerIterator end = 
+      this->Internals->Histograms.end();
+    for (; it != end; ++it)
+      {
+      if (*it && !index--)
+        {
+        return (*it)->GetHistogram();
+        }
+      }
     }
 
-  vtkKWHistogramSet::HistogramSlot *histogram_slot = NULL;
-  if (this->Histograms->GetItem(index, histogram_slot) != VTK_OK)
-    {
-    return NULL;
-    }
-
-  return histogram_slot->GetHistogram();
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -308,13 +294,7 @@ int vtkKWHistogramSet::AddHistogram(const char *name)
 
   vtkKWHistogramSet::HistogramSlot *histogram_slot = 
     new vtkKWHistogramSet::HistogramSlot;
-  
-  if (this->Histograms->AppendItem(histogram_slot) != VTK_OK)
-    {
-    vtkErrorMacro("Error while adding an histogram to the set.");
-    delete histogram_slot;
-    return 0;
-    }
+  this->Internals->Histograms.push_back(histogram_slot);
   
   // Assign the name
 
@@ -333,8 +313,12 @@ int vtkKWHistogramSet::RemoveHistogram(const char *name)
     return 0;
     }
 
-  vtkIdType pos = 0;
-  if (this->Histograms->FindItem(histogram_slot, pos) != VTK_OK)
+  vtkKWHistogramSetInternals::HistogramsContainerIterator pos = 
+    vtkstd::find(this->Internals->Histograms.begin(),
+                 this->Internals->Histograms.end(),
+                 histogram_slot);
+
+  if (pos == this->Internals->Histograms.end())
     {
     vtkErrorMacro("Error while removing an histogram from the set "
                   "(can not find the histogram).");
@@ -343,11 +327,7 @@ int vtkKWHistogramSet::RemoveHistogram(const char *name)
 
   // Remove the histogram from the container
 
-  if (this->Histograms->RemoveItem(pos) != VTK_OK)
-    {
-    vtkErrorMacro("Error while removing the histogram from the container.");
-    return 0;
-    }
+  this->Internals->Histograms.erase(pos);
 
   // Delete the slot
 
