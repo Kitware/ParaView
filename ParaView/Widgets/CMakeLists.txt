@@ -14,7 +14,6 @@ vtkKWDialog
 vtkKWEntry 
 vtkKWEvent
 vtkKWExtent 
-vtkKWFileDialog
 vtkKWFindPath
 vtkKWGenericComposite 
 vtkKWHashTable
