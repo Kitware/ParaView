@@ -95,6 +95,8 @@ vtkKWApplication::vtkKWApplication()
   this->Script("wm overrideredirect %s 1", this->BalloonHelpWindow->GetWidgetName());
   this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
 
+  this->WidgetVisibility = 1;
+  
   this->EventNotifier = vtkKWEventNotifier::New();
   this->EventNotifier->SetApplication( this );
 }
@@ -142,8 +144,8 @@ void vtkKWApplication::SimpleScript(char *event)
   
   if (Tcl_GlobalEval(this->MainInterp, event) != TCL_OK)
     {
-    vtkGenericWarningMacro("Error returned from tcl script.\n" <<
-			   this->MainInterp->result << endl);
+    vtkErrorMacro("Error returned from tcl script.\n" <<
+		  this->MainInterp->result << endl);
     }
 }
 
