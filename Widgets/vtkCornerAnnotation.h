@@ -86,7 +86,8 @@ protected:
   void operator=(const vtkCornerAnnotation&) {};
 
   float MaximumLineHeight;
-  
+
+  int FontSize;
   vtkActor2D    *TextActor[4];
   vtkTimeStamp   BuildTime;
   int            LastSize[2];
