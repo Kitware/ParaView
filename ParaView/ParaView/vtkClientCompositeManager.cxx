@@ -57,7 +57,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.32");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.33");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -620,53 +620,32 @@ void vtkClientCompositeManager::SatelliteStartRender()
   controller->Receive((int*)(&winInfo), winInfoSize, 
                       otherId, vtkCompositeManager::WIN_INFO_TAG);
 
-  renWin->SetSize(winInfo.WindowSize[0],
-                  winInfo.WindowSize[1]);
-  // Artificial size maximum to test.
-  if (0)
-    {
-    int x, y;
-    x = winInfo.WindowSize[0];
-    y = winInfo.WindowSize[1];
-    if (x > 200)
-      {
-      x = 200;
-      }
-    if (y > 200)
-      {
-      y = 200;
-      }
-    renWin->SetSize(x, y);
-    }
-
   // In case the render window is smaller than requested.
   // This assumes that all server processes will have the
   // same (or larger) maximum render window size.
-  int* renWinSize;
-  renWinSize = renWin->GetSize();
-  if (winInfo.WindowSize[0] != renWinSize[0] ||
-      winInfo.WindowSize[1] != renWinSize[1])
+  int* screenSize = renWin->GetScreenSize();
+  if (winInfo.WindowSize[0] > screenSize[0] ||
+      winInfo.WindowSize[1] > screenSize[1])
     {
     if (myId == 0)
       {
       // We need to keep the same aspect ratio.
       int newSize[2];
       float k1, k2;
-      k1 = (float)renWinSize[0]/(float)winInfo.WindowSize[0];
-      k2 = (float)renWinSize[1]/(float)winInfo.WindowSize[1];
+      k1 = (float)screenSize[0]/(float)winInfo.WindowSize[0];
+      k2 = (float)screenSize[1]/(float)winInfo.WindowSize[1];
       if (k1 < k2)
         {
-        newSize[0] = renWinSize[0];
+        newSize[0] = screenSize[0];
         newSize[1] = (int)((float)(winInfo.WindowSize[1]) * k1);
         }
       else
         {
         newSize[0] = (int)((float)(winInfo.WindowSize[0]) * k2);
-        newSize[1] = renWinSize[1];
+        newSize[1] = screenSize[1];
         }
       winInfo.WindowSize[0] = newSize[0];
       winInfo.WindowSize[1] = newSize[1];
-      renWin->SetSize(newSize);
       }
     else
       { // Sanity check that all server 
@@ -674,6 +653,8 @@ void vtkClientCompositeManager::SatelliteStartRender()
       vtkErrorMacro("Server window size mismatch.");
       }
     }
+
+  renWin->SetSize(winInfo.WindowSize);
 
   if (myId == 0)
     {  
@@ -932,9 +913,6 @@ void vtkClientCompositeManager::ReallocPDataArrays()
 {
   int numComps = 4;
   int numTuples = this->PDataSize[0] * this->PDataSize[1];
-  // This was producing a warning. I did not remove it because
-  // I was not sure if the author intended to use it later.
-  //int magNumTuples = this->PDataSize[0] * this->PDataSize[1];
   int numProcs = 1;
 
   if ( ! this->ClientFlag)
