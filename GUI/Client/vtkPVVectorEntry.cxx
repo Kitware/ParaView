@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.53.2.1");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.53.2.2");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -691,6 +691,7 @@ void vtkPVVectorEntry::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LabelWidget: " << this->LabelWidget << endl;
   os << indent << "ReadOnly: " << this->ReadOnly << endl;
   os << indent << "VectorLength: " << this->VectorLength << endl;
+  os << indent << "AcceptCalled: " << this->AcceptCalled << endl;
 }
 
 //-----------------------------------------------------------------------------

@@ -2051,6 +2051,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                            radius_scale_factor=".1"
                            radius_property="Radius"
                            input_menu="im"
+                           number_of_points_property="NumberOfPoints"
                            default_number_of_points="100"
                            show_entries="1"/>
       </Item>

@@ -34,8 +34,8 @@ public:
   
   // Description:
   // This method allows scripts to modify the widgets value.
-  void SetValue(float val);
-  float GetValue();
+  void SetValue(double val);
+  double GetValue();
 
   // Description:
   // The label.

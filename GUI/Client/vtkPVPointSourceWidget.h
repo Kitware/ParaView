@@ -129,8 +129,6 @@ protected:
 
   vtkPVScaleFactorEntry* RadiusWidget;
   vtkPVVectorEntry* NumberOfPointsWidget;
-  vtkPVWidgetProperty *RadiusProperty;
-  vtkPVWidgetProperty *NumberOfPointsProperty;
 
   float RadiusScaleFactor;
   float DefaultRadius;
