@@ -143,6 +143,12 @@ public:
   void Render();
   void EventuallyRender();
   void EventuallyRenderCallBack();
+
+  // Description:
+  // Tcl "update" has to be called for various reasons (packing).
+  // This calls update without triggering EventuallyRenderCallback.
+  // I was having problems with multiple renders.
+  void UpdateTclButAvoidRendering();
   
   // Description:
   // Update all the actors.

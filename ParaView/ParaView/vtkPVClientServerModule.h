@@ -96,6 +96,10 @@ public:
   void RelayScriptRMI(const char *str);
     
   // Description:
+  // Execute on all server procs (but not client).
+  virtual void ServerSimpleScript(const char *str);
+
+  // Description:
   // Get the Partition piece. -1 means no partition assigned to this process.
   virtual int GetPartitionId();
 

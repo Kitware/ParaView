@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.281");
+vtkCxxRevisionMacro(vtkPVSource, "1.282");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -951,7 +951,7 @@ void vtkPVSource::Pack()
 {
   // The update is needed to work around a packing problem which
   // occur for large windows. Do not remove.
-  this->Script("update");
+  this->GetPVRenderView()->UpdateTclButAvoidRendering();
 
   this->Script("catch {eval pack forget [pack slaves %s]}",
                this->ParametersParent->GetWidgetName());
@@ -1202,12 +1202,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   vtkPVPart *part;
   vtkPVSource *input;
 
-  this->Script("update");
-
   window = this->GetPVWindow();
 
   this->SetAcceptButtonColorToWhite();
-  this->Script("update");
+  this->GetPVRenderView()->UpdateTclButAvoidRendering();
   
   // We need to pass the parameters from the UI to the VTK objects before
   // we check whether to insert ExtractPieces.  Otherwise, we'll get errors
@@ -1328,7 +1326,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     pvd->UpdateProperties();
     }
 
-  this->Script("update");  
+  this->GetPVRenderView()->UpdateTclButAvoidRendering();
 
 #ifdef _WIN32
   this->Script("%s configure -cursor arrow", window->GetWidgetName());
@@ -2574,7 +2572,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.281 $");
+  this->ExtractRevision(os,"$Revision: 1.282 $");
 }
 
 //----------------------------------------------------------------------------

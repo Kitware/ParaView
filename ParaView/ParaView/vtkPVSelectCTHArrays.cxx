@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.1");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.2");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -452,4 +452,5 @@ int vtkPVSelectCTHArrays::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVSelectCTHArrays::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "InputMenu: " << this->InputMenu << endl;
 }

@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.244");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.245");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1948,6 +1948,38 @@ void vtkPVRenderView::Render()
     }
 }
 
+
+
+//----------------------------------------------------------------------------
+// There are a couple of ways I could do this.
+// I could allow eventually render callback to occur
+// and abort the render using the disable rendering flag ...
+void vtkPVRenderView::UpdateTclButAvoidRendering()
+{
+  int saveRender = 0;
+
+  // Remove any pending renders.
+  if (this->RenderPending && this->Application )
+    {
+    saveRender = 1;
+    this->Script("after cancel %s", this->RenderPending);
+    this->SetRenderPending(NULL);
+    // This flag is not necessary.  We should just use render pending ivar.
+    this->EventuallyRenderFlag = 0;
+    }
+
+  this->Script("update");
+
+  // Add render pending back.
+  if (saveRender)
+    {
+    this->EventuallyRender();
+    }
+}
+
+
+
+
 //----------------------------------------------------------------------------
 void vtkPVRenderView::EventuallyRender()
 {
@@ -2005,7 +2037,9 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     vtkErrorMacro("Inconsistent EventuallyRenderFlag");
     return;
     }
+  // We could get rid of the flag and use the pending ivar.
   this->EventuallyRenderFlag = 0;
+  this->SetRenderPending(NULL);
   if (this->GetPVWindow()->GetInteractor())
     {
     this->RenderWindow->SetDesiredUpdateRate(
@@ -2642,7 +2676,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.244 $");
+  this->ExtractRevision(os,"$Revision: 1.245 $");
 }
 
 //------------------------------------------------------------------------------

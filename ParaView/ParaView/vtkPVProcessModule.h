@@ -85,12 +85,21 @@ public:
   void RemoteScript(int remoteId, char *EventString, ...);
 
   // Description:
-  // Can only be called by process 0.  It executes a script on every other
+  // Can only be called by process 0.  It executes a script on every
   // process.
   void BroadcastScript(char *EventString, ...);
+
+  // Description:
+  // Can only be called by process 0.  
+  // It executes a script on every server process.
+  // This is needed because we only connect pipeline on server (not client).
+  void ServerScript(char *EventString, ...);
+
+
 //ETX
   virtual void RemoteSimpleScript(int remoteId, const char *str);
   virtual void BroadcastSimpleScript(const char *str);
+  virtual void ServerSimpleScript(const char *str);
   
   // Description:
   // The controller is needed for filter that communicate internally.

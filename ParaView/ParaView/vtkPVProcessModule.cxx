@@ -77,7 +77,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.13");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.14");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -181,9 +181,53 @@ void vtkPVProcessModule::BroadcastScript(char *format, ...)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVProcessModule::ServerScript(char *format, ...)
+{
+  char event[1600];
+  char* buffer = event;
+  
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Missing application object.");
+    return;
+    }
+
+  va_list ap;
+  va_start(ap, format);
+  int length = this->Application->EstimateFormatLength(format, ap);
+  va_end(ap);
+  
+  if(length > 1599)
+    {
+    buffer = new char[length+1];
+    }
+  
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(buffer, format, var_args);
+  va_end(var_args);
+  
+  this->ServerSimpleScript(buffer);
+  
+  if(buffer != event)
+    {
+    delete [] buffer;
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVProcessModule::BroadcastSimpleScript(const char *str)
 {
   this->Application->SimpleScript(str);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::ServerSimpleScript(const char *str)
+{
+  // Do this so that only the client server process module 
+  // needs to implement this method.
+  this->BroadcastSimpleScript(str);
 }
 
 //----------------------------------------------------------------------------

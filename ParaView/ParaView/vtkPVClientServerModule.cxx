@@ -154,7 +154,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.23");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.24");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -473,6 +473,29 @@ const char* vtkPVClientServerModule::GetRootResult()
     this->SocketController->Receive(this->RootResult, length, 1, VTK_PV_ROOT_RESULT_TAG);
     }
   return this->RootResult;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::ServerSimpleScript(const char *str)
+{
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("Missing application object.");
+    return;
+    }
+  if (!str || (strlen(str) < 1))
+    {
+    return;
+    }
+
+  if ( ! this->ClientMode)
+    {
+    vtkErrorMacro("NotExpecting this call on the server.");
+    return;
+    }
+
+  this->SocketController->TriggerRMI(1, const_cast<char*>(str), 
+                                     VTK_PV_BROADCAST_SCRIPT_RMI_TAG);
 }
 
 //----------------------------------------------------------------------------
