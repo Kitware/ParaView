@@ -15,7 +15,7 @@
 #include "vtkPVXMLElement.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVXMLElement, "1.8");
+vtkCxxRevisionMacro(vtkPVXMLElement, "1.9");
 vtkStandardNewMacro(vtkPVXMLElement);
 
 //----------------------------------------------------------------------------
@@ -282,6 +282,12 @@ int vtkPVXMLElement::GetScalarAttribute(const char* name, float* value)
 }
 
 //----------------------------------------------------------------------------
+int vtkPVXMLElement::GetScalarAttribute(const char* name, double* value)
+{
+  return this->GetVectorAttribute(name, 1, value);
+}
+
+//----------------------------------------------------------------------------
 template <class T>
 int vtkPVXMLVectorAttributeParse(const char* str, int length, T* data)
 {
@@ -307,6 +313,13 @@ int vtkPVXMLElement::GetVectorAttribute(const char* name, int length,
 //----------------------------------------------------------------------------
 int vtkPVXMLElement::GetVectorAttribute(const char* name, int length,
                                         float* data)
+{
+  return vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
+}
+
+//----------------------------------------------------------------------------
+int vtkPVXMLElement::GetVectorAttribute(const char* name, int length,
+                                        double* data)
 {
   return vtkPVXMLVectorAttributeParse(this->GetAttribute(name), length, data);
 }
