@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.6");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -473,8 +473,8 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       if (aInfo)
         {
         double *range = aInfo->GetComponentRange(0);
-        absMaxRange = abs(range[0]);
-        absMaxRange = (abs(range[1]) > absMaxRange) ? abs(range[1]) :
+        absMaxRange = fabs(range[0]);
+        absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
           absMaxRange;
         }
       }
@@ -488,8 +488,8 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       if (aInfo)
         {
         double *range = aInfo->GetComponentRange(-1);
-        absMaxRange = abs(range[0]);
-        absMaxRange = (abs(range[1]) > absMaxRange) ? abs(range[1]) :
+        absMaxRange = fabs(range[0]);
+        absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
           absMaxRange;
         }
       }
@@ -505,16 +505,16 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
         double *range0 = aInfo->GetComponentRange(0);
         double *range1 = aInfo->GetComponentRange(1);
         double *range2 = aInfo->GetComponentRange(2);
-        absMaxRange = abs(range0[0]);
-        absMaxRange = (abs(range0[1]) > absMaxRange) ? abs(range0[1]) :
+        absMaxRange = fabs(range0[0]);
+        absMaxRange = (fabs(range0[1]) > absMaxRange) ? fabs(range0[1]) :
           absMaxRange;
-        absMaxRange = (abs(range1[0]) > absMaxRange) ? abs(range1[0]) :
+        absMaxRange = (fabs(range1[0]) > absMaxRange) ? fabs(range1[0]) :
           absMaxRange;
-        absMaxRange = (abs(range1[1]) > absMaxRange) ? abs(range1[1]) :
+        absMaxRange = (fabs(range1[1]) > absMaxRange) ? fabs(range1[1]) :
           absMaxRange;
-        absMaxRange = (abs(range2[0]) > absMaxRange) ? abs(range2[0]) :
+        absMaxRange = (fabs(range2[0]) > absMaxRange) ? fabs(range2[0]) :
           absMaxRange;
-        absMaxRange = (abs(range2[1]) > absMaxRange) ? abs(range2[1]) :
+        absMaxRange = (fabs(range2[1]) > absMaxRange) ? fabs(range2[1]) :
           absMaxRange;
         }
       }
