@@ -406,6 +406,7 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   if (this->CurrentIndex >= 0)
     {
     pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+    pvw->Deselect();
     this->Script("pack forget %s", pvw->GetWidgetName());
     }
   this->CurrentIndex = idx;
@@ -414,6 +415,7 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
   this->Script("pack %s -side top -fill both -expand t", pvw->GetWidgetName());
   pvw->Reset();
+  pvw->Select();
 
   this->ModifiedCallback();
 }
@@ -510,6 +512,22 @@ void vtkPVSelectWidget::CopyProperties(vtkPVWidget* clone,
     {
     vtkErrorMacro("Internal error. Could not downcast clone to PVSelectWidget.");
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::Select()
+{
+  vtkPVWidget *pvw;
+  pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+  pvw->Select();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::Deselect()
+{
+  vtkPVWidget *pvw;
+  pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+  pvw->Deselect();
 }
 
 //----------------------------------------------------------------------------

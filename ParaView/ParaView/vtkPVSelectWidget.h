@@ -102,6 +102,16 @@ public:
   virtual void Reset();
 
   // Description:
+  // This method is called when the source that contains this widget
+  // is selected. 
+  virtual void Select();
+
+  // Description:
+  // This method is called when the source that contains this widget
+  // is deselected. 
+  virtual void Deselect();
+
+  // Description:
   // This is how the user can query the state of the selection.
   // The value is the label of the widget item.
   const char* GetCurrentValue();

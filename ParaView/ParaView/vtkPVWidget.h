@@ -109,6 +109,18 @@ public:
   void RemoveAllDependents();
 
   // Description:
+  // This method is called when the source that contains this widget
+  // is selected. This is empty implementation but subclasses can
+  // overwrite it.
+  virtual void Select() {}
+
+  // Description:
+  // This method is called when the source that contains this widget
+  // is deselected. This is empty implementation but subclasses can
+  // overwrite it.
+  virtual void Deselect() {}
+
+  // Description:
   // This commands is an optional action that will be called when
   // the widget is modified.  Really we should change "ModifiedFlag" 
   // to some other name, because is gets confused with vtkObject::Modified().

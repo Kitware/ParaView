@@ -514,6 +514,15 @@ void vtkPVSource::Select()
     // Update the Display page.
     data->UpdateProperties();
     }
+
+  int i;
+  vtkPVWidget *pvw = 0;
+  this->Widgets->InitTraversal();
+  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+    {
+    pvw = this->Widgets->GetNextPVWidget();
+    pvw->Select();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -522,6 +531,14 @@ void vtkPVSource::Deselect(int doPackForget)
   if (doPackForget)
     {
     this->Script("pack forget %s", this->Notebook->GetWidgetName());
+    }
+  int i;
+  vtkPVWidget *pvw = 0;
+  this->Widgets->InitTraversal();
+  for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
+    {
+    pvw = this->Widgets->GetNextPVWidget();
+    pvw->Deselect();
     }
 }
 
