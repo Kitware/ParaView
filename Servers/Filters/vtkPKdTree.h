@@ -63,25 +63,44 @@ public:
   //   Build the spatial decomposition.  Call this explicitly
   //   after changing any parameters affecting the build of the
   //   tree.  It must be called by all processes in the parallel
-  //   application, or it will hang.  This is the only public method
-  //   in this class that must be called by all processes.
+  //   application, or it will hang.  
 
   void BuildLocator();
 
   // Description:
   //   Get the total number of cells distributed across the data
-  //   files read by all processes.
+  //   files read by all processes.  You must have called BuildLocator
+  //   before calling this method.
 
   int GetTotalNumberOfCells(){return this->TotalNumCells;}
 
+  // Description:
+  //   Create tables of counts of cells per process per region.
+  //   These tables can be accessed with queries like
+  //   "HasData", "GetProcessCellCountForRegion", and so on.
+  //   You must have called BuildLocator() beforehand.  This
+  //   method must be called by all processes or it will hang.
+  //   Returns 1 on error, 0 when no error.
+
+  int CreateProcessCellCountData();
+
+  // Description:
+  //   A convenience function which compiles the global 
+  //   bounds of the data arrays across processes.  
+  //   These bounds can be accessed with 
+  //   "GetCellArrayGlobalRange" and "GetPointArrayGlobalRange".
+  //   This method must be called by all processes or it will hang.
+  //   Returns 1 on error, 0 when no error.
+
+  int CreateGlobalDataArrayBounds();
 
   // Description:
   //   Set/Get the number of spatial regions you want to get close
   //   to without going over.  (The number of spatial regions is normally
-  //   a power of two.)
+  //   a power of two.)  Call this before BuildLocator().
 
-  vtkSetMacro(NumRegionsOrLess, int);
   vtkGetMacro(NumRegionsOrLess, int);
+  vtkSetMacro(NumRegionsOrLess, int);
 
   // Description:
   //   Set/Get the number of spatial regions you want to get close
@@ -89,27 +108,10 @@ public:
   //   spatial regions is normally a power of two.)  Performance
   //   hint:  Request just enough regions so you have at least one
   //   spatial region per processor.  Further subdividing the
-  //   space takes time.
+  //   space takes time.  Call this before BuildLocator().
 
-  vtkSetMacro(NumRegionsOrMore, int);
   vtkGetMacro(NumRegionsOrMore, int);
-
-  // Description:
-  //   Set/Get the level of ghost cells included in cell count tables
-  //   The feature is not implemented yet.  GhostLevel is 0.
-
-  vtkSetMacro(GhostLevel, int);
-  vtkGetMacro(GhostLevel, int);
-
-  // Description:
-  //    Set/Get whether cell counts are computed.
-  //    If this is "On", we create tables indicating
-  //    how many cells each processor has in each spatial region.
-  //    Default is "Off".
-
-  vtkBooleanMacro(ProcessCellCountData, int);
-  vtkSetMacro(ProcessCellCountData, int);
-  vtkGetMacro(ProcessCellCountData, int);
+  vtkSetMacro(NumRegionsOrMore, int);
 
   // Description:
   //   Set/Get the communicator object
@@ -126,14 +128,12 @@ public:
   //   computed.  Specifying an assignment scheme (with AssignRegions*())
   //   automatically turns on RegionAssignment.
 
-  vtkBooleanMacro(RegionAssignment, int);
   vtkGetMacro(RegionAssignment, int);
 
   static const int NoRegionAssignment;
   static const int ContiguousAssignment;
   static const int UserDefinedAssignment;
   static const int RoundRobinAssignment;
-  static const int MinimizeDataMovementAssignment;
 
   // Description:
   //   Assign spatial regions to processes via a user defined map.
@@ -158,15 +158,6 @@ public:
   //    will be assigned after BuildLocator executes.
 
   int AssignRegionsContiguous();
-
-  // Description:
-  //    Let the PKdTree class assign a process to each region 
-  //    by considering which data each process already has, so
-  //    as to minimize data movement.  If the k-d tree has not yet been
-  //    built, the regions will be assigned after BuildLocator executes.
-  //    Not yet implemented.
-
-  int AssignRegionsToMinimizeDataMovement();
 
   // Description:
   //    Writes the list of region IDs assigned to the specified
@@ -282,7 +273,6 @@ public:
   //    The internal process/region cell count tables may require a 
   //    large amount of memory.  This call frees this memory.
 
-  void ReleaseTables();
 
   // Description:
   //    Return a list of all processes in order from front to
@@ -291,15 +281,21 @@ public:
   int DepthOrderAllProcesses(vtkCamera *camera, vtkIntArray *orderedList);
 
   // Description:
-  //    This class doesn't have enough public methods, so I am adding
-  //    two more.  While building the k-d tree data structure we also
-  //    calculate the global range for each cell array and each point
-  //    array across all processes.  Returns 1 on error, 0 otherwise.
+  //    An added feature of vtkPKdTree is that it will calculate the
+  //    the global range of field arrays across all processes.  You
+  //    call CreateGlobalDataArrayBounds() to do this calculation.
+  //    Then the following methods return the ranges.
+  //    Returns 1 on error, 0 otherwise.
 
   int GetCellArrayGlobalRange(int arrayIndex, float range[2]);
   int GetPointArrayGlobalRange(int arrayIndex, float range[2]);
   int GetCellArrayGlobalRange(int arrayIndex, double range[2]);
   int GetPointArrayGlobalRange(int arrayIndex, double range[2]);
+
+  int GetCellArrayGlobalRange(const char *name, float range[2]);
+  int GetPointArrayGlobalRange(const char *name, float range[2]);
+  int GetCellArrayGlobalRange(const char *name, double range[2]);
+  int GetPointArrayGlobalRange(const char *name, double range[2]);
 
   // Description:
   //   This is a useful function that probably belongs in some
@@ -314,13 +310,12 @@ protected:
   ~vtkPKdTree();
 
   void SingleProcessBuildLocator();
+  int MultiProcessBuildLocator();
 
 private:
 
   int NumRegionsOrLess;
   int NumRegionsOrMore;
-  int GhostLevel;
-  int ProcessCellCountData;
   int RegionAssignment;
 
   vtkMultiProcessController *Controller;
@@ -338,7 +333,6 @@ private:
   int **ProcessAssignmentMap;      // indexed by process ID
   int *NumRegionsAssigned;         // indexed by process ID
 
-  vtkSetMacro(RegionAssignment, int);
   int UpdateRegionAssignment();
 
   // basic tables reflecting the data that was read from disk
@@ -358,6 +352,8 @@ private:
   double *CellDataMax;
   double *PointDataMin;
   double *PointDataMax;
+  const char **CellDataName;
+  const char **PointDataName;
   int NumCellArrays;
   int NumPointArrays; 
 
@@ -439,6 +435,11 @@ private:
   void InitializeProcessDataLists();
   int AllocateAndZeroProcessDataLists();
   void FreeProcessDataLists();
+  void InitializeFieldArrayMinMax();
+  int AllocateAndZeroFieldArrayMinMax();
+  void FreeFieldArrayMinMax();
+
+  void ReleaseTables();
 
   // Assigning regions to processors
 
@@ -449,8 +450,12 @@ private:
 
   int *CollectLocalRegionProcessData();
   int BuildRegionProcessTables();
+  int BuildFieldArrayMinMax();
   void AddEntry(int *list, int len, int id);
   static int BinarySearch(int *list, int len, int which);
+
+  static int FindLocalArrayIndex(const char *n, const char **names, int len);
+
 
   vtkPKdTree(const vtkPKdTree&); // Not implemented
   void operator=(const vtkPKdTree&); // Not implemented
