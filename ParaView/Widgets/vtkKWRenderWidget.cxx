@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.52");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.53");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -115,6 +115,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->HeaderAnnotation->GetPosition2Coordinate()
     ->SetCoordinateSystemToNormalizedViewport();
   this->HeaderAnnotation->GetPosition2Coordinate()->SetValue(0.6, 0.1);
+  this->HeaderAnnotation->VisibilityOff();
   
   this->Units = NULL;
 
