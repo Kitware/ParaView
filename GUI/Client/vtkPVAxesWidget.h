@@ -12,8 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVAxesWidget
+// .NAME vtkPVAxesWidget - A widget to manipulate an axe
+//
 // .SECTION Description
+// This widget creates and manages its own vtkPVAxesActor.
+
 
 #ifndef __vtkPVAxesWidget_h
 #define __vtkPVAxesWidget_h

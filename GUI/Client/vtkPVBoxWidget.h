@@ -12,10 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVBoxWidget - A widget to manipulate an box.
+// .NAME vtkPVBoxWidget - A widget to manipulate a box.
 // .SECTION Description
 // This widget creates and manages its own vtkPlanes on each process.
-// I could not descide whether to include the bounds display or not. 
+// I could not decide whether to include the bounds display or not. 
 // (I did not.) 
 
 

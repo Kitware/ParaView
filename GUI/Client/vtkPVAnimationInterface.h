@@ -12,10 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVAnimationInterface - An object that controlls an animation.
+// .NAME vtkPVAnimationInterface - An object that controls an animation.
+//
 // .SECTION Description
 // This object will have a link to a vtkPVSource and a method.
-// It will create an animation byu changing that method and rendering 
+// It will create an animation by changing that method and rendering 
 // in a loop.  vtkPVAnimtion may have a polydata timeline to display 
 // to make it like other sources.  I am going to have to find a way to 
 // choose the vtkPVSource to control.  It is different than the input 
