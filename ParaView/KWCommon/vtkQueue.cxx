@@ -17,7 +17,7 @@
 =========================================================================*/
 
 #include "vtkQueue.txx"
-#include "vtkLinkedList.txx"
+#include "vtkVector.txx"
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
