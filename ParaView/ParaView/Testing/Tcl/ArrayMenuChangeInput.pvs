@@ -1,0 +1,92 @@
+    if {[info exists argc]} { 
+        set argcm1 [expr $argc - 1]
+        for {set i 0} {$i < $argcm1} {incr i} {
+            if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+            }
+        }
+    } 
+
+# This test is to see if the array menu gets updated properly
+# when the input menu is changed.
+
+set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp44) [$kw(vtkTemp1) GetMainView]
+set kw(vtkTemp90) [$kw(vtkTemp1) GetGlyphSource Arrow]
+set kw(vtkTemp94) [$kw(vtkTemp1) GetGlyphSource Cone]
+set kw(vtkTemp98) [$kw(vtkTemp1) GetGlyphSource Sphere]
+set kw(vtkTemp99) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+
+set kw(vtkTemp117) [$kw(vtkTemp99) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp117) SetValue 16
+set kw(vtkTemp126) [$kw(vtkTemp99) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp126) SetValue 16
+$kw(vtkTemp99) AcceptCallback
+
+set kw(vtkTemp167) [$kw(vtkTemp1) CreatePVSource vtkSphereSource]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+set kw(vtkTemp177) [$kw(vtkTemp167) GetPVWidget {Center}]
+$kw(vtkTemp177) SetValue 2 0 0
+set kw(vtkTemp185) [$kw(vtkTemp167) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp185) SetValue 8
+set kw(vtkTemp194) [$kw(vtkTemp167) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp194) SetValue 6
+$kw(vtkTemp167) AcceptCallback
+
+$kw(vtkTemp1) ResetCameraCallback
+
+set kw(vtkTemp209) [$kw(vtkTemp1) CreatePVSource vtkElevationFilter]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+$kw(vtkTemp209) AcceptCallback
+$kw(vtkTemp1) SetCurrentPVSource $kw(vtkTemp99)
+$kw(vtkTemp1) ShowCurrentSourceProperties
+
+set kw(vtkTemp240) [$kw(vtkTemp1) CalculatorCallback]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+$kw(vtkTemp240) AddScalarVariable Normals_0 Normals 0
+$kw(vtkTemp240) SetFunctionLabel {Normals_0}
+$kw(vtkTemp240) AcceptCallback
+
+set kw(vtkTemp267) [$kw(vtkTemp1) CreatePVSource vtkWarpScalar]
+$kw(vtkTemp1) ShowCurrentSourceProperties
+set kw(vtkTemp273) [$kw(vtkTemp267) GetPVWidget {Input}]
+$kw(vtkTemp273) SetCurrentValue $kw(vtkTemp240)
+set kw(vtkTemp274) [$kw(vtkTemp267) GetPVWidget {Scalars}]
+$kw(vtkTemp274) SetValue resultArray
+$kw(vtkTemp267) AcceptCallback
+
+# Change the input.
+$kw(vtkTemp273) SetCurrentValue $kw(vtkTemp209)
+
+# Lets see if the array menu has the correct value.
+# Create a text files with the current menu value.
+# out.txt is a special name
+if { [catch {set fp [open "out.txt" w]}] == 0 } {
+  puts $fp [$kw(vtkTemp274) GetValue]
+}
+close $fp
+
+source $DataDir/Utility/rtText.tcl
+pvFileTest $DataDir/Baseline/ArrayMenuChangeInput.txt
+file delete -force out.txt
+
+
+# Continue with the rest of the test.
+ 
+$kw(vtkTemp267) AcceptCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/ArrayMenuChangeInput.png 10
+   
+Application Exit
+
+
+
+
+

@@ -1,6 +1,10 @@
 IF (VTK_USE_MPI)
   IF (UNIX)
     IF (MPIRUN)
+      ADD_TEST(ArrayMenuChangeInput-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
+              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ArrayMenuChangeInput.pvs 
+              -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
+
       ADD_TEST(Arrow-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE} 
               ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Arrow.pvs 
               -D ${PARAVIEW_SOURCE_DIR}/Data ${MPI_POSTFLAGS})
@@ -100,6 +104,10 @@ IF (VTK_USE_MPI)
     ENDIF (MPIRUN)
   ENDIF (UNIX)
 ENDIF (VTK_USE_MPI)
+
+ADD_TEST(ArrayMenuChangeInput ${PARAVIEW_EXECUTABLE}
+         ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ArrayMenuChangeInput.pvs 
+         -D ${PARAVIEW_SOURCE_DIR}/Data)
 
 ADD_TEST(Arrow ${PARAVIEW_EXECUTABLE}
          ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Arrow.pvs 
