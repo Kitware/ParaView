@@ -27,7 +27,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.11");
 
 struct vtkSMDisplayWindowProxyInternals
 {
@@ -156,6 +156,36 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
   
 
   pm->SendStream(this->WindowToImage->Servers, str, 0);
+
+
+}
+
+//---------------------------------------------------------------------------
+void vtkSMDisplayWindowProxy::TileWindows(int xsize, int ysize, int nColumns)
+{
+  vtkClientServerStream str;
+
+  vtkSMProxy* compositeProxy = this->GetSubProxy("composite");
+  if (!compositeProxy)
+    {
+    vtkErrorMacro("No composite sub-proxy was defined. Please make sure that "
+                  "the configuration file defines it.");
+    }
+  else
+    {
+    unsigned int numObjects = compositeProxy->GetNumberOfIDs();
+    for (unsigned i=0; i<numObjects; i++)
+      {
+      str << vtkClientServerStream::Invoke 
+          << compositeProxy->GetID(i) 
+          << "TileWindows" 
+          << xsize << ysize << nColumns
+          << vtkClientServerStream::End;
+      }
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->SendStream(compositeProxy->Servers, str, 0);
+    }
+
 }
 
 //---------------------------------------------------------------------------

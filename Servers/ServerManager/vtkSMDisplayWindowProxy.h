@@ -56,6 +56,11 @@ public:
   // Description:
   // Generate a screenshot from the render window.
   void WriteImage(const char* filename, const char* writerName);
+
+  // Description:
+  // Given the x and y size of the render windows, reposition them
+  // in a tile of n columns.
+  void TileWindows(int xsize, int ysize, int nColumns);
   
 //BTX
   // Description:
