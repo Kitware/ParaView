@@ -63,8 +63,8 @@ pvd:
 	echo  Makefile ParaView.o ${TOOLKIT_DEPENDS} 
 
 ParaView: Makefile ParaView.o pvinit.o ${TOOLKIT_DEPENDS} 
-	$(CXX) -o ParaView ParaView.o pvinit.o \
-	${TK_LIB} ${TCL_LIB} ${DL_LIBS} ${THREAD_LIBS} \
+	$(CXX) -o ParaView ParaView.o pvinit.o ${USE_CONTRIB_LIBS} \
+	-L${VTKBIN}/common -lVTKCommon ${TK_LIB} ${TCL_LIB} ${DL_LIBS} ${THREAD_LIBS} \
 	-L. ${CXX_FLAGS} ${VTK_SHLIB_LINK_FLAGS} ${XLDFLAGS} ${LDLIBS} \
 	${XLIBS} -lXext -lXt ${X_PRE_LIBS} -lX11 ${X_EXTRA_LIBS} -lm
 
