@@ -91,6 +91,7 @@ public:
   virtual void EntryValueChanged();
   virtual void InvokeStartCommand();
   virtual void InvokeEndCommand();
+  virtual void InvokeEntryCommand();
 
   // Description:
   // Method to set / get the resolution of the slider.  Be sure to set the
@@ -106,6 +107,7 @@ public:
   virtual void SetCommand(vtkKWObject* Object, const char *MethodAndArgString);
   virtual void SetStartCommand(vtkKWObject* Object, const char *MethodAndArgString);
   virtual void SetEndCommand(vtkKWObject* Object, const char *MethodAndArgString);
+  virtual void SetEntryCommand(vtkKWObject* Object, const char *MethodAndArgString);
 
   // Description:
   // Setting this string enables balloon help for this widget.
@@ -122,6 +124,7 @@ protected:
   char        *Command;
   char        *StartCommand;
   char        *EndCommand;
+  char        *EntryCommand;
   float       Value;
   float       Resolution;
   vtkKWWidget *ScaleWidget;

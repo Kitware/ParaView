@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.31");
+vtkCxxRevisionMacro(vtkKWScale, "1.31.2.1");
 
 
 
@@ -61,6 +61,7 @@ vtkKWScale::vtkKWScale()
   this->Command = NULL;
   this->StartCommand = 0;
   this->EndCommand = NULL;
+  this->EntryCommand = NULL;
   this->Value = 0;
   this->Resolution = 1;
   this->Entry = NULL;
@@ -85,6 +86,10 @@ vtkKWScale::~vtkKWScale()
   if (this->EndCommand)
     {
     delete [] this->EndCommand;
+    }
+  if (this->EntryCommand)
+    {
+    delete [] this->EntryCommand;
     }
   if (this->Entry)
     {
@@ -180,6 +185,8 @@ void vtkKWScale::DisplayEntry()
   this->Entry->Create(this->Application,"-width 10");
   this->Script("bind %s <Return> {%s EntryValueChanged}",
                this->Entry->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s EntryValueChanged}",
+               this->Entry->GetWidgetName(), this->GetTclName());
   this->Entry->SetValue(this->GetValue(), 2);
   this->PackWidget();
 }
@@ -264,6 +271,10 @@ void vtkKWScale::EntryValueChanged()
     {
     this->Script("eval %s",this->Command);
     }
+  if ( this->EntryCommand )
+    {
+    this->Script("eval %s",this->EntryCommand);
+    }
 }
 
 void vtkKWScale::InvokeStartCommand()
@@ -279,6 +290,14 @@ void vtkKWScale::InvokeEndCommand()
   if ( this->EndCommand )
     {
     this->Script("eval %s",this->EndCommand);
+    }
+}
+
+void vtkKWScale::InvokeEntryCommand()
+{
+  if ( this->EntryCommand )
+    {
+    this->Script("eval %s",this->EntryCommand);
     }
 }
 
@@ -333,6 +352,20 @@ void vtkKWScale::SetEndCommand(vtkKWObject* Object, const char * MethodAndArgStr
   this->EndCommand = command.str();
 }
 
+void vtkKWScale::SetEntryCommand(vtkKWObject* Object, const char * MethodAndArgString)
+{
+  if (this->EntryCommand)
+    {
+    delete [] this->EntryCommand;
+    }
+  if ( !Object )
+    {
+    return;
+    }
+  ostrstream command;
+  command << Object->GetTclName() << " " << MethodAndArgString << ends;
+  this->EntryCommand = command.str();
+}
 
 void vtkKWScale::SetCommand(vtkKWObject* CalledObject, const char *CommandString)
 {
