@@ -41,7 +41,7 @@ class vtkKWEntry;
 class VTK_EXPORT vtkPVSourceList : public vtkKWWidget
 {
 public:
-  static vtkPVSourceList* New() {return new vtkPVSourceList;};
+  static vtkPVSourceList* New();
   vtkTypeMacro(vtkPVSourceList,vtkKWWidget);
 
   // Description:

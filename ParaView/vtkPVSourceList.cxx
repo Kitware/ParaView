@@ -75,6 +75,22 @@ vtkPVSourceList::~vtkPVSourceList()
 }
 
 
+//------------------------------------------------------------------------------
+vtkPVSourceList* vtkPVSourceList::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVSourceList");
+  if(ret)
+    {
+    return (vtkPVSourceList*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVSourceList;
+}
+
+
+
+
 //----------------------------------------------------------------------------
 void vtkPVSourceList::Create(vtkKWApplication *app, char *args)
 {
