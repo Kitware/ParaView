@@ -22,13 +22,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWGenericRenderWindowInteractor.h"
 
 #include "vtkKWRenderWidget.h"
-#include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkKWGenericRenderWindowInteractor, "1.6");
+vtkCxxRevisionMacro(vtkKWGenericRenderWindowInteractor, "1.7");
 
 //----------------------------------------------------------------------------
 vtkKWGenericRenderWindowInteractor::vtkKWGenericRenderWindowInteractor()

@@ -25,7 +25,7 @@
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCompositeCollection.h"
-#include "vtkKWCornerAnnotation.h"
+#include "vtkPVCornerAnnotation.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -90,7 +90,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.137");
+vtkCxxRevisionMacro(vtkKWView, "1.1");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -136,7 +136,6 @@ vtkKWView::vtkKWView()
   this->PropertiesParent = NULL;
   this->CommandFunction = vtkKWViewCommand;
   this->Composites = vtkKWCompositeCollection::New();
-  this->SelectedComposite = NULL;
   this->SharedPropertiesParent = 0;
   this->Notebook = vtkKWNotebook::New();
 
@@ -145,31 +144,7 @@ vtkKWView::vtkKWView()
   this->ProgressGauge->SetParent(this->Frame2);
 
   this->AnnotationProperties = vtkKWFrame::New();
-  this->HeaderFrame = vtkKWLabeledFrame::New();
-  this->HeaderDisplayFrame = vtkKWWidget::New();
-  this->HeaderEntryFrame = vtkKWWidget::New();
-  this->HeaderButton = vtkKWCheckButton::New();
-  this->HeaderColor = vtkKWChangeColorButton::New();
-  this->HeaderLabel = vtkKWLabel::New();
-  this->HeaderEntry = vtkKWEntry::New();
-
-  this->HeaderMapper = vtkTextMapper::New();
-  this->HeaderMapper->GetTextProperty()->SetJustificationToCentered();
-  this->HeaderMapper->GetTextProperty()->SetVerticalJustificationToTop();
-  this->HeaderMapper->GetTextProperty()->SetFontSize(15);  
-  this->HeaderMapper->GetTextProperty()->ShadowOff();  
-
-  this->HeaderProp = vtkTextActor::New();
-  this->HeaderProp->ScaledTextOn();
-  this->HeaderProp->GetPositionCoordinate()->SetCoordinateSystemToNormalizedViewport();
-  this->HeaderProp->GetPositionCoordinate()->SetValue(0.2,0.88);
-  this->HeaderProp->GetPosition2Coordinate()->SetValue(0.6, 0.1);
-
-  this->HeaderProp->SetMapper(this->HeaderMapper);
-  this->HeaderComposite = vtkKWGenericComposite::New();
-  this->HeaderComposite->SetProp(this->HeaderProp);
-
-  this->CornerAnnotation = vtkKWCornerAnnotation::New();
+  this->CornerAnnotation = vtkPVCornerAnnotation::New();
   this->CornerAnnotation->SetTraceReferenceObject(this);
   this->CornerAnnotation->SetTraceReferenceCommand("GetCornerAnnotation");
   
@@ -180,8 +155,6 @@ vtkKWView::vtkKWView()
   this->StillUpdateRates[0] = 1.0;
   this->RenderMode = VTK_KW_STILL_RENDER;
   this->RenderState = 1;
-  this->MultiPassStillAbortCheckMethod = NULL;
-  this->MultiPassStillAbortCheckMethodArg = NULL;
 
   this->GeneralProperties = vtkKWFrame::New();
 
@@ -193,37 +166,11 @@ vtkKWView::vtkKWView()
   this->MenuEntryName = NULL;
   this->MenuEntryHelp = NULL;
   this->MenuEntryUnderline = -1;
-  
-  // Since paraview is the only user of this class
-  // We can start reorganizing it.  Render module now
-  // keeps the render window and renderers.
-  //this->Renderer = vtkRenderer::New();
-  //this->RenderWindow = vtkRenderWindow::New();
-  //this->RenderWindow->AddRenderer(this->Renderer);
-
-  //vtkCallbackCommand* abc = vtkCallbackCommand::New();
-  //abc->SetCallback(KWViewAbortCheckMethod);
-  //abc->SetClientData(this);
-  //this->RenderWindow->AddObserver(vtkCommand::AbortCheckEvent, abc);
-  //abc->Delete();
-
 }
 
 //----------------------------------------------------------------------------
 vtkKWView::~vtkKWView()
 {
-  //if (this->Renderer)
-  //  {
-  //  this->Renderer->Delete();
-  //  this->Renderer = NULL;
-  //  }
-  
-  //if (this->RenderWindow)
-  //  {
-  //  this->RenderWindow->Delete();
-  //  this->RenderWindow = NULL;
-  //  }
-    
   // Remove all binding
   const char *wname = this->VTKWidget->GetWidgetName();
   if (this->IsCreated())
@@ -252,16 +199,6 @@ vtkKWView::~vtkKWView()
   this->RendererBackgroundColor->Delete();
 
   this->AnnotationProperties->Delete();
-  this->HeaderComposite->Delete();
-  this->HeaderProp->Delete();
-  this->HeaderMapper->Delete();
-  this->HeaderFrame->Delete();
-  this->HeaderDisplayFrame->Delete();
-  this->HeaderColor->Delete();
-  this->HeaderEntryFrame->Delete();
-  this->HeaderButton->Delete();
-  this->HeaderLabel->Delete();
-  this->HeaderEntry->Delete();
 
   this->CornerAnnotation->Delete();
   
@@ -396,39 +333,19 @@ void vtkKWView::SetStillUpdateRates( int count, float *rates )
 }
 
 //----------------------------------------------------------------------------
-// Specify a function to be called to check and see if an abort
-// of the multi-pass still rendering in progress is desired
-void vtkKWView::SetMultiPassStillAbortCheckMethod(int (*f)(void *), void *arg)
-{
-  if ( f != this->MultiPassStillAbortCheckMethod || 
-       arg != this->MultiPassStillAbortCheckMethodArg )
-    {
-    this->MultiPassStillAbortCheckMethod = f;
-    this->MultiPassStillAbortCheckMethodArg = arg;
-    }
-}
-
-
-//----------------------------------------------------------------------------
 void vtkKWView::Close()
 {
   vtkKWComposite *c;
        
   if (this->PropertiesCreated)
     {
-    if (this->HeaderButton->GetState())
-      {
-      this->RemoveComposite(this->HeaderComposite);
-      }
     this->CornerAnnotation->Close();
     }
     
-  // first unselect any composites
-  this->SetSelectedComposite(NULL);
-  
   this->Composites->InitTraversal();
   while((c = this->Composites->GetNextKWComposite()))
     {
+    cerr << "Closing composite " << c  << endl;
     c->Close();
     c->SetView(NULL);
     this->GetViewport()->RemoveViewProp(c->GetProp());
@@ -450,7 +367,7 @@ void vtkKWView::CreateViewProperties()
     "General", "Set the general properties of the image view", ico);
   ico->SetImage(vtkKWIcon::ICON_ANNOTATE);
   this->Notebook->AddPage(
-    "Annotate", "Set the header and corner annotation", ico);
+    "Annotate", "Set the corner annotation", ico);
   ico->Delete();
   
   this->AnnotationProperties->SetParent(this->Notebook->GetFrame("Annotate"));
@@ -463,49 +380,6 @@ void vtkKWView::CreateViewProperties()
   this->Notebook->Raise("Annotate");
   
   // create the anno widgets
-  this->HeaderFrame->SetParent( this->AnnotationProperties->GetParent() );  
-  this->HeaderFrame->Create(app, 0);
-  this->HeaderFrame->SetLabel("Header Annotation");
-  this->HeaderDisplayFrame->SetParent(this->HeaderFrame->GetFrame());
-  this->HeaderDisplayFrame->Create(app,"frame","");
-  this->HeaderEntryFrame->SetParent(this->HeaderFrame->GetFrame());
-  this->HeaderEntryFrame->Create(app,"frame","");
-  this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-               this->HeaderFrame->GetWidgetName());
-  this->Script("pack %s %s -side top -padx 2 -pady 4 -expand 1 -fill x -anchor nw",
-               this->HeaderDisplayFrame->GetWidgetName(),
-               this->HeaderEntryFrame->GetWidgetName());
-
-  this->HeaderButton->SetParent(this->HeaderDisplayFrame);
-  this->HeaderButton->Create(this->GetApplication(), "");
-  this->HeaderButton->SetText("Display Header Annotation");
-  this->HeaderButton->SetBalloonHelpString("Toggle the visibility of the header text");
-  this->HeaderButton->SetCommand(this, "OnDisplayHeader");
-
-  this->HeaderColor->SetParent(this->HeaderDisplayFrame);
-  this->HeaderColor->Create(app, "");
-  this->HeaderColor->SetCommand( this, "SetHeaderTextColor" );
-  this->HeaderColor->SetBalloonHelpJustificationToRight();
-  this->HeaderColor->SetBalloonHelpString("Change the color of the header text");
-  this->HeaderColor->SetDialogText("Header Text Color");
-  this->Script("pack %s -side left -padx 2 -pady 4 -anchor nw",
-               this->HeaderButton->GetWidgetName());
-  this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
-               this->HeaderColor->GetWidgetName());
-
-  this->HeaderLabel->SetParent(this->HeaderEntryFrame);
-  this->HeaderLabel->Create(app, "");
-  this->HeaderLabel->SetTextOption("Header:");
-  this->HeaderLabel->SetBalloonHelpString("Set the header text string");
-  this->HeaderEntry->SetParent(this->HeaderEntryFrame);
-  this->HeaderEntry->Create(app,"-width 20");
-  this->Script("bind %s <Return> {%s HeaderChanged}",
-               this->HeaderEntry->GetWidgetName(),this->GetTclName());
-  this->Script("pack %s -side left -anchor w -padx 4 -expand no",
-               this->HeaderLabel->GetWidgetName());
-  this->Script("pack %s -side left -anchor w -padx 4 -expand yes -fill x",
-               this->HeaderEntry->GetWidgetName());
-
   this->CornerAnnotation->SetParent(this->AnnotationProperties->GetFrame());
   this->CornerAnnotation->SetView(this);
   this->CornerAnnotation->GetFrame()->ShowHideFrameOn();
@@ -544,44 +418,6 @@ void vtkKWView::CreateViewProperties()
 
   this->PropertiesCreated = 1;
 }
-
-//----------------------------------------------------------------------------
-void vtkKWView::SetHeaderTextColor( double r, double g, double b )
-{
-  if ( r < 0 || g < 0 || b < 0 )
-    {
-    return;
-    }
-  double *ff = this->GetHeaderTextColor();
-  if ( ff[0] == r && ff[1] == g && ff[2] == b )
-    {
-    return;
-    }
-  this->HeaderColor->SetColor( r, g, b );
-  this->HeaderProp->GetProperty()->SetColor( r, g, b );
-  float color[3];
-  color[0] = r;
-  color[1] = g;
-  color[2] = b;
-  this->InvokeEvent( vtkKWEvent::AnnotationColorChangedEvent, color );
-  this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0);
-}
-
-//----------------------------------------------------------------------------
-double* vtkKWView::GetHeaderTextColor()
-{
-  return this->HeaderProp->GetProperty()->GetColor( );
-}
-
-//----------------------------------------------------------------------------
-void vtkKWView::GetHeaderTextColor( double *r, double *g, double *b )
-{
-  double *ff = this->GetHeaderTextColor();
-  *r = ff[0];
-  *g = ff[1];
-  *b = ff[2];
-}
-
 
 //----------------------------------------------------------------------------
 void vtkKWView::SetPropertiesParent(vtkKWWidget *args)
@@ -697,33 +533,6 @@ void vtkKWView::PackProperties()
                    this->PropertiesParent->GetWidgetName());
       }
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWView::SetSelectedComposite(vtkKWComposite *_arg)
-{
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting SelectedComposite to " << _arg ); 
-  if (this->SelectedComposite != _arg) 
-    { 
-    if (this->SelectedComposite != NULL) 
-      { 
-      if (this->ParentWindow->GetSelectedView() == this)
-        {
-        this->SelectedComposite->Deselect(this);
-        }
-      this->SelectedComposite->UnRegister(this); 
-      }
-    this->SelectedComposite = _arg; 
-    if (this->SelectedComposite != NULL) 
-      { 
-      this->SelectedComposite->Register(this); 
-      if (this->ParentWindow->GetSelectedView() == this)
-        {
-        this->SelectedComposite->Select(this);
-        } 
-      } 
-    this->Modified(); 
-    } 
 }
 
 //----------------------------------------------------------------------------
@@ -1222,12 +1031,6 @@ void vtkKWView::Select(vtkKWWindow *pw)
   this->Script("%s configure -bg #008", this->Label->GetWidgetName());
   this->Script("%s configure -bg #008", this->Frame2->GetWidgetName());
   
-  // forward to selected composite
-  if (this->SelectedComposite)
-    {
-    this->SelectedComposite->Select(this);
-    }
-  
   // map the property sheet as needed
   if (this->SharedPropertiesParent && this->MenuEntryName)
     {
@@ -1274,12 +1077,6 @@ void vtkKWView::Deselect(vtkKWWindow *pw)
   this->Script("%s configure -bg #888", this->Label->GetWidgetName());
   this->Script("%s configure -bg #888", this->Frame2->GetWidgetName());
   
-  // forward to selected composite
-  if (this->SelectedComposite)
-    {
-    this->SelectedComposite->Deselect(this);
-    }
-
   // forget the properties parent as necc
   if (this->SharedPropertiesParent)
     {
@@ -1293,7 +1090,6 @@ void vtkKWView::MakeSelected()
 {
   if (this->ParentWindow)
     {
-    this->ParentWindow->SetSelectedView(this);
     if (this->ParentWindow->GetUserInterfaceManager())
       {
       this->ParentWindow->GetUserInterfaceManager()->Update();
@@ -1399,6 +1195,7 @@ void vtkKWView::UnRegister(vtkObjectBase *o)
         this->Composites->InitTraversal();
         while ((c = this->Composites->GetNextKWComposite()))
           {
+          cerr << "Deleting composite " << c << " " << c->GetClassName() << endl;
           c->SetView(NULL);
           }
         this->CornerAnnotation->SetView(NULL);
@@ -1431,35 +1228,6 @@ void vtkKWView::SetTitle(const char *title)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWView::OnDisplayHeader() 
-{
-  if (this->HeaderButton->GetState())
-    {
-    this->AddComposite(this->HeaderComposite);
-    this->HeaderMapper->SetInput(this->HeaderEntry->GetValue());
-    this->Render();
-    }
-  else
-    {
-    this->RemoveComposite(this->HeaderComposite);
-    this->Render();
-    }
-  
-  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWView::HeaderChanged() 
-{
-  this->HeaderMapper->SetInput(this->HeaderEntry->GetValue());
-  if (this->HeaderButton->GetState())
-    {
-    this->Render();
-    }
-  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWView::InteractOn()
 {
   this->SetRenderModeToInteractive();
@@ -1470,106 +1238,6 @@ void vtkKWView::InteractOff()
 {
   this->SetRenderModeToStill();
   this->Render();
-}
-
-//----------------------------------------------------------------------------
-// Description:
-// Chaining method to serialize an object and its superclasses.
-void vtkKWView::SerializeSelf(ostream& os, vtkIndent indent)
-{
-  // invoke superclass
-  this->Superclass::SerializeSelf(os,indent);
-
-  // write out the composite
-  if (this->PropertiesCreated)
-    {
-    os << indent << "CornerAnnotation ";
-    this->CornerAnnotation->Serialize(os,indent);
-    
-    os << indent << "HeaderEntry ";
-    vtkKWSerializer::WriteSafeString(os, this->HeaderEntry->GetValue());
-    os << endl;
-    os << indent << "HeaderButton " << this->HeaderButton->GetState() << endl;
-    
-    os << indent << "HeaderColor ";
-    this->HeaderColor->Serialize(os,indent);
-
-    os << indent << "RendererBackgroundColor ";
-    this->RendererBackgroundColor->Serialize(os,indent);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWView::SerializeToken(istream& is, const char *token)
-{
-  int i;
-  char tmp[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
-  
-  // do we need to create the props ?
-  if (!this->PropertiesCreated)
-    {
-    this->CreateViewProperties();
-    }
-
-  // if this file is from an old version then look for the 
-  // old corner annotation code version 1.7 or earlier
-  if (!this->VersionsLoaded || 
-      this->CompareVersions(this->GetVersion("vtkKWView"),"1.7") <= 0)
-    {
-    if (!strcmp(token,"CornerButton"))
-      {
-      is >> i;
-      this->CornerAnnotation->SetVisibility(i);
-      return;
-      }
-    if (!strcmp(token,"CornerText"))
-      {
-      vtkKWSerializer::GetNextToken(&is,tmp);
-      this->CornerAnnotation->SetCornerText(tmp,0);
-      return;
-      }
-    }
-
-  if (!strcmp(token,"HeaderButton"))
-    {
-    is >> i;
-    this->HeaderButton->SetState(i);
-    this->OnDisplayHeader();
-    return;
-    }
-  if (!strcmp(token,"HeaderEntry"))
-    {
-    vtkKWSerializer::GetNextToken(&is,tmp);
-    this->HeaderEntry->SetValue(tmp);
-    this->OnDisplayHeader();
-    return;
-    }
-  if (!strcmp(token,"HeaderColor"))
-    {
-    this->HeaderColor->Serialize(is);
-    return;
-    }
-  if (!strcmp(token,"CornerAnnotation"))
-    {
-    this->CornerAnnotation->Serialize(is);
-    return;
-    }
-  
-  if (!strcmp(token,"RendererBackgroundColor"))
-    {
-    this->RendererBackgroundColor->Serialize(is);
-    return;
-    }
-
-  vtkKWWidget::SerializeToken(is,token);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
-{
-  vtkKWWidget::SerializeRevision(os,indent);
-  os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.137 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1702,13 +1370,6 @@ void vtkKWView::UpdateEnableState()
   this->PropagateEnableState(this->Frame2);
   this->PropagateEnableState(this->ControlFrame);
   this->PropagateEnableState(this->AnnotationProperties);
-  this->PropagateEnableState(this->HeaderFrame);
-  this->PropagateEnableState(this->HeaderDisplayFrame);
-  this->PropagateEnableState(this->HeaderEntryFrame);
-  this->PropagateEnableState(this->HeaderColor);
-  this->PropagateEnableState(this->HeaderButton);
-  this->PropagateEnableState(this->HeaderLabel);
-  this->PropagateEnableState(this->HeaderEntry);
   this->PropagateEnableState(this->GeneralProperties);
   this->PropagateEnableState(this->ColorsFrame);
   this->PropagateEnableState(this->RendererBackgroundColor);
@@ -1720,8 +1381,6 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ControlFrame: " << this->GetControlFrame() << endl;
   os << indent << "CornerAnnotation: " << this->GetCornerAnnotation() << endl;
-  os << indent << "HeaderButton: " << this->GetHeaderButton() << endl;
-  os << indent << "HeaderEntry: " << this->GetHeaderEntry() << endl;
   os << indent << "InExpose: " << this->GetInExpose() << endl;
   os << indent << "InteractiveUpdateRate: " 
      << this->GetInteractiveUpdateRate() << endl;
@@ -1741,8 +1400,6 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RenderState: " << this->GetRenderState() << endl;
   //os << indent << "RenderWindow: " << this->GetRenderWindow() << endl;
   //os << indent << "Renderer: " << this->GetRenderer() << endl;
-  os << indent << "SelectedComposite: " << this->GetSelectedComposite() 
-     << endl;
   os << indent << "SupportControlFrame: " << this->GetSupportControlFrame() 
      << endl;
   os << indent << "SupportPrint: " << this->GetSupportPrint() << endl;

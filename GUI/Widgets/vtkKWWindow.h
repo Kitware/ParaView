@@ -35,8 +35,6 @@ class vtkKWTclInteractor;
 class vtkKWToolbarSet;
 class vtkKWToolbar;
 class vtkKWUserInterfaceManager;
-class vtkKWView;
-class vtkKWViewCollection;
 
 //BTX
 class vtkKWRecentFileEntry;
@@ -119,13 +117,6 @@ public:
   
   // Description:
   // Operations on the views.
-  void AddView(vtkKWView *);
-  void RemoveView(vtkKWView *);
-  virtual void SetSelectedView(vtkKWView *);
-  vtkGetObjectMacro(SelectedView,vtkKWView);
-  //BTX
-  vtkKWViewCollection *GetViews() {return this->Views;};
-  //ETX
   vtkGetObjectMacro(ViewFrame,vtkKWFrame);
   
   // Description:
@@ -267,7 +258,7 @@ public:
 
   // Description:
   // Call render on all views
-  void Render();
+  virtual void Render();
 
   //Description:
   // Set/Get Number of recent files in the menu.
@@ -403,8 +394,6 @@ protected:
 
   vtkKWNotebook *Notebook;
 
-  vtkKWView           *SelectedView;
-  vtkKWViewCollection *Views;
   vtkKWSplitFrame     *MiddleFrame; // Contains view frame & properties parent.
 
   vtkKWMenu *Menu;

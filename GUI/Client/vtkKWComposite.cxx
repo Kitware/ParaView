@@ -20,7 +20,7 @@
 #include "vtkKWView.h"
 #include "vtkKWWindow.h"
 
-vtkCxxRevisionMacro(vtkKWComposite, "1.25");
+vtkCxxRevisionMacro(vtkKWComposite, "1.1");
 
 int vtkKWCompositeCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -59,14 +59,6 @@ vtkKWComposite::~vtkKWComposite()
     {
     this->PropertiesParent->UnRegister(this);
     this->PropertiesParent = NULL;
-    }
-}
-
-void vtkKWComposite::MakeSelected()
-{
-  if (this->View)
-    {
-    this->View->SetSelectedComposite(this);
     }
 }
 
@@ -183,7 +175,7 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.25 $");
+  this->ExtractRevision(os,"$Revision: 1.1 $");
 }
 
 //----------------------------------------------------------------------------

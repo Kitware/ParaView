@@ -83,7 +83,6 @@ public:
   // add an option to the menu bar to view the 2D slices.
   virtual void Select(vtkKWView *);
   virtual void Deselect(vtkKWView *);
-  virtual void MakeSelected();
 
   // Description:
   // Allow access to the notebook objects.

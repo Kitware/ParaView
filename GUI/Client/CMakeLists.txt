@@ -47,6 +47,12 @@ SET( ParaViewClientNotWrapped_SRCS
 
 SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
+  vtkKWView.cxx
+  vtkKWViewCollection.cxx
+  vtkKWActorComposite.cxx 
+  vtkKWComposite.cxx 
+  vtkKWCompositeCollection.cxx 
+  vtkKWGenericComposite.cxx 
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
@@ -67,6 +73,7 @@ SET( ParaViewClient_SRCS
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx
+  vtkPVCornerAnnotation.cxx
   vtkPVCutEntry.cxx
   vtkPVDeskTopRenderModuleUI.cxx
   vtkPVDisplayGUI.cxx
@@ -172,6 +179,12 @@ IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF(VTK_USE_MPI)
 
+IF(BUILD_TESTING)
+  SET( ParaViewClient_SRCS ${ParaViewClient_SRCS}
+    vtkKWTesting.cxx
+    )
+ENDIF(BUILD_TESTING)
+
 
 
 SET(ParaViewBinary_SRCS ParaView.cxx)
@@ -184,12 +197,16 @@ IF (PARAVIEW_USE_ICE_T)
 ENDIF (PARAVIEW_USE_ICE_T)
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkKWCompositeCollection.cxx
+  vtkKWViewCollection.cxx
   vtkPVApplicationResources
   vtkPVWindowResources
   WRAP_EXCLUDE
   )
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkKWComposite.cxx
+  vtkKWView.cxx
   vtkPV3DWidget
   vtkPVJoystickFly
   vtkPVObjectWidget

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWCompositeCollection.cxx
+  Module:    vtkKWViewCollection.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -11,35 +11,35 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWCompositeCollection.h"
+
+#include "vtkKWViewCollection.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWView.h"
 
-#include "vtkKWComposite.h"
+vtkStandardNewMacro( vtkKWViewCollection );
+vtkCxxRevisionMacro(vtkKWViewCollection, "1.1");
 
-vtkStandardNewMacro( vtkKWCompositeCollection );
-vtkCxxRevisionMacro(vtkKWCompositeCollection, "1.8");
-
-void vtkKWCompositeCollection::AddItem(vtkKWComposite *a) 
+void vtkKWViewCollection::AddItem(vtkKWView *a) 
 {
   this->Superclass::AddItem((vtkObject *)a);
 }
 
-void vtkKWCompositeCollection::RemoveItem(vtkKWComposite *a) 
+void vtkKWViewCollection::RemoveItem(vtkKWView *a) 
 {
   this->Superclass::RemoveItem((vtkObject *)a);
 }
 
-int vtkKWCompositeCollection::IsItemPresent(vtkKWComposite *a) 
+int vtkKWViewCollection::IsItemPresent(vtkKWView *a) 
 {
   return this->Superclass::IsItemPresent((vtkObject *)a);
 }
 
-vtkKWComposite *vtkKWCompositeCollection::GetNextKWComposite() 
+vtkKWView *vtkKWViewCollection::GetNextKWView() 
 { 
-  return vtkKWComposite::SafeDownCast(this->GetNextItemAsObject());
+  return vtkKWView::SafeDownCast(this->GetNextItemAsObject());
 }
 
-vtkKWComposite *vtkKWCompositeCollection::GetLastKWComposite() 
+vtkKWView *vtkKWViewCollection::GetLastKWView() 
 { 
   if ( this->Bottom == NULL )
     {
@@ -47,12 +47,12 @@ vtkKWComposite *vtkKWCompositeCollection::GetLastKWComposite()
     }
   else
     {
-    return vtkKWComposite::SafeDownCast(this->Bottom->Item);
+    return vtkKWView::SafeDownCast(this->Bottom->Item);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCompositeCollection::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWViewCollection::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }

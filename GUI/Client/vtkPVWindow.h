@@ -57,15 +57,11 @@
 #ifdef PARAVIEW_USE_LOOKMARKS
 class vtkPVLookmarkManager;
 #endif
-class vtkActor;
-class vtkAxes;
 class vtkCollection;
 class vtkPVGenericRenderWindowInteractor;
 class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
-class vtkKWNotebook;
 class vtkKWPushButton;
 class vtkKWPushButtonWithMenu;
 class vtkKWMenuButton;
@@ -79,7 +75,6 @@ class vtkPVApplication;
 class vtkPVApplicationSettingsInterface;
 class vtkPVCameraManipulator;
 class vtkPVColorMap;
-class vtkPVData;
 class vtkPVErrorLogDisplay;
 class vtkPVInteractorStyle;
 class vtkPVInteractorStyleCenterOfRotation;
@@ -93,8 +88,6 @@ class vtkPVVolumeAppearanceEditor;
 class vtkPVWidget;
 class vtkPVWriter;
 class vtkPVXMLPackageParser;
-class vtkPolyDataMapper;
-class vtkPVPluginsDialog;
 class vtkSMAxesProxy;
 
 //BTX
@@ -208,10 +201,6 @@ public:
   void SaveSMState(const char *filename);
 
   // Description:
-  // Display the plug-in window.
-  void DisplayPluginWindow();
-
-  // Description:
   // This should part of a render module !!!!!
   void SaveGeometryInBatchFile(ofstream *file, 
                                const char* filename,
@@ -235,11 +224,6 @@ public:
   // Copy the trace file to a file with the specified file name.
   void SaveTrace();
   int SaveTrace(const char*);
-  
-  // Description:
-  // Save the state of ParaView as a Tcl script. Not implemented
-  // yet.
-  void SaveWorkspace();
   
   // Description:
   // Open a data file. Prompt the user for the filename first.
@@ -337,10 +321,6 @@ public:
   // Re-populate the filter menu.
   void UpdateFilterMenu();
   
-  // Description:
-  // Experimenting with wizards. Has to cleaned up - Berk
-  void WizardCallback();
-
   // Description:
   // Access to the animation interface for scripting.
   vtkGetObjectMacro(AnimationInterface, vtkPVAnimationInterface);
@@ -561,6 +541,11 @@ public:
   //             "tools"       : tools toolbar
   //             "camera"      : camera toolbar.
   void SetToolbarVisibility(const char* identifier, int state);
+
+  // Description::
+  // Override Unregister since widgets have loops.
+  virtual void UnRegister(vtkObjectBase *o);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -584,8 +569,6 @@ protected:
   vtkKWMenu *SelectMenu;
   vtkKWMenu *GlyphMenu;
   vtkKWMenu *PreferencesMenu;
-
-  vtkPVPluginsDialog *PluginsDialog;
 
   vtkPVInteractorStyle *CameraStyle2D;
   vtkPVInteractorStyle *CameraStyle3D;

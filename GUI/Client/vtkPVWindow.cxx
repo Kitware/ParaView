@@ -17,9 +17,7 @@
 #ifdef PARAVIEW_USE_LOOKMARKS
 #include "vtkPVLookmarkManager.h"
 #endif
-#include "vtkActor.h"
 #include "vtkArrayMap.txx"
-#include "vtkAxes.h"
 #include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
@@ -27,7 +25,6 @@
 #include "vtkDirectory.h"
 #include "vtkImageData.h"
 #include "vtkInstantiator.h"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
@@ -45,7 +42,6 @@
 #include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
-#include "vtkKWTclInteractor.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
@@ -54,7 +50,6 @@
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkMath.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVAnimationInterfaceEntry.h"
@@ -89,7 +84,6 @@
 #include "vtkPVWriter.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkRectilinearGrid.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -103,7 +97,6 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkClientServerStream.h"
 #include "vtkTimerLog.h"
-#include "vtkPVPluginsDialog.h"
 #include "vtkPVRenderViewProxyImplementation.h"
 #include "vtkSMApplication.h"
 #include "vtkPVGUIClientOptions.h"
@@ -111,6 +104,7 @@
 #include "vtkSMAxesProxy.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
+#include "vtkKWWidgetCollection.h"
 
 #ifdef _WIN32
 # include "vtkKWRegisteryUtilities.h"
@@ -221,7 +215,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.638");
+vtkCxxRevisionMacro(vtkPVWindow, "1.639");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -263,8 +257,6 @@ vtkPVWindow::vtkPVWindow()
   this->GlyphMenu = vtkKWMenu::New();
   this->PreferencesMenu = 0;
   
-  this->PluginsDialog = vtkPVPluginsDialog::New();
-
   // This toolbar contains buttons for modifying user interaction
   // mode
   this->InteractorToolbar = vtkKWToolbar::New();
@@ -526,6 +518,40 @@ vtkPVWindow::~vtkPVWindow()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVWindow::UnRegister(vtkObjectBase *o)
+{
+  if (!this->DeletingChildren)
+    {
+    // delete the children if we are about to be deleted
+    if (this->ReferenceCount == 
+        (1 + 1 +
+         (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0)))
+      {
+      if (!(this->MainView == o ||
+            (this->HasChildren() && 
+             this->GetChildren()->IsItemPresent((vtkKWWidget *)o))))
+        {
+        vtkKWWidget *child;
+        this->DeletingChildren = 1;
+        if (this->HasChildren())
+          {
+          vtkKWWidgetCollection *children = this->GetChildren();
+          children->InitTraversal();
+          while ((child = children->GetNextKWWidget()))
+            {
+            child->SetParent(NULL);
+            }
+          }
+        this->MainView->SetParentWindow(0);
+        this->DeletingChildren = 0;
+        }
+      }
+    }
+  
+  this->vtkKWWidget::UnRegister(o);
+}
+
 //-----------------------------------------------------------------------------
 void vtkPVWindow::CloseNoPrompt()
 {
@@ -552,6 +578,7 @@ void vtkPVWindow::CloseNoPrompt()
     }
 #endif
 
+  this->MainView->Close();
   this->vtkKWWindow::CloseNoPrompt();
 }
 
@@ -758,7 +785,6 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->MainView->PrepareForDelete();
     this->MainView->Delete();
-    this->MainView = NULL;
     }
 
   if (this->GetApplication())
@@ -795,12 +821,6 @@ void vtkPVWindow::PrepareForDelete()
     {
       this->PreferencesMenu->Delete();
       this->PreferencesMenu=NULL;
-    }
-
-  if(this->PluginsDialog!=NULL)
-    {
-      this->PluginsDialog->Delete();
-      this->PluginsDialog=NULL;
     }
 }
 
@@ -912,12 +932,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->PreferencesMenu->SetParent(this->MenuFile);
   this->PreferencesMenu->SetTearOff(0);
   this->PreferencesMenu->Create(this->GetApplication(), "");  
-  this->PreferencesMenu->InsertCommand(0, "Plug-ins", this,
-                                       "DisplayPluginWindow", 7,
-                                       "Manage available plug-ins");
-  
-  this->PluginsDialog->Create(this->GetApplication(),0);
-  this->PluginsDialog->SetMasterWindow(this);
 
   //this->MenuFile->InsertCascade(clidx++,"Preferences", this->PreferencesMenu, 8);
   this->MenuFile->InsertSeparator(clidx++);
@@ -2097,11 +2111,13 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView = view;
   this->MainView->SetParent(this->ViewFrame);
   this->MainView->SetPropertiesParent(this->GetPropertiesParent());
-  this->AddView(this->MainView);
+  this->MainView->SetParentWindow(this);
   this->MainView->Create(this->GetApplication(),"-width 200 -height 200");
   this->MainView->MakeSelected();
+  this->MainView->Select(this);
   this->MainView->ShowViewProperties();
   this->MainView->SetupBindings();
+  this->MainView->Register(this);
   
   this->CameraStyle3D->SetCurrentRenderer(this->MainView->GetRenderer());
   this->CameraStyle2D->SetCurrentRenderer(this->MainView->GetRenderer());
@@ -3135,15 +3151,6 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   delete file;
 }
 
-// Description:
-// Display the plug-in window.
-void vtkPVWindow::DisplayPluginWindow()
-{
-  int res=0;
-
-  res = this->PluginsDialog->Invoke();
-}
-
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file, 
                                           const char* filename,
@@ -3425,12 +3432,6 @@ void vtkPVWindow::SaveState(const char* filename)
   file = NULL;
 }
 
-
-//-----------------------------------------------------------------------------
-// Not implemented yet.
-void vtkPVWindow::SaveWorkspace()
-{
-}
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::UpdateSourceMenu()
@@ -4515,23 +4516,6 @@ void vtkPVWindow::GoToNextCallback()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::WizardCallback()
-{
-  return;
-//    if (this->GetModuleLoaded("vtkARLTCL.pvm") == 0)
-//      {
-//      return;
-//      }
-
-//    vtkPVWizard *w = vtkPVWizard::New();
-//    w->SetParent(this);
-//    w->Create(this->GetApplication(), "");
-//    w->Invoke(this);
-//    w->Delete();
-}
-
-
-//-----------------------------------------------------------------------------
 void vtkPVWindow::AddFileType(const char *description, const char *ext,
                               vtkPVReaderModule* prototype)
 {
@@ -5262,4 +5246,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
     }
 #endif //PARAVIEW_USE_LOOKMARKS
 }
+
 

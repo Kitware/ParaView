@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWGenericComposite );
-vtkCxxRevisionMacro(vtkKWGenericComposite, "1.12");
+vtkCxxRevisionMacro(vtkKWGenericComposite, "1.1");
 
 
 

@@ -31,7 +31,6 @@ class vtkKWLabeledText;
 class vtkKWRenderWidget;
 class vtkKWScale;
 class vtkKWTextProperty;
-class vtkKWView;
 
 class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWPopupFrameCheckButton
 {
@@ -59,8 +58,6 @@ public:
   // Note that in vtkKWView mode, each view has a vtkKWCornerAnnotation. 
   // In vtkKWRenderWidget, each widget has a vtkCornerAnnotation, which is 
   // controlled by a unique (decoupled) vtkKWCornerAnnotation in the GUI.
-  virtual void SetView(vtkKWView*);
-  vtkGetObjectMacro(View,vtkKWView);
   virtual void SetRenderWidget(vtkKWRenderWidget*);
   vtkGetObjectMacro(RenderWidget,vtkKWRenderWidget);
 
@@ -127,12 +124,6 @@ public:
   virtual void Close();
 
   // Description:
-  // Chaining method to serialize an object and its superclasses.
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char *token);
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -140,10 +131,6 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
-
-  // Description:
-  // Export the corner annotation to a file.
-  void SaveState(ofstream *file);
 
   // Description:
   // Access to the TextPropertyWidget from a script.
@@ -159,8 +146,6 @@ protected:
 
   vtkKWRenderWidget       *RenderWidget;
 
-  vtkKWView               *View;
-  vtkKWGenericComposite   *InternalCornerComposite;
   vtkCornerAnnotation     *InternalCornerAnnotation;
 
   // GUI
@@ -174,7 +159,7 @@ protected:
   vtkKWTextProperty       *TextPropertyWidget;
   vtkKWLabeledPopupButton *TextPropertyPopupButton;
 
-  void Render();
+  virtual void Render();
 
   // Get the value that should be used to set the checkbutton state
   // (i.e. depending on the value this checkbutton is supposed to reflect,

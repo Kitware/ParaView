@@ -36,7 +36,7 @@ class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 class vtkKWComposite;
 class vtkKWCompositeCollection;
-class vtkKWCornerAnnotation;
+class vtkPVCornerAnnotation;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWGenericComposite;
@@ -164,11 +164,6 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   //ETX
   
   // Description:
-  // Set/Get the selected composite
-  vtkGetObjectMacro(SelectedComposite,vtkKWComposite);
-  void SetSelectedComposite(vtkKWComposite *);
-  
-  // Description:
   // Get the attachment point for the Composits properties.
   // This attachment point may be obtained from the parent window
   // if it has been set.
@@ -226,15 +221,8 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   virtual void CreateViewProperties();
 
   // Description:
-  // Callbacks for the property widgets.
-  virtual void HeaderChanged();
-  virtual void OnDisplayHeader();
-
-  // Description:
   // Allow access to the UI components of interest
-  vtkGetObjectMacro(HeaderButton,vtkKWCheckButton);
-  vtkGetObjectMacro(HeaderEntry,vtkKWEntry);
-  vtkGetObjectMacro(CornerAnnotation,vtkKWCornerAnnotation);
+  vtkGetObjectMacro(CornerAnnotation,vtkPVCornerAnnotation);
 
   vtkSetMacro( InteractiveUpdateRate, float );
   vtkGetMacro( InteractiveUpdateRate, float );
@@ -264,29 +252,6 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   vtkSetClampMacro( RenderState, int, 0, 1 );
   vtkBooleanMacro( RenderState, int );
   
-//BTX
-  // Description:
-  // Keep these methods public for use in non-member idle callback
-  // of vtkKWRenderView
-  void SetMultiPassStillAbortCheckMethod(int (*f)(void *), void *arg);
-  int              (*MultiPassStillAbortCheckMethod)(void *);
-  void             *MultiPassStillAbortCheckMethodArg;
-//ETX
-
-  // Description:
-  // Chaining method to serialize an object and its superclasses.
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char *token);
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-
-  // Description:
-  // Change the color of the annotation text
-  virtual void SetHeaderTextColor( double r, double g, double b );
-  virtual void SetHeaderTextColor( double rgb[3] )
-    { this->SetHeaderTextColor( rgb[0], rgb[1], rgb[2] ); }
-  virtual void GetHeaderTextColor( double *r, double *g, double *b );
-  virtual double *GetHeaderTextColor();
-
   // Description:
   // Change the color of the corner annotation text
   virtual void SetCornerTextColor( double rgb[3] );
@@ -377,7 +342,7 @@ protected:
   vtkKWView();
   ~vtkKWView();
 
-  vtkKWCornerAnnotation *CornerAnnotation;
+  vtkPVCornerAnnotation *CornerAnnotation;
   
   vtkKWNotebook *Notebook;
   int InExpose;
@@ -393,20 +358,8 @@ protected:
   vtkKWWidget *Frame;
   vtkKWWidget *Frame2;
   vtkKWWidget *ControlFrame;
-  vtkKWComposite *SelectedComposite;
 
   vtkKWFrame             *AnnotationProperties;
-
-  vtkKWGenericComposite  *HeaderComposite;
-  vtkKWLabeledFrame      *HeaderFrame;
-  vtkKWWidget            *HeaderDisplayFrame;
-  vtkKWWidget            *HeaderEntryFrame;
-  vtkKWChangeColorButton *HeaderColor;
-  vtkKWCheckButton       *HeaderButton;
-  vtkKWLabel             *HeaderLabel;
-  vtkKWEntry             *HeaderEntry;
-  vtkTextActor           *HeaderProp;
-  vtkTextMapper          *HeaderMapper;
 
   vtkKWFrame             *GeneralProperties;
   vtkKWLabeledFrame      *ColorsFrame;

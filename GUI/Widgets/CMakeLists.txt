@@ -18,7 +18,6 @@ SET(CMAKE_C_FLAGS "${CMAKE_ANSI_CFLAGS} ${CMAKE_C_FLAGS}")
 
 SET( KWWidgets_SRCS
   ${VTK_TCL_HOME}/vtktcl.c
-  vtkKWActorComposite.cxx 
   vtkKWApplication.cxx 
   vtkKWApplicationSettingsInterface.cxx
   vtkKWBWidgets.cxx
@@ -29,15 +28,12 @@ SET( KWWidgets_SRCS
   vtkKWCheckButtonWithChangeColor.cxx
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
-  vtkKWComposite.cxx 
-  vtkKWCompositeCollection.cxx 
   vtkKWCornerAnnotation.cxx 
   vtkKWDialog.cxx 
   vtkKWEntry.cxx 
   vtkKWEntrySet.cxx 
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
-  vtkKWGenericComposite.cxx 
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWHSVColorSelector.cxx
   vtkKWHeaderAnnotation.cxx 
@@ -106,8 +102,6 @@ SET( KWWidgets_SRCS
   vtkKWUserInterfaceManager.cxx
   vtkKWUserInterfaceNotebookManager.cxx
   vtkKWUserInterfacePanel.cxx
-  vtkKWView.cxx 
-  vtkKWViewCollection.cxx 
   vtkKWVolumeMaterialPropertyWidget.cxx
   vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx 
@@ -118,22 +112,18 @@ SET( KWWidgets_SRCS
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkKWComposite.cxx
   vtkKWMaterialPropertyWidget.cxx
   vtkKWParameterValueFunctionEditor.cxx
   vtkKWParameterValueFunctionInterface.cxx
   vtkKWUserInterfaceManager.cxx
-  vtkKWView.cxx
   ABSTRACT
   )
 
 SET_SOURCE_FILES_PROPERTIES(
   ${VTK_TCL_HOME}/vtktcl.c
-  vtkKWCompositeCollection.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
   vtkKWTkUtilities.cxx
-  vtkKWViewCollection.cxx
   vtkKWWidgetCollection.cxx
   vtkKWWindowCollection.cxx
   WRAP_EXCLUDE
@@ -202,9 +192,6 @@ IF (WIN32)
 ENDIF (WIN32)
 
 IF(BUILD_TESTING)
-  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-    vtkKWTesting.cxx
-    )
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
 

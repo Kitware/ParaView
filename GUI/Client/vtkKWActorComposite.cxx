@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWActorComposite );
-vtkCxxRevisionMacro(vtkKWActorComposite, "1.15");
+vtkCxxRevisionMacro(vtkKWActorComposite, "1.1");
 
 //----------------------------------------------------------------------------
 int vtkKWActorCompositeCommand(ClientData cd, Tcl_Interp *interp,

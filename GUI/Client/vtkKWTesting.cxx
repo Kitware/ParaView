@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTesting );
-vtkCxxRevisionMacro(vtkKWTesting, "1.8");
+vtkCxxRevisionMacro(vtkKWTesting, "1.1");
 vtkCxxSetObjectMacro(vtkKWTesting,RenderView,vtkKWView);
 
 //----------------------------------------------------------------------------

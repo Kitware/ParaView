@@ -30,7 +30,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWComposite.h"
 #include "vtkKWCompositeCollection.h"
-#include "vtkKWCornerAnnotation.h"
+#include "vtkPVCornerAnnotation.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -136,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.348");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.349");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -257,7 +257,6 @@ void vtkPVRenderView::Add2DComposite(vtkKWComposite *c)
 // Only used for corner annotation.
 void vtkPVRenderView::Remove2DComposite(vtkKWComposite *c)  
 {  
-  
   c->SetView(NULL);  
   this->GetRenderer2D()->RemoveViewProp(c->GetProp());  
   this->Composites->RemoveItem(c);  

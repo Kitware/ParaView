@@ -32,8 +32,6 @@
 #include "vtkKWToolbar.h"
 #include "vtkKWToolbarSet.h"
 #include "vtkKWUserInterfaceNotebookManager.h"
-#include "vtkKWView.h"
-#include "vtkKWViewCollection.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkObjectFactory.h"
@@ -45,7 +43,7 @@
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_WINDOW_DEFAULT_GEOMETRY "900x700+0+0"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.204");
+vtkCxxRevisionMacro(vtkKWWindow, "1.205");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -133,10 +131,7 @@ int vtkKWWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWWindow::vtkKWWindow()
 {
-  this->Views                 = vtkKWViewCollection::New();
-
   this->PropertiesParent      = NULL;
-  this->SelectedView          = NULL;
 
   this->Menu                  = vtkKWMenu::New();
   this->MenuFile              = vtkKWMenu::New();
@@ -219,12 +214,6 @@ vtkKWWindow::~vtkKWWindow()
 
   this->Notebook->Delete();
   this->SetPropertiesParent(NULL);
-  this->SetSelectedView(NULL);
-  if (this->Views)
-    {
-    this->Views->Delete();
-    this->Views = NULL;
-    }
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION <= 2)
   // This "hack" is here to get around a Tk bug ( Bug: 3402 )
@@ -559,20 +548,6 @@ void vtkKWWindow::DisplayHelp()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWWindow::AddView(vtkKWView *v) 
-{
-  v->SetParentWindow(this);
-  this->Views->AddItem(v);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::RemoveView(vtkKWView *v) 
-{
-  v->SetParentWindow(NULL);
-  this->Views->RemoveItem(v);
-}
-
-//----------------------------------------------------------------------------
 void vtkKWWindow::CreateDefaultPropertiesParent()
 {
   if (!this->PropertiesParent)
@@ -589,27 +564,6 @@ void vtkKWWindow::CreateDefaultPropertiesParent()
     {
     vtkDebugMacro("Properties Parent already set for Window");
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWindow::SetSelectedView(vtkKWView *_arg)
-{
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting SelectedView to " << _arg ); 
-  if (this->SelectedView != _arg) 
-    { 
-    if (this->SelectedView != NULL) 
-      {
-      this->SelectedView->Deselect(this);
-      this->SelectedView->UnRegister(this); 
-      }
-    this->SelectedView = _arg; 
-    if (this->SelectedView != NULL) 
-      { 
-      this->SelectedView->Register(this); 
-      this->SelectedView->Select(this);
-      } 
-    this->Modified(); 
-    } 
 }
 
 //----------------------------------------------------------------------------
@@ -675,15 +629,6 @@ void vtkKWWindow::CloseNoPrompt()
     this->SaveWindowGeometry();
     }
 
-  vtkKWView *v;
-
-  // Give each view a chance to close
-  this->Views->InitTraversal();
-  while ((v = this->Views->GetNextKWView()))
-    {
-    v->Close();
-    }
-
   // Close this window in the application. The
   // application will exit if there are no more windows.
   this->GetApplication()->Close(this);
@@ -743,13 +688,6 @@ void vtkKWWindow::RestoreWindowGeometry()
 //----------------------------------------------------------------------------
 void vtkKWWindow::Render()
 {
-  vtkKWView *v;
-  
-  this->Views->InitTraversal();
-  while ((v = this->Views->GetNextKWView()))
-    {
-    v->Render();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -1028,16 +966,13 @@ void vtkKWWindow::UnRegister(vtkObjectBase *o)
   if (!this->DeletingChildren)
     {
     // delete the children if we are about to be deleted
-    if (this->ReferenceCount == 
-        (this->Views->GetNumberOfItems() + 1 +
-         (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0)))
+    if (this->ReferenceCount == 1 +
+        (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0))
       {
-      if (!(this->Views->IsItemPresent((vtkKWView *)o) ||
-            (this->HasChildren() && 
+      if (!((this->HasChildren() && 
              this->GetChildren()->IsItemPresent((vtkKWWidget *)o))))
         {
         vtkKWWidget *child;
-        vtkKWView *v;
         
         this->DeletingChildren = 1;
         if (this->HasChildren())
@@ -1048,16 +983,6 @@ void vtkKWWindow::UnRegister(vtkObjectBase *o)
             {
             child->SetParent(NULL);
             }
-          }
-        // deselect if required
-        if (this->SelectedView)
-          {
-          this->SetSelectedView(NULL);
-          }
-        this->Views->InitTraversal();
-        while ((v = this->Views->GetNextKWView()))
-          {
-          v->SetParentWindow(NULL);
           }
         this->DeletingChildren = 0;
         }
@@ -1779,7 +1704,6 @@ void vtkKWWindow::UpdateEnableState()
 
   this->PropagateEnableState(this->TclInteractor);
 
-  this->PropagateEnableState(this->SelectedView);
   this->PropagateEnableState(this->MiddleFrame);
   this->PropagateEnableState(this->StatusFrame);
   //this->PropagateEnableState(this->StatusLabel);
@@ -1880,7 +1804,6 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
   os << indent << "ScriptExtension: " << this->GetScriptExtension() << endl;
   os << indent << "ScriptType: " << this->GetScriptType() << endl;
-  os << indent << "SelectedView: " << this->GetSelectedView() << endl;
   os << indent << "SupportHelp: " << this->GetSupportHelp() << endl;
   os << indent << "SupportPrint: " << this->GetSupportPrint() << endl;
   os << indent << "StatusFrame: " << this->GetStatusFrame() << endl;

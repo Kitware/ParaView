@@ -23,7 +23,6 @@
 #include "vtkKWComposite.h"
 
 class vtkKWApplication;
-class vtkKWView;
 class vtkPolyData;
 class vtkActor;
 class vtkPolyData;
