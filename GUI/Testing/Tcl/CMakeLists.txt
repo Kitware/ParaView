@@ -286,7 +286,7 @@ ADD_TEST(AnimationImages-batch-ParaView
   -BT ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch.tcl
   -BC ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
   -B ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch
-  -V ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch.png
+  -V ${ParaView_BINARY_DIR}/Testing/Temporary/AnimationImagesbatch00001.png
   )
 
 ADD_TEST(VolumeRenderVox8-ParaView 
