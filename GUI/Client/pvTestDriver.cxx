@@ -118,9 +118,13 @@ void pvTestDriver::CollectConfiguredOptions()
   this->ParaView += "/paraview";
 
   // now find all the mpi information if mpi run is set
-
+#ifdef VTK_USE_MPI
 #ifdef VTK_MPIRUN_EXE
   this->MPIRun = VTK_MPIRUN_EXE;
+#else
+  cerr << "Error: VTK_MPIRUN_EXE must be set of VTK_USE_MPI is on.\n";
+  return -1;
+#endif
   int serverNumProc = 1;
   int renderNumProc = 1;
 
@@ -147,7 +151,7 @@ void pvTestDriver::CollectConfiguredOptions()
   this->MPIRenderServerNumProcessFlag = buf;
   this->MPIClientNumProcessFlag = "1";
   
-#endif // VTK_MPIRUN_EXE
+#endif // VTK_USE_MPI
 
 }
 
