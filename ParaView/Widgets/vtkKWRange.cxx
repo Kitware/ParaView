@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.1");
+vtkCxxRevisionMacro(vtkKWRange, "1.2");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -76,7 +76,7 @@ vtkKWRange::vtkKWRange()
   this->Range[1]           = this->WholeRange[1];  
   this->Resolution         = (this->WholeRange[1]-this->WholeRange[0]) / 100.0;
   this->AdjustResolution   = 0;
-  this->Thickness          = 18;
+  this->Thickness          = 19;
   this->InternalThickness  = 0.5;
   this->Orientation        = vtkKWRange::ORIENTATION_HORIZONTAL;
   this->SliderSize         = 3;
@@ -314,10 +314,16 @@ void vtkKWRange::Pack()
 
   tk_cmd << "grid " << this->CanvasFrame->GetWidgetName() 
          << o_row << 1 << o_col << 2 << stickydir << o_span << 3;
-  if (this->ShowEntries && 
-      this->EntriesPosition == vtkKWRange::POSITION_ALIGNED)
+  if (this->ShowEntries)
     {
-    tk_cmd << (is_horiz ? " -padx " : " -pady ") << 2;
+    if (this->EntriesPosition == vtkKWRange::POSITION_ALIGNED)
+      {
+      tk_cmd << (is_horiz ? " -padx " : " -pady ") << 2;
+      }
+    else
+      {
+      tk_cmd << (is_horiz ? " -pady " : " -padx ") << 2;
+      }
     }
   tk_cmd << endl;
 
