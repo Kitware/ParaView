@@ -313,18 +313,19 @@ vtkPoints *vtkPOPReader::ReadPoints(vtkImageData *image)
   double x, y, z, depth, radius;
   double theta, phi;
   int i, j, k;
-  int *ext;  
-  int id, num, numLevels;
+  int id, num;
+  // The only different between these two is the z extent.
+  // We should probably ditch ext and user update extent to make things simpler.
+  int *updateExt = this->GetOutput()->GetUpdateExtent();
+  int *ext = image->GetExtent();
   
-  ext = image->GetExtent();
-  numLevels = this->DepthValues->GetNumberOfTuples();
   points = vtkPoints::New();
-  num = (ext[1]-ext[0]+1)*(ext[3]-ext[2]+1)*numLevels;
+  num = (ext[1]-ext[0]+1)*(ext[3]-ext[2]+1)*(updateExt[5]-updateExt[4]+1);
   points->Allocate(num);
   points->SetNumberOfPoints(num);
   
   id = 0;
-  for (k = 0; k < numLevels; ++k)
+  for (k = updateExt[4]; k <= updateExt[5]; ++k)
     {
     depth = this->DepthValues->GetValue(k);
     radius = this->Radius - depth;

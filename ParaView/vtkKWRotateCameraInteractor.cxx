@@ -183,8 +183,13 @@ void vtkKWRotateCameraInteractor::AButtonPress(int num, int x, int y)
     pos = (double)y / (double)(size[1]);
     if (pos < 0.333 || pos > 0.667)
       {
+#ifdef _WIN32      
       this->Script("%s configure -cursor size_ns",
                    this->RenderView->GetWidgetName());
+#else      
+      this->Script("%s configure -cursor sb_v_double_arrow",
+		   this->RenderView->GetWidgetName());
+#endif      
       this->CursorState = VTK_VIEW_ZOOM;
       }
     else
@@ -291,6 +296,7 @@ void vtkKWRotateCameraInteractor::UpdateRollCursor(double px, double py)
 {
   double tmp;
 
+#ifdef _WIN32  
   // Since we have to make do with arrows (win32)
   if (px == 0)
     {
@@ -320,4 +326,51 @@ void vtkKWRotateCameraInteractor::UpdateRollCursor(double px, double py)
     this->Script("%s configure -cursor size_ne_sw",
                  this->RenderView->GetWidgetName());
     }
+#else
+  // Since we have to make do with arrows (win32)
+  if (px == 0)
+    {
+    tmp = VTK_LARGE_FLOAT;
+    }
+  else
+    {
+    tmp = fabs(py) / fabs(px);
+    }
+  if (tmp < 0.41421)
+    {
+    this->Script("%s configure -cursor sb_v_double_arrow",
+                 this->RenderView->GetWidgetName());
+    }
+  else if (tmp > 2.41421)
+    {
+    this->Script("%s configure -cursor sb_h_double_arrow",
+                 this->RenderView->GetWidgetName());
+    }
+  else if (px > 0.0)
+    {
+    if (py > 0.0)
+      {
+      this->Script("%s configure -cursor ur_angle",
+		   this->RenderView->GetWidgetName());
+      }
+    else
+      {
+      this->Script("%s configure -cursor lr_angle",
+		   this->RenderView->GetWidgetName());
+      }
+    }
+  else
+    {
+    if (py > 0.0)
+      {
+      this->Script("%s configure -cursor ul_angle",
+		   this->RenderView->GetWidgetName());
+      }
+    else
+      {
+      this->Script("%s configure -cursor ll_angle",
+		   this->RenderView->GetWidgetName());
+      }
+    }
+#endif
 }

@@ -212,7 +212,13 @@ void vtkKWTranslateCameraInteractor::MotionCallback(int x, int y)
 //----------------------------------------------------------------------------
 void vtkKWTranslateCameraInteractor::InitializeCursors()
 {
+#ifdef _WIN32
   this->SetZoomCursorName("size_ns");
+#else
+  //this->SetZoomCursorName("sb_h_double_arrow");
+  this->SetZoomCursorName("sb_v_double_arrow");
+#endif
+
   this->SetPanCursorName("fleur");
 }
 

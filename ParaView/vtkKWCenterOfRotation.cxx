@@ -31,7 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkKWEntry.h"
 #include "vtkKWCheckButton.h"
-#include "vtkWorldPointPicker.h"
+#include "vtkPVWorldPointPicker.h"
 #include "vtkActorCollection.h"
 #include "vtkPropPicker.h"
 #include "vtkCamera.h"
@@ -80,7 +80,7 @@ vtkKWCenterOfRotation::vtkKWCenterOfRotation()
   this->RenderView = NULL; 
 
   // For interactively choosing the center of rotation.
-  this->Picker = vtkWorldPointPicker::New();
+  this->Picker = vtkPVWorldPointPicker::New();
 
   // Display of the center of rotation
   this->CenterSource = vtkAxes::New();
@@ -379,7 +379,10 @@ void vtkKWCenterOfRotation::SetRenderView(vtkPVRenderView *view)
       this->ResetCenterActorSize();
       }
     }
-   
+  
+  // Picker needs a link to the Tree Composite class.
+  this->Picker->SetComposite(view->GetComposite());
+  
   // Now just set the render view with reference counting
   this->vtkKWInteractor::SetRenderView(view);
   this->Update();

@@ -43,7 +43,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 class vtkKWEntry;
 class vtkKWCheckButton;
 class vtkPVRenderView;
-class vtkWorldPointPicker;
+class vtkPVWorldPointPicker;
 
 class VTK_EXPORT vtkKWCenterOfRotation : public vtkKWInteractor
 {
@@ -145,7 +145,7 @@ protected:
 
   // We need our own picker, because we do not want the center of part selection
   // to change any picked parts.
-  vtkWorldPointPicker *Picker;
+  vtkPVWorldPointPicker *Picker;
 
   // stuff to display the center
   vtkAxes *CenterSource;

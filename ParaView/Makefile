@@ -14,18 +14,25 @@ ABSTRACT = \
 vtkInteractorStyleExtent 
 
 CONCRETE = \
+vtkCameraInteractor \
 vtkClipPlane \
 vtkCutMaterial \
 vtkCutPlane \
 vtkDummyRenderWindowInteractor \
 vtkFastGeometryFilter \
 vtkImageOutlineFilter \
+vtkInteractor \
 vtkInteractorStyleCamera \
 vtkInteractorStyleGridExtent \
 vtkInteractorStyleImageExtent \
 vtkInteractorStylePlane \
 vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
+vtkKWCenterOfRotation \
+vtkKWFlyInteractor \
+vtkKWInteractor \
+vtkKWRotateCameraInteractor \
+vtkKWTranslateCameraInteractor \
 vtkPOPReader \
 vtkPVActorComposite \
 vtkPVApplication \
@@ -45,6 +52,7 @@ vtkPVSourceInterface \
 vtkPVSourceList \
 vtkPVThreshold \
 vtkPVWindow \
+vtkPVWorldPointPicker \
 vtkSimpleFieldDataToAttributeDataFilter \
 vtkSingleContourFilter \
 vtkStringList 

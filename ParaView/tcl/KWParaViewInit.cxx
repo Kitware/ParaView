@@ -1,7 +1,13 @@
 #include "vtkTclUtil.h"
+int vtkCameraInteractorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkCameraInteractorNewCommand();
 int vtkClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkClipPlaneNewCommand();
+int vtkCutMaterialCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkCutMaterialNewCommand();
 int vtkCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkCutPlaneNewCommand();
@@ -14,6 +20,9 @@ ClientData vtkFastGeometryFilterNewCommand();
 int vtkImageOutlineFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkImageOutlineFilterNewCommand();
+int vtkInteractorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkInteractorNewCommand();
 int vtkInteractorStyleCameraCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleCameraNewCommand();
@@ -32,6 +41,21 @@ ClientData vtkInteractorStylePlaneSourceNewCommand();
 int vtkInteractorStyleSphereCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleSphereNewCommand();
+int vtkKWCenterOfRotationCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWCenterOfRotationNewCommand();
+int vtkKWFlyInteractorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWFlyInteractorNewCommand();
+int vtkKWInteractorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWInteractorNewCommand();
+int vtkKWRotateCameraInteractorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWRotateCameraInteractorNewCommand();
+int vtkKWTranslateCameraInteractorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWTranslateCameraInteractorNewCommand();
 int vtkPOPReaderCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPOPReaderNewCommand();
@@ -89,6 +113,9 @@ ClientData vtkPVThresholdNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
+int vtkPVWorldPointPickerCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVWorldPointPickerNewCommand();
 int vtkSimpleFieldDataToAttributeDataFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkSimpleFieldDataToAttributeDataFilterNewCommand();
@@ -126,8 +153,12 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
+  vtkTclCreateNew(interp,(char *) "vtkCameraInteractor", vtkCameraInteractorNewCommand,
+                  vtkCameraInteractorCommand);
   vtkTclCreateNew(interp,(char *) "vtkClipPlane", vtkClipPlaneNewCommand,
                   vtkClipPlaneCommand);
+  vtkTclCreateNew(interp,(char *) "vtkCutMaterial", vtkCutMaterialNewCommand,
+                  vtkCutMaterialCommand);
   vtkTclCreateNew(interp,(char *) "vtkCutPlane", vtkCutPlaneNewCommand,
                   vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
@@ -136,6 +167,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkFastGeometryFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
                   vtkImageOutlineFilterCommand);
+  vtkTclCreateNew(interp,(char *) "vtkInteractor", vtkInteractorNewCommand,
+                  vtkInteractorCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
                   vtkInteractorStyleCameraCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractorStyleGridExtent", vtkInteractorStyleGridExtentNewCommand,
@@ -148,6 +181,16 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkInteractorStylePlaneSourceCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractorStyleSphere", vtkInteractorStyleSphereNewCommand,
                   vtkInteractorStyleSphereCommand);
+  vtkTclCreateNew(interp,(char *) "vtkKWCenterOfRotation", vtkKWCenterOfRotationNewCommand,
+                  vtkKWCenterOfRotationCommand);
+  vtkTclCreateNew(interp,(char *) "vtkKWFlyInteractor", vtkKWFlyInteractorNewCommand,
+                  vtkKWFlyInteractorCommand);
+  vtkTclCreateNew(interp,(char *) "vtkKWInteractor", vtkKWInteractorNewCommand,
+                  vtkKWInteractorCommand);
+  vtkTclCreateNew(interp,(char *) "vtkKWRotateCameraInteractor", vtkKWRotateCameraInteractorNewCommand,
+                  vtkKWRotateCameraInteractorCommand);
+  vtkTclCreateNew(interp,(char *) "vtkKWTranslateCameraInteractor", vtkKWTranslateCameraInteractorNewCommand,
+                  vtkKWTranslateCameraInteractorCommand);
   vtkTclCreateNew(interp,(char *) "vtkPOPReader", vtkPOPReaderNewCommand,
                   vtkPOPReaderCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVActorComposite", vtkPVActorCompositeNewCommand,
@@ -186,6 +229,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVThresholdCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVWorldPointPicker", vtkPVWorldPointPickerNewCommand,
+                  vtkPVWorldPointPickerCommand);
   vtkTclCreateNew(interp,(char *) "vtkSimpleFieldDataToAttributeDataFilter", vtkSimpleFieldDataToAttributeDataFilterNewCommand,
                   vtkSimpleFieldDataToAttributeDataFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkSingleContourFilter", vtkSingleContourFilterNewCommand,

@@ -243,6 +243,7 @@ void vtkKWFlyInteractor::CreateCursor()
 
   if (this->PlaneCursor == NULL)
     {
+    vtkWarningMacro("Could not define cursor.");
     }
 }
 
