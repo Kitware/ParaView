@@ -39,6 +39,21 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSlave.h"
 
+
+
+
+extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
+
+Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
+{
+  Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc,argv);
+  
+  Vtkkwparaviewtcl_Init(interp);
+  return interp;
+}
+
+
+
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVApplication::New()
 {
@@ -56,6 +71,8 @@ vtkPVApplication* vtkPVApplication::New()
 vtkPVApplication::vtkPVApplication()
 {
   this->SetApplicationName("ParaView");
+
+  this->Controller = NULL;
 }
 
 
@@ -76,9 +93,7 @@ void vtkPVApplication::RemoteScript(int id, char *format, ...)
 void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str, char *result, int resultMax)
 {
   int length;
-  vtkMultiProcessController *controller;
-
-  controller = vtkMultiProcessController::RegisterAndGetGlobalController(this);
+  char *resultStr;
 
   // send string to evaluate.
   length = strlen(str) + 1;
@@ -87,25 +102,24 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str, char *result,
     return;
     }
 
-  controller->TriggerRMI(remoteId, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+  this->Controller->TriggerRMI(remoteId, VTK_PV_SLAVE_SCRIPT_RMI_TAG);
 
-  controller->Send(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG);
-  controller->Send(str, length, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_TAG);
+  this->Controller->Send(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG);
+  this->Controller->Send(str, length, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_TAG);
 
   // Receive the result.
-  controller->Receive(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_RESULT_LENGTH_TAG);
-  str = new char[length];
-  controller->Receive(str, length, remoteId, VTK_PV_SLAVE_SCRIPT_RESULT_TAG);
+  this->Controller->Receive(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_RESULT_LENGTH_TAG);
+  resultStr = new char[length];
+  this->Controller->Receive(resultStr, length, remoteId, VTK_PV_SLAVE_SCRIPT_RESULT_TAG);
 
-  cerr << "Master: " << length << " " << str << endl;
-
+  cerr << "Master: " << str << " -> " << resultStr << endl;
+  
   if (result && resultMax > 0)
     { 
-    strncpy(result, str, resultMax-1);
+    strncpy(result, resultStr, resultMax-1);
     }
   
-  controller->UnRegister(this);
-  delete [] str;
+  delete [] resultStr;
 }
 
 
@@ -150,6 +164,7 @@ int vtkPVApplication::CheckRegistration()
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
+  
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
   ui->Create(this,"");
@@ -189,18 +204,16 @@ void vtkPVApplication::DisplayAbout(vtkKWWindow *win)
 void vtkPVApplication::Exit()
 {
   int id, myId, num;
-  vtkMultiProcessController *controller;
   
   // Send a break RMI to each of the slaves.
-  controller = vtkMultiProcessController::RegisterAndGetGlobalController(this);
-  num = controller->GetNumberOfProcesses();
-  myId = controller->GetLocalProcessId();
+  num = this->Controller->GetNumberOfProcesses();
+  myId = this->Controller->GetLocalProcessId();
   
   for (id = 0; id < num; ++id)
     {
     if (id != myId)
       {
-      controller->TriggerRMI(id, VTK_BREAK_RMI_TAG);
+      this->Controller->TriggerRMI(id, VTK_BREAK_RMI_TAG);
       }
     }
   

@@ -53,6 +53,9 @@ ClientData vtkKWOptionMenuNewCommand();
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWProgressGaugeNewCommand();
+int vtkKWPushButtonCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWPushButtonNewCommand();
 int vtkKWRadioButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWRadioButtonNewCommand();
@@ -153,6 +156,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWOptionMenuCommand);
   vtkTclCreateNew(interp,"vtkKWProgressGauge", vtkKWProgressGaugeNewCommand,
                   vtkKWProgressGaugeCommand);
+  vtkTclCreateNew(interp,"vtkKWPushButton", vtkKWPushButtonNewCommand,
+                  vtkKWPushButtonCommand);
   vtkTclCreateNew(interp,"vtkKWRadioButton", vtkKWRadioButtonNewCommand,
                   vtkKWRadioButtonCommand);
   vtkTclCreateNew(interp,"vtkKWSaveImageDialog", vtkKWSaveImageDialogNewCommand,

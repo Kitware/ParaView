@@ -53,30 +53,40 @@ KIT_NEWS = ${TCL_NEWS}
 KIT_FLAGS = -I../Widgets -I../../Widgets
 KIT_EXTRA_DEPENDS = ../Widgets
 
-VTK_LIB_FILE  = libVTK${ME}${VTK_LIB_EXT}
-TCL_LIB_FILE  = vtk${ME}Tcl
+VTK_LIB_FILE  = vtk${ME}${VTK_LIB_EXT}
+TCL_LIB_FILE  = vtk${ME}Tcl${VTK_LIB_EXT}
 
 
 #------------------------------------------------------------------------------
 # Include the generic stuff here
 
 include ../Kits.make
-pvd:
-	echo  Makefile ParaView.o ${TOOLKIT_DEPENDS} 
 
-ParaView: Makefile ParaView.o pvinit.o ${TOOLKIT_DEPENDS} 
-	$(CXX) -o ParaView ParaView.o pvinit.o \
-	-L/. -lVTKKWParaView ./vtkKWParaViewTcl  \
-	-L../Widgets -lVTKKWWidgets ../Widgets/vtkKWWidgetsTcl \
-	${USE_CONTRIB_LIBS}	\
+vtktcl.o: ${VTKSRC}/tcl/vtktcl.c
+	$(CC) $(CC_FLAGS) -c -o vtktcl.o $(VTKSRC)/tcl/vtktcl.c
+
+ParaView: Makefile ParaView.o vtktcl.o ${TOOLKIT_DEPENDS} 
+	$(CXX) -o ParaView ParaView.o \
+	${TCL_LIB_FILE} ${KIT_LIBS} \
+	../Widgets/vtkKWWidgetsTcl$(VTK_LIB_EXT) \
 	${USE_PATENTED_LIBS}	\
 	${USE_IMAGING_LIBS}	\
 	${USE_GRAPHICS_LIBS}	\
+	${USE_CONTRIB_LIBS}	\
 	-L${VTKBIN}/common -lVTKCommonTcl  -lVTKCommon \
-	${XLIBS} ${GRAPHICS_API_LIBS} \
+	vtktcl.o ${LDLIBS} ${CONTROLLER_API_LIBS} \
 	${TK_LIB} ${TCL_LIB} ${DL_LIBS} ${THREAD_LIBS} \
 	-L. ${CXX_FLAGS} ${VTK_SHLIB_LINK_FLAGS} ${XLDFLAGS} ${LDLIBS} \
-	${XLIBS} -lXext -lXt ${X_PRE_LIBS} -lX11 ${X_EXTRA_LIBS} -lm
+	${XLIBS} ${GRAPHICS_API_LIBS} -lXext -lXt ${X_PRE_LIBS} -lX11 ${X_EXTRA_LIBS} -lm
+
+
+
+#	-L/. -lVTKKWParaView ./vtkKWParaViewTcl  \
+#	-L../Widgets -lVTKKWWidgets ../Widgets/vtkKWWidgetsTcl \
+#	${XLIBS} ${GRAPHICS_API_LIBS} \
+#	${TK_LIB} ${TCL_LIB} ${DL_LIBS} ${THREAD_LIBS} \
+#	-L. ${CXX_FLAGS} ${VTK_SHLIB_LINK_FLAGS} ${XLDFLAGS} ${LDLIBS} \
+#	${XLIBS} -lXext -lXt ${X_PRE_LIBS} -lX11 ${X_EXTRA_LIBS} -lm
 
 
 

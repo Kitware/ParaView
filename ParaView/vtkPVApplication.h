@@ -33,6 +33,9 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVApplication_h
 
 #include "vtkKWApplication.h"
+#include "vtkMultiProcessController.h"
+
+
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
@@ -53,7 +56,11 @@ public:
   void RemoteSimpleScript(int remoteId, char *str, char *result, int resultMax);
 //ETX
   
-
+  // Description:
+  // We need to keep the controller in a prominent spot because there is no more 
+  // "RegisterAndGetGlobalController" method.
+  vtkSetObjectMacro(Controller, vtkMultiProcessController);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
   
   // Description:
   // Display the on-line help and about dialog for this application.
@@ -68,14 +75,20 @@ public:
   // We need to kill the slave processes
   void Exit();
   
+  // Description:
+  // class static method to initialize Tcl/Tk
+  static Tcl_Interp *InitializeTcl(int argc, char *argv[]);  
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication() {};
   vtkPVApplication(const vtkPVApplication&) {};
   void operator=(const vtkPVApplication&) {};
-
+  
   int CheckRegistration();
   int PromptRegistration(char *,char *);
+  
+  vtkMultiProcessController *Controller;
 };
 
 #endif

@@ -25,15 +25,17 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-#include "pvinit.h"
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVSlave.h"
+#include "vtkPVApplication.h"
 #include "vtkTclUtil.h"
 
 
-extern "C" {void Slave_Init(int myId, int numSlaves);}
+extern "C" {void vtkPVSlaveStart(vtkMultiProcessController *controller);}
 
+// external global variable.
+vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
 
 
 struct vtkPVArgs
@@ -43,33 +45,35 @@ struct vtkPVArgs
 };
 
 
-// Temporary replacement of vtkMultiThreader stuff
-//typedef int VTK_THREAD_RETURN_TYPE;
-//#define VTK_THREAD_RETURN_VALUE 0 
 
 // Each process starts with this method.  One process is designated as "master" 
 // and starts the application.  The other processes are slaves to the application.
-VTK_THREAD_RETURN_TYPE Process_Init( void *arg )
+void Process_Init(vtkMultiProcessController *controller, void *arg )
 {
   vtkPVArgs *pvArgs = (vtkPVArgs *)arg;
-  vtkMultiProcessController *controller;
-  int numProcs, myId;
-
-  controller = vtkMultiProcessController::RegisterAndGetGlobalController(NULL);
-  numProcs = controller->GetNumberOfProcesses();
+  int myId, numProcs;
+  
   myId = controller->GetLocalProcessId();
+  numProcs = controller->GetNumberOfProcesses();
+  
+  
 
-  vtkGenericWarningMacro("Process_Init: " << myId << " of " << numProcs);
+
 
   if (myId == numProcs - 1)
-    {
-    Et_Init(pvArgs->argc, pvArgs->argv);
-    return VTK_THREAD_RETURN_VALUE;
+    { // The last process is for UI.
+    // We need to pass the local controller to the UI process.
+    Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+    vtkPVApplication *app = vtkPVApplication::New();
+    app->SetController(controller);
+    app->Script("wm withdraw .");
+    app->Start(pvArgs->argc,pvArgs->argv);
+    app->Delete();
     }
   else
     {
     // The last is used as a master, so reduce the slave count by one.
-    Slave_Init(myId, numProcs-1);
+    vtkPVSlaveStart(controller);
     }
 }
 
@@ -133,15 +137,16 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   pvArgs.argc = argc;
   pvArgs.argv = argv;
   
-  vtkMultiProcessController *controller = vtkMultiProcessController::RegisterAndGetGlobalController(NULL);
+  vtkMultiProcessController *controller = vtkMultiProcessController::New();
   controller->SetNumberOfProcesses(2);
   controller->Initialize(argc, argv);
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();
+  
 
   //Process_Init((void *)(&pvArgs));
 
-  controller->UnRegister(NULL);
+  controller->Delete();
   
   delete [] argv[0];
   delete [] argv[1];
@@ -158,7 +163,7 @@ int main(int argc, char *argv[])
   pvArgs.argc = argc;
   pvArgs.argv = argv;
   
-  vtkMultiProcessController *controller = vtkMultiProcessController::RegisterAndGetGlobalController(NULL);
+  vtkMultiProcessController *controller = vtkMultiProcessController::New();
   controller->Initialize(argc, argv);
   controller->SetNumberOfProcesses(2);
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
@@ -166,7 +171,7 @@ int main(int argc, char *argv[])
 
   //Process_Init((void *)(&pvArgs));
   
-  controller->UnRegister(NULL);
+  controller->Delete();
   
   return 0;
 }

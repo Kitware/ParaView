@@ -40,10 +40,10 @@ libVTK${ME}.a: ${SRC_OBJ} ${KIT_OBJ}
 	${RANLIB} libVTK$(ME).a
 
 
-libVTK$(ME)$(SHLIB_SUFFIX): ${KIT_OBJ}
-	rm -f libVTK$(ME)$(SHLIB_SUFFIX)
+vtk$(ME)$(SHLIB_SUFFIX): ${KIT_OBJ}
+	rm -f vtk$(ME)$(SHLIB_SUFFIX)
 	$(CXX) ${CXX_FLAGS} ${VTK_SHLIB_BUILD_FLAGS} -o \
-	libVTK$(ME)$(SHLIB_SUFFIX) \
+	vtk$(ME)$(SHLIB_SUFFIX) \
 	   ${KIT_OBJ} ${SHLIB_LD_LIBS}
 
 #------------------------------------------------------------------------------
@@ -58,9 +58,9 @@ libVTK${ME}Tcl.a: tcl/${ME}Init.o ${KIT_LIBS} ${KIT_TCL_OBJ}
 	${AR} cr libVTK${ME}Tcl.a tcl/${ME}Init.o ${KIT_LIBS} ${KIT_TCL_OBJ}
 	${RANLIB} libVTK$(ME)Tcl.a
 
-vtk$(ME)Tcl: tcl/${ME}Init.o libVTK${ME}${SHLIB_SUFFIX} ${KIT_LIBS} ${KIT_TCL_OBJ}
-	rm -f vtk$(ME)Tcl
+vtk$(ME)Tcl${SHLIB_SUFFIX}: tcl/${ME}Init.o vtk${ME}${SHLIB_SUFFIX} ${KIT_LIBS} ${KIT_TCL_OBJ}
+	rm -f vtk$(ME)Tcl${SHLIB_SUFFIX}
 	$(CXX) ${CXX_FLAGS} ${VTK_SHLIB_BUILD_FLAGS} -o \
-	vtk$(ME)Tcl tcl/${ME}Init.o  \
-	${KIT_LIBS} ${KIT_TCL_OBJ} libVTK${ME}${SHLIB_SUFFIX}
+	vtk$(ME)Tcl${SHLIB_SUFFIX} tcl/${ME}Init.o  \
+	${KIT_LIBS} ${KIT_TCL_OBJ} vtk${ME}${SHLIB_SUFFIX}
 

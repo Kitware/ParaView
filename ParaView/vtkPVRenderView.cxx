@@ -30,6 +30,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkMultiProcessController.h"
 #include "vtkDummyRenderWindowInteractor.h"
+#include "vtkPVSlave.h"
 #include "vtkObjectFactory.h"
 
 
@@ -96,27 +97,31 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
     return;
     }
 
-  this->vtkKWRenderView::Create(app, args);
-
-  // Styles need motion events.
-  this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}", 
-               this->VTKWidget->GetWidgetName(), this->GetTclName());
-
-
+  
   // Here we are going to create a single slave renderer in another process.
   // (As a test)
   vtkPVApplication *pvApp = (vtkPVApplication *)(app);
+  pvApp->GetController()->TriggerRMI(0, VTK_PV_SLAVE_INIT_RMI_TAG);
+  
   pvApp->RemoteSimpleScript(0, "vtkPVRenderSlave RenderSlave", NULL, 0);
   // The global "Slave" was setup when the process was initiated.
   pvApp->RemoteSimpleScript(0, "RenderSlave SetPVSlave Slave", NULL, 0);
   
   // lets show something as a test.
-  pvApp->RemoteSimpleScript(0, "vtkSphereSource SphereSource", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "vtkPolyDataMapper SphereMapper", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "SphereMapper SetInput [SphereSource GetOutput]", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "vtkActor SphereActor", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "SphereActor SetMapper SphereMapper", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "[RenderSlave GetRenderer] AddActor SphereActor", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "vtkConeSource ConeSource", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "vtkPolyDataMapper ConeMapper", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "ConeMapper SetInput [ConeSource GetOutput]", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "vtkActor ConeActor", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "ConeActor SetMapper ConeMapper", NULL, 0);
+  pvApp->RemoteSimpleScript(0, "[RenderSlave GetRenderer] AddActor ConeActor", NULL, 0);
+
+  
+  
+  this->vtkKWRenderView::Create(app, args);
+
+  // Styles need motion events.
+  this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}", 
+               this->VTKWidget->GetWidgetName(), this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -244,7 +249,7 @@ void vtkPVRenderView::Render()
   
   this->vtkKWRenderView::Render();
   
-  controller = vtkMultiProcessController::RegisterAndGetGlobalController(NULL);
+  controller = pvApp->GetController();
   
   window_size = this->RenderWindow->GetSize();
   total_pixels = window_size[0] * window_size[1];

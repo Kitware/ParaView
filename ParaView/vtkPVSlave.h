@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVSlave_h
 
 #include "vtkKWObject.h"
+#include "vtkMultiProcessController.h"
 #include "tcl.h"
 #include "tk.h"
 
@@ -44,6 +45,7 @@ class vtkKWWindow;
 class vtkKWWidget;
 class vtkKWEventNotifier;
 
+#define VTK_PV_SLAVE_INIT_RMI_TAG 1160
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -52,8 +54,10 @@ class vtkKWEventNotifier;
 #define VTK_PV_SLAVE_SCRIPT_RESULT_TAG 1140
 
 
-extern "C" void Slave_Init(int myId, int numSlaves);
-
+//BTX
+// Adds an RMI to initialize the interpreter and start the RMI loop.
+extern "C" void vtkPVSlaveStart(vtkMultiProcessController *controller);
+//ETX
 
 
 class VTK_EXPORT vtkPVSlave : public vtkKWObject
@@ -63,9 +67,11 @@ public:
   vtkTypeMacro(vtkPVSlave,vtkKWObject);
   
   // Description:
-  // Start running the main application.
-  virtual void Start();
-
+  // Keep the controller in this object.
+  // (We no longer have a global controller.)
+  vtkSetObjectMacro(Controller, vtkMultiProcessController);
+  vtkGetObjectMacro(Controller, vtkMultiProcessController);
+  
   // Description:
   // Get the interpreter being used by this application
   Tcl_Interp *GetInterp() {return this->Interp;};
@@ -99,6 +105,8 @@ protected:
   int SlaveId;
 
   Tcl_Interp *Interp;
+  vtkMultiProcessController *Controller;
+  
 };
 
 #endif

@@ -26,6 +26,9 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
+int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVRenderSlaveNewCommand();
 int vtkPVSlaveCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSlaveNewCommand();
@@ -78,6 +81,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
+  vtkTclCreateNew(interp,"vtkPVRenderSlave", vtkPVRenderSlaveNewCommand,
+                  vtkPVRenderSlaveCommand);
   vtkTclCreateNew(interp,"vtkPVSlave", vtkPVSlaveNewCommand,
                   vtkPVSlaveCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
