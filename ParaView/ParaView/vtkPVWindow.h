@@ -112,6 +112,7 @@ class vtkPVSourceCollection;
 class vtkPVTimerLogDisplay;
 class vtkPVTrackballRoll;
 class vtkPVWidget;
+class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
 
@@ -250,8 +251,8 @@ public:
 
   // Description:
   // Methods that can be used from scripts to save data to files.
-  void WriteVTKFile(char *filename);
-  void WritePVTKFile(char *filename, int ghostLevel);
+  void WriteVTKFile(const char* filename);
+  void WritePVTKFile(const char* filename, int ghostLevel);
 
   // Description:
   // These methods create a new data source/object given a name and a 
@@ -526,6 +527,12 @@ protected:
   void ReadSourceInterfacesFromFile(const char*);
   int ReadSourceInterfacesFromDirectory(const char*);
 
+  // Add a file writer.
+  void AddFileWriter(vtkPVWriter* writer);  
+  
+  // Helper for WriteVTKFile() and WritePVTKFile().
+  vtkPVWriter* FindPVWriter(const char* fileName, int parallel);
+  
 //BTX
   vtkArrayMap<const char*, vtkPVSource*>* Prototypes;
   vtkArrayMap<const char*, vtkPVSourceCollection*>* SourceLists;
@@ -533,6 +540,7 @@ protected:
   vtkArrayMap<const char*, const char*>* Writers;
   vtkLinkedList<vtkPVReaderModule*>* ReaderList;
   vtkLinkedList<const char*>* PackageNames;
+  vtkLinkedList<vtkPVWriter*>* FileWriterList;
 
   friend class vtkPVXMLPackageParser;
 //ETX
@@ -561,6 +569,8 @@ private:
   static const char* StandardReaderInterfaces;
   static const char* StandardSourceInterfaces;
   static const char* StandardFilterInterfaces;
+  static const char* StandardManipulators;
+  static const char* StandardWriters;
 
 
   vtkPVWindow(const vtkPVWindow&); // Not implemented

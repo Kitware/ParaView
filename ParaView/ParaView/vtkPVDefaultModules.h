@@ -684,7 +684,11 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "          module_type=\"Filter\">\n"
 "    <Filter type=\"vtkProbeFilter\"/>\n"
 "  </Module>\n"
-"\n"
+"</ModuleInterfaces>\n";
+
+// Define the standard manipulators.
+const char* vtkPVWindow::StandardManipulators=
+"<ModuleInterfaces>\n"
 "  <Manipulator name=\"FlyIn\" types=\"3D\" class=\"vtkPVJoystickFlyIn\">\n"
 "    <Scale variable=\"FlySpeed\" resolution=\".1\" range=\"1 30\" help=\"Set the speed of fly-in camera manipulation.\"/>\n"
 "  </Manipulator>\n"
@@ -714,7 +718,23 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "    <PushButton variable=\"ResetCenterOfRotation\" label=\"Reset Center Of Rotation\"\n"
 "                 help=\"Reset the center of rotation\"/>\n"
 "  </Manipulator>\n"
-"\n"
+"</ModuleInterfaces>\n";
+
+
+// Define the standard writers.
+const char* vtkPVWindow::StandardWriters=
+"<ModuleInterfaces>\n"
+"  <Writer input=\"vtkDataSet\"\n"
+"          class=\"vtkPVWriter\"\n"
+"          writer=\"vtkDataSetWriter\"\n"
+"          extension=\".vtk\"\n"
+"          file_description=\"VTK Files\"/>\n"
+"  <Writer input=\"vtkDataSet\"\n"
+"          class=\"vtkPVWriter\"\n"
+"          writer=\"vtkPDataSetWriter\"\n"
+"          parallel=\"1\"\n"
+"          extension=\".pvtk\"\n"
+"          file_description=\"PVTK Files\"/>\n"
 "</ModuleInterfaces>\n";
 
 #endif

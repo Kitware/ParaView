@@ -51,12 +51,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVWidget.h"
 #include "vtkPVWindow.h"
+#include "vtkPVWriter.h"
 #include "vtkPVXMLElement.h"
 #include "vtkParaViewInstantiator.h"
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.6");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.7");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -220,6 +221,10 @@ void vtkPVXMLPackageParser::ProcessConfiguration()
     else if(strcmp(name, "Manipulator") == 0)
       {
       this->CreateManipulator(element);
+      }
+    else if(strcmp(name, "Writer") == 0)
+      {
+      this->CreateWriter(element);
       }
     else if(strcmp(name, "Library") == 0)
       {
@@ -632,5 +637,78 @@ void vtkPVXMLPackageParser::CreateManipulator(vtkPVXMLElement* ma)
     }
 
   pcm->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLPackageParser::CreateWriter(vtkPVXMLElement* we)
+{
+  vtkPVWriter* pwm = 0;
+  const char* className = we->GetAttribute("class");
+  if(className)
+    {
+    vtkObject* object = vtkInstantiator::CreateInstance(className);
+    pwm = vtkPVWriter::SafeDownCast(object);
+    if(!pwm)
+      {
+      vtkErrorMacro("Cannot create Writer class \"" << className << "\"");
+      if(object)
+        {
+        object->Delete();
+        }
+      return;
+      }
+    }
+  else
+    {
+    pwm = vtkPVWriter::New();
+    }
+  
+  // Setup the writer's input type.
+  const char* input = we->GetAttribute("input");
+  if(!input)
+    {
+    vtkErrorMacro("Writer missing input attribute.");
+    return;
+    }
+  pwm->SetInputClassName(input);
+  
+  // Setup the writer's type.
+  const char* writer = we->GetAttribute("writer");
+  if(!writer)
+    {
+    vtkErrorMacro("Writer missing writer attribute.");
+    return;
+    }
+  pwm->SetWriterClassName(writer);
+  
+  // Setup the writer's file extension.
+  const char* extension = we->GetAttribute("extension");
+  if(!extension)
+    {
+    vtkErrorMacro("Writer missing extension attribute.");
+    return;
+    }
+  pwm->SetExtension(extension);
+  
+  // Setup the writer's file description.
+  const char* file_description = we->GetAttribute("file_description");
+  if(!file_description)
+    {
+    vtkErrorMacro("Writer missing file_description attribute.");
+    return;
+    }
+  pwm->SetDescription(file_description);  
+  
+  // Check whether the writer is for parallel formats.
+  const char* parallel = we->GetAttribute("parallel");
+  if(parallel && (strcmp(parallel, "1") == 0))
+    {
+    pwm->SetParallel(1);
+    }
+  
+  // Add the writer.
+  this->Window->AddFileWriter(pwm);
+  
+  pwm->Delete();
 }
 

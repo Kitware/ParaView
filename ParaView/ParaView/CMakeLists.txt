@@ -81,6 +81,7 @@ vtkPVWidgetCollection.cxx
 vtkPVWindow.cxx 
 #vtkPVWizard.cxx
 vtkPVWorldPointPicker.cxx 
+vtkPVWriter.cxx
 vtkPVXMLElement.cxx
 vtkPVXMLPackageParser.cxx
 vtkPVXMLParser.cxx

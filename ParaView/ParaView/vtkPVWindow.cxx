@@ -84,6 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
+#include "vtkPVWriter.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkString.h"
@@ -219,6 +220,9 @@ vtkPVWindow::vtkPVWindow()
   // created by calling ReadFile() on these.
   this->ReaderList = vtkLinkedList<vtkPVReaderModule*>::New();
 
+  // The writer modules.
+  this->FileWriterList = vtkLinkedList<vtkPVWriter*>::New();
+
   // The writers (used in SaveInTclScript) mapped to the extensions
   this->Writers = vtkArrayMap<const char*, const char*>::New();
   this->Writers->SetItem(".jpg", "vtkJPEGWriter");
@@ -322,6 +326,7 @@ vtkPVWindow::~vtkPVWindow()
   this->Prototypes->Delete();
   this->ReaderList->Delete();
   this->Writers->Delete();
+  this->FileWriterList->Delete();
 
   this->PVColorMaps->Delete();
   this->PVColorMaps = NULL;
@@ -1550,159 +1555,196 @@ int vtkPVWindow::Open(char *openFileName, int store)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::WriteVTKFile(char *filename)
+void vtkPVWindow::WriteVTKFile(const char* filename)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (!this->CurrentPVData)
+  if(!this->CurrentPVData)
     {
     return;
     }
-
+  
+  // Find the writer that supports this file name and data type.
+  vtkPVWriter* writer = this->FindPVWriter(filename, 0);
+  
+  // Make sure a writer is available for this file type.
+  if(!writer)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Error Saving File", 
+      "No writers support the data set's type.", 
+      vtkKWMessageDialog::ErrorIcon);
+    return;
+    }
+  
+  // Now that we can safely write the file, add the trace entry.
+  vtkPVApplication *pvApp = this->GetPVApplication();  
   pvApp->AddTraceEntry("$kw(%s) WriteVTKFile %s", this->GetTclName(),
                        filename);
   
-  if(this->Application->EvaluateBooleanExpression(
-       "info exists vtkXMLDataSetWriter"))
-    {
-    int len = vtkString::Length(filename);
-    if(len > 5)
-      {
-      const char* fn = filename + len-5;
-      if(strcmp(fn, ".xvtk") == 0)
-        {
-        pvApp->BroadcastScript("vtkXMLDataSetWriter writer");
-        pvApp->BroadcastScript("writer SetFileName %s", filename);
-        pvApp->BroadcastScript("writer SetInput %s",
-                               this->GetCurrentPVData()->GetVTKDataTclName());
-        pvApp->BroadcastScript("writer Write");
-        pvApp->BroadcastScript("writer Delete");
-        return;
-        }
-      }
-    }  
-  
-  pvApp->BroadcastScript("vtkDataSetWriter writer");
-  pvApp->BroadcastScript("writer SetFileName %s", filename);
-  pvApp->BroadcastScript("writer SetInput %s",
-                         this->GetCurrentPVData()->GetVTKDataTclName());
-  pvApp->BroadcastScript("writer SetFileTypeToBinary");
-  pvApp->BroadcastScript("writer Write");
-  pvApp->BroadcastScript("writer Delete");
+  // Actually write the file.
+  writer->Write(filename, this->GetCurrentPVData()->GetVTKDataTclName(), 1, 0);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::WritePVTKFile(char *filename, int ghostLevel)
+void vtkPVWindow::WritePVTKFile(const char* filename, int ghostLevel)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  int numProcs;
-  int idx;
-
   if (!this->CurrentPVData)
     {
     return;
     }
-
-  numProcs = 1;
+  
+  // Find the writer that supports this file name and data type.
+  vtkPVWriter* writer = this->FindPVWriter(filename, 1);
+  
+  // Make sure a writer is available for this file type.
+  if(!writer)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Error Saving File", 
+      "No writers support the data set's type.", 
+      vtkKWMessageDialog::ErrorIcon);
+    return;
+    }
+  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int numProcs = 1;
   if (pvApp->GetController())
     {
     numProcs = pvApp->GetController()->GetNumberOfProcesses();
     }
-
+  
+  // Now that we can safely write the file, add the trace entry.
   pvApp->AddTraceEntry("$kw(%s) WritePVTKFile %s", this->GetTclName(),
                        filename, ghostLevel);
-
-  pvApp->BroadcastScript("vtkPDataSetWriter writer");
-  pvApp->BroadcastScript("writer SetFileName %s", filename);
-  pvApp->BroadcastScript("writer SetInput %s",
-                         this->GetCurrentPVData()->GetVTKDataTclName());
-  pvApp->BroadcastScript("writer SetFileTypeToBinary");
-  pvApp->BroadcastScript("writer SetNumberOfPieces %d", numProcs);
-  pvApp->BroadcastScript("writer SetGhostLevel %d", ghostLevel);
-  this->Script("writer SetStartPiece 0");
-  this->Script("writer SetEndPiece 0");
-  for (idx = 1; idx < numProcs; ++idx)
-    {
-    pvApp->RemoteScript(idx, "writer SetStartPiece %d", idx);
-    pvApp->RemoteScript(idx, "writer SetEndPiece %d", idx);
-    }
-  pvApp->BroadcastScript("writer Write");
-  pvApp->BroadcastScript("writer Delete");
+  
+  // Actually write the file.
+  writer->Write(filename, this->GetCurrentPVData()->GetVTKDataTclName(),
+                numProcs, ghostLevel);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::WriteData()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  char *filename;
-  int numProcs;
-
-  if (!this->CurrentPVData)
+  // Make sure there are data to write.
+  if(!this->GetCurrentPVData())
     {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Error Saving File", 
+      "No data set is selected.", 
+      vtkKWMessageDialog::ErrorIcon);
     return;
     }
+  vtkDataSet* data = this->GetCurrentPVData()->GetVTKData();  
 
-  numProcs = 1;
+  // Check the number of processes.
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int numProcs = 1;
   if (pvApp->GetController())
     {
     numProcs = pvApp->GetController()->GetNumberOfProcesses();
     }
-
-  if (numProcs == 1)
+  int parallel = (numProcs > 1);
+  const char* defaultExtension = 0;
+  
+  ostrstream typesStr;
+  typesStr << "{";
+  
+  // Build list of file types supporting this data type.
+  vtkLinkedListIterator<vtkPVWriter*>* it =
+    this->FileWriterList->NewIterator();
+  while(!it->IsDoneWithTraversal())
     {
-    if(this->Application->EvaluateBooleanExpression(
-         "info exists vtkXMLDataSetWriter"))
+    vtkPVWriter* wm = 0;
+    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel))
       {
-      this->Script("tk_getSaveFile -filetypes {"
-                   "{{VTK files} {.vtk}} "
-                   "{{VTK XML files} {.xvtk}} "
-                   "} -defaultextension .vtk -initialfile data.vtk");
+      const char* desc = wm->GetDescription();
+      const char* ext = wm->GetExtension();
+      typesStr << " {{" << desc << "} {" << ext << "}}";
+      if(!defaultExtension)
+        {
+        defaultExtension = ext;
+        }
       }
-    else
+    it->GoToNextItem();
+    }
+  it->Delete();
+  
+  // Make sure we have at least one writer.
+  if(!defaultExtension)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Error Saving File", 
+      "No writers support the data set's type.", 
+      vtkKWMessageDialog::ErrorIcon);
+    return;
+    }
+  
+  typesStr << " }" << ends;
+  char* types = vtkString::Duplicate(typesStr.str());
+  typesStr.rdbuf()->freeze(0);
+  
+  // Ask the user for the filename.  Default the extension to the
+  // first writer supported.
+  this->Script("tk_getSaveFile -filetypes %s"
+               " -defaultextension %s -initialfile data%s",
+               types, defaultExtension, defaultExtension);
+  
+  // Get the filename selected.
+  char* filename =
+    vtkString::Duplicate(this->Application->GetMainInterp()->result);
+  
+  delete [] types;
+  
+  // Make sure we were given a filename.
+  if (strcmp(filename, "") == 0)
+    {
+    delete [] filename;
+    return;
+    }
+  
+  // Write the file.
+  if(parallel)
+    {
+    // See if the user wants to save any ghost levels.
+    this->Script("tk_dialog .ghostLevelDialog {Ghost Level Selection} "
+                 "{How many ghost levels would you like to save?} "
+                 "{} 0 0 1 2");
+    int ghostLevel = this->GetIntegerResult(this->GetPVApplication());
+    if (ghostLevel >= 0)
       {
-      this->Script("tk_getSaveFile -filetypes {"
-                   "{{VTK files} {.vtk}} "
-                   "} -defaultextension .vtk -initialfile data.vtk");
+      this->WritePVTKFile(filename, ghostLevel);
       }
-    
-    filename 
-      = vtkString::Duplicate(this->Application->GetMainInterp()->result);
-    
-    if (strcmp(filename, "") == 0)
-      {
-      delete [] filename;
-      return;
-      }
-    this->WriteVTKFile(filename);
     }
   else
     {
-    int ghostLevel;
-
-    this->Script("tk_getSaveFile -filetypes {"
-                 "{{PVTK files} {.pvtk}} "
-                 "} -defaultextension .pvtk -initialfile data.pvtk");
-    filename 
-      = vtkString::Duplicate(this->Application->GetMainInterp()->result);
-    if (strcmp(filename, "") == 0)
-      {
-      delete [] filename;
-      return;
-      }
-  
-    // See if the user wants to save any ghost levels.
-    this->Script("tk_dialog .ghostLevelDialog {Ghost Level Selection} {How many ghost levels would you like to save?} {} 0 0 1 2");
-    ghostLevel = this->GetIntegerResult(pvApp);
-    if (ghostLevel == -1)
-      {
-      delete [] filename;
-      return;
-      }
-
-    this->WritePVTKFile(filename, ghostLevel);
+    this->WriteVTKFile(filename);  
     }
-  
   delete [] filename;
+}
+
+//----------------------------------------------------------------------------
+vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
+{
+  // Find the writer that supports this file name and data type.
+  vtkPVWriter* writer = 0;
+  
+  vtkDataSet* data = this->GetCurrentPVData()->GetVTKData();  
+  vtkLinkedListIterator<vtkPVWriter*>* it =
+    this->FileWriterList->NewIterator();
+  while(!it->IsDoneWithTraversal())
+    {
+    vtkPVWriter* wm = 0;
+    if((it->GetData(wm) == VTK_OK) && wm->CanWriteData(data, parallel))
+      {
+      if(vtkString::EndsWith(fileName, wm->GetExtension()))
+        {
+        writer = wm;
+        break;
+        }
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+  return writer;
 }
 
 //----------------------------------------------------------------------------
@@ -2835,6 +2877,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   this->ReadSourceInterfacesFromString(vtkPVWindow::StandardSourceInterfaces);
   this->ReadSourceInterfacesFromString(vtkPVWindow::StandardFilterInterfaces);
   this->ReadSourceInterfacesFromString(vtkPVWindow::StandardReaderInterfaces);
+  this->ReadSourceInterfacesFromString(vtkPVWindow::StandardManipulators);
+  this->ReadSourceInterfacesFromString(vtkPVWindow::StandardWriters);
   
   // A list of standard directories in which to find interfaces.  The
   // first directory in this list that is found is the only one used.
@@ -3032,6 +3076,13 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
 
   this->ReaderList->AppendItem(prototype);
   this->MenuFile->SetState("Open Data File", vtkKWMenu::Normal);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::AddFileWriter(vtkPVWriter* writer)
+{
+  writer->SetApplication(this->GetPVApplication());
+  this->FileWriterList->AppendItem(writer);
 }
 
 //----------------------------------------------------------------------------
