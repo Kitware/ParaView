@@ -27,6 +27,16 @@
 class vtkKWPushButton;
 class vtkKWApplication;
 class vtkPVRenderView;
+class vtkKWRange;
+class vtkKWLabeledFrame;
+class vtkPVArrayInformation;
+class vtkPVSource;
+class vtkKWLabel;
+class vtkKWScale;
+class vtkKWChangeColorButton;
+class vtkKWOptionMenu;
+class vtkKWMenuButton;
+class vtkKWWidget;
 
 class VTK_EXPORT vtkPVVolumeAppearanceEditor : public vtkKWWidget
 {
@@ -46,18 +56,15 @@ public:
   virtual vtkPVVolumeAppearanceEditor *MakeObject()
     { vtkErrorMacro("No MakeObject"); return NULL;}
       
-  // Description:
-  // Looks at the data to reset the range used for the various
-  // color maps
-  void ResetScalarRange();
-  void ResetScalarRangeInternal();
-  
+
   // Description:
   // This method returns the user to the source page.
   // I would eventually like to replace this by 
   // a more general back/forward ParaView navigation.
   void BackButtonCallback();
 
+  void ColorButtonCallback( float r, float g, float b );
+  
   // Description:
   // Reference to the view is needed for the back callback
   void SetPVRenderView(vtkPVRenderView *view);
@@ -71,15 +78,57 @@ public:
   // enable/disable parts of the widget UI, enable/disable the visibility
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
- 
+
+  void SetPVSourceAndArrayInfo( vtkPVSource *source,
+                                vtkPVArrayInformation *arrayInfo );
+  
+  void ScalarOpacityRampChanged();
+  void ScalarOpacityRampChangedInternal();
+
+  void ColorRampChanged();
+  void ColorRampChangedInternal();
+
+  void ColorMapLabelConfigureCallback(int width, int height);
+  
 protected:
   vtkPVVolumeAppearanceEditor();
   ~vtkPVVolumeAppearanceEditor();
 
-  vtkKWPushButton*   BackButton;
+  vtkKWLabeledFrame      *ScalarOpacityFrame;
+  vtkKWLabeledFrame      *ColorFrame;
+  vtkKWPushButton        *BackButton;
   
-  vtkPVRenderView *PVRenderView;
+  vtkKWLabel             *ScalarOpacityRampLabel;
+  vtkKWRange             *ScalarOpacityRampRange;
+  vtkKWLabel             *ScalarOpacityStartValueLabel;
+  vtkKWScale             *ScalarOpacityStartValueScale;
+  vtkKWLabel             *ScalarOpacityEndValueLabel;
+  vtkKWScale             *ScalarOpacityEndValueScale;
+  
+  vtkKWLabel             *ColorRampLabel;
+  vtkKWRange             *ColorRampRange;
+  vtkKWWidget            *ColorEditorFrame;
+  vtkKWChangeColorButton *ColorStartValueButton;
+  vtkKWChangeColorButton *ColorEndValueButton;
+  vtkKWLabel             *ColorMapLabel;
+  
+  unsigned char          *MapData;
+  int                     MapDataSize;
+  int                     MapWidth;
+  int                     MapHeight;
+  
+  void                    UpdateMap(int width, int height);
+  
+  vtkPVRenderView        *PVRenderView;
 
+  double                  ScalarRange[2];
+  float                   StartOpacity;
+  float                   EndOpacity;
+  
+  vtkPVSource            *PVSource;
+  vtkPVArrayInformation  *ArrayInfo;
+
+  void                    RenderView();
   
   vtkPVVolumeAppearanceEditor(const vtkPVVolumeAppearanceEditor&); // Not implemented
   void operator=(const vtkPVVolumeAppearanceEditor&); // Not implemented

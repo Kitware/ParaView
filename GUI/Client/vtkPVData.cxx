@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.279");
+vtkCxxRevisionMacro(vtkPVData, "1.280");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1139,6 +1139,27 @@ void vtkPVData::EditVolumeAppearanceCallback()
           this->GetPVRenderView()->GetPropertiesParent()->GetWidgetName());
   this->Script("pack %s -side top -fill both -expand t",
           this->VolumeAppearanceEditor->GetWidgetName());
+  
+  vtkPVSource* source = this->GetPVSource();
+
+  if (!source)
+    {
+    return;
+    }
+
+  const char *menuValue = this->VolumeScalarsMenu->GetValue();
+
+  if ( menuValue && strlen(menuValue) > 6 )
+    {
+    vtkPVDataInformation* dataInfo = source->GetDataInformation();
+    vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetPointDataInformation();
+    vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(menuValue+6);
+    this->VolumeAppearanceEditor->SetPVSourceAndArrayInfo( source, arrayInfo );
+    }
+  else
+    {
+    this->VolumeAppearanceEditor->SetPVSourceAndArrayInfo( NULL, NULL );
+    }                                              
 }
 
 
@@ -1308,6 +1329,7 @@ void vtkPVData::UpdatePropertiesInternal()
   this->ColorMenu->AddEntryWithCommand("Property",
                                        this, "ColorByProperty");
 
+  const char *currentVolumeField = this->VolumeScalarsMenu->GetValue();
   this->VolumeScalarsMenu->ClearEntries();
   
   attrInfo = dataInfo->GetPointDataInformation();
@@ -1328,7 +1350,8 @@ void vtkPVData::UpdatePropertiesInternal()
       {
       sprintf(tmp, "Point %s", arrayInfo->GetName());
       this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
-      if ( firstField )
+      if ( (firstField && !strlen(currentVolumeField)) ||
+           !strcmp( tmp, currentVolumeField ) )
         {
         this->VolumeScalarsMenu->SetValue( tmp );
         volRenArray = arrayInfo;
@@ -1351,8 +1374,11 @@ void vtkPVData::UpdatePropertiesInternal()
       strcpy(defCmd, tmp);
       defPoint = 1;
       defArray = arrayInfo;
-      volRenArray = arrayInfo;
-      this->VolumeScalarsMenu->SetValue( tmp );
+      if ( !strlen(currentVolumeField) )
+        {
+        volRenArray = arrayInfo;
+        this->VolumeScalarsMenu->SetValue( tmp );
+        }
       }
     }
 
@@ -1451,6 +1477,7 @@ void vtkPVData::UpdatePropertiesInternal()
     {
       this->RepresentationMenu->DeleteEntry( VTK_PV_VOLUME_LABEL );
     }
+  
   if (dataType == VTK_UNSTRUCTURED_GRID && volRenArray)
     {
     this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
@@ -1464,7 +1491,7 @@ void vtkPVData::UpdatePropertiesInternal()
     for (idx = 0; idx < num; ++idx)
       {
       part = this->GetPVSource()->GetPart(idx);
-      part->GetPartDisplay()->ResetTransferFunctions(volRenArray);
+      part->GetPartDisplay()->InitializeTransferFunctions(volRenArray);
       }
     }
 }
@@ -1608,10 +1635,29 @@ void vtkPVData::VolumeRenderPointField(const char *name)
   char *str;
   str = new char [strlen(name) + 16];
   sprintf(str, "Point %s", name);
-  this->VolumeScalarsMenu->SetValue(str);
-  delete [] str;
+  
+  if ( !strcmp(this->VolumeScalarsMenu->GetValue(),str) )
+    {
+    // Update the transfer functions
+    vtkPVPart *part;
+    int idx, num;
+    
+    vtkPVDataInformation* dataInfo = this->GetPVSource()->GetDataInformation();
+    vtkPVDataSetAttributesInformation *attrInfo = dataInfo->GetPointDataInformation();
+    vtkPVArrayInformation *arrayInfo = attrInfo->GetArrayInformation(name);
+    
+    num = this->GetPVSource()->GetNumberOfParts();
+    for (idx = 0; idx < num; ++idx)
+      {
+      part = this->GetPVSource()->GetPart(idx);
+      part->GetPartDisplay()->ResetTransferFunctions(arrayInfo);
+      }
 
-  this->VolumeRenderPointFieldInternal(name);
+    this->VolumeScalarsMenu->SetValue(str);
+    this->VolumeRenderPointFieldInternal(name);
+    }
+  
+  delete [] str;
 }
 
 //----------------------------------------------------------------------------

@@ -48,7 +48,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.32");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.33");
 
 
 //----------------------------------------------------------------------------
@@ -363,19 +363,9 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
          << vtkClientServerStream::End;
   
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
-         << "AddHSVPoint" << 0.0 << 0.01 << 1.0 << 1.0 
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
-         << "AddHSVPoint" << 0.5 << 0.5 << 1.0 << 1.0 
-         << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->VolumeColorID 
-         << "AddHSVPoint" << 1.0 << 0.99 << 1.0 << 1.0 
-         << vtkClientServerStream::End;
-
+         << "RemoveAllPoints"  << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
-         << "AddPoint" << 0.0 << 0.0 << vtkClientServerStream::End;
-  stream << vtkClientServerStream::Invoke << this->VolumeOpacityID 
-         << "AddPoint" << 1.0 << 1.0 << vtkClientServerStream::End;
+         << "RemoveAllPoints" << vtkClientServerStream::End;
   
   pm->SendStreamToClientAndRenderServer();
   
@@ -669,6 +659,24 @@ void vtkPVPartDisplay::VolumeRenderModeOff()
 
 
 //----------------------------------------------------------------------------
+void vtkPVPartDisplay::InitializeTransferFunctions(vtkPVArrayInformation *info)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  
+  vtkPiecewiseFunction *opacityFunc = 
+    vtkPiecewiseFunction::SafeDownCast(
+      pm->GetObjectFromID(this->VolumeOpacityID));
+
+  // need to initialize only if there are no points in the function
+  if ( opacityFunc->GetSize() == 0 )
+    {
+    this->ResetTransferFunctions(info);
+    }
+  
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *info)
 {
   double range[2];
@@ -687,17 +695,15 @@ void vtkPVPartDisplay::ResetTransferFunctions(vtkPVArrayInformation *info)
          << "AddPoint" << range[1] << 1.0 << vtkClientServerStream::End;
   
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
-         << "AddHSVPoint" << range[0] << 0.01 << 1.0 << 1.0 
+         << "AddHSVPoint" << range[0] << 0.0 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
-         << "AddHSVPoint" << (range[0]+range[1])/2.0 << 0.5 << 1.0 << 1.0 
+         << "AddHSVPoint" << range[1] << 0.8 << 1.0 << 1.0 
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke << this->VolumeColorID 
-         << "AddHSVPoint" << range[1] << 0.99 << 1.0 << 1.0 
-         << vtkClientServerStream::End;
-
+         << "SetColorSpaceToHSV" << vtkClientServerStream::End;
+  
   pm->SendStreamToClientAndRenderServer();
-
 }
 
 //----------------------------------------------------------------------------

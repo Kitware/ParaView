@@ -121,6 +121,14 @@ public:
   // Return the id of the volume (on the server side)
   vtkGetMacro(VolumeID, vtkClientServerID);
 
+  // Description:
+  // Return the id of the volume opacity tfun (on the server side)
+  vtkGetMacro(VolumeOpacityID, vtkClientServerID);
+
+  // Description:
+  // Return the id of the volume color tfun (on the server side)
+  vtkGetMacro(VolumeColorID, vtkClientServerID);
+
   //BTX
   // Description:
   // Return the vtkVolume
@@ -155,6 +163,7 @@ public:
   // Description:
   // Initialize the transfer functions based on the scalar range
   void ResetTransferFunctions(vtkPVArrayInformation *info);
+  void InitializeTransferFunctions(vtkPVArrayInformation *info);
   
 protected:
   vtkPVPartDisplay();
