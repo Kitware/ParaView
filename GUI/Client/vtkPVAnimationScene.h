@@ -217,6 +217,8 @@ protected:
   void CreateProxy();
   int InPlay;
   int InvokingError;
+  int GeometryCached; // flag used to indicate of any geometry has been cached at all.
+          // helps in reducing the RemoveAllGeometries calls.
 
   unsigned long ErrorEventTag;
 private:

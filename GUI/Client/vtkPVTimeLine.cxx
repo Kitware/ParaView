@@ -20,7 +20,7 @@
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.5");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -192,9 +192,10 @@ void vtkPVTimeLine::RemoveAll()
 {
   int old_disable_redraw = this->GetDisableRedraw();
   this->SetDisableRedraw(1);
-  while (this->GetFunctionSize() > 0)
+  int size = 0;
+  while ((size = this->GetFunctionSize()) > 0)
     {
-    if (!this->RemovePoint(0))
+    if (!this->RemovePoint(size-1))
       {
       vtkErrorMacro("Error while removing all points");
       break;
@@ -340,7 +341,24 @@ void vtkPVTimeLine::ParameterCursorEndInteractionCallback()
 
 
 //----------------------------------------------------------------------------
+int vtkPVTimeLine::FunctionPointParameterIsLocked(int id)
+{
+  if (id == 0 && this->GetFunctionSize() > 1)
+    {
+    return 1;
+    }
+  return this->Superclass::FunctionPointParameterIsLocked(id);
+}
 //----------------------------------------------------------------------------
+int vtkPVTimeLine::FunctionPointCanBeMovedToParameter(int id, double parameter)
+{
+  if (id == 0)
+    {
+    return 0;
+    }
+  return this->Superclass::FunctionPointCanBeMovedToParameter(id, parameter);
+}
+
 //----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::PrintSelf(ostream& os, vtkIndent indent)

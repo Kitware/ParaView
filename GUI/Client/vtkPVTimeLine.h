@@ -94,6 +94,9 @@ protected:
   vtkPVTimeLine();
   ~vtkPVTimeLine();
 
+  // To override the manipulation of the start point in certain cases.
+  virtual int FunctionPointParameterIsLocked(int id);
+  virtual int FunctionPointCanBeMovedToParameter(int id, double parameter);
   //vtkKWParameterValueFunctionInterface methods.
   virtual unsigned long GetFunctionMTime();
   virtual int GetFunctionPointParameter(int id, double *parameter);

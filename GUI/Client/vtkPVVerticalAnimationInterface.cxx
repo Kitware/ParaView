@@ -40,7 +40,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.8");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.9");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -426,6 +426,7 @@ void vtkPVVerticalAnimationInterface::SetCacheGeometry(int cache)
     }
   this->CacheGeometry = cache;
   this->CacheGeometryCheck->SetState(cache);
+  this->AnimationManager->InvalidateAllGeometries();
   this->AddTraceEntry("$kw(%s) SetCacheGeometry %d", this->GetTclName(), cache);
 }
 

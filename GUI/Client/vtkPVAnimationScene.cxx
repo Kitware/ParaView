@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.17");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.18");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -137,6 +137,7 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->GeometryWriter = NULL;
 
   this->InvokingError = 0;
+  this->GeometryCached = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -622,6 +623,7 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
         int index = static_cast<int>((info->CurrentTime - stime) * this->GetFrameRate());
         int maxindex = static_cast<int>((etime - stime) * this->GetFrameRate())+1; 
         vtkProcessModule::GetProcessModule()->GetRenderModule()->CacheUpdate(index, maxindex);
+        this->GeometryCached = 1;
         }
       if (this->RenderView)
         {
@@ -706,6 +708,10 @@ void vtkPVAnimationScene::SaveAnimationCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetDuration(double duration)
 {
+  if (this->GetDuration() == duration)
+    {
+    return;
+    }
   double ntime = this->GetNormalizedCurrentTime();
   
   this->AnimationSceneProxy->SetEndTime(duration);
@@ -917,11 +923,15 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::InvalidateAllGeometries()
 {
-  vtkPVRenderModule* rm = vtkProcessModule::GetProcessModule()->GetRenderModule();
-  if (rm)
+  if (this->GeometryCached)
     {
-    rm->InvalidateAllGeometries();
+    vtkPVRenderModule* rm = vtkProcessModule::GetProcessModule()->GetRenderModule();
+    if (rm)
+      {
+      rm->InvalidateAllGeometries();
+      }
     }
+  this->GeometryCached = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -952,8 +962,6 @@ int vtkPVAnimationScene::GetLoop()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SetCurrentTime(double time)
 {
-  int old_override = this->AnimationManager->GetOverrideCache();
-  this->AnimationManager->SetOverrideCache(1);
   if (!this->IsCreated())
     {
     vtkErrorMacro("Scene has not been created yet.");
@@ -966,7 +974,6 @@ void vtkPVAnimationScene::SetCurrentTime(double time)
     this->Window->GetCurrentPVSource()->ResetCallback();
     }
   this->AddTraceEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(), time);
-  this->AnimationManager->SetOverrideCache(old_override);
 }
 
 //-----------------------------------------------------------------------------

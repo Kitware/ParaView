@@ -75,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.14");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.15");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -433,7 +433,34 @@ int vtkPVAnimationCue::AddNewKeyFrame(double time)
     }
   else
     {
+    int numOfKeyFrames = this->GetNumberOfKeyFrames();
+    if (numOfKeyFrames == 0 && time != 0)
+      {
+      // This stuff is to add the a keyframe at the start of the animation (let's call it
+      // pilot key frame). Note that vtkPVAnimationCue::RecordState has the additional 
+      // responsibility to initialize the pilot keyframe value propertly.
+      // Actually, vtkPVAnimationCue::AddNewKeyFrame gives up any gurantees about the
+      // key frames values in recording mode (only that it will be the properties
+      // current value) and the RecordState should init all the keyframes the way it wants.
+      if (this->AddNewKeyFrame(0.0) == -1) 
+        {
+        vtkErrorMacro("Failed to add Pilot keyframe!");
+        return -1;
+        }
+      }
     id = this->CreateAndAddKeyFrame(time, vtkPVAnimationManager::RAMP);
+    vtkPVKeyFrame* keyframe = this->GetKeyFrame(id);
+    if (!this->InRecording)
+      {
+      if (id == 0)
+        {
+        keyframe->SetValueToMinimum();
+        }
+      else if (id == this->GetNumberOfKeyFrames()-1)
+        {
+        keyframe->SetValueToMaximum();
+        }
+      }
     }
   return id;
 }
@@ -477,7 +504,7 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
   keyframe->Delete();
 
   this->InitializeKeyFrameUsingCurrentState(keyframe);
-  if (!this->InRecording)
+/*  if (!this->InRecording)
     {
     if (id == 0)
       {
@@ -488,7 +515,7 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
       keyframe->SetValueToMaximum();
       }
     }
-
+*/
   this->TimeLine->SelectPoint(id);
   return id;
 }
@@ -1142,7 +1169,8 @@ void vtkPVAnimationCue::RecordState(double ntime, double offset,
   // animated property has changed.
   // add a keyframe at ntime.
   this->TimeLine->DisableAddAndRemoveOff();
-
+  int old_numOfKeyFrames = this->GetNumberOfKeyFrames();
+  
   if (!this->PreviousStepKeyFrameAdded)
     {
     int id = this->AddNewKeyFrame(ntime);
@@ -1154,6 +1182,14 @@ void vtkPVAnimationCue::RecordState(double ntime, double offset,
     this->GetKeyFrame(id)->InitializeKeyValueUsingProperty(
       this->PropertyStatusManager->GetInternalProperty(vtkSMVectorProperty::SafeDownCast(property)),
       index);
+    
+    if (old_numOfKeyFrames == 0)
+      {
+      //Pilot keyframe also needs to be initilaized.
+      this->GetKeyFrame(0)->InitializeKeyValueUsingProperty(
+        this->PropertyStatusManager->GetInternalProperty(vtkSMVectorProperty::SafeDownCast(property)),
+        index);
+      }
     }
   int id2 = this->AddNewKeyFrame(ntime + offset);
   if (id2 == -1)
