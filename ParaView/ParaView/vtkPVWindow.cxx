@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.428");
+vtkCxxRevisionMacro(vtkPVWindow, "1.429");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1221,7 +1221,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // set up bindings for the interactor  
   const char *wname = this->MainView->GetVTKWidget()->GetWidgetName();
   const char *tname = this->GetTclName();
-  this->Script("bind %s <Motion> {%s MouseAction 2 %%b %%x %%y 0 0}", wname, tname);
+  this->Script("bind %s <Motion> {%s MouseAction 2 0 %%x %%y 0 0}", wname, tname);
   this->Script("bind %s <B1-Motion> {%s MouseAction 2 1 %%x %%y 0 0}", wname, tname);
   this->Script("bind %s <B2-Motion> {%s MouseAction 2 2 %%x %%y 0 0}", wname, tname);
   this->Script("bind %s <B3-Motion> {%s MouseAction 2 3 %%x %%y 0 0}", wname, tname);
@@ -4013,7 +4013,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.428 $");
+  this->ExtractRevision(os,"$Revision: 1.429 $");
 }
 
 //-----------------------------------------------------------------------------
