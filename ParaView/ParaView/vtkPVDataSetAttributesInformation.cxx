@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetAttributesInformation);
-vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.5");
+vtkCxxRevisionMacro(vtkPVDataSetAttributesInformation, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -158,6 +158,11 @@ void vtkPVDataSetAttributesInformation::AddInformation(vtkPVDataSetAttributesInf
   short                  infoArrayIndex;
   short                  newAttributeIndices[5]; 
   vtkCollection*         newArrayInformation;
+
+  for (idx1 = 0; idx1 < 5; ++idx1)
+    {
+    newAttributeIndices[idx1] = -1;
+    }
 
   // Combine point array information.
   infoArrayIndex = 0;
