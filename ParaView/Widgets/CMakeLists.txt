@@ -1,7 +1,6 @@
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SOURCE_FILES( KWWidgets_SRCS
 kwinit
-vtkContainer
 vtkCornerAnnotation 
 vtkKWActorComposite 
 vtkKWApplication 

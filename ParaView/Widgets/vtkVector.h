@@ -41,110 +41,40 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 // .NAME vtkVector - a dynamic vector
 
-#include "vtkContainer.h"
+#ifndef __vtkVector_h
+#define __vtkVector_h
 
-template <class T>
-class VTK_COMMON_EXPORT vtkVector : public vtkContainer
+#include "vtkAbstractList.h"
+
+template <class DType>
+class vtkVector : public vtkAbstractList<DType>
 {
-  // Description:
-  // This is a prototype for a compare function. It has to
-  // return true if objects are the same and false if not.
-  typedef int (*CompareFunction)(T item1, T item2);
-
 public:
-  static vtkVector<T> *New() { return new vtkVector<T>(); }  
+  static vtkVector<DType> *New() { return new vtkVector<DType>(); }  
   
   // Description:
   // Append an Item to the end of the vector
-  unsigned long AppendItem(T a) 
-    {
-      if ((this->NumberOfItems + 1) >= this->Size)
-        {
-        if (!this->Size)
-          {
-          this->Size = 2;
-          }
-        T *newArray = new T [this->Size*2];
-        unsigned int i;
-        for (i = 0; i < this->NumberOfItems; ++i)
-          {
-          newArray[i] = this->Array[i];
-          }
-        this->Size = this->Size*2;
-        if (this->Array)
-          {
-          delete [] this->Array;
-          }
-        this->Array = newArray;
-        }
-      this->Array[this->NumberOfItems] = a;
-      this->NumberOfItems++;
-      return (this->NumberOfItems - 1);
-    }
+  unsigned long AppendItem(DType a);
   
   // Description:
   // Remove an Item from the vector
-  unsigned long RemoveItem(unsigned long id) 
-    {
-      if (id >= this->NumberOfItems)
-        {
-        return 0;
-        }
-      unsigned int i;
-      this->NumberOfItems--;
-      for (i = id; i < this->NumberOfItems; ++i)
-        {
-        this->Array[i] = this->Array[i+1];
-        }
-      return 1;
-    }
+  unsigned long RemoveItem(unsigned long id);
   
   // Description:
   // Return an item that was previously added to this vector. 
-  int GetItem(unsigned long id, T& ret) 
-    {
-      if (id < this->NumberOfItems)
-        {
-        ret = this->Array[id];
-	return 1;
-        }
-      return 0;
-    }
+  int GetItem(unsigned long id, DType& ret);
       
   // Description:
   // Find an item in the vector. Return one if it was found, zero if it was
   // not found. The location of the item is returned in res.
-  int Find(T a, unsigned long &res) 
-    {
-      int i;
-      for (i = 0; i < this->NumberOfItems; ++i)
-        {
-        if (this->Array[i] == a)
-          {
-          res = i;
-          return 1;
-          }
-        }
-      return 0;
-    }
+  int Find(DType a, unsigned long &res);
 
   // Description:
   // Find an item in the vector using a comparison routine. 
   // Return one if it was found, zero if it was
   // not found. The location of the item is returned in res.
-  int Find(T a, CompareFunction compare, unsigned long &res) 
-    {
-      int i;
-      for (i = 0; i < this->NumberOfItems; ++i)
-        {
-        if ( compare(this->Array[i], a) )
-          {
-          res = i;
-          return 1;
-          }
-        }
-      return 0;
-    }
+  int Find(DType a, vtkAbstractList<DType>::CompareFunction compare, 
+	   unsigned long &res);
   
   // Description:
   // Return the number of items currently held in this container. This
@@ -158,17 +88,7 @@ public:
 
   // Description:
   // Removes all items from the container.
-  virtual void RemoveAllItems()
-    {
-    if (this->Array)
-      {
-      delete [] this->Array;
-      }
-    this->Array = 0;
-    this->NumberOfItems = 0;
-    this->Size = 0;
-    }
-  
+  virtual void RemoveAllItems();
 
 protected:
   vtkVector() {
@@ -181,5 +101,11 @@ protected:
   }
   unsigned long NumberOfItems;
   unsigned long Size;
-  T *Array;
+  DType *Array;
 };
+
+#ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
+#include "vtkImageIterator.txx"
+#endif 
+
+#endif
