@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.265");
+vtkCxxRevisionMacro(vtkPVData, "1.266");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2104,8 +2104,14 @@ void vtkPVData::ShowActorAppearance()
                this->ColorFrame->GetWidgetName(),
                this->ViewFrame->GetWidgetName() );
   
+  this->InterpolationMenuLabel->EnabledOn();
+  this->InterpolationMenu->EnabledOn();
+  this->LineWidthLabel->EnabledOn();
+  this->LineWidthThumbWheel->EnabledOn();
+  this->PointSizeLabel->EnabledOn();
+  this->PointSizeThumbWheel->EnabledOn();
+  this->OpacityLabel->EnabledOn();
   this->OpacityScale->EnabledOn();
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -2120,8 +2126,14 @@ void vtkPVData::ShowVolumeAppearance()
                this->VolumeAppearanceFrame->GetWidgetName(),
                this->ViewFrame->GetWidgetName() );
   
+  this->InterpolationMenuLabel->EnabledOff();
+  this->InterpolationMenu->EnabledOff();
+  this->LineWidthLabel->EnabledOff();
+  this->LineWidthThumbWheel->EnabledOff();
+  this->PointSizeLabel->EnabledOff();
+  this->PointSizeThumbWheel->EnabledOff();
+  this->OpacityLabel->EnabledOff();
   this->OpacityScale->EnabledOff();
-  this->UpdateEnableState();
 }
 
   
