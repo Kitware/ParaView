@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.11");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.12");
 
 struct vtkSMStringListDomainInternals
 {
@@ -226,5 +226,11 @@ void vtkSMStringListDomain::SetAnimationValue(vtkSMProperty *prop, int idx,
 void vtkSMStringListDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
+  unsigned int size = this->GetNumberOfStrings();
+  os << indent << "Strings(" << size << "):" << endl;
+  for(unsigned int i=0; i<size; i++)
+    {
+    os << indent.GetNextIndent() 
+          << i << ". " << this->GetString(i) << endl;
+    }
 }

@@ -22,7 +22,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMStringListRangeDomain);
-vtkCxxRevisionMacro(vtkSMStringListRangeDomain, "1.3");
+vtkCxxRevisionMacro(vtkSMStringListRangeDomain, "1.4");
 
 //---------------------------------------------------------------------------
 vtkSMStringListRangeDomain::vtkSMStringListRangeDomain()
@@ -265,4 +265,36 @@ void vtkSMStringListRangeDomain::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
 
   os << indent << "IntDomainMode: " << this->IntDomainMode << endl;
+  unsigned int size = this->SLDomain->GetNumberOfStrings();
+  os << indent << "Strings(" << size << "):" << endl;
+  unsigned int i;
+  for(i=0; i<size; i++)
+    {
+    os << indent.GetNextIndent() 
+      << i << ". " << this->SLDomain->GetString(i) << endl;
+    }
+
+  size = this->IRDomain->GetNumberOfEntries();
+  os << indent << "Min" << endl;
+  for(i=0; i<size; i++)
+    {
+    int exists;
+    int min = this->IRDomain->GetMinimum(i, exists);
+    if (exists)
+      {
+      os << indent.GetNextIndent() 
+        << i << ". " << min << endl;
+      }
+    }
+  os << indent << "Max" << endl;
+  for(i=0; i<size; i++)
+    {
+    int exists;
+    int max = this->IRDomain->GetMaximum(i, exists);
+    if (exists)
+      {
+      os << indent.GetNextIndent() 
+        << i << ". " << max << endl;
+      }
+    }
 }
