@@ -80,6 +80,10 @@ public:
   static int EndsWith(const char* str1, const char* str2);
 
   // Description:
+  // Returns a pointer to the last occurence of str2 in str1.
+  static const char* FindLastString(const char* str1, const char* str2);
+
+  // Description:
   // Append two strings and prroduce new one.  Programmer must delete
   // the resulting string. The method returns 0 if inputs are empty or
   // if there was an error.
@@ -105,6 +109,11 @@ public:
   // Description:
   // Return the number of occurence of a char.
   static unsigned int CountChar(const char* str, char c);
+
+  // Description:
+  // Fill 'str' with 'len' times 'c', add NULL terminator
+  // Return 'str'.
+  static char* FillString(char* str, char c, size_t len);
 
 protected:
   vtkString() {};

@@ -29,13 +29,10 @@
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.13");
+vtkCxxRevisionMacro(vtkString, "1.14");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
-// Description:
-// This method returns the size of string. If the string is empty,
-// it returns 0. It can handle null pointers.
 vtkIdType vtkString::Length(const char* str)
 {
   if ( !str )
@@ -47,8 +44,6 @@ vtkIdType vtkString::Length(const char* str)
 
   
 //----------------------------------------------------------------------------
-// Description:
-// Copy string to the other string.
 void vtkString::Copy(char* dest, const char* src)
 {
   if ( !dest )
@@ -64,11 +59,6 @@ void vtkString::Copy(char* dest, const char* src)
 }
 
 //----------------------------------------------------------------------------
-// Description:
-// This method makes a duplicate of the string similar to
-// C function strdup but it uses new to create new string, so
-// you can use delete to remove it. It returns empty string 
-// "" if the input is empty.
 char* vtkString::Duplicate(const char* str)
 {    
   if ( str )
@@ -81,9 +71,6 @@ char* vtkString::Duplicate(const char* str)
 }
 
 //----------------------------------------------------------------------------
-// Description:
-// This method compare two strings. It is similar to strcmp,
-// but it can handle null pointers.
 int vtkString::Compare(const char* str1, const char* str2)
 {
   if ( !str1 )
@@ -98,8 +85,6 @@ int vtkString::Compare(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-// Description:
-// Check if the first string starts with the second one.
 int vtkString::StartsWith(const char* str1, const char* str2)
 {
   if ( !str1 || !str2 || strlen(str1) < strlen(str2) )
@@ -110,8 +95,6 @@ int vtkString::StartsWith(const char* str1, const char* str2)
 }
 
 //----------------------------------------------------------------------------
-// Description:
-// Check if the first string starts with the second one.
 int vtkString::EndsWith(const char* str1, const char* str2)
 {
   if ( !str1 || !str2 || strlen(str1) < strlen(str2) )
@@ -119,6 +102,34 @@ int vtkString::EndsWith(const char* str1, const char* str2)
     return 0;
     }
   return !strncmp(str1 + (strlen(str1)-strlen(str2)), str2, strlen(str2));
+}
+
+//----------------------------------------------------------------------------
+const char* vtkString::FindLastString(const char* str1, const char* str2)
+{
+  if (!str1 || !str2)
+    {
+    return NULL;
+    }
+  
+  size_t len1 = strlen(str1);
+  size_t len2 = strlen(str2);
+
+  if (len1 < len2)
+    {
+    return NULL;
+    }
+
+  const char *ptr = str1 + len1 - len2;
+  do
+    {
+    if (!strncmp(ptr, str2, len2))
+      {
+      return ptr;
+      }
+    } while (ptr-- != str1);
+
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -278,4 +289,16 @@ unsigned int vtkString::CountChar(const char* str, const char c)
       }
     }
   return count;
+}
+
+//----------------------------------------------------------------------------
+char* vtkString::FillString(char* str, char c, size_t len)
+{
+  if (str)
+    {
+    memset(str, c, len);
+    str[len] = '\0';
+    }
+
+  return str;
 }
