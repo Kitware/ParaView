@@ -33,12 +33,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWToolbar.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWFrame.h"
+#include "vtkKWRadioButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
-#include "vtkKWRadioButton.h"
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
 
@@ -50,10 +52,10 @@ template class VTK_EXPORT vtkVectorIterator<vtkKWWidget*>;
 #endif
 
 #ifdef _WIN32
-static int vtkKWToolbarGlobalFlatAspect = 1;
+static int vtkKWToolbarGlobalFlatAspect        = 1;
 static int vtkKWToolbarGlobalWidgetsFlatAspect = 1;
 #else
-static int vtkKWToolbarGlobalFlatAspect = 0;
+static int vtkKWToolbarGlobalFlatAspect        = 0;
 static int vtkKWToolbarGlobalWidgetsFlatAspect = 0;
 #endif
 
@@ -77,8 +79,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.32");
-
+vtkCxxRevisionMacro(vtkKWToolbar, "1.33");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -87,46 +88,100 @@ int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWToolbar::vtkKWToolbar()
 {
   this->CommandFunction = vtkKWToolbarCommand;
-  this->Expanding = 0;
 
-  this->Frame = vtkKWWidget::New();
-  this->Frame->SetParent(this);
+  this->Frame   = vtkKWFrame::New();
+  this->Handle  = vtkKWFrame::New();
 
-  this->Separator = vtkKWWidget::New();
-  this->Separator->SetParent(this);
+  this->Widgets                   = vtkVector<vtkKWWidget*>::New();
 
-  this->Widgets = vtkVector<vtkKWWidget*>::New();
+  this->FlatAspect                = vtkKWToolbar::GetGlobalFlatAspect();
+  this->WidgetsFlatAspect         = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
+  this->Resizable                 = 0;
+  this->Expanding                 = 0;
 
-  this->FlatAspect = vtkKWToolbar::GetGlobalFlatAspect();
-  this->WidgetsFlatAspect = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
+  this->WidgetsFlatAdditionalPadX = 1;
+  this->WidgetsFlatAdditionalPadY = 0;
 
-  this->Resizable = 0;
+#if defined(WIN32)
+  this->PadX = 0;
+  this->PadY = 0;
+#else
+  this->PadX = 1;
+  this->PadY = 1;
+#endif
 
   // This widget is used to keep track of default options
 
   this->DefaultOptionsWidget = vtkKWRadioButton::New();
-  this->DefaultOptionsWidget->SetParent(this);
-
-#if defined(WIN32)
-  this->PadX = this->PadY = 0;
-#else
-  this->PadX = this->PadY = 1;
-#endif
-  this->WidgetsFlatAdditionalPadX = this->WidgetsFlatAdditionalPadY = 1;
 }
 
 //----------------------------------------------------------------------------
 vtkKWToolbar::~vtkKWToolbar()
 {
-  this->Frame->Delete();
-  this->Frame = 0;
+  if (this->Frame)
+    {
+    this->Frame->Delete();
+    this->Frame = 0;
+    }
 
-  this->Separator->Delete();
-  this->Separator = 0;
+  if (this->Handle)
+    {
+    this->Handle->Delete();
+    this->Handle = 0;
+    }
 
-  this->Widgets->Delete();
+  if (this->Widgets)
+    {
+    this->Widgets->Delete();
+    this->Widgets = NULL;
+    }
 
-  this->DefaultOptionsWidget->Delete();
+  if (this->DefaultOptionsWidget)
+    {
+    this->DefaultOptionsWidget->Delete();
+    this->DefaultOptionsWidget = NULL;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWToolbar::Create(vtkKWApplication *app)
+{
+  // Set the application
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("widget already created");
+    return;
+    }
+
+  this->SetApplication(app);
+
+  // Create the main frame for this widget
+
+  this->Script("frame %s", this->GetWidgetName());
+
+  this->Script("bind %s <Configure> {%s ScheduleResize}",
+               this->GetWidgetName(), this->GetTclName());
+
+  // Create the widgets container itself
+
+  this->Frame->SetParent(this);
+  this->Frame->Create(app, "");
+
+  // Create a "toolbar handle"
+
+  this->Handle->SetParent(this);
+  this->Handle->Create(app, "-bd 2 -relief raised");
+
+  // Create the default options repository (never packed, just a way
+  // to keep track of default options)
+
+  this->DefaultOptionsWidget->SetParent(this);
+  this->DefaultOptionsWidget->Create(app, "");
+
+  // Update aspect
+
+  this->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -134,6 +189,7 @@ void vtkKWToolbar::AddWidget(vtkKWWidget *widget)
 {
   if (this->Widgets->AppendItem(widget) == VTK_OK)
     {
+    widget->SetEnabled(this->Enabled);
     this->UpdateWidgets();
     }
   else
@@ -163,6 +219,7 @@ void vtkKWToolbar::InsertWidget(vtkKWWidget *location, vtkKWWidget *widget)
 
   if (res)
     {
+    widget->SetEnabled(this->Enabled);
     this->UpdateWidgets();
     }
   else
@@ -240,10 +297,12 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
     }
 
   vtkKWRadioButton *rb = vtkKWRadioButton::New();
+
   rb->SetParent(this->GetFrame());
   rb->Create(this->Application, "");
   rb->SetIndicator(0);
   rb->SetValue(value);
+
   if (image_name)
     {
     this->Script(
@@ -252,18 +311,22 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
       image_name, 
       select_image_name ? select_image_name : image_name);
     }
+
   if (object && method)
     {
     rb->SetCommand(object, method);
     }
+
   if (variable_name)
     {
     rb->SetVariableName(variable_name);
     }
+
   if (help)
     {
     rb->SetBalloonHelpString(help);
     }
+
   if (extra)
     {
     this->Script("%s configure %s", rb->GetWidgetName(), extra);
@@ -274,49 +337,6 @@ vtkKWWidget* vtkKWToolbar::AddRadioButtonImage(int value,
   rb->Delete();
 
   return rb;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWToolbar::Create(vtkKWApplication *app)
-{
-  // Set the application
-
-  if (this->IsCreated())
-    {
-    vtkErrorMacro("widget already created");
-    return;
-    }
-  this->SetApplication(app);
-
-  // Note that there are two frames here. It used to be mandatory in the past. 
-  // Let's keep it like this in case we want to add something in the toolbar
-  // like a "grip" on the left for example, to detach/drag the toolbar.
-
-  // Create the main frame for this widget
-
-  this->Script("frame %s", this->GetWidgetName());
-
-  this->Script("bind %s <Configure> {%s ScheduleResize}",
-               this->GetWidgetName(), this->GetTclName());
-
-  // Create the widgets container itself
-
-  this->Frame->Create(app, "frame", "-bd 0");
-
-  // Create a "toolbar separator" for the flat aspect
-
-  this->Separator->Create(app, "frame", "-bd 2 -relief raised");
-
-  this->Update();
-
-  // Create the default options repository (never packed, just a way
-  // to keep track of default options)
-
-  this->DefaultOptionsWidget->Create(app, "");
-
-  // Update enable state
-
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -352,9 +372,11 @@ void vtkKWToolbar::UpdateWidgetsAspect()
   while (!it->IsDoneWithTraversal())
     {
     vtkKWWidget* widget = 0;
+
     // Change the relief of buttons (let's say that everything that
     // has a -command will qualify, -state could have been used, or
-    // a match on the widget type, etc.
+    // a match on the widget type, etc).
+
     if (it->GetData(widget) == VTK_OK && 
         widget->HasConfigurationOption("-command"))
       {
@@ -376,6 +398,7 @@ void vtkKWToolbar::UpdateWidgetsAspect()
         // an empty border as the negative current value (i.e.
         // the negative value will be handled as 0, but still will enable
         // us to retrieve the old value using abs() later on).
+
         if (widget->HasConfigurationOption("-bd"))
           {
           this->Script("%s cget -bd", widget->GetWidgetName());
@@ -384,7 +407,9 @@ void vtkKWToolbar::UpdateWidgetsAspect()
             << (this->WidgetsFlatAspect ? -abs(bd) : abs(bd)) << endl;
           }
         }
+
       // If radiobutton, remove the select color border in flat aspect
+
       if (widget->HasConfigurationOption("-selectcolor"))
         {
         if (this->WidgetsFlatAspect)
@@ -394,17 +419,14 @@ void vtkKWToolbar::UpdateWidgetsAspect()
           }
         else
           {
-#if 1
           s << widget->GetWidgetName() << " config -selectcolor [" 
             << this->DefaultOptionsWidget->GetWidgetName() 
             << " cget -selectcolor]" << endl; 
-#else
-          s << widget->GetWidgetName() << " config -selectcolor [lindex [" 
-            << widget->GetWidgetName() << " config -selectcolor] 3]" << endl;
-#endif
           }
         }
+
       // Do not use active background in flat mode either
+
       if (widget->HasConfigurationOption("-activebackground"))
         {
         if (this->WidgetsFlatAspect)
@@ -414,14 +436,9 @@ void vtkKWToolbar::UpdateWidgetsAspect()
           }
         else
           {
-#if 1
           s << widget->GetWidgetName() << " config -activebackground [" 
             << this->DefaultOptionsWidget->GetWidgetName() 
             << " cget -activebackground]" << endl; 
-#else
-          s << widget->GetWidgetName() << " config -activebackground [lindex [" 
-            << widget->GetWidgetName() << " config -activebackground] 3]" << endl;
-#endif
           }
         }
       }
@@ -512,8 +529,7 @@ void vtkKWToolbar::UpdateWidgetsLayout()
     return;
     }
 
-  this->Script("catch {eval grid forget [grid slaves %s]}",
-               this->GetFrame()->GetWidgetName());
+  this->GetFrame()->UnpackChildren();
 
   // If this toolbar is resizable, then constrain it to the current size
 
@@ -548,6 +564,7 @@ void vtkKWToolbar::UpdateWidgetsLayout()
     << (this->PadY + (this->WidgetsFlatAspect ? 
                       this->WidgetsFlatAdditionalPadY : 0))
     << ends;
+
   this->Script(s.str());
   s.rdbuf()->freeze(0);
 }
@@ -557,7 +574,6 @@ void vtkKWToolbar::UpdateWidgets()
 {
   this->UpdateWidgetsAspect();
   this->UpdateWidgetsLayout();
-  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
@@ -619,54 +635,23 @@ void vtkKWToolbar::SetWidgetsFlatAdditionalPadY(int arg)
 //----------------------------------------------------------------------------
 void vtkKWToolbar::Update()
 {
+  this->UpdateEnableState();
+
+  const char *common_opts = " -side left -anchor nw -fill both -expand n";
+
   if (this->FlatAspect)
     {
-    this->Script(
-      "%s config -relief flat -bd 0", 
-      this->GetWidgetName());
+    this->Script("%s config -relief flat -bd 0", this->GetWidgetName());
 
-    this->Script(
-      "pack %s -ipadx 2 -ipady 0 -padx 0 -pady 3 -side left -anchor nw -fill both -expand n",
-      this->Frame->GetWidgetName());
-
-    this->Script(
-      "pack %s -ipadx 1 -side left -anchor nw -fill y -expand n -before %s",
-      this->Separator->GetWidgetName(),
-      this->Frame->GetWidgetName());
+    this->Script("pack %s -ipadx 0 -ipady 0 -padx 0 -pady 0 %s",
+                 this->Frame->GetWidgetName(), common_opts);
     }
   else
     {
-    this->Script(
-      "%s config -relief raised -bd 1", 
-      this->GetWidgetName());
+    this->Script("%s config -relief raised -bd 1", this->GetWidgetName());
 
-    this->Script(
-      "pack forget %s", 
-      this->Separator->GetWidgetName());
-
-    this->Script(
-      "pack %s -ipadx 2 -ipady 2 -padx 1 -pady 0 -side left -anchor nw -fill both -expand n",
-      this->Frame->GetWidgetName());
-    }
-
-  this->UpdateEnableState();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWToolbar::Pack(const char *options)
-{
-  this->Script("pack %s -padx 2 -pady 2 -anchor n %s", 
-               this->GetWidgetName(), options);
-
-  if (this->Resizable)
-    {
-    this->Script("pack %s -fill both -expand y", 
-                 this->GetWidgetName());
-    }
-  else
-    {
-    this->Script("pack %s -fill both -expand n", 
-                 this->GetWidgetName());
+    this->Script("pack %s -ipadx 1 -ipady 1 -padx 0 -pady 0 %s",
+                 this->Frame->GetWidgetName(), common_opts);
     }
 }
 
@@ -677,14 +662,12 @@ void vtkKWToolbar::SetFlatAspect(int f)
     {
     return;
     }
+
   this->FlatAspect = f;
   this->Modified();
+
   this->Update();
   this->UpdateWidgets();
-  if (this->IsPacked())
-    {
-    this->Pack();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -694,8 +677,10 @@ void vtkKWToolbar::SetWidgetsFlatAspect(int f)
     {
     return;
     }
+
   this->WidgetsFlatAspect = f;
   this->Modified();
+
   this->UpdateWidgets();
 }
 
@@ -706,14 +691,12 @@ void vtkKWToolbar::SetResizable(int r)
     {
     return;
     }
+
   this->Resizable = r;
   this->Modified();
+
   this->Update();
   this->UpdateWidgets();
-  if (this->IsPacked())
-    {
-    this->Pack();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -740,7 +723,6 @@ void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Frame: " << this->Frame << endl;
-  os << indent << "Separator: " << this->Separator << endl;
   os << indent << "Resizable: " << (this->Resizable ? "On" : "Off") << endl;
   os << indent << "FlatAspect: " << (this->FlatAspect ? "On" : "Off") << endl;
   os << indent << "WidgetsFlatAspect: " << (this->WidgetsFlatAspect ? "On" : "Off") << endl;
