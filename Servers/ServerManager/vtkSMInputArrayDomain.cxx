@@ -25,7 +25,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.7");
 
 //---------------------------------------------------------------------------
 static const char* const vtkSMInputArrayDomainAttributeTypes[] = {
@@ -255,7 +255,8 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
       }
     else if (strcmp(attribute_type, "point") == 0)
       {
-      this->SetAttributeType(vtkSMInputArrayDomain::POINT);
+      this->SetAttributeType(
+        static_cast<unsigned char>(vtkSMInputArrayDomain::POINT));
       }
     else
       {
