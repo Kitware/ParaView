@@ -38,7 +38,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.36");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.37");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -280,7 +280,6 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
     return;
     }
 
-  vtkIdType idx, numCells;
   vtkIdType* endCellPtr;
   vtkIdType* cellPtr;
   vtkIdType *pts = 0;
