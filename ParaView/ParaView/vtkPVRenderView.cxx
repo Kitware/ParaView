@@ -123,7 +123,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.278");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.279");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1094,12 +1094,12 @@ void vtkPVRenderView::CreateViewProperties()
       }
     else
       {
-      this->OrientationAxes->SetViewport(0, 0.2, 0, 0.2);
+      this->OrientationAxes->SetViewport(0, 0, 0.2, 0.2);
       }
     }
   else
     {
-    this->OrientationAxes->SetViewport(0, 0.2, 0, 0.2);
+    this->OrientationAxes->SetViewport(0, 0, 0.2, 0.2);
     }
   
   // Camera settings
