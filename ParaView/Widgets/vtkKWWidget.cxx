@@ -23,9 +23,14 @@
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
+#include "vtkImageData.h"
+#include "vtkPNGWriter.h"
+
+#include "X11/Xutil.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.94");
+vtkCxxRevisionMacro(vtkKWWidget, "1.95");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -326,7 +331,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.94 $");
+  this->ExtractRevision(os,"$Revision: 1.95 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1606,20 +1611,137 @@ void vtkKWWidget::Configure(const char* opts)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWWidget::TakeScreenDump(const char* fname)
+{
+  int res = 0;
+  if ( !fname )
+    {
+    return 0;
+    }
+
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
+  const char* w = this->GetWidgetName();
+  const char* dims 
+    = this->Script(
+      "list "
+      "[ winfo rootx %s ] "
+      "[ winfo rooty %s ] "
+      "[ winfo width %s ] "
+      "[ winfo height %s ]",
+      w, w, w, w);
+  if ( !dims )
+    {
+    return 0;
+    }
+
+  int xx, yy, ww, hh;
+  xx = yy = ww = hh = 0;
+  if ( sscanf(dims, "%d %d %d %d", &xx, &yy, &ww, &hh) != 4 )
+    {
+    return 0;
+    }
+
+#if defined(VTK_USE_X)
+  Tk_Window image_window;
+
+  image_window = Tk_MainWindow (this->Application->GetMainInterp());
+  Display *dpy = Tk_Display(image_window);
+  int screen = DefaultScreen(dpy);
+  Window win=RootWindow(dpy, screen);
+
+  XImage *ximage = XGetImage(dpy, win, xx, yy,
+    (unsigned int)ww, (unsigned int)hh, AllPlanes, XYPixmap);
+  if ( !ximage )
+    {
+    return 0;
+    }
+  unsigned int buffer_size = ximage->bytes_per_line * ximage->height;
+  if (ximage->format != ZPixmap)
+    {
+    buffer_size = ximage->bytes_per_line * ximage->height * ximage->depth;
+    }
+
+  unsigned long pixel;
+  unsigned long mask[3];
+  unsigned int shift0[3], shift8[3];
+
+  mask[0] = ximage->red_mask;
+  mask[1] = ximage->green_mask;
+  mask[2] = ximage->blue_mask;
+  if (!mask[0] || !mask[1] || !mask[2]) 
+    {
+    vtkErrorMacro("unsupported screen depth; bailing out");
+    XDestroyImage(ximage);
+    return 0;
+    }
+
+  int i;
+  for (i = 0; i < 3; i++) 
+    {
+    shift0[i] = 0;
+    while (!(mask[i] & (1 << shift0[i])))
+      {
+      shift0[i]++;
+      }
+    shift8[i] = shift0[i];
+    while (mask[i] & (1 << shift8[i]))
+      {
+      shift8[i]++;
+      }
+    shift8[i] = 8 - (shift8[i] - shift0[i]);
+    }
+
+  vtkImageData* id = vtkImageData::New();
+  id->SetDimensions(ww, hh, 1);
+  id->SetScalarTypeToUnsignedChar();
+  id->SetNumberOfScalarComponents(3);
+  id->AllocateScalars();
+
+  unsigned char* ptr = (unsigned char*) id->GetScalarPointer();
+  int x, y;
+  for (y = 0; y < hh; y++) 
+    {
+    for (x = 0; x < ww; x++) 
+      {
+      pixel = (*ximage->f.get_pixel)(ximage, x, hh-y);
+      ptr[0] = (pixel & mask[0]) >> shift0[0] << shift8[0];
+      ptr[1] = (pixel & mask[1]) >> shift0[1] << shift8[1];
+      ptr[2] = (pixel & mask[2]) >> shift0[2] << shift8[2];
+      ptr += 3;
+      }
+    }
+  vtkPNGWriter *writer = vtkPNGWriter::New();
+  writer->SetInput(id);
+  writer->SetFileName(fname);
+  writer->Write();
+  writer->Delete();
+  id->Delete();
+
+  XDestroyImage(ximage);
+  res = 1; 
+#endif
+
+  return res;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "BalloonHelpJustification: " 
-     << this->GetBalloonHelpJustification() << endl;
+    << this->GetBalloonHelpJustification() << endl;
   os << indent << "BalloonHelpString: " 
-     << (this->BalloonHelpString ? this->BalloonHelpString : "none") << endl;
+    << (this->BalloonHelpString ? this->BalloonHelpString : "none") << endl;
   os << indent << "Children: " << this->GetChildren() << endl;
   os << indent << "Parent: " << this->GetParent() << endl;
   os << indent << "TraceName: " << (this->TraceName?this->TraceName:"none") 
-     << endl;
+    << endl;
   os << indent << "Enabled: " << (this->Enabled ? "on" : "off") << endl;
   os << indent << "EnableDragAndDrop: " 
-     << (this->EnableDragAndDrop ? "On" : "Off") << endl;
+    << (this->EnableDragAndDrop ? "On" : "Off") << endl;
   os << indent << "DragAndDropAnchor: " << this->DragAndDropAnchor << endl;
 }
 

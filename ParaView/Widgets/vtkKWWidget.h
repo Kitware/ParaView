@@ -331,6 +331,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Take screendump of the widget and store it into the png file.
+  int TakeScreenDump(const char* fname);
+
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
