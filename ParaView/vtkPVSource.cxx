@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWCompositeCollection.h"
+#include "vtkKWRotateCameraInteractor.h"
 
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
@@ -935,6 +936,12 @@ void vtkPVSource::AcceptCallback()
     // the camera when the first source is created.
     if (window->GetSources()->GetNumberOfItems() == 1)
       {
+      float bds[6];
+      ac->GetBounds(bds);
+      window->GetRotateCameraInteractor()->SetCenter(
+                    0.5*(bds[0]+bds[1]), 
+                    0.5*(bds[2]+bds[3]),
+                    0.5*(bds[4]+bds[5]));
       window->GetMainView()->ResetCamera();
       }
 
@@ -1109,9 +1116,6 @@ void vtkPVSource::DeleteCallback()
   
   this->GetPVRenderView()->EventuallyRender();
 
-  // I hope this will delete this source.
-  this->GetWindow()->GetMainView()->RemoveComposite(this);
-
   this->Script("%s index end", window->GetMenu()->GetWidgetName());
   numMenus = atoi(pvApp->GetMainInterp()->result);
   
@@ -1130,6 +1134,9 @@ void vtkPVSource::DeleteCallback()
                window->GetGlyphButton()->GetWidgetName());
   this->Script("%s configure -state normal",
                window->GetProbeButton()->GetWidgetName());
+
+  // This should delete this source.
+  this->GetWindow()->GetMainView()->RemoveComposite(this);
 }
 
 //----------------------------------------------------------------------------

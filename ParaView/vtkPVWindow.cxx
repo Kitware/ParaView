@@ -528,8 +528,10 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->SelectPointInteractor->SetRenderView(this->GetMainView());
   
   this->Script("%s SetInteractor %s", this->GetMainView()->GetTclName(),
-               this->FlyInteractor->GetTclName());
-  
+               this->RotateCameraInteractor->GetTclName());
+  this->RotateCameraInteractor->SetCenter(0.0, 0.0, 0.0);
+  this->MainView->ResetCamera();
+
   this->Script( "wm deiconify %s", this->GetWidgetName());  
 }
 

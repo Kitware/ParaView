@@ -355,6 +355,18 @@ void vtkKWCenterOfRotation::ResetCallback()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWCenterOfRotation::SetCenter(double x, double y, double z)
+{
+  if (this->CameraInteractor)
+    {
+    this->CameraInteractor->SetCenter(x, y, z);
+    this->DefaultFlag = 0;
+    this->Update();
+    this->RenderView->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkKWCenterOfRotation::ShowCenterOn()
 {
   this->Update();

@@ -86,6 +86,10 @@ public:
   // keep objects from being deleted.
   void PrepareForDelete();
 
+  // Description:
+  // Set the center of rotation manually.
+  void SetCenter(double x, double y, double z);
+
 protected: 
   vtkKWRotateCameraInteractor();
   ~vtkKWRotateCameraInteractor();

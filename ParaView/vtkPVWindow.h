@@ -57,6 +57,7 @@ class vtkKWToolbar;
 class vtkKWScale;
 class vtkKWPushButton;
 class vtkKWInteractor;
+class vtkKWRotateCameraInteractor;
 
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
@@ -180,6 +181,11 @@ public:
   // Useful for writing scripts that create sources.
   vtkPVSourceInterface *GetSourceInterface(const char *className);
   
+  // Description:
+  // Access to the RotateCamera interactor for thinks like setting its center of roation.
+  vtkKWRotateCameraInteractor *GetRotateCameraInteractor()
+    {return this->RotateCameraInteractor;}
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -197,7 +203,7 @@ protected:
   vtkKWToolbar *InteractorToolbar;
   vtkKWPushButton *CameraStyleButton;
   vtkKWInteractor *FlyInteractor;
-  vtkKWInteractor *RotateCameraInteractor;
+  vtkKWRotateCameraInteractor *RotateCameraInteractor;
   vtkKWInteractor *TranslateCameraInteractor;
   vtkKWInteractor *SelectPointInteractor;
   

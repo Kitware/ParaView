@@ -328,6 +328,11 @@ void vtkKWRotateCameraInteractor::MotionCallback(int x, int y)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkKWRotateCameraInteractor::SetCenter(double x, double y, double z)
+{
+  this->CenterUI->SetCenter(x, y, z);
+}
 
 //----------------------------------------------------------------------------
 void vtkKWRotateCameraInteractor::UpdateRollCursor(double px, double py)

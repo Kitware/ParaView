@@ -130,6 +130,7 @@ void PVRenderViewAbortCheck(void *arg)
   
   if (me->ShouldIAbort() == 2)
     {
+    vtkGenericWarningMacro("Abort 2");
     me->GetRenderWindow()->SetAbortRender(1);
     }
 }

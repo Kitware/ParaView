@@ -135,6 +135,10 @@ public:
   // of dealing with reference loops.
   virtual void PrepareForDelete();
 
+  // Description:
+  // For setting the center of rotation mannually
+  void SetCenter(double x, double y, double z);
+
 protected: 
   vtkKWCenterOfRotation();
   ~vtkKWCenterOfRotation();
