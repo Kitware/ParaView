@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29.2.1");
 
 vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
@@ -221,6 +221,10 @@ void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
   color[2] = b;
   this->InvokeEvent( vtkKWEvent::AnnotationColorChangedEvent, color );
   this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
+
+  this->AddTraceEntry("$kw(%s) SetTextColor %f %f %f",
+                      this->GetTclName(), r, g, b);
+
 }
 
 void vtkKWCornerAnnotation::OnDisplayCorner() 
@@ -233,11 +237,13 @@ void vtkKWCornerAnnotation::OnDisplayCorner()
       this->CornerProp->SetText(i,this->GetCornerText(i));
       }
     this->View->Render();
+    this->AddTraceEntry("$kw(%s) SetVisibility 1", this->GetTclName());
     }
   else
     {
     this->View->RemoveComposite(this->CornerComposite);
     this->View->Render();
+    this->AddTraceEntry("$kw(%s) SetVisibility 0", this->GetTclName());
     }
   this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
 }
@@ -271,6 +277,9 @@ void vtkKWCornerAnnotation::CornerChanged(int i)
     this->View->Render();
     }
   this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0 );
+
+  this->AddTraceEntry("$kw(%s) SetCornerText %s %d", 
+                      this->GetTclName(), this->CornerText[i]->GetValue(), i);
 }
 
 // Description:
@@ -351,7 +360,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.29 $");
+  this->ExtractRevision(os,"$Revision: 1.29.2.1 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 

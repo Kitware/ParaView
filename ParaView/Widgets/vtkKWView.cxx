@@ -97,7 +97,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.87");
+vtkCxxRevisionMacro(vtkKWView, "1.87.2.1");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -171,6 +171,8 @@ vtkKWView::vtkKWView()
   this->HeaderComposite->SetProp(this->HeaderProp);
 
   this->CornerAnnotation = vtkKWCornerAnnotation::New();
+  this->CornerAnnotation->SetTraceReferenceObject(this);
+  this->CornerAnnotation->SetTraceReferenceCommand("GetCornerAnnotation");
   
   this->PropertiesCreated = 0;
   this->InteractiveUpdateRate = 5.0;
@@ -1483,7 +1485,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.87 $");
+  this->ExtractRevision(os,"$Revision: 1.87.2.1 $");
 }
 
 //----------------------------------------------------------------------------
