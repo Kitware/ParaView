@@ -49,6 +49,7 @@ protected:
 
   void StartElement(const char* name, const char** atts);
   void EndElement(const char* name);
+  void CharacterDataHandler(const char* data, int length);
 
   void AddElement(vtkPVXMLElement* element);
   void PushOpenElement(vtkPVXMLElement* element);

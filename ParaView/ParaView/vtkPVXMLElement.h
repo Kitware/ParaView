@@ -101,6 +101,7 @@ protected:
   vtkSetStringMacro(Id);
   void ReadXMLAttributes(const char** atts);
   void AddNestedElement(vtkPVXMLElement* element);
+  void AddCharacterData(const char* data, int length);
 
   void PrintXML(ostream& os, vtkIndent indent);
 

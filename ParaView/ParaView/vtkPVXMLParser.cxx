@@ -16,7 +16,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 
-vtkCxxRevisionMacro(vtkPVXMLParser, "1.6");
+vtkCxxRevisionMacro(vtkPVXMLParser, "1.7");
 vtkStandardNewMacro(vtkPVXMLParser);
 
 //----------------------------------------------------------------------------
@@ -89,6 +89,16 @@ void vtkPVXMLParser::EndElement(const char* vtkNotUsed(name))
   else
     {
     this->RootElement = finished;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVXMLParser::CharacterDataHandler(const char* data, int length)
+{
+  unsigned int numOpen = this->NumberOfOpenElements;
+  if(numOpen > 0)
+    {
+    this->OpenElements[numOpen-1]->AddCharacterData(data, length);
     }
 }
 
