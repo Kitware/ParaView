@@ -109,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.289");
+vtkCxxRevisionMacro(vtkPVApplication, "1.290");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -2235,11 +2235,11 @@ char* vtkPVApplication::GetDemoPath()
 
   if (this->GetApplicationInstallationDirectory())
     {
-    sprintf(temp1, "%s/Demos/Demo1.pvs",
+    sprintf(temp1, "%s/../Demos/Demo1.pvs",
             this->GetApplicationInstallationDirectory());
     if (stat(temp1, &fs) == 0) 
       {
-      sprintf(temp1, "%s/Demos",
+      sprintf(temp1, "%s/../Demos",
               this->GetApplicationInstallationDirectory());
       this->SetDemoPath(temp1);
       found=1;
