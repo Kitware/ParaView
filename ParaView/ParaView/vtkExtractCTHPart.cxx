@@ -33,6 +33,7 @@
 #include "vtkStringList.h"
 #include "vtkCharArray.h"
 #include "vtkFloatArray.h"
+#include "vtkTimerLog.h"
 
 #ifdef VTK_USE_PATENTED
 #include "vtkKitwareContourFilter.h"
@@ -40,7 +41,7 @@
 
 #include <math.h>
 
-vtkCxxRevisionMacro(vtkExtractCTHPart, "1.4");
+vtkCxxRevisionMacro(vtkExtractCTHPart, "1.5");
 vtkStandardNewMacro(vtkExtractCTHPart);
 vtkCxxSetObjectMacro(vtkExtractCTHPart,ClipPlane,vtkPlane);
 
@@ -209,10 +210,21 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
   vtkAppendPolyData *append2 = NULL;
   int* dims;
 
+  vtkTimerLog::MarkStartEvent("Execute Part");
+
   // First things first.
   // Convert Cell data array to point data array.
   // Pass cell data.
   data->CopyStructure(input);
+
+  // Do not pass cell volume fraction data.
+  data->GetCellData()->CopyFieldOff(arrayName);
+  vtkDataArray* scalars = input->GetCellData()->GetScalars();
+  if (scalars && strcmp(arrayName, scalars->GetName()) == 0)
+    { // I do not know why the reader sets attributes, but ....
+    data->GetCellData()->CopyScalarsOff();
+    }
+
   data->GetCellData()->PassData(input->GetCellData());
   // Only convert single volume fraction array to point data.
   // Other attributes will have to be viewed as cell data.
@@ -238,6 +250,7 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
 
   // Create the contour surface.
 #ifdef VTK_USE_PATENTED
+  //vtkContourFilter *contour = vtkContourFilter::New();
   vtkContourFilter *contour = vtkKitwareContourFilter::New();
   // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
   //contour->ComputeNormalsOn();
@@ -247,22 +260,36 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
   contour->SetInput(data);
   contour->SetValue(0, 0.5);
 
+  vtkTimerLog::MarkStartEvent("CTH Contour");
+  contour->Update();
+  vtkTimerLog::MarkEndEvent("CTH Contour");
+
   // Create the capping surface for the contour and append.
+  /*
   append1 = vtkAppendPolyData::New();
   append1->AddInput(contour->GetOutput());
   surface = vtkDataSetSurfaceFilter::New();
   surface->SetInput(data);
   tmp = surface->GetOutput();
+
+  vtkTimerLog::MarkStartEvent("Surface");
   tmp->Update();
+  vtkTimerLog::MarkEndEvent("surface");
+
   // Clip surface less than volume fraction 0.5.
   clip0 = vtkClipPolyData::New();
   clip0->SetInput(surface->GetOutput());
   clip0->SetValue(0.5);
   tmp = clip0->GetOutput();
+  vtkTimerLog::MarkStartEvent("Clip Surface");
   tmp->Update();
+  vtkTimerLog::MarkEndEvent("Clip Surface");
   append1->AddInput(clip0->GetOutput());
 
+  vtkTimerLog::MarkStartEvent("Append");
   append1->Update();
+  vtkTimerLog::MarkEndEvent("Append");
+
   tmp = append1->GetOutput();
   
   if (this->Clipping && this->ClipPlane)
@@ -293,6 +320,9 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
     clip2->Delete();
     clip2 = NULL;
     }
+  */
+
+tmp = contour->GetOutput();
 
   output->CopyStructure(tmp);
   output->GetCellData()->PassData(tmp->GetCellData());
@@ -302,9 +332,9 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
 
   data->Delete();
   contour->Delete();
-  surface->Delete();
-  clip0->Delete();
-  append1->Delete();
+  //surface->Delete();
+  //clip0->Delete();
+  //append1->Delete();
   if (append2)
     {
     append2->Delete();
@@ -318,6 +348,7 @@ void vtkExtractCTHPart::ExecutePart(const char* arrayName, vtkPolyData* output)
   sprintf(str, "%s", arrayName);
   output->GetFieldData()->AddArray(nameArray);
   nameArray->Delete();
+  vtkTimerLog::MarkEndEvent("Execute Part");
 }
 
 //------------------------------------------------------------------------------

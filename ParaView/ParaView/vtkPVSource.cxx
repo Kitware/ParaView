@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.293");
+vtkCxxRevisionMacro(vtkPVSource, "1.294");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -2195,7 +2195,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 
   clone = 0;
 
-  // Create instance
   vtkPVSource* pvs = this->NewInstance();
   // Copy properties
   pvs->SetApplication(this->Application);
@@ -2630,7 +2629,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.293 $");
+  this->ExtractRevision(os,"$Revision: 1.294 $");
 }
 
 //----------------------------------------------------------------------------

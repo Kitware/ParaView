@@ -27,11 +27,12 @@
 #include "vtkRenderer.h"
 #include "vtkVRMLImporter.h"
 #include "vtkTransformPolyDataFilter.h"
+#include "vtkAppendPolyData.h"
 #include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
 
 
-vtkCxxRevisionMacro(vtkVRMLSource, "1.4");
+vtkCxxRevisionMacro(vtkVRMLSource, "1.5");
 vtkStandardNewMacro(vtkVRMLSource);
 
 //------------------------------------------------------------------------------
@@ -40,6 +41,7 @@ vtkVRMLSource::vtkVRMLSource()
   this->FileName = NULL;
   this->Importer = NULL;
   this->Color = 1;
+  this->Append = 1;
 }
 
 //------------------------------------------------------------------------------
@@ -67,6 +69,11 @@ vtkPolyData* vtkVRMLSource::GetOutput(int idx)
 //----------------------------------------------------------------------------
 int vtkVRMLSource::GetNumberOfOutputs()
 {
+  if (this->Append)
+    {
+    return 1;
+    }
+
   if (this->Importer == NULL)
     {
     this->InitializeImporter();
@@ -138,10 +145,16 @@ void vtkVRMLSource::CopyImporterToOutputs()
   int arrayCount = 0;
   char name[256];
   int ptIdx;
+  vtkAppendPolyData* append = NULL;
 
   if (this->Importer == NULL)
     {
     return;
+    }
+
+  if (this->Append)
+    {
+    append = vtkAppendPolyData::New();
     }
 
   ren = this->Importer->GetRenderer();
@@ -155,7 +168,14 @@ void vtkVRMLSource::CopyImporterToOutputs()
       {
       input = mapper->GetInput();
       input->Update();
-      output = this->GetOutput(idx);
+      if (append)
+        {
+        output = vtkPolyData::New();
+        }
+      else
+        {
+        output = this->GetOutput(idx);
+        }
       vtkTransformPolyDataFilter *tf = vtkTransformPolyDataFilter::New();
       vtkTransform *trans = vtkTransform::New();
       tf->SetInput(input);
@@ -218,12 +238,26 @@ void vtkVRMLSource::CopyImporterToOutputs()
         colorArray->Delete();
         colorArray = NULL;
         }
+      if (append)
+        {
+        append->AddInput(output);
+        output->Delete();
+        output = NULL;
+        }
+
       ++idx;
       tf->Delete();
       tf = NULL;
       trans->Delete();
       trans = NULL;
       }
+    }
+  if (append)
+    {
+    output = this->GetOutput();
+    append->Update();
+    output->ShallowCopy(append->GetOutput());
+    append->Delete();
     }
 }
 

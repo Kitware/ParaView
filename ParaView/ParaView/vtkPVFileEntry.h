@@ -158,6 +158,7 @@ protected:
   // Timestep scale
   vtkKWFrame *TimestepFrame;
   vtkKWScale *Timestep;
+  int TimeStep;
 
   vtkSetStringMacro(Format);
   vtkSetStringMacro(Prefix);

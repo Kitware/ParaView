@@ -134,7 +134,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.42");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.43");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1564,85 +1564,85 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot)
   fileName = NULL;
 }
 
-//-----------------------------------------------------------------------------
-// These arguements are not consistent.  SHould I share a file root for both
-// images and geometry.
-void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
-                                                const char* fileRoot,
-                                                const char* geometryFileName,
-                                                const char* extension,
-                                                const char* writerName)
-{
-  int timeIdx = 0;
-  float t;
-  float sgn;
-  char countStr[100];
 
-  // We need a different end test if the step is negative.
-  sgn = 1.0;
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file, 
+                                                const char* imageFileName,
+                                                const char* geometryFileName)
+{
+  char *root;
+  char *ext;
+  char *ptr;
+  float t;
+  int timeIdx;
+  float sgn = 1;
+  float frac;
+  char countStr[10];
+
   if (this->TimeStep < 0)
     {
     sgn = -1.0;
     }
 
-  t = this->GetTimeStart();
-  *file << "set pvTime " << t << "\n";
-  *file << this->GetScript() << endl;
-  *file << "if {$myProcId} {treeComp RenderRMI} else {\n\t";  
-  sprintf(countStr, "%05d", (int)(t));
-  if ( extension && writerName )
+  // Loop through all of the time steps.
+  t = this->TimeStart;
+  timeIdx = 0;
+  while ((sgn*t) <= (sgn*this->TimeEnd))
     {
-    *file << "# This update is necessary to resolve some exposure event\n\t";
-    *file << "# problems which occur with certain cards on Windows.\n\t";
-    *file << "update\n\t";
-    *file << "WinToImage Modified\n\t";
-    *file << "ImageWriter SetFileName {" << fileRoot << countStr << extension
-          << "}\n\t";
-    *file << "ImageWriter Write\n";
-    }
-  else
-    {
-    *file << "RenWin1 Render\n";
-    }
-  if (geometryFileName)
-    {
-    this->GetWindow()->SaveGeometryInBatchFile(file, 
-                                               geometryFileName,
-                                               timeIdx);
-    }
-  *file << "}\n\n"; 
-
-  while ((sgn*t) < (sgn*this->TimeEnd))
-    {
-    ++timeIdx; 
-    t = t + this->TimeStep;
-    if ((sgn*t) > (sgn*this->TimeEnd))
-      {
-      t = this->TimeEnd;
-      }
     *file << "set pvTime " << t << "\n";
     *file << this->GetScript() << endl;
     *file << "if {$myProcId != 0} {treeComp RenderRMI} else {\n\t";  
     sprintf(countStr, "%05d", (int)(timeIdx));
     // Not necessary because WinToImage causes a render.
     //*file << "RenWin1 Render\n\t";
-    *file << "# This update is necessary to resolve some exposure event\n\t";
+    *file << "# This update is necessary to resolve some expose event\n\t";
     *file << "# problems which occur with certain cards on Windows.\n\t";
     *file << "update\n\t";
-    if (fileRoot && extension && writerName )
+    if (imageFileName)
       {
       *file << "WinToImage Modified\n\t";
-      *file << "ImageWriter SetFileName {" << fileRoot << countStr << ".vtp"
-            << "}\n\t";
+      root = new char[strlen(imageFileName)+1];
+      strcpy(root, imageFileName);
+      ext = NULL;
+      ptr = root;
+      while(*ptr)
+        { // Find the extenstion
+        if (*ptr == '.')
+          {
+          ext = ptr;
+          }
+        ++ptr;
+        }
+      if (ext)
+        {
+        *ext = '\0';
+        ++ext;
+        *file << "ImageWriter SetFileName {" << root << countStr
+              << "." << ext << "}\n\t";
+        }
+      else
+        {
+        *file << "ImageWriter SetFileName {" << root << countStr << "}\n\t";
+        }
       *file << "ImageWriter Write\n";
+      delete [] root;
       }
+    *file << "}\n";
     if (geometryFileName)
       {
       this->GetWindow()->SaveGeometryInBatchFile(file, 
                                                  geometryFileName,
                                                  timeIdx);
       }
-    *file << "}\n\n";
+
+    ++timeIdx;
+    t = t + this->TimeStep;
+    // Do not let numerical issues keep us from getting the last sample.
+    frac = (t-this->TimeEnd)/this->TimeStep;
+    if (frac > 0 && frac < 0.01)
+      {
+      t = TimeEnd;
+      }
     }
 }
 

@@ -129,7 +129,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.434");
+vtkCxxRevisionMacro(vtkPVWindow, "1.435");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2725,23 +2725,8 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
 
   if (animationFlag)
     {
-    *file << "# prevent the tk window from showing up then start "
-      "the event loop\n";
-    int length = vtkString::Length(geometryFileName);
-    char* newPath = vtkString::Duplicate(geometryFileName);
-    // Remove the extension. The animation tool will add it's
-    // own interface.
-    if ( newPath[length-4] == '.')
-      {
-      char* tmpStr = new char[length-3];
-      strncpy(tmpStr, newPath, length-4);
-      tmpStr[length-4] = '\0';
-      delete [] newPath;
-      newPath = tmpStr;
-      }
-    this->AnimationInterface->SaveInBatchScript(file, newPath, geometryFileName, extension,
-                                                writerName);
-    delete [] newPath;
+    this->AnimationInterface->SaveInBatchScript(file, imageFileName, 
+                                                geometryFileName);
     }
   else
     { // Just do one frame.
@@ -4195,7 +4180,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.434 $");
+  this->ExtractRevision(os,"$Revision: 1.435 $");
 }
 
 //-----------------------------------------------------------------------------

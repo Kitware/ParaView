@@ -49,6 +49,13 @@ public:
   vtkGetMacro(Color,int);
   vtkBooleanMacro(Color,int);
 
+  // Description:
+  // This method allows all parts to be put into a single output.
+  // By default this flag is on.
+  vtkSetMacro(Append,int);
+  vtkGetMacro(Append,int);
+  vtkBooleanMacro(Append,int);
+
 protected:
   vtkVRMLSource();
   ~vtkVRMLSource();
@@ -60,6 +67,7 @@ protected:
   char* FileName;
   vtkVRMLImporter *Importer;
   int Color;
+  int Append;
 
 private:
   vtkVRMLSource(const vtkVRMLSource&);  // Not implemented.

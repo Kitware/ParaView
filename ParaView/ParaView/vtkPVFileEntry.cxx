@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.32");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.33");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -76,6 +76,7 @@ vtkPVFileEntry::vtkPVFileEntry()
 
   this->TimestepFrame = vtkKWFrame::New();
   this->Timestep = vtkKWScale::New();
+  this->TimeStep = 0;
   this->Format = 0;
   this->Prefix = 0;
   this->Ext = 0;
@@ -236,6 +237,7 @@ void vtkPVFileEntry::EntryChangedCallback()
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SetTimeStep(int ts)
 {
+  this->TimeStep = ts;
   cout << "vtkPVFileEntry::SetTimeStep: " << ts << endl;
   if ( !(this->FileNameLength && this->Format && this->Path && this->Prefix && this->Ext) )
     {
@@ -419,6 +421,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       this->SetRange(min, max);
       }
     this->Timestep->SetValue(med);
+    this->TimeStep = med;
     ostrstream str;
     str << "set " << this->GetPVSource()->GetVTKSourceTclName() << "_files {";
     char* name = new char [ this->FileNameLength ];
@@ -561,9 +564,20 @@ const char* vtkPVFileEntry::GetValue()
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName)
 {
-  *file << "\tset " << sourceTclName << "_files {";
-  *file << this->Script("concat $%s_files", sourceTclName);
-  *file << "}" << endl;
+  if (this->Range[0] < this->Range[1])
+    {
+    *file << "\tset " << sourceTclName << "_files {";
+    *file << this->Script("concat $%s_files", sourceTclName);
+    *file << "}" << endl;
+
+    *file << "\t" << sourceTclName << " SetFileName [ lindex $" 
+          << sourceTclName << "_files " << this->TimeStep << "]\n";
+    }
+  else
+    {
+    *file << "\t" << sourceTclName << " SetFileName {" 
+          << this->Entry->GetValue() << "}\n";
+    }
 }
 
 

@@ -50,10 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
+#include "vtkPVWidgetCollection.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.27");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.28");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -94,10 +95,11 @@ void vtkPVReaderModule::CreateProperties()
                                       "SetAcceptButtonColorToRed");
   this->FileEntry->SetObjectVariable(this->GetVTKSourceTclName(), "FileName");
   this->FileEntry->Create(this->GetPVApplication());
-
   if (this->AddFileEntry)
     {
-    this->AddPVWidget(this->FileEntry);
+    // This widget has to be the first.
+    // Same as AddPVWidget, but puts first in the list.
+    this->AddPVFileEntry(this->FileEntry);
     }
   
   if (this->PackFileEntry)
@@ -304,6 +306,36 @@ void vtkPVReaderModule::SaveState(ofstream *file)
   this->VisitedFlag = 1;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
+{
+  vtkPVWidget* pvw;
+  // How to add to the begining of a collection?
+  // Just make a new one.
+  vtkPVWidgetCollection *newWidgets = vtkPVWidgetCollection::New();
+  newWidgets->AddItem(fileEntry);
+  this->Widgets->InitTraversal();
+  while ( (pvw = this->Widgets->GetNextPVWidget()) )
+    {
+    newWidgets->AddItem(pvw);
+    }
+  this->Widgets->Delete();
+  this->Widgets = newWidgets;
+
+  // Just doing what is in vtkPVSource::AddPVWidget(pvw);
+  char str[512];
+  if (fileEntry->GetTraceName() == NULL)
+    {
+    vtkWarningMacro("TraceName not set. Widget class: " 
+                    << pvw->GetClassName());
+    return;
+    }
+
+  fileEntry->SetTraceReferenceObject(this);
+  sprintf(str, "GetPVWidget {%s}", fileEntry->GetTraceName());
+  fileEntry->SetTraceReferenceCommand(str);
+  fileEntry->Select();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::PrintSelf(ostream& os, vtkIndent indent)

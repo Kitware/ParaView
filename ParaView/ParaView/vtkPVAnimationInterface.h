@@ -138,9 +138,9 @@ public:
 
   // Description:
   // Make the tcl script save the images of the animation.
-  void SaveInBatchScript(ofstream *file, const char *fileRoot, 
-                         const char* geometryFileName,
-                         const char* extension, const char* writerName);
+  void SaveInBatchScript(ofstream *file, 
+                         const char *imageFileName, 
+                         const char* geometryFileName);
 
   // Description:
   // If the animation is controlling a specific PVWidget, then

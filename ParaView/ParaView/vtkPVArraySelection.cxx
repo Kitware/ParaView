@@ -65,7 +65,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.28");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.29");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -446,10 +446,13 @@ void vtkPVArraySelection::SetArrayStatus(const char *name, int status)
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
 {
+  int firstOff = 1;
+
   if (this->VTKReaderTclName == NULL)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
+
 
   this->SetLocalSelectionsFromReader();
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
@@ -459,6 +462,12 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
     // Since they default to on.
     if(!this->Selection->ArrayIsEnabled(check->GetText()))
       {
+      if (firstOff)
+        {
+        // Need to update information before setting array selections.
+        *file << "\t" << this->VTKReaderTclName << " UpdateInformation\n";
+        firstOff = 0;
+        }
       *file << "\t";
       *file << this->VTKReaderTclName
             << " Set" << this->AttributeName << "ArrayStatus {" 

@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.1");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.2");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -254,7 +254,7 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
   this->GeometryFileNameEntry->Create(app, 0);
   if (fileName)
     {
-    sprintf(fileName, "%s/%s.vtk", this->FilePath, this->FileRoot);
+    sprintf(fileName, "%s/%s.vtp", this->FilePath, this->FileRoot);
     this->GeometryFileNameEntry->SetValue(fileName);
     }
   this->GeometryFileNameBrowseButton->SetParent(this->GeometryFileNameFrame);

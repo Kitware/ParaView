@@ -139,6 +139,11 @@ public:
   // to saveing a trace, except only the last state is stored.
   virtual void SaveState(ofstream *file);
 
+  // Description:
+  // Puts the file entry at the begining of the list for batch files.
+  // The file name has to be set before array selection.
+  void AddPVFileEntry(vtkPVFileEntry *pvw);
+
 protected:
   vtkPVReaderModule();
   ~vtkPVReaderModule();
