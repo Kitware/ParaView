@@ -301,6 +301,10 @@ SOURCE=.\vtkPVInputMenu.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVInputMenuTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVMethodInterface.cxx
 # End Source File
 # Begin Source File

@@ -158,13 +158,15 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       pvs->AddFileEntry(mInt->GetVariableName(), 
 			mInt->GetSetCommand(),
 			mInt->GetGetCommand(), 
-			mInt->GetFileExtension());
+			mInt->GetFileExtension(),
+                        mInt->GetBalloonHelp());
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_TOGGLE)
       {
       pvs->AddLabeledToggle(mInt->GetVariableName(), 
 			    mInt->GetSetCommand(),
-			    mInt->GetGetCommand());
+			    mInt->GetGetCommand(),
+                            mInt->GetBalloonHelp());
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_SELECTION)
       {
@@ -172,7 +174,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       vtkStringList *l;
       pvs->AddModeList(mInt->GetVariableName(),
 		       mInt->GetSetCommand(),
-		       mInt->GetGetCommand());
+		       mInt->GetGetCommand(),
+                       mInt->GetBalloonHelp());
       l = mInt->GetSelectionEntries();
       for (i = 0; i < l->GetLength(); ++i)
 	{
@@ -185,38 +188,44 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 	{
 	pvs->AddStringEntry(mInt->GetVariableName(), 
 			    mInt->GetSetCommand(),
-			    mInt->GetGetCommand());
+			    mInt->GetGetCommand(),
+                            mInt->GetBalloonHelp());
 	}
       else
 	{
 	pvs->AddLabeledEntry(mInt->GetVariableName(), 
 			     mInt->GetSetCommand(),
-			     mInt->GetGetCommand());
+			     mInt->GetGetCommand(),
+                             mInt->GetBalloonHelp());
 	}
       }
     else if (mInt->GetNumberOfArguments() == 2)
       {
       pvs->AddVector2Entry(mInt->GetVariableName(), "", "", 
 			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand());
+			   mInt->GetGetCommand(),
+                           mInt->GetBalloonHelp());
       }
     else if (mInt->GetNumberOfArguments() == 3)
       {
       pvs->AddVector3Entry(mInt->GetVariableName(), "", "", "",
 			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand());
+			   mInt->GetGetCommand(),
+                           mInt->GetBalloonHelp());
       }
     else if (mInt->GetNumberOfArguments() == 4)
       {
       pvs->AddVector4Entry(mInt->GetVariableName(), "", "", "", "",
 			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand());
+			   mInt->GetGetCommand(),
+                           mInt->GetBalloonHelp());
       }
     else if (mInt->GetNumberOfArguments() == 6)
       {
       pvs->AddVector6Entry(mInt->GetVariableName(), "", "", "", "", "", "",
 			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand());
+			   mInt->GetGetCommand(),
+                           mInt->GetBalloonHelp());
       }
     else
       {

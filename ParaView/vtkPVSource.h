@@ -151,20 +151,20 @@ public:
   // Description:
   // Create an entry for a filename.
   vtkKWEntry *AddFileEntry(char *label, char *setCmd, char *getCmd,
-                           char *ext, vtkKWObject *o = NULL);
+                           char *ext, char* help, vtkKWObject *o = NULL);
 
   // Description:
   // Formats the command with brackets so that sopaces are preserved.  
   // Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkKWEntry *AddStringEntry(char *label, char *setCmd, char *getCmd,
-                             vtkKWObject *o = NULL);
+                             char* help, vtkKWObject *o = NULL);
  
   // Description:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkKWEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,
-                              vtkKWObject *o = NULL);
+                              char* help, vtkKWObject *o = NULL);
   
   // Description:
   // Create an entry for items with multiple elements.
@@ -172,29 +172,33 @@ public:
   // (l1,l2,l3, ...) are put in from of the individual entry boxes.
   // The methods are called on the object (VTKSource if o=NULL).
   void AddVector2Entry(char *label, char *l1, char *l2,
-		       char *setCmd, char *getCmd, vtkKWObject *o = NULL);
+		       char *setCmd, char *getCmd, char* help,
+                       vtkKWObject *o = NULL);
   void AddVector3Entry(char *label, char *l1, char *l2, char *l3,
-		       char *setCmd, char *getCmd, vtkKWObject *o = NULL);
+		       char *setCmd, char *getCmd, char* help,
+                       vtkKWObject *o = NULL);
   void AddVector4Entry(char *label, char *l1, char *l2, char *l3, char *l4,
-		       char *setCmd, char *getCmd, vtkKWObject *o = NULL);
+		       char *setCmd, char *getCmd, char *help,
+                       vtkKWObject *o = NULL);
   void AddVector6Entry(char *label, char *l1, char *l2, char *l3, 
 		       char *l4, char *l5, char *l6,
-		       char *setCmd, char *getCmd, vtkKWObject *o = NULL);
+		       char *setCmd, char *getCmd, char* help,
+                       vtkKWObject *o = NULL);
   
   // Description:
   // Special widget controls (not entries).
   // The methods are called on the object (VTKSource if o=NULL).
   vtkKWCheckButton *AddLabeledToggle(char *label, char *setCmd, char *getCmd,
-                                     vtkKWObject *o = NULL);
+                                     char* help, vtkKWObject *o = NULL);
   vtkKWScale *AddScale(char *label, char *setCmd, char *getCmd, 
                        float min, float max, float resolution,
-                       vtkKWObject *o = NULL);
+                       char* help, vtkKWObject *o = NULL);
   
   // Description:
   // Creates a list for delecting a mode.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkPVSelectionList *AddModeList(char *label, char *setCmd, char *getCmd,
-                                  vtkKWObject *o = NULL);
+                                  char* help, vtkKWObject *o = NULL);
   void AddModeListItem(char *name, int value);
 
   // Description:

@@ -39,6 +39,7 @@ vtkPVMethodInterface::vtkPVMethodInterface()
   this->WidgetType = VTK_PV_METHOD_WIDGET_ENTRY;
   this->SelectionEntries = NULL;
   this->FileExtension = NULL;
+  this->BalloonHelp = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -55,6 +56,11 @@ vtkPVMethodInterface::~vtkPVMethodInterface()
     this->SelectionEntries = NULL;
     }
   this->SetFileExtension(NULL);
+  if (this->BalloonHelp)
+    {
+    delete [] this->BalloonHelp;
+    this->BalloonHelp = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -814,6 +814,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetFilePrefix");
   mInt->SetGetCommand("GetFilePrefix");
   mInt->AddStringArgument();
+  mInt->SetBalloonHelp("Set the prefix for the files for this image data.");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -822,7 +823,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("ScalarType");
   mInt->SetSetCommand("SetDataScalarType");
   mInt->SetGetCommand("GetDataScalarType");
-  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the scalar type for the data: unsigned char (3), short (4), unsigned short (5), int (6), float (10), double(11)");
   mInt->Delete();
   mInt = NULL;
   // Method
@@ -830,12 +832,13 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Extent");
   mInt->SetSetCommand("SetDataExtent");
   mInt->SetGetCommand("GetDataExtent");
-  mInt->AddIntegerArgument();  
-  mInt->AddIntegerArgument();  
-  mInt->AddIntegerArgument();  
-  mInt->AddIntegerArgument();  
-  mInt->AddIntegerArgument();  
-  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the min and max values of the data in each dimension");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -862,6 +865,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the min and max values of the data in each dimension");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -870,9 +874,10 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("SubSpace");
   mInt->SetSetCommand("SetProjectionAxes");
   mInt->SetGetCommand("GetProjectionAxes");
-  mInt->AddIntegerArgument();  
-  mInt->AddIntegerArgument();  
-  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Choose which axes of the data set to display");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -881,10 +886,11 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Origin");
   mInt->SetSetCommand("SetOriginCX");
   mInt->SetGetCommand("GetOriginCX");
-  mInt->AddFloatArgument();  
-  mInt->AddFloatArgument();  
-  mInt->AddFloatArgument();  
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the imaginary and real values for C (constant) and X (initial value)");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -893,10 +899,11 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Spacing");
   mInt->SetSetCommand("SetSampleCX");
   mInt->SetGetCommand("GetSampleCX");
-  mInt->AddFloatArgument();  
-  mInt->AddFloatArgument();  
-  mInt->AddFloatArgument();  
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the inaginary and real values for the spacing for C (constant) and X (initial value)");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -921,6 +928,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetGetCommand("GetFileName");
   mInt->SetWidgetTypeToFile();
   mInt->SetFileExtension("stl");
+  mInt->SetBalloonHelp("Select the data file for the STL data set");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -944,6 +952,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();  
+  mInt->SetBalloonHelp("Set the coordinates for the center of the sphere.");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -953,6 +962,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetRadius");
   mInt->SetGetCommand("GetRadius");
   mInt->AddFloatArgument();  
+  mInt->SetBalloonHelp("Set the radius of the sphere");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -961,7 +971,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Theta Resolution");
   mInt->SetSetCommand("SetThetaResolution");
   mInt->SetGetCommand("GetThetaResolution");
-  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the number of points in the longitude direction (ranging from Start Theta to End Theta)");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -970,7 +981,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Start Theta");
   mInt->SetSetCommand("SetStartTheta");
   mInt->SetGetCommand("GetStartTheta");
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the starting angle in the longitude direction");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -979,7 +991,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("End Theta");
   mInt->SetSetCommand("SetEndTheta");
   mInt->SetGetCommand("GetEndTheta");
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the ending angle in the longitude direction");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -988,7 +1001,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Phi Resolution");
   mInt->SetSetCommand("SetPhiResolution");
   mInt->SetGetCommand("GetPhiResolution");
-  mInt->AddIntegerArgument();  
+  mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the number of points in the latitude direction (ranging from Start Phi to End Phi)");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -997,7 +1011,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Start Phi");
   mInt->SetSetCommand("SetStartPhi");
   mInt->SetGetCommand("GetStartPhi");
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the starting angle in the latitude direction");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1006,7 +1021,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("End Phi");
   mInt->SetSetCommand("SetEndPhi");
   mInt->SetGetCommand("GetEndPhi");
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the ending angle in the latitude direction");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1028,6 +1044,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetResolution");
   mInt->SetGetCommand("GetResolution");
   mInt->AddIntegerArgument();
+  mInt->SetBalloonHelp("Set the number of faces on this cone");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1036,7 +1053,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Radius");
   mInt->SetSetCommand("SetRadius");
   mInt->SetGetCommand("GetRadius");
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the radius of the widest part of the cone");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1045,7 +1063,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetVariableName("Height");
   mInt->SetSetCommand("SetHeight");
   mInt->SetGetCommand("GetHeight");
-  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("Set the height of the cone");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
@@ -1055,6 +1074,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->SetSetCommand("SetCapping");
   mInt->SetGetCommand("GetCapping");
   mInt->SetWidgetTypeToToggle();
+  mInt->SetBalloonHelp("Set whether to draw the base of the cone");
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;

@@ -128,15 +128,19 @@ void vtkPVAnimation::CreateProperties()
   frame->Delete();
   frame = NULL;
 
-  this->AddStringEntry("Method:", "SetMethod", "GetMethod", this);
-  this->TimeMin = this->AddLabeledEntry("Start:", "SetStart", "GetStart",this);
+  this->AddStringEntry("Method:", "SetMethod", "GetMethod", NULL, this);
+  this->TimeMin = this->AddLabeledEntry("Start:", "SetStart", "GetStart",
+                                        NULL, this);
   this->TimeMin->Register(this);
-  this->TimeMax = this->AddLabeledEntry("End:", "SetEnd", "GetEnd", this);
+  this->TimeMax = this->AddLabeledEntry("End:", "SetEnd", "GetEnd", NULL,
+                                        this);
   this->TimeMax->Register(this);
-  this->TimeStep = this->AddLabeledEntry("Step:", "SetStep", "GetStep", this);
+  this->TimeStep = this->AddLabeledEntry("Step:", "SetStep", "GetStep", NULL,
+                                         this);
   this->TimeStep->Register(this);
   this->TimeScale = this->AddScale("Value:", "SetCurrent", "GetCurrent", 
-                                   this->Start, this->End, this->Step, this);
+                                   this->Start, this->End, this->Step, NULL,
+                                   this);
 
   vtkKWPushButton *playButton = vtkKWPushButton::New();
   playButton->SetParent(this->ParameterFrame->GetFrame());

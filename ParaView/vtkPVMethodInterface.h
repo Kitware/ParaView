@@ -71,6 +71,11 @@ public:
   // geneneric interface.  Default is just an entry box.
   void SetWidgetType(int type);
   vtkGetMacro(WidgetType,int);
+
+  // Description:
+  // Set balloon help for this widget.
+  vtkSetStringMacro(BalloonHelp);
+  vtkGetStringMacro(BalloonHelp);
   
   // Description:
   // Add the argument types one by one.
@@ -116,6 +121,8 @@ protected:
   vtkStringList *SelectionEntries;
   
   char *FileExtension;
+  
+  char *BalloonHelp;
 };
 
 #endif

@@ -1235,7 +1235,8 @@ void vtkPVSource::Save(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd, 
+vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd,
+                                                char *getCmd, char* help,
                                                 vtkKWObject *o)
 {
   // Find the Tcl name of the object whose methods will be called.
@@ -1260,6 +1261,10 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char 
     labelWidget->SetParent(frame);
     labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
+    if (help)
+      {
+      labelWidget->SetBalloonHelpString(help);
+      }
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
     labelWidget = NULL;
@@ -1270,6 +1275,10 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char 
   this->Widgets->AddItem(check);
   check->SetParent(frame);
   check->Create(this->Application, "");
+  if (help)
+    {
+    check->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left", check->GetWidgetName());
 
   // Command to update the UI.
@@ -1291,7 +1300,7 @@ vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char 
 }  
 //----------------------------------------------------------------------------
 vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
-                                      char *ext, vtkKWObject *o)
+                                      char *ext, char *help, vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1320,6 +1329,10 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
     labelWidget->SetParent(frame);
     labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
+    if (help)
+      {
+      labelWidget->SetBalloonHelpString(help);
+      }
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
     labelWidget = NULL;
@@ -1329,6 +1342,10 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
   this->Widgets->AddItem(entry);
   entry->SetParent(frame);
   entry->Create(this->Application, "");
+  if (help)
+    {
+    entry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
 
 
@@ -1337,6 +1354,10 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
   browseButton->SetParent(frame);
   browseButton->Create(this->Application, "");
   browseButton->SetLabel("Browse");
+  if (help)
+    {
+    browseButton->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left", browseButton->GetWidgetName());
   if (ext)
     {
@@ -1368,7 +1389,8 @@ vtkKWEntry *vtkPVSource::AddFileEntry(char *label, char *setCmd, char *getCmd,
 }
 
 //----------------------------------------------------------------------------
-vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
+vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd,
+                                        char *getCmd, char *help,
                                         vtkKWObject *o)
 {
   vtkKWWidget *frame;
@@ -1397,6 +1419,10 @@ vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
     labelWidget->SetParent(frame);
     labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
+    if (help)
+      {
+      labelWidget->SetBalloonHelpString(help);
+      }
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
     labelWidget = NULL;
@@ -1406,6 +1432,10 @@ vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
   this->Widgets->AddItem(entry);
   entry->SetParent(frame);
   entry->Create(this->Application, "");
+  if (help)
+    {
+    entry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
 
   // Command to update the UI.
@@ -1425,7 +1455,8 @@ vtkKWEntry *vtkPVSource::AddStringEntry(char *label, char *setCmd, char *getCmd,
 }
 
 //----------------------------------------------------------------------------
-vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd,
+vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd,
+                                         char *getCmd, char* help,
                                          vtkKWObject *o)
 {
   vtkKWWidget *frame;
@@ -1454,6 +1485,10 @@ vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd
     labelWidget->SetParent(frame);
     labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
+    if (help)
+      {
+      labelWidget->SetBalloonHelpString(help);
+      }
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
     labelWidget = NULL;
@@ -1463,6 +1498,10 @@ vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd
   this->Widgets->AddItem(entry);
   entry->SetParent(frame);
   entry->Create(this->Application, "");
+  if (help)
+    {
+    entry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", entry->GetWidgetName());
 
   // Command to update the UI.
@@ -1483,7 +1522,8 @@ vtkKWEntry *vtkPVSource::AddLabeledEntry(char *label, char *setCmd, char *getCmd
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
-                                  char *setCmd, char *getCmd, vtkKWObject *o)
+                                  char *setCmd, char *getCmd, char *help,
+                                  vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1511,6 +1551,10 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
     labelWidget->SetParent(frame);
     labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
+    if (help)
+      {
+      labelWidget->SetBalloonHelpString(help);
+      }
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
     labelWidget = NULL;
@@ -1532,6 +1576,10 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   this->Widgets->AddItem(minEntry);
   minEntry->SetParent(frame);
   minEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    minEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", minEntry->GetWidgetName());
 
   // Max
@@ -1550,6 +1598,10 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
   this->Widgets->AddItem(maxEntry);
   maxEntry->SetParent(frame);
   maxEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    maxEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", maxEntry->GetWidgetName());
 
   // Command to update the UI.
@@ -1570,7 +1622,8 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
 
 //----------------------------------------------------------------------------
 void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
-				  char *setCmd, char *getCmd, vtkKWObject *o)
+				  char *setCmd, char *getCmd, char* help,
+                                  vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1598,6 +1651,10 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget->SetParent(frame);
     labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
+    if (help)
+      {
+      labelWidget->SetBalloonHelpString(help);
+      }
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
     labelWidget = NULL;
@@ -1619,6 +1676,10 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
   xEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    xEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
 
   // Y
@@ -1637,6 +1698,10 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
   yEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    yEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
 
   // Z
@@ -1655,6 +1720,10 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
   zEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    zEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
 
   // Command to update the UI.
@@ -1680,7 +1749,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
 //----------------------------------------------------------------------------
 void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
                                   char *l4, char *setCmd, char *getCmd,
-                                  vtkKWObject *o)
+                                  char* help, vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -1708,6 +1777,10 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget->SetParent(frame);
     labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
+    if (help)
+      {
+      labelWidget->SetBalloonHelpString(help);
+      }
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
     labelWidget = NULL;
@@ -1729,6 +1802,10 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
   xEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    xEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
 
   // Y
@@ -1747,6 +1824,10 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
   yEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    yEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
 
   // Z
@@ -1765,6 +1846,10 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
   zEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    zEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
 
   // W
@@ -1783,6 +1868,10 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(wEntry);
   wEntry->SetParent(frame);
   wEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    wEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", wEntry->GetWidgetName());
 
   // Command to update the UI.
@@ -1812,7 +1901,8 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
 // so that a loop can be used to create the widgets.
 void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
                                   char *l4, char *l5, char *l6,
-                                  char *setCmd, char *getCmd, vtkKWObject *o)
+                                  char *setCmd, char *getCmd, char *help,
+                                  vtkKWObject *o)
 
 {
   vtkKWWidget *frame;
@@ -1841,6 +1931,10 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
     labelWidget->SetParent(frame);
     labelWidget->Create(this->Application, "-width 18 -justify right");
     labelWidget->SetLabel(label);
+    if (help)
+      {
+      labelWidget->SetBalloonHelpString(help);
+      }
     this->Script("pack %s -side left", labelWidget->GetWidgetName());
     labelWidget->Delete();
     labelWidget = NULL;
@@ -1862,6 +1956,10 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(uEntry);
   uEntry->SetParent(frame);
   uEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    uEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", uEntry->GetWidgetName());
 
   // V
@@ -1880,6 +1978,10 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(vEntry);
   vEntry->SetParent(frame);
   vEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    vEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", vEntry->GetWidgetName());
 
   // W
@@ -1898,6 +2000,10 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(wEntry);
   wEntry->SetParent(frame);
   wEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    wEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", wEntry->GetWidgetName());
 
   // X
@@ -1916,6 +2022,10 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(xEntry);
   xEntry->SetParent(frame);
   xEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    xEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", xEntry->GetWidgetName());
 
   // Y
@@ -1934,6 +2044,10 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(yEntry);
   yEntry->SetParent(frame);
   yEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    yEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", yEntry->GetWidgetName());
 
   // Z
@@ -1952,6 +2066,10 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
   this->Widgets->AddItem(zEntry);
   zEntry->SetParent(frame);
   zEntry->Create(this->Application, "-width 2");
+  if (help)
+    {
+    zEntry->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", zEntry->GetWidgetName());
 
   // Command to update the UI.
@@ -1987,7 +2105,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
 //----------------------------------------------------------------------------
 vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
                                   float min, float max, float resolution,
-                                  vtkKWObject *o)
+                                  char* help, vtkKWObject *o)
 {
   vtkKWWidget *frame;
   vtkKWLabel *labelWidget;
@@ -2013,6 +2131,10 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   labelWidget->SetParent(frame);
   labelWidget->Create(this->Application, "-width 18 -justify right");
   labelWidget->SetLabel(label);
+  if (help)
+    {
+    labelWidget->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left", labelWidget->GetWidgetName());
 
   slider = vtkKWScale::New();
@@ -2021,6 +2143,10 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   slider->Create(this->Application, "-showvalue 1");
   slider->SetRange(min, max);
   slider->SetResolution(resolution);
+  if (help)
+    {
+    slider->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left -fill x -expand t", slider->GetWidgetName());
 
   // Command to update the UI.
@@ -2041,7 +2167,8 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
 }
 
 //----------------------------------------------------------------------------
-vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd,
+vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd,
+                                             char *getCmd, char *help,
                                              vtkKWObject *o)
 {
   vtkKWWidget *frame;
@@ -2067,12 +2194,20 @@ vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd, char *ge
   labelWidget->SetParent(frame);
   labelWidget->Create(this->Application, "-width 18 -justify right");
   labelWidget->SetLabel(label);
+  if (help)
+    {
+    labelWidget->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -side left", labelWidget->GetWidgetName());
 
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
   this->Widgets->AddItem(sl);
   sl->SetParent(frame);
   sl->Create(this->Application);  
+  if (help)
+    {
+    sl->SetBalloonHelpString(help);
+    }
   this->Script("pack %s -fill x -expand t", sl->GetWidgetName());
     
   // Command to update the UI.
@@ -2110,5 +2245,3 @@ void vtkPVSource::AddModeListItem(char *name, int value)
     }
   this->LastSelectionList->AddItem(name, value);
 }
-
-
