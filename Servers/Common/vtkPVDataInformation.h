@@ -60,6 +60,7 @@ public:
   // Description:
   // Access to information.
   vtkGetMacro(DataSetType, int);
+  vtkGetMacro(BaseDataSetType, int);
   const char *GetDataSetTypeAsString();
   int DataSetTypeIsA(const char* type);
   vtkGetMacro(NumberOfPoints, vtkTypeInt64);
@@ -91,6 +92,10 @@ public:
   // ClassName of the data represented by information object.
   vtkGetStringMacro(DataClassName);
 
+  // Description:
+  // The least common class name of composite dataset blocks
+  vtkGetStringMacro(BaseDataClassName);
+
 protected:
   vtkPVDataInformation();
   ~vtkPVDataInformation();
@@ -103,6 +108,7 @@ protected:
   
   // Data information collected from remote processes.
   int            DataSetType;
+  int            BaseDataSetType;
   int            NumberOfDataSets;
   vtkTypeInt64   NumberOfPoints;
   vtkTypeInt64   NumberOfCells;
@@ -114,6 +120,9 @@ protected:
 
   char*          DataClassName;
   vtkSetStringMacro(DataClassName);
+
+  char*          BaseDataClassName;
+  vtkSetStringMacro(BaseDataClassName);
 
   vtkPVDataSetAttributesInformation* PointDataInformation;
   vtkPVDataSetAttributesInformation* CellDataInformation;
