@@ -95,7 +95,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.65");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.66");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -129,7 +129,7 @@ vtkPVFileEntry::~vtkPVFileEntry()
 {
   if ( this->ListObserverTag )
     {
-    this->FileListSelect->RemoveObservers(this->ListObserverTag);
+    this->FileListSelect->RemoveObserver(this->ListObserverTag);
     }
   this->Observer->FileEntry = 0;
   this->Observer->Delete();

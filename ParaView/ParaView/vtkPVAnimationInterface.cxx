@@ -181,7 +181,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.94");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.95");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1146,7 +1146,7 @@ void vtkPVAnimationInterface::SetWindow(vtkPVWindow *window)
     }
   if ( this->Window )
     {
-    this->Window->RemoveObservers(this->ErrorEventTag);
+    this->Window->RemoveObserver(this->ErrorEventTag);
     }
   this->Window = window;
   if ( this->Window )
