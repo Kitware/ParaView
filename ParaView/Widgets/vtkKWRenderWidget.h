@@ -157,6 +157,17 @@ public:
   vtkGetObjectMacro(CornerAnnotation, vtkCornerAnnotation);
 
   // Description:
+  // Get and control the 2D cursor annotation.
+  virtual void SetCursor2DVisibility(int v);
+  vtkBooleanMacro(Cursor2DVisibility, int);
+  vtkGetMacro(Cursor2DVisibility, int);
+  virtual void SetCursor2DColor(float r, float g, float b);
+  virtual void SetCursor2DColor(float *rgb)
+    { this->SetCursor2DColor(rgb[0], rgb[1], rgb[2]); };
+  vtkGetVector3Macro(Cursor2DColor, float);
+  virtual void SetCursor2DPosition(int x, int y);
+
+  // Description:
   // Get and control the header annotation.
   virtual void SetHeaderAnnotationVisibility(int v);
   virtual int  GetHeaderAnnotationVisibility();
@@ -255,6 +266,11 @@ protected:
 
   int CollapsingRenders;
   int CollapsingRendersCount;
+
+  int   Cursor2DVisibility;
+  float Cursor2DColor[3];
+  int   Cursor2DPosition[2];
+  
 
   vtkKWRenderWidgetObserver *Observer;
   

@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.27");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.28");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -869,6 +869,49 @@ void vtkKWRenderWidget::UpdateEnableState()
     {
     this->RemoveInteractionBindings();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetCursor2DVisibility(int v)
+{
+  if ( v == this->Cursor2DVisibility )
+    {
+    return;
+    }
+  this->Cursor2DVisibility = v;
+  // Set the visibility
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetCursor2DColor(float r, float g, float b)
+{
+  if ( r == this->Cursor2DColor[0] &&
+       g == this->Cursor2DColor[1] &&
+       b == this->Cursor2DColor[2] )
+    {
+    return;
+    }
+
+  this->Cursor2DColor[0] = r;
+  this->Cursor2DColor[1] = g;
+  this->Cursor2DColor[2] = b;
+  // Change color of widget
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetCursor2DPosition(int x, int y)
+{
+  if ( x == this->Cursor2DPosition[0] &&
+       y == this->Cursor2DPosition[1] )
+    {
+    return;
+    }
+  this->Cursor2DPosition[0] = x;
+  this->Cursor2DPosition[1] = y;
+  // Move the widget
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
