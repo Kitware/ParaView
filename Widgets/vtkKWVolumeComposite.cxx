@@ -91,6 +91,10 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   this->RayCastMapper->SetGradientEstimator( gradientEstimator );
   this->HiResTextureMapper->SetGradientEstimator( gradientEstimator );
 
+  this->LowResTextureMapper->SetMaximumNumberOfPlanes(128);
+  this->MedResTextureMapper->SetMaximumNumberOfPlanes(128);
+  this->HiResTextureMapper->SetMaximumNumberOfPlanes(128);
+  
   gradientEstimator->Delete();
   directionEncoder->Delete();
 
@@ -354,5 +358,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.9 $");
+  this->ExtractRevision(os,"$Revision: 1.10 $");
 }
