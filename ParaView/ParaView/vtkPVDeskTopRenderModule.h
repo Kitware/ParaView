@@ -70,8 +70,8 @@ protected:
 
   // This is the IceT manager that is ignorent of the client.
   // It runs on all processes of the server.
-  vtkSetStringMacro(DisplayManagerTclName);
-  char *DisplayManagerTclName;
+  vtkSetMacro(DisplayManagerID,vtkClientServerID);
+  vtkClientServerID DisplayManagerID;
 
   vtkPVDeskTopRenderModule(const vtkPVDeskTopRenderModule&); // Not implemented
   void operator=(const vtkPVDeskTopRenderModule&); // Not implemented

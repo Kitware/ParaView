@@ -54,10 +54,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkPVRenderModule.h"
+#include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.10.2.1");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.10.2.2");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -122,45 +123,55 @@ void vtkPVCameraIcon::Create(vtkKWApplication *pvApp, const char *args)
 //----------------------------------------------------------------------------
 void vtkPVCameraIcon::RestoreCamera()
 {
-#if 0
-  const char* renTclName;
-
   if ( this->RenderView && this->Camera )
     {
-    renTclName = this->RenderView->GetPVApplication()->GetRenderModule()
-      ->GetRendererTclName();
+    vtkPVProcessModule* pm = this->RenderView->GetPVApplication()->GetProcessModule();
     vtkClientServerID rendererID = this->RenderView->GetPVApplication()->GetRenderModule()
       ->GetRendererID();
-    vtk renderer = this->RenderView->GetPVApplication()->GetRenderModule()
-      ->GetRendererID();
-    
-    ostrstream str;
-    str << "eval [" << renTclName 
-        << " GetActiveCamera ] SetParallelScale [[ "
-        << this->GetTclName() << " GetCamera ] GetParallelScale ]" << endl;
-    str << "eval [ " << renTclName 
-        << " GetActiveCamera ] SetViewAngle [[ "
-        << this->GetTclName() << " GetCamera ] GetViewAngle ]" << endl;
-    str << "eval [ " << renTclName 
-        << " GetActiveCamera ] SetClippingRange [[ "
-        << this->GetTclName() << " GetCamera ] GetClippingRange ]" << endl;
-    str << "eval [ " << renTclName 
-        << " GetActiveCamera ] SetFocalPoint [[ "
-        << this->GetTclName() << " GetCamera ] GetFocalPoint ]" << endl;
-    str << "eval [ " << renTclName 
-        << " GetActiveCamera ] SetPosition [[ "
-        << this->GetTclName() << " GetCamera ] GetPosition ]" << endl;
-    str << "eval [ " << renTclName 
-        << " GetActiveCamera ] SetViewUp [[ "
-        << this->GetTclName() << " GetCamera ] GetViewUp ]" << endl;
-    str << renTclName << " ResetCameraClippingRange";
-    str << ends;
+    // create an id for the active camera of the renderer
+    vtkClientServerID activeCamera = pm->GetUniqueID();
+    pm->GetStream() << vtkClientServerStream::Invoke << rendererID
+                    << "GetActiveCamera"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Assign << activeCamera 
+                    << vtkClientServerStream::LastResult 
+                    << vtkClientServerStream::End;
 
-    this->RenderView->GetPVApplication()->BroadcastScript(str.str());
-    str.rdbuf()->freeze(0);
+    // copy the parameters of the current camera for this class
+    // into the active camera on the client and server
+    vtkCamera* camera = this->GetCamera();
+    float a[3];
+    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
+                    << "SetParallelScale"
+                    << camera->GetParallelScale()
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
+                    << "SetViewAngle"
+                    << camera->GetViewAngle()
+                    << vtkClientServerStream::End;
+    camera->GetClippingRange(a);
+    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
+                    << "SetClippingRange"
+                    << vtkClientServerStream::InsertArray(a, 2)
+                    << vtkClientServerStream::End;
+    camera->GetFocalPoint(a);
+    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
+                    << "SetFocalPoint"
+                    << vtkClientServerStream::InsertArray(a, 3)
+                    << vtkClientServerStream::End;
+    camera->GetPosition(a);
+    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
+                    << "SetPosition"
+                    << vtkClientServerStream::InsertArray(a, 3)
+                    << vtkClientServerStream::End;
+    camera->GetViewUp(a);
+    pm->GetStream() << vtkClientServerStream::Invoke << activeCamera
+                    << "SetViewUp"
+                    << vtkClientServerStream::InsertArray(a, 3)
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     this->RenderView->EventuallyRender();
     }
-#endif
 }
 
 //----------------------------------------------------------------------------

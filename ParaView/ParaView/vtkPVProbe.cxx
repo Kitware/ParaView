@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.7");
+vtkCxxRevisionMacro(vtkPVProbe, "1.99.2.8");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -184,10 +184,14 @@ void vtkPVProbe::CreateProperties()
     xyp->GetPosition2Coordinate()->SetValue(0.8, 0.3, 0);
     xyp->SetNumberOfXLabels(5);
     xyp->SetXTitle("Line Divisions");
-    
-    pvApp->GetProcessModule()->ServerScript(
-      "%s SetController [ $Application GetController ] ", 
-      this->GetVTKSourceTclName());
+    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
+                    << "GetController"
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID() 
+                    << "SetController"
+                    << vtkClientServerStream::LastResult
+                    << vtkClientServerStream::End; 
+    pm->SendStreamToServer();
     // Special condition to signal the client.
     // Because both processes of the Socket controller think they are 0!!!!
 //    if (pvApp->GetClientMode())

@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.7");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.8");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1104,8 +1104,13 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (this->RunBatchScript)
     {
-    this->BroadcastScript("$Application LoadScript {%s}", 
-                          this->GetBatchScriptName());
+    vtkPVProcessModule* pm = this->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << pm->GetApplicationID()
+                    << "LoadScript"
+                    << this->GetBatchScriptName()
+                    << vtkClientServerStream::End;
+    pm->SendStreamToClientAndServer();
     this->Exit();
     return;
     }
@@ -1137,20 +1142,23 @@ void vtkPVApplication::Start(int argc, char*argv[])
 #ifdef VTK_USE_MANGLED_MESA
   if (this->UseSoftwareRendering)
     {
-    this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n"
-                          "_graphics_fact SetUseMesaClasses 1\n"
-                          "_graphics_fact Delete");
-    this->BroadcastScript("vtkImagingFactory _imaging_fact\n"
-                          "_imaging_fact SetUseMesaClasses 1\n"
-                          "_imaging_fact Delete");
+    vtkPVProcessModule* pm = this->GetProcessModule();
+    vtkClientServerID gf = pm->NewStreamObject("vtkGraphicsFactory");
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << gf << "SetUseMesaClasses"
+                    << vtkClientServerStream::End;
+    pm->DeleteStreamObject(gf);
+    vtkClientServerID imf = pm->NewStreamObject("vtkImagingFactory");
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << imf << "SetUseMesaClasses"
+                    << vtkClientServerStream::End;
+    pm->DeleteStreamObject(imf);
+    pm->SendStreamToClientAndServer();
+
     if (this->UseSatelliteSoftware)
       {
-      this->Script("vtkGraphicsFactory _graphics_fact\n"
-                   "_graphics_fact SetUseMesaClasses 0\n"
-                   "_graphics_fact Delete");
-      this->Script("vtkImagingFactory _imaging_fact\n"
-                   "_imaging_fact SetUseMesaClasses 0\n"
-                   "_imaging_fact Delete");
+      vtkGraphicsFactory::SetUseMesaClasses();
+      vtkImagingFactory::SetUseMesaClasses();
       }
     }
 #endif
@@ -1613,9 +1621,13 @@ void vtkPVApplication::SetGlobalLODFlag(int val)
     {
     return;
     }
-
-  this->ProcessModule->BroadcastScript(
-                        "$Application SetGlobalLODFlagInternal %d",val);
+  vtkPVProcessModule* pm = this->GetProcessModule();
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << pm->GetApplicationID()
+                  << "SetGlobalLODFlagInternal"
+                  << val
+                  << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
  

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.45.4.1");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.45.4.2");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -104,8 +104,14 @@ int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
     int numSources = this->GetNumberOfVTKSources();
     for(i=0; i < numSources; ++i)
       {
-      pm->ServerScript("%s SetController [$Application GetController]",
-                       this->GetVTKSourceTclName(i));
+      pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
+                      << "GetController"
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(i) 
+                      << "SetController"
+                      << vtkClientServerStream::LastResult
+                      << vtkClientServerStream::End;
+      pm->SendStreamToServer();
       }
     }
   return this->Superclass::ReadFileInformation(fname);

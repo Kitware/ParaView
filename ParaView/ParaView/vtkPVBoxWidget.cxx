@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12.2.6");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12.2.7");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -814,4 +814,7 @@ vtkClientServerID vtkPVBoxWidget::GetObjectByName(const char* name)
     {
     return this->BoxMatrixID;
     }
+  vtkClientServerID id = {0};
+  vtkErrorMacro("GetObjectByName called with invalid object name: " << name);
+  return id;
 }
