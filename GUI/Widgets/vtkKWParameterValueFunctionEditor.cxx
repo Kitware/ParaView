@@ -32,7 +32,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.35");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.36");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -1258,7 +1258,7 @@ void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app, const
     return;
     }
 
-  this->Superclass::CreateLabel(app, NULL);
+  this->Superclass::CreateLabel(app, args);
   vtkKWTkUtilities::ChangeFontWeightToBold(
     app->GetMainInterp(), this->GetLabel()->GetWidgetName());
 }
