@@ -105,6 +105,7 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_PV_SATELLITE_SCRIPT              838431
 
 #define VTK_PV_CLIENTSERVER_RMI_TAG          938531
+#define VTK_PV_CLIENTSERVER_ROOT_RMI_TAG     938532
 
 #define VTK_PV_ROOT_SCRIPT_RMI_TAG           838485
 #define VTK_PV_ROOT_RESULT_RMI_TAG           838486
@@ -151,6 +152,15 @@ void vtkPVClientServerSocketRMI(void *localArg, void *remoteArg,
   vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
 }
 
+
+//----------------------------------------------------------------------------
+// This RMI is only on process 0 of server. (socket controller)
+void vtkPVClientServerRootRMI(void *localArg, void *remoteArg,
+                              int remoteArgLength,
+                              int remoteProcessId)
+{
+  vtkPVClientServerMPIRMI(localArg, remoteArg, remoteArgLength, remoteProcessId);
+}
 
 //----------------------------------------------------------------------------
 // This RMI is only on process 0 of server. (socket controller)
@@ -260,7 +270,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.14");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.15");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -396,6 +406,8 @@ void vtkPVClientServerModule::Initialize()
     // for SendMessages
     this->SocketController->AddRMI(vtkPVClientServerSocketRMI, (void *)(this),
                                    VTK_PV_CLIENTSERVER_RMI_TAG);
+    this->SocketController->AddRMI(vtkPVClientServerRootRMI, (void *)(this),
+                                   VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
 
     // For root script: Execute script only on process 0 of server.
     this->SocketController->AddRMI(vtkPVRootScript, (void *)(this), 
@@ -1221,6 +1233,16 @@ void vtkPVClientServerModule::SendStreamToServer()
     }
   this->SendStreamToServerInternal();
   this->ClientServerStream->Reset();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::SendStreamToServerRoot()
+{
+  const unsigned char* data;
+  size_t len;
+  this->ClientServerStream->GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len,
+                                     VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
 }
 
 void vtkPVClientServerModule::SendStreamToClientAndServer()

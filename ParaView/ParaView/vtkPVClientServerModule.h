@@ -170,6 +170,10 @@ public:
   // Send current ClientServerStream data to the server
   virtual void SendStreamToServer();
   
+  // Send the current vtkClientServerStream contents to the server
+  // root node.  Also reset the vtkClientServerStream object.
+  virtual void SendStreamToServerRoot();
+
   // Description:
   // Send current ClientServerStream data to the server and the client.
   virtual void SendStreamToClientAndServer();
