@@ -176,7 +176,7 @@ void vtkKWChangeColorButton::AButtonRelease(int x, int y)
 
 void vtkKWChangeColorButton::ChangeColor()
 {  
-  unsigned char r, g, b;
+  int r, g, b;
   char *result, tmp[3];
 
   this->Script(
@@ -255,5 +255,5 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.7 $");
+  this->ExtractRevision(os,"$Revision: 1.8 $");
 }
