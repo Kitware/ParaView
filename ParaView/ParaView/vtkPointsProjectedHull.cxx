@@ -12,7 +12,7 @@
 
 #include "vtkPointsProjectedHull.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.3");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.4");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -70,18 +70,18 @@ void vtkPointsProjectedHull::clearAllocations()
   }
 }
 #define GETCCWHULL(which, dim) \
-int vtkPointsProjectedHull::GetCcwHull##which(float *pts, int len)\
+int vtkPointsProjectedHull::GetCcwHull##which(float *ipts, int len)\
 {                                                       \
   int i;                                        \
   double *dpts = new double [len*2];            \
   int copypts = this->GetCcwHull##which(dpts, len);     \
   for (i=0; i<copypts*2; i++){                  \
-    pts[i] = (float)dpts[i];                    \
+    ipts[i] = (float)dpts[i];                    \
   }                                             \
   delete [] dpts;                \
   return copypts;                \
 }                                \
-int vtkPointsProjectedHull::GetCcwHull##which(double *pts, int len)\
+int vtkPointsProjectedHull::GetCcwHull##which(double *ipts, int len)\
 {                                                                 \
   if ((this->hullSize[dim] == 0) ||                           \
       (this->GetMTime() > this->hullTime[dim])){   \
@@ -89,7 +89,7 @@ int vtkPointsProjectedHull::GetCcwHull##which(double *pts, int len)\
   }                                                       \
   int copylen = (this->hullSize[dim] <= len) ? this->hullSize[dim] : len; \
   if (copylen <= 0) return 0; \
-  memcpy(pts, this->ccwHull[dim], sizeof(double) * 2 * copylen); \
+  memcpy(ipts, this->ccwHull[dim], sizeof(double) * 2 * copylen); \
   return copylen;             \
 }
 GETCCWHULL(X, 0);
@@ -550,7 +550,7 @@ int vtkPointsProjectedHull::rectangleOutside(double hmin, double hmax,
 
   // a representative point inside the polygon
 
-  int npts = this->hullSize[dir];
+  int inpts = this->hullSize[dir];
 
   double *insidePt = new double[2];
 
@@ -567,7 +567,7 @@ int vtkPointsProjectedHull::rectangleOutside(double hmin, double hmax,
   // polygon, determine if rectangle is entirely outside that line.
   // If so, it must be outside the polygon.
 
-  for (i=0; i < npts-1; i++){
+  for (i=0; i < inpts-1; i++){
 
     if (outsideLine(hmin,hmax,vmin,vmax, 
                   this->ccwHull[dir] + 2*i,

@@ -20,7 +20,7 @@
 #include <vtkFloatArray.h>
 #include <vtkMath.h>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.4");
+vtkCxxRevisionMacro(vtkKdTree, "1.5");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -1441,28 +1441,28 @@ void vtkKdTree::GenerateRepresentation(int *regions, int len, vtkPolyData *pd)
 
 #define REMOVEDUPLICATES(l, lsize, newsize) \
 {                                  \
-int i,j;                           \
-for (i=0, j=0; i<lsize; i++){    \
-  if ((i > 0) && (l[i] == l[j-1])) continue; \
-  if (j != i) l[j] = l[i];       \
-  j++;                           \
+int ii,jj;                           \
+for (ii=0, jj=0; ii<lsize; ii++){    \
+  if ((ii > 0) && (l[ii] == l[jj-1])) continue; \
+  if (jj != ii) l[jj] = l[ii];       \
+  jj++;                           \
 }                                \
-newsize = j;                     \
+newsize = jj;                     \
 }
 #define REMOVEFOUNDIN(l1, l1length, l2, l2length, newsize) \
 {                                             \
-int i,j,k;                                    \
-j = k = 0;                                    \
-for (i=0; i<l2length; i++){                     \
-  while((j < l1length) && (l1[j] < l2[i])) j++; \
-  if (l2[i] == l1[j]){                        \
-    j++;                                      \
+int ii,jj,kk;                                    \
+jj = kk = 0;                                    \
+for (ii=0; ii<l2length; ii++){                     \
+  while((jj < l1length) && (l1[jj] < l2[ii])) jj++; \
+  if (l2[ii] == l1[jj]){                        \
+    jj++;                                      \
     continue;                                 \
   }                                           \
-  if (i != k) l2[k] = l2[i];                  \
-  k++;                                        \
+  if (ii != kk) l2[kk] = l2[ii];                  \
+  kk++;                                        \
 }                                             \
-newsize = k;                                  \
+newsize = kk;                                  \
 }
 int vtkKdTree::findRegion(vtkKdNode *node, float x, float y, float z)
 {

@@ -13,7 +13,7 @@
 #include "vtkMath.h"
 #include "vtkPlanesIntersection.h"
 
-vtkCxxRevisionMacro(vtkPlanesIntersection, "1.2");
+vtkCxxRevisionMacro(vtkPlanesIntersection, "1.3");
 vtkStandardNewMacro(vtkPlanesIntersection);
 
 //#define TESTING_INTERSECTIONS
@@ -227,7 +227,7 @@ int vtkPlanesIntersection::IntersectsRegion(vtkPoints *R)
          allInside = 0;
        }
 
-       if (where[plane] == outside){
+       if (where[plane] == ::outside){
 
          intersects = 0;
 
@@ -350,17 +350,17 @@ int ntested=0;
 
          if (duplicate(testv)) continue;
 
-         int outside = this->outsideRegion(testv);
+         int ioutside = this->outsideRegion(testv);
 
-         if (!outside){
+         if (!ioutside){
            this->regionPts->InsertPoint(nvertices, testv);
            nvertices++;
          }
 
 #ifdef TESTING_INTERSECTIONS
 ntested++;
-if (outside) cout <<"  " <<testv[0] <<" " <<testv[1] <<" " <<testv[2] <<" OUTSIDE" <<endl;
-if (!outside) cout <<"  " <<testv[0] <<" " <<testv[1] <<" " <<testv[2] <<" KEEPER" <<endl;
+if (ioutside) cout <<"  " <<testv[0] <<" " <<testv[1] <<" " <<testv[2] <<" OUTSIDE" <<endl;
+if (!ioutside) cout <<"  " <<testv[0] <<" " <<testv[1] <<" " <<testv[2] <<" KEEPER" <<endl;
 #endif
 
       }
@@ -408,7 +408,7 @@ const void vtkPlanesIntersection::planesRHS(int p1, int p2, int p3, double r[3])
 const int vtkPlanesIntersection::outsideRegion(double testv[3])
 {
   int i;
-  int outside = 0;
+  int ioutside = 0;
   int nplanes = this->GetNumberOfPlanes();
 
   for (i=0; i<nplanes; i++){
@@ -420,11 +420,11 @@ const int vtkPlanesIntersection::outsideRegion(double testv[3])
                 this->Plane[row+3];
 
     if (fx > SMALL_DOUBLE){
-      outside = 1;
+      ioutside = 1;
       break;
     }
   }
-  return outside;
+  return ioutside;
 }
 int vtkPlanesIntersection::Invert3x3(double M[3][3])
 {
@@ -535,7 +535,7 @@ int vtkPlanesIntersection::EvaluateFacePlane(int plane, vtkPoints *R)
 #ifdef VERBOSE
   cout << "Outside face plane " << plane << endl;
 #endif
-    return outside;
+  return ::outside;
   }
 
   double posVal = this->Plane[plane*4]     * withN[0] +

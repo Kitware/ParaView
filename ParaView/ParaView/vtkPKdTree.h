@@ -25,21 +25,18 @@
 #ifndef __vtkPKdTree_h
 #define __vtkPKdTree_h
 
-//#include "vtksnlParallelWin32Header.h"
-
-#include <vtkKdTree.h>
-#include <vtkMultiProcessController.h>
-#include <vtkCommunicator.h>
-#include <vtkVersion.h>
+#include "vtkKdTree.h"
+#include "vtkMultiProcessController.h"
+#include "vtkCommunicator.h"
+#include "vtkVersion.h"
 
 class vtkSubGroup;
 class vtkIdList;
 
 class VTK_EXPORT vtkPKdTree : public vtkKdTree
 {
-    vtkTypeRevisionMacro(vtkPKdTree, vtkKdTree);
-
 public:
+    vtkTypeRevisionMacro(vtkPKdTree, vtkKdTree);
 
     void PrintSelf(ostream& os, vtkIndent indent);
     void PrintTiming(ostream& os, vtkIndent indent);

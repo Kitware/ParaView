@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.225");
+vtkCxxRevisionMacro(vtkPVApplication, "1.226");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -914,7 +914,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
@@ -931,7 +931,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
       // Strip string to equals sign.
       const char* newarg=0;
       int len = (int)(strlen(argv[index]));
-      for (int i=0; i<len; i++)
+      for (i=0; i<len; i++)
         {
         if (argv[index][i] == '=')
           {
