@@ -359,7 +359,7 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
     {
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
-    if (getenv("PV_DEADLOCK_PROTECTION") != NULL)
+    if (1 || getenv("PV_DEADLOCK_PROTECTION") != NULL)
       {
       pvApp->BroadcastSimpleScript("vtkExtractPolyDataPiece pvTemp");
       }
@@ -372,7 +372,7 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
     {
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
-    if (getenv("PV_DEADLOCK_PROTECTION") != NULL)
+    if (1 || getenv("PV_DEADLOCK_PROTECTION") != NULL)
       {
       pvApp->BroadcastSimpleScript("vtkExtractUnstructuredGridPiece pvTemp");
       }

@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 
 #include "vtkPVDataSetReaderInterface.h"
-#include "vtkDataSetReader.h"
+#include "vtkPDataSetReader.h"
 #include "vtkObjectFactory.h"
 #include <ctype.h>
 
@@ -75,10 +75,9 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   char tclName[100], outputTclName[100];
   vtkDataSet *d;
   vtkPVData *pvd;
-  vtkDataSetReader *reader;
+  vtkPDataSetReader *reader;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  int numOutputs, i;
   char* result;
   char *extension;
   int position;
@@ -123,7 +122,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
 
   sprintf(tclName, "%s%d", tclName, this->InstanceCount);
   
-  reader = (vtkDataSetReader *)
+  reader = (vtkPDataSetReader *)
               (pvApp->MakeTclObject(this->SourceClassName, tclName));
   if (reader == NULL)
     {
@@ -148,38 +147,34 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   pvApp->BroadcastScript("%s Update", tclName);
   
   // Create dummy source for each output.
-  numOutputs = reader->GetNumberOfOutputs();
-  for (i = 0; i < numOutputs; i++)
-    {
-    sprintf(outputTclName, "%sOutput%d", tclName, i);
-    d = (vtkDataSet*)(pvApp->MakeTclObject(reader->GetOutput(i)->GetClassName(),
-					   outputTclName));
-    pvApp->BroadcastScript("%s ShallowCopy [%s GetOutput %d]",
-			   outputTclName, tclName, i);
-    pvd = vtkPVData::New();
-    pvd->SetApplication(pvApp);
-    pvd->SetVTKData(d, outputTclName);
+  sprintf(outputTclName, "%sOutput", tclName);
+  d = (vtkDataSet*)(pvApp->MakeTclObject(reader->GetOutput()->GetClassName(),
+                                         outputTclName));
+  pvApp->BroadcastScript("%s ShallowCopy [%s GetOutput]",
+			   outputTclName, tclName);
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  pvd->SetVTKData(d, outputTclName);
     
-    pvs = vtkPVSource::New();
-    pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetPropertiesParent());
-    pvs->SetApplication(pvApp);
-    pvs->SetInterface(this);
+  pvs = vtkPVSource::New();
+  pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetPropertiesParent());
+  pvs->SetApplication(pvApp);
+  pvs->SetInterface(this);
 
-    this->PVWindow->GetMainView()->AddComposite(pvs);
-    pvs->CreateProperties();
-    this->PVWindow->SetCurrentPVSource(pvs);
+  this->PVWindow->GetMainView()->AddComposite(pvs);
+  pvs->CreateProperties();
+  this->PVWindow->SetCurrentPVSource(pvs);
     
-    pvs->SetName(tclName);
-    pvs->SetNthPVOutput(0, pvd);
+  pvs->SetName(tclName);
+  pvs->SetNthPVOutput(0, pvd);
 
-    pvd->InsertExtractPiecesIfNecessary();
+  pvd->InsertExtractPiecesIfNecessary();
     
-    pvs->AcceptCallback();
-    
-    pvs->Delete();
-    pvd->Delete();
-    }
-
+  pvs->AcceptCallback();
+   
+  pvs->Delete();
+  pvd->Delete();
+  
   // Get rid of the original reader.
   pvApp->BroadcastScript("%s Delete", tclName);
   

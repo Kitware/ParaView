@@ -39,21 +39,19 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVGeometryFilter - Geometry filter with a couple other options.
+// .NAME vtkPVGeometryFilter - Geometry filter that does outlines for volumes.
 // .SECTION Description
-// This allows an outline of an image data set as one mode.
+// This filter defaults to using the outlint filter unless the input
+// is a structured volume.
 
 #ifndef __vtkPVGeometryFilter_h
 #define __vtkPVGeometryFilter_h
 
 #include "vtkDataSetSurfaceFilter.h"
 #include "vtkImageData.h"
-
-
-#define VTK_PV_SURFACE 0
-#define VTK_PV_IMAGE_OUTLINE 1
-
-
+#include "vtkStructuredGrid.h"
+#include "vtkRectilinearGrid.h"
+#include "vtkUnstructuredGrid.h"
 
 class VTK_EXPORT vtkPVGeometryFilter : public vtkDataSetSurfaceFilter
 {
@@ -62,19 +60,10 @@ public:
   vtkTypeMacro(vtkPVGeometryFilter,vtkDataSetSurfaceFilter);
 
   // Description:
-  // We do not need any of the input every (only the information).
-  void ComputeInputUpdateExtents( vtkDataObject *output);
+  // This flag is set during the execute method.  It indicates
+  // that the input was 3d and an outline representation was used.
+  vtkGetMacro(OutlineFlag, int);
 
-  // Description:
-  // There has to be an easier way for a filter to tell its input not to update.
-  void UpdateData(vtkDataObject *output);
-
-  // Description:
-  vtkSetMacro(Mode,int);
-  vtkGetMacro(Mode,int);  
-  void SetModeToSurface() {this->SetMode(VTK_PV_SURFACE);}
-  void SetModeToImageOutline() {this->SetMode(VTK_PV_IMAGE_OUTLINE);}
-  
 protected:
   vtkPVGeometryFilter();
   ~vtkPVGeometryFilter();
@@ -82,9 +71,12 @@ protected:
   void operator=(const vtkPVGeometryFilter&) {};
 
   void Execute();
-  void ExecuteInformation();
-  
-  int Mode;
+  void ImageDataExecute(vtkImageData *input);
+  void StructuredGridExecute(vtkStructuredGrid *input);
+  void RectilinearGridExecute(vtkRectilinearGrid *input);
+  void UnstructuredGridExecute(vtkUnstructuredGrid *input);
+
+  int OutlineFlag;
 };
 
 #endif

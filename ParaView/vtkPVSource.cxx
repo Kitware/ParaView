@@ -1523,7 +1523,7 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
       *file << dataName+pos << "]\n\t";
       }
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkDataSetReader") == 0)
+                                    "vtkPDataSetReader") == 0)
       {
       dataName = this->GetNthPVInput(0)->GetVTKDataTclName();      
       tempName = strtok(dataName, "O");
@@ -1573,9 +1573,9 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
     return;
     }
   else if (strcmp(this->GetInterface()->GetSourceClassName(),
-                  "vtkDataSetReader") == 0)
+                  "vtkPDataSetReader") == 0)
     {
-    *file << "vtkDataSetReader " << this->Name << "\n";
+    *file << "vtkPDataSetReader " << this->Name << "\n";
     sprintf(tclName, this->Name);
     }
   
@@ -1596,7 +1596,7 @@ void vtkPVSource::SaveInTclScript(ofstream *file)
       *file << dataName+pos << "]\n";
       }
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkDataSetReader") == 0)
+                                    "vtkPDataSetReader") == 0)
       {
       sprintf(sourceTclName, "DataSetReader");
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");

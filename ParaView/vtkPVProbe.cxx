@@ -1035,7 +1035,7 @@ void vtkPVProbe::SaveInTclScript(ofstream *file)
     *file << dataName+pos << "]\n\n";
     }
   else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                  "vtkDataSetReader") == 0)
+                                  "vtkPDataSetReader") == 0)
     {
     tempName = strtok(this->ProbeSourceTclName, "O");
     *file << tempName << " GetOutput]\n\n";

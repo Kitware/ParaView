@@ -1088,28 +1088,9 @@ void vtkPVActorComposite::Initialize()
   
   if (this->PVData->GetVTKData()->IsA("vtkPolyData"))
     {
-    this->SetModeToPolyData();
     pvApp->BroadcastScript("%s SetInput %s",
 			       this->GeometryTclName,
 			       this->PVData->GetVTKDataTclName());
-    }
-  else if (this->PVData->GetVTKData()->IsA("vtkImageData"))
-    {
-    int *ext;
-    this->PVData->GetVTKData()->UpdateInformation();
-    ext = this->PVData->GetVTKData()->GetWholeExtent();
-    if (ext[1] > ext[0] && ext[3] > ext[2] && ext[5] > ext[4])
-      {
-      this->SetModeToImageOutline();
-      }
-    else
-      {
-      this->SetModeToDataSet();
-      }      
-    }
-  else 
-    {
-    this->SetModeToDataSet();
     }
   
   // Do we really need to do this here ???????????????  I don't think so.

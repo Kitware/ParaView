@@ -286,7 +286,7 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
       *file << dataName+pos << "]\n\t";
       }
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkDataSetReader") == 0)
+                                    "vtkPDataSetReader") == 0)
       {
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
       *file << tempName << " GetOutput]\n\t";
@@ -323,7 +323,7 @@ void vtkPVThreshold::SaveInTclScript(ofstream *file)
       *file << dataName+pos << "]\n\t";
       }
     else if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(),
-                                    "vtkDataSetReader") == 0)
+                                    "vtkPDataSetReader") == 0)
       {
       tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
       *file << tempName << " GetOutput]\n\t";

@@ -40,8 +40,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVGeometryFilter.h"
-#include "vtkImageData.h"
+#include "vtkExtractEdges.h"
 #include "vtkOutlineSource.h"
+#include "vtkStructuredGridOutlineFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkCommand.h"
 
@@ -65,7 +66,7 @@ vtkPVGeometryFilter* vtkPVGeometryFilter::New()
 //----------------------------------------------------------------------------
 vtkPVGeometryFilter::vtkPVGeometryFilter ()
 {
-  this->Mode = VTK_PV_SURFACE;
+  this->OutlineFlag = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -75,133 +76,73 @@ vtkPVGeometryFilter::~vtkPVGeometryFilter ()
 
 
 //----------------------------------------------------------------------------
-void vtkPVGeometryFilter::ComputeInputUpdateExtents( vtkDataObject *output)
-{
-  vtkDataSet *input = this->GetInput();
-  vtkImageData *image = vtkImageData::SafeDownCast(input);
-  
-  // Force update of volumes for timing.
-  if (0 && this->Mode == VTK_PV_IMAGE_OUTLINE && image)
-    {
-    image->SetUpdateExtent(0, -1, 0, -1, 0, -1);
-    }
-  else
-    {
-    this->vtkDataSetSurfaceFilter::ComputeInputUpdateExtents(output);
-    }
-}
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::UpdateData(vtkDataObject *output)
-{
-  vtkDataSet *input = this->GetInput();
-  vtkImageData *image = vtkImageData::SafeDownCast(input);
-  int idx;
-
-  // Lets update even on images for now.  Easy timing.
-  if (1 || image == NULL || this->Mode != VTK_PV_IMAGE_OUTLINE)
-    {
-    this->vtkDataSetSurfaceFilter::UpdateData(output);
-    return;
-    }  
-  
-  // Initialize all the outputs
-  for (idx = 0; idx < this->NumberOfOutputs; idx++)
-    {
-    if (this->Outputs[idx])
-      {
-      this->Outputs[idx]->PrepareForNewData(); 
-      }
-    }
- 
-  // If there is a start method, call it
-//  if ( this->StartMethod )
-//    {
-//    (*this->StartMethod)(this->StartMethodArg);
-//    }
-  
-  if ( this->StartTag )
-    {
-    // All the examples of using this I see have NULL as the 2nd parameter.
-    this->InvokeEvent(vtkCommand::StartEvent, NULL);
-    }
-
-  // Execute this object - we have not aborted yet, and our progress
-  // before we start to execute is 0.0.
-  this->AbortExecute = 0;
-  this->Progress = 0.0;
-  if (this->NumberOfInputs < this->NumberOfRequiredInputs)
-    {
-    vtkErrorMacro(<< "At least " << this->NumberOfRequiredInputs << " inputs are required but only " << this->NumberOfInputs << " are specified");
-    }
-  else
-    {
-    this->Execute();
-    }
-
-  // If we ended due to aborting, push the progress up to 1.0 (since
-  // it probably didn't end there)
-  if ( !this->AbortExecute )
-    {
-    this->UpdateProgress(1.0);
-    }
-
-  // Call the end method, if there is one
-//  if ( this->EndMethod )
-//    {
-//    (*this->EndMethod)(this->EndMethodArg);
-//    }
-  
-  if ( this->EndTag )
-    {
-    this->InvokeEvent(vtkCommand::EndEvent, NULL);
-    }
-    
-  // Now we have to mark the data as up to data.
-  for (idx = 0; idx < this->NumberOfOutputs; ++idx)
-    {
-    if (this->Outputs[idx])
-      {
-      this->Outputs[idx]->DataHasBeenGenerated();
-      }
-    }
-  
-  // Information gets invalidated as soon as Update is called,
-  // so validate it again here.
-  this->InformationTime.Modified();
-}
-
-
-
-
-//----------------------------------------------------------------------------
 void vtkPVGeometryFilter::Execute()
+{
+  vtkDataSet *input = this->GetInput();
+
+  if (input == NULL)
+    {
+    return;
+    }
+
+  if (input->IsA("vtkImageData"))
+    {
+    this->ImageDataExecute((vtkImageData*)input);
+    return;
+    }
+
+  if (input->IsA("vtkStructuredGrid"))
+    {
+    this->StructuredGridExecute((vtkStructuredGrid*)input);
+    return;
+    }
+
+  if (input->IsA("vtkRectilinearGrid"))
+    {
+    this->RectilinearGridExecute((vtkRectilinearGrid*)input);
+    return;
+    }
+
+  if (input->IsA("vtkUnstructuredGrid"))
+    {
+    this->UnstructuredGridExecute((vtkUnstructuredGrid*)input);
+    return;
+    }
+
+  this->vtkDataSetSurfaceFilter::Execute();
+  return;
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::ImageDataExecute(vtkImageData *input)
 {
   float *spacing;
   float *origin;
   int *ext;
   float bounds[6];
   vtkPolyData *output = this->GetOutput();
-  vtkDataSet *ds = this->GetInput();
-  vtkImageData *input = vtkImageData::SafeDownCast(ds);
 
-  if (input == NULL || this->Mode != VTK_PV_IMAGE_OUTLINE)
+  ext = input->GetWholeExtent();
+
+  // If 2d then default to superclass behavior.
+  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
     {
     this->vtkDataSetSurfaceFilter::Execute();
+    this->OutlineFlag = 0;
     return;
     }  
-  
+  this->OutlineFlag = 1;
+
   //
-  // Let OutlineSource do all the work
+  // Otherwise, let OutlineSource do all the work
   //
   
   if (output->GetUpdatePiece() == 0)
     {
     spacing = input->GetSpacing();
     origin = input->GetOrigin();
-    ext = input->GetWholeExtent();
     
     bounds[0] = spacing[0] * ((float)ext[0]) + origin[0];
     bounds[1] = spacing[0] * ((float)ext[1]) + origin[0];
@@ -222,22 +163,117 @@ void vtkPVGeometryFilter::Execute()
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVGeometryFilter::ExecuteInformation()
-{
-  vtkDataSet *ds = this->GetInput();
-  vtkImageData *input = vtkImageData::SafeDownCast(ds);
 
-  if (input == NULL || this->Mode != VTK_PV_IMAGE_OUTLINE)
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::StructuredGridExecute(vtkStructuredGrid *input)
+{
+  int *ext;
+  vtkPolyData *output = this->GetOutput();
+
+  ext = input->GetWholeExtent();
+
+  // If 2d then default to superclass behavior.
+  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
     {
-    this->vtkDataSetSurfaceFilter::ExecuteInformation();
+    this->vtkDataSetSurfaceFilter::Execute();
+    this->OutlineFlag = 0;
     return;
     }  
-  
-  vtkDebugMacro(<< "Creating dataset outline");
+  this->OutlineFlag = 1;
 
   //
-  // Let OutlineSource do all the work
+  // Otherwise, let Outline do all the work
   //
-  this->vtkSource::ExecuteInformation();
+  
+
+  vtkStructuredGridOutlineFilter *outline = vtkStructuredGridOutlineFilter::New();
+  // Because of streaming, it is important to set the input and not copy it.
+  outline->SetInput(input);
+  outline->GetOutput()->SetUpdateNumberOfPieces(output->GetUpdateNumberOfPieces());
+  outline->GetOutput()->SetUpdatePiece(output->GetUpdatePiece());
+  outline->GetOutput()->SetUpdateGhostLevel(output->GetUpdateGhostLevel());
+  outline->GetOutput()->Update();
+
+  output->CopyStructure(outline->GetOutput());
+  outline->Delete();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::RectilinearGridExecute(vtkRectilinearGrid *input)
+{
+  int *ext;
+  float bounds[6];
+  vtkPolyData *output = this->GetOutput();
+
+  ext = input->GetWholeExtent();
+
+  // If 2d then default to superclass behavior.
+  if (ext[0] == ext[1] || ext[2] == ext[3] || ext[4] == ext[5])
+    {
+    this->vtkDataSetSurfaceFilter::Execute();
+    this->OutlineFlag = 0;
+    return;
+    }  
+  this->OutlineFlag = 1;
+
+  //
+  // Otherwise, let Outline do all the work
+  //
+  
+  // Until we get a vtkRectilinearOutlineFilter.
+  input->GetBounds(bounds);
+
+  vtkOutlineSource *outline = vtkOutlineSource::New();
+  outline->SetBounds(bounds);
+  outline->Update();
+
+  output->CopyStructure(outline->GetOutput());
+  outline->Delete();
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid *input)
+{
+  vtkIdType numCells, id;
+  int type;
+  vtkPolyData *output = this->GetOutput();
+  
+  this->OutlineFlag = 0;
+
+  // Look through the input a see if it is 2D.
+  // I know that having only part of the data may fool us, but so what.
+  numCells = input->GetNumberOfCells();
+  for (id = 0; id < numCells && this->OutlineFlag == 0; ++id)
+    {
+    type = input->GetCellType(id);
+    if (type != VTK_TETRA || type != VTK_VOXEL || type != VTK_HEXAHEDRON
+        || type != VTK_WEDGE || type != VTK_PYRAMID)
+      {
+      this->OutlineFlag = 1;
+      } 
+    }
+
+  // If 2d then default to superclass behavior.
+  if (this->OutlineFlag == 0)
+    {
+    this->vtkDataSetSurfaceFilter::Execute();
+    return;
+    }  
+
+
+  vtkDataSetSurfaceFilter *surface = vtkDataSetSurfaceFilter::New();
+  surface->SetInput(input);
+  vtkExtractEdges *edges = vtkExtractEdges::New();
+  edges->SetInput(surface->GetOutput());
+  edges->GetOutput()->SetUpdateNumberOfPieces(output->GetUpdateNumberOfPieces());
+  edges->GetOutput()->SetUpdatePiece(output->GetUpdatePiece());
+  edges->GetOutput()->SetUpdateGhostLevel(output->GetUpdateGhostLevel());
+  edges->GetOutput()->Update();
+
+  output->CopyStructure(edges->GetOutput());
+  surface->Delete();
+  edges->Delete();
 }
