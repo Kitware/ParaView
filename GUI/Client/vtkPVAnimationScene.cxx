@@ -55,6 +55,7 @@
 #include "vtkSMPartDisplay.h"
 #include "vtkErrorCode.h"
 #include "vtkPVVCRControl.h"
+#include "vtkKWToolbarSet.h"
 
 #ifdef _WIN32
   #include "vtkAVIWriter.h"
@@ -67,9 +68,12 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.8");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.9");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
+
+#define VTK_PV_TOOLBARS_ANIMATION_LABEL "Animation"
+
 //*****************************************************************************
 class vtkPVAnimationSceneObserver : public vtkCommand
 {
@@ -107,6 +111,8 @@ vtkPVAnimationScene::vtkPVAnimationScene()
   this->AnimationSceneProxyName = NULL;
 
   this->VCRControl = vtkPVVCRControl::New();
+  this->VCRToolbar = vtkPVVCRControl::New();
+
   this->TimeLabel = vtkKWLabel::New();
   this->TimeScale = vtkKWScale::New();
   this->FrameRateLabel = vtkKWLabel::New();
@@ -148,6 +154,7 @@ vtkPVAnimationScene::~vtkPVAnimationScene()
   this->SetWindow(NULL);
   this->Observer->Delete();
   this->VCRControl->Delete();
+  this->VCRToolbar->Delete();
 
   this->TimeLabel->Delete();
   this->TimeScale->Delete();
@@ -252,7 +259,19 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->VCRControl->SetLoopCheckCommand(this,"LoopCheckButtonCallback");
   this->Script("grid %s -columnspan 2 -sticky {}",
     this->VCRControl->GetWidgetName());
-  
+
+  this->VCRToolbar->SetParent(this->Window->GetLowerToolbars()->GetToolbarsFrame());
+  this->VCRToolbar->Create(app);
+  this->VCRToolbar->SetPlayCommand(this, "Play");
+  this->VCRToolbar->SetStopCommand(this, "Stop");
+  this->VCRToolbar->SetGoToBeginningCommand(this, "GoToBeginning");
+  this->VCRToolbar->SetGoToEndCommand(this,"GoToEnd");
+  this->VCRToolbar->SetGoToPreviousCommand(this, "GoToPrevious");
+  this->VCRToolbar->SetGoToNextCommand(this,"GoToNext");
+  this->VCRToolbar->SetLoopCheckCommand(this,"ToolbarLoopCheckButtonCallback");
+  this->Window->AddLowerToolbar(this->VCRToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL, 0);
+  this->VCRToolbar->UpdateEnableState();
+
   // Animation Control: Time scale
   this->TimeLabel->SetParent(this);
   this->TimeLabel->Create(app, 0);
@@ -682,6 +701,8 @@ void vtkPVAnimationScene::Play()
     }
   this->VCRControl->SetInPlay(1);
   this->VCRControl->UpdateEnableState();
+  this->VCRToolbar->SetInPlay(1);
+  this->VCRToolbar->UpdateEnableState();
   
   this->AnimationSceneProxy->Play();
   this->InPlay = 0;
@@ -691,6 +712,8 @@ void vtkPVAnimationScene::Play()
     }
   this->VCRControl->SetInPlay(0);
   this->VCRControl->UpdateEnableState();
+  this->VCRToolbar->SetInPlay(0);
+  this->VCRToolbar->UpdateEnableState();
   this->AddTraceEntry("$kw(%s) Play", this->GetTclName());
 }
 
@@ -782,6 +805,13 @@ void vtkPVAnimationScene::LoopCheckButtonCallback()
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationScene::ToolbarLoopCheckButtonCallback()
+{
+  this->SetLoop(this->VCRToolbar->GetLoopButtonState());
+}
+
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::FrameRateChangedCallback()
 {
   this->SetFrameRate(this->FrameRateThumbWheel->GetEntry()->GetValueAsFloat());
@@ -820,6 +850,7 @@ void vtkPVAnimationScene::SetLoop(int loop)
     return;
     }
   this->VCRControl->SetLoopButtonState(loop);
+  this->VCRToolbar->SetLoopButtonState(loop);
   this->AnimationSceneProxy->SetLoop(loop);
   this->AddTraceEntry("$kw(%s) SetLoop %d", this->GetTclName(), loop);
 }

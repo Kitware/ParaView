@@ -54,6 +54,7 @@ public:
   void SetPlayModeToRealTime();
   void DurationChangedCallback();
   void LoopCheckButtonCallback();
+  void ToolbarLoopCheckButtonCallback();
   void TimeScaleCallback();
   void FrameRateChangedCallback();
     
@@ -159,6 +160,7 @@ protected:
 
   // Animation Control.
   vtkPVVCRControl* VCRControl;
+  vtkPVVCRControl* VCRToolbar;
 
   vtkKWLabel* TimeLabel;
   vtkKWScale* TimeScale;

@@ -187,7 +187,6 @@ public:
 
   // Description:
   // Access to the toolbars.
-  vtkGetObjectMacro(AnimationToolbar, vtkKWToolbar);
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   vtkGetObjectMacro(InteractorToolbar, vtkKWToolbar);
   vtkGetObjectMacro(PickCenterToolbar, vtkKWToolbar);
@@ -630,15 +629,6 @@ protected:
   // This controls button visibility.
   vtkKWMenuButton* ToolbarMenuButton;
  
-  // Animation Toolbar
-  vtkKWToolbar* AnimationToolbar;
-  vtkKWPushButton *PlayButton;
-  vtkKWPushButton *StopButton;
-  vtkKWPushButton *GotoBeginingButton;
-  vtkKWPushButton *GotoEndButton;
-  vtkKWPushButton *GotoPreviousButton;
-  vtkKWPushButton *GotoNextButton;
-  
   // widgets for setting center of rotation for rotate camera interactor style
   vtkKWToolbar *PickCenterToolbar;
   vtkKWPushButton *PickCenterButton;
@@ -676,7 +666,6 @@ protected:
   void InitializeMenus(vtkKWApplication* app);
   void InitializeToolbars(vtkKWApplication* app);
   void InitializeInteractorInterfaces(vtkKWApplication* app);
-  void InitializeAnimationInterfaces(vtkKWApplication* app);
 
   vtkPVTimerLogDisplay *TimerLogDisplay;
   vtkPVErrorLogDisplay *ErrorLogDisplay;
