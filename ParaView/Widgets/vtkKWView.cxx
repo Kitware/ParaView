@@ -1317,7 +1317,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.59 $");
+  this->ExtractRevision(os,"$Revision: 1.60 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
@@ -1345,8 +1345,9 @@ void *vtkKWView::GetMemoryDC()
 #ifdef _WIN32	
   return (void *)vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->GetMemoryDC();
-#endif
+#else
   return NULL;
+#endif
 }
 
 unsigned char *vtkKWView::GetMemoryData()
@@ -1354,8 +1355,9 @@ unsigned char *vtkKWView::GetMemoryData()
 #ifdef _WIN32	
   return vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->GetMemoryData();
-#endif
+#else
   return NULL;
+#endif
 }
 
 void vtkKWView::SetBackgroundColor( float r, float g, float b )
