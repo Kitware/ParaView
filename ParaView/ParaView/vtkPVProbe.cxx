@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.98");
+vtkCxxRevisionMacro(vtkPVProbe, "1.98.2.1");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -336,6 +336,7 @@ void vtkPVProbe::AcceptCallbackInternal()
         this->HSVtoRGB(ccolor, 1, 1, &r, &g, &b);
         xyp->SetPlotColor(i, r, g, b);
         ccolor += cstep;
+        arrayCount ++;
         }      
       }
     
