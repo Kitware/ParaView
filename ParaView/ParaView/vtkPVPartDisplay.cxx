@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.18");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.19");
 
 
 //----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ vtkPVPartDisplay::vtkPVPartDisplay()
   this->DirectColorFlag = 1;
   this->Visibility = 1;
   this->Part = NULL;
-
+  
   // Used to be in vtkPVActorComposite
   static int instanceCount = 0;
 
@@ -174,8 +174,7 @@ void vtkPVPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     vtkProperty::SafeDownCast(
       pm->GetObjectFromID(this->PropertyID));
   this->Mapper = 
-    vtkPolyDataMapper::SafeDownCast(
-      pm->GetObjectFromID(this->MapperID));
+    vtkPolyDataMapper::SafeDownCast(pm->GetObjectFromID(this->MapperID));
 
   pm->GetStream()
     << vtkClientServerStream::Invoke

@@ -87,18 +87,28 @@ public:
   // For flip books.
   virtual void CacheUpdate(int idx, int total);  
 
-  //===================
-
-  vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
-
-          
-  //=============================================================== 
   // Description:
-  // These access methods are neede for process module abstraction.
+  // Return a pointer to the mapper (on the client side)
+  vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
+          
+  // Description:
+  // Return a pointer to the property (on the client side)
   vtkProperty *GetProperty() { return this->Property;}
+
+  // Description:
+  // Return a pointer to the actor (on the client side)
   vtkProp *GetProp() { return this->Prop;}
+
+  // Description:
+  // Return the id of the actor (on the server side)
   vtkGetMacro(PropID, vtkClientServerID);
+
+  // Description:
+  // Return the id of the property (on the server side)
   vtkGetMacro(PropertyID, vtkClientServerID);
+
+  // Description:
+  // Return the id of the mapper (on the server side)
   vtkGetMacro(MapperID, vtkClientServerID);
 
   // Description:
