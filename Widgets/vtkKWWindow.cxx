@@ -2677,7 +2677,7 @@ void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
   DWORD dwType, dwSize;
   
   dwType = REG_SZ;
-  dwSize = 40;
+  dwSize = 1023;
   if(RegQueryValueEx(hKey,key, NULL, &dwType, 
                      (BYTE *)val, &dwSize) != ERROR_SUCCESS)
     {
@@ -2686,13 +2686,14 @@ void ReadAValue(HKEY hKey,char *val,char *key, char *adefault)
 }
 #endif
 
-void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target, 
-                                       const char *command)
+void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 {
 #ifdef _WIN32
   int i;
   char fkey[1024];
   char *KeyName[4] = {"File1","File2","File3","File4"};
+  char *CmdName[4] = {"File1Cmd","File2Cmd","File3Cmd","File4Cmd"};
+  char Cmd[1024];
   
   if (!key)
     {
@@ -2719,11 +2720,12 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target,
 
     for (i = 0; i < 4; i++)
       {
-      ReadAValue(hKey, File,KeyName[i],"");
+      ReadAValue(hKey, File, KeyName[i],"");
+      ReadAValue(hKey, Cmd, CmdName[i],"Open");
       if (strlen(File) > 1)
         {
         char cmd[1024];
-        sprintf(cmd,"%s {%s}",command, File);
+        sprintf(cmd,"%s {%s}",Cmd, File);
         this->GetMenuFile()->InsertCommand(
           this->GetMenuFile()->GetIndex("Close") - 1,
           File, target, cmd);
@@ -2742,6 +2744,7 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
 #ifdef _WIN32
   char fkey[1024];
   char File[1024];
+  char Cmd[1024];
   
   if (!key)
     {
@@ -2789,17 +2792,29 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
     
     // move the other three down
     ReadAValue(hKey, File,"File3","");
+    ReadAValue(hKey, Cmd,"File3Cmd","");
     RegSetValueEx(hKey, "File4", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)File, strlen(File)+1);
+    RegSetValueEx(hKey, "File4Cmd", 0, REG_SZ, 
+		  (CONST BYTE *)(const char *)Cmd, strlen(Cmd)+1);
     ReadAValue(hKey, File,"File2","");
+    ReadAValue(hKey, Cmd,"File2Cmd","");
     RegSetValueEx(hKey, "File3", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)File, strlen(File)+1);
+    RegSetValueEx(hKey, "File3Cmd", 0, REG_SZ, 
+		  (CONST BYTE *)(const char *)Cmd, strlen(Cmd)+1);
     ReadAValue(hKey, File,"File1","");
+    ReadAValue(hKey, Cmd,"File1Cmd","");
     RegSetValueEx(hKey, "File2", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)File, strlen(File)+1);
+    RegSetValueEx(hKey, "File2Cmd", 0, REG_SZ, 
+		  (CONST BYTE *)(const char *)Cmd, strlen(Cmd)+1);
     RegSetValueEx(hKey, "File1", 0, REG_SZ, 
 		  (CONST BYTE *)(const char *)name, 
 		  strlen(name)+1);
+    RegSetValueEx(hKey, "File1Cmd", 0, REG_SZ, 
+		  (CONST BYTE *)(const char *)command, 
+                  strlen(command)+1);
 
     this->NumberOfMRUFiles++;
     // add the new entry
@@ -2838,5 +2853,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.11 $");
+  this->ExtractRevision(os,"$Revision: 1.12 $");
 }
