@@ -70,6 +70,7 @@
 #include "vtkPVWindowToImageFilter.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkPostScriptWriter.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
 #include "vtkRenderWindow.h"
@@ -104,7 +105,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.298");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.299");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2216,14 +2217,15 @@ void vtkPVRenderView::PrintView()
     // Is this right? Should DPI be int or float?
     DPI = this->GetParentWindow()->GetPrintTargetDPI();
     }
-  if (DPI >= 150.0)
-    {
-    w2i->SetMagnification(2);
-    }
-  if (DPI >= 300.0)
-    {
-    w2i->SetMagnification(3);
-    }
+//  TODO: SetMagnification should work in vtkPVWindowToImageFilter
+//  if (DPI >= 150.0)
+//    {
+//    w2i->SetMagnification(2);
+//    }
+//  if (DPI >= 300.0)
+//    {
+//    w2i->SetMagnification(3);
+//    }
   w2i->SetInput(this->GetPVApplication()->GetRenderModule());
   w2i->Update();
   
