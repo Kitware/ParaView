@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.359");
+vtkCxxRevisionMacro(vtkPVWindow, "1.360");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -659,8 +659,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->MenuFile->InsertCommand(0, "Open Data File", this, "OpenCallback",0);
   // Save current data in VTK format.
   this->MenuFile->InsertCommand(1, "Save Data", this, "WriteData",0);
-  // Copies the current trace file to another file.
-  this->MenuFile->InsertCommand(3, "Save Trace File", this, "SaveTrace");
 
   // Select menu: ParaView specific menus.
 
@@ -684,6 +682,8 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 
   this->AdvancedMenu->AddCommand("Load ParaView Script", this, "LoadScript", 0,
                                  "Load ParaView Script (.pvs)");
+  this->AdvancedMenu->AddCommand("Save ParaView Script", this, "SaveScript", 0,
+                                 "Saves a script/trace of every action since start up.");
   this->AdvancedMenu->InsertCommand(2, "Export VTK Script", this,
                                     "ExportVTKScript", 7,
                                     "Write a script which can be "
@@ -696,7 +696,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->AdvancedMenu);
   this->SourceMenu->Create(this->Application, "-tearoff 0");
-  this->AdvancedMenu->AddCascade("VTK Sources", this->SourceMenu, 4,
+  this->AdvancedMenu->AddCascade("VTK Sources", this->SourceMenu, 5,
                                  "Choose a source from a list of "
                                  "VTK sources");  
   
@@ -3587,7 +3587,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.359 $");
+  this->ExtractRevision(os,"$Revision: 1.360 $");
 }
 
 //----------------------------------------------------------------------------
