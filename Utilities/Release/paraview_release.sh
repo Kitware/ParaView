@@ -23,14 +23,14 @@
 #
 
 # Release version number.
-TAG="HEAD"
-PARAVIEW_VERSION="1.1"
+TAG="ParaView-1-4"
+PARAVIEW_VERSION="1.4"
 VERSION="${PARAVIEW_VERSION}.0"
 RELEASE="1"
 
 # Project configuration.
 PROJECT="paraview"
-CVS_MODULE="ParaViewComplete"
+CVS_MODULE="ParaView"
 CVS_MODULE_DOCS="ParaViewReleaseDocs/${PARAVIEW_VERSION}"
 
 # CVSROOT setting used to check out ParaView.
@@ -331,7 +331,7 @@ config()
         echo "${CONFIG_FILE} should specify CC, CXX, and PLATFORM." &&
         return 1
     fi
-    export CC CXX CFLAGS CXXFLAGS PATH LD_LIBRARY_PATH DISPLAY
+    export CC CXX CFLAGS CXXFLAGS LDFLAGS PATH LD_LIBRARY_PATH DISPLAY
 }
 
 #-----------------------------------------------------------------------------
@@ -339,16 +339,25 @@ checkout()
 {
     [ -z "${DONE_checkout}" ] || return 0 ; DONE_checkout="yes"
     config || return 1
-    echo "Exporting ${CVS_MODULE} from cvs ..." &&
+    echo "Updating ${CVS_MODULE} from cvs ..." &&
     (
-        rm -rf ${PROJECT}-${VERSION} &&
-        rm -rf CheckoutTemp &&
-        mkdir CheckoutTemp &&
-        cd CheckoutTemp &&
-        cvs -q -z3 -d $CVSROOT export -r ${TAG} ${CVS_MODULE} &&
-        mv ${CVS_MODULE} ../${PROJECT}-${VERSION} &&
-        cd .. &&
-        rm -rf CheckoutTemp
+        if [ -d ${PROJECT}-${VERSION}/CVS ]; then
+            cd ${PROJECT}-${VERSION} &&
+            cvs -q -z3 -d $CVSROOT update -dAP -r ${TAG} &&
+            rm -rf Xdmf/Utilities/expat &&
+            rm -rf Xdmf/Utilities/zlib
+        else
+            rm -rf ${PROJECT}-${VERSION} &&
+            rm -rf CheckoutTemp &&
+            mkdir CheckoutTemp &&
+            cd CheckoutTemp &&
+            cvs -q -z3 -d $CVSROOT co -r ${TAG} ${CVS_MODULE} &&
+            rm -rf ${CVS_MODULE}/Xdmf/Utilities/expat &&
+            rm -rf ${CVS_MODULE}/Xdmf/Utilities/zlib &&
+            mv ${CVS_MODULE} ../${PROJECT}-${VERSION} &&
+            cd .. &&
+            rm -rf CheckoutTemp
+        fi
     ) >Logs/checkout.log 2>&1 || error_log Logs/checkout.log
 }
 
@@ -384,7 +393,7 @@ source_tarball()
     (
         mkdir -p Tarballs &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.tar* &&
-        tar cvf Tarballs/${PROJECT}-${VERSION}.tar ${PROJECT}-${VERSION} &&
+        tar cvf Tarballs/${PROJECT}-${VERSION}.tar --exclude CVS ${PROJECT}-${VERSION} &&
         gzip -c Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.gz &&
         compress -cf Tarballs/${PROJECT}-${VERSION}.tar >Tarballs/${PROJECT}-${VERSION}.tar.Z &&
         rm -rf Tarballs/${PROJECT}-${VERSION}.tar
@@ -454,21 +463,16 @@ write_standard_cache()
     cat > CMakeCache.txt <<EOF
 BUILD_SHARED_LIBS:BOOL=OFF
 BUILD_TESTING:BOOL=ON
-CMAKE_BACKWARDS_COMPATIBILITY:STRING=1.6
 CMAKE_BUILD_TYPE:STRING=Release
 CMAKE_INSTALL_PREFIX:PATH=/usr/local
 CMAKE_SKIP_RPATH:BOOL=1
 CMAKE_VERBOSE_MAKEFILE:BOOL=TRUE
-PARAVIEW_LINK_XDMF:BOOL=ON
-USE_INCLUDED_TCLTK:BOOL=ON
 VTK_USE_64BIT_IDS:BOOL=OFF
 VTK_USE_HYBRID:BOOL=ON
 VTK_USE_MPI:BOOL=OFF
 VTK_USE_PARALLEL:BOOL=ON
 VTK_USE_PATENTED:BOOL=ON
 VTK_USE_RENDERING:BOOL=ON
-VTK_WRAP_TCL:BOOL=ON
-XDMF_SYSTEM_HDF5:BOOL=OFF
 EOF
 }
 
@@ -526,7 +530,7 @@ install()
 {
     [ -z "${DONE_install}" ] || return 0 ; DONE_install="yes"
     config || return 1
-    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/ParaView" ] || build || return 1
+    [ -f "${PROJECT}-${VERSION}-${PLATFORM}/bin/paraview" ] || build || return 1
     echo "Running make install ..." &&
     (
         rm -rf Install &&
@@ -540,7 +544,7 @@ strip()
 {
     [ -z "${DONE_strip}" ] || return 0 ; DONE_strip="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}/bin/paraview" ] || install || return 1
     echo "Stripping executables ..." &&
     (
         strip Install${PREFIX}/bin/*
@@ -552,7 +556,7 @@ manifest()
 {
     [ -z "${DONE_manifest}" ] || return 0 ; DONE_manifest="yes"
     config || return 1
-    [ -f "Install${PREFIX}/bin/ParaView" ] || install || return 1
+    [ -f "Install${PREFIX}/bin/paraview" ] || install || return 1
     echo "Writing MANIFEST ..." &&
     (
         mkdir -p Install${PREFIX}${DOC_DIR} &&
