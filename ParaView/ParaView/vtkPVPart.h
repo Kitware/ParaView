@@ -167,14 +167,9 @@ protected:
   
   vtkPVClassNameInformation *ClassNameInformation;
   
-  char *VTKDataTclName;
   vtkClientServerID GeometryID;
   vtkClientServerID VTKDataID;
   
-    
-//  char *GeometryTclName;
-//  vtkSetStringMacro(GeometryTclName);
-
   // Here to create unique names.
   int InstanceCount;
 

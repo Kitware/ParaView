@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.39");
+vtkCxxRevisionMacro(vtkPVPart, "1.40");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -525,8 +525,6 @@ void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Name: " << (this->Name?this->Name:"none") << endl;
-//  os << indent << "GeometryID: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
-//  os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "ClassNameInformation: " << this->ClassNameInformation << endl;
   os << indent << "VTKSourceIndex: " << this->VTKSourceIndex << endl;
   os << indent << "VTKOutputIndex: " << this->VTKOutputIndex << endl;
