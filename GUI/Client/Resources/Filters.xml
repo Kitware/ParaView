@@ -1361,24 +1361,6 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
 The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on. If the Random option is selected, the unique value per piece will be chosen at random; otherwise it will match the process id. This filter operates on any type of data when ParaView is run in parallel. It is useful for determining whether your data is load-balanced across the processors being used. The output data set type is the same as that of the input.
     </Documentation>
   </Module>
-  <Module name="CellIdAttribute"
-          menu_name="Cell Id Scalars"
-          root_name="CellId"
-          module_type="Filter"
-          long_help="This filter uses colors to show the cell id."
-          short_help="Generate cell scalars from cell id.">
-    <Filter class="vtkCellIdAttribute">
-      <Input name="Input"
-             class="vtkDataSet"/>
-    </Filter>
-    <InputMenu trace_name="Input" property="Input"
-               label="Input"
-               help="Set the input to this filter."
-               input_name="Input"/>
-    <Documentation>
-This cell id attribute filters create a new cell attribute array that contains the cell id.  Since this new array will be copied by filters it is useful for determining which input cell is the origin of an output cell. 
-    </Documentation>
-  </Module>
   <Module name="PointDataToCellData"
           root_name="PointToCell"
           menu_name="Point Data to Cell Data"
