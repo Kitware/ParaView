@@ -497,6 +497,8 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
   mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;

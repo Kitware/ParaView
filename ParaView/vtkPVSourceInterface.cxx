@@ -182,9 +182,21 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 			   mInt->GetSetCommand(),
 			   mInt->GetGetCommand());
       }
+    else if (mInt->GetNumberOfArguments() == 4)
+      {
+      pvs->AddVector4Entry(mInt->GetVariableName(), "", "", "", "",
+			   mInt->GetSetCommand(),
+			   mInt->GetGetCommand());
+      }
+    else if (mInt->GetNumberOfArguments() == 6)
+      {
+      pvs->AddVector6Entry(mInt->GetVariableName(), "", "", "", "", "", "",
+			   mInt->GetSetCommand(),
+			   mInt->GetGetCommand());
+      }
     else
       {
-      vtkErrorMacro("I do not handle this type yet.");
+      vtkErrorMacro("I do not handle this widget type yet.");
       }
     }
   pvs->UpdateParameterWidgets();

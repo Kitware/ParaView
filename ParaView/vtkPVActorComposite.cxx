@@ -57,6 +57,12 @@ int vtkPVActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVActorComposite::vtkPVActorComposite()
 {
+  static int instanceCount = 0;
+
+  // Create a unique id for creating tcl names.
+  ++instanceCount;
+  this->InstanceCount = instanceCount;
+  
   this->CommandFunction = vtkPVActorCompositeCommand;
   
   this->Properties = vtkKWWidget::New();
@@ -81,6 +87,8 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->ActorTclName = NULL;
   this->MapperTclName = NULL;
+  this->OutlineTclName = NULL;
+  this->GeometryTclName = NULL;
 }
 
 
@@ -88,11 +96,9 @@ vtkPVActorComposite::vtkPVActorComposite()
 void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
   int numProcs, id;
-  static int instanceCount = 0;
   char tclName[100];
   
   this->SetApplication(pvApp);
-  ++instanceCount;
   
   // Get rid of previous object created by the superclass.
   if (this->Mapper)
@@ -101,7 +107,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
     this->Mapper = NULL;
     }
   // Make a new tcl object.
-  sprintf(tclName, "Mapper%d", instanceCount);
+  sprintf(tclName, "Mapper%d", this->InstanceCount);
   this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
@@ -113,7 +119,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
     this->Actor = NULL;
     }
   // Make a new tcl object.
-  sprintf(tclName, "Actor%d", instanceCount);
+  sprintf(tclName, "Actor%d", this->InstanceCount);
   this->Actor = (vtkActor*)pvApp->MakeTclObject("vtkActor", tclName);
   this->ActorTclName = NULL;
   this->SetActorTclName(tclName);
@@ -173,6 +179,19 @@ vtkPVActorComposite::~vtkPVActorComposite()
   pvApp->BroadcastScript("%s Delete", this->ActorTclName);
   this->SetActorTclName(NULL);
   this->Actor = NULL;
+
+  if (this->OutlineTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->OutlineTclName);
+    this->SetOutlineTclName(NULL);
+    }
+  
+  if (this->GeometryTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->GeometryTclName);
+    this->SetGeometryTclName(NULL);
+    }
+  
 }
 
 //----------------------------------------------------------------------------
@@ -300,7 +319,36 @@ void vtkPVActorComposite::SetInput(vtkPVData *data)
     vtkDataTclName = data->GetVTKDataTclName();
     }
     
-  pvApp->BroadcastScript("%s SetInput %s", this->MapperTclName, vtkDataTclName);
+  if (data->GetVTKData()->IsA("vtkPolyData"))
+    {
+    pvApp->BroadcastScript("%s SetInput %s", this->MapperTclName, vtkDataTclName);
+    }
+  else if (data->GetVTKData()->IsA("vtkImageData"))
+    {
+    if (this->OutlineTclName == NULL)
+      {
+      char tclName[150];
+      sprintf(tclName, "ActorCompositeOutline%d", this->InstanceCount);
+      pvApp->MakeTclObject("vtkImageOutlineFilter", tclName);
+      this->SetOutlineTclName(tclName);
+      }
+    pvApp->BroadcastScript("%s SetInput %s", this->OutlineTclName, vtkDataTclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+			   this->MapperTclName, this->OutlineTclName);    
+    }
+  else 
+    {
+    if (this->GeometryTclName == NULL)
+      {
+      char tclName[150];
+      sprintf(tclName, "ActorCompositeGeometry%d", this->InstanceCount);
+      pvApp->MakeTclObject("vtkGeometryFilter", tclName);
+      this->SetGeometryTclName(tclName);
+      }
+    pvApp->BroadcastScript("%s SetInput %s", this->GeometryTclName, vtkDataTclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+			   this->MapperTclName, this->GeometryTclName);    
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -169,7 +169,15 @@ protected:
   
   char *MapperTclName;
   vtkSetStringMacro(MapperTclName);
+
+  char *OutlineTclName;
+  vtkSetStringMacro(OutlineTclName);
   
+  char *GeometryTclName;
+  vtkSetStringMacro(GeometryTclName);
+  
+  // Here to create unique names.
+  int InstanceCount;
 };
 
 #endif
