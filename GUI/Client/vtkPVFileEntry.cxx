@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.102");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.103");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -452,7 +452,10 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   kwsys_stl::string file = kwsys::SystemTools::GetFilenameName(fileName);
   kwsys_stl::string ext = kwsys::SystemTools::GetFilenameExtension(fileName);
-
+  if (ext.size() >= 1)
+    {
+    ext.erase(0,1); // Get rid of the "." GetFilenameExtension returns.
+    }
   int in_ext = 1;
   int in_num = 0;
 
