@@ -56,8 +56,7 @@ public:
 
   // Description:
   // Callbacks that initialize and finish the compositing.
-  virtual void EndRender();
-  virtual void SatelliteEndRender();
+  virtual void ClientEndRender();
   
   // Description:
   // If the user wants to handle the event loop, then they must call this
@@ -89,7 +88,8 @@ public:
 
 //BTX
   enum Tags {
-    RENDER_RMI_TAG=12721,
+    ROOT_RENDER_RMI_TAG=12721,
+    SATELLITE_RENDER_RMI_TAG=12722,
     INFO_TAG=22135
   };
 //ETX
@@ -127,6 +127,19 @@ public:
                      float *p, vtkCamera* cam);
 
   // Description:
+  // This is a hack to get around a shortcomming
+  // of the SocketController.  There is no way to distinguish
+  // between socket processes.
+  vtkSetMacro(ClientFlag,int);
+  vtkGetMacro(ClientFlag,int);
+
+  // Description:
+  // A bad API !!!!  This flag is set when MPI node 0 is the client.
+  // This works in combination with controllers and ClientFlag.
+  vtkSetMacro(ZeroEmpty,int);
+  vtkGetMacro(ZeroEmpty,int);
+
+  // Description:
   // Internal, but public for RMI/Callbacks.
 //BTX
   void ClientStartRender();
@@ -137,6 +150,8 @@ public:
 protected:
   vtkMultiDisplayManager();
   ~vtkMultiDisplayManager();
+
+  int ClientFlag;
   
   vtkRenderWindow* RenderWindow;
   vtkMultiProcessController* Controller;

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.5");
 
 
 
@@ -90,11 +90,24 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     }
 
   this->Composite = NULL;
-  pvApp->MakeTclObject("vtkPVTiledDisplayManager", "TDispManager1");
+  pvApp->MakeTclObject("vtkMultiDisplayManager", "TDispManager1");
   int *tileDim = pvApp->GetTileDimensions();
   pvApp->BroadcastScript("TDispManager1 SetTileDimensions %d %d",
                          tileDim[0], tileDim[1]);
+
+  if (pvApp->GetClientMode())
+    {
+    pvApp->Script("TDispManager1 SetClientFlag 1");
+    pvApp->BroadcastScript("TDispManager1 SetSocketController [[$Application GetProcessModule] GetSocketController]");
+    pvApp->BroadcastScript("TDispManager1 SetZeroEmpty 0");
+    }
+  else
+    {
+    pvApp->BroadcastScript("TDispManager1 SetZeroEmpty 1");
+    }
+  // Have to initialize after ZeroEmpty, and tile dimensions have been set.
   pvApp->BroadcastScript("TDispManager1 InitializeSchedule");
+
 
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TDispManager1");

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.4");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -80,11 +80,6 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
     pvApp->BroadcastScript("%s ZeroEmptyOn; %s ZeroEmptyOn",
                           this->CollectTclName,
                           this->LODCollectTclName);
-    int* dims = pvApp->GetTileDimensions();
-    int numProcs = pvApp->GetController()->GetNumberOfProcesses();
-    pvApp->BroadcastScript("%s InitializeSchedule %d %d; %s InitializeSchedule %d %d", 
-                           this->CollectTclName, numProcs, dims[0]*dims[1],
-                           this->LODCollectTclName, numProcs, dims[0]*dims[1]);
 
     // Broadcast for subclasses.  
     pvApp->BroadcastScript("%s SetUpdateNumberOfPieces [expr {[[$Application GetProcessModule] GetNumberOfPartitions]-1}]",
@@ -97,6 +92,20 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
                           this->UpdateSuppressorTclName);
     // Local pipeline has no data, or all of the data?
     }
+  else
+    {
+    // We need this because the socket controller has no way of distinguishing
+    // between processes.
+    pvApp->Script("%s SetClientFlag 1; %s SetClientFlag 1",
+                  this->CollectTclName,
+                  this->LODCollectTclName);
+    }   
+
+  int* dims = pvApp->GetTileDimensions();
+  int numProcs = pvApp->GetController()->GetNumberOfProcesses();
+  pvApp->BroadcastScript("%s InitializeSchedule %d %d; %s InitializeSchedule %d %d", 
+                         this->CollectTclName, numProcs, dims[0]*dims[1],
+                         this->LODCollectTclName, numProcs, dims[0]*dims[1]);
 }
 
 //----------------------------------------------------------------------------

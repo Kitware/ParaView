@@ -26,7 +26,7 @@
 #include "vtkSocketController.h"
 #include "vtkTiledDisplaySchedule.h"
 
-vtkCxxRevisionMacro(vtkPVDuplicatePolyData, "1.4");
+vtkCxxRevisionMacro(vtkPVDuplicatePolyData, "1.5");
 vtkStandardNewMacro(vtkPVDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkPVDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -129,7 +129,14 @@ void vtkPVDuplicatePolyData::Execute()
     }
   // MPIRoot as client.
   // Subset of satellites for zero empty.
-  myId = this->Controller->GetLocalProcessId() - this->ZeroEmpty;
+  if (this->Controller)
+    {
+    myId = this->Controller->GetLocalProcessId() - this->ZeroEmpty;
+    }
+  else
+    {
+    myId = 0;
+    }
   if (myId < 0)
     {
     this->ClientExecute(this->Controller);
