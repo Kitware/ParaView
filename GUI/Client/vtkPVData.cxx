@@ -86,7 +86,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.299");
+vtkCxxRevisionMacro(vtkPVData, "1.300");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -127,6 +127,7 @@ vtkPVData::vtkPVData()
   this->ViewFrame = vtkKWLabeledFrame::New();
   
   this->TypeLabel = vtkKWLabel::New();
+  this->NumDataSetsLabel = vtkKWLabel::New();
   this->NumCellsLabel = vtkKWLabel::New();
   this->NumPointsLabel = vtkKWLabel::New();
   this->MemorySizeLabel = vtkKWLabel::New();
@@ -237,6 +238,9 @@ vtkPVData::~vtkPVData()
   this->TypeLabel->Delete();
   this->TypeLabel = NULL;
   
+  this->NumDataSetsLabel->Delete();
+  this->NumDataSetsLabel = NULL;
+
   this->NumCellsLabel->Delete();
   this->NumCellsLabel = NULL;
   
@@ -1093,6 +1097,9 @@ void vtkPVData::CreateProperties()
   this->TypeLabel->SetParent(this->StatsFrame->GetFrame());
   this->TypeLabel->Create(this->GetApplication(), "");
 
+  this->NumDataSetsLabel->SetParent(this->StatsFrame->GetFrame());
+  this->NumDataSetsLabel->Create(this->GetApplication(), "");
+
   this->NumCellsLabel->SetParent(this->StatsFrame->GetFrame());
   this->NumCellsLabel->Create(this->GetApplication(), "");
 
@@ -1111,6 +1118,7 @@ void vtkPVData::CreateProperties()
   
   this->Script("pack %s %s %s %s -side top -anchor nw",
                this->TypeLabel->GetWidgetName(),
+               this->NumDataSetsLabel->GetWidgetName(),
                this->NumCellsLabel->GetWidgetName(),
                this->NumPointsLabel->GetWidgetName(),
                this->MemorySizeLabel->GetWidgetName());
@@ -1322,22 +1330,38 @@ void vtkPVData::UpdatePropertiesInternal()
     }
   type << ends;
   this->TypeLabel->SetLabel(type.str());
-  type.rdbuf()->freeze(0);
+  delete[] type.str();
   
   ostrstream numcells;
+  if (dataType == VTK_MULTI_BLOCK_DATA_SET ||
+      dataType == VTK_HIERARCHICAL_BOX_DATA_SET)
+    {
+    ostrstream numds;
+    numds << "Number of datasets: " 
+             << dataInfo->GetNumberOfDataSets() 
+             << ends;
+    this->NumDataSetsLabel->SetLabel(numds.str());
+    delete[] numds.str();
+    }
+  else
+    {
+    this->Script("pack forget %s", 
+                 this->NumDataSetsLabel->GetWidgetName());
+    }
+
   numcells << "Number of cells: " << dataInfo->GetNumberOfCells() << ends;
   this->NumCellsLabel->SetLabel(numcells.str());
-  numcells.rdbuf()->freeze(0);
+  delete[] numcells.str();
 
   ostrstream numpts;
   numpts << "Number of points: " << dataInfo->GetNumberOfPoints() << ends;
   this->NumPointsLabel->SetLabel(numpts.str());
-  numpts.rdbuf()->freeze(0);
+  delete[] numpts.str();
   
   ostrstream memsize;
   memsize << "Memory: " << ((float)(dataInfo->GetMemorySize())/1000.0) << " MBytes" << ends;
   this->MemorySizeLabel->SetLabel(memsize.str());
-  memsize.rdbuf()->freeze(0);
+  delete[] memsize.str();
 
   dataInfo->GetBounds(bounds);
   this->BoundsDisplay->SetBounds(bounds);
@@ -3873,6 +3897,7 @@ void vtkPVData::UpdateEnableState()
   this->PropagateEnableState(this->Properties);
   this->PropagateEnableState(this->InformationFrame);
   this->PropagateEnableState(this->TypeLabel);
+  this->PropagateEnableState(this->NumDataSetsLabel);
   this->PropagateEnableState(this->NumCellsLabel);
   this->PropagateEnableState(this->NumPointsLabel);
   this->PropagateEnableState(this->MemorySizeLabel);

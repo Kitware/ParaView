@@ -372,6 +372,7 @@ protected:
   vtkKWFrame *Properties;
   vtkKWFrame *InformationFrame;
   vtkKWLabel *TypeLabel;
+  vtkKWLabel *NumDataSetsLabel;
   vtkKWLabel *NumCellsLabel;
   vtkKWLabel *NumPointsLabel;
   vtkKWLabel *MemorySizeLabel;
