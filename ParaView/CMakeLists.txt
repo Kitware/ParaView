@@ -36,7 +36,11 @@ IF (WIN32)
 
 ENDIF (WIN32)
 
-IF(NOT ParaViewComplete_BINARY_DIR)
+IF(ParaViewComplete_BINARY_DIR)  
+  INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
+  LINK_DIRECTORIES(${VTK_LIBRARY_PATH})
+  INCLUDE(${ParaViewComplete_BINARY_DIR}/VTK/UseVTK.cmake)
+ELSE(ParaViewComplete_BINARY_DIR)
   # include module to find vtk
   INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
   # if vtk was found include the use vtk file
@@ -46,9 +50,7 @@ IF(NOT ParaViewComplete_BINARY_DIR)
     SET (PARAVIEW_CAN_BUILD 0)
     MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_DIR to directory where vtkConfigure.h and UseVTK.cmake are found.")
   ENDIF (USE_VTK_FILE)
-ELSE(NOT ParaViewComplete_BINARY_DIR)
-  INCLUDE(${ParaViewComplete_BINARY_DIR}/VTK/UseVTK.cmake)
-ENDIF(NOT ParaViewComplete_BINARY_DIR)
+ENDIF(ParaViewComplete_BINARY_DIR)
 
 IF (PARAVIEW_CAN_BUILD)
  IF ( NOT VTK_WRAP_TCL )
