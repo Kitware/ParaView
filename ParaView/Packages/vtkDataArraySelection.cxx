@@ -19,7 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkVector.txx"
 
-vtkCxxRevisionMacro(vtkDataArraySelection, "1.2");
+vtkCxxRevisionMacro(vtkDataArraySelection, "1.3");
 vtkStandardNewMacro(vtkDataArraySelection);
 
 //----------------------------------------------------------------------------
@@ -179,4 +179,25 @@ void vtkDataArraySelection::SetArrays(const char** names, int numArrays)
   this->ArraySettings->Delete();
   this->ArrayNames = newNames;
   this->ArraySettings = newSettings;
+}
+
+//----------------------------------------------------------------------------
+void vtkDataArraySelection::CopySelections(vtkDataArraySelection* selections)
+{
+  if(this == selections)
+    {
+    return;
+    }
+  this->RemoveAllArrays();
+  
+  const char* name=0;
+  int setting=0;
+  vtkIdType i;
+  for(i=0;i < selections->ArrayNames->GetNumberOfItems();++i)
+    {
+    selections->ArrayNames->GetItemNoCheck(i, name);
+    selections->ArraySettings->GetItemNoCheck(i, setting);
+    this->ArrayNames->AppendItem(name);
+    this->ArraySettings->AppendItem(setting);
+    }
 }

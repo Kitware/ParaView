@@ -81,6 +81,9 @@ public:
   // There will be no more entries than the names given.
   void SetArrays(const char** names, int numArrays);
   
+  // Description:
+  // Copy the selections from the given vtkDataArraySelection instance.
+  void CopySelections(vtkDataArraySelection* selections);
 protected:
   vtkDataArraySelection();
   ~vtkDataArraySelection();
