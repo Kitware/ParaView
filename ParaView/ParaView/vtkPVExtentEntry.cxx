@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.33");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -202,12 +202,12 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     this->MinMax[i]->GetMinScale()->SetEntryCommand(this, "ModifiedCallback");
     this->MinMax[i]->GetMinScale()->SetDisplayEntryAndLabelOnTop(1);
     this->MinMax[i]->GetMinScale()->DisplayEntry();
-    this->MinMax[i]->GetMinScale()->DisplayLabel(" Min:");
+    this->MinMax[i]->GetMinScale()->DisplayLabel(" Min.");
     this->MinMax[i]->GetMaxScale()->SetEndCommand(this, "ModifiedCallback");
     this->MinMax[i]->GetMaxScale()->SetEntryCommand(this, "ModifiedCallback");
     this->MinMax[i]->GetMaxScale()->SetDisplayEntryAndLabelOnTop(1);
     this->MinMax[i]->GetMaxScale()->DisplayEntry();
-    this->MinMax[i]->GetMaxScale()->DisplayLabel(" Max:");
+    this->MinMax[i]->GetMaxScale()->DisplayLabel(" Max.");
     }
   
   for(i=0; i<3; i++)
