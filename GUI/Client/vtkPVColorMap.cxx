@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.86");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.87");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -157,7 +157,7 @@ vtkPVColorMap::vtkPVColorMap()
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;    
-  this->VectorMode = vtkPVColorMap::COMPONENT;
+  this->VectorMode = vtkPVColorMap::MAGNITUDE;
   this->VectorComponent = 0;
 
   // User interaface.
@@ -529,7 +529,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                                           "VectorModeMagnitudeCallback");
     this->VectorModeMenu->AddEntryWithCommand("Component", this, 
                                           "VectorModeComponentCallback");
-    this->VectorModeMenu->SetValue("Component");
+    this->VectorModeMenu->SetValue("Magnitude");
 
     this->VectorComponentMenu->SetParent(this->VectorFrame->GetFrame());
     this->VectorComponentMenu->Create(this->Application, "");
@@ -538,6 +538,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                  this->VectorModeMenu->GetWidgetName());
     this->Script("pack %s -side left -expand f -fill both -padx 2",
                  this->VectorComponentMenu->GetWidgetName());
+    
+    this->VectorModeMagnitudeCallback();
     }
 
   // Scalar bar frame
@@ -855,7 +857,7 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LookupTable =
     vtkLookupTable::SafeDownCast(pm->GetObjectFromID(this->LookupTableID));
   pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->LookupTableID << "SetVectorModeToComponent"
+                  << this->LookupTableID << "SetVectorModeToMagnitude"
                   << vtkClientServerStream::End;
 
   this->ScalarBar = vtkScalarBarWidget::New();
@@ -1805,7 +1807,8 @@ void vtkPVColorMap::UpdateScalarBarTitle()
 
   vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
 
-  if (this->VectorMode == vtkPVColorMap::MAGNITUDE)
+  if (this->VectorMode == vtkPVColorMap::MAGNITUDE &&
+      this->NumberOfVectorComponents > 1)
     {
     ostrstream ostr;
     ostr << this->ScalarBarTitle << " " << this->VectorMagnitudeTitle << ends;
