@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.265.2.2");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.265.2.3");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1132,8 +1132,11 @@ void vtkPVRenderView::SetBackgroundColor(float r, float g, float b)
 // a litle more complex than just "bind $widget <Expose> {%W Render}"
 // we have to handle all pending expose events otherwise they que up.
 void vtkPVRenderView::Exposed()
-{
-  if (this->InExpose) return;
+{  
+  if (this->InExpose)
+    {
+    return;
+    }
   this->InExpose = 1;
   this->Script("update");
   this->EventuallyRender();
@@ -1147,10 +1150,13 @@ void vtkPVRenderView::Exposed()
 // i.e. eventually render. If an Expose event was also generated after
 // that Configure event, it will be discard because of the InExpose ivar
 // logic (see above)
-
 void vtkPVRenderView::Configured()
 {
-  this->Exposed();
+  vtkPVRenderModule* rm = this->GetPVApplication()->GetRenderModule();
+  if (rm)
+    {
+    rm->InteractiveRender();
+    }
 }
 
 

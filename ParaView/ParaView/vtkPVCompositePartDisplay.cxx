@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.5.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -224,6 +224,7 @@ vtkPVLODPartDisplayInformation* vtkPVCompositePartDisplay::GetInformation()
   if ( ! this->GeometryIsValid)
     { // Update but with collection filter off.
     this->CollectionDecision = 0;
+    this->LODCollectionDecision = 0;
     pvApp->BroadcastScript("%s SetPassThrough 1; %s ForceUpdate; " 
                            "%s SetPassThrough 1; %s ForceUpdate", 
                            this->CollectTclName,

@@ -73,10 +73,14 @@ public:
 
   // Description:
   // Set this flag to indicate whether to calculate the reduction factor for
-  // use in tree composite.
-  vtkSetMacro(UseReductionFactor, int);
-  vtkGetMacro(UseReductionFactor, int);
-  vtkBooleanMacro(UseReductionFactor, int);
+  // use in tree composite (or client server).
+  vtkSetMacro(ReductionFactor, int);
+
+  // Description:
+  // Squirt is a hybrid run length encoding and bit reduction compression
+  // algorithm that is used to compress images for transmition from the
+  // server to client.
+  virtual void SetSquirtLevel(int val);
 
   // Description:
   void SetUseCompositeWithFloat(int val);
@@ -116,6 +120,7 @@ protected:
 
   // Computes the reduction factor to use in compositing.
   void ComputeReductionFactor();
+  int ReductionFactor;
 
   int LocalRender;
 
@@ -123,7 +128,6 @@ protected:
   int LODCollectionDecision;
 
   float CollectThreshold;
-  int UseReductionFactor;
 
   vtkPVTreeComposite *Composite;
   char *CompositeTclName;

@@ -90,7 +90,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.2");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.5.2.3");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -246,14 +246,14 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
   int row = 0;
 
-  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+  pvapp->Script("grid %s -row %d -column 2 -sticky nws", 
                 this->LODThresholdValue->GetWidgetName(), row++);
   pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
                 this->LODThresholdLabel->GetWidgetName(), row);
-  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+  pvapp->Script("grid %s -row %d -column 2 -sticky news", 
                 this->LODThresholdScale->GetWidgetName(), row++);
   
-  pvapp->Script("grid columnconfigure %s 1 -weight 1",
+  pvapp->Script("grid columnconfigure %s 2 -weight 1",
                 this->LODThresholdScale->GetParent()->GetWidgetName());
 
   // LOD parameters: resolution
@@ -287,12 +287,15 @@ void vtkPVLODRenderModuleUI::Create(vtkKWApplication *app, const char *)
     "\nLeft: Use slow high-resolution models. "
     "Right: Use fast simple models .");
 
-  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+  pvapp->Script("grid %s -row %d -column 2 -sticky news", 
                 this->LODResolutionValue->GetWidgetName(), row++);
   pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
                 this->LODResolutionLabel->GetWidgetName(), row);
-  pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+  pvapp->Script("grid %s -row %d -column 2 -sticky news", 
                 this->LODResolutionScale->GetWidgetName(), row++);
+
+  pvapp->Script("grid columnconfigure %s 2 -weight 1",
+                this->LODResolutionScale->GetParent()->GetWidgetName());
 
   // LOD parameters: rendering interrupts
 

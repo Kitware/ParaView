@@ -78,22 +78,31 @@ public:
   void CompositeWithRGBACallback(int val);
   void CompositeCompressionCallback();
   void CompositeCompressionCallback(int val);
-  
+
+  // Description:
+  // Tracing uses the method with the argument.
+  // A reduction value of 1 is equivalent to having the feature
+  // disabled.
+  void ReductionCheckCallback();
+  void ReductionFactorScaleCallback();
+  void SetReductionFactor(int val);
+
+  // Description:
+  // Squirt compression os a combination of run-length encoding
+  // and bit compression.  A level of 0 is the same as disabling
+  // squirt compression.
+  void SquirtCheckCallback();
+  void SquirtLevelScaleCallback();
+  void SetSquirtLevel(int val);
+
   // Description:
   // Threshold for collecting data to a single process (MBytes).
+  void CollectCheckCallback();
   void CollectThresholdScaleCallback();
-
-  // Description:
-  // This method sets the threshold without tracing or
-  // changing the UI scale.
-  void SetCollectThresholdInternal(float threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetCollectThreshold(float);
+  void SetCollectThreshold(float val);
   vtkGetMacro(CollectThreshold, float);
-  vtkBooleanMacro(CollectThreshold, float);
+  // I should really put this in the composite module.
+  void SetCollectThresholdInternal(float threshold);
 
 protected:
   vtkPVCompositeRenderModuleUI();
@@ -107,11 +116,23 @@ protected:
   vtkKWCheckButton *CompositeWithRGBACheck;
   vtkKWCheckButton *CompositeCompressionCheck;
 
-  vtkKWLabel *CollectThresholdLabel;
-  vtkKWScale *CollectThresholdScale;
-  vtkKWLabel *CollectThresholdValue;
+  vtkKWLabel*       CollectLabel;
+  vtkKWCheckButton* CollectCheck;
+  vtkKWScale*       CollectThresholdScale;
+  vtkKWLabel*       CollectThresholdLabel;
+  float             CollectThreshold;
 
-  float CollectThreshold;
+  vtkKWLabel*       ReductionLabel;
+  vtkKWCheckButton* ReductionCheck;
+  vtkKWScale*       ReductionFactorScale;
+  vtkKWLabel*       ReductionFactorLabel;
+  float             ReductionFactor;
+
+  vtkKWLabel*       SquirtLabel;
+  vtkKWCheckButton* SquirtCheck;
+  vtkKWScale*       SquirtLevelScale;      
+  vtkKWLabel*       SquirtLevelLabel;
+  int               SquirtLevel;
 
   int CompositeWithFloatFlag;
   int CompositeWithRGBAFlag;

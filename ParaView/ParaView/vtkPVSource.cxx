@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309.2.4");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.5");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -621,7 +621,7 @@ void vtkPVSource::AddVTKSource(vtkSource *source, const char *tclName)
                 tclName, this->GetTclName());
     
   pvApp->BroadcastScript(
-    "%s AddObserver EndEvent {$Application LogStartEvent {Execute %s}}", 
+    "%s AddObserver StartEvent {$Application LogStartEvent {Execute %s}}", 
     tclName, tclName);
 
   pvApp->BroadcastScript(

@@ -153,10 +153,10 @@ public:
   void GatherZBufferValueRMI(int x, int y);
 
   // Description:
-  // Turn on and off Squirt compression
-  vtkBooleanMacro(UseSquirt, int);
-  vtkSetClampMacro(UseSquirt, int, 0, 1);
-  vtkGetMacro(UseSquirt, int);
+  // Turn on and off Squirt compression.
+  // Level 0 means no compression.
+  vtkSetClampMacro(SquirtLevel, int, 0, 7);
+  vtkGetMacro(SquirtLevel, int);
 
 protected:
   vtkClientCompositeManager();
@@ -198,6 +198,7 @@ protected:
 
   vtkObject *RenderView;
   int ReductionFactor;
+  int InternalReductionFactor;
 
   vtkDataArray *PData;
   vtkFloatArray *ZData;
@@ -205,7 +206,7 @@ protected:
   vtkDataArray *PData2;
   vtkFloatArray *ZData2;
 
-  int SquirtCompression;
+  int SquirtLevel;
   vtkUnsignedCharArray *SquirtArray;
   void SquirtCompress(vtkUnsignedCharArray *in,
                       vtkUnsignedCharArray *out,
@@ -226,10 +227,7 @@ protected:
 
   int UseChar;
   int UseRGB;
-
   int UseCompositing;
-
-  int UseSquirt;
 
 private:
   vtkClientCompositeManager(const vtkClientCompositeManager&); // Not implemented

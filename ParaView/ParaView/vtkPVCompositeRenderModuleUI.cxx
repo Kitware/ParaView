@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.1");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2.2.2");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -69,18 +69,30 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
   
   this->CompositeRenderModule = NULL;
 
-  this->UseReductionFactor = 1;
   this->ParallelRenderParametersFrame = vtkKWLabeledFrame::New();
 
   this->CompositeWithFloatCheck = vtkKWCheckButton::New();
   this->CompositeWithRGBACheck = vtkKWCheckButton::New();
   this->CompositeCompressionCheck = vtkKWCheckButton::New();
 
-  this->CollectThresholdLabel = vtkKWLabel::New();
+  this->CollectLabel = vtkKWLabel::New();
+  this->CollectCheck = vtkKWCheckButton::New();
   this->CollectThresholdScale = vtkKWScale::New();
-  this->CollectThresholdValue = vtkKWLabel::New();
-
+  this->CollectThresholdLabel = vtkKWLabel::New();
   this->CollectThreshold = 20.0;
+
+  this->SquirtLabel = vtkKWLabel::New();
+  this->SquirtCheck = vtkKWCheckButton::New();
+  this->SquirtLevelScale = vtkKWScale::New();
+  this->SquirtLevelLabel = vtkKWLabel::New();
+  this->SquirtLevel = 3;
+
+  this->ReductionLabel = vtkKWLabel::New();
+  this->ReductionCheck = vtkKWCheckButton::New();
+  this->ReductionFactorScale = vtkKWScale::New();
+  this->ReductionFactorLabel = vtkKWLabel::New();
+  this->ReductionFactor = 2;
+
 
   this->CompositeWithFloatFlag = 0;
   this->CompositeWithRGBAFlag = 0;
@@ -95,8 +107,6 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
   vtkPVApplication* pvapp = this->GetPVApplication();
   if (pvapp)
     {
-    pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
-                             this->CollectThreshold);
     pvapp->SetRegisteryValue(2, "RunTime", "RenderInterruptsEnabled", "%d",
                              this->RenderInterruptsEnabled);
     pvapp->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
@@ -105,6 +115,13 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
                              this->CompositeWithRGBAFlag);
     pvapp->SetRegisteryValue(2, "RunTime", "UseCompressionInComposite", "%d",
                              this->CompositeCompressionFlag);
+
+    pvapp->SetRegisteryValue(2, "RunTime", "CollectThreshold", "%f",
+                             this->CollectThreshold);
+    pvapp->SetRegisteryValue(2, "RunTime", "ReductionFactor", "%d",
+                             this->ReductionFactor);
+    pvapp->SetRegisteryValue(2, "RunTime", "SquirtLevel", "%d",
+                             this->SquirtLevel);
     }
 
   this->ParallelRenderParametersFrame->Delete();
@@ -119,12 +136,32 @@ vtkPVCompositeRenderModuleUI::~vtkPVCompositeRenderModuleUI()
   this->CompositeCompressionCheck->Delete();
   this->CompositeCompressionCheck = NULL;
 
-  this->CollectThresholdLabel->Delete();
-  this->CollectThresholdLabel = NULL;
+  this->CollectLabel->Delete();
+  this->CollectLabel = NULL;
+  this->CollectCheck->Delete();
+  this->CollectCheck = NULL;
   this->CollectThresholdScale->Delete();
   this->CollectThresholdScale = NULL;
-  this->CollectThresholdValue->Delete();
-  this->CollectThresholdValue = NULL;
+  this->CollectThresholdLabel->Delete();
+  this->CollectThresholdLabel = NULL;
+
+  this->ReductionLabel->Delete();
+  this->ReductionLabel = NULL;
+  this->ReductionCheck->Delete();
+  this->ReductionCheck = NULL;
+  this->ReductionFactorScale->Delete();
+  this->ReductionFactorScale = NULL;
+  this->ReductionFactorLabel->Delete();
+  this->ReductionFactorLabel = NULL;
+
+  this->SquirtLabel->Delete();
+  this->SquirtLabel = NULL;
+  this->SquirtCheck->Delete();
+  this->SquirtCheck = NULL;
+  this->SquirtLevelScale->Delete();
+  this->SquirtLevelScale = NULL;
+  this->SquirtLevelLabel->Delete();
+  this->SquirtLevelLabel = NULL;
 
   if (this->CompositeRenderModule)
     {
@@ -178,30 +215,20 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
       !pvapp->GetUseRenderingGroup())
     {
     // Determines when geometry is collected to process 0 for rendering.
+    this->CollectLabel->SetParent(this->LODScalesFrame);
+    this->CollectLabel->Create(this->Application, "-anchor w");
+    this->CollectLabel->SetLabel("Collection threshold:");
 
-    this->CollectThresholdLabel->SetParent(this->LODScalesFrame);
-    this->CollectThresholdLabel->Create(this->Application, "-anchor w");
-    this->CollectThresholdLabel->SetLabel("Collection threshold:");
+    this->CollectCheck->SetParent(this->LODScalesFrame);
+    this->CollectCheck->Create(this->Application, "");
+    this->CollectCheck->SetState(1);
+    this->CollectCheck->SetCommand(this, "CollectCheckCallback");
 
     this->CollectThresholdScale->SetParent(this->LODScalesFrame);
     this->CollectThresholdScale->Create(this->Application,
                                         "-orient horizontal");
-    this->CollectThresholdScale->SetRange(0.0, 100.0);
+    this->CollectThresholdScale->SetRange(0.1, 100.0);
     this->CollectThresholdScale->SetResolution(0.1);
-
-    this->CollectThresholdValue->SetParent(this->LODScalesFrame);
-    this->CollectThresholdValue->Create(this->Application, "-anchor w");
-    if (pvapp &&
-        pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
-      {
-      this->SetCollectThreshold(
-        pvapp->GetFloatRegisteryValue(2, "RunTime", "CollectThreshold"));
-      }
-    else
-      {
-      this->SetCollectThreshold(this->CollectThreshold);
-      }
-
     this->CollectThresholdScale->SetValue(this->CollectThreshold);
     this->CollectThresholdScale->SetCommand(this, 
                                             "CollectThresholdScaleCallback");
@@ -212,12 +239,135 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
       "Left: Always leave models distributed. Right: Move even large models "
       "to process 0.");    
 
-    pvapp->Script("grid %s -row %d -column 1 -sticky news", 
-                  this->CollectThresholdValue->GetWidgetName(), row++);
+    this->CollectThresholdLabel->SetParent(this->LODScalesFrame);
+    this->CollectThresholdLabel->Create(this->Application, "-anchor w");
+    if (pvapp &&
+        pvapp->GetRegisteryValue(2, "RunTime", "CollectThreshold", 0))
+      {
+      this->CollectThreshold = 
+        pvapp->GetFloatRegisteryValue(2, "RunTime", "CollectThreshold");
+      }
+
+    // Force the set.
+    float tmp = this->CollectThreshold;
+    this->CollectThreshold = -1.0;
+    this->SetCollectThreshold(tmp);
+
+    pvapp->Script("grid %s -row %d -column 2 -sticky nws", 
+                  this->CollectThresholdLabel->GetWidgetName(), row++);
     pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
-                  this->CollectThresholdLabel->GetWidgetName(), row);
-    pvapp->Script("grid %s -row %d -column 1 -sticky news", 
+                  this->CollectLabel->GetWidgetName(), row);
+    pvapp->Script("grid %s -row %d -column 1 -sticky nes", 
+                  this->CollectCheck->GetWidgetName(), row);
+    pvapp->Script("grid %s -row %d -column 2 -sticky news", 
                   this->CollectThresholdScale->GetWidgetName(), row++);
+
+    pvapp->Script("grid columnconfigure %s 2 -weight 1",
+                  this->CollectThresholdScale->GetParent()->GetWidgetName());
+
+
+    // Determines which reduction/subsampling factor to use.
+    this->ReductionLabel->SetParent(this->LODScalesFrame);
+    this->ReductionLabel->Create(this->Application, "-anchor w");
+    this->ReductionLabel->SetLabel("Subsample Rate:");
+
+    this->ReductionCheck->SetParent(this->LODScalesFrame);
+    this->ReductionCheck->Create(this->Application, "");
+    this->ReductionCheck->SetState(1);
+    this->ReductionCheck->SetCommand(this, "ReductionCheckCallback");
+
+    this->ReductionFactorScale->SetParent(this->LODScalesFrame);
+    this->ReductionFactorScale->Create(this->Application,
+                                        "-orient horizontal");
+    this->ReductionFactorScale->SetRange(2, 5);
+    this->ReductionFactorScale->SetResolution(1);
+    this->ReductionFactorScale->SetValue(this->ReductionFactor);
+    this->ReductionFactorScale->SetCommand(this, 
+                                            "ReductionFactorScaleCallback");
+    this->ReductionFactorScale->SetBalloonHelpString(
+             "Subsampling is a compositing LOD technique. "
+             "Subsampling will use larger pixels during interaction.");
+
+    this->ReductionFactorLabel->SetParent(this->LODScalesFrame);
+    this->ReductionFactorLabel->SetLabel("2 Pixels");
+    this->ReductionFactorLabel->Create(this->Application, "-anchor w");
+    if (pvapp &&
+        pvapp->GetRegisteryValue(2, "RunTime", "ReductionFactor", 0))
+      {
+      this->SetReductionFactor(
+        pvapp->GetFloatRegisteryValue(2, "RunTime", "ReductionFactor"));
+      }
+    else
+      {
+      this->SetReductionFactor(this->ReductionFactor);
+      }
+
+    pvapp->Script("grid %s -row %d -column 2 -sticky nws", 
+                  this->ReductionFactorLabel->GetWidgetName(), row++);
+    pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
+                  this->ReductionLabel->GetWidgetName(), row);
+    pvapp->Script("grid %s -row %d -column 1 -sticky nes", 
+                  this->ReductionCheck->GetWidgetName(), row);
+    pvapp->Script("grid %s -row %d -column 2 -sticky news", 
+                  this->ReductionFactorScale->GetWidgetName(), row++);
+
+
+    // Determines whether to squirt and what compression level.
+    this->SquirtLabel->SetParent(this->LODScalesFrame);
+    this->SquirtLabel->Create(this->Application, "-anchor w");
+    this->SquirtLabel->SetLabel("Squirt Compression:");
+
+    this->SquirtCheck->SetParent(this->LODScalesFrame);
+    this->SquirtCheck->Create(this->Application, "");
+    this->SquirtCheck->SetState(1);
+    this->SquirtCheck->SetCommand(this, "SquirtCheckCallback");
+
+    this->SquirtLevelScale->SetParent(this->LODScalesFrame);
+    this->SquirtLevelScale->Create(this->Application,
+                                        "-orient horizontal");
+    this->SquirtLevelScale->SetRange(1, 6);
+    this->SquirtLevelScale->SetResolution(1);
+    this->SquirtLevelScale->SetValue(this->SquirtLevel);
+    this->SquirtLevelScale->SetCommand(this, 
+                                            "SquirtLevelScaleCallback");
+
+    this->SquirtLevelLabel->SetParent(this->LODScalesFrame);
+    this->SquirtLevelLabel->Create(this->Application, "-anchor w");
+    if (pvapp &&
+        pvapp->GetRegisteryValue(2, "RunTime", "SquirtLevel", 0))
+      {
+      this->SquirtLevel = 
+        pvapp->GetFloatRegisteryValue(2, "RunTime", "SquirtLevel");
+      }
+
+    if (pvapp->GetClientMode() && ! pvapp->GetUseTiledDisplay())
+      {
+      this->SquirtLevelScale->SetBalloonHelpString(
+        "Squirt is a combinination of runlength encoding and bit compression.");
+      pvapp->Script("grid %s -row %d -column 2 -sticky nws", 
+                    this->SquirtLevelLabel->GetWidgetName(), row++);
+      pvapp->Script("grid %s -row %d -column 0 -sticky nws", 
+                    this->SquirtLabel->GetWidgetName(), row);
+      pvapp->Script("grid %s -row %d -column 1 -sticky nes", 
+                    this->SquirtCheck->GetWidgetName(), row);
+      pvapp->Script("grid %s -row %d -column 2 -sticky news", 
+                    this->SquirtLevelScale->GetWidgetName(), row++);
+      // Force initialize.
+      int tmp = this->SquirtLevel;
+      this->SquirtLevel = -1;
+      this->SetSquirtLevel(tmp);
+      }
+    else
+      {
+      this->SquirtLevelScale->SetBalloonHelpString(
+        "Squirt only an option when running client server mode."
+        "Squirt is not used for tiled displays");
+      this->SquirtCheck->SetState(0);
+      this->SquirtLabel->EnabledOff();
+      this->SquirtCheck->EnabledOff();
+      this->SquirtLevelScale->EnabledOff();
+      this->SquirtLevelLabel->EnabledOff();
+      }
     }
   // Parallel rendering parameters
   // Conditional interface should really be part of a module !!!!!!
@@ -294,7 +444,6 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
                  this->CompositeWithRGBACheck->GetWidgetName(),
                  this->CompositeCompressionCheck->GetWidgetName());
     }
-
 }
 
 
@@ -304,42 +453,79 @@ void vtkPVCompositeRenderModuleUI::CollectThresholdScaleCallback()
 {
   float threshold = this->CollectThresholdScale->GetValue();
 
-  // Use internal method so we do not reset the slider.
-  // I do not know if it would cause a problem, but ...
-  this->SetCollectThresholdInternal(threshold);
+  if (threshold == 0.0)
+    {
+    threshold = 0.1;
+    }
+  this->SetCollectThreshold(threshold);
+}
 
-  vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
-  this->AddTraceEntry("$kw(%s) SetCollectThreshold %f",
-                      this->GetTclName(), threshold);
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::CollectCheckCallback()
+{
+  int val = this->CollectCheck->GetState();
+
+  if (val == 0)
+    {
+    this->SetCollectThreshold(0.0);
+    }
+  else
+    {
+    float threshold = this->CollectThresholdScale->GetValue();
+    if (threshold == 0.0)
+      {
+      threshold = 1.0;
+      }
+    this->SetCollectThreshold(threshold);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::SetCollectThreshold(float threshold)
 {
-  this->CollectThresholdScale->SetValue(threshold);
+  if (this->CollectThreshold == threshold)
+    {
+    return;
+    }
+
+  if (threshold == 0.0)
+    {
+    this->CollectCheck->SetState(0);
+    this->CollectThresholdScale->EnabledOff();
+    this->CollectThresholdLabel->EnabledOff();
+    this->CollectThresholdLabel->SetLabel("0 MBytes");
+    }
+  else
+    {
+    char str[256];
+    this->CollectCheck->SetState(1);
+    this->CollectThresholdScale->EnabledOn();
+    this->CollectThresholdLabel->EnabledOn();
+    this->CollectThresholdScale->SetValue(threshold);
+    sprintf(str, "%.1f MBytes", threshold);
+    this->CollectThresholdLabel->SetLabel(str);
+    }
+
+  this->CollectThreshold = threshold;
+
 
   this->SetCollectThresholdInternal(threshold);
-
   vtkTimerLog::FormatAndMarkEvent("--- Change LOD Threshold %f.", threshold);
   this->AddTraceEntry("$kw(%s) SetCollectThreshold %f",
                       this->GetTclName(), threshold);
 }
 
 //----------------------------------------------------------------------------
+// Eliminate this method ...........!!!!!!!!!!!!!!
 void vtkPVCompositeRenderModuleUI::SetCollectThresholdInternal(float threshold)
 {
-  char str[256];
-
-  sprintf(str, "%.1f MBytes", threshold);
-  this->CollectThresholdValue->SetLabel(str);
-
-  this->CollectThreshold = threshold;
-
   // This will cause collection to be re evaluated.
   this->CompositeRenderModule->SetTotalVisibleMemorySizeValid(0);
   this->CompositeRenderModule->SetCollectThreshold(threshold);
-
 }
+
+
+
 
 
 //----------------------------------------------------------------------------
@@ -461,12 +647,153 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
 
 
 
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::SquirtLevelScaleCallback()
+{
+  int val = this->SquirtLevelScale->GetValue();
+  this->SetSquirtLevel(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::SquirtCheckCallback()
+{
+  int val = this->SquirtCheck->GetState();
+  if (val)
+    {
+    val = this->SquirtLevelScale->GetValue();
+    }
+  this->SetSquirtLevel(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::SetSquirtLevel(int level)
+{
+  if (this->SquirtLevel == level)
+    {
+    return;
+    }
+
+  this->AddTraceEntry("$kw(%s) SetSquirtLevel %d", 
+                      this->GetTclName(), level);
+  this->SquirtLevel = level;
+
+  if (level == 0)
+    {
+    this->SquirtLevelScale->EnabledOff();
+    this->SquirtLevelLabel->EnabledOff();
+    this->SquirtCheck->SetState(0);
+    this->SquirtLevelLabel->SetLabel("24 Bits-disabled");
+    vtkTimerLog::MarkEvent("--- Squirt disabled.");
+    }
+  else
+    {
+    this->SquirtLevelScale->EnabledOn();
+    this->SquirtLevelLabel->EnabledOn();
+    this->SquirtLevelScale->SetValue(level);
+    this->SquirtCheck->SetState(1);
+    switch(level)
+      {
+      case 1:
+        this->SquirtLevelLabel->SetLabel("24 Bits");
+        break;
+      case 2:
+        this->SquirtLevelLabel->SetLabel("22 Bits");
+        break;
+      case 3:
+        this->SquirtLevelLabel->SetLabel("19 Bits");
+        break;
+      case 4:
+        this->SquirtLevelLabel->SetLabel("16 Bits");
+        break;
+      case 5:
+        this->SquirtLevelLabel->SetLabel("13 Bits");
+        break;
+      case 6:
+        this->SquirtLevelLabel->SetLabel("10 Bits");
+        break;
+      }
+
+    vtkTimerLog::FormatAndMarkEvent("--- Squirt level %d.", level);
+    }
+ 
+  if (this->CompositeRenderModule)
+    {
+    this->CompositeRenderModule->SetSquirtLevel(level);
+    }
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::ReductionFactorScaleCallback()
+{
+  int val = this->ReductionFactorScale->GetValue();
+  this->SetReductionFactor(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::ReductionCheckCallback()
+{
+  int val = this->ReductionCheck->GetState();
+  if (val)
+    {
+    val = this->ReductionFactorScale->GetValue();
+    }
+  else
+    { // value of 1 is disabled.
+    val = 1;
+    }
+  this->SetReductionFactor(val);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::SetReductionFactor(int factor)
+{
+  if (this->ReductionFactor == factor)
+    {
+    return;
+    }
+
+  this->AddTraceEntry("$kw(%s) SetReductionFactor %d", 
+                      this->GetTclName(), factor);
+  this->ReductionFactor = factor;
+
+  if (factor == 1)
+    {
+    this->ReductionFactorScale->EnabledOff();
+    this->ReductionFactorLabel->EnabledOff();
+    this->ReductionCheck->SetState(0);
+    vtkTimerLog::MarkEvent("--- Reduction disabled.");
+    }
+  else
+    {
+    this->ReductionFactorScale->EnabledOn();
+    this->ReductionFactorLabel->EnabledOn();
+    this->ReductionFactorScale->SetValue(factor);
+    this->ReductionCheck->SetState(1);
+    vtkTimerLog::FormatAndMarkEvent("--- Reduction factor %d.", factor);
+    }
+  char str[128];
+  sprintf(str, "%d Pixels", factor);
+  this->ReductionFactorLabel->SetLabel(str); 
+
+
+  if (this->CompositeRenderModule)
+    {
+    this->CompositeRenderModule->SetReductionFactor(factor);
+    }
+}
+
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
+  os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
+  os << indent << "SquirtLevel: " << this->SquirtLevel << endl;
 
   os << indent << "CompositeWithFloatFlag: " 
      << this->CompositeWithFloatFlag << endl;

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModule);
-vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.4.2.1");
+vtkCxxRevisionMacro(vtkPVLODRenderModule, "1.4.2.2");
 
 //int vtkPVLODRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -118,7 +118,11 @@ void vtkPVLODRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVLODRenderModule::CreatePartDisplay()
 {
-  return vtkPVLODPartDisplay::New();
+  vtkPVLODPartDisplay* pDisp;
+
+  pDisp = vtkPVLODPartDisplay::New();
+  pDisp->SetLODResolution(this->LODResolution);
+  return pDisp;
 }
 
 //----------------------------------------------------------------------------

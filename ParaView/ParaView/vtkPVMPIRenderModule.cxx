@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.3.2.1");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.3.2.2");
 
 
 
@@ -64,9 +64,7 @@ vtkPVMPIRenderModule::vtkPVMPIRenderModule()
 //----------------------------------------------------------------------------
 vtkPVMPIRenderModule::~vtkPVMPIRenderModule()
 {
-
 }
-
 
 
 //----------------------------------------------------------------------------

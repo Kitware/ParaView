@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.4");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.4.2.1");
 
 
 
@@ -78,6 +78,7 @@ vtkPVLODPartDisplay::vtkPVLODPartDisplay()
 
   this->Information = vtkPVLODPartDisplayInformation::New();
   this->InformationIsValid = 0;
+  this->LODResolution = 50;
 }
 
 //----------------------------------------------------------------------------
@@ -166,6 +167,11 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
   // This should be changed to origin and spacing determined globally.
+
+  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
+                         this->LODDeciTclName, this->LODResolution, 
+                         this->LODResolution, this->LODResolution);
+
 
   // ===== LOD branch:
   sprintf(tclName, "LODUpdateSuppressor%d", this->InstanceCount);
@@ -273,9 +279,18 @@ void vtkPVLODPartDisplay::SetUseImmediateMode(int val)
 //----------------------------------------------------------------------------
 void vtkPVLODPartDisplay::SetLODResolution(int res)
 {
+  if (res == this->LODResolution)
+    {
+    return;
+    }
+  this->LODResolution = res;
+
   vtkPVApplication* pvApp = this->GetPVApplication();
-  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
-                         this->LODDeciTclName, res, res, res);
+  if (pvApp)
+    {
+    pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
+                           this->LODDeciTclName, res, res, res);
+    }
   this->InvalidateGeometry();
 }
 
@@ -299,9 +314,12 @@ void vtkPVLODPartDisplay::Update()
 //----------------------------------------------------------------------------
 void vtkPVLODPartDisplay::RemoveAllCaches()
 {
-  this->GetPVApplication()->BroadcastScript(
+  if (this->PVApplication)
+    {
+    this->GetPVApplication()->BroadcastScript(
              "%s RemoveAllCaches; %s RemoveAllCaches",
              this->UpdateSuppressorTclName, this->LODUpdateSuppressorTclName);
+    }
 }
 
 
@@ -350,6 +368,8 @@ void vtkPVLODPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "LODMapperTclName: " << (this->LODMapperTclName?this->LODMapperTclName:"none") << endl;
   os << indent << "LODDeciTclName: " << (this->LODDeciTclName?this->LODDeciTclName:"none") << endl;
+
+  os << indent << "LODResolution: " << this->LODResolution << endl;
 
   if (this->LODUpdateSuppressorTclName)
     {

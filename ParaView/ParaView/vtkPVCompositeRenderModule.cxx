@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.1");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.6.2.2");
 
 
 
@@ -76,7 +76,7 @@ vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
   this->CollectionDecision = 1;
   this->LODCollectionDecision = 1;
 
-  this->UseReductionFactor = 1;
+  this->ReductionFactor = 2;
 }
 
 //----------------------------------------------------------------------------
@@ -108,7 +108,11 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVCompositeRenderModule::CreatePartDisplay()
 {
-  return vtkPVCompositePartDisplay::New();
+  vtkPVLODPartDisplay* pDisp;
+
+  pDisp = vtkPVCompositePartDisplay::New();
+  pDisp->SetLODResolution(this->LODResolution);
+  return pDisp;
 }
 
 
@@ -152,6 +156,12 @@ void vtkPVCompositeRenderModule::StillRender()
       pDisp->SetCollectionDecision(localRender);
       pDisp->Update();
       }
+    }
+  // No reduction for still render.
+  if (this->PVApplication && this->CompositeTclName)
+    {
+    this->PVApplication->Script("%s SetReductionFactor 1",
+                                this->CompositeTclName);
     }
 
   // Switch the compositer to local/composite mode.
@@ -282,7 +292,7 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
 
   // Compute reduction factor. 
-  if (this->Composite && ! localRender)
+  if (this->CompositeTclName && ! localRender)
     {
     this->ComputeReductionFactor();
     }
@@ -302,6 +312,21 @@ void vtkPVCompositeRenderModule::InteractiveRender()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModule::SetSquirtLevel(int val)
+{
+  if (this->PVApplication == NULL)
+    {
+    vtkErrorMacro("Do not change squirt compression before application is set.");
+    return;
+    }
+  if (this->CompositeTclName == NULL)
+    {
+    vtkErrorMacro("Do not change squirt compression before composite manager is set.");
+    return;
+    }
+  this->PVApplication->Script("%s SetSquirtLevel %d", this->CompositeTclName, val);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModule::ComputeReductionFactor()
@@ -314,46 +339,49 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
   float newReductionFactor;
   float maxReductionFactor;
   
-  // Tiled displays do not use pixel reduction LOD.
-  // This is not necessary because to caller already checks,
-  // but it clarifies the situation.
-  if (this->Composite == NULL)
+  newReductionFactor = 1;
+  if (this->ReductionFactor > 1)
     {
-    return;
-    }
+    // We have to come up with a more consistent way to compute reduction.
+    newReductionFactor = this->ReductionFactor;
+    if (this->Composite)
+      {
+      // Leave halve time for compositing.
+      renderTime = renderTime * 0.5;
+      // Try to factor in user preference.
+      renderTime = renderTime / (float)(this->ReductionFactor);
+      // Compute time for each pixel on the last render.
+      area = windowSize[0] * windowSize[1];
+      reductionFactor = this->Composite->GetReductionFactor();
+      reducedArea = area / (reductionFactor * reductionFactor);
+      getBuffersTime = this->Composite->GetGetBuffersTime();
+      setBuffersTime = this->Composite->GetSetBuffersTime();
+      transmitTime = this->Composite->GetCompositeTime();
 
-  if (!this->UseReductionFactor)
-    {
-    this->Composite->SetReductionFactor(1);
-    return;
-    }
+      // Do not consider SetBufferTime because 
+      //it is not dependent on reduction factor.,
+      timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
+      newReductionFactor = sqrt(area * timePerPixel / renderTime);
   
-  // Do not let the width go below 150.
-  maxReductionFactor = windowSize[0] / 150.0;
-
-  renderTime *= 0.5;
-  area = windowSize[0] * windowSize[1];
-  reductionFactor = this->Composite->GetReductionFactor();
-  reducedArea = area / (reductionFactor * reductionFactor);
-  getBuffersTime = this->Composite->GetGetBuffersTime();
-  setBuffersTime = this->Composite->GetSetBuffersTime();
-  transmitTime = this->Composite->GetCompositeTime();
-
-  // Do not consider SetBufferTime because 
-  //it is not dependent on reduction factor.,
-  timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
-  newReductionFactor = sqrt(area * timePerPixel / renderTime);
-  
-  if (newReductionFactor > maxReductionFactor)
-    {
-    newReductionFactor = maxReductionFactor;
+      // Do not let the width go below 150.
+      maxReductionFactor = windowSize[0] / 150.0;
+      if (newReductionFactor > maxReductionFactor)
+        {
+        newReductionFactor = maxReductionFactor;
+        }
+      if (newReductionFactor < 1.0)
+        {
+        newReductionFactor = 1.0;
+        }
+      }
     }
-  if (newReductionFactor < 1.0)
+  //this->Composite->SetReductionFactor((int)newReductionFactor);
+  if (this->PVApplication && this->CompositeTclName)
     {
-    newReductionFactor = 1.0;
+    this->PVApplication->Script("%s SetReductionFactor %d",
+                                this->CompositeTclName, 
+                                (int)(newReductionFactor));
     }
-  
-  this->Composite->SetReductionFactor((int)newReductionFactor);
 }
 
 
@@ -537,7 +565,6 @@ void vtkPVCompositeRenderModule::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
 
-  os << indent << "UseReductionFactor: " << this->UseReductionFactor << endl;
   if (this->CompositeTclName)
     {
     os << indent << "CompositeTclName: " << this->CompositeTclName << endl;
@@ -547,5 +574,7 @@ void vtkPVCompositeRenderModule::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetInteractiveCompositeTime() << endl;
   os << indent << "StillCompositeTime: " 
      << this->GetStillCompositeTime() << endl;
+
+  os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
 }
 

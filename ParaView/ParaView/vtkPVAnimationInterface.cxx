@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.3");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.4");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1156,9 +1156,9 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   fileName = new char[strlen(fileRoot) + strlen(ext) + 25];      
 
   // Loop through all of the time steps.
-  t = this->GetGlobalStart();
+  t = 0;
   fileCount = 0;
-  while (t < this->GetGlobalEnd())
+  while (t < this->NumberOfFrames)
     {
     this->SetCurrentTime(t);
     this->View->EventuallyRender();
@@ -1285,9 +1285,9 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
   fileName = new char[strlen(fileRoot) + 30];      
 
   // Loop through all of the time steps.
-  t = this->GetGlobalStart();
+  t = 0;
   timeCount = 0;
-  while (t < this->GetGlobalEnd())
+  while (t < this->NumberOfFrames)
     {
     this->SetCurrentTime(t);
     this->View->EventuallyRender();
