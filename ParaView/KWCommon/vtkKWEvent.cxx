@@ -141,6 +141,7 @@ static const char *vtkKWEventStrings[] = {
   "ProbeInformationOffEvent",
   "ProjectionTypeChangedEvent",
   "RenderEvent",
+  "RenderWidgetInSelectionFrameChangedEvent",
   "RightMouseOptionChangedEvent",
   "ScalarColorFunctionChangedEvent",
   "ScalarColorFunctionPresetApplyEvent",

@@ -150,6 +150,7 @@ class VTK_EXPORT vtkKWEvent
     ProbeInformationOffEvent,
     ProjectionTypeChangedEvent,
     RenderEvent,
+    RenderWidgetInSelectionFrameChangedEvent,
     RightMouseOptionChangedEvent,
     ScalarColorFunctionChangedEvent,
     ScalarColorFunctionPresetApplyEvent,
