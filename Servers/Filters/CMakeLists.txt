@@ -89,14 +89,14 @@ IF (PARAVIEW_USE_ICE_T)
     #vtkIceTComposite.cxx
     vtkIceTFactory.cxx
     vtkDesktopDeliveryServer.cxx
-    vtkIceTClientCompositeManager.cxx
-    vtkIceTRenderer.cxx
     vtkDesktopDeliveryClient.cxx
     )
   IF(VTK_USE_MPI)
     SET(Filters_SRCS 
       ${Filters_SRCS}
+      vtkIceTClientCompositeManager.cxx
       vtkIceTRenderManager.cxx
+      vtkIceTRenderer.cxx
       )
   ENDIF(VTK_USE_MPI)
   SET_SOURCE_FILES_PROPERTIES(
