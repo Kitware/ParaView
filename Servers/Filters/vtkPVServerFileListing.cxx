@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerFileListing);
-vtkCxxRevisionMacro(vtkPVServerFileListing, "1.1");
+vtkCxxRevisionMacro(vtkPVServerFileListing, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkPVServerFileListingInternals
@@ -123,12 +123,23 @@ void vtkPVServerFileListing::List(const char* dirname, int save)
   pattern += "*";
   WIN32_FIND_DATA data;
   HANDLE handle = FindFirstFile(pattern.c_str(), &data);
-  if(!handle)
-    {
+  if(handle == INVALID_HANDLE_VALUE)
+    { 
+    LPVOID lpMsgBuf;
+    FormatMessage( 
+      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+      NULL,
+      GetLastError(),
+      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+      (LPTSTR) &lpMsgBuf,
+      0,
+      NULL 
+      );
     // Could add check of GetLastError here.
+    vtkErrorMacro("Error calling FindFirstFile : " << (char*)lpMsgBuf << "\nDirectory: " << pattern.c_str());
+    LocalFree( lpMsgBuf );
     return;
     }
-
   int done = 0;
   while(!done)
     {
@@ -166,8 +177,7 @@ void vtkPVServerFileListing::List(const char* dirname, int save)
       0,
       NULL 
       );
-    // Could add check of GetLastError here.
-    vtkErrorMacro("Error calling FindNextFile : " << (char*)lpMsgBuf);
+    vtkErrorMacro("Error calling FindNextFile : " << (char*)lpMsgBuf << "\nDirectory: " << dirname);
     LocalFree( lpMsgBuf );
     }
 
