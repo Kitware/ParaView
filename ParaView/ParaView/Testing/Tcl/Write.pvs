@@ -8,8 +8,19 @@ if {[info exists argc]} {
     }
 } 
 
+# Disable popup message dialogs.
+set kw(vtkTemp1) [Application GetMainWindow]
+$kw(vtkTemp1) SetUseMessageDialog 0
+
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+
+# Choose the file name/type based on whether we are in parallel mode.
+set kw(vtkTemp1000) [Application GetController]
+set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
+
+set ext "vtk"
+if {$nprocs > 1} { set ext "pvtk" }
 
 $pvWindow Open "$DataDir/Data/blow.vtk"
 if { [catch {
@@ -17,10 +28,10 @@ if { [catch {
   $pvWindow ShowAnimationProperties
   $pvWindow ShowCurrentSourceProperties
   $pvWindow EnableMenus
-  $pvWindow WriteVTKFile vtkParaViewWriteTest.vtk
-  $pvWindow WritePVTKFile vtkParaViewWriteTestGhost.vtk 3
-  file delete -force vtkParaViewWriteTest.vtk
-  file delete -force vtkParaViewWriteTestGhost.vtk
+  $pvWindow WriteVTKFile vtkParaViewWriteTest.$ext
+  $pvWindow WriteVTKFile vtkParaViewWriteTestGhost.$ext 3
+  file delete -force vtkParaViewWriteTest.$ext
+  file delete -force vtkParaViewWriteTestGhost.$ext
   $pvWindow SaveInTclScript vtkParaViewWriteTest.tcl 1 1
   file delete -force vtkParaViewWriteTest.tcl
 } res ] != 0 } {
