@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.9");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.10");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -413,7 +413,7 @@ void vtkPVSourceNotebook::SetAutoAccept(int val)
     {
     this->AcceptButton->SetText("Auto Accept");
     // Just in case the source is already modified.
-    this->AcceptButtonCallback();
+    this->SetAcceptButtonColorToModified();
     }
   else
     {
@@ -458,10 +458,11 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToModified()
     {
     return;
     }
-  this->AcceptButtonRed = 1;
   if ( this->PVSource 
    && !this->PVSource->GetOverideAutoAccept())
     {
+    // Needs to be here for icons toolbar to work
+    this->AcceptButtonRed = 1;
     if (this->AutoAccept == 1)
       {
       this->EventuallyAccept();
@@ -473,9 +474,7 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToModified()
       return;
       }
     }
-  else
-    {
-    }
+
   if ( this->GetPVApplication()->GetMainWindow()->GetInDemo() )
     {
     return;
