@@ -33,7 +33,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkM2NDuplicate, "1.1");
+vtkCxxRevisionMacro(vtkM2NDuplicate, "1.2");
 vtkStandardNewMacro(vtkM2NDuplicate);
 
 vtkCxxSetObjectMacro(vtkM2NDuplicate,MPIMToNSocketConnection, vtkMPIMToNSocketConnection);
@@ -52,6 +52,7 @@ vtkM2NDuplicate::vtkM2NDuplicate()
 //-----------------------------------------------------------------------------
 vtkM2NDuplicate::~vtkM2NDuplicate()
 {
+  this->SetMPIMToNSocketConnection(0);
 }
 
 
