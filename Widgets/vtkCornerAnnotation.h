@@ -25,10 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWCornerAnnotation - simple annotation for a data set.
+// .NAME vtkCornerAnnotation - text annotation in four corners
 // .SECTION Description
-// A property class used for annotation of a data set. Provides simple
-// functionality such as a bounding box, scalar bar, and labeled axes.
+// This is an annotation object that manages four text actors / mappers
+// to provide annotation in the four corners of a viewport
 //
 // .SECTION See Also
 // vtkActor2D vtkTextMapper

@@ -25,10 +25,11 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWCornerAnnotation - simple annotation for a data set.
+// .NAME vtkKWCornerAnnotation - a corner annotation widget
 // .SECTION Description
-// A property class used for annotation of a data set. Provides simple
-// functionality such as a bounding box, scalar bar, and labeled axes.
+// A class that provides a UI for vtkCornerAnnotation. User can set the
+// text for each corner, set the color of the text, and turn the annotation
+// on and off.
 
 #ifndef __vtkKWCornerAnnotation_h
 #define __vtkKWCornerAnnotation_h

@@ -25,10 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkKWLabel - check button widget
+// .NAME vtkKWLabel - label widget
 // .SECTION Description
-// A simple widget that represents a check button. It can be modified 
-// and queried using the GetState and SetState methods.
+// A simple widget that represents a label. The label can be set with 
+// the SetLabel method.
 
 #ifndef __vtkKWLabel_h
 #define __vtkKWLabel_h
