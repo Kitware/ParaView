@@ -83,7 +83,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.288");
+vtkCxxRevisionMacro(vtkPVData, "1.289");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2696,9 +2696,9 @@ void vtkPVData::MapScalarsCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::SetMapScalarsFlag(int val)
 {
+  this->AddTraceEntry("$kw(%s) SetMapScalarsFlag %d", this->GetTclName(), val);
   if (this->MapScalarsCheck->GetState() != val)
     {
-    this->AddTraceEntry("$kw(%s) SetMapScalarsFlag %d", this->GetTclName(), val);
     this->MapScalarsCheck->SetState(val);
     }
 
@@ -2734,9 +2734,9 @@ void vtkPVData::InterpolateColorsCheckCallback()
 //----------------------------------------------------------------------------
 void vtkPVData::SetInterpolateColorsFlag(int val)
 {
+  this->AddTraceEntry("$kw(%s) SetInterpolateColorsFlag %d", this->GetTclName(), val);
   if (this->InterpolateColorsCheck->GetState() != val)
     {
-    this->AddTraceEntry("$kw(%s) SetInterpolateColorsFlag %d", this->GetTclName(), val);
     this->InterpolateColorsCheck->SetState(val);
     }
 
@@ -3075,6 +3075,10 @@ void vtkPVData::SaveState(ofstream *file)
       }
     }
 
+  *file << "$kw(" << this->GetTclName() << ") SetMapScalarsFlag " 
+        << this->MapScalarsCheck->GetState() << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetInterpolateColorsFlag " 
+        << this->InterpolateColorsCheck->GetState() << endl;
 
   if (strcmp(this->RepresentationMenu->GetValue(), VTK_PV_OUTLINE_LABEL) == 0)
     {
