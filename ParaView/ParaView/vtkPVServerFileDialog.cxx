@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.9");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.10");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -911,11 +911,14 @@ void vtkPVServerFileDialog::Update()
   if(!(this->GetPVApplication()->GetProcessModule()
        ->GetDirectoryListing(this->LastPath, dirs, files)))
     {
+    // Directory did not exist, use current directory instead.
     vtkErrorMacro("Cannot open directory: " << this->LastPath);
     this->GetPVApplication()->GetProcessModule()->RootScript("pwd");
     char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
     this->SetLastPath(result);
     delete [] result;
+    
+    // We will now succeed.
     this->GetPVApplication()->GetProcessModule()
       ->GetDirectoryListing(this->LastPath, dirs, files);
     }
@@ -1115,7 +1118,15 @@ void vtkPVServerFileDialog::CalculateBBox(vtkKWWidget* canvas,
   const char *result;
   // Get the bounding box for the name. We may need to highlight it.
   result = this->Script("%s bbox %s", canvas->GetWidgetName(), name);
-  sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
+  if(sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3) < 4)
+    {
+    // There are no objects in the canvas.  Create a fake bounding
+    // box.
+    bbox[0] = 0;
+    bbox[1] = 0;
+    bbox[2] = 1;
+    bbox[3] = 1;
+    }
 }
 
 
