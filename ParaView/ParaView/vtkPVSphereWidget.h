@@ -39,28 +39,35 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVSphereWidget - A widget to manipulate an implicit sphere.
+// .NAME vtkPVSphereWidget - A widget to manipulate an implicit plane.
 // .SECTION Description
-// This widget creates and manages its own vtkSphere on each process.
-// I could not descide whether to include the bounds display or not. (I did not.) 
+// This widget creates and manages its own vtkPlane on each process.
+// I could not descide whether to include the bounds display or not. 
+// (I did not.) 
 
 
 #ifndef __vtkPVSphereWidget_h
 #define __vtkPVSphereWidget_h
 
-#include "vtkPVObjectWidget.h"
+#include "vtkPV3DWidget.h"
 
 class vtkPVSource;
-class vtkPVVectorEntry;
+class vtkKWEntry;
+class vtkKWPushButton;
+class vtkKWWidget;
+class vtkKWLabel;
 
-class VTK_EXPORT vtkPVSphereWidget : public vtkPVObjectWidget
+class VTK_EXPORT vtkPVSphereWidget : public vtkPV3DWidget
 {
 public:
   static vtkPVSphereWidget* New();
-  vtkTypeMacro(vtkPVSphereWidget, vtkPVObjectWidget);
+  vtkTypeMacro(vtkPVSphereWidget, vtkPV3DWidget);
+
   void PrintSelf(ostream& os, vtkIndent indent);
     
-  virtual void Create(vtkKWApplication *app);
+  // Description:
+  // Callback that set the center to the middle of the bounds.
+  void CenterResetCallback();
 
   // Description:
   // Called when the PVSources reset button is called.
@@ -72,13 +79,8 @@ public:
   virtual void Accept();
 
   // Description:
-  // The Tcl name of the VTK implicit sphere.
+  // The Tcl name of the VTK implicit plane.
   vtkGetStringMacro(SphereTclName);
-
-  // Description:
-  // Access to the widgets is required for tracing and scripting.
-  vtkGetObjectMacro(CenterEntry, vtkPVVectorEntry);
-  vtkGetObjectMacro(RadiusEntry, vtkPVVectorEntry);
 
   // Description:
   // For saving the widget into a VTK tcl script.
@@ -94,22 +96,40 @@ public:
 				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
+  void SetCenter();
+  void SetCenter(float,float,float);
+  void SetRadius();
+  void SetRadius(float);
+
 protected:
   vtkPVSphereWidget();
   ~vtkPVSphereWidget();
 
-  vtkPVVectorEntry *CenterEntry;
+  // Description:
+  // Call creation on the child.
+  virtual void ChildCreate(vtkPVApplication*);
 
-  vtkPVVectorEntry *RadiusEntry;
+  // Description:
+  // Execute event of the 3D Widget.
+  virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
+
+  vtkKWEntry *CenterEntry[3];
+  vtkKWEntry *RadiusEntry;
+  vtkKWPushButton *CenterResetButton;
+
+  vtkKWLabel* Labels[2];
+  vtkKWLabel* CoordinateLabel[3];
 
   char *SphereTclName;
   vtkSetStringMacro(SphereTclName);
 
-  vtkPVSphereWidget(const vtkPVSphereWidget&); // Not implemented
-  void operator=(const vtkPVSphereWidget&); // Not implemented
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+private:
+  vtkPVSphereWidget(const vtkPVSphereWidget&); // Not implemented
+  void operator=(const vtkPVSphereWidget&); // Not implemented
 };
 
 #endif

@@ -43,17 +43,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkCamera.h"
 #include "vtkKWCompositeCollection.h"
+#include "vtkKWEntry.h"
+#include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
+#include "vtkPlaneWidget.h"
 #include "vtkRenderer.h"
-#include "vtkKWEntry.h"
+
+vtkStandardNewMacro(vtkPVPlaneWidget);
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -61,175 +67,50 @@ int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVPlaneWidget::vtkPVPlaneWidget()
 {
-  this->CommandFunction = vtkPVPlaneWidgetCommand;
-
-  this->CenterEntry = vtkPVVectorEntry::New();
-  this->CenterEntry->SetTraceReferenceObject(this);
-  this->CenterEntry->SetTraceReferenceCommand("GetCenterEntry");
+  int cc;
+  this->Widget3D = vtkPlaneWidget::New();
+  this->Labels[0] = vtkKWLabel::New();
+  this->Labels[1] = vtkKWLabel::New();  
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->CenterEntry[cc] = vtkKWEntry::New();
+    this->NormalEntry[cc] = vtkKWEntry::New();
+    this->CoordinateLabel[cc] = vtkKWLabel::New();
+   }
   this->CenterResetButton = vtkKWPushButton::New();
-
-  this->NormalEntry = vtkPVVectorEntry::New();
-  this->NormalEntry->SetTraceReferenceObject(this);
-  this->NormalEntry->SetTraceReferenceCommand("GetNormalEntry");
   this->NormalButtonFrame = vtkKWWidget::New();
   this->NormalCameraButton = vtkKWPushButton::New();
   this->NormalXButton = vtkKWPushButton::New();
   this->NormalYButton = vtkKWPushButton::New();
   this->NormalZButton = vtkKWPushButton::New();
-
-  this->PlaneTclName = NULL;
-
-  this->ObjectTclName = NULL;
-  this->VariableName = NULL;
+  this->PlaneTclName = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVPlaneWidget::~vtkPVPlaneWidget()
 {
-  this->CenterEntry->Delete();
-  this->CenterEntry = NULL;
-  this->CenterResetButton->Delete();
-  this->CenterResetButton = NULL;
-
-  this->NormalEntry->Delete();
-  this->NormalEntry = NULL;
-  this->NormalButtonFrame->Delete();
-  this->NormalButtonFrame = NULL;
-  this->NormalCameraButton->Delete();
-  this->NormalCameraButton = NULL;
-  this->NormalXButton->Delete();
-  this->NormalXButton = NULL;
-  this->NormalYButton->Delete();
-  this->NormalYButton = NULL;
-  this->NormalZButton->Delete();
-  this->NormalZButton = NULL;
-
   if (this->PlaneTclName)
     {
-    this->GetPVApplication()->BroadcastScript("%s Delete", this->PlaneTclName);
+    this->GetPVApplication()->BroadcastScript("%s Delete", 
+					      this->PlaneTclName);
     this->SetPlaneTclName(NULL);
     }
-
-  this->SetObjectTclName(NULL);
-  this->SetVariableName(NULL);
+  int i;
+  this->Labels[0]->Delete();
+  this->Labels[1]->Delete();
+  for (i=0; i<3; i++)
+    {
+    this->CenterEntry[i]->Delete();
+    this->NormalEntry[i]->Delete();
+    this->CoordinateLabel[i]->Delete();
+    }
+  this->CenterResetButton->Delete();
+  this->NormalButtonFrame->Delete();
+  this->NormalCameraButton->Delete();
+  this->NormalXButton->Delete();
+  this->NormalYButton->Delete();
+  this->NormalZButton->Delete();
 }
-
-//----------------------------------------------------------------------------
-vtkPVPlaneWidget* vtkPVPlaneWidget::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVPlaneWidget");
-  if(ret)
-    {
-    return (vtkPVPlaneWidget*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVPlaneWidget;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVPlaneWidget::Create(vtkKWApplication *app)
-{
-  static int instanceCount = 0;
-  char planeTclName[256];
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-
-  if (pvApp == NULL)
-    {
-    vtkErrorMacro("Expecting a PVApplication.");
-    return;
-    }
-
-  if (this->Application != NULL)
-    {
-    vtkErrorMacro("Object has already been created.");
-    return;
-    }
-  this->SetApplication(app);
-  
-  // Create the implicit plane associated with this widget.
-  ++instanceCount;
-  sprintf(planeTclName, "pvPlane%d", instanceCount);
-  pvApp->BroadcastScript("vtkPlane %s", planeTclName);
-  this->SetPlaneTclName(planeTclName);
-
-  // create the top level
-  this->Script("frame %s", this->GetWidgetName());
- 
-  this->CenterEntry->SetParent(this);
-  this->CenterEntry->SetObjectVariable(planeTclName, "Origin");
-  this->CenterEntry->SetModifiedCommand(this->GetTclName(), 
-                                        "ModifiedCallback");
-  this->CenterEntry->SetLabel("Center");
-  this->CenterEntry->SetVectorLength(3);
-  this->CenterEntry->Create(this->Application);
-  this->Script("pack %s -side top -fill x",
-               this->CenterEntry->GetWidgetName());
-
-  this->CenterResetButton->SetParent(this);
-  this->CenterResetButton->Create(this->Application, "");
-  this->CenterResetButton->SetLabel("Set Plane Center to Center of Bounds");
-  this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
-  this->Script("pack %s -side top -fill x -padx 2",
-               this->CenterResetButton->GetWidgetName());
-
-  // Normal -------------------------
-  this->NormalEntry->SetParent(this);
-  this->NormalEntry->SetObjectVariable(planeTclName, "Normal");
-  this->NormalEntry->SetModifiedCommand(this->GetTclName(), 
-                                        "ModifiedCallback");
-  this->NormalEntry->SetLabel("Normal");
-  this->NormalEntry->SetVectorLength(3);
-  this->NormalEntry->Create(this->Application);
-  this->Script("pack %s -side top -fill x",
-               this->NormalEntry->GetWidgetName());
-
-  this->NormalButtonFrame->SetParent(this);
-  this->NormalButtonFrame->Create(this->Application, "frame", "");
-  this->Script("pack %s -side top -fill x -padx 2",
-               this->NormalButtonFrame->GetWidgetName());
-
-  this->NormalCameraButton->SetParent(this->NormalButtonFrame);
-  this->NormalCameraButton->Create(this->Application, "");
-  this->NormalCameraButton->SetLabel("Use Camera Normal");
-  this->NormalCameraButton->SetCommand(this, "NormalCameraCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalCameraButton->GetWidgetName());
-  this->NormalXButton->SetParent(this->NormalButtonFrame);
-  this->NormalXButton->Create(this->Application, "");
-  this->NormalXButton->SetLabel("X Normal");
-  this->NormalXButton->SetCommand(this, "NormalXCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalXButton->GetWidgetName());
-  this->NormalYButton->SetParent(this->NormalButtonFrame);
-  this->NormalYButton->Create(this->Application, "");
-  this->NormalYButton->SetLabel("Y Normal");
-  this->NormalYButton->SetCommand(this, "NormalYCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalYButton->GetWidgetName());
-  this->NormalZButton->SetParent(this->NormalButtonFrame);
-  this->NormalZButton->Create(this->Application, "");
-  this->NormalZButton->SetLabel("Z Normal");
-  this->NormalZButton->SetCommand(this, "NormalZCallback"); 
-  this->Script("pack %s -side left -fill x -expand t",
-               this->NormalZButton->GetWidgetName());
-
-  // Initialize the center of the plane based on the input bounds.
-  if (this->PVSource)
-    {
-    vtkPVData *input = this->PVSource->GetPVInput();
-    if (input)
-      {
-      float bds[6];
-      input->GetBounds(bds);
-      pvApp->BroadcastScript("%s SetOrigin %f %f %f", planeTclName,
-                             0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                             0.5*(bds[4]+bds[5]));
-      }
-    }
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::CenterResetCallback()
@@ -249,12 +130,11 @@ void vtkPVPlaneWidget::CenterResetCallback()
     return;
     }
   input->GetBounds(bds);
+  this->CenterEntry[0]->SetValue(0.5*(bds[0]+bds[1]), 3);
+  this->CenterEntry[1]->SetValue(0.5*(bds[2]+bds[3]), 3);
+  this->CenterEntry[2]->SetValue(0.5*(bds[4]+bds[5]), 3);
 
-  this->CenterEntry->GetEntry(0)->SetValue(0.5*(bds[0]+bds[1]), 3);
-  this->CenterEntry->GetEntry(1)->SetValue(0.5*(bds[2]+bds[3]), 3);
-  this->CenterEntry->GetEntry(2)->SetValue(0.5*(bds[4]+bds[5]), 3);
-
-  this->CenterEntry->ModifiedCallback();
+  this->SetCenter();
 }
 
 
@@ -292,72 +172,72 @@ void vtkPVPlaneWidget::NormalCameraCallback()
     }
   cam->GetViewPlaneNormal(normal);
 
-  this->NormalEntry->GetEntry(0)->SetValue(-normal[0], 5);
-  this->NormalEntry->GetEntry(1)->SetValue(-normal[1], 5);
-  this->NormalEntry->GetEntry(2)->SetValue(-normal[2], 5);
-
-  this->NormalEntry->ModifiedCallback();
+  this->SetNormal(-normal[0], -normal[1], -normal[2]);
+  this->SetNormal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::NormalXCallback()
 {
-  this->NormalEntry->GetEntry(0)->SetValue(1.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
+  this->SetNormal(1,0,0);
+  this->SetNormal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::NormalYCallback()
 {
-  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(1.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(0.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
+  this->SetNormal(0,1,0);
+  this->SetNormal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::NormalZCallback()
 {
-  this->NormalEntry->GetEntry(0)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(1)->SetValue(0.0, 1);
-  this->NormalEntry->GetEntry(2)->SetValue(1.0, 1);
-
-  this->NormalEntry->ModifiedCallback();
+  this->SetNormal(0,0,1);
+  this->SetNormal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::Reset()
 {
-  this->CenterEntry->Reset();
-  this->NormalEntry->Reset();
-
+  if ( this->PlaneTclName )
+    {
+    this->Script("eval %s SetCenter [ %s GetOrigin ]", 
+		 this->GetTclName(), this->PlaneTclName);
+    this->Script("eval %s SetNormal [ %s GetNormal ]", 
+		 this->GetTclName(), this->PlaneTclName);
+    }
   this->ModifiedFlag = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::Accept()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if ( this->CenterEntry->GetModifiedFlag())
+  if ( this->PlaneTclName && this->ModifiedFlag )
     {
-    this->CenterEntry->Accept();
-    }
-
-  if ( this->NormalEntry->GetModifiedFlag())
-    {
-    this->NormalEntry->Accept();
-    }
-
-  // Set this here to keep this widget like others.
-  if (this->ObjectTclName && this->VariableName && this->PlaneTclName)
-    {
-    pvApp->BroadcastScript("%s Set%s %s", this->ObjectTclName,
-                           this->VariableName, this->PlaneTclName);
+    vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
+      this->Application);
+    float val[3];
+    int cc;
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      val[cc] = atof( this->CenterEntry[cc]->GetValue() );
+      }
+    pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
+			   this->PlaneTclName,
+			   val[0], val[1], val[2]);
+    this->AddTraceEntry("$kw(%s) SetCenter %f %f %f", 
+			this->GetTclName(), val[0], val[1], val[2]);
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      val[cc] = atof( this->NormalEntry[cc]->GetValue() );
+      }
+    pvApp->BroadcastScript("%s SetNormal %f %f %f", 
+			   this->PlaneTclName,
+			   val[0], val[1], val[2]);
+    this->AddTraceEntry("$kw(%s) SetNormal %f %f %f", 
+			this->GetTclName(), val[0], val[1], val[2]);
+			
     }
   this->ModifiedFlag = 0;
 }
@@ -367,25 +247,18 @@ void vtkPVPlaneWidget::Accept()
 void vtkPVPlaneWidget::SaveInTclScript(ofstream *file)
 {
   *file << "vtkPlane " << this->PlaneTclName << endl;
-
-  if (this->ObjectTclName && this->VariableName)
-    {
-    *file << "\t" << this->ObjectTclName << " Set" << this->VariableName
-          << " " << this->PlaneTclName << endl;
-    }
-
-  this->CenterEntry->SaveInTclScript(file);
-  this->NormalEntry->SaveInTclScript(file);
+  *file << "\t" << this->PlaneTclName << " SetOrigin ";
+  this->Script("%s GetOrigin", this->PlaneTclName);
+  *file << this->Application->GetMainInterp()->result << endl;
+  *file << "\t" << this->PlaneTclName << " SetNormal ";
+  this->Script("%s GetNormal", this->PlaneTclName);
+  *file << this->Application->GetMainInterp()->result << endl;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "CenterEntry: " << this->CenterEntry << endl;
-  os << indent << "NormalEntry: " << this->NormalEntry << endl;
-  os << indent << "PlaneTclName: " 
-     << (this->PlaneTclName?this->PlaneTclName:"none") << endl;
 }
 
 vtkPVPlaneWidget* vtkPVPlaneWidget::ClonePrototype(vtkPVSource* pvSource,
@@ -396,9 +269,243 @@ vtkPVPlaneWidget* vtkPVPlaneWidget::ClonePrototype(vtkPVSource* pvSource,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
+{
+  static int instanceCount = 0;
+  char planeTclName[256];
+
+  ++instanceCount;
+  sprintf(planeTclName, "pvPlane%d", instanceCount);
+  this->SetTraceName(planeTclName);
+  pvApp->BroadcastScript("vtkPlane %s", planeTclName);
+  this->SetPlaneTclName(planeTclName);
+
+  this->SetFrameLabel("Plane Widget");
+  this->Labels[0]->SetParent(this->Frame->GetFrame());
+  this->Labels[0]->Create(pvApp, "");
+  this->Labels[0]->SetLabel("Center");
+  this->Labels[1]->SetParent(this->Frame->GetFrame());
+  this->Labels[1]->Create(pvApp, "");
+  this->Labels[1]->SetLabel("Normal");
+
+  int i;
+  for (i=0; i<3; i++)
+    {
+    this->CoordinateLabel[i]->SetParent(this->Frame->GetFrame());
+    this->CoordinateLabel[i]->Create(pvApp, "");
+    char buffer[3];
+    sprintf(buffer, "%c", "xyz"[i]);
+    this->CoordinateLabel[i]->SetLabel(buffer);
+    }
+  for (i=0; i<3; i++)
+    {
+    this->CenterEntry[i]->SetParent(this->Frame->GetFrame());
+    this->CenterEntry[i]->Create(pvApp, "");
+    }
+
+  for (i=0; i<3; i++)    
+    {
+    this->NormalEntry[i]->SetParent(this->Frame->GetFrame());
+    this->NormalEntry[i]->Create(pvApp, "");
+    }
+
+  this->Script("grid propagate %s 1",
+	       this->Frame->GetFrame()->GetWidgetName());
+
+  this->Script("grid x %s %s %s -sticky ew",
+	       this->CoordinateLabel[0]->GetWidgetName(),
+	       this->CoordinateLabel[1]->GetWidgetName(),
+	       this->CoordinateLabel[2]->GetWidgetName());
+  this->Script("grid %s %s %s %s -sticky ew",
+	       this->Labels[0]->GetWidgetName(),
+	       this->CenterEntry[0]->GetWidgetName(),
+	       this->CenterEntry[1]->GetWidgetName(),
+	       this->CenterEntry[2]->GetWidgetName());
+  this->Script("grid %s %s %s %s -sticky ew",
+	       this->Labels[1]->GetWidgetName(),
+	       this->NormalEntry[0]->GetWidgetName(),
+	       this->NormalEntry[1]->GetWidgetName(),
+	       this->NormalEntry[2]->GetWidgetName());
+
+  this->Script("grid columnconfigure %s 0 -weight 0", 
+	       this->Frame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 1 -weight 2", 
+	       this->Frame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 2 -weight 2", 
+	       this->Frame->GetFrame()->GetWidgetName());
+  this->Script("grid columnconfigure %s 3 -weight 2", 
+	       this->Frame->GetFrame()->GetWidgetName());
+
+  for (i=0; i<3; i++)
+    {
+    this->Script("bind %s <Key> {%s SetValueChanged}",
+		 this->CenterEntry[i]->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("bind %s <Key> {%s SetValueChanged}",
+		 this->NormalEntry[i]->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("bind %s <FocusOut> {%s SetCenter}",
+		 this->CenterEntry[i]->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("bind %s <FocusOut> {%s SetNormal}",
+		 this->NormalEntry[i]->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("bind %s <KeyPress-Return> {%s SetCenter}",
+		 this->CenterEntry[i]->GetWidgetName(),
+		 this->GetTclName());
+    this->Script("bind %s <KeyPress-Return> {%s SetNormal}",
+		 this->NormalEntry[i]->GetWidgetName(),
+		 this->GetTclName());
+    }
+  this->CenterResetButton->SetParent(this->Frame->GetFrame());
+  this->CenterResetButton->Create(pvApp, "");
+  this->CenterResetButton->SetLabel("Set Plane Center to Center of Bounds");
+  this->CenterResetButton->SetCommand(this, "CenterResetCallback"); 
+  this->Script("grid %s - - - - -sticky ew", 
+	       this->CenterResetButton->GetWidgetName());
+
+  this->NormalButtonFrame->SetParent(this->Frame->GetFrame());
+  this->NormalButtonFrame->Create(pvApp, "frame", "");
+  this->Script("grid %s - - - - -sticky ew", 
+	       this->NormalButtonFrame->GetWidgetName());
+
+  this->NormalCameraButton->SetParent(this->NormalButtonFrame);
+  this->NormalCameraButton->Create(pvApp, "");
+  this->NormalCameraButton->SetLabel("Use Camera Normal");
+  this->NormalCameraButton->SetCommand(this, "NormalCameraCallback"); 
+  this->Script("pack %s -side left -fill x -expand t",
+               this->NormalCameraButton->GetWidgetName());
+  this->NormalXButton->SetParent(this->NormalButtonFrame);
+  this->NormalXButton->Create(pvApp, "");
+  this->NormalXButton->SetLabel("X Normal");
+  this->NormalXButton->SetCommand(this, "NormalXCallback"); 
+  this->Script("pack %s -side left -fill x -expand t",
+               this->NormalXButton->GetWidgetName());
+  this->NormalYButton->SetParent(this->NormalButtonFrame);
+  this->NormalYButton->Create(pvApp, "");
+  this->NormalYButton->SetLabel("Y Normal");
+  this->NormalYButton->SetCommand(this, "NormalYCallback"); 
+  this->Script("pack %s -side left -fill x -expand t",
+               this->NormalYButton->GetWidgetName());
+  this->NormalZButton->SetParent(this->NormalButtonFrame);
+  this->NormalZButton->Create(pvApp, "");
+  this->NormalZButton->SetLabel("Z Normal");
+  this->NormalZButton->SetCommand(this, "NormalZCallback"); 
+  this->Script("pack %s -side left -fill x -expand t",
+               this->NormalZButton->GetWidgetName());
+
+  // Initialize the center of the plane based on the input bounds.
+  if (this->PVSource)
+    {
+    vtkPVData *input = this->PVSource->GetPVInput();
+    if (input)
+      {
+      float bds[6];
+      input->GetBounds(bds);
+      pvApp->BroadcastScript("%s SetOrigin %f %f %f", planeTclName,
+                             0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+			     0.5*(bds[4]+bds[5]));
+      pvApp->BroadcastScript("%s SetNormal 1 0 0", planeTclName);
+      this->Reset();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long, void*)
+{
+  vtkPlaneWidget *widget = vtkPlaneWidget::SafeDownCast(wdg);
+  if ( !widget )
+    {
+    cout << "This is not a plane widget" << endl;
+    return;
+    }
+  float val[3];
+  int cc;
+  widget->GetCenter(val); 
+  for (cc=0; cc < 3; cc ++ )
+    {
+    this->CenterEntry[cc]->SetValue(val[cc], 5);
+    }
+  widget->GetNormal(val); 
+  for (cc=0; cc < 3; cc ++ )
+    {
+    this->NormalEntry[cc]->SetValue(val[cc], 5);
+    }
+}
+
+//----------------------------------------------------------------------------
 int vtkPVPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
                                         vtkPVXMLPackageParser* parser)
 {
   if(!this->Superclass::ReadXMLAttributes(element, parser)) { return 0; }  
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
+{
+  this->CenterEntry[0]->SetValue(x, 3);
+  this->CenterEntry[1]->SetValue(y, 3);
+  this->CenterEntry[2]->SetValue(z, 3); 
+  if ( this->Widget3D )
+    {
+    vtkPlaneWidget *plane = static_cast<vtkPlaneWidget*>(this->Widget3D);
+    plane->SetCenter(x, y, z); 
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlaneWidget::SetNormal(float x, float y, float z)
+{
+  this->NormalEntry[0]->SetValue(x, 3);
+  this->NormalEntry[1]->SetValue(y, 3);
+  this->NormalEntry[2]->SetValue(z, 3); 
+  if ( this->Widget3D )
+    {
+    vtkPlaneWidget *plane = static_cast<vtkPlaneWidget*>(this->Widget3D);
+    plane->SetNormal(x, y, z); 
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlaneWidget::SetCenter()
+{
+  float val[3];
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    val[cc] = atof(this->CenterEntry[cc]->GetValue());
+    }
+  vtkPlaneWidget *plane = static_cast<vtkPlaneWidget*>(this->Widget3D);
+  plane->SetCenter(val);
+  vtkPVGenericRenderWindowInteractor* iren = 
+    this->PVSource->GetPVWindow()->GetGenericInteractor();
+  if(iren)
+    {
+    iren->Render();
+    }
+  this->ModifiedCallback();
+  this->ValueChanged = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPlaneWidget::SetNormal()
+{
+  float val[3];
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    val[cc] = atof(this->NormalEntry[cc]->GetValue());
+    }
+  vtkPlaneWidget *plane = static_cast<vtkPlaneWidget*>(this->Widget3D);
+  plane->SetNormal(val);
+  vtkPVGenericRenderWindowInteractor* iren = 
+    this->PVSource->GetPVWindow()->GetGenericInteractor();
+  if(iren)
+    {
+    iren->Render();
+    }
+  this->ModifiedCallback();
+  this->ValueChanged = 0;
 }
