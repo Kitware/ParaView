@@ -389,11 +389,11 @@ The output of the Plane source is polygonal data.
                entry_and_label_on_top="0"
                help="Set the number of points in the latitude direction (ranging from Start Phi to End Phi)" />
   <Scale label="Start Phi" trace_name="Start Phi" variable="StartPhi" 
-               default_value="0.0" resolution="0.01" range="0 360" 
+               default_value="0.0" resolution="0.01" range="0 180" 
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the starting angle in the latitude direction" />
   <Scale label="End Phi" trace_name="End Phi" variable="EndPhi" 
-               default_value="180.0" resolution="0.01" range="0 360" 
+               default_value="180.0" resolution="0.01" range="0 180" 
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Set the ending angle in the latitude direction" />
   <Documentation>
@@ -435,11 +435,15 @@ The output of the Sphere source is polygonal data with point normals defined.
                resolution="0.001" range="0.0001 1" default_value="0.3333"
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Changing thickness maintains the outside diameter of the toroid."/>
-  <VectorEntry label="Theta roundness" trace_name="ThetaRoundness" 
-               variable="ThetaRoundness" type="float" default_value="1.0"
+  <Scale label="Theta roundness" trace_name="ThetaRoundness" 
+               variable="ThetaRoundness" type="float"
+               resolution="0.01" range="0.01 10" default_value="1"
+               display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Values range from 0 (rectangular) to 1 (circular) to higher order." />
-  <VectorEntry label="Phi roundness" trace_name="PhiRoundness" 
-               variable="PhiRoundness" type="float" default_value="1.0"
+  <Scale label="Phi roundness" trace_name="PhiRoundness" 
+               variable="PhiRoundness" type="float"
+               resolution="0.01" range="0.01 10" default_value="1"
+               display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="Values range from 0 (rectangular) to 1 (circular) to higher order."/>
   <VectorEntry variable="Size" trace_name="Size"
                type="float" default_value="0.5"

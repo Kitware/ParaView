@@ -16,12 +16,13 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVFileEntry.h"
+#include "vtkPVSource.h"
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVFileEntryProperty);
-vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.4");
+vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.4.4.1");
 
 class vtkPVFileEntryPropertyList : vtkstd::vector<vtkstd::string>
 {
@@ -85,6 +86,7 @@ public:
 vtkPVFileEntryProperty::vtkPVFileEntryProperty()
 {
   this->TimeStep = 0;
+  this->DirectoryName = 0;
   this->Files = new vtkPVFileEntryPropertyList;
 }
 
@@ -93,6 +95,7 @@ vtkPVFileEntryProperty::~vtkPVFileEntryProperty()
 {
   delete this->Files;
   this->Files = 0;
+  this->SetDirectoryName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -106,6 +109,26 @@ void vtkPVFileEntryProperty::SetAnimationTime(float time)
   
   this->SetTimeStep(static_cast<int>(time));
   widget->Reset();
+}
+
+void vtkPVFileEntryProperty::SetAnimationTimeInBatch(
+  ofstream *file, float val)
+{
+  vtkPVSource* pvs = this->Widget->GetPVSource();
+  if (pvs)
+    {
+    vtkPVFileEntry* fe = vtkPVFileEntry::SafeDownCast(this->Widget);
+    if (fe)
+      {
+      *file << "[$pvTemp" << pvs->GetVTKSourceID(0) 
+            <<  " GetProperty " << fe->GetVariableName() << "] SetElement 0 "
+            << " [ lindex $" << "pvTemp" << pvs->GetVTKSourceID(0)  
+            << "_files [expr round(" <<  val << ")]]" << endl;
+      *file << "$pvTemp" << pvs->GetVTKSourceID(0)
+            << " UpdateVTKObjects" << endl;
+
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

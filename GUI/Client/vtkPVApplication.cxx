@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.267.2.1");
+vtkCxxRevisionMacro(vtkPVApplication, "1.267.2.2");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1258,7 +1258,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     }
 #endif
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--offscreen-rendering",
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-offscreen-rendering",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-os",
                                           index) == VTK_OK ||

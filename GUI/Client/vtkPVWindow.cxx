@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.2");
+vtkCxxRevisionMacro(vtkPVWindow, "1.541.2.3");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2536,15 +2536,19 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
 
   if (animationFlag)
     {
-    this->AnimationInterface->SaveInBatchScript(file, imageFileName, 
-                                                geometryFileName);
+    this->AnimationInterface->SaveInBatchScript(file, 
+                                                imageFileName, 
+                                                geometryFileName,
+                                                writerName);
     }
   else
     {
     *file << endl << "$Ren1 UpdateVTKObjects" << endl;
     if (imageFileName)
       {
-      *file << "$Ren1 WriteImage {" << imageFileName << "}\n";
+      *file 
+        << "$Ren1 WriteImage {" << imageFileName << "} " << writerName
+        << "\n";
       }
     else
       {

@@ -33,6 +33,7 @@ public:
   // Set the animation time for this proeprty.  This sets the modified flag on
   // the widget, and then calls Reset on it.
   virtual void SetAnimationTime(float time);
+  virtual void SetAnimationTimeInBatch(ofstream *file, float val);
   
   // Description:
   // Set/get the time step
@@ -55,12 +56,18 @@ public:
   // Get the file with given index.
   const char* GetFile(int idx);
   
+  // Description:
+  // Get and set the directory name.
+  vtkSetStringMacro(DirectoryName);
+  vtkGetStringMacro(DirectoryName);
+  
 protected:
   vtkPVFileEntryProperty();
   ~vtkPVFileEntryProperty();
   
   int TimeStep;
   vtkPVFileEntryPropertyList *Files;
+  char* DirectoryName;
   
 private:
   vtkPVFileEntryProperty(const vtkPVFileEntryProperty&); // Not implemented
