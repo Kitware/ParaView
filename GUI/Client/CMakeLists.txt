@@ -146,6 +146,7 @@ SET( ParaViewClient_SRCS
   vtkPVValueList.cxx
   vtkPVVectorEntry.cxx
   vtkPVVolumeAppearanceEditor.cxx
+  vtkPVVolumePropertyWidget.cxx
   vtkPVWidget.cxx
   vtkPVWindow.cxx
   vtkPVWindowResources.cxx
