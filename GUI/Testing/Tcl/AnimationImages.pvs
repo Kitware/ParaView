@@ -59,19 +59,20 @@ update
 #[[$Application GetMainWindow] GetMainView] ForceRender
 
 # Save animation images
-$kw(vtkTemp164) SaveImages "$TempDir/Baseline/AnimationImages" {png}
+puts $TempDir/AnimationImages
+$kw(vtkTemp164) SaveImages "$TempDir/AnimationImages" {png}
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [ComparePNG "$TempDir/Baseline/AnimationImages0001"]
+	$Application SetExitStatus [ComparePNG "$TempDir/AnimationImages0001"]
     }
 }
 
-file delete "$TempDir/Baseline/AnimationImages0000.png"
-file delete "$TempDir/Baseline/AnimationImages0001.png"
-file delete "$TempDir/Baseline/AnimationImages0002.png"
-file delete "$TempDir/Baseline/AnimationImages0003.png"
+file delete "$TempDir/AnimationImages0000.png"
+file delete "$TempDir/AnimationImages0001.png"
+file delete "$TempDir/AnimationImages0002.png"
+file delete "$TempDir/AnimationImages0003.png"
 
 $Application Exit
 
