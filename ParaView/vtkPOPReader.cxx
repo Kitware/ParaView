@@ -429,7 +429,7 @@ void vtkPOPReader::ReadInformationFile()
 //----------------------------------------------------------------------------
 void vtkPOPReader::SetGridName(char *name)
 {
-  if (this->IsFileName(name))
+  if (name[0] == '/' || name[1] == ':')
     {
     this->SetGridFileName(name);
     return;

@@ -418,7 +418,8 @@ void vtkPVActorComposite::ResetColorRange()
   float range[2];
   this->GetColorRange(range);
   
-  this->Mapper->SetScalarRange(range);
+  this->GetPVApplication()->BroadcastScript("%s SetScalarRange %f %f",
+			this->MapperTclName, range[0], range[1]);
   this->GetView()->Render();
 }
 
@@ -721,7 +722,7 @@ void vtkPVActorComposite::SetVisibility(int v)
     }
   if (v == 0 && this->GeometryTclName)
     {
-    pvApp->BroadcastScript("[%s GetOutput] ReleaseData", this->ActorTclName);
+    pvApp->BroadcastScript("[%s GetInput] ReleaseData", this->MapperTclName);
     }
 }
   

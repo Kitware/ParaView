@@ -1645,6 +1645,15 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetRootName("ColorPieces");
   sInt->SetInputClassName("vtkDataSet");
   sInt->SetOutputClassName("vtkDataSet");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Random");
+  mInt->SetSetCommand("SetRandomMode");
+  mInt->SetGetCommand("GetRandomMode");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
