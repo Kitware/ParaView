@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.41");
+vtkCxxRevisionMacro(vtkKWMenu, "1.42");
 
 
 
@@ -667,6 +667,11 @@ void vtkKWMenu::DeleteMenuItem(const char* menuitem)
 //----------------------------------------------------------------------------
 void vtkKWMenu::DeleteAllMenuItems()
 {
+  if ( !this->IsCreated() )
+    {
+    return;
+    }
+
   int i, last;
   
   this->Script("%s index end", this->GetWidgetName());

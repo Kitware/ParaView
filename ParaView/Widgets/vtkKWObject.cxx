@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.38");
+vtkCxxRevisionMacro(vtkKWObject, "1.39");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -113,7 +113,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.38 $");
+  this->ExtractRevision(os,"$Revision: 1.39 $");
 }
 
 //----------------------------------------------------------------------------
@@ -240,6 +240,7 @@ void vtkKWObject::SetApplication (vtkKWApplication* arg)
     if (this->Application != NULL) 
       { 
       this->Application->UnRegister(this); 
+      this->Application = 0;
       }
     this->Application = arg;
     if (this->Application != NULL)
@@ -404,6 +405,11 @@ int vtkKWObject::InitializeTrace(ofstream* file)
 //----------------------------------------------------------------------------
 void vtkKWObject::AddTraceEntry(const char *format, ...)
 {
+  if ( !this->Application )
+    {
+    return;
+    }
+
   ofstream *os;
 
   os = this->Application->GetTraceFile();

@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWText );
-vtkCxxRevisionMacro(vtkKWText, "1.12");
+vtkCxxRevisionMacro(vtkKWText, "1.13");
 
 vtkKWText::vtkKWText()
 {
@@ -57,6 +57,10 @@ vtkKWText::~vtkKWText()
 
 char *vtkKWText::GetValue()
 {
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
   this->Script("%s get 1.0 {end -1 chars}", this->GetWidgetName());
   this->SetValueString( this->Application->GetMainInterp()->result );
   return this->GetValueString();
@@ -64,6 +68,10 @@ char *vtkKWText::GetValue()
 
 void vtkKWText::SetValue(const char *s)
 {
+  if ( !this->IsCreated() )
+    {
+    return;
+    }
   this->Script("%s delete 1.0 end", this->GetWidgetName());
   if (s)
     {

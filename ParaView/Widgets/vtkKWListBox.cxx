@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.17");
+vtkCxxRevisionMacro(vtkKWListBox, "1.18");
 
 
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
@@ -74,6 +74,10 @@ vtkKWListBox::~vtkKWListBox()
 
 int vtkKWListBox::GetNumberOfItems()
 {
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
   this->Script("%s size", this->Listbox->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
   return atoi(result);
@@ -104,6 +108,10 @@ void vtkKWListBox::SetSelectionIndex(int sel)
 
 int vtkKWListBox::GetSelectionIndex()
 {
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
   this->Script("%s curselection", this->Listbox->GetWidgetName(),
                this->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
@@ -117,6 +125,10 @@ int vtkKWListBox::GetSelectionIndex()
   
 const char *vtkKWListBox::GetSelection()
 {
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
   if ( this->GetSelectionIndex() < 0 )
     {
     return 0;

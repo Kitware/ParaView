@@ -122,7 +122,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.22");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.23");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -945,6 +945,10 @@ void vtkKWTextProperty::SetOpacityNoTrace(float v)
 void vtkKWTextProperty::SetOpacity(float v) 
 {
   this->SetOpacityNoTrace(v);
+  if ( !this->IsCreated() )
+    {
+    return;
+    }
   this->AddTraceEntry("$kw(%s) SetOpacity %f", this->GetTclName(), v);
 }
 

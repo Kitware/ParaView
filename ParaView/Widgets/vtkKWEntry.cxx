@@ -73,7 +73,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.34");
+vtkCxxRevisionMacro(vtkKWEntry, "1.35");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -113,6 +113,10 @@ vtkKWEntry::~vtkKWEntry()
 //----------------------------------------------------------------------------
 char *vtkKWEntry::GetValue()
 {
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
   this->Script("%s get", this->Entry->GetWidgetName());
   this->SetValueString( this->Application->GetMainInterp()->result );
   return this->GetValueString();
@@ -121,12 +125,20 @@ char *vtkKWEntry::GetValue()
 //----------------------------------------------------------------------------
 int vtkKWEntry::GetValueAsInt()
 {
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
   return atoi(this->GetValue());
 }
 
 //----------------------------------------------------------------------------
 float vtkKWEntry::GetValueAsFloat()
 {
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
   return atof(this->GetValue());
 }
 
@@ -363,6 +375,10 @@ void vtkKWEntry::WithdrawPopupCallback()
 void vtkKWEntry::SetReadOnly(int ro)
 {
   this->ReadOnly = ro;
+  if (!this->IsCreated())
+    {
+    return;
+    }
   if ( ro && this->GetWidgetName() )
     {
     this->Script("%s configure -state disabled", this->Entry->GetWidgetName());

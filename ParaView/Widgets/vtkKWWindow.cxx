@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.161");
+vtkCxxRevisionMacro(vtkKWWindow, "1.162");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -555,6 +555,11 @@ vtkKWMenu *vtkKWWindow::GetMenuEdit()
     {
     return this->MenuEdit;
     }
+
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
   
   this->MenuEdit = vtkKWMenu::New();
   this->MenuEdit->SetParent(this->GetMenu());
@@ -570,6 +575,11 @@ vtkKWMenu *vtkKWWindow::GetMenuView()
   if (this->MenuView)
     {
     return this->MenuView;
+    }
+
+  if ( !this->IsCreated() )
+    {
+    return 0;
     }
 
   this->MenuView = vtkKWMenu::New();
@@ -594,6 +604,11 @@ vtkKWMenu *vtkKWWindow::GetMenuWindow()
   if (this->MenuWindow)
     {
     return this->MenuWindow;
+    }
+
+  if ( !this->IsCreated() )
+    {
+    return 0;
     }
 
   this->MenuWindow = vtkKWMenu::New();
@@ -1095,6 +1110,11 @@ void vtkKWWindow::AddRecentFile(const char *key, const char *name, vtkKWObject *
 
 int vtkKWWindow::GetFileMenuIndex()
 {
+  if ( !this->IsCreated() )
+    {
+    return 0;
+    }
+
   // First find the print-related menu commands
   if ( this->GetMenuFile()->HasItem(VTK_KW_PAGE_SETUP_MENU_LABEL))
     {
