@@ -203,7 +203,7 @@ void vtkPVImageData::SetData(vtkDataSet *data)
   
   // Mode will tell the actor composite how to create the mapper.
   this->ActorComposite->SetInput(data);
-
+  
   // Determine which mode to use.
   image->UpdateInformation();
   ext = image->GetWholeExtent();

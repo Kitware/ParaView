@@ -890,9 +890,9 @@ void vtkPVWindow::NextSource()
 
   if (composite != NULL)
     {
-    this->GetCurrentSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    this->GetCurrentSource()->GetPVOutput()->GetActorComposite()->VisibilityOff();
     this->SetCurrentSource(composite);
-    this->GetCurrentSource()->GetPVData()->GetActorComposite()->VisibilityOn();
+    this->GetCurrentSource()->GetPVOutput()->GetActorComposite()->VisibilityOn();
     }
   
   this->MainView->Render();
@@ -906,9 +906,9 @@ void vtkPVWindow::PreviousSource()
   vtkPVSource *composite = this->GetPreviousSource();
   if (composite != NULL)
     {
-    this->GetCurrentSource()->GetPVData()->GetActorComposite()->VisibilityOff();
+    this->GetCurrentSource()->GetPVOutput()->GetActorComposite()->VisibilityOff();
     this->SetCurrentSource(composite);
-    this->GetCurrentSource()->GetPVData()->GetActorComposite()->VisibilityOn();
+    this->GetCurrentSource()->GetPVOutput()->GetActorComposite()->VisibilityOn();
     }
   
   this->MainView->Render();

@@ -95,7 +95,7 @@ void vtkPVDataSetToDataSetFilter::SetPVOutput(vtkPVData *pvd)
 			   pvd->GetTclName());
     }
   // This calls just does reference counting.
-  this->SetPVData(pvd);  
+  this->vtkPVSource::SetPVOutput(pvd);  
   pvd->SetData(f->GetOutput());
 }
 

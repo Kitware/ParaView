@@ -172,7 +172,7 @@ void vtkPVImageClip::SetInput(vtkPVImageData *pvi)
 //----------------------------------------------------------------------------
 void vtkPVImageClip::SetPVOutput(vtkPVImageData *pvi)
 {
-  this->SetPVData(pvi);
+  this->vtkPVSource::SetPVOutput(pvi);
 
   pvi->SetData(this->ImageClip->GetOutput());
 }
@@ -263,7 +263,7 @@ void vtkPVImageClip::ExtentsChanged()
 					this->ClipZMinEntry->GetValueAsInt(),
 					this->ClipZMaxEntry->GetValueAsInt());
   
-  if (this->GetPVData() == NULL)
+  if (this->GetPVOutput() == NULL)
     {
     this->GetImageClip()->SetStartMethod(StartImageClipProgress, this);
     this->GetImageClip()->SetProgressMethod(ImageClipProgress, this);
@@ -272,14 +272,14 @@ void vtkPVImageClip::ExtentsChanged()
     pvi = vtkPVImageData::New();
     pvi->Clone(pvApp);
     this->SetPVOutput(pvi);
-    a = window->GetPreviousSource()->GetPVData()->GetAssignment();
+    a = window->GetPreviousSource()->GetPVOutput()->GetAssignment();
     pvi->SetAssignment(a);
-    this->GetPVData()->GetData()->
-      SetUpdateExtent(this->GetPVData()->GetData()->GetWholeExtent());
+    this->GetPVOutput()->GetData()->
+      SetUpdateExtent(this->GetPVOutput()->GetData()->GetWholeExtent());
     this->GetInput()->GetActorComposite()->VisibilityOff();
     this->GetInput()->GetScalarBar()->VisibilityOff();
     this->CreateDataPage();
-    ac = this->GetPVData()->GetActorComposite();
+    ac = this->GetPVOutput()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
     window->GetSourceList()->Update();
     }
@@ -298,7 +298,7 @@ void vtkPVImageClip::ExtentsChanged()
 //----------------------------------------------------------------------------
 void vtkPVImageClip::GetSource()
 {
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
+  this->GetPVOutput()->GetActorComposite()->VisibilityOff();
   this->GetWindow()->GetMainView()->
     SetSelectedComposite(this->GetInput()->GetPVSource());
   this->GetInput()->GetActorComposite()->VisibilityOn();

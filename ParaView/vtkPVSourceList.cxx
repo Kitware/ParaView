@@ -264,13 +264,13 @@ void vtkPVSourceList::ToggleVisibility(int compIdx, int button)
   if (comp)
     {
     // Toggle visibility
-    if (comp->GetPVData()->GetActorComposite()->GetVisibility())
+    if (comp->GetPVOutput()->GetActorComposite()->GetVisibility())
       {
-      comp->GetPVData()->GetActorComposite()->VisibilityOff();
+      comp->GetPVOutput()->GetActorComposite()->VisibilityOff();
       }
     else
       {
-      comp->GetPVData()->GetActorComposite()->VisibilityOn();
+      comp->GetPVOutput()->GetActorComposite()->VisibilityOn();
       }
     comp->GetView()->Render();
     }
@@ -337,7 +337,7 @@ int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in)
 
   // Draw the icon indicating visibility.
   result = NULL;
-  if (comp->GetPVData() == NULL)
+  if (comp->GetPVOutput() == NULL)
     {
     this->Script("%s create image %d %d -image visonbm",
                  this->Canvas->GetWidgetName(), x, y);
@@ -346,7 +346,7 @@ int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in)
     }
   else
     {
-    switch (comp->GetPVData()->GetActorComposite()->GetVisibility())
+    switch (comp->GetPVOutput()->GetActorComposite()->GetVisibility())
       {
       case 0:
         this->Script("%s create image %d %d -image visoffbm",

@@ -76,6 +76,10 @@ vtkRunTimeContour::vtkRunTimeContour()
 
   this->XSlice = this->YSlice = this->ZSlice = 0;
   this->XScale = this->YScale = this->ZScale = NULL;
+
+  this->SetXSliceOutput(vtkImageData::New());
+  this->SetYSliceOutput(vtkImageData::New());
+  this->SetZSliceOutput(vtkImageData::New());
 }
 
 //----------------------------------------------------------------------------
@@ -185,7 +189,7 @@ void vtkRunTimeContour::Execute()
                                     this->YSlice, ext[4], ext[5]);
   this->YClip->Update();
   this->GetYSliceOutput()->ShallowCopy(this->YClip->GetOutput());
-  this->ZClip->SetOutputWholeExtent(ext[0], ext[1], ext[3], ext[4],
+  this->ZClip->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3],
                                     this->ZSlice, this->ZSlice);
   this->ZClip->Update();
   this->GetZSliceOutput()->ShallowCopy(this->ZClip->GetOutput());

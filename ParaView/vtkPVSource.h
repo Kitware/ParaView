@@ -65,7 +65,7 @@ public:
   
   // Description:
   // A way to get the output in the superclass.
-  vtkPVData *GetPVData() {return this->PVOutput;}
+  vtkPVData *GetPVOutput() {return this->PVOutput;}
     
   // Description:
   // Create the properties object, called by InitializeProperties.
@@ -221,7 +221,7 @@ protected:
   
   // Description:
   // Mangages the double pointer and reference counting.
-  void SetPVData(vtkPVData *data);
+  virtual void SetPVOutput(vtkPVData *data);
   
   vtkPVData *PVOutput;
   vtkSource *VTKSource;

@@ -60,7 +60,7 @@ void vtkPVImageSource::SetPVOutput(vtkPVImageData *pvi)
 			   pvi->GetTclName());
     }
 
-  this->SetPVData(pvi);
+  this->vtkPVSource::SetPVOutput(pvi);
   pvi->SetData(this->GetVTKImageSource()->GetOutput());  
 }
 

@@ -256,7 +256,7 @@ const char *vtkPVSource::GetVTKSourceTclName()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::SetPVData(vtkPVData *data)
+void vtkPVSource::SetPVOutput(vtkPVData *data)
 {
   if (this->PVOutput == data)
     {
@@ -381,7 +381,7 @@ void vtkPVSource::CreateDataPage()
   if (!this->DataCreated)
     {
     const char *dataPage;
-    vtkPVData *data = this->GetPVData();
+    vtkPVData *data = this->GetPVOutput();
     
     if (data == NULL)
       {
@@ -1476,7 +1476,7 @@ void vtkPVSource::AcceptCallback()
     }  
   
   // Initialize the output if necessary.
-  if (this->GetPVData() == NULL && this->GetVTKSource())
+  if (this->GetPVOutput() == NULL && this->GetVTKSource())
     { // This is the first time, initialize data.  
     vtkPVData *input;
     vtkPVActorComposite *ac;
@@ -1485,18 +1485,18 @@ void vtkPVSource::AcceptCallback()
     input = this->GetNthInput(0);
     this->InitializeOutput();
     this->CreateDataPage();
-    ac = this->GetPVData()->GetActorComposite();
+    ac = this->GetPVOutput()->GetActorComposite();
     window->GetMainView()->AddComposite(ac);
-    sb = this->GetPVData()->GetScalarBar();
+    sb = this->GetPVOutput()->GetScalarBar();
     window->GetMainView()->AddComposite(sb);
     // Make the last data invisible.
     // We want this to work whether we create different sources with or
     // without using filters.
     if (window->GetPreviousSource())
       {
-      window->GetPreviousSource()->GetPVData()->GetActorComposite()->
+      window->GetPreviousSource()->GetPVOutput()->GetActorComposite()->
         SetVisibility(0);
-      window->GetPreviousSource()->GetPVData()->GetScalarBar()->
+      window->GetPreviousSource()->GetPVOutput()->GetScalarBar()->
         SetVisibility(0);
       }
     window->GetMainView()->ResetCamera();
@@ -1607,9 +1607,9 @@ void vtkPVSource::DeleteCallback()
     this->PVOutput->GetScalarBar()->VisibilityOff();
     if (prev)
       {
-      prev->GetPVData()->GetActorComposite()->VisibilityOn();
+      prev->GetPVOutput()->GetActorComposite()->VisibilityOn();
       }
-    this->SetPVData(NULL);
+    this->SetPVOutput(NULL);
     this->GetView()->Render();
     this->GetWindow()->GetMainView()->RemoveComposite(this);
     pvApp->Script("%s Delete", this->GetTclName());
@@ -1807,7 +1807,7 @@ void vtkPVSource::UpdateNavigationCanvas()
                      this->NavigationCanvas->GetWidgetName(), xMid, yMid,
                      245, yMid);
         }
-      if (moreOut = source->GetPVData())
+      if (moreOut = source->GetPVOutput())
         {
         if (moreOuts = moreOut->GetPVSourceUsers())
           {
@@ -1839,8 +1839,8 @@ void vtkPVSource::SelectSource(vtkPVSource *source)
     this->GetWindow()->SetCurrentSource(source);
     source->ShowProperties();
     source->GetNotebook()->Raise(0);
-    if (source->GetPVData() &&
-        source->GetPVData()->GetPVSourceUsers()->GetNumberOfItems() > 0)
+    if (source->GetPVOutput() &&
+        source->GetPVOutput()->GetPVSourceUsers()->GetNumberOfItems() > 0)
       {
       this->Script("%s configure -state disabled",
                    source->GetDeleteButton()->GetWidgetName());

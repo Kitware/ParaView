@@ -60,7 +60,7 @@ void vtkPVPolyDataSource::SetPVOutput(vtkPVPolyData *pvd)
 			   pvd->GetTclName());
     }
 
-  this->SetPVData(pvd);  
+  this->vtkPVSource::SetPVOutput(pvd);
   pvd->SetData(this->GetVTKPolyDataSource()->GetOutput());
 }
 
@@ -98,8 +98,8 @@ void vtkPVPolyDataSource::InitializeOutput()
 //----------------------------------------------------------------------------
 void vtkPVPolyDataSource::SelectInputSource()
 {
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
-  this->GetPVData()->GetScalarBar()->VisibilityOff();
+  this->GetPVOutput()->GetActorComposite()->VisibilityOff();
+  this->GetPVOutput()->GetScalarBar()->VisibilityOff();
   this->GetWindow()->GetMainView()->
     SetSelectedComposite(this->GetInput()->GetPVSource());
   this->GetInput()->GetActorComposite()->VisibilityOn();
