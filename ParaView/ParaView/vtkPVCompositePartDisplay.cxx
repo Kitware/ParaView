@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.8");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -126,6 +126,7 @@ void vtkPVCompositePartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
     << this->CollectID << "SetInput"
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -407,7 +408,7 @@ void vtkPVCompositePartDisplay::SetLODCollectionDecision(int v)
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
 
-  if (v == this->CollectionDecision)
+  if (v == this->LODCollectionDecision)
     {
     return;
     }
