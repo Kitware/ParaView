@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProgressHandler);
-vtkCxxRevisionMacro(vtkPVProgressHandler, "1.1");
+vtkCxxRevisionMacro(vtkPVProgressHandler, "1.2");
 vtkCxxSetObjectMacro(vtkPVProgressHandler, SocketController, vtkSocketController);
 
 //----------------------------------------------------------------------------
@@ -457,4 +457,6 @@ void vtkPVProgressHandler::CleanupPendingProgress(vtkProcessModule* app)
 void vtkPVProgressHandler::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "ClientMode: " << this->ClientMode << endl;
+  os << indent << "ServerMode: " << this->ServerMode << endl;
 }
