@@ -189,8 +189,6 @@ public:
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
-  vtkPVApplication(const vtkPVApplication&) {};
-  void operator=(const vtkPVApplication&) {};
 
   void CreateButtonPhotos();
   void CreatePhoto(char *name, unsigned char *data, int width, int height);

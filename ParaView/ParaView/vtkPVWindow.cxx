@@ -238,8 +238,8 @@ vtkPVWindow::~vtkPVWindow()
   this->RotateCameraButton = NULL;
   this->TranslateCameraButton->Delete();
   this->TranslateCameraButton = NULL;
-  this->TrackballCameraButton->Delete();
-  this->TrackballCameraButton = NULL;
+  //this->TrackballCameraButton->Delete();
+  //this->TrackballCameraButton = NULL;
 
   this->CenterSource->Delete();
   this->CenterSource = NULL;
@@ -950,9 +950,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                this->FlySpeedScale->GetWidgetName());
   
   this->GenericInteractor->SetPVRenderView(this->MainView);
-  //this->GenericInteractor->SetInteractorStyle(this->TrackballCameraStyle);
-  this->GenericInteractor->SetInteractorStyle(this->RotateCameraStyle);
-  
+  this->ChangeInteractorStyle(1);
+ 
   // set up bindings for the interactor  
   const char *wname = this->MainView->GetVTKWidget()->GetWidgetName();
   const char *tname = this->GetTclName();
