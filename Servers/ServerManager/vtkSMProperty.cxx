@@ -31,7 +31,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.23");
+vtkCxxRevisionMacro(vtkSMProperty, "1.24");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 vtkCxxSetObjectMacro(vtkSMProperty, InformationHelper, vtkSMInformationHelper);
@@ -375,11 +375,11 @@ void vtkSMProperty::SaveState(const char* name, ostream* file, vtkIndent indent)
     {
     vtkSMProxyManager *pxm = this->GetProxyManager();
     //NOTE: this operation is slow :(.
-    const char* name = pxm->GetProxyName(this->ControllerProxy->GetXMLGroup(),this->ControllerProxy);
-    if (name)
+    const char* cname = pxm->GetProxyName(this->ControllerProxy->GetXMLGroup(),this->ControllerProxy);
+    if (cname)
       {
     *file << "    <ControllerProperty name=\""
-      << name << "." << this->ControllerProperty->GetXMLName() 
+      << cname << "." << this->ControllerProperty->GetXMLName() 
       << "\" />" << endl;
       }
     }
