@@ -1,0 +1,20 @@
+/*=========================================================================
+
+  Program:   ParaView
+  Module:    vtkPVDemoPaths.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.paraview.org/HTML/Copyright.html for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+#ifndef VTK_DEMO_PATHS
+#define VTK_DEMO_PATHS
+
+static const char* VTK_PV_DEMO_PATHS[] = { "@PVGUI_SOURCE_DIR@/Demos", "@CMAKE_INSTALL_PREFIX@/share/paraview-@PARAVIEW_VERSION@/Demos", 0};
+
+#endif
