@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.12.2.2");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.12.2.3");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -289,7 +289,7 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
 //----------------------------------------------------------------------------
 void vtkKWBWidgets::Execute(Tcl_Interp* interp, const char* str, const char* module)
 {
-  const int maxlen = 32000;
+  const unsigned int maxlen = 32000;
   if ( strlen(str) > maxlen )
     {
     cout << "The size of tcl string for module " << module << " is " << strlen(str) 
