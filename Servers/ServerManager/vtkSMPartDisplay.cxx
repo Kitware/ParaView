@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.8");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.9");
 
 
 //----------------------------------------------------------------------------s
@@ -1563,7 +1563,7 @@ void vtkSMPartDisplay::GatherGeometryInformation()
 
 //----------------------------------------------------------------------------
 // This should be handle the same way batch is (in the future).
-void vtkSMPartDisplay::SaveState(ofstream *file, const char* tclName, 
+void vtkSMPartDisplay::SavePVState(ostream *file, const char* tclName, 
                                  vtkIndent indent)
 {
   float rgb[3];

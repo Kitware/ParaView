@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.391");
+vtkCxxRevisionMacro(vtkPVSource, "1.392");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1867,7 +1867,7 @@ void vtkPVSource::SaveState(ofstream *file)
   *file << "set " << dispTclName+1 
         << " [$kw(" << this->GetTclName() << ") GetPartDisplay]" << endl;
   vtkIndent indent;
-  this->GetPartDisplay()->SaveState(file, dispTclName, indent);
+  this->GetPartDisplay()->SavePVState(file, dispTclName, indent);
 
   // Make sure the GUI is upto date.  
   *file << "[$kw(" << this->GetTclName()
@@ -2221,10 +2221,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
                     << "AddObserver"
                     << "EndEvent"
                     << end
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
-                    << "RegisterProgressEvent"
-                    << sourceId << sourceId.ID
                     << vtkClientServerStream::End;
     
     }
