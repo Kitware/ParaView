@@ -23,11 +23,12 @@
 #include "vtkSMCompositePartDisplay.h"
 #include "vtkPVLODPartDisplayInformation.h"
 #include "vtkClientServerStream.h"
+#include "vtkPVTreeComposite.h"
 #include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -341,50 +342,53 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
   float maxReductionFactor;
  
   newReductionFactor = 1;
+  vtkPVProcessModule* pm = this->ProcessModule;
   if (this->ReductionFactor > 1)
     {
     // We have to come up with a more consistent way to compute reduction.
     newReductionFactor = this->ReductionFactor;
     if (this->CompositeID.ID)
       {
-      //      TODO
-//      // Leave halve time for compositing.
-//      renderTime = renderTime * 0.5;
-//      // Try to factor in user preference.
-//      renderTime = renderTime / (float)(this->ReductionFactor);
-//      // Compute time for each pixel on the last render.
-//      area = windowSize[0] * windowSize[1];
-//      reductionFactor = (float)this->Composite->GetImageReductionFactor();
-//      reducedArea = (int)(area / (reductionFactor * reductionFactor));
-//      getBuffersTime = this->Composite->GetGetBuffersTime();
-//      setBuffersTime = this->Composite->GetSetBuffersTime();
-//      transmitTime = this->Composite->GetCompositeTime();
-//
-//      // Do not consider SetBufferTime because 
-//      //it is not dependent on reduction factor.,
-//      timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
-//      newReductionFactor = sqrt(area * timePerPixel / renderTime);
-//  
-//      // Do not let the width go below 150.
-//      maxReductionFactor = windowSize[0] / 150.0;
-//      if (maxReductionFactor > this->ReductionFactor)
-//        {
-//        maxReductionFactor = this->ReductionFactor;
-//        }
-//      if (newReductionFactor > maxReductionFactor)
-//        {
-//        newReductionFactor = maxReductionFactor;
-//        }
-//      if (newReductionFactor < 1.0)
-//        {
-//        newReductionFactor = 1.0;
-//        }
+      vtkPVTreeComposite *composite = 
+        vtkPVTreeComposite::SafeDownCast( pm->GetObjectFromID( this->CompositeID ));
+
+      // Leave halve time for compositing.
+      renderTime = renderTime * 0.5;
+      // Try to factor in user preference.
+      renderTime = renderTime / (float)(this->ReductionFactor);
+      // Compute time for each pixel on the last render.
+      area = windowSize[0] * windowSize[1];
+      reductionFactor = (float)composite->GetImageReductionFactor();
+      reducedArea = (int)(area / (reductionFactor * reductionFactor));
+      getBuffersTime = composite->GetGetBuffersTime();
+      
+      setBuffersTime = composite->GetSetBuffersTime();
+      transmitTime = composite->GetCompositeTime();
+
+      // Do not consider SetBufferTime because 
+      //it is not dependent on reduction factor.,
+      timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
+      newReductionFactor = sqrt(area * timePerPixel / renderTime);
+  
+      // Do not let the width go below 150.
+      maxReductionFactor = windowSize[0] / 150.0;
+      if (maxReductionFactor > this->ReductionFactor)
+        {
+        maxReductionFactor = this->ReductionFactor;
+        }
+      if (newReductionFactor > maxReductionFactor)
+        {
+        newReductionFactor = maxReductionFactor;
+        }
+      if (newReductionFactor < 1.0)
+        {
+        newReductionFactor = 1.0;
+        }
       }
     }
 
   if (this->ProcessModule && this->CompositeID.ID)
     {
-    vtkPVProcessModule* pm = this->ProcessModule;
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke
            << this->CompositeID << "SetImageReductionFactor" << int(newReductionFactor)
@@ -409,12 +413,17 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithFloat(int val)
   if (this->CompositeID.ID)
     {
     vtkPVProcessModule* pm = this->ProcessModule;
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->CompositeID << "SetUseChar" << (val?0:1)
-           << vtkClientServerStream::End;
-    pm->SendStream(
-      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+    vtkPVTreeComposite *composite = 
+      vtkPVTreeComposite::SafeDownCast( pm->GetObjectFromID( this->CompositeID));
+    if( composite ) // we know this is a vtkPVTreeComposite
+      {
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "SetUseChar" << (val?0:1)
+             << vtkClientServerStream::End;
+      pm->SendStream(
+        vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+      }
     }
 
   if (val)
@@ -434,12 +443,17 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithRGBA(int val)
   if (this->CompositeID.ID)
     {
     vtkPVProcessModule* pm = this->ProcessModule;
-    vtkClientServerStream stream;
-    stream << vtkClientServerStream::Invoke
-           << this->CompositeID << "SetUseRGB" << (val?0:1)
-           << vtkClientServerStream::End;
-    pm->SendStream(
-      vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+    vtkPVTreeComposite *composite = 
+      vtkPVTreeComposite::SafeDownCast( pm->GetObjectFromID( this->CompositeID));
+    if( composite ) // we know this is a vtkPVTreeComposite
+      {
+      vtkClientServerStream stream;
+      stream << vtkClientServerStream::Invoke
+             << this->CompositeID << "SetUseRGB" << (val?0:1)
+             << vtkClientServerStream::End;
+      pm->SendStream(
+        vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+      }
     }
 
   if (val)
