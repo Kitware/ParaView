@@ -157,7 +157,7 @@ void vtkPVContour::CreateProperties()
 
   
   this->AddValueButton->SetParent(this->NewValueFrame);
-  this->AddValueButton->Create(pvApp, "-text \"Add Value\"");
+  this->AddValueButton->Create(pvApp, "-text {Add Value}");
   this->AddValueButton->SetCommand(this, "AddValueCallback");
   this->AddValueButton->SetBalloonHelpString("Add the new contour value to the contour values list");
   
@@ -167,12 +167,12 @@ void vtkPVContour::CreateProperties()
                this->AddValueButton->GetWidgetName());
   
   this->DeleteValueButton->SetParent(this->GetParameterFrame()->GetFrame());
-  this->DeleteValueButton->Create(pvApp, "-text \"Delete Value\"");
+  this->DeleteValueButton->Create(pvApp, "-text {Delete Value}");
   this->DeleteValueButton->SetCommand(this, "DeleteValueCallback");
   this->DeleteValueButton->SetBalloonHelpString("Remove the currently selected contour value from the list");
   
   this->ComputeNormalsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ComputeNormalsCheck->Create(pvApp, "-text \"Compute Normals\"");
+  this->ComputeNormalsCheck->Create(pvApp, "-text {Compute Normals}");
   this->ComputeNormalsCheck->SetState(1);
   this->ComputeNormalsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeNormalsCheck->SetBalloonHelpString("Select whether to compute normals");
@@ -188,7 +188,7 @@ void vtkPVContour::CreateProperties()
                                   this->ComputeNormalsCheck->GetTclName());
 
   this->ComputeGradientsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ComputeGradientsCheck->Create(pvApp, "-text \"Compute Gradients\"");
+  this->ComputeGradientsCheck->Create(pvApp, "-text {Compute Gradients}");
   this->ComputeGradientsCheck->SetState(0);
   this->ComputeGradientsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeGradientsCheck->SetBalloonHelpString("Select whether to compute gradients");
@@ -204,7 +204,7 @@ void vtkPVContour::CreateProperties()
                                   this->ComputeGradientsCheck->GetTclName());
 
   this->ComputeScalarsCheck->SetParent(this->GetParameterFrame()->GetFrame());
-  this->ComputeScalarsCheck->Create(pvApp, "-text \"Compute Scalars\"");
+  this->ComputeScalarsCheck->Create(pvApp, "-text {Compute Scalars}");
   this->ComputeScalarsCheck->SetState(1);
   this->ComputeScalarsCheck->SetCommand(this, "ChangeAcceptButtonColor");
   this->ComputeScalarsCheck->SetBalloonHelpString("Select whether to compute scalars");

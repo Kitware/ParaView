@@ -1973,7 +1973,7 @@ void vtkPVSource::AddVector2Entry(char *label, char *l1, char *l2,
                                  maxEntry->GetTclName(), tclName, getCmd);
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [list [%s GetValue] [%s GetValue]]",
                         this->GetTclName(), tclName, setCmd, minEntry->GetTclName(),
                         maxEntry->GetTclName());
 
@@ -2103,7 +2103,7 @@ void vtkPVSource::AddVector3Entry(char *label, char *l1, char *l2, char *l3,
                                  zEntry->GetTclName(), tclName, getCmd); 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [list [%s GetValue] [%s GetValue] [%s GetValue]]",
                         this->GetTclName(), tclName, setCmd, xEntry->GetTclName(),
                         yEntry->GetTclName(), zEntry->GetTclName());
 
@@ -2261,7 +2261,7 @@ void vtkPVSource::AddVector4Entry(char *label, char *l1, char *l2, char *l3,
     "%s SetValue [lindex [%s %s] 3]", wEntry->GetTclName(), tclName, getCmd);
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [list [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]]",
                         this->GetTclName(), tclName, setCmd, xEntry->GetTclName(),
                         yEntry->GetTclName(), zEntry->GetTclName(), wEntry->GetTclName());
 
@@ -2475,7 +2475,7 @@ void vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2, char *l3,
     "%s SetValue [lindex [%s %s] 5]",zEntry->GetTclName(), tclName, getCmd);
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]\"",
+  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [list [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue] [%s GetValue]]",
   	 this->GetTclName(), tclName, setCmd, uEntry->GetTclName(), 
          vEntry->GetTclName(), wEntry->GetTclName(),
          xEntry->GetTclName(), yEntry->GetTclName(), zEntry->GetTclName());

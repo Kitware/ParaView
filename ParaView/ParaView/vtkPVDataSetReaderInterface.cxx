@@ -107,25 +107,25 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     {
     slashPosition = endingSlash - this->DataFileName + 1;
     }
-  tclName = new char[extensionPosition-slashPosition+1];
+  tclName = new char[extensionPosition-slashPosition+1+10];
   strncpy(tclName, this->DataFileName+slashPosition, extensionPosition-slashPosition);
   tclName[extensionPosition-slashPosition] = '\0';
 
   if (isdigit(tclName[0]))
     {
     // A VTK object name beginning with a digit is invalid.
-    tmp = new char[strlen(tclName)+3];
+    tmp = new char[strlen(tclName)+3+10];
     strcpy(tmp, tclName);
     delete [] tclName;
-    tclName = new char[strlen(tmp)+1];
+    tclName = new char[strlen(tmp)+1+10];
     sprintf(tclName, "PV%s", tmp);
     delete [] tmp;
     }
   // Append the unique number for the name.
-  tmp = new char[strlen(tclName)+1];
+  tmp = new char[strlen(tclName)+1+10];
   strcpy(tmp, tclName);
   delete [] tclName;
-  tclName = new char[strlen(tmp)+1 + (this->InstanceCount%10)+1];
+  tclName = new char[strlen(tmp)+1 + (this->InstanceCount%10)+1 + 10];
   sprintf(tclName, "%s%d", tmp, this->InstanceCount);
   delete [] tmp;
   
@@ -162,7 +162,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   pvd = vtkPVData::New();
   pvd->SetApplication(pvApp);
 
-  outputTclName = new char[strlen(tclName)+7];
+  outputTclName = new char[strlen(tclName)+7+10];
   sprintf(outputTclName, "%sOutput", tclName);
   s->UpdateInformation();
   switch (s->GetDataType())
@@ -199,7 +199,7 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());   
 
-  extentTclName = new char[strlen(tclName)+11 + (this->InstanceCount%10)+1];
+  extentTclName = new char[strlen(tclName)+11 + (this->InstanceCount%10)+1 + 10];
   sprintf(extentTclName, "%s%dTranslator", tclName, this->InstanceCount);
   pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);
   pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",

@@ -402,7 +402,7 @@ void vtkPVProbe::CreateProperties()
   this->Script("[%s GetPosition2Coordinate] SetValue 0.8 0.3 0",
 	       this->XYPlotTclName);
   this->Script("%s SetNumberOfXLabels 5", this->XYPlotTclName);
-  this->Script("%s SetXTitle \"Line Divisions\"", this->XYPlotTclName);
+  this->Script("%s SetXTitle {Line Divisions}", this->XYPlotTclName);
 }
 
 void vtkPVProbe::SetInteractor()
