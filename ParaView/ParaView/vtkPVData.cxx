@@ -514,8 +514,8 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          pvApp->GetNumberOfPipes());
 #else
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  pvApp->BroadcastScript("%s SetThreshold %f", tclName, 
-                         this->CollectThreshold);
+  pvApp->BroadcastScript("%s SetThreshold 1000", tclName);
+  
 #endif
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
@@ -2784,8 +2784,8 @@ void vtkPVData::SetCollectThreshold(float threshold)
   
   vtkPVApplication *pvApp = this->GetPVApplication();
     
-  pvApp->BroadcastScript("%s SetThreshold %f", this->CollectTclName,
-                         threshold*1000.0);
+  pvApp->BroadcastScript("%s SetThreshold %d", this->CollectTclName,
+                         static_cast<unsigned long>(threshold*1000.0));
 }
 
 
@@ -2794,7 +2794,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.133 $");
+  this->ExtractRevision(os,"$Revision: 1.134 $");
 }
 
 //----------------------------------------------------------------------------
