@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.206");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.207");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1506,8 +1506,8 @@ void vtkPVRenderView::AddPVData(vtkPVData *pvc)
     
   if (pvc->GetPropTclName() != NULL)
     {
-    pvApp->Script("%s AddProp %s", this->RendererTclName,
-                  pvc->GetPropTclName());
+    pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
+                           pvc->GetPropTclName());
     }
 }
 
@@ -1524,7 +1524,7 @@ void vtkPVRenderView::RemovePVData(vtkPVData *pvc)
   pvc->SetPVRenderView(NULL);
   if (pvc->GetPropTclName() != NULL)
     {
-    pvApp->Script("%s RemoveProp %s", this->RendererTclName,
+    pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
                   pvc->GetPropTclName());
     }
 }
@@ -2341,7 +2341,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.206 $");
+  this->ExtractRevision(os,"$Revision: 1.207 $");
 }
 
 //------------------------------------------------------------------------------
