@@ -42,12 +42,6 @@ public:
   // Callback that set the center to the middle of the bounds.
   void CenterResetCallback();
 
-  //BTX
-  // Description:
-  // The Tcl name of the VTK implicit plane.
-  vtkGetMacro(SphereID, vtkClientServerID);
-  //ETX
-
   // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
@@ -97,7 +91,7 @@ public:
   // Description:
   // Return a contained object by name as follows:
   // Sphere == SphereID
-  vtkClientServerID GetObjectByName(const char* ){ return this->SphereID;}
+  vtkClientServerID GetObjectByName(const char* );
   //ETX
 
   // Description:
@@ -129,13 +123,6 @@ protected:
 
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
-
-  vtkClientServerID SphereID;
-
-  double LastAcceptedCenter[3];
-  double LastAcceptedRadius;
-  vtkSetVector3Macro(LastAcceptedCenter, double);
-  vtkSetMacro(LastAcceptedRadius, double);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);

@@ -50,12 +50,6 @@ public:
   void NormalYCallback();
   void NormalZCallback();
 
-  //BTX
-  // Description:
-  // The Tcl name of the VTK implicit plane.
-  vtkGetMacro(PlaneID, vtkClientServerID);
-  vtkSetMacro(PlaneID, vtkClientServerID);
-  //ETX
 
   // Description:
   // This method sets the input to the 3D widget and places the widget.
@@ -112,7 +106,8 @@ public:
   // Description:
   // Return a contained object by name as follows:
   // Plane == PlaneID
-  vtkClientServerID GetObjectByName(const char* ){ return this->PlaneID;}
+  vtkClientServerID GetObjectByName(const char* );
+
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -151,13 +146,6 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
 
-  vtkClientServerID PlaneID;
-
-  double LastAcceptedCenter[3];
-  double LastAcceptedNormal[3];
-  vtkSetVector3Macro(LastAcceptedCenter, double);
-  vtkSetVector3Macro(LastAcceptedNormal, double);
-  
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 

@@ -31,8 +31,11 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
 
+#include "vtkKWEvent.h"
+#include "vtkRMLineWidget.h"
+
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.50");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.51");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -47,6 +50,7 @@ vtkPVLineWidget::vtkPVLineWidget()
     this->Point2[i] = vtkKWEntry::New();
     }
   this->ResolutionEntry = vtkKWEntry::New();
+  this->RM3DWidget = vtkRMLineWidget::New();
   this->Point1Variable = 0;
   this->Point2Variable = 0;
   this->ResolutionVariable = 0;
@@ -60,12 +64,6 @@ vtkPVLineWidget::vtkPVLineWidget()
   this->SetResolutionLabelTextName("Resolution");
 
   this->ShowResolution = 1;
-
-  this->LastAcceptedPoint1[0] = -0.5;
-  this->LastAcceptedPoint1[1] = this->LastAcceptedPoint1[2] = 0;
-  this->LastAcceptedPoint2[0] = 0.5;
-  this->LastAcceptedPoint2[1] = this->LastAcceptedPoint2[2] = 0;
-  this->LastAcceptedResolution = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -81,7 +79,8 @@ vtkPVLineWidget::~vtkPVLineWidget()
     }
   this->ResolutionLabel->Delete();
   this->ResolutionEntry->Delete();
-  
+  this->RM3DWidget->Delete();
+
   this->SetPoint1Variable(0);
   this->SetPoint2Variable(0);
   this->SetResolutionVariable(0);
@@ -131,25 +130,7 @@ void vtkPVLineWidget::SetResolutionLabelTextName(const char* varname)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint1Internal(double x, double y, double z)
 {
-  this->Point1[0]->SetValue(x);
-  this->Point1[1]->SetValue(y);
-  this->Point1[2]->SetValue(z);
- 
-  int i;
-  double pos[3];
-  for (i=0; i<3; i++)
-    {
-    pos[i] = this->Point1[i]->GetValueAsFloat();
-    }
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "SetPoint1" << pos[0] << pos[1] <<  pos[2]
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "SetAlignToNone" <<  vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->Render();
+  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->SetPoint1(x,y,z);
 }
 
 //----------------------------------------------------------------------------
@@ -167,34 +148,13 @@ void vtkPVLineWidget::GetPoint1(double pt[3])
     vtkErrorMacro("Not created yet.");
     return;
     }
-  pt[0] = this->Point1[0]->GetValueAsFloat();
-  pt[1] = this->Point1[1]->GetValueAsFloat();
-  pt[2] = this->Point1[2]->GetValueAsFloat();
+  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetPoint1(pt);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetPoint2Internal(double x, double y, double z)
 {
-  this->Point2[0]->SetValue(x);
-  this->Point2[1]->SetValue(y);
-  this->Point2[2]->SetValue(z);
- 
-  int i;
-  double pos[3];
-  for (i=0; i<3; i++)
-    {
-    pos[i] = this->Point2[i]->GetValueAsFloat();
-    }
-
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "SetPoint2" << pos[0] << pos[1] <<  pos[2]
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "SetAlignToNone" <<  vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->Render();
+  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->SetPoint2(x,y,z);
 }
 
 //----------------------------------------------------------------------------
@@ -212,9 +172,7 @@ void vtkPVLineWidget::GetPoint2(double pt[3])
     vtkErrorMacro("Not created yet.");
     return;
     }
-  pt[0] = this->Point2[0]->GetValueAsFloat();
-  pt[1] = this->Point2[1]->GetValueAsFloat();
-  pt[2] = this->Point2[2]->GetValueAsFloat();
+  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetPoint2(pt);
 }
 
 //----------------------------------------------------------------------------
@@ -256,21 +214,7 @@ void vtkPVLineWidget::SetPoint2()
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetResolution(int i)
 {
-  this->ResolutionEntry->SetValue(i);
-  int res = this->ResolutionEntry->GetValueAsInt();
-
-
-  if ( !this->GetPVApplication() )
-    {
-    return;
-    } 
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "SetResolution" << res
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->Render();
+  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->SetResolution(i);
 }
 
 //----------------------------------------------------------------------------
@@ -282,7 +226,7 @@ int vtkPVLineWidget::GetResolution()
     return 0;
     }
 
-  return this->ResolutionEntry->GetValueAsInt();
+  return static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetResolution();
 }
 
 //----------------------------------------------------------------------------
@@ -328,51 +272,8 @@ void vtkPVLineWidget::AcceptInternal(vtkClientServerID sourceID)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::UpdateVTKObject(vtkClientServerID sourceID)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->SetPoint1Internal(this->Point1[0]->GetValueAsFloat(),
-                          this->Point1[1]->GetValueAsFloat(),
-                          this->Point1[2]->GetValueAsFloat());
-  this->SetPoint2Internal(this->Point2[0]->GetValueAsFloat(),
-                          this->Point2[1]->GetValueAsFloat(),
-                          this->Point2[2]->GetValueAsFloat());
-
-  this->SetLastAcceptedPoint1(this->Point1[0]->GetValueAsFloat(),
-                              this->Point1[1]->GetValueAsFloat(),
-                              this->Point1[2]->GetValueAsFloat());
-  this->SetLastAcceptedPoint2(this->Point2[0]->GetValueAsFloat(),
-                              this->Point2[1]->GetValueAsFloat(),
-                              this->Point2[2]->GetValueAsFloat());
-  this->SetLastAcceptedResolution(this->ResolutionEntry->GetValueAsFloat());
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  char acceptCmd[1024];
-  if ( this->Point1Variable && sourceID.ID )    
-    {
-    sprintf(acceptCmd, "Set%s", this->Point1Variable);
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                    << acceptCmd << this->Point1[0]->GetValueAsFloat()
-                    << this->Point1[1]->GetValueAsFloat()
-                    << this->Point1[2]->GetValueAsFloat()
-                    << vtkClientServerStream::End;
-    }
-  if ( this->Point2Variable && sourceID.ID )
-    {
-    sprintf(acceptCmd, "Set%s", this->Point2Variable);
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                    << acceptCmd << this->Point2[0]->GetValueAsFloat()
-                    << this->Point2[1]->GetValueAsFloat()
-                    << this->Point2[2]->GetValueAsFloat()
-                    << vtkClientServerStream::End;
-    }
-  if ( this->ResolutionVariable && sourceID.ID )
-    {
-    sprintf(acceptCmd, "Set%s", this->ResolutionVariable);
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                    << acceptCmd
-                    << this->ResolutionEntry->GetValueAsInt()
-                    << vtkClientServerStream::End;
-    }
-  pm->SendStream(vtkProcessModule::DATA_SERVER);
+  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->UpdateVTKObject(sourceID,
+    this->Point1Variable, this->Point2Variable, this->ResolutionVariable);
 }
 
 //----------------------------------------------------------------------------
@@ -400,13 +301,7 @@ void vtkPVLineWidget::ActualPlaceWidget()
     bds[1] = bds[3] = bds[5] = 1.0;
     }
   
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "PlaceWidget" 
-                  <<  bds[0] << bds[1] << bds[2] << bds[3] << bds[4] << bds[5] 
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->RM3DWidget->PlaceWidget(bds);
   this->UpdateVTKObject(this->ObjectID);
 }
 
@@ -456,13 +351,7 @@ void vtkPVLineWidget::ResetInternal()
     {
     return;
     }
-
-  this->SetPoint1(this->LastAcceptedPoint1[0], this->LastAcceptedPoint1[1],
-                  this->LastAcceptedPoint1[2]);
-  this->SetPoint2(this->LastAcceptedPoint2[0], this->LastAcceptedPoint2[1],
-                  this->LastAcceptedPoint2[2]);
-  this->SetResolution(static_cast<int>(this->LastAcceptedResolution));
-
+  static_cast<vtkRMLineWidget*>(this->RM3DWidget)->ResetInternal();
   this->Superclass::ResetInternal();
 }
 
@@ -551,36 +440,45 @@ int vtkPVLineWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
-  vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
-  if (!widget)
+  if(l == vtkKWEvent::WidgetModifiedEvent)
     {
-    return;
-    }
-  double val[3];
-  int i;
-  widget->GetPoint1(val);
-  for (i=0; i<3; i++)
-    {
-    this->Point1[i]->SetValue(val[i]);
-    }
+    double pos[3];
+    int res;
+    static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetPoint1(pos);
+    this->Point1[0]->SetValue(pos[0]);
+    this->Point1[1]->SetValue(pos[1]);
+    this->Point1[2]->SetValue(pos[2]);
+
+    static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetPoint2(pos);
+    this->Point2[0]->SetValue(pos[0]);
+    this->Point2[1]->SetValue(pos[1]);
+    this->Point2[2]->SetValue(pos[2]);
+    
+    res = static_cast<vtkRMLineWidget*>(this->RM3DWidget)->GetResolution();
+    this->ResolutionEntry->SetValue(res);
+
+    this->Render();
   
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "SetPoint1" << val[0] << val[1] <<  val[2]
-                  << vtkClientServerStream::End;
-  
-  widget->GetPoint2(val);
-  for (i=0; i<3; i++)
+    }
+  else
     {
-    this->Point2[i]->SetValue(val[i],5);
-    } 
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "SetPoint2" << val[0] << val[1] <<  val[2]
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->Superclass::ExecuteEvent(wdg, l, p);
+    vtkLineWidget* widget = vtkLineWidget::SafeDownCast(wdg);
+    if (!widget)
+      {
+      return;
+      }
+    double val[3];
+    
+    widget->GetPoint1(val);
+    this->SetPoint1(val[0],val[1],val[2]);
+    
+    widget->GetPoint2(val);
+    this->SetPoint2(val[0],val[1],val[2]);
+    
+    this->Superclass::ExecuteEvent(wdg, l, p);
+    }
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::SetBalloonHelpString(const char *str)
@@ -636,11 +534,7 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceName("Line");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  this->Widget3DID = pm->NewStreamObject("vtkLineWidget");
-  pm->GetStream() << vtkClientServerStream::Invoke <<  this->Widget3DID
-                  << "SetAlignToNone" << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");

@@ -104,9 +104,6 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
 
-  double LastAcceptedPosition[3];
-  vtkSetVector3Macro(LastAcceptedPosition, double);
-  
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 

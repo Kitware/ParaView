@@ -32,6 +32,8 @@ class vtk3DWidget;
 class vtkPV3DWidgetObserver;
 class vtkKWFrame;
 
+class vtkRM3DWidget;
+
 class VTK_EXPORT vtkPV3DWidget : public vtkPVObjectWidget
 {
 public:
@@ -102,7 +104,6 @@ protected:
   ~vtkPV3DWidget();
 
   void Render();
-  
 
   vtkPV3DWidgetObserver* Observer;
 
@@ -135,13 +136,13 @@ protected:
   vtkKWFrame*        Frame;
   vtkKWLabeledFrame* LabeledFrame;
   vtkKWCheckButton* Visibility;
+  vtkRM3DWidget* RM3DWidget;
   int ValueChanged;
   int Placed;
   int Visible;
   int UseLabel;
 
-  vtkClientServerID Widget3DID;
-  vtk3DWidget* Widget3D;
+  vtk3DWidget* Widget3D;  
 
 private:  
   vtkPV3DWidget(const vtkPV3DWidget&); // Not implemented

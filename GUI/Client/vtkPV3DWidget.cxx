@@ -32,8 +32,10 @@
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
 
+#include "vtkKWEvent.h"
+#include "vtkRM3DWidget.h"
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.53");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.54");
 
 //===========================================================================
 //***************************************************************************
@@ -70,9 +72,9 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->LabeledFrame = vtkKWLabeledFrame::New();
   this->Visibility   = vtkKWCheckButton::New();
   this->Frame        = vtkKWFrame::New();
+  this->RM3DWidget = 0; //will be initialized by subclass
   this->ValueChanged = 1;
   this->ModifiedFlag = 1;
-  this->Widget3DID.ID = 0;
   this->Visible = 0;
   this->Placed = 0;
   this->UseLabel = 1;
@@ -82,16 +84,6 @@ vtkPV3DWidget::vtkPV3DWidget()
 //----------------------------------------------------------------------------
 vtkPV3DWidget::~vtkPV3DWidget()
 {
-  if (this->Widget3DID.ID)
-    {    
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();    
-    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                    << "EnabledOff" << vtkClientServerStream::End;
-    pm->DeleteStreamObject(this->Widget3DID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    this->Widget3DID.ID = 0;
-    }
   this->Observer->Delete();
   this->Visibility->Delete();
   this->LabeledFrame->Delete();
@@ -146,33 +138,21 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
   this->Script("pack %s -fill x -expand 1",
                this->Visibility->GetWidgetName());
 
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+
+  this->RM3DWidget->Create(pm,pvApp->GetRenderModule()->GetRendererID(),
+    this->GetPVSource()->GetPVWindow()->GetInteractorID());
+
+
   this->ChildCreate(pvApp);
 
-  if(this->Widget3DID.ID != 0)
+  if(this->RM3DWidget->GetWidget3DID().ID != 0)
     {
     this->Widget3D = 
-      vtk3DWidget::SafeDownCast(pvApp->GetProcessModule()->GetObjectFromID(this->Widget3DID));
+      vtk3DWidget::SafeDownCast(pvApp->GetProcessModule()->
+      GetObjectFromID(this->RM3DWidget->GetWidget3DID()));
+    this->InitializeObservers(this->Widget3D);
     }
-  
-  // Only initialize observers on the UI process.
-  if (this->Widget3DID.ID  != 0)
-    {
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();    
-    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
-                    << "SetCurrentRenderer" 
-                    << pvApp->GetRenderModule()->GetRendererID()
-                    << vtkClientServerStream::End;
-
-    // Default/dummy interactor for satelite procs.
-    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
-                    << "SetInteractor" 
-                    << this->PVSource->GetPVWindow()->GetInteractorID()
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    this->InitializeObservers(
-      vtk3DWidget::SafeDownCast(pm->GetObjectFromID(this->Widget3DID)));
-    }
-
   this->PlaceWidget();
 }
 
@@ -193,6 +173,10 @@ void vtkPV3DWidget::InitializeObservers(vtk3DWidget* widget3D)
     widget3D->AddObserver(vtkCommand::EndInteractionEvent, 
                           this->Observer);
     widget3D->EnabledOff();
+    }
+  if(this->RM3DWidget)
+    {
+    this->RM3DWidget->AddObserver(vtkKWEvent::WidgetModifiedEvent,this->Observer);
     }
   this->Observer->Execute(widget3D, vtkCommand::InteractionEvent, 0);
 }
@@ -258,9 +242,7 @@ void vtkPV3DWidget::SetVisibility(int visibility)
     this->PlaceWidget();
     }
   this->Widget3D->SetCurrentRenderer(this->PVSource->GetPVWindow()->GetMainView()->GetRenderer());
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                  << "SetEnabled" << visibility << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->RM3DWidget->SetVisibility(visibility);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
                       this->GetTclName(), visibility);
   this->Visibility->SetState(visibility);
@@ -286,10 +268,7 @@ void vtkPV3DWidget::Deselect()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibilityNoTrace(int visibility)
 {  
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                  << "SetEnabled" << visibility << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->RM3DWidget->SetVisibility(visibility);
 }
 
 //----------------------------------------------------------------------------
@@ -314,14 +293,7 @@ void vtkPV3DWidget::ActualPlaceWidget()
   //this->Widget3D->SetInput(data);
   double bds[6];
   this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                  << "PlaceWidget" 
-                  << bds[0] << bds[1] << bds[2] << bds[3] 
-                  << bds[4] << bds[5] << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->RM3DWidget->PlaceWidget(bds);
 }
 
 //----------------------------------------------------------------------------
@@ -329,7 +301,7 @@ void vtkPV3DWidget::PlaceWidget()
 {
   // We should really check to see if the input has changed (modified).
 
-  if (!this->Placed && this->Widget3DID.ID)
+  if (!this->Placed && this->RM3DWidget->GetWidget3DID().ID != 0 )
     {
     this->ActualPlaceWidget();
     this->Placed = 1;
@@ -396,5 +368,5 @@ void vtkPV3DWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Use Label: " << (this->UseLabel?"on":"off") << endl;
   os << indent << "3D Widget:" << endl;
-  os << indent << "3DWidgetID: " << this->Widget3DID << endl;
+  os << indent << "RM3DWidget: " << this->RM3DWidget << endl; 
 }

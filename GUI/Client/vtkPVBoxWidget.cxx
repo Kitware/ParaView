@@ -43,8 +43,11 @@
 #include "vtkPlanes.h"
 #include "vtkPlane.h"
 
+#include "vtkRMBoxWidget.h"
+#include "vtkKWEvent.h"
+
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.33");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -53,12 +56,6 @@ int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVBoxWidget::vtkPVBoxWidget()
 {
   this->CommandFunction = vtkPVBoxWidgetCommand;
-  this->BoxID.ID = 0;
-  this->BoxMatrixID.ID = 0;
-  this->BoxTransformID.ID = 0;
-
-  this->BoxTransform = 0;
-  this->Box = 0;
 
   this->ControlFrame = vtkKWFrame::New();
   this->TranslateLabel = vtkKWLabel::New();
@@ -71,15 +68,9 @@ vtkPVBoxWidget::vtkPVBoxWidget()
     this->TranslateThumbWheel[cc] = vtkKWThumbWheel::New();
     this->ScaleThumbWheel[cc] = vtkKWThumbWheel::New();
     this->OrientationScale[cc] = vtkKWScale::New();
-
-    this->PositionGUI[cc] = 0.0;
-    this->ScaleGUI[cc]    = 1.0;
-    this->RotationGUI[cc] = 0.0;
-    this->StoredPosition[cc] = 0.0;
-    this->StoredScale[cc]    = 1.0;
-    this->StoredRotation[cc] = 0.0;
     }
 
+  this->RM3DWidget = vtkRMBoxWidget::New();
   this->Initialized = 0;
 }
 
@@ -98,30 +89,7 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
     this->ScaleThumbWheel[cc]->Delete();
     this->OrientationScale[cc]->Delete();
     }
-  vtkPVProcessModule* pm = 0;
-  if(this->GetPVApplication())
-    {
-    pm = this->GetPVApplication()->GetProcessModule();
-    }
-  if (pm && this->BoxID.ID)
-    {
-    pm->DeleteStreamObject(this->BoxID);
-    this->BoxID.ID = 0;
-    }
-  if (pm && this->BoxTransformID.ID )
-    {
-    pm->DeleteStreamObject(this->BoxTransformID);
-    this->BoxTransformID.ID = 0; 
-    }
-  if (pm && this->BoxMatrixID.ID)
-    {
-    pm->DeleteStreamObject(this->BoxMatrixID);
-    this->BoxMatrixID.ID = 0;
-    }
-  if(pm)
-    {
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-    }
+  this->RM3DWidget->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -131,27 +99,7 @@ void vtkPVBoxWidget::ResetInternal()
     {
     return;
     }
-  if ( this->BoxID.ID )
-    {
-    //this->Script("eval %s SetState [ %s GetState ]", 
-    //this->GetTclName(), this->BoxTclName);
-    //this->SetPositionGUI(this->StoredPosition);
-    //this->SetRotationGUI(this->StoredRotation);
-    //this->SetScaleGUI(this->StoredScale);
-    if ( this->StoredRotation[0] < 0 ) { this->StoredRotation[0] += 360; }
-    if ( this->StoredRotation[1] < 0 ) { this->StoredRotation[1] += 360; }
-    if ( this->StoredRotation[2] < 0 ) { this->StoredRotation[2] += 360; }
-    this->OrientationScale[0]->SetValue(this->StoredRotation[0]);
-    this->OrientationScale[1]->SetValue(this->StoredRotation[1]);
-    this->OrientationScale[2]->SetValue(this->StoredRotation[2]);
-    this->ScaleThumbWheel[0]->SetValue(this->StoredScale[0]);
-    this->ScaleThumbWheel[1]->SetValue(this->StoredScale[1]);
-    this->ScaleThumbWheel[2]->SetValue(this->StoredScale[2]);
-    this->TranslateThumbWheel[0]->SetValue(this->StoredPosition[0]);
-    this->TranslateThumbWheel[1]->SetValue(this->StoredPosition[1]);
-    this->TranslateThumbWheel[2]->SetValue(this->StoredPosition[2]);
-    this->UpdateBox(1);
-    }
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->ResetInternal();
   this->Superclass::ResetInternal();
 }
 
@@ -159,51 +107,23 @@ void vtkPVBoxWidget::ResetInternal()
 void vtkPVBoxWidget::ActualPlaceWidget()
 {
   this->Superclass::ActualPlaceWidget();
-  vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-    this->GetApplication());
-  vtkPVProcessModule* pm = pvApp->GetProcessModule(); 
-  // now make sure the widget is placed on the server
-  // since this is the only 3d widget on the server....
   double bds[6];
   this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
-  pvApp->GetProcessModule()->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                  << "PlaceWidget" 
-                  << bds[0] << bds[1] << bds[2] << bds[3] 
-                  << bds[4] << bds[5] << vtkClientServerStream::End;
-  pvApp->GetProcessModule()->SendStream(vtkProcessModule::DATA_SERVER);
-  
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->Widget3DID << "GetPlanes" << this->BoxID 
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  this->RM3DWidget->PlaceWidget(bds);  
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
-  vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(this->GetApplication());
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-
   this->PlaceWidget(); 
   if ( ! this->ModifiedFlag)
     {
     return;
     }
-  if ( this->BoxID.ID )
-    {
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->Widget3DID << "GetPlanes" << this->BoxID 
-                    << vtkClientServerStream::End;
-    this->SetStoredPosition(this->PositionGUI);
-    this->SetStoredRotation(this->RotationGUI);
-    this->SetStoredScale(this->ScaleGUI);
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS); 
-    }
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->UpdateVTKObject();
   this->Superclass::AcceptInternal(sourceID);
   this->Initialized = 1;
 }
-
-
 //---------------------------------------------------------------------------
 void vtkPVBoxWidget::Trace(ofstream *file)
 {
@@ -256,7 +176,7 @@ void vtkPVBoxWidget::UpdateVTKObject(const char*)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 {
-  vtkTransform* trans = this->BoxTransform;
+  vtkTransform* trans = static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxTransform();
   trans->Identity();
   trans->Translate(this->GetPositionFromGUI());
   this->GetRotationFromGUI();
@@ -265,36 +185,41 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
   trans->RotateY(this->RotationGUI[1]);
   trans->Scale(this->GetScaleFromGUI());
   vtkMatrix4x4* mat = trans->GetMatrix();
+  
+  vtkClientServerID boxMatrixID = 
+    static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxMatrixID();
 
   *file << endl;
-  *file << "set pvTemp" << this->BoxMatrixID.ID
+  *file << "set pvTemp" << boxMatrixID.ID
         << " [$proxyManager NewProxy matrices Matrix4x4]"
         << endl;
-  *file << "  $proxyManager RegisterProxy math pvTemp" << this->BoxMatrixID.ID
-        << " $pvTemp" << this->BoxMatrixID.ID << endl;
-  *file << "  $pvTemp" << this->BoxMatrixID.ID << " UnRegister {}" << endl;
+  *file << "  $proxyManager RegisterProxy matrices pvTemp" << boxMatrixID.ID
+        << " $pvTemp" << boxMatrixID.ID << endl;
+  *file << "  $pvTemp" << boxMatrixID.ID << " UnRegister {}" << endl;
 
   for(int i=0; i<16; i++)
     {
-    *file << "  [$pvTemp" << this->BoxMatrixID.ID
+    *file << "  [$pvTemp" << boxMatrixID.ID
           << " GetProperty DeepCopy] SetElement " << i
           << " " << *(&mat->Element[0][0] + i)
           << endl;
     }
-  *file << "  $pvTemp" << this->BoxMatrixID.ID
+  *file << "  $pvTemp" << boxMatrixID.ID
         << " UpdateVTKObjects" << endl;
 
   *file << endl;
-  *file << "set pvTemp" << this->BoxTransformID.ID
+  vtkClientServerID boxTransformID = 
+    static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxTransformID();
+  *file << "set pvTemp" << boxTransformID.ID
         << " [$proxyManager NewProxy transforms Transform]"
         << endl;
-  *file << "$proxyManager RegisterProxy math pvTemp" << this->BoxTransformID.ID
-        << " $pvTemp" << this->BoxTransformID.ID << endl;
-  *file << " $pvTemp" << this->BoxTransformID.ID << " UnRegister {}" << endl;
-  *file << "  [$pvTemp" << this->BoxTransformID.ID
-        << " GetProperty Matrix] AddProxy $pvTemp" << this->BoxMatrixID.ID
+  *file << "$proxyManager RegisterProxy transforms pvTemp" << boxTransformID.ID
+        << " $pvTemp" << boxTransformID.ID << endl;
+  *file << " $pvTemp" << boxTransformID.ID << " UnRegister {}" << endl;
+  *file << "  [$pvTemp" << boxTransformID.ID
+        << " GetProperty Matrix] AddProxy $pvTemp" << boxMatrixID.ID
         << endl;
-  *file << "  $pvTemp" << this->BoxTransformID.ID
+  *file << "  $pvTemp" << boxTransformID.ID
         << " UpdateVTKObjects"  << endl;
 
   *file << endl;
@@ -304,13 +229,6 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 void vtkPVBoxWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "BoxID: " << this->BoxID.ID
-     << endl;
-  os << indent << "Box: " 
-    << this->Box << endl;
-  os << indent << "BoxTransform: " 
-    << this->BoxTransform << endl;
-  os << indent << "BoxTransformID" << this->BoxTransformID << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -366,22 +284,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  this->Widget3DID = pm->NewStreamObject("vtkBoxWidget");
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "SetPlaceFactor" << 1.0 
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "PlaceWidget"
-                  << 0 << 1 << 0 << 1 << 0 << 1
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-  this->BoxID = pm->NewStreamObject("vtkPlanes");
-  this->BoxMatrixID = pm->NewStreamObject("vtkMatrix4x4");
-  this->BoxTransformID = pm->NewStreamObject("vtkTransform");
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-  
-  this->Box = vtkPlanes::SafeDownCast(pm->GetObjectFromID(this->BoxID));
-  this->BoxTransform = vtkTransform::SafeDownCast(pm->GetObjectFromID(this->BoxTransformID));
   this->SetFrameLabel("Box Widget");
-
   this->ControlFrame->SetParent(this->Frame->GetFrame());
   this->ControlFrame->Create(this->GetApplication(), 0);
 
@@ -521,13 +424,16 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     }
 
   this->SetBalloonHelpString(this->BalloonHelpString);
-
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ScaleCallback()
 {
-  this->SetScaleNoTrace(this->GetScaleFromGUI());
+  this->GetScaleFromGUI();
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->SetScaleNoEvent(
+    this->ScaleGUI[0],this->ScaleGUI[1],this->ScaleGUI[2]);
+  this->SetValueChanged();
+
   if ( this->GetPVSource()->GetPVRenderView() )
     {
     this->GetPVSource()->GetPVRenderView()->EventuallyRender();
@@ -537,7 +443,10 @@ void vtkPVBoxWidget::ScaleCallback()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::TranslateCallback()
 {
-  this->SetTranslateNoTrace(this->GetPositionFromGUI());
+  this->GetPositionFromGUI();
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->SetPositionNoEvent(
+    this->PositionGUI[0], this->PositionGUI[1], this->PositionGUI[2]);
+  this->SetValueChanged();
   if ( this->GetPVSource()->GetPVRenderView() )
     {
     this->GetPVSource()->GetPVRenderView()->EventuallyRender();
@@ -547,7 +456,10 @@ void vtkPVBoxWidget::TranslateCallback()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::OrientationCallback()
 {
-  this->SetOrientationNoTrace(this->GetRotationFromGUI());
+  this->GetRotationFromGUI();
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->SetRotationNoEvent(
+    this->RotationGUI[0],this->RotationGUI[1],this->RotationGUI[2]);
+  this->SetValueChanged();
   if ( this->GetPVSource()->GetPVRenderView() )
     {
     this->GetPVSource()->GetPVRenderView()->EventuallyRender();
@@ -615,25 +527,28 @@ void vtkPVBoxWidget::OrientationKeyPressCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetOrientationNoTrace(float, float, float)
+void vtkPVBoxWidget::SetOrientationInternal(double x, double y, double z)
 {
-  this->UpdateBox(1);
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->SetRotation(x,y,z);
+  this->SetValueChanged();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetTranslateNoTrace(float, float, float)
+void vtkPVBoxWidget::SetTranslateInternal(double x, double y, double z)
 {
-  this->UpdateBox(1);
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->SetPosition(x,y,z);
+  this->SetValueChanged();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetScaleNoTrace(float, float, float)
+void vtkPVBoxWidget::SetScaleInternal(double x, double y, double z)
 {
-  this->UpdateBox(1);
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->SetScale(x,y,z);
+  this->SetValueChanged();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetOrientation(float px, float py, float pz)
+void vtkPVBoxWidget::SetOrientation(double px, double py, double pz)
 {
   this->GetRotationFromGUI();
   if ( !( px == this->RotationGUI[0] && 
@@ -646,108 +561,47 @@ void vtkPVBoxWidget::SetOrientation(float px, float py, float pz)
     if ( px < 0 ) { px += 360; }
     if ( py < 0 ) { py += 360; }
     if ( pz < 0 ) { pz += 360; }
-    this->OrientationScale[0]->SetValue(px);
-    this->OrientationScale[1]->SetValue(py);
-    this->OrientationScale[2]->SetValue(pz);
+    this->SetOrientationInternal(px, py, pz);
     }
-  this->SetOrientationNoTrace(px, py, pz);
-  if ( this->GetPVSource()->GetPVRenderView() )
-    {
-    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
-    }
-
   this->AddTraceEntry("$kw(%s) SetOrientation %f %f %f",
                       this->GetTclName(), px, py, pz);  
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetScale(float px, float py, float pz)
+void vtkPVBoxWidget::SetScale(double px, double py, double pz)
 {
   this->GetScaleFromGUI();
   if ( !( px == this->ScaleGUI[0] && 
       py == this->ScaleGUI[1] && 
       pz == this->ScaleGUI[2] ) )
     {
-    this->ScaleThumbWheel[0]->SetValue(px);
-    this->ScaleThumbWheel[1]->SetValue(py);
-    this->ScaleThumbWheel[2]->SetValue(pz);
+    this->SetScaleInternal(px, py, pz);
     }
-  this->SetScaleNoTrace(px, py, pz);
-  if ( this->GetPVSource()->GetPVRenderView() )
-    {
-    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
-    }
-
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::SetTranslate(float px, float py, float pz)
+void vtkPVBoxWidget::SetTranslate(double px, double py, double pz)
 {
   this->GetPositionFromGUI();
   if ( !( px == this->PositionGUI[0] && 
       py == this->PositionGUI[1] && 
       pz == this->PositionGUI[2] ) )
     {
-    this->TranslateThumbWheel[0]->SetValue(px);
-    this->TranslateThumbWheel[1]->SetValue(py);
-    this->TranslateThumbWheel[2]->SetValue(pz);
-    }
-  this->SetTranslateNoTrace(px, py, pz);
-  if ( this->GetPVSource()->GetPVRenderView() )
-    {
-    this->GetPVSource()->GetPVRenderView()->EventuallyRender();
+    this->SetTranslateInternal(px, py, pz);
     }
 
   this->AddTraceEntry("$kw(%s) SetTranslate %f %f %f",
                       this->GetTclName(), px, py, pz);  
 }
-
-//----------------------------------------------------------------------------
-void vtkPVBoxWidget::UpdateBox(int update)
-{
-  vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkTransform* trans = this->BoxTransform;
-  trans->Identity();
-  if ( update || !this->Initialized )
-    {
-    this->GetPositionFromGUI();
-    this->GetRotationFromGUI();
-    this->GetScaleFromGUI();
-    this->Initialized = 1;
-    }
-  trans->Translate(this->PositionGUI);
-  trans->RotateZ(this->RotationGUI[2]);
-  trans->RotateX(this->RotationGUI[0]);
-  trans->RotateY(this->RotationGUI[1]);
-  trans->Scale(this->ScaleGUI);
-  vtkMatrix4x4* mat = trans->GetMatrix();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke << this->BoxTransformID
-                  << "Identity" << vtkClientServerStream::End
-                  << vtkClientServerStream::Invoke << this->BoxMatrixID
-                  << "DeepCopy" 
-                  << vtkClientServerStream::InsertArray(&mat->Element[0][0], 16)
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << this->BoxTransformID
-                  << "SetMatrix" << this->BoxMatrixID << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                  << "SetTransform" << this->BoxTransformID << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-  this->SetValueChanged();
-}
-
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::UpdateFromBox()
 {
-  vtkBoxWidget* box = static_cast<vtkBoxWidget*>(this->Widget3D);
-  box->GetTransform(this->BoxTransform);
-  float orientation[3];
-  float scale[3];
-  float position[3];
-  this->BoxTransform->GetOrientation(orientation);
-  this->BoxTransform->GetScale(scale);
-  this->BoxTransform->GetPosition(position);
+  double orientation[3];
+  double scale[3];
+  double position[3];
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetRotation(orientation);
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetPosition(position);
+  static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetScale(scale);
 
   this->GetScaleFromGUI();
   if ( !( scale[0] == this->ScaleGUI[0] && 
@@ -757,8 +611,8 @@ void vtkPVBoxWidget::UpdateFromBox()
     this->ScaleThumbWheel[0]->SetValue(scale[0]);
     this->ScaleThumbWheel[1]->SetValue(scale[1]);
     this->ScaleThumbWheel[2]->SetValue(scale[2]);
-    this->SetScaleNoTrace(scale);
     }
+  
   this->GetPositionFromGUI();
   if ( !( position[0] == this->PositionGUI[0] && 
       position[1] == this->PositionGUI[1] && 
@@ -767,7 +621,6 @@ void vtkPVBoxWidget::UpdateFromBox()
     this->TranslateThumbWheel[0]->SetValue(position[0]);
     this->TranslateThumbWheel[1]->SetValue(position[1]);
     this->TranslateThumbWheel[2]->SetValue(position[2]);
-    this->SetTranslateNoTrace(position);
     }
 
   this->GetRotationFromGUI();
@@ -781,12 +634,11 @@ void vtkPVBoxWidget::UpdateFromBox()
     this->OrientationScale[0]->SetValue(orientation[0]);
     this->OrientationScale[1]->SetValue(orientation[1]);
     this->OrientationScale[2]->SetValue(orientation[2]);
-    this->SetOrientationNoTrace(orientation);
     }
 }
 
 //----------------------------------------------------------------------------
-float* vtkPVBoxWidget::GetPositionFromGUI()
+double* vtkPVBoxWidget::GetPositionFromGUI()
 {
   this->PositionGUI[0] = this->TranslateThumbWheel[0]->GetValue();
   this->PositionGUI[1] = this->TranslateThumbWheel[1]->GetValue();
@@ -795,7 +647,7 @@ float* vtkPVBoxWidget::GetPositionFromGUI()
 }
 
 //----------------------------------------------------------------------------
-float* vtkPVBoxWidget::GetRotationFromGUI()
+double* vtkPVBoxWidget::GetRotationFromGUI()
 {
   this->RotationGUI[0] = this->OrientationScale[0]->GetValue();
   this->RotationGUI[1] = this->OrientationScale[1]->GetValue();
@@ -804,7 +656,7 @@ float* vtkPVBoxWidget::GetRotationFromGUI()
 }
 
 //----------------------------------------------------------------------------
-float* vtkPVBoxWidget::GetScaleFromGUI()
+double* vtkPVBoxWidget::GetScaleFromGUI()
 {
   this->ScaleGUI[0] = this->ScaleThumbWheel[0]->GetValue();
   this->ScaleGUI[1] = this->ScaleThumbWheel[1]->GetValue();
@@ -822,7 +674,18 @@ vtkBoxWidget* vtkPVBoxWidget::GetBoxWidget()
 void vtkPVBoxWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
   this->UpdateFromBox();
-  this->Superclass::ExecuteEvent(wdg, l, p);
+
+  if(l == vtkKWEvent::WidgetModifiedEvent && wdg == this->RM3DWidget)
+    {//case to update the display values from iVars
+    if ( this->GetPVSource()->GetPVRenderView() )
+      {
+      this->GetPVSource()->GetPVRenderView()->EventuallyRender();
+      }
+    }
+  else
+    {//case to update iVars 
+    this->Superclass::ExecuteEvent(wdg, l, p);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -838,15 +701,15 @@ vtkClientServerID vtkPVBoxWidget::GetObjectByName(const char* name)
 {
   if(!strcmp(name, "Box"))
     {
-    return this->BoxID;
+    return static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxID();
     }
   if(!strcmp(name, "BoxTransform"))
     {
-    return this->BoxTransformID;
+    return static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxTransformID();
     }
   if(!strcmp(name, "BoxMatrix"))
     {
-    return this->BoxMatrixID;
+    return static_cast<vtkRMBoxWidget*>(this->RM3DWidget)->GetBoxMatrixID();
     }
   vtkClientServerID id = {0};
   vtkErrorMacro("GetObjectByName called with invalid object name: " << name);

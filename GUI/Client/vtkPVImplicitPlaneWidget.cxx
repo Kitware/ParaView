@@ -39,9 +39,12 @@
 #include "vtkPVXMLElement.h"
 #include "vtkRenderer.h"
 
+#include "vtkKWEvent.h"
+#include "vtkRMImplicitPlaneWidget.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -69,29 +72,14 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
   this->NormalXButton = vtkKWPushButton::New();
   this->NormalYButton = vtkKWPushButton::New();
   this->NormalZButton = vtkKWPushButton::New();
-  this->PlaneID.ID = 0;
   
-  this->LastAcceptedCenter[0] = this->LastAcceptedCenter[1] =
-    this->LastAcceptedCenter[2] = 0;
-  this->LastAcceptedNormal[0] = this->LastAcceptedNormal[1] = 0;
-  this->LastAcceptedNormal[2] = 1;
+  this->RM3DWidget = vtkRMImplicitPlaneWidget::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
 {
-  vtkPVProcessModule* pm = 0;
   this->SetInputMenu(NULL);
-  if(this->GetPVApplication())
-    {
-    pm = this->GetPVApplication()->GetProcessModule();
-    if (pm && this->PlaneID.ID != 0)
-      {
-      pm->DeleteStreamObject(this->PlaneID);
-      pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-      this->PlaneID.ID = 0;
-      }
-    }
   int i;
   this->Labels[0]->Delete();
   this->Labels[1]->Delete();
@@ -107,6 +95,7 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
   this->NormalXButton->Delete();
   this->NormalYButton->Delete();
   this->NormalZButton->Delete();
+  this->RM3DWidget->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -127,11 +116,8 @@ void vtkPVImplicitPlaneWidget::CenterResetCallback()
     return;
     }
   input->GetDataInformation()->GetBounds(bds);
-  this->CenterEntry[0]->SetValue(0.5*(bds[0]+bds[1]));
-  this->CenterEntry[1]->SetValue(0.5*(bds[2]+bds[3]));
-  this->CenterEntry[2]->SetValue(0.5*(bds[4]+bds[5]));
-
-  this->SetCenter();
+  this->SetCenter(0.5*(bds[0]+bds[1]),0.5*(bds[2]+bds[3]),
+    0.5*(bds[4]+bds[5]));
 }
 
 
@@ -170,49 +156,34 @@ void vtkPVImplicitPlaneWidget::NormalCameraCallback()
   cam->GetViewPlaneNormal(normal);
 
   this->SetNormal(-normal[0], -normal[1], -normal[2]);
-  this->SetNormal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::NormalXCallback()
 {
   this->SetNormal(1,0,0);
-  this->SetNormal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::NormalYCallback()
 {
   this->SetNormal(0,1,0);
-  this->SetNormal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::NormalZCallback()
 {
   this->SetNormal(0,0,1);
-  this->SetNormal();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ResetInternal()
 {
-  vtkPVApplication *pvApp;
-
   if ( ! this->ModifiedFlag)
     {
     return;
     }
-
-  pvApp = this->GetPVApplication(); 
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->Widget3DID << "SetDrawPlane" << 0
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->SetCenter(this->LastAcceptedCenter);
-  this->SetNormal(this->LastAcceptedNormal);
-
+  static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->ResetInternal();
   this->Superclass::ResetInternal();
 }
 
@@ -233,51 +204,17 @@ void vtkPVImplicitPlaneWidget::ActualPlaceWidget()
   this->SetNormal(normal[0], normal[1], normal[2]);
 }
 
+vtkClientServerID vtkPVImplicitPlaneWidget::GetObjectByName(const char* )
+{
+return static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->GetPlaneID();
+}
+
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
 { 
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   this->PlaceWidget();
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->Widget3DID << "SetDrawPlane" << 0
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  // This should be done in the initialization.
-  // There must be a more general way of hooking up the plane object.
-  // ExtractCTH uses this varible, General Clipping uses the select widget.
-  if (this->VariableName && sourceID.ID != 0)
-    {
-    ostrstream str;
-    str << "Set" << this->VariableName << ends;
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                    << str.str() << this->PlaneID << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    delete [] str.str();
-    }
-  if ( this->PlaneID.ID != 0 )
-    {
-    double val[3];
-    int cc;
-    for ( cc = 0; cc < 3; cc ++ )
-      {
-      val[cc] = atof( this->CenterEntry[cc]->GetValue() );
-      }
-    this->SetCenterInternal(val[0], val[1], val[2]);
-    pm->GetStream() << vtkClientServerStream::Invoke << this->PlaneID << "SetOrigin"
-                    << val[0] << val[1] <<  val[2] << vtkClientServerStream::End;
-    this->SetLastAcceptedCenter(val);
-    for ( cc = 0; cc < 3; cc ++ )
-      {
-      val[cc] = atof( this->NormalEntry[cc]->GetValue() );
-      }
-    this->SetNormalInternal(val[0], val[1], val[2]);
-    pm->GetStream() << vtkClientServerStream::Invoke << this->PlaneID << "SetNormal"
-                    << val[0] << val[1] <<  val[2] << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    this->SetLastAcceptedNormal(val);
-    }
-
+  static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->UpdateVTKObject(
+    sourceID, this->VariableName);
   this->Superclass::AcceptInternal(sourceID);
 }
 
@@ -309,14 +246,16 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 {
+  vtkClientServerID planeID = static_cast<vtkRMImplicitPlaneWidget*>
+    (this->RM3DWidget)->GetPlaneID();
   *file << endl;
-  *file << "set pvTemp" <<  this->PlaneID.ID
+  *file << "set pvTemp" <<  planeID.ID
         << " [$proxyManager NewProxy implicit_functions Plane]"
         << endl;
   *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
-        << this->PlaneID.ID << " $pvTemp" << this->PlaneID.ID
+        << planeID.ID << " $pvTemp" << planeID.ID
         << endl;
-  *file << " $pvTemp" << this->PlaneID.ID << " UnRegister {}" << endl;
+  *file << " $pvTemp" << planeID.ID << " UnRegister {}" << endl;
 
   double val[3];
   int cc;
@@ -325,16 +264,16 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
     {
     val[cc] = atof( this->CenterEntry[cc]->GetValue() );
     }
-  *file << "  [$pvTemp" << this->PlaneID.ID << " GetProperty Origin] "
+  *file << "  [$pvTemp" << planeID.ID << " GetProperty Origin] "
         << "SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
 
   for ( cc = 0; cc < 3; cc ++ )
     {
     val[cc] = atof( this->NormalEntry[cc]->GetValue() );
     }
-  *file << "  [$pvTemp" << this->PlaneID.ID << " GetProperty Normal] "
+  *file << "  [$pvTemp" << planeID.ID << " GetProperty Normal] "
         << "SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
-  *file << "  $pvTemp" << this->PlaneID.ID << " UpdateVTKObjects" << endl;
+  *file << "  $pvTemp" << planeID.ID << " UpdateVTKObjects" << endl;
   *file << endl;
 }
 
@@ -342,7 +281,6 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 void vtkPVImplicitPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "PlaneID: " << this->PlaneID;
   os << indent << "InputMenu: " << this->GetInputMenu();
 }
 
@@ -456,23 +394,6 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceName("Plane");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-  this->PlaneID = pm->NewStreamObject("vtkPlane");
-  // create the plane on all servers and client
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-  // Create the 3D widget on each process.
-  // This is for tiled display and client server.
-  // This may decrease compresion durring compositing.
-  // We should have a special call instead of broadcast script.
-  // Better yet, control visibility based on mode (client-server ...). 
-  this->Widget3DID = pm->NewStreamObject("vtkImplicitPlaneWidget");
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "SetPlaceFactor" << 1.0 
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "OutlineTranslationOff"
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "PlaceWidget"
-                  << 0 << 1 << 0 << 1 << 0 << 1
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   this->SetFrameLabel("Plane Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -589,76 +510,64 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
                this->NormalZButton->GetWidgetName());
 
   // Initialize the center of the plane based on the input bounds.
-  if (this->PVSource)
+  if (this->PVSource)  // *********************************** DON'T FORGET ME
     {
     vtkPVSource *input = this->PVSource->GetPVInput(0);
     if (input)
       {
       double bds[6];
       input->GetDataInformation()->GetBounds(bds);
-      pm->GetStream() << vtkClientServerStream::Invoke << this->PlaneID << "SetOrigin"
-                      << 0.5*(bds[0]+bds[1]) << 0.5*(bds[2]+bds[3]) << 0.5*(bds[4]+bds[5])
-                      << vtkClientServerStream::End;
-      this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
-                                  0.5*(bds[4]+bds[5]));
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                       0.5*(bds[4]+bds[5]));
-      pm->GetStream() << vtkClientServerStream::Invoke << this->PlaneID << "SetNormal"
-                      << 0 << 0 << 1
-                      << vtkClientServerStream::End;
-      this->SetLastAcceptedNormal(0, 0, 1);
+      static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->
+        SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                                  0.5*(bds[4]+bds[5]));
       this->SetNormal(0, 0, 1);
+      static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->
+        SetLastAcceptedNormal(0, 0, 1);
+
       }
     }
-  float opacity = 1.0;
-  if (pvApp->GetProcessModule()->GetNumberOfPartitions() == 1)
-    { 
-    opacity = .25;
-    }
-  
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->Widget3DID << "GetPlaneProperty"
-                  << vtkClientServerStream::End
-                  << vtkClientServerStream::Invoke 
-                  << vtkClientServerStream::LastResult 
-                  << "SetOpacity" 
-                  << opacity 
-                  << vtkClientServerStream::End;
-  pm->GetStream() << vtkClientServerStream::Invoke 
-                  << this->Widget3DID
-                  << "GetSelectedPlaneProperty" 
-                  << vtkClientServerStream::End
-                  << vtkClientServerStream::Invoke 
-                  << vtkClientServerStream::LastResult 
-                  << "SetOpacity" 
-                  << opacity 
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->SetBalloonHelpString(this->BalloonHelpString);
-
 }
 
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
-  vtkImplicitPlaneWidget *widget = vtkImplicitPlaneWidget::SafeDownCast(wdg);
-  if ( widget )
+  if(l == vtkKWEvent::WidgetModifiedEvent)
     {
     double val[3];
-    widget->GetOrigin(val); 
-    this->SetCenterInternal(val[0], val[1], val[2]);
-    widget->GetNormal(val);
-    this->SetNormalInternal(val[0], val[1], val[2]);
-    if (!widget->GetDrawPlane())
-      { 
-      vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-      pm->GetStream() << vtkClientServerStream::Invoke 
-                      << this->Widget3DID << "SetDrawPlane" << 1
-                      << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-      }
+    static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->GetCenter(val);
+    this->CenterEntry[0]->SetValue(val[0]);
+    this->CenterEntry[1]->SetValue(val[1]);
+    this->CenterEntry[2]->SetValue(val[2]);
+
+    static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->GetNormal(val);
+    this->NormalEntry[0]->SetValue(val[0]);
+    this->NormalEntry[1]->SetValue(val[1]);
+    this->NormalEntry[2]->SetValue(val[2]);
+
+    this->Render();
+    this->ModifiedCallback();
+    this->ValueChanged = 0;
     }
-  this->Superclass::ExecuteEvent(wdg, l, p);
+  else
+    {
+    vtkImplicitPlaneWidget *widget = vtkImplicitPlaneWidget::SafeDownCast(wdg);
+    if ( widget )
+      {
+      double val[3];
+      widget->GetOrigin(val); 
+      this->SetCenterInternal(val[0], val[1], val[2]);
+      widget->GetNormal(val);
+      this->SetNormalInternal(val[0], val[1], val[2]);
+      if (!widget->GetDrawPlane())
+        { 
+        static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->SetDrawPlane(1);
+        }
+      }
+    this->Superclass::ExecuteEvent(wdg, l, p);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -699,27 +608,7 @@ int vtkPVImplicitPlaneWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetCenterInternal(double x, double y, double z)
 {
-  this->CenterEntry[0]->SetValue(x);
-  this->CenterEntry[1]->SetValue(y);
-  this->CenterEntry[2]->SetValue(z); 
-  if ( this->Widget3DID.ID )
-    { 
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->Widget3DID << "SetOrigin" << x << y << z
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
-  if ( this->PlaneID.ID )
-    { 
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->PlaneID << "SetOrigin" << x << y << z
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    }
+  static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->SetCenter(x,y,z);
 }
 
 //----------------------------------------------------------------------------
@@ -732,27 +621,7 @@ void vtkPVImplicitPlaneWidget::SetCenter(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetNormalInternal(double x, double y, double z)
 {
-  this->NormalEntry[0]->SetValue(x);
-  this->NormalEntry[1]->SetValue(y);
-  this->NormalEntry[2]->SetValue(z); 
-  if ( this->Widget3DID.ID)
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication(); 
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->Widget3DID << "SetNormal" << x << y << z
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    } 
-  if ( this->PlaneID.ID )
-    { 
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->PlaneID << "SetNormal" << x << y << z
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
-    }
+  static_cast<vtkRMImplicitPlaneWidget*>(this->RM3DWidget)->SetNormal(x,y,z);
 }
 
 //----------------------------------------------------------------------------
@@ -810,16 +679,7 @@ void vtkPVImplicitPlaneWidget::Update()
   if (input)
     {
     input->GetDataInformation()->GetBounds(bds);
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "PlaceWidget"
-                    << bds[0] << bds[1] << bds[2] << bds[3] << bds[4] << bds[5]
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-
-    // Should I also move the center of the plane?  Keep the old plane?
-    // Keep the old normal?
-
-    // There has to be a better way to que a render.
+    this->RM3DWidget->PlaceWidget(bds);
     this->GetPVApplication()->GetMainWindow()->GetMainView()->EventuallyRender();
     }
 }
@@ -849,5 +709,3 @@ void vtkPVImplicitPlaneWidget::UpdateEnableState()
     this->PropagateEnableState(this->NormalEntry[cc]);
     }
 }
-
-

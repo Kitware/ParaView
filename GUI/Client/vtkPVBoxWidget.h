@@ -43,16 +43,6 @@ public:
 
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  //BTX
-  // Description:
-  // The Tcl name of the VTK implicit plane.
-  vtkGetMacro(BoxID,vtkClientServerID);
-
-  // Description:
-  // The Tcl name of the VTK transform.
-  vtkGetMacro(BoxTransformID,vtkClientServerID);
-  //ETX
-
   // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
@@ -100,35 +90,27 @@ public:
 
   // Description:
   // Set the box
-  void SetScaleNoTrace(float p[3])
-    { this->SetScaleNoTrace(p[0], p[1], p[2]); }
-  void SetScaleNoTrace(float px, float py, float pz);
-  void SetScale(float p[3])
-    { this->SetScale(p[0], p[1], p[2]); }
-  void SetScale(float px, float py, float pz);
-  void SetTranslateNoTrace(float p[3])
-    { this->SetTranslateNoTrace(p[0], p[1], p[2]); }
-  void SetTranslateNoTrace(float px, float py, float pz);
-  void SetTranslate(float p[3])
-    { this->SetTranslate(p[0], p[1], p[2]); }
-  void SetTranslate(float px, float py, float pz);
-  void SetOrientationNoTrace(float p[3])
-    { this->SetOrientationNoTrace(p[0], p[1], p[2]); }
-  void SetOrientationNoTrace(float px, float py, float pz);
-  void SetOrientation(float p[3])
-    { this->SetOrientation(p[0], p[1], p[2]); }
-  void SetOrientation(float px, float py, float pz);
+  void SetScale(double p[3]){ this->SetScale(p[0], p[1], p[2]); }
+  void SetScale(double px, double py, double pz);
+  void SetScaleInternal(double x, double y, double z);
+  void SetScaleInternal(double p[3]){this->SetScaleInternal(p[0],p[1],p[2]);}
+
+  void SetTranslateInternal(double x, double y, double z);
+  void SetTranslateInternal(double p[3]){this->SetTranslateInternal(p[0],p[1],p[2]);}
+  void SetTranslate(double p[3]){ this->SetTranslate(p[0], p[1], p[2]); }
+  void SetTranslate(double px, double py, double pz);
+
+  void SetOrientationInternal(double px, double py, double pz);
+  void SetOrientationInternal(double p[3]){this->SetOrientationInternal(p[0],p[1],p[2]);}
+  void SetOrientation(double p[3]){ this->SetOrientation(p[0], p[1], p[2]); }
+  void SetOrientation(double px, double py, double pz);
 
   //BTX
   vtkBoxWidget* GetBoxWidget();
-
-  vtkGetObjectMacro(BoxTransform, vtkTransform);
   //ETX
 
   // Description:
-  // If update is specified, then it is updated from the gui, otherwise from
-  // the stored variables.
-  void UpdateBox(int update);
+  // Get iVar values from vtkRMBoxWidget object and update the GUI.
   void UpdateFromBox();
 
   // Description:
@@ -161,10 +143,6 @@ protected:
 
   void UpdateVTKObject(const char* sourceTclName);
 
-  vtkClientServerID BoxID;
-  vtkClientServerID BoxTransformID;
-  vtkClientServerID BoxMatrixID;
-
   vtkKWFrame*        ControlFrame;
   vtkKWLabel*        TranslateLabel;
   vtkKWThumbWheel*   TranslateThumbWheel[3];
@@ -172,9 +150,6 @@ protected:
   vtkKWThumbWheel*   ScaleThumbWheel[3];
   vtkKWLabel*        OrientationLabel;
   vtkKWScale*        OrientationScale[3];
-
-  vtkTransform*      BoxTransform;
-  vtkPlanes*         Box;
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
@@ -185,22 +160,15 @@ protected:
   // one sphere.
   virtual void SaveInBatchScript(ofstream *file);
 
-  float* GetPositionFromGUI();
-  float* GetRotationFromGUI();
-  float* GetScaleFromGUI();
-  vtkSetVector3Macro(PositionGUI, float);
-  vtkSetVector3Macro(RotationGUI, float);
-  vtkSetVector3Macro(ScaleGUI,    float);
-  float PositionGUI[3];
-  float RotationGUI[3];
-  float ScaleGUI[3];
-
-  vtkSetVector3Macro(StoredPosition, float);
-  vtkSetVector3Macro(StoredScale,    float);
-  vtkSetVector3Macro(StoredRotation, float);
-  float StoredPosition[3];
-  float StoredRotation[3];
-  float StoredScale[3];
+  double* GetPositionFromGUI();
+  double* GetRotationFromGUI();
+  double* GetScaleFromGUI();
+  vtkSetVector3Macro(PositionGUI, double);
+  vtkSetVector3Macro(RotationGUI, double);
+  vtkSetVector3Macro(ScaleGUI,    double);
+  double PositionGUI[3];
+  double RotationGUI[3];
+  double ScaleGUI[3];
 
   int Initialized;
 

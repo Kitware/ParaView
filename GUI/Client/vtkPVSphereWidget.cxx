@@ -34,8 +34,11 @@
 #include "vtkRenderer.h"
 #include "vtkPVProcessModule.h"
 
+#include "vtkKWEvent.h"
+#include "vtkRMSphereWidget.h"
+
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.39");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.40");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -53,23 +56,12 @@ vtkPVSphereWidget::vtkPVSphereWidget()
    }
   this->RadiusEntry = vtkKWEntry::New();
   this->CenterResetButton = vtkKWPushButton::New();
-  this->SphereID.ID = 0;
-  
-  this->LastAcceptedCenter[0] = this->LastAcceptedCenter[1] =
-    this->LastAcceptedCenter[2] = 0.0;
-  this->LastAcceptedRadius = 1;
+  this->RM3DWidget = vtkRMSphereWidget::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVSphereWidget::~vtkPVSphereWidget()
 {
-  if (this->SphereID.ID)
-    {
-    vtkPVProcessModule* pv = this->GetPVApplication()->GetProcessModule();
-    pv->DeleteStreamObject(this->SphereID);
-    this->SphereID.ID = 0;
-    pv->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-    }
   int i;
   this->Labels[0]->Delete();
   this->Labels[1]->Delete();
@@ -80,8 +72,13 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
     }
   this->RadiusEntry->Delete();
   this->CenterResetButton->Delete();
+  this->RM3DWidget->Delete();
 }
-
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVSphereWidget::GetObjectByName(const char* )
+{ 
+  return static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetSphereID();
+}
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::CenterResetCallback()
 {
@@ -104,7 +101,6 @@ void vtkPVSphereWidget::CenterResetCallback()
                   0.5*(bds[2]+bds[3]),
                   0.5*(bds[4]+bds[5]));
 
-  this->SetCenter();
 }
 
 
@@ -115,10 +111,7 @@ void vtkPVSphereWidget::ResetInternal()
     {
     return;
     }
-
-  this->SetCenter(this->LastAcceptedCenter);
-  this->SetRadius(this->LastAcceptedRadius);
-  
+  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->ResetInternal();
   this->Superclass::ResetInternal();
 }
 
@@ -127,13 +120,15 @@ void vtkPVSphereWidget::ActualPlaceWidget()
 {
   double center[3];
   double radius;
-  int cc;
-  for ( cc = 0; cc < 3; cc ++ )
-    {
-    center[cc] = atof(this->CenterEntry[cc]->GetValue());
-    }
-  radius = atof(this->RadiusEntry->GetValue());
- 
+  //int cc;
+  //for ( cc = 0; cc < 3; cc ++ )
+  //  {
+  //  center[cc] = atof(this->CenterEntry[cc]->GetValue());
+  //  }
+  //radius = atof(this->RadiusEntry->GetValue());
+  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetCenter(center);
+  radius = 
+    static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetRadius();
   this->Superclass::ActualPlaceWidget();
   this->SetCenter(center[0], center[1], center[2]);
   this->SetRadius(radius);
@@ -147,30 +142,31 @@ void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)
     {
     return;
     }
-  if ( this->SphereID.ID )
-    {
-    vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-      this->GetApplication()); 
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    double val[3];
-    int cc;
-    for ( cc = 0; cc < 3; cc ++ )
-      {
-      val[cc] = atof( this->CenterEntry[cc]->GetValue() );
-      }
-    this->SetCenterInternal(val);
-    double rad = atof(this->RadiusEntry->GetValue());
-    this->SetRadiusInternal(rad);
-    pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
-                    << "SetCenter" << val[0] << val[1] << val[2] 
-                    << vtkClientServerStream::End;
-    pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
-                    << "SetRadius" << rad
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
-    this->SetLastAcceptedCenter(val);
-    this->SetLastAcceptedRadius(rad);
-    }
+  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->UpdateVTKObject();
+  //if ( this->SphereID.ID )
+  //  {
+  //  vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
+  //    this->GetApplication()); 
+  //  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  //  double val[3];
+  //  int cc;
+  //  for ( cc = 0; cc < 3; cc ++ )
+  //    {
+  //    val[cc] = atof( this->CenterEntry[cc]->GetValue() );
+  //    }
+  //  this->SetCenterInternal(val);
+  //  double rad = atof(this->RadiusEntry->GetValue());
+  //  this->SetRadiusInternal(rad);
+  //  pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
+  //                  << "SetCenter" << val[0] << val[1] << val[2] 
+  //                  << vtkClientServerStream::End;
+  //  pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
+  //                  << "SetRadius" << rad
+  //                  << vtkClientServerStream::End;
+  //  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  //  this->SetLastAcceptedCenter(val);
+  //  this->SetLastAcceptedRadius(rad);
+  //  }
   this->Superclass::AcceptInternal(sourceID);
 }
 
@@ -209,24 +205,33 @@ void vtkPVSphereWidget::UpdateVTKObject(const char*)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 {
+  vtkClientServerID sphereID = 
+    static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetSphereID();
+  double center[3];
+  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->
+    GetLastAcceptedCenter(center);
+
+  double radius = static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->
+    GetLastAcceptedRadius();
+
   *file << endl;
-  *file << "set pvTemp" <<  this->SphereID.ID
+  *file << "set pvTemp" << sphereID.ID
         << " [$proxyManager NewProxy implicit_functions Sphere]"
         << endl;
   *file << "  $proxyManager RegisterProxy implicit_functions pvTemp"
-        << this->SphereID.ID << " $pvTemp" << this->SphereID.ID
+        << sphereID.ID << " $pvTemp" << sphereID.ID
         << endl;
-  *file << "  $pvTemp" << this->SphereID.ID << " UnRegister {}" << endl;
-  *file << "  [$pvTemp" << this->SphereID.ID << " GetProperty Center] "
+  *file << "  $pvTemp" << sphereID.ID << " UnRegister {}" << endl;
+  *file << "  [$pvTemp" << sphereID.ID << " GetProperty Center] "
         << "SetElements3 " 
-        << this->LastAcceptedCenter[0] << " "
-        << this->LastAcceptedCenter[1] << " "
-        << this->LastAcceptedCenter[2] << " "
+        << center[0] << " "
+        << center[1] << " "
+        << center[2] << " "
         << endl;
-  *file << "  [$pvTemp" << this->SphereID.ID << " GetProperty Radius] "
+  *file << "  [$pvTemp" << sphereID.ID << " GetProperty Radius] "
         << "SetElements1 "
-        << this->LastAcceptedRadius << endl << endl;
-  *file << "  $pvTemp" << this->SphereID.ID << " UpdateVTKObjects" << endl;
+        << radius << endl << endl;
+  *file << "  $pvTemp" << sphereID.ID << " UpdateVTKObjects" << endl;
   *file << endl;
 }
 
@@ -234,7 +239,7 @@ void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 void vtkPVSphereWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "SphereID: " << this->SphereID << endl;
+//  os << indent << "SphereID: " << this->SphereID << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -299,14 +304,14 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  this->Widget3DID = pm->NewStreamObject("vtkSphereWidget");
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                  << "PlaceWidget" << 0 << 1 << 0 << 1 << 0 << 1 
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-  this->SphereID = pm->NewStreamObject("vtkSphere");
-  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
+  //vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  //this->Widget3DID = pm->NewStreamObject("vtkSphereWidget");
+  //pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+  //                << "PlaceWidget" << 0 << 1 << 0 << 1 << 0 << 1 
+  //                << vtkClientServerStream::End;
+  //pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  //this->SphereID = pm->NewStreamObject("vtkSphere");
+  //pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS);
   
   this->SetFrameLabel("Sphere Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -393,23 +398,25 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       {
       double bds[6];
       input->GetDataInformation()->GetBounds(bds);
-      pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
-                      << "SetCenter" 
-                      << 0.5*(bds[0]+bds[1])
-                      << 0.5*(bds[2]+bds[3])
-                      << 0.5*(bds[4]+bds[5]) 
-                      << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      //pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
+      //                << "SetCenter" 
+      //                << 0.5*(bds[0]+bds[1])
+      //                << 0.5*(bds[2]+bds[3])
+      //                << 0.5*(bds[4]+bds[5]) 
+      //                << vtkClientServerStream::End;
+      //pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                       0.5*(bds[4]+bds[5]));
-      this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+      static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetLastAcceptedCenter(
+                      0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                                   0.5*(bds[4]+bds[5]));
-      pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
-                      << "SetRadius"  << 0.5*(bds[1]-bds[0])
-                      << vtkClientServerStream::End;
-      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      //pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID 
+      //                << "SetRadius"  << 0.5*(bds[1]-bds[0])
+      //                << vtkClientServerStream::End;
+      //pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
       this->SetRadius(0.5*(bds[1]-bds[0]));
-      this->SetLastAcceptedRadius(0.5*(bds[1]-bds[0]));
+      static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetLastAcceptedRadius(
+                      0.5*(bds[1]-bds[0]));
       }
     }
 
@@ -420,16 +427,33 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
-  vtkSphereWidget *widget = vtkSphereWidget::SafeDownCast(wdg);
-  if ( widget )
+  if(l == vtkKWEvent::WidgetModifiedEvent && wdg == this->RM3DWidget)
     {
-    double val[3];
-    widget->GetCenter(val); 
-    this->SetCenter(val[0], val[1], val[2]);
-    double rad = widget->GetRadius();
-    this->SetRadius(rad);
+    double center[3];
+    double radius;
+    static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetCenter(center);
+    radius = static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->GetRadius();
+    this->CenterEntry[0]->SetValue(center[0]);
+    this->CenterEntry[1]->SetValue(center[1]);
+    this->CenterEntry[2]->SetValue(center[2]);
+    this->RadiusEntry->SetValue(radius);
+    this->Render();
+    this->ModifiedCallback();
+    this->ValueChanged = 0;
     }
-  this->Superclass::ExecuteEvent(wdg, l, p);
+  else
+    {
+    vtkSphereWidget *widget = vtkSphereWidget::SafeDownCast(wdg);
+    if ( widget )
+      {
+      double val[3];
+      widget->GetCenter(val); 
+      this->SetCenter(val[0], val[1], val[2]);
+      double rad = widget->GetRadius();
+      this->SetRadius(rad);
+      }
+    this->Superclass::ExecuteEvent(wdg, l, p);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -441,19 +465,20 @@ int vtkPVSphereWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 void vtkPVSphereWidget::SetCenterInternal(double x, double y, double z)
-{ 
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  this->CenterEntry[0]->SetValue(x);
-  this->CenterEntry[1]->SetValue(y);
-  this->CenterEntry[2]->SetValue(z);  
-  if ( this->Widget3DID.ID )
-    {
-    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                    << "SetCenter" << x << y << z
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
+{
+  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetCenter(x,y,z);
+  //vtkPVApplication *pvApp = this->GetPVApplication();
+  //vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  //this->CenterEntry[0]->SetValue(x);
+  //this->CenterEntry[1]->SetValue(y);
+  //this->CenterEntry[2]->SetValue(z);  
+  //if ( this->Widget3DID.ID )
+  //  {
+  //  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+  //                  << "SetCenter" << x << y << z
+  //                  << vtkClientServerStream::End;
+  //  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  //  }
 }
 
 //----------------------------------------------------------------------------
@@ -472,12 +497,7 @@ void vtkPVSphereWidget::SetCenter()
     {
     val[cc] = atof(this->CenterEntry[cc]->GetValue());
     } 
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                  << "SetCenter" << val[0] << val[1] << val[2]
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->SetCenterInternal(val[0],val[1],val[2]);
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
@@ -486,16 +506,17 @@ void vtkPVSphereWidget::SetCenter()
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetRadiusInternal(double r)
 {
-  this->RadiusEntry->SetValue(r); 
-  if ( this->Widget3DID.ID )
-    {
-    vtkPVApplication *pvApp = this->GetPVApplication();
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
-                  << "SetRadius" << r
-                  << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
+  static_cast<vtkRMSphereWidget*>(this->RM3DWidget)->SetRadius(r);
+  //this->RadiusEntry->SetValue(r); 
+  //if ( this->Widget3DID.ID )
+  //  {
+  //  vtkPVApplication *pvApp = this->GetPVApplication();
+  //  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  //  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID
+  //                << "SetRadius" << r
+  //                << vtkClientServerStream::End;
+  //  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  //  }
 }
 
 
@@ -513,10 +534,7 @@ void vtkPVSphereWidget::SetRadius()
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   double val;
   val = atof(this->RadiusEntry->GetValue());
-  pm->GetStream() << vtkClientServerStream::Invoke << this->SphereID
-                  << "SetRadius" << val
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  this->SetRadiusInternal(val);
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;

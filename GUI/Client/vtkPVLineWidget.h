@@ -185,13 +185,6 @@ protected:
   char *ResolutionLabelText;
 
   int ShowResolution;
-
-  double LastAcceptedPoint1[3];
-  double LastAcceptedPoint2[3];
-  double LastAcceptedResolution;
-  vtkSetVector3Macro(LastAcceptedPoint1, double);
-  vtkSetVector3Macro(LastAcceptedPoint2, double);
-  vtkSetMacro(LastAcceptedResolution, double);
   
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented

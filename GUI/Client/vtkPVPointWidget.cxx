@@ -35,8 +35,12 @@
 #include "vtkRenderer.h"
 #include "vtkPVRenderModuleProxyImplementation.h"
 
+#include "vtkKWEvent.h"
+#include "vtkRMPointWidget.h"
+#include "vtkPVRenderModule.h"
+
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.33");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -53,9 +57,7 @@ vtkPVPointWidget::vtkPVPointWidget()
     this->CoordinateLabel[cc] = vtkKWLabel::New();
    }
   this->PositionResetButton = vtkKWPushButton::New();
-  
-  this->LastAcceptedPosition[0] = this->LastAcceptedPosition[1] =
-    this->LastAcceptedPosition[2] = 0;
+  this->RM3DWidget = static_cast<vtkRM3DWidget*>(vtkRMPointWidget::New());
 }
 
 //----------------------------------------------------------------------------
@@ -70,6 +72,7 @@ vtkPVPointWidget::~vtkPVPointWidget()
     this->CoordinateLabel[i]->Delete();
     }
   this->PositionResetButton->Delete();
+  this->RM3DWidget->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -93,8 +96,6 @@ void vtkPVPointWidget::PositionResetCallback()
   this->SetPosition(0.5*(bds[0]+bds[1]),
                   0.5*(bds[2]+bds[3]),
                   0.5*(bds[4]+bds[5]));
-
-  this->SetPosition();
 }
 
 
@@ -124,10 +125,7 @@ void vtkPVPointWidget::ResetInternal()
     return;
     }
   // Reset point
-  this->SetPosition(this->LastAcceptedPosition[0],
-                    this->LastAcceptedPosition[1],
-                    this->LastAcceptedPosition[2]);
-  
+  static_cast<vtkRMPointWidget*>(this->RM3DWidget)->ResetInternal();
   this->Superclass::ResetInternal();
 }
 
@@ -135,12 +133,7 @@ void vtkPVPointWidget::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
-  this->SetPositionInternal(this->PositionEntry[0]->GetValueAsFloat(),
-                            this->PositionEntry[1]->GetValueAsFloat(),
-                            this->PositionEntry[2]->GetValueAsFloat());
-
   this->UpdateVTKObject();
-  
   this->Superclass::AcceptInternal(sourceID);
 }
 
@@ -161,26 +154,11 @@ void vtkPVPointWidget::Trace(ofstream *file)
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::UpdateVTKObject()  
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Accept point
-  char acceptCmd[1024];
   if ( this->VariableName && this->ObjectID.ID )
-    {    
-    sprintf(acceptCmd, "Set%s", this->VariableName);
-    vtkPVProcessModule* pm = pvApp->GetProcessModule();
-    pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
-                    << acceptCmd 
-                    << this->PositionEntry[0]->GetValueAsFloat()
-                    << this->PositionEntry[1]->GetValueAsFloat()
-                    << this->PositionEntry[2]->GetValueAsFloat()
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    {
+    static_cast<vtkRMPointWidget*>(this->RM3DWidget)->
+      UpdateVTKObject(this->ObjectID,this->VariableName);
     }
-  
-  this->SetLastAcceptedPosition(this->PositionEntry[0]->GetValueAsFloat(),
-                                this->PositionEntry[1]->GetValueAsFloat(),
-                                this->PositionEntry[2]->GetValueAsFloat());
 }
 
 
@@ -188,15 +166,17 @@ void vtkPVPointWidget::UpdateVTKObject()
 void vtkPVPointWidget::SaveInBatchScript(ofstream *file)
 {
   vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+  double pos[3];
+  static_cast<vtkRMPointWidget*>(this->RM3DWidget)->GetPosition(pos);
 
   // Point1
   if (this->VariableName)
     {  
     *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
           << this->VariableName << "] SetElements3 "
-          << this->PositionEntry[0]->GetValueAsFloat() << " "
-          << this->PositionEntry[1]->GetValueAsFloat() << " "
-          << this->PositionEntry[2]->GetValueAsFloat() << endl;
+          << pos[0] << " "
+          << pos[1] << " "
+          << pos[2] << endl;
     }
 }
 
@@ -224,15 +204,11 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  this->Widget3DID = pm->NewStreamObject("vtkPickPointWidget");
-  pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID << "AllOff" 
-                  << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
 
   // Widget needs the RenderModule for picking.
   vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(
-             pm->GetObjectFromID(Widget3DID));
+             pm->GetObjectFromID(this->RM3DWidget->GetWidget3DID()));
   if (widget)
     {
     vtkPVRenderModuleProxyImplementation* rmp 
@@ -241,7 +217,7 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
     widget->SetRenderModuleProxy(rmp);
     rmp->Delete();
     }
-  
+
   this->SetFrameLabel("Point Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
@@ -307,17 +283,28 @@ void vtkPVPointWidget::ChildCreate(vtkPVApplication* pvApp)
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
-  vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(wdg);
-  if ( !widget )
+  if(l == vtkKWEvent::WidgetModifiedEvent)
     {
-    vtkErrorMacro( "This is not a point widget" );
-    return;
+      double pos[3];
+      static_cast<vtkRMPointWidget*>(this->RM3DWidget)->GetPosition(pos);
+      this->PositionEntry[0]->SetValue(pos[0]);
+      this->PositionEntry[1]->SetValue(pos[1]);
+      this->PositionEntry[2]->SetValue(pos[2]);
+      this->Render();
     }
-  double val[3];
-  widget->GetPosition(val); 
-  this->SetPosition(val[0], val[1], val[2]);
-
-  this->Superclass::ExecuteEvent(wdg, l, p);
+  else
+    {
+    vtkPickPointWidget *widget = vtkPickPointWidget::SafeDownCast(wdg);
+    if ( !widget )
+      {
+      vtkErrorMacro( "This is not a point widget" );
+      return;
+      }
+    double val[3];
+    widget->GetPosition(val); 
+    this->SetPosition(val[0], val[1], val[2]);
+    this->Superclass::ExecuteEvent(wdg, l, p);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -349,17 +336,7 @@ void vtkPVPointWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::SetPositionInternal(double x, double y, double z)
 { 
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  this->PositionEntry[0]->SetValue(x);
-  this->PositionEntry[1]->SetValue(y);
-  this->PositionEntry[2]->SetValue(z);  
-  if ( this->Widget3DID.ID )
-    {
-    pm->GetStream() << vtkClientServerStream::Invoke << this->Widget3DID 
-                    << "SetPosition" << x << y << z << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
-    }
-  this->Render();
+  ((vtkRMPointWidget*)this->RM3DWidget)->SetPosition(x,y,z);
 }
 
 //----------------------------------------------------------------------------
@@ -377,9 +354,7 @@ void vtkPVPointWidget::GetPosition(double pt[3])
     vtkErrorMacro("Cannot get your point.");
     return;
     }
-  pt[0] = this->PositionEntry[0]->GetValueAsFloat(); 
-  pt[1] = this->PositionEntry[1]->GetValueAsFloat(); 
-  pt[2] = this->PositionEntry[2]->GetValueAsFloat(); 
+  ((vtkRMPointWidget*)this->RM3DWidget)->GetPosition(pt);
 }
 
 //----------------------------------------------------------------------------

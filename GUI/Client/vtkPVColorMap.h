@@ -27,7 +27,6 @@
 
 
 #include "vtkKWWidget.h"
-
 #include "vtkClientServerID.h" // Needed for LookupTableID
 
 class vtkKWChangeColorButton;
@@ -46,7 +45,8 @@ class vtkLookupTable;
 class vtkPVApplication;
 class vtkPVRenderView;
 class vtkScalarBarWidget;
-class vtkScalarBarWidgetObserver;
+class vtkRMScalarBarWidgetObserver;
+class vtkRMScalarBarWidget;
 
 class VTK_EXPORT vtkPVColorMap : public vtkKWWidget
 {
@@ -73,22 +73,23 @@ public:
   // by this color map object.
   void SetScalarBarTitle(const char* Name);
   void SetScalarBarTitleInternal(const char* Name);
-  const char* GetScalarBarTitle() {return this->ScalarBarTitle;}
+  const char* GetScalarBarTitle();
 
   // Description:
   // This map is used for arrays with this name 
   // and this number of components.  In the future, they may
   // handle more than one type of array.
   void SetArrayName(const char* name);
-  const char* GetArrayName() { return this->ArrayName;}
+  const char* GetArrayName();
   int MatchArrayName(const char* name, int numberOfComponents);
   void SetNumberOfVectorComponents(int num);
-  vtkGetMacro(NumberOfVectorComponents, int);
+  int GetNumberOfVectorComponents();
+
 
   // Description:
   // The format of the scalar bar labels.
   void SetScalarBarLabelFormat(const char* Name);
-  vtkGetStringMacro(ScalarBarLabelFormat);
+  const char* GetScalarBarLabelFormat();
 
   // Description:
   // Just like in vtk data objects, this method makes a data object
@@ -107,7 +108,7 @@ public:
   // the user interface as well.
   void SetScalarRange(double min, double max);
   void SetScalarRangeInternal(double min, double max);
-  double *GetScalarRange() {return this->ScalarRange;}
+  double *GetScalarRange();
       
   // Description:
   // Looks at all of the data object for a global range.
@@ -137,7 +138,8 @@ public:
   // Description:
   // Choose which component to color with.
   void SetVectorComponent(int component);
-  vtkGetMacro(VectorComponent, int);
+  int GetVectorComponent();
+
 
   // Description:
   // Save out the mapper and actor to a file.
@@ -145,7 +147,7 @@ public:
 
   // Description:
   // The data needs to lookup table name to set the lookup table of the mapper.
-  vtkGetMacro(LookupTableID,vtkClientServerID);
+  vtkClientServerID GetLookupTableID();
 
   // --- UI Stuff ---
 
@@ -249,44 +251,24 @@ protected:
   vtkPVColorMap();
   ~vtkPVColorMap();
 
-  char* ArrayName;
-  int NumberOfVectorComponents;
-  char* ScalarBarTitle;
-  char* ScalarBarLabelFormat;
-
-  char *VectorMagnitudeTitle;
-  char **VectorComponentTitles;
+  vtkRMScalarBarWidget *RMScalarBarWidget;
     
   // Here to create unique Tcl names.
   int InstanceCount;
 
-  int NumberOfColors;
-  double ScalarRange[2];
-  int VectorMode;
-  int VectorComponent;
 
-  double StartHSV[3];
-  double EndHSV[3];
+  vtkRMScalarBarWidgetObserver* RMScalarBarObserver;
 
-  vtkScalarBarWidget* ScalarBar;
-  vtkScalarBarWidgetObserver* ScalarBarObserver;
-
-  vtkClientServerID ScalarBarActorID;
-
-  void UpdateScalarBarTitle();
   void UpdateVectorComponentMenu();
-  void UpdateScalarBarLabelFormat();
-  void UpdateLookupTable();
   // Visibility depends on check and UseCount.
   void UpdateInternalScalarBarVisibility();
+
   void RGBToHSV(double rgb[3], double hsv[3]);
   void HSVToRGB(double hsv[3], double rgb[3]);
 
   void LabToXYZ(double Lab[3], double xyz[3]);
   void XYZToRGB(double xyz[3], double rgb[3]);
 
-  vtkLookupTable* LookupTable;
-  vtkClientServerID LookupTableID;
 
   vtkPVRenderView *PVRenderView;
 
@@ -344,7 +326,7 @@ protected:
   // For determining how many data objects are using the color map.
   //  This is used to make the scalar bar invisible when not used.
   int UseCount;
-
+private:
   vtkPVColorMap(const vtkPVColorMap&); // Not implemented
   void operator=(const vtkPVColorMap&); // Not implemented
 };
