@@ -66,6 +66,10 @@ public:
   char *GetValue();
 
   // Description:
+  // Get the menu.
+  vtkGetObjectMacro(Menu, vtkKWWidget);
+
+  // Description:
   // Add entries to an option menu, with or without a command.
   void AddEntry(const char *name);
   void AddEntryWithCommand(const char *name, const char *obj, const char *method);

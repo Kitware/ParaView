@@ -182,6 +182,13 @@ public:
   void SetState(const char* item, int state);
 
   // Description:
+  // Set cascade menu for menu entry.
+  void SetCascade(int index, vtkKWMenu*);
+  void SetCascade(const char* item, vtkKWMenu*);
+  void SetCascade(int index, const char*);
+  void SetCascade(const char* item, const char*);
+
+  // Description:
   // Set command of the menu entry with a given index.
   void SetEntryCommand(int index, vtkKWObject* object, const char* MethodAndArgString);
   void SetEntryCommand(const char* item, vtkKWObject* object, const char* method);
