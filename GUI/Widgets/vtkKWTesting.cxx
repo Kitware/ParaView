@@ -37,12 +37,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkKWView.h"
-#include "vtkTesting.h"
+#include "vtkImageAppend.h"
+#include "vtkImageData.h"
 #include "vtkPNGReader.h"
+#include "vtkTesting.h"
+#include "vtkWindowToImageFilter.h"
+#include "vtkRenderWIndow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTesting );
-vtkCxxRevisionMacro(vtkKWTesting, "1.4");
+vtkCxxRevisionMacro(vtkKWTesting, "1.5");
 vtkCxxSetObjectMacro(vtkKWTesting,RenderView,vtkKWView);
 
 //----------------------------------------------------------------------------
@@ -51,6 +55,7 @@ vtkKWTesting::vtkKWTesting()
   this->Testing = vtkTesting::New();
   this->RenderView = 0;
   this->ComparisonImage = 0;
+  this->AppendFilter = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -60,6 +65,11 @@ vtkKWTesting::~vtkKWTesting()
   this->Testing->Delete();
   this->Testing = 0;
   this->SetComparisonImage(0);
+  if (this->AppendFilter)
+    {
+    this->AppendFilter->Delete();
+    this->AppendFilter = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -87,7 +97,36 @@ int vtkKWTesting::RegressionTest(float thresh)
     res = this->Testing->RegressionTest(reader->GetOutput(), thresh);
     reader->Delete();
     }
+  if ( this->AppendFilter )
+    {
+    this->AppendFilter->Update();
+    res = 
+      this->Testing->RegressionTest(this->AppendFilter->GetOutput(), thresh);
+    }
   return res != vtkTesting::PASSED;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkKWTesting::AppendTestImage(vtkKWView *RenderView)
+{
+  if (!RenderView)
+    {
+    return;
+    }
+  
+  if (!this->AppendFilter)
+    {
+    this->AppendFilter = vtkImageAppend::New();
+    }
+
+  vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
+  w2i->SetInput(RenderView->GetRenderWindow());
+  w2i->Update();
+  
+  this->AppendFilter->AddInput(w2i->GetOutput());
+  w2i->GetOutput()->SetSource(0);
+  w2i->Delete();
 }
 
 //----------------------------------------------------------------------------
