@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -270,6 +270,13 @@ void vtkPVLineWidget::Accept()
 void vtkPVLineWidget::UpdateVTKObject()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+
+  this->SetPoint1(this->Point1[0]->GetValueAsFloat(),
+                  this->Point1[1]->GetValueAsFloat(),
+                  this->Point1[2]->GetValueAsFloat());
+  this->SetPoint2(this->Point2[0]->GetValueAsFloat(),
+                  this->Point2[1]->GetValueAsFloat(),
+                  this->Point2[2]->GetValueAsFloat());
 
   char acceptCmd[1024];
   if ( this->Point1Variable && this->ObjectTclName )

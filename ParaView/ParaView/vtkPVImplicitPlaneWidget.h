@@ -110,8 +110,10 @@ public:
 
   void SetCenter();
   virtual void SetCenter(float,float,float);
+  virtual void SetCenter(float f[3]) { this->SetCenter(f[0], f[1], f[2]); }
   void SetNormal();
   virtual void SetNormal(float,float,float);
+  virtual void SetNormal(float f[3]) { this->SetNormal(f[0], f[1], f[2]); }
 
 protected:
   vtkPVImplicitPlaneWidget();

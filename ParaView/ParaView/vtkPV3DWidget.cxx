@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.22");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.23");
 
 //===========================================================================
 //***************************************************************************
@@ -209,6 +209,7 @@ void vtkPV3DWidget::Accept()
 void vtkPV3DWidget::SetValueChanged()
 {
   this->ValueChanged = 1;
+  this->ModifiedCallback();
 }
 
 //----------------------------------------------------------------------------

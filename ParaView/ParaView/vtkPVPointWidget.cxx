@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.9");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -153,6 +153,10 @@ void vtkPVPointWidget::Accept()
       {
       traceFlag = 1;
       }
+
+    this->SetPosition(this->PositionEntry[0]->GetValueAsFloat(),
+                      this->PositionEntry[1]->GetValueAsFloat(),
+                      this->PositionEntry[2]->GetValueAsFloat());
 
     if (traceFlag)
       {

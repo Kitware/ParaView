@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.3");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.4");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -255,6 +255,7 @@ void vtkPVImplicitPlaneWidget::Accept()
       {
       val[cc] = atof( this->CenterEntry[cc]->GetValue() );
       }
+    this->SetCenter(val);
     pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
                            this->PlaneTclName,
                            val[0], val[1], val[2]);
@@ -264,6 +265,7 @@ void vtkPVImplicitPlaneWidget::Accept()
       {
       val[cc] = atof( this->NormalEntry[cc]->GetValue() );
       }
+    this->SetNormal(val);
     pvApp->BroadcastScript("%s SetNormal %f %f %f", 
                            this->PlaneTclName,
                            val[0], val[1], val[2]);
