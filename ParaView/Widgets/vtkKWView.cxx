@@ -80,6 +80,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXOpenGLRenderWindow.h"
 
 int vtkKWViewFoundMatch;
+
+//----------------------------------------------------------------------------
 Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event, 
 			     char * vtkNotUsed(arg))
 {  
@@ -102,6 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 void KWViewAbortCheckMethod( void *arg )
 {
   vtkKWView *me = (vtkKWView *)arg;
@@ -118,6 +121,7 @@ void KWViewAbortCheckMethod( void *arg )
     }
 }
 
+//----------------------------------------------------------------------------
 vtkKWView::vtkKWView()
 {
   this->SupportPrint        = 1;
@@ -208,6 +212,7 @@ vtkKWView::vtkKWView()
 
 }
 
+//----------------------------------------------------------------------------
 vtkKWView::~vtkKWView()
 {
   if (this->Renderer)
@@ -274,6 +279,7 @@ vtkKWView::~vtkKWView()
   
 }
 
+//----------------------------------------------------------------------------
 // Return 1 to mean abort but keep trying, 2 to mean hard abort
 int vtkKWView::ShouldIAbort()
 {
@@ -358,6 +364,7 @@ int vtkKWView::ShouldIAbort()
   
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetStillUpdateRates( int count, float *rates )
 {
   if ( count < 1 || count > 5 )
@@ -376,6 +383,7 @@ void vtkKWView::SetStillUpdateRates( int count, float *rates )
   memcpy( this->StillUpdateRates, rates, count*sizeof(float) );
 }
 
+//----------------------------------------------------------------------------
 // Specify a function to be called to check and see if an abort
 // of the multi-pass still rendering in progress is desired
 void vtkKWView::SetMultiPassStillAbortCheckMethod(int (*f)(void *), void *arg)
@@ -389,6 +397,7 @@ void vtkKWView::SetMultiPassStillAbortCheckMethod(int (*f)(void *), void *arg)
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWView::Close()
 {
   vtkKWComposite *c;
@@ -415,6 +424,7 @@ void vtkKWView::Close()
   this->Composites->RemoveAllItems();
 }
 
+//----------------------------------------------------------------------------
 vtkKWWidget *vtkKWView::GetPropertiesParent()
 {
   // if already set then return
@@ -437,6 +447,7 @@ vtkKWWidget *vtkKWView::GetPropertiesParent()
   return this->PropertiesParent;
 }
 
+//----------------------------------------------------------------------------
 // if you are not using window based properties then you are probably 
 // using view based properties
 void vtkKWView::CreateDefaultPropertiesParent()
@@ -456,7 +467,7 @@ void vtkKWView::CreateDefaultPropertiesParent()
     }
 }
 
-
+//----------------------------------------------------------------------------
 void vtkKWView::CreateViewProperties()
 {
   vtkKWApplication *app = this->Application;
@@ -544,6 +555,7 @@ void vtkKWView::CreateViewProperties()
   this->PropertiesCreated = 1;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetHeaderTextColor( float r, float g, float b )
 {
   if ( r < 0 || g < 0 || b < 0 )
@@ -567,11 +579,13 @@ void vtkKWView::SetHeaderTextColor( float r, float g, float b )
   this->InvokeEvent( vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
+//----------------------------------------------------------------------------
 float* vtkKWView::GetHeaderTextColor()
 {
   return this->HeaderProp->GetProperty()->GetColor( );
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::GetHeaderTextColor( float *r, float *g, float *b )
 {
   float *ff = this->GetHeaderTextColor();
@@ -580,6 +594,7 @@ void vtkKWView::GetHeaderTextColor( float *r, float *g, float *b )
   *b = ff[2];
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::ShowViewProperties()
 {
   this->ParentWindow->ShowProperties();
@@ -611,6 +626,7 @@ void vtkKWView::ShowViewProperties()
   this->PackProperties();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::PackProperties()
 {
   // make sure the view is packed if necc
@@ -631,6 +647,7 @@ void vtkKWView::PackProperties()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetSelectedComposite(vtkKWComposite *_arg)
 {
   vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting SelectedComposite to " << _arg ); 
@@ -657,6 +674,7 @@ void vtkKWView::SetSelectedComposite(vtkKWComposite *_arg)
     } 
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::AddComposite(vtkKWComposite *c)
 {
   c->SetView(this);
@@ -671,6 +689,8 @@ void vtkKWView::AddComposite(vtkKWComposite *c)
     this->GetViewport()->AddProp(c->GetProp());
     }
 }
+
+//----------------------------------------------------------------------------
 void vtkKWView::RemoveComposite(vtkKWComposite *c)
 {
   c->SetView(NULL);
@@ -678,11 +698,13 @@ void vtkKWView::RemoveComposite(vtkKWComposite *c)
   this->Composites->RemoveItem(c);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::Enter(int /*x*/, int /*y*/)
 {
 //  this->Script("focus %s",this->VTKWidget->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::PrintView()
 {
   this->Printing = 1;
@@ -850,75 +872,85 @@ void vtkKWView::PrintView()
   this->Printing = 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SaveAsImage() 
 {
   char *path;
   
   // first get the file name
   vtkKWSaveImageDialog *dlg = vtkKWSaveImageDialog::New();
-  dlg->Create(this->Application,"");
+  dlg->Create(this->Application,"");  
+  dlg->Invoke();
+  path = dlg->GetFileName();
   
+  // make sure we have a file name
+  if (path && strlen(path) < 1)
+    {
+    this->SaveAsImage(path);
+    }
+  dlg->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWView::SaveAsImage(const char* filename) 
+{
+  if ( !filename || !*filename )
+    {
+    vtkErrorMacro("Filename not specified");
+    return;
+    }
+  
+  // first get the file name
   vtkWindow *vtkWin = this->GetVTKWindow();
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(vtkWin);
   w2i->Update();
   
-  dlg->Invoke();
-  path = dlg->GetFileName();
-  
-  // make sure we have a file name
-  if (!path || strlen(path) < 1)
-    {
-    dlg->Delete();
-    w2i->Delete();
-    return;
-    }
-    
-  if (!strcmp(path + strlen(path) - 4,".bmp"))
+  if (!strcmp(filename + strlen(filename) - 4,".bmp"))
     {
     vtkBMPWriter *bmp = vtkBMPWriter::New();
     bmp->SetInput(w2i->GetOutput());
-    bmp->SetFileName((char *)path);
+    bmp->SetFileName((char *)filename);
     bmp->Write();
     bmp->Delete();
     }
-  else if (!strcmp(path + strlen(path) - 4,".tif"))
+  else if (!strcmp(filename + strlen(filename) - 4,".tif"))
     {
     vtkTIFFWriter *tif = vtkTIFFWriter::New();
     tif->SetInput(w2i->GetOutput());
-    tif->SetFileName((char *)path);
+    tif->SetFileName((char *)filename);
     tif->Write();
     tif->Delete();
     }
-  else if (!strcmp(path + strlen(path) - 4,".ppm"))
+  else if (!strcmp(filename + strlen(filename) - 4,".ppm"))
     {
     vtkPNMWriter *pnm = vtkPNMWriter::New();
     pnm->SetInput(w2i->GetOutput());
-    pnm->SetFileName((char *)path);
+    pnm->SetFileName((char *)filename);
     pnm->Write();
     pnm->Delete();
     }
-  else if (!strcmp(path + strlen(path) - 4,".png"))
+  else if (!strcmp(filename + strlen(filename) - 4,".png"))
     {
     vtkPNGWriter *png = vtkPNGWriter::New();
     png->SetInput(w2i->GetOutput());
-    png->SetFileName((char *)path);
+    png->SetFileName((char *)filename);
     png->Write();
     png->Delete();
     }
-  else if (!strcmp(path + strlen(path) - 4,".jpg"))
+  else if (!strcmp(filename + strlen(filename) - 4,".jpg"))
     {
     vtkJPEGWriter *jpg = vtkJPEGWriter::New();
     jpg->SetInput(w2i->GetOutput());
-    jpg->SetFileName((char *)path);
+    jpg->SetFileName((char *)filename);
     jpg->Write();
     jpg->Delete();
     }
 
   w2i->Delete();
-  dlg->Delete();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::EditCopy()
 {
   vtkWindow *vtkWin = this->GetVTKWindow();
@@ -979,6 +1011,7 @@ void vtkKWView::EditCopy()
   w2i->Delete();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::Select(vtkKWWindow *pw)
 {
   // now add property options
@@ -1046,6 +1079,7 @@ void vtkKWView::Select(vtkKWWindow *pw)
 
 
 
+//----------------------------------------------------------------------------
 void vtkKWView::Deselect(vtkKWWindow *pw)
 {
   if ( this->ParentWindow->GetUseMenuProperties() )
@@ -1085,6 +1119,7 @@ void vtkKWView::Deselect(vtkKWWindow *pw)
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWView::MakeSelected()
 {
   this->Script("focus %s",this->VTKWidget->GetWidgetName());
@@ -1094,6 +1129,7 @@ void vtkKWView::MakeSelected()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetupBindings()
 {
   const char *wname = this->VTKWidget->GetWidgetName();
@@ -1142,6 +1178,7 @@ void vtkKWView::SetupBindings()
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWView::UnRegister(vtkObjectBase *o)
 {
   if (!this->DeletingChildren)
@@ -1176,6 +1213,7 @@ void vtkKWView::UnRegister(vtkObjectBase *o)
   this->vtkObject::UnRegister(o);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetParentWindow(vtkKWWindow *_arg)
 { 
   vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ParentWindow to " << _arg ); 
@@ -1188,6 +1226,7 @@ void vtkKWView::SetParentWindow(vtkKWWindow *_arg)
     } 
 } 
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetTitle(const char *title)
 {
   this->Script("%s configure -text {%s}", 
@@ -1195,6 +1234,7 @@ void vtkKWView::SetTitle(const char *title)
   this->Script("update idletasks");
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::OnDisplayHeader() 
 {
   if (this->HeaderButton->GetState())
@@ -1212,6 +1252,7 @@ void vtkKWView::OnDisplayHeader()
   this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::HeaderChanged() 
 {
   this->HeaderMapper->SetInput(this->HeaderEntry->GetValue());
@@ -1222,17 +1263,20 @@ void vtkKWView::HeaderChanged()
   this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::InteractOn()
 {
   this->SetRenderModeToInteractive();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::InteractOff()
 {
   this->SetRenderModeToStill();
   this->Render();
 }
 
+//----------------------------------------------------------------------------
 // Description:
 // Chaining method to serialize an object and its superclasses.
 void vtkKWView::SerializeSelf(ostream& os, vtkIndent indent)
@@ -1259,6 +1303,7 @@ void vtkKWView::SerializeSelf(ostream& os, vtkIndent indent)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SerializeToken(istream& is, const char token[1024])
 {
   int i;
@@ -1323,13 +1368,15 @@ void vtkKWView::SerializeToken(istream& is, const char token[1024])
   vtkKWWidget::SerializeToken(is,token);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.70 $");
+  this->ExtractRevision(os,"$Revision: 1.71 $");
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetupMemoryRendering(
 #ifdef _WIN32
   int x, int y, void *cd
@@ -1348,6 +1395,7 @@ void vtkKWView::SetupMemoryRendering(
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::ResumeScreenRendering() 
 {
 #ifdef _WIN32
@@ -1356,6 +1404,7 @@ void vtkKWView::ResumeScreenRendering()
 #endif
 }
 
+//----------------------------------------------------------------------------
 void *vtkKWView::GetMemoryDC()
 {
 #ifdef _WIN32	
@@ -1366,6 +1415,7 @@ void *vtkKWView::GetMemoryDC()
 #endif
 }
 
+//----------------------------------------------------------------------------
 unsigned char *vtkKWView::GetMemoryData()
 {
 #ifdef _WIN32	
@@ -1376,6 +1426,7 @@ unsigned char *vtkKWView::GetMemoryData()
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetBackgroundColor( float r, float g, float b )
 {
   if ( r < 0 || g < 0 || b < 0 )
@@ -1398,11 +1449,13 @@ void vtkKWView::SetBackgroundColor( float r, float g, float b )
   this->InvokeEvent( vtkKWEvent::BackgroundColorChangedEvent, color );
 }
 
+//----------------------------------------------------------------------------
 float* vtkKWView::GetBackgroundColor( )
 {
   return this->Renderer->GetBackground( );
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::GetBackgroundColor( float *r, float *g, float *b )
 {
   float *ff = this->Renderer->GetBackground( );
@@ -1412,6 +1465,7 @@ void vtkKWView::GetBackgroundColor( float *r, float *g, float *b )
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWView::SetCornerTextColor( float rgb[3] )
 {
   if ( rgb[0] < 0 || rgb[1] < 0 || rgb[2] < 0 )
@@ -1422,21 +1476,25 @@ void vtkKWView::SetCornerTextColor( float rgb[3] )
   this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
 }
 
+//----------------------------------------------------------------------------
 float *vtkKWView::GetCornerTextColor()
 {
   return this->CornerAnnotation->GetTextColor();
 }
 
+//----------------------------------------------------------------------------
 vtkWindow *vtkKWView::GetVTKWindow() 
 { 
   return this->RenderWindow; 
 }
 
+//----------------------------------------------------------------------------
 vtkViewport *vtkKWView::GetViewport() 
 { 
   return this->Renderer; 
 }
 
+//----------------------------------------------------------------------------
 void vtkKWView::Render() 
 {
   this->GetVTKWindow()->Render();

@@ -128,6 +128,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // Handle the file save as image menu option.
   virtual void SaveAsImage();
+  virtual void SaveAsImage(const char* filename);
 
   // Description
   // Printthe image. This may pop up a dialog box etc.
