@@ -93,6 +93,9 @@ public:
   void ScaleEndCallback();
   void TranslateEndCallback();
   void OrientationEndCallback();
+  void ScaleKeyPressCallback();
+  void TranslateKeyPressCallback();
+  void OrientationKeyPressCallback();
 
   // Description:
   // Set the box

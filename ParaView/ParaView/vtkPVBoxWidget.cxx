@@ -42,7 +42,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.19");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -168,6 +168,9 @@ void vtkPVBoxWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
+  this->ScaleKeyPressCallback();
+  this->TranslateKeyPressCallback();
+  this->OrientationKeyPressCallback();
   this->PlaceWidget();
   if ( ! this->ModifiedFlag)
     {
@@ -416,6 +419,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
                                                  "TranslateEndCallback");
     this->TranslateThumbWheel[cc]->SetEntryCommand(this,
                                                    "TranslateEndCallback");
+    //this->TranslateThumbWheel[cc]->GetEntry()->SetBind(this,
+    //  "<KeyRelease>", "TranslateKeyPressCallback");
     this->TranslateThumbWheel[cc]->SetBalloonHelpString(
       "Translate the geometry relative to the dataset location.");
 
@@ -433,6 +438,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     this->ScaleThumbWheel[cc]->SetCommand(this, "ScaleCallback");
     this->ScaleThumbWheel[cc]->SetEndCommand(this, "ScaleEndCallback");
     this->ScaleThumbWheel[cc]->SetEntryCommand(this, "ScaleEndCallback");
+    //this->ScaleThumbWheel[cc]->GetEntry()->SetBind(this,
+    //  "<KeyRelease>", "ScaleKeyPressCallback");
     this->ScaleThumbWheel[cc]->SetBalloonHelpString(
       "Scale the geometry relative to the size of the dataset.");
 
@@ -451,6 +458,8 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
                                               "OrientationEndCallback");
     this->OrientationScale[cc]->SetEntryCommand(this, 
                                                 "OrientationEndCallback");
+    //this->OrientationScale[cc]->GetEntry()->SetBind(this,
+    //  "<KeyRelease>", "OrientationKeyPressCallback");
     this->OrientationScale[cc]->SetBalloonHelpString(
       "Orient the geometry relative to the dataset origin.");
 
@@ -551,6 +560,48 @@ void vtkPVBoxWidget::TranslateEndCallback()
 void vtkPVBoxWidget::OrientationEndCallback()
 {
   this->SetOrientation(this->GetRotationFromGUI());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::ScaleKeyPressCallback()
+{
+  const char* pos0 = this->ScaleThumbWheel[0]->GetEntry()->GetValue();
+  const char* pos1 = this->ScaleThumbWheel[1]->GetEntry()->GetValue();
+  const char* pos2 = this->ScaleThumbWheel[2]->GetEntry()->GetValue();
+  if ( *pos0 && *pos1 && *pos2 )
+    {
+    this->ScaleThumbWheel[0]->EntryCallback();
+    this->ScaleThumbWheel[1]->EntryCallback();
+    this->ScaleThumbWheel[2]->EntryCallback();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::TranslateKeyPressCallback()
+{
+  const char* pos0 = this->TranslateThumbWheel[0]->GetEntry()->GetValue();
+  const char* pos1 = this->TranslateThumbWheel[1]->GetEntry()->GetValue();
+  const char* pos2 = this->TranslateThumbWheel[2]->GetEntry()->GetValue();
+  if ( *pos0 && *pos1 && *pos2 )
+    {
+    this->TranslateThumbWheel[0]->EntryCallback();
+    this->TranslateThumbWheel[1]->EntryCallback();
+    this->TranslateThumbWheel[2]->EntryCallback();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::OrientationKeyPressCallback()
+{
+  const char* pos0 = this->OrientationScale[0]->GetEntry()->GetValue();
+  const char* pos1 = this->OrientationScale[1]->GetEntry()->GetValue();
+  const char* pos2 = this->OrientationScale[2]->GetEntry()->GetValue();
+  if ( *pos0 && *pos1 && *pos2 )
+    {
+    this->OrientationScale[0]->EntryValueCallback();
+    this->OrientationScale[1]->EntryValueCallback();
+    this->OrientationScale[2]->EntryValueCallback();
+    }
 }
 
 //----------------------------------------------------------------------------
