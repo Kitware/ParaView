@@ -400,7 +400,7 @@ ENDIF(UNIX)
 
 
 ADD_EXECUTABLE(ProcessXML ProcessXML.cxx)
-TARGET_LINK_LIBRARIES(ProcessXML vtkCommon)
+TARGET_LINK_LIBRARIES(ProcessXML vtkCommon kwsys)
 
 SET(EXE_EXT "")
 IF(WIN32)

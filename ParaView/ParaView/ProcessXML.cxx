@@ -16,13 +16,15 @@
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
+#include "kwsys/SystemTools.hxx"
+#include "kwsys/RegularExpression.hxx"
 
 class Output
 {
 public:
   Output()
     {
-    this->MaxLen = 10000;
+    this->MaxLen = 16000;
     this->CurrentPosition = 0;
     }
   ~Output()
@@ -49,9 +51,10 @@ public:
       << this->Count << ";" << endl;
     }
 
-  void CheckSplit(const char* title, const char* file)
+  void CheckSplit(const char* title, const char* file, int force=0)
     {
-    if ( (this->Stream.tellp() - this->CurrentPosition) > this->MaxLen )
+    if ( (this->Stream.tellp() - this->CurrentPosition) > this->MaxLen ||
+      force )
       {
       this->Count ++;
       this->Stream << ";" << endl;
@@ -61,8 +64,8 @@ public:
 
   int ProcessFile(const char* file, const char* title)
     {
-    FILE* fp = fopen(file, "r");
-    if ( !fp )
+    ifstream ifs(file);
+    if ( !ifs )
       {
       cout << "Canot open file: " << file << endl;
       return VTK_ERROR;
@@ -86,75 +89,71 @@ public:
     this->Count = 0;
     this->PrintHeader(title, file);
     this->Stream << "\"";
-    while ( ( ch = fgetc(fp) ) != EOF )
+
+    std::string line;
+    std::string::size_type cc;
+
+    kwsys::RegularExpression reIfDef("^[ \r\n\t]*#[ \r\n\t]*if");
+    kwsys::RegularExpression reElse("^[ \r\n\t]*#[ \r\n\t]*el(se|if)");
+    kwsys::RegularExpression reEndif("^[ \r\n\t]*#[ \r\n\t]*endif");
+
+    while ( kwsys::SystemTools::GetLineFromStream(ifs, line) )
       {
-      if ( preproc )
+      int regex = 0;
+      int ifdef_line = 0;
+      if ( reIfDef.find(line) )
         {
-        preproc_cnt ++;
-        if ( ch == '\n' )
+        in_ifdef ++;
+        regex = 1;
+        ifdef_line = 1;
+        }
+      else if ( reElse.find(line) )
+        {
+        regex = 1;
+        }
+      else if ( reEndif.find(line) )
+        {
+        in_ifdef --;
+        regex = 1;
+        }
+      if ( regex )
+        {
+        this->Stream << "\\n\"" << endl;
+        if ( ifdef_line )
           {
-          preproc = 0;
-          if ( in_endif )
-            {
-            in_ifdef = 0;
-            in_endif = 0;
-            this->Stream << " // End of ifdef";
-            this->CheckSplit(title, file);
-            }
-          this->Stream << endl << "\"";
+          this->CheckSplit(title, file, 1);
           }
-        else
+        this->Stream << line.c_str() << endl;
+        if ( !ifdef_line )
           {
-          if ( preproc_cnt == 1 )
-            {
-            if ( ch == 'i' )
-              {
-              in_ifdef = 1;
-              }
-            else if ( ch == 'e' )
-              {
-              in_ifdef = 2;
-              }
-            }
-          else if ( preproc_cnt == 2 && in_ifdef == 2 && ch == 'n' )
-            {
-            in_endif = 1;
-            }
-          this->Stream << (unsigned char)ch;
+          this->CheckSplit(title, file);
           }
+        this->Stream << "\"";
         }
       else
         {
-        if ( ch == '\n' )
+        for ( cc = 0; cc < line.size(); cc ++ )
           {
-          this->Stream << "\\n\"" << endl;
+          ch = line[cc];
+          if ( ch == '\\' )
+            {
+            this->Stream << "\\\\";
+            }
+          else if ( ch == '\"' )
+            {
+            this->Stream << "\\\"";
+            }
+          else
+            {
+            this->Stream << (unsigned char)ch;
+            }
+          }
+        this->Stream << "\\n\"" << endl;
+        if ( !in_ifdef )
+          {
           this->CheckSplit(title, file);
-          this->Stream << "\"";
-          start = 1;
           }
-        else if ( start && ch == '#' )
-          {
-          preproc = 1;
-          this->Stream << "\\n\"" << endl;
-          this->CheckSplit(title, file);
-          this->Stream << "#";
-          preproc_cnt = 0;
-          }
-        else if ( ch == '\\' )
-          {
-          this->Stream << "\\\\";
-          start = 0;
-          }
-        else if ( ch == '\"' )
-          {
-          this->Stream << "\\\"";
-          start = 0;
-          }
-        else
-          {
-          this->Stream << (unsigned char)ch;
-          start = 0;
-          }
+        this->Stream << "\"";
         }
       }
     this->Stream << "\\n\";" << endl;
@@ -164,8 +163,7 @@ public:
       << "  ostr.rdbuf()->freeze(0);" << endl
       << "  return this->Standard" << title << "String;" << endl
       << "}" << endl << endl;
-    
-    fclose(fp);
+
     return VTK_OK;
     }
 };
