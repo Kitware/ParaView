@@ -118,7 +118,9 @@ LINK_LIBRARIES (vtkKWWidgetsTCL
                 ${TCL_LIBRARY} 
                 ${TK_LIBRARY})
 
+LINK_LIBRARIES (Expat)
 
 TARGET_LINK_LIBRARIES (ParaView
-                       vtkKWParaViewTCL
-                       Expat)
+                       vtkKWParaViewTCL)
+
+
