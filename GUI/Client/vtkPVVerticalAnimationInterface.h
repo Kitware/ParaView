@@ -121,6 +121,7 @@ protected:
   void BuildTypeMenu();
   void UpdateTypeImage(vtkPVKeyFrame*);
   void ShowKeyFrame(int id);
+
 private:
   vtkPVVerticalAnimationInterface(const vtkPVVerticalAnimationInterface&); // Not implemented.
   void operator=(const vtkPVVerticalAnimationInterface&); // Not implemented.

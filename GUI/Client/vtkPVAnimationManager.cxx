@@ -61,7 +61,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.11");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.12");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -783,15 +783,17 @@ void vtkPVAnimationManager::InitializeAnimatedPropertyStatus()
   //we could run thru the collection of PVCues this class has.
   //But why bother when the vtkPVHorizontalAnimationInterface has a
   //PVCue that is parent of all?
-  this->HAnimationInterface->InitializeAnimatedPropertyStatus();
-  
   this->AddTraceEntry("$kw(%s) InitializeAnimatedPropertyStatus",
     this->GetTclName());
+  this->HAnimationInterface->InitializeAnimatedPropertyStatus();
+  
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::KeyFramePropertyChanges()
 {
+  this->AddTraceEntry("$kw(%s) KeyFramePropertyChanges",
+    this->GetTclName());
   // determine the paramter to insert the key frame.
   double curbounds[2] = {0, 0};
   this->HAnimationInterface->GetTimeBounds(curbounds);
@@ -807,8 +809,6 @@ void vtkPVAnimationManager::KeyFramePropertyChanges()
     !this->RecordAll);
   this->InitializeAnimatedPropertyStatus();
 
-  this->AddTraceEntry("$kw(%s) KeyFramePropertyChanges",
-    this->GetTclName());
 }
 
 //-----------------------------------------------------------------------------
@@ -1175,6 +1175,13 @@ void vtkPVAnimationManager::RestoreWindowGeometry()
   this->HAnimationInterface->RestoreWindowGeometry();
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::InvalidateAllGeometries()
+{
+  this->AnimationScene->InvalidateAllGeometries();
+}
+
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::PrintSelf(ostream& os, vtkIndent indent)
 {

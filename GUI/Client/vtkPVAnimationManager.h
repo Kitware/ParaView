@@ -201,6 +201,10 @@ public:
   int GetUseGeometryCache();
 
   // Description:
+  // Invalidates all geometry.
+  void InvalidateAllGeometries();
+
+  // Description:
   // Can be called to set up a default animation for the given type of
   // pvSource. Presently, a default animation is added to only to a
   // reader with multiple timesteps.
