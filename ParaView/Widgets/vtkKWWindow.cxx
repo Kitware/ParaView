@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.168");
+vtkCxxRevisionMacro(vtkKWWindow, "1.169");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1034,7 +1034,7 @@ void vtkKWWindow::StoreRecentFilesToRegistery()
 void vtkKWWindow::AddRecentFilesMenu(
   const char *menuEntry, vtkKWObject *target, const char *label)
 {
-  if (!this->IsCreated() || !label)
+  if (!this->IsCreated() || !label || !this->MenuFile)
     {
     return;
     }
@@ -1102,7 +1102,7 @@ void vtkKWWindow::AddRecentFilesMenu(
 //----------------------------------------------------------------------------
 void vtkKWWindow::UpdateRecentFilesMenu()
 { 
-  if (!this->MenuRecentFiles)
+  if (!this->MenuRecentFiles || !this->RecentFilesVector)
     {
     return;
     }
