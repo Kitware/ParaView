@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.47");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.48");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -539,7 +539,16 @@ void vtkPVVectorEntry::SaveInBatchScript(ofstream *file)
     {
     *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
           <<  " GetProperty " << this->VariableName << "] SetElement "
-          << cc << " " << this->Property->GetScalar(cc) << endl;
+          << cc << " ";
+    if (this->DataType == VTK_INT)
+      {
+      *file << "[expr round(" << this->Property->GetScalar(cc) << ")]";
+      }
+    else
+      {
+      *file << this->Property->GetScalar(cc);
+      }
+    *file << endl;
     }
 }
 
