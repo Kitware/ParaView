@@ -142,6 +142,7 @@ class VTK_EXPORT vtkKWEvent
     ObliqueProbeVisibilityChangedEvent,
     PerspectiveViewAngleChangedEvent,
     PluginFilterApplyEvent,
+    PluginFilterCancelEvent,
     PluginFilterSelectEvent,
     PrinterDPIChangedEvent,
     ProbeInformationChangedEvent,

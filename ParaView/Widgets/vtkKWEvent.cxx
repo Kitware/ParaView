@@ -133,6 +133,7 @@ static const char *vtkKWEventStrings[] = {
   "ObliqueProbeVisibilityChangedEvent",
   "PerspectiveViewAngleChangedEvent",
   "PluginFilterApplyEvent",
+  "PluginFilterCancelEvent",
   "PluginFilterSelectEvent",
   "PrinterDPIChangedEvent",
   "ProbeInformationChangedEvent",
