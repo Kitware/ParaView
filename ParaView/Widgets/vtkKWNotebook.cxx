@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.57");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.58");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -498,6 +498,27 @@ unsigned int vtkKWNotebook::GetNumberOfPages()
 }
 
 //----------------------------------------------------------------------------
+unsigned int  vtkKWNotebook::GetNumberOfPagesMatchingTag(int tag)
+{
+  unsigned int count = 0;
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+      {
+      count++;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return count;
+}
+
+//----------------------------------------------------------------------------
 unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
 {
   unsigned int count = 0;
@@ -508,6 +529,27 @@ unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
   while (!it->IsDoneWithTraversal())
     {
     if (it->GetData(page) == VTK_OK && page->Visibility)
+      {
+      count++;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return count;
+}
+
+//----------------------------------------------------------------------------
+unsigned int vtkKWNotebook::GetNumberOfVisiblePagesMatchingTag(int tag)
+{
+  unsigned int count = 0;
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && page->Visibility && page->Tag == tag)
       {
       count++;
       }
