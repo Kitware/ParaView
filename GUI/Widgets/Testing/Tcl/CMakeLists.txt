@@ -1,11 +1,11 @@
 IF(VTK_PRINT_SELF_CHECK_TCL)
-ADD_TEST(PrintSelf-Widgets ${TCL_TCLSH}
+ADD_TEST(PrintSelf-KWWidgets ${TCL_TCLSH}
          ${VTK_PRINT_SELF_CHECK_TCL}
          ${KWWidgets_SOURCE_DIR})
 ENDIF(VTK_PRINT_SELF_CHECK_TCL)
 
 IF(VTK_FIND_STRING_TCL)
-ADD_TEST(TestSetObjectMacro-Widgets ${TCL_TCLSH}
+ADD_TEST(TestSetObjectMacro-KWWidgets ${TCL_TCLSH}
          ${VTK_FIND_STRING_TCL}
 	 "${KWWidgets_SOURCE_DIR}/vtk\\\\*.h"
 	 "vtkSetObjectMacro")
