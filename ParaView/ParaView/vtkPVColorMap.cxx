@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.47");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.48");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -231,8 +231,6 @@ vtkPVColorMap::~vtkPVColorMap()
     this->ArrayName = NULL;
     }
   
-  this->SetNumberOfVectorComponents(0);
-
   if (this->ScalarBarTitle)
     {
     delete [] this->ScalarBarTitle;
@@ -827,7 +825,7 @@ void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
       }
     }
 
-  delete this->VectorComponentTitles;
+  delete[] this->VectorComponentTitles;
   this->VectorComponentTitles = NULL;
   
   this->NumberOfVectorComponents = num;
