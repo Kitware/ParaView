@@ -62,11 +62,26 @@ public:
   virtual const char* GetTitle();
 
   // Description:
+  // Select/Deselect the window
+  virtual void SetSelected(int);
+  vtkGetMacro(Selected, int);
+  vtkBooleanMacro(Selected, int);
+
+  // Description:
   // Set the selection list (array for num strings) and the command
-  // that will be called when a selection is made (this command will be
-  // passed both the string selected and a point to this object)
+  // that will be called when a selection is made by the user. 
+  // This command will be passed both the selected string and 
+  // a pointer to this object.
   virtual void SetSelectionList(int num, const char **list);
-  virtual void SetSelectCommand(vtkKWObject *object, const char *method);
+  virtual void SetSelectListEntryCommand(
+    vtkKWObject *object, const char *method);
+
+  // Description:
+  // Set the select command, called when the frame is selected by the user
+  // (click in title bar).
+  // This command will be passed a pointer to this object.
+  virtual void SetSelectCommand(
+    vtkKWObject *object, const char *method);
 
   // Description:
   // Set/Get the title foregroud/background color (in both normal and 
@@ -90,7 +105,8 @@ public:
   
   // Description:
   // Callbacks
-  virtual void SelectionMenuCallback(const char *menuItem);
+  virtual void SelectListEntryCallback(const char *menuItem);
+  virtual void SelectCallback();
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -117,6 +133,10 @@ protected:
   vtkKWFrame      *TitleBarRightSubframe;
   vtkKWFrame      *BodyFrame;
 
+  virtual void Pack();
+  virtual void Bind();
+  virtual void UnBind();
+
   virtual int SetColor(float *color, float r, float g, float b);
   virtual void UpdateColors();
 
@@ -125,10 +145,11 @@ protected:
   float TitleBackgroundColor[3];
   float TitleBackgroundSelectedColor[3];
 
-  virtual void SetObjectMethodCommand(
-    char **command, vtkKWObject *object, const char *method);
+  char *SelectListEntryCommand;
   char *SelectCommand;
-  
+
+  int Selected;
+
 private:
   vtkKWSelectionFrame(const vtkKWSelectionFrame&);  // Not implemented
   void operator=(const vtkKWSelectionFrame&);  // Not implemented

@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWIcon.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.15");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.16");
 
 //----------------------------------------------------------------------------
 vtkKWSelectionFrame::vtkKWSelectionFrame()
@@ -54,8 +54,9 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->SelectionList         = vtkKWMenuButton::New();
   this->TitleBarRightSubframe = vtkKWFrame::New();
   this->BodyFrame             = vtkKWFrame::New();
-  
-  this->SelectCommand         = NULL;
+
+  this->SelectListEntryCommand = NULL;
+  this->SelectCommand          = NULL;
 
   this->TitleColor[0]                   = 1.0;
   this->TitleColor[1]                   = 1.0;
@@ -65,13 +66,15 @@ vtkKWSelectionFrame::vtkKWSelectionFrame()
   this->TitleSelectedColor[1]           = 1.0;
   this->TitleSelectedColor[2]           = 1.0;
 
-  this->TitleBackgroundColor[0]         = 0.0;
-  this->TitleBackgroundColor[1]         = 0.0;
-  this->TitleBackgroundColor[2]         = 0.5;
+  this->TitleBackgroundColor[0]         = 0.6;
+  this->TitleBackgroundColor[1]         = 0.6;
+  this->TitleBackgroundColor[2]         = 0.6;
 
   this->TitleBackgroundSelectedColor[0] = 0.0;
   this->TitleBackgroundSelectedColor[1] = 0.0;
   this->TitleBackgroundSelectedColor[2] = 0.5;
+
+  this->Selected = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -82,6 +85,12 @@ vtkKWSelectionFrame::~vtkKWSelectionFrame()
   this->SelectionList->Delete();
   this->TitleBarRightSubframe->Delete();
   this->BodyFrame->Delete();
+
+  if (this->SelectListEntryCommand)
+    {
+    delete [] this->SelectListEntryCommand;
+    this->SelectListEntryCommand = NULL;
+    }
 
   if (this->SelectCommand)
     {
@@ -115,9 +124,6 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   this->TitleBar->SetParent(this);
   this->TitleBar->Create(app, "");
 
-  this->Script("pack %s -side top -fill x -expand no",
-               this->TitleBar->GetWidgetName());
-
   // The selection button
 
   this->SelectionList->SetParent(this->TitleBar);
@@ -125,43 +131,118 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   this->SelectionList->IndicatorOff();
   this->SelectionList->SetImageOption(vtkKWIcon::ICON_EXPAND);
 
-  this->Script("pack %s -side left -anchor w -fill y -padx 1 -pady 1",
-               this->SelectionList->GetWidgetName());
-
-  //cout << this->SelectionList->GetTclName() << endl;
-
   // The title itself
 
   this->Title->SetParent(this->TitleBar);
   this->Title->Create(app, "");
   this->Title->SetLabel("<Click to Select>");
   
-  this->Script("pack %s -side left -anchor w -fill y",
-               this->Title->GetWidgetName());
-  
   // The subframe on the right
 
   this->TitleBarRightSubframe->SetParent(this->TitleBar);
   this->TitleBarRightSubframe->Create(app, "");
 
-  this->Script("pack %s -side right -anchor e -padx 4",
-               this->TitleBarRightSubframe->GetWidgetName());
-  
   // The body frame
 
   this->BodyFrame->SetParent(this);
-  this->BodyFrame->Create(app, "-bg white");
+  this->BodyFrame->Create(app, "-bg black");
 
-  this->Script("pack %s -side top -fill both -expand yes",
-               this->BodyFrame->GetWidgetName());
+  // Pack
+
+  this->Pack();
 
   // Update colors
 
   this->UpdateColors();
+  
+  // Bind
+
+  this->Bind();
 
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::Pack()
+{
+  if (!this->IsAlive())
+    {
+    return;
+    }
+
+  ostrstream tk_cmd;
+
+  tk_cmd << "pack " << this->TitleBar->GetWidgetName()
+         << " -side top -fill x -expand no" << endl;
+
+  tk_cmd << "pack " << this->SelectionList->GetWidgetName()
+         << " -side left -anchor w -fill y -padx 1 -pady 1" << endl;
+
+  tk_cmd << "pack " << this->Title->GetWidgetName()
+         << " -side left -anchor w -fill y" << endl;
+  
+  tk_cmd << "pack " << this->TitleBarRightSubframe->GetWidgetName()
+         << " -side right -anchor e -padx 4" << endl;
+  
+  tk_cmd << "pack " << this->BodyFrame->GetWidgetName()
+         << " -side top -fill both -expand yes" << endl;
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::Bind()
+{
+  if (!this->IsAlive())
+    {
+    return;
+    }
+
+  ostrstream tk_cmd;
+
+  tk_cmd << "bind " << this->TitleBar->GetWidgetName() 
+         << " <ButtonPress-1> {" << this->GetTclName() 
+         << " SelectCallback}" << endl;
+
+  tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
+         << " <ButtonPress-1> {" << this->GetTclName() 
+         << " SelectCallback}" << endl;
+
+  tk_cmd << "bind " << this->Title->GetWidgetName() 
+         << " <ButtonPress-1> {" << this->GetTclName() 
+         << " SelectCallback}" << endl;
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::UnBind()
+{
+  if (!this->IsAlive())
+    {
+    return;
+    }
+
+  ostrstream tk_cmd;
+
+  tk_cmd << "bind " << this->TitleBar->GetWidgetName() 
+         << " <ButtonPress-1> {}" << endl;
+
+  tk_cmd << "bind " << this->SelectionList->GetWidgetName() 
+         << " <ButtonPress-1> {}" << endl;
+
+  tk_cmd << "bind " << this->Title->GetWidgetName() 
+         << " <ButtonPress-1> {}" << endl;
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -238,6 +319,20 @@ void vtkKWSelectionFrame::SetTitleBackgroundSelectedColor(
 }
 
 //----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SetSelected(int arg)
+{
+  if (this->Selected == arg)
+    {
+    return;
+    }
+
+  this->Selected = arg;
+
+  this->Modified();
+  this->UpdateColors();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWSelectionFrame::UpdateColors()
 {
   if (!this->IsCreated())
@@ -245,25 +340,30 @@ void vtkKWSelectionFrame::UpdateColors()
     return;
     }
 
+  float *fgcolor, *bgcolor;
+
+  if (this->Selected)
+    {
+    fgcolor = this->TitleSelectedColor;
+    bgcolor = this->TitleBackgroundSelectedColor;
+    }
+  else
+    {
+    fgcolor = this->TitleColor;
+    bgcolor = this->TitleBackgroundColor;
+    }
+
   this->TitleBar->SetBackgroundColor(
-    this->TitleBackgroundColor[0], 
-    this->TitleBackgroundColor[1], 
-    this->TitleBackgroundColor[2]);
+    bgcolor[0], bgcolor[1], bgcolor[2]);
 
   this->Title->SetBackgroundColor(
-    this->TitleBackgroundColor[0], 
-    this->TitleBackgroundColor[1], 
-    this->TitleBackgroundColor[2]);
+    bgcolor[0], bgcolor[1], bgcolor[2]);
 
   this->Title->SetForegroundColor(
-    this->TitleColor[0], 
-    this->TitleColor[1], 
-    this->TitleColor[2]);
+    fgcolor[0], fgcolor[1], fgcolor[2]);
 
   this->TitleBarRightSubframe->SetBackgroundColor(
-    this->TitleBackgroundColor[0], 
-    this->TitleBackgroundColor[1], 
-    this->TitleBackgroundColor[2]);
+    bgcolor[0], bgcolor[1], bgcolor[2]);
 }
 
 //----------------------------------------------------------------------------
@@ -279,53 +379,48 @@ void vtkKWSelectionFrame::SetSelectionList(int num, const char **list)
   this->SelectionList->GetMenu()->DeleteAllMenuItems();
   
   int i;
-  char *cbk;
-  
   for (i = 0; i < num; i++)
     {
-    cbk = new char[strlen(list[i]) + 25];
-    sprintf(cbk, "SelectionMenuCallback {%s}", list[i]);
-    this->SelectionList->AddCommand(list[i], this, cbk);
-    delete [] cbk;
+    ostrstream cbk;
+    cbk << "SelectListEntryCallback {" << list[i] << "}" << ends;
+    this->SelectionList->AddCommand(list[i], this, cbk.str());
+    cbk.rdbuf()->freeze(0);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SetObjectMethodCommand(
-  char **command, 
-  vtkKWObject *object, 
-  const char *method)
+void vtkKWSelectionFrame::SetSelectListEntryCommand(vtkKWObject *object,
+                                                    const char *method)
 {
-  if (*command)
-    {
-    delete [] *command;
-    *command = NULL;
-    }
-
-  if (!object)
-    {
-    return;
-    }
-
-  ostrstream command_str;
-  command_str << object->GetTclName() << " " << method << ends;
-  *command = command_str.str();
+  this->SetObjectMethodCommand(&this->SelectListEntryCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSelectionFrame::SetSelectCommand(vtkKWObject *object,
-                                           const char *method)
+                                                    const char *method)
 {
   this->SetObjectMethodCommand(&this->SelectCommand, object, method);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWSelectionFrame::SelectionMenuCallback(const char *menuItem)
+void vtkKWSelectionFrame::SelectListEntryCallback(const char *menuItem)
 {
-  if (this->SelectCommand)
+  if (this->SelectListEntryCommand)
     {
     this->Script("eval {%s {%s} %s}",
-                 this->SelectCommand, menuItem, this->GetTclName());
+                 this->SelectListEntryCommand, menuItem, this->GetTclName());
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSelectionFrame::SelectCallback()
+{
+  this->SelectedOn();
+
+  if (this->SelectCommand)
+    {
+    this->Script("eval {%s %s}",
+                 this->SelectCommand, this->GetTclName());
     }
 }
 
@@ -358,6 +453,15 @@ void vtkKWSelectionFrame::UpdateEnableState()
     {
     this->BodyFrame->SetEnabled(this->Enabled);
     }
+
+  if (this->Enabled)
+    {
+    this->Bind();
+    }
+  else
+    {
+    this->UnBind();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -384,5 +488,6 @@ void vtkKWSelectionFrame::PrintSelf(ostream& os, vtkIndent indent)
      << this->TitleBackgroundSelectedColor[0] << ", " 
      << this->TitleBackgroundSelectedColor[1] << ", " 
      << this->TitleBackgroundSelectedColor[2] << ")" << endl;
+  os << indent << "Selected: " << (this->Selected ? "On" : "Off") << endl;
 }
 
