@@ -57,6 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVRenderModule_h
 
 #include "vtkObject.h"
+#include "vtkClientServerID.h"
 
 class vtkMultiProcessController;
 class vtkPVApplication;
@@ -104,19 +105,12 @@ public:
   // My version.
   vtkRenderer *GetRenderer();
   vtkRenderWindow *GetRenderWindow();
-  //const char *GetRenderWindowTclName() {return this->RenderWindowTclName;}
 
   // Description:
   // Change the background color.
   void SetBackgroundColor(float r, float g, float b);
   virtual void SetBackgroundColor(float *c) {this->SetBackgroundColor(c[0],c[1],c[2]);}
 
-  // Description:
-  // These are still used in a couple of cases (cube axes ...)
-  // They will eventually be removed.
-  vtkGetStringMacro(RendererTclName);
-  vtkGetStringMacro(RenderWindowTclName);
-  
   // Description:
   // Callback for the triangle strips check button
   void SetUseTriangleStrips(int val);
@@ -152,6 +146,9 @@ public:
   vtkSetMacro(TotalVisibleMemorySizeValid, int);
   vtkGetMacro(TotalVisibleMemorySizeValid, int);
 
+  
+  vtkClientServerID GetRendererID() { return this->RendererID;}
+  vtkClientServerID GetRenderWindowID() { return this->RenderWindowID;}
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
@@ -175,11 +172,8 @@ protected:
   //int Interactive;
   int TotalVisibleMemorySizeValid;
   
-  char *RendererTclName;
-  vtkSetStringMacro(RendererTclName);  
-   
-  char *RenderWindowTclName;
-  vtkSetStringMacro(RenderWindowTclName);  
+  vtkClientServerID RendererID;
+  vtkClientServerID RenderWindowID;
     
   double StillRenderTime;
   double InteractiveRenderTime;

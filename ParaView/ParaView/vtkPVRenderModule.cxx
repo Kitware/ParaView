@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.14");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.14.4.1");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -95,8 +95,8 @@ vtkPVRenderModule::vtkPVRenderModule()
 
   this->Renderer = 0;
   this->RenderWindow = 0;
-  this->RendererTclName     = 0;
-  this->RenderWindowTclName = 0;
+  this->RendererID.ID     = 0;
+  this->RenderWindowID.ID = 0;
   this->InteractiveRenderTime    = 0;
   this->StillRenderTime          = 0;
 
@@ -104,7 +104,6 @@ vtkPVRenderModule::vtkPVRenderModule()
 
   this->RenderInterruptsEnabled = 1;
 
-  this->RenderWindowTclName = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -132,30 +131,20 @@ vtkPVRenderModule::~vtkPVRenderModule()
 
     if ( pvApp )
       {
-      pvApp->BroadcastScript("%s Delete", this->RendererTclName);
+      pvApp->DeleteClientAndServerObject(this->RendererID);
       }
-    else
-      {
-      this->Renderer->Delete();
-      }
-    this->SetRendererTclName(NULL);
-    this->Renderer = NULL;
+    this->RendererID.ID = 0;
     }
   
   if (this->RenderWindow)
     {
     if ( pvApp )
-      {
-      pvApp->BroadcastScript("%s Delete", this->RenderWindowTclName);
+      { 
+      pvApp->DeleteClientAndServerObject(this->RenderWindowID);
       }
-    else
-      {
-      this->RenderWindow->Delete();
-      }
-    this->SetRenderWindowTclName(NULL);
-    this->RenderWindow = NULL;
+    this->RenderWindowID.ID = 0;
     }
-
+  pvApp->GetProcessModule()->SendStreamToClientAndServer();
   this->SetPVApplication(NULL);
 }
 
@@ -216,29 +205,32 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     {
     return;
     }  
-
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
   // Maybe I should not reference count this object to avoid
   // a circular reference.
   this->PVApplication = pvApp;
   this->PVApplication->Register(this);
 
-  this->Renderer = (vtkRenderer*)pvApp->MakeTclObject("vtkRenderer", "Ren1");
-  this->RendererTclName = NULL;
-  this->SetRendererTclName("Ren1");
-  
+  this->RendererID = pvApp->NewClientAndServerObject("vtkRenderer");
+  this->RenderWindowID = pvApp->NewClientAndServerObject("vtkRenderWindow");
+  pvApp->GetProcessModule()->SendStreamToClientAndServer();
+  this->Renderer = 
+    vtkRenderer::SafeDownCast(
+      pvApp->GetProcessModule()->GetObjectFromID(this->RendererID));
   this->RenderWindow = 
-    (vtkRenderWindow*)pvApp->MakeTclObject("vtkRenderWindow", "RenWin1");
-
+    vtkRenderWindow::SafeDownCast(
+      pvApp->GetProcessModule()->GetObjectFromID(this->RenderWindowID));
+  
   if (pvApp->GetUseStereoRendering())
     {
     this->RenderWindow->StereoCapableWindowOn();
     this->RenderWindow->StereoRenderOn();
     }
-
-  this->SetRenderWindowTclName("RenWin1");
-  
-  pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
-                           this->RendererTclName);
+  stream << vtkClientServerStream::Invoke
+         << this->RenderWindowID << "AddRenderer" << this->RendererID
+         << vtkClientServerStream::End;
+  pvApp->GetProcessModule()->SendStreamToClientAndServer();
   
   // Make sure we have a chance to set the clipping range properly.
   vtkCallbackCommand* cbc;
@@ -269,9 +261,11 @@ vtkRenderWindow *vtkPVRenderModule::GetRenderWindow()
 void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  pvApp->BroadcastScript("%s SetBackground %f %f %f",
-                         this->RendererTclName, r, g, b);
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  stream << vtkClientServerStream::Invoke << this->RendererID << "SetBackground"
+         << r << g << b << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 
@@ -342,10 +336,13 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
     part->SetPartDisplay(pDisp);
     pDisp->SetPart(part);
 
-    if (part && pDisp->GetPropTclName() != NULL)
-      {
-      pvApp->BroadcastScript("%s AddProp %s", this->RendererTclName,
-                             pDisp->GetPropTclName());
+    if (part && pDisp->GetPropID().ID != 0)
+      { 
+      vtkPVProcessModule *pm = pvApp->GetProcessModule();
+      vtkClientServerStream& stream = pm->GetStream();
+      stream << vtkClientServerStream::Invoke << this->RendererID << "AddProp"
+             << pDisp->GetPropID() << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     pDisp->Delete();
     }
@@ -372,10 +369,13 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
     if (pDisp)
       {
       this->PartDisplays->RemoveItem(pDisp);
-      if (pDisp->GetPropTclName() != NULL)
-        {
-        pvApp->BroadcastScript("%s RemoveProp %s", this->RendererTclName,
-                               pDisp->GetPropTclName());
+      if (pDisp->GetPropID().ID != 0)
+        {  
+        vtkPVProcessModule *pm = pvApp->GetProcessModule();
+        vtkClientServerStream& stream = pm->GetStream();
+        stream << vtkClientServerStream::Invoke << this->RendererID << "RemoveProp"
+               << pDisp->GetPropID() << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         }
       part->SetPartDisplay(NULL);
       }
@@ -444,9 +444,11 @@ void vtkPVRenderModule::SetUseTriangleStrips(int val)
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetPart())
       {
-      pvApp->BroadcastScript("%s SetUseStrips %d",
-                             pDisp->GetPart()->GetGeometryTclName(),
-                             val);
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      vtkClientServerStream& stream = pm->GetStream();
+      stream << vtkClientServerStream::Invoke << pDisp->GetPart()->GetGeometryID()
+             <<  "SetUseStrips" << val << vtkClientServerStream::End;
+      pm->SendStreamToClientAndServer();
       }
     }
 
@@ -523,10 +525,10 @@ void vtkPVRenderModule::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "InteractiveRenderTime: " 
      << this->InteractiveRenderTime << endl;
-  os << indent << "RenderWindowTclName: " 
-     << (this->GetRenderWindowTclName()?this->GetRenderWindowTclName():"<none>") << endl;
-  os << indent << "RendererTclName: " 
-     << (this->GetRendererTclName()?this->GetRendererTclName():"<none>") << endl;
+//   os << indent << "RenderWindowTclName: " 
+//      << (this->GetRenderWindowTclName()?this->GetRenderWindowTclName():"<none>") << endl;
+//   os << indent << "RendererTclName: " 
+//      << (this->GetRendererTclName()?this->GetRendererTclName():"<none>") << endl;
   os << indent << "StillRenderTime: " << this->StillRenderTime << endl;
   os << indent << "RenderInterruptsEnabled: " 
      << (this->RenderInterruptsEnabled ? "on" : "off") << endl;

@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDWriter);
-vtkCxxRevisionMacro(vtkPVDWriter, "1.3");
+vtkCxxRevisionMacro(vtkPVDWriter, "1.3.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVDWriter::vtkPVDWriter()
@@ -121,9 +121,10 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     int i;
     for(i=0; i < pvs->GetNumberOfParts(); ++i)
       {
-      pm->ServerScript("writer AddInput \"%s\" {%s}",
-                       pvs->GetPart(i)->GetVTKDataTclName(),
-                       pvs->GetName());
+// ********
+//       pm->ServerScript("writer AddInput \"%s\" {%s}",
+//                        pvs->GetPart(i)->GetVTKDataTclName(),
+//                        pvs->GetName());
       }
     
     // Start the animation.
@@ -146,11 +147,12 @@ void vtkPVDWriter::Write(const char* fileName, vtkPVSource* pvs,
     {
     // Plug the inputs into the writer.
     int i;
-    for(i=0; i < pvs->GetNumberOfParts(); ++i)
-      {
-      pm->ServerScript("writer AddInput \"%s\"",
-                       pvs->GetPart(i)->GetVTKDataTclName());
-      }
+    // *********************
+ //    for(i=0; i < pvs->GetNumberOfParts(); ++i)
+//       {
+//       pm->ServerScript("writer AddInput \"%s\"",
+//                        pvs->GetPart(i)->GetVTKDataTclName());
+//       }
     
     // Just write the current data.
     pm->ServerScript("writer Write");

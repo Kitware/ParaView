@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.5");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.6");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1790,6 +1790,7 @@ void vtkPVData::SetAmbient(float ambient)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void vtkPVData::Initialize()
 {
+#if 0
   vtkPVApplication *pvApp = this->GetPVApplication();
   float bounds[6];
   char *tclName;
@@ -1814,6 +1815,7 @@ void vtkPVData::Initialize()
   this->Script("%s SetCamera [%s GetActiveCamera]",
                this->GetCubeAxesTclName(), tclName);
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
+#endif
   
 }
 
@@ -1821,6 +1823,7 @@ void vtkPVData::Initialize()
 //----------------------------------------------------------------------------
 void vtkPVData::CenterCamera()
 {
+#if 0
   float bounds[6];
   vtkPVApplication *pvApp = this->GetPVApplication();
   char* tclName;
@@ -1838,6 +1841,7 @@ void vtkPVData::CenterCamera()
       this->GetPVRenderView()->EventuallyRender();
       }
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1913,6 +1917,7 @@ void vtkPVData::SetScalarBarVisibility(int val)
 //----------------------------------------------------------------------------
 void vtkPVData::SetCubeAxesVisibility(int val)
 {
+#if 0
   vtkRenderer *ren;
   char *tclName;
   
@@ -1949,6 +1954,7 @@ void vtkPVData::SetCubeAxesVisibility(int val)
       this->Script("%s RemoveProp %s", tclName, this->GetCubeAxesTclName());
       }
     }
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -2133,6 +2139,7 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveInBatchScript(ofstream *file)
 {
+#if 0
   float range[2];
   const char* scalarMode;
   char* result;
@@ -2177,17 +2184,17 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
         outputCount = 0;
         }
 
-      *file << "vtkPVGeometryFilter " << part->GetGeometryTclName() << "\n\t"
-            << part->GetGeometryTclName() << " SetInput [" 
-            << this->GetPVSource()->GetVTKSourceTclName(sourceCount) 
-            << " GetOutput " << outputCount << "]\n";
+ //      *file << "vtkPVGeometryFilter " << part->GetGeometryTclName() << "\n\t"
+//             << part->GetGeometryTclName() << " SetInput [" 
+//             << this->GetPVSource()->GetVTKSourceTclName(sourceCount) 
+//             << " GetOutput " << outputCount << "]\n";
       // Move to next output
       ++outputCount;
 
 
-      *file << "vtkPolyDataMapper " << part->GetPartDisplay()->GetMapperTclName() << "\n\t"
-            << part->GetPartDisplay()->GetMapperTclName() << " SetInput ["
-            << part->GetGeometryTclName() << " GetOutput]\n\t";  
+ //      *file << "vtkPolyDataMapper " << part->GetPartDisplay()->GetMapperTclName() << "\n\t"
+//             << part->GetPartDisplay()->GetMapperTclName() << " SetInput ["
+//             << part->GetGeometryTclName() << " GetOutput]\n\t";  
       *file << part->GetPartDisplay()->GetMapperTclName() << " SetImmediateModeRendering "
             << part->GetPartDisplay()->GetMapper()->GetImmediateModeRendering() << "\n\t";
       part->GetPartDisplay()->GetMapper()->GetScalarRange(range);
@@ -2266,6 +2273,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << this->CubeAxesTclName << " SetInertia 20\n";
     *file << renTclName << " AddProp " << this->CubeAxesTclName << "\n";
     }
+#endif
 }
 
 //----------------------------------------------------------------------------

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVSource_h
 
 #include "vtkKWObject.h"
-
+#include "vtkClientServerStream.h"  // needed for vtkClientServerID
 class vtkCollection;
 class vtkDataSet;
 class vtkKWEntry;
@@ -77,6 +77,7 @@ class vtkStringList;
 class vtkCollection;
 class vtkPVPart;
 class vtkPVDataInformation;
+class vtkClientServerIDList;
 class vtkPVNumberOfOutputsInformation;
 
 class VTK_EXPORT vtkPVSource : public vtkKWObject
@@ -222,12 +223,18 @@ public:
   // Set the vtk source that will be a part of the pipeline.
   // The pointer to this class is not used.
   // (VTKSourceTclName is used instead.)
+  const char *GetVTKSourceTclName(int idx);
+  const char *GetVTKSourceTclName();
+  
   void AddVTKSource(const char *tclName);
   void RemoveAllVTKSources();
   int GetNumberOfVTKSources();
-  const char *GetVTKSourceTclName(int idx);
+  vtkClientServerID GetVTKSourceID(int idx);
   // Legacy
-  const char *GetVTKSourceTclName() {return this->GetVTKSourceTclName(0);}
+  vtkClientServerID GetVTKSourceID() {return this->GetVTKSourceID(0);}
+
+
+  void AddVTKSource(vtkClientServerID);
 
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
   vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
@@ -493,9 +500,11 @@ protected:
   // If this is on, no Information page (from vtkPVData) is displayed
   // for this source. Used by sources like Glyphs
   int HideInformationPage;
-
+//BTX
   vtkStringList *VTKSourceTclNames;
-
+  vtkClientServerIDList* VTKSourceIDs;
+  vtkClientServerIDList* VTKSourceOuputIDs;
+//ETX
   // One output. Now used only to hold UI
   vtkPVData *PVOutput;
   

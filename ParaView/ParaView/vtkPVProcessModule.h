@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVProcessModule_h
 
 #include "vtkKWObject.h"
+#include "vtkClientServerStream.h"
 
 class vtkPolyData;
 class vtkKWLoadSaveDialog;
@@ -163,10 +164,33 @@ public:
     {
       return *this->ClientServerStream;
     }
+  
+  vtkClientServerID NewServerObject(const char*);
+  void DeleteServerObject(vtkClientServerID);
+  
+  // Description: 
+  // Return the vtk object associated with the given id.
+  // If this is running in client/server mode then 0 is returned.
+  // If the client and server are in the same process the object pointer
+  // will be returned.
+  virtual vtkObjectBase* GetObjectFromID(vtkClientServerID);
+  
+  // Description:
+  // Return a message containing the result of the last SendMessages call.
+  // In client/server mode this causes a round trip to the server.
+  virtual const vtkClientServerStream* GetLastResultStream();
 //ETX
   // Description:
+
   // Send the current vtkClientServerStream contents to the server.
-  virtual void SendMessages();
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToServer();
+  
+  // Description:
+  // Send current ClientServerStream data to the server and the client.
+  virtual void SendStreamToClientAndServer();
+
+  vtkClientServerID GetUniqueID();
 protected:
   vtkPVProcessModule();
   ~vtkPVProcessModule();
@@ -178,9 +202,10 @@ protected:
 
   char *RootResult;
 
-  vtkClientServerInterpreter* ClientServerInterpreter;
+  vtkClientServerInterpreter* ClientInterpreter;
   vtkClientServerStream* ClientServerStream;
-
+  vtkClientServerStream* LastResultStream;
+  vtkClientServerID UniqueID;
 private:  
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented

@@ -39,9 +39,19 @@ struct VTK_CLIENT_SERVER_EXPORT vtkClientServerID
     {
     return this->ID == i.ID;
     }
-
   // The identifying integer.
   vtkTypeUInt32 ID;
 };
 
+inline ostream& operator<<(ostream& os, const vtkClientServerID& id)
+{
+  return os << id.ID;
+}
+
+inline vtkOStreamWrapper& operator<<(vtkOStreamWrapper& os, const vtkClientServerID& id)
+{
+  return os << id.ID;
+}
+
+                      
 #endif

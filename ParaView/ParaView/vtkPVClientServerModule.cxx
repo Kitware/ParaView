@@ -110,11 +110,21 @@ int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
 #define VTK_PV_ROOT_RESULT_RMI_TAG           838486
 #define VTK_PV_ROOT_RESULT_LENGTH_TAG        838487
 #define VTK_PV_ROOT_RESULT_TAG               838488
+#define VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG 838490
 
 #define VTK_PV_SEND_DATA_OBJECT_TAG          838489
 #define VTK_PV_DATA_OBJECT_TAG               923857
 
 
+//----------------------------------------------------------------------------
+// This RMI is only on process 0 of server. (socket controller)
+void vtkPVClientServerLastResultRMI(void *localArg, void* , 
+                                    int vtkNotUsed(remoteArgLength),
+                                    int vtkNotUsed(remoteProcessId))
+{
+  vtkPVClientServerModule *self = (vtkPVClientServerModule *)(localArg);
+  self->SendLastClientServerResult();
+}
 
 
 void vtkPVClientServerMPIRMI(void *localArg, void *remoteArg, 
@@ -250,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.2");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.3");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -259,9 +269,9 @@ int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVClientServerModule::vtkPVClientServerModule()
 {
-  this->ClientServerInterpreter = 0;
-  this->ClientServerStream = 0;
-
+  this->ServerInterpreter = 0;
+  this->ClientServerStream = new vtkClientServerStream;
+  this->LastResultStream = new vtkClientServerStream;
   this->Controller = NULL;
   this->SocketController = NULL;
   this->ClientMode = 1;
@@ -283,6 +293,7 @@ vtkPVClientServerModule::vtkPVClientServerModule()
 //----------------------------------------------------------------------------
 vtkPVClientServerModule::~vtkPVClientServerModule()
 {
+  delete this->LastResultStream;
   if (this->Controller)
     {
     this->Controller->Delete();
@@ -345,13 +356,15 @@ void vtkPVClientServerModule::Initialize()
   this->ClientMode = pvApp->GetClientMode();
   if(this->ClientMode)
     {
-    // move up to vtkPVProcessModule
-    this->ClientServerStream = new vtkClientServerStream;
+    this->ClientInterpreter = vtkClientServerInterpreter::New();
+    this->ClientInterpreter->SetLogFile("c:/pvClient.out");
+    Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
     }
   else
     {
-    this->ClientServerInterpreter = vtkClientServerInterpreter::New();
-    Vtkparaviewcswrapped_Initialize(this->ClientServerInterpreter);
+    this->ServerInterpreter = vtkClientServerInterpreter::New();
+    this->ServerInterpreter->SetLogFile("c:/pvServer.out");
+    Vtkparaviewcswrapped_Initialize(this->ServerInterpreter);
     }
   
   if (this->ClientMode)
@@ -520,6 +533,9 @@ void vtkPVClientServerModule::Initialize()
     this->SocketController->Send(&numProcs, 1, 1, 8843);
 
     // 
+    this->SocketController->AddRMI(vtkPVClientServerLastResultRMI, (void *)(this), 
+                                   VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
+    // for SendMessages
     this->SocketController->AddRMI(vtkPVClientServerSocketRMI, (void *)(this), 
                                    VTK_PV_CLIENTSERVER_RMI_TAG);
     
@@ -1080,22 +1096,84 @@ int vtkPVClientServerModule::ReceiveRootPolyData(const char* tclName,
 
 
 
-
-
 void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
 {
-  this->ClientServerInterpreter->ProcessStream(msg, len);
+  this->ServerInterpreter->ProcessStream(msg, len);
 }
 
 
 
+const vtkClientServerStream* vtkPVClientServerModule::GetLastResultStream()
+{  
+  if(!this->Application)
+    {
+    vtkErrorMacro("Missing application object.");
+    return 0;
+    }
+  
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("NotExpecting this call on the server.");
+    return 0;
+    }
+  int length;    
+  this->SocketController->TriggerRMI(1, "", VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
+  this->SocketController->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  if(length <= 0)
+    {
+    return 0;
+    }
+  unsigned char* result = new unsigned char[length];
+  this->SocketController->Receive((char*)result, length, 1, VTK_PV_ROOT_RESULT_TAG);
+  this->LastResultStream->SetData(result, length);
+  return this->LastResultStream;
+}
 
 //----------------------------------------------------------------------------
 // This sends the current stream to the server
-void vtkPVClientServerModule::SendMessages()
+void vtkPVClientServerModule::SendStreamToServer()
 {
   const unsigned char* data;
   size_t len;
   this->ClientServerStream->GetData(&data, &len);
   this->SocketController->TriggerRMI(1, (void*)(data), len, VTK_PV_CLIENTSERVER_RMI_TAG);
+  this->ClientServerStream->Reset();
 }
+
+void vtkPVClientServerModule::SendStreamToClientAndServer()
+{
+  // copy from SendStreamToServer but leave out the stream Reset
+  const unsigned char* data;
+  size_t len;
+  this->ClientServerStream->GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len, VTK_PV_CLIENTSERVER_RMI_TAG);
+  // now process the stream locally
+  this->ClientInterpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
+}
+
+void vtkPVClientServerModule::SendLastClientServerResult()
+{
+  vtkClientServerID id;
+  id.ID=0;
+  const vtkClientServerStream* amsg = this->ServerInterpreter->GetMessageFromID(id);
+  const unsigned char* data;
+  size_t length;
+  if(!amsg)
+    {
+    length = 0;
+    }
+  else
+    {
+    amsg->GetData(&data, &length);
+    }
+  int len = length;
+  this->GetSocketController()->Send(&len, 1, 1, 
+                                    VTK_PV_ROOT_RESULT_LENGTH_TAG);
+  if (length > 0)
+    {
+    this->GetSocketController()->Send((char*)(data), length, 1,
+                                      VTK_PV_ROOT_RESULT_TAG);  
+    }
+}
+

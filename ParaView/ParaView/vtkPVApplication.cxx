@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.3");
+vtkCxxRevisionMacro(vtkPVApplication, "1.221.2.4");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1440,18 +1440,15 @@ void vtkPVApplication::Start(int argc, char*argv[])
   
   //********
   // Simple test for Client/Server wrapper of vtkObject
-#if 0
+//#if 0
   vtkClientServerStream& stream = this->ProcessModule->GetStream();
-  vtkClientServerID instance_id = stream.GetUniqueID();
-  stream << vtkClientServerStream::New << "vtkObject" 
-         << instance_id << vtkClientServerStream::End;
+  vtkClientServerID instance_id = this->NewServerObject("vtkObject");
   stream << vtkClientServerStream::Invoke << instance_id
          << "DebugOn" << vtkClientServerStream::End;
-  this->ProcessModule->SendMessages();
-  stream.Reset();
-  stream << vtkClientServerStream::Delete << instance_id 
-         << vtkClientServerStream::End;
-#endif
+  this->ProcessModule->DeleteServerObject(instance_id);
+  this->ProcessModule->SendStreamToServer();
+
+//#endif
   //********
   
   
@@ -1661,6 +1658,34 @@ void vtkPVApplication::MakeServerTclObject(const char *className,
                                            const char *tclName)
 {
   this->GetProcessModule()->ServerScript("%s %s", className, tclName);
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVApplication::NewServerObject(const char *className)
+{
+  vtkClientServerStream& stream = this->GetProcessModule()->GetStream();
+  return this->ProcessModule->NewServerObject(className);
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVApplication::NewClientAndServerObject(const char *className)
+{
+  return this->NewServerObject(className);
+}
+//----------------------------------------------------------------------------
+void vtkPVApplication::DeleteClientAndServerObject(vtkClientServerID id)
+{
+  
+  vtkClientServerStream& stream = this->ProcessModule->GetStream();
+  stream << vtkClientServerStream::Delete << id << vtkClientServerStream::End;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::DeleteServerObject(vtkClientServerID id)
+{
+  
+  vtkClientServerStream& stream = this->ProcessModule->GetStream();
+  stream << vtkClientServerStream::Delete << id << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------

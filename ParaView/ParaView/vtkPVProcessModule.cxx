@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.2");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.3");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -95,11 +95,12 @@ int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
 {
+  this->UniqueID.ID = 3;
   this->Controller = NULL;
   this->TemporaryInformation = NULL;
   this->RootResult = NULL; 
   this->ClientServerStream = 0;
-  this->ClientServerInterpreter = 0;
+  this->ClientInterpreter = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -111,13 +112,16 @@ vtkPVProcessModule::~vtkPVProcessModule()
     this->Controller = NULL;
     }
   this->SetRootResult(NULL);
-  if(this->ClientServerInterpreter)
+  if(this->ClientInterpreter)
     {
-    this->ClientServerInterpreter->Delete();
+    this->ClientInterpreter->Delete();
     }
   delete this->ClientServerStream;
 }
 
+// Declare the initialization function as external
+// this is defined in the PackageInit file
+extern void Vtkparaviewcswrapped_Initialize(vtkClientServerInterpreter *arlu);
 
 
 //----------------------------------------------------------------------------
@@ -141,7 +145,14 @@ int vtkPVProcessModule::Start(int argc, char **argv)
 
   this->InitializeTclMethodImplementations();
   
+
+  this->ClientServerStream = new vtkClientServerStream;
+  this->ClientInterpreter = vtkClientServerInterpreter::New();
+  this->ClientInterpreter->SetLogFile("c:/pvClient.out");
+  Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
+
   app->Start(argc,argv);
+
 
   return app->GetExitStatus();
 }
@@ -528,10 +539,55 @@ int vtkPVProcessModule::ReceiveRootPolyData(const char* tclName,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVProcessModule::SendMessages()
-{
+void vtkPVProcessModule::SendStreamToServer()
+{ 
+  this->ClientInterpreter->ProcessStream(*this->ClientServerStream);
+  this->ClientServerStream->Reset();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToClientAndServer()
+{ 
+  this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerID vtkPVProcessModule::NewServerObject(const char* type)
+{ 
+  vtkClientServerStream& stream = this->GetStream();
+  vtkClientServerID id = this->GetUniqueID();
+  stream << vtkClientServerStream::New << type
+         << id <<  vtkClientServerStream::End;
+  return id;
+}
+
+vtkObjectBase* vtkPVProcessModule::GetObjectFromID(vtkClientServerID id)
+{
+  return this->ClientInterpreter->GetObjectFromID(id);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::DeleteServerObject(vtkClientServerID id)
+{
+  vtkClientServerStream& stream = this->GetStream();
+  stream << vtkClientServerStream::Delete << id
+         <<  vtkClientServerStream::End;
+}
+
+//----------------------------------------------------------------------------
+const vtkClientServerStream* vtkPVProcessModule::GetLastResultStream()
+{
+  vtkClientServerID id;
+  id.ID=0;
+  return this->ClientInterpreter->GetMessageFromID(id);
+}
+
+vtkClientServerID vtkPVProcessModule::GetUniqueID()
+{
+  UniqueID.ID++;
+  return UniqueID;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)

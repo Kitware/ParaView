@@ -86,6 +86,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
+#include "vtkClientServerStream.h"
+
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -111,7 +113,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.269.2.3");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.269.2.4");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1357,9 +1359,12 @@ void vtkPVRenderView::TriangleStripsCallback()
     numParts = pvs->GetNumberOfParts();
     for (partIdx = 0; partIdx < numParts; ++partIdx)
       {
-      pvApp->BroadcastScript("%s SetUseStrips %d",
-                             pvs->GetPart(partIdx)->GetGeometryTclName(),
-                             this->TriangleStripsCheck->GetState());
+      vtkPVProcessModule* pm = pvApp->GetProcessModule();
+      vtkClientServerStream& stream = pm->GetStream();
+      stream << vtkClientServerStream::Invoke << pvs->GetPart(partIdx)->GetGeometryID()
+             <<  "SetUseStrips" << this->TriangleStripsCheck->GetState()
+             << vtkClientServerStream::End;
+      pm->SendStreamToServer();
       pvs->GetPart(partIdx)->GetPartDisplay()->InvalidateGeometry();
       }
     }

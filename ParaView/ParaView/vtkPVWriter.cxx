@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.10");
+vtkCxxRevisionMacro(vtkPVWriter, "1.10.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -150,6 +150,8 @@ void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
 int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
                               int numProcs, int ghostLevel)
 {
+  return 0;
+#if 0  
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   const char* dataTclName = pvs->GetPart()->GetVTKDataTclName();
@@ -226,4 +228,5 @@ int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
     pm->ServerScript("writer Delete");
     }
   return success;
+#endif
 }

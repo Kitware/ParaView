@@ -79,10 +79,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include "vtkCollection.h"
 #include "vtkPVAnimationInterface.h"
+#include <vtkstd/vector>
+
+class vtkClientServerIDList : public vtkstd::vector<vtkClientServerID>
+{
+public:
+};
+
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.5");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.6");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -126,10 +133,12 @@ vtkPVSource::vtkPVSource()
   this->NumberOfPVConsumers = 0;
   this->PVConsumers = 0;
 
-  // The underlying VTK object. This will change. PVSource will
-  // support multiple VTK sources/filters.
-  this->VTKSourceTclNames = vtkStringList::New();
 
+  // The underlying VTK objects. PVSource supports multiple VTK sources/filters.
+  this->VTKSourceIDs = new vtkClientServerIDList;
+  this->VTKSourceOuputIDs = new vtkClientServerIDList;
+  
+  
   // The frame which contains the parameters related to the data source
   // and the Accept/Reset/Delete buttons.
   this->Parameters = vtkKWWidget::New();
@@ -184,6 +193,7 @@ vtkPVSource::vtkPVSource()
 //----------------------------------------------------------------------------
 vtkPVSource::~vtkPVSource()
 {
+  delete this->VTKSourceOuputIDs;
   this->SetPVOutput(NULL);  
   this->RemoveAllPVInputs();
 
@@ -204,7 +214,6 @@ vtkPVSource::~vtkPVSource()
 
   // We need to delete the Tcl object too.  This call does it.
   this->RemoveAllVTKSources();
-  this->VTKSourceTclNames->Delete();
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -283,7 +292,7 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
   int partIdx, numParts;
   vtkPVPart *part;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  const char *sourceTclName;
+  vtkClientServerID sourceID;
   const char* inputName;
 
   if (pvApp == NULL)
@@ -322,38 +331,40 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
     inputName = "Input";
     }
   numParts = pvs->GetNumberOfParts();
+  vtkClientServerStream& stream = pm->GetStream();
   for (partIdx = 0; partIdx < numParts; ++partIdx)
     {
     part = pvs->GetPart(partIdx);
     if (this->VTKMultipleInputsFlag)
       { // Only one source takes all parts as input.
-      sourceTclName = this->GetVTKSourceTclName(0);
+      sourceID = this->GetVTKSourceID(0);
       
-      if (part->GetVTKDataTclName() == NULL || sourceTclName == NULL)
+      if (part->GetVTKDataID().ID == 0 || sourceID.ID == 0)
         { // Sanity check.
-        vtkErrorMacro("Missing tcl name.");
+        vtkErrorMacro("Missing id.");
         }
       else
         {
-        pm->ServerScript("%s Add%s %s", sourceTclName, inputName,
-                         part->GetVTKDataTclName());
+        stream << vtkClientServerStream::Invoke << sourceID << "Add" << part->GetVTKDataID() 
+               << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         }      
       }
     else
       { // One source for each part.
-      sourceTclName = this->GetVTKSourceTclName(partIdx);
-      if (part->GetVTKDataTclName() == NULL || sourceTclName == NULL)
+      sourceID = this->GetVTKSourceID(partIdx);
+      if (part->GetVTKDataID().ID == 0 || sourceID.ID == 0)
         {
         vtkErrorMacro("Source data mismatch.");
         }
       else
         {
-        pm->ServerScript("%s Set%s %s", sourceTclName, inputName,
-                         part->GetVTKDataTclName());
+        stream << vtkClientServerStream::Invoke << sourceID << "Set" << part->GetVTKDataID() 
+               << vtkClientServerStream::End;
+        pm->SendStreamToClientAndServer();
         }
       }
     }
-
   this->GetPVRenderView()->UpdateNavigationWindow(this, 0);
 }
 
@@ -606,71 +617,48 @@ void vtkPVSourceEndProgress(void* vtkNotUsed(arg))
   //  }
 }
 
+
+void vtkPVSource::AddVTKSource(vtkClientServerID id)
+{
+  this->VTKSourceIDs->push_back(id);
+}
+
 //----------------------------------------------------------------------------
 // Tcl does the reference counting, so we are not going to put an 
 // additional reference of the data.
 void vtkPVSource::AddVTKSource(const char *tclName)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp == NULL)
-    {
-    return;
-    }
-  
-  if (tclName == NULL)
-    {
-    vtkErrorMacro("Missing source  Tcl name.");
-    return;
-    }
-
-  this->VTKSourceTclNames->AddString(tclName);
-
-  // This script won't work if we aren't creating VTK objects on the client.
-//  pvApp->Script("%s AddObserver ModifiedEvent {catch {%s VTKSourceModifiedMethod}}",
-//                tclName, this->GetTclName());
-    
-  pvApp->GetProcessModule()->ServerScript(
-    "%s AddObserver StartEvent {$Application LogStartEvent {Execute %s}}", 
-    tclName, tclName);
-
-  pvApp->GetProcessModule()->ServerScript(
-    "%s AddObserver EndEvent {$Application LogEndEvent {Execute %s}}", 
-    tclName, tclName);
-
+  vtkErrorMacro("No longer supported.");
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::RemoveAllVTKSources()
 {
-  const char *tclName;
   vtkPVApplication *pvApp = this->GetPVApplication();
   int num, idx;
 
-  num = this->VTKSourceTclNames->GetNumberOfStrings();
+  num = this->GetNumberOfVTKSources();
   for (idx = 0; idx < num; ++ idx)
     {
-    tclName = this->VTKSourceTclNames->GetString(idx);
-    pvApp->GetProcessModule()->ServerScript("%s Delete", tclName);
+    vtkClientServerID id = this->GetVTKSourceID(idx);
+    vtkClientServerStream& stream = pvApp->GetProcessModule()->GetStream();
+    stream << vtkClientServerStream::Delete << id << vtkClientServerStream::End;
+    pvApp->GetProcessModule()->SendStreamToServer();
     }
 
-  this->VTKSourceTclNames->RemoveAllItems();
+  delete this->VTKSourceIDs;
 }
 
 //----------------------------------------------------------------------------
 int vtkPVSource::GetNumberOfVTKSources()
 {
-  if (this->VTKSourceTclNames == NULL)
-    {
-    return 0;
-    }
-  return this->VTKSourceTclNames->GetNumberOfStrings();
+  return this->VTKSourceIDs->size();
 }
 
 //----------------------------------------------------------------------------
-const char* vtkPVSource::GetVTKSourceTclName(int idx)
+vtkClientServerID vtkPVSource::GetVTKSourceID(int idx)
 {
-  return this->VTKSourceTclNames->GetString(idx);
+  return this->VTKSourceIDs->at(idx);
 }
 
 //----------------------------------------------------------------------------
@@ -1858,8 +1846,8 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
 //    *file << this->GetVTKSource(sourceIdx)->GetClassName()
-    *file << this->GetSourceClassName()
-          << " " << this->GetVTKSourceTclName(sourceIdx) << "\n";
+//    *file << this->GetSourceClassName()
+//          << " " << this->GetVTKSourceTclName(sourceIdx) << "\n";
     }
 
   // Handle this here.
@@ -1885,7 +1873,7 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
     {
     for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
       {
-      *file << this->GetVTKSourceTclName(sourceIdx) << " Update\n";
+//      *file << this->GetVTKSourceTclName(sourceIdx) << " Update\n";
       }
     }
 
@@ -1977,6 +1965,7 @@ void vtkPVSource::SaveState(ofstream *file)
 // Others (source) are set by InputMenuWidget.
 void vtkPVSource::SetInputsInBatchScript(ofstream *file)
 {
+#if 0
   int num, idx;
   int numSources, numOutputs;
   int sourceCount, outputCount;
@@ -2012,9 +2001,20 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
       for (sourceCount = 0; sourceCount < numSources; ++sourceCount)
         {
         // Loop through all of the outputs of this vtk source (multiple outputs).
-        pm->GatherInformation(this->NumberOfOutputsInformation,
-                              (char*)(pvs->GetVTKSourceTclName(sourceCount)));
-        numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
+        vtkClientServerStream& stream = pm->GetStream();
+        stream.Reset();
+        stream << vtkClientServerStream::Invoke << pvs->GetVTKSourceID(sourceCount) <<
+          "GetNumberOfOutputs" << vtkClientServerStream::End;
+        pm->SendStreamToServer();
+        vtkClientServerStream* amsg = pm->GetLastResultStream();
+        if(!amsg->GetArgument(0, 0, &numOutputs))
+          {
+          vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
+          }
+        // should we have a GatherInformation for client server??
+//         pm->GatherInformation(this->NumberOfOutputsInformation,
+//                               (char*)(pvs->GetVTKSourceTclName(sourceCount)));
+//         numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
         for (outputCount = 0; outputCount < numOutputs; ++outputCount)
           {
           *file << "\t";
@@ -2077,6 +2077,7 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
     
     ++outputCount;
     }
+#endif
 }
 
 
@@ -2349,11 +2350,9 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
       }
 
     // Create a vtkSource
-    pvApp->MakeServerTclObject(this->SourceClassName, tclName);
-    
-    pvs->AddVTKSource(tclName);
+    pvs->AddVTKSource(pvApp->NewServerObject(this->SourceClassName));
     }
-
+  pvApp->GetProcessModule()->SendStreamToServer();
   pvs->SetView(this->GetPVWindow()->GetMainView());
 
   pvs->PrototypeInstanceCount = this->PrototypeInstanceCount;
@@ -2419,9 +2418,7 @@ int vtkPVSource::InitializeData()
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   int numSources, sourceIdx;
-  const char* sourceTclName;
   int numOutputs, idx;
-  char dataName[1024];
   int outputCount = 0;
   vtkPVPart* part;
   vtkPVSource* input = this->GetPVInput(0);
@@ -2432,49 +2429,56 @@ int vtkPVSource::InitializeData()
   pvd->SetPVApplication(pvApp);
 
   numSources = this->GetNumberOfVTKSources();
+  vtkClientServerStream& stream = pm->GetStream();
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
-    sourceTclName = this->GetVTKSourceTclName(sourceIdx);
-    pm->GatherInformation(this->NumberOfOutputsInformation,
-                          (char*)(sourceTclName));
-    numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
+    vtkClientServerID sourceID = this->GetVTKSourceID(sourceIdx);
+    stream.Reset();
+    stream << vtkClientServerStream::Invoke << sourceID <<
+      "GetNumberOfOutputs" << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    const vtkClientServerStream* amsg = pm->GetLastResultStream();
+    if(!amsg->GetArgument(0, 0, &numOutputs))
+      {
+      vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
+      }
 
     for (idx = 0; idx < numOutputs; ++idx)
       {
       ++outputCount;
-      sprintf(dataName, "%sOutput%d", this->GetName(), outputCount);
-      pm->ServerScript("set %s [%s GetOutput %d]", dataName, 
-                       sourceTclName, idx);
+      stream << vtkClientServerStream::Invoke << sourceID 
+             << "GetOutput" << idx <<  vtkClientServerStream::End;
+      vtkClientServerID dataID = pm->GetUniqueID();
+      stream << vtkClientServerStream::AssignResult << dataID << vtkClientServerStream::End;
+      pm->SendStreamToServer();
       part = vtkPVPart::New();
       part->SetPVApplication(pvApp);
-      this->Script("%s SetVTKDataTclName {${%s}}", part->GetTclName(),
-                   dataName);
+      part->SetVTKDataID(dataID);
       this->AddPart(part);
 
       // Create the extent translator (sources with no inputs only).
       // Needs to be before "ExtractPieces" because translator propagates.
-      char translatorTclName[1024];
-      translatorTclName[0] = '\0';
+      vtkClientServerID translatorID = {0};
       if ( ! input)
         {
-        sprintf(translatorTclName, "%sTranslator%d", this->GetName(), idx);
-        pm->ServerScript("vtkPVExtentTranslator %s", translatorTclName);
-        pm->ServerScript("${%s} SetExtentTranslator %s",
-                         dataName, translatorTclName);
+        vtkClientServerID translatorID = pvApp->NewServerObject("vtkPVExtentTranslator");
+        stream << vtkClientServerStream::Invoke << dataID 
+               << "SetExtentTranslator" << translatorID 
+               << vtkClientServerStream::End;
+        pm->SendStreamToServer();
         }
-
       part->InsertExtractPiecesIfNecessary();
-      
-      if (translatorTclName[0])
+      if (translatorID.ID != 0)
         {
         // Translator has to be set on source because it is propagated.
         // Original source is set after transmit so reference
         // loop can be broken when pvPart is deleted.
-        pm->ServerScript("%s SetOriginalSource ${%s}",
-                         translatorTclName, dataName);
-        pm->ServerScript("%s Delete", translatorTclName);
+        stream << vtkClientServerStream::Invoke << translatorID 
+               << "SetOriginalSource" << dataID 
+               << vtkClientServerStream::End;
+        pvApp->DeleteServerObject(translatorID); 
+        pm->SendStreamToServer();
         }
-
       part->Delete();  
       }
     }
@@ -2539,3 +2543,14 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfOutputsInformation: "
      << this->NumberOfOutputsInformation << endl;
 }
+
+const char *vtkPVSource::GetVTKSourceTclName(int idx)
+{
+  return "";
+}
+
+const char *vtkPVSource::GetVTKSourceTclName()
+{
+  return "";
+}
+

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.10");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.10.2.1");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -122,12 +122,18 @@ void vtkPVCameraIcon::Create(vtkKWApplication *pvApp, const char *args)
 //----------------------------------------------------------------------------
 void vtkPVCameraIcon::RestoreCamera()
 {
+#if 0
   const char* renTclName;
 
   if ( this->RenderView && this->Camera )
     {
     renTclName = this->RenderView->GetPVApplication()->GetRenderModule()
       ->GetRendererTclName();
+    vtkClientServerID rendererID = this->RenderView->GetPVApplication()->GetRenderModule()
+      ->GetRendererID();
+    vtk renderer = this->RenderView->GetPVApplication()->GetRenderModule()
+      ->GetRendererID();
+    
     ostrstream str;
     str << "eval [" << renTclName 
         << " GetActiveCamera ] SetParallelScale [[ "
@@ -154,6 +160,7 @@ void vtkPVCameraIcon::RestoreCamera()
     str.rdbuf()->freeze(0);
     this->RenderView->EventuallyRender();
     }
+#endif
 }
 
 //----------------------------------------------------------------------------

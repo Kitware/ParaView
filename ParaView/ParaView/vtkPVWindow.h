@@ -112,6 +112,7 @@ class vtkPVWidget;
 class vtkPVWriter;
 class vtkPVXMLPackageParser;
 class vtkPolyDataMapper;
+#include "vtkClientServerID.h"
 
 //BTX
 template <class key, class data> 
@@ -492,6 +493,7 @@ public:
   // For flip books. These methods should really be in a render module.
   void RemoveAllCaches();
   void CacheUpdate(int idx, int total);
+  vtkClientServerID GetInteractorID(){ return this->InteractorID;}
 
 protected:
   vtkPVWindow();
@@ -506,8 +508,10 @@ protected:
 
   // Should I move this to vtkPVRenderView?
   vtkPVGenericRenderWindowInteractor *Interactor;
-  char *InteractorTclName;
-  vtkSetStringMacro(InteractorTclName);  
+  vtkClientServerID InteractorID;
+  
+//  char *InteractorTclName;
+//  vtkSetStringMacro(InteractorTclName);  
 
   // ParaView specific menus
   vtkKWMenu *SourceMenu;

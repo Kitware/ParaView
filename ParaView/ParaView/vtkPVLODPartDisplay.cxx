@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.6");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.6.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -134,16 +134,18 @@ vtkPVLODPartDisplayInformation* vtkPVLODPartDisplay::GetInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODPartDisplay::ConnectToGeometry(char* geometryTclName)
+void vtkPVLODPartDisplay::ConnectToGeometry(vtkClientServerID geometryID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-
-  // Superclass connects the full res pipeline.
-  this->Superclass::ConnectToGeometry(geometryTclName);
-
-  // The input of course is the geometry filter.
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODDeciTclName, geometryTclName);
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  
+  stream << vtkClientServerStream::Invoke << geometryID
+         << "GetOutput" << vtkClientServerStream::End;
+  vtkClientServerID outputID = {0};
+  stream << vtkClientServerStream::Invoke << this->LODDeciID << "SetInput" 
+         << outputID << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
 }
 
 //----------------------------------------------------------------------------

@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkPVPartDisplay.h"
-
+#include "vtkClientServerID.h" // needed for vtkClientServerID
 class vtkDataSet;
 class vtkPVApplication;
 class vtkPVLODPartDisplayInformation;
@@ -86,7 +86,7 @@ public:
 
   // Description:
   // Connect the geometry filter to the display pipeline.
-  virtual void ConnectToGeometry(char* geometryTclName);
+  virtual void ConnectToGeometry(vtkClientServerID);
 
   // Description:
   // This method updates the piece that has been assigned to this process.
@@ -101,6 +101,10 @@ public:
   //=============================================================== 
   // Description:
   // These access methods are neede for process module abstraction.
+  vtkGetMacro(LODUpdateSuppressorID,vtkClientServerID);
+  vtkGetMacro(LODMapperID,vtkClientServerID);
+  vtkGetMacro(LODDeciID,vtkClientServerID);
+  
   vtkGetStringMacro(LODUpdateSuppressorTclName);
   vtkGetStringMacro(LODMapperTclName);
   vtkGetStringMacro(LODDeciTclName);
@@ -115,6 +119,10 @@ protected:
   ~vtkPVLODPartDisplay();
 
   int LODResolution;
+  
+  vtkClientServerID LODUpdateSuppressorID;
+  vtkClientServerID LODMapperID;
+  vtkClientServerID LODDeciID;
   
   char *LODMapperTclName;
   vtkSetStringMacro(LODMapperTclName);

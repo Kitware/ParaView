@@ -180,7 +180,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.2");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.3");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1328,13 +1328,13 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
         int numParts = source->GetNumberOfParts();
         for(int partIdx = 0; partIdx < numParts; ++partIdx)
           {
-          vtkPVPart* part = source->GetPart(partIdx);
-          pm->ServerScript(
-            "set pvAnimCompleteArrays {pvAnimCompleteArrays%s_%d}\n"
-            "vtkCompleteArrays ${pvAnimCompleteArrays}\n"
-            "${pvAnimCompleteArrays} SetInput [%s GetOutput]\n"
-            "pvAnimWriter AddInput [${pvAnimCompleteArrays} GetOutput] {%s}",
-            sourceName, partIdx, part->GetGeometryTclName(), sourceName);
+ //          vtkPVPart* part = source->GetPart(partIdx);
+//           pm->ServerScript(
+//             "set pvAnimCompleteArrays {pvAnimCompleteArrays%s_%d}\n"
+//             "vtkCompleteArrays ${pvAnimCompleteArrays}\n"
+//             "${pvAnimCompleteArrays} SetInput [%s GetOutput]\n"
+//             "pvAnimWriter AddInput [${pvAnimCompleteArrays} GetOutput] {%s}",
+//             sourceName, partIdx, part->GetGeometryTclName(), sourceName);
           }
         }
       }
@@ -1355,14 +1355,14 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
       {
       if(source->GetVisibility())
         {
-        const char* sourceName = source->GetName();
-        int numParts = source->GetNumberOfParts();
-        for(int partIdx = 0; partIdx < numParts; ++partIdx)
-          {
-          vtkPVPart* part = source->GetPart(partIdx);
-          pm->ServerScript("pvAnimWriter AddInput [%s GetOutput] {%s}",
-                           part->GetGeometryTclName(), sourceName);
-          }
+//         const char* sourceName = source->GetName();
+//         int numParts = source->GetNumberOfParts();
+//         for(int partIdx = 0; partIdx < numParts; ++partIdx)
+//           {
+//           vtkPVPart* part = source->GetPart(partIdx);
+//           pm->ServerScript("pvAnimWriter AddInput [%s GetOutput] {%s}",
+//                            part->GetGeometryTclName(), sourceName);
+//           }
         }
       }
     }
@@ -1719,7 +1719,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
   int script_available = 0;
   if ( this->AnimationEntries->GetNumberOfItems() > 0 )
     {
-    typedef vtkstd::map<vtkstd::string, int> smaptype;
+    typedef vtkstd::map<vtkTypeUInt32, int> smaptype;
     smaptype smap;
 
 
@@ -1728,9 +1728,9 @@ void vtkPVAnimationInterface::UpdateNewScript()
       vtkPVAnimationInterfaceEntry* entry
         = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
       entry->Prepare();
-      if ( entry->GetPVSource() && entry->GetPVSource()->GetVTKSourceTclName() )
+      if ( entry->GetPVSource() && entry->GetPVSource()->GetVTKSourceID().ID != 0 )
         {
-        smap[entry->GetPVSource()->GetVTKSourceTclName()] = 1;
+        smap[entry->GetPVSource()->GetVTKSourceID().ID] = 1;
         cnt ++;
         }
       if ( entry->GetDirty() )
@@ -1747,7 +1747,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
       smaptype::iterator sit;
       for ( sit = smap.begin(); sit != smap.end(); ++sit )
         {
-        str << sit->first.c_str() << " ";
+        str << sit->first << " ";
         }
       str << endl;
       script_available = 1;

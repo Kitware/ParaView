@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include "vtkObject.h"
+#include "vtkClientServerStream.h"
 
 class vtkDataSet;
 class vtkPVApplication;
@@ -100,7 +101,7 @@ public:
 
   // Description:
   // Connect the geometry filter to the display pipeline.
-  virtual void ConnectToGeometry(char* geometryTclName);
+  virtual void ConnectToGeometry(vtkClientServerID );
 
   // Description:
   // This method updates the piece that has been assigned to this process.
@@ -114,22 +115,15 @@ public:
 
   vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
 
-  // Description:
-  // Tcl name of the actor.
-  vtkGetStringMacro(PropTclName);  
           
   //=============================================================== 
   // Description:
   // These access methods are neede for process module abstraction.
-  vtkGetStringMacro(PropertyTclName);
   vtkProperty *GetProperty() { return this->Property;}
   vtkProp *GetProp() { return this->Prop;}
+  vtkGetMacro(PropID, vtkClientServerID);
+//  vtkClientServerID GetPropID() { return this->PropID;}
 
-  // Description:
-  // Used for saving a batch file and in animation.
-  // I would like to get rid of access to this name.
-  vtkGetStringMacro(MapperTclName);
-    
   // Description:
   // Not referenced counted.  I might get rid of this reference later.
   virtual void SetPart(vtkPVPart* part) {this->Part = part;}
@@ -139,6 +133,22 @@ public:
   // PVSource calls this when it gets modified.
   void InvalidateGeometry();
 
+  char* UpdateSuppressorTclName;
+  const char* GetPropertyTclName() 
+    {
+      return "";
+    }
+  const char* GetMapperTclName()
+    {
+      return "";
+    }
+  const char* GetPropTclName()
+    {
+      return "";
+    }
+  char* PropTclName;
+  char* MapperTclName;
+  char* PropertyTclName;
 protected:
   vtkPVPartDisplay();
   ~vtkPVPartDisplay();
@@ -157,17 +167,10 @@ protected:
   vtkProperty *Property;
   vtkProp *Prop;
         
-  char *PropTclName;
-  vtkSetStringMacro(PropTclName);
-  
-  char *PropertyTclName;
-  vtkSetStringMacro(PropertyTclName);
-  
-  char *MapperTclName;
-  vtkSetStringMacro(MapperTclName);
-
-  char *UpdateSuppressorTclName;
-  vtkSetStringMacro(UpdateSuppressorTclName);
+  vtkClientServerID PropID;
+  vtkClientServerID PropertyID;
+  vtkClientServerID MapperID;
+  vtkClientServerID UpdateSuppressorID;
     
   // Here to create unique names.
   int InstanceCount;

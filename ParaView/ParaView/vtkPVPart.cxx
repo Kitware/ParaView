@@ -63,11 +63,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
-
+#include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.1");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.2");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -85,12 +85,12 @@ vtkPVPart::vtkPVPart()
 
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
-  this->VTKDataTclName = NULL;
+  this->VTKDataID.ID = 0;
 
   // Used to be in vtkPVActorComposite
   static int instanceCount = 0;
 
-  this->GeometryTclName = NULL;
+  this->GeometryID.ID = 0;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -106,12 +106,12 @@ vtkPVPart::~vtkPVPart()
 
   // Get rid of the circular reference created by the extent translator.
   // We have a problem with ExtractPolyDataPiece also.
-  if (this->VTKDataTclName)
+  if (this->VTKDataID.ID != 0)
     {
-    this->GetPVApplication()->GetProcessModule()->
-      ServerScript("%s SetExtentTranslator {}", this->VTKDataTclName);
-    delete [] this->VTKDataTclName;
-    this->VTKDataTclName = NULL;
+    vtkClientServerStream& stream = this->GetPVApplication()->GetProcessModule()->GetStream();
+    stream.Reset();
+    stream << vtkClientServerStream::Invoke << this->VTKDataID << "SetExtentTranslator" << 0 
+           << vtkClientServerStream::End;
     }  
     
   this->SetName(NULL);
@@ -122,13 +122,12 @@ vtkPVPart::~vtkPVPart()
   // Used to be in vtkPVActorComposite........
   vtkPVApplication *pvApp = this->GetPVApplication();
     
-  if (this->GeometryTclName)
+  if (this->GeometryID.ID != 0)
     {
     if ( pvApp )
       {
-      pvApp->BroadcastScript("%s Delete", this->GeometryTclName);
+      pvApp->DeleteClientAndServerObject(this->GeometryID);
       }
-    this->SetGeometryTclName(NULL);
     }
   
   this->ClassNameInformation->Delete();
@@ -154,25 +153,21 @@ void vtkPVPart::CreateParallelTclObjects(vtkPVApplication *pvApp)
     {
     return;
     }
-  char tclName[100];
-  
   this->vtkKWObject::SetApplication(pvApp);
-  
-  // Create the one geometry filter,
-  // which creates the poly data from all data sets.
-  sprintf(tclName, "Geometry%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
-  this->SetGeometryTclName(tclName);
-
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  vtkClientServerStream& stream = pm->GetStream();
+  this->GeometryID = pvApp->NewClientAndServerObject("vtkPVGeometryFilter");
+  stream << vtkClientServerStream::Invoke << this->GeometryID << "SetUseStrips"
+         << pvApp->GetMainView()->GetTriangleStripsCheck()->GetState()
+         << vtkClientServerStream::End;
+  pm->SendStreamToClientAndServer();
   // Default setting.
-  pvApp->BroadcastScript("%s SetUseStrips %d", tclName,
-    pvApp->GetMainView()->GetTriangleStripsCheck()->GetState());
 
-  // Keep track of how long each geometry filter takes to execute.
-  pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent "
-                         "{Execute Geometry}}", this->GeometryTclName);
-  pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent "
-                         "{Execute Geometry}}", this->GeometryTclName);
+//   // Keep track of how long each geometry filter takes to execute.
+//   pvApp->BroadcastScript("%s AddObserver StartEvent {$Application LogStartEvent "
+//                          "{Execute Geometry}}", this->GeometryTclName);
+//   pvApp->BroadcastScript("%s AddObserver EndEvent {$Application LogEndEvent "
+//                          "{Execute Geometry}}", this->GeometryTclName);
 
 }
 
@@ -189,7 +184,7 @@ void vtkPVPart::SetPartDisplay(vtkPVPartDisplay* pDisp)
     this->PartDisplay = pDisp;
     this->PartDisplay->Register(this);
     // This is special (why we cannot use a macro).
-    this->PartDisplay->ConnectToGeometry(this->GeometryTclName);
+    this->PartDisplay->ConnectToGeometry(this->GeometryID);
     }
 }
 
@@ -225,8 +220,8 @@ void vtkPVPart::GatherDataInformation()
     this->PartDisplay->Update();
     }
 
-  pm->GatherInformation(this->DataInformation, 
-                        this->GetVTKDataTclName());
+//   pm->GatherInformation(this->DataInformation, 
+//                         this->GetVTKDataTclName());
 
   this->DataInformationValid = 1;
 
@@ -278,35 +273,21 @@ void vtkPVPart::GatherDataInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPart::SetVTKDataTclName(const char* tclName)
+void vtkPVPart::SetVTKDataID(vtkClientServerID id)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( !pvApp )
     {
+    vtkErrorMacro("Set the application before you set the VTKDataID.");
     return;
     }
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  
-  if (pvApp == NULL)
-    {
-    vtkErrorMacro("Set the application before you set the VTKDataTclName.");
-    return;
-    }
-  
-  if (this->VTKDataTclName)
-    {
-    delete [] this->VTKDataTclName;
-    this->VTKDataTclName = NULL;
-    }
-  if (tclName)
-    {
-    this->VTKDataTclName = new char[strlen(tclName)+1];
-    strcpy(this->VTKDataTclName, tclName);
-    // Connect the data to the pipeline for displaying the data.
-    pm->ServerScript("%s SetInput %s",
-                     this->GeometryTclName,
-                     this->VTKDataTclName);
-    }
+  this->VTKDataID = id;
+  vtkClientServerStream& stream = pm->GetStream();
+  stream 
+    << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
+    << this->VTKDataID << vtkClientServerStream::End;
+  pm->SendStreamToServer();
 }
 
 
@@ -320,6 +301,20 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
   // The vtkData object will be moved to the output of the piece filter.
+  vtkClientServerStream& stream = pm->GetStream();
+  stream.Reset();
+  stream << vtkClientServerStream::Invoke 
+         << this->VTKDataID << "IsA" << "vtkPolyData" 
+         << vtkClientServerStream::End;
+  pm->SendStreamToServer();
+  const vtkClientServerStream* amsg = pm->GetLastResultStream();
+  int ispolydata = 0;
+  if(!amsg->GetArgument(0, 0, &ispolydata))
+    {
+    vtkErrorMacro("bad return from IsA call");
+    }
+  return;
+#if 0
   pm->GatherInformation(this->ClassNameInformation, this->VTKDataTclName);
   char *className = this->ClassNameInformation->GetVTKClassName();
   if (!strcmp(className, "vtkPolyData"))
@@ -407,6 +402,7 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   
   // Now delete Tcl's reference to the piece filter.
   pm->ServerSimpleScript("pvTemp Delete");
+#endif
 }
 
 
@@ -435,8 +431,8 @@ void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Name: " << (this->Name?this->Name:"none") << endl;
-  os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
-  os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
+//  os << indent << "GeometryID: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
+//  os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "ClassNameInformation: " << this->ClassNameInformation << endl;
 }
 

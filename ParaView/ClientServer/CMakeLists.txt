@@ -59,6 +59,8 @@ SET (ClientServer_WRAP_CLASSES
  vtkGeometryFilter
 #
  vtkLineSource
+ vtkConeSource
+
 #
  vtkTubeFilter
 #
@@ -82,6 +84,23 @@ SET (ClientServer_WRAP_CLASSES
  vtkWindow
  vtkViewport
  vtkProp3D
+ vtkProperty
+vtkPolyData
+vtkDataSet
+vtkDataObject
+vtkDataSetSurfaceFilter
+vtkArrowSource
+vtkExtentTranslator
+vtkOpenGLProperty
+vtkPointSet
+# paraview classes
+vtkGenericRenderWindowInteractor
+vtkPVArrowSource
+vtkPVExtentTranslator
+vtkPVGenericRenderWindowInteractor
+vtkPVGeometryFilter
+vtkPVUpdateSuppressor
+vtkPVLODActor
 )
 
 IF(VTK_USE_X)
@@ -108,7 +127,7 @@ FIND_FILE(VTK_WRAP_HINTS hints
 #
 FOREACH(CLASS ${ClientServer_WRAP_CLASSES})
   SET(ClientServer_CLASS_FOUND 0)
-  FOREACH(DIR ${VTK_INCLUDE_DIRS})
+  FOREACH(DIR ${VTK_INCLUDE_DIRS} ${PARAVIEW_SOURCE_DIR}/ParaView)
     IF (NOT ClientServer_CLASS_FOUND)
       IF (EXISTS ${DIR}/${CLASS}.h)
         SET(ClientServer_RESOLVED_CLASSES ${ClientServer_RESOLVED_CLASSES} ${DIR}/${CLASS}.h)

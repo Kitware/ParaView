@@ -153,11 +153,33 @@ public:
 //ETX
   
   static void ErrorCallback(vtkObject *caller, unsigned long eid, void *clientdata, void *calldata);
+
+  // Description:
+  // Process a client server message on the server.
   void ProcessMessage(unsigned char* arg, size_t len);
-  virtual void SendMessages();
+  
+  // Description:
+  // Send current ClientServerStream data to the server
+  virtual void SendStreamToServer();
+  
+  // Description:
+  // Send current ClientServerStream data to the server and the client.
+  virtual void SendStreamToClientAndServer();
+
+  //BTX
+  // Description:
+  // Return a message containing the result of the last SendMessages call.
+  // In client/server mode this causes a round trip to the server.
+  virtual const vtkClientServerStream* GetLastResultStream();
+  friend void vtkPVClientServerLastResultRMI(  void *, void* , int ,int );
+  //ETX
 protected:
   vtkPVClientServerModule();
   ~vtkPVClientServerModule();
+
+    // Description:
+  // Send the last client server result to the client called from an RMI
+  void SendLastClientServerResult();
 
   int NumberOfServerProcesses;
   int ClientMode;
@@ -175,7 +197,9 @@ protected:
   int Port;
   int MultiProcessMode;
   int NumberOfProcesses;
-
+  
+  vtkClientServerInterpreter* ServerInterpreter;
+  
   vtkKWRemoteExecute* RemoteExecution;
 private:  
   vtkPVClientServerModule(const vtkPVClientServerModule&); // Not implemented

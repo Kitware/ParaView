@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.6.2.1");
 
 
 
@@ -84,7 +84,7 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   if (this->RenderWindow->IsA("vtkOpenGLRenderWindow") &&
       (pvApp->GetProcessModule()->GetNumberOfPartitions() > 1))
     {
-    pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
+//    pvApp->BroadcastScript("%s SetMultiSamples 0", this->RenderWindowTclName);
     }
 
   this->Composite = NULL;
@@ -110,8 +110,8 @@ void vtkPVMultiDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TDispManager1");
 
-  pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
-                         this->RenderWindowTclName);
+//  pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
+//                         this->RenderWindowTclName);
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
 
 }
