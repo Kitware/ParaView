@@ -66,7 +66,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
-    #vtkBalancedRedistributePolyData.cxx
+    vtkBalancedRedistributePolyData.cxx
     vtkAllToNRedistributePolyData.cxx
     vtkBoxClipDataSet.cxx
     vtkDistributedDataFilter.cxx
