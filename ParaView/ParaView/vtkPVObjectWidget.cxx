@@ -23,7 +23,7 @@
 #include "vtkPVProcessModule.h"
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.14");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.15");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -86,7 +86,10 @@ void vtkPVObjectWidget::CopyProperties(vtkPVWidget* clone,
   if (pvow)
     {
     pvow->SetVariableName(this->VariableName);
-    pvow->SetObjectID(pvSource->GetVTKSourceID());
+    // TODO: This should change. There is more than one source now.
+    //pvow->SetObjectID(pvSource->GetVTKSourceID());
+    // temporary fix. should check all sub-classes of object widget.
+    pvow->SetObjectID(pvSource->GetVTKSourceID(0));
     }
   else 
     {

@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.35");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.36");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -508,7 +508,10 @@ void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
   if (pvas)
     {
     pvas->SetAttributeName(this->AttributeName);
-    pvas->VTKReaderID = pvSource->GetVTKSourceID();
+    // It is assumed that there is only one VTK source id.
+    // Since this is a source object (reader probably), this
+    // is a reasonable assumption.
+    pvas->VTKReaderID = pvSource->GetVTKSourceID(0);
     }
   else 
     {

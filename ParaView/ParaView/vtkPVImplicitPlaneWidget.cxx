@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.25");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -326,7 +326,7 @@ void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream *file)
     num = this->PVSource->GetNumberOfVTKSources();
     for (idx = 0; idx < num; ++idx)
       {
-      *file << this->PVSource->GetVTKSourceID().ID
+      *file << this->PVSource->GetVTKSourceID(idx).ID
             << " Set" << this->VariableName << " " 
             << this->PlaneID.ID << endl;                  
       }
