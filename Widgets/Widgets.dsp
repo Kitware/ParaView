@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "Widgets_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /MD /W3 /Gm /GX /ZI /Od /I "C:\program files\html help workshop\include" /I "..\..\vtk\common" /I "..\..\vtk\graphics" /I "..\..\vtk\imaging" /I "..\..\vtk\contrib" /I "..\..\vtk\pcmaker\xlib" /D "_DEBUG" /D "_USRDLL" /D "Widgets_EXPORTS" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "VTKDLL" /YX /FD /GZ /Zm1000 /c
+# ADD CPP /nologo /MDd /W3 /Gm /GX /ZI /Od /I "C:\program files\html help workshop\include" /I "..\..\vtk\common" /I "..\..\vtk\graphics" /I "..\..\vtk\imaging" /I "..\..\vtk\contrib" /I "..\..\vtk\pcmaker\xlib" /D "_DEBUG" /D "_USRDLL" /D "Widgets_EXPORTS" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "VTKDLL" /YX /FD /GZ /Zm1000 /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
@@ -92,6 +92,10 @@ LINK32=link.exe
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
+# Begin Source File
+
+SOURCE=.\kwinit.c
+# End Source File
 # Begin Source File
 
 SOURCE=.\tcl\KWWidgetsInit.cxx
@@ -380,6 +384,10 @@ SOURCE=.\vtkKWWindowTcl.cxx
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\kwinit.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\vtkKWApplication.h

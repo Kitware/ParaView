@@ -64,6 +64,10 @@ public:
   virtual void Start(int argc, char *argv[]);
 
   // Description:
+  // class static method to initialize Tcl/Tk
+  static Tcl_Interp *InitializeTcl(int argc, char *argv[]);
+  
+  // Description:
   // Get the interpreter being used by this application
   Tcl_Interp *GetMainInterp() {return this->MainInterp;};
 

@@ -37,7 +37,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkOutputWindow.h"
 #include "vtkKWWindow.h"
 #include "vtkKWEventNotifier.h"
-
+#include "kwinit.h"
 
 //------------------------------------------------------------------------------
 vtkKWApplication* vtkKWApplication::New()
@@ -56,6 +56,7 @@ vtkKWApplication* vtkKWApplication::New()
 
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
 
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
 			    int argc, char *argv[]);
@@ -73,10 +74,12 @@ vtkKWApplication::vtkKWApplication()
   this->Windows = vtkKWWindowCollection::New();  
   
   // add the application as $app
-  vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
-                             vtkKWApplicationCommand);
+	
+  //vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
+  //                           vtkKWApplicationCommand);
 
-  this->Script("set Application %s",this->MainInterp->result);
+  //this->Script("set Application %s",this->MainInterp->result);
+  this->Script("set Application %s",this->GetTclName());
 
   this->BalloonHelpWindow = vtkKWWidget::New();
   this->BalloonHelpLabel = vtkKWWidget::New();
@@ -96,6 +99,14 @@ vtkKWApplication::vtkKWApplication()
 
 vtkKWApplication::~vtkKWApplication()
 {
+  if (this->Windows)
+    {
+    this->Windows->Delete();
+    this->Windows = NULL;
+    this->MainInterp = NULL;
+    vtkObjectFactory::UnRegisterAllFactories();
+    }
+
   this->SetApplicationName(NULL);
   this->SetApplicationVersionName(NULL);
 
@@ -212,17 +223,31 @@ void vtkKWApplication::Exit()
       }
     }
   
-  if (this->Windows)
-    {
-    this->Windows->Delete();
-    this->Windows = NULL;
-    this->MainInterp = NULL;
-    vtkObjectFactory::UnRegisterAllFactories();
-    Tcl_Finalize();
-    }
   return;
 }
     
+#define ET_TCL_LIBRARY "C:/Program Files/Tcl/lib/tcl8.2"
+#define ET_TK_LIBRARY "C:/Program Files/Tcl/lib/tk8.2"
+Tcl_Interp *vtkKWApplication::InitializeTcl(int argc, char *argv[])
+{
+  Tcl_Interp *interp;
+  
+  putenv("TCL_LIBRARY=" ET_TCL_LIBRARY);
+  putenv("TK_LIBRARY=" ET_TK_LIBRARY);
+  
+  Tcl_FindExecutable(argv[0]);
+  interp = Tcl_CreateInterp();
+  Tcl_SetVar(interp, "tcl_interactive", "0", TCL_GLOBAL_ONLY);
+  Et_DoInit(interp);
+  
+  // initialize VTK
+  Vtktcl_Init(interp);
+  // initialize Widgets
+  Vtkkwwidgetstcl_Init(interp);
+  
+  return interp;
+}
+
 void vtkKWApplication::Start()
 { 
   int i;
@@ -254,7 +279,12 @@ void vtkKWApplication::Start(char *arg)
 }
 void vtkKWApplication::Start(int argc, char *argv[])
 { 
-//  Tk_MainLoop();
+  while (this->Windows->GetNumberOfItems())
+    {
+    Tcl_DoOneEvent(0);
+    }
+  
+  //Tk_MainLoop();
 }
 
 void vtkKWApplication::DisplayAbout(vtkKWWindow *win)
