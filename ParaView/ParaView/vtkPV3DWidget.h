@@ -81,7 +81,7 @@ public:
   // Internal method used only to get the widget pointer.
   void InitializeObservers(vtk3DWidget* widget3D); 
 
-  // BTX
+  //BTX
   // Description:
   // Move widget state to VTK object or back.
   virtual void AcceptInternal(vtkClientServerID);

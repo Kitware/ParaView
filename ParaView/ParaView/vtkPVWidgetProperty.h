@@ -37,9 +37,9 @@ public:
   virtual void AcceptInternal() {}
 
   virtual void SetAnimationTime(float) {}
-  // BTX
+  //BTX
   vtkSetMacro(VTKSourceID,vtkClientServerID);
-  // ETX
+  //ETX
 protected:
   vtkPVWidgetProperty();
   ~vtkPVWidgetProperty();

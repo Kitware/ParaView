@@ -66,6 +66,7 @@ public:
 //  virtual void SetVTKDataTclName(const char* tclName);
 //  vtkGetStringMacro(VTKDataTclName);  
 
+  //BTX
   // Description:
   // Set the id for the vtk data object.  This should be the primary
   // method of manipulating the data since it exists on all processes.
@@ -78,6 +79,7 @@ public:
   // of data to create.
   virtual void SetVTKDataID(vtkClientServerID id);
   vtkClientServerID GetVTKDataID() {return this->VTKDataID;}
+  //ETX
 
   // Description:
   // This method is called on creation.  If the data object is unstructured and 
