@@ -147,7 +147,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.10");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -265,6 +265,11 @@ void vtkPVClientServerModule::Initialize()
     int dsmatch = 1, rsmatch = 1;
     // Check if it matched
     this->SocketController->Receive(&dsmatch, 1, 1, 8843);
+    if (!dsmatch)
+      {
+      vtkErrorMacro("Connect ID mismatch. Data server was expecting another ID. "
+                    "The server will exit.");
+      }
 
     // Receive as the hand shake the number of processes available.
     int numServerProcs = 0;
@@ -277,6 +282,11 @@ void vtkPVClientServerModule::Initialize()
       this->RenderServerSocket->Send(&this->ConnectID, 1, 1, 8843);
       // Check if it matched
       this->RenderServerSocket->Receive(&rsmatch, 1, 1, 8843);
+      if (!rsmatch)
+        {
+        vtkErrorMacro("Connect ID mismatch. Data server was expecting "
+                      "another ID. The server will exit.");
+        }
       this->RenderServerSocket->Receive(&numServerProcs, 1, 1, 8843);
       this->NumberOfRenderServerProcesses = numServerProcs;
       }
@@ -299,6 +309,10 @@ void vtkPVClientServerModule::Initialize()
       
       this->ReturnValue = this->GUIHelper->
         RunGUIStart(this->ArgumentCount, this->Arguments, numServerProcs, myId);
+      }
+    else
+      {
+      this->GUIHelper->ExitApplication();
       }
     cout << "Exit Client\n";
     cout.flush();
