@@ -2363,6 +2363,8 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Vector name=\"Extent\" type=\"int\" length=\"6\" help=\"Set the min/max extents of the grid\"/>\n"
 "</Filter>\n"
 "\n"
+"<Filter class=\"vtkStructuredGridOutlineFilter\" root=\"GOutline\" input=\"vtkStructuredGrid\" output=\"vtkPolyData\" />\n"
+"\n"
 "<Filter class=\"vtkTriangleFilter\" root=\"Tri\" input=\"vtkPolyData\" output=\"vtkPolyData\"/>\n"
 "\n"
 "<Filter class=\"vtkTubeFilter\" root=\"Tuber\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
