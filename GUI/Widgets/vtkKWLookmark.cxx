@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.3");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.4");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -72,12 +72,6 @@ vtkKWLookmark::vtkKWLookmark()
 
 //----------------------------------------------------------------------------
 vtkKWLookmark::~vtkKWLookmark()
-{
-  this->RemoveLookmark();
-}
-
-//----------------------------------------------------------------------------
-void vtkKWLookmark::RemoveLookmark()
 {
   if(this->LmkIcon)
     {
@@ -159,7 +153,6 @@ void vtkKWLookmark::RemoveLookmark()
     delete [] this->Dataset;
     this->Dataset = NULL;
     }
-
 }
 
 

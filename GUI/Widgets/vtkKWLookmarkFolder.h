@@ -52,10 +52,6 @@ public:
   void ChangeName();
 
   // Description:
-  // Contents of Delete(), not reference counted so should probably get rid of this
-  void RemoveFolder();
-
-  // Description:
   // When a lmk container's checkbox is selected, we want all nested lmk items to also be selected (and vice versa)
   void SelectCallback();
   void ToggleNestedLabels(vtkKWWidget *prnt, int state);
