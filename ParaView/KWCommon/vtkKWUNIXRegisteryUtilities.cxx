@@ -27,7 +27,7 @@
 #define BUFFER_SIZE 8192
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.12");
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.13");
 
 //----------------------------------------------------------------------------
 vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()
@@ -62,6 +62,7 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
   if ( readonly == vtkKWRegisteryUtilities::READWRITE )
     {
     ofstream ofs( str.str(), ios::out|ios::app );
+    str.rdbuf()->freeze(0);
     if ( ofs.fail() )
       {
       return 0;
@@ -70,6 +71,7 @@ int vtkKWUNIXRegisteryUtilities::OpenInternal(const char *toplevel,
     }
 
   ifstream *ifs = new ifstream(str.str(), ios::in VTK_IOS_NOCREATE);
+  str.rdbuf()->freeze(0);
   if ( !ifs )
     {
     return 0;
@@ -144,6 +146,7 @@ int vtkKWUNIXRegisteryUtilities::CloseInternal()
     }
   str << getenv("HOME") << "/." << this->GetTopLevel() << "rc" << ends;
   ofstream *ofs = new ofstream(str.str(), ios::out);
+  str.rdbuf()->freeze(0);
   if ( !ofs )
     {
     return 0;
