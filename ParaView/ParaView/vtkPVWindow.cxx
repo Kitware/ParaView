@@ -124,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.14");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.15");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -401,6 +401,19 @@ void vtkPVWindow::CloseNoPrompt()
 //----------------------------------------------------------------------------
 void vtkPVWindow::PrepareForDelete()
 {
+  // Put this one first
+
+  if (this->AnimationInterface)
+    {
+    // It is very important to stop the animation at this point, otherwise
+    // it will never go out of its animation loop and this will block
+    // the whole destruction process since the animation object registers
+    // itself before the loop. See vtkPVAnimationInterface::Play() code.
+    this->AnimationInterface->Stop();
+    this->AnimationInterface->Delete();
+    this->AnimationInterface = NULL;
+    }
+  
   // Color maps have circular references because they
   // reference renderview.
   if (this->PVColorMaps)
@@ -589,14 +602,6 @@ void vtkPVWindow::PrepareForDelete()
     this->GlyphMenu->Delete();
     this->GlyphMenu = NULL;
     }
-  
-
-  if (this->AnimationInterface)
-    {
-    this->AnimationInterface->Delete();
-    this->AnimationInterface = NULL;
-    }
-  
 }
 
 
@@ -3773,7 +3778,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.14 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.15 $");
 }
 
 //----------------------------------------------------------------------------
