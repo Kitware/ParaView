@@ -21,7 +21,7 @@
                  type="int" length="3"
                  help="Set the strind in x, y, and z." />
     <Documentation>
-No documation now.
+No documentation now.
     </Documentation>
   </Module>
   <Module name="SurfaceVectors"
@@ -80,7 +80,7 @@ The surface vectors filter is used for 2D data sets.  It constrains vectors to l
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
-Intergates point and cell data over lines and surfaces.  It also computes length of lines, area of surface or volume.
+Integrates point and cell data over lines and surfaces.  It also computes length of lines, area of surface or volume.
     </Documentation>
   </Module>
   
@@ -1255,6 +1255,7 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
       <Item name="Aspect Ratio" value="1"/>
       <Item name="Frobenius Norm" value="2"/>
       <Item name="Edge Ratio" value="3"/>
+      <Item name="Minimal Angle" value="6"/>
     </SelectionList>
     <SelectionList property="QuadQualityMeasure"
                    trace_name="QuadQualityMeasure"
@@ -1262,7 +1263,10 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
                    help="Select the quality measure used to evaluate quadrilateral quality">
       <Item name="Radius Ratio" value="0"/>
       <Item name="Aspect Ratio" value="1"/>
+      <Item name="Average Frobenius Norm" value="4"/>
+      <Item name="Maximal Frobenius Norm" value="5"/>
       <Item name="Edge Ratio" value="3"/>
+      <Item name="Minimal Angle" value="6"/>
     </SelectionList>
     <SelectionList property="TetQualityMeasure"
                    trace_name="TetQualityMeasure"
@@ -1272,9 +1276,10 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
       <Item name="Aspect Ratio" value="1"/>
       <Item name="Frobenius Norm" value="2"/>
       <Item name="Edge Ratio" value="3"/>
+      <Item name="Minimal Dihedral Angle" value="6"/>
     </SelectionList>
     <Documentation>
-The mesh quality filter computes the quality of individual triangles, quadrilaterals and tetrahedra in a data set. Several quality measures exist for the different cell types. You may choose one for each type of cell. The filter then adds a new scalar array named "Quality" to the per-cell values of the data set containing these measures. Typically, a value of 1 is the optimal quality and the higher the value, the lower the cell quality.
+The mesh quality filter computes the quality of individual triangles, quadrilaterals, tetrahedra and hexahedra in a data set. Several quality measures exist for the different cell types. You may choose one for each type of cell. The filter then adds a new scalar array named "Quality" to the per-cell values of the data set containing these measures. Typically, a value of 1 is the optimal quality and the higher the value, the lower the cell quality.
     </Documentation>
   </Module>
   <Module name="PolyDataNormals"
