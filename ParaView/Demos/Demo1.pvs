@@ -106,6 +106,7 @@ proc clip_run {} {
     $clip(vtkTemp589) SetCenter -0.168960 -0.079800 0.086050
     $clip(vtkTemp589) SetNormal -0.821320 -0.387910 0.418280
     $clip(vtkTemp572) AcceptCallback
+    [$clip(vtkTemp572) GetPVOutput] DrawSurface
     update
 
     if $pvDemoShouldStop {
@@ -117,6 +118,7 @@ proc clip_run {} {
     set clip(vtkTemp623) [$clip(vtkTemp572) GetPVWidget {InsideOut}]
     $clip(vtkTemp623) SetState 1
     $clip(vtkTemp572) AcceptCallback
+    [$clip(vtkTemp572) GetPVOutput] DrawSurface
     update
 
     if $pvDemoShouldStop {
@@ -129,6 +131,7 @@ proc clip_run {} {
     $clip(vtkTemp589) SetCenter -0.031120 -0.014700 0.015850
     $clip(vtkTemp589) SetNormal -0.821320 -0.387910 0.418280
     $clip(vtkTemp572) AcceptCallback
+    [$clip(vtkTemp572) GetPVOutput] DrawSurface
     update
 
     if $pvDemoShouldStop {
@@ -141,6 +144,7 @@ proc clip_run {} {
     $clip(vtkTemp589) SetCenter 0.061670 0.029120 -0.031410
     $clip(vtkTemp589) SetNormal -0.821320 -0.387910 0.418280
     $clip(vtkTemp572) AcceptCallback
+    [$clip(vtkTemp572) GetPVOutput] DrawSurface
     update
 
     if $pvDemoShouldStop {
@@ -153,6 +157,7 @@ proc clip_run {} {
     $clip(vtkTemp589) SetCenter 0.061670 0.029120 -0.031410
     $clip(vtkTemp589) SetNormal -0.656260 0.715200 0.240440
     $clip(vtkTemp572) AcceptCallback
+    [$clip(vtkTemp572) GetPVOutput] DrawSurface
     $clip(vtkTemp24) SetCameraState -0.0383057 0 3.46879  0 0 0  0 1 0 
     update
     $clip(vtkTemp24) SetCameraState -0.0766067 0 3.46815  0 0 0  0 1 0 
@@ -814,6 +819,7 @@ proc extract_init {} {
 
     set extract(vtkTemp478) [$extract(vtkTemp1) CreatePVSource ExtractGrid]
     $extract(vtkTemp478) AcceptCallback
+    [$extract(vtkTemp478) GetPVOutput] DrawSurface
 
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp384)
     set extract(vtkTemp598) [$extract(vtkTemp1) CreatePVSource Cut]
@@ -3357,6 +3363,7 @@ proc threshold_init {} {
     $threshold(vtkTemp492) SetMaxValue 278.000000
     $threshold(vtkTemp492) SetMinValue 0
     $threshold(vtkTemp482) AcceptCallback
+    [$threshold(vtkTemp482) GetPVOutput] DrawSurface
 
     if $pvDemoShouldStop {
         return
@@ -3390,6 +3397,7 @@ proc threshold_run {} {
     for {set i 20} {$i < 260} {incr i 10} {
         $threshold(vtkTemp492) SetMinValue $i
         $threshold(vtkTemp482) AcceptCallback
+        [$threshold(vtkTemp482) GetPVOutput] DrawSurface
         update
         if $pvDemoShouldStop {
             return
