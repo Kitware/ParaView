@@ -141,6 +141,10 @@ public:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
 
+  // Description:
+  // Forwards UpdateVTKObjects to the currently selected widget.
+  virtual void UpdateVTKObjects();
+
 protected:
   vtkPVSelectWidget();
   ~vtkPVSelectWidget();

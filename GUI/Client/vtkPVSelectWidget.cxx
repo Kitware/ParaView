@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.58");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.59");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -568,6 +568,16 @@ void vtkPVSelectWidget::AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimatio
   if ( pv )
     {
     pv->AddAnimationScriptsToMenu(menu, ai);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSelectWidget::UpdateVTKObjects()
+{
+  vtkPVWidget* pv = this->GetPVWidget(this->GetCurrentValue());
+  if ( pv )
+    {
+    pv->UpdateVTKObjects();
     }
 }
 
