@@ -82,6 +82,8 @@ public:
   virtual void SetRange(float min, float max);
   virtual void SetRange(float *range) { this->SetRange(range[0], range[1]); };
   vtkGetVector2Macro(Range, float);
+  virtual float GetRangeMin() { return this->GetRange()[0]; };
+  virtual float GetRangeMax() { return this->GetRange()[1]; };
 
   // Description:
   // Set/get whether to display the range of the scale
