@@ -68,6 +68,11 @@ public:
   vtkGetMacro(NumberOfPieces, int);
   vtkSetMacro(NumberOfPieces, int);
   
+  // Description:
+  // Get/Set whether this instance will write the main animation
+  // file.
+  vtkGetMacro(WriteAnimationFile, int);
+  virtual void SetWriteAnimationFile(int flag);
 protected:
   vtkPVAnimationWriter();
   ~vtkPVAnimationWriter();  
@@ -94,6 +99,10 @@ protected:
   // Status safety check for method call ordering.
   int StartCalled;
   int FinishCalled;
+  
+  // Whether to write the animation file on this node.
+  int WriteAnimationFile;
+  int WriteAnimationFileInitialized;
   
   // Internal implementation details.
   vtkPVAnimationWriterInternals* Internal;

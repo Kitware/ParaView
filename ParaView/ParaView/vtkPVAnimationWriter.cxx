@@ -45,7 +45,7 @@ int vtkPVAnimationWriterMakeDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationWriter);
-vtkCxxRevisionMacro(vtkPVAnimationWriter, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVAnimationWriter, "1.1.2.3");
 
 //----------------------------------------------------------------------------
 
@@ -111,6 +111,9 @@ vtkPVAnimationWriter::vtkPVAnimationWriter()
   this->FinishCalled = 0;
   this->Piece = 0;
   this->NumberOfPieces = 1;
+  this->WriteAnimationFileInitialized = 0;
+  this->WriteAnimationFile = 0;
+
 }
 
 //----------------------------------------------------------------------------
@@ -151,6 +154,19 @@ const char* vtkPVAnimationWriter::GetDefaultFileExtension()
 const char* vtkPVAnimationWriter::GetDataSetName()
 {
   return "Collection";
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationWriter::SetWriteAnimationFile(int flag)
+{
+  this->WriteAnimationFileInitialized = 1;
+  vtkDebugMacro(<< this->GetClassName() << " ("
+                << this << "): setting WriteAnimationFile to " << flag);
+  if(this->WriteAnimationFile != flag)
+    {
+    this->WriteAnimationFile = flag;
+    this->Modified();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -312,7 +328,22 @@ int vtkPVAnimationWriter::WriteInternal()
   
   this->FinishCalled = 0;
   
-  return this->Superclass::WriteInternal();
+  // Decide whether to write the animation file.
+  int writeAnimation = 0;
+  if(this->WriteAnimationFileInitialized)
+    {
+    writeAnimation = this->WriteAnimationFile;
+    }
+  else if(this->Piece == 0)
+    {
+    writeAnimation = 1;
+    }
+  
+  if(writeAnimation)
+    {
+    return this->Superclass::WriteInternal();
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------

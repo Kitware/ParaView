@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.5");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.6");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1244,6 +1244,14 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
           }
         }
       }
+    
+    // Only write the animation file once on each disk.
+    pm->ServerScript(
+      "vtkPVSummaryHelper pvAnimHelper\n"
+      "pvAnimHelper SetWriter pvAnimWriter\n"
+      "pvAnimHelper SetController [$Application GetController]\n"
+      "pvAnimHelper SynchronizeSummaryFiles\n"
+      "pvAnimHelper Delete");
     }
   else
     {
