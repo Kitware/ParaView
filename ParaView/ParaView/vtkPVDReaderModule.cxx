@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.2.2.1");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.2.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -94,39 +94,46 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
   // Make sure the reader's file name is set.
   this->SetReaderFileName(fname);
   int fixme;
-  
+
   // Check whether the input file has a "timestep" attribute.
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->ServerScript("%s UpdateAttributes", this->GetVTKSourceID());
-  pm->RootScript(
-    "namespace eval ::paraview::vtkPVDReaderModule {\n"
-    "  proc GetTimeAttributeIndex {reader} {\n"
-    "    set n [$reader GetNumberOfAttributes]\n"
-    "    for {set i 0} {$i < $n} {incr i} {\n"
-    "      if {[$reader GetAttributeName $i] == {timestep}} {\n"
-    "        return $i\n"
-    "      }\n"
-    "    }\n"
-    "    return -1\n"
-    "  }\n"
-    "  GetTimeAttributeIndex {%s}\n"
-    "}\n", this->GetVTKSourceTclName());
-  int index = atoi(pm->GetRootResult());
-  this->HaveTime = (index >= 0)?1:0;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetVTKSourceID() << "UpdateAttributes"
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->GetVTKSourceID() << "GetAttributeIndex" << "timestep"
+    << vtkClientServerStream::End;
+  pm->SendStreamToServer();
+  int index = -1;
+  this->HaveTime = (pm->GetLastServerResult().GetArgument(0, 0, &index) &&
+                    index >= 0)? 1 : 0;
 
   // If we have time, we need to behave as an advanced reader module.
   if(this->HaveTime)
     {
-    pm->ServerScript("%s SetRestrictionAsIndex timestep 0",
-                     this->GetVTKSourceTclName());
-    pm->RootScript("%s GetNumberOfAttributeValues %d",
-                   this->GetVTKSourceTclName(), index);
-    int max = atoi(pm->GetRootResult())-1;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->GetVTKSourceID() << "SetRestrictionAsIndex"
+      << "timestep" << 0
+      << vtkClientServerStream::End;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->GetVTKSourceID() << "GetNumberOfAttributeValues" << index
+      << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    int numValues = 0;
+    if(!pm->GetLastServerResult().GetArgument(0, 0, &numValues))
+      {
+      vtkErrorMacro("Error getting number of timesteps from reader.");
+      numValues = 0;
+      }
     this->TimeScale = vtkPVScale::New();
     this->TimeScale->SetLabel("Timestep");
     this->TimeScale->SetPVSource(this);
     this->TimeScale->RoundOn();
-    this->TimeScale->SetRange(0, max);
+    this->TimeScale->SetRange(0, numValues-1);
     this->TimeScale->SetParent(this->GetParameterFrame()->GetFrame());
     this->TimeScale->SetModifiedCommand(this->GetTclName(), 
                                         "SetAcceptButtonColorToRed");

@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.5");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.6");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -140,36 +140,36 @@ int vtkPVReaderModule::CloneAndInitialize(int makeCurrent,
 int vtkPVReaderModule::CanReadFile(const char* fname)
 {
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-
   const char* ext = this->ExtractExtension(fname);
-  const char* val = 0;
-  this->Iterator->GoToFirstItem();
-  while(!this->Iterator->IsDoneWithTraversal())
+  int matches = 0;
+  int canRead = 0;
+
+  // Check if the file name matches any of our extensions.
+  for(this->Iterator->GoToFirstItem();
+      !this->Iterator->IsDoneWithTraversal() && !matches;
+      this->Iterator->GoToNextItem())
     {
+    const char* val = 0;
     this->Iterator->GetData(val);
-    if (ext && strcmp(ext, val) == 0)
+    if(ext && strcmp(ext, val) == 0)
       {
-      // The extension matches, see if the reader can read the file.
-      pm->RootScript(
-        "namespace eval ::paraview::vtkPVReaderModule {\n"
-        "  proc CanReadFileTest {reader fname} {\n"
-        "    $reader vtkPVReaderModuleCanReadFileTemp\n"
-        "    if {[catch {vtkPVReaderModuleCanReadFileTemp CanReadFile \"$fname\"} result]} {\n"
-        "      set result 1\n"
-        "    }\n"
-        "    vtkPVReaderModuleCanReadFileTemp Delete\n"
-        "    return $result\n"
-        "  }\n"
-        "  CanReadFileTest {%s} {%s}\n"
-        "}\n", this->SourceClassName, fname);
-      if(atoi(pm->GetRootResult()))
-        {
-        return 1;
-        }
+      matches = 1;
       }
-    this->Iterator->GoToNextItem();
     }
-  return 0;
+
+  // If the extension matches, see if the reader can read the file.
+  if(matches)
+    {
+    vtkClientServerID tmpID = pm->NewStreamObject(this->SourceClassName);
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << tmpID << "CanReadFile" << fname
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    pm->GetLastServerResult().GetArgument(0, 0, &canRead);
+    pm->DeleteStreamObject(tmpID);
+    pm->SendStreamToServer();
+    }
+  return canRead;
 }
 
 //----------------------------------------------------------------------------
