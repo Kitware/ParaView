@@ -126,12 +126,17 @@ public:
   // the widget is modified.  Really we should change "ModifiedFlag" 
   // to some other name, because is gets confused with vtkObject::Modified().
   void SetModifiedCommand(const char* cmdObject, const char* methodAndArgs);
+  void SetAcceptedCommand(const char* cmdObject, const char* methodAndArgs);
 
   // Description:
   // This callback gets called when the user changes the widgets value,
   // or a script changes the widgets value.  Ideally, this method should 
   // be protected.
   virtual void ModifiedCallback();
+
+  // Description:
+  // This callback gets called when the widget is accepted.
+  virtual void AcceptedCallback();
 
   // Description:
   // Access to the flag that indicates whether the widgets
@@ -197,6 +202,11 @@ protected:
   char *ModifiedCommandMethod;
   vtkSetStringMacro(ModifiedCommandObjectTclName);
   vtkSetStringMacro(ModifiedCommandMethod);
+  
+  char *AcceptedCommandObjectTclName;
+  char *AcceptedCommandMethod;
+  vtkSetStringMacro(AcceptedCommandObjectTclName);
+  vtkSetStringMacro(AcceptedCommandMethod);
   
   // This flag indicates that the widget has changed and should be
   // added to the trace file.

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVVectorEntry.h"
 
 #include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMenu.h"
 #include "vtkKWWidgetCollection.h"
@@ -249,7 +250,8 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
           delete[] this->EntryValues[cc];
           }
         this->EntryValues[cc] = vtkString::Duplicate(this->GetEntry(cc)->GetValue());
-        found = 1;
+        this->AcceptedCallback();
+        this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
         }
       }
     }
@@ -263,6 +265,10 @@ void vtkPVVectorEntry::CheckModifiedCallback(const char* key)
         this->GetEntry(cc)->SetValue(val);
         }
       }
+    }
+  else
+    {
+    found = 1;
     }
   if ( found )
     {

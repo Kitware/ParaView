@@ -91,6 +91,10 @@ public:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to a widget it contains.
   virtual void SetBalloonHelpString(const char *str);
+
+  // Description:
+  // Check if the widget was modified.
+  void CheckModifiedCallback();
   
 //BTX
   // Description:
@@ -99,7 +103,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVScale* ClonePrototype(vtkPVSource* pvSource,
-			     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                             vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -118,11 +122,11 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
-			vtkPVXMLPackageParser* parser);
+                        vtkPVXMLPackageParser* parser);
 
 };
 

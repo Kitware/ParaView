@@ -232,7 +232,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
           ostrstream str;
           str << "ChangeArgument " << name << " " 
               << widget->GetTclName() << ends;
-          widget->SetModifiedCommand(this->GetTclName(), str.str());
+          widget->SetAcceptedCommand(this->GetTclName(), str.str());
           str.rdbuf()->freeze(0);
           
           char manipulator[100];
@@ -261,7 +261,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
 
 //------------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::ExecuteEvent(
-  vtkObject* wdg, unsigned long vtkNotUsed(event), void* calldata)
+  vtkObject* wdg, unsigned long event, void* calldata)
 {
   if ( this->InEvent )
     {
@@ -269,31 +269,34 @@ void vtkPVInteractorStyleControl::ExecuteEvent(
     }
   this->InEvent = 1;
 
-  const char* argument = static_cast<char*>(calldata);
-
-  vtkPVCameraManipulator* manipulator = static_cast<vtkPVCameraManipulator*>(wdg);
-  const char* name = manipulator->GetManipulatorName();
-  
-  vtkPVInteractorStyleControl::ArrayStrings *strings = 0;
-  this->Arguments->GetItem(argument, strings);
-  if ( strings )
+  if ( event == vtkKWEvent::ManipulatorModifiedEvent )
     {
-    vtkPVInteractorStyleControl::ArrayStrings::IteratorType *vit
-      = strings->NewIterator();
-    vit->InitTraversal();
-    while ( !vit->IsDoneWithTraversal() )
+    const char* argument = static_cast<char*>(calldata);
+
+    vtkPVCameraManipulator* manipulator = static_cast<vtkPVCameraManipulator*>(wdg);
+    const char* name = manipulator->GetManipulatorName();
+  
+    vtkPVInteractorStyleControl::ArrayStrings *strings = 0;
+    this->Arguments->GetItem(argument, strings);
+    if ( strings )
       {
-      const char* mname = 0;
-      if ( vit->GetData(mname) == VTK_OK && mname )
+      vtkPVInteractorStyleControl::ArrayStrings::IteratorType *vit
+        = strings->NewIterator();
+      vit->InitTraversal();
+      while ( !vit->IsDoneWithTraversal() )
         {
-        if ( vtkString::Equals(name, mname) )
+        const char* mname = 0;
+        if ( vit->GetData(mname) == VTK_OK && mname )
           {
-          this->ResetWidget(manipulator, argument);
+          if ( vtkString::Equals(name, mname) )
+            {
+            this->ResetWidget(manipulator, argument);
+            }
           }
+        vit->GoToNextItem();
         }
-      vit->GoToNextItem();
+      vit->Delete();
       }
-    vit->Delete();
     }
   this->InEvent = 0;
 }

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVScale.h"
 
 #include "vtkArrayMap.txx"
+#include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
@@ -109,14 +110,24 @@ void vtkPVScale::SetBalloonHelpString(const char *str)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScale::SetResolution(float res)
 {
   this->Scale->SetResolution(res);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVScale::SetRange(float min, float max)
 {
   this->Scale->SetRange(min, max);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::CheckModifiedCallback()
+{
+  this->ModifiedCallback();
+  this->AcceptedCallback();
+  this->InvokeEvent(vtkKWEvent::WidgetModifiedEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -144,7 +155,7 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
 
   this->Scale->SetParent(this);
   this->Scale->Create(this->Application, "-showvalue 1");
-  this->Scale->SetCommand(this, "ModifiedCallback");
+  this->Scale->SetCommand(this, "CheckModifiedCallback");
 
   this->SetBalloonHelpString(this->BalloonHelpString);
   this->Script("pack %s -side left -fill x -expand t", 

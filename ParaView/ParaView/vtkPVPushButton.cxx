@@ -107,6 +107,7 @@ void vtkPVPushButton::SetBalloonHelpString(const char *str)
 void vtkPVPushButton::ExecuteCommand()
 {
   this->ModifiedCallback();
+  this->AcceptedCallback();
 }
 
 //----------------------------------------------------------------------------

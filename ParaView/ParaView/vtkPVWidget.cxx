@@ -72,6 +72,9 @@ vtkPVWidget::vtkPVWidget()
   this->ModifiedCommandObjectTclName = NULL;
   this->ModifiedCommandMethod = NULL;
 
+  this->AcceptedCommandObjectTclName = NULL;
+  this->AcceptedCommandMethod = NULL;
+
   // Start modified because empty widgets do not match their variables.
   this->ModifiedFlag = 1;
 
@@ -84,6 +87,8 @@ vtkPVWidget::~vtkPVWidget()
 {
   this->SetModifiedCommandObjectTclName(NULL);
   this->SetModifiedCommandMethod(NULL);
+  this->SetAcceptedCommandObjectTclName(NULL);
+  this->SetAcceptedCommandMethod(NULL);
 
   this->Dependents->Delete();
   this->Dependents = NULL;
@@ -95,6 +100,14 @@ void vtkPVWidget::SetModifiedCommand(const char* cmdObject,
 {
   this->SetModifiedCommandObjectTclName(cmdObject);
   this->SetModifiedCommandMethod(methodAndArgs);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::SetAcceptedCommand(const char* cmdObject, 
+                                     const char* methodAndArgs)
+{
+  this->SetAcceptedCommandObjectTclName(cmdObject);
+  this->SetAcceptedCommandMethod(methodAndArgs);
 }
 
 //----------------------------------------------------------------------------
@@ -165,6 +178,16 @@ void vtkPVWidget::ModifiedCallback()
     {
     this->Script("%s %s", this->ModifiedCommandObjectTclName,
                  this->ModifiedCommandMethod);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::AcceptedCallback()
+{
+  if (this->AcceptedCommandObjectTclName && this->AcceptedCommandMethod)
+    {
+    this->Script("%s %s", this->AcceptedCommandObjectTclName,
+                 this->AcceptedCommandMethod);
     }
 }
 
