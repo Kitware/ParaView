@@ -103,6 +103,8 @@ public:
   void AddValue(const char* value);
   void DeleteValue(int idx);
   int GetValueIndex(const char* value);
+  int GetNumberOfValues();
+  void DeleteAllValues();
 
   // Description:
   // Make this entry a puldown combobox.
@@ -113,6 +115,10 @@ public:
   // Description:
   // This method is called when one of the entries in pulldown is selected.
   void ValueSelectedCallback();
+
+  // Description:
+  // Get the actuall Entry widget.
+  vtkGetObjectMacro(Entry, vtkKWWidget);
 
 protected:
   vtkKWEntry();

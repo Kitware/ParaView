@@ -70,7 +70,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.18");
+vtkCxxRevisionMacro(vtkKWEntry, "1.19");
 
 //----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
@@ -218,7 +218,7 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
     label->Delete();
     this->TopLevel = vtkKWWidget::New();
     this->TopLevel->Create(app, "toplevel", "-bg black -bd 1 -relief flat");
-    this->TopLevel->SetBind(this, "<Leave>", "WithdrawPopupCallback");
+    //this->TopLevel->SetBind(this, "<Leave>", "WithdrawPopupCallback");
     this->Script("wm overrideredirect %s 1", 
                  this->TopLevel->GetWidgetName());
     this->Script("wm withdraw %s", 
@@ -393,6 +393,21 @@ void vtkKWEntry::AddValue(const char* value)
     }
   this->Internals->Entries.push_back(value);
   this->Internals->Dirty = 1;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::GetNumberOfValues()
+{
+  return this->Internals->Entries.size();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::DeleteAllValues()
+{
+  this->Internals->Entries.empty();
+  this->Internals->Dirty = 1;
+  this->Modified();
 }
 
 //----------------------------------------------------------------------------
@@ -415,6 +430,7 @@ void vtkKWEntry::DeleteValue(int idx)
     {
     this->Internals->Entries.erase(it);
     this->Internals->Dirty = 1;
+    this->Modified();
     }
 }
 
