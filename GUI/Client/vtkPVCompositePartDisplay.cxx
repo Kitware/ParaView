@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.21");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.22");
 
 
 //----------------------------------------------------------------------------
@@ -171,7 +171,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << vtkClientServerStream::End;
     pm->SendStreamToRenderServerClientAndServer();
     }
-  else if (pvApp->GetUseTiledDisplay())
+  else if (pvApp->GetUseTiledDisplay() || pvApp->GetCaveConfigurationFileName())
     { 
     this->CollectID = pm->NewStreamObject("vtkMPIMoveData");
     pm->GetStream()
@@ -231,7 +231,7 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
       << vtkClientServerStream::End;
     pm->SendStreamToRenderServerClientAndServer();
     }
-  else if (pvApp->GetUseTiledDisplay())
+  else if (pvApp->GetUseTiledDisplay() || pvApp->GetCaveConfigurationFileName())
     { // This should be in subclass.
     this->LODCollectID = pm->NewStreamObject("vtkMPIMoveData");
     pm->GetStream()
