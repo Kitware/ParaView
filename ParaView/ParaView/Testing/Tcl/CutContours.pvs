@@ -6,6 +6,8 @@
             }
         }
     } 
+    set DataDir "E:/Law/ParaView/Data"
+    
 
     
 # Test the new feature of multiple cut values.

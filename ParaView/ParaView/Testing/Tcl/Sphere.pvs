@@ -35,16 +35,13 @@ set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
 set sInt [$pvWindow GetSourceInterface "vtkSphereSource"]
 set pvSphere [$sInt CreateCallback]
-[$pvSphere GetVTKSource] SetThetaResolution 16
-$pvSphere UpdateParameterWidgets
+[$pvSphere GetPVWidget {Theta Resolution}] SetValue 16
 $pvSphere AcceptCallback
 
 set sInt [$pvWindow GetSourceInterface "vtkShrinkPolyData"]
 set pvShrink [$sInt CreateCallback]
-[$pvShrink GetVTKSource] SetShrinkFactor 0.9
-$pvShrink UpdateParameterWidgets
+[$pvShrink GetPVWidget {ShrinkFactor}] SetValue 0.9
 $pvShrink AcceptCallback
-
 
 
 RenWin1 SetSize 250 250

@@ -6,7 +6,6 @@
             }
         }
     } 
-    
 
     # hack to get the window.
     set pvWindow [lindex [vtkPVWindow ListInstances] 0]
