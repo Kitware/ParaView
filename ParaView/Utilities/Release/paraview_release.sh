@@ -250,7 +250,8 @@ remote_binary()
 upload()
 {
     echo "------- Copying tarballs to www.paraview.org. -------"
-    scp ${PROJECT}-${VERSION}*tar.* kitware@www.paraview.org:/projects/FTP/pub/paraview
+    scp ${PROJECT}-${VERSION}*tar.* kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
+    scp ${PROJECT}-docs-${VERSION}*tar.* kitware@www.paraview.org:/projects/FTP/pub/paraview/v${PARAVIEW_VERSION}
     echo "---- Done copying tarballs to www.paraview.org. -----"
 }
 
