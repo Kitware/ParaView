@@ -17,7 +17,7 @@
 =========================================================================*/
 #include "vtkKWProcessStatistics.h"
 
-vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.7");
+vtkCxxRevisionMacro(vtkKWProcessStatistics, "1.8");
 
 #ifdef __linux
 #include <sys/procfs.h>
@@ -188,9 +188,9 @@ int vtkKWProcessStatistics::QueryMemory()
   unsigned long temp;
   char buffer[1024];
   fgets(buffer, sizeof(buffer), fd);
-  fscanf(fd, "Mem: %ul %ul %ul %ul %ul %ul\n",
+  fscanf(fd, "Mem: %lu %lu %lu %lu %lu %lu\n",
 	 &tp, &temp, &ap, &temp, &temp, &temp);
-  fscanf(fd, "Swap: %ul %ul %ul\n", &tv, &temp, &tv);  
+  fscanf(fd, "Swap: %lu %lu %lu\n", &tv, &temp, &tv);  
   fclose( fd );
   this->TotalVirtualMemory = tv>>10;
   this->TotalPhysicalMemory = tp>>10;
