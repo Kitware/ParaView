@@ -112,25 +112,7 @@ SET_SOURCE_FILES_PROPERTIES(
   WRAP_EXCLUDE
   )
 
-
-IF (NOT DO_NOT_BUILD_XML_RW)
-  INCLUDE_DIRECTORIES(
-    ${KWCommon_SOURCE_DIR}/XML
-    ${KWWidgets_SOURCE_DIR}/XML
-    )
-  SET (KWWidgets_SRCS ${KWWidgets_SRCS}
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationReader.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLCornerAnnotationWriter.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetReader.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWRenderWidgetWriter.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceManagerReader.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceManagerWriter.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceNotebookManagerReader.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWUserInterfaceNotebookManagerWriter.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWWindowReader.cxx
-    ${KWWidgets_SOURCE_DIR}/XML/vtkXMLKWWindowWriter.cxx
-    )
-ELSE (NOT DO_NOT_BUILD_XML_RW)
+IF (DO_NOT_BUILD_XML_RW)
   SET_SOURCE_FILES_PROPERTIES(
     vtkKWScalarBarAnnotation.cxx 
     vtkKWApplication.cxx 
@@ -138,7 +120,7 @@ ELSE (NOT DO_NOT_BUILD_XML_RW)
     vtkKWHeaderAnnotation.cxx 
     COMPILE_FLAGS -DDO_NOT_BUILD_XML_RW
     )
-ENDIF (NOT DO_NOT_BUILD_XML_RW)
+ENDIF (DO_NOT_BUILD_XML_RW)
 
 # If needed, copy the Tcl/Tk support files needed for vtkKWApplication
 # at run-time to initialize Tcl/Tk
