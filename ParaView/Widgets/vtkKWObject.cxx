@@ -116,7 +116,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.20 $");
+  this->ExtractRevision(os,"$Revision: 1.21 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -310,7 +310,7 @@ int vtkKWObject::CompareVersions(const char *v1, const char *v2)
       {
       return 1;
       }    
-		pos++;
+                pos++;
     }
   // revisions match but maybe one has more .2.3.4.2
   if (nVer1 < nVer2)

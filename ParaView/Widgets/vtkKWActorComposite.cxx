@@ -57,7 +57,7 @@ vtkStandardNewMacro( vtkKWActorComposite );
 
 
 int vtkKWActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
-				int argc, char *argv[]);
+                                int argc, char *argv[]);
 
 vtkKWActorComposite::vtkKWActorComposite()
 {

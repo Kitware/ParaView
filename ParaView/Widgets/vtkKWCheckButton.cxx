@@ -68,13 +68,13 @@ void vtkKWCheckButton::SetIndicator(int ind)
     if (this->Application)
       {
       if (ind)
-	{
-	this->Script("%s configure -indicatoron 1", this->GetWidgetName());
-	}
+        {
+        this->Script("%s configure -indicatoron 1", this->GetWidgetName());
+        }
       else
-	{
-	this->Script("%s configure -indicatoron 0", this->GetWidgetName());
-	}
+        {
+        this->Script("%s configure -indicatoron 0", this->GetWidgetName());
+        }
       }
     }
   this->SetMyText(0);
@@ -143,12 +143,12 @@ void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
   if (!this->IndicatorOn)
     {
     this->Script("checkbutton %s -indicatoron 0 -variable %sValue %s",
-		 wname,wname,args);
+                 wname,wname,args);
     }
   else
     {
     this->Script("checkbutton %s -variable %sValue %s",
-		 wname,wname,args);
+                 wname,wname,args);
     }
 
   if (this->MyText)

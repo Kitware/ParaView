@@ -52,7 +52,7 @@ vtkStandardNewMacro( vtkKWSplitFrame );
 
 
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
-		      int argc, char *argv[]);
+                      int argc, char *argv[]);
 
 vtkKWSplitFrame::vtkKWSplitFrame()
 {

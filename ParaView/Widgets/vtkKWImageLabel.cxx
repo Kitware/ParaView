@@ -69,7 +69,7 @@ void vtkKWImageLabel::SetImageData(vtkKWIcon* icon)
 }
 
 void vtkKWImageLabel::SetImageData(const unsigned char* data, 
-				   int width, int height)
+                                   int width, int height)
 {
   int r, g, b;
   this->GetBackgroundColor(&r, &g, &b);
@@ -78,7 +78,7 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
   Tk_PhotoHandle photo;
   Tk_PhotoImageBlock sblock;
   photo = Tk_FindPhoto(this->Application->GetMainInterp(),
-		       this->ImageDataLabel);
+                       this->ImageDataLabel);
   Tk_PhotoBlank(photo);
   const unsigned char *dd = data;
   int xx, yy;
@@ -110,7 +110,7 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
     }
   Tk_PhotoPutBlock(photo, &sblock, 0, 0, width, height);
   this->Script("%s configure -image %s", this->GetWidgetName(),
-	       this->ImageDataLabel);
+               this->ImageDataLabel);
   delete [] array;
 }
 

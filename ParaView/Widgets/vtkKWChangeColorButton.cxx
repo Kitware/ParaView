@@ -50,7 +50,7 @@ vtkStandardNewMacro( vtkKWChangeColorButton );
 
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
-		      int argc, char *argv[]);
+                      int argc, char *argv[]);
 
 vtkKWChangeColorButton::vtkKWChangeColorButton()
 {
@@ -96,9 +96,9 @@ void vtkKWChangeColorButton::SetColor(float r, float g, float b)
     {
     this->Script( "%s configure -bg {#%02x%02x%02x}", 
                   this->Label2->GetWidgetName(),
-		  (int)(r*255.5), 
-		  (int)(g*255.5), 
-		  (int)(b*255.5) );
+                  (int)(r*255.5), 
+                  (int)(g*255.5), 
+                  (int)(b*255.5) );
     }
 }
 
@@ -120,9 +120,9 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
   // create the top level
   wname = this->GetWidgetName();
   sprintf( color, "#%02x%02x%02x", 
-	   (int)(this->Color[0]*255.5), 
-	   (int)(this->Color[1]*255.5), 
-	   (int)(this->Color[2]*255.5) );
+           (int)(this->Color[0]*255.5), 
+           (int)(this->Color[1]*255.5), 
+           (int)(this->Color[2]*255.5) );
 
   this->Script("frame %s -relief raised -bd 2 %s", wname, args);
   char textarg[1024];
@@ -208,7 +208,7 @@ void vtkKWChangeColorButton::ChangeColor()
     if ( this->Command )
       {
       this->Script("eval %s %f %f %f", this->Command, 
-		   (float)r/255.0, (float)g/255.0, (float)b/255.0);
+                   (float)r/255.0, (float)g/255.0, (float)b/255.0);
       }
     this->Color[0] = (float)r/255.0;
     this->Color[1] = (float)g/255.0;
@@ -217,7 +217,7 @@ void vtkKWChangeColorButton::ChangeColor()
 }
 
 void vtkKWChangeColorButton::SetCommand( vtkKWObject* CalledObject, 
-					 const char *CommandString )
+                                         const char *CommandString )
 {
   if (this->Command)
     {
@@ -249,7 +249,7 @@ void vtkKWChangeColorButton::SerializeToken(istream& is, const char token[1024])
     if ( this->Command )
       {
       this->Script("eval %s %f %f %f", this->Command, 
-		   clr[0], clr[1], clr[2]);
+                   clr[0], clr[1], clr[2]);
       }
     return;
     }
@@ -260,7 +260,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.15 $");
+  this->ExtractRevision(os,"$Revision: 1.16 $");
 }
 
 //----------------------------------------------------------------------------

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro( vtkKWBWidgets );
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
-			    int argc, char *argv[]);
+                            int argc, char *argv[]);
 
 #define minus_width 9
 #define minus_height 9
@@ -239,14 +239,14 @@ vtkKWBWidgets::~vtkKWBWidgets()
 
 //----------------------------------------------------------------------------
 int vtkKWBWidgets::CreatePhoto(Tcl_Interp* interp, char *name, 
-				unsigned char *data, int width, int height)
+                                unsigned char *data, int width, int height)
 {
   Tk_PhotoHandle photo;
   Tk_PhotoImageBlock block;
 
   ostrstream command;
   command << "image create photo " << name << " -height "
-	  << height << " -width " << width << ends;
+          << height << " -width " << width << ends;
   if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
     {
     vtkGenericWarningMacro(<< "Unable to create image. Error:" 

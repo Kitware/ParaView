@@ -52,7 +52,7 @@ vtkStandardNewMacro(vtkCornerAnnotation);
  
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
-				vtkImageMapToWindowLevelColors);
+                                vtkImageMapToWindowLevelColors);
 
 vtkCornerAnnotation::vtkCornerAnnotation()
 {

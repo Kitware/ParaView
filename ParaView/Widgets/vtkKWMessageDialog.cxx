@@ -166,9 +166,9 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
   if ( this->OKButton->GetApplication() )
     {
     this->OKButton->SetBind("<FocusIn>", this->OKFrame->GetWidgetName(), 
-			    "configure -relief groove");
+                            "configure -relief groove");
     this->OKButton->SetBind("<FocusOut>", this->OKFrame->GetWidgetName(), 
-			    "configure -relief flat");
+                            "configure -relief flat");
     {
     this->OKButton->SetBind(this, "<Return>", "OK");
     }
@@ -192,16 +192,16 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     {
     this->CheckButton->SetText("Do not show this dialog any more.");
     this->Script("pack %s -side bottom -fill x -padx 20 -pady 10",
-		 this->CheckButton->GetWidgetName());
+                 this->CheckButton->GetWidgetName());
     }
   this->Script("pack %s -side bottom -fill x -padx 20 -pady 10",
                this->Label->GetWidgetName());
 
   this->Script("pack %s -side right -fill both -expand true -pady 4",
-	       this->MessageDialogFrame->GetWidgetName());
+               this->MessageDialogFrame->GetWidgetName());
   this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -borderwidth 0");
   this->Script("pack %s -side left -fill y",
-	       this->Icon->GetWidgetName());
+               this->Icon->GetWidgetName());
   this->Script("pack forget %s", this->Icon->GetWidgetName());
 }
 
@@ -217,7 +217,7 @@ void vtkKWMessageDialog::SetText(const char *txt)
 int vtkKWMessageDialog::Invoke()
 {
   this->InvokeEvent(vtkKWEvent::MessageDialogInvokeEvent, 
-		    this->DialogText);
+                    this->DialogText);
   if ( !this->GetApplication()->GetUseMessageDialogs() )
     {
     return 0;
@@ -267,9 +267,9 @@ int vtkKWMessageDialog::Invoke()
     else
       {
       if ( !ires )
-	{
-	ires = -1;
-	}
+        {
+        ires = -1;
+        }
       }
     this->Application->SetMessageDialogResponse(this->DialogName, ires);
     }
@@ -300,21 +300,21 @@ void vtkKWMessageDialog::SetIcon()
   else
     {
     this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
-		 this->Icon->GetWidgetName());
+                 this->Icon->GetWidgetName());
     this->Script("pack forget %s", this->Icon->GetWidgetName());
     return;
     }  
   
   this->Script("%s configure -anchor n "
-	       "-pady 10 -padx 4 -borderwidth 4",
-	       this->Icon->GetWidgetName());
+               "-pady 10 -padx 4 -borderwidth 4",
+               this->Icon->GetWidgetName());
   this->Script("pack %s -pady 17 -side left -fill y", 
-	       this->Icon->GetWidgetName());
+               this->Icon->GetWidgetName());
 }
 
 void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
-				      const char* title, 
-				      const char*message, int options)
+                                      const char* title, 
+                                      const char*message, int options)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   dlg2->SetMasterWindow(win);
@@ -330,9 +330,9 @@ void vtkKWMessageDialog::PopupMessage(vtkKWApplication *app, vtkKWWindow *win,
 }
 
 int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
-				   const char* name, 
-				   const char* title, const char* message,
-				   int options)
+                                   const char* name, 
+                                   const char* title, const char* message,
+                                   int options)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   dlg2->SetStyleToYesNo();
@@ -351,16 +351,16 @@ int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
 }
 
 int vtkKWMessageDialog::PopupYesNo(vtkKWApplication *app, vtkKWWindow *win,
-				   const char* title, 
-				   const char*message, int options)
+                                   const char* title, 
+                                   const char*message, int options)
 {
   return vtkKWMessageDialog::PopupYesNo(app, win, 0, title, message, 
-					options);
+                                        options);
 }
 
 int vtkKWMessageDialog::PopupOkCancel(vtkKWApplication *app, vtkKWWindow *win,
-				      const char* title, 
-				      const char*message, int options)
+                                      const char* title, 
+                                      const char*message, int options)
 {
   vtkKWMessageDialog *dlg2 = vtkKWMessageDialog::New();
   dlg2->SetStyleToOkCancel();

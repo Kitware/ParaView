@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro( vtkKWProgressGauge );
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
-			      int argc, char *argv[]);
+                              int argc, char *argv[]);
 
 
 vtkKWProgressGauge::vtkKWProgressGauge()
@@ -86,13 +86,13 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, char *args)
   wname = this->GetWidgetName();
   this->Script("frame %s", wname);
   this->Script("canvas %s.display -borderwidth 0  -highlightthickness 0 -width %d -height %d %s",
-	       wname, this->Length, this->Height, args);
+               wname, this->Length, this->Height, args);
   this->Script("pack %s.display -expand yes", wname);
   // initialize the bar color to the background so it does
   // not show up until used
   this->Script(
     "%s.display create rectangle 0 0 0 0 -outline \"\"  -tags bar", 
-	       wname );
+               wname );
   this->Script(
     "%s.display create text [expr 0.5 * %d] "
     "%d "
@@ -121,13 +121,13 @@ void vtkKWProgressGauge::SetValue(int value)
     this->Script("%s.display itemconfigure value -text {}", wname);
     this->Script("%s.display coords bar 0 0 0 0", wname);
     this->Script("%s.display itemconfigure bar -fill {}", 
-		 wname);
+                 wname);
     }
   else
     {
     // if the Value is not 0 then use the BarColor for the bar
     this->Script("%s.display itemconfigure bar -fill %s", 
-		 wname, this->BarColor);
+                 wname, this->BarColor);
     // Set the text to the percent done
     const char* textcolor = "-fill black";
     if(this->Value > 50)
@@ -136,10 +136,10 @@ void vtkKWProgressGauge::SetValue(int value)
       }
     
     this->Script("%s.display itemconfigure value -text {%3.0d%%} %s", 
-		 wname, this->Value, textcolor);
+                 wname, this->Value, textcolor);
     // Draw the correct rectangle
     this->Script("%s.display coords bar 0 0 [expr 0.01 * %d * [winfo width %s.display]] [winfo height %s.display]", 
-		 wname, this->Value, wname, wname);
+                 wname, this->Value, wname, wname);
     }
   // do an update
   this->Script("update idletasks");

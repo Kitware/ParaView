@@ -60,7 +60,7 @@ vtkStandardNewMacro( vtkKWCornerAnnotation );
 vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
-				int argc, char *argv[]);
+                                int argc, char *argv[]);
 
 vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 {
@@ -83,7 +83,7 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
     {
     this->CornerFrame[i] = vtkKWWidget::New();
     this->CornerFrame[i]->SetParent( 
-	     (i<2)?(this->CornerBottomFrame):(this->CornerTopFrame) );
+             (i<2)?(this->CornerBottomFrame):(this->CornerTopFrame) );
     this->CornerLabel[i] = vtkKWWidget::New();    
     this->CornerLabel[i]->SetParent(this->CornerFrame[i]);
     this->CornerText[i] = vtkKWText::New();
@@ -352,7 +352,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.25 $");
+  this->ExtractRevision(os,"$Revision: 1.26 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 

@@ -93,10 +93,10 @@ int vtkKWLoadSaveDialog::Invoke()
   this->Application->SetDialogUp(1);
   char *path = NULL;
   this->Script("%s -title \"%s\" -defaultextension {%s} "
-	       "-filetypes {%s} -initialdir {%s}", 
-	       (this->SaveDialog) ? "tk_getSaveFile" : "tk_getOpenFile", 
-	       this->Title, this->DefaultExt ? this->DefaultExt : "",
-	       this->FileTypes, this->InitialDir);
+               "-filetypes {%s} -initialdir {%s}", 
+               (this->SaveDialog) ? "tk_getSaveFile" : "tk_getOpenFile", 
+               this->Title, this->DefaultExt ? this->DefaultExt : "",
+               this->FileTypes, this->InitialDir);
   path = this->Application->GetMainInterp()->result;
   if ( path && strlen(path) )
     {

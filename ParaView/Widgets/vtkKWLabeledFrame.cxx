@@ -52,7 +52,7 @@ vtkStandardNewMacro( vtkKWLabeledFrame );
 
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
-		      int argc, char *argv[]);
+                      int argc, char *argv[]);
 
 vtkKWLabeledFrame::vtkKWLabeledFrame()
 {
@@ -131,10 +131,10 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app)
   if ( vtkKWLabeledFrame::AllowShowHide && this->ShowHideFrame )
     {
     this->Script("place %s -relx 1 -x -5 -y 2 -anchor ne",
-		 this->Icon->GetWidgetName());    
+                 this->Icon->GetWidgetName());    
     this->Script("bind %s <ButtonRelease-1> { %s PerformShowHideFrame }",
-		 this->Icon->GetWidgetName(),
-		 this->GetTclName());
+                 this->Icon->GetWidgetName(),
+                 this->GetTclName());
     this->Script("raise %s", this->Icon->GetWidgetName());
     }
 }
@@ -150,7 +150,7 @@ void vtkKWLabeledFrame::PerformShowHideFrame()
   else
     {
     this->Script("pack %s -fill both -expand yes",
-		 this->Frame->GetWidgetName());
+                 this->Frame->GetWidgetName());
     this->Displayed = 1;
     this->IconData->SetImageData(vtkKWIcon::ICON_SHRINK);
    }

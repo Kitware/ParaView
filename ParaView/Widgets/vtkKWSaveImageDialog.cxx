@@ -75,16 +75,16 @@ void vtkKWSaveImageDialog::Invoke()
       }
     path =  
       strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
-	     this->Application->GetMainInterp()->result);
+             this->Application->GetMainInterp()->result);
     if (strlen(path) == 0)
       {
       done = 1;
       }  
     else if (!strcmp(path + strlen(path) - 4,".bmp") ||
-	     !strcmp(path + strlen(path) - 4,".tif") ||
-	     !strcmp(path + strlen(path) - 4,".png") ||
-	     !strcmp(path + strlen(path) - 4,".jpg") ||
-	     !strcmp(path + strlen(path) - 4,".ppm"))
+             !strcmp(path + strlen(path) - 4,".tif") ||
+             !strcmp(path + strlen(path) - 4,".png") ||
+             !strcmp(path + strlen(path) - 4,".jpg") ||
+             !strcmp(path + strlen(path) - 4,".ppm"))
       {
       done = 1;
       }
@@ -95,8 +95,8 @@ void vtkKWSaveImageDialog::Invoke()
       dlg2->Create(this->Application,"");
       dlg2->SetText(
         "A valid file extension was not found.\\n"
-	"Please use a .bmp, .ppm, or .tif file extension\\n"
-	"when naming your file.");
+        "Please use a .bmp, .ppm, or .tif file extension\\n"
+        "when naming your file.");
       dlg2->SetOptions(dlg2->GetOptions() | vtkKWMessageDialog::ErrorIcon);
       dlg2->SetTitle("Save Image Error");
       dlg2->Invoke();

@@ -92,7 +92,7 @@ void vtkKWFrame::Create(vtkKWApplication *app, int scrollable)
     this->ScrollFrame->SetParent(this);
     this->ScrollFrame->Create(this->Application, "ScrollableFrame", "-height 1024");
     this->Script("%s setwidget %s", this->GetWidgetName(),
-		 this->ScrollFrame->GetWidgetName());
+                 this->ScrollFrame->GetWidgetName());
 
     this->Frame = vtkKWWidget::New();
     this->Frame->SetParent(this->ScrollFrame);

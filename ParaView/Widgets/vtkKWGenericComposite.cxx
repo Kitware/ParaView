@@ -54,7 +54,7 @@ vtkSetObjectImplementationMacro(vtkKWGenericComposite, Prop, vtkProp);
 
 
 int vtkKWGenericCompositeCommand(ClientData cd, Tcl_Interp *interp,
-				int argc, char *argv[]);
+                                int argc, char *argv[]);
 
 vtkKWGenericComposite::vtkKWGenericComposite()
 {

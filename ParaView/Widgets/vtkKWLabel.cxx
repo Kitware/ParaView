@@ -74,7 +74,7 @@ void vtkKWLabel::SetLabel(const char* l)
     {
     // if this has been created then change the text
     this->Script("%s configure -text {%s}", this->GetWidgetName(), 
-		 this->Label);
+                 this->Label);
     }
 }
 
@@ -97,7 +97,7 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
   if ( this->LineType == vtkKWLabel::MultiLine )
     {
     this->Script("message %s -text {%s} %s -width %d", 
-		 wname, this->Label, args, this->Width);
+                 wname, this->Label, args, this->Width);
     }
   else
     {
@@ -112,19 +112,19 @@ void vtkKWLabel::SetLineType( int type )
     if ( this->LineType != type )
       {
       this->Script("lindex [ %s configure -text ] 4", 
-		   this->GetWidgetName());
+                   this->GetWidgetName());
       char *str = this->Application->GetMainInterp()->result;
       this->Script("destroy %s", this->GetWidgetName());
       if ( this->LineType == vtkKWLabel::MultiLine )
-	{
-	this->Script("message %s -text {%s} -width %d", 
-		     this->GetWidgetName(), str, this->Width);
-	}
+        {
+        this->Script("message %s -text {%s} -width %d", 
+                     this->GetWidgetName(), str, this->Width);
+        }
       else
-	{
-	this->Script("label %s -text {%s}", 
-		     this->GetWidgetName(), str);
-	}		   
+        {
+        this->Script("label %s -text {%s}", 
+                     this->GetWidgetName(), str);
+        }                  
       }
     }
   this->LineType = type;

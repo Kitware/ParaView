@@ -84,13 +84,13 @@ int vtkKWDialog::Invoke()
     int width, height, x, y;
     int sw, sh;
     this->Script("concat [ winfo screenwidth %s ] [ winfo screenheight %s ]",
-		 this->GetMasterWindow()->GetWidgetName(), 
-		 this->GetMasterWindow()->GetWidgetName());
+                 this->GetMasterWindow()->GetWidgetName(), 
+                 this->GetMasterWindow()->GetWidgetName());
     sscanf(this->GetApplication()->GetMainInterp()->result,
-	   "%d %d", &sw, &sh);
+           "%d %d", &sw, &sh);
     this->Script("wm geometry %s", this->GetMasterWindow()->GetWidgetName());
     sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
-	   &width, &height, &x, &y);
+           &width, &height, &x, &y);
     x += width/2;
     y += height/2;
     if ( x > sw - 200 )
@@ -103,7 +103,7 @@ int vtkKWDialog::Invoke()
       }
 
     this->Script("wm geometry %s +%d+%d", this->GetWidgetName(),
-		 x, y);
+                 x, y);
     }
   this->Script("update idletasks");
 
@@ -188,7 +188,7 @@ void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
   if (this->MasterWindow)
     {
     this->Script("wm transient %s %s", wname, 
-		 this->MasterWindow->GetWidgetName());
+                 this->MasterWindow->GetWidgetName());
     }
 
 }
@@ -211,10 +211,10 @@ void vtkKWDialog::SetMasterWindow(vtkKWWindow* win)
       { 
       this->MasterWindow->Register(this); 
       if (this->Application)
-	{
-	this->Script("wm transient %s %s", this->GetWidgetName(), 
-		     this->MasterWindow->GetWidgetName());
-	}
+        {
+        this->Script("wm transient %s %s", this->GetWidgetName(), 
+                     this->MasterWindow->GetWidgetName());
+        }
       } 
     this->Modified(); 
     } 
@@ -231,7 +231,7 @@ void vtkKWDialog::SetTitle( const char* title )
   if (this->Application)
     {
     this->Script("wm title %s \"%s\"", this->GetWidgetName(), 
-		 title);
+                 title);
     }
   else
     {

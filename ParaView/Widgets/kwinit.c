@@ -9375,7 +9375,7 @@ int vxprintf(
       case etORDINAL:
       case etRADIX:
         if( flag_long )  longvalue = va_arg(ap,long);
-	else             longvalue = va_arg(ap,int);
+        else             longvalue = va_arg(ap,int);
 #ifdef etCOMPATIBILITY
         /* For the format %#x, the value zero is printed "0" not "0x0".
         ** I think this is stupid. */
@@ -9395,7 +9395,7 @@ int vxprintf(
         }else                        prefix = 0;
         if( flag_zeropad && precision<width-(prefix!=0) ){
           precision = width-(prefix!=0);
-	}
+        }
         bufpt = &buf[etBUFSIZE];
         if( xtype==etORDINAL ){
           long a,b;
@@ -9425,18 +9425,18 @@ int vxprintf(
             *(--bufpt) = cset[longvalue%base];
             longvalue = longvalue/base;
           }while( longvalue>0 );
-	}
+        }
         length = vtkConvertToLong((void*)&buf[etBUFSIZE])-vtkConvertToLong(bufpt);
         for(idx=precision-length; idx>0; idx--){
           *(--bufpt) = '0';                             /* Zero pad */
-	}
+        }
         if( prefix ) *(--bufpt) = prefix;               /* Add sign */
         if( flag_alternateform && infop->prefix ){      /* Add "0" or "0x" */
           char *pre, x;
           pre = infop->prefix;
           if( *bufpt!=pre[0] ){
             for(pre=infop->prefix; (x=(*pre))!=0; pre++) *(--bufpt) = x;
-	  }
+          }
         }
         length = vtkConvertToLong(&buf[etBUFSIZE])-vtkConvertToLong(bufpt);
         break;
@@ -9450,11 +9450,11 @@ int vxprintf(
         if( realvalue<0.0 ){
           realvalue = -realvalue;
           prefix = '-';
-	}else{
+        }else{
           if( flag_plussign )          prefix = '+';
           else if( flag_blanksign )    prefix = ' ';
           else                         prefix = 0;
-	}
+        }
         if( infop->type==etGENERIC && precision>0 ) precision--;
         rounder = 0.0;
 #ifdef COMPATIBILITY
@@ -9478,7 +9478,7 @@ int vxprintf(
             length = 3;
             break;
           }
-	}
+        }
         bufpt = buf;
         /*
         ** If the field type is etGENERIC, then convert to either etEXP
@@ -9497,9 +9497,9 @@ int vxprintf(
             precision = precision - exp;
             xtype = etFLOAT;
           }
-	}else{
+        }else{
           flag_rtz = 0;
-	}
+        }
         /*
         ** The "exp+precision" test causes output to be of type etEXP if
         ** the precision is too large to fit in buf[].
@@ -9521,7 +9521,7 @@ int vxprintf(
             if( bufpt>=buf && *bufpt=='.' ) *(bufpt--) = 0;
           }
           bufpt++;                            /* point to next free slot */
-	}else{    /* etEXP or etGENERIC */
+        }else{    /* etEXP or etGENERIC */
           flag_dp = (precision>0 || flag_alternateform);
           if( prefix ) *(bufpt++) = prefix;   /* Sign */
           *(bufpt++) = et_getdigit(&realvalue,&nsd);  /* First digit */
@@ -9540,11 +9540,11 @@ int vxprintf(
             if( exp>=100 ){
               *(bufpt++) = (exp/100)+'0';                /* 100's digit */
               exp %= 100;
-  	    }
+            }
             *(bufpt++) = exp/10+'0';                     /* 10's digit */
             *(bufpt++) = exp%10+'0';                     /* 1's digit */
           }
-	}
+        }
         /* The converted number is in buf[] and zero terminated. Output it.
         ** Note that the number is in the usual order, not reversed as with
         ** integer conversions. */
@@ -9580,9 +9580,9 @@ int vxprintf(
         if( precision>=0 ){
           for(idx=1; idx<precision; idx++) buf[idx] = c;
           length = precision;
-	}else{
+        }else{
           length =1;
-	}
+        }
         bufpt = buf;
         break;
       case etSTRING:
@@ -9655,7 +9655,7 @@ int vxprintf(
           nspace = nspace/2;
           width -= nspace;
           flag_leftjustify = 1;
-	}
+        }
         count += nspace;
         while( nspace>=etSPACESIZE ){
           (*func)(arg,spaces,etSPACESIZE);
@@ -10140,16 +10140,16 @@ static int Et_FileHandle(ClientData notUsed, int dir, ClientData *handlePtr){
 ** This is the channel type that will access the built-in files.
 */
 static Tcl_ChannelType builtinChannelType = {
-    "builtin",			/* Type name. */
-    NULL,			/* Always non-blocking.*/
-    Et_FileClose,		/* Close proc. */
-    Et_FileInput,		/* Input proc. */
-    Et_FileOutput,		/* Output proc. */
-    Et_FileSeek,		/* Seek proc. */
-    NULL,			/* Set option proc. */
-    NULL,			/* Get option proc. */
-    Et_FileWatch,		/* Watch for events on console. */
-    Et_FileHandle,		/* Get a handle from the device. */
+    "builtin",                  /* Type name. */
+    NULL,                       /* Always non-blocking.*/
+    Et_FileClose,               /* Close proc. */
+    Et_FileInput,               /* Input proc. */
+    Et_FileOutput,              /* Output proc. */
+    Et_FileSeek,                /* Seek proc. */
+    NULL,                       /* Set option proc. */
+    NULL,                       /* Get option proc. */
+    Et_FileWatch,               /* Watch for events on console. */
+    Et_FileHandle,              /* Get a handle from the device. */
     0
 #if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 3)
     ,0, 0, 0

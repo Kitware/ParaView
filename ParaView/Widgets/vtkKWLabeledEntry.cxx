@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro( vtkKWLabeledEntry );
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
-			     int argc, char *argv[]);
+                             int argc, char *argv[]);
 
 vtkKWLabeledEntry::vtkKWLabeledEntry()
 {
@@ -96,7 +96,7 @@ void vtkKWLabeledEntry::Create(vtkKWApplication *app)
   this->Entry->Create(app, "");
 
   this->Script("pack %s %s -side left", this->Label->GetWidgetName(),
-	       this->Entry->GetWidgetName());
+               this->Entry->GetWidgetName());
 }
 
 void vtkKWLabeledEntry::SetValue(const char *value)

@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro( vtkKWVolumeComposite );
 
 int vtkKWVolumeCompositeCommand(ClientData cd, Tcl_Interp *interp,
-				int argc, char *argv[]);
+                                int argc, char *argv[]);
 
 vtkKWVolumeComposite::vtkKWVolumeComposite()
 {
@@ -110,12 +110,12 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
   
   this->HiResTextureID = 
     this->LODVolume->AddLOD( this->HiResTextureMapper,
-			     this->VolumeProperty, 0.0 );
+                             this->VolumeProperty, 0.0 );
   this->LODVolume->SetLODLevel( this->HiResTextureID, 1.0 );
 
   this->RayCastID = 
     this->LODVolume->AddLOD( this->RayCastMapper,
-			     this->VolumeProperty, 11.0 );
+                             this->VolumeProperty, 11.0 );
   this->LODVolume->SetLODLevel( this->HiResTextureID, 0.0 );
 
   this->LowResTextureID   = -1;
@@ -516,7 +516,7 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.37 $");
+  this->ExtractRevision(os,"$Revision: 1.38 $");
 }
 
 vtkProp *vtkKWVolumeComposite::GetProp() 
@@ -542,7 +542,7 @@ void vtkKWVolumeComposite::DeregisterIntermixIntersectingGeometry()
     {
     this->UseIntermixIntersectingGeometry = 0;
     vtkErrorMacro("Reference count for intermix intersecting geometry cannot "
-		  "be less than zero.");
+                  "be less than zero.");
     }
   else
     {

@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkStandardNewMacro( vtkKWMenuButton );
 
 int vtkKWMenuButtonCommand(ClientData cd, Tcl_Interp *interp,
-		      int argc, char *argv[]);
+                      int argc, char *argv[]);
 
 vtkKWMenuButton::vtkKWMenuButton()
 {
@@ -74,7 +74,7 @@ void vtkKWMenuButton::Create(vtkKWApplication *app, char* /*args*/)
 
   this->Menu->SetParent(this);
   this->Script("menubutton %s -menu %s -relief raised -bd 2", 
-	       this->GetWidgetName(), this->Menu->GetWidgetName());
+               this->GetWidgetName(), this->Menu->GetWidgetName());
 
   // Should the args be passed through?
   this->Menu->Create(app, "");  
@@ -84,12 +84,12 @@ void vtkKWMenuButton::Create(vtkKWApplication *app, char* /*args*/)
 void vtkKWMenuButton::SetButtonText(const char *text)
 {
     this->Script("%s configure -text {%s}",
-		 this->GetWidgetName(), text);
+                 this->GetWidgetName(), text);
 }
 
 void vtkKWMenuButton::AddCommand(const char* label, vtkKWObject* Object,
-				 const char* MethodAndArgString,
-				 const char* help)
+                                 const char* MethodAndArgString,
+                                 const char* help)
 {
   this->Menu->AddCommand(label, Object, MethodAndArgString, help);
 }

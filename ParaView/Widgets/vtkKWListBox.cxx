@@ -49,7 +49,7 @@ vtkStandardNewMacro( vtkKWListBox );
 
 
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
-			int argc, char *argv[]);
+                        int argc, char *argv[]);
 
 vtkKWListBox::vtkKWListBox()
 {   
@@ -99,7 +99,7 @@ const char* vtkKWListBox::GetItem(int index)
 int vtkKWListBox::GetSelectionIndex()
 {
   this->Script("%s curselection", this->Listbox->GetWidgetName(),
-	       this->GetWidgetName());
+               this->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
   if ( strlen(result)>0 )
     {
@@ -116,7 +116,7 @@ const char *vtkKWListBox::GetSelection()
     return 0;
     }
   this->Script("%s get [%s curselection]", this->Listbox->GetWidgetName(),
-	       this->Listbox->GetWidgetName());
+               this->Listbox->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
   this->CurrentSelection = strcpy(new char[strlen(result)+1], result);
   return this->CurrentSelection;
@@ -131,10 +131,10 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
 
  
 void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj, 
-					  const char* methodAndArgs)
+                                          const char* methodAndArgs)
 {
   this->Script("bind %s <Double-1> {%s %s}", this->Listbox->GetWidgetName(),
-	       obj->GetTclName(), methodAndArgs);
+               obj->GetTclName(), methodAndArgs);
 }
 
 

@@ -116,10 +116,10 @@ void vtkKWTclInteractor::SetMasterWindow(vtkKWWindow* win)
       { 
       this->MasterWindow->Register(this); 
       if (this->Application)
-	{
-	this->Script("wm transient %s %s", this->GetWidgetName(), 
-		     this->MasterWindow->GetWidgetName());
-	}
+        {
+        this->Script("wm transient %s %s", this->GetWidgetName(), 
+                     this->MasterWindow->GetWidgetName());
+        }
       } 
     this->Modified(); 
     } 
@@ -147,7 +147,7 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   if (this->MasterWindow)
     {
     this->Script("wm transient %s %s", wname, 
-		 this->MasterWindow->GetWidgetName());
+                 this->MasterWindow->GetWidgetName());
     }
   
   this->ButtonFrame->SetParent(this);
@@ -232,11 +232,11 @@ void vtkKWTclInteractor::Evaluate()
                this->CommandEntry->GetValue());
   this->Script("%s insert end \"\n\"", this->DisplayText->GetWidgetName());
   this->Script("catch {eval [list %s]} _tmp_err",  
-	       this->CommandEntry->GetValue());
+               this->CommandEntry->GetValue());
   this->Script("set _tmp_err");
   this->Script("%s insert end {%s}", 
-	       this->DisplayText->GetWidgetName(),
-	       this->Application->GetMainInterp()->result);
+               this->DisplayText->GetWidgetName(),
+               this->Application->GetMainInterp()->result);
   this->Script("%s insert end \"\n\n\"", this->DisplayText->GetWidgetName());
   this->Script("%s configure -state disabled",
                this->DisplayText->GetWidgetName());

@@ -106,7 +106,7 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
 
   this->Frame->Create(app, "frame", "");
   this->Script("pack %s -side left -expand yes   -anchor nw ",
-	       this->Frame->GetWidgetName());
+               this->Frame->GetWidgetName());
 
 
 }
@@ -134,10 +134,10 @@ void vtkKWToolbar::UpdateWidgets()
       {
       vtkKWWidget* widget = 0;
       if (it->GetData(widget) == VTK_OK)
-	{
-	this->Script("winfo reqwidth %s", widget->GetWidgetName());
-	totReqWidth += this->GetIntegerResult(this->Application);
-	}
+        {
+        this->Script("winfo reqwidth %s", widget->GetWidgetName());
+        totReqWidth += this->GetIntegerResult(this->Application);
+        }
       it->GoToNextItem();
       }
 
@@ -154,17 +154,17 @@ void vtkKWToolbar::UpdateWidgets()
       it->InitTraversal();
       int num = 0;
       while ( !it->IsDoneWithTraversal() )
-	{
-	vtkKWWidget* widget = 0;
-	if (it->GetData(widget) == VTK_OK)
-	  {
-	  s << "grid " << widget->GetWidgetName() << " -row " 
-	    << row << " -column " << num << " -sticky nsew " << endl;
-	  num++;
-	  if ( num == numPerRow ) { row++; num=0;}
-	  }
-	it->GoToNextItem();
-	}
+        {
+        vtkKWWidget* widget = 0;
+        if (it->GetData(widget) == VTK_OK)
+          {
+          s << "grid " << widget->GetWidgetName() << " -row " 
+            << row << " -column " << num << " -sticky nsew " << endl;
+          num++;
+          if ( num == numPerRow ) { row++; num=0;}
+          }
+        it->GoToNextItem();
+        }
       s << ends;
       this->Script(s.str());
       s.rdbuf()->freeze(0);
