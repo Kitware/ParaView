@@ -2,3 +2,4 @@ PLATFORM="darwin"
 CC="cc"
 CXX="c++"
 CMAKE="/Users/kitware/Nightly/CMakeRelease-install/bin/cmake"
+export DISPLAY=

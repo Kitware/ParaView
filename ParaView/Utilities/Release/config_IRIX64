@@ -2,3 +2,4 @@ PLATFORM="irix64"
 CC="cc"
 CXX="CC"
 CMAKE="/home/sci/itk/CMake-CC-dashboard/bin/cmake"
+export DISPLAY=:0.0
