@@ -28,7 +28,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.18");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.19");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -266,23 +266,12 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
     this->LogStream->flush();
     }
 
-  // Report an error if the command failed with an error message.
+  // If the command failed with an error message, invoke the error
+  // event so observers can handle the error.
   if(!result)
     {
-    const char* errorMessage;
-    if(this->LastResultMessage->GetNumberOfMessages() > 0 &&
-       this->LastResultMessage->GetCommand(0) ==
-       vtkClientServerStream::Error &&
-       this->LastResultMessage->GetArgument(0, 0, &errorMessage))
-      {
-      ostrstream error;
-      error << "\nwhile processing\n";
-      css.PrintMessage(error, message);
-      error << ends;
-      vtkErrorMacro(<< errorMessage << error.str());
-      error.rdbuf()->freeze(0);
-      abort();
-      }
+    vtkClientServerInterpreterErrorCallbackInfo info = {&css, message};
+    this->InvokeEvent(vtkCommand::ErrorEvent, &info);
     }
 
   return result;

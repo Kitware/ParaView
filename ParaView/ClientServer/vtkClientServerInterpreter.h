@@ -56,6 +56,18 @@ typedef int (*vtkClientServerNewInstanceFunction)(vtkClientServerInterpreter*,
                                                   const char* name,
                                                   vtkClientServerID id);
 
+// Description:
+// A pointer to this struct is sent as call data when an ErrorEvent is
+// invoked by the interpreter.
+struct vtkClientServerInterpreterErrorCallbackInfo
+{
+  // The stream containing the message causing the error.
+  const vtkClientServerStream* css;
+
+  // The message index with in the stream that caused the error.
+  int message;
+};
+
 class VTK_CLIENT_SERVER_EXPORT vtkClientServerInterpreter : public vtkObject
 {
 public:
