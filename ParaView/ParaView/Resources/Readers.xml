@@ -348,4 +348,20 @@
 
  </Module>
 #endif
+#ifdef PARAVIEW_USE_SAF
+ <Module name="SAFReader" root_name="SAFReader" 
+    output="vtkUnstructuredGrid" 
+    class="vtkPVAdvancedReaderModule" module_type="Reader" extensions=".saf" 
+    file_description="SAF Reader">
+  <Source class="vtkSAFPVReader"/>
+
+  <Scale variable="TimeStep" type="int" label="Time step" trace_name="TimeStep"
+    help="Set the current timestep." range_source="TimeStepRange" />
+
+  <ArraySelection trace_name="variable_sel" attribute_name="Variable"  />
+ 
+  <ArraySelection trace_name="block_sel" attribute_name="Block"  />
+ 
+ </Module>
+#endif
 </ModuleInterfaces>
