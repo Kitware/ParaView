@@ -1610,4 +1610,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << (this->OutputClassName?this->OutputClassName:"null") << endl;
   os << indent << "SourceClassName: " 
      << (this->SourceClassName?this->SourceClassName:"null") << endl;
+  os << indent << "HideParametersPage: " << this->HideParametersPage << endl;
+  os << indent << "HideDisplayPage: " << this->HideDisplayPage << endl;
 }

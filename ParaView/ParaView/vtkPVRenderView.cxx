@@ -1347,5 +1347,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "StillRenderTime: " << this->GetStillRenderTime() << endl;
   os << indent << "TriangleStripsCheck: " << this->GetTriangleStripsCheck() << endl;
   os << indent << "UseReductionFactor: " << this->GetUseReductionFactor() << endl;
+  os << indent << "DisableRenderingFlag: " 
+     << (this->DisableRenderingFlag ? "on" : "off") << endl;
 }
 

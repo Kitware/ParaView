@@ -530,4 +530,11 @@ void vtkPVColorMap::UpdateScalarBarTitle()
 void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "VectorComponent: " << this->VectorComponent << endl;
+  os << indent << "LookupTableTclName: " 
+     << (this->LookupTableTclName ? this->LookupTableTclName : "none" )
+     << endl;
+  os << indent << "ScalarBarTclName: " 
+     << (this->ScalarBarTclName ? this->ScalarBarTclName : "none" )
+     << endl;
 }

@@ -120,7 +120,7 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
   int bbox[4];
   int bboxIn[4], bboxOut[4], bboxSource[4];
   vtkPVData *moreOut;
-  static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
+  static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";  
   
   this->Script("pack forget %s", this->ScrollBar->GetWidgetName());
 

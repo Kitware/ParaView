@@ -288,6 +288,8 @@ void vtkPVPlaneWidget::SaveInTclScript(ofstream *file)
 void vtkPVPlaneWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "PlaneTclName: " 
+     << ( this->PlaneTclName ? this->PlaneTclName : "none" ) << endl;
 }
 
 vtkPVPlaneWidget* vtkPVPlaneWidget::ClonePrototype(vtkPVSource* pvSource,

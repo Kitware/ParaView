@@ -25,7 +25,7 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVEnSightVerifier, "1.3");
+vtkCxxRevisionMacro(vtkPVEnSightVerifier, "1.4");
 vtkStandardNewMacro(vtkPVEnSightVerifier);
 
 vtkCxxSetObjectMacro(vtkPVEnSightVerifier, Controller, 
@@ -351,6 +351,7 @@ void vtkPVEnSightVerifier::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PieceCaseFileName: "
      << (this->PieceCaseFileName ? this->PieceCaseFileName : "(none)") << endl;
   os << indent << "Last error: " << this->LastError << endl;
-  os << indent << "EnSight version: " << this-EnSightVersion << endl;
+  os << indent << "EnSight version: " << this->EnSightVersion << endl;
+  os << indent << "Controller: " << this->Controller << endl;
 }
 

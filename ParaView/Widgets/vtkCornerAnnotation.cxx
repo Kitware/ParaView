@@ -411,4 +411,6 @@ void vtkCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "WindowLevel: " << this->GetWindowLevel() << endl;
   os << indent << "Mapper: " << this->GetMapper() << endl;
   os << indent << "MaximumLineHeight: " << this->MaximumLineHeight << endl;
+  os << indent << "LevelShift: " << this->LevelShift << endl;
+  os << indent << "LevelScale: " << this->LevelScale << endl;
 }

@@ -948,4 +948,6 @@ void vtkPVProbe::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "Dimensionality: " << this->GetDimensionality() << endl;
   os << indent << "ShowXYPlotToggle: " << this->GetShowXYPlotToggle() << endl;
+  os << indent << "NumberOfLineDivisions: " 
+     << this->NumberOfLineDivisions << endl;
 }

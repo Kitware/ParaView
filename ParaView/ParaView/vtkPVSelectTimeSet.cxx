@@ -391,3 +391,12 @@ int vtkPVSelectTimeSet::ReadXMLAttributes(vtkPVXMLElement* element,
   
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSelectTimeSet::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "TimeValue: " << this->TimeValue << endl;
+  os << indent << "Frame: " << this->Frame << endl;
+  os << indent << "Reader: " << this->Reader << endl;
+}

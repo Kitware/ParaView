@@ -1271,6 +1271,8 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Controller: " << this->Controller << endl;;
   os << indent << "MajorVersion: " << this->MajorVersion << endl;
   os << indent << "MinorVersion: " << this->MinorVersion << endl;
+  os << indent << "RunningParaViewScript: " 
+     << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
