@@ -58,8 +58,10 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Set the text of the message
-  void SetText(const char *);
+  // Set the text of the message (and the width of a line, in pixels)
+  virtual void SetText(const char *);
+  virtual void SetTextWidth(int);
+  virtual int GetTextWidth();
 
   // Description:
   // Invoke the dialog and display it in a modal manner. 
@@ -158,7 +160,7 @@ public:
 
   // Description:
   // Set the icon on the message dialog.
-  void SetIcon();
+  virtual void SetIcon();
 
   // Description:
   // Accessor for OK and cancel button

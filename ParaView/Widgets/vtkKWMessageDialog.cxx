@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.55");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.56");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -262,10 +262,29 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 void vtkKWMessageDialog::SetText(const char *txt)
 {
   this->SetDialogText(txt);
-  if ( this->Label )
+  if (this->Label)
     {
     this->Label->SetLabel(this->DialogText);
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMessageDialog::SetTextWidth(int w)
+{
+  if (this->Label)
+    {
+    this->Label->SetWidth(w);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMessageDialog::GetTextWidth()
+{
+  if (this->Label)
+    {
+    return this->Label->GetWidth();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
