@@ -17,7 +17,7 @@ if {[info exists argc]} {
 } 
 
 $kw(vtkTemp44) SetOrientationAxesVisibility 0
-$kw(vtkTemp44) SetBackgroundColor 0 0 0
+$kw(vtkTemp44) SetRendererBackgroundColor 0 0 0
 set kw(vtkTemp92) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp96) [$kw(vtkTemp1) GetPVSource GlyphSources Cone0]
 set kw(vtkTemp100) [$kw(vtkTemp1) GetPVSource GlyphSources Sphere0]

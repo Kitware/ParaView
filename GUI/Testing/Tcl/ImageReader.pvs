@@ -17,7 +17,7 @@ if {[info exists argc]} {
 } 
 
 $pv(vtkTemp43) SetOrientationAxesVisibility 0
-$pv(vtkTemp43) SetBackgroundColor 0 0 0
+$pv(vtkTemp43) SetRendererBackgroundColor 0 0 0
 
 set pv(vtkTemp603) [$pv(vtkTemp1) InitializeReadCustom "ImageReader" "$DataDir/Data/headsq/quarter.1"]
 $pv(vtkTemp1) ReadFileInformation $pv(vtkTemp603) "$DataDir/Data/headsq/quarter.1"

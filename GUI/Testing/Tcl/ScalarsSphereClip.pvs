@@ -19,7 +19,7 @@ if {[info exists argc]} {
 # Test the option of cliping with scalars and a sphere.
 
 $kw(vtkTemp29) SetOrientationAxesVisibility 0    
-$kw(vtkTemp29) SetBackgroundColor 0 0 0
+$kw(vtkTemp29) SetRendererBackgroundColor 0 0 0
 set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
 $kw(vtkTemp224) AcceptCallback
 set kw(vtkTemp288) [$kw(vtkTemp1) CreatePVSource Clip]

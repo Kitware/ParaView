@@ -14,7 +14,7 @@ if {[info exists argc]} {
 } 
 
 $kw(vtkTemp16) SetOrientationAxesVisibility 0
-$kw(vtkTemp16) SetBackgroundColor 0 0 0
+$kw(vtkTemp16) SetRendererBackgroundColor 0 0 0
 set kw(vtkTemp213) [$kw(vtkTemp1) CreatePVSource RTAnalyticSource]
 $kw(vtkTemp213) AcceptCallback
 set kw(vtkTemp273) [$kw(vtkTemp1) CreatePVSource Probe]

@@ -50,7 +50,7 @@ $kw(vtkTemp1) ResetCameraCallback
 
 set kw(vtkTemp209) [$kw(vtkTemp1) CreatePVSource Clip]
 
-$kw(vtkTemp44) SetBackgroundColor 1.000000 0.000000 0.501961
+$kw(vtkTemp44) SetRendererBackgroundColor 1.000000 0.000000 0.501961
 
 set BoundsDisplay [$kw(vtkTemp209) GetPVWidget {Input Bounds}]
 puts $fp [[$BoundsDisplay GetWidget] GetBounds]

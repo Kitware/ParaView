@@ -29,7 +29,7 @@ $kw(vtkTemp290) SetValue 16
 set kw(vtkTemp299) [$kw(vtkTemp273) GetPVWidget {Phi Resolution}]
 $kw(vtkTemp299) SetValue 16
 $kw(vtkTemp273) AcceptCallback
-$kw(vtkTemp22) SetBackgroundColor 0.000000 0.000000 0.000000
+$kw(vtkTemp22) SetRendererBackgroundColor 0.000000 0.000000 0.000000
 set kw(vtkTemp327) [$kw(vtkTemp1) CreatePVSource SphereSource]
 set kw(vtkTemp336) [$kw(vtkTemp327) GetPVWidget {Center}]
 $kw(vtkTemp336) SetValue 2 0 0

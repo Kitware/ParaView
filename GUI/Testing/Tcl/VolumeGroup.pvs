@@ -144,7 +144,7 @@ $kw(vtkTemp1404) AcceptCallback
 set kw(vtkTemp1438) [$kw(vtkTemp1404) GetPVOutput]
 $kw(vtkTemp1438) DrawSurface
 $kw(vtkTemp1438) ColorByPointField {RTData} 1
-$kw(vtkTemp17) SetBackgroundColor 0 0 0
+$kw(vtkTemp17) SetRendererBackgroundColor 0 0 0
 $kw(vtkTemp17) SetCameraState 12.8281 -41.2598 -35.7789 -1.86549 10.1548 8.9481 -0.780543 -0.522102 0.343747
 
 # Retrace

@@ -40,7 +40,7 @@ proc AdjustContourValue { cnt val } {
 
 
 $pv(vtkTemp43) SetOrientationAxesVisibility 0
-$pv(vtkTemp43) SetBackgroundColor 0 0 0
+$pv(vtkTemp43) SetRendererBackgroundColor 0 0 0
 
 #change to rotate camera interactor style
 $pvWindow ChangeInteractorStyle 1

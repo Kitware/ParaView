@@ -111,7 +111,7 @@ set kw(vtkTemp1356) [$kw(vtkTemp1320) GetPVOutput]
 $kw(vtkTemp1356) DrawSurface
 $kw(vtkTemp1356) ChangeActorColor 0.517647 1 0.035294
 $kw(vtkTemp1356) SetActorTranslate 0 -0.126582 0
-$kw(vtkTemp17) SetBackgroundColor 0 0 0
+$kw(vtkTemp17) SetRendererBackgroundColor 0 0 0
 $kw(vtkTemp17) SetCameraState -2.36222 -1.38908 3.13496 1.93014 1.1332 -0.999191 -0.0779149 0.931913 0.354215
 
 # Retrace

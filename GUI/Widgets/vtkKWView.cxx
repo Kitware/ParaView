@@ -86,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.132");
+vtkCxxRevisionMacro(vtkKWView, "1.133");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -182,7 +182,7 @@ vtkKWView::vtkKWView()
   this->GeneralProperties = vtkKWFrame::New();
 
   this->ColorsFrame = vtkKWLabeledFrame::New();
-  this->BackgroundColor = vtkKWChangeColorButton::New();
+  this->RendererBackgroundColor = vtkKWChangeColorButton::New();
 
   this->Printing = 0;
   
@@ -245,7 +245,7 @@ vtkKWView::~vtkKWView()
     }
   this->GeneralProperties->Delete();
   this->ColorsFrame->Delete();
-  this->BackgroundColor->Delete();
+  this->RendererBackgroundColor->Delete();
 
   this->AnnotationProperties->Delete();
   this->HeaderComposite->Delete();
@@ -529,15 +529,17 @@ void vtkKWView::CreateViewProperties()
                this->ColorsFrame->GetWidgetName());
 
   double c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
-  this->BackgroundColor->SetParent( this->ColorsFrame->GetFrame() );
-  this->BackgroundColor->SetColor( c );
-  this->BackgroundColor->SetText("Set Background Color");
-  this->BackgroundColor->Create( app, "" );
-  this->BackgroundColor->SetCommand( this, "SetBackgroundColor" );
-  this->BackgroundColor->SetBalloonHelpString("Set the background color");
-  this->BackgroundColor->SetDialogText("Background Color");
+  this->RendererBackgroundColor->SetParent( this->ColorsFrame->GetFrame() );
+  this->RendererBackgroundColor->SetColor( c );
+  this->RendererBackgroundColor->SetText("Set Background Color");
+  this->RendererBackgroundColor->Create( app, "" );
+  this->RendererBackgroundColor->SetCommand(
+    this, "SetRendererBackgroundColor");
+  this->RendererBackgroundColor->SetBalloonHelpString(
+    "Set the background color");
+  this->RendererBackgroundColor->SetDialogText("Background Color");
   this->Script("pack %s -side top -padx 15 -pady 4 -expand 1 -fill x",
-               this->BackgroundColor->GetWidgetName());
+               this->RendererBackgroundColor->GetWidgetName());
 
   this->PropertiesCreated = 1;
 }
@@ -1491,8 +1493,8 @@ void vtkKWView::SerializeSelf(ostream& os, vtkIndent indent)
     os << indent << "HeaderColor ";
     this->HeaderColor->Serialize(os,indent);
 
-    os << indent << "BackgroundColor ";
-    this->BackgroundColor->Serialize(os,indent);
+    os << indent << "RendererBackgroundColor ";
+    this->RendererBackgroundColor->Serialize(os,indent);
     }
 }
 
@@ -1552,9 +1554,9 @@ void vtkKWView::SerializeToken(istream& is, const char *token)
     return;
     }
   
-  if (!strcmp(token,"BackgroundColor"))
+  if (!strcmp(token,"RendererBackgroundColor"))
     {
-    this->BackgroundColor->Serialize(is);
+    this->RendererBackgroundColor->Serialize(is);
     return;
     }
 
@@ -1566,7 +1568,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.132 $");
+  this->ExtractRevision(os,"$Revision: 1.133 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1632,7 +1634,7 @@ void vtkKWView::SetRendererBackgroundColor( double r, double g, double b )
     return;
     }
 
-  this->BackgroundColor->SetColor( r, g, b );
+  this->RendererBackgroundColor->SetColor( r, g, b );
   this->GetRenderer()->SetBackground( r, g, b );
   this->Render();
   float color[3];
@@ -1708,7 +1710,7 @@ void vtkKWView::UpdateEnableState()
   this->PropagateEnableState(this->HeaderEntry);
   this->PropagateEnableState(this->GeneralProperties);
   this->PropagateEnableState(this->ColorsFrame);
-  this->PropagateEnableState(this->BackgroundColor);
+  this->PropagateEnableState(this->RendererBackgroundColor);
 }
 
 //----------------------------------------------------------------------------

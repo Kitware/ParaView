@@ -17,7 +17,7 @@ if {[info exists argc]} {
 } 
 
 $pv(vtkTemp43) SetOrientationAxesVisibility 0
-$pv(vtkTemp43) SetBackgroundColor 0 0 0
+$pv(vtkTemp43) SetRendererBackgroundColor 0 0 0
 set kw(vtkTemp2) [$Application GetMainWindow]
 set kw(vtkTemp18) [$kw(vtkTemp2) GetMainView]
 set kw(vtkTemp601) [$kw(vtkTemp2) CreatePVSource SphereSource]

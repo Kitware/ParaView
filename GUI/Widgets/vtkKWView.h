@@ -409,7 +409,7 @@ protected:
 
   vtkKWFrame             *GeneralProperties;
   vtkKWLabeledFrame      *ColorsFrame;
-  vtkKWChangeColorButton *BackgroundColor;
+  vtkKWChangeColorButton *RendererBackgroundColor;
 
   //vtkRenderer            *Renderer;
   //vtkRenderWindow        *RenderWindow;
