@@ -2,19 +2,19 @@ PROJECT(KWCommon)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
 SET( KWCommon_SRCS
-vtkContainer.cxx
-vtkKWArguments.cxx
-vtkKWDirectoryUtilities.cxx
-vtkKWEvent.cxx
-vtkKWIcon.cxx
-vtkKWMath.cxx
-vtkKWProcessStatistics.cxx
-vtkKWRegisteryUtilities.cxx
-vtkKWRemoteExecute.cxx
-vtkKWSerializer.cxx
-vtkQueue.cxx
-vtkString.cxx
-)
+  vtkContainer.cxx
+  vtkKWArguments.cxx
+  vtkKWDirectoryUtilities.cxx
+  vtkKWEvent.cxx
+  vtkKWIcon.cxx
+  vtkKWMath.cxx
+  vtkKWProcessStatistics.cxx
+  vtkKWRegisteryUtilities.cxx
+  vtkKWRemoteExecute.cxx
+  vtkKWSerializer.cxx
+  vtkQueue.cxx
+  vtkString.cxx
+  )
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkContainer
@@ -89,7 +89,7 @@ ENDIF (NOT DO_NOT_BUILD_XML_RW)
 IF (WIN32)
   SET( KWCommon_SRCS ${KWCommon_SRCS}
     vtkKWWin32RegisteryUtilities.cxx
-  )
+    )
   SET_SOURCE_FILES_PROPERTIES(
     vtkKWWin32RegisteryUtilities
     WRAP_EXCLUDE
@@ -98,19 +98,31 @@ ELSE (WIN32)
   ADD_DEFINITIONS(-D_HPUX_SOURCE)
   SET( KWCommon_SRCS ${KWCommon_SRCS}
     vtkKWUNIXRegisteryUtilities.cxx
-  )
+    )
   SET_SOURCE_FILES_PROPERTIES(
     vtkKWUNIXRegisteryUtilities
     WRAP_EXCLUDE
     )
 ENDIF (WIN32)
 
-VTK_WRAP_TCL2(vtkKWCommonTCL KWCommonTCL_SRCS ${KWCommon_SRCS})
-ADD_LIBRARY(vtkKWCommonTCL ${KWCommonTCL_SRCS} ${KWCommon_SRCS})
+IF(ParaView_SOURCE_DIR)
+  IF(VTK_ZLIB_INCLUDE_DIRS)
+    INCLUDE_DIRECTORIES(${VTK_ZLIB_INCLUDE_DIRS})
+  ENDIF(VTK_ZLIB_INCLUDE_DIRS)
+
+  ADD_LIBRARY(vtkKWCommon ${KWCommon_SRCS})
+ELSE
+  VTK_WRAP_TCL2(vtkKWCommonTCL KWCommonTCL_SRCS ${KWCommon_SRCS})
+  ADD_LIBRARY(vtkKWCommonTCL ${KWCommonTCL_SRCS} ${KWCommon_SRCS})
+ENDIF(ParaView_SOURCE_DIR)
 
 IF(KWSYS_NAMESPACE)
   # Link to the kwsys library if the parent project configures it.
-  TARGET_LINK_LIBRARIES (vtkKWCommonTCL ${KWSYS_NAMESPACE})
+  IF(ParaView_SOURCE_DIR)
+    TARGET_LINK_LIBRARIES (vtkKWCommon ${KWSYS_NAMESPACE})
+  ELSE(ParaView_SOURCE_DIR)
+    TARGET_LINK_LIBRARIES (vtkKWCommonTCL ${KWSYS_NAMESPACE})
+  ENDIF(ParaView_SOURCE_DIR)
 ENDIF(KWSYS_NAMESPACE)
 
 TARGET_LINK_LIBRARIES (vtkKWCommonTCL
@@ -126,29 +138,30 @@ vtkFiltering
 vtkRendering
 )
 
-IF (NOT DO_NOT_BUILD_XML_RW)
-  IF (VTK_USE_HYBRID)
-    TARGET_LINK_LIBRARIES (vtkKWCommonTCL
-      vtkHybridTCL 
-      vtkHybrid
-    )
-  ENDIF (VTK_USE_HYBRID)
-ENDIF (NOT DO_NOT_BUILD_XML_RW)
+	IF (NOT DO_NOT_BUILD_XML_RW)
+		IF (VTK_USE_HYBRID)
+			TARGET_LINK_LIBRARIES (vtkKWCommonTCL
+				vtkHybridTCL 
+				vtkHybrid
+			)
+		ENDIF (VTK_USE_HYBRID)
+	ENDIF (NOT DO_NOT_BUILD_XML_RW)
 
-IF(BUILD_SHARED_LIBS)
-  # Let parent project set KW_INSTALL_LIB_DIR to control library install
-  # location.
-  IF(NOT KW_INSTALL_LIB_DIR)
-    SET(KW_INSTALL_LIB_DIR /lib)
-  ENDIF(NOT KW_INSTALL_LIB_DIR)
-  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWCommonTCL)
-ENDIF(BUILD_SHARED_LIBS)
+	IF(BUILD_SHARED_LIBS)
+		# Let parent project set KW_INSTALL_LIB_DIR to control library install
+		# location.
+		IF(NOT KW_INSTALL_LIB_DIR)
+			SET(KW_INSTALL_LIB_DIR /lib)
+		ENDIF(NOT KW_INSTALL_LIB_DIR)
+		INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWCommonTCL)
+	ENDIF(BUILD_SHARED_LIBS)
 
-IF(BUILD_TESTING)
-  SUBDIRS(Testing)
-ENDIF(BUILD_TESTING)
+	IF(BUILD_TESTING)
+		SUBDIRS(Testing)
+	ENDIF(BUILD_TESTING)
 
-SUBDIRS(Utilities)
+	SUBDIRS(Utilities)
+ENDIF(ParaView_SOURCE_DIR)
 
 OPTION(USE_NOTEBOOK_ICONS "Display Notebook with icons." OFF)
 MARK_AS_ADVANCED(USE_NOTEBOOK_ICONS)
