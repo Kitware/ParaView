@@ -1,11 +1,10 @@
 SOURCE_FILES( ParaView_SRCS
-vtkAllToNPoly.cxx
-vtkBalancePoly.cxx
-vtkCommSched.cxx
+vtkAllToNRedistributePolyData.cxx
+vtkBalancedRedistributePolyData.cxx
 vtkDummyRenderWindow.cxx
 vtkDummyRenderer.cxx
-vtkRedistributePoly.cxx
-vtkWeightedPoly.cxx
+vtkRedistributePolyData.cxx
+vtkWeightedRedistributePolyData.cxx
 vtkKWBoundsDisplay.cxx
 vtkKWExtractGeometryByScalar.cxx
 vtkPassThroughFilter.cxx

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkCommSched.cxx
+  Module:    vtkAllToNRedistributePolyData.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -69,116 +69,74 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ======================================================================*/
 
 
-#include "vtkCommSched.h"
+#define DO_TIMING 0
+#include "vtkAllToNRedistributePolyData.h"
+#include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkMultiProcessController.h"
 
-//*****************************************************************
-
-vtkCommSched* vtkCommSched::New()
+vtkAllToNRedistributePolyData* vtkAllToNRedistributePolyData::New()
 {
-
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkCommSched");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkAllToNRedistributePolyData");
   if(ret)
     {
-    return (vtkCommSched*)ret;
+    return (vtkAllToNRedistributePolyData*)ret;
     }
   // If the factory was unable to create the object, then create it here.
-  return new vtkCommSched;
+  return new vtkAllToNRedistributePolyData;
 }
+
+vtkAllToNRedistributePolyData::vtkAllToNRedistributePolyData()
+{
+  this->NumberOfProcesses = 1;
+}
+
+vtkAllToNRedistributePolyData::~vtkAllToNRedistributePolyData()
+{
+}
+
+void vtkAllToNRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->vtkWeightedRedistributePolyData::PrintSelf(os,indent);
+}
+
+
+//*****************************************************************
+void vtkAllToNRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
+
+{
+//*****************************************************************
+// purpose: This routine sets up a schedule to shift cells around so
+//          the number of cells on each processor is as even as possible.
+//
 //*****************************************************************
 
-vtkCommSched::vtkCommSched()
-{
-  // ... initalize a communication schedule to do nothing ...
-  numCells = 0;
-  cntSend  = 0;
-  cntRec   = 0;
-  sendTo  = NULL;
-  sendNum = NULL;
-  recFrom = NULL;
-  recNum  = NULL;
-  sendCellList = NULL;
-  keepCellList = NULL;
+  // get total number of polys and figure out how many each processor should have
+
+  int myId, numProcs;
+  if (!this->Controller)
+    {
+    vtkErrorMacro("need controller to set weights");
+    return;
+    }
+
+  numProcs = this->Controller->GetNumberOfProcesses();
+  myId = this->Controller->GetLocalProcessId();
+
+
+  // make sure the cells are redistributed into a valid range.
+  int numberOfValidProcesses = this->NumberOfProcesses;
+  if (numberOfValidProcesses <= 0) { numberOfValidProcesses = numProcs; }
+  if (numberOfValidProcesses > numProcs ) { numberOfValidProcesses = numProcs; }
+
+  this->SetWeights(0, numberOfValidProcesses-1, 1.);
+  if (numberOfValidProcesses < numProcs)
+    {
+    this->SetWeights(numberOfValidProcesses, numProcs-1, 0.);
+    }
+
+  this->vtkWeightedRedistributePolyData::MakeSchedule(localSched);
+
 }
 //*****************************************************************
-vtkCommSched::~vtkCommSched()
-{
-  if (sendTo  != NULL) delete [] sendTo;
-  if (sendNum != NULL) delete [] sendNum;
-  if (recFrom != NULL) delete [] recFrom;
-  if (recNum  != NULL) delete [] recNum;
-  if (sendCellList != NULL) 
-  {
-     for (int i=0; i<cntSend; i++) delete [] sendCellList[i];
-     delete [] sendCellList;
-  }
-  if (keepCellList != NULL) delete [] keepCellList; 
-}
-#if 0
-//*****************************************************************
-// ... copy constructor ...
-vtkCommSched::vtkCommSched(vtkCommSched& sched)
-{
-  numCells = sched.numCells;
-  cntSend  = sched.cntSend;
-  cntRec   = sched.cntRec;
-  sendTo  = new int [cntSend];
-  sendNum = new vtkIdType [cntSend];
-  int i;
-  vtkIdType j;
-  for (i=0; i<cntSend; i++)
-    {
-    sendTo[i]  = sched.sendTo[i];
-    sendNum[i] = sched.sendNum[i];
-    }
-  if (sched.sendCellList != NULL)
-    {
-    sendCellList = new vtkIdType*[cntSend];
-    for (i=0; i<cntSend; i++)
-      {
-      sendCellList[i] = new vtkIdType[sendNum[i]];
-      for (j=0; j<sendNum[i]; j++)
-	sendCellList[i][j] = sched.sendCellList[i][j];
-      }
-    }
-  recFrom = new int [cntRec];
-  recNum  = new vtkIdType [cntRec];
-  for (i=0; i<cntRec; i++)
-    {
-    recFrom[i] = sched.recFrom[i];
-    recNum[i]  = sched.recNum[i];
-    }
-  if (sched.keepCellList != NULL)
-    {
-    keepCellList = new vtkIdType [numCells];
-    for (i=0; i<numCells; i++) keepCellList[i] = sched.keepCellList[i];
-    }
-  
-}
-//*****************************************************************
-#endif
-void vtkCommSched::PrintSelf(ostream& os, vtkIndent indent)
-{
-  vtkObject::PrintSelf(os,indent);
-
-  int i;
-  os << indent << "numCells (" << this->numCells<< ")/n";
-
-  os << indent << "cntSend (" << this->cntSend<< ")/n";
-  for (i=0; i<cntSend; i++)
-  {
-    os << indent << "sendTo["<<i<<"] (" << this->sendTo[i]<< ")/n";
-    os << indent << "sendNum["<<i<<"] (" << this->sendNum[i]<< ")/n";
-  }
-
-  os << indent << "cntRec (" << this->cntRec<< ")/n";
-  for (i=0; i<cntRec; i++)
-  {
-    os << indent << "recFrom["<<i<<"] (" << this->recFrom[i]<< ")/n";
-    os << indent << "recNum["<<i<<"] (" << this->recNum[i]<< ")/n";
-  }
-
-}
-
-

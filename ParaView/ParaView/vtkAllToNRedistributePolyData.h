@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkBalancePoly.cxx
+  Module:    vtkAllToNRedistributePolyData.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*======================================================================
+/*=========================================================================
 // This software and ancillary information known as vtk_ext (and
 // herein called "SOFTWARE") is made available under the terms
 // described below.  The SOFTWARE has been approved for release with
@@ -66,70 +66,47 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // If SOFTWARE is modified to produce derivative works, such modified
 // SOFTWARE should be clearly marked, so as not to confuse it with the
 // version available from Los Alamos National Laboratory.
-======================================================================*/
+=========================================================================*/
 
+// .NAME vtkAllToNRedistributePolyData - do balanced redistribution of cells on from all to n processors
 
-#define DO_TIMING 0
-#include "vtkBalancePoly.h"
-#include "vtkMath.h"
-#include "vtkObjectFactory.h"
-#include "vtkMultiProcessController.h"
+#ifndef __vtkAllToNRedistributePolyData_h
+#define __vtkAllToNRedistributePolyData_h
 
+#include "vtkWeightedRedistributePolyData.h"
+class vtkMultiProcessController;
 
-vtkCxxSetObjectMacro(vtkBalancePoly,Controller, vtkMultiProcessController);
+//*******************************************************************
 
-
-vtkBalancePoly* vtkBalancePoly::New()
+class VTK_EXPORT vtkAllToNRedistributePolyData : 
+  public vtkWeightedRedistributePolyData
 {
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkBalancePoly");
-  if(ret)
-    {
-    return (vtkBalancePoly*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkBalancePoly;
-}
+public:
+  vtkTypeMacro(vtkAllToNRedistributePolyData, vtkWeightedRedistributePolyData);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
-vtkBalancePoly::vtkBalancePoly()
-{
-}
+  // Description:
+  static vtkAllToNRedistributePolyData *New();
 
-vtkBalancePoly::~vtkBalancePoly()
-{
-}
-
-void vtkBalancePoly::PrintSelf(ostream& os, vtkIndent indent)
-{
-  vtkWeightedPoly::PrintSelf(os,indent);
-  os << indent << "Controller: (" << this->Controller << ")\n";
-}
+  vtkSetMacro(NumberOfProcesses, int);
+  vtkGetMacro(NumberOfProcesses, int);
 
 
-//*****************************************************************
-void vtkBalancePoly::MakeSchedule ( vtkCommSched& localSched)
+protected:
+  vtkAllToNRedistributePolyData();
+  ~vtkAllToNRedistributePolyData();
 
-{
-//*****************************************************************
-// purpose: This routine sets up a schedule to shift cells around so
-//          the number of cells on each processor is as even as possible.
-//
-//*****************************************************************
+  void MakeSchedule (vtkCommSched*);
 
-  // get total number of polys and figure out how many each processor should have
+  int NumberOfProcesses;
 
-  int myId, numProcs;
-  if (!this->Controller)
-    {
-    vtkErrorMacro("need controller to set weights");
-    return;
-    }
+private:
+  vtkAllToNRedistributePolyData(const vtkAllToNRedistributePolyData&); // Not implemented
+  void operator=(const vtkAllToNRedistributePolyData&); // Not implemented
+};
 
-  numProcs = this->Controller->GetNumberOfProcesses();
-  myId = this->Controller->GetLocalProcessId();
+//****************************************************************
 
-  this->SetWeights(0,numProcs-1,1.);
-  this->vtkWeightedPoly::MakeSchedule(localSched);
+#endif
 
-}
-//*****************************************************************
+

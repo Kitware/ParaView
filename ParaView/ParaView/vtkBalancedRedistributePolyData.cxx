@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkCommSched.h
+  Module:    vtkBalancedRedistributePolyData.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -40,7 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-/*=========================================================================
+/*======================================================================
 // This software and ancillary information known as vtk_ext (and
 // herein called "SOFTWARE") is made available under the terms
 // described below.  The SOFTWARE has been approved for release with
@@ -66,44 +66,64 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // If SOFTWARE is modified to produce derivative works, such modified
 // SOFTWARE should be clearly marked, so as not to confuse it with the
 // version available from Los Alamos National Laboratory.
-=========================================================================*/
+======================================================================*/
 
-// .NAME vtkCommSched - redistribute poly cells from other processes
-//                        (special version to color according to processor)
 
-#ifndef _vtkCommSched_h_
-#define _vtkCommSched_h_
+#include "vtkBalancedRedistributePolyData.h"
+#include "vtkMath.h"
+#include "vtkObjectFactory.h"
+#include "vtkMultiProcessController.h"
 
-#include "vtkObject.h"
-
-//*******************************************************************
-class VTK_EXPORT vtkCommSched : public vtkObject
+vtkBalancedRedistributePolyData* vtkBalancedRedistributePolyData::New()
 {
-public:
-  vtkTypeMacro(vtkCommSched, vtkObject);
-  void PrintSelf(ostream& os, vtkIndent indent);
-  
-  vtkCommSched();
-  ~vtkCommSched();
-  
-  static vtkCommSched* New();
-  //vtkCommSched(vtkCommSched&);
-  
-  int cntSend;
-  int cntRec;
-  int* sendTo;
-  int* recFrom;
-  vtkIdType numCells;
-  vtkIdType* sendNum;
-  vtkIdType* recNum;
-  
-  vtkIdType** sendCellList;
-  vtkIdType* keepCellList;
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkBalancedRedistributePolyData");
+  if(ret)
+    {
+    return (vtkBalancedRedistributePolyData*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkBalancedRedistributePolyData;
+}
 
-private:
-  vtkCommSched(const vtkCommSched&); // Not implemented
-  void operator=(const vtkCommSched&); // Not implemented    
-};
+vtkBalancedRedistributePolyData::vtkBalancedRedistributePolyData()
+{
+}
 
-#endif    // _vtkCommSched_h_
+vtkBalancedRedistributePolyData::~vtkBalancedRedistributePolyData()
+{
+}
 
+void vtkBalancedRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->vtkWeightedRedistributePolyData::PrintSelf(os,indent);
+}
+
+
+//*****************************************************************
+void vtkBalancedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
+
+{
+//*****************************************************************
+// purpose: This routine sets up a schedule to shift cells around so
+//          the number of cells on each processor is as even as possible.
+//
+//*****************************************************************
+
+  // get total number of polys and figure out how many each processor should have
+
+  int myId, numProcs;
+  if (!this->Controller)
+    {
+    vtkErrorMacro("need controller to set weights");
+    return;
+    }
+
+  numProcs = this->Controller->GetNumberOfProcesses();
+  myId = this->Controller->GetLocalProcessId();
+
+  this->SetWeights(0, numProcs-1, 1.);
+  this->vtkWeightedRedistributePolyData::MakeSchedule(localSched);
+
+}
+//*****************************************************************

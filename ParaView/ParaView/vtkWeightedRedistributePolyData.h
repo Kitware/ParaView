@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkWeightedPoly.h
+  Module:    vtkWeightedRedistributePolyData.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -68,52 +68,54 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // version available from Los Alamos National Laboratory.
 =========================================================================*/
 
-// .NAME vtkWeightedPoly - do weighted balance of cells on 
-//                         processors
+// .NAME vtkWeightedRedistributePolyData - do weighted balance of cells on processors
 
-#ifndef __vtkWeightedPoly_h
-#define __vtkWeightedPoly_h
+#ifndef __vtkWeightedRedistributePolyData_h
+#define __vtkWeightedRedistributePolyData_h
 
-#include "vtkRedistributePoly.h"
+#include "vtkRedistributePolyData.h"
+
 class vtkMultiProcessController;
-
-#define VTK_NUM_LOC_CELLS_TAG       70
-
-#define VTK_SCHED_LEN_1_TAG    300
-#define VTK_SCHED_LEN_2_TAG    301
-#define VTK_SCHED_1_TAG        310
-#define VTK_SCHED_2_TAG        311
 
 //*******************************************************************
 
-class VTK_EXPORT vtkWeightedPoly : public vtkRedistributePoly
+class VTK_EXPORT vtkWeightedRedistributePolyData : public vtkRedistributePolyData
 {
 public:
-  vtkTypeMacro(vtkWeightedPoly, vtkRedistributePoly);
+  vtkTypeMacro(vtkWeightedRedistributePolyData, vtkRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Construct object with LowPoint=(0,0,0) and HighPoint=(0,0,1). Scalar
   // range is (0,1).
-  static vtkWeightedPoly *New();
+  static vtkWeightedRedistributePolyData *New();
 
-  // Description:
-  // The filter needs a controller to determine which process it is in.
-  void SetController(vtkMultiProcessController *controller);
-  vtkGetObjectMacro(Controller, vtkMultiProcessController); 
+  void SetWeights (int, int, float );
 
-  void SetWeights (const int , const int , const float );
 
 protected:
-  vtkWeightedPoly();
-  ~vtkWeightedPoly();
+  vtkWeightedRedistributePolyData();
+  ~vtkWeightedRedistributePolyData();
 
-  virtual void MakeSchedule (vtkCommSched&);
+//BTX
+  enum
+  {
+    NUM_LOC_CELLS_TAG  = 70,
+    
+    SCHED_LEN_1_TAG    = 300,
+    SCHED_LEN_2_TAG    = 301,
+    SCHED_1_TAG        = 310,
+    SCHED_2_TAG        = 311
+  };
+//ETX
+
+
+  virtual void MakeSchedule (vtkCommSched*);
   float* Weights;
 
 private:
-  vtkWeightedPoly(const vtkWeightedPoly&); // Not implemented
-  void operator=(const vtkWeightedPoly&); // Not implemented
+  vtkWeightedRedistributePolyData(const vtkWeightedRedistributePolyData&); // Not implemented
+  void operator=(const vtkWeightedRedistributePolyData&); // Not implemented
 };
 
 //****************************************************************

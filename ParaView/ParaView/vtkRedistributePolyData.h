@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkRedistributePoly.h
+  Module:    vtkRedistributePolyData.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -68,130 +68,147 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // version available from Los Alamos National Laboratory.
 ======================================================================*/
 
-// .NAME vtkRedistributePoly - redistribute poly cells from other processes
-//                        (special version to color according to processor)
+// .NAME vtkRedistributePolyData - redistribute poly cells from other processes (special version to color according to processor)
 
-#ifndef __vtkRedistributePoly_h
-#define __vtkRedistributePoly_h
+#ifndef __vtkRedistributePolyData_h
+#define __vtkRedistributePolyData_h
 
 #include "vtkPolyDataToPolyDataFilter.h"
-#include "vtkMultiProcessController.h"
 
-#define VTK_CELL_ID_TAG      10
-#define VTK_POINT_COORDS_TAG 20
-#define VTK_NUM_POINTS_TAG   30
-#define VTK_NUM_CELLS_TAG    40
-#define VTK_POLY_DATA_TAG    50
-#define VTK_BOUNDS_TAG       60
-#define VTK_CNT_SEND_TAG            80
-#define VTK_CNT_REC_TAG             90
-#define VTK_SEND_PROC_TAG          100
-#define VTK_SEND_NUM_TAG           110
-#define VTK_REC_PROC_TAG           120
-#define VTK_REC_NUM_TAG            130
-#define VTK_NUM_CURR_CELLS_TAG     140
+class vtkMultiProcessController;
 
-#define VTK_CELL_CNT_TAG     150
-#define VTK_CELL_TAG         160
-#define VTK_POINTS_SIZE_TAG  170
-#define VTK_POINTS_TAG       180
-
-//#define VTK_DATA_ARRAY_SIZE_TAG     190
-#define VTK_SCALARS_TAG             200
-#define VTK_VECTORS_TAG             210
-#define VTK_NORMALS_TAG             220
-#define VTK_TCOORDS_TAG             230
-#define VTK_TENSOR_TAG              240
-#define VTK_FIELDDATA_TAG         1250
-
-#include "vtkCommSched.h"
-
-//*******************************************************************
-
-class VTK_EXPORT vtkRedistributePoly : public vtkPolyDataToPolyDataFilter 
+class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataToPolyDataFilter 
 {
 public:
-  vtkTypeMacro(vtkRedistributePoly, vtkPolyDataToPolyDataFilter);
+  vtkTypeMacro(vtkRedistributePolyData, vtkPolyDataToPolyDataFilter);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  static vtkRedistributePoly *New();
+  static vtkRedistributePolyData *New();
 
   // Description:
   // The filter needs a controller to determine which process it is in.
   void SetController(vtkMultiProcessController* controller);
   vtkGetObjectMacro(Controller, vtkMultiProcessController); 
 
-  void SetColorProc(int cp){colorProc = cp;};
-  void SetColorProc(){colorProc = 1;};
-  int GetColorProc(){return colorProc;};
+  void SetColorProc(int cp) { colorProc = cp; };
+  void SetColorProc() { colorProc = 1; };
+  int GetColorProc() { return colorProc; };
 
 protected:
-  vtkRedistributePoly();
-  ~vtkRedistributePoly();
-  
-  virtual void MakeSchedule (vtkCommSched&);
-  void OrderSchedule (vtkCommSched&);
+  vtkRedistributePolyData();
+  ~vtkRedistributePolyData();
 
-  void SendCellSizes (const vtkIdType, const vtkIdType, vtkPolyData*, const int, 
+//BTX
+  enum {
+    CELL_ID_TAG        = 10,
+    POINT_COORDS_TAG   = 20,
+    NUM_POINTS_TAG     = 30,
+    NUM_CELLS_TAG      = 40,
+    POLY_DATA_TAG      = 50,
+    BOUNDS_TAG         = 60,
+    CNT_SEND_TAG       = 80,
+    CNT_REC_TAG        = 90,
+    SEND_PROC_TAG      = 100,
+    SEND_NUM_TAG       = 110,
+    REC_PROC_TAG       = 120,
+    REC_NUM_TAG        = 130,
+    NUM_CURR_CELLS_TAG = 140,
+
+    CELL_CNT_TAG       = 150,
+    CELL_TAG           = 160,
+    POINTS_SIZE_TAG    = 170,
+    POINTS_TAG         = 180,
+
+// DATA_ARRAY_SIZE_TAG     = 190,
+    SCALARS_TAG        = 200,
+    VECTORS_TAG        = 210,
+    NORMALS_TAG        = 220,
+    TCOORDS_TAG        = 230,
+    TENSOR_TAG         = 240,
+    FIELDDATA_TAG      = 1250
+  };
+
+  class VTK_EXPORT vtkCommSched
+  {
+  public:
+    vtkCommSched();
+    ~vtkCommSched();
+    
+    int SendCount;
+    int ReceiveCount;
+    int* SendTo;
+    int* ReceiveFrom;
+    vtkIdType NumberOfCells;
+    vtkIdType* SendNumber;
+    vtkIdType* ReceiveNumber;
+    
+    vtkIdType** SendCellList;
+    vtkIdType* KeepCellList;
+    
+  private:
+    vtkCommSched(const vtkCommSched&); // Not implemented
+    void operator=(const vtkCommSched&); // Not implemented    
+  };
+
+//ETX
+
+  virtual void MakeSchedule (vtkCommSched*);
+  void OrderSchedule (vtkCommSched*);
+
+  void SendCellSizes (vtkIdType, vtkIdType, vtkPolyData*, int, 
                       vtkIdType&, vtkIdType&, vtkIdType*); 
-  void CopyCells (const vtkIdType,vtkPolyData*, vtkPolyData*, vtkIdType*); 
-  void SendCells (const vtkIdType, const vtkIdType, vtkPolyData*, vtkPolyData*, 
-                  const int, vtkIdType&, vtkIdType&, vtkIdType*); 
-  void ReceiveCells (const vtkIdType, const vtkIdType, vtkPolyData*, const int, 
-                     const vtkIdType, const vtkIdType, const vtkIdType, const vtkIdType);
+  void CopyCells (vtkIdType,vtkPolyData*, vtkPolyData*, vtkIdType*); 
+  void SendCells (vtkIdType, vtkIdType, vtkPolyData*, vtkPolyData*, 
+                  int, vtkIdType&, vtkIdType&, vtkIdType*); 
+  void ReceiveCells (vtkIdType, vtkIdType, vtkPolyData*, int, 
+                     vtkIdType, vtkIdType, vtkIdType, 
+		     vtkIdType);
 
-  void FindMemReq (const vtkIdType, vtkPolyData*, vtkIdType&, vtkIdType&);
+  void FindMemReq (vtkIdType, vtkPolyData*, vtkIdType&, vtkIdType&);
 
-  void AllocateDataArrays (vtkDataSetAttributes*, vtkIdType*, const int, int*, 
-                           const vtkIdType);
-  void AllocateArrays (vtkDataArray*, const vtkIdType);
+  void AllocateDataArrays (vtkDataSetAttributes*, vtkIdType*, int, int*, 
+                           vtkIdType);
+  void AllocateArrays (vtkDataArray*, vtkIdType);
 
   void CopyDataArrays(vtkDataSetAttributes* , vtkDataSetAttributes* ,
-                      const vtkIdType , vtkIdType*, const int);
+                      vtkIdType , vtkIdType*, int);
 
   void CopyCellBlockDataArrays(vtkDataSetAttributes* , vtkDataSetAttributes* ,
-                               const vtkIdType , vtkIdType* , const vtkIdType, 
-                               const int);
+                               vtkIdType , vtkIdType* , vtkIdType, int);
 
-  void CopyArrays (vtkDataArray*, vtkDataArray*, const vtkIdType, vtkIdType*, 
-                   const int, const int); 
+  void CopyArrays (vtkDataArray*, vtkDataArray*, vtkIdType, vtkIdType*, 
+                   int, int); 
 
-  void CopyBlockArrays (vtkDataArray*, vtkDataArray*, const vtkIdType, const vtkIdType, 
-                        const int); 
+  void CopyBlockArrays (vtkDataArray*, vtkDataArray*, vtkIdType, vtkIdType, 
+                        int); 
 
   void SendDataArrays (vtkDataSetAttributes*, vtkDataSetAttributes*,
-                       const vtkIdType, const int, vtkIdType*, const int); 
+		       vtkIdType, int, vtkIdType*, int); 
 
   void SendCellBlockDataArrays (vtkDataSetAttributes*, vtkDataSetAttributes*,
-                       const vtkIdType, const int, vtkIdType*, const vtkIdType); 
+				vtkIdType, int, vtkIdType*, vtkIdType); 
 
-  void SendArrays (vtkDataArray*, const vtkIdType, const int, 
-                   vtkIdType*, const int, const int); 
+  void SendArrays (vtkDataArray*, vtkIdType, int,  vtkIdType*, int, int); 
 
-  void SendBlockArrays (vtkDataArray*, const vtkIdType, const int, 
-                        const vtkIdType, const int); 
+  void SendBlockArrays (vtkDataArray*, vtkIdType, int, vtkIdType, int); 
 
-  void ReceiveDataArrays (vtkDataSetAttributes*, const vtkIdType, const int, vtkIdType*, 
-                          const int); 
+  void ReceiveDataArrays (vtkDataSetAttributes*, vtkIdType, int, vtkIdType*, 
+                          int); 
 
-  void ReceiveArrays (vtkDataArray*, const vtkIdType, const int, 
-                      vtkIdType*, const int, const int); 
+  void ReceiveArrays (vtkDataArray*, vtkIdType, int, 
+                      vtkIdType*, int, int); 
 
   void Execute();
 
-  void CompleteArrays (const int);
-  void SendCompleteArrays (const int);
+  void CompleteArrays (int);
+  void SendCompleteArrays (int);
 
   vtkMultiProcessController *Controller;
-  //vtkPointLocator *Locator;
   int colorProc; // Set to 1 to color data according to processor
-private:
-  vtkRedistributePoly(const vtkRedistributePoly&); // Not implemented
-  void operator=(const vtkRedistributePoly&); // Not implemented
-};
 
-//****************************************************************
+private:
+  vtkRedistributePolyData(const vtkRedistributePolyData&); // Not implemented
+  void operator=(const vtkRedistributePolyData&); // Not implemented
+};
 
 #endif
 

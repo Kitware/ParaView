@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkWeightedPoly.cxx
+  Module:    vtkWeightedRedistributePolyData.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -69,49 +69,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ======================================================================*/
 
 
-#define DO_TIMING 0
-#include "vtkWeightedPoly.h"
+#include "vtkWeightedRedistributePolyData.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
 
-vtkCxxSetObjectMacro(vtkWeightedPoly,Controller, vtkMultiProcessController);
-
-
-vtkWeightedPoly* vtkWeightedPoly::New()
+vtkWeightedRedistributePolyData* vtkWeightedRedistributePolyData::New()
 {
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkWeightedPoly");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkWeightedRedistributePolyData");
   if(ret)
     {
-    return (vtkWeightedPoly*)ret;
+    return (vtkWeightedRedistributePolyData*)ret;
     }
   // If the factory was unable to create the object, then create it here.
-  return new vtkWeightedPoly;
+  return new vtkWeightedRedistributePolyData;
 }
 
-vtkWeightedPoly::vtkWeightedPoly()
+vtkWeightedRedistributePolyData::vtkWeightedRedistributePolyData()
 {
-  this->Controller = NULL;
   this->Weights= NULL;
 }
 
-vtkWeightedPoly::~vtkWeightedPoly()
+vtkWeightedRedistributePolyData::~vtkWeightedRedistributePolyData()
 {
-  delete [] Weights;
+  delete [] this->Weights;
 }
 
-void vtkWeightedPoly::PrintSelf(ostream& os, vtkIndent indent)
+void vtkWeightedRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkRedistributePoly::PrintSelf(os,indent);
-
-  os << indent << "Controller: (" << this->Controller << ")\n";
+  this->vtkRedistributePolyData::PrintSelf(os,indent);
 }
 
 
 //*****************************************************************
-void vtkWeightedPoly::SetWeights( const int startProc, const int stopProc, 
-                                  const float weight )
+void vtkWeightedRedistributePolyData::SetWeights( int startProc, int stopProc, float weight )
 {
   int myId, numProcs;
   if (!this->Controller)
@@ -126,17 +118,17 @@ void vtkWeightedPoly::SetWeights( const int startProc, const int stopProc,
   if (myId == 0) 
   {
     int np;
-    if (Weights == NULL) 
+    if (this->Weights == NULL) 
     {
-      Weights = new float[numProcs];
-      for (np = 0;  np < numProcs; np++) Weights[np] = 1.;
+      this->Weights = new float[numProcs];
+      for (np = 0;  np < numProcs; np++) this->Weights[np] = 1.;
     }
-    for (np = startProc;  np <= stopProc; np++) Weights[np] = weight;
+    for (np = startProc;  np <= stopProc; np++) { this->Weights[np] = weight; }
   }
 }
 
 //*****************************************************************
-void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
+void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
 
 {
 //*****************************************************************
@@ -167,62 +159,62 @@ void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
   int id;
   if (myId == 0)
     {
-    if (Weights == NULL) 
+    if (this->Weights == NULL) 
       {
       // ... no weights have been set so this is a uniform balance case ...
-      Weights = new float[numProcs];
-      for (id = 0;  id < numProcs; id++) Weights[id] = 1./ numProcs;
+      this->Weights = new float[numProcs];
+      for (id = 0;  id < numProcs; id++) { this->Weights[id] = 1./ numProcs; }
       }
     else
       {
       // ... weights have been set so normalize to add to 1. ...
       float weight_sum = 0.;
-      for (id=0; id<numProcs; id++) weight_sum += Weights[id];
+      for (id=0; id<numProcs; id++) { weight_sum += this->Weights[id]; }
 
       float weight_scale = 0.;
       if (weight_sum>0) weight_scale = 1. / weight_sum;
-      for (id=0; id<numProcs; id++) Weights[id] *= weight_scale;
+      for (id=0; id<numProcs; id++) { this->Weights[id] *= weight_scale; }
       }
     }
 
   vtkCommSched* remoteSched = new vtkCommSched[numProcs];
 
   vtkIdType totalCells;
-  vtkIdType numRemoteCells;
-  vtkIdType* goalNumCells;
+  vtkIdType numRemoteCells=0;
+  vtkIdType* goalNumCells=0;
   int numProcZero = 0;
   if (myId!=0)
     {
     this->Controller->
-      Send((vtkIdType*)(&numLocalCells), 1, 0, VTK_NUM_LOC_CELLS_TAG); 
+      Send((vtkIdType*)(&numLocalCells), 1, 0, NUM_LOC_CELLS_TAG); 
     } 
   else
     {
     totalCells = numLocalCells;
-    remoteSched[0].numCells = numLocalCells;
+    remoteSched[0].NumberOfCells = numLocalCells;
     for (id = 1; id < numProcs; id++)
       {
       this->Controller->Receive((vtkIdType*)(&numRemoteCells), 1, id,
-				VTK_NUM_LOC_CELLS_TAG);
+				NUM_LOC_CELLS_TAG);
       totalCells += numRemoteCells;
-      remoteSched[id].numCells = numRemoteCells;
+      remoteSched[id].NumberOfCells = numRemoteCells;
       }
     goalNumCells = new vtkIdType [numProcs]; 
     for (id = 0; id < numProcs; id++) 
       {
-      goalNumCells[id] = static_cast<vtkIdType>(totalCells * Weights[id]);
-      if (goalNumCells[id]==0) numProcZero++;
+      goalNumCells[id] = static_cast<vtkIdType>(totalCells * this->Weights[id]);
+      if (goalNumCells[id]==0) { numProcZero++; }
       }
 
     vtkIdType sumCells = 0;
-    for (id = 0; id < numProcs; id++) sumCells += goalNumCells[id];
+    for (id = 0; id < numProcs; id++) { sumCells += goalNumCells[id]; }
     leftovers = totalCells - sumCells;
     }
 
   // ... order processors to minimize the number of sends (replace with more 
   //   efficient sort later) ... 
-  int schedLen1;
-  int schedLen2;
+  int schedLen1=0;
+  int schedLen2=0;
   int* schedArray1;
   vtkIdType* schedArray2;
 
@@ -237,8 +229,8 @@ void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
       for (id2 = id+1; id2 < numProcs; id2++)
 	{
 	//if (remoteSched[order[id]].numCells < remoteSched[order[id2]].numCells)
-	if ((remoteSched[order[id]].numCells - goalNumCells[order[id]]) < 
-	    (remoteSched[order[id2]].numCells - goalNumCells[order[id2]]))
+	if ((remoteSched[order[id]].NumberOfCells - goalNumCells[order[id]]) < 
+	    (remoteSched[order[id2]].NumberOfCells - goalNumCells[order[id2]]))
           {
 	  temp = order[id];
 	  order[id] = order[id2];
@@ -256,14 +248,15 @@ void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
 
     int recflag = 0; // turn on if receive should get extra leftover cell,
                      // without flag this gets lost
-    for (id = 0; id < numProcs; id++) remoteSched[id].cntSend = 0;
+    for (id = 0; id < numProcs; id++) { remoteSched[id].SendCount = 0; }
 
     vtkIdType numToSend, numToReceive;
     //while (start<last && cnt<1)
     while (start<last)
       {
       //numToSend = remoteSched[order[start]].numCells-avgCells;
-      numToSend = remoteSched[order[start]].numCells-goalNumCells[order[start]];
+      numToSend = remoteSched[order[start]].NumberOfCells-
+	goalNumCells[order[start]];
 
       // put in special test for when weights are exactly 0 to make
       // sure all points are removed
@@ -278,9 +271,13 @@ void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
       //while (numToSend>0 && cnt<1)
       while (numToSend>0)
 	{
-	if (start == last) cerr<<"error: start =last"<<endl;
+	if (start == last) 
+	  {
+	  vtkErrorMacro("error: start =last");
+	  }
 	//numToReceive = avgCells-remoteSched[order[last]].numCells;
-	numToReceive = goalNumCells[order[last]]-remoteSched[order[last]].numCells;
+	numToReceive = goalNumCells[order[last]]-
+	  remoteSched[order[last]].NumberOfCells;
 	if (leftovers>=(last-start-numProcZero) || (recflag==1))
           {
 	  // ... receiving processors are going to get some of the 
@@ -295,8 +292,8 @@ void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
 	  sendToTemp[cnt] = order[last];
 	  sendNumTemp[cnt++] = numToReceive;
 	  numToSend -= numToReceive;
-	  remoteSched[order[start]].numCells -= numToReceive;
-	  remoteSched[order[last]].numCells  += numToReceive;
+	  remoteSched[order[start]].NumberOfCells -= numToReceive;
+	  remoteSched[order[last]].NumberOfCells  += numToReceive;
 	  last--;
 	  recflag = 0; // extra leftover point will have been used
           }
@@ -304,55 +301,60 @@ void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
           {
 	  sendToTemp[cnt] = order[last];
 	  sendNumTemp[cnt++] = numToSend;
-	  remoteSched[order[start]].numCells -= numToSend;
-	  remoteSched[order[last]].numCells  += numToSend;
+	  remoteSched[order[start]].NumberOfCells -= numToSend;
+	  remoteSched[order[last]].NumberOfCells  += numToSend;
 	  numToSend = 0;
           }
 	}
       int ostart = order[start];
-      remoteSched[ostart].cntSend = cnt;
-      remoteSched[ostart].sendTo  = new int[cnt];
-      remoteSched[ostart].sendNum = new vtkIdType[cnt];
+      remoteSched[ostart].SendCount = cnt;
+      remoteSched[ostart].SendTo  = new int[cnt];
+      remoteSched[ostart].SendNumber = new vtkIdType[cnt];
       for (int i=0; i<cnt;i++)
 	{
-	remoteSched[ostart].sendTo[i]  = sendToTemp[i];
-	remoteSched[ostart].sendNum[i] = sendNumTemp[i];
+	remoteSched[ostart].SendTo[i]  = sendToTemp[i];
+	remoteSched[ostart].SendNumber[i] = sendNumTemp[i];
 	}
       start++;
       }
 
-    for (id = 0; id < numProcs; id++) remoteSched[id].cntRec = 0; 
+    for (id = 0; id < numProcs; id++) { remoteSched[id].ReceiveCount = 0; }
 
     // ... count up how processors a processor will be receiving from ...
     for (id = 0; id < numProcs; id++) 
-      for (i=0;i<remoteSched[id].cntSend;i++) 
+      {
+      for (i=0;i<remoteSched[id].SendCount;i++) 
 	{
-	int sendId = remoteSched[id].sendTo[i];
-	remoteSched[sendId].cntRec++; 
+	int sendId = remoteSched[id].SendTo[i];
+	remoteSched[sendId].ReceiveCount++; 
 	}
+      }
 
     // ... allocate memory to store the processor to receive from and how 
     //   many to receive ...
     for (id = 0; id < numProcs; id++) 
       {
-      remoteSched[id].recFrom = new int [remoteSched[id].cntRec]; 
-      remoteSched[id].recNum  = new vtkIdType [remoteSched[id].cntRec]; 
+      remoteSched[id].ReceiveFrom = 
+	new int [remoteSched[id].ReceiveCount]; 
+      remoteSched[id].ReceiveNumber = 
+	new vtkIdType [remoteSched[id].ReceiveCount]; 
       }
 
     // ... reinitialize the count so records are stored in the correct place ...
-    for (id = 0; id < numProcs; id++) remoteSched[id].cntRec = 0; 
+    for (id = 0; id < numProcs; id++) { remoteSched[id].ReceiveCount = 0; }
 
     // ... store which processors will be received from and how many cells 
     //   will be received ...
     for (id = 0; id < numProcs; id++) 
       {
-      for (i=0;i<remoteSched[id].cntSend;i++) 
+      for (i=0;i<remoteSched[id].SendCount;i++) 
 	{
-	int recId = remoteSched[id].sendTo[i];
-	int remCntRec = remoteSched[recId].cntRec;
-	remoteSched[recId].recFrom[remCntRec] = id; 
-	remoteSched[recId].recNum[remCntRec] = remoteSched[id].sendNum[i]; 
-	remoteSched[recId].cntRec++;
+	int recId = remoteSched[id].SendTo[i];
+	int remCntRec = remoteSched[recId].ReceiveCount;
+	remoteSched[recId].ReceiveFrom[remCntRec] = id; 
+	remoteSched[recId].ReceiveNumber[remCntRec] = 
+	  remoteSched[id].SendNumber[i]; 
+	remoteSched[recId].ReceiveCount++;
 	}
       }
 
@@ -362,59 +364,59 @@ void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
     for (id = 1; id < numProcs; id++)
       {
       // ... number of ints ...
-      schedLen1 = 2 + remoteSched[id].cntSend + remoteSched[id].cntRec;
+      schedLen1 = 2 + remoteSched[id].SendCount + remoteSched[id].ReceiveCount;
 
       // ... number of vtkIdTypes ...
-      schedLen2 = 1 + remoteSched[id].cntSend + remoteSched[id].cntRec;
+      schedLen2 = 1 + remoteSched[id].SendCount + remoteSched[id].ReceiveCount;
 
       schedArray1 = new int [schedLen1];
       schedArray2 = new vtkIdType [schedLen2];
-      schedArray2[0] = remoteSched[id].numCells;
-      schedArray1[0] = remoteSched[id].cntSend;
-      schedArray1[1] = remoteSched[id].cntRec;
+      schedArray2[0] = remoteSched[id].NumberOfCells;
+      schedArray1[0] = remoteSched[id].SendCount;
+      schedArray1[1] = remoteSched[id].ReceiveCount;
       int arraycnt1 = 2;
       int arraycnt2 = 1;
-      if (remoteSched[id].cntSend > 0)
+      if (remoteSched[id].SendCount > 0)
 	{
-        for (i=0;i<remoteSched[id].cntSend;i++) 
+        for (i=0;i<remoteSched[id].SendCount;i++) 
 	  {
-	  schedArray1[arraycnt1++] = remoteSched[id].sendTo[i];
-	  schedArray2[arraycnt2++] = remoteSched[id].sendNum[i];
+	  schedArray1[arraycnt1++] = remoteSched[id].SendTo[i];
+	  schedArray2[arraycnt2++] = remoteSched[id].SendNumber[i];
 	  }
 	}
-      if (remoteSched[id].cntRec > 0)
+      if (remoteSched[id].ReceiveCount > 0)
 	{
-        for (i=0;i<remoteSched[id].cntRec;i++) 
+        for (i=0;i<remoteSched[id].ReceiveCount;i++) 
 	  {
-	  schedArray1[arraycnt1++] = remoteSched[id].recFrom[i];
-	  schedArray2[arraycnt2++] = remoteSched[id].recNum[i];
+	  schedArray1[arraycnt1++] = remoteSched[id].ReceiveFrom[i];
+	  schedArray2[arraycnt2++] = remoteSched[id].ReceiveNumber[i];
 	  }
 	}
-      this->Controller->Send((int*)(&schedLen1), 1, id, VTK_SCHED_LEN_1_TAG); 
-      this->Controller->Send((int*)(&schedLen2), 1, id, VTK_SCHED_LEN_2_TAG); 
-      this->Controller->Send((int*)schedArray1, schedLen1, id, VTK_SCHED_1_TAG); 
-      this->Controller->Send((vtkIdType*)schedArray2, schedLen2, id, VTK_SCHED_2_TAG); 
+      this->Controller->Send((int*)(&schedLen1), 1, id, SCHED_LEN_1_TAG); 
+      this->Controller->Send((int*)(&schedLen2), 1, id, SCHED_LEN_2_TAG); 
+      this->Controller->Send((int*)schedArray1, schedLen1, id, SCHED_1_TAG); 
+      this->Controller->Send((vtkIdType*)schedArray2, schedLen2, id, SCHED_2_TAG); 
       delete [] schedArray1;
       delete [] schedArray2;
       } 
 
     // ... initialize the local schedule to return ...
-    localSched.numCells = remoteSched[0].numCells;
-    localSched.cntSend  = remoteSched[0].cntSend;
-    localSched.cntRec   = remoteSched[0].cntRec;
-    localSched.sendTo   = new int [localSched.cntSend];
-    localSched.recFrom  = new int [localSched.cntRec];
-    localSched.sendNum  = new vtkIdType [localSched.cntSend];
-    localSched.recNum   = new vtkIdType [localSched.cntRec];
-    for (i=0;i<localSched.cntSend; i++)
+    localSched->NumberOfCells = remoteSched[0].NumberOfCells;
+    localSched->SendCount  = remoteSched[0].SendCount;
+    localSched->ReceiveCount   = remoteSched[0].ReceiveCount;
+    localSched->SendTo   = new int [localSched->SendCount];
+    localSched->ReceiveFrom  = new int [localSched->ReceiveCount];
+    localSched->SendNumber  = new vtkIdType [localSched->SendCount];
+    localSched->ReceiveNumber   = new vtkIdType [localSched->ReceiveCount];
+    for (i=0;i<localSched->SendCount; i++)
       {
-      localSched.sendTo[i]  = remoteSched[0].sendTo[i];
-      localSched.sendNum[i] = remoteSched[0].sendNum[i];
+      localSched->SendTo[i]  = remoteSched[0].SendTo[i];
+      localSched->SendNumber[i] = remoteSched[0].SendNumber[i];
       }
-    for (i=0;i<localSched.cntRec; i++)
+    for (i=0;i<localSched->ReceiveCount; i++)
       {
-      localSched.recFrom[i] = remoteSched[0].recFrom[i];
-      localSched.recNum[i]  = remoteSched[0].recNum[i];
+      localSched->ReceiveFrom[i] = remoteSched[0].ReceiveFrom[i];
+      localSched->ReceiveNumber[i]  = remoteSched[0].ReceiveNumber[i];
       }
 
     delete [] order;
@@ -427,36 +429,36 @@ void vtkWeightedPoly::MakeSchedule ( vtkCommSched& localSched)
     // myId != 0
     //schedLen1;
     //schedLen2;
-    this->Controller->Receive((int*)(&schedLen1), 1, 0, VTK_SCHED_LEN_1_TAG); 
-    this->Controller->Receive((int*)(&schedLen2), 1, 0, VTK_SCHED_LEN_2_TAG); 
+    this->Controller->Receive((int*)(&schedLen1), 1, 0, SCHED_LEN_1_TAG); 
+    this->Controller->Receive((int*)(&schedLen2), 1, 0, SCHED_LEN_2_TAG); 
     schedArray1       = new int [schedLen1];
     schedArray2 = new vtkIdType [schedLen2];
-    this->Controller->Receive(schedArray1, schedLen1, 0, VTK_SCHED_1_TAG); 
-    this->Controller->Receive(schedArray2, schedLen2, 0, VTK_SCHED_2_TAG); 
+    this->Controller->Receive(schedArray1, schedLen1, 0, SCHED_1_TAG); 
+    this->Controller->Receive(schedArray2, schedLen2, 0, SCHED_2_TAG); 
 
-    localSched.numCells = schedArray2[0];
-    localSched.cntSend  = schedArray1[0];
-    localSched.cntRec   = schedArray1[1];
+    localSched->NumberOfCells = schedArray2[0];
+    localSched->SendCount  = schedArray1[0];
+    localSched->ReceiveCount   = schedArray1[1];
     int arraycnt1 = 2;
     int arraycnt2 = 1;
-    if (localSched.cntSend > 0)
+    if (localSched->SendCount > 0)
       {
-      localSched.sendTo  = new int [localSched.cntSend];
-      localSched.sendNum = new vtkIdType [localSched.cntSend];
-      for (i=0;i<localSched.cntSend;i++) 
+      localSched->SendTo  = new int [localSched->SendCount];
+      localSched->SendNumber = new vtkIdType [localSched->SendCount];
+      for (i=0;i<localSched->SendCount;i++) 
 	{
-	localSched.sendTo[i]  = schedArray1[arraycnt1++];
-	localSched.sendNum[i] = schedArray2[arraycnt2++];
+	localSched->SendTo[i]  = schedArray1[arraycnt1++];
+	localSched->SendNumber[i] = schedArray2[arraycnt2++];
 	}
       }
-    if (localSched.cntRec > 0)
+    if (localSched->ReceiveCount > 0)
       {
-      localSched.recFrom = new int [localSched.cntRec];
-      localSched.recNum  = new vtkIdType [localSched.cntRec];
-      for (i=0;i<localSched.cntRec;i++) 
+      localSched->ReceiveFrom = new int [localSched->ReceiveCount];
+      localSched->ReceiveNumber  = new vtkIdType [localSched->ReceiveCount];
+      for (i=0;i<localSched->ReceiveCount;i++) 
 	{
-	localSched.recFrom[i] = schedArray1[arraycnt1++]; 
-	localSched.recNum[i]  = schedArray2[arraycnt2++];
+	localSched->ReceiveFrom[i] = schedArray1[arraycnt1++]; 
+	localSched->ReceiveNumber[i]  = schedArray2[arraycnt2++];
 	}
       }
     delete [] schedArray1;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkAllToNPoly.h
+  Module:    vtkBalancedRedistributePolyData.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -68,46 +68,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // version available from Los Alamos National Laboratory.
 =========================================================================*/
 
-// .NAME vtkAllToNPoly - do balanced redistribution of cells on 
-//                         from all to n processors
+// .NAME vtkBalancedRedistributePolyData - do balance of cells on processors
 
-#ifndef __vtkAllToNPoly_h
-#define __vtkAllToNPoly_h
+#ifndef __vtkBalancedRedistributePolyData_h
+#define __vtkBalancedRedistributePolyData_h
 
-#include "vtkWeightedPoly.h"
+#include "vtkWeightedRedistributePolyData.h"
 class vtkMultiProcessController;
+
 
 //*******************************************************************
 
-class VTK_EXPORT vtkAllToNPoly : public vtkWeightedPoly
+class VTK_EXPORT vtkBalancedRedistributePolyData : 
+  public vtkWeightedRedistributePolyData
 {
 public:
-  vtkTypeMacro(vtkAllToNPoly, vtkWeightedPoly);
+  vtkTypeMacro(vtkBalancedRedistributePolyData, vtkWeightedRedistributePolyData);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  static vtkAllToNPoly *New();
-
-  // Description:
-  // The filter needs a controller to determine which process it is in.
-  void SetController(vtkMultiProcessController* controller);
-  vtkGetObjectMacro(Controller, vtkMultiProcessController); 
-
-  void SetN(const int n){numRestrict = n;};
-  int GetN(){return numRestrict;};
-
+  static vtkBalancedRedistributePolyData *New();
 
 protected:
-  vtkAllToNPoly();
-  ~vtkAllToNPoly();
-
-  void MakeSchedule (vtkCommSched&);
-
-  int numRestrict;
+  vtkBalancedRedistributePolyData();
+  ~vtkBalancedRedistributePolyData();
+  void MakeSchedule (vtkCommSched*);
 
 private:
-  vtkAllToNPoly(const vtkAllToNPoly&); // Not implemented
-  void operator=(const vtkAllToNPoly&); // Not implemented
+  vtkBalancedRedistributePolyData(const vtkBalancedRedistributePolyData&); // Not implemented
+  void operator=(const vtkBalancedRedistributePolyData&); // Not implemented
 };
 
 //****************************************************************
