@@ -63,13 +63,20 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
   this->CornerButton->SetParent(this->CornerDisplayFrame);
   this->CornerColor = vtkKWChangeColorButton::New();
   this->CornerColor->SetParent(this->CornerDisplayFrame);
+  this->CornerTopFrame = vtkKWWidget::New();
+  this->CornerTopFrame->SetParent( this->GetFrame() );
+  this->CornerBottomFrame = vtkKWWidget::New();
+  this->CornerBottomFrame->SetParent( this->GetFrame() );
 
   for (int i = 0; i < 4; i++)
     {
-    this->CornerLabel[i] = vtkKWWidget::New();
-    this->CornerLabel[i]->SetParent(this->GetFrame());
+    this->CornerFrame[i] = vtkKWWidget::New();
+    this->CornerFrame[i]->SetParent( 
+	     (i<2)?(this->CornerBottomFrame):(this->CornerTopFrame) );
+    this->CornerLabel[i] = vtkKWWidget::New();    
+    this->CornerLabel[i]->SetParent(this->CornerFrame[i]);
     this->CornerText[i] = vtkKWText::New();
-    this->CornerText[i]->SetParent(this->GetFrame());
+    this->CornerText[i]->SetParent(this->CornerFrame[i]);
     this->CornerMapper[i] = vtkTextMapper::New();
     this->CornerMapper[i]->SetFontSize(15);  
     this->CornerMapper[i]->ShadowOff();  
@@ -104,9 +111,12 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
   this->CornerDisplayFrame->Delete();
   this->CornerButton->Delete();
   this->CornerColor->Delete();
+  this->CornerTopFrame->Delete();
+  this->CornerBottomFrame->Delete();
 
   for (int i = 0; i < 4; i++)
     {
+    this->CornerFrame[i]->Delete();
     this->CornerComposite[i]->Delete();
     this->CornerProp[i]->Delete();
     this->CornerMapper[i]->Delete();
@@ -151,6 +161,30 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
   this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
                this->CornerColor->GetWidgetName());
   this->CornerColor->SetCommand( this, "SetTextColor" );
+
+  this->CornerTopFrame->Create( app, "frame", "" );
+  this->CornerBottomFrame->Create( app, "frame", "" );
+
+  this->Script(
+    "pack %s %s -side top -padx 2 -pady 2 -expand 1 -fill x -anchor nw",
+    this->CornerTopFrame->GetWidgetName(),
+    this->CornerBottomFrame->GetWidgetName() );
+
+  this->CornerFrame[0]->Create( app, "frame", "" );
+  this->CornerFrame[1]->Create( app, "frame", "" );
+
+  this->Script(
+    "pack %s %s -side left -padx 0 -pady 0 -expand 1 -fill x -anchor nw",
+    this->CornerFrame[0]->GetWidgetName(),
+    this->CornerFrame[1]->GetWidgetName() );
+
+  this->CornerFrame[2]->Create( app, "frame", "" );
+  this->CornerFrame[3]->Create( app, "frame", "" );
+
+  this->Script(
+    "pack %s %s -side left -padx 0 -pady 0 -expand 1 -fill x -anchor nw",
+    this->CornerFrame[2]->GetWidgetName(),
+    this->CornerFrame[3]->GetWidgetName() );
 
   this->CornerLabel[0]->Create(app,"label","-text {Lower Left}");
   this->CornerLabel[1]->Create(app,"label","-text {Lower Right}");
@@ -310,6 +344,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.1 $");
+  this->ExtractRevision(os,"$Revision: 1.2 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }

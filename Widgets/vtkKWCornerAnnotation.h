@@ -92,6 +92,10 @@ protected:
   vtkKWChangeColorButton *CornerColor;
   vtkKWCheckButton       *CornerButton;
 
+  vtkKWWidget            *CornerTopFrame;
+  vtkKWWidget            *CornerBottomFrame;
+
+  vtkKWWidget            *CornerFrame[4];
   vtkKWWidget            *CornerLabel[4];
   vtkKWText              *CornerText[4];
   vtkScaledTextActor     *CornerProp[4];
