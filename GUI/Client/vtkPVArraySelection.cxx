@@ -39,7 +39,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.50");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.51");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -400,7 +400,6 @@ void vtkPVArraySelection::SetWidgetSelectionsFromLocal()
 void vtkPVArraySelection::SetReaderSelectionsFromWidgets()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();  
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
 
   vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.57");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.58");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -628,7 +628,6 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
     }
   else
     {
-    char methodAndArgs[200];
     vtkKWMenu *cascadeMenu = vtkKWMenu::New();
     cascadeMenu->SetParent(menu);
     cascadeMenu->Create(this->GetApplication(), "-tearoff 0");
