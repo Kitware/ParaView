@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLColorTransferFunctionWriter.h"
 
 vtkStandardNewMacro(vtkXMLColorTransferFunctionReader);
-vtkCxxRevisionMacro(vtkXMLColorTransferFunctionReader, "1.1");
+vtkCxxRevisionMacro(vtkXMLColorTransferFunctionReader, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLColorTransferFunctionReader::GetRootElementName()
@@ -63,7 +63,8 @@ int vtkXMLColorTransferFunctionReader::Parse(vtkXMLDataElement *elem)
     return 0;
     }
 
-  vtkColorTransferFunction *obj = vtkColorTransferFunction::SafeDownCast(this->Object);
+  vtkColorTransferFunction *obj = 
+    vtkColorTransferFunction::SafeDownCast(this->Object);
   if (!obj)
     {
     vtkWarningMacro(<< "The ColorTransferFunction is not set!");
