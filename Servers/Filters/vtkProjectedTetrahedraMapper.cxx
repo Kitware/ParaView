@@ -60,7 +60,7 @@ static int tet_edges[6][2] = { {0,1}, {1,2}, {2,0},
 
 //-----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.2");
+vtkCxxRevisionMacro(vtkProjectedTetrahedraMapper, "1.3");
 vtkStandardNewMacro(vtkProjectedTetrahedraMapper);
 
 vtkCxxSetObjectMacro(vtkProjectedTetrahedraMapper,
@@ -196,7 +196,7 @@ void vtkProjectedTetrahedraMapper::Render(vtkRenderer *renderer,
     float unit_distance = volume->GetProperty()->GetScalarOpacityUnitDistance();
 
 #define TEXRES  258
-    float *texture = new float[4*TEXRES*TEXRES];
+    float *texture = new float[TEXRES*TEXRES];
     for (int depthi = 0; depthi < TEXRES; depthi++)
       {
       if (renderer->GetRenderWindow()->CheckAbortStatus())
@@ -209,22 +209,16 @@ void vtkProjectedTetrahedraMapper::Render(vtkRenderer *renderer,
 //         {
 //         float opacity = (float)opacityi/(TEXRES-1);
 //         float alpha = CorrectOpacityForDepth(opacity, depth/unit_distance);
-//         texture[4*(depthi*TEXRES + opacityi) + 0] = alpha;
-//         texture[4*(depthi*TEXRES + opacityi) + 1] = alpha;
-//         texture[4*(depthi*TEXRES + opacityi) + 2] = alpha;
-//         texture[4*(depthi*TEXRES + opacityi) + 3] = alpha;
+//         texture[(depthi*TEXRES + opacityi)] = alpha;
 //         }
       for (int attenuationi = 0; attenuationi < TEXRES; attenuationi++)
         {
         float attenuation = (float)attenuationi/(TEXRES);
         float alpha = 1 - (float)exp(-attenuation*depth/unit_distance);
-        texture[4*(depthi*TEXRES + attenuationi) + 0] = alpha;
-        texture[4*(depthi*TEXRES + attenuationi) + 1] = alpha;
-        texture[4*(depthi*TEXRES + attenuationi) + 2] = alpha;
-        texture[4*(depthi*TEXRES + attenuationi) + 3] = alpha;
+        texture[(depthi*TEXRES + attenuationi)] = alpha;
         }
       }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, TEXRES, TEXRES, 1, GL_RGBA,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, TEXRES, TEXRES, 1, GL_ALPHA,
                  GL_FLOAT, texture);
     delete[] texture;
 
@@ -439,7 +433,7 @@ void vtkProjectedTetrahedraMapper::ProjectTetrahedra(vtkRenderer *renderer,
   glBindTexture(GL_TEXTURE_2D, this->OpacityTexture);
   glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 
-  glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   // Establish vertex arrays.
   float tet_points[5*3];
