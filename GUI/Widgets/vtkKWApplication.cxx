@@ -59,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.164");
+vtkCxxRevisionMacro(vtkKWApplication, "1.165");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1034,7 +1034,9 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
   if (!this->AboutDialog->IsCreated())
     {
     this->AboutDialog->SetMasterWindow(master);
-    this->AboutDialog->Create(this, "");
+    this->AboutDialog->SetOptions(	
+      this->AboutDialog->GetOptions() | vtkKWMessageDialog::NoDecoration);
+    this->AboutDialog->Create(this, "-bd 1 -relief solid");
     }
 
   this->ConfigureAbout();
