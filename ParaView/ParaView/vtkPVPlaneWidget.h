@@ -49,22 +49,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVPlaneWidget_h
 #define __vtkPVPlaneWidget_h
 
-#include "vtkPV3DWidget.h"
+#include "vtkPVObjectWidget.h"
 
 class vtkPVSource;
-class vtkKWEntry;
+class vtkPVVectorEntry;
 class vtkKWPushButton;
 class vtkKWWidget;
-class vtkKWLabel;
 
-class VTK_EXPORT vtkPVPlaneWidget : public vtkPV3DWidget
+class VTK_EXPORT vtkPVPlaneWidget : public vtkPVObjectWidget
 {
 public:
   static vtkPVPlaneWidget* New();
-  vtkTypeMacro(vtkPVPlaneWidget, vtkPV3DWidget);
+  vtkTypeMacro(vtkPVPlaneWidget, vtkPVObjectWidget);
 
   void PrintSelf(ostream& os, vtkIndent indent);
     
+  virtual void Create(vtkKWApplication *app);
+
   // Description:
   // Callback that set the center to the middle of the bounds.
   void CenterResetCallback();
@@ -90,6 +91,11 @@ public:
   vtkGetStringMacro(PlaneTclName);
 
   // Description:
+  // Access to the widgets is required for tracing and scripting.
+  vtkGetObjectMacro(CenterEntry, vtkPVVectorEntry);
+  vtkGetObjectMacro(NormalEntry, vtkPVVectorEntry);
+
+  // Description:
   // For saving the widget into a VTK tcl script.
   void SaveInTclScript(ofstream *file);
 
@@ -103,46 +109,30 @@ public:
 				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
-  void SetCenter();
-  void SetCenter(float,float,float);
-  void SetNormal();
-  void SetNormal(float,float,float);
-
 protected:
   vtkPVPlaneWidget();
   ~vtkPVPlaneWidget();
 
-  // Description:
-  // Call creation on the child.
-  virtual void ChildCreate(vtkPVApplication*);
-
-  // Description:
-  // Execute event of the 3D Widget.
-  virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
-
-  vtkKWEntry *CenterEntry[3];
+  vtkPVVectorEntry *CenterEntry;
   vtkKWPushButton *CenterResetButton;
 
-  vtkKWEntry *NormalEntry[3];
+  vtkPVVectorEntry *NormalEntry;
 
   vtkKWWidget *NormalButtonFrame;
   vtkKWPushButton *NormalCameraButton;
   vtkKWPushButton *NormalXButton;
   vtkKWPushButton *NormalYButton;
   vtkKWPushButton *NormalZButton;
-  vtkKWLabel* Labels[2];
-  vtkKWLabel* CoordinateLabel[3];
 
   char *PlaneTclName;
   vtkSetStringMacro(PlaneTclName);
 
 
-  int ReadXMLAttributes(vtkPVXMLElement* element,
-                        vtkPVXMLPackageParser* parser);
-
-private:
   vtkPVPlaneWidget(const vtkPVPlaneWidget&); // Not implemented
   void operator=(const vtkPVPlaneWidget&); // Not implemented
+
+  int ReadXMLAttributes(vtkPVXMLElement* element,
+                        vtkPVXMLPackageParser* parser);
 };
 
 #endif
