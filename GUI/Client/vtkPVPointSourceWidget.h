@@ -29,7 +29,6 @@ class vtkPVInputMenu;
 class vtkPVPointWidget;
 class vtkPVScaleFactorEntry;
 class vtkPVVectorEntry;
-class vtkPVWidgetProperty;
 
 class VTK_EXPORT vtkPVPointSourceWidget : public vtkPVSourceWidget
 {

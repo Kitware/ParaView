@@ -33,7 +33,6 @@ class vtkCollection;
 class vtkDataArray;
 class vtkPVDataSetAttributesInformation;
 class vtkPVArrayInformation;
-class vtkPVStringAndScalarListWidgetProperty;
 class vtkKWOptionMenu;
 class vtkKWLabel;
 

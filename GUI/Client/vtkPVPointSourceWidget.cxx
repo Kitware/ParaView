@@ -23,7 +23,6 @@
 #include "vtkPVScaleFactorEntry.h"
 #include "vtkPVSource.h"
 #include "vtkPVVectorEntry.h"
-#include "vtkPVWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMBoundsDomain.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -35,7 +34,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.33");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.34");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
