@@ -57,6 +57,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkParallelInstantiator.h"
 #endif
 
+#include "vtkPVCommonInstantiator.h"
 #include "vtkPVFiltersInstantiator.h"
 #include "vtkSMInstantiator.h"
 #include "vtkParaViewInstantiator.h"
