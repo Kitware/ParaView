@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.15");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.16");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -121,15 +121,62 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
                                   const char *blend_with_name,
                                   const char *color_option)
 {
-  // Find the photo
+  // Check params
 
-  Tk_PhotoHandle photo = Tk_FindPhoto(interp,
-                                      const_cast<char *>(photo_name));
+  if (!interp)
+    {
+    vtkGenericWarningMacro(<< "Empty interpreter");
+    return 0;
+    }
+
+  if (!photo_name || !photo_name[0])
+    {
+    vtkGenericWarningMacro(<< "Empty photo name");
+    return 0;
+    }
+
+  if (!pixels)
+    {
+    vtkGenericWarningMacro(<< "No pixel data");
+    return 0;
+    }
+
+  if (width <= 0 || height <= 0)
+    {
+    vtkGenericWarningMacro(<< "Invalid size: " << width << "x" << height);
+    return 0;
+    }
+
+  if (pixel_size != 3 && pixel_size != 4)
+    {
+    vtkGenericWarningMacro(<< "Unsupported pixel size: " << pixel_size);
+    return 0;
+    }
+
+  // Find the photo (create it if not found)
+
+  Tk_PhotoHandle photo = Tk_FindPhoto(interp, const_cast<char *>(photo_name));
+
   if (!photo)
     {
-    vtkGenericWarningMacro(<< "Error looking up Tk photo:" << photo_name);
-    return 0;
-    }  
+    ostrstream create_photo;
+    create_photo << "image create photo " << photo_name << ends;
+    int res = Tcl_GlobalEval(interp, create_photo.str());
+    create_photo.rdbuf()->freeze(0);
+    if (res != TCL_OK)
+      {
+      vtkGenericWarningMacro(
+        << "Unable to create photo " << photo_name << ": " << interp->result);
+      return 0;
+      }
+
+    photo = Tk_FindPhoto(interp, const_cast<char *>(photo_name));
+    if (!photo)
+      {
+      vtkGenericWarningMacro(<< "Error looking up Tk photo:" << photo_name);
+      return 0;
+      }
+    }
 
   Tk_PhotoSetSize(photo, width, height);
 
