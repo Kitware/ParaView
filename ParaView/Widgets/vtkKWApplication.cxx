@@ -482,11 +482,12 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
   if ( !HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0) )
     {
     vtkKWMessageDialog::PopupMessage(
-      this, master, vtkKWMessageDialog::Error,
+      this, master,
       "Loading Help Error",
       "Help file cannot be displayed. This can be a result of "
       "the program being wrongly installed or help file being "
-      "corrupted. Please reinstall this program.");
+      "corrupted. Please reinstall this program.", 
+      vtkKWMessageDialog::ErrorIcon);
     }
 #else
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
