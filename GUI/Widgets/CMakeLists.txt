@@ -5,14 +5,12 @@ PROJECT(KWWidgets)
 # directory so that it gets built and then you will use the following variables
 # in your CMakeLists files to get the proper include paths and libraries
 SET (KWWidgets_INCLUDE_PATH 
-  ${KWWidgets_SOURCE_DIR}
-  ${KWWidgets_BINARY_DIR}
+  "${KWWidgets_SOURCE_DIR};${KWWidgets_BINARY_DIR}"
   CACHE INTERNAL "include paths for KWWidgets"
   )
 SET (KWWidgets_LIBRARIES vtkKWWidgetsTCL
   CACHE INTERNAL "libraries for KWWidgets")
 ########################################################################
-
 
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 
