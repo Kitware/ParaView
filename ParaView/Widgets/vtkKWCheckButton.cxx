@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.13.2.2");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.13.2.3");
 
 
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -206,4 +206,6 @@ void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
 void vtkKWCheckButton::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "VariableName: " 
+     << (this->VariableName ? this->VariableName : "None" );
 }
