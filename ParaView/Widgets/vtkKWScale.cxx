@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.31.2.3");
+vtkCxxRevisionMacro(vtkKWScale, "1.31.2.4");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -394,8 +394,6 @@ void vtkKWScale::Bind()
                  this->Entry->GetWidgetName(), this->GetTclName());
     this->Script("bind %s <FocusOut> {%s EntryValueChanged}",
                  this->Entry->GetWidgetName(), this->GetTclName());
-    this->Script("%s config -bg [lindex [%s config -bg] 3]",
-                 this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
     }
 
   if (this->PopupScale && 
@@ -425,8 +423,6 @@ void vtkKWScale::UnBind()
                  this->Entry->GetWidgetName());
     this->Script("bind %s <FocusOut>",
                  this->Entry->GetWidgetName());
-    this->Script("%s config -bg [%s cget -disabledbackground]",
-                 this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
     }
 
   if (this->PopupScale && 
