@@ -208,7 +208,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
   // Make a new tcl object.
   sprintf(tclName, "Actor%d", this->InstanceCount);
-  this->Prop = (vtkProp*)pvApp->MakeTclObject("vtkLODProp3D", tclName);
+  this->Prop = (vtkProp*)pvApp->MakeTclObject("vtkPVLODActor", tclName);
   //this->Actor = (vtkLODProp3D*)pvApp->MakeTclObject("vtkLODProp3D", tclName);
   this->SetPropTclName(tclName);
 
@@ -217,10 +217,12 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->Property = (vtkProperty*)pvApp->MakeTclObject("vtkProperty", tclName);
   this->SetPropertyTclName(tclName);
   
-  pvApp->BroadcastScript("%s AddLOD %s %s 1.0", this->PropTclName, 
-			 this->MapperTclName, this->PropertyTclName);
-  pvApp->BroadcastScript("%s AddLOD %s %s 0.05", this->PropTclName,
-			 this->LODMapperTclName, this->PropertyTclName);
+  pvApp->BroadcastScript("%s SetProperty %s", this->PropTclName, 
+			 this->PropertyTclName);
+  pvApp->BroadcastScript("%s SetMapper %s", this->PropTclName, 
+			 this->MapperTclName);
+  pvApp->BroadcastScript("%s SetLODMapper %s", this->PropTclName,
+			 this->LODMapperTclName);
   
   // Hard code assignment based on processes.
   numProcs = pvApp->GetController()->GetNumberOfProcesses() ;

@@ -31,6 +31,7 @@ vtkPVExtentTranslator
 vtkPVGeometryFilter
 vtkPVGlyph3D 
 vtkPVInputMenu 
+vtkPVLODActor
 vtkPVMethodInterface 
 vtkPVOutputWindow
 vtkPVProbe
