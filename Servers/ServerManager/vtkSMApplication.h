@@ -20,8 +20,6 @@
 
 #include "vtkSMObject.h"
 
-class vtkKWArguments;
-
 class VTK_EXPORT vtkSMApplication : public vtkSMObject
 {
 public:
@@ -30,10 +28,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  void Initialize(vtkKWArguments* args);
+  void Initialize();
 
   // Description:
-  void Finalize(vtkKWArguments* args);
+  void Finalize();
 
 protected:
   vtkSMApplication();

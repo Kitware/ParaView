@@ -107,7 +107,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.262");
+vtkCxxRevisionMacro(vtkPVApplication, "1.263");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -164,6 +164,7 @@ extern "C" int Vtkpvdevelopmenttcl_Init(Tcl_Interp *interp);
 
 #ifdef PARAVIEW_NEW_SOURCE_ORGANIZATION
 extern "C" int Vtkkwparaview_Init(Tcl_Interp *interp);
+extern "C" int Vtkpvservermanagertcl_Init(Tcl_Interp *interp); 
 #else
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 #endif
@@ -384,6 +385,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
    
 #ifdef PARAVIEW_NEW_SOURCE_ORGANIZATION
   Vtkkwparaview_Init(interp);
+  Vtkpvservermanagertcl_Init(interp); 
 #else
   Vtkkwparaviewtcl_Init(interp);
 #endif

@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.1");
+vtkCxxRevisionMacro(vtkSMApplication, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -42,15 +42,15 @@ vtkSMApplication::~vtkSMApplication()
 extern "C" { void vtkPVServerManager_Initialize(vtkClientServerInterpreter*); }
 
 //---------------------------------------------------------------------------
-void vtkSMApplication::Initialize(vtkKWArguments* args)
+void vtkSMApplication::Initialize()
 {
-  args->AddCallback("--configuration-path", 
-                    vtkKWArguments::EQUAL_ARGUMENT, 
-                    NULL, 
-                    NULL, 
-                    "Directory where all configuration files are stored");
+//   args->AddCallback("--configuration-path", 
+//                     vtkKWArguments::EQUAL_ARGUMENT, 
+//                     NULL, 
+//                     NULL, 
+//                     "Directory where all configuration files are stored");
 
-  args->Parse();
+//   args->Parse();
 
   //vtkSMProcessModule* pm = vtkSMProcessModule::New();
   //pm->InitializeInterpreter();
@@ -129,7 +129,7 @@ void vtkSMApplication::Initialize(vtkKWArguments* args)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMApplication::Finalize(vtkKWArguments* /*args*/)
+void vtkSMApplication::Finalize()
 {
   vtkSMSimpleCommunicationModule::SafeDownCast(this->GetCommunicationModule())
     ->Disconnect();
