@@ -227,6 +227,7 @@ int MyMain(int argc, char *argv[])
   pm->Delete();
   pm = NULL;
   Tcl_DeleteInterp(interp);
+  Tcl_Finalize();
 
   return (retVal?retVal:startVal);
 }
@@ -340,8 +341,6 @@ int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance),
     }
   free(argv);
 
-  // !!!!! Should this be in the common main. !!!!!!
-  Tcl_Finalize();
   return retVal;;
 }
 #else
