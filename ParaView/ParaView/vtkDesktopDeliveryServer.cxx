@@ -40,7 +40,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.2");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.3");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -188,7 +188,7 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
 
   // Send remote display flag.
   this->Controller->Send(&this->RemoteDisplay, 1, this->RootProcessId,
-             vtkDesktopDeliveryServer::REMOTE_DISPLAY_TAG);
+    vtkDesktopDeliveryServer::REMOTE_DISPLAY_TAG);
 
   if (this->ParallelRenderManager)
     {
@@ -200,22 +200,22 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
       vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
       vtkRenderer *ren;
       int i;
-      for (rens->InitTraversal(), i = 0; ren = rens->GetNextItem(); i++)
-    {
-    float *viewport = ren->GetViewport();
-    ren->SetViewport(viewport[0]*this->ImageReductionFactor,
-             viewport[1]*this->ImageReductionFactor,
-             viewport[2]*this->ImageReductionFactor,
-             viewport[3]*this->ImageReductionFactor);
-    }
+      for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
+        {
+        float *viewport = ren->GetViewport();
+        ren->SetViewport(viewport[0]*this->ImageReductionFactor,
+          viewport[1]*this->ImageReductionFactor,
+          viewport[2]*this->ImageReductionFactor,
+          viewport[3]*this->ImageReductionFactor);
+        }
       }
 
     // Make sure the prm has the correct image reduction factor.
     if (  this->ParallelRenderManager->GetImageReductionFactor()
-    < this->ImageReductionFactor)
+      < this->ImageReductionFactor)
       {
       this->ParallelRenderManager
-    ->SetMaxImageReductionFactor(this->ImageReductionFactor);
+        ->SetMaxImageReductionFactor(this->ImageReductionFactor);
       }
     this->ParallelRenderManager
       ->SetImageReductionFactor(this->ImageReductionFactor);
