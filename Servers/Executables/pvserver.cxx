@@ -36,7 +36,7 @@
 #include "vtkTimerLog.h"
 #include "vtkDynamicLoader.h"
 #include "kwsys/SystemTools.hxx"
-#include "vtkpvConfig.h"
+#include "vtkPVConfig.h"
 #include "vtkPVDemoPaths.h"
 
 
