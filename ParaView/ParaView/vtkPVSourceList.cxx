@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.26");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -133,11 +133,12 @@ void vtkPVSourceList::Pick(int compIdx)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceList::ToggleVisibility(int compIdx, int )
+void vtkPVSourceList::ToggleVisibility(int compIdx, char* id, int )
 {
   vtkPVSource *comp;
   int i;
   
+
   comp = vtkPVSource::SafeDownCast(
     this->Sources->GetItemAsObject(compIdx));
   if (comp)
@@ -154,8 +155,15 @@ void vtkPVSourceList::ToggleVisibility(int compIdx, int )
         comp->GetPVOutput(i)->VisibilityOn();
         }
       }
-    comp->GetPVWindow()->SetCurrentPVSourceCallback(
-      comp->GetPVWindow()->GetCurrentPVSource());
+
+    int bbox[4];
+    this->CalculateBBox(this->Canvas, id, bbox);
+    int compIdx = this->Sources->IsItemPresent(comp) - 1;
+    this->UpdateVisibility(comp, compIdx, 
+                           (bbox[0]+bbox[2])/2, 
+                           (bbox[1]+bbox[3])/2,
+                           0);
+
     vtkPVRenderView* renderView 
       = vtkPVRenderView::SafeDownCast(comp->GetView());
     if ( renderView )
@@ -242,25 +250,14 @@ void vtkPVSourceList::PostChildUpdate()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
-                                  int NoBind)
+int vtkPVSourceList::UpdateVisibility(vtkPVSource *comp, int compIdx,
+                                      int x, int y, 
+                                      int noBind)
 {
-  int compIdx, x, yNext; 
-  static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
-  char *result;
-  int bbox[4];
+  char *result = 0;
   char *tmp;
 
-  compIdx = this->Sources->IsItemPresent(comp) - 1;
-
-  // Draw the small horizontal indent line.
-  x = in + 8;
-  this->Script("%s create line %d %d %d %d -fill gray50",
-               this->Canvas->GetWidgetName(), in, y, x, y);
-  yNext = y + 17;
-
   // Draw the icon indicating visibility.
-  result = NULL;
   if ( !comp->GetHideDisplayPage() )
     {
     if (comp->GetPVOutput(0) == NULL)
@@ -289,18 +286,42 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
         }
       }
     }
-  if (result && !NoBind)
+  if (result && !noBind)
     {
     tmp = vtkString::Duplicate(result);
-    this->Script("%s bind %s <ButtonPress-1> {%s ToggleVisibility %d 1}",
+    this->Script("%s bind %s <ButtonPress-1> {%s ToggleVisibility %d %s 1}",
                  this->Canvas->GetWidgetName(), tmp,
-                 this->GetTclName(), compIdx);
-    this->Script("%s bind %s <ButtonPress-3> {%s ToggleVisibility %d 3}",
+                 this->GetTclName(), compIdx, tmp);
+    this->Script("%s bind %s <ButtonPress-3> {%s ToggleVisibility %d %s 3}",
                  this->Canvas->GetWidgetName(), tmp,
-                 this->GetTclName(), compIdx);
+                 this->GetTclName(), compIdx, tmp);
     delete [] tmp;
     tmp = NULL;
     }
+
+  return x;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
+                                  int noBind)
+{
+  int compIdx, x, yNext; 
+  static const char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
+  char *result = 0;
+  int bbox[4];
+  char *tmp;
+
+  compIdx = this->Sources->IsItemPresent(comp) - 1;
+
+  // Draw the small horizontal indent line.
+  x = in + 8;
+  this->Script("%s create line %d %d %d %d -fill gray50",
+               this->Canvas->GetWidgetName(), in, y, x, y);
+  yNext = y + 17;
+
+
+  x = this->UpdateVisibility(comp, compIdx, x, y, noBind);
 
   // Draw the name of the assembly.
   if (comp->GetDescription())
@@ -321,7 +342,7 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in, int current,
   result = this->Application->GetMainInterp()->result;
   tmp = new char[strlen(result)+1];
   strcpy(tmp,result);
-  if ( !NoBind )
+  if ( !noBind )
     {
     this->Script("%s bind %s <ButtonPress-1> {%s Pick %d}",
                  this->Canvas->GetWidgetName(), tmp,

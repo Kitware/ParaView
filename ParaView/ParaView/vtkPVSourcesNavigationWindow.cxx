@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.4");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.5");
 
 //------------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -109,9 +109,8 @@ const char* vtkPVSourcesNavigationWindow::CreateCanvasItem(const char *format, .
 //------------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::ChildUpdate(vtkPVSource*,int)
 {
-  cout << "Subclass should do this." << endl;
-  cout << "I am " << this->GetClassName() << endl;
-  abort();
+  vtkErrorMacro(<< "Subclass should do this.");
+  vtkErrorMacro(<< "I am " << this->GetClassName());
 }
 
 //------------------------------------------------------------------------------

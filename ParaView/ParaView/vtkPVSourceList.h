@@ -63,7 +63,7 @@ public:
   // Description:
   // Callback from the canvas buttons.
   void Pick(int assyIdx);
-  void ToggleVisibility(int assyIdx, int button);
+  void ToggleVisibility(int assyIdx, char* id, int button);
   void EditColor(int assyIdx);
 
   // Description:
@@ -81,7 +81,8 @@ protected:
   // Create a Tk widget
   virtual void ChildCreate();
 
-  int UpdateSource(vtkPVSource *comp, int y, int in, int current, int NoBind);
+  int UpdateSource(vtkPVSource *comp, int y, int in, int current, int noBind);
+  int UpdateVisibility(vtkPVSource *comp, int compIdx, int x, int y, int noBind);
 
   // Description:
   // The assembly that is displayed in the editor.

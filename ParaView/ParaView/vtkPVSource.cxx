@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.238");
+vtkCxxRevisionMacro(vtkPVSource, "1.239");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -177,8 +177,10 @@ vtkPVSource::~vtkPVSource()
 
   this->SetVTKSource(NULL, NULL);
 
-  this->SetName(NULL);
-  this->SetDescription(NULL);
+  // Do not use SetName() or SetDescription() here. These make
+  // the navigation window update when it should not.
+  delete[] this->Name;
+  delete[] this->Description;
 
   // This is necessary in order to make the parent frame release it's
   // reference to the widgets. Otherwise, the widgets get deleted only
@@ -651,6 +653,11 @@ void vtkPVSource::Select()
     {
     // Update the Display page.
     data->UpdateProperties();
+    }
+
+  if (this->GetPVRenderView())
+    {
+    this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
     }
 
   int i;
@@ -1250,8 +1257,6 @@ void vtkPVSource::UpdateProperties()
       this->Script("%s configure -state disabled",
                    this->DeleteButton->GetWidgetName());
       }
-  
-  this->GetPVRenderView()->UpdateNavigationWindow(this, this->SourceGrabbed);
   
   // I do not know why the inputs have to be updated.
   // I am changing it to output as an experiment.
@@ -2038,7 +2043,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.238 $");
+  this->ExtractRevision(os,"$Revision: 1.239 $");
 }
 
 //----------------------------------------------------------------------------
