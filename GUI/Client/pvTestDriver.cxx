@@ -37,6 +37,7 @@ pvTestDriver::pvTestDriver()
   this->TimeOut = 300;
   this->TestRenderServer = 0;
   this->TestServer = 0;
+  this->ReverseConnection = 0;
 }
 
 // now implement the pvTestDriver class
@@ -128,6 +129,13 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
       this->TestServer = 1;
       fprintf(stderr, "Test Render Server.\n");
       }
+    if(strcmp(argv[index], "--test-r2d") == 0)
+      {
+      this->ArgStart = index+1;
+      this->TestRenderServer = 2;
+      this->TestServer = 1;
+      fprintf(stderr, "Test Render Server.\n");
+      }
     if(strcmp(argv[index], "--test-server") == 0)
       {
       this->ArgStart = index+1;
@@ -144,6 +152,12 @@ int pvTestDriver::ProcessCommandLine(int argc, char* argv[])
   int i;
   for(i =1; i < argc - 1; ++i)
     {
+    if(strcmp(argv[i], "--test-rc") == 0)
+      {
+      this->ArgStart = i+1;
+      this->ReverseConnection = 1;
+      fprintf(stderr, "Test reverse connection.\n");
+      }
     if(strcmp(argv[i], "--timeout") == 0)
       {
       this->ArgStart = i+2;
@@ -188,12 +202,15 @@ pvTestDriver::CreateCommandLine(kwsys_stl::vector<const char*>& commandLine,
     {
     commandLine.push_back(paraviewFlags);
     }
+  if(this->ReverseConnection)
+    {
+    commandLine.push_back("-rc");
+    }
   
   for(int ii = argStart; ii < argCount; ++ii)
     {
     commandLine.push_back(argv[ii]);
     }
-  
   for(unsigned int i = 0; i < this->MPIPostFlags.size(); ++i)
     {
     commandLine.push_back(MPIPostFlags[i].c_str());
@@ -349,7 +366,14 @@ int pvTestDriver::Main(int argc, char* argv[])
   vtkstd::string clientFlag;
   if(renderServer)
     {
-    clientFlag = "--client-render-server";
+    if(this->TestRenderServer == 2)
+      {
+      clientFlag = "-r2d";
+      }
+    else
+      {
+      clientFlag = "--client-render-server";
+      }
     }
   else
     {
@@ -376,23 +400,49 @@ int pvTestDriver::Main(int argc, char* argv[])
     {
     kwsysProcess_SetTimeout(server, this->TimeOut);
     }
-  // Start the render server if there is one
-  if(!this->StartServer(renderServer, "Render Server",
-                        RenderServerStdOut, RenderServerStdErr))
+  if(renderServer)
     {
-    cerr << "pvTestDriver: Render server never started.\n";
-    return -1;
+    kwsysProcess_SetTimeout(renderServer, this->TimeOut);
     }
-  // Start the data server if there is one
-  if(!this->StartServer(server, "Server",
-                        ServerStdOut, ServerStdErr))
+  if(this->ReverseConnection)
     {
-    cerr << "pvTestDriver: Server never started.\n";
-    return -1;
+    if(!this->StartServer(client, "Client reverse ",
+                          ClientStdOut, ClientStdErr))
+      {
+      cerr << "pvTestDriver: Reverse connection client never started.\n";
+      return -1;
+      }
+    // Now run the server
+    if(server)
+      {
+      kwsysProcess_Execute(server);
+      }
+    // Now run the render server
+    if(renderServer)
+      {
+      kwsysProcess_Execute(renderServer);
+      }
     }
-  // Now run the client
-  kwsysProcess_Execute(client);
-
+  else
+    {
+    // Start the render server if there is one
+    if(!this->StartServer(renderServer, "Render Server",
+                          RenderServerStdOut, RenderServerStdErr))
+      {
+      cerr << "pvTestDriver: Render server never started.\n";
+      return -1;
+      }
+    // Start the data server if there is one
+    if(!this->StartServer(server, "Server",
+                          ServerStdOut, ServerStdErr))
+      {
+      cerr << "pvTestDriver: Server never started.\n";
+      return -1;
+      }
+    // Now run the client
+    kwsysProcess_Execute(client);
+    }
+  
   // Report the output of the processes.
   int clientPipe = 1;
   int serverPipe = 1;

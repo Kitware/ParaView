@@ -137,6 +137,67 @@ FOREACH (tfile ${PROJECT_TESTS})
     -V ${PVClientTestData}/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
+# add some tests for the various ways that connections 
+# can be made
+
+# test render server with a reverse connection
+# between the servers and the client.  The client
+# will start first and wait for the servers to connect to it.
+ADD_TEST("ArrowRenderServer-ParaView-rc" 
+  ${PARAVIEW_CS_EXECUTABLE}
+  --test-render-server
+  --test-rc
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/Arrow.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/Arrow.png)
+
+# test the render server where the render server
+# connects to the data server, the default is for the
+# data server to connect to the render server
+ADD_TEST("ArrowRenderServer-ParaView-r2d" 
+  ${PARAVIEW_CS_EXECUTABLE}
+  --test-r2d
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/Arrow.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/Arrow.png)
+
+# same test as -r2d, but this time do a reverse
+# connection between the servers and the client like
+# the -rc test
+ADD_TEST("ArrowRenderServer-ParaView-r2d-rc" 
+  ${PARAVIEW_CS_EXECUTABLE}
+  --test-r2d 
+  --test-rc
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/Arrow.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/Arrow.png)
+
+# test the reverse connection for one server
+# and no render server
+ADD_TEST("ArrowServer-ParaView-rc" 
+  ${PARAVIEW_CS_EXECUTABLE}
+  --test-server
+  --test-rc
+  ${TIMEOUT}
+  --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/Arrow.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${PVClientTestData}/Baseline/Arrow.png)
+
 # remove the following for the batch tests
 REMOVE (PROJECT_TESTS
   MouseInteraction
