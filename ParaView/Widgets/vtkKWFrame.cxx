@@ -97,7 +97,7 @@ void vtkKWFrame::Create(vtkKWApplication *app, int scrollable)
     this->Canvas = vtkKWWidget::New();
     this->ScrollBar = vtkKWWidget::New();
     this->Canvas->SetParent(this);
-    this->Canvas->Create(this->Application, "canvas", " -height 800"); 
+    this->Canvas->Create(this->Application, "canvas", " -height 800 -highlightthickness 0"); 
     
     ostrstream command;
     this->ScrollBar->SetParent(this);
