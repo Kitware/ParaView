@@ -1,0 +1,529 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkPOPReader.cxx
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+
+Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ * Neither name of Ken Martin, Will Schroeder, or Bill Lorensen nor the names
+   of any contributors may be used to endorse or promote products derived
+   from this software without specific prior written permission.
+
+ * Modified source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=========================================================================*/
+#include <ctype.h>
+#include <math.h>
+#include "vtkPOPReader.h"
+#include "vtkMath.h"
+#include "vtkExtentTranslator.h"
+#include "vtkFloatArray.h"
+#include "vtkImageReader.h"
+#include "vtkImageShrink3D.h"
+#include "vtkObjectFactory.h"
+
+//-------------------------------------------------------------------------
+vtkPOPReader* vtkPOPReader::New()
+{
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPOPReader");
+  if(ret)
+    {
+    return (vtkPOPReader*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPOPReader;
+}
+
+//----------------------------------------------------------------------------
+vtkPOPReader::vtkPOPReader()
+{
+  this->Radius = 20000.0;
+  
+  this->Dimensions[0] = 3600;
+  this->Dimensions[1] = 2400;
+  this->ReductionFactors[0] = 1;
+  this->ReductionFactors[1] = 1;
+  
+  this->GridFileName = NULL;
+  this->FileName = NULL;
+  
+  this->NumberOfArrays = 0;
+  this->MaximumNumberOfArrays = 0;
+  this->ArrayNames = NULL;
+  this->ArrayFileNames = NULL;
+  
+  this->DepthValues = vtkFloatArray::New();
+} 
+
+//----------------------------------------------------------------------------
+vtkPOPReader::~vtkPOPReader()
+{
+  int i;
+  
+  this->SetFileName(NULL);
+  this->SetGridFileName(NULL);
+  for (i = 0; i < this->NumberOfArrays; ++i)
+    {
+    if (this->ArrayNames && this->ArrayNames[i])
+      {
+      delete [] this->ArrayNames[i];
+      this->ArrayNames[i] = NULL;
+      }
+    if (this->ArrayFileNames && this->ArrayFileNames[i])
+      {
+      delete [] this->ArrayFileNames[i];
+      this->ArrayFileNames[i] = NULL;
+      }
+    }
+  if (this->ArrayNames)
+    {
+    delete [] this->ArrayNames;
+    this->ArrayNames = NULL;
+    }
+  if (this->ArrayFileNames)
+    {
+    delete [] this->ArrayFileNames;
+    this->ArrayFileNames = NULL;
+    }
+  
+  this->DepthValues->Delete();
+  this->DepthValues = NULL;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPOPReader::AddArray(char *arrayName, char *fileName)
+{
+  if (this->NumberOfArrays == this->MaximumNumberOfArrays)
+    {
+    int idx;
+    char **tmp1, **tmp2;
+    
+    this->MaximumNumberOfArrays += 20;
+    tmp1 = new (char*)[this->MaximumNumberOfArrays];
+    tmp2 = new (char*)[this->MaximumNumberOfArrays];
+    for (idx = 0; idx < this->NumberOfArrays; ++idx)
+      {
+      tmp1[idx] = this->ArrayNames[idx];
+      tmp2[idx] = this->ArrayFileNames[idx];
+      }
+    delete [] this->ArrayNames;
+    this->ArrayNames = tmp1;
+    delete [] this->ArrayFileNames;
+    this->ArrayFileNames = tmp2;
+    }
+  
+  this->ArrayNames[this->NumberOfArrays] = new char[strlen(arrayName)+1];
+  strcpy(this->ArrayNames[this->NumberOfArrays], arrayName);
+
+  this->ArrayFileNames[this->NumberOfArrays] = new char[strlen(fileName)+1];
+  strcpy(this->ArrayFileNames[this->NumberOfArrays], fileName);
+
+  ++this->NumberOfArrays;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPOPReader::ExecuteInformation()
+{
+  int xDim, yDim, zDim;
+  
+  this->ReadInformationFile();  
+  
+  xDim = this->Dimensions[0] / this->ReductionFactors[0];
+  yDim = this->Dimensions[1] / this->ReductionFactors[1];
+  zDim = this->DepthValues->GetNumberOfTuples();
+  
+  this->GetOutput()->SetWholeExtent(0, xDim-1, 0, yDim-1, 0, zDim-1);
+}
+
+//----------------------------------------------------------------------------
+void vtkPOPReader::Execute()
+{
+  vtkStructuredGrid *output;
+  vtkPoints *points;
+  vtkImageData *image;
+  int ext[6];
+  int i;
+  vtkFieldData *fd;
+
+  output = this->GetOutput();
+  fd = vtkFieldData::New();
+  output->GetPointData()->SetFieldData(fd);
+  fd->Delete();
+  fd = NULL;
+  
+  // Set up the extent of the grid image.
+  ext[0] = ext[2] = ext[4] = 0;
+  ext[1] = this->Dimensions[0]-1;
+  ext[3] = this->Dimensions[1]-1;
+  ext[5] = 1;
+  
+  vtkImageReader *reader = vtkImageReader::New();
+  reader->SetFileDimensionality(3);
+  reader->SetDataExtent(ext);
+  reader->SetFileName(this->GridFileName);
+  reader->SetDataByteOrderToBigEndian();
+  reader->SetNumberOfScalarComponents(1);
+  reader->SetDataScalarTypeToDouble();
+  reader->SetHeaderSize(0);
+
+  vtkImageShrink3D *shrink = vtkImageShrink3D::New();
+  shrink->SetInput(reader->GetOutput());
+  shrink->SetShrinkFactors(this->ReductionFactors[0], this->ReductionFactors[1], 1);
+  shrink->AveragingOff();
+
+  image = vtkImageData::New();
+  if (this->ReductionFactors[0] == 1 && this->ReductionFactors[1] == 1)
+    {
+    reader->SetOutput(image);
+    }
+  else
+    {
+    shrink->SetOutput(image);
+    }
+  output->GetUpdateExtent(ext);
+  output->SetExtent(ext);
+  ext[4] = 0;
+  ext[5] = 1;
+  image->SetUpdateExtent(ext);
+  image->Update();
+  
+  // Create the grid points from the grid image.
+  points = this->ReadPoints(image);
+  image->Delete();
+  image = NULL;
+
+  output->SetPoints(points);
+  points->Delete();
+  points = NULL;
+  
+  // Now read in the arrays.
+  // Set up the extent of the grid image.
+  ext[0] = ext[2] = ext[4] = 0;
+  ext[1] = this->Dimensions[0]-1;
+  ext[3] = this->Dimensions[1]-1;
+  ext[5] = this->DepthValues->GetNumberOfTuples()-1;
+  reader->SetDataExtent(ext);
+  reader->SetDataScalarTypeToFloat();
+  for (i = 0; i < this->NumberOfArrays; ++i)
+    {
+    if (this->ArrayFileNames[i] && this->ArrayNames[i])
+      {
+      reader->SetFileName(this->ArrayFileNames[i]);
+      // Just in case.
+      reader->SetHeaderSize(0);
+      image = vtkImageData::New();
+      output->GetUpdateExtent(ext);
+      image->SetUpdateExtent(ext);
+      if (this->ReductionFactors[0] == 1 && this->ReductionFactors[1] == 1)
+	{
+	reader->SetOutput(image);
+	}
+      else
+	{
+	shrink->SetOutput(image);
+	}
+      image->Update();
+      output->GetPointData()->GetFieldData()->AddArray(
+	image->GetPointData()->GetScalars()->GetData(), this->ArrayNames[i]);
+      image->Delete();
+      image = NULL;
+      }
+    }
+}
+
+
+//----------------------------------------------------------------------------
+vtkPoints *vtkPOPReader::GeneratePoints()
+{
+  vtkPoints *points;
+  vtkImageData *temp;
+  double x, y, z, radius;
+  double theta, phi;
+  int i, j;
+  int *wholeExt;
+  int xDim, yDim;
+  int *ext;  
+  int id;
+  
+  //temp = this->GetInput();
+  wholeExt = temp->GetWholeExtent();
+  if (wholeExt[0] != 0 || wholeExt[2] != 0 || wholeExt[4] != 0)
+    {
+    vtkErrorMacro("Expecting whole extent to start at 0.");
+    return NULL;
+    }
+  xDim = wholeExt[1]+1;
+  yDim = wholeExt[3]+1;  
+  ext = temp->GetExtent();
+  
+  points = vtkPoints::New();
+  points->Allocate(xDim*yDim);
+  id = 0;
+  radius = 20000.0;
+  for (j = ext[2]; j <= ext[3]; ++j)
+    {
+    phi = (double)j * vtkMath::Pi() / (double)(yDim);
+    for (i = ext[0]; i <= ext[1]; ++i)
+      {
+      theta = (double)i * 2.0 * vtkMath::Pi() / (double)(xDim);
+      y = cos(phi)*radius;
+      x = sin(theta)*sin(phi)*radius;
+      z = cos(theta)*sin(phi)*radius;
+      points->SetPoint(id, x, y, z);
+      ++id;
+      }
+    }
+  
+  return points;
+}
+
+
+
+
+//----------------------------------------------------------------------------
+vtkPoints *vtkPOPReader::ReadPoints(vtkImageData *image)
+{
+  vtkPoints *points;
+  double x, y, z, depth, radius;
+  double theta, phi;
+  int i, j, k;
+  int *wholeExt;
+  int xDim, yDim;
+  int *ext;  
+  int id, num, numLevels;
+  
+  ext = image->GetExtent();
+  numLevels = this->DepthValues->GetNumberOfTuples();
+  points = vtkPoints::New();
+  num = (ext[1]-ext[0]+1)*(ext[3]-ext[2]+1)*numLevels;
+  points->Allocate(num);
+  points->SetNumberOfPoints(num);
+  
+  id = 0;
+  for (k = 0; k < numLevels; ++k)
+    {
+    depth = this->DepthValues->GetValue(k);
+    radius = this->Radius - depth;
+    for (j = ext[2]; j <= ext[3]; ++j)
+      {
+      for (i = ext[0]; i <= ext[1]; ++i)
+	{      
+	phi = (double)(image->GetScalarComponentAsFloat(i, j, 0, 0));
+	theta = (double)(image->GetScalarComponentAsFloat(i, j, 1, 0));
+	phi += vtkMath::Pi()/2.0;
+	y = -cos(phi)*radius;
+	x = sin(theta)*sin(phi)*radius;
+	z = cos(theta)*sin(phi)*radius;
+	points->SetPoint(id, x, y, z);
+	++id;
+	}
+      }
+    }
+  
+  return points;
+}
+
+
+//==================== Stuff for reading the pop file ========================
+
+
+
+//----------------------------------------------------------------------------
+void vtkPOPReader::ReadInformationFile()
+{
+  ifstream *file;
+  int i, num;
+  float tempf;
+  char str[256];
+  char *tmp;
+
+  this->DepthValues->Reset();
+  file = new ifstream(this->FileName, ios::in);
+  
+  while (1)
+    {
+    // Read Key
+    *file >> str;
+    if (file->fail())
+      {
+      file->close();
+      delete file;
+      return;
+      }
+    
+    if (strcmp(str, "Dimensions") == 0)
+      {
+      *file >> num;
+      this->Dimensions[0] = num;
+      *file >> num;
+      this->Dimensions[1] = num;
+      }
+
+    else if (strcmp(str, "GridFileName") == 0)
+      {
+      *file >> str;
+      this->SetGridName(str);
+      }
+
+    else if (strcmp(str, "NumberOfArrays") == 0)
+      {
+      *file >> num;
+      for (i = 0; i < num; ++i)
+	{
+	*file >> str;
+	if (file->fail())
+	  {
+	  vtkErrorMacro("Error reading array name " << i);    
+	  delete file;
+	  return ;
+	  }
+	this->AddArrayName(str);
+	}
+      }
+
+    else if (strcmp(str, "NumberOfDepthValues") == 0)
+      {
+      *file >> num;
+      for (i = 0; i < num; ++i)
+	{
+	*file >> str;
+	if (file->fail())
+	  {
+	  vtkErrorMacro("Error reading depth value " << i);    
+	  delete file;
+	  return;
+	  }
+	tempf = atof(str);
+	this->DepthValues->InsertNextValue(tempf);
+	}
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPOPReader::SetGridName(char *name)
+{
+  if (this->IsFileName(name))
+    {
+    this->SetGridFileName(name);
+    return;
+    }
+  
+  char *tmp;
+  
+  tmp = this->MakeFileName(name);
+  this->SetGridFileName(tmp);
+  delete [] tmp;
+}
+
+//----------------------------------------------------------------------------
+void vtkPOPReader::AddArrayName(char *name)
+{
+  if (this->IsFileName(name))
+    {
+    vtkErrorMacro("We do not handle arrays in differnt directories yet.");
+    return;
+    }
+  
+  char *tmp;
+  tmp = this->MakeFileName(name);
+  this->AddArray(name, tmp);
+  delete [] tmp;
+}
+
+//----------------------------------------------------------------------------
+int vtkPOPReader::IsFileName(char *name)
+{
+  while (name && *name)
+    {
+    if (*name == '/')
+      {
+      return 1;
+      }
+    ++name;
+    }
+  
+  return 0;  
+}
+
+//----------------------------------------------------------------------------
+char *vtkPOPReader::MakeFileName(char *name)
+{
+  char *fileName;
+  char *tmp1;
+  char *tmp2;
+  char *start;
+  
+  if (name == NULL)
+    {
+    vtkErrorMacro("No name.");
+    return NULL;
+    }
+  
+  if (this->FileName == NULL)
+    {
+    fileName = new char[strlen(name) + 1];
+    strcpy(fileName, name);
+    return fileName;
+    }
+  
+  fileName = new char[strlen(this->FileName) + strlen(name) + 1];
+  tmp1 = this->FileName;
+  tmp2 = fileName;
+  start = fileName;
+  while (tmp1 && *tmp1)
+    {
+    *tmp2 = *tmp1;
+    if (*tmp1 == '/')
+      {
+      start = tmp2+1;
+      }
+    ++tmp1;
+    ++tmp2;
+    }
+  
+  strcpy(start, name);
+  
+  return fileName;
+}
+
+  
+      
+  
+//----------------------------------------------------------------------------
+void vtkPOPReader::PrintSelf(ostream& os, vtkIndent indent)
+{
+  vtkStructuredGridSource::PrintSelf(os,indent);
+
+}
+

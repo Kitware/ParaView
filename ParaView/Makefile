@@ -25,6 +25,7 @@ vtkInteractorStyleImageExtent \
 vtkInteractorStylePlane \
 vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
+vtkPOPReader \
 vtkPVActorComposite \
 vtkPVApplication \
 vtkPVArrayCalculator \
