@@ -167,6 +167,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
       {
       cerr << "Could not delete application.\n";
       }
+    app->SetController(NULL);
     }
   else
     {
@@ -310,30 +311,3 @@ int main(int argc, char *argv[])
   return 0;
 }
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
