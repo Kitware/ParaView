@@ -1,114 +1,9 @@
 <ModuleInterfaces>
-  <Module name="legacyreader" class="vtkPVReaderModule" root_name="Leg" 
-          module_type="Reader"
-          extensions=".vtk" file_description="Legacy VTK files.">
-    <Source class="vtkPDataSetReader"/>
-  </Module>
-  <Module name="stlreader" class="vtkPVReaderModule" root_name="STL" 
-          module_type="Reader"
-          extensions=".stl" file_description="Stereo Lithography">
-    <Source class="vtkSTLReader"/>
-  </Module>
-  <Module name="byureader" class="vtkPVReaderModule" root_name="BYU" 
-          module_type="Reader"
-          extensions=".g" file_description="BYU Files">
-    <Source class="vtkBYUReader"/>
-  </Module>
-  <Module name="gaussiancubereader" class="vtkPVAdvancedReaderModule" root_name="GaussianCube" 
-          module_type="Reader"
-          extensions=".cube" file_description="Gaussian Cube Files">
-    <Source class="vtkGaussianCubeReader"/>
-    <VectorEntry variable="HBScale" trace_name="HBScale" type="float" 
-                 help="Set the HB scale"/>
-    <VectorEntry variable="BScale" trace_name="BScale" type="float" 
-                 help="Set the B scale"/>
-  </Module>
-  <Module name="popreader" class="vtkPVAdvancedReaderModule" 
-          root_name="POP" 
-          module_type="Reader"
-          extensions=".pop" file_description="POP Ocean Files">
-    <Source class="vtkPOPReader"/>
-    <VectorEntry variable="Radius" trace_name="Radius" type="float" 
-                 help="Set the radius of the data set"/>
-    <VectorEntry label="Clip Extent" variable="ClipExtent" type="int"
-                 length="6" trace_name="ClipExtent"
-                 help="For reading a smaller extent."/>
-    <VectorEntry label="Ghost Levels" trace_name="NumberOfGhostLevels"
-                 variable="NumberOfGhostLevels" 
-                 type="int" 
-                 help="Set the number of ghost levels to read."/>
-  </Module>
-  <Module name="ensight" class="vtkPVEnSightReaderModule"
-          root_name="Ensight" 
-          module_type="Reader"
-          extensions=".case" file_description="EnSight Files">
-    <Source class="vtkGenericEnSightReader"/>
-    <SelectionList label="Byte order" trace_name="ByteOrder"
-                   variable="ByteOrder"
-           help="Select the byte order of the binary file">
-      <Item name="big endian" value="0"/>
-      <Item name="little endian" value="1"/>
-    </SelectionList>
-    
-    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
-    <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
-    <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
-  </Module>
-  <Module name="ensightMS" class="vtkPVEnSightReaderModule"
-          root_name="Ensight" 
-          module_type="Reader"
-          extensions=".sos" file_description="EnSight Master Server Files">
-    <Source class="vtkPVEnSightMasterServerReader"/>
-    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
-    <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
-    <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
-  </Module>
-  <Module name="pdbreader" class="vtkPVReaderModule" root_name="PDB" 
-          module_type="Reader"
-          extensions=".pdb" file_description="PDB Files">
-    <Source class="vtkPDBReader"/>
-  </Module>
-  <Module name="xyzreader" class="vtkPVReaderModule" root_name="XYZMol" 
-          module_type="Reader"
-          extensions=".xyz" file_description="XYZ Molecule Files">
-    <Source class="vtkXYZMolReader"/>
-    <VectorEntry variable="TimeStep" trace_name="TimeStep" type="int" 
-                 help="Set the TimeStep"/>
-  </Module>
-  <Module name="P3DReader" class="vtkPVPLOT3DReaderModule"
-          root_name="Plot3D"
-          module_type="Reader"
-          extensions=".xyz" file_description="PLOT3D Files">
-    <Source class="vtkPLOT3DReader"/>
-    <FileEntry label="Q File" trace_name="QFileName"
-               variable="QFileName" extension="q" 
-               help="Set the plot3d q file to read."/>
-    <LabeledToggle label="Binary" trace_name="BinaryFile"
-                   variable="BinaryFile" 
-                   help="Is this a binary file?"/>
-    <LabeledToggle label="Multi-block" trace_name="MultiGrid"
-                   variable="MultiGrid" 
-                   help="Does this file have multiple block information"/>
-    <LabeledToggle label="Fortran byte count" trace_name="HasByteCount"
-       variable="HasByteCount" 
-       help="Does this file use Fortran leading-trailing byte counts"/>
-    <LabeledToggle label="I blanking" trace_name="IBlanking"
-                    variable="IBlanking"
-                    help="Any visibility information?"/>
-    <LabeledToggle label="2D geometry"
-                   trace_name="TwoDimensionalGeometry"
-                    variable="TwoDimensionalGeometry"
-                    help="Is there only data for two dimensions?"/>
-    <LabeledToggle label="Force read" trace_name="ForceRead"
-                   variable="ForceRead"
-                   help="Read even if file looks corrupt?"/>
-  <SelectionList label="Byte order" trace_name="ByteOrder"
-                 variable="ByteOrder"
-         help="Select the byte order of the binary file">
-    <Item name="big endian" value="0"/>
-    <Item name="little endian" value="1"/>
-  </SelectionList>
-  </Module>
+ <Module name="XMLCollectionReader" class="vtkPVReaderModule"
+         root_name="XMLCollectionReader" module_type="Reader"
+         extensions=".pvd" file_description="ParaView Data Files">
+  <Source class="vtkXMLCollectionReader"/>
+ </Module>
  <Module name="XMLPolyDataReader"
          root_name="XMLPolyDataReader" 
          class="vtkPVAdvancedReaderModule"
@@ -164,7 +59,7 @@
          class="vtkPVAdvancedReaderModule"
          module_type="Reader"
          extensions=".pvtp"
-         file_description="PVTK PolyData Files">
+         file_description="VTK PolyData Files (partitioned)">
   <Source class="vtkXMLPPolyDataReader"/>
   <ArraySelection attribute_name="Point" />
   <ArraySelection attribute_name="Cell" />
@@ -174,7 +69,7 @@
          class="vtkPVAdvancedReaderModule"
          module_type="Reader"
          extensions=".pvtu"
-         file_description="PVTK UnstructuredGrid Files">
+         file_description="VTK UnstructuredGrid Files (partitioned)">
   <Source class="vtkXMLPUnstructuredGridReader"/>
   <ArraySelection attribute_name="Point" />
   <ArraySelection attribute_name="Cell" />
@@ -184,7 +79,7 @@
          class="vtkPVAdvancedReaderModule"
          module_type="Reader"
          extensions=".pvti"
-         file_description="PVTK ImageData Files">
+         file_description="VTK ImageData Files (partitioned)">
   <Source class="vtkXMLPImageDataReader"/>
   <ArraySelection attribute_name="Point" />
   <ArraySelection attribute_name="Cell" />
@@ -194,7 +89,7 @@
          class="vtkPVAdvancedReaderModule"
          module_type="Reader"
          extensions=".pvts"
-         file_description="PVTK StructuredGrid Files">
+         file_description="VTK StructuredGrid Files (partitioned)">
   <Source class="vtkXMLPStructuredGridReader"/>
   <ArraySelection attribute_name="Point" />
   <ArraySelection attribute_name="Cell" />
@@ -204,16 +99,38 @@
          class="vtkPVAdvancedReaderModule"
          module_type="Reader"
          extensions=".pvtr"
-         file_description="PVTK RectilinearGrid Files">
+         file_description="VTK RectilinearGrid Files (partitioned)">
   <Source class="vtkXMLPRectilinearGridReader"/>
   <ArraySelection attribute_name="Point" />
   <ArraySelection attribute_name="Cell" />
  </Module>
- <Module name="XMLCollectionReader" class="vtkPVReaderModule"
-         root_name="XMLCollectionReader" module_type="Reader"
-         extensions=".pvd" file_description="ParaView Data Files">
-  <Source class="vtkXMLCollectionReader"/>
- </Module>
+  <Module name="legacyreader" class="vtkPVReaderModule" root_name="LegaVTK" 
+          module_type="Reader"
+          extensions=".vtk" file_description="Legacy VTK files.">
+    <Source class="vtkPDataSetReader"/>
+  </Module>
+ <Module name="pvtkfile" class="vtkPVDataSetReaderModule" 
+         root_name="LegaPVTK" output="vtkDataSet" 
+         module_type="Reader" extensions=".pvtk" 
+         file_description="Legacy VTK Files (partitioned)">
+    <Source class="vtkPDataSetReader"/>
+  </Module>
+  <Module name="ensight" class="vtkPVEnSightReaderModule"
+          root_name="Ensight" 
+          module_type="Reader"
+          extensions=".case" file_description="EnSight Files">
+    <Source class="vtkGenericEnSightReader"/>
+    <SelectionList label="Byte order" trace_name="ByteOrder"
+                   variable="ByteOrder"
+           help="Select the byte order of the binary file">
+      <Item name="big endian" value="0"/>
+      <Item name="little endian" value="1"/>
+    </SelectionList>
+    
+    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
+    <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
+    <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
+  </Module>
  <Module name="HDF5RawImageReader"
          root_name="HDF5RawImageReader"
          output="vtkImageData"
@@ -228,9 +145,98 @@
  </Module>
  <Module name="vrmlreader" class="vtkPVReaderModule" root_name="VRML" 
           module_type="Reader"
-          extensions=".wrl" file_description="VRML">
+          extensions=".wrl" file_description="VRML 2 Files">
     <Source class="vtkVRMLSource"/>
  </Module>
+  <Module name="pdbreader" class="vtkPVReaderModule" root_name="PDB" 
+          module_type="Reader"
+          extensions=".pdb" file_description="Protein Data Bank Files">
+    <Source class="vtkPDBReader"/>
+  </Module>
+  <Module name="xyzreader" class="vtkPVReaderModule" root_name="XYZMol" 
+          module_type="Reader"
+          extensions=".xyz" file_description="XMol Molecule Files">
+    <Source class="vtkXYZMolReader"/>
+    <VectorEntry variable="TimeStep" trace_name="TimeStep" type="int" 
+                 help="Set the TimeStep"/>
+  </Module>
+  <Module name="P3DReader" class="vtkPVPLOT3DReaderModule"
+          root_name="Plot3D"
+          module_type="Reader"
+          extensions=".xyz" file_description="PLOT3D Files">
+    <Source class="vtkPLOT3DReader"/>
+    <FileEntry label="Q File" trace_name="QFileName"
+               variable="QFileName" extension="q" 
+               help="Set the plot3d q file to read."/>
+    <LabeledToggle label="Binary" trace_name="BinaryFile"
+                   variable="BinaryFile" 
+                   help="Is this a binary file?"/>
+    <LabeledToggle label="Multi-block" trace_name="MultiGrid"
+                   variable="MultiGrid" 
+                   help="Does this file have multiple block information"/>
+    <LabeledToggle label="Fortran byte count" trace_name="HasByteCount"
+       variable="HasByteCount" 
+       help="Does this file use Fortran leading-trailing byte counts"/>
+    <LabeledToggle label="I blanking" trace_name="IBlanking"
+                    variable="IBlanking"
+                    help="Any visibility information?"/>
+    <LabeledToggle label="2D geometry"
+                   trace_name="TwoDimensionalGeometry"
+                    variable="TwoDimensionalGeometry"
+                    help="Is there only data for two dimensions?"/>
+    <LabeledToggle label="Force read" trace_name="ForceRead"
+                   variable="ForceRead"
+                   help="Read even if file looks corrupt?"/>
+  <SelectionList label="Byte order" trace_name="ByteOrder"
+                 variable="ByteOrder"
+         help="Select the byte order of the binary file">
+    <Item name="big endian" value="0"/>
+    <Item name="little endian" value="1"/>
+  </SelectionList>
+  </Module>
+  <Module name="stlreader" class="vtkPVReaderModule" root_name="STL" 
+          module_type="Reader"
+          extensions=".stl" file_description="Stereo Lithography">
+    <Source class="vtkSTLReader"/>
+  </Module>
+  <Module name="byureader" class="vtkPVReaderModule" root_name="BYU" 
+          module_type="Reader"
+          extensions=".g" file_description="BYU Files">
+    <Source class="vtkBYUReader"/>
+  </Module>
+  <Module name="gaussiancubereader" class="vtkPVAdvancedReaderModule" root_name="GaussianCube" 
+          module_type="Reader"
+          extensions=".cube" file_description="Gaussian Cube Files">
+    <Source class="vtkGaussianCubeReader"/>
+    <VectorEntry variable="HBScale" trace_name="HBScale" type="float" 
+                 help="Set the HB scale"/>
+    <VectorEntry variable="BScale" trace_name="BScale" type="float" 
+                 help="Set the B scale"/>
+  </Module>
+  <Module name="popreader" class="vtkPVAdvancedReaderModule" 
+          root_name="POP" 
+          module_type="Reader"
+          extensions=".pop" file_description="POP Ocean Files">
+    <Source class="vtkPOPReader"/>
+    <VectorEntry variable="Radius" trace_name="Radius" type="float" 
+                 help="Set the radius of the data set"/>
+    <VectorEntry label="Clip Extent" variable="ClipExtent" type="int"
+                 length="6" trace_name="ClipExtent"
+                 help="For reading a smaller extent."/>
+    <VectorEntry label="Ghost Levels" trace_name="NumberOfGhostLevels"
+                 variable="NumberOfGhostLevels" 
+                 type="int" 
+                 help="Set the number of ghost levels to read."/>
+  </Module>
+  <Module name="ensightMS" class="vtkPVEnSightReaderModule"
+          root_name="Ensight" 
+          module_type="Reader"
+          extensions=".sos" file_description="EnSight Master Server Files">
+    <Source class="vtkPVEnSightMasterServerReader"/>
+    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
+    <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
+    <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
+  </Module>
 #ifdef PARAVIEW_LINK_XDMF
  <Module name="XdmfReader" root_name="XdmfReader"
    output="vtkDataSet"
