@@ -497,6 +497,7 @@ const char* vtkPVInitialize::StandardFilterInterfaces=
 "  <LabeledToggle variable=\"UseInputPoints\" help=\"Select whether to use points from the input in the output or to calculate optimum representative points for each bin\"/>\n"
 "  <LabeledToggle variable=\"UseFeatureEdges\" help=\"Select whether to use feature edge quadrics to match up the boundaries between pieces\"/>\n"
 "  <LabeledToggle variable=\"UseFeaturePoints\" help=\"Select whether to use feature point quadrics to align piece boundaries\"/>\n"
+"  <LabeledToggle variable=\"CopyCellData\" help=\"Should cell data be copied from output to input?\"/>\n"
 "</Module>\n"
 "\n"
 "<Module name=\"RectilinearGridGeometryFilter\" root_name=\"RectGridGeom\" input=\"vtkRectilinearGrid\" output=\"vtkPolyData\" module_type=\"Filter\">\n"
