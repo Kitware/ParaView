@@ -271,12 +271,22 @@ void vtkPVMinMax::SetRange(float min, float max)
 
 void vtkPVMinMax::MinValueCallback()
 {
-  this->SetMinValue(this->MinScale->GetValue());
+  if (this->MinScale->GetValue() > this->MaxScale->GetValue())
+    {
+    this->MinScale->SetValue(this->MaxScale->GetValue());
+    }
+  
+  this->ModifiedCallback();
 }
 
 void vtkPVMinMax::MaxValueCallback()
 {
-  this->SetMaxValue(this->MaxScale->GetValue());
+  if (this->MaxScale->GetValue() < this->MinScale->GetValue())
+    {
+    this->MaxScale->SetValue(this->MinScale->GetValue());
+    }
+  
+  this->ModifiedCallback();
 }
 
 void vtkPVMinMax::SaveInTclScript(ofstream *file, const char *sourceName)
