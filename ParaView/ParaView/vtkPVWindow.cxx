@@ -183,6 +183,13 @@ vtkPVWindow::vtkPVWindow()
   this->SetMenuPropertiesTitle("View");
 
   this->Modules = vtkStringList::New();
+  this->FileExtensions = NULL;
+  this->FileDescriptions = NULL;
+  this->AddFileType("VTK Files", "vtk");
+  this->AddFileType("Parallel VTK Files", "pvtk");
+  this->AddFileType("Stereo Lithography", "stl");
+  this->AddFileType("POP Ocean Files", "pop");
+  this->AddFileType("EnSight Files", "case");
 }
 
 //----------------------------------------------------------------------------
@@ -203,6 +210,17 @@ vtkPVWindow::~vtkPVWindow()
   this->TclInteractor = NULL;
 
   this->Modules->Delete();
+
+  if (this->FileExtensions)
+    {
+    delete [] this->FileExtensions;
+    this->FileExtensions = NULL;
+    }
+  if (this->FileDescriptions)
+    {
+    delete [] this->FileDescriptions;
+    this->FileDescriptions = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -776,6 +794,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Try to load modules we know about.
   if (this->LoadModule("vtkARLTCL.pvm"))
     {
+    this->AddFileType("CTH Files", "xml");
     // Load Modules should really look for wizards.
     this->AdvancedMenu->InsertCommand(2, "CTH Wizard", this, "WizardCallback",0);
     }
@@ -927,23 +946,9 @@ void vtkPVWindow::OpenCallback()
   
   char *openFileName = NULL;
 
-  // Once again:  Load modules should be able to add extension and readers transparently.
-  if (this->GetModuleLoaded("vtkARLTCL.pvm"))
-    {
-#ifdef _WIN32  
-    this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {*.xml;*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{XDMF files} {.xml}} {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
-#else
-    this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {.xml .vtk .pvtk .case .pop .stl}}  {{XDMF files} {.xml}} {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
-#endif
-    }
-  else
-    {
-#ifdef _WIN32  
-    this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
-#else
-    this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {.vtk .pvtk .case .pop .stl}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
-#endif
-    }
+  this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {%s}} %s}]", 
+               buffer, this->FileExtensions, this->FileDescriptions);
+
   openFileName = new char[strlen(this->GetPVApplication()->GetMainInterp()->result) + 1];
   strcpy(openFileName, this->GetPVApplication()->GetMainInterp()->result);
 
@@ -1380,7 +1385,11 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       pvs->SaveInTclScript(file);
       }
     }
-  
+
+  *file << "vtkTreeComposite treeComp\n\t";
+  *file << "treeComp SetRenderWindow RenWin1 \n\t";
+  *file << "treeComp InitializePieces\n\n";
+
   // Descide what this script should do.
   // Save an image or series of images, or run interactively.
   const char *script = this->AnimationInterface->GetScript();
@@ -1413,22 +1422,26 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
 
   if (path && strlen(path) > 0)
     {
+    *file << "treeComp ManualOn\n\t";
+    *file << "if {[catch {set myProcId [[treeComp GetController] GetLocalProcessId]}]} {set myProcId 0 } \n\n";
     *file << "vtkWindowToImageFilter WinToImage\n\t";
     *file << "WinToImage SetInput RenWin1\n";
     *file << "vtkJPEGWriter Writer\n\t";
-    *file << "Writer SetInput [WinToImage GetOutput]\n";
+    *file << "Writer SetInput [WinToImage GetOutput]\n\n";
     if (vtkKWMessageDialog::PopupYesNo(this->Application, this, 
 			       vtkKWMessageDialog::Question, "Offscreen", 
 			       "Do you want offscreen rendering?"))
       {
-      *file << "RenWin1 SetOffScreenRendering 1\n";
+      *file << "RenWin1 SetOffScreenRendering 1\n\n";
       }    
    
     if (imageFlag)
       {
-      *file << "RenWin1 Render\n";
+      *file << "if {$myProcId == 0} {treeComp RenderRMI} else {\n\t";
+      *file << "RenWin1 Render\n\t";
       *file << "Writer SetFileName {" << path << "}\n\t";
       *file << "Writer Write\n";
+      *file << "}\n\n";
       }
     if (animationFlag)
       {
@@ -2851,6 +2864,81 @@ void vtkPVWindow::WizardCallback()
   w->Invoke(this);
   w->Delete();
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::AddFileType(const char *description, const char *ext)
+{
+  int length = 0;
+  char *newStr;
+  
+  if (ext == NULL)
+    {
+    vtkErrorMacro("Missing extension.");
+    return;
+    }
+  if (description == NULL)
+    {
+    description = "";
+    }
+
+  // First add to the extension string.
+  if (this->FileExtensions)
+    {
+    length = strlen(this->FileExtensions);
+    }
+  length += strlen(ext) + 5;
+  newStr = new char [length];
+#ifdef _WIN32
+  if (this->FileExtensions == NULL)
+    {  
+    sprintf(newStr, "*.%s", ext);
+    }
+  else
+    {
+    sprintf(newStr, "%s;*.%s", this->FileExtensions, ext);
+    }
+#else
+  if (this->FileExtensions == NULL)
+    {  
+    sprintf(newStr, ".%s", ext);
+    }
+  else
+    {
+    sprintf(newStr, "%s .%s", this->FileExtentsions, ext);
+    }
+#endif
+  if (this->FileExtensions)
+    {
+    delete [] this->FileExtensions;
+    }
+  this->FileExtensions = newStr;
+  newStr = NULL;
+
+  // Now add to the description string.
+  length = 0;
+  if (this->FileDescriptions)
+    {
+    length = strlen(this->FileDescriptions);
+    }
+  length += strlen(description) + strlen(ext) + 10;
+  newStr = new char [length];
+  if (this->FileDescriptions == NULL)
+    {  
+    sprintf(newStr, "{{%s} {.%s}}", description, ext);
+    }
+  else
+    {
+    sprintf(newStr, "%s {{%s} {.%s}}", this->FileDescriptions, description, ext);
+    }
+  if (this->FileDescriptions)
+    {
+    delete [] this->FileDescriptions;
+    }
+  this->FileDescriptions = newStr;
+  newStr = NULL;
+}
+
 
 
 

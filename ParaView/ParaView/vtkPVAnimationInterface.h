@@ -112,6 +112,7 @@ public:
 
   // Description:
   // The object which is being manipulated to produce the animation.
+  // No reference counting here because of loops (leak).
   void SetPVSource(vtkPVSource *source);
   vtkGetObjectMacro(PVSource,vtkPVSource);
 

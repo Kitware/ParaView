@@ -363,6 +363,11 @@ protected:
   // of circular references before closing.
   virtual void CloseNoPrompt();
 
+  // Extensions of files that loaded readers recognize.
+  char *FileExtensions;
+  char *FileDescriptions;
+  void AddFileType(const char* description, const char* ext);
+
 private:
   static const char* StandardSourceInterfaces;
   static const char* StandardFilterInterfaces;

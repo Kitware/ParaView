@@ -499,12 +499,19 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
 
   if (this->PVSource)
     {
-    this->PVSource->UnRegister(this);
+    //this->PVSource->UnRegister(this);
     this->PVSource = NULL;
     }
+
+  // Special case during destruction.
+  if (this->SourceMenuButton == NULL)
+    {
+    return;
+    }
+
   if (source)
     {
-    source->Register(this);
+    //source->Register(this);
     this->PVSource = source;
     this->SourceMenuButton->SetButtonText(this->PVSource->GetName());
     }
@@ -795,13 +802,16 @@ void vtkPVAnimationInterface::SaveInTclScript(ofstream *file,
     }
 
   t = this->GetTimeStart();
-  *file << "set pvTime " << t << "\n\n";
+  *file << "set pvTime " << t << "\n";
   *file << this->GetScript() << endl;
+  *file << "if {$myProcId} {treeComp RenderRMI} else {\n\t";  
   sprintf(countStr, "%05d", (int)(t));
-  *file << "RenWin1 Render\n";
-  *file << "WinToImage Modified\n";
+  // Not necessary because WinToImage causes a render.
+  //*file << "RenWin1 Render\n\t";
+  *file << "WinToImage Modified\n\t";
   *file << "Writer SetFileName {" << fileRoot << countStr << ".jpg}\n";
-  *file << "Writer Write\n"; 
+  *file << "Writer Write\n";
+  *file << "}\n\n"; 
 
   while ((sgn*t) < (sgn*this->TimeEnd))
     {
@@ -810,13 +820,16 @@ void vtkPVAnimationInterface::SaveInTclScript(ofstream *file,
       {
       t = this->TimeEnd;
       }
-    *file << "set pvTime " << t << "\n\n";
+    *file << "set pvTime " << t << "\n";
     *file << this->GetScript() << endl;
+    *file << "if {$myProcId} {treeComp RenderRMI} else {\n\t";  
     sprintf(countStr, "%05d", (int)(t));
-    *file << "RenWin1 Render\n";
-    *file << "WinToImage Modified\n";
-    *file << "Writer SetFileName {" << fileRoot << countStr << ".jpg}\n";
+    // Not necessary because WinToImage causes a render.
+    //*file << "RenWin1 Render\n\t";
+    *file << "WinToImage Modified\n\t";
+    *file << "Writer SetFileName {" << fileRoot << countStr << ".jpg}\n\t";
     *file << "Writer Write\n"; 
+    *file << "}\n\n";
     }
 }
 

@@ -90,6 +90,17 @@ public:
   void SetValue(char* v1, char* v2, char* v3, char* v4, char* v5, char* v6);
   void SetValue(char** vals, int num);
   
+  // Description:
+  // I need a solution:  I want to run ParaView with a low resolution
+  // data set, but create a batch simulation with high resolution data.
+  //  When this widget is saved in a VTK script, this value is used.
+  vtkSetStringMacro(ScriptValue);
+  vtkGetStringMacro(ScriptValue);
+
+  // Description:
+  // An interface for saving a widget into a script.
+  virtual void SaveInTclScript(ofstream *file);
+
 protected:
   vtkPVVectorEntry();
   ~vtkPVVectorEntry();
@@ -99,6 +110,8 @@ protected:
   vtkKWLabel *Label;
   vtkKWWidgetCollection *SubLabels;
   vtkKWWidgetCollection *Entries;
+
+  char *ScriptValue;
 };
 
 #endif

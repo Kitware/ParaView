@@ -63,6 +63,8 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   this->Label->SetParent(this);
   this->Entries = vtkKWWidgetCollection::New();
   this->SubLabels = vtkKWWidgetCollection::New();
+
+  this->ScriptValue = NULL;
 }
 
 //---------------------------------------------------------------------------
@@ -74,6 +76,8 @@ vtkPVVectorEntry::~vtkPVVectorEntry()
   this->SubLabels = NULL;
   this->Label->Delete();
   this->Label = NULL;
+
+  this->SetScriptValue(NULL);
 }
 
 //---------------------------------------------------------------------------
@@ -316,3 +320,15 @@ void vtkPVVectorEntry::SetValue(char *v0, char *v1, char *v2,
   this->SetValue(vals, 6);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVVectorEntry::SaveInTclScript(ofstream *file)
+{
+  if (this->ScriptValue == NULL)
+    {
+    vtkPVObjectWidget::SaveInTclScript(file);
+    return;
+    }
+  
+  *file << "\t" << this->ObjectTclName << " Set" << this->VariableName;
+  *file << " " << this->ScriptValue << "\n";
+}

@@ -383,6 +383,9 @@ void vtkPVWizard::SetupPipeline(vtkPVWindow *pvWin)
                this->FirstFileName);
   this->Script("[$cthReader GetPVWidget Stride] SetValue %d %d %d",
                this->Stride, this->Stride, this->Stride);
+  // A hack to get the full resolution data in the script.
+  this->Script("[$cthReader GetPVWidget Stride] SetScriptValue \"1 1 1\"");
+
   this->Script("[$cthReader GetPVWidget CellArraySelection] AllOffCallback");
   if (this->ColorArrayName)
     {
