@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.17");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.18");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -256,11 +256,16 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     this->InformationError = 1;
     return;
     }
-  
+
+  // All time sets have the correct size.  Now compare the values.
+  // The CumulativeTimeSetSizes has the sizes on all nodes, even those
+  // beyond the number of pieces.
+
   // Compare time set values.
   this->Internal->TimeSetValues.clear();
   if(piece < this->NumberOfPieces)
     {
+    // This is a real piece, fill in the time set values.
     for(i=0; i < this->Internal->NumberOfTimeSets; ++i)
       {
       vtkDataArray* array = timeSets->GetItem(i);
@@ -270,6 +275,12 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
         this->Internal->TimeSetValues.push_back(array->GetTuple1(j));
         }
       }
+    }
+  else
+    {
+    // This is not a piece, allocate memory to receive the time set values.
+    this->Internal->TimeSetValues.resize(
+      this->Internal->CumulativeTimeSetSizes[this->Internal->NumberOfTimeSets]);
     }
   if(vtkPVEnSightMasterServerReaderSyncValues(
        &*this->Internal->TimeSetValues.begin(),
