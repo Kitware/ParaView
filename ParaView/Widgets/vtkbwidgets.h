@@ -2375,7 +2375,9 @@ const char* bwidgets4 =
 "    rename $path {}\n"
 "}\n"
 "\n"
-"\n"
+"\n";
+
+const char* bwidgets5 =
 "# ------------------------------------------------------------------------------\n"
 "#  Command Tree::_see\n"
 "# ------------------------------------------------------------------------------\n"
@@ -3282,7 +3284,9 @@ const char* bwidgets4 =
 "    }\n"
 "    return\n"
 "}\n"
-"\n"
+"\n";
+
+const char* bwidgets6 =
 "# Tree::_get_node_name --\n"
 "#\n"
 "#      Given a canvas item, get the name of the tree node represented by that\n"

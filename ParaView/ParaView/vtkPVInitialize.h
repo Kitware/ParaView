@@ -66,14 +66,26 @@ public:
   void Initialize(vtkPVWindow*);
 
 protected:
-  vtkPVInitialize() {}
-  ~vtkPVInitialize() {}
+  vtkPVInitialize();
+  ~vtkPVInitialize();
 
-  static const char* StandardReadersInterfaces;
-  static const char* StandardSourcesInterfaces;
-  static const char* StandardFiltersInterfaces;
-  static const char* StandardManipulatorsInterfaces;
-  static const char* StandardWritersInterfaces;
+  char* GetStandardFiltersInterfaces();
+  char* GetStandardManipulatorsInterfaces();
+  char* GetStandardReadersInterfaces();
+  char* GetStandardSourcesInterfaces();
+  char* GetStandardWritersInterfaces();
+
+  char* StandardFiltersString;
+  char* StandardManipulatorsString;
+  char* StandardReadersString;
+  char* StandardSourcesString;
+  char* StandardWritersString;
+
+  vtkSetStringMacro(StandardFiltersString);
+  vtkSetStringMacro(StandardManipulatorsString);
+  vtkSetStringMacro(StandardReadersString);
+  vtkSetStringMacro(StandardSourcesString);
+  vtkSetStringMacro(StandardWritersString);
 
 private:
   vtkPVInitialize(const vtkPVInitialize&); // Not implemented
