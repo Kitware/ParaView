@@ -45,7 +45,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 
-//------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplitFrame );
 
 
@@ -54,6 +53,7 @@ vtkStandardNewMacro( vtkKWSplitFrame );
 int vtkKWSplitFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
 
+//----------------------------------------------------------------------------
 vtkKWSplitFrame::vtkKWSplitFrame()
 {
   this->CommandFunction = vtkKWSplitFrameCommand;
@@ -65,16 +65,19 @@ vtkKWSplitFrame::vtkKWSplitFrame()
   this->Frame2 = vtkKWWidget::New();
   this->Frame2->SetParent(this);
 
-  this->Frame1Width = 100;
-  this->Frame2Width = 700;
-  this->Frame1MinimumWidth = 50;
-  this->Frame2MinimumWidth = 50;
+  this->Frame1Size = 100;
+  this->Frame2Size = 700;
+  this->Frame1MinimumSize = 50;
+  this->Frame2MinimumSize = 50;
 
-  this->SeparatorWidth = 6;
+  this->SeparatorSize = 6;
 
-  this->Width = 806;
+  this->Size = 806;
+
+  this->Orientation = vtkKWSplitFrame::Horizontal;
 }
 
+//----------------------------------------------------------------------------
 vtkKWSplitFrame::~vtkKWSplitFrame()
 {
   this->Frame1->Delete();
@@ -86,6 +89,20 @@ vtkKWSplitFrame::~vtkKWSplitFrame()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetOrientationToHorizontal()
+{
+  this->SetOrientation(vtkKWSplitFrame::Horizontal);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetOrientationToVertical()
+{
+  this->SetOrientation(vtkKWSplitFrame::Vertical);
+}
+
+
+//----------------------------------------------------------------------------
 void vtkKWSplitFrame::Create(vtkKWApplication *app)
 {
   const char *wname;
@@ -117,50 +134,81 @@ void vtkKWSplitFrame::Create(vtkKWApplication *app)
 
 
   // Setup the cursor to indication an action associatyed with the separator. 
-#ifdef _WIN32  
-  this->Script("%s configure -cursor size_we",
-               this->Separator->GetWidgetName());
+#ifdef _WIN32
+  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    {  
+    this->Script("%s configure -cursor size_we",
+                 this->Separator->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s configure -cursor size_ns",
+                 this->Separator->GetWidgetName());
+    }
 #else
-  this->Script("%s configure -cursor sb_h_double_arrow",
-               this->Separator->GetWidgetName());
+  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    {  
+    this->Script("%s configure -cursor sb_h_double_arrow",
+                 this->Separator->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s configure -cursor sb_v_double_arrow",
+                 this->Separator->GetWidgetName());
+    }
 #endif
 }
 
+//----------------------------------------------------------------------------
 void vtkKWSplitFrame::ConfigureCallback()
 {
   int tmp;
-  int width;
+  int size;
 
-  this->Script( "winfo width %s", this->GetWidgetName());
-  width = vtkKWObject::GetIntegerResult(this->Application);   
+  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    {
+    this->Script( "winfo width %s", this->GetWidgetName());
+    }
+  else
+    {
+    this->Script( "winfo height %s", this->GetWidgetName());
+    }
+  size = vtkKWObject::GetIntegerResult(this->Application);   
 
   // First check to see if we have to make the window larger.
-  tmp = this->Frame1MinimumWidth + this->Frame2MinimumWidth 
-          + this->SeparatorWidth;
-  if (width < tmp)
+  tmp = this->Frame1MinimumSize + this->Frame2MinimumSize 
+          + this->SeparatorSize;
+  if (size < tmp)
     {
-    this->Frame1Width = this->Frame1MinimumWidth;
-    this->Frame2Width = this->Frame2MinimumWidth;
-    this->Width = tmp;
-    this->Script("%s configure -width %d", this->GetWidgetName(), this->Width);
+    this->Frame1Size = this->Frame1MinimumSize;
+    this->Frame2Size = this->Frame2MinimumSize;
+    this->Size = tmp;
+    if (this->Orientation == vtkKWSplitFrame::Horizontal)
+      {
+      this->Script("%s configure -width %d", this->GetWidgetName(), this->Size);
+      }
+    else
+      {
+      this->Script("%s configure -height %d", this->GetWidgetName(), this->Size);
+      }
     this->Update();
     return;
     }
 
-  // Width of second frame
-  this->Width = width;
-  tmp = width - this->Frame1Width - this->SeparatorWidth;
+  // Size of second frame
+  this->Size = size;
+  tmp = size - this->Frame1Size - this->SeparatorSize;
 
-  // Do we have to adjust the first frame width?
-  if (tmp < this->Frame2MinimumWidth)
+  // Do we have to adjust the first frame size?
+  if (tmp < this->Frame2MinimumSize)
     {
-    this->Frame2Width = this->Frame2MinimumWidth;
-    this->Frame1Width = width - this->Frame2Width - this->SeparatorWidth;
+    this->Frame2Size = this->Frame2MinimumSize;
+    this->Frame1Size = size - this->Frame2Size - this->SeparatorSize;
     this->Update();
     return;
     }
 
-  this->Frame2Width = tmp;
+  this->Frame2Size = tmp;
   this->Update();
 }
 
@@ -168,154 +216,224 @@ void vtkKWSplitFrame::ConfigureCallback()
 
 
 
+//----------------------------------------------------------------------------
 void vtkKWSplitFrame::DragCallback()
 {
-  int width, x, xmin, tmp;
-  int h1, h2;
+  int size, s, smin, tmp;
+  int halfSepSize1, halfSepSize2;
 
-  h1 = this->SeparatorWidth/2;
-  h2 = this->SeparatorWidth-h1;
+  halfSepSize1 = this->SeparatorSize/2;
+  halfSepSize2 = this->SeparatorSize-halfSepSize1;
 
-  this->Script( "winfo width %s", this->GetWidgetName());
-  width = vtkKWObject::GetIntegerResult(this->Application); 
-
-  this->Width = width;
+  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    {
+    this->Script( "winfo width %s", this->GetWidgetName());
+    }
+  else
+    {
+    this->Script( "winfo height %s", this->GetWidgetName());
+    }
+  size = vtkKWObject::GetIntegerResult(this->Application); 
+  this->Size = size;
 
   // get the relative position of the render in the window
-  this->Script( "winfo rootx %s",this->GetWidgetName());
-  xmin = vtkKWObject::GetIntegerResult(this->Application);
+  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    {
+    this->Script( "winfo rootx %s",this->GetWidgetName());
+    }
+  else
+    {
+    this->Script( "winfo rooty %s",this->GetWidgetName());
+    } 
+  smin = vtkKWObject::GetIntegerResult(this->Application);
   // Get the position of the mouse in the renderer.
-  this->Script( "winfo pointerx %s", this->GetWidgetName());
-  x = vtkKWObject::GetIntegerResult(this->Application);
+  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    {
+    this->Script( "winfo pointerx %s", this->GetWidgetName());
+    }
+  else
+    {
+    this->Script( "winfo pointery %s", this->GetWidgetName());
+    }
+  s = vtkKWObject::GetIntegerResult(this->Application);
   // Relative position.
-  x = x - xmin;
+  s = s - smin;
 
   // Constraints on the window.
-  tmp = this->Frame1MinimumWidth + h1;
-  if (x < tmp)
+  tmp = this->Frame1MinimumSize + halfSepSize1;
+  if (s < tmp)
     {
-    x = tmp;
+    s = tmp;
     }
-  tmp = width - this->Frame2MinimumWidth - h2;
-  if (x > tmp)
+  tmp = size - this->Frame2MinimumSize - halfSepSize2;
+  if (s > tmp)
     {
-    x = tmp;
+    s = tmp;
     }
 
-  this->Frame1Width = x-h1;
-  this->Frame2Width = width-x-h2;
+  this->Frame1Size = s-halfSepSize1;
+  this->Frame2Size = size-s-halfSepSize2;
   this->Update();
 }
 
 
-void vtkKWSplitFrame::SetFrame1MinimumWidth(int minWidth)
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetFrame1MinimumSize(int minSize)
 {
-  if (this->Frame1MinimumWidth == minWidth)
+  if (this->Frame1MinimumSize == minSize)
     {
     return;
     }
 
-  this->Frame1MinimumWidth = minWidth;
+  this->Frame1MinimumSize = minSize;
 
-  if (this->Frame1Width < minWidth)
+  if (this->Frame1Size < minSize)
     {
-    this->Frame1Width = minWidth;
+    this->Frame1Size = minSize;
     // Shrink frame2 if possible.
-    this->Frame2Width = this->Width - this->Frame1Width - this->SeparatorWidth;
+    this->Frame2Size = this->Size - this->Frame1Size - this->SeparatorSize;
     // Will the top frame actually grow because of this (configure).
-    if (this->Frame2Width < this->Frame2MinimumWidth)
+    if (this->Frame2Size < this->Frame2MinimumSize)
       {
-      this->Frame2Width = this->Frame2MinimumWidth;
-      this->Width = this->Frame1Width + this->Frame2Width + this->SeparatorWidth;
-      this->Script("%s configure -width %d", this->GetWidgetName(), this->Width);
+      this->Frame2Size = this->Frame2MinimumSize;
+      this->Size = this->Frame1Size + this->Frame2Size + this->SeparatorSize;
+      if (this->Orientation == vtkKWSplitFrame::Horizontal)
+        {
+        this->Script("%s configure -width %d", this->GetWidgetName(), this->Size);
+        }
+      else
+        {
+        this->Script("%s configure -height %d", this->GetWidgetName(), this->Size);
+        }
       }
     this->Update();
     }
 }
 
-void vtkKWSplitFrame::SetFrame2MinimumWidth(int minWidth)
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetFrame2MinimumSize(int minSize)
 {
-  if (this->Frame2MinimumWidth == minWidth)
+  if (this->Frame2MinimumSize == minSize)
     {
     return;
     }
 
-  this->Frame2MinimumWidth = minWidth;
+  this->Frame2MinimumSize = minSize;
 
-  if (this->Frame2Width < minWidth)
+  if (this->Frame2Size < minSize)
     {
-    this->Frame2Width = minWidth;
+    this->Frame2Size = minSize;
     // Shrink frame1 if possible.
-    this->Frame1Width = this->Width - this->Frame1Width - this->SeparatorWidth;
+    this->Frame1Size = this->Size - this->Frame1Size - this->SeparatorSize;
     // Will the top frame actually grow because of this (configure).
-    if (this->Frame1Width < this->Frame1MinimumWidth)
+    if (this->Frame1Size < this->Frame1MinimumSize)
       {
-      this->Frame1Width = this->Frame1MinimumWidth;
-      this->Width = this->Frame1Width + this->Frame2Width + this->SeparatorWidth;
-      this->Script("%s configure -width %d", this->GetWidgetName(), this->Width);
+      this->Frame1Size = this->Frame1MinimumSize;
+      this->Size = this->Frame1Size + this->Frame2Size + this->SeparatorSize;
+      if (this->Orientation == vtkKWSplitFrame::Horizontal)
+        {
+        this->Script("%s configure -width %d", this->GetWidgetName(), this->Size);
+        }
+      else
+        {
+        this->Script("%s configure -height %d", this->GetWidgetName(), this->Size);
+        }
       }
     this->Update();
     }
 }
 
-void vtkKWSplitFrame::SetFrame1Width(int width)
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetFrame1Size(int size)
 {
-  if (this->Frame1Width == width)
+  if (this->Frame1Size == size)
     {
     return;
     }
 
-  this->Frame1Width = width;
-  this->Frame2Width = this->Width - this->Frame1Width - this->SeparatorWidth;
-  if (this->Frame2Width < this->Frame2MinimumWidth)
+  this->Frame1Size = size;
+  this->Frame2Size = this->Size - this->Frame1Size - this->SeparatorSize;
+  if (this->Frame2Size < this->Frame2MinimumSize)
     {
-    this->Frame2Width = this->Frame2MinimumWidth;
-    this->Width = this->Frame1Width + this->Frame2Width + this->SeparatorWidth;
-    this->Script("%s configure -width %d", this->GetWidgetName(), this->Width);
+    this->Frame2Size = this->Frame2MinimumSize;
+    this->Size = this->Frame1Size + this->Frame2Size + this->SeparatorSize;
+    if (this->Orientation == vtkKWSplitFrame::Horizontal)
+      {
+      this->Script("%s configure -width %d", this->GetWidgetName(), this->Size);
+      }
+    else
+      {
+      this->Script("%s configure -height %d", this->GetWidgetName(), this->Size);
+      }
     }
   this->Update();
 }
 
-void vtkKWSplitFrame::SetSeparatorWidth(int width)
+//----------------------------------------------------------------------------
+void vtkKWSplitFrame::SetSeparatorSize(int size)
 {
 
-  if (this->SeparatorWidth == width)
+  if (this->SeparatorSize == size)
     {
     return;
     }
 
-  this->SeparatorWidth = width;
+  this->SeparatorSize = size;
   // Update the frame sizes.
-  this->SetFrame1Width(this->Frame1Width);
+  this->SetFrame1Size(this->Frame1Size);
 }
 
 
+//----------------------------------------------------------------------------
 void vtkKWSplitFrame::Update()
 {
   if (this->Application == NULL)
     {
     return;
     }
-  
-  this->Script("place %s -relx 0 -rely 0 -width %d -relheight 1.0",
-               this->Frame1->GetWidgetName(), this->Frame1Width);
-  this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
-               this->Separator->GetWidgetName(), this->Frame1Width,
-               this->SeparatorWidth);
-  this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
-               this->Frame2->GetWidgetName(), 
-               this->Frame1Width+this->SeparatorWidth, this->Frame2Width);
+
+  if (this->Orientation == vtkKWSplitFrame::Horizontal)  
+    {
+    this->Script("place %s -relx 0 -rely 0 -width %d -relheight 1.0",
+                 this->Frame1->GetWidgetName(), this->Frame1Size);
+    this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
+                 this->Separator->GetWidgetName(), this->Frame1Size,
+                 this->SeparatorSize);
+    this->Script("place %s -x %d -rely 0 -width %d -relheight 1.0",
+                 this->Frame2->GetWidgetName(), 
+                 this->Frame1Size+this->SeparatorSize, this->Frame2Size);
+    }
+  else
+    {
+    this->Script("place %s -relx 0 -rely 0 -relwidth 1.0 -height %d",
+                 this->Frame1->GetWidgetName(), this->Frame1Size);
+    this->Script("place %s -relx 0 -y %d -relwidth 1.0 -height %d",
+                 this->Separator->GetWidgetName(), this->Frame1Size,
+                 this->SeparatorSize);
+    this->Script("place %s -relx 0 -y %d -height %d -relwidth 1.0",
+                 this->Frame2->GetWidgetName(), 
+                 this->Frame1Size+this->SeparatorSize, this->Frame2Size);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWSplitFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Frame1MinimumWidth: " << this->GetFrame1MinimumWidth() 
+  os << indent << "Frame1MinimumSize: " << this->GetFrame1MinimumSize() 
      << endl;
-  os << indent << "Frame1Width: " << this->GetFrame1Width() << endl;
-  os << indent << "Frame2MinimumWidth: " << this->GetFrame2MinimumWidth() 
+  os << indent << "Frame1Size: " << this->GetFrame1Size() << endl;
+  os << indent << "Frame2MinimumSize: " << this->GetFrame2MinimumSize() 
      << endl;
-  os << indent << "Frame2Width: " << this->GetFrame2Width() << endl;
-  os << indent << "SeparatorWidth: " << this->GetSeparatorWidth() << endl;
+  os << indent << "Frame2Size: " << this->GetFrame2Size() << endl;
+  os << indent << "SeparatorSize: " << this->GetSeparatorSize() << endl;
+
+  if (this->Orientation == vtkKWSplitFrame::Horizontal)
+    {
+    os << indent << "Orientation: Horizontal\n";
+    }
+  else
+    {
+    os << indent << "Orientation: Vertical\n";
+    }
 }

@@ -73,27 +73,44 @@ public:
   // Description:
   // Set/Get The minimum widths for the two frames.
   // They default to 50 pixels.
-  vtkGetMacro(Frame1MinimumWidth, int);
-  vtkGetMacro(Frame2MinimumWidth, int);
-  void SetFrame1MinimumWidth(int minWidth);
-  void SetFrame2MinimumWidth(int minWidth);
+  vtkGetMacro(Frame1MinimumSize, int);
+  vtkGetMacro(Frame2MinimumSize, int);
+  void SetFrame1MinimumSize(int minSize);
+  void SetFrame2MinimumSize(int minSize);
 
   // Description:
   // Set/Get the width of the left frame.  
   // For now, we cannot direclty set the width of the second frame.
-  vtkGetMacro(Frame1Width, int);
-  vtkGetMacro(Frame2Width, int);
-  void SetFrame1Width(int minWidth);
+  vtkGetMacro(Frame1Size, int);
+  vtkGetMacro(Frame2Size, int);
+  void SetFrame1Size(int minSize);
 
   // Description:
-  // This sets the separator width.  if the width is 0, then
-  // the two frames cannot be adjusted by the user.
-  void SetSeparatorWidth(int width);
-  vtkGetMacro(SeparatorWidth, int);
+  // This sets the separators narrow dimension. Horizontal=> size = width.  
+  // If the size is 0, then the two frames cannot be adjusted by the user.
+  void SetSeparatorSize(int size);
+  vtkGetMacro(SeparatorSize, int);
 
   // Callbacks used internally to adjust the widths,
   void DragCallback();
   void ConfigureCallback();
+
+  // Description:
+  // Vertical orientation has the first frame on top of the second frame.
+  // Horizontal orientation has first frame to left of second.
+  // At the moment, this state has to be set before the
+  // widget is created.  I should extend it in the future to be more flexible.
+  vtkSetMacro(Orientation, int);
+  vtkGetMacro(Orientation, int);
+  void SetOrientationToHorizontal();
+  void SetOrientationToVertical();
+
+//BTX
+  enum OrientationStates {
+    Horizontal = 0,
+    Vertical
+  };
+//ETX
 
 protected:
   vtkKWSplitFrame();
@@ -103,13 +120,15 @@ protected:
   vtkKWWidget *Separator;
   vtkKWWidget *Frame2;
 
-  int Width;
-  int Frame1Width;
-  int Frame2Width;
-  int SeparatorWidth;
+  int Size;
+  int Frame1Size;
+  int Frame2Size;
+  int SeparatorSize;
 
-  int Frame1MinimumWidth;
-  int Frame2MinimumWidth;
+  int Frame1MinimumSize;
+  int Frame2MinimumSize;
+
+  int Orientation;
 
   // Reset the actual windows to match our width IVars.
   void Update();
