@@ -1,13 +1,4 @@
 SET( ParaView_SRCS
-  vtkDistributedDataFilter.cxx
-  vtkPKdTree.cxx
-  vtkExtractCells.cxx
-  vtkKdTree.cxx
-  vtkMergeCells.cxx
-  vtkPlanesIntersection.cxx
-  vtkPointsProjectedHull.cxx
-#  vtkAllToNRedistributePolyData.cxx
-#  vtkBalancedRedistributePolyData.cxx
   vtkClientCompositeManager.cxx
   vtkColorByPart.cxx
   vtkCompleteArrays.cxx
@@ -185,6 +176,22 @@ SET( ParaView_SRCS
   vtkXMLPVAnimationWriter.cxx
   vtkXMLPVDWriter.cxx
   )
+
+IF(VTK_USE_MPI)
+  SET(ParaView_SRCS
+    ${ParaView_SRCS}
+    vtkDistributedDataFilter.cxx
+    vtkPKdTree.cxx
+    vtkExtractCells.cxx
+    vtkKdTree.cxx
+    vtkMergeCells.cxx
+    vtkPlanesIntersection.cxx
+    vtkPointsProjectedHull.cxx
+#  vtkAllToNRedistributePolyData.cxx
+#  vtkBalancedRedistributePolyData.cxx
+    )
+ENDIF(VTK_USE_MPI)
+
 
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaView_SRCS
