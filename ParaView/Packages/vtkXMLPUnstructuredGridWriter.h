@@ -38,7 +38,7 @@ class VTK_EXPORT vtkXMLPUnstructuredGridWriter : public vtkXMLPUnstructuredDataW
 {
 public:
   static vtkXMLPUnstructuredGridWriter* New();
-  vtkTypeRevisionMacro(vtkXMLPUnstructuredGridWriter,vtkXMLWriter);
+  vtkTypeRevisionMacro(vtkXMLPUnstructuredGridWriter,vtkXMLPUnstructuredDataWriter);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:

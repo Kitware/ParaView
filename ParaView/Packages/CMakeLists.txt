@@ -1,4 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 1.4)
+PROJECT(PVPackages)
 
 SET( AltIO_SRCS
   vtkBase64InputStream.cxx
