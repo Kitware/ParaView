@@ -53,7 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class vtkCornerAnnotation;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
+class vtkKWFrame;
 class vtkKWGenericComposite;
+class vtkKWLabel;
 class vtkKWScale;
 class vtkKWText;
 class vtkKWTextProperty;
@@ -132,11 +134,11 @@ protected:
 
   vtkKWCheckButton       *CornerVisibilityButton;
 
-  vtkKWWidget            *CornerTopFrame;
-  vtkKWWidget            *CornerBottomFrame;
+  vtkKWFrame             *CornerTopFrame;
+  vtkKWFrame             *CornerBottomFrame;
 
-  vtkKWWidget            *CornerFrame[4];
-  vtkKWWidget            *CornerLabel[4];
+  vtkKWFrame             *CornerFrame[4];
+  vtkKWLabel             *CornerLabel[4];
   vtkKWText              *CornerText[4];
   vtkCornerAnnotation    *CornerProp;
   vtkKWGenericComposite  *CornerComposite;
