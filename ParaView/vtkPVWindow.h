@@ -59,6 +59,7 @@ public:
   virtual void Save();
   virtual void NewCone();
   virtual void NewVolume();
+  virtual void NewSphere();
   
   // Description:
   // Chaining method to serialize an object and its superclasses.

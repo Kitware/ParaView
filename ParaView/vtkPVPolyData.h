@@ -39,8 +39,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkDataSet.h"
 #include "vtkPVData.h"
 
-class vtkPVComposite;
-
 class VTK_EXPORT vtkPVPolyData : public vtkPVData
 {
 public:
@@ -65,7 +63,6 @@ protected:
   ~vtkPVPolyData();
   vtkPVPolyData(const vtkPVPolyData&) {};
   void operator=(const vtkPVPolyData&) {};
-
 };
 
 #endif

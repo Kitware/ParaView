@@ -39,7 +39,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkPVAssignment.h"
 
-#include "vtkConeSource.h"
 #include "vtkPVApplication.h"
 #include "vtkPVMenuButton.h"
 #include "vtkDataSetMapper.h"

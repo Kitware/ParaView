@@ -48,7 +48,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImage.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
-
+#include "vtkPVSphereSource.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -131,6 +131,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   this->CreateMenu->AddCommand("Volume", this, "NewVolume");
   this->CreateMenu->AddCommand("Cone", this, "NewCone");
+  this->CreateMenu->AddCommand("Sphere", this, "NewSphere");
 
   this->SetStatusText("Version 1.0 beta");
   
@@ -273,6 +274,30 @@ void vtkPVWindow::NewCone()
   this->SourceList->Update();
   cone->Delete();
   cone = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::NewSphere()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVSphereSource *sphere;
+  
+  // Create the pipeline objects in all processes.
+  sphere = vtkPVSphereSource::New();
+  sphere->Clone(pvApp);
+  
+  sphere->SetName("sphere");
+  
+  // Add the new Source to the View (in all processes).
+  this->MainView->AddComposite(sphere);
+
+  // Select this Source
+  this->SetCurrentSource(sphere);
+  
+  // Clean up. (How about on the other processes?)
+  this->SourceList->Update();
+  sphere->Delete();
+  sphere = NULL;
 }
 
 //----------------------------------------------------------------------------
