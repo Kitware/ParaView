@@ -38,7 +38,7 @@ static vtkIceTRenderer *currentRenderer;
 // vtkIceTRenderer implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderer, "1.9");
+vtkCxxRevisionMacro(vtkIceTRenderer, "1.10");
 vtkStandardNewMacro(vtkIceTRenderer);
 
 vtkIceTRenderer::vtkIceTRenderer()
@@ -92,6 +92,7 @@ void vtkIceTRenderer::DeviceRender()
     this->vtkOpenGLRenderer::DeviceRender();
     glMatrixMode(GL_MODELVIEW);
     glPopMatrix();
+    this->InvokeEvent(vtkCommand::EndEvent,NULL);
     return;
     }
 
