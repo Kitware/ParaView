@@ -82,15 +82,15 @@ void vtkPVObjectWidget::SaveInTclScript(ofstream *file)
 }
 
 vtkPVObjectWidget* vtkPVObjectWidget::ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   vtkPVWidget* clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVObjectWidget::SafeDownCast(clone);
 }
 
 void vtkPVObjectWidget::CopyProperties(vtkPVWidget* clone, 
-				       vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
+                                       vtkPVSource* pvSource,
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
   vtkPVObjectWidget* pvow = vtkPVObjectWidget::SafeDownCast(clone);
@@ -118,6 +118,26 @@ int vtkPVObjectWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
+
+//------------------------------------------------------------------------------
+void vtkPVObjectWidget::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeRevision(os,indent);
+  os << indent << "vtkPVObjectWidget ";
+  this->ExtractRevision(os,"$Revision: 1.6 $");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVObjectWidget::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeSelf(os, indent);
+  if ( this->ObjectTclName && this->VariableName )
+    {
+    os << indent << "VariableName " << this->VariableName << endl;
+    os << indent << "VariableValue " 
+       << this->Script("%s Get%s", this->ObjectTclName, this->VariableName) << endl;
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVObjectWidget::PrintSelf(ostream& os, vtkIndent indent)

@@ -321,9 +321,17 @@ public:
   // Get notebook widget name.
   const char* GetNotebookWidgetName();
 
+  // Description:
+  // Set or get the module name.
+  vtkSetStringMacro(ModuleName);
+  vtkGetStringMacro(ModuleName);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
+
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
+  virtual void SerializeSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a menu to select the input.
@@ -375,6 +383,9 @@ protected:
   // The name is just for display.
   char      *Name;
 
+  // This is the module name.
+  char      *ModuleName;
+
   vtkKWWidget* Parameters;
   void UpdateProperties();
 
@@ -399,8 +410,6 @@ protected:
 
   int VisitedFlag;
 
-  vtkPVSource(const vtkPVSource&); // Not implemented
-  void operator=(const vtkPVSource&); // Not implemented
 
   // Number of instances cloned from this prototype
   int PrototypeInstanceCount;
@@ -411,6 +420,10 @@ protected:
   int AcceptCallbackFlag;
 
   virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
+
+private:
+  vtkPVSource(const vtkPVSource&); // Not implemented
+  void operator=(const vtkPVSource&); // Not implemented
 };
 
 #endif

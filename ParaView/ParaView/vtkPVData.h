@@ -170,8 +170,8 @@ public:
   
   // Description:
   // Set the transparency of the actor.
-  void SetTransparency(float f);
-  void TransparencyChangedCallback();
+  void SetOpacity(float f);
+  void OpacityChangedCallback();
 
   // Description:
   // Create the properties object, called by UpdateProperties.
@@ -353,6 +353,8 @@ public:
 protected:
   vtkPVData();
   ~vtkPVData();
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
+  virtual void SerializeSelf(ostream& os, vtkIndent indent);
   
   vtkDataSet *VTKData;
   char *VTKDataTclName;
@@ -472,8 +474,8 @@ protected:
   vtkKWLabeledFrame* ActorControlFrame;
   vtkKWLabel* TranslateLabel;
   vtkKWEntry* TranslateEntry[3];
-  vtkKWScale* Transparency;
-  vtkKWLabel* TransparencyLabel;
+  vtkKWScale* Opacity;
+  vtkKWLabel* OpacityLabel;
 
   vtkKWCheckButton *CubeAxesCheck;
   char* CubeAxesTclName;

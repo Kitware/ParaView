@@ -333,6 +333,20 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
+//------------------------------------------------------------------------------
+void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeRevision(os,indent);
+  os << indent << "vtkPVWidget ";
+  this->ExtractRevision(os,"$Revision: 1.21 $");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWidget::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeSelf(os, indent);
+}
+
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVWidget::GetPVWidgetFromParser(vtkPVXMLElement* element,
                                                 vtkPVXMLPackageParser* parser)

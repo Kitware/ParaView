@@ -80,6 +80,7 @@ vtkPVSource::vtkPVSource()
   this->PrototypeInstanceCount = 0;
 
   this->Name = NULL;
+  this->ModuleName = 0;
 
   // Initialize the data only after  Accept is invoked for the first time.
   // This variable is used to determine that.
@@ -215,6 +216,7 @@ vtkPVSource::~vtkPVSource()
   this->SetOutputClassName(0);
   this->SetSourceClassName(0);
 
+  this->SetModuleName(0);
 }
 
 //----------------------------------------------------------------------------
@@ -920,7 +922,6 @@ void vtkPVSource::DeleteCallback()
   // This should delete this source.
   // "this" will no longer be valid after the call.
   window->RemovePVSource("Sources", this);
-
   window->SetCurrentPVSourceCallback(current);
 }
 
@@ -1615,6 +1616,65 @@ int vtkPVSource::ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone)
   
   clone = pvs;
   return VTK_OK;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeSelf(os, indent);
+  os << indent << "ModuleName " << this->ModuleName << endl;
+  os << indent << "HideDisplayPage " << this->HideDisplayPage << endl;
+  os << indent << "HideParametersPage " << this->HideParametersPage << endl;
+  os << indent << "NumberOfPVOutputs " << this->NumberOfPVOutputs << endl;
+  os << indent << "NumberOfPVInputs " << this->NumberOfPVInputs << endl;
+  if ( this->InputClassName )
+    {
+    os << indent << "InputClassName " << this->InputClassName << endl;
+    }
+  if ( this->OutputClassName )
+    {
+    os << indent << "OutputClassName " << this->OutputClassName << endl;
+    }
+  if ( this->SourceClassName )
+    {
+    os << indent << "SourceClassName " << this->SourceClassName << endl;
+    }
+  if ( this->GetPVInput() && this->GetPVInput()->GetPVSource() )
+    {
+    os << indent << "Input " << this->GetPVInput()->GetPVSource()->GetName() 
+       << endl;
+    }
+  os << indent << "Output ";
+  this->GetPVOutput()->Serialize(os, indent);
+  if ( this->Widgets )
+    {
+    os << indent << "Widgets " << endl;
+    vtkCollectionIterator* it = this->Widgets->NewIterator();
+    it->InitTraversal();
+    vtkIndent indentp = indent.GetNextIndent();
+    vtkIndent indentpp = indentp.GetNextIndent();
+    os << indentp << "{" << endl;
+    int cc =0;
+    while( !it->IsDoneWithTraversal() )
+      {
+      vtkPVWidget* widget = static_cast<vtkPVWidget*>( it->GetObject() );
+      os << indentp << "Widget" << cc << " ";
+      widget->Serialize(os, indentp);
+
+      it->GoToNextItem();
+      cc ++;
+      }
+    os << indentp << "}" << endl;
+    it->Delete();
+    }
+}
+
+//------------------------------------------------------------------------------
+void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeRevision(os,indent);
+  os << indent << "vtkPVSource ";
+  this->ExtractRevision(os,"$Revision: 1.218 $");
 }
 
 //----------------------------------------------------------------------------

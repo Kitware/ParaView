@@ -289,6 +289,9 @@ protected:
   vtkPVRenderView();
   ~vtkPVRenderView();
 
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
+  virtual void SerializeSelf(ostream& os, vtkIndent indent);
+
   void CalculateBBox(char* name, int bbox[4]);
 
   void UpdateAllPVData();

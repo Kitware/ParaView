@@ -182,8 +182,8 @@ vtkPVData::vtkPVData()
     {
     this->TranslateEntry[cc] = vtkKWEntry::New();
     }
-  this->TransparencyLabel = vtkKWLabel::New();
-  this->Transparency = vtkKWScale::New();
+  this->OpacityLabel = vtkKWLabel::New();
+  this->Opacity = vtkKWScale::New();
   
   
   this->PreviousAmbient = 0.15;
@@ -302,8 +302,8 @@ vtkPVData::~vtkPVData()
     {
     this->TranslateEntry[cc]->Delete();
     }
-  this->TransparencyLabel->Delete();
-  this->Transparency->Delete();
+  this->OpacityLabel->Delete();
+  this->Opacity->Delete();
  
   if (this->CubeAxesTclName)
     {
@@ -1292,15 +1292,15 @@ void vtkPVData::CreateProperties()
                  this->TranslateEntry[cc]->GetWidgetName(),
                  this->GetTclName());
     }
-  this->TransparencyLabel->SetParent(this->ActorControlFrame->GetFrame());
-  this->TransparencyLabel->Create(this->Application, 0);
-  this->TransparencyLabel->SetLabel("Opacity");
-  this->Transparency->SetParent(this->ActorControlFrame->GetFrame());
-  this->Transparency->Create(this->Application, 0);
-  this->Transparency->SetRange(0, 1);
-  this->Transparency->SetResolution(0.1);
-  this->Transparency->SetValue(1);
-  this->Transparency->SetCommand(this, "TransparencyChangedCallback");
+  this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
+  this->OpacityLabel->Create(this->Application, 0);
+  this->OpacityLabel->SetLabel("Opacity");
+  this->Opacity->SetParent(this->ActorControlFrame->GetFrame());
+  this->Opacity->Create(this->Application, 0);
+  this->Opacity->SetRange(0, 1);
+  this->Opacity->SetResolution(0.1);
+  this->Opacity->SetValue(1);
+  this->Opacity->SetCommand(this, "OpacityChangedCallback");
 
   this->Script("grid %s %s %s %s -sticky ew",
                this->TranslateLabel->GetWidgetName(),
@@ -1308,8 +1308,8 @@ void vtkPVData::CreateProperties()
                this->TranslateEntry[1]->GetWidgetName(),
                this->TranslateEntry[2]->GetWidgetName());
   this->Script("grid %s %s - -  -sticky ew",
-               this->TransparencyLabel->GetWidgetName(),
-               this->Transparency->GetWidgetName());
+               this->OpacityLabel->GetWidgetName(),
+               this->Opacity->GetWidgetName());
 
   this->Script("grid columnconfigure %s 0 -weight 0", 
                this->ActorControlFrame->GetFrame()->GetWidgetName());
@@ -2545,19 +2545,19 @@ void vtkPVData::ScalarBarOrientationCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::TransparencyChangedCallback()
+void vtkPVData::OpacityChangedCallback()
 {
-  float val = this->Transparency->GetValue();
-  this->SetTransparency(val);
+  float val = this->Opacity->GetValue();
+  this->SetOpacity(val);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetTransparency(float val)
+void vtkPVData::SetOpacity(float val)
 {  
-  this->Transparency->SetValue(val);
+  this->Opacity->SetValue(val);
   this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
                                             this->PropTclName, val);
-  this->AddTraceEntry("$kw(%s) SetTransparency %f", this->GetTclName(),
+  this->AddTraceEntry("$kw(%s) SetOpacity %f", this->GetTclName(),
                       val);
   this->GetPVRenderView()->EventuallyRender();
 }
@@ -2611,6 +2611,29 @@ void vtkPVData::SetScalarBarOrientationToHorizontal()
   this->ScalarBarOrientationCallback();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeRevision(os,indent);
+  os << indent << "vtkPVData ";
+  this->ExtractRevision(os,"$Revision: 1.123 $");
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeSelf(os, indent);
+  os << indent << "Visibility " << this->VisibilityCheck->GetState() << endl;
+  os << indent << "ColorBy " << this->ColorMenu->GetValue() << endl;
+  os << indent << "Representation " << this->RepresentationMenu->GetValue() << endl;
+  os << indent << "Interpolation " << this->InterpolationMenu->GetValue() << endl;
+  os << indent << "PointSize " << this->PointSizeScale->GetValue() << endl;
+  os << indent << "LineWidth " << this->LineWidthScale->GetValue() << endl;
+  os << indent << "Translate {" << this->TranslateEntry[0]->GetValue() << " "
+     << this->TranslateEntry[1]->GetValue() << " " 
+     << this->TranslateEntry[1]->GetValue() << "}"  << endl;
+  os << indent << "Opacity " << this->Opacity->GetValue() << endl;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,

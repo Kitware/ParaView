@@ -79,12 +79,14 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVObjectWidget* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
   vtkPVObjectWidget();
   ~vtkPVObjectWidget();
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
+  virtual void SerializeSelf(ostream& os, vtkIndent indent);
 
   char *ObjectTclName;
   char *VariableName;
@@ -94,7 +96,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

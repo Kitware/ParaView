@@ -416,6 +416,7 @@ public:
   // This method is for testing only.
   void SaveSessionFile(const char* path);
   void LoadSessionFile(const char* path);
+  void SerializeSelf(ostream& os, vtkIndent indent);
 
 protected:
   vtkPVWindow();

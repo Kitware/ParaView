@@ -194,9 +194,18 @@ public:
   // attributes.
   virtual int ReadXMLAttributes(vtkPVXMLElement* element,
                                 vtkPVXMLPackageParser* parser);
+
+  // Description:
+  // Get the tcl object and the method that will be called when
+  // accepting or reseting the source.
+  vtkGetStringMacro(ModifiedCommandObjectTclName);
+  vtkGetStringMacro(ModifiedCommandMethod);
+
 protected:
   vtkPVWidget();
   ~vtkPVWidget();
+  virtual void SerializeRevision(ostream& os, vtkIndent indent);
+  virtual void SerializeSelf(ostream& os, vtkIndent indent);
 
   char *ModifiedCommandObjectTclName;
   char *ModifiedCommandMethod;

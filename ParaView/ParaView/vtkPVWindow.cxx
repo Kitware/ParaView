@@ -68,6 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
+#include "vtkPVCameraManipulator.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVData.h"
 #include "vtkPVDefaultModules.h"
@@ -2753,6 +2754,8 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
       {
       return 0;
       }
+    
+    clone->SetModuleName(className);
 
     if (addTraceEntry)
       {
@@ -2799,7 +2802,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
       }
     clone->Delete();
     }
-
+  
   return clone;
 }
 
@@ -3180,7 +3183,51 @@ void vtkPVWindow::LoadSessionFile(const char* path)
   delete fptr;
 }
 
-#include "vtkPVCameraManipulator.h"
+//----------------------------------------------------------------------------
+void vtkPVWindow::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  cout << "SerializeSelf" << endl;
+  this->Superclass::SerializeSelf(os, indent);
+
+  os << indent << "CenterOfRotation { "
+     << this->CenterActor->GetPosition()[0] << " "
+     << this->CenterActor->GetPosition()[1] << " " 
+     << this->CenterActor->GetPosition()[2] << " }" 
+     << endl;    
+
+  os << indent << "RenderView ";
+  this->MainView->Serialize(os, indent);
+  os << indent << "AnimationInterface ";
+  this->AnimationInterface->Serialize(os, indent);
+
+  vtkArrayMapIterator<const char*,vtkPVSourceCollection*>* scit 
+    = this->SourceLists->NewIterator();
+  scit->InitTraversal();
+  vtkIndent nindent = indent.GetNextIndent();
+  while ( !scit->IsDoneWithTraversal() )
+    {
+    vtkPVSourceCollection* col = 0;
+    const char* name = 0;
+    if ( scit->GetKey(name) == VTK_OK && name &&
+         scit->GetData(col) == VTK_OK )
+      {
+      os << indent << "SourceList_" << name << " {" << endl;
+      vtkCollectionIterator* it = col->NewIterator();
+      it->InitTraversal();
+      while ( !it->IsDoneWithTraversal() )
+        {
+        vtkPVSource *source = static_cast<vtkPVSource*>(it->GetObject());
+        os << nindent << source->GetName() << " ";
+        source->Serialize(os, indent);
+        it->GoToNextItem();
+        }
+      it->Delete();
+      os << indent << "}" << endl;
+      }
+    scit->GoToNextItem();
+    }
+  scit->Delete();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::AddManipulator(const char* rotypes, const char* name, 

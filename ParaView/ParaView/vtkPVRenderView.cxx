@@ -1743,6 +1743,41 @@ void vtkPVRenderView::SetupCameraManipulators()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SerializeSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeSelf(os, indent);
+  vtkCamera* cam = this->GetRenderer()->GetActiveCamera();
+  os << indent << "CameraParallelScale " << cam->GetParallelScale() << endl;
+  os << indent << "CameraViewAngle " << cam->GetViewAngle() << endl;
+  os << indent << "CameraClippingRange { " << cam->GetClippingRange()[0] << " "
+     << cam->GetClippingRange()[1] << " }" 
+     << endl;
+  os << indent << "CameraFocalPoint { " 
+     << cam->GetFocalPoint()[0] << " "
+     << cam->GetFocalPoint()[1] << " " 
+     << cam->GetFocalPoint()[2] << " }" 
+     << endl;
+  os << indent << "CameraPosition { " 
+     << cam->GetPosition()[0] << " "
+     << cam->GetPosition()[1] << " " 
+     << cam->GetPosition()[2] << " }" 
+     << endl;
+  os << indent << "CameraViewUp { " 
+     << cam->GetViewUp()[0] << " "
+     << cam->GetViewUp()[1] << " " 
+     << cam->GetViewUp()[2] << " }" 
+     << endl;
+}
+
+//------------------------------------------------------------------------------
+void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
+{
+  this->Superclass::SerializeRevision(os,indent);
+  os << indent << "vtkPVRenderView ";
+  this->ExtractRevision(os,"$Revision: 1.170 $");
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
