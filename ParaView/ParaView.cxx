@@ -132,21 +132,20 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       pos = 0;
       }
     }
-  
-  // New processes need these args to initialize.
-  vtkPVArgs pvArgs;
-  pvArgs.argc = argc;
-  pvArgs.argv = argv;
-  
+
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
   controller->SetNumberOfProcesses(1);
   controller->Initialize(argc, argv);
-  controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
-  controller->SingleMethodExecute();
+
+
+  Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+  vtkPVApplication *app = vtkPVApplication::New();
+  app->SetController(controller);
+  app->Script("wm withdraw .");
+    
+  app->Start(pvArgs->argc,pvArgs->argv);
+  app->Delete();
   
-
-  //Process_Init((void *)(&pvArgs));
-
   controller->Delete();
   
   delete [] argv[0];
