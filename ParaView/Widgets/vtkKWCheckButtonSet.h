@@ -64,9 +64,9 @@ template<class DataType> class vtkLinkedListIterator;
 class VTK_EXPORT vtkKWCheckButtonSet : public vtkKWWidget
 {
 public:
-
   static vtkKWCheckButtonSet* New();
   vtkTypeRevisionMacro(vtkKWCheckButtonSet,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create the widget (a frame holding all the checkbuttons).
@@ -79,42 +79,51 @@ public:
   // Object and method parameters, if any, will be used to set the command.
   // A help string will be used, if any, to set the baloon help. 
   // Return 1 on success, 0 otherwise.
-  int AddCheckButton(int id, 
-                     const char *text, 
-                     vtkKWObject *object = 0, 
-                     const char *method_and_arg_string = 0,
-                     const char *balloonhelp_string = 0);
+  int AddButton(int id, 
+                const char *text = 0, 
+                vtkKWObject *object = 0, 
+                const char *method_and_arg_string = 0,
+                const char *balloonhelp_string = 0);
 
   // Description:
   // Get a checkbutton from the set, given its unique id.
   // It is advised not to temper with the checkbutton var name or value :)
   // Return a pointer to the checkbutton, or NULL on error.
-  vtkKWCheckButton* GetCheckButton(int id);
-  int HasCheckButton(int id);
+  vtkKWCheckButton* GetButton(int id);
+  int HasButton(int id);
 
   // Description:
   // Convenience method to select a particular button or query if it is selected.
-  void SelectCheckButton(int id);
-  void DeselectCheckButton(int id);
-  void SetCheckButtonState(int id, int state);
-  int IsCheckButtonSelected(int id);
-  void SelectAllCheckButtons();
-  void DeselectAllCheckButtons();
+  void SelectButton(int id);
+  void DeselectButton(int id);
+  void SetButtonState(int id, int state);
+  int IsButtonSelected(int id);
+  void SelectAllButtons();
+  void DeselectAllButtons();
 
   // Description:
   // Convenience method to hide/show a button
-  void HideCheckButton(int id);
-  void ShowCheckButton(int id);
-  void SetCheckButtonVisibility(int id, int flag);
+  void HideButton(int id);
+  void ShowButton(int id);
+  void SetButtonVisibility(int id, int flag);
+  int GetNumberOfVisibleButtons();
 
   // Description:
   // Enable/Disable this widget. This propagates SetEnabled() calls to all
   // checkbuttons.
   virtual void SetEnabled(int);
 
+  // Description:
+  // Set the widget packing order to be horizontal (default is vertical).
+  void SetPackHorizontally(int);
+  vtkBooleanMacro(PackHorizontally, int);
+  vtkGetMacro(PackHorizontally, int);
+
 protected:
   vtkKWCheckButtonSet();
   ~vtkKWCheckButtonSet();
+
+  int PackHorizontally;
 
   //BTX
 
@@ -123,22 +132,24 @@ protected:
   // a), we might need more information in the future, b) a map 
   // Register/Unregister pointers if they are pointers to VTK objects.
  
-  class CheckButtonSlot
+  class ButtonSlot
   {
   public:
     int Id;
-    vtkKWCheckButton *CheckButton;
+    vtkKWCheckButton *Button;
   };
 
-  typedef vtkLinkedList<CheckButtonSlot*> CheckButtonsContainer;
-  typedef vtkLinkedListIterator<CheckButtonSlot*> CheckButtonsContainerIterator;
-  CheckButtonsContainer *CheckButtons;
+  typedef vtkLinkedList<ButtonSlot*> ButtonsContainer;
+  typedef vtkLinkedListIterator<ButtonSlot*> ButtonsContainerIterator;
+  ButtonsContainer *Buttons;
 
   // Helper methods
 
-  CheckButtonSlot* GetCheckButtonSlot(int id);
+  ButtonSlot* GetButtonSlot(int id);
 
   //ETX
+
+  void Pack();
 
 private:
   vtkKWCheckButtonSet(const vtkKWCheckButtonSet&); // Not implemented

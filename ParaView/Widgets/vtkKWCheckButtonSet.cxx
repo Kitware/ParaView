@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWCheckButtonSet);
-vtkCxxRevisionMacro(vtkKWCheckButtonSet, "1.1");
+vtkCxxRevisionMacro(vtkKWCheckButtonSet, "1.2");
 
 int vtkvtkKWCheckButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -59,7 +59,8 @@ int vtkvtkKWCheckButtonSetCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkKWCheckButtonSet::vtkKWCheckButtonSet()
 {
-  this->CheckButtons = vtkKWCheckButtonSet::CheckButtonsContainer::New();
+  this->PackHorizontally = 0;
+  this->Buttons = vtkKWCheckButtonSet::ButtonsContainer::New();
 }
 
 //----------------------------------------------------------------------------
@@ -67,21 +68,21 @@ vtkKWCheckButtonSet::~vtkKWCheckButtonSet()
 {
   // Delete all checkbuttons
 
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = NULL;
-  vtkKWCheckButtonSet::CheckButtonsContainerIterator *it = 
-    this->CheckButtons->NewIterator();
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWCheckButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(checkbutton_slot) == VTK_OK)
+    if (it->GetData(button_slot) == VTK_OK)
       {
-      if (checkbutton_slot->CheckButton)
+      if (button_slot->Button)
         {
-        checkbutton_slot->CheckButton->Delete();
-        checkbutton_slot->CheckButton = NULL;
+        button_slot->Button->Delete();
+        button_slot->Button = NULL;
         }
-      delete checkbutton_slot;
+      delete button_slot;
       }
     it->GoToNextItem();
     }
@@ -89,24 +90,24 @@ vtkKWCheckButtonSet::~vtkKWCheckButtonSet()
 
   // Delete the container
 
-  this->CheckButtons->Delete();
+  this->Buttons->Delete();
 }
 
 //----------------------------------------------------------------------------
-vtkKWCheckButtonSet::CheckButtonSlot* 
-vtkKWCheckButtonSet::GetCheckButtonSlot(int id)
+vtkKWCheckButtonSet::ButtonSlot* 
+vtkKWCheckButtonSet::GetButtonSlot(int id)
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = NULL;
-  vtkKWCheckButtonSet::CheckButtonSlot *found = NULL;
-  vtkKWCheckButtonSet::CheckButtonsContainerIterator *it = 
-    this->CheckButtons->NewIterator();
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWCheckButtonSet::ButtonSlot *found = NULL;
+  vtkKWCheckButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(checkbutton_slot) == VTK_OK && checkbutton_slot->Id == id)
+    if (it->GetData(button_slot) == VTK_OK && button_slot->Id == id)
       {
-      found = checkbutton_slot;
+      found = button_slot;
       break;
       }
     it->GoToNextItem();
@@ -117,23 +118,23 @@ vtkKWCheckButtonSet::GetCheckButtonSlot(int id)
 }
 
 //----------------------------------------------------------------------------
-vtkKWCheckButton* vtkKWCheckButtonSet::GetCheckButton(int id)
+vtkKWCheckButton* vtkKWCheckButtonSet::GetButton(int id)
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = 
-    this->GetCheckButtonSlot(id);
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
 
-  if (!checkbutton_slot)
+  if (!button_slot)
     {
     return NULL;
     }
 
-  return checkbutton_slot->CheckButton;
+  return button_slot->Button;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWCheckButtonSet::HasCheckButton(int id)
+int vtkKWCheckButtonSet::HasButton(int id)
 {
-  return this->GetCheckButtonSlot(id) ? 1 : 0;
+  return this->GetButtonSlot(id) ? 1 : 0;
 }
 
 //------------------------------------------------------------------------------
@@ -157,16 +158,16 @@ void vtkKWCheckButtonSet::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWCheckButtonSet::SetEnabled(int arg)
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = NULL;
-  vtkKWCheckButtonSet::CheckButtonsContainerIterator *it = 
-    this->CheckButtons->NewIterator();
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWCheckButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(checkbutton_slot) == VTK_OK)
+    if (it->GetData(button_slot) == VTK_OK)
       {
-      checkbutton_slot->CheckButton->SetEnabled(arg);
+      button_slot->Button->SetEnabled(arg);
       }
     it->GoToNextItem();
     }
@@ -174,11 +175,11 @@ void vtkKWCheckButtonSet::SetEnabled(int arg)
 }
 
 //------------------------------------------------------------------------------
-int vtkKWCheckButtonSet::AddCheckButton(int id, 
-                                        const char *text, 
-                                        vtkKWObject *object, 
-                                        const char *method_and_arg_string,
-                                        const char *balloonhelp_string)
+int vtkKWCheckButtonSet::AddButton(int id, 
+                                   const char *text, 
+                                   vtkKWObject *object, 
+                                   const char *method_and_arg_string,
+                                   const char *balloonhelp_string)
 {
   // Widget must have been created
 
@@ -191,7 +192,7 @@ int vtkKWCheckButtonSet::AddCheckButton(int id,
 
   // Check if the new checkbutton has a unique id
 
-  if (this->HasCheckButton(id))
+  if (this->HasButton(id))
     {
     vtkErrorMacro("A checkbutton with that id (" << id << ") already exists "
                   "in the checkbutton set.");
@@ -200,111 +201,164 @@ int vtkKWCheckButtonSet::AddCheckButton(int id,
 
   // Add the checkbutton slot to the manager
 
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = 
-    new vtkKWCheckButtonSet::CheckButtonSlot;
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = 
+    new vtkKWCheckButtonSet::ButtonSlot;
 
-  if (this->CheckButtons->AppendItem(checkbutton_slot) != VTK_OK)
+  if (this->Buttons->AppendItem(button_slot) != VTK_OK)
     {
     vtkErrorMacro("Error while adding a checkbutton to the set.");
-    delete checkbutton_slot;
+    delete button_slot;
     return 0;
     }
   
   // Create the checkbutton
 
-  checkbutton_slot->CheckButton = vtkKWCheckButton::New();
-  checkbutton_slot->Id = id;
+  button_slot->Button = vtkKWCheckButton::New();
+  button_slot->Id = id;
 
-  checkbutton_slot->CheckButton->SetParent(this);
-  checkbutton_slot->CheckButton->Create(this->Application, 0);
+  button_slot->Button->SetParent(this);
+  button_slot->Button->Create(this->Application, 0);
 
   // Set text command and balloon help, if any
 
   if (text)
     {
-    checkbutton_slot->CheckButton->SetText(text);
+    button_slot->Button->SetText(text);
     }
 
   if (object && method_and_arg_string)
     {
-    checkbutton_slot->CheckButton->SetCommand(object, method_and_arg_string);
+    button_slot->Button->SetCommand(object, method_and_arg_string);
     }
 
   if (balloonhelp_string)
     {
-    checkbutton_slot->CheckButton->SetBalloonHelpString(balloonhelp_string);
+    button_slot->Button->SetBalloonHelpString(balloonhelp_string);
     }
 
   // Pack the button
 
-  this->Script("grid %s -column 0 -row %d -sticky nsw",
-               checkbutton_slot->CheckButton->GetWidgetName(),
-               this->CheckButtons->GetNumberOfItems() - 1);
+  this->Pack();
 
   return 1;
 }
 
-//----------------------------------------------------------------------------
-void vtkKWCheckButtonSet::SelectCheckButton(int id)
+// ----------------------------------------------------------------------------
+void vtkKWCheckButtonSet::Pack()
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = 
-    this->GetCheckButtonSlot(id);
-
-  if (checkbutton_slot && checkbutton_slot->CheckButton)
+  if (!this->IsCreated())
     {
-    checkbutton_slot->CheckButton->SetState(1);
+    return;
+    }
+
+  ostrstream tk_cmd;
+
+  tk_cmd << "catch {eval grid forget [grid slaves " << this->GetWidgetName() 
+         << "]}" << endl;
+
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWCheckButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
+
+  int i = 0;
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(button_slot) == VTK_OK)
+      {
+      tk_cmd << "grid " << button_slot->Button->GetWidgetName() 
+             << " -sticky " << (this->PackHorizontally ? "ews" : "nsw")
+             << " -column " << (this->PackHorizontally ? i : 0)
+             << " -row " << (this->PackHorizontally ? 0 : i)
+             << endl;
+      i++;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  tk_cmd << "grid " << (this->PackHorizontally ? "row" : "column") 
+         << "configure " << this->GetWidgetName() << " 0 -weight 1" << endl;
+
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWCheckButtonSet::SetPackHorizontally(int _arg)
+{
+  if (this->PackHorizontally == _arg)
+    {
+    return;
+    }
+  this->PackHorizontally = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButtonSet::SelectButton(int id)
+{
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
+
+  if (button_slot && button_slot->Button)
+    {
+    button_slot->Button->SetState(1);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonSet::DeselectCheckButton(int id)
+void vtkKWCheckButtonSet::DeselectButton(int id)
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = 
-    this->GetCheckButtonSlot(id);
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
 
-  if (checkbutton_slot && checkbutton_slot->CheckButton)
+  if (button_slot && button_slot->Button)
     {
-    checkbutton_slot->CheckButton->SetState(0);
+    button_slot->Button->SetState(0);
     }
 }
 
 //----------------------------------------------------------------------------
-int vtkKWCheckButtonSet::IsCheckButtonSelected(int id)
+int vtkKWCheckButtonSet::IsButtonSelected(int id)
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = 
-    this->GetCheckButtonSlot(id);
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
 
-  return (checkbutton_slot && 
-          checkbutton_slot->CheckButton && 
-          checkbutton_slot->CheckButton->GetState()) ? 1 : 0;
+  return (button_slot && 
+          button_slot->Button && 
+          button_slot->Button->GetState()) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonSet::SetCheckButtonState(int id, int state)
+void vtkKWCheckButtonSet::SetButtonState(int id, int state)
 {
   if (state)
     {
-    this->SelectCheckButton(id);
+    this->SelectButton(id);
     }
   else
     {
-    this->DeselectCheckButton(id);
+    this->DeselectButton(id);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonSet::SelectAllCheckButtons()
+void vtkKWCheckButtonSet::SelectAllButtons()
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = NULL;
-  vtkKWCheckButtonSet::CheckButtonsContainerIterator *it = 
-    this->CheckButtons->NewIterator();
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWCheckButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(checkbutton_slot) == VTK_OK)
+    if (it->GetData(button_slot) == VTK_OK)
       {
-      checkbutton_slot->CheckButton->SetState(1);
+      button_slot->Button->SetState(1);
       }
     it->GoToNextItem();
     }
@@ -312,18 +366,18 @@ void vtkKWCheckButtonSet::SelectAllCheckButtons()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonSet::DeselectAllCheckButtons()
+void vtkKWCheckButtonSet::DeselectAllButtons()
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = NULL;
-  vtkKWCheckButtonSet::CheckButtonsContainerIterator *it = 
-    this->CheckButtons->NewIterator();
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = NULL;
+  vtkKWCheckButtonSet::ButtonsContainerIterator *it = 
+    this->Buttons->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(checkbutton_slot) == VTK_OK)
+    if (it->GetData(button_slot) == VTK_OK)
       {
-      checkbutton_slot->CheckButton->SetState(0);
+      button_slot->Button->SetState(0);
       }
     it->GoToNextItem();
     }
@@ -331,28 +385,47 @@ void vtkKWCheckButtonSet::DeselectAllCheckButtons()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonSet::HideCheckButton(int id)
+void vtkKWCheckButtonSet::HideButton(int id)
 {
-  this->SetCheckButtonVisibility(id, 0);
+  this->SetButtonVisibility(id, 0);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonSet::ShowCheckButton(int id)
+void vtkKWCheckButtonSet::ShowButton(int id)
 {
-  this->SetCheckButtonVisibility(id, 1);
+  this->SetButtonVisibility(id, 1);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWCheckButtonSet::SetCheckButtonVisibility(int id, int flag)
+void vtkKWCheckButtonSet::SetButtonVisibility(int id, int flag)
 {
-  vtkKWCheckButtonSet::CheckButtonSlot *checkbutton_slot = 
-    this->GetCheckButtonSlot(id);
+  vtkKWCheckButtonSet::ButtonSlot *button_slot = 
+    this->GetButtonSlot(id);
 
-  if (checkbutton_slot && checkbutton_slot->CheckButton)
+  if (button_slot && button_slot->Button)
     {
     this->Script("grid %s %s", 
-                 (flag ? "" : "forget"),
-                 checkbutton_slot->CheckButton->GetWidgetName());
+                 (flag ? "" : "remove"),
+                 button_slot->Button->GetWidgetName());
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWCheckButtonSet::GetNumberOfVisibleButtons()
+{
+  if (!this->IsCreated())
+    {
+    return 0;
+    }
+  return atoi(this->Script("llength [grid slaves %s]", this->GetWidgetName()));
+}
+
+//----------------------------------------------------------------------------
+void vtkKWCheckButtonSet::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "PackHorizontally: " 
+     << (this->PackHorizontally ? "On" : "Off") << endl;
 }
 
