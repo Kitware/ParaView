@@ -493,22 +493,10 @@ public:
 
   // Description:
   // The following methods are needed for mouse interaction tracing.
-  void SetInteractorEventPosition(int x, int y);
-  void CenterOfRotationStyleOnLeftButtonUp();
-  void CenterOfRotationStyleOnLeftButtonDown();
-  void CenterOfRotationStyleOnRightButtonUp();
-  void CenterOfRotationStyleOnRightButtonDown();
-  void CenterOfRotationStyleOnMiddleButtonUp();
-  void CenterOfRotationStyleOnMiddleButtonDown();
-  void CenterOfRotationStyleOnMouseMove();
-  void CameraStyle3DOnLeftButtonUp();
-  void CameraStyle3DOnLeftButtonDown();
-  void CameraStyle3DOnRightButtonUp();
-  void CameraStyle3DOnRightButtonDown();
-  void CameraStyle3DOnMiddleButtonUp();
-  void CameraStyle3DOnMiddleButtonDown();
-  void CameraStyle3DOnMouseMove();
-  void SetInteractorShiftKey(int i);
+  void SetInteractorEventInformation(int x, int y, int ctrl, int shift,
+                                     char keycode, int repeatcount,
+                                     const char *keysym);
+  void InvokeInteractorEvent(const char *event);
 
 protected:
   vtkPVWindow();

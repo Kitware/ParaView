@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.534");
+vtkCxxRevisionMacro(vtkPVWindow, "1.535");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4496,39 +4496,20 @@ void vtkPVWindow::EndProgress(int enabled)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::SetInteractorEventPosition(int x, int y)
-{ this->GetInteractor()->SetEventPosition(x,y); }
+void vtkPVWindow::SetInteractorEventInformation(int x, int y, int ctrl,
+                                                int shift, char keycode,
+                                                int repeatcount,
+                                                const char *keysym)
+{
+  this->Interactor->SetEventInformation(x, y, ctrl, shift, keycode,
+                                        repeatcount, keysym);
+}
+
 //-----------------------------------------------------------------------------
-void vtkPVWindow::CenterOfRotationStyleOnLeftButtonUp() { this->GetCenterOfRotationStyle()->OnLeftButtonUp(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CenterOfRotationStyleOnLeftButtonDown() { this->GetCenterOfRotationStyle()->OnLeftButtonDown(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CenterOfRotationStyleOnRightButtonUp() { this->GetCenterOfRotationStyle()->OnRightButtonUp(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CenterOfRotationStyleOnRightButtonDown() { this->GetCenterOfRotationStyle()->OnRightButtonDown(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CenterOfRotationStyleOnMiddleButtonUp() { this->GetCenterOfRotationStyle()->OnMiddleButtonUp(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CenterOfRotationStyleOnMiddleButtonDown() { this->GetCenterOfRotationStyle()->OnMiddleButtonDown(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CenterOfRotationStyleOnMouseMove() { this->GetCenterOfRotationStyle()->OnMouseMove(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CameraStyle3DOnLeftButtonUp() { this->GetCameraStyle3D()->OnLeftButtonUp(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CameraStyle3DOnLeftButtonDown() { this->GetCameraStyle3D()->OnLeftButtonDown(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CameraStyle3DOnRightButtonUp() { this->GetCameraStyle3D()->OnRightButtonUp(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CameraStyle3DOnRightButtonDown() { this->GetCameraStyle3D()->OnRightButtonDown(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CameraStyle3DOnMiddleButtonUp() { this->GetCameraStyle3D()->OnMiddleButtonUp(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CameraStyle3DOnMiddleButtonDown() { this->GetCameraStyle3D()->OnMiddleButtonDown(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CameraStyle3DOnMouseMove() { this->GetCameraStyle3D()->OnMouseMove(); }
-//-----------------------------------------------------------------------------
-void vtkPVWindow::SetInteractorShiftKey(int i)
-{ this->GetInteractor()->SetShiftKey(i); }
+void vtkPVWindow::InvokeInteractorEvent(const char *event)
+{
+  this->Interactor->InvokeEvent(event);
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
