@@ -106,7 +106,7 @@ set kw(vtkTemp1264) [$kw(vtkTemp1247) GetPVWidget {Input}]
 $kw(vtkTemp1264) SetCurrentValue $kw(vtkTemp1119)
 set kw(vtkTemp1255) [$kw(vtkTemp1247) GetPVWidget {BoundaryMode}]
 $kw(vtkTemp1255) SetCurrentValue {0}
-set kw(vtkTemp1258) [$kw(vtkTemp1247) GetPVWidget {GlobalIdArrayName}]
+set kw(vtkTemp1258) [$kw(vtkTemp1247) GetPVWidget {GlobalNodeIdArrayName}]
 $kw(vtkTemp1258) SetValue {}
 set kw(vtkTemp1261) [$kw(vtkTemp1247) GetPVWidget {UseMinimalMemory}]
 $kw(vtkTemp1261) SetState 0
