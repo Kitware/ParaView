@@ -34,7 +34,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.30");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.31");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -534,6 +534,10 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
         {
         return 0;
         }
+      }
+    else if (strcmp(name, "Documentation") == 0)
+      {
+      // Ignore this documentation element.
       }
     else
       {
