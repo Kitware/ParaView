@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVData.h"
+#include "vtkToolkits.h"
 
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetSurfaceFilter.h"
@@ -481,7 +482,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
 #ifdef PV_USE_SGI_PIPES
   pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-  pvApp->BroadcastScript("%s SetNumberOfProcesses %s", this->CollectTclName,
+  pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
                          pvApp->GetNumberOfPipes());
 #else
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
@@ -552,7 +553,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   sprintf(tclName, "LODCollect%d", this->InstanceCount);
 #ifdef PV_USE_SGI_PIPES
   pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-  pvApp->BroadcastScript("%s SetNumberOfProcesses %s", this->CollectTclName,
+  pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
                          pvApp->GetNumberOfPipes());
 #else
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
