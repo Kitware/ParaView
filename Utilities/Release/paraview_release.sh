@@ -462,7 +462,7 @@ docs_zipfile()
 write_standard_cache()
 {
     cat > CMakeCache.txt <<EOF
-BUILD_SHARED_LIBS:BOOL=OFF
+BUILD_SHARED_LIBS:BOOL=ON
 BUILD_TESTING:BOOL=ON
 CMAKE_BUILD_TYPE:STRING=Release
 CMAKE_INSTALL_PREFIX:PATH=/usr/local
