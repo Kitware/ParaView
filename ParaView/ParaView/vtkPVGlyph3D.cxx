@@ -50,12 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVSelectionList.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkPVArrayMenu.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkPVWindow.h"
 #include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGlyph3D);
-vtkCxxRevisionMacro(vtkPVGlyph3D, "1.73");
+vtkCxxRevisionMacro(vtkPVGlyph3D, "1.73.2.1");
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -120,6 +122,7 @@ void vtkPVGlyph3D::CreateProperties()
 void vtkPVGlyph3D::InitializePrototype()
 {
   vtkPVInputMenu *inputMenu;
+  vtkPVInputMenu *sourceMenu;
   
   inputMenu = this->AddInputMenu(
     "Input", "PVInput", "vtkDataSet",
@@ -129,14 +132,51 @@ void vtkPVGlyph3D::InitializePrototype()
   inputMenu->SetModifiedCommand(this->GetTclName(), 
                                 "SetAcceptButtonColorToRed");
 
-  inputMenu = this->AddInputMenu(
+  sourceMenu = this->AddInputMenu(
     "Glyph", "GlyphSource", "vtkPolyData",
     "Select the data set to use as the glyph geometry.",
     this->GetPVWindow()->GetSourceList("GlyphSources"));
-  inputMenu->SetVTKInputName("Source");
-  inputMenu->SetModifiedCommand(this->GetTclName(), 
+  sourceMenu->SetVTKInputName("Source");
+  sourceMenu->SetModifiedCommand(this->GetTclName(), 
                                 "SetAcceptButtonColorToRed");
     
+  /* Not necessary now that we have input arraySelection.
+  sl = vtkPVSelectionList::New();  
+  sl->SetParent(this->ParameterFrame->GetFrame());
+  sl->SetLabel("Vector Mode");
+  sl->SetObjectVariable(this->GetVTKSourceTclName(), "VectorMode");
+  sl->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
+  sl->Create(this->Application);
+  sl->SetBalloonHelpString("Select what to use as vectors for "
+                           "scaling/rotation");
+  sl->AddItem("Vector", 0);
+  //sl->AddItem("Normal", 1);
+  sl->AddItem("Vector RotationOff", 2);
+  this->AddPVWidget(sl);
+  sl->Delete();
+  */
+
+  vtkPVLabeledToggle *toggle = vtkPVLabeledToggle::New();
+  toggle->SetParent(this->ParameterFrame->GetFrame());
+  toggle->SetObjectVariable(this->GetVTKSourceTclName(), "Orient");
+  toggle->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
+  toggle->SetLabel("Orient");
+  toggle->Create(this->Application);
+  toggle->SetBalloonHelpString("Select whether to orient the glyphs");
+  this->AddPVWidget(toggle);
+  toggle->Delete();
+
+  vtkPVArrayMenu *am = vtkPVArrayMenu::New();
+  am->SetLabel("Vectors");
+  am->SetNumberOfComponents(3);
+  am->SetInputName("Input");
+  am->SetAttributeType(vtkDataSetAttributes::VECTORS);
+  am->SetObjectTclName(this->GetVTKSourceTclName());
+  am->SetInputMenu(inputMenu);
+  this->AddPVWidget(am);
+  am->Delete();
+  am = NULL;
+
   vtkPVSelectionList *sl = vtkPVSelectionList::New();  
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->SetLabel("Scale Mode");
@@ -151,31 +191,7 @@ void vtkPVGlyph3D::InitializePrototype()
   this->AddPVWidget(sl);
   sl->Delete();
 
-
-  sl = vtkPVSelectionList::New();  
-  sl->SetParent(this->ParameterFrame->GetFrame());
-  sl->SetLabel("Vector Mode");
-  sl->SetObjectVariable(this->GetVTKSourceTclName(), "VectorMode");
-  sl->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
-  sl->Create(this->Application);
-  sl->SetBalloonHelpString("Select what to use as vectors for "
-                           "scaling/rotation");
-  sl->AddItem("Vector", 0);
-  sl->AddItem("Normal", 1);
-  sl->AddItem("Vector RotationOff", 2);
-  this->AddPVWidget(sl);
-  sl->Delete();
-
-  vtkPVLabeledToggle *toggle = vtkPVLabeledToggle::New();
-  toggle->SetParent(this->ParameterFrame->GetFrame());
-  toggle->SetObjectVariable(this->GetVTKSourceTclName(), "Orient");
-  toggle->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
-  toggle->SetLabel("Orient");
-  toggle->Create(this->Application);
-  toggle->SetBalloonHelpString("Select whether to orient the glyphs");
-  this->AddPVWidget(toggle);
-  toggle->Delete();
-
+  /* Scaling off can be achieved with DataScaling Off and scale factor of 1.
   toggle = vtkPVLabeledToggle::New();
   toggle->SetParent(this->ParameterFrame->GetFrame());
   toggle->SetObjectVariable(this->GetVTKSourceTclName(), "Scaling");
@@ -185,6 +201,7 @@ void vtkPVGlyph3D::InitializePrototype()
   toggle->SetBalloonHelpString("Select whether to scale the glyphs");
   this->AddPVWidget(toggle);
   toggle->Delete();
+  */
 
   vtkPVVectorEntry *entry = vtkPVVectorEntry::New();
   entry->SetParent(this->ParameterFrame->GetFrame());
