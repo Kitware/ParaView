@@ -1,0 +1,54 @@
+$Application ExitOnReturnOn
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "--pvlocal-dir"} {
+        set pvlocal_dir [lindex $argv [expr $i + 1]]
+    }
+}
+
+set kw(vtkTemp5) [$Application GetMainWindow]
+set kw(vtkTemp19) [$kw(vtkTemp5) GetMainView]
+puts stdout "Loading package ${pvlocal_dir}/PVLocal.xml"
+if {[$kw(vtkTemp5) OpenPackage "${pvlocal_dir}/PVLocal.xml"] != 1} {
+  puts stderr "Could not open package!"
+  $Application SetExitStatus 1
+  $Application Exit 1
+}
+set kw(vtkTemp948) [$kw(vtkTemp5) CreatePVSource LocalConeSource]
+set kw(vtkTemp955) [$kw(vtkTemp948) GetPVWidget {Resolution}]
+$kw(vtkTemp955) SetValue 6
+set kw(vtkTemp960) [$kw(vtkTemp948) GetPVWidget {Radius}]
+$kw(vtkTemp960) SetValue 0.5
+set kw(vtkTemp966) [$kw(vtkTemp948) GetPVWidget {Height}]
+$kw(vtkTemp966) SetValue 1
+set kw(vtkTemp971) [$kw(vtkTemp948) GetPVWidget {Capping}]
+$kw(vtkTemp971) SetState 1
+$kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp5) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp948) AcceptCallback
+
+# Fix the size of the image.
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
+update
+[[$Application GetMainWindow] GetMainView] ForceRender
+
+set didRegression 0
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+       set didRegression 1
+    }
+}
+
+if { ! $didRegression } {
+    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+        if {[lindex $argv $i] == "-BT"} {
+            source [lindex $argv [expr $i + 1]]
+        }
+    }
+}
+
+$Application Exit
