@@ -879,11 +879,18 @@ void vtkPVWindow::PlayDemo()
 //----------------------------------------------------------------------------
 void vtkPVWindow::OpenCallback()
 {
+  char buffer[1024];
+  // Retrieve old path from the registery
+  if ( !this->GetRegisteryValue(2, "RunTime", "OpenPath", buffer) )
+  {
+    sprintf(buffer, ".");
+  }
+  
   char *openFileName = NULL;
 #ifdef _WIN32  
-  this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+  this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
 #else
-  this->Script("set openFileName [tk_getOpenFile -filetypes {{{ParaView Files} {.vtk .pvtk .case .pop .stl}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
+  this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {.vtk .pvtk .case .pop .stl}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
 #endif
   
   openFileName = new char[strlen(this->GetPVApplication()->GetMainInterp()->result) + 1];
@@ -907,8 +914,24 @@ void vtkPVWindow::OpenCallback()
     return;
     }
 
-  
+  // Store last path
+  if ( openFileName && strlen(openFileName) > 0 )
+  {
+    char *pth = new char [strlen(openFileName)+1];
+    sprintf(pth,"%s",openFileName);
+    int pos = strlen(openFileName);
+    // Strip off the file name
+    while (pos && pth[pos] != '/' && pth[pos] != '\\')
+      {
+      pos--;
+      }
+    pth[pos] = '\0';
+    // Store in the registery
+    this->SetRegisteryValue(2, "RunTime", "OpenPath", pth);
+    delete [] pth;
+  }
   this->Open(openFileName);
+  
   delete [] openFileName;
 }
 
