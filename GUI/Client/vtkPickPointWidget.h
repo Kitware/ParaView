@@ -47,13 +47,24 @@ public:
   void SetRenderModule(vtkPVRenderModule* rm);
   vtkPVRenderModule* GetRenderModule() { return this->RenderModule;}
 
+  // Description:
+  // We have to look for key press events too.
+  virtual void SetEnabled(int);
+
 protected:
   vtkPickPointWidget();
   ~vtkPickPointWidget();
 
   // For picking.  Use a proxy in the future.
   vtkPVRenderModule* RenderModule;
-  virtual void OnRightButtonDown();
+
+  virtual void OnChar();
+
+  // Handles the events
+  static void ProcessEvents(vtkObject* object, 
+                            unsigned long event,
+                            void* clientdata, 
+                            void* calldata);
 
 private:
   vtkPickPointWidget(const vtkPickPointWidget&); // Not implemented
