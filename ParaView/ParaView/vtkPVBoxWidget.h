@@ -139,6 +139,7 @@ public:
   vtkGetObjectMacro(BoxTransform, vtkTransform);
 
   void UpdateBox();
+  void UpdateFromBox();
 
 protected:
   vtkPVBoxWidget();
@@ -159,6 +160,9 @@ protected:
 
   char *BoxTransformTclName;
   vtkSetStringMacro(BoxTransformTclName);
+
+  char *BoxMatrixTclName;
+  vtkSetStringMacro(BoxMatrixTclName);
 
   vtkKWFrame*        ControlFrame;
   vtkKWLabel*        TranslateLabel;
@@ -181,10 +185,20 @@ protected:
 
   float* GetPositionFromGUI();
   float* GetRotationFromGUI();
-  float* GetScalarFromGUI();
+  float* GetScaleFromGUI();
+  vtkSetVector3Macro(PositionGUI, float);
+  vtkSetVector3Macro(RotationGUI, float);
+  vtkSetVector3Macro(ScaleGUI,    float);
   float PositionGUI[3];
   float RotationGUI[3];
   float ScaleGUI[3];
+
+  vtkSetVector3Macro(StoredPosition, float);
+  vtkSetVector3Macro(StoredScale,    float);
+  vtkSetVector3Macro(StoredRotation, float);
+  float StoredPosition[3];
+  float StoredRotation[3];
+  float StoredScale[3];
 
 private:
   vtkPVBoxWidget(const vtkPVBoxWidget&); // Not implemented

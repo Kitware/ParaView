@@ -65,9 +65,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWScale.h"
 #include "vtkPVRenderView.h"
 #include "vtkTransform.h"
+#include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.5");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -119,6 +120,12 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
       this->BoxTransformTclName);
     this->SetBoxTransformTclName(0);
     }
+  if ( this->BoxMatrixTclName)
+    {
+    this->GetPVApplication()->BroadcastScript("%s Delete", 
+      this->BoxMatrixTclName);
+    this->SetBoxMatrixTclName(0);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -132,6 +139,10 @@ void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
     {
     //this->Script("eval %s SetState [ %s GetState ]", 
     //this->GetTclName(), this->BoxTclName);
+    this->SetPositionGUI(this->StoredPosition);
+    this->SetRotationGUI(this->StoredRotation);
+    this->SetScaleGUI(this->StoredScale);
+    this->UpdateBox();
     }
   this->Superclass::ResetInternal(sourceTclName);
 }
@@ -158,6 +169,10 @@ void vtkPVBoxWidget::AcceptInternal(const char* sourceTclName)
     vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
       this->Application);
     pvApp->BroadcastScript("%s GetPlanes %s", this->Widget3DTclName, this->BoxTclName);
+
+    this->SetStoredPosition(this->PositionGUI);
+    this->SetStoredRotation(this->RotationGUI);
+    this->SetStoredScale(this->ScaleGUI);
     }
   this->Superclass::AcceptInternal(sourceTclName);
 }
@@ -171,31 +186,79 @@ void vtkPVBoxWidget::Trace(ofstream *file)
     return;
     }
 
+  this->GetRotationFromGUI();
+  this->GetScaleFromGUI();
+  this->GetPositionFromGUI();
+
+  *file << "$kw(" << this->GetTclName() << ") SetScale "
+    << this->ScaleGUI[0] << " "
+    << this->ScaleGUI[1] << " "
+    << this->ScaleGUI[2] << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetTranslate "
+    << this->PositionGUI[0] << " "
+    << this->PositionGUI[1] << " "
+    << this->PositionGUI[2] << endl;
+  *file << "$kw(" << this->GetTclName() << ") SetOrientation "
+    << this->RotationGUI[0] << " "
+    << this->RotationGUI[1] << " "
+    << this->RotationGUI[2] << endl;
   /*
   for ( cc = 0; cc < 3; cc ++ )
-    {
-    val[cc] = atof( this->CenterEntry[cc]->GetValue() );
-    }
-  *file << "$kw(" << this->GetTclName() << ") SetCenter "
-        << val[0] << " " << val[1] << " " << val[2] << endl;
+  {
+  val[cc] = atof( this->CenterEntry[cc]->GetValue() );
+  }
+   *file << "$kw(" << this->GetTclName() << ") SetCenter "
+   << val[0] << " " << val[1] << " " << val[2] << endl;
 
-  rad = atof(this->RadiusEntry->GetValue());
-  this->AddTraceEntry("$kw(%s) SetRadius %f", 
-                      this->GetTclName(), rad);
-  *file << "$kw(" << this->GetTclName() << ") SetRadius "
-        << rad << endl;
-        */
+   rad = atof(this->RadiusEntry->GetValue());
+   this->AddTraceEntry("$kw(%s) SetRadius %f", 
+   this->GetTclName(), rad);
+   *file << "$kw(" << this->GetTclName() << ") SetRadius "
+   << rad << endl;
+   */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::UpdateVTKObject(const char*)
 {
+  this->Superclass::Update();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
 {
   *file << "vtkPlanes " << this->BoxTclName << endl;
+  float bds[6];
+  *file << "vtkBoxWidget " << this->Widget3DTclName << endl;
+  this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
+  *file << "\t" << this->Widget3DTclName << " PlaceWidget "
+    << bds[0] << " " << bds[1] << " " << bds[2] << " "
+    << bds[3] << " " << bds[4] << " " << bds[5] << endl;
+  *file << "\t" << this->Widget3DTclName << " EnabledOn" << endl;
+  *file << "vtkTransform " << this->BoxTransformTclName << endl;
+  *file << "vtkMatrix4x4 " << this->BoxMatrixTclName << endl;
+  *file << this->Widget3DTclName << " GetTransform " << this->BoxTransformTclName << endl;
+  vtkTransform* trans = this->BoxTransform;
+  trans->Identity();
+  trans->Translate(this->GetPositionFromGUI());
+  this->GetRotationFromGUI();
+  trans->RotateZ(this->RotationGUI[2]);
+  trans->RotateX(this->RotationGUI[0]);
+  trans->RotateY(this->RotationGUI[1]);
+  trans->Scale(this->GetScaleFromGUI());
+  vtkMatrix4x4* mat = trans->GetMatrix();
+  *file << "\t" << this->BoxMatrixTclName << " DeepCopy "
+    << (*mat)[0][0] << " " << (*mat)[0][1] << " " << (*mat)[0][2] << " " 
+    << (*mat)[0][3] << " " << (*mat)[1][0] << " " << (*mat)[1][1] << " " 
+    << (*mat)[1][2] << " " << (*mat)[1][3] << " " << (*mat)[2][0] << " " 
+    << (*mat)[2][1] << " " << (*mat)[2][2] << " " << (*mat)[2][3] << " "
+    << (*mat)[3][0] << " " << (*mat)[3][1] << " " << (*mat)[3][2] << " " 
+    << (*mat)[3][3] << endl;
+  *file << "\t" << this->BoxTransformTclName << " SetMatrix " 
+    << this->BoxMatrixTclName << endl;
+  *file << "\t" << this->Widget3DTclName << " SetTransform " 
+    << this->BoxTransformTclName << endl;
+  *file << "\t" << this->Widget3DTclName << " GetPlanes " << this->BoxTclName << endl;
   /*
   *file << "\t" << this->BoxTclName << " SetCenter ";
   this->Script("%s GetCenter", this->BoxTclName);
@@ -204,6 +267,7 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
   this->Script("%s GetRadius", this->BoxTclName);
   *file << this->Application->GetMainInterp()->result << endl;
   */
+  *file << endl;
 }
 
 //----------------------------------------------------------------------------
@@ -274,6 +338,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   sprintf(tclName, "pvBoxWidget%d", instanceCount);
   this->SetWidget3DTclName(tclName);
   pvApp->BroadcastScript("vtkBoxWidget %s", tclName);
+  pvApp->BroadcastScript("%s SetPlaceFactor 1.0", tclName);
   pvApp->BroadcastScript("%s PlaceWidget 0 1 0 1 0 1", tclName);
 
   sprintf(tclName, "pvBox%d", instanceCount);
@@ -283,6 +348,10 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   sprintf(tclName, "pvBoxTransform%d", instanceCount);
   pvApp->BroadcastScript("vtkTransform %s", tclName);
   this->SetBoxTransformTclName(tclName);
+
+  sprintf(tclName, "pvBoxMatrix%d", instanceCount);
+  pvApp->BroadcastScript("vtkMatrix4x4 %s", tclName);
+  this->SetBoxMatrixTclName(tclName);
 
   this->BoxTransform = vtkTransform::SafeDownCast(pvApp->TclToVTKObject(this->BoxTransformTclName));
   
@@ -315,6 +384,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     this->TranslateThumbWheel[cc]->SetParent(this->ControlFrame->GetFrame());
     this->TranslateThumbWheel[cc]->PopupModeOn();
     this->TranslateThumbWheel[cc]->SetValue(0.0);
+    this->TranslateThumbWheel[cc]->SetResolution(0.001);
     this->TranslateThumbWheel[cc]->Create(this->Application, 0);
     this->TranslateThumbWheel[cc]->DisplayEntryOn();
     this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
@@ -333,7 +403,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     this->ScaleThumbWheel[cc]->SetValue(1.0);
     this->ScaleThumbWheel[cc]->SetMinimumValue(0.0);
     this->ScaleThumbWheel[cc]->ClampMinimumValueOn();
-    this->ScaleThumbWheel[cc]->SetResolution(0.05);
+    this->ScaleThumbWheel[cc]->SetResolution(0.001);
     this->ScaleThumbWheel[cc]->Create(this->Application, 0);
     this->ScaleThumbWheel[cc]->DisplayEntryOn();
     this->ScaleThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
@@ -349,7 +419,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     this->OrientationScale[cc]->PopupScaleOn();
     this->OrientationScale[cc]->Create(this->Application, 0);
     this->OrientationScale[cc]->SetRange(0, 360);
-    this->OrientationScale[cc]->SetResolution(1);
+    this->OrientationScale[cc]->SetResolution(.001);
     this->OrientationScale[cc]->SetValue(0);
     this->OrientationScale[cc]->DisplayEntry();
     this->OrientationScale[cc]->DisplayEntryAndLabelOnTopOff();
@@ -417,8 +487,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ScaleCallback()
 {
-  cout << "ScaleCallback" << endl;
-  this->SetScaleNoTrace(this->GetRotationFromGUI());
+  this->SetScaleNoTrace(this->GetScaleFromGUI());
   if ( this->GetPVSource()->GetPVRenderView() )
     {
     this->GetPVSource()->GetPVRenderView()->EventuallyRender();
@@ -428,8 +497,7 @@ void vtkPVBoxWidget::ScaleCallback()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::TranslateCallback()
 {
-  cout << "TranslateCallback" << endl;
-  this->SetTranslateNoTrace(this->GetRotationFromGUI());
+  this->SetTranslateNoTrace(this->GetPositionFromGUI());
   if ( this->GetPVSource()->GetPVRenderView() )
     {
     this->GetPVSource()->GetPVRenderView()->EventuallyRender();
@@ -439,7 +507,6 @@ void vtkPVBoxWidget::TranslateCallback()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::OrientationCallback()
 {
-  cout << "OrientationCallback" << endl;
   this->SetOrientationNoTrace(this->GetRotationFromGUI());
   if ( this->GetPVSource()->GetPVRenderView() )
     {
@@ -450,39 +517,51 @@ void vtkPVBoxWidget::OrientationCallback()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ScaleEndCallback()
 {
-  cout << "ScaleEndCallback" << endl;
-  this->SetScale(this->GetRotationFromGUI());
+  this->SetScale(this->GetScaleFromGUI());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::TranslateEndCallback()
 {
-  cout << "TranslateEndCallback" << endl;
-  this->SetTranslate(this->GetRotationFromGUI());
+  this->SetTranslate(this->GetPositionFromGUI());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::OrientationEndCallback()
 {
-  cout << "OrientationEndCallback" << endl;
   this->SetOrientation(this->GetRotationFromGUI());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetOrientationNoTrace(float, float, float)
-{this->UpdateBox();}
+{
+  this->UpdateBox();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetTranslateNoTrace(float, float, float)
-{this->UpdateBox();}
+{
+  this->UpdateBox();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetScaleNoTrace(float, float, float)
-{this->UpdateBox();}
+{
+  this->UpdateBox();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetOrientation(float px, float py, float pz)
 {
+  this->GetRotationFromGUI();
+  if ( !( px == this->RotationGUI[0] && 
+      py == this->RotationGUI[1] && 
+      pz == this->RotationGUI[2] ) )
+    {
+    this->OrientationScale[0]->SetValue(px);
+    this->OrientationScale[1]->SetValue(py);
+    this->OrientationScale[2]->SetValue(pz);
+    }
   this->SetOrientationNoTrace(px, py, pz);
   if ( this->GetPVSource()->GetPVRenderView() )
     {
@@ -496,19 +575,35 @@ void vtkPVBoxWidget::SetOrientation(float px, float py, float pz)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetScale(float px, float py, float pz)
 {
+  this->GetScaleFromGUI();
+  if ( !( px == this->ScaleGUI[0] && 
+      py == this->ScaleGUI[1] && 
+      pz == this->ScaleGUI[2] ) )
+    {
+    this->ScaleThumbWheel[0]->SetValue(px);
+    this->ScaleThumbWheel[1]->SetValue(py);
+    this->ScaleThumbWheel[2]->SetValue(pz);
+    }
   this->SetScaleNoTrace(px, py, pz);
   if ( this->GetPVSource()->GetPVRenderView() )
     {
     this->GetPVSource()->GetPVRenderView()->EventuallyRender();
     }
 
-  this->AddTraceEntry("$kw(%s) SetScale %f %f %f",
-                      this->GetTclName(), px, py, pz);  
 }
 
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetTranslate(float px, float py, float pz)
 {
+  this->GetPositionFromGUI();
+  if ( !( px == this->PositionGUI[0] && 
+      py == this->PositionGUI[1] && 
+      pz == this->PositionGUI[2] ) )
+    {
+    this->TranslateThumbWheel[0]->SetValue(px);
+    this->TranslateThumbWheel[1]->SetValue(py);
+    this->TranslateThumbWheel[2]->SetValue(pz);
+    }
   this->SetTranslateNoTrace(px, py, pz);
   if ( this->GetPVSource()->GetPVRenderView() )
     {
@@ -527,46 +622,101 @@ void vtkPVBoxWidget::UpdateBox()
   trans->Identity();
   trans->Translate(this->GetPositionFromGUI());
   this->GetRotationFromGUI();
+  trans->RotateZ(this->RotationGUI[2]);
   trans->RotateX(this->RotationGUI[0]);
   trans->RotateY(this->RotationGUI[1]);
-  trans->RotateZ(this->RotationGUI[2]);
-  trans->Scale(this->GetScalarFromGUI());
-  trans->Print(cout);
+  trans->Scale(this->GetScaleFromGUI());
   vtkMatrix4x4* mat = trans->GetMatrix();
+  /*
   printf(
     "%s Identity\n"
-    "[ %s GetMatrix ] DeepCopy { "
+    "eval %s DeepCopy { "
     "%f %f %f %f "
     "%f %f %f %f "
     "%f %f %f %f "
     "%f %f %f %f "
     " }\n"
+    "%s SetMatrix %s\n"
     "%s SetTransform %s\n",
     this->BoxTransformTclName,
-    this->BoxTransformTclName,
+    this->BoxMatrixTclName,
     (*mat)[0][0], (*mat)[0][1], (*mat)[0][2], (*mat)[0][3],
     (*mat)[1][0], (*mat)[1][1], (*mat)[1][2], (*mat)[1][3],
     (*mat)[2][0], (*mat)[2][1], (*mat)[2][2], (*mat)[2][3],
     (*mat)[3][0], (*mat)[3][1], (*mat)[3][2], (*mat)[3][3],
+    this->BoxTransformTclName,
+    this->BoxMatrixTclName,
     this->Widget3DTclName,
-    this->BoxTransformTclName);
+    this->BoxTransformTclName
+    );
+    */
   pvApp->BroadcastScript(
     "%s Identity\n"
-    "eval [ %s GetMatrix ] DeepCopy { "
+    "eval %s DeepCopy { "
     "%f %f %f %f "
     "%f %f %f %f "
     "%f %f %f %f "
     "%f %f %f %f "
     " }\n"
-    "%s SetTransform %s",
+    "%s SetMatrix %s\n"
+    "%s SetTransform %s\n",
     this->BoxTransformTclName,
-    this->BoxTransformTclName,
+    this->BoxMatrixTclName,
     (*mat)[0][0], (*mat)[0][1], (*mat)[0][2], (*mat)[0][3],
     (*mat)[1][0], (*mat)[1][1], (*mat)[1][2], (*mat)[1][3],
     (*mat)[2][0], (*mat)[2][1], (*mat)[2][2], (*mat)[2][3],
     (*mat)[3][0], (*mat)[3][1], (*mat)[3][2], (*mat)[3][3],
+    this->BoxTransformTclName,
+    this->BoxMatrixTclName,
     this->Widget3DTclName,
-    this->BoxTransformTclName);
+    this->BoxTransformTclName
+    );
+  this->SetValueChanged();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::UpdateFromBox()
+{
+  vtkBoxWidget* box = static_cast<vtkBoxWidget*>(this->Widget3D);
+  box->GetTransform(this->BoxTransform);
+  float orientation[3];
+  float scale[3];
+  float position[3];
+  this->BoxTransform->GetOrientation(orientation);
+  this->BoxTransform->GetScale(scale);
+  this->BoxTransform->GetPosition(position);
+
+  this->GetScaleFromGUI();
+  if ( !( scale[0] == this->ScaleGUI[0] && 
+      scale[1] == this->ScaleGUI[1] && 
+      scale[2] == this->ScaleGUI[2] ) )
+    {
+    this->ScaleThumbWheel[0]->SetValue(scale[0]);
+    this->ScaleThumbWheel[1]->SetValue(scale[1]);
+    this->ScaleThumbWheel[2]->SetValue(scale[2]);
+    this->SetScaleNoTrace(scale);
+    }
+  this->GetPositionFromGUI();
+  if ( !( position[0] == this->PositionGUI[0] && 
+      position[1] == this->PositionGUI[1] && 
+      position[2] == this->PositionGUI[2] ) )
+    {
+    this->TranslateThumbWheel[0]->SetValue(position[0]);
+    this->TranslateThumbWheel[1]->SetValue(position[1]);
+    this->TranslateThumbWheel[2]->SetValue(position[2]);
+    this->SetTranslateNoTrace(position);
+    }
+
+  this->GetRotationFromGUI();
+  if ( !( orientation[0] == this->RotationGUI[0] && 
+      orientation[1] == this->RotationGUI[1] && 
+      orientation[2] == this->RotationGUI[2] ) )
+    {
+    this->OrientationScale[0]->SetValue(orientation[0]);
+    this->OrientationScale[1]->SetValue(orientation[1]);
+    this->OrientationScale[2]->SetValue(orientation[2]);
+    this->SetOrientationNoTrace(orientation);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -588,7 +738,7 @@ float* vtkPVBoxWidget::GetRotationFromGUI()
 }
 
 //----------------------------------------------------------------------------
-float* vtkPVBoxWidget::GetScalarFromGUI()
+float* vtkPVBoxWidget::GetScaleFromGUI()
 {
   this->ScaleGUI[0] = this->ScaleThumbWheel[0]->GetValue();
   this->ScaleGUI[1] = this->ScaleThumbWheel[1]->GetValue();
@@ -605,6 +755,7 @@ vtkBoxWidget* vtkPVBoxWidget::GetBoxWidget()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::ExecuteEvent(vtkObject* wdg, unsigned long l, void* p)
 {
+  this->UpdateFromBox();
   this->Superclass::ExecuteEvent(wdg, l, p);
 }
 
