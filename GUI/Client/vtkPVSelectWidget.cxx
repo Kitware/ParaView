@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.41");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.42");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -223,7 +223,7 @@ void vtkPVSelectWidget::SaveInBatchScript(ofstream *file)
         {
         *file << "{}" ;
         }
-      *file << " Set" << this->VariableName;
+      *file << " Set" << this->VariableName << " 0";
       }
     else
       {
