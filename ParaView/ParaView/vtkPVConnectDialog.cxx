@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.9");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.10");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -163,8 +163,8 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::OK()
 {
-  this->SetHostnameString(this->Hostname->GetValue());
-  this->PortInt = this->Port->GetValueAsInt();
+  this->SetHostnameString(this->Hostname->GetEntry()->GetValue());
+  this->PortInt = this->Port->GetEntry()->GetValueAsInt();
   this->NumberOfProcesses = static_cast<int>(this->MPINumberOfServers->GetValue());
   if ( this->MPIMode->GetCheckButton()->GetState() )
     {
@@ -178,7 +178,7 @@ void vtkPVConnectDialog::OK()
 
   int cc;
   vtkstd::string servers;
-  servers = this->Hostname->GetValue();
+  servers = this->Hostname->GetEntry()->GetValue();
   for ( cc = 0; cc < this->Hostname->GetEntry()->GetNumberOfValues(); cc ++ )
     {
     servers += ",";
@@ -196,7 +196,7 @@ void vtkPVConnectDialog::SetHostname(const char* hn)
 {
   if ( this->Hostname->IsCreated() )
     {
-    this->Hostname->SetValue(hn);
+    this->Hostname->GetEntry()->SetValue(hn);
     }
   this->SetHostnameString(hn);
 }
@@ -214,7 +214,7 @@ void vtkPVConnectDialog::SetPort(int pt)
     {
     char buffer[100];
     sprintf(buffer, "%d", pt);
-    this->Port->SetValue(buffer);
+    this->Port->GetEntry()->SetValue(buffer);
     }
   this->PortInt = pt;
 }

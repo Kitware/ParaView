@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.87");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -530,7 +530,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->NumberOfFramesEntry->Create(this->Application);
   this->NumberOfFramesEntry->GetEntry()->SetWidth(6);
   this->NumberOfFramesEntry->SetLabel("Number Of Frames:");
-  this->NumberOfFramesEntry->SetValue(this->NumberOfFrames);
+  this->NumberOfFramesEntry->GetEntry()->SetValue(this->NumberOfFrames);
 
 
   this->Script("bind %s <KeyPress-Return> {%s NumberOfFramesEntryCallback}",
@@ -780,7 +780,7 @@ void vtkPVAnimationInterface::UpdateInterface()
 
   if (this->NumberOfFramesEntry && this->NumberOfFramesEntry->IsCreated())
     {
-    this->NumberOfFramesEntry->SetValue(this->NumberOfFrames);
+    this->NumberOfFramesEntry->GetEntry()->SetValue(this->NumberOfFrames);
     if (this->InPlay)
       {
       this->NumberOfFramesEntry->EnabledOff();
@@ -820,7 +820,7 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
 {
   //cout << "Set NumberOfFrames: " << t << endl;
   this->NumberOfFrames= t;
-  this->NumberOfFramesEntry->SetValue(t);
+  this->NumberOfFramesEntry->GetEntry()->SetValue(t);
   float range[2];
   this->TimeRange->SetWholeRange(0, t);
   this->TimeRange->GetRange(range);
@@ -838,7 +838,7 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
 void vtkPVAnimationInterface::NumberOfFramesEntryCallback()
 {
   //cout << "NumberOfFramesEntryCallback" << endl;
-  this->SetNumberOfFrames(static_cast<int>(this->NumberOfFramesEntry->GetValueAsFloat()));
+  this->SetNumberOfFrames(static_cast<int>(this->NumberOfFramesEntry->GetEntry()->GetValueAsFloat()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1856,7 +1856,7 @@ void vtkPVAnimationInterface::DeleteSource(vtkPVSource* src)
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveState(ofstream* file)
 {
-  int numberFrames = this->NumberOfFramesEntry->GetValueAsInt();
+  int numberFrames = this->NumberOfFramesEntry->GetEntry()->GetValueAsInt();
   int frame = static_cast<int>(this->TimeScale->GetValue());
 
   int cc;

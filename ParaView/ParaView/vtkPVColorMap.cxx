@@ -74,7 +74,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.63");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.64");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1419,9 +1419,9 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
   char str[256];
 
   sprintf(str, "%g", min);
-  this->ColorRangeMinEntry->SetValue(str);
+  this->ColorRangeMinEntry->GetEntry()->SetValue(str);
   sprintf(str, "%g", max);
-  this->ColorRangeMaxEntry->SetValue(str);
+  this->ColorRangeMaxEntry->GetEntry()->SetValue(str);
 
   if (this->ScalarRange[0] == min && this->ScalarRange[1] == max)
     {
@@ -1783,8 +1783,8 @@ void vtkPVColorMap::ColorRangeEntryCallback()
 {
   float min, max;
 
-  min = this->ColorRangeMinEntry->GetValueAsFloat();
-  max = this->ColorRangeMaxEntry->GetValueAsFloat();
+  min = this->ColorRangeMinEntry->GetEntry()->GetValueAsFloat();
+  max = this->ColorRangeMaxEntry->GetEntry()->GetValueAsFloat();
   
   // Avoid the bad range error
   if (max <= min)

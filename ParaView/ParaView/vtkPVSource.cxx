@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.318");
+vtkCxxRevisionMacro(vtkPVSource, "1.319");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1165,7 +1165,7 @@ void vtkPVSource::SetLabelNoTrace(const char* arg)
 //----------------------------------------------------------------------------
 void vtkPVSource::LabelEntryCallback()
 {
-  this->SetLabel(this->LabelEntry->GetValue());
+  this->SetLabel(this->LabelEntry->GetEntry()->GetValue());
 }
 
 //----------------------------------------------------------------------------
