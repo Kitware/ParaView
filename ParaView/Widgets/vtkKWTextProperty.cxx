@@ -118,7 +118,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.8");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.9");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1058,6 +1058,7 @@ void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Actor2D: None" << endl;
     }
+  os << indent << "ShowLabel: " << (this->ShowLabel ? "On" : "Off") << endl;
   os << indent << "ShowColor: " << (this->ShowColor ? "On" : "Off") << endl;
   os << indent << "ShowFontFamily: " 
      << (this->ShowFontFamily ? "On" : "Off") << endl;

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29.2.8");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.29.2.9");
 
 vtkSetObjectImplementationMacro(vtkKWCornerAnnotation,View,vtkKWView);
 
@@ -478,7 +478,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.29.2.8 $");
+  this->ExtractRevision(os,"$Revision: 1.29.2.9 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
@@ -494,4 +494,5 @@ void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "CornerProp: " << this->GetCornerProp() << endl;
   os << indent << "View: " << this->GetView() << endl;
+  os << indent << "TextPropertyWidget: " << this->TextPropertyWidget << endl;
 }
