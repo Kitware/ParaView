@@ -45,7 +45,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.5");
+vtkCxxRevisionMacro(vtkMultiDisplayManager, "1.6");
 vtkStandardNewMacro(vtkMultiDisplayManager);
 
 vtkCxxSetObjectMacro(vtkMultiDisplayManager, RenderView, vtkObject);
@@ -623,7 +623,7 @@ void vtkMultiDisplayManager::Composite()
       {
       // Send and recycle the buffer.
       vtkPVCompositeUtilities::SendBuffer(this->Controller, buf,
-                                  this->Schedule->GetElementOtherProcessId(myId, idx), 
+                                  this->Schedule->GetElementOtherProcessId(myId, idx)+this->ZeroEmpty, 
                                   98);
       buf->Delete();
       buf = NULL;          
@@ -632,8 +632,8 @@ void vtkMultiDisplayManager::Composite()
       {
       // Receive a buffer.
       buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
-                                  this->Schedule->GetElementOtherProcessId(myId, idx), 
-                                  98);
+               this->Schedule->GetElementOtherProcessId(myId, idx)+this->ZeroEmpty, 
+               98);
       // This value is currently a conservative estimate.
       length = vtkPVCompositeUtilities::GetCompositedLength(buf, buf2);
       buf3 = this->CompositeUtilities->NewCompositeBuffer(length);
@@ -656,7 +656,8 @@ void vtkMultiDisplayManager::Composite()
       buf = tileBuffers[this->Schedule->GetElementTileId(myId, i)];
       tileBuffers[this->Schedule->GetElementTileId(myId, i)] = NULL;
       vtkPVCompositeUtilities::SendBuffer(this->Controller, buf, 
-                                  this->Schedule->GetElementOtherProcessId(myId, i), 99);
+        this->Schedule->GetElementOtherProcessId(myId, i)+this->ZeroEmpty, 
+        99);
       buf->Delete();          
       buf = NULL;
       }
@@ -666,7 +667,8 @@ void vtkMultiDisplayManager::Composite()
       tileBuffers[this->Schedule->GetElementTileId(myId, i)] = NULL;
       // Receive a buffer.
       buf2 = this->CompositeUtilities->ReceiveNewBuffer(this->Controller, 
-                                  this->Schedule->GetElementOtherProcessId(myId, idx), 99);
+               this->Schedule->GetElementOtherProcessId(myId, idx)+this->ZeroEmpty, 
+               99);
       // Length is a conservative estimate.
       length = vtkPVCompositeUtilities::GetCompositedLength(buf, buf2);
       buf3 = this->CompositeUtilities->NewCompositeBuffer(length);
@@ -744,10 +746,15 @@ void vtkMultiDisplayManager::Composite()
 //-------------------------------------------------------------------------
 void vtkMultiDisplayManager::InitializeSchedule()
 {
-  int  numberOfTiles = this->TileDimensions[0] * this->TileDimensions[1];
-  this->Schedule->InitializeTiles(numberOfTiles, 
-                                  this->NumberOfProcesses-this->ZeroEmpty);
+  // In clinet server mode, the client does not have a schedule.
+  if ( ! this->ClientFlag)
+    {
+    int  numberOfTiles = this->TileDimensions[0] * this->TileDimensions[1];
+    this->Schedule->InitializeTiles(numberOfTiles, 
+                                    this->NumberOfProcesses-this->ZeroEmpty);
+    }
 }
+
 
 
 

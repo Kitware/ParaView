@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.1");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.2");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -80,7 +80,7 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
   this->CollectThresholdScale = vtkKWScale::New();
   this->CollectThresholdValue = vtkKWLabel::New();
 
-  this->CollectThreshold = 4.0;
+  this->CollectThreshold = 20.0;
 
   this->CompositeWithFloatFlag = 0;
   this->CompositeWithRGBAFlag = 0;
@@ -189,7 +189,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
     this->CollectThresholdScale->SetParent(this->LODScalesFrame);
     this->CollectThresholdScale->Create(this->Application,
                                         "-orient horizontal");
-    this->CollectThresholdScale->SetRange(0.0, 20.0);
+    this->CollectThresholdScale->SetRange(0.0, 100.0);
     this->CollectThresholdScale->SetResolution(0.1);
 
     this->CollectThresholdValue->SetParent(this->LODScalesFrame);

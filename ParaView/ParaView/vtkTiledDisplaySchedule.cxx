@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 
 
-vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.4");
+vtkCxxRevisionMacro(vtkTiledDisplaySchedule, "1.5");
 vtkStandardNewMacro(vtkTiledDisplaySchedule);
 
 
@@ -436,6 +436,11 @@ void vtkTiledDisplaySchedule::InitializeTiles(int numTiles, int numProcs)
   vtkTiledDisplayProcess* p;
   int i, j;
 
+  if (numProcs == 1 && numTiles > 1)
+    { // We must be running client server, and we must be the client.
+    return;
+    }
+      
   this->NumberOfProcesses = numProcs;
   this->NumberOfTiles = numTiles;
 

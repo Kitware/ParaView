@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.3");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -156,13 +156,12 @@ void vtkPVCompositePartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp
                            pvApp->GetNumberOfPipes());
     }
   else if (pvApp->GetUseTiledDisplay())
-    {
+    { // This should be in subclass.
     int numProcs = pvApp->GetController()->GetNumberOfProcesses();
     int* dims = pvApp->GetTileDimensions();
     pvApp->BroadcastScript("vtkPVDuplicatePolyData %s", tclName);
-    pvApp->BroadcastScript("%s InitializeSchedule %d %d", tclName,
-                           numProcs, dims[0]*dims[1]);
-    // Initialize collection descision here. (When we have rendering module).
+    pvApp->BroadcastScript("%s InitializeSchedule %d", tclName,
+                           dims[0]*dims[1]);
     }
   else
     {

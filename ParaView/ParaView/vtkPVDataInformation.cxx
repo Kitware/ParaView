@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.11");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.12");
 
 
 //----------------------------------------------------------------------------
@@ -491,6 +491,11 @@ void vtkPVDataInformation::CopyFromMessage(unsigned char *msg)
   unsigned char* tmp;
   int attrMsgLength;
   int idx;
+
+  if (msg == NULL)
+    { // Something really bad has happend ...
+    return;
+    }
 
 #ifdef VTK_WORDS_BIGENDIAN
   bigEndianFlag = (unsigned char)(1);

@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.262");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.263");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1391,6 +1391,14 @@ void vtkPVRenderView::ImmediateModeCallback()
   vtkPVSource *pvs;
   vtkPVApplication *pvApp;
   int partIdx, numParts;
+
+  if ( ! this->ImmediateModeCheck->GetState() && 
+       ! this->TriangleStripsCheck->GetState())
+    { // Make sure triangle strips are on.
+    // When immediate mode is off, triangle strips must be on.
+    this->TriangleStripsCheck->SetState(1);
+    this->TriangleStripsCallback();
+    }
 
   pvApp = this->GetPVApplication();
   pvWin = this->GetPVWindow();

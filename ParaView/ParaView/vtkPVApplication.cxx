@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.211");
+vtkCxxRevisionMacro(vtkPVApplication, "1.212");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1736,14 +1736,16 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     }
 
   os << indent << "UseStereoRendering: " << this->UseStereoRendering << endl;
-  os << indent << "RenderModuleName: " << this->RenderModuleName << endl;
+  os << indent << "RenderModuleName: " 
+     << (this->RenderModuleName?this->RenderModuleName:"(none)") << endl;
 
   if (this->ClientMode)
     {
     os << indent << "Running as a client\n";
     os << indent << "Port: " << this->Port << endl;
-    os << indent << "Host: " << this->HostName << endl;
-    os << indent << "Username: " << this->Username << endl;
+    os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
+    os << indent << "Username: " 
+       << (this->Username?this->Username:"(none)") << endl;
     os << indent << "AlwaysSSH: " << this->AlwaysSSH << endl;
     }
   if (this->ServerMode)

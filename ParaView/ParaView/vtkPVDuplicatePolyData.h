@@ -51,7 +51,7 @@ public:
   virtual void SetController(vtkMultiProcessController*);
   vtkGetObjectMacro(Controller, vtkMultiProcessController);
 
-  void InitializeSchedule(int numProcs, int numTiles);
+  void InitializeSchedule(int numTiles);
 
   // Description:
   // This duplicate filter works in client server mode when this

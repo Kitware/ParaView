@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.5");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -102,10 +102,9 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
     }   
 
   int* dims = pvApp->GetTileDimensions();
-  int numProcs = pvApp->GetController()->GetNumberOfProcesses();
-  pvApp->BroadcastScript("%s InitializeSchedule %d %d; %s InitializeSchedule %d %d", 
-                         this->CollectTclName, numProcs, dims[0]*dims[1],
-                         this->LODCollectTclName, numProcs, dims[0]*dims[1]);
+  pvApp->BroadcastScript("%s InitializeSchedule %d; %s InitializeSchedule %d", 
+                         this->CollectTclName, dims[0]*dims[1],
+                         this->LODCollectTclName, dims[0]*dims[1]);
 }
 
 //----------------------------------------------------------------------------
