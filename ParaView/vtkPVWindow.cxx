@@ -259,7 +259,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCone()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkConeSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkConeSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -293,7 +294,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSphere()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkSphereSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkSphereSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -331,7 +333,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateAxes()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkAxes",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkAxes",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -363,7 +366,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCube()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkCubeSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkCubeSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -396,7 +400,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCylinder()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkCylinderSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkCylinderSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -430,7 +435,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateDisk()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkDiskSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkDiskSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -442,7 +448,7 @@ vtkPVPolyDataSource *vtkPVWindow::CreateDisk()
   pds->AddLabeledEntry("InnerRadius:", "SetInnerRadius", "GetInnerRadius");
   pds->AddLabeledEntry("OuterRadius:", "SetOuterRadius", "GetOuterRadius");
   pds->AddLabeledEntry("Radial Res:", "SetRadialResolution", "GetRadialResolution");
-  pds->AddLabeledEntry("Circumfrance Res:", "SetCircumferentialResolution", "GetCircumferentialResolution");
+  pds->AddLabeledEntry("Circumference Res:", "SetCircumferentialResolution", "GetCircumferentialResolution");
   pds->UpdateParameterWidgets();
 
   // Clean up. (How about on the other processes?)
@@ -463,7 +469,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateLine()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkLineSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkLineSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -495,7 +502,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreatePlane()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkPlaneSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkPlaneSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -528,7 +536,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreatePoints()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkPointSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkPointSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -564,7 +573,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSTLReader()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkSTLReader",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkSTLReader",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View, and make it current.
@@ -595,7 +605,8 @@ vtkPVPolyDataSource *vtkPVWindow::CreateSuperQuadric()
 
   // Create the pvSource. Clone the PVSource and the vtkSource,
   // Linkthe PVSource to the vtkSource.
-  pds = pvApp->MakePVPolyDataSource("vtkSuperquadricSource",name);
+  pds = vtkPVPolyDataSource::New();
+  pvApp->SetupPVPolyDataSource(pds,"vtkSuperquadricSource",name);
   if (pds == NULL) {return NULL;}
   
   // Add the new Source to the View and make it current.

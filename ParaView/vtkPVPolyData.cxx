@@ -27,11 +27,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVShrinkPolyData.h"
 #include "vtkPVGetRemoteGhostCells.h"
 #include "vtkPVGlyph3D.h"
-#include "vtkPVPolyDataNormals.h"
-#include "vtkPVTubeFilter.h"
 #include "vtkPVParallelDecimate.h"
 #include "vtkKWView.h"
 #include "vtkKWEventNotifier.h"
@@ -79,66 +76,105 @@ vtkPVPolyData* vtkPVPolyData::New()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Shrink()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  // shrink factor defaults to 0.5, which seems reasonable
-  vtkPVShrinkPolyData *shrink;
+  static count = 0;
+  char name[200];
+  vtkPVPolyDataToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  
-  shrink = vtkPVShrinkPolyData::New();
-  shrink->Clone(pvApp);
-  
-  shrink->SetInput(this);
-  
-  shrink->SetName("shrink");
 
-  this->GetPVSource()->GetView()->AddComposite(shrink);
+  // Generate a unique name.
+  ++count;
+  sprintf(name, "Shrink%d", count);
 
-  // The window here should probably be replaced with the view.
-  window->SetCurrentSource(shrink);
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Linkthe PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::New();
+  pvApp->SetupPVPolyDataSource(f,"vtkShrinkPolyData",name);
+  f->SetInput(this);
   
-  shrink->Delete();
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  f->AddScale("Shrink Factor:", "SetShrinkFactor", "GetShrinkFactor",
+		  0.0, 1.0, 0.01);
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  f->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::TubeFilter()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVTubeFilter *tube;
+  static count = 0;
+  char name[200];
+  vtkPVPolyDataToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
+
+  // Generate a unique name.
+  ++count;
+  sprintf(name, "Tube%d", count);
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Linkthe PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::New();
+  pvApp->SetupPVPolyDataSource(f,"vtkTubeFilter",name);
+  f->SetInput(this);
   
-  tube = vtkPVTubeFilter::New();
-  tube->Clone(pvApp);
-  
-  tube->SetInput(this);
-  
-  tube->SetName("tube");
-  
-  this->GetPVSource()->GetView()->AddComposite(tube);
-  
-  window->SetCurrentSource(tube);
-  
-  tube->Delete();
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  f->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
+  f->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  f->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::PolyDataNormals()
 {
+  static count = 0;
+  char name[200];
+  vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVPolyDataNormals *normal;
   vtkPVWindow *window = this->GetPVSource()->GetWindow();
-  
-  normal = vtkPVPolyDataNormals::New();
-  normal->Clone(pvApp);
-  
-  normal->SetInput(this);
-  
-  normal->SetName("normal");
 
-  this->GetPVSource()->GetView()->AddComposite(normal);
+  // Generate a unique name.
+  ++count;
+  sprintf(name, "Normals%d", count);
 
-  window->SetCurrentSource(normal);
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Linkthe PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::New();
+  pvApp->SetupPVPolyDataSource(f,"vtkPolyDataNormals",name);
+  f->SetInput(this);
   
-  normal->Delete();
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  f->AddLabeledEntry("FeatureAngle:", "SetFeatureAngle", "GetFeatureAngle");
+  f->AddLabeledToggle("Splitting:", "SetSplitting", "GetSplitting");
+  f->AddLabeledToggle("Consistency:", "SetConsistency", "GetConsistency");
+  f->AddLabeledToggle("ComputePointNormals:", "SetComputePointNormals", "GetComputePointNormals");
+  f->AddLabeledToggle("ComputeCellNormals:", "SetComputeCellNormals", "GetComputeCellNormals");
+  f->AddLabeledToggle("FlipNormals:", "SetFlipNormals", "GetFlipNormals");
+  f->AddLabeledToggle("NonManifoldTraversal:", "SetNonManifoldTraversal", "GetNonManifoldTraversal");
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -159,6 +195,103 @@ void vtkPVPolyData::Glyph()
   window->SetCurrentSource(glyph);
 
   glyph->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPolyData::LoopSubdivision()
+{
+  static count = 0;
+  char name[200];
+  vtkPVPolyDataToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+
+  // Generate a unique name.
+  ++count;
+  sprintf(name, "LoopSubdiv%d", count);
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Linkthe PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::New();
+  pvApp->SetupPVPolyDataSource(f,"vtkLoopSubdivisionFilter",name);
+  f->SetInput(this);
+  
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  f->AddLabeledEntry("NumberOfSubdivisions:", "SetNumberOfSubdivisions", "GetNumberOfSubdivisions");
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  f->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPolyData::Clean()
+{
+  static count = 0;
+  char name[200];
+  vtkPVPolyDataToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+
+  // Generate a unique name.
+  ++count;
+  sprintf(name, "CleanPD%d", count);
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Linkthe PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::New();
+  pvApp->SetupPVPolyDataSource(f,"vtkCleanPolyData",name);
+  f->SetInput(this);
+  
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  f->AddScale("Tolerance:","SetTolerance","GetTolerance",0,1,0.01);
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  f->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVPolyData::Triangulate()
+{
+  static count = 0;
+  char name[200];
+  vtkPVPolyDataToPolyDataFilter *f;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+
+  // Generate a unique name.
+  ++count;
+  sprintf(name, "Triangulate%d", count);
+
+  // Create the pvSource. Clone the PVSource and the vtkSource,
+  // Linkthe PVSource to the vtkSource.
+  f = vtkPVPolyDataToPolyDataFilter::New();
+  pvApp->SetupPVPolyDataSource(f,"vtkTriangleFilter",name);
+  f->SetInput(this);
+  
+  // Add the new Source to the View, and make it current.
+  this->GetPVSource()->GetView()->AddComposite(f);
+  window->SetCurrentSource(f);
+
+  // Add some source specific widgets.
+  // Normally these would be added in the create method.
+  f->AddLabeledToggle("Pass Verts:","SetPassVerts","GetPassVerts");
+  f->AddLabeledToggle("Pass Lines:","SetPassLines","GetPassLines");
+  f->UpdateParameterWidgets();
+
+  // Clean up. (How about on the other processes?)
+  f->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -211,17 +344,21 @@ int vtkPVPolyData::Create(char *args)
     return 0;
     }
   
-  this->FiltersMenuButton->AddCommand("vtkShrinkPolyData", this,
+  this->FiltersMenuButton->AddCommand("ShrinkPolyData", this,
 				      "Shrink");
-  this->FiltersMenuButton->AddCommand("vtkGlyph3D", this,
+  this->FiltersMenuButton->AddCommand("Glyph3D", this,
 				      "Glyph");
-  this->FiltersMenuButton->AddCommand("vtkGetRemoteGhostCells", this,
+  this->FiltersMenuButton->AddCommand("LoopSubdivision", this,
+				      "LoopSubdivision");
+  this->FiltersMenuButton->AddCommand("Clean", this, "Clean");
+  this->FiltersMenuButton->AddCommand("Triangulate", this, "Triangulate");
+  this->FiltersMenuButton->AddCommand("GetRemoteGhostCells", this,
 				      "GetGhostCells");
-  this->FiltersMenuButton->AddCommand("vtkPolyDataNormals", this,
+  this->FiltersMenuButton->AddCommand("PolyDataNormals", this,
 				      "PolyDataNormals");
-  this->FiltersMenuButton->AddCommand("vtkTubeFilter", this,
+  this->FiltersMenuButton->AddCommand("TubeFilter", this,
 				      "TubeFilter");
-  this->FiltersMenuButton->AddCommand("vtkParallelDecimate", this,
+  this->FiltersMenuButton->AddCommand("ParallelDecimate", this,
 				      "ParallelDecimate");
   
   this->DecimateButton->SetParent(this);

@@ -104,9 +104,6 @@ ClientData vtkPVParallelDecimateNewCommand();
 int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVPolyDataNewCommand();
-int vtkPVPolyDataNormalsCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVPolyDataNormalsNewCommand();
 int vtkPVPolyDataSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVPolyDataSourceNewCommand();
@@ -119,18 +116,12 @@ ClientData vtkPVRenderViewNewCommand();
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSelectionListNewCommand();
-int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVShrinkPolyDataNewCommand();
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSourceNewCommand();
 int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSourceListNewCommand();
-int vtkPVTubeFilterCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVTubeFilterNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
@@ -232,8 +223,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVParallelDecimateCommand);
   vtkTclCreateNew(interp,"vtkPVPolyData", vtkPVPolyDataNewCommand,
                   vtkPVPolyDataCommand);
-  vtkTclCreateNew(interp,"vtkPVPolyDataNormals", vtkPVPolyDataNormalsNewCommand,
-                  vtkPVPolyDataNormalsCommand);
   vtkTclCreateNew(interp,"vtkPVPolyDataSource", vtkPVPolyDataSourceNewCommand,
                   vtkPVPolyDataSourceCommand);
   vtkTclCreateNew(interp,"vtkPVPolyDataToPolyDataFilter", vtkPVPolyDataToPolyDataFilterNewCommand,
@@ -242,14 +231,10 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVRenderViewCommand);
   vtkTclCreateNew(interp,"vtkPVSelectionList", vtkPVSelectionListNewCommand,
                   vtkPVSelectionListCommand);
-  vtkTclCreateNew(interp,"vtkPVShrinkPolyData", vtkPVShrinkPolyDataNewCommand,
-                  vtkPVShrinkPolyDataCommand);
   vtkTclCreateNew(interp,"vtkPVSource", vtkPVSourceNewCommand,
                   vtkPVSourceCommand);
   vtkTclCreateNew(interp,"vtkPVSourceList", vtkPVSourceListNewCommand,
                   vtkPVSourceListCommand);
-  vtkTclCreateNew(interp,"vtkPVTubeFilter", vtkPVTubeFilterNewCommand,
-                  vtkPVTubeFilterCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
   return TCL_OK;

@@ -74,6 +74,10 @@ public:
   // These are filtering operations called from UI.
   void Shrink();
   void Glyph();
+  void LoopSubdivision();
+  void Clean();
+  void Triangulate();
+
   void GetGhostCells();
   void PolyDataNormals();
   void TubeFilter();

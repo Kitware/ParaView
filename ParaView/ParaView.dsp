@@ -413,14 +413,6 @@ SOURCE=.\vtkPVPolyData.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVPolyDataNormals.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVPolyDataNormalsTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVPolyDataSource.cxx
 # End Source File
 # Begin Source File
@@ -457,14 +449,6 @@ SOURCE=.\vtkPVSelectionListTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVShrinkPolyData.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVShrinkPolyDataTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVSource.cxx
 # End Source File
 # Begin Source File
@@ -486,14 +470,6 @@ SOURCE=.\vtkPVSourceListTcl.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVSourceTcl.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVTubeFilter.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVTubeFilterTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -1362,26 +1338,6 @@ InputName=vtkPVPolyData
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVPolyDataNormals.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVPolyDataNormals.h
-InputName=vtkPVPolyDataNormals
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVPolyDataSource.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -1462,26 +1418,6 @@ InputName=vtkPVSelectionList
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkPVShrinkPolyData.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVShrinkPolyData.h
-InputName=vtkPVShrinkPolyData
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkPVSource.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -1540,26 +1476,6 @@ InputName=vtkPVSourceList
 # Begin Custom Build
 InputPath=.\vtkPVSourceList.h
 InputName=vtkPVSourceList
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVTubeFilter.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVTubeFilter.h
-InputName=vtkPVTubeFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

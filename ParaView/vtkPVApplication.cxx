@@ -264,3 +264,34 @@ vtkPVPolyDataSource *vtkPVApplication::MakePVPolyDataSource(
   return pds;
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVApplication::SetupPVPolyDataSource(vtkPVSource *pvs,
+                                             const char *className,
+                                             const char *tclName)
+{
+  vtkSource *s;
+  int error;
+
+  // Create the vtkSource.
+  this->Script("%s %s", className, tclName);
+  this->BroadcastScript("%s %s", className, tclName); 
+
+  // Get the pointer for the Tcl object.
+  s = (vtkSource *)(vtkTclGetPointerFromObject(tclName,
+                                  "vtkSource", this->GetMainInterp(), error));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return;
+    }
+
+  // Initialize the PVSource.
+  pvs->Clone(this);
+  pvs->SetVTKSource(s);
+  pvs->SetVTKSourceTclName(tclName);
+  pvs->SetName(tclName);
+  this->BroadcastScript("%s SetVTKSource %s", pvs->GetTclName(), tclName); 
+}
+
+

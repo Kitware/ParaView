@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkMultiProcessController.h"
 
 class vtkPVPolyDataSource;
+class vtkPVSource;
 
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
@@ -102,6 +103,15 @@ public:
   // for all processes.
   vtkPVPolyDataSource *MakePVPolyDataSource(const char *className,
                                             const char *tclName);
+
+  // Description:
+  // This is an alternative version of the previous method.
+  // The poly date source (uncloned) is passed in.  This allows
+  // any subclass (i.e. vtkPVPolyDataToPolyDataFilter) to be setup.
+  void SetupPVPolyDataSource(vtkPVSource *pvs,
+                             const char *className,
+                             const char *tclName);
+
 
 protected:
   vtkPVApplication();
