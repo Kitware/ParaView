@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.9");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.10");
 
 
 //----------------------------------------------------------------------------
@@ -69,16 +69,6 @@ void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pv
     {
     vtkErrorMacro("Cannot run tile display without client-server mode.");
     }
-
-  int* dims = pvApp->GetTileDimensions();
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->CollectID << "InitializeSchedule" << (dims[0]*dims[1])
-    << vtkClientServerStream::End;
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->LODCollectID << "InitializeSchedule" << (dims[0]*dims[1])
-    << vtkClientServerStream::End;
 }
 
 //----------------------------------------------------------------------------
