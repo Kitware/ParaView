@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.42");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.43");
 
 
 //----------------------------------------------------------------------------
@@ -203,6 +203,14 @@ int vtkPVInputMenu::AddEntry(vtkPVSource *pvs)
 
   this->Menu->AddEntryWithCommand(pvs->GetName(), 
                                   this, methodAndArgs);
+
+  // If there is not an input yet, default to the first in the list.
+  // Primarily for glyph source input default.
+  if (this->CurrentValue == NULL)
+    {
+    this->CurrentValue = pvs;
+    }
+
   return 1;
 }
 
