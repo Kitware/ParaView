@@ -309,9 +309,6 @@ VTK_MAKE_INSTANTIATOR3(vtkParaViewInstantiator PVInstantiator_SRCS
   VTK_EXPORT
   "${PVGUI_BINARY_DIR}/Client" "")
 
-ADD_LIBRARY(vtkParaViewServer foo.cxx)
-TARGET_LINK_LIBRARIES(vtkParaViewServer vtkPVFiltersCS vtkKWWidgetsTCL)
-
 # load the ClientServer command
 INCLUDE(${ParaView_SOURCE_DIR}/Utilities/VTKClientServer/vtkClientServer.cmake)
 CS_INITIALIZE_WRAP()
@@ -324,23 +321,23 @@ INCLUDE_DIRECTORIES(
 # Create ClientServer wrappers for ParaView classes.
 SET(VTK_BINARY_DIR "${PVClient_BINARY_DIR}")
 INCLUDE(${VTK_SOURCE_DIR}/CMake/vtkExportKit.cmake)
-VTK_EXPORT_KIT("ParaViewServer" "PVSERVER" "${ParaViewServer_SRCS};${ParaViewShared_SRCS};${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWApplication.cxx;${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWObject.cxx;${ParaViewSharedNotTclWrapped_SRCS}")
+VTK_EXPORT_KIT("KWParaView" "PVSERVER" "${ParaViewServer_SRCS};${ParaViewShared_SRCS};${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWApplication.cxx;${ParaView_SOURCE_DIR}/GUI/Widgets/vtkKWObject.cxx;${ParaViewSharedNotTclWrapped_SRCS}")
 
 SET(KIT_WRAP_DEPS PVFilters)
 SET(VTK_KITS_DIR "${ParaView_BINARY_DIR}/GUI/Client/Utilities")
-PV_WRAP_VTK_CS(ParaViewServer PVSERVER "${KIT_WRAP_DEPS}")
+PV_WRAP_VTK_CS(KWParaView PVSERVER "${KIT_WRAP_DEPS}")
 
 # Wrap Tcl code
 SET(VTK_WRAP_TCL3_INIT_DIR "${VTKTclWrapping_SOURCE_DIR}")
 INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
-VTK_WRAP_TCL3(vtkKWParaViewTCL ParaViewTCL_SRCS "${ParaViewShared_SRCS};${ParaViewClient_SRCS}" "")
-ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
+VTK_WRAP_TCL3(vtkKWParaView ParaViewTCL_SRCS "${ParaViewShared_SRCS};${ParaViewClient_SRCS}" "")
+ADD_LIBRARY(vtkKWParaView ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaViewServer_SRCS} 
   ${ParaViewServerNonWrapped_SRCS}
   ${ParaViewSharedNotTclWrapped_SRCS}
   ${ParaViewSharedNotWrapped_SRCS}
   ${ParaView_SRCS})
-TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkKWWidgetsTCL vtkParaViewServer)
+TARGET_LINK_LIBRARIES(vtkKWParaView vtkKWWidgetsTCL)
 
 
 
@@ -400,24 +397,23 @@ IF(VTK_USE_CARBON)
 ENDIF(VTK_USE_CARBON)
 
 TARGET_LINK_LIBRARIES (paraview 
-  vtkParaViewServerCS 
-  vtkKWParaViewTCL
+  vtkKWParaViewCS
   vtkClientServer 
   ${PARAVIEW_ADDITIONAL_LIBRARIES})
 IF(PARAVIEW_BUILD_DEVELOPMENT)
   IF (PARAVIEW_BLT_LIBRARY)
-    TARGET_LINK_LIBRARIES(vtkKWParaViewTCL ${PARAVIEW_BLT_LIBRARY})
+    TARGET_LINK_LIBRARIES(vtkKWParaView ${PARAVIEW_BLT_LIBRARY})
   ENDIF (PARAVIEW_BLT_LIBRARY)
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 
-TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkPVFilters)
-TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkXdmf)
+TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVFilters)
+TARGET_LINK_LIBRARIES(vtkKWParaView vtkXdmf)
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
-  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL vtkPVDevelopment)
+  TARGET_LINK_LIBRARIES(vtkKWParaView vtkPVDevelopment)
 ENDIF(PARAVIEW_BUILD_DEVELOPMENT)
 IF(PARAVIEW_USE_ICE_T)
-  TARGET_LINK_LIBRARIES(vtkKWParaViewTCL icet icet_mpi icet_strategies)
+  TARGET_LINK_LIBRARIES(vtkKWParaView icet icet_mpi icet_strategies)
   INCLUDE_DIRECTORIES(${ICE_T_INCLUDE_DIR})
 ENDIF(PARAVIEW_USE_ICE_T)
 
