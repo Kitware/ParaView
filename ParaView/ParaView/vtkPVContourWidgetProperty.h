@@ -39,8 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVContourWidgetProperty
+// .NAME vtkPVContourWidgetProperty - property for vtkPVContourWidget
 // .SECTION Description
+// vtkPVContourWidgetProperty is a subclass of vtkPVScalarListWidgetProperty
+// that is specialized for vtkPVContourEntry.  It sets the widget range that
+// is used in animation.
 
 #ifndef __vtkPVContourWidgetProperty_h
 #define __vtkPVContourWidgetProperty_h
@@ -54,8 +57,14 @@ public:
   vtkTypeRevisionMacro(vtkPVContourWidgetProperty, vtkPVScalarListWidgetProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
   
+  // Description:
+  // Set the animation time for this property.  This sets the modified flag on
+  // the widget, and then calls Reset on it.
   virtual void SetAnimationTime(float time);
 
+  // Description:
+  // Pass values to VTK objects.  For subclasses of vtkContourFilter, it also
+  // sets the widget range, which is used in animation.
   virtual void AcceptInternal();
   
 protected:

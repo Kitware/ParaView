@@ -39,8 +39,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVIndexWidgetProperty
+// .NAME vtkPVIndexWidgetProperty - a property for integer-value parameters
 // .SECTION Description
+// vtkPVIndexWidgetProperty is a subclass of vtkPVWidgetProperty that is
+// used to pass integer values to a VTK object.
 
 #ifndef __vtkPVIndexWidgetProperty_h
 #define __vtkPVIndexWidgetProperty_h
@@ -53,12 +55,19 @@ public:
   static vtkPVIndexWidgetProperty* New();
   vtkTypeRevisionMacro(vtkPVIndexWidgetProperty, vtkPVWidgetProperty);
   void PrintSelf(ostream &os, vtkIndent indent);
-  
+
+  // Description:
+  // Set/get the index, an integer value passed as the only parameter to the
+  // specified VTK command.
   vtkSetMacro(Index, int);
   vtkGetMacro(Index, int);
   
+  // Description:
+  // Set the method to call on the specified VTK object.
   vtkSetStringMacro(VTKCommand);
   
+  // Description:
+  // Pass values to VTK objects.
   void AcceptInternal();
   
 protected:

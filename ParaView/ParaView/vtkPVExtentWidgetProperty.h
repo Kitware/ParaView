@@ -39,8 +39,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVExtentWidgetProperty
+// .NAME vtkPVExtentWidgetProperty - property for vtkPVExtentEntry
 // .SECTION Description
+// vtkPVExtentEntry is a subclass of vtkPVScalarListWidgetProperty that is
+// specialized for vtkPVExtentEntry.  
 
 #ifndef __vtkPVExtentWidgetProperty_h
 #define __vtkPVExtentWidgetProperty_h
@@ -53,7 +55,10 @@ public:
   static vtkPVExtentWidgetProperty* New();
   vtkTypeRevisionMacro(vtkPVExtentWidgetProperty, vtkPVScalarListWidgetProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
-  
+
+  // Description:
+  // Set the animation time for this property.  This sets the modified flag on
+  // the widget, and then calls Reset on it.  
   virtual void SetAnimationTime(float time);
   
 protected:
