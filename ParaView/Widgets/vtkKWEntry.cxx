@@ -43,12 +43,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEntry.h"
 #include "vtkObjectFactory.h"
 
-
-
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.13");
+vtkCxxRevisionMacro(vtkKWEntry, "1.14");
 
+//----------------------------------------------------------------------------
 vtkKWEntry::vtkKWEntry()
 {
   this->ValueString = NULL;
@@ -56,13 +55,13 @@ vtkKWEntry::vtkKWEntry()
   this->ReadOnly    = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWEntry::~vtkKWEntry()
 {
   this->SetValueString(NULL);
 }
 
-
-
+//----------------------------------------------------------------------------
 char *vtkKWEntry::GetValue()
 {
   this->Script("%s get", this->GetWidgetName());
@@ -70,16 +69,19 @@ char *vtkKWEntry::GetValue()
   return this->GetValueString();
 }
 
+//----------------------------------------------------------------------------
 int vtkKWEntry::GetValueAsInt()
 {
   return atoi(this->GetValue());
 }
 
+//----------------------------------------------------------------------------
 float vtkKWEntry::GetValueAsFloat()
 {
   return atof(this->GetValue());
 }
 
+//----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(const char *s)
 {
   int ro = 0;
@@ -99,6 +101,7 @@ void vtkKWEntry::SetValue(const char *s)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(int i)
 {
   char tmp[1024];
@@ -106,6 +109,7 @@ void vtkKWEntry::SetValue(int i)
   this->SetValue(tmp);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWEntry::SetValue(float f, int size)
 {
   char tmp[1024];
@@ -115,6 +119,7 @@ void vtkKWEntry::SetValue(float f, int size)
   this->SetValue(tmp);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
@@ -151,6 +156,7 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
   this->UpdateEnableState();
 }
 
+//----------------------------------------------------------------------------
 void vtkKWEntry::SetReadOnly(int ro)
 {
   this->ReadOnly = ro;
@@ -164,6 +170,7 @@ void vtkKWEntry::SetReadOnly(int ro)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkKWEntry::SetWidth(int width)
 {
   if (this->Width == width)
@@ -177,6 +184,19 @@ void vtkKWEntry::SetWidth(int width)
   if (this->Application != NULL)
     {
     this->Script("%s configure -width %d", this->GetWidgetName(), width);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWEntry::BindCommand(vtkKWObject *object, 
+                             const char *command)
+{
+  if (this->IsCreated())
+    {
+    this->Script("bind %s <Return> {%s %s}",
+                 this->GetWidgetName(), object->GetTclName(), command);
+    this->Script("bind %s <FocusOut> {%s %s}",
+                 this->GetWidgetName(), object->GetTclName(), command);
     }
 }
 

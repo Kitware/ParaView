@@ -85,6 +85,11 @@ public:
   vtkBooleanMacro(ReadOnly, int);
   vtkGetMacro(ReadOnly, int);
 
+  // Description:
+  // Bind the command called when <Return> is pressed or the widget gets out
+  // of focus.
+  virtual void BindCommand(vtkKWObject *object, const char *command);
+
 protected:
   vtkKWEntry();
   ~vtkKWEntry();
