@@ -257,7 +257,7 @@ void vtkPVLineWidget::SetPoint2()
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::Accept()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
+  //vtkPVApplication *pvApp = this->GetPVApplication();
 
   this->ModifiedFlag = 0;
 }

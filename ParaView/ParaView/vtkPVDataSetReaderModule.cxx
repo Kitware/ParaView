@@ -100,7 +100,6 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   vtkPVData *pvd;
   vtkPVReaderModule *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
-  char* result;
   char *extension;
   int extensionPosition;
   char *endingSlash = NULL;

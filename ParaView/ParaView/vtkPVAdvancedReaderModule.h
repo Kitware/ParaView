@@ -60,9 +60,10 @@ public:
 protected:
   vtkPVAdvancedReaderModule();
   ~vtkPVAdvancedReaderModule();
-  vtkPVAdvancedReaderModule(const vtkPVAdvancedReaderModule&) {};
-  void operator=(const vtkPVAdvancedReaderModule&) {};
 
+private:
+  vtkPVAdvancedReaderModule(const vtkPVAdvancedReaderModule&); // Not implemented
+  void operator=(const vtkPVAdvancedReaderModule&); // Not implemented
 };
 
 #endif

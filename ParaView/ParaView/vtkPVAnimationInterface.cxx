@@ -610,9 +610,6 @@ void vtkPVAnimationInterface::Stop()
 void vtkPVAnimationInterface::UpdateSourceMenu()
 {
   char methodAndArgString[1024];
-  int numSources;
-  int i;
-  vtkPVSource *source;
   int sourceValid = 0;
   
   // Remove all previous items form the menu.

@@ -68,10 +68,10 @@ public:
 protected:
   vtkPVEnSightReaderModule();
   ~vtkPVEnSightReaderModule();
-  vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&) {};
-  void operator=(const vtkPVEnSightReaderModule&) {};
 
-
+private:
+  vtkPVEnSightReaderModule(const vtkPVEnSightReaderModule&); // Not implemented
+  void operator=(const vtkPVEnSightReaderModule&); // Not implemented
 };
 
 #endif

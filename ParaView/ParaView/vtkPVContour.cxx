@@ -101,7 +101,6 @@ void vtkPVContour::CreateProperties()
     }
 
   vtkPVApplication*      pvApp = this->GetPVApplication();
-  vtkPVArrayMenu*        arrayMenu;
   vtkPVContourEntry*     entry;
   vtkPVLabeledToggle*    computeScalarsCheck;
   vtkPVLabeledToggle*    computeNormalsCheck;

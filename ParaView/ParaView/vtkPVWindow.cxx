@@ -561,7 +561,7 @@ void vtkPVWindow::PrepareForDelete()
 
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::InitializeMenus(vtkKWApplication *app)
+void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
 {
   // Add view options.
 

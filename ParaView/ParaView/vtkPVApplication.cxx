@@ -97,8 +97,8 @@ extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
 
-static void vtkPVAppProcessMessage(vtkObject* object,
-				   unsigned long event, 
+static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
+				   unsigned long vtkNotUsed(event), 
 				   void *clientdata, void *calldata)
 {
   vtkPVApplication *self = static_cast<vtkPVApplication*>( clientdata );

@@ -194,7 +194,6 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
 
   vtkLinkedListIterator<vtkPVWidget*>* it = this->Widgets->NewIterator();
   vtkPVWidget* widget;
-  vtkPVWidget* clone;
   while ( it->IsDoneWithTraversal() != VTK_OK )
     {
     widget = 0;
@@ -212,7 +211,7 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVContainerWidget::SaveInTclScript(ofstream *file)
+void vtkPVContainerWidget::SaveInTclScript(ofstream *)
 {
 }
 

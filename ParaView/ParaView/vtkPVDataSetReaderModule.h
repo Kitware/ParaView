@@ -68,9 +68,10 @@ public:
 protected:
   vtkPVDataSetReaderModule();
   ~vtkPVDataSetReaderModule();
-  vtkPVDataSetReaderModule(const vtkPVDataSetReaderModule&) {};
-  void operator=(const vtkPVDataSetReaderModule&) {};
 
+private:
+  vtkPVDataSetReaderModule(const vtkPVDataSetReaderModule&); // Not implemented
+  void operator=(const vtkPVDataSetReaderModule&); // Not implemented
 };
 
 #endif

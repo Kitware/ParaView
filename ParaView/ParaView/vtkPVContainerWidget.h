@@ -106,8 +106,6 @@ public:
 protected:
   vtkPVContainerWidget();
   ~vtkPVContainerWidget();
-  vtkPVContainerWidget(const vtkPVContainerWidget&) {};
-  void operator=(const vtkPVContainerWidget&) {};
 
 //BTX
   vtkLinkedList<vtkPVWidget*>* Widgets;
@@ -119,6 +117,10 @@ protected:
 //ETX
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+private:
+  vtkPVContainerWidget(const vtkPVContainerWidget&); // Not implemented
+  void operator=(const vtkPVContainerWidget&); // Not implemented
 };
 
 #endif

@@ -108,9 +108,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname,
   int position;
   char *endingSlash = NULL;
   char *newTclName;
-  char *result;
-  
-  
+
   extension = strrchr(fname, '.');
   position = extension - fname;
   tclName = new char[position+1];

@@ -103,8 +103,6 @@ public:
 protected:
   vtkPVReaderModule();
   ~vtkPVReaderModule();
-  vtkPVReaderModule(const vtkPVReaderModule&) {};
-  void operator=(const vtkPVReaderModule&) {};
 
   const char* ExtractExtension(const char* fname);
 
@@ -115,6 +113,10 @@ protected:
   vtkVector<const char*>* Extensions;
   vtkVectorIterator<const char*>* Iterator;
 //ETX
+
+private:
+  vtkPVReaderModule(const vtkPVReaderModule&); // Not implemented
+  void operator=(const vtkPVReaderModule&); // Not implemented
 };
 
 #endif
