@@ -41,9 +41,9 @@ public:
   
   // Description:
   // Handle progress links.
-  virtual void SendPrepareProgress() {}
-  virtual void SendCleanupPendingProgress() {}
-  virtual void SetLocalProgress(const char*, int) {}
+  virtual void SendPrepareProgress();
+  virtual void SendCleanupPendingProgress();
+  virtual void SetLocalProgress(const char*, int);
 
   // Description:
   // Exit the application
@@ -54,6 +54,12 @@ protected:
   virtual ~vtkPVProcessModuleBatchHelper();
 
   vtkSMApplication* SMApplication;
+  int ShowProgress;
+  vtkSetStringMacro(Filter);
+  char* Filter;
+  int CurrentProgress;
+
+  void CloseCurrentProgress();
 private:
 
   vtkPVProcessModuleBatchHelper(const vtkPVProcessModuleBatchHelper&); // Not implemented
