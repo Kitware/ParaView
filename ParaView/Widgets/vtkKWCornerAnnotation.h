@@ -74,7 +74,7 @@ public:
 
   // Description:
   // Create the properties object, called by ShowProperties.
-  virtual void Create(vtkKWApplication *app);
+  virtual void Create(vtkKWApplication *app, const char* args);
 
   // Description:
   // Close out and remove any composites prior to deletion.
