@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.21");
 
 struct vtkSMSourceProxyInternals
 {
@@ -107,9 +107,10 @@ void vtkSMSourceProxy::UpdatePipeline()
   // I would like to get rid of vtkSMParts eventually.
   
   if (strcmp(this->GetVTKClassName(), "vtkPVEnSightMasterServerReader") == 0)
-    { // Cannot set the update extent until we get the output.  Need to call update
-    // before we can get the output.  Cannot not update whole extent of every source.
-    // Multiblock should fix this.
+    { 
+    // Cannot set the update extent until we get the output.  Need to call
+    // update before we can get the output.  Cannot not update whole extent
+    // of every source.  Multiblock should fix this.
     int numIDs = this->GetNumberOfIDs();
     if (numIDs <= 0)
       {
