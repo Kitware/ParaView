@@ -115,8 +115,6 @@ if { ! $didRegression } {
     }
 }
 
-$kw(vtkTemp44) SetBackgroundColor 0 0 0
- 
 $Application Exit
 
 

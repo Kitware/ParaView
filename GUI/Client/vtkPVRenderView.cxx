@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.324");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.325");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -459,7 +459,6 @@ vtkPVRenderView::~vtkPVRenderView()
   this->PropertiesButton->Delete();
   this->PropertiesButton = NULL;
   this->SetMenuLabelSwitchBackAndForthToViewProperties(NULL);
-  vtkTimerLog::CleanupLog();
   
   this->RenderTimer->Delete();
   if (this->TimerToken)
