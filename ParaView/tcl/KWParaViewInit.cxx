@@ -80,9 +80,6 @@ ClientData vtkPVSourceNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
-int vtkPVMesaRenderWindowCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVMesaRenderWindowNewCommand();
 
 extern Tcl_HashTable vtkInstanceLookup;
 extern Tcl_HashTable vtkPointerLookup;
@@ -165,7 +162,5 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSourceCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
-  vtkTclCreateNew(interp,"vtkPVMesaRenderWindow", vtkPVMesaRenderWindowNewCommand,
-                  vtkPVMesaRenderWindowCommand);
   return TCL_OK;
 }
