@@ -68,7 +68,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.69");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.70");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -683,7 +683,10 @@ void vtkPVFileEntry::ResetInternal()
 
   this->UpdateAvailableFiles();
 
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //----------------------------------------------------------------------------

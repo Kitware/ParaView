@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.23");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.24");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -179,7 +179,10 @@ void vtkPVLabeledToggle::ResetInternal()
 
   this->SetState(this->Property->GetIndex());
 
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //----------------------------------------------------------------------------

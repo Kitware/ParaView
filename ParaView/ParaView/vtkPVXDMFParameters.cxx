@@ -136,7 +136,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.12");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -322,7 +322,10 @@ void vtkPVXDMFParameters::Trace(ofstream *file)
 void vtkPVXDMFParameters::ResetInternal()
 {
   this->UpdateFromReader();
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //----------------------------------------------------------------------------

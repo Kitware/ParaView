@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.7");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.8");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -215,7 +215,10 @@ void vtkPVFieldMenu::ResetInternal()
 //               sourceTclName);
   this->SetValue(this->Property->GetIndex());
 
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
   // Do we really need to update?
   // What causes dependent widgets like ArrayMenu to update?
   this->Update();

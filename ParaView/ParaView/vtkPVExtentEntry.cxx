@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.31");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.32");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -271,7 +271,10 @@ void vtkPVExtentEntry::ResetInternal()
                  static_cast<int>(values[2]), static_cast<int>(values[3]),
                  static_cast<int>(values[4]), static_cast<int>(values[5]));
   
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------

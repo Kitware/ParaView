@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.17");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -118,7 +118,10 @@ void vtkPVGroupInputsWidget::ResetInternal()
     }
 
   // Because list box does not notify us when it is modified ...
-  //this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 

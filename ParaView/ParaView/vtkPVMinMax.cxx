@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.27");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -320,7 +320,10 @@ void vtkPVMinMax::ResetInternal()
     this->SetMinValue(values[0]);
     this->SetMaxValue(values[1]);
     }
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 

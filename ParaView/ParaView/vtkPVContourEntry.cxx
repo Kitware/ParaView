@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.43");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.44");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -166,7 +166,10 @@ void vtkPVContourEntry::ResetInternal()
     }
 
   // Since the widget now matches the fitler, it is no longer modified.
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------

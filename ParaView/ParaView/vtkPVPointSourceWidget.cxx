@@ -26,7 +26,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.16");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -206,7 +206,10 @@ void vtkPVPointSourceWidget::ResetInternal()
   this->PointWidget->ResetInternal();
   this->RadiusWidget->ResetInternal();
   this->NumberOfPointsWidget->ResetInternal();
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -32,7 +32,7 @@
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.45");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.46");
 
 //===========================================================================
 //***************************************************************************
@@ -229,7 +229,10 @@ void vtkPV3DWidget::AcceptInternal(vtkClientServerID id)
 void vtkPV3DWidget::ResetInternal()
 {
   this->Superclass::ResetInternal();
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
   this->ValueChanged = 0;
 }
 

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.50");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.51");
 
 
 //----------------------------------------------------------------------------
@@ -375,7 +375,10 @@ void vtkPVInputMenu::ResetInternal()
     this->Script("%s SetCurrentValue %s", 
                this->GetTclName(), input->GetTclName());
     // Only turn off modified if we successfully set input.
-    this->ModifiedFlag = 0;
+    if (this->AcceptCalled)
+      {
+      this->ModifiedFlag = 0;
+      }
 
     // Update any widgets that depend on this input menu.
     this->Update();

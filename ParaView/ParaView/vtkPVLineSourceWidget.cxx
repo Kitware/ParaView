@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.11");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.12");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -99,7 +99,10 @@ int vtkPVLineSourceWidget::GetModifiedFlag()
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::ResetInternal()
 {
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
   // Ignore the source passed in.  Modify our one source.
   this->LineWidget->ResetInternal();
 }

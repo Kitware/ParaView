@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.39");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.40");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -214,7 +214,10 @@ void vtkPVSelectionList::ResetInternal()
 {
   this->SetCurrentValue(this->Property->GetIndex());
   
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.31");
+vtkCxxRevisionMacro(vtkPVScale, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -314,7 +314,10 @@ void vtkPVScale::ResetInternal()
       range[0], range[1]);
     }
 
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
 }
 
 //----------------------------------------------------------------------------
