@@ -125,7 +125,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLookmarkManager);
-vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.6");
+vtkCxxRevisionMacro(vtkPVLookmarkManager, "1.7");
 int vtkPVLookmarkManagerCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
@@ -3256,6 +3256,8 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
           else if((selectTimeSet = vtkPVSelectTimeSet::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
+            selectTimeSet->SetTimeValueCallback(this->GetStringEntryValue(ptr));
+            selectTimeSet->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
           else if((vectorEntry = vtkPVVectorEntry::SafeDownCast(pvWidget)))
@@ -3273,15 +3275,15 @@ void vtkPVLookmarkManager::ParseAndExecuteStateScript(vtkPVSource *reader,char *
           else if((selectionList = vtkPVSelectionList::SafeDownCast(pvWidget)))
             {
             ptr = strtok(NULL,"\r\n");
+            val = this->GetIntegerScalarWidgetValue(ptr);
+            selectionList->SetCurrentValue(val);
+            selectionList->ModifiedCallback();
             ptr = strtok(NULL,"\r\n");
             }
           else if((stringEntry = vtkPVStringEntry::SafeDownCast(pvWidget)))
             {
+            //  This widget is used
             ptr = strtok(NULL,"\r\n");
-
-            //stringEntry->SetValue(this->GetStringEntryValue(ptr));
-            //stringEntry->ModifiedCallback();
-
             ptr = strtok(NULL,"\r\n");
             }
           else if((minMaxWidget = vtkPVMinMax::SafeDownCast(pvWidget)))
