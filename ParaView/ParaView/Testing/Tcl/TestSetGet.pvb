@@ -19,6 +19,7 @@ set exceptions {
   vtkPointsProjectedHull-GetSizeCcwHullX
   vtkPointsProjectedHull-GetSizeCcwHullY
   vtkPointsProjectedHull-GetSizeCcwHullZ
+  vtkKWUserInterfaceNotebookManager-GetNotebook
 }
 
 proc TestOne {cname} {
