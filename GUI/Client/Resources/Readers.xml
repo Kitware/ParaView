@@ -592,6 +592,14 @@
           file_description="Meta Image Data Files">
     <Source class="vtkMetaImageReader"/>
   </Module>
+  <Module name="Facet Reader"
+          class="vtkPVReaderModule"
+          root_name="FCTReader"
+          module_type="Reader"
+          extensions=".facet"
+          file_description="Facet Polygonal Data Files">
+    <Source class="vtkFacetReader"/>
+  </Module>
   <Module name="PNGReader"
           root_name="PNGReader"
           class="vtkPVReaderModule"

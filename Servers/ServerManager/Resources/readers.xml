@@ -1597,6 +1597,17 @@
    <!-- End AVSucdReader -->
    </SourceProxy>
 
+   <SourceProxy name="Facet Reader" 
+                class="vtkFacetReader">
+     <StringVectorProperty
+        name="FileName"
+        command="SetFileName"
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
+   <!-- End Facet Reader -->
+   </SourceProxy>
+
    <SourceProxy name="Meta Image Reader" 
                 class="vtkMetaImageReader">
      <StringVectorProperty
@@ -1606,8 +1617,8 @@
         <StringListDomain name="files"/>
      </StringVectorProperty>
    <!-- End Meta Image Reader -->
-
    </SourceProxy>
+
    <SourceProxy name="PNGReader" 
                 class="vtkPNGReader">
      <StringVectorProperty
