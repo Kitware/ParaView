@@ -12,12 +12,15 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   PrintSelf-PVServer-Filters
   PrintSelf-PVServer-ServerManager
   PrintSelf-PVServer-StreamInterpreter
+  PrintSelf-PVGUI-Client
   TestSetObjectMacro-KWWidgets
   TestSetObjectMacro-ParaView
   TestSetObjectMacro-PVServer-Common
   TestSetObjectMacro-PVServer-Filters
   TestSetObjectMacro-PVServer-ServerManager
   TestSetObjectMacro-PVServer-StreamInterpreter
+  TestSetGet-ParaView
+  HeaderTesting-PVGUI-Client
   
   # this one runs python which then runs two program so no memory checking there
   Sockets-image
