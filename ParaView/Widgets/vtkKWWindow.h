@@ -302,14 +302,15 @@ public:
   void PrintRecentFiles();
   
   // Description:
-  // Get the user interface manager.
+  // Get the User Interface Manager.
   virtual vtkKWUserInterfaceManager* GetUserInterfaceManager()
     { return 0; };
 
   // Description:
-  // Get the application settings interface. 
+  // Get/Show the Application Settings Interface. 
   virtual vtkKWApplicationSettingsInterface* GetApplicationSettingsInterface() 
     { return 0; };
+  void ShowApplicationSettingsInterface();
 
   // Description:
   // Display the tcl interactor.
