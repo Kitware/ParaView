@@ -49,8 +49,7 @@ vtkKWEntry* vtkKWEntry::New()
 
 char *vtkKWEntry::GetValue()
 {
-  vtkKWObject::Script(this->Application,
-		      "%s get", this->GetWidgetName());
+  this->Script("%s get", this->GetWidgetName());
   return this->Application->GetMainInterp()->result;
 }
 
@@ -66,31 +65,26 @@ float vtkKWEntry::GetValueAsFloat()
 
 void vtkKWEntry::SetValue(char *s)
 {
-  vtkKWObject::Script(this->Application,"%s delete 0 end", 
-		      this->GetWidgetName());
+  this->Script("%s delete 0 end", this->GetWidgetName());
   if (s)
     {
-    vtkKWObject::Script(this->Application,"%s insert 0 {%s}", 
-			this->GetWidgetName(),s);
+    this->Script("%s insert 0 {%s}", this->GetWidgetName(),s);
     }
 }
 
 void vtkKWEntry::SetValue(int i)
 {
-  vtkKWObject::Script(this->Application,"%s delete 0 end", 
-		      this->GetWidgetName());
-  vtkKWObject::Script(this->Application,"%s insert 0 %d", 
-			this->GetWidgetName(),i);
+  this->Script("%s delete 0 end", this->GetWidgetName());
+  this->Script("%s insert 0 %d", this->GetWidgetName(),i);
 }
 
 void vtkKWEntry::SetValue(float f, int size)
 {
   char tmp[1024];
   
-  vtkKWObject::Script(this->Application,"%s delete 0 end", 
-		      this->GetWidgetName());
+  this->Script("%s delete 0 end",this->GetWidgetName());
   sprintf(tmp,"%%s insert 0 %%.%df",size);
-  vtkKWObject::Script(this->Application,tmp,this->GetWidgetName(),f);
+  this->Script(tmp,this->GetWidgetName(),f);
 }
 
 void vtkKWEntry::Create(vtkKWApplication *app, char *args)
@@ -108,7 +102,6 @@ void vtkKWEntry::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  vtkKWObject::Script(app,"entry %s -textvariable %sValue %s",
-		      wname,wname,args);
+  this->Script("entry %s -textvariable %sValue %s",wname,wname,args);
 }
 

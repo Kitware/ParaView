@@ -83,6 +83,14 @@ public:
   void SetApplicationName(const char *);
   vtkGetStringMacro(ApplicationName);
   
+//BTX
+  // Description:
+  // A convienience method to invoke some tcl script code and
+  // perform arguement substitution.
+  void Script(char *EventString, ...);
+  void SimpleScript(char *EventString);
+//ETX
+  
 protected:
   Tk_Window MainWindow;
   Tcl_Interp *MainInterp;

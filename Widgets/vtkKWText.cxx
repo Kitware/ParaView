@@ -49,19 +49,16 @@ vtkKWText* vtkKWText::New()
 
 char *vtkKWText::GetValue()
 {
-  vtkKWObject::Script(this->Application,
-		      "%s get 1.0 {end -1 chars}", this->GetWidgetName());
+  this->Script("%s get 1.0 {end -1 chars}", this->GetWidgetName());
   return this->Application->GetMainInterp()->result;
 }
 
 void vtkKWText::SetValue(char *s)
 {
-  vtkKWObject::Script(this->Application,"%s delete 1.0 end", 
-		      this->GetWidgetName());
+  this->Script("%s delete 1.0 end", this->GetWidgetName());
   if (s)
     {
-    vtkKWObject::Script(this->Application,"%s insert 1.0 {%s}", 
-			this->GetWidgetName(),s);
+    this->Script("%s insert 1.0 {%s}",this->GetWidgetName(),s);
     }
 }
 
@@ -80,7 +77,7 @@ void vtkKWText::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  vtkKWObject::Script(app,"text %s %s",wname,args);
+  this->Script("text %s %s",wname,args);
 }
 
 

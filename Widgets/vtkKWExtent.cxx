@@ -106,7 +106,7 @@ void vtkKWExtent::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  vtkKWObject::Script(app,"frame %s %s", wname,args);
+  this->Script("frame %s %s", wname,args);
 
   this->XMinScale->Create(this->Application,"-length 190");
   this->XMinScale->SetCommand("{%s ExtentSelected}",this->GetTclName());
@@ -138,14 +138,14 @@ void vtkKWExtent::Create(vtkKWApplication *app, char *args)
   this->ZMaxScale->DisplayEntry();
   this->ZMaxScale->DisplayLabel("Maximum Z");
 
-  vtkKWObject::Script(this->Application,
-                      "pack %s %s %s %s %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-                      this->XMinScale->GetWidgetName(),
-                      this->XMaxScale->GetWidgetName(),
-                      this->YMinScale->GetWidgetName(),
-                      this->YMaxScale->GetWidgetName(),
-                      this->ZMinScale->GetWidgetName(),
-                      this->ZMaxScale->GetWidgetName());
+  this->Script(
+    "pack %s %s %s %s %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
+    this->XMinScale->GetWidgetName(),
+    this->XMaxScale->GetWidgetName(),
+    this->YMinScale->GetWidgetName(),
+    this->YMaxScale->GetWidgetName(),
+    this->ZMinScale->GetWidgetName(),
+    this->ZMaxScale->GetWidgetName());
 }
 
 
@@ -229,7 +229,7 @@ void vtkKWExtent::ExtentSelected()
     this->ZMinScale->SetValue(this->Extent[4]);    
     }
   
-  vtkKWObject::Script(this->Application,"eval %s",this->Command);
+  this->Script("eval %s",this->Command);
 }
 
 void vtkKWExtent::SetCommand(char *format, ...)

@@ -64,8 +64,7 @@ void vtkKWSaveImageDialog::Invoke()
   
   while (!done)
     {
-    vtkKWObject::Script(this->Application,
-			"tk_getSaveFile -title \"Save As Image\" -filetypes {{{Windows Bitmap} {.bmp}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
+    this->Script("tk_getSaveFile -title \"Save As Image\" -filetypes {{{Windows Bitmap} {.bmp}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
     if (path)
       {
       free(path);
@@ -84,7 +83,7 @@ void vtkKWSaveImageDialog::Invoke()
     else
       {
       // unknown file extension
-      vtkKWObject::Script(this->Application,"tk_messageBox -icon error -title \"Save Image Error\" -message \"A valid file extension was not found.\\nPlease use a .bmp, .ppm, or .tif file extension\\nwhen naming your file.\"");
+      this->Script("tk_messageBox -icon error -title \"Save Image Error\" -message \"A valid file extension was not found.\\nPlease use a .bmp, .ppm, or .tif file extension\\nwhen naming your file.\"");
       }
     }
   

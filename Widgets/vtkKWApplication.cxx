@@ -85,15 +85,35 @@ vtkKWApplication::vtkKWApplication()
   this->Windows = vtkKWWindowCollection::New();  
   
   // add the application as $app
-  vtkTclGetObjectFromPointer(this->MainInterp, 
-                             (void *)this, 
+  vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
                              vtkKWApplicationCommand);
-  vtkKWObject::Script(this,"set Application %s",this->MainInterp->result);
+
+  this->Script("set Application %s",this->MainInterp->result);
 }
 
 vtkKWApplication::~vtkKWApplication()
 {
   this->SetApplicationName(NULL);
+}
+
+void vtkKWApplication::Script(char *format, ...)
+{
+  static char event[16000];
+  
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(event, format, var_args);
+  va_end(var_args);
+
+  this->SimpleScript(event);
+}
+void vtkKWApplication::SimpleScript(char *event)
+{
+  if (Tcl_GlobalEval(this->MainInterp, event) != TCL_OK)
+    {
+    vtkGenericWarningMacro("Error returned from tcl script.\n" <<
+			   this->MainInterp->result << endl);
+    }
 }
 
 void vtkKWApplication::SetApplicationName(const char *_arg)
@@ -143,7 +163,7 @@ void vtkKWApplication::Exit()
   this->Windows->RemoveAllItems();
   this->Windows->Delete();
   this->Windows = NULL;  
-  vtkKWObject::Script(this,"exit");
+  this->Script("exit");
   //Tcl_GlobalEval(this->MainInterp, "destroy .");  
   //Tcl_DeleteInterp(this->MainInterp);
   this->MainInterp = NULL;

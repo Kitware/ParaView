@@ -2317,10 +2317,9 @@ void vtkKWWindow::CreateDefaultPropertiesParent()
     vtkKWWidget *pp = vtkKWWidget::New();
     pp->SetParent(this);
     pp->Create(this->Application,"frame","-bd 0");
-    vtkKWObject::Script(this->Application,
-			"pack %s -before %s -side left -fill y -anchor nw",
-			pp->GetWidgetName(), 
-                        this->ViewFrame->GetWidgetName());
+    this->Script("pack %s -before %s -side left -fill y -anchor nw",
+                 pp->GetWidgetName(), 
+                 this->ViewFrame->GetWidgetName());
     this->SetPropertiesParent(pp);
     pp->Delete();
     }
@@ -2383,13 +2382,13 @@ void vtkKWWindow::SetStatusText(const char *text)
 {
   if (text) 
     {
-    vtkKWObject::Script(this->Application,"%s configure -text \"%s\"",
-      this->StatusLabel->GetWidgetName(), text);
+    this->Script("%s configure -text \"%s\"",
+                 this->StatusLabel->GetWidgetName(), text);
     }
   else
     {
-    vtkKWObject::Script(this->Application,"%s configure -text \"\"",
-      this->StatusLabel->GetWidgetName());
+    this->Script("%s configure -text \"\"",
+                 this->StatusLabel->GetWidgetName());
     }
 }
 
@@ -2404,9 +2403,8 @@ vtkKWWidget *vtkKWWindow::GetMenuEdit()
   this->MenuEdit = vtkKWWidget::New();
   this->MenuEdit->SetParent(this->GetMenu());
   this->MenuEdit->Create(this->Application,"menu","-tearoff 0");
-  vtkKWObject::Script(this->Application,
-    "%s insert 1 cascade -label {Edit} -menu %s -underline 0",
-    this->Menu->GetWidgetName(),this->MenuEdit->GetWidgetName());
+  this->Script("%s insert 1 cascade -label {Edit} -menu %s -underline 0",
+               this->Menu->GetWidgetName(),this->MenuEdit->GetWidgetName());
 
   return this->MenuEdit;
 }
@@ -2423,17 +2421,15 @@ vtkKWWidget *vtkKWWindow::GetMenuView()
   this->MenuView->Create(this->Application,"menu","-tearoff 0");
   if (this->MenuEdit)
     {
-    vtkKWObject::Script(this->Application,
-			"%s insert 2 cascade -label {View} -menu %s -underline 0",
-			this->Menu->GetWidgetName(),
-			this->MenuView->GetWidgetName());
+    this->Script("%s insert 2 cascade -label {View} -menu %s -underline 0",
+                 this->Menu->GetWidgetName(),
+                 this->MenuView->GetWidgetName());
     }
   else
     {
-    vtkKWObject::Script(this->Application,
-			"%s insert 1 cascade -label {View} -menu %s -underline 0",
-			this->Menu->GetWidgetName(),
-			this->MenuView->GetWidgetName());
+    this->Script("%s insert 1 cascade -label {View} -menu %s -underline 0",
+                 this->Menu->GetWidgetName(),
+                 this->MenuView->GetWidgetName());
     }
   
   return this->MenuView;
@@ -2451,24 +2447,24 @@ vtkKWWidget *vtkKWWindow::GetMenuProperties()
   this->MenuProperties->Create(this->Application,"menu","-tearoff 0");
   if (this->MenuView && this->MenuEdit)
     {
-    vtkKWObject::Script(this->Application,
-			"%s insert 3 cascade -label {Properties} -menu %s -underline 0",
-			this->Menu->GetWidgetName(),
-			this->MenuProperties->GetWidgetName());
+    this->Script(
+      "%s insert 3 cascade -label {Properties} -menu %s -underline 0",
+      this->Menu->GetWidgetName(),
+      this->MenuProperties->GetWidgetName());
     }
   else if (this->MenuView || this->MenuEdit)
     {
-    vtkKWObject::Script(this->Application,
-			"%s insert 2 cascade -label {Properties} -menu %s -underline 0",
-			this->Menu->GetWidgetName(),
-			this->MenuProperties->GetWidgetName());
+    this->Script(
+      "%s insert 2 cascade -label {Properties} -menu %s -underline 0",
+      this->Menu->GetWidgetName(),
+      this->MenuProperties->GetWidgetName());
     }
   else
     {
-    vtkKWObject::Script(this->Application,
-			"%s insert 1 cascade -label {Properties} -menu %s -underline 0",
-			this->Menu->GetWidgetName(),
-			this->MenuProperties->GetWidgetName());
+    this->Script(
+      "%s insert 1 cascade -label {Properties} -menu %s -underline 0",
+      this->Menu->GetWidgetName(),
+      this->MenuProperties->GetWidgetName());
     }
   
   return this->MenuProperties;
@@ -2490,65 +2486,58 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  vtkKWObject::Script(app,"toplevel %s -visual best %s",wname,args);
-  vtkKWObject::Script(app,"wm title %s {%s}",wname,
-                      app->GetApplicationName());
-  vtkKWObject::Script(app,"wm iconname %s {%s}",wname,
-                      app->GetApplicationName());
-  vtkKWObject::Script(app,
-		      "wm protocol %s WM_DELETE_WINDOW {%s Close}",
-		      wname, this->GetTclName());
+  this->Script("toplevel %s -visual best %s",wname,args);
+  this->Script("wm title %s {%s}",wname,
+               app->GetApplicationName());
+  this->Script("wm iconname %s {%s}",wname,
+               app->GetApplicationName());
+  this->Script("wm protocol %s WM_DELETE_WINDOW {%s Close}",
+               wname, this->GetTclName());
 
   this->StatusFrame->Create(app,"frame","");
-  vtkKWObject::Script(app,"image create photo -height 34 -width 128");
+  this->Script("image create photo -height 34 -width 128");
   this->StatusImageName = new char [strlen(interp->result)+1];
   strcpy(this->StatusImageName,interp->result);
   this->CreateStatusImage();
   this->StatusImage->Create(app,"label",
                             "-relief sunken -bd 1 -height 38 -width 132 -fg #ffffff -bg #ffffff");
-  vtkKWObject::Script(app,"%s configure -image %s",
-                      this->StatusImage->GetWidgetName(),
-                      this->StatusImageName);
-  vtkKWObject::Script(app,"pack %s -side left -padx 2",
-    this->StatusImage->GetWidgetName());
+  this->Script("%s configure -image %s", this->StatusImage->GetWidgetName(),
+               this->StatusImageName);
+  this->Script("pack %s -side left -padx 2", 
+               this->StatusImage->GetWidgetName());
   this->StatusLabel->Create(app,"label","-relief sunken -padx 3 -bd 1 -font \"Helvetica 10\" -anchor w");
-  vtkKWObject::Script(app,"pack %s -side left -padx 2 -expand yes -fill both",
-    this->StatusLabel->GetWidgetName());
-  vtkKWObject::Script(app,"pack %s -side bottom -fill x -pady 2",
+  this->Script("pack %s -side left -padx 2 -expand yes -fill both",
+               this->StatusLabel->GetWidgetName());
+  this->Script("pack %s -side bottom -fill x -pady 2",
     this->StatusFrame->GetWidgetName());
 
   this->ViewFrame->Create(app,"frame","");
-  vtkKWObject::Script(app,"pack %s -side right -fill both -expand yes",
-    this->ViewFrame->GetWidgetName());
+  this->Script("pack %s -side right -fill both -expand yes",
+               this->ViewFrame->GetWidgetName());
 
   this->Menu->Create(app,"menu","-tearoff 0");
   this->MenuFile->Create(app,"menu","-tearoff 0");
-  vtkKWObject::Script(app,
-    "%s add cascade -label \"File\" -menu %s -underline 0",
-    this->Menu->GetWidgetName(),this->MenuFile->GetWidgetName());
-  vtkKWObject::Script(app,
+  this->Script("%s add cascade -label \"File\" -menu %s -underline 0",
+               this->Menu->GetWidgetName(),this->MenuFile->GetWidgetName());
+  this->Script(
     "%s add command -label \"Load Script\" -command {%s LoadScript}",
     this->MenuFile->GetWidgetName(), this->GetTclName());
-  vtkKWObject::Script(app, "%s add separator",
+  this->Script( "%s add separator",
     this->MenuFile->GetWidgetName(), this->GetTclName());
-  vtkKWObject::Script(app,
-    "%s add command -label \"Close\" -command {%s Close}",
+  this->Script("%s add command -label \"Close\" -command {%s Close}",
     this->MenuFile->GetWidgetName(), this->GetTclName());
-  vtkKWObject::Script(app,
-    "%s add command -label \"Exit\" -command {%s Exit}",
-    this->MenuFile->GetWidgetName(), this->GetTclName());
-
-  vtkKWObject::Script(app,"%s configure -menu %s",wname,
-    this->Menu->GetWidgetName());
+  this->Script("%s add command -label \"Exit\" -command {%s Exit}",
+               this->MenuFile->GetWidgetName(), this->GetTclName());
+  
+  this->Script("%s configure -menu %s",wname,this->Menu->GetWidgetName());
   
   this->MenuHelp->Create(app,"menu","-tearoff 0");
-  vtkKWObject::Script(app,
-    "%s add cascade -label \"Help\" -menu %s -underline 0",
-    this->Menu->GetWidgetName(),this->MenuHelp->GetWidgetName());
-  vtkKWObject::Script(app,
+  this->Script("%s add cascade -label \"Help\" -menu %s -underline 0",
+               this->Menu->GetWidgetName(),this->MenuHelp->GetWidgetName());
+  this->Script(
     "%s add command -label \"OnLine Help\" -command {%s DisplayHelp}",
     this->MenuHelp->GetWidgetName(), this->GetTclName());
-  vtkKWObject::Script(app,
+  this->Script(
     "%s add command -label \"About\" -command {%s DisplayAbout}",
     this->MenuHelp->GetWidgetName(), this->GetTclName());
 }
@@ -2595,8 +2584,7 @@ void vtkKWWindow::LoadScript()
 {
   char *path = NULL;
 
-  vtkKWObject::Script(this->Application,
-                      "tk_getOpenFile -title \"Load Script\" -filetypes {{{Tcl Script} {.tcl}}}");
+  this->Script("tk_getOpenFile -title \"Load Script\" -filetypes {{{Tcl Script} {.tcl}}}");
   path = strdup(this->Application->GetMainInterp()->result);
   if (strlen(path) != 0)
     {
@@ -2616,9 +2604,8 @@ void vtkKWWindow::LoadScript()
 void vtkKWWindow::LoadScript(char *path)
 {
   // add this window as a variable
-  vtkKWObject::Script(this->Application,"set InitialWindow %s",
-                      this->GetTclName());
-  vtkKWObject::Script(this->Application,"source {%s}",path);
+  this->Script("set InitialWindow %s", this->GetTclName());
+  this->Script("source {%s}",path);
 }
 
 void vtkKWWindow::CreateStatusImage()
@@ -2708,19 +2695,18 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, char *command)
     {
     char File[1024];
     
-    vtkKWObject::Script(this->Application, "%s insert [expr [%s index Close] -1] separator",
-                        this->GetMenuFile()->GetWidgetName(), 
-                        this->GetMenuFile()->GetWidgetName());
+    this->Script( "%s insert [expr [%s index Close] -1] separator",
+                  this->GetMenuFile()->GetWidgetName(), 
+                  this->GetMenuFile()->GetWidgetName());
     for (i = 0; i < 4; i++)
       {
       ReadAValue(hKey, File,KeyName[i],"");
       if (strlen(File) > 1)
         {
-        vtkKWObject::Script(this->Application,
-                            "%s insert [expr [%s index Close] -1] command -label {%s} -command {%s {%s}}",
-                            this->GetMenuFile()->GetWidgetName(), 
-                            this->GetMenuFile()->GetWidgetName(), 
-                            File, command, File);
+        this->Script("%s insert [expr [%s index Close] -1] command -label {%s} -command {%s {%s}}",
+                     this->GetMenuFile()->GetWidgetName(), 
+                     this->GetMenuFile()->GetWidgetName(), 
+                     File, command, File);
         this->NumberOfMRUFiles++;
         }    
       }
@@ -2767,19 +2753,18 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,char *command)
     // if this is the first addition
     if (!this->NumberOfMRUFiles)
       {
-      vtkKWObject::Script(this->Application, "%s insert [expr [%s index Close] -1] separator",
-                          this->GetMenuFile()->GetWidgetName(), 
-                          this->GetMenuFile()->GetWidgetName());
+      this->Script( "%s insert [expr [%s index Close] -1] separator",
+                    this->GetMenuFile()->GetWidgetName(), 
+                    this->GetMenuFile()->GetWidgetName());
       }
     
     // remove the old entry number 4
     ReadAValue(hKey, File,"File4","");
     if (strlen(File) > 1)
       {
-      vtkKWObject::Script(this->Application,
-                          "%s delete [expr [%s index Close] -2]",
-                          this->GetMenuFile()->GetWidgetName(),
-                          this->GetMenuFile()->GetWidgetName());
+      this->Script("%s delete [expr [%s index Close] -2]",
+                   this->GetMenuFile()->GetWidgetName(),
+                   this->GetMenuFile()->GetWidgetName());
       this->NumberOfMRUFiles--;
       }
     
@@ -2801,18 +2786,18 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,char *command)
     // add the new entry
     if (strlen(File) > 1)
       {
-      vtkKWObject::Script(this->Application,
-                          "%s insert %d command -label {%s} -command {%s {%s}}",
-                          this->GetMenuFile()->GetWidgetName(),
-                          this->GetFileMenuIndex() + 2,name, command, name);
+      this->Script(
+        "%s insert %d command -label {%s} -command {%s {%s}}",
+        this->GetMenuFile()->GetWidgetName(),
+        this->GetFileMenuIndex() + 2,name, command, name);
       }
     else
       {
-      vtkKWObject::Script(this->Application,
-                          "%s insert [expr [%s index Close] -1] command -label {%s} -command {%s {%s}}",
-                          this->GetMenuFile()->GetWidgetName(), 
-                          this->GetMenuFile()->GetWidgetName(), 
-                          name, command, name);
+      this->Script(
+        "%s insert [expr [%s index Close] -1] command -label {%s} -command {%s {%s}}",
+        this->GetMenuFile()->GetWidgetName(), 
+        this->GetMenuFile()->GetWidgetName(), 
+        name, command, name);
       }
     }
   RegCloseKey(hKey);
@@ -2823,9 +2808,7 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,char *command)
 int vtkKWWindow::GetFileMenuIndex()
 {
   // first find Close
-  vtkKWObject::Script(this->Application,
-                      "%s index Close",
-                      this->GetMenuFile()->GetWidgetName());
+  this->Script("%s index Close",this->GetMenuFile()->GetWidgetName());
   int clidx = vtkKWObject::GetIntegerResult(this->Application);
   
   if (this->NumberOfMRUFiles > 0)

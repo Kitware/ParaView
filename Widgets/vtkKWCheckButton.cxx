@@ -49,8 +49,7 @@ vtkKWCheckButton* vtkKWCheckButton::New()
 
 int vtkKWCheckButton::GetState()
 {
-  vtkKWObject::Script(this->Application,"set %sValue",
-		      this->GetWidgetName());
+  this->Script("set %sValue",this->GetWidgetName());
   
   return vtkKWObject::GetIntegerResult(this->Application);
 }
@@ -59,11 +58,11 @@ void vtkKWCheckButton::SetState(int s)
 {
   if (s)
     {
-    vtkKWObject::Script(this->Application,"%s select",this->GetWidgetName());
+    this->Script("%s select",this->GetWidgetName());
     }
   else
     {
-    vtkKWObject::Script(this->Application,"%s deselect",this->GetWidgetName());
+    this->Script("%s deselect",this->GetWidgetName());
     }
 }
 
@@ -83,7 +82,7 @@ void vtkKWCheckButton::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  vtkKWObject::Script(app,"checkbutton %s -variable %sValue %s",
-		      wname,wname,args);
+  this->Script("checkbutton %s -variable %sValue %s",
+               wname,wname,args);
 }
 

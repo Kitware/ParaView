@@ -70,10 +70,8 @@ int vtkKWDialog::Invoke()
   this->Done = 0;
 
   // map the window
-  vtkKWObject::Script(this->Application,
-    "wm deiconify %s",this->GetWidgetName());
-  vtkKWObject::Script(this->Application,
-                      "focus %s",this->GetWidgetName());
+  this->Script("wm deiconify %s",this->GetWidgetName());
+  this->Script("focus %s",this->GetWidgetName());
   // do a grab
   // wait for the end
   while (!this->Done)
@@ -88,31 +86,27 @@ void vtkKWDialog::Display()
   this->Done = 0;
 
   // map the window
-  vtkKWObject::Script(this->Application,
-                      "wm deiconify %s",this->GetWidgetName());
-  vtkKWObject::Script(this->Application,
-                      "focus %s",this->GetWidgetName());
+  this->Script("wm deiconify %s",this->GetWidgetName());
+  this->Script("focus %s",this->GetWidgetName());
 }
 
 void vtkKWDialog::Cancel()
 {
-  vtkKWObject::Script(this->Application,
-		      "wm withdraw %s",this->GetWidgetName());
+  this->Script("wm withdraw %s",this->GetWidgetName());
   this->Done = 1;  
   if (this->Command && strlen(this->Command) > 0)
     {
-    vtkKWObject::Script(this->Application,"eval %s",this->Command);
+    this->Script("eval %s",this->Command);
     }
 }
 
 void vtkKWDialog::OK()
 {
-  vtkKWObject::Script(this->Application,
-		      "wm withdraw %s",this->GetWidgetName());
+  this->Script("wm withdraw %s",this->GetWidgetName());
   this->Done = 2;  
   if (this->Command && strlen(this->Command) > 0)
     {
-    vtkKWObject::Script(this->Application,"eval %s",this->Command);
+    this->Script("eval %s",this->Command);
     }
 }
 
@@ -132,13 +126,12 @@ void vtkKWDialog::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  vtkKWObject::Script(app,"toplevel %s %s",wname,args);
-  vtkKWObject::Script(app,"wm title %s \"Kitware Dialog\"",wname);
-  vtkKWObject::Script(app,"wm iconname %s \"Dialog\"",wname);
-  vtkKWObject::Script(app,
-		      "wm protocol %s WM_DELETE_WINDOW {%s Cancel}",
-		      wname, this->GetTclName());
-  vtkKWObject::Script(app,"wm withdraw %s",wname);
+  this->Script("toplevel %s %s",wname,args);
+  this->Script("wm title %s \"Kitware Dialog\"",wname);
+  this->Script("wm iconname %s \"Dialog\"",wname);
+  this->Script("wm protocol %s WM_DELETE_WINDOW {%s Cancel}",
+               wname, this->GetTclName());
+  this->Script("wm withdraw %s",wname);
 }
 
 void vtkKWDialog::SetCommand(char *format, ...)

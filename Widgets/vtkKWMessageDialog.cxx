@@ -31,7 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWMessageDialog* vtkKWMessageDialog::New()
 {
   // First try to create the object from the vtkObjectFactory
@@ -78,16 +78,16 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, char *args)
   this->ButtonFrame->Create(app,"frame","");
   this->OKButton->Create(app,"button","-text OK -width 16");
   this->OKButton->SetCommand("{%s OK}",this->GetTclName());
-  vtkKWObject::Script(app,"pack %s -side left -padx 4 -expand yes",
-		      this->OKButton->GetWidgetName());
-  vtkKWObject::Script(app,"pack %s -side bottom -fill x -pady 4",
-		      this->ButtonFrame->GetWidgetName());
-  vtkKWObject::Script(app,"pack %s -side bottom -fill x -pady 4",
-		      this->Message->GetWidgetName());
+  this->Script("pack %s -side left -padx 4 -expand yes",
+               this->OKButton->GetWidgetName());
+  this->Script("pack %s -side bottom -fill x -pady 4",
+               this->ButtonFrame->GetWidgetName());
+  this->Script("pack %s -side bottom -fill x -pady 4",
+               this->Message->GetWidgetName());
 }
 
 void vtkKWMessageDialog::SetText(const char *txt)
 {
-  vtkKWObject::Script(this->Application,"%s configure -text {%s}",
-		      this->Message->GetWidgetName(),txt);
+  this->Script("%s configure -text {%s}",
+               this->Message->GetWidgetName(),txt);
 }

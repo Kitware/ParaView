@@ -125,7 +125,7 @@ const char *vtkKWObject::GetTclName()
   return this->TclName;
 }
 
-void vtkKWObject::Script(vtkKWApplication *app, char *format, ...)
+void vtkKWObject::Script(char *format, ...)
 {
   static char event[16000];
 
@@ -134,10 +134,13 @@ void vtkKWObject::Script(vtkKWApplication *app, char *format, ...)
   vsprintf(event, format, var_args);
   va_end(var_args);
 
-  if (Tcl_GlobalEval(app->GetMainInterp(), event) != TCL_OK)
+  if (this->Application)
     {
-    vtkGenericWarningMacro("Error returned from tcl script.\n" <<
-			   app->GetMainInterp()->result << endl);
+    this->Application->SimpleScript(event);
+    }
+  else
+    {
+    vtkWarningMacro("Attempt to script a command without a KWApplication");
     }
 }
 

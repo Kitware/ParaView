@@ -65,8 +65,7 @@ vtkKWWidget::~vtkKWWidget()
   
   if (this->Application)
     {
-    vtkKWObject::Script(this->Application, 
-      "destroy %s",this->GetWidgetName());
+    this->Script("destroy %s",this->GetWidgetName());
     }
   if (this->WidgetName)
     {
@@ -135,7 +134,7 @@ void vtkKWWidget::Create(vtkKWApplication *app, char *name, char *args)
     return;
     }
   this->SetApplication(app);
-  vtkKWObject::Script(app,"%s %s %s",name,this->GetWidgetName(),args);
+  this->Script("%s %s %s",name,this->GetWidgetName(),args);
 }
 
 int  vtkKWWidget::GetNetReferenceCount() 

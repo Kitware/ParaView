@@ -237,10 +237,9 @@ void vtkKWView::CreateDefaultPropertiesParent()
     this->PropertiesParent = vtkKWWidget::New();
     this->PropertiesParent->SetParent(this);
     this->PropertiesParent->Create(this->Application,"frame","-bd 0");
-    vtkKWObject::Script(this->Application,
-			"pack %s -before %s -fill y -side left -anchor nw",
-			this->PropertiesParent->GetWidgetName(),
-			this->Frame->GetWidgetName());
+    this->Script("pack %s -before %s -fill y -side left -anchor nw",
+                 this->PropertiesParent->GetWidgetName(),
+                 this->Frame->GetWidgetName());
     }
   else
     {
@@ -260,57 +259,55 @@ void vtkKWView::CreateViewProperties()
   this->AnnotationProperties->SetParent
     (this->Notebook->GetFrame("Anno"));
   this->AnnotationProperties->Create(app,"frame","");
-  vtkKWObject::Script(this->Application,"pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-    this->Notebook->GetWidgetName());
-  vtkKWObject::Script(this->Application,"pack %s -pady 2 -fill both -expand yes -anchor n",
-    this->AnnotationProperties->GetWidgetName());
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
+  this->Script("pack %s -pady 2 -fill both -expand yes -anchor n",
+               this->AnnotationProperties->GetWidgetName());
   this->Notebook->Raise("Anno");
-
+  
   // create the anno widgets
   this->HeaderButton->Create(this->Application,
-                           "-text {Display Header Annotation}");
+                             "-text {Display Header Annotation}");
   this->HeaderButton->SetCommand("{%s OnDisplayHeader}",
                                  this->GetTclName());
-  vtkKWObject::Script(this->Application,"pack %s -padx 2 -pady 4 -anchor nw",
-                      this->HeaderButton->GetWidgetName());
+  this->Script("pack %s -padx 2 -pady 4 -anchor nw",
+               this->HeaderButton->GetWidgetName());
   this->HeaderLabel->Create(app,"label","-text Header");
   this->HeaderEntry->Create(app,"-width 28");
-  vtkKWObject::Script(app,
-		      "bind %s <Return> {%s HeaderChanged}",
-		      this->HeaderEntry->GetWidgetName(), 
-                      this->GetTclName());
-  vtkKWObject::Script(app,"pack %s -side top -anchor w -padx 4 -expand yes",
-    this->HeaderLabel->GetWidgetName());
-  vtkKWObject::Script(app,"pack %s -side top -anchor w -padx 4 -expand yes -fill x",
-    this->HeaderEntry->GetWidgetName());
-
+  this->Script("bind %s <Return> {%s HeaderChanged}",
+               this->HeaderEntry->GetWidgetName(),this->GetTclName());
+  this->Script("pack %s -side top -anchor w -padx 4 -expand yes",
+               this->HeaderLabel->GetWidgetName());
+  this->Script("pack %s -side top -anchor w -padx 4 -expand yes -fill x",
+               this->HeaderEntry->GetWidgetName());
+  
   this->CornerButton->Create(this->Application,
-                           "-text {Display Corner Annotation}");
+                             "-text {Display Corner Annotation}");
   this->CornerButton->SetCommand("{%s OnDisplayCorner}",
                                  this->GetTclName());
-  vtkKWObject::Script(this->Application,"pack %s -padx 2 -pady 4 -anchor nw",
-                      this->CornerButton->GetWidgetName());
+  this->Script("pack %s -padx 2 -pady 4 -anchor nw",
+               this->CornerButton->GetWidgetName());
   this->CornerLabel->Create(app,"label","-text {Corner Text}");
   this->CornerText->Create(app,"-height 4 -width 28");
-  vtkKWObject::Script(app,"bind %s <Return> {%s CornerChanged}",
-                      this->CornerText->GetWidgetName(), 
-                      this->GetTclName());
-  vtkKWObject::Script(app,"pack %s -side top -anchor w -padx 4 -expand yes",
-    this->CornerLabel->GetWidgetName());
-  vtkKWObject::Script(app,"pack %s -side top -anchor w -padx 4 -expand yes -fill x",
-    this->CornerText->GetWidgetName());
-
+  this->Script("bind %s <Return> {%s CornerChanged}",
+               this->CornerText->GetWidgetName(), 
+               this->GetTclName());
+  this->Script("pack %s -side top -anchor w -padx 4 -expand yes",
+               this->CornerLabel->GetWidgetName());
+  this->Script("pack %s -side top -anchor w -padx 4 -expand yes -fill x",
+               this->CornerText->GetWidgetName());
+  
   this->CornerOptions->Create(this->Application,"");
   this->CornerOptions->AddEntryWithCommand("Lower Left",this->GetTclName(),
-					  "CornerSelected 0");
+                                           "CornerSelected 0");
   this->CornerOptions->AddEntryWithCommand("Upper Left",this->GetTclName(),
-					  "CornerSelected 1");
+                                           "CornerSelected 1");
   this->CornerOptions->AddEntryWithCommand("Lower Right",this->GetTclName(),
-					  "CornerSelected 2");
+                                           "CornerSelected 2");
   this->CornerOptions->AddEntryWithCommand("Upper Right",this->GetTclName(),
-					  "CornerSelected 3");
+                                           "CornerSelected 3");
   this->CornerOptions->SetCurrentEntry("Lower Left");
-  vtkKWObject::Script(app,"pack %s -side top -anchor w -padx 4 -expand yes",
+  this->Script("pack %s -side top -anchor w -padx 4 -expand yes",
     this->CornerOptions->GetWidgetName());
 }
 
@@ -323,18 +320,17 @@ void vtkKWView::ShowViewProperties()
     }
   
   // unpack any current children
-  vtkKWObject::Script(this->Application,
-    "catch {eval pack forget [pack slaves %s]}",
-    this->GetPropertiesParent()->GetWidgetName());
-
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->GetPropertiesParent()->GetWidgetName());
+  
   // do we need to create the props ?
   if (!this->PropertiesCreated)
     {
     this->CreateViewProperties();
     this->PropertiesCreated = 1;
     }
-  vtkKWObject::Script(this->Application,"pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-    this->Notebook->GetWidgetName());
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
 }
 
 void vtkKWView::SetSelectedComposite(vtkKWComposite *_arg)
@@ -378,8 +374,7 @@ void vtkKWView::RemoveComposite(vtkKWComposite *c)
 
 void vtkKWView::Enter(int x, int y)
 {
-  vtkKWObject::Script(this->Application,
-		      "focus %s",this->VTKWidget->GetWidgetName());
+  this->Script("focus %s",this->VTKWidget->GetWidgetName());
 }
 
 void vtkKWView::Print()
@@ -424,9 +419,8 @@ void vtkKWView::Print()
     GlobalFree(pd.hDevNames);
     }
   
-  vtkKWObject::Script(this->Application,
-		      "%s configure -cursor watch; update",
-                      this->ParentWindow->GetWidgetName());  
+  this->Script("%s configure -cursor watch; update",
+               this->ParentWindow->GetWidgetName());  
 
   di.cbSize      = sizeof(DOCINFO);
   di.lpszDocName = "Kitware Test";
@@ -503,17 +497,15 @@ void vtkKWView::Print()
   DeleteDC  (ghdc);
 
   this->SetRenderMode(oldrm);
-  vtkKWObject::Script(this->Application,
-                      "%s configure -cursor top_left_arrow",
-                      this->ParentWindow->GetWidgetName());
+  this->Script("%s configure -cursor top_left_arrow",
+               this->ParentWindow->GetWidgetName());
 #else
 
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
   w2i->SetInput(vtkWin);
   w2i->Update();
   
-  vtkKWObject::Script(this->Application,
-		      "tk_getSaveFile -title \"Save Postscript\" -filetypes {{{Postscript} {.ps}}}");
+  this->Script("tk_getSaveFile -title \"Save Postscript\" -filetypes {{{Postscript} {.ps}}}");
   char *path = strdup(this->Application->GetMainInterp()->result);
   if (strlen(path) != 0)
     {
@@ -655,37 +647,34 @@ void vtkKWView::EditCopy()
 void vtkKWView::Select(vtkKWWindow *pw)
 {
   // now add property options
-  vtkKWObject::Script(this->Application,
-		      "%s insert 0 command -label \"View\" -command {%s ShowViewProperties}",
-		      this->GetParentWindow()->GetMenuProperties()->GetWidgetName(), 
-		      this->GetTclName());
+  this->Script(
+    "%s insert 0 command -label \"View\" -command {%s ShowViewProperties}",
+    this->GetParentWindow()->GetMenuProperties()->GetWidgetName(), 
+    this->GetTclName());
 
   // add the Print option
-  vtkKWObject::Script(this->Application,
-		      "%s insert %d command -label {Print} -command {%s Print}",
-		      this->ParentWindow->GetMenuFile()->GetWidgetName(), 
-                      this->ParentWindow->GetFileMenuIndex(),
-		      this->GetTclName());
-
+  this->Script("%s insert %d command -label {Print} -command {%s Print}",
+               this->ParentWindow->GetMenuFile()->GetWidgetName(), 
+               this->ParentWindow->GetFileMenuIndex(),
+               this->GetTclName());
+  
   // add the save as image option
-  vtkKWObject::Script(this->Application,
-		      "%s insert %d command -label {Save As Image} -command {%s SaveAsImage}",
-		      this->ParentWindow->GetMenuFile()->GetWidgetName(), 
-                      this->ParentWindow->GetFileMenuIndex(),
-		      this->GetTclName());
+  this->Script(
+    "%s insert %d command -label {Save As Image} -command {%s SaveAsImage}",
+    this->ParentWindow->GetMenuFile()->GetWidgetName(), 
+    this->ParentWindow->GetFileMenuIndex(),
+    this->GetTclName());
   
 #ifdef _WIN32
   // add the edit copy option
-  vtkKWObject::Script(this->Application,
-		      "%s add command -label \"Copy\" -command {%s EditCopy}",
-		      this->ParentWindow->GetMenuEdit()->GetWidgetName(), 
-		      this->GetTclName());
+  this->Script(
+    "%s add command -label \"Copy\" -command {%s EditCopy}",
+    this->ParentWindow->GetMenuEdit()->GetWidgetName(), 
+    this->GetTclName());
 #endif
   // change the color of the frame
-  vtkKWObject::Script(this->Application,"%s configure -bg #008",
-		      this->Label->GetWidgetName());
-  vtkKWObject::Script(this->Application,"%s configure -bg #008",
-		      this->Frame2->GetWidgetName());
+  this->Script("%s configure -bg #008", this->Label->GetWidgetName());
+  this->Script("%s configure -bg #008", this->Frame2->GetWidgetName());
   
   // forward to selected composite
   if (this->SelectedComposite)
@@ -696,9 +685,8 @@ void vtkKWView::Select(vtkKWWindow *pw)
   // map the property sheet as needed
   if (this->SharedPropertiesParent)
     {
-    vtkKWObject::Script(this->Application,
-			"pack %s -side left -anchor nw -fill y",
-			this->PropertiesParent->GetWidgetName());
+    this->Script("pack %s -side left -anchor nw -fill y",
+                 this->PropertiesParent->GetWidgetName());
     }
 }
 
@@ -706,23 +694,17 @@ void vtkKWView::Select(vtkKWWindow *pw)
 
 void vtkKWView::Deselect(vtkKWWindow *pw)
 {
-  vtkKWObject::Script(this->Application, "%s delete View",
-                      pw->GetMenuProperties()->GetWidgetName());
-
-  vtkKWObject::Script(this->Application, "%s delete Print",
-		                  pw->GetMenuFile()->GetWidgetName());
-  vtkKWObject::Script(this->Application, "%s delete {Save As Image}",
-		                  pw->GetMenuFile()->GetWidgetName());
+  this->Script( "%s delete View", pw->GetMenuProperties()->GetWidgetName());
+  this->Script( "%s delete Print", pw->GetMenuFile()->GetWidgetName());
+  this->Script( "%s delete {Save As Image}",
+                pw->GetMenuFile()->GetWidgetName());
 #ifdef _WIN32
   // add the edit copy option
-  vtkKWObject::Script(this->Application, "%s delete Copy",
-		                  pw->GetMenuEdit()->GetWidgetName());
+  this->Script( "%s delete Copy", pw->GetMenuEdit()->GetWidgetName());
 #endif
   // change the color of the frame
-  vtkKWObject::Script(this->Application,"%s configure -bg #888",
-		      this->Label->GetWidgetName());
-  vtkKWObject::Script(this->Application,"%s configure -bg #888",
-		      this->Frame2->GetWidgetName());
+  this->Script("%s configure -bg #888", this->Label->GetWidgetName());
+  this->Script("%s configure -bg #888", this->Frame2->GetWidgetName());
   
   // forward to selected composite
   if (this->SelectedComposite)
@@ -733,9 +715,7 @@ void vtkKWView::Deselect(vtkKWWindow *pw)
   // forget the properties parent as necc
   if (this->SharedPropertiesParent)
     {
-    vtkKWObject::Script(this->Application,
-			"pack forget %s",
-			this->PropertiesParent->GetWidgetName());
+    this->Script("pack forget %s", this->PropertiesParent->GetWidgetName());
     }
 }
 
@@ -750,43 +730,36 @@ void vtkKWView::MakeSelected()
 
 void vtkKWView::SetupBindings()
 {
-  vtkKWApplication *app = this->Application;
   const char *wname = this->VTKWidget->GetWidgetName();
   const char *tname = this->GetTclName();
 
   // setup some default bindings
-  vtkKWObject::Script(app,
-    "bind %s <Expose> {%s Exposed}",wname,tname);
+  this->Script("bind %s <Expose> {%s Exposed}",wname,tname);
   
-  vtkKWObject::Script(app,
-    "bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y}",
-    wname, tname);
+  this->Script("bind %s <Any-ButtonPress> {%s AButtonPress %%b %%x %%y}",
+               wname, tname);
 
-  vtkKWObject::Script(app,
-    "bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
-    wname, tname);
+  this->Script("bind %s <Any-ButtonRelease> {%s AButtonRelease %%b %%x %%y}",
+               wname, tname);
 
-  vtkKWObject::Script(app,
-    "bind %s <B1-Motion> {%s Button1Motion %%x %%y}",
-    wname, tname);
+  this->Script("bind %s <B1-Motion> {%s Button1Motion %%x %%y}",
+               wname, tname);
 
-  vtkKWObject::Script(app,
-    "bind %s <B2-Motion> {%s Button2Motion %%x %%y}", wname, tname);
+  this->Script("bind %s <B2-Motion> {%s Button2Motion %%x %%y}", 
+               wname, tname);
+  
+  this->Script("bind %s <B3-Motion> {%s Button3Motion %%x %%y}", 
+               wname, tname);
 
-  vtkKWObject::Script(app,
-    "bind %s <B3-Motion> {%s Button3Motion %%x %%y}", wname, tname);
+  this->Script("bind %s <Shift-B1-Motion> {%s Button2Motion %%x %%y}", 
+               wname, tname);
 
-  vtkKWObject::Script(app,
-    "bind %s <Shift-B1-Motion> {%s Button2Motion %%x %%y}", 
-		      wname, tname);
+  this->Script("bind %s <KeyPress> {%s AKeyPress %%A %%x %%y}", 
+               wname, tname);
+  
+  this->Script("bind %s <Enter> {%s Enter %%x %%y}", wname, tname);
 
-  vtkKWObject::Script(app,
-    "bind %s <KeyPress> {%s AKeyPress %%A %%x %%y}", wname, tname);
-
-  vtkKWObject::Script(app,
-    "bind %s <Enter> {%s Enter %%x %%y}", wname, tname);
-
-  //vtkKWObject::Script(app,
+  //this->Script(
   //  "bind %s <Leave> {%s Leave %%x %%y}", wname, tname);
 }
 
@@ -838,9 +811,9 @@ void vtkKWView::SetParentWindow(vtkKWWindow *_arg)
 
 void vtkKWView::SetTitle(char *title)
 {
-  vtkKWObject::Script(this->Application,"%s configure -text {%s}",
-		      this->Label->GetWidgetName(), title);
-  vtkKWObject::Script(this->Application,"update idletasks");
+  this->Script("%s configure -text {%s}", 
+               this->Label->GetWidgetName(), title);
+  this->Script("update idletasks");
 }
 
 void vtkKWView::OnDisplayHeader() 

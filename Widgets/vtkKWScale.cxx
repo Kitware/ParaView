@@ -90,15 +90,14 @@ vtkKWScale::~vtkKWScale()
 
 void vtkKWScale::SetValue(float s)
 {
-  vtkKWObject::Script(this->Application,"%s set %f",
-		      this->ScaleWidget->GetWidgetName(),s);
+  this->Script("%s set %f", this->ScaleWidget->GetWidgetName(),s);
   if (this->Entry)
     {
     this->Entry->SetValue(s,0);
     }
   this->Value = s;
 
-  vtkKWObject::Script(this->Application, "update idletasks");
+  this->Script( "update idletasks");
 }
 
 
@@ -117,20 +116,19 @@ void vtkKWScale::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  vtkKWObject::Script(app,"frame %s",wname);
+  this->Script("frame %s",wname);
   this->ScaleWidget->Create(app,"scale","-orient horizontal -showvalue no");
-  vtkKWObject::Script(this->Application,"%s configure %s",
-		      this->ScaleWidget->GetWidgetName(),args);
+  this->Script("%s configure %s",this->ScaleWidget->GetWidgetName(),args);
   this->ScaleWidget->SetCommand("{%s ScaleValueChanged}",this->GetTclName());
-  vtkKWObject::Script(app,"pack %s -side bottom -fill x -expand yes",
-		      this->ScaleWidget->GetWidgetName());
+  this->Script("pack %s -side bottom -fill x -expand yes",
+               this->ScaleWidget->GetWidgetName());
 
 }
 
 void vtkKWScale::SetRange(float min, float max)
 {
-  vtkKWObject::Script(this->Application,"%s configure -from %f -to %f",
-		      this->ScaleWidget->GetWidgetName(),min,max);
+  this->Script("%s configure -from %f -to %f",
+               this->ScaleWidget->GetWidgetName(),min,max);
 }
 
 
@@ -143,17 +141,13 @@ void vtkKWScale::DisplayEntry()
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->Entry->Create(this->Application,"-width 10");
-  vtkKWObject::Script(this->Application,
-		      "bind %s <Return> {%s EntryValueChanged}",
-		      this->Entry->GetWidgetName(), this->GetTclName());
-  vtkKWObject::Script(this->Application,
-		      "bind %s <ButtonPress> {%s InvokeStartCommand}",
-		      this->ScaleWidget->GetWidgetName(), this->GetTclName());
-  vtkKWObject::Script(this->Application,
-		      "bind %s <ButtonRelease> {%s InvokeEndCommand}",
-		      this->ScaleWidget->GetWidgetName(), this->GetTclName());
-  vtkKWObject::Script(this->Application,"pack %s -side right",
-		      this->Entry->GetWidgetName());
+  this->Script("bind %s <Return> {%s EntryValueChanged}",
+               this->Entry->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <ButtonPress> {%s InvokeStartCommand}",
+               this->ScaleWidget->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <ButtonRelease> {%s InvokeEndCommand}",
+               this->ScaleWidget->GetWidgetName(), this->GetTclName());
+  this->Script("pack %s -side right", this->Entry->GetWidgetName());
 }
 
 void vtkKWScale::DisplayLabel(const char *name)
@@ -167,24 +161,22 @@ void vtkKWScale::DisplayLabel(const char *name)
   char temp[1024];
   sprintf(temp,"-text {%s}",name);
   this->ScaleLabel->Create(this->Application,"label",temp);
-  vtkKWObject::Script(this->Application,"pack %s -side left",
-		      this->ScaleLabel->GetWidgetName());
+  this->Script("pack %s -side left",
+               this->ScaleLabel->GetWidgetName());
 }
 
 void vtkKWScale::EntryValueChanged()
 {
   this->Value = this->Entry->GetValueAsFloat();
-  vtkKWObject::Script(this->Application,"%s set %f",
-		      this->ScaleWidget->GetWidgetName(), 
-		      this->Value);
-  vtkKWObject::Script(this->Application,"eval %s",this->Command);
+  this->Script("%s set %f", this->ScaleWidget->GetWidgetName(), this->Value);
+  this->Script("eval %s",this->Command);
 }
 
 void vtkKWScale::InvokeStartCommand()
 {
   if ( this->StartCommand )
     {
-    vtkKWObject::Script(this->Application,"eval %s",this->StartCommand);
+    this->Script("eval %s",this->StartCommand);
     }
 }
 
@@ -192,7 +184,7 @@ void vtkKWScale::InvokeEndCommand()
 {
   if ( this->EndCommand )
     {
-    vtkKWObject::Script(this->Application,"eval %s",this->EndCommand);
+    this->Script("eval %s",this->EndCommand);
     }
 }
 
@@ -203,7 +195,7 @@ void vtkKWScale::ScaleValueChanged(float num)
     {
     this->Entry->SetValue(this->Value,0);
     }
-  vtkKWObject::Script(this->Application,"eval %s",this->Command);
+  this->Script("eval %s",this->Command);
 }
 
 void vtkKWScale::SetCommand(char *format, ...)

@@ -122,18 +122,18 @@ void vtkKWComposite::CreateProperties()
     // create and use a toplevel shell
     this->TopLevel = vtkKWWidget::New();
     this->TopLevel->Create(app,"toplevel","");
-    vtkKWObject::Script(app,"wm title %s \"Properties\"",
-			this->TopLevel->GetWidgetName());
-    vtkKWObject::Script(app,"wm iconname %s \"Properties\"",
-			this->TopLevel->GetWidgetName());
+    this->Script("wm title %s \"Properties\"",
+                 this->TopLevel->GetWidgetName());
+    this->Script("wm iconname %s \"Properties\"",
+                 this->TopLevel->GetWidgetName());
     this->Notebook->SetParent(this->TopLevel);
     this->Notebook2->SetParent(this->TopLevel);
     }
   this->Notebook->Create(this->Application,"");
   this->Notebook2->Create(this->Application,"");
 
-  vtkKWObject::Script(this->Application,"pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-    this->Notebook->GetWidgetName());
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
 }
 
 void vtkKWComposite::Select(vtkKWView *v)

@@ -128,50 +128,48 @@ void vtkKWNotebook::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  vtkKWObject::Script(app,"frame %s -width %d -height %d -borderwidth 0 -relief flat %s",
-                      wname, this->MinimumWidth, this->MinimumHeight, args);
+  this->Script("frame %s -width %d -height %d -borderwidth 0 -relief flat %s",
+               wname, this->MinimumWidth, this->MinimumHeight, args);
 
   this->TabsFrame->Create(app,"frame","-borderwidth 0 -relief flat");
-  vtkKWObject::Script(app,"bind %s <Configure> {%s ScheduleResize}",
-                      this->TabsFrame->GetWidgetName(),
-                      this->GetTclName());
+  this->Script("bind %s <Configure> {%s ScheduleResize}",
+               this->TabsFrame->GetWidgetName(), this->GetTclName());
   this->Body->Create(app,"frame","-borderwidth 2 -relief raised");
-  vtkKWObject::Script(app,"bind %s <Configure> {%s ScheduleResize}",
-                      this->Body->GetWidgetName(),
-                      this->GetTclName());
+  this->Script("bind %s <Configure> {%s ScheduleResize}",
+               this->Body->GetWidgetName(), this->GetTclName());
   this->Mask->Create(app,"frame","-borderwidth 0 -relief flat");
   this->MaskLeft->Create(app,"frame","-borderwidth 0 -relief flat");
 #ifdef _WIN32
   this->MaskLeft2->Create(app,"frame","-borderwidth 2 -relief raised");
-  vtkKWObject::Script(app,"place %s -x 0 -y %d -width %d -height %d",
-                      this->MaskLeft2->GetWidgetName(), -this->BorderWidth,
-                      2*this->BorderWidth, 4*this->BorderWidth);  
+  this->Script("place %s -x 0 -y %d -width %d -height %d",
+               this->MaskLeft2->GetWidgetName(), -this->BorderWidth,
+               2*this->BorderWidth, 4*this->BorderWidth);  
 #else
   this->MaskLeft2->Create(app,"frame","-borderwidth 2 -relief sunken");
-  vtkKWObject::Script(app,"place %s -x %d -y %d -width %d -height %d",
-                      this->MaskLeft2->GetWidgetName(), 
-		      -this->BorderWidth, -this->BorderWidth,
-                      2*this->BorderWidth, 3*this->BorderWidth);
+  this->Script("place %s -x %d -y %d -width %d -height %d",
+               this->MaskLeft2->GetWidgetName(), 
+               -this->BorderWidth, -this->BorderWidth,
+               2*this->BorderWidth, 3*this->BorderWidth);
 #endif
 
   this->MaskRight->Create(app,"frame","-borderwidth 0 -relief flat");
 
 #ifdef _WIN32
   this->MaskRight2->Create(app,"frame","-borderwidth 2 -relief raised");
-  vtkKWObject::Script(app,"place %s -x %d -y %d -width %d -height %d",
-                      this->MaskRight2->GetWidgetName(), -this->BorderWidth,
-                      -this->BorderWidth, 2*this->BorderWidth, 
-                      4*this->BorderWidth);
+  this->Script("place %s -x %d -y %d -width %d -height %d",
+               this->MaskRight2->GetWidgetName(), -this->BorderWidth,
+               -this->BorderWidth, 2*this->BorderWidth, 
+               4*this->BorderWidth);
 #else
   this->MaskRight2->Create(app,"frame","-borderwidth 2 -relief sunken");
-  vtkKWObject::Script(app,"place %s -x 0 -y %d -width %d -height %d",
+  this->Script("place %s -x 0 -y %d -width %d -height %d",
                       this->MaskRight2->GetWidgetName(),
                       -this->BorderWidth, 2*this->BorderWidth, 
                       3*this->BorderWidth);
 #endif
   
-  vtkKWObject::Script(app,"place %s -x 0 -y 0 -relwidth 1.0 -relheight 1.0",
-                      this->Body->GetWidgetName());
+  this->Script("place %s -x 0 -y 0 -relwidth 1.0 -relheight 1.0",
+               this->Body->GetWidgetName());
   
 }
 
@@ -188,11 +186,11 @@ void vtkKWNotebook::Raise(int num)
     {
     if (this->Current >= 0)
       {
-      vtkKWObject::Script(app,"pack forget %s",
-                          this->Frames[this->Current]->GetWidgetName());
+      this->Script("pack forget %s",
+                   this->Frames[this->Current]->GetWidgetName());
       }
-    vtkKWObject::Script(app,"pack %s -fill both -anchor n",
-                        this->Frames[num]->GetWidgetName());
+    this->Script("pack %s -fill both -anchor n",
+                 this->Frames[num]->GetWidgetName());
     }
 
   this->Current = num;
@@ -203,19 +201,17 @@ void vtkKWNotebook::Raise(int num)
     }
   
   int bw = this->BorderWidth;
-  vtkKWObject::Script(app,"winfo x %s",this->Buttons[num]->GetWidgetName());
+  this->Script("winfo x %s",this->Buttons[num]->GetWidgetName());
   int xb = vtkKWObject::GetIntegerResult(app);
-  vtkKWObject::Script(app,"winfo y %s",this->Buttons[num]->GetWidgetName());
+  this->Script("winfo y %s",this->Buttons[num]->GetWidgetName());
   int yb = vtkKWObject::GetIntegerResult(app);
-  vtkKWObject::Script(app,"winfo x %s",this->TabsFrame->GetWidgetName());
+  this->Script("winfo x %s",this->TabsFrame->GetWidgetName());
   int x = vtkKWObject::GetIntegerResult(app);
-  vtkKWObject::Script(app,"winfo y %s",this->TabsFrame->GetWidgetName());
+  this->Script("winfo y %s",this->TabsFrame->GetWidgetName());
   int y = vtkKWObject::GetIntegerResult(app);
-  vtkKWObject::Script(app,"winfo height %s",
-                      this->Buttons[num]->GetWidgetName());
+  this->Script("winfo height %s", this->Buttons[num]->GetWidgetName());
   int height = vtkKWObject::GetIntegerResult(app);
-  vtkKWObject::Script(app,"winfo width %s",
-                      this->Buttons[num]->GetWidgetName());
+  this->Script("winfo width %s", this->Buttons[num]->GetWidgetName());
   int width = vtkKWObject::GetIntegerResult(app);
   
   int x0 = xb + x + bw;
@@ -226,15 +222,15 @@ void vtkKWNotebook::Raise(int num)
 #else
   int h0 = bw * 2;
 #endif
-  vtkKWObject::Script(app,"place %s -x %d -y %d -width %d -height %d",
-                      this->Mask->GetWidgetName(),x0,y0,w0,h0);
+  this->Script("place %s -x %d -y %d -width %d -height %d",
+               this->Mask->GetWidgetName(),x0,y0,w0,h0);
   
   int x1 = x0 - bw;
   int y1 = y0;
   int w1 = bw;
   int h1 = h0;
-  vtkKWObject::Script(app,"place %s -x %d -y %d -width %d -height %d",
-                      this->MaskLeft->GetWidgetName(),x1,y1,w1,h1);
+  this->Script("place %s -x %d -y %d -width %d -height %d",
+               this->MaskLeft->GetWidgetName(),x1,y1,w1,h1);
   
   int x2 = x0 + w0;
   int y2 = y0;
@@ -244,8 +240,8 @@ void vtkKWNotebook::Raise(int num)
 #else
   int h2 = h0;
 #endif
-  vtkKWObject::Script(app,"place %s -x %d -y %d -width %d -height %d",
-                      this->MaskRight->GetWidgetName(),x2,y2,w2,h2);
+  this->Script("place %s -x %d -y %d -width %d -height %d",
+               this->MaskRight->GetWidgetName(),x2,y2,w2,h2);
 }
 
 
@@ -331,28 +327,26 @@ void vtkKWNotebook::AddPage(char *title)
   this->Buttons[this->NumberOfPages]->Create(this->Application,"button",
 					     "-bd 2 -highlightthickness 0");
 
-  vtkKWObject::Script(this->Application,
-                      "%s configure -text {%s} -borderwidth %d -command {%s Raise %d}",
-                      this->Buttons[this->NumberOfPages]->GetWidgetName(),
-                      this->Titles[this->NumberOfPages], this->BorderWidth,
-                      this->GetTclName(),this->NumberOfPages);
-  vtkKWObject::Script(this->Application,
-                      "pack %s -side left -pady 0 -padx %d -fill y",
-                      this->Buttons[this->NumberOfPages]->GetWidgetName(),
-                      this->Pad);
-  vtkKWObject::Script(this->Application,
-                      "bind %s  <Configure> {%s RaiseCurrent}",
-                      this->Buttons[this->NumberOfPages]->GetWidgetName(),
-                      this->GetTclName(),this->NumberOfPages);
+  this->Script(
+    "%s configure -text {%s} -borderwidth %d -command {%s Raise %d}",
+    this->Buttons[this->NumberOfPages]->GetWidgetName(),
+    this->Titles[this->NumberOfPages], this->BorderWidth,
+    this->GetTclName(),this->NumberOfPages);
+  this->Script("pack %s -side left -pady 0 -padx %d -fill y",
+               this->Buttons[this->NumberOfPages]->GetWidgetName(),
+               this->Pad);
+  this->Script("bind %s  <Configure> {%s RaiseCurrent}",
+               this->Buttons[this->NumberOfPages]->GetWidgetName(),
+               this->GetTclName(),this->NumberOfPages);
   
   this->NumberOfPages++;
   
   if (this->NumberOfPages == 2)
     {
-    vtkKWObject::Script(this->Application,"place %s -x 0 -y 0 -relwidth 1.0 -height %d",
-                        this->TabsFrame->GetWidgetName(), this->Height);
-    vtkKWObject::Script(this->Application,"place %s -x 0 -y %d -relwidth 1.0 -relheight 1.0 -height %d",
-                        this->Body->GetWidgetName(), this->Height, -this->Height);
+    this->Script("place %s -x 0 -y 0 -relwidth 1.0 -height %d",
+                 this->TabsFrame->GetWidgetName(), this->Height);
+    this->Script("place %s -x 0 -y %d -relwidth 1.0 -relheight 1.0 -height %d",
+                 this->Body->GetWidgetName(), this->Height, -this->Height);
     }
   
   if (this->NumberOfPages == 1)
@@ -368,22 +362,18 @@ void vtkKWNotebook::ScheduleResize()
     return;
     }
   this->Expanding = 1;
-  vtkKWObject::Script(this->Application,"after idle {%s Resize}",
-                      this->GetTclName());
+  this->Script("after idle {%s Resize}", this->GetTclName());
 }
 
 void vtkKWNotebook::Resize()
 {
-  vtkKWObject::Script(this->Application,"winfo reqwidth %s",
-                      this->Body->GetWidgetName());
+  this->Script("winfo reqwidth %s",this->Body->GetWidgetName());
   int width = vtkKWObject::GetIntegerResult(this->Application) +
     this->BorderWidth*2 + 4;
-  vtkKWObject::Script(this->Application,"winfo reqwidth %s",
-                      this->TabsFrame->GetWidgetName());
+  this->Script("winfo reqwidth %s", this->TabsFrame->GetWidgetName());
   int twidth = vtkKWObject::GetIntegerResult(this->Application);
-  vtkKWObject::Script(this->Application,"winfo reqheight %s",
-                      this->Body->GetWidgetName());
-
+  this->Script("winfo reqheight %s", this->Body->GetWidgetName());
+  
   int height;
   if (this->NumberOfPages <= 1)
     {
@@ -420,9 +410,8 @@ void vtkKWNotebook::Resize()
     height = this->MinimumHeight;
     }
 
-  vtkKWObject::Script(this->Application,
-                      "%s configure -width %d -height %d",
-                      this->GetWidgetName(),width, height);
+  this->Script("%s configure -width %d -height %d",
+               this->GetWidgetName(),width, height);
   this->Expanding = 0;
 }
 
