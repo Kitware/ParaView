@@ -51,17 +51,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkFieldDataToAttributeDataFilter.h"
 
 
-class VTK_EXPORT vtkSimpleFieldDataToAttributeDataFilter : public vtkFieldDataToAttributeDataFilter
+class VTK_EXPORT vtkSimpleFieldDataToAttributeDataFilter : public vtkDataSetToDataSetFilter
 {
 public:
   void PrintSelf(ostream& os, vtkIndent indent);
-  vtkTypeMacro(vtkSimpleFieldDataToAttributeDataFilter,vtkFieldDataToAttributeDataFilter);
+  vtkTypeMacro(vtkSimpleFieldDataToAttributeDataFilter,vtkDataSetToDataSetFilter);
   static vtkSimpleFieldDataToAttributeDataFilter *New();
 
   // Description:
   // Select point data or cell data. 0 point and 1 cell.
-  vtkSetMacro(AttributeType, int);
-  vtkGetMacro(AttributeType, int);
+  //vtkSetMacro(AttributeType, int);
+  //vtkGetMacro(AttributeType, int);
 
   // Description:
   // Which field name:
@@ -81,7 +81,7 @@ protected:
 
   void Execute(); //generate output data
 
-  int AttributeType;
+  //int AttributeType;
   int Attribute;
   char *FieldName;
   

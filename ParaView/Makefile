@@ -18,6 +18,7 @@ vtkClipPlane \
 vtkCutMaterial \
 vtkCutPlane \
 vtkDummyRenderWindowInteractor \
+vtkFastGeometryFilter \
 vtkImageOutlineFilter \
 vtkInteractorStyleCamera \
 vtkInteractorStyleGridExtent \

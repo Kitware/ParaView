@@ -58,7 +58,7 @@ vtkSimpleFieldDataToAttributeDataFilter* vtkSimpleFieldDataToAttributeDataFilter
 // Instantiate object with no input and no defined output.
 vtkSimpleFieldDataToAttributeDataFilter::vtkSimpleFieldDataToAttributeDataFilter()
 {
-  this->AttributeType = 0;
+  //this->AttributeType = 0;
   this->Attribute = 0;
   this->FieldName = NULL;
 }
@@ -73,66 +73,58 @@ void vtkSimpleFieldDataToAttributeDataFilter::Execute()
   int num, i;
   vtkFieldData *field;
   vtkDataArray *array = NULL;
+  vtkDataSet *input;
+  vtkDataSet *output;
 
-  if (this->AttributeType == 0)
+  input = this->GetInput();
+  output = this->GetOutput();
+
+  output->ShallowCopy(input);
+
+  field = this->GetInput()->GetPointData()->GetFieldData();
+  if (field)
     {
-    this->SetInputFieldToPointDataField();
-    this->SetOutputAttributeDataToPointData();
-    field = this->GetInput()->GetPointData()->GetFieldData();
-    if (field)
-      {
-      array = field->GetArray(this->FieldName);
-      }
+    array = field->GetArray(this->FieldName);
     }
-  else
-    {
-    this->SetInputFieldToCellDataField();
-    this->SetOutputAttributeDataToCellData();
-    field = this->GetInput()->GetCellData()->GetFieldData();
-    if (field)
-      {
-      array = field->GetArray(this->FieldName);
-      }
-    else
-      {
-      vtkErrorMacro("No field data in this data set.");
-      return;
-      }
-   }
-
 
   if (array == NULL)
     {
     vtkErrorMacro("Could not find field array with name: " << this->FieldName);
     return;
     }
+
   num = array->GetNumberOfComponents();
   if (this->Attribute == 0)
-    {
-    for (i = 0; i < num; ++i)
-      {
-      this->SetScalarComponent(i, this->FieldName, i);
-      }
+    { // scalars
+    // Create a scalars object around the array. 
+    vtkScalars *scalars;
+    scalars = vtkScalars::New();
+    scalars->SetData(array);
+    output->GetPointData()->SetScalars(scalars);
+    scalars->Delete();
+    scalars = NULL;
     }
-  else if (this->Attribute == 1)
-    {
-    for (i = 0; i < num; ++i)
-      {
-      this->SetVectorComponent(i, this->FieldName, i);
-      }
-    }
+  else
+    { // vectors
+    // Create a vector object around the array. 
+    vtkVectors *vects;
+    vects = vtkVectors::New();
+    vects->SetData(array);
+    output->GetPointData()->SetVectors(vects);
+    vects->Delete();
+    vects = NULL;
 
-  this->vtkFieldDataToAttributeDataFilter::Execute();
+    }
 }
 
 
 void vtkSimpleFieldDataToAttributeDataFilter::PrintSelf(ostream& os, 
                                                   vtkIndent indent)
 {
-  vtkSimpleFieldDataToAttributeDataFilter::PrintSelf(os,indent);
+  vtkDataSetToDataSetFilter::PrintSelf(os,indent);
 
   os << indent << "Field Name: " << this->FieldName << endl;
-  os << indent << "AttributeType: " << this->AttributeType << endl;
+  //os << indent << "AttributeType: " << this->AttributeType << endl;
   os << indent << "Attribute: " << this->Attribute << endl;
 
 

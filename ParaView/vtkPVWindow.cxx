@@ -1555,6 +1555,56 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt = NULL;
 
 
+  // StructuredGrid to StructuredGrid Filters
+
+  // ---- ExtractGrid ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkExtractGrid");
+  sInt->SetRootName("ExtractGrid");
+  sInt->SetInputClassName("vtkStructuredGrid");
+  sInt->SetOutputClassName("vtkStructuredGrid");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("VOI");
+  mInt->SetSetCommand("SetVOI");
+  mInt->SetGetCommand("GetVOI");
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("SampleRate");
+  mInt->SetSetCommand("SetSampleRate");
+  mInt->SetGetCommand("GetSampleRate");
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("IncludeBoundary");
+  mInt->SetSetCommand("SetIncludeBoundary");
+  mInt->SetGetCommand("GetIncludeBoundary");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+
   // StructuredGrid to PolyData Filters
   
   // ---- Geometry ----.
@@ -1562,7 +1612,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
   sInt->SetSourceClassName("vtkStructuredGridGeometryFilter");
-  sInt->SetRootName("ExtractGeom");
+  sInt->SetRootName("GridGeom");
   sInt->SetInputClassName("vtkStructuredGrid");
   sInt->SetOutputClassName("vtkPolyData");
   // Method
@@ -1654,16 +1704,16 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetInputClassName("vtkDataSet");
   sInt->SetOutputClassName("vtkDataSet");
   // Method
-  mInt = vtkPVMethodInterface::New();
-  mInt->SetVariableName("AttributeType");
-  mInt->SetSetCommand("SetAttributeType");
-  mInt->SetGetCommand("GetAttributeType");
-  mInt->SetWidgetTypeToSelection();
-  mInt->AddSelectionEntry(0, "Point");
-  mInt->AddSelectionEntry(1, "Cell");
-  sInt->AddMethodInterface(mInt);
-  mInt->Delete();
-  mInt = NULL;  
+  //mInt = vtkPVMethodInterface::New();
+  //mInt->SetVariableName("AttributeType");
+  //mInt->SetSetCommand("SetAttributeType");
+  //mInt->SetGetCommand("GetAttributeType");
+  //mInt->SetWidgetTypeToSelection();
+  //mInt->AddSelectionEntry(0, "Point");
+  //mInt->AddSelectionEntry(1, "Cell");
+  //sInt->AddMethodInterface(mInt);
+  //mInt->Delete();
+  //mInt = NULL;  
   // Method
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Attribute");

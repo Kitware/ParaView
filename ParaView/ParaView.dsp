@@ -129,6 +129,14 @@ SOURCE=.\vtkDummyRenderWindowInteractorTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkFastGeometryFilter.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkFastGeometryFilterTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkImageOutlineFilter.cxx
 # End Source File
 # Begin Source File
@@ -209,6 +217,14 @@ SOURCE=.\vtkParallelDecimateTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPOPReader.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPOPReaderTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVActorComposite.cxx
 # End Source File
 # Begin Source File
@@ -270,6 +286,14 @@ SOURCE=.\vtkPVEnSightReaderInterface.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVEnSightReaderInterfaceTcl.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVGlyph3D.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVGlyph3DTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -455,6 +479,26 @@ InputName=vtkDummyRenderWindowInteractor
 # Begin Custom Build
 InputPath=.\vtkDummyRenderWindowInteractor.h
 InputName=vtkDummyRenderWindowInteractor
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkFastGeometryFilter.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkFastGeometryFilter.h
+InputName=vtkFastGeometryFilter
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
@@ -684,6 +728,26 @@ InputName=vtkParallelDecimate
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPOPReader.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPOPReader.h
+InputName=vtkPOPReader
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVActorComposite.h
 
 !IF  "$(CFG)" == "ParaView - Win32 Release"
@@ -842,6 +906,26 @@ SOURCE=.\vtkPVEnSightReaderInterface.h
 # Begin Custom Build
 InputPath=.\vtkPVEnSightReaderInterface.h
 InputName=vtkPVEnSightReaderInterface
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVGlyph3D.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVGlyph3D.h
+InputName=vtkPVGlyph3D
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

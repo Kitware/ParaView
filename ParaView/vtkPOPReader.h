@@ -61,12 +61,7 @@ public:
   // Description:
   // This is the longitude and latitude dimensions of the structured grid.
   vtkGetVector2Macro(Dimensions, int);  
-  
-  // Description:
-  // This is for debugging.  It reduces the resolution of the grid by these factors.
-  //vtkSetVector2Macro(ReductionFactors, int);
-  //vtkGetVector2Macro(ReductionFactors, int);
-  
+    
   // Description:
   // This file contains the latitude and longitude of the grid.  
   // It must be double with no header.
@@ -99,7 +94,6 @@ protected:
   char *FileName;
   
   int Dimensions[2];
-  int ReductionFactors[2];
   vtkSetStringMacro(GridFileName);
   void SetGridName(char *name);
   char *GridFileName;
@@ -107,6 +101,7 @@ protected:
   float Radius;
   vtkFloatArray *DepthValues;
   
+  void DeleteArrays();
   void AddArray(char *arrayName, char *fileName);
   void AddArrayName(char *arrayName);
   int NumberOfArrays;

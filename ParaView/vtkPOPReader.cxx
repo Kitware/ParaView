@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkExtentTranslator.h"
 #include "vtkFloatArray.h"
 #include "vtkImageReader.h"
-#include "vtkImageShrink3D.h"
+#include "vtkImageWrapPad.h"
 #include "vtkObjectFactory.h"
 
 //-------------------------------------------------------------------------
@@ -69,8 +69,6 @@ vtkPOPReader::vtkPOPReader()
   
   this->Dimensions[0] = 3600;
   this->Dimensions[1] = 2400;
-  this->ReductionFactors[0] = 1;
-  this->ReductionFactors[1] = 1;
   
   this->GridFileName = NULL;
   this->FileName = NULL;
@@ -85,11 +83,21 @@ vtkPOPReader::vtkPOPReader()
 
 //----------------------------------------------------------------------------
 vtkPOPReader::~vtkPOPReader()
-{
-  int i;
-  
+{ 
   this->SetFileName(NULL);
   this->SetGridFileName(NULL);
+  this->DeleteArrays();
+  
+  this->DepthValues->Delete();
+  this->DepthValues = NULL;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPOPReader::DeleteArrays()
+{
+  int i;
+
   for (i = 0; i < this->NumberOfArrays; ++i)
     {
     if (this->ArrayNames && this->ArrayNames[i])
@@ -113,11 +121,10 @@ vtkPOPReader::~vtkPOPReader()
     delete [] this->ArrayFileNames;
     this->ArrayFileNames = NULL;
     }
-  
-  this->DepthValues->Delete();
-  this->DepthValues = NULL;
-}
 
+  this->NumberOfArrays = 0;
+  this->MaximumNumberOfArrays = 0;
+}
 
 //----------------------------------------------------------------------------
 void vtkPOPReader::AddArray(char *arrayName, char *fileName)
@@ -128,8 +135,8 @@ void vtkPOPReader::AddArray(char *arrayName, char *fileName)
     char **tmp1, **tmp2;
     
     this->MaximumNumberOfArrays += 20;
-    tmp1 = new (char*)[this->MaximumNumberOfArrays];
-    tmp2 = new (char*)[this->MaximumNumberOfArrays];
+    tmp1 = new char*[this->MaximumNumberOfArrays];
+    tmp2 = new char*[this->MaximumNumberOfArrays];
     for (idx = 0; idx < this->NumberOfArrays; ++idx)
       {
       tmp1[idx] = this->ArrayNames[idx];
@@ -158,8 +165,8 @@ void vtkPOPReader::ExecuteInformation()
   
   this->ReadInformationFile();  
   
-  xDim = this->Dimensions[0] / this->ReductionFactors[0];
-  yDim = this->Dimensions[1] / this->ReductionFactors[1];
+  xDim = this->Dimensions[0]+1;
+  yDim = this->Dimensions[1];
   zDim = this->DepthValues->GetNumberOfTuples();
   
   this->GetOutput()->SetWholeExtent(0, xDim-1, 0, yDim-1, 0, zDim-1);
@@ -195,21 +202,12 @@ void vtkPOPReader::Execute()
   reader->SetNumberOfScalarComponents(1);
   reader->SetDataScalarTypeToDouble();
   reader->SetHeaderSize(0);
+  vtkImageWrapPad *wrap = vtkImageWrapPad::New();
+  wrap->SetInput(reader->GetOutput());
+  ++ext[1];
+  wrap->SetOutputWholeExtent(ext);
 
-  vtkImageShrink3D *shrink = vtkImageShrink3D::New();
-  shrink->SetInput(reader->GetOutput());
-  shrink->SetShrinkFactors(this->ReductionFactors[0], this->ReductionFactors[1], 1);
-  shrink->AveragingOff();
-
-  image = vtkImageData::New();
-  if (this->ReductionFactors[0] == 1 && this->ReductionFactors[1] == 1)
-    {
-    reader->SetOutput(image);
-    }
-  else
-    {
-    shrink->SetOutput(image);
-    }
+  image = wrap->GetOutput();
   output->GetUpdateExtent(ext);
   output->SetExtent(ext);
   ext[4] = 0;
@@ -219,8 +217,6 @@ void vtkPOPReader::Execute()
   
   // Create the grid points from the grid image.
   points = this->ReadPoints(image);
-  image->Delete();
-  image = NULL;
 
   output->SetPoints(points);
   points->Delete();
@@ -234,6 +230,8 @@ void vtkPOPReader::Execute()
   ext[5] = this->DepthValues->GetNumberOfTuples()-1;
   reader->SetDataExtent(ext);
   reader->SetDataScalarTypeToFloat();
+  ++ext[1];
+  wrap->SetOutputWholeExtent(ext);
   for (i = 0; i < this->NumberOfArrays; ++i)
     {
     if (this->ArrayFileNames[i] && this->ArrayNames[i])
@@ -241,30 +239,26 @@ void vtkPOPReader::Execute()
       reader->SetFileName(this->ArrayFileNames[i]);
       // Just in case.
       reader->SetHeaderSize(0);
-      image = vtkImageData::New();
       output->GetUpdateExtent(ext);
+      image = wrap->GetOutput();
       image->SetUpdateExtent(ext);
-      if (this->ReductionFactors[0] == 1 && this->ReductionFactors[1] == 1)
-	{
-	reader->SetOutput(image);
-	}
-      else
-	{
-	shrink->SetOutput(image);
-	}
       image->Update();
       output->GetPointData()->GetFieldData()->AddArray(
-	image->GetPointData()->GetScalars()->GetData(), this->ArrayNames[i]);
-      image->Delete();
-      image = NULL;
+        image->GetPointData()->GetScalars()->GetData(), this->ArrayNames[i]);
+      image->ReleaseData();
       }
     }
+  reader->Delete();
+  reader = NULL;
+  wrap->Delete();
+  wrap = NULL;
 }
 
 
 //----------------------------------------------------------------------------
 vtkPoints *vtkPOPReader::GeneratePoints()
 {
+  /*
   vtkPoints *points;
   vtkImageData *temp;
   double x, y, z, radius;
@@ -305,6 +299,8 @@ vtkPoints *vtkPOPReader::GeneratePoints()
     }
   
   return points;
+  */
+  return NULL;
 }
 
 
@@ -317,8 +313,6 @@ vtkPoints *vtkPOPReader::ReadPoints(vtkImageData *image)
   double x, y, z, depth, radius;
   double theta, phi;
   int i, j, k;
-  int *wholeExt;
-  int xDim, yDim;
   int *ext;  
   int id, num, numLevels;
   
@@ -365,8 +359,8 @@ void vtkPOPReader::ReadInformationFile()
   int i, num;
   float tempf;
   char str[256];
-  char *tmp;
 
+  this->DeleteArrays();
   this->DepthValues->Reset();
   file = new ifstream(this->FileName, ios::in);
   
@@ -399,33 +393,33 @@ void vtkPOPReader::ReadInformationFile()
       {
       *file >> num;
       for (i = 0; i < num; ++i)
-	{
-	*file >> str;
-	if (file->fail())
-	  {
-	  vtkErrorMacro("Error reading array name " << i);    
-	  delete file;
-	  return ;
-	  }
-	this->AddArrayName(str);
-	}
+        {
+        *file >> str;
+        if (file->fail())
+          {
+          vtkErrorMacro("Error reading array name " << i);    
+          delete file;
+          return;
+          }
+        this->AddArrayName(str);
+        }
       }
 
     else if (strcmp(str, "NumberOfDepthValues") == 0)
       {
       *file >> num;
       for (i = 0; i < num; ++i)
-	{
-	*file >> str;
-	if (file->fail())
-	  {
-	  vtkErrorMacro("Error reading depth value " << i);    
-	  delete file;
-	  return;
-	  }
-	tempf = atof(str);
-	this->DepthValues->InsertNextValue(tempf);
-	}
+        {
+        *file >> str;
+        if (file->fail())
+          {
+          vtkErrorMacro("Error reading depth value " << i);    
+          delete file;
+          return;
+          }
+        tempf = atof(str);
+        this->DepthValues->InsertNextValue(tempf);
+        }
       }
     }
 }

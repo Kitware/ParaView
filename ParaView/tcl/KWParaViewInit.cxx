@@ -8,6 +8,9 @@ ClientData vtkCutPlaneNewCommand();
 int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkDummyRenderWindowInteractorNewCommand();
+int vtkFastGeometryFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkFastGeometryFilterNewCommand();
 int vtkImageOutlineFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkImageOutlineFilterNewCommand();
@@ -29,6 +32,9 @@ ClientData vtkInteractorStylePlaneSourceNewCommand();
 int vtkInteractorStyleSphereCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleSphereNewCommand();
+int vtkPOPReaderCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPOPReaderNewCommand();
 int vtkPVActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVActorCompositeNewCommand();
@@ -114,6 +120,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
                   vtkDummyRenderWindowInteractorCommand);
+  vtkTclCreateNew(interp,(char *) "vtkFastGeometryFilter", vtkFastGeometryFilterNewCommand,
+                  vtkFastGeometryFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
                   vtkImageOutlineFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
@@ -130,6 +138,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkInteractorStyleSphereCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVActorComposite", vtkPVActorCompositeNewCommand,
                   vtkPVActorCompositeCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPOPReader", vtkPOPReaderNewCommand,
+                  vtkPOPReaderCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVApplication", vtkPVApplicationNewCommand,
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVArrayCalculator", vtkPVArrayCalculatorNewCommand,

@@ -30,11 +30,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
+#include "vtkKWCheckButton.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkGeometryFilter.h"
+#include "vtkFastGeometryFilter.h"
 //#include "vtkPVImageTextureFilter.h"
 #include "vtkTexture.h"
 
@@ -67,8 +69,6 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->Properties = vtkKWWidget::New();
   this->Name = NULL;
-
-  this->Mapper->ImmediateModeRenderingOn();
   
   this->NumCellsLabel = vtkKWLabel::New();
   this->BoundsLabel = vtkKWLabel::New();
@@ -84,13 +84,18 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
+  this->DecimateCheck = vtkKWCheckButton::New();
+
   this->PVData = NULL;
   this->DataSetInput = NULL;
   this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
   
+  this->Decimate = 0;
+
   //this->TextureFilter = NULL;
   
   this->ActorTclName = NULL;
+  this->DeciTclName = NULL;
   this->MapperTclName = NULL;
   this->OutlineTclName = NULL;
   this->GeometryTclName = NULL;
@@ -116,6 +121,9 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper", tclName);
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
+
+  pvApp->BroadcastScript("%s ImmediateModeRenderingOn", this->MapperTclName);
+
   
   // Get rid of previous object created by the superclass.
   if (this->Actor)
@@ -196,12 +204,19 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->SetActorTclName(NULL);
   this->Actor = NULL;
 
+  this->DecimateCheck->Delete();
+  this->DecimateCheck = NULL;
+  
+  if (this->DeciTclName)
+    {
+    pvApp->BroadcastScript("%s Delete", this->DeciTclName);
+    this->SetDeciTclName(NULL);
+    }
   if (this->OutlineTclName)
     {
     pvApp->BroadcastScript("%s Delete", this->OutlineTclName);
     this->SetOutlineTclName(NULL);
-    }
-  
+    }  
   if (this->GeometryTclName)
     {
     pvApp->BroadcastScript("%s Delete", this->GeometryTclName);
@@ -271,6 +286,12 @@ void vtkPVActorComposite::CreateProperties()
                                                 "DrawPoints");
   this->RepresentationMenu->SetValue("Surface");
   
+  this->DecimateCheck->SetParent(this->Properties);
+  this->DecimateCheck->Create(this->Application, "-text Decimate");
+  this->Application->Script("%s configure -command {%s DecimateCheckCallback}",
+                            this->DecimateCheck->GetWidgetName(),
+                            this->GetTclName());
+
   this->Script("pack %s",
 	       this->NumCellsLabel->GetWidgetName());
   this->Script("pack %s",
@@ -289,6 +310,8 @@ void vtkPVActorComposite::CreateProperties()
                this->RepresentationMenuLabel->GetWidgetName());
   this->Script("pack %s",
                this->RepresentationMenu->GetWidgetName());
+  this->Script("pack %s",
+               this->DecimateCheck->GetWidgetName());
 }
 
 
@@ -696,6 +719,10 @@ void vtkPVActorComposite::SetVisibility(int v)
     {
     pvApp->BroadcastScript("%s SetVisibility %d", this->ActorTclName, v);
     }
+  if (v == 0 && this->GeometryTclName)
+    {
+    pvApp->BroadcastScript("[%s GetOutput] ReleaseData", this->ActorTclName);
+    }
 }
   
 //----------------------------------------------------------------------------
@@ -731,7 +758,6 @@ vtkPVApplication* vtkPVActorComposite::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
-// Not used.
 void vtkPVActorComposite::SetMode(int mode)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -773,7 +799,8 @@ void vtkPVActorComposite::SetMode(int mode)
       {
       char tclName[150];
       sprintf(tclName, "ActorCompositeGeometry%d", this->InstanceCount);
-      pvApp->MakeTclObject("vtkGeometryFilter", tclName);
+      //pvApp->MakeTclObject("vtkGeometryFilter", tclName);
+      pvApp->MakeTclObject("vtkFastGeometryFilter", tclName);
       this->SetGeometryTclName(tclName);
       }
     pvApp->BroadcastScript("%s SetInput %s", this->GeometryTclName,
@@ -784,4 +811,72 @@ void vtkPVActorComposite::SetMode(int mode)
   
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::DecimateCheckCallback()
+{
+  this->SetDecimate(this->DecimateCheck->GetState());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::SetDecimate(int val)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (val > 1)
+    {
+    val = 1;
+    }
+  if (val < 0)
+    {
+    val = 0;
+    }
+  if (val == this->Decimate)
+    {
+    return;
+    }
+  
+  if (pvApp == NULL)
+    {
+    vtkErrorMacro("I cannot decimate without an application.");
+    }
+
+  if (val)
+    {
+    if (this->DeciTclName == NULL)
+      {
+      char tclName[150];
+      float bds[6];
+      float spacing;
+
+      sprintf(tclName, "ActorCompositeDeci%d", this->InstanceCount);
+      pvApp->MakeTclObject("vtkQuadricClustering", tclName);
+      this->SetDeciTclName(tclName);
+
+      // Determine bounds and spacing.
+      this->GetPVData()->GetBounds(bds);
+	  // I would consider the number of cells too, 
+      // but I cannot get the number of cells of geometry output.
+      // numCells = this->GetPVData()->GetNumberOfCells());
+      spacing = ((bds[1]-bds[0])+(bds[3]-bds[2])+(bds[5]-bds[4]))/150.0;
+      pvApp->BroadcastScript("%s SetDivisionSpacing %f %f %f", this->DeciTclName,
+                             spacing, spacing, spacing);
+      pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->DeciTclName);
+      pvApp->BroadcastScript("%s UseInputPointsOn", this->DeciTclName);
+      }
+
+    // Place in front of the mapper.
+    pvApp->BroadcastScript("%s SetInput [%s GetInput]", 
+                           this->DeciTclName, this->MapperTclName);
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                           this->MapperTclName, this->DeciTclName);
+    }
+  else
+    {
+    // Take decimate out of pipeline.
+    pvApp->BroadcastScript("%s SetInput [%s GetInput]", 
+                           this->MapperTclName, this->DeciTclName);
+    } 
+  this->Decimate = val;
+}
 

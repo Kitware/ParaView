@@ -48,6 +48,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 //class vtkPVImageTextureFilter;
 class vtkPVApplication;
 class vtkPVData;
+class vtkKWCheckButton;
 
 #define VTK_PV_ACTOR_COMPOSITE_NO_MODE            0
 #define VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE      1
@@ -157,6 +158,16 @@ public:
   // Callback for the ResetColorRange button.
   void ResetColorRange();
   
+  // Description:
+  // This is an experiment with decimation.  
+  // Turning this on will cause the geometry to be decimated
+  // before being mapped.  The intent is to eventualy select
+  // decimated models for interactive rendering.
+  void SetDecimate(int val);
+  vtkGetMacro(Decimate, int)
+  vtkBooleanMacro(Decimate, int);
+  void DecimateCheckCallback();
+
 protected:
 
   vtkPVActorComposite();
@@ -180,11 +191,19 @@ protected:
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
 
-  // the data object that owns this composite
+  vtkKWCheckButton *DecimateCheck;
+
+  // I merged the PVData object and the PVActorComposite.  
+  // I do not know what this point is for.  It is probably obsolete.
+  // ???The data object that owns this composite???
   vtkPVData *PVData;
   
   //vtkPVImageTextureFilter *TextureFilter;
   
+  // An experiment with decimation.
+  int Decimate;
+
+  // How to convert data set to polydata.
   int Mode;
   // Super class stores a vtkPolyDataInput, this is a more general input.
   vtkDataSet *DataSetInput;
@@ -194,6 +213,9 @@ protected:
   
   char *MapperTclName;
   vtkSetStringMacro(MapperTclName);
+
+  char *DeciTclName;
+  vtkSetStringMacro(DeciTclName);
 
   char *OutlineTclName;
   vtkSetStringMacro(OutlineTclName);
