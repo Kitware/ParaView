@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.15");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.16");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2093,45 +2093,35 @@ void vtkPVWindow::WriteData()
       vtkKWMessageDialog::ErrorIcon);
     return;
     }
-  
+
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  vtkClientServerStream& stream = pm->GetStream();
-  stream.Reset();
-  stream << vtkClientServerStream::Invoke << 
-    this->GetCurrentPVSource()->GetPart()->GetVTKDataID() << "GetClassName" <<
-    vtkClientServerStream::End;
-  pm->SendStreamToServer();
-  const char* dataClassName;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &dataClassName))
-    {
-    vtkErrorMacro("bad return from GetClassName call");
-    }
   vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
-  pm->GatherInformation(part->GetClassNameInformation(),
-                        part->GetVTKDataID());
+  vtkPVClassNameInformation* info = part->GetClassNameInformation();
+  pm->GatherInformation(info, part->GetVTKDataID());
+
   // Instantiator does not work for static builds and VTK objects.
   vtkDataSet* data;
-  if (strcmp(dataClassName, "vtkImageData") == 0)
+  if (strcmp(info->GetVTKClassName(), "vtkImageData") == 0)
     {
     data = vtkImageData::New();
     }
-  else if (strcmp(dataClassName, "vtkStructuredPoints") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkStructuredPoints") == 0)
     {
     data = vtkStructuredPoints::New();
     }
-  else if (strcmp(dataClassName, "vtkStructuredGrid") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkStructuredGrid") == 0)
     {
     data = vtkStructuredGrid::New();
     }
-  else if (strcmp(dataClassName, "vtkRectilinearGrid") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkRectilinearGrid") == 0)
     {
     data = vtkRectilinearGrid::New();
     }
-  else if (strcmp(dataClassName, "vtkPolyData") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkPolyData") == 0)
     {
     data = vtkPolyData::New();
     }
-  else if (strcmp(dataClassName, "vtkUnstructuredGrid") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkUnstructuredGrid") == 0)
     {
     data = vtkUnstructuredGrid::New();
     }
@@ -2272,45 +2262,32 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
 {
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = 0;
-  
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  
-  vtkClientServerStream& stream = pm->GetStream();
-  stream.Reset();
-  stream << vtkClientServerStream::Invoke << 
-    this->GetCurrentPVSource()->GetPart()->GetVTKDataID() << "GetClassName" <<
-    vtkClientServerStream::End;
-  pm->SendStreamToServer();
-  const char* dataClassName;
-  if(!pm->GetLastServerResult().GetArgument(0, 0, &dataClassName))
-    {
-    vtkErrorMacro("bad return from GetClassName call");
-    }
   vtkDataSet* data;
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
-  pm->GatherInformation(part->GetClassNameInformation(),
-                        part->GetVTKDataID());
-  if (strcmp(dataClassName, "vtkImageData") == 0)
+  vtkPVClassNameInformation* info = part->GetClassNameInformation();
+  pm->GatherInformation(info, part->GetVTKDataID());
+  if (strcmp(info->GetVTKClassName(), "vtkImageData") == 0)
     {
     data = vtkImageData::New();
     }
-  else if (strcmp(dataClassName, "vtkStructuredPoints") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkStructuredPoints") == 0)
     {
     data = vtkStructuredPoints::New();
     }
-  else if (strcmp(dataClassName, "vtkStructuredGrid") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkStructuredGrid") == 0)
     {
     data = vtkStructuredGrid::New();
     }
-  else if (strcmp(dataClassName, "vtkRectilinearGrid") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkRectilinearGrid") == 0)
     {
     data = vtkRectilinearGrid::New();
     }
-  else if (strcmp(dataClassName, "vtkPolyData") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkPolyData") == 0)
     {
     data = vtkPolyData::New();
     }
-  else if (strcmp(dataClassName, "vtkUnstructuredGrid") == 0)
+  else if (strcmp(info->GetVTKClassName(), "vtkUnstructuredGrid") == 0)
     {
     data = vtkUnstructuredGrid::New();
     }
