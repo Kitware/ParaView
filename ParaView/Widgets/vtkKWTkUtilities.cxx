@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.31");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.32");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -598,6 +598,39 @@ int vtkKWTkUtilities::GetGridSize(Tcl_Interp *interp,
     return 0;
     }
   sscanf(interp->result, "%d %d", nb_of_cols, nb_of_rows);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetGridPosition(Tcl_Interp *interp,
+                                      const char *widget,
+                                      int *col,
+                                      int *row)
+{
+  ostrstream info;
+  info << "grid info " << widget << ends;
+  int res = Tcl_GlobalEval(interp, info.str());
+  info.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query grid info!");
+    return 0;
+    }
+  
+  const char *pos;
+
+  pos = strstr(interp->result, "-column ");
+  if (pos)
+    {
+    sscanf(pos, "-column %d", col);
+    }
+
+  pos = strstr(interp->result, "-row ");
+  if (pos)
+    {
+    sscanf(pos, "-row %d", row);
+    }
 
   return 1;
 }

@@ -128,6 +128,13 @@ public:
                          int *nb_of_rows);
 
   // Description:
+  // Get the position of a widget in a grid.
+  static int GetGridPosition(Tcl_Interp *interp,
+                             const char *widget,
+                             int *col,
+                             int *row);
+
+  // Description:
   // Get the bounding box of the slaves of a pack (i.e. the largest width
   // and height of the slaves packed in a master widget, including padding).
   static int GetPackSlavesBbox(Tcl_Interp *interp,
