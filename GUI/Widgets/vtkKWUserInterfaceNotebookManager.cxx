@@ -22,16 +22,29 @@
 #include "vtkKWTkUtilities.h"
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWidgetCollection.h"
-#include "vtkLinkedList.txx"
-#include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
+
+#include <vtkstd/list>
+#include <vtkstd/algorithm>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.30");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.31");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
+class vtkKWUserInterfaceNotebookManagerInternals
+{
+public:
+
+  typedef vtkstd::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*> DragAndDropEntriesContainer;
+  typedef vtkstd::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*>::iterator DragAndDropEntriesContainerIterator;
+  typedef vtkstd::list<vtkKWUserInterfaceNotebookManager::DragAndDropEntry*>::reverse_iterator DragAndDropEntriesContainerReverseIterator;
+
+  DragAndDropEntriesContainer DragAndDropEntries;
+};
 
 //----------------------------------------------------------------------------
 vtkKWUserInterfaceNotebookManager::vtkKWUserInterfaceNotebookManager()
@@ -48,8 +61,7 @@ vtkKWUserInterfaceNotebookManager::vtkKWUserInterfaceNotebookManager()
   this->EnableDragAndDrop = 0;
   this->LockDragAndDropEntries = 0;
 
-  this->DragAndDropEntries = 
-    vtkKWUserInterfaceNotebookManager::DragAndDropEntriesContainer::New();
+  this->Internals = new vtkKWUserInterfaceNotebookManagerInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -63,7 +75,7 @@ vtkKWUserInterfaceNotebookManager::~vtkKWUserInterfaceNotebookManager()
 
   // Delete the container
 
-  this->DragAndDropEntries->Delete();
+  delete this->Internals;
 }
 
 //----------------------------------------------------------------------------
@@ -844,62 +856,51 @@ vtkKWUserInterfaceNotebookManager::DragAndDropEntry::DragAndDropEntry()
 vtkKWUserInterfaceNotebookManager::DragAndDropEntry* 
 vtkKWUserInterfaceNotebookManager::GetLastDragAndDropEntry(vtkKWWidget *widget)
 {
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = NULL;
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *found = NULL;
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntriesContainerIterator *it = 
-    this->DragAndDropEntries->NewIterator();
-
-  it->GoToLastItem();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals && widget)
     {
-    if (it->GetData(dd_entry) == VTK_OK && dd_entry->Widget == widget)
+    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerReverseIterator 
+      rit = this->Internals->DragAndDropEntries.rbegin();
+    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerReverseIterator 
+      rend = this->Internals->DragAndDropEntries.rend();
+    for (; rit != rend; ++rit)
       {
-      found = dd_entry;
-      break;
+      if (*rit && (*rit)->Widget == widget)
+        {
+        return *rit;
+        }
       }
-    it->GoToPreviousItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //---------------------------------------------------------------------------
 int vtkKWUserInterfaceNotebookManager::GetNumberOfDragAndDropEntries()
 {
-  if (this->DragAndDropEntries)
-    {
-    return this->DragAndDropEntries->GetNumberOfItems();
-    }
-  return 0;
+  return this->Internals ? this->Internals->DragAndDropEntries.size() : 0;
 }
 
 //---------------------------------------------------------------------------
 int vtkKWUserInterfaceNotebookManager::DeleteAllDragAndDropEntries()
 {
-  if (!this->DragAndDropEntries)
+  if (this->Internals)
     {
-    return 0;
-    }
-
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = NULL;
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntriesContainerIterator *it = 
-    this->DragAndDropEntries->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(dd_entry) == VTK_OK)
+    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = 
+      this->Internals->DragAndDropEntries.begin();
+    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = 
+      this->Internals->DragAndDropEntries.end();
+    for (; it != end; ++it)
       {
-      delete dd_entry;
+      if (*it)
+        {
+        delete (*it);
+        }
       }
-    it->GoToNextItem();
+    this->Internals->DragAndDropEntries.clear();
+    return 1;
     }
-  it->Delete();
 
-  this->DragAndDropEntries->RemoveAllItems();
-
-  return 1;
+  return 0;
 }
 
 //---------------------------------------------------------------------------
@@ -913,17 +914,27 @@ int vtkKWUserInterfaceNotebookManager::GetDragAndDropEntry(
   ostream &to_page_title,
   ostream &to_after_widget_label)
 {
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = NULL;
-  if (this->LockDragAndDropEntries ||
-      !this->DragAndDropEntries ||
-      this->DragAndDropEntries->GetItem(idx, dd_entry) != VTK_OK ||
-      !dd_entry)
+  if (this->LockDragAndDropEntries || !this->Internals)
+    {
+    return 0;
+    }
+
+  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = 
+    this->Internals->DragAndDropEntries.begin();
+  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = 
+    this->Internals->DragAndDropEntries.end();
+  for (; it != end && idx; ++it, --idx)
+    {
+    }
+
+  if (it == this->Internals->DragAndDropEntries.end() || !(*it))
     {
     return 0;
     }
 
   // Widget
 
+  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = *it;
   if (dd_entry->Widget)
     {
     widget_label << this->GetDragAndDropWidgetLabel(dd_entry->Widget);
@@ -1140,35 +1151,27 @@ int vtkKWUserInterfaceNotebookManager::IsDragAndDropWidgetAtOriginalLocation(
     return 0;
     }
 
-  int atoriginal = 1;
-
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntry *dd_entry = NULL;
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntriesContainerIterator *it = 
-    this->DragAndDropEntries->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = 
+    this->Internals->DragAndDropEntries.begin();
+  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = 
+    this->Internals->DragAndDropEntries.end();
+  for (; it != end; ++it)
     {
-    if (it->GetData(dd_entry) == VTK_OK && dd_entry->Widget == widget)
+    if (*it && (*it)->Widget == widget)
       {
       // Check that we have the same location, and that the after widget
       // is either NULL or a widget that has not moved either
 
-      atoriginal = 
-        (dd_entry->FromLocation.PageId == 
-         dd_entry->ToLocation.PageId &&
-         dd_entry->FromLocation.AfterWidget == 
-         dd_entry->ToLocation.AfterWidget &&
-         (dd_entry->ToLocation.AfterWidget == NULL ||
+      return 
+        ((*it)->FromLocation.PageId == (*it)->ToLocation.PageId &&
+         (*it)->FromLocation.AfterWidget == (*it)->ToLocation.AfterWidget &&
+         ((*it)->ToLocation.AfterWidget == NULL ||
           this->IsDragAndDropWidgetAtOriginalLocation(
-            dd_entry->ToLocation.AfterWidget)));
-      break;
+            (*it)->ToLocation.AfterWidget)));
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return atoriginal;
+  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -1193,26 +1196,24 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
   prev_entry = this->GetLastDragAndDropEntry(widget);
   if (prev_entry)
     {
-    vtkIdType idx;
-    if (!this->DragAndDropEntries->FindItem(prev_entry, idx) ||
-        !this->DragAndDropEntries->RemoveItem(idx))
+    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator pos = 
+      vtkstd::find(this->Internals->DragAndDropEntries.begin(),
+                   this->Internals->DragAndDropEntries.end(),
+                   prev_entry);
+    if (pos == this->Internals->DragAndDropEntries.end())
       {
       vtkErrorMacro(
         "Error while removing previous Drag & Drop entry from the manager.");
       return 0;
       }
+    this->Internals->DragAndDropEntries.erase(pos);
     from_loc_fixed = prev_entry->FromLocation;
     }
 
   // Append and set an entry
 
   dd_entry = new vtkKWUserInterfaceNotebookManager::DragAndDropEntry;
-  if (this->DragAndDropEntries->AppendItem(dd_entry) != VTK_OK)
-    {
-    vtkErrorMacro("Error while adding a Drag & Drop entry to the manager.");
-    delete dd_entry;
-    return 0;
-    }
+  this->Internals->DragAndDropEntries.push_back(dd_entry);
 
   dd_entry->Widget = widget;
   dd_entry->FromLocation = from_loc_fixed;
@@ -1228,48 +1229,38 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
   // if A is not valid anymore (it has been repack elsewhere), update the
   // old entry W so that its destination location matches its current location
 
-  vtkKWUserInterfaceNotebookManager::DragAndDropEntriesContainerIterator *it = 
-    this->DragAndDropEntries->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = this->Internals->DragAndDropEntries.begin();
+  vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = this->Internals->DragAndDropEntries.end();
+  for (; it != end; ++it)
     {
-    if (it->GetData(dd_entry) == VTK_OK &&
-        dd_entry->ToLocation.AfterWidget == widget)
+    if (*it && (*it)->ToLocation.AfterWidget == widget)
       {
       this->GetDragAndDropWidgetLocation(
-        dd_entry->Widget, &dd_entry->ToLocation);
+        (*it)->Widget, &((*it)->ToLocation));
       }
-    it->GoToNextItem();
     }
 
   // Browse each entry, check if it represents an actual motion, if not 
   // then remove it
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  int keep_going;
+  do
     {
-    if (it->GetData(dd_entry) == VTK_OK && 
-        this->IsDragAndDropWidgetAtOriginalLocation(dd_entry->Widget))
+    keep_going = 0;
+    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator it = this->Internals->DragAndDropEntries.begin();
+    vtkKWUserInterfaceNotebookManagerInternals::DragAndDropEntriesContainerIterator end = this->Internals->DragAndDropEntries.end();
+    while (it != end)
       {
-      it->GoToNextItem();
-      vtkIdType idx;
-      if (this->DragAndDropEntries->FindItem(dd_entry, idx) &&
-          this->DragAndDropEntries->RemoveItem(idx))
+      if (*it && this->IsDragAndDropWidgetAtOriginalLocation((*it)->Widget))
         {
-        delete dd_entry;
+        delete *it;
+        this->Internals->DragAndDropEntries.erase(it);
+        keep_going = 1;
+        break;
         }
-      else
-        {
-        vtkErrorMacro(
-          "Error while removing noop Drag & Drop entry from the manager.");
-        }
+      ++it;
       }
-    else
-      {
-      it->GoToNextItem();
-      }
-    }
+    } while (keep_going);
 
 #if 0
   cout << "-------------------------------" << endl;
@@ -1296,8 +1287,6 @@ int vtkKWUserInterfaceNotebookManager::AddDragAndDropEntry(
     }
 #endif
 
-  it->Delete();
-  
   return 1;
 }
 

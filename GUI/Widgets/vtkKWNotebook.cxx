@@ -60,7 +60,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.68");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.69");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -931,19 +931,19 @@ void vtkKWNotebook::RemovePagesMatchingTag(int tag)
     do
       {
       keep_going = 0;
-      vtkKWNotebookInternals::PagesContainerReverseIterator rit = 
-        this->Internals->Pages.rbegin();
-      vtkKWNotebookInternals::PagesContainerReverseIterator rend = 
-        this->Internals->Pages.rend();
-      while (rit != rend)
+      vtkKWNotebookInternals::PagesContainerIterator it = 
+        this->Internals->Pages.begin();
+      vtkKWNotebookInternals::PagesContainerIterator end = 
+        this->Internals->Pages.end();
+      while (it != end)
         {
-        if (*rit && (*rit)->Tag == tag)
+        if (*it && (*it)->Tag == tag)
           {
-          this->RemovePage(*rit);
+          this->RemovePage(*it);
           keep_going = 1;
           break;
           }
-        ++rit;
+        ++it;
         }
       } while (keep_going);
     }
@@ -2586,25 +2586,27 @@ void vtkKWNotebook::ConstrainVisiblePages()
 
     // There are more pages than allowed, try to remove some of them
 
-    vtkKWNotebookInternals::PagesContainerReverseIterator rit = 
-      this->Internals->MostRecentPages.rbegin();
-    vtkKWNotebookInternals::PagesContainerReverseIterator rend = 
-      this->Internals->MostRecentPages.rend();
-    while (diff && rit != rend)
+    int keep_going;
+    do
       {
-      if (*rit && this->CanBeHidden(*rit))
+      keep_going = 0;
+      vtkKWNotebookInternals::PagesContainerIterator it = 
+        this->Internals->Pages.begin();
+      vtkKWNotebookInternals::PagesContainerIterator end = 
+        this->Internals->Pages.end();
+      while (diff && it != end)
         {
-        vtkKWNotebook::Page *page = *rit;
-        ++rit;
-        this->RemoveFromMostRecentPages(page);
-        this->HidePage(page);
-        diff--;
+        if (*it && this->CanBeHidden(*it))
+          {
+          this->RemoveFromMostRecentPages(*it);
+          this->HidePage(*it);
+          diff--;
+          keep_going = 1;
+          break;
+          }
+        ++it;
         }
-      else
-        {
-        ++rit;
-        }
-      }
+      } while (keep_going);
     }
 }
 

@@ -40,11 +40,7 @@ class vtkKWIcon;
 class vtkKWNotebook;
 class vtkKWUserInterfacePanel;
 class vtkKWWidget;
-
-//BTX
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
-//ETX
+class vtkKWUserInterfaceNotebookManagerInternals;
 
 class VTK_EXPORT vtkKWUserInterfaceNotebookManager : public vtkKWUserInterfaceManager
 {
@@ -200,35 +196,6 @@ public:
   vtkSetMacro(LockDragAndDropEntries, int);
   vtkGetMacro(LockDragAndDropEntries, int);
 
-  //BTX
-  // A Widget location. 
-  // Store both the page the widget is packed in, and the widget it is 
-  // packed after (if any).
-
-  class WidgetLocation
-  {
-  public:
-    WidgetLocation();
-    void Empty();
-
-    int PageId;
-    vtkKWWidget *AfterWidget;
-  };
-
-  // A D&D entry. 
-  // Store the widget source and target location.
-
-  class DragAndDropEntry
-  {
-  public:
-    DragAndDropEntry();
-
-    vtkKWWidget *Widget;
-    WidgetLocation FromLocation;
-    WidgetLocation ToLocation;
-  };
-  // ETX
-
 protected:
   vtkKWUserInterfaceNotebookManager();
   ~vtkKWUserInterfaceNotebookManager();
@@ -266,6 +233,38 @@ protected:
   // save a D&D event to a text string/file.
   virtual char* GetDragAndDropWidgetLabel(vtkKWWidget *widget);
 
+  // A Widget location. 
+  // Store both the page the widget is packed in, and the widget it is 
+  // packed after (if any).
+
+  class WidgetLocation
+  {
+  public:
+    WidgetLocation();
+    void Empty();
+
+    int PageId;
+    vtkKWWidget *AfterWidget;
+  };
+
+  // A D&D entry. 
+  // Store the widget source and target location.
+
+  class DragAndDropEntry
+  {
+  public:
+    DragAndDropEntry();
+
+    vtkKWWidget *Widget;
+    WidgetLocation FromLocation;
+    WidgetLocation ToLocation;
+  };
+
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWUserInterfaceNotebookManagerInternals *Internals;
+  friend class vtkKWUserInterfaceNotebookManagerInternals;
+
   // Description:
   // Get the location of a widget.
   virtual int GetDragAndDropWidgetLocation(
@@ -276,13 +275,6 @@ protected:
   // GetDragAndDropWidgetLabel()) and a hint about its location.
   virtual vtkKWWidget* GetDragAndDropWidgetFromLabelAndLocation(
     const char *widget_label, const WidgetLocation *loc_hint);
-
-  // List of D&D entries
-
-  typedef vtkLinkedList<DragAndDropEntry*> DragAndDropEntriesContainer;
-  typedef vtkLinkedListIterator<DragAndDropEntry*>
-  DragAndDropEntriesContainerIterator;
-  DragAndDropEntriesContainer *DragAndDropEntries;
 
   // Description:
   // Get the last D&D entry that was added for a given widget
