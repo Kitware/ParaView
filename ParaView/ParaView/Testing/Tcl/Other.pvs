@@ -1,0 +1,12 @@
+Application ExitOnReturnOn
+Application StartRecordingScript none.pvs
+Application AcceptLicense
+Application AcceptEvaluation
+set pvWindow [lindex [vtkPVWindow ListInstances] 0]
+$pvWindow ErrorMessage "This is an error"
+$pvWindow WarningMessage "This is a warning"
+$pvWindow DisableToolbarButtons
+$pvWindow EnableToolbarButtons
+$pvWindow PrintRecentFiles
+$pvWindow SaveSessionFile "vtkParaViewOtherTest.pvs"
+
