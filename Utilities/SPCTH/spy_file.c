@@ -26,19 +26,19 @@
 #define MEG (1024*1024)
 static long open_mem=0;
 
-// Memory handler
+/* Memory handler */
 void *myMalloc(long size) {
 
   static long total_mem=0;
   void *mem_ptr;
 
-  // Quick sanity check
+  /* Quick sanity check */
   if (size<=0) return NULL;
 
-  // Actually allocate memory
+  /* Actually allocate memory */
   mem_ptr = malloc(size+sizeof(long));
 
-  // Make sure malloc worked
+  /* Make sure malloc worked */
   if (mem_ptr == NULL) 
     {
     fprintf(stderr,"Could not allocate %ld bytes of mem\n", (long)size);
@@ -46,10 +46,10 @@ void *myMalloc(long size) {
     }
   else
     {
-    // Store size of malloc
+    /* Store size of malloc  */
     *((long*)mem_ptr) = size;
 
-    // Accumulate total
+    /* Accumulate total */
     total_mem += size;
     open_mem += size;
     printf("Total MB alloc'd mem: %f (Open=%f)\n",
@@ -62,20 +62,20 @@ void myFree(void *mem_ptr) {
 
   static long freed_mem=0;
 
-  // Read the amount of memory this will 'free'
+  /* Read the amount of memory this will 'free' */
   long size = *((long*)mem_ptr-1);
 
-  // Accumulate total
+  /* Accumulate total */
   freed_mem += size;
   open_mem -= size;
   printf("Total Mbytes of freed mem: %f (Open=%f)\n",
             (float)freed_mem/MEG,(float)open_mem/MEG);
 
-  // Actually free memory
+  /* Actually free memory */
   free(((long*)mem_ptr)-1);
 }
-//#define free myFree
-//#define malloc myMalloc
+/*#define free myFree */
+/*#define malloc myMalloc */
 
 
 /*-------------------------------------------------------------------------*/
@@ -274,7 +274,7 @@ static void spy_clean_structured_mesh_data(Structured_Mesh_Data* stm_ptmp)
   memset(stm_ptmp, 0, sizeof(Structured_Mesh_Data));
 }
 
-// Set the filename of the file to read
+/* Set the filename of the file to read */
 void spy_setfilename(SpyFile* spy, const char *filename)
 {
   if ( spy->SavedVariablesFileName )
@@ -534,19 +534,19 @@ void fread_offsets(SpyFile* spy, long *a, int count, FILE *fp)
   int i;
   double* buffer;
 
-  // Allocate temporary buffer
+  /* Allocate temporary buffer */
   buffer = (double*) malloc (sizeof(double)*count);
 
-  // Use existing double function to read in data
+  /* Use existing double function to read in data */
   fread_double(spy,buffer,count,fp);
 
-  // okay now convert to longs
+  /* okay now convert to longs */
   for(i=0;i<count;++i)
     {
     a[i] = (long)buffer[i];
     }
 
-  // Free the temporary buffer
+  /* Free the temporary buffer */
   free(buffer);
 }
 
@@ -763,7 +763,7 @@ int read_file_header(SpyFile* spy)
     else stm_ptmp->MField_int[i] = (i+1)*100;
     }
 
-  // Read in the file offset
+  /* Read in the file offset */
   fread_double(spy, &spy->FirstGroup,1,spy->in_file);
   read_groups(spy);
   return 0;
@@ -775,14 +775,14 @@ int spy_open_file_for_input(SpyFile* spy, const char *filename)
 {
   int error;
 
-  // If I have an open file close it
+  /* If I have an open file close it */
   if (spy->in_file != NULL)
     {
     fclose(spy->in_file);
     spy->in_file = 0;
     }
 
-  // Open the file
+  /* Open the file */
   spy->in_file = fopen(filename,"rb");
   if (spy->in_file==NULL) 
     {
