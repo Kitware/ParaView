@@ -39,15 +39,16 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
+
+#include "vtkKWApplication.h"
+#include "vtkKWFrame.h"
+#include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
-
-
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWChangeColorButton );
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.20");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.21");
 
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
@@ -62,10 +63,8 @@ vtkKWChangeColorButton::vtkKWChangeColorButton()
   this->Color[2] = 1.0;
   this->Text = NULL;
   this->SetText("Set Color");
-  this->Label1 = vtkKWWidget::New();
-  this->Label1->SetParent(this);
-  this->Label2 = vtkKWWidget::New();
-  this->Label2->SetParent(this);
+  this->Label1 = vtkKWLabel::New();
+  this->Label2 = vtkKWFrame::New();
 }
 
 vtkKWChangeColorButton::~vtkKWChangeColorButton()
@@ -126,11 +125,13 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
            (int)(this->Color[2]*255.5) );
 
   this->Script("frame %s -relief raised -bd 2 %s", wname, args);
-  char textarg[1024];
-  sprintf( textarg, "-text {%s}", this->Text );
-  this->Label1->Create(this->Application,"label", textarg);
-  this->Label2->Create(this->Application,
-                       "frame", "-width 16");
+  this->Label1->SetParent(this);
+  this->Label1->Create(this->Application,0);
+  this->Label1->SetLabel(this->Text);
+  this->Label2->SetParent(this);
+  this->Label2->Create(this->Application, 0);
+  this->Script("%s configure -width 16", this->Label2->GetWidgetName());
+
   this->Script("pack %s -padx 2 -pady 2 -side right -fill both",
                this->Label2->GetWidgetName());
   if (this->Text && strlen(this->Text) > 0)
@@ -267,7 +268,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.20 $");
+  this->ExtractRevision(os,"$Revision: 1.21 $");
 }
 
 //----------------------------------------------------------------------------

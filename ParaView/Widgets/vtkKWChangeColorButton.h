@@ -50,6 +50,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
+class vtkKWFrame;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkKWChangeColorButton : public vtkKWWidget
 {
@@ -98,8 +100,8 @@ protected:
   vtkKWChangeColorButton();
   ~vtkKWChangeColorButton();
 
-  vtkKWWidget *Label1;
-  vtkKWWidget *Label2;
+  vtkKWLabel *Label1;
+  vtkKWFrame *Label2;
   char        *Command;
   char        *Text;
   float       Color[3];
