@@ -46,7 +46,7 @@ public:
   // Description:
   // Methods for setting the value of the widget from the VTKReader.
   // User internally when user hits Reset.
-  virtual void Reset();
+  virtual void ResetInternal();
 
   // Description:
   // This specifies whether to ues Cell or Point data.

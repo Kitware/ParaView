@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.41");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.42");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -246,7 +246,7 @@ void vtkPVArraySelection::SetLocalSelectionsFromReader()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVArraySelection::Reset()
+void vtkPVArraySelection::ResetInternal()
 {
   vtkKWCheckButton* checkButton;
   
