@@ -998,19 +998,6 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- PieceScalars ----.
-  sInt = vtkPVSourceInterface::New();
-  sInt->SetApplication(pvApp);
-  sInt->SetPVWindow(this);
-  sInt->SetSourceClassName("vtkPieceScalars");
-  sInt->SetRootName("ColorPieces");
-  sInt->SetInputClassName("vtkPolyData");
-  sInt->SetOutputClassName("vtkPolyData");
-  // Add it to the list.
-  this->SourceInterfaces->AddItem(sInt);
-  sInt->Delete();
-  sInt = NULL;
-
   // ---- Shrink ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -1183,6 +1170,19 @@ void vtkPVWindow::ReadSourceInterfaces()
 
   // DataSet to DataSet Filters
   
+  // ---- PieceScalars ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkPieceScalars");
+  sInt->SetRootName("ColorPieces");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkDataSet");
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- ExtractEdges ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
