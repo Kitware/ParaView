@@ -57,7 +57,6 @@ private:
   int Length;
   int Height;
   char* BarColor;
-  char* BackgroundColor;
   int Value;
 private:
   vtkKWProgressGauge(const vtkKWProgressGauge&); // Not implemented
