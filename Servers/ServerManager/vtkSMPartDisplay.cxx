@@ -44,7 +44,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.20");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.21");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -409,7 +409,6 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
     end << vtkClientServerStream::Invoke << pm->GetProcessModuleID() 
         << "LogEndEvent" << "Execute Geometry" 
         << vtkClientServerStream::End;
-    vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke 
            << this->GeometryProxy->GetID(i) 
            << "AddObserver"
