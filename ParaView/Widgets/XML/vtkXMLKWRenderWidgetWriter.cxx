@@ -50,12 +50,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetWriter);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetWriter, "1.2");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetWriter::GetRootElementName()
 {
   return "KWRenderWidget";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLKWRenderWidgetWriter::GetCurrentCameraElementName()
+{
+  return "CurrentCamera";
+}
+
+//----------------------------------------------------------------------------
+char* vtkXMLKWRenderWidgetWriter::GetCornerAnnotationElementName()
+{
+  return "CornerAnnotation";
 }
 
 //----------------------------------------------------------------------------
@@ -110,12 +122,9 @@ int vtkXMLKWRenderWidgetWriter::AddNestedElements(vtkXMLDataElement *elem)
   vtkCamera *cam = obj->GetCurrentCamera();
   if (cam)
     {
-    vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
-    elem->AddNestedElement(nested_elem);
-    nested_elem->Delete();
     vtkXMLCameraWriter *xmlw = vtkXMLCameraWriter::New();
     xmlw->SetObject(cam);
-    xmlw->Create(nested_elem);
+    xmlw->CreateInNestedElement(elem, this->GetCurrentCameraElementName());
     xmlw->Delete();
     }
 
@@ -124,14 +133,9 @@ int vtkXMLKWRenderWidgetWriter::AddNestedElements(vtkXMLDataElement *elem)
   vtkCornerAnnotation *canno = obj->GetCornerAnnotation();
   if (canno)
     {
-    vtkXMLDataElement *nested_elem = vtkXMLDataElement::New();
-    elem->AddNestedElement(nested_elem);
-    nested_elem->Delete();
     vtkXMLCornerAnnotationWriter *xmlw = vtkXMLCornerAnnotationWriter::New();
     xmlw->SetObject(canno);
-    xmlw->Create(nested_elem);
-    nested_elem->SetIntAttribute(
-      "Visibility", obj->GetCornerAnnotationVisibility());
+    xmlw->CreateInNestedElement(elem, this->GetCornerAnnotationElementName());
     xmlw->Delete();
     }
 

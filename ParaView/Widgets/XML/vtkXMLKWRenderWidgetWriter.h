@@ -63,6 +63,16 @@ public:
   virtual char* GetRootElementName();
 
   // Description:
+  // Return the name of the camera element used inside that tree to
+  // store the current camera parameters.
+  static char* GetCurrentCameraElementName();
+
+  // Description:
+  // Return the name of the element used inside that tree to
+  // store the corner annotation parameters.
+  static char* GetCornerAnnotationElementName();
+
+  // Description:
   // Return the name of the header annotation element used inside that tree to
   // store the data.
   static char* GetHeaderAnnotationElementName();
