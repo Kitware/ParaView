@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.12");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.15.4.13");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -465,6 +465,7 @@ vtkPVMPIProcessModule::GatherInformationInternal(const char* infoClassName,
 }
 
 //----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
 {
   // Make sure we have a communicator.
@@ -500,3 +501,9 @@ int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
 
   return globalResult;
 }
+#else
+int vtkPVMPIProcessModule::LoadModuleInternal(const char* name)
+{
+  return this->Superclass::LoadModuleInternal(name);
+}
+#endif
