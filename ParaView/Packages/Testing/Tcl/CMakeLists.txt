@@ -42,7 +42,7 @@ IF(PARAVIEW_HAVE_XDMF OR XDMF_FOUND)
         ${PARAVIEW_SOURCE_DIR}/${TEST_PATH}/Testing/Tcl/${tfile}.pvs
         -D ${XDMF_DATASET}
         -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
-        -V ${XDMF_DATASET}/Baseline/${tfile}.png
+        -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
         ${VTK_MPI_POSTFLAGS})
     ENDFOREACH(tfile)
   ENDIF(RUN_WITH_MPI)
