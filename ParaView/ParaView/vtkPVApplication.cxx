@@ -101,7 +101,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.247.2.3");
+vtkCxxRevisionMacro(vtkPVApplication, "1.247.2.4");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1143,8 +1143,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
     if (this->UseSatelliteSoftware)
       {
-      vtkGraphicsFactory::SetUseMesaClasses(1);
-      vtkImagingFactory::SetUseMesaClasses(1);
+      vtkGraphicsFactory::SetUseMesaClasses(0);
+      vtkImagingFactory::SetUseMesaClasses(0);
       }
     }
 #endif
