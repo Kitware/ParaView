@@ -91,7 +91,7 @@ void vtkKWText::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("text %s %s",wname,args);
+  this->Script("text %s %s",wname,(args?args:""));
 }
 
 
