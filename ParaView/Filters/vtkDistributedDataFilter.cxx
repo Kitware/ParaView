@@ -92,7 +92,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.13.2.2");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.13.2.3");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -168,6 +168,12 @@ const char *vtkDistributedDataFilter::GetGlobalNodeIdArray(vtkDataSet *set)
      "GlobalNodeId"  // vtkExodusReader name
      };
   //------------------------------------------------
+
+  if (this->GlobalIdArrayName && (!this->GlobalIdArrayName[0]))
+    {
+    delete [] this->GlobalIdArrayName;
+    this->GlobalIdArrayName = NULL;
+    }
 
   const char *gidArrayName = NULL;
 
@@ -431,7 +437,6 @@ void vtkDistributedDataFilter::ExecuteInformation()
     output->SetMaximumNumberOfPieces(-1);
     }
 }
-
 void vtkDistributedDataFilter::Execute()
 {
   vtkDataSet *input  = this->GetInput();
@@ -483,6 +488,7 @@ void vtkDistributedDataFilter::Execute()
     this->Kdtree->SetController(this->Controller);
     this->Kdtree->SetTiming(this->Timing);
     this->Kdtree->SetNumRegionsOrMore(this->NumProcesses);
+    this->Kdtree->SetMinCells(2);
     }
 
   // Stage (1) - use vtkPKdTree to...
