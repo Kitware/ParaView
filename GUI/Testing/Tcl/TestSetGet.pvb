@@ -68,7 +68,6 @@ set classExceptions {
   vtkCommand
   vtkFileOutputWindow
   vtkIndent
-  vtkObjectBase
   vtkOutputWindow
   vtkParallelFactory
   vtkPlanes
