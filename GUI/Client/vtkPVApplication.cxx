@@ -112,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.313");
+vtkCxxRevisionMacro(vtkPVApplication, "1.314");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -892,7 +892,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     this->OutputWindow->CrashOnErrorsOn();
     }
 
-  this->Print(cout);
   return 0;
 }
 
