@@ -569,8 +569,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CalculatorButton->SetBalloonHelpString("Calculator");
   
   this->CutPlaneButton->SetParent(this->Toolbar);
-  this->CutPlaneButton->Create(app, "-text Cut");
-  //this->CutPlaneButton->Create(app, "-image PVCutPlaneButton");
+  this->CutPlaneButton->Create(app, "-image PVCutPlaneButton");
   this->CutPlaneButton->SetCommand(this, "CutPlaneCallback");
   this->CutPlaneButton->SetBalloonHelpString("Cut with an implicit plane. It is identical to generating point scalars from an implicit plane, and taking an iso surface. This filter typically reduces the dimensionality of the data.  A 3D input data set will produce an 2D output plane.");
 
