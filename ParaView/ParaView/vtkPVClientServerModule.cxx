@@ -144,7 +144,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.60");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.61");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -300,7 +300,6 @@ void vtkPVClientServerModule::Initialize()
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::ShouldWaitForConnection()
 {  
-  int myId = this->Controller->GetLocalProcessId();
   vtkPVApplication *pvApp = this->GetPVApplication();
   // if client mode then return reverse connection
   if(this->ClientMode)
@@ -318,7 +317,6 @@ int vtkPVClientServerModule::ShouldWaitForConnection()
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::OpenConnectionDialog(int* start)
 {
-  int myId = this->Controller->GetLocalProcessId();
   vtkPVApplication *pvApp = this->GetPVApplication();
   char servers[1024];
   servers[0] = 0;
@@ -357,9 +355,6 @@ int vtkPVClientServerModule::OpenConnectionDialog(int* start)
 //----------------------------------------------------------------------------
 int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
 { 
-  int myId = this->Controller->GetLocalProcessId();
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
   char numbuffer[100];
   vtkstd::string runcommand = "eval ${PARAVIEW_SETUP_SCRIPT} ; ";
   // Add mpi
@@ -414,7 +409,6 @@ int vtkPVClientServerModule::StartRemoteParaView(vtkSocketCommunicator* comm)
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::ConnectToRemote()
 {
-  int myId = this->Controller->GetLocalProcessId();
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   // according to the cvs logs this stops a memory leak
@@ -492,7 +486,6 @@ void vtkPVClientServerModule::ConnectToRemote()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SetupWaitForConnection()
 {
-  int myId = this->Controller->GetLocalProcessId();
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( this->ClientMode )
     {
