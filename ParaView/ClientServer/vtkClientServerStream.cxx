@@ -978,18 +978,33 @@ int vtkClientServerStream::GetArgumentObject(int message, int argument,
 int vtkClientServerStream::GetData(const unsigned char** data,
                                    size_t* length) const
 {
-  if(data)
+  // Do not return data unless stream is valid.
+  if(!this->Internal->Invalid)
     {
-    *data = &*this->Internal->Data.begin();
-    }
+    if(data)
+      {
+      *data = &*this->Internal->Data.begin();
+      }
 
-  if(length)
+    if(length)
+      {
+      *length = this->Internal->Data.size();
+      }
+    return 1;
+    }
+  else
     {
-    *length = this->Internal->Data.size();
-    }
+    if(data)
+      {
+      *data = 0;
+      }
 
-  // Return whether the stream is valid.
-  return this->Internal->Invalid? 0:1;
+    if(length)
+      {
+      *length = 0;
+      }
+    return 0;
+    }
 }
 
 //----------------------------------------------------------------------------
