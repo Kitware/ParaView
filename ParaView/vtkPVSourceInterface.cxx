@@ -108,7 +108,7 @@ void vtkPVSourceInterface::SetPVWindow(vtkPVWindow *w)
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVSourceInterface::CreateCallback()
 {
-  char tclName[100], extentTclName[100], *pieceTclName;
+  char tclName[100], extentTclName[100];
   const char *outputDataType;
   vtkDataSet *d;
   vtkPVData *pvd;
@@ -163,14 +163,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     {
     vtkPVData *current = this->PVWindow->GetCurrentPVData();
     pvs->SetNthPVInput(0, current);
-
-    pieceTclName =
-      this->PVWindow->GetCurrentPVSource()->GetExtractPieceTclName();
-    if (pieceTclName != NULL)
-      {
-      pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                             tclName, pieceTclName);
-      }
     }
   
   // Add the new Source to the View, and make it current.
@@ -206,6 +198,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
 
   if (!this->InputClassName)
     {
+    pvd->InsertExtractPiecesIfNecessary();
+
     sprintf(extentTclName, "%s%dTranslator", this->RootName,
 	    this->InstanceCount);
     pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);
@@ -216,7 +210,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     // Hold onto name so it can be deleted.
     pvs->SetExtentTranslatorTclName(extentTclName);
 
-    pvs->ExtractPieces();
     }
   else
     {

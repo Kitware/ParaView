@@ -119,6 +119,13 @@ public:
   // Description:
   // This methiod updates the piece that has been assinged to this process.
   void Update();
+
+  // Description:
+  // This method is called on creation.  If the data object is unstructured and 
+  // has a maximum number of pieces, then a extract piece filter is inserted
+  // before the data object.  This will give parallel pipelines at the
+  // expense of initial generation (reading) of the data.
+  void InsertExtractPiecesIfNecessary();
   
 protected:
   vtkPVData();

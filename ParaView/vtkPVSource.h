@@ -264,15 +264,6 @@ public:
   // Needed to clean up properly.
   vtkSetStringMacro(ExtentTranslatorTclName);
 
-  // Description:
-  // Get the ExtractPieceTclName
-  vtkGetStringMacro(ExtractPieceTclName);
-
-  // Description:
-  // Extract the correct piece of the output for each processor.
-  // This only extracts a piece if the data has not already been broken up.
-  void ExtractPieces();
-
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -332,9 +323,6 @@ protected:
   char *DefaultScalarsName;
   vtkSetStringMacro(ChangeScalarsFilterTclName);
   vtkSetStringMacro(DefaultScalarsName);
-  
-  char *ExtractPieceTclName;
-  vtkSetStringMacro(ExtractPieceTclName);
   
   char *DefaultVectorsName;
   vtkSetStringMacro(DefaultVectorsName);

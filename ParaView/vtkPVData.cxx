@@ -335,3 +335,45 @@ void vtkPVData::Update()
 			 this->MapperTclName, this->MapperTclName);
   pvApp->BroadcastScript("%s Update", this->VTKDataTclName);
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVData::InsertExtractPiecesIfNecessary()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  if ( this->VTKData == NULL)
+    {
+    return;
+    }
+  this->VTKData->UpdateInformation();
+  if (this->VTKData->GetMaximumNumberOfPieces() != 1)
+    { // The source can already produce pieces.
+    return;
+    }
+  
+  // We are going to create the piece filter with a dummy tcl name,
+  // setup the pipeline, and remove tcl's reference to the objects.
+  // The vtkData object will be moved to the output of the piece filter.
+  if (this->VTKData->IsA("vtkPolyData"))
+    {
+    pvApp->BroadcastSimpleScript("vtkExtractPolyDataPiece pvTemp");
+    }
+  else if (this->VTKData->IsA("vtkUnstructuredGrid"))
+    {
+    pvApp->BroadcastSimpleScript("vtkExtractUnstructuredGridPiece pvTemp");
+    }
+  else
+    {
+    vtkWarningMacro("We do not extract pieces from structured data.");
+    return;
+    }
+
+  pvApp->BroadcastSimpleScript("pvTemp SetInput [pvTemp GetOutput]");
+  pvApp->BroadcastScript("pvTemp SetOutput %s", this->VTKDataTclName);
+  pvApp->BroadcastScript("%s SetOutput [pvTemp GetInput]",
+                         this->PVSource->GetVTKSourceTclName());
+
+  // Now delete Tcl's reference to the piece filter.
+  pvApp->BroadcastSimpleScript("pvTemp Delete");
+}
