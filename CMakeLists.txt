@@ -54,7 +54,6 @@ IF(BUILD_DOCUMENTATION)
   SUBDIRS(Utilities/Doxygen)
 ENDIF(BUILD_DOCUMENTATION)
 
-
 #########################################################################
 # Configure Testing
 OPTION(BUILD_TESTING "Build ParaView Complete Testing" ON)
@@ -269,6 +268,19 @@ SUBDIRS(Utilities/VTKClientServer)
 #########################################################################
 # Configure Tcl wrapping
 SUBDIRS(Utilities/VTKTclWrapping)
+
+#########################################################################
+# Configure ParaViewPro
+IF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPro")
+  OPTION(PARAVIEW_PRO_BUILD "Build ParaViewPro part. Requires Kitware License and ParaViewPro source" OFF)
+  MARK_AS_ADVANCED(PARAVIEW_PRO_BUILD)
+  IF(PARAVIEW_PRO_BUILD)
+    SUBDIRS(ParaViewPro)
+    SET(PARAVIEW_PRO_INCLUDE_DIRS
+      ${ParaView_SOURCE_DIR}/ParaViewPro/IO
+      )
+  ENDIF(PARAVIEW_PRO_BUILD)
+ENDIF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPro")
 
 #########################################################################
 # Configure Server

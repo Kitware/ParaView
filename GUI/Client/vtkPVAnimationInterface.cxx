@@ -56,6 +56,15 @@
 #include "vtkKWRange.h"
 #include "vtkCommand.h"
 #include "vtkKWEvent.h"
+#include "vtkPVConfig.h"
+
+#ifdef PARAVIEW_PRO_BUILD
+# ifdef _WIN32
+#  include "vtkAVIWriter.h"
+# else
+#  include "vtkMovieWriter.h"
+# endif
+#endif
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -170,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.126");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.127");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1200,7 +1209,19 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   saveDialog->SaveDialogOn();
   saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Images");
-  saveDialog->SetFileTypes("{{jpeg} {.jpg}} {{tiff} {.tif}} {{Portable Network Graphics} {.png}}");
+  ostrstream ostr;
+  ostr << "{{jpeg} {.jpg}} {{tiff} {.tif}} {{Portable Network Graphics} {.png}}";
+#ifdef PARAVIEW_PRO_BUILD
+# ifdef _WIN32
+  ostr << " {{AVI movie file} {.avi}}";
+# else
+  ostr << " {{MPEG movie file} {.mpg}}";
+# endif
+#endif
+  ostr << ends;
+
+  saveDialog->SetFileTypes(ostr.str());
+  ostr.rdbuf()->freeze(0);
 
   if ( saveDialog->Invoke() &&
        strlen(saveDialog->GetFileName())>0 )
@@ -1254,7 +1275,10 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   this->SavingData = 1;
   this->GetWindow()->UpdateEnableState();
   vtkWindowToImageFilter* winToImage;
-  vtkImageWriter* writer;
+  vtkImageWriter* writer = 0;
+#ifdef PARAVIEW_PRO_BUILD
+  vtkKWGenericMovieWriter* awriter = 0;
+#endif
   char *fileName;
   int fileCount;
   int t;
@@ -1275,6 +1299,16 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     writer = vtkPNGWriter::New();
     }
+#ifdef PARAVIEW_PRO_BUILD
+  else if (strcmp(ext,"avi") == 0 || strcmp(ext, "mpg") == 0)
+    {
+# ifdef _WIN32
+    awriter = vtkAVIWriter::New();
+# else
+    awriter = vtkMovieWriter::New();
+# endif
+    }
+#endif
   else
     {
     vtkErrorMacro("Unknown extension " << ext << ", try: jpg, tif or png.");
@@ -1282,8 +1316,22 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     this->GetWindow()->UpdateEnableState();
     return;
     }
-  writer->SetInput(winToImage->GetOutput());
-  fileName = new char[strlen(fileRoot) + strlen(ext) + 25];      
+
+  fileName = new char[strlen(fileRoot) + strlen(ext) + 25];
+
+  if ( writer )
+    {
+    writer->SetInput(winToImage->GetOutput());
+    }
+#ifdef PARAVIEW_PRO_BUILD
+  else if ( awriter )
+    {
+    awriter->SetInput(winToImage->GetOutput());
+    sprintf(fileName, "%s.%s", fileRoot, ext);
+    awriter->SetFileName(fileName);
+    awriter->Start();
+    }
+#endif
 
   // Loop through all of the time steps.
   t = this->GetGlobalStart();
@@ -1297,28 +1345,54 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 
     // Create a file name for this image.
     sprintf(fileName, "%s%04d.%s", fileRoot, fileCount, ext);
-    writer->SetFileName(fileName);
     winToImage->Modified();
     winToImage->ShouldRerenderOff();
-    writer->Write();
-    if (writer->GetErrorCode() == vtkErrorCode::OutOfDiskSpaceError)
+    int errcode = 0;
+    if ( writer )
       {
-      for (i = 0; i < fileCount; i++)
+      writer->SetFileName(fileName);
+      writer->Write();
+      errcode = writer->GetErrorCode();
+      }
+#ifdef PARAVIEW_PRO_BUILD
+    else if ( awriter )
+      {
+      awriter->Write();
+      errcode = awriter->GetErrorCode();
+      }
+#endif
+    if ( errcode == vtkErrorCode::OutOfDiskSpaceError)
+      {
+      if ( writer )
         {
-        sprintf(fileName, "%s%04d.%s", fileRoot, i, ext);
-        unlink(fileName);
+        for (i = 0; i < fileCount; i++)
+          {
+          sprintf(fileName, "%s%04d.%s", fileRoot, i, ext);
+          unlink(fileName);
+          }
         }
       success = 0;
       break;
       }
+
     ++fileCount;
     ++t;
     }
 
   winToImage->Delete();
   winToImage = NULL;
-  writer->Delete();
-  writer = NULL;
+  if ( writer )
+    {
+    writer->Delete();
+    writer = NULL;
+    }
+#ifdef PARAVIEW_PRO_BUILD
+  else if ( awriter )
+    {
+    awriter->Delete();
+    awriter = 0;
+    }
+#endif
   delete [] fileName;
   fileName = NULL;
   
