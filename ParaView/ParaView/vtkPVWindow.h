@@ -364,7 +364,11 @@ public:
   // Description:
   // Callback for fly speed widget
   void FlySpeedScaleCallback();
-  
+
+  // Description:
+  // Return the main render window interactor.
+  vtkGetObjectMacro(GenericInteractor, vtkPVGenericRenderWindowInteractor);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
