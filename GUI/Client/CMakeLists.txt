@@ -197,24 +197,6 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 
-IF(PARAVIEW_USE_SAF)
-  SET( ParaViewClient_SRCS
-    ${ParaViewClient_SRCS}
-    ${SAF_SOURCE_DIR}/vtkPVSAFReaderModule.cxx )
-
-  SET( ParaViewClient_SRCS
-      ${ParaViewClient_SRCS}
-      ${SAF_SOURCE_DIR}/../Filtering/vtkPVBasicDSPFilterWidget.cxx )
-  INCLUDE_DIRECTORIES(${SAF_SOURCE_DIR}/../Filtering/)
-
-ELSE(PARAVIEW_USE_SAF)
-  IF(PARAVIEW_USE_EXODUS)
-    SET( ParaViewClient_SRCS
-      ${ParaViewClient_SRCS}
-      ${EXODUS_SOURCE_DIR}/../Filtering/vtkPVBasicDSPFilterWidget.cxx )
-    INCLUDE_DIRECTORIES(${EXODUS_SOURCE_DIR}/../Filtering/)
-  ENDIF(PARAVIEW_USE_EXODUS)
-ENDIF(PARAVIEW_USE_SAF)
 
 SET(ParaView_SRCS ${ParaView_SRCS} ${ParaViewShared_SRCS}
   ${ParaViewClient_SRCS} ${ParaViewClientNotWrapped_SRCS} ${ParaViewSharedNotTclWrapped_SRCS})
