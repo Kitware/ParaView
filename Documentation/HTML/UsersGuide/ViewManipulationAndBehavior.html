@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>View Manipulation and Behaviour</title>
+</head>
+
+<body>
+<h1>View Manipulation and Behaviour</h1>
+
+There are several different ways to manipulate the view of you data in
+ParaView.  In the upper left corner of the application is the view toolbar.
+The first button on this toolbar resets the view to all the visible data
+sets.
+<center>
+<img alt="Reset View Button" src="ResetViewButton.jpg">
+</center>
+
+If you would like to reset the view to show a single data set, you should
+press the "Set View To Data" button on the data's display page.
+
+<p>
+<center>
+<img alt="Set View to Data" src="SetViewToData.jpg">
+</center>
+<p>
+
+The remaining buttons activate different interactors states.  The current
+interactor state is indicated by the highlighted button, and special
+cursors when the mouse is over the render window.
+
+<p>
+<center>
+<img alt="Fly Button" src="FlyButton.jpg">
+</center>
+<p>
+
+The "Fly" interactor causes the view to move toward where the cursor is
+pointing.  When the cursor is in the middle of the view, the interactor
+zooms.  When the cursor is near the edge of the view, the fly interactor
+pans the view.  This interactor is most useful when trying to position the
+view internal to several elements.  The left mouse button flys forward, and
+the right mouse button flys backward.  None of the interactors use the
+middle mouse button.
+
+<p>
+<center>
+<img alt="Rotate Button" src="RotateButton.jpg">
+</center>
+<p>
+
+The "Rotate" interactor is the default interactor.  Its behavior also
+depends on where the cursor is position over the view.  The left mouse
+button rotates around the center of rotation.  The center of rotation is
+indicated by the cross hairs in the view.  You can change the center of
+rotation using the center of rotation toolbar.  Reset puts the center of
+rotation in the current view.  You can also select the center of rotation
+by selecting the pick-center-of-rotation icon.  There is also an entry
+available to manually select the center of roation point.
+
+There are two options for rotation that depend on when you first click in
+the view.  When you mouse near the center of rotation, you get the standard
+rotation around the view's X and Y axes.  When you start rotation by
+clicking far from the center of rotation, the you get a roll behavior which
+is rotation around the views Z axis.
+
+For convenience, in the rotation interactor state, the right mouse button
+behaves like the translation interactor.
+
+<p>
+<center>
+<img alt="Translate Button" src="TranslateButton.jpg">
+</center>
+<p>
+
+The translate interactor allows you to pan the view.  Once again, its
+behavior depends on where you first click on the view.  When you click in
+upper or lower thirds of the view, you get a zooming behavor which moves
+the view along it's Z axis.  Clicking in the middle third of the view gives
+a paning interaction which translates the view along its X and Y axes.
+
+
+<hr>
+<address></address>
+<!-- hhmts start -->
+Last modified: Tue Oct 23 10:31:54 EDT 2001
+<!-- hhmts end -->
+</body> </html>
