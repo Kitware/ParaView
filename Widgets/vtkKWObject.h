@@ -90,7 +90,7 @@ public:
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
-  void Script(char *EventString, ...);
+  void Script(const char *EventString, ...);
 
 private:
   char *TclName;

@@ -131,7 +131,8 @@ const char *vtkKWWidget::GetWidgetName()
   return this->WidgetName;
 }
 
-void vtkKWWidget::Create(vtkKWApplication *app, char *name, char *args)
+void vtkKWWidget::Create(vtkKWApplication *app, const char *name, 
+                         const char *args)
 {
   // must set the application
   if (this->Application)
@@ -197,7 +198,7 @@ char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * Command
   return event.str();
 }
 
-void vtkKWWidget::SetBalloonHelpString(char *str)
+void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
   if (this->Application == NULL)
     {
@@ -247,7 +248,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.9 $");
+  this->ExtractRevision(os,"$Revision: 1.10 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()

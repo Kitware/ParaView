@@ -72,7 +72,7 @@ void vtkKWText::SetValue(const char *s)
     }
 }
 
-void vtkKWText::Create(vtkKWApplication *app, char *args)
+void vtkKWText::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

@@ -47,7 +47,7 @@ vtkKWRadioButton* vtkKWRadioButton::New()
 
 
 
-void vtkKWRadioButton::Create(vtkKWApplication *app, char *args)
+void vtkKWRadioButton::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

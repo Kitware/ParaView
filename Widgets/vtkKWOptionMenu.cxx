@@ -79,7 +79,7 @@ char *vtkKWOptionMenu::GetValue()
   return this->CurrentValue;  
 }
 
-void vtkKWOptionMenu::SetValue(char *s)
+void vtkKWOptionMenu::SetValue(const char *s)
 {
   if (s)
     {
@@ -139,7 +139,7 @@ void vtkKWOptionMenu::SetCurrentEntry(const char *name)
   this->Script("set %sValue {%s}",this->GetWidgetName(), name);
 }
  
-void vtkKWOptionMenu::Create(vtkKWApplication *app, char *args)
+void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

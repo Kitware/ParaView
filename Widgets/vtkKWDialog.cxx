@@ -119,7 +119,7 @@ void vtkKWDialog::OK()
 }
 
 
-void vtkKWDialog::Create(vtkKWApplication *app, char *args)
+void vtkKWDialog::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

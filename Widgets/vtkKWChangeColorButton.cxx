@@ -100,7 +100,7 @@ void vtkKWChangeColorButton::SetColor(float r, float g, float b)
 }
 
 
-void vtkKWChangeColorButton::Create(vtkKWApplication *app, char *args)
+void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
   char color[256];
@@ -255,5 +255,5 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.8 $");
+  this->ExtractRevision(os,"$Revision: 1.9 $");
 }

@@ -66,7 +66,7 @@ public:
 
   // Description:
   // Create a View
-  virtual void Create(vtkKWApplication *app, char *args) = 0;
+  virtual void Create(vtkKWApplication *app, const char *args) = 0;
 
   // Description:
   // Sets up some default event handlers to allow
@@ -185,7 +185,7 @@ public:
 
   // Description::
   // Set the title of this view.
-  virtual void SetTitle(char *);
+  virtual void SetTitle(const char *);
 
   // Description:
   // Allow access to the notebook object.

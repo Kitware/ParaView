@@ -69,7 +69,7 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
 }
 
 
-void vtkKWMessageDialog::Create(vtkKWApplication *app, char *args)
+void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 {
   // invoke super method
   this->vtkKWDialog::Create(app,args);

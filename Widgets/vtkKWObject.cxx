@@ -103,7 +103,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.7 $");
+  this->ExtractRevision(os,"$Revision: 1.8 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -180,7 +180,7 @@ const char *vtkKWObject::GetTclName()
   return this->TclName;
 }
 
-void vtkKWObject::Script(char *format, ...)
+void vtkKWObject::Script(const char *format, ...)
 {
   static char event[16000];
 

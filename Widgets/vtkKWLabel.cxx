@@ -73,7 +73,7 @@ void vtkKWLabel::SetLabel(const char* l)
 }
 
 
-void vtkKWLabel::Create(vtkKWApplication *app, char *args)
+void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

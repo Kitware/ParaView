@@ -875,7 +875,7 @@ void vtkKWView::SetParentWindow(vtkKWWindow *_arg)
     } 
 } 
 
-void vtkKWView::SetTitle(char *title)
+void vtkKWView::SetTitle(const char *title)
 {
   this->Script("%s configure -text {%s}", 
                this->Label->GetWidgetName(), title);
@@ -1011,5 +1011,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.20 $");
+  this->ExtractRevision(os,"$Revision: 1.21 $");
 }

@@ -137,7 +137,7 @@ int vtkKWListBox::AppendUnique(const char* name)
 
 
 
-void vtkKWListBox::Create(vtkKWApplication *app, char *args)
+void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

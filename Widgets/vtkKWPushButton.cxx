@@ -46,7 +46,7 @@ vtkKWPushButton* vtkKWPushButton::New()
 
 
 
-void vtkKWPushButton::Create(vtkKWApplication *app, char *args)
+void vtkKWPushButton::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

@@ -2,6 +2,9 @@
 int vtkCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkCornerAnnotationNewCommand();
+int vtkKWActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWActorCompositeNewCommand();
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWApplicationNewCommand();
@@ -134,6 +137,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
 {
   vtkTclCreateNew(interp,"vtkCornerAnnotation", vtkCornerAnnotationNewCommand,
                   vtkCornerAnnotationCommand);
+  vtkTclCreateNew(interp,"vtkKWActorComposite", vtkKWActorCompositeNewCommand,
+                  vtkKWActorCompositeCommand);
   vtkTclCreateNew(interp,"vtkKWApplication", vtkKWApplicationNewCommand,
                   vtkKWApplicationCommand);
   vtkTclCreateNew(interp,"vtkKWCallbackSpecification", vtkKWCallbackSpecificationNewCommand,

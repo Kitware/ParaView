@@ -91,7 +91,7 @@ vtkKWExtent::~vtkKWExtent()
   this->ZMaxScale->Delete();
 }
 
-void vtkKWExtent::Create(vtkKWApplication *app, char *args)
+void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

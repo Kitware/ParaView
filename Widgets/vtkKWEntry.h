@@ -44,13 +44,13 @@ public:
 
   // Description:
   // Create a Tk widget
-  void Create(vtkKWApplication *app, char *args);
+  void Create(vtkKWApplication *app, const char *args);
 
   // Description:
   // Set/Get the value of the entry in a few different formats.
   // In the SetValue method with float, the second argument is the
   // number of decimal places to display.
-  void SetValue(char *);
+  void SetValue(const char *);
   void SetValue(int a);
   void SetValue(float f,int size);
   char *GetValue();

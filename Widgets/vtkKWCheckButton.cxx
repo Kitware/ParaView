@@ -67,7 +67,7 @@ void vtkKWCheckButton::SetState(int s)
 }
 
 
-void vtkKWCheckButton::Create(vtkKWApplication *app, char *args)
+void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

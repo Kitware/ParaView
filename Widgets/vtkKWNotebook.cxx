@@ -113,7 +113,7 @@ vtkKWNotebook::~vtkKWNotebook()
     }
 }
 
-void vtkKWNotebook::Create(vtkKWApplication *app, char *args)
+void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
   

@@ -115,7 +115,7 @@ void vtkKWScale::SetResolution( float r )
   this->Modified();
 }
 
-void vtkKWScale::Create(vtkKWApplication *app, char *args)
+void vtkKWScale::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 

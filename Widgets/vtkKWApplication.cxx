@@ -123,7 +123,7 @@ vtkKWApplication::~vtkKWApplication()
   this->EventNotifier->Delete();
 }
 
-void vtkKWApplication::Script(char *format, ...)
+void vtkKWApplication::Script(const char *format, ...)
 {
   static char event[16000];
   

@@ -73,7 +73,7 @@ float vtkKWEntry::GetValueAsFloat()
   return atof(this->GetValue());
 }
 
-void vtkKWEntry::SetValue(char *s)
+void vtkKWEntry::SetValue(const char *s)
 {
   this->Script("%s delete 0 end", this->GetWidgetName());
   if (s)
@@ -97,7 +97,7 @@ void vtkKWEntry::SetValue(float f, int size)
   this->Script(tmp,this->GetWidgetName(),f);
 }
 
-void vtkKWEntry::Create(vtkKWApplication *app, char *args)
+void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 
