@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.16");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.17");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1027,6 +1027,8 @@ void vtkPVRenderView::CreateViewProperties()
 {
   this->vtkKWView::CreateViewProperties();
 
+  this->BackgroundColor->SetBalloonHelpString("Change the background color of the 3D View window");
+
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication* pvapp = this->GetPVApplication();
 
@@ -1059,7 +1061,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->ParallelProjectionCheck->SetCommand(this, 
                                             "ParallelProjectionCallback");
   this->ParallelProjectionCheck->SetBalloonHelpString(
-    "Toggle the use of parallel projection vesus perspective.");
+    "Toggle the use of parallel projection "
+    "(if parallel project is off, perspective projection is used).");
   
   // Render parameters: triangle strips
 
@@ -1079,7 +1082,8 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->TriangleStripsCheck->SetCommand(this, "TriangleStripsCallback");
   this->TriangleStripsCheck->SetBalloonHelpString(
-    "Toggle the use of triangle strips when rendering polygonal data");
+    "If this option is chosen, all triangles are converted into triangle "
+    "strips before rendering. This may improve the rendering perfermance.");
   
   // Render parameters: immediate mode
 
@@ -1098,8 +1102,10 @@ void vtkPVRenderView::CreateViewProperties()
     this->ImmediateModeCheck->SetState(1);
     }
   this->ImmediateModeCheck->SetBalloonHelpString(
-    "Toggle the use of immediate mode rendering (when off, display "
-    "lists are used)");
+    "When this option is off, OpenGL display lists are used when rendering."
+    "Using display lists improves performance for small datasets "
+    "but is not recommended for large datasets due to excessive memory "
+    "usage and long display list creating times.");
 
   // Render parameters: pack
 
@@ -1153,9 +1159,10 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->LODThresholdScale->SetCommand(this, "LODThresholdScaleCallback");
   this->LODThresholdScale->SetBalloonHelpString(
-    "This slider adjusts when the decimated LOD is used. Threshold is based "
-    "on number of points.  "
-   "Left: Use slow full-resolution models. Right: Use fast decimated models.");
+    "This slider adjusts when the decimated level-of-detail models are used. "
+    "Threshold is based on number of points.  "
+    "\nLeft: Use slow full-resolution models. "
+    "Right: Use fast decimated models.");
 
   int row = 0;
 
@@ -1198,9 +1205,11 @@ void vtkPVRenderView::CreateViewProperties()
   this->LODResolutionScale->SetCommand(this, "LODResolutionLabelCallback");
   this->LODResolutionScale->SetEndCommand(this, "LODResolutionScaleCallback");
   this->LODResolutionScale->SetBalloonHelpString(
-    "This slider determines the resolution of the decimated level of details. "
-   "The value is the dimension for each axis in the quadric clustering filter."
-   "Left: Use slow high-resolution models. Right: Use fast simple models .");
+    "This slider determines the resolution of the decimated level-of-detail "
+    "models. The value is the dimension for each axis in the quadric clustering "
+    "algorithm."
+    "\nLeft: Use slow high-resolution models. "
+    "Right: Use fast simple models .");
 
   pvapp->Script("grid %s -row %d -column 1 -sticky news", 
                 this->LODResolutionValue->GetWidgetName(), row++);
@@ -1388,6 +1397,11 @@ void vtkPVRenderView::CreateViewProperties()
     this->InterfaceSettingsFrame->GetFrame());
   this->Display3DWidgets->Create(this->Application, 0);
   this->Display3DWidgets->SetText("Display 3D widgets automatically");
+  this->Display3DWidgets->SetBalloonHelpString(
+    "When this advanced option is on, all 3D widgets (manipulators) are "
+    "visible when created. Turn this off to avoid unnecessary "
+    "renders when working with large data and not using 3D widgets "
+    "to adjust parameters.");
   this->Display3DWidgets->SetCommand(this, "Display3DWidgetsCallback");
 
   if (!this->Application->GetRegisteryValue(2,"RunTime","Display3DWidgets",0)||
@@ -1429,6 +1443,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->XMaxViewButton->SetLabel("+X");
   this->XMaxViewButton->Create(this->Application, "");
   this->XMaxViewButton->SetCommand(this, "StandardViewCallback 1 0 0");
+  this->XMaxViewButton->SetBalloonHelpString(
+    "Looking down X axis from (1,0,0)");
   this->Script("grid configure %s -column 0 -row 0 %s",
                this->XMaxViewButton->GetWidgetName(), views_grid_settings);
 
@@ -1436,6 +1452,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->XMinViewButton->SetLabel("-X");
   this->XMinViewButton->Create(this->Application, "");
   this->XMinViewButton->SetCommand(this, "StandardViewCallback -1 0 0");
+  this->XMinViewButton->SetBalloonHelpString(
+    "Looking down X axis from (-1,0,0)");
   this->Script("grid configure %s -column 0 -row 1 %s",
                this->XMinViewButton->GetWidgetName(), views_grid_settings);
 
@@ -1443,6 +1461,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->YMaxViewButton->SetLabel("+Y");
   this->YMaxViewButton->Create(this->Application, "");
   this->YMaxViewButton->SetCommand(this, "StandardViewCallback 0 1 0");
+  this->YMaxViewButton->SetBalloonHelpString(
+    "Looking down Y axis from (0,1,0)");
   this->Script("grid configure %s -column 1 -row 0 %s",
                this->YMaxViewButton->GetWidgetName(), views_grid_settings);
 
@@ -1450,6 +1470,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->YMinViewButton->SetLabel("-Y");
   this->YMinViewButton->Create(this->Application, "");
   this->YMinViewButton->SetCommand(this, "StandardViewCallback 0 -1 0");
+  this->YMinViewButton->SetBalloonHelpString(
+    "Looking down Y axis from (0,-1,0)");
   this->Script("grid configure %s -column 1 -row 1 %s",
                this->YMinViewButton->GetWidgetName(), views_grid_settings);
 
@@ -1457,6 +1479,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->ZMaxViewButton->SetLabel("+Z");
   this->ZMaxViewButton->Create(this->Application, "");
   this->ZMaxViewButton->SetCommand(this, "StandardViewCallback 0 0 1");
+  this->ZMaxViewButton->SetBalloonHelpString(
+    "Looking down Z axis from (0,0,1)");
   this->Script("grid configure %s -column 2 -row 0 %s",
                this->ZMaxViewButton->GetWidgetName(), views_grid_settings);
 
@@ -1464,6 +1488,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->ZMinViewButton->SetLabel("-Z");
   this->ZMinViewButton->Create(this->Application, "");
   this->ZMinViewButton->SetCommand(this, "StandardViewCallback 0 0 -1");
+  this->ZMinViewButton->SetBalloonHelpString(
+    "Looking down Z axis from (0,0,-1)");
   this->Script("grid configure %s -column 2 -row 1 %s",
                this->ZMinViewButton->GetWidgetName(), views_grid_settings);
 
@@ -2564,7 +2590,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.16 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.17 $");
 }
 
 //------------------------------------------------------------------------------
