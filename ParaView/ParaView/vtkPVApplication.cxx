@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.141");
+vtkCxxRevisionMacro(vtkPVApplication, "1.142");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -257,6 +257,9 @@ vtkPVApplication::vtkPVApplication()
 
   this->Controller = NULL;
 
+  this->UseRenderingGroup = 0;
+  this->GroupFileName = 0;
+
   struct stat fs;
 
   if (stat("ParaViewTrace1.pvs", &fs) == 0) 
@@ -343,6 +346,7 @@ vtkPVApplication::~vtkPVApplication()
     delete this->TraceFile;
     this->TraceFile = 0;
     }
+  this->SetGroupFileName(0);
 }
 
 
@@ -482,15 +486,28 @@ int vtkPVApplication::CheckForArgument(int argc, char* argv[],
     }
 
   int i;
+  int retVal = VTK_ERROR;
   for (i=0; i < argc; i++)
     {
-    if (argv[i] && strcmp(arg, argv[i]) == 0)
+    char* newarg = vtkString::Duplicate(argv[i]);
+    int len = strlen(newarg);
+    for (int j=0; j<len; j++)
+      {
+      if (newarg[j] == '=')
+        {
+        newarg[j] = '\0';
+        }
+      }
+    if (newarg && strcmp(arg, newarg) == 0)
       {
       index = i;
-      return VTK_OK;
+      retVal = VTK_OK;
+      delete[] newarg;
+      break;
       }
+    delete[] newarg;
     }
-  return VTK_ERROR;
+  return retVal;
 }
 
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
@@ -498,6 +515,10 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Start ParaView without any default modules.", 
   "--disable-registry", "-g", 
   "Do not use registry when running ParaView (for testing).", 
+  "--use-rendering-group", "-p",
+  "Use a subset of processes to render.",
+  "--group-file", "-gf",
+  "--group-file=fname where fname is the name of the input file listing number of processors to render on.",
 #ifdef VTK_MANGLE_MESA
   "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
@@ -614,11 +635,23 @@ void vtkPVApplication::Start(int argc, char*argv[])
         const char* argument2 = vtkPVApplication::ArgumentList[j+1];
         while (argument1 && argument1[0])
           {
-          if ( strcmp(argv[i], argument1) == 0 || 
-               strcmp(argv[i], argument2) == 0)
+
+          char* newarg = vtkString::Duplicate(argv[i]);
+          int len = strlen(newarg);
+          for (int i=0; i<len; i++)
+            {
+            if (newarg[i] == '=')
+              {
+              newarg[i] = '\0';
+              }
+            }
+
+          if ( strcmp(newarg, argument1) == 0 || 
+               strcmp(newarg, argument2) == 0)
             {
             valid = 1;
             }
+          delete[] newarg;
           j += 3;
           argument1 = vtkPVApplication::ArgumentList[j];
           if (argument1 && argument1[0]) 
@@ -661,6 +694,32 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->RegisteryLevel = 0;
     }
 
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-u",
+                                          index) == VTK_OK )
+    {
+    this->UseRenderingGroup = 1;
+    }
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--group-file",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-gf",
+                                          index) == VTK_OK )
+    {
+    const char* newarg=0;
+
+    int len = strlen(argv[index]);
+    for (int i=0; i<len; i++)
+      {
+      if (argv[index][i] == '=')
+        {
+        newarg = &(argv[index][i+1]);
+        }
+      }
+    this->SetGroupFileName(newarg);
+    }
+
 #ifdef VTK_MANGLE_MESA
   
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
@@ -697,68 +756,84 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
 
   // Handle setting up the SGI pipes.
-#ifdef PV_USE_SGI_PIPES
-  int numPipes = 1;
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  int id;
-  // Until I add a user interface to set the number of pipes,
-  // just read it from a file.
-  ifstream ifs("pipes.inp",ios::in);
-  if (ifs.fail())
+  if (this->UseRenderingGroup)
     {
-    vtkErrorMacro("Could not find the file pipes.inp");
-    numPipes = numProcs;
-    }
-  else
-    {
-    ifs >> numPipes;
-    if (numPipes > numProcs) numPipes = numProcs;
-    if (numPipes < 1) numPipes = 1;
-    }
-  this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);
-
-  // assuming that the number of pipes is the same as the number of procs
-  char *displayString;
-  // Get display root
-  char displayCommand[80];
-  char displayStringRoot[80];
-  displayString = getenv("DISPLAY");
-  if (displayString)
-    {
-    // Extract the position of the display from the string.
-    int len = -1;
-    int j, i = 0;
-    while (i < 80)
+    int numPipes = 1;
+    int numProcs = this->Controller->GetNumberOfProcesses();
+    int id;
+    // Until I add a user interface to set the number of pipes,
+    // just read it from a file.
+    ifstream ifs;
+    if (this->GroupFileName)
       {
-      if (displayString[i] == ':')
+      ifs.open(this->GroupFileName,ios::in);
+      }
+    else
+      {
+      ifs.open("pipes.inp",ios::in);
+      }
+    if (ifs.fail())
+      {
+      if (this->GroupFileName)
         {
-        j = i+1;
-        while (j < 80)
-          {
-          if (displayString[j] == '.')
-            {
-            len = j+1;
-            break;
-            }
-          j++;
-          }
-        break;
+        vtkErrorMacro("Could not find the file " << this->GroupFileName);
         }
-      i++;
+      else
+        {
+        vtkErrorMacro("Could not find the file pipes.inp");
+        }
+        numPipes = numProcs;
       }
-    for (id = 0; id < numPipes; ++id)
+    else
       {
-      // Format a new display string based on process.
-      strncpy(displayStringRoot, displayString, len);
-      displayStringRoot[len] = '\0';
-      //    cerr << "display string root = " << displayStringRoot << endl;
-      sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, id);
-      //    cerr << "display command = " << displayCommand << endl;
-      this->RemoteScript(id, "$Application SetEnvironmentVariable {%s}", 
-                         displayCommand);
+      ifs >> numPipes;
+      if (numPipes > numProcs) numPipes = numProcs;
+      if (numPipes < 1) numPipes = 1;
+      }
+    this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);
+    
+    // assuming that the number of pipes is the same as the number of procs
+    char *displayString;
+    // Get display root
+    char displayCommand[80];
+    char displayStringRoot[80];
+    displayString = getenv("DISPLAY");
+    if (displayString)
+      {
+      // Extract the position of the display from the string.
+      int len = -1;
+      int j, i = 0;
+      while (i < 80)
+        {
+        if (displayString[i] == ':')
+          {
+          j = i+1;
+          while (j < 80)
+            {
+            if (displayString[j] == '.')
+              {
+              len = j+1;
+              break;
+              }
+            j++;
+            }
+          break;
+          }
+        i++;
+        }
+      for (id = 0; id < numPipes; ++id)
+        {
+        // Format a new display string based on process.
+        strncpy(displayStringRoot, displayString, len);
+        displayStringRoot[len] = '\0';
+        //    cerr << "display string root = " << displayStringRoot << endl;
+        sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, id);
+        //    cerr << "display command = " << displayCommand << endl;
+        this->RemoteScript(id, "$Application SetEnvironmentVariable {%s}", 
+                           displayCommand);
+        }
       }
     }
-#endif
 
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);

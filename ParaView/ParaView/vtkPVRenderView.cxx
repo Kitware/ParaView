@@ -86,7 +86,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.197");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.198");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -492,16 +492,14 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
 
         // If we are using SGI pipes, create a new Controller/Communicator/Group
   // to use for compositing.
-#ifdef PV_USE_SGI_PIPES
-  int numPipes = pvApp->GetNumberOfPipes();
-  // I would like to create another controller with a subset of world, but ...
-  //pvApp->BroadcastScript("%s SetController [$Application NewController 0 %d]",
-  //                       this->CompositeTclName, numPipes-1);
-  
-  // For now, I added it as a hack to the composite manager.
-  pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
-                         this->CompositeTclName, numPipes);
-#endif
+  if (pvApp->GetUseRenderingGroup())
+    {
+    int numPipes = pvApp->GetNumberOfPipes();
+    // I would like to create another controller with a subset of world, but ...
+    // For now, I added it as a hack to the composite manager.
+    pvApp->BroadcastScript("%s SetNumberOfProcesses %d",
+                           this->CompositeTclName, numPipes);
+    }
 
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
                          this->RendererTclName);
@@ -2321,7 +2319,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.197 $");
+  this->ExtractRevision(os,"$Revision: 1.198 $");
 }
 
 //------------------------------------------------------------------------------

@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.152");
+vtkCxxRevisionMacro(vtkPVData, "1.153");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -499,14 +499,18 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // They also redistributed data for SGI pipes option.
   // ===== Primary branch:
   sprintf(tclName, "Collect%d", this->InstanceCount);
-  // Different filter for SGI pipe redistribution.
-#ifdef PV_USE_SGI_PIPES
-  pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-  pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
-                         pvApp->GetNumberOfPipes());
-#else
+
+  // Different filter for  pipe redistribution.
+  if (pvApp->GetUseRenderingGroup())
+    {
+    pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
+    pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
+                           pvApp->GetNumberOfPipes());
+    }
+  else
+    {
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-#endif
+    }
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->CollectTclName, this->GeometryTclName);
@@ -517,14 +521,18 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   //
   // ===== LOD branch:
   sprintf(tclName, "LODCollect%d", this->InstanceCount);
-  // Different filter for SGI pipe redistribution.
-#ifdef PV_USE_SGI_PIPES
-  pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
-  pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
-                         pvApp->GetNumberOfPipes());
-#else
-  pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-#endif
+
+  // Different filter for pipe redistribution.
+  if (pvApp->GetUseRenderingGroup())
+    {
+    pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
+    pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
+                           pvApp->GetNumberOfPipes());
+    }
+  else
+    {
+    pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+    }
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODCollectTclName, this->LODDeciTclName);
@@ -2761,7 +2769,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.152 $");
+  this->ExtractRevision(os,"$Revision: 1.153 $");
 }
 
 //----------------------------------------------------------------------------

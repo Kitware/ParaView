@@ -227,13 +227,6 @@ public:
   vtkGetMacro(ProcessId, int);
 
   // Description:
-  // This is used internally for specifying how many SGI pipes
-  // to use for rendering which PV_USE_SGI_PIPES is defined.
-  // All processes have this set to the same value.
-  vtkSetMacro(NumberOfPipes, int);
-  vtkGetMacro(NumberOfPipes, int);
-
-  // Description:
   // A helper class to create a controller/communicator pair
   // the has a restricted set of processes as its world.
   vtkMultiProcessController *NewController(int minId, int maxId);
@@ -245,7 +238,6 @@ public:
   void SetEnvironmentVariable(const char* string);
 
   // Description: 
-  
   // Set or get the display 3D widgets flag.  When this flag is set,
   // the 3D widgets will be displayed when they are created. Otherwise
   // user has to enable them. User will still be able to disable the
@@ -253,6 +245,18 @@ public:
   vtkSetClampMacro(Display3DWidgets, int, 0, 1);
   vtkBooleanMacro(Display3DWidgets, int);
   vtkGetMacro(Display3DWidgets, int);
+
+  // Description: 
+  // Are we using a subset to render?
+  vtkGetMacro(UseRenderingGroup, int);
+
+  // Description:
+  // This is used internally for specifying how many pipes
+  // to use for rendering when UseRenderingGroup is defined.
+  // All processes have this set to the same value.
+  vtkSetMacro(NumberOfPipes, int);
+  vtkGetMacro(NumberOfPipes, int);
+
 
 protected:
   vtkPVApplication();
@@ -273,6 +277,10 @@ protected:
   int ProcessId;
 
   int Display3DWidgets;
+
+  int UseRenderingGroup;
+  char* GroupFileName;
+  vtkSetStringMacro(GroupFileName);
 
   // Need to put a global flag that indicates interactive rendering.
   // All process must be consistent in choosing LODs because
