@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.13");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.14");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -289,10 +289,10 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
 //----------------------------------------------------------------------------
 void vtkKWBWidgets::Execute(Tcl_Interp* interp, const char* str, const char* module)
 {
-  if ( strlen(str) > 64000 )
+  if ( strlen(str) > 65000 )
     {
     cout << "The size of tcl string for module " << module << " is " << strlen(str) 
-      << " (higher than 32000), so compilers that cannot "
+      << " (higher than 65000), so compilers that cannot "
       "handle such a large strings might not compile this." << endl;
     }
   char* script = new char[strlen(str)+1];
