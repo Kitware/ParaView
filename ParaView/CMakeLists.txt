@@ -68,7 +68,6 @@ CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/vtkPVSourceInterfaceDirectories.h
 INCLUDE_DIRECTORIES(${PARAVIEW_BINARY_DIR}/ParaView)
 
 INCLUDE_DIRECTORIES(${EXPAT_SOURCE_DIR}/xmlparse)
-TARGET_LINK_LIBRARIES (vtkKWParaViewTCL Expat)
 
 IF (TK_LIBRARY)
   LINK_LIBRARIES (${TK_LIBRARY})
@@ -120,5 +119,6 @@ LINK_LIBRARIES (vtkKWWidgetsTCL
                 ${TK_LIBRARY})
 
 
-TARGET_LINK_LIBRARIES (ParaView 
-                       vtkKWParaViewTCL)
+TARGET_LINK_LIBRARIES (ParaView
+                       vtkKWParaViewTCL
+                       Expat)
