@@ -195,4 +195,6 @@ int main(int , char *[])
 #ifdef VTK_USE_PATENTED
   c = vtkPVKitwareContourFilter::New(); c->Print(cout); c->Delete(); 
 #endif //VTK_USE_PATENTED
+
+  return 0;
 }
