@@ -71,6 +71,7 @@ SET( KWWidgets_SRCS
   vtkKWRegistryHelper.cxx
   vtkKWRenderWidget.cxx 
   vtkKWRenderWidgetCallbackCommand.cxx 
+  vtkKWResourceUtilities.cxx 
   vtkKWSaveImageDialog.cxx 
   vtkKWScalarBarAnnotation.cxx 
   vtkKWScalarComponentSelectionWidget.cxx
@@ -183,7 +184,6 @@ SET_SOURCE_FILES_PROPERTIES(
   vtkKWEvent.cxx
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWRenderWidgetCallbackCommand.cxx 
-  vtkKWTkUtilities.cxx
   vtkKWWidgetCollection.cxx
   vtkKWWindowCollection.cxx
   WRAP_EXCLUDE
