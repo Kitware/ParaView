@@ -42,6 +42,9 @@ set kw(vtkTemp206) [$kw(vtkTemp179) GetPVWidget {Phi Resolution}]
 $kw(vtkTemp206) SetValue 32
 $kw(vtkTemp179) AcceptCallback
 set kw(vtkTemp236) [$kw(vtkTemp1) CreatePVSource ElevationFilter]
+set kw(vtkTemp999) [$kw(vtkTemp236) GetPVWidget {Line}]
+$kw(vtkTemp999) SetPoint1 0 0 0
+$kw(vtkTemp999) SetPoint2 0 0 1
 $kw(vtkTemp1) ShowCurrentSourceProperties
 set kw(vtkTemp257) [$kw(vtkTemp236) GetPVWidget {ScalarRange}]
 $kw(vtkTemp257) SetValue 0 10
@@ -113,12 +116,10 @@ RenWin1 SetSize 300 300
 RenWin1 Render
 update
 
-if {[Application GetExitStatus] == 0} {
-    for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-        if {[lindex $argv $i] == "-C"} {
-            source [lindex $argv [expr $i + 1]]
-            $Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
-        }
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
    
