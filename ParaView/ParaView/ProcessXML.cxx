@@ -108,6 +108,7 @@ int main(int argc, char* argv[])
     }
   ot.Stream << "" << endl
     << "#endif" << endl;
+  ot.Stream << ends;
   FILE* fp = fopen(output.c_str(), "w");
   if ( !fp )
     {
