@@ -94,8 +94,8 @@ public:
   
   // Description:
   // Set/get the viewport to position/size this 3D widget.
-  void SetViewport(float minX, float minY, float maxX, float maxY);
-  float* GetViewport();
+  void SetViewport(double minX, double minY, double maxX, double maxY);
+  double* GetViewport();
   
 protected:
   vtkPVAxesWidget();

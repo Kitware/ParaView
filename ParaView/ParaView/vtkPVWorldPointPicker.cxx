@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWorldPointPicker);
-vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.7");
+vtkCxxRevisionMacro(vtkPVWorldPointPicker, "1.8");
 
 vtkCxxSetObjectMacro(vtkPVWorldPointPicker, RenderModule, vtkPVRenderModule);
 
@@ -72,10 +72,10 @@ int vtkPVWorldPointPicker::Pick(float selectionX, float selectionY,
                               float selectionZ, vtkRenderer *renderer)
 {
   vtkCamera *camera;
-  float cameraFP[4];
-  float display[3], *world;
-  float *displayCoord;
-  float z;
+  double cameraFP[4];
+  double display[3], *world;
+  double *displayCoord;
+  double z;
 
   if (this->RenderModule == NULL)
     {
@@ -109,7 +109,7 @@ int vtkPVWorldPointPicker::Pick(float selectionX, float selectionY,
     // Get camera focal point and position. Convert to display (screen) 
     // coordinates. We need a depth value for z-buffer.
     camera = renderer->GetActiveCamera();
-    camera->GetFocalPoint((float *)cameraFP); cameraFP[3] = 1.0;
+    camera->GetFocalPoint(cameraFP); cameraFP[3] = 1.0;
 
     renderer->SetWorldPoint(cameraFP);
     renderer->WorldToDisplay();

@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCompositer.h"
 #include "vtkDataSet.h"
 #include "vtkFloatArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkImageActor.h"
 #include "vtkImageCast.h"
 #include "vtkImageData.h"
@@ -76,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.44");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.45");
 
 
 //=========================================================================
@@ -481,7 +482,15 @@ void vtkPVTreeComposite::InternalStartRender()
     lc->InitTraversal();
     light = lc->GetNextItem();
     renInfoInt.NumberOfLights = lc->GetNumberOfItems();
-    ren->GetViewport(renInfoFloat.Viewport);
+    // fix
+    int fixme;
+    double vp[4];
+    ren->GetViewport(vp);
+    renInfoFloat.Viewport[0] = vp[0];
+    renInfoFloat.Viewport[1] = vp[2];
+    renInfoFloat.Viewport[3] = vp[3];
+    renInfoFloat.Viewport[4] = vp[4];
+    // -end fix
     if (this->ImageReductionFactor > 1)
       {
       this->Viewports->SetNumberOfTuples(1);
@@ -513,7 +522,7 @@ void vtkPVTreeComposite::InternalStartRender()
                        id, vtkCompositeRenderManager::REN_INFO_INT_TAG);
       controller->Send((float*)(&renInfoFloat),
                        sizeof(struct vtkPVTreeCompositeRendererInfoFloat)/sizeof(int),
-                       id, vtkCompositeRenderManager::REN_INFO_FLOAT_TAG);
+                       id, vtkCompositeRenderManager::REN_INFO_DOUBLE_TAG);
       controller->Send((float*)(&lightInfoFloat),
                        sizeof(struct vtkPVTreeCompositeLightInfoFloat)/sizeof(float),
                        id, vtkCompositeRenderManager::LIGHT_INFO_FLOAT_TAG);

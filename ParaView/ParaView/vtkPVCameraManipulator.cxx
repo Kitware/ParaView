@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.7");
+vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.8");
 vtkStandardNewMacro(vtkPVCameraManipulator);
 
 vtkCxxSetObjectMacro(vtkPVCameraManipulator,Application,vtkPVApplication);
@@ -112,7 +112,7 @@ void vtkPVCameraManipulator::OnMouseMove(int, int, vtkRenderer*,
 //-------------------------------------------------------------------------
 void vtkPVCameraManipulator::ComputeDisplayCenter(vtkRenderer *ren)
 {
-  float *pt;
+  double *pt;
 
   // save the center of rotation in screen coordinates
   ren->SetWorldPoint(this->Center[0],

@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.102");
+vtkCxxRevisionMacro(vtkPVProbe, "1.103");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -492,7 +492,7 @@ void vtkPVProbe::SaveInBatchScript(ofstream *file)
     {    
     if (this->ShowXYPlotToggle->GetState())
       {
-      float pos[3];
+      double pos[3];
       vtkXYPlotActor* xyp = this->XYPlotWidget->GetXYPlotActor();
       *file << "vtkXYPlotActor " << this->XYPlotTclName << "\n";
       xyp->GetPositionCoordinate()->GetValue(pos);

@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.6");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -242,10 +242,10 @@ void vtkPVAxesWidget::UpdateCursorIcon()
   
   int x = this->Interactor->GetEventPosition()[0];
   int y = this->Interactor->GetEventPosition()[1];
-  float xNorm = x / (float)parentSize[0];
-  float yNorm = y / (float)parentSize[1];
+  double xNorm = x / (double)parentSize[0];
+  double yNorm = y / (double)parentSize[1];
   
-  float pos[4];
+  double pos[4];
   this->Renderer->GetViewport(pos);
   
   int pState = this->MouseCursorState;
@@ -421,12 +421,12 @@ void vtkPVAxesWidget::MoveWidget()
   this->StartPosition[1] = y;
 
   int *size = this->ParentRenderer->GetSize();
-  float dxNorm = dx / (float)size[0];
-  float dyNorm = dy / (float)size[1];
+  double dxNorm = dx / (double)size[0];
+  double dyNorm = dy / (double)size[1];
   
-  float *vp = this->Renderer->GetViewport();
+  double *vp = this->Renderer->GetViewport();
   
-  float newPos[4];
+  double newPos[4];
   newPos[0] = vp[0] + dxNorm;
   newPos[1] = vp[1] + dyNorm;
   newPos[2] = vp[2] + dxNorm;
@@ -470,13 +470,13 @@ void vtkPVAxesWidget::ResizeTopLeft()
   int dy = y - this->StartPosition[1];
   
   int *size = this->ParentRenderer->GetSize();
-  float dxNorm = dx / (float)size[0];
-  float dyNorm = dy / (float)size[1];
+  double dxNorm = dx / (double)size[0];
+  double dyNorm = dy / (double)size[1];
   
   int useX;
-  float change;
-  float absDx = fabs(dxNorm);
-  float absDy = fabs(dyNorm);
+  double change;
+  double absDx = fabs(dxNorm);
+  double absDy = fabs(dyNorm);
   
   if (absDx > absDy)
     {
@@ -489,12 +489,12 @@ void vtkPVAxesWidget::ResizeTopLeft()
     useX = 0;
     }
   
-  float *vp = this->Renderer->GetViewport();
+  double *vp = this->Renderer->GetViewport();
   
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
   
-  float newPos[4];
+  double newPos[4];
   newPos[0] = useX ? vp[0] + change : vp[0] - change;
   newPos[1] = vp[1];
   newPos[2] = vp[2];
@@ -532,12 +532,12 @@ void vtkPVAxesWidget::ResizeTopRight()
   int dy = y - this->StartPosition[1];
   
   int *size = this->ParentRenderer->GetSize();
-  float dxNorm = dx / (float)size[0];
-  float dyNorm = dy / (float)size[1];
+  double dxNorm = dx / (double)size[0];
+  double dyNorm = dy / (double)size[1];
 
-  float change;
-  float absDx = fabs(dxNorm);
-  float absDy = fabs(dyNorm);
+  double change;
+  double absDx = fabs(dxNorm);
+  double absDy = fabs(dyNorm);
   
   if (absDx > absDy)
     {
@@ -548,12 +548,12 @@ void vtkPVAxesWidget::ResizeTopRight()
     change = dyNorm;
     }
   
-  float *vp = this->Renderer->GetViewport();
+  double *vp = this->Renderer->GetViewport();
   
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
   
-  float newPos[4];
+  double newPos[4];
   newPos[0] = vp[0];
   newPos[1] = vp[1];
   newPos[2] = vp[2] + change;
@@ -591,13 +591,13 @@ void vtkPVAxesWidget::ResizeBottomLeft()
   int dy = y - this->StartPosition[1];
   
   int *size = this->ParentRenderer->GetSize();
-  float dxNorm = dx / (float)size[0];
-  float dyNorm = dy / (float)size[1];
-  float *vp = this->Renderer->GetViewport();
+  double dxNorm = dx / (double)size[0];
+  double dyNorm = dy / (double)size[1];
+  double *vp = this->Renderer->GetViewport();
   
-  float change;
-  float absDx = fabs(dxNorm);
-  float absDy = fabs(dyNorm);
+  double change;
+  double absDx = fabs(dxNorm);
+  double absDy = fabs(dyNorm);
   
   if (absDx > absDy)
     {
@@ -611,7 +611,7 @@ void vtkPVAxesWidget::ResizeBottomLeft()
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
   
-  float newPos[4];
+  double newPos[4];
   newPos[0] = vp[0] + change;
   newPos[1] = vp[1] + change;
   newPos[2] = vp[2];
@@ -649,15 +649,15 @@ void vtkPVAxesWidget::ResizeBottomRight()
   int dy = y - this->StartPosition[1];
   
   int *size = this->ParentRenderer->GetSize();
-  float dxNorm = dx / (float)size[0];
-  float dyNorm = dy / (float)size[1];
+  double dxNorm = dx / (double)size[0];
+  double dyNorm = dy / (double)size[1];
   
-  float *vp = this->Renderer->GetViewport();
+  double *vp = this->Renderer->GetViewport();
   
   int useX;
-  float change;
-  float absDx = fabs(dxNorm);
-  float absDy = fabs(dyNorm);
+  double change;
+  double absDx = fabs(dxNorm);
+  double absDy = fabs(dyNorm);
   
   if (absDx > absDy)
     {
@@ -673,7 +673,7 @@ void vtkPVAxesWidget::ResizeBottomRight()
   this->StartPosition[0] = x;
   this->StartPosition[1] = y;
   
-  float newPos[4];
+  double newPos[4];
   newPos[0] = vp[0];
   newPos[1] = useX ? vp[1] - change : vp[1] + change;
   newPos[2] = useX ? vp[2] + change : vp[2] - change;
@@ -710,11 +710,11 @@ void vtkPVAxesWidget::SquareRenderer()
     return;
     }
   
-  float vp[4];
+  double vp[4];
   this->Renderer->GetViewport(vp);
   
-  float deltaX = vp[2] - vp[0];
-  float newDeltaX = size[1] * deltaX / (float)size[0];
+  double deltaX = vp[2] - vp[0];
+  double newDeltaX = size[1] * deltaX / (double)size[0];
   vp[2] = vp[0] + newDeltaX;
   
   this->Renderer->SetViewport(vp);
@@ -768,13 +768,13 @@ vtkRenderer* vtkPVAxesWidget::GetParentRenderer()
   return this->ParentRenderer;
 }
 
-void vtkPVAxesWidget::SetViewport(float minX, float minY,
-                                  float maxX, float maxY)
+void vtkPVAxesWidget::SetViewport(double minX, double minY,
+                                  double maxX, double maxY)
 {
   this->Renderer->SetViewport(minX, minY, maxX, maxY);
 }
 
-float* vtkPVAxesWidget::GetViewport()
+double* vtkPVAxesWidget::GetViewport()
 {
   return this->Renderer->GetViewport();
 }

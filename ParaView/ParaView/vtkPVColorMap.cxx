@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.68");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.69");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1757,7 +1757,7 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
     *file << "\t" << actor.str() << " SetHeight " 
           << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
 
-    const float *pos = 
+    const double *pos = 
      this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
     *file << "\t[" << actor.str() << " GetPositionCoordinate] SetValue " 
           << pos[0] << " " << pos[1] << "\n";
@@ -2157,11 +2157,11 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
       this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOff();
       this->RenderView();
       vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
-      float *pos1 = sact->GetPositionCoordinate()->GetValue();
-      float *pos2 = sact->GetPosition2Coordinate()->GetValue();
-      this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %f %f", 
+      double *pos1 = sact->GetPositionCoordinate()->GetValue();
+      double *pos2 = sact->GetPosition2Coordinate()->GetValue();
+      this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %lf %lf", 
                           this->GetTclName(), pos1[0], pos1[1]);
-      this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %f %f", 
+      this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %lf %lf", 
                           this->GetTclName(), pos2[0], pos2[1]);
       this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d",
                           this->GetTclName(), sact->GetOrientation());
@@ -2229,8 +2229,8 @@ void vtkPVColorMap::SaveState(ofstream *file)
         << this->ScalarBarVisibility << endl;
 
   vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
-  float *pos1 = sact->GetPositionCoordinate()->GetValue();
-  float *pos2 = sact->GetPosition2Coordinate()->GetValue();
+  double *pos1 = sact->GetPositionCoordinate()->GetValue();
+  double *pos2 = sact->GetPosition2Coordinate()->GetValue();
 
   if (pos1[0] != 0.87 || pos1[1] != 0.25)
     {    

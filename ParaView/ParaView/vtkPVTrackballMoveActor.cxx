@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.5");
+vtkCxxRevisionMacro(vtkPVTrackballMoveActor, "1.6");
 vtkStandardNewMacro(vtkPVTrackballMoveActor);
 
 //-------------------------------------------------------------------------
@@ -102,10 +102,10 @@ void vtkPVTrackballMoveActor::OnMouseMove(int x, int y, vtkRenderer *ren,
   if ( pvs )
     {
     double bounds[6];
-    float center[3];
-    float dpoint1[3];
-    float startpoint[4];
-    float endpoint[4];
+    double center[3];
+    double dpoint1[3];
+    double startpoint[4];
+    double endpoint[4];
     int cc;
 
     // Get bounds

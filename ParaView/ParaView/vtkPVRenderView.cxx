@@ -123,7 +123,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.280");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.281");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -479,9 +479,9 @@ void vtkPVRenderView::PrepareForDelete()
                              this->TriangleStripsCheck->GetState());
     pvapp->SetRegisteryValue(2, "RunTime", "UseImmediateMode", "%d",
                              this->ImmediateModeCheck->GetState());
-    float *vp = this->OrientationAxes->GetViewport();
+    double *vp = this->OrientationAxes->GetViewport();
     pvapp->SetRegisteryValue(2, "RunTime", "OrientationAxesViewport",
-                             "%f %f %f %f", vp[0], vp[1], vp[2], vp[3]);
+                             "%lf %lf %lf %lf", vp[0], vp[1], vp[2], vp[3]);
 
     // If it's the last win, save the size of the nav frame
 
@@ -1084,13 +1084,13 @@ void vtkPVRenderView::CreateViewProperties()
   this->OrientationAxes->SetParentRenderer(this->Renderer);
 
   char buffer[1024];
-  float vp[4];
+  double vp[4];
   if (pvapp && pvwindow &&
       pvapp->GetRegisteryValue(2, "RunTime", "OrientationAxesViewport", buffer))
     {
     if (*buffer)
       {
-      sscanf(buffer, "%f %f %f %f", vp, vp+1, vp+2, vp+3);
+      sscanf(buffer, "%lf %lf %lf %lf", vp, vp+1, vp+2, vp+3);
       this->OrientationAxes->SetViewport(vp[0], vp[1], vp[2], vp[3]);
       }
     else

@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkCell.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPlanesIntersection, "1.8");
+vtkCxxRevisionMacro(vtkPlanesIntersection, "1.9");
 vtkStandardNewMacro(vtkPlanesIntersection);
 
 // Experiment shows that we get plane equation values on the
@@ -491,29 +491,21 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldPerspective(
 
   double sensibleZ = vtkPlanesIntersection::SensibleZCoordinate(ren);
 
-  int fixme;
-
-  float tmp[3];
-
   // upper left
-  tmp[0] = xmin; tmp[1] = ymax; tmp[2] = sensibleZ;
-  ren->ViewToWorld(tmp[0], tmp[1], tmp[2]);
-  ulFront[0] = tmp[0]; ulFront[1] = tmp[1]; ulFront[2] = tmp[2];
+  ulFront[0] = xmin; ulFront[1] = ymax; ulFront[2] = sensibleZ;
+  ren->ViewToWorld(ulFront[0], ulFront[1], ulFront[2]);
 
   // upper right      
-  tmp[0] = xmax; tmp[1] = ymax; tmp[2] = sensibleZ;
-  ren->ViewToWorld(tmp[0], tmp[1], tmp[2]);
-  urFront[0] = tmp[0]; urFront[1] = tmp[1]; urFront[2] = tmp[2];
+  urFront[0] = xmax; urFront[1] = ymax; urFront[2] = sensibleZ;
+  ren->ViewToWorld(urFront[0], urFront[1], urFront[2]);
 
   // lower left
-  tmp[0] = xmin; tmp[1] = ymin; tmp[2] = sensibleZ;
-  ren->ViewToWorld(tmp[0], tmp[1], tmp[2]);
-  llFront[0] = tmp[0]; llFront[1] = tmp[1]; llFront[2] = tmp[2];
+  llFront[0] = xmin; llFront[1] = ymin; llFront[2] = sensibleZ;
+  ren->ViewToWorld(llFront[0], llFront[1], llFront[2]);
 
   // lower right
-  tmp[0] = xmax; tmp[1] = ymin; tmp[2] = sensibleZ;
-  ren->ViewToWorld(tmp[0], tmp[1], tmp[2]);
-  lrFront[0] = tmp[0]; lrFront[1] = tmp[1]; lrFront[2] = tmp[2];
+  lrFront[0] = xmax; lrFront[1] = ymin; lrFront[2] = sensibleZ;
+  ren->ViewToWorld(lrFront[0], lrFront[1], lrFront[2]);
 
   //  We need second, different reasonable z value for back points
   
@@ -523,27 +515,23 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldPerspective(
   double dy = dir[1] * .01;
   double dz = dir[2] * .01;
   
-  int fixme2;
+  ulBack[0] = ulFront[0] + dx;
+  ulBack[1] = ulFront[1] + dy;
+  ulBack[2] = ulFront[2] + dz;
 
-  tmp[0] = ulFront[0] + dx;
-  tmp[1] = ulFront[1] + dy;
-  tmp[2] = ulFront[2] + dz;
-
-  ren->WorldToView(tmp[0], tmp[1], tmp[2]);
-  tmp[0] = xmin;
-  tmp[1] = ymax;
-  ren->ViewToWorld(tmp[0], tmp[1], tmp[2]);
-  ulBack[0] = tmp[0]; ulBack[1] = tmp[1]; ulBack[2] = tmp[2];
+  ren->WorldToView(ulBack[0], ulBack[1], ulBack[2]);
+  ulBack[0] = xmin;
+  ulBack[1] = ymax;
+  ren->ViewToWorld(ulBack[0], ulBack[1], ulBack[2]);
   
-  tmp[0] = lrFront[0] + dx;
-  tmp[1] = lrFront[1] + dy;
-  tmp[2] = lrFront[2] + dz;
+  lrBack[0] = lrFront[0] + dx;
+  lrBack[1] = lrFront[1] + dy;
+  lrBack[2] = lrFront[2] + dz;
   
-  ren->WorldToView(tmp[0], tmp[1], tmp[2]);
-  tmp[0] = xmax;
-  tmp[1] = ymin;
-  ren->ViewToWorld(tmp[0], tmp[1], tmp[2]);
-  lrBack[0] = tmp[0]; lrBack[1] = tmp[1]; lrBack[2] = tmp[2];
+  ren->WorldToView(lrBack[0], lrBack[1], lrBack[2]);
+  lrBack[0] = xmax;
+  lrBack[1] = ymin;
+  ren->ViewToWorld(lrBack[0], lrBack[1], lrBack[2]);
   
   // left plane
   
@@ -641,11 +629,7 @@ vtkPlanesIntersection *vtkPlanesIntersection::ConvertFrustumToWorldParallel(
           newPt[2] = sensibleZ;
           break;
         }
-      int fixme3;
-      float tmp[3];
-      tmp[0]=newPt[0];tmp[1]=newPt[1];tmp[2]=newPt[2];
-      ren->ViewToWorld(tmp[0], tmp[1], tmp[2]);
-      newPt[0]=tmp[0];newPt[1]=tmp[1];newPt[2]=tmp[2];
+      ren->ViewToWorld(newPt[0], newPt[1], newPt[2]);
       } 
     else
       {
@@ -818,12 +802,9 @@ double vtkPlanesIntersection::SensibleZCoordinate(vtkRenderer *ren)
   double FP[3];
 
   ren->GetActiveCamera()->GetFocalPoint(FP);
-  int fixme;
-  float tmp[3];
-  tmp[0]=FP[0];tmp[1]=FP[1];tmp[2]=FP[2];
-  ren->WorldToView(tmp[0], tmp[1], tmp[2]);
+  ren->WorldToView(FP[0], FP[1], FP[2]);
   
-  return tmp[2];
+  return FP[2];
 }
 
 double vtkPlanesIntersection::EvaluatePlaneEquation(double *x, double *p)
