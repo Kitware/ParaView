@@ -92,6 +92,7 @@ public:
   void UpdateDomains(const char*);
 
   void EnableGrid(const char* grid);
+  void EnableAllGrids();
 
 protected:
   vtkXDMFReaderModule();

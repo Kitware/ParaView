@@ -57,13 +57,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 #include "vtkKWListBox.h"
+#include "vtkKWPushButton.h"
 
 #include <vtkstd/string>
 #include <vtkstd/map>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.11");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -176,6 +177,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     this->GridSelection->SetHeight(0);
     this->UpdateGrids(res);
 
+
     this->Script("%s configure -height 1", this->DomainMenu->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side top -pady 2", 
       this->DomainMenu->GetWidgetName());
@@ -183,6 +185,18 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
       this->GridSelection->GetWidgetName());
     this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
       this->DomainGridFrame->GetWidgetName());
+
+    if ( this->GridSelection->GetNumberOfItems() > 1 )
+      {
+      vtkKWPushButton* selectAllButton = vtkKWPushButton::New();
+      selectAllButton->SetParent(this->DomainGridFrame->GetFrame());
+      selectAllButton->SetLabel("Select All Grids");
+      selectAllButton->Create(pvApp, 0);
+      selectAllButton->SetCommand(this, "EnableAllGrids");
+      this->Script("pack %s -expand yes -fill x -side bottom -pady 2", 
+        selectAllButton->GetWidgetName());
+      selectAllButton->Delete();
+      }
 
     if ( dlg->Invoke() )
       {
@@ -372,6 +386,16 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
   this->VisitedFlag = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkXDMFReaderModule::EnableAllGrids()
+{
+  int cc;
+  for ( cc = 0; cc < this->GridSelection->GetNumberOfItems(); cc ++ )
+    {
+    this->GridSelection->SetSelectState(cc, 1);
+    }
 }
 
 //----------------------------------------------------------------------------
