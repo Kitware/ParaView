@@ -7,7 +7,6 @@ SET(Filters_SRCS
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
-  vtkPVServerProbe.cxx
   vtkPVServerSelectTimeSet.cxx
   vtkPVServerXDMFParameters.cxx
   vtkPVExtentTranslator.cxx
@@ -71,7 +70,7 @@ SET(Filters_SRCS
   vtkXMLPVAnimationWriter.cxx
   vtkXMLCollectionReader.cxx
   vtkSelectInputs.cxx
-	vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
+  vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
   )
 
 SET_SOURCE_FILES_PROPERTIES( 
