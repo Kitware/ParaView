@@ -25,9 +25,9 @@ template <class DType>
 class vtkQueueIterator : public vtkAbstractIterator<vtkIdType,DType>
 {
   friend class vtkQueue<DType>;
+  virtual const char* GetClassNameInternal() const { return "vtkQueueIterator"; }
 
 public:
-  virtual const char* GetClassName() const { return "vtkQueueIterator"; }
 
   // Description:
   // Retrieve the index of the element.

@@ -35,7 +35,7 @@ template<class KeyType, class DataType>
 class vtkArrayMap : public vtkAbstractMap<KeyType,DataType>
 {
   friend class vtkArrayMapIterator<KeyType,DataType>;
-  
+  virtual const char* GetClassNameInternal() const {return "vtkArrayMap";}
 public:
   typedef vtkAbstractMap<KeyType,DataType> Superclass;
   typedef vtkArrayMapIterator<KeyType,DataType> IteratorType;
@@ -43,8 +43,6 @@ public:
   // Cannot use this macro because of the comma in the type name.
   // The CPP splits that in two and we ae in trouble.
   //vtkContainerTypeMacro((vtkArrayMap<KeyType,DataType>), vtkContainer);
-
-  virtual const char *GetClassName() const {return "vtkArrayMap";} 
 
   static vtkArrayMap<KeyType,DataType> *New(); 
 

@@ -34,10 +34,8 @@ class  vtkAbstractIterator : public vtkObjectBase
 {
   friend class vtkContainer;
 
+  virtual const char* GetClassNameInternal() const { return "vtkAbstractIterator"; }
 public:
-  // Description:
-  // Return the class name as a string.
-  virtual const char* GetClassName() const { return "vtkAbstractIterator"; }
 
   // Description:
   // Retrieve the key from the iterator. For lists, the key is the

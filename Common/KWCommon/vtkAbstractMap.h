@@ -44,9 +44,9 @@ class vtkAbstractIterator;
 template<class KeyType, class DataType>
 class vtkAbstractMap : public vtkContainer
 {
+  virtual const char* GetClassNameInternal() const {return "vtkAbstractMap";}
 public:
   typedef vtkContainer Superclass; 
-  virtual const char *GetClassName() const {return "vtkAbstractMap";} 
 
   // Description:
   // Sets the item at with specific key to data.

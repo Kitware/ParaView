@@ -22,9 +22,8 @@ template <class KeyType,class DataType>
 class vtkArrayMapIterator : public vtkAbstractIterator<KeyType,DataType>
 {
   friend class vtkArrayMap<KeyType,DataType>;
-
+  virtual const char* GetClassNameInternal() const { return "vtkArrayMapIterator"; }
 public:
-  virtual const char* GetClassName() const { return "vtkArrayMapIterator"; }
 
   // Description:
   // Retrieve the index of the element.

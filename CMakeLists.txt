@@ -34,6 +34,10 @@ SET(PARAVIEW_BUILD_SHARED_LIBS "${BUILD_SHARED_LIBS}")
 SET(DO_NOT_BUILD_XML_RW 1)
 SET(CXX_TEST_PATH ${EXECUTABLE_OUTPUT_PATH})
 
+# Tell VTK to include windows header.  This can be removed when
+# ParaView is converted to use the windows mangling workarounds.
+ADD_DEFINITIONS(-DVTK_INCLUDE_WINDOWS_H)
+
 INCLUDE_DIRECTORIES(${ParaView_BINARY_DIR})
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/vtkPVConfig.h.in
   ${ParaView_BINARY_DIR}/vtkPVConfig.h

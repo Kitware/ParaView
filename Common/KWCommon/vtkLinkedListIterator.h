@@ -25,9 +25,9 @@ template <class DType>
 class vtkLinkedListIterator : public vtkAbstractIterator<vtkIdType,DType>
 {
   friend class vtkLinkedList<DType>;
+  virtual const char* GetClassNameInternal() const { return "vtkLinkedListIterator"; }
 
 public:
-  virtual const char* GetClassName() const { return "vtkLinkedListIterator"; }
   // Description:
   // Retrieve the index of the element.
   // This method returns VTK_OK if key was retrieved correctly.

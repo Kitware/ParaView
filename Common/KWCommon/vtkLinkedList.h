@@ -25,13 +25,13 @@ template <class DType>
 class vtkLinkedList : public vtkAbstractList<DType>
 {
   friend class vtkLinkedListIterator<DType>;
+  virtual const char* GetClassNameInternal() const { return "vtkLinkedList"; }
 
 public:
   typedef vtkAbstractList<DType> Superclass;
   typedef vtkLinkedListIterator<DType> IteratorType;
 
   static vtkLinkedList<DType> *New();
-  virtual const char* GetClassName() const { return "vtkLinkedList"; }
 
   // Description:
   // Return an iterator to the list. This iterator is allocated using

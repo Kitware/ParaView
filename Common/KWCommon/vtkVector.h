@@ -29,13 +29,13 @@ template <class DType>
 class vtkVector : public vtkAbstractList<DType>
 {
   friend class vtkVectorIterator<DType>;
+  virtual const char* GetClassNameInternal() const { return "vtkVector"; }
 
 public:
   typedef vtkAbstractList<DType> Superclass;
   typedef vtkVectorIterator<DType> IteratorType;
   
   static vtkVector<DType> *New();
-  virtual const char* GetClassName() const { return "vtkVector"; }
 
   // Description:
   // Return an iterator to the list. This iterator is allocated using

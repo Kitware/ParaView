@@ -35,7 +35,7 @@ template<class KeyType, class DataType>
 class vtkHashMap : public vtkAbstractMap<KeyType,DataType>
 {
   friend class vtkHashMapIterator<KeyType,DataType>;
-  
+  virtual const char* GetClassNameInternal() const {return "vtkHashMap";}
 public:
   typedef vtkAbstractMap<KeyType,DataType> Superclass;
   typedef vtkHashMapIterator<KeyType,DataType> IteratorType;
@@ -44,7 +44,6 @@ public:
   // The CPP splits that in two and we ae in trouble.
   //vtkContainerTypeMacro((vtkHashMap<KeyType,DataType>), vtkContainer);
 
-  virtual const char* GetClassName() const {return "vtkHashMap";} 
   void PrintSelf(ostream& os, vtkIndent indent);
   static vtkHashMap<KeyType,DataType>* New(); 
   

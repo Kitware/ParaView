@@ -44,16 +44,15 @@
 
 #include "vtkObjectBase.h"
 
+#include "vtkSetGet.h" // For vtkTypeMacro.
+
 #ifndef __vtkContainer_h
 #define __vtkContainer_h
 
 class VTK_EXPORT vtkContainer : public vtkObjectBase
 {
 public:
-  // Description:
-  // Return the class name as a string.
-  virtual const char* GetClassName() const { return "vtkContainer"; }
-
+  vtkTypeMacro(vtkContainer, vtkObjectBase);
 protected:
   //vtkIdType ReferenceCount;   
   vtkContainer();

@@ -26,9 +26,9 @@ template <class KeyType,class DataType>
 class vtkHashMapIterator : public vtkAbstractIterator<KeyType,DataType>
 {
   friend class vtkHashMap<KeyType,DataType>;
+  virtual const char* GetClassNameInternal() const { return "vtkHashMapIterator"; }
 
 public:
-  virtual const char* GetClassName() const { return "vtkHashMapIterator"; }
 
   // Description:
   // Retrieve the key of the current element.

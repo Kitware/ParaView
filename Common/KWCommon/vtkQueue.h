@@ -24,11 +24,11 @@ template <class DType>
 class vtkQueue : public vtkVector<DType>
 {
   friend class vtkQueueIterator<DType>;
+  virtual const char* GetClassNameInternal() const { return "vtkQueue"; }
 public:
   typedef vtkVector<DType> Superclass;
 
   static vtkQueue<DType> *New();
-  virtual const char* GetClassName() const { return "vtkQueue"; }
 
   // Description:
   // Create the iterator.

@@ -94,10 +94,10 @@
 template<class DType>
 class vtkAbstractList : public vtkContainer
 {
+  virtual const char* GetClassNameInternal() const { return "vtkAbstractList"; }
 public:
   typedef vtkContainer Superclass;
   static vtkAbstractList<DType>* New();
-  virtual const char* GetClassName() const { return "vtkAbstractList"; }
 
   // Just to avoid typing over and over, let us define some typedefs.
   // They will not work in subclasses, but this header file will 
