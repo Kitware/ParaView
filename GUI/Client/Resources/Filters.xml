@@ -1431,7 +1431,6 @@ The Triangle Strips filter converts triangles into triangle strips and lines int
   <Module name="Subdivide"
           root_name="Subdivide"
           module_type="Filter"
-          button_help="Subdivide the poly data into more polygons"
           long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface."
           short_help="Creates a surface with more triangles than the input.">
     <Scale label="Num. divisions"
@@ -1575,7 +1574,6 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
   <Module name="WarpScalar"
           menu_name="Warp (scalar)"
           root_name="WarpS"
-          default="scalars"
           module_type="Filter"
           long_help="This filter moves point coordinates along a vector scaled by a point attribute.  It can be used to produce carpet plots."
           short_help="Warp point scalars into a spatial elevation plot.">
@@ -1631,7 +1629,6 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
           menu_name="Warp (vector)"
           button_image="PVVectorDisplacementButton"
           button_help="Warp (displace) the geometry with a given vector field."
-          default="vectors"
           module_type="Filter"
           long_help="This filter displaces point coordinates along a vector attribute.  It is useful for showing mechanical deformation."
           short_help="Warp (displace) the geometry with a given vector field.">
