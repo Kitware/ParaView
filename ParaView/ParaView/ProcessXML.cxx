@@ -71,11 +71,7 @@ public:
       return VTK_ERROR;
       }
     int ch;
-    int start = 1;
-    int preproc = 0;
     int in_ifdef = 0;
-    int in_endif = 0;
-    int preproc_cnt = 0;
 
     this->InitStream
       << "// Define the " << title << " interfaces." << endl
