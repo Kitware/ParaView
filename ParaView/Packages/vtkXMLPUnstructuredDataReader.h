@@ -15,9 +15,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPUnstructuredDataReader
+// .NAME vtkXMLPUnstructuredDataReader - Superclass for parallel unstructured data XML readers.
 // .SECTION Description
-// vtkXMLPUnstructuredDataReader
+// vtkXMLPUnstructuredDataReader provides functionality common to all
+// parallel unstructured data format readers.
+
+// .SECTION See Also
+// vtkXMLPPolyDataReader vtkXMLPUnstructuredGridReader
 
 #ifndef __vtkXMLPUnstructuredDataReader_h
 #define __vtkXMLPUnstructuredDataReader_h

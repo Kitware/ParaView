@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPUnstructuredGridReader
+// .NAME vtkXMLPUnstructuredGridReader - Read PVTK XML UnstructuredGrid files.
 // .SECTION Description
-// vtkXMLPUnstructuredGridReader
+// vtkXMLPUnstructuredGridReader reads the PVTK XML UnstructuredGrid
+// file format.  This reads the parallel format's summary file and
+// then uses vtkXMLUnstructuredGridReader to read data from the
+// individual UnstructuredGrid piece files.  Streaming is supported.
+// The standard extension for this reader's file format is "pvtu".
+
+// .SECTION See Also
+// vtkXMLUnstructuredGridReader
 
 #ifndef __vtkXMLPUnstructuredGridReader_h
 #define __vtkXMLPUnstructuredGridReader_h

@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPolyDataReader
+// .NAME vtkXMLPolyDataReader - Read VTK XML PolyData files.
 // .SECTION Description
-// vtkXMLPolyDataReader
+// vtkXMLPolyDataReader reads the VTK XML PolyData file format.  One
+// polygonal data file can be read to produce one output.  Streaming
+// is supported.  The standard extension for this reader's file format
+// is "vtp".  This reader is also used to read a single piece of the
+// parallel file format.
+
+// .SECTION See Also
+// vtkXMLPPolyDataReader
 
 #ifndef __vtkXMLPolyDataReader_h
 #define __vtkXMLPolyDataReader_h

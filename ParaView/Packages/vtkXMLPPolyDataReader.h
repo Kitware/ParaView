@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPPolyDataReader
+// .NAME vtkXMLPPolyDataReader - Read PVTK XML PolyData files.
 // .SECTION Description
-// vtkXMLPPolyDataReader
+// vtkXMLPPolyDataReader reads the PVTK XML PolyData file format.
+// This reads the parallel format's summary file and then uses
+// vtkXMLPolyDataReader to read data from the individual PolyData
+// piece files.  Streaming is supported.  The standard extension for
+// this reader's file format is "pvtp".
+
+// .SECTION See Also
+// vtkXMLPolyDataReader
 
 #ifndef __vtkXMLPPolyDataReader_h
 #define __vtkXMLPPolyDataReader_h

@@ -15,9 +15,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPDataReader
+// .NAME vtkXMLPDataReader - Superclass for PVTK XML file readers.
 // .SECTION Description
-// vtkXMLPDataReader
+// vtkXMLPDataReader provides functionality common to all PVTK XML
+// file readers.  Concrete subclasses call upon this functionality
+// when needed.
+
+// .SECTION See Also
+// vtkXMLDataReader
 
 #ifndef __vtkXMLPDataReader_h
 #define __vtkXMLPDataReader_h

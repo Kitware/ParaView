@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLStructuredGridReader
+// .NAME vtkXMLStructuredGridReader - Read VTK XML StructuredGrid files.
 // .SECTION Description
-// vtkXMLStructuredGridReader
+// vtkXMLStructuredGridReader reads the VTK XML StructuredGrid file
+// format.  One structured grid file can be read to produce one
+// output.  Streaming is supported.  The standard extension for this
+// reader's file format is "vts".  This reader is also used to read a
+// single piece of the parallel file format.
+
+// .SECTION See Also
+// vtkXMLPStructuredGridReader
 
 #ifndef __vtkXMLStructuredGridReader_h
 #define __vtkXMLStructuredGridReader_h

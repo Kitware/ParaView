@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLUnstructuredGridReader
+// .NAME vtkXMLUnstructuredGridReader - Read VTK XML UnstructuredGrid files.
 // .SECTION Description
-// vtkXMLUnstructuredGridReader
+// vtkXMLUnstructuredGridReader reads the VTK XML UnstructuredGrid
+// file format.  One unstructured grid file can be read to produce one
+// output.  Streaming is supported.  The standard extension for this
+// reader's file format is "vtu".  This reader is also used to read a
+// single piece of the parallel file format.
+
+// .SECTION See Also
+// vtkXMLPUnstructuredGridReader
 
 #ifndef __vtkXMLUnstructuredGridReader_h
 #define __vtkXMLUnstructuredGridReader_h

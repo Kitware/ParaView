@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPImageDataReader
+// .NAME vtkXMLPImageDataReader - Read PVTK XML ImageData files.
 // .SECTION Description
-// vtkXMLPImageDataReader
+// vtkXMLPImageDataReader reads the PVTK XML ImageData file format.
+// This reads the parallel format's summary file and then uses
+// vtkXMLImageDataReader to read data from the individual ImageData
+// piece files.  Streaming is supported.  The standard extension for
+// this reader's file format is "pvti".
+
+// .SECTION See Also
+// vtkXMLImageDataReader
 
 #ifndef __vtkXMLPImageDataReader_h
 #define __vtkXMLPImageDataReader_h

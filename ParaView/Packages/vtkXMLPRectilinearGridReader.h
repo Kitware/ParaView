@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPRectilinearGridReader
+// .NAME vtkXMLPRectilinearGridReader - Read PVTK XML RectilinearGrid files.
 // .SECTION Description
-// vtkXMLPRectilinearGridReader
+// vtkXMLPRectilinearGridReader reads the PVTK XML RectilinearGrid
+// file format.  This reads the parallel format's summary file and
+// then uses vtkXMLRectilinearGridReader to read data from the
+// individual RectilinearGrid piece files.  Streaming is supported.
+// The standard extension for this reader's file format is "pvtr".
+
+// .SECTION See Also
+// vtkXMLRectilinearGridReader
 
 #ifndef __vtkXMLPRectilinearGridReader_h
 #define __vtkXMLPRectilinearGridReader_h

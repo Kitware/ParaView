@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLImageDataReader
+// .NAME vtkXMLImageDataReader - Read VTK XML ImageData files.
 // .SECTION Description
-// vtkXMLImageDataReader
+// vtkXMLImageDataReader reads the VTK XML ImageData file format.  One
+// image data file can be read to produce one output.  Streaming is
+// supported.  The standard extension for this reader's file format is
+// "vti".  This reader is also used to read a single piece of the
+// parallel file format.
+
+// .SECTION See Also
+// vtkXMLPImageDataReader
 
 #ifndef __vtkXMLImageDataReader_h
 #define __vtkXMLImageDataReader_h

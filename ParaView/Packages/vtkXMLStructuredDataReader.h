@@ -15,9 +15,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLStructuredDataReader
+// .NAME vtkXMLStructuredDataReader - Superclass for structured data XML readers.
 // .SECTION Description
-// vtkXMLStructuredDataReader
+// vtkXMLStructuredDataReader provides functionality common to all
+// structured data format readers.
+
+// .SECTION See Also
+// vtkXMLImageDataReader vtkXMLStructuredGridReader
+// vtkXMLRectilinearGridReader
 
 #ifndef __vtkXMLStructuredDataReader_h
 #define __vtkXMLStructuredDataReader_h

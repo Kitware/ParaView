@@ -15,9 +15,16 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLPStructuredGridReader
+// .NAME vtkXMLPStructuredGridReader - Read PVTK XML StructuredGrid files.
 // .SECTION Description
-// vtkXMLPStructuredGridReader
+// vtkXMLPStructuredGridReader reads the PVTK XML StructuredGrid file
+// format.  This reads the parallel format's summary file and then
+// uses vtkXMLStructuredGridReader to read data from the individual
+// StructuredGrid piece files.  Streaming is supported.  The standard
+// extension for this reader's file format is "pvts".
+
+// .SECTION See Also
+// vtkXMLStructuredGridReader
 
 #ifndef __vtkXMLPStructuredGridReader_h
 #define __vtkXMLPStructuredGridReader_h

@@ -15,9 +15,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkXMLDataReader - Superclass for VTK's XML format readers.
+// .NAME vtkXMLDataReader - Superclass for VTK XML file readers.
 // .SECTION Description
-// vtkXMLDataReader uses vtkXMLDataParser to parse a VTK XML input file.
+// vtkXMLDataReader provides functionality common to all VTK XML file
+// readers.  Concrete subclasses call upon this functionality when
+// needed.
+
+// .SECTION See Also
+// vtkXMLPDataReader
 
 #ifndef __vtkXMLDataReader_h
 #define __vtkXMLDataReader_h

@@ -18,6 +18,8 @@
 // .NAME vtkXMLReader - Superclass for VTK's XML format readers.
 // .SECTION Description
 // vtkXMLReader uses vtkXMLDataParser to parse a VTK XML input file.
+// Concrete subclasses then traverse the parsed file structure and
+// extract data.
 
 #ifndef __vtkXMLReader_h
 #define __vtkXMLReader_h
