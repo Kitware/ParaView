@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.205");
+vtkCxxRevisionMacro(vtkPVApplication, "1.206");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1094,49 +1094,38 @@ void vtkPVApplication::Start(int argc, char*argv[])
     int fileFound=0;
     // Until I add a user interface to set the number of pipes,
     // just read it from a file.
-    ifstream ifs;
     if (this->GroupFileName)
       {
+      ifstream ifs;
       ifs.open(this->GroupFileName,ios::in);
-      }
-    else
-      {
-      ifs.open("pipes.inp",ios::in);
-      }
-    if (ifs.fail())
-      {
-      if (this->GroupFileName)
+      if (ifs.fail())
         {
         vtkErrorMacro("Could not find the file " << this->GroupFileName);
         }
       else
         {
-        vtkErrorMacro("Could not find the file pipes.inp");
-        }
-        numPipes = numProcs;
-      }
-    else
-      {
-      char bfr[1024];
-      ifs.getline(bfr, 1024);
-      numPipes = atoi(bfr);
-      if (numPipes > numProcs) { numPipes = numProcs; }
-      if (numPipes < 1) { numPipes = 1; }
-      this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);   
-
-      for (id = 0; id < numPipes; ++id)
-        {
+        char bfr[1024];
         ifs.getline(bfr, 1024);
-        this->RemoteScript(
-          id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
-          bfr);
+        numPipes = atoi(bfr);
+        if (numPipes > numProcs) { numPipes = numProcs; }
+        if (numPipes < 1) { numPipes = 1; }
+        this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);   
+        
+        for (id = 0; id < numPipes; ++id)
+          {
+          ifs.getline(bfr, 1024);
+          this->RemoteScript(
+            id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
+            bfr);
+          }
+        fileFound = 1;
         }
-      fileFound = 1;
       }
 
     
     if (!fileFound)
       {
+      numPipes = numProcs;
       vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
       const char *displayString;
       displayString = getenv("DISPLAY");
@@ -1190,6 +1179,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
       {
       if ( !vtkKWDirectoryUtilities::FileExists(argv[i]) )
         {
+        vtkErrorMacro("Could not find the script file: " << argv[i]);
         this->SetRenderModule(NULL);
         this->SetExitStatus(1);
         this->Exit();
