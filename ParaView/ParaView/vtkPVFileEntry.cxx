@@ -68,7 +68,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.71");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.72");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -289,7 +289,8 @@ void vtkPVFileEntry::SetTimeStep(int ts)
     {
     if ( fname[0] == '/' || 
       (fname[1] == ':' && (fname[2] == '/' || fname[2] == '\\')) ||
-      (fname[0] == '\\' && fname[1] == '\\') )
+      (fname[0] == '\\' && fname[1] == '\\') ||
+      !this->Path || !*this->Path)
       {
       this->SetValue(fname);
       }
