@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.35");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.35.2.1");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -548,6 +548,12 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   vtkPVXMLElement* ime = element->LookupElement(input_menu);
+  if (!ime)
+    {
+    vtkErrorMacro("Couldn't find InputMenu element" << input_menu);
+    return 0;
+    }
+  
   vtkPVWidget* w = this->GetPVWidgetFromParser(ime, parser);
   vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast(w);
   if(!imw)

@@ -1,5 +1,4 @@
 <ModuleInterfaces>
-<!-- Removed until these filters are fixed
   <Module name="Balance"
           root_name="Balance" module_type="Filter"
           multiprocess_support="multiple_processes"
@@ -36,7 +35,6 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
 The All to N filter is available when ParaView is run in parallel. It redistributes the data so that it is located on the number of processes specified in the Number of Processes entry box. It also does load-balancing of the data among these processes. This filter operates on polygonal data and produces polygonal output.
     </Documentation>
   </Module>
--->
   <Module name="AppendAttributes"
           menu_name="Append Attributes"
           root_name="AppendAttr"
@@ -1473,8 +1471,8 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
                  variable="MaximumNumberOfSubdivisions" type="int"
                  default_value="1" data_range="0 8"/>
     <Documentation>
-The DataSetPolygonizer filter tessellates cells with nonlinear geometry and/or scalar fields into a simplicial complex with linearly interpolated field values that more closely approximate the original field. This is useful for the quadratic cells supported by VTK. There are several settings that affect the tessellation.
-The Output Dimension specifies whether nonlinear cells should have their volumes, surfaces, or edges tessellated. When the Output Dimension is 3 then 3-D cells produce tetrahedra, 2-D cells produce triangles, and 1-D cells produce line segments. When the Output Dimension is 2, 3-D cells will have their boundaries tessellated with triangles. And when the Output Dimension is 1, then all cells except points produce line-segments.
+The Tessellate filter tessellates cells with nonlinear geometry and/or scalar fields into a simplicial complex with linearly interpolated field values that more closely approximate the original field. This is useful for the quadratic cells supported by VTK. There are several settings that affect the tessellation.
+The Output Dimension specifies whether nonlinear cells should have their volumes, surfaces, or edges tessellated. When the Output Dimension is 3, 3-D cells produce tetrahedra, 2-D cells produce triangles, and 1-D cells produce line segments. When the Output Dimension is 2, 3-D cells will have their boundaries tessellated with triangles. When the Output Dimension is 1, then all cells except points produce line segments.
 The Max Chord Error setting is the maximum allowed distance between the midpoint of any output edge and the original nonlinear geometry.
 The Max Field Error setting is a per-field error, also sampled at midpoints, but comparing the linear and nonlinear field values.
 The Max Num Of Subdivisions setting specifies the maximum number of times an edge may be subdivided. Increasing this number allows further refinement but can drastically increase the computational and storage requirements, especially when the Output Dimension is 3.
@@ -2028,6 +2026,8 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
       <Item name="Cell" value="1"/>
     </SelectionList>
     <Documentation>
+The Pick filter displays the underlying data nearest to a user-selected point. A point widget, with its usual controls in the display area and on the Parameters tab, is provided for choosing this point. (See section 6.4 for information about using the point widget.) If you select Point from the Pick Type menu, the values of the point-centered variables at the nearest point will be displayed on the Parameters tab. If you select Cell, the values of the cell-centered variables and of the point-centered variables for the points in that cell will be displayed on the Parameters tab. Also, the selected cell will be outlined in red in the display area, and the ids of the points within that cell will be labeled.
+The Pick filter operates on any type of data and produces unstructured grid output.
     </Documentation>
   </Module>
   <Module name="Probe"
@@ -2062,6 +2062,10 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
       </Item>
     </SelectWidget>
     <Documentation>
+The Probe filter samples the data set attributes of the current data set at a point or along a line. Selecting either Point or Line from the menu button in the Probe object portion of the interface displays the appropriate 3D widget and its associated user interface controls. See section 6.4 for more information about using 3D widgets.
+If you are probing with a point, the values of the point-centered variables at the selected point will be listed on the Parameters tab for this filter. If you are probing with a line, the values of the point-centered variables along that line will be displayed in a 2D graph in the display area if Show XY-Plot is selected.
+Probing with a point is different from using the Pick filter at a point because the Pick filter displays the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the value at the selected point, whether or not it lies at an input point.
+The Probe filter operates on any type of data and produces polygonal output (a point or a line).
     </Documentation>
   </Module>
   <Module name="StreamTracer"

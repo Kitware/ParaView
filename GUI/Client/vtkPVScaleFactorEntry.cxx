@@ -21,7 +21,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.9.2.1");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.9.2.2");
 
 vtkCxxSetObjectMacro(vtkPVScaleFactorEntry, InputMenu, vtkPVInputMenu);
 
@@ -100,6 +100,12 @@ int vtkPVScaleFactorEntry::ReadXMLAttributes(vtkPVXMLElement *element,
   if (input_menu)
     {
     vtkPVXMLElement *ime = element->LookupElement(input_menu);
+    if (!ime)
+      {
+      vtkErrorMacro("Couldn't find InputMenu element " << input_menu);
+      return 0;
+      }
+    
     vtkPVWidget *w = this->GetPVWidgetFromParser(ime, parser);
     vtkPVInputMenu *imw = vtkPVInputMenu::SafeDownCast(w);
     if (!imw)

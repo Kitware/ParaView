@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.1.2.4");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.1.2.5");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -639,6 +639,12 @@ int vtkPVTempTessellatorEntry::ReadXMLAttributes( vtkPVXMLElement* element, vtkP
   if ( input_menu_id )
     {
     vtkPVXMLElement* im = element->LookupElement( input_menu_id );
+    if (!im)
+      {
+      vtkErrorMacro("Couldn't find InputMenu element " << input_menu_id);
+      return 0;
+      }
+    
     vtkPVWidget* w = this->GetPVWidgetFromParser( im, parser );
     vtkPVInputMenu* imw = vtkPVInputMenu::SafeDownCast( w );
     if ( ! imw )

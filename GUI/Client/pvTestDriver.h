@@ -36,7 +36,8 @@ protected:
                          vtkstd::vector<vtkstd::string>& flags);
   
   int WaitForAndPrintData(const char* pname, kwsysProcess* process, double timeout,
-                          int* foundWaiting, vtkstd::string* output=0 );
+                          vtkstd::string* output=0 );
+  void PrintData(const char* pname, const char* data, int length);
   void ReportCommand(const char* const* command, const char* name);
   int ReportStatus(kwsysProcess* process, const char* name);
   int ProcessCommandLine(int argc, char* argv[]);
