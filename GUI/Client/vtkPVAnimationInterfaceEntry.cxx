@@ -77,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.50");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -621,7 +621,9 @@ void vtkPVAnimationInterfaceEntry::UpdateMethodMenu(int samesource /* =1 */)
     }
   char methodAndArgs[1024];
   sprintf(methodAndArgs, "ScriptMethodCallback");
+#ifdef PARAVIEW_EXPERIMENTAL_USER
   menu->AddCommand("Script", this, methodAndArgs, 0,"");
+#endif //PARAVIEW_EXPERIMENTAL_USER
   sprintf(methodAndArgs, "NoMethodCallback");
   menu->AddCommand("None", this, methodAndArgs, 0,"");
 
