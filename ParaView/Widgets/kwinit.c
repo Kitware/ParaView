@@ -9438,7 +9438,7 @@ int vxprintf(
             for(pre=infop->prefix; (x=(*pre))!=0; pre++) *(--bufpt) = x;
 	  }
         }
-        length = (long)&buf[etBUFSIZE]-(long)bufpt;
+        length = vtkConvertToLong(&buf[etBUFSIZE])-vtkConvertToLong(bufpt);
         break;
       case etFLOAT:
       case etEXP:
@@ -9548,7 +9548,7 @@ int vxprintf(
         /* The converted number is in buf[] and zero terminated. Output it.
         ** Note that the number is in the usual order, not reversed as with
         ** integer conversions. */
-        length = (long)bufpt-(long)buf;
+        length = vtkConvertToLong(bufpt)-vtkConvertToLong(buf);
         bufpt = buf;
 
         /* Special case:  Add leading zeros if the flag_zeropad flag is
@@ -10183,7 +10183,7 @@ static Tcl_Channel Et_FileOpen(
   p->zData = zData;
   p->nData = nData;
   p->cursor = 0;
-  sprintf(zName,"etbi_%x_%x",((int)Et_FileOpen)>>12,count++);
+  sprintf(zName,"etbi_%x_%x",(int)(vtkConvertToLong(Et_FileOpen))>>12,count++);
   chan = Tcl_CreateChannel(&builtinChannelType, zName, 
                            (ClientData)p, TCL_READABLE);
   return chan;
