@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.35");
+vtkCxxRevisionMacro(vtkPVScale, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -511,7 +511,7 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   ai->SetCurrentProperty(this->Property);
   ai->SetTimeStart(this->GetRangeMin());
   ai->SetTimeEnd(this->GetRangeMax());
-  ai->SetTypeToInt();
+  ai->SetTypeToFloat();
   ai->Update();
 }
 
