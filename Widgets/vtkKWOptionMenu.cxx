@@ -83,7 +83,7 @@ void vtkKWOptionMenu::SetValue(const char *s)
 {
   if (s)
     {
-    this->Script("set %sValue %s", this->GetWidgetName(),s);
+    this->Script("set %sValue {%s}", this->GetWidgetName(),s);
     }
 }
 
