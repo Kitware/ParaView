@@ -48,12 +48,12 @@ public:
   // Description:
   // Manual method for selecting which axis gets sliced.
   void SetSliceAxis(int axis);
-  int GetSliceAxis();
+  vtkGetMacro(SliceAxis, int);
 
   // Description:
   // Manual method for selecting which slice to display
   void SetSliceNumber(int slice);
-  int GetSliceNumber();
+  vtkGetMacro(SliceNumber, int);
   
   // Description:
   // Get the underlying vtkImageSlice

@@ -161,6 +161,7 @@ public:
   // Set the vtk source that will be a part of the pipeline.
   void SetVTKSource(vtkSource *source);
   vtkGetObjectMacro(VTKSource, vtkSource);
+  const char *GetVTKSourceTclName();
 
   // Description:
   // A method used to broadcast changes resulting from widgets.
@@ -184,6 +185,7 @@ protected:
   
   vtkPVData *PVOutput;
   vtkSource *VTKSource;
+  char *VTKSourceTclName;
 
   // Just one input for now.
   vtkPVData *Input;

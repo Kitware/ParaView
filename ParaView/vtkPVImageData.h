@@ -77,6 +77,7 @@ public:
   
   void Clip();
   void Slice();
+  void ShiftScale();
   
   // Description:
   // Uses the assignment to set the extent, then updates the data.

@@ -74,101 +74,36 @@ vtkPVImageSlice* vtkPVImageSlice::New()
 }
 
 //----------------------------------------------------------------------------
+vtkImageClip* vtkPVImageSlice::GetImageClip()
+{
+  return vtkImageClip::SafeDownCast(this->GetVTKSource());
+}
+
+//----------------------------------------------------------------------------
 void vtkPVImageSlice::CreateProperties()
 {
   // must set the application
   this->vtkPVImageToImageFilter::CreateProperties();
  
-  this->GetSliceStyle()->
-    SetImageData(this->GetInput()->GetData());
-  this->GetSliceStyle()->
-    SetExtent(this->GetSlice()->GetOutputWholeExtent());
+  this->GetSliceStyle()->SetImageData(this->GetImageClip()->GetInput());
+  this->GetSliceStyle()->SetExtent(this->GetImageClip()->GetOutputWholeExtent());
   
   this->AddScale("Slice:","SetSliceNumber","GetSliceNumber", 
                  0,100,1, this);
-  this->AddModeList("Axis:", "SetSliceAxis","GetSliceAxis" *setCmd, char *getCmd,
-                   vtkKWObject *o = NULL);
-  void AddModeListItem(char *name, int value);
+  this->AddModeList("Axis:", "SetSliceAxis","GetSliceAxis", this);
+  this->AddModeListItem("X Axis", 0);
+  this->AddModeListItem("Y Axis", 1);
+  this->AddModeListItem("Z Axis", 2);
   
   this->UpdateProperties();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SelectXCallback()
-{
-  int ext[6];
-  ((vtkImageData*)this->GetInput()->GetData())->GetWholeExtent(ext);
-  int sliceNum = this->GetSliceEntry()->GetValueAsInt();
-  
-  this->YDimension->SetState(0);
-  this->ZDimension->SetState(0);
-  this->GetSliceStyle()->SetConstraint0ToCollapse();
-  this->GetSliceStyle()->SetConstraint1ToNone();
-  this->GetSliceStyle()->SetConstraint2ToNone();
-  this->GetSliceStyle()->SetExtent(sliceNum, sliceNum, ext[2], ext[3], ext[4],
-				   ext[5]);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SelectYCallback()
-{
-  int ext[6];
-  ((vtkImageData*)this->GetInput()->GetData())->GetWholeExtent(ext);
-  int sliceNum = this->GetSliceEntry()->GetValueAsInt();
-  
-  this->XDimension->SetState(0);
-  this->ZDimension->SetState(0);
-  this->GetSliceStyle()->SetConstraint0ToNone();
-  this->GetSliceStyle()->SetConstraint1ToCollapse();
-  this->GetSliceStyle()->SetConstraint2ToNone();
-  this->GetSliceStyle()->SetExtent(ext[0], ext[1], sliceNum, sliceNum, ext[4],
-				   ext[5]);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SelectZCallback()
-{
-  int ext[6];
-  ((vtkImageData*)this->GetInput()->GetData())->GetWholeExtent(ext);
-  int sliceNum = this->GetSliceEntry()->GetValueAsInt();
-  
-  this->XDimension->SetState(0);
-  this->YDimension->SetState(0);
-  this->GetSliceStyle()->SetConstraint0ToNone();
-  this->GetSliceStyle()->SetConstraint1ToNone();
-  this->GetSliceStyle()->SetConstraint2ToCollapse();
-  this->GetSliceStyle()->SetExtent(ext[0], ext[1], ext[2], ext[3], sliceNum,
-				   sliceNum);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::UpdateProperties()
 {
-  if ( ! this->PropertiesCreated)
-    {
-    return;
-    }
-  
-  this->SliceEntry->SetValue(this->SliceNumber);
-
-  this->XDimension->SetState(0);
-  this->YDimension->SetState(0);
-  this->ZDimension->SetState(0);
-  if (this->SliceAxis == 0)
-    {
-    this->XDimension->SetState(1);
-    this->GetSliceStyle()->SetConstraint0ToCollapse();
-    }
-  if (this->SliceAxis == 1)
-    {
-    this->YDimension->SetState(1);
-    this->GetSliceStyle()->SetConstraint1ToCollapse();
-    }
-  if (this->SliceAxis == 2)
-    {
-    this->ZDimension->SetState(1);
-    this->GetSliceStyle()->SetConstraint2ToCollapse();
-    }
+  this->UpdateParameterWidgets();
+  this->UpdateNavigationCanvas();  
 }
 
 //----------------------------------------------------------------------------
@@ -197,68 +132,6 @@ void vtkPVImageSlice::SetSliceAxis(int axis)
   this->UpdateProperties();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SetOutputWholeExtent(int xmin, int xmax, int ymin, 
-					   int ymax, int zmin, int zmax)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  this->Slice->SetOutputWholeExtent(xmin, xmax, ymin, ymax, zmin, zmax);
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetOutputWholeExtent %d %d %d %d %d %d",
-		   this->GetTclName(), xmin,xmax, ymin,ymax, zmin,zmax);
-    }
-}
-
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void StartImageSliceProgress(void *arg)
-{
-  vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
-  me->GetWindow()->SetStatusText("Processing ImageSlice");
-}
-
-//----------------------------------------------------------------------------
-void ImageSliceProgress(void *arg)
-{
-  vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetSlice()->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void EndImageSliceProgress(void *arg)
-{
-  vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
-
-//----------------------------------------------------------------------------
-void SliceCallback(void *arg)
-{
-  vtkPVImageSlice *me = (vtkPVImageSlice*)arg;
-  int *extent;
-  
-  me->GetSliceStyle()->DefaultCallback(me->GetSliceStyle()->GetCallbackType());
-  
-  extent = me->GetSliceStyle()->GetExtent();
-  if (me->GetSliceStyle()->GetConstraint0())
-    {
-    me->GetSliceEntry()->SetValue(extent[0]);
-    }
-  else if (me->GetSliceStyle()->GetConstraint1())
-    {
-    me->GetSliceEntry()->SetValue(extent[2]);
-    }
-  else
-    {
-    me->GetSliceEntry()->SetValue(extent[4]);
-    }
-  
-  me->SliceChanged();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::UseSliceStyle()
@@ -266,152 +139,6 @@ void vtkPVImageSlice::UseSliceStyle()
   this->GetWindow()->GetMainView()->SetInteractorStyle(this->SliceStyle);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SliceChanged()
-{
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVImageData *pvi;
-  vtkPVWindow *window = this->GetWindow();
-  vtkPVActorComposite *ac;
-  vtkPVAssignment *a;
-  int *ext;
-  
-  // Get the parameter values from the properties UI.
-  if (this->XDimension->GetState())
-    {
-    this->SliceAxis = 0;
-    }
-  else if (this->YDimension->GetState())
-    {
-    this->SliceAxis = 1;
-    }
-  else
-    {
-    this->SliceAxis = 2;
-    }
-  this->SliceNumber = this->SliceEntry->GetValueAsInt();
-  
-  // Set the extent of the clip filter.
-  this->Slice->GetInput()->UpdateInformation();
-  ext = this->Slice->GetInput()->GetWholeExtent();
-  
-  if (this->SliceAxis == 0)
-    {
-    if (this->SliceNumber < ext[0])
-      {
-      this->SetSliceNumber(ext[0]);
-      }
-    if (this->SliceNumber > ext[1])
-      {
-      this->SetSliceNumber(ext[1]);
-      }
-    this->SetOutputWholeExtent(this->SliceNumber, this->SliceNumber,
-			       ext[2], ext[3], ext[4], ext[5]);
-    }
-  if (this->SliceAxis == 1)
-    {
-    if (this->SliceNumber < ext[2])
-      {
-      this->SetSliceNumber(ext[2]);
-      }
-    if (this->SliceNumber > ext[3])
-      {
-      this->SetSliceNumber(ext[3]);
-      }
-    this->SetOutputWholeExtent(ext[0], ext[1], this->SliceNumber, 
-			       this->SliceNumber, ext[4], ext[5]);
-    }
-  if (this->SliceAxis == 2)
-    {
-    if (this->SliceNumber < ext[4])
-      {
-      this->SetSliceNumber(ext[4]);
-      }
-    if (this->SliceNumber > ext[5])
-      {
-      this->SetSliceNumber(ext[5]);
-      }
-    this->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3],
-			       this->SliceNumber, this->SliceNumber);
-    }
-  
-  // Create the data if this is the first accept.
-  if (this->GetPVData() == NULL)
-    {
-    this->GetSlice()->SetStartMethod(StartImageSliceProgress, this);
-    this->GetSlice()->SetProgressMethod(ImageSliceProgress, this);
-    this->GetSlice()->SetEndMethod(EndImageSliceProgress, this);
-    this->GetSliceStyle()->SetCallbackMethod(SliceCallback, this);
-    pvi = vtkPVImageData::New();
-    pvi->Clone(pvApp);
-    pvi->OutlineFlagOff();
-    this->SetPVOutput(pvi);
-    a = this->GetInput()->GetAssignment();
-    pvi->SetAssignment(a);  
-    this->GetInput()->GetActorComposite()->VisibilityOff();
-    this->CreateDataPage();
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    window->GetSourceList()->Update();
-
-    this->GetSliceStyle()->SetExtent(this->GetSlice()->GetOutputWholeExtent());
-    
-    // Lets try to pick a reasonable scalar range.
-    float range[2];
-    // The GetScalarRange is in vtkPVActorComposite instead of vtkPVData,
-    // because the actor composite knows what piece to request.
-    ac->GetInputScalarRange(range);
-    ac->SetScalarRange(range[0], range[1]);
-    }
-
-  window->GetMainView()->SetSelectedComposite(this);
-  
-  if (!this->SliceStyleCreated)
-    {
-    this->SliceStyleCreated = 1;
-    this->Script("%s configure -state normal",
-		 this->SliceStyleButton->GetWidgetName());
-    }
-  
-  this->GetView()->Render();  
-}
-
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SetInput(vtkPVImageData *pvData)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
-			   pvData->GetTclName());
-    }  
-  
-  this->Slice->SetInput(pvData->GetImageData());
-  this->Input = pvData;
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVImageSlice::SetPVOutput(vtkPVImageData *pvi)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
-			   pvi->GetTclName());
-    }  
-  
-  this->SetPVData(pvi);
-  pvi->SetData(this->Slice->GetOutput());
-}
-
-//----------------------------------------------------------------------------
-vtkPVImageData *vtkPVImageSlice::GetPVOutput()
-{
-  return vtkPVImageData::SafeDownCast(this->PVOutput);
-}
 
 //----------------------------------------------------------------------------
 void vtkPVImageSlice::Select(vtkKWView *view)

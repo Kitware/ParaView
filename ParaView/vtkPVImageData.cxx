@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageData.h"
 #include "vtkPVImageClip.h"
 #include "vtkPVImageSlice.h"
+#include "vtkPVImageShiftScale.h"
 #include "vtkPVWindow.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkPVAssignment.h"
@@ -150,6 +151,27 @@ void vtkPVImageData::Slice()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVImageData::ShiftScale()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVImageShiftScale *f;
+  int ext[6];
+
+  f = vtkPVImageShiftScale::New();
+  f->Clone(pvApp);    
+  f->SetInput(this);
+  
+  f->SetName("ShiftScale");
+  
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  this->GetPVSource()->GetView()->AddComposite(f);
+  
+  window->SetCurrentSource(f);
+  
+  f->Delete();
+}
+
+//----------------------------------------------------------------------------
 int vtkPVImageData::Create(char *args)
 {
   if (this->vtkPVData::Create(args) == 0)
@@ -159,6 +181,7 @@ int vtkPVImageData::Create(char *args)
   
   this->FiltersMenuButton->AddCommand("vtkImageClip", this, "Clip");
   this->FiltersMenuButton->AddCommand("ImageSlice", this, "Slice");
+  this->FiltersMenuButton->AddCommand("ShiftScale", this, "ShiftScale");
   
   return 1;
 }
