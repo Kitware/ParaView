@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.20");
+vtkCxxRevisionMacro(vtkSMProxy, "1.21");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -931,5 +931,8 @@ void vtkSMProxy::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "VTKClassName: " 
      << (this->VTKClassName ? this->VTKClassName : "(null)")
+     << endl;
+  os << indent << "XMLName: "
+     << (this->XMLName ? this->XMLName : "(null)")
      << endl;
 }
