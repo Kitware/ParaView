@@ -58,25 +58,25 @@ public:
   vtkTypeRevisionMacro(vtkKWTkUtilities,vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
-  // Get RGB component for color (given a window)
   //BTX  
+
+  // Description:
+  // Get RGB component for color (given a window).
   static void GetRGBColor(Tcl_Interp *interp,
                           const char *window, 
                           const char *color, 
                           int *rr, int *gg, int *bb);
-  //ETX
 
-  // Get background color of window/widget
-  //BTX  
+  // Description:
+  // Get background color of window/widget.
   static void GetBackgroundColor(Tcl_Interp *interp,
                                  const char *window, 
                                  int *r, int *g, int *b);
-  //ETX
   
+  // Description:
   // Update a photo given a pixel structure. 
   // If RGBA (pixel_size > 3), blend pixels with background color of
   // the blend_with_name widget (otherwise 0.5, 0.5, 0.5 gray)
-  //BTX  
   static int UpdatePhoto(Tcl_Interp *interp,
                          const char *photo_name,
                          const unsigned char *pixels, 
@@ -90,15 +90,49 @@ public:
                          vtkImageData *image, 
                          const char *blend_with_name = 0);
 
+  // Description:
+  // Quick way to get a photo height/width.
   static int GetPhotoHeight(Tcl_Interp *interp,
                             const char *photo_name);
-
   static int GetPhotoWidth(Tcl_Interp *interp,
                            const char *photo_name);
 
-
+  // Description:
+  // Boldify the -font attribute of widget.
   static int ChangeFontToBold(Tcl_Interp *interp,
                               const char *widget);
+
+  // Description:
+  // Get the size of a grid (i.e. the number of colums and rows in this 
+  // master widget).
+  static int GetGridSize(Tcl_Interp *interp,
+                         const char *widget,
+                         int *nb_of_cols,
+                         int *nb_of_rows);
+
+  // Description:
+  // Get the column widths of a grid (i.e. a master widget that has been grid).
+  // If 'allocate' is true, the resulting array (col_widths) is allocated
+  // by the function to match the number of columns.
+  // The function iterates over cells to request the width of
+  // each slave (winfo reqwidth).
+  static int GetGridColumnWidths(Tcl_Interp *interp,
+                                 const char *widget,
+                                 int *nb_of_cols,
+                                 int **col_widths,
+                                 int allocate = 0);
+  // Description:
+  // Synchronize the columns minimum size of different widgets that have
+  // been grid. If 'factors' is non-null, it is used as an array of
+  // multiplication factor to apply to each column minimum size.
+  // If 'weights' is non-null, it is used as an array of weight
+  // to apply to each column through columnconfigure -weight.
+  static int SynchroniseGridsColumnMinimumSize(Tcl_Interp *interp,
+                                               int nb_of_widgets,
+                                               const char **widgets,
+                                               const float *factors = 0,
+                                               const int *weights = 0);
+
   //ETX
 
 protected:

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.8");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.9");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -404,6 +404,204 @@ int vtkKWTkUtilities::ChangeFontToBold(Tcl_Interp *interp,
     }
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetGridSize(Tcl_Interp *interp,
+                                  const char *widget,
+                                  int *nb_of_cols,
+                                  int *nb_of_rows)
+{
+  ostrstream size;
+  size << "grid size " << widget << ends;
+  int res = Tcl_GlobalEval(interp, size.str());
+  size.rdbuf()->freeze(0);
+  if (res != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to query grid size!");
+    return 0;
+    }
+  sscanf(interp->result, "%d %d", nb_of_cols, nb_of_rows);
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::GetGridColumnWidths(Tcl_Interp *interp,
+                                          const char *widget,
+                                          int *nb_of_cols,
+                                          int **col_widths,
+                                          int allocate)
+{
+  // First get grid size
+
+  int nb_of_rows;
+  if (!vtkKWTkUtilities::GetGridSize(interp, widget, nb_of_cols, &nb_of_rows))
+    {
+    vtkGenericWarningMacro(<< "Unable to query grid size!");
+    return 0;
+    }
+
+  // Iterate over the columns and get the largest widget
+  // (I'm expecting only one widget per cell here)
+
+  if (allocate)
+    {
+    *col_widths = new int[*nb_of_cols];
+    }
+
+  int col, row;
+  for (col = 0; col < *nb_of_cols; col++)
+    {
+    (*col_widths)[col] = 0;
+    for (row = 0; row < nb_of_rows; row++)
+      {
+      // Get the slave
+
+      ostrstream slave;
+      slave << "grid slaves " << widget << " -column " << col 
+            << " -row " << row << ends;
+      int res = Tcl_GlobalEval(interp, slave.str());
+      slave.rdbuf()->freeze(0);
+      if (res != TCL_OK)
+        {
+        vtkGenericWarningMacro(<< "Unable to get grid slave!");
+        continue;
+        }
+
+      // No slave, let's process the next row
+
+      if (!interp->result || !interp->result[0])
+        {
+        continue;
+        }
+
+      ostrstream wclass;
+      wclass << "winfo class " << interp->result << ends;
+
+      cout << "[" << col << ", " << row << "] [" << interp->result << "] ";
+
+      ostrstream reqwidth;
+      reqwidth << "winfo reqwidth " << interp->result << ends;
+
+      ostrstream wwidth;
+      wwidth << "winfo width " << interp->result << ends;
+
+      res = Tcl_GlobalEval(interp, wclass.str());
+      wclass.rdbuf()->freeze(0);
+
+      cout << "[" << interp->result << "] ";
+
+      // Get the slave reqwidth
+
+      res = Tcl_GlobalEval(interp, reqwidth.str());
+      reqwidth.rdbuf()->freeze(0);
+      if (res != TCL_OK)
+        {
+        vtkGenericWarningMacro(<< "Unable to query slave width!");
+        continue;
+        }
+      int width = 0;
+      sscanf(interp->result, "%d", &width);
+
+      cout << "= " << width;
+
+      if (width > (*col_widths)[col])
+        {
+        (*col_widths)[col] = width;
+        }
+
+      // Get the slave width
+
+      res = Tcl_GlobalEval(interp, wwidth.str());
+      wwidth.rdbuf()->freeze(0);
+      cout << " (w = " << interp->result << ")" << endl;
+
+      }
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
+  Tcl_Interp *interp,
+  int nb_of_widgets,
+  const char **widgets,
+  const float *factors,
+  const int *weights)
+{
+  // Allocate mem for nb of colums and widths
+
+  int *nb_of_cols = new int [nb_of_widgets];
+  int **col_widths = new int* [nb_of_widgets];
+  int widget;
+
+  // Collect column widths
+
+  int min_nb_of_cols = 10000;
+  for (widget = 0; widget < nb_of_widgets; widget++)
+    {
+    if (vtkKWTkUtilities::GetGridColumnWidths(
+      interp, widgets[widget], &nb_of_cols[widget], &col_widths[widget], 1))
+      {
+      if (nb_of_cols[widget] < min_nb_of_cols)
+        {
+        min_nb_of_cols = nb_of_cols[widget];
+        }
+      }
+    }
+
+  // Synchronize columns (for each column, configure -minsize to the largest
+  // column width for all grids)
+
+  ostrstream minsize;
+  for (int col = 0; col < min_nb_of_cols; col++)
+    {
+    int col_width_max = 0;
+    for (widget = 0; widget < nb_of_widgets; widget++)
+      {
+      if (col_widths[widget][col] > col_width_max)
+        {
+        col_width_max = col_widths[widget][col];
+        }
+      }
+    if (factors)
+      {
+      col_width_max = (int)((float)col_width_max * factors[col]);
+      }
+    for (widget = 0; widget < nb_of_widgets; widget++)
+      {
+      minsize << "grid columnconfigure " << widgets[widget] << " " << col 
+              << " -minsize " << col_width_max;
+      if (weights)
+        {
+        minsize << " -weight " << weights[col];
+        }
+      minsize << endl;
+      }
+    }
+  minsize << ends;
+  cout << minsize.str() << endl;
+
+  int ok = 1;
+  if (Tcl_GlobalEval(interp, minsize.str()) != TCL_OK)
+    {
+    vtkGenericWarningMacro(<< "Unable to synchronize grid columns!");
+    ok = 0;
+    }
+  minsize.rdbuf()->freeze(0);
+
+  // Free mem
+
+  delete [] nb_of_cols;
+  for (widget = 0; widget < nb_of_widgets; widget++)
+    {
+    delete [] col_widths[widget];
+    }
+  delete [] col_widths;
+
+  return ok;
 }
 
 //----------------------------------------------------------------------------
