@@ -289,8 +289,7 @@ public:
 
   // Description: 
   // Convenience methid which calls ClonePrototype() and InitializeClone()
-  int CloneAndInitialize(
-    int makeCurrent, vtkPVSource*& clone, const char* groupName);
+  int CloneAndInitialize(int makeCurrent, vtkPVSource*& clone);
 
   // Description: 
   // Creates and returns (by reference) a copy of this
@@ -484,6 +483,9 @@ public:
   void SetProxy(vtkSMSourceProxy* proxy);
   vtkGetObjectMacro(Proxy, vtkSMSourceProxy);
 
+  // Description:
+  void RegisterProxy(const char* sourceList, vtkPVSource* clone);
+  
 protected:
   vtkPVSource();
   ~vtkPVSource();

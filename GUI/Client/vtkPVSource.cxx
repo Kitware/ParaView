@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.367");
+vtkCxxRevisionMacro(vtkPVSource, "1.368");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -186,6 +186,7 @@ vtkPVSource::~vtkPVSource()
     {
     proxm->UnRegisterProxy(this->GetName());
     }
+  this->Proxy = 0;
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -2136,8 +2137,7 @@ int vtkPVSource::GetNumberOfProcessorsValid()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSource::CloneAndInitialize(
-  int makeCurrent, vtkPVSource*& clone , const char* groupName)
+int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone)
 {
 
   int retVal = this->ClonePrototypeInternal(clone);
@@ -2157,16 +2157,25 @@ int vtkPVSource::CloneAndInitialize(
     return retVal;
     }
 
+  // Accept button is always red when a source is first created.
+  clone->SetAcceptButtonColorToModified();
+
+  return VTK_OK;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::RegisterProxy(const char* sourceList, vtkPVSource* clone)
+{
   const char* module_group = 0;
-  if (groupName)
+  if (sourceList)
     {
-    if (strcmp(groupName, "GlyphSources") == 0)
+    if (strcmp(sourceList, "GlyphSources") == 0)
       {
-      module_group = "glyph_sources";
+        module_group = "glyph_sources";
       }
     else
       {
-      module_group = groupName;
+      module_group = sourceList;
       }
     }
   else if (this->GetNumberOfInputProperties() > 0)
@@ -2182,10 +2191,6 @@ int vtkPVSource::CloneAndInitialize(
   proxm->RegisterProxy(module_group, clone->GetName(), clone->Proxy);
   clone->Proxy->Delete();
 
-  // Accept button is always red when a source is first created.
-  clone->SetAcceptButtonColorToModified();
-
-  return VTK_OK;
 }
 
 //----------------------------------------------------------------------------

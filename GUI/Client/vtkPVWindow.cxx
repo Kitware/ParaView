@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.591");
+vtkCxxRevisionMacro(vtkPVWindow, "1.592");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2005,6 +2005,10 @@ vtkPVReaderModule* vtkPVWindow::InitializeRead(vtkPVReaderModule* proto,
     "set kw(%s) [$kw(%s) InitializeReadCustom \"%s\" \"%s\"]", 
     clone->GetTclName(), this->GetTclName(), proto->GetModuleName(), fileName);
 
+  if (clone)
+    {
+    proto->RegisterProxy(0, clone);
+    }
   return clone;
 }
 
@@ -3746,11 +3750,11 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     // the Sources list.
     if (sourceList && strcmp(sourceList, "Sources") != 0)
       {
-      success = pvs->CloneAndInitialize(0, clone, sourceList);
+      success = pvs->CloneAndInitialize(0, clone);
       }
     else
       {
-      success = pvs->CloneAndInitialize(1, clone, sourceList);
+      success = pvs->CloneAndInitialize(1, clone);
       }
 
     if (success != VTK_OK)
@@ -3768,7 +3772,9 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
       this->UpdateEnableState();
       return 0;
       }
-    
+
+    pvs->RegisterProxy(sourceList, clone);
+
     if (grabFocus)
       {
       clone->GrabFocus();
