@@ -48,20 +48,19 @@ FOREACH (tfile
                VectorTextSpace
                Write
          )
-  IF(RUN_WITH_MPI)
+  IF(${RUN_WITH_MPI})
     ADD_TEST(${tfile}-MPI ${MPIRUN} ${MPI_PREFLAGS} ${PARAVIEW_EXECUTABLE}
              ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/${tfile}.pvs
                -D ${PARAVIEW_SOURCE_DIR}/Data 
                -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
                -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png
                   ${MPI_POSTFLAGS})
-  ELSE(RUN_WITH_MPI)
-    ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE}
-             ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/${tfile}.pvs
-               -D ${PARAVIEW_SOURCE_DIR}/Data 
-               -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
-               -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
-  ENDIF(RUN_WITH_MPI)
+  ENDIF(${RUN_WITH_MPI})
+  ADD_TEST(${tfile} ${PARAVIEW_EXECUTABLE}
+           ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/${tfile}.pvs
+             -D ${PARAVIEW_SOURCE_DIR}/Data 
+             -C ${PARAVIEW_SOURCE_DIR}/Widgets/Testing/Tcl/CompareImages.tcl
+             -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
 ADD_TEST(PrintSelf-ParaView ${TCL_TCLSH}
