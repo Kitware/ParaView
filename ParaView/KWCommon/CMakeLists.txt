@@ -25,6 +25,8 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML
   )
   SET (KWCommon_SRCS ${KWCommon_SRCS}
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLCameraReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLCameraWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLColorTransferFunctionReader.cxx
@@ -35,8 +37,14 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLProperty2DReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLProperty2DWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropertyReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropertyWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarActorReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarActorWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarsToColorsReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarsToColorsWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyReader.cxx
@@ -49,6 +57,8 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     SET (KWCommon_SRCS ${KWCommon_SRCS}
       ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetReader.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetWriter.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarWidgetReader.cxx
+      ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarWidgetWriter.cxx
     )
   ENDIF (VTK_USE_HYBRID)
   SET_SOURCE_FILES_PROPERTIES(
