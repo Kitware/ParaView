@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVDefaultModules_h
 
 #include "vtkToolkits.h"
+#include "vtkPVConfig.h"
 
 // Define the standard reader interfaces.
 const char* vtkPVInitialize::StandardReaderInterfaces =
@@ -232,6 +233,19 @@ const char* vtkPVInitialize::StandardReaderInterfaces =
 "               help=\"Read a subset of data spaced by the stride.\"/>\n"
 "  <ArraySelection attribute_name=\"Point\"/>\n"
 " </Module>\n"
+#ifdef PARAVIEW_LINK_XDMF
+" <Module name=\"XdmfReader\" root_name=\"XdmfReader\"\n"
+"   output=\"vtkDataSet\"\n"
+"   class=\"vtkXDMFReaderModule\" module_type=\"Reader\" extensions=\".xmf\"\n"
+"   file_description=\"Xdmf Reader\">\n"
+"  <Source class=\"vtkMyXdmfReader\"/>\n"
+"  <ArraySelection trace_name=\"point_array_sel\" attribute_name=\"Cell\" />\n"
+"  <ArraySelection trace_name=\"cell_array_sel\" attribute_name=\"Point\" />\n"
+"  <VectorEntry label=\"Stride\" trace_name=\"stride\" variable=\"Stride\" type=\"int\"\n"
+"               length=\"3\"\n"
+"               help=\"Set the number of steps to skip between each point (structured data only).\"/>\n"
+" </Module>\n"
+#endif
 "</ModuleInterfaces>\n";
 
 // Define the standard source interfaces.

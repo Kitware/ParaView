@@ -114,12 +114,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "direct.h"
 #endif
 
+#ifdef _MSC_VER
+#pragma warning (push, 2)
+#endif
+
 #include <vector>
 #include <string>
 
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.185");
+vtkCxxRevisionMacro(vtkPVApplication, "1.186");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -137,6 +145,10 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 //----------------------------------------------------------------------------
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
+
+#ifdef PARAVIEW_LINK_XDMF
+extern "C" int Vtkxdmftcl_Init(Tcl_Interp *interp);
+#endif
 
 vtkPVApplication* vtkPVApplication::MainApplication = 0;
 
@@ -258,6 +270,10 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
     }
    
   Vtkkwparaviewtcl_Init(interp);
+
+#ifdef PARAVIEW_LINK_XDMF
+  Vtkxdmftcl_Init(interp);
+#endif
   
   // Create the component loader procedure in Tcl.
   char* script = vtkString::Duplicate(vtkPVApplication::LoadComponentProc);  
@@ -525,6 +541,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Run ParaView as client (MPI run, 1 process) (ParaView Server must be started first).", 
   "--server" , "-v", 
   "Start ParaView as a server (use MPI run).",
+  "--detach" , "-d",
+  "Detach ParaView from console (for running as server).",
   "--host", "-h",
   "Tell the client where to look for the server (default: --host=localhost). Use this option only with the --client option.", 
   "--port", "",

@@ -30,11 +30,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 # include <mpi.h>
 #endif
 
+#include "vtkKWRemoteExecute.h"
 #include "vtkMultiProcessController.h"
-#include "vtkPVMPIProcessModule.h"
-#include "vtkPVClientServerModule.h"
-#include "vtkPVApplication.h"
 #include "vtkOutputWindow.h"
+#include "vtkPVApplication.h"
+#include "vtkPVClientServerModule.h"
+#include "vtkPVMPIProcessModule.h"
 
 #include "vtkObject.h"
 #include "vtkTclUtil.h"
@@ -67,6 +68,17 @@ int MyMain(int argc, char *argv[])
 #else
   vtkOutputWindow::GetInstance()->PromptUserOff();
 #endif
+
+  // When running remote application, we need to detach, otherwise the session
+  // will stay open. So, we will do a little hack and we will call Paraview
+  // with --detach as an argument, which will detach ParaView.
+  if ( argc > 2 && (strcmp(argv[1],"--detach") == 0 || strcmp(argv[1],"-dd") == 0))
+    {
+    if ( vtkKWRemoteExecute::Detach() != VTK_OK )
+      {
+      return 1;
+      }
+    }
   
   // The server is a special case.  We do not initialize Tk for process 0.
   // I would rather have application find this command line option, but

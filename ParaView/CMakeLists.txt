@@ -47,24 +47,52 @@ IF(ParaViewComplete_BINARY_DIR)
   INCLUDE (${ParaViewComplete_BINARY_DIR}/VTK/VTKConfig.cmake)
   INCLUDE (${ParaViewComplete_BINARY_DIR}/VTK/UseVTK.cmake)
 ELSE(ParaViewComplete_BINARY_DIR)
+  OPTION (PARAVIEW_LINK_XDMF "Link XDMF library to paraview" OFF)
+  IF(PARAVIEW_LINK_XDMF)
+    FIND_PACKAGE(XDMF)
+    IF(XDMF_FOUND)
+      INCLUDE(${XDMF_USE_FILE})
+      IF(NOT XDMF_VTK_DIR)
+        MESSAGE(FATAL_ERROR 
+          "Xdmf was not build with VTK support. "
+          "Either rebuild Xdmf with VTK support or turn off "
+          "linking XDMF library to ParaView")
+      ENDIF(NOT XDMF_VTK_DIR)
+      IF(EXISTS ${XDMF_VTK_DIR}/VTKConfig.cmake)
+      ELSE(EXISTS ${XDMF_VTK_DIR}/VTKConfig.cmake)
+        MESSAGE(FATAL_ERROR
+          "The selected Xdmf has broken VTK support.")
+      ENDIF(EXISTS ${XDMF_VTK_DIR}/VTKConfig.cmake)
+    ENDIF(XDMF_FOUND)
+  ENDIF(PARAVIEW_LINK_XDMF)
+
   # include module to find vtk
-  INCLUDE (${CMAKE_ROOT}/Modules/FindVTK.cmake)
+  IF(XDMF_VTK_DIR)
+    SET(VTK_DIR "${XDMF_VTK_DIR}" CACHE INTERNAL "Imported from XDMF")
+    SET(VTK_FOUND 1)
+    INCLUDE(${XDMF_VTK_DIR}/VTKConfig.cmake)
+    IF(NOT PARAVIEW_NO_HDF5)
+      SET(PARAVIEW_USE_SYSTEM_HDF5 "${PARAVIEW_USE_SYSTEM_HDF5}" CACHE INTERNAL "Imported from XDMF")
+      SET(HDF5_LIBRARY "${HDF5_LIBRARY}" CACHE INTERNAL "Imported from XDMF")
+      SET(HDF5_INCLUDE_DIR "${HDF5_INCLUDE_DIR}" CACHE INTERNAL "Imported from XDMF")
+      SET(PARAVIEW_USE_SYSTEM_HDF5 1)
+      SET(HDF5_LIBRARY ${XDMF_HDF5_LIBRARIES})
+      SET(HDF5_INCLUDE_DIR)
+    ENDIF(NOT PARAVIEW_NO_HDF5)
+  ELSE(XDMF_VTK_DIR)
+    FIND_PACKAGE(VTK)
+    SET(VTK_DIR "${VTK_DIR}" CACHE PATH "The directory containing VTKConfig.cmake." FORCE)
+    SET(PARAVIEW_USE_SYSTEM_HDF5 "${PARAVIEW_USE_SYSTEM_HDF5}" CACHE BOOL "Use system HDF5" FORCE)
+    SET(HDF5_LIBRARY "${HDF5_LIBRARY}" CACHE FILEPATH "Location of HDF5 library" FORCE)
+    SET(HDF5_INCLUDE_DIR "${HDF5_INCLUDE_DIR}" CACHE PATH "Location of HDF5 includes" FORCE)
+  ENDIF(XDMF_VTK_DIR)
+  
   # if vtk was found include the use vtk file
-  IF (USE_VTK_FILE)
-    INCLUDE(${USE_VTK_FILE})
-
-    # Pull in VTK's flags for now.
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${VTK_C_FLAGS}")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VTK_CXX_FLAGS}")
-
-  ELSE(USE_VTK_FILE)
-    SET (PARAVIEW_CAN_BUILD 0)
-    IF (CMAKE_MAJOR_VERSION MATCHES "^1$")
-      IF (CMAKE_MINOR_VERSION MATCHES "^0$")
-        MESSAGE("Warning. VTK might be found on your system as different flavours: installed VTK or built VTK. Please make sure that the VTK_INSTALL_PATH or VTK_BINARY_PATH setting reflects which VTK you are planning to use, then set ONE of the USE_INSTALLED_VTK or USE_BUILT_VTK setting to ON.")
-      ENDIF (CMAKE_MINOR_VERSION MATCHES "^0$")
-    ENDIF (CMAKE_MAJOR_VERSION MATCHES "^1$")
-  ENDIF (USE_VTK_FILE)
+  IF (VTK_FOUND)
+    INCLUDE(${VTK_USE_FILE})
+  ELSE(VTK_FOUND)
+    SET(PARAVIEW_CAN_BUILD 0)
+  ENDIF (VTK_FOUND)
 ENDIF(ParaViewComplete_BINARY_DIR)
 
 IF (PARAVIEW_CAN_BUILD)
@@ -168,15 +196,6 @@ IF(BUILD_TESTING)
   OPTION (PARAVIEW_HAVE_XDMF "Perform testing of ParaView with XDMF" OFF)
   MARK_AS_ADVANCED(PARAVIEW_HAVE_XDMF)
   IF(PARAVIEW_HAVE_XDMF)
-    OPTION (PARAVIEW_LINK_XDMF "Link XDMF library to paraview" OFF)
-    IF(PARAVIEW_LINK_XDMF)
-      FIND_LIBRARY(XDMF_LIBRARY
-        vtkXdmfTCL
-        ${PARAVIEW_BINARY_DIR}/../Xdmf-bin
-        ${PARAVIEW_BINARY_DIR}/../Xdmf-64
-        ${PARAVIEW_BINARY_DIR}/../Xdmf-gcc
-        )
-    ENDIF(PARAVIEW_LINK_XDMF)
   ENDIF(PARAVIEW_HAVE_XDMF)
 
   ENABLE_TESTING()
