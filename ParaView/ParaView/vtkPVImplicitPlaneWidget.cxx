@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.26");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -799,3 +799,31 @@ void vtkPVImplicitPlaneWidget::Update()
     this->GetPVApplication()->GetMainWindow()->GetMainView()->EventuallyRender();
     }
 }
+
+//----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->InputMenu);
+
+  this->PropagateEnableState(this->CenterResetButton);
+  this->PropagateEnableState(this->NormalButtonFrame);
+  this->PropagateEnableState(this->NormalCameraButton);
+  this->PropagateEnableState(this->NormalXButton);
+  this->PropagateEnableState(this->NormalYButton);
+  this->PropagateEnableState(this->NormalZButton);
+
+  this->PropagateEnableState(this->Labels[0]);
+  this->PropagateEnableState(this->Labels[1]);
+
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->PropagateEnableState(this->CoordinateLabel[cc]);
+    this->PropagateEnableState(this->CenterEntry[cc]);
+    this->PropagateEnableState(this->NormalEntry[cc]);
+    }
+}
+
+

@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.24");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -292,6 +292,15 @@ vtkPVWidgetProperty* vtkPVLabeledToggle::GetProperty()
 vtkPVWidgetProperty* vtkPVLabeledToggle::CreateAppropriateProperty()
 {
   return vtkPVIndexWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Label);
+  this->PropagateEnableState(this->CheckButton);
 }
 
 //----------------------------------------------------------------------------

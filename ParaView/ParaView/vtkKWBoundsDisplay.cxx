@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.12");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.13");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -175,6 +175,16 @@ void vtkKWBoundsDisplay::UpdateWidgets()
       this->ZRangeLabel->SetLabel(tmp);
       }
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWBoundsDisplay::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->XRangeLabel);
+  this->PropagateEnableState(this->YRangeLabel);
+  this->PropagateEnableState(this->ZRangeLabel);
 }
 
 //----------------------------------------------------------------------------

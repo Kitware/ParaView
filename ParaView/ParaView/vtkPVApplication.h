@@ -34,6 +34,8 @@ class vtkPVWindow;
 class vtkPVRenderView;
 class vtkPolyDataMapper;
 class vtkProbeFilter;
+class vtkProcessObject;
+class vtkPVApplicationObserver;
 
 class VTK_EXPORT vtkPVApplication : public vtkKWApplication
 {
@@ -159,6 +161,7 @@ public:
   // pointers to all filters.
   void LogStartEvent(char* str);
   void LogEndEvent(char* str);
+  void RegisterProgressEvent(vtkProcessObject* po);
 
   // Description:
   // More timer log access methods.  Static methods are not accessible 
@@ -341,6 +344,10 @@ public:
   // Abort execution and display errors.
   static void Abort();
 
+  // Description:
+  // Execute event on callback
+  void ExecuteEvent(vtkObject *o, unsigned long event, void* calldata);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -437,6 +444,8 @@ protected:
   float LogThreshold;
 
   int CrashOnErrors;
+
+  vtkPVApplicationObserver* Observer;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.301");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.302");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2266,6 +2266,49 @@ void vtkPVRenderView::PrintView()
   w2i->Delete();
 #endif
   this->Printing = 0;
+}
+
+void vtkPVRenderView::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->StandardViewsFrame);
+  this->PropagateEnableState(this->XMaxViewButton);
+  this->PropagateEnableState(this->XMinViewButton);
+  this->PropagateEnableState(this->YMaxViewButton);
+  this->PropagateEnableState(this->YMinViewButton);
+  this->PropagateEnableState(this->ZMaxViewButton);
+  this->PropagateEnableState(this->ZMinViewButton);
+  this->PropagateEnableState(this->RenderParametersFrame);
+  this->PropagateEnableState(this->TriangleStripsCheck);
+  this->PropagateEnableState(this->ParallelProjectionCheck);
+  this->PropagateEnableState(this->ImmediateModeCheck);
+  this->PropagateEnableState(this->RenderModuleUI);
+  this->PropagateEnableState(this->InterfaceSettingsFrame);
+  this->PropagateEnableState(this->Display3DWidgets);
+  this->PropagateEnableState(this->OrientationAxesFrame);
+  this->PropagateEnableState(this->OrientationAxesCheck);
+  this->PropagateEnableState(this->OrientationAxesInteractiveCheck);
+  this->PropagateEnableState(this->OrientationAxesOutlineColor);
+  this->PropagateEnableState(this->SplitFrame);
+  this->PropagateEnableState(this->NavigationFrame);
+  this->PropagateEnableState(this->NavigationWindow);
+  this->PropagateEnableState(this->SelectionWindow);
+  this->PropagateEnableState(this->NavigationWindowButton);
+  this->PropagateEnableState(this->SelectionWindowButton);
+  this->PropagateEnableState(this->TopLevelRenderWindow);
+  this->PropagateEnableState(this->ManipulatorControl2D);
+  this->PropagateEnableState(this->ManipulatorControl3D);
+  this->PropagateEnableState(this->CameraControlFrame);
+  this->PropagateEnableState(this->CameraIconsFrame);
+  int cc;
+  for ( cc = 0; cc < 6; cc ++ )
+    {
+    this->PropagateEnableState(this->CameraIcons[cc]);
+    }
+  this->PropagateEnableState(this->CameraControlFrame);
+  this->PropagateEnableState(this->CameraControl);
+  this->PropagateEnableState(this->PropertiesButton);
 }
 
 //----------------------------------------------------------------------------

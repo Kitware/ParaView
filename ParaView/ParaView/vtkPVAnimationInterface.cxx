@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.110");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.111");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -2010,6 +2010,55 @@ void vtkPVAnimationInterface::ExecuteEvent(vtkObject *, unsigned long event,
   if ( event == vtkKWEvent::ErrorMessageEvent )
     {
     this->Stop();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->TopFrame);
+  this->PropagateEnableState(this->ControlFrame);
+  this->PropagateEnableState(this->ControlButtonFrame);
+  this->PropagateEnableState(this->PlayButton);
+  this->PropagateEnableState(this->StopButton);
+  this->PropagateEnableState(this->GoToBeginningButton);
+  this->PropagateEnableState(this->GoToEndButton);
+  this->PropagateEnableState(this->LoopCheckButton);
+  this->PropagateEnableState(this->TimeScale);
+  this->PropagateEnableState(this->TimeFrame);
+  this->PropagateEnableState(this->NumberOfFramesEntry);
+  this->PropagateEnableState(this->TimeRange);
+  this->PropagateEnableState(this->AnimationDelayScale);
+  this->PropagateEnableState(this->ActionFrame);
+  this->PropagateEnableState(this->ScriptCheckButtonFrame);
+  this->PropagateEnableState(this->ScriptCheckButton);
+  this->PropagateEnableState(this->ScriptEditor);
+  this->PropagateEnableState(this->PVSource);
+  this->PropagateEnableState(this->ControlledWidget);
+  this->PropagateEnableState(this->SaveFrame);
+  this->PropagateEnableState(this->SaveButtonFrame);
+  this->PropagateEnableState(this->SaveImagesButton);
+  this->PropagateEnableState(this->SaveGeometryButton);
+  this->PropagateEnableState(this->CacheGeometryCheck);
+  this->PropagateEnableState(this->AnimationEntriesFrame);
+  this->PropagateEnableState(this->AddItemButton);
+  this->PropagateEnableState(this->DeleteItemButton);
+  this->PropagateEnableState(this->AnimationEntryInformation);
+  this->PropagateEnableState(this->AnimationEntriesMenu);
+  if ( this->AnimationEntriesIterator && this->AnimationEntries )
+    {
+    for ( this->AnimationEntriesIterator->InitTraversal();
+      !this->AnimationEntriesIterator->IsDoneWithTraversal();
+      this->AnimationEntriesIterator->GoToNextItem() )
+      {
+      vtkKWWidget* widget = vtkKWWidget::SafeDownCast(this->AnimationEntriesIterator->GetObject());
+      if ( widget )
+        {
+        widget->SetEnabled(this->Enabled);
+        }
+      }
     }
 }
 

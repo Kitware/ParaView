@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.14");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -996,6 +996,60 @@ vtkPVWidgetProperty* vtkPVCalculatorWidget::GetProperty()
 vtkPVWidgetProperty* vtkPVCalculatorWidget::CreateAppropriateProperty()
 {
   return vtkPVStringAndScalarListWidgetProperty::New();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVCalculatorWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->AttributeModeFrame);
+  this->PropagateEnableState(this->AttributeModeLabel);
+  this->PropagateEnableState(this->AttributeModeMenu);
+  this->PropagateEnableState(this->CalculatorFrame);
+  this->PropagateEnableState(this->FunctionLabel);
+  this->PropagateEnableState(this->ButtonClear);
+  this->PropagateEnableState(this->ButtonZero);
+  this->PropagateEnableState(this->ButtonOne);
+  this->PropagateEnableState(this->ButtonTwo);
+  this->PropagateEnableState(this->ButtonThree);
+  this->PropagateEnableState(this->ButtonFour);
+  this->PropagateEnableState(this->ButtonFive);
+  this->PropagateEnableState(this->ButtonSix);
+  this->PropagateEnableState(this->ButtonSeven);
+  this->PropagateEnableState(this->ButtonEight);
+  this->PropagateEnableState(this->ButtonNine);
+  this->PropagateEnableState(this->ButtonDivide);
+  this->PropagateEnableState(this->ButtonMultiply);
+  this->PropagateEnableState(this->ButtonSubtract);
+  this->PropagateEnableState(this->ButtonAdd);
+  this->PropagateEnableState(this->ButtonDecimal);
+  this->PropagateEnableState(this->ButtonDot);
+  this->PropagateEnableState(this->ButtonSin);
+  this->PropagateEnableState(this->ButtonCos);
+  this->PropagateEnableState(this->ButtonTan);
+  this->PropagateEnableState(this->ButtonASin);
+  this->PropagateEnableState(this->ButtonACos);
+  this->PropagateEnableState(this->ButtonATan);
+  this->PropagateEnableState(this->ButtonSinh);
+  this->PropagateEnableState(this->ButtonCosh);
+  this->PropagateEnableState(this->ButtonTanh);
+  this->PropagateEnableState(this->ButtonPow);
+  this->PropagateEnableState(this->ButtonSqrt);
+  this->PropagateEnableState(this->ButtonExp);
+  this->PropagateEnableState(this->ButtonCeiling);
+  this->PropagateEnableState(this->ButtonFloor);
+  this->PropagateEnableState(this->ButtonLog);
+  this->PropagateEnableState(this->ButtonAbs);
+  this->PropagateEnableState(this->ButtonMag);
+  this->PropagateEnableState(this->ButtonNorm);
+  this->PropagateEnableState(this->ButtonIHAT);
+  this->PropagateEnableState(this->ButtonJHAT);
+  this->PropagateEnableState(this->ButtonKHAT);
+  this->PropagateEnableState(this->ButtonLeftParenthesis);
+  this->PropagateEnableState(this->ButtonRightParenthesis);
+  this->PropagateEnableState(this->ScalarsMenu);
+  this->PropagateEnableState(this->VectorsMenu);
 }
 
 //----------------------------------------------------------------------------

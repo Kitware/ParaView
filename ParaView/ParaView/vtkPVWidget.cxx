@@ -41,7 +41,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.42");
+vtkCxxRevisionMacro(vtkPVWidget, "1.43");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -428,7 +428,7 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 vtkPVWidget* vtkPVWidget::GetPVWidgetFromParser(vtkPVXMLElement* element,
                                                 vtkPVXMLPackageParser* parser)
 {
-  return parser->GetPVWidget(element, 0);
+  return parser->GetPVWidget(element, 0, 1);
 }
 
 //-----------------------------------------------------------------------------

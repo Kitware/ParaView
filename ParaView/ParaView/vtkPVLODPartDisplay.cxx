@@ -40,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.14");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -393,7 +393,7 @@ void vtkPVLODPartDisplay::Update()
       << vtkClientServerStream::Invoke
       << this->LODUpdateSuppressorID << "ForceUpdate"
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    this->SendForceUpdate();
     this->GeometryIsValid = 1;
     }
 }

@@ -27,12 +27,13 @@
 #include "vtkStringList.h"
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
+#include "vtkCollectionIterator.h"
 
 #include <vtkstd/string>
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.37");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -698,6 +699,28 @@ void vtkPVSelectWidget::SetProperty(vtkPVWidgetProperty *prop)
 vtkPVWidgetProperty* vtkPVSelectWidget::CreateAppropriateProperty()
 {
   return vtkPVStringWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LabeledFrame);
+  this->PropagateEnableState(this->Menu);
+
+  vtkCollectionIterator* it = this->WidgetProperties->NewIterator();
+  for ( it->InitTraversal();
+    !it->IsDoneWithTraversal();
+    it->GoToNextItem() )
+    {
+    vtkPVWidgetProperty* prop = vtkPVWidgetProperty::SafeDownCast(it->GetObject());
+    if ( prop && prop->GetWidget() )
+      {
+      prop->GetWidget()->SetEnabled(this->Enabled);
+      }
+    }
+  it->Delete();
 }
 
 //-----------------------------------------------------------------------------

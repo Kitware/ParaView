@@ -22,7 +22,7 @@
 #ifndef __vtkPVSource_h
 #define __vtkPVSource_h
 
-#include "vtkKWObject.h"
+#include "vtkKWWidget.h"
 #include "vtkClientServerStream.h"  // needed for vtkClientServerID
 class vtkCollection;
 class vtkDataSet;
@@ -53,11 +53,11 @@ class vtkPVDataInformation;
 class vtkClientServerIDList;
 class vtkPVNumberOfOutputsInformation;
 
-class VTK_EXPORT vtkPVSource : public vtkKWObject
+class VTK_EXPORT vtkPVSource : public vtkKWWidget
 {
 public:
   static vtkPVSource* New();
-  vtkTypeRevisionMacro(vtkPVSource,vtkKWObject);
+  vtkTypeRevisionMacro(vtkPVSource,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
@@ -454,7 +454,16 @@ public:
   // Access to the vtkPVNumberOfOutputsInformation object.
   vtkGetObjectMacro(NumberOfOutputsInformation,
                     vtkPVNumberOfOutputsInformation);
-  
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+ 
 protected:
   vtkPVSource();
   ~vtkPVSource();

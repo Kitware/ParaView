@@ -81,7 +81,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.248");
+vtkCxxRevisionMacro(vtkPVData, "1.249");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -3239,3 +3239,57 @@ void vtkPVData::UpdateActorControlResolutions()
     this->OriginThumbWheel[i]->SetResolution(res);
     }
 }
+
+void vtkPVData::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Properties);
+  this->PropagateEnableState(this->InformationFrame);
+  this->PropagateEnableState(this->TypeLabel);
+  this->PropagateEnableState(this->NumCellsLabel);
+  this->PropagateEnableState(this->NumPointsLabel);
+  this->PropagateEnableState(this->MemorySizeLabel);
+  this->PropagateEnableState(this->BoundsDisplay);
+  this->PropagateEnableState(this->ExtentDisplay);
+  this->PropagateEnableState(this->AmbientScale);
+  this->PropagateEnableState(this->ColorFrame);
+  this->PropagateEnableState(this->DisplayStyleFrame);
+  this->PropagateEnableState(this->StatsFrame);
+  this->PropagateEnableState(this->ViewFrame);
+  this->PropagateEnableState(this->ColorMenuLabel);
+  this->PropagateEnableState(this->ColorMenu);
+  this->PropagateEnableState(this->ColorButton);
+  this->PropagateEnableState(this->EditColorMapButton);
+  this->PropagateEnableState(this->RepresentationMenuLabel);
+  this->PropagateEnableState(this->RepresentationMenu);
+  this->PropagateEnableState(this->InterpolationMenuLabel);
+  this->PropagateEnableState(this->InterpolationMenu);
+  this->PropagateEnableState(this->PointSizeLabel);
+  this->PropagateEnableState(this->PointSizeThumbWheel);
+  this->PropagateEnableState(this->LineWidthLabel);
+  this->PropagateEnableState(this->LineWidthThumbWheel);
+  this->PropagateEnableState(this->VisibilityCheck);
+  this->PropagateEnableState(this->ScalarBarCheck);
+  this->PropagateEnableState(this->MapScalarsCheck);
+  this->PropagateEnableState(this->ActorControlFrame);
+  this->PropagateEnableState(this->TranslateLabel);
+  this->PropagateEnableState(this->ScaleLabel);
+  this->PropagateEnableState(this->OrientationLabel);
+  this->PropagateEnableState(this->OriginLabel);
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->PropagateEnableState(this->TranslateThumbWheel[cc]);
+    this->PropagateEnableState(this->ScaleThumbWheel[cc]);
+    this->PropagateEnableState(this->OrientationScale[cc]);
+    this->PropagateEnableState(this->OriginThumbWheel[cc]);
+    }
+  this->PropagateEnableState(this->OpacityLabel);
+  this->PropagateEnableState(this->OpacityScale);
+  this->PropagateEnableState(this->CubeAxesCheck);
+  this->PropagateEnableState(this->ResetCameraButton);
+  this->PropagateEnableState(this->PVColorMap);
+  this->PropagateEnableState(this->PointLabelCheck);
+}
+

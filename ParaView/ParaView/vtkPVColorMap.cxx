@@ -49,7 +49,7 @@
 #include "vtkPVProcessModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.73");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.74");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2221,6 +2221,40 @@ void vtkPVColorMap::SaveState(ofstream *file)
     *file << "$kw(" << this->GetTclName() << ") SetScalarBarOrientation " 
          << sact->GetOrientation() << endl;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->ColorMapFrame);
+  this->PropagateEnableState(this->ArrayNameLabel);
+  this->PropagateEnableState(this->NumberOfColorsScale);
+  this->PropagateEnableState(this->ColorEditorFrame);
+  this->PropagateEnableState(this->StartColorButton);
+  this->PropagateEnableState(this->Map);
+  this->PropagateEnableState(this->EndColorButton);
+  this->PropagateEnableState(this->VectorFrame);
+  this->PropagateEnableState(this->VectorModeMenu);
+  this->PropagateEnableState(this->VectorComponentMenu);
+  this->PropagateEnableState(this->ScalarBarVectorTitleEntry);
+  this->PropagateEnableState(this->ScalarBarFrame);
+  this->PropagateEnableState(this->ScalarBarCheck);
+  this->PropagateEnableState(this->ScalarBarTitleFrame);
+  this->PropagateEnableState(this->ScalarBarTitleLabel);
+  this->PropagateEnableState(this->ScalarBarTitleEntry);
+  this->PropagateEnableState(this->ScalarBarLabelFormatFrame);
+  this->PropagateEnableState(this->ScalarBarLabelFormatLabel);
+  this->PropagateEnableState(this->ScalarBarLabelFormatEntry);
+  this->PropagateEnableState(this->TitleTextPropertyWidget);
+  this->PropagateEnableState(this->LabelTextPropertyWidget);
+  this->PropagateEnableState(this->PresetsMenuButton);
+  this->PropagateEnableState(this->ColorRangeFrame);
+  this->PropagateEnableState(this->ColorRangeResetButton);
+  this->PropagateEnableState(this->ColorRangeMinEntry);
+  this->PropagateEnableState(this->ColorRangeMaxEntry);
+  this->PropagateEnableState(this->BackButton);
 }
 
 //----------------------------------------------------------------------------

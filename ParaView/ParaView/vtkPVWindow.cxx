@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.517");
+vtkCxxRevisionMacro(vtkPVWindow, "1.518");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -761,6 +761,8 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->GetMenuEdit()->InsertCommand(5, "Delete All Modules", this, 
                                      "DeleteAllSourcesCallback", 
                                      1, "Delete all modules in ParaView");
+  this->GetMenuEdit()->InsertCommand(8, "Check Disabled GUI",
+    this->GetApplication(), "SimpleScript {source ~/list_all_widgets.pvs}");
 }
 
 //-----------------------------------------------------------------------------
@@ -1487,6 +1489,10 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
 void vtkPVWindow::MouseAction(int action,int button, 
                               int x,int y, int shift,int control)
 {
+  if ( !this->Enabled  )
+    {
+    return;
+    }
   if ( action == 0 )
     {
     if (button == 1)
@@ -4268,6 +4274,164 @@ void vtkPVWindow::UpdateToolbarAspect()
   
   this->DisableToolbarButtons();
   this->EnableToolbarButtons();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+
+  this->PropagateEnableState(this->MainView);
+
+  this->PropagateEnableState(this->Notebook);
+
+  this->PropagateEnableState(this->Toolbar);
+  this->PropagateEnableState(this->InteractorToolbar);
+  this->PropagateEnableState(this->PickCenterToolbar);
+
+  this->PropagateEnableState(this->AnimationInterface);
+  this->PropagateEnableState(this->TimerLogDisplay);
+  this->PropagateEnableState(this->ErrorLogDisplay);
+
+  this->PropagateEnableState(this->CenterXEntry);
+  this->PropagateEnableState(this->CenterYEntry);
+  this->PropagateEnableState(this->CenterZEntry);
+
+  if ( this->ApplicationSettingsInterface )
+    {
+    this->ApplicationSettingsInterface->SetEnabled(this->Enabled);
+    }
+
+  this->PropagateEnableState(this->TranslateCameraButton);
+  this->PropagateEnableState(this->RotateCameraButton);
+
+  if ( this->CurrentPVSource )
+    {
+    this->CurrentPVSource->SetEnabled(this->Enabled);
+    }
+  if ( this->SourceLists )
+    {
+    const char* sourcelists[] = { 
+      "Sources",
+      "GlyphSources",
+      0
+    };
+    int cc, kk;
+    for ( cc = 0; sourcelists[cc]; cc ++ )
+      {
+      vtkPVSourceCollection* col = 0;
+      if ( this->SourceLists->GetItem(sourcelists[cc], col) == VTK_OK && col )
+        {
+        for ( kk = 0; kk < col->GetNumberOfItems(); kk ++ )
+          {
+          vtkPVSource* source = vtkPVSource::SafeDownCast(col->GetItemAsObject(kk));
+          if ( source )
+            {
+            source->SetEnabled(this->Enabled);
+            }
+          }
+        }
+      }
+    }
+  if ( this->SourceLists )
+    {
+    const char* sourcelists[] = { 
+      "Sources",
+      "GlyphSources",
+      0
+    };
+    int cc;
+    for ( cc = 0; sourcelists[cc]; cc ++ )
+      {
+      vtkPVSource* source = 0;
+      if ( this->Prototypes->GetItem(sourcelists[cc], source) == VTK_OK && source)
+        {
+        source->SetEnabled(this->Enabled);
+        }
+      }
+    }
+  if ( this->ReaderList )
+    {
+    int cc;
+    for ( cc = 0; cc < this->ReaderList->GetNumberOfItems(); cc ++ )
+      {
+      vtkPVReaderModule* rm = 0;
+      if ( this->ReaderList->GetItem(cc, rm) == VTK_OK && rm )
+        {
+        rm->SetEnabled(this->Enabled);
+        }
+      }
+    }
+  this->UpdateMenuState();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::UpdateMenuState()
+{
+  this->Superclass::UpdateMenuState();
+
+  int menu_state = this->Enabled ? vtkKWMenu::Normal : vtkKWMenu::Disabled;
+  if ( this->Menu )
+    {
+    this->Menu->SetEnabled(this->Enabled);
+    this->Menu->SetState(menu_state);
+    }
+  if ( this->MenuEdit )
+    {
+    this->MenuEdit->SetEnabled(this->Enabled);
+    this->MenuEdit->SetState(menu_state);
+    }
+  if ( this->MenuView )
+    {
+    this->MenuView->SetEnabled(this->Enabled);
+    this->MenuView->SetState(menu_state);
+    }
+  if ( this->MenuWindow )
+    {
+    this->MenuWindow->SetEnabled(this->Enabled);
+    this->MenuWindow->SetState(menu_state);
+    }
+  if ( this->MenuHelp )
+    {
+    this->MenuHelp->SetEnabled(this->Enabled);
+    this->MenuHelp->SetState(menu_state);
+    }
+  if ( this->PageMenu )
+    {
+    this->PageMenu->SetEnabled(this->Enabled);
+    this->PageMenu->SetState(menu_state);
+    }
+  if ( this->MenuFile )
+    {
+    this->MenuFile->SetEnabled(this->Enabled);
+    this->MenuFile->SetState(menu_state);
+    }
+  if ( this->SelectMenu ) 
+    { 
+    this->SelectMenu->SetEnabled(this->Enabled); 
+    this->SelectMenu->SetState(menu_state);
+    }
+  if ( this->GlyphMenu ) 
+    { 
+    this->GlyphMenu->SetEnabled(this->Enabled); 
+    this->GlyphMenu->SetState(menu_state);
+    }
+  if ( this->SourceMenu ) 
+    { 
+    this->SourceMenu->SetEnabled(this->Enabled); 
+    this->SourceMenu->SetState(menu_state);
+    }
+  if ( this->FilterMenu ) 
+    { 
+    this->FilterMenu->SetEnabled(this->Enabled);
+    this->FilterMenu->SetState(menu_state);
+    }
+  if ( this->Enabled )
+    {
+    this->UpdateSelectMenu();
+    this->UpdateFilterMenu();
+    }
 }
 
 //-----------------------------------------------------------------------------

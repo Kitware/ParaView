@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.53");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.54");
 
 
 //----------------------------------------------------------------------------
@@ -476,6 +476,14 @@ void vtkPVInputMenu::ClearEntries()
   this->Menu->ClearEntries();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Label);
+  this->PropagateEnableState(this->Menu);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::PrintSelf(ostream& os, vtkIndent indent)

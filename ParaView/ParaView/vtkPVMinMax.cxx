@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.28");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.29");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -645,6 +645,20 @@ vtkPVWidgetProperty* vtkPVMinMax::GetProperty()
 vtkPVWidgetProperty* vtkPVMinMax::CreateAppropriateProperty()
 {
   return vtkPVScalarListWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMinMax::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->ArrayMenu);  
+  this->PropagateEnableState(this->MinLabel);
+  this->PropagateEnableState(this->MaxLabel);
+  this->PropagateEnableState(this->MinScale);
+  this->PropagateEnableState(this->MaxScale);
+  this->PropagateEnableState(this->MinFrame);
+  this->PropagateEnableState(this->MaxFrame);
 }
 
 //----------------------------------------------------------------------------

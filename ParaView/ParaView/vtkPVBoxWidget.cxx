@@ -42,7 +42,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.21");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -846,4 +846,24 @@ vtkClientServerID vtkPVBoxWidget::GetObjectByName(const char* name)
   vtkClientServerID id = {0};
   vtkErrorMacro("GetObjectByName called with invalid object name: " << name);
   return id;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+
+  this->PropagateEnableState(this->ControlFrame);
+  this->PropagateEnableState(this->TranslateLabel);
+  this->PropagateEnableState(this->ScaleLabel);
+  this->PropagateEnableState(this->OrientationLabel);
+  
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->PropagateEnableState(this->TranslateThumbWheel[cc]);
+    this->PropagateEnableState(this->ScaleThumbWheel[cc]);
+    this->PropagateEnableState(this->OrientationScale[cc]);
+    }
 }

@@ -28,7 +28,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.44");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -286,6 +286,14 @@ vtkPVWidgetProperty* vtkPVContourEntry::GetProperty()
 vtkPVWidgetProperty* vtkPVContourEntry::CreateAppropriateProperty()
 {
   return vtkPVContourWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContourEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->ArrayMenu);
 }
 
 //-----------------------------------------------------------------------------

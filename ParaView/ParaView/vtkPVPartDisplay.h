@@ -126,6 +126,10 @@ protected:
   
   virtual void RemoveAllCaches();
 
+  // Description:
+  // Sends the current stream to the client and server. 
+  void SendForceUpdate();
+
   // I might get rid of this reference.
   vtkPVPart* Part;
 

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.33");
+vtkCxxRevisionMacro(vtkPVScale, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -548,6 +548,15 @@ vtkPVWidgetProperty* vtkPVScale::GetProperty()
 vtkPVWidgetProperty* vtkPVScale::CreateAppropriateProperty()
 {
   return vtkPVScalarListWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LabelWidget);
+  this->PropagateEnableState(this->Scale);
 }
 
 //----------------------------------------------------------------------------

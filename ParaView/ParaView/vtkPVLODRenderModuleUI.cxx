@@ -63,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.12");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.13");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -500,6 +500,22 @@ void vtkPVLODRenderModuleUI::SaveState(ofstream *file)
         << "}" << endl;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVLODRenderModuleUI::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LODFrame);
+  this->PropagateEnableState(this->RenderInterruptsEnabledCheck);
+  this->PropagateEnableState(this->LODScalesFrame);
+  this->PropagateEnableState(this->LODResolutionLabel);
+  this->PropagateEnableState(this->LODResolutionScale);
+  this->PropagateEnableState(this->LODResolutionValue);
+  this->PropagateEnableState(this->LODThresholdLabel);
+  this->PropagateEnableState(this->LODCheck);
+  this->PropagateEnableState(this->LODThresholdScale);
+  this->PropagateEnableState(this->LODThresholdValue);
+}
 //----------------------------------------------------------------------------
 void vtkPVLODRenderModuleUI::PrintSelf(ostream& os, vtkIndent indent)
 {

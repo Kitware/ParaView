@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.13");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.14");
 
 
 //----------------------------------------------------------------------------
@@ -325,7 +325,7 @@ vtkPVLODPartDisplayInformation* vtkPVCompositePartDisplay::GetInformation()
       << vtkClientServerStream::Invoke
       << this->LODUpdateSuppressorID << "ForceUpdate"
       << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    this->SendForceUpdate();
     this->InformationIsValid = 0;
     }
 

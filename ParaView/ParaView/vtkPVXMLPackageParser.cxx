@@ -34,7 +34,7 @@
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.28");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.29");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -122,7 +122,8 @@ vtkPVInputRequirement* vtkPVXMLPackageParser::CreatePVInputRequirement(
 
 //----------------------------------------------------------------------------
 vtkPVWidget* vtkPVXMLPackageParser::GetPVWidget(vtkPVXMLElement* element,
-                                                vtkPVSource* pvm)
+                                                vtkPVSource* pvm,
+                                                int store)
 {
   vtkPVWidget* pvWidget = 0;
   // Check if the widget has alread been created.
@@ -136,7 +137,10 @@ vtkPVWidget* vtkPVXMLPackageParser::GetPVWidget(vtkPVXMLElement* element,
     pvWidget->SetPVSource(pvm);
     
     // Add it to the map.
-    this->WidgetMap->SetItem(element, pvWidget);
+    if ( store )
+      {
+      this->WidgetMap->SetItem(element, pvWidget);
+      }
     
     // Now initialize it.  Must be done after adding to map to avoid
     // loops on circular references.
@@ -144,7 +148,10 @@ vtkPVWidget* vtkPVXMLPackageParser::GetPVWidget(vtkPVXMLElement* element,
       {
       pvWidget->Delete();
       pvWidget = 0;
-      this->WidgetMap->SetItem(element, pvWidget);
+      if ( store )
+        {
+        this->WidgetMap->SetItem(element, pvWidget);
+        }
       }
     }
   else
@@ -531,7 +538,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     else
       {
       // Assume it is a widget.
-      vtkPVWidget* widget = this->GetPVWidget(element, pvm);
+      vtkPVWidget* widget = this->GetPVWidget(element, pvm, 1);
       if(widget)
         {
         pvm->AddPVWidget(widget);
@@ -715,7 +722,7 @@ void vtkPVXMLPackageParser::CreateManipulator(vtkPVXMLElement* ma)
     {
     vtkPVXMLElement* element = ma->GetNestedElement(i);
     const char* variable = element->GetAttribute("variable");
-    vtkPVWidget* widget = this->GetPVWidget(element, 0);
+    vtkPVWidget* widget = this->GetPVWidget(element, 0, 0);
     if(widget && variable)
       {
       this->Window->AddManipulatorArgument(types, name, variable, widget);

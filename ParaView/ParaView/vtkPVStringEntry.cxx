@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.28");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.29");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -347,6 +347,15 @@ vtkPVWidgetProperty* vtkPVStringEntry::GetProperty()
 vtkPVWidgetProperty* vtkPVStringEntry::CreateAppropriateProperty()
 {
   return vtkPVStringWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVStringEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->LabelWidget);
+  this->PropagateEnableState(this->Entry);
 }
 
 //----------------------------------------------------------------------------

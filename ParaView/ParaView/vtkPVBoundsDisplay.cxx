@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.16");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.17");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
@@ -253,3 +253,14 @@ int vtkPVBoundsDisplay::ReadXMLAttributes(vtkPVXMLElement* element,
   
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVBoundsDisplay::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Widget);
+  this->PropagateEnableState(this->InputMenu);
+}
+
+

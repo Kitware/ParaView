@@ -30,7 +30,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.45");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.46");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -769,3 +769,34 @@ vtkPVWidgetProperty* vtkPVVectorEntry::CreateAppropriateProperty()
 {
   return vtkPVScalarListWidgetProperty::New();
 }
+
+//----------------------------------------------------------------------------
+void vtkPVVectorEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+  if ( this->LabelWidget )
+    {
+    this->LabelWidget->SetEnabled(this->Enabled);
+    }
+  int cc;
+  for ( cc = 0; cc < this->VectorLength; cc ++ )
+    {
+    if ( this->SubLabels )
+      {
+      vtkKWWidget* w = vtkKWWidget::SafeDownCast(this->SubLabels->GetItemAsObject(cc));
+      if ( w )
+        {
+        w->SetEnabled(this->Enabled);
+        }
+      }
+    if ( this->Entries )
+      {
+      vtkKWWidget* w = vtkKWWidget::SafeDownCast(this->Entries->GetItemAsObject(cc));
+      if ( w )
+        {
+        w->SetEnabled(this->Enabled);
+        }
+      }
+    }
+}
+

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.20");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -460,6 +460,25 @@ int vtkPVContainerWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  vtkCollectionIterator* it = this->WidgetProperties->NewIterator();
+  for ( it->InitTraversal();
+    !it->IsDoneWithTraversal();
+    it->GoToNextItem() )
+    {
+    vtkPVWidgetProperty* prop = vtkPVWidgetProperty::SafeDownCast(it->GetObject());
+    if ( prop && prop->GetWidget() )
+      {
+      prop->GetWidget()->SetEnabled(this->Enabled);
+      }
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------

@@ -32,7 +32,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.45");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.46");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -770,6 +770,23 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->PropagateEnableState(this->Point1[cc]);
+    this->PropagateEnableState(this->Point2[cc]);
+    this->PropagateEnableState(this->Labels[cc]);
+    this->PropagateEnableState(this->CoordinateLabel[cc]);
+    }
+  this->PropagateEnableState(this->ResolutionLabel);
+  this->PropagateEnableState(this->ResolutionEntry);
+}
+  
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::PrintSelf(ostream& os, vtkIndent indent)
 {

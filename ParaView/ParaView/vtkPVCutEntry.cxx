@@ -22,7 +22,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCutEntry);
-vtkCxxRevisionMacro(vtkPVCutEntry, "1.4");
+vtkCxxRevisionMacro(vtkPVCutEntry, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVCutEntry, InputMenu, vtkPVInputMenu);
 
@@ -124,6 +124,14 @@ int vtkPVCutEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   imw->Delete();
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+  
+  this->PropagateEnableState(this->InputMenu);
 }
 
 //-----------------------------------------------------------------------------

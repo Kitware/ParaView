@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.51");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -830,6 +830,17 @@ vtkPVWidgetProperty* vtkPVArrayMenu::CreateAppropriateProperty()
   return vtkPVStringAndScalarListWidgetProperty::New();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVArrayMenu::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->InputMenu);
+  this->PropagateEnableState(this->FieldMenu);
+  this->PropagateEnableState(this->Label);
+  this->PropagateEnableState(this->ArrayMenu);
+  this->PropagateEnableState(this->ComponentMenu);
+}
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
 {

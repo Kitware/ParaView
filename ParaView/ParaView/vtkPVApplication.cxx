@@ -79,6 +79,8 @@
 #include "vtkGraphicsFactory.h"
 #include "vtkImagingFactory.h"
 
+#include "vtkKWProgressGauge.h"
+
 // #include "vtkPVRenderGroupDialog.h"
 
 #include <sys/stat.h>
@@ -101,7 +103,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.250");
+vtkCxxRevisionMacro(vtkPVApplication, "1.251");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -116,6 +118,40 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 {
   this->ProcessModule = pm;
 }
+
+//----------------------------------------------------------------------------
+//****************************************************************************
+class vtkPVApplicationObserver : public vtkCommand
+{
+public:
+  static vtkPVApplicationObserver *New() 
+    {return new vtkPVApplicationObserver;};
+
+  vtkPVApplicationObserver()
+    {
+    this->Application= 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+    void* calldata)
+    {
+    if ( this->Application)
+      {
+      this->Application->ExecuteEvent(wdg, event, calldata);
+      }
+    }
+
+  void SetApplication(vtkPVApplication* app)
+    {
+    this->Application = app;
+    }
+
+private:
+  vtkPVApplication* Application;
+
+};
+//****************************************************************************
+//----------------------------------------------------------------------------
 
 //----------------------------------------------------------------------------
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
@@ -348,6 +384,8 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  this->Observer = vtkPVApplicationObserver::New();
+  this->Observer->SetApplication(this);
   vtkPVApplication::MainApplication = this;
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   this->OutputWindow = window;
@@ -450,6 +488,7 @@ vtkPVApplication::~vtkPVApplication()
   this->SetDemoPath(NULL);
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
+  this->Observer->Delete();
 }
 
 
@@ -1714,6 +1753,12 @@ void vtkPVApplication::LogStartEvent(char* str)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVApplication::RegisterProgressEvent(vtkProcessObject* po)
+{
+  po->AddObserver(vtkCommand::ProgressEvent, this->Observer);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVApplication::LogEndEvent(char* str)
 {
   vtkTimerLog::MarkEndEvent(str);
@@ -2020,5 +2065,12 @@ void vtkPVApplication::Abort()
 {
   vtkPVApplication::MainApplication->OutputWindow->FlushErrors(cerr);
   abort();
+}
+
+void vtkPVApplication::ExecuteEvent(vtkObject *o, unsigned long event, void* calldata)
+{
+  (void)o;
+  (void)event;
+  (void)calldata;
 }
 

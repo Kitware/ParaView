@@ -26,7 +26,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.11");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.12");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -369,6 +369,16 @@ char* vtkPVSourcesNavigationWindow::GetTextRepresentation(vtkPVSource* comp)
       }
     }
   return buffer;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSourcesNavigationWindow::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Canvas);
+  this->PropagateEnableState(this->ScrollBar);
+  this->PropagateEnableState(this->PopupMenu);
 }
 
 //-----------------------------------------------------------------------------

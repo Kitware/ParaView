@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.40");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.41");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -395,6 +395,15 @@ vtkPVWidgetProperty* vtkPVSelectionList::GetProperty()
 vtkPVWidgetProperty* vtkPVSelectionList::CreateAppropriateProperty()
 {
   return vtkPVIndexWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Label);
+  this->PropagateEnableState(this->Menu);
 }
 
 //----------------------------------------------------------------------------

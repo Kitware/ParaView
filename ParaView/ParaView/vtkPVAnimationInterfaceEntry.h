@@ -18,7 +18,7 @@
 #ifndef __vtkPVAnimationInterfaceEntry_h
 #define __vtkPVAnimationInterfaceEntry_h
 
-#include "vtkKWObject.h"
+#include "vtkKWWidget.h"
 
 class vtkPVApplication;
 class vtkKWWidget;
@@ -33,11 +33,11 @@ class vtkPVAnimationInterfaceEntryObserver;
 class vtkKWText;
 class vtkPVWidgetProperty;
 
-class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkKWObject
+class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkKWWidget
 {
 public:
   static vtkPVAnimationInterfaceEntry* New();
-  vtkTypeRevisionMacro(vtkPVAnimationInterfaceEntry, vtkKWObject);
+  vtkTypeRevisionMacro(vtkPVAnimationInterfaceEntry, vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   void SetParent(vtkKWWidget* widget);
@@ -163,6 +163,15 @@ public:
   // Description:
   // Convenience method.
   vtkPVApplication* GetPVApplication();
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
 
 protected:
   vtkPVAnimationInterfaceEntry();

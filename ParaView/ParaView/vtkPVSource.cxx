@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.337");
+vtkCxxRevisionMacro(vtkPVSource, "1.338");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -538,6 +538,8 @@ void vtkPVSource::GatherDataInformation()
 //----------------------------------------------------------------------------
 void vtkPVSource::Update()
 {
+  int enabled = this->GetPVWindow()->GetEnabled();
+  this->GetPVWindow()->SetEnabled(0);
   vtkPVPart *part;
 
   this->Parts->InitTraversal();
@@ -548,8 +550,51 @@ void vtkPVSource::Update()
       part->GetPartDisplay()->Update();
       }
     }
+  if ( enabled )
+    {
+    this->GetPVWindow()->EnabledOn();
+    }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->PVOutput);
+  this->PropagateEnableState(this->Notebook);
+  this->PropagateEnableState(this->Parameters);
+  this->PropagateEnableState(this->MainParameterFrame);
+  this->PropagateEnableState(this->ButtonFrame);
+  this->PropagateEnableState(this->ParameterFrame);
+
+  if ( this->WidgetProperties )
+    {
+    vtkPVWidget *pvWidget;
+    vtkPVWidgetProperty *pvwProp;
+    vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
+    it->InitTraversal();
+
+    int i;
+    for (i = 0; i < this->WidgetProperties->GetNumberOfItems(); i++)
+      {
+      pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
+      pvWidget = pvwProp->GetWidget();
+      pvWidget->SetEnabled(this->Enabled);
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
+
+  this->PropagateEnableState(this->AcceptButton);
+  this->PropagateEnableState(this->ResetButton);
+  this->PropagateEnableState(this->DeleteButton);
+  this->PropagateEnableState(this->DescriptionFrame);
+  this->PropagateEnableState(this->NameLabel);
+  this->PropagateEnableState(this->TypeLabel);
+  this->PropagateEnableState(this->LabelEntry);
+  this->PropagateEnableState(this->LongHelpLabel);
+}
   
 //----------------------------------------------------------------------------
 void vtkPVSource::SetVisibilityInternal(int v)
@@ -1315,8 +1360,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // We need to update so we will have correct information for initialization.
     if (this->GetPVOutput())
       {
+      cout << "Updating data" << endl;
       // Update the VTK data.
       this->Update();
+      cout << "Done" << endl;
       }
 
     // The best test I could come up with to only reset
@@ -2334,6 +2381,10 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
                     << "AddObserver"
                     << "EndEvent"
                     << end
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
+                    << "RegisterProgressEvent"
+                    << sourceId
                     << vtkClientServerStream::End;
     
     pvs->AddVTKSource(sourceId);

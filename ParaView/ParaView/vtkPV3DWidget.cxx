@@ -32,7 +32,7 @@
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.46");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.47");
 
 //===========================================================================
 //***************************************************************************
@@ -380,6 +380,16 @@ void vtkPV3DWidget::Render()
     {
     this->GetPVApplication()->GetMainWindow()->GetInteractor()->Render();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Frame);
+  this->PropagateEnableState(this->LabeledFrame);
+  this->PropagateEnableState(this->Visibility);
 }
 
 //----------------------------------------------------------------------------

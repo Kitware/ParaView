@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.14");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.15");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -576,6 +576,31 @@ vtkPVTimerInformation* vtkPVTimerLogDisplay::GetTimerInformation()
 vtkPVApplication* vtkPVTimerLogDisplay::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->Application);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVTimerLogDisplay::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->MasterWindow);
+
+  this->PropagateEnableState(this->ControlFrame);
+  this->PropagateEnableState(this->SaveButton);
+  this->PropagateEnableState(this->ClearButton);
+  this->PropagateEnableState(this->ThresholdLabel);
+  this->PropagateEnableState(this->ThresholdMenu);
+  this->PropagateEnableState(this->BufferLengthLabel);
+  this->PropagateEnableState(this->BufferLengthMenu);
+  this->PropagateEnableState(this->EnableLabel);
+  this->PropagateEnableState(this->EnableCheck);
+
+  this->PropagateEnableState(this->DisplayFrame);
+  this->PropagateEnableState(this->DisplayText);
+  this->PropagateEnableState(this->DisplayScrollBar);
+
+  this->PropagateEnableState(this->ButtonFrame);
+  this->PropagateEnableState(this->DismissButton);
 }
 
 //----------------------------------------------------------------------------

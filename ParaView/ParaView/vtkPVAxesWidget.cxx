@@ -29,7 +29,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -135,13 +135,16 @@ void vtkPVAxesWidget::SetEnabled(int enabling)
 
     this->Enabled = 1;
     
-    vtkRenderWindowInteractor *i = this->Interactor;
-    i->AddObserver(vtkCommand::MouseMoveEvent,
-                   this->EventCallbackCommand, this->Priority);
-    i->AddObserver(vtkCommand::LeftButtonPressEvent,
-                   this->EventCallbackCommand, this->Priority);
-    i->AddObserver(vtkCommand::LeftButtonReleaseEvent,
-                   this->EventCallbackCommand, this->Priority);
+    if ( this->EventCallbackCommand )
+      {
+      vtkRenderWindowInteractor *i = this->Interactor;
+      i->AddObserver(vtkCommand::MouseMoveEvent,
+        this->EventCallbackCommand, this->Priority);
+      i->AddObserver(vtkCommand::LeftButtonPressEvent,
+        this->EventCallbackCommand, this->Priority);
+      i->AddObserver(vtkCommand::LeftButtonReleaseEvent,
+        this->EventCallbackCommand, this->Priority);
+      }
     
     this->ParentRenderer->GetRenderWindow()->AddRenderer(this->Renderer);
     if (this->ParentRenderer->GetRenderWindow()->GetNumberOfLayers() < 2)

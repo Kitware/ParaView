@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.29");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -870,6 +870,26 @@ void vtkPVAnimationInterfaceEntry::Prepare()
 vtkPVApplication* vtkPVAnimationInterfaceEntry::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->Application);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterfaceEntry::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->SourceMethodFrame);
+  this->PropagateEnableState(this->SourceLabel);
+  this->PropagateEnableState(this->SourceMenuButton);
+  this->PropagateEnableState(this->TimeScriptEntryFrame);
+  this->PropagateEnableState(this->StartTimeEntry);
+  this->PropagateEnableState(this->EndTimeEntry);
+  this->PropagateEnableState(this->MethodLabel);
+  this->PropagateEnableState(this->MethodMenuButton);
+  this->PropagateEnableState(this->TimeRange);
+  this->PropagateEnableState(this->DummyFrame);
+  this->PropagateEnableState(this->ScriptEditor);
+  this->PropagateEnableState(this->ScriptEditorFrame);
+  this->PropagateEnableState(this->ScriptEditorScroll);
 }
 
 //-----------------------------------------------------------------------------

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.20");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.21");
 
 
 //----------------------------------------------------------------------------
@@ -270,7 +270,7 @@ void vtkPVPartDisplay::Update()
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
            << "ForceUpdate" << vtkClientServerStream::End;
-    pm->SendStreamToClientAndServer();
+    this->SendForceUpdate();
     this->GeometryIsValid = 1;
     }
 }
@@ -411,6 +411,16 @@ void vtkPVPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVPartDisplay::SendForceUpdate()
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  //cout << "vtkPVLODPartDisplay::ForceUpdate" << endl;
+  pm->SendStreamToClientAndServer();
+  //cout << "vtkPVLODPartDisplay::ForceUpdate - done" << endl;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -424,9 +434,4 @@ void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "DirectColorFlag: " << this->DirectColorFlag << endl;
   os << indent << "UpdateSuppressor: " << this->UpdateSuppressorID.ID << endl;
 }
-
-
-  
-
-
 

@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.32");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -507,4 +507,24 @@ void vtkPVSphereWidget::SetRadius()
   this->ModifiedCallback();
   this->ValueChanged = 0;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->RadiusEntry);
+  this->PropagateEnableState(this->CenterResetButton);
+
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    this->PropagateEnableState(this->CenterEntry[cc]);
+    this->PropagateEnableState(this->CoordinateLabel[cc]);
+    }
+
+  this->PropagateEnableState(this->Labels[0]);
+  this->PropagateEnableState(this->Labels[1]);
+}
+
 

@@ -36,11 +36,7 @@ class vtkPVCameraManipulator;
 class vtkPVInteractorStyleControlCmd;
 class vtkPVWidget;
 
-//BTX
-template<class KeyType,class DataType> class vtkArrayMap;
-template<class KeyType,class DataType> class vtkArrayMapIterator;
-template<class DataType> class vtkVector;
-//ETX
+class vtkPVInteractorStyleControlInternal;
 
 class VTK_EXPORT vtkPVInteractorStyleControl : public vtkKWWidget
 {  
@@ -132,12 +128,22 @@ public:
   // Description:
   // Export the state of the interactor style to a file.
   virtual void SaveState(ofstream *file);
-  
+ 
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+ 
 protected:
   vtkPVInteractorStyleControl();
   ~vtkPVInteractorStyleControl();
 
   vtkKWLabeledFrame *LabeledFrame;
+  vtkKWFrame        *OuterFrame;
   vtkKWLabel *Labels[6];
   vtkKWOptionMenu *Menus[9];
   vtkKWFrame *ArgumentsFrame;
@@ -151,22 +157,10 @@ protected:
   char* DefaultManipulator;
   char* RegisteryName;
 
-//BTX
-  typedef vtkVector<const char*> ArrayStrings;
-  typedef vtkArrayMap<const char*,vtkPVCameraManipulator*> ManipulatorMap;
-  typedef vtkArrayMapIterator<const char*,vtkPVCameraManipulator*> 
-    ManipulatorMapIterator;
-  typedef vtkArrayMap<const char*,vtkPVWidget*> WidgetsMap;
-  typedef vtkArrayMap<const char*,ArrayStrings*> MapStringToArrayStrings;
-
-  ManipulatorMap*          Manipulators;
-  WidgetsMap*              Widgets;
-  vtkCollection*           WidgetProperties;
-  MapStringToArrayStrings* Arguments;
-//ETX
-
   // This is hack to get tcl name;
   vtkPVCameraManipulator *CurrentManipulator;
+
+  vtkPVInteractorStyleControlInternal* Internals;
 
 private:
   vtkPVInteractorStyleControl(const vtkPVInteractorStyleControl&); // Not implemented

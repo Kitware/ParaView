@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.8");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.9");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -434,4 +434,14 @@ vtkPVWidgetProperty* vtkPVFieldMenu::GetProperty()
 vtkPVWidgetProperty* vtkPVFieldMenu::CreateAppropriateProperty()
 {
   return vtkPVIndexWidgetProperty::New();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVFieldMenu::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->Label);
+  this->PropagateEnableState(this->FieldMenu);
+  this->PropagateEnableState(this->InputMenu);
 }

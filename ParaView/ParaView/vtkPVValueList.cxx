@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.8");
+vtkCxxRevisionMacro(vtkPVValueList, "1.9");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -640,6 +640,36 @@ int vtkPVValueList::ReadXMLAttributes(vtkPVXMLElement* element,
 const char* vtkPVValueList::GetLabel() 
 {
   return this->ContourValuesFrame->GetLabel()->GetLabel();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVValueList::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  this->PropagateEnableState(this->ContourValuesFrame);
+  this->PropagateEnableState(this->ContourValuesFrame2);
+  this->PropagateEnableState(this->ContourValuesList);
+
+  this->PropagateEnableState(this->ContourValuesButtonsFrame);
+  this->PropagateEnableState(this->DeleteValueButton);
+  this->PropagateEnableState(this->DeleteAllButton);
+
+  this->PropagateEnableState(this->NewValueFrame);
+  this->PropagateEnableState(this->NewValueLabel);
+  this->PropagateEnableState(this->NewValueEntry);
+  this->PropagateEnableState(this->AddValueButton);
+
+  this->PropagateEnableState(this->GenerateFrame);
+  this->PropagateEnableState(this->GenerateNumberFrame);
+  this->PropagateEnableState(this->GenerateRangeFrame);
+
+  this->PropagateEnableState(this->GenerateLabel);
+  this->PropagateEnableState(this->GenerateRangeLabel);
+  this->PropagateEnableState(this->GenerateEntry);
+  this->PropagateEnableState(this->GenerateButton);
+
+  this->PropagateEnableState(this->GenerateRangeWidget);
 }
 
 //-----------------------------------------------------------------------------
