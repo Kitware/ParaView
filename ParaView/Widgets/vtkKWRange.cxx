@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.7");
+vtkCxxRevisionMacro(vtkKWRange, "1.8");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -526,7 +526,7 @@ void vtkKWRange::SetResolution(float arg)
 
   if (this->AdjustResolution)
     {
-    arg = powf(10.0, floorf(log10f(arg)));
+    arg = pow(10.0, floor(log10(arg)));
     }
 
   if (this->Resolution == arg || arg <= 0.0)
@@ -559,7 +559,7 @@ void vtkKWRange::SetAdjustResolution(int arg)
 
   if (this->AdjustResolution)
     {
-    this->SetResolution(powf(10.0, floorf(log10f(this->Resolution))));
+    this->SetResolution(pow(10.0, floor(log10(this->Resolution))));
     }
 }
 
