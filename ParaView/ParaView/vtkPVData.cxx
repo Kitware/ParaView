@@ -57,7 +57,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWWidget.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVSourceInterface.h"
 #include "vtkScalarBarActor.h"
 #include "vtkTexture.h"
 #include "vtkTimerLog.h"
