@@ -96,6 +96,11 @@ public:
   void SetValue(char* v1, char* v2, char* v3, char* v4, char* v5);
   void SetValue(char* v1, char* v2, char* v3, char* v4, char* v5, char* v6);
   void SetValue(char** vals, int num);
+
+  // Description:
+  // Access values in the vector. Argument num is the size of the
+  // values array. It has to be smaller than number of items.
+  void GetValue(float* values, int num);
   
   // Description:
   // I need a solution:  I want to run ParaView with a low resolution

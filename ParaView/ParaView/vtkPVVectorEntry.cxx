@@ -330,6 +330,24 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
 }
 
 //---------------------------------------------------------------------------
+void vtkPVVectorEntry::GetValue(float *values, int num)
+{
+  int idx;
+  vtkKWEntry *entry;
+
+  if (num != this->Entries->GetNumberOfItems())
+    {
+    vtkErrorMacro("Componenet mismatch.");
+    return;
+    }
+  for (idx = 0; idx < num; ++idx)
+    {
+    entry = this->GetEntry(idx);    
+    values[idx] = atof(entry->GetValue());
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkPVVectorEntry::SetValue(char *v0)
 {
   char* vals[1];
