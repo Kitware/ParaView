@@ -47,6 +47,7 @@ SET( ParaView_SRCS
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
   vtkPVContourFilter.cxx
+  vtkPVContourWidgetProperty.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
   vtkPVData.cxx 
@@ -61,7 +62,8 @@ SET( ParaView_SRCS
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
-  vtkPVExtentTranslator.cxx 
+  vtkPVExtentTranslator.cxx
+  vtkPVExtentWidgetProperty.cxx
   vtkPVExtractGeometryByScalar.cxx
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx

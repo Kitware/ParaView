@@ -57,7 +57,7 @@ class vtkKWLabel;
 class vtkKWLabeledFrame;
 class vtkPVInputMenu;
 class vtkPVMinMax;
-class vtkPVScalarListWidgetProperty;
+class vtkPVExtentWidgetProperty;
 
 class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
@@ -133,6 +133,9 @@ public:
 
   virtual void SetProperty(vtkPVWidgetProperty *prop);
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+
+  vtkSetMacro(AnimationAxis, int);
+  vtkGetMacro(AnimationAxis, int);
   
 protected:
   vtkPVExtentEntry();
@@ -156,7 +159,8 @@ protected:
 
   int AcceptCalled;
 
-  vtkPVScalarListWidgetProperty *Property;
+  vtkPVExtentWidgetProperty *Property;
+  int AnimationAxis;
   
 private:
   vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented

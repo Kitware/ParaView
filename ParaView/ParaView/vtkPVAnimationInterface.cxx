@@ -48,6 +48,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetCollection.h"
+#include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkWindowToImageFilter.h"
@@ -179,7 +180,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.86.2.1");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -914,11 +915,9 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
     {
     float ctime = static_cast<float>(this->GetCurrentTime()) / 
       static_cast<float>(this->NumberOfFrames-1);
-    const char* script = this->ScriptEditor->GetValue();
-    pvApp->BroadcastScript(
-      "set globalPVTime %g\n"
-      "%s", ctime, script);
 
+    this->Script("set globalPVTime %g", ctime);
+    
     if (this->ControlledWidget)
       {
       this->ControlledWidget->ModifiedCallback();
@@ -932,25 +931,23 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
       }
     else
       {
-      if (this->PVSource)
-        {
-        this->PVSource->MarkSourcesForUpdate(1);
-        }
       vtkCollectionIterator* it = this->AnimationEntriesIterator;
       for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
         {
         vtkPVAnimationInterfaceEntry* entry
           = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+        vtkPVWidgetProperty *prop = entry->GetCurrentProperty();
+        if (prop)
+          {
+          this->Script(entry->GetTimeEquation());
+          prop->SetAnimationTime(vtkKWObject::GetFloatResult(pvApp));
+          prop->GetWidget()->ModifiedCallback();
+          }
         if ( entry->GetPVSource() )
           {
-          entry->GetPVSource()->MarkSourcesForUpdate(1);
+          entry->GetPVSource()->AcceptCallback();
           }
         }
-      }
-
-    if (this->View)
-      {
-      this->View->EventuallyRender();
       }
 
     this->AddTraceEntry("$kw(%s) SetCurrentTime %d", 

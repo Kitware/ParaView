@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVScalarListWidgetProperty.h
+  Module:    vtkPVExtentWidgetProperty.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,45 +39,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVScalarListWidgetProperty
-// .SECTION Description
+#include "vtkPVExtentWidgetProperty.h"
 
-#ifndef __vtkPVScalarListWidgetProperty_h
-#define __vtkPVScalarListWidgetProperty_h
+#include "vtkObjectFactory.h"
+#include "vtkPVExtentEntry.h"
 
-#include "vtkPVWidgetProperty.h"
+vtkStandardNewMacro(vtkPVExtentWidgetProperty);
+vtkCxxRevisionMacro(vtkPVExtentWidgetProperty, "1.1.2.1");
 
-class VTK_EXPORT vtkPVScalarListWidgetProperty : public vtkPVWidgetProperty
+void vtkPVExtentWidgetProperty::SetAnimationTime(float time)
 {
-public:
-  static vtkPVScalarListWidgetProperty* New();
-  vtkTypeRevisionMacro(vtkPVScalarListWidgetProperty, vtkPVWidgetProperty);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  vtkPVExtentEntry *entry = vtkPVExtentEntry::SafeDownCast(this->Widget);
+  if (!entry)
+    {
+    return;
+    }
   
-  virtual void AcceptInternal();
+  int axis = entry->GetAnimationAxis();
   
-  void SetVTKCommands(int numCmds, char **cmds, int *numScalars);
-  void SetScalars(int num, float *scalars);
-  void AddScalar(float scalar);
-  float* GetScalars() { return this->Scalars; }
-  float GetScalar(int idx);
-  vtkGetMacro(NumberOfScalars, int);
+  this->Scalars[2*axis] = this->Scalars[2*axis+1] = time;
+  entry->ModifiedCallback();
+  entry->Reset();
+}
 
-  virtual void SetAnimationTime(float time);
-  
-protected:
-  vtkPVScalarListWidgetProperty();
-  ~vtkPVScalarListWidgetProperty();
-  
-  float *Scalars;
-  int NumberOfScalars;
-  char **VTKCommands;
-  int *NumberOfScalarsPerCommand;
-  int NumberOfCommands;
-  
-private:
-  vtkPVScalarListWidgetProperty(const vtkPVScalarListWidgetProperty&); // Not implemented
-  void operator=(const vtkPVScalarListWidgetProperty&); // Not implemented
-};
-
-#endif
+void vtkPVExtentWidgetProperty::PrintSelf(ostream &os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}

@@ -94,7 +94,10 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.19.2.1");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.19.2.2");
+
+vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
+                     vtkPVWidgetProperty);
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -137,6 +140,8 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->Dirty = 1;
 
   this->ScriptEditorDirty = 0;
+  
+  this->CurrentProperty = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -350,6 +355,8 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
   this->StartTimeEntry->Delete();
   this->TimeRange->Delete();
   this->TimeScriptEntryFrame->Delete();
+  
+  this->SetCurrentProperty(NULL);
 }
 
 //-----------------------------------------------------------------------------

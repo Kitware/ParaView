@@ -54,7 +54,7 @@ class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWLabel;
 class vtkContourValues;
-class vtkPVScalarListWidgetProperty;
+class vtkPVContourWidgetProperty;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
 {
@@ -143,7 +143,7 @@ protected:
   vtkContourValues *LastAcceptedContourValues;
   int AcceptCalled;
   void UpdateProperty();
-  vtkPVScalarListWidgetProperty *Property;
+  vtkPVContourWidgetProperty *Property;
   
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented

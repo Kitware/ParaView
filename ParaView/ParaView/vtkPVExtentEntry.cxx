@@ -56,13 +56,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInputMenu.h"
 #include "vtkPVMinMax.h"
 #include "vtkPVPart.h"
-#include "vtkPVScalarListWidgetProperty.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVExtentWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.3");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.4");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -87,6 +88,8 @@ vtkPVExtentEntry::vtkPVExtentEntry()
   this->AcceptCalled = 0;
   
   this->Property = NULL;
+
+  this->AnimationAxis = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -425,15 +428,12 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 
   cascadeMenu->Delete();
   cascadeMenu = NULL;
-
-  return;
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
                                              int mode)
 {
-  char script[500];
   int ext[6];
 
   if (ai->InitializeTrace(NULL))
@@ -446,34 +446,28 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   // Get the whole extent to set up defaults.
   // Now I can imagine that we will need a more flexible way of getting 
   // the whole extent from sources (in the future.
-  this->Script("[%s GetInput] GetWholeExtent", this->ObjectTclName);
-  sscanf(this->Application->GetMainInterp()->result, "%d %d %d %d %d %d",
-    ext, ext+1, ext+2, ext+3, ext+4, ext+5);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->GetProcessModule()->RootScript(
+    "[%s GetInput] GetWholeExtent", this->ObjectTclName);
+  const char *res = pvApp->GetProcessModule()->GetRootResult();
+  sscanf(res, "%d %d %d %d %d %d",
+         ext, ext+1, ext+2, ext+3, ext+4, ext+5);
 
   if (mode == 0)
     {
-    sprintf(script, 
-      "%s Set%s [expr int($pvTime)] [expr round($pvTime)] %d %d %d %d", 
-      this->ObjectTclName,this->VariableName,ext[2],ext[3],ext[4],ext[5]);
-    ai->SetLabelAndScript("X Axis", script);
+    ai->SetLabelAndScript("X Axis", NULL);
     ai->SetTimeStart(ext[0]);
     ai->SetTimeEnd(ext[1]);
     }
   else if (mode == 1)
     {
-    sprintf(script, 
-      "%s Set%s %d %d [expr int($pvTime)] [expr int($pvTime)] %d %d", 
-      this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[4],ext[5]);
-    ai->SetLabelAndScript("Y Axis", script);
+    ai->SetLabelAndScript("Y Axis", NULL);
     ai->SetTimeStart(ext[2]);
     ai->SetTimeEnd(ext[3]);
     }
   else if (mode == 2)
     {
-    sprintf(script, 
-      "%s Set%s %d %d %d %d [expr int($pvTime)] [expr int($pvTime)]", 
-      this->ObjectTclName,this->VariableName,ext[0],ext[1],ext[2],ext[3]);
-    ai->SetLabelAndScript("Z Axis", script);
+    ai->SetLabelAndScript("Z Axis", NULL);
     ai->SetTimeStart(ext[4]);
     ai->SetTimeEnd(ext[5]);
     }
@@ -481,10 +475,9 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
     {
     vtkErrorMacro("Bad extent animation mode.");
     }
-  sprintf(script, "AnimationMenuCallback $kw(%s) %d", 
-    ai->GetTclName(), mode);
-  ai->SetSaveStateScript(script);
-  ai->SetSaveStateObject(this);
+
+  this->SetAnimationAxis(mode);
+  ai->SetCurrentProperty(this->Property);
   ai->Update();
 }
 
@@ -564,7 +557,7 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::SetProperty(vtkPVWidgetProperty *prop)
 {
-  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  this->Property = vtkPVExtentWidgetProperty::SafeDownCast(prop);
   if (this->Property)
     {
     char *cmd = new char[strlen(this->VariableName)+4];
@@ -578,7 +571,7 @@ void vtkPVExtentEntry::SetProperty(vtkPVWidgetProperty *prop)
 //-----------------------------------------------------------------------------
 vtkPVWidgetProperty* vtkPVExtentEntry::CreateAppropriateProperty()
 {
-  return vtkPVScalarListWidgetProperty::New();
+  return vtkPVExtentWidgetProperty::New();
 }
 
 //-----------------------------------------------------------------------------

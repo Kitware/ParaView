@@ -51,13 +51,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVScalarListWidgetProperty.h"
+#include "vtkPVContourWidgetProperty.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.3");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.28.2.4");
 
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -485,21 +485,14 @@ void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  char script[500];
-  
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
                         this->GetTclName(), ai->GetTclName());
     }
   
-  sprintf(script, "%s SetValue 0 $pvTime", 
-          this->PVSource->GetVTKSourceTclName());
-
-  ai->SetLabelAndScript(this->GetTraceName(), script);
-  sprintf(script, "AnimationMenuCallback $kw(%s)", ai->GetTclName());
-  ai->SetSaveStateScript(script);
-  ai->SetSaveStateObject(this);
+  ai->SetLabelAndScript(this->GetTraceName(), NULL);
+  ai->SetCurrentProperty(this->Property);
   ai->Update();
 }
 
@@ -586,13 +579,13 @@ void vtkPVContourEntry::UpdateProperty()
 //-----------------------------------------------------------------------------
 void vtkPVContourEntry::SetProperty(vtkPVWidgetProperty *prop)
 {
-  this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  this->Property = vtkPVContourWidgetProperty::SafeDownCast(prop);
 }
 
 //-----------------------------------------------------------------------------
 vtkPVWidgetProperty* vtkPVContourEntry::CreateAppropriateProperty()
 {
-  return vtkPVScalarListWidgetProperty::New();
+  return vtkPVContourWidgetProperty::New();
 }
 
 //-----------------------------------------------------------------------------

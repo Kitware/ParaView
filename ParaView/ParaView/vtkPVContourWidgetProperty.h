@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVScalarListWidgetProperty.h
+  Module:    vtkPVContourWidgetProperty.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,45 +39,30 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVScalarListWidgetProperty
+// .NAME vtkPVContourWidgetProperty
 // .SECTION Description
 
-#ifndef __vtkPVScalarListWidgetProperty_h
-#define __vtkPVScalarListWidgetProperty_h
+#ifndef __vtkPVContourWidgetProperty_h
+#define __vtkPVContourWidgetProperty_h
 
-#include "vtkPVWidgetProperty.h"
+#include "vtkPVScalarListWidgetProperty.h"
 
-class VTK_EXPORT vtkPVScalarListWidgetProperty : public vtkPVWidgetProperty
+class VTK_EXPORT vtkPVContourWidgetProperty : public vtkPVScalarListWidgetProperty
 {
 public:
-  static vtkPVScalarListWidgetProperty* New();
-  vtkTypeRevisionMacro(vtkPVScalarListWidgetProperty, vtkPVWidgetProperty);
+  static vtkPVContourWidgetProperty* New();
+  vtkTypeRevisionMacro(vtkPVContourWidgetProperty, vtkPVScalarListWidgetProperty);
   void PrintSelf(ostream& os, vtkIndent indent);
   
-  virtual void AcceptInternal();
-  
-  void SetVTKCommands(int numCmds, char **cmds, int *numScalars);
-  void SetScalars(int num, float *scalars);
-  void AddScalar(float scalar);
-  float* GetScalars() { return this->Scalars; }
-  float GetScalar(int idx);
-  vtkGetMacro(NumberOfScalars, int);
-
   virtual void SetAnimationTime(float time);
   
 protected:
-  vtkPVScalarListWidgetProperty();
-  ~vtkPVScalarListWidgetProperty();
-  
-  float *Scalars;
-  int NumberOfScalars;
-  char **VTKCommands;
-  int *NumberOfScalarsPerCommand;
-  int NumberOfCommands;
+  vtkPVContourWidgetProperty() {}
+  ~vtkPVContourWidgetProperty() {}
   
 private:
-  vtkPVScalarListWidgetProperty(const vtkPVScalarListWidgetProperty&); // Not implemented
-  void operator=(const vtkPVScalarListWidgetProperty&); // Not implemented
+  vtkPVContourWidgetProperty(const vtkPVContourWidgetProperty&); // Not implemented
+  void operator=(const vtkPVContourWidgetProperty&); // Not implemented
 };
 
 #endif

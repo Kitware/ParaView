@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.3");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.36.2.4");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -353,7 +353,18 @@ void vtkPVVectorEntry::ResetInternal()
     {
     ostrstream val;
     val << scalars[count] << ends;
-    this->SetEntryValue(count, val.str());
+    if (this->DataType == VTK_FLOAT || this->DataType == VTK_DOUBLE)
+      {
+      this->SetEntryValue(count, val.str());
+      }
+    else
+      {
+      int scalar = atoi(val.str());
+      char *newStr = new char[strlen(val.str())+1];
+      sprintf(newStr, "%d", scalar);
+      this->SetEntryValue(count, newStr);
+      delete [] newStr;
+      }
     val.rdbuf()->freeze(0);
     }
 
@@ -578,36 +589,16 @@ void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
-  char script[500];
-
   if (ai->InitializeTrace(NULL))
     {
-    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
-      this->GetTclName(), ai->GetTclName());
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
+                        this->GetTclName(), ai->GetTclName());
     }
-
+  
   if (this->Entries->GetNumberOfItems() == 1)
     {
-    // I do not like setting the label like this but ...
-    if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
-      {
-      sprintf(script, "%s Set%s [expr round($pvTime)]", 
-        this->ObjectTclName, this->VariableName);
-      }
-    else
-      {
-      sprintf(script, "%s Set%s $pvTime", 
-        this->ObjectTclName, this->VariableName);
-      }
-    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
-    if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
-      {
-      ai->SetTypeToInt();
-      }
-    sprintf(script, "AnimationMenuCallback $kw(%s)", 
-      ai->GetTclName());
-    ai->SetSaveStateScript(script);
-    ai->SetSaveStateObject(this);
+    ai->SetLabelAndScript(this->LabelWidget->GetLabel(), NULL);
+    ai->SetCurrentProperty(this->Property);
     ai->Update();
     }
   // What if there are more than one entry?

@@ -58,6 +58,7 @@ class vtkPVAnimationInterface;
 class vtkKWRange;
 class vtkPVAnimationInterfaceEntryObserver;
 class vtkKWText;
+class vtkPVWidgetProperty;
 
 class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkKWObject
 {
@@ -87,6 +88,9 @@ public:
   vtkSetStringMacro(CurrentMethod);
   vtkGetStringMacro(CurrentMethod);
 
+  void SetCurrentProperty(vtkPVWidgetProperty *prop);
+  vtkGetObjectMacro(CurrentProperty, vtkPVWidgetProperty);
+  
   void SetTimeStart(float f);
 
   void SetTimeEnd(float f);
@@ -206,6 +210,8 @@ protected:
   char*              TimeEquation;
   char*              Label;
 
+  vtkPVWidgetProperty *CurrentProperty;
+  
   float TimeStart;
   float TimeEnd;
 

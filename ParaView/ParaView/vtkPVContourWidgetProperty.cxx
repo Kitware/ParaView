@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVScalarListWidgetProperty.h
+  Module:    vtkPVContourWidgetProperty.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,45 +39,46 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVScalarListWidgetProperty
-// .SECTION Description
+#include "vtkPVContourWidgetProperty.h"
 
-#ifndef __vtkPVScalarListWidgetProperty_h
-#define __vtkPVScalarListWidgetProperty_h
+#include "vtkObjectFactory.h"
+#include "vtkPVWidget.h"
 
-#include "vtkPVWidgetProperty.h"
+vtkStandardNewMacro(vtkPVContourWidgetProperty);
+vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.1.2.1");
 
-class VTK_EXPORT vtkPVScalarListWidgetProperty : public vtkPVWidgetProperty
+void vtkPVContourWidgetProperty::SetAnimationTime(float time)
 {
-public:
-  static vtkPVScalarListWidgetProperty* New();
-  vtkTypeRevisionMacro(vtkPVScalarListWidgetProperty, vtkPVWidgetProperty);
-  void PrintSelf(ostream& os, vtkIndent indent);
-  
-  virtual void AcceptInternal();
-  
-  void SetVTKCommands(int numCmds, char **cmds, int *numScalars);
-  void SetScalars(int num, float *scalars);
-  void AddScalar(float scalar);
-  float* GetScalars() { return this->Scalars; }
-  float GetScalar(int idx);
-  vtkGetMacro(NumberOfScalars, int);
+  if (this->NumberOfCommands > 1)
+    {
+    this->Scalars[1] = 0;
+    this->Scalars[2] = time;
+    }
+  else
+    {
+    float scalars[3];
+    scalars[0] = 1;
+    scalars[1] = 0;
+    scalars[2] = time;
+    this->SetScalars(3, scalars);
+    char **commands = new char *[2];
+    int numScalars[2];
+    numScalars[0] = 1;
+    numScalars[1] = 2;
+    commands[0] = new char[strlen(this->VTKCommands[0])+1];
+    strcpy(commands[0], this->VTKCommands[0]);
+    commands[1] = new char[9];
+    sprintf(commands[1], "SetValue");
+    this->SetVTKCommands(2, commands, numScalars);
+    delete [] commands[0];
+    delete [] commands[1];
+    delete [] commands;
+    }
+  this->Widget->ModifiedCallback();
+  this->Widget->Reset();
+}
 
-  virtual void SetAnimationTime(float time);
-  
-protected:
-  vtkPVScalarListWidgetProperty();
-  ~vtkPVScalarListWidgetProperty();
-  
-  float *Scalars;
-  int NumberOfScalars;
-  char **VTKCommands;
-  int *NumberOfScalarsPerCommand;
-  int NumberOfCommands;
-  
-private:
-  vtkPVScalarListWidgetProperty(const vtkPVScalarListWidgetProperty&); // Not implemented
-  void operator=(const vtkPVScalarListWidgetProperty&); // Not implemented
-};
-
-#endif
+void vtkPVContourWidgetProperty::PrintSelf(ostream &os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+}

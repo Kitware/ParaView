@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.1.2.2");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.1.2.3");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -184,6 +184,13 @@ void vtkPVScalarListWidgetProperty::AcceptInternal()
   
   this->Widget->GetPVApplication()->GetProcessModule()->ServerScript(cmd.str());
   cmd.rdbuf()->freeze(0);
+}
+
+void vtkPVScalarListWidgetProperty::SetAnimationTime(float time)
+{
+  this->SetScalars(1, &time);
+  this->Widget->ModifiedCallback();
+  this->Widget->Reset();
 }
 
 void vtkPVScalarListWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)

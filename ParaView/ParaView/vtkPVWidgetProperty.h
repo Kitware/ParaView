@@ -65,6 +65,8 @@ public:
 
   vtkSetStringMacro(VTKSourceTclName);
 
+  virtual void SetAnimationTime(float time) {}
+  
 protected:
   vtkPVWidgetProperty();
   ~vtkPVWidgetProperty();
