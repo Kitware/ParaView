@@ -32,7 +32,7 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.10");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -128,8 +128,8 @@ void vtkPVHorizontalAnimationInterface::AddAnimationCueTree(
     return;
     }
   this->ParentTree->AddChild(pvCueTree);
-  this->Script("update");
-  this->ResizeCallback();
+  //this->Script("update");
+  //this->ResizeCallback();
 }
 
 //-----------------------------------------------------------------------------
@@ -177,8 +177,8 @@ void vtkPVHorizontalAnimationInterface::RemoveAnimationCueTree(
   this->Script("bind %s <<ResizeEvent>> {}",
     pvCueTree->GetWidgetName());
   this->ParentTree->RemoveChild(pvCueTree);
-  this->Script("update");
-  this->ResizeCallback();
+//  this->Script("update");
+//  this->ResizeCallback();
 }
 
 //-----------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "vtkPVApplication.h"
 #include "vtkPVWindow.h"
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.4");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -281,10 +281,6 @@ void vtkPVTimeLine::RemoveFocus()
 //----------------------------------------------------------------------------
 void vtkPVTimeLine::InvokeSelectionChangedCommand()
 {
-  if (this->HasSelection() && !this->HasFocus())
-    {
-    this->GetFocus();
-    }
   this->Superclass::InvokeSelectionChangedCommand();
 }
 
@@ -295,6 +291,10 @@ void vtkPVTimeLine::StartInteractionCallback(int x, int y)
     this->GetTclName(), x, y);
   vtkPVApplication::SafeDownCast(this->GetApplication())->GetMainWindow()
     ->ShowAnimationPanes();
+  if (!this->HasFocus())
+    {
+    this->GetFocus();
+    }
   this->Superclass::StartInteractionCallback(x,y);
 }
 

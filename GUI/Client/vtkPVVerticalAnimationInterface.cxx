@@ -40,7 +40,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.6");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.7");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -151,6 +151,7 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
       {
       this->RemoveObservers(this->AnimationCue);
       this->AnimationCue->UnRegister(this);
+      this->TitleLabel->SetLabel("");
       }
     this->AnimationCue = cue;
     if (this->AnimationCue)
@@ -247,6 +248,15 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
 
   this->SelectKeyFrameLabel->Create(app, "-justify left");
   this->SelectKeyFrameLabel->AdjustWrapLengthToWidthOn();
+
+  this->Script("grid %s - - -row 0 -sticky ew", this->IndexScale->GetWidgetName());
+  
+  this->Script("grid %s %s %s -columnspan 1 -row 2 -sticky w",
+    this->TypeLabel->GetWidgetName(),
+    this->TypeImage->GetWidgetName(),
+    this->TypeMenuButton->GetWidgetName());
+
+  this->Script("grid columnconfigure %s 2 -weight 2", this->PropertiesFrame->GetWidgetName());
 
   // SAVE FRAME
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
@@ -484,6 +494,11 @@ void vtkPVVerticalAnimationInterface::Update()
 void vtkPVVerticalAnimationInterface::ShowKeyFrame(int id)
 {
   vtkPVKeyFrame* pvKeyFrame = this->AnimationCue->GetKeyFrame(id);
+  if (this->ActiveKeyFrame)
+    {
+    // unpack the old keyframe.
+    this->Script("grid forget %s", this->ActiveKeyFrame->GetWidgetName());
+    }
   this->SetActiveKeyFrame(pvKeyFrame);
   if (!pvKeyFrame)
     {
@@ -514,21 +529,8 @@ void vtkPVVerticalAnimationInterface::ShowKeyFrame(int id)
   pvKeyFrame->PrepareForDisplay();
   this->UpdateTypeImage(pvKeyFrame);
   
-  this->PropertiesFrame->GetFrame()->UnpackChildren();
-
-  this->Script("grid %s - - -sticky ew",
-    this->IndexScale->GetWidgetName());
-  
-  this->Script("grid %s -columnspan 3 -sticky ew",
+  this->Script("grid %s -columnspan 3 -row 1 -sticky ew",
     pvKeyFrame->GetWidgetName());
-  
-  this->Script("grid %s %s %s -columnspan 1 -sticky w",
-    this->TypeLabel->GetWidgetName(),
-    this->TypeImage->GetWidgetName(),
-    this->TypeMenuButton->GetWidgetName());
-
-  this->Script("grid columnconfigure %s 2 -weight 2",
-    this->PropertiesFrame->GetWidgetName());
 }
 
 //-----------------------------------------------------------------------------
