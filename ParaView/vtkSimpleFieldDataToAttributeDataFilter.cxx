@@ -93,10 +93,15 @@ void vtkSimpleFieldDataToAttributeDataFilter::Execute()
       {
       array = field->GetArray(this->FieldName);
       }
+    else
+      {
+      vtkErrorMacro("No field data in this data set.");
+      return;
+      }
    }
 
 
-  if (field == NULL)
+  if (array == NULL)
     {
     vtkErrorMacro("Could not find field array with name: " << this->FieldName);
     return;
