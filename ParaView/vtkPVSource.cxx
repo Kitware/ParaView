@@ -1244,7 +1244,7 @@ void vtkPVSource::AcceptCallback()
     }  
   
   // Initialize the output if necessary.
-  if (this->GetPVData() == NULL)
+  if (this->GetPVData() == NULL && this->GetVTKSource())
     { // This is the first time, initialize data.  
     vtkPVData *input;
     vtkPVActorComposite *ac;

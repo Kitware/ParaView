@@ -75,9 +75,17 @@ public:
   vtkSetObjectMacro(Object,vtkPVSource);
   vtkGetObjectMacro(Object,vtkPVSource);
 
+  // Description:
+  // We need to changed the slider when the Min/max animation time changes.
+  void AcceptCallback();
+
+  // Description:
+  // Callback that starts an animation.
+  void Play();
+
 protected:
   vtkPVAnimation();
-  ~vtkPVAnimation() {};
+  ~vtkPVAnimation();
   vtkPVAnimation(const vtkPVAnimation&) {};
   void operator=(const vtkPVAnimation&) {};
 
@@ -89,6 +97,12 @@ protected:
   float End;
   float Step;
   float Current;
+
+  // UI elements
+  vtkKWEntry *TimeMin;
+  vtkKWEntry *TimeMax;
+  vtkKWEntry *TimeStep;
+  vtkKWScale *TimeScale;
 };
 
 #endif
