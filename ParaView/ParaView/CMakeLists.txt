@@ -43,8 +43,6 @@ SET( ParaView_SRCS
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx 
   vtkPVContourFilter.cxx
-  vtkPVDeskTopRenderModule.cxx
-  vtkPVDeskTopRenderModuleUI.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
   vtkPVData.cxx 
@@ -198,6 +196,8 @@ ENDIF(VTK_USE_MPI)
 IF (PARAVIEW_USE_ICE_T)
   SET( ParaView_SRCS
     ${ParaView_SRCS}
+    vtkPVDeskTopRenderModule.cxx
+    vtkPVDeskTopRenderModuleUI.cxx
     vtkDesktopDeliveryClient.cxx
     vtkDesktopDeliveryServer.cxx
     #vtkIceTComposite.cxx
