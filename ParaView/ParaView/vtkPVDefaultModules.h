@@ -244,6 +244,36 @@ const char* vtkPVWindow::StandardSourceInterfaces =
 // Define the standard filter interfaces.
 const char* vtkPVWindow::StandardFilterInterfaces=
 "<ModuleInterfaces>\n"
+
+
+
+
+"<Module name=\"Balance\" root_name=\"Balance\" input=\"vtkPolyData\" output=\"vtkPolyData\" module_type=\"Filter\">\n"
+"  <Filter type=\"vtkBalanceRedistributePolyData\"/>\n"
+"  <InputMenu label=\"Input\" help=\"Balance the number of cells on all processes.\"\n"
+"             input_name=\"PVInput\" input_type=\"vtkPolyData\"/>\n"
+"</Module>\n"
+"\n"
+"<Module name=\"AllToN\" root_name=\"AllToN\" input=\"vtkPolyData\" output=\"vtkPolyData\" module_type=\"Filter\">\n"
+"  <Filter type=\"vtkBalanceRedistributePolyData\"/>\n"
+"  <InputMenu label=\"Input\" \n"
+"             help=\"Redistribute polydata to a subset of processes.\"\n"
+"             input_name=\"PVInput\" input_type=\"vtkPolyData\"/>\n"
+"  <VectorEntry variable=\"NumberOfProcesses\" type=\"int\"/>\n"
+"</Module>\n"
+"\n"
+"<Module name=\"AllToN\" root_name=\"AllToN\" input=\"vtkPolyData\" output=\"vtkPolyData\" module_type=\"Filter\">\n"
+"  <Filter type=\"vtkBalanceRedistributePolyData\"/>\n"
+"  <InputMenu label=\"Input\" \n"
+"             help=\"Redistribute polydata to a subset of processes.\"\n"
+"             input_name=\"PVInput\" input_type=\"vtkPolyData\"/>\n"
+"  <VectorEntry variable=\"NumberOfProcesses\" type=\"int\"/>\n"
+"</Module>\n"
+"\n"
+
+
+
+
 "<Module name=\"BrownianPoints\" root_name=\"BPts\" input=\"vtkDataSet\" output=\"vtkDataSet\" module_type=\"Filter\">\n"
 "  <Filter type=\"vtkBrownianPoints\"/>\n"
 "  <InputMenu label=\"Input\" help=\"Set the input to this filter.\"\n"

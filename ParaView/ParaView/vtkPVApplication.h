@@ -218,6 +218,12 @@ public:
   // Get the process Id when running in MPI mode.
   vtkGetMacro(ProcessId, int);
 
+  // Description:
+  // This is used internally for specifying how many SGI pipes
+  // to use for rendering which PV_USE_SGI_PIPES is defined.
+  vtkSetMacro(NumberOfPipes, int);
+  vtkGetMacro(NumberOfPipes, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -229,6 +235,9 @@ protected:
 
   int MajorVersion;
   int MinorVersion;
+
+  // For running with SGI pipes.
+  int NumberOfPipes;
 
   int ProcessId;
 
@@ -244,7 +253,7 @@ protected:
   vtkPVOutputWindow *OutputWindow;
 
   static int CheckForArgument(int argc, char* argv[], const char* arg,
-			      int& index);
+                              int& index);
   static int IsParaViewScriptFile(const char* arg);
   char* CreateHelpString();
 

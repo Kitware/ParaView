@@ -457,7 +457,14 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
 #ifdef VTK_USE_MPI
   sprintf(tclName, "Collect%d", this->InstanceCount);
+
+#ifdef PV_USE_SGI_PIPES
+  pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
+  pvApp->BroadcastScript("%s SetNumberOfProcesses %s", this->CollectTclName,
+                         pvApp->GetNumberOfPipes());
+#else
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+#endif
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->CollectTclName, this->GeometryTclName);
@@ -522,7 +529,13 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 
 #ifdef VTK_USE_MPI
   sprintf(tclName, "LODCollect%d", this->InstanceCount);
+#ifdef PV_USE_SGI_PIPES
+  pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
+  pvApp->BroadcastScript("%s SetNumberOfProcesses %s", this->CollectTclName,
+                         pvApp->GetNumberOfPipes());
+#else
   pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+#endif
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODCollectTclName, this->LODDeciTclName);

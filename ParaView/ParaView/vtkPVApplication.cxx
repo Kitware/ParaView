@@ -308,6 +308,8 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
   
 
   this->Controller = c;
+
+  this->NumberOfPipes = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -1395,6 +1397,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RunningParaViewScript: " 
      << ( this->RunningParaViewScript ? "on" : " off" ) << endl;
   os << indent << "Current Process Id: " << this->ProcessId << endl;
+  os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)
