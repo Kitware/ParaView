@@ -123,6 +123,11 @@ public:
   // Initialize the widget after creation
   virtual void Initialize();
  
+  // Description:
+  // This flag tells the menu to use cell arrays.
+  vtkSetMacro(CellData,int);
+  vtkGetMacro(CellData,int);
+
 protected:
   vtkPVArrayMenu();
   ~vtkPVArrayMenu();
@@ -157,6 +162,8 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+  int CellData;
 
 private:
   vtkPVArrayMenu(const vtkPVArrayMenu&); // Not implemented

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.68");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.69");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -52,6 +52,8 @@ vtkPVArrayMenu::vtkPVArrayMenu()
 
   this->InputMenu = NULL;
   this->FieldMenu = NULL;
+
+  this->CellData = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -412,9 +414,15 @@ vtkPVDataSetAttributesInformation *vtkPVArrayMenu::GetFieldInformation()
       return NULL;
       }
     // TODO Fix
-    return input->GetDataInformation()->GetPointDataInformation();
+    if (this->CellData)
+      {
+      return input->GetDataInformation()->GetCellDataInformation();
+      }
+    else
+      {
+      return input->GetDataInformation()->GetPointDataInformation();
+      }
     }
-
   vtkErrorMacro("No input menu or field menu.");
   return NULL;
 }
@@ -501,6 +509,7 @@ void vtkPVArrayMenu::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
       pvam->SetFieldMenu(im);
       im->Delete();
       }
+    this->CellData = pvam->GetCellData();
     }
   else 
     {
@@ -564,6 +573,20 @@ int vtkPVArrayMenu::ReadXMLAttributes(vtkPVXMLElement* element,
     imw->Delete();
     }
   
+  // Setup the flag to use cell data.
+  const char* field = element->GetAttribute("field");
+  if (field)
+    {
+    if (strcmp(field,"Point") == 0)
+      {
+      this->CellData = 0;
+      }
+    else if (strcmp(field,"Cell") == 0)
+      {
+      this->CellData = 1;
+      }
+    }
+
   return 1;
 }
 
@@ -605,4 +628,6 @@ void vtkPVArrayMenu::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "FieldMenu: NULL\n";
     }
+
+  os << indent << "CellData: " << this->CellData << endl;
 }
