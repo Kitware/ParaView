@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.2");
 
 struct vtkSMStringListDomainInternals
 {
@@ -57,7 +57,7 @@ const char* vtkSMStringListDomain::GetString(unsigned int idx)
 //---------------------------------------------------------------------------
 void vtkSMStringListDomain::AddString(const char* string)
 {
-  return this->SLInternals->Strings.push_back(string);
+  this->SLInternals->Strings.push_back(string);
 }
 
 //---------------------------------------------------------------------------
