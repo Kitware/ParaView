@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.245");
+vtkCxxRevisionMacro(vtkPVSource, "1.246");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -93,7 +93,7 @@ vtkPVSource::vtkPVSource()
   // This variable is used to determine that.
   this->Initialized = 0;
 
-  // The notebook which holds Parameters and Display pages.
+  // The notebook which holds Parameters, Display and Informations pages.
   this->Notebook = vtkKWNotebook::New();
   this->Notebook->AlwaysShowTabsOn();
 
@@ -143,6 +143,7 @@ vtkPVSource::vtkPVSource()
 
   this->HideDisplayPage = 0;
   this->HideParametersPage = 0;
+  this->HideInformationsPage = 0;
   
   this->AcceptCallbackFlag = 0;
 
@@ -648,7 +649,7 @@ void vtkPVSource::Select()
   data = this->GetPVOutput();
   if (data)
     {
-    // Update the Display page.
+    // Update the Display and Informations page.
     data->UpdateProperties();
     }
 
@@ -907,6 +908,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     if (!this->GetHideDisplayPage())
       {
       this->Notebook->AddPage("Display");
+      }
+    if (!this->GetHideInformationsPage())
+      {
+      this->Notebook->AddPage("Informations");
       }
     ac->CreateProperties();
     ac->Initialize();
@@ -1880,6 +1885,7 @@ void vtkPVSource::SerializeSelf(ostream& os, vtkIndent indent)
   os << indent << "ModuleName " << this->ModuleName << endl;
   os << indent << "HideDisplayPage " << this->HideDisplayPage << endl;
   os << indent << "HideParametersPage " << this->HideParametersPage << endl;
+  os << indent << "HideInformationsPage " << this->HideInformationsPage << endl;
   os << indent << "NumberOfPVInputs " << this->GetNumberOfPVInputs() << endl;
   for ( cc = 0; cc < this->GetNumberOfPVInputs(); cc ++ )
     {
@@ -1935,6 +1941,16 @@ void vtkPVSource::SerializeToken(istream& is, const char token[1024])
       vtkErrorMacro("Problem Parsing session file");
       }
     this->HideParametersPage = cor;
+    }
+  else if ( vtkString::Equals(token, "HideInformationsPage") )
+    {
+    int cor;
+    cor = 0;
+    if (! (is >> cor) )
+      {
+      vtkErrorMacro("Problem Parsing session file");
+      }
+    this->HideInformationsPage = cor;
     }
   else if ( vtkString::Equals(token, "ModuleName") )
     {
@@ -2050,7 +2066,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.245 $");
+  this->ExtractRevision(os,"$Revision: 1.246 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2092,5 +2108,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << (this->SourceClassName?this->SourceClassName:"null") << endl;
   os << indent << "HideParametersPage: " << this->HideParametersPage << endl;
   os << indent << "HideDisplayPage: " << this->HideDisplayPage << endl;
+  os << indent << "HideInformationsPage: " << this->HideDisplayPage << endl;
   os << indent << "ToolbarModule: " << this->ToolbarModule << endl;
 }
