@@ -81,6 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
+#include "vtkPVClassNameInformation.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
 #include "vtkPVData.h"
@@ -144,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.14");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.15");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2105,9 +2106,9 @@ void vtkPVWindow::WriteData()
     {
     vtkErrorMacro("bad return from GetClassName call");
     }
-//  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
-//  pm->GatherInformation(part->GetClassNameInformation(),
-//                        part->GetVTKDataID());
+  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
+  pm->GatherInformation(part->GetClassNameInformation(),
+                        part->GetVTKDataID());
   // Instantiator does not work for static builds and VTK objects.
   vtkDataSet* data;
   if (strcmp(dataClassName, "vtkImageData") == 0)
@@ -2286,9 +2287,9 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
     vtkErrorMacro("bad return from GetClassName call");
     }
   vtkDataSet* data;
-//  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
-//  pm->GatherInformation(part->GetClassNameInformation(),
-//                        part->GetVTKDataTclName());
+  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
+  pm->GatherInformation(part->GetClassNameInformation(),
+                        part->GetVTKDataID());
   if (strcmp(dataClassName, "vtkImageData") == 0)
     {
     data = vtkImageData::New();

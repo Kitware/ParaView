@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.7");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.8");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -229,8 +229,7 @@ void vtkPVPart::GatherDataInformation()
     this->PartDisplay->Update();
     }
 
-//   pm->GatherInformation(this->DataInformation, 
-//                         this->GetVTKDataTclName());
+  pm->GatherInformation(this->DataInformation, this->GetVTKDataID());
 
   this->DataInformationValid = 1;
 

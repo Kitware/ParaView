@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9.4.2");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.9.4.3");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -489,10 +489,10 @@ void vtkPVTimerLogDisplay::Update()
     this->TimerInformation = NULL;
     }
   this->TimerInformation = vtkPVTimerInformation::New();
-  //pvApp->GetProcessModule()->GatherInformation(this->TimerInformation, 
-  // "$Application");
-  // Special case for client-server.
-  // add the client process as a log.
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pm->GatherInformation(this->TimerInformation, pm->GetApplicationID());
+
+  // Special case for client-server.  add the client process as a log.
   if (pvApp->GetClientMode())
     {
     vtkPVTimerInformation* tmp = vtkPVTimerInformation::New();
