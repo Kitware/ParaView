@@ -144,7 +144,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.58");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.59");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -760,16 +760,19 @@ vtkKWLoadSaveDialog* vtkPVClientServerModule::NewLoadSaveDialog()
   return dialog;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
 {
   this->Interpreter->ProcessStream(msg, len);
 }
 
+//----------------------------------------------------------------------------
 const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
 {
   return this->Superclass::GetLastServerResult();
 }
 
+//----------------------------------------------------------------------------
 const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
 {
   if(!this->Application)
@@ -812,6 +815,7 @@ const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
   return *this->LastServerResultStream;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToClient()
 {
   if(!this->ClientMode)
@@ -844,6 +848,7 @@ void vtkPVClientServerModule::SendStreamToServerRoot()
   this->ClientServerStream->Reset();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToClientAndServer()
 {
   if(!this->ClientMode)
@@ -858,6 +863,7 @@ void vtkPVClientServerModule::SendStreamToClientAndServer()
   this->SendStreamToClient();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToClientAndServerRoot()
 {
   if(!this->ClientMode)
@@ -872,6 +878,7 @@ void vtkPVClientServerModule::SendStreamToClientAndServerRoot()
   this->SendStreamToClient();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendLastClientServerResult()
 {
   const unsigned char* data;
