@@ -123,7 +123,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.227");
+vtkCxxRevisionMacro(vtkPVApplication, "1.228");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -142,7 +142,7 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
 //----------------------------------------------------------------------------
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
-extern "C" int Vtkfilterstcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkpvfilterstcl_Init(Tcl_Interp *interp);
 
 #ifdef PARAVIEW_LINK_XDMF
 extern "C" int Vtkxdmftcl_Init(Tcl_Interp *interp);
@@ -276,7 +276,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
     return interp;
     }
 
-  Vtkfilterstcl_Init(interp);
+  Vtkpvfilterstcl_Init(interp);
   //  if (Vtkparalleltcl_Init(interp) == TCL_ERROR) 
   //  {
    // cerr << "Init Parallel error\n";
