@@ -9277,7 +9277,7 @@ int vxprintf(
   char prefix;              /* Prefix character.  "+" or "-" or " " or '\0'. */
   int  errorflag = 0;       /* True if an error is encountered */
   enum et_type xtype;       /* Conversion paradigm */
-  char *zMem;               /* String to be freed */
+  char *zMem=0;             /* String to be freed */
   char *zExtra;             /* Extra memory used for etTCLESCAPE conversions */
   static char spaces[] = "                                                  "
      "                                                                      ";

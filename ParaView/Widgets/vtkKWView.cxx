@@ -744,7 +744,7 @@ void vtkKWView::Print()
 #else
 
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  float DPI;
+  float DPI=0;
   if (this->GetParentWindow())
     {
     // Is this right? Should DPI be int or float?
@@ -1246,7 +1246,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.49 $");
+  this->ExtractRevision(os,"$Revision: 1.50 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

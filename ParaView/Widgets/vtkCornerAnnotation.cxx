@@ -113,9 +113,9 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia)
 {
   int i;
   char *text, *text2;
-  int image;
+  int image=0;
   char *rpos, *tmp;
-  float window, level;
+  float window=0, level=0;
     
   if (ia)
     {
