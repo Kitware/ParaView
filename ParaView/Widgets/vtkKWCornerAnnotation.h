@@ -57,7 +57,8 @@ class vtkKWFrame;
 class vtkKWGenericComposite;
 class vtkKWLabel;
 class vtkKWScale;
-class vtkKWText;
+class vtkKWRenderWidget;
+class vtkKWLabeledText;
 class vtkKWTextProperty;
 class vtkKWView;
 
@@ -69,32 +70,71 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Displays and/or updates the property ui display
-  virtual void ShowProperties();
-
-  // Description:
-  // Create the properties object, called by ShowProperties.
+  // Create the widget.
   virtual void Create(vtkKWApplication *app, const char* args);
 
   // Description:
-  // Close out and remove any composites prior to deletion.
+  // Set/Get the vtkKWView or the vtkKWRenderWidget that owns this annotation.
+  // vtkKWView and vtkKWRenderWidget are two different frameworks, choose one or
+  // the other (ParaView uses vtkKWView, VolView uses vtkKWRenderWidget).
+  // Note that in vtkKWView mode, each view has a vtkKWCornerAnnotation. 
+  // In vtkKWRenderWidget, each widget has a vtkCornerAnnotation, which is 
+  // controlled by a unique (decoupled) vtkKWCornerAnnotation in the GUI.
+  virtual void SetView(vtkKWView*);
+  vtkGetObjectMacro(View,vtkKWView);
+  virtual void SetRenderWidget(vtkKWRenderWidget*);
+  vtkGetObjectMacro(RenderWidget,vtkKWRenderWidget);
+
+  // Description:
+  // Get the underlying vtkCornerAnnotation. 
+  // In vtkKWView mode, the CornerProp is created automatically and handled
+  // by this class (i.e. each vtkKWCornerAnnotation has a vtkCornerAnnotation).
+  // In vtkKWRenderWidget, the corner prop is part of vtkKWRenderWidget, and
+  // this method is just a gateway to vtkKWRenderWidget::GetCornerProp().
+  vtkGetObjectMacro(CornerProp, vtkCornerAnnotation);
+  
+  // Description:
+  // When used with a vtkKWView, close out and remove any composites/props 
+  // prior to deletion. Has no impact when used with a vtkKWRenderWidget.
   virtual void Close();
 
   // Description:
-  // Set/Get the composite that owns this annotation
-  void SetView(vtkKWView*);
-  vtkGetObjectMacro(View,vtkKWView);
+  // In vtkKWView mode, displays and updates the property ui display
+  virtual void ShowProperties();
 
   // Description:
-  // Callback functions used by the pro sheet
-  virtual void SetCornerText(const char *txt, int corner);
-  virtual char *GetCornerText(int i);
-  virtual void CornerChanged(int i);
-  virtual void OnDisplayCorner();
+  // Set/Get the annotation visibility
   virtual void SetVisibility(int i);
   virtual int  GetVisibility();
   vtkBooleanMacro(Visibility,int);
+  virtual void DisplayCornerCallback();
   
+  // Description:
+  // Set/Get corner text
+  virtual void SetCornerText(const char *txt, int corner);
+  virtual char *GetCornerText(int i);
+  virtual void CornerTextCallback(int i);
+
+  // Description:
+  // Change the color of the annotation
+  virtual void SetTextColor(float r, float g, float b);
+  virtual void SetTextColor(float *rgb)
+               { this->SetTextColor(rgb[0], rgb[1], rgb[2]); }
+  virtual float *GetTextColor();
+  virtual void TextColorCallback();
+
+  // Description:
+  // Set/Get the maximum line height.
+  virtual void SetMaximumLineHeight(float);
+  virtual void SetMaximumLineHeightNoTrace(float);
+  virtual void MaximumLineHeightCallback();
+  virtual void MaximumLineHeightEndCallback();
+
+  // Description:
+  // GUI components access
+  vtkGetObjectMacro(TextPropertyWidget, vtkKWTextProperty);
+  void TextPropertyCallback();
+
   // Description:
   // Chaining method to serialize an object and its superclasses.
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
@@ -102,49 +142,35 @@ public:
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   // Description:
-  // Change the color of the annotation
-  void SetTextColor(float r, float g, float b);
-  void SetTextColor(float *rgb)
-    { this->SetTextColor(rgb[0], rgb[1], rgb[2]); }
-  float *GetTextColor();
-  void OnTextColorChangeCallback();
-
-  // Description:
-  // Set/Get the maximum line height.
-  void SetMaximumLineHeight(float);
-  void SetMaximumLineHeightNoTrace(float);
-  float GetMaximumLineHeight();
-  void MaximumLineHeightCallback();
-  void MaximumLineHeightEndCallback();
-
-  // Description:
-  // Get at the underlying vtkCornerAnnotationClass
-  vtkGetObjectMacro(CornerProp,vtkCornerAnnotation);
-  
-  // Description:
-  // GUI components access
-  vtkGetObjectMacro(TextPropertyWidget, vtkKWTextProperty);
-  void OnTextChangeCallback();
+  // Set/Get the enabled state.
+  // Override to pass down to children.
+  virtual void SetEnabled(int);
 
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
 
-  vtkKWTextProperty *TextPropertyWidget;
+  vtkCornerAnnotation    *CornerProp;
+
+  vtkKWRenderWidget      *RenderWidget;
+
+  vtkKWView              *View;
+  vtkKWGenericComposite  *InternalCornerComposite;
+  vtkCornerAnnotation    *InternalCornerProp;
+
+  // GUI
 
   vtkKWCheckButton       *CornerVisibilityButton;
-
-  vtkKWFrame             *CornerTopFrame;
-  vtkKWFrame             *CornerBottomFrame;
-
-  vtkKWFrame             *CornerFrame[4];
-  vtkKWLabel             *CornerLabel[4];
-  vtkKWText              *CornerText[4];
-  vtkCornerAnnotation    *CornerProp;
-  vtkKWGenericComposite  *CornerComposite;
+  vtkKWFrame             *CornerFrame;
+  vtkKWLabeledText       *CornerText[4];
   vtkKWScale             *MaximumLineHeightScale;
+  vtkKWTextProperty      *TextPropertyWidget;
 
-  vtkKWView *View;
+  // Update the GUI according to the value of the ivars
+
+  void Update();
+  void Render();
+
 private:
   vtkKWCornerAnnotation(const vtkKWCornerAnnotation&); // Not implemented
   void operator=(const vtkKWCornerAnnotation&); // Not Implemented
