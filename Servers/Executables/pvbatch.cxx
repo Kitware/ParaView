@@ -57,7 +57,7 @@ static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  vtkPVMain::Initialize(argc, argv); // MPI must be initialized before any vtk object
+  vtkPVMain::Initialize(&argc, &argv); // MPI must be initialized before any vtk object
   vtkPVMain* pvmain = vtkPVMain::New();
   vtkPVBatchOptions* options = vtkPVBatchOptions::New();
   options->SetProcessType(vtkPVOptions::PVBATCH);

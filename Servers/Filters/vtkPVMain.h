@@ -36,7 +36,7 @@ public:
   int Run(vtkPVOptions*, vtkProcessModuleGUIHelper* guihelp,
           INITIALIZE_INTERPRETER_FUNCTION func,
           int argc, char* argv[]);
-  static void Initialize(int argc, char* argv[]);
+  static void Initialize(int* argc, char** argv[]);
   static void Finalize();
 protected:
   // Description:

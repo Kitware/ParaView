@@ -36,7 +36,7 @@
 #include "vtkDynamicLoader.h"
 
 vtkStandardNewMacro(vtkPVMain);
-vtkCxxRevisionMacro(vtkPVMain, "1.3");
+vtkCxxRevisionMacro(vtkPVMain, "1.4");
 
 
 
@@ -61,7 +61,7 @@ vtkPVMain::~vtkPVMain()
   vtkTimerLog::CleanupLog();
 }
 
-void vtkPVMain::Initialize(int argc, char* argv[])
+void vtkPVMain::Initialize(int* argc, char** argv[])
 {
 #ifdef VTK_USE_MPI
   // This is here to avoid false leak messages from vtkDebugLeaks when
@@ -70,7 +70,7 @@ void vtkPVMain::Initialize(int argc, char* argv[])
   // the others are done, causing apparent memory leaks for any objects
   // created before MPI_Init().
   int myId = 0;
-  MPI_Init(&argc, &argv);
+  MPI_Init(argc, argv);
   // Might as well get our process ID here.  I use it to determine
   // Whether to initialize tk.  Once again, splitting Tk and Tcl 
   // initialization would clean things up.
@@ -144,7 +144,6 @@ int vtkPVMain::Run(vtkPVOptions* options,
   int display_help = 0;
   if ( !options->Parse(argc, argv) )
     {
-    cerr << "Problem parsing command line arguments" << endl;
     if ( options->GetUnknownArgument() )
       {
       cerr << "Got unknown argument: " << options->GetUnknownArgument() << endl;

@@ -52,7 +52,7 @@ static void ParaViewInitializeInterpreter(vtkProcessModule* pm);
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-  vtkPVMain::Initialize(argc, argv);
+  vtkPVMain::Initialize(&argc, &argv);
   // First create the correct options for this process
   vtkPVServerOptions* options = vtkPVServerOptions::New();
   // set the type of process

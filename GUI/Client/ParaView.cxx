@@ -94,7 +94,7 @@ int MyMain(int argc, char *argv[])
 #else
   vtkOutputWindow::GetInstance()->PromptUserOff();
 #endif
-  vtkPVMain::Initialize(argc, argv);
+  vtkPVMain::Initialize(&argc, &argv);
   vtkPVGUIClientOptions* options = vtkPVGUIClientOptions::New();
   options->SetProcessType(vtkPVOptions::PARAVIEW);
     // Create a pvmain
