@@ -64,7 +64,9 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
 
 
 
-// We will start the rmi loop, and let an RMI initialize the slave.
+// This used to be the fuction that initialized Tcl (not Tk) for the satelite processes.
+// It is not used anymore.  I am keeping it around to remember how I use to intialize
+// Tcl without Tk.  We may need this option in the future.
 void vtkPVSlaveStart(vtkMultiProcessController *controller)
 {
   Tcl_Interp *interp = Tcl_CreateInterp();
@@ -147,7 +149,6 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     // We need to pass the local controller to the UI process.
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     vtkPVApplication *app = vtkPVApplication::New();
-    cerr << "app: " << app << ", controller: " << controller << endl;
     app->SetController(controller);
     app->Script("wm withdraw .");
     
@@ -156,8 +157,29 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     }
   else
     {
-    // The last is used as a master, so reduce the slave count by one.
-    vtkPVSlaveStart(controller);
+    // The slaves try to connect.  In the future, we may not want to initialize Tk.
+    putenv("DISPLAY=:0.0");
+    Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
+    // We should use the application tcl name in the future.
+    // All object in the satellite processes must be created through tcl.
+    // (To assign the correct name).
+    if (Tcl_Eval(interp, "vtkPVApplication Slave") != TCL_OK)
+      {
+      cerr << "Error returned from tcl script.\n" << interp->result << endl;
+      }
+    int    error;
+    vtkPVApplication *app = (vtkPVApplication *)(
+      vtkTclGetPointerFromObject("Slave","vtkPVApplication",interp,error));
+    if (app == NULL)
+      {
+      vtkGenericWarningMacro("Could not get application pointer.");
+      return;
+      }  
+    app->WidgetVisibilityOff();
+    app->SetController(controller);
+    app->Script("wm withdraw .");
+    controller->AddRMI(vtkPVSlaveScript, (void *)(app), VTK_PV_SLAVE_SCRIPT_RMI_TAG);
+    controller->ProcessRMIs();
     }
 }
 
