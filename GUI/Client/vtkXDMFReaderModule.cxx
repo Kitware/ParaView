@@ -26,8 +26,6 @@
 #include "vtkPVProcessModule.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
-#include "vtkVector.txx"
-#include "vtkVectorIterator.txx"
 #include "vtkKWListBox.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVColorMap.h"
@@ -38,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.32");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.33");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);

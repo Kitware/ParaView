@@ -22,12 +22,10 @@
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVWidgetCollection.h"
-#include "vtkVector.txx"
-#include "vtkVectorIterator.txx"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAdvancedReaderModule);
-vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.24");
+vtkCxxRevisionMacro(vtkPVAdvancedReaderModule, "1.25");
 
 int vtkPVAdvancedReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
