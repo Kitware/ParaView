@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.267");
+vtkCxxRevisionMacro(vtkPVData, "1.268");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1527,7 +1527,6 @@ void vtkPVData::VolumeRenderPointField(const char *name)
 //----------------------------------------------------------------------------
 void vtkPVData::VolumeRenderPointFieldInternal(const char *name)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   int num, idx;
   vtkPVPart *part;
 
