@@ -1,4 +1,5 @@
 PROJECT(PARAVIEW) 
+INCLUDE_REGULAR_EXPRESSION("^(vtk).*$")
 
 SET (LIBRARY_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all libraries.")
 SET (EXECUTABLE_OUTPUT_PATH ${PARAVIEW_BINARY_DIR}/bin/ CACHE PATH "Single output directory for building all executables.")
@@ -48,7 +49,7 @@ ELSE(ParaViewComplete_BINARY_DIR)
     INCLUDE(${USE_VTK_FILE})
   ELSE(USE_VTK_FILE)
     SET (PARAVIEW_CAN_BUILD 0)
-    MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_DIR to directory where vtkConfigure.h and UseVTK.cmake are found.")
+    MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_PATH to directory where vtkConfigure.h and UseVTK.cmake are found.")
   ENDIF (USE_VTK_FILE)
 ENDIF(ParaViewComplete_BINARY_DIR)
 
