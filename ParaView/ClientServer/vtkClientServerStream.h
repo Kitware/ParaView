@@ -282,6 +282,9 @@ public:
   void Print(ostream&, vtkIndent) const;
   void PrintMessage(ostream&, int message) const;
   void PrintMessage(ostream&, int message, vtkIndent) const;
+  void PrintArgument(ostream&, int message, int argument) const;
+  void PrintArgument(ostream&, int message, int argument, vtkIndent) const;
+  void PrintArgumentValue(ostream&, int message, int argument) const;
 
 protected:
   // Write arbitrary data to the stream.  Used internally.
@@ -320,6 +323,11 @@ protected:
   // includes the Command and End portions of the message.  Returns 0
   // if the given index is out of range.
   int GetNumberOfValues(int message) const;
+
+  // Internal implementation shared between PrintArgument and
+  // PrintArgumentValue.
+  void PrintArgumentInternal(ostream&, int message, int argument,
+                             int annotate, vtkIndent) const;
 private:
   vtkClientServerStreamInternals* Internal;
   friend class vtkClientServerStreamInternals;
