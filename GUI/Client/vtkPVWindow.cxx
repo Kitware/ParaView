@@ -215,7 +215,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.642");
+vtkCxxRevisionMacro(vtkPVWindow, "1.643");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -4278,7 +4278,6 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
       if ( col )
         {
         col->AddItem(clone);
-        clone->SetSourceList(sourceList);
         }
       else
         {
@@ -4290,7 +4289,6 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     else
       {
       this->AddPVSource("Sources", clone);
-      clone->SetSourceList("Sources");
       }
     clone->Delete();
     }

@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.408");
+vtkCxxRevisionMacro(vtkPVSource, "1.409");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -154,7 +154,6 @@ vtkPVSource::vtkPVSource()
 //----------------------------------------------------------------------------
 vtkPVSource::~vtkPVSource()
 {
-  this->SetPartDisplay(0);
   this->RemoveAllPVInputs();
 
   this->NumberOfOutputsInformation->Delete();
@@ -171,13 +170,15 @@ vtkPVSource::~vtkPVSource()
   if (proxm && this->GetName())
     {
     proxm->UnRegisterProxy(this->GetName());
-    const char* proxyName = proxm->GetProxyName("animateable", this->Proxy);
+    const char* proxyName = 
+      proxm->GetProxyName("animateable", this->PartDisplay);
     if (proxyName)
       {
       proxm->UnRegisterProxy("animateable", proxyName);
       }
     }
   this->SetProxy(0);
+  this->SetPartDisplay(0);
 
   // Do not use SetName() or SetLabel() here. These make
   // the navigation window update when it should not.
@@ -1068,14 +1069,22 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     rm->AddDisplay(pDisp);
 
     vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
-    ostrstream animName_with_warning_C4701;
-    animName_with_warning_C4701 << this->GetSourceList() << ";" 
-                                << this->GetName() << ";"
-                                << "Display"
-                                << ends;
-    proxm->RegisterProxy(
-      "animateable", animName_with_warning_C4701.str(), pDisp);
-    delete[] animName_with_warning_C4701.str();
+    if (!this->GetSourceList())
+      {
+      vtkErrorMacro("SourceList should not be empty. "
+                    "Cannot register display for animation.");
+      }
+    else
+      {
+      ostrstream animName_with_warning_C4701;
+      animName_with_warning_C4701 << this->GetSourceList() << ";" 
+                                  << this->GetName() << ";"
+                                  << "Display"
+                                  << ends;
+      proxm->RegisterProxy(
+        "animateable", animName_with_warning_C4701.str(), pDisp);
+      delete[] animName_with_warning_C4701.str();
+      }
 
     // Hookup cube axes display.
     this->CubeAxesDisplay->SetInput(this->Proxy);
@@ -2177,6 +2186,8 @@ void vtkPVSource::RegisterProxy(const char* sourceList, vtkPVSource* clone)
   proxm->RegisterProxy(
     "animateable", animName_with_warning_C4701.str(), clone->Proxy);
   delete[] animName_with_warning_C4701.str();
+
+  clone->SetSourceList(sourceList);
 }
 
 //----------------------------------------------------------------------------

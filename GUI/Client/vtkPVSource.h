@@ -542,10 +542,6 @@ protected:
   // This ivar is set and used by vtkPVWindow.
   int SavedRaisedNotebookPageId;
 
-//BTX  
-  friend class vtkPVWindow;
-//ETX  
-
   char* SourceList;
   vtkSetStringMacro(SourceList);
   vtkGetStringMacro(SourceList);
