@@ -186,7 +186,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.150");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.151");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1371,7 +1371,6 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     // For now, the image size for the animations cannot be larger than
     // the size of the render window. The problem is that tiling doesn't
     // work with multiple processes.
-    vtkPVApplication *pvApp = this->GetPVApplication();
     if (width > origWidth || height > origHeight)
       {
       int diffX = width - origWidth;
