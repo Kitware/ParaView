@@ -8,6 +8,7 @@ vtkDummyRenderWindow
 vtkDummyRenderer
 vtkKWBoundsDisplay
 vtkKWExtractGeometryByScalar
+vtkPassThroughFilter
 vtkPV3DWidget
 vtkPVAdvancedReaderModule
 vtkPVAnimationInterface
@@ -52,6 +53,7 @@ vtkPVScalarRangeLabel
 vtkPVScale 
 vtkPVSelectWidget 
 vtkPVSelectionList
+vtkPVSelectTimeSet
 vtkPVSource 
 vtkPVSourceCollection
 vtkPVSphereWidget
