@@ -165,8 +165,6 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, vtkKWMenu *menu )
     file[0] = pos + '0';
     menu->InsertCommand( menu->GetIndex("Close") - 1, 
 			 file, this->Target, this->Command, 0 );
-    //cout << "Insert to menu: " << file << " (" << this->Command << ")"
-    //<< endl;
     free( file );
     return 1;
     }
@@ -903,7 +901,6 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
       {
       char cmd[1024];
       sprintf(cmd,"%s {%s}",command, name);
-      //cout << "Insert: " << name << " - " << cmd  << endl;
       this->InsertRecentFileToMenu(name, target, cmd);
       this->UpdateRecentMenu();
       /*
@@ -976,7 +973,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.41 $");
+  this->ExtractRevision(os,"$Revision: 1.42 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1026,7 +1023,6 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 					 const char *command)
 {
   //cout << "Insert: " << filename << endl;
-  this->PrintRecentFiles();
   char *file = new char [strlen(filename) + 3];
   if ( strlen(filename) <= 40 )
     {
@@ -1110,7 +1106,6 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
     }
 
   delete [] file;
-  this->PrintRecentFiles();
   //cout << "---------------------------------------" << endl;
 }
 
