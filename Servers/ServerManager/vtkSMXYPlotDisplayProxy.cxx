@@ -60,7 +60,7 @@ protected:
 
 
 vtkStandardNewMacro(vtkSMXYPlotDisplayProxy);
-vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.3");
+vtkCxxRevisionMacro(vtkSMXYPlotDisplayProxy, "1.1.2.4");
 //-----------------------------------------------------------------------------
 vtkSMXYPlotDisplayProxy::vtkSMXYPlotDisplayProxy()
 {
@@ -84,6 +84,7 @@ vtkSMXYPlotDisplayProxy::~vtkSMXYPlotDisplayProxy()
   this->XYPlotWidget->Delete();
   this->UpdateSuppressorProxy = 0;
   this->CollectProxy = 0;
+  this->XYPlotWidget->SetXYPlotActor(0);
   this->XYPlotActorProxy = 0;
   this->PropertyProxy =0;
   this->RenderModuleProxy = 0;
@@ -461,9 +462,9 @@ void vtkSMXYPlotDisplayProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
     {
     this->XYPlotWidget->SetEnabled(0);
     }
-  this->XYPlotWidget->SetXYPlotActor(0);
   this->XYPlotWidget->SetInteractor(0);
   this->XYPlotWidget->SetCurrentRenderer(0);
+  this->RenderModuleProxy = 0;
 }
 
 //-----------------------------------------------------------------------------

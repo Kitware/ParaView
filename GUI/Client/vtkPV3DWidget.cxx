@@ -20,27 +20,21 @@
 #include "vtkKWFrameLabeled.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-  #include "vtkSMRenderModuleProxy.h"
-#endif
+#include "vtkSMRenderModuleProxy.h"
 #include "vtkPVDisplayGUI.h"
-#include "vtkPVRenderModule.h"
 #include "vtkPVDataInformation.h"
-#include "vtkPVGenericRenderWindowInteractor.h"
-#include "vtkPVRenderView.h"
+
 #include "vtkPVSource.h"
-#include "vtkPVWindow.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
 
-#include "vtkKWEvent.h"
 #include "vtkSMProxyManager.h"
 #include "vtkSM3DWidgetProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.2");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.67.2.3");
 
 //===========================================================================
 //***************************************************************************
@@ -101,11 +95,13 @@ vtkPV3DWidget::~vtkPV3DWidget()
   this->SetWidgetProxyName(0);
   if (this->WidgetProxy)
     {
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
-//    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
-//    rm->RemoveDisplay(this->WidgetProxy);
-//    rm->UpdateVTKObjects();
-#endif
+    
+    vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
+    if (rm)
+      {
+      rm->RemoveDisplay(this->WidgetProxy);
+      rm->UpdateVTKObjects();
+      }
     this->WidgetProxy->Delete();
     this->WidgetProxy = 0;
     }
@@ -182,11 +178,12 @@ void vtkPV3DWidget::Create(vtkKWApplication *app)
   proxyNum++;
   str.rdbuf()->freeze(0);
   this->WidgetProxy->CreateVTKObjects(1);
-#if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
+
+  // Add to the render module.
   vtkSMRenderModuleProxy* rm = this->GetPVApplication()->GetRenderModuleProxy();
   rm->AddDisplay(this->WidgetProxy);
   rm->UpdateVTKObjects();
-#endif
+
   this->InitializeObservers(this->WidgetProxy);
   this->ChildCreate(pvApp);
 }
@@ -196,6 +193,7 @@ void vtkPV3DWidget::InitializeObservers(vtkSM3DWidgetProxy* widgetproxy)
 {
   if(widgetproxy)
     {
+    // TODO: verify if we need the Start and End Interaction events at all.
     widgetproxy->AddObserver(vtkCommand::WidgetModifiedEvent,this->Observer);
     widgetproxy->AddObserver(vtkCommand::StartInteractionEvent,this->Observer);
     widgetproxy->AddObserver(vtkCommand::EndInteractionEvent,this->Observer);
@@ -349,24 +347,12 @@ void vtkPV3DWidget::PlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::ExecuteEvent(vtkObject* obj, unsigned long event, void*calldata)
 {
-  //Interactive rendering enabling/disabling code should eventually
-  //move to the SM3DWidget
- 
   if (vtkSM3DWidgetProxy::SafeDownCast(obj))
     {
-    if ( event == vtkCommand::StartInteractionEvent && this->PVSource )
-      {
-//      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
-      }
-    else if ( event == vtkCommand::EndInteractionEvent && this->PVSource )
-      {
-//      this->PVSource->GetPVWindow()->InteractiveRenderEnabledOff();
-      }
-    else
+    if (event == vtkCommand::WidgetModifiedEvent)
       {
       this->ModifiedCallback();
       }
-//    this->Render();
     }
   this->Superclass::ExecuteEvent(obj, event, calldata);
 }
@@ -390,7 +376,7 @@ void vtkPV3DWidget::Render()
 {
   if ( this->Placed )
     {
-    this->GetPVApplication()->GetMainWindow()->GetInteractor()->Render();
+    this->GetPVApplication()->GetRenderModuleProxy()->StillRender();
     }
 }
 

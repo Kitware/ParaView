@@ -61,6 +61,7 @@ public:
   // Sets the visibility of the XYPlotActor. Also enables/disables
   // the XYPlotWidget.
   void SetVisibility(int visible);
+  vtkGetMacro(Visibility, int);
 
   // Description:
   // This method updates the piece that has been assigned to this process.

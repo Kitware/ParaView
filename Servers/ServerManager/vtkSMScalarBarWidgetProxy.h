@@ -12,79 +12,33 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMScalarBarWidgetProxy - 
+// .NAME vtkSMScalarBarWidgetProxy - Proxy for vtkSMScalarBarWidget.
 // .SECTION Description
 // vtkSMScalarBarWidgetProxy is the proxy for vtkScalarBarWidget.
 
 #ifndef __vtkSMScalarBarWidgetProxy_h
 #define __vtkSMScalarBarWidgetProxy_h
 
-#include "vtkSMInteractorObserverProxy.h"
+#include "vtkSMDisplayProxy.h"
+class vtkSMScalarBarWidgetProxyObserver;
+class vtkScalarBarWidget;
 
-class VTK_EXPORT vtkSMScalarBarWidgetProxy : public vtkSMInteractorObserverProxy
+
+class VTK_EXPORT vtkSMScalarBarWidgetProxy : public vtkSMDisplayProxy
 {
 public:
   static vtkSMScalarBarWidgetProxy* New();
-  vtkTypeRevisionMacro(vtkSMScalarBarWidgetProxy, vtkSMInteractorObserverProxy);
+  vtkTypeRevisionMacro(vtkSMScalarBarWidgetProxy, vtkSMDisplayProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the scalr bar title string.
-  virtual void SetTitle(const char* title);
-
-
-  // Description:
-  // Enable/Disable the scalar bar. Overridden to set the current renderer on the
-  // ScalarBarWidget.
-  virtual void SetEnabled(int enable);
-
-  // Description:
-  // Set the format for the labels on the ScalarBar
-  virtual void SetLabelFormat(const char* format);
-
-  // Description:
-  // GetSet the position and orientation for the ScalarBar.
-  vtkGetVector2Macro(Position1,double);
-  vtkSetVector2Macro(Position1,double);
-  vtkGetVector2Macro(Position2,double);
-  vtkSetVector2Macro(Position2,double);
-  vtkGetMacro(Orientation,int);
-  vtkSetMacro(Orientation,int);
+  // Enable/Disable the scalar bar. Overridden to set the current 
+  // renderer on the ScalarBarWidget. This also enables the scalar bar 
+  // widget on the client.
+  virtual void SetVisibility(int visible);
+  vtkGetMacro(Visibility, int);
  
-  // Description:
-  // Push the properties on to the vtk objects.
-  virtual void UpdateVTKObjects();
-
-  // Description:
-  // Set the visibility of the scalar bar
-  virtual void SetVisibility(int visible)
-    { this->SetEnabled(visible); }
-
-  // Description:
-  // Set the text property for title
-  virtual void SetTitleFormatColor(double color[3]);
-  virtual void SetTitleFormatOpacity(double opacity);
-  virtual void SetTitleFormatFont(int font);
-  virtual void SetTitleFormatBold(int bold);
-  virtual void SetTitleFormatItalic(int italic);
-  virtual void SetTitleFormatShadow(int shadow);
-  
-  // Description:
-  // Set the text property for the labels
-  virtual void SetLabelFormatColor(double color[3]);
-  virtual void SetLabelFormatOpacity(double opacity);
-  virtual void SetLabelFormatFont(int font);
-  virtual void SetLabelFormatBold(int bold);
-  virtual void SetLabelFormatItalic(int italic);
-  virtual void SetLabelFormatShadow(int shadow);
-
   virtual void SaveInBatchScript(ofstream* file);
-
-  // Description:
-  // Get/Set Lookuptable proxy for the scalar bar.
-  void SetLookupTable(vtkSMProxy* lut);
-  //vtkSMProxy* GetLookupTable();
-
   
   // Description:
   // Called when the display is added/removed to/from a RenderModule.
@@ -94,16 +48,20 @@ protected:
 //BTX
   vtkSMScalarBarWidgetProxy();
   ~vtkSMScalarBarWidgetProxy();
-  friend class vtkPVColorMap;
 
+  
   virtual void CreateVTKObjects(int numObjects);
   
   void ExecuteEvent(vtkObject*obj, unsigned long event, void*p);
-  
-  double Position1[2];
-  double Position2[2];
-  int Orientation;
 
+  int Visibility;
+  vtkSMProxy* ScalarBarActorProxy;
+  vtkScalarBarWidget* ScalarBarWidget; // Widget on the client. 
+  
+  friend class vtkSMScalarBarWidgetProxyObserver;
+  vtkSMScalarBarWidgetProxyObserver* Observer;
+
+  vtkSMRenderModuleProxy* RenderModuleProxy;
 private:
   vtkSMScalarBarWidgetProxy(const vtkSMScalarBarWidgetProxy&); // Not implemented
   void operator=(const vtkSMScalarBarWidgetProxy&); // Not implemented

@@ -70,6 +70,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
   vtkSMRenderModuleProxy.cxx
+  vtkSMScalarBarActorProxy.cxx
   vtkSMScalarBarWidgetProxy.cxx
   vtkSMSimpleIntInformationHelper.cxx
   vtkSMSimpleDisplayProxy.cxx

@@ -25,43 +25,94 @@
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMProxyProperty.h"
 #include "vtkSMRenderModuleProxy.h"
+#include "vtkPVGenericRenderWindowInteractor.h"
+#include "vtkRenderer.h"
+#include "vtkCommand.h"
+
+
+class vtkSMScalarBarWidgetProxyObserver : public vtkCommand
+{
+public:
+  static vtkSMScalarBarWidgetProxyObserver* New()
+    { return new vtkSMScalarBarWidgetProxyObserver; }
+  
+  void SetTarget(vtkSMScalarBarWidgetProxy* t)
+    {
+    this->Target = t;
+    }
+  virtual void Execute(vtkObject* o, unsigned long event, void *p)
+    {
+    if (this->Target)
+      {
+      this->Target->ExecuteEvent(o, event, p);
+      }
+    }
+protected:
+  vtkSMScalarBarWidgetProxyObserver() { this->Target = 0; }
+  vtkSMScalarBarWidgetProxy* Target;
+    
+};
+//----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkSMScalarBarWidgetProxy);
-vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6.2.1");
+vtkCxxRevisionMacro(vtkSMScalarBarWidgetProxy, "1.6.2.2");
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::vtkSMScalarBarWidgetProxy()
 {
-  this->Position1[0] = 0.87;
-  this->Position1[1] = 0.25;
-  this->Position2[0] = 0.13;
-  this->Position2[1] = 0.5;
-  this->Orientation = VTK_ORIENT_VERTICAL;
-  this->SetVTKClassName("vtkScalarBarWidget");
+  this->Observer = vtkSMScalarBarWidgetProxyObserver::New();
+  this->Observer->SetTarget(this);
+  this->ScalarBarActorProxy = 0;
+  this->ScalarBarWidget = vtkScalarBarWidget::New();
+  this->RenderModuleProxy = 0;
+  this->Visibility = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkSMScalarBarWidgetProxy::~vtkSMScalarBarWidgetProxy()
 {
+  this->Observer->SetTarget(0);
+  this->Observer->Delete();
+  this->ScalarBarActorProxy = 0;
+  this->ScalarBarWidget->Delete();
+  this->RenderModuleProxy = 0;
 }
 
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::AddToRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  this->SetCurrentRenderer(rm->GetRenderer2DProxy());
-  this->SetInteractor(rm->GetInteractorProxy());
-  this->SetCurrentRenderModuleProxy(rm);
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
+  if (!pp)
+    {
+    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
+    return;
+    }
+  pp->AddProxy(this->ScalarBarActorProxy);
+
+  this->RenderModuleProxy = rm;
+  this->SetVisibility(this->Visibility);
 }
 
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::RemoveFromRenderModule(vtkSMRenderModuleProxy* rm)
 {
-  if (this->CurrentRenderModuleProxy == rm )
+  vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(
+    rm->GetRenderer2DProxy()->GetProperty("ViewProps"));
+  if (!pp)
     {
-    this->SetCurrentRenderer(rm->GetRenderer2DProxy());
-    this->SetInteractor(rm->GetInteractorProxy());
-    this->SetCurrentRenderModuleProxy(0); 
+    vtkErrorMacro("Failed to find property ViewProps on vtkSMRenderModuleProxy.");
+    return;
     }
+  pp->RemoveProxy(this->ScalarBarActorProxy);
+  
+  if (this->ScalarBarWidget->GetEnabled())
+    {
+    this->ScalarBarWidget->SetEnabled(0);
+    }
+  this->ScalarBarWidget->SetInteractor(0);
+  this->ScalarBarWidget->SetCurrentRenderer(0);
+  this->RenderModuleProxy = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -71,537 +122,155 @@ void vtkSMScalarBarWidgetProxy::CreateVTKObjects(int numObjects)
     {
     return;
     }
+
+  this->ScalarBarActorProxy = this->GetSubProxy("ScalarBarActor");
+  if (!this->ScalarBarActorProxy)
+    {
+    vtkErrorMacro("Failed to find subproxy ScalarBarActor.");
+    return;
+    }
+
+  this->ScalarBarActorProxy->SetServers(
+    vtkProcessModule::CLIENT | vtkProcessModule::RENDER_SERVER);
+
   this->Superclass::CreateVTKObjects(numObjects);
-}
 
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetEnabled(int enable)
-{
-  if (enable && this->CurrentRenderModuleProxy)
-    {
-    this->SetCurrentRenderer(
-      this->CurrentRenderModuleProxy->GetRenderer2DProxy());
-    }
-  this->Superclass::SetEnabled(enable);
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::UpdateVTKObjects()
-{
+  // Set up the widget.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  vtkScalarBarActor* actor = vtkScalarBarActor::SafeDownCast(
+    pm->GetObjectFromID(this->ScalarBarActorProxy->GetID(0)));
 
-  this->Superclass::UpdateVTKObjects();
-  
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
+  if (!actor)
     {
-    // Set Position1 Coordinate
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetPositionCoordinate"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetValue" << this->Position1[0]
-      << this->Position1[1]
-      << vtkClientServerStream::End;
-
-    // Set Position2 Coordinate
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetPosition2Coordinate"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetValue" << this->Position2[0]
-      << this->Position2[1]
-      << vtkClientServerStream::End;
-
-    // Set Orientation
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetOrientation"
-      << this->Orientation
-      << vtkClientServerStream::End;
+    vtkErrorMacro("Failed to create client side ScalarBarActor.");
+    return;
     }
-
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers,str);
-    }
-  // Build the lookuptable
-  /*
-  vtkSMLookupTableProxy* lut = vtkSMLookupTableProxy::SafeDownCast(
-    this->GetSubProxy("LookupTable"));
-  if (lut)
-    {
-    lut->Build();
-    }
-  else
-    {
-    vtkErrorMacro("SubProxy LookupTable is must be defined in the configuration");
-    }*/
+  this->ScalarBarWidget->SetScalarBarActor(actor);
+  this->ScalarBarWidget->AddObserver(vtkCommand::InteractionEvent,
+    this->Observer);
+  this->ScalarBarWidget->AddObserver(vtkCommand::StartInteractionEvent,
+    this->Observer);
+  this->ScalarBarWidget->AddObserver(vtkCommand::EndInteractionEvent,
+    this->Observer);
 }
 
 //----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetLookupTable(vtkSMProxy *lut)
+void vtkSMScalarBarWidgetProxy::SetVisibility(int visible)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-
-  unsigned int cc;
-  unsigned int numObjects = this->GetNumberOfIDs();
-  if (!lut)
+  this->Visibility = visible;
+  if (!this->RenderModuleProxy)
     {
     return;
     }
-  for (cc=0; cc < numObjects; cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetLookupTable"
-      << lut->GetID(0)
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }
-}
 
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetTitle(const char* title)
-{
+  // Set widget interactor.
   vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
+  vtkRenderWindowInteractor* iren = vtkRenderWindowInteractor::SafeDownCast(
+    pm->GetObjectFromID(this->RenderModuleProxy->GetInteractorProxy()->GetID(0)));
+  if (!iren)
     {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetTitle"
-      << title
-      << vtkClientServerStream::End;
+    vtkErrorMacro("Failed to get client side Interactor.");
+    return;
     }
-  if (str.GetNumberOfMessages() > 0)
+  this->ScalarBarWidget->SetInteractor(iren);
+
+  vtkRenderer* ren = vtkRenderer::SafeDownCast(
+    pm->GetObjectFromID(this->RenderModuleProxy->GetRenderer2DProxy()->GetID(0)));
+  if (!ren)
     {
-    pm->SendStream(this->Servers, str);
+    vtkErrorMacro("Failed to get client side 2D renderer.");
+    return;
     }
+  this->ScalarBarWidget->SetCurrentRenderer(ren);
+  this->ScalarBarWidget->SetEnabled(visible);
+
+  vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+    this->ScalarBarActorProxy->GetProperty("Visibility"));
+  if (!ivp)
+    {
+    vtkErrorMacro("Failed to find property Visibility on XYPlotActorProxy.");
+    return;
+    }
+  ivp->SetElement(0, visible);
+  this->ScalarBarActorProxy->UpdateVTKObjects();
 }
 
 //----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetLabelFormat(const char* format)
+void vtkSMScalarBarWidgetProxy::ExecuteEvent(vtkObject*, 
+  unsigned long event, void*)
 {
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
+  vtkPVGenericRenderWindowInteractor* iren;
+  iren = vtkPVGenericRenderWindowInteractor::SafeDownCast(
+    this->ScalarBarWidget->GetInteractor());
+  switch (event)
     {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetLabelFormat"
-      << format
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }
-}
+  case vtkCommand::StartInteractionEvent:
+    // enable Interactive rendering.
+    iren->InteractiveRenderEnabledOn();
+    break;
+    
+  case vtkCommand::EndInteractionEvent:
+    // disable interactive rendering.
+    iren->InteractiveRenderEnabledOff();
+    break;
 
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetTitleFormatColor(double color[3])
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetTitleTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetColor"
-      << color[0] << color[1] << color[2]
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }
-}
+  case vtkCommand::InteractionEvent:
+    // Take the client position values and push on to the server.
+    vtkScalarBarActor* actor = this->ScalarBarWidget->GetScalarBarActor();
+    double *pos1 = actor->GetPositionCoordinate()->GetValue();
+    double *pos2 = actor->GetPosition2Coordinate()->GetValue();
+    int orientation = actor->GetOrientation();
+    vtkSMDoubleVectorProperty* dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->ScalarBarActorProxy->GetProperty("Position"));
+    if (dvp)
+      {
+      dvp->SetElement(0, pos1[0]);
+      dvp->SetElement(1, pos1[1]);
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property Position on ScalarBarActorProxy.");
+      }
 
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetLabelFormatColor(double color[3])
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetLabelTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetColor"
-      << color[0] << color[1] << color[2]
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }
-}
+    dvp = vtkSMDoubleVectorProperty::SafeDownCast(
+      this->ScalarBarActorProxy->GetProperty("Position2"));
+    if (dvp)
+      {
+      dvp->SetElement(0, pos2[0]);
+      dvp->SetElement(1, pos2[1]);
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property Position2 on ScalarBarActorProxy.");
+      }
 
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetTitleFormatOpacity(double opacity)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetTitleTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetOpacity"
-      << opacity
-      << vtkClientServerStream::End;
+    vtkSMIntVectorProperty* ivp = vtkSMIntVectorProperty::SafeDownCast(
+      this->ScalarBarActorProxy->GetProperty("Orientation"));
+    if (ivp)
+      {
+      ivp->SetElement(0, orientation);
+      }
+    else
+      {
+      vtkErrorMacro("Failed to find property Orientation on ScalarBarActorProxy.");
+      }
+    this->ScalarBarActorProxy->UpdateVTKObjects();
+    break;
     }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }
-}
+  this->InvokeEvent(event); // just in case the GUI wants to know about interaction.
 
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetLabelFormatOpacity(double opacity)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetLabelTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetOpacity"
-      << opacity
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetTitleFormatFont(int font)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetTitleTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetFontFamily"
-      << font 
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetLabelFormatFont(int font)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetLabelTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetFontFamily"
-      << font 
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetTitleFormatBold(int bold)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetTitleTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetBold"
-      << bold 
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetLabelFormatBold(int bold)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetLabelTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetBold"
-      << bold 
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetTitleFormatItalic(int italic)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetTitleTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetItalic"
-      << italic
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetLabelFormatItalic(int italic)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetLabelTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetItalic"
-      << italic
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetTitleFormatShadow(int shadow)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetTitleTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetShadow"
-      << shadow
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::SetLabelFormatShadow(int shadow)
-{
-  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
-  vtkClientServerStream str;
-  unsigned int cc;
-  for (cc=0; cc < this->GetNumberOfIDs(); cc++)
-    {
-    str << vtkClientServerStream::Invoke
-      << this->GetID(cc)
-      << "GetScalarBarActor"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "GetLabelTextProperty"
-      << vtkClientServerStream::End;
-    str << vtkClientServerStream::Invoke
-      << vtkClientServerStream::LastResult
-      << "SetShadow"
-      << shadow
-      << vtkClientServerStream::End;
-    }
-  if (str.GetNumberOfMessages() > 0)
-    {
-    pm->SendStream(this->Servers, str);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkSMScalarBarWidgetProxy::ExecuteEvent(vtkObject*obj, unsigned long event, void*p)
-{
-//  vtkWarningMacro("ExecuteEvent called with event :" << event);
-  vtkScalarBarWidget* widget = vtkScalarBarWidget::SafeDownCast(obj);
-  if (widget)
-    {
-    double position[3];
-    vtkScalarBarActor* actor = widget->GetScalarBarActor();
-    actor->GetPositionCoordinate()->GetValue(position);
-    this->SetPosition1(position[0],position[1]);
-    actor->GetPosition2Coordinate()->GetValue(position);
-    this->SetPosition2(position[0],position[1]);
-    this->Orientation = actor->GetOrientation();
-    }
-  else
-    {
-    vtkErrorMacro("Widget is not a ScalarBar");
-    }
-  this->Superclass::ExecuteEvent(obj,event,p);
 }
   
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::SaveInBatchScript(ofstream* file)
 {
   *file << endl;
+/*
   unsigned int cc;
   unsigned int numObjects = this->GetNumberOfIDs();
   vtkSMStringVectorProperty* svp;
   vtkSMIntVectorProperty* ivp;
   vtkSMDoubleVectorProperty* dvp;
-
   for (cc=0; cc< numObjects; cc++)
     {
     vtkClientServerID id = this->GetID(cc);
@@ -738,16 +407,13 @@ void vtkSMScalarBarWidgetProxy::SaveInBatchScript(ofstream* file)
     *file << "  $pvTemp" << id.ID << " UpdateVTKObjects" << endl;
     *file << endl;
     }
+*/
 }
 
 //----------------------------------------------------------------------------
 void vtkSMScalarBarWidgetProxy::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Visibility: " << this->Visibility << endl;
 
-  os << indent << "Position1: " 
-    << this->Position1[0] << ", " << this->Position1[1] << endl;
-  os << indent << "Position2: " 
-    << this->Position2[0] << ", " << this->Position2[1] << endl;
-  os << indent << "Orientation: " << this->Orientation << endl;
 }

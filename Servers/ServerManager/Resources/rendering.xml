@@ -1360,6 +1360,24 @@
   </ProxyGroup>
   
   <ProxyGroup name="displays">
+
+    <ScalarBarWidgetProxy name="ScalarBarWidget" class="vtkScalarBarWidget">
+      <IntVectorProperty
+        name="Visibility"
+        command="SetVisibility"
+        number_of_elements="1"
+        update_self="1"
+        default_values="0">
+        <BooleanDomain name="bool"/>
+      </IntVectorProperty>
+      <SubProxy>
+        <Proxy name="ScalarBarActor" 
+          proxygroup="annotations"
+          proxyname="ScalarBarActor">
+        </Proxy>
+      </SubProxy>
+    </ScalarBarWidgetProxy>
+
     <XYPlotDisplayProxy name="XYPlotDisplay">
       <InputProperty
         name="Input"
