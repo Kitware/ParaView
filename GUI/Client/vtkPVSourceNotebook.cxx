@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.11");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.12");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -458,7 +458,10 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToModified()
     {
     return;
     }
-  this->AcceptButtonRed = 1;
+  if( this->PVSource ) // only accept if there is a source
+    {
+    this->AcceptButtonRed = 1;
+    }
   if ( this->PVSource 
    && !this->PVSource->GetOverideAutoAccept())
     {
