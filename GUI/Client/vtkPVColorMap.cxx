@@ -63,7 +63,7 @@
 #include "vtkMath.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.108");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.109");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -952,7 +952,6 @@ void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->vtkKWObject::SetApplication(pvApp);
   
   vtkSMProxyManager* pxm = vtkSMObject::GetProxyManager();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   static int proxyNum = 0;
   // Create LookupTableProxy
   this->LookupTableProxy = vtkSMLookupTableProxy::SafeDownCast(
