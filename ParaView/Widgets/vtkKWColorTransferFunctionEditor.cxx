@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.4");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.5");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -148,7 +148,21 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointColor(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::GetFunctionPointAsCanvasCoordinates(
+int vtkKWColorTransferFunctionEditor::GetFunctionPointParameter(
+  int id, float &parameter)
+{
+  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
+    {
+    return 0;
+    }
+
+  parameter = this->ColorTransferFunction->GetDataPointer()[id * 4];
+  
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::GetFunctionPointCanvasCoordinates(
   int id, int &x, int &y)
 {
   if (!this->IsCreated() || 
@@ -174,7 +188,7 @@ int vtkKWColorTransferFunctionEditor::GetFunctionPointAsCanvasCoordinates(
 
 //----------------------------------------------------------------------------
 int vtkKWColorTransferFunctionEditor::AddFunctionPointAtCanvasCoordinates(
-  int x, int vtkNotUsed(y), int &new_id)
+  int x, int vtkNotUsed(y), int &id)
 {
   if (!this->IsCreated() || !this->HasFunction() || this->DisableAddAndRemove)
     {
@@ -191,16 +205,52 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   float rgb[3] = { 1.0, 1.0, 1.0 };
   this->ColorTransferFunction->GetColor(parameter, rgb);
 
-  new_id = this->ColorTransferFunction->AddRGBPoint(
+  // Add the point and redraw if a point was really added
+
+  int old_size = this->GetFunctionSize();
+
+  id = this->ColorTransferFunction->AddRGBPoint(
     parameter, rgb[0], rgb[1], rgb[2]);
 
-  this->RedrawCanvasElements();
+  if (old_size != this->GetFunctionSize())
+    {
+    this->RedrawCanvasElements();
+    }
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWColorTransferFunctionEditor::UpdateFunctionPointFromCanvasCoordinates(
+int vtkKWColorTransferFunctionEditor::AddFunctionPointAtParameter(
+  float parameter, int &id)
+{
+  if (!this->IsCreated() || !this->HasFunction() || this->DisableAddAndRemove)
+    {
+    return 0;
+    }
+
+  // Get the interpolated value
+
+  float rgb[3] = { 1.0, 1.0, 1.0 };
+  this->ColorTransferFunction->GetColor(parameter, rgb);
+
+  // Add the point and redraw if a point was really added
+
+  int old_size = this->GetFunctionSize();
+
+  id = this->ColorTransferFunction->AddRGBPoint(
+    parameter, rgb[0], rgb[1], rgb[2]);
+
+  if (old_size != this->GetFunctionSize())
+    {
+    this->RedrawCanvasElements();
+    }
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWColorTransferFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   int id, int x, int vtkNotUsed(y))
 {
   if (!this->IsCreated() || 
@@ -261,10 +311,17 @@ int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
     this->ClearSelection();
     }
 
+  // Remove the point and redraw if a point was really removed
+
+  int old_size = this->GetFunctionSize();
+
   this->ColorTransferFunction->RemovePoint(
     this->ColorTransferFunction->GetDataPointer()[id * 4]);
 
-  this->RedrawCanvasElements();
+  if (old_size != this->GetFunctionSize())
+    {
+    this->RedrawCanvasElements();
+    }
 
   return 1;
 }
@@ -460,7 +517,8 @@ void vtkKWColorTransferFunctionEditor::UpdateInfoLabelWithRange()
 //----------------------------------------------------------------------------
 void vtkKWColorTransferFunctionEditor::ColorSpaceToRGBCallback()
 {
-  if (this->ColorTransferFunction)
+  if (this->ColorTransferFunction &&
+      this->ColorTransferFunction->GetColorSpace() != VTK_CTF_RGB)
     {
     this->ColorTransferFunction->SetColorSpaceToRGB();
     this->Update();
@@ -471,7 +529,8 @@ void vtkKWColorTransferFunctionEditor::ColorSpaceToRGBCallback()
 //----------------------------------------------------------------------------
 void vtkKWColorTransferFunctionEditor::ColorSpaceToHSVCallback()
 {
-  if (this->ColorTransferFunction)
+  if (this->ColorTransferFunction &&
+      this->ColorTransferFunction->GetColorSpace() != VTK_CTF_HSV)
     {
     this->ColorTransferFunction->SetColorSpaceToHSV();
     this->Update();

@@ -80,15 +80,17 @@ protected:
 
   // Description:
   // Proxy to the function
-  virtual int HasFunction();
-  virtual int GetFunctionSize();
-  virtual unsigned long GetFunctionMTime();
-  virtual int GetFunctionPointColor(int id, float rgb[3]);
-  virtual int GetFunctionPointAsCanvasCoordinates(int id, int &x, int &y);
-  virtual int AddFunctionPointAtCanvasCoordinates(int x, int y, int &new_id);
-  virtual int UpdateFunctionPointFromCanvasCoordinates(int id, int x, int y);
-  virtual int RemoveFunctionPoint(int id);
+  virtual int  HasFunction();
+  virtual int  GetFunctionSize();
+  virtual int  GetFunctionPointColor(int id, float rgb[3]);
+  virtual int  GetFunctionPointParameter(int id, float &parameter);
+  virtual int  GetFunctionPointCanvasCoordinates(int id, int &x, int &y);
+  virtual int  AddFunctionPointAtCanvasCoordinates(int x, int y, int &id);
+  virtual int  AddFunctionPointAtParameter(float parameter, int &id);
+  virtual int  MoveFunctionPointToCanvasCoordinates(int id,int x,int y);
+  virtual int  RemoveFunctionPoint(int id);
   virtual void UpdateInfoLabelWithFunctionPoint(int id);
+  virtual unsigned long GetFunctionMTime();
 
 private:
   vtkKWPiecewiseFunctionEditor(const vtkKWPiecewiseFunctionEditor&); // Not implemented
