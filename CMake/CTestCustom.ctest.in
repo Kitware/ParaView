@@ -6,21 +6,22 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   Example-vtkMy
 
   # These tests do not actually run any VTK code
+  HeaderTesting-PVGUI-Client
   PrintSelf-KWWidgets	
-  PrintSelf-ParaView
+  PrintSelf-PVGUI-Client
   PrintSelf-PVServer-Common
   PrintSelf-PVServer-Filters
   PrintSelf-PVServer-ServerManager
   PrintSelf-PVServer-StreamInterpreter
-  PrintSelf-PVGUI-Client
+  PrintSelf-ParaView
+  TestSetGet-ParaView
   TestSetObjectMacro-KWWidgets
-  TestSetObjectMacro-ParaView
+  TestSetObjectMacro-PVGUI-Client
   TestSetObjectMacro-PVServer-Common
   TestSetObjectMacro-PVServer-Filters
   TestSetObjectMacro-PVServer-ServerManager
   TestSetObjectMacro-PVServer-StreamInterpreter
-  TestSetGet-ParaView
-  HeaderTesting-PVGUI-Client
+  TestSetObjectMacro-ParaView
   
   # this one runs python which then runs two program so no memory checking there
   Sockets-image
