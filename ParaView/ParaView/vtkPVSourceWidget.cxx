@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVApplication.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -55,15 +55,6 @@ vtkPVSourceWidget::vtkPVSourceWidget()
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::~vtkPVSourceWidget()
 {
-  if (this->SourceTclName)
-    {
-    vtkPVApplication* pvApp = 
-      vtkPVApplication::SafeDownCast(this->Application);
-    if (pvApp)
-      {
-      pvApp->BroadcastScript("%s Delete", this->SourceTclName);
-      }
-    }
 
   if (this->OutputTclName)
     {
@@ -72,6 +63,16 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
     if (pvApp)
       {
       pvApp->BroadcastScript("%s Delete", this->OutputTclName);
+      }
+    }
+
+  if (this->SourceTclName)
+    {
+    vtkPVApplication* pvApp = 
+      vtkPVApplication::SafeDownCast(this->Application);
+    if (pvApp)
+      {
+      pvApp->BroadcastScript("%s Delete", this->SourceTclName);
       }
     }
 
