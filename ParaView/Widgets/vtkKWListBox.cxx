@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.24");
+vtkCxxRevisionMacro(vtkKWListBox, "1.25");
 
 
 //----------------------------------------------------------------------------
@@ -68,7 +68,10 @@ int vtkKWListBox::GetNumberOfItems()
 //----------------------------------------------------------------------------
 void vtkKWListBox::DeleteRange(int start, int end)
 {
+  int enabled = this->Enabled;
+  this->SetEnabled(1);
   this->Script("%s delete %d %d", this->Listbox->GetWidgetName(), start, end);
+  this->SetEnabled(enabled);
 }
 
 //----------------------------------------------------------------------------
@@ -315,7 +318,7 @@ void vtkKWListBox::SetHeight(int h)
 void vtkKWListBox::DeleteAll()
 {
   int n =  this->GetNumberOfItems();
-  this->DeleteRange(0, n);
+  this->DeleteRange(0, n-1);
 }
 
 //----------------------------------------------------------------------------
