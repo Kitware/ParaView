@@ -101,7 +101,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.242");
+vtkCxxRevisionMacro(vtkPVApplication, "1.243");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -250,9 +250,9 @@ public:
   
   void SetWindowCollection(vtkKWWindowCollection *windows)
   {
-    vtkKWWindowCollection* win = this->Windows;
+    vtkKWWindowCollection* wins = this->Windows;
     this->Windows = windows;
-    if ( !win && this->Windows )
+    if ( !wins && this->Windows )
       {
       ostrstream str;
       unsigned int cc;
