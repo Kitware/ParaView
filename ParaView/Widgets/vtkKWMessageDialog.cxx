@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.54");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.55");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -157,7 +157,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
     }
   else
     {
-    pack_opt << "-side left -expand yes -padx 1" << ends;
+    pack_opt << "-side left -expand yes -padx 2" << ends;
     }
 
   if (nb_buttons >= 1)
