@@ -67,7 +67,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.155");
+vtkCxxRevisionMacro(vtkKWApplication, "1.156");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1607,7 +1607,11 @@ int vtkKWApplication::CheckForValuedArgument(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::GetCheckForUpdatesPath(ostream &path)
+int vtkKWApplication::GetCheckForUpdatesPath(ostream &
+#ifdef _WIN32
+                                             path
+#endif
+  )
 {
 #ifdef _WIN32
   this->FindApplicationInstallationDirectory();
@@ -1624,9 +1628,6 @@ int vtkKWApplication::GetCheckForUpdatesPath(ostream &path)
     return res;
     }
 #endif
-
-  // To remove compiler warning on unused variable
-  (void)path;
 
   return 0;
 }
@@ -1664,7 +1665,11 @@ void vtkKWApplication::CheckForUpdates()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWApplication::GetSystemVersion(ostream &os)
+int vtkKWApplication::GetSystemVersion(ostream &
+#ifdef _WIN32
+                                       os
+#endif
+  )
 {
 #ifdef _WIN32
   OSVERSIONINFOEX osvi;
@@ -1906,9 +1911,6 @@ int vtkKWApplication::GetSystemVersion(ostream &os)
       break;
     }
 #endif
-
-  // Here to suppress compiler warning on unused variable
-  (void)os;
 
   return 1;
 }
