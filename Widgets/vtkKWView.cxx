@@ -260,20 +260,24 @@ void vtkKWView::CreateViewProperties()
   this->HeaderEntryFrame->Create(app,"frame","");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->HeaderFrame->GetWidgetName());
-    this->Script("pack %s %s -side top -padx 2 -pady 4 -expand 1 -fill x -anchor nw",
+  this->Script("pack %s %s -side top -padx 2 -pady 4 -expand 1 -fill x -anchor nw",
                this->HeaderDisplayFrame->GetWidgetName(),
                this->HeaderEntryFrame->GetWidgetName());
 
   this->HeaderButton->Create(this->Application,
                              "-text {Display Header Annotation}");
+  this->HeaderButton->SetBalloonHelpString("Toggle the visibility of header");
   this->HeaderButton->SetCommand(this, "OnDisplayHeader");
   this->HeaderColor->Create(this->Application, "");
   this->HeaderColor->SetCommand( this, "SetHeaderTextColor" );
+  this->HeaderColor->SetBalloonHelpJustificationToRight();
+  this->HeaderColor->SetBalloonHelpString("Change the color the the header text");
   this->Script("pack %s -side left -padx 2 -pady 4 -anchor nw",
                this->HeaderButton->GetWidgetName());
   this->Script("pack %s -side right -padx 2 -pady 4 -anchor ne",
                this->HeaderColor->GetWidgetName());
   this->HeaderLabel->Create(app,"label","-text Header:");
+  this->HeaderLabel->SetBalloonHelpString("Set the text for the header");
   this->HeaderEntry->Create(app,"-width 20");
   this->Script("bind %s <Return> {%s HeaderChanged}",
                this->HeaderEntry->GetWidgetName(),this->GetTclName());
@@ -953,5 +957,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.15 $");
+  this->ExtractRevision(os,"$Revision: 1.16 $");
 }
