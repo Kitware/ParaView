@@ -20,7 +20,7 @@
 #include "vtkKWMaterialPropertyWidget.h"
 
 class vtkKWApplication;
-class vtkKWLabeledCheckButton;
+class vtkKWCheckButtonLabeled;
 class vtkKWScalarComponentSelectionWidget;
 class vtkVolumeProperty;
 
@@ -92,7 +92,7 @@ protected:
   // UI
 
   vtkKWScalarComponentSelectionWidget *ComponentSelectionWidget;
-  vtkKWLabeledCheckButton             *EnableShadingCheckButton;
+  vtkKWCheckButtonLabeled             *EnableShadingCheckButton;
 
   // Pack
   virtual void Pack();

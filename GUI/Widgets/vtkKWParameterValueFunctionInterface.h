@@ -45,12 +45,12 @@
 #ifndef __vtkKWParameterValueFunctionInterface_h
 #define __vtkKWParameterValueFunctionInterface_h
 
-#include "vtkKWLabeledWidget.h"
+#include "vtkKWWidgetLabeled.h"
 
-class VTK_EXPORT vtkKWParameterValueFunctionInterface : public vtkKWLabeledWidget
+class VTK_EXPORT vtkKWParameterValueFunctionInterface : public vtkKWWidgetLabeled
 {
 public:
-  vtkTypeRevisionMacro(vtkKWParameterValueFunctionInterface,vtkKWLabeledWidget);
+  vtkTypeRevisionMacro(vtkKWParameterValueFunctionInterface,vtkKWWidgetLabeled);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -27,7 +27,7 @@
 #define VTK_KW_CTFE_COLOR_RAMP_TAG "color_ramp_tag"
 
 class vtkColorTransferFunction;
-class vtkKWLabeledEntry;
+class vtkKWEntryLabeled;
 class vtkKWOptionMenu;
 
 class VTK_EXPORT vtkKWColorTransferFunctionEditor : public vtkKWParameterValueFunctionEditor
@@ -79,8 +79,8 @@ public:
   //BTX
   enum
   {
-    ColorRampPositionAtDefault = 10,
-    ColorRampPositionAtCanvas
+    ColorRampPositionDefault = 10,
+    ColorRampPositionCanvas
   };
   //ETX
   virtual void SetColorRampPosition(int);
@@ -189,7 +189,7 @@ protected:
   // GUI
 
   vtkKWOptionMenu   *ColorSpaceOptionMenu;
-  vtkKWLabeledEntry *ValueEntries[3];
+  vtkKWEntryLabeled *ValueEntries[3];
   vtkKWLabel        *ColorRamp;
 
   // Description:

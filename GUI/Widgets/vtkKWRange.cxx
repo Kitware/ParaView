@@ -20,12 +20,11 @@
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
-#include "vtkKWPushButtonSet.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.39");
+vtkCxxRevisionMacro(vtkKWRange, "1.40");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -71,13 +70,11 @@ vtkKWRange::vtkKWRange()
   this->Inverted              = 0;
   this->SliderSize            = 3;
   this->ShowEntries           = 0;
-  this->LabelPosition         = vtkKWRange::POSITION_SIDE1;
-  this->EntriesPosition       = vtkKWRange::POSITION_SIDE1;
-  this->ZoomButtonsPosition   = vtkKWRange::POSITION_SIDE1;
+  this->Entry1Position        = vtkKWRange::EntryPositionDefault;
+  this->Entry2Position        = vtkKWRange::EntryPositionDefault;
   this->EntriesWidth          = 10;
   this->SliderCanPush         = 0;
   this->DisableCommands       = 0;
-  this->ShowZoomButtons       = 0;
 
   this->InInteraction            = 0;
   this->StartInteractionPos      = 0;
@@ -104,8 +101,6 @@ vtkKWRange::vtkKWRange()
     {
     this->Entries[i]        = NULL;
     }
-
-  this->ZoomButtons         = NULL;
 
   this->ClampRange = 1;
 
@@ -162,12 +157,6 @@ vtkKWRange::~vtkKWRange()
       this->Entries[i] = NULL;
       }
     }
-
-  if (this->ZoomButtons)
-    {
-    this->ZoomButtons->Delete();
-    this->ZoomButtons = NULL;
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -212,11 +201,6 @@ void vtkKWRange::Create(vtkKWApplication *app, const char *args)
     this->CreateEntries();
     }
 
-  if (this->ShowZoomButtons)
-    {
-    this->CreateZoomButtons();
-    }
-
   // Pack the widget
 
   this->Pack();
@@ -257,46 +241,6 @@ void vtkKWRange::CreateEntries()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWRange::CreateZoomButtons()
-{
-  if (!this->ZoomButtons)
-    {
-    this->ZoomButtons = vtkKWPushButtonSet::New();
-    }
-
-  if (!this->ZoomButtons->IsCreated() && this->IsCreated())
-    {
-    this->ZoomButtons->SetParent(this);
-    this->ZoomButtons->Create(this->GetApplication(), "");
-
-    vtkKWPushButton *button;
-
-    this->ZoomButtons->AddButton(
-      0, "+", this, "EnlargeRangeCallback",
-      "Enlarge the range");
-
-    button = this->ZoomButtons->GetButton(0);
-    if (button)
-      {
-      button->SetImageOption(vtkKWIcon::ICON_PLUS);
-      }
-
-    this->ZoomButtons->AddButton(
-      1, "-", this, "ShrinkRangeCallback",
-      "Shrink the range");
-
-    button = this->ZoomButtons->GetButton(1);
-    if (button)
-      {
-      button->SetImageOption(vtkKWIcon::ICON_MINUS);
-      }
-
-    this->ZoomButtons->SetBorderWidth(0);
-    this->ZoomButtons->SetPadding(0, 0);
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkKWRange::Pack()
 {
   if (!this->IsCreated())
@@ -306,113 +250,218 @@ void vtkKWRange::Pack()
 
   // Unpack everything
 
-  this->CanvasFrame->UnpackSiblings();
+  if (this->CanvasFrame)
+    {
+    this->CanvasFrame->UnpackSiblings();
+    }
 
   // Repack everything
 
   ostrstream tk_cmd;
   int is_horiz = (this->Orientation == vtkKWRange::ORIENTATION_HORIZONTAL);
 
-  tk_cmd << "pack " << this->Canvas->GetWidgetName() 
-         << " -fill both -expand y -pady 0 -padx 0 -ipady 0 -ipadx 0" << endl;
+  int row, col, row_span, col_span, c_padx = 0, c_pady = 0;
+  const char *anchor, *sticky;
 
   /*
-     ALIGNED: L [--------------]            E1 [--------------] E2
-
-                       L                       E1            E2
-     SIDE1:     [--------------]               [--------------]
-
-     SIDE2:     [--------------]               [--------------]
-                       L                       E1            E2
-
-             0 1  2      3      4  5 6  7
-         +-------------------------------
-        0|        E0     L      Z E1 
-        1|   L E0 [----------------] E1 Z
-        2|        E0     L      Z E1
+           0 1  2  3    4    5 6 7  8        0   1  2
+         +---------------------------      +---------
+        0|         E1   L   E2            0|     L 
+        1| L E1 E2 [---------] L E1 E2    1|     E1
+        2|         E1   L   E2            2|     E2
+                                          3| E1  ^  E1
+                                           |     |
+                                          4| L   |  L
+                                           |     |
+                                          5| E2  v  E2
+                                          6|     L
+                                          7|     E1
+                                          8|     E2
   */
 
-  // We need a 6x3 grid
+  // Canvas
 
-  char o_row[15], o_col[15], o_span[15], colconfig[20], stickydir[15];
-
-  sprintf(o_row, " %s ", is_horiz ? "-row" : "-column");
-  sprintf(o_col, " %s ", is_horiz ? "-column" : "-row");
-  sprintf(o_span, " %s ", is_horiz ? "-columnspan" : "-rowspan");
-  sprintf(colconfig, " %s ", is_horiz ? "columnconfigure" : "rowconfigure");
-  sprintf(stickydir, " -sticky %s ", is_horiz ? "ew" : "ns");
-
-  int row, col;
+  if (this->Canvas && this->Canvas->IsCreated())
+    {
+    tk_cmd << "pack " << this->Canvas->GetWidgetName() 
+           << " -fill both -expand y -pady 0 -padx 0 -ipady 0 -ipadx 0" 
+           << endl;
+    }
 
   // Label
 
   if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
     {
-    row = this->LabelPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 
-      (this->LabelPosition == vtkKWRange::POSITION_SIDE1 ? 0 : 2);
-    col = this->LabelPosition == vtkKWRange::POSITION_ALIGNED ? 0 : 3;
+    if (is_horiz)
+      {
+      switch (this->LabelPosition)
+        {
+        case vtkKWWidgetLabeled::LabelPositionLeft:
+          col = 0; row = 1; sticky = "nsw"; anchor = "w";
+          break;
+        case vtkKWWidgetLabeled::LabelPositionRight:
+          col = 6; row = 1; sticky = "nsw"; anchor = "w";
+          break;
+        case vtkKWWidgetLabeled::LabelPositionBottom:
+          col = 4; row = 2; sticky = "ew"; anchor = "c";
+          break;
+        case vtkKWWidgetLabeled::LabelPositionDefault:
+        case vtkKWWidgetLabeled::LabelPositionTop:
+        default:
+          col = 4; row = 0; sticky = "ew"; anchor = "c";
+          break;
+        }
+      } else {
+      switch (this->LabelPosition)
+        {
+        case vtkKWWidgetLabeled::LabelPositionDefault:
+        case vtkKWWidgetLabeled::LabelPositionLeft:
+        default:
+          col = 0; row = 4; sticky = "nsw"; anchor = "w";
+          break;
+        case vtkKWWidgetLabeled::LabelPositionRight:
+          col = 2; row = 4; sticky = "nsw"; anchor = "w";
+          break;
+        case vtkKWWidgetLabeled::LabelPositionBottom:
+          col = 1; row = 6; sticky = "ew"; anchor = "w";
+          break;
+        case vtkKWWidgetLabeled::LabelPositionTop:
+          col = 1; row = 0; sticky = "ew"; anchor = "w";
+          break;
+        }
+      }
     tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
-           << o_row << row << o_col << col
-           << (this->LabelPosition != vtkKWRange::POSITION_ALIGNED ? 
-               stickydir : (is_horiz ? " -sticky w" : " -sticky n")) << endl;
-    tk_cmd << this->GetLabel()->GetWidgetName() << " config -anchor "
-           << (this->LabelPosition != vtkKWRange::POSITION_ALIGNED ? "c" : 
-               (is_horiz ? "w" : "c")) << endl;
+           << " -row " << row << " -column " << col 
+           << " -sticky " << sticky << endl;
+    tk_cmd << this->GetLabel()->GetWidgetName() 
+           << " config -anchor " << anchor << endl;
     }
 
   // Entries
 
   if (this->ShowEntries)
     {
-    row = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 
-      (this->EntriesPosition == vtkKWRange::POSITION_SIDE1 ? 0 : 2);
-    int col0 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 2;
-    int col1 = this->EntriesPosition == vtkKWRange::POSITION_ALIGNED ? 6 : 5;
-    tk_cmd << "grid " << this->Entries[this->Inverted ? 1 : 0]->GetWidgetName()
-           << o_row << row << o_col << col0
-           << " -sticky " << (is_horiz ? "w" : "n") << endl;
-    tk_cmd << "grid " << this->Entries[this->Inverted ? 0 : 1]->GetWidgetName()
-           << o_row << row << o_col << col1
-           << " -sticky " << (is_horiz ? "e" : "s") << endl;
+    vtkKWEntry *entry = this->Entries[this->Inverted ? 1 : 0];
+    if (entry && entry->IsCreated())
+      {
+      if (is_horiz)
+        {
+        switch (this->Entry1Position)
+          {
+          case vtkKWRange::EntryPositionLeft:
+            col = 1; row = 1; sticky = "nsw"; c_padx = 1;
+            break;
+          case vtkKWRange::EntryPositionRight:
+            col = 7; row = 1; sticky = "nsw"; c_padx = 1;
+            break;
+          case vtkKWRange::EntryPositionBottom:
+            col = 3; row = 2; sticky = "w"; c_pady = 1;
+            break;
+          case vtkKWRange::EntryPositionDefault:
+          case vtkKWRange::EntryPositionTop:
+          default:
+            col = 3; row = 0; sticky = "w"; c_pady = 1;
+            break;
+          }
+        } else {
+        switch (this->Entry1Position)
+          {
+          case vtkKWRange::EntryPositionDefault:
+          case vtkKWRange::EntryPositionLeft:
+          default:
+            col = 0; row = 3; sticky = "nw"; c_padx = 1;
+            break;
+          case vtkKWRange::EntryPositionRight:
+            col = 2; row = 3; sticky = "nw"; c_padx = 1;
+            break;
+          case vtkKWRange::EntryPositionBottom:
+            col = 1; row = 7; sticky = "w"; c_pady = 1;
+            break;
+          case vtkKWRange::EntryPositionTop:
+            col = 1; row = 1; sticky = "w"; c_pady = 1;
+            break;
+          }
+        }
+      tk_cmd << "grid " << entry->GetWidgetName()
+             << " -row " << row << " -column " << col 
+             << " -sticky " << sticky << endl;
+      }
+
+    entry = this->Entries[this->Inverted ? 0 : 1];
+    if (entry && entry->IsCreated())
+      {
+
+      if (is_horiz)
+        {
+        switch (this->Entry2Position)
+          {
+          case vtkKWRange::EntryPositionLeft:
+            col = 2; row = 1; sticky = "nsw"; c_padx = 1;
+            break;
+          case vtkKWRange::EntryPositionRight:
+            col = 8; row = 1; sticky = "nsw"; c_padx = 1;
+            break;
+          case vtkKWRange::EntryPositionBottom:
+            col = 5; row = 2; sticky = "e"; c_pady = 1;
+            break;
+          case vtkKWRange::EntryPositionDefault:
+          case vtkKWRange::EntryPositionTop:
+          default:
+            col = 5; row = 0; sticky = "e"; c_pady = 1;
+            break;
+          }
+        } else {
+        switch (this->Entry2Position)
+          {
+          case vtkKWRange::EntryPositionDefault:
+          case vtkKWRange::EntryPositionLeft:
+          default:
+            col = 0; row = 5; sticky = "nw"; c_padx = 1;
+            break;
+          case vtkKWRange::EntryPositionRight:
+            col = 2; row = 5; sticky = "nw"; c_padx = 1;
+            break;
+          case vtkKWRange::EntryPositionBottom:
+            col = 1; row = 8; sticky = "w"; c_pady = 1;
+            break;
+          case vtkKWRange::EntryPositionTop:
+            col = 1; row = 2; sticky = "w"; c_pady = 1;
+            break;
+          }
+        }
+      tk_cmd << "grid " << entry->GetWidgetName()
+             << " -row " << row << " -column " << col 
+             << " -sticky " << sticky << endl;
+      }
     }
 
   // Canvas
 
-  tk_cmd << "grid " << this->CanvasFrame->GetWidgetName() 
-         << o_row << 1 << o_col << 2 << stickydir << o_span << 4;
-  if (this->ShowEntries)
+  if (this->CanvasFrame && this->CanvasFrame->IsCreated())
     {
-    if (this->EntriesPosition == vtkKWRange::POSITION_ALIGNED)
-      {
-      tk_cmd << (is_horiz ? " -padx " : " -pady ") << 2;
+    if (is_horiz) 
+      { 
+      col = 3; row = 1; col_span = 3; row_span = 1; sticky = "ew";
       }
-    else
-      {
-      tk_cmd << (is_horiz ? " -pady " : " -padx ") << 2;
+    else 
+      { 
+      col = 1; row = 3; col_span = 1; row_span = 3; sticky = "ns";
       }
-    }
-  tk_cmd << endl;
+    tk_cmd << "grid " << this->CanvasFrame->GetWidgetName()
+           << " -row " << row << " -column " << col 
+           << " -rowspan " << row_span << " -columnspan " << col_span
+           << " -sticky " << sticky 
+           << " -padx " << c_padx * 2 << " -pady " << c_pady * 2
+           << endl;
 
-  // Zoom buttons
+    // Make sure it will resize properly
 
-  if (this->ShowZoomButtons)
-    {
-    this->ZoomButtons->SetPackHorizontally(is_horiz ? 1 : 0);
-    row = this->ZoomButtonsPosition == vtkKWRange::POSITION_ALIGNED ? 1 : 
-      (this->ZoomButtonsPosition == vtkKWRange::POSITION_SIDE1 ? 0 : 2);
-    col = this->ZoomButtonsPosition == vtkKWRange::POSITION_ALIGNED ? 7 : 4;
-    tk_cmd << "grid " << this->ZoomButtons->GetWidgetName() 
-           << o_row << row << o_col << col
-           << " -sticky " << (is_horiz ? "e" : "s") << endl;
-    }
-
-  // Make sure it will resize properly
-
-  for (int i = 2; i <= 5; i++)
-    {
-    tk_cmd << "grid " << colconfig
-           << this->CanvasFrame->GetParent()->GetWidgetName() << " " << i
-           << " -weight 1" << endl;
+    for (int i = 3; i <= 5; i++)
+      {
+      tk_cmd << "grid " << (is_horiz ? "columnconfigure" : "rowconfigure")
+             << " " << this->CanvasFrame->GetParent()->GetWidgetName() 
+             << " " << i << " -weight 1" << endl;
+      }
     }
 
   tk_cmd << ends;
@@ -893,57 +942,48 @@ void vtkKWRange::SetShowEntries(int _arg)
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWRange::SetShowZoomButtons(int _arg)
+void vtkKWRange::SetEntry1Position(int arg)
 {
-  if (this->ShowZoomButtons == _arg)
+  if (arg < vtkKWRange::EntryPositionDefault)
+    {
+    arg = vtkKWRange::EntryPositionDefault;
+    }
+  else if (arg > vtkKWRange::EntryPositionRight)
+    {
+    arg = vtkKWRange::EntryPositionRight;
+    }
+
+  if (this->Entry1Position == arg)
     {
     return;
     }
-  this->ShowZoomButtons = _arg;
-  this->Modified();
 
-  if (this->ShowZoomButtons)
-    {
-    this->CreateZoomButtons();
-    }
+  this->Entry1Position = arg;
 
-  this->Pack();
-}
-
-// ----------------------------------------------------------------------------
-void vtkKWRange::SetLabelPosition(int _arg)
-{
-  if (this->LabelPosition == _arg)
-    {
-    return;
-    }
-  this->LabelPosition = _arg;
   this->Modified();
 
   this->Pack();
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWRange::SetEntriesPosition(int _arg)
+void vtkKWRange::SetEntry2Position(int arg)
 {
-  if (this->EntriesPosition == _arg)
+  if (arg < vtkKWRange::EntryPositionDefault)
+    {
+    arg = vtkKWRange::EntryPositionDefault;
+    }
+  else if (arg > vtkKWRange::EntryPositionRight)
+    {
+    arg = vtkKWRange::EntryPositionRight;
+    }
+
+  if (this->Entry2Position == arg)
     {
     return;
     }
-  this->EntriesPosition = _arg;
-  this->Modified();
 
-  this->Pack();
-}
+  this->Entry2Position = arg;
 
-// ----------------------------------------------------------------------------
-void vtkKWRange::SetZoomButtonsPosition(int _arg)
-{
-  if (this->ZoomButtonsPosition == _arg)
-    {
-    return;
-    }
-  this->ZoomButtonsPosition = _arg;
   this->Modified();
 
   this->Pack();
@@ -1287,11 +1327,6 @@ void vtkKWRange::UpdateEnableState()
       {
       this->Entries[i]->SetEnabled(this->Enabled);
       }
-    }
-
-  if (this->ZoomButtons)
-    {
-    this->ZoomButtons->SetEnabled(this->Enabled);
     }
 
   if (this->Enabled)
@@ -2237,11 +2272,8 @@ void vtkKWRange::PrintSelf(ostream& os, vtkIndent indent)
      << this->RangeInteractionColor[2] << ")" << endl;
   os << indent << "ShowEntries: " 
      << (this->ShowEntries ? "On" : "Off") << endl;
-  os << indent << "ShowZoomButtons: " 
-     << (this->ShowZoomButtons ? "On" : "Off") << endl;
-  os << indent << "LabelPosition: " << this->LabelPosition << endl;
-  os << indent << "EntriesPosition: " << this->EntriesPosition << endl;
-  os << indent << "ZoomButtonsPosition: " << this->ZoomButtonsPosition << endl;
+  os << indent << "Entry1Position: " << this->Entry1Position << endl;
+  os << indent << "Entry2Position: " << this->Entry2Position << endl;
   os << indent << "EntriesWidth: " << this->EntriesWidth << endl;
   os << indent << "SliderCanPush: "
      << (this->SliderCanPush ? "On" : "Off") << endl;

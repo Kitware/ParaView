@@ -22,10 +22,10 @@
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
-class vtkKWLabeledLabel;
-class vtkKWLabeledPushButtonSet;
-class vtkKWLabeledPopupButton;
+class vtkKWFrameLabeled;
+class vtkKWLabelLabeled;
+class vtkKWPushButtonSetLabeled;
+class vtkKWPopupButtonLabeled;
 class vtkKWPushButton;
 class vtkKWScale;
 
@@ -47,7 +47,7 @@ public:
   vtkSetMacro(PopupMode, int);
   vtkGetMacro(PopupMode, int);
   vtkBooleanMacro(PopupMode, int);
-  vtkGetObjectMacro(PopupButton, vtkKWLabeledPopupButton);
+  vtkGetObjectMacro(PopupButton, vtkKWPopupButtonLabeled);
   
   // Description:
   // Create the widget.
@@ -165,16 +165,16 @@ protected:
 
   // UI
 
-  vtkKWLabeledPopupButton   *PopupButton;
-  vtkKWLabeledFrame         *MaterialPropertiesFrame;
+  vtkKWPopupButtonLabeled   *PopupButton;
+  vtkKWFrameLabeled         *MaterialPropertiesFrame;
   vtkKWFrame                *LightingFrame;
   vtkKWScale                *AmbientScale;
   vtkKWScale                *DiffuseScale;
   vtkKWScale                *SpecularScale;
   vtkKWScale                *SpecularPowerScale;
   vtkKWFrame                *PresetsFrame;
-  vtkKWLabeledLabel         *PreviewLabel;
-  vtkKWLabeledPushButtonSet *PresetPushButtonSet;
+  vtkKWLabelLabeled         *PreviewLabel;
+  vtkKWPushButtonSetLabeled *PresetPushButtonSet;
 
   // Create a preview image given material properties
   virtual void CreateImage(unsigned char *data, 

@@ -14,19 +14,26 @@
 // .NAME vtkKWChangeColorButton - a button for selecting colors
 // .SECTION Description
 // A button that can be pressed to select a color.
+// Note: As a subclass of vtkKWWidgetLabeled, it inherits a label and methods
+// to set its position and visibility. Note that the default label position 
+// implemented in this class is on the left of the color label. Only a subset
+// of the specific positions listed in vtkKWWidgetLabeled is supported: on 
+// Left, and on Right of the color label. 
+// .SECTION See Also
+// vtkKWWidgetLabeled
 
 #ifndef __vtkKWChangeColorButton_h
 #define __vtkKWChangeColorButton_h
 
-#include "vtkKWLabeledWidget.h"
+#include "vtkKWWidgetLabeled.h"
 
 class vtkKWFrame;
 
-class VTK_EXPORT vtkKWChangeColorButton : public vtkKWLabeledWidget
+class VTK_EXPORT vtkKWChangeColorButton : public vtkKWWidgetLabeled
 {
 public:
   static vtkKWChangeColorButton* New();
-  vtkTypeRevisionMacro(vtkKWChangeColorButton,vtkKWLabeledWidget);
+  vtkTypeRevisionMacro(vtkKWChangeColorButton,vtkKWWidgetLabeled);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -39,11 +46,6 @@ public:
   void SetColor(double r, double g, double b);
   virtual double *GetColor() {return this->Color;};
 
-  // Description:
-  // Set the label to be used on the button.
-  vtkSetStringMacro(Text);
-  vtkGetStringMacro(Text);
- 
   // Description:
   // Set the text that will be used on the title of the color selection dialog.
   vtkSetStringMacro(DialogText);
@@ -69,15 +71,8 @@ public:
   virtual void SetBalloonHelpJustification(int j);
 
   // Description:
-  // Set the label to be placed after the color button. Default is before.
-  virtual void SetLabelAfterColor(int);
-  vtkGetMacro(LabelAfterColor, int);
-  vtkBooleanMacro(LabelAfterColor, int);
-
-  // Description:
-  // Set the label to be outside the color button. Default is inside. This option
-  // has to be set before Create() is called.
-  vtkSetMacro(LabelOutsideButton, int);
+  // Set the label to be outside the color button. Default is inside.
+  virtual void SetLabelOutsideButton(int);
   vtkGetMacro(LabelOutsideButton, int);
   vtkBooleanMacro(LabelOutsideButton, int);
 
@@ -87,8 +82,8 @@ public:
 
   // Description:
   // Callbacks (handle button press and release events, etc.)
-  void ButtonPressCallback(int x, int y);
-  void ButtonReleaseCallback(int x, int y);
+  void ButtonPressCallback();
+  void ButtonReleaseCallback();
   
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -104,13 +99,11 @@ protected:
   ~vtkKWChangeColorButton();
 
   vtkKWLabel  *ColorButton;
-  vtkKWFrame  *MainFrame;
+  vtkKWFrame  *ButtonFrame;
 
   char        *Command;
-  char        *Text;
   char        *DialogText;
   double      Color[3];
-  int         LabelAfterColor;
   int         LabelOutsideButton;
 
   void Bind();
@@ -121,10 +114,16 @@ protected:
 
   virtual void Pack();
 
-  virtual void CreateLabel(vtkKWApplication *app);
-
   int ButtonDown;
   
+  // Description:
+  // Create the label (override the superclass)
+  virtual void CreateLabel(vtkKWApplication *app, const char *args = 0);
+
+  // Description:
+  // Create the button frame
+  virtual void CreateButtonFrame(vtkKWApplication *app, const char *args = 0);
+
 private:
   vtkKWChangeColorButton(const vtkKWChangeColorButton&); // Not implemented
   void operator=(const vtkKWChangeColorButton&); // Not implemented

@@ -30,7 +30,7 @@
 
 class vtkKWApplication;
 class vtkKWFrame;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWCheckButton;
 class vtkKWText;
 class vtkKWLabel;
@@ -64,7 +64,7 @@ public:
   void SetFolderName(const char *val);
 
   // Direct Access to underlying widgets:
-  vtkGetObjectMacro(LabelFrame,vtkKWLabeledFrame);
+  vtkGetObjectMacro(LabelFrame,vtkKWFrameLabeled);
   vtkGetObjectMacro(SeparatorFrame,vtkKWFrame);
   vtkGetObjectMacro(NestedSeparatorFrame,vtkKWFrame);
 
@@ -90,7 +90,7 @@ protected:
   ~vtkKWLookmarkFolder();
 
   vtkKWFrame *MainFrame;
-  vtkKWLabeledFrame *LabelFrame;
+  vtkKWFrameLabeled *LabelFrame;
   vtkKWFrame *SeparatorFrame;
   vtkKWFrame *NestedSeparatorFrame;
   vtkKWCheckButton *Checkbox;

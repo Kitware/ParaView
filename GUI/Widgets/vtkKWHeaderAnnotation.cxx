@@ -18,9 +18,9 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledPopupButton.h"
+#include "vtkKWEntryLabeled.h"
+#include "vtkKWFrameLabeled.h"
+#include "vtkKWPopupButtonLabeled.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWTextProperty.h"
@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWHeaderAnnotation );
-vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.10");
+vtkCxxRevisionMacro(vtkKWHeaderAnnotation, "1.11");
 
 int vtkKWHeaderAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -47,7 +47,7 @@ vtkKWHeaderAnnotation::vtkKWHeaderAnnotation()
   // GUI
 
   this->TextFrame               = vtkKWFrame::New();
-  this->TextEntry               = vtkKWLabeledEntry::New();
+  this->TextEntry               = vtkKWEntryLabeled::New();
   this->TextPropertyWidget      = vtkKWTextProperty::New();
   this->TextPropertyPopupButton = NULL;
 }
@@ -170,8 +170,8 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
   this->TextEntry->SetParent(this->TextFrame);
   this->TextEntry->Create(app, 0);
   this->TextEntry->SetLabel("Header:");
-  this->TextEntry->GetEntry()->SetWidth(20);
-  this->TextEntry->GetEntry()->BindCommand(this, "HeaderTextCallback");
+  this->TextEntry->GetWidget()->SetWidth(20);
+  this->TextEntry->GetWidget()->BindCommand(this, "HeaderTextCallback");
 
   this->TextEntry->SetBalloonHelpString(
     "Set the header annotation. The text will automatically scale "
@@ -188,21 +188,21 @@ void vtkKWHeaderAnnotation::Create(vtkKWApplication *app,
     {
     if (!this->TextPropertyPopupButton)
       {
-      this->TextPropertyPopupButton = vtkKWLabeledPopupButton::New();
+      this->TextPropertyPopupButton = vtkKWPopupButtonLabeled::New();
       }
     this->TextPropertyPopupButton->SetParent(this->TextFrame);
     this->TextPropertyPopupButton->Create(app);
     this->TextPropertyPopupButton->SetLabel("Header properties:");
-    this->TextPropertyPopupButton->SetPopupButtonLabel("Edit...");
+    this->TextPropertyPopupButton->GetWidget()->SetLabel("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
-                 this->TextPropertyPopupButton->GetPopupButton()
+                 this->TextPropertyPopupButton->GetWidget()
                  ->GetPopupFrame()->GetWidgetName());
 
     this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
                  this->TextPropertyPopupButton->GetWidgetName());
 
     this->TextPropertyWidget->SetParent(
-      this->TextPropertyPopupButton->GetPopupButton()->GetPopupFrame());
+      this->TextPropertyPopupButton->GetWidget()->GetPopupFrame());
     }
   else
     {
@@ -256,7 +256,7 @@ void vtkKWHeaderAnnotation::Update()
     {
     if (anno)
       {
-      this->TextEntry->GetEntry()->SetValue(
+      this->TextEntry->GetWidget()->SetValue(
         anno->GetInput() ? anno->GetInput() : "");
       }
     }
@@ -355,7 +355,7 @@ void vtkKWHeaderAnnotation::HeaderTextCallback()
 {
   if (this->TextEntry && this->TextEntry->IsCreated())
     {
-    this->SetHeaderText(this->TextEntry->GetEntry()->GetValue());
+    this->SetHeaderText(this->TextEntry->GetWidget()->GetValue());
     }
 }
 

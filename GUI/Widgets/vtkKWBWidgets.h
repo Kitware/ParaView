@@ -33,12 +33,6 @@ public:
   // Load the bwidgets.
   static void Initialize(Tcl_Interp*);
 
-  // Description:
-  // Create a photo from an array. Used to initialized
-  // some icons used in the Tree widget.
-  static int CreatePhoto(Tcl_Interp*, char *name, 
-                         unsigned char *data, int width, int height);
-
 protected:
   vtkKWBWidgets();
   ~vtkKWBWidgets();

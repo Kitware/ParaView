@@ -19,8 +19,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWHistogram.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWLabeledLabel.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWRange.h"
 #include "vtkKWCanvas.h"
@@ -31,7 +30,7 @@
 #include <vtkstd/string>
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.21");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.22");
 
 #define VTK_KW_CTFE_RGB_LABEL "RGB"
 #define VTK_KW_CTFE_HSV_LABEL "HSV"
@@ -54,7 +53,7 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
   this->ShowColorRamp                  = 1;
   this->ColorRampHeight                = 10;
   this->LastRedrawColorRampTime        = 0;
-  this->ColorRampPosition              = vtkKWColorTransferFunctionEditor::ColorRampPositionAtDefault;
+  this->ColorRampPosition              = vtkKWColorTransferFunctionEditor::ColorRampPositionDefault;
   this->ColorRampOutlineStyle          = vtkKWColorTransferFunctionEditor::ColorRampOutlineStyleSolid;
 
   this->ColorSpaceOptionMenu           = vtkKWOptionMenu::New();
@@ -63,7 +62,7 @@ vtkKWColorTransferFunctionEditor::vtkKWColorTransferFunctionEditor()
   int i;
   for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
     {
-    this->ValueEntries[i] = vtkKWLabeledEntry::New();
+    this->ValueEntries[i] = vtkKWEntryLabeled::New();
     }
 }
 
@@ -396,7 +395,7 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntries(
     {
     for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
-      this->ValueEntries[i]->GetEntry()->SetValue("");
+      this->ValueEntries[i]->GetWidget()->SetValue("");
       this->ValueEntries[i]->SetEnabled(0);
       }
     return;
@@ -423,7 +422,7 @@ void vtkKWColorTransferFunctionEditor::UpdatePointEntries(
 
   for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
     {
-    this->ValueEntries[i]->GetEntry()->SetValue(values[i], 2);
+    this->ValueEntries[i]->GetWidget()->SetValue(values[i], 2);
     }
 }
 
@@ -582,8 +581,8 @@ void vtkKWColorTransferFunctionEditor::CreateValueEntries(
       {
       this->ValueEntries[i]->SetParent(this->TopRightFrame);
       this->ValueEntries[i]->Create(app, "");
-      this->ValueEntries[i]->GetEntry()->SetWidth(4);
-      this->ValueEntries[i]->GetEntry()->BindCommand(
+      this->ValueEntries[i]->GetWidget()->SetWidth(4);
+      this->ValueEntries[i]->GetWidget()->BindCommand(
         this, "ValueEntriesCallback");
       }
 
@@ -623,7 +622,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
   // Add the color space menu (in top left frame)
 
   if (this->ShowColorSpaceOptionMenu && 
-      this->ColorSpaceOptionMenu->IsCreated())
+      this->ColorSpaceOptionMenu && this->ColorSpaceOptionMenu->IsCreated())
     {
     tk_cmd << "pack " << this->ColorSpaceOptionMenu->GetWidgetName() 
            << " -side left -fill both -padx 0" << endl;
@@ -636,7 +635,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
     int i;
     for (i = 0; i < VTK_KW_CTFE_NB_ENTRIES; i++)
       {
-      if (this->ValueEntries[i]->IsCreated())
+      if (this->ValueEntries[i] && this->ValueEntries[i]->IsCreated())
         {
         tk_cmd << "pack " << this->ValueEntries[i]->GetWidgetName() 
                << " -side left -pady 0" << endl;
@@ -648,20 +647,21 @@ void vtkKWColorTransferFunctionEditor::Pack()
 
   if (this->ShowColorRamp && 
       (this->ColorRampPosition == 
-       vtkKWColorTransferFunctionEditor::ColorRampPositionAtDefault) &&
-      this->ColorRamp->IsCreated())
+       vtkKWColorTransferFunctionEditor::ColorRampPositionDefault) &&
+      this->ColorRamp && this->ColorRamp->IsCreated())
     {
     // Get the current position of the parameter range, and move it one
     // row below. Otherwise get the current number of rows and insert
     // the ramp at the end
 
     int show_pr = 
-      (this->ShowParameterRange && this->ParameterRange->IsCreated()) ? 1 : 0;
+      (this->ShowParameterRange && 
+       this->ParameterRange && this->ParameterRange->IsCreated()) ? 1 : 0;
 
     int col, row, nb_cols;
     if (show_pr &&
         (this->ParameterRangePosition == 
-         vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom) &&
+         vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom) &&
         vtkKWTkUtilities::GetGridPosition(
           this->GetApplication()->GetMainInterp(), 
           this->ParameterRange->GetWidgetName(), 
@@ -681,7 +681,7 @@ void vtkKWColorTransferFunctionEditor::Pack()
         row = 2 + (this->ShowParameterTicks ? 1 : 0) + 
           (show_pr &&
            (this->ParameterRangePosition == 
-            vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop) 
+            vtkKWParameterValueFunctionEditor::ParameterRangePositionTop) 
            ? 1 :0 );
         }
       }
@@ -824,7 +824,7 @@ void vtkKWColorTransferFunctionEditor::ValueEntriesCallback()
       {
       return;
       }
-    values[i] = this->ValueEntries[i]->GetEntry()->GetValueAsFloat();
+    values[i] = this->ValueEntries[i]->GetWidget()->GetValueAsFloat();
     }
 
   // Move the point, check if something has really been moved
@@ -898,14 +898,14 @@ void vtkKWColorTransferFunctionEditor::SetShowColorRamp(int arg)
 //----------------------------------------------------------------------------
 void vtkKWColorTransferFunctionEditor::SetColorRampPosition(int arg)
 {
-  if (arg < vtkKWColorTransferFunctionEditor::ColorRampPositionAtDefault)
+  if (arg < vtkKWColorTransferFunctionEditor::ColorRampPositionDefault)
     {
-    arg = vtkKWColorTransferFunctionEditor::ColorRampPositionAtDefault;
+    arg = vtkKWColorTransferFunctionEditor::ColorRampPositionDefault;
     }
   else if (arg > 
-           vtkKWColorTransferFunctionEditor::ColorRampPositionAtCanvas)
+           vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas)
     {
-    arg = vtkKWColorTransferFunctionEditor::ColorRampPositionAtCanvas;
+    arg = vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas;
     }
 
   if (this->ColorRampPosition == arg)
@@ -916,7 +916,7 @@ void vtkKWColorTransferFunctionEditor::SetColorRampPosition(int arg)
   // If the ramp was drawn in the canvas before, make sure we remove it now
 
   if (this->ColorRampPosition == 
-      vtkKWColorTransferFunctionEditor::ColorRampPositionAtCanvas)
+      vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas)
     {
     this->CanvasRemoveTag(VTK_KW_CTFE_COLOR_RAMP_TAG);
     }
@@ -1152,7 +1152,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
     
     int in_canvas = 
       (this->ColorRampPosition == 
-       vtkKWColorTransferFunctionEditor::ColorRampPositionAtCanvas);
+       vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas);
 
     // Create the image buffer
 
@@ -1302,7 +1302,7 @@ void vtkKWColorTransferFunctionEditor::RedrawColorRamp()
   // If the ramp has to be in the canvas, draw it now or remove it
 
   if (this->ColorRampPosition == 
-      vtkKWColorTransferFunctionEditor::ColorRampPositionAtCanvas &&
+      vtkKWColorTransferFunctionEditor::ColorRampPositionCanvas &&
       this->Canvas && this->Canvas->IsAlive())
     {
     const char *canv = this->Canvas->GetWidgetName();

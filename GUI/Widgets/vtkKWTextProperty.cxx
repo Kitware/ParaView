@@ -19,9 +19,9 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWCheckButtonSet.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledCheckButtonSet.h"
-#include "vtkKWLabeledOptionMenu.h"
-#include "vtkKWLabeledPushButtonSet.h"
+#include "vtkKWCheckButtonSetLabeled.h"
+#include "vtkKWOptionMenuLabeled.h"
+#include "vtkKWPushButtonSetLabeled.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.34");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.35");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -121,10 +121,10 @@ vtkKWTextProperty::vtkKWTextProperty()
   this->ChangeColorButton = vtkKWChangeColorButton::New();
 
   this->ShowFontFamily = 1;
-  this->FontFamilyOptionMenu = vtkKWLabeledOptionMenu::New();
+  this->FontFamilyOptionMenu = vtkKWOptionMenuLabeled::New();
 
   this->ShowStyles = 1;
-  this->StylesCheckButtonSet = vtkKWLabeledCheckButtonSet::New();
+  this->StylesCheckButtonSet = vtkKWCheckButtonSetLabeled::New();
 
   this->ShowOpacity = 1;
   this->OpacityScale = vtkKWScale::New();
@@ -133,7 +133,7 @@ vtkKWTextProperty::vtkKWTextProperty()
   this->ColorChangedCommand = NULL;
 
   this->ShowCopy = 0;
-  this->PushButtonSet = vtkKWLabeledPushButtonSet::New();
+  this->PushButtonSet = vtkKWPushButtonSetLabeled::New();
 }
 
 // ----------------------------------------------------------------------------
@@ -221,36 +221,34 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   this->FontFamilyOptionMenu->SetParent(this);
   this->FontFamilyOptionMenu->Create(app);
   this->Script("%s config -width 7 -padx 0 -pady 2", 
-               this->FontFamilyOptionMenu->GetOptionMenu()->GetWidgetName());
+               this->FontFamilyOptionMenu->GetWidget()->GetWidgetName());
+  this->FontFamilyOptionMenu->ExpandWidgetOff();
   this->FontFamilyOptionMenu->SetBalloonHelpString("Select the font.");
 
-  this->FontFamilyOptionMenu->GetOptionMenu()->AddEntryWithCommand(
+  this->FontFamilyOptionMenu->GetWidget()->AddEntryWithCommand(
     VTK_KW_TEXT_PROP_ARIAL, this, "FontFamilyCallback");
 
-  this->FontFamilyOptionMenu->GetOptionMenu()->AddEntryWithCommand(
+  this->FontFamilyOptionMenu->GetWidget()->AddEntryWithCommand(
     VTK_KW_TEXT_PROP_COURIER, this, "FontFamilyCallback");
 
-  this->FontFamilyOptionMenu->GetOptionMenu()->AddEntryWithCommand(
+  this->FontFamilyOptionMenu->GetWidget()->AddEntryWithCommand(
     VTK_KW_TEXT_PROP_TIMES, this, "FontFamilyCallback");
 
   // Styles (bold, italic, shadow)
 
   this->StylesCheckButtonSet->SetParent(this);
-  this->StylesCheckButtonSet->PackHorizontallyOn();
   this->StylesCheckButtonSet->Create(app);
   this->StylesCheckButtonSet->SetBalloonHelpString("Select the font style.");
 
-  vtkKWCheckButtonSet *cbs = this->StylesCheckButtonSet->GetCheckButtonSet();
+  vtkKWCheckButtonSet *cbs = this->StylesCheckButtonSet->GetWidget();
   cbs->PackHorizontallyOn();
 
   vtkKWCheckButton *cb;
   const char *styles_options = "-indicator 0 -padx 0 -pady 0";
 
-  cbs->AddButton(VTK_KW_TEXT_PROP_BOLD_ID, 
-                 0,
-                 this, "BoldCallback",
-                 "Select bold style.");
-  cb = cbs->GetButton(VTK_KW_TEXT_PROP_BOLD_ID);
+  cb = cbs->AddWidget(VTK_KW_TEXT_PROP_BOLD_ID);
+  cb->SetCommand(this, "BoldCallback");
+  cb->SetBalloonHelpString("Select bold style.");
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
   cb->SetImageOption(image_bold, 
@@ -259,11 +257,9 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
                      image_bold_pixel_size,
                      image_bold_buffer_length);
 
-  cbs->AddButton(VTK_KW_TEXT_PROP_ITALIC_ID, 
-                 0, 
-                 this, "ItalicCallback",
-                 "Select italic style.");
-  cb = cbs->GetButton(VTK_KW_TEXT_PROP_ITALIC_ID);
+  cb = cbs->AddWidget(VTK_KW_TEXT_PROP_ITALIC_ID);
+  cb->SetCommand(this, "ItalicCallback");
+  cb->SetBalloonHelpString("Select italic style.");
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
   cb->SetImageOption(image_italic, 
@@ -272,11 +268,9 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
                      image_italic_pixel_size,
                      image_italic_buffer_length);
 
-  cbs->AddButton(VTK_KW_TEXT_PROP_SHADOW_ID, 
-                 0, 
-                 this, "ShadowCallback",
-                 "Select shadow style.");
-  cb = cbs->GetButton(VTK_KW_TEXT_PROP_SHADOW_ID);
+  cb = cbs->AddWidget(VTK_KW_TEXT_PROP_SHADOW_ID);
+  cb->SetCommand(this, "ShadowCallback");
+  cb->SetBalloonHelpString("Select shadow style.");
   this->Script("%s configure %s", cb->GetWidgetName(), styles_options);
 
   cb->SetImageOption(image_shadow, 
@@ -304,19 +298,18 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
   // Buttons
 
   this->PushButtonSet->SetParent(this);
-  this->PushButtonSet->PackHorizontallyOn();
+  this->PushButtonSet->SetLabelPositionToLeft();
   this->PushButtonSet->Create(app);
+  this->PushButtonSet->ExpandWidgetOff();
 
-  vtkKWPushButtonSet *pbs = this->PushButtonSet->GetPushButtonSet();
+  vtkKWPushButtonSet *pbs = this->PushButtonSet->GetWidget();
   pbs->PackHorizontallyOn();
 
   vtkKWPushButton *pb;
 
   // Buttons : copy button
 
-  pbs->AddButton(VTK_KW_TEXT_PROP_COPY_ID);
-  pb = pbs->GetButton(VTK_KW_TEXT_PROP_COPY_ID);
-
+  pb = pbs->AddWidget(VTK_KW_TEXT_PROP_COPY_ID);
   pb->SetImageOption(image_copy, 
                      image_copy_width, 
                      image_copy_height, 
@@ -349,7 +342,7 @@ void vtkKWTextProperty::Pack()
     this->ChangeColorButton->SetLabel("Color:");
     this->ChangeColorButton->ShowLabelOn();
 
-    this->FontFamilyOptionMenu->GetOptionMenu()->IndicatorOn();
+    this->FontFamilyOptionMenu->GetWidget()->IndicatorOn();
     this->FontFamilyOptionMenu->SetLabel("Font:");
     this->FontFamilyOptionMenu->ShowLabelOn();
 
@@ -393,7 +386,7 @@ void vtkKWTextProperty::Pack()
     {
     this->ChangeColorButton->ShowLabelOff();
 
-    this->FontFamilyOptionMenu->GetOptionMenu()->IndicatorOff();
+    this->FontFamilyOptionMenu->GetWidget()->IndicatorOff();
     this->FontFamilyOptionMenu->ShowLabelOff();
 
     this->StylesCheckButtonSet->ShowLabelOff();
@@ -686,15 +679,15 @@ void vtkKWTextProperty::UpdateFontFamilyOptionMenu()
     switch (this->TextProperty->GetFontFamily())
       {
       case VTK_ARIAL:
-        this->FontFamilyOptionMenu->GetOptionMenu()->SetValue(
+        this->FontFamilyOptionMenu->GetWidget()->SetValue(
           VTK_KW_TEXT_PROP_ARIAL);
         break;
       case VTK_COURIER:
-        this->FontFamilyOptionMenu->GetOptionMenu()->SetValue(
+        this->FontFamilyOptionMenu->GetWidget()->SetValue(
           VTK_KW_TEXT_PROP_COURIER);
         break;
       case VTK_TIMES:
-        this->FontFamilyOptionMenu->GetOptionMenu()->SetValue(
+        this->FontFamilyOptionMenu->GetWidget()->SetValue(
           VTK_KW_TEXT_PROP_TIMES);
         break;
       }
@@ -709,7 +702,7 @@ void vtkKWTextProperty::FontFamilyCallback()
 {
   if (this->FontFamilyOptionMenu->IsCreated())
     {
-    const char *value = this->FontFamilyOptionMenu->GetOptionMenu()->GetValue();
+    const char *value = this->FontFamilyOptionMenu->GetWidget()->GetValue();
     if (!strcmp(value, VTK_KW_TEXT_PROP_ARIAL))
       {
       this->SetFontFamily(VTK_ARIAL);
@@ -782,8 +775,7 @@ void vtkKWTextProperty::UpdateBoldCheckButton()
       this->StylesCheckButtonSet &&
       this->TextProperty)
     {
-    this->StylesCheckButtonSet->GetCheckButtonSet()->SetButtonState(
-      VTK_KW_TEXT_PROP_BOLD_ID, this->TextProperty->GetBold());
+    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_BOLD_ID)->SetState(this->TextProperty->GetBold());
     }
 }
 
@@ -792,8 +784,8 @@ void vtkKWTextProperty::BoldCallback()
 {
   if (this->IsCreated())
     {
-    this->SetBold(this->StylesCheckButtonSet->GetCheckButtonSet()
-                  ->IsButtonSelected(VTK_KW_TEXT_PROP_BOLD_ID));
+    this->SetBold(this->StylesCheckButtonSet->GetWidget()
+                  ->GetWidget(VTK_KW_TEXT_PROP_BOLD_ID)->GetState());
     }
 }
 
@@ -826,8 +818,7 @@ void vtkKWTextProperty::UpdateItalicCheckButton()
       this->StylesCheckButtonSet &&
       this->TextProperty)
     {
-    this->StylesCheckButtonSet->GetCheckButtonSet()->SetButtonState(
-      VTK_KW_TEXT_PROP_ITALIC_ID, this->TextProperty->GetItalic());
+    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_ITALIC_ID)->SetState(this->TextProperty->GetItalic());
     }
 }
 
@@ -836,8 +827,8 @@ void vtkKWTextProperty::ItalicCallback()
 {
   if (this->IsCreated())
     {
-    this->SetItalic(this->StylesCheckButtonSet->GetCheckButtonSet()
-                    ->IsButtonSelected(VTK_KW_TEXT_PROP_ITALIC_ID));
+    this->SetItalic(this->StylesCheckButtonSet->GetWidget()
+                    ->GetWidget(VTK_KW_TEXT_PROP_ITALIC_ID)->GetState());
     }
 }
 
@@ -870,8 +861,7 @@ void vtkKWTextProperty::UpdateShadowCheckButton()
       this->StylesCheckButtonSet &&
       this->TextProperty)
     {
-    this->StylesCheckButtonSet->GetCheckButtonSet()->SetButtonState(
-      VTK_KW_TEXT_PROP_SHADOW_ID, this->TextProperty->GetShadow());
+    this->StylesCheckButtonSet->GetWidget()->GetWidget(VTK_KW_TEXT_PROP_SHADOW_ID)->SetState(this->TextProperty->GetShadow());
     }
 }
 
@@ -880,8 +870,8 @@ void vtkKWTextProperty::ShadowCallback()
 {
   if (this->IsCreated())
     {
-    this->SetShadow(this->StylesCheckButtonSet->GetCheckButtonSet()
-                    ->IsButtonSelected(VTK_KW_TEXT_PROP_SHADOW_ID));
+    this->SetShadow(this->StylesCheckButtonSet->GetWidget()
+                    ->GetWidget(VTK_KW_TEXT_PROP_SHADOW_ID)->GetState());
     }
 }
 
@@ -1015,7 +1005,7 @@ vtkKWPushButton* vtkKWTextProperty::GetCopyButton()
 {
   if (this->IsCreated())
     {
-    return this->PushButtonSet->GetPushButtonSet()->GetButton(
+    return this->PushButtonSet->GetWidget()->GetWidget(
       VTK_KW_TEXT_PROP_COPY_ID);
     }
   return NULL;
@@ -1026,12 +1016,12 @@ void vtkKWTextProperty::UpdatePushButtonSet()
 {
   if (this->IsCreated() && this->PushButtonSet)
     {
-    this->PushButtonSet->GetPushButtonSet()->SetButtonVisibility(
+    this->PushButtonSet->GetWidget()->SetWidgetVisibility(
       VTK_KW_TEXT_PROP_COPY_ID, this->ShowCopy);
 
     this->Script("grid %s %s",
-                 (this->PushButtonSet->GetPushButtonSet()
-                  ->GetNumberOfVisibleButtons() ? "" : "remove"), 
+                 (this->PushButtonSet->GetWidget()
+                  ->GetNumberOfVisibleWidgets() ? "" : "remove"), 
                  this->PushButtonSet->GetWidgetName());
     }
 }

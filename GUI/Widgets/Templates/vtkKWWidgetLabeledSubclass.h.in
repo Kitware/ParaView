@@ -1,0 +1,91 @@
+/*=========================================================================
+
+  Module:    vtkKWWidgetLabeledSubclass.h.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkKW@WidgetType@Labeled - a @WidgetType@ associated to a label
+// .SECTION Description
+// This class creates a composite widget associating a @WidgetType@ to a label.
+// As a subclass of vtkKWWidgetLabeled, it inherits a label and methods to
+// set its position and visibility. Note that the default label position 
+// implemented in this class is on the left of the @WidgetType@, but 
+// specific positions listed in vtkKWWidgetLabeled are supported as well.
+// .SECTION See Also
+// vtkKWWidgetLabeled
+
+#ifndef __vtkKW@WidgetType@Labeled_h
+#define __vtkKW@WidgetType@Labeled_h
+
+#include "vtkKWWidgetLabeled.h"
+
+class vtkKWApplication;
+class vtkKW@WidgetType@;
+
+class VTK_EXPORT vtkKW@WidgetType@Labeled : public vtkKWWidgetLabeled
+{
+public:
+  static vtkKW@WidgetType@Labeled* New();
+  vtkTypeRevisionMacro(vtkKW@WidgetType@Labeled, vtkKWWidgetLabeled);
+  void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Create the widget
+  virtual void Create(vtkKWApplication *app, const char *args = 0);
+
+  // Description:
+  // Get the vtkKW@WidgetType@ that is being labeled
+  virtual vtkKW@WidgetType@* GetWidget();
+  
+  // Description:
+  // Set the layout to allow the widget that is labeled to expand
+  // horizontally automatically 
+  virtual void SetExpandWidget(int);
+  vtkBooleanMacro(ExpandWidget, int);
+  vtkGetMacro(ExpandWidget, int);
+
+  // Description:
+  // Set the string that enables balloon help for this widget.
+  // Override to pass down to children.
+  virtual void SetBalloonHelpString(const char *str);
+  virtual void SetBalloonHelpJustification(int j);
+
+  // Description:
+  // Update the "enable" state of the object and its internal parts.
+  // Depending on different Ivars (this->Enabled, the application's 
+  // Limited Edition Mode, etc.), the "enable" state of the object is updated
+  // and propagated to its internal parts/subwidgets. This will, for example,
+  // enable/disable parts of the widget UI, enable/disable the visibility
+  // of 3D widgets, etc.
+  virtual void UpdateEnableState();
+
+protected:
+  vtkKW@WidgetType@Labeled();
+  ~vtkKW@WidgetType@Labeled();
+
+  // Description:
+  // Expand the widget that is being labeled
+  int ExpandWidget;
+
+  // Description:
+  // Pack or repack the widget. To be implemented by subclasses.
+  virtual void Pack();
+
+  // Description:
+  // Internal widget
+  vtkKW@WidgetType@ *Widget;
+
+private:
+
+  vtkKW@WidgetType@Labeled(const vtkKW@WidgetType@Labeled&); // Not implemented
+  void operator=(const vtkKW@WidgetType@Labeled&); // Not implemented
+};
+
+#endif

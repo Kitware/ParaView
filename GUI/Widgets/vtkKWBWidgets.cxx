@@ -24,7 +24,7 @@
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.20");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.21");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -214,30 +214,6 @@ vtkKWBWidgets::~vtkKWBWidgets()
 }
 
 //----------------------------------------------------------------------------
-int vtkKWBWidgets::CreatePhoto(Tcl_Interp* interp, char *name, 
-                                unsigned char *data, int width, int height)
-{
-  ostrstream command;
-  command << "image create photo " << name << " -height "
-          << height << " -width " << width << ends;
-  if (Tcl_GlobalEval(interp, command.str()) != TCL_OK)
-    {
-    vtkGenericWarningMacro(<< "Unable to create image: " << interp->result);
-    command.rdbuf()->freeze(0);     
-    return VTK_ERROR;
-    }
-  command.rdbuf()->freeze(0);     
-
-  if (!vtkKWTkUtilities::UpdatePhoto(interp, name, data, width, height, 3))
-    {
-    vtkGenericWarningMacro(<< "Error updating Tk photo " << name);
-    }
-  
-  return VTK_OK;
-
-}
-
-//----------------------------------------------------------------------------
 void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
 {
   if (!interp)
@@ -246,16 +222,10 @@ void vtkKWBWidgets::Initialize(Tcl_Interp* interp)
     return;
     }
 
-  if ( CreatePhoto(interp, (char *)"bwminus", minus_bits,  
-                   minus_width, minus_height) 
-       != VTK_OK )
-    {
-    return;
-    }
-
-  if ( CreatePhoto(interp, (char *)"bwplus", plus_bits,  
-                   plus_width, plus_height) 
-       != VTK_OK )
+  if (!vtkKWTkUtilities::UpdatePhoto(
+        interp, "bwminus", minus_bits, minus_width, minus_height, 3) ||
+      !vtkKWTkUtilities::UpdatePhoto(
+        interp, "bwplus", plus_bits, plus_width, plus_height, 3))
     {
     return;
     }

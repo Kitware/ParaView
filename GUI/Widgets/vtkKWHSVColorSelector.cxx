@@ -17,12 +17,11 @@
 #include "vtkKWCanvas.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledLabel.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.2");
+vtkCxxRevisionMacro(vtkKWHSVColorSelector, "1.3");
 vtkStandardNewMacro(vtkKWHSVColorSelector);
 
 #define VTK_KW_HSV_SEL_POINT_RADIUS_MIN     2

@@ -24,7 +24,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWLookmark.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWText.h"
 #include "vtkKWLabel.h"
@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.5");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.6");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -46,7 +46,7 @@ vtkKWLookmarkFolder::vtkKWLookmarkFolder()
   this->CommandFunction = vtkKWLookmarkFolderCommand;
 
   this->MainFrame = vtkKWFrame::New();
-  this->LabelFrame= vtkKWLabeledFrame::New();
+  this->LabelFrame= vtkKWFrameLabeled::New();
   this->SeparatorFrame = vtkKWFrame::New();
   this->NestedSeparatorFrame = vtkKWFrame::New();
   this->NameField = vtkKWText::New();

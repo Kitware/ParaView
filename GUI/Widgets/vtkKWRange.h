@@ -14,22 +14,29 @@
 // .NAME vtkKWRange - a range widget
 // .SECTION Description
 // A widget that represents a range within a bigger range.
+// Note: As a subclass of vtkKWWidgetLabeled, it inherits a label and methods
+// to set its position and visibility. Note that the default label position 
+// implemented in this class is on the top of the range if the range 
+// direction is horizontal, on the left if is is vertical. Specific positions
+// listed in vtkKWWidgetLabeled are supported as well.
+// .SECTION See Also
+// vtkKWWidgetLabeled
 
 #ifndef __vtkKWRange_h
 #define __vtkKWRange_h
 
-#include "vtkKWLabeledWidget.h"
+#include "vtkKWWidgetLabeled.h"
 
 class vtkKWCanvas;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWPushButtonSet;
 
-class VTK_EXPORT vtkKWRange : public vtkKWLabeledWidget
+class VTK_EXPORT vtkKWRange : public vtkKWWidgetLabeled
 {
 public:
   static vtkKWRange* New();
-  vtkTypeRevisionMacro(vtkKWRange,vtkKWLabeledWidget);
+  vtkTypeRevisionMacro(vtkKWRange,vtkKWWidgetLabeled);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -168,52 +175,45 @@ public:
   vtkGetMacro(EntriesWidth, int);
 
   // Description:
-  // Set/Get the position of the items (label and entries) in the widget.
-  // POSITION_ALIGNED: the items are aligned with the range/sliders
-  // POSITION_SIDE1: the items are on top/left of the range/sliders
-  // POSITION_SIDE2: the items are at the bottom/right of the range/sliders
+  // Set/Get the position of the entries (Default is top if the range 
+  // direction is horizontal, left if it is vertical).
+  // Note that you can also set the label position using the superclass
+  // methods (vtkKWWidgetLabeled).
   //BTX
   enum
   {
-    POSITION_ALIGNED = 0,
-    POSITION_SIDE1   = 1,
-    POSITION_SIDE2   = 2
+    EntryPositionDefault = 0,
+    EntryPositionTop,
+    EntryPositionBottom,
+    EntryPositionLeft,
+    EntryPositionRight
   };
   //ETX
-  virtual void SetLabelPosition(int);
-  virtual void SetLabelPositionToAligned()
-    { this->SetLabelPosition(vtkKWRange::POSITION_ALIGNED); };
-  virtual void SetLabelPositionToSide1()
-    { this->SetLabelPosition(vtkKWRange::POSITION_SIDE1); };
-  virtual void SetLabelPositionToSide2()
-    { this->SetLabelPosition(vtkKWRange::POSITION_SIDE2); };
-  vtkBooleanMacro(LabelPosition, int);
-  vtkGetMacro(LabelPosition, int);
-  virtual void SetEntriesPosition(int);
-  virtual void SetEntriesPositionToAligned()
-    { this->SetEntriesPosition(vtkKWRange::POSITION_ALIGNED); };
-  virtual void SetEntriesPositionToSide1()
-    { this->SetEntriesPosition(vtkKWRange::POSITION_SIDE1); };
-  virtual void SetEntriesPositionToSide2()
-    { this->SetEntriesPosition(vtkKWRange::POSITION_SIDE2); };
-  vtkBooleanMacro(EntriesPosition, int);
-  vtkGetMacro(EntriesPosition, int);
-  virtual void SetZoomButtonsPosition(int);
-  virtual void SetZoomButtonsPositionToAligned()
-    { this->SetZoomButtonsPosition(vtkKWRange::POSITION_ALIGNED); };
-  virtual void SetZoomButtonsPositionToSide1()
-    { this->SetZoomButtonsPosition(vtkKWRange::POSITION_SIDE1); };
-  virtual void SetZoomButtonsPositionToSide2()
-    { this->SetZoomButtonsPosition(vtkKWRange::POSITION_SIDE2); };
-  vtkBooleanMacro(ZoomButtonsPosition, int);
-  vtkGetMacro(ZoomButtonsPosition, int);
+  virtual void SetEntry1Position(int);
+  vtkGetMacro(Entry1Position, int);
+  virtual void SetEntry1PositionToDefault()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionDefault); };
+  virtual void SetEntry1PositionToTop()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionTop); };
+  virtual void SetEntry1PositionToBottom()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionBottom); };
+  virtual void SetEntry1PositionToLeft()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionLeft); };
+  virtual void SetEntry1PositionToRight()
+    { this->SetEntry1Position(vtkKWRange::EntryPositionRight); };
+  virtual void SetEntry2Position(int);
+  vtkGetMacro(Entry2Position, int);
+  virtual void SetEntry2PositionToDefault()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionDefault); };
+  virtual void SetEntry2PositionToTop()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionTop); };
+  virtual void SetEntry2PositionToBottom()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionBottom); };
+  virtual void SetEntry2PositionToLeft()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionLeft); };
+  virtual void SetEntry2PositionToRight()
+    { this->SetEntry2Position(vtkKWRange::EntryPositionRight); };
 
-  // Description:
-  // Show/Hide the zoom buttons
-  virtual void SetShowZoomButtons(int);
-  vtkBooleanMacro(ShowZoomButtons, int);
-  vtkGetMacro(ShowZoomButtons, int);
-  
   // Description:
   // Set commands.
   virtual void SetCommand(vtkKWObject* object, const char *method);
@@ -297,12 +297,10 @@ protected:
   double RangeColor[3];
   double RangeInteractionColor[3];
   int   ShowEntries;
-  int   LabelPosition;
-  int   EntriesPosition;
-  int   ZoomButtonsPosition;
+  int   Entry1Position;
+  int   Entry2Position;
   int   EntriesWidth;
   int   SliderCanPush;
-  int   ShowZoomButtons;
 
   int   InInteraction;
   int   StartInteractionPos;
@@ -318,10 +316,8 @@ protected:
   vtkKWFrame         *CanvasFrame;
   vtkKWCanvas        *Canvas;
   vtkKWEntry         *Entries[2];
-  vtkKWPushButtonSet *ZoomButtons;
 
   virtual void CreateEntries();
-  virtual void CreateZoomButtons();
   virtual void UpdateEntriesValue(double range[2]);
   virtual void ConstrainResolution();
 

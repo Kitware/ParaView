@@ -21,8 +21,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWHistogram.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWLabeledLabel.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkKWRange.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkMath.h"
@@ -33,7 +32,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.32");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.33");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -67,8 +66,8 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
 {
   this->ShowParameterRange          = 1;
   this->ShowValueRange              = 1;
-  this->PointPositionInValueRange   = vtkKWParameterValueFunctionEditor::PointPositionAtValue;
-  this->ParameterRangePosition      = vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom;
+  this->PointPositionInValueRange   = vtkKWParameterValueFunctionEditor::PointPositionValue;
+  this->ParameterRangePosition      = vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom;
   this->CanvasHeight                = 55;
   this->CanvasWidth                 = 55;
   this->ExpandCanvasWidth           = 1;
@@ -98,10 +97,9 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->ShowPointIndex              = 0;
   this->ShowPointGuideline          = 0;
   this->ShowSelectedPointIndex      = 1;
-  this->LabelPosition               = vtkKWParameterValueFunctionEditor::LabelPositionAtDefault;
   this->ShowRangeLabel              = 1;
-  this->RangeLabelPosition         = vtkKWParameterValueFunctionEditor::RangeLabelPositionAtDefault;
-  this->ParameterEntryPosition         = vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtDefault;
+  this->RangeLabelPosition          = vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault;
+  this->ParameterEntryPosition      = vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault;
   this->ShowParameterEntry          = 1;
   this->ShowUserFrame               = 0;
   this->PointMarginToCanvas         = vtkKWParameterValueFunctionEditor::PointMarginAllSides;
@@ -185,7 +183,7 @@ vtkKWParameterValueFunctionEditor::vtkKWParameterValueFunctionEditor()
   this->UserFrame                   = vtkKWFrame::New();
   this->TopRightFrame               = vtkKWFrame::New();
   this->RangeLabel                  = vtkKWLabel::New();
-  this->ParameterEntry              = vtkKWLabeledEntry::New();
+  this->ParameterEntry              = vtkKWEntryLabeled::New();
   this->ValueTicksCanvas            = vtkKWCanvas::New();
   this->ParameterTicksCanvas        = vtkKWCanvas::New();
 
@@ -704,7 +702,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
   // If the value is forced to be placed at top
 
   if (this->PointPositionInValueRange == 
-      vtkKWParameterValueFunctionEditor::PointPositionAtTop)
+      vtkKWParameterValueFunctionEditor::PointPositionTop)
     {
     y = vtkMath::Round((v_w_range[1] - v_v_range[1]) * factors[1]);
     }
@@ -712,7 +710,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
   // If the value is forced to be placed at bottom
 
   else if (this->PointPositionInValueRange == 
-           vtkKWParameterValueFunctionEditor::PointPositionAtBottom)
+           vtkKWParameterValueFunctionEditor::PointPositionBottom)
     {
     y = vtkMath::Round((v_w_range[1] - v_v_range[0]) * factors[1]);
     }
@@ -721,7 +719,7 @@ int vtkKWParameterValueFunctionEditor::GetFunctionPointCanvasCoordinates(
   // just place the point in the middle of the current value range
 
   else if (this->PointPositionInValueRange == 
-           vtkKWParameterValueFunctionEditor::PointPositionAtCenter ||
+           vtkKWParameterValueFunctionEditor::PointPositionCenter ||
            this->GetFunctionPointDimensionality() != 1)
     {
     y = vtkMath::Floor(
@@ -766,11 +764,11 @@ int vtkKWParameterValueFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   // a point interpolated from the function.
 
   if (this->PointPositionInValueRange == 
-      vtkKWParameterValueFunctionEditor::PointPositionAtCenter ||
+      vtkKWParameterValueFunctionEditor::PointPositionCenter ||
       this->PointPositionInValueRange == 
-      vtkKWParameterValueFunctionEditor::PointPositionAtTop ||
+      vtkKWParameterValueFunctionEditor::PointPositionTop ||
       this->PointPositionInValueRange == 
-      vtkKWParameterValueFunctionEditor::PointPositionAtBottom ||
+      vtkKWParameterValueFunctionEditor::PointPositionBottom ||
       this->GetFunctionPointDimensionality() != 1)
     {
     if (!this->InterpolateFunctionPointValues(parameter, values))
@@ -839,11 +837,11 @@ int vtkKWParameterValueFunctionEditor::MoveFunctionPointToCanvasCoordinates(
   // the point in the parameter range, keep the same value.
 
   if (this->PointPositionInValueRange == 
-      vtkKWParameterValueFunctionEditor::PointPositionAtCenter ||
+      vtkKWParameterValueFunctionEditor::PointPositionCenter ||
       this->PointPositionInValueRange == 
-      vtkKWParameterValueFunctionEditor::PointPositionAtTop ||
+      vtkKWParameterValueFunctionEditor::PointPositionTop ||
       this->PointPositionInValueRange == 
-      vtkKWParameterValueFunctionEditor::PointPositionAtBottom ||
+      vtkKWParameterValueFunctionEditor::PointPositionBottom ||
       this->GetFunctionPointDimensionality() != 1)
     {
     if (!this->GetFunctionPointValues(id, values))
@@ -1126,8 +1124,6 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
   this->ParameterRange->SliderCanPushOff();
   this->ParameterRange->ShowLabelOff();
   this->ParameterRange->ShowEntriesOff();
-  this->ParameterRange->ShowZoomButtonsOff();
-  this->ParameterRange->SetZoomButtonsPositionToAligned();
   this->ParameterRange->SetCommand(
     this, "VisibleParameterRangeChangingCallback");
   this->ParameterRange->SetEndCommand(
@@ -1158,10 +1154,6 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
     this->ParameterRange->GetShowLabel());
   this->ValueRange->SetShowEntries(
     this->ParameterRange->GetShowEntries());
-  this->ValueRange->SetShowZoomButtons(
-    this->ParameterRange->GetShowZoomButtons());
-  this->ValueRange->SetZoomButtonsPosition(
-    this->ParameterRange->GetZoomButtonsPosition());
   this->ValueRange->SetCommand(
     this, "VisibleValueRangeChangingCallback");
   this->ValueRange->SetEndCommand(
@@ -1332,12 +1324,12 @@ void vtkKWParameterValueFunctionEditor::CreateParameterEntry(
     {
     this->ParameterEntry->SetParent(this);
     this->ParameterEntry->Create(app, "");
-    this->ParameterEntry->GetEntry()->SetWidth(9);
+    this->ParameterEntry->GetWidget()->SetWidth(9);
     this->ParameterEntry->SetLabel("P:");
 
     this->UpdateParameterEntry(this->SelectedPoint);
 
-    this->ParameterEntry->GetEntry()->BindCommand(
+    this->ParameterEntry->GetWidget()->BindCommand(
       this, "ParameterEntryCallback");
     }
 }
@@ -1408,10 +1400,10 @@ int vtkKWParameterValueFunctionEditor::IsTopLeftFrameUsed()
 {
   return ((this->ShowLabel && 
            (this->LabelPosition == 
-            vtkKWParameterValueFunctionEditor::LabelPositionAtDefault)) ||
+            vtkKWWidgetLabeled::LabelPositionDefault)) ||
           (this->ShowRangeLabel && 
            (this->RangeLabelPosition == 
-            vtkKWParameterValueFunctionEditor::RangeLabelPositionAtDefault)) ||
+            vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault)) ||
           this->ShowHistogramLogModeOptionMenu);
 }
 
@@ -1421,7 +1413,7 @@ int vtkKWParameterValueFunctionEditor::IsTopRightFrameUsed()
   return 
     (this->ShowParameterEntry && 
      (this->ParameterEntryPosition == 
-      vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtDefault));
+      vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault));
 }
 
 //----------------------------------------------------------------------------
@@ -1506,7 +1498,10 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   // Unpack everything
 
-  this->Canvas->UnpackSiblings();
+  if (this->Canvas)
+    {
+    this->Canvas->UnpackSiblings();
+    }
 
   // Repack everything
 
@@ -1565,7 +1560,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   if (this->ShowLabel && 
       (this->LabelPosition == 
-       vtkKWParameterValueFunctionEditor::LabelPositionAtTop) &&
+       vtkKWWidgetLabeled::LabelPositionTop) &&
       this->HasLabel() && this->GetLabel()->IsCreated())
     {
     tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
@@ -1579,8 +1574,8 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   if (this->ShowRangeLabel && 
       (this->RangeLabelPosition == 
-       vtkKWParameterValueFunctionEditor::RangeLabelPositionAtTop) &&
-      this->RangeLabel->IsCreated())
+       vtkKWParameterValueFunctionEditor::RangeLabelPositionTop) &&
+      this->RangeLabel && this->RangeLabel->IsCreated())
     {
     tk_cmd << "grid " << this->RangeLabel->GetWidgetName() 
            << " -stick ens -padx 0 -pady 0  -in "
@@ -1593,7 +1588,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Top left container (TLC)
 
-  if (this->TopLeftContainer->IsCreated())
+  if (this->TopLeftContainer && this->TopLeftContainer->IsCreated())
     {
     this->TopLeftContainer->UnpackChildren();
     if (this->IsTopLeftFrameUsed() || this->ShowUserFrame)
@@ -1607,7 +1602,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Top left frame (TLF) and User frame (UF)
   // inside the top left container (TLC)
   
-  if (this->TopLeftFrame->IsCreated())
+  if (this->TopLeftFrame && this->TopLeftFrame->IsCreated())
     {
     this->TopLeftFrame->UnpackChildren();
     if (this->IsTopLeftFrameUsed())
@@ -1617,7 +1612,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
       }
     }
 
-  if (this->UserFrame->IsCreated())
+  if (this->UserFrame && this->UserFrame->IsCreated())
     {
     tk_cmd << "pack " << this->UserFrame->GetWidgetName() 
            << " -side left -fill both -padx 0 -pady 0" << endl;
@@ -1627,9 +1622,9 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   if (this->ShowLabel && 
       (this->LabelPosition == 
-       vtkKWParameterValueFunctionEditor::LabelPositionAtDefault) &&
+       vtkKWWidgetLabeled::LabelPositionDefault) &&
       this->HasLabel() && this->GetLabel()->IsCreated() &&
-      this->TopLeftFrame->IsCreated())
+      this->TopLeftFrame && this->TopLeftFrame->IsCreated())
     {
     tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
            << " -side left -fill both -padx 0 -pady 0 -in " 
@@ -1639,6 +1634,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Histogram log mode (in top left frame)
 
   if (this->ShowHistogramLogModeOptionMenu &&
+      this->HistogramLogModeOptionMenu && 
       this->HistogramLogModeOptionMenu->IsCreated())
     {
     tk_cmd << "pack " << this->HistogramLogModeOptionMenu->GetWidgetName() 
@@ -1649,9 +1645,9 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   if (this->ShowRangeLabel && 
       (this->RangeLabelPosition == 
-       vtkKWParameterValueFunctionEditor::RangeLabelPositionAtDefault) &&
-      this->RangeLabel->IsCreated() &&
-      this->TopLeftFrame->IsCreated())
+       vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
+      this->RangeLabel && this->RangeLabel->IsCreated() &&
+      this->TopLeftFrame && this->TopLeftFrame->IsCreated())
     {
     tk_cmd << "pack " << this->RangeLabel->GetWidgetName() 
            << " -side left -fill both -padx 0 -pady 0 -in " 
@@ -1660,7 +1656,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // TopRightFrame (TRF)
 
-  if (this->TopRightFrame->IsCreated())
+  if (this->TopRightFrame && this->TopRightFrame->IsCreated())
     {
     this->TopRightFrame->UnpackChildren();
     if (this->IsTopRightFrameUsed())
@@ -1675,9 +1671,9 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   if (this->ShowParameterEntry && 
       (this->ParameterEntryPosition == 
-       vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtDefault) &&
-      this->ParameterEntry->IsCreated() &&
-      this->TopRightFrame->IsCreated())
+       vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
+      this->ParameterEntry && this->ParameterEntry->IsCreated() &&
+      this->TopRightFrame && this->TopRightFrame->IsCreated())
     {
     tk_cmd << "pack " << this->ParameterEntry->GetWidgetName() 
            << " -side left -padx 2 -in "
@@ -1689,9 +1685,9 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Parameter range (PR) if at top
   
   if (this->ShowParameterRange && 
-      this->ParameterRange->IsCreated() &&
+      this->ParameterRange && this->ParameterRange->IsCreated() &&
       (this->ParameterRangePosition == 
-       vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop))
+       vtkKWParameterValueFunctionEditor::ParameterRangePositionTop))
     {
     tk_cmd << "grid " << this->ParameterRange->GetWidgetName() 
            << " -sticky ew -padx 0 -pady 2"
@@ -1703,7 +1699,7 @@ void vtkKWParameterValueFunctionEditor::Pack()
 
   if (this->ShowLabel && 
       (this->LabelPosition == 
-       vtkKWParameterValueFunctionEditor::LabelPositionAtLeft) &&
+       vtkKWWidgetLabeled::LabelPositionLeft) &&
       this->HasLabel() && this->GetLabel()->IsCreated())
     {
     tk_cmd << "grid " << this->GetLabel()->GetWidgetName() 
@@ -1714,7 +1710,8 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Value Ticks (VT)
   
-  if (this->ShowValueTicks && this->ValueTicksCanvas->IsCreated())
+  if (this->ShowValueTicks && 
+      this->ValueTicksCanvas && this->ValueTicksCanvas->IsCreated())
     {
     tk_cmd << "grid " << this->ValueTicksCanvas->GetWidgetName() 
            << " -sticky ns -padx 0 -pady 0 "
@@ -1723,13 +1720,17 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   // Canvas ([------])
   
-  tk_cmd << "grid " << this->Canvas->GetWidgetName() 
-         << " -sticky news -padx 0 -pady 0 "
-         << " -columnspan 2 -column " << col_c << " -row " << row << endl;
+  if (this->Canvas && this->Canvas->IsCreated())
+    {
+    tk_cmd << "grid " << this->Canvas->GetWidgetName() 
+           << " -sticky news -padx 0 -pady 0 "
+           << " -columnspan 2 -column " << col_c << " -row " << row << endl;
+    }
   
   // Value range (VR)
   
-  if (this->ShowValueRange && this->ValueRange->IsCreated())
+  if (this->ShowValueRange && 
+      this->ValueRange && this->ValueRange->IsCreated())
     {
     tk_cmd << "grid " << this->ValueRange->GetWidgetName() 
            << " -sticky ns -padx 2 -pady 0 "
@@ -1740,8 +1741,8 @@ void vtkKWParameterValueFunctionEditor::Pack()
   
   if (this->ShowParameterEntry && 
       (this->ParameterEntryPosition == 
-       vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtRight) &&
-      this->ParameterEntry->IsCreated())
+       vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight) &&
+      this->ParameterEntry && this->ParameterEntry->IsCreated())
     {
     tk_cmd << "grid " << this->ParameterEntry->GetWidgetName() 
            << " -sticky wns -padx 2 -pady 0 -in "
@@ -1756,7 +1757,8 @@ void vtkKWParameterValueFunctionEditor::Pack()
     
   // Parameter Ticks (PT)
   
-  if (this->ShowParameterTicks && this->ParameterTicksCanvas->IsCreated())
+  if (this->ShowParameterTicks && 
+      this->ParameterTicksCanvas && this->ParameterTicksCanvas->IsCreated())
     {
     tk_cmd << "grid " << this->ParameterTicksCanvas->GetWidgetName() 
            << " -sticky ew -padx 0 -pady 0"
@@ -1767,9 +1769,9 @@ void vtkKWParameterValueFunctionEditor::Pack()
   // Parameter range (PR)
   
   if (this->ShowParameterRange && 
-      this->ParameterRange->IsCreated() &&
+      this->ParameterRange && this->ParameterRange->IsCreated() &&
       (this->ParameterRangePosition == 
-       vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom))
+       vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom))
     {
     tk_cmd << "grid " << this->ParameterRange->GetWidgetName() 
            << " -sticky ew -padx 0 -pady 2"
@@ -2120,14 +2122,14 @@ void vtkKWParameterValueFunctionEditor::SetShowParameterRange(int arg)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetParameterRangePosition(int arg)
 {
-  if (arg < vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop)
+  if (arg < vtkKWParameterValueFunctionEditor::ParameterRangePositionTop)
     {
-    arg = vtkKWParameterValueFunctionEditor::ParameterRangePositionAtTop;
+    arg = vtkKWParameterValueFunctionEditor::ParameterRangePositionTop;
     }
   else if (arg > 
-           vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom)
+           vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom)
     {
-    arg = vtkKWParameterValueFunctionEditor::ParameterRangePositionAtBottom;
+    arg = vtkKWParameterValueFunctionEditor::ParameterRangePositionBottom;
     }
 
   if (this->ParameterRangePosition == arg)
@@ -2233,13 +2235,13 @@ void vtkKWParameterValueFunctionEditor::SetShowValueRange(int arg)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetPointPositionInValueRange(int arg)
 {
-  if (arg < vtkKWParameterValueFunctionEditor::PointPositionAtValue)
+  if (arg < vtkKWParameterValueFunctionEditor::PointPositionValue)
     {
-    arg = vtkKWParameterValueFunctionEditor::PointPositionAtValue;
+    arg = vtkKWParameterValueFunctionEditor::PointPositionValue;
     }
-  else if (arg > vtkKWParameterValueFunctionEditor::PointPositionAtCenter)
+  else if (arg > vtkKWParameterValueFunctionEditor::PointPositionCenter)
     {
-    arg = vtkKWParameterValueFunctionEditor::PointPositionAtCenter;
+    arg = vtkKWParameterValueFunctionEditor::PointPositionCenter;
     }
 
   if (this->PointPositionInValueRange == arg)
@@ -2263,7 +2265,7 @@ void vtkKWParameterValueFunctionEditor::SetShowLabel(int arg)
 
   if (arg && 
       (this->LabelPosition == 
-       vtkKWParameterValueFunctionEditor::LabelPositionAtDefault) &&
+       vtkKWWidgetLabeled::LabelPositionDefault) &&
       this->IsCreated())
     {
     this->CreateTopLeftFrame(this->GetApplication());
@@ -2275,13 +2277,11 @@ void vtkKWParameterValueFunctionEditor::SetShowLabel(int arg)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetLabelPosition(int arg)
 {
-  if (arg < vtkKWParameterValueFunctionEditor::LabelPositionAtDefault)
+  if (arg != vtkKWParameterValueFunctionEditor::LabelPositionDefault &&
+      arg != vtkKWParameterValueFunctionEditor::LabelPositionTop &&
+      arg != vtkKWParameterValueFunctionEditor::LabelPositionLeft)
     {
-    arg = vtkKWParameterValueFunctionEditor::LabelPositionAtDefault;
-    }
-  else if (arg > vtkKWParameterValueFunctionEditor::LabelPositionAtLeft)
-    {
-    arg = vtkKWParameterValueFunctionEditor::LabelPositionAtLeft;
+    arg = vtkKWParameterValueFunctionEditor::LabelPositionDefault;
     }
 
   if (this->LabelPosition == arg)
@@ -2296,7 +2296,7 @@ void vtkKWParameterValueFunctionEditor::SetLabelPosition(int arg)
 
   if (this->ShowLabel && 
       (this->LabelPosition == 
-       vtkKWParameterValueFunctionEditor::LabelPositionAtDefault) &&
+       vtkKWParameterValueFunctionEditor::LabelPositionDefault) &&
       this->IsCreated())
     {
     this->CreateTopLeftFrame(this->GetApplication());
@@ -2322,7 +2322,7 @@ void vtkKWParameterValueFunctionEditor::SetShowRangeLabel(int arg)
 
   if (this->ShowRangeLabel && 
       (this->RangeLabelPosition == 
-       vtkKWParameterValueFunctionEditor::RangeLabelPositionAtDefault) &&
+       vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
       this->IsCreated())
     {
     this->CreateTopLeftFrame(this->GetApplication());
@@ -2346,14 +2346,14 @@ void vtkKWParameterValueFunctionEditor::SetShowRangeLabel(int arg)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
 {
-  if (arg < vtkKWParameterValueFunctionEditor::RangeLabelPositionAtDefault)
+  if (arg < vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault)
     {
-    arg = vtkKWParameterValueFunctionEditor::RangeLabelPositionAtDefault;
+    arg = vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault;
     }
   else if (arg > 
-           vtkKWParameterValueFunctionEditor::RangeLabelPositionAtTop)
+           vtkKWParameterValueFunctionEditor::RangeLabelPositionTop)
     {
-    arg = vtkKWParameterValueFunctionEditor::RangeLabelPositionAtTop;
+    arg = vtkKWParameterValueFunctionEditor::RangeLabelPositionTop;
     }
 
   if (this->RangeLabelPosition == arg)
@@ -2368,7 +2368,7 @@ void vtkKWParameterValueFunctionEditor::SetRangeLabelPosition(int arg)
 
   if (this->ShowRangeLabel && 
       (this->RangeLabelPosition == 
-       vtkKWParameterValueFunctionEditor::RangeLabelPositionAtDefault) &&
+       vtkKWParameterValueFunctionEditor::RangeLabelPositionDefault) &&
       this->IsCreated())
     {
     this->CreateTopLeftFrame(this->GetApplication());
@@ -2394,7 +2394,7 @@ void vtkKWParameterValueFunctionEditor::SetShowParameterEntry(int arg)
 
   if (this->ShowParameterEntry && 
       (this->ParameterEntryPosition == 
-       vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtDefault) &&
+       vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
       this->IsCreated())
     {
     this->CreateTopRightFrame(this->GetApplication());
@@ -2418,14 +2418,14 @@ void vtkKWParameterValueFunctionEditor::SetShowParameterEntry(int arg)
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionEditor::SetParameterEntryPosition(int arg)
 {
-  if (arg < vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtDefault)
+  if (arg < vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault)
     {
-    arg = vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtDefault;
+    arg = vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault;
     }
   else if (arg > 
-           vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtRight)
+           vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight)
     {
-    arg = vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtRight;
+    arg = vtkKWParameterValueFunctionEditor::ParameterEntryPositionRight;
     }
 
   if (this->ParameterEntryPosition == arg)
@@ -2440,7 +2440,7 @@ void vtkKWParameterValueFunctionEditor::SetParameterEntryPosition(int arg)
 
   if (this->ShowParameterEntry && 
       (this->ParameterEntryPosition == 
-       vtkKWParameterValueFunctionEditor::ParameterEntryPositionAtDefault) &&
+       vtkKWParameterValueFunctionEditor::ParameterEntryPositionDefault) &&
       this->IsCreated())
     {
     this->CreateTopRightFrame(this->GetApplication());
@@ -4245,7 +4245,7 @@ void vtkKWParameterValueFunctionEditor::RedrawPanOnlyDependentElements()
   this->RedrawRangeTicks();
 
   if (this->PointPositionInValueRange != 
-      vtkKWParameterValueFunctionEditor::PointPositionAtValue)
+      vtkKWParameterValueFunctionEditor::PointPositionValue)
     {
     this->RedrawFunction();
     }
@@ -5744,9 +5744,9 @@ void vtkKWParameterValueFunctionEditor::UpdateParameterEntry(int id)
     {
     if (this->ParameterEntry)
       {
-      if (this->ParameterEntry->GetEntry())
+      if (this->ParameterEntry->GetWidget())
         {
-        this->ParameterEntry->GetEntry()->SetValue("");
+        this->ParameterEntry->GetWidget()->SetValue("");
         }
       this->ParameterEntry->SetEnabled(0);
       }
@@ -5776,11 +5776,11 @@ void vtkKWParameterValueFunctionEditor::UpdateParameterEntry(int id)
     {
     char buffer[256];
     sprintf(buffer, this->ParameterEntryFormat, parameter);
-    this->ParameterEntry->GetEntry()->SetValue(buffer);
+    this->ParameterEntry->GetWidget()->SetValue(buffer);
     }
   else
     {
-    this->ParameterEntry->GetEntry()->SetValue(parameter);
+    this->ParameterEntry->GetWidget()->SetValue(parameter);
     }
 }
 
@@ -5794,7 +5794,7 @@ void vtkKWParameterValueFunctionEditor::ParameterEntryCallback()
 
   unsigned long mtime = this->GetFunctionMTime();
 
-  double parameter = this->ParameterEntry->GetEntry()->GetValueAsFloat();
+  double parameter = this->ParameterEntry->GetWidget()->GetValueAsFloat();
 
   // Map from the internal parameter range to the displayed  parameter range
   // if needed
@@ -6628,7 +6628,6 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
      << (this->ShowParameterRange ? "On" : "Off") << endl;
   os << indent << "ShowValueRange: "
      << (this->ShowValueRange ? "On" : "Off") << endl;
-  os << indent << "LabelPosition: " << this->LabelPosition << endl;
   os << indent << "ShowRangeLabel: "
      << (this->ShowRangeLabel ? "On" : "Off") << endl;
   os << indent << "RangeLabelPosition: " << this->RangeLabelPosition << endl;

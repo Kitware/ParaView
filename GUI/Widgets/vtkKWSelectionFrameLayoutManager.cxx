@@ -28,7 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkImageData.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEntry.h"
-#include "vtkKWLabeledEntry.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
@@ -71,7 +71,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.9");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.10");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1250,7 +1250,7 @@ int vtkKWSelectionFrameLayoutManager::ChangeWidgetTitleCallback(
   int ok = dlg->Invoke();
   if (ok)
     {
-    char *new_title = dlg->GetEntry()->GetEntry()->GetValue();
+    char *new_title = dlg->GetEntry()->GetWidget()->GetValue();
     ok = this->CanWidgetTitleBeChanged(widget, new_title);
     if (!ok)
       {

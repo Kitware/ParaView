@@ -17,7 +17,7 @@
 #include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWToolbar.h"
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.24");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.25");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -191,7 +191,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->InterfaceSettingsFrame)
     {
-    this->InterfaceSettingsFrame = vtkKWLabeledFrame::New();
+    this->InterfaceSettingsFrame = vtkKWFrameLabeled::New();
     }
 
   this->InterfaceSettingsFrame->SetParent(this->GetPagesParentWidget());
@@ -308,7 +308,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->InterfaceCustomizationFrame)
     {
-    this->InterfaceCustomizationFrame = vtkKWLabeledFrame::New();
+    this->InterfaceCustomizationFrame = vtkKWFrameLabeled::New();
     }
 
   this->InterfaceCustomizationFrame->SetParent(this->GetPagesParentWidget());
@@ -369,7 +369,7 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
 
   if (!this->ToolbarSettingsFrame)
     {
-    this->ToolbarSettingsFrame = vtkKWLabeledFrame::New();
+    this->ToolbarSettingsFrame = vtkKWFrameLabeled::New();
     }
 
   this->ToolbarSettingsFrame->SetParent(this->GetPagesParentWidget());

@@ -18,9 +18,9 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledCheckButton.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledOptionMenu.h"
+#include "vtkKWCheckButtonLabeled.h"
+#include "vtkKWFrameLabeled.h"
+#include "vtkKWOptionMenuLabeled.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
@@ -29,7 +29,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWVolumeMaterialPropertyWidget);
-vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWVolumeMaterialPropertyWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
@@ -51,7 +51,7 @@ vtkKWVolumeMaterialPropertyWidget::vtkKWVolumeMaterialPropertyWidget()
   this->ComponentSelectionWidget = 
     vtkKWScalarComponentSelectionWidget::New();
 
-  this->EnableShadingCheckButton = vtkKWLabeledCheckButton::New();
+  this->EnableShadingCheckButton = vtkKWCheckButtonLabeled::New();
 }
 
 //----------------------------------------------------------------------------
@@ -116,7 +116,7 @@ void vtkKWVolumeMaterialPropertyWidget::Create(vtkKWApplication *app,
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWLabeledOptionMenu *omenu = 
+  vtkKWOptionMenuLabeled *omenu = 
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
   omenu->SetLabelWidth(label_width);
   
@@ -127,8 +127,8 @@ void vtkKWVolumeMaterialPropertyWidget::Create(vtkKWApplication *app,
   this->EnableShadingCheckButton->Create(app, 0);
   this->EnableShadingCheckButton->SetLabel("Enable Shading");
   this->EnableShadingCheckButton->SetLabelWidth(label_width);
-  this->EnableShadingCheckButton->GetCheckButton()->SetText("");
-  this->EnableShadingCheckButton->GetCheckButton()->SetCommand(
+  this->EnableShadingCheckButton->GetWidget()->SetText("");
+  this->EnableShadingCheckButton->GetWidget()->SetCommand(
     this, "EnableShadingCallback");
 
   // Pack
@@ -200,7 +200,7 @@ void vtkKWVolumeMaterialPropertyWidget::Update()
 
   if (this->EnableShadingCheckButton)
     {
-    this->EnableShadingCheckButton->GetCheckButton()->SetState(
+    this->EnableShadingCheckButton->GetWidget()->SetState(
       this->VolumeProperty->GetShade(this->SelectedComponent));
     }
 
@@ -344,7 +344,7 @@ void vtkKWVolumeMaterialPropertyWidget::EnableShadingCallback()
     return;
     }
 
-  int state = this->EnableShadingCheckButton->GetCheckButton()->GetState();
+  int state = this->EnableShadingCheckButton->GetWidget()->GetState();
 
   if (this->VolumeProperty &&
       this->VolumeProperty->GetShade(this->SelectedComponent) != state)

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-  Module:    vtkKWLabeledWidget.cxx
+  Module:    vtkKWWidgetLabeled.cxx
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,28 +12,29 @@
 
 =========================================================================*/
 
-#include "vtkKWLabeledWidget.h"
+#include "vtkKWWidgetLabeled.h"
 
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkKWLabeledWidget);
-vtkCxxRevisionMacro(vtkKWLabeledWidget, "1.13");
+vtkStandardNewMacro(vtkKWWidgetLabeled);
+vtkCxxRevisionMacro(vtkKWWidgetLabeled, "1.1");
 
-int vtkKWLabeledWidgetCommand(ClientData cd, Tcl_Interp *interp,
+int vtkKWWidgetLabeledCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkKWLabeledWidget::vtkKWLabeledWidget()
+vtkKWWidgetLabeled::vtkKWWidgetLabeled()
 {
-  this->CommandFunction = vtkKWLabeledWidgetCommand;
+  this->CommandFunction = vtkKWWidgetLabeledCommand;
   this->ShowLabel       = 1;
   this->Label           = NULL;
+  this->LabelPosition   = vtkKWWidgetLabeled::LabelPositionDefault;
 }
 
 //----------------------------------------------------------------------------
-vtkKWLabeledWidget::~vtkKWLabeledWidget()
+vtkKWWidgetLabeled::~vtkKWWidgetLabeled()
 {
   if (this->Label)
     {
@@ -43,7 +44,7 @@ vtkKWLabeledWidget::~vtkKWLabeledWidget()
 }
 
 //----------------------------------------------------------------------------
-vtkKWLabel* vtkKWLabeledWidget::GetLabel()
+vtkKWLabel* vtkKWWidgetLabeled::GetLabel()
 {
   // Lazy evaluation. Create the label only when it is needed
 
@@ -52,17 +53,18 @@ vtkKWLabel* vtkKWLabeledWidget::GetLabel()
     this->Label = vtkKWLabel::New();
     this->Label->SetEnabled(this->Enabled);
     }
+
   return this->Label;
 }
 
 //----------------------------------------------------------------------------
-int vtkKWLabeledWidget::HasLabel()
+int vtkKWWidgetLabeled::HasLabel()
 {
   return this->Label ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledWidget::Create(vtkKWApplication *app, const char *args)
+void vtkKWWidgetLabeled::Create(vtkKWApplication *app, const char *args)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
@@ -91,11 +93,11 @@ void vtkKWLabeledWidget::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledWidget::CreateLabel(vtkKWApplication *app)
+void vtkKWWidgetLabeled::CreateLabel(vtkKWApplication *app, const char *args)
 {
   // Create the label. If the parent has been set before (i.e. by the subclass)
   // do not set it.
-  // This will also create the label on the fly, if needed
+  // Note that GetLabel() will allocate the label on the fly
   
   vtkKWLabel *label = this->GetLabel();
   if (label->IsCreated())
@@ -109,32 +111,62 @@ void vtkKWLabeledWidget::CreateLabel(vtkKWApplication *app)
     }
 
   label->Create(app, "-anchor w");
+  label->ConfigureOptions(args);
   // -bd 0 -highlightthickness 0 -padx 0 -pady 0");
 
   label->SetBalloonHelpString(this->GetBalloonHelpString());
   label->SetBalloonHelpJustification(this->GetBalloonHelpJustification());
+
+  // Since we have just created the label on the fly, it is likely that 
+  // it needs to be displayed somehow, which is usually Pack()'s job
+
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledWidget::SetLabel(const char *text)
+void vtkKWWidgetLabeled::SetLabel(const char *text)
 {
   this->GetLabel()->SetLabel(text);
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledWidget::SetLabelWidth(int width)
+void vtkKWWidgetLabeled::SetLabelPosition(int arg)
+{
+  if (arg < vtkKWWidgetLabeled::LabelPositionDefault)
+    {
+    arg = vtkKWWidgetLabeled::LabelPositionDefault;
+    }
+  else if (arg > vtkKWWidgetLabeled::LabelPositionRight)
+    {
+    arg = vtkKWWidgetLabeled::LabelPositionRight;
+    }
+
+  if (this->LabelPosition == arg)
+    {
+    return;
+    }
+
+  this->LabelPosition = arg;
+
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWidgetLabeled::SetLabelWidth(int width)
 {
   this->GetLabel()->SetWidth(width);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWLabeledWidget::GetLabelWidth()
+int vtkKWWidgetLabeled::GetLabelWidth()
 {
   return this->GetLabel()->GetWidth();
 }
 
 // ----------------------------------------------------------------------------
-void vtkKWLabeledWidget::SetShowLabel(int _arg)
+void vtkKWWidgetLabeled::SetShowLabel(int _arg)
 {
   if (this->ShowLabel == _arg)
     {
@@ -155,13 +187,13 @@ void vtkKWLabeledWidget::SetShowLabel(int _arg)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledWidget::UpdateEnableState()
+void vtkKWWidgetLabeled::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
   
-  // Do not use GetLabel() here, otherwise the label would be created 
-  // on the fly, and we don't want this. Once the label gets created when
-  // there is a real need for, it's Enabled state will be set correctly
+  // Do not use GetLabel() here, otherwise the label will be created 
+  // on the fly, and we do not want this. Once the label gets created when
+  // there is a real need for it, its Enabled state will be set correctly
   // anyway.
 
   if (this->Label)
@@ -171,13 +203,13 @@ void vtkKWLabeledWidget::UpdateEnableState()
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWLabeledWidget::SetBalloonHelpString(const char *string)
+void vtkKWWidgetLabeled::SetBalloonHelpString(const char *string)
 {
   this->Superclass::SetBalloonHelpString(string);
 
-  // Do not use GetLabel() here, otherwise the label would be created 
-  // on the fly, and we don't want this. Once the label gets created when
-  // there is a real need for, it's ballon help state will be set correctly
+  // Do not use GetLabel() here, otherwise the label will be created 
+  // on the fly, and we do not want this. Once the label gets created when
+  // there is a real need for it, its Enabled state will be set correctly
   // anyway.
 
   if (this->Label)
@@ -187,13 +219,13 @@ void vtkKWLabeledWidget::SetBalloonHelpString(const char *string)
 }
 
 // ---------------------------------------------------------------------------
-void vtkKWLabeledWidget::SetBalloonHelpJustification(int j)
+void vtkKWWidgetLabeled::SetBalloonHelpJustification(int j)
 {
   this->Superclass::SetBalloonHelpJustification(j);
 
-  // Do not use GetLabel() here, otherwise the label would be created 
-  // on the fly, and we don't want this. Once the label gets created when
-  // there is a real need for, it's ballon help state will be set correctly
+  // Do not use GetLabel() here, otherwise the label will be created 
+  // on the fly, and we do not want this. Once the label gets created when
+  // there is a real need for it, its Enabled state will be set correctly
   // anyway.
 
   if (this->Label)
@@ -203,12 +235,14 @@ void vtkKWLabeledWidget::SetBalloonHelpJustification(int j)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWLabeledWidget::PrintSelf(ostream& os, vtkIndent indent)
+void vtkKWWidgetLabeled::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "ShowLabel: " 
      << (this->ShowLabel ? "On" : "Off") << endl;
+
+  os << indent << "LabelPosition: " << this->LabelPosition << endl;
 
   os << indent << "Label: ";
   if (this->Label)

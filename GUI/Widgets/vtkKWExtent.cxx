@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.31");
+vtkCxxRevisionMacro(vtkKWExtent, "1.32");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -395,21 +395,40 @@ void vtkKWExtent::SetLabelPosition(int v)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWExtent::SetEntriesPosition(int v)
+void vtkKWExtent::SetEntry1Position(int v)
 { 
   if (this->XRange)
     {
-    this->XRange->SetEntriesPosition(v);
+    this->XRange->SetEntry1Position(v);
     }
 
   if (this->YRange)
     {
-    this->YRange->SetEntriesPosition(v);
+    this->YRange->SetEntry1Position(v);
     }
 
   if (this->ZRange)
     {
-    this->ZRange->SetEntriesPosition(v);
+    this->ZRange->SetEntry1Position(v);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWExtent::SetEntry2Position(int v)
+{ 
+  if (this->XRange)
+    {
+    this->XRange->SetEntry2Position(v);
+    }
+
+  if (this->YRange)
+    {
+    this->YRange->SetEntry2Position(v);
+    }
+
+  if (this->ZRange)
+    {
+    this->ZRange->SetEntry2Position(v);
     }
 }
 

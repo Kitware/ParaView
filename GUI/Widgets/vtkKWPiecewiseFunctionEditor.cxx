@@ -19,14 +19,14 @@
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkKWRange.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 #include "vtkPiecewiseFunction.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.19");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.20");
 
 
 int vtkKWPiecewiseFunctionEditorCommand(ClientData cd, Tcl_Interp *interp,
@@ -46,7 +46,7 @@ vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
 
   this->WindowLevelModeChangedCommand    = NULL;
 
-  this->ValueEntry                       = vtkKWLabeledEntry::New();
+  this->ValueEntry                       = vtkKWEntryLabeled::New();
 
   this->WindowLevelModeCheckButton       = vtkKWCheckButton::New();
 }
@@ -361,7 +361,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 
   if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize())
     {
-    this->ValueEntry->GetEntry()->SetValue("");
+    this->ValueEntry->GetWidget()->SetValue("");
     this->ValueEntry->SetEnabled(0);
     return;
     }
@@ -375,7 +375,7 @@ void vtkKWPiecewiseFunctionEditor::UpdatePointEntries(int id)
 
   double *point = this->PiecewiseFunction->GetDataPointer() + id * 2;
 
-  this->ValueEntry->GetEntry()->SetValue(point[1], 3);
+  this->ValueEntry->GetWidget()->SetValue(point[1], 3);
 }
 
 //----------------------------------------------------------------------------
@@ -447,12 +447,12 @@ void vtkKWPiecewiseFunctionEditor::CreateValueEntry(
     this->CreateTopRightFrame(app);
     this->ValueEntry->SetParent(this->TopRightFrame);
     this->ValueEntry->Create(app, "");
-    this->ValueEntry->GetEntry()->SetWidth(6);
+    this->ValueEntry->GetWidget()->SetWidth(6);
     this->ValueEntry->SetLabel("V:");
 
     this->UpdatePointEntries(this->SelectedPoint);
 
-    this->ValueEntry->GetEntry()->BindCommand(
+    this->ValueEntry->GetWidget()->BindCommand(
       this, "ValueEntryCallback");
     }
 }
@@ -487,7 +487,8 @@ void vtkKWPiecewiseFunctionEditor::Pack()
 
   // Value entry (in top right frame)
 
-  if (this->ShowValueEntry && this->ValueEntry->IsCreated())
+  if (this->ShowValueEntry && 
+      this->ValueEntry && this->ValueEntry->IsCreated())
     {
     tk_cmd << "pack " << this->ValueEntry->GetWidgetName() 
            << " -side left" << endl;
@@ -496,6 +497,7 @@ void vtkKWPiecewiseFunctionEditor::Pack()
   // Window/Level mode (in top left frame)
 
   if (this->ShowWindowLevelModeButton &&
+      this->WindowLevelModeCheckButton && 
       this->WindowLevelModeCheckButton->IsCreated())
     {
     tk_cmd << "pack " << this->WindowLevelModeCheckButton->GetWidgetName() 
@@ -857,7 +859,7 @@ void vtkKWPiecewiseFunctionEditor::ValueEntryCallback()
 
   // Get the value from the entry
 
-  double value = this->ValueEntry->GetEntry()->GetValueAsFloat();
+  double value = this->ValueEntry->GetWidget()->GetValueAsFloat();
 
   // Move the point, check if something has really been moved
 

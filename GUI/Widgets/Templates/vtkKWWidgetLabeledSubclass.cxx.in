@@ -1,0 +1,206 @@
+/*=========================================================================
+
+  Module:    vtkKWWidgetLabeledSubclass.cxx.in
+
+  Copyright (c) Kitware, Inc.
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+
+#include "vtkKW@WidgetType@Labeled.h"
+
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
+#include "vtkKW@WidgetType@.h"
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkKW@WidgetType@Labeled);
+vtkCxxRevisionMacro(vtkKW@WidgetType@Labeled, "1.1");
+
+int vtkKW@WidgetType@LabeledCommand(ClientData cd, Tcl_Interp *interp,
+                                    int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
+vtkKW@WidgetType@Labeled::vtkKW@WidgetType@Labeled()
+{
+  this->CommandFunction = vtkKW@WidgetType@LabeledCommand;
+  this->ExpandWidget    = 1;
+  this->Widget          = vtkKW@WidgetType@::New();
+}
+
+//----------------------------------------------------------------------------
+vtkKW@WidgetType@Labeled::~vtkKW@WidgetType@Labeled()
+{
+  if (this->Widget)
+    {
+    this->Widget->Delete();
+    this->Widget = NULL;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkKW@WidgetType@* vtkKW@WidgetType@Labeled::GetWidget()
+{
+  return this->Widget;
+}
+
+//----------------------------------------------------------------------------
+void vtkKW@WidgetType@Labeled::Create(vtkKWApplication *app, const char *args)
+{
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("vtkKW@WidgetType@Labeled already created");
+    return;
+    }
+
+  // Call the superclass
+
+  this->Superclass::Create(app, args);
+
+  // Create the widget
+
+  this->Widget->SetParent(this);
+  this->Widget->Create(app, NULL);
+
+  // Pack
+
+  this->Pack();
+
+  // Update enable state
+  
+  this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+void vtkKW@WidgetType@Labeled::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Unpack everything
+
+  if (this->Widget)
+    {
+    this->Widget->UnpackSiblings();
+    }
+
+  // Repack everything
+
+  ostrstream tk_cmd;
+
+  const char *side;
+  switch (this->LabelPosition)
+    {
+    case vtkKWWidgetLabeled::LabelPositionTop:
+      side = "top";
+      break;
+    case vtkKWWidgetLabeled::LabelPositionBottom:
+      side = "bottom";
+      break;
+    case vtkKWWidgetLabeled::LabelPositionRight:
+      side = "right";
+      break;
+    case vtkKWWidgetLabeled::LabelPositionDefault:
+    case vtkKWWidgetLabeled::LabelPositionLeft:
+    default:
+      side = "left";
+      break;
+    }
+
+  if (this->ShowLabel && this->HasLabel() && this->GetLabel()->IsCreated())
+    {
+    tk_cmd << "pack " << this->GetLabel()->GetWidgetName() 
+           << " -anchor nw -side " << side << endl;
+    }
+
+  if (this->Widget && this->Widget->IsCreated())
+    {
+    tk_cmd << "pack " << this->Widget->GetWidgetName() 
+           << " -anchor nw -fill x -side " << side << " -expand "
+           << (this->ExpandWidget ? "y" : "n") << endl;
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
+}
+
+// ----------------------------------------------------------------------------
+void vtkKW@WidgetType@Labeled::SetExpandWidget(int _arg)
+{
+  if (this->ExpandWidget == _arg)
+    {
+    return;
+    }
+
+  this->ExpandWidget = _arg;
+
+  this->Modified();
+
+  this->Pack();
+}
+
+//----------------------------------------------------------------------------
+void vtkKW@WidgetType@Labeled::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+  
+ if (this->Widget)
+    {
+    this->Widget->SetEnabled(this->Enabled);
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKW@WidgetType@Labeled::SetBalloonHelpString(const char *string)
+{
+  this->Superclass::SetBalloonHelpString(string);
+
+  if (this->Widget)
+    {
+    this->Widget->SetBalloonHelpString(string);
+    }
+}
+
+// ---------------------------------------------------------------------------
+void vtkKW@WidgetType@Labeled::SetBalloonHelpJustification(int j)
+{
+  this->Superclass::SetBalloonHelpJustification(j);
+
+  if (this->Widget)
+    {
+    this->Widget->SetBalloonHelpJustification(j);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKW@WidgetType@Labeled::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "ShowLabel: " 
+     << (this->ShowLabel ? "On" : "Off") << endl;
+
+  os << indent << "ExpandWidget: " 
+     << (this->ExpandWidget ? "On" : "Off") << endl;
+
+  os << indent << "Widget: ";
+  if (this->Widget)
+    {
+    os << endl;
+    this->Widget->PrintSelf(os, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "None" << endl;
+    }
+}

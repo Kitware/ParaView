@@ -25,18 +25,17 @@
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
 //#include "../Client/vtkPVCameraIcon.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWText.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWIcon.h"
-#include "vtkKWRadioButtonSet.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWLabeledCheckButton.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.5");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.6");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -52,11 +51,10 @@ vtkKWLookmark::vtkKWLookmark()
   this->LmkLeftFrame= vtkKWFrame::New();
   this->LmkRightFrame= vtkKWFrame::New();
   this->LmkFrame = vtkKWFrame::New();
-  this->LmkMainFrame = vtkKWLabeledFrame::New();
-  this->LmkCommentsFrame= vtkKWLabeledFrame::New();
+  this->LmkMainFrame = vtkKWFrameLabeled::New();
+  this->LmkCommentsFrame= vtkKWFrameLabeled::New();
   this->LmkDatasetLabel= vtkKWLabel::New();
   this->LmkDatasetCheckbox = vtkKWLabeledCheckButton::New();
-  this->DatasetOption = vtkKWRadioButtonSet::New();
   this->LmkDatasetFrame = vtkKWFrame::New();
   this->LmkCommentsText= vtkKWText::New();
   this->LmkNameField = vtkKWText::New();

@@ -19,9 +19,9 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledPopupButton.h"
+#include "vtkKWEntryLabeled.h"
+#include "vtkKWFrameLabeled.h"
+#include "vtkKWPopupButtonLabeled.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
 #include "vtkKWScale.h"
@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.14");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.15");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -61,12 +61,12 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
     vtkKWScalarComponentSelectionWidget::New();
 
   this->TitleFrame                      = vtkKWFrame::New();
-  this->TitleEntry                      = vtkKWLabeledEntry::New();
+  this->TitleEntry                      = vtkKWEntryLabeled::New();
   this->TitleTextPropertyWidget         = vtkKWTextProperty::New();
   this->TitleTextPropertyPopupButton    = NULL;
 
   this->LabelFrame                      = vtkKWFrame::New();
-  this->LabelFormatEntry                = vtkKWLabeledEntry::New();
+  this->LabelFormatEntry                = vtkKWEntryLabeled::New();
   this->LabelTextPropertyWidget         = vtkKWTextProperty::New();
   this->LabelTextPropertyPopupButton    = NULL;
 
@@ -248,8 +248,8 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->TitleEntry->SetParent(this->TitleFrame);
   this->TitleEntry->Create(app, 0);
   this->TitleEntry->SetLabel("Title:");
-  this->TitleEntry->GetEntry()->SetWidth(20);
-  this->TitleEntry->GetEntry()->BindCommand(this, "ScalarBarTitleCallback");
+  this->TitleEntry->GetWidget()->SetWidth(20);
+  this->TitleEntry->GetWidget()->BindCommand(this, "ScalarBarTitleCallback");
 
   this->TitleEntry->SetBalloonHelpString(
     "Set the scalar bar title. The text will automatically scale "
@@ -266,21 +266,21 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
     {
     if (!this->TitleTextPropertyPopupButton)
       {
-      this->TitleTextPropertyPopupButton = vtkKWLabeledPopupButton::New();
+      this->TitleTextPropertyPopupButton = vtkKWPopupButtonLabeled::New();
       }
     this->TitleTextPropertyPopupButton->SetParent(this->TitleFrame);
     this->TitleTextPropertyPopupButton->Create(app);
     this->TitleTextPropertyPopupButton->SetLabel("Title properties:");
-    this->TitleTextPropertyPopupButton->SetPopupButtonLabel("Edit...");
+    this->TitleTextPropertyPopupButton->GetWidget()->SetLabel("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
-                 this->TitleTextPropertyPopupButton->GetPopupButton()
+                 this->TitleTextPropertyPopupButton->GetWidget()
                  ->GetPopupFrame()->GetWidgetName());
 
     this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
                  this->TitleTextPropertyPopupButton->GetWidgetName());
 
     this->TitleTextPropertyWidget->SetParent(
-      this->TitleTextPropertyPopupButton->GetPopupButton()->GetPopupFrame());
+      this->TitleTextPropertyPopupButton->GetWidget()->GetPopupFrame());
     }
   else
     {
@@ -318,8 +318,8 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
   this->LabelFormatEntry->SetParent(this->LabelFrame);
   this->LabelFormatEntry->Create(app, 0);
   this->LabelFormatEntry->SetLabel("Label format:");
-  this->LabelFormatEntry->GetEntry()->SetWidth(20);
-  this->LabelFormatEntry->GetEntry()->BindCommand(
+  this->LabelFormatEntry->GetWidget()->SetWidth(20);
+  this->LabelFormatEntry->GetWidget()->BindCommand(
     this, "ScalarBarLabelFormatCallback");
 
   this->LabelFormatEntry->SetBalloonHelpString(
@@ -332,18 +332,18 @@ void vtkKWScalarBarAnnotation::Create(vtkKWApplication *app,
     {
     if (!this->LabelTextPropertyPopupButton)
       {
-      this->LabelTextPropertyPopupButton = vtkKWLabeledPopupButton::New();
+      this->LabelTextPropertyPopupButton = vtkKWPopupButtonLabeled::New();
       }
     this->LabelTextPropertyPopupButton->SetParent(this->LabelFrame);
     this->LabelTextPropertyPopupButton->Create(app);
     this->LabelTextPropertyPopupButton->SetLabel("Label properties:");
-    this->LabelTextPropertyPopupButton->SetPopupButtonLabel("Edit...");
+    this->LabelTextPropertyPopupButton->GetWidget()->SetLabel("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
-                 this->LabelTextPropertyPopupButton->GetPopupButton()
+                 this->LabelTextPropertyPopupButton->GetWidget()
                  ->GetPopupFrame()->GetWidgetName());
 
     this->LabelTextPropertyWidget->SetParent(
-      this->LabelTextPropertyPopupButton->GetPopupButton()->GetPopupFrame());
+      this->LabelTextPropertyPopupButton->GetWidget()->GetPopupFrame());
     }
   else
     {
@@ -546,7 +546,7 @@ void vtkKWScalarBarAnnotation::Update()
     {
     if (anno)
       {
-      this->TitleEntry->GetEntry()->SetValue(
+      this->TitleEntry->GetWidget()->SetValue(
         anno->GetTitle() ? anno->GetTitle() : "");
       }
     }
@@ -567,7 +567,7 @@ void vtkKWScalarBarAnnotation::Update()
     {
     if (anno)
       {
-      this->LabelFormatEntry->GetEntry()->SetValue(
+      this->LabelFormatEntry->GetWidget()->SetValue(
         anno->GetLabelFormat() ? anno->GetLabelFormat() : "");
       }
     }
@@ -741,7 +741,7 @@ void vtkKWScalarBarAnnotation::ScalarBarTitleCallback()
 {
   if (this->IsCreated() && this->TitleEntry)
     {
-    this->SetScalarBarTitle(this->TitleEntry->GetEntry()->GetValue());
+    this->SetScalarBarTitle(this->TitleEntry->GetWidget()->GetValue());
     }
 }
 
@@ -773,7 +773,7 @@ void vtkKWScalarBarAnnotation::ScalarBarLabelFormatCallback()
   if (this->IsCreated() && this->LabelFormatEntry)
     {
     this->SetScalarBarLabelFormat(
-      this->LabelFormatEntry->GetEntry()->GetValue());
+      this->LabelFormatEntry->GetWidget()->GetValue());
     }
 }
 

@@ -16,13 +16,13 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkKWSimpleEntryDialog );
-vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.6");
+vtkCxxRevisionMacro(vtkKWSimpleEntryDialog, "1.7");
 
 int vtkKWSimpleEntryDialogCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -32,7 +32,7 @@ vtkKWSimpleEntryDialog::vtkKWSimpleEntryDialog()
 {
   this->CommandFunction = vtkKWSimpleEntryDialogCommand;
 
-  this->Entry = vtkKWLabeledEntry::New();
+  this->Entry = vtkKWEntryLabeled::New();
 }
 
 //----------------------------------------------------------------------------
@@ -65,10 +65,10 @@ void vtkKWSimpleEntryDialog::Create(vtkKWApplication *app, const char *args)
                this->Entry->GetWidgetName(), this->Label->GetWidgetName());
 
   this->Script("bind %s <Return> {%s OK}",
-               this->Entry->GetEntry()->GetWidgetName(), this->GetTclName());
+               this->Entry->GetWidget()->GetWidgetName(), this->GetTclName());
 
   this->Script("bind %s <Escape> {%s Cancel}",
-               this->Entry->GetEntry()->GetWidgetName(), this->GetTclName());
+               this->Entry->GetWidget()->GetWidgetName(), this->GetTclName());
 }
 
 //----------------------------------------------------------------------------
@@ -76,7 +76,7 @@ int vtkKWSimpleEntryDialog::Invoke()
 {
   if (this->IsCreated())
     {
-    this->Entry->GetEntry()->Focus();
+    this->Entry->GetWidget()->Focus();
     }
 
   return this->Superclass::Invoke();

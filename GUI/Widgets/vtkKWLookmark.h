@@ -35,7 +35,7 @@ class vtkKWLabeledCheckButton;
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWCheckButton;
 class vtkPVCameraIcon;
 class vtkKWText;
@@ -68,7 +68,7 @@ public:
   void SetSelectionState(int state);
   int GetSelectionState();
 
-  vtkGetObjectMacro(LmkMainFrame,vtkKWLabeledFrame);
+  vtkGetObjectMacro(LmkMainFrame,vtkKWFrameLabeled);
   vtkGetObjectMacro(SeparatorFrame,vtkKWFrame);
 
 //  void DragAndDropStartCallback(int x, int y);
@@ -110,8 +110,8 @@ protected:
   vtkKWFrame *LmkLeftFrame;
   vtkKWFrame *LmkRightFrame;
   vtkKWFrame *LmkFrame;
-  vtkKWLabeledFrame *LmkMainFrame;
-  vtkKWLabeledFrame *LmkCommentsFrame;
+  vtkKWFrameLabeled *LmkMainFrame;
+  vtkKWFrameLabeled *LmkCommentsFrame;
   vtkKWLabel *LmkDatasetLabel;
   vtkKWLabeledCheckButton *LmkDatasetCheckbox;
   vtkKWFrame *LmkDatasetFrame;
@@ -120,7 +120,6 @@ protected:
   vtkKWText *LmkNameField;
   vtkKWFrame *SeparatorFrame;
   vtkKWCheckButton *Checkbox;
-  vtkKWRadioButtonSet *DatasetOption;
 
   int Location;
   int Width;

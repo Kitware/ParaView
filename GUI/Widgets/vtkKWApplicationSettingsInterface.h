@@ -38,7 +38,7 @@
 
 class vtkKWCheckButton;
 class vtkKWFrame;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWPushButton;
 class vtkKWWindow;
 
@@ -93,7 +93,7 @@ protected:
 
   // Interface settings
 
-  vtkKWLabeledFrame *InterfaceSettingsFrame;
+  vtkKWFrameLabeled *InterfaceSettingsFrame;
 
   vtkKWCheckButton  *ConfirmExitCheckButton;
   vtkKWCheckButton  *SaveWindowGeometryCheckButton;
@@ -103,13 +103,13 @@ protected:
 
   // Interface customization
 
-  vtkKWLabeledFrame *InterfaceCustomizationFrame;
+  vtkKWFrameLabeled *InterfaceCustomizationFrame;
   vtkKWCheckButton  *EnableDragAndDropCheckButton;
   vtkKWPushButton   *ResetDragAndDropButton;
 
   // Toolbar settings
 
-  vtkKWLabeledFrame *ToolbarSettingsFrame;
+  vtkKWFrameLabeled *ToolbarSettingsFrame;
   vtkKWCheckButton  *FlatFrameCheckButton;
   vtkKWCheckButton  *FlatButtonsCheckButton;
 

@@ -14,12 +14,12 @@
 #include "vtkKWScalarComponentSelectionWidget.h"
 
 #include "vtkKWEvent.h"
-#include "vtkKWLabeledOptionMenu.h"
+#include "vtkKWOptionMenuLabeled.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.6");
+vtkCxxRevisionMacro(vtkKWScalarComponentSelectionWidget, "1.7");
 vtkStandardNewMacro(vtkKWScalarComponentSelectionWidget);
 
 //----------------------------------------------------------------------------
@@ -34,7 +34,7 @@ vtkKWScalarComponentSelectionWidget::vtkKWScalarComponentSelectionWidget()
 
   // GUI
 
-  this->SelectedComponentOptionMenu     = vtkKWLabeledOptionMenu::New();
+  this->SelectedComponentOptionMenu     = vtkKWOptionMenuLabeled::New();
 }
 
 //----------------------------------------------------------------------------
@@ -76,6 +76,7 @@ void vtkKWScalarComponentSelectionWidget::Create(
 
   this->SelectedComponentOptionMenu->SetParent(this);
   this->SelectedComponentOptionMenu->Create(app);
+  this->SelectedComponentOptionMenu->ExpandWidgetOff();
   this->SelectedComponentOptionMenu->SetLabel("Component:");
   this->SelectedComponentOptionMenu->SetBalloonHelpString(
     "Select the component this interface will control.");
@@ -131,8 +132,7 @@ void vtkKWScalarComponentSelectionWidget::Update()
 
   if (this->SelectedComponentOptionMenu)
     {
-    vtkKWOptionMenu *menu = 
-      this->SelectedComponentOptionMenu->GetOptionMenu();
+    vtkKWOptionMenu *menu = this->SelectedComponentOptionMenu->GetWidget();
 
     if (this->SelectedComponentOptionMenu->IsCreated() &&
         menu->GetNumberOfEntries() != this->NumberOfComponents)

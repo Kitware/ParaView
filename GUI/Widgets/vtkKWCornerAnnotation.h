@@ -26,8 +26,8 @@ class vtkCornerAnnotation;
 class vtkKWFrame;
 class vtkKWGenericComposite;
 class vtkKWLabel;
-class vtkKWLabeledPopupButton;
-class vtkKWLabeledText;
+class vtkKWPopupButtonLabeled;
+class vtkKWTextLabeled;
 class vtkKWRenderWidget;
 class vtkKWScale;
 class vtkKWTextProperty;
@@ -151,11 +151,11 @@ protected:
   int                     PopupTextProperty;
 
   vtkKWFrame              *CornerFrame;
-  vtkKWLabeledText        *CornerText[4];
+  vtkKWTextLabeled        *CornerText[4];
   vtkKWFrame              *PropertiesFrame;
   vtkKWScale              *MaximumLineHeightScale;
   vtkKWTextProperty       *TextPropertyWidget;
-  vtkKWLabeledPopupButton *TextPropertyPopupButton;
+  vtkKWPopupButtonLabeled *TextPropertyPopupButton;
 
   virtual void Render();
 

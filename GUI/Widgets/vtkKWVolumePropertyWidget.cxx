@@ -24,11 +24,11 @@
 #include "vtkKWHistogramSet.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledOptionMenu.h"
-#include "vtkKWLabeledPopupButton.h"
-#include "vtkKWLabeledScaleSet.h"
+#include "vtkKWEntryLabeled.h"
+#include "vtkKWFrameLabeled.h"
+#include "vtkKWOptionMenuLabeled.h"
+#include "vtkKWPopupButtonLabeled.h"
+#include "vtkKWScaleSetLabeled.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPiecewiseFunctionEditor.h"
 #include "vtkKWScalarComponentSelectionWidget.h"
@@ -46,7 +46,7 @@
 #define VTK_KW_VPW_TESTING 0
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.4");
+vtkCxxRevisionMacro(vtkKWVolumePropertyWidget, "1.5");
 vtkStandardNewMacro(vtkKWVolumePropertyWidget);
 
 //----------------------------------------------------------------------------
@@ -73,9 +73,9 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   // GUI
 
-  this->EditorFrame                     = vtkKWLabeledFrame::New();
+  this->EditorFrame                     = vtkKWFrameLabeled::New();
 
-  this->InterpolationTypeOptionMenu     = vtkKWLabeledOptionMenu::New();
+  this->InterpolationTypeOptionMenu     = vtkKWOptionMenuLabeled::New();
 
   this->EnableShadingCheckButton        = vtkKWCheckButton::New();
 
@@ -87,7 +87,7 @@ vtkKWVolumePropertyWidget::vtkKWVolumePropertyWidget()
 
   this->EnableGradientOpacityOptionMenu = vtkKWOptionMenu::New();
 
-  this->ComponentWeightScaleSet         = vtkKWLabeledScaleSet::New();
+  this->ComponentWeightScaleSet         = vtkKWScaleSetLabeled::New();
 
   this->ComponentSelectionWidget = 
     vtkKWScalarComponentSelectionWidget::New();
@@ -258,28 +258,29 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   this->ComponentSelectionWidget->SetSelectedComponentChangedCommand(
     this, "SelectedComponentCallback");
 
-  vtkKWLabeledOptionMenu *omenu = 
+  vtkKWOptionMenuLabeled *omenu = 
     this->ComponentSelectionWidget->GetSelectedComponentOptionMenu();
   omenu->SetLabelWidth(label_width);
-  omenu->GetOptionMenu()->SetWidth(menu_width);
+  omenu->GetWidget()->SetWidth(menu_width);
 
   // --------------------------------------------------------------
   // Interpolation type
 
   if (!this->InterpolationTypeOptionMenu)
     {
-    this->InterpolationTypeOptionMenu = vtkKWLabeledOptionMenu::New();
+    this->InterpolationTypeOptionMenu = vtkKWOptionMenuLabeled::New();
     }
 
   this->InterpolationTypeOptionMenu->SetParent(frame);
   this->InterpolationTypeOptionMenu->Create(app);
+  this->InterpolationTypeOptionMenu->ExpandWidgetOff();
   this->InterpolationTypeOptionMenu->SetLabel("Interpolation:");
   this->InterpolationTypeOptionMenu->SetLabelWidth(label_width);
-  this->InterpolationTypeOptionMenu->GetOptionMenu()->SetWidth(menu_width);
+  this->InterpolationTypeOptionMenu->GetWidget()->SetWidth(menu_width);
   this->InterpolationTypeOptionMenu->SetBalloonHelpString(
     "Set the interpolation type used for sampling the volume.");
 
-  vtkKWOptionMenu *menu = this->InterpolationTypeOptionMenu->GetOptionMenu();
+  vtkKWOptionMenu *menu = this->InterpolationTypeOptionMenu->GetWidget();
 
   char callback[128];
 
@@ -333,9 +334,9 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   this->ScalarOpacityFunctionEditor->ComputePointColorFromValueOff();
   this->ScalarOpacityFunctionEditor->LockEndPointsParameterOn();
   this->ScalarOpacityFunctionEditor->SetLabelPosition(
-    vtkKWParameterValueFunctionEditor::LabelPositionAtTop);
+    vtkKWParameterValueFunctionEditor::LabelPositionTop);
   this->ScalarOpacityFunctionEditor->SetRangeLabelPosition(
-    vtkKWParameterValueFunctionEditor::RangeLabelPositionAtTop);
+    vtkKWParameterValueFunctionEditor::RangeLabelPositionTop);
   this->ScalarOpacityFunctionEditor->ShowValueRangeOff();
   this->ScalarOpacityFunctionEditor->ShowWindowLevelModeButtonOn();
   this->ScalarOpacityFunctionEditor->Create(app, "");
@@ -482,10 +483,10 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
   this->ComponentWeightScaleSet->Create(app, "");
   this->ComponentWeightScaleSet->SetLabel("Component Weights:");
 
-  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetScaleSet();
+  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
 
   scaleset->PackHorizontallyOn();
-  scaleset->SetMaximumNumberOfWidgetInPackingDirection(2);
+  scaleset->SetMaximumNumberOfWidgetsInPackingDirection(2);
   scaleset->SetPadding(2, 0);
 
   int i;
@@ -493,9 +494,9 @@ void vtkKWVolumePropertyWidget::Create(vtkKWApplication *app, const char *args)
 
   for (i = 0; i < VTK_MAX_VRCOMP; i++)
     {
-    scaleset->AddScale(i);
-    scaleset->HideScale(i);
-    vtkKWScale *scale = scaleset->GetScale(i);
+    scaleset->AddWidget(i);
+    scaleset->HideWidget(i);
+    vtkKWScale *scale = scaleset->GetWidget(i);
     scale->SetResolution(0.01);
     scale->DisplayEntry();
     sprintf(label, "%d:", i + 1);
@@ -736,7 +737,7 @@ void vtkKWVolumePropertyWidget::Update()
 
   if (InterpolationTypeOptionMenu)
     {
-    vtkKWOptionMenu *m = this->InterpolationTypeOptionMenu->GetOptionMenu();
+    vtkKWOptionMenu *m = this->InterpolationTypeOptionMenu->GetWidget();
     if (has_prop)
       {
       switch (this->VolumeProperty->GetInterpolationType())
@@ -1059,28 +1060,28 @@ void vtkKWVolumePropertyWidget::Update()
 
   if (this->ComponentWeightScaleSet)
     {
-    vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetScaleSet();
+    vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
     if (has_prop)
       {
       for (i = 0; i < VTK_MAX_VRCOMP; i++)
         {
-        if (scaleset->GetScale(i))
+        if (scaleset->GetWidget(i))
           {
-          int old_disable = scaleset->GetScale(i)->GetDisableCommands();
-          scaleset->GetScale(i)->SetDisableCommands(1);
-          scaleset->GetScale(i)->SetValue(
+          int old_disable = scaleset->GetWidget(i)->GetDisableCommands();
+          scaleset->GetWidget(i)->SetDisableCommands(1);
+          scaleset->GetWidget(i)->SetValue(
             this->VolumeProperty->GetComponentWeight(i));
-          scaleset->GetScale(i)->SetDisableCommands(old_disable);
+          scaleset->GetWidget(i)->SetDisableCommands(old_disable);
           }
         }
       }
     if (this->ComponentWeightScaleSet->IsCreated())
       {
-      if (scaleset->GetNumberOfVisibleScales() != nb_components)
+      if (scaleset->GetNumberOfVisibleWidgets() != nb_components)
         {
         for (i = 0; i < VTK_MAX_VRCOMP; i++)
           {
-          scaleset->SetScaleVisibility(i, (i < nb_components ? 1 : 0));
+          scaleset->SetWidgetVisibility(i, (i < nb_components ? 1 : 0));
           }
         }
       int scales_out = (!this->GetIndependentComponents() || nb_components < 2);
@@ -1882,13 +1883,13 @@ void vtkKWVolumePropertyWidget::ComponentWeightChangedCallback(int index)
     return;
     }
 
-  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetScaleSet();
-  if (index < 0 || index > scaleset->GetNumberOfVisibleScales())
+  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
+  if (index < 0 || index > scaleset->GetNumberOfVisibleWidgets())
     {
     return;
     }
 
-  float weight = scaleset->GetScale(index)->GetValue();
+  float weight = scaleset->GetWidget(index)->GetValue();
   this->VolumeProperty->SetComponentWeight(index, weight);
   
   float fargs[2];
@@ -1907,13 +1908,13 @@ void vtkKWVolumePropertyWidget::ComponentWeightChangingCallback(int index)
     return;
     }
 
-  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetScaleSet();
-  if (index < 0 || index > scaleset->GetNumberOfVisibleScales())
+  vtkKWScaleSet *scaleset = this->ComponentWeightScaleSet->GetWidget();
+  if (index < 0 || index > scaleset->GetNumberOfVisibleWidgets())
     {
     return;
     }
 
-  float weight = scaleset->GetScale(index)->GetValue();
+  float weight = scaleset->GetWidget(index)->GetValue();
   this->VolumeProperty->SetComponentWeight(index, weight);
   
   float fargs[2];

@@ -14,13 +14,13 @@
 #include "vtkKWPopupFrame.h"
 
 #include "vtkKWFrame.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWPopupButton.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.5");
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.6");
 
 int vtkKWPopupFrameCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -35,7 +35,7 @@ vtkKWPopupFrame::vtkKWPopupFrame()
   this->PopupMode               = 0;
 
   this->PopupButton             = NULL;
-  this->Frame                   = vtkKWLabeledFrame::New();
+  this->Frame                   = vtkKWFrameLabeled::New();
 }
 
 //----------------------------------------------------------------------------

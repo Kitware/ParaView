@@ -15,6 +15,8 @@
 // .SECTION Description
 // A widget that allows the user to edit a parameter/value function.
 // Keybindings: Delete or x, Home, End, PageUp or p, PageDown or n, 
+// .SECTION See Also
+// vtkKWWidgetLabeled
 
 #ifndef __vtkKWParameterValueFunctionEditor_h
 #define __vtkKWParameterValueFunctionEditor_h
@@ -43,7 +45,7 @@ class vtkKWCanvas;
 class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
-class vtkKWLabeledEntry;
+class vtkKWEntryLabeled;
 class vtkKWRange;
 class vtkKWOptionMenu;
 
@@ -144,28 +146,20 @@ public:
     { this->SetWholeValueRangeAndMaintainVisible(range[0], range[1]); };
 
   // Description:
-  // Show the label at the default position (on the same line as all
-  // other elements), or on top on its own line, or on the left of the
-  // whole editor, on the same line as the canvas.
-  // The superclass ShowLabel still has to be On for the label to be
-  // shown.
-  // Use the superclass: 
-  //   - SetLabel() to set the label string, 
-  //   - GetLabel() to get the widget,
-  //   - SetShowLabel(), ShowLabelOn(), ShowLabelOff() to show/hide the label.
-  // Note: set ShowLabel to the proper value before calling Create() in order
-  // to minimize the footprint of the object.
+  // Show/Hide the internal label (override the super).
   virtual void SetShowLabel(int);
-  //BTX
-  enum
-  {
-    LabelPositionAtDefault = 10,
-    LabelPositionAtTop,
-    LabelPositionAtLeft
-  };
-  //ETX
+
+  // Description:
+  // If supported, set the label position in regards to the rest of
+  // the composite widget (override the super).
+  // As a subclass of vtkKWWidgetLabeled, this class inherits a label and
+  // methods to set its position and visibility. Note that the default label 
+  // position implemented in this class is on the same line as all other UI
+  // elements like entries, or range parameters. Only a subset of the specific
+  // positions listed in vtkKWWidgetLabeled is supported: on Top
+  // (the label is placed on its own line), or the Left of the whole editor, 
+  // on the same line as the canvas. 
   virtual void SetLabelPosition(int);
-  vtkGetMacro(LabelPosition, int);
 
   // Description:
   // Show the parameter range UI (the slider).
@@ -180,8 +174,8 @@ public:
   //BTX
   enum 
   {
-    ParameterRangePositionAtTop = 0,
-    ParameterRangePositionAtBottom
+    ParameterRangePositionTop = 0,
+    ParameterRangePositionBottom
   };
   //ETX
   virtual void SetParameterRangePosition(int);
@@ -226,16 +220,16 @@ public:
   // Set the position of points in the value range. 
   // Default is PointPositionValue, i.e. if the point value is
   // mono-dimensional, its vertical position in the canvas will be computed
-  // from its value relative to the whole value range. If PositionAtCenter 
+  // from its value relative to the whole value range. If PositionCenter 
   // or if the point value is multi-dimensional, the point is centered
   // vertically.
   //BTX
   enum 
   {
-    PointPositionAtValue = 0,
-    PointPositionAtTop,
-    PointPositionAtBottom,
-    PointPositionAtCenter
+    PointPositionValue = 0,
+    PointPositionTop,
+    PointPositionBottom,
+    PointPositionCenter
   };
   //ETX
   virtual void SetPointPositionInValueRange(int);
@@ -257,8 +251,8 @@ public:
   //BTX
   enum
   {
-    RangeLabelPositionAtDefault = 10,
-    RangeLabelPositionAtTop
+    RangeLabelPositionDefault = 10,
+    RangeLabelPositionTop
   };
   //ETX
   virtual void SetRangeLabelPosition(int);
@@ -280,8 +274,8 @@ public:
   //BTX
   enum
   {
-    ParameterEntryPositionAtDefault = 10,
-    ParameterEntryPositionAtRight
+    ParameterEntryPositionDefault = 10,
+    ParameterEntryPositionRight
   };
   //ETX
   virtual void SetParameterEntryPosition(int);
@@ -298,7 +292,7 @@ public:
   // Access the entry
   // If you need to customize this object, make sure you first set 
   // ShowParameterEntry to On and call Create().
-  vtkGetObjectMacro(ParameterEntry, vtkKWLabeledEntry);
+  vtkGetObjectMacro(ParameterEntry, vtkKWEntryLabeled);
 
   // Description:
   // Show the user frame UI.
@@ -952,7 +946,6 @@ protected:
   int   ShowPointIndex;
   int   ShowPointGuideline;
   int   ShowSelectedPointIndex;
-  int   LabelPosition;
   int   ShowRangeLabel;
   int   RangeLabelPosition;
   int   ParameterEntryPosition;
@@ -1020,7 +1013,7 @@ protected:
   vtkKWFrame        *UserFrame;
   vtkKWFrame        *TopRightFrame;
   vtkKWLabel        *RangeLabel;
-  vtkKWLabeledEntry *ParameterEntry;
+  vtkKWEntryLabeled *ParameterEntry;
   vtkKWCanvas       *ValueTicksCanvas;
   vtkKWCanvas       *ParameterTicksCanvas;
 

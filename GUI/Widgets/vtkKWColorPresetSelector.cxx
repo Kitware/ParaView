@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.3");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.4");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 
@@ -615,8 +615,8 @@ void vtkKWColorPresetSelector::Create(vtkKWApplication *app,
     "Preset transfer functions for mapping scalar value to color. Select a "
     "preset to use it.");
 
-  this->OptionMenu->IndicatorOff();
-  this->OptionMenu->SetImageOption(vtkKWIcon::ICON_FOLDER);
+  this->GetWidget()->IndicatorOff();
+  this->GetWidget()->SetImageOption(vtkKWIcon::ICON_FOLDER);
 
   this->PopulatePresetMenu();
 }
@@ -714,7 +714,7 @@ void vtkKWColorPresetSelector::PopulatePresetMenu()
     return;
     }
 
-  vtkKWMenu *menu = this->OptionMenu->GetMenu();
+  vtkKWMenu *menu = this->GetWidget()->GetMenu();
   menu->DeleteAllMenuItems();
 
   Tcl_Interp *interp = this->GetApplication()->GetMainInterp();

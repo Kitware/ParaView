@@ -18,10 +18,10 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledLabel.h"
-#include "vtkKWLabeledPopupButton.h"
-#include "vtkKWLabeledPushButtonSet.h"
+#include "vtkKWFrameLabeled.h"
+#include "vtkKWLabelLabeled.h"
+#include "vtkKWPopupButtonLabeled.h"
+#include "vtkKWPushButtonSetLabeled.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWPushButtonSet.h"
@@ -35,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.3");
+vtkCxxRevisionMacro(vtkKWMaterialPropertyWidget, "1.4");
 
 //----------------------------------------------------------------------------
 vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
@@ -66,7 +66,7 @@ vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
 
   this->PopupButton = NULL;
 
-  this->MaterialPropertiesFrame = vtkKWLabeledFrame::New();
+  this->MaterialPropertiesFrame = vtkKWFrameLabeled::New();
 
   this->LightingFrame = vtkKWFrame::New();
 
@@ -80,9 +80,9 @@ vtkKWMaterialPropertyWidget::vtkKWMaterialPropertyWidget()
 
   this->PresetsFrame = vtkKWFrame::New();
 
-  this->PreviewLabel = vtkKWLabeledLabel::New();
+  this->PreviewLabel = vtkKWLabelLabeled::New();
 
-  this->PresetPushButtonSet = vtkKWLabeledPushButtonSet::New();
+  this->PresetPushButtonSet = vtkKWPushButtonSetLabeled::New();
 }
 
 //----------------------------------------------------------------------------
@@ -261,14 +261,14 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
     {
     if (!this->PopupButton)
       {
-      this->PopupButton = vtkKWLabeledPopupButton::New();
+      this->PopupButton = vtkKWPopupButtonLabeled::New();
       }
     
     this->PopupButton->SetParent(this);
     this->PopupButton->Create(app, 0);
     this->PopupButton->SetLabel("Edit material:");
-    this->PopupButton->SetPopupButtonLabel("");
-    this->PopupButton->GetPopupButton()->SetPopupTitle("Material Properties");
+    this->PopupButton->GetWidget()->SetLabel("");
+    this->PopupButton->GetWidget()->SetPopupTitle("Material Properties");
 
     this->Script("pack %s -side left -anchor w -fill x",
                  this->PopupButton->GetWidgetName());
@@ -281,7 +281,7 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
     {
     this->MaterialPropertiesFrame->ShowHideFrameOff();
     this->MaterialPropertiesFrame->SetParent(
-      this->PopupButton->GetPopupButton()->GetPopupFrame());
+      this->PopupButton->GetWidget()->GetPopupFrame());
     }
   else
     {
@@ -405,7 +405,8 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   // Preview
 
   this->PreviewLabel->SetParent(this->PresetsFrame);
-  this->PreviewLabel->PackHorizontallyOff();
+  this->PreviewLabel->SetLabelPositionToTop();
+  this->PreviewLabel->ExpandWidgetOff();
   this->PreviewLabel->Create(app, "");
   this->PreviewLabel->SetLabel("Preview:");
   
@@ -416,15 +417,16 @@ void vtkKWMaterialPropertyWidget::Create(vtkKWApplication *app,
   // Presets
 
   this->PresetPushButtonSet->SetParent(this->PresetsFrame);
-  this->PresetPushButtonSet->PackHorizontallyOff();
+  this->PresetPushButtonSet->SetLabelPositionToTop();
   this->PresetPushButtonSet->SetLabel("Presets:");
   this->PresetPushButtonSet->Create(app);
+  this->PresetPushButtonSet->ExpandWidgetOff();
 
   this->Script(
     "pack %s -side right -padx 2 -pady 2 -anchor nw",
     this->PresetPushButtonSet->GetWidgetName());
 
-  vtkKWPushButtonSet *pbs = this->PresetPushButtonSet->GetPushButtonSet();
+  vtkKWPushButtonSet *pbs = this->PresetPushButtonSet->GetWidget();
   pbs->PackHorizontallyOn();
 
   this->CreatePresets();
@@ -518,7 +520,7 @@ void vtkKWMaterialPropertyWidget::UpdatePreview()
                     this->SpecularPowerScale->GetValue(), 
                     this->PreviewSize);
 
-  this->PreviewLabel->GetLabel2()->SetImageOption(
+  this->PreviewLabel->GetWidget()->SetImageOption(
     buffer, this->PreviewSize, this->PreviewSize, pixel_size);
   
   delete [] buffer;
@@ -564,7 +566,7 @@ void vtkKWMaterialPropertyWidget::UpdatePopupPreview()
                     this->SpecularPowerScale->GetValue(), 
                     this->PopupPreviewSize);
 
-  this->PopupButton->GetPopupButton()->SetImageOption(
+  this->PopupButton->GetWidget()->SetImageOption(
     buffer, this->PopupPreviewSize, this->PopupPreviewSize, pixel_size);
   
   delete [] buffer;
@@ -594,8 +596,8 @@ void vtkKWMaterialPropertyWidget::CreatePresets()
 
   // Delete all presets
 
-  vtkKWPushButtonSet *pbs = this->PresetPushButtonSet->GetPushButtonSet();
-  pbs->DeleteAllButtons();
+  vtkKWPushButtonSet *pbs = this->PresetPushButtonSet->GetWidget();
+  pbs->DeleteAllWidgets();
 
   int pixel_size = 3 + (this->GridOpacity == 1.0 ? 0 : 1);
 
@@ -614,8 +616,7 @@ void vtkKWMaterialPropertyWidget::CreatePresets()
     {
     if (it->GetData(preset) == VTK_OK && it->GetKey(key) == VTK_OK)
       {
-      pbs->AddButton(key);
-      vtkKWPushButton *pb = pbs->GetButton(key);
+      vtkKWPushButton *pb = pbs->AddWidget(key);
       if (preset->HelpString)
         {
         pb->SetBalloonHelpString(preset->HelpString);

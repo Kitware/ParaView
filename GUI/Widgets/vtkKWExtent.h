@@ -93,7 +93,8 @@ public:
   // This just propagates the same method to the internal ranges.
   virtual void SetOrientation(int);
   virtual void SetLabelPosition(int);
-  virtual void SetEntriesPosition(int);
+  virtual void SetEntry1Position(int);
+  virtual void SetEntry2Position(int);
   virtual void SetSliderCanPush(int);
   vtkBooleanMacro(SliderCanPush, int);
 

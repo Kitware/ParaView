@@ -21,18 +21,18 @@
 #ifndef __vtkKWColorPresetSelector_h
 #define __vtkKWColorPresetSelector_h
 
-#include "vtkKWLabeledOptionMenu.h"
+#include "vtkKWOptionMenuLabeled.h"
 
 class vtkColorTransferFunction;
 class vtkKWColorPresetSelectorInternals;
 
 //----------------------------------------------------------------------------
 
-class VTK_EXPORT vtkKWColorPresetSelector : public vtkKWLabeledOptionMenu
+class VTK_EXPORT vtkKWColorPresetSelector : public vtkKWOptionMenuLabeled
 {
 public:
   static vtkKWColorPresetSelector* New();
-  vtkTypeRevisionMacro(vtkKWColorPresetSelector,vtkKWLabeledOptionMenu);
+  vtkTypeRevisionMacro(vtkKWColorPresetSelector,vtkKWOptionMenuLabeled);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

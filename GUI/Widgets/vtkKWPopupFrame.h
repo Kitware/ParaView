@@ -20,7 +20,7 @@
 
 #include "vtkKWWidget.h"
 
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWPopupButton;
 
 class VTK_EXPORT vtkKWPopupFrame : public vtkKWWidget
@@ -43,7 +43,7 @@ public:
   // Description:
   // Access to sub-widgets
   vtkGetObjectMacro(PopupButton, vtkKWPopupButton);
-  vtkGetObjectMacro(Frame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(Frame, vtkKWFrameLabeled);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -63,7 +63,7 @@ protected:
   int                     PopupMode;
 
   vtkKWPopupButton        *PopupButton;
-  vtkKWLabeledFrame       *Frame;
+  vtkKWFrameLabeled       *Frame;
 
 private:
   vtkKWPopupFrame(const vtkKWPopupFrame&); // Not implemented

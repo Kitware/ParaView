@@ -21,8 +21,8 @@
 #include "vtkKWPopupFrameCheckButton.h"
 
 class vtkKWFrame;
-class vtkKWLabeledEntry;
-class vtkKWLabeledPopupButton;
+class vtkKWEntryLabeled;
+class vtkKWPopupButtonLabeled;
 class vtkKWScalarComponentSelectionWidget;
 class vtkKWScale;
 class vtkKWTextProperty;
@@ -141,13 +141,13 @@ protected:
 
   vtkKWScalarComponentSelectionWidget *ComponentSelectionWidget;
   vtkKWFrame                          *TitleFrame;
-  vtkKWLabeledEntry                   *TitleEntry;
+  vtkKWEntryLabeled                   *TitleEntry;
   vtkKWTextProperty                   *TitleTextPropertyWidget;
-  vtkKWLabeledPopupButton             *TitleTextPropertyPopupButton;
+  vtkKWPopupButtonLabeled             *TitleTextPropertyPopupButton;
   vtkKWFrame                          *LabelFrame;
-  vtkKWLabeledEntry                   *LabelFormatEntry;
+  vtkKWEntryLabeled                   *LabelFormatEntry;
   vtkKWTextProperty                   *LabelTextPropertyWidget;
-  vtkKWLabeledPopupButton             *LabelTextPropertyPopupButton;
+  vtkKWPopupButtonLabeled             *LabelTextPropertyPopupButton;
   vtkKWThumbWheel                     *MaximumNumberOfColorsThumbWheel;
   vtkKWScale                          *NumberOfLabelsScale;
 

@@ -18,9 +18,9 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledPopupButton.h"
-#include "vtkKWLabeledText.h"
+#include "vtkKWFrameLabeled.h"
+#include "vtkKWPopupButtonLabeled.h"
+#include "vtkKWTextLabeled.h"
 #include "vtkKWPopupButton.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWScale.h"
@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.84");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.85");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -66,7 +66,7 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 
   for (int i = 0; i < 4; i++)
     {
-    this->CornerText[i] = vtkKWLabeledText::New();
+    this->CornerText[i] = vtkKWTextLabeled::New();
     }
 }
 
@@ -222,7 +222,8 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     {
     this->CornerText[i]->SetParent(this->CornerFrame);
     this->CornerText[i]->Create( app, 0);
-    vtkKWText *text = this->CornerText[i]->GetText();
+    this->CornerText[i]->SetLabelPositionToTop();
+    vtkKWText *text = this->CornerText[i]->GetWidget();
     text->SetHeight(3);
     text->SetWidth(25);
     text->SetWrapToNone();
@@ -317,21 +318,21 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     {
     if (!this->TextPropertyPopupButton)
       {
-      this->TextPropertyPopupButton = vtkKWLabeledPopupButton::New();
+      this->TextPropertyPopupButton = vtkKWPopupButtonLabeled::New();
       }
     this->TextPropertyPopupButton->SetParent(this->PropertiesFrame);
     this->TextPropertyPopupButton->Create(app);
     this->TextPropertyPopupButton->SetLabel("Text properties:");
-    this->TextPropertyPopupButton->SetPopupButtonLabel("Edit...");
+    this->TextPropertyPopupButton->GetWidget()->SetLabel("Edit...");
     this->Script("%s configure -bd 2 -relief groove", 
-                 this->TextPropertyPopupButton->GetPopupButton()
+                 this->TextPropertyPopupButton->GetWidget()
                  ->GetPopupFrame()->GetWidgetName());
 
     this->Script("pack %s -padx 2 -pady 2 -side left -anchor w", 
                  this->TextPropertyPopupButton->GetWidgetName());
 
     this->TextPropertyWidget->SetParent(
-      this->TextPropertyPopupButton->GetPopupButton()->GetPopupFrame());
+      this->TextPropertyPopupButton->GetWidget()->GetPopupFrame());
     }
   else
     {
@@ -383,7 +384,7 @@ void vtkKWCornerAnnotation::Update()
     {
     if (this->CornerText[i])
       {
-      this->CornerText[i]->GetText()->SetValue(
+      this->CornerText[i]->GetWidget()->SetValue(
         this->CornerAnnotation ? this->CornerAnnotation->GetText(i) : "");
       }
     }
@@ -604,7 +605,7 @@ void vtkKWCornerAnnotation::CornerTextCallback(int i)
 {
   if (this->IsCreated() && this->CornerText[i])
     {
-    this->SetCornerText(this->CornerText[i]->GetText()->GetValue(), i);
+    this->SetCornerText(this->CornerText[i]->GetWidget()->GetValue(), i);
     }
 }
 

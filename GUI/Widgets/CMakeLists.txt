@@ -5,7 +5,7 @@ PROJECT(KWWidgets)
 # directory so that it gets built and then you will use the following variables
 # in your CMakeLists files to get the proper include paths and libraries
 SET (KWWidgets_INCLUDE_PATH 
-  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR};${CMAKE_CURRENT_BINARY_DIR}"
   CACHE INTERNAL "include paths for KWWidgets"
   )
 
@@ -25,18 +25,17 @@ SET( KWWidgets_SRCS
   vtkKWCanvas.cxx 
   vtkKWChangeColorButton.cxx 
   vtkKWCheckButton.cxx 
-  vtkKWCheckButtonSet.cxx 
   vtkKWCheckButtonWithChangeColor.cxx
   vtkKWColorPresetSelector.cxx
   vtkKWColorTransferFunctionEditor.cxx
   vtkKWCornerAnnotation.cxx 
   vtkKWDialog.cxx 
   vtkKWEntry.cxx 
-  vtkKWEntrySet.cxx 
   vtkKWEvent.cxx
   vtkKWEventMap.cxx
   vtkKWExtent.cxx 
   vtkKWFrame.cxx
+  vtkKWFrameLabeled.cxx 
   vtkKWGenericRenderWindowInteractor.cxx
   vtkKWHistogram.cxx
   vtkKWHistogramSet.cxx
@@ -44,21 +43,6 @@ SET( KWWidgets_SRCS
   vtkKWHeaderAnnotation.cxx 
   vtkKWIcon.cxx
   vtkKWLabel.cxx
-  vtkKWLabeledCheckButton.cxx
-  vtkKWLabeledCheckButtonSet.cxx 
-  vtkKWLabeledEntry.cxx 
-  vtkKWLabeledFrame.cxx 
-  vtkKWLabeledLabel.cxx 
-  vtkKWLabeledLabelSet.cxx
-  vtkKWLabeledLoadSaveButton.cxx
-  vtkKWLabeledOptionMenu.cxx 
-  vtkKWLabeledPopupButton.cxx 
-  vtkKWLabeledPushButton.cxx
-  vtkKWLabeledPushButtonSet.cxx 
-  vtkKWLabeledRadioButtonSet.cxx 
-  vtkKWLabeledScaleSet.cxx 
-  vtkKWLabeledText.cxx 
-  vtkKWLabeledWidget.cxx 
   vtkKWListBox.cxx 
   vtkKWListSelectOrder.cxx
   vtkKWLoadSaveButton.cxx
@@ -79,10 +63,8 @@ SET( KWWidgets_SRCS
   vtkKWPopupFrameCheckButton.cxx 
   vtkKWProgressGauge.cxx 
   vtkKWPushButton.cxx 
-  vtkKWPushButtonSet.cxx 
   vtkKWPushButtonWithMenu.cxx 
   vtkKWRadioButton.cxx 
-  vtkKWRadioButtonSet.cxx
   vtkKWRange.cxx 
   vtkKWRegisteryUtilities.cxx
   vtkKWRenderWidget.cxx 
@@ -91,7 +73,6 @@ SET( KWWidgets_SRCS
   vtkKWScalarBarAnnotation.cxx 
   vtkKWScalarComponentSelectionWidget.cxx
   vtkKWScale.cxx 
-  vtkKWScaleSet.cxx 
   vtkKWSegmentedProgressGauge.cxx
   vtkKWSelectionFrame.cxx
   vtkKWSelectionFrameLayoutManager.cxx
@@ -112,9 +93,62 @@ SET( KWWidgets_SRCS
   vtkKWVolumePropertyWidget.cxx
   vtkKWWidget.cxx 
   vtkKWWidgetCollection.cxx 
+  vtkKWWidgetLabeled.cxx 
   vtkKWWindow.cxx 
   vtkKWWindowCollection.cxx 
   )
+
+# The "set of widgets" are automatically generated from some core widgets
+# (i.e., CheckButton => vtkKWCheckButtonSet)
+
+FOREACH (WidgetType 
+    CheckButton 
+    Entry
+    LabelLabeled
+    PushButton
+    RadioButton
+    Scale
+    )
+  SET (WidgetType ${WidgetType})
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetSet.h.in 
+    ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.h IMMEDIATE)
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetSet.cxx.in 
+    ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.cxx IMMEDIATE)
+  SET (KWWidgets_SRCS 
+    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Set.cxx)
+ENDFOREACH (WidgetType)
+
+# The "labeled widgets" are automatically generated from some core widgets
+# (i.e., CheckButton => vtkKWCheckButtonLabeled)
+
+FOREACH (WidgetType 
+    CheckButton 
+    CheckButtonSet
+    Entry
+    Label
+    LoadSaveButton
+    OptionMenu
+    PopupButton
+    PushButton
+    PushButtonSet
+    Text
+    RadioButtonSet
+    ScaleSet
+    )
+  SET (WidgetType ${WidgetType})
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetLabeledSubclass.h.in 
+    ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Labeled.h IMMEDIATE)
+  CONFIGURE_FILE (
+    ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetLabeledSubclass.cxx.in 
+    ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Labeled.cxx IMMEDIATE)
+  SET (KWWidgets_SRCS 
+    ${KWWidgets_SRCS} ${KWWidgets_BINARY_DIR}/vtkKW${WidgetType}Labeled.cxx)
+ENDFOREACH (WidgetType)
+
+# ParaView stuff, should be moved to ParaView
 
 IF (PARAVIEW_USE_LOOKMARKS)
   SET( KWWidgets_SRCS
@@ -123,6 +157,21 @@ IF (PARAVIEW_USE_LOOKMARKS)
     vtkKWLookmarkFolder.cxx 
     )
 ENDIF (PARAVIEW_USE_LOOKMARKS)
+
+IF (WIN32)
+  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
+    vtkKWWin32RegisteryUtilities.cxx
+    )
+  SET_SOURCE_FILES_PROPERTIES(
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
+    WRAP_EXCLUDE
+    )
+ELSE (WIN32)
+  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
+    vtkKWUNIXRegisteryUtilities.cxx
+    )
+ENDIF (WIN32)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkKWMaterialPropertyWidget.cxx
@@ -183,21 +232,6 @@ IF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
   ENDIF (VTK_TCL_SUPPORT_LIBRARY_PATH AND VTK_TK_SUPPORT_LIBRARY_PATH)
 ENDIF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
 
-IF (WIN32)
-  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
-    vtkKWWin32RegisteryUtilities.cxx
-    )
-  SET_SOURCE_FILES_PROPERTIES(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
-    WRAP_EXCLUDE
-    )
-ELSE (WIN32)
-  SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-    vtkKWUNIXRegisteryUtilities.cxx
-    )
-ENDIF (WIN32)
-
 IF(BUILD_TESTING)
   SUBDIRS(Testing)
 ENDIF(BUILD_TESTING)
@@ -247,7 +281,9 @@ ENDIF(NOT WIN32)
 OPTION(USE_NOTEBOOK_ICONS "Display Notebook with icons." OFF)
 MARK_AS_ADVANCED(USE_NOTEBOOK_ICONS)
 
-CONFIGURE_FILE(${KWWidgets_SOURCE_DIR}/vtkKWWidgetsConfigure.h.in ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
+CONFIGURE_FILE(
+  ${KWWidgets_SOURCE_DIR}/Templates/vtkKWWidgetsConfigure.h.in 
+  ${KWWidgets_BINARY_DIR}/vtkKWWidgetsConfigure.h)
 
 INCLUDE_DIRECTORIES(
   ${KWWidgets_BINARY_DIR}
