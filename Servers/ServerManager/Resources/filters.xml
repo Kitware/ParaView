@@ -837,7 +837,7 @@
         command="SetNumberOfSubdivisions" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain name="bool"/>
+       <IntRangeDomain name="range" min="1" max="4"/>
      </IntVectorProperty>
    <!-- End LoopSubdivisionFilter -->
    </SourceProxy>
