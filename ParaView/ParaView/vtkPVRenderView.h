@@ -297,6 +297,8 @@ public:
   vtkGetObjectMacro(StandardViewsFrame, vtkKWLabeledFrame);
   vtkGetObjectMacro(CameraIconsFrame, vtkKWLabeledFrame);
   vtkGetObjectMacro(CameraControlFrame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(OrientationAxes, vtkPVAxesWidget);
+  vtkGetObjectMacro(OrientationAxesFrame, vtkKWLabeledFrame);
   
 protected:
   vtkPVRenderView();
