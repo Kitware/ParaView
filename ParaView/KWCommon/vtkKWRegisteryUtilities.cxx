@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkKWRegisteryUtilities, "1.5");
+vtkCxxRevisionMacro(vtkKWRegisteryUtilities, "1.5.2.1");
 
 //-----------------------------------------------------------------------------
 vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
@@ -74,11 +74,12 @@ vtkKWRegisteryUtilities *vtkKWRegisteryUtilities::New()
 //-----------------------------------------------------------------------------
 vtkKWRegisteryUtilities::vtkKWRegisteryUtilities()
 {
-  this->TopLevel = 0;
-  this->Opened   = 0;
-  this->Locked   = 0;
-  this->Changed  = 0;
-  this->Empty    = 1;
+  this->TopLevel    = 0;
+  this->Opened      = 0;
+  this->Locked      = 0;
+  this->Changed     = 0;
+  this->Empty       = 1;
+  this->GlobalScope = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -319,8 +320,10 @@ void vtkKWRegisteryUtilities::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "TopLevel: " << this->GetTopLevel() << endl
-     << indent << "Locked:   " << (this->GetLocked() ? "true" : "false") 
+     << indent << "Locked: " << (this->GetLocked() ? "on" : "off") 
      << endl
-     << indent << "Opened:   " << (this->GetOpened() ? "true" : "false")
+     << indent << "Opened: " << (this->GetOpened() ? "on" : "off")
+     << endl
+     << indent << "GlobalScope: " << (this->GetGlobalScope() ? "on" : "off")
      << endl;
 }

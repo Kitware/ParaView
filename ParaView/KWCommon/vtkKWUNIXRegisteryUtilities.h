@@ -39,6 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkKWRegisteryUtilities - A registery class
+// .SECTION Description
+// This class abstracts the storing of data that can be restored
+// when the program executes again. It is implemented as a file in
+// the user's home directory.
 
 #ifndef __vtkKWUNIXRegisteryUtilities_h
 #define __vtkKWUNIXRegisteryUtilities_h
