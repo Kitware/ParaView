@@ -130,7 +130,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.437");
+vtkCxxRevisionMacro(vtkPVWindow, "1.438");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2810,22 +2810,22 @@ void vtkPVWindow::SaveGeometryInBatchFile(ofstream *file,
         // Create a file name for the geometry.
         if (numParts == 1 && timeIdx >= 0)
           {
-          sprintf(fileName, "%s%sT%04d.vtp", 
-                  fileRoot, sourceName, timeIdx);
+          sprintf(fileName, "%s/%s%sT%04d.vtp", 
+                  filePath, fileRoot, sourceName, timeIdx);
           }
         else if (numParts != 1 && timeIdx >= 0)
           {
-          sprintf(fileName, "%s%sP%dT%04d.vtp", 
-                  fileRoot, sourceName, partIdx, timeIdx);
+          sprintf(fileName, "%s/%s%sP%dT%04d.vtp", 
+                  filePath, fileRoot, sourceName, partIdx, timeIdx);
           }
         else if (numParts == 1 && timeIdx < 0)
           {
-          sprintf(fileName, "%s%s.vtp", 
-                  fileRoot, sourceName);
+          sprintf(fileName, "%s/%s%s.vtp", 
+                  filePath, fileRoot, sourceName);
           }
         else if (numParts != 1 && timeIdx < 0)
           {
-          sprintf(fileName, "%s%s%sP%d.vtp", 
+          sprintf(fileName, "%s/%s%sP%d.vtp", 
                   filePath, fileRoot, sourceName, partIdx);
           }
         *file << "GeometryWriter SetInput [" << part->GetGeometryTclName() << " GetOutput]\n";
@@ -4180,7 +4180,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.437 $");
+  this->ExtractRevision(os,"$Revision: 1.438 $");
 }
 
 //-----------------------------------------------------------------------------
