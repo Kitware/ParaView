@@ -58,6 +58,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVGlyph3D.h"
 #include "vtkObjectFactory.h"
 
+#include "vtkUnstructuredGridSource.h"
+
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
@@ -103,6 +105,8 @@ vtkPVSource::vtkPVSource()
   this->ChangeScalarsFilterTclName = NULL;
   this->DefaultScalarsName = NULL;
   this->DefaultVectorsName = NULL;
+  
+  this->ExtractPieceTclName = NULL;
   
   this->Widgets = vtkKWWidgetCollection::New();
   this->LastSelectionList = NULL;
@@ -207,6 +211,14 @@ vtkPVSource::~vtkPVSource()
     {
     delete [] this->DefaultVectorsName;
     this->DefaultVectorsName = NULL;
+    }
+  
+  if (this->ExtractPieceTclName)
+    {
+    this->GetPVApplication()->BroadcastScript("%s Delete",
+                                              this->ExtractPieceTclName);
+    delete [] this->ExtractPieceTclName;
+    this->ExtractPieceTclName = NULL;
     }
   
   if (this->LastSelectionList)
@@ -2658,4 +2670,55 @@ void vtkPVSource::EntryChanged(float vtkNotUsed(f1), float vtkNotUsed(f2))
 vtkPVRenderView* vtkPVSource::GetPVRenderView()
 {
   return vtkPVRenderView::SafeDownCast(this->GetView());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::ExtractPieces()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int numProcs, i;
+  char tclPieceNum[256];
+  char tclName[256];
+
+  this->Script("%s UpdateInformation",
+    this->GetPVOutput(0)->GetVTKDataTclName());
+  this->Script("set numPieces [%s GetMaximumNumberOfPieces]",
+    this->GetPVOutput(0)->GetVTKDataTclName());
+
+  if ( atoi(pvApp->GetMainInterp()->result) != 1)
+    {
+    return;
+    }
+  
+  sprintf(tclName, "ExtractPiece%d", this->InstanceCount);
+  this->SetExtractPieceTclName(tclName);
+  
+  if (this->GetPVOutput(0)->GetVTKData()->IsA("vtkPolyData"))
+    {
+    pvApp->MakeTclObject("vtkExtractPolyDataPiece",
+                         this->ExtractPieceTclName);
+    }
+  else if (this->GetPVOutput(0)->GetVTKData()->IsA("vtkUnstructuredGrid"))
+    {
+    pvApp->MakeTclObject("vtkExtractUnstructuredGridPiece",
+                         this->ExtractPieceTclName);
+    }
+  
+  pvApp->BroadcastScript("%s SetInput %s",
+                         this->ExtractPieceTclName,
+                         this->GetPVOutput(0)->GetVTKDataTclName());
+  numProcs = pvApp->GetController()->GetNumberOfProcesses();
+  
+  pvApp->BroadcastScript("[%s GetOutput] SetUpdateNumberOfPieces %d",
+                         this->ExtractPieceTclName, numProcs);
+
+  for (i = 1; i < numProcs; i++)
+    {
+    sprintf(tclPieceNum, "[%s GetOutput] SetUpdatePiece %d",
+            this->ExtractPieceTclName, i);    
+    }
+
+  this->Script("[%s GetOutput] SetUpdatePiece 0",
+               this->ExtractPieceTclName);
+  pvApp->BroadcastScript("%s ReleaseDataFlagOn", this->ExtractPieceTclName);
 }

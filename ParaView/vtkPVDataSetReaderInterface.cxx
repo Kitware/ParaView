@@ -172,6 +172,8 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     pvs->SetName(tclName);
     pvs->SetNthPVOutput(0, pvd);
 
+    pvs->ExtractPieces();
+    
     pvs->AcceptCallback();
     
     pvs->Delete();
