@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 
-vtkCxxRevisionMacro(vtkKWWidgetSet, "1.2");
+vtkCxxRevisionMacro(vtkKWWidgetSet, "1.3");
 
 int vtkKWWidgetSetCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -38,10 +38,10 @@ public:
     vtkKWWidget *Widget;
   };
 
-  typedef vtkstd::list<WidgetSlot> WidgetContainer;
-  typedef vtkstd::list<WidgetSlot>::iterator WidgetContainerIterator;
+  typedef vtkstd::list<WidgetSlot> WidgetsContainer;
+  typedef vtkstd::list<WidgetSlot>::iterator WidgetsContainerIterator;
 
-  WidgetContainer Widgets;
+  WidgetsContainer Widgets;
 };
 
 //----------------------------------------------------------------------------
@@ -76,9 +76,9 @@ void vtkKWWidgetSet::DeleteAllWidgets()
 {
   // Delete all widgets
 
-  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
@@ -95,9 +95,9 @@ void vtkKWWidgetSet::DeleteAllWidgets()
 //----------------------------------------------------------------------------
 vtkKWWidget* vtkKWWidgetSet::GetWidgetInternal(int id)
 {
-  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
@@ -125,9 +125,9 @@ int vtkKWWidgetSet::GetNumberOfWidgets()
 //----------------------------------------------------------------------------
 int vtkKWWidgetSet::GetNthWidgetId(int rank)
 {
-  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
@@ -161,9 +161,9 @@ void vtkKWWidgetSet::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
   for (; it != end; ++it)
     {
@@ -224,9 +224,9 @@ void vtkKWWidgetSet::Pack()
   tk_cmd << "catch {eval grid forget [grid slaves " << this->GetWidgetName() 
          << "]}" << endl;
 
-  vtkKWWidgetSetInternals::WidgetContainerIterator it = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
     this->Internals->Widgets.begin();
-  vtkKWWidgetSetInternals::WidgetContainerIterator end = 
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
     this->Internals->Widgets.end();
 
   int col = 0;

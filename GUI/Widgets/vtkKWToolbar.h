@@ -25,11 +25,7 @@
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWRadioButton;
-
-//BTX
-template <class value>
-class vtkVector;
-//ETX
+class vtkKWWidgetSetInternals;
 
 class VTK_EXPORT vtkKWToolbar : public vtkKWWidget
 {
@@ -145,7 +141,6 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
-
   // Description:
   // Bind/Unbind events.
   virtual void Bind();
@@ -166,9 +161,13 @@ protected:
   void UpdateWidgetsAspect();
   void UpdateToolbarFrameAspect();
   
-//BTX
-  vtkVector<vtkKWWidget*>* Widgets;
-//ETX
+  //BTX
+
+  // PIMPL Encapsulation for STL containers
+
+  vtkKWWidgetSetInternals *Internals;
+
+  //ETX
 
   int PadX;
   int PadY;

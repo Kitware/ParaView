@@ -17,17 +17,9 @@
 #include "vtkKWFrame.h"
 #include "vtkKWRadioButton.h"
 #include "vtkObjectFactory.h"
-#include "vtkVector.txx"
-#include "vtkVectorIterator.txx"
 
-#ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
-
-template class VTK_EXPORT vtkAbstractList<vtkKWWidget*>;
-template class VTK_EXPORT vtkVector<vtkKWWidget*>;
-template class VTK_EXPORT vtkAbstractIterator<vtkIdType,vtkKWWidget*>;
-template class VTK_EXPORT vtkVectorIterator<vtkKWWidget*>;
-
-#endif
+#include <vtkstd/list>
+#include <vtkstd/algorithm>
 
 #ifdef _WIN32
 static int vtkKWToolbarGlobalFlatAspect        = 1;
@@ -57,10 +49,21 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.39");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.40");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
+
+//----------------------------------------------------------------------------
+class vtkKWWidgetSetInternals
+{
+public:
+
+  typedef vtkstd::list<vtkKWWidget*> WidgetsContainer;
+  typedef vtkstd::list<vtkKWWidget*>::iterator WidgetsContainerIterator;
+
+  WidgetsContainer Widgets;
+};
 
 //----------------------------------------------------------------------------
 vtkKWToolbar::vtkKWToolbar()
@@ -69,8 +72,6 @@ vtkKWToolbar::vtkKWToolbar()
 
   this->Frame   = vtkKWFrame::New();
   this->Handle  = vtkKWFrame::New();
-
-  this->Widgets                   = vtkVector<vtkKWWidget*>::New();
 
   this->FlatAspect                = vtkKWToolbar::GetGlobalFlatAspect();
   this->WidgetsFlatAspect         = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
@@ -91,6 +92,10 @@ vtkKWToolbar::vtkKWToolbar()
   // This widget is used to keep track of default options
 
   this->DefaultOptionsWidget = vtkKWRadioButton::New();
+
+  // Internal structs
+
+  this->Internals = new vtkKWWidgetSetInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -108,16 +113,26 @@ vtkKWToolbar::~vtkKWToolbar()
     this->Handle = 0;
     }
 
-  if (this->Widgets)
-    {
-    this->Widgets->Delete();
-    this->Widgets = NULL;
-    }
-
   if (this->DefaultOptionsWidget)
     {
     this->DefaultOptionsWidget->Delete();
     this->DefaultOptionsWidget = NULL;
+    }
+
+  if (this->Internals)
+    {
+    vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+      this->Internals->Widgets.begin();
+    vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+      this->Internals->Widgets.end();
+    for (; it != end; ++it)
+      {
+      if (*it)
+        {
+        (*it)->Delete();
+        }
+      }
+    delete this->Internals;
     }
 }
 
@@ -176,60 +191,75 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
 //----------------------------------------------------------------------------
 void vtkKWToolbar::AddWidget(vtkKWWidget *widget)
 {
-  if (this->Widgets->AppendItem(widget) == VTK_OK)
+  if (!widget || !this->Internals)
     {
-    widget->SetEnabled(this->Enabled);
-    this->UpdateWidgets();
+    return;
     }
-  else
-    {
-    vtkErrorMacro("Unable to add widget to toolbar");
-    }
+    
+  this->Internals->Widgets.push_back(widget);
+
+  widget->Register(this);
+  widget->SetEnabled(this->Enabled);
+
+  this->UpdateWidgets();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWToolbar::InsertWidget(vtkKWWidget *location, vtkKWWidget *widget)
 {
-  int res;
+  if (!widget || !this->Internals)
+    {
+    return;
+    }
+
   if (!location)
     {
-    res = this->Widgets->PrependItem(widget);
-    }
-
-  vtkIdType loc = 0;
-  if (this->Widgets->FindItem(location, loc) == VTK_OK)
-    {
-    res = this->Widgets->InsertItem(loc, widget);
+    this->Internals->Widgets.push_front(widget);
     }
   else
     {
-    res = this->Widgets->PrependItem(widget);
+    vtkKWWidgetSetInternals::WidgetsContainerIterator location_pos = 
+      vtkstd::find(this->Internals->Widgets.begin(),
+                   this->Internals->Widgets.end(),
+                   location);
+    if (location_pos == this->Internals->Widgets.end())
+      {
+      this->Internals->Widgets.push_front(widget);
+      }
+    else
+      {
+      this->Internals->Widgets.insert(location_pos, widget);
+      }
     }
 
-  if (res)
-    {
-    widget->SetEnabled(this->Enabled);
-    this->UpdateWidgets();
-    }
-  else
-    {
-    vtkErrorMacro("Unable to insert widget in toolbar");
-    }
+  widget->Register(this);
+  widget->SetEnabled(this->Enabled);
+
+  this->UpdateWidgets();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
 {
-  vtkIdType loc = 0;
-  if (this->Widgets->FindItem(widget, loc) == VTK_OK)
+  if (!widget || !this->Internals)
     {
-    if (this->Widgets->RemoveItem(loc) == VTK_OK)
-      {
-      this->UpdateWidgets();
-      return;
-      }
+    return;
     }
-  vtkErrorMacro("Unable to remove widget from toolbar");
+
+  vtkKWWidgetSetInternals::WidgetsContainerIterator location_pos = 
+    vtkstd::find(this->Internals->Widgets.begin(),
+                 this->Internals->Widgets.end(),
+                 widget);
+  if (location_pos == this->Internals->Widgets.end())
+    {
+    vtkErrorMacro("Unable to remove widget from toolbar");
+    }
+  else
+    {
+    (*location_pos)->Delete();
+    this->Internals->Widgets.erase(location_pos);
+    this->UpdateWidgets();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -237,37 +267,35 @@ vtkKWWidget* vtkKWToolbar::GetWidget(const char *name)
 {
   vtkKWWidget *found = 0;
 
-  if (name && this->Widgets)
+  if (name && this->Internals)
     {
     const char *options[4] = { "-label", "-text", "-image", "-selectimage" };
 
-    vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+      this->Internals->Widgets.begin();
+    vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+      this->Internals->Widgets.end();
+    for (; it != end; ++it)
       {
-      vtkKWWidget* widget = 0;
-      if (it->GetData(widget) == VTK_OK)
+      if (*it)
         {
         for (int i = 0; i < 4; i++)
           {
-          if (widget->HasConfigurationOption(options[i]))
+          if ((*it)->HasConfigurationOption(options[i]))
             {
             const char *option = 
-              this->Script("%s cget %s", widget->GetWidgetName(), options[i]);
+              this->Script("%s cget %s", (*it)->GetWidgetName(), options[i]);
             if (!strcmp(name, option))
               {
-              found = widget;
-              break;
+              return (*it);
               }
             }
           }
         }
-      it->GoToNextItem();
       }
-    it->Delete();
     }
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -397,36 +425,35 @@ void vtkKWToolbar::Resize()
 //----------------------------------------------------------------------------
 void vtkKWToolbar::UpdateWidgetsAspect()
 {
-  if (this->Widgets->GetNumberOfItems() <= 0)
+  if (!this->Internals || this->Internals->Widgets.size() <= 0)
     {
     return;
     }
 
-  vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
   ostrstream s;
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    vtkKWWidget* widget = 0;
-
     // Change the relief of buttons (let's say that everything that
     // has a -command will qualify, -state could have been used, or
     // a match on the widget type, etc).
 
-    if (it->GetData(widget) == VTK_OK && 
-        widget->HasConfigurationOption("-command"))
+    if ((*it) && (*it)->HasConfigurationOption("-command"))
       {
-      int use_relief = widget->HasConfigurationOption("-relief");
-      if (widget->HasConfigurationOption("-indicatoron"))
+      int use_relief = (*it)->HasConfigurationOption("-relief");
+      if ((*it)->HasConfigurationOption("-indicatoron"))
         {
-        this->Script("%s cget -indicatoron", widget->GetWidgetName());
+        this->Script("%s cget -indicatoron", (*it)->GetWidgetName());
         use_relief = this->GetIntegerResult(this->GetApplication());
         }
         
       if (use_relief)
         {
-        s << widget->GetWidgetName() << " config -relief " 
+        s << (*it)->GetWidgetName() << " config -relief " 
           << (this->WidgetsFlatAspect ? "flat" : "raised") << endl;
         }
       else
@@ -436,27 +463,27 @@ void vtkKWToolbar::UpdateWidgetsAspect()
         // the negative value will be handled as 0, but still will enable
         // us to retrieve the old value using abs() later on).
 
-        if (widget->HasConfigurationOption("-bd"))
+        if ((*it)->HasConfigurationOption("-bd"))
           {
-          this->Script("%s cget -bd", widget->GetWidgetName());
+          this->Script("%s cget -bd", (*it)->GetWidgetName());
           int bd = this->GetIntegerResult(this->GetApplication());
-          s << widget->GetWidgetName() << " config -bd "
+          s << (*it)->GetWidgetName() << " config -bd "
             << (this->WidgetsFlatAspect ? -abs(bd) : abs(bd)) << endl;
           }
         }
 
       // If radiobutton, remove the select color border in flat aspect
 
-      if (widget->HasConfigurationOption("-selectcolor"))
+      if ((*it)->HasConfigurationOption("-selectcolor"))
         {
         if (this->WidgetsFlatAspect)
           {
-          s << widget->GetWidgetName() << " config -selectcolor [" 
-            << widget->GetWidgetName() << " cget -bg]" << endl; 
+          s << (*it)->GetWidgetName() << " config -selectcolor [" 
+            << (*it)->GetWidgetName() << " cget -bg]" << endl; 
           }
         else
           {
-          s << widget->GetWidgetName() << " config -selectcolor [" 
+          s << (*it)->GetWidgetName() << " config -selectcolor [" 
             << this->DefaultOptionsWidget->GetWidgetName() 
             << " cget -selectcolor]" << endl; 
           }
@@ -464,24 +491,22 @@ void vtkKWToolbar::UpdateWidgetsAspect()
 
       // Do not use active background in flat mode either
 
-      if (widget->HasConfigurationOption("-activebackground"))
+      if ((*it)->HasConfigurationOption("-activebackground"))
         {
         if (this->WidgetsFlatAspect)
           {
-          s << widget->GetWidgetName() << " config -activebackground [" 
-            << widget->GetWidgetName() << " cget -bg]" << endl; 
+          s << (*it)->GetWidgetName() << " config -activebackground [" 
+            << (*it)->GetWidgetName() << " cget -bg]" << endl; 
           }
         else
           {
-          s << widget->GetWidgetName() << " config -activebackground [" 
+          s << (*it)->GetWidgetName() << " config -activebackground [" 
             << this->DefaultOptionsWidget->GetWidgetName() 
             << " cget -activebackground]" << endl; 
           }
         }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   s << ends;
   this->Script(s.str());
@@ -491,35 +516,34 @@ void vtkKWToolbar::UpdateWidgetsAspect()
 //----------------------------------------------------------------------------
 void vtkKWToolbar::ConstrainWidgetsLayout()
 {
-  if (this->Widgets->GetNumberOfItems() <= 0)
+  if (!this->Internals || this->Internals->Widgets.size() <= 0)
     {
     return;
     }
 
   int totReqWidth = 0;
 
-  vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
-    
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    vtkKWWidget* widget = 0;
-    if (it->GetData(widget) == VTK_OK)
+    if (*it)
       {
-      this->Script("winfo reqwidth %s", widget->GetWidgetName());
+      this->Script("winfo reqwidth %s", (*it)->GetWidgetName());
       totReqWidth += this->GetIntegerResult(this->GetApplication()) + this->PadX;
       if (this->WidgetsFlatAspect)
         {
         totReqWidth += this->WidgetsFlatAdditionalPadX;
         }
       }
-    it->GoToNextItem();
     }
 
   this->Script("winfo width %s", this->GetWidgetName());
   int width = this->GetIntegerResult(this->GetApplication());
 
-  int widthWidget = totReqWidth / this->Widgets->GetNumberOfItems();
+  int widthWidget = totReqWidth / this->Internals->Widgets.size();
   int numPerRow = width / widthWidget;
 
   if ( numPerRow > 0 )
@@ -527,13 +551,12 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
     int row = 0, num = 0;
     ostrstream s;
 
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    it = this->Internals->Widgets.begin();
+    for (; it != end; ++it)
       {
-      vtkKWWidget* widget = 0;
-      if (it->GetData(widget) == VTK_OK)
+      if ((*it))
         {
-        s << "grid " << widget->GetWidgetName() << " -row " 
+        s << "grid " << (*it)->GetWidgetName() << " -row " 
           << row << " -column " << num << " -sticky news "
           << " -ipadx " 
           << (this->PadX + (this->WidgetsFlatAspect ? 
@@ -549,19 +572,18 @@ void vtkKWToolbar::ConstrainWidgetsLayout()
           num=0;
           }
         }
-      it->GoToNextItem();
       }
     s << ends;
     this->Script(s.str());
     s.rdbuf()->freeze(0);
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWToolbar::UpdateWidgetsLayout()
 {
-  if (!this->IsCreated() || this->Widgets->GetNumberOfItems() <= 0)
+  if (!this->IsCreated() || 
+      !this->Internals || this->Internals->Widgets.size() <= 0)
     {
     return;
     }
@@ -579,19 +601,17 @@ void vtkKWToolbar::UpdateWidgetsLayout()
   ostrstream s;
   s << "grid "; 
 
-  vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    vtkKWWidget* widget = 0;
-    if (it->GetData(widget) == VTK_OK)
+    if ((*it))
       {
-      s << " " << widget->GetWidgetName();
+      s << " " << (*it)->GetWidgetName();
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   s << " -sticky news -row 0 "
     << " -ipadx " 
@@ -751,18 +771,17 @@ void vtkKWToolbar::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();
 
-  vtkVectorIterator<vtkKWWidget*>* it = this->Widgets->NewIterator();
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  vtkKWWidgetSetInternals::WidgetsContainerIterator it = 
+    this->Internals->Widgets.begin();
+  vtkKWWidgetSetInternals::WidgetsContainerIterator end = 
+    this->Internals->Widgets.end();
+  for (; it != end; ++it)
     {
-    vtkKWWidget* widget = 0;
-    if (it->GetData(widget) == VTK_OK)
+    if ((*it))
       {
-      widget->SetEnabled(this->Enabled);
+      (*it)->SetEnabled(this->Enabled);
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
