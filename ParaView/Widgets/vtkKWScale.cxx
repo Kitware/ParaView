@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.51");
+vtkCxxRevisionMacro(vtkKWScale, "1.52");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1083,6 +1083,16 @@ void vtkKWScale::SetEntryWidth(int width)
   if (this->Entry)
     {
     this->Entry->SetWidth(width);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWScale::SetWidth(int width)
+{
+  if (this->IsCreated())
+    {
+    this->Script("%s config -width %d",
+                 this->Scale->GetWidgetName(), width);
     }
 }
 

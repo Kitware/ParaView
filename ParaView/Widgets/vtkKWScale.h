@@ -112,10 +112,10 @@ public:
   vtkGetObjectMacro(PopupPushButton, vtkKWPushButton);
 
   // Description:
-  // Set/Get the entry expansion flag. This flag is only used if PopupScale mode
-  // is On. In that case, the default behaviour is to provide a widget as compact
-  // as possible, i.e. the Entry won't be expanded if the widget grows. Set
-  // ExpandEntry to On to override this behaviour.
+  // Set/Get the entry expansion flag. This flag is only used if PopupScale 
+  // mode is On. In that case, the default behaviour is to provide a widget
+  // as compact as possible, i.e. the Entry won't be expanded if the widget
+  // grows. Set ExpandEntry to On to override this behaviour.
   virtual void SetExpandEntry(int flag);
   vtkGetMacro(ExpandEntry, int);
   vtkBooleanMacro(ExpandEntry, int);  
@@ -175,6 +175,12 @@ public:
   // Convenience method to set the width of the label or entry
   virtual void SetLabelWidth(int width);
   virtual void SetEntryWidth(int width);
+
+  // Description
+  // Convenience method to set the narrow dimension of scale. For vertical 
+  // scales this is the trough's width; for horizontal scales this is the 
+  // trough's height. In pixel.
+  virtual void SetWidth(int width);
 
 protected:
   vtkKWScale();
