@@ -34,12 +34,13 @@ class vtkProp;
 class vtkProperty;
 class vtkPVPart;
 class vtkPVColorMap;
+class vtkPolyData;
 
 class VTK_EXPORT vtkPVPlotDisplay : public vtkPVDisplay
 {
 public:
   static vtkPVPlotDisplay* New();
-  vtkTypeRevisionMacro(vtkPVPlotDisplay, vtkObject);
+  vtkTypeRevisionMacro(vtkPVPlotDisplay, vtkPVDisplay);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
@@ -80,6 +81,10 @@ public:
   // Description:
   // Needed to connect actor to 3D widget.
   vtkClientServerID GetXYPlotActorID() { return this->XYPlotActorID;}
+
+  // Description:
+  // The Probe needs access to this to fill in the UI point values.
+  vtkPolyData *GetCollectedData();
 
 protected:
   vtkPVPlotDisplay();
