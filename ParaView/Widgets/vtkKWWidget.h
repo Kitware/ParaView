@@ -224,7 +224,10 @@ public:
   // if the widget was initialized successfully.  This widget needs
   // a TraceName unique between the children of the parent in order for
   // this method to work.  The parent also has to be able to be initialized.
-  virtual int InitializeTrace();
+  // The "file" arguments extends the functinality to saving state
+  // Into a tcl script.  I need a way to store "TraceInitialized"
+  // for each file.
+  virtual int InitializeTrace(ofstream* file);
 
   // Description:
   // Enable/disable Drag and Drop.

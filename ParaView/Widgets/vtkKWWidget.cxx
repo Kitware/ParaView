@@ -50,14 +50,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.64");
+vtkCxxRevisionMacro(vtkKWWidget, "1.65");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWWidget::vtkKWWidget()
 {
   this->WidgetName               = NULL;
@@ -84,7 +84,7 @@ vtkKWWidget::vtkKWWidget()
   this->DragAndDropAnchor = this;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWWidget::~vtkKWWidget()
 {
   this->DragAndDropAnchor = NULL;
@@ -114,7 +114,7 @@ vtkKWWidget::~vtkKWWidget()
   this->SetTraceName(NULL);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetParent(vtkKWWidget *p)
 {
   if (this->Parent && p)
@@ -137,7 +137,7 @@ void vtkKWWidget::SetParent(vtkKWWidget *p)
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char *vtkKWWidget::GetWidgetName()
 {
   static unsigned long count = 0;
@@ -166,7 +166,7 @@ const char *vtkKWWidget::GetWidgetName()
   return this->WidgetName;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::Create(vtkKWApplication *app, const char *name, 
                          const char *args)
 {
@@ -183,7 +183,7 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
   this->UpdateEnableState();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetUpBalloonHelpBindings()
 {
   this->Script("bind %s <Enter> {+%s BalloonHelpTrigger %s}", 
@@ -199,7 +199,7 @@ void vtkKWWidget::SetUpBalloonHelpBindings()
                this->GetWidgetName(), this->Application->GetTclName());  
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int  vtkKWWidget::GetNetReferenceCount() 
 {
   int childCounts = 0;
@@ -214,7 +214,7 @@ int  vtkKWWidget::GetNetReferenceCount()
     2*this->Children->GetNumberOfItems();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Removing items in the middle of a traversal is a bad thing.
 // UnRegister will handle removing all of the children.
 void vtkKWWidget::RemoveChild(vtkKWWidget *w) 
@@ -226,7 +226,7 @@ void vtkKWWidget::RemoveChild(vtkKWWidget *w)
 }
 
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::UnRegister(vtkObjectBase *o)
 {
   if (!this->DeletingChildren)
@@ -250,44 +250,44 @@ void vtkKWWidget::UnRegister(vtkObjectBase *o)
   this->Superclass::UnRegister(o);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::Focus()
 {
   this->Script( "focus %s", this->GetWidgetName() );
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetBind(vtkKWObject* CalledObject, const char *Event, const char *CommandString)
 {
   this->Script("bind %s %s { %s %s }", this->GetWidgetName(), 
                Event, CalledObject->GetTclName(), CommandString);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *Event, const char *CommandString)
 {
   this->Script("bind %s %s { %s }", this->GetWidgetName(), Event, CommandString);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetBind(const char *event, const char *widget, const char *command)
 {
   this->Script("bind %s %s { %s %s }", this->GetWidgetName(), event, widget, command);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetBindAll(const char *event, const char *widget, const char *command)
 {
   this->Script("bind all %s { %s %s }", event, widget, command);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetBindAll(const char *event, const char *command)
 {
   this->Script("bind all %s { %s }", event, command);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandString)
 {
   char* command = this->CreateCommand(CalledObject, CommandString);
@@ -295,7 +295,7 @@ void vtkKWWidget::SetCommand(vtkKWObject* CalledObject, const char * CommandStri
   delete [] command;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * CommandString)
 {
   ostrstream event;
@@ -306,7 +306,7 @@ char* vtkKWWidget::CreateCommand(vtkKWObject* CalledObject, const char * Command
   return event.str();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetBalloonHelpString(const char *str)
 {
 //    if (this->Application == NULL)
@@ -341,15 +341,15 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.64 $");
+  this->ExtractRevision(os,"$Revision: 1.65 $");
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWWindow* vtkKWWidget::GetWindow()
 {
   vtkKWWindow* win =0;
@@ -367,7 +367,7 @@ vtkKWWindow* vtkKWWidget::GetWindow()
 
 
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Methods for tracing.
 
 vtkKWWidget *vtkKWWidget::GetChildWidget(const char *traceName)
@@ -389,16 +389,34 @@ vtkKWWidget *vtkKWWidget::GetChildWidget(const char *traceName)
 }
        
 
-//------------------------------------------------------------------------------
-int vtkKWWidget::InitializeTrace()
+//-----------------------------------------------------------------------------
+int vtkKWWidget::InitializeTrace(ofstream* file)
 {
-  // There is no need to do anything if there is no trace file.
-  if(this->Application == NULL || this->Application->GetTraceFile() == NULL)
+  int dummyInit = 0;
+  int *pInit;
+
+  if(this->Application == NULL)
     {
+    vtkErrorMacro("Tracing before widget is created.");
     return 0;
     }
 
-  if (this->TraceInitialized)
+  if (file == NULL || file == this->Application->GetTraceFile())
+    { // Use the global trace file and respect initialized.
+    file = this->Application->GetTraceFile();
+    pInit = &(this->TraceInitialized);
+    }
+  else
+    { // Use stateFile and ignore "TraceInitialized"
+    pInit = &(dummyInit);
+    }
+
+  // There is no need to do anything if there is no trace file.
+  if(file == NULL)
+    {
+    return 0;
+    }
+  if (*pInit)
     {
     return 1;
     }
@@ -406,41 +424,25 @@ int vtkKWWidget::InitializeTrace()
   // The new general way to initialize objects (from vtkKWObject).
   if (this->TraceReferenceObject && this->TraceReferenceCommand)
     {
-    if (this->TraceReferenceObject->InitializeTrace())
+    if (this->TraceReferenceObject->InitializeTrace(file))
       {
-      this->Application->AddTraceEntry("set kw(%s) [$kw(%s) %s]",
-                                      this->GetTclName(), 
-                                      this->TraceReferenceObject->GetTclName(),
-                                      this->TraceReferenceCommand);
-      this->TraceInitialized = 1;
+      *file << "set kw(" << this->GetTclName() << ") "
+            << "[$kw(" << this->TraceReferenceObject->GetTclName()
+            << ") " << this->TraceReferenceCommand << "]" << endl;
+      *pInit = 1;
       return 1;
       }
     }
 
-  // The only other possibility is to have the 
-  // parent initialize the childs trace.
-  // This will only work if we have a parent and this child has a trace name.
-  // The name is the way to get the children from the parent.
-  if (this->Parent == NULL || this->TraceName == NULL)
-    {
-    return 0;
-    }
-  if ( ! this->Parent->InitializeTrace())
-    {
-    return 0;
-    }
+  // I used to have the option of getting the child from the parent,
+  // but it was not used, and we can simply set the 
+  // TraceReferenceObject to the parent, and the TraceReferenceCommand to
+  // GetChildWidgetName "this->TraceName".
 
-  // Default method for initializing varible form parent.
-  // Only works if someone has given this widget a named.
-  // The name must be different than all the parents other children.    
-  this->Application->AddTraceEntry("set $kw(%s) [$kw(%s) GetChildWidget %s]",
-                                  this->GetTclName(), this->Parent->GetTclName(),
-                                  this->TraceName);
-  this->TraceInitialized = 1;
-  return 1;
+  return 0;
 }  
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 const char* vtkKWWidget::GetType()
 {
   if ( this->Application )
@@ -451,7 +453,7 @@ const char* vtkKWWidget::GetType()
   return "None";
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetEnabled(int e)
 {
   if ( this->Enabled == e )
@@ -464,7 +466,7 @@ void vtkKWWidget::SetEnabled(int e)
   this->Modified();
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::UpdateEnableState()
 {
   if (this->IsAlive() && this->HasConfigurationOption("-state"))
@@ -475,7 +477,7 @@ void vtkKWWidget::UpdateEnableState()
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
 {
   vtkKWTkUtilities::GetBackgroundColor(this->Application->GetMainInterp(),
@@ -483,7 +485,7 @@ void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
                                        r, g, b);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetBackgroundColor(int r, int g, int b)
 {
   char color[10];
@@ -491,7 +493,7 @@ void vtkKWWidget::SetBackgroundColor(int r, int g, int b)
   this->Script("%s config -bg %s", this->GetWidgetName(), color);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::GetBackgroundColor(float *r, float *g, float *b)
 {
   int ir, ig, ib;
@@ -502,7 +504,7 @@ void vtkKWWidget::GetBackgroundColor(float *r, float *g, float *b)
   *b = (float)ib / 255.0;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetBackgroundColor(float r, float g, float b)
 {
   char color[10];
@@ -511,7 +513,7 @@ void vtkKWWidget::SetBackgroundColor(float r, float g, float b)
   this->Script("%s config -bg %s", this->GetWidgetName(), color);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::GetForegroundColor(int *r, int *g, int *b)
 {
   vtkKWTkUtilities::GetOptionColor(this->Application->GetMainInterp(),
@@ -520,7 +522,7 @@ void vtkKWWidget::GetForegroundColor(int *r, int *g, int *b)
                                    r, g, b);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetForegroundColor(int r, int g, int b)
 {
   char color[10];
@@ -528,7 +530,7 @@ void vtkKWWidget::SetForegroundColor(int r, int g, int b)
   this->Script("%s config -fg %s", this->GetWidgetName(), color);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::GetForegroundColor(float *r, float *g, float *b)
 {
   int ir, ig, ib;
@@ -539,7 +541,7 @@ void vtkKWWidget::GetForegroundColor(float *r, float *g, float *b)
   *b = (float)ib / 255.0;
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetForegroundColor(float r, float g, float b)
 {
   char color[10];
@@ -548,7 +550,7 @@ void vtkKWWidget::SetForegroundColor(float r, float g, float b)
   this->Script("%s config -fg %s", this->GetWidgetName(), color);
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::HasConfigurationOption(const char* option)
 {
   return (this->Application && 
@@ -557,7 +559,7 @@ int vtkKWWidget::HasConfigurationOption(const char* option)
             this->GetWidgetName(), option));
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
 {
   if (!this->HasConfigurationOption(option))
@@ -568,7 +570,7 @@ int vtkKWWidget::GetConfigurationOptionAsInt(const char* option)
   return atoi(this->Script("%s cget %s", this->GetWidgetName(), option));
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::IsAlive()
 {
   if (!this->IsCreated())
@@ -579,21 +581,21 @@ int vtkKWWidget::IsAlive()
   return atoi(this->Script("winfo exists %s", this->GetWidgetName()));
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::IsMapped()
 {
   return this->IsAlive() && this->Application->EvaluateBooleanExpression(
     "winfo ismapped %s", this->GetWidgetName());
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::IsPacked()
 {
   return this->IsCreated() && !this->Application->EvaluateBooleanExpression(
     "catch {pack info %s}", this->GetWidgetName());
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::GetNumberOfPackedChildren()
 {
   if (!this->IsCreated())
@@ -603,14 +605,14 @@ int vtkKWWidget::GetNumberOfPackedChildren()
   return atoi(this->Script("llength [pack slaves %s]", this->GetWidgetName()));
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::Unpack()
 {
   this->Script("catch {eval pack forget %s}",
                this->GetWidgetName());
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::UnpackSiblings()
 {
   if (this->GetParent())
@@ -622,7 +624,7 @@ void vtkKWWidget::UnpackSiblings()
     }
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::UnpackChildren()
 {
   this->Script("catch {eval pack forget [pack slaves %s]} \n "
@@ -630,13 +632,13 @@ void vtkKWWidget::UnpackChildren()
                this->GetWidgetName(),this->GetWidgetName());
 }
 
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::AddChild(vtkKWWidget *w) 
 {
   this->Children->AddItem(w);
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetEnableDragAndDrop(int arg)
 {
   if (this->EnableDragAndDrop == arg)
@@ -657,7 +659,7 @@ void vtkKWWidget::SetEnableDragAndDrop(int arg)
     }
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetDragAndDropAnchor(vtkKWWidget *arg)
 {
   if (this->DragAndDropAnchor == arg)
@@ -673,7 +675,7 @@ void vtkKWWidget::SetDragAndDropAnchor(vtkKWWidget *arg)
   this->SetDragAndDropBindings();
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::SetDragAndDropBindings()
 {
   if (!this->DragAndDropAnchor || !this->DragAndDropAnchor->IsCreated())
@@ -689,7 +691,7 @@ void vtkKWWidget::SetDragAndDropBindings()
                this->DragAndDropAnchor->GetWidgetName(), this->GetTclName());
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::RemoveDragAndDropBindings()
 {
   if (!this->DragAndDropAnchor || !this->DragAndDropAnchor->IsCreated())
@@ -705,7 +707,7 @@ void vtkKWWidget::RemoveDragAndDropBindings()
                this->DragAndDropAnchor->GetWidgetName(), this->GetTclName());
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWWidget::DragAndDropTarget::DragAndDropTarget()
 {
   this->Target = 0;
@@ -714,7 +716,7 @@ vtkKWWidget::DragAndDropTarget::DragAndDropTarget()
   this->EndCommand = 0;
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWWidget::DragAndDropTarget::~DragAndDropTarget()
 {
   this->Target = 0;
@@ -723,7 +725,7 @@ vtkKWWidget::DragAndDropTarget::~DragAndDropTarget()
   this->SetEndCommand(0);
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropTarget::SetStartCommand(const char *arg)
 {
   if ((this->StartCommand == NULL && arg == NULL) ||
@@ -748,7 +750,7 @@ void vtkKWWidget::DragAndDropTarget::SetStartCommand(const char *arg)
     }
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropTarget::SetPerformCommand(const char *arg)
 {
   if ((this->PerformCommand == NULL && arg == NULL) ||
@@ -773,7 +775,7 @@ void vtkKWWidget::DragAndDropTarget::SetPerformCommand(const char *arg)
     }
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropTarget::SetEndCommand(const char *arg)
 {
   if ((this->EndCommand == NULL && arg == NULL) ||
@@ -798,7 +800,7 @@ void vtkKWWidget::DragAndDropTarget::SetEndCommand(const char *arg)
     }
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::DeleteDragAndDropTargets()
 {
   if (!this->DragAndDropTargets)
@@ -822,7 +824,7 @@ void vtkKWWidget::DeleteDragAndDropTargets()
   it->Delete();
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWWidget::DragAndDropTarget*
 vtkKWWidget::GetDragAndDropTarget(vtkKWWidget *widget)
 {
@@ -851,7 +853,7 @@ vtkKWWidget::GetDragAndDropTarget(vtkKWWidget *widget)
   return found;
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::AddDragAndDropTarget(vtkKWWidget *widget)
 {
   vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(widget);
@@ -879,7 +881,7 @@ int vtkKWWidget::AddDragAndDropTarget(vtkKWWidget *widget)
   return 1;
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::RemoveDragAndDropTarget(vtkKWWidget *widget)
 {
   vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(widget);
@@ -906,14 +908,14 @@ int vtkKWWidget::RemoveDragAndDropTarget(vtkKWWidget *widget)
   return 1;
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::HasDragAndDropTarget(vtkKWWidget *widget)
 {
   vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(widget);
   return found ? 1 : 0;
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::GetNumberOfDragAndDropTargets()
 {
   if (!this->DragAndDropTargets)
@@ -924,7 +926,7 @@ int vtkKWWidget::GetNumberOfDragAndDropTargets()
   return this->DragAndDropTargets->GetNumberOfItems();
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::SetDragAndDropStartCommand(vtkKWWidget *target, 
                                             vtkKWObject *object, 
                                             const char *method)
@@ -948,7 +950,7 @@ int vtkKWWidget::SetDragAndDropStartCommand(vtkKWWidget *target,
   return 1;
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::SetDragAndDropPerformCommand(vtkKWWidget *target, 
                                               vtkKWObject *object, 
                                               const char *method)
@@ -972,7 +974,7 @@ int vtkKWWidget::SetDragAndDropPerformCommand(vtkKWWidget *target,
   return 1;
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 int vtkKWWidget::SetDragAndDropEndCommand(vtkKWWidget *target, 
                                           vtkKWObject *object, 
                                           const char *method)
@@ -996,7 +998,7 @@ int vtkKWWidget::SetDragAndDropEndCommand(vtkKWWidget *target,
   return 1;
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropStartCallback(int x, int y)
 {
   if (!this->EnableDragAndDrop || 
@@ -1045,7 +1047,7 @@ void vtkKWWidget::DragAndDropStartCallback(int x, int y)
   it->Delete();
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropPerformCallback(int x, int y)
 {
   if (!this->EnableDragAndDrop || 
@@ -1075,7 +1077,7 @@ void vtkKWWidget::DragAndDropPerformCallback(int x, int y)
   it->Delete();
 }
 
-// ---------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::DragAndDropEndCallback(int x, int y)
 {
   if (!this->EnableDragAndDrop || 
@@ -1130,7 +1132,7 @@ void vtkKWWidget::DragAndDropEndCallback(int x, int y)
   it->Delete();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1147,3 +1149,7 @@ void vtkKWWidget::PrintSelf(ostream& os, vtkIndent indent)
      << (this->EnableDragAndDrop ? "On" : "Off") << endl;
   os << indent << "DragAndDropAnchor: " << this->DragAndDropAnchor << endl;
 }
+
+
+
+

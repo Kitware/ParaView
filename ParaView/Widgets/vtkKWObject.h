@@ -100,10 +100,14 @@ public:
   void ExtractRevision(ostream& os,const char *revIn);
   int CompareVersions(const char *v1, const char *v2);
   
+  // Description:
   // This method returns 1 if the trace for this object has been 
   // initialized. If it has not, it tries to initialize the object
   // by invoking an event.  If this does not work, it returns 0.
-  virtual int InitializeTrace();
+  // The argument is for saving a trace into a state file.
+  // When NULL, then the application trace file is used (conveniance).
+  // When file does not match global trace file, init flag is ignored.
+  virtual int InitializeTrace(ofstream* file);
 
   // Description:
   // If the a callback initializes the widget, then it can indicate so
