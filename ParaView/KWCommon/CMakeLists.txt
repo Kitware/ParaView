@@ -56,6 +56,8 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarActorWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarsToColorsReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarsToColorsWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextActorReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextActorWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLUtilities.cxx
