@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkXMLTextActorReader.h"
 
 vtkStandardNewMacro(vtkXMLKWRenderWidgetReader);
-vtkCxxRevisionMacro(vtkXMLKWRenderWidgetReader, "1.6");
+vtkCxxRevisionMacro(vtkXMLKWRenderWidgetReader, "1.7");
 
 //----------------------------------------------------------------------------
 char* vtkXMLKWRenderWidgetReader::GetRootElementName()
@@ -78,14 +78,6 @@ int vtkXMLKWRenderWidgetReader::Parse(vtkXMLDataElement *elem)
   if (elem->GetVectorAttribute("BackgroundColor", 3, fbuffer3) == 3)
     {
     obj->SetBackgroundColor(fbuffer3);
-    }
-
-  // LEGACY
-
-  cptr = elem->GetAttribute("Units");
-  if (cptr)
-    {
-    obj->SetDistanceUnits(cptr);
     }
 
   cptr = elem->GetAttribute("DistanceUnits");
