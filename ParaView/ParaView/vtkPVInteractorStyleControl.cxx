@@ -42,7 +42,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.31");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.32");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -742,8 +742,8 @@ void vtkPVInteractorStyleControl::AddArgument(
   if ( mit == this->Internals->Arguments.end() )
     {
     // If there is none, create it.
-    vtkPVInteractorStyleControlInternal::ArrayString str;
-    this->Internals->Arguments[name] = str;
+    vtkPVInteractorStyleControlInternal::ArrayString nstr;
+    this->Internals->Arguments[name] = nstr;
     mit = this->Internals->Arguments.find(name);
     }
   
