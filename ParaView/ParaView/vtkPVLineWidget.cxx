@@ -57,14 +57,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.32");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
 {
-  vtkLineWidget *line = vtkLineWidget::New();
-  line->SetAlignToNone();
-  this->Widget3D = line;
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();
   this->ResolutionLabel = vtkKWLabel::New();
@@ -163,9 +160,10 @@ void vtkPVLineWidget::SetPoint1(float x, float y, float z)
     {
     pos[i] = this->Point1[i]->GetValueAsFloat();
     }
-  vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
-  line->SetPoint1(pos);
-  line->SetAlignToNone();
+
+  this->GetPVApplication()->BroadcastScript("%s SetPoint1 %f %f %f; %s SetAlignToNone",
+                                        this->Widget3DTclName, pos[0], pos[1], pos[2],
+                                        this->Widget3DTclName);
   this->ModifiedFlag = 1;
   this->Render();
 }
@@ -196,9 +194,10 @@ void vtkPVLineWidget::SetPoint2(float x, float y, float z)
     {
     pos[i] = this->Point2[i]->GetValueAsFloat();
     }
-  vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
-  line->SetPoint2(pos);
-  line->SetAlignToNone();
+
+  this->GetPVApplication()->BroadcastScript("%s SetPoint2 %f %f %f; %s SetAlignToNone",
+                                        this->Widget3DTclName, pos[0], pos[1], pos[2],
+                                        this->Widget3DTclName);
   this->ModifiedFlag = 1;
   this->Render();
 }
@@ -257,8 +256,10 @@ void vtkPVLineWidget::SetResolution(int i)
 {
   this->ResolutionEntry->SetValue(i);
   int res = this->ResolutionEntry->GetValueAsInt();
-  vtkLineWidget *line = static_cast<vtkLineWidget*>( this->Widget3D );
-  line->SetResolution(res);
+
+
+  this->GetPVApplication()->BroadcastScript("%s SetResolution %d",
+                                            this->Widget3DTclName, res);
   this->Render();
 }
 
@@ -316,7 +317,6 @@ void vtkPVLineWidget::Accept()
                << this->ResolutionEntry->GetValue() << endl;
     }
 
-  //this->UpdateVTKObject(this->ObjectTclName);
   this->Superclass::Accept();
 }
 
@@ -328,6 +328,7 @@ void vtkPVLineWidget::Accept(const char* sourceTclName)
   int traceFlag = 0;
 
   // Start the trace entry and the accept command.
+
   if (this->ModifiedFlag && traceFile && this->InitializeTrace())
     {
     traceFlag = 1;
@@ -397,30 +398,35 @@ void vtkPVLineWidget::UpdateVTKObject(const char* sourceTclName)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ActualPlaceWidget()
 {
-  vtkDataSet* data = 0;
-  float bounds[6];
+  float bds[6];
+  float x, y, z;
+
   if ( this->PVSource->GetPVInput() )
     {
-    data = this->PVSource->GetPVInput()->GetPVPart()->GetVTKData();
-    this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bounds);
+    this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bds);
 
-    this->SetPoint1((bounds[0]+bounds[1])/2, 
-                    bounds[2], 
-                    (bounds[4]+bounds[5])/2);
-    this->SetPoint2((bounds[0]+bounds[1])/2, 
-                    bounds[3], 
-                    (bounds[4]+bounds[5])/2);
+    x = (bds[0]+bds[1])/2; 
+    y = bds[2]; 
+    z = (bds[4]+bds[5])/2;
+    this->SetPoint1(x, y, z);
+    x = (bds[0]+bds[1])/2; 
+    y = bds[3]; 
+    z = (bds[4]+bds[5])/2;
+    this->SetPoint2(x, y, z);
     }
   else
     {
-    bounds[0] = bounds[2] = bounds[4] = 0.0;
-    bounds[1] = bounds[3] = bounds[5] = 1.0;
+    bds[0] = bds[2] = bds[4] = 0.0;
+    bds[1] = bds[3] = bds[5] = 1.0;
     }
-  this->Widget3D->SetInput(data);
 
-  this->Widget3D->PlaceWidget(bounds);
+  this->GetPVApplication()->BroadcastScript("%s PlaceWidget %f %f %f %f %f %f",
+                                            this->Widget3DTclName,
+                                            bds[0], bds[1], bds[2], bds[3],
+                                            bds[4], bds[5]);
+
   // We want to use these defaults, not the default setting of the line source.
-  this->UpdateVTKObject(this->ObjectTclName);
+  //this->UpdateVTKObject(this->ObjectTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -648,12 +654,21 @@ void vtkPVLineWidget::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
 {
+  char tclName[256];
+  static int instanceCount = 0;
+
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Line");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
+
+  ++instanceCount;
+  sprintf(tclName, "pvLineWidget%d", instanceCount);
+  this->SetWidget3DTclName(tclName);
+  pvApp->BroadcastScript("vtkLineWidget %s", tclName);
+  pvApp->BroadcastScript("%s SetAlignToNone", tclName);
 
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());

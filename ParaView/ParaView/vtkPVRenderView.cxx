@@ -109,7 +109,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.229");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.230");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -215,6 +215,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->RendererTclName     = 0;
   this->CompositeTclName    = 0;
   this->RenderWindowTclName = 0;
+  this->SatelliteInteractorTclName = 0;
   this->InteractiveCompositeTime = 0;
   this->InteractiveRenderTime    = 0;
   this->StillRenderTime          = 0;
@@ -304,6 +305,13 @@ vtkPVRenderView::~vtkPVRenderView()
   if ( this->Application )
     {
     pvApp = this->GetPVApplication();
+    }
+
+  if (this->SatelliteInteractorTclName)
+    {
+    pvApp->BroadcastScript("%s SetRenderWindow {}", this->SatelliteInteractorTclName);
+    pvApp->BroadcastScript("%s Delete", this->SatelliteInteractorTclName);
+    this->SetSatelliteInteractorTclName(NULL);
     }
 
   this->InterfaceSettingsFrame->Delete();
@@ -578,9 +586,16 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
     }
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
                            this->RendererTclName);
+  // Create a dummy interactor on the satellites so they han have 3d widgets.
+  pvApp->BroadcastScript("vtkPVSatelliteRenderWindowInteractor IRen");
+  pvApp->BroadcastScript("IRen SetRenderWindow %s", this->RenderWindowTclName);
+  this->SetSatelliteInteractorTclName("IRen");  
+  
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
                          this->RenderWindowTclName);
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
+
+
 
   if ( getenv("PV_DISABLE_COMPOSITE_INTERRUPTS") )
     {
@@ -2639,7 +2654,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.229 $");
+  this->ExtractRevision(os,"$Revision: 1.230 $");
 }
 
 //------------------------------------------------------------------------------

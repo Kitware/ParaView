@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.260");
+vtkCxxRevisionMacro(vtkPVSource, "1.261");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1354,7 +1354,7 @@ void vtkPVSource::UpdateParameterWidgets()
     // Do not try to reset the widget if it is not initialized
     if (pvw->GetApplication())
       {
-      pvw->ForceReset(this->GetVTKSourceTclName(0));
+      pvw->Reset(this->GetVTKSourceTclName(0));
       }
     it->GoToNextItem();
     }
@@ -2487,7 +2487,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.260 $");
+  this->ExtractRevision(os,"$Revision: 1.261 $");
 }
 
 //----------------------------------------------------------------------------

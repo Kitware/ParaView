@@ -113,14 +113,14 @@ public:
   virtual void ActualPlaceWidget();
 
   // Description:
-  // Get the 3D Widget.
-  vtkGetObjectMacro(Widget3D, vtk3DWidget);
-
-  // Description:
   // Determines whether there is a label-border around the widget
   // ui.
   vtkSetMacro(UseLabel, int);
   vtkGetMacro(UseLabel, int);
+
+  // Description:
+  // Internal method used only to get the widget pointer.
+  void InitializeObservers(vtk3DWidget* widget3D); 
 
 protected:
   vtkPV3DWidget();
@@ -128,7 +128,6 @@ protected:
 
   void Render();
   
-  vtk3DWidget* Widget3D;
   vtkPV3DWidgetObserver* Observer;
 
   // Description:
@@ -164,6 +163,9 @@ protected:
   int Placed;
   int Visible;
   int UseLabel;
+
+  char* Widget3DTclName;
+  vtkSetStringMacro(Widget3DTclName);
 
 private:  
   vtkPV3DWidget(const vtkPV3DWidget&); // Not implemented

@@ -42,7 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkPVImplicitPlaneWidget - A widget to manipulate an implicit plane.
 // .SECTION Description
 // This widget creates and manages its own vtkPlane on each process.
-// I could not descide whether to include the bounds display or not. 
+// I could not decide whether to include the bounds display or not. 
 // (I did not.) 
 
 

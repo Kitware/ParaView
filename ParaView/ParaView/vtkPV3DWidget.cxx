@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.31");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.32");
 
 //===========================================================================
 //***************************************************************************
@@ -96,7 +96,7 @@ vtkPV3DWidget::vtkPV3DWidget()
   this->Frame        = vtkKWFrame::New();
   this->ValueChanged = 1;
   this->ModifiedFlag = 1;
-  this->Widget3D = 0;
+  this->Widget3DTclName = 0;
   this->Visible = 0;
   this->Placed = 0;
   this->UseLabel = 1;
@@ -105,13 +105,12 @@ vtkPV3DWidget::vtkPV3DWidget()
 //----------------------------------------------------------------------------
 vtkPV3DWidget::~vtkPV3DWidget()
 {
-  if ( this->Widget3D )
+  if (this->Widget3DTclName)
     {
-    if (this->Widget3D->GetEnabled())
-      {
-      this->Widget3D->EnabledOff();
-      }
-    this->Widget3D->Delete();
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    pvApp->BroadcastScript("%s EnabledOff", this->Widget3DTclName);
+    pvApp->BroadcastScript("%s Delete", this->Widget3DTclName);
+    this->SetWidget3DTclName(NULL);
     }
   this->Observer->Delete();
   this->Visibility->Delete();
@@ -175,24 +174,37 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 
   this->ChildCreate(pvApp);
 
+  // Only initialize observers on the UI process.
+  if (this->Widget3DTclName)
+    {
+    // Default/dummy interactor for satelite procs.
+    pvApp->BroadcastScript("%s SetInteractor IRen", this->Widget3DTclName);
+    this->Script("%s InitializeObservers %s", this->GetTclName(),
+                 this->Widget3DTclName);
+    }
+
+  this->PlaceWidget();
+}
+
+//----------------------------------------------------------------------------
+void vtkPV3DWidget::InitializeObservers(vtk3DWidget* widget3D) 
+{
   vtkPVGenericRenderWindowInteractor* iren = 
     this->PVSource->GetPVWindow()->GetGenericInteractor();
   if (iren)
     {
-    this->Widget3D->SetInteractor(iren);
-    this->Widget3D->AddObserver(vtkCommand::InteractionEvent, 
-                                this->Observer);
-    this->Widget3D->AddObserver(vtkCommand::PlaceWidgetEvent, 
-                                this->Observer);
-    this->Widget3D->AddObserver(vtkCommand::StartInteractionEvent, 
-                                this->Observer);
-    this->Widget3D->AddObserver(vtkCommand::EndInteractionEvent, 
-                                this->Observer);
-    this->Widget3D->EnabledOff();
+    widget3D->SetInteractor(iren);
+    widget3D->AddObserver(vtkCommand::InteractionEvent, 
+                          this->Observer);
+    widget3D->AddObserver(vtkCommand::PlaceWidgetEvent, 
+                          this->Observer);
+    widget3D->AddObserver(vtkCommand::StartInteractionEvent, 
+                          this->Observer);
+    widget3D->AddObserver(vtkCommand::EndInteractionEvent, 
+                          this->Observer);
+    widget3D->EnabledOff();
     }
-  this->Observer->Execute(this->Widget3D, vtkCommand::InteractionEvent, 0);
-
-  this->PlaceWidget();
+  this->Observer->Execute(widget3D, vtkCommand::InteractionEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -262,12 +274,14 @@ void vtkPV3DWidget::SetVisibility()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibility(int visibility)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
   if ( visibility )
     {
     this->PlaceWidget();
     }
 
-  this->Widget3D->SetEnabled(visibility);
+  pvApp->BroadcastScript("%s SetEnabled %d", this->Widget3DTclName, 
+                         visibility);
   this->AddTraceEntry("$kw(%s) SetVisibility %d", 
                       this->GetTclName(), visibility);
   this->Visibility->SetState(visibility);
@@ -292,7 +306,9 @@ void vtkPV3DWidget::Deselect()
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::SetVisibilityNoTrace(int visibility)
 {
-  this->Widget3D->SetEnabled(visibility);  
+  this->GetPVApplication()->BroadcastScript("%s SetEnabled %d",
+                                            this->Widget3DTclName, visibility);
+  //is->Widget3D->SetEnabled(visibility);  
 }
 
 //----------------------------------------------------------------------------
@@ -307,26 +323,29 @@ void vtkPV3DWidget::SetFrameLabel(const char* label)
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::ActualPlaceWidget()
 {
-  vtkDataSet* data = 0;
-  if ( this->PVSource->GetPVInput() )
-    {
-    data = this->PVSource->GetPVInput()->GetPVPart()->GetVTKData();
-    }
-  this->Widget3D->SetInput(data);
-  float bounds[6];
-  this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bounds);
-  this->Widget3D->PlaceWidget(bounds);
+  // I do not think we actually need an input.
+
+  //vtkDataSet* data = 0;
+  //if ( this->PVSource->GetPVInput() )
+  //  {
+  //  data = this->PVSource->GetPVInput()->GetPVPart()->GetVTKData();
+  //  }
+  //this->Widget3D->SetInput(data);
+  float bds[6];
+  this->PVSource->GetPVInput()->GetDataInformation()->GetBounds(bds);
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->BroadcastScript("%s PlaceWidget %f %f %f %f %f %f", 
+                         this->Widget3DTclName, 
+                         bds[0], bds[1], bds[2], bds[3], bds[4], bds[5]);
+  //this->Widget3D->PlaceWidget(bounds);
 }
 
 //----------------------------------------------------------------------------
 void vtkPV3DWidget::PlaceWidget()
 {
-  vtkDataSet* data = 0;
-  if ( this->PVSource->GetPVInput() )
-    {
-    data = this->PVSource->GetPVInput()->GetPVPart()->GetVTKData();
-    }
-  if (!this->Placed || data != this->Widget3D->GetInput())
+  // We should really check to see if the input has changed (modified).
+
+  if (!this->Placed && this->Widget3DTclName)
     {
     this->ActualPlaceWidget();
     this->Placed = 1;
@@ -388,5 +407,8 @@ void vtkPV3DWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Use Label: " << (this->UseLabel?"on":"off") << endl;
   os << indent << "3D Widget:" << endl;
-  this->Widget3D->PrintSelf(os, indent.GetNextIndent());
+  if (this->Widget3DTclName)
+    {
+    os << indent << "3DWidgetTclName: " << this->Widget3DTclName << endl;
+    }
 }

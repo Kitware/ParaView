@@ -59,11 +59,13 @@ public:
   // Description:
   // Method for setting the value of the VTKReader from the widget.
   // Used internally when user hits Accept.
+  virtual void Accept(const char* sourceTclName);
   virtual void Accept();
   
   // Description:
   // Method for setting the value of the widget from the VTKReader.
   // Used internally when user hits Reset
+  virtual void Reset(const char* sourceTclName);
   virtual void Reset();
   
   // Description:

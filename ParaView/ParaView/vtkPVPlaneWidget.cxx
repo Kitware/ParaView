@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPlaneWidget);
-vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVPlaneWidget, "1.31");
 
 int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -67,13 +67,6 @@ int vtkPVPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVPlaneWidget::vtkPVPlaneWidget()
 {
-  if ( this->Widget3D )
-    {
-    this->Widget3D->Delete();
-    }
-  vtkPlaneWidget *plane = vtkPlaneWidget::New();
-  plane->SetPlaceFactor(1.0);
-  this->Widget3D = plane;
 }
 
 //----------------------------------------------------------------------------
@@ -129,7 +122,22 @@ vtkPVPlaneWidget* vtkPVPlaneWidget::ClonePrototype(vtkPVSource* pvSource,
 //----------------------------------------------------------------------------
 void vtkPVPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 {
+  char tclName[256];
+  static int instanceCount = 0;
+
   this->Superclass::ChildCreate(pvApp);
+
+  if ( this->Widget3DTclName )
+    {
+    pvApp->BroadcastScript("%s Delete");
+    this->SetWidget3DTclName(NULL);
+    }
+
+  ++instanceCount;
+  sprintf(tclName, "pvPlaneWidget%d", instanceCount);
+  pvApp->BroadcastScript("vtkPlaneWidget %s", tclName);
+  pvApp->BroadcastScript("%s SetPlaceFactor 1.0", tclName);
+  this->SetWidget3DTclName(tclName);
 }
 
 //----------------------------------------------------------------------------
@@ -169,10 +177,10 @@ void vtkPVPlaneWidget::SetCenter(float x, float y, float z)
   this->CenterEntry[1]->SetValue(y, 3);
   this->CenterEntry[2]->SetValue(z, 3); 
   this->ModifiedFlag = 1;
-  if ( this->Widget3D )
+  if ( this->Widget3DTclName )
     {
-    vtkPlaneWidget *plane = static_cast<vtkPlaneWidget*>(this->Widget3D);
-    plane->SetCenter(x, y, z); 
+    this->GetPVApplication()->BroadcastScript("%s SetCenter %f %f %f",
+                                              this->Widget3DTclName, x, y, z);
     }
 }
 
@@ -183,10 +191,10 @@ void vtkPVPlaneWidget::SetNormal(float x, float y, float z)
   this->NormalEntry[1]->SetValue(y, 3);
   this->NormalEntry[2]->SetValue(z, 3); 
   this->ModifiedFlag = 1;
-  if ( this->Widget3D )
+  if ( this->Widget3DTclName )
     {
-    vtkPlaneWidget *plane = static_cast<vtkPlaneWidget*>(this->Widget3D);
-    plane->SetNormal(x, y, z); 
+    this->GetPVApplication()->BroadcastScript("%s SetNormal %f %f %f",
+                                              this->Widget3DTclName, x, y, z);
     }
 }
 

@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.10");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.11");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -75,10 +75,6 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
 {
   int cc;
 
-  vtkImplicitPlaneWidget *plane = vtkImplicitPlaneWidget::New();
-  plane->SetPlaceFactor(1.0);
-  plane->OutlineTranslationOff();
-  this->Widget3D = plane;
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();  
   for ( cc = 0; cc < 3; cc ++ )
@@ -210,12 +206,15 @@ void vtkPVImplicitPlaneWidget::NormalZCallback()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::Reset(const char* sourceTclName)
 {
+  vtkPVApplication *pvApp;
+
   if ( ! this->ModifiedFlag)
     {
     return;
     }
 
-  static_cast<vtkImplicitPlaneWidget*>(this->Widget3D)->SetDrawPlane(0);
+  pvApp = this->GetPVApplication();
+  pvApp->BroadcastScript("%s SetDrawPlane 0", this->Widget3DTclName);
   if ( this->PlaneTclName )
     {
     this->Script("eval %s SetCenter [ %s GetOrigin ]", 
@@ -253,7 +252,7 @@ void vtkPVImplicitPlaneWidget::Accept(const char* sourceTclName)
   vtkPVApplication *pvApp = this->GetPVApplication();
 
   this->PlaceWidget();
-  static_cast<vtkImplicitPlaneWidget*>(this->Widget3D)->SetDrawPlane(0);
+  pvApp->BroadcastScript("%s SetDrawPlane 0", this->Widget3DTclName);
 
   // I guess this should be done in the initialization.
   if (this->VariableName && sourceTclName)
@@ -382,19 +381,33 @@ void vtkPVImplicitPlaneWidget::SetBalloonHelpString(const char *str)
 void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   static int instanceCount = 0;
-  char planeTclName[256];
-  this->Widget3D->PlaceWidget(0, 1, 0, 1, 0, 1);
-  ++instanceCount;
-  sprintf(planeTclName, "pvPlane%d", instanceCount);
+  char tclName[256];
 
+  ++instanceCount;
+
+  // Now that the 3D widget is on each process,
+  // we do not need to create our own plane (but it does not hurt).
+  sprintf(tclName, "pvPlane%d", instanceCount);
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
     {
     this->SetTraceName("Plane");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-  pvApp->BroadcastScript("vtkPlane %s", planeTclName);
-  this->SetPlaneTclName(planeTclName);
+  pvApp->BroadcastScript("vtkPlane %s", tclName);
+  this->SetPlaneTclName(tclName);
+
+  // Create the 3D widget on each process.
+  // This is for tiled display and client server.
+  // This may decrease compresion durring compositing.
+  // We should have a special call instead of broadcast script.
+  // Better yet, controll visibility based on mode (client-server ...).
+  sprintf(tclName, "pvImplicitPlaneWidget%d", instanceCount);
+  pvApp->BroadcastScript("vtkImplicitPlaneWidget %s", tclName);
+  this->SetWidget3DTclName(tclName);
+  pvApp->BroadcastScript("%s SetPlaceFactor 1.0", this->Widget3DTclName);
+  pvApp->BroadcastScript("%s OutlineTranslationOff", this->Widget3DTclName);
+  pvApp->BroadcastScript("%s PlaceWidget 0 1 0 1 0 1", this->Widget3DTclName);
 
   this->SetFrameLabel("Plane Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -518,25 +531,23 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       {
       float bds[6];
       input->GetDataInformation()->GetBounds(bds);
-      pvApp->BroadcastScript("%s SetOrigin %f %f %f", planeTclName,
+      pvApp->BroadcastScript("%s SetOrigin %f %f %f", this->PlaneTclName,
                              0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                              0.5*(bds[4]+bds[5]));
-      pvApp->BroadcastScript("%s SetNormal 0 0 1", planeTclName);
+      pvApp->BroadcastScript("%s SetNormal 0 0 1", this->PlaneTclName);
       this->Reset();
       }
     }
 
-  vtkImplicitPlaneWidget* plane = 
-    static_cast<vtkImplicitPlaneWidget*>(this->Widget3D);
   if (pvApp->GetProcessModule()->GetNumberOfPartitions() == 1)
     {
-    plane->GetPlaneProperty()->SetOpacity(0.25);
-    plane->GetSelectedPlaneProperty()->SetOpacity(0.25);
+    pvApp->BroadcastScript("[%s GetPlaneProperty] SetOpacity 0.25; [%s GetSelectedPlaneProperty] SetOpacity 0.25", 
+                           this->Widget3DTclName, this->Widget3DTclName);
     }
   else
     {
-    plane->GetPlaneProperty()->SetOpacity(1.0);
-    plane->GetSelectedPlaneProperty()->SetOpacity(1.0);
+    pvApp->BroadcastScript("[%s GetPlaneProperty] SetOpacity 1.0; [%s GetSelectedPlaneProperty] SetOpacity 1.0", 
+                           this->Widget3DTclName, this->Widget3DTclName);
     }
 
   this->SetBalloonHelpString(this->BalloonHelpString);
@@ -584,10 +595,11 @@ void vtkPVImplicitPlaneWidget::SetCenter(float x, float y, float z)
   this->CenterEntry[1]->SetValue(y, 3);
   this->CenterEntry[2]->SetValue(z, 3); 
   this->ModifiedFlag = 1;
-  if ( this->Widget3D )
+  if ( this->Widget3DTclName )
     {
-    vtkImplicitPlaneWidget *plane = static_cast<vtkImplicitPlaneWidget*>(this->Widget3D);
-    plane->SetOrigin(x, y, z); 
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
+                           this->Widget3DTclName, x, y, z);
     }
 }
 
@@ -598,10 +610,11 @@ void vtkPVImplicitPlaneWidget::SetNormal(float x, float y, float z)
   this->NormalEntry[1]->SetValue(y, 3);
   this->NormalEntry[2]->SetValue(z, 3); 
   this->ModifiedFlag = 1;
-  if ( this->Widget3D )
+  if ( this->Widget3DTclName )
     {
-    vtkImplicitPlaneWidget *plane = static_cast<vtkImplicitPlaneWidget*>(this->Widget3D);
-    plane->SetNormal(x, y, z); 
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    pvApp->BroadcastScript("%s SetNormal %f %f %f", 
+                           this->Widget3DTclName, x, y, z);
     }
 }
 

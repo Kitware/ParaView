@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.19");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -70,7 +70,6 @@ int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVSphereWidget::vtkPVSphereWidget()
 {
   int cc;
-  this->Widget3D = vtkSphereWidget::New();
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();  
   for ( cc = 0; cc < 3; cc ++ )
@@ -288,10 +287,7 @@ void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
 void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
 {
   static int instanceCount = 0;
-  char sphereTclName[256];
-  this->Widget3D->PlaceWidget(0, 1, 0, 1, 0, 1);
-  ++instanceCount;
-  sprintf(sphereTclName, "pvSphere%d", instanceCount);
+  char tclName[256];
 
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
@@ -299,8 +295,16 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
     this->SetTraceName("Sphere");
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-  pvApp->BroadcastScript("vtkSphere %s", sphereTclName);
-  this->SetSphereTclName(sphereTclName);
+
+  ++instanceCount;
+  sprintf(tclName, "pvSphereWidget%d", instanceCount);
+  this->SetWidget3DTclName(tclName);
+  pvApp->BroadcastScript("vtkSphereWidget %s", tclName);
+  pvApp->BroadcastScript("%s PlaceWidget 0 1 0 1 0 1", tclName);
+
+  sprintf(tclName, "pvSphere%d", instanceCount);
+  pvApp->BroadcastScript("vtkSphere %s", tclName);
+  this->SetSphereTclName(tclName);
   
   this->SetFrameLabel("Sphere Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
@@ -387,10 +391,10 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       {
       double bds[6];
       input->GetDataInformation()->GetBounds(bds);
-      pvApp->BroadcastScript("%s SetCenter %f %f %f", sphereTclName,
+      pvApp->BroadcastScript("%s SetCenter %f %f %f", this->SphereTclName,
                              0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                              0.5*(bds[4]+bds[5]));
-      pvApp->BroadcastScript("%s SetRadius %f", sphereTclName,
+      pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName,
                              0.5*(bds[1]-bds[0]));
       this->Reset();
       }
@@ -430,10 +434,10 @@ void vtkPVSphereWidget::SetCenter(float x, float y, float z)
   this->CenterEntry[1]->SetValue(y, 5);
   this->CenterEntry[2]->SetValue(z, 5);  
   this->ModifiedFlag = 1;
-  if ( this->Widget3D )
+  if ( this->Widget3DTclName )
     {
-    vtkSphereWidget *sphere = static_cast<vtkSphereWidget*>(this->Widget3D);
-    sphere->SetCenter(x, y, z);
+    this->GetPVApplication()->BroadcastScript("%s SetCenter %f %f %f",
+                                              this->Widget3DTclName, x, y, z);
     }
 }
 
@@ -446,8 +450,10 @@ void vtkPVSphereWidget::SetCenter()
     {
     val[cc] = atof(this->CenterEntry[cc]->GetValue());
     }
-  vtkSphereWidget *sphere = static_cast<vtkSphereWidget*>(this->Widget3D);
-  sphere->SetCenter(val);
+
+  this->GetPVApplication()->BroadcastScript("%s SetCenter %f %f %f",
+                                            this->Widget3DTclName, 
+                                            val[0], val[1], val[2]);
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
@@ -458,10 +464,10 @@ void vtkPVSphereWidget::SetRadius(float r)
 {
   this->RadiusEntry->SetValue(r, 5); 
   this->ModifiedFlag = 1;
-  if ( this->Widget3D )
+  if ( this->Widget3DTclName )
     {
-    vtkSphereWidget *sphere = static_cast<vtkSphereWidget*>(this->Widget3D);
-    sphere->SetRadius(r);
+    this->GetPVApplication()->BroadcastScript("%s SetRadius %f",
+                                              this->Widget3DTclName, r);
     }
 }
 
@@ -471,8 +477,8 @@ void vtkPVSphereWidget::SetRadius()
   float val;
   val = atof(this->RadiusEntry->GetValue());
 
-  vtkSphereWidget *sphere = static_cast<vtkSphereWidget*>(this->Widget3D);
-  sphere->SetRadius(val);
+  this->GetPVApplication()->BroadcastScript("%s SetRadius %f",
+                                            this->Widget3DTclName, val);
   this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;

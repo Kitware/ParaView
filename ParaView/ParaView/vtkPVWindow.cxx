@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.410");
+vtkCxxRevisionMacro(vtkPVWindow, "1.411");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1457,22 +1457,33 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
 void vtkPVWindow::MouseAction(int action,int button, 
                               int x,int y, int shift,int control)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   if ( action == 0 )
     {
     if (button == 1)
       {
       this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
       this->GenericInteractor->LeftButtonPressEvent();
+      // Send the same event to the satellite to synchronize the 3D widgets.
+      // Maybe I should itegrate this into the PV interactor.
+      pvApp->BroadcastScript("IRen LeftPress %d %d %d %d", x, y, control, shift);
       }
     else if (button == 2)
       {
       this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
       this->GenericInteractor->MiddleButtonPressEvent();
+      // Send the same event to the satellite to synchronize the 3D widgets.
+      // Maybe I should itegrate this into the PV interactor.
+      pvApp->BroadcastScript("IRen MiddlePress %d %d %d %d", x, y, control, shift);
       }
     else if (button == 3)
       {
       this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
       this->GenericInteractor->RightButtonPressEvent();
+      // Send the same event to the satellite to synchronize the 3D widgets.
+      // Maybe I should itegrate this into the PV interactor.
+      pvApp->BroadcastScript("IRen RightPress %d %d %d %d", x, y, control, shift);
       }    
     }
   else if ( action == 1 )
@@ -1481,16 +1492,25 @@ void vtkPVWindow::MouseAction(int action,int button,
       {
       this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
       this->GenericInteractor->LeftButtonReleaseEvent();
+      // Send the same event to the satellite to synchronize the 3D widgets.
+      // Maybe I should itegrate this into the PV interactor.
+      pvApp->BroadcastScript("IRen LeftRelease %d %d %d %d", x, y, control, shift);
       }
     else if (button == 2)
       {
       this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
       this->GenericInteractor->MiddleButtonReleaseEvent();
+      // Send the same event to the satellite to synchronize the 3D widgets.
+      // Maybe I should itegrate this into the PV interactor.
+      pvApp->BroadcastScript("IRen MiddleRelease %d %d %d %d", x, y, control, shift);
       }
     else if (button == 3)
       {
       this->GenericInteractor->SetEventInformationFlipY(x, y, control, shift);
       this->GenericInteractor->RightButtonReleaseEvent();
+      // Send the same event to the satellite to synchronize the 3D widgets.
+      // Maybe I should itegrate this into the PV interactor.
+      pvApp->BroadcastScript("IRen RightRelease %d %d %d %d", x, y, control, shift);
       }    
 
     vtkCamera* cam = this->MainView->GetRenderer()->GetActiveCamera();
@@ -1511,6 +1531,9 @@ void vtkPVWindow::MouseAction(int action,int button,
     {
     this->GenericInteractor->SetMoveEventInformationFlipY(x, y);
     this->GenericInteractor->MouseMoveEvent();
+    // Send the same event to the satellite to synchronize the 3D widgets.
+    // Maybe I should itegrate this into the PV interactor.
+    pvApp->BroadcastScript("IRen Move %d %d", x, y);
     }
 }
 
@@ -3869,7 +3892,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.410 $");
+  this->ExtractRevision(os,"$Revision: 1.411 $");
 }
 
 //----------------------------------------------------------------------------

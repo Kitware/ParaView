@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightArraySelection);
-vtkCxxRevisionMacro(vtkPVEnSightArraySelection, "1.3");
+vtkCxxRevisionMacro(vtkPVEnSightArraySelection, "1.4");
 
 //-------------------------------------------------------------------------
 int vtkPVEnSightArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -62,7 +62,15 @@ vtkPVEnSightArraySelection::~vtkPVEnSightArraySelection()
 {
 }
 
+//----------------------------------------------------------------------------
 void vtkPVEnSightArraySelection::Accept()
+{
+  this->Accept(this->VTKReaderTclName);
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVEnSightArraySelection::Accept(const char* sourceTclName)
 {
   vtkKWCheckButton *check;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -78,7 +86,7 @@ void vtkPVEnSightArraySelection::Accept()
     }
   
   // Create new check buttons.
-  if (this->VTKReaderTclName == NULL)
+  if (sourceTclName == NULL)
     {
     vtkErrorMacro("VTKReader has not been set.");
     }
@@ -88,7 +96,7 @@ void vtkPVEnSightArraySelection::Accept()
     return;
     }
 
-  pvApp->BroadcastScript("%s RemoveAll%sVariableNames", this->VTKReaderTclName,
+  pvApp->BroadcastScript("%s RemoveAll%sVariableNames", sourceTclName,
                          this->AttributeName);
   
   this->ArrayCheckButtons->InitTraversal();
@@ -97,7 +105,7 @@ void vtkPVEnSightArraySelection::Accept()
     if (check->GetState())
       {
       pvApp->BroadcastScript("%s AddVariableName {%s} %d",
-                             this->VTKReaderTclName, check->GetText(),
+                             sourceTclName, check->GetText(),
                              attributeType);
       }
 
@@ -106,7 +114,14 @@ void vtkPVEnSightArraySelection::Accept()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVEnSightArraySelection::Reset()
+{
+  this->Reset(this->VTKReaderTclName);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVEnSightArraySelection::Reset(const char* sourceTclName)
 {
   vtkKWCheckButton* checkButton;
   int row = 0;
@@ -127,16 +142,16 @@ void vtkPVEnSightArraySelection::Reset()
   this->ArrayCheckButtons->RemoveAllItems();
   
   // Create new check buttons.
-  if (this->VTKReaderTclName)
+  if (sourceTclName)
     {
     int numArrays, idx;
-    this->Script("%s GetNumberOfVariables", this->VTKReaderTclName);
+    this->Script("%s GetNumberOfVariables", sourceTclName);
     numArrays = this->GetIntegerResult(this->Application);
     
     for (idx = 0; idx < numArrays; ++idx)
       {
       this->Script("%s GetVariableType %d",
-                   this->VTKReaderTclName, idx);
+                   sourceTclName, idx);
       variableType = vtkKWObject::GetIntegerResult(this->Application);
       switch (attributeType)
         {
@@ -158,7 +173,7 @@ void vtkPVEnSightArraySelection::Reset()
       checkButton->SetParent(this->CheckFrame);
       checkButton->Create(this->Application, "");
       this->Script("%s SetText [%s GetDescription %d]", 
-                   checkButton->GetTclName(), this->VTKReaderTclName, idx);
+                   checkButton->GetTclName(), sourceTclName, idx);
       this->Script("grid %s -row %d -sticky w",
                    checkButton->GetWidgetName(), row);
       ++row;
@@ -167,13 +182,13 @@ void vtkPVEnSightArraySelection::Reset()
       checkButton->Delete();
       }
 
-    this->Script("%s GetNumberOfComplexVariables", this->VTKReaderTclName);
+    this->Script("%s GetNumberOfComplexVariables", sourceTclName);
     numArrays = this->GetIntegerResult(this->Application);
     
     for (idx = 0; idx < numArrays; ++idx)
       {
       this->Script("%s GetComplexVariableType %d",
-                   this->VTKReaderTclName, idx);
+                   sourceTclName, idx);
       variableType = vtkKWObject::GetIntegerResult(this->Application);
       switch (attributeType)
         {
@@ -194,7 +209,7 @@ void vtkPVEnSightArraySelection::Reset()
       checkButton->SetParent(this->CheckFrame);
       checkButton->Create(this->Application, "");
       this->Script("%s SetText [%s GetComplexDescription %d]", 
-                   checkButton->GetTclName(), this->VTKReaderTclName, idx);
+                   checkButton->GetTclName(), sourceTclName, idx);
       this->Script("grid %s -row %d -sticky w",
                    checkButton->GetWidgetName(), row);
       ++row;
@@ -208,7 +223,7 @@ void vtkPVEnSightArraySelection::Reset()
   this->ArrayCheckButtons->InitTraversal();
   while ( (checkButton = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
-    this->Script("%s IsRequestedVariable {%s} %d", this->VTKReaderTclName,
+    this->Script("%s IsRequestedVariable {%s} %d", sourceTclName,
                  checkButton->GetText(), attributeType);
     checkButton->SetState(this->GetIntegerResult(this->Application));
     }

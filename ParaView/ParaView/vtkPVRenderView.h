@@ -395,6 +395,9 @@ protected:
   char *RenderWindowTclName;
   vtkSetStringMacro(RenderWindowTclName);  
   
+  char *SatelliteInteractorTclName;
+  vtkSetStringMacro(SatelliteInteractorTclName);  
+  
   vtkKWLabeledFrame *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
   vtkKWPushButton   *XMinViewButton; 
