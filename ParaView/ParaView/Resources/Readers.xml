@@ -14,6 +14,25 @@
           extensions=".g" file_description="BYU Files">
     <Source class="vtkBYUReader"/>
   </Module>
+  <Module name="pdbreader" class="vtkPVReaderModule" root_name="PDB" 
+          module_type="Reader"
+          extensions=".pdb" file_description="PDB Files">
+    <Source class="vtkPDBReader"/>
+  </Module>
+  <Module name="xyzreader" class="vtkPVReaderModule" root_name="XYZMol" 
+          module_type="Reader"
+          extensions=".xyz" file_description="XYZ Molecule Files">
+    <Source class="vtkXYZMolReader"/>
+  </Module>
+  <Module name="gaussiancubereader" class="vtkPVAdvancedReaderModule" root_name="GaussianCube" 
+          module_type="Reader"
+          extensions=".cube" file_description="Gaussian Cube Files">
+    <Source class="vtkGaussianCubeReader"/>
+    <VectorEntry variable="HBScale" trace_name="HBScale" type="float" 
+                 help="Set the HB scale"/>
+    <VectorEntry variable="BScale" trace_name="BScale" type="float" 
+                 help="Set the B scale"/>
+  </Module>
   <Module name="popreader" class="vtkPVAdvancedReaderModule" 
           root_name="POP" 
           module_type="Reader"
