@@ -30,7 +30,7 @@
 #include <vtkstd/map>
 #include <vtkstd/algorithm>
 
-vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLCollectionReader, "1.3.2.1");
 vtkStandardNewMacro(vtkXMLCollectionReader);
 
 //----------------------------------------------------------------------------
@@ -292,6 +292,18 @@ const char* vtkXMLCollectionReader::GetRestriction(const char* name)
     {
     return 0;
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkXMLCollectionReader::SetRestrictionAsIndex(const char* name, int index)
+{
+  this->SetRestriction(name, this->GetAttributeValue(name, index));
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLCollectionReader::GetRestrictionAsIndex(const char* name)
+{
+  return this->GetAttributeValueIndex(name, this->GetRestriction(name));
 }
 
 //----------------------------------------------------------------------------
@@ -649,6 +661,24 @@ const char* vtkXMLCollectionReader::GetAttributeName(int attribute)
 }
 
 //----------------------------------------------------------------------------
+int vtkXMLCollectionReader::GetAttributeIndex(const char* name)
+{
+  if(name)
+    {
+    for(vtkXMLCollectionReaderAttributeNames::const_iterator i =
+          this->Internal->AttributeNames.begin();
+        i != this->Internal->AttributeNames.end(); ++i)
+      {
+      if(*i == name)
+        {
+        return static_cast<int>(i - this->Internal->AttributeNames.begin());
+        }
+      }
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
 int vtkXMLCollectionReader::GetNumberOfAttributeValues(int attribute)
 {
   if(attribute >= 0 && attribute < this->GetNumberOfAttributes())
@@ -666,6 +696,39 @@ const char* vtkXMLCollectionReader::GetAttributeValue(int attribute, int index)
     return this->Internal->AttributeValueSets[attribute][index].c_str();
     }
   return 0;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkXMLCollectionReader::GetAttributeValue(const char* name,
+                                                      int index)
+{
+  return this->GetAttributeValue(this->GetAttributeIndex(name), index);
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLCollectionReader::GetAttributeValueIndex(int attribute,
+                                                   const char* value)
+{
+  if(attribute >= 0 && attribute < this->GetNumberOfAttributes() && value)
+    {
+    for(vtkXMLCollectionReaderAttributeValueSets::value_type::const_iterator i
+          = this->Internal->AttributeValueSets[attribute].begin();
+        i != this->Internal->AttributeValueSets[attribute].end(); ++i)
+      {
+      if(*i == value)
+        {
+        return static_cast<int>(i - this->Internal->AttributeValueSets[attribute].begin());
+        }
+      }
+    }
+  return -1;
+}
+
+//----------------------------------------------------------------------------
+int vtkXMLCollectionReader::GetAttributeValueIndex(const char* name,
+                                                   const char* value)
+{
+  return this->GetAttributeValueIndex(this->GetAttributeIndex(name), value);
 }
 
 //----------------------------------------------------------------------------

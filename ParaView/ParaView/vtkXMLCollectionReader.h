@@ -49,6 +49,14 @@ public:
   virtual const char* GetRestriction(const char* name);
   
   // Description:
+  // Get/set the required value for a particular named attribute.  The
+  // value should be referenced by its index.  Only data sets matching
+  // this value will be read.  An out-of-range index will remove the
+  // restriction.
+  virtual void SetRestrictionAsIndex(const char* name, int index);
+  virtual int GetRestrictionAsIndex(const char* name);
+  
+  // Description:
   // Get the number of outputs.  Valid when a FileName has been set.
   virtual int GetNumberOfOutputs();
   
@@ -75,6 +83,11 @@ public:
   const char* GetAttributeName(int attribute);
   
   // Description:
+  // Get the index of the attribute with the given name.  Returns -1
+  // if no such attribute exists.
+  int GetAttributeIndex(const char* name);
+  
+  // Description:
   // Get the number of distinct values for the given attribute.
   int GetNumberOfAttributeValues(int attribute);
   
@@ -84,6 +97,14 @@ public:
   // specified, but will be the same every time the same instance of
   // the reader reads the same input file.
   const char* GetAttributeValue(int attribute, int index);
+  const char* GetAttributeValue(const char* name, int index);
+  
+  // Description:
+  // Get the index of the attribute value with the given name.  Returns -1
+  // if no such attribute or value exists.
+  int GetAttributeValueIndex(int attribute, const char* value);
+  int GetAttributeValueIndex(const char* name, const char* value);
+  
 protected:
   vtkXMLCollectionReader();
   ~vtkXMLCollectionReader();  
