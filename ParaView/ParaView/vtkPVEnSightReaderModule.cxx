@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.29");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.30");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -1106,7 +1106,6 @@ int vtkPVEnSightReaderModule::Finalize(const char* fname)
   delete [] tclName;
   this->DeleteVerifier();
   
-  delete[] tclName;
   this->Delete();
   return VTK_OK;
 }
