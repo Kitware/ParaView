@@ -519,8 +519,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->InterruptRenderCheck->Create(this->Application, "-text \"Allow Rendering Interrupts\"");
   this->InterruptRenderCheck->SetCommand(this, "InterruptRenderCallback");
 
-  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
-					      "InterruptRender", 0))
+  if (pvwindow && pvwindow->GetWindowRegisteryValue(2, "RunTime", 
+                                                    "InterruptRender", 0))
     {
     this->InterruptRenderCheck->SetState(
       pvwindow->GetIntRegisteryValue(2, "RunTime", "InterruptRender"));
