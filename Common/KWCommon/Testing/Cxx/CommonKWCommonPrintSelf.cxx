@@ -14,7 +14,6 @@
 =========================================================================*/
 
 #include "vtkKWArguments.h"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWIcon.h"
 #include "vtkKWProcessStatistics.h"
 #include "vtkKWRegisteryUtilities.h"
@@ -32,7 +31,6 @@ int main(int , char* [])
 {
   vtkObject *c;
   c = vtkKWArguments::New(); c->Print( cout ); c->Delete();
-  c = vtkKWDirectoryUtilities::New(); c->Print( cout ); c->Delete();
   c = vtkKWIcon::New(); c->Print( cout ); c->Delete();
   c = vtkKWProcessStatistics::New(); c->Print( cout ); c->Delete();
   c = vtkKWRegisteryUtilities::New(); c->Print( cout ); c->Delete();

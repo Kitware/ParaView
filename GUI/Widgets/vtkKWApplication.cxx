@@ -16,7 +16,6 @@
 #include "vtkCollectionIterator.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
-#include "vtkKWDirectoryUtilities.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWMessageDialog.h"
@@ -32,6 +31,8 @@
 #include "vtkString.h"
 #include "vtkKWText.h"
 #include "vtkTclUtil.h"
+
+#include <kwsys/SystemTools.hxx>
 
 #include <stdarg.h>
 
@@ -60,7 +61,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.182");
+vtkCxxRevisionMacro(vtkKWApplication, "1.183");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -252,10 +253,10 @@ void vtkKWApplication::SetApplication(vtkKWApplication*)
 void vtkKWApplication::FindApplicationInstallationDirectory()
 {
   const char *nameofexec = Tcl_GetNameOfExecutable();
-  if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
+  if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
     {
-    char directory[1024];
-    vtkKWDirectoryUtilities::GetFilenamePath(nameofexec, directory);
+    kwsys_stl::string directory = 
+      kwsys::SystemTools::GetFilenamePath(nameofexec);
     // remove the /bin from the end
     // What the h??? no, do not *do* that: first it breaks all the apps 
     // relying on this method to find where the binary is installed 
@@ -264,10 +265,8 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     // If you need to remove whatever dir, just copy the result of this
     // method and strip it yourself.
     // directory[strlen(directory) - 4] = '\0';
-    vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-    this->SetApplicationInstallationDirectory(
-      util->ConvertToUnixSlashes(directory));
-    util->Delete();
+    kwsys::SystemTools::ConvertToUnixSlashes(directory);
+    this->SetApplicationInstallationDirectory(directory.c_str());
     }
   else
     {
@@ -278,24 +277,22 @@ void vtkKWApplication::FindApplicationInstallationDirectory()
     char installed_path[REG_KEY_VALUE_SIZE_MAX];
     if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
       {
-      vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-      this->SetApplicationInstallationDirectory(
-        util->ConvertToUnixSlashes(installed_path));
-      util->Delete();
+      kwsys_stl::string directory(installed_path);
+      kwsys::SystemTools::ConvertToUnixSlashes(directory);
+      this->SetApplicationInstallationDirectory(directory.c_str());
       }
     else
       {
       reg->SetGlobalScope(1);
       if (reg && reg->ReadValue(setup_key, "InstalledPath", installed_path))
         {
-        vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-        this->SetApplicationInstallationDirectory(
-          util->ConvertToUnixSlashes(installed_path));
-        util->Delete();
+        kwsys_stl::string directory(installed_path);
+        kwsys::SystemTools::ConvertToUnixSlashes(directory);
+        this->SetApplicationInstallationDirectory(directory.c_str());
         }
       else
         {
-      this->SetApplicationInstallationDirectory(0);
+        this->SetApplicationInstallationDirectory(0);
         }
       reg->SetGlobalScope(0);
       }
@@ -581,23 +578,25 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   if (!has_tcllibpath_env || !has_tklibpath_env)
     {
     const char *nameofexec = Tcl_GetNameOfExecutable();
-    if (nameofexec && vtkKWDirectoryUtilities::FileExists(nameofexec))
+    if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
       {
-      char dir[1024], dir_unix[1024], buffer[1024];
-      vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-      util->GetFilenamePath(nameofexec, dir);
-      strcpy(dir_unix, util->ConvertToUnixSlashes(dir));
+      char dir_unix[1024], buffer[1024];
+      kwsys_stl::string dir = 
+        kwsys::SystemTools::GetFilenamePath(nameofexec);
+      kwsys::SystemTools::ConvertToUnixSlashes(dir);
+      strcpy(dir_unix, dir.c_str());
 
       // Installed KW application, otherwise build tree/windows
       sprintf(buffer, "%s/..%s/TclTk", dir_unix, KW_INSTALL_LIB_DIR);
-      int exists = vtkKWDirectoryUtilities::FileExists(buffer);
+      int exists = kwsys::SystemTools::FileExists(buffer);
       if (!exists)
         {
         sprintf(buffer, "%s/TclTk", dir_unix);
-        exists = vtkKWDirectoryUtilities::FileExists(buffer);
+        exists = kwsys::SystemTools::FileExists(buffer);
         }
-      sprintf(buffer, util->CollapseDirectory(buffer));
-      util->Delete();
+      kwsys_stl::string collapsed = 
+        kwsys::SystemTools::CollapseFullPath(buffer);
+      sprintf(buffer, collapsed.c_str());
       if (exists)
         {
         // Also prepend our Tcl Tk lib path to the library paths
@@ -613,7 +612,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
         {
         char tcl_library[1024] = "";
         sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
-        if (vtkKWDirectoryUtilities::FileExists(tcl_library))
+        if (kwsys::SystemTools::FileExists(tcl_library))
           {
           if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
                           TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
@@ -642,7 +641,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
           {
           char tk_library[1024] = "";
           sprintf(tk_library, "%s/lib/tk%s", buffer, TK_VERSION);
-          if (vtkKWDirectoryUtilities::FileExists(tk_library))
+          if (kwsys::SystemTools::FileExists(tk_library))
             {
             if (!Tcl_SetVar(interp, "tk_library", tk_library, 
                             TCL_GLOBAL_ONLY | TCL_LEAVE_ERR_MSG))
@@ -1653,7 +1652,7 @@ int vtkKWApplication::GetCheckForUpdatesPath(ostream &
     {
     ostrstream upd;
     upd << this->ApplicationInstallationDirectory << "/WiseUpdt.exe" << ends;
-    int res = vtkKWDirectoryUtilities::FileExists(upd.str());
+    int res = kwsys::SystemTools::FileExists(upd.str());
     upd.rdbuf()->freeze(0);
     if (res)
       {

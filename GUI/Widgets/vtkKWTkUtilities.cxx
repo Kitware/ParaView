@@ -19,7 +19,8 @@
 #include "vtkKWIcon.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGReader.h"
-#include "vtkKWDirectoryUtilities.h"
+
+#include <kwsys/SystemTools.hxx>
 
 // This has to be here because on HP varargs are included in 
 // tcl.h and they have different prototypes for va_start so
@@ -37,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.41");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.42");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -379,11 +380,11 @@ int vtkKWTkUtilities::UpdateOrLoadPhoto(Tcl_Interp *interp,
     {
     char buffer[1024];
     sprintf(buffer, "%s/%s.png", directory, file_name);
-    int found = vtkKWDirectoryUtilities::FileExists(buffer);
+    int found = kwsys::SystemTools::FileExists(buffer);
     if (!found)
       {
       sprintf(buffer, "%s/Resources/%s.png", directory, file_name);
-      found = vtkKWDirectoryUtilities::FileExists(buffer);
+      found = kwsys::SystemTools::FileExists(buffer);
       }
     if (found)
       {
