@@ -77,6 +77,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->CommandFunction = vtkPVRenderViewCommand;
   
   this->Interactive = 0;
+
+  this->UseReductionFactor = 1;
   
   this->RenderWindow->SetDesiredUpdateRate(1.0);  
 
@@ -692,6 +694,11 @@ void vtkPVRenderView::StartRender()
   float getBuffersTime, setBuffersTime, transmitTime;
   float newReductionFactor;
   float maxReductionFactor;
+  
+  if (!this->UseReductionFactor)
+    {
+    this->GetComposite()->SetReductionFactor(1);
+    }
   
   // Do not let the width go below 150.
   maxReductionFactor = windowSize[0] / 150.0;

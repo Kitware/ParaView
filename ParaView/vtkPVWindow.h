@@ -132,6 +132,10 @@ public:
   // Callback from the frame rate scale.
   void FrameRateScaleCallback();
 
+  // Description:
+  // Callback from the reduction check.
+  void ReductionCheckCallback();
+  
   virtual void Close();
 
 protected:
@@ -163,6 +167,8 @@ protected:
 
   vtkKWLabel *FrameRateLabel;
   vtkKWScale *FrameRateScale;
+
+  vtkKWCheckButton *ReductionCheck;
   
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;

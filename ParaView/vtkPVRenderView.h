@@ -163,6 +163,13 @@ public:
   // Get the tcl name of the renderer.
   vtkGetStringMacro(RendererTclName);
   
+  // Description:
+  // Set this flag to indicate whether to calculate the reduction factor for
+  // use in tree composite.
+  vtkSetMacro(UseReductionFactor, int);
+  vtkGetMacro(UseReductionFactor, int);
+  vtkBooleanMacro(UseReductionFactor, int);
+  
 protected:
 
   vtkPVRenderView();
@@ -172,6 +179,8 @@ protected:
 
   int Interactive;
 
+  int UseReductionFactor;
+  
   vtkTreeComposite *Composite;
   char *CompositeTclName;
   vtkSetStringMacro(CompositeTclName);
@@ -192,8 +201,3 @@ protected:
 
 
 #endif
-
-
-
-
-

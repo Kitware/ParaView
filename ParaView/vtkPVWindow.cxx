@@ -97,6 +97,8 @@ vtkPVWindow::vtkPVWindow()
 
   this->FrameRateLabel = vtkKWLabel::New();
   this->FrameRateScale = vtkKWScale::New();
+
+  this->ReductionCheck = vtkKWCheckButton::New();
   
   this->Sources = vtkKWCompositeCollection::New();
   
@@ -185,6 +187,12 @@ void vtkPVWindow::PrepareForDelete()
     {
     this->FrameRateScale->Delete();
     this->FrameRateScale = NULL;
+    }
+
+  if (this->ReductionCheck)
+    {
+    this->ReductionCheck->Delete();
+    this->ReductionCheck = NULL;
     }
   
   if (this->Toolbar)
@@ -318,9 +326,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->InteractorToolbar->Create(app);
 
   this->Toolbar->SetParent(this->GetToolbarFrame());
-  this->Toolbar->Create(app); 
-
-
+  this->Toolbar->Create(app);
   
   this->CalculatorButton->SetParent(this->Toolbar);
   this->CalculatorButton->Create(app, "-text Calculator");
@@ -359,6 +365,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->FrameRateLabel->SetLabel("Frame Rate");
   this->Script("pack %s -side right -fill none -expand no",
                this->FrameRateLabel->GetWidgetName());
+
+  this->ReductionCheck->SetParent(this->GetToolbarFrame());
+  this->ReductionCheck->Create(app, "-text Reduction");
+  this->ReductionCheck->SetState(1);
+  this->ReductionCheck->SetCommand(this, "ReductionCheckCallback");
+  this->ReductionCheck->SetBalloonHelpString("If selected, tree compositing will scale the size of the render window based on how long the previous render took.");
+  this->Script("pack %s -side right -fill none -expand no",
+               this->ReductionCheck->GetWidgetName());
   
   // This button doesn't do anything useful right now.  It was put in originally
   // so we could switch between interactor styles.
@@ -817,6 +831,13 @@ void vtkPVWindow::FrameRateScaleCallback()
 {
   float newRate = this->FrameRateScale->GetValue();
   this->GetMainView()->GetRenderWindow()->SetDesiredUpdateRate(newRate);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ReductionCheckCallback()
+{
+  int reduce = this->ReductionCheck->GetState();
+  this->GetMainView()->SetUseReductionFactor(reduce);
 }
 
 //----------------------------------------------------------------------------
