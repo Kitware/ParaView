@@ -170,7 +170,7 @@
           menu_name="CleanToGrid"
           root_name="CleanUGrid"
           module_type="Filter"
-          long_help="This filter shrinks merges points and converts to unstructured grid."
+          long_help="This filter merges points and converts the data set to unstructured grid."
           short_help="Merge points.">
     <Filter class="vtkCleanUnstructuredGrid">
       <Input name="Input"
@@ -574,6 +574,10 @@
                trace_name="ArrayMenu"
                input_menu="im"
                help="Select the input scalars to process."/>
+    <SelectionList variable="Dimensionality"
+                   trace_name="Dimensionality"
+                   default_value="3"
+                   help="Select whether to perform a 2d or 3d gradient magnitude">
   </Module>
   <Module name="GroupParts"
           menu_name="Group Parts"
