@@ -31,6 +31,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
+#include "vtkPVPolyData.h"
 
 int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
 				int argc, char *argv[]);
@@ -91,6 +92,7 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->Accept->SetParent(this);
   
   this->Elevation = vtkElevationFilter::New();
+
 }
 
 vtkPVElevationFilter::~vtkPVElevationFilter()
@@ -262,6 +264,19 @@ void vtkPVElevationFilter::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s %s",
 	       this->RangeLabel->GetWidgetName(),
 	       this->RangeFrame->GetWidgetName());
+}
+
+vtkPVData *vtkPVElevationFilter::GetDataWidget()
+{
+  if (this->DataWidget == NULL)
+    {
+    vtkPVPolyData *pd = vtkPVPolyData::New();
+    pd->SetPolyData(this->Elevation->GetPolyDataOutput());
+    this->SetDataWidget(pd);
+    pd->Delete();    
+    }
+
+  return this->DataWidget;
 }
 
 void vtkPVElevationFilter::ElevationParameterChanged()

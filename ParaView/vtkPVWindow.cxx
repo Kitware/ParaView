@@ -319,20 +319,25 @@ void vtkPVWindow::NewCone()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
-  vtkPVConeSource *cone = vtkPVConeSource::New();
-  vtkPVPolyData *poly = vtkPVPolyData::New();
+  vtkPVConeSource *cone;
 
-  poly->SetPolyData(cone->GetConeSource()->GetOutput());
-
+  // Maybe theses two objects should be merged ito one.
+  cone = vtkPVConeSource::New();
   comp = vtkPVComposite::New();
   comp->SetSource(cone);
-  comp->SetData(poly);
+
+  // Create the properties (interface).
   comp->SetPropertiesParent(this->GetDataPropertiesParent());
   comp->CreateProperties(pvApp, "");
+
   this->MainView->AddComposite(comp);
+  // We should probably use the View instead of the window.
   comp->SetWindow(this);
   this->SetCurrentDataComposite(comp);
+
+  // Clean up.
   comp->Delete();
+  cone->Delete();
   
   this->MainView->ResetCamera();
   this->MainView->Render();

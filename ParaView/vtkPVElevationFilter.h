@@ -46,6 +46,8 @@ public:
   vtkGetObjectMacro(Elevation, vtkElevationFilter);
   
   void ElevationParameterChanged();
+
+  vtkPVData *GetDataWidget();
   
 protected:
   vtkPVElevationFilter();

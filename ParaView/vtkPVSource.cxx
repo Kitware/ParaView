@@ -41,12 +41,18 @@ vtkPVSource::vtkPVSource()
   
   this->Composite = NULL;
   this->DataWidget = NULL;
+  this->Input = NULL;
 }
 
 vtkPVSource::~vtkPVSource()
 {
   this->SetComposite(NULL);
   this->SetDataWidget(NULL);
+  if (this->Input)
+    {
+    this->Input->UnRegister(this);
+    this->Input = NULL;
+    }
 }
 
 vtkPVSource* vtkPVSource::New()

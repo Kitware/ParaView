@@ -77,22 +77,19 @@ vtkPVData* vtkPVData::New()
 void vtkPVData::Contour()
 {
   vtkPVContourFilter *contour;
-  vtkPVPolyData *pd;
   vtkPVComposite *newComp;
   float *range;
   
   contour = vtkPVContourFilter::New();
+  contour->SetInput(this);
+  // This should be eliminated.
   contour->GetContour()->SetInput(this->GetData());
   
   range = this->GetData()->GetScalarRange();
   contour->GetContour()->SetValue(0, (range[1]-range[0])/2.0);
-  
-  pd = vtkPVPolyData::New();
-  pd->SetPolyData(contour->GetContour()->GetOutput());
-    
+      
   newComp = vtkPVComposite::New();
   newComp->SetSource(contour);
-  newComp->SetData(pd);
 
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
@@ -104,9 +101,9 @@ void vtkPVData::Contour()
   
   window->SetCurrentDataComposite(newComp);
   
-  pd->GetComposite()->GetView()->Render();
+  this->GetComposite()->GetView()->Render();
   
-  pd->Delete();
+  contour->Delete();
   newComp->Delete();
 }
 

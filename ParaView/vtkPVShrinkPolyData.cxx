@@ -31,12 +31,15 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
+#include "vtkPVPolyData.h"
 
 int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
 vtkPVShrinkPolyData::vtkPVShrinkPolyData()
 {
+  vtkPVPolyData *pd;
+
   this->CommandFunction = vtkPVShrinkPolyDataCommand;
   
   this->Accept = vtkKWWidget::New();
@@ -44,6 +47,11 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
   this->ShrinkFactorScale = vtkKWScale::New();
   this->ShrinkFactorScale->SetParent(this);
   this->Shrink = vtkShrinkPolyData::New();
+
+  pd = vtkPVPolyData::New();
+  pd->SetPolyData(this->Shrink->GetOutput());
+  this->SetDataWidget(pd);
+  pd->Delete();
 }
 
 vtkPVShrinkPolyData::~vtkPVShrinkPolyData()

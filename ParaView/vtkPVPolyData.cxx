@@ -60,39 +60,35 @@ void vtkPVPolyData::Shrink()
 {
   //shrink factor defaults to 0.5, which seems reasonable
   vtkPVShrinkPolyData *shrink;
-  vtkPVPolyData *pd;
   vtkPVComposite *newComp;
   
   shrink = vtkPVShrinkPolyData::New();
-  shrink->GetShrink()->SetInput(this->GetPolyData());
-  
-  pd = vtkPVPolyData::New();
-  pd->SetPolyData(shrink->GetShrink()->GetOutput());
+  shrink->GetShrink()->SetInput(this->GetPolyData());  
     
   newComp = vtkPVComposite::New();
   newComp->SetSource(shrink);
-  newComp->SetData(pd);
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
   newComp->CreateProperties(this->Application, "");
   this->GetComposite()->GetView()->AddComposite(newComp);
+
+  // Turn this data object off so the next will will not be ocluded.
   this->GetComposite()->GetProp()->VisibilityOff();
   
+  // The windowhere should probably be replaced with the view.
   newComp->SetWindow(window);
-  
   window->SetCurrentDataComposite(newComp);
   
-  pd->GetComposite()->GetView()->Render();
+  this->GetComposite()->GetView()->Render();
   
-  pd->Delete();
   newComp->Delete();
+  shrink->New();
 }
 
 void vtkPVPolyData::Elevation()
 {
   vtkPVElevationFilter *elevation;
-  vtkPVPolyData *pd;
   vtkPVComposite *newComp;
   float *bounds;
   float low[3], high[3];
@@ -109,13 +105,9 @@ void vtkPVPolyData::Elevation()
   elevation->GetElevation()->SetInput(this->GetPolyData());
   elevation->GetElevation()->SetLowPoint(low);
   elevation->GetElevation()->SetHighPoint(high);
-  
-  pd = vtkPVPolyData::New();
-  pd->SetPolyData(elevation->GetElevation()->GetPolyDataOutput());
-  
+    
   newComp = vtkPVComposite::New();
   newComp->SetSource(elevation);
-  newComp->SetData(pd);
   
   vtkPVWindow *window = this->GetComposite()->GetWindow();
   newComp->SetPropertiesParent(window->GetDataPropertiesParent());
@@ -127,9 +119,7 @@ void vtkPVPolyData::Elevation()
   
   window->SetCurrentDataComposite(newComp);
   
-  pd->GetComposite()->GetView()->Render();
-  
-  pd->Delete();
+  this->GetComposite()->GetView()->Render();
   newComp->Delete();
 }
 

@@ -31,12 +31,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
 #include "vtkPVComposite.h"
+#include "vtkPVPolyData.h"
 
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
 vtkPVConeSource::vtkPVConeSource()
 {
+  vtkPVPolyData *pvData;
   this->CommandFunction = vtkPVConeSourceCommand;
   
   this->HeightLabel = vtkKWLabel::New();
@@ -54,6 +56,11 @@ vtkPVConeSource::vtkPVConeSource()
   this->Accept = vtkKWWidget::New();
   this->Accept->SetParent(this);
   this->ConeSource = vtkConeSource::New();
+
+  pvData = vtkPVPolyData::New();
+  pvData->SetPolyData(this->ConeSource->GetOutput());
+  this->SetDataWidget(pvData);
+  pvData->Delete();
 }
 
 vtkPVConeSource::~vtkPVConeSource()

@@ -49,7 +49,7 @@ public:
   // Set and get the UI representing the data.  These calls also manage the
   // double pointers between the data widget and this source widget.
   void SetDataWidget(vtkPVData *data);
-  vtkPVData *GetDataWidget();
+  virtual vtkPVData *GetDataWidget();
 
   // Description:
   // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
@@ -66,7 +66,12 @@ protected:
   void operator=(const vtkPVSource&) {};
     
   vtkPVComposite* Composite;
+  
+  // Should this be called output ?
   vtkPVData *DataWidget;
+
+  // Just one input for now.
+  vtkPVData *Input;
 };
 
 #endif
