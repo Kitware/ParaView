@@ -12,9 +12,8 @@ IF ( VTK_BINARY_DIR )
 ENDIF (VTK_BINARY_DIR )
 
 INCLUDE (${CMAKE_SOURCE_DIR}/CMake/Modules/FindMPI.cmake)
-IF (MPI_LIB_PATH)
+IF (MPI_LIBRARY)
   LINK_LIBRARIES (${MPI_LIBRARY})
-  LINK_DIRECTORIES (${MPI_LIB_PATH})
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
 ENDIF (MPI_LIB_PATH)
 
@@ -32,4 +31,26 @@ ${VIEWS_BINARY_DIR}/ParaView
 IF (UNIX)
   LINK_LIBRARIES(${THREAD_LIBS} ${DL_LIBS} -lm)
 ENDIF (UNIX)
+
+IF (WIN32)
+FIND_PATH( HTML_HELP_PATH htmlhelp.h 
+	   "c:\program files\html help workshop"  
+	   "c:\program files\html help workshop\include" )
+
+IF (HTML_HELP_PATH)	  
+   INCLUDE_DIRECTORIES(
+	${HTML_HELP_PATH} 
+   )
+ENDIF (HTML_HELP_PATH)
+
+FIND_LIBRARY( HTML_HELP_LIBRARY htmlhelp
+	   "c:\program files\html help workshop"  
+	   "c:\program files\html help workshop\LIB")
+
+IF (HTML_HELP_LIBRARY)	  
+   LINK_LIBRARIES(
+	${HTML_HELP_LIBRARY} 
+   )
+ENDIF (HTML_HELP_LIBRARY)
+ENDIF(WIN32)
 

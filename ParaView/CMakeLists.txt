@@ -78,8 +78,13 @@ vtkKWWidgets
 vtkKWParaView 
 )
 
+IF (TK_LIBRARY)
+    LINK_LIBRARIES (${TK_LIBRARY})
+ENDIF (TK_LIBRARY)
+
 
 ADD_EXECUTABLE(ParaView ParaView ${VTK_SOURCE_DIR}/Wrapping/vtktcl) 
+LINK_LIBRARIES ( ${OPENGL_LIBRARY} )				    
 TARGET_LINK_LIBRARIES (ParaView vtkKWParaViewTCL vtkKWWidgetsTCL vtkCommonTCL 
                        vtkFilteringTCL   
                        vtkGraphicsTCL 
