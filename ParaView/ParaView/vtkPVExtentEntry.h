@@ -1,7 +1,7 @@
 /*=========================================================================
 
-  Program:   ParaView
-  Module:    vtkPVContourEntry.h
+  Program:   Visualization Toolkit
+  Module:    vtkPVExtentEntry.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,87 +39,67 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVContourEntry maintains a list of floats for contouring.
+// .NAME vtkPVExtentEntry -
 // .SECTION Description
-// This widget lets the user add or delete floats from a list.
-// It is used for contours, but could be generalized for arbitrary lists.
+// Although I could make this a subclass of vtkPVVector Entry,
+// Vector entry is too general, and some inherited method may be confusing.
+// The resaon I created this class is to get a special behavior
+// for animations.
 
-#ifndef __vtkPVContourEntry_h
-#define __vtkPVContourEntry_h
+#ifndef __vtkPVExtentEntry_h
+#define __vtkPVExtentEntry_h
 
-#include "vtkPVWidget.h"
+#include "vtkPVObjectWidget.h"
+#include "vtkKWApplication.h"
 #include "vtkKWLabel.h"
+#include "vtkKWWidgetCollection.h"
 
-class vtkKWListBox;
-class vtkKWEntry;
-class vtkKWPushButton;
-
-class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
+class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
 public:
-  static vtkPVContourEntry* New();
-  vtkTypeMacro(vtkPVContourEntry, vtkPVWidget);
-  
-  // Description:
-  // Create the widget.
-  virtual void Create(vtkKWApplication *app);
+  static vtkPVExtentEntry* New();
+  vtkTypeMacro(vtkPVExtentEntry, vtkPVObjectWidget);
 
-  // Description:
-  // Set the label.  The label can be used to get this widget
-  // from a script.
-  void SetLabel (const char* label);
-  const char* GetLabel() {return this->ContourValuesLabel->GetLabel();}
+  void Create(vtkKWApplication *pvApp, char *label, char *help);
   
   // Description:
-  // Gets called when the accept button is pressed.
-  // This method may add an entry to the trace file.
+  // Called when accept button is pushed.  
+  // Sets objects variable to the widgets value.
+  // Adds a trace entry.  Side effect is to turn modified flag off.
   virtual void Accept();
-
+  
   // Description:
-  // Gets called when the reset button is pressed.
+  // Called when the reset button is pushed.
+  // Sets widget's value to the object-variable's value.
+  // Side effect is to turn the modified flag off.
   virtual void Reset();
 
   // Description:
-  // Access to this widget from a script.
-  void AddValue(char* val);
-  void RemoveAllValues();
-
-  // Description:
-  // Button callbacks.
-  void AddValueCallback();
-  void DeleteValueCallback();
-
-  // Description:
-  // Need the filter to set the countour.
-  // I would like to get rid of this ivar.
-  // It is not reference counted for fear of loops.
-  void SetPVSource(vtkPVSource *pvs) { this->PVSource = pvs;}
-  vtkPVSource *GetPVSource() { return this->PVSource;}
-
-  // Description:
-  // The widget saves it state/command in the vtk tcl script.
-  void SaveInTclScript(ofstream *file);
-
+  // Methods to set this widgets value from a script.
+  void SetValue(int v1, int v2, int v3, int v4, int v5, int v6);
+  
   // Description:
   // adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterface *ai);
 
+  // Description:
+  // This method gets called when the user selects this widget to animate.
+  // It sets up the script and animation parameters.
+  void AnimationMenuCallback(vtkPVAnimationInterface *ai, int Mode);
+
 protected:
-  vtkPVContourEntry();
-  ~vtkPVContourEntry();
-  vtkPVContourEntry(const vtkPVContourEntry&) {};
-  void operator=(const vtkPVContourEntry&) {};
-
-  vtkKWLabel* ContourValuesLabel;
-  vtkKWListBox *ContourValuesList;
-  vtkKWWidget* NewValueFrame;
-  vtkKWLabel* NewValueLabel;
-  vtkKWEntry* NewValueEntry;
-  vtkKWPushButton* AddValueButton;
-  vtkKWPushButton* DeleteValueButton;
-
-  // I would like to get rid of this reference.
-  vtkPVSource *PVSource;
+  vtkPVExtentEntry();
+  ~vtkPVExtentEntry();
+  vtkPVExtentEntry(const vtkPVExtentEntry&) {};
+  void operator=(const vtkPVExtentEntry&) {};
+  
+  vtkKWLabel *Label;
+  vtkKWEntry *XMinEntry;
+  vtkKWEntry *XMaxEntry;
+  vtkKWEntry *YMinEntry;
+  vtkKWEntry *YMaxEntry;
+  vtkKWEntry *ZMinEntry;
+  vtkKWEntry *ZMaxEntry;
 };
 
 #endif

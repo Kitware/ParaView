@@ -309,12 +309,11 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback(const char *name,
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)
       {
       this->Script("eval %s Set%s [%s GetWholeExtent]",
-		   pvs->GetVTKSourceTclName(), mInt->GetVariableName(),
-		   pvs->GetPVInput()->GetVTKDataTclName());
-       pvs->AddVector6Entry(mInt->GetLabel(), "", "", "", "", "", "",
-                            mInt->GetVariableName(),
-                            mInt->GetBalloonHelp(),
-                            VTK_INT);      
+		          pvs->GetVTKSourceTclName(), mInt->GetVariableName(),
+		          pvs->GetPVInput()->GetVTKDataTclName());
+      pvs->AddExtentEntry(mInt->GetLabel(),
+                          mInt->GetVariableName(),
+                          mInt->GetBalloonHelp());      
       }
     else if (mInt->GetNumberOfArguments() == 1)
       {

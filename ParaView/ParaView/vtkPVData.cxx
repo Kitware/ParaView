@@ -1165,7 +1165,7 @@ void vtkPVData::UpdateProperties()
         numComps = array->GetNumberOfComponents();
         for (j = 0; j < numComps; ++j)
           {
-          sprintf(cmd, "ColorByCellFieldComponent %s %d",
+          sprintf(cmd, "ColorByCellFieldComponent {%s} %d",
                   fieldData->GetArrayName(i), j);
           if (numComps == 1)
             {
@@ -1442,7 +1442,7 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByCellFieldComponent(const char *name, int comp)
 {
-  this->AddTraceEntry("$kw(%s) ColorByCellFieldComponent %s %d", 
+  this->AddTraceEntry("$kw(%s) ColorByCellFieldComponent {%s} %d", 
                       this->GetTclName(), name, comp);
   this->ColorByCellFieldComponentInternal(name, comp);
 }

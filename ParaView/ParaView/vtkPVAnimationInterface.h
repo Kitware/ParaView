@@ -140,6 +140,12 @@ public:
   const char *GetScript();
 
   // Description:
+  // This method gets called when the user types in the script
+  // editor.  All it does is invalidate the method menu value
+  // which may be invalid.
+  void ScriptEditorCallback();
+
+  // Description:
   // Make the tcl script save the images of the animation.
   void SaveInTclScript(ofstream *file, const char *fileRoot);
 

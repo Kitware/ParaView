@@ -340,6 +340,8 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
                this->ScriptCheckButton->GetWidgetName());
 
   this->ScriptEditor->Create(this->Application, "-relief sunken -bd 2");
+  this->Script("bind %s <KeyPress> {%s ScriptEditorCallback}",
+               this->ScriptEditor->GetWidgetName(), this->GetTclName());
 
   this->SourceMethodFrame->Create(this->Application, "frame", "");
   this->Script("pack %s -side top -expand t -fill both", 
@@ -611,9 +613,18 @@ void vtkPVAnimationInterface::UpdateSourceMenu()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVAnimationInterface::ScriptEditorCallback()
+{
+  // If some one is typing in the script editor, then the method
+  // selection is no longer valid.
+  this->MethodMenuButton->SetButtonText("None");
+}
+
+//----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetScript(const char* script)
 {
   this->ScriptEditor->SetValue(script);
+  this->MethodMenuButton->SetButtonText("None");
 }
 
 //----------------------------------------------------------------------------

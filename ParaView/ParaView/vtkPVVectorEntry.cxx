@@ -340,9 +340,10 @@ void vtkPVVectorEntry::SaveInTclScript(ofstream *file)
 void vtkPVVectorEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                                  vtkPVAnimationInterface *ai)
 {
+  char methodAndArgs[500];
+  
   if (this->Entries->GetNumberOfItems() == 1)
     {
-    char methodAndArgs[500];
     // I do not like setting the label like this but ...
     if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
       {

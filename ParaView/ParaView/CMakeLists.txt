@@ -24,6 +24,7 @@ vtkPVData
 vtkPVDataSetFileEntry
 vtkPVDataSetReaderInterface 
 vtkPVEnSightReaderInterface 
+vtkPVExtentEntry
 vtkPVExtentTranslator 
 vtkPVFileEntry
 vtkPVGlyph3D 

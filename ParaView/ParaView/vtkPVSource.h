@@ -77,6 +77,7 @@ class vtkKWScrollableFrame;
 class vtkKWLabel;
 class vtkPVStringEntry;
 class vtkPVVectorEntry;
+class vtkPVExtentEntry;
 class vtkPVWidget;
 class vtkPVWindow;
 class vtkSource;
@@ -223,7 +224,12 @@ public:
   vtkPVVectorEntry* AddVector6Entry(char *label, char *l1, char *l2, char *l3, 
                                     char *l4, char *l5, char *l6,
                                     char *varName, char* help, int dataType);
-  
+
+  // Description:
+  // Extent entries are like Vector6Entries, but more specialized for
+  // setting clip extents.
+  vtkPVExtentEntry* AddExtentEntry(char *label, char *varName, char* help);
+
   // Description:
   // Special widget controls (not entries).
   // The methods are called on the object (VTKSource if o=NULL).

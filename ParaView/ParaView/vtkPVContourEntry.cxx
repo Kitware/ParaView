@@ -46,6 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEntry.h"
 #include "vtkKWPushButton.h"
 
+#include "vtkKWMenu.h"
+#include "vtkPVAnimationInterface.h"
+
+
 int vtkPVContourEntryCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
@@ -332,5 +336,18 @@ void vtkPVContourEntry::Reset()
 
   // Since the widget now matches the fitler, it is no longer modified.
   this->ModifiedFlag = 0;
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVContourEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+                                                  vtkPVAnimationInterface *ai)
+{
+  char methodAndArgs[500];
+
+  sprintf(methodAndArgs, "SetLabelAndScript {%s} {%s SetValue 0 $pvTime}", 
+          this->GetTraceName(), this->PVSource->GetVTKSourceTclName());
+
+  menu->AddCommand(this->GetTraceName(), ai, methodAndArgs, 0, "");
 }
 

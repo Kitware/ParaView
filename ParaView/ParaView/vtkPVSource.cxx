@@ -69,6 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVFileEntry.h"
 #include "vtkPVStringEntry.h"
 #include "vtkPVVectorEntry.h"
+#include "vtkPVExtentEntry.h"
 #include "vtkPVBoundsDisplay.h"
 #include "vtkPVScalarRangeLabel.h"
 #include "vtkKWEvent.h"
@@ -1616,6 +1617,26 @@ vtkPVVectorEntry* vtkPVSource::AddVector6Entry(char *label, char *l1, char *l2,
   return entry;
 }
 
+//----------------------------------------------------------------------------
+vtkPVExtentEntry* vtkPVSource::AddExtentEntry(char *label, char *varName, 
+                                               char *help)
+
+{
+  vtkPVExtentEntry *entry;
+
+  entry = vtkPVExtentEntry::New();
+  entry->SetParent(this->ParameterFrame->GetFrame());
+  entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
+  entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
+  entry->Create(this->Application, label, help);
+
+  this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
+  this->AddPVWidget(entry);
+  entry->Delete();
+  
+  
+  return entry;
+}
 
 //----------------------------------------------------------------------------
 vtkPVScale *vtkPVSource::AddScale(char *label, char *varName,
