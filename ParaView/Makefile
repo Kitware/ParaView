@@ -16,6 +16,7 @@ vtkInteractorStyleExtent
 CONCRETE = \
 vtkColorByProcess \
 vtkDummyRenderWindowInteractor \
+vtkGetRemoteGhostCells \
 vtkImageOutlineFilter \
 vtkInteractorStyleCamera \
 vtkInteractorStyleGridExtent \
@@ -34,6 +35,7 @@ vtkPVData \
 vtkPVDataSetToDataSetFilter \
 vtkPVElevationFilter \
 vtkPVExtentTranslator \
+vtkPVGetRemoteGhostCells \
 vtkPVGlyph3D \
 vtkPVImage \
 vtkPVImageClip \
