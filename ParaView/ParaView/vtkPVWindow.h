@@ -285,6 +285,8 @@ public:
   // Most of the manipulation is internal to window.
   void DisableToolbarButtons();
   void EnableToolbarButtons();
+  void EnableToolbarButton(const char* buttonName);
+  void DisableToolbarButton(const char* buttonName);
 
   // Description:
   // Re-populate the source menu (under Advanced).

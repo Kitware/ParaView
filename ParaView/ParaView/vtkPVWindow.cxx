@@ -700,8 +700,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->AdvancedMenu->AddCascade("VTK Filters", this->FilterMenu, 4,
                                  "Choose a filter from a list of "
                                  "VTK filters");  
-  this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
-               this->AdvancedMenu->GetWidgetName());
+  this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Disabled);
 }
 
 //----------------------------------------------------------------------------
@@ -964,8 +963,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
-  this->Script("%s entryconfigure \"Open Data File\" -state disabled",
-               this->MenuFile->GetWidgetName());
+  this->MenuFile->SetState("Open Data File", vtkKWMenu::Disabled);
 
   if (this->InitializeDefaultInterfaces)
     {
@@ -2067,13 +2065,11 @@ void vtkPVWindow::UpdateSourceMenu()
   // If there are no filters, disable the menu.
   if (numFilters > 0)
     {
-    this->Script("%s entryconfigure \"VTK Sources\" -state normal",
-                 this->AdvancedMenu->GetWidgetName());
+    this->AdvancedMenu->SetState("VTK Sources", vtkKWMenu::Normal);
     }
   else
     {
-    this->Script("%s entryconfigure \"VTK Sources\" -state disabled",
-                 this->AdvancedMenu->GetWidgetName());
+    this->AdvancedMenu->SetState("VTK Sources", vtkKWMenu::Disabled);
     }
 }
 
@@ -2088,6 +2084,7 @@ void vtkPVWindow::UpdateFilterMenu()
 
   // Remove all of the entries from the filter menu.
   this->FilterMenu->DeleteAllMenuItems();
+  this->DisableToolbarButtons();
 
   if (this->CurrentPVData && this->CurrentPVSource &&
       !this->CurrentPVSource->GetIsPermanent() && 
@@ -2114,6 +2111,7 @@ void vtkPVWindow::UpdateFilterMenu()
           sprintf(methodAndArgs, "CreatePVSource %s", key);
           // Remove "vtk" from the class name to get the menu item name.
           this->FilterMenu->AddCommand(key, this, methodAndArgs);
+	  this->EnableToolbarButton(key);
           }
         }
       it->GoToNextItem();
@@ -2123,22 +2121,18 @@ void vtkPVWindow::UpdateFilterMenu()
     // If there are no sources, disable the menu.
     if (numSources > 0)
       {
-      this->Script("%s entryconfigure \"VTK Filters\" -state normal",
-                   this->AdvancedMenu->GetWidgetName());
+      this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Normal);
       }
     else
       {
-      this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
-                   this->AdvancedMenu->GetWidgetName());
+      this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Disabled);
       }
-    this->EnableToolbarButtons();
     }
   else
     {
     // If there is no current data, disable the menu.
     this->DisableToolbarButtons();
-    this->Script("%s entryconfigure \"VTK Filters\" -state disabled",
-                 this->AdvancedMenu->GetWidgetName());
+    this->AdvancedMenu->SetState("VTK Filters", vtkKWMenu::Disabled);
     }
   
 }
@@ -2389,17 +2383,13 @@ void vtkPVWindow::EnableSelectMenu()
   
   if (numSources == 0)
     {
-    this->Script("%s entryconfigure Select -state disabled",
-                 this->Menu->GetWidgetName());
-    this->Script("%s entryconfigure \" Source\" -state disabled",
-                 this->MenuProperties->GetWidgetName());
+    this->Menu->SetState("Select", vtkKWMenu::Disabled);
+    this->MenuProperties->SetState(" Source", vtkKWMenu::Disabled);
     }
   else
     {
-    this->Script("%s entryconfigure Select -state normal",
-                 this->Menu->GetWidgetName());
-    this->Script("%s entryconfigure \" Source\" -state normal",
-                 this->MenuProperties->GetWidgetName());
+    this->Menu->SetState("Select", vtkKWMenu::Normal);
+    this->MenuProperties->SetState(" Source", vtkKWMenu::Normal);
     }
 }
 
@@ -2415,8 +2405,7 @@ void vtkPVWindow::DisableMenus()
   // deactivating menus and toolbar buttons (except the interactors)
   for (i = 0; i <= numMenus; i++)
     {
-    this->Script("%s entryconfigure %d -state disabled",
-                 this->Menu->GetWidgetName(), i);
+    this->Menu->SetState(i, vtkKWMenu::Disabled);
     }
 }
 
@@ -2432,8 +2421,7 @@ void vtkPVWindow::EnableMenus()
   // deactivating menus and toolbar buttons (except the interactors)
   for (i = 0; i <= numMenus; i++)
     {
-    this->Script("%s entryconfigure %d -state normal",
-                 this->Menu->GetWidgetName(), i);
+    this->Menu->SetState(i, vtkKWMenu::Normal);
     }
 
   // Disable or enable the menu.
@@ -2450,11 +2438,33 @@ void vtkPVWindow::DisableToolbarButtons()
     vtkKWPushButton* button = 0;
     if (it->GetData(button) == VTK_OK && button)
       {
-      this->Script("%s configure -state disabled", button->GetWidgetName());
+      button->EnabledOff();
       }
     it->GoToNextItem();
     }
   it->Delete();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::EnableToolbarButton(const char* buttonName)
+{
+  vtkKWPushButton *button = 0;
+  if ( this->ToolbarButtons->GetItem(buttonName, button) == VTK_OK &&
+       button )
+    {
+    button->EnabledOn();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::DisableToolbarButton(const char* buttonName)
+{
+  vtkKWPushButton *button = 0;
+  if ( this->ToolbarButtons->GetItem(buttonName, button) == VTK_OK &&
+       button )
+    {
+    button->EnabledOff();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2472,7 +2482,7 @@ void vtkPVWindow::EnableToolbarButtons()
     vtkKWPushButton* button = 0;
     if (it->GetData(button) == VTK_OK && button)
       {
-      this->Script("%s configure -state normal", button->GetWidgetName());
+      button->EnabledOn();
       }
     it->GoToNextItem();
     }
@@ -2489,8 +2499,7 @@ void vtkPVWindow::EnableToolbarButtons()
     if (this->ToolbarButtons->GetItem("ExtractGrid", button) == VTK_OK && 
         button)
       {
-      this->Script("%s configure -state disabled",
-                   button->GetWidgetName());
+      button->EnabledOff();
       }
     }
 
@@ -3047,9 +3056,7 @@ void vtkPVWindow::AddFileType(const char *description, const char *ext,
   newStr = NULL;
 
   this->ReaderList->AppendItem(prototype);
-  this->Script("%s entryconfigure \"Open Data File\" -state normal",
-               this->MenuFile->GetWidgetName());
-
+  this->MenuFile->SetState("Open Data File", vtkKWMenu::Normal);
 }
 
 //----------------------------------------------------------------------------
