@@ -105,10 +105,10 @@ SIMPLE_TEST(struct stat sb; sb.st_blocks=0);
 #include <string.h>
 int main(void)
 {
-        char *s = malloc(128);
-        LL_TYPE x = (LL_TYPE)1048576 * (LL_TYPE)1048576;
-        sprintf(s,"%" TO_STRING(PRINTF_LL_WIDTH) "d",x);
-        exit(strcmp(s,"1099511627776"));
+  char *s = malloc(128);
+  LL_TYPE x = (LL_TYPE)1048576 * (LL_TYPE)1048576;
+  sprintf(s,"%" TO_STRING(PRINTF_LL_WIDTH) "d",x);
+  exit(strcmp(s,"1099511627776"));
 }
 
 #endif /* PRINTF_LL_WIDTH */
