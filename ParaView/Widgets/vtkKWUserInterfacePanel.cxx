@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfacePanel);
-vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.2");
+vtkCxxRevisionMacro(vtkKWUserInterfacePanel, "1.3");
 
 int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
                                    int argc, char *argv[]);
@@ -56,6 +56,7 @@ int vtkKWUserInterfacePanelCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWUserInterfacePanel::vtkKWUserInterfacePanel()
 {
   this->UserInterfaceManager = NULL;
+  this->Enabled = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -121,6 +122,8 @@ void vtkKWUserInterfacePanel::Create(vtkKWApplication *app)
     {
     this->UserInterfaceManager->Create(this->Application);
     }
+
+  // Do *not* call Update() here.
 }
 
 //----------------------------------------------------------------------------
@@ -214,10 +217,33 @@ int vtkKWUserInterfacePanel::Raise()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWUserInterfacePanel::Update()
+{
+  // Update the enable state
+
+  this->UpdateEnableState();
+}
+
+//------------------------------------------------------------------------------
+void vtkKWUserInterfacePanel::SetEnabled(int e)
+{
+  if ( this->Enabled == e )
+    {
+    return;
+    }
+
+  this->Enabled = e;
+  this->UpdateEnableState();
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWUserInterfacePanel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "UserInterfaceManager: " 
      << this->UserInterfaceManager << endl;
+
+  os << indent << "Enabled: " << (this->Enabled ? "On" : "Off") << endl;
 }

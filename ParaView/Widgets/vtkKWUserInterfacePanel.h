@@ -103,7 +103,9 @@ public:
   // Description:
   // Enable/Disable this panel. This should propagate SetEnabled() calls to the
   // internal widgets.
-  virtual void SetEnabled(int) {};
+  virtual void SetEnabled(int);
+  vtkBooleanMacro(Enabled, int);
+  vtkGetMacro(Enabled, int);
 
   // Description:
   // Add a page to the panel (this will, in turn, instructs the manager to 
@@ -143,13 +145,18 @@ public:
 
   // Description:
   // Refresh the interface.
-  virtual void Update() {};
+  virtual void Update();
 
 protected:
   vtkKWUserInterfacePanel();
   ~vtkKWUserInterfacePanel();
 
   vtkKWUserInterfaceManager *UserInterfaceManager;
+
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState() {};
+  int Enabled;
 
 private:
 
