@@ -47,8 +47,8 @@ if ![file exists $DataDir/small.pop] {
     set DataDirLocal 0
 }
 
-if ![file exists $DataDir/small.pop] {
-    if ![file exists small.pop] {
+if ![file exists $DataDir/Dat.vtk] {
+    if ![file exists Dat.vtk] {
 	vtkKWMessageDialog _adialog
 	_adialog Create Application ""
 	_adialog SetText "Could not find the data file Dat.pvtk\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
