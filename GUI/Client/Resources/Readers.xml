@@ -242,7 +242,7 @@
     <Source class="vtkPLOT3DReader"/>
     <FileEntry label="Q File"
                trace_name="QFileName"
-               variable="QFileName" extension="q"
+               property="QFileName" extension="q"
                help="Set the plot3d q file to read."/>
     <LabeledToggle label="Binary"
                    trace_name="BinaryFile"

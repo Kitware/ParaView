@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.52");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.53");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -47,7 +47,7 @@ void vtkPVEnSightReaderModule::PrintSelf(ostream& os, vtkIndent indent)
 void vtkPVEnSightReaderModule::CreateProperties()
 {
   this->Superclass::CreateProperties();
-  this->FileEntry->SetVariableName("CaseFileName");
+  this->FileEntry->SetSMPropertyName("CaseFileName");
 }
 
 //----------------------------------------------------------------------------

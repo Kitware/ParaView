@@ -76,6 +76,10 @@ public:
   // properties. Overwritten by sub-classes.
   virtual void Update(vtkSMProperty*);
 
+  // Description:
+  // Set the value of an element of a property from the animation editor.
+  virtual void SetAnimationValue(vtkSMProperty*, int, double);
+
 protected:
   vtkSMStringListDomain();
   ~vtkSMStringListDomain();

@@ -283,7 +283,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <StringListDomain name="files"/>
+     </StringVectorProperty>
    <!-- End pvtkfile -->
    </SourceProxy>
 
@@ -415,7 +417,9 @@
      <StringVectorProperty
         name="QFileName"
         command="SetQFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="BinaryFile" 
@@ -604,7 +608,9 @@
      <StringVectorProperty
         name="FilePrefix"
         command="SetFilePrefix"
-        number_of_elements="1" />
+        number_of_elements="1">
+       <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="FilePattern"

@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringListDomain);
-vtkCxxRevisionMacro(vtkSMStringListDomain, "1.7");
+vtkCxxRevisionMacro(vtkSMStringListDomain, "1.8");
 
 struct vtkSMStringListDomainInternals
 {
@@ -199,6 +199,23 @@ void vtkSMStringListDomain::SaveState(
   *file << indent
         << "</Domain>" << endl;
     
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringListDomain::SetAnimationValue(vtkSMProperty *prop, int idx,
+                                              double value)
+{
+  if (!prop)
+    {
+    return;
+    }
+
+  vtkSMStringVectorProperty *svp =
+    vtkSMStringVectorProperty::SafeDownCast(prop);
+  if (svp)
+    {
+    svp->SetElement(idx, this->GetString((int)(floor(value))));
+    }
 }
 
 //---------------------------------------------------------------------------

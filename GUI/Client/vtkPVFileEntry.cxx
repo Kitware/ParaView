@@ -26,7 +26,6 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
-#include "vtkPVFileEntryProperty.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVWindow.h"
@@ -38,6 +37,8 @@
 #include "vtkKWPopupButton.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWEvent.h"
+#include "vtkSMStringListDomain.h"
+#include "vtkSMStringVectorProperty.h"
 
 #define MAX_FILES_ON_THE_LIST 100
 
@@ -71,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.86");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.87");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -89,8 +90,6 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->Timestep = vtkKWScale::New();
   this->TimeStep = 0;
   
-  this->Property = NULL;
-
   this->Path = 0;
 
   this->FileListPopup = vtkKWPopupButton::New();
@@ -127,8 +126,6 @@ vtkPVFileEntry::~vtkPVFileEntry()
   this->FileListSelect->Delete();
   this->FileListSelect = 0;
   
-  this->SetProperty(NULL);
-
   this->SetPath(0);
 }
 
@@ -269,7 +266,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
   this->FileListSelect->SetEllipsisCommand(this, "UpdateAvailableFiles 1");
 }
 
-
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::EntryChangedCallback()
 {
@@ -280,30 +276,47 @@ void vtkPVFileEntry::EntryChangedCallback()
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SetTimeStep(int ts)
 {
-  if ( ts >= this->Property->GetNumberOfFiles() && ts < 0 )
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMStringListDomain *dom = 0;
+
+  if (prop)
+    {
+    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
+    }
+  
+  if (!prop || !dom)
     {
     return;
     }
-  this->TimeStep = ts;
-  const char* fname = this->Property->GetFile(this->TimeStep);
-  if ( fname )
+  
+  if ( ts >= dom->GetNumberOfStrings() && ts < 0 )
     {
-    if ( fname[0] == '/' || 
-      (fname[1] == ':' && (fname[2] == '/' || fname[2] == '\\')) ||
-      (fname[0] == '\\' && fname[1] == '\\') ||
-      !this->Path || !*this->Path)
+    return;
+    }
+
+  if (this->Initialized)
+    {
+    const char* fname = dom->GetString(ts);
+    if ( fname )
       {
-      this->SetValue(fname);
-      }
-    else
-      {
-      ostrstream str;
-      str << this->Path << "/" << fname << ends;
-      this->SetValue(str.str());
-      str.rdbuf()->freeze(0);
+      if ( fname[0] == '/' || 
+           (fname[1] == ':' && (fname[2] == '/' || fname[2] == '\\')) ||
+           (fname[0] == '\\' && fname[1] == '\\') ||
+           !this->Path || !*this->Path)
+        {
+        this->SetValue(fname);
+        }
+      else
+        {
+        ostrstream str;
+        str << this->Path << "/" << fname << ends;
+        this->SetValue(str.str());
+        str.rdbuf()->freeze(0);
+        }
       }
     }
-  this->Timestep->SetValue(this->TimeStep);
+
+  this->Timestep->SetValue(ts);
 }
 
 //----------------------------------------------------------------------------
@@ -385,6 +398,20 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     {
     return;
     }
+
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMStringListDomain *dom = 0;
+  
+  if (prop)
+    {
+    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
+    }
+  
+  if (!prop || !dom)
+    {
+    return;
+    }
+  
   this->InSetValue = 1;
 
   this->Entry->SetValue(fileName); 
@@ -394,7 +421,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   char* prefix = 0;
   char* format = 0;
-  already_set = this->Property->GetNumberOfFiles();
+  already_set = dom->GetNumberOfStrings();
 
   char* path   = new char [ strlen(fileName) + 1];
   vtkKWDirectoryUtilities::GetFilenamePath(fileName, path);
@@ -592,26 +619,34 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   if ( !this->Initialized )
     {
-    this->Property->RemoveAllFiles();
+    dom->RemoveAllStrings();
     int kk;
-    for ( kk = 0; kk < this->FileListSelect->GetNumberOfElementsOnFinalList(); kk ++ )
+    for ( kk = 0; kk < this->FileListSelect->GetNumberOfElementsOnFinalList();
+          kk ++ )
       {
-      this->Property->AddFile(this->FileListSelect->GetElementFromFinalList(kk));
+      ostrstream str;
+      if (this->Path && this->Path[0])
+        {
+        str << this->Path << "/";
+        }
+      str << this->FileListSelect->GetElementFromFinalList(kk) << ends;
+      dom->AddString(str.str());
+      str.rdbuf()->freeze();
       }
     char* cfile = new char[ strlen(fileName) + 1];
-    vtkKWDirectoryUtilities::GetFilenamePath(fileName, cfile);
-    this->Property->SetDirectoryName(cfile);
     vtkKWDirectoryUtilities::GetFilenameName(fileName, cfile);
-    for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
+    ostrstream fullPath;
+    fullPath << this->Path << "/" << cfile << ends;
+    unsigned int i;
+    for ( i = 0; i < dom->GetNumberOfStrings(); i ++ )
       {
-
-      if ( strcmp(cfile, this->Property->GetFile(cc)) == 0 )
+      if ( strcmp(fullPath.str(), dom->GetString(i)) == 0 )
         {
-        this->Property->SetTimeStep(cc);
-        this->SetTimeStep(cc);
+        this->SetTimeStep(i);
         break;
         }
       }
+    fullPath.rdbuf()->freeze();
     delete [] cfile;
     this->Initialized = 1;
     }
@@ -642,20 +677,22 @@ void vtkPVFileEntry::Trace(ofstream *file)
         << this->GetValue() << "\"" << endl;
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::AcceptInternal(vtkClientServerID sourceID)
+void vtkPVFileEntry::Accept()
 {
-  const char* fname = this->Entry->GetValue();
-  char *cmd = new char[strlen(this->VariableName)+4];
-  sprintf(cmd, "Set%s", this->VariableName);
-  
-  this->Property->SetString(fname);
-  this->Property->SetVTKSourceID(sourceID);
-  this->Property->SetTimeStep(this->TimeStep);
-  this->Property->SetVTKCommand(cmd);
+  int modFlag = this->GetModifiedFlag();
 
-  delete[] cmd;
+  const char* fname = this->Entry->GetValue();
+  
+  this->TimeStep = this->Timestep->GetValue();
+
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
+  
+  if (svp)
+    {
+    svp->SetElement(0, fname);
+    }
   
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
   if (rm && fname && fname[0])
@@ -666,40 +703,77 @@ void vtkPVFileEntry::AcceptInternal(vtkClientServerID sourceID)
       rm->SetLabelOnce(desc);
       }
     }
-  this->Property->RemoveAllFiles();
-  int cc;
-  for ( cc = 0; cc < this->FileListSelect->GetNumberOfElementsOnFinalList(); cc ++ )
+
+  vtkSMStringListDomain *sld = vtkSMStringListDomain::SafeDownCast(
+    svp->GetDomain("files"));
+
+  if (sld)
     {
-    this->Property->AddFile(this->FileListSelect->GetElementFromFinalList(cc));
+    sld->RemoveAllStrings();
+    int cc;
+    for ( cc = 0; cc < this->FileListSelect->GetNumberOfElementsOnFinalList();
+          cc ++ )
+      {
+      ostrstream str;
+      if (this->Path && this->Path[0])
+        {
+        str << this->Path << "/";
+        }
+      str << this->FileListSelect->GetElementFromFinalList(cc) << ends;
+      sld->AddString(str.str());
+      str.rdbuf()->freeze(0);
+      }
     }
 
-  if ( this->Property->GetNumberOfFiles() > 0 )
-    {
-    this->WidgetRange[0] = 0;
-    this->WidgetRange[1] = this->FileListSelect->GetNumberOfElementsOnFinalList();
-    this->UseWidgetRange = 1;
-    }
-  
-  this->Property->AcceptInternal();
   this->UpdateAvailableFiles();
   
   this->ModifiedFlag = 0;
+  
+  // I put this after the accept internal, because
+  // vtkPVGroupWidget inactivates and builds an input list ...
+  // Putting this here simplifies subclasses AcceptInternal methods.
+  if (modFlag)
+    {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    ofstream* file = pvApp->GetTraceFile();
+    if (file)
+      {
+      this->Trace(file);
+      }
+    }
+
+  this->AcceptCalled = 1;
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::ResetInternal()
 {
-  this->SetValue(this->Property->GetString());
-  this->SetTimeStep(this->Property->GetTimeStep());
+  vtkSMStringVectorProperty *svp = vtkSMStringVectorProperty::SafeDownCast(
+    this->GetSMProperty());
 
-  this->IgnoreFileListEvents = 1;
-  this->FileListSelect->RemoveItemsFromFinalList();
-  int cc;
-  for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
+  if (svp)
     {
-    this->FileListSelect->AddFinalElement(this->Property->GetFile(cc), 1);
+    this->SetValue(svp->GetElement(0));
+    this->SetTimeStep(this->TimeStep);
+
+    vtkSMStringListDomain *sld = vtkSMStringListDomain::SafeDownCast(
+      svp->GetDomain("files"));
+    if (sld)
+      {
+      this->IgnoreFileListEvents = 1;
+      this->FileListSelect->RemoveItemsFromFinalList();
+      unsigned int cc;
+      for ( cc = 0; cc < sld->GetNumberOfStrings(); cc ++ )
+        {
+        char *filename = new char[strlen(sld->GetString(cc))+1];
+        vtkKWDirectoryUtilities::GetFilenameName(sld->GetString(cc), filename);
+        this->FileListSelect->AddFinalElement(filename, 1);
+        delete [] filename;
+        }
+      }
     }
+
   const char* fileName = this->Entry->GetValue();
   if ( fileName && fileName[0] )
     {
@@ -782,47 +856,87 @@ const char* vtkPVFileEntry::GetValue()
 //-----------------------------------------------------------------------------
 int vtkPVFileEntry::GetNumberOfFiles()
 {
-  if ( !this->Property )
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMStringListDomain *dom = 0;
+  
+  if (prop)
+    {
+    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
+    }
+  
+  if ( !dom )
     {
     return 0;
     }
-  return this->Property->GetNumberOfFiles();
+  return dom->GetNumberOfStrings();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::SaveInBatchScript(ofstream* file)
 {
-  if ( this->Property->GetNumberOfFiles() > 1 )
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMStringListDomain *dom = 0;
+
+  if (prop)
     {
-    *file << "set " 
-          << "pvTemp" << this->PVSource->GetVTKSourceID(0) << "_files {";
-    int cc;
-    for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
+    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
+    }
+  
+  if (!dom)
+    {
+    return;
+    }
+
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
+  if (sourceID.ID == 0 || !this->SMPropertyName)
+    {
+    vtkErrorMacro("Sanity check failed. " << this->GetClassName());
+    return;
+    }
+
+  if ( dom->GetNumberOfStrings() > 1 )
+    {
+    *file << "set " << "pvTemp" << sourceID << "_files {";
+    unsigned int cc;
+    for ( cc = 0; cc <  dom->GetNumberOfStrings(); cc ++ )
       {
-      *file << "\"" << this->Property->GetDirectoryName() << "/" << this->Property->GetFile(cc) << "\" ";
+      *file << "\"" << dom->GetString(cc) << "\" ";
       }
     *file << "}" << endl;
 
-    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-          <<  " GetProperty " << this->VariableName << "] SetElement 0 "
-          << " [ lindex $" << "pvTemp" << this->PVSource->GetVTKSourceID(0)  
+    *file << "  [$pvTemp" << sourceID
+          <<  " GetProperty " << this->SMPropertyName << "] SetElement 0 "
+          << " [ lindex $" << "pvTemp" << sourceID
           << "_files " << this->TimeStep << "]" << endl;
 
     }
   else
     {
-    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-          <<  " GetProperty " << this->VariableName << "] SetElement 0 {"
+    *file << "  [$pvTemp" << sourceID
+          <<  " GetProperty " << this->SMPropertyName << "] SetElement 0 {"
           << this->Entry->GetValue() << "}" << endl;
     }
 }
-
 
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
                                                vtkPVAnimationInterfaceEntry *ai)
 {
-  if ( this->Property->GetNumberOfFiles() > 0 )
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMStringListDomain *dom = 0;
+
+  if (prop)
+    {
+    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
+    }
+  
+  if (!dom)
+    {
+    return;
+    }
+  
+  if ( dom->GetNumberOfStrings() > 0 )
     {
     char methodAndArgs[500];
 
@@ -840,37 +954,25 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
       this->GetTclName(), ai->GetTclName());
     }
 
+  vtkSMProperty *prop = this->GetSMProperty();
+  vtkSMStringListDomain *dom = 0;
+  if (prop)
+    {
+    dom = vtkSMStringListDomain::SafeDownCast(prop->GetDomain("files"));
+    }
+  
+  if (!prop || !dom)
+    {
+    return;
+    }
+  
   ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
-  ai->SetCurrentProperty(this->Property);
+  ai->SetCurrentSMProperty(prop);
+  ai->SetCurrentSMDomain(dom);
   ai->SetTimeStart(0);
-  ai->SetTimeEnd(this->Property->GetNumberOfFiles()-1);
+  ai->SetTimeEnd(dom->GetNumberOfStrings()-1);
   ai->SetTypeToInt();
   ai->Update();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVFileEntry::SetProperty(vtkPVWidgetProperty *prop)
-{
-  this->Property = vtkPVFileEntryProperty::SafeDownCast(prop);
-  if (this->Property)
-    {
-    char *cmd = new char[strlen(this->VariableName)+4];
-    sprintf(cmd, "Set%s", this->VariableName);
-    this->Property->SetVTKCommand(cmd);
-    delete[] cmd;
-    }
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVFileEntry::GetProperty()
-{
-  return this->Property;
-}
-
-//----------------------------------------------------------------------------
-vtkPVWidgetProperty* vtkPVFileEntry::CreateAppropriateProperty()
-{
-  return vtkPVFileEntryProperty::New();
 }
 
 //----------------------------------------------------------------------------
@@ -896,8 +998,8 @@ void vtkPVFileEntry::UpdateTimeStep()
   char* file = new char[ strlen(fileName) + 1 ];
   vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
   this->FileListSelect->AddFinalElement(file, 1);
-  this->TimeStep = this->FileListSelect->GetElementIndexFromFinalList(file);
-  if ( this->TimeStep < 0 )
+  int ts = this->FileListSelect->GetElementIndexFromFinalList(file);
+  if ( ts < 0 )
     {
     cout << "This should not have happended" << endl;
     cout << "Cannot find \"" << file << "\" on the list" << endl;
@@ -909,7 +1011,7 @@ void vtkPVFileEntry::UpdateTimeStep()
     vtkPVApplication::Abort();
     }
   delete [] file;
-  this->Timestep->SetValue(this->TimeStep);
+  this->Timestep->SetValue(ts);
   if ( this->FileListSelect->GetNumberOfElementsOnFinalList() > 1 )
     {
     this->Script("pack %s -side bottom -expand 1 -fill x", 

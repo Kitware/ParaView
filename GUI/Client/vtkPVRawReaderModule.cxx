@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRawReaderModule);
-vtkCxxRevisionMacro(vtkPVRawReaderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVRawReaderModule, "1.5");
 
 int vtkPVRawReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -40,7 +40,7 @@ void vtkPVRawReaderModule::CreateProperties()
   this->Superclass::CreateProperties();
 
   this->FileEntry->SetLabel("File Prefix");
-  this->FileEntry->SetVariableName("FilePrefix");
+  this->FileEntry->SetSMPropertyName("FilePrefix");
 }
 
 //----------------------------------------------------------------------------

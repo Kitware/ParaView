@@ -26,7 +26,6 @@ class vtkKWEntry;
 class vtkPVSource;
 class vtkKWScale;
 class vtkKWFrame;
-class vtkPVFileEntryProperty;
 class vtkKWListSelectOrder;
 class vtkPVFileEntryObserver;
 class vtkKWPopupButton;
@@ -83,7 +82,7 @@ public:
   // Called when accept button is pushed.
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   //ETX
 
   // Description:
@@ -118,15 +117,6 @@ public:
   // Description:
   // Set the current time step.
   void SetTimeStep(int ts);
-
-  // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
 
   // Description:
   // Get the number of files
@@ -177,8 +167,6 @@ protected:
 
   vtkKWListSelectOrder* FileListSelect;
   vtkKWPopupButton* FileListPopup;
-
-  vtkPVFileEntryProperty *Property;
 
   //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

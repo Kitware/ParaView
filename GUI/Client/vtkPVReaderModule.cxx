@@ -25,13 +25,14 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVWidgetProperty.h"
 #include "vtkPVWindow.h"
+#include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.45");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.46");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -70,7 +71,7 @@ void vtkPVReaderModule::CreateProperties()
   this->FileEntry->SetParent(this->GetParameterFrame()->GetFrame());
   this->FileEntry->SetModifiedCommand(this->GetTclName(), 
                                       "SetAcceptButtonColorToModified");
-  this->FileEntry->SetVariableName("FileName");
+  this->FileEntry->SetSMPropertyName("FileName");
   this->FileEntry->Create(this->GetPVApplication());
   if (this->AddFileEntry)
     {
@@ -345,19 +346,22 @@ void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::SetReaderFileName(const char* fname)
 {
-  if (this->FileEntry )
+  if (this->FileEntry)
     {
+    vtkSMProperty *prop = this->FileEntry->GetSMProperty();
     this->FileEntry->SetValue(fname);
     vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   // Since this is a reader, it is ok to assume that there is on
   // VTKSource. Hence, the use of index 0.
-    pm->GetStream() << vtkClientServerStream::Invoke 
-                    << this->GetVTKSourceID(0) 
-                    << (vtkstd::string("Set") 
-                        + vtkstd::string(this->FileEntry->GetVariableName())).c_str()
-                    << fname
-                    << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::DATA_SERVER);
+    if (prop)
+      {
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << this->GetVTKSourceID(0) 
+                      << prop->GetCommand()
+                      << fname
+                      << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::DATA_SERVER);
+      }
     const char* ext = this->ExtractExtension(fname);
     if (ext)
       {
