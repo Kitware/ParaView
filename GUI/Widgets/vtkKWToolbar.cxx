@@ -49,7 +49,7 @@ void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.41");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.42");
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -265,8 +265,6 @@ void vtkKWToolbar::RemoveWidget(vtkKWWidget *widget)
 //----------------------------------------------------------------------------
 vtkKWWidget* vtkKWToolbar::GetWidget(const char *name)
 {
-  vtkKWWidget *found = 0;
-
   if (name && this->Internals)
     {
     const char *options[4] = { "-label", "-text", "-image", "-selectimage" };
