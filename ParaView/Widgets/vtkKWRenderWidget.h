@@ -68,6 +68,7 @@ public:
   
   virtual void Create(vtkKWApplication *app, const char *args);
 
+  vtkGetObjectMacro(EventMap, vtkKWEventMap);
   vtkGetObjectMacro(Renderer, vtkRenderer);
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
   
