@@ -63,6 +63,18 @@
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>
+  <Module name="pdbreader" class="vtkPVReaderModule" root_name="PDB" 
+          module_type="Reader"
+          extensions=".pdb" file_description="PDB Files">
+    <Source class="vtkPDBReader"/>
+  </Module>
+  <Module name="xyzreader" class="vtkPVReaderModule" root_name="XYZMol" 
+          module_type="Reader"
+          extensions=".xyz" file_description="XYZ Molecule Files">
+    <Source class="vtkXYZMolReader"/>
+    <VectorEntry variable="TimeStep" trace_name="TimeStep" type="int" 
+                 help="Set the TimeStep"/>
+  </Module>
   <Module name="P3DReader" class="vtkPVPLOT3DReaderModule"
           root_name="Plot3D"
           module_type="Reader"
@@ -214,18 +226,6 @@
           extensions=".wrl" file_description="VRML">
     <Source class="vtkVRMLSource"/>
  </Module>
-  <Module name="pdbreader" class="vtkPVReaderModule" root_name="PDB" 
-          module_type="Reader"
-          extensions=".pdb" file_description="PDB Files">
-    <Source class="vtkPDBReader"/>
-  </Module>
-  <Module name="xyzreader" class="vtkPVReaderModule" root_name="XYZMol" 
-          module_type="Reader"
-          extensions=".xyz" file_description="XYZ Molecule Files">
-    <Source class="vtkXYZMolReader"/>
-    <VectorEntry variable="TimeStep" trace_name="TimeStep" type="int" 
-                 help="Set the TimeStep"/>
-  </Module>
 #ifdef PARAVIEW_LINK_XDMF
  <Module name="XdmfReader" root_name="XdmfReader"
    output="vtkDataSet"
