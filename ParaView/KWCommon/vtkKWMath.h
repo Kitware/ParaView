@@ -69,11 +69,7 @@ public:
 
   // Description:
   // Get the data's scalar range given a component
-  // WARNING: the 'double' version does *not* cache the ranges, it 
-  // iterates over the data each time (whereas the 'float' version is
-  // just a proxy to vtkDataArray::GetRange)
   // Return 1 on success, 0 otherwise.
-  static int GetScalarRange(vtkDataArray *array, int comp, float range[2]);
   static int GetScalarRange(vtkDataArray *array, int comp, double range[2]);
  
   // Description:
@@ -82,7 +78,7 @@ public:
   // the real range is within that limit).
   // Return 1 on success, 0 otherwise.
   static int GetAdjustedScalarRange(
-    vtkDataArray *array, int comp, float range[2]);
+    vtkDataArray *array, int comp, double range[2]);
  
   // Description:
   // Get the scalar type that will be able to store a given range of data 
@@ -99,9 +95,9 @@ public:
   // at each end of that range.
   // Return 1 on success, 0 otherwise.
   static int FixTransferFunctionPointsOutOfRange(
-    vtkPiecewiseFunction *func, float range[2]);
+    vtkPiecewiseFunction *func, double range[2]);
   static int FixTransferFunctionPointsOutOfRange(
-    vtkColorTransferFunction *func, float range[2]);
+    vtkColorTransferFunction *func, double range[2]);
  
   // Description:
   // Return true if first extent is within second extent

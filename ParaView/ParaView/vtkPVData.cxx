@@ -102,7 +102,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.229");
+vtkCxxRevisionMacro(vtkPVData, "1.230");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2380,7 +2380,8 @@ void vtkPVData::SetPropertiesParent(vtkKWWidget *parent)
 //----------------------------------------------------------------------------
 void vtkPVData::SaveInBatchScript(ofstream *file)
 {
-  float range[2];
+  int fixme; // range is not used
+  double range[2];
   const char* scalarMode;
   const char* result;
   char* renTclName;
