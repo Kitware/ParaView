@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVRenderSlave.h
+  Module:    vtkPVSlaveProp.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -25,56 +25,51 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-// .NAME vtkPVRenderSlave - Off screen rendering in a slave process.
+// .NAME vtkPVSlaveProp - A prop to represent the remote renderers.
 // .SECTION Description
-// Try rendering in the slave process and transmitting the results
-// to the master UI process.
+// vtkPVSlaveProp uses "RenderIntoImage" feature to encapsulate the
+// results from remote renderers into a main UI renderer.
 
-#ifndef __vtkPVRenderSlave_h
-#define __vtkPVRenderSlave_h
+#ifndef __vtkPVSlaveProp_h
+#define __vtkPVSlaveProp_h
 
-#include "vtkKWObject.h"
-#include "vtkPVSlave.h"
+#include "vtkProp.h"
 #include "vtkRenderWindow.h"
-#include "vtkRenderer.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 
-
-class VTK_EXPORT vtkPVRenderSlave : public vtkObject
+class VTK_EXPORT vtkPVSlaveProp : public vtkProp
 {
 public:
-  static vtkPVRenderSlave* New();
-  vtkTypeMacro(vtkPVRenderSlave,vtkObject);
+  static vtkPVSlaveProp* New();
+  vtkTypeMacro(vtkPVSlaveProp,vtkProp);
+
+  vtkSetObjectMacro(Application, vtkPVApplication);
+  vtkGetObjectMacro(Application, vtkPVApplication);  
 
   // Description:
-  // This renders and transmits the image back.
-  void Render();
-
-  // Description:
-  // The PVSlave is like a controller but is used by the slaves.
-  // It may be the start of a communicator.
-  vtkSetObjectMacro(PVSlave, vtkPVSlave);
-  vtkGetObjectMacro(PVSlave, vtkPVSlave);
-
-  // Description:
-  // Access to renderer for adding actors ...
-  vtkGetObjectMacro(Renderer, vtkRenderer);
+  // We are going to try and manipulate the render window directly.
+  // this assumes the renderer fills the whole render window.
+  vtkSetObjectMacro(RenderWindow, vtkRenderWindow);
   vtkGetObjectMacro(RenderWindow, vtkRenderWindow);
-
-  // Description:
-  // Computes and sends the prop bounds.
-  void TransmitBounds();
+  
+  int RequiresRenderingIntoImage() { return 1; };
+  int RenderIntoImage(vtkViewport *viewport);
+  float *GetRGBAImage() {return this->RGBAImage;};
+  
+  void SetupTest();
   
 protected:
-  vtkPVRenderSlave();
-  ~vtkPVRenderSlave();
-  vtkPVRenderSlave(const vtkPVRenderSlave&) {};
-  void operator=(const vtkPVRenderSlave&) {};
+  vtkPVSlaveProp();
+  ~vtkPVSlaveProp();
+  vtkPVSlaveProp(const vtkPVSlaveProp&) {};
+  void operator=(const vtkPVSlaveProp&) {};
 
+  vtkPVApplication *Application;
   vtkRenderWindow *RenderWindow;
-  vtkRenderer *Renderer;
-  vtkPVSlave *PVSlave;
+  
+  float *RGBAImage;
 };
-
 
 #endif
 

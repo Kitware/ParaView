@@ -32,6 +32,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 
+#include "vtkTimerLog.h"
+
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #else
@@ -320,6 +322,10 @@ void vtkKWRenderView::Render()
     return;
     }
   
+  vtkTimerLog  *timer = vtkTimerLog::New();
+  timer->StartTimer();
+  cerr << "Start View Render\n";
+  
   this->InRender = 1;
 
   if (this->CurrentLight)
@@ -364,6 +370,10 @@ void vtkKWRenderView::Render()
     this->RenderWindow->Render();
     this->InMotion = 0;
     }
+  
+  timer->StopTimer();
+  cerr << "End View Render: " << timer->GetElapsedTime() << endl;
+  timer->Delete();
   
   this->InRender = 0;
 }
@@ -654,5 +664,5 @@ void vtkKWRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWView::SerializeRevision(os,indent);
   os << indent << "vtkKWRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.2 $");
+  this->ExtractRevision(os,"$Revision: 1.3 $");
 }

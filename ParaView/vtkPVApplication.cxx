@@ -42,13 +42,19 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 
 
+extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
 
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 {
+  cerr << "Start UI Initialize\n";
+
   Tcl_Interp *interp = vtkKWApplication::InitializeTcl(argc,argv);
-  
+  Vtktkrenderwidget_Init(interp);
   Vtkkwparaviewtcl_Init(interp);
+  
+  cerr << "End UI Initialize\n";
+  
   return interp;
 }
 
@@ -86,11 +92,11 @@ void vtkPVApplication::RemoteScript(int id, char *format, ...)
   vsprintf(event, format, var_args);
   va_end(var_args);
 
-  this->RemoteSimpleScript(id, event, NULL, 0);
+  this->RemoteSimpleScript(id, event);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str, char *result, int resultMax)
+void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str)
 {
   int length;
   char *resultStr;
@@ -107,19 +113,7 @@ void vtkPVApplication::RemoteSimpleScript(int remoteId, char *str, char *result,
   this->Controller->Send(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG);
   this->Controller->Send(str, length, remoteId, VTK_PV_SLAVE_SCRIPT_COMMAND_TAG);
 
-  // Receive the result.
-  this->Controller->Receive(&length, 1, remoteId, VTK_PV_SLAVE_SCRIPT_RESULT_LENGTH_TAG);
-  resultStr = new char[length];
-  this->Controller->Receive(resultStr, length, remoteId, VTK_PV_SLAVE_SCRIPT_RESULT_TAG);
-
-  cerr << "Master: " << str << " -> " << resultStr << endl;
-  
-  if (result && resultMax > 0)
-    { 
-    strncpy(result, resultStr, resultMax-1);
-    }
-  
-  delete [] resultStr;
+  //cerr << "Master: " << str << endl;
 }
 
 

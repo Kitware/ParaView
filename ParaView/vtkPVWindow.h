@@ -35,6 +35,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
+class vtkKWToolbar;
+
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -71,6 +73,9 @@ protected:
   vtkPVRenderView *MainView;
   vtkKWWidget *RetrieveMenu;
   vtkKWWidget *CreateMenu;
+
+  vtkKWToolbar *Toolbar;
+  vtkKWWidget *ResetCameraButton;
 };
 
 

@@ -27,10 +27,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVRenderSlave.h"
-#include "vtkMesaRenderWindow.h"
+#include "vtkPVMesaRenderWindow.h"
 #include "vtkMesaRenderer.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkTimerLog.h"
 
 
 //----------------------------------------------------------------------------
@@ -53,10 +53,10 @@ int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVRenderSlave::vtkPVRenderSlave()
 {
-  vtkMesaRenderWindow *mesaRenderWindow;
+  vtkPVMesaRenderWindow *mesaRenderWindow;
   vtkMesaRenderer *mesaRenderer;
 
-  mesaRenderWindow = vtkMesaRenderWindow::New();
+  mesaRenderWindow = vtkPVMesaRenderWindow::New();
   mesaRenderWindow->SetOffScreenRendering(1);
   mesaRenderer = vtkMesaRenderer::New();
   mesaRenderWindow->AddRenderer(mesaRenderer);
@@ -79,14 +79,12 @@ vtkPVRenderSlave::~vtkPVRenderSlave()
 //----------------------------------------------------------------------------
 void vtkPVRenderSlave::Render()
 {
-  float *zdata, *pdata;
+  unsigned char *pdata;
   int *window_size;
-  int total_pixels;
-  int pdata_size, zdata_size;
+  int length;
   int myId, numProcs, masterId;
+  float message[15];
   vtkMultiProcessController *controller;
-
-  this->RenderWindow->Render();
 
   controller = this->PVSlave->GetController();
   myId = controller->GetLocalProcessId();
@@ -94,20 +92,57 @@ void vtkPVRenderSlave::Render()
   // Makes an assumption about how the tasks are setup.
   masterId = numProcs - 1;
   
+  // Receive the camera information.
+  controller->Receive(message, 15, masterId, 133);
+  vtkCamera *cam = this->Renderer->GetActiveCamera();
+  vtkLightCollection *lc = this->Renderer->GetLights();
+  lc->InitTraversal();
+  vtkLight *light = lc->GetNextItem();
+  
+  cam->SetPosition(message);
+  cam->SetFocalPoint(message+3);
+  cam->SetViewUp(message+6);
+  if (light)
+    {
+    light->SetPosition(message+9);
+    light->SetFocalPoint(message+12);
+    }
+  
+  vtkTimerLog *timer = vtkTimerLog::New();
+  cerr << "    -Start Render\n";
+  timer->StartTimer();
+  this->RenderWindow->Render();
+  timer->StopTimer();
+  cerr << "    -Stop Render: " << timer->GetElapsedTime() << endl;
+  
+  
   window_size = this->RenderWindow->GetSize();
-  total_pixels = window_size[0] * window_size[1];
+  length = 3*(window_size[0] * window_size[1]);
 
-  zdata = this->RenderWindow->GetZbufferData(0,0,window_size[0]-1, window_size[1]-1);
-  zdata_size = total_pixels;
-
-  pdata = this->RenderWindow->GetRGBAPixelData(0,0,window_size[0]-1, \
-				   window_size[1]-1,1);
-  pdata_size = 4*total_pixels;
-  // pdata = ((vtkMesaRenderWindow *)renWin)->GetRGBACharPixelData(0,0,window_size[0]-1,window_size[1]-1,1);    
-  // pdata_size = total_pixels;
-
-  controller->Send(zdata, zdata_size, masterId, 99);
-  controller->Send(pdata, pdata_size, masterId, 99);
-
+  cerr << "    -Start GetData\n";  
+  timer->StartTimer();
+  pdata = this->RenderWindow->GetPixelData(0,0,window_size[0]-1, \
+					   window_size[1]-1,1);
+  timer->StopTimer();
+  cerr << "    -Stop GetData: " << timer->GetElapsedTime() << endl;
+  timer->Delete();
+  
+  controller->Send((char*)pdata, length, masterId, 99);
 }
 
+
+
+//----------------------------------------------------------------------------
+void vtkPVRenderSlave::TransmitBounds()
+{
+  float bounds[6];
+  vtkMultiProcessController *controller;
+  int masterId;
+  
+  this->Renderer->ComputeVisiblePropBounds(bounds);
+  controller = this->PVSlave->GetController();
+
+  // Makes an assumption about how the tasks are setup.
+  masterId = controller->GetNumberOfProcesses() - 1;
+  controller->Send(bounds, 6, masterId, 112);  
+}

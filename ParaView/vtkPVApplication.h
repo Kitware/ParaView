@@ -53,7 +53,7 @@ public:
   // Script which is executed in the remot processes.
   // If a result string is passed in, the results are place in it. 
   void RemoteScript(int remoteId, char *EventString, ...);
-  void RemoteSimpleScript(int remoteId, char *str, char *result, int resultMax);
+  void RemoteSimpleScript(int remoteId, char *str);
 //ETX
   
   // Description:

@@ -40,14 +40,22 @@ extern "C" int Vtkgraphicstcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkimagingtcl_Init(Tcl_Interp *interp);
 
 
-// For setting up the tcl interpreter and the slave object.
-void vtkPVSlaveInit(void *localArg, void *remoteArg, int remoteArgLength,
-	            int remoteProcessId)
+
+void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
+		      int remoteProcessId)
 {
-  vtkMultiProcessController *controller = (vtkMultiProcessController *)(localArg);
+  vtkPVSlave *self = (vtkPVSlave *)(localArg);
+
+  self->SlaveScript(remoteProcessId);
+}
+
+
+// We will start the rmi loop, and let an RMI initialize the slave.
+void vtkPVSlaveStart(vtkMultiProcessController *controller)
+{
+
   Tcl_Interp *interp = Tcl_CreateInterp();
 
-  
   //if (Tcl_Init(interp) == TCL_ERROR) 
   //  {
   //  cerr << "Init Tcl error\n";
@@ -70,14 +78,14 @@ void vtkPVSlaveInit(void *localArg, void *remoteArg, int remoteArgLength,
     {
     cerr << "Init Contrib error\n";
     }
-  
-  if (Tcl_Eval(interp, "load vtkKWWidgetsTcl") != TCL_OK)
+
+  if (Vtkkwwidgetstcl_Init(interp) == TCL_ERROR) 
     {
-    cerr << "Error returned from tcl script.\n" << interp->result << endl;
-    } 
-  if (Tcl_Eval(interp, "load vtkKWParaViewTcl") != TCL_OK)
+    cerr << "Init KWWidgets error\n";
+    }
+  if (Vtkkwparaviewtcl_Init(interp) == TCL_ERROR) 
     {
-    cerr << "Error returned from tcl script.\n" << interp->result << endl;
+    cerr << "Init KWParaView error\n";
     }
 
   // Set up the slave object.
@@ -88,14 +96,14 @@ void vtkPVSlaveInit(void *localArg, void *remoteArg, int remoteArgLength,
     }
   int    error;
   vtkPVSlave *slave = (vtkPVSlave *)(vtkTclGetPointerFromObject("Slave","vtkPVSlave",interp,error));
+  cerr << "Interp: " << interp << " has slave " << slave << endl;
+  
   if (slave == NULL)
     {
     vtkGenericWarningMacro("Could not get slave pointer.");
     return;
     }
   
-  cerr << "Slave : " << slave << " has interp " << interp << endl;
-
   slave->SetController(controller);
   slave->SetInterp(interp);
   // This may not be needed.  I do not like that the slave numbering scheme is divided
@@ -103,16 +111,8 @@ void vtkPVSlaveInit(void *localArg, void *remoteArg, int remoteArgLength,
   slave->SetNumberOfSlaves(controller->GetNumberOfProcesses()-1);
   slave->SetSlaveId(controller->GetLocalProcessId());
 
-  controller->AddRMI(vtkPVSlaveInit, (void *)(controller), VTK_PV_SLAVE_INIT_RMI_TAG);  
-}
-
-
-
-
-// We will start the rmi loop, and let an RMI initialize the slave.
-void vtkPVSlaveStart(vtkMultiProcessController *controller)
-{
-  controller->AddRMI(vtkPVSlaveInit, (void *)(controller), VTK_PV_SLAVE_INIT_RMI_TAG);
+  
+  controller->AddRMI(vtkPVSlaveScript, (void *)(slave), VTK_PV_SLAVE_SCRIPT_RMI_TAG);  
   
   controller->ProcessRMIs();
 }
@@ -167,7 +167,7 @@ void vtkPVSlave::SetInterp(Tcl_Interp *interp)
 }
 
 
-char *vtkPVSlave::Script(char *format, ...)
+void vtkPVSlave::Script(char *format, ...)
 {
   static char event[16000];
   
@@ -176,9 +176,9 @@ char *vtkPVSlave::Script(char *format, ...)
   vsprintf(event, format, var_args);
   va_end(var_args);
 
-  return this->SimpleScript(event);
+  this->SimpleScript(event);
 }
-char * vtkPVSlave::SimpleScript(char *event)
+void vtkPVSlave::SimpleScript(char *event)
 {
 //#define VTK_DEBUG_SCRIPT
 #ifdef VTK_DEBUG_SCRIPT
@@ -191,7 +191,6 @@ char * vtkPVSlave::SimpleScript(char *event)
     vtkGenericWarningMacro("In Script (" << this->Interp << "): " 
 			   << event << "\nReceived Error: " << this->Interp->result);
     }
-  return this->Interp->result;
 }
 
 
@@ -211,28 +210,9 @@ void vtkPVSlave::SlaveScript(int otherId)
   this->Controller->Receive(str, length, otherId, VTK_PV_SLAVE_SCRIPT_COMMAND_TAG);
 
   // Evalute string ...
-  result = this->SimpleScript(str);
-
-  if (result == NULL)
-    {
-    vtkErrorMacro("ERROR: NULL result");
-    }
-
-  // Send result back.
-  length = strlen(result) + 1;
-  this->Controller->Send(&length, 1, otherId, VTK_PV_SLAVE_SCRIPT_RESULT_LENGTH_TAG);
-  this->Controller->Send(result, length, otherId, VTK_PV_SLAVE_SCRIPT_RESULT_TAG);
-
+  this->SimpleScript(str);
+  
   delete [] str;
-}
-
-
-void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
-		      int remoteProcessId)
-{
-  vtkPVSlave *self = (vtkPVSlave *)(localArg);
-
-  self->SlaveScript(remoteProcessId);
 }
 
 

@@ -56,17 +56,19 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
   myId = controller->GetLocalProcessId();
   numProcs = controller->GetNumberOfProcesses();
   
+  sleep(myId);
+  cerr << myId << " of " << numProcs << endl;
   
-
-
-
   if (myId == numProcs - 1)
     { // The last process is for UI.
     // We need to pass the local controller to the UI process.
+    putenv("DISPLAY=:2.0");
+    //putenv("DISPLAY=:0.0");
     Tcl_Interp *interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     vtkPVApplication *app = vtkPVApplication::New();
     app->SetController(controller);
     app->Script("wm withdraw .");
+    cerr << "Starting app in process " << myId << endl;
     app->Start(pvArgs->argc,pvArgs->argv);
     app->Delete();
     }
@@ -138,7 +140,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
   pvArgs.argv = argv;
   
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
-  controller->SetNumberOfProcesses(2);
+  controller->SetNumberOfProcesses(1);
   controller->Initialize(argc, argv);
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
   controller->SingleMethodExecute();

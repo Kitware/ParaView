@@ -67,10 +67,11 @@ public:
   void MotionCallback(int x, int y);
 
   // Description:
-  // Composites the remote renderers image into the renderwindow...
-  void Render();
-
+  // Method called by the toolbar reset camera button.
+  void ResetCamera();
+  
 protected:
+
   vtkPVRenderView();
   ~vtkPVRenderView();
   vtkPVRenderView(const vtkPVRenderView&) {};

@@ -25,14 +25,15 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
+#include "vtkPVApplication.h"
+#include "vtkKWToolbar.h"
 #include "vtkPVWindow.h"
 #include "vtkOutlineFilter.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWDialog.h"
-#include "vtkPVApplication.h"
 
 #include "vtkInteractorStylePlaneSource.h"
+#include "vtkInteractorStyleCamera.h"
 
 
 //----------------------------------------------------------------------------
@@ -57,11 +58,17 @@ vtkPVWindow::vtkPVWindow()
   this->CommandFunction = vtkPVWindowCommand;
   this->RetrieveMenu = vtkKWWidget::New();
   this->CreateMenu = vtkKWWidget::New();
+  this->Toolbar = vtkKWToolbar::New();
+  this->ResetCameraButton = vtkKWWidget::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVWindow::~vtkPVWindow()
 {
+  this->Toolbar->Delete();
+  this->Toolbar = NULL;
+  this->ResetCameraButton->Delete();
+  this->ResetCameraButton = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -70,14 +77,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   // invoke super method first
   this->vtkKWWindow::Create(app,"");
 
-  // Test the slave process.
-  //vtkPVApplication *pvApp = (vtkPVApplication *)(app);
-  //char result[255];
-  //pvApp->RemoteScript(0, "vtkConeSource cone", NULL, 0);
-  //pvApp->RemoteScript(0, "cone Update", NULL, 0);
-  //pvApp->RemoteSimpleScript(0, "[cone GetOutput] GetNumberOfPoints", result, 255);
-  //cerr << "The slave process gave this result: " << result << endl;
-  
   this->Script("wm geometry %s 900x700+0+0",
                       this->GetWidgetName());
   
@@ -130,6 +129,17 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   char cmd[1024];
   sprintf(cmd,"%s Open", this->GetTclName());
   
+  this->Toolbar->SetParent(this->GetToolbarFrame());
+  this->Toolbar->Create(app); 
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+               this->Toolbar->GetWidgetName());
+  
+  this->ResetCameraButton->SetParent(this->Toolbar);
+  this->ResetCameraButton->Create(app, "button", "-text ResetCamera");
+  this->ResetCameraButton->SetCommand(this->MainView, "ResetCamera");
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+               this->ResetCameraButton->GetWidgetName());
+    
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
   // Setup an interactor style.
@@ -143,11 +153,20 @@ void vtkPVWindow::SetupTest()
 {
   vtkInteractorStylePlaneSource *planeStyle = 
                       vtkInteractorStylePlaneSource::New();
-  this->MainView->SetInteractorStyle(planeStyle);
+  vtkInteractorStyle *style = vtkInteractorStyleCamera::New();
 
+  //this->MainView->SetInteractorStyle(planeStyle);
+  this->MainView->SetInteractorStyle(style);
+  
   vtkActor *actor = planeStyle->GetPlaneActor();
-
-  this->MainView->GetRenderer()->AddActor(actor);
+  actor->GetProperty()->SetColor(0.0, 0.8, 0.0);
+  
+  //this->MainView->GetRenderer()->AddActor(actor);
+  
+  planeStyle->Delete();
+  style->Delete();
+  
+  this->MainView->ResetCamera();
 }
 
 

@@ -30,8 +30,115 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkMultiProcessController.h"
 #include "vtkDummyRenderWindowInteractor.h"
-#include "vtkPVSlave.h"
 #include "vtkObjectFactory.h"
+#include "vtkRayCaster.h"
+
+#include "vtkTimerLog.h"
+
+vtkTimerLog *TIMER = NULL;
+
+
+void vtkPVRenderViewStartRender(void *arg)
+{
+  vtkPVRenderView *rv = (vtkPVRenderView*)arg;
+  vtkPVApplication *pvApp = (vtkPVApplication*)(rv->GetApplication());
+  int *windowSize;
+  
+  if (TIMER == NULL)
+    {  
+    TIMER = vtkTimerLog::New();
+    }
+  TIMER->StartTimer();
+  cerr << "  -Start Remote Render\n";
+  // Make sure the render slave size matches our size
+  windowSize = rv->GetRenderWindow()->GetSize();
+  pvApp->RemoteScript(0, "[RenderSlave GetRenderWindow] SetSize %d %d", 
+		      windowSize[0], windowSize[1]);
+
+  pvApp->RemoteSimpleScript(0, "RenderSlave Render");
+
+  // Make sure the render slave has the same camera we do.
+  float message[15];
+  vtkMultiProcessController *controller = pvApp->GetController();
+  vtkCamera *cam = rv->GetRenderer()->GetActiveCamera();
+  vtkLightCollection *lc = rv->GetRenderer()->GetLights();
+  lc->InitTraversal();
+  vtkLight *light = lc->GetNextItem();
+  
+  cam->GetPosition(message);
+  cam->GetFocalPoint(message+3);
+  cam->GetViewUp(message+6);
+  light->GetPosition(message+9);
+  light->GetFocalPoint(message+12);
+  controller->Send(message, 15, 0, 133);
+  
+  rv->GetRenderWindow()->SwapBuffersOff();
+}
+
+void vtkPVRenderViewEndRender(void *arg)
+{
+  vtkPVRenderView *rv = (vtkPVRenderView*)arg;
+  vtkPVApplication *pvApp = (vtkPVApplication*)(rv->GetApplication());
+  vtkRenderWindow *renWin = rv->GetRenderWindow();
+  vtkMultiProcessController *controller;
+  int *windowSize;
+  int length;
+  unsigned char *pdata, *pTmp;
+  unsigned char *overlay, *endPtr;
+
+  windowSize = renWin->GetSize();
+  length = 3*(windowSize[0] * windowSize[1]);
+
+
+  // Get the results from the local process.
+  TIMER->StartTimer();
+  cerr << "  -Start Get Overlay\n";
+  overlay = renWin->GetPixelData(0,0,windowSize[0]-1, \
+				 windowSize[1]-1,0);
+  TIMER->StopTimer();
+  cerr << "  -End GetOverlay: " << TIMER->GetElapsedTime() << endl;
+  
+
+  // Get the results from the remote processes.
+  pdata = new unsigned char[length];
+  
+  controller = pvApp->GetController();
+  controller->Receive((char*)pdata, length, 0, 99);
+  
+  TIMER->StopTimer();
+  cerr << "  -End Remote Render: " << TIMER->GetElapsedTime() << endl;
+  
+
+  // merge the two images.
+  TIMER->StartTimer();
+  cerr << "  -Start Merge\n";  
+  pTmp = pdata;
+  endPtr = overlay+length;
+  while (overlay != endPtr)
+    {
+    if (*overlay)
+      {
+      *pTmp = *overlay;
+      }
+    ++pTmp;
+    ++overlay;
+    }
+  TIMER->StopTimer();
+  cerr << "  -End Merge: " << TIMER->GetElapsedTime() << endl;
+  
+  // For now just put this image in the renderer.
+  TIMER->StartTimer();
+  cerr << "  -Start Put Image\n";
+  renWin->SetPixelData(0,0,windowSize[0]-1, windowSize[1]-1,pdata,0);
+  TIMER->StopTimer();
+  cerr << "  -End Put Image: " << TIMER->GetElapsedTime() << endl;
+
+  renWin->SwapBuffersOn();  
+  renWin->Frame();
+  
+  delete [] pdata;
+}
+
 
 
 
@@ -86,7 +193,7 @@ void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
     this->InteractorStyle = style;
     style->Register(this);
     }
-} 
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
@@ -96,33 +203,50 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
     vtkErrorMacro("RenderView already created");
     return;
     }
-
-  
-  // Here we are going to create a single slave renderer in another process.
-  // (As a test)
-  vtkPVApplication *pvApp = (vtkPVApplication *)(app);
-  pvApp->GetController()->TriggerRMI(0, VTK_PV_SLAVE_INIT_RMI_TAG);
-  
-  pvApp->RemoteSimpleScript(0, "vtkPVRenderSlave RenderSlave", NULL, 0);
-  // The global "Slave" was setup when the process was initiated.
-  pvApp->RemoteSimpleScript(0, "RenderSlave SetPVSlave Slave", NULL, 0);
-  
-  // lets show something as a test.
-  pvApp->RemoteSimpleScript(0, "vtkConeSource ConeSource", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "vtkPolyDataMapper ConeMapper", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "ConeMapper SetInput [ConeSource GetOutput]", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "vtkActor ConeActor", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "ConeActor SetMapper ConeMapper", NULL, 0);
-  pvApp->RemoteSimpleScript(0, "[RenderSlave GetRenderer] AddActor ConeActor", NULL, 0);
-
-  
   
   this->vtkKWRenderView::Create(app, args);
 
   // Styles need motion events.
   this->Script("bind %s <Motion> {%s MotionCallback %%x %%y}", 
                this->VTKWidget->GetWidgetName(), this->GetTclName());
+  
+  
+  
+  // Setup the remote renderers.
+  vtkPVApplication *pvApp = (vtkPVApplication*)app;
+  pvApp->RemoteSimpleScript(0, "vtkPVRenderSlave RenderSlave");
+  // The global "Slave" was setup when the process was initiated.
+  pvApp->RemoteSimpleScript(0, "RenderSlave SetPVSlave Slave");
+  
+  // lets show something as a test.
+  pvApp->RemoteSimpleScript(0, "vtkConeSource ConeSource");
+  pvApp->RemoteSimpleScript(0, "vtkPolyDataMapper ConeMapper");
+  pvApp->RemoteSimpleScript(0, "ConeMapper SetInput [ConeSource GetOutput]");
+  pvApp->RemoteSimpleScript(0, "vtkActor ConeActor");
+  pvApp->RemoteSimpleScript(0, "ConeActor SetMapper ConeMapper");
+  pvApp->RemoteSimpleScript(0, "[RenderSlave GetRenderer] AddActor ConeActor");
+  
+  // The start and end methods merge the processes renderers.
+  this->GetRenderer()->SetStartRenderMethod(vtkPVRenderViewStartRender, this);
+  this->GetRenderer()->SetEndRenderMethod(vtkPVRenderViewEndRender, this);
 }
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ResetCamera()
+{
+  float bounds[6];
+  vtkPVApplication *pvApp = (vtkPVApplication*)(this->Application);
+  vtkMultiProcessController *controller = pvApp->GetController();
+  
+  pvApp->RemoteSimpleScript(0, "RenderSlave TransmitBounds");
+
+  controller->Receive(bounds, 6, 0, 112);
+  
+  this->GetRenderer()->ResetCamera(bounds);
+  this->Render();
+}
+
+
 
 //----------------------------------------------------------------------------
 // Called by a binding, so I must flip y.
@@ -232,46 +356,4 @@ void vtkPVRenderView::AKeyPress(char key, int x, int y)
 }
 
 
-
-//----------------------------------------------------------------------------
-// A method for testing the remote rendering.
-void vtkPVRenderView::Render()
-{
-  vtkPVApplication *pvApp = (vtkPVApplication*)(this->Application);
-  vtkRenderWindow *renWin;
-  float *zdata, *pdata;
-  int *window_size;
-  int total_pixels;
-  int pdata_size, zdata_size;
-  vtkMultiProcessController *controller;
-  
-  renWin = this->GetRenderWindow();
-  
-  this->vtkKWRenderView::Render();
-  
-  controller = pvApp->GetController();
-  
-  window_size = this->RenderWindow->GetSize();
-  total_pixels = window_size[0] * window_size[1];
-  zdata_size = total_pixels;
-  pdata_size = 4*total_pixels;
-
-  zdata = new float[zdata_size];
-  pdata = new float[pdata_size];
-  
-  // Make sure the render slave size matches our size
-  pvApp->RemoteScript(0, "[RenderSlave GetRenderWindow] SetSize %d %d", window_size[0], window_size[1]);
-  
-  // Render and get the data.
-  pvApp->RemoteSimpleScript(0, "RenderSlave Render", NULL, 0);
-  
-  controller->Receive(zdata, zdata_size, 0, 99);
-  controller->Receive(pdata, pdata_size, 0, 99);
-
-  renWin->SetRGBAPixelData(0,0,window_size[0]-1, \
-			   window_size[1]-1,pdata,1);
-  //((vtkMesaRenderWindow *)renWin)-> \ 
-  //  SetRGBACharPixelData(0,0, window_size[0]-1, \
-  //			 window_size[1]-1,pdata,1);
-}
 

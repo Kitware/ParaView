@@ -45,7 +45,6 @@ class vtkKWWindow;
 class vtkKWWidget;
 class vtkKWEventNotifier;
 
-#define VTK_PV_SLAVE_INIT_RMI_TAG 1160
 
 #define VTK_PV_SLAVE_SCRIPT_RMI_TAG 1150
 #define VTK_PV_SLAVE_SCRIPT_COMMAND_LENGTH_TAG 1100
@@ -88,8 +87,8 @@ public:
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
-  char *Script(char *EventString, ...);
-  char *SimpleScript(char *EventString);
+  void Script(char *EventString, ...);
+  void SimpleScript(char *EventString);
   void SlaveScript(int otherId);
 //ETX
 
