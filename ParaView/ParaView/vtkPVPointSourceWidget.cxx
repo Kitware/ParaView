@@ -193,4 +193,6 @@ void vtkPVPointSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "Point widget: " << this->PointWidget << endl;
+  os << indent << "RadiusWidget: " << this->RadiusWidget << endl;
+  os << indent << "NumberOfPointsWidget: " << this->NumberOfPointsWidget << endl;
 }

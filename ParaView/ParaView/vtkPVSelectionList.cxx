@@ -324,4 +324,5 @@ void vtkPVSelectionList::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "CurrentName: " << (this->CurrentName?this->CurrentName:"none") << endl;
   os << indent << "CurrentValue: " << this->CurrentValue << endl;
+  os << indent << "OptionWidth: " << this->OptionWidth << endl;
 }

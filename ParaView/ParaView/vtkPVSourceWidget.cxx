@@ -83,4 +83,6 @@ void vtkPVSourceWidget::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << "Source Tcl name: " << (this->SourceTclName?this->SourceTclName:"none")
      << endl;
+  os << "Output Tcl Name: " << (this->OutputTclName?this->OutputTclName:"none")
+     << endl;
 }

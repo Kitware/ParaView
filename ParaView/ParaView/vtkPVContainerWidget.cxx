@@ -365,3 +365,11 @@ int vtkPVContainerWidget::ReadXMLAttributes(vtkPVXMLElement* element,
   
   return 1;
 }
+
+//----------------------------------------------------------------------------
+void vtkPVContainerWidget::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os,indent);
+  os << indent << "PackDirection: " 
+     << (this->PackDirection?this->PackDirection:"(none)") << endl;
+}

@@ -329,6 +329,7 @@ void vtkPV3DWidget::Render()
 void vtkPV3DWidget::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << "3D Widget:" << endl;
+  os << indent << "Use Label: " << (this->UseLabel?"on":"off") << endl;
+  os << indent << "3D Widget:" << endl;
   this->Widget3D->PrintSelf(os, indent.GetNextIndent());
 }

@@ -2258,7 +2258,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.184 $");
+  this->ExtractRevision(os,"$Revision: 1.185 $");
 }
 
 //------------------------------------------------------------------------------
@@ -2375,5 +2375,7 @@ void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ManipulatorControl3D: " 
      << this->ManipulatorControl3D << endl;
   os << indent << "LODThreshold: " << this->LODThreshold << endl;
+  os << indent << "LODResolution: " << this->LODResolution << endl;
+  os << indent << "CollectThreshold: " << this->CollectThreshold << endl;
 }
 

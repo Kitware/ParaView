@@ -75,10 +75,6 @@ public:
   virtual void Accept();
 
   // Description:
-  // The Tcl name of the VTK implicit plane.
-  vtkGetStringMacro(PlaneTclName);
-
-  // Description:
   // For saving the widget into a VTK tcl script.
   void SaveInTclScript(ofstream *file);
 

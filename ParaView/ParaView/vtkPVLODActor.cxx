@@ -324,4 +324,5 @@ void vtkPVLODActor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "LODMapper: " << this->GetLODMapper() << endl;
+  os << indent << "EnableLOD: " << (this->EnableLOD?"on":"off") << endl;
 }

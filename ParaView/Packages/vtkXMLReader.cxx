@@ -32,7 +32,7 @@
 
 #include <sys/stat.h>
 
-vtkCxxRevisionMacro(vtkXMLReader, "1.4");
+vtkCxxRevisionMacro(vtkXMLReader, "1.5");
 
 //----------------------------------------------------------------------------
 vtkXMLReader::vtkXMLReader()
@@ -73,8 +73,12 @@ vtkXMLReader::~vtkXMLReader()
 void vtkXMLReader::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "FileName: " <<
-    (this->FileName? this->FileName:"(none)") << "\n";
+  os << indent << "FileName: "
+     << (this->FileName? this->FileName:"(none)") << "\n";
+  os << indent << "CellDataArraySelection: " << this->CellDataArraySelection 
+     << endl;
+  os << indent << "PointDataArraySelection: " << this->PointDataArraySelection 
+     << endl;
 }
 
 //----------------------------------------------------------------------------
