@@ -73,7 +73,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.256");
+vtkCxxRevisionMacro(vtkPVSource, "1.257");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -471,11 +471,11 @@ void vtkPVSource::CreateProperties()
 
   this->NameLabel->SetParent(this->DescriptionFrame);
   this->NameLabel->Create(this->Application);
-  this->NameLabel->GetLabel1()->SetLabel("Name:");
+  this->NameLabel->SetLabel("Name:");
   this->Script("%s configure -anchor w", 
                this->NameLabel->GetLabel2()->GetWidgetName());
   this->Script("%s config %s", 
-               this->NameLabel->GetLabel1()->GetWidgetName(), label1_opt);
+               this->NameLabel->GetLabel()->GetWidgetName(), label1_opt);
   this->Script("pack %s -fill x -expand t", 
                this->NameLabel->GetLabel2()->GetWidgetName());
   vtkKWTkUtilities::ChangeFontWeightToBold(
@@ -484,11 +484,11 @@ void vtkPVSource::CreateProperties()
 
   this->TypeLabel->SetParent(this->DescriptionFrame);
   this->TypeLabel->Create(this->Application);
-  this->TypeLabel->GetLabel1()->SetLabel("Class:");
+  this->TypeLabel->GetLabel()->SetLabel("Class:");
   this->Script("%s configure -anchor w", 
                this->TypeLabel->GetLabel2()->GetWidgetName());
   this->Script("%s config %s", 
-               this->TypeLabel->GetLabel1()->GetWidgetName(), label1_opt);
+               this->TypeLabel->GetLabel()->GetWidgetName(), label1_opt);
   this->Script("pack %s -fill x -expand t", 
                this->TypeLabel->GetLabel2()->GetWidgetName());
 
@@ -505,12 +505,12 @@ void vtkPVSource::CreateProperties()
 
   this->LongHelpLabel->SetParent(this->DescriptionFrame);
   this->LongHelpLabel->Create(this->Application);
-  this->LongHelpLabel->GetLabel1()->SetLabel("Description:");
+  this->LongHelpLabel->GetLabel()->SetLabel("Description:");
   this->LongHelpLabel->GetLabel2()->AdjustWrapLengthToWidthOn();
   this->Script("%s configure -anchor w", 
                this->LongHelpLabel->GetLabel2()->GetWidgetName());
   this->Script("%s config %s", 
-               this->LongHelpLabel->GetLabel1()->GetWidgetName(), label1_opt);
+               this->LongHelpLabel->GetLabel()->GetWidgetName(), label1_opt);
   this->Script("pack %s -fill x -expand t", 
                this->LongHelpLabel->GetLabel2()->GetWidgetName());
 
@@ -2188,7 +2188,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.256 $");
+  this->ExtractRevision(os,"$Revision: 1.257 $");
 }
 
 //----------------------------------------------------------------------------
