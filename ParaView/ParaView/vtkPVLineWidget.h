@@ -95,6 +95,20 @@ public:
   void SetPoint2VariableName(const char* varname);
   void SetResolutionVariableName(const char* varname);
 
+  vtkGetStringMacro(Point1Variable);
+  vtkGetStringMacro(Point2Variable);
+  vtkGetStringMacro(ResolutionVariable);
+
+  // Description:
+  // Set the tcl labels that are modified when accept is called.
+  void SetPoint1LabelTextName(const char* varname);
+  void SetPoint2LabelTextName(const char* varname);
+  void SetResolutionLabelTextName(const char* varname);
+
+  vtkGetStringMacro(Point1LabelText);
+  vtkGetStringMacro(Point2LabelText);
+  vtkGetStringMacro(ResolutionLabelText);
+
   // Description:
   // This method does the actual placing. It sets the first point at 
   // (bounds[0]+bounds[1])/2, bounds[2], (bounds[4]+bounds[5])/2
@@ -150,6 +164,14 @@ protected:
   char *Point1Variable;
   char *Point2Variable;
   char *ResolutionVariable;
+
+  vtkSetStringMacro(Point1LabelText);
+  vtkSetStringMacro(Point2LabelText);
+  vtkSetStringMacro(ResolutionLabelText);
+
+  char *Point1LabelText;
+  char *Point2LabelText;
+  char *ResolutionLabelText;
 
 private:  
   vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented

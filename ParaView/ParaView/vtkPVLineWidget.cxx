@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.22");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -76,6 +76,14 @@ vtkPVLineWidget::vtkPVLineWidget()
   this->Point1Variable = 0;
   this->Point2Variable = 0;
   this->ResolutionVariable = 0;
+
+  this->Point1LabelText = 0;
+  this->Point2LabelText = 0;
+  this->ResolutionLabelText = 0;
+
+  this->SetPoint1LabelTextName("Point 1");
+  this->SetPoint2LabelTextName("Point 2");
+  this->SetResolutionLabelTextName("Resolution");
 }
 
 //----------------------------------------------------------------------------
@@ -95,6 +103,10 @@ vtkPVLineWidget::~vtkPVLineWidget()
   this->SetPoint1Variable(0);
   this->SetPoint2Variable(0);
   this->SetResolutionVariable(0);
+
+  this->SetPoint1LabelTextName(0);
+  this->SetPoint2LabelTextName(0);
+  this->SetResolutionLabelTextName(0);
 }
 
 
@@ -114,6 +126,24 @@ void vtkPVLineWidget::SetPoint2VariableName(const char* varname)
 void vtkPVLineWidget::SetResolutionVariableName(const char* varname)
 {
   this->SetResolutionVariable(varname);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SetPoint1LabelTextName(const char* varname)
+{
+  this->SetPoint1LabelText(varname);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SetPoint2LabelTextName(const char* varname)
+{
+  this->SetPoint2LabelText(varname);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::SetResolutionLabelTextName(const char* varname)
+{
+  this->SetResolutionLabelText(varname);
 }
 
 //----------------------------------------------------------------------------
@@ -370,6 +400,12 @@ void vtkPVLineWidget::CopyProperties(vtkPVWidget* clone,
   vtkPVLineWidget* pvlw = vtkPVLineWidget::SafeDownCast(clone);
   if (pvlw)
     {
+    pvlw->SetPoint1VariableName(this->GetPoint1Variable());
+    pvlw->SetPoint2VariableName(this->GetPoint2Variable());
+    pvlw->SetResolutionVariableName(this->GetResolutionVariable());
+    pvlw->SetPoint1LabelTextName(this->GetPoint1LabelText());
+    pvlw->SetPoint2LabelTextName(this->GetPoint2LabelText());
+    pvlw->SetResolutionLabelTextName(this->GetResolutionLabelText());
     }
   else 
     {
@@ -395,6 +431,29 @@ int vtkPVLineWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetPoint2VariableName(point2_variable);
     }
 
+  const char* resolution_variable = element->GetAttribute("resolution_variable");
+  if(resolution_variable)
+    {
+    this->SetResolutionVariableName(resolution_variable);
+    }
+
+  const char* point1_label = element->GetAttribute("point1_label");
+  if(point1_label)
+    {
+    this->SetPoint1LabelTextName(point1_label);
+    }
+
+  const char* point2_label = element->GetAttribute("point2_label");
+  if(point2_label)
+    {
+    this->SetPoint2LabelTextName(point2_label);
+    }
+
+  const char* resolution_label = element->GetAttribute("resolution_label");
+  if(resolution_label)
+    {
+    this->SetResolutionLabelTextName(resolution_label);
+    }
   return 1;
 }
 
@@ -429,10 +488,10 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
   this->SetFrameLabel("Line Widget");
   this->Labels[0]->SetParent(this->Frame->GetFrame());
   this->Labels[0]->Create(pvApp, "");
-  this->Labels[0]->SetLabel("Point 0");
+  this->Labels[0]->SetLabel(this->GetPoint1LabelText());
   this->Labels[1]->SetParent(this->Frame->GetFrame());
   this->Labels[1]->Create(pvApp, "");
-  this->Labels[1]->SetLabel("Point 1");
+  this->Labels[1]->SetLabel(this->GetPoint2LabelText());
   int i;
   for (i=0; i<3; i++)
     {
@@ -455,7 +514,7 @@ void vtkPVLineWidget::ChildCreate(vtkPVApplication* pvApp)
     }
   this->ResolutionLabel->SetParent(this->Frame->GetFrame());
   this->ResolutionLabel->Create(pvApp, "");
-  this->ResolutionLabel->SetLabel("Resolution");
+  this->ResolutionLabel->SetLabel(this->GetResolutionLabelText());
   this->ResolutionEntry->SetParent(this->Frame->GetFrame());
   this->ResolutionEntry->Create(pvApp, "");
   this->ResolutionEntry->SetValue(0);

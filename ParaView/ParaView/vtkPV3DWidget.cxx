@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.23");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.24");
 
 //===========================================================================
 //***************************************************************************
@@ -188,6 +188,15 @@ void vtkPV3DWidget::CopyProperties(vtkPVWidget* clone,
                                    vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
   this->Superclass::CopyProperties(clone, pvSource, map);
+  vtkPV3DWidget* pvlw = vtkPV3DWidget::SafeDownCast(clone);
+  if (pvlw)
+    {
+    pvlw->SetUseLabel(this->GetUseLabel());
+    }
+  else 
+    {
+    vtkErrorMacro("Internal error. Could not downcast clone to PVLineWidget.");
+    }
 }
 
 //----------------------------------------------------------------------------
