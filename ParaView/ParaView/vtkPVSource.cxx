@@ -363,7 +363,8 @@ void vtkPVSource::CreateProperties()
   this->DisplayNameLabel->SetParent(this->Properties);
   if (this->Name != NULL)
     {
-    sprintf(displayName, "Name: %s", this->GetName());
+    sprintf(displayName, "Name: %s Type: %s", this->GetName(),
+	    this->GetVTKSource()->GetClassName()+3);
     this->DisplayNameLabel->SetLabel(displayName);
     }
   else
