@@ -19,7 +19,8 @@
     <Item name="Arrow"        value="9"/>
     <Item name="Thick Arrow"  value="10"/>
   </SelectionList>
-  <LabeledToggle variable="Filled" trace_name="Filled" default_value="0"
+  <LabeledToggle label="Filled" property="Filled" trace_name="Filled"
+                 default_value="0"
                  help="Specify whether the glyph is filled (a polygon) or not (a closed polygon defined by line segments). This only applies to 2D closed glyphs"/>
   <Documentation>
 The 2D Glyph source is used for generating a family of 2D glyphs, each of which lies in the x-y plane. There are two parameters for 2D Glyphs.
@@ -46,7 +47,8 @@ The output of the 2D Glyph source is polygonal data.
   <VectorEntry label="MaximumLevel" trace_name="MaximumLevel"
                property="MaximumLevel" type="int" default_value="6"
                help="Determines how deep to refine the grid."/>
-  <LabeledToggle variable="GhostLevels" trace_name="GhostLevels" 
+  <LabeledToggle label="GhostLevels" trace_name="GhostLevels" 
+                 property="GhostLevels"
                  default_value="0"
                  help="Set whether to generate overlapping ghost levels." />
 </Module>
@@ -140,7 +142,7 @@ The output of the Arrow source is polygonal data. This polygonal data will not c
   <VectorEntry label="Origin" property="Origin" trace_name="Origin"
                type="float" length="3" default_value="0.0 0.0 0.0"
                help="Set the x, y, z coordinates of the origin of the axes" />
-  <LabeledToggle variable="Symmetric" trace_name="Symmetric"
+  <LabeledToggle label="Symmetric" trace_name="Symmetric" property="Symmetric"
                  default_value="0"
                  help="Select whether to display the negative axes" />
   <Documentation>
@@ -194,7 +196,8 @@ The output of the Box source is polygonal data containing both normals and textu
   <ThumbWheel variable="Height" trace_name="Height"
               resolution="0.01" minimum_value="0" default_value="1"
               help="Set the height of the cone" />
-  <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"
+  <LabeledToggle label="Capping" trace_name="Capping" property="Capping"
+                 default_value="1"
                  help="Set whether to draw the base of the cone" />
   <Documentation>
 The Cone source can be used to add a polygonal cone to the 3D scene. The Cone source has the following parameters.
@@ -224,7 +227,8 @@ The output of the Cone source is polygonal data.
   <VectorEntry  label="Center" property="Center" trace_name="Center"
                type="float" length="3" default_value="0.0 0.0 0.0" 
                help="Set the center of the cylinder." />
-  <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"
+  <LabeledToggle label="Capping" property="Capping" trace_name="Capping"
+                 default_value="1"
                  help="Set whether to draw the ends of the cylinder" />
   <Documentation>
 The Cylinder source can be used to add a polygonal cylinder to the 3D scene. The following parameters can be set for the Cylinder source.
@@ -314,7 +318,8 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
                trace_name="RandomSeed" 
                type="int" default_value="111" 
                help="Initializes the random number generator." />
-  <LabeledToggle variable="ShowSolution" trace_name="ShowSolution" default_value="0"
+  <LabeledToggle label="ShowSolution" property="ShowSolution"
+               trace_name="ShowSolution" default_value="0"
                help="Show the solution path." />
   <Documentation>
 The Maze source can be used to display a 2D maze in the 3D scene. The following parameters can be specified.
@@ -450,7 +455,8 @@ The output of the Sphere source is polygonal data with point normals defined.
   <VectorEntry label="Size" property="Size" trace_name="Size"
                type="float" default_value="0.5"
                help="Isotropic size" />
-  <LabeledToggle variable="Toroidal" trace_name="Toroidal" default_value="0" 
+  <LabeledToggle label="Toroidal" trace_name="Toroidal" property="Toroidal"
+                 default_value="0" 
                  help="Whether or not the superquadric is toroidal or ellipsoidal" />
   <Documentation>
 The Superquadric source can be used to add a polygonal superquadric to the 3D scene. This source can be used to create a wide variety of shapes (e.g., a sphere, a box, or a torus) by adjusting the roundness parameters. The Superquadric source has the following parameters.

@@ -225,32 +225,32 @@
                help="Set the plot3d q file to read."/>
     <LabeledToggle label="Binary"
                    trace_name="BinaryFile"
-                   variable="BinaryFile"
+                   property="BinaryFile"
                    help="Is this a binary file?"
                    default_value="1"/>
     <LabeledToggle label="Multi-block"
                    trace_name="MultiGrid"
-                   variable="MultiGrid"
+                   property="MultiGrid"
                    help="Does this file have multiple block information"
                    default_value="0"/>
     <LabeledToggle label="Fortran byte count"
                    trace_name="HasByteCount"
-                   variable="HasByteCount"
+                   property="HasByteCount"
                    help="Does this file use Fortran leading-trailing byte counts"
                    default_value="0"/>
     <LabeledToggle label="I blanking"
                    trace_name="IBlanking"
-                   variable="IBlanking"
+                   property="IBlanking"
                    help="Any visibility information?"
                    default_value="0"/>
     <LabeledToggle label="2D geometry"
                    trace_name="TwoDimensionalGeometry"
-                   variable="TwoDimensionalGeometry"
+                   property="TwoDimensionalGeometry"
                    help="Is there only data for two dimensions?"
                    default_value="0"/>
     <LabeledToggle label="Force read"
                    trace_name="ForceRead"
-                   variable="ForceRead"
+                   property="ForceRead"
                    help="Read even if file looks corrupt?"
                    default_value="0"/>
     <SelectionList label="Byte order"
@@ -495,7 +495,7 @@
       </Item>
     </SelectWidget>
 	<LabeledToggle label="Apply Displacements"
-                   variable="ApplyDisplacements"
+                   property="ApplyDisplacements"
                    trace_name="apply_displacements"
                    help="Select whether the reader automatically applies displacements" default_value="1"/>
 	<VectorEntry label="Displacement Scale"
@@ -505,19 +505,19 @@
                  help="The magnitude of the applied displacement."
                  default_value="1.0"/>
     <LabeledToggle label="Block Ids"
-                   variable="GenerateBlockIdCellArray"
+                   property="GenerateBlockIdCellArray"
                    trace_name="block_ids"
                    help="Select whether the reader generates block ids" default_value="1"/>
     <LabeledToggle label="Global Node Ids"
-                   variable="GenerateGlobalNodeIdArray"
+                   property="GenerateGlobalNodeIdArray"
                    trace_name="global_node_ids"
                    help="Select whether the reader generates global node ids" default_value="1"/>
     <LabeledToggle label="Global Element Ids"
-                   variable="GenerateGlobalElementIdArray"
+                   property="GenerateGlobalElementIdArray"
                    trace_name="global_element_ids"
                    help="Select whether the reader generates global element ids" default_value="0"/>
     <LabeledToggle label="File Ids"
-                   variable="GenerateFileIdArray"
+                   property="GenerateFileIdArray"
                    trace_name="global_file_ids"
                    help="Select whether the reader generates cell based disk file ids" default_value="0"/>
   </Module>

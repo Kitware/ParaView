@@ -98,7 +98,7 @@ The Append Datasets filter operates on multiple data sets of any type (polygonal
                input_name="Input"/>
     <LabeledToggle label="Generate vertices"
                    trace_name="VertexCells"
-                   variable="VertexCells"
+                   property="VertexCells"
                    help="Generate vertex as geometry of just points."
                    default_value="0"/>
     <Documentation>
@@ -123,7 +123,7 @@ The Cell Centers filter places a point at the center of each cell in the input d
                input_name="Input"/>
     <LabeledToggle label="Pass cell data"
                    trace_name="PassCellData"
-                   variable="PassCellData"
+                   property="PassCellData"
                    help=" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output."
                    default_value="0"/>
     <Documentation>
@@ -144,7 +144,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
                input_name="Input"/>
     <LabeledToggle label="Piece invariant"
                    trace_name="PieceInvariant"
-                   variable="PieceInvariant"
+                   property="PieceInvariant"
                    help="Turn this on to remove seams when running in parallel."
                    default_value="1"/>
     <Scale variable="Tolerance"
@@ -163,27 +163,27 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
                 help="The tolerance in absolute terms."/>
     <LabeledToggle label="Tolerance is absolute"
                    trace_name="ToleranceIsAbsolute"
-                   variable="ToleranceIsAbsolute"
+                   property="ToleranceIsAbsolute"
                    help="Turn this on to use the absolute tolerance."
                    default_value="0"/>
     <LabeledToggle label="Convert lines to points"
                    trace_name="ConvertLinesToPoints"
-                   variable="ConvertLinesToPoints"
+                   property="ConvertLinesToPoints"
                    help="Turn on/off conversion of degenerate lines to points."
                    default_value="1"/>
     <LabeledToggle label="Convert polys to lines"
                    trace_name="ConvertPolysToLines"
-                   variable="ConvertPolysToLines"
+                   property="ConvertPolysToLines"
                    help="Turn on/off conversion of degenerate polys to lines."
                    default_value="1"/>
     <LabeledToggle label="Convert strips to polys"
                    trace_name="ConvertStripsToPolys"
-                   variable="ConvertStripsToPolys"
+                   property="ConvertStripsToPolys"
                    help="Turn on/off conversion of degenerate strips to polys."
                    default_value="1"/>
     <LabeledToggle label="Point merging"
                    trace_name="PointMerging"
-                   variable="PointMerging"
+                   property="PointMerging"
                    help="Turn this On to control wheter points merging is performed."
                    default_value="1"/>
     <Documentation>
@@ -264,7 +264,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
                input_name="Input"/>
     <LabeledToggle label="Invert mean curvature"
                    trace_name="InvertMeanCurvature"
-                   variable="InvertMeanCurvature"
+                   property="InvertMeanCurvature"
                    help="Turn this on to invert the mean curvature calculation for meshes with inward pointing normals."
                    default_value="0"/>
     <SelectionList property="CurvatureType"
@@ -302,7 +302,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
            entry_and_label_on_top="0" display_value="0"/>
     <LabeledToggle label="Preserve topology"
                    trace_name="PreserveTopology"
-                   variable="PreserveTopology"
+                   property="PreserveTopology"
                    help="If off, better reduction can occur, but model may break up."
                    default_value="0"/>
     <Scale label="Feature angle"
@@ -316,7 +316,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
            display_value="0"/>
     <LabeledToggle label="Boundary deletable"
                    trace_name="BoundaryVertexDeletion"
-                   variable="BoundaryVertexDeletion"
+                   property="BoundaryVertexDeletion"
                    help="If off, decimate will not remove points on the boundary."
                    default_value="1"/>
     <Documentation>
@@ -349,7 +349,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
                  help="Provide name of global node ID array so redistributed data does not duplicate node IDs" />
     <LabeledToggle label="Minimal memory"
                    trace_name="UseMinimalMemory" 
-                   variable="UseMinimalMemory" 
+                   property="UseMinimalMemory" 
                    help="Force communication routines to use minimal memory, which is slower"
                    default_value="0"/>
     <Documentation>
@@ -590,26 +590,27 @@ The Calculator filter is available on the Toolbar.
                input_name="Input"/>
     <LabeledToggle label="Boundary edges"
                    trace_name="BoundaryEdges"
-                   variable="BoundaryEdges"
+                   property="BoundaryEdges"
                    help="Turn this off if you do not want to extract boundary edges."
                    default_value="1"/>
     <LabeledToggle label="Feature edges"
                    trace_name="FeatureEdges"
-                   variable="FeatureEdges"
+                   property="FeatureEdges"
                    help="Turn this off if you do not want to extract feature edges."
                    default_value="1"/>
     <LabeledToggle label="Non-manifold edges"
                    trace_name="NonManifoldEdges"
-                   variable="NonManifoldEdges"
+                   property="NonManifoldEdges"
                    help="Turn this off if you do not want to extract non-manifold edges."
                    default_value="1"/>
     <LabeledToggle label="Manifold edges"
                    trace_name="ManifoldEdges"
-                   variable="ManifoldEdges"
+                   property="ManifoldEdges"
                    help="Turn this on if you want to extract manifold edges."
                    default_value="0"/>
-    <LabeledToggle variable="Coloring"
+    <LabeledToggle label="Coloring"
                    trace_name="Coloring"
+                   property="Coloring"
                    help="Turn this off if you do not want to color the edges by type."
                    default_value="1"/>
     <Scale label="Feature angle"
@@ -740,13 +741,14 @@ The Group Parts filter causes different data sets to be grouped into a collectio
                  type="float" length="3"
                  help="Set the direction for the extrusion"
                  default_value="0.0 0.0 1.0"/>
-    <LabeledToggle variable="Capping"
+    <LabeledToggle label="Capping"
                    trace_name="Capping"
+                   property="Capping"
                    help="Select whether to draw endcaps" 
                    default_value="1"/>
     <LabeledToggle label="Piece invariant"
                    trace_name="PieceInvariant"
-                   variable="PieceInvariant"
+                   property="PieceInvariant"
                    help="Turn this off if you do want to process ghost levels and do not mind seams."
                    default_value="0"/>
     <Documentation>
@@ -815,12 +817,12 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
                 default_value="0"
                 help="Start with this point."/>
     <LabeledToggle label="Random" trace_name="Random"
-                   variable="RandomMode"
+                   property="RandomMode"
                    help="Select whether to randomly select points, or subsample regularly."
                    default_value="0"/>
     <LabeledToggle label="Generate vertices"
                    trace_name="GenerateVertices"
-                   variable="GenerateVertices"
+                   property="GenerateVertices"
                    help="Convienience feature to display points."
                    default_value="0"/>
     <Documentation>
@@ -879,32 +881,34 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
            resolution="0.01" range="0 180"
            display_entry="1"
            entry_and_label_on_top="0" display_value="0"/>
-    <LabeledToggle variable="Splitting"
+    <LabeledToggle label="Splitting"
                    trace_name="Splitting"
+                   property="Splitting"
                    help="Turn on/off the splitting of sharp edges."
                    default_value="1"/>
-    <LabeledToggle variable="Consistency"
+    <LabeledToggle label="Consistency"
                    trace_name="Consistency"
+                   property="Consistency"
                    help="Turn on/off the enforcement of consistent polygon ordering."
                    default_value="1"/>
     <LabeledToggle label="Flip normals"
                    trace_name="FlipNormals"
-                   variable="FlipNormals"
+                   property="FlipNormals"
                    help="Flipping reverves the meaning of front and back."
                    default_value="0"/>
     <LabeledToggle label="Non-manifold"
                    trace_name="NonManifoldTraversal"
-                   variable="NonManifoldTraversal"
+                   property="NonManifoldTraversal"
                    help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops."
                    default_value="1"/>
     <LabeledToggle label="Cell normals"
                    trace_name="ComputeCellNormals"
-                   variable="ComputeCellNormals"
+                   property="ComputeCellNormals"
                    help="Turn on/off the computation of cell normals."
                    default_value="0"/>
     <LabeledToggle label="Piece invariant"
                    trace_name="PieceInvariant"
-                   variable="PieceInvariant"
+                   property="PieceInvariant"
                    help="Turn this off if you do not want to process ghost levels and do not mind seams."
                    default_value="1"/>
     <Documentation>
@@ -1026,7 +1030,7 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
                input_name="Input"/>
     <LabeledToggle label="Random"
                    trace_name="RandomMode"
-                   variable="RandomMode"
+                   property="RandomMode"
                    help="Select whether to use random colors for the various pieces"
                    default_value="0"/>
     <Documentation>
@@ -1052,7 +1056,7 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
                input_name="Input"/>
     <LabeledToggle label="Pass point data"
                    trace_name="PassPointData"
-                   variable="PassPointData"
+                   property="PassPointData"
                    help="If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output."
                    default_value="0"/>
     <Documentation>
@@ -1083,22 +1087,22 @@ The Point Data to Cell Data filter averages the values of the point attributes o
                  default_value="50 50 50"/>
     <LabeledToggle label="Use input points"
                    trace_name="UseInputPoints"
-                   variable="UseInputPoints"
+                   property="UseInputPoints"
                    help="Select whether to use points from the input in the output or to calculate optimum representative points for each bin"
                    default_value="0"/>
     <LabeledToggle label="Use feature edges"
                    trace_name="UseFeatureEdges"
-                   variable="UseFeatureEdges"
+                   property="UseFeatureEdges"
                    help="Select whether to use feature edge quadrics to match up the boundaries between pieces"
                    default_value="0"/>
     <LabeledToggle label="Use feature points"
                    trace_name="UseFeaturePoints"
-                   variable="UseFeaturePoints"
+                   property="UseFeaturePoints"
                    help="Select whether to use feature point quadrics to align piece boundaries"
                    default_value="0"/>
     <LabeledToggle label="Copy cell data"
                    trace_name="CopyCellData"
-                   variable="CopyCellData"
+                   property="CopyCellData"
                    help="Should cell data be copied from output to input?"
                    default_value="0"/>
     <Documentation>
@@ -1184,7 +1188,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
                  type="float"
                  help="The center of the mirror plane."
                  default_value="0.0"/>
-    <LabeledToggle variable="CopyInput" trace_name="CopyInput"
+    <LabeledToggle property="CopyInput" trace_name="CopyInput"
                    label="Copy Input"
                    help="Include both the input and its reflection in the output."
                    default_value="1"/>
@@ -1241,7 +1245,7 @@ The Reflection filter reflects the input data set across the specified plane. If
            display_value="0"/>
     <LabeledToggle label="Use default normal"
                    trace_name="UseDefaultNormal"
-                   variable="UseDefaultNormal"
+                   property="UseDefaultNormal"
                    help="When this option is off, default normals will be generated if the input contains no normals. If on, the Default normal will be used."
                    default_value="0"/>
     <!-- keeping vector entries with length > 1 -->
@@ -1254,7 +1258,7 @@ The Reflection filter reflects the input data set across the specified plane. If
                  default_value="0.0 0.0 1.0"/>
     <LabeledToggle label="Vary width"
                    trace_name="VaryWidth"
-                   variable="VaryWidth"
+                   property="VaryWidth"
                    help="Turn on/off the variation of ribbon width with scalar value."
                    default_value="0"/>
     <Documentation>
@@ -1282,8 +1286,10 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
                 resolution="1"
                 minimum_value="1"
                 default_value="12"/>
-    <LabeledToggle variable="Capping"
-                   trace_name="Capping" default_value="1"/>
+    <LabeledToggle label="Capping"
+                   trace_name="Capping"
+                   property="Capping"
+                   default_value="1"/>
     <VectorEntry label="Angle"
                  trace_name="Angle"
                  property="Angle"
@@ -1573,8 +1579,9 @@ The Transform filter allows you to specify the position, size, and orientation o
                 minimum_value="3"
                 default_value="6"
                 help="Set the number of sides for the tube"/>
-    <LabeledToggle variable="Capping"
+    <LabeledToggle label="Capping"
                    trace_name="Capping"
+                   property="Capping"
                    help="Select whether to draw endcaps on the tube"
                    default_value="0"/>
     <ScaleFactorEntry label="Radius"
@@ -1647,12 +1654,12 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
                  default_value="0.0 0.0 1.0"/>
     <LabeledToggle label="Use normal"
                    trace_name="UseNormal"
-                   variable="UseNormal"
+                   property="UseNormal"
                    help="Use instance model normals rather than instance normal."
                    default_value="0"/>
     <LabeledToggle label="X-Y plane"
                    trace_name="XYPlane"
-                   variable="XYPlane"
+                   property="XYPlane"
                    help="Z value is used to warp the surface, scalars to color surface."
                    default_value="0"/>
     <Documentation>
@@ -1829,7 +1836,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
     </SelectWidget>
     <LabeledToggle label="Inside Out"
                    trace_name="InsideOut"
-                   variable="InsideOut"
+                   property="InsideOut"
                    help="Switches which part to keep."
                    default_value="0"/>
     <Documentation>
@@ -1878,7 +1885,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
             set_command="ThresholdBetween"/>
     <LabeledToggle label="All Scalars"
                    trace_name="AllScalars"
-                   variable="AllScalars"
+                   property="AllScalars"
                    default_value="1"
                    help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data."/>
     <Documentation>
@@ -1935,17 +1942,17 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                   set_contour_command="SetValue"
                   help="List of current contour values." />
     <LabeledToggle label="Compute Normals"
-                   variable="ComputeNormals"
+                   property="ComputeNormals"
                    default_value="1"
                    trace_name="Compute Normals"
                    help="Select whether to compute normals" />
     <LabeledToggle label="Compute Gradients"
-                   variable="ComputeGradients"
+                   property="ComputeGradients"
                    default_value="0"
                    trace_name="Compute Gradients"
                    help="Select whether to compute gradients"/>
     <LabeledToggle label="Compute Scalars"
-                   variable="ComputeScalars"
+                   property="ComputeScalars"
                    default_value="0"
                    trace_name="Compute Scalars"
                    help="Select whether to compute scalars" />
@@ -1998,12 +2005,12 @@ The Contour filter operates on any type of data set, but the input is required t
                 help="Set the maximum number of points to glyph"/>
     <LabeledToggle label="Mask Points"
                    trace_name="MaskPoints"
-                   variable="UseMaskPoints"
+                   property="UseMaskPoints"
                    default_value="1"
                    help="Create no more than specified maximum number of glyphs" />
     <LabeledToggle label="Random Masking"
                    trace_name="RandomMask"
-                   variable="RandomMode"
+                   property="RandomMode"
                    default_value="1"
                    help="Choose points at random to mask" />
     <Documentation>
@@ -2341,7 +2348,7 @@ This filter operates on any type of data set, provided it has point-centered vec
       </Item>
     </ContainerWidget>
     <LabeledToggle label="Include boundary"
-                   variable="IncludeBoundary"
+                   property="IncludeBoundary"
                    trace_name="IncludeBoundary"
                    default_value="0"
                    help="Select whether to always include the boundary of the grid in the output"/>

@@ -23,7 +23,6 @@
 class vtkKWApplication;
 class vtkKWLabel;
 class vtkKWCheckButton;
-class vtkPVIndexWidgetProperty;
 
 class VTK_EXPORT vtkPVLabeledToggle : public vtkPVObjectWidget
 {
@@ -64,15 +63,6 @@ public:
 //ETX
   
   // Description:
-  // Set/get the property to use with this widget.
-  virtual void SetProperty(vtkPVWidgetProperty *prop);
-  virtual vtkPVWidgetProperty* GetProperty();
-  
-  // Description:
-  // Create the right property for use with this widget.
-  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
-
-  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated
@@ -92,7 +82,7 @@ protected:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Side effect is to turn modified flag off.Resources/
-  virtual void AcceptInternal(vtkClientServerID);
+  virtual void Accept();
   
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
@@ -117,8 +107,6 @@ protected:
   int DefaultValue;
   vtkSetMacro(DefaultValue, int);
 
-  vtkPVIndexWidgetProperty *Property;
-  
 private:
   vtkPVLabeledToggle(const vtkPVLabeledToggle&); // Not implemented
   void operator=(const vtkPVLabeledToggle&); // Not implemented

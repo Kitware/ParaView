@@ -181,7 +181,7 @@
         name="Capping" 
         command="SetCapping" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="1" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Cone -->
@@ -210,6 +210,14 @@
          number_of_elements="1"
          default_values="5" >
         <IntRangeDomain name="range" min="1" max="10" />
+      </IntVectorProperty>
+
+      <IntVectorProperty
+         name="GhostLevels"
+         command="SetGhostLevels"
+         number_of_elements="1"
+         default_values="0">
+        <BooleanDomain name="bool"/>
       </IntVectorProperty>
    <!-- End CTHSource -->
    </SourceProxy>
@@ -250,7 +258,7 @@
         name="Capping" 
         command="SetCapping" 
         number_of_elements="1"
-        default_values="0" > 
+        default_values="1" > 
        <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Cylinder -->
