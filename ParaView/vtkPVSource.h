@@ -106,6 +106,15 @@ public:
   void ChangeInput(const char *inputTclName);
   
   // Description:
+  // If this VTK source operates on scalars, pack the menu to choose which
+  // array to use as scalars.
+  void PackScalarsMenu();
+  
+  // Description:
+  // Tcl callback to change which array to use as scalars
+  void ChangeScalars();
+  
+  // Description:
   // This just returns the application typecast correctly.
   vtkPVApplication* GetPVApplication();  
 
@@ -255,6 +264,14 @@ protected:
   vtkPVInputMenu *InputMenu;
   vtkKWLabel *InputMenuLabel;
   vtkKWWidget *InputMenuFrame;
+  vtkKWOptionMenu *ScalarOperationMenu;
+  vtkKWLabel *ScalarOperationLabel;
+  vtkKWWidget *ScalarOperationFrame;
+  
+  char *ChangeScalarsFilterTclName;
+  char *DefaultScalarsName;
+  vtkSetStringMacro(ChangeScalarsFilterTclName);
+  vtkSetStringMacro(DefaultScalarsName);
   
   vtkPVSelectionList *LastSelectionList;
 
@@ -265,7 +282,8 @@ protected:
   vtkStringList *CancelCommands;
 
   vtkPVSourceInterface *Interface;
-
+  
+  int InstanceCount;
 };
 
 #endif

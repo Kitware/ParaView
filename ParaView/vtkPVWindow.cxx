@@ -166,8 +166,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
-  this->MenuFile->InsertCommand(2, "Save Camera", this, "Save");
-  this->MenuFile->InsertCommand(2, "Save", this, "SavePipeline");
+  this->MenuFile->InsertCommand(2, "Save Tcl script", this, "Save");
   
   // Create the menu for creating data sources.  
   this->CreateMenu->SetParent(this->GetMenu());
@@ -307,44 +306,6 @@ void vtkPVWindow::NewWindow()
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::Save()
-{
-  // Save out the camera parameters.  These are the ones used for the run-time
-  // simulation.  We may need to add other parameters later.
-  FILE *cameraFile;
-  vtkCamera *camera = this->GetMainView()->GetRenderer()->GetActiveCamera();
-  float position[3];
-  float focalPoint[3];
-  float viewUp[3];
-  float viewAngle;
-  float clippingRange[2];
-  
-  if ((cameraFile = fopen("camera.pv", "w")) == NULL)
-    {
-    vtkErrorMacro("Couldn't open file: camera.pv");
-    return;
-    }
-
-  camera->GetPosition(position);
-  camera->GetFocalPoint(focalPoint);
-  camera->GetViewUp(viewUp);
-  viewAngle = camera->GetViewAngle();
-  camera->GetClippingRange(clippingRange);
-  
-  fprintf(cameraFile, "position %.6f %.6f %.6f\n", position[0], position[1],
-	  position[2]);
-  fprintf(cameraFile, "focal_point %.6f %.6f %.6f\n", focalPoint[0],
-	  focalPoint[1], focalPoint[2]);
-  fprintf(cameraFile, "view_up %.6f %.6f %.6f\n", viewUp[0], viewUp[1],
-	  viewUp[2]);
-  fprintf(cameraFile, "view_angle %.6f\n", viewAngle);
-  fprintf(cameraFile, "clipping_range %.6f %.6f", clippingRange[0],
-	  clippingRange[1]);
-
-  fclose (cameraFile);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::SavePipeline()
 {
   ofstream *file;
   vtkCollection *sources;
@@ -634,6 +595,7 @@ void vtkPVWindow::ThresholdCallback()
 
   this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
+  threshold->PackScalarsMenu();
   threshold->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(threshold);
 
@@ -697,6 +659,7 @@ void vtkPVWindow::ContourCallback()
 
   this->GetMainView()->AddComposite(contour);
   contour->CreateProperties();
+  contour->PackScalarsMenu();
   contour->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(contour);
 
@@ -760,6 +723,7 @@ void vtkPVWindow::GlyphCallback()
 
   this->GetMainView()->AddComposite(glyph);
   glyph->CreateProperties();
+  glyph->PackScalarsMenu();
   glyph->CreateInputList("vtkDataSet");
   this->SetCurrentPVSource(glyph);
 
@@ -1198,7 +1162,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- Contour ----.
+  // ---- SingleContour ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
@@ -1206,6 +1170,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetRootName("SingleContour");
   sInt->SetInputClassName("vtkDataSet");
   sInt->SetOutputClassName("vtkPolyData");
+  sInt->DefaultScalarsOn();
   // Method
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Value");
@@ -1344,7 +1309,7 @@ void vtkPVWindow::ReadSourceInterfaces()
 
   // ============= PolyData to PolyData Filters ==============
   
-  // ---- Cut Plane ----.
+  // ---- ClipPlane ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
@@ -1414,6 +1379,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetRootName("ClipScalars");
   sInt->SetInputClassName("vtkPolyData");
   sInt->SetOutputClassName("vtkPolyData");
+  sInt->DefaultScalarsOn();
   // Method
   mInt = vtkPVMethodInterface::New();
   mInt->SetVariableName("Value");
@@ -1671,7 +1637,7 @@ void vtkPVWindow::ReadSourceInterfaces()
 
   // UnstructuredGrid to UnstructuredGrid Filters
 
-  // ---- ExtractPolyDataPiece ----.
+  // ---- ExtractUnstructuredGridPiece ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
@@ -1797,7 +1763,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
-  // ---- ExtractEdges ----.
+  // ---- ElevationFilter ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);

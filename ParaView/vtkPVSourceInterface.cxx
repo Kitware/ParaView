@@ -40,7 +40,8 @@ vtkPVSourceInterface::vtkPVSourceInterface()
   this->RootName = NULL;
   this->InputClassName = NULL;
   this->OutputClassName = NULL;
-
+  this->DefaultScalars = 0;
+  
   this->MethodInterfaces = vtkCollection::New();
 
   this->CommandFunction = vtkPVSourceInterfaceCommand;
@@ -120,6 +121,11 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   // Add the new Source to the View, and make it current.
   this->PVWindow->GetMainView()->AddComposite(pvs);
   pvs->CreateProperties();
+  if (this->DefaultScalars)
+    {
+    pvs->PackScalarsMenu();
+    }
+  
   pvs->CreateInputList(this->InputClassName);
   this->PVWindow->SetCurrentPVSource(pvs);
 

@@ -246,35 +246,80 @@ void vtkPVThreshold::Save(ofstream *file)
   char *charFound;
   int pos;
   
+  if (this->DefaultScalarsName)
+    {
+    *file << "vtkSimpleFieldDataToAttributeDataFilter "
+          << this->ChangeScalarsFilterTclName << "\n\t"
+          << this->ChangeScalarsFilterTclName << " SetInput [";
+    if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                "EnSight", 7) == 0)
+      {
+      char *charFound;
+      int pos;
+      char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+      
+      sprintf(sourceTclName, "EnSightReader");
+      tempName = strtok(dataName, "O");
+      strcat(sourceTclName, tempName+7);
+      *file << sourceTclName << " GetOutput ";
+      charFound = strrchr(dataName, 't');
+      pos = charFound - dataName + 1;
+      *file << dataName+pos << "]\n\t";
+      }
+    else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                     "DataSet", 7) == 0)
+      {
+      sprintf(sourceTclName, "DataSetReader");
+      tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+      strcat(sourceTclName, tempName+7);
+      *file << sourceTclName << " GetOutput]\n\t";
+      }
+    else
+      {
+      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+            << " GetOutput]\n\t";
+      }
+    *file << this->ChangeScalarsFilterTclName << " SetFieldName "
+          << this->DefaultScalarsName << "\n\n";
+    }
+
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n";
   
   *file << "\t" << this->VTKSourceTclName << " SetInput [";
-  if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-              "EnSight", 7) == 0)
+
+  if (!this->DefaultScalarsName)
     {
-    char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
-    
-    sprintf(sourceTclName, "EnSightReader");
-    tempName = strtok(dataName, "O");
-    strcat(sourceTclName, tempName+7);
-    *file << sourceTclName << " GetOutput ";
-    charFound = strrchr(dataName, 't');
-    pos = charFound - dataName + 1;
-    *file << dataName+pos << "]\n\t";
-    }
-  else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                   "DataSet", 7) == 0)
-    {
-    sprintf(sourceTclName, "DataSetReader");
-    tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
-    strcat(sourceTclName, tempName+7);
-    *file << sourceTclName << " GetOutput]\n\t";
+    if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                "EnSight", 7) == 0)
+      {
+      char *dataName = this->GetNthPVInput(0)->GetVTKDataTclName();
+      
+      sprintf(sourceTclName, "EnSightReader");
+      tempName = strtok(dataName, "O");
+      strcat(sourceTclName, tempName+7);
+      *file << sourceTclName << " GetOutput ";
+      charFound = strrchr(dataName, 't');
+      pos = charFound - dataName + 1;
+      *file << dataName+pos << "]\n\t";
+      }
+    else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
+                     "DataSet", 7) == 0)
+      {
+      sprintf(sourceTclName, "DataSetReader");
+      tempName = strtok(this->GetNthPVInput(0)->GetVTKDataTclName(), "O");
+      strcat(sourceTclName, tempName+7);
+      *file << sourceTclName << " GetOutput]\n\t";
+      }
+    else
+      {
+      *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
+            << " GetOutput]\n\t";
+      }
     }
   else
     {
-    *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
-          << " GetOutput]\n\t";
+    *file << this->ChangeScalarsFilterTclName << " GetOutput]\n\t";
     }
   
   *file << this->VTKSourceTclName << " SetAttributeModeToUse";

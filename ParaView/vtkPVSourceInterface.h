@@ -62,6 +62,12 @@ public:
   vtkGetStringMacro(OutputClassName);
   
   // Description:
+  // Does this filter operate on scalars?
+  vtkBooleanMacro(DefaultScalars, int);
+  vtkGetMacro(DefaultScalars, int);
+  vtkSetMacro(DefaultScalars, int);
+  
+  // Description:
   // Access to the method interfaces.
   void AddMethodInterface(vtkPVMethodInterface *methonInt);
   vtkCollection *GetMethodInterfaces() {return this->MethodInterfaces;}
@@ -95,6 +101,8 @@ protected:
   char *SourceClassName;
   char *InputClassName;
   char *OutputClassName;
+
+  int DefaultScalars;
   
   vtkCollection *MethodInterfaces;
   

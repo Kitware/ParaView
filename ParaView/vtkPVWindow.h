@@ -107,13 +107,8 @@ public:
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   
   // Description:
-  // Save the camera parameters.
+  // Save the pipeline as a tcl script.
   void Save();
-
-  // Description:
-  // Callback from the file menu.
-  // Save the pipeline.
-  void SavePipeline();
 
   // Description:
   // Callback from the calculator button.
