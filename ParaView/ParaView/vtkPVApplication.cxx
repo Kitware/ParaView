@@ -101,7 +101,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.245");
+vtkCxxRevisionMacro(vtkPVApplication, "1.246");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -330,6 +330,7 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc,
 //----------------------------------------------------------------------------
 vtkPVApplication::vtkPVApplication()
 {
+  vtkPVApplication::MainApplication = this;
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   this->OutputWindow = window;
   vtkOutputWindow::SetInstance(this->OutputWindow);
@@ -1697,7 +1698,6 @@ void vtkPVApplication::LogEndEvent(char* str)
 //----------------------------------------------------------------------------
 void vtkPVApplication::SetupTrapsForSignals(int nodeid)
 {
-  vtkPVApplication::MainApplication = this;
 #ifndef _WIN32
   signal(SIGHUP, vtkPVApplication::TrapsForSignals);
 #endif
@@ -1989,5 +1989,11 @@ void vtkPVApplication::EnableTestErrors()
 void vtkPVApplication::DisableTestErrors()
 {
   this->OutputWindow->DisableTestErrors();
+}
+
+void vtkPVApplication::Abort()
+{
+  vtkPVApplication::MainApplication->OutputWindow->FlushErrors(cerr);
+  abort();
 }
 

@@ -331,10 +331,15 @@ public:
   void DisableTestErrors();
 
   // Description:
-  // This is a debug feature of ParaView. If this is set, ParaView will crash on errors.
+  // This is a debug feature of ParaView. If this is set, ParaView will crash
+  // on errors.
   vtkSetClampMacro(CrashOnErrors, int, 0, 1);
   vtkBooleanMacro(CrashOnErrors, int);
   vtkGetMacro(CrashOnErrors, int);
+
+  // Description:
+  // Abort execution and display errors.
+  static void Abort();
 
 protected:
   vtkPVApplication();
