@@ -165,8 +165,8 @@
   <VectorEntry label="Start Theta" trace_name="Start Theta" variable="StartTheta" type="float" help="Set the starting angle in the longitude direction" default_value="0.0" data_range="0 360"/>
   <VectorEntry label="End Theta" trace_name="End Theta" variable="EndTheta" type="float" help="Set the ending angle in the longitude direction" default_value="360.0" data_range="0 360"/>
   <VectorEntry label="Phi Resolution" trace_name="Phi Resolution" variable="PhiResolution" type="int" help="Set the number of points in the latitude direction (ranging from Start Phi to End Phi)" default_value="8" data_range="0 1024"/>
-  <VectorEntry label="Start Phi" trace_name="Start Phi" variable="StartPhi" type="float" help="Set the starting angle in the latitude direction" default_value="0.0" data_range="0 360"/>
-  <VectorEntry label="End Phi" trace_name="End Phi" variable="EndPhi" type="float" help="Set the ending angle in the latitude direction" default_value="180.0" data_range="0 360"/>
+  <VectorEntry label="Start Phi" trace_name="Start Phi" variable="StartPhi" type="float" help="Set the starting angle in the latitude direction" default_value="0.0" data_range="0 180"/>
+  <VectorEntry label="End Phi" trace_name="End Phi" variable="EndPhi" type="float" help="Set the ending angle in the latitude direction" default_value="180.0" data_range="0 180"/>
 </Module>
 
 <Module name="SuperquadricSource" menu_name="Superquadric" root_name="SQuad" module_type="Source" 
