@@ -95,6 +95,11 @@ public:
   // name of the method to be called and any arguments in string form.
   // The calling is done via TCL wrappers for the KWObject.
   virtual void SetCommand( vtkKWObject* Object, const char* MethodAndArgString);
+  
+  // Description:
+  // A method to set binding on the object
+  void SetBind(vtkKWObject* CalledObject, const char *Event, const char *CommandString);
+
   // Description: a method to create a callback string from a KWObject.
   // The caller is resposible for deleting the returned string.  
   char* CreateCommand(vtkKWObject* Object, const char* MethodAndArgString);
