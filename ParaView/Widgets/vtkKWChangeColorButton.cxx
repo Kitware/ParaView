@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.30");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.31");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -247,9 +247,14 @@ void vtkKWChangeColorButton::UpdateColorButton()
     }
   else
     {
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 3)
+    this->Script("%s configure -bg #808080", 
+                 this->ColorButton->GetWidgetName());
+#else
     this->Script("%s configure -bg [%s cget -disabledforeground] ", 
                  this->ColorButton->GetWidgetName(), 
                  this->ColorButton->GetWidgetName());
+#endif   
     }
 }
 
@@ -486,7 +491,7 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.30 $");
+  this->ExtractRevision(os,"$Revision: 1.31 $");
 }
 
 //----------------------------------------------------------------------------
