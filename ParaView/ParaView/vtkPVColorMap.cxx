@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.37");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.38");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1306,8 +1306,8 @@ void vtkPVColorMap::SetScalarRangeInternal(float min, float max)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
 
-  this->ColorRangeMinEntry->SetValue(this->ScalarRange[0], 5);
-  this->ColorRangeMaxEntry->SetValue(this->ScalarRange[1], 5);
+  this->ColorRangeMinEntry->SetValue(min, 5);
+  this->ColorRangeMaxEntry->SetValue(max, 5);
 
   if (this->ScalarRange[0] == min && this->ScalarRange[1] == max)
     {
