@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.73");
+vtkCxxRevisionMacro(vtkKWWidget, "1.74");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -224,7 +224,7 @@ void vtkKWWidget::RemoveChild(vtkKWWidget *w)
 //----------------------------------------------------------------------------
 void vtkKWWidget::UnRegister(vtkObjectBase *o)
 {
-  if (!this->DeletingChildren)
+  if (!this->DeletingChildren && this->Children)
     {
     // delete the children if we are about to be deleted
     if (this->ReferenceCount == this->Children->GetNumberOfItems() + 1)
@@ -347,7 +347,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.73 $");
+  this->ExtractRevision(os,"$Revision: 1.74 $");
 }
 
 //----------------------------------------------------------------------------
