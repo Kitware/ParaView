@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.8");
 
 int vtkPVImplicitPlaneWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -245,17 +245,23 @@ void vtkPVImplicitPlaneWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::Accept()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   this->PlaceWidget();
   static_cast<vtkImplicitPlaneWidget*>(this->Widget3D)->SetDrawPlane(0);
 
+  // I guess this should be done in the initialization.
+  if (this->VariableName && this->ObjectTclName)
+    {
+    pvApp->BroadcastScript("%s Set%s %s", this->ObjectTclName,
+                           this->VariableName, this->PlaneTclName);                   
+    }
   if ( ! this->ModifiedFlag)
     {
     return;
     }
   if ( this->PlaneTclName )
     {
-    vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-      this->Application);
     float val[3];
     int cc;
     for ( cc = 0; cc < 3; cc ++ )
@@ -278,7 +284,7 @@ void vtkPVImplicitPlaneWidget::Accept()
                            val[0], val[1], val[2]);
     this->AddTraceEntry("$kw(%s) SetNormal %f %f %f", 
                         this->GetTclName(), val[0], val[1], val[2]);
-                        
+     
     }
 
   this->Superclass::Accept();

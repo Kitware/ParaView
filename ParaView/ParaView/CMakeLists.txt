@@ -4,6 +4,7 @@ vtkBalancedRedistributePolyData.cxx
 vtkClientCompositeManager.cxx
 vtkCompositeProp.cxx
 vtkDuplicatePolyData.cxx
+vtkExtractCTHPart.cxx
 vtkRedistributePolyData.cxx
 vtkWeightedRedistributePolyData.cxx
 vtkKWBoundsDisplay.cxx
