@@ -43,7 +43,7 @@ public:
   
   // Description:
   // Add text to the button
-  void SetButtonText(char *text);
+  void SetButtonText(const char *text);
   
   // Description: 
   // Append a standard menu item and command to the current menu.

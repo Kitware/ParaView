@@ -29,9 +29,6 @@ ClientData vtkInteractorStylePlaneSourceNewCommand();
 int vtkInteractorStyleSphereCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorStyleSphereNewCommand();
-int vtkKWRenderViewCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkKWRenderViewNewCommand();
 int vtkParallelDecimateCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkParallelDecimateNewCommand();
@@ -188,8 +185,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkInteractorStylePlaneSourceCommand);
   vtkTclCreateNew(interp,"vtkInteractorStyleSphere", vtkInteractorStyleSphereNewCommand,
                   vtkInteractorStyleSphereCommand);
-  vtkTclCreateNew(interp,"vtkKWRenderView", vtkKWRenderViewNewCommand,
-                  vtkKWRenderViewCommand);
   vtkTclCreateNew(interp,"vtkParallelDecimate", vtkParallelDecimateNewCommand,
                   vtkParallelDecimateCommand);
   vtkTclCreateNew(interp,"vtkPVActorComposite", vtkPVActorCompositeNewCommand,

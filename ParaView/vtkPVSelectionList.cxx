@@ -36,13 +36,22 @@ vtkPVSelectionList::vtkPVSelectionList()
 {
   this->CommandFunction = vtkPVSelectionListCommand;
 
-  this->Value = 0;
-  this->Label = NULL;
+  this->CurrentValue = 0;
+  this->CurrentName = NULL;
+  
+  this->MenuButton = vtkPVMenuButton::New();
+  this->Label = vtkKWLabel::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVSelectionList::~vtkPVSelectionList()
 {
+  this->SetCurrentName(NULL);
+  
+  this->MenuButton->Delete();
+  this->MenuButton = NULL;
+  this->Label->Delete();
+  this->Label = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -54,39 +63,47 @@ vtkPVSelectionList* vtkPVSelectionList::New()
 //----------------------------------------------------------------------------
 int vtkPVSelectionList::Create(vtkKWApplication *app)
 {
-  if (this->Application == NULL)
+  if (this->Application != NULL)
     {
-    vtkErrorMacro("Object has not been cloned yet.");
+    vtkErrorMacro("Object has already been created.");
     return 0;
     }
   this->SetApplication(app);
   
   // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), "");
+  this->Script("frame %s", this->GetWidgetName());
 
-  //this->Script("pack %s", this->ActorCompositeButton->GetWidgetName());
+  this->Label->SetParent(this);
+  this->Label->Create(app, "");
+  this->Script("pack %s -side left", this->Label->GetWidgetName());
+
+  this->MenuButton->SetParent(this);
+  this->MenuButton->Create(app, "");
+  this->Script("pack %s -side left", this->MenuButton->GetWidgetName());
 
   return 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::AddItem(char *name, int value)
+void vtkPVSelectionList::AddItem(const char *name, int value)
 {
+  char tmp[1024];
+  
+  sprintf(tmp, "SelectCallback %s %d", name, value);
+  this->MenuButton->AddCommand(name, this, tmp);
+  
+  if (value == this->CurrentValue)
+    {
+    this->MenuButton->SetButtonText(name);
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSelectionList::SetValue(int value)
+void vtkPVSelectionList::SelectCallback(const char *name, int value)
 {
-}
-
-//----------------------------------------------------------------------------
-int vtkPVSelectionList::GetValue()
-{
-  return this->Value;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSelectionList::SetLabel(char *label)
-{
+  this->SetCurrentValue(value);
+  this->SetCurrentName(name);
+  
+  this->MenuButton->SetButtonText(name);
 }
 

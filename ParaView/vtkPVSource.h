@@ -53,8 +53,8 @@ public:
   // Description:
   // This duplicates the object in the satellite processes.
   // They will all have the same tcl name.
-  void Clone(vtkPVApplication *app);
-    
+  virtual void Clone(vtkPVApplication *app);
+  
   // Description:
   // Get the Window for this class.
   vtkPVWindow *GetWindow();

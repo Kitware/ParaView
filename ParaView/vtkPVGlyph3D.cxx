@@ -27,13 +27,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVGlyph3D.h"
-#include "vtkPVApplication.h"
-#include "vtkPVRenderView.h"
-#include "vtkPVWindow.h"
-#include "vtkPVPolyData.h"
-#include "vtkPVActorComposite.h"
+#include "vtkGlyph3D.h"
 #include "vtkPVConeSource.h"
-#include "vtkPVAssignment.h"
+#include "vtkPVPolyData.h"
+#include "vtkPVApplication.h"
+#include "vtkPVWindow.h"
+#include "vtkPVActorComposite.h"
+#include "vtkKWView.h"
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
 			int argc, char *argv[]);
@@ -41,39 +41,17 @@ int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVGlyph3D::vtkPVGlyph3D()
 {
+  vtkGlyph3D *g;
+  
   this->CommandFunction = vtkPVGlyph3DCommand;
   
-  this->GlyphSourceButton = vtkKWPushButton::New();
-  this->GlyphSourceButton->SetParent(this->Properties);
-  //this->ScaleFactorEntry = vtkKWLabeledEntry::New();
-  //this->ScaleFactorEntry->SetParent(this->Properties);
-  this->SourceButton = vtkKWPushButton::New();
-  this->SourceButton->SetParent(this->Properties);
-  this->Accept = vtkKWPushButton::New();
-  this->Accept->SetParent(this->Properties);
+  g = vtkGlyph3D::New();
+  // This default should really be set up looking at the input. 
+  g->SetVectorModeToUseNormal();
+  this->SetVTKSource(g);
+  g->Delete();
   
-  this->Glyph = vtkGlyph3D::New();
-  this->Glyph->SetVectorModeToUseNormal();
-
-
-}
-
-//----------------------------------------------------------------------------
-vtkPVGlyph3D::~vtkPVGlyph3D()
-{
-  this->GlyphSourceButton->Delete();
-  this->GlyphSourceButton = NULL;
-  //this->ScaleFactorEntry->Delete();
-  //this->ScaleFactorEntry = NULL;
-  this->SourceButton->Delete();
-  this->SourceButton = NULL;
-  this->Accept->Delete();
-  this->Accept = NULL;
-  
-  this->Glyph->Delete();
-  this->Glyph = NULL;
-
-
+  this->Source = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -83,53 +61,33 @@ vtkPVGlyph3D* vtkPVGlyph3D::New()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVGlyph3D::CreateProperties()
+void vtkPVGlyph3D::AcceptCallback()
 {
-  // must set the application
-  this->vtkPVSource::CreateProperties();
+  vtkPVConeSource *cone;
   
-  this->GlyphSourceButton->Create(this->Application, "-text GetGlyphSource");
-  this->GlyphSourceButton->SetCommand(this, "ShowGlyphSource");
-  
-  //this->ScaleFactorEntry->Create(this->Application);
-  //this->ScaleFactorEntry->SetValue(1, 2);
-  //this->ScaleFactorEntry->SetLabel("Scale Factor:");
-  this->Accept->Create(this->Application, "-text Accept");
-  this->Accept->SetCommand(this, "ScaleFactorChanged");
-  this->SourceButton->Create(this->Application, "-text GetSource");
-  this->SourceButton->SetCommand(this, "GetSource");
-  
-  this->Script("pack %s %s %s",
-	       this->SourceButton->GetWidgetName(),
-	       this->GlyphSourceButton->GetWidgetName(),
-	       this->Accept->GetWidgetName());
-	       //this->ScaleFactorEntry->GetWidgetName();
-  
-  this->AddLabeledEntry("Scale Factor:", "SetScaleFactor", "GetScaleFactor");
-  // I suppose we should check to see if the data has normals or vectors.
-  this->AddLabeledToggle("Orient:", "SetOrient", "GetOrient");
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetInput(vtkPVData *pvData)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+  if (this->Source == NULL)
     {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetTclName(),
-			   pvData->GetTclName());
-    }  
-  
-  this->GetGlyph()->SetInput(pvData->GetData());
-  this->Input = pvData;
+    cone = vtkPVConeSource::New();
+    cone->Clone(this->GetPVApplication());
+    cone->SetName("glyphCone");
+    this->GetWindow()->GetMainView()->AddComposite(cone);
+    this->GetWindow()->SetCurrentSource(cone);
+
+    cone->AcceptCallback();
+    this->SetSource(cone->GetPVOutput());
+    cone->GetPVOutput()->GetActorComposite()->SetVisibility(0);
+    }
+
+  this->vtkPVDataSetToPolyDataFilter::AcceptCallback();  
 }
 
 //----------------------------------------------------------------------------
 void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkGlyph3D *f;
+  
+  f = vtkGlyph3D::SafeDownCast(this->GetVTKSource());
   
   if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
     {
@@ -137,182 +95,41 @@ void vtkPVGlyph3D::SetSource(vtkPVPolyData *pvData)
 			   pvData->GetTclName());
     }  
   
-  this->GetGlyph()->SetSource(pvData->GetPolyData());
+  f->SetSource(pvData->GetPolyData());
+  
+  // All inputs should be stored in vtkPVSource (like vtk).
+  // Get rid of this ivar.
+  this->Source = pvData;
 }
+
 
 //----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetPVOutput(vtkPVPolyData *pvd)
+void vtkPVGlyph3D::CreateProperties()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
+  // must set the application
+  this->vtkPVDataSetToPolyDataFilter::CreateProperties();
+
+  this->AddLabeledToggle("Scaling:", "SetScaling", "GetScaling");
+  this->AddLabeledEntry("ScaleFactor:", "SetScaleFactor", "GetScaleFactor");
+  this->AddVector2Entry("ScalarRange:", "Min", "Max", "SetRange", "GetRange");
+  this->AddLabeledToggle("Clamping:", "SetClamping", "GetClamping");
+  this->AddModeList("ScaleMode:", "SetScaleMode", "GetScaleMode");
+  this->AddModeListItem("Scalar", 0);
+  this->AddModeListItem("Vector", 1);
+  this->AddModeListItem("VectorComponents", 2);
+  this->AddModeListItem("Off", 3);
   
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetPVOutput %s", this->GetTclName(),
-			   pvd->GetTclName());
-    }  
+  this->AddLabeledToggle("Orient:", "SetOrient", "GetOrient");
+  this->AddModeList("OrientMode:", "SetVectorMode", "GetVectorMode");
+  this->AddModeListItem("Vector", 0);
+  this->AddModeListItem("Normal", 1);
+  this->AddModeListItem("Off", 2);
+
+  this->AddModeList("ColorMode:", "SetColorMode", "GetColorMode");
+  this->AddModeListItem("Scale", 0);
+  this->AddModeListItem("Scalar", 1);
+  this->AddModeListItem("Vector", 2);
   
-  this->SetPVData(pvd);  
-  pvd->SetData(this->Glyph->GetOutput());
 }
 
-//----------------------------------------------------------------------------
-vtkPVPolyData *vtkPVGlyph3D::GetPVOutput()
-{
-  return vtkPVPolyData::SafeDownCast(this->PVOutput);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetGlyphSource(vtkPVSource *comp)
-{
-  this->GlyphSource = comp;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetScaleModeToDataScalingOff()  
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetScaleModeToDataScalingOff", 
-			   this->GetTclName());
-    }
-  
-  this->GetGlyph()->SetScaleModeToDataScalingOff();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetScaleFactor(float factor)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
-    {
-    pvApp->BroadcastScript("%s SetScaleFactor %f", this->GetTclName(),
-			   factor);
-    }  
-  
-  this->GetGlyph()->SetScaleFactor(factor);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGlyph3D::ShowGlyphSource()
-{
-  vtkPVWindow *window = 
-		vtkPVWindow::SafeDownCast(this->GetView()->GetParentWindow());
-  
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
-  window->SetCurrentSource(this->GlyphSource);
-  this->GlyphSource->GetPVData()->GetActorComposite()->VisibilityOn();
-  this->GlyphSource->GetView()->Render();
-  window->GetSourceList()->Update();
-  
-  window->GetMainView()->ResetCamera();
-}
-
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void StartGlyphProgress(void *arg)
-{
-  vtkPVGlyph3D *me = (vtkPVGlyph3D*)arg;
-  me->GetWindow()->SetStatusText("Processing Glyph");
-}
-
-//----------------------------------------------------------------------------
-void GlyphProgress(void *arg)
-{
-  vtkPVGlyph3D *me = (vtkPVGlyph3D*)arg;
-  me->GetWindow()->GetProgressGauge()->SetValue((int)(me->GetGlyph()->GetProgress() * 100));
-}
-
-//----------------------------------------------------------------------------
-void EndGlyphProgress(void *arg)
-{
-  vtkPVGlyph3D *me = (vtkPVGlyph3D*)arg;
-  me->GetWindow()->SetStatusText("");
-  me->GetWindow()->GetProgressGauge()->SetValue(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGlyph3D::ScaleFactorChanged()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
-  vtkPVWindow *window = this->GetWindow();
-  vtkPVActorComposite *ac;
-
-  // ####
-  int i;
-  for (i = 0; i < this->NumberOfAcceptCommands; ++i)
-    {
-    this->Script(this->AcceptCommands[i]);
-    }
-  // ####
-  
-  //this->SetScaleFactor(this->ScaleFactorEntry->GetValueAsFloat());
-  
-  if (this->GetPVData() == NULL)
-    { // This is the first time.  Create the data.
-    vtkPVConeSource *cone;
-    vtkPVPolyData *coneOut;
-    vtkPVAssignment *coneAssignment;
-
-    this->GetGlyph()->SetStartMethod(StartGlyphProgress, this);
-    this->GetGlyph()->SetProgressMethod(GlyphProgress, this);
-    this->GetGlyph()->SetEndMethod(EndGlyphProgress, this);
-    
-    // Here we are creating our own glyph source.
-    // In the future this may be set in the UI.
-    cone = vtkPVConeSource::New();
-    cone->Clone(pvApp);
-    cone->SetName("glyph cone");
-    this->SetGlyphSource(cone);
-    window->GetMainView()->AddComposite(cone);
-    window->SetCurrentSource(cone);
-    // Accept
-    coneOut = vtkPVPolyData::New();
-    coneOut->Clone(pvApp);
-    coneAssignment = vtkPVAssignment::New();
-    coneAssignment->Clone(pvApp);
-    coneOut->SetAssignment(coneAssignment);
-    cone->SetPVOutput(coneOut);
-    cone->CreateDataPage();
-    window->GetMainView()->AddComposite(coneOut->GetActorComposite());
-    coneOut->GetActorComposite()->VisibilityOff();
-    cone->Delete();
-    cone = NULL;
-    this->SetSource(coneOut);
-    coneOut->Delete();
-    coneOut = NULL;
-    coneAssignment->Delete();
-    coneAssignment = NULL;
-
-    // Create our own output.
-    pvd = vtkPVPolyData::New();
-    pvd->Clone(pvApp);
-    this->SetPVOutput(pvd);
-    a = this->GetInput()->GetAssignment();
-    pvd->SetAssignment(a);
-    this->GetInput()->GetActorComposite()->VisibilityOff();
-    this->CreateDataPage();
-    ac = this->GetPVData()->GetActorComposite();
-    window->GetMainView()->AddComposite(ac);
-    window->GetSourceList()->Update();
-    }
-  
-  window->GetMainView()->SetSelectedComposite(this);
-  this->GetView()->Render();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVGlyph3D::GetSource()
-{
-  this->GetPVData()->GetActorComposite()->VisibilityOff();
-  this->GetWindow()->GetMainView()->
-    SetSelectedComposite(this->GetInput()->GetPVSource());
-  this->GetInput()->GetActorComposite()->VisibilityOn();
-  this->GetView()->Render();
-  this->GetWindow()->GetMainView()->ResetCamera();
-}
 

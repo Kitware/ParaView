@@ -37,7 +37,6 @@ vtkPVMenuButton::vtkPVMenuButton()
   this->CommandFunction = vtkPVMenuButtonCommand;
   
   this->Menu = vtkKWMenu::New();
-  this->Menu->SetParent(this);
 }
 
 vtkPVMenuButton::~vtkPVMenuButton()
@@ -61,6 +60,8 @@ vtkPVMenuButton* vtkPVMenuButton::New()
 
 void vtkPVMenuButton::Create(vtkKWApplication *app, char *args)
 { 
+  char tmp[500];
+  
   // must set the application
   if (this->Application)
     {
@@ -68,14 +69,16 @@ void vtkPVMenuButton::Create(vtkKWApplication *app, char *args)
     return;
     }
   this->SetApplication(app);
-  
-  this->Script("menubutton %s -menu %s", this->GetWidgetName(),
-	       this->Menu->GetWidgetName());
 
-  this->Menu->Create(app, "");
+  this->Menu->SetParent(this);
+  this->Script("menubutton %s -menu %s -relief raised -bd 2", 
+	       this->GetWidgetName(), this->Menu->GetWidgetName());
+
+  this->Menu->Create(app, "");  
+  
 }
 
-void vtkPVMenuButton::SetButtonText(char *text)
+void vtkPVMenuButton::SetButtonText(const char *text)
 {
     this->Script("%s configure -text {%s}",
 		 this->GetWidgetName(), text);

@@ -35,6 +35,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #define __vtkPVSelectionList_h
 
 #include "vtkKWWidget.h"
+#include "vtkKWLabel.h"
+#include "vtkPVMenuButton.h"
 
 
 class VTK_EXPORT vtkPVSelectionList : public vtkKWWidget
@@ -51,23 +53,37 @@ public:
   // Add items to the possible selection.
   // The string name is displayed in the list, and the integer value
   // is used to set and get the current selection programmatically.
-  void AddItem(char *name, int value);
-  void SetValue(int value);
-  int GetValue();
+  void AddItem(const char *name, int value);
   
   // Description:
   // A label is placed in from of the menu button.
-  void SetLabel(char *label);
-  char *GetLabel() {return this->Label;}
+  void SetLabel(const char *label) {this->Label->SetLabel(label);}
+  const char *GetLabel() {return this->Label->GetLabel();}
+
+  // Description:
+  // This is how the user can query the stat of the selection.
+  // Warning:  Setting the current value will not change the label.
+  vtkGetMacro(CurrentValue, int);
+  vtkSetMacro(CurrentValue, int);
+  vtkGetStringMacro(CurrentName);
+  
+  // Description:
+  // This method gets called when the user selects an entry/
+  void SelectCallback(const char *name, int value);
   
 protected:
   vtkPVSelectionList();
   ~vtkPVSelectionList();
   vtkPVSelectionList(const vtkPVSelectionList&) {};
   void operator=(const vtkPVSelectionList&) {};
+
+  vtkKWLabel *Label;
+  vtkPVMenuButton *MenuButton;
+
+  int CurrentValue;
+  char *CurrentName;
+  vtkSetStringMacro(CurrentName);
   
-  int Value;
-  char *Label;
 };
 
 #endif

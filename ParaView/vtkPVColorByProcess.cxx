@@ -28,8 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVColorByProcess.h"
 #include "vtkPVApplication.h"
-#include "vtkKWView.h"
-#include "vtkKWRenderView.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVImageData.h"
 #include "vtkPVWindow.h"

@@ -153,8 +153,6 @@ void vtkPVPolyData::Glyph()
   glyph->Clone(pvApp);
   
   glyph->SetInput(this);
-  glyph->SetScaleModeToDataScalingOff();
-  
   glyph->SetName("glyph");
  
   this->GetPVSource()->GetView()->AddComposite(glyph);

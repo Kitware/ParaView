@@ -29,72 +29,33 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVGlyph3D_h
 #define __vtkPVGlyph3D_h
 
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWPushButton.h"
-#include "vtkGlyph3D.h"
-#include "vtkPVSource.h"
+#include "vtkPVDataSetToPolyDataFilter.h"
 
-class vtkPVPolyData;
-
-
-class VTK_EXPORT vtkPVGlyph3D : public vtkPVSource
+class VTK_EXPORT vtkPVGlyph3D : public vtkPVDataSetToPolyDataFilter
 {
 public:
   static vtkPVGlyph3D* New();
-  vtkTypeMacro(vtkPVGlyph3D, vtkPVSource);
+  vtkTypeMacro(vtkPVGlyph3D, vtkPVDataSetToPolyDataFilter);
 
+  // Description:
+  // This is here to create the default source.
+  void AcceptCallback();
+  
+  // Description:
+  // Parallel method to set the source.
+  void SetSource(vtkPVPolyData *source);
+    
   // Description:
   // You have to clone this object before you create its UI.
   void CreateProperties();
 
-  // Description:
-  // This method executes in every process.
-  void SetInput(vtkPVData *input);
-  void SetSource(vtkPVPolyData *source);
-  
-  // Description:
-  // This method executes in every process.
-  void SetScaleFactor(float factor);
-
-  // Description:
-  // For now you have to set the output explicitly.  This allows you to manage
-  // the object creation/tcl-names in the other processes.
-  void SetPVOutput(vtkPVPolyData *pvd);
-  vtkPVPolyData *GetPVOutput();  
-  
-  vtkGetObjectMacro(Glyph, vtkGlyph3D);
-  
-  vtkGetObjectMacro(GlyphSource, vtkPVSource);
-  void SetGlyphSource(vtkPVSource *comp);
-  
-  // Description:
-  // Propagated to all processes.
-  void SetScaleModeToDataScalingOff();  
-  
-  void ShowGlyphSource();
-  void ScaleFactorChanged();
-  void GetSource();
- 
-  // Description:
-  // Needed by the helper method above.
-  // This should be pushed up to vtkPVSource ...
-  vtkSource *GetVTKSource() { return this->Glyph;}
-
 protected:
   vtkPVGlyph3D();
-  ~vtkPVGlyph3D();
+  ~vtkPVGlyph3D() {};
   vtkPVGlyph3D(const vtkPVGlyph3D&) {};
   void operator=(const vtkPVGlyph3D&) {};
   
-  vtkKWPushButton *GlyphSourceButton;
-  vtkKWLabeledEntry *ScaleFactorEntry;
-  vtkKWPushButton *Accept;
-  vtkKWPushButton *SourceButton;
-
-  vtkGlyph3D *Glyph;
-  vtkPVSource *GlyphSource;
-
-  
+  vtkPVData *Source;
 };
 
 #endif

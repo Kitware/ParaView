@@ -24,7 +24,6 @@ vtkInteractorStyleImageExtent \
 vtkInteractorStylePlane \
 vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
-vtkKWRenderView \
 vtkParallelDecimate \
 vtkPVActorComposite \
 vtkPVApplication \

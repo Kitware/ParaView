@@ -1026,13 +1026,13 @@ void vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd)
   this->Widgets->AddItem(sl);
   sl->SetParent(this->ParameterFrame->GetFrame());
   sl->Create(this->Application);  
-  this->Script("pack %s -side left", sl->GetWidgetName());
+  this->Script("pack %s", sl->GetWidgetName());
     
-  this->Script("%s SetValue [[%s GetVTKSource] %s]",
+  this->Script("%s SetCurrentValue [[%s GetVTKSource] %s]",
 	       sl->GetTclName(), this->GetTclName(), getCmd);
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AddAcceptCommand("%s AcceptHelper %s [%s GetValue]",
+  this->AddAcceptCommand("%s AcceptHelper %s [%s GetCurrentValue]",
 			 this->GetTclName(), setCmd, sl->GetTclName());
   
   // Save this selection list so the user can add items to it.
@@ -1107,7 +1107,6 @@ void vtkPVSource::AcceptHelper(char *method, char *args)
 
   vtkDebugMacro("[" << this->GetTclName() << " GetVTKSource] " 
                 << method << " " << args);
-
 
   pvApp->BroadcastScript("[%s GetVTKSource] %s %s", this->GetTclName(),
                          method, args);

@@ -129,7 +129,7 @@ int vtkPVData::Create(char *args)
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
 
-  this->Update();
+  //this->Update();
   
   this->FiltersMenuButton->SetParent(this);
   this->FiltersMenuButton->Create(this->Application, "");
