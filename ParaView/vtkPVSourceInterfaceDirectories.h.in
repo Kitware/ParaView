@@ -1,6 +1,7 @@
-#define vtkPV_SOURCE_CONFIG_DIR "${PARAVIEW_SOURCE_DIR}/Config"
+#define VTK_PV_SOURCE_CONFIG_DIR "${PARAVIEW_SOURCE_DIR}/Config"
+#define VTK_PV_BINARY_CONFIG_DIR "${PARAVIEW_BINARY_DIR}/Config"
 
 // On UNIX, define the installation path.
 #if defined(__unix) || defined(__unix__)
-#define vtkPV_INSTALL_CONFIG_DIR "${CMAKE_INSTALL_PREFIX}/share/ParaView/Config"
+#define VTK_PV_INSTALL_CONFIG_DIR "${CMAKE_INSTALL_PREFIX}/share/ParaView/Config"
 #endif

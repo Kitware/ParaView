@@ -1939,11 +1939,14 @@ void vtkPVWindow::ReadSourceInterfaces()
   // first directory in this list that is found is the only one used.
   static const char* standardDirectories[] =
     {
-#ifdef vtkPV_SOURCE_CONFIG_DIR
-      vtkPV_SOURCE_CONFIG_DIR,
+#ifdef VTK_PV_BINARY_CONFIG_DIR
+      VTK_PV_BINARY_CONFIG_DIR,
 #endif
-#ifdef vtkPV_INSTALL_CONFIG_DIR
-      vtkPV_INSTALL_CONFIG_DIR,
+#ifdef VTK_PV_SOURCE_CONFIG_DIR
+      VTK_PV_SOURCE_CONFIG_DIR,
+#endif
+#ifdef VTK_PV_INSTALL_CONFIG_DIR
+      VTK_PV_INSTALL_CONFIG_DIR,
 #endif
       0
     };
