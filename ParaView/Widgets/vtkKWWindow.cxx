@@ -260,6 +260,9 @@ vtkKWWindow::vtkKWWindow()
 
   this->RecentFiles = 0;
   this->NumberOfRecentFiles = 5;
+
+  this->ScriptExtension = 0;
+  this->SetScriptExtension(".tcl");
 }
 
 vtkKWWindow::~vtkKWWindow()
@@ -725,7 +728,7 @@ void vtkKWWindow::LoadScript()
 {
   char *path = NULL;
 
-  this->Script("tk_getOpenFile -title \"Load Script\" -filetypes {{{Tcl Script} {.tcl}}}");
+  this->Script("tk_getOpenFile -title \"Load Script\" -filetypes {{{Tcl Script} {%s}}}", this->ScriptExtension);
   path = 
     strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
 	   this->Application->GetMainInterp()->result);
@@ -880,7 +883,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.54 $");
+  this->ExtractRevision(os,"$Revision: 1.55 $");
 }
 
 int vtkKWWindow::ExitDialog()

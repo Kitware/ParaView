@@ -187,6 +187,11 @@ public:
   vtkGetMacro(PromptBeforeClose, int);
 
   // Description:
+  // The extension used in LoadScript. Default is .tcl.
+  vtkSetStringMacro(ScriptExtension);
+  vtkGetStringMacro(ScriptExtension);
+
+  // Description:
   // Call render on all views
   void Render();
 
@@ -237,13 +242,14 @@ protected:
   vtkKWWidget *ToolbarFrame;
   float      PrintTargetDPI;
   vtkKWMenu *PageMenu;
+  char *ScriptExtension;
 
   int SupportHelp;
   char *WindowClass;
   int PromptBeforeClose;
 
   vtkKWPointerArray *RecentFiles;
-
+  
   void PrintRecentFiles();
 };
 

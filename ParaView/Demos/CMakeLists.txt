@@ -1,9 +1,9 @@
 CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/Demos/Demo1.tcl.in
-${PARAVIEW_BINARY_DIR}/Demos/Demo1.tcl @ONLY)
+${PARAVIEW_SOURCE_DIR}/Demos/Demo1.pvs.in
+${PARAVIEW_BINARY_DIR}/Demos/Demo1.pvs @ONLY)
 
 CONFIGURE_FILE(
-${PARAVIEW_SOURCE_DIR}/Demos/Demo2.tcl.in
-${PARAVIEW_BINARY_DIR}/Demos/Demo2.tcl @ONLY)
+${PARAVIEW_SOURCE_DIR}/Demos/Demo2.pvs.in
+${PARAVIEW_BINARY_DIR}/Demos/Demo2.pvs @ONLY)
 
-INSTALL_FILES(/share/ParaView/Demos .tcl ${PARAVIEW_BINARY_DIR}/Demos/Demo1)
+INSTALL_FILES(/share/ParaView/Demos .pvs ${PARAVIEW_BINARY_DIR}/Demos/Demo1)
