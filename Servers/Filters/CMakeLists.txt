@@ -45,7 +45,6 @@ SET(Filters_SRCS
   vtkXMLPVDWriter.cxx
   vtkDataSetSubdivisionAlgorithm.cxx
   vtkStreamingTessellator.cxx
-  vtkStreamingTessellator.cxx
   vtkSubdivisionAlgorithm.cxx
   vtkMPIMoveData.cxx
 
