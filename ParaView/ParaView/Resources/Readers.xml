@@ -1,0 +1,197 @@
+<ModuleInterfaces>
+  <Module name="legacyreader" class="vtkPVReaderModule" root_name="Leg" 
+          module_type="Reader"
+          extensions=".vtk" file_description="Legacy VTK files.">
+    <Source class="vtkPDataSetReader"/>
+  </Module>
+  <Module name="stlreader" class="vtkPVReaderModule" root_name="STL" 
+          module_type="Reader"
+          extensions=".stl" file_description="Stereo Lithography">
+    <Source class="vtkSTLReader"/>
+  </Module>
+  <Module name="byureader" class="vtkPVReaderModule" root_name="BYU" 
+          module_type="Reader"
+          extensions=".g" file_description="BYU Files">
+    <Source class="vtkBYUReader"/>
+  </Module>
+  <Module name="popreader" class="vtkPVAdvancedReaderModule" 
+          root_name="POP" 
+          module_type="Reader"
+          extensions=".pop" file_description="POP Ocean Files">
+    <Source class="vtkPOPReader"/>
+    <VectorEntry variable="Radius" trace_name="Radius" type="float" 
+                 help="Set the radius of the data set"/>
+    <VectorEntry label="Clip Extent" variable="ClipExtent" type="int"
+                 length="6" 
+                 help="For reading a smaller extent."/>
+    <VectorEntry label="Ghost Levels" trace_name="NumberOfGhostLevels"
+                 variable="NumberOfGhostLevels" 
+                 type="int" 
+                 help="Set the number of ghost levels to read."/>
+  </Module>
+  <Module name="ensight" class="vtkPVEnSightReaderModule"
+          root_name="Ensight" 
+          module_type="Reader"
+          extensions=".case .sos" file_description="EnSight Files">
+    <Source class="vtkGenericEnSightReader"/>
+  </Module>
+  <Module name="P3DReader" class="vtkPVPLOT3DReaderModule"
+          root_name="Plot3D"
+          module_type="Reader"
+          extensions=".xyz" file_description="PLOT3D Files">
+    <Source class="vtkPLOT3DReader"/>
+    <FileEntry label="Q File" trace_name="QFileName"
+               variable="QFileName" extension="q" 
+               help="Set the plot3d q file to read."/>
+    <LabeledToggle label="Binary" trace_name="BinaryFile"
+                   variable="BinaryFile" 
+                   help="Is this a binary file?"/>
+    <LabeledToggle label="Multi-block" trace_name="MultiGrid"
+                   variable="MultiGrid" 
+                   help="Does this file have multiple block information"/>
+    <LabeledToggle label="Fortran byte count" trace_name="HasByteCount"
+       variable="HasByteCount" 
+       help="Does this file use Fortran leading-trailing byte counts"/>
+    <LabeledToggle label="I blanking" trace_name="IBlanking"
+                    variable="IBlanking"
+                    help="Any visibility information?"/>
+    <LabeledToggle label="2D geometry"
+                   trace_name="TwoDimensionalGeometry"
+                    variable="TwoDimensionalGeometry"
+                    help="Is there only data for two dimensions?"/>
+    <LabeledToggle label="Force read" trace_name="ForceRead"
+                   variable="ForceRead"
+                   help="Read even if file looks corrupt?"/>
+  <SelectionList label="Byte order" trace_name="ByteOrder"
+                 variable="ByteOrder"
+         help="Select the byte order of the binary file">
+    <Item name="big endian" value="0"/>
+    <Item name="little endian" value="1"/>
+  </SelectionList>
+  </Module>
+ <Module name="XMLPolyDataReader"
+         root_name="XMLPolyDataReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".vtp"
+         file_description="VTK PolyData Files">
+  <Source class="vtkXMLPolyDataReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLUnstructuredGridReader"
+         root_name="XMLUnstructuredGridReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".vtu"
+         file_description="VTK UnstructuredGrid Files">
+  <Source class="vtkXMLUnstructuredGridReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLImageDataReader"
+         root_name="XMLImageDataReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".vti"
+         file_description="VTK ImageData Files">
+  <Source class="vtkXMLImageDataReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLStructuredGridReader"
+         root_name="XMLStructuredGridReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".vts"
+         file_description="VTK StructuredGrid Files">
+  <Source class="vtkXMLStructuredGridReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLRectilinearGridReader"
+         root_name="XMLRectilinearGridReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".vtr"
+         file_description="VTK RectilinearGrid Files">
+  <Source class="vtkXMLRectilinearGridReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLPPolyDataReader"
+         root_name="XMLPPolyDataReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".pvtp"
+         file_description="PVTK PolyData Files">
+  <Source class="vtkXMLPPolyDataReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLPUnstructuredGridReader"
+         root_name="XMLPUnstructuredGridReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".pvtu"
+         file_description="PVTK UnstructuredGrid Files">
+  <Source class="vtkXMLPUnstructuredGridReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLPImageDataReader"
+         root_name="XMLPImageDataReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".pvti"
+         file_description="PVTK ImageData Files">
+  <Source class="vtkXMLPImageDataReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLPStructuredGridReader"
+         root_name="XMLPStructuredGridReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".pvts"
+         file_description="PVTK StructuredGrid Files">
+  <Source class="vtkXMLPStructuredGridReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="XMLPRectilinearGridReader"
+         root_name="XMLPRectilinearGridReader" 
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".pvtr"
+         file_description="PVTK RectilinearGrid Files">
+  <Source class="vtkXMLPRectilinearGridReader"/>
+  <ArraySelection attribute_name="Point" />
+  <ArraySelection attribute_name="Cell" />
+ </Module>
+ <Module name="HDF5RawImageReader"
+         root_name="HDF5RawImageReader"
+         output="vtkImageData"
+         class="vtkPVAdvancedReaderModule"
+         module_type="Reader"
+         extensions=".h5"
+         file_description="HDF5 Raw ImageData Files">
+  <Source class="vtkHDF5RawImageReader"/>
+  <VectorEntry length="3" variable="Stride" trace_name="Stride" type="int" 
+               help="Read a subset of data spaced by the stride."/>
+  <ArraySelection attribute_name="Point"/>
+ </Module>
+#ifdef PARAVIEW_LINK_XDMF
+ <Module name="XdmfReader" root_name="XdmfReader"
+   output="vtkDataSet"
+   class="vtkXDMFReaderModule" module_type="Reader" extensions=".xmf"
+   file_description="Xdmf Reader">
+  <Source class="vtkMyXdmfReader"/>
+  <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
+  <ArraySelection trace_name="cell_array_sel" attribute_name="Point" />
+  <VectorEntry label="Stride" trace_name="stride" variable="Stride" type="int"
+               length="3"
+               help="Set the number of steps to skip between each point (structured data only)."/>
+ </Module>
+#endif
+</ModuleInterfaces>

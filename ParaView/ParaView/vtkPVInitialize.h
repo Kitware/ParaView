@@ -69,11 +69,11 @@ protected:
   vtkPVInitialize() {}
   ~vtkPVInitialize() {}
 
-  static const char* StandardReaderInterfaces;
-  static const char* StandardSourceInterfaces;
-  static const char* StandardFilterInterfaces;
-  static const char* StandardManipulators;
-  static const char* StandardWriters;
+  static const char* StandardReadersInterfaces;
+  static const char* StandardSourcesInterfaces;
+  static const char* StandardFiltersInterfaces;
+  static const char* StandardManipulatorsInterfaces;
+  static const char* StandardWritersInterfaces;
 
 private:
   vtkPVInitialize(const vtkPVInitialize&); // Not implemented

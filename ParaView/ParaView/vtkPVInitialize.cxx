@@ -42,30 +42,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInitialize.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVDefaultModules.h"
+//#include "vtkPVDefaultModules.h"
+#include "vtkPVGeneratedModules.h"
 #include "vtkPVWindow.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInitialize);
-vtkCxxRevisionMacro(vtkPVInitialize, "1.2");
+vtkCxxRevisionMacro(vtkPVInitialize, "1.3");
 
 //----------------------------------------------------------------------------
 void vtkPVInitialize::Initialize(vtkPVWindow* win)
 {
   win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::StandardSourceInterfaces);
+    vtkPVInitialize::StandardSourcesInterfaces);
 
   win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::StandardFilterInterfaces);
+    vtkPVInitialize::StandardFiltersInterfaces);
 
   win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::StandardReaderInterfaces);
+    vtkPVInitialize::StandardReadersInterfaces);
 
   win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::StandardManipulators);
+    vtkPVInitialize::StandardManipulatorsInterfaces);
 
   win->ReadSourceInterfacesFromString(
-    vtkPVInitialize::StandardWriters);
+    vtkPVInitialize::StandardWritersInterfaces);
 }
 
 //----------------------------------------------------------------------------
