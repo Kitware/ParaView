@@ -992,11 +992,12 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.103 $");
+  this->ExtractRevision(os,"$Revision: 1.104 $");
 }
 
 int vtkKWWindow::ExitDialog()
 {
+  this->Application->SetBalloonHelpWidget(0);
   if ( this->ExitDialogWidget )
     {
     return 1;
