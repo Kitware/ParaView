@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.28");
+vtkCxxRevisionMacro(vtkKWMenu, "1.28.2.1");
 
 
 
@@ -228,7 +228,8 @@ void  vtkKWMenu::InsertCascade(int position,
 //------------------------------------------------------------------------------
 void  vtkKWMenu::AddCheckButton(const char* label, const char* ButtonVar, 
                                 vtkKWObject* Object, 
-                                const char* MethodAndArgString, const char* help )
+                                const char* MethodAndArgString, 
+                                const char* help )
 { 
   this->AddCheckButton(label, ButtonVar, Object, MethodAndArgString, -1, help);
 }
@@ -532,10 +533,33 @@ int vtkKWMenu::GetIndex(const char* menuname)
 }
 
 //----------------------------------------------------------------------------
+int vtkKWMenu::GetItemLabel(int position, char* label, int maxlen)
+{
+  if (!label)
+    {
+    return VTK_ERROR;
+    }
+  const char* lbl = 
+    this->Script("%s entrycget %d -label", this->GetWidgetName(), position);
+  if (!label[0]) 
+    {
+    return VTK_ERROR;
+    }
+  strncpy(label, lbl, maxlen);
+  return VTK_OK;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWMenu::IsItemPresent(const char* menuname)
 {
   this->Script("catch {%s index {%s}}", this->GetWidgetName(), menuname);
   return !vtkKWObject::GetIntegerResult(this->Application);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetNumberOfItems()
+{
+  return this->GetIndex("end")+1;
 }
 
 //----------------------------------------------------------------------------
@@ -548,6 +572,41 @@ void vtkKWMenu::AddSeparator()
 void vtkKWMenu::InsertSeparator(int position)
 {
   this->Script( "%s insert %d separator", this->GetWidgetName(), position);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetState(int index)
+{
+  const char* state = this->Script("%s entrycget %d -state", 
+                                   this->GetWidgetName(), index);
+  if (!state || !state[0])
+    {
+    return vtkKWMenu::Unknown;
+    }
+  if ( strcmp(state, "normal") == 0 )
+    {
+    return vtkKWMenu::Normal;
+    }
+  else if ( strcmp(state, "active") == 0 )
+    {
+    return vtkKWMenu::Active;
+    }
+  else if ( strcmp(state, "disabled") == 0 )
+    {
+    return vtkKWMenu::Disabled;
+    }
+  return vtkKWMenu::Unknown;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWMenu::GetState(const char* item)
+{
+  if ( !this->IsItemPresent(item) )
+    {
+    return vtkKWMenu::Unknown;
+    }
+  int index = this->GetIndex(item);
+  return this->GetState(index);
 }
 
 //----------------------------------------------------------------------------
