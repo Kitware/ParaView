@@ -1,0 +1,87 @@
+$Application ExitOnReturnOn
+
+set kw(vtkTemp5) [$Application GetMainWindow]
+set kw(vtkTemp24) [$kw(vtkTemp5) GetMainView]
+
+source [file join [file dirname [info script]] CommandLineOptions.tcl]
+ParseCommandLine $kw(vtkTemp24) $argv $argc
+
+set kw(vtkTemp994) [$kw(vtkTemp5) InitializeReadCustom "legacyreader" "$DataDir/Data/vox8_bin.vtk"]
+$kw(vtkTemp5) ReadFileInformation $kw(vtkTemp994) "$DataDir/Data/vox8_bin.vtk"
+$kw(vtkTemp5) FinalizeRead $kw(vtkTemp994) "$DataDir/Data/vox8_bin.vtk"
+set kw(vtkTemp999) [$kw(vtkTemp994) GetPVWidget {Filename}]
+$kw(vtkTemp999) SetValue "$DataDir/Data/vox8_bin.vtk"
+$kw(vtkTemp5) SetCenterOfRotation 1.000000 1.000000 1.000000
+$kw(vtkTemp5) SetCenterOfRotation 1.000000 1.000000 1.000000
+$kw(vtkTemp5) SetCenterOfRotation 1.000000 1.000000 1.000000
+$kw(vtkTemp5) SetCenterOfRotation 1.000000 1.000000 1.000000
+set kw(vtkTemp1176) [$kw(vtkTemp5) CreatePVSource DataSetTriangleFilter]
+set kw(vtkTemp1183) [$kw(vtkTemp1176) GetPVWidget {Input}]
+$kw(vtkTemp1183) SetCurrentValue $kw(vtkTemp994)
+$kw(vtkTemp1176) AcceptCallback
+set kw(vtkTemp1299) [$kw(vtkTemp5) CreatePVSource ExtractEdges]
+set kw(vtkTemp1306) [$kw(vtkTemp1299) GetPVWidget {Input}]
+$kw(vtkTemp1306) SetCurrentValue $kw(vtkTemp1176)
+$kw(vtkTemp1299) AcceptCallback
+
+
+$kw(vtkTemp5) SetCurrentPVSourceCallback $kw(vtkTemp1299)
+set kw(vtkTemp1310) [$kw(vtkTemp1299) GetPVOutput]
+$kw(vtkTemp1310) ColorByProperty
+
+set kw(vtkTemp1422) [$kw(vtkTemp5) CreatePVSource TubeFilter]
+set kw(vtkTemp1448) [$kw(vtkTemp1422) GetPVWidget {Input}]
+$kw(vtkTemp1448) SetCurrentValue $kw(vtkTemp1299)
+set kw(vtkTemp1430) [$kw(vtkTemp1422) GetPVWidget {NumberOfSides}]
+$kw(vtkTemp1430) SetValue 6
+set kw(vtkTemp1435) [$kw(vtkTemp1422) GetPVWidget {Capping}]
+$kw(vtkTemp1435) SetState 1
+set kw(vtkTemp1438) [$kw(vtkTemp1422) GetPVWidget {Radius}]
+$kw(vtkTemp1438) SetValue 0.02
+set kw(vtkTemp1442) [$kw(vtkTemp1422) GetPVWidget {VaryRadius}]
+$kw(vtkTemp1442) SetCurrentValue {0}
+set kw(vtkTemp1445) [$kw(vtkTemp1422) GetPVWidget {RadiusFactor}]
+$kw(vtkTemp1445) SetValue 10
+$kw(vtkTemp1422) AcceptCallback
+
+$kw(vtkTemp5) SetCurrentPVSourceCallback $kw(vtkTemp1176)
+set kw(vtkTemp1187) [$kw(vtkTemp1176) GetPVOutput]
+$kw(vtkTemp1187) SetVisibility 1
+
+$kw(vtkTemp1187) DrawVolume
+$kw(vtkTemp24) SetCameraState -2.443 -3.984 4.451  1.000 1.000 1.000  -0.384 0.690 0.613
+$kw(vtkTemp24) SetCameraState 5.820 -3.332 3.569  1.000 1.000 1.000  -0.554 -0.129 0.823
+$kw(vtkTemp1187) VolumeRenderCellField {cRamp1}
+$kw(vtkTemp24) SetCameraState 5.351 -2.781 4.920  1.000 1.000 1.000  -0.682 -0.027 0.731
+$kw(vtkTemp24) SetCameraState 6.208 -3.526 5.692  1.857 0.256 1.772  -0.682 -0.027 0.731
+$kw(vtkTemp24) SetCameraState 6.208 -3.526 5.692  1.880 0.351 1.839  -0.682 -0.027 0.731
+$kw(vtkTemp24) SetCameraState 6.305 -3.161 5.915  1.892 0.414 1.872  -0.686 -0.024 0.727
+$kw(vtkTemp24) SetCameraState 3.887 -4.721 6.343  1.504 0.144 1.956  -0.812 0.117 0.571
+$kw(vtkTemp24) SetCameraState 3.887 -4.721 6.343  1.569 0.111 1.885  -0.812 0.117 0.571
+
+
+$kw(vtkTemp5) SetCurrentPVSourceCallback $kw(vtkTemp1422)
+set kw(vtkTemp1452) [$kw(vtkTemp1422) GetPVOutput]
+$kw(vtkTemp1452) DrawSurface
+$kw(vtkTemp5) SetCurrentPVSourceCallback $kw(vtkTemp1176)
+
+
+set kw(vtkTemp311) [$kw(vtkTemp5) GetVolumeAppearanceEditor]
+$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.900000 1.000000
+$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 1.000000
+$kw(vtkTemp311) SetColorRamp 0.129920 1.000000 0.000000 0.000000 0.900000 0.800000 0.000000 1.000000
+$kw(vtkTemp311) SetColorRamp 0.129920 1.000000 0.000000 0.000000 0.872800 0.800000 0.000000 1.000000
+$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.990000
+$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
+$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
+$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.000000 0.868000 0.980000
+$kw(vtkTemp311) SetScalarOpacityRamp 0.132000 0.040000 0.868000 0.980000
+$kw(vtkTemp311) SetScalarOpacityUnitDistance 0.290000
+$kw(vtkTemp311) SetScalarOpacityUnitDistance 0.380000
+$kw(vtkTemp24) SetCameraState 3.161 -4.844 6.550  1.452 0.085 1.925  -0.839 0.188 0.511
+$kw(vtkTemp24) SetCameraState 4.256 -3.987 6.843  1.627 0.237 1.960  -0.812 0.148 0.565
+
+source [file join [file dirname [info script]] Compare.tcl]
+Compare $Application $argv $argc
+
+$Application Exit
