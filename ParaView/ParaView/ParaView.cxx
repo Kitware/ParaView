@@ -25,15 +25,16 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+#ifdef VTK_USE_MPI
+ #include <mpi.h>
+#endif
+
 #include "vtkObject.h"
 #include "vtkMultiProcessController.h"
 #include "vtkPVApplication.h"
 #include "vtkTclUtil.h"
 #include "vtkToolkits.h"
 
-#ifdef VTK_USE_MPI
- #include <mpi.h>
-#endif
 
 // external global variable.
 vtkMultiProcessController *VTK_PV_UI_CONTROLLER = NULL;
