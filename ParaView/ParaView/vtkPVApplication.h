@@ -193,6 +193,8 @@ public:
   static const char* const LoadComponentProc;
   //ETX
 
+  void DisplayTCLError(const char* message);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();

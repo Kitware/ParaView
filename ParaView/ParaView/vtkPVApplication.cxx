@@ -456,7 +456,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     }
 
-
+  this->Script("proc bgerror { m } { Application DisplayTCLError m }");
   this->vtkKWApplication::Start(argc,argv);
 }
 
@@ -1067,6 +1067,11 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "MinorVersion: " << this->GetMinorVersion();
 }
 
+void vtkPVApplication::DisplayTCLError(const char* message)
+{
+  vtkErrorMacro("TclTk error: "<<message);
+}
+
 //----------------------------------------------------------------------------
 const char* const vtkPVApplication::LoadComponentProc =
 "namespace eval ::paraview {\n"
@@ -1119,3 +1124,4 @@ const char* const vtkPVApplication::LoadComponentProc =
 "    }   \n"
 "    namespace export load_component\n"
 "}\n";
+
