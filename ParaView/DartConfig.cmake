@@ -30,3 +30,4 @@ SET (USE_GNATS "On")
 
 # copy over the testing logo
 CONFIGURE_FILE(${PARAVIEW_SOURCE_DIR}/ParaView/Resources/ParaViewLogo.gif ${PARAVIEW_BINARY_DIR}/Testing/HTML/TestingResults/Icons/Logo.gif COPYONLY)
+
