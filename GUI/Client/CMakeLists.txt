@@ -21,6 +21,7 @@ SET(ParaViewSharedNotTclWrapped_SRCS
   )
 
 SET( ParaViewServer_SRCS
+  vtkCaveRenderManager.cxx
   vtkMultiDisplayManager.cxx
   vtkPVServerArraySelection.cxx
   vtkPVServerFileListing.cxx
@@ -62,6 +63,7 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVAxesWidget.cxx
   vtkPVInteractorStyle.cxx
   vtkPVInteractorStyleCenterOfRotation.cxx
+  vtkPVCaveRenderModule.cxx
   vtkPVCompositeRenderModule.cxx
   vtkPVMultiDisplayRenderModule.cxx
   vtkPVLODRenderModule.cxx
@@ -89,6 +91,7 @@ SET( ParaViewClient_SRCS
   vtkPVCameraControl.cxx
   vtkPVCameraIcon.cxx
   vtkPVCameraManipulator.cxx
+  vtkPVCaveRenderModuleUI.cxx
   vtkPVColorMap.cxx
   vtkPVCompositePartDisplay.cxx
   vtkPVCompositeRenderModuleUI.cxx
