@@ -29,7 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.1");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.2");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -83,7 +83,7 @@ void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
   int i;
   for (i = 0; i < this->NumberOfSegments; i++)
     {
-    this->Script("%s create rectangle %d 0 %d %d -outline black -fill black -tags bar%d",
+    this->Script("%s create rectangle %d 0 %d %d -fill #008 -tags bar%d",
                  this->ProgressCanvas->GetWidgetName(),
                  (int)(i*this->Width/(float)this->NumberOfSegments),
                  (int)((i+1)*(this->Width/(float)this->NumberOfSegments)),
@@ -134,12 +134,12 @@ void vtkKWSegmentedProgressGauge::SetValue(int segment, int value)
     {
     if (i <= this->Segment)
       {
-      this->Script("%s itemconfigure bar%d -fill $color%d -outline {}",
+      this->Script("%s itemconfigure bar%d -fill $color%d",
                    this->ProgressCanvas->GetWidgetName(), i, i);
       }
     else
       {
-      this->Script("%s itemconfigure bar%d -fill black -outline black",
+      this->Script("%s itemconfigure bar%d -fill #008",
                    this->ProgressCanvas->GetWidgetName(), i);
       }
     
