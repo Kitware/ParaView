@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVContour.h
+  Module:    vtkPVContourEntry.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,43 +39,69 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVContour - A class to handle the UI for vtkContour
+// .NAME vtkPVContourEntry maintains a list of floats for contouring.
 // .SECTION Description
+// This widget lets the user add or delete floats from a list.
+// It is used for contours, but could be generalized for arbitrary lists.
 
+#ifndef __vtkPVContourEntry_h
+#define __vtkPVContourEntry_h
 
-#ifndef __vtkPVContour_h
-#define __vtkPVContour_h
+#include "vtkPVWidget.h"
+#include "vtkKWLabel.h"
 
-#include "vtkPVSource.h"
-#include "vtkKWPushButton.h"
-#include "vtkPVLabeledToggle.h"
-#include "vtkKWEntry.h"
+class vtkKWListBox;
+class vtkKWEntry;
+class vtkKWPushButton;
 
-class VTK_EXPORT vtkPVContour : public vtkPVSource
+class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
 {
 public:
-  static vtkPVContour* New();
-  vtkTypeMacro(vtkPVContour, vtkPVSource);
-    
-  // Description:
-  // Set up the UI for this source
-  void CreateProperties();
+  static vtkPVContourEntry* New();
+  vtkTypeMacro(vtkPVContourEntry, vtkPVWidget);
   
   // Description:
-  // Save this source to a file.
-  void SaveInTclScript(ofstream *file);
+  // Create the widget.
+  virtual void Create(vtkKWApplication *app);
+
+  // Description:
+  // Set the label.  The label can be used to get this widget
+  // from a script.
+  void SetLabel (const char* label);
+  const char* GetLabel() {return this->ContourValuesLabel->GetLabel();}
   
-  virtual void UpdateScalars();
+  // Description:
+  // Gets called when the accept button is pressed.
+  // This method may add an entry to the trace file.
+  virtual void Accept();
+
+  // Description:
+  // Gets called when the reset button is pressed.
+  virtual void Reset();
+
+  // Description:
+  // Access to this widget from a script.
+  void AddValue(char* val);
+  void RemoveAllValues();
+
+  // Description:
+  // Button callbacks.
+  void AddValueCallback();
+  void DeleteValueCallback();
 
 protected:
-  vtkPVContour();
-  ~vtkPVContour();
-  vtkPVContour(const vtkPVContour&) {};
-  void operator=(const vtkPVContour&) {};
+  vtkPVContourEntry();
+  ~vtkPVContourEntry();
+  vtkPVContourEntry(const vtkPVContourEntry&) {};
+  void operator=(const vtkPVContourEntry&) {};
 
-  vtkKWLabel *ScalarRangeLabel;
-  
-  void GetDataArrayRange(float range[2]);
+  vtkKWLabel* ContourValuesLabel;
+  vtkKWListBox *ContourValuesList;
+  vtkKWWidget* NewValueFrame;
+  vtkKWLabel* NewValueLabel;
+  vtkKWEntry* NewValueEntry;
+  vtkKWPushButton* AddValueButton;
+  vtkKWPushButton* DeleteValueButton;
 };
 
 #endif

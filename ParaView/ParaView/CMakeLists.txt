@@ -16,6 +16,7 @@ vtkPVArraySelection
 vtkPVClipPlane
 vtkPVCutPlane
 vtkPVContour 
+vtkPVContourEntry 
 vtkPVData 
 vtkPVDataSetReaderInterface 
 vtkPVEnSightReaderInterface 

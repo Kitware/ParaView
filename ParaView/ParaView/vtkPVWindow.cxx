@@ -1369,10 +1369,10 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
 }
 
 //----------------------------------------------------------------------------
-vtkPVSource* vtkPVWindow::GetPreviousPVSource()
+vtkPVSource* vtkPVWindow::GetPreviousPVSource(int idx)
 {
   int pos = this->Sources->IsItemPresent(this->GetCurrentPVSource());
-  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-2));
+  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-1-idx));
 }
 
 //----------------------------------------------------------------------------

@@ -189,6 +189,14 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback()
 
     this->PVWindow->GetMainView()->AddComposite(pvs);
     pvs->CreateProperties();
+
+    // Now this is a bit of a hack to get tcl variables of these multiple sources.
+    // It is important that this trace entry occurs before the source is set to current,
+    // because the set current source adds its own trace which uses the variable.
+    pvApp->AddTraceEntry("set pv(%s) [$pv(%s) GetPreviousPVSource %d]",
+                         pvs->GetTclName(), this->PVWindow->GetTclName(),
+                         numOutputs - 1  - i);
+
     this->PVWindow->SetCurrentPVSource(pvs);
 
     srcTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];

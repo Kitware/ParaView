@@ -91,7 +91,7 @@ public:
   // It also sets the selected composite to the source.
   void SetCurrentPVSource(vtkPVSource *comp);
   vtkPVSource *GetCurrentPVSource();
-  vtkPVSource *GetPreviousPVSource();
+  vtkPVSource *GetPreviousPVSource(int idx = 1);
   
   // Description:
   // The current data is the data object that will be used as input to the next filter.

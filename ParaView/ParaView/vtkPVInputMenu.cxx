@@ -94,12 +94,12 @@ void vtkPVInputMenu::SetLabel(const char* label)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVInputMenu::Create(vtkKWApplication *app)
+void vtkPVInputMenu::Create(vtkKWApplication *app)
 {
   if (this->Application != NULL)
     {
     vtkErrorMacro("Object has already been created.");
-    return 0;
+    return;
     }
   this->SetApplication(app);
 
@@ -113,8 +113,6 @@ int vtkPVInputMenu::Create(vtkKWApplication *app)
   this->Menu->SetParent(this);
   this->Menu->Create(app, "");
   this->Script("pack %s -side left", this->Menu->GetWidgetName());
-
-  return 1;
 }
 
 //----------------------------------------------------------------------------
