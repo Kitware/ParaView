@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.40");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.41");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -679,7 +679,7 @@ void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 //-----------------------------------------------------------------------------
 void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
 {
-  char script[500];
+  char script[5000];
   
   if (ai->InitializeTrace(NULL))
     {
