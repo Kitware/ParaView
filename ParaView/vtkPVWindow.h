@@ -35,8 +35,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWWindow.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVComposite.h"
-#include "vtkPVDataList.h"
+#include "vtkPVSource.h"
+#include "vtkPVSourceList.h"
 
 class vtkKWNotebook;
 class vtkKWToolbar;
@@ -69,27 +69,26 @@ public:
   // Access to the RenderView.
   vtkGetObjectMacro(MainView, vtkPVRenderView);
 
-  // Description:
-  // Properties menu call back.
-  void ShowDataProperties();
-  vtkKWWidget *GetDataPropertiesParent();
+  void SetCurrentSource(vtkPVSource *comp);
+  vtkPVSource *GetCurrentSource();
+  vtkPVSource *GetNextSource();
+  vtkPVSource *GetPreviousSource();
   
-  void SetCurrentDataComposite(vtkPVComposite *comp);
-  vtkPVComposite *GetCurrentDataComposite();
-  vtkPVComposite *GetNextComposite();
-  vtkPVComposite *GetPreviousComposite();
-  
-  vtkKWCompositeCollection *GetCompositeList();
+  vtkKWCompositeCollection *GetSources();
   
   //tcl callbacks that use GetNextComposite and GetPreviousComposite
-  void NextComposite();
-  void PreviousComposite();
+  void NextSource();
+  void PreviousSource();
   
-  vtkGetObjectMacro(DataList, vtkPVDataList);
+  vtkGetObjectMacro(SourceList, vtkPVSourceList);
 
   // Description:
   // Callback from the reset camera button.
   void ResetCameraCallback();
+  
+  // Description:
+  // Callback to display window proerties
+  void ShowWindowProperties();
   
 protected:
   vtkPVWindow();
@@ -100,23 +99,17 @@ protected:
   void SetupCone();
   
   vtkPVRenderView *MainView;
-  vtkKWMenu *RetrieveMenu;
   vtkKWMenu *CreateMenu;
   
   vtkKWToolbar *Toolbar;
   vtkKWPushButton *ResetCameraButton;
-  vtkKWPushButton *PreviousCompositeButton;
-  vtkKWPushButton *NextCompositeButton;
+  vtkKWPushButton *PreviousSourceButton;
+  vtkKWPushButton *NextSourceButton;
 
-  vtkKWMenu *MenuSource;
-  
-  vtkKWNotebook *DataPropertiesFrame;
-  int DataPropertiesFrameCreated;
-  void CreateDataPropertiesFrame();
-
-  vtkPVComposite *CurrentDataComposite;
-  vtkKWCompositeCollection *CompositeList;
-  vtkPVDataList *DataList;
+  vtkPVSource *CurrentSource;
+  vtkKWCompositeCollection *Sources;
+  vtkKWLabeledFrame *ApplicationAreaFrame;
+  vtkPVSourceList *SourceList;
 };
 
 

@@ -41,12 +41,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkSynchronizedTemplates3D.h"
 
 #include "vtkPVAssignment.h"
-#include "vtkPVComposite.h"
+#include "vtkPVSource.h"
 #include "vtkPVConeSource.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVImageReader.h"
 #include "vtkPVImage.h"
-#include "vtkPVDataList.h"
+#include "vtkPVSourceList.h"
+
+
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -68,23 +70,18 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVWindow::vtkPVWindow()
 {  
   this->CommandFunction = vtkPVWindowCommand;
-  this->RetrieveMenu = vtkKWMenu::New();
   this->CreateMenu = vtkKWMenu::New();
   this->Toolbar = vtkKWToolbar::New();
   this->ResetCameraButton = vtkKWPushButton::New();
-  this->PreviousCompositeButton = vtkKWPushButton::New();
-  this->NextCompositeButton = vtkKWPushButton::New();
-  this->CurrentDataComposite = NULL;
-  this->CompositeList = vtkKWCompositeCollection::New();
+  this->PreviousSourceButton = vtkKWPushButton::New();
+  this->NextSourceButton = vtkKWPushButton::New();
+  this->CurrentSource = NULL;
+  this->Sources = vtkKWCompositeCollection::New();
   
-  this->MenuSource = vtkKWMenu::New();
-  this->MenuSource->SetParent(this->Menu);
-    
-  this->DataPropertiesFrame = vtkKWNotebook::New();
-  this->DataPropertiesFrameCreated = 0;
-  
-  this->DataList = vtkPVDataList::New();
-  this->DataList->SetCompositeCollection(this->CompositeList);
+  this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
+  this->SourceList = vtkPVSourceList::New();
+  this->SourceList->SetSources(this->Sources);
+  this->SourceList->SetParent(this->ApplicationAreaFrame->GetFrame());
 }
 
 //----------------------------------------------------------------------------
@@ -94,27 +91,21 @@ vtkPVWindow::~vtkPVWindow()
   this->Toolbar = NULL;
   this->ResetCameraButton->Delete();
   this->ResetCameraButton = NULL;
-  this->PreviousCompositeButton->Delete();
-  this->PreviousCompositeButton = NULL;
-  this->NextCompositeButton->Delete();
-  this->NextCompositeButton = NULL;
+  this->PreviousSourceButton->Delete();
+  this->PreviousSourceButton = NULL;
+  this->NextSourceButton->Delete();
+  this->NextSourceButton = NULL;
   
-  if (this->CurrentDataComposite != NULL)
+  if (this->CurrentSource != NULL)
     {
-    this->CurrentDataComposite->Delete();
-    this->CurrentDataComposite = NULL;
+    this->CurrentSource->Delete();
+    this->CurrentSource = NULL;
     }
   
-  this->DataList->Delete();
-  this->DataList = NULL;
+  this->SourceList->Delete();
+  this->SourceList = NULL;
   
-  this->MenuSource->SetParent(NULL);
-  this->MenuSource->Delete();
-  this->MenuSource = NULL;
-  
-  this->DataPropertiesFrame->SetParent(NULL);
-  this->DataPropertiesFrame->Delete();
-  this->DataPropertiesFrame = NULL;
+  this->ApplicationAreaFrame->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -126,29 +117,66 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("wm geometry %s 900x700+0+0",
                       this->GetWidgetName());
   
-  Tcl_Interp *interp = this->Application->GetMainInterp();
+  // now add property options
+  char *rbv = 
+    this->GetMenuProperties()->CreateRadioButtonVariable(
+      this->GetMenuProperties(),"Radio");
+  this->GetMenuProperties()->AddRadioButton(1," ParaView Window", 
+                                            rbv, this, "ShowWindowProperties");
+  delete [] rbv;
 
   // create the top level
   this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
 
-  // Create the menu for creating data sources.
-  this->MenuSource->Create(app,"-tearoff 0");
-  this->MenuFile->InsertCascade(1, "New Data", this->MenuSource, 0);
-  this->MenuSource->AddCommand("Volume", this, "NewVolume");
-  this->MenuSource->AddCommand("Cone", this, "NewCone");
-  
+  // Create the menu for creating data sources.  
   this->CreateMenu->SetParent(this->GetMenu());
-  this->CreateMenu->Create(this->Application,"");
+  this->CreateMenu->Create(this->Application,"-tearoff 0");
   this->Menu->InsertCascade(2,"Create",this->CreateMenu,0);
 
-  this->RetrieveMenu->SetParent(this->GetMenu());
-  this->RetrieveMenu->Create(this->Application,"");
-  this->Menu->InsertCascade(3, "Retrieve", this->RetrieveMenu, 0);
+  this->CreateMenu->AddCommand("Volume", this, "NewVolume");
+  this->CreateMenu->AddCommand("Cone", this, "NewCone");
 
   this->SetStatusText("Version 1.0 beta");
-  this->CreateDefaultPropertiesParent();
   
   this->Script( "wm withdraw %s", this->GetWidgetName());
+
+  this->Toolbar->SetParent(this->GetToolbarFrame());
+  this->Toolbar->Create(app); 
+
+  this->ResetCameraButton->SetParent(this->Toolbar);
+  this->ResetCameraButton->Create(app, "-text ResetCamera");
+  this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+               this->ResetCameraButton->GetWidgetName());
+  
+  this->PreviousSourceButton->SetParent(this->Toolbar);
+  this->PreviousSourceButton->Create(app, "-text Previous");
+  this->PreviousSourceButton->SetCommand(this, "PreviousSource");
+  this->NextSourceButton->SetParent(this->Toolbar);
+  this->NextSourceButton->Create(app, "-text Next");
+  this->NextSourceButton->SetCommand(this, "NextSource");
+  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
+	       this->PreviousSourceButton->GetWidgetName(),
+	       this->NextSourceButton->GetWidgetName());
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+               this->Toolbar->GetWidgetName());
+  
+  this->CreateDefaultPropertiesParent();
+  
+  this->Notebook->SetParent(this->GetPropertiesParent());
+  this->Notebook->Create(this->Application,"");
+  this->Notebook->AddPage("Preferences");
+
+  this->ApplicationAreaFrame->
+    SetParent(this->Notebook->GetFrame("Preferences"));
+  this->ApplicationAreaFrame->Create(this->Application);
+  this->ApplicationAreaFrame->SetLabel("Sources");
+  this->SourceList->Create(app, "");
+  this->Script("pack %s -side top -fill x -expand no",
+	       this->SourceList->GetWidgetName());
+
+  this->Script("pack %s -side top -anchor w -expand yes -fill x -padx 2 -pady 2",
+               this->ApplicationAreaFrame->GetWidgetName());
 
   // create the main view
   // we keep a handle to them as well
@@ -157,134 +185,28 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->MainView->SetParent(this->ViewFrame);
   this->MainView->Create(this->Application,"-width 200 -height 200");
   this->AddView(this->MainView);
-  // force creation of the properties parent
-  this->MainView->GetPropertiesParent();
   this->MainView->MakeSelected();
   this->MainView->ShowViewProperties();
   this->MainView->SetupBindings();
   this->MainView->Delete();
   this->Script( "pack %s -expand yes -fill both", 
-                this->MainView->GetWidgetName());
+                this->MainView->GetWidgetName());  
 
-  char cmd[1024];
-  sprintf(cmd,"%s Open", this->GetTclName());
-  
-  this->Toolbar->SetParent(this->GetToolbarFrame());
-  this->Toolbar->Create(app); 
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-               this->Toolbar->GetWidgetName());
-  
-  this->ResetCameraButton->SetParent(this->Toolbar);
-  this->ResetCameraButton->Create(app, "-text ResetCamera");
-  this->ResetCameraButton->SetCommand(this, "ResetCameraCallback");
-  this->Script("pack %s -side left -pady 0 -fill none -expand no",
-               this->ResetCameraButton->GetWidgetName());
-  
-  this->PreviousCompositeButton->SetParent(this->Toolbar);
-  this->PreviousCompositeButton->Create(app, "-text Previous");
-  this->PreviousCompositeButton->SetCommand(this, "PreviousComposite");
-  this->NextCompositeButton->SetParent(this->Toolbar);
-  this->NextCompositeButton->Create(app, "-text Next");
-  this->NextCompositeButton->SetCommand(this, "NextComposite");
-  this->Script("pack %s %s -side left -pady 0 -fill none -expand no",
-	       this->PreviousCompositeButton->GetWidgetName(),
-	       this->NextCompositeButton->GetWidgetName());
-  
-  this->DataList->SetParent(this->GetDataPropertiesParent());
-  this->DataList->Create(app, "");
-  this->Script("pack %s -side bottom -fill x -expand no",
-	       this->DataList->GetWidgetName());
-  
   this->Script( "wm deiconify %s", this->GetWidgetName());
-
-  char *rbv =
-    this->GetMenuProperties()->CreateRadioButtonVariable(
-      this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(11,"Data", rbv, this, "ShowDataProperties");
-  delete [] rbv;
   
-  this->GetMenuProperties()->CheckRadioButton(this->GetMenuProperties(),
-					      "Radio", 11);
-  //not sure I should have to explicitly call this
-  this->ShowDataProperties();
   
   // Setup an interactor style.
   vtkInteractorStyleTrackballCamera *style = vtkInteractorStyleTrackballCamera::New();
   this->MainView->SetInteractorStyle(style);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVWindow::ShowDataProperties()
+void vtkPVWindow::SetCurrentSource(vtkPVSource *comp)
 {
-  if (this->DataPropertiesFrameCreated == 0)
+  this->MainView->SetSelectedComposite(comp);  
+  if (comp && this->Sources->IsItemPresent(comp) == 0)
     {
-    this->CreateDataPropertiesFrame();
-    }
-
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-	       this->GetPropertiesParent()->GetWidgetName());
-  this->Script("pack %s",
-	       this->DataPropertiesFrame->GetWidgetName());
-}
-
-
-//----------------------------------------------------------------------------
-vtkKWWidget *vtkPVWindow::GetDataPropertiesParent()
-{
-  if (this->DataPropertiesFrameCreated == 0)
-    {
-    this->CreateDataPropertiesFrame();
-    }
-  
-  return this->DataPropertiesFrame->GetFrame("Only");
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::CreateDataPropertiesFrame()
-{
-  vtkKWApplication *app = this->Application;
-
-  if (this->DataPropertiesFrameCreated)
-    {
-    return;
-    }
-  this->DataPropertiesFrameCreated = 1;
-  
-  this->DataPropertiesFrame->SetParent(this->GetPropertiesParent());
-  this->DataPropertiesFrame->Create(this->Application,"-bd 0");
-  this->DataPropertiesFrame->AddPage("Only");
-}
-
-void vtkPVWindow::SetCurrentDataComposite(vtkPVComposite *comp)
-{
-  if (comp->GetPropertiesParent() != this->GetDataPropertiesParent())
-    {
-    vtkErrorMacro("CurrentComposites must use our DataPropertiesParent.");
-    return;
-    }
-  
-  if (this->CurrentDataComposite)
-    {
-    this->CurrentDataComposite->Deselect(this->MainView);
-    this->CurrentDataComposite->UnRegister(this);
-    this->CurrentDataComposite = NULL;
-    this->Script("catch {eval pack forget [pack slaves %s]}",
-		 this->GetDataPropertiesParent()->GetWidgetName());
-    }
-  
-  if (comp)
-    {
-    this->CurrentDataComposite = comp;
-    comp->Select(this->MainView);
-    comp->Register(this);
-    if (this->CompositeList->IsItemPresent(comp) == 0)
-      {
-      this->CompositeList->AddItem(comp);
-      }
-    this->Script("pack %s %s -side top -anchor w -padx 2 -pady 2 -expand yes -fill x",
-		 this->DataList->GetWidgetName(),
-		 comp->GetProperties()->GetWidgetName());
+    this->Sources->AddItem(comp);
+    this->SourceList->Update();
     }
 }
 
@@ -333,15 +255,11 @@ void vtkPVWindow::SetupCone()
 void vtkPVWindow::NewCone()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVComposite *comp;
   vtkPVConeSource *cone;
   vtkPVPolyData *pvd;
   vtkPVAssignment *a;
   
-  // Maybe source and composite should be merged into one class.
   // Create the pipeline objects in all processes.
-  comp = vtkPVComposite::New();
-  comp->Clone(pvApp);
   cone = vtkPVConeSource::New();
   cone->Clone(pvApp);
   pvd = vtkPVPolyData::New();
@@ -351,27 +269,17 @@ void vtkPVWindow::NewCone()
   
   // Link the objects together (in all processes).
   cone->SetOutput(pvd);
-  comp->SetSource(cone);
-  comp->SetCompositeName("cone");
+  cone->SetName("cone");
   cone->SetAssignment(a);
   
-  // Create the properties (interface).
-  comp->SetPropertiesParent(this->GetDataPropertiesParent());
-  comp->CreateProperties("");
+  // Add the new Source to the View (in all processes).
+  this->MainView->AddComposite(cone);
 
-  // Add the new composite to the View (in all processes).
-  this->MainView->AddComposite(comp);
-  
-  // We should probably use the View (instead of the window)
-  // to manage the selected composite.
-  comp->SetWindow(this);
-  // Select this composite
-  this->SetCurrentDataComposite(comp);
+  // Select this Source
+  this->SetCurrentSource(cone);
 
   // Clean up. (How about on the other processes?)
-  comp->Delete();
-  comp = NULL;
-  this->DataList->Update();
+  this->SourceList->Update();
   cone->Delete();
   cone = NULL;
   a->Delete();
@@ -385,15 +293,12 @@ void vtkPVWindow::NewCone()
 // Setup the pipeline
 void vtkPVWindow::NewVolume()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVComposite *comp;
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   vtkPVImageReader *reader;
   vtkPVImage *image;
   vtkPVAssignment *a;
 
   
-  comp = vtkPVComposite::New();
-  comp->Clone(pvApp);
   reader = vtkPVImageReader::New();
   reader->Clone(pvApp);
   image = vtkPVImage::New();
@@ -407,15 +312,10 @@ void vtkPVWindow::NewVolume()
   reader->SetOutput(image);
   reader->SetAssignment(a);
   
-  comp->SetSource(reader);
-  comp->SetCompositeName("volume");
-  comp->SetPropertiesParent(this->GetDataPropertiesParent());
-  comp->CreateProperties("");
-  this->MainView->AddComposite(comp);
-  comp->SetWindow(this);
-  this->SetCurrentDataComposite(comp);
-  comp->Delete();
-  this->DataList->Update();
+  reader->SetName("volume");
+  this->MainView->AddComposite(reader);
+  this->SetCurrentSource(reader);
+  this->SourceList->Update();
   
   this->MainView->ResetCamera();
   this->MainView->Render();
@@ -463,60 +363,60 @@ void vtkPVWindow::SerializeToken(istream& is, const char token[1024])
 }
 
 //----------------------------------------------------------------------------
-vtkPVComposite* vtkPVWindow::GetCurrentDataComposite()
+vtkPVSource* vtkPVWindow::GetCurrentSource()
 {
-  return this->CurrentDataComposite;
+  return this->CurrentSource;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::NextComposite()
+void vtkPVWindow::NextSource()
 {
-  vtkPVComposite *composite = this->GetNextComposite();
+  vtkPVSource *composite = this->GetNextSource();
   if (composite != NULL)
     {
-    this->GetCurrentDataComposite()->GetProp()->VisibilityOff();
-    this->SetCurrentDataComposite(composite);
-    this->GetCurrentDataComposite()->GetProp()->VisibilityOn();
+    this->GetCurrentSource()->GetProp()->VisibilityOff();
+    this->SetCurrentSource(composite);
+    this->GetCurrentSource()->GetProp()->VisibilityOn();
     }
   
   this->MainView->Render();
-  this->DataList->Update();
+  this->SourceList->Update();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::PreviousComposite()
+void vtkPVWindow::PreviousSource()
 {
-  vtkPVComposite *composite = this->GetPreviousComposite();
+  vtkPVSource *composite = this->GetPreviousSource();
   if (composite != NULL)
     {
-    this->GetCurrentDataComposite()->GetProp()->VisibilityOff();
-    this->SetCurrentDataComposite(composite);
-    this->GetCurrentDataComposite()->GetProp()->VisibilityOn();
+    this->GetCurrentSource()->GetProp()->VisibilityOff();
+    this->SetCurrentSource(composite);
+    this->GetCurrentSource()->GetProp()->VisibilityOn();
     }
   
   this->MainView->Render();
-  this->DataList->Update();
+  this->SourceList->Update();
 }
 
 
 //----------------------------------------------------------------------------
-vtkPVComposite* vtkPVWindow::GetNextComposite()
+vtkPVSource* vtkPVWindow::GetNextSource()
 {
-  int pos = this->CompositeList->IsItemPresent(this->CurrentDataComposite);
-  return (vtkPVComposite*)this->CompositeList->GetItemAsObject(pos);
+  int pos = this->Sources->IsItemPresent(this->CurrentSource);
+  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos));
 }
 
 //----------------------------------------------------------------------------
-vtkPVComposite* vtkPVWindow::GetPreviousComposite()
+vtkPVSource* vtkPVWindow::GetPreviousSource()
 {
-  int pos = this->CompositeList->IsItemPresent(this->CurrentDataComposite);
-  return (vtkPVComposite*)this->CompositeList->GetItemAsObject(pos-2);
+  int pos = this->Sources->IsItemPresent(this->CurrentSource);
+  return vtkPVSource::SafeDownCast(this->Sources->GetItemAsObject(pos-2));
 }
 
 //----------------------------------------------------------------------------
-vtkKWCompositeCollection* vtkPVWindow::GetCompositeList()
+vtkKWCompositeCollection* vtkPVWindow::GetSources()
 {
-  return this->CompositeList;
+  return this->Sources;
 }
 
 //----------------------------------------------------------------------------
@@ -529,3 +429,17 @@ void vtkPVWindow::ResetCameraCallback()
 
 
 
+void vtkPVWindow::ShowWindowProperties()
+{
+  this->ShowProperties();
+  
+  // make sure the variable is set, otherwise set it
+  this->GetMenuProperties()->CheckRadioButton(
+    this->GetMenuProperties(),"Radio",1);
+
+  // forget current props
+  this->Script("pack forget [pack slaves %s]",
+               this->Notebook->GetParent()->GetWidgetName());  
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
+}

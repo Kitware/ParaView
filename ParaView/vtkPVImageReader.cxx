@@ -34,6 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 vtkPVImageReader::vtkPVImageReader()
 {
   this->Label = vtkKWLabel::New();
+  this->Label->SetParent(this->Properties);
   this->ImageReader = vtkImageReader::New();
 }
 
@@ -54,19 +55,13 @@ vtkPVImageReader* vtkPVImageReader::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVImageReader::Create(char *args)
+void vtkPVImageReader::CreateProperties()
 {  
-  if (this->vtkPVSource::Create(args) == 0)
-    {
-    return 0;
-    }
-  
-  this->Label->SetParent(this);
+  this->vtkPVSource::CreateProperties();
+
   this->Label->Create(this->Application, "");
   this->Label->SetLabel("vtkPVImageReader label");
   this->Script("pack %s", this->Label->GetWidgetName());
-  
-  return 1;
 }
 
 //----------------------------------------------------------------------------

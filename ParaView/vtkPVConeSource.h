@@ -51,7 +51,7 @@ public:
 
   // Description:
   // You have to clone this object before you can create it.
-  int Create(char *args);
+  void CreateProperties();
 
   vtkGetObjectMacro(ConeSource, vtkConeSource);
 

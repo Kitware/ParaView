@@ -29,7 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVGlyph3D.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkPVPolyData.h"
 
@@ -41,14 +40,14 @@ vtkPVGlyph3D::vtkPVGlyph3D()
 {
   this->CommandFunction = vtkPVGlyph3DCommand;
   
-  this->GlyphCompositeButton = vtkKWWidget::New();
-  this->GlyphCompositeButton->SetParent(this);
+  this->GlyphSourceButton = vtkKWWidget::New();
+  this->GlyphSourceButton->SetParent(this->Properties);
   this->ScaleFactorEntry = vtkKWEntry::New();
-  this->ScaleFactorEntry->SetParent(this);
+  this->ScaleFactorEntry->SetParent(this->Properties);
   this->ScaleFactorLabel = vtkKWLabel::New();
-  this->ScaleFactorLabel->SetParent(this);
+  this->ScaleFactorLabel->SetParent(this->Properties);
   this->Accept = vtkKWWidget::New();
-  this->Accept->SetParent(this);
+  this->Accept->SetParent(this->Properties);
   
   this->Glyph = vtkGlyph3D::New();
 }
@@ -56,8 +55,8 @@ vtkPVGlyph3D::vtkPVGlyph3D()
 //----------------------------------------------------------------------------
 vtkPVGlyph3D::~vtkPVGlyph3D()
 {
-  this->GlyphCompositeButton->Delete();
-  this->GlyphCompositeButton = NULL;
+  this->GlyphSourceButton->Delete();
+  this->GlyphSourceButton = NULL;
   this->ScaleFactorEntry->Delete();
   this->ScaleFactorEntry = NULL;
   this->ScaleFactorLabel->Delete();
@@ -76,17 +75,14 @@ vtkPVGlyph3D* vtkPVGlyph3D::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVGlyph3D::Create(char *args)
+void vtkPVGlyph3D::CreateProperties()
 {
   // must set the application
-  if (this->vtkPVSource::Create(args) == 0)
-    {
-    return 0;
-    }
+  this->vtkPVSource::CreateProperties();
   
-  this->GlyphCompositeButton->Create(this->Application, "button",
-			 "-text GetGlyphComposite");
-  this->GlyphCompositeButton->SetCommand(this, "ShowGlyphComposite");
+  this->GlyphSourceButton->Create(this->Application, "button",
+			 "-text GetGlyphSource");
+  this->GlyphSourceButton->SetCommand(this, "ShowGlyphSource");
   
   this->ScaleFactorEntry->Create(this->Application, "");
   this->ScaleFactorEntry->SetValue(1, 2);
@@ -97,12 +93,10 @@ int vtkPVGlyph3D::Create(char *args)
   this->Accept->SetCommand(this, "ScaleFactorChanged");
   
   this->Script("pack %s %s %s %s",
-	       this->GlyphCompositeButton->GetWidgetName(),
+	       this->GlyphSourceButton->GetWidgetName(),
 	       this->Accept->GetWidgetName(),
 	       this->ScaleFactorLabel->GetWidgetName(),
 	       this->ScaleFactorEntry->GetWidgetName());
-
-  return 1;
 }
 
 
@@ -159,9 +153,9 @@ vtkPVPolyData *vtkPVGlyph3D::GetOutput()
 
 
 //----------------------------------------------------------------------------
-void vtkPVGlyph3D::SetGlyphComposite(vtkPVComposite *comp)
+void vtkPVGlyph3D::SetGlyphSource(vtkPVSource *comp)
 {
-  this->GlyphComposite = comp;
+  this->GlyphSource = comp;
 }
 
 //----------------------------------------------------------------------------
@@ -180,15 +174,16 @@ void vtkPVGlyph3D::SetScaleModeToDataScalingOff()
 
 
 //----------------------------------------------------------------------------
-void vtkPVGlyph3D::ShowGlyphComposite()
+void vtkPVGlyph3D::ShowGlyphSource()
 {
-  vtkPVWindow *window = this->Composite->GetWindow();
+  vtkPVWindow *window = 
+		vtkPVWindow::SafeDownCast(this->GetView()->GetParentWindow());
   
-  this->Composite->VisibilityOff();
-  window->SetCurrentDataComposite(this->GlyphComposite);
-  this->GlyphComposite->VisibilityOn();
-  this->GlyphComposite->GetView()->Render();
-  window->GetDataList()->Update();
+  this->VisibilityOff();
+  window->SetCurrentSource(this->GlyphSource);
+  this->GlyphSource->VisibilityOn();
+  this->GlyphSource->GetView()->Render();
+  window->GetSourceList()->Update();
 }
 
 //----------------------------------------------------------------------------
@@ -198,6 +193,6 @@ void vtkPVGlyph3D::ScaleFactorChanged()
   this->Glyph->Modified();
   this->Glyph->Update();
   
-  this->Composite->GetView()->Render();
+  this->GetView()->Render();
 }
 

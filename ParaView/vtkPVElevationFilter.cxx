@@ -30,7 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
-#include "vtkPVComposite.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVImage.h"
 
@@ -43,9 +42,9 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->CommandFunction = vtkPVElevationFilterCommand;
   
   this->LowPointLabel = vtkKWLabel::New();
-  this->LowPointLabel->SetParent(this);
+  this->LowPointLabel->SetParent(this->Properties);
   this->LowPointFrame = vtkKWWidget::New();
-  this->LowPointFrame->SetParent(this);
+  this->LowPointFrame->SetParent(this->Properties);
   this->LowPointXEntry = vtkKWEntry::New();
   this->LowPointXEntry->SetParent(this->LowPointFrame);
   this->LowPointYEntry = vtkKWEntry::New();
@@ -54,9 +53,9 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->LowPointZEntry->SetParent(this->LowPointFrame);
 
   this->HighPointLabel = vtkKWLabel::New();
-  this->HighPointLabel->SetParent(this);
+  this->HighPointLabel->SetParent(this->Properties);
   this->HighPointFrame = vtkKWWidget::New();
-  this->HighPointFrame->SetParent(this);
+  this->HighPointFrame->SetParent(this->Properties);
   this->HighPointXEntry = vtkKWEntry::New();
   this->HighPointXEntry->SetParent(this->HighPointFrame);
   this->HighPointYEntry = vtkKWEntry::New();
@@ -65,9 +64,9 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->HighPointZEntry->SetParent(this->HighPointFrame);
 
   this->RangeLabel = vtkKWLabel::New();
-  this->RangeLabel->SetParent(this);
+  this->RangeLabel->SetParent(this->Properties);
   this->RangeFrame = vtkKWWidget::New();
-  this->RangeFrame->SetParent(this);
+  this->RangeFrame->SetParent(this->Properties);
   this->RangeMinEntry = vtkKWEntry::New();
   this->RangeMinEntry->SetParent(this->RangeFrame);
   this->RangeMaxEntry = vtkKWEntry::New();
@@ -91,7 +90,7 @@ vtkPVElevationFilter::vtkPVElevationFilter()
   this->RangeMaxLabel->SetParent(this->RangeFrame);
   
   this->Accept = vtkKWWidget::New();
-  this->Accept->SetParent(this);
+  this->Accept->SetParent(this->Properties);
   
   this->Elevation = vtkElevationFilter::New();
 
@@ -161,15 +160,12 @@ vtkPVElevationFilter* vtkPVElevationFilter::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVElevationFilter::Create(char *args)
+void vtkPVElevationFilter::CreateProperties()
 { 
   float *low, *high, *range;
  
   // must set the application
-  if (this->vtkPVSource::Create(args) == 0)
-    {
-    return 0;
-    }
+  this->vtkPVSource::CreateProperties();
   
   low = this->GetElevation()->GetLowPoint();
   high = this->GetElevation()->GetHighPoint();
@@ -264,8 +260,6 @@ int vtkPVElevationFilter::Create(char *args)
   this->Script("pack %s %s",
 	       this->RangeLabel->GetWidgetName(),
 	       this->RangeFrame->GetWidgetName());
-
-  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -342,7 +336,7 @@ void vtkPVElevationFilter::ElevationParameterChanged()
   this->SetHighPoint(high[0], high[1], high[2]);
   this->SetScalarRange(range[0], range[1]);
   
-  this->Composite->GetView()->Render();
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------

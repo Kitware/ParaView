@@ -28,9 +28,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
-#include "vtkPVComposite.h"
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
+#include "vtkPVWindow.h"
+
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
@@ -39,16 +40,16 @@ int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVSource::vtkPVSource()
 {
   this->CommandFunction = vtkPVSourceCommand;
+  this->Name = NULL;
   
-  this->Composite = NULL;
   this->Input = NULL;
   this->Output = NULL;
+  this->Properties = vtkKWWidget::New();
 }
 
 //----------------------------------------------------------------------------
 vtkPVSource::~vtkPVSource()
 {
-  this->SetComposite(NULL);
   if (this->Output)
     {
     this->Output->UnRegister(this);
@@ -60,6 +61,8 @@ vtkPVSource::~vtkPVSource()
     this->Input->UnRegister(this);
     this->Input = NULL;
     }
+  this->SetName(NULL);
+  this->Properties->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -81,28 +84,6 @@ void vtkPVSource::Clone(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s %s", this->GetClassName(), this->GetTclName());
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVSource::SetComposite(vtkPVComposite *comp)
-{
-  if (this->Composite == comp)
-    {
-    return;
-    }
-  this->Modified();
-
-  if (this->Composite)
-    {
-    vtkPVComposite *tmp = this->Composite;
-    this->Composite = NULL;
-    tmp->UnRegister(this);
-    }
-  if (comp)
-    {
-    this->Composite = comp;
-    comp->Register(this);
-    }
-}
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SetPVData(vtkPVData *data)
@@ -143,20 +124,15 @@ void vtkPVSource::SetAssignment(vtkPVAssignment *a)
   this->Output->SetAssignment(a); 
 }
 
-
 //----------------------------------------------------------------------------
-int vtkPVSource::Create(char *args)
+vtkPVWindow* vtkPVSource::GetWindow()
 {
-  if (this->Application == NULL)
+  if (this->View == NULL || this->View->GetParentWindow() == NULL)
     {
-    vtkErrorMacro("This object has not been cloned yet.");
-    return 0;
+    return NULL;
     }
   
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
-  
-  return 1;
+  return vtkPVWindow::SafeDownCast(this->View->GetParentWindow());
 }
 
 //----------------------------------------------------------------------------
@@ -176,4 +152,165 @@ vtkPVApplication* vtkPVSource::GetPVApplication()
     vtkErrorMacro("Bad typecast");
     return NULL;
     } 
+}
+
+//----------------------------------------------------------------------------
+vtkProp* vtkPVSource::GetProp()
+{
+  vtkPVData *data = this->GetPVData();
+
+  if (data == NULL)
+    {
+    return NULL;
+    }
+  return data->GetProp();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::CreateProperties()
+{ 
+  const char *dataPage, *sourcePage;
+  vtkPVData *data = this->GetPVData();
+  vtkPVApplication *app = this->GetPVApplication();
+
+  if (data == NULL)
+    {
+    vtkErrorMacro("You need to set the data before you create a composite");
+    return;
+    }
+  
+  // invoke super
+  this->vtkKWComposite::CreateProperties();  
+
+  sourcePage = this->GetClassName();
+  this->Notebook->AddPage(sourcePage);
+  this->Properties->SetParent(this->Notebook->GetFrame(sourcePage));
+  this->Properties->Create(this->Application,"frame","");
+  this->Script("pack %s -pady 2 -fill x -expand yes",
+               this->Properties->GetWidgetName());
+  
+  dataPage = data->GetClassName();
+  this->Notebook->AddPage(dataPage);
+  
+  data->SetParent(this->Notebook->GetFrame(dataPage));
+  data->Create("");
+  this->Script("pack %s", data->GetWidgetName());
+}
+
+void vtkPVSource::Select(vtkKWView *v)
+{
+  // invoke super
+  this->vtkKWComposite::Select(v); 
+  vtkKWMenu* MenuProperties = v->GetParentWindow()->GetMenuProperties();
+  char* rbv = 
+    MenuProperties->CreateRadioButtonVariable(MenuProperties,"Radio");
+
+  // now add our own menu options
+  if (MenuProperties->GetRadioButtonValue(MenuProperties,"Radio") >= 10)
+    {
+    if (this->LastSelectedProperty == 10)
+      {
+      this->View->ShowViewProperties();
+      }
+    if (this->LastSelectedProperty == 100 || this->LastSelectedProperty == -1)
+      {
+      this->ShowProperties();
+      }
+    }
+
+  MenuProperties->AddRadioButton(100, " Data", rbv, this, "ShowProperties");
+  delete [] rbv;
+}
+
+void vtkPVSource::Deselect(vtkKWView *v)
+{
+  // invoke super
+  this->vtkKWComposite::Deselect(v);
+  v->GetParentWindow()->GetMenuProperties()->DeleteMenuItem(" Data");
+}
+
+void vtkPVSource::ShowProperties()
+{
+  vtkKWWindow *pw = this->View->GetParentWindow();
+  pw->ShowProperties();
+  pw->GetMenuProperties()->CheckRadioButton(
+    pw->GetMenuProperties(),"Radio",100);
+  
+  // unpack any current children
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->View->GetPropertiesParent()->GetWidgetName());
+  
+  if (!this->PropertiesCreated)
+    {
+    this->InitializeProperties();
+    }
+  
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
+  this->View->PackProperties();
+}
+
+//----------------------------------------------------------------------------
+char* vtkPVSource::GetName()
+{
+  return this->Name;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetName (const char* arg) 
+{ 
+  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting " 
+                << this->Name << " to " << arg ); 
+  if ( this->Name && arg && (!strcmp(this->Name,arg))) 
+    { 
+    return;
+    } 
+  if (this->Name) 
+    { 
+    delete [] this->Name; 
+    } 
+  if (arg) 
+    { 
+    this->Name = new char[strlen(arg)+1]; 
+    strcpy(this->Name,arg); 
+    } 
+  else 
+    { 
+    this->Name = NULL;
+    }
+  this->Modified(); 
+} 
+
+//----------------------------------------------------------------------------
+void vtkPVSource::SetVisibility(int v)
+{
+  vtkProp * p = this->GetProp();
+  vtkPVApplication *pvApp;
+  
+  if (p)
+    {
+    p->SetVisibility(v);
+    }
+  
+  pvApp = (vtkPVApplication*)(this->Application);
+  
+  // Make the assignment in all of the processes.
+  if (pvApp && pvApp->GetController()->GetLocalProcessId() == 0)
+    {
+    pvApp->BroadcastScript("%s SetVisibility %d", this->GetTclName(), v);
+    }
+}
+
+  
+//----------------------------------------------------------------------------
+int vtkPVSource::GetVisibility()
+{
+  vtkProp *p = this->GetProp();
+  
+  if (p == NULL)
+    {
+    return 0;
+    }
+  
+  return p->GetVisibility();
 }

@@ -32,9 +32,6 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVAssignmentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVAssignmentNewCommand();
-int vtkPVCompositeCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVCompositeNewCommand();
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVConeSourceNewCommand();
@@ -44,9 +41,9 @@ ClientData vtkPVContourFilterNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
-int vtkPVDataListCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
-ClientData vtkPVDataListNewCommand();
+ClientData vtkPVSourceListNewCommand();
 int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVElevationFilterNewCommand();
@@ -133,16 +130,14 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,"vtkPVAssignment", vtkPVAssignmentNewCommand,
                   vtkPVAssignmentCommand);
-  vtkTclCreateNew(interp,"vtkPVComposite", vtkPVCompositeNewCommand,
-                  vtkPVCompositeCommand);
   vtkTclCreateNew(interp,"vtkPVConeSource", vtkPVConeSourceNewCommand,
                   vtkPVConeSourceCommand);
   vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,
                   vtkPVContourFilterCommand);
   vtkTclCreateNew(interp,"vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
-  vtkTclCreateNew(interp,"vtkPVDataList", vtkPVDataListNewCommand,
-                  vtkPVDataListCommand);
+  vtkTclCreateNew(interp,"vtkPVSourceList", vtkPVSourceListNewCommand,
+                  vtkPVSourceListCommand);
   vtkTclCreateNew(interp,"vtkPVElevationFilter", vtkPVElevationFilterNewCommand,
                   vtkPVElevationFilterCommand);
   vtkTclCreateNew(interp,"vtkPVGlyph3D", vtkPVGlyph3DNewCommand,

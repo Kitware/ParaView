@@ -38,15 +38,16 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkPVData.h"
 #include "vtkSource.h"
+#include "vtkKWComposite.h"
+class vtkPVWindow;
 
-class vtkPVComposite;
 class vtkPVAssignment;
 
-class VTK_EXPORT vtkPVSource : public vtkKWWidget
+class VTK_EXPORT vtkPVSource : public vtkKWComposite
 {
 public:
   static vtkPVSource* New();
-  vtkTypeMacro(vtkPVSource,vtkKWWidget);
+  vtkTypeMacro(vtkPVSource,vtkKWComposite);
   
   // Description:
   // This duplicates the object in the satellite processes.
@@ -54,31 +55,51 @@ public:
   void Clone(vtkPVApplication *app);
   
   // Description:
-  // Creates common widgets.
-  // Returns 0 if there was an error.
-  virtual int Create(char *args);  
-  
-  // Description:
-  // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
-  void SetComposite(vtkPVComposite *comp);
-
-  // Description:
-  // Gets the composite that owns this source widget.
-  vtkGetObjectMacro(Composite, vtkPVComposite);
-
-  // Description:
   // Tells the filter which piece of data to generate.
   // Makes the call (indirectly) in parallel (on every process).
   virtual void SetAssignment(vtkPVAssignment *a);
+  
+  // Description:
+  // Get the Prop for this class.
+  virtual vtkProp *GetProp();
+
+  // Description:
+  // Get the Window for this class.
+  vtkPVWindow *GetWindow();
   
   // Description:
   // A way to get the output in the superclass.
   vtkPVData *GetPVData() {return this->Output;}
     
   // Description:
+  // Create the properties object, called by InitializeProperties.
+  virtual void CreateProperties();
+  virtual void ShowProperties();
+  
+  // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
   
+  // Description:
+  // Methods to indicate when this composite is the selected composite.
+  // These methods are used by subclasses to modify the menu bar
+  // for example. When a volume composite is selected it might 
+  // add an option to the menu bar to view the 2D slices.
+  virtual void Select(vtkKWView *);
+  virtual void Deselect(vtkKWView *);
+
+  // Description:
+  // This flage turns the visibility of the prop on and off.  These methods transmit
+  // the state change to all of the satellite processes.
+  void SetVisibility(int v);
+  int GetVisibility();
+  vtkBooleanMacro(Visibility, int);
+
+  // Description:
+  // This name is used in the data list to identify the composite.
+  virtual void SetName(const char *name);
+  char* GetName();
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -93,9 +114,8 @@ protected:
   
   // Just one input for now.
   vtkPVData *Input;
-
-  vtkPVComposite* Composite;
-  
+  char *Name;
+  vtkKWWidget *Properties;
 };
 
 #endif

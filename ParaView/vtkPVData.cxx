@@ -27,7 +27,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h" 
-#include "vtkPVComposite.h"
 #include "vtkPVSource.h"
 #include "vtkKWView.h"
 #include "vtkPVWindow.h"
@@ -131,14 +130,11 @@ int vtkPVData::Create(char *args)
 void vtkPVData::Contour()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVComposite *newComp;
   vtkPVContourFilter *contour;
   vtkPVPolyData *pvd;
   vtkPVAssignment *a;
   float *range;
   
-  newComp = vtkPVComposite::New();
-  newComp->Clone(pvApp);
   contour = vtkPVContourFilter::New();
   contour->Clone(pvApp);
   pvd = vtkPVPolyData::New();
@@ -152,24 +148,20 @@ void vtkPVData::Contour()
   range = this->Data->GetScalarRange();
   contour->SetValue(0, (range[1]-range[0])/2.0);
       
-  newComp->SetSource(contour);
-  newComp->SetCompositeName("contour");
+  contour->SetName("contour");
 
-  vtkPVWindow *window = this->GetComposite()->GetWindow();
-  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties("");
-  this->GetComposite()->GetView()->AddComposite(newComp);
-  this->GetComposite()->VisibilityOff();
+  vtkPVWindow *window = vtkPVWindow::SafeDownCast(
+    this->GetPVSource()->GetView()->GetParentWindow());
+  contour->CreateProperties();
+  this->GetPVSource()->GetView()->AddComposite(contour);
+  this->GetPVSource()->VisibilityOff();
   
-  newComp->SetWindow(window);
+  window->SetCurrentSource(contour);
+  window->GetSourceList()->Update();
   
-  window->SetCurrentDataComposite(newComp);
-  window->GetDataList()->Update();
-  
-  this->GetComposite()->GetView()->Render();
+  this->GetPVSource()->GetView()->Render();
   
   contour->Delete();
-  newComp->Delete();
   pvd->Delete();
 }
 
@@ -222,17 +214,6 @@ void vtkPVData::SetPVSource(vtkPVSource *source)
     }
 }
 
-
-//----------------------------------------------------------------------------
-vtkPVComposite *vtkPVData::GetComposite()
-{
-  if (this->PVSource == NULL)
-    {
-    return NULL;
-    }
-
-  return this->PVSource->GetComposite();
-}
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetAssignment(vtkPVAssignment *a)

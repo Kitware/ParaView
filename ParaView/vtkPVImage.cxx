@@ -28,7 +28,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImage.h"
 #include "vtkPVImageClip.h"
 #include "vtkPVImageSlice.h"
-#include "vtkPVComposite.h"
 #include "vtkPVWindow.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkPVAssignment.h"
@@ -58,15 +57,11 @@ vtkPVImage* vtkPVImage::New()
 void vtkPVImage::Clip()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVComposite *newComp;
   vtkPVImageClip *clip;
   vtkPVImage *pvi;
-  vtkPVAssignment *a;
   int ext[6];
 
   
-  newComp = vtkPVComposite::New();
-  newComp->Clone(pvApp);
   clip = vtkPVImageClip::New();
   clip->Clone(pvApp);
   pvi = vtkPVImage::New();
@@ -80,26 +75,21 @@ void vtkPVImage::Clip()
   clip->SetOutput(pvi);
   clip->SetOutputWholeExtent(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
   
-  newComp->SetSource(clip);
-  newComp->SetCompositeName("clip");
+  clip->SetName("clip");
   
-  vtkPVWindow *window = this->GetComposite()->GetWindow();
-  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties("");
-  this->GetComposite()->GetView()->AddComposite(newComp);
-  this->GetComposite()->VisibilityOff();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  clip->CreateProperties();
+  this->GetPVSource()->GetView()->AddComposite(clip);
+  this->GetPVSource()->VisibilityOff();
   
-  newComp->SetWindow(window);
-  
-  window->SetCurrentDataComposite(newComp);
-  window->GetDataList()->Update();
+  window->SetCurrentSource(clip);
+  window->GetSourceList()->Update();
 
   window->GetMainView()->ResetCamera();
   window->GetMainView()->Render();
   
-  this->GetComposite()->GetView()->Render();
+  this->GetPVSource()->GetView()->Render();
   
-  newComp->Delete();
   clip->Delete();
   pvi->Delete();
 }
@@ -108,13 +98,10 @@ void vtkPVImage::Clip()
 void vtkPVImage::Slice()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
-  vtkPVComposite *newComp;
   vtkPVImageSlice *slice;
   vtkPVImage *pvi;
   int *extents;
   
-  newComp = vtkPVComposite::New();
-  newComp->Clone(pvApp);
   slice = vtkPVImageSlice::New();
   slice->Clone(pvApp);
   pvi = vtkPVImage::New();
@@ -134,23 +121,18 @@ void vtkPVImage::Slice()
   slice->GetSlice()->SetOutputWholeExtent(extents);
   slice->GetSlice()->Update();
 
-  newComp->SetSource(slice);
-  newComp->SetCompositeName("slice");
+  slice->SetName("slice");
   
-  vtkPVWindow *window = this->GetComposite()->GetWindow();
-  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties("");
-  this->GetComposite()->GetView()->AddComposite(newComp);
-  this->GetComposite()->VisibilityOff();
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  slice->CreateProperties();
+  this->GetPVSource()->GetView()->AddComposite(slice);
+  this->GetPVSource()->VisibilityOff();
   
-  newComp->SetWindow(window);
+  window->SetCurrentSource(slice);
+  window->GetSourceList()->Update();
   
-  window->SetCurrentDataComposite(newComp);
-  window->GetDataList()->Update();
+  this->GetPVSource()->GetView()->Render();
   
-  this->GetComposite()->GetView()->Render();
-  
-  newComp->Delete();
   slice->Delete();
 }
 

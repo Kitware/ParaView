@@ -29,7 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVShrinkPolyData.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVComposite.h"
 #include "vtkPVPolyData.h"
 
 int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
@@ -38,14 +37,12 @@ int vtkPVShrinkPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVShrinkPolyData::vtkPVShrinkPolyData()
 {
-  vtkPVPolyData *pd;
-
   this->CommandFunction = vtkPVShrinkPolyDataCommand;
   
   this->Accept = vtkKWWidget::New();
-  this->Accept->SetParent(this);
+  this->Accept->SetParent(this->Properties);
   this->ShrinkFactorScale = vtkKWScale::New();
-  this->ShrinkFactorScale->SetParent(this);
+  this->ShrinkFactorScale->SetParent(this->Properties);
   this->Shrink = vtkShrinkPolyData::New();
   
 }
@@ -70,13 +67,10 @@ vtkPVShrinkPolyData* vtkPVShrinkPolyData::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVShrinkPolyData::Create(char *args)
+void vtkPVShrinkPolyData::CreateProperties()
 {  
   // must set the application
-  if (this->vtkPVSource::Create(args) == 0)
-    {
-    return 0;
-    }
+  this->vtkPVSource::CreateProperties();
   
   this->ShrinkFactorScale->Create(this->Application,
 				  "-showvalue 1");
@@ -88,8 +82,6 @@ int vtkPVShrinkPolyData::Create(char *args)
   this->Accept->SetCommand(this, "ShrinkFactorChanged");
   this->Script("pack %s %s", this->ShrinkFactorScale->GetWidgetName(),
 	this->Accept->GetWidgetName());
-
-  return 1;
 }
 
 
@@ -123,7 +115,7 @@ void vtkPVShrinkPolyData::ShrinkFactorChanged()
   this->Shrink->Modified();
   this->Shrink->Update();
   
-  this->Composite->GetView()->Render();
+  this->GetView()->Render();
 }
 
 

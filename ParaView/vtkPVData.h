@@ -35,7 +35,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkActor.h"
 #include "vtkDataSet.h"
 
-class vtkPVComposite;
 class vtkPVSource;
 class vtkPVAssignment;
 class vtkPVApplication;
@@ -98,12 +97,6 @@ protected:
 
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;
-
-  // Description:
-  // A convenience method to get the cpmposite that owns the source widget
-  // that owns this data widget.
-  vtkPVComposite *GetComposite();
-
   vtkPVAssignment *Assignment;
 };
 

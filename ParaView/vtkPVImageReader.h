@@ -45,7 +45,7 @@ public:
 
   // Description:
   // You will need to clone this object before you create it.
-  int Create(char *args);
+  void CreateProperties();
   
   // Description:
   // For now you have to set the output explicitly.  This allows you to manage

@@ -33,7 +33,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWEntry.h"
 #include "vtkGlyph3D.h"
 #include "vtkPVSource.h"
-#include "vtkPVComposite.h"
 
 class vtkPVPolyData;
 
@@ -46,7 +45,7 @@ public:
 
   // Description:
   // You have to clone this object before you create its UI.
-  int Create(char *args);
+  void CreateProperties();
 
   // Description:
   // This method executes in every process.
@@ -61,14 +60,14 @@ public:
   
   vtkGetObjectMacro(Glyph, vtkGlyph3D);
   
-  vtkGetObjectMacro(GlyphComposite, vtkPVComposite);
-  void SetGlyphComposite(vtkPVComposite *comp);
+  vtkGetObjectMacro(GlyphSource, vtkPVSource);
+  void SetGlyphSource(vtkPVSource *comp);
   
   // Description:
   // Propagated to all processes.
   void SetScaleModeToDataScalingOff();  
   
-  void ShowGlyphComposite();
+  void ShowGlyphSource();
   void ScaleFactorChanged();
   
 protected:
@@ -77,13 +76,13 @@ protected:
   vtkPVGlyph3D(const vtkPVGlyph3D&) {};
   void operator=(const vtkPVGlyph3D&) {};
   
-  vtkKWWidget *GlyphCompositeButton;
+  vtkKWWidget *GlyphSourceButton;
   vtkKWLabel *ScaleFactorLabel;
   vtkKWEntry *ScaleFactorEntry;
   vtkKWWidget *Accept;
 
   vtkGlyph3D *Glyph;
-  vtkPVComposite *GlyphComposite;
+  vtkPVSource *GlyphSource;
 };
 
 #endif

@@ -29,7 +29,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageSlice.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVComposite.h"
 #include "vtkPVImage.h"
 
 int vtkPVImageSliceCommand(ClientData cd, Tcl_Interp *interp,
@@ -41,18 +40,18 @@ vtkPVImageSlice::vtkPVImageSlice()
   this->CommandFunction = vtkPVImageSliceCommand;
   
   this->Accept = vtkKWWidget::New();
-  this->Accept->SetParent(this);
+  this->Accept->SetParent(this->Properties);
   
   this->SliceEntry = vtkKWEntry::New();
-  this->SliceEntry->SetParent(this);
+  this->SliceEntry->SetParent(this->Properties);
   this->SliceLabel = vtkKWLabel::New();
-  this->SliceLabel->SetParent(this);
+  this->SliceLabel->SetParent(this->Properties);
   this->XDimension = vtkKWRadioButton::New();
-  this->XDimension->SetParent(this);
+  this->XDimension->SetParent(this->Properties);
   this->YDimension = vtkKWRadioButton::New();
-  this->YDimension->SetParent(this);
+  this->YDimension->SetParent(this->Properties);
   this->ZDimension = vtkKWRadioButton::New();
-  this->ZDimension->SetParent(this);
+  this->ZDimension->SetParent(this->Properties);
   
   this->Slice = vtkImageClip::New();
 }
@@ -85,16 +84,13 @@ vtkPVImageSlice* vtkPVImageSlice::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVImageSlice::Create(char *args)
+void vtkPVImageSlice::CreateProperties()
 {
   int *extents;
   int sliceNumber;
   
   // must set the application
-  if (this->vtkPVSource::Create(args) == 0)
-    {
-    return 0;
-    }
+  this->vtkPVSource::CreateProperties();
   
   this->XDimension->Create(this->Application, "-text X");
   this->XDimension->SetCommand(this, "SelectX");
@@ -134,8 +130,6 @@ int vtkPVImageSlice::Create(char *args)
 	       this->XDimension->GetWidgetName(),
 	       this->YDimension->GetWidgetName(),
 	       this->ZDimension->GetWidgetName());
-
-  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -171,7 +165,7 @@ void vtkPVImageSlice::SliceChanged()
   this->Slice->Modified();
   this->Slice->Update();
   
-  this->Composite->GetView()->Render();
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------

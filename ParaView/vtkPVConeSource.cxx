@@ -30,7 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWApplication.h"
 #include "vtkKWView.h"
 #include "vtkKWRenderView.h"
-#include "vtkPVComposite.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVApplication.h"
 
@@ -40,23 +39,22 @@ int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVConeSource::vtkPVConeSource()
 {
-  vtkPVPolyData *pvData;
   this->CommandFunction = vtkPVConeSourceCommand;
   
   this->HeightLabel = vtkKWLabel::New();
-  this->HeightLabel->SetParent(this);
+  this->HeightLabel->SetParent(this->Properties);
   this->RadiusLabel = vtkKWLabel::New();
-  this->RadiusLabel->SetParent(this);
+  this->RadiusLabel->SetParent(this->Properties);
   this->ResolutionLabel = vtkKWLabel::New();
-  this->ResolutionLabel->SetParent(this);
+  this->ResolutionLabel->SetParent(this->Properties);
   this->HeightEntry = vtkKWEntry::New();
-  this->HeightEntry->SetParent(this);
+  this->HeightEntry->SetParent(this->Properties);
   this->RadiusEntry = vtkKWEntry::New();
-  this->RadiusEntry->SetParent(this);
+  this->RadiusEntry->SetParent(this->Properties);
   this->ResolutionEntry = vtkKWEntry::New();
-  this->ResolutionEntry->SetParent(this);
+  this->ResolutionEntry->SetParent(this->Properties);
   this->Accept = vtkKWWidget::New();
-  this->Accept->SetParent(this);
+  this->Accept->SetParent(this->Properties);
   this->ConeSource = vtkConeSource::New();  
 }
 
@@ -90,12 +88,9 @@ vtkPVConeSource* vtkPVConeSource::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVConeSource::Create(char *args)
+void vtkPVConeSource::CreateProperties()
 {  
-  if (this->vtkPVSource::Create(args) == 0)
-    {
-    return 0;
-    }
+  this->vtkPVSource::CreateProperties();
   
   this->RadiusLabel->Create(this->Application, "");
   this->RadiusLabel->SetLabel("Radius:");
@@ -166,7 +161,7 @@ void vtkPVConeSource::ConeParameterChanged()
 			this->ConeSource->GetResolution());
     }
   
-  this->Composite->GetView()->Render();
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------

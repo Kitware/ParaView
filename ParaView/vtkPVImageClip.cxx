@@ -28,7 +28,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageClip.h"
 #include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVComposite.h"
 #include "vtkPVImage.h"
 
 int vtkPVImageClipCommand(ClientData cd, Tcl_Interp *interp,
@@ -40,33 +39,33 @@ vtkPVImageClip::vtkPVImageClip()
   this->CommandFunction = vtkPVImageClipCommand;
   
   this->Accept = vtkKWWidget::New();
-  this->Accept->SetParent(this);
+  this->Accept->SetParent(this->Properties);
   
   this->ClipXMinEntry = vtkKWEntry::New();
-  this->ClipXMinEntry->SetParent(this);
+  this->ClipXMinEntry->SetParent(this->Properties);
   this->ClipXMaxEntry = vtkKWEntry::New();
-  this->ClipXMaxEntry->SetParent(this);
+  this->ClipXMaxEntry->SetParent(this->Properties);
   this->ClipYMinEntry = vtkKWEntry::New();
-  this->ClipYMinEntry->SetParent(this);
+  this->ClipYMinEntry->SetParent(this->Properties);
   this->ClipYMaxEntry = vtkKWEntry::New();
-  this->ClipYMaxEntry->SetParent(this);
+  this->ClipYMaxEntry->SetParent(this->Properties);
   this->ClipZMinEntry = vtkKWEntry::New();
-  this->ClipZMinEntry->SetParent(this);
+  this->ClipZMinEntry->SetParent(this->Properties);
   this->ClipZMaxEntry = vtkKWEntry::New();
-  this->ClipZMaxEntry->SetParent(this);
+  this->ClipZMaxEntry->SetParent(this->Properties);
   
   this->ClipXMinLabel = vtkKWLabel::New();
-  this->ClipXMinLabel->SetParent(this);
+  this->ClipXMinLabel->SetParent(this->Properties);
   this->ClipXMaxLabel = vtkKWLabel::New();
-  this->ClipXMaxLabel->SetParent(this);
+  this->ClipXMaxLabel->SetParent(this->Properties);
   this->ClipYMinLabel = vtkKWLabel::New();
-  this->ClipYMinLabel->SetParent(this);
+  this->ClipYMinLabel->SetParent(this->Properties);
   this->ClipYMaxLabel = vtkKWLabel::New();
-  this->ClipYMaxLabel->SetParent(this);
+  this->ClipYMaxLabel->SetParent(this->Properties);
   this->ClipZMinLabel = vtkKWLabel::New();
-  this->ClipZMinLabel->SetParent(this);
+  this->ClipZMinLabel->SetParent(this->Properties);
   this->ClipZMaxLabel = vtkKWLabel::New();
-  this->ClipZMaxLabel->SetParent(this);
+  this->ClipZMaxLabel->SetParent(this->Properties);
   
   this->ImageClip = vtkImageClip::New();
   this->ImageClip->ClipDataOn();
@@ -115,16 +114,13 @@ vtkPVImageClip* vtkPVImageClip::New()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVImageClip::Create(char *args)
+void vtkPVImageClip::CreateProperties()
 {
   int *extents;
   
   // must set the application
-  if (this->vtkPVSource::Create(args) == 0)
-    {
-    return 0;
-    }
-  
+  this->vtkPVSource::CreateProperties();
+
   extents = this->GetImageClip()->GetOutputWholeExtent();
   
   this->ClipXMinLabel->Create(this->Application, "");
@@ -168,7 +164,6 @@ int vtkPVImageClip::Create(char *args)
 	       this->ClipZMinEntry->GetWidgetName(),
 	       this->ClipZMaxLabel->GetWidgetName(),
 	       this->ClipZMaxEntry->GetWidgetName());
-  return 1;
 }
 
 
@@ -230,5 +225,5 @@ void vtkPVImageClip::ExtentsChanged()
   this->ImageClip->Modified();
   this->ImageClip->Update();
   
-  this->Composite->GetView()->Render();
+  this->GetView()->Render();
 }
