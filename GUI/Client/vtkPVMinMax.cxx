@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.44");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -313,6 +313,8 @@ void vtkPVMinMax::Initialize()
 //----------------------------------------------------------------------------
 void vtkPVMinMax::ResetInternal()
 {
+  this->Update();
+
   if ( this->MinScale->IsCreated() )
     {
     vtkSMDoubleVectorProperty* dprop = vtkSMDoubleVectorProperty::SafeDownCast(
@@ -346,9 +348,6 @@ void vtkPVMinMax::ResetInternal()
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Update()
 {
-  vtkPVSource* source = this->GetPVSource();
-  source->GetProxy()->UpdateInformation();
-
   double range[2];
   double oldRange[2];
 
