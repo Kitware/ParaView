@@ -225,7 +225,26 @@ void vtkKWApplication::Exit()
     
 void vtkKWApplication::Start()
 { 
-  this->Start(0,NULL);
+  // look at Tcl for any args
+  this->Script("set argc");
+  int argc = vtkKWObject::GetIntegerResult(this);
+  char **argv = NULL;
+  if (argc)
+    {
+    argv = new char *[argc];
+    for (int i = 0; i < argc; i++)
+      {
+      this->Script("lindex $argv %d",i);
+      argv[i] = strdup(this->GetMainInterp()->result);
+      }
+    }
+  this->Start(argc,argv);
+  
+  for (int i = 0; i < argc; i++)
+    {
+    free(argv[i]);
+    }
+  delete [] argv;
 }
 void vtkKWApplication::Start(char *arg)
 { 
