@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVLineWidget.h
+  Module:    vtkPV3DWidget.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,7 +39,7 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVLineWidget -
+// .NAME vtkPV3DWidget - superclass of 3D Widgets
 // .SECTION Description
 
 // Todo:
@@ -48,82 +48,92 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //       * Resolution
 //       *
 
-#ifndef __vtkPVLineWidget_h
-#define __vtkPVLineWidget_h
+#ifndef __vtkPV3DWidget_h
+#define __vtkPV3DWidget_h
 
-#include "vtkPV3DWidget.h"
+#include "vtkPVWidget.h"
 
 class vtkKWCheckButton;
-class vtkKWEntry;
-class vtkKWLabel;
 class vtkKWLabeledFrame;
-class vtkLineWidget;
-class vtkLineWidgetObserver;
+class vtk3DWidget;
+class vtkPV3DWidgetObserver;
+class vtkKWFrame;
 
-class VTK_EXPORT vtkPVLineWidget : public vtkPV3DWidget
+class VTK_EXPORT vtkPV3DWidget : public vtkPVWidget
 {
 public:
-  static vtkPVLineWidget* New();
-  vtkTypeMacro(vtkPVLineWidget, vtkPVWidget);
+  vtkTypeMacro(vtkPV3DWidget, vtkPVWidget);
 
+  void Create(vtkKWApplication *pvApp);
+  
   // Description:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept();
+  virtual void Accept() = 0;
   
   // Description:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void Reset();
+  virtual void Reset() = 0;
 
-  // Description:
-  // Callbacks to set the points of the 3D widget from the
-  // entry values. Bound to <KeyPress-Return>.
-  void SetPoint1();
-  void SetPoint2();
-    
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
   // a new instance of the same type as the current object
   // using NewInstance() and then copy some necessary state 
   // parameters.
-  vtkPVLineWidget* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+  virtual vtkPV3DWidget* ClonePrototype(vtkPVSource* pvSource,
+					vtkArrayMap<vtkPVWidget*, 
+					vtkPVWidget*>* map) = 0;
 //ETX
+
+  // Description:
+  // Set the line visibility.
+  void SetVisibility();
+
+  // Description:
+  // Set modified to 1 when value has changed.
+  void SetValueChanged();
 
 protected:
-  vtkPVLineWidget();
-  ~vtkPVLineWidget();
+  vtkPV3DWidget();
+  ~vtkPV3DWidget();
   
-//BTX
-  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
-
-  friend class vtkLineWidgetObserver;
-//ETX
-  
-  int ReadXMLAttributes(vtkPVXMLElement* element,
-                        vtkPVXMLPackageParser* parser);
+  vtk3DWidget* Widget3D;
+  vtkPV3DWidgetObserver* Observer;
 
   // Description:
   // Call creation on the child.
-  virtual void ChildCreate(vtkPVApplication*);
+  virtual void ChildCreate(vtkPVApplication*) = 0;
+
+  // Description:
+  // Set the 3D widget we are observing.
+  void SetObservable3DWidget(vtk3DWidget*);
+
+//BTX
+  virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
+			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)=0;
+
+  friend class vtkPV3DWidgetObserver;
+//ETX
 
   // Description:
   // Execute event of the 3D Widget.
-  virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
+  virtual void ExecuteEvent(vtkObject*, unsigned long, void*) = 0;
+  
+  virtual int ReadXMLAttributes(vtkPVXMLElement* element,
+				vtkPVXMLPackageParser* parser) = 0;
 
-  vtkKWEntry* Point1[3];
-  vtkKWEntry* Point2[3];
-  vtkKWLabel* Labels[2];
-  vtkKWLabel* CoordinateLabel[3];
+  vtkKWFrame*        Frame;
+  vtkKWLabeledFrame* LabeledFrame;
+  vtkKWCheckButton* Visibility;
+  int ValueChanged;
 
 private:  
-  vtkPVLineWidget(const vtkPVLineWidget&); // Not implemented
-  void operator=(const vtkPVLineWidget&); // Not implemented
+  vtkPV3DWidget(const vtkPV3DWidget&); // Not implemented
+  void operator=(const vtkPV3DWidget&); // Not implemented
 };
 
 #endif

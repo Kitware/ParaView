@@ -8,6 +8,7 @@ vtkDummyRenderWindow
 vtkDummyRenderer
 vtkKWBoundsDisplay
 vtkKWExtractGeometryByScalar
+vtkPV3DWidget
 vtkPVAdvancedReaderModule
 vtkPVAnimationInterface
 vtkPVApplication 
@@ -73,6 +74,7 @@ vtkStringList
 ABSTRACT_FILES(
 vtkPVObjectWidget
 vtkPVWidget
+vtkPV3DWidget
 )
 WRAP_EXCLUDE_FILES(
 vtkPVSourceInterfaceParser
