@@ -42,7 +42,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkSource.h"
 
 class vtkPVWindow;
-class vtkPVCommandList;
+class vtkStringList;
 class vtkKWCheckButton;
 class vtkKWScale;
 class vtkKWEntry;
@@ -66,8 +66,11 @@ public:
   // Description:
   // Create the properties object, called by InitializeProperties.
   virtual void CreateProperties();
+  
+  // Description:
+  // Pack properties for this source. 
   virtual void ShowProperties();
-
+  
   // Description:
   // Methods to indicate when this composite is the selected composite.
   // These methods are used by subclasses to modify the menu bar
@@ -130,6 +133,10 @@ public:
   // It uses the GetCommand supplied to the interface.
   void UpdateParameterWidgets();
   
+  //---------------------------------------------------------------------
+  // This is a poor way to create widgets.  Another method that integrates
+  // with vtkPVMethodInterfaces should be created.
+  
   // Description:
   // Create an entry for a filename.
   vtkKWEntry *AddFileEntry(char *label, char *setCmd, char *getCmd,
@@ -142,7 +149,7 @@ public:
   vtkKWEntry *AddStringEntry(char *label, char *setCmd, char *getCmd,
                              vtkKWObject *o = NULL);
  
-   // Description:
+  // Description:
   // Create an entry for a single value.  Label is put to left of entry.
   // The methods are called on the object (VTKSource if o=NULL).
   vtkKWEntry *AddLabeledEntry(char *label, char *setCmd, char *getCmd,
@@ -268,8 +275,8 @@ protected:
   // These are obsolete, and should be replaced by a reference to the vtkPVSourceInterface.
   // Until we find a way to match up widget names and commands to the method interfaces,
   // we will have to keep the generic strings.
-  vtkPVCommandList *AcceptCommands;
-  vtkPVCommandList *CancelCommands;
+  vtkStringList *AcceptCommands;
+  vtkStringList *CancelCommands;
 
   vtkPVSourceInterface *Interface;
 

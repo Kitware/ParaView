@@ -36,7 +36,15 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObject.h"
 #include "vtkIdList.h"
 
+class vtkStringList;
+
+
 #define VTK_STRING 13
+
+#define VTK_PV_METHOD_WIDGET_ENTRY      0
+#define VTK_PV_METHOD_WIDGET_TOGGLE     1
+#define VTK_PV_METHOD_WIDGET_SELECTION  2
+#define VTK_PV_METHOD_WIDGET_FILE       3
 
 class VTK_EXPORT vtkPVMethodInterface : public vtkObject
 {
@@ -57,16 +65,40 @@ public:
   vtkGetStringMacro(GetCommand);
   
   // Description:
+  // This specifies the type of widget to use.
+  // I have not descided whether we should have subclasses that specifies
+  // the widget and its parameters.  For now, it is just a mode in this
+  // geneneric interface.  Default is just an entry box.
+  void SetWidgetType(int type);
+  vtkGetMacro(WidgetType,int);
+  
+  // Description:
   // Add the argument types one by one.
+  // Only the entry widget supports multiple arguments.  
+  // Toggle and Selection should both have one integer argument.
+  void SetWidgetTypeToEntry() { this->SetWidgetType(VTK_PV_METHOD_WIDGET_ENTRY);}
   void AddArgumentType(int type);
   void AddFloatArgument() {this->AddArgumentType(VTK_FLOAT);}
   void AddIntegerArgument() {this->AddArgumentType(VTK_INT);}
   void AddStringArgument() {this->AddArgumentType(VTK_STRING);}
+  int GetNumberOfArguments() {return this->ArgumentTypes->GetNumberOfIds();}
+  int GetArgumentType(int i) {return this->ArgumentTypes->GetId(i);}  
+
+  // Discription:
+  // Toggle an integer ivar.  This is the only call required.
+  void SetWidgetTypeToToggle() { this->SetWidgetType(VTK_PV_METHOD_WIDGET_TOGGLE);}  
   
   // Description:
-  // Accessing the arguments.
-  int GetNumberOfArguments() {return this->ArgumentTypes->GetNumberOfIds();}
-  int GetArgumentType(int i) {return this->ArgumentTypes->GetId(i);}
+  // For a selection widget.  Add the string options.
+  void SetWidgetTypeToSelection() { this->SetWidgetType(VTK_PV_METHOD_WIDGET_SELECTION);}
+  void AddSelectionEntry(int idx, char *label);
+  vtkStringList *GetSelectionEntries() {return this->SelectionEntries;}
+
+  // Description:
+  // Displays a button that brings up a file selection dialog.
+  void SetWidgetTypeToFile() { this->SetWidgetType(VTK_PV_METHOD_WIDGET_FILE);}  
+  vtkSetStringMacro(FileExtension);
+  vtkGetStringMacro(FileExtension);
   
 protected:
   vtkPVMethodInterface();
@@ -79,6 +111,11 @@ protected:
   char *GetCommand;
 
   vtkIdList *ArgumentTypes;
+  
+  int WidgetType;
+  vtkStringList *SelectionEntries;
+  
+  char *FileExtension;
 };
 
 #endif

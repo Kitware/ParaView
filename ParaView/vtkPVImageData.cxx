@@ -104,8 +104,6 @@ int vtkPVImageData::Create(char *args)
     return 0;
     }
   
-  this->FiltersMenuButton->AddCommand("ShiftScale", this, "ShiftScale");
-  
   return 1;
 }
 

@@ -26,6 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVMethodInterface.h"
+#include "vtkStringList.h"
 
 
 //----------------------------------------------------------------------------
@@ -35,6 +36,9 @@ vtkPVMethodInterface::vtkPVMethodInterface()
   this->SetCommand = NULL;
   this->GetCommand = NULL;
   this->ArgumentTypes = vtkIdList::New();
+  this->WidgetType = VTK_PV_METHOD_WIDGET_ENTRY;
+  this->SelectionEntries = NULL;
+  this->FileExtension = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -45,6 +49,12 @@ vtkPVMethodInterface::~vtkPVMethodInterface()
   this->SetGetCommand(NULL);
   this->ArgumentTypes->Delete();
   this->ArgumentTypes = NULL;
+  if (this->SelectionEntries)
+    {
+    this->SelectionEntries->Delete();
+    this->SelectionEntries = NULL;
+    }
+  this->SetFileExtension(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -59,4 +69,40 @@ void vtkPVMethodInterface::AddArgumentType(int type)
   this->ArgumentTypes->InsertNextId(type);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMethodInterface::AddSelectionEntry(int idx, char *string)
+{
+  if (this->SelectionEntries == NULL)
+    {
+    this->SelectionEntries = vtkStringList::New();
+    }
+  this->SelectionEntries->SetString(idx, string);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVMethodInterface::SetWidgetType(int type)
+{
+  if (this->WidgetType == type)
+    {
+    return;
+    }
+  this->Modified();
+  this->WidgetType = type;
+  
+  if (this->WidgetType == VTK_PV_METHOD_WIDGET_TOGGLE)
+    {
+    this->ArgumentTypes->Reset();
+    this->AddIntegerArgument();
+    }
+  if (this->WidgetType == VTK_PV_METHOD_WIDGET_SELECTION)
+    {
+    this->ArgumentTypes->Reset();
+    this->AddIntegerArgument();
+    }
+  if (this->WidgetType == VTK_PV_METHOD_WIDGET_FILE)
+    {
+    this->ArgumentTypes->Reset();
+    this->AddStringArgument();
+    }
+}
 

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVCommandList.h
+  Module:    vtkStringList.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -27,51 +27,51 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 // .NAME vtkKWAssignment - An object for assigning data to processors.
 // .SECTION Description
-// A vtkPVCommandList holds a data piece/extent specification for a process.
+// A vtkStringList holds a data piece/extent specification for a process.
 // It is really just a parallel object wrapper for vtkPVExtentTranslator.
 
-#ifndef __vtkPVCommandList_h
-#define __vtkPVCommandList_h
+#ifndef __vtkStringList_h
+#define __vtkStringList_h
 
 #include "vtkObject.h"
 
 
-class VTK_EXPORT vtkPVCommandList : public vtkObject
+class VTK_EXPORT vtkStringList : public vtkObject
 {
 public:
-  static vtkPVCommandList* New();
-  vtkTypeMacro(vtkPVCommandList,vtkObject);
+  static vtkStringList* New();
+  vtkTypeMacro(vtkStringList,vtkObject);
   
 //BTX
   // Description:
   // Add a command and format it any way you like/
-  void AddCommand(const char *EventString, ...);
+  void AddString(const char *EventString, ...);
 //ETX
   
   // Description:
   // Random access.
-  void SetCommand(int idx, const char *str);
+  void SetString(int idx, const char *str);
 
   // Description:
   // Get the length of the list.
-  int GetLength() { return this->NumberOfCommands;}
+  int GetLength() { return this->NumberOfStrings;}
   
   // Description:
   // Get a command from its index.
-  char *GetCommand(int idx);
+  char *GetString(int idx);
   
   
 protected:
-  vtkPVCommandList();
-  ~vtkPVCommandList();
-  vtkPVCommandList(const vtkPVCommandList&) {};
-  void operator=(const vtkPVCommandList&) {};
+  vtkStringList();
+  ~vtkStringList();
+  vtkStringList(const vtkStringList&) {};
+  void operator=(const vtkStringList&) {};
   
-  int NumberOfCommands;
-  int CommandArrayLength;
-  char **Commands;
+  int NumberOfStrings;
+  int StringArrayLength;
+  char **Strings;
   void Reallocate(int num);
-  void DeleteCommands();
+  void DeleteStrings();
 
 };
 

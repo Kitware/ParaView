@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVCommandList.cxx
+  Module:    vtkStringList.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -27,65 +27,65 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 #include <stdarg.h>
 #include "vtkObjectFactory.h"
-#include "vtkPVCommandList.h"
+#include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
-vtkPVCommandList* vtkPVCommandList::New()
+vtkStringList* vtkStringList::New()
 {
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVCommandList");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkStringList");
   if(ret)
     {
-    return (vtkPVCommandList*)ret;
+    return (vtkStringList*)ret;
     }
   // If the factory was unable to create the object, then create it here.
-  return new vtkPVCommandList;
+  return new vtkStringList;
 }
 
 //----------------------------------------------------------------------------
-vtkPVCommandList::vtkPVCommandList()
+vtkStringList::vtkStringList()
 {  
-  this->NumberOfCommands = 0;
-  this->CommandArrayLength = 0;
-  this->Commands = NULL;
+  this->NumberOfStrings = 0;
+  this->StringArrayLength = 0;
+  this->Strings = NULL;
 }
 
 //----------------------------------------------------------------------------
-vtkPVCommandList::~vtkPVCommandList()
+vtkStringList::~vtkStringList()
 {
   int i;
 
-  for (i = 0; i < this->NumberOfCommands; ++i)
+  for (i = 0; i < this->NumberOfStrings; ++i)
     {
-    if (this->Commands[i])
+    if (this->Strings[i])
       {
-      delete [] this->Commands[i];
-      this->Commands[i] = NULL;
+      delete [] this->Strings[i];
+      this->Strings[i] = NULL;
       }
     }
-  if (this->Commands)
+  if (this->Strings)
     {
-    delete [] this->Commands;
-    this->Commands = NULL;
-    this->NumberOfCommands = 0;
-    this->CommandArrayLength = 0;
+    delete [] this->Strings;
+    this->Strings = NULL;
+    this->NumberOfStrings = 0;
+    this->StringArrayLength = 0;
     }
 }
 
 
 //----------------------------------------------------------------------------
-char *vtkPVCommandList::GetCommand(int idx)
+char *vtkStringList::GetString(int idx)
 {
-  if (idx < 0 || idx >= this->NumberOfCommands)
+  if (idx < 0 || idx >= this->NumberOfStrings)
     {
     return NULL;
     }
   
-  return this->Commands[idx];
+  return this->Strings[idx];
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCommandList::AddCommand(const char *format, ...)
+void vtkStringList::AddString(const char *format, ...)
 {
   static char event[16000];
 
@@ -95,44 +95,44 @@ void vtkPVCommandList::AddCommand(const char *format, ...)
   va_end(var_args);
 
   // Check to see if we need to extent to array of commands.
-  if (this->CommandArrayLength <= this->NumberOfCommands)
+  if (this->StringArrayLength <= this->NumberOfStrings)
     { // Yes.
-    this->Reallocate(this->CommandArrayLength + 20);
+    this->Reallocate(this->StringArrayLength + 20);
     }
 
   // Allocate the string for and set the new command.
-  this->Commands[this->NumberOfCommands] 
+  this->Strings[this->NumberOfStrings] 
               = new char[strlen(event) + 2];
-  strcpy(this->Commands[this->NumberOfCommands], event);
-  this->NumberOfCommands += 1;
+  strcpy(this->Strings[this->NumberOfStrings], event);
+  this->NumberOfStrings += 1;
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCommandList::SetCommand(int idx, const char *str)
+void vtkStringList::SetString(int idx, const char *str)
 {
   int j;
 
-  if (idx >= this->CommandArrayLength)
+  if (idx >= this->StringArrayLength)
     {
     this->Reallocate(idx + 20);
     }
 
   // Expand the command list to include idx.
   // Add NULL entries if necessary.
-  if (idx >= this->NumberOfCommands)
+  if (idx >= this->NumberOfStrings)
     {
-    for (j = this->NumberOfCommands; j <= idx; ++j)
+    for (j = this->NumberOfStrings; j <= idx; ++j)
       {
-      this->Commands[j] = NULL;
+      this->Strings[j] = NULL;
       }
-    this->NumberOfCommands = idx + 1;
+    this->NumberOfStrings = idx + 1;
     }
   
   // Delete old command
-  if (this->Commands[idx])
+  if (this->Strings[idx])
     {
-    delete [] this->Commands[idx];
-    this->Commands[idx] = NULL;
+    delete [] this->Strings[idx];
+    this->Strings[idx] = NULL;
     }
   if (str == NULL)
     {
@@ -140,36 +140,36 @@ void vtkPVCommandList::SetCommand(int idx, const char *str)
     }
 
   // Copy the string into the array.
-  this->Commands[idx] = new char[strlen(str) + 2];
-  strcpy(this->Commands[idx], str);
+  this->Strings[idx] = new char[strlen(str) + 2];
+  strcpy(this->Strings[idx], str);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCommandList::Reallocate(int num)
+void vtkStringList::Reallocate(int num)
 {
   int i;
 
   // Check to see if we need to extent to array of commands.
-  if (this->CommandArrayLength >= num)
+  if (this->StringArrayLength >= num)
     { // No
     return;
     }
 
   // Allocate a new array
-  this->CommandArrayLength = num;
-  char **tmp = new char* [this->CommandArrayLength];
+  this->StringArrayLength = num;
+  char **tmp = new char* [this->StringArrayLength];
   // Copy array elements.
-  for (i = 0; i < this->NumberOfCommands; ++i)
+  for (i = 0; i < this->NumberOfStrings; ++i)
     {
-    tmp[i] = this->Commands[i];
+    tmp[i] = this->Strings[i];
     }
   // Delete the old array.
-  if (this->Commands)
+  if (this->Strings)
     {
-    delete [] this->Commands;
-    this->Commands = NULL;
+    delete [] this->Strings;
+    this->Strings = NULL;
     }
   // Set the new array.
-  this->Commands = tmp;
+  this->Strings = tmp;
   tmp = NULL;
 }

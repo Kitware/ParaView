@@ -66,14 +66,6 @@ public:
   vtkPVActorComposite* GetActorComposite();
   
   // Description:
-  // General filters that can be applied to vtkDataSet.
-  void Contour();
-  void ColorByProcess();
-  void Elevation();
-  void ExtractEdges();
-  void Cutter();
-
-  // Description:
   // DO NOT CALL THIS IF YOU ARE NOT A PVSOURCE!
   // The composite sets this so this data widget will know who owns it.
   void SetPVSource(vtkPVSource *source);
@@ -137,7 +129,6 @@ protected:
   vtkPVData(const vtkPVData&) {};
   void operator=(const vtkPVData&) {};
   
-  vtkKWMenuButton *FiltersMenuButton;
   vtkDataSet *VTKData;
   char *VTKDataTclName;
   vtkSetStringMacro(VTKDataTclName);

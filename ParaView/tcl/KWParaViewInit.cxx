@@ -29,9 +29,6 @@ ClientData vtkPVActorCompositeNewCommand();
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVApplicationNewCommand();
-int vtkPVCommandListCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkPVCommandListNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
@@ -68,6 +65,9 @@ ClientData vtkPVWindowNewCommand();
 int vtkSingleContourFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkSingleContourFilterNewCommand();
+int vtkStringListCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkStringListNewCommand();
 
 extern Tcl_HashTable vtkInstanceLookup;
 extern Tcl_HashTable vtkPointerLookup;
@@ -116,8 +116,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVActorCompositeCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVApplication", vtkPVApplicationNewCommand,
                   vtkPVApplicationCommand);
-  vtkTclCreateNew(interp,(char *) "vtkPVCommandList", vtkPVCommandListNewCommand,
-                  vtkPVCommandListCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVImageData", vtkPVImageDataNewCommand,
@@ -142,5 +140,7 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVWindowCommand);
   vtkTclCreateNew(interp,(char *) "vtkSingleContourFilter", vtkSingleContourFilterNewCommand,
                   vtkSingleContourFilterCommand);
+  vtkTclCreateNew(interp,(char *) "vtkStringList", vtkStringListNewCommand,
+                  vtkStringListCommand);
   return TCL_OK;
 }

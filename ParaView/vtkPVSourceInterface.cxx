@@ -27,6 +27,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 =========================================================================*/
 
 #include "vtkPVSourceInterface.h"
+#include "vtkStringList.h"
 
 int vtkPVSourceInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 			        int argc, char *argv[]);
@@ -66,7 +67,6 @@ vtkPVSourceInterface* vtkPVSourceInterface::New()
 {
   return new vtkPVSourceInterface();
 }
-
 
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVSourceInterface::CreateCallback()
@@ -112,11 +112,50 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   this->MethodInterfaces->InitTraversal();
   while ( (mInt = ((vtkPVMethodInterface*)(this->MethodInterfaces->GetNextItemAsObject()))) )
     {
-    if (mInt->GetNumberOfArguments() == 1)
+    //---------------------------------------------------------------------
+    // This is a poor way to create widgets.  Another method that integrates
+    // with vtkPVMethodInterfaces should be created.
+  
+    if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_FILE)
       {
-      pvs->AddLabeledEntry(mInt->GetVariableName(), 
-			   mInt->GetSetCommand(),
-			   mInt->GetGetCommand());
+      pvs->AddFileEntry(mInt->GetVariableName(), 
+			mInt->GetSetCommand(),
+			mInt->GetGetCommand(), 
+			mInt->GetFileExtension());
+      }
+    else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_TOGGLE)
+      {
+      pvs->AddLabeledToggle(mInt->GetVariableName(), 
+			    mInt->GetSetCommand(),
+			    mInt->GetGetCommand());
+      }
+    else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_SELECTION)
+      {
+      int i, num;
+      vtkStringList *l;
+      pvs->AddModeList(mInt->GetVariableName(),
+		       mInt->GetSetCommand(),
+		       mInt->GetGetCommand());
+      l = mInt->GetSelectionEntries();
+      for (i = 0; i < l->GetLength(); ++i)
+	{
+	pvs->AddModeListItem(l->GetString(i), i);
+	}
+      }
+    else if (mInt->GetNumberOfArguments() == 1)
+      {
+      if (mInt->GetArgumentType(0) == VTK_STRING)
+	{
+	pvs->AddStringEntry(mInt->GetVariableName(), 
+			    mInt->GetSetCommand(),
+			    mInt->GetGetCommand());
+	}
+      else
+	{
+	pvs->AddLabeledEntry(mInt->GetVariableName(), 
+			     mInt->GetSetCommand(),
+			     mInt->GetGetCommand());
+	}
       }
     else if (mInt->GetNumberOfArguments() == 2)
       {
@@ -160,21 +199,15 @@ int vtkPVSourceInterface::GetIsValidInput(vtkPVData *pvd)
 {
   const char *pvName;
   const char *dataName;
+  vtkDataObject *data;
   
   if (this->InputClassName == NULL)
     {
     return 0;
     }
   
-  pvName = pvd->GetClassName();
-  dataName = this->InputClassName;
-  
-  // Strip off the "vtkPV" and the "vtk" to compare.
-  if (strcmp(pvName+5, dataName+3) == 0)
-    {
-    return 1;
-    }
-  return 0;
+  data = pvd->GetVTKData();
+  return data->IsA(this->InputClassName);
 }
 
 

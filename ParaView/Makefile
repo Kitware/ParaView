@@ -24,7 +24,6 @@ vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
 vtkPVActorComposite \
 vtkPVApplication \
-vtkPVCommandList \
 vtkPVData \
 vtkPVImageData \
 vtkPVMethodInterface \
@@ -36,7 +35,8 @@ vtkPVSourceCollection \
 vtkPVSourceInterface \
 vtkPVSourceList \
 vtkPVWindow \
-vtkSingleContourFilter 
+vtkSingleContourFilter \
+vtkStringList 
 
 
 #------------------------------------------------------------------------------

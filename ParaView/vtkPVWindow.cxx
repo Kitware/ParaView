@@ -476,6 +476,28 @@ void vtkPVWindow::ReadSourceInterfaces()
   vtkPVMethodInterface *mInt;
   vtkPVSourceInterface *sInt;
 
+  // ---- STL Reader ----
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkSTLReader");
+  sInt->SetRootName("STLReader");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("FileName");
+  mInt->SetSetCommand("SetFileName");
+  mInt->SetGetCommand("GetFileName");
+  mInt->SetWidgetTypeToFile();
+  mInt->SetFileExtension("stl");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- Sphere ----
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -596,11 +618,99 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Capping");
+  mInt->SetSetCommand("SetCapping");
+  mInt->SetGetCommand("GetCapping");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
   sInt = NULL;
 
+  // ---- Axes ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkAxes");
+  sInt->SetRootName("Axes");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Scale");
+  mInt->SetSetCommand("SetScaleFactor");
+  mInt->SetGetCommand("GetScaleFactor");
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Origin");
+  mInt->SetSetCommand("SetOrigin");
+  mInt->SetGetCommand("GetOrigin");
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Symmetric");
+  mInt->SetSetCommand("SetSymmetric");
+  mInt->SetGetCommand("GetSymmetric");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- VectorText ----
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkVectorText");
+  sInt->SetRootName("VectorText");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Text");
+  mInt->SetSetCommand("SetText");
+  mInt->SetGetCommand("GetText");
+  mInt->AddStringArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // DataSet to PolyData Filters
+  
+  // ---- ExtractEdges ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkExtractEdges");
+  sInt->SetRootName("ExtractEdges");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // PolyData to PolyData Filters
+  
   // ---- PieceScalars ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
@@ -636,11 +746,111 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // ---- Tube ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkTubeFilter");
+  sInt->SetRootName("Tuber");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("NumberOfSides");
+  mInt->SetSetCommand("SetNumberOfSides");
+  mInt->SetGetCommand("GetNumberOfSides");
+  mInt->AddIntegerArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Capping");
+  mInt->SetSetCommand("SetCapping");
+  mInt->SetGetCommand("GetCapping");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;  
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Radius");
+  mInt->SetSetCommand("SetRadius");
+  mInt->SetGetCommand("GetRadius");
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("VaryRadius");
+  mInt->SetSetCommand("SetVaryRadius");
+  mInt->SetGetCommand("GetVaryRadius");
+  mInt->SetWidgetTypeToSelection();
+  mInt->AddSelectionEntry(0, "Off");
+  mInt->AddSelectionEntry(1, "ByScalar");
+  mInt->AddSelectionEntry(2, "ByVector");
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;  
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("RadiusFactor");
+  mInt->SetSetCommand("SetRadiusFactor");
+  mInt->SetGetCommand("GetRadiusFactor");
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- LinearExtrusion ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkLinearExtrusionFilter");
+  sInt->SetRootName("LinExtrude");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Capping");
+  mInt->SetSetCommand("SetCapping");
+  mInt->SetGetCommand("GetCapping");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ScaleFactor");
+  mInt->SetSetCommand("SetScaleFactor");
+  mInt->SetGetCommand("GetScaleFactor");
+  mInt->AddFloatArgument();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Vector");
+  mInt->SetSetCommand("SetVector");
+  mInt->SetGetCommand("GetVector");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();  
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   //this->CreateMenu->AddCommand("ImageReader", this, "CreateImageReader");
   //this->CreateMenu->AddCommand("FractalVolume", this, "CreateFractalVolume");
-  //this->CreateMenu->AddCommand("STLReader", this, "CreateSTLReader");
-  //this->CreateMenu->AddCommand("Cone", this, "CreateCone");
-  //this->CreateMenu->AddCommand("Axes", this, "CreateAxes");
   //this->CreateMenu->AddCommand("Cube", this, "CreateCube");
   //this->CreateMenu->AddCommand("Cylinder", this, "CreateCylinder");
   //this->CreateMenu->AddCommand("Disk", this, "CreateDisk");
@@ -652,67 +862,7 @@ void vtkPVWindow::ReadSourceInterfaces()
 
 
 /*
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateCone()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkConeSource",
-                            "Cone", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
 
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("Resolution:", "SetResolution", "GetResolution");
-  pvs->AddLabeledEntry("Height:", "SetHeight", "GetHeight");
-  pvs->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  pvs->AddLabeledToggle("Capping:", "SetCapping", "GetCapping");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-}
-
-//----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateAxes()
-{
-  static int instanceCount = 0;
-  vtkPVSource *pvs;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Linkthe PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkAxes",
-                            "Axes", ++instanceCount);
-  if (pvs == NULL) {return NULL;}
-  
-  // Add the new Source to the View, and make it current.
-  this->MainView->AddComposite(pvs);
-  this->SetCurrentSource(pvs);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the create method.
-  pvs->AddLabeledEntry("Scale:", "SetScaleFactor", "GetScaleFactor");
-  pvs->AddVector3Entry("Origin", "X","Y","Z", "SetOrigin", "GetOrigin");
-  pvs->AddLabeledToggle("Symmetric:", "SetSymmetric", "GetSymmetric");
-  pvs->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
-}
- 
 //----------------------------------------------------------------------------
 vtkPVPolyDataSource *vtkPVWindow::CreateCube()
 {

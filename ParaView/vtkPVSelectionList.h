@@ -40,7 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabel.h"
 #include "vtkKWMenuButton.h"
 
-class vtkPVCommandList;
+class vtkStringList;
 
 class VTK_EXPORT vtkPVSelectionList : public vtkKWWidget
 {
@@ -86,7 +86,7 @@ protected:
   int CurrentValue;
   char *CurrentName;
   // Using this list as an array of strings.
-  vtkPVCommandList *Names;
+  vtkStringList *Names;
 
   vtkSetStringMacro(CurrentName);
   

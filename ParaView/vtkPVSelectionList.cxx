@@ -26,7 +26,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVSelectionList.h"
-#include "vtkPVCommandList.h"
+#include "vtkStringList.h"
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -43,7 +43,7 @@ vtkPVSelectionList::vtkPVSelectionList()
   
   this->MenuButton = vtkKWMenuButton::New();
 
-  this->Names = vtkPVCommandList::New();
+  this->Names = vtkStringList::New();
 }
 
 //----------------------------------------------------------------------------
@@ -111,7 +111,7 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
   char tmp[1024];
   
   // Save for internal use
-  this->Names->SetCommand(value, name);
+  this->Names->SetString(value, name);
 
   sprintf(tmp, "SelectCallback %s %d", name, value);
   this->MenuButton->AddCommand(name, this, tmp);
@@ -133,7 +133,7 @@ void vtkPVSelectionList::SetCurrentValue(int value)
     }
   this->Modified();
   this->CurrentValue = value;
-  name = this->Names->GetCommand(value);
+  name = this->Names->GetString(value);
   if (name)
     {
     this->SelectCallback(name, value);

@@ -92,10 +92,10 @@ vtkPVPolyData* vtkPVPolyData::New()
   return new vtkPVPolyData();
 }
 
+/*
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Shrink()
 {
-  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -123,47 +123,11 @@ void vtkPVPolyData::Shrink()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
-  */
-}
-
-//----------------------------------------------------------------------------
-void vtkPVPolyData::TubeFilter()
-{
-  /*
-  static int instanceCount = 0;
-  vtkPVPolyDataToPolyDataFilter *f;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVWindow *window = this->GetPVSource()->GetWindow();
-
-  // Create the pvSource. Clone the PVSource and the vtkSource,
-  // Link the PVSource to the vtkSource.
-  f = vtkPVPolyDataToPolyDataFilter::SafeDownCast(
-          pvApp->MakePVSource("vtkPVPolyDataToPolyDataFilter",
-                              "vtkTubeFilter", "Tuber", ++instanceCount));
-  if (f == NULL) {return;}
-  f->SetPVInput(this);
-  
-  // Add the new Source to the View, and make it current.
-  this->GetPVSource()->GetView()->AddComposite(f);
-  window->SetCurrentSource(f);
-
-  // Add some source specific widgets.
-  // Normally these would be added in the CreateProperties method.
-  f->AddPVInputList();
-  f->AddLabeledEntry("Radius:", "SetRadius", "GetRadius");
-  f->AddLabeledEntry("Number of Sides:", "SetNumberOfSides", "GetNumberOfSides");
-  f->UpdateParameterWidgets();
-
-  // Clean up. (How about on the other processes?)
-  // We cannot create an object in tcl and delete it in C++.
-  //f->Delete();
-  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::PolyDataNormals()
 {
-  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -196,13 +160,11 @@ void vtkPVPolyData::PolyDataNormals()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
-  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Glyph()
 {
-  /*
   static int instanceCount = 0;
   vtkPVGlyph3D *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -221,13 +183,11 @@ void vtkPVPolyData::Glyph()
   
   window->SetCurrentSource(f);
   f->AddPVInputList();
-  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::LoopSubdivision()
 {
-  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -255,13 +215,11 @@ void vtkPVPolyData::LoopSubdivision()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
-  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Clean()
 {
-  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -288,13 +246,11 @@ void vtkPVPolyData::Clean()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
-  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Triangulate()
 {
-  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -323,13 +279,11 @@ void vtkPVPolyData::Triangulate()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.  
   //f->Delete();
-  */
 }
 
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Decimate()
 {
-  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -370,12 +324,10 @@ void vtkPVPolyData::Decimate()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
-  */
 }
 //----------------------------------------------------------------------------
 void vtkPVPolyData::QuadricClustering()
 {
-  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -406,7 +358,6 @@ void vtkPVPolyData::QuadricClustering()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
-  */
 }
 
 //----------------------------------------------------------------------------
@@ -423,7 +374,6 @@ void vtkPVPolyData::ParallelDecimate()
 //----------------------------------------------------------------------------
 void vtkPVPolyData::PieceScalars()
 {
-  /*
   static int instanceCount = 0;
   vtkPVPolyDataToPolyDataFilter *f;
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -450,8 +400,8 @@ void vtkPVPolyData::PieceScalars()
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //f->Delete();
-  */
 }
+*/
 
 //----------------------------------------------------------------------------
 int vtkPVPolyData::Create(char *args)
@@ -460,23 +410,6 @@ int vtkPVPolyData::Create(char *args)
     {
     return 0;
     }
-  
-  this->FiltersMenuButton->AddCommand("ShrinkPolyData", this,
-				      "Shrink");
-  this->FiltersMenuButton->AddCommand("Glyph3D", this,
-				      "Glyph");
-  this->FiltersMenuButton->AddCommand("LoopSubdivision", this,
-				      "LoopSubdivision");
-  this->FiltersMenuButton->AddCommand("Clean", this, "Clean");
-  this->FiltersMenuButton->AddCommand("Triangulate", this, "Triangulate");
-  this->FiltersMenuButton->AddCommand("Decimate", this, "Decimate");
-  this->FiltersMenuButton->AddCommand("QuadricClustering", this, "QuadricClustering");
-  this->FiltersMenuButton->AddCommand("PolyDataNormals", this,
-				      "PolyDataNormals");
-  this->FiltersMenuButton->AddCommand("TubeFilter", this,
-				      "TubeFilter");
-  this->FiltersMenuButton->AddCommand("PieceScalars", this,
-				      "PieceScalars");
   
   this->DecimateButton->SetParent(this);
   this->DecimateButton->Create(this->Application, "-text Decimate");

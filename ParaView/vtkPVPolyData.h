@@ -74,22 +74,6 @@ public:
   void InteractiveOnCallback();
   void InteractiveOffCallback();
   
-  // Description:
-  // These are filtering operations called from UI.
-  void Shrink();
-  void Glyph();
-  void LoopSubdivision();
-  void Clean();
-  void Triangulate();
-  void Decimate();
-  void QuadricClustering();
-
-  void GetGhostCells();
-  void PolyDataNormals();
-  void TubeFilter();
-  void ParallelDecimate();  
-  void PieceScalars();
-  
 protected:
   vtkPVPolyData();
   ~vtkPVPolyData();
