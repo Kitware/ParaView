@@ -494,6 +494,7 @@ void vtkPVSource::UpdateScalarsMenu()
     {
     this->ScalarOperationMenu->SetValue(arrayName);
     }
+  this->UpdateScalars();
 }
 
 void vtkPVSource::PackScalarsMenu()
@@ -507,10 +508,15 @@ void vtkPVSource::PackScalarsMenu()
 //----------------------------------------------------------------------------
 void vtkPVSource::ChangeScalars()
 {
+  this->ChangeAcceptButtonColor();
+  this->UpdateScalars();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateScalars()
+{
   char *newScalars = this->ScalarOperationMenu->GetValue();
   vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  this->ChangeAcceptButtonColor();
   
   if (this->DefaultScalarsName)
     {
@@ -919,10 +925,13 @@ void vtkPVSource::DeleteCallback()
       }
     }
   
+  cerr << "Delete CallBack\n";
+  cerr << "PVRenderView: " << this->GetPVRenderView() << " " << this->GetPVRenderView()->GetClassName() << endl;
   this->GetPVRenderView()->EventuallyRender();
 
   // I hope this will delete this source.
   this->GetWindow()->GetMainView()->RemoveComposite(this);
+  cerr << "DeleteCallback exiting\n";
 }
 
 //----------------------------------------------------------------------------
