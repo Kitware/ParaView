@@ -87,7 +87,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
-#include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTimerLogDisplay.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
