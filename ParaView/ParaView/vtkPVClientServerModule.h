@@ -171,7 +171,9 @@ protected:
   int    ReturnValue;
 
   vtkSetStringMacro(Hostname);
+  vtkSetStringMacro(Username);
   char* Hostname;
+  char* Username;
   int Port;
   int MultiProcessMode;
   int NumberOfProcesses;

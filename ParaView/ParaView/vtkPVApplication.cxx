@@ -119,7 +119,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.187");
+vtkCxxRevisionMacro(vtkPVApplication, "1.188");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -319,6 +319,7 @@ vtkPVApplication::vtkPVApplication()
   this->HostName = NULL;
   this->SetHostName("localhost");
   this->Port = 11111;
+  this->Username = 0;
   this->UseSoftwareRendering = 0;
   this->UseSatelliteSoftware = 0;
   this->StartEmpty = 0;
@@ -379,6 +380,7 @@ vtkPVApplication::~vtkPVApplication()
   this->SetTraceFileName(0);
   this->SetArgv0(0);
   this->SetHostName(NULL);
+  this->SetUsername(0);
 }
 
 
@@ -537,6 +539,8 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Detach ParaView from console (for running as server).",
   "--host", "-h",
   "Tell the client where to look for the server (default: --host=localhost). Use this option only with the --client option.", 
+  "--user", "",
+  "Tell the client what username to send to server when establishing SSH connection.",
   "--port", "",
   "Specify the port client and server will use (--port=11111).  Client and servers ports must match.", 
   "--start-empty" , "-e", 
@@ -889,6 +893,21 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     {
     this->ClientMode = 1;
 
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--user",
+                                            index) == VTK_OK )
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (int i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->SetUsername(newarg);
+      }
     if ( vtkPVApplication::CheckForArgument(argc, argv, "--host",
                                             index) == VTK_OK ||
          vtkPVApplication::CheckForArgument(argc, argv, "-h",

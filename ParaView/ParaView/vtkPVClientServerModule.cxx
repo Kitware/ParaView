@@ -207,7 +207,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.31");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.32");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -226,6 +226,7 @@ vtkPVClientServerModule::vtkPVClientServerModule()
   this->RootResult = 0;
 
   this->Hostname = 0;
+  this->Username = 0;
   this->Port = 0;
   this->MultiProcessMode = vtkPVClientServerModule::SINGLE_PROCESS_MODE;
   this->NumberOfProcesses = 2;
@@ -253,6 +254,7 @@ vtkPVClientServerModule::~vtkPVClientServerModule()
   this->SetRootResult(0);
 
   this->SetHostname(0);
+  this->SetUsername(0);
 
   this->RemoteExecution->Delete();
 }
@@ -295,6 +297,7 @@ void vtkPVClientServerModule::Initialize()
 
     // Get the host name from the command line arguments
     this->SetHostname(pvApp->GetHostName());
+    this->SetUsername(pvApp->GetUsername());
 
     // Get the port from the command line arguments
     this->Port = pvApp->GetPort();
@@ -310,37 +313,51 @@ void vtkPVClientServerModule::Initialize()
         if ( this->MultiProcessMode == vtkPVClientServerModule::MPI_MODE )
           {
           sprintf(numbuffer, "%d", this->NumberOfProcesses);
-          cout << "Running mpi with " << this->NumberOfProcesses << " servers " << endl;
           runcommand += "mpirun -np ";
           runcommand += numbuffer;
           runcommand += " ";
           }
-        runcommand += "ParaView --server --port=";
+        runcommand += "${PARAVIEW_EXECUTABLE} --server --port=";
         sprintf(numbuffer, "%d", this->Port);
         runcommand += numbuffer;
         this->RemoteExecution->SetRemoteHost(this->Hostname);
+        this->RemoteExecution->SetSSHUser(this->Username);
         this->RemoteExecution->RunRemoteCommand(runcommand.c_str());
-#ifdef _WIN32
-        Sleep(5000);
-#else
-        sleep(5);
-#endif
         start = 0;
+        int cc;
+        const int max_try = 10;
+        for ( cc = 0; cc < max_try; cc ++ )
+          {
+#ifdef _WIN32
+          Sleep(1000);
+#else
+          sleep(1);
+#endif
+          if (comm->ConnectTo(this->Hostname, this->Port)) 
+            {
+            break;
+            }
+          }
+        if ( cc < max_try )
+          {
+          break;
+          }
         continue;
         }
       this->Script("wm withdraw .");
       vtkPVConnectDialog* dialog = 
         vtkPVConnectDialog::New();
       dialog->SetHostname(this->Hostname);
+      dialog->SetSSHUser(this->Username);
       dialog->SetPort(this->Port);
       dialog->SetNumberOfProcesses(this->NumberOfProcesses);
       dialog->SetMultiProcessMode(this->MultiProcessMode);
       dialog->Create(this->GetPVApplication(), 0);
       int res = dialog->Invoke();
-      cout << "Res: " << res << endl;
       if ( res )
         {
         this->SetHostname(dialog->GetHostName());
+        this->SetUsername(dialog->GetSSHUser());
         this->Port = dialog->GetPort();
         this->NumberOfProcesses = dialog->GetNumberOfProcesses();
         this->MultiProcessMode = dialog->GetMultiProcessMode();

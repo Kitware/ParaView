@@ -83,12 +83,14 @@ public:
   vtkSetMacro(NumberOfProcesses, int);
   vtkGetMacro(NumberOfProcesses, int);
 
+  vtkSetStringMacro(SSHUser);
+  vtkGetStringMacro(SSHUser);
 
 protected:
   vtkPVConnectDialog();
   ~vtkPVConnectDialog();
 
-   vtkKWEntry* Username;
+  vtkKWEntry* Username;
   vtkKWLabeledEntry* Hostname;
   vtkKWLabeledEntry* Port;
   vtkKWLabel* Label;
@@ -97,6 +99,7 @@ protected:
 
   vtkSetStringMacro(HostnameString);
   char* HostnameString;
+  char* SSHUser;
   int PortInt;
   int MultiProcessMode;
   int NumberOfProcesses;

@@ -53,9 +53,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVWindow.h"
 
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.2");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.3");
 
+//----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
 {
   char buffer[1024];
@@ -77,6 +79,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
   frame->Create(app, 0);
   this->Username->SetParent(frame);
   this->Username->Create(app, 0);
+  this->Username->SetValue(this->SSHUser);
   this->Hostname->SetParent(frame);
   this->Hostname->Create(app, 0);
   this->Hostname->SetLabel("@");
@@ -130,6 +133,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
   this->MPINumberOfServers->EnabledOff();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVConnectDialog::OK()
 {
   this->SetHostnameString(this->Hostname->GetValue());
@@ -143,9 +147,11 @@ void vtkPVConnectDialog::OK()
     {
     this->MultiProcessMode = 0;
     }
+  this->SetSSHUser(this->Username->GetValue());
   this->Superclass::OK();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVConnectDialog::SetHostname(const char* hn)
 {
   if ( this->Hostname->IsCreated() )
@@ -154,10 +160,14 @@ void vtkPVConnectDialog::SetHostname(const char* hn)
     }
   this->SetHostnameString(hn);
 }
+
+//----------------------------------------------------------------------------
 const char* vtkPVConnectDialog::GetHostName()
 {
   return this->HostnameString;
 }
+
+//----------------------------------------------------------------------------
 void vtkPVConnectDialog::SetPort(int pt)
 {
   if ( this->Port->IsCreated() )
@@ -168,11 +178,14 @@ void vtkPVConnectDialog::SetPort(int pt)
     }
   this->PortInt = pt;
 }
+
+//----------------------------------------------------------------------------
 int vtkPVConnectDialog::GetPort()
 {
   return this->PortInt;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVConnectDialog::MPICheckBoxCallback()
 {
   if ( this->MPIMode->GetCheckButton()->GetState() )
@@ -185,6 +198,7 @@ void vtkPVConnectDialog::MPICheckBoxCallback()
     }
 }
 
+//----------------------------------------------------------------------------
 vtkPVConnectDialog::vtkPVConnectDialog()
 {
   this->Username = vtkKWEntry::New();
@@ -198,8 +212,10 @@ vtkPVConnectDialog::vtkPVConnectDialog()
   this->PortInt = 0;
   this->MultiProcessMode = 0;
   this->NumberOfProcesses = 2;
+  this->SSHUser = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVConnectDialog::~vtkPVConnectDialog()
 {
   this->Username->Delete();
@@ -208,6 +224,7 @@ vtkPVConnectDialog::~vtkPVConnectDialog()
   this->Label->Delete();
   this->MPINumberOfServers->Delete();
   this->MPIMode->Delete();
+  this->SetSSHUser(0);
 }
 
 

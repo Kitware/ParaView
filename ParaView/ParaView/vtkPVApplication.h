@@ -269,6 +269,7 @@ public:
   // Description:
   // Get the host command line option. (--host=localhost).
   vtkGetStringMacro(HostName);
+  vtkGetStringMacro(Username);
 
   // Description:
   // The the port for the client/server socket connection.
@@ -353,6 +354,8 @@ protected:
   int ServerMode;
   char* HostName;
   vtkSetStringMacro(HostName);
+  char* Username;
+  vtkSetStringMacro(Username);
   int Port;
   int UseSoftwareRendering;
   int UseSatelliteSoftware;
