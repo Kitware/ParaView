@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.17");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.17.2.1");
 
 //----------------------------------------------------------------------------
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -150,19 +150,20 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   this->AllOnButton->Create(app, "");
   this->AllOnButton->SetLabel("All On");
   this->AllOnButton->SetCommand(this, "AllOnCallback");
-  app->Script("pack %s -fill x -side left -expand t",
-              this->AllOnButton->GetWidgetName());
 
   this->AllOffButton->SetParent(this->ButtonFrame);
   this->AllOffButton->Create(app, "");
   this->AllOffButton->SetLabel("All Off");
   this->AllOffButton->SetCommand(this, "AllOffCallback");
-  app->Script("pack %s -fill x -side left -expand t",
+
+  app->Script("pack %s %s -fill x -side left -expand t -padx 2 -pady 2",
+              this->AllOnButton->GetWidgetName(),
               this->AllOffButton->GetWidgetName());
 
   this->CheckFrame->SetParent(this->LabeledFrame->GetFrame());
   this->CheckFrame->Create(app, "frame", "");
-  app->Script("pack %s -fill both -side top -expand t",
+
+  app->Script("pack %s -side top -expand f -anchor w",
               this->CheckFrame->GetWidgetName());
 
   // This creates the check buttons and packs the button frame.
