@@ -1,6 +1,7 @@
 ADD_EXECUTABLE( TestRegistery TestRegistery.cxx )
 ADD_EXECUTABLE( TestMemory TestMemory.cxx )
 ADD_EXECUTABLE( CommandLineArguments CommandLineArguments.cxx )
+ADD_EXECUTABLE( RemoteProcess RemoteProcess.cxx )
 
 ADD_TEST(TestRegistery ${CXX_TEST_PATH}/TestRegistery)
 ADD_TEST(TestMemory ${CXX_TEST_PATH}/TestMemory)
@@ -9,3 +10,4 @@ ADD_TEST(CommandLineArguments ${CXX_TEST_PATH}/CommandLineArguments -A -B asdklj
 TARGET_LINK_LIBRARIES(TestRegistery vtkKWCommonTCL)
 TARGET_LINK_LIBRARIES(TestMemory vtkKWCommonTCL)
 TARGET_LINK_LIBRARIES(CommandLineArguments vtkKWCommonTCL)
+TARGET_LINK_LIBRARIES(RemoteProcess vtkKWCommonTCL)
