@@ -164,14 +164,14 @@ public:
   // Description:
   // Convenience method to Set/Get the current background and foreground colors
   // of the widget (either using 0 -> 255 int, or normalized 0.0 -> 1.0 float).
-  void GetBackgroundColor(int *r, int *g, int *b);
-  void SetBackgroundColor(int r, int g, int b);
-  void GetBackgroundColor(double *r, double *g, double *b);
-  void SetBackgroundColor(double r, double g, double b);
-  void GetForegroundColor(int *r, int *g, int *b);
-  void SetForegroundColor(int r, int g, int b);
-  void GetForegroundColor(double *r, double *g, double *b);
-  void SetForegroundColor(double r, double g, double b);
+  virtual void GetBackgroundColor(int *r, int *g, int *b);
+  virtual void SetBackgroundColor(int r, int g, int b);
+  virtual void GetBackgroundColor(double *r, double *g, double *b);
+  virtual void SetBackgroundColor(double r, double g, double b);
+  virtual void GetForegroundColor(int *r, int *g, int *b);
+  virtual void SetForegroundColor(int r, int g, int b);
+  virtual void GetForegroundColor(double *r, double *g, double *b);
+  virtual void SetForegroundColor(double r, double g, double b);
   
   // Description:
   // Query if widget has a given Tk configuration option (ex: "-state"), 

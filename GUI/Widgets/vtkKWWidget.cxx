@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.106");
+vtkCxxRevisionMacro(vtkKWWidget, "1.107");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -467,7 +467,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.106 $");
+  this->ExtractRevision(os,"$Revision: 1.107 $");
 }
 
 //----------------------------------------------------------------------------
@@ -691,10 +691,8 @@ void vtkKWWidget::GetBackgroundColor(double *r, double *g, double *b)
 //----------------------------------------------------------------------------
 void vtkKWWidget::SetBackgroundColor(double r, double g, double b)
 {
-  char color[10];
-  sprintf(color, "#%02x%02x%02x", 
-          (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
-  this->Script("%s config -bg %s", this->GetWidgetName(), color);
+  this->SetBackgroundColor(
+    (int)(r * 255.0), (int)(g * 255.0), (int)(b * 255.0));
 }
 
 //----------------------------------------------------------------------------
