@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.11");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.12");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -337,7 +337,7 @@ vtkClientServerInterpreter
         !created && it != this->Internal->NewInstanceFunctions.end(); ++it)
       {
       // Try this new-instance function.
-      if((*(*it))(this, cname, id) == 0)
+      if((*(*it))(this, cname, id))
         {
         created = 1;
         }
@@ -404,7 +404,7 @@ vtkClientServerInterpreter
       {
       // Try to invoke the method.  If it fails, LastResultMessage
       // will have the error message.
-      if(func(this, obj, method, msg, *this->LastResultMessage) == 0)
+      if(func(this, obj, method, msg, *this->LastResultMessage))
         {
         return 1;
         }

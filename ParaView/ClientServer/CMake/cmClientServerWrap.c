@@ -93,12 +93,12 @@ static void CreateInitFile(cmLoadedCommandInfo *info,
             "      {\n"
             "      vtkObjectBase *ptr = %sNewCommand();\n"
             "      arlu->NewInstance(ptr,id);\n"
-            "      return 0;\n"
+            "      return 1;\n"
             "      }\n"
             ,concrete[i], concrete[i]);
     }
   fprintf(fout,
-          "  return 1;\n}\n");
+          "  return 0;\n}\n");
   fclose(fout);
 
   /* copy the file if different */
