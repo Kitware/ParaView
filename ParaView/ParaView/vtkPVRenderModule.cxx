@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.26");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.27");
 
 //===========================================================================
 //***************************************************************************
@@ -446,6 +446,8 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
       vtkClientServerStream& stream = pm->GetStream();
       stream << vtkClientServerStream::Invoke << this->RendererID << "AddProp"
              << pDisp->GetPropID() << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Invoke << this->RendererID << "AddProp"
+             << pDisp->GetVolumeID() << vtkClientServerStream::End;
       pm->SendStreamToClientAndServer();
       }
     pDisp->Delete();
@@ -530,6 +532,7 @@ void vtkPVRenderModule::StillRender()
 
   this->GetPVApplication()->SetGlobalLODFlag(0);
   vtkTimerLog::MarkStartEvent("Still Render");
+  this->RenderWindow->SetDesiredUpdateRate(0.002);
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Still Render");
 }
