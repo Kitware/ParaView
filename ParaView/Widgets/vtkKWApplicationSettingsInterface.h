@@ -53,13 +53,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 
-#define VTK_VV_ASI_LABEL                        "Application Settings"
+#define VTK_KW_APPLICATION_SETTINGS_UIP_LABEL "Application Settings"
 
-#define VTK_KW_ASI_PREFERENCES_LABEL            "Preferences"
-
-#define VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY "SaveWindowGeometry"
-#define VTK_KW_ASI_SHOW_SPLASH_SCREEN_REG_KEY   "ShowSplashScreen"
-#define VTK_KW_ASI_SHOW_TOOLTIPS_REG_KEY        "ShowBalloonHelp"
+#define VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY   "SaveWindowGeometry"
+#define VTK_KW_SHOW_SPLASH_SCREEN_REG_KEY     "ShowSplashScreen"
+#define VTK_KW_SHOW_TOOLTIPS_REG_KEY          "ShowBalloonHelp"
 
 //------------------------------------------------------------------------------
 
@@ -105,11 +103,6 @@ public:
   void SaveGeometryCallback();
   void ShowSplashScreenCallback();
   void ShowBalloonHelpCallback();
-
-  // Description:
-  // Access to some sub-widgets. Note that they might be NULL until the Create()
-  // function is called.
-  vtkGetObjectMacro(InterfaceSettingsFrame, vtkKWLabeledFrame);
 
 protected:
   vtkKWApplicationSettingsInterface();
