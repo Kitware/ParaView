@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.1");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.2");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -176,16 +176,16 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->SaveGeometryCheckButton->SetText("Save window geometry on exit");
   
   if (app->HasRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+        2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY))
     {
     this->SaveGeometryCheckButton->SetState(
       app->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY));
+        2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY));
     }
   else
     {
     app->SetRegisteryValue(
-      2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", 1);
+      2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY, "%d", 1);
     this->SaveGeometryCheckButton->SetState(1);
     }
   
@@ -212,11 +212,11 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
     this->ShowSplashScreenCheckButton->SetText("Show splash screen");
 
     if (app->HasRegisteryValue(
-          2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY))
+          2, "RunTime", VTK_KW_ASI_SHOW_SPLASH_SCREEN_REG_KEY))
       {
       this->ShowSplashScreenCheckButton->SetState(
         app->GetIntRegisteryValue(
-          2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY));
+          2, "RunTime", VTK_KW_ASI_SHOW_SPLASH_SCREEN_REG_KEY));
       }
     else
       {
@@ -246,11 +246,11 @@ void vtkKWApplicationSettingsInterface::Create(vtkKWApplication *app)
   this->ShowBalloonHelpCheckButton->SetText("Show tooltips");
 
   if (app->HasRegisteryValue(
-        2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY))
+        2, "RunTime", VTK_KW_ASI_SHOW_TOOLTIPS_REG_KEY))
     {
     this->ShowBalloonHelpCheckButton->SetState(
       app->GetIntRegisteryValue(
-        2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY));
+        2, "RunTime", VTK_KW_ASI_SHOW_TOOLTIPS_REG_KEY));
     }
   else
     {
@@ -291,7 +291,7 @@ void vtkKWApplicationSettingsInterface::SaveGeometryCheckButtonCallback()
  if (this->IsCreated())
    {
    this->GetApplication()->SetRegisteryValue(
-     2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY,
+     2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY,
      "%d", this->SaveGeometryCheckButton->GetState());
    }
 }
@@ -304,7 +304,7 @@ void vtkKWApplicationSettingsInterface::ShowSplashScreenCheckButtonCallback()
    {
    int val = this->ShowSplashScreenCheckButton->GetState();
    this->GetApplication()->SetRegisteryValue(
-     2, "RunTime", VTK_KW_SPLASH_SCREEN_REG_KEY, "%d", val);
+     2, "RunTime", VTK_KW_ASI_SHOW_SPLASH_SCREEN_REG_KEY, "%d", val);
    this->GetApplication()->SetShowSplashScreen(val);
    }
 }
@@ -316,7 +316,7 @@ void vtkKWApplicationSettingsInterface::ShowBalloonHelpCheckButtonCallback()
    {
    int val = this->ShowBalloonHelpCheckButton->GetState();
    this->GetApplication()->SetRegisteryValue(
-     2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY, "%d", val);
+     2, "RunTime", VTK_KW_ASI_SHOW_TOOLTIPS_REG_KEY, "%d", val);
    this->GetApplication()->SetShowBalloonHelp(val);
    }
 }

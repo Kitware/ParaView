@@ -75,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.104");
+vtkCxxRevisionMacro(vtkKWApplication, "1.105");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -162,10 +162,10 @@ vtkKWApplication::vtkKWApplication()
   this->ShowSplashScreen = 1;
 
   if (this->HasRegisteryValue(
-    2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY))
+    2, "RunTime", VTK_KW_ASI_SHOW_TOOLTIPS_REG_KEY))
     {
     this->ShowBalloonHelp = this->GetIntRegisteryValue(
-      2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY);
+      2, "RunTime", VTK_KW_ASI_SHOW_TOOLTIPS_REG_KEY);
     }
   else
     {
@@ -586,10 +586,10 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
   // constructor.
 
   if (this->HasRegisteryValue(
-    2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY))
+    2, "RunTime", VTK_KW_ASI_SHOW_TOOLTIPS_REG_KEY))
     {
     this->ShowBalloonHelp = this->GetIntRegisteryValue(
-      2, "RunTime", VTK_KW_BALLOON_HELP_REG_KEY);
+      2, "RunTime", VTK_KW_ASI_SHOW_TOOLTIPS_REG_KEY);
     }
   else
     {

@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.132");
+vtkCxxRevisionMacro(vtkKWWindow, "1.133");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -485,9 +485,9 @@ void vtkKWWindow::CloseNoPrompt()
 
   if (this->Application->GetWindows()->GetNumberOfItems() <= 1 &&
       this->Application->HasRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY))
+        2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY))
     {
     this->Script("wm geometry %s", this->GetWidgetName());
     this->Application->SetRegisteryValue(
@@ -632,9 +632,9 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   // Restore window geometry
 
   if (this->Application->HasRegisteryValue(
-    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+    2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->HasRegisteryValue(
         2, "Geometry", VTK_KW_WINDOW_GEOMETRY_REG_KEY))
     {
@@ -699,9 +699,9 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MiddleFrame->SetFrame1MinimumSize(360);
 
   if (this->Application->HasRegisteryValue(
-    2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+    2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->GetIntRegisteryValue(
-        2, "Geometry", VTK_KW_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
+        2, "Geometry", VTK_KW_ASI_SAVE_WINDOW_GEOMETRY_REG_KEY) &&
       this->Application->HasRegisteryValue(
         2, "Geometry", VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY))
     {
@@ -1107,7 +1107,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.132 $");
+  this->ExtractRevision(os,"$Revision: 1.133 $");
 }
 
 int vtkKWWindow::ExitDialog()
