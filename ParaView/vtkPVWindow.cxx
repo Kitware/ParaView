@@ -35,6 +35,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkInteractorStylePlaneSource.h"
 #include "vtkInteractorStyleCamera.h"
 
+#include "vtkImageReader.h"
+#include "vtkOutlineSource.h"
+#include "vtkSynchronizedTemplates3D.h"
+#include "vtkPolyDataMapper.h"
+#include "vtkActor.h"
+
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -144,6 +150,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // Setup an interactor style.
   this->SetupTest();
+  //this->SetupVolumeIso();
 
 }
 
@@ -187,6 +194,73 @@ void vtkPVWindow::SetupTest()
   
   this->MainView->ResetCamera();
 }
+
+
+//----------------------------------------------------------------------------
+// Setup the pipeline
+void vtkPVWindow::SetupVolumeIso()
+{
+  int id, num;
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+
+  // Put the outline in the UI window.
+  
+  // We have two options for displaying this in the future:
+  // 1: Create an image outline filter that only updates information.
+  // 2: Create a distributed outline filter that uses piece hints.
+  vtkOutlineSource *outline = vtkOutlineSource::New();
+  outline->SetBounds(0, 255, 0, 255, 0, 92 * 1.8);
+  vtkPolyDataMapper *mapper = vtkPolyDataMapper::New();
+  mapper->SetInput(outline->GetOutput());
+  vtkActor *actor = vtkActor::New();
+  actor->SetMapper(mapper);
+  this->MainView->GetRenderer()->AddActor(actor);
+  actor->Delete();
+  mapper->Delete();
+  outline->Delete();
+  
+  
+  
+  // Setup the worker pipelines
+  num = pvApp->GetController()->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    pvApp->RemoteSimpleScript(id, "vtkImageReader ImageReader");
+
+    //pvApp->RemoteSimpleScript(id, "ImageReader SetFilePrefix {/home/lawcc/vtkdata/fullHead/headsq}");
+    //pvApp->RemoteSimpleScript(id, "ImageReader SetDataSpacing 1 1 1.8");
+    //pvApp->RemoteSimpleScript(id, "ImageReader SetDataExtent 0 255 0 255 1 93");
+
+    pvApp->RemoteSimpleScript(id, "ImageReader SetFilePrefix {/home/lawcc/vtkdata/headsq/quarter}");
+    pvApp->RemoteSimpleScript(id, "ImageReader SetDataSpacing 4 4 1.8");
+    pvApp->RemoteSimpleScript(id, "ImageReader SetDataExtent 0 63 0 63 1 93");
+
+    pvApp->RemoteSimpleScript(id, "ImageReader SetDataByteOrderToLittleEndian");
+    pvApp->RemoteSimpleScript(id, "vtkSynchronizedTemplates3D Iso");
+    pvApp->RemoteSimpleScript(id, "Iso SetInput [ImageReader GetOutput]");
+    pvApp->RemoteSimpleScript(id, "Iso SetValue 0 1150");
+    pvApp->RemoteScript(id, "[Iso GetOutput] SetUpdateExtent %d %d", id-1, num-1);
+    
+    pvApp->RemoteSimpleScript(id, "vtkPolyDataMapper IsoMapper");
+    pvApp->RemoteSimpleScript(id, "IsoMapper SetInput [Iso GetOutput]");
+    pvApp->RemoteSimpleScript(id, "vtkActor IsoActor");
+    pvApp->RemoteSimpleScript(id, "IsoActor SetMapper IsoMapper");
+    pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor IsoActor");
+    }
+  
+  // Setup an interactor style
+  vtkInteractorStylePlaneSource *planeStyle = 
+                      vtkInteractorStylePlaneSource::New();
+  vtkInteractorStyle *style = vtkInteractorStyleCamera::New();
+
+  //this->MainView->SetInteractorStyle(planeStyle);
+  this->MainView->SetInteractorStyle(style);
+  style->Delete();
+  
+  this->MainView->ResetCamera();
+}
+
+
 
 
 //----------------------------------------------------------------------------

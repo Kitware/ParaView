@@ -69,6 +69,7 @@ protected:
   void operator=(const vtkPVWindow&) {};
 
   void SetupTest();
+  void SetupVolumeIso();
 
   vtkPVRenderView *MainView;
   vtkKWWidget *RetrieveMenu;

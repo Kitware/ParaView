@@ -277,9 +277,10 @@ void vtkPVRenderView::ComputeVisiblePropBounds(float bounds[6])
     {
     pvApp->RemoteSimpleScript(id, "RenderSlave TransmitBounds");
     }
-  
-  controller->Receive(bounds, 6, 1, 112);
-  for (id = 2; id < num; ++id)
+
+  this->GetRenderer()->ComputeVisiblePropBounds(bounds);
+
+  for (id = 1; id < num; ++id)
     {
     controller->Receive(tmp, 6, id, 112);
     if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];}

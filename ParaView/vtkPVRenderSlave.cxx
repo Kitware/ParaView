@@ -171,6 +171,7 @@ void vtkPVRenderSlave::TransmitBounds()
 #include "vtkMesaRenderWindow.h"
 #include "vtkMultiProcessController.h"
 
+// Results are put in the local data.
 void vtkCompositeImagePair(float *localZdata, float *localPdata, 
 			   float *remoteZdata, float *remotePdata, 
 			   int total_pixels, int flag) 
@@ -184,12 +185,12 @@ void vtkCompositeImagePair(float *localZdata, float *localPdata,
     pixel_data_size = 4;
     for (i = 0; i < total_pixels; i++) 
       {
-      if (localZdata[i] <= remoteZdata[i]) 
+      if (remoteZdata[i] < localZdata[i]) 
 	{
-	remoteZdata[i] = localZdata[i];
+	localZdata[i] = remoteZdata[i];
 	for (j = 0; j < pixel_data_size; j++) 
 	  {
-	  remotePdata[i*pixel_data_size+j] = localPdata[i*pixel_data_size+j];
+	  localPdata[i*pixel_data_size+j] = remotePdata[i*pixel_data_size+j];
 	  }
 	}
       }
@@ -199,10 +200,10 @@ void vtkCompositeImagePair(float *localZdata, float *localPdata,
     pEnd = remoteZdata + total_pixels;
     while(remoteZdata != pEnd) 
       {
-      if (*localZdata <= *remoteZdata) 
+      if (*remoteZdata < *localZdata) 
 	{
-	*remoteZdata++ = *localZdata++;
-	*remotePdata++ = *localPdata++;
+	*localZdata++ = *remoteZdata++;
+	*localPdata++ = *remotePdata++;
 	}
       else
 	{
@@ -279,12 +280,12 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
 	// (handles non-power of 2 cases)
 	if (id < numProcs) 
 	  {
-	  //cerr << "phase " << i << " receiver: " << myId 
-	  //     << " receives data from " << id << endl;
+	  cerr << "phase " << i << " receiver: " << myId 
+	       << " receives data from " << id << endl;
 	  controller->Receive(remoteZdata, zdata_size, id, 99);
 	  controller->Receive(remotePdata, pdata_size, id, 99);
 
-	  // notice the result is stored as the local data 
+	  // notice the result is stored as the local data
 	  vtkCompositeImagePair(localZdata, localPdata, remoteZdata, remotePdata, 
 				total_pixels, flag);
 	  }
@@ -294,8 +295,8 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
 	id = myId-pow2(i);
 	if (id < numProcs) 
 	  {
-	  //cerr << i << " sender: " << myId << " sends data to "
-	  //       << id << endl;
+	  cerr << i << " sender: " << myId << " sends data to "
+	         << id << endl;
 	  controller->Send(localZdata, zdata_size, id, 99);
 	  controller->Send(localPdata, pdata_size, id, 99);
 	  }
@@ -308,13 +309,13 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
     if (flag) 
       {
       renWin->SetRGBAPixelData(0,0,windowSize[0]-1, 
-			       windowSize[1]-1,remotePdata,0);
+			       windowSize[1]-1,localPdata,0);
       } 
     else 
       {
       ((vtkMesaRenderWindow *)renWin)-> \
 	SetRGBACharPixelData(0,0, windowSize[0]-1, \
-			     windowSize[1]-1,(unsigned char*)remotePdata,0);
+			     windowSize[1]-1,(unsigned char*)localPdata,0);
       }
     }
 }

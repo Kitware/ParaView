@@ -78,6 +78,10 @@ void vtkPVSlaveStart(vtkMultiProcessController *controller)
     {
     cerr << "Init Contrib error\n";
     }
+  if (Vtkpatentedtcl_Init(interp) == TCL_ERROR) 
+    {
+    cerr << "Init Contrib error\n";
+    }
 
   if (Vtkkwwidgetstcl_Init(interp) == TCL_ERROR) 
     {
