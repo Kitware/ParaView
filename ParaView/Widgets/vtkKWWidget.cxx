@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.49");
+vtkCxxRevisionMacro(vtkKWWidget, "1.50");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -341,7 +341,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.49 $");
+  this->ExtractRevision(os,"$Revision: 1.50 $");
 }
 
 //------------------------------------------------------------------------------
@@ -490,6 +490,18 @@ void vtkKWWidget::GetBackgroundColor(int *r, int *g, int *b)
   vtkKWTkUtilities::GetBackgroundColor(this->Application->GetMainInterp(),
                                        this->GetWidgetName(), 
                                        r, g, b);
+}
+
+//------------------------------------------------------------------------------
+void vtkKWWidget::GetBackgroundColor(float *r, float *g, float *b)
+{
+  int ir, ig, ib;
+  vtkKWTkUtilities::GetBackgroundColor(this->Application->GetMainInterp(),
+                                       this->GetWidgetName(), 
+                                       &ir, &ig, &ib);
+  *r = (float)ir / 255.0;
+  *g = (float)ig / 255.0;
+  *b = (float)ib / 255.0;
 }
 
 //------------------------------------------------------------------------------

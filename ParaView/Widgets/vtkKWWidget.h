@@ -163,8 +163,10 @@ public:
   void GetRGBColor(const char* color, int *r, int *g, int *b);
   
   // Description:
-  // Get the current background color of the widget.
+  // Get the current background color of the widget (either as 0 -> 255 int, or
+  // normalized 0.0 -> 1.0 float).
   void GetBackgroundColor(int *r, int *g, int *b);
+  void GetBackgroundColor(float *r, float *g, float *b);
   
   // Description:
   // Query if widget has Tk configuration option
