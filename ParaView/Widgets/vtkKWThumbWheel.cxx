@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.3");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.4");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -891,7 +891,7 @@ void vtkKWThumbWheel::UpdateEntryResolution()
     const char *pos = strchr(res, '.');
     if (pos)
       {
-      this->EntryResolution = strlen(res) - (pos - res) - 1;
+      this->EntryResolution = static_cast<int>(strlen(res)) - (pos - res) - 1;
       }
     }
 }
