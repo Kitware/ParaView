@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.47");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.48");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -155,8 +155,6 @@ void vtkPVSelectionList::Create(vtkKWApplication *app)
     this->Menu->SetValue(name);
     }
   this->SetBalloonHelpString(this->BalloonHelpString);
-
-//  this->SetCurrentValue(this->Property->GetIndex());
 }
 
 
@@ -310,11 +308,6 @@ void vtkPVSelectionList::SetCurrentValue(int value)
     this->Menu->SetValue(name);
     this->SelectCallback(name, value);
     }
-  
-//  if (!this->AcceptCalled)
-//    {
-//    this->Property->SetIndex(value);
-//    }
 }
 
 //----------------------------------------------------------------------------
@@ -328,7 +321,6 @@ void vtkPVSelectionList::SelectCallback(const char *name, int value)
   this->CurrentValue = value;
   this->SetCurrentName(name);
   
-//  this->Menu->SetButtonText(name);
   this->ModifiedCallback();
   this->Update();
 }
