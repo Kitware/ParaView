@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.39.2.1");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.39.2.2");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -402,10 +402,6 @@ const char* vtkPVSelectWidget::GetVTKValue(int index)
   if (res)
     {
     return res;
-    }
-  else
-    {
-    return 0;
     }
   return 0;
 }
