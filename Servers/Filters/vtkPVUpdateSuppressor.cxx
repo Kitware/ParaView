@@ -26,7 +26,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.23");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.24");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -221,4 +221,8 @@ void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
   os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
+  os << indent << "OutputType: " 
+     << (this->OutputType?this->OutputType:"(none)")
+     << endl;
+         
 }
