@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.274");
+vtkCxxRevisionMacro(vtkPVApplication, "1.275");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1651,7 +1651,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     // Some scripts were hanging due to event loop issues.
     // This update prevents such problems.
     this->Script("update");
-    ui->LoadScript(open_files[cc].c_str());
+    this->LoadScript(open_files[cc].c_str());
     this->RunningParaViewScript = 0;
     }
   
