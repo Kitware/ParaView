@@ -208,6 +208,34 @@ public:
     const char *to_page_title,
     const char *to_after_widget_label);
 
+  //BTX
+  // A Widget location. 
+  // Store both the page the widget is packed in, and the widget it is 
+  // packed after (if any).
+
+  class WidgetLocation
+  {
+  public:
+    WidgetLocation();
+
+    int PageId;
+    vtkKWWidget *AfterWidget;
+  };
+
+  // A D&D entry. 
+  // Store the widget source and target location.
+
+  class DragAndDropEntry
+  {
+  public:
+    DragAndDropEntry();
+
+    vtkKWWidget *Widget;
+    WidgetLocation FromLocation;
+    WidgetLocation ToLocation;
+  };
+  // ETX
+
 protected:
   vtkKWUserInterfaceNotebookManager();
   ~vtkKWUserInterfaceNotebookManager();
@@ -244,19 +272,6 @@ protected:
   // serialize a D&D event to a text string/file.
   virtual char* GetDragAndDropWidgetLabel(vtkKWWidget *widget);
 
-  // A Widget location. 
-  // Store both the page the widget is packed in, and the widget it is 
-  // packed after (if any).
-
-  class WidgetLocation
-  {
-  public:
-    WidgetLocation();
-
-    int PageId;
-    vtkKWWidget *AfterWidget;
-  };
-
   // Description:
   // Get the location of a widget.
   virtual int GetDragAndDropWidgetLocation(
@@ -267,19 +282,6 @@ protected:
   // GetDragAndDropWidgetLabel()) and a hint about its location.
   virtual vtkKWWidget* GetDragAndDropWidgetFromLabelAndLocation(
     const char *widget_label, WidgetLocation *loc_hint);
-
-  // A D&D entry. 
-  // Store the widget source and target location.
-
-  class DragAndDropEntry
-  {
-  public:
-    DragAndDropEntry();
-
-    vtkKWWidget *Widget;
-    WidgetLocation FromLocation;
-    WidgetLocation ToLocation;
-  };
 
   // List of D&D entries
 
