@@ -50,7 +50,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWOptionMenu.h"
-#include "vtkKWToolbar.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"

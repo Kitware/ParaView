@@ -514,10 +514,8 @@ void vtkPVSource::UnGrabFocus()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::Select()
+void vtkPVSource::Pack()
 {
-  vtkPVData *data;
-  
   // The update is needed to work around a packing problem which
   // occur for large windows. Do not remove.
   this->Script("update");
@@ -528,7 +526,15 @@ void vtkPVSource::Select()
                this->GetPVRenderView()->GetNavigationFrame()->GetWidgetName());
   this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
                this->Notebook->GetWidgetName());
+}
 
+//----------------------------------------------------------------------------
+void vtkPVSource::Select()
+{
+  this->Pack();
+
+  vtkPVData *data;
+  
   this->UpdateProperties();
   // This may best be merged with the UpdateProperties call but ...
   // We make the call here to update the input menu, 
@@ -1005,12 +1011,6 @@ void vtkPVSource::UpdateParameterWidgets()
     it->GoToNextItem();
     }
   it->Delete();
-}
-
-//----------------------------------------------------------------------------
-const char* vtkPVSource::GetNotebookWidgetName()
-{
-  return this->Notebook->GetWidgetName();
 }
 
 //----------------------------------------------------------------------------
@@ -1852,7 +1852,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.228 $");
+  this->ExtractRevision(os,"$Revision: 1.229 $");
 }
 
 //----------------------------------------------------------------------------
