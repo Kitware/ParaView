@@ -45,9 +45,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWImageLabel.h"
 #include "vtkKWIcon.h"
 
+#include <ctype.h>
+
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.14");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.15");
 
 
 
