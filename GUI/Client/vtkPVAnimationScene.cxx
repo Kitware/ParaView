@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.19");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.20");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -377,6 +377,18 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
     this->GetWidgetName());
   this->Script("grid columnconfigure %s 1 -weight 2",
     this->GetWidgetName());
+
+  // Setup key bindings 
+  // Quick Keys!  (Left arrow for one step back, right arrow for one step
+  // forward, up arrow for last time step, down arrow for first time step). :)
+  this->Script("bind %s <Key-Left> {%s GoToPrevious}",
+    this->Window->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <Key-Right> {%s GoToNext}",
+    this->Window->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <Key-Up> {%s GoToEnd}",
+    this->Window->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <Key-Down> {%s GoToBeginning}",
+    this->Window->GetWidgetName(), this->GetTclName());
   
 }
 
