@@ -56,12 +56,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTextActor.h"
 #include "vtkTextProperty.h"
+#include "vtkXMLCameraReader.h"
+#include "vtkXMLCameraWriter.h"
+#include "vtkXMLTextPropertyReader.h"
+#include "vtkXMLTextPropertyWriter.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.36");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.37");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -855,7 +859,6 @@ void vtkKWRenderWidget::UpdateEnableState()
 void vtkKWRenderWidget::SerializeSelf(ostream& os, vtkIndent indent)
 {
   float *fptr;
-  double *dptr;
 
   // Invoke superclass
 
@@ -868,6 +871,51 @@ void vtkKWRenderWidget::SerializeSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "BackgroundColor " 
        << fptr[0] << " " << fptr[1] << " " << fptr[2] << endl;
+    }
+
+  // Corner Annotation
+
+  os << indent << "CornerAnnotationVisibility " 
+     << this->GetCornerAnnotationVisibility() << endl;
+
+  vtkCornerAnnotation *anno = this->GetCornerAnnotation();
+  if (anno)
+    {
+    os << indent << "CornerAnnotationTexts";
+    for (int i = 0; i < 4; i++)
+      {
+      os << ' ';
+      vtkKWSerializer::WriteSafeString(os, anno->GetText(i));
+      }
+    os << endl;
+
+    os << indent << "CornerAnnotationMaximumLineHeight " 
+       << anno->GetMaximumLineHeight() << endl;
+
+    os << indent << "CornerAnnotationMinimumFontSize " 
+       << anno->GetMinimumFontSize() << endl;
+
+    os << indent << "CornerAnnotationLevelShift " 
+       << anno->GetLevelShift() << endl;
+
+    os << indent << "CornerAnnotationLevelScale " 
+       << anno->GetLevelScale() << endl;
+
+    vtkTextProperty *tprop = anno->GetTextProperty();
+    if (tprop)
+      {
+      strstream tprop_str;
+      vtkXMLTextPropertyWriter *xmlw = vtkXMLTextPropertyWriter::New();
+      xmlw->SetTextProperty(tprop);
+      xmlw->Write(tprop_str, indent);
+      tprop_str << ends;
+      xmlw->Delete();
+
+      os << indent << "CornerAnnotationTextProperty ";
+      vtkKWSerializer::WriteSafeString(os, tprop_str.str());
+      os << endl;
+      tprop_str.rdbuf()->freeze(0);
+      }
     }
 
   // Header Annotation
@@ -903,28 +951,17 @@ void vtkKWRenderWidget::SerializeSelf(ostream& os, vtkIndent indent)
   vtkCamera *cam = this->GetCurrentCamera();
   if (cam)
     {
-    dptr = cam->GetPosition();
-    os << indent << "CameraPosition " 
-       << dptr[0] << " " << dptr[1] << " " << dptr[2] << endl;
-
-    dptr = cam->GetFocalPoint();
-    os << indent << "CameraFocalPoint " 
-       << dptr[0] << " " << dptr[1] << " " << dptr[2] << endl;
-
-    dptr = cam->GetViewUp();
-    os << indent << "CameraViewUp " 
-       << dptr[0] << " " << dptr[1] << " " << dptr[2] << endl;
-
-    dptr = cam->GetClippingRange();
-    os << indent << "CameraClippingRange " 
-       << dptr[0] << " " << dptr[1] << endl;
-
-    os << indent << "CameraViewAngle " << cam->GetViewAngle() << endl;
-
-    os << indent << "CameraParallelScale " << cam->GetParallelScale() << endl;
-
-    os << indent << "CameraParallelProjection " 
-       << cam->GetParallelProjection() << endl;
+    strstream cam_str;
+    vtkXMLCameraWriter *xmlw = vtkXMLCameraWriter::New();
+    xmlw->SetCamera(cam);
+    xmlw->Write(cam_str, indent);
+    cam_str << ends;
+    xmlw->Delete();
+    
+    os << indent << "Camera ";
+    vtkKWSerializer::WriteSafeString(os, cam_str.str());
+    os << endl;
+    cam_str.rdbuf()->freeze(0);
     }
 
   // ScalarShift and ScalarScale
@@ -938,7 +975,6 @@ void vtkKWRenderWidget::SerializeSelf(ostream& os, vtkIndent indent)
 void vtkKWRenderWidget::SerializeToken(istream& is, const char token[1024])
 {
   float fval, fbuffer3[3];
-  double dval, dbuffer3[3];
   int i;
   char buffer[1024];
 
@@ -950,6 +986,70 @@ void vtkKWRenderWidget::SerializeToken(istream& is, const char token[1024])
     is >> fbuffer3[0] >> fbuffer3[1] >> fbuffer3[2];
     this->SetBackgroundColor(fbuffer3);
     return;
+    }
+
+  // Corner Annotation
+
+  if (!strcmp(token, "CornerAnnotationVisibility"))
+    {
+    is >> i;
+    this->SetCornerAnnotationVisibility(i);
+    return;
+    }
+
+  vtkCornerAnnotation *anno = this->GetCornerAnnotation();
+  if (anno)
+    {
+    if (!strcmp(token, "CornerAnnotationTexts"))
+      {
+      for (i = 0; i < 4; i++)
+        {
+        buffer[0] = '\0';
+        vtkKWSerializer::GetNextToken(&is, buffer);
+        anno->SetText(i, buffer);
+        }
+      return;
+      }
+
+    if (!strcmp(token, "CornerAnnotationMaximumLineHeight"))
+      {
+      is >> fval;
+      anno->SetMaximumLineHeight(fval);
+      return;
+      }
+    
+    if (!strcmp(token, "CornerAnnotationMinimumFontSize"))
+      {
+      is >> fval;
+      anno->SetMinimumFontSize(fval);
+      return;
+      }
+
+    if (!strcmp(token, "CornerAnnotationLevelShift"))
+      {
+      is >> fval;
+      anno->SetLevelShift(fval);
+      return;
+      }
+
+    if (!strcmp(token, "CornerAnnotationLevelScale"))
+      {
+      is >> fval;
+      anno->SetLevelScale(fval);
+      return;
+      }
+
+    vtkTextProperty *tprop = anno->GetTextProperty();
+    if (tprop && !strcmp(token, "CornerAnnotationTextProperty"))
+      {
+      buffer[0] = '\0';
+      vtkKWSerializer::GetNextToken(&is, buffer);
+      vtkXMLTextPropertyReader *xmlr = vtkXMLTextPropertyReader::New();
+      xmlr->SetTextProperty(tprop);
+      xmlr->Parse(buffer);
+      xmlr->Delete();
+      return;
+      }
     }
 
   // Header Annotation
@@ -990,58 +1090,15 @@ void vtkKWRenderWidget::SerializeToken(istream& is, const char token[1024])
   // Camera
 
   vtkCamera *cam = this->GetCurrentCamera();
-  if (cam)
+  if (cam && !strcmp(token, "Camera"))
     {
-    if (!strcmp(token, "CameraPosition"))
-      {
-      is >> dbuffer3[0] >> dbuffer3[1] >> dbuffer3[2];
-      cam->SetPosition(dbuffer3);
-      cam->ComputeViewPlaneNormal();
-      return;
-      }
-
-    if (!strcmp(token, "CameraFocalPoint"))
-      {
-      is >> dbuffer3[0] >> dbuffer3[1] >> dbuffer3[2];
-      cam->SetFocalPoint(dbuffer3);
-      cam->ComputeViewPlaneNormal();
-      return;
-      }
-
-    if (!strcmp(token, "CameraViewUp"))
-      {
-      is >> dbuffer3[0] >> dbuffer3[1] >> dbuffer3[2];
-      cam->SetViewUp(dbuffer3);
-      return;
-      }
-
-    if (!strcmp(token, "CameraClippingRange"))
-      {
-      is >> dbuffer3[0] >> dbuffer3[1];
-      cam->SetClippingRange(dbuffer3[0], dbuffer3[1]);
-      return;
-      }
-
-    if (!strcmp(token, "CameraViewAngle"))
-      {
-      is >> dval;
-      cam->SetViewAngle(dval);
-      return;
-      }
-
-    if (!strcmp(token, "CameraParallelScale"))
-      {
-      is >> dval;
-      cam->SetParallelScale(dval);
-      return;
-      }
-
-    if (!strcmp(token, "CameraParallelProjection"))
-      {
-      is >> i;
-      cam->SetParallelProjection(i);
-      return;
-      }
+    buffer[0] = '\0';
+    vtkKWSerializer::GetNextToken(&is, buffer);
+    vtkXMLCameraReader *xmlr = vtkXMLCameraReader::New();
+    xmlr->SetCamera(cam);
+    xmlr->Parse(buffer);
+    xmlr->Delete();
+    return;
     }
 
   // ScalarShift and ScalarScale
@@ -1070,7 +1127,7 @@ void vtkKWRenderWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os, indent);
   os << indent << "vtkKWRenderWidget ";
-  this->ExtractRevision(os, "$Revision: 1.36 $");
+  this->ExtractRevision(os, "$Revision: 1.37 $");
 }
 
 //----------------------------------------------------------------------------
