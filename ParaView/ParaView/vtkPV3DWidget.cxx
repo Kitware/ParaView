@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWFrame.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.21");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.22");
 
 //===========================================================================
 //***************************************************************************
@@ -178,6 +178,8 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
     this->Widget3D->EnabledOff();
     }
   this->Observer->Execute(this->Widget3D, vtkCommand::InteractionEvent, 0);
+
+  this->PlaceWidget();
 }
 
 //----------------------------------------------------------------------------

@@ -111,6 +111,8 @@ protected:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
+  void UpdateVTKObject();
+
   vtkKWEntry *PositionEntry[3];
   vtkKWPushButton *PositionResetButton;
 

@@ -134,6 +134,8 @@ protected:
   // Execute event of the 3D Widget.
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
+  void UpdateVTKObject();
+
   vtkKWEntry* Point1[3];
   vtkKWEntry* Point2[3];
   vtkKWLabel* Labels[2];

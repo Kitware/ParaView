@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.7");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.8");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -161,20 +161,26 @@ void vtkPVPointWidget::Accept()
                  << this->PositionEntry[1]->GetValue() << " "
                  << this->PositionEntry[2]->GetValue() << endl;
       }
-    
-    // Accept point
-    char acceptCmd[1024];
-    if ( this->VariableName && this->ObjectTclName )
-      {    
-      sprintf(acceptCmd, "%s Set%s %f %f %f", this->ObjectTclName, 
-              this->VariableName,
-              this->PositionEntry[0]->GetValueAsFloat(),
-              this->PositionEntry[1]->GetValueAsFloat(),
-              this->PositionEntry[2]->GetValueAsFloat());
-      pvApp->BroadcastScript(acceptCmd);
-      }
+    this->UpdateVTKObject();
     }
   this->Superclass::Accept();
+}
+
+void vtkPVPointWidget::UpdateVTKObject()  
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  // Accept point
+  char acceptCmd[1024];
+  if ( this->VariableName && this->ObjectTclName )
+    {    
+    sprintf(acceptCmd, "%s Set%s %f %f %f", this->ObjectTclName, 
+            this->VariableName,
+            this->PositionEntry[0]->GetValueAsFloat(),
+            this->PositionEntry[1]->GetValueAsFloat(),
+            this->PositionEntry[2]->GetValueAsFloat());
+    pvApp->BroadcastScript(acceptCmd);
+    }
 }
 
 
@@ -302,6 +308,13 @@ int vtkPVPointWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 void vtkPVPointWidget::ActualPlaceWidget()
 {
   this->Superclass::ActualPlaceWidget();
+
+  float bounds[6];
+  this->PVSource->GetPVInput()->GetBounds(bounds);
+
+  this->SetPosition((bounds[0]+bounds[1])/2,(bounds[2]+bounds[3])/2, 
+                    (bounds[4]+bounds[5])/2);
+  this->UpdateVTKObject();
 }
 
 //----------------------------------------------------------------------------

@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -262,6 +262,15 @@ void vtkPVLineWidget::Accept()
                << this->ResolutionEntry->GetValue() << endl;
     }
 
+  this->UpdateVTKObject();
+  this->Superclass::Accept();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineWidget::UpdateVTKObject()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
   char acceptCmd[1024];
   if ( this->Point1Variable && this->ObjectTclName )
     {    
@@ -288,7 +297,6 @@ void vtkPVLineWidget::Accept()
             this->ResolutionEntry->GetValueAsInt());
     pvApp->BroadcastScript(acceptCmd);
     }
-  this->Superclass::Accept();
 }
 
 //----------------------------------------------------------------------------
@@ -307,6 +315,7 @@ void vtkPVLineWidget::ActualPlaceWidget()
   this->SetPoint1((bounds[0]+bounds[1])/2, bounds[2], (bounds[4]+bounds[5])/2);
   this->SetPoint2((bounds[0]+bounds[1])/2, bounds[3], (bounds[4]+bounds[5])/2);
   this->Widget3D->PlaceWidget();  
+  this->UpdateVTKObject();
 }
 
 //----------------------------------------------------------------------------
