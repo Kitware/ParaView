@@ -28,7 +28,7 @@
 #include "vtkSMProxyManagerInternals.h"
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.19");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.20");
 
 //---------------------------------------------------------------------------
 vtkSMProxyManager::vtkSMProxyManager()
@@ -321,6 +321,11 @@ void vtkSMProxyManager::UpdateRegisteredProxies(const char* groupname)
       {
       it2->second->UpdateVTKObjects();
       }
+      
+    for (it2 = it->second.begin(); it2 != it->second.end(); it2++)
+      {
+      it2->second->UpdateInformation();
+      }
     }
 }
 
@@ -336,6 +341,11 @@ void vtkSMProxyManager::UpdateRegisteredProxies()
     for (; it2 != it->second.end(); it2++)
       {
       it2->second->UpdateVTKObjects();
+      }
+
+    for (it2 = it->second.begin(); it2 != it->second.end(); it2++)
+      {
+      it2->second->UpdateInformation();
       }
     }
 }
