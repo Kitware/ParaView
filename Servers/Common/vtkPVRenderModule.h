@@ -147,6 +147,10 @@ public:
   // can stay in sync
   void StartRenderEvent();
 
+  vtkClientServerID GetInteractorID() { return this->InteractorID;}
+  //BTX
+  void SetInteractorID(vtkClientServerID id) {this->InteractorID = id;}
+  //ETX
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
@@ -170,6 +174,10 @@ protected:
 
   //int Interactive;
   int TotalVisibleMemorySizeValid;
+  
+  //Code for initializing InteractorID needs to be moved
+  //from vtkPVWindow
+  vtkClientServerID InteractorID;
   
   vtkClientServerID RenderWindowID;
   vtkClientServerID RendererID;
