@@ -1,7 +1,6 @@
 #include "vtkHDF5RawImageReader.h"
 #include "vtkColorByPart.h"
 #include "vtkGroup.h"
-#include "vtkKWExtractGeometryByScalar.h"
 #include "vtkMergeArrays.h"
 #include "vtkMultiOut.h"
 #include "vtkMultiOut2.h"
@@ -34,7 +33,6 @@ int main()
   o = vtkHDF5RawImageReader::New(); o->Print(cout); o->Delete();
   o = vtkColorByPart::New(); o->Print(cout); o->Delete();
   o = vtkGroup::New(); o->Print(cout); o->Delete();
-  o = vtkKWExtractGeometryByScalar::New(); o->Print(cout); o->Delete();
   o = vtkMergeArrays::New(); o->Print(cout); o->Delete();
   o = vtkMultiOut::New(); o->Print(cout); o->Delete();
   o = vtkMultiOut2::New(); o->Print(cout); o->Delete();

@@ -290,15 +290,6 @@
              input_name="Input"/>
 </Module>
 
-  <Module name="ExtractVoids" menu_name="Extract Voids" class="vtkPVExtractGeometryByScalar" 
-          root_name="ExtractVoids"
-          module_type="Filter"
-          long_help="This filter works with connectivity filter.  It removes regions based on region id." 
-          short_help="Remove geometry based on integer id array.">
-    <Filter class="vtkKWExtractGeometryByScalar">
-      <Input name="Input" class="vtkUnstructuredGrid" /> 
-    </Filter>
-  </Module>
   <Module name="Calculator" class="vtkPVSource"
           root_name="Calc" button_image="PVCalculatorButton"
           button_help="Create new arrays using mathematical operations and existing arrays."

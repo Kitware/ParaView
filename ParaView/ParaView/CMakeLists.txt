@@ -1,7 +1,6 @@
 SET(Filters_SRCS  
   vtkColorByPart.cxx
   vtkGroup.cxx
-  vtkKWExtractGeometryByScalar.cxx
   vtkMergeArrays.cxx
   vtkMultiOut.cxx
   vtkMultiOut2.cxx
@@ -75,7 +74,6 @@ SET( ParaView_SRCS
   vtkPVErrorLogDisplay.cxx
   vtkPVExtentEntry.cxx
   vtkPVExtentTranslator.cxx 
-  vtkPVExtractGeometryByScalar.cxx
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx
