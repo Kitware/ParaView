@@ -1,6 +1,7 @@
 SOURCE_FILES( ParaView_SRCS
 vtkAllToNRedistributePolyData.cxx
 vtkBalancedRedistributePolyData.cxx
+vtkCompositeProp.cxx
 vtkDummyRenderWindow.cxx
 vtkDummyRenderer.cxx
 vtkRedistributePolyData.cxx
@@ -67,6 +68,7 @@ vtkPVTrackballRoll.cxx
 vtkPVTrackballRotate.cxx
 vtkPVTrackballZoom.cxx
 vtkPVTreeComposite.cxx 
+vtkPVUpdateSupressor.cxx
 vtkPVVectorEntry.cxx
 vtkPVWidget.cxx
 vtkPVWidgetCollection.cxx
