@@ -27,14 +27,18 @@
 
 
 vtkStandardNewMacro(vtkSMProxyManager);
-vtkCxxRevisionMacro(vtkSMProxyManager, "1.3");
+vtkCxxRevisionMacro(vtkSMProxyManager, "1.4");
 
 struct vtkSMProxyManagerInternals
 {
   typedef vtkstd::map<vtkStdString, 
-                      vtkSmartPointer<vtkPVXMLElement> > ProxyMapType;
-  typedef vtkstd::map<vtkStdString, ProxyMapType> GroupMapType;
+                      vtkSmartPointer<vtkPVXMLElement> > ElementMapType;
+  typedef vtkstd::map<vtkStdString, ElementMapType> GroupMapType;
+
   GroupMapType GroupMap;
+
+  typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMProxy> > ProxyMapType;
+  ProxyMapType RegisteredProxyMap;
 };
 
 //---------------------------------------------------------------------------
@@ -47,6 +51,7 @@ vtkSMProxyManager::vtkSMProxyManager()
 vtkSMProxyManager::~vtkSMProxyManager()
 {
   delete this->Internals;
+  this->UnRegisterProxies();
 }
 
 //----------------------------------------------------------------------------
@@ -54,9 +59,9 @@ void vtkSMProxyManager::AddElement(const char* groupName,
                                    const char* name,
                                    vtkPVXMLElement* element)
 {
-  vtkSMProxyManagerInternals::ProxyMapType& proxyMap = 
+  vtkSMProxyManagerInternals::ElementMapType& elementMap = 
     this->Internals->GroupMap[groupName];
-  proxyMap[name] = element;
+  elementMap[name] = element;
 }
 
 //----------------------------------------------------------------------------
@@ -88,7 +93,7 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(
     this->Internals->GroupMap.find(groupName);
   if (it != this->Internals->GroupMap.end())
     {
-    vtkSMProxyManagerInternals::ProxyMapType::iterator it2 =
+    vtkSMProxyManagerInternals::ElementMapType::iterator it2 =
       it->second.find(proxyName);
 
     if (it2 != it->second.end())
@@ -134,6 +139,54 @@ vtkSMProxy* vtkSMProxyManager::NewProxy(vtkPVXMLElement* pelement)
       }
     }
   return proxy;
+}
+
+//---------------------------------------------------------------------------
+vtkSMProxy* vtkSMProxyManager::GetProxy(const char* name)
+{
+  vtkSMProxyManagerInternals::ProxyMapType::iterator it =
+    this->Internals->RegisteredProxyMap.find(name);
+  if (it != this->Internals->RegisteredProxyMap.end())
+    {
+    return it->second;
+    }
+  return 0;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterProxies()
+{
+  this->Internals->RegisteredProxyMap.erase(
+    this->Internals->RegisteredProxyMap.begin(),
+    this->Internals->RegisteredProxyMap.end());
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UnRegisterProxy(const char* name)
+{
+  vtkSMProxyManagerInternals::ProxyMapType::iterator it =
+    this->Internals->RegisteredProxyMap.find(name);
+  if (it != this->Internals->RegisteredProxyMap.end())
+    {
+    this->Internals->RegisteredProxyMap.erase(it);
+    }
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::RegisterProxy(const char* name, vtkSMProxy* proxy)
+{
+  this->Internals->RegisteredProxyMap[name] = proxy;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProxyManager::UpdateRegisteredProxies()
+{
+  vtkSMProxyManagerInternals::ProxyMapType::iterator it =
+    this->Internals->RegisteredProxyMap.begin();
+  for(; it != this->Internals->RegisteredProxyMap.end(); it++)
+    {
+    it->second->UpdateVTKObjects();
+    }
 }
 
 //---------------------------------------------------------------------------

@@ -17,6 +17,10 @@
 // vtkSMProxyManager is a singleton that creates and manages proxies.
 // It maintains a map of XML elements (populated by the XML parser) from
 // which it can create and initialize proxies and properties.
+// Once a proxy is created, it can either be managed by the user code or
+// the proxy manager. For latter, pass the control of the proxy to the
+// manager with ManageProxy() and unregister it. At destruction, proxy
+// manager deletes all managed proxies.
 // .SECTION See Also
 // vtkSMXMLParser
 
@@ -48,6 +52,31 @@ public:
   // the deletion of object created through other methods. Use
   // UnRegister instead.
   vtkSMProxy* NewProxy(const char* groupName, const char* proxyName);
+
+  // Description:
+  // Used to pass the control of the proxy to the manager. The user code can
+  // then release its reference count and not care about what happens
+  // to the proxy. Managed proxies are deleted at destruction. NOTE:
+  // The name has to be unique. If not, the existing proxy will be
+  // replaced (and unregistered).
+  void RegisterProxy(const char* name, vtkSMProxy* proxy);
+
+  // Description:
+  // Given its name returns a proxy. If not a managed proxy, returns 0.
+  vtkSMProxy* GetProxy(const char* name);
+
+  // Description:
+  // Given its name, unregisters a proxy and remove it from the list
+  // of managed proxies. 
+  void UnRegisterProxy(const char* name);
+
+  // Description:
+  // Unregisters all managed proxies.
+  void UnRegisterProxies();
+
+  // Description:
+  // Calls UpdateVTKObjects() on all managed proxies.
+  void UpdateRegisteredProxies();
 
 protected:
   vtkSMProxyManager();
