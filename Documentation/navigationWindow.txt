@@ -1,0 +1,7 @@
+Navigation Window
+
+<insert navigationFrame.jpg>
+
+The navigation window is a graphical representation of the pipeline structure used in ParaView.  Items are added to the pipeline as the user loads or modifies data.  The name of the currently active data source is drawn in black and is centered in the navigation frame.  (When new filters are added to the pipeline, the current data -- associated with the current source -- will be passed through that filter.  This is true even if the current source is somewhere in the middle of the pipeline.)  The names of the sources directly before and directly after this source are displayed in blue and are connected by arrows to the name of the current source.  If there are more sources in the pipeline that are not currently represented in the navigation frame, an elipsis (...) is drawn on the corresponding end of the navigation frame.  Clicking on the source names displayed in blue will 1) make that source active and 2) bring up the user interface corresponding to that source.
+
+Note: Only sources at the end of the pipeline can be removed from the pipeline.  This is done by clicking the "Delete" button on the Parameters page associated with that source.
