@@ -32,7 +32,7 @@
 
 #include "vtkKWDialog.h"
 
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWPushButton;
 class vtkKWFrame;
 
@@ -62,7 +62,7 @@ class VTK_EXPORT vtkPVPluginsDialog : public vtkKWDialog
   // Destructor.
   virtual ~vtkPVPluginsDialog();
   
-  vtkKWLabeledFrame *PluginsFrame;
+  vtkKWFrameLabeled *PluginsFrame;
   vtkKWPushButton *NameButton;
   vtkKWPushButton *TypeButton;
   vtkKWPushButton *LoadedButton;

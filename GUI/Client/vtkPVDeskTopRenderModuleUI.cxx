@@ -20,12 +20,12 @@
 #include "vtkKWScale.h"
 #include "vtkPVApplication.h"
 #include "vtkTimerLog.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.6");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.7");
 
 int vtkPVDeskTopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);

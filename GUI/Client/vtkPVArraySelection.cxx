@@ -21,7 +21,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -42,7 +42,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.62");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.63");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -57,7 +57,7 @@ vtkPVArraySelection::vtkPVArraySelection()
   
   this->LabelText = 0;
   
-  this->LabeledFrame = vtkKWLabeledFrame::New();
+  this->LabeledFrame = vtkKWFrameLabeled::New();
   this->ButtonFrame = vtkKWWidget::New();
   this->AllOnButton = vtkKWPushButton::New();
   this->AllOffButton = vtkKWPushButton::New();

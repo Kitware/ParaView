@@ -24,7 +24,7 @@
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.19");
+vtkCxxRevisionMacro(vtkPVLODRenderModuleUI, "1.20");
 
 int vtkPVLODRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -77,7 +77,7 @@ vtkPVLODRenderModuleUI::vtkPVLODRenderModuleUI()
 
   this->RenderInterruptsEnabledCheck = vtkKWCheckButton::New();
 
-  this->LODFrame = vtkKWLabeledFrame::New();
+  this->LODFrame = vtkKWFrameLabeled::New();
  
   this->LODScalesFrame = vtkKWWidget::New();
   this->LODThresholdLabel = vtkKWLabel::New();

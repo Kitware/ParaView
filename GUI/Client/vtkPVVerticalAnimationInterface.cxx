@@ -17,7 +17,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWApplication.h"
 #include "vtkKWFrame.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
 #include "vtkPVAnimationCue.h"
 #include "vtkCommand.h"
@@ -40,7 +40,7 @@
 #include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.10");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.11");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -86,8 +86,8 @@ protected:
 vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
 {
   this->TopFrame = vtkKWFrame::New();
-  this->KeyFramePropertiesFrame = vtkKWLabeledFrame::New();
-  this->ScenePropertiesFrame = vtkKWLabeledFrame::New();
+  this->KeyFramePropertiesFrame = vtkKWFrameLabeled::New();
+  this->ScenePropertiesFrame = vtkKWFrameLabeled::New();
   this->SelectKeyFrameLabel = vtkKWLabel::New();
   this->PropertiesFrame = vtkKWFrame::New();
   this->TypeFrame = vtkKWFrame::New();
@@ -97,7 +97,7 @@ vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
   
   this->RecordAllButton = vtkKWCheckButton::New();
 
-  this->SaveFrame = vtkKWLabeledFrame::New();
+  this->SaveFrame = vtkKWFrameLabeled::New();
   this->CacheGeometryCheck = vtkKWCheckButton::New();
   this->AdvancedAnimationCheck = vtkKWCheckButton::New();
  

@@ -32,7 +32,7 @@
 #include "vtkPVCornerAnnotation.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
@@ -131,7 +131,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.354");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.355");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -164,7 +164,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->SetMenuEntryName(VTK_PV_VIEW_MENU_LABEL);
   this->SetMenuEntryHelp("Show global view parameters (background color, annoations2 etc.)");
 
-  this->StandardViewsFrame = vtkKWLabeledFrame::New();
+  this->StandardViewsFrame = vtkKWFrameLabeled::New();
   this->XMaxViewButton = vtkKWPushButton::New();
   this->XMinViewButton = vtkKWPushButton::New();
   this->YMaxViewButton = vtkKWPushButton::New();
@@ -172,7 +172,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->ZMaxViewButton = vtkKWPushButton::New();
   this->ZMinViewButton = vtkKWPushButton::New();
   
-  this->RenderParametersFrame = vtkKWLabeledFrame::New();
+  this->RenderParametersFrame = vtkKWFrameLabeled::New();
 
   this->TriangleStripsCheck = vtkKWCheckButton::New();
   this->ParallelProjectionCheck = vtkKWCheckButton::New();
@@ -185,10 +185,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->ManipulatorControl3D = vtkPVInteractorStyleControl::New();
   this->ManipulatorControl3D->SetRegisteryName("3D");
 
-  this->CameraControlFrame = vtkKWLabeledFrame::New();
+  this->CameraControlFrame = vtkKWFrameLabeled::New();
   this->CameraControl = vtkPVCameraControl::New();
   
-  this->NavigationFrame = vtkKWLabeledFrame::New();
+  this->NavigationFrame = vtkKWFrameLabeled::New();
   this->NavigationWindow = vtkPVNavigationWindow::New();
   this->SelectionWindow = vtkPVSourceList::New();
 
@@ -198,10 +198,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->ShowSelectionWindow = 0;
   this->ShowNavigationWindow = 0;
 
-  this->InterfaceSettingsFrame = vtkKWLabeledFrame::New();
+  this->InterfaceSettingsFrame = vtkKWFrameLabeled::New();
   this->Display3DWidgets = vtkKWCheckButton::New();
 
-  this->OrientationAxesFrame = vtkKWLabeledFrame::New();
+  this->OrientationAxesFrame = vtkKWFrameLabeled::New();
   this->OrientationAxesCheck = vtkKWCheckButton::New();
   this->OrientationAxesInteractiveCheck = vtkKWCheckButton::New();
   this->OrientationAxesOutlineColor = vtkKWChangeColorButton::New();
@@ -213,7 +213,7 @@ vtkPVRenderView::vtkPVRenderView()
     {
     this->CameraIcons[cc] = vtkPVCameraIcon::New();
     }
-  this->CameraIconsFrame = vtkKWLabeledFrame::New();
+  this->CameraIconsFrame = vtkKWFrameLabeled::New();
 
   this->PropertiesButton = vtkKWPushButton::New();
   this->MenuLabelSwitchBackAndForthToViewProperties = 0;
@@ -1113,7 +1113,7 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->OrientationAxesOutlineColor->SetParent(
     this->OrientationAxesFrame->GetFrame());
-  this->OrientationAxesOutlineColor->SetText("Set Outline Color");
+  this->OrientationAxesOutlineColor->SetLabel("Set Outline Color");
   this->OrientationAxesOutlineColor->Create(this->GetApplication(), 0);
   this->OrientationAxesOutlineColor->SetCommand(this, "SetOrientationAxesOutlineColor");
   this->OrientationAxesOutlineColor->SetBalloonHelpString(
@@ -1140,7 +1140,7 @@ void vtkPVRenderView::CreateViewProperties()
   
   this->OrientationAxesTextColor->SetParent(
     this->OrientationAxesFrame->GetFrame());
-  this->OrientationAxesTextColor->SetText("Set Axis Label Color");
+  this->OrientationAxesTextColor->SetLabel("Set Axis Label Color");
   this->OrientationAxesTextColor->Create(this->GetApplication(), 0);
   this->OrientationAxesTextColor->SetCommand(this, "SetOrientationAxesTextColor");
   this->OrientationAxesTextColor->SetBalloonHelpString(

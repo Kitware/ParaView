@@ -23,7 +23,7 @@
 #include "vtkPVDisplayGUI.h"
 #include "vtkKWScale.h"
 #include "vtkSMPartDisplay.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkPVArrayInformation.h"
 #include "vtkPiecewiseFunction.h"
 #include "vtkPVProcessModule.h"
@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.26");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.27");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                                        int argc, char *argv[]);

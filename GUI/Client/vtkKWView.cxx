@@ -30,7 +30,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
@@ -87,7 +87,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.3");
+vtkCxxRevisionMacro(vtkKWView, "1.4");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -154,7 +154,7 @@ vtkKWView::vtkKWView()
 
   this->GeneralProperties = vtkKWFrame::New();
 
-  this->ColorsFrame = vtkKWLabeledFrame::New();
+  this->ColorsFrame = vtkKWFrameLabeled::New();
   this->RendererBackgroundColor = vtkKWChangeColorButton::New();
 
   this->Printing = 0;
@@ -389,7 +389,7 @@ void vtkKWView::CreateViewProperties()
   double c[3];  c[0] = 0.0;  c[1] = 0.0;  c[2] = 0.0;
   this->RendererBackgroundColor->SetParent( this->ColorsFrame->GetFrame() );
   this->RendererBackgroundColor->SetColor( c );
-  this->RendererBackgroundColor->SetText("Set Background Color");
+  this->RendererBackgroundColor->SetLabel("Set Background Color");
   this->RendererBackgroundColor->Create( app, "" );
   this->RendererBackgroundColor->SetCommand(
     this, "SetRendererBackgroundColor");

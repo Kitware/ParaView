@@ -33,8 +33,7 @@ class vtkKWChangeColorButton;
 class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWLabel;
-class vtkKWLabeledEntry;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWMenuButton;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
@@ -313,7 +312,7 @@ protected:
   int ScalarRangeLock;
   
   // User interaface.
-  vtkKWLabeledFrame* ColorMapFrame;
+  vtkKWFrameLabeled* ColorMapFrame;
   vtkKWLabel*        ArrayNameLabel;
   // Stuff for setting the range of the color map.
   vtkKWWidget*       ScalarRangeFrame;
@@ -326,12 +325,12 @@ protected:
   vtkKWLabel*        Map;
   vtkKWChangeColorButton* EndColorButton;
 
-  vtkKWLabeledFrame* VectorFrame;
+  vtkKWFrameLabeled* VectorFrame;
   vtkKWOptionMenu*   VectorModeMenu;
   vtkKWOptionMenu*   VectorComponentMenu;
   vtkKWEntry*        ScalarBarVectorTitleEntry;
 
-  vtkKWLabeledFrame* ScalarBarFrame;
+  vtkKWFrameLabeled* ScalarBarFrame;
   vtkKWCheckButton*  ScalarBarCheck;
   vtkKWWidget*       ScalarBarTitleFrame;
   vtkKWLabel*        ScalarBarTitleLabel;

@@ -45,7 +45,7 @@
 #include "vtkSMDomainIterator.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkKWLabeledEntry.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWEntry.h"
 #include "vtkProcessModule.h"
@@ -60,7 +60,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.23");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.24");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -1039,17 +1039,17 @@ void vtkPVAnimationManager::SaveAnimation()
     int origWidth = view->GetRenderWindowSize()[0];
     int origHeight = view->GetRenderWindowSize()[1];
 
-    vtkKWLabeledEntry *widthEntry = vtkKWLabeledEntry::New();
+    vtkKWEntryLabeled *widthEntry = vtkKWEntryLabeled::New();
     widthEntry->SetLabel("Width:");
     widthEntry->SetParent(frame);
     widthEntry->Create(this->GetApplication(), "");
-    widthEntry->GetEntry()->SetValue(origWidth);
+    widthEntry->GetWidget()->SetValue(origWidth);
 
-    vtkKWLabeledEntry *heightEntry = vtkKWLabeledEntry::New();
+    vtkKWEntryLabeled *heightEntry = vtkKWEntryLabeled::New();
     heightEntry->SetLabel("Height:");
     heightEntry->SetParent(frame);
     heightEntry->Create(this->GetApplication(), "");
-    heightEntry->GetEntry()->SetValue(origHeight);
+    heightEntry->GetWidget()->SetValue(origHeight);
 
     this->Script("pack %s %s -side left -fill both -expand t",
       widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
@@ -1057,9 +1057,9 @@ void vtkPVAnimationManager::SaveAnimation()
 
     dlg->Invoke();
 
-    int width = widthEntry->GetEntry()->GetValueAsInt();
+    int width = widthEntry->GetWidget()->GetValueAsInt();
     int height = origHeight;
-    height = heightEntry->GetEntry()->GetValueAsInt();
+    height = heightEntry->GetWidget()->GetValueAsInt();
 
     // For now, the image size for the animations cannot be larger than
     // the size of the render window. The problem is that tiling doesn't

@@ -28,7 +28,7 @@
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkPVInputMenu;
 class vtkPVMinMax;
 
@@ -136,7 +136,7 @@ protected:
   vtkPVExtentEntry();
   ~vtkPVExtentEntry();
 
-  vtkKWLabeledFrame* LabeledFrame;
+  vtkKWFrameLabeled* LabeledFrame;
   char* Label;
 
   vtkPVInputMenu* InputMenu;

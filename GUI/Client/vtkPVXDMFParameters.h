@@ -21,7 +21,7 @@
 #include "vtkPVObjectWidget.h"
 
 class vtkKWLabel;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWScale;
 class vtkPVXDMFParametersInternals;
 
@@ -99,7 +99,7 @@ public:
   //BTX
   // Description:
   // Get the frame
-  vtkGetObjectMacro(Frame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(Frame, vtkKWFrameLabeled);
   vtkGetMacro(VTKReaderID, vtkClientServerID);
   //ETX
 
@@ -126,7 +126,7 @@ protected:
   
 
   vtkPVXDMFParametersInternals* Internals;
-  vtkKWLabeledFrame* Frame;
+  vtkKWFrameLabeled* Frame;
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

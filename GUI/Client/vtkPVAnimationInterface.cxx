@@ -24,9 +24,8 @@
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWLabeledFrame.h"
-#include "vtkKWLabeledOptionMenu.h"
+#include "vtkKWEntryLabeled.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
@@ -179,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.178");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.179");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -210,7 +209,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   //
   this->TopFrame = vtkKWFrame::New();
 
-  this->ControlFrame = vtkKWLabeledFrame::New();
+  this->ControlFrame = vtkKWFrameLabeled::New();
 
   this->ControlButtonFrame = vtkKWWidget::New();
 
@@ -226,7 +225,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 
   this->TimeFrame = vtkKWWidget::New();
 
-  this->NumberOfFramesEntry = vtkKWLabeledEntry::New();
+  this->NumberOfFramesEntry = vtkKWEntryLabeled::New();
 
   this->TimeScale = vtkKWScale::New();
   this->AnimationDelayScale = vtkKWScale::New();
@@ -234,7 +233,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 
   // Action and script editing
 
-  this->ActionFrame = vtkKWLabeledFrame::New();
+  this->ActionFrame = vtkKWFrameLabeled::New();
 
   this->ScriptCheckButtonFrame = vtkKWWidget::New();
 
@@ -245,7 +244,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->ControlledWidget = NULL;
 
   // Save button frame
-  this->SaveFrame = vtkKWLabeledFrame::New();
+  this->SaveFrame = vtkKWFrameLabeled::New();
   this->SaveButtonFrame = vtkKWWidget::New();
   this->SaveImagesButton = vtkKWPushButton::New();
   this->SaveGeometryButton = vtkKWPushButton::New();
@@ -253,7 +252,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 
   this->AnimationEntries = vtkCollection::New();
   this->AnimationEntriesIterator = this->AnimationEntries->NewIterator();
-  this->AnimationEntriesFrame = vtkKWLabeledFrame::New();
+  this->AnimationEntriesFrame = vtkKWFrameLabeled::New();
   this->AddItemButton = vtkKWPushButton::New();
   this->DeleteItemButton = vtkKWPushButton::New();
   this->NewScriptString = 0;
@@ -524,17 +523,17 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
 
   this->NumberOfFramesEntry->SetParent(this->TimeFrame);
   this->NumberOfFramesEntry->Create(app);
-  this->NumberOfFramesEntry->GetEntry()->SetWidth(6);
+  this->NumberOfFramesEntry->GetWidget()->SetWidth(6);
   this->NumberOfFramesEntry->SetLabel("Number Of Frames:");
-  this->NumberOfFramesEntry->GetEntry()->SetValue(this->NumberOfFrames);
+  this->NumberOfFramesEntry->GetWidget()->SetValue(this->NumberOfFrames);
 
 
   this->Script("bind %s <KeyPress-Return> {%s NumberOfFramesEntryCallback}",
-               this->NumberOfFramesEntry->GetEntry()->GetWidgetName(),
+               this->NumberOfFramesEntry->GetWidget()->GetWidgetName(),
                this->GetTclName());
 
   this->Script("bind %s <FocusOut> {%s NumberOfFramesEntryCallback}",
-               this->NumberOfFramesEntry->GetEntry()->GetWidgetName(),
+               this->NumberOfFramesEntry->GetWidget()->GetWidgetName(),
                this->GetTclName());
 
   this->Script("pack %s -side left -expand t -fill x", 
@@ -818,7 +817,7 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
     }
   //cout << "Set NumberOfFrames: " << t << endl;
   this->NumberOfFrames= t;
-  this->NumberOfFramesEntry->GetEntry()->SetValue(t);
+  this->NumberOfFramesEntry->GetWidget()->SetValue(t);
   double range[2];
   this->TimeRange->SetWholeRange(0, t);
   this->TimeRange->GetRange(range);
@@ -842,7 +841,7 @@ void vtkPVAnimationInterface::SetNumberOfFrames(int t)
 void vtkPVAnimationInterface::NumberOfFramesEntryCallback()
 {
   //cout << "NumberOfFramesEntryCallback" << endl;
-  this->SetNumberOfFrames(static_cast<int>(this->NumberOfFramesEntry->GetEntry()->GetValueAsFloat()));
+  this->SetNumberOfFrames(static_cast<int>(this->NumberOfFramesEntry->GetWidget()->GetValueAsFloat()));
 }
 
 //-----------------------------------------------------------------------------
@@ -1322,17 +1321,17 @@ void vtkPVAnimationInterface::SaveImagesCallback()
     int origWidth = this->View->GetRenderWindowSize()[0];
     int origHeight = this->View->GetRenderWindowSize()[1];
 
-    vtkKWLabeledEntry *widthEntry = vtkKWLabeledEntry::New();
+    vtkKWEntryLabeled *widthEntry = vtkKWEntryLabeled::New();
     widthEntry->SetLabel("Width:");
     widthEntry->SetParent(frame);
     widthEntry->Create(this->GetApplication(), "");
-    widthEntry->GetEntry()->SetValue(origWidth);
+    widthEntry->GetWidget()->SetValue(origWidth);
 
-    vtkKWLabeledEntry *heightEntry = vtkKWLabeledEntry::New();
+    vtkKWEntryLabeled *heightEntry = vtkKWEntryLabeled::New();
     heightEntry->SetLabel("Height:");
     heightEntry->SetParent(frame);
     heightEntry->Create(this->GetApplication(), "");
-    heightEntry->GetEntry()->SetValue(origHeight);
+    heightEntry->GetWidget()->SetValue(origHeight);
 
     this->Script("pack %s %s -side left -fill both -expand t",
                  widthEntry->GetWidgetName(), heightEntry->GetWidgetName());
@@ -1340,9 +1339,9 @@ void vtkPVAnimationInterface::SaveImagesCallback()
 
     dlg->Invoke();
 
-    int width = widthEntry->GetEntry()->GetValueAsInt();
+    int width = widthEntry->GetWidget()->GetValueAsInt();
     int height = origHeight;
-    height = heightEntry->GetEntry()->GetValueAsInt();
+    height = heightEntry->GetWidget()->GetValueAsInt();
 
     // For now, the image size for the animations cannot be larger than
     // the size of the render window. The problem is that tiling doesn't
@@ -2272,7 +2271,7 @@ void vtkPVAnimationInterface::DeleteSource(vtkPVSource* src)
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveState(ofstream* file)
 {
-  int numberFrames = this->NumberOfFramesEntry->GetEntry()->GetValueAsInt();
+  int numberFrames = this->NumberOfFramesEntry->GetWidget()->GetValueAsInt();
   int frame = static_cast<int>(this->TimeScale->GetValue());
 
   int cc;

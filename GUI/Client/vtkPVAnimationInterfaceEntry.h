@@ -22,8 +22,8 @@
 
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWLabeledEntry;
-class vtkKWLabeledOptionMenu;
+class vtkKWEntryLabeled;
+class vtkKWOptionMenuLabeled;
 class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWRange;
@@ -227,9 +227,9 @@ protected:
   vtkKWMenuButton *SourceMenuButton;
 
   vtkKWFrame *TimeScriptEntryFrame;
-  vtkKWLabeledEntry *StartTimeEntry;
-  vtkKWLabeledEntry *EndTimeEntry;
-  vtkKWLabeledOptionMenu *TimeEquationStyleEntry;
+  vtkKWEntryLabeled *StartTimeEntry;
+  vtkKWEntryLabeled *EndTimeEntry;
+  vtkKWOptionMenuLabeled *TimeEquationStyleEntry;
   vtkKWScale *TimeEquationPhaseEntry;
   vtkKWThumbWheel *TimeEquationFrequencyEntry;
   vtkKWWidget *TimeEquationFrame;

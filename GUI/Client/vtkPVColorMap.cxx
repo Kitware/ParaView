@@ -20,8 +20,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
@@ -64,7 +63,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.114");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.115");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -148,7 +147,7 @@ vtkPVColorMap::vtkPVColorMap()
   this->ScalarBarObserver = NULL;
 
   // User interaface.
-  this->ColorMapFrame = vtkKWLabeledFrame::New();
+  this->ColorMapFrame = vtkKWFrameLabeled::New();
   this->ArrayNameLabel = vtkKWLabel::New();
   // Stuff for setting the range of the color map.
   this->ScalarRangeFrame = vtkKWWidget::New();
@@ -165,12 +164,12 @@ vtkPVColorMap::vtkPVColorMap()
   this->ScalarRange[1] = this->WholeScalarRange[1] = -VTK_LARGE_FLOAT;
   this->ScalarRangeLock = 0;
 
-  this->VectorFrame = vtkKWLabeledFrame::New();
+  this->VectorFrame = vtkKWFrameLabeled::New();
   this->VectorModeMenu = vtkKWOptionMenu::New() ;
   this->VectorComponentMenu = vtkKWOptionMenu::New();
 
   // Stuff for manipulating the scalar bar.
-  this->ScalarBarFrame = vtkKWLabeledFrame::New();
+  this->ScalarBarFrame = vtkKWFrameLabeled::New();
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->ScalarBarTitleFrame = vtkKWWidget::New();
   this->ScalarBarTitleLabel = vtkKWLabel::New();
@@ -401,8 +400,8 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarRangeWidget->GetEntry1()->SetWidth(7);
   this->ScalarRangeWidget->GetEntry2()->SetWidth(7);
   this->ScalarRangeWidget->SetCommand(this, "ScalarRangeWidgetCallback");
-  this->ScalarRangeWidget->SetEntriesPosition(
-    vtkKWRange::POSITION_ALIGNED);
+  this->ScalarRangeWidget->SetEntry1PositionToLeft();
+  this->ScalarRangeWidget->SetEntry2PositionToRight();
   this->ScalarRangeWidget->SetBalloonHelpString(
     "Set the minimum and maximum of the values of the color map");
   this->Script("pack %s -side left -fill x -expand t",

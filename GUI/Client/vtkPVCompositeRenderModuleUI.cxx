@@ -15,7 +15,7 @@
 #include "vtkPVCompositeRenderModuleUI.h"
 #include "vtkPVCompositeRenderModule.h"
 #include "vtkObjectFactory.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWScale.h"
@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.19");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.20");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -41,7 +41,7 @@ vtkPVCompositeRenderModuleUI::vtkPVCompositeRenderModuleUI()
   
   this->CompositeRenderModule = NULL;
 
-  this->ParallelRenderParametersFrame = vtkKWLabeledFrame::New();
+  this->ParallelRenderParametersFrame = vtkKWFrameLabeled::New();
 
   this->CompositeWithFloatCheck = vtkKWCheckButton::New();
   this->CompositeWithRGBACheck = vtkKWCheckButton::New();

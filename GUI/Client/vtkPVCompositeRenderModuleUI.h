@@ -99,7 +99,7 @@ protected:
  
   vtkPVCompositeRenderModule* CompositeRenderModule;
 
-  vtkKWLabeledFrame *ParallelRenderParametersFrame;
+  vtkKWFrameLabeled *ParallelRenderParametersFrame;
 
   vtkKWCheckButton *CompositeWithFloatCheck;
   vtkKWCheckButton *CompositeWithRGBACheck;

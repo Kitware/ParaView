@@ -16,7 +16,7 @@
 
 #include "vtkArrayMap.txx"
 #include "vtkKWFrame.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPV3DWidget.h"
@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.63");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.64");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -48,7 +48,7 @@ vtkPVSelectWidget::vtkPVSelectWidget()
 {
   this->CommandFunction = vtkPVSelectWidgetCommand;
 
-  this->LabeledFrame = vtkKWLabeledFrame::New();
+  this->LabeledFrame = vtkKWFrameLabeled::New();
   this->Menu = vtkKWOptionMenu::New();
 
   this->Labels = vtkStringList::New();

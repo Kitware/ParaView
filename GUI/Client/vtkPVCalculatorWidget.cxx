@@ -20,7 +20,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWOptionMenu.h"
@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.37");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.38");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -70,7 +70,7 @@ vtkPVCalculatorWidget::vtkPVCalculatorWidget()
   this->AttributeModeLabel = vtkKWLabel::New();
   this->AttributeModeMenu = vtkKWOptionMenu::New();
   
-  this->CalculatorFrame = vtkKWLabeledFrame::New();
+  this->CalculatorFrame = vtkKWFrameLabeled::New();
   this->FunctionLabel = vtkKWEntry::New();
 
   this->ButtonClear = vtkKWPushButton::New();

@@ -37,6 +37,7 @@
 class vtkKWOptionMenu;
 class vtkKWListBox;
 class vtkXDMFReaderModuleInternal;
+class vtkKWFrameLabeled;
 
 class VTK_EXPORT vtkXDMFReaderModule : public vtkPVAdvancedReaderModule
 {
@@ -76,7 +77,7 @@ protected:
   vtkXDMFReaderModule();
   ~vtkXDMFReaderModule();
 
-  vtkKWLabeledFrame *DomainGridFrame;
+  vtkKWFrameLabeled *DomainGridFrame;
   vtkKWOptionMenu *DomainMenu;
   vtkKWListBox* GridSelection;
 

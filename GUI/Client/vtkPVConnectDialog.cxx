@@ -19,8 +19,8 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledCheckButton.h"
-#include "vtkKWLabeledEntry.h"
+#include "vtkKWCheckButtonLabeled.h"
+#include "vtkKWEntryLabeled.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWScale.h"
 #include "vtkObjectFactory.h"
@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.18");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.19");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -72,7 +72,7 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   this->Port->SetParent(frame);
   this->Port->Create(app,0);
   this->Port->SetLabel(":");
-  this->Port->GetEntry()->SetWidth(4);
+  this->Port->GetWidget()->SetWidth(4);
   this->Username->SetWidth(7);
   this->Script("pack %s -side left -expand 0", 
     this->Username->GetWidgetName());
@@ -92,13 +92,13 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
   this->MPIMode->SetLabel("Use MPI");
   if ( this->MultiProcessMode == 1 )
     {
-    this->MPIMode->GetCheckButton()->SetState(1);
+    this->MPIMode->GetWidget()->SetState(1);
     }
   else
     {
-    this->MPIMode->GetCheckButton()->SetState(0);
+    this->MPIMode->GetWidget()->SetState(0);
     }
-  this->MPIMode->GetCheckButton()->SetCommand(this, "MPICheckBoxCallback");
+  this->MPIMode->GetWidget()->SetCommand(this, "MPICheckBoxCallback");
   this->MPINumberOfServers->SetParent(frame);
   this->MPINumberOfServers->PopupScaleOn();
   this->MPINumberOfServers->Create(app, 0);
@@ -129,13 +129,13 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
       if ( servers[cc] == ',' )
         {
         servers[cc] = 0;
-        this->Hostname->GetEntry()->AddValue(server);
+        this->Hostname->GetWidget()->AddValue(server);
         server = servers + cc + 1;
         }
       }
     if ( strlen(server) )
       {
-      this->Hostname->GetEntry()->AddValue(server);
+      this->Hostname->GetWidget()->AddValue(server);
       }
     }
   this->GrabDialog = 0;
@@ -144,10 +144,10 @@ void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(op
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::OK()
 {
-  this->SetHostnameString(this->Hostname->GetEntry()->GetValue());
-  this->PortInt = this->Port->GetEntry()->GetValueAsInt();
+  this->SetHostnameString(this->Hostname->GetWidget()->GetValue());
+  this->PortInt = this->Port->GetWidget()->GetValueAsInt();
   this->NumberOfProcesses = static_cast<int>(this->MPINumberOfServers->GetValue());
-  if ( this->MPIMode->GetCheckButton()->GetState() )
+  if ( this->MPIMode->GetWidget()->GetState() )
     {
     this->MultiProcessMode = 1;
     }
@@ -159,11 +159,11 @@ void vtkPVConnectDialog::OK()
 
   int cc;
   vtkstd::string servers;
-  servers = this->Hostname->GetEntry()->GetValue();
-  for ( cc = 0; cc < this->Hostname->GetEntry()->GetNumberOfValues(); cc ++ )
+  servers = this->Hostname->GetWidget()->GetValue();
+  for ( cc = 0; cc < this->Hostname->GetWidget()->GetNumberOfValues(); cc ++ )
     {
     servers += ",";
-    servers += this->Hostname->GetEntry()->GetValueFromIndex(cc);
+    servers += this->Hostname->GetWidget()->GetValueFromIndex(cc);
     }
   this->GetApplication()->SetRegisteryValue(2, "RunTime", "ConnectionServers", servers.c_str());
 
@@ -175,7 +175,7 @@ void vtkPVConnectDialog::SetHostname(const char* hn)
 {
   if ( this->Hostname->IsCreated() )
     {
-    this->Hostname->GetEntry()->SetValue(hn);
+    this->Hostname->GetWidget()->SetValue(hn);
     }
   this->SetHostnameString(hn);
 }
@@ -193,7 +193,7 @@ void vtkPVConnectDialog::SetPortNumber(int pt)
     {
     char buffer[100];
     sprintf(buffer, "%d", pt);
-    this->Port->GetEntry()->SetValue(buffer);
+    this->Port->GetWidget()->SetValue(buffer);
     }
   this->PortInt = pt;
 }
@@ -207,7 +207,7 @@ int vtkPVConnectDialog::GetPortNumber()
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::MPICheckBoxCallback()
 {
-  if ( this->MPIMode->GetCheckButton()->GetState() )
+  if ( this->MPIMode->GetWidget()->GetState() )
     {
     this->MPINumberOfServers->EnabledOn();
     }
@@ -221,12 +221,12 @@ void vtkPVConnectDialog::MPICheckBoxCallback()
 vtkPVConnectDialog::vtkPVConnectDialog()
 {
   this->Username = vtkKWEntry::New();
-  this->Hostname = vtkKWLabeledEntry::New();
-  this->Hostname->GetEntry()->PullDownOn();
-  this->Port = vtkKWLabeledEntry::New();
+  this->Hostname = vtkKWEntryLabeled::New();
+  this->Hostname->GetWidget()->PullDownOn();
+  this->Port = vtkKWEntryLabeled::New();
   this->Label = vtkKWLabel::New();
   this->MPINumberOfServers = vtkKWScale::New();
-  this->MPIMode = vtkKWLabeledCheckButton::New();
+  this->MPIMode = vtkKWCheckButtonLabeled::New();
 
   this->HostnameString = 0;
   this->PortInt = 0;
@@ -276,7 +276,7 @@ void vtkPVConnectDialog::SetListOfServers(const char* list)
   int kk;
   for ( kk = 0; kk < this->Servers->GetLength(); kk ++ )
     {
-    this->Hostname->GetEntry()->AddValue(this->Servers->GetString(kk));
+    this->Hostname->GetWidget()->AddValue(this->Servers->GetString(kk));
     }
 }
 
@@ -286,10 +286,10 @@ const char* vtkPVConnectDialog::GetListOfServers()
   vtkstd::string servlist;
   int cc;
 
-  this->Servers->AddUniqueString(this->Hostname->GetEntry()->GetValue());
-  for ( cc = 0; cc < this->Hostname->GetEntry()->GetNumberOfValues(); cc ++ )
+  this->Servers->AddUniqueString(this->Hostname->GetWidget()->GetValue());
+  for ( cc = 0; cc < this->Hostname->GetWidget()->GetNumberOfValues(); cc ++ )
     {
-    const char* server = this->Hostname->GetEntry()->GetValueFromIndex(cc);
+    const char* server = this->Hostname->GetWidget()->GetValueFromIndex(cc);
     this->Servers->AddUniqueString(server);
     }
 

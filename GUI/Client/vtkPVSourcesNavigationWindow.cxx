@@ -17,7 +17,7 @@
 #include "vtkProperty.h"
 #include "vtkKWApplication.h"
 #include "vtkKWCanvas.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
@@ -30,7 +30,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.20");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.21");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()

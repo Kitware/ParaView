@@ -28,8 +28,8 @@
 class vtkKWApplication;
 class vtkKWNotebook;
 class vtkPVSource;
-class vtkKWLabeledLabel;
-class vtkKWLabeledEntry;
+class vtkKWLabelLabeled;
+class vtkKWEntryLabeled;
 class vtkKWPushButton;
 class vtkKWPushButtonWithMenu;
 class vtkPVApplication;
@@ -120,14 +120,14 @@ protected:
   vtkPVDisplayGUI* DisplayGUI;
   vtkPVInformationGUI* InformationGUI;
   vtkKWWidget *DescriptionFrame;
-    vtkKWLabeledLabel *NameLabel;
-    vtkKWLabeledLabel *TypeLabel;
-    vtkKWLabeledEntry *LabelEntry;
-    vtkKWLabeledLabel *LongHelpLabel;
+  vtkKWLabelLabeled *NameLabel;
+  vtkKWLabelLabeled *TypeLabel;
+  vtkKWEntryLabeled *LabelEntry;
+  vtkKWLabelLabeled *LongHelpLabel;
   vtkKWWidget *ButtonFrame;
-    vtkKWPushButtonWithMenu *AcceptButton;
-    vtkKWPushButton *ResetButton;
-    vtkKWPushButton *DeleteButton;
+  vtkKWPushButtonWithMenu *AcceptButton;
+  vtkKWPushButton *ResetButton;
+  vtkKWPushButton *DeleteButton;
   vtkKWWidget *MainParameterFrame;
 
   vtkKWPushButton* AcceptPullDownArrow;

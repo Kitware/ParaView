@@ -25,7 +25,6 @@
 
 class vtkKWApplication;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
 class vtkPVArrayMenu;
 
 class VTK_EXPORT vtkPVScalarRangeLabel : public vtkPVWidget

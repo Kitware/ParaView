@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # Doxygen documentation batch
-# modified by S. Barre (Time-stamp: <2002-12-22 09:49:58 barre>
+# modified by S. Barre (Time-stamp: <2005-03-19 19:19:31 barre>
 # -------------------------------------------------------------------------
 
 # Path to several tools (_PROG to avoid the typical GZIP env var pb)
@@ -168,6 +168,11 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/ServerManager" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Widgets" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Client"
+
+    $PERL_PROG "$PATH_TO_VTK_DOX_SCRIPTS/doc_header2doxygen.pl" \
+        --to "$INTERMEDIATE_DOX_DIR" \
+        --relativeto "@ParaView_BINARY_DIR@" \
+        "@ParaView_BINARY_DIR@/GUI/Widgets"
 fi
 
 # ----------------------------------------------------------------------------
@@ -185,7 +190,8 @@ if test "x$PERL_PROG" != "xNOTFOUND" ; then
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/Filters" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/Servers/ServerManager" \
         "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Widgets" \
-        "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Client"
+        "$SOURCE_DIR/$REL_PATH_TO_TOP/GUI/Client" \
+        "@ParaView_BINARY_DIR@/GUI/Widgets"
 fi
 
 #  # ----------------------------------------------------------------------------

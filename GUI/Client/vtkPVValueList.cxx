@@ -19,7 +19,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWListBox.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
@@ -34,7 +34,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVValueList, "1.20");
+vtkCxxRevisionMacro(vtkPVValueList, "1.21");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -46,7 +46,7 @@ vtkPVValueList::vtkPVValueList()
 {
   this->CommandFunction = vtkPVValueListCommand;
 
-  this->ContourValuesFrame = vtkKWLabeledFrame::New();
+  this->ContourValuesFrame = vtkKWFrameLabeled::New();
   this->ContourValuesFrame2 = vtkKWFrame::New();
   this->ContourValuesList = vtkKWListBox::New();
 
@@ -54,13 +54,13 @@ vtkPVValueList::vtkPVValueList()
   this->DeleteValueButton = vtkKWPushButton::New();
   this->DeleteAllButton = vtkKWPushButton::New();
 
-  this->NewValueFrame = vtkKWLabeledFrame::New();
+  this->NewValueFrame = vtkKWFrameLabeled::New();
   this->NewValueLabel = vtkKWLabel::New();
   this->NewValueEntry = vtkKWScale::New();
   this->NewValueEntry->ClampValueOff();
   this->AddValueButton = vtkKWPushButton::New();
 
-  this->GenerateFrame = vtkKWLabeledFrame::New();
+  this->GenerateFrame = vtkKWFrameLabeled::New();
   this->GenerateNumberFrame = vtkKWFrame::New();
   this->GenerateRangeFrame = vtkKWFrame::New();
 
@@ -311,8 +311,8 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   this->GenerateRangeWidget->ShowLabelOff();
   this->GenerateRangeWidget->GetEntry1()->SetWidth(7);
   this->GenerateRangeWidget->GetEntry2()->SetWidth(7);
-  this->GenerateRangeWidget->SetEntriesPosition(
-    vtkKWRange::POSITION_ALIGNED);
+  this->GenerateRangeWidget->SetEntry1PositionToLeft();
+  this->GenerateRangeWidget->SetEntry2PositionToRight();
   this->GenerateRangeWidget->SetBalloonHelpString(
     "Set the minimum and maximum of the values to be added");
 

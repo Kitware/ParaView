@@ -16,7 +16,7 @@
 
 #include "vtkCollectionIterator.h"
 #include "vtkKWFrame.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.30");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.31");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -140,7 +140,7 @@ int vtkXDMFReaderModule::ReadFileInformation(const char* fname)
     dlg->Create(pvApp,0);
     dlg->SetText("Select Domain and Grids");
 
-    this->DomainGridFrame = vtkKWLabeledFrame::New();
+    this->DomainGridFrame = vtkKWFrameLabeled::New();
     this->DomainGridFrame->SetParent(dlg->GetMessageDialogFrame());
     this->DomainGridFrame->Create(pvApp, 0);
     this->DomainGridFrame->SetLabel("Domain and Grids Selection");

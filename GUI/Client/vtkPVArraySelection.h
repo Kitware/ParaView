@@ -25,7 +25,7 @@
 class vtkCollection;
 class vtkDataArraySelection;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWPushButton;
 class vtkKWRadioButton;
 class vtkPVArraySelectionArraySet;
@@ -116,7 +116,7 @@ protected:
 
   char* LabelText;
   
-  vtkKWLabeledFrame* LabeledFrame;
+  vtkKWFrameLabeled* LabeledFrame;
   
   vtkKWWidget* ButtonFrame;
   vtkKWPushButton* AllOnButton;

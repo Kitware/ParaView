@@ -18,7 +18,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWTkUtilities.h"
@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.25");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -53,7 +53,7 @@ vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScaleFactorProperty,
 //----------------------------------------------------------------------------
 vtkPVOrientScaleWidget::vtkPVOrientScaleWidget()
 {
-  this->LabeledFrame = vtkKWLabeledFrame::New();
+  this->LabeledFrame = vtkKWFrameLabeled::New();
   this->LabeledFrame->SetParent(this);
   this->ScalarsFrame = vtkKWWidget::New();
   this->ScalarsFrame->SetParent(this->LabeledFrame->GetFrame());

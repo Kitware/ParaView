@@ -25,7 +25,7 @@
 
 class vtkKWLabel;
 class vtkKWMenu;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkDataArrayCollection;
 
 class VTK_EXPORT vtkPVSelectTimeSet : public vtkPVWidget
@@ -69,7 +69,7 @@ public:
 
   // Description:
   // This is the labeled frame around the timeset tree.
-  vtkGetObjectMacro(LabeledFrame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(LabeledFrame, vtkKWFrameLabeled);
 
   // Description:
   // Label displayed on the labeled frame.
@@ -119,7 +119,7 @@ protected:
   vtkKWWidget* Tree;
   vtkKWWidget* TreeFrame;
   vtkKWLabel* TimeLabel;
-  vtkKWLabeledFrame* LabeledFrame;
+  vtkKWFrameLabeled* LabeledFrame;
 
   void AddRootNode(const char* name, const char* text);
   void AddChildNode(const char* parent, const char* name, 

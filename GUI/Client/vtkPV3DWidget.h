@@ -27,7 +27,7 @@
 #include "vtkPVObjectWidget.h"
 
 class vtkKWCheckButton;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 
 class vtkPV3DWidgetObserver;
 class vtkKWFrame;
@@ -167,7 +167,7 @@ protected:
                                 vtkPVXMLPackageParser* parser);
 
   vtkKWFrame*        Frame;
-  vtkKWLabeledFrame* LabeledFrame;
+  vtkKWFrameLabeled* LabeledFrame;
   vtkKWCheckButton* Visibility;
   int ValueChanged;
   int Placed;

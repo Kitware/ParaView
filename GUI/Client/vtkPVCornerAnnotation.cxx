@@ -15,9 +15,9 @@
 
 #include "vtkCornerAnnotation.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWLabeledText.h"
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
+#include "vtkKWTextLabeled.h"
 #include "vtkKWTextProperty.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVRenderView.h"
@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotation );
-vtkCxxRevisionMacro(vtkPVCornerAnnotation, "1.3");
+vtkCxxRevisionMacro(vtkPVCornerAnnotation, "1.4");
 
 int vtkPVCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -158,7 +158,7 @@ void vtkPVCornerAnnotation::UpdateCornerText()
       if (this->CornerText[i])
         {
         this->SetCornerTextInternal(
-          this->CornerText[i]->GetText()->GetValue(), i);
+          this->CornerText[i]->GetWidget()->GetValue(), i);
         }
       }
     }
@@ -181,7 +181,7 @@ void vtkPVCornerAnnotation::CornerTextCallback(int i)
 {
   if (this->IsCreated() && this->CornerText[i])
     {
-    char* text = this->CornerText[i]->GetText()->GetValue();
+    char* text = this->CornerText[i]->GetWidget()->GetValue();
     this->SetCornerTextInternal(text, i);
 
     this->Update();
@@ -201,10 +201,10 @@ void vtkPVCornerAnnotation::CornerTextCallback(int i)
 //----------------------------------------------------------------------------
 void vtkPVCornerAnnotation::SetCornerText(const char *text, int corner) 
 {
-  char* oldValue = this->CornerText[corner]->GetText()->GetValue();
+  char* oldValue = this->CornerText[corner]->GetWidget()->GetValue();
   if (this->CornerAnnotation && (strcmp(oldValue, text)))
     {
-    this->CornerText[corner]->GetText()->SetValue(text);
+    this->CornerText[corner]->GetWidget()->SetValue(text);
     this->SetCornerTextInternal(text, corner);
 
     this->Update();
@@ -269,9 +269,9 @@ void vtkPVCornerAnnotation::SaveState(ofstream *file)
   for (i = 0; i < 4; i++)
     {
     *file << "$kw(" << this->GetTclName() << ") SetCornerText {";
-    if (this->CornerText[i]->GetText()->GetValue())
+    if (this->CornerText[i]->GetWidget()->GetValue())
       {
-      *file << this->CornerText[i]->GetText()->GetValue();
+      *file << this->CornerText[i]->GetWidget()->GetValue();
       }
     *file << "} " << i << endl;
     }

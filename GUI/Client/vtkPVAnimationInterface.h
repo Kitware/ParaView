@@ -34,8 +34,8 @@
 
 class vtkKWCheckButton;
 class vtkKWLabel;
-class vtkKWLabeledEntry;
-class vtkKWLabeledFrame;
+class vtkKWEntryLabeled;
+class vtkKWFrameLabeled;
 class vtkKWMenuButton;
 class vtkKWPushButton;
 class vtkKWScale;
@@ -280,7 +280,7 @@ protected:
   vtkPVWindow *Window;
 
   vtkKWFrame        *TopFrame;
-  vtkKWLabeledFrame *ControlFrame;
+  vtkKWFrameLabeled *ControlFrame;
   vtkKWWidget *ControlButtonFrame;
   vtkKWPushButton *PlayButton;
   vtkKWPushButton *StopButton;
@@ -291,7 +291,7 @@ protected:
   vtkKWScale *TimeScale;
 
   vtkKWWidget *TimeFrame;
-  vtkKWLabeledEntry *NumberOfFramesEntry;
+  vtkKWEntryLabeled *NumberOfFramesEntry;
   vtkKWRange        *TimeRange;
   vtkKWScale *AnimationDelayScale;
 
@@ -310,7 +310,7 @@ protected:
   // New interface ------------------------------------------------
 
   // Menu showing all the possible sources to select.
-  vtkKWLabeledFrame *ActionFrame;
+  vtkKWFrameLabeled *ActionFrame;
   // Here to get a left justified check button.
   vtkKWWidget *ScriptCheckButtonFrame;
   vtkKWCheckButton *ScriptCheckButton;
@@ -328,7 +328,7 @@ protected:
   int ScriptAvailable;
 
   // Should be a better way (menu?)
-  vtkKWLabeledFrame* SaveFrame;
+  vtkKWFrameLabeled* SaveFrame;
   vtkKWWidget*       SaveButtonFrame;
   vtkKWPushButton*   SaveImagesButton;
   vtkKWPushButton*   SaveGeometryButton;
@@ -338,7 +338,7 @@ protected:
   // Collection of animation entries
   vtkCollection* AnimationEntries;
   vtkCollectionIterator* AnimationEntriesIterator;
-  vtkKWLabeledFrame* AnimationEntriesFrame;
+  vtkKWFrameLabeled* AnimationEntriesFrame;
   vtkKWPushButton* AddItemButton;
   vtkKWPushButton* DeleteItemButton;
   vtkKWFrame* AnimationEntryInformation;

@@ -17,7 +17,7 @@
 #include "vtkCommand.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVDisplayGUI.h"
@@ -37,7 +37,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.65");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.66");
 
 //===========================================================================
 //***************************************************************************
@@ -71,7 +71,7 @@ vtkPV3DWidget::vtkPV3DWidget()
 {
   this->Observer     = vtkPV3DWidgetObserver::New();
   this->Observer->PV3DWidget = this;
-  this->LabeledFrame = vtkKWLabeledFrame::New();
+  this->LabeledFrame = vtkKWFrameLabeled::New();
   this->Visibility   = vtkKWCheckButton::New();
   this->Frame        = vtkKWFrame::New();
   this->ValueChanged = 1;

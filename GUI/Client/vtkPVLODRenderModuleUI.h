@@ -25,7 +25,7 @@
 class vtkKWLabel;
 class vtkKWPushButton;
 class vtkKWRadioButton;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWScale;
 class vtkKWCheckButton;
 class vtkKWSplitFrame;
@@ -134,7 +134,7 @@ protected:
 
   int UseReductionFactor;
   
-  vtkKWLabeledFrame *LODFrame;
+  vtkKWFrameLabeled *LODFrame;
   vtkKWCheckButton *RenderInterruptsEnabledCheck;
 
   vtkKWWidget*      LODScalesFrame;

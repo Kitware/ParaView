@@ -19,8 +19,8 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWLabeledOptionMenu.h"
+#include "vtkKWEntryLabeled.h"
+#include "vtkKWOptionMenuLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWOptionMenu.h"
@@ -37,8 +37,6 @@
 #include "vtkPVWidgetCollection.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkKWScale.h"
-#include "vtkKWLabeledRadioButtonSet.h"
-#include "vtkKWRadioButtonSet.h"
 #include "vtkSMProperty.h"
 #include "vtkSMDomain.h"
 
@@ -79,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.56");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.57");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -97,11 +95,11 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->SourceMenuButton = vtkKWMenuButton::New();
   this->MethodLabel = vtkKWLabel::New();
   this->MethodMenuButton = vtkKWMenuButton::New();
-  this->StartTimeEntry = vtkKWLabeledEntry::New();
-  this->EndTimeEntry = vtkKWLabeledEntry::New();
+  this->StartTimeEntry = vtkKWEntryLabeled::New();
+  this->EndTimeEntry = vtkKWEntryLabeled::New();
   this->ResetRangeButton = vtkKWPushButton::New();
   this->ResetRangeButtonState = 0;
-  this->TimeEquationStyleEntry = vtkKWLabeledOptionMenu::New();
+  this->TimeEquationStyleEntry = vtkKWOptionMenuLabeled::New();
   this->TimeEquationPhaseEntry = vtkKWScale::New();
   this->TimeEquationFrequencyEntry = vtkKWThumbWheel::New();
   this->TimeEquationFrame = vtkKWWidget::New();
@@ -252,11 +250,12 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->TimeEquationStyleEntry->SetLabel( "Waveform:" );
   this->TimeEquationStyleEntry->SetParent(this->TimeScriptEntryFrame->GetFrame());
   this->TimeEquationStyleEntry->Create( pvApp, 0 );
-  this->TimeEquationStyleEntry->GetOptionMenu()->AddEntryWithCommand(
+  this->TimeEquationStyleEntry->ExpandWidgetOff();
+  this->TimeEquationStyleEntry->GetWidget()->AddEntryWithCommand(
     "Ramp", this, "UpdateTimeEquationValuesFromEntry");
-  this->TimeEquationStyleEntry->GetOptionMenu()->AddEntryWithCommand(
+  this->TimeEquationStyleEntry->GetWidget()->AddEntryWithCommand(
     "Triangle", this, "UpdateTimeEquationValuesFromEntry");
-  this->TimeEquationStyleEntry->GetOptionMenu()->AddEntryWithCommand(
+  this->TimeEquationStyleEntry->GetWidget()->AddEntryWithCommand(
     "Sinusoid", this, "UpdateTimeEquationValuesFromEntry");
 
   this->TimeEquationFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
@@ -702,13 +701,13 @@ void vtkPVAnimationInterfaceEntry::UpdateStartEndValueFromEntry()
     {
     return;
     }
-  if ( this->TimeStart != this->StartTimeEntry->GetEntry()->GetValueAsFloat() )
+  if ( this->TimeStart != this->StartTimeEntry->GetWidget()->GetValueAsFloat() )
     {
-    this->SetTimeStart(this->StartTimeEntry->GetEntry()->GetValueAsFloat());
+    this->SetTimeStart(this->StartTimeEntry->GetWidget()->GetValueAsFloat());
     }
-  if ( this->TimeEnd != this->EndTimeEntry->GetEntry()->GetValueAsFloat() )
+  if ( this->TimeEnd != this->EndTimeEntry->GetWidget()->GetValueAsFloat() )
     {
-    this->SetTimeEnd(this->EndTimeEntry->GetEntry()->GetValueAsFloat());
+    this->SetTimeEnd(this->EndTimeEntry->GetWidget()->GetValueAsFloat());
     }
   this->UpdatingEntries = 0;
 }
@@ -716,8 +715,8 @@ void vtkPVAnimationInterfaceEntry::UpdateStartEndValueFromEntry()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::UpdateStartEndValueToEntry()
 {
-  this->StartTimeEntry->GetEntry()->SetValue(this->GetTimeStart());
-  this->EndTimeEntry->GetEntry()->SetValue(this->GetTimeEnd());
+  this->StartTimeEntry->GetWidget()->SetValue(this->GetTimeStart());
+  this->EndTimeEntry->GetWidget()->SetValue(this->GetTimeEnd());
 }
 
 //-----------------------------------------------------------------------------
@@ -838,14 +837,14 @@ void vtkPVAnimationInterfaceEntry::UpdateTimeEquationValuesFromEntry()
     }
   vtkPVApplication *pvApp = this->GetPVApplication();
   int style;
-  if (!strcmp(this->TimeEquationStyleEntry->GetOptionMenu()->GetValue(),
+  if (!strcmp(this->TimeEquationStyleEntry->GetWidget()->GetValue(),
               "Triangle"))
     {
     style = 1;
     pvApp->Script("catch {eval pack forget %s}",
                   this->TimeEquationFrame->GetWidgetName());
     }
-  else if (!strcmp(this->TimeEquationStyleEntry->GetOptionMenu()->GetValue(),
+  else if (!strcmp(this->TimeEquationStyleEntry->GetWidget()->GetValue(),
                    "Sinusoid"))
     {
     style = 2;
@@ -879,13 +878,13 @@ void vtkPVAnimationInterfaceEntry::UpdateTimeEquationValuesToEntry()
   switch(this->TimeEquationStyle)
     {
     case 0:
-      this->TimeEquationStyleEntry->GetOptionMenu()->SetValue("Ramp");
+      this->TimeEquationStyleEntry->GetWidget()->SetValue("Ramp");
       break;
     case 1:
-      this->TimeEquationStyleEntry->GetOptionMenu()->SetValue("Triangle");
+      this->TimeEquationStyleEntry->GetWidget()->SetValue("Triangle");
       break;
     case 2:
-      this->TimeEquationStyleEntry->GetOptionMenu()->SetValue("Sinusoid");
+      this->TimeEquationStyleEntry->GetWidget()->SetValue("Sinusoid");
       break;
     }
   
@@ -984,10 +983,10 @@ const char* vtkPVAnimationInterfaceEntry::GetTimeEquation(float vtkNotUsed(tmax)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::RemoveBinds()
 {
-  this->StartTimeEntry->GetEntry()->UnsetBind("<FocusOut>");
-  this->StartTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
-  this->EndTimeEntry->GetEntry()->UnsetBind("<FocusOut>");
-  this->EndTimeEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
+  this->StartTimeEntry->GetWidget()->UnsetBind("<FocusOut>");
+  this->StartTimeEntry->GetWidget()->UnsetBind("<KeyPress-Return>");
+  this->EndTimeEntry->GetWidget()->UnsetBind("<FocusOut>");
+  this->EndTimeEntry->GetWidget()->UnsetBind("<KeyPress-Return>");
   this->TimeEquationPhaseEntry->GetEntry()->UnsetBind("<FocusOut>");
   this->TimeEquationPhaseEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
   this->TimeEquationFrequencyEntry->GetEntry()->UnsetBind("<FocusOut>");
@@ -999,13 +998,13 @@ void vtkPVAnimationInterfaceEntry::RemoveBinds()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetupBinds()
 {
-  this->StartTimeEntry->GetEntry()->SetBind(this, "<FocusOut>",
+  this->StartTimeEntry->GetWidget()->SetBind(this, "<FocusOut>",
     "UpdateStartEndValueFromEntry");
-  this->StartTimeEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
+  this->StartTimeEntry->GetWidget()->SetBind(this, "<KeyPress-Return>",
     "UpdateStartEndValueFromEntry");
-  this->EndTimeEntry->GetEntry()->SetBind(this, "<FocusOut>",
+  this->EndTimeEntry->GetWidget()->SetBind(this, "<FocusOut>",
     "UpdateStartEndValueFromEntry");
-  this->EndTimeEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
+  this->EndTimeEntry->GetWidget()->SetBind(this, "<KeyPress-Return>",
     "UpdateStartEndValueFromEntry"); 
   this->TimeEquationPhaseEntry->GetEntry()->SetBind(this, "<FocusOut>",
     "UpdateTimeEquationValuesFromEntry");

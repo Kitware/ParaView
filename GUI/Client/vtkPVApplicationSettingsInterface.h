@@ -32,7 +32,7 @@
 #define VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY "ShowTraceFiles"
 
 class vtkKWCheckButton;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 
 class VTK_EXPORT vtkPVApplicationSettingsInterface : public vtkKWApplicationSettingsInterface
 {

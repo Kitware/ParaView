@@ -38,7 +38,7 @@
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWDialog.h"
 #include "vtkKWEvent.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWLoadSaveDialog.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWSplashScreen.h"
@@ -111,7 +111,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.342");
+vtkCxxRevisionMacro(vtkPVApplication, "1.343");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -425,8 +425,8 @@ vtkPVApplication::vtkPVApplication()
 
   // GUI style & consistency
 
-  vtkKWLabeledFrame::AllowShowHideOn();
-  vtkKWLabeledFrame::BoldLabelOn();
+  vtkKWFrameLabeled::AllowShowHideOn();
+  vtkKWFrameLabeled::BoldLabelOn();
   
   // The following is necessary to make sure that the tcl object
   // created has the right command function. Without this,

@@ -24,7 +24,7 @@
 
 #include "vtkKWFrame.h"
 class vtkPVSource;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWLabel;
 class vtkKWBoundsDisplay;
 
@@ -59,7 +59,7 @@ protected:
   vtkPVInformationGUI();
   ~vtkPVInformationGUI();
   
-  vtkKWLabeledFrame *StatsFrame;
+  vtkKWFrameLabeled *StatsFrame;
 
   vtkKWLabel *TypeLabel;
   vtkKWLabel *NumDataSetsLabel;

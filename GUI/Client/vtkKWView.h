@@ -37,7 +37,7 @@ class vtkKWCheckButton;
 class vtkPVCornerAnnotation;
 class vtkKWEntry;
 class vtkKWFrame;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWMenuButton;
@@ -347,7 +347,7 @@ protected:
   vtkKWFrame             *AnnotationProperties;
 
   vtkKWFrame             *GeneralProperties;
-  vtkKWLabeledFrame      *ColorsFrame;
+  vtkKWFrameLabeled      *ColorsFrame;
   vtkKWChangeColorButton *RendererBackgroundColor;
 
   //vtkRenderer            *Renderer;

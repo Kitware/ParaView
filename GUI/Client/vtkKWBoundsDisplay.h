@@ -21,16 +21,16 @@
 #ifndef __vtkKWBoundsDisplay_h
 #define __vtkKWBoundsDisplay_h
 
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 
 class vtkKWApplication;
 class vtkKWLabel;
 
-class VTK_EXPORT vtkKWBoundsDisplay : public vtkKWLabeledFrame
+class VTK_EXPORT vtkKWBoundsDisplay : public vtkKWFrameLabeled
 {
 public:
   static vtkKWBoundsDisplay* New();
-  vtkTypeRevisionMacro(vtkKWBoundsDisplay, vtkKWLabeledFrame);
+  vtkTypeRevisionMacro(vtkKWBoundsDisplay, vtkKWFrameLabeled);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

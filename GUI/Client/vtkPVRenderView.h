@@ -135,7 +135,7 @@ public:
 
   // Description:
   // Get the frame for the navigation window
-  vtkGetObjectMacro(NavigationFrame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(NavigationFrame, vtkKWFrameLabeled);
 
   // Description:
   // Show either navigation window with a fragment of pipeline or a
@@ -310,10 +310,10 @@ public:
  
   // Description:
   // Access to these widgets from a script.
-  vtkGetObjectMacro(StandardViewsFrame, vtkKWLabeledFrame);
-  vtkGetObjectMacro(CameraIconsFrame, vtkKWLabeledFrame);
-  vtkGetObjectMacro(CameraControlFrame, vtkKWLabeledFrame);
-  vtkGetObjectMacro(OrientationAxesFrame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(StandardViewsFrame, vtkKWFrameLabeled);
+  vtkGetObjectMacro(CameraIconsFrame, vtkKWFrameLabeled);
+  vtkGetObjectMacro(CameraControlFrame, vtkKWFrameLabeled);
+  vtkGetObjectMacro(OrientationAxesFrame, vtkKWFrameLabeled);
   //BTX
   vtkGetObjectMacro(OrientationAxes, vtkPVAxesWidget);
   //ETX
@@ -329,7 +329,7 @@ protected:
 
   void CalculateBBox(char* name, int bbox[4]);
  
-  vtkKWLabeledFrame *StandardViewsFrame;
+  vtkKWFrameLabeled *StandardViewsFrame;
   vtkKWPushButton   *XMaxViewButton; 
   vtkKWPushButton   *XMinViewButton; 
   vtkKWPushButton   *YMaxViewButton; 
@@ -337,17 +337,17 @@ protected:
   vtkKWPushButton   *ZMaxViewButton; 
   vtkKWPushButton   *ZMinViewButton; 
 
-  vtkKWLabeledFrame *RenderParametersFrame;
+  vtkKWFrameLabeled *RenderParametersFrame;
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ParallelProjectionCheck;
   vtkKWCheckButton *ImmediateModeCheck;
 
   vtkPVRenderModuleUI* RenderModuleUI;
 
-  vtkKWLabeledFrame *InterfaceSettingsFrame;
+  vtkKWFrameLabeled *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
 
-  vtkKWLabeledFrame *OrientationAxesFrame;
+  vtkKWFrameLabeled *OrientationAxesFrame;
   vtkKWCheckButton *OrientationAxesCheck;
   vtkKWCheckButton *OrientationAxesInteractiveCheck;
   vtkKWChangeColorButton *OrientationAxesOutlineColor;
@@ -356,7 +356,7 @@ protected:
 
   vtkKWSplitFrame *SplitFrame;
 
-  vtkKWLabeledFrame* NavigationFrame;
+  vtkKWFrameLabeled* NavigationFrame;
   vtkPVSourcesNavigationWindow* NavigationWindow;
   vtkPVSourcesNavigationWindow* SelectionWindow;
   vtkKWRadioButton *NavigationWindowButton;
@@ -374,11 +374,11 @@ protected:
   vtkPVInteractorStyleControl *ManipulatorControl3D;
 
   // Camera icons
-  vtkKWLabeledFrame* CameraIconsFrame;
+  vtkKWFrameLabeled* CameraIconsFrame;
   vtkPVCameraIcon* CameraIcons[6];
   
   // Camera controls (elevation, azimuth, roll)
-  vtkKWLabeledFrame *CameraControlFrame;
+  vtkKWFrameLabeled *CameraControlFrame;
   vtkPVCameraControl *CameraControl;
 
   vtkKWPushButton *PropertiesButton;

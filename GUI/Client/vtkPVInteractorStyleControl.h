@@ -30,7 +30,7 @@ class vtkCollection;
 class vtkKWApplication;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWOptionMenu;
 class vtkPVCameraManipulator;
 class vtkPVInteractorStyleControlCmd;
@@ -51,7 +51,7 @@ public:
 
   // Description:
   // Get the vtkKWWidget for the internal frame.
-  vtkGetObjectMacro(LabeledFrame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(LabeledFrame, vtkKWFrameLabeled);
 
   // Description:
   // Add manipulator to the list of manipulators.
@@ -142,7 +142,7 @@ protected:
   vtkPVInteractorStyleControl();
   ~vtkPVInteractorStyleControl();
 
-  vtkKWLabeledFrame *LabeledFrame;
+  vtkKWFrameLabeled *LabeledFrame;
   vtkKWFrame        *OuterFrame;
   vtkKWLabel *Labels[6];
   vtkKWOptionMenu *Menus[9];

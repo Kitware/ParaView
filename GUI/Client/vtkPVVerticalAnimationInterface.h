@@ -22,7 +22,7 @@
 #include "vtkKWWidget.h"
 
 class vtkKWFrame;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWLabel;
 class vtkPVAnimationCue;
 class vtkPVVerticalAnimationInterfaceObserver;
@@ -85,8 +85,8 @@ protected:
 
   vtkPVAnimationManager* AnimationManager;
   vtkKWFrame* TopFrame;
-  vtkKWLabeledFrame* ScenePropertiesFrame;
-  vtkKWLabeledFrame* KeyFramePropertiesFrame;
+  vtkKWFrameLabeled* ScenePropertiesFrame;
+  vtkKWFrameLabeled* KeyFramePropertiesFrame;
   vtkKWLabel* TitleLabelLabel;
   vtkKWLabel* TitleLabel; // label to show the cue text representation.
   vtkKWFrame* PropertiesFrame;
@@ -99,7 +99,7 @@ protected:
 
   vtkKWCheckButton* RecordAllButton;
 
-  vtkKWLabeledFrame* SaveFrame;
+  vtkKWFrameLabeled* SaveFrame;
   vtkKWCheckButton* CacheGeometryCheck;
   vtkKWCheckButton* AdvancedAnimationCheck;
   

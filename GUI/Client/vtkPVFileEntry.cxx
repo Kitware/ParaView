@@ -33,7 +33,7 @@
 #include "vtkKWListSelectOrder.h"
 #include "vtkCommand.h"
 #include "vtkKWPopupButton.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWEvent.h"
 #include "vtkSMStringListDomain.h"
 #include "vtkSMStringVectorProperty.h"
@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.103");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.104");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()

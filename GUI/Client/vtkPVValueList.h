@@ -25,7 +25,7 @@
 class vtkContourValues;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWListBox;
 class vtkKWPushButton;
 class vtkKWRange;
@@ -100,7 +100,7 @@ protected:
 
   vtkContourValues *ContourValues;
   
-  vtkKWLabeledFrame* ContourValuesFrame;
+  vtkKWFrameLabeled* ContourValuesFrame;
   vtkKWFrame* ContourValuesFrame2;
   vtkKWListBox* ContourValuesList;
 
@@ -108,12 +108,12 @@ protected:
   vtkKWPushButton* DeleteValueButton;
   vtkKWPushButton* DeleteAllButton;
 
-  vtkKWLabeledFrame* NewValueFrame;
+  vtkKWFrameLabeled* NewValueFrame;
   vtkKWLabel* NewValueLabel;
   vtkKWScale* NewValueEntry;
   vtkKWPushButton* AddValueButton;
 
-  vtkKWLabeledFrame* GenerateFrame;
+  vtkKWFrameLabeled* GenerateFrame;
   vtkKWFrame* GenerateNumberFrame;
   vtkKWFrame* GenerateRangeFrame;
 

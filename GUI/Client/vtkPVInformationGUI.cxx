@@ -15,7 +15,7 @@
 #include "vtkPVInformationGUI.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVSource.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWLabel.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWNotebook.h"
@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInformationGUI);
-vtkCxxRevisionMacro(vtkPVInformationGUI, "1.2");
+vtkCxxRevisionMacro(vtkPVInformationGUI, "1.3");
 
 int vtkPVInformationGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -33,7 +33,7 @@ vtkPVInformationGUI::vtkPVInformationGUI()
 {
   this->CommandFunction = vtkPVInformationGUICommand;
 
-  this->StatsFrame = vtkKWLabeledFrame::New();
+  this->StatsFrame = vtkKWFrameLabeled::New();
   this->TypeLabel = vtkKWLabel::New();
   this->NumDataSetsLabel = vtkKWLabel::New();
   this->NumCellsLabel = vtkKWLabel::New();

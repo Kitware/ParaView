@@ -18,7 +18,7 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledFrame.h"
+#include "vtkKWFrameLabeled.h"
 #include "vtkKWMenu.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
@@ -39,14 +39,14 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.50");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
 //-----------------------------------------------------------------------------
 vtkPVExtentEntry::vtkPVExtentEntry()
 {
-  this->LabeledFrame = vtkKWLabeledFrame::New();
+  this->LabeledFrame = vtkKWFrameLabeled::New();
   this->LabeledFrame->SetParent(this);
 
   this->Label = 0;

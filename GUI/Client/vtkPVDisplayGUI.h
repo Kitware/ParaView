@@ -33,8 +33,7 @@ class vtkKWCheckButton;
 class vtkKWEntry;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWLabeledEntry;
-class vtkKWLabeledFrame;
+class vtkKWFrameLabeled;
 class vtkKWOptionMenu;
 class vtkKWPushButton;
 class vtkKWScale;
@@ -278,7 +277,7 @@ public:
   // Description:
   // Access to these objects from a script
   vtkGetObjectMacro(ResetCameraButton, vtkKWPushButton);
-  vtkGetObjectMacro(ActorControlFrame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(ActorControlFrame, vtkKWFrameLabeled);
 
   // Description:
   // Used during state file loading to restore the transfer functions
@@ -340,10 +339,10 @@ protected:
   // This flag is set when the data set type is unknown.
   int ShouldReinitialize;
 
-  vtkKWLabeledFrame *ColorFrame;
-  vtkKWLabeledFrame *VolumeAppearanceFrame;
-  vtkKWLabeledFrame *DisplayStyleFrame;
-  vtkKWLabeledFrame *ViewFrame;
+  vtkKWFrameLabeled *ColorFrame;
+  vtkKWFrameLabeled *VolumeAppearanceFrame;
+  vtkKWFrameLabeled *DisplayStyleFrame;
+  vtkKWFrameLabeled *ViewFrame;
   
   vtkKWLabel *ColorMenuLabel;
   vtkKWOptionMenu *ColorMenu;
@@ -375,7 +374,7 @@ protected:
   vtkKWCheckButton *InterpolateColorsCheck;
   
   // For translating actor
-  vtkKWLabeledFrame* ActorControlFrame;
+  vtkKWFrameLabeled* ActorControlFrame;
   vtkKWLabel*        TranslateLabel;
   vtkKWThumbWheel*   TranslateThumbWheel[3];
   vtkKWLabel*        ScaleLabel;

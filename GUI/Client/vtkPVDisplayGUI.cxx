@@ -34,7 +34,6 @@
 #include "vtkKWEntry.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
-#include "vtkKWLabeledEntry.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWOptionMenu.h"
@@ -85,7 +84,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDisplayGUI);
-vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.24");
+vtkCxxRevisionMacro(vtkPVDisplayGUI, "1.25");
 
 int vtkPVDisplayGUICommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -109,10 +108,10 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
   ++instanceCount;
   this->InstanceCount = instanceCount;
     
-  this->ColorFrame = vtkKWLabeledFrame::New();
-  this->VolumeAppearanceFrame = vtkKWLabeledFrame::New();
-  this->DisplayStyleFrame = vtkKWLabeledFrame::New();
-  this->ViewFrame = vtkKWLabeledFrame::New();
+  this->ColorFrame = vtkKWFrameLabeled::New();
+  this->VolumeAppearanceFrame = vtkKWFrameLabeled::New();
+  this->DisplayStyleFrame = vtkKWFrameLabeled::New();
+  this->ViewFrame = vtkKWFrameLabeled::New();
   
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
@@ -148,7 +147,7 @@ vtkPVDisplayGUI::vtkPVDisplayGUI()
 
   this->ResetCameraButton = vtkKWPushButton::New();
 
-  this->ActorControlFrame = vtkKWLabeledFrame::New();
+  this->ActorControlFrame = vtkKWFrameLabeled::New();
   this->TranslateLabel = vtkKWLabel::New();
   this->ScaleLabel = vtkKWLabel::New();
   this->OrientationLabel = vtkKWLabel::New();
@@ -483,7 +482,7 @@ void vtkPVDisplayGUI::Create(vtkKWApplication* app, const char* options)
     "Select method for coloring dataset geometry.");
 
   this->ColorButton->SetParent(this->ColorFrame->GetFrame());
-  this->ColorButton->SetText("Actor Color");
+  this->ColorButton->SetLabel("Actor Color");
   this->ColorButton->Create(this->GetApplication(), "");
   this->ColorButton->SetCommand(this, "ChangeActorColor");
   this->ColorButton->SetBalloonHelpString(
