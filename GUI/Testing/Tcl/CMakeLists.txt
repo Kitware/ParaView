@@ -24,7 +24,7 @@ SET(PROJECT_TESTS
   #               Composite
   ConeCubeCylSQ
   CTH
-  CutContours
+#  CutContours
   Data
   Delete
   DeleteSource
@@ -143,3 +143,10 @@ ADD_TEST (AnimationImages-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
   -T ${ParaView_BINARY_DIR}/Testing/Temporary
   -C ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
   -V ${PVClientTestData}/Baseline/AnimationImages.png)
+
+ADD_TEST (CutContours-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/CutContours.pvs
+  -D ${PVClientTestData}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -C ${PVClientTests_SOURCE_DIR}/Tcl/CompareMultipleImages.tcl
+  -V ${PVClientTestData}/Baseline/CutContours.png)

@@ -3,6 +3,12 @@ $Application ExitOnReturnOn
 set pv(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+    }
+}
+
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -84,12 +90,129 @@ $MainView SetRenderWindowSize 300 300
 update
 [[$Application GetMainWindow] GetMainView] ForceRender
 
-for {set i  1} {$i < [expr $argc - 1]} {incr i} {
-    if {[lindex $argv $i] == "-C"} {
-	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
+pv_testing AppendTestImage [[$Application GetMainWindow] GetMainView]
+
+
+########################################################################
+# clear for next test
+#######################################################################
+$pv(vtkTemp1) DeleteAllSources
+
+set pv(vtkTemp1) [$Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$pv(vtkTemp43) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
+        }
     }
-}
+} 
+
+    
+$pv(vtkTemp43) SetBackgroundColor 0 0 0
+
+set pv(vtkTemp98) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
+set pv(vtkTemp110) [$pv(vtkTemp98) GetPVWidget {Extent}]
+$pv(vtkTemp110) SetValue 0 12 0 12 0 10
+set pv(vtkTemp129) [$pv(vtkTemp98) GetPVWidget {Size}]
+$pv(vtkTemp129) SetValue 1.2 1.2 1.0 1.0
+$pv(vtkTemp98) AcceptCallback
+
+set pv(vtkTemp164) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
+set pv(vtkTemp176) [$pv(vtkTemp164) GetPVWidget {Extent}]
+$pv(vtkTemp176) SetValue 13 25 0 12 0 10
+set pv(vtkTemp195) [$pv(vtkTemp164) GetPVWidget {Size}]
+$pv(vtkTemp195) SetValue 1.2 1.2 1.0 1.0
+$pv(vtkTemp164) AcceptCallback
+$pv(vtkTemp1) ResetCameraCallback
+
+set pv(vtkTemp207) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
+set pv(vtkTemp219) [$pv(vtkTemp207) GetPVWidget {Extent}]
+$pv(vtkTemp219) SetValue 0 12 13 25 0 10
+set pv(vtkTemp238) [$pv(vtkTemp207) GetPVWidget {Size}]
+$pv(vtkTemp238) SetValue 1.2 1.2 1.0 1.0
+$pv(vtkTemp207) AcceptCallback
+$pv(vtkTemp1) ResetCameraCallback
+
+set pv(vtkTemp250) [$pv(vtkTemp1) CreatePVSource ImageMandelbrotSource]
+set pv(vtkTemp262) [$pv(vtkTemp250) GetPVWidget {Extent}]
+$pv(vtkTemp262) SetValue 13 25 13 25 0 10
+set pv(vtkTemp281) [$pv(vtkTemp250) GetPVWidget {Size}]
+$pv(vtkTemp281) SetValue 1.2 1.2 1.0 1.0
+$pv(vtkTemp250) AcceptCallback
+
+set pv(vtkTemp294) [$pv(vtkTemp1) CreatePVSource Clip]
+set pv(vtkTemp296) [$pv(vtkTemp294) GetPVWidget {Clip Function}]
+set pv(vtkTemp295) [$pv(vtkTemp296) GetPVWidget {Plane}]
+$pv(vtkTemp295) SetCenter 0.150 0.650 0.500
+$pv(vtkTemp295) SetNormal 0 0 -1
+$pv(vtkTemp294) AcceptCallback
+
+set pv(vtkTemp327) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
+$pv(vtkTemp327) AcceptCallback
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp207)
+$pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
+
+
+set pv(vtkTemp366) [$pv(vtkTemp1) CreatePVSource Clip]
+set pv(vtkTemp368) [$pv(vtkTemp366) GetPVWidget {Clip Function}]
+set pv(vtkTemp367) [$pv(vtkTemp368) GetPVWidget {Plane}]
+$pv(vtkTemp367) SetCenter -1.150 0.650 0.500
+$pv(vtkTemp367) SetNormal -0.54203 0.35221 -0.76299
+$pv(vtkTemp366) AcceptCallback
+
+set pv(vtkTemp395) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
+$pv(vtkTemp395) AcceptCallback
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp164)
+$pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
+
+
+set pv(vtkTemp416) [$pv(vtkTemp1) CreatePVSource Cut]
+set pv(vtkTemp418) [$pv(vtkTemp416) GetPVWidget {Cut Function}]
+set pv(vtkTemp417) [$pv(vtkTemp418) GetPVWidget {Plane}]
+$pv(vtkTemp417) SetCenter 0.150 -0.650 0.500
+$pv(vtkTemp417) SetNormal 0 0 -1
+$pv(vtkTemp416) AcceptCallback
+$pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp98)
+$pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
+
+
+set pv(vtkTemp446) [$pv(vtkTemp1) CreatePVSource Cut]
+set pv(vtkTemp449) [$pv(vtkTemp446) GetPVWidget {Cut Function}]
+set pv(vtkTemp448) [$pv(vtkTemp449) GetPVWidget {Plane}]
+$pv(vtkTemp448) SetCenter -1.1 -0.650 0.500
+$pv(vtkTemp448) SetNormal 0.58440 0.58807 -0.55914
+set pv(vtkTemp463) [$pv(vtkTemp446) GetPVWidget {Cut Values}]
+$pv(vtkTemp463) RemoveAllValues
+$pv(vtkTemp463) AddValue 0.1
+$pv(vtkTemp446) AcceptCallback
+
+# Retrace
+#  update
+#  $Application StopRecordingScript
+#  [ $Application GetMainWindow ] DeleteAllSources
+#  # Source the trace to regenerate the sources.
+#  if {[catch {set channel [open test.tmp w]}] == 0 } {
+#     close $channel
+#     file delete -force test.tmp
+#     source "[$Application GetTraceFileName]"
+#  }
+
+# Fix the size of the image.
+set MainView [[$Application GetMainWindow] GetMainView]
+$MainView SetRenderWindowSize 300 300
+update
+[[$Application GetMainWindow] GetMainView] ForceRender
+
+
+pv_testing AppendTestImage [[$Application GetMainWindow] GetMainView]
+$Application SetExitStatus [CompareMultipleImages ]
    
 $Application Exit
 
