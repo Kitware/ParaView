@@ -29,8 +29,6 @@
 #include "vtkLightCollection.h"
 #include "vtkMultiProcessController.h"
 #include "vtkSocketController.h"
-#include "vtkCompressCompositer.h"
-#include "vtkTreeCompositer.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
@@ -43,6 +41,7 @@
 // Until we trigger LOD from AllocatedRenderTime ...
 #include "vtkPVApplication.h"
 #include "vtkByteSwap.h"
+#include "vtkIceTRenderManager.h"
 
 
 #ifdef _WIN32
@@ -52,10 +51,10 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.2.2.2");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.2.2.3");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
-vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,Compositer,vtkCompositer);
+vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
 
 // Structures to communicate render info.
 struct vtkClientRenderWindowInfo 
@@ -63,6 +62,7 @@ struct vtkClientRenderWindowInfo
   int Size[2];
   int NumberOfRenderers;
   int ReductionFactor;
+  int UseCompositing;
 };
 
 struct vtkClientRendererInfo 
@@ -109,14 +109,12 @@ vtkIceTClientCompositeManager::vtkIceTClientCompositeManager()
   this->ReductionFactor = 2;
   this->RenderView = NULL;
 
-  this->Compositer = vtkCompressCompositer::New();
-  //this->Compositer = vtkTreeCompositer::New();
-
   this->Tiled = 1;
   this->TiledDimensions[0] = this->TiledDimensions[1] = 1;
 
 
   this->UseCompositing = 0;
+  this->IceTManager = NULL;
 }
 
   
@@ -128,9 +126,8 @@ vtkIceTClientCompositeManager::~vtkIceTClientCompositeManager()
   this->SetClientController(NULL);
 
   this->SetRenderView(NULL);
-  this->SetCompositer(NULL);
 
-
+  this->SetIceTManager(NULL);
 }
 
 
@@ -231,12 +228,6 @@ void vtkIceTClientCompositeManager::StartRender()
   static int firstRender = 1;
   float updateRate = this->RenderWindow->GetDesiredUpdateRate();
   
-  if ( ! this->UseCompositing)
-    {
-    this->RenderWindow->EraseOn();
-    return;
-    }
-
   if (firstRender)
     {
     firstRender = 0;
@@ -263,6 +254,7 @@ void vtkIceTClientCompositeManager::StartRender()
   winInfo.Size[0] = size[0]/this->ReductionFactor;
   winInfo.Size[1] = size[1]/this->ReductionFactor;
   winInfo.ReductionFactor = this->ReductionFactor;
+  winInfo.UseCompositing = this->UseCompositing;
   winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   
   controller->TriggerRMI(1, vtkIceTClientCompositeManager::RENDER_RMI_TAG);
@@ -272,7 +264,7 @@ void vtkIceTClientCompositeManager::StartRender()
   //                 sizeof(vtkClientRenderWindowInfo), 1, 
   //                 vtkIceTClientCompositeManager::WIN_INFO_TAG);
   // Let the socket controller deal with byte swapping.
-  controller->Send((int*)(&winInfo), 4, 1, 
+  controller->Send((int*)(&winInfo), 5, 1, 
                    vtkIceTClientCompositeManager::WIN_INFO_TAG);
   
   // Make sure the satellite renderers have the same camera I do.
@@ -373,10 +365,16 @@ void vtkIceTClientCompositeManager::SatelliteStartRender()
   //controller->Receive((char*)(&winInfo), 
   //                    sizeof(struct vtkClientRenderWindowInfo), 
   //                    otherId, vtkCompositeManager::WIN_INFO_TAG);
-  controller->Receive((int*)(&winInfo), 4, otherId, 
+  controller->Receive((int*)(&winInfo), 5, otherId, 
                       vtkCompositeManager::WIN_INFO_TAG);
 
   this->ReductionFactor = winInfo.ReductionFactor;
+  this->UseCompositing = winInfo.UseCompositing;
+  if (this->IceTManager)
+    {
+    this->IceTManager->SetImageReductionFactor(this->ReductionFactor);
+    this->IceTManager->SetUseCompositing(this->UseCompositing);
+    }
 
   // Synchronize the renderers.
   rens = renWin->GetRenderers();
@@ -603,8 +601,10 @@ void vtkIceTClientCompositeManager::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseCompositing: " << this->UseCompositing << endl;
   os << indent << "ClientFlag: " << this->ClientFlag << endl;
 
-  os << indent << "Compositer: " << this->Compositer << endl;
-
+  if (this->IceTManager)
+    {
+    os << indent << "IceTManager: " << this->IceTManager << endl;
+    }
 }
 
 

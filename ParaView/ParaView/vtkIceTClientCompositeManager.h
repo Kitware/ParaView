@@ -39,6 +39,7 @@ class vtkRenderer;
 class vtkDataArray;
 class vtkFloatArray;
 class vtkUnsignedCharArray;
+class vtkIceTRenderManager;
 
 class VTK_EXPORT vtkIceTClientCompositeManager : public vtkObject
 {
@@ -97,10 +98,10 @@ public:
   virtual void SetRenderView(vtkObject*) {};
 
   // Description:
-  // When the server has more than one process, this object
-  // composites the buffers into one.  Defaults to vtkCompressCompositer.
-  void SetCompositer(vtkCompositer *c);
-  vtkGetObjectMacro(Compositer,vtkCompositer);
+  // This is the server (IceT) manager.
+  // This is the way we propagate the parameters client->server.
+  void SetIceTManager(vtkIceTRenderManager *c);
+  vtkGetObjectMacro(IceTManager,vtkIceTRenderManager);
 
   // Description:
   // These parameters allow this object to manage a tiled display.
@@ -135,6 +136,13 @@ public:
   float GetZBufferValue(int x, int y);
   void GatherZBufferValueRMI(int x, int y);
 
+  // Description:
+  // This is not used.  It is here until we can clean up
+  // the render module superclasses.
+  vtkSetMacro(UseCompositeCompression,int);
+  vtkGetMacro(UseCompositeCompression,int);
+  vtkBooleanMacro(UseCompositeCompression,int);
+
 protected:
   vtkIceTClientCompositeManager();
   ~vtkIceTClientCompositeManager();
@@ -142,7 +150,7 @@ protected:
   vtkRenderWindow* RenderWindow;
   vtkMultiProcessController* CompositeController;
   vtkSocketController* ClientController;
-  vtkCompositer *Compositer;
+  vtkIceTRenderManager *IceTManager;
 
   int Tiled;
   int TiledDimensions[2];
@@ -158,6 +166,7 @@ protected:
   int ReductionFactor;
 
   int UseCompositing;
+  int UseCompositeCompression;
 
 //BTX
   enum {
