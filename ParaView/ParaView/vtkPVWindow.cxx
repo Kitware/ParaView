@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.420");
+vtkCxxRevisionMacro(vtkPVWindow, "1.421");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1874,17 +1874,16 @@ void vtkPVWindow::PlayDemo()
 // Try to open a file for reading, return error on failure.
 int vtkPVWindow::CheckIfFileIsReadable(const char* fileName)
 {
-  struct stat fs;
-  if (stat(fileName, &fs)) 
+  this->GetPVApplication()->GetProcessModule()->RootScript(
+    "file readable {%s}", fileName);
+  char* result = this->GetPVApplication()->GetProcessModule()->NewRootResult();
+  int retVal = VTK_ERROR;
+  if(strcmp("1", result) == 0)
     {
-    return VTK_ERROR;
+    retVal = VTK_OK;
     }
-  ifstream input(fileName, ios::in PV_NOCREATE);
-  if (input.fail())
-    {
-    return VTK_ERROR;
-    }
-  return VTK_OK;
+  delete [] result;
+  return retVal;
 }
 
 
@@ -4047,7 +4046,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.420 $");
+  this->ExtractRevision(os,"$Revision: 1.421 $");
 }
 
 //-----------------------------------------------------------------------------
