@@ -49,6 +49,8 @@ class VTK_EXPORT vtkKWEvent
   enum {
     KWWidgetEvents = 2000,
     MessageDialogInvokeEvent,
+    FocusInEvent,
+    FocusOutEvent,
     // VV    
     AngleVisibilityChangedEvent,
     AnnotationColorChangedEvent,

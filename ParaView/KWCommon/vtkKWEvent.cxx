@@ -39,6 +39,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const char *vtkKWEventStrings[] = {
   "KWWidgetEvents",
   "MessageDialogInvokeEvent",
+  "FocusInEvent",
+  "FocusOutEvent",
   // VV    
   "AngleVisibilityChangedEvent",
   "AnnotationColorChangedEvent",
