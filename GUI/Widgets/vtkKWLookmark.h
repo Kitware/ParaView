@@ -75,7 +75,8 @@ public:
 //  void DragAndDropEndCallback(int x, int y);
 
   // Set/Get methods called from vtkPVLookmarkManager
-  vtkGetObjectMacro(LmkIcon,vtkPVCameraIcon);
+//  vtkGetObjectMacro(LmkIcon,vtkPVCameraIcon);
+  vtkGetObjectMacro(LmkIcon,vtkKWLabel);
   // needed in vtkPVLookmarkManager to set turn it enabled/disabled
 
   // Description:
@@ -120,7 +121,8 @@ protected:
   vtkKWLabel *LmkDatasetLabel;
   vtkKWLabeledCheckButton *LmkDatasetCheckbox;
   vtkKWFrame *LmkDatasetFrame;
-  vtkPVCameraIcon *LmkIcon;
+//  vtkPVCameraIcon *LmkIcon;
+  vtkKWLabel *LmkIcon;
   vtkKWText *LmkCommentsText;
   vtkKWText *LmkNameField;
   vtkKWFrame *SeparatorFrame;
@@ -128,7 +130,8 @@ protected:
   vtkKWRadioButtonSet *DatasetOption;
 
   int Location;
-
+  int Width;
+  int Height;
   char *Dataset;
   int SelectionFlag;
 

@@ -24,7 +24,7 @@
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWCheckButton.h"
-#include "../Client/vtkPVCameraIcon.h"
+//#include "../Client/vtkPVCameraIcon.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWText.h"
 #include "vtkKWTkUtilities.h"
@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.1");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.2");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -48,7 +48,8 @@ vtkKWLookmark::vtkKWLookmark()
 {
   this->CommandFunction = vtkKWLookmarkCommand;
 
-  this->LmkIcon= vtkPVCameraIcon::New();
+//  this->LmkIcon= vtkPVCameraIcon::New();
+  this->LmkIcon= vtkKWLabel::New();
   this->Checkbox= vtkKWCheckButton::New();
   this->LmkLeftFrame= vtkKWFrame::New();
   this->LmkRightFrame= vtkKWFrame::New();
@@ -64,8 +65,8 @@ vtkKWLookmark::vtkKWLookmark()
   this->SeparatorFrame = vtkKWFrame::New();
 
   this->Dataset = NULL;
-//  this->Lookmark = NULL;
 
+  this->Width = this->Height = 48; 
 
   this->DragAndDropAnchor = this->LmkMainFrame->GetLabel();
 }
@@ -160,11 +161,6 @@ void vtkKWLookmark::RemoveLookmark()
     this->Dataset = NULL;
     }
 
- // if(this->Lookmark)
- //   {
- //   this->Lookmark->Delete();
- //   this->Dataset = NULL;
- //   }
 }
 
 
@@ -216,7 +212,29 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
 
   this->LmkIcon->SetParent(this->LmkLeftFrame->GetFrame());
   this->LmkIcon->Create(app, "");
+
+  this->LmkIcon->SetLabel("Empty");
+  this->Script("%s configure -relief raised -anchor center", 
+               this->LmkIcon->GetWidgetName());
+
+  int rw, rh, padx, pady, bd;
+  this->Script("concat [winfo reqwidth %s] [winfo reqheight %s] "
+               "[%s cget -padx] [%s cget -pady] [%s cget -bd]",
+               this->LmkIcon->GetWidgetName(), this->LmkIcon->GetWidgetName(), 
+               this->LmkIcon->GetWidgetName(), this->LmkIcon->GetWidgetName(), 
+               this->LmkIcon->GetWidgetName());
+
+  sscanf(this->GetApplication()->GetMainInterp()->result, 
+         "%d %d %d %d %d", 
+         &rw, &rh, &padx, &pady, &bd);
+  
+  this->Script("%s configure -padx %d -pady %d", 
+               this->LmkIcon->GetWidgetName(), 
+               padx + (int)ceil((double)(this->Width  - rw) / 2.0) + bd, 
+               pady + (int)ceil((double)(this->Height - rh) / 2.0) + bd);
+
   this->LmkIcon->SetBalloonHelpString("Left click to generate lookmark");
+
 
   this->LmkDatasetFrame->SetParent(this->LmkRightFrame->GetFrame());
   this->LmkDatasetFrame->Create(app, 0);
@@ -231,16 +249,6 @@ void vtkKWLookmark::Create(vtkKWApplication *app)
   this->LmkDatasetCheckbox->GetCheckButton()->SetIndicator(1);
   this->LmkDatasetCheckbox->GetCheckButton()->SetState(1);
   this->LmkDatasetCheckbox->SetLabel("Lock to Dataset");
-
-
-/*
-  this->DatasetOption->SetParent(this->LmkDatasetFrame->GetFrame());
-  this->DatasetOption->Create(app,0);
-  this->DatasetOption->AddButton(0,"Use Stored Dataset",this,"InitializeWidgetValues");
-  this->DatasetOption->AddButton(1,"Use Current Dataset",this,"InitializeWidgetValues");
-  this->DatasetOption->SelectButton(0);
-  this->DatasetOption->SetPackHorizontally(1);
-*/
 
   this->LmkCommentsFrame->SetParent(this->LmkRightFrame->GetFrame());
   this->LmkCommentsFrame->ShowHideFrameOn();
@@ -319,7 +327,6 @@ void vtkKWLookmark::ChangeLookmarkName()
   this->LmkNameField->Unpack();
   this->Script("pack %s -anchor nw -side left -fill both -expand true -padx 2 -pady 0", this->LmkMainFrame->GetLabel()->GetWidgetName());
   this->LmkMainFrame->SetLabel(lmkName);
-//  this->Lookmark->SetName(lmkName);
 
   delete [] lmkName;
 }
@@ -371,24 +378,14 @@ void vtkKWLookmark::SetDataset(char *dsetName)
 void vtkKWLookmark::SetLookmarkImage(vtkKWIcon *icon)
 {
   if(this->LmkIcon)
+    {
     this->LmkIcon->SetImageOption(icon);
+    }
 }
 
 //----------------------------------------------------------------------------
 void vtkKWLookmark::SetSelectionState(int flag)
 {
-/*
-  if(this->SelectionFlag != flag)
-    {
-    int fr, fg, fb, br, bg, bb;
-    this->DragAndDropAnchor->GetForegroundColor(&fr, &fg, &fb);
-    this->DragAndDropAnchor->GetBackgroundColor(&br, &bg, &bb);
-    this->DragAndDropAnchor->SetForegroundColor(br, bg, bb);
-    this->DragAndDropAnchor->SetBackgroundColor(fr, fg, fb);
-
-    this->SelectionFlag = flag;
-    }
-*/
   this->Checkbox->SetState(flag);
 }
 
