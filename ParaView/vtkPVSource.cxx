@@ -510,7 +510,7 @@ void vtkPVSource::AcceptCallback()
     vtkPVActorComposite *ac;
     
     ac = this->GetPVOutput(0)->GetActorComposite();
-    ac->ResetScalarRange();
+    ac->Initialize();
     window->GetMainView()->AddComposite(ac);
     // Make the last data invisible.
     input = this->GetNthPVInput(0);

@@ -82,7 +82,7 @@ public:
   // This method is meant to setup the actor/mapper
   // to best disply it input.  This will involve setting the scalar range,
   // and possibly other properties. 
-  //void Initialize();
+  void Initialize();
 
   // Description:
   // This flag turns the visibility of the prop on and off.  These methods transmit
@@ -101,7 +101,6 @@ public:
   // Parallel methods for computing the scalar range from the input,
   /// and setting the scalar range of the mapper.
   void GetInputScalarRange(float range[2]);
-  void TransmitInputScalarRange();
   void SetScalarRange(float min, float max);
   void ResetScalarRange();
   
@@ -146,6 +145,10 @@ public:
   // Tcl name of the actor across all processes.
   vtkGetStringMacro(ActorTclName);
   
+  // Description:
+  // This method is called when the ColorByCellCheck is pressed.
+  void ColorByCellCheckCallBack();
+  
 protected:
 
   vtkPVActorComposite();
@@ -160,6 +163,9 @@ protected:
   vtkKWLabel *XRangeLabel;
   vtkKWLabel *YRangeLabel;
   vtkKWLabel *ZRangeLabel;
+  vtkKWLabel *ScalarRangeLabel;
+  vtkKWCheckButton *ColorByCellCheck;
+  vtkKWLabeledEntry *ColorByArrayNameEntry;
   
   vtkKWPushButton *DataNotebookButton;
   vtkKWScale *AmbientScale;

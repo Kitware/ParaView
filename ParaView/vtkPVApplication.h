@@ -106,7 +106,10 @@ public:
   // get the information back (only VTK object on satellite procs).
   // These methods send the requested data to proc 0 with a tag of 1966.
   // Note:  Process 0 returns without sending.
+  // These should probably be consolidated into one GetDataInfo method.
   void SendDataScalarRange(vtkDataSet *data);
+  void SendDataBounds(vtkDataSet *data);
+  void SendDataNumberOfCells(vtkDataSet *data);
   
 protected:
   vtkPVApplication();

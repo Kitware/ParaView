@@ -51,6 +51,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSourceInterface.h"
 #include "vtkPVEnSightReaderInterface.h"
+#include "vtkPVDataSetReaderInterface.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -491,8 +492,13 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentActorProperties()
 {
-  this->GetCurrentPVSource()->GetPVOutput(0)->GetActorComposite()->
-    ShowProperties();
+  vtkPVSource *pvs;
+  
+  pvs =  this->GetCurrentPVSource();
+  if (pvs)
+    {
+    pvs->GetPVOutput(0)->GetActorComposite()->ShowProperties();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -800,6 +806,16 @@ void vtkPVWindow::ReadSourceInterfaces()
 
   // ============= DataSet Sources ==============  
   
+  // ---- GenericDataSetReader ----.
+  sInt = vtkPVDataSetReaderInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkDataSetReader");
+  sInt->SetRootName("DataSet");
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- GenericEnSightReader ----.
   sInt = vtkPVEnSightReaderInterface::New();
   sInt->SetApplication(pvApp);
@@ -830,7 +846,7 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->SetApplication(pvApp);
   sInt->SetPVWindow(this);
   sInt->SetSourceClassName("vtkSingleContourFilter");
-  sInt->SetRootName("ExtractEdges");
+  sInt->SetRootName("Contour");
   sInt->SetInputClassName("vtkDataSet");
   sInt->SetOutputClassName("vtkPolyData");
   // Method
@@ -842,6 +858,34 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Normals");
+  mInt->SetSetCommand("SetComputeNormals");
+  mInt->SetGetCommand("GetComputeNormals");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Gradients");
+  mInt->SetSetCommand("SetComputeGradients");
+  mInt->SetGetCommand("GetComputeGradients");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Scalars");
+  mInt->SetSetCommand("SetComputeScalars");
+  mInt->SetGetCommand("GetComputeScalars");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+
   // Add it to the list.
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
@@ -983,6 +1027,27 @@ void vtkPVWindow::ReadSourceInterfaces()
   mInt->Delete();
   mInt = NULL;
   // Add it to the list.
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
+  // ---- ExtractPolyDataPiece ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkExtractPolyDataPiece");
+  sInt->SetRootName("Piece");
+  sInt->SetInputClassName("vtkPolyData");
+  sInt->SetOutputClassName("vtkPolyData");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("GhostCells");
+  mInt->SetSetCommand("SetCreateGhostCells");
+  mInt->SetGetCommand("GetCreateGhostCells");
+  mInt->SetWidgetTypeToToggle();
+  sInt->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
   this->SourceInterfaces->AddItem(sInt);
   sInt->Delete();
   sInt = NULL;

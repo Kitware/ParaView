@@ -91,26 +91,19 @@ public:
   vtkGetStringMacro(VTKDataTclName);  
   
   // Description:
-  // Uses the assignment to set the extent, then updates the data.
-  virtual void Update();
+  // This method collects the scalar range from all processes.
+  // It expects the data to be up to date.
+  void GetScalarRange(float range[2]);
 
   // Description:
   // This method collects the bounds from all processes.
+  // It expects the data to be up to date.
   void GetBounds(float bounds[6]);
 
   // Description:
-  // A Helper method for GetBounds that needs to be wrapped.
-  // Do not call this method directly.
-  void TransmitBounds();
-  
-  // Description:
   // This method collects the number of cells from all processes.
+  // It expects the data to be up to date.
   int GetNumberOfCells();
-  
-  // Description:
-  // A Helper method for GetNumberOfCells that needs to be wrapped.
-  // Do not call this method directly.
-  void TransmitNumberOfCells();
   
   void ShowActorComposite();
   

@@ -32,6 +32,9 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
+int vtkPVDataSetReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVDataSetReaderInterfaceNewCommand();
 int vtkPVEnSightReaderInterfaceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVEnSightReaderInterfaceNewCommand();
@@ -115,6 +118,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVDataSetReaderInterface", vtkPVDataSetReaderInterfaceNewCommand,
+                  vtkPVDataSetReaderInterfaceCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVEnSightReaderInterface", vtkPVEnSightReaderInterfaceNewCommand,
                   vtkPVEnSightReaderInterfaceCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVMethodInterface", vtkPVMethodInterfaceNewCommand,

@@ -75,6 +75,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->XRangeLabel = vtkKWLabel::New();
   this->YRangeLabel = vtkKWLabel::New();
   this->ZRangeLabel = vtkKWLabel::New();
+  this->ScalarRangeLabel = vtkKWLabel::New();
   
   this->DataNotebookButton = vtkKWPushButton::New();
   this->AmbientScale = vtkKWScale::New();
@@ -163,6 +164,11 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->YRangeLabel = NULL;
   this->ZRangeLabel->Delete();
   this->ZRangeLabel = NULL;
+  this->ScalarRangeLabel->Delete();
+  this->ScalarRangeLabel = NULL;
+  
+  this->ColorByCellCheck->Delete();
+  this->ColorByCellCheck = NULL;  
   
   this->DataNotebookButton->Delete();
   this->DataNotebookButton = NULL;
@@ -211,20 +217,16 @@ vtkPVActorComposite::~vtkPVActorComposite()
 void vtkPVActorComposite::CreateProperties()
 {
   const char *actorPage;
-  char *cellsLabel;
-  char *xLabel;
-  char *yLabel;
-  char *zLabel;
+  char tmp[350];
   float bounds[6];
+  float range[2];
   int i, numPointFDArrays = 0, numCellFDArrays = 0;
   vtkFieldData *pointFieldData, *cellFieldData;
+  vtkPVApplication *pvApp = this->GetPVApplication();  
   
-  cellsLabel = new char[350];
-  xLabel = new char[350];
-  yLabel = new char[350];
-  zLabel = new char[350];
-  
+  pvApp->BroadcastScript("%s Update", this->MapperTclName);
   this->GetPVData()->GetBounds(bounds);
+  this->GetPVData()->GetScalarRange(range);
   
   // invoke superclass always
   this->vtkKWActorComposite::CreateProperties();
@@ -238,24 +240,34 @@ void vtkPVActorComposite::CreateProperties()
   
   this->NumCellsLabel->SetParent(this->Properties);
   this->NumCellsLabel->Create(this->Application, "");
-  sprintf(cellsLabel, "number of cells: %d",
+  sprintf(tmp, "number of cells: %d", 
 	  this->GetPVData()->GetNumberOfCells());
-  this->NumCellsLabel->SetLabel(cellsLabel);
+  this->NumCellsLabel->SetLabel(tmp);
   this->BoundsLabel->SetParent(this->Properties);
   this->BoundsLabel->Create(this->Application, "");
   this->BoundsLabel->SetLabel("bounds:");
   this->XRangeLabel->SetParent(this->Properties);
   this->XRangeLabel->Create(this->Application, "");
-  sprintf(xLabel, "x range: %f to %f", bounds[0], bounds[1]);
-  this->XRangeLabel->SetLabel(xLabel);
+  sprintf(tmp, "x range: %f to %f", bounds[0], bounds[1]);
+  this->XRangeLabel->SetLabel(tmp);
   this->YRangeLabel->SetParent(this->Properties);
   this->YRangeLabel->Create(this->Application, "");
-  sprintf(yLabel, "y range: %f to %f", bounds[2], bounds[3]);
-  this->YRangeLabel->SetLabel(yLabel);
+  sprintf(tmp, "y range: %f to %f", bounds[2], bounds[3]);
+  this->YRangeLabel->SetLabel(tmp);
   this->ZRangeLabel->SetParent(this->Properties);
   this->ZRangeLabel->Create(this->Application, "");
-  sprintf(zLabel, "z range: %f to %f", bounds[4], bounds[5]);
-  this->ZRangeLabel->SetLabel(zLabel);
+  sprintf(tmp, "z range: %f to %f", bounds[4], bounds[5]);
+  this->ZRangeLabel->SetLabel(tmp);
+  this->ScalarRangeLabel->SetParent(this->Properties);
+  this->ScalarRangeLabel->Create(this->Application, "");
+  sprintf(tmp, " Scalar Range: %f to %f", range[0], range[1]);
+  this->ScalarRangeLabel->SetLabel(tmp);
+  
+  this->ColorByCellCheck->SetParent(this->Properties);
+  this->ColorByCellCheck->Create(this->Application, "-text {Color By Cell Data:}");
+  this->ColorByCellCheck->SetCommand(this, "ColorByCellCheckCallBack");
+  
+  
 //  this->DataNotebookButton->SetParent(this->Properties);
 //  this->DataNotebookButton->Create(this->Application, "");
 //  this->DataNotebookButton->SetLabel("Return to Data Notebook");
@@ -268,12 +280,14 @@ void vtkPVActorComposite::CreateProperties()
   this->AmbientScale->SetValue(this->GetActor()->GetProperty()->GetAmbient());
   this->AmbientScale->SetCommand(this, "AmbientChanged");
   
-  this->Script("pack %s %s %s %s %s %s",
+  this->Script("pack %s %s %s %s %s %s %s %s",
 	       this->NumCellsLabel->GetWidgetName(),
 	       this->BoundsLabel->GetWidgetName(),
 	       this->XRangeLabel->GetWidgetName(),
 	       this->YRangeLabel->GetWidgetName(),
 	       this->ZRangeLabel->GetWidgetName(),
+	       this->ScalarRangeLabel->GetWidgetName(),
+	       this->ColorByCellCheck->GetWidgetName(),
 	       this->AmbientScale->GetWidgetName());
 
   pointFieldData = 
@@ -322,10 +336,6 @@ void vtkPVActorComposite::CreateProperties()
     
 //	       this->DataNotebookButton->GetWidgetName());
   
-  delete [] cellsLabel;
-  delete [] xLabel;
-  delete [] yLabel;
-  delete [] zLabel;
 }
 
 void vtkPVActorComposite::SetMapperToUsePointFieldData()
@@ -337,6 +347,28 @@ void vtkPVActorComposite::SetMapperToUseCellFieldData()
 {
   this->Mapper->SetScalarModeToUseCellFieldData();
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::ColorByCellCheckCallBack()
+{
+  int val;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  val = this->ColorByCellCheck->GetState();
+  if (val)
+    {
+    pvApp->BroadcastScript("%s SetScalarModeToUseCellData",
+			   this->MapperTclName);
+    }
+  else
+    {
+    pvApp->BroadcastScript("%s SetScalarModeToUsePointData",
+			   this->MapperTclName);
+    }
+  this->GetView()->Render();  
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::AmbientChanged()
@@ -376,6 +408,37 @@ void vtkPVActorComposite::SelectArrayComponent()
   this->Mapper->SetScalarRange(this->Mapper->GetColors()->GetRange());
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVActorComposite::Initialize()
+{
+  if (this->PVData->GetVTKData()->IsA("vtkPolyData"))
+    {
+    this->SetModeToPolyData();
+    }
+  else if (this->PVData->GetVTKData()->IsA("vtkImageData"))
+    {
+    int *ext;
+    this->PVData->GetVTKData()->UpdateInformation();
+    ext = this->PVData->GetVTKData()->GetWholeExtent();
+    if (ext[1] > ext[0] && ext[3] > ext[2] && ext[5] > ext[4])
+      {
+      this->SetModeToImageOutline();
+      }
+    else
+      {
+      this->SetModeToDataSet();
+      }      
+    }
+  else 
+    {
+    this->SetModeToDataSet();
+    }
+
+  // Mapper needs an input, so the mode needs to be set first.
+  this->ResetScalarRange();
+}
+
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetInput(vtkPVData *data)
 {
@@ -403,28 +466,6 @@ void vtkPVActorComposite::SetInput(vtkPVData *data)
     vtkDataTclName = data->GetVTKDataTclName();
     }
     
-  if (data->GetVTKData()->IsA("vtkPolyData"))
-    {
-    this->SetModeToPolyData();
-    }
-  else if (data->GetVTKData()->IsA("vtkImageData"))
-    {
-    int *ext;
-    data->GetVTKData()->UpdateInformation();
-    ext = data->GetVTKData()->GetWholeExtent();
-    if (ext[1] > ext[0] && ext[3] > ext[2] && ext[5] > ext[4])
-      {
-      this->SetModeToImageOutline();
-      }
-    else
-      {
-      this->SetModeToDataSet();
-      }      
-    }
-  else 
-    {
-    this->SetModeToDataSet();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -458,34 +499,7 @@ void vtkPVActorComposite::GetInputScalarRange(float range[2])
   int numProcs = controller->GetNumberOfProcesses();
   
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
-  pvApp->BroadcastScript("Application SendDataScalarRange [%s GetInput]", 
-			this->MapperTclName);
-  this->Mapper->GetInput()->GetScalarRange(range);
-  for (idx = 1; idx < numProcs; ++idx)
-    {
-    controller->Receive(tmp, 2, idx, 1966);
-    if (range[0] > tmp[0])
-      {
-      range[0] = tmp[0];
-      }
-    if (range[1] < tmp[1])
-      {
-      range[1] = tmp[1];
-      }    
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::TransmitInputScalarRange() 
-{ 
-  float tmp[2];
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  
-  this->Mapper->Update();
-  this->Mapper->GetInput()->GetScalarRange(tmp);
-  
-  controller->Send(tmp, 2, 0, 99399);
+  this->GetPVData()->GetScalarRange(range);
 }
 
 //----------------------------------------------------------------------------

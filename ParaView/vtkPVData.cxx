@@ -136,9 +136,6 @@ int vtkPVData::Create(char *args)
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
 
-  // The contour entry checks for scalars.
-  this->Update();
-  
   this->ActorCompositeButton->SetParent(this);
   this->ActorCompositeButton->Create(this->Application, "");
   this->ActorCompositeButton->SetLabel("Get Actor Composite");
@@ -156,204 +153,132 @@ void vtkPVData::ShowActorComposite()
 
 
 //----------------------------------------------------------------------------
-// This is a bit more complicated than you would expect, because I have to 
-// handle the case when some processes have empty pieces.
+// Data is expected to be updated.
+void vtkPVData::GetScalarRange(float range[2])
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  float tmp[2];
+  int id, num;
+  
+  if (this->VTKData == NULL)
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    return;
+    }
+
+  pvApp->BroadcastScript("Application SendDataScalarRange %s", 
+			this->VTKDataTclName);
+  
+  this->VTKData->GetScalarRange(range);
+  if (this->VTKData->GetNumberOfPoints() == 0 && this->VTKData->GetNumberOfCells() == 0)
+    {
+    range[0] = VTK_LARGE_FLOAT;
+    range[1] = -VTK_LARGE_FLOAT;
+    }  
+  
+  num = controller->GetNumberOfProcesses();
+  for (id = 1; id < num; ++id)
+    {
+    controller->Receive(tmp, 2, id, 1966);
+    if (tmp[0] < range[0])
+      {
+      range[0] = tmp[0];
+      }
+    if (tmp[1] > range[1])
+      {
+      range[1] = tmp[1];
+      }
+    }
+  
+  if (range[0] > range[1])
+    {
+    range[0] = 0.0;
+    range[1] = 1.0;
+    }  
+}
+
+//----------------------------------------------------------------------------
+// Data is expected to be updated.
 void vtkPVData::GetBounds(float bounds[6])
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkMultiProcessController *controller = pvApp->GetController();
   float tmp[6];
-  float id, num, emptyFlag;
-  
-  // Just some error checking.
-  if (controller->GetLocalProcessId() != 0)
-    {
-    vtkErrorMacro("This method should only be called from processes 0");
-    return;
-    }
+  int id, num;
   
   if (this->VTKData == NULL)
     {
-    bounds[0] = bounds[1] = bounds[2] = 0.0;
-    bounds[3] = bounds[4] = bounds[5] = 0.0;
+    bounds[0] = bounds[1] = bounds[2] = VTK_LARGE_FLOAT;
+    bounds[3] = bounds[4] = bounds[5] = -VTK_LARGE_FLOAT;
+    return;
     }
+
+  pvApp->BroadcastScript("Application SendDataBounds %s", 
+			this->VTKDataTclName);
   
-  //pvApp->BroadcastScript("%s TransmitBounds", this->GetTclName());
-  
-  if (0)
-    {
-    vtkWarningMacro("Cannot update without Assignment.");
-    }
-  
-  else
-    {
-    //this->VTKData->SetUpdateExtent(this->Assignment->GetPiece(),
-    //				this->Assignment->GetNumberOfPieces(),
-    //				0);
-    this->VTKData->Update();
-    }
-  
-  if (this->VTKData->GetNumberOfCells() > 0)
-    {
-    this->VTKData->GetBounds(bounds);
-    emptyFlag = 0;
-    }
-  else
-    {
-    emptyFlag = 1;
-    }
+  this->VTKData->GetBounds(bounds);
   
   num = controller->GetNumberOfProcesses();
   for (id = 1; id < num; ++id)
     {
-    if (emptyFlag)
-      {      
-      controller->Receive(&emptyFlag, 1, id, 993);
-      controller->Receive(bounds, 6, id, 994);
-      }
-    else
+    controller->Receive(tmp, 6, id, 1967);
+    if (tmp[0] < bounds[0])
       {
-      controller->Receive(&emptyFlag, 1, id, 993);
-      controller->Receive(tmp, 6, id, 994);
-      if ( ! emptyFlag )
-	{
-	if (tmp[0] < bounds[0])
-	  {
-	  bounds[0] = tmp[0];
-	  }
-	if (tmp[1] > bounds[1])
-	  {
-	  bounds[1] = tmp[1];
-	  }
-	if (tmp[2] < bounds[2])
-	  {
-	  bounds[2] = tmp[2];
-	  }
-	if (tmp[3] > bounds[3])
-	  {
-	  bounds[3] = tmp[3];
-	  }
-	if (tmp[4] < bounds[4])
-	  {
-	  bounds[4] = tmp[4];
-	  }
-	if (tmp[5] > bounds[5])
-	  {
-	  bounds[5] = tmp[5];
-	  }
-	}
-      // emptyFlag was 1 before this block. Restore it.
-      emptyFlag = 1;
+      bounds[0] = tmp[0];
+      }
+    if (tmp[1] > bounds[1])
+      {
+      bounds[1] = tmp[1];
+      }
+    if (tmp[2] < bounds[2])
+      {
+      bounds[2] = tmp[2];
+      }
+    if (tmp[3] > bounds[3])
+      {
+      bounds[3] = tmp[3];
+      }
+    if (tmp[4] < bounds[4])
+      {
+      bounds[4] = tmp[4];
+      }
+    if (tmp[5] > bounds[5])
+      {
+      bounds[5] = tmp[5];
       }
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::TransmitBounds()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  float bounds[6];
-  float emptyFlag;
-  
-  // Try to update data.
-  if (0)
-    {
-    vtkWarningMacro("Cannot update without Assignment.");
-    }
-  else
-    {
-    //this->VTKData->SetUpdateExtent(this->Assignment->GetPiece(),
-    //  this->Assignment->GetNumberOfPieces(),
-    //  0);
-    this->VTKData->Update();
-    }  
-
-  if (this->VTKData == NULL || this->VTKData->GetNumberOfCells() == 0)
-    {
-    emptyFlag = 1;
-    bounds[0] = bounds[1] = bounds[2] = 0.0;
-    bounds[3] = bounds[4] = bounds[5] = 0.0;
-    }
-  else
-    {
-    this->VTKData->GetBounds(bounds);
-    emptyFlag = 0;
-    }
-  
-  controller->Send(&emptyFlag, 1, 0, 993);
-  controller->Send(bounds, 6, 0, 994);  
-}
-
-//----------------------------------------------------------------------------
+// Data is expected to be updated.
 int vtkPVData::GetNumberOfCells()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkMultiProcessController *controller = pvApp->GetController();
-  float id, num;
-  int numCells, numRemoteCells;
-  
-  // Just some error checking.
-  if (controller->GetLocalProcessId() != 0)
-    {
-    vtkErrorMacro("This method should only be called from processes 0");
-    return -1;
-    }
+  int tmp, numCells, id, numProcs;
   
   if (this->VTKData == NULL)
     {
-    numCells = 0;
+    return 0;
     }
+
+  pvApp->BroadcastScript("Application SendDataNumberOfCells %s", 
+			this->VTKDataTclName);
   
-  //pvApp->BroadcastScript("%s TransmitNumberOfCells", this->GetTclName());
+  numCells = this->VTKData->GetNumberOfCells();
   
-  if (0)
+  numProcs = controller->GetNumberOfProcesses();
+  for (id = 1; id < numProcs; ++id)
     {
-    vtkWarningMacro("Cannot update without Assignment.");
+    controller->Receive(&tmp, 1, id, 1968);
+    numCells += tmp;
     }
-  else
-    {
-    //this->VTKData->SetUpdateExtent(this->Assignment->GetPiece(),
-    //  this->Assignment->GetNumberOfPieces(),
-    //  0);
-    this->VTKData->Update();
-    numCells = this->VTKData->GetNumberOfCells();
-    }
-  
-  num = controller->GetNumberOfProcesses();
-  for (id = 1; id < num; ++id)
-    {
-    controller->Receive((int*)(&numRemoteCells), 1, id, 994);
-    numCells += numRemoteCells;
-    }
-  
   return numCells;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVData::TransmitNumberOfCells()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller = pvApp->GetController();
-  int numCells;
-  
-  // Try to update data.
-  if (0)
-    {
-    vtkWarningMacro("Cannot update without Assignment.");
-    }
-  else
-    {
-    //this->VTKData->SetUpdateExtent(this->Assignment->GetPiece(),
-    //  this->Assignment->GetNumberOfPieces(),
-    //  0);
-    this->VTKData->Update();
-    }
 
-  numCells = this->VTKData->GetNumberOfCells();
-  
-  controller->Send((int*)(&numCells), 1, 0, 994);
-}
 
 //----------------------------------------------------------------------------
 vtkPVActorComposite* vtkPVData::GetActorComposite()
@@ -403,22 +328,6 @@ void vtkPVData::SetPVSource(vtkPVSource *source)
     source->Register(this);
     }
 }
-
-
-//----------------------------------------------------------------------------
-void vtkPVData::Update()
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  if (this->VTKDataTclName == NULL)
-    {
-    vtkErrorMacro("No data object to update.");
-    return;
-    }
-  
-  pvApp->BroadcastScript("%s Update", this->VTKDataTclName);
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVData::AddPVSourceToUsers(vtkPVSource *s)

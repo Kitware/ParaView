@@ -25,6 +25,7 @@ vtkInteractorStyleSphere \
 vtkPVActorComposite \
 vtkPVApplication \
 vtkPVData \
+vtkPVDataSetReaderInterface \
 vtkPVEnSightReaderInterface \
 vtkPVMethodInterface \
 vtkPVRenderView \
