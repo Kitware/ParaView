@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.196");
+vtkCxxRevisionMacro(vtkKWWindow, "1.197");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -1029,6 +1029,9 @@ void vtkKWWindow::CreateStatusImage()
   block.offset[0] = 0;
   block.offset[1] = 1;
   block.offset[2] = 2;
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 4)
+  block.offset[3] = 3;
+#endif
   block.pixelPtr = new unsigned char [block.pitch*block.height];
 
   photo = Tk_FindPhoto(this->GetApplication()->GetMainInterp(),

@@ -59,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.170");
+vtkCxxRevisionMacro(vtkKWApplication, "1.171");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -570,7 +570,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
       {
       char dir[1024], dir_unix[1024], buffer[1024];
       vtkKWDirectoryUtilities *util = vtkKWDirectoryUtilities::New();
-      strcpy(dir, util->GetFilenamePath(nameofexec, dir));
+      util->GetFilenamePath(nameofexec, dir);
       strcpy(dir_unix, util->ConvertToUnixSlashes(dir));
 
       // Installed KW application, otherwise build tree/windows
