@@ -56,7 +56,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
-#include "vtkPVInteractorStyleRotateCamera.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
