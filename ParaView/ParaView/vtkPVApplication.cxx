@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 #include "vtkPVData.h"
 #include "vtkPVHelpPaths.h"
-#include "vtkPVRenderGroupDialog.h"
+// #include "vtkPVRenderGroupDialog.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVSourceInterfaceDirectories.h"
@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.206");
+vtkCxxRevisionMacro(vtkPVApplication, "1.207");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -835,30 +835,31 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
     }
 
 #ifdef VTK_USE_MPI
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-p",
-                                          index) == VTK_OK )
-    {
-    this->UseRenderingGroup = 1;
-    }
+// Temporarily removing this (for the release - it has bugs)
+//    if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
+//                                            index) == VTK_OK ||
+//         vtkPVApplication::CheckForArgument(argc, argv, "-p",
+//                                            index) == VTK_OK )
+//      {
+//      this->UseRenderingGroup = 1;
+//      }
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--group-file",
-                                          index) == VTK_OK ||
-       vtkPVApplication::CheckForArgument(argc, argv, "-gf",
-                                          index) == VTK_OK )
-    {
-    const char* newarg=0;
-    int len = (int)(strlen(argv[index]));
-    for (int i=0; i<len; i++)
-      {
-      if (argv[index][i] == '=')
-        {
-        newarg = &(argv[index][i+1]);
-        }
-      }
-    this->SetGroupFileName(newarg);
-    }
+//    if ( vtkPVApplication::CheckForArgument(argc, argv, "--group-file",
+//                                            index) == VTK_OK ||
+//         vtkPVApplication::CheckForArgument(argc, argv, "-gf",
+//                                            index) == VTK_OK )
+//      {
+//      const char* newarg=0;
+//      int len = (int)(strlen(argv[index]));
+//      for (int i=0; i<len; i++)
+//        {
+//        if (argv[index][i] == '=')
+//          {
+//          newarg = &(argv[index][i+1]);
+//          }
+//        }
+//      this->SetGroupFileName(newarg);
+//      }
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-tiled-display",
                                           index) == VTK_OK ||
@@ -1085,76 +1086,78 @@ void vtkPVApplication::Start(int argc, char*argv[])
     }
 #endif
 
-  // Handle setting up the SGI pipes.
-  if (this->UseRenderingGroup)
-    {
-    int numProcs = this->ProcessModule->GetNumberOfPartitions();
-    int numPipes = 1;
-    int id;
-    int fileFound=0;
-    // Until I add a user interface to set the number of pipes,
-    // just read it from a file.
-    if (this->GroupFileName)
-      {
-      ifstream ifs;
-      ifs.open(this->GroupFileName,ios::in);
-      if (ifs.fail())
-        {
-        vtkErrorMacro("Could not find the file " << this->GroupFileName);
-        }
-      else
-        {
-        char bfr[1024];
-        ifs.getline(bfr, 1024);
-        numPipes = atoi(bfr);
-        if (numPipes > numProcs) { numPipes = numProcs; }
-        if (numPipes < 1) { numPipes = 1; }
-        this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);   
+
+// Temporarily removing this (for the release - it has bugs)
+//    // Handle setting up the SGI pipes.
+//    if (this->UseRenderingGroup)
+//      {
+//      int numProcs = this->ProcessModule->GetNumberOfPartitions();
+//      int numPipes = 1;
+//      int id;
+//      int fileFound=0;
+//      // Until I add a user interface to set the number of pipes,
+//      // just read it from a file.
+//      if (this->GroupFileName)
+//        {
+//        ifstream ifs;
+//        ifs.open(this->GroupFileName,ios::in);
+//        if (ifs.fail())
+//          {
+//          vtkErrorMacro("Could not find the file " << this->GroupFileName);
+//          }
+//        else
+//          {
+//          char bfr[1024];
+//          ifs.getline(bfr, 1024);
+//          numPipes = atoi(bfr);
+//          if (numPipes > numProcs) { numPipes = numProcs; }
+//          if (numPipes < 1) { numPipes = 1; }
+//          this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);   
         
-        for (id = 0; id < numPipes; ++id)
-          {
-          ifs.getline(bfr, 1024);
-          this->RemoteScript(
-            id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
-            bfr);
-          }
-        fileFound = 1;
-        }
-      }
+//          for (id = 0; id < numPipes; ++id)
+//            {
+//            ifs.getline(bfr, 1024);
+//            this->RemoteScript(
+//              id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
+//              bfr);
+//            }
+//          fileFound = 1;
+//          }
+//        }
 
     
-    if (!fileFound)
-      {
-      numPipes = numProcs;
-      vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
-      const char *displayString;
-      displayString = getenv("DISPLAY");
-      if (displayString)
-        {
-        rgDialog->SetDisplayString(0, displayString);
-        }
-      rgDialog->SetNumberOfProcessesInGroup(numPipes);
-      rgDialog->Create(this);
+//      if (!fileFound)
+//        {
+//        numPipes = numProcs;
+//        vtkPVRenderGroupDialog *rgDialog = vtkPVRenderGroupDialog::New();
+//        const char *displayString;
+//        displayString = getenv("DISPLAY");
+//        if (displayString)
+//          {
+//          rgDialog->SetDisplayString(0, displayString);
+//          }
+//        rgDialog->SetNumberOfProcessesInGroup(numPipes);
+//        rgDialog->Create(this);
       
-      rgDialog->Invoke();
-      numPipes = rgDialog->GetNumberOfProcessesInGroup();
+//        rgDialog->Invoke();
+//        numPipes = rgDialog->GetNumberOfProcessesInGroup();
       
-      this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
+//        this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);    
       
-      if (displayString)
-        {    
-        for (id = 1; id < numPipes; ++id)
-          {
-          // Format a new display string based on process.
-          displayString = rgDialog->GetDisplayString(id);
-          this->RemoteScript(
-            id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
-            displayString);
-          }
-        }
-      rgDialog->Delete();
-      }
-    }
+//        if (displayString)
+//          {    
+//          for (id = 1; id < numPipes; ++id)
+//            {
+//            // Format a new display string based on process.
+//            displayString = rgDialog->GetDisplayString(id);
+//            this->RemoteScript(
+//              id, "$Application SetEnvironmentVariable {DISPLAY=%s}", 
+//              displayString);
+//            }
+//          }
+//        rgDialog->Delete();
+//        }
+//      }
 
   // Create the rendering module here.
   char* rmClassName;

@@ -1,6 +1,6 @@
 SET( ParaView_SRCS
-  vtkAllToNRedistributePolyData.cxx
-  vtkBalancedRedistributePolyData.cxx
+#  vtkAllToNRedistributePolyData.cxx
+#  vtkBalancedRedistributePolyData.cxx
   vtkClientCompositeManager.cxx
   vtkColorByPart.cxx
   vtkCompleteArrays.cxx
@@ -115,7 +115,7 @@ SET( ParaView_SRCS
   vtkPVProcessModule.cxx
   vtkPVPushButton.cxx
   vtkPVReaderModule.cxx
-  vtkPVRenderGroupDialog.cxx
+#  vtkPVRenderGroupDialog.cxx
   vtkPVRenderModule.cxx
   vtkPVRenderModuleUI.cxx
   vtkPVRenderView.cxx 
@@ -159,12 +159,12 @@ SET( ParaView_SRCS
   vtkPVXMLElement.cxx
   vtkPVXMLPackageParser.cxx
   vtkPVXMLParser.cxx
-  vtkRedistributePolyData.cxx
+#  vtkRedistributePolyData.cxx
   vtkSelectInputs.cxx
   vtkStringList.cxx 
   vtkTiledDisplaySchedule.cxx
   vtkVRMLSource.cxx
-  vtkWeightedRedistributePolyData.cxx
+#  vtkWeightedRedistributePolyData.cxx
   vtkPVXDMFParameters.cxx
   vtkXDMFReaderModule.cxx
   vtkXMLCollectionReader.cxx
