@@ -82,8 +82,9 @@ IF (WIN32)
   SET( KWWidgets_SRCS ${KWWidgets_SRCS}
     kwappicon.c
   )
-  WRAP_EXCLUDE_FILES(
+  SET_SOURCE_FILES_PROPERTIES(
     kwappicon 
+    WRAP_EXCLUDE
   )
 ENDIF (WIN32)
 
