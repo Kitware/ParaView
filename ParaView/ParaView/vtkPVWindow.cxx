@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.382");
+vtkCxxRevisionMacro(vtkPVWindow, "1.383");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3273,7 +3273,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
 
 //----------------------------------------------------------------------------
 // Create a new data object/source by cloning a module prototype.
-vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
+vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
                                          const char* sourceList,
                                          int addTraceEntry)
 {
@@ -3281,7 +3281,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
   vtkPVSource* clone = 0;
   int success;
 
-  if ( this->Prototypes->GetItem(className, pvs) == VTK_OK ) 
+  if ( this->Prototypes->GetItem(moduleName, pvs) == VTK_OK ) 
     {
     // Make the cloned source current only if it is going into
     // the Sources list.
@@ -3296,7 +3296,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
 
     if (success != VTK_OK)
       {
-      vtkErrorMacro("Cloning operation for " << className
+      vtkErrorMacro("Cloning operation for " << moduleName
                     << " failed.");
       return 0;
       }
@@ -3306,7 +3306,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
       return 0;
       }
     
-    clone->SetModuleName(className);
+    clone->SetModuleName(moduleName);
 
     if (addTraceEntry)
       {
@@ -3317,14 +3317,14 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
           this->GetPVApplication()->AddTraceEntry(
             "set kw(%s) [$kw(%s) CreatePVSource %s %s]", 
             clone->GetTclName(), this->GetTclName(),
-            className, sourceList);
+            moduleName, sourceList);
           }
         else
           {
           this->GetPVApplication()->AddTraceEntry(
             "set kw(%s) [$kw(%s) CreatePVSource %s]", 
             clone->GetTclName(), this->GetTclName(),
-            className);
+            moduleName);
           }
         clone->SetTraceInitialized(1);
         }
@@ -3355,7 +3355,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
     }
   else
     {
-    vtkErrorMacro("Prototype for " << className << " could not be found.");
+    vtkErrorMacro("Prototype for " << moduleName << " could not be found.");
     }
   
   return clone;
@@ -3784,7 +3784,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.382 $");
+  this->ExtractRevision(os,"$Revision: 1.383 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3845,23 +3845,26 @@ void vtkPVWindow::SerializeSource(ostream& os, vtkIndent indent,
   writtenMap->GetItem(static_cast<void*>(source), written);
   if ( !written )
     {
-    if ( source->GetNumberOfPVInputs() > 0 )
+    if (source->GetModuleName())
       {
-      int cc;
-      for ( cc = 0; cc < source->GetNumberOfPVInputs(); cc ++ )
+      if ( source->GetNumberOfPVInputs() > 0 )
         {
-        vtkPVData* data = source->GetNthPVInput(cc);
-        if ( data && data->GetPVSource() )
+        int cc;
+        for ( cc = 0; cc < source->GetNumberOfPVInputs(); cc ++ )
           {
-          this->SerializeSource(os, indent, data->GetPVSource(), writtenMap);
+          vtkPVData* data = source->GetNthPVInput(cc);
+          if ( data && data->GetPVSource() )
+            {
+            this->SerializeSource(os, indent, data->GetPVSource(), writtenMap);
+            }
           }
         }
+      vtkPVSource* inputsource = source->GetInputPVSource();
+      os << indent << "Module " << source->GetName() << " " 
+         << source->GetModuleName() << " " 
+         << (inputsource?inputsource->GetName():"None") << " ";
+      source->Serialize(os, indent.GetNextIndent());
       }
-    vtkPVSource* inputsource = source->GetInputPVSource();
-    os << indent << "Module " << source->GetName() << " " 
-       << source->GetModuleName() << " " 
-       << (inputsource?inputsource->GetName():"None") << " ";
-    source->Serialize(os, indent.GetNextIndent());
     writtenMap->SetItem(static_cast<void*>(source), 1);
     }
   else
