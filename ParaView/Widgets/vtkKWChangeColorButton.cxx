@@ -153,7 +153,7 @@ void vtkKWChangeColorButton::Create(vtkKWApplication *app, const char *args)
 
 }
 
-void vtkKWChangeColorButton::AButtonPress(int x, int y)
+void vtkKWChangeColorButton::AButtonPress(int /*x*/, int /*y*/)
 {  
   this->Script("%s configure -relief sunken", this->GetWidgetName());  
 }
@@ -261,5 +261,5 @@ void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.12 $");
+  this->ExtractRevision(os,"$Revision: 1.13 $");
 }

@@ -62,7 +62,7 @@ vtkKWMenuButton::~vtkKWMenuButton()
 }
 
 
-void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
+void vtkKWMenuButton::Create(vtkKWApplication *app, char* /*args*/)
 { 
   // must set the application
   if (this->Application)
@@ -76,6 +76,7 @@ void vtkKWMenuButton::Create(vtkKWApplication *app, char *args)
   this->Script("menubutton %s -menu %s -relief raised -bd 2", 
 	       this->GetWidgetName(), this->Menu->GetWidgetName());
 
+  // Should the args be passed through?
   this->Menu->Create(app, "");  
   
 }

@@ -86,13 +86,12 @@ public:
   static int GetIntegerResult(vtkKWApplication *);
   static float GetFloatResult(vtkKWApplication *);
 
-
   // Description:
   // Chaining method to serialize an object and its superclasses.
   void Serialize(ostream& os, vtkIndent indent);
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
   void Serialize(istream& is);
-  virtual void SerializeSelf(ostream& os, vtkIndent indent) {};
+  virtual void SerializeSelf(ostream& /*os*/, vtkIndent /*indent*/) {};
   virtual void SerializeToken(istream& is, const char token[1024]);
   virtual const char *GetVersion(const char *);
   virtual void AddVersion(const char *cname, const char *version);

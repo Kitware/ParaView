@@ -392,7 +392,7 @@ void vtkKWApplication::Start(char *arg)
 { 
   this->Start(1,&arg);
 }
-void vtkKWApplication::Start(int argc, char *argv[])
+void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 { 
   while (this->Windows->GetNumberOfItems())
     {
@@ -573,7 +573,7 @@ int vtkKWApplication::GetWidgetVisibility()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::DisplayAbout(vtkKWWindow *win)
+void vtkKWApplication::DisplayAbout(vtkKWWindow* /*win*/)
 {
   ostrstream str;
   str << "Application : " << this->GetApplicationName() << "\nVersion : " << this->GetApplicationVersionName() << "\nRelease : " << this->GetApplicationReleaseName() << ends;

@@ -115,7 +115,7 @@ void vtkKWSaveImageDialog::Invoke()
   free(path);
 }
 
-void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char *args)
+void vtkKWSaveImageDialog::Create(vtkKWApplication *app, const char* /*args*/)
 {
   // must set the application
   if (this->Application)

@@ -82,7 +82,7 @@ public:
 
   // Description:
   // Create a View
-  virtual void Create(vtkKWApplication *app, const char *args) {}
+  virtual void Create(vtkKWApplication* /*app*/, const char* /*args*/) {}
 
   // Description:
   // Sets up some default event handlers to allow
@@ -96,18 +96,18 @@ public:
 
   // Description:
   // These are the event handlers that UIs can use or override.
-  virtual void AButtonPress(int num, int x, int y) {};
-  virtual void AButtonRelease(int num, int x, int y) {};
-  virtual void AShiftButtonPress(int num, int x, int y) {};
-  virtual void AShiftButtonRelease(int num, int x, int y) {};
-  virtual void AKeyPress(char key, int x, int y) {};
-  virtual void Button1Motion(int x, int y) {};
-  virtual void Button2Motion(int x, int y) {};
-  virtual void Button3Motion(int x, int y) {};
-  virtual void ShiftButton1Motion(int x, int y) {};
-  virtual void ShiftButton2Motion(int x, int y) {};
-  virtual void ShiftButton3Motion(int x, int y) {};
-  virtual void Exposed() {};
+  virtual void AButtonPress(int /*num*/, int /*x*/, int /*y*/) {}
+  virtual void AButtonRelease(int /*num*/, int /*x*/, int /*y*/) {}
+  virtual void AShiftButtonPress(int /*num*/, int /*x*/, int /*y*/) {}
+  virtual void AShiftButtonRelease(int /*num*/, int /*x*/, int /*y*/) {}
+  virtual void AKeyPress(char /*key*/, int /*x*/, int /*y*/) =0;
+  virtual void Button1Motion(int /*x*/, int /*y*/) {}
+  virtual void Button2Motion(int /*x*/, int /*y*/) {}
+  virtual void Button3Motion(int /*x*/, int /*y*/) {}
+  virtual void ShiftButton1Motion(int /*x*/, int /*y*/) {}
+  virtual void ShiftButton2Motion(int /*x*/, int /*y*/) {}
+  virtual void ShiftButton3Motion(int /*x*/, int /*y*/) {}
+  virtual void Exposed() {}
   virtual void Enter(int x, int y);
 
   // Description:

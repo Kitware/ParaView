@@ -205,7 +205,7 @@ protected:
   void InsertRecentFileToMenu(const char *filename, 
 			      vtkKWObject *taret, 
 			      const char *command);
-  void UpdateRecentMenu();
+  void UpdateRecentMenu(char *key);
   void StoreRecentMenuToRegistry(char *key);
 
   unsigned int NumberOfRecentFiles;

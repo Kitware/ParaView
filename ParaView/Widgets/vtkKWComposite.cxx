@@ -191,7 +191,7 @@ void vtkKWComposite::Deselect(vtkKWView *v)
       v->GetParentWindow()->GetMenuProperties(),"Radio");
 }
 
-void vtkKWComposite::Select(vtkKWView *v)
+void vtkKWComposite::Select(vtkKWView* /*v*/)
 {
   // make sure we have an applicaiton
   if (!this->Application)
@@ -211,5 +211,5 @@ void vtkKWComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWComposite ";
-  this->ExtractRevision(os,"$Revision: 1.11 $");
+  this->ExtractRevision(os,"$Revision: 1.12 $");
 }

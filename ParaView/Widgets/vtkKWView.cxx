@@ -618,7 +618,7 @@ void vtkKWView::RemoveComposite(vtkKWComposite *c)
   this->Composites->RemoveItem(c);
 }
 
-void vtkKWView::Enter(int x, int y)
+void vtkKWView::Enter(int /*x*/, int /*y*/)
 {
 //  this->Script("focus %s",this->VTKWidget->GetWidgetName());
 }
@@ -721,7 +721,9 @@ void vtkKWView::Print()
       (static_cast<float>(cxInch)*cxDIB);
     } 
   
-  int DPI = vtkWin->GetDPI();
+  // Do we actually need this DPI?
+  //int DPI = 
+  vtkWin->GetDPI();
   
   this->SetupMemoryRendering(rcDest.right/scale,
                              rcDest.top/scale, ghdc);
@@ -742,17 +744,17 @@ void vtkKWView::Print()
 #else
 
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
-  int DPI;
+  float DPI;
   if (this->GetParentWindow())
     {
     // Is this right? Should DPI be int or float?
-    DPI = static_cast<int>( this->GetParentWindow()->GetPrintTargetDPI() );
+    DPI = his->GetParentWindow()->GetPrintTargetDPI();
     }
-  if (DPI >= 150)
+  if (DPI >= 150.0)
     {
     w2i->SetMagnification(2);
     }
-  if (DPI >= 300)
+  if (DPI >= 300.0)
     {
     w2i->SetMagnification(3);
     }
@@ -1244,7 +1246,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.47 $");
+  this->ExtractRevision(os,"$Revision: 1.48 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

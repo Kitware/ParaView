@@ -58,7 +58,7 @@ vtkKWTclCommand::~vtkKWTclCommand()
     }
 }
 
-void vtkKWTclCommand::Execute(vtkObject *caller, unsigned long event,
+void vtkKWTclCommand::Execute(vtkObject *caller, unsigned long /*event*/,
                                  void *callData)
 {
   char *str = (char *) callData;

@@ -107,7 +107,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.13 $");
+  this->ExtractRevision(os,"$Revision: 1.14 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -157,7 +157,7 @@ void vtkKWObject::Serialize(istream& is)
   while (token[0] != '}');
 }
 
-void vtkKWObject::SerializeToken(istream& is, const char token[1024])
+void vtkKWObject::SerializeToken(istream& /*is*/, const char * /*token[1024]*/)
 {
 }
 

@@ -71,7 +71,7 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
   this->SetOpenFile(0);
 }
 
-void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char *args)
+void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
 {
   // must set the application
   if (this->Application)
