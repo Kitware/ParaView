@@ -289,7 +289,8 @@ public:
 
   // Description: 
   // Convenience methid which calls ClonePrototype() and InitializeClone()
-  int CloneAndInitialize(int makeCurrent, vtkPVSource*& clone);
+  int CloneAndInitialize(
+    int makeCurrent, vtkPVSource*& clone, const char* groupName);
 
   // Description: 
   // Creates and returns (by reference) a copy of this

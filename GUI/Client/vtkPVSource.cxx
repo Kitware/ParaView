@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.366");
+vtkCxxRevisionMacro(vtkPVSource, "1.367");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2136,7 +2136,8 @@ int vtkPVSource::GetNumberOfProcessorsValid()
 }
 
 //----------------------------------------------------------------------------
-int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
+int vtkPVSource::CloneAndInitialize(
+  int makeCurrent, vtkPVSource*& clone , const char* groupName)
 {
 
   int retVal = this->ClonePrototypeInternal(clone);
@@ -2148,12 +2149,38 @@ int vtkPVSource::CloneAndInitialize(int makeCurrent, vtkPVSource*& clone )
   vtkPVSource *current = this->GetPVWindow()->GetCurrentPVSource();
   retVal = clone->InitializeClone(current, makeCurrent);
 
+
   if (retVal != VTK_OK)
     {
     clone->Delete();
     clone = 0;
     return retVal;
     }
+
+  const char* module_group = 0;
+  if (groupName)
+    {
+    if (strcmp(groupName, "GlyphSources") == 0)
+      {
+      module_group = "glyph_sources";
+      }
+    else
+      {
+      module_group = groupName;
+      }
+    }
+  else if (this->GetNumberOfInputProperties() > 0)
+    {
+    module_group = "filters";
+    }
+  else
+    {
+    module_group = "sources";
+    }
+
+  vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
+  proxm->RegisterProxy(module_group, clone->GetName(), clone->Proxy);
+  clone->Proxy->Delete();
 
   // Accept button is always red when a source is first created.
   clone->SetAcceptButtonColorToModified();
@@ -2261,8 +2288,6 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     pvs->Delete();
     return VTK_ERROR;
     }
-  proxm->RegisterProxy(module_group, pvs->GetName(), pvs->Proxy);
-  pvs->Proxy->Delete();
   pvs->Proxy->CreateVTKObjects(numSources);
 
   for (idx = 0; idx < numSources; ++idx)

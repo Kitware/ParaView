@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.589");
+vtkCxxRevisionMacro(vtkPVWindow, "1.590");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3740,11 +3740,11 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
     // the Sources list.
     if (sourceList && strcmp(sourceList, "Sources") != 0)
       {
-      success = pvs->CloneAndInitialize(0, clone);
+      success = pvs->CloneAndInitialize(0, clone, sourceList);
       }
     else
       {
-      success = pvs->CloneAndInitialize(1, clone);
+      success = pvs->CloneAndInitialize(1, clone, sourceList);
       }
 
     if (success != VTK_OK)
