@@ -80,7 +80,12 @@ public:
   // Turn on display of the entry box widget that lets the user entry
   // an exact value.
   void DisplayEntry();
-  
+
+  // Description:
+  // Set whether the entry is displayed to the side of the scale or on
+  // top.  Default is 1 for on top.  Set to 0 for side.
+  void SetDisplayEntryAndLabelOnTop(int value);
+
   // Description:
   // This class redefines SetBalloonHelpString since it
   // has to forward the call to a widget it contains.

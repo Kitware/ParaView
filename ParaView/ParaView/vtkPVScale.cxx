@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.16.2.1");
+vtkCxxRevisionMacro(vtkPVScale, "1.16.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -127,6 +127,12 @@ void vtkPVScale::SetRange(float min, float max)
 void vtkPVScale::DisplayEntry()
 {
   this->Scale->DisplayEntry();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScale::SetDisplayEntryAndLabelOnTop(int value)
+{
+  this->Scale->SetDisplayEntryAndLabelOnTop(value);
 }
 
 //----------------------------------------------------------------------------

@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.1.2.2");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -131,18 +131,10 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
                                        "RestrictionAsIndex timestep");
     this->TimeScale->Create(this->GetPVApplication());
     this->TimeScale->DisplayEntry();
+    this->TimeScale->SetDisplayEntryAndLabelOnTop(0);
     this->AddPVWidget(this->TimeScale);
-    if(this->TimeScale->GetParent()->GetNumberOfPackedChildren() > 0)
-      {
-      this->Script("pack %s -pady 10 -side top -fill x -expand t -before [lindex [pack slaves %s] 0]", 
-                   this->TimeScale->GetWidgetName(), 
-                   this->TimeScale->GetParent()->GetWidgetName());
-      }
-    else
-      {
-      this->Script("pack %s -side top -fill x -expand t", 
-                   this->TimeScale->GetWidgetName());
-      }
+    this->Script("pack %s -side top -fill x -expand 1", 
+                 this->TimeScale->GetWidgetName());
     return this->Superclass::ReadFileInformation(fname);
     }
   else
