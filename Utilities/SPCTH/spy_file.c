@@ -330,12 +330,12 @@ void realloc_blocks(Structured_Mesh_Data* stm_data, int n_blocks)
       processor to processor. */
   if (n_blocks && (n_blocks <= stm_data->Nblocks))
     {
-    printf("Reused block memory\n");
+    //printf("Reused block memory\n");
     return;
     }
 
-  printf("Freeing and allocating block memory!\n");
-  printf("Allocating %d blocks...\n",n_blocks);
+  //printf("Freeing and allocating block memory!\n");
+  //printf("Allocating %d blocks...\n",n_blocks);
  
  
   /* Free the old block array */
