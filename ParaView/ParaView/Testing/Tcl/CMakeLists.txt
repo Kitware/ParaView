@@ -24,6 +24,7 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                ClipCut
 	       ColorMap
                CombustorTest
+#               Composite
                ConeCubeCylSQ
                CutContours
                Data
