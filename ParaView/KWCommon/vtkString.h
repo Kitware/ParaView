@@ -133,6 +133,11 @@ public:
   // Return 'str'.
   static char* FillString(char* str, char c, size_t len);
 
+  // Description:
+  // Crop string to a given length by removing chars in the center of the
+  // string and replacing them with an ellipsis (...). This is done in-place.
+  static char* CropString(char* str, size_t max_len);
+
 protected:
   vtkString() {};
   ~vtkString() {};

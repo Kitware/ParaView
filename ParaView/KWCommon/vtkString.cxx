@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #  define STRCASECMP strcasecmp
 #endif
 
-vtkCxxRevisionMacro(vtkString, "1.15");
+vtkCxxRevisionMacro(vtkString, "1.16");
 vtkStandardNewMacro(vtkString);
  
 //----------------------------------------------------------------------------
@@ -321,5 +321,39 @@ char* vtkString::FillString(char* str, char c, size_t len)
   return str;
 }
 
+//----------------------------------------------------------------------------
+char* vtkString::CropString(char* str, size_t max_len)
+{
+  if (!str || max_len == 0)
+    {
+    return str;
+    }
 
+  size_t str_len = strlen(str);
+  if (max_len >= str_len)
+    {
+    return str;
+    }
 
+  // Crop the string
+
+  size_t middle = max_len / 2;
+  strcpy(str + middle, str + str_len - (max_len - middle));
+
+  // Add the ellipsis
+
+  if (max_len > 2)
+    {
+    str[middle] = '.';
+    if (max_len > 3)
+      {
+      str[middle - 1] = '.';
+      if (max_len > 4)
+        {
+        str[middle + 1] = '.';
+        }
+      }
+    }
+
+  return str;
+}
