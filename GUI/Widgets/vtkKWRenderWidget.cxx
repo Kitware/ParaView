@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.75");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.76");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -542,7 +542,7 @@ void vtkKWRenderWidget::AKeyPress(char key,
   this->Interactor->SetShiftKey(shift);
   this->Interactor->SetKeyCode(key);
   this->Interactor->SetKeySym(keysym);
-  this->Interactor->KeyPressEvent();
+  this->Interactor->CharEvent();
 }
 
 //----------------------------------------------------------------------------
@@ -581,16 +581,6 @@ void vtkKWRenderWidget::FocusOutCallback()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::Reset()
 {
-  /*
-  vtkCamera *c = this->GetCurrentCamera();
-  if (c)
-    {
-    c->SetPosition(0, 0, 1);
-    c->SetFocalPoint(0, 0, 0);
-    c->SetViewUp(0, 1, 0);
-    }
-  */
-
   this->ResetCamera();
   this->Render();
 }
