@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.43");
+vtkCxxRevisionMacro(vtkKWObject, "1.44");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -91,7 +91,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.43 $");
+  this->ExtractRevision(os,"$Revision: 1.44 $");
 }
 
 //----------------------------------------------------------------------------
@@ -399,7 +399,7 @@ void vtkKWObject::AddTraceEntry(const char *format, ...)
     return;
     }
 
-  if (this->GetApplication() == NULL || this->InitializeTrace(os) == 0)
+  if (this->InitializeTrace(os) == 0)
     {
     return;
     }
