@@ -73,7 +73,7 @@ public:
   vtkGetMacro(InteractiveRenderEnabled,int);
   vtkBooleanMacro(InteractiveRenderEnabled,int);
   virtual void Render();
-  
+
   // Description:
   // Methods broadcasted to the satellites to synchronize 3D widgets.
   void SatelliteLeftPress(int x, int y, int control, int shift);
