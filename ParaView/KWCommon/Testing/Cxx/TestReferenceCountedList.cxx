@@ -69,8 +69,9 @@ int main()
   
   //cout << "Vector: " << endl;
 
-  vtkReferenceCountedVector<vtkActor*> *vv 
-    = vtkReferenceCountedVector<vtkActor*>::New();
+  vtkVector<vtkActor*> *vv 
+    = vtkVector<vtkActor*>::New();
+  vtkAbstractListDataIsReferenceCounted(vv);
   res += TestList(vv);
   vv->Delete();
 

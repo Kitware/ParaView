@@ -21,6 +21,7 @@
 #define __vtkVector_txx
 
 #include "vtkVector.h"
+#include "vtkAbstractList.txx"
 
 // Description:
 // Append an Item to the end of the vector
@@ -51,7 +52,9 @@ int vtkVector<DType>::AppendItem(DType a)
       }
     this->Array = newArray;
     }
-  this->Array[this->NumberOfItems] = a;
+  
+  vtkAbstractList<DType>::CreateFunction(this->Array[this->NumberOfItems], a);
+  
   this->NumberOfItems++;
   return VTK_OK;
 }
@@ -112,7 +115,7 @@ int vtkVector<DType>::InsertItem(vtkIdType loc, DType a)
       this->Array[i] = this->Array[i-1];
       }
     }
-  this->Array[loc] = a;
+  vtkAbstractList<DType>::CreateFunction(this->Array[loc], a);
   this->NumberOfItems++;
   return VTK_OK;
 }
@@ -142,7 +145,8 @@ int vtkVector<DType>::SetItem(vtkIdType loc, DType a)
 template <class DType>
 void vtkVector<DType>::SetItemNoCheck(vtkIdType loc, DType a)
 {
-  this->Array[loc] = a;
+  vtkAbstractList<DType>::DeleteFunction(this->Array[loc]);
+  vtkAbstractList<DType>::CreateFunction(this->Array[loc], a);
 }
 
 // Description:
@@ -156,6 +160,8 @@ int vtkVector<DType>::RemoveItem(vtkIdType id)
     }
   vtkIdType i;
   this->NumberOfItems--;
+  
+  DType dt = this->Array[id];
   
   if ( this->NumberOfItems < (this->Size / 3) && this->Size > 10 &&
        !this->Resize )
@@ -183,6 +189,7 @@ int vtkVector<DType>::RemoveItem(vtkIdType id)
       this->Array[i] = this->Array[i+1];
       }
     }
+  vtkAbstractList<DType>::DeleteFunction(dt);
   return VTK_OK;
 }
   
@@ -199,6 +206,14 @@ int vtkVector<DType>::GetItem(vtkIdType id, DType& ret)
     }
   return VTK_ERROR;
 }
+   
+// Description:
+// Return an item that was previously added to this vector. 
+template <class DType>
+void vtkVector<DType>::GetItemNoCheck(vtkIdType id, DType& ret) 
+{
+  ret = this->Array[id];
+}
       
 // Description:
 // Find an item in the vector. Return one if it was found, zero if it was
@@ -209,7 +224,7 @@ int vtkVector<DType>::FindItem(DType a, vtkIdType &res)
   vtkIdType i;
   for (i = 0; i < this->NumberOfItems; ++i)
     {
-    if (this->Array[i] == a)
+    if (vtkAbstractList<DType>::CompareFunction(this->Array[i], a) == 0 )
       {
       res = i;
       return VTK_OK;
@@ -247,13 +262,30 @@ void vtkVector<DType>::RemoveAllItems()
 {
   if (this->Array)
     {
+    vtkIdType cc;
+    for ( cc = 0; cc < this->NumberOfItems; cc ++ )
+      {
+      vtkAbstractList<DType>::DeleteFunction(this->Array[cc]);
+      }
     delete [] this->Array;
     }
   this->Array = 0;
   this->NumberOfItems = 0;
   this->Size = 0;
 }
-
+template <class DType>
+vtkVector<DType>::~vtkVector() 
+{
+  if (this->Array)
+    {
+    vtkIdType cc;
+    for ( cc = 0; cc < this->NumberOfItems; cc ++ )
+      {
+      vtkAbstractList<DType>::DeleteFunction(this->Array[cc]);
+      }
+    delete [] this->Array;
+    }
+}
 // Description:
 // Set the capacity of the vector.
 // It returns VTK_OK if successfull.

@@ -86,6 +86,10 @@ public:
   virtual int GetItem(vtkIdType id, DType& ret);
       
   // Description:
+  // Return an item that was previously added to this vector. 
+  virtual void GetItemNoCheck(vtkIdType id, DType& ret);
+      
+  // Description:
   // Find an item in the vector. Return one if it was found, zero if it was
   // not found. The location of the item is returned in res.
   virtual int FindItem(DType a, vtkIdType &res);
@@ -135,12 +139,7 @@ protected:
   vtkVector() {
     this->Array = 0; this->NumberOfItems = 0; this->Size = 0; 
     this->Resize = 1; }
-  virtual ~vtkVector() {
-    if (this->Array)
-      {
-      delete [] this->Array;
-      }
-  }
+  virtual ~vtkVector();
   vtkIdType NumberOfItems;
   vtkIdType Size;
   int Resize;
