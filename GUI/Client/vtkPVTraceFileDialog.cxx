@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.8");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.9");
 
 int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -91,7 +91,7 @@ void vtkPVTraceFileDialog::Create(vtkKWApplication *app, const char *args)
     }
   this->RetraceFrame->Create(app, "-bd 3 -relief flat");
 
-  this->RetraceButton->Create(app, "-text Retrace -width 16");
+  this->RetraceButton->Create(app, "-text Recover -width 16");
   this->RetraceButton->SetCommand(this, "Retrace");
 
   this->Script("pack %s -side left -expand yes",
