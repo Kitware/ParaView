@@ -472,12 +472,6 @@ public:
   vtkLinkedList<vtkPVReaderModule*>* GetReaderList() { return this->ReaderList; }
   //ETX
 
-  // Descrition:
-  // Show/Hide the sources long help.
-  virtual void SetShowSourcesLongHelp(int);
-  vtkGetMacro(ShowSourcesLongHelp, int);
-  vtkBooleanMacro(ShowSourcesLongHelp, int);
-
   // Description:
   // Get the User Interface Manager.
   virtual vtkKWUserInterfaceManager* GetUserInterfaceManager();
@@ -659,8 +653,6 @@ protected:
   int InteractiveRenderEnabled;
 
   void UpdateStatusImage();
-
-  int ShowSourcesLongHelp;
 
   // To avoid disabling menus multiple times.
   int MenusDisabled;

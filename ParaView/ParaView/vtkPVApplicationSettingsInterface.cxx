@@ -42,22 +42,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVApplicationSettingsInterface.h"
 
-#include "vtkKWApplication.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVWindow.h"
 
-//------------------------------------------------------------------------------
-
-#define VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY "ShowSourcesLongHelp"
-#define VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY       "SourcesBrowserAlwaysShowName"
-
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.8");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.9");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -176,80 +171,68 @@ void vtkPVApplicationSettingsInterface::Update()
     return;
     }
 
+  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+
   // Interface settings : show sources description
 
-  if (this->ShowSourcesDescriptionCheckButton)
+  if (this->ShowSourcesDescriptionCheckButton && app)
     {
-    if (this->Application->HasRegisteryValue(
-          2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY))
-      {
-      this->ShowSourcesDescriptionCheckButton->SetState(
-        this->Application->GetIntRegisteryValue(
-          2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY));
-      }
-    else
-      {
-      this->Application->SetRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", 1);
-      this->ShowSourcesDescriptionCheckButton->SetState(1);
-      }
+    this->ShowSourcesDescriptionCheckButton->SetState(
+      app->GetShowSourcesLongHelp());
     }
 
   // Interface settings : show sources name
 
-  if (this->ShowSourcesNameCheckButton)
+  if (this->ShowSourcesNameCheckButton && app)
     {
-    if (this->Application->HasRegisteryValue(
-          2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY))
-      {
-      this->ShowSourcesNameCheckButton->SetState(
-        this->Application->GetIntRegisteryValue(
-          2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY));
-      }
-    else
-      {
-      this->Application->SetRegisteryValue(
-        2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", 0);
-      this->ShowSourcesNameCheckButton->SetState(0);
-      }
+    this->ShowSourcesNameCheckButton->SetState(
+      app->GetSourcesBrowserAlwaysShowName());
     }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback()
 {
- if (this->IsCreated())
+ if (!this->ShowSourcesDescriptionCheckButton ||
+     !this->ShowSourcesDescriptionCheckButton->IsCreated())
    {
-   int flag = this->ShowSourcesDescriptionCheckButton->GetState() ? 1 : 0;
-   this->GetApplication()->SetRegisteryValue(
-     2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
-   
-   vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->Window);
-   if (win)
-     {
-     win->SetShowSourcesLongHelp(flag);
-     }
+   return;
+   }
+
+ int flag = this->ShowSourcesDescriptionCheckButton->GetState() ? 1 : 0;
+
+ this->GetApplication()->SetRegisteryValue(
+   2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
+
+ vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+ if (app)
+   {
+   app->SetShowSourcesLongHelp(flag);
    }
 }
 
 //----------------------------------------------------------------------------
 void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback()
 {
- if (this->IsCreated())
+ if (!this->ShowSourcesNameCheckButton ||
+     !this->ShowSourcesNameCheckButton->IsCreated())
    {
-   int flag = this->ShowSourcesNameCheckButton->GetState() ? 1 : 0;
-    this->GetApplication()->SetRegisteryValue(
-      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);
+   return;
+   }
 
-   vtkPVWindow *win = vtkPVWindow::SafeDownCast(this->Window);
-   if (win && win->GetMainView())
-     {
-     win->GetMainView()->SetSourcesBrowserAlwaysShowName(flag);
-     }
+ int flag = this->ShowSourcesNameCheckButton->GetState() ? 1 : 0;
+
+ this->GetApplication()->SetRegisteryValue(
+   2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);
+
+ vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+ if (app)
+   {
+   app->SetSourcesBrowserAlwaysShowName(flag);
    }
 }
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void vtkPVApplicationSettingsInterface::UpdateEnableState()
 {
   this->Superclass::UpdateEnableState();

@@ -111,7 +111,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.267");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.268");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -707,6 +707,9 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     this->ShowSelectionWindowCallback(0);
     }
 
+  this->SetSourcesBrowserAlwaysShowName(
+    this->GetPVApplication()->GetSourcesBrowserAlwaysShowName());
+
   this->EventuallyRender();
   delete [] local;
 }
@@ -785,22 +788,11 @@ void vtkPVRenderView::SetDisplay3DWidgets(int s)
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SetSourcesBrowserAlwaysShowName(int s)
 {
-  if (this->GetPVWindow())
-    {
-    vtkPVApplicationSettingsInterface *asi = 
-      vtkPVApplicationSettingsInterface::SafeDownCast(
-        this->GetPVWindow()->GetApplicationSettingsInterface());
-    if (asi)
-      {
-      asi->Update();
-      }
-    }
-
-  if (this->NavigationWindow && this->NavigationWindow->IsCreated())
+  if (this->NavigationWindow)
     {
     this->NavigationWindow->SetAlwaysShowName(s);
     }
-  if (this->SelectionWindow && this->SelectionWindow->IsCreated())
+  if (this->SelectionWindow)
     {
     this->SelectionWindow->SetAlwaysShowName(s);
     }

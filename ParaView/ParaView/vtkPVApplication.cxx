@@ -49,19 +49,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMPIGroup.h"
 #endif
 
-#include "vtkPVConfig.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVRenderModule.h"
-#include "vtkInstantiator.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellData.h"
 #include "vtkCharArray.h"
+#include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDirectory.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
+#include "vtkInstantiator.h"
 #include "vtkIntArray.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWDialog.h"
@@ -75,15 +73,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
+#include "vtkPVApplicationSettingsInterface.h"
+#include "vtkPVClientServerModule.h"
+#include "vtkPVConfig.h"
 #include "vtkPVData.h"
 #include "vtkPVHelpPaths.h"
-// #include "vtkPVRenderGroupDialog.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
-#include "vtkPVSourceInterfaceDirectories.h"
+#include "vtkPVSource.h"
+#include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTraceFileDialog.h"
 #include "vtkPVWindow.h"
-#include "vtkPVClientServerModule.h"
 #include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
@@ -98,6 +100,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
+// #include "vtkPVRenderGroupDialog.h"
 
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -119,7 +122,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.216");
+vtkCxxRevisionMacro(vtkPVApplication, "1.217");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -371,11 +374,8 @@ vtkPVApplication::vtkPVApplication()
   this->BatchScriptName = 0;
   this->RunBatchScript = 0;
 
-  // Get application settings from registery. 
-  // We can only do it now since it requires the application name
-  // (i.e., it could not be done in the superclass constructor)
-
-  this->GetApplicationSettingsFromRegistery();
+  this->SourcesBrowserAlwaysShowName = 0;
+  this->ShowSourcesLongHelp = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -727,9 +727,6 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
     }
   exportDialog->Delete();
 }
-
-
-
 
 //----------------------------------------------------------------------------
 int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
@@ -1399,7 +1396,77 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->SetRenderModule(NULL);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVApplication::GetApplicationSettingsFromRegistery()
+{ 
+  this->Superclass::GetApplicationSettingsFromRegistery();
 
+  // Show sources description ?
+
+  if (this->HasRegisteryValue(
+    2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY))
+    {
+    this->ShowSourcesLongHelp = this->GetIntRegisteryValue(
+      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY);
+    }
+
+  // Show name in sources description browser
+
+  if (this->HasRegisteryValue(
+    2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY))
+    {
+    this->SourcesBrowserAlwaysShowName = this->GetIntRegisteryValue(
+      2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVApplication::SetShowSourcesLongHelp(int v)
+{
+  if (this->ShowSourcesLongHelp == v)
+    {
+    return;
+    }
+
+  this->ShowSourcesLongHelp = v;
+  this->Modified();
+
+  // Update the properties of all the sources previously created
+  // so that the Description label can be removed/brought back.
+  
+  if (this->GetMainWindow())
+    {
+    vtkPVSource *pvs;
+    vtkPVSourceCollection *col = 
+      this->GetMainWindow()->GetSourceList("Sources");
+    vtkCollectionIterator *cit = col->NewIterator();
+    cit->InitTraversal();
+    while (!cit->IsDoneWithTraversal())
+      {
+      pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+      pvs->UpdateProperties();
+      cit->GoToNextItem();
+      }
+    cit->Delete();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVApplication::SetSourcesBrowserAlwaysShowName(int v)
+{
+  if (this->SourcesBrowserAlwaysShowName == v)
+    {
+    return;
+    }
+
+  this->SourcesBrowserAlwaysShowName = v;
+  this->Modified();
+
+  if (this->GetMainView())
+    {
+    this->GetMainView()->SetSourcesBrowserAlwaysShowName(v);
+    }
+}
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::Exit()
@@ -1785,6 +1852,10 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "RenderModuleName: " 
     << (this->RenderModuleName?this->RenderModuleName:"(null)") << endl;
+  os << indent << "ShowSourcesLongHelp: " 
+     << (this->ShowSourcesLongHelp?"on":"off") << endl;
+  os << indent << "SourcesBrowserAlwaysShowName: " 
+     << (this->SourcesBrowserAlwaysShowName?"on":"off") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

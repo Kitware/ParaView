@@ -150,6 +150,14 @@ int MyMain(int argc, char *argv[])
     app->SetStartGUI(0);
     }
 
+  // Get the application settings from the registery
+  // It has to be called now, after ParseCommandLineArguments, which can 
+  // change the registery level (also, it can not be called in the application
+  // constructor or even the KWApplication constructor since we need the
+  // application name to be set)
+
+  app->GetApplicationSettingsFromRegistery();
+
   // Create the proper default render module.
   // Only the root server processes args.
   if (app->GetUseTiledDisplay())

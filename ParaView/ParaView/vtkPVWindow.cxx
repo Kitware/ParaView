@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.466");
+vtkCxxRevisionMacro(vtkPVWindow, "1.467");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -280,8 +280,6 @@ vtkPVWindow::vtkPVWindow()
   this->PVColorMaps = vtkCollection::New();
 
   this->CenterActorVisibility = 1;
-
-  this->ShowSourcesLongHelp = 1;
 
   this->MenusDisabled = 0;
   this->ToolbarButtonsDisabled = 0;
@@ -1834,40 +1832,6 @@ vtkKWApplicationSettingsInterface* vtkPVWindow::GetApplicationSettingsInterface(
       }
     }
   return this->ApplicationSettingsInterface;
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::SetShowSourcesLongHelp(int v)
-{
-  vtkPVApplicationSettingsInterface *asi = 
-    vtkPVApplicationSettingsInterface::SafeDownCast(
-      this->GetApplicationSettingsInterface());
-  if (asi)
-    {
-    asi->Update();
-    }
-
-  if (this->ShowSourcesLongHelp == v)
-    {
-    return;
-    }
-  this->ShowSourcesLongHelp = v;
-  this->Modified();
-
-  // Update the properties of all the sources previously created
-  // so that the Description label can be removed/brought back.
-  
-  vtkPVSource *pvs;
-  vtkPVSourceCollection *col = this->GetSourceList("Sources");
-  vtkCollectionIterator *cit = col->NewIterator();
-  cit->InitTraversal();
-  while (!cit->IsDoneWithTraversal())
-    {
-    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
-    pvs->UpdateProperties();
-    cit->GoToNextItem();
-    }
-  cit->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -4299,7 +4263,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
   os << indent << "InteractiveRenderEnabled: " 
      << (this->InteractiveRenderEnabled?"on":"off") << endl;
-  os << indent << "ShowSourcesLongHelp: " 
-     << (this->ShowSourcesLongHelp?"on":"off") << endl;
   os << indent << "AnimationInterface: " << this->AnimationInterface << endl;
 }

@@ -342,6 +342,22 @@ public:
   vtkBooleanMacro(AlwaysSSH, int);
   vtkGetMacro(AlwaysSSH, int);
 
+  // Descrition:
+  // Show/Hide the sources long help.
+  virtual void SetShowSourcesLongHelp(int);
+  vtkGetMacro(ShowSourcesLongHelp, int);
+  vtkBooleanMacro(ShowSourcesLongHelp, int);
+
+  // Descrition:
+  // Show/Hide the sources long help.
+  virtual void SetSourcesBrowserAlwaysShowName(int);
+  vtkGetMacro(SourcesBrowserAlwaysShowName, int);
+  vtkBooleanMacro(SourcesBrowserAlwaysShowName, int);
+
+  // Descrition:
+  // Get those application settings that are stored in the registery
+  virtual void GetApplicationSettingsFromRegistery();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -428,6 +444,9 @@ protected:
   //ETX
 
   static vtkPVApplication* MainApplication;  
+
+  int ShowSourcesLongHelp;
+  int SourcesBrowserAlwaysShowName;
 
 private:  
   vtkPVApplication(const vtkPVApplication&); // Not implemented

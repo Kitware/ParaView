@@ -52,7 +52,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWApplicationSettingsInterface.h"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+
+#define VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY "ShowSourcesLongHelp"
+#define VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY    "SourcesBrowserAlwaysShowName"
 
 class vtkKWCheckButton;
 class vtkKWLabeledFrame;

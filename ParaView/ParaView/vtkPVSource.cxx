@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.311");
+vtkCxxRevisionMacro(vtkPVSource, "1.312");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -919,8 +919,8 @@ void vtkPVSource::UpdateDescriptionFrame()
   if (this->LongHelpLabel && this->LongHelpLabel->IsCreated())
     {
     if (this->LongHelp && 
-        !(this->GetPVWindow() && 
-          !this->GetPVWindow()->GetShowSourcesLongHelp())) 
+        !(this->GetPVApplication() && 
+          !this->GetPVApplication()->GetShowSourcesLongHelp())) 
       {
       this->LongHelpLabel->GetLabel2()->SetLabel(this->LongHelp);
       if (this->DescriptionFrame->IsPacked())
