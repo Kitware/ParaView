@@ -48,6 +48,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkVector.txx"
 #include "vtkVectorIterator.txx"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVReaderModule);
+
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
@@ -71,20 +74,6 @@ vtkPVReaderModule::~vtkPVReaderModule()
   this->Extensions->Delete();
   this->Iterator->Delete();
 }
-
-//----------------------------------------------------------------------------
-vtkPVReaderModule* vtkPVReaderModule::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVReaderModule");
-  if(ret)
-    {
-    return (vtkPVReaderModule*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVReaderModule;
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVReaderModule::CreateProperties()

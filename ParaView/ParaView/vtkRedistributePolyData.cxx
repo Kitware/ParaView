@@ -67,9 +67,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // SOFTWARE should be clearly marked, so as not to confuse it with the
 // version available from Los Alamos National Laboratory.
 =========================================================================*/
-
-
 #include "vtkRedistributePolyData.h"
+
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
@@ -94,25 +93,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkMultiProcessController.h"
 
+vtkStandardNewMacro(vtkRedistributePolyData);
+
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, vtkMultiProcessController);
 
 #undef VTK_REDIST_DO_TIMING
 
-
 typedef struct {vtkTimerLog* Timer; float Time;} TimerInfoType;
 TimerInfoType timerInfo8;
-
-vtkRedistributePolyData* vtkRedistributePolyData::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkRedistributePolyData");
-  if(ret)
-    {
-    return (vtkRedistributePolyData*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkRedistributePolyData;
-}
 
 vtkRedistributePolyData::vtkRedistributePolyData()
 {

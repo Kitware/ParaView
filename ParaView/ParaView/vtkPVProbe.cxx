@@ -66,6 +66,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include "vtkTclUtil.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVProbe);
+
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
@@ -195,20 +198,6 @@ vtkPVProbe::~vtkPVProbe()
   this->ScalarArrayMenu = NULL;
   this->SetInputMenu(0);
 }
-
-//----------------------------------------------------------------------------
-vtkPVProbe* vtkPVProbe::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVProbe");
-  if (ret)
-    {
-    return (vtkPVProbe*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVProbe();
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVProbe::SetPVInput(vtkPVData *pvd)

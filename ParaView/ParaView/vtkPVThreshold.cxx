@@ -57,6 +57,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 #include "vtkThreshold.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVThreshold);
+
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
 
@@ -87,18 +90,6 @@ vtkPVThreshold::~vtkPVThreshold()
   this->MinMaxScale = NULL;
   this->AllScalarsCheck->Delete();
   this->AllScalarsCheck = NULL;
-}
-
-//----------------------------------------------------------------------------
-vtkPVThreshold* vtkPVThreshold::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVThreshold");
-  if(ret)
-    {
-    return (vtkPVThreshold*)ret;
-    }
-  return new vtkPVThreshold();
 }
 
 //----------------------------------------------------------------------------

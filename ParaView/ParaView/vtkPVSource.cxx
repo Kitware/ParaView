@@ -62,6 +62,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVSource);
+
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
 			   int argc, char *argv[]);
 
@@ -210,20 +213,6 @@ vtkPVSource::~vtkPVSource()
   this->SetSourceClassName(0);
 
 }
-
-//----------------------------------------------------------------------------
-vtkPVSource* vtkPVSource::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVSource");
-  if(ret)
-    {
-    return (vtkPVSource*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVSource;
-}
-
 
 //----------------------------------------------------------------------------
 void vtkPVSource::SetPVInput(vtkPVData *pvd)

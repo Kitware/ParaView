@@ -49,17 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkPVScale* vtkPVScale::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVScale");
-  if (ret)
-    {
-    return (vtkPVScale*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVScale;
-}
+vtkStandardNewMacro(vtkPVScale);
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()

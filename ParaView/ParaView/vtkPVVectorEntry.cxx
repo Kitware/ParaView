@@ -52,17 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
-vtkPVVectorEntry* vtkPVVectorEntry::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVVectorEntry");
-  if (ret)
-    {
-    return (vtkPVVectorEntry*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVVectorEntry;
-}
+vtkStandardNewMacro(vtkPVVectorEntry);
 
 //---------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()

@@ -67,35 +67,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // SOFTWARE should be clearly marked, so as not to confuse it with the
 // version available from Los Alamos National Laboratory.
 ======================================================================*/
-
-
 #include "vtkWeightedRedistributePolyData.h"
+
 #include "vtkMath.h"
-#include "vtkObjectFactory.h"
 #include "vtkMultiProcessController.h"
+#include "vtkObjectFactory.h"
 
-vtkWeightedRedistributePolyData* vtkWeightedRedistributePolyData::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkWeightedRedistributePolyData");
-  if(ret)
-    {
-    return (vtkWeightedRedistributePolyData*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkWeightedRedistributePolyData;
-}
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkWeightedRedistributePolyData);
 
+//----------------------------------------------------------------------------
 vtkWeightedRedistributePolyData::vtkWeightedRedistributePolyData()
 {
   this->Weights= NULL;
 }
 
+//----------------------------------------------------------------------------
 vtkWeightedRedistributePolyData::~vtkWeightedRedistributePolyData()
 {
   delete [] this->Weights;
 }
 
+//----------------------------------------------------------------------------
 void vtkWeightedRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->vtkRedistributePolyData::PrintSelf(os,indent);

@@ -40,14 +40,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVSelectWidget.h"
-#include "vtkPVApplication.h"
-#include "vtkStringList.h"
-#include "vtkPVWidgetCollection.h"
+
+#include "vtkArrayMap.txx"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkObjectFactory.h"
-#include "vtkArrayMap.txx"
+#include "vtkPVApplication.h"
+#include "vtkPVWidgetCollection.h"
 #include "vtkPVXMLElement.h"
+#include "vtkStringList.h"
+
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVSelectWidget);
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
 		     int argc, char *argv[]);
@@ -84,19 +88,6 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
   this->Widgets->Delete();
   this->Widgets = NULL;
   this->SetEntryLabel(0);
-}
-
-//----------------------------------------------------------------------------
-vtkPVSelectWidget* vtkPVSelectWidget::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVSelectWidget");
-  if(ret)
-    {
-    return (vtkPVSelectWidget*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVSelectWidget;
 }
 
 //----------------------------------------------------------------------------

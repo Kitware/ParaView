@@ -39,22 +39,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include <stdarg.h>
-#include "vtkObjectFactory.h"
 #include "vtkStringList.h"
 
+#include "vtkObjectFactory.h"
+
+#include <stdarg.h>
+
 //----------------------------------------------------------------------------
-vtkStringList* vtkStringList::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkStringList");
-  if(ret)
-    {
-    return (vtkStringList*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkStringList;
-}
+vtkStandardNewMacro(vtkStringList);
 
 //----------------------------------------------------------------------------
 vtkStringList::vtkStringList()

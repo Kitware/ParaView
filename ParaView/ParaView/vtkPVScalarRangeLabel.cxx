@@ -55,17 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
 //----------------------------------------------------------------------------
-vtkPVScalarRangeLabel* vtkPVScalarRangeLabel::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVScalarRangeLabel");
-  if(ret)
-    {
-    return (vtkPVScalarRangeLabel*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVScalarRangeLabel;
-}
+vtkStandardNewMacro(vtkPVScalarRangeLabel);
 
 //----------------------------------------------------------------------------
 int vtkPVScalarRangeLabelCommand(ClientData cd, Tcl_Interp *interp,

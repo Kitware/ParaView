@@ -56,17 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
-vtkPVSelectTimeSet* vtkPVSelectTimeSet::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVSelectTimeSet");
-  if (ret)
-    {
-    return (vtkPVSelectTimeSet*)ret;
-    }
-  // If the factory was unable to create the object, then create it here.
-  return new vtkPVSelectTimeSet;
-}
+vtkStandardNewMacro(vtkPVSelectTimeSet);
 
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()

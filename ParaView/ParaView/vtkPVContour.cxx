@@ -56,6 +56,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVScalarRangeLabel.h"
 #include "vtkPVWindow.h"
 
+//----------------------------------------------------------------------------
+vtkStandardNewMacro(vtkPVContour);
+
+//----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
 
@@ -77,18 +81,6 @@ vtkPVContour::~vtkPVContour()
     this->ArrayMenu->UnRegister(this);
     this->ArrayMenu = NULL;
     }
-}
-
-//----------------------------------------------------------------------------
-vtkPVContour* vtkPVContour::New()
-{
-  // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVContour");
-  if(ret)
-    {
-    return (vtkPVContour*)ret;
-    }
-  return new vtkPVContour;
 }
 
 //----------------------------------------------------------------------------
