@@ -44,8 +44,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWApplication_h
 
 #include "vtkKWObject.h"
-#include "tcl.h" // Needed for Tcl_Interp
-#include "tk.h" // Needed for Tk_Window
+#include "vtkTcl.h" // Needed for Tcl_Interp
+#include "vtkTk.h" // Needed for Tk_Window
 
 class vtkKWLabel;
 class vtkKWRegisteryUtilities;
