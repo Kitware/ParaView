@@ -1,4 +1,7 @@
 #include "vtkTclUtil.h"
+int vtkColorByProcessCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkColorByProcessNewCommand();
 int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkDummyRenderWindowInteractorNewCommand();
@@ -35,6 +38,9 @@ ClientData vtkPVApplicationNewCommand();
 int vtkPVAssignmentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVAssignmentNewCommand();
+int vtkPVColorByProcessCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVColorByProcessNewCommand();
 int vtkPVConeSourceCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVConeSourceNewCommand();
@@ -44,6 +50,9 @@ ClientData vtkPVContourFilterNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
+int vtkPVDataSetToDataSetFilterCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVDataSetToDataSetFilterNewCommand();
 int vtkPVElevationFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVElevationFilterNewCommand();
@@ -83,6 +92,9 @@ ClientData vtkPVSourceNewCommand();
 int vtkPVSourceListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSourceListNewCommand();
+int vtkPVSphereSourceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVSphereSourceNewCommand();
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVWindowNewCommand();
@@ -114,6 +126,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
+  vtkTclCreateNew(interp,"vtkColorByProcess", vtkColorByProcessNewCommand,
+                  vtkColorByProcessCommand);
   vtkTclCreateNew(interp,"vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
                   vtkDummyRenderWindowInteractorCommand);
   vtkTclCreateNew(interp,"vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
@@ -138,12 +152,16 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVApplicationCommand);
   vtkTclCreateNew(interp,"vtkPVAssignment", vtkPVAssignmentNewCommand,
                   vtkPVAssignmentCommand);
+  vtkTclCreateNew(interp,"vtkPVColorByProcess", vtkPVColorByProcessNewCommand,
+                  vtkPVColorByProcessCommand);
   vtkTclCreateNew(interp,"vtkPVConeSource", vtkPVConeSourceNewCommand,
                   vtkPVConeSourceCommand);
   vtkTclCreateNew(interp,"vtkPVContourFilter", vtkPVContourFilterNewCommand,
                   vtkPVContourFilterCommand);
   vtkTclCreateNew(interp,"vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
+  vtkTclCreateNew(interp,"vtkPVDataSetToDataSetFilter", vtkPVDataSetToDataSetFilterNewCommand,
+                  vtkPVDataSetToDataSetFilterCommand);
   vtkTclCreateNew(interp,"vtkPVElevationFilter", vtkPVElevationFilterNewCommand,
                   vtkPVElevationFilterCommand);
   vtkTclCreateNew(interp,"vtkPVExtentTranslator", vtkPVExtentTranslatorNewCommand,
@@ -170,6 +188,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVSourceCommand);
   vtkTclCreateNew(interp,"vtkPVSourceList", vtkPVSourceListNewCommand,
                   vtkPVSourceListCommand);
+  vtkTclCreateNew(interp,"vtkPVSphereSource", vtkPVSphereSourceNewCommand,
+                  vtkPVSphereSourceCommand);
   vtkTclCreateNew(interp,"vtkPVWindow", vtkPVWindowNewCommand,
                   vtkPVWindowCommand);
   return TCL_OK;

@@ -14,6 +14,7 @@ ABSTRACT = \
 vtkInteractorStyleExtent 
 
 CONCRETE = \
+vtkColorByProcess \
 vtkDummyRenderWindowInteractor \
 vtkImageOutlineFilter \
 vtkInteractorStyleCamera \
@@ -26,9 +27,11 @@ vtkKWRenderView \
 vtkPVActorComposite \
 vtkPVApplication \
 vtkPVAssignment \
+vtkPVColorByProcess \
 vtkPVConeSource \
 vtkPVContourFilter \
 vtkPVData \
+vtkPVDataSetToDataSetFilter \
 vtkPVElevationFilter \
 vtkPVExtentTranslator \
 vtkPVGlyph3D \
@@ -42,6 +45,7 @@ vtkPVRenderView \
 vtkPVShrinkPolyData \
 vtkPVSource \
 vtkPVSourceList \
+vtkPVSphereSource \
 vtkPVWindow 
 
 
