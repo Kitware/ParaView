@@ -35,21 +35,15 @@
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkRenderer.h"
+#include "vtkRenderWindow.h"
 #include "vtkFloatArray.h"
 #include "vtkString.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 
-#ifdef _WIN32
-#include "vtkWin32OpenGLRenderWindow.h"
-#else
-#include "vtkOpenGLRenderWindow.h"
-#include "vtkOpenGLRenderer.h"
-#endif
-
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.19");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.20");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
