@@ -115,8 +115,11 @@ protected:
   vtkKWWidgetCollection *Children; 
   int DeletingChildren;
 
-  char *BalloonHelpString;
+  char  *BalloonHelpString;
   int   BalloonHelpJustification;
+  int   BalloonHelpInitialized;
+  void  SetUpBalloonHelpBindings();
+  
 };
 
 

@@ -87,8 +87,14 @@ public:
   // Description: 
   // Set the height of the list box.  If the height is less than or equal to 0,
   // then the height is set to the size of the number of items in the listbox.
-  void SetHeight(int);
+    void SetHeight(int);
 
+  // Description:
+  // Setting this string enables balloon help for this widget.
+  // Override to pass down to children for cleaner behavior
+  virtual void SetBalloonHelpString(const char *str);
+  virtual void SetBalloonHelpJustification( int j );
+    
 protected:
   vtkKWListBox();
   ~vtkKWListBox();
@@ -96,6 +102,10 @@ protected:
   void operator=(const vtkKWListBox&) {};
   char* CurrentSelection;	// store last call of CurrentSelection
   char* Item;			// store last call of GetItem
+  
+  vtkKWWidget *Scrollbar;
+  vtkKWWidget *Listbox;
+  
 };
 
 

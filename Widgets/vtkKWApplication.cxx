@@ -350,6 +350,13 @@ void vtkKWApplication::BalloonHelpTrigger(vtkKWWidget *widget)
 {
   char *result;
 
+  // If there is no help string, return
+  if ( !widget->GetBalloonHelpString() )
+    {
+    this->SetBalloonHelpPending(NULL);
+    return;
+    }
+  
   this->BalloonHelpCancel();
   this->Script("after 2000 {%s BalloonHelpDisplay %s}", 
                this->GetTclName(), widget->GetTclName());
@@ -363,6 +370,13 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
 {
   int x, y;
 
+  // If there is no help string, return
+  if ( !widget->GetBalloonHelpString() )
+    {
+    this->SetBalloonHelpPending(NULL);
+    return;
+    }
+  
   // make sure it is really pending
   this->Script("%s configure -text {%s}", 
                this->BalloonHelpLabel->GetWidgetName(), 
@@ -431,8 +445,8 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
     this->Script("raise %s", this->BalloonHelpWindow->GetWidgetName());
     
     // remove the balloon help if the mouse moves
-    this->Script("bind %s <Motion> {%s BalloonHelpCancel; bind %s <Motion> {} }", 
-                 widget->GetWidgetName(), this->GetTclName(), widget->GetWidgetName() );
+    this->Script("bind %s <Motion> {%s BalloonHelpWithdraw}", 
+                 widget->GetWidgetName(), this->GetTclName() );
     }
   
   this->SetBalloonHelpPending(NULL);
@@ -450,6 +464,12 @@ void vtkKWApplication::BalloonHelpCancel()
   this->Script("wm withdraw %s",this->BalloonHelpWindow->GetWidgetName());
 }
 
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::BalloonHelpWithdraw()
+{
+  this->Script("wm withdraw %s",this->BalloonHelpWindow->GetWidgetName());
+}
 
 //----------------------------------------------------------------------------
 void vtkKWApplication::SetWidgetVisibility(int v)

@@ -52,13 +52,14 @@ int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
 
 vtkKWWidget::vtkKWWidget()
 {
-  this->WidgetName = NULL;
-  this->Parent = NULL;
-  this->CommandFunction = vtkKWWidgetCommand;
-  this->Children = vtkKWWidgetCollection::New();
-  this->DeletingChildren= 0;
-  this->BalloonHelpString = NULL;  
+  this->WidgetName               = NULL;
+  this->Parent                   = NULL;
+  this->CommandFunction          = vtkKWWidgetCommand;
+  this->Children                 = vtkKWWidgetCollection::New();
+  this->DeletingChildren         = 0;
+  this->BalloonHelpString        = NULL;  
   this->BalloonHelpJustification = 0;
+  this->BalloonHelpInitialized   = 0;
 }
 
 vtkKWWidget::~vtkKWWidget()
@@ -144,6 +145,22 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
   this->Script("%s %s %s",name,this->GetWidgetName(),args);
 }
 
+void vtkKWWidget::SetUpBalloonHelpBindings()
+{
+  this->Script("bind %s <Enter> {+%s BalloonHelpTrigger %s}", 
+               this->GetWidgetName(), this->Application->GetTclName(),
+               this->GetTclName());
+  this->Script("bind %s <ButtonPress> {+%s BalloonHelpCancel}", 
+               this->GetWidgetName(), this->Application->GetTclName());
+  this->Script("bind %s <KeyPress> {+%s BalloonHelpCancel}", 
+               this->GetWidgetName(), this->Application->GetTclName());
+  this->Script("bind %s <Leave> {+%s BalloonHelpCancel}", 
+               this->GetWidgetName(), this->Application->GetTclName());
+  this->Script("bind %s <B1-Motion> {+%s BalloonHelpWithdraw}", 
+               this->GetWidgetName(), this->Application->GetTclName());
+}
+
+
 int  vtkKWWidget::GetNetReferenceCount() 
 {
   int childCounts = 0;
@@ -212,29 +229,6 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     return;
     }
 
-  // We do not need to change the bindings if the string is replaced
-  // with another string.
-  if (this->BalloonHelpString == NULL && str != NULL)
-    { // Turning balloon help on.
-    this->Script("bind %s <Enter> {%s BalloonHelpTrigger %s}", 
-                 this->GetWidgetName(), this->Application->GetTclName(),
-                 this->GetTclName());
-    this->Script("bind %s <ButtonPress> {%s BalloonHelpCancel}", 
-                 this->GetWidgetName(), this->Application->GetTclName());
-    this->Script("bind %s <KeyPress> {%s BalloonHelpCancel}", 
-                 this->GetWidgetName(), this->Application->GetTclName());
-    this->Script("bind %s <Leave> {%s BalloonHelpCancel}", 
-                 this->GetWidgetName(), this->Application->GetTclName());
-    }
-  if (this->BalloonHelpString != NULL && str == NULL)
-    { // Turning balloon help off.
-    this->Script("catch {bind %s <Enter> {}}", this->GetWidgetName());
-    this->Script("catch {bind %s <ButtonPress> {}}", this->GetWidgetName());
-    this->Script("catch {bind %s <KeyPress> {}}", this->GetWidgetName());
-    this->Script("catch {bind %s <Motion> {}}", this->GetWidgetName());
-    this->Script("catch {bind %s <Leave> {}}", this->GetWidgetName());
-    }
-
   // Normal string stuff.
   if (this->BalloonHelpString)
     {
@@ -246,13 +240,19 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     this->BalloonHelpString = new char[strlen(str)+1];
     strcpy(this->BalloonHelpString, str);
     }
+  
+  if ( !this->BalloonHelpInitialized )
+    {
+    this->SetUpBalloonHelpBindings();
+    this->BalloonHelpInitialized = 1;
+    }
 }
 
 void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.12 $");
+  this->ExtractRevision(os,"$Revision: 1.13 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()

@@ -52,30 +52,40 @@ vtkKWListBox::vtkKWListBox()
   this->CurrentSelection = 0;
   this->Item = 0; 
   this->CommandFunction = vtkKWListBoxCommand;
+  
+  this->Scrollbar = vtkKWWidget::New();
+  this->Scrollbar->SetParent(this);
+  
+  this->Listbox = vtkKWWidget::New();
+  this->Listbox->SetParent(this);
 }
 
 vtkKWListBox::~vtkKWListBox()
 {
   delete [] this->Item;
   delete [] this->CurrentSelection;
+  
+  this->Scrollbar->Delete();
+  this->Listbox->Delete();
+  
 }
 
 
 int vtkKWListBox::GetNumberOfItems()
 {
-  this->Script("%s.list size", this->GetWidgetName());
+  this->Script("%s size", this->Listbox->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
   return atoi(result);
 }
 
 void vtkKWListBox::DeleteRange(int start, int end)
 {
-  this->Script("%s.list delete %d %d", this->GetWidgetName(), start, end);
+  this->Script("%s delete %d %d", this->Listbox->GetWidgetName(), start, end);
 }
 
 const char* vtkKWListBox::GetItem(int index)
 {
-  this->Script("%s.list get %d", this->GetWidgetName(), index);
+  this->Script("%s get %d", this->Listbox->GetWidgetName(), index);
   char* result = this->Application->GetMainInterp()->result;
   delete [] this->Item;
   this->Item = strcpy(new char[strlen(result)+1], result);
@@ -84,7 +94,7 @@ const char* vtkKWListBox::GetItem(int index)
 
 int vtkKWListBox::GetSelectionIndex()
 {
-  this->Script("%s.list curselection", this->GetWidgetName(),
+  this->Script("%s curselection", this->Listbox->GetWidgetName(),
 	       this->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
   return atoi(result);
@@ -93,8 +103,8 @@ int vtkKWListBox::GetSelectionIndex()
   
 const char *vtkKWListBox::GetSelection()
 {
-  this->Script("%s.list get [%s.list curselection]", this->GetWidgetName(),
-	       this->GetWidgetName());
+  this->Script("%s get [%s curselection]", this->Listbox->GetWidgetName(),
+	       this->Listbox->GetWidgetName());
   char* result = this->Application->GetMainInterp()->result;
   this->CurrentSelection = strcpy(new char[strlen(result)+1], result);
   return this->CurrentSelection;
@@ -103,7 +113,7 @@ const char *vtkKWListBox::GetSelection()
 
 void vtkKWListBox::InsertEntry(int index, const char *name)
 {
-  this->Script("%s.list insert %d {%s}", this->GetWidgetName(), index, name);
+  this->Script("%s insert %d {%s}", this->Listbox->GetWidgetName(), index, name);
 }
 
 
@@ -111,7 +121,7 @@ void vtkKWListBox::InsertEntry(int index, const char *name)
 void vtkKWListBox::SetDoubleClickCallback(vtkKWObject* obj, 
 					  const char* methodAndArgs)
 {
-  this->Script("bind %s.list <Double-1> {%s %s}", this->GetWidgetName(),
+  this->Script("bind %s <Double-1> {%s %s}", this->Listbox->GetWidgetName(),
 	       obj->GetTclName(), methodAndArgs);
 }
 
@@ -154,27 +164,48 @@ void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
   wname = this->GetWidgetName();
   
   this->Script("frame %s ", wname);
-  this->Script("scrollbar %s.scroll -command \"%s.list yview\"", 
-	       wname, wname);
-  this->Script("listbox %s.list  -yscroll \"%s.scroll set\" %s", 
-	       wname, wname, args);
-  this->Script("pack %s.scroll -side right -fill y", wname);
-  this->Script("pack %s.list -side left -expand 1 -fill both", wname);
+  this->Scrollbar->Create( app, "scrollbar", "" );
+  
+  this->Listbox->Create( app, "listbox", args );
+  
+  this->Script( "%s configure -yscroll {%s set}", 
+                this->Listbox->GetWidgetName(),
+                this->Scrollbar->GetWidgetName());
+  
+  this->Script( "%s configure -command {%s yview}", 
+                this->Scrollbar->GetWidgetName(),
+                this->Listbox->GetWidgetName());
+  
+  this->Script("pack %s -side right -fill y", this->Scrollbar->GetWidgetName());
+  this->Script("pack %s -side left -expand 1 -fill both", this->Listbox->GetWidgetName());
 }
 
 
 void vtkKWListBox::SetWidth(int w)
 {
-  this->Script("%s.list configure -width %d", this->GetWidgetName(), w);
+  this->Script("%s configure -width %d", this->Listbox->GetWidgetName(), w);
 }
 
 void vtkKWListBox::SetHeight(int h)
 {
-  this->Script("%s.list configure -height %d", this->GetWidgetName(), h);
+  this->Script("%s configure -height %d", this->Listbox->GetWidgetName(), h);
 }
 
 void vtkKWListBox::DeleteAll()
 {
   int n =  this->GetNumberOfItems();
   this->DeleteRange(0, n);
+}
+
+void vtkKWListBox::SetBalloonHelpString(const char *str)
+{
+  this->Listbox->SetBalloonHelpString( str );
+  this->Scrollbar->SetBalloonHelpString( str );
+}
+
+
+void vtkKWListBox::SetBalloonHelpJustification( int j )
+{
+  this->Listbox->SetBalloonHelpJustification( j );
+  this->Scrollbar->SetBalloonHelpJustification( j );
 }

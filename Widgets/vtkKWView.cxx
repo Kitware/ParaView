@@ -102,6 +102,7 @@ vtkKWView::vtkKWView()
   this->StillUpdateRates = new float[1];
   this->StillUpdateRates[0] = 1.0;
   this->RenderMode = VTK_KW_STILL_RENDER;
+  this->RenderState = 1;
   this->MultiPassStillAbortCheckMethod = NULL;
   this->MultiPassStillAbortCheckMethodArg = NULL;
 
@@ -1045,5 +1046,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.26 $");
+  this->ExtractRevision(os,"$Revision: 1.27 $");
 }

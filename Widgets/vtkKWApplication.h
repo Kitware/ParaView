@@ -113,6 +113,7 @@ public:
   void BalloonHelpTrigger(vtkKWWidget *widget);
   void BalloonHelpDisplay(vtkKWWidget *widget);
   void BalloonHelpCancel();
+  void BalloonHelpWithdraw();
 
   // Description:
   // This variable can be used to hide the user interface.  
