@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.13");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.13.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVMinMax::vtkPVMinMax()
@@ -213,10 +213,10 @@ void vtkPVMinMax::Accept()
 
   if (this->ModifiedFlag)
     {  
-    this->AddTraceEntry("$kw(%s) SetMinValue %f", this->GetTclName(), 
-                         this->MinScale->GetValue());
     this->AddTraceEntry("$kw(%s) SetMaxValue %f", this->GetTclName(), 
                          this->MaxScale->GetValue());
+    this->AddTraceEntry("$kw(%s) SetMinValue %f", this->GetTclName(), 
+                         this->MinScale->GetValue());
     }
 
   pvApp->BroadcastScript("%s %s %f %f",
