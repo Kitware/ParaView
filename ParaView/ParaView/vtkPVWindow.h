@@ -51,8 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // SelectMenu   -> used to select existing data objects
 // GlyphMenu    -> used to select existing glyph objects (cascaded from
 //                 SelectMenu)
-// AdvancedMenu -> for advanced users, contains SourceMenu and FilterMenu,
-//                 buttons for command prompt, exporting VTK scripts...
 // Help         -> Brings up on-line help
 // 
 // @endverbatim
@@ -320,11 +318,11 @@ public:
   void DisableToolbarButton(const char* buttonName);
 
   // Description:
-  // Re-populate the source menu (under Advanced).
+  // Re-populate the source menu.
   void UpdateSourceMenu();
 
   // Description:
-  // Re-populate the filter menu (under Advanced).
+  // Re-populate the filter menu.
   void UpdateFilterMenu();
 
   // Description:
@@ -499,7 +497,6 @@ protected:
   vtkPVRenderView *MainView;
 
   // ParaView specific menus
-  vtkKWMenu *AdvancedMenu;
   vtkKWMenu *SourceMenu;
   vtkKWMenu *FilterMenu;
   vtkKWMenu *SelectMenu;
