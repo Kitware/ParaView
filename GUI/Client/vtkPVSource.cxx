@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.384");
+vtkCxxRevisionMacro(vtkPVSource, "1.385");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkKWNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,InformationGUI,vtkPVInformationGUI);
 vtkCxxSetObjectMacro(vtkPVSource,DisplayGUI,vtkPVDisplayGUI);
@@ -1704,19 +1704,8 @@ void vtkPVSource::DeleteCallback()
   
     if (prev == NULL)
       {
-      // Unpack the properties.  This is required if prev is NULL.
-      //this->Script("catch {eval pack forget [pack slaves %s]}",
-      //             this->Notebook->GetParent()->GetWidgetName());
-      
-      //law int remindme;  // Should we unpack the parameters frame?
-      
       // Show the 3D View settings
-      vtkPVApplication *pvApp = 
-        vtkPVApplication::SafeDownCast(this->GetApplication());
-      vtkPVWindow *iwindow = pvApp->GetMainWindow();
-      this->Script("%s invoke \"%s\"", 
-                   iwindow->GetMenuView()->GetWidgetName(),
-                   VTK_PV_VIEW_MENU_LABEL);
+      window->GetMainView()->ShowViewProperties();
       }
     }
         
