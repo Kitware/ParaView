@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.16");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -592,6 +592,11 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
 {
   this->UpdateFunction(variableName);
 
+  if (this->ScalarVariableExists(variableName, arrayName, component))
+    {
+    return;
+    }
+  
   char** arrayNames = new char *[this->NumberOfScalarVariables];
   char** varNames = new char *[this->NumberOfScalarVariables];
   int* tempComponents = new int[this->NumberOfScalarVariables];
@@ -655,11 +660,34 @@ void vtkPVCalculatorWidget::AddScalarVariable(const char* variableName,
                        this->GetTclName(), variableName, arrayName, component);
 }
 
+int vtkPVCalculatorWidget::ScalarVariableExists(const char *variableName,
+                                                const char *arrayName,
+                                                int component)
+{
+  int i;
+  for (i = 0; i < this->NumberOfScalarVariables; i++)
+    {
+    if (!strcmp(this->ScalarVariableNames[i], variableName) &&
+        !strcmp(this->ScalarArrayNames[i], arrayName) &&
+        this->ScalarComponents[i] == component)
+      {
+      return 1;
+      }
+    }
+  
+  return 0;
+}
+
 void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
                                              const char* arrayName)
 {
   this->UpdateFunction(variableName);
 
+  if (this->VectorVariableExists(variableName, arrayName))
+    {
+    return;
+    }
+  
   char** arrayNames = new char *[this->NumberOfVectorVariables];
   char** varNames = new char *[this->NumberOfVectorVariables];
   int i;
@@ -712,6 +740,20 @@ void vtkPVCalculatorWidget::AddVectorVariable(const char* variableName,
                        this->GetTclName(), variableName, arrayName);
 }
 
+int vtkPVCalculatorWidget::VectorVariableExists(const char *variableName,
+                                                const char *arrayName)
+{
+  int i;
+  for (i = 0; i < this->NumberOfVectorVariables; i++)
+    {
+    if (!strcmp(this->VectorVariableNames[i], variableName) &&
+        !strcmp(this->VectorArrayNames[i], arrayName))
+      {
+      return 1;
+      }
+    }
+  return 0;
+}
 
 //---------------------------------------------------------------------------
 void vtkPVCalculatorWidget::Trace(ofstream *file)

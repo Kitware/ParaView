@@ -164,6 +164,10 @@ protected:
   char *LastAcceptedFunction;
   vtkSetStringMacro(LastAcceptedFunction);
 
+  int ScalarVariableExists(const char *variableName, const char *arrayName,
+                           int component);
+  int VectorVariableExists(const char *variableName, const char *arrayName);
+  
   char **ScalarArrayNames;
   char **ScalarVariableNames;
   int *ScalarComponents;
