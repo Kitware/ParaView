@@ -47,15 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef __vtkPVArraySelection_h
 #define __vtkPVArraySelection_h
 
-#include "vtkDataSet.h"
-#include "vtkKWLabel.h"
 #include "vtkPVWidget.h"
-#include "vtkKWLabeledFrame.h"
 
 class vtkKWRadioButton;
 class vtkPVData;
 class vtkKWPushButton;
 class vtkCollection;
+class vtkKWLabeledFrame;
 
 class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 {

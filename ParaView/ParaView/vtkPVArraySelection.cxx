@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVArraySelection.h"
+
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
 #include "vtkKWPushButton.h"
@@ -48,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
 #include "vtkPVXMLElement.h"
+#include "vtkKWLabeledFrame.h"
 
 //----------------------------------------------------------------------------
 vtkPVArraySelection* vtkPVArraySelection::New()
