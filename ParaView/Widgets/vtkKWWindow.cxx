@@ -58,6 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
 #include "vtkKWWidgetCollection.h"
+#include "vtkKWLoadSaveDialog.h"
 
 vtkSetObjectImplementationMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
@@ -955,7 +956,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.72 $");
+  this->ExtractRevision(os,"$Revision: 1.73 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1200,6 +1201,64 @@ int vtkKWWindow::GetIntRegisteryValue(int level, const char* subkey,
     }
   return res;
 }
+void vtkKWWindow::SaveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
+{
+  //  "OpenDirectory"
+  if ( dialog->GetLastPath() )
+    {
+    this->SetRegisteryValue(1, "RunTime", key, dialog->GetLastPath());
+    }
+}
+
+void vtkKWWindow::RetrieveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
+{
+  char buffer[1024];
+  if ( this->GetRegisteryValue(1, "RunTime", key, buffer) )
+    {
+    if ( *buffer )
+      {
+      dialog->SetLastPath( buffer );
+      }  
+    }
+}
+
+void vtkKWWindow::SaveColor(int level, const char* key, float rgb[3])
+{
+  this->SetRegisteryValue(level, "RunTime", key, "Color: %f %f %f",
+			  rgb[0], rgb[1], rgb[2]);
+}
+
+void vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
+{
+  char buffer[1024];
+  rgb[0] = -1;
+  rgb[1] = -1;
+  rgb[2] = -1;
+
+  if ( this->GetRegisteryValue(level, "RunTime", key, buffer) )
+    {
+    if ( *buffer )
+      {      
+      sscanf(buffer, "Color: %f %f %f", rgb, rgb+1, rgb+2);
+      }
+    }
+}
+
+int vtkKWWindow::BooleanRegisteryCheck(int level, const char* key, 
+				       const char* trueval)
+{
+  char buffer[1024];
+  int allset = 0;
+  if ( this->GetRegisteryValue(level, "RunTime", key, buffer) )
+    {
+    if ( !strncmp(buffer+1, trueval+1, strlen(trueval)-1) )
+      {
+      allset = 1;
+      }
+    }
+  return allset;
+}
+
 
 void vtkKWWindow::WarningMessage(const char* message)
 {
@@ -1217,3 +1276,4 @@ void vtkKWWindow::ErrorMessage(const char* message)
 				   "VTK Error",
 				   message);
 }
+
