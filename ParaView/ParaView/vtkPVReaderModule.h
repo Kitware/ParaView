@@ -145,6 +145,7 @@ protected:
   int ClonePrototype(int makeCurrent, vtkPVReaderModule*& clone);
 
   int PackFileEntry;
+  int AddFileEntry;
 
 private:
   vtkPVReaderModule(const vtkPVReaderModule&); // Not implemented

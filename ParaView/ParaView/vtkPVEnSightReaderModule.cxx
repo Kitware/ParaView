@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.22");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.23");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -495,7 +495,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   char *tclName, *outputTclName, *connectionTclName;
   vtkDataSet *d;
   vtkPVData *pvd = 0;
-  vtkPVSource *pvs = 0;
+  vtkPVEnSightReaderModule *pvs = 0;
   int numOutputs, i;
 
   if (!window)
@@ -723,6 +723,8 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
 
   // Create the main reader source.
   pvs = vtkPVEnSightReaderModule::New();
+  pvs->AddFileEntry = 0;
+  pvs->PackFileEntry = 0;
   pvs->SetParametersParent(window->GetMainView()->GetSourceParent());
   pvs->SetApplication(pvApp);
   pvs->SetVTKSource(reader, tclName);
