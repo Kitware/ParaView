@@ -32,7 +32,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.24");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.25");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -92,6 +92,9 @@ void vtkPVDataInformation::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Name: NULL\n";
     }
+
+  os << indent << "DataClassName: " 
+     << (this->DataClassName?this->DataClassName:"(none)") << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -20,7 +20,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMNumberOfPartsDomain);
-vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMNumberOfPartsDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMNumberOfPartsDomain::vtkSMNumberOfPartsDomain()
@@ -138,4 +138,6 @@ int vtkSMNumberOfPartsDomain::ReadXMLAttributes(
 void vtkSMNumberOfPartsDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+
+  os << indent << "PartMultiplicity: " << this->PartMultiplicity << endl;
 }

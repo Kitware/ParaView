@@ -23,7 +23,7 @@
 #include "vtkSMSourceProxy.h"
 
 vtkStandardNewMacro(vtkSMInputArrayDomain);
-vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMInputArrayDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMInputArrayDomain::vtkSMInputArrayDomain()
@@ -189,5 +189,7 @@ int vtkSMInputArrayDomain::ReadXMLAttributes(
 void vtkSMInputArrayDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-
+  
+  os << indent << "NumberOfComponents: " << this->NumberOfComponents << endl;
+  os << indent << "AttributeType: " << this->AttributeType << endl;
 }
