@@ -58,27 +58,27 @@ public:
   // Description:
   // Retrieve the index of the element.
   // This method returns VTK_OK if key was retrieved correctly.
-  virtual int GetKey(vtkIdType&);
+  int GetKey(vtkIdType&);
 
   // Description:
   // Retrieve the data from the iterator. 
   // This method returns VTK_OK if key was retrieved correctly.
-  virtual int GetData(DType&);
+  int GetData(DType&);
 
   // Description:
   // Initialize the traversal of the container. 
   // Set the iterator to the "beginning" of the container.
-  virtual void InitTraversal();
+  void InitTraversal();
 
   // Description:
   // Check if the iterator is at the end of the container. Return 
   // VTK_OK if it is.
-  virtual int IsDoneWithTraversal();
+  int IsDoneWithTraversal();
 
   // Description:
   // Increment the iterator to the next location.
   // Return VTK_OK if everything is ok.
-  virtual int GoToNextItem();
+  int GoToNextItem();
 
 
 protected:
