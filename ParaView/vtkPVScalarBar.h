@@ -40,6 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVMenuButton.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWScale.h"
 
 class VTK_EXPORT vtkPVScalarBar : public vtkKWComposite
 {
@@ -96,6 +97,12 @@ public:
   // This method is a callback from the entry box that controls the
   // title of the PVScalarBar.
   void SetScalarBarTitle();
+
+  // Description:
+  // These methods are callbacks from the sliders that control the
+  // height and width of the PVScalarBar.
+  void SetScalarBarHeight();
+  void SetScalarBarWidth();
   
 protected:
   vtkPVScalarBar();
@@ -110,6 +117,8 @@ protected:
   vtkPVMenuButton *OrientationMenu;
   vtkKWCheckButton *VisibilityButton;
   vtkKWLabeledEntry *TitleEntry;
+  vtkKWScale *WidthScale;
+  vtkKWScale *HeightScale;
   vtkKWWidget *Properties;
   
   // The vtkPVData object that owns this vtkPVScalarBar object.

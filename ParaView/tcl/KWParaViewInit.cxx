@@ -104,6 +104,9 @@ ClientData vtkPVRenderViewNewCommand();
 int vtkPVRunTimeContourCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRunTimeContourNewCommand();
+int vtkPVScalarBarCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVScalarBarNewCommand();
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSelectionListNewCommand();
@@ -223,6 +226,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVRenderViewCommand);
   vtkTclCreateNew(interp,"vtkPVRunTimeContour", vtkPVRunTimeContourNewCommand,
                   vtkPVRunTimeContourCommand);
+  vtkTclCreateNew(interp,"vtkPVScalarBar", vtkPVScalarBarNewCommand,
+                  vtkPVScalarBarCommand);
   vtkTclCreateNew(interp,"vtkPVSelectionList", vtkPVSelectionListNewCommand,
                   vtkPVSelectionListCommand);
   vtkTclCreateNew(interp,"vtkPVSource", vtkPVSourceNewCommand,

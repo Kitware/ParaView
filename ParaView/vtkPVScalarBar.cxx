@@ -41,15 +41,14 @@ vtkPVScalarBar::vtkPVScalarBar()
 {
   this->CommandFunction = vtkPVScalarBarCommand;
   this->ScalarBar = vtkScalarBarActor::New();
-  this->ScalarBar->GetPositionCoordinate()->
-    SetCoordinateSystemToNormalizedViewport();
-  this->ScalarBar->GetPositionCoordinate()->
-    SetValue(0.9, 0.1);
   this->ScalarBar->SetWidth(0.06);
+  
   this->DataNotebookButton = vtkKWPushButton::New();
   this->OrientationMenu = vtkPVMenuButton::New();
   this->VisibilityButton = vtkKWCheckButton::New();
   this->TitleEntry = vtkKWLabeledEntry::New();
+  this->WidthScale = vtkKWScale::New();
+  this->HeightScale = vtkKWScale::New();
   this->Properties = vtkKWWidget::New();
   this->PVData = NULL;
   this->Visibility = 1;
@@ -70,6 +69,10 @@ vtkPVScalarBar::~vtkPVScalarBar()
   this->TitleEntry = NULL;
   this->ScalarBar->Delete();
   this->ScalarBar = NULL;
+  this->WidthScale->Delete();
+  this->WidthScale = NULL;
+  this->HeightScale->Delete();
+  this->HeightScale = NULL;
   this->Properties->Delete();
   this->Properties = NULL;
 }
@@ -136,12 +139,35 @@ void vtkPVScalarBar::CreateProperties()
   this->Script("bind %s <KeyPress-Return> {%s SetScalarBarTitle}",
                 this->TitleEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
+
+  this->WidthScale->SetParent(this->Properties);
+  this->WidthScale->Create(this->Application, "-showvalue 1");
+  this->WidthScale->DisplayLabel("Width");
+  this->WidthScale->SetRange(0.0, 1.0);
+  this->WidthScale->SetValue(this->ScalarBar->GetWidth());
+  vtkErrorMacro("width: " << this->WidthScale->GetValue());
+  this->WidthScale->SetResolution(0.01);
+  this->WidthScale->SetCommand(this, "SetScalarBarWidth");
+  
+  this->HeightScale->SetParent(this->Properties);
+  this->HeightScale->Create(this->Application, "-showvalue 1");
+  this->HeightScale->DisplayLabel("Height");
+  this->HeightScale->SetRange(0.0, 1.0);
+  this->HeightScale->SetValue(this->ScalarBar->GetHeight());
+  vtkErrorMacro("height: " << this->HeightScale->GetValue());
+  this->HeightScale->SetResolution(0.01);
+  this->HeightScale->SetCommand(this, "SetScalarBarHeight");
+
+  vtkErrorMacro("Initial Height: " << this->HeightScale->GetValue());
   
   this->Script("pack %s %s %s %s",
                this->DataNotebookButton->GetWidgetName(),
                this->OrientationMenu->GetWidgetName(),
                this->VisibilityButton->GetWidgetName(),
                this->TitleEntry->GetWidgetName());
+  this->Script("pack %s %s -fill x",
+               this->WidthScale->GetWidgetName(),
+               this->HeightScale->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -168,6 +194,21 @@ void vtkPVScalarBar::ShowProperties()
 vtkProp *vtkPVScalarBar::GetProp()
 {
   return this->ScalarBar;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScalarBar::SetScalarBarWidth()
+{
+  this->ScalarBar->SetWidth(this->WidthScale->GetValue());
+  this->GetView()->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVScalarBar::SetScalarBarHeight()
+{
+  vtkErrorMacro("New Height: " << this->HeightScale->GetValue());
+  this->ScalarBar->SetHeight(this->HeightScale->GetValue());
+  this->GetView()->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -218,7 +259,12 @@ void vtkPVScalarBar::SetOrientationToHorizontal()
       SetValue((1.0 - pos[0])/2.0, pos[1]);
     tmp = this->ScalarBar->GetHeight();
     this->ScalarBar->SetHeight(this->ScalarBar->GetWidth());
+
+    vtkErrorMacro("Change1 slider to : " << this->ScalarBar->GetHeight());
+
+    this->HeightScale->SetValue(this->ScalarBar->GetHeight());
     this->ScalarBar->SetWidth(tmp);
+    this->WidthScale->SetValue(this->ScalarBar->GetWidth());
     this->ScalarBar->SetOrientationToHorizontal();
     this->GetView()->Render();
     }
@@ -239,7 +285,12 @@ void vtkPVScalarBar::SetOrientationToVertical()
       SetValue(1.0 - 2*pos[0], pos[1]);
     tmp = this->ScalarBar->GetHeight();
     this->ScalarBar->SetHeight(this->ScalarBar->GetWidth());
+
+    vtkErrorMacro("Change2 slider to : " << this->ScalarBar->GetHeight());
+    
+    this->HeightScale->SetValue(this->ScalarBar->GetHeight());
     this->ScalarBar->SetWidth(tmp);
+    this->WidthScale->SetValue(this->ScalarBar->GetWidth());
     this->ScalarBar->SetOrientationToVertical();
     this->GetView()->Render();
     }
