@@ -132,7 +132,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.3");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.4");
 
 
 //----------------------------------------------------------------------------
@@ -421,7 +421,13 @@ void vtkPVClientServerModule::ConnectToRemote()
     {
     start = 1;
     }
-  while (!comm->ConnectTo(this->HostName, this->Port))
+  int port = this->Port;
+  if(this->RenderServerMode && !this->ClientMode)
+    {
+    port = this->RenderServerPort;
+    }
+  cout << "Connect to " << this->HostName << ":" << port << endl;
+  while (!comm->ConnectTo(this->HostName, port))
     {  
     // Do not bother trying to start the client if reverse connection is specified.
     // only try the ConnectTo once if it is a server in reverse mode
@@ -430,7 +436,7 @@ void vtkPVClientServerModule::ConnectToRemote()
       // This is the "reverse-connection" server condition.  
       // For now just fail if connection is not found.
       vtkErrorMacro("Server error: Could not connect to the client. " 
-                    << this->HostName << " " << this->Port);
+                    << this->HostName << " " << port);
       comm->Delete();
       commRenderServer->Delete();
       if(this->GUIHelper)
@@ -480,6 +486,8 @@ void vtkPVClientServerModule::ConnectToRemote()
   
   if(this->ClientMode && this->RenderServerMode)
     {
+    cout << "Connect to " << this->RenderServerHostName << ":" 
+         << this->RenderServerPort << endl;
     if(commRenderServer->ConnectTo(this->RenderServerHostName, this->RenderServerPort))
       {
       this->RenderServerSocket = vtkSocketController::New();
@@ -516,16 +524,32 @@ void vtkPVClientServerModule::ConnectToRemote()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SetupWaitForConnection()
 {
+  int needTwoSockets = 0;
+  if(this->RenderServerMode && this->ClientMode)
+    {
+    needTwoSockets = 1;
+    this->RenderServerSocket = vtkSocketController::New();
+    }
+  
   this->SocketController = vtkSocketController::New();
   this->SocketController->Initialize();
   this->ProgressHandler->SetSocketController(this->SocketController);
   vtkSocketCommunicator* comm = vtkSocketCommunicator::New();
-  
+  vtkSocketCommunicator* comm2 = 0;
+  int sock2 = 0;
+  if(needTwoSockets)
+    {
+    comm2 = vtkSocketCommunicator::New();
+    cout << "Listen on port: " << this->GetRenderServerPort() << endl;
+    sock2 = comm2->OpenSocket(this->GetRenderServerPort());
+    }
   int port= this->GetPort();
-  if(this->RenderServerMode)
+  if((!needTwoSockets && this->RenderServerMode) ||
+     (!this->ClientMode && this->RenderServerMode))
     {
     port = this->GetRenderServerPort();
     }
+  cout << "Listen on port: " << port << endl;
   int sock = comm->OpenSocket(port);
   if ( this->ClientMode )
     {
@@ -548,6 +572,20 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     this->ReturnValue = 1;
     return;
     }
+  cout << "connected to port " << port << "\n";
+    // Establish connection
+  if (comm2 && !comm2->WaitForConnectionOnSocket(sock2))
+    {
+    vtkErrorMacro("Wait timed out or could not initialize render server socket.");
+    comm->Delete();
+    this->ReturnValue = 1;
+    return;
+    }
+  if(comm2)
+    {
+    cout << "connected to port " << this->GetRenderServerPort() << "\n";
+    }
+  
   if ( this->ClientMode )
     {
     cout << "Server connected." << endl;
@@ -557,8 +595,14 @@ void vtkPVClientServerModule::SetupWaitForConnection()
     cout << "Client connected." << endl;
     }
   this->SocketController->SetCommunicator(comm);
+  if(comm2)
+    {
+    this->RenderServerSocket->SetCommunicator(comm2);
+    comm2->Delete();
+    comm2 = 0;
+    }
   comm->Delete();
-  comm = NULL;
+  comm = 0;
 }
 
 
