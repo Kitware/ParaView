@@ -105,6 +105,10 @@ void vtkPVComponentSelection::Create(vtkKWApplication *pvApp,
     button->SetState(1);
     sprintf(compId, "%d", i);
     button->SetText(compId);
+    if (help)
+      {
+      button->SetBalloonHelpString(help);
+      }
     this->CheckButtons->AddItem(button);
     this->Script("pack %s", button->GetWidgetName());
     button->Delete();
