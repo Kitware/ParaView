@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.146");
+vtkCxxRevisionMacro(vtkPVData, "1.147");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1600,15 +1600,24 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
 //----------------------------------------------------------------------------
 void vtkPVData::SetColorRange(float min, float max)
 {
+  if (this->PVColorMap == NULL)
+    {
+    vtkErrorMacro("Color map is missing.");
+    }
+
   if ( this->ColorRangeMinEntry->GetValueAsFloat() == min &&
        this->ColorRangeMaxEntry->GetValueAsFloat() == max )
     {
     return;
     }
-  this->SetColorRange(min, max);
+  this->PVColorMap->SetScalarRange(min, max);
+
+  this->ColorRangeMinEntry->SetValue(min, 5);
+  this->ColorRangeMaxEntry->SetValue(max, 5);
 }
 
 //----------------------------------------------------------------------------
+// Hack for now.
 void vtkPVData::SetColorRangeInternal(float min, float max)
 {
   if (this->PVColorMap == NULL)
@@ -2814,7 +2823,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.146 $");
+  this->ExtractRevision(os,"$Revision: 1.147 $");
 }
 
 //----------------------------------------------------------------------------
