@@ -144,7 +144,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.55");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.56");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -765,7 +765,7 @@ void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
 
 const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
 {
-  return this->Interpreter->GetLastResult();
+  return this->Superclass::GetLastServerResult();
 }
 
 const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
