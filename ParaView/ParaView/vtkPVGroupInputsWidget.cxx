@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.18");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -153,7 +153,7 @@ void vtkPVGroupInputsWidget::Inactivate()
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
 {
-  int num, idx, count;
+  int num, idx;
   int state;
   vtkPVWindow *pvWin;
   vtkPVSourceCollection *sources;
@@ -164,7 +164,6 @@ void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
   sources->InitTraversal();
 
   num = this->PartSelectionList->GetNumberOfItems();
-  count = 0;
 
   vtkPVApplication *pvApp = this->GetPVApplication();
 
@@ -177,9 +176,6 @@ void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
   this->Inputs->RemoveAllItems();
 
   // Now loop through the input mask setting the selection states.
-  pvApp->GetProcessModule()->GetStream() << 
-    vtkClientServerStream::Invoke << vtkSourceID << "RemoveAllInputs" << 
-    vtkClientServerStream::End;
   pvApp->GetProcessModule()->SendStreamToServer();
   this->PVSource->RemoveAllPVInputs();  
   sources->InitTraversal();
@@ -197,7 +193,7 @@ void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
       // Keep a list of selected inputs for later use.
       this->Inputs->AddItem(pvs);
 
-      this->PVSource->SetPVInput(count++, pvs);
+      this->PVSource->AddPVInput(pvs);
       // SetPVinput does all this for us.
       // Special replace input feature.
       // Visibility of ALL selected input turned off.
