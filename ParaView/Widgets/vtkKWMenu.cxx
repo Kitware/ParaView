@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMenu );
-vtkCxxRevisionMacro(vtkKWMenu, "1.28.2.2");
+vtkCxxRevisionMacro(vtkKWMenu, "1.28.2.3");
 
 
 
@@ -182,48 +182,130 @@ void vtkKWMenu::InsertGeneric(int position, const char* addtype,
 }
 
 //------------------------------------------------------------------------------
-void vtkKWMenu::AddCascade(const char* label, vtkKWMenu* menu, 
-                           int underline, const char* help)
+void vtkKWMenu::AddCascade(const char* label, 
+                           vtkKWMenu* menu, 
+                           int underline, 
+                           const char* help)
 {
   ostrstream str;
-  str << this->GetWidgetName() << " add cascade -label \"" << label << "\"";
-  if ( menu )
-    {
-    str << " -menu " << menu->GetWidgetName();
-    }
-  str << " -underline " << underline << ends;
+  str << this->GetWidgetName() << " add cascade -label {" << label << "}"
+      << " -underline " << underline << ends;
   this->Application->SimpleScript(str.str());
   delete [] str.str();
+
   if(!help)
     {
     help = label;
     }
-  this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
-               label, help);
+  this->Script("set {%sHelpArray(%s)} {%s}", 
+               this->GetTclName(), label, help);
 
+  this->SetCascade(label, menu);
 }
-
-
 
 //------------------------------------------------------------------------------
 void  vtkKWMenu::InsertCascade(int position, 
                                const char* label, 
                                vtkKWMenu* menu, 
-                               int underline, const char* help)
+                               int underline, 
+                               const char* help)
 {
   ostrstream str;
   
   str << this->GetWidgetName() << " insert " << position 
-      << " cascade -label \"" << label << "\" -menu " 
-      << menu->GetWidgetName() << " -underline " << underline << ends;
+      << " cascade -label {" << label << "} -underline " << underline << ends;
   this->Application->SimpleScript(str.str());
   delete [] str.str();
+
   if(!help)
     {
     help = label;
     }
-  this->Script("set {%sHelpArray(%s)} {%s}", this->GetTclName(), 
-               label, help);
+  this->Script("set {%sHelpArray(%s)} {%s}", 
+               this->GetTclName(), label, help);
+
+  this->SetCascade(label, menu);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetCascade(int index, const char* menu)
+{
+  if (!menu)
+    {
+    return;
+    }
+
+  const char *wname = this->GetWidgetName();
+
+  ostrstream str;
+  str << wname << " entryconfigure " << index;
+
+  // The cascade menu has to be a child 
+  // (i.e. the parent + '.' + at least a letter)
+  // If not, clone it.
+
+  int parent_length = strlen(wname);
+  int child_length = strlen(menu);
+
+  if (child_length < (parent_length + 2) || 
+      strncmp(wname, menu, parent_length) ||
+      menu[parent_length] != '.')
+    {
+    ostrstream clone_menu;
+    clone_menu << wname << ".clone_";
+    this->Script("string trim [%s entrycget %d -label]",  wname, index);
+    const char *res = this->GetApplication()->GetMainInterp()->result;
+    if (res && *res)
+      {
+      clone_menu << res;
+      }
+    else
+      {
+      clone_menu << index;
+      }
+    clone_menu << ends;
+    this->Script("catch { destroy %s } \n %s clone %s", 
+                 clone_menu.str(), menu, clone_menu.str());
+    str << " -menu {" << clone_menu.str() << "}" << ends;
+    clone_menu.rdbuf()->freeze(0); 
+    }
+  else
+    {
+    str << " -menu {" << menu << "}" << ends;
+    }
+
+  this->Script(str.str());
+  str.rdbuf()->freeze(0); 
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetCascade(int index, vtkKWMenu* menu)
+{
+  if (!menu)
+    {
+    return;
+    }
+  this->SetCascade(index, menu->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetCascade(const char* item, vtkKWMenu* menu)
+{
+  if (!menu )
+    {
+    return;
+    }
+  this->SetCascade(this->GetIndex(item), menu->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWMenu::SetCascade(const char* item, const char* menu)
+{
+  if (!menu )
+    {
+    return;
+    }
+  this->SetCascade(this->GetIndex(item), menu);
 }
 
 //------------------------------------------------------------------------------
@@ -685,51 +767,6 @@ void vtkKWMenu::SetEntryCommand(int index, vtkKWObject* object,
       << " " << MethodAndArgString << "}" << ends;
   this->Script(str.str());
   str.rdbuf()->freeze(0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(int index, vtkKWMenu* menu)
-{
-  if ( !menu)
-    {
-    return;
-    }
-  this->SetCascade(index, menu->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(int index, const char* menu)
-{
-  if ( !menu)
-    {
-    return;
-    }
-  ostrstream str;
-  str << this->GetWidgetName() << " entryconfigure "
-      << index << " -menu {" << menu << "}" << ends;
-  //cout << "Set cascade to: [" << str.str() << "]" << endl;
-  this->Script(str.str());
-  str.rdbuf()->freeze(0); 
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(const char* item, vtkKWMenu* menu)
-{
-  if ( !menu )
-    {
-    return;
-    }
-  this->SetCascade(this->GetIndex(item), menu->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
-void vtkKWMenu::SetCascade(const char* item, const char* menu)
-{
-  if ( !menu )
-    {
-    return;
-    }
-  this->SetCascade(this->GetIndex(item), menu);
 }
 
 //----------------------------------------------------------------------------
