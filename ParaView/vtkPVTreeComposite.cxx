@@ -56,6 +56,7 @@ vtkPVTreeComposite* vtkPVTreeComposite::New()
 }
 
 
+#undef VTK_USE_MPI
 //#########################################################################
 // If we are not using MPI, just stub out this class so the supper class
 // will do every thing.
