@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.23");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.24");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -83,7 +83,7 @@ void vtkPVScalarRangeLabel::Update()
   vtkSMDoubleRangeDomain* dom = 0;
   if (prop)
     {
-    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("range"));
+    dom = vtkSMDoubleRangeDomain::SafeDownCast(prop->GetDomain("scalar_range"));
     }
   if (!prop || !dom)
     {
