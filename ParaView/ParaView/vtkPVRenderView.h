@@ -260,9 +260,12 @@ public:
   // Get the widget that controls the interactor styles.
   vtkGetObjectMacro(ManipulatorControl3D, vtkPVInteractorStyleControl);
   vtkGetObjectMacro(ManipulatorControl2D, vtkPVInteractorStyleControl);
+
+  // Description:
+  // Get the size of the render window.
+  int* GetRenderWindowSize();
     
 protected:
-
   vtkPVRenderView();
   ~vtkPVRenderView();
 

@@ -1551,6 +1551,16 @@ void vtkPVRenderView::AddActorsToTclScript(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
+int* vtkPVRenderView::GetRenderWindowSize()
+{
+  if ( this->GetRenderWindow() )
+    {
+    return this->GetRenderWindow()->GetSize();
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
