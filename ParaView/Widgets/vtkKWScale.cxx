@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.40");
+vtkCxxRevisionMacro(vtkKWScale, "1.41");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -180,6 +180,7 @@ vtkKWScale::~vtkKWScale()
     }
   
   this->SetShortLabel(NULL);
+  this->SetNormalLabel(NULL);
 }
 
 // ---------------------------------------------------------------------------
