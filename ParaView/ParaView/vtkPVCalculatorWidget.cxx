@@ -69,7 +69,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.10");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -1008,6 +1008,12 @@ void vtkPVCalculatorWidget::ClearAllVariables()
 void vtkPVCalculatorWidget::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVCalculatorWidget::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

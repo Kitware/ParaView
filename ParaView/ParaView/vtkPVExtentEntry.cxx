@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.27");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.28");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -563,6 +563,12 @@ void vtkPVExtentEntry::SetProperty(vtkPVWidgetProperty *prop)
     this->Property->SetVTKCommands(1, &cmd, &numScalars);
     delete [] cmd;
     }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVExtentEntry::GetProperty()
+{
+  return this->Property;
 }
 
 //-----------------------------------------------------------------------------

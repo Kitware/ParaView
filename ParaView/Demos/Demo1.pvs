@@ -835,10 +835,11 @@ proc extract_init {} {
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp598)
     set extract(vtkTemp780) [$extract(vtkTemp1) CreatePVSource Glyph]
     set extract(vtkTemp795) [$extract(vtkTemp780) GetPVWidget {Orient}]
-    set extract(vtkTemp794) [$extract(vtkTemp795) GetPVWidget {Vector}]
+    set extract(vtkTemp794) [$extract(vtkTemp780) GetPVWidget {Vectors}]
     $extract(vtkTemp794) SetValue {Momentum}
     set extract(vtkTemp799) [$extract(vtkTemp780) GetPVWidget {Scale Mode}]
-    $extract(vtkTemp799) SetCurrentValue {Data Scaling Off}
+    #Data Scaling Off
+    $extract(vtkTemp799) SetCurrentValue 3
     set extract(vtkTemp143) [$extract(vtkTemp1) GetPVSource GlyphSources Arrow0]
     set extract(vtkTemp804) [$extract(vtkTemp780) GetPVWidget {Glyph}]
     $extract(vtkTemp804) SetCurrentValue $extract(vtkTemp143)
@@ -1361,7 +1362,10 @@ proc iso_run {} {
     $iso(vtkTemp1032) SetTimeStart 0.0
     $iso(vtkTemp1032) SetTimeEnd 29.0
     $Application BroadcastSimpleScript "set iso_tcl_name [$iso(vtkTemp739) GetVTKSourceTclName]"
-    $iso(vtkTemp1032) SetLabelAndScript {Y Axis} {$iso_tcl_name SetVOI 0 29 [expr int($pvTime)] [expr int($pvTime)] 0 29}
+#    $iso(vtkTemp1032) SetLabelAndScript {Y Axis} {$iso_tcl_name SetVOI 0 29 [expr int($pvTime)] [expr int($pvTime)] 0 29}
+    $iso(vtkTemp1032) SetLabelAndScript {Y Axis} {}
+    $iso(vtkTemp1032) SetCurrentProperty [$iso(vtkTemp756) GetProperty]
+    $iso(vtkTemp756) SetAnimationAxis 1
     $iso(vtkTemp106) SetCurrentTime 0
     $iso(vtkTemp1032) SetTimeEnd 29.000000
     $iso(vtkTemp106) SetCurrentTime 1; after 100

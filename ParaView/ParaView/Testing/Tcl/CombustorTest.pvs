@@ -89,7 +89,8 @@ $pvGlyph AcceptCallback
 set GlyphScaleEntry [$pvGlyph GetPVWidget {Scale Factor}]
 $GlyphScaleEntry SetValue 3.0
 set GlyphScaleMode [$pvGlyph GetPVWidget {Scale Mode}]
-$GlyphScaleMode SetCurrentValue "Scalar"
+#Scalar
+$GlyphScaleMode SetCurrentValue 0
 $pvGlyph AcceptCallback
 [$pvGlyph GetPVOutput] SetVisibility 0
 

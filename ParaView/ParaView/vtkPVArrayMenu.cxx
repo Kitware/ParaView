@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.44");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.45");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -447,7 +447,10 @@ void vtkPVArrayMenu::ResetInternal()
     this->SetSelectedComponent(static_cast<int>(this->Property->GetScalar(0)));
     }
 
-  this->ModifiedFlag = 0;
+  if (this->AcceptCalled)
+    {
+    this->ModifiedFlag = 0;
+    }
   this->Update();
 }
 
@@ -851,6 +854,12 @@ const char* vtkPVArrayMenu::GetLabel()
 void vtkPVArrayMenu::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVArrayMenu::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

@@ -55,8 +55,6 @@ set kw(vtkTemp400) [$kw(vtkTemp1) CreatePVSource Glyph]
 set kw(vtkTemp142) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp427) [$kw(vtkTemp400) GetPVWidget {Glyph}]
 $kw(vtkTemp427) SetCurrentValue $kw(vtkTemp142)
-set kw(vtkTemp430) [$kw(vtkTemp400) GetPVWidget {Scale Factor}]
-$kw(vtkTemp430) SetValue "1"
 $kw(vtkTemp400) AcceptCallback
 $kw(vtkTemp21) SetCameraState 39.338 4.455 37.614  15.000 15.000 15.000  -0.619 0.201 0.760
 $kw(vtkTemp427) SetCurrentValue $kw(vtkTemp142)
@@ -74,12 +72,17 @@ $kw(vtkTemp21) SetCameraState -4.208 17.411 -13.986  15.000 15.000 15.000  0.631
 $kw(vtkTemp21) SetCameraState 4.397 21.006 -17.657  15.000 15.000 15.000  0.743 0.658 -0.120
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp400)
 set kw(vtkTemp411) [$kw(vtkTemp400) GetPVWidget {Scale Mode}]
-$kw(vtkTemp411) SetCurrentValue {Vector Magnitude}
+#Vector Magnitude
+$kw(vtkTemp411) SetCurrentValue 1
 $kw(vtkTemp400) AcceptCallback
 $kw(vtkTemp21) SetCameraState 33.941 -12.690 24.459  15.000 15.000 15.000  0.777 0.598 0.197
-$kw(vtkTemp411) SetCurrentValue {Scalar}
+#Scalar
+$kw(vtkTemp411) SetCurrentValue 0
 $kw(vtkTemp400) AcceptCallback
-$kw(vtkTemp411) SetCurrentValue {Data Scaling Off}
+#Data Scaling Off
+$kw(vtkTemp411) SetCurrentValue 3
+set kw(vtkTemp430) [$kw(vtkTemp400) GetPVWidget {Scale Factor}]
+$kw(vtkTemp430) SetValue "1"
 $kw(vtkTemp400) AcceptCallback
 $kw(vtkTemp21) SetCameraState -6.310 29.823 38.262  15.000 15.000 15.000  0.267 0.905 -0.332
 $kw(vtkTemp21) SetCameraState 4.621 22.219 26.330  25.931 7.397 3.067  0.267 0.905 -0.332

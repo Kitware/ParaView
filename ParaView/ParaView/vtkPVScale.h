@@ -140,8 +140,9 @@ public:
   vtkBooleanMacro(Round, int);
   
   // Description:
-  // Set the property to use with this widget.
+  // Set/get the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  virtual vtkPVWidgetProperty* GetProperty();
   
   // Description:
   // Create the right property for use with this widget.

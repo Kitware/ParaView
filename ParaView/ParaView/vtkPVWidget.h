@@ -245,8 +245,9 @@ public:
   virtual void ResetInternal();
 
   // Description:
-  // Set the property to use with this widget.  Overridden in subclasses.
+  // Set/get the property to use with this widget.  Overridden in subclasses.
   virtual void SetProperty(vtkPVWidgetProperty *) {}
+  virtual vtkPVWidgetProperty* GetProperty() { return NULL; }
   
   // Description:
   // Create the right property for use with this widget.  Overridden in

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.20");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -304,6 +304,12 @@ void vtkPVLabeledToggle::SetProperty(vtkPVWidgetProperty *prop)
     this->Property->SetIndex(this->DefaultValue);
     delete [] cmd;
     }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVLabeledToggle::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

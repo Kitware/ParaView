@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.22");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.23");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -643,6 +643,12 @@ void vtkPVMinMax::SetProperty(vtkPVWidgetProperty *prop)
     this->Property->SetScalars(2, scalars);
     delete [] cmd;
     }
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVMinMax::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

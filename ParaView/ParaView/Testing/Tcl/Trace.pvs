@@ -53,7 +53,8 @@ set pv(vtkTemp251) [$pv(vtkTemp230) GetPVWidget {Scale Factor}]
 $pv(vtkTemp251) SetValue 2
 $pv(vtkTemp230) AcceptCallback
 set pv(vtkTemp245) [$pv(vtkTemp230) GetPVWidget {Orient}]
-$pv(vtkTemp245) SetCurrentValue {Off}
+#Off
+$pv(vtkTemp245) SetCurrentValue 0
 $pv(vtkTemp230) AcceptCallback
 set pv(vtkTemp265) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 set pv(vtkTemp274) [$pv(vtkTemp265) GetPVWidget {Input}]

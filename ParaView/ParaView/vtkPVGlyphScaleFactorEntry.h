@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVScaleFactorEntry.h
+  Module:    vtkPVGlyphScaleFactorEntry.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,58 +39,60 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkPVScaleFactorEntry - entry specifically for scale factors
+// .NAME vtkPVGlyphScaleFactorEntry - subclass of vtkPVScaleFactorEntry that also depends on scale mode
 // .SECTION Description
-// vtkPVScaleFactorEntry is a subclass of vtkPVVectorEntry that depends
-// on a vtkPVInputMenu to determine what its default scale value should be.
 
-#ifndef __vtkPVScaleFactorEntry_h
-#define __vtkPVScaleFactorEntry_h
+#ifndef __vtkPVGlyphScaleFactorEntry_h
+#define __vtkPVGlyphScaleFactorEntry_h
 
-#include "vtkPVVectorEntry.h"
+#include "vtkPVScaleFactorEntry.h"
 
-class vtkPVInputMenu;
+class vtkPVArrayMenu;
+class vtkPVSelectionList;
 
-class VTK_EXPORT vtkPVScaleFactorEntry : public vtkPVVectorEntry
+class VTK_EXPORT vtkPVGlyphScaleFactorEntry : public vtkPVScaleFactorEntry
 {
 public:
-  static vtkPVScaleFactorEntry* New();
-  vtkTypeRevisionMacro(vtkPVScaleFactorEntry, vtkPVVectorEntry);
-  void PrintSelf(ostream& os, vtkIndent indent);
+  static vtkPVGlyphScaleFactorEntry* New();
+  vtkTypeRevisionMacro(vtkPVGlyphScaleFactorEntry, vtkPVScaleFactorEntry);
+  void PrintSelf(ostream &os, vtkIndent indent);
   
   // Description:
-  // This input menu supplies the data set.
-  virtual void SetInputMenu(vtkPVInputMenu*);
-  vtkGetObjectMacro(InputMenu, vtkPVInputMenu);
+  // Set/get the vector menu
+  void SetScalarMenu(vtkPVArrayMenu *menu);
+  vtkGetObjectMacro(ScalarMenu, vtkPVArrayMenu);
   
   // Description:
-  // This is called to update the menus if something (InputMenu) changes.
-  virtual void Update();
+  // Set/get the scalar menu
+  void SetVectorMenu(vtkPVArrayMenu *menu);
+  vtkGetObjectMacro(VectorMenu, vtkPVArrayMenu);
+  
+  // Description:
+  // Set/get the scale mode menu
+  void SetScaleModeList(vtkPVSelectionList *list);
+  vtkGetObjectMacro(ScaleModeList, vtkPVSelectionList);
 
-  // Description:
-  // Move widget state to vtk object or back.
-  virtual void ResetInternal();
-  
 protected:
-  vtkPVScaleFactorEntry();
-  ~vtkPVScaleFactorEntry();
-  
-  virtual void UpdateScaleFactor();
+  vtkPVGlyphScaleFactorEntry();
+  ~vtkPVGlyphScaleFactorEntry();
 
+  virtual void UpdateScaleFactor();
+  
 //BTX
   virtual void CopyProperties(vtkPVWidget *clone, vtkPVSource *pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
-  virtual int ReadXMLAttributes(vtkPVXMLElement* element,
-                                vtkPVXMLPackageParser* parser);  
   
-  vtkPVInputMenu *InputMenu;
-  vtkPVSource *Input;
-  void SetInput(vtkPVSource *input);
+  virtual int ReadXMLAttributes(vtkPVXMLElement *element,
+                                vtkPVXMLPackageParser *parser);
+  
+  vtkPVArrayMenu *ScalarMenu;
+  vtkPVArrayMenu *VectorMenu;
+  vtkPVSelectionList *ScaleModeList;
   
 private:
-  vtkPVScaleFactorEntry(const vtkPVScaleFactorEntry&); // Not implemented
-  void operator=(const vtkPVScaleFactorEntry&); // Not implemented
+  vtkPVGlyphScaleFactorEntry(const vtkPVGlyphScaleFactorEntry&); // Not implemented
+  void operator=(const vtkPVGlyphScaleFactorEntry&); // Not implemented
 };
 
 #endif

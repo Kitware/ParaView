@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.10");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -340,6 +340,12 @@ void vtkPVExtractPartsWidget::SaveInBatchScript(ofstream *file)
 void vtkPVExtractPartsWidget::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVExtractPartsWidget::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

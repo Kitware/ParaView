@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.28");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.29");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -264,11 +264,6 @@ void vtkPVSelectTimeSet::AcceptInternal(const char *sourceTclName)
     }
 
   this->Property->SetVTKSourceTclName(sourceTclName);
-  char *cmd = new char[13];
-  sprintf(cmd, "SetTimeValue");
-  int numScalars = 1;
-  this->Property->SetVTKCommands(1, &cmd, &numScalars);
-  delete [] cmd;
   this->Property->SetScalars(1, &this->TimeValue);
   this->Property->AcceptInternal();
 
@@ -420,6 +415,7 @@ void vtkPVSelectTimeSet::CopyProperties(vtkPVWidget* clone,
   if (pvts)
     {
     pvts->SetLabel(this->FrameLabel);
+    pvts->SetSetCommand(this->SetCommand);
     }
   else 
     {
@@ -529,6 +525,17 @@ void vtkPVSelectTimeSet::SetupTimeSetsTclName()
 void vtkPVSelectTimeSet::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+  if (this->Property)
+    {
+    int numScalars = 1;
+    this->Property->SetVTKCommands(1, &this->SetCommand, &numScalars);
+    }
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVSelectTimeSet::GetProperty()
+{
+  return this->Property;
 }
 
 //-----------------------------------------------------------------------------
@@ -543,4 +550,6 @@ void vtkPVSelectTimeSet::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os, indent);
   os << indent << "TimeValue: " << this->TimeValue << endl;
   os << indent << "LabeledFrame: " << this->LabeledFrame << endl;
+  os << indent << "SetCommand: "
+     << (this->SetCommand ? this->SetCommand : "(none)") << endl;
 }

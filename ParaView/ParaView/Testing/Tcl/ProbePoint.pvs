@@ -46,10 +46,11 @@ set pv(vtkTemp187) [$pv(vtkTemp179) GetPVWidget {Input}]
 $pv(vtkTemp187) SetCurrentValue $pv(vtkTemp138)
 set pv(vtkTemp188) [$pv(vtkTemp179) GetPVWidget {Glyph}]
 $pv(vtkTemp188) SetCurrentValue $pv(vtkTemp97)
+set pv(vtkTemp201) [$pv(vtkTemp179) GetPVWidget {Scale Mode}]
+#Scalar
+$pv(vtkTemp201) SetCurrentValue 0
 set pv(vtkTemp200) [$pv(vtkTemp179) GetPVWidget {Scale Factor}]
 $pv(vtkTemp200) SetValue .5
-set pv(vtkTemp201) [$pv(vtkTemp179) GetPVWidget {Scale Mode}]
-$pv(vtkTemp201) SetCurrentValue "Scalar"
 $pv(vtkTemp179) AcceptCallback
 
 foreach a {bmp tif ppm png  jpg} {

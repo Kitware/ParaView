@@ -51,8 +51,9 @@ set kw(vtkTemp97) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp320) [$kw(vtkTemp300) GetPVWidget {Glyph}]
 $kw(vtkTemp320) SetCurrentValue $kw(vtkTemp97)
 set kw(vtkTemp309) [$kw(vtkTemp300) GetPVWidget {Orient}]
-$kw(vtkTemp309) SetCurrentValue {Off}
+$kw(vtkTemp309) SetCurrentValue 0
 set kw(vtkTemp310) [$kw(vtkTemp300) GetPVWidget {Scale Factor}]
+#Off
 $kw(vtkTemp310) SetValue "1"
 $kw(vtkTemp300) AcceptCallback
 
@@ -60,13 +61,18 @@ $kw(vtkTemp300) AcceptCallback
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp260)
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp300)
 set kw(vtkTemp308) [$kw(vtkTemp300) GetPVWidget {Scale Mode}]
-$kw(vtkTemp308) SetCurrentValue {Vector Magnitude}
+#Vector Magnitude
+$kw(vtkTemp308) SetCurrentValue 1
 $kw(vtkTemp300) AcceptCallback
-$kw(vtkTemp308) SetCurrentValue {Vector Components}
+#Vector Components
+$kw(vtkTemp308) SetCurrentValue 2
 $kw(vtkTemp300) AcceptCallback
-$kw(vtkTemp308) SetCurrentValue {Data Scaling Off}
+#Data Scaling Off
+$kw(vtkTemp308) SetCurrentValue 3
 $kw(vtkTemp300) AcceptCallback
-$kw(vtkTemp308) SetCurrentValue {Scalar}
+#Scalar
+$kw(vtkTemp308) SetCurrentValue 0
+$kw(vtkTemp310) SetValue "1"
 $kw(vtkTemp300) AcceptCallback
 
 set kw(vtkTemp339) [$kw(vtkTemp300) GetPVOutput]

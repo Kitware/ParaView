@@ -63,6 +63,7 @@ SET( ParaView_SRCS
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGhostLevelDialog.cxx
+  vtkPVGlyphScaleFactorEntry.cxx
   vtkPVGroupInputsWidget.cxx
   vtkPVImplicitPlaneWidget.cxx
   vtkPVIndexWidgetProperty.cxx

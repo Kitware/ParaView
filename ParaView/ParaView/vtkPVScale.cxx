@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.20");
+vtkCxxRevisionMacro(vtkPVScale, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -436,6 +436,12 @@ int vtkPVScale::RoundValue(float val)
 void vtkPVScale::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVScalarListWidgetProperty::SafeDownCast(prop);
+}
+
+//----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVScale::GetProperty()
+{
+  return this->Property;
 }
 
 //----------------------------------------------------------------------------

@@ -24,7 +24,8 @@ set pv(vtkTemp183) [$pv(vtkTemp1) CreatePVSource Glyph]
 set pv(vtkTemp204) [$pv(vtkTemp183) GetPVWidget {Scale Factor}]
 $pv(vtkTemp204) SetValue 0.2
 set pv(vtkTemp389) [$pv(vtkTemp183) GetPVWidget {Orient}]
-$pv(vtkTemp389) SetCurrentValue {Off}
+#Off
+$pv(vtkTemp389) SetCurrentValue 0
 $pv(vtkTemp183) AcceptCallback
 
 

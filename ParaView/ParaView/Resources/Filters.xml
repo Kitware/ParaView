@@ -667,29 +667,19 @@
   </Filter>
   <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <InputMenu id="im2" label="Glyph" help="Select the glyph source." input_name="Source" source_list="GlyphSources"/>
-  <SelectWidget variable="Orient">
-    <Item label="Vector" value="1">
-      <ArrayMenu input_name="Input" attribute_type="Vectors" trace_name="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input vectors used to orient to glyphs."/>
-    </Item>
-    <Item label="Off" value="0">
-      <DummyWidget/>
-    </Item>
-  </SelectWidget>
-  <SelectWidget label="Scale Mode" variable="ScaleMode" trace_name="Scale Mode">
-    <Item label="Vector Magnitude"  value="1">
-      <DummyWidget/>
-    </Item>
-    <Item label="Vector Components"  value="2">
-      <DummyWidget/>
-    </Item>
-    <Item label="Scalar" value="0">
-      <ArrayMenu input_name="Input" attribute_type="Scalars" trace_name="Scalars" label="Scalars" input_menu="im" number_of_components="1" help="Choose the scalar array used to scale the glyphs."/>
-    </Item>
-    <Item label="Data Scaling Off"  value="3">
-      <DummyWidget/>
-    </Item>
-  </SelectWidget>
-  <ScaleFactorEntry label="Scale Factor" trace_name="Scale Factor" variable="ScaleFactor" type="float" help="Scale the glyphs by this constant" input_menu="im"/>
+  <ArrayMenu id="vectors" input_name="Input" attribute_type="Vectors" trace_name="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input vectors used to scale and/or orient to glyphs."/>
+  <ArrayMenu id="scalars" input_name="Input" attribute_type="Scalars" trace_name="Scalars" label="Scalars" input_menu="im" number_of_components="1" help="Choose the scalar array used to scale the glyphs."/>
+  <SelectionList variable="Orient" trace_name="Orient" help="Select the mode for orienting the glyphs." default_value="1" option_width="15">
+    <Item name="Off" value="0"/>
+    <Item name="Vector" value="1"/>
+  </SelectionList>
+  <SelectionList id="sl" label="Scale Mode" variable="ScaleMode" trace_name="Scale Mode" default_value="1" option_width="15" help="Select the mode for scaling the glyphs.">
+    <Item name="Scalar" value="0"/>
+    <Item name="Vector Magnitude" value="1"/>
+    <Item name="Vector Components" value="2"/>
+    <Item name="Data Scaling Off"  value="3"/>
+  </SelectionList>
+  <GlyphScaleFactorEntry label="Scale Factor" trace_name="Scale Factor" variable="ScaleFactor" type="float" help="Scale the glyphs by this constant" input_menu="im" scalar_menu="scalars" vector_menu="vectors" scale_mode_list="sl"/>
   <VectorEntry label="Max. Number of Glyphs" trace_name="Max Glyphs" variable="MaximumNumberOfPoints" type="int" help="Set the maximum number of points to glyph" default_value="5000"/>
   <LabeledToggle label="Mask Points" trace_name="MaskPoints" variable="UseMaskPoints" help="Create no more than specified maximum number of glyphs" default_value="1"/>
   <LabeledToggle label="Random Masking" trace_name="RandomMask" variable="RandomMode" help="Choose points at random to mask" default_value="0"/>

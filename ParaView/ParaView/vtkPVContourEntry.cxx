@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContourEntry);
-vtkCxxRevisionMacro(vtkPVContourEntry, "1.40");
+vtkCxxRevisionMacro(vtkPVContourEntry, "1.41");
 
 vtkCxxSetObjectMacro(vtkPVContourEntry, ArrayMenu, vtkPVArrayMenu);
 
@@ -298,6 +298,12 @@ void vtkPVContourEntry::UpdateProperty()
 void vtkPVContourEntry::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVContourWidgetProperty::SafeDownCast(prop);
+}
+
+//-----------------------------------------------------------------------------
+vtkPVWidgetProperty* vtkPVContourEntry::GetProperty()
+{
+  return this->Property;
 }
 
 //-----------------------------------------------------------------------------
