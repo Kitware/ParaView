@@ -65,7 +65,38 @@ SET (ClientServer_WRAP_CLASSES
  vtkLineWidget
  vtk3DWidget
  vtkInteractorObserver
+
+
+ vtkActor
+ vtkMapper
+ vtkAbstractMapper
+ vtkAbstractMapper3D
+ vtkPolyDataMapper
+ vtkRenderer
+ vtkRenderWindow
+ vtkRenderWindowInteractor
+ vtkOpenGLRenderer
+ vtkOpenGLRenderWindow
+ vtkOpenGLActor
+ vtkOpenGLPolyDataMapper
+ vtkWindow
+ vtkViewport
+ vtkProp3D
 )
+
+IF(VTK_USE_X)
+  SET(ClientServer_WRAP_CLASSES ${ClientServer_WRAP_CLASSES}
+    vtkXOpenGLRenderWindow
+    vtkXRenderWindowInteractor
+    )
+ELSE(VTK_USE_X)
+  IF(WIN32)
+    SET(ClientServer_WRAP_CLASSES ${ClientServer_WRAP_CLASSES}
+      vtkWin32OpenGLRenderWindow
+      vtkWin32RenderWindowInteractor
+    )
+  ENDIF(WIN32)
+ENDIF(VTK_USE_X)
 
 FIND_FILE(VTK_WRAP_HINTS hints
           ${VTK_DIR}/../VTK/Wrapping
