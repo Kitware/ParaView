@@ -915,7 +915,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       }
     if (cellSelect->GetNumberOfArrays() > 0)
       {
-      pvApp->Script("pack %s %s -side top -fill x -expand t",
+      pvApp->Script("pack %s -side top -fill x -expand t",
                     cellSelect->GetWidgetName());
       }
     
