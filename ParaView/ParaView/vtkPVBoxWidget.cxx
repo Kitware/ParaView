@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.5");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.6");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -231,13 +231,12 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
   float bds[6];
   *file << "vtkBoxWidget " << this->Widget3DTclName << endl;
   this->PVSource->GetPVInput(0)->GetDataInformation()->GetBounds(bds);
+  *file << "\t" << this->Widget3DTclName << " SetPlaceFactor 1.0" << endl;
   *file << "\t" << this->Widget3DTclName << " PlaceWidget "
     << bds[0] << " " << bds[1] << " " << bds[2] << " "
     << bds[3] << " " << bds[4] << " " << bds[5] << endl;
-  *file << "\t" << this->Widget3DTclName << " EnabledOn" << endl;
   *file << "vtkTransform " << this->BoxTransformTclName << endl;
   *file << "vtkMatrix4x4 " << this->BoxMatrixTclName << endl;
-  *file << this->Widget3DTclName << " GetTransform " << this->BoxTransformTclName << endl;
   vtkTransform* trans = this->BoxTransform;
   trans->Identity();
   trans->Translate(this->GetPositionFromGUI());
@@ -254,11 +253,27 @@ void vtkPVBoxWidget::SaveInBatchScript(ofstream *file)
     << (*mat)[2][1] << " " << (*mat)[2][2] << " " << (*mat)[2][3] << " "
     << (*mat)[3][0] << " " << (*mat)[3][1] << " " << (*mat)[3][2] << " " 
     << (*mat)[3][3] << endl;
+  //*file << "\tputs [" << this->BoxMatrixTclName << " Print ]" << endl;
   *file << "\t" << this->BoxTransformTclName << " SetMatrix " 
     << this->BoxMatrixTclName << endl;
+  *file << "\t" << this->BoxTransformTclName << " Update"  << endl;
   *file << "\t" << this->Widget3DTclName << " SetTransform " 
     << this->BoxTransformTclName << endl;
   *file << "\t" << this->Widget3DTclName << " GetPlanes " << this->BoxTclName << endl;
+
+  /*
+  *file << "set normals [ " << this->BoxTclName << " GetNormals ]\n"
+  "puts \"Normal:\" \n"
+  "for { set c 0 } { $c < 6 } { incr c } {\n"
+  "  puts [ $normals GetTuple3 $c ]\n"
+  "}\n"
+  "puts \"Points:\" \n"
+  "set points [ " << this->BoxTclName << " GetPoints]\n"
+  "for { set c 0 } { $c < 6 } { incr c } {\n"
+  "  puts [ $points GetPoint $c ]\n"
+  "}\n";
+  */
+
   /*
   *file << "\t" << this->BoxTclName << " SetCenter ";
   this->Script("%s GetCenter", this->BoxTclName);
@@ -671,6 +686,19 @@ void vtkPVBoxWidget::UpdateBox()
     this->Widget3DTclName,
     this->BoxTransformTclName
     );
+  /*
+  mat->Print(cout);
+  pvApp->BroadcastScript("set normals [ %s GetNormals ]\n"
+  "puts \"Normal:\" \n"
+  "for { set c 0 } { $c < 6 } { incr c } {\n"
+  "  puts [ $normals GetTuple3 $c ]\n"
+  "}\n"
+  "puts \"Points:\" \n"
+  "set points [ %s GetPoints]\n"
+  "for { set c 0 } { $c < 6 } { incr c } {\n"
+  "  puts [ $points GetPoint $c ]\n"
+  "}\n", this->BoxTclName, this->BoxTclName);
+  */
   this->SetValueChanged();
 }
 
