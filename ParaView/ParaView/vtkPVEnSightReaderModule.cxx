@@ -278,10 +278,10 @@ void vtkPVEnSightReaderModule::DisplayErrorMessage(const char* message,
 //----------------------------------------------------------------------------
 // Make sure that all case files in the master file are compatible
 // and create the appropriate EnSight reader.
+#ifdef VTK_USE_MPI
 vtkEnSightReader* vtkPVEnSightReaderModule::VerifyMasterFile(
   vtkPVApplication* pvApp, const char* tclName, const char* filename)
 {
-#ifdef VTK_USE_MPI
 
   // Create the EnSight verifier.
   char* vtclName = new char[strlen(tclName)+strlen("Ver")+1];
@@ -338,16 +338,20 @@ vtkEnSightReader* vtkPVEnSightReaderModule::VerifyMasterFile(
   
 
   return reader;
-#else
-  return 0;
-#endif
 }
+#else
+vtkEnSightReader* vtkPVEnSightReaderModule::VerifyMasterFile(
+  vtkPVApplication*, const char*, const char*)
+{
+  return 0;
+}
+#endif
 
 //----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 void vtkPVEnSightReaderModule::VerifyTimeSets(vtkPVApplication *pvApp,
 					      const char* tclName)
 {
-#ifdef VTK_USE_MPI
 
   pvApp->BroadcastScript("%s ReadAndVerifyTimeSets %s", this->VerifierTclName,
 			 tclName);
@@ -358,14 +362,18 @@ void vtkPVEnSightReaderModule::VerifyTimeSets(vtkPVApplication *pvApp,
 			      "the master file do not match. This might "
 			      "cause inconsistent behaviour.", 1);
     }
-#endif
 }
+#else
+void vtkPVEnSightReaderModule::VerifyTimeSets(vtkPVApplication *, const char* )
+{
+}
+#endif
 
 //----------------------------------------------------------------------------
+#ifdef VTK_USE_MPI
 int vtkPVEnSightReaderModule::VerifyParts(vtkPVApplication *pvApp,
 					  const char* tclName)
 {
-#ifdef VTK_USE_MPI
 
   pvApp->BroadcastScript("%s ReadAndVerifyParts %s", this->VerifierTclName,
 			 tclName);
@@ -379,11 +387,14 @@ int vtkPVEnSightReaderModule::VerifyParts(vtkPVApplication *pvApp,
     return VTK_ERROR;
     }
   return VTK_OK;
+}
 #else
+int vtkPVEnSightReaderModule::VerifyParts(vtkPVApplication *, const char*)
+{
   return VTK_ERROR;
+}
 #endif
 
-}
 
 //----------------------------------------------------------------------------
 int vtkPVEnSightReaderModule::ReadFile(const char* fname, 
