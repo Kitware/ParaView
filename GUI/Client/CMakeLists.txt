@@ -62,7 +62,6 @@ SET( ParaViewClientNotWrapped_SRCS
   vtkPVAxesWidget.cxx
   vtkPVInteractorStyle.cxx
   vtkPVInteractorStyleCenterOfRotation.cxx
-  vtkPVSourceCollection.cxx
   vtkPVCompositeRenderModule.cxx
   vtkPVMultiDisplayRenderModule.cxx
   vtkPVLODRenderModule.cxx
@@ -166,6 +165,7 @@ SET( ParaViewClient_SRCS
   vtkPVSelectionList.cxx
   vtkPVServerFileDialog.cxx
   vtkPVSource.cxx
+  vtkPVSourceCollection.cxx
   vtkPVSourceList.cxx
   vtkPVSourceWidget.cxx
   vtkPVSourcesNavigationWindow.cxx
