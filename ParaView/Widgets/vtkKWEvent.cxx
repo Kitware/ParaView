@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 static const char *vtkKWEventStrings[] = {
   "KWWidgetEvents",
   "MessageDialogInvokeEvent",
+  // VV    
   "WindowLevelChangedEvent",
   "WindowLevelChangingEvent",
   "WindowLevelChangedImageCompositeEvent",
@@ -110,13 +111,37 @@ static const char *vtkKWEventStrings[] = {
   "ChangeMouseOperationsEvent",
   "ChangeStandardInteractivityEvent",
   "SwitchToVolumeProEvent",
+  "ViewAnnotationChangedEvent",
+  "RenderEvent",
+  // PV
   "InitializeTraceEvent",
   "ErrorMessageEvent",
   "WarningMessageEvent",
   "ManipulatorModifiedEvent",
   "WidgetModifiedEvent",
-  "FinalBogusNotUsedEvent"
+  // 
+  "FinalBogusNotUsedEvent",
+  0
 };
+
+unsigned long vtkKWEvent::GetEventIdFromString(const char* cevent)
+{
+  unsigned long event = vtkCommand::GetEventIdFromString(cevent);
+  if ( event != vtkCommand::NoEvent )
+    {
+    return event;
+    }
+  
+  int cc;
+  for ( cc = 0; vtkKWEventStrings[cc] != 0; cc ++ )
+    {
+    if ( strcmp(cevent, vtkKWEventStrings[cc]) == 0 )
+      {
+      return cc + vtkKWEvent::KWWidgetEvents;
+      }
+    }
+  return vtkCommand::NoEvent;
+}
 
 const char *vtkKWEvent::GetStringFromEventId(unsigned long event)
 {

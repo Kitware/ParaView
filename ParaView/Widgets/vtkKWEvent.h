@@ -51,6 +51,7 @@ class VTK_EXPORT vtkKWEvent
 {
   public:
   static const char* GetStringFromEventId(unsigned long event);
+  static unsigned long GetEventIdFromString(const char* event);
   enum {
     KWWidgetEvents = 2000,
     MessageDialogInvokeEvent,
@@ -120,6 +121,7 @@ class VTK_EXPORT vtkKWEvent
     ChangeStandardInteractivityEvent,
     SwitchToVolumeProEvent,
     ViewAnnotationChangedEvent,
+    RenderEvent,
     // PV
     InitializeTraceEvent,
     ErrorMessageEvent,
