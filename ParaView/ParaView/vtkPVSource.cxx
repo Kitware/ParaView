@@ -790,6 +790,12 @@ void vtkPVSource::DeleteCallback()
     // Unpack the properties.  This is required if prev is NULL.
     this->Script("catch {eval pack forget [pack slaves %s]}",
 		 this->ParametersParent->GetWidgetName());
+
+    // Show the 3D View settings
+    vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+    vtkPVWindow *window = pvApp->GetMainWindow();
+    this->Script("%s invoke \" 3D View Settings\"", 
+		 window->GetMenuProperties()->GetWidgetName());    
     }
   else
     {
