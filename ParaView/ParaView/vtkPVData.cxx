@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.209.2.1");
+vtkCxxRevisionMacro(vtkPVData, "1.209.2.2");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1145,10 +1145,10 @@ void vtkPVData::UpdatePropertiesInternal()
   type.rdbuf()->freeze(0);
   
   sprintf(tmp, "Number of cells: %d", 
-          dataInfo->GetNumberOfCells());
+          (int)(dataInfo->GetNumberOfCells()));
   this->NumCellsLabel->SetLabel(tmp);
   sprintf(tmp, "Number of points: %d", 
-          dataInfo->GetNumberOfPoints());
+          (int)(dataInfo->GetNumberOfPoints()));
   this->NumPointsLabel->SetLabel(tmp);
   
   dataInfo->GetBounds(bounds);
