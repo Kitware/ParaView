@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.13");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.14");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -56,7 +56,9 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
   vtkSMSourceProxy* proxy = pvs->GetProxy();
   if (!proxy)
     {
-    //cout << "< " << pvs->GetSourceClassName() << endl;
+    vtkErrorMacro("The server manager prototype for " 
+                  << pvs->GetSourceClassName()
+                  << " does not exist.");
     return 0;
     }
   vtkSMProxyProperty* property = vtkSMProxyProperty::SafeDownCast(
