@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.8");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.9");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -176,10 +176,10 @@ void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
                this->SaveImagesCheck->GetWidgetName());
   this->Script("pack %s -side top -expand 1 -fill x -padx 2",
                this->ImageFileNameFrame->GetWidgetName());
-  this->Script("pack %s -side top -expand 0 -padx 2 -anchor w",
-               this->SaveGeometryCheck->GetWidgetName());
-  this->Script("pack %s -side top -expand 1 -fill x -padx 2",
-               this->GeometryFileNameFrame->GetWidgetName());
+  //this->Script("pack %s -side top -expand 0 -padx 2 -anchor w",
+  //this->SaveGeometryCheck->GetWidgetName());
+  //this->Script("pack %s -side top -expand 1 -fill x -padx 2",
+  //this->GeometryFileNameFrame->GetWidgetName());
 
   char* fileName = NULL;
   if (this->FilePath && this->FileRoot)
