@@ -51,6 +51,8 @@ public:
   void EditCallback();
   void ChangeName();
 
+  void RemoveFolder();
+
   // Description:
   // When a lmk container's checkbox is selected, we want all nested lmk items to also be selected (and vice versa)
   void SelectCallback();
