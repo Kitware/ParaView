@@ -28,16 +28,12 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.3");
-
-
-
-//***************************************************************************
-//===========================================================================
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVMultiDisplayRenderModule::vtkPVMultiDisplayRenderModule()
 {
+  this->UseCompositeCompression = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -393,14 +389,18 @@ void vtkPVMultiDisplayRenderModule::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
 {
-  if (this->CompositeID.ID)
+  if( this->UseCompositeCompression != val )
     {
-    vtkPVProcessModule* pm = this->ProcessModule;
-    pm->GetStream()
-      << vtkClientServerStream::Invoke
-      << this->CompositeID << "SetUseCompositeCompression" << val
-      << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+    this->UseCompositeCompression = val;
+    if (this->CompositeID.ID)
+      {
+      vtkPVProcessModule* pm = this->ProcessModule;
+      pm->GetStream()
+        << vtkClientServerStream::Invoke
+        << this->CompositeID << "SetUseCompositeCompression" << val
+        << vtkClientServerStream::End;
+      pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+      }
     }
 }
 
@@ -408,5 +408,7 @@ void vtkPVMultiDisplayRenderModule::SetUseCompositeCompression(int val)
 void vtkPVMultiDisplayRenderModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  
+  os << "UseCompositeCompression:" << this->UseCompositeCompression << endl;
 }
 

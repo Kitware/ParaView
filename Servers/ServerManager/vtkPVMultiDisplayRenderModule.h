@@ -48,6 +48,7 @@ protected:
   ~vtkPVMultiDisplayRenderModule();
 
   virtual vtkPVPartDisplay* CreatePartDisplay();
+  int UseCompositeCompression;
 
   vtkPVMultiDisplayRenderModule(const vtkPVMultiDisplayRenderModule&); // Not implemented
   void operator=(const vtkPVMultiDisplayRenderModule&); // Not implemented
