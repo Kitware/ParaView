@@ -54,10 +54,8 @@ vtkPVAssignment::vtkPVAssignment()
   this->Extent[0] = this->Extent[2] = this->Extent[4] = 0;
   this->Extent[1] = this->Extent[3] = this->Extent[5] = 0;  
 
-  this->WholeExtent[0] = this->WholeExtent[2] = this->WholeExtent[4] = 0;
-  this->WholeExtent[1] = this->WholeExtent[3] = this->WholeExtent[5] = 0;  
-  
   this->Translator = vtkExtentTranslator::New();
+  this->OriginalImage = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -65,6 +63,7 @@ vtkPVAssignment::~vtkPVAssignment()
 {
   this->Translator->Delete();
   this->Translator = NULL;
+  this->SetOriginalImage(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -80,33 +79,45 @@ void vtkPVAssignment::Clone(vtkPVApplication *pvApp)
 
   // Clone this object on every other process, and set up the assignment.
   num = pvApp->GetController()->GetNumberOfProcesses();
-
+  //this->SetPiece(0, num);
   this->SetPiece(0, 2);
   for (id = 1; id < num; ++id)
     {
     pvApp->RemoteScript(id, "%s %s", this->GetClassName(), this->GetTclName());
-    pvApp->RemoteScript(id, "%s SetPiece %d %d", this->GetTclName(), 0, 2);
+    pvApp->RemoteScript(id, "%s SetPiece %d %d", this->GetTclName(), id, num);
     }
-
-
-  //this->SetPiece(0, num);
-  //for (id = 1; id < num; ++id)
-  //  {
-  //  pvApp->RemoteScript(id, "%s %s", this->GetClassName(), this->GetTclName());
-  //  pvApp->RemoteScript(id, "%s SetPiece %d %d", this->GetTclName(), id, num);
-  //  }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAssignment::BroadcastWholeExtent(int *ext)
+void vtkPVAssignment::SetOriginalImage(vtkPVImage *pvImage)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVApplication *pvApp;
   
+  if (this->OriginalImage == pvImage)
+    {
+    return;
+    }
+  
+  this->Modified();
+  
+  pvApp = this->GetPVApplication();
   if (pvApp->GetController()->GetLocalProcessId() == 0)
     {
-    pvApp->BroadcastScript("%s SetWholeExtent %d %d %d %d %d %d",
-			   this->GetTclName(), ext[0], ext[1], 
-			   ext[2], ext[3], ext[4], ext[5]);
+    pvApp->BroadcastScript("%s SetOriginalImage %s", this->GetTclName(),
+			   pvImage->GetTclName());
+    }
+  
+  if (this->OriginalImage)
+    {
+    vtkPVImage *tmp = this->OriginalImage;
+    this->OriginalImage = NULL;
+    tmp->UnRegister(this);
+    }
+  
+  if (pvImage)
+    {
+    pvImage->Register(this);
+    this->OriginalImage = pvImage;
     }
 }
 
@@ -128,12 +139,23 @@ void vtkPVAssignment::SetPiece(int piece, int numPieces)
 //----------------------------------------------------------------------------
 int *vtkPVAssignment::GetExtent()
 {
-  this->Extent[0] = this->WholeExtent[0];
-  this->Extent[1] = this->WholeExtent[1];
-  this->Extent[2] = this->WholeExtent[2];
-  this->Extent[3] = this->WholeExtent[3];
-  this->Extent[4] = this->WholeExtent[4];
-  this->Extent[5] = this->WholeExtent[5];
+  vtkImageData *image;
+  
+  if (this->OriginalImage == NULL)
+    {
+    vtkErrorMacro("OriginalImage has not been set");
+    return NULL;
+    }
+
+  image = this->OriginalImage->GetImageData();
+  if (image == NULL)
+    {
+    vtkErrorMacro("OriginalImage has no data.");
+    return NULL;
+    }
+  
+  image->UpdateInformation();
+  image->GetWholeExtent(this->Extent);
   
   this->Translator->SplitExtent(this->Piece, this->NumberOfPieces, this->Extent);
   

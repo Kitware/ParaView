@@ -110,8 +110,8 @@ void vtkPVImageReader::ImageAccepted()
   image->Clone(pvApp);
   a = vtkPVAssignment::New();
   a->Clone(pvApp);
-  
-  a->BroadcastWholeExtent(this->GetImageReader()->GetOutput()->GetWholeExtent());
+  a->SetOriginalImage(image);
+
   this->SetOutput(image);
   this->SetAssignment(a);
   

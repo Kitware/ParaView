@@ -34,7 +34,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWObject.h"
 #include "vtkExtentTranslator.h"
-
+#include "vtkPVImage.h"
 
 class vtkPVApplication;
 
@@ -56,14 +56,10 @@ public:
   int GetNumberOfPieces() {return this->NumberOfPieces;}
 
   // Description:
-  // Set this whole extent before you try to get the extent.
-  vtkSetVector6Macro(WholeExtent,int);
-  vtkGetVector6Macro(WholeExtent,int);
-  
-  // Description:
-  // A hack to get around changing the hints file (PV Hints???).
-  // This broadcasts the whole extent to clones in all processes.
-  void BroadcastWholeExtent(int *ext);
+  // The original source supplies this input so we will
+  // always know the whole extent.  Set broadcasts executes on all processes.
+  void SetOriginalImage(vtkPVImage *pvImage);
+  vtkPVImage *GetOriginalImage() {return this->OriginalImage;}
   
   // Description:
   // The extent is computetd from then piece and whole extent.
@@ -82,9 +78,8 @@ protected:
   int Piece;
   int NumberOfPieces;
 
-  vtkExtentTranslator *Translator;
-  
-  int WholeExtent[6];
+  vtkExtentTranslator *Translator;  
+  vtkPVImage *OriginalImage;
   int Extent[6];
 };
 

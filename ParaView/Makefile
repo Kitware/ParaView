@@ -23,8 +23,10 @@ vtkInteractorStylePlane \
 vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
 vtkKWRenderView \
+vtkPVActorComposite \
 vtkPVApplication \
 vtkPVAssignment \
+vtkPVAssignmentClip \
 vtkPVConeSource \
 vtkPVContourFilter \
 vtkPVData \
@@ -37,6 +39,7 @@ vtkPVImageSlice \
 vtkPVImageTextureFilter \
 vtkPVMenuButton \
 vtkPVPolyData \
+vtkPVPolyDataMapper \
 vtkPVRenderView \
 vtkPVShrinkPolyData \
 vtkPVSource \
