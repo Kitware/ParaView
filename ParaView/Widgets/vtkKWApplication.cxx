@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.125");
+vtkCxxRevisionMacro(vtkKWApplication, "1.126");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -479,6 +479,8 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
   Tcl_Interp *interp;
   char *args;
   char buf[100];
+
+  (void)err;
 
   // This is mandatory, it does more than just finding the executable
 
