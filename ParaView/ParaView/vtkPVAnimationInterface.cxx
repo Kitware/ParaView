@@ -58,7 +58,7 @@ vtkStandardNewMacro(vtkPVAnimationInterface);
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
 int vtkPVAnimationInterfaceCommand(ClientData cd, Tcl_Interp *interp,
-			   int argc, char *argv[]);
+                           int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 vtkPVAnimationInterface::vtkPVAnimationInterface()
@@ -371,10 +371,10 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->MethodMenuButton->SetBalloonHelpString(
     "Select the method that will be called.");
   this->Script("pack %s %s %s %s -side left", 
-	       this->SourceLabel->GetWidgetName(),
-	       this->SourceMenuButton->GetWidgetName(),
-	       this->MethodLabel->GetWidgetName(),
-	       this->MethodMenuButton->GetWidgetName());
+               this->SourceLabel->GetWidgetName(),
+               this->SourceMenuButton->GetWidgetName(),
+               this->MethodLabel->GetWidgetName(),
+               this->MethodMenuButton->GetWidgetName());
 
   this->UpdateSourceMenu();
   this->UpdateMethodMenu();
@@ -428,11 +428,11 @@ void vtkPVAnimationInterface::EntryCallback()
   this->TimeScale->SetResolution(this->TimeStep);
 
   this->AddTraceEntry("$kw(%s) SetTimeStart {%f}", this->GetTclName(), 
-		      this->TimeStart);
+                      this->TimeStart);
   this->AddTraceEntry("$kw(%s) SetTimeEnd {%f}", this->GetTclName(), 
-		      this->TimeEnd);
+                      this->TimeEnd);
   this->AddTraceEntry("$kw(%s) SetTimeStep {%f}", this->GetTclName(), 
-		      this->TimeStep);
+                      this->TimeStep);
   this->AddTraceEntry("$kw(%s) EntryCallback", this->GetTclName());
 }
 
@@ -465,12 +465,12 @@ void vtkPVAnimationInterface::CurrentTimeCallback()
       this->View->Render();
       }
     this->AddTraceEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(),
-			this->GetCurrentTime());
+                        this->GetCurrentTime());
     this->AddTraceEntry("$kw(%s) CurrentTimeCallback", this->GetTclName());
     if (this->Window && this->Window->GetMainView())
       {
       this->AddTraceEntry("$kw(%s) ResetCameraClippingRange", 
-			  this->Window->GetMainView()->GetTclName());
+                          this->Window->GetMainView()->GetTclName());
       }
 
     this->AddTraceEntry("update");
@@ -490,7 +490,7 @@ void vtkPVAnimationInterface::ScriptCheckButtonCallback()
   if (this->ScriptCheckButton->GetState())
     {
     this->AddTraceEntry("$kw(%s) SetScriptCheckButtonState 1", 
-			this->GetTclName());
+                        this->GetTclName());
     this->Script("pack %s -expand yes -fill x",
                  this->ScriptEditor->GetWidgetName());
     this->Script("pack forget %s", 
@@ -499,7 +499,7 @@ void vtkPVAnimationInterface::ScriptCheckButtonCallback()
   else
     {
     this->AddTraceEntry("$kw(%s) SetScriptCheckButtonState 0", 
-			this->GetTclName());
+                        this->GetTclName());
     this->Script("pack %s -side top -expand t -fill x", 
                  this->SourceMethodFrame->GetWidgetName());
     this->Script("pack forget %s", 
@@ -544,8 +544,8 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
     //source->Register(this);
     this->PVSource = source;
     this->SourceMenuButton->SetButtonText(this->PVSource->GetName());
-    this->AddTraceEntry("$kw(%s) SetPVSource {%s}", this->GetTclName(), 
-			source->GetTclName());
+    this->AddTraceEntry("$kw(%s) SetPVSource $kw(%s)", this->GetTclName(), 
+                        source->GetTclName());
     }
   else
     {
@@ -638,11 +638,11 @@ void vtkPVAnimationInterface::UpdateSourceMenu()
       {
       sprintf(methodAndArgString, "SetPVSource %s", source->GetTclName());
       this->SourceMenuButton->GetMenu()->AddCommand(source->GetName(), this,
-						    methodAndArgString);
+                                                    methodAndArgString);
       if (this->PVSource == source)
-	{
-	sourceValid = 1;
-	}
+        {
+        sourceValid = 1;
+        }
       }
     }
 
@@ -677,7 +677,7 @@ void vtkPVAnimationInterface::SetLabelAndScript(const char* label,
   if (this->Application)
     {
     this->AddTraceEntry("$kw(%s) SetLabelAndScript {%s} {%s}", 
-			this->GetTclName(), label, script);
+                        this->GetTclName(), label, script);
     }
 }
 
@@ -729,8 +729,8 @@ void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInTclScript(ofstream *file, 
                                               const char* fileRoot,
-					      const char* extension,
-					      const char* writerName)
+                                              const char* extension,
+                                              const char* writerName)
 {
   float t;
   float sgn;
@@ -755,7 +755,7 @@ void vtkPVAnimationInterface::SaveInTclScript(ofstream *file,
     *file << "update\n\t";
     *file << "WinToImage Modified\n\t";
     *file << "Writer SetFileName {" << fileRoot << countStr << extension
-	  << "}\n\t";
+          << "}\n\t";
     *file << "Writer Write\n";
     }
   else
@@ -782,7 +782,7 @@ void vtkPVAnimationInterface::SaveInTclScript(ofstream *file,
     *file << "update\n\t";
     *file << "WinToImage Modified\n\t";
     *file << "Writer SetFileName {" << fileRoot << countStr << extension
-	  << "}\n\t";
+          << "}\n\t";
     *file << "Writer Write\n"; 
     *file << "}\n\n";
     }
