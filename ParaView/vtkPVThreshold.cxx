@@ -173,7 +173,7 @@ void vtkPVThreshold::CreateProperties()
                this->UpperValueScale->GetWidgetName(),
                this->LowerValueScale->GetWidgetName(),
                this->AllScalarsCheck->GetWidgetName());
-  }
+}
 
 void vtkPVThreshold::UpperValueCallback()
 {
@@ -210,6 +210,8 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
       range[1] = 1;
       }
     this->Threshold->SetAttributeModeToUsePointData();
+    pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
+                           this->GetVTKSourceTclName());
     }
   else if (strcmp(newMode, "cell") == 0)
     {
@@ -223,12 +225,14 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
       range[1] = 1;
       }
     this->Threshold->SetAttributeModeToUseCellData();
+    pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
+                           this->GetVTKSourceTclName());
     }
 
   this->UpperValueScale->SetResolution((range[1] - range[0]) / 100.0);
   this->UpperValueScale->SetRange(range[0], range[1]);
   this->UpperValueScale->SetValue(range[1]);
-  
+
   this->LowerValueScale->SetResolution((range[1] - range[0]) / 100.0);
   this->LowerValueScale->SetRange(range[0], range[1]);
   this->LowerValueScale->SetValue(range[0]);

@@ -480,20 +480,28 @@ void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
   int numComponents;
   char menuCommand[256];
   char menuEntry[256];
+  vtkPVApplication *pvApp = this->GetPVApplication();
   
   this->ScalarsMenu->GetMenu()->DeleteAllMenuItems();
   this->VectorsMenu->GetMenu()->DeleteAllMenuItems();
   this->FunctionEntry->SetValue("");
   this->Calculator->RemoveAllVariables();
+
+  pvApp->BroadcastScript("%s RemoveAllVariables",
+                         this->GetVTKSourceTclName());
   
   if (strcmp(newMode, "point") == 0)
     {
     this->Calculator->SetAttributeModeToUsePointData();
+    pvApp->BroadcastScript("%s SetAttributeModeToUsePointData",
+                           this->GetVTKSourceTclName());
     fd = this->Calculator->GetInput()->GetPointData()->GetFieldData();
     }
   else if (strcmp(newMode, "cell") == 0)
     {
     this->Calculator->SetAttributeModeToUseCellData();
+    pvApp->BroadcastScript("%s SetAttributeModeToUseCellData",
+                           this->GetVTKSourceTclName());
     fd = this->Calculator->GetInput()->GetCellData()->GetFieldData();
     }
   
@@ -534,13 +542,23 @@ void vtkPVArrayCalculator::AddScalarVariable(const char* variableName,
                                              const char* arrayName,
                                              int component)
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
   this->UpdateFunction(variableName);
   this->Calculator->AddScalarVariable(variableName, arrayName, component);
+  pvApp->BroadcastScript("%s AddScalarVariable %s %s %d",
+                         this->GetVTKSourceTclName(),
+                         variableName, arrayName, component);
 }
 
 void vtkPVArrayCalculator::AddVectorVariable(const char* variableName,
                                              const char* arrayName)
 {
+  vtkPVApplication* pvApp = this->GetPVApplication();
+
   this->UpdateFunction(variableName);
   this->Calculator->AddVectorVariable(variableName, arrayName);
+  pvApp->BroadcastScript("%s AddVectorVariable %s %s 0 1 2",
+                         this->GetVTKSourceTclName(),
+                         variableName, arrayName);
 }
