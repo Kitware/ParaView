@@ -219,6 +219,13 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
 //----------------------------------------------------------------------------
 vtkPVAnimationInterface* vtkPVAnimationInterface::New()
 {
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVAnimationInterface");
+  if(ret)
+    {
+    return (vtkPVAnimationInterface*)ret;
+    }
+  // If the factory was unable to create the object, then create it here.
   return new vtkPVAnimationInterface();
 }
 
