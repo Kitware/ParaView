@@ -52,8 +52,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkRenderer.h"
 #include "vtkTimerLog.h"
+#include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.6");
+vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.7");
 vtkStandardNewMacro(vtkPVInteractorStyleFly);
 
 //-------------------------------------------------------------------------
