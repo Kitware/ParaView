@@ -77,7 +77,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.10");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.11");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -410,7 +410,7 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
                                             vtkStringList* dirs,
                                             vtkStringList* files)
 {
-  return this->GetDirectoryListing(dir, dirs, files, "r w");
+  return this->GetDirectoryListing(dir, dirs, files, "readable");
 }
 
 //----------------------------------------------------------------------------
@@ -461,11 +461,11 @@ void vtkPVProcessModule::InitializeTclMethodImplementations()
     "        return {<NO_SUCH_DIRECTORY>}\n"
     "      }\n"
     "    }\n"
-    "    set entries [glob -nocomplain -type \"d f l $perm\" $exp]\n"
+    "    set entries [glob -nocomplain $exp]\n"
     "    foreach f [lsort -dictionary $entries] {\n"
-    "      if {[file isfile $f]} {\n"
+    "      if {[file isfile $f] && [file $perm $f]} {\n"
     "        lappend files $f\n"
-    "      } elseif {[file isdirectory $f]} {\n"
+    "      } elseif {[file isdirectory $f] && [file $perm $f]} {\n"
     "        lappend dirs $f\n"
     "      }\n"
     "    }\n"
