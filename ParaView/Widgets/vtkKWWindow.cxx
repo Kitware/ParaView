@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_SHOW_PROPERTIES_LABEL "Show Left Panel"
 #define VTK_KW_EXIT_DIALOG_NAME "ExitApplication"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.120");
+vtkCxxRevisionMacro(vtkKWWindow, "1.121");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -819,9 +819,9 @@ void vtkKWWindow::CreatePreferencesProperties()
 
   this->DialogSettingsFrame->SetParent(
     this->Notebook->GetFrame(VTK_KW_PREFERENCES_PAGE_LABEL));
+  this->DialogSettingsFrame->ShowHideFrameOn();
   this->DialogSettingsFrame->Create(this->Application);
   this->DialogSettingsFrame->SetLabel("Dialog Settings");
-  this->DialogSettingsFrame->ShowHideFrameOn();
   
   // Confirm on exit ?
 
@@ -1159,7 +1159,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.120 $");
+  this->ExtractRevision(os,"$Revision: 1.121 $");
 }
 
 int vtkKWWindow::ExitDialog()

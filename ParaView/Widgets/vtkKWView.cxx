@@ -97,7 +97,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.86");
+vtkCxxRevisionMacro(vtkKWView, "1.87");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -488,6 +488,7 @@ void vtkKWView::CreateViewProperties()
 
   this->CornerAnnotation->SetParent(this->AnnotationProperties->GetFrame());
   this->CornerAnnotation->SetView(this);
+  this->CornerAnnotation->ShowHideFrameOn();
   this->CornerAnnotation->Create(app);
   this->CornerAnnotation->SetLabel("Corner Annotation");
   this->Script("pack %s -padx 2 -pady 4 -fill x -expand yes -anchor w",
@@ -502,6 +503,7 @@ void vtkKWView::CreateViewProperties()
                this->GeneralProperties->GetWidgetName());  
 
   this->ColorsFrame->SetParent( this->GeneralProperties->GetFrame() );
+  this->ColorsFrame->ShowHideFrameOn();
   this->ColorsFrame->Create( app );
   this->ColorsFrame->SetLabel("Colors");
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
@@ -1481,7 +1483,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.86 $");
+  this->ExtractRevision(os,"$Revision: 1.87 $");
 }
 
 //----------------------------------------------------------------------------

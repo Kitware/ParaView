@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.159");
+vtkCxxRevisionMacro(vtkPVData, "1.160");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1259,6 +1259,7 @@ void vtkPVData::CreateProperties()
                this->CubeAxesCheck->GetWidgetName());
 
   this->ActorControlFrame->SetParent(this->Properties->GetFrame());
+  this->ActorControlFrame->ShowHideFrameOn();
   this->ActorControlFrame->Create(this->Application);
   this->ActorControlFrame->SetLabel("Actor Control");
 
@@ -2786,7 +2787,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.159 $");
+  this->ExtractRevision(os,"$Revision: 1.160 $");
 }
 
 //----------------------------------------------------------------------------
