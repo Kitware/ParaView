@@ -1,12 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    vtkKWArguments.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
+Copyright (c) 1998-2003 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 All rights reserved.
 
@@ -21,7 +15,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -86,7 +80,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.9");
+vtkCxxRevisionMacro(vtkKWArguments, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
@@ -392,3 +386,6 @@ void vtkKWArguments::PrintSelf(ostream& os, vtkIndent indent)
     os << indent << "No help" << endl;
     }
 }
+
+
+

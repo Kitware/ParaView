@@ -1,12 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    vtkKWView.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
+Copyright (c) 1998-2003 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 All rights reserved.
 
@@ -21,7 +15,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -107,7 +101,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.110");
+vtkCxxRevisionMacro(vtkKWView, "1.111");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1530,7 +1524,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.110 $");
+  this->ExtractRevision(os,"$Revision: 1.111 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1695,3 +1689,4 @@ void vtkKWView::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SupportCopy: " << this->GetSupportCopy() << endl;
   os << indent << "UseProgressGauge: " << this->UseProgressGauge << endl;
 }
+

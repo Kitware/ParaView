@@ -1,12 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    vtkKWBWidgets.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
+Copyright (c) 1998-2003 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 All rights reserved.
 
@@ -21,7 +15,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -50,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWBWidgets );
-vtkCxxRevisionMacro(vtkKWBWidgets, "1.8");
+vtkCxxRevisionMacro(vtkKWBWidgets, "1.9");
 
 int vtkKWBWidgetsCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -327,3 +321,5 @@ void vtkKWBWidgets::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
 }
+
+

@@ -1,12 +1,6 @@
 /*=========================================================================
 
-  Program:   Visualization Toolkit
-  Module:    vtkKWParameterValueFunctionEditor.cxx
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
+Copyright (c) 1998-2003 Kitware Inc. 469 Clifton Corporate Parkway,
 Clifton Park, NY, 12065, USA.
 All rights reserved.
 
@@ -21,7 +15,7 @@ modification, are permitted provided that the following conditions are met:
    and/or other materials provided with the distribution.
 
  * Neither the name of Kitware nor the names of any contributors may be used
-   to endorse or promote products derived from this software without specific 
+   to endorse or promote products derived from this software without specific
    prior written permission.
 
  * Modified source versions must be plainly marked as such, and must not be
@@ -51,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.5");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.6");
 
 #define VTK_KW_RANGE_POINT_RADIUS_MIN    2
 
@@ -1773,3 +1767,4 @@ void vtkKWParameterValueFunctionEditor::PrintSelf(
   os << indent << "ComputePointColorFromValue: "
      << (this->ComputePointColorFromValue ? "On" : "Off") << endl;
 }
+
