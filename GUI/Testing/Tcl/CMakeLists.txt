@@ -85,6 +85,13 @@ IF(RUN_WITH_MPI)
   ENDFOREACH(tfile)
 ENDIF(RUN_WITH_MPI)
 
+ADD_TEST(TestBatch1-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
+  ${PVClientTests_SOURCE_DIR}/Tcl/TestBatch1.pvs
+  -D ${PVClientTestData}
+  -C ${PVCompareImages}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
+  -V ${ParaView_BINARY_DIR}/Testing/Temporary/TestBatch1.png)
+
 SET (PV_MPI_COMMANDS )
 IF(RUN_WITH_MPI)
   SET (PV_MPI_COMMANDS "--use-mpi=${VTK_MPIRUN_EXE}")
