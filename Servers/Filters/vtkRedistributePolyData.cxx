@@ -43,7 +43,7 @@
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.14");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.15");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -2897,11 +2897,18 @@ void vtkRedistributePolyData::ReceiveInputArrays(vtkDataSetAttributes* attr,
     if (array)
       {
       array->SetNumberOfComponents(numComps);
-      name = new char[nameLength];
-      this->Controller->Receive(name, nameLength, recFrom, 997248);
-      array->SetName(name);
-      delete [] name;
-      name = NULL;
+      if (nameLength > 0)
+        {
+        name = new char[nameLength];
+        this->Controller->Receive(name, nameLength, recFrom, 997248);
+        array->SetName(name);
+        delete [] name;
+        name = NULL;
+        }
+      else
+        {
+        array->SetName(NULL);
+        }
       index = attr->AddArray(array);
       array->Delete();
       array = NULL;
@@ -2944,13 +2951,19 @@ void vtkRedistributePolyData::SendInputArrays(vtkDataSetAttributes* attr,
     name = array->GetName();
     if (name == NULL)
       {
-      name = "";
+      nameLength = 0;
       }
-    nameLength = (int)strlen(name)+1;
+    else
+      {
+      nameLength = (int)strlen(name)+1;
+      }
     this->Controller->Send(&nameLength, 1, sendTo, 997247);
-    // I am pretty sure that Send does not modify the string.
-    this->Controller->Send(const_cast<char*>(name), nameLength, 
-                           sendTo, 997248);
+    if (nameLength > 0)
+      {
+      // I am pretty sure that Send does not modify the string.
+      this->Controller->Send(const_cast<char*>(name), nameLength, 
+                             sendTo, 997248);
+      }
 
     attributeType = attr->IsArrayAnAttribute(i);
     copyFlag = -1;
