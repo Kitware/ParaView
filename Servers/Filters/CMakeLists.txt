@@ -54,7 +54,6 @@ SET(Filters_SRCS
   vtkPVUpdateSuppressor.cxx
   vtkPVWarpScalar.cxx
   vtkPVWarpVector.cxx
-  vtkStructuredCacheFilter.cxx
   vtkTiledDisplaySchedule.cxx
   vtkVRMLSource.cxx
   vtkXMLPVDWriter.cxx

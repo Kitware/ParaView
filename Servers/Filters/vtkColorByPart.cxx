@@ -21,7 +21,7 @@
 #include "vtkFieldData.h"
 #include "vtkIntArray.h"
 
-vtkCxxRevisionMacro(vtkColorByPart, "1.5");
+vtkCxxRevisionMacro(vtkColorByPart, "1.6");
 vtkStandardNewMacro(vtkColorByPart);
 
 
@@ -29,7 +29,7 @@ vtkStandardNewMacro(vtkColorByPart);
 // Add a dataset to the list of data to append.
 void vtkColorByPart::AddInput(vtkDataSet *ds)
 {
-  this->vtkProcessObject::AddInput(ds);
+  this->Superclass::AddInput(ds);
 }
 
 //----------------------------------------------------------------------------

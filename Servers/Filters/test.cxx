@@ -34,7 +34,6 @@
 #include "vtkPVUpdateSuppressor.h"
 #include "vtkPVWarpScalar.h"
 #include "vtkPVWarpVector.h"
-#include "vtkStructuredCacheFilter.h"
 #include "vtkVRMLSource.h"
 #include "vtkXMLPVDWriter.h"
 #include "vtkDataSetSubdivisionAlgorithm.h"
@@ -84,7 +83,6 @@ int main()
   c = vtkPVUpdateSuppressor::New(); c->Print(cout); c->Delete();
   c = vtkPVWarpScalar::New(); c->Print(cout); c->Delete();
   c = vtkPVWarpVector::New(); c->Print(cout); c->Delete();
-  c = vtkStructuredCacheFilter::New(); c->Print(cout); c->Delete();
   c = vtkVRMLSource::New(); c->Print(cout); c->Delete();
   c = vtkXMLPVDWriter::New(); c->Print(cout); c->Delete();
 #ifdef VTK_USE_MPI

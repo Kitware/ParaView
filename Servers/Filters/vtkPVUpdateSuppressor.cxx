@@ -15,12 +15,13 @@
 #include "vtkPVUpdateSuppressor.h"
 
 #include "vtkCommand.h"
+#include "vtkDemandDrivenPipeline.h"
 #include "vtkObjectFactory.h"
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.16");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.17");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor,Input,vtkDataSet);
 
@@ -98,7 +99,25 @@ void vtkPVUpdateSuppressor::ForceUpdate()
   input->SetUpdatePiece(this->UpdatePiece);
   input->SetUpdateNumberOfPieces(this->UpdateNumberOfPieces);
   input->Update();
-  if (input->GetPipelineMTime() > this->UpdateTime || output->GetDataReleased())
+
+  unsigned long t2;
+#ifdef VTK_USE_EXECUTIVES
+  vtkDemandDrivenPipeline *ddp = 0;
+  if (input->GetSource())
+    {
+    ddp = 
+      vtkDemandDrivenPipeline::SafeDownCast(
+        input->GetSource()->GetExecutive());
+    }
+  if (ddp)
+    {
+    ddp->UpdateInformation();
+    t2 = ddp->GetPipelineMTime();
+    }
+#else
+  t2 = input->GetPipelineMTime();
+#endif
+  if (t2 > this->UpdateTime || output->GetDataReleased())
     {
     output->ShallowCopy(input);
     this->UpdateTime.Modified();

@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.8");
+vtkCxxRevisionMacro(vtkSMPart, "1.9");
 
 
 //----------------------------------------------------------------------------
@@ -259,30 +259,6 @@ void vtkSMPart::InsertExtractPiecesIfNecessary()
 //                       << "EndEvent"
 //                       << end
 //                       << vtkClientServerStream::End;
-      }
-    }
-  else if (!strcmp(className, "vtkImageData"))
-    {
-    if (getenv("PV_LOCK_SAFE") == NULL)
-      { 
-      tempDataPiece = pm->NewStreamObject(
-        "vtkStructuredCacheFilter", stream);
-      }
-    }
-  else if (!strcmp(className, "vtkStructuredGrid"))
-    {
-    if (getenv("PV_LOCK_SAFE") == NULL)
-      {
-      tempDataPiece = pm->NewStreamObject(
-        "vtkStructuredCacheFilter", stream);
-      }
-    }
-  else if (!strcmp(className, "vtkRectilinearGrid"))
-    {
-    if (getenv("PV_LOCK_SAFE") == NULL)
-      {
-      tempDataPiece = pm->NewStreamObject(
-        "vtkStructuredCacheFilter", stream);
       }
     }
 
