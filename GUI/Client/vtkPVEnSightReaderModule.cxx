@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.51");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.52");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -76,7 +76,7 @@ void vtkPVEnSightReaderModule::SaveInBatchScript(ofstream *file)
 
   this->SaveFilterInBatchScript(file);
   *file << "  $pvTemp" <<  this->GetVTKSourceID(0)
-        << " Update" 
+        << " UpdatePipeline" 
         << endl;
   // Add the mapper, actor, scalar bar actor ...
   this->GetPVOutput()->SaveInBatchScript(file);
