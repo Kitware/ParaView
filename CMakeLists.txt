@@ -83,4 +83,18 @@ INCLUDE (${CMAKE_ROOT}/Modules/FindDart.cmake)
 #
 # try to find the data files for VTKData
 #
-FIND_PATH(VTK_DATA_ROOT VTKData.readme ${VTK_SOURCE_DIR}/../VTKData ${VTK_SOURCE_DIR}/../../VTKData $ENV{VTK_DATA_ROOT})
+FIND_PATH(VTK_DATA_ROOT VTKData.readme ${VTK_SOURCE_DIR}/../VTKData ${VTK_SOURCE_DIR}/../../VTKData $ENV{VTK_DATA_ROOT} DOC "If you have VTK data files (used in tests and examples), where is it located?")
+
+MARK_AS_ADVANCED(CLEAR VTK_USE_MPI MPI_EXTRA_LIBRARY MPI_INCLUDE_PATH MPI_LIBRARY)
+MARK_AS_ADVANCED(BUILD_EXAMPLES VTK_WRAP_TCL VTK_WRAP_JAVA VTK_WRAP_PYTHON VTK_USE_HYBRID VTK_USE_PARALLEL VTK_USE_RENDERING VTK_USE_VOLUMEPRO VTK_USE_ANSI_STDLIB TK_WISH TCL_TCLSH PARAVIEW_DATA_ROOT)
+
+OPTION (VTK_USE_MPI 
+        "use MPI (Message Passing Interface) library for parallel support"
+        OFF)
+
+IF(VTK_USE_MPI)
+  FIND_LIBRARY(MPI_EXTRA_LIBRARY 
+               NAMES mpi++
+               PATHS /usr/lib /usr/local/lib /usr/local/mpi/lib
+               DOC "If a second mpi library is necessary, specify it here.")
+ENDIF(VTK_USE_MPI)
