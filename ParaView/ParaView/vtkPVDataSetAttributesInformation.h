@@ -112,7 +112,7 @@ protected:
   // Data information collected from remote processes.
   vtkCollection* ArrayInformation;
   // Standard cell attributes.
-  int            AttributeIndices[5]; 
+  short          AttributeIndices[5]; 
 
   vtkPVDataSetAttributesInformation(const vtkPVDataSetAttributesInformation&); // Not implemented
   void operator=(const vtkPVDataSetAttributesInformation&); // Not implemented
