@@ -48,7 +48,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.18");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.19");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -61,6 +61,7 @@ vtkPVProcessModule::vtkPVProcessModule()
   this->ServerInformation = vtkPVServerInformation::New();
   this->UseTriangleStrips = 0;
   this->UseImmediateMode = 1;
+  this->Options = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -196,69 +197,32 @@ vtkObjectBase* vtkPVProcessModule::GetObjectFromIntID(unsigned int idin)
 void vtkPVProcessModule::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
   os << indent << "LogThreshold: " << this->LogThreshold << endl;
-  os << indent << "MachinesFileName: " 
-     << (this->Options->GetMachinesFileName()?this->Options->GetMachinesFileName():"(null)") << endl;
-  if (this->Options->GetClientMode())
-    {
-    os << indent << "Running as a client\n";
-    os << indent << "Port: " << this->Options->GetPort() << endl;
-    os << indent << "RenderNodePort: " << this->Options->GetRenderNodePort() << endl;
-    os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
-    os << indent << "Host: " << (this->Options->GetHostName()?this->Options->GetHostName():"(none)") << endl;
-    os << indent << "Render Host: " << (this->Options->GetRenderServerHostName()?this->Options->GetRenderServerHostName():"(none)") << endl;
-    os << indent << "Username: " 
-       << (this->Options->GetUsername()?this->Options->GetUsername():"(none)") << endl;
-    os << indent << "AlwaysSSH: " << this->Options->GetAlwaysSSH() << endl;
-    os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
-    os << indent << "UseStereoRendering: " << this->Options->GetUseStereoRendering() << endl;
-    }
-  if (this->Options->GetServerMode())
-    {
-    os << indent << "Running as a server\n";
-    os << indent << "Port: " << this->Options->GetPort() << endl;
-    os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
-    os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
-    }
-  if (this->Options->GetRenderServerMode())
-    {
-    if(this->Options->GetClientMode())
-      {
-      os << indent << "Running as a client connectd to a render server\n";
-      }
-    else
-      {
-      os << indent << "Running as a render server\n";
-      os << indent << "RenderServerPort: " << this->Options->GetRenderServerPort() << endl;
-      os << indent << "Port: " << this->Options->GetPort() << endl;
-      os << indent << "ReverseConnection: " << this->Options->GetReverseConnection() << endl;
-      }
-    } 
   os << indent << "ProgressEnabled: " << this->ProgressEnabled << endl;
   os << indent << "DemoPath: " << (this->DemoPath?this->DemoPath:"(none)") << endl;
-
-  if (this->ServerInformation)
-    {
-    os << indent << "ServerInformation:\n";
-    vtkIndent i2 = indent.GetNextIndent();
-    this->ServerInformation->PrintSelf(os, i2);
-    }
-  else
-    {
-    os << indent << "ServerInformation: NULL\n";
-    }
-  os << indent << "UseTiledDisplay: " << this->Options->GetUseTiledDisplay() << endl;
-  if (this->Options->GetCaveConfigurationFileName())
-    {
-    os << indent << "CaveConfigurationFileName: " 
-       << this->Options->GetCaveConfigurationFileName() << endl;
-    }
-  else
-    {
-    os << indent << "CaveConfigurationFileName: NULL\n";
-    } 
   os << indent << "UseTriangleStrips: " << this->UseTriangleStrips << endl;
   os << indent << "UseImmediateMode: " << this->UseImmediateMode << endl;
+
+  os << indent << "Options: ";
+  if(this->Options)
+    {
+    this->Options->PrintSelf(os << endl, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;
+    }
+
+  os << indent << "ServerInformation: ";
+  if (this->ServerInformation)
+    {
+    this->ServerInformation->PrintSelf(os << endl, indent.GetNextIndent());
+    }
+  else
+    {
+    os << "(none)" << endl;;
+    }
 }
 
 //----------------------------------------------------------------------------

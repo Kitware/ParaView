@@ -148,7 +148,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.15");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.16");
 
 
 //----------------------------------------------------------------------------
@@ -1150,11 +1150,8 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Controller: " << this->Controller << endl;;
   os << indent << "SocketController: " << this->SocketController << endl;;
   os << indent << "RenderServerSocket: " << this->RenderServerSocket << endl;;
-  os << indent << "ClientMode: " << this->Options->GetClientMode() << endl;
-  os << indent << "RenderServerMode(): " << this->Options->GetRenderServerMode() << endl;
   os << indent << "NumberOfProcesses: " << this->NumberOfProcesses << endl;
   os << indent << "MultiProcessMode: " << this->MultiProcessMode << endl;
-  os << indent << "RenderServerMode(): " << this->Options->GetRenderServerMode() << endl;
   os << indent << "NumberOfServerProcesses: " << this->NumberOfServerProcesses << endl;
   os << indent << "ConnectID: " << this->ConnectID << endl;
   os << indent << "Enabled: " << this->Enabled << endl;
