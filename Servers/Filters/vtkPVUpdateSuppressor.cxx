@@ -19,7 +19,7 @@
 #include "vtkDataSet.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.13");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.14");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 
 //----------------------------------------------------------------------------
@@ -87,6 +87,7 @@ void vtkPVUpdateSuppressor::ForceUpdate()
         input->GetSource()->IsA("vtkMPIDuplicatePolyData") ||
         input->GetSource()->IsA("vtkM2NDuplicate") ||
         input->GetSource()->IsA("vtkM2NCollect") ||
+        input->GetSource()->IsA("vtkMPIDuplicateUnstructuredGrid") ||
         input->GetSource()->IsA("vtkPVDuplicatePolyData")))
     {
     input->GetSource()->Modified();
