@@ -3456,107 +3456,116 @@ proc warp_run {} {
     $warp(vtkTemp469) SetVisibility 0
 }
 
-#$Application ExitOnReturnOn
-
-set foundFiles 1
-
-CheckForDemoFile combxyz.bin
-CheckForDemoFile combq.bin
-CheckForDemoFile postxyz.bin
-CheckForDemoFile postq.bin
-CheckForDemoFile quadric.vtk
-CheckForDemoFile blow.vtk
-
-if $foundFiles {
-    set pvDemoShouldStop 0
-
-    wm protocol .paraview WM_DELETE_WINDOW {StopDemo}
-
-    if {![winfo exists .control]} {
-        toplevel .control
-        wm withdraw .control
-        wm title .control "demo control panel"
-        frame .control.main -width 350 -height 200
-        label .control.main.info  -wraplength 300
-        button .control.main.stop -text "Stop Demo" -command {StopDemo} -bg red
-        pack .control.main
-        place .control.main.info -rely 0 -relx 0.5 -anchor n
-        place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
-        
-        wm transient .control .paraview  
-    }
-
-    wm deiconify .control
-    .control.main.stop configure -state normal
-    .control.main.info configure -text "ParaView demo initializing.\n Please wait." 
-    grab .control.main.stop
-
-    clip_init
-    extract_init
-    iso_init
-    threshold_init
-    warp_init
-    if {[[$Application GetController] GetNumberOfProcesses] == 1} {
-        stream_init
-    }
-
-    while {1} {
-        iso_run
-        warp_run
-        if {[[$Application GetController] GetNumberOfProcesses] == 1} {
-            stream_run
-        }
-        extract_run
-        clip_run
-        threshold_run
-
-        if $pvDemoShouldStop {
-            break
-        }
-    }
-
-}
-
-if { [info exists pvDemoCommandLine] } {
-    $Application Exit
+if ![info exists DemoDir] {
+    vtkKWMessageDialog _adialog
+    _adialog PopupMessage $Application [$Application GetMainWindow] Error "Please launch the demo either by choosing \"Play Demo\" from the Help menu or by adding  --play-demo argument to the command line." 0
+    _adialog Delete
 } else {
-    global clip extract iso streams threshold warp
 
-    catch {$clip(vtkTemp572) DeleteCallback}
-    catch {$clip(vtkTemp507) DeleteCallback}
-    catch {$clip(vtkTemp384) DeleteCallback}
+    #$Application ExitOnReturnOn
 
-    catch {$extract(vtkTemp780) DeleteCallback}
-    catch {$extract(vtkTemp703) DeleteCallback}
-    catch {$extract(vtkTemp598) DeleteCallback}
-    catch {$extract(vtkTemp478) DeleteCallback}
-    catch {$extract(vtkTemp384) DeleteCallback}
+    set foundFiles 1
 
-    catch {$iso(vtkTemp820) DeleteCallback}
-    catch {$iso(vtkTemp739) DeleteCallback}
-    catch {$iso(vtkTemp674) DeleteCallback}
-    catch {$iso(vtkTemp565) DeleteCallback}
-    catch {$iso(vtkTemp449) DeleteCallback}
-    catch {$iso(vtkTemp384) DeleteCallback}
+    CheckForDemoFile combxyz.bin
+    CheckForDemoFile combq.bin
+    CheckForDemoFile postxyz.bin
+    CheckForDemoFile postq.bin
+    CheckForDemoFile quadric.vtk
+    CheckForDemoFile blow.vtk
 
-    catch {$streams(vtkTemp900) DeleteCallback}
-    catch {$streams(vtkTemp786) DeleteCallback}
-    catch {$streams(vtkTemp679) DeleteCallback}
-    catch {$streams(vtkTemp597) DeleteCallback}
-    catch {$streams(vtkTemp478) DeleteCallback}
-    catch {$streams(vtkTemp384) DeleteCallback}
+    if $foundFiles {
+        set pvDemoShouldStop 0
 
-    catch {$threshold(vtkTemp482) DeleteCallback}
-    catch {$threshold(vtkTemp384) DeleteCallback}
+        wm protocol .paraview WM_DELETE_WINDOW {StopDemo}
 
-    catch {$warp(vtkTemp450) DeleteCallback}
-    catch {$warp(vtkTemp384) DeleteCallback}
+        if {![winfo exists .control]} {
+            toplevel .control
+            wm withdraw .control
+            wm title .control "demo control panel"
+            frame .control.main -width 350 -height 200
+            label .control.main.info  -wraplength 300
+            button .control.main.stop -text "Stop Demo" -command {StopDemo} -bg red
+            pack .control.main
+            place .control.main.info -rely 0 -relx 0.5 -anchor n
+            place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
+            
+            wm transient .control .paraview  
+        }
 
-    $clip(vtkTemp24) EventuallyRender
+        wm deiconify .control
+        .control.main.stop configure -state normal
+        .control.main.info configure -text "ParaView demo initializing.\n Please wait." 
+        grab .control.main.stop
 
-    grab release .control.main.stop
-    wm withdraw .control
+        clip_init
+        extract_init
+        iso_init
+        threshold_init
+        warp_init
+        if {[[$Application GetController] GetNumberOfProcesses] == 1} {
+            stream_init
+        }
 
-    wm protocol .paraview WM_DELETE_WINDOW { [$Application GetMainWindow] Exit }
+        while {1} {
+            iso_run
+            warp_run
+            if {[[$Application GetController] GetNumberOfProcesses] == 1} {
+                stream_run
+            }
+            extract_run
+            clip_run
+            threshold_run
+
+            if $pvDemoShouldStop {
+                break
+            }
+        }
+
+    }
+
+    if { [info exists pvDemoCommandLine] } {
+        $Application Exit
+    } else {
+        global clip extract iso streams threshold warp
+
+        catch {$clip(vtkTemp572) DeleteCallback}
+        catch {$clip(vtkTemp507) DeleteCallback}
+        catch {$clip(vtkTemp384) DeleteCallback}
+
+        catch {$extract(vtkTemp780) DeleteCallback}
+        catch {$extract(vtkTemp703) DeleteCallback}
+        catch {$extract(vtkTemp598) DeleteCallback}
+        catch {$extract(vtkTemp478) DeleteCallback}
+        catch {$extract(vtkTemp384) DeleteCallback}
+
+        catch {$iso(vtkTemp820) DeleteCallback}
+        catch {$iso(vtkTemp739) DeleteCallback}
+        catch {$iso(vtkTemp674) DeleteCallback}
+        catch {$iso(vtkTemp565) DeleteCallback}
+        catch {$iso(vtkTemp449) DeleteCallback}
+        catch {$iso(vtkTemp384) DeleteCallback}
+
+        catch {$streams(vtkTemp900) DeleteCallback}
+        catch {$streams(vtkTemp786) DeleteCallback}
+        catch {$streams(vtkTemp679) DeleteCallback}
+        catch {$streams(vtkTemp597) DeleteCallback}
+        catch {$streams(vtkTemp478) DeleteCallback}
+        catch {$streams(vtkTemp384) DeleteCallback}
+
+        catch {$threshold(vtkTemp482) DeleteCallback}
+        catch {$threshold(vtkTemp384) DeleteCallback}
+
+        catch {$warp(vtkTemp450) DeleteCallback}
+        catch {$warp(vtkTemp384) DeleteCallback}
+
+        $clip(vtkTemp24) EventuallyRender
+
+        grab release .control.main.stop
+        wm withdraw .control
+
+        wm protocol .paraview WM_DELETE_WINDOW { [$Application GetMainWindow] Exit }
+    }
+
+    unset DemoDir
 }
 
