@@ -1,4 +1,7 @@
 #include "vtkTclUtil.h"
+int vtkArrowSourceCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkArrowSourceNewCommand();
 int vtkCameraInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkCameraInteractorNewCommand();
@@ -11,9 +14,9 @@ ClientData vtkCutPlaneNewCommand();
 int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkDummyRenderWindowInteractorNewCommand();
-int vtkImageOutlineFilterCommand(ClientData cd, Tcl_Interp *interp,
+int vtkInhibitPointsCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
-ClientData vtkImageOutlineFilterNewCommand();
+ClientData vtkInhibitPointsNewCommand();
 int vtkInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkInteractorNewCommand();
@@ -159,6 +162,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_SafeInit(Tcl_Interp *interp)
 
 int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
+  vtkTclCreateNew(interp,(char *) "vtkArrowSource", vtkArrowSourceNewCommand,
+                  vtkArrowSourceCommand);
   vtkTclCreateNew(interp,(char *) "vtkCameraInteractor", vtkCameraInteractorNewCommand,
                   vtkCameraInteractorCommand);
   vtkTclCreateNew(interp,(char *) "vtkClipPlane", vtkClipPlaneNewCommand,
@@ -167,8 +172,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
                   vtkDummyRenderWindowInteractorCommand);
-  vtkTclCreateNew(interp,(char *) "vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
-                  vtkImageOutlineFilterCommand);
+  vtkTclCreateNew(interp,(char *) "vtkInhibitPoints", vtkInhibitPointsNewCommand,
+                  vtkInhibitPointsCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractor", vtkInteractorNewCommand,
                   vtkInteractorCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,
