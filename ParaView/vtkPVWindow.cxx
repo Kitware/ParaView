@@ -116,6 +116,12 @@ vtkPVWindow::vtkPVWindow()
   this->SourceInterfaces = vtkCollection::New();
   this->CurrentPVData = NULL;
   //this->CurrentInteractor = NULL;
+
+  // Allow the user to interactively resize the properties parent.
+  this->MiddleFrame->SetSeparatorWidth(6);
+  this->MiddleFrame->SetFrame1MinimumWidth(5);
+  this->MiddleFrame->SetFrame1Width(360);
+  this->MiddleFrame->SetFrame2MinimumWidth(200);
 }
 
 //----------------------------------------------------------------------------
