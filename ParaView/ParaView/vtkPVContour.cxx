@@ -190,6 +190,7 @@ void vtkPVContour::SetPVInput(vtkPVData *input)
     return;
     }
 
+  this->InputMenu->Reset();
   this->ArrayMenu->Reset();
   if (this->ArrayMenu->GetValue() == NULL)
     {
