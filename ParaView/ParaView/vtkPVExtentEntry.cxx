@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.21");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -427,7 +427,6 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
     ai->SetTimeStart(ext[0]);
     ai->SetCurrentTime(ext[0]);
     ai->SetTimeEnd(ext[1]);
-    ai->SetTimeStep(1.0);
     }
   else if (mode == 1)
     {
@@ -438,7 +437,6 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
     ai->SetTimeStart(ext[2]);
     ai->SetCurrentTime(ext[2]);
     ai->SetTimeEnd(ext[3]);
-    ai->SetTimeStep(1.0);
     }
   else if (mode == 2)
     {
@@ -449,7 +447,6 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai,
     ai->SetTimeStart(ext[4]);
     ai->SetCurrentTime(ext[4]);
     ai->SetTimeEnd(ext[5]);
-    ai->SetTimeStep(1.0);
     }
   else
     {

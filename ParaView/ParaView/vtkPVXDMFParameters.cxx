@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.5");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -429,7 +429,6 @@ void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterface *ai, con
   ai->SetLabelAndScript(this->GetTraceName(), script);
   ai->SetTimeStart(0);
   ai->SetCurrentTime(p->Value);
-  ai->SetTimeStep(1);
   ai->SetTimeEnd(p->Max);
   ai->SetTypeToInt();
   //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;

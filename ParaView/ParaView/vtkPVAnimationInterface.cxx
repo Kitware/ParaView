@@ -142,7 +142,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.53");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -166,7 +166,6 @@ public:
     this->MethodMenuButton = vtkKWMenuButton::New();
     this->StartTimeEntry = vtkKWEntry::New();
     this->EndTimeEntry = vtkKWEntry::New();
-    this->StepTimeEntry = vtkKWEntry::New();
     this->TimeRange = vtkKWRange::New();
 
     this->PVSource = 0;
@@ -174,7 +173,6 @@ public:
     this->CurrentMethod = 0;
     this->TimeStart = 0;
     this->TimeEnd = 100;
-    this->TimeStep = 1;
     this->TimeEquation = 0;
     this->Label = 0;
 
@@ -220,7 +218,6 @@ public:
     this->MethodMenuButton->SetParent(this->SourceMethodFrame->GetFrame());
     this->StartTimeEntry->SetParent(this->SourceMethodFrame->GetFrame());
     this->EndTimeEntry->SetParent(this->SourceMethodFrame->GetFrame());
-    this->StepTimeEntry->SetParent(this->SourceMethodFrame->GetFrame());
     this->TimeRange->SetParent(this->SourceMethodFrame->GetFrame());
 
     this->SourceMenuButton->GetMenu()->SetTearOff(0);
@@ -234,7 +231,6 @@ public:
     this->MethodMenuButton->Create(pvApp, 0);
     this->StartTimeEntry->Create(pvApp, 0);
     this->EndTimeEntry->Create(pvApp, 0);
-    this->StepTimeEntry->Create(pvApp, 0);
     this->TimeRange->Create(pvApp, 0);
 
     this->SourceMenuButton->SetBalloonHelpString(
@@ -253,13 +249,12 @@ public:
 
     this->SourceLabel->SetLabel("Source");
     this->MethodLabel->SetLabel("Method");
-    pvApp->Script("grid %s %s - - -sticky news -pady 2 -padx 2", 
+    pvApp->Script("grid %s %s - -sticky news -pady 2 -padx 2", 
       this->SourceLabel->GetWidgetName(), this->SourceMenuButton->GetWidgetName());
-    pvApp->Script("grid %s %s - - -sticky news -pady 2 -padx 2", 
+    pvApp->Script("grid %s %s - -sticky news -pady 2 -padx 2", 
       this->MethodLabel->GetWidgetName(), this->MethodMenuButton->GetWidgetName());
-    pvApp->Script("grid x %s %s %s -sticky news -pady 2 -padx 2", 
+    pvApp->Script("grid x %s %s -sticky news -pady 2 -padx 2", 
       this->StartTimeEntry->GetWidgetName(), 
-      this->StepTimeEntry->GetWidgetName(),
       this->EndTimeEntry->GetWidgetName());
     /*
     pvApp->Script("grid %s - - - -sticky news -pady 2 -padx 2", 
@@ -290,7 +285,6 @@ public:
     this->MethodMenuButton->Delete();
     this->StartTimeEntry->Delete();
     this->EndTimeEntry->Delete();
-    this->StepTimeEntry->Delete();
     this->SetPVSource(0);
     this->SetScript(0);
     this->SetCurrentMethod(0);
@@ -330,12 +324,6 @@ public:
     this->UpdateStartEndValueToEntry();
     }
 
-  void SetTimeStepValue(float f)
-    {
-    this->SetTimeStep(f);
-    this->UpdateStartEndValueToEntry();
-    }
-
   void UpdateStartEndValueFromEntry()
     {
     if ( this->TimeStart != this->StartTimeEntry->GetValueAsFloat() )
@@ -346,17 +334,12 @@ public:
       {
       this->Parent->SetTimeEnd(this->CurrentIndex, this->EndTimeEntry->GetValueAsFloat());
       }
-    if ( this->TimeStep != this->StepTimeEntry->GetValueAsFloat() )
-      {
-      this->Parent->SetTimeStep(this->CurrentIndex, this->StepTimeEntry->GetValueAsFloat());
-      }
     }
 
   void UpdateStartEndValueToEntry()
     {
     this->StartTimeEntry->SetValue(this->GetTimeStart());
     this->EndTimeEntry->SetValue(this->GetTimeEnd());
-    this->StepTimeEntry->SetValue(this->GetTimeStep());
     }
 
   float GetTimeStartValue()
@@ -371,26 +354,16 @@ public:
     return this->GetTimeEnd();
     }
 
-  float GetTimeStepValue()
-    {
-    this->UpdateStartEndValueFromEntry();
-    return this->GetTimeStep();
-    }
-
   vtkSetMacro(TimeStart, float);
-  vtkSetMacro(TimeStep, float);
   vtkSetMacro(TimeEnd, float);
   vtkGetMacro(TimeStart, float);
-  vtkGetMacro(TimeStep, float);
   vtkGetMacro(TimeEnd, float);
 
-  const char* GetTimeEquation(float tmin, float tmax, float tstep)
+  const char* GetTimeEquation(float vtkNotUsed(tmax))
     {
     this->UpdateStartEndValueFromEntry();
-    float trange = (tmax - tmin) + 1;
     float max = this->TimeEnd;
     float min = this->TimeStart;
-    float step = this->TimeStep;
     float range = (max - min) + 1;
 
     // formula is:
@@ -401,8 +374,7 @@ public:
       {
       str << "round";
       }
-    str << "((((((1.0 * $globalPVTime - " << tmin << ") / " << trange 
-      << ") / " << tstep << ") * " << range << ") + " << min << " ) * " << step << " ) ]" << ends;
+    str << "(($globalPVTime * " << range << ") + " << min << " ) ]" << ends;
     this->SetTimeEquation(str.str());
     str.rdbuf()->freeze(0);
     return this->GetTimeEquation();
@@ -415,8 +387,6 @@ public:
     this->StartTimeEntry->SetBind(ai, "<KeyPress-Return>", "UpdateNewScript");
     this->EndTimeEntry->SetBind(ai, "<FocusOut>", "UpdateNewScript");
     this->EndTimeEntry->SetBind(ai, "<KeyPress-Return>", "UpdateNewScript");
-    this->StepTimeEntry->SetBind(ai, "<FocusOut>", "UpdateNewScript");
-    this->StepTimeEntry->SetBind(ai, "<KeyPress-Return>", "UpdateNewScript");
     }
 
   void SetTypeToFloat()
@@ -445,7 +415,6 @@ protected:
   vtkKWMenuButton *SourceMenuButton;
   vtkKWEntry *StartTimeEntry;
   vtkKWEntry *EndTimeEntry;
-  vtkKWEntry *StepTimeEntry;
 
   // Menu Showing all of the possible methods of the selected source.
   vtkKWLabel*        MethodLabel;
@@ -460,7 +429,6 @@ protected:
   char*              Label;
 
   float TimeStart;
-  float TimeStep;
   float TimeEnd;
 
   int TypeIsInt;
@@ -480,9 +448,7 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 {
   this->CommandFunction = vtkPVAnimationInterfaceCommand;
 
-  this->TimeStart = 0;
-  this->TimeStep = 1;
-  this->TimeEnd = 100;
+  this->TimeSpan = 100;
 
   this->StopFlag = 0;
   this->InPlay = 0;
@@ -511,13 +477,10 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
 
   this->TimeFrame = vtkKWWidget::New();
 
-  this->TimeStartEntry = vtkKWLabeledEntry::New();
-
-  this->TimeEndEntry = vtkKWLabeledEntry::New();
-
-  this->TimeStepEntry = vtkKWLabeledEntry::New();
+  this->TimeSpanEntry = vtkKWLabeledEntry::New();
 
   this->TimeScale = vtkKWScale::New();
+  this->TimeRange = vtkKWRange::New();
 
   // Action and script editing
 
@@ -601,20 +564,15 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
     this->TimeFrame->Delete();
     this->TimeFrame = NULL;
     }
-  if (this->TimeStartEntry)
+  if (this->TimeSpanEntry)
     {
-    this->TimeStartEntry->Delete();
-    this->TimeStartEntry = NULL;
+    this->TimeSpanEntry->Delete();
+    this->TimeSpanEntry = NULL;
     }
-  if (this->TimeEndEntry)
+  if (this->TimeRange)
     {
-    this->TimeEndEntry->Delete();
-    this->TimeEndEntry = NULL;
-    }
-  if (this->TimeStepEntry)
-    {
-    this->TimeStepEntry->Delete();
-    this->TimeStepEntry = NULL;
+    this->TimeRange->Delete();
+    this->TimeRange = 0;
     }
 
   if (this->ScriptEditor)
@@ -876,61 +834,35 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->Script("pack %s -side top -expand t -fill x", 
                this->TimeScale->GetWidgetName());
 
-  // Animation Control: Start/Step/End
-
   this->TimeFrame->SetParent(this->ControlFrame->GetFrame());
   this->TimeFrame->Create(this->Application, "frame", "");
 
   this->Script("pack %s -side top -expand t -fill x", 
                this->TimeFrame->GetWidgetName());
 
-  this->TimeStartEntry->SetParent(this->TimeFrame);
-  this->TimeStartEntry->Create(this->Application);
-  this->TimeStartEntry->GetEntry()->SetWidth(6);
-  this->TimeStartEntry->SetLabel("Start:");
-  this->TimeStartEntry->SetValue(this->TimeStart);
+  this->TimeSpanEntry->SetParent(this->TimeFrame);
+  this->TimeSpanEntry->Create(this->Application);
+  this->TimeSpanEntry->GetEntry()->SetWidth(6);
+  this->TimeSpanEntry->SetLabel("Span:");
+  this->TimeSpanEntry->SetValue(this->TimeSpan);
 
-  this->Script("bind %s <KeyPress-Return> {%s TimeStartEntryCallback}",
-               this->TimeStartEntry->GetEntry()->GetWidgetName(),
+  this->Script("bind %s <KeyPress-Return> {%s TimeSpanEntryCallback}",
+               this->TimeSpanEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
 
-  this->Script("bind %s <FocusOut> {%s TimeStartEntryCallback}",
-               this->TimeStartEntry->GetEntry()->GetWidgetName(),
+  this->Script("bind %s <FocusOut> {%s TimeSpanEntryCallback}",
+               this->TimeSpanEntry->GetEntry()->GetWidgetName(),
                this->GetTclName());
 
-  this->TimeStepEntry->SetParent(this->TimeFrame);
-  this->TimeStepEntry->Create(this->Application);
-  this->TimeStepEntry->GetEntry()->SetWidth(6);
-  this->TimeStepEntry->SetLabel("Step:");
-  this->TimeStepEntry->SetValue(this->TimeStep);
+  this->Script("pack %s -side left -expand t -fill x", 
+               this->TimeSpanEntry->GetWidgetName());
 
-  this->Script("bind %s <KeyPress-Return> {%s TimeStepEntryCallback}",
-               this->TimeStepEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
+  this->TimeRange->SetParent(this->ControlFrame->GetFrame());
+  this->TimeRange->ShowEntriesOn();
+  this->TimeRange->Create(this->Application, 0);
 
-  this->Script("bind %s <FocusOut> {%s TimeStepEntryCallback}",
-               this->TimeStepEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->TimeEndEntry->SetParent(this->TimeFrame);
-  this->TimeEndEntry->Create(this->Application);
-  this->TimeEndEntry->GetEntry()->SetWidth(6);
-  this->TimeEndEntry->SetLabel("End:");
-  this->TimeEndEntry->SetValue(this->TimeEnd);
-
-  this->Script("bind %s <KeyPress-Return> {%s TimeEndEntryCallback}",
-               this->TimeEndEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("bind %s <FocusOut> {%s TimeEndEntryCallback}",
-               this->TimeEndEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("pack %s %s %s -side left -expand t -fill x", 
-               this->TimeStartEntry->GetWidgetName(),
-               this->TimeStepEntry->GetWidgetName(),
-               this->TimeEndEntry->GetWidgetName());
-
+  this->Script("pack %s -side top -expand t -fill x", 
+               this->TimeRange->GetWidgetName());
 
   // New Interface ----------------------------------------------------
   this->AnimationEntriesFrame->SetParent(this);
@@ -957,7 +889,7 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->Script("pack %s %s -side left -fill both -expand 1", 
     this->AddItemButton->GetWidgetName(),
     this->DeleteItemButton->GetWidgetName());
-  this->Script("%s configure -bg red", this->AnimationEntryInformation->GetWidgetName());
+  //this->Script("%s configure -bg red", this->AnimationEntryInformation->GetWidgetName());
   frame->Delete();
   this->AddItemButton->SetCommand(this, "AddEmptySourceItem");
 
@@ -1027,6 +959,8 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
                this->ActionFrame->GetWidgetName(),
                this->SaveFrame->GetWidgetName());
 
+  this->TimeRange->SetWholeRange(0, this->TimeSpan-1);
+  this->TimeRange->SetRange(0, this->TimeSpan-1);
   this->UpdateInterface();
 
   this->AddEmptySourceItem();
@@ -1106,49 +1040,25 @@ void vtkPVAnimationInterface::UpdateInterface()
       }
     }
 
-  if (this->TimeStartEntry && this->TimeStartEntry->IsCreated())
+  if (this->TimeSpanEntry && this->TimeSpanEntry->IsCreated())
     {
-    this->TimeStartEntry->SetValue(this->TimeStart);
+    this->TimeSpanEntry->SetValue(this->TimeSpan);
     if (this->InPlay)
       {
-      this->TimeStartEntry->EnabledOff();
+      this->TimeSpanEntry->EnabledOff();
       }
     else
       {
-      this->TimeStartEntry->EnabledOn();
-      }
-    }
-
-  if (this->TimeEndEntry && this->TimeEndEntry->IsCreated())
-    {
-    this->TimeEndEntry->SetValue(this->TimeEnd);
-    if (this->InPlay)
-      {
-      this->TimeEndEntry->EnabledOff();
-      }
-    else
-      {
-      this->TimeEndEntry->EnabledOn();
-      }
-    }
-
-  if (this->TimeStepEntry && this->TimeStepEntry->IsCreated())
-    {
-    this->TimeStepEntry->SetValue(this->TimeStep);
-    if (this->InPlay)
-      {
-      this->TimeStepEntry->EnabledOff();
-      }
-    else
-      {
-      this->TimeStepEntry->EnabledOn();
+      this->TimeSpanEntry->EnabledOn();
       }
     }
 
   if (this->TimeScale && this->TimeScale->IsCreated())
     {
-    this->TimeScale->SetRange(this->TimeStart, this->TimeEnd);
-    this->TimeScale->SetResolution(this->TimeStep);
+    this->TimeScale->SetRange(0, this->TimeSpan-1);
+    this->TimeScale->SetResolution(1);
+    this->TimeRange->SetWholeRange(0, this->TimeSpan-1);
+    this->TimeRange->SetResolution(1);
     if (this->InPlay)
       {
       // We do not disable it so that the slider will still be updated
@@ -1175,7 +1085,7 @@ void vtkPVAnimationInterface::SetTimeStart(int idx, float t)
     {
     entry->SetTimeStartValue(t);
     this->AddTraceEntry("$kw(%s) SetTimeStart %d %f", 
-      this->GetTclName(), idx, this->TimeStart);
+      this->GetTclName(), idx, t);
     }
 }
 
@@ -1187,100 +1097,55 @@ void vtkPVAnimationInterface::SetTimeEnd(int idx, float t)
     {
     entry->SetTimeEndValue(t);
     this->AddTraceEntry("$kw(%s) SetTimeEnd %d %f", 
-      this->GetTclName(), idx, this->TimeEnd);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SetTimeStep(int idx, float t)
-{
-  vtkPVAnimationInterfaceEntry* entry = this->GetSourceEntry(idx);
-  if ( entry )
-    {
-    entry->SetTimeStepValue(t);
-    this->AddTraceEntry("$kw(%s) SetTimeStep %d %f", 
-      this->GetTclName(), idx, this->TimeStep);
+      this->GetTclName(), idx, t);
     }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetTimeStart(float t)
 {
-  this->AddTraceEntry("$kw(%s) SetTimeStart %f", this->GetTclName(), t);
   if ( this->LastEntryIndex < 0 )
     {
-    this->TimeStart = t;
-    this->TimeStartEntry->SetValue(t);
     return;
     }
-  vtkPVAnimationInterfaceEntry* entry = this->GetSourceEntry(this->LastEntryIndex);
-  if ( entry )
-    {
-    entry->SetTimeStartValue(t);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::TimeStartEntryCallback()
-{
-  this->SetTimeStart(this->TimeStartEntry->GetValueAsFloat());
-  this->UpdateNewScript();
+  this->SetTimeStart(this->LastEntryIndex, t);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetTimeEnd(float t)
 {
-  this->AddTraceEntry("$kw(%s) SetTimeEnd %f", this->GetTclName(), t);
   if ( this->LastEntryIndex < 0 )
     {
-    this->TimeEnd = t;
-    this->TimeEndEntry->SetValue(t);
     return;
     }
-  vtkPVAnimationInterfaceEntry* entry = this->GetSourceEntry(this->LastEntryIndex);
-  if ( entry )
-    {
-    entry->SetTimeEndValue(t);
-    }
+  this->SetTimeEnd(this->LastEntryIndex, t);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::TimeEndEntryCallback()
+void vtkPVAnimationInterface::SetTimeSpan(int t)
 {
-  this->SetTimeEnd(this->TimeEndEntry->GetValueAsFloat());
-  this->UpdateNewScript();
+  this->AddTraceEntry("$kw(%s) SetTimeSpan %d", this->GetTclName(), t);
+  cout << "Set TimeSpan: " << t << endl;
+  this->TimeSpan= t;
+  this->TimeSpanEntry->SetValue(t);
+  float range[2];
+  this->TimeRange->GetWholeRange(range);
+  this->TimeRange->SetWholeRange(range[0], t);
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SetTimeStep(float t)
+void vtkPVAnimationInterface::TimeSpanEntryCallback()
 {
-  this->AddTraceEntry("$kw(%s) SetTimeStep %f", this->GetTclName(), t);
-  if ( this->LastEntryIndex < 0 )
-    {
-    this->TimeStep = t;
-    this->TimeStepEntry->SetValue(t);
-    return;
-    }
-  vtkPVAnimationInterfaceEntry* entry = this->GetSourceEntry(this->LastEntryIndex);
-  if ( entry )
-    {
-    entry->SetTimeStep(t);
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::TimeStepEntryCallback()
-{
-  this->SetTimeStep(this->TimeStepEntry->GetValueAsFloat());
+  cout << "TimeSpanEntryCallback" << endl;
+  this->LastEntryIndex = -1;
+  this->SetTimeSpan(this->TimeSpanEntry->GetValueAsFloat());
   this->UpdateNewScript();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::EntryCallback()
 {
-  this->TimeStartEntryCallback();
-  this->TimeEndEntryCallback();
-  this->TimeStepEntryCallback();
+  this->TimeSpanEntryCallback();
 }
 
 //-----------------------------------------------------------------------------
@@ -1379,22 +1244,22 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source, int idx)
 }
 
 //-----------------------------------------------------------------------------
-float vtkPVAnimationInterface::GetCurrentTime()
+int vtkPVAnimationInterface::GetCurrentTime()
 {
-  return this->TimeScale->GetValue();
+  return static_cast<int>(this->TimeScale->GetValue());
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SetCurrentTime(float time)
+void vtkPVAnimationInterface::SetCurrentTime(int time)
 {
-  int total = (int)(floor(0.5 +(this->GetTimeEnd()-this->GetTimeStart())/this->GetTimeStep())) + 1;
-  int timeIdx = (int)(floor(0.5 + (time-this->GetTimeStart())/this->GetTimeStep()));
   this->TimeScale->SetValue(time);
 
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   if (pvApp)
     {
-    pvApp->BroadcastScript("set globalPVTime %g", this->GetCurrentTime());
+    float ctime = static_cast<float>(this->GetCurrentTime()) / 
+      static_cast<float>(this->TimeSpan);
+    pvApp->BroadcastScript("set globalPVTime %g", ctime);
     pvApp->BroadcastScript("catch {%s}", this->ScriptEditor->GetValue());
 
     if (this->ControlledWidget)
@@ -1406,7 +1271,7 @@ void vtkPVAnimationInterface::SetCurrentTime(float time)
     // Generate the cache, or use previous cache.
     if (this->GetCacheGeometry())
       {
-      this->Window->CacheUpdate(timeIdx, total);
+      this->Window->CacheUpdate(time, this->TimeSpan);
       }
     else
       {
@@ -1431,7 +1296,7 @@ void vtkPVAnimationInterface::SetCurrentTime(float time)
       this->View->EventuallyRender();
       }
 
-    this->AddTraceEntry("$kw(%s) SetCurrentTime %f", 
+    this->AddTraceEntry("$kw(%s) SetCurrentTime %d", 
                         this->GetTclName(), this->GetCurrentTime());
 
     // Allow the application GUI to be refreshed (ex: in a trace file)
@@ -1497,12 +1362,7 @@ void vtkPVAnimationInterface::Play()
 
   // We need a different end test if the step is negative.
 
-  float t, sgn;
-  sgn = 1.0;
-  if (this->TimeStep < 0)
-    {
-    sgn = -1.0;
-    }
+  int t;
 
   // NOTE: the object registers itself for the following reason. The call
   // to "update" in the loop below (through SetCurrentTime()) enables the
@@ -1520,18 +1380,20 @@ void vtkPVAnimationInterface::Play()
   this->StopFlag = 0;
   do
     {
+    cout << "T: " << t << endl;
     t = this->GetCurrentTime();
-    if (t >= this->GetTimeEnd())
+    if (t >= this->GetGlobalEnd())
       {
-      this->SetCurrentTime(this->GetTimeStart());
+      cout << "We came to the end" << endl;
+      this->SetCurrentTime(this->GetGlobalStart());
       t = this->GetCurrentTime();
       }
-    while ((sgn*t) < (sgn*this->TimeEnd) && !this->StopFlag)
+    while (t < this->GetGlobalEnd() && !this->StopFlag)
       {
-      t = t + this->TimeStep;
-      if ((sgn*t) > (sgn*this->TimeEnd))
+      ++t;
+      if (t > this->GetGlobalEnd())
         {
-        t = this->TimeEnd;
+        t = this->GetGlobalEnd();
         }
       this->SetCurrentTime(t);
       // The stop button can be used here because SetCurrentTime()
@@ -1555,13 +1417,13 @@ void vtkPVAnimationInterface::Stop()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::GoToBeginning()
 {  
-  this->SetCurrentTime(this->GetTimeStart());
+  this->SetCurrentTime(0);
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::GoToEnd()
 {  
-  this->SetCurrentTime(this->GetTimeEnd());
+  this->SetCurrentTime(this->GetTimeSpan()-1);
 }
 
 //-----------------------------------------------------------------------------
@@ -1770,9 +1632,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   vtkImageWriter* writer;
   char *fileName;
   int fileCount;
-  float t;
-  float sgn = 1;
-  float frac;
+  int t;
 
   winToImage = vtkWindowToImageFilter::New();
   winToImage->SetInput(this->View->GetRenderWindow());
@@ -1795,15 +1655,11 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     }
   writer->SetInput(winToImage->GetOutput());
   fileName = new char[strlen(fileRoot) + strlen(ext) + 25];      
-  if (this->TimeStep < 0)
-    {
-    sgn = -1.0;
-    }
 
   // Loop through all of the time steps.
-  t = this->TimeStart;
+  t = this->GetGlobalStart();
   fileCount = 0;
-  while ((sgn*t) <= (sgn*this->TimeEnd))
+  while (t <= this->GetGlobalEnd())
     {
     this->SetCurrentTime(t);
     this->View->EventuallyRender();
@@ -1816,13 +1672,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     writer->Write();
     
     ++fileCount;
-    t = t + this->TimeStep;
-    // Do not let numerical issues keep us from getting the last sample.
-    frac = (t-this->TimeEnd)/this->TimeStep;
-    if (frac > 0 && frac < 0.01)
-      {
-      t = TimeEnd;
-      }
+    ++t;
     }
 
   winToImage->Delete();
@@ -1906,9 +1756,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
   vtkPVPart* part;
   char *fileName;
   int timeCount;
-  float t;
-  float sgn = 1;
-  float frac;
+  int t;
   vtkPVSourceCollection *sources;
 
   sources = this->GetWindow()->GetSourceList("Sources");
@@ -1936,15 +1784,11 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
     }
 
   fileName = new char[strlen(fileRoot) + 30];      
-  if (this->TimeStep < 0)
-    {
-    sgn = -1.0;
-    }
 
   // Loop through all of the time steps.
-  t = this->TimeStart;
+  t = this->GetGlobalStart();
   timeCount = 0;
-  while ((sgn*t) <= (sgn*this->TimeEnd))
+  while (t <= this->GetGlobalEnd())
     {
     this->SetCurrentTime(t);
     this->View->EventuallyRender();
@@ -2009,13 +1853,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileRoot,
       }
     
     ++timeCount;
-    t = t + this->TimeStep;
-    // Do not let numerical issues keep us from getting the last sample.
-    frac = (t-this->TimeEnd)/this->TimeStep;
-    if (frac > 0 && frac < 0.01)
-      {
-      t = TimeEnd;
-      }
+    ++t;
     }
 
   this->GetPVApplication()->GetProcessModule()->ServerScript(
@@ -2041,21 +1879,14 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
   char *root;
   char *ext;
   char *ptr;
-  float t;
+  int t;
   int timeIdx;
-  float sgn = 1;
-  float frac;
   char countStr[10];
 
-  if (this->TimeStep < 0)
-    {
-    sgn = -1.0;
-    }
-
   // Loop through all of the time steps.
-  t = this->TimeStart;
+  t = this->GetGlobalStart();
   timeIdx = 0;
-  while ((sgn*t) <= (sgn*this->TimeEnd))
+  while (t <= this->GetGlobalEnd())
     {
     *file << "set pvTime " << t << "\n";
     *file << this->GetScript() << endl;
@@ -2100,13 +1931,7 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
       }
     *file << endl;
     ++timeIdx;
-    t = t + this->TimeStep;
-    // Do not let numerical issues keep us from getting the last sample.
-    frac = (t-this->TimeEnd)/this->TimeStep;
-    if (frac > 0 && frac < 0.01)
-      {
-      t = TimeEnd;
-      }
+    ++t;
     }
 }
 
@@ -2263,7 +2088,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
       = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
     if ( entry->GetScript() )
       {
-      str << entry->GetTimeEquation(this->TimeStart, this->TimeEnd, this->TimeStep) << endl;
+      str << entry->GetTimeEquation(this->TimeSpan) << endl;
       str << entry->GetScript() << endl;
       cnt ++;
       }
@@ -2283,13 +2108,27 @@ void vtkPVAnimationInterface::UpdateNewScript()
 }
 
 //-----------------------------------------------------------------------------
+int vtkPVAnimationInterface::GetGlobalStart()
+{
+  float range[2];
+  this->TimeRange->GetRange(range);
+  return static_cast<int>(range[0]);
+}
+
+//-----------------------------------------------------------------------------
+int vtkPVAnimationInterface::GetGlobalEnd()
+{
+  float range[2];
+  this->TimeRange->GetRange(range);
+  return static_cast<int>(range[1]);
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ControlledWidget: " << this->GetControlledWidget();
-  os << indent << "TimeEnd: " << this->GetTimeEnd();
-  os << indent << "TimeStart: " << this->GetTimeStart();
-  os << indent << "TimeStep: " << this->GetTimeStep();
+  os << indent << "TimeSpan: " << this->GetTimeSpan();
   os << indent << "Loop: " << this->GetLoop();
   os << indent << "View: " << this->GetView();
   os << indent << "Window: " << this->GetWindow();

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.36");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.37");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -616,7 +616,6 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
 
   int ts = static_cast<int>(this->Timestep->GetValue());
   ai->SetCurrentTime(ts);
-  ai->SetTimeStep(1.0);
   ai->SetTimeEnd(this->Range[1]);
   //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
 }

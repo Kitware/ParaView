@@ -59,6 +59,7 @@ class vtkPVWidget;
 class vtkPVApplication;
 class vtkCollection;
 class vtkCollectionIterator;
+class vtkKWRange;
 
 //BTX
 class vtkPVAnimationInterfaceEntry;
@@ -77,17 +78,15 @@ public:
   // Description:
   // Access to the animation parmeters
   void SetTimeStart(float t);
-  vtkGetMacro(TimeStart, float);
   void SetTimeEnd(float t);
-  vtkGetMacro(TimeEnd, float);
-  void SetTimeStep(float t);
-  vtkGetMacro(TimeStep, float);
-  void SetCurrentTime(float time);
-  float GetCurrentTime();
+  void SetTimeSpan(int t);
+  vtkGetMacro(TimeSpan, int);
+
+  void SetCurrentTime(int time);
+  int GetCurrentTime();
 
   void SetTimeStart(int idx, float t);
   void SetTimeEnd(int idx, float t);
-  void SetTimeStep(int idx, float t);
 
   // Description:
   // Callback that starts an animation.
@@ -157,9 +156,7 @@ public:
   // Decription:
   // Callback for setting the animation parameters from the
   // entries.
-  void TimeStartEntryCallback();
-  void TimeEndEntryCallback();
-  void TimeStepEntryCallback();
+  void TimeSpanEntryCallback();
 
   // Description:
   // This sets the entries from the animation parameters.
@@ -226,24 +223,20 @@ protected:
   vtkKWScale *TimeScale;
 
   vtkKWWidget *TimeFrame;
-  vtkKWLabeledEntry *TimeStartEntry;
-  vtkKWLabeledEntry *TimeEndEntry;
-  vtkKWLabeledEntry *TimeStepEntry;
+  vtkKWLabeledEntry *TimeSpanEntry;
+  vtkKWRange        *TimeRange;
 
   void EntryCallback();
 
   // Animation parameters
-  float TimeStart;
-  float TimeEnd;
-  float TimeStep;
-
-  float MinTime;
-  float MinStep;
-  float MaxTime;
+  int TimeSpan;
 
   int StopFlag;
   int InPlay;
   int Loop;
+
+  int GetGlobalStart();
+  int GetGlobalEnd();
 
   // New interface ------------------------------------------------
 
