@@ -167,6 +167,7 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
        !vtkString::Equals(type, "Label")  && 
        !vtkString::Equals(type, "Canvas") && 
        !vtkString::Equals(type, "Scrollbar") && 
+       !vtkString::Equals(type, "Listbox") && 
        !vtkString::Equals(type, "Toplevel") )
     {
     this->Script("%s configure -state %s", 
@@ -342,7 +343,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.35 $");
+  this->ExtractRevision(os,"$Revision: 1.36 $");
 }
 
 //------------------------------------------------------------------------------
@@ -479,6 +480,7 @@ void vtkKWWidget::SetEnabled(int e)
 	 !vtkString::Equals(type, "Canvas") && 
 	 !vtkString::Equals(type, "Label") && 
 	 !vtkString::Equals(type, "Scrollbar") && 
+	 !vtkString::Equals(type, "Listbox") && 
 	 !vtkString::Equals(type, "Toplevel"))
       {
       this->Script("%s configure -state %s", this->GetWidgetName(),
