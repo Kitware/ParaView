@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.31");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.32");
 
 //===========================================================================
 //***************************************************************************
@@ -276,8 +276,8 @@ void vtkPVRenderModule::SetPVApplication(vtkPVApplication *pvApp)
     //pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
     //                << "SetStereoTypeToCrystalEyes" 
     //                << vtkClientServerStream::End;
+    pm->SendStreamToRenderServer();
     }
-  pm->SendStreamToRenderServer();
 
   if (pvApp->GetUseStereoRendering())
     {
