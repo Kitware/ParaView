@@ -24,11 +24,13 @@
 #define __vtkCTHExtractAMRPart_h
 
 #include "vtkCTHDataToPolyDataFilter.h"
+#include "vtkToolkits.h" // I need the VTK_USE_PATENTED flag 
 
 class vtkCTHData;
 class vtkPlane;
 class vtkStringList;
 class vtkAppendPolyData;
+class vtkSynchronizedTemplates3D;
 class vtkContourFilter;
 class vtkDataSetSurfaceFilter;
 class vtkClipPolyData;
@@ -106,7 +108,14 @@ protected:
   // Pipeline to extract a part from a block.
   vtkImageData* Image;
   vtkPolyData* PolyData;
+  // KitwareContourFilter took too long because of garbage collection
+  // when input of internal filter was deleted.
+  // Synchronized template super class is poly data source.
+#ifdef VTK_USE_PATENTED  
+  vtkSynchronizedTemplates3D* Contour;
+#else
   vtkContourFilter* Contour;
+#endif
   vtkAppendPolyData* Append1;
   vtkAppendPolyData* Append2;
   vtkDataSetSurfaceFilter* Surface;

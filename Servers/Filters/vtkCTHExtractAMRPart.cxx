@@ -30,7 +30,8 @@
 #include "vtkClipPolyData.h"
 #include "vtkCTHAMRCellToPointData.h"
 #ifdef VTK_USE_PATENTED
-#  include "vtkPVKitwareContourFilter.h"
+#  include "vtkKitwareContourFilter.h"
+#  include "vtkSynchronizedTemplates3D.h"
 #  include "vtkKitwareCutter.h"
 #else
 #  include "vtkContourFilter.h"
@@ -43,7 +44,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.14");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.15");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -298,7 +299,9 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
       vtkDataArray* cellVolumeFraction;
       dims = block->GetDimensions();
 
+      vtkTimerLog::MarkStartEvent("GetBlock");
       cellVolumeFraction = block->GetCellData()->GetArray(arrayName);
+      vtkTimerLog::MarkEndEvent("GetBlock");
       if (cellVolumeFraction == NULL)
         {
         vtkErrorMacro("Could not find cell array " << arrayName);
@@ -309,9 +312,11 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
         {
         pointVolumeFraction = vtkFloatArray::New();
         pointVolumeFraction->SetNumberOfTuples(block->GetNumberOfPoints());
+        vtkTimerLog::MarkStartEvent("CellToPoint(Ghost)");        
         this->ExecuteCellDataToPointData(cellVolumeFraction, 
                                          pointVolumeFraction, 
                                          dims);        
+        vtkTimerLog::MarkEndEvent("CellToPoint(Ghost)");        
         }
       else
         {
@@ -339,7 +344,9 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
     ext[3] -= extraGhostLevels;
     ext[5] -= extraGhostLevels;
     block->SetUpdateExtent(ext);
+    vtkTimerLog::MarkStartEvent("CropGhostCells");            
     block->Crop();
+    vtkTimerLog::MarkEndEvent("CropGhostCells");            
     }
   
   // Loop over parts extracting surfaces.
@@ -363,18 +370,27 @@ void vtkCTHExtractAMRPart::CreateInternalPipeline()
   // The filter that iteratively appends the output.
   this->FinalAppend = vtkAppendPolyData::New();
   
+  // Note: I had trouble with the kitware contour filter setting the input
+  // of the internal synchronized templates filter (garbage collection took too long.)
+  
   // Create the contour surface.
 #ifdef VTK_USE_PATENTED
-  this->Contour = vtkPVKitwareContourFilter::New();
+  vtkSynchronizedTemplates3D* tmp = vtkSynchronizedTemplates3D::New();
   // vtkDataSetSurfaceFilter does not generate normals, so they will be lost.
-  this->Contour->ComputeNormalsOff();
-#else
-  this->Contour = vtkContourFilter::New();
-#endif
-  this->Contour->SetInput(this->Image);
+  tmp->ComputeNormalsOff();
+  tmp->SetInput(this->Image);
   // I had a problem with boundary.  Hotel effect.
   // The bondary surface was being clipped a hair under 0.5
-  this->Contour->SetValue(0, CTH_AMR_SURFACE_VALUE);
+  tmp->SetValue(0, CTH_AMR_SURFACE_VALUE);
+  this->Contour = tmp;
+#else
+  vtkContourFilter* tmp = vtkContourFilter::New();
+  tmp->SetInput(this->Image);
+  // I had a problem with boundary.  Hotel effect.
+  // The bondary surface was being clipped a hair under 0.5
+  tmp->SetValue(0, CTH_AMR_SURFACE_VALUE);
+  this->Contour = tmp;  
+#endif
 
   // Create the capping surface for the contour and append.
   this->Append1 = vtkAppendPolyData::New();
@@ -490,11 +506,52 @@ void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
                                        vtkImageData* block, 
                                        vtkPolyData* appendCache)
 {
+  // See if we can skip this block.
+  vtkDataArray* array = block->GetPointData()->GetArray(arrayName);
+  if (array == 0)
+    {
+    return;
+    }
+  double *range = array->GetRange();
+  if (range[0] > CTH_AMR_SURFACE_VALUE || range[1] < CTH_AMR_SURFACE_VALUE)
+    {
+    return;
+    }
+  
   block->GetPointData()->SetActiveScalars(arrayName);
 
   this->Image->ShallowCopy(block);
   this->PolyData->ShallowCopy(appendCache);
+  
+  
+  if (this->Contour)
+    {
+    vtkTimerLog::MarkStartEvent("Contour");              
+    this->Contour->Update();
+    vtkTimerLog::MarkEndEvent("Contour");              
+    }
+  if (this->Surface)
+    {
+    vtkTimerLog::MarkStartEvent("Surface");              
+    this->Surface->Update();
+    vtkTimerLog::MarkEndEvent("Surface");              
+    }
+  if (this->Clip0)
+    {
+    vtkTimerLog::MarkStartEvent("Clip0");              
+    this->Clip0->Update();
+    vtkTimerLog::MarkEndEvent("Clip0");              
+    }
+  if (this->Append1)
+    {
+    vtkTimerLog::MarkStartEvent("Append1");              
+    this->Append1->Update();
+    vtkTimerLog::MarkEndEvent("Append1");              
+    }
+  
+  vtkTimerLog::MarkStartEvent("BlockAppend");              
   this->FinalAppend->Update();
+  vtkTimerLog::MarkEndEvent("BlockAppend");              
   appendCache->ShallowCopy(this->FinalAppend->GetOutput());
 }
 
