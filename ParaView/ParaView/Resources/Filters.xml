@@ -272,7 +272,7 @@
 </Module>
 
 <Module name="DataSetSurfaceFilter" menu_name="Extract Surface" root_name="Surface" module_type="Filter"
-        long_help="Extract a 2-d boundary surface using neighbor relations to elimate internal faces." 
+        long_help="Extract a 2-d boundary surface using neighbor relations to eliminate internal faces." 
         short_help="Extract 2-d boundary surface.">
   <Filter class="vtkDataSetSurfaceFilter">
     <Input name="Input" class="vtkDataSet" /> 
