@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.585");
+vtkCxxRevisionMacro(vtkPVWindow, "1.586");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -424,20 +424,20 @@ void vtkPVWindow::PrepareForDelete()
   if (pvApp && this->CenterSourceID.ID)
     {
     pm->DeleteStreamObject(this->CenterSourceID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   this->CenterSourceID.ID = 0;
   if (pvApp && this->CenterMapperID.ID)
     {
     pm->DeleteStreamObject(this->CenterMapperID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   this->CenterMapperID.ID = 0;
 
   if (pvApp && this->CenterActorID.ID)
     {
     pm->DeleteStreamObject(this->CenterActorID);
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
   this->CenterActorID.ID = 0;
 
@@ -1050,7 +1050,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "VisibilityOff"
                   << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   
   this->CenterEntryFrame->SetParent(this->PickCenterToolbar->GetFrame());
   this->CenterEntryFrame->Create(app, "frame", "");
@@ -1113,7 +1113,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
                   << pvApp->GetRenderModule()->GetRendererID()
                   << "AddActor" << this->CenterActorID 
                   << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 
   this->Interactor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
@@ -1404,7 +1404,7 @@ void vtkPVWindow::SetCenterOfRotation(float x, float y, float z)
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "SetPosition" << x << y << z
                   << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
   this->MainView->EventuallyRender();
 }
 
@@ -1420,7 +1420,7 @@ void vtkPVWindow::HideCenterActor()
   pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                   << "VisibilityOff"
                   << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //-----------------------------------------------------------------------------
@@ -1437,7 +1437,7 @@ void vtkPVWindow::ShowCenterActor()
     pm->GetStream() << vtkClientServerStream::Invoke <<  this->CenterActorID
                     << "VisibilityOn"
                     << vtkClientServerStream::End;
-    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+    pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
     }
 }
 
@@ -1550,7 +1550,7 @@ void vtkPVWindow::ResizeCenterActor()
                     << vtkClientServerStream::End;
     this->MainView->ResetCamera();
     }
-  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER_ROOT);
+  pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
 }
 
 //-----------------------------------------------------------------------------
