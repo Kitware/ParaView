@@ -15,7 +15,6 @@
 #include "vtkSMLODPartDisplay.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkFieldDataToAttributeDataFilter.h"
 #include "vtkImageData.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -40,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.4");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.5");
 
 
 //----------------------------------------------------------------------------
@@ -282,7 +281,7 @@ void vtkSMLODPartDisplay::ColorByArray(vtkRMScalarBarWidget *colorMap,
       << this->MapperProxy->GetID(i) << "SetLookupTable" << colorMap->GetLookupTableID()
       << vtkClientServerStream::End;
 
-    if (field == VTK_CELL_DATA_FIELD)
+    if (field == vtkDataSet::CELL_DATA_FIELD)
       {
       pm->GetStream()
         << vtkClientServerStream::Invoke
@@ -293,7 +292,7 @@ void vtkSMLODPartDisplay::ColorByArray(vtkRMScalarBarWidget *colorMap,
         << this->LODMapperProxy->GetID(i) << "SetScalarModeToUseCellFieldData"
         << vtkClientServerStream::End;
       }
-    else if (field == VTK_POINT_DATA_FIELD)
+    else if (field == vtkDataSet::POINT_DATA_FIELD)
       {
       pm->GetStream()
         << vtkClientServerStream::Invoke

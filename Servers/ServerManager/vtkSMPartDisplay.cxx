@@ -15,7 +15,6 @@
 #include "vtkSMPartDisplay.h"
 
 #include "vtkClientServerStream.h"
-#include "vtkFieldDataToAttributeDataFilter.h"
 #include "vtkImageData.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
@@ -46,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.14");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.15");
 
 
 //----------------------------------------------------------------------------s
@@ -149,7 +148,7 @@ vtkSMPartDisplay::vtkSMPartDisplay()
   this->ColorProperty->SetElement(1, 1.0);
   this->ColorProperty->SetElement(2, 1.0);
 
-  this->ColorField = VTK_POINT_DATA;
+  this->ColorField = vtkDataSet::POINT_DATA_FIELD;
 
   this->Source = 0;
   this->ColorMap = 0;
@@ -913,12 +912,12 @@ void vtkSMPartDisplay::ColorByArray(vtkRMScalarBarWidget *colorMap,
           << "SetLookupTable" << colorMap->GetLookupTableID()
           << vtkClientServerStream::End;
     
-    if (field == VTK_CELL_DATA_FIELD)
+    if (field == vtkDataSet::CELL_DATA_FIELD)
       { 
       stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i)
             << "SetScalarModeToUseCellFieldData" << vtkClientServerStream::End;
       }
-    else if (field == VTK_POINT_DATA_FIELD)
+    else if (field == vtkDataSet::POINT_DATA_FIELD)
       {
       stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i)
             << "SetScalarModeToUsePointFieldData" << vtkClientServerStream::End;
@@ -1060,7 +1059,7 @@ void vtkSMPartDisplay::SaveInBatchScript(ofstream *file, vtkSMSourceProxy* pvs)
           << " GetProperty LookupTable] AddProxy $pvTemp" 
           << this->ColorMap->GetLookupTableID() << endl;
     int scalarMode = VTK_SCALAR_MODE_USE_POINT_FIELD_DATA;
-    if (this->ColorField == VTK_CELL_DATA_FIELD)
+    if (this->ColorField == vtkDataSet::CELL_DATA_FIELD)
       {
       scalarMode = VTK_SCALAR_MODE_USE_CELL_FIELD_DATA;
       }
