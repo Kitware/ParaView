@@ -64,7 +64,6 @@ public:
   // Description:
   // Create the properties object, called by UpdateProperties.
   void CreateProperties();
-  void ShowProperties();
   void UpdateProperties();
   
   // Description:
@@ -104,15 +103,12 @@ public:
   /// and setting the scalar range of the mapper.
   void GetInputScalarRange(float range[2]);
   void SetScalarRange(float min, float max);
-  void ResetScalarRange();
   
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
   
   vtkGetObjectMacro(Mapper, vtkPolyDataMapper);
-  
-  void ShowDataNotebook();
   
   // Description:
   // to change the ambient component of the light
@@ -177,8 +173,6 @@ protected:
   vtkKWLabel *ColorMenuLabel;
   vtkKWOptionMenu *ColorMenu;
 
-  vtkKWPushButton *ResetColorRangeButton;
-  
   // the data object that owns this composite
   vtkPVData *PVData;
   

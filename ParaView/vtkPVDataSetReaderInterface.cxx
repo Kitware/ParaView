@@ -92,13 +92,20 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
     pvd = vtkPVData::New();
     pvd->SetApplication(pvApp);
     pvd->SetVTKData(d, outputTclName);
+    
     pvs = vtkPVSource::New();
-    sprintf(srcTclName, "%s_%d", tclName, i+1);
-    pvs->SetName(srcTclName);
-    pvs->SetNthPVOutput(0, pvd);
+    pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetSourceParent());
+    pvs->SetApplication(pvApp);
+    pvs->CreateProperties();
+    pvs->SetInterface(this);
 
     this->PVWindow->GetMainView()->AddComposite(pvs);
     this->PVWindow->SetCurrentPVSource(pvs);
+    this->PVWindow->GetMainView()->ShowSourceParent();
+    
+    sprintf(srcTclName, "%s_%d", tclName, i+1);
+    pvs->SetName(srcTclName);
+    pvs->SetNthPVOutput(0, pvd);
 
     pvs->AcceptCallback();
     

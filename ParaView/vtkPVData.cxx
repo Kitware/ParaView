@@ -87,6 +87,25 @@ void vtkPVData::SetApplication(vtkPVApplication *pvApp)
   this->vtkKWWidget::SetApplication(pvApp);
 }
 
+
+//----------------------------------------------------------------------------
+void vtkPVData::Select(vtkKWView *v)
+{
+  if (this->ActorComposite)
+    {
+    this->ActorComposite->Select(v);
+    }  
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::Deselect(vtkKWView *v)
+{
+  if (this->ActorComposite)
+    {
+    this->ActorComposite->Deselect(v);
+    }  
+}
+
 //----------------------------------------------------------------------------
 // Tcl does the reference counting, so we are not going to put an 
 // additional reference of the data.
@@ -142,13 +161,9 @@ int vtkPVData::Create(char *args)
   this->ActorCompositeButton->SetCommand(this, "ShowActorComposite");
   this->Script("pack %s", this->ActorCompositeButton->GetWidgetName());
 
+  
+  
   return 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::ShowActorComposite()
-{
-  this->GetActorComposite()->ShowProperties();
 }
 
 

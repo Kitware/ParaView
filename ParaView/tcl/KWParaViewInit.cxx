@@ -2,6 +2,9 @@
 int vtkClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkClipPlaneNewCommand();
+int vtkCutMaterialCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkCutMaterialNewCommand();
 int vtkCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkCutPlaneNewCommand();
@@ -107,6 +110,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
   vtkTclCreateNew(interp,(char *) "vtkClipPlane", vtkClipPlaneNewCommand,
                   vtkClipPlaneCommand);
+  vtkTclCreateNew(interp,(char *) "vtkCutMaterial", vtkCutMaterialNewCommand,
+                  vtkCutMaterialCommand);
   vtkTclCreateNew(interp,(char *) "vtkCutPlane", vtkCutPlaneNewCommand,
                   vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,

@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 class vtkPVActorComposite;
 class vtkPVSource;
+class vtkKWView;
 class vtkPVApplication;
 class vtkKWMenuButton;
 
@@ -60,6 +61,11 @@ public:
   // Creates common widgets.
   // Returns 0 if there was an error.
   virtual int Create(char *args);
+  
+  // Description:
+  // Just packs and unpacks actor composite's properties.
+  void Select(vtkKWView *v);
+  void Deselect(vtkKWView *v);
   
   // Description:
   // This composite actually has an actor that displays the data.
@@ -104,8 +110,6 @@ public:
   // This method collects the number of cells from all processes.
   // It expects the data to be up to date.
   int GetNumberOfCells();
-  
-  void ShowActorComposite();
   
   // Description:
   // We are keeping the forward links.  I have not 

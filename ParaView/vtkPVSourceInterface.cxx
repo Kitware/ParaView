@@ -104,19 +104,24 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     }
   
   pvs = vtkPVSource::New();
+  pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetSourceParent());
   pvs->SetApplication(pvApp);
+  pvs->CreateProperties();
   pvs->SetInterface(this);
   pvs->SetVTKSource(s, tclName);
-  pvs->SetName(tclName);
-
+  pvs->SetName(tclName);  
 
   // Set the input if necessary.
   if (this->InputClassName)
     {
     vtkPVData *current = this->PVWindow->GetCurrentPVData();
     pvs->SetNthPVInput(0, current);
-    }
-  
+    }  
+
+  // Add the new Source to the View, and make it current.
+  this->PVWindow->GetMainView()->AddComposite(pvs);
+  this->PVWindow->SetCurrentPVSource(pvs);
+  this->PVWindow->GetMainView()->ShowSourceParent();
 
   // Create the output.
   pvd = vtkPVData::New();
@@ -134,10 +139,6 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());   
   
-  // Add the new Source to the View, and make it current.
-  this->PVWindow->GetMainView()->AddComposite(pvs);
-  this->PVWindow->SetCurrentPVSource(pvs);
-
   // Loop through the methods creating widgets.
   this->MethodInterfaces->InitTraversal();
   while ( (mInt = ((vtkPVMethodInterface*)(this->MethodInterfaces->GetNextItemAsObject()))) )

@@ -486,19 +486,17 @@ void vtkPVWindow::ShowWindowProperties()
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
-  this->GetCurrentPVSource()->ShowProperties();
+  // We need to update the properties-menu radio button too!
+  
+  this->MainView->ShowSourceParent();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentActorProperties()
 {
-  vtkPVSource *pvs;
+  // We need to update the properties-menu radio button too!
   
-  pvs =  this->GetCurrentPVSource();
-  if (pvs)
-    {
-    pvs->GetPVOutput(0)->GetActorComposite()->ShowProperties();
-    }
+  this->MainView->ShowActorParent();
 }
 
 //----------------------------------------------------------------------------

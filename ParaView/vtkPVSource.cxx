@@ -345,7 +345,7 @@ void vtkPVSource::CreateProperties()
   // Isolate events to this window untill accept or cancel is pressed.
   this->Script("grab set %s", this->ParameterFrame->GetWidgetName());
   
-  this->UpdateNavigationCanvas();
+  this->UpdateProperties();
   
   this->UpdateParameterWidgets();
 }
@@ -353,76 +353,47 @@ void vtkPVSource::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVSource::Select(vtkKWView *v)
 {
+  vtkPVData *data;
+  
   // invoke super
   this->vtkKWComposite::Select(v); 
-  vtkKWMenu* MenuProperties = v->GetParentWindow()->GetMenuProperties();
-  char* rbv = 
-    MenuProperties->CreateRadioButtonVariable(MenuProperties,"Radio");
   
-  // now add our own menu options
-  if (MenuProperties->GetRadioButtonValue(MenuProperties,"Radio") >= 1)
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
+
+  this->UpdateProperties();
+  
+  // This assumes that a source only has one output.
+  data = this->GetNthPVOutput(0);
+  if (data)
     {
-    if (this->LastSelectedProperty == 10)
-      {
-      this->View->ShowViewProperties();
-      }
-    if (this->LastSelectedProperty == 100 || this->LastSelectedProperty == -1)
-      {
-      this->ShowProperties();
-      }
+    data->Select(v);
     }
-
-  this->UpdateNavigationCanvas();
-
-  MenuProperties->AddRadioButton(100, " Data", rbv, this, "ShowProperties");
-  delete [] rbv;
-  
-  // Change the state of the delete button based on if there are any useres.
-  if (this->GetPVOutput(0) &&
-      this->GetPVOutput(0)->GetPVSourceUsers()->GetNumberOfItems() > 0)
-      {
-      this->Script("%s configure -state disabled",
-                   this->DeleteButton->GetWidgetName());
-      }
-    else
-      {
-      this->Script("%s configure -state normal",
-                   this->DeleteButton->GetWidgetName());
-      }  
-  
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::Deselect(vtkKWView *v)
 {
+  int idx;
+  vtkPVData *data;
+  vtkPVActorComposite *ac;
+
   // invoke super
-  this->vtkKWComposite::Deselect(v);
-  v->GetParentWindow()->GetMenuProperties()->DeleteMenuItem(" Data");
-}
+  this->vtkKWComposite::Deselect(v); 
+  
+  this->Script("pack forget %s", this->Notebook->GetWidgetName());
 
-//----------------------------------------------------------------------------
-void vtkPVSource::ShowProperties()
-{
-  vtkKWWindow *pw = this->View->GetParentWindow();
-  pw->ShowProperties();
-  pw->GetMenuProperties()->CheckRadioButton(
-    pw->GetMenuProperties(),"Radio",100);
-  
-  // unpack any current children
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->View->GetPropertiesParent()->GetWidgetName());
-  
-  if (!this->PropertiesCreated)
+  // Deselect all outputs.
+  for (idx = 0; idx < this->NumberOfPVOutputs; ++idx)
     {
-    this->InitializeProperties();
+    data = this->GetNthPVOutput(idx);
+    if (data)
+      {
+      data->Deselect(v);
+      }
     }
-  
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-               this->Notebook->GetWidgetName());
-  this->View->PackProperties();
 }
 
-  
 //----------------------------------------------------------------------------
 char* vtkPVSource::GetName()
 {
@@ -510,8 +481,11 @@ void vtkPVSource::AcceptCallback()
     vtkPVActorComposite *ac;
     
     ac = this->GetPVOutput(0)->GetActorComposite();
-    ac->Initialize();
     window->GetMainView()->AddComposite(ac);
+    ac->SetApplication(this->Application);
+    ac->SetPropertiesParent(window->GetMainView()->GetActorParent());    
+    ac->CreateProperties();
+    ac->Initialize();
     // Make the last data invisible.
     input = this->GetNthPVInput(0);
     if (input)
@@ -529,7 +503,7 @@ void vtkPVSource::AcceptCallback()
     }
 
   window->GetMainView()->SetSelectedComposite(this);  
-  this->UpdateNavigationCanvas();
+  this->UpdateProperties();
   this->GetView()->Render();
   window->GetSourceList()->Update();
 }
@@ -663,7 +637,7 @@ void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSource::UpdateNavigationCanvas()
+void vtkPVSource::UpdateProperties()
 {
   static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
   char *result;
@@ -675,6 +649,24 @@ void vtkPVSource::UpdateNavigationCanvas()
   vtkPVData *moreOut;
   int i;
   
+  
+  // --------------------------------------
+  // Change the state of the delete button based on if there are any useres.
+  // Only filters at the end of a pipeline can be deleted.
+  if (this->GetPVOutput(0) &&
+      this->GetPVOutput(0)->GetPVSourceUsers()->GetNumberOfItems() > 0)
+      {
+      this->Script("%s configure -state disabled",
+                   this->DeleteButton->GetWidgetName());
+      }
+    else
+      {
+      this->Script("%s configure -state normal",
+                   this->DeleteButton->GetWidgetName());
+      }  
+  
+  // --------------------------------------
+  // Now do the navigation canvas.
   // Clear the canvas
   this->Script("%s delete all",
                this->NavigationCanvas->GetWidgetName());
@@ -775,7 +767,7 @@ void vtkPVSource::UpdateNavigationCanvas()
   if (this->PVOutputs)
     {
     y = 10;
-//    for (i = 0; i < this->NumberOfPVOutputs; i++)
+    //  for (i = 0; i < this->NumberOfPVOutputs; i++)
     if (this->PVOutputs[0])
       {
       outs = this->PVOutputs[0]->GetPVSourceUsers();

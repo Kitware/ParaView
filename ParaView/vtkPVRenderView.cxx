@@ -73,6 +73,10 @@ vtkPVRenderView::vtkPVRenderView()
   this->Interactive = 0;
   
   this->RenderWindow->SetDesiredUpdateRate(1.0);  
+
+  // Alternative properties parent
+  this->SourceParent = NULL;
+  this->ActorParent = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -130,7 +134,99 @@ vtkPVRenderView::~vtkPVRenderView()
   pvApp->BroadcastScript("%s Delete", this->CompositeTclName);
   this->SetCompositeTclName(NULL);
   this->Composite = NULL;
+  
+  if (this->SourceParent)
+    {
+    this->SourceParent->Delete();
+    this->SourceParent = NULL;
+    }
+  if (this->ActorParent)
+    {
+    this->ActorParent->Delete();
+    this->ActorParent = NULL;
+    }
 }
+
+
+//----------------------------------------------------------------------------
+vtkKWWidget *vtkPVRenderView::GetSourceParent()
+{
+  if (this->SourceParent)
+    {
+    return this->SourceParent;
+    }
+  
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("The view has not been created yet.");
+    return NULL;
+    }
+  if (this->ParentWindow == NULL)
+    {
+    vtkErrorMacro("The view does not have a parent window.");
+    return NULL;
+    }
+  
+  this->SourceParent = vtkKWWidget::New();
+  this->SourceParent->SetParent(this->ParentWindow->GetPropertiesParent());
+  this->SourceParent->Create(this->Application, "frame", "");
+  
+  return this->SourceParent;
+}
+
+//----------------------------------------------------------------------------
+vtkKWWidget *vtkPVRenderView::GetActorParent()
+{
+  if (this->ActorParent)
+    {
+    return this->ActorParent;
+    }
+  
+  if (this->Application == NULL)
+    {
+    vtkErrorMacro("The view has not been created yet.");
+    return NULL;
+    }
+  if (this->ParentWindow == NULL)
+    {
+    vtkErrorMacro("The view does not have a parent window.");
+    return NULL;
+    }
+  
+  this->ActorParent = vtkKWWidget::New();
+  this->ActorParent->SetParent(this->ParentWindow->GetPropertiesParent());
+  this->ActorParent->Create(this->Application, "frame", "");
+  return this->ActorParent;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ShowSourceParent()
+{
+  vtkKWWidget *frame = this->GetSourceParent();
+  
+  // Unpack all other siblings.
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               frame->GetParent()->GetWidgetName());
+  
+  // Pack the frame we want.
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               frame->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::ShowActorParent()
+{
+  vtkKWWidget *frame = this->GetActorParent();
+  
+  // Unpack all other siblings.
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               frame->GetParent()->GetWidgetName());
+  
+  // Pack the frame we want.
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               frame->GetWidgetName());
+}
+
 
 //----------------------------------------------------------------------------
 // Here we are going to change only the satellite procs.

@@ -127,6 +127,16 @@ public:
   vtkRenderWindow *GetRenderWindow();
 
   void OffScreenRenderingOn();
+
+  // Description:
+  // Different property parents a composite can choose between.
+  vtkKWWidget *GetSourceParent();
+  vtkKWWidget *GetActorParent();
+
+  // Description:
+  // Methods for packing the different properties parent.
+  void ShowSourceParent();
+  void ShowActorParent();  
   
 protected:
 
@@ -150,8 +160,10 @@ protected:
   char *RenderWindowTclName;
   vtkSetStringMacro(RenderWindowTclName);  
   
- //vtkRenderWindow *RenderWindow;
-  //vtkRenderer *Renderer;
+  // We are going to switch between these properties parents.
+  vtkKWWidget *SourceListParent;
+  vtkKWWidget *SourceParent;
+  vtkKWWidget *ActorParent;
 };
 
 

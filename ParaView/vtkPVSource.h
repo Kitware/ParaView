@@ -68,10 +68,6 @@ public:
   virtual void CreateProperties();
   
   // Description:
-  // Pack properties for this source. 
-  virtual void ShowProperties();
-  
-  // Description:
   // Methods to indicate when this composite is the selected composite.
   // These methods are used by subclasses to modify the menu bar
   // for example. When a volume composite is selected it might 
@@ -243,7 +239,7 @@ protected:
   vtkKWWidget       *Properties;
   vtkKWLabeledFrame *NavigationFrame;
   vtkKWWidget       *NavigationCanvas;
-  void              UpdateNavigationCanvas();
+  void              UpdateProperties();
   vtkKWLabeledFrame *ParameterFrame;
   
   vtkKWWidgetCollection *Widgets;

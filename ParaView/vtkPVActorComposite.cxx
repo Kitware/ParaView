@@ -82,8 +82,6 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
 
-  this->ResetColorRangeButton = vtkKWPushButton::New();
-  
   this->PVData = NULL;
   this->DataSetInput = NULL;
   this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
@@ -176,9 +174,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->ColorMenu->Delete();
   this->ColorMenu = NULL;
   
-  this->ResetColorRangeButton->Delete();
-  this->ResetColorRangeButton = NULL;
-  
   this->SetInput(NULL);
   
   //if (this->TextureFilter != NULL)
@@ -258,11 +253,6 @@ void vtkPVActorComposite::CreateProperties()
   this->ColorMenu->SetParent(this->Properties);
   this->ColorMenu->Create(this->Application, "");    
 
-  this->ResetColorRangeButton->SetParent(this->Properties);
-  this->ResetColorRangeButton->Create(this->Application, "");
-  this->ResetColorRangeButton->SetLabel("Reset Color Range");
-  this->ResetColorRangeButton->SetCommand(this, "ResetColorRange");
-  
   this->Script("pack %s",
 	       this->NumCellsLabel->GetWidgetName());
   this->Script("pack %s",
@@ -279,8 +269,6 @@ void vtkPVActorComposite::CreateProperties()
 	       this->ColorMenuLabel->GetWidgetName());
   this->Script("pack %s",
                this->ColorMenu->GetWidgetName());
-  this->Script("pack %s",
-	       this->ResetColorRangeButton->GetWidgetName());
   
   this->UpdateProperties();  
 }
@@ -451,6 +439,7 @@ void vtkPVActorComposite::ColorByPointScalars()
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUsePointData",
                          this->MapperTclName);
+  this->ResetColorRange();
   this->GetView()->Render();
 }
 //----------------------------------------------------------------------------
@@ -461,6 +450,7 @@ void vtkPVActorComposite::ColorByCellScalars()
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUseCellData",
                          this->MapperTclName);
+  this->ResetColorRange();
   this->GetView()->Render();
 }
 //----------------------------------------------------------------------------
@@ -473,6 +463,7 @@ void vtkPVActorComposite::ColorByPointFieldComponent(char *name, int comp)
                          this->MapperTclName);
   pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
                          this->MapperTclName, name, comp);
+  this->ResetColorRange();
   this->GetView()->Render();
 }
 //----------------------------------------------------------------------------
@@ -485,6 +476,7 @@ void vtkPVActorComposite::ColorByCellFieldComponent(char *name, int comp)
                          this->MapperTclName);
   pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
                          this->MapperTclName, name, comp);
+  this->ResetColorRange();
   this->GetView()->Render();
 }
 
@@ -507,14 +499,6 @@ void vtkPVActorComposite::SetAmbient(float ambient)
 {
   this->GetActor()->GetProperty()->SetAmbient(ambient);
 }
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::ShowDataNotebook()
-{
-  this->GetPVData()->GetPVSource()->ShowProperties();
-}
-
-
 
 
 //----------------------------------------------------------------------------
@@ -544,7 +528,9 @@ void vtkPVActorComposite::Initialize()
     }
 
   // Mapper needs an input, so the mode needs to be set first.
-  this->ResetScalarRange();
+  //this->ResetColorRange();
+  this->ColorByProperty();
+  this->ColorMenu->SetValue("Property");
 }
 
 //----------------------------------------------------------------------------
@@ -575,27 +561,6 @@ void vtkPVActorComposite::SetInput(vtkPVData *data)
     }
     
 }
-
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::ResetScalarRange()
-{
-  float range[2];
-
-  this->GetInputScalarRange(range);
-  if (range[0] > range[1])
-    {
-    return;
-    }
-  
-  // The mapper complains if the range is a single point.
-  if (range[0] == range[1])
-    {
-    range[1] += 0.0001;
-    }
-  this->SetScalarRange(range[0], range[1]);
-}
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::GetInputScalarRange(float range[2]) 
@@ -652,24 +617,9 @@ void vtkPVActorComposite::Select(vtkKWView *v)
 {
   // invoke super
   this->vtkKWComposite::Select(v); 
-  vtkKWMenu* MenuProperties = v->GetParentWindow()->GetMenuProperties();
-  char* rbv = 
-    MenuProperties->CreateRadioButtonVariable(MenuProperties,"Radio");
-
-  // now add our own menu options
-  if (MenuProperties->GetRadioButtonValue(MenuProperties,"Radio") >= 10)
-    {
-    if (this->LastSelectedProperty == 10)
-      {
-      this->View->ShowViewProperties();
-      }
-    if (this->LastSelectedProperty == 100 || this->LastSelectedProperty == -1)
-      {
-      this->ShowProperties();
-      }
-    }
-
-  delete [] rbv;
+  
+  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
+               this->Notebook->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
@@ -677,32 +627,8 @@ void vtkPVActorComposite::Deselect(vtkKWView *v)
 {
   // invoke super
   this->vtkKWComposite::Deselect(v);
-}
 
-//----------------------------------------------------------------------------
-void vtkPVActorComposite::ShowProperties()
-{
-  vtkKWWindow *pw = this->View->GetParentWindow();
-
-  pw->ShowProperties();
-  pw->GetMenuProperties()->CheckRadioButton(pw->GetMenuProperties(),
-					    "Radio", 100);
-
-  // unpack any current children
-  this->Script("catch {eval pack forget [pack slaves %s]}",
-               this->View->GetPropertiesParent()->GetWidgetName());
-  
-  if (!this->PropertiesCreated)
-    {
-    this->InitializeProperties();
-    }
-  
-  // Make sure the widgets reflect any data changes.
-  this->UpdateProperties();
-
-  this->Script("pack %s -pady 2 -padx 2 -fill both -expand yes -anchor n",
-               this->Notebook->GetWidgetName());
-  this->View->PackProperties();
+  this->Script("pack forget %s", this->Notebook->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------
