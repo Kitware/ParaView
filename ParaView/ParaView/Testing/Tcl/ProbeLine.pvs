@@ -23,10 +23,10 @@ $pv(vtkTemp138) UseLine
 $pv(vtkTemp138) AcceptCallback
 [$pv(vtkTemp138) GetEndPointMenu] SetValue "End Point 1"
 $pv(vtkTemp138) SetCurrentEndPoint 1
-[$pv(vtkTemp138) GetInteractor] SetSelectedPoint 0.000000 0.000000 1.000000
+$pv(vtkTemp138) SetEndPoint1 0.000000 0.000000 1.000000
 [$pv(vtkTemp138) GetEndPointMenu] SetValue "End Point 2"
 $pv(vtkTemp138) SetCurrentEndPoint 2
-[$pv(vtkTemp138) GetInteractor] SetSelectedPoint 2.000000 2.000000 1.000000
+$pv(vtkTemp138) SetEndPoint2 2.000000 2.000000 1.000000
 [$pv(vtkTemp138) GetShowXYPlotToggle] SetState 0
 $pv(vtkTemp138) AcceptCallback
 

@@ -20,7 +20,7 @@ $pv(vtkTemp101) DrawWireframe
 $pv(vtkTemp101) ColorByProperty
 set pv(vtkTemp138) [$pv(vtkTemp1) ProbeCallback]
 $pv(vtkTemp138) UsePoint
-[$pv(vtkTemp138) GetInteractor] SetSelectedPoint 0.409600 0.385700 1.620400
+$pv(vtkTemp138) SetSelectedPoint 0.409600 0.385700 1.620400
 $pv(vtkTemp138) AcceptCallback
 set pv(vtkTemp179) [$pv(vtkTemp1) GlyphCallback]
 set pv(vtkTemp187) [$pv(vtkTemp179) GetPVWidget {Input}]
