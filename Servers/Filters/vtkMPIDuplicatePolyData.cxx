@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.11");
+vtkCxxRevisionMacro(vtkMPIDuplicatePolyData, "1.12");
 vtkStandardNewMacro(vtkMPIDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkMPIDuplicatePolyData,Controller, vtkMultiProcessController);
@@ -48,6 +48,9 @@ vtkMPIDuplicatePolyData::vtkMPIDuplicatePolyData()
   this->PassThrough = 0;
   this->ZeroEmpty = 0;
   //this->MemorySize = 0;
+  
+  // Client has no inputs.
+  this->NumberOfRequiredInputs = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -114,14 +117,12 @@ void vtkMPIDuplicatePolyData::Execute()
   
   vtkTimerLog::MarkStartEvent("MPIGather");
   
-  if (input == NULL)
-    { // This will probably lock up.
-    vtkErrorMacro("Input has not been set.");
-    return;
-    }
-
   if (this->PassThrough)
     {
+    if (input == NULL)
+      {
+      return;
+      }
     vtkPolyData* output = this->GetOutput();
     output->CopyStructure(input);
     output->GetPointData()->ShallowCopy(input->GetPointData());
@@ -178,9 +179,12 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
   // First marshal our input.
   input = this->GetInput();
   pd = vtkPolyData::New();
-  pd->CopyStructure(input);
-  pd->GetPointData()->PassData(input->GetPointData());
-  pd->GetCellData()->PassData(input->GetCellData());
+  if (input)
+    {
+    pd->CopyStructure(input);
+    pd->GetPointData()->PassData(input->GetPointData());
+    pd->GetCellData()->PassData(input->GetCellData());
+    }
   writer->SetInput(pd);
   writer->Write();
   int size = writer->GetOutputStringLength();
@@ -257,8 +261,10 @@ void vtkMPIDuplicatePolyData::ServerExecute(vtkPolyDataReader* ,
     this->SocketController->Send(buf, size, 1, 948346);
     }
   // Degenerate reconstruct output.
-  this->GetOutput()->ShallowCopy(input);
-
+  if (input)
+    {
+    this->GetOutput()->ShallowCopy(input);
+    }
   delete [] buf;
   buf = NULL;
 }
