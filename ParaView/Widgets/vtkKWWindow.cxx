@@ -54,11 +54,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWindowCollection.h"
 #include "vtkKWRegisteryUtilities.h"
 #include "KitwareLogo.h"
-#include "vtkKWPointerArray.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabel.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWLoadSaveDialog.h"
+#include "vtkVector.txx"
 
 vtkSetObjectImplementationMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
@@ -269,7 +269,7 @@ vtkKWWindow::vtkKWWindow()
 
   this->PromptBeforeClose = 1;
 
-  this->RecentFiles = 0;
+  this->RecentFilesVector = 0;
   this->NumberOfRecentFiles = 5;
 
   this->ScriptExtension = 0;
@@ -284,20 +284,22 @@ vtkKWWindow::vtkKWWindow()
 
 vtkKWWindow::~vtkKWWindow()
 {
-  if ( this->RecentFiles )
+  if ( this->RecentFilesVector )
     {
     vtkKWWindowMenuEntry *kc = 0;
-    while( this->RecentFiles->GetSize() > 0 )
+    while( this->RecentFilesVector->GetNumberOfItems() )
       {
-      if ( ( kc = (vtkKWWindowMenuEntry *)
-	     this->RecentFiles->Lookup( this->RecentFiles->GetSize()-1 ) ) )
+      kc = 0;
+      unsigned long cc = this->RecentFilesVector->GetNumberOfItems()-1;
+      if ( this->RecentFilesVector->GetItem(cc, kc) == VTK_OK && kc )
 	{
 	kc->Delete();
-	this->RecentFiles->Remove( this->RecentFiles->GetSize()-1 );
+	this->RecentFilesVector->RemoveItem(cc);
 	}
       }
-    this->RecentFiles->Delete();
+    this->RecentFilesVector->Delete();
     }
+
   this->SetRecentFilesMenuTag(0);
   this->Notebook->Delete();
   this->SetPropertiesParent(NULL);
@@ -890,11 +892,10 @@ void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
     sprintf(CmdNameP, "File%dCmd", i);
     this->DeleteRegisteryValue( 1, "MRU", KeyNameP );
     this->DeleteRegisteryValue( 1, "MRU", CmdNameP );    
-    if ( this->RecentFiles )
+    if ( this->RecentFilesVector )
       {
-      vtkKWWindowMenuEntry *vp = reinterpret_cast<vtkKWWindowMenuEntry *>(
-	this->RecentFiles->Lookup(i) );
-      if ( vp )
+      vtkKWWindowMenuEntry *vp = 0;
+      if ( this->RecentFilesVector->GetItem(i, vp) == VTK_OK && vp )
 	{
 	this->SetRegisteryValue(1, "MRU", KeyNameP, vp->GetFullFile());
 	this->SetRegisteryValue(1, "MRU", CmdNameP, vp->GetCommand());
@@ -959,7 +960,7 @@ void vtkKWWindow::AddRecentFilesToMenu(char *menuEntry, vtkKWObject *target)
 
 void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
                                 const char *command)
-{
+{  
   const char* filename = this->Application->ExpandFileName(name);
   this->InsertRecentFileToMenu(filename, target, command);
   this->UpdateRecentMenu(key);
@@ -990,7 +991,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.82 $");
+  this->ExtractRevision(os,"$Revision: 1.83 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1027,13 +1028,13 @@ void vtkKWWindow::UpdateRecentMenu(char * vtkNotUsed(key))
       this->GetMenuFile()->GetIndex(this->GetRecentFilesMenuTag()) - 1);
     }
   this->RealNumberOfMRUFiles = 0;
-  if ( this->RecentFiles )
+  if ( this->RecentFilesVector )
     {
     for ( cc = 0; static_cast<unsigned int>(cc)<this->NumberOfRecentFiles; 
 	  cc++ ) 
       {
-      vtkKWWindowMenuEntry *kc;
-      if ( ( kc = (vtkKWWindowMenuEntry *)this->RecentFiles->Lookup(cc) ) )
+      vtkKWWindowMenuEntry *kc = 0;
+      if ( this->RecentFilesVector->GetItem(cc, kc) == VTK_OK && kc )
 	{
 	kc->InsertToMenu(cc, this->GetRecentFilesMenuTag(),
 			 this->GetMenuFile());
@@ -1053,6 +1054,7 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 					 vtkKWObject *target, 
 					 const char *command)
 {
+  //this->PrintRecentFiles();
   char *file = new char [strlen(filename) + 3];
   if ( strlen(filename) <= 40 )
     {
@@ -1088,9 +1090,9 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
     sprintf(file, format, filename, filename + lastJ);
     }
 
-  if ( !this->RecentFiles )
+  if ( !this->RecentFilesVector )
     {
-    this->RecentFiles = vtkKWPointerArray::New();
+    this->RecentFilesVector = vtkVector<vtkKWWindowMenuEntry*>::New();
     }
 
   // Find current one
@@ -1098,15 +1100,16 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
   vtkKWWindowMenuEntry *kc = 0;
   int cc;
   for ( cc = 0; 
-	static_cast<unsigned int>(cc) < this->RecentFiles->GetSize(); cc ++ )
+	static_cast<unsigned long>(cc) < 
+	  this->RecentFilesVector->GetNumberOfItems(); cc ++ )
     {
-    kc = (vtkKWWindowMenuEntry *)
-      this->RecentFiles->Lookup(cc);
-    if ( kc->Same( file, filename, target, command ) )
+    kc = 0;
+    if ( this->RecentFilesVector->GetItem(cc, kc) == VTK_OK && kc &&
+	 kc->Same( file, filename, target, command ) )
       {
       recent = kc;
       // delete it from array
-      this->RecentFiles->Remove(cc);
+      this->RecentFilesVector->RemoveItem(cc);
       break;
       }
     }
@@ -1122,18 +1125,21 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
    }
 
   // prepend it to array  
-  this->RecentFiles->Prepend( recent );
-  while ( this->RecentFiles->GetSize() > this->NumberOfRecentFiles )
+  this->RecentFilesVector->PrependItem( recent );
+  while ( this->RecentFilesVector->GetNumberOfItems() > 
+	  this->NumberOfRecentFiles )
     {
-    if ( ( kc = (vtkKWWindowMenuEntry *)
-	   this->RecentFiles->Lookup(this->NumberOfRecentFiles) ) )
+    kc = 0;
+    if ( this->RecentFilesVector->GetItem(this->NumberOfRecentFiles, kc) ==
+	 VTK_OK && kc )
       {
       kc->Delete();
-      this->RecentFiles->Remove(this->NumberOfRecentFiles);
+      this->RecentFilesVector->RemoveItem(this->NumberOfRecentFiles);
       }
     }
 
   delete [] file;
+  //this->PrintRecentFiles();
 }
 
 int vtkKWWindow::SetRegisteryValue(int level, const char* subkey, 
@@ -1322,3 +1328,25 @@ void vtkKWWindow::ErrorMessage(const char* message)
 				   message);
 }
 
+void vtkKWWindow::PrintRecentFiles()
+{
+  cout << "PrintRecentFiles" << endl;
+  if ( !this->RecentFilesVector && this->NumberOfRecentFiles )
+    {
+    cout << "Problem with the number: " << this->NumberOfRecentFiles
+	 << endl;
+    }
+  if ( !this->RecentFilesVector )
+    {
+    return;
+    }
+  unsigned long cc;
+  for ( cc = 0; cc< this->NumberOfRecentFiles; cc ++ )
+    {
+    vtkKWWindowMenuEntry *kc = 0;
+    if ( this->RecentFilesVector->GetItem(cc, kc) == VTK_OK )
+      {
+      cout << "Item: " << kc << endl;
+      }
+    }
+}

@@ -25,16 +25,21 @@
 // Description:
 // Append an Item to the end of the vector
 template <class DType>
-unsigned long vtkVector<DType>::AppendItem(DType a) 
+int vtkVector<DType>::AppendItem(DType a) 
 {
-  if ((this->NumberOfItems + 1) >= this->Size)
+  if ((this->NumberOfItems + 1) > this->Size)
     {
+    if ( !this->Resize )
+      {
+      return VTK_ERROR;
+      }
+
     if (!this->Size)
       {
       this->Size = 2;
       }
     DType *newArray = new DType [this->Size*2];
-    unsigned int i;
+    unsigned long i;
     for (i = 0; i < this->NumberOfItems; ++i)
       {
       newArray[i] = this->Array[i];
@@ -48,25 +53,97 @@ unsigned long vtkVector<DType>::AppendItem(DType a)
     }
   this->Array[this->NumberOfItems] = a;
   this->NumberOfItems++;
-  return (this->NumberOfItems - 1);
+  return VTK_OK;
 }
   
 // Description:
+// Insert an Item to the front of the vector
+template <class DType>
+int vtkVector<DType>::PrependItem(DType a)
+{
+  return this->InsertItem(0, a);
+}
+  
+// Description:
+// Insert an Item to the specific location in the vector.
+template <class DType>
+int vtkVector<DType>::InsertItem(unsigned long loc, DType a)
+{
+  unsigned long i;
+  if ((this->NumberOfItems + 1) > this->Size)
+    {
+    if ( !this->Resize )
+      {
+      return VTK_ERROR;
+      }
+
+    if (!this->Size)
+      {
+      this->Size = 2;
+      }
+    DType *newArray = new DType [this->Size*2];
+    for (i = 0; i < this->NumberOfItems; ++i)
+      {
+      newArray[i+1] = this->Array[i];
+      }
+    this->Size = this->Size*2;
+    if (this->Array)
+      {
+      delete [] this->Array;
+      }
+    this->Array = newArray;
+    }
+  else
+    {
+    for ( i = this->NumberOfItems; i > loc; i-- )
+      {
+      this->Array[i] = this->Array[i-1];
+      }
+    }
+  this->Array[loc] = a;
+  this->NumberOfItems++;
+  return VTK_OK;
+}
+
+// Description:
 // Remove an Item from the vector
 template <class DType>
-unsigned long vtkVector<DType>::RemoveItem(unsigned long id) 
+int vtkVector<DType>::RemoveItem(unsigned long id) 
 {
   if (id >= this->NumberOfItems)
     {
-    return 0;
+    return VTK_ERROR;
     }
-  unsigned int i;
+  unsigned long i;
   this->NumberOfItems--;
-  for (i = id; i < this->NumberOfItems; ++i)
+  
+  if ( this->NumberOfItems < (this->Size / 3) && this->Size > 10 &&
+       !this->Resize )
     {
-    this->Array[i] = this->Array[i+1];
+    // We should resize the array not to waste space
+    DType *newArray = new DType [ this->Size / 2 ];
+
+    // Copy 0 - (id-1) elements
+    for ( i = 0; i < id; ++i )
+      {
+      newArray[i] = this->Array[i];
+      }
+    // Copy (id+1) - end elements
+    for ( i = id; i < this->NumberOfItems; i++ )
+      {
+      newArray[i] = this->Array[i+1];
+      }
+    delete [] this->Array;
+    this->Array = newArray;
     }
-  return 1;
+  else
+    {
+    for (i = id; i < this->NumberOfItems; ++i)
+      {
+      this->Array[i] = this->Array[i+1];
+      }
+    }
+  return VTK_OK;
 }
   
 // Description:
@@ -74,12 +151,13 @@ unsigned long vtkVector<DType>::RemoveItem(unsigned long id)
 template <class DType>
 int vtkVector<DType>::GetItem(unsigned long id, DType& ret) 
 {
+  ret = 0;
   if (id < this->NumberOfItems)
     {
     ret = this->Array[id];
-    return 1;
+    return VTK_OK;
     }
-  return 0;
+  return VTK_ERROR;
 }
       
 // Description:
@@ -94,10 +172,10 @@ int vtkVector<DType>::Find(DType a, unsigned long &res)
     if (this->Array[i] == a)
       {
       res = i;
-      return 1;
+      return VTK_OK;
       }
     }
-  return 0;
+  return VTK_ERROR;
 }
 
 // Description:
@@ -115,10 +193,10 @@ int vtkVector<DType>::Find(DType a,
     if ( compare(this->Array[i], a) )
       {
       res = i;
-      return 1;
+      return VTK_OK;
       }
     }
-  return 0;
+  return VTK_ERROR;
 }
   
 
@@ -135,5 +213,32 @@ void vtkVector<DType>::RemoveAllItems()
   this->NumberOfItems = 0;
   this->Size = 0;
 }
-  
+
+// Description:
+// Set the capacity of the vector.
+// It returns VTK_OK if successfull.
+// If capacity is set, the vector will not resize down.
+template <class DType>
+int vtkVector<DType>::SetSize(unsigned long size)
+{
+  if ( size < this->GetNumberOfItems() )
+    {
+    return VTK_ERROR;
+    }
+  this->ResizeOff();
+  DType *newArray = new DType[ size ];
+  if ( this->Array )
+    {
+    unsigned long cc;
+    for ( cc = 0; cc < this->GetNumberOfItems(); cc ++ )
+      {
+      newArray[cc] = this->Array[cc];
+      }
+    delete [] this->Array;
+    }
+  this->Array = newArray;
+  this->Size = size;
+  return VTK_OK;
+}
+ 
 #endif

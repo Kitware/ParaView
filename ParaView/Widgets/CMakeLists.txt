@@ -30,7 +30,6 @@ vtkKWNotebook
 vtkKWObject 
 vtkKWOKCancelDialog 
 vtkKWOptionMenu 
-vtkKWPointerArray
 vtkKWProgressGauge 
 vtkKWProcessStatistics
 vtkKWPushButton 

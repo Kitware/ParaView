@@ -56,9 +56,13 @@ class vtkKWViewCollection;
 class vtkKWMenu;
 class vtkKWProgressGauge;
 class vtkKWView;
-class vtkKWPointerArray;
 class vtkKWLabel;
 class vtkKWLoadSaveDialog;
+
+//BTX
+class vtkKWWindowMenuEntry;
+template<class DType> class vtkVector;
+//ETX
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -278,6 +282,7 @@ protected:
 			      const char *command);
   void UpdateRecentMenu(char *key);
   void StoreRecentMenuToRegistery(char *key);
+  void PrintRecentFiles();
 
   unsigned int NumberOfRecentFiles;
 
@@ -287,11 +292,15 @@ protected:
   vtkSetStringMacro(RecentFilesMenuTag);
   vtkGetStringMacro(RecentFilesMenuTag);
   char *RecentFilesMenuTag;
-  
+
+  // Description:
+  // Display the exit dialog.
   int ExitDialog();
 
   vtkKWNotebook *Notebook;
+
   virtual void CreateStatusImage();
+
   int NumberOfMRUFiles;
   int RealNumberOfMRUFiles;
   vtkKWView *SelectedView;
@@ -326,7 +335,12 @@ protected:
   int InExit;
   int UseMenuProperties;
 
-  vtkKWPointerArray *RecentFiles;
+//BTX
+  // Description:
+  // This vector holds the list of most recently used files.
+  vtkVector<vtkKWWindowMenuEntry*> *RecentFilesVector;
+//ETX
+
 private:
   vtkKWWindow(const vtkKWWindow&); // Not implemented
   void operator=(const vtkKWWindow&); // Not implemented

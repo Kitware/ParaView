@@ -53,12 +53,20 @@ public:
   static vtkVector<DType> *New() { return new vtkVector<DType>(); }  
   
   // Description:
-  // Append an Item to the end of the vector
-  unsigned long AppendItem(DType a);
+  // Append an Item to the end of the vector.
+  int AppendItem(DType a);
+  
+  // Description:
+  // Insert an Item to the front of the vector.
+  int PrependItem(DType a);
+  
+  // Description:
+  // Insert an Item to the specific location in the vector.
+  int InsertItem(unsigned long loc, DType a);
   
   // Description:
   // Remove an Item from the vector
-  unsigned long RemoveItem(unsigned long id);
+  int RemoveItem(unsigned long id);
   
   // Description:
   // Return an item that was previously added to this vector. 
@@ -90,9 +98,25 @@ public:
   // Removes all items from the container.
   virtual void RemoveAllItems();
 
+  // Description:
+  // Set the capacity of the vector.
+  // It returns VTK_OK if successfull.
+  // If capacity is set, the vector will not resize.
+  virtual int SetSize(unsigned long size);
+
+  // Description:
+  // Allow or disallow resizing. If resizing is disallowed, when
+  // inserting too many elements, it will return VTK_ERROR.
+  // Initially allowed.
+  void SetResize(int r) { this->Resize = r; }
+  void ResizeOn() { this->SetResize(1); }
+  void ResizeOff() { this->SetResize(0); }
+  int GetResize() { return this->Resize; }
+
 protected:
   vtkVector() {
-    this->Array = 0; this->NumberOfItems = 0; this->Size = 0; }
+    this->Array = 0; this->NumberOfItems = 0; this->Size = 0; 
+    this->Resize = 1; }
   ~vtkVector() {
     if (this->Array)
       {
@@ -101,6 +125,7 @@ protected:
   }
   unsigned long NumberOfItems;
   unsigned long Size;
+  int Resize;
   DType *Array;
 };
 
