@@ -17,9 +17,14 @@
 // vtkSMSourceProxy manages VTK source(s) that are created on a server
 // using the proxy pattern. In addition to functionality provided
 // by vtkSMProxy, vtkSMSourceProxy provides method to connect and
-// update sources.
+// update sources. Each source proxy has one or more parts (vtkSMPart).
+// Each part represents one output of one filter. These are created
+// automatically (when CreateParts() is called) by the source.
+// Each vtkSMSourceProxy creates a property called DataInformation.
+// This property is a composite property that provides information
+// about the output(s) of the VTK sources (obtained from the server)
 // .SECTION See Also
-// vtkSMProxy vtkSMPart
+// vtkSMProxy vtkSMPart vtkSMInputProperty
 
 #ifndef __vtkSMSourceProxy_h
 #define __vtkSMSourceProxy_h
@@ -44,11 +49,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Calls UpdateInformation() on all sources.
+  // Calls UpdateInformation() on all sources (chains to superclass).
   virtual void UpdateInformation();
 
   // Description:
-  // Calls Update() on all sources. 
+  // Calls Update() on all sources. It also creates parts if
+  // they are not already created.
   void UpdatePipeline();
 
   // Description:
@@ -68,18 +74,26 @@ public:
                 int hasMultipleInputs);
 
   // Description:
+  // Calls method on all VTK sources. Used by the input property 
+  // to remove inputs. Made public to allow access by wrappers. Do
+  // not use.
   void CleanInputs(const char* method);
 
   // Description:
+  // Chains to superclass and calls UpdateInformation()
   virtual void UpdateSelfAndAllInputs();
 
   // Description:
+  // Updates data information if necessary and copies information to 
+  // the DataInformation property.
   void UpdateDataInformation();
 
   // Description:
+  // Return the number of parts (output proxies).
   unsigned int GetNumberOfParts();
 
   // Description:
+  // Return a part (output proxy).
   vtkSMPart* GetPart(unsigned int idx);
 
   // Description:
@@ -89,13 +103,23 @@ public:
 
 //BTX
   // Description:
+  // DataInformation is used by the source proxy to obtain information
+  // on the output(s) from the server. The information contained in
+  // this object is also copied to the DataInformation automatically.
+  // The direct use of the data information object is low level and
+  // should be avoided if possible.
   vtkPVDataInformation* GetDataInformation();
 //ETX
 
   // Description:
+  // Chains to superclass as well as mark the data information as
+  // invalid (next time data information is requested, it will be
+  // re-created).
   virtual void MarkConsumersAsModified();
 
   // Description:
+  // Return a property (see superclass documentation). Overwritten
+  // to allow DataInformation property specially.
   vtkSMProperty* GetProperty(const char* name) 
     {
       return this->Superclass::GetProperty(name);
@@ -110,6 +134,8 @@ protected:
 //ETX
 
   // Description:
+  // Internal helper methods used to populate the information property
+  // using the information object.
   void ConvertDataInformationToProperty(
     vtkPVDataInformation* info, vtkSMProperty* prop);
   void ConvertFieldDataInformationToProperty(
@@ -122,12 +148,17 @@ protected:
 
 
   // Description:
+  // Obtain data information from server (does not check if the
+  // data information is valid)
   void GatherDataInformation();
 
   // Description:
+  // Mark the data information as invalid.
   void InvalidateDataInformation();
 
   // Description:
+  // Return a property (see superclass documentation). Overwritten
+  // to allow DataInformation property specially.
   virtual vtkSMProperty* GetProperty(const char* name, int selfOnly);
 
   vtkPVDataInformation *DataInformation;
