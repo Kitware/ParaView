@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.2");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModuleUI, "1.3");
 
 int vtkPVDeskTopRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -73,7 +73,6 @@ vtkPVDeskTopRenderModuleUI::~vtkPVDeskTopRenderModuleUI()
 //----------------------------------------------------------------------------
 void vtkPVDeskTopRenderModuleUI::Create(vtkKWApplication *app, const char *)
 {
-  vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
   // Skip over LOD res and threshold.
   
   if (this->Application)
