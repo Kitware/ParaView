@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.23");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.24");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -85,9 +85,10 @@ void vtkKWSplashScreen::UpdateCanvasSize()
   if (this->IsCreated() && this->ImageName)
     {
     int w, h;
-    this->Script("concat [%s cget -width] [%s cget -height]", 
-                 this->ImageName, this->ImageName);
-    sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &w, &h);
+    const char *res = 
+      this->Script("concat [%s cget -width] [%s cget -height]", 
+                   this->ImageName, this->ImageName);
+    sscanf(res, "%d %d", &w, &h);
 
     this->Script("%s config -width %d -height %d",
                  this->Canvas->GetWidgetName(), w, h);
@@ -127,9 +128,10 @@ void vtkKWSplashScreen::Show()
   // Get screen size
 
   int sw, sh;
-  this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
-               this->GetWidgetName(), this->GetWidgetName());
-  sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &sw, &sh);
+  const char *res = 
+    this->Script("concat [winfo screenwidth %s] [winfo screenheight %s]",
+                 this->GetWidgetName(), this->GetWidgetName());
+  sscanf(res, "%d %d", &sw, &sh);
 
   // Get size of splash from image size
 
@@ -138,9 +140,9 @@ void vtkKWSplashScreen::Show()
     {
     this->Script("%s itemconfigure image -image %s", 
                  this->Canvas->GetWidgetName(), this->ImageName);
-    this->Script("concat [%s cget -width] [%s cget -height]", 
-                 this->ImageName, this->ImageName);
-    sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &w, &h);
+    res = this->Script("concat [%s cget -width] [%s cget -height]", 
+                       this->ImageName, this->ImageName);
+    sscanf(res, "%d %d", &w, &h);
     }
 
   // Center the splash

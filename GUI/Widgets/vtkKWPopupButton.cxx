@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWPopupButton);
-vtkCxxRevisionMacro(vtkKWPopupButton, "1.16");
+vtkCxxRevisionMacro(vtkKWPopupButton, "1.17");
 
 int vtkKWPopupButtonCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -217,20 +217,20 @@ void vtkKWPopupButton::DisplayPopupCallback()
 
   // Get the position of the mouse, the size of the toplevel.
 
-  this->Script("concat "
-               " [winfo pointerx %s] [winfo pointery %s]" 
-               " [winfo reqwidth %s] [winfo reqheight %s]"
-               " [winfo screenwidth %s] [winfo screenheight %s]",
-               this->GetWidgetName(), 
-               this->GetWidgetName(),
-               this->PopupTopLevel->GetWidgetName(), 
-               this->PopupTopLevel->GetWidgetName(),
-               this->GetWidgetName(), 
-               this->GetWidgetName());
+  const char *res = 
+    this->Script("concat "
+                 " [winfo pointerx %s] [winfo pointery %s]" 
+                 " [winfo reqwidth %s] [winfo reqheight %s]"
+                 " [winfo screenwidth %s] [winfo screenheight %s]",
+                 this->GetWidgetName(), 
+                 this->GetWidgetName(),
+                 this->PopupTopLevel->GetWidgetName(), 
+                 this->PopupTopLevel->GetWidgetName(),
+                 this->GetWidgetName(), 
+                 this->GetWidgetName());
   
   int px, py, tw, th, sw, sh;
-  sscanf(this->GetApplication()->GetMainInterp()->result, 
-         "%d %d %d %d %d %d", &px, &py, &tw, &th, &sw, &sh);
+  sscanf(res, "%d %d %d %d %d %d", &px, &py, &tw, &th, &sw, &sh);
 
   px -= tw / 2;
   if (px + tw > sw)

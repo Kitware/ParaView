@@ -31,7 +31,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.24");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.25");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -344,12 +344,13 @@ void vtkKWThumbWheel::ToggleDisplayThumbWheelCenterIndicator()
 // ---------------------------------------------------------------------------
 void vtkKWThumbWheel::ResizeThumbWheelCallback()
 {
-  this->Script("concat [winfo width %s] [winfo height %s]",
-               this->ThumbWheel->GetWidgetName(),
-               this->ThumbWheel->GetWidgetName());
+  const char *res = 
+    this->Script("concat [winfo width %s] [winfo height %s]",
+                 this->ThumbWheel->GetWidgetName(),
+                 this->ThumbWheel->GetWidgetName());
   
   int tw, th;
-  sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &tw, &th);
+  sscanf(res, "%d %d", &tw, &th);
 
   // Remove the border size (-bd)
 
@@ -778,18 +779,19 @@ void vtkKWThumbWheel::DisplayPopupCallback()
   // Get the position of the mouse, the position and size of the push button,
   // the size of the scale.
 
-  this->Script("concat "
-               " [winfo pointerx %s] [winfo pointery %s]" 
-               " [winfo rooty %s] [winfo height %s]"
-               " [winfo width %s] [winfo height %s]",
-               this->GetWidgetName(), this->GetWidgetName(),
-               this->PopupPushButton->GetWidgetName(), 
-               this->PopupPushButton->GetWidgetName(),
-               this->ThumbWheel->GetWidgetName(),
-               this->ThumbWheel->GetWidgetName());
+  const char *res = 
+    this->Script("concat "
+                 " [winfo pointerx %s] [winfo pointery %s]" 
+                 " [winfo rooty %s] [winfo height %s]"
+                 " [winfo width %s] [winfo height %s]",
+                 this->GetWidgetName(), this->GetWidgetName(),
+                 this->PopupPushButton->GetWidgetName(), 
+                 this->PopupPushButton->GetWidgetName(),
+                 this->ThumbWheel->GetWidgetName(),
+                 this->ThumbWheel->GetWidgetName());
   
   int x, y, py, ph, tw, th;
-  sscanf(this->GetApplication()->GetMainInterp()->result, 
+  sscanf(res, 
          "%d %d %d %d %d %d", 
          &x, &y, &py, &ph, &tw, &th);
  
@@ -850,11 +852,12 @@ void vtkKWThumbWheel::EntryCallback()
 // (< 0.0 if position < lower limit , > 1.0 if position > upper limit)
 double vtkKWThumbWheel::GetMousePositionInThumbWheel()
 {
-  this->Script("concat [winfo pointerx %s] [winfo rootx %s]",
-               this->GetWidgetName(), this->ThumbWheel->GetWidgetName());
+  const char *res = 
+    this->Script("concat [winfo pointerx %s] [winfo rootx %s]",
+                 this->GetWidgetName(), this->ThumbWheel->GetWidgetName());
   
   int x, tx;
-  sscanf(this->GetApplication()->GetMainInterp()->result, "%d %d", &x, &tx);
+  sscanf(res, "%d %d", &x, &tx);
 
   return (double)(x - tx - VTK_KW_TW_BORDER_SIZE) / 
     (double)(this->ThumbWheelWidth - 1);

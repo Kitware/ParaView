@@ -26,7 +26,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.25");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.26");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -195,9 +195,9 @@ void vtkKWTclInteractor::Display()
     
     int x, y;
 
-    this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
-    sscanf(this->GetApplication()->GetMainInterp()->result, "%dx%d+%d+%d",
-           &width, &height, &x, &y);
+    const char *res = 
+      this->Script("wm geometry %s", this->MasterWindow->GetWidgetName());
+    sscanf(res, "%dx%d+%d+%d", &width, &height, &x, &y);
     
     x += width / 3;
     y += height / 3;
@@ -236,9 +236,7 @@ void vtkKWTclInteractor::Evaluate()
     }
   this->UnRegister(this);
 
-  this->Script("set _tmp_err");
-
-  vtkstd::string res(this->GetApplication()->GetMainInterp()->result);
+  vtkstd::string res(this->Script("set _tmp_err"));
   this->DisplayText->AppendValue(res.c_str());
   this->DisplayText->AppendValue("\n\n");
 

@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextPropertyEditor);
-vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.1");
+vtkCxxRevisionMacro(vtkKWTextPropertyEditor, "1.2");
 
 int vtkKWTextPropertyEditorCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -421,7 +421,7 @@ void vtkKWTextPropertyEditor::Pack()
     labels[nb++] = this->OpacityScale->GetLabel()->GetWidgetName();
     labels[nb++] = this->PushButtonSet->GetLabel()->GetWidgetName();
     vtkKWTkUtilities::SynchroniseLabelsMaximumWidth(
-      this->GetApplication()->GetMainInterp(), nb, labels, "-anchor w");
+      this->GetApplication(), nb, labels, "-anchor w");
     }
 }
 

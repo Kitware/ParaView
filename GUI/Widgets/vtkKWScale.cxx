@@ -22,7 +22,7 @@
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.82");
+vtkCxxRevisionMacro(vtkKWScale, "1.83");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -507,20 +507,21 @@ void vtkKWScale::DisplayPopupScaleCallback()
   // Get the position of the mouse, the position and size of the push button,
   // the size of the scale.
 
-  this->Script("concat "
-               " [winfo pointerx %s] [winfo pointery %s]" 
-               " [winfo rooty %s] [winfo height %s]"
-               " [%s coords %g]"
-               " [winfo x %s] [winfo y %s]",
-               this->GetWidgetName(), 
-               this->GetWidgetName(),
-               this->PopupPushButton->GetWidgetName(), 
-               this->PopupPushButton->GetWidgetName(),
-               this->Scale->GetWidgetName(), this->Value,
-               this->Scale->GetWidgetName(), this->Scale->GetWidgetName());
+  const char *res = 
+    this->Script("concat "
+                 " [winfo pointerx %s] [winfo pointery %s]" 
+                 " [winfo rooty %s] [winfo height %s]"
+                 " [%s coords %g]"
+                 " [winfo x %s] [winfo y %s]",
+                 this->GetWidgetName(), 
+                 this->GetWidgetName(),
+                 this->PopupPushButton->GetWidgetName(), 
+                 this->PopupPushButton->GetWidgetName(),
+                 this->Scale->GetWidgetName(), this->Value,
+                 this->Scale->GetWidgetName(), this->Scale->GetWidgetName());
   
   int x, y, py, ph, scx, scy, sx, sy;
-  sscanf(this->GetApplication()->GetMainInterp()->result, 
+  sscanf(res, 
          "%d %d %d %d %d %d %d %d", 
          &x, &y, &py, &ph, &scx, &scy, &sx, &sy);
  

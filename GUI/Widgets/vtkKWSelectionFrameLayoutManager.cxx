@@ -72,7 +72,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.11");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.12");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -214,10 +214,7 @@ void vtkKWSelectionFrameLayoutManager::Pack()
   // on the master)
 
   int nb_of_cols = 10, nb_of_rows = 10;
-  vtkKWTkUtilities::GetGridSize(
-    this->GetApplication()->GetMainInterp(),
-    this->GetWidgetName(),
-    &nb_of_cols, &nb_of_rows);
+  vtkKWTkUtilities::GetGridSize(this, &nb_of_cols, &nb_of_rows);
 
   for (j = 0; j < this->Resolution[1]; j++)
     {
@@ -551,7 +548,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
   // Got to create the icons
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout1x1",
     NULL,
     NULL,
@@ -562,7 +559,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x1_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout1x1c",
     NULL,
     NULL,
@@ -573,7 +570,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x1c_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout1x2",
     NULL,
     NULL,
@@ -584,7 +581,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x2_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout1x2c",
     NULL,
     NULL,
@@ -595,7 +592,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout1x2c_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout2x1",
     NULL,
     NULL,
@@ -606,7 +603,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x1_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout2x1c",
     NULL,
     NULL,
@@ -617,7 +614,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x1c_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout2x2",
     NULL,
     NULL,
@@ -628,7 +625,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x2_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout2x2c",
     NULL,
     NULL,
@@ -639,7 +636,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x2c_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout2x3",
     NULL,
     NULL,
@@ -650,7 +647,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x3_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout2x3c",
     NULL,
     NULL,
@@ -661,7 +658,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout2x3c_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout3x2",
     NULL,
     NULL,
@@ -672,7 +669,7 @@ void vtkKWSelectionFrameLayoutManager::CreateResolutionEntriesToolbar(
     image_KWWindowLayout3x2_buffer_length);
 
   vtkKWTkUtilities::UpdateOrLoadPhoto(
-    parent->GetApplication()->GetMainInterp(),
+    parent->GetApplication(),
     "KWWindowLayout3x2c",
     NULL,
     NULL,
