@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.13");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.14");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -489,6 +489,10 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          this->LODResolution, this->LODResolution); 
 
 #ifdef VTK_USE_MPI
+
+  if (getenv("PV_DEBUG_ZERO") == NULL)
+   {
+
   // Create the collection filters which allow small models to render locally.  
   // They also redistributed data for SGI pipes option.
   // ===== Primary branch:
@@ -534,6 +538,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
                          this->LODCollectTclName);
   pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent {Execute LODCollect}}", 
                          this->LODCollectTclName);
+   }
 #endif
 
 
@@ -1076,14 +1081,20 @@ void vtkPVData::CreateProperties()
     this->VisibilityCheck->GetWidgetName(),
     this->GetTclName());
   this->VisibilityCheck->SetState(1);
+  this->VisibilityCheck->SetBalloonHelpString(
+    "Toggle the visibility of this dataset's geometry.");
 
   this->ResetCameraButton->SetParent(this->ViewFrame->GetFrame());
   this->ResetCameraButton->Create(this->Application, "");
   this->ResetCameraButton->SetLabel("Set View to Data");
   this->ResetCameraButton->SetCommand(this, "CenterCamera");
+  this->ResetCameraButton->SetBalloonHelpString(
+    "Change the camera location to best fit the dataset in the view window.");
 
   this->ScalarBarCheck->SetParent(this->ViewFrame->GetFrame());
   this->ScalarBarCheck->Create(this->Application, "-text {Scalar bar}");
+  this->ScalarBarCheck->SetBalloonHelpString(
+    "Toggle the visibility of the scalar bar for this data.");
   this->Application->Script(
     "%s configure -command {%s ScalarBarCheckCallback}",
     this->ScalarBarCheck->GetWidgetName(),
@@ -1093,10 +1104,14 @@ void vtkPVData::CreateProperties()
   this->EditColorMapButton->Create(this->Application, "");
   this->EditColorMapButton->SetLabel("Edit Color Map...");
   this->EditColorMapButton->SetCommand(this,"EditColorMapCallback");
-  
+  this->EditColorMapButton->SetBalloonHelpString(
+    "Edit the table used to map data attributes to pseudo colors.");
+
   this->CubeAxesCheck->SetParent(this->ViewFrame->GetFrame());
   this->CubeAxesCheck->Create(this->Application, "-text CubeAxes");
   this->CubeAxesCheck->SetCommand(this, "CubeAxesCheckCallback");
+  this->CubeAxesCheck->SetBalloonHelpString(
+    "Toggle the visibility of X,Y,Z scales for this dataset.");
 
   this->Script("grid %s %s -sticky wns",
                this->VisibilityCheck->GetWidgetName(),
@@ -1126,14 +1141,20 @@ void vtkPVData::CreateProperties()
   this->ColorMenuLabel->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenuLabel->Create(this->Application, "");
   this->ColorMenuLabel->SetLabel("Color by:");
+  this->ColorMenuLabel->SetBalloonHelpString(
+    "Select method for coloring dataset geometry.");
   
   this->ColorMenu->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenu->Create(this->Application, "");   
+  this->ColorMenu->SetBalloonHelpString(
+    "Select method for coloring dataset geometry.");
 
   this->ColorButton->SetParent(this->ColorFrame->GetFrame());
   this->ColorButton->SetText("Actor Color");
   this->ColorButton->Create(this->Application, "");
   this->ColorButton->SetCommand(this, "ChangeActorColor");
+  this->ColorButton->SetBalloonHelpString(
+    "Edit the constant color for the geometry.");
   
   this->Script("grid %s %s -sticky wns",
                this->ColorMenuLabel->GetWidgetName(),
@@ -1177,6 +1198,8 @@ void vtkPVData::CreateProperties()
   this->RepresentationMenu->AddEntryWithCommand("Points", this,
                                                 "DrawPoints");
   this->RepresentationMenu->SetValue("Surface");
+  this->RepresentationMenu->SetBalloonHelpString(
+    "Choose what geometry should be used to represent the dataset.");
 
   this->InterpolationMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->InterpolationMenuLabel->Create(this->Application, "");
@@ -1189,11 +1212,15 @@ void vtkPVData::CreateProperties()
   this->InterpolationMenu->AddEntryWithCommand("Gouraud", this,
                                                "SetInterpolationToGouraud");
   this->InterpolationMenu->SetValue("Gouraud");
+  this->InterpolationMenu->SetBalloonHelpString(
+    "Choose the method used to shade the geometry and interpolate point attributes.");
 
   this->PointSizeLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->PointSizeLabel->Create(this->Application, "");
   this->PointSizeLabel->SetLabel("Point size:");
-  
+  this->PointSizeLabel->SetBalloonHelpString(
+    "If your dataset contains points/verticies, "
+    "this scale adjusts the diameter of the rendered points.");
   this->PointSizeScale->SetParent(this->DisplayStyleFrame->GetFrame());
   this->PointSizeScale->Create(this->Application, "");
   this->PointSizeScale->SetRange(1, 5);
@@ -1204,10 +1231,16 @@ void vtkPVData::CreateProperties()
   this->Script("%s configure -width 5", 
                this->PointSizeScale->GetEntry()->GetWidgetName());
   this->PointSizeScale->SetCommand(this, "ChangePointSize");
+  this->PointSizeScale->SetBalloonHelpString(
+    "If your dataset contains points/verticies, "
+    "this scale adjusts the diameter of the rendered points.");
 
   this->LineWidthLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->LineWidthLabel->Create(this->Application, "");
   this->LineWidthLabel->SetLabel("Line width:");
+  this->LineWidthLabel->SetBalloonHelpString(
+    "If your dataset containes lines/edges, "
+    "this scale adjusts the width of the rendered lines.");
   
   this->LineWidthScale->SetParent(this->DisplayStyleFrame->GetFrame());
   this->LineWidthScale->Create(this->Application, "");
@@ -1219,6 +1252,9 @@ void vtkPVData::CreateProperties()
   this->Script("%s configure -width 5", 
                this->LineWidthScale->GetEntry()->GetWidgetName());
   this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
+  this->LineWidthScale->SetBalloonHelpString(
+    "If your dataset containes lines/edges, "
+    "this scale adjusts the width of the rendered lines.");
 
   this->Script("grid %s %s -sticky wns",
                this->RepresentationMenuLabel->GetWidgetName(),
@@ -1278,10 +1314,14 @@ void vtkPVData::CreateProperties()
   this->TranslateLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->TranslateLabel->Create(this->Application, 0);
   this->TranslateLabel->SetLabel("Translate:");
+  this->TranslateLabel->SetBalloonHelpString(
+    "Translate the geometry relative to the dataset location.");
 
   this->ScaleLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->ScaleLabel->Create(this->Application, 0);
   this->ScaleLabel->SetLabel("Scale:");
+  this->ScaleLabel->SetBalloonHelpString(
+    "Scale the geometry relative to the size of the dataset.");
 
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
@@ -1292,10 +1332,14 @@ void vtkPVData::CreateProperties()
     this->Script("bind %s <Key-Return> { %s SetActorTranslate }",
                  this->TranslateEntry[cc]->GetWidgetName(),
                  this->GetTclName());
+    this->TranslateEntry[cc]->SetBalloonHelpString(
+      "Translate the geometry relative to the dataset location.");
 
     this->ScaleEntry[cc]->SetParent(this->ActorControlFrame->GetFrame());
     this->ScaleEntry[cc]->Create(this->Application, 0);
     this->ScaleEntry[cc]->SetValue(1, 4);
+    this->ScaleEntry[cc]->SetBalloonHelpString(
+      "Scale the geometry relative to the size of the dataset.");
     this->Script("bind %s <Key-Return> { %s SetActorScale }",
                  this->ScaleEntry[cc]->GetWidgetName(),
                  this->GetTclName());
@@ -1304,6 +1348,10 @@ void vtkPVData::CreateProperties()
   this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
   this->OpacityLabel->Create(this->Application, 0);
   this->OpacityLabel->SetLabel("Opacity:");
+  this->OpacityLabel->SetBalloonHelpString(
+    "Set the opacity of the dataset's geometry.  "
+    "Artifacts may appear in translucent geomtry "
+    "because primatives are not sorted.");
 
   this->Opacity->SetParent(this->ActorControlFrame->GetFrame());
   this->Opacity->Create(this->Application, 0);
@@ -1315,6 +1363,10 @@ void vtkPVData::CreateProperties()
   this->Script("%s configure -width 5", 
                this->Opacity->GetEntry()->GetWidgetName());
   this->Opacity->SetCommand(this, "OpacityChangedCallback");
+  this->Opacity->SetBalloonHelpString(
+    "Set the opacity of the dataset's geometry.  "
+    "Artifacts may appear in translucent geomtry "
+    "because primatives are not sorted.");
 
   this->Script("grid %s %s %s %s -sticky news",
                this->TranslateLabel->GetWidgetName(),
@@ -2927,7 +2979,7 @@ void vtkPVData::SetCollectThreshold(float threshold)
   
   vtkPVApplication *pvApp = this->GetPVApplication();
     
-  if (!pvApp->GetUseRenderingGroup())
+  if (!pvApp->GetUseRenderingGroup() && this->CollectTclName)
     {
     pvApp->BroadcastScript("%s SetThreshold %d", this->CollectTclName,
                            static_cast<unsigned long>(threshold*1000.0));
@@ -2942,7 +2994,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.13 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.14 $");
 }
 
 //----------------------------------------------------------------------------
