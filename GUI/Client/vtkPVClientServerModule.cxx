@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.73");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.74");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -289,7 +289,8 @@ void vtkPVClientServerModule::Initialize()
       {
       pvApp->Exit();
       }
-
+    cout << "Exit Client\n";
+    cout.flush();
     // Exiting:  CLean up.
     this->ReturnValue = pvApp->GetExitStatus();
     }
@@ -318,6 +319,17 @@ void vtkPVClientServerModule::Initialize()
     
     this->Controller->CreateOutputWindow();
     this->SocketController->ProcessRMIs();
+    if(this->RenderServerMode)
+      {
+      cout << "Exit Render Server.\n";
+      cout.flush();
+      }
+    else
+      {
+      cout << "Exit Data Server.\n";
+      cout.flush();
+      }
+      
     
     // Exiting.  Relay the break RMI to otehr processes.
     for (id = 1; id < numProcs; ++id)
@@ -701,8 +713,6 @@ void vtkPVClientServerModule::InitializeRenderServer()
     << vtkClientServerStream::Invoke << id << "Connect"
     << vtkClientServerStream::End;
   this->SendStreamToServer();
-
-  info->Print(cerr);
   info->Delete();
 }
 
