@@ -33,12 +33,12 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWPushButton.h"
+#include "vtkToolkits.h"
 
 #include "vtkInteractorStylePlaneSource.h"
 
 #include "vtkDirectory.h"
 #include "vtkMath.h"
-#include "vtkSynchronizedTemplates3D.h"
 
 #include "vtkPVSource.h"
 #include "vtkPVData.h"
@@ -1037,7 +1037,11 @@ void vtkPVWindow::ContourCallback()
   // Create the vtkSource.
   sprintf(tclName, "%s%d", "Contour", instanceCount);
   // Create the object through tcl on all processes.
+#ifdef VTK_USE_PATENTED
   s = (vtkSource *)(pvApp->MakeTclObject("vtkKitwareContourFilter", tclName));
+#else
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkContourFilter", tclName));
+#endif
   if (s == NULL)
     {
     vtkErrorMacro("Could not get pointer from object.");

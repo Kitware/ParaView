@@ -71,11 +71,6 @@ IF ( VTK_BINARY_DIR )
     SET (PARAVIEW_CAN_BUILD 0)
   ENDIF (NOT VTK_USE_PARALLEL)
 
-  IF (NOT VTK_USE_PATENTED)
-    MESSAGE("ParaView requires VTK to be built with patented support. Please rebuild VTK with patented and re-run CMake")
-    SET (PARAVIEW_CAN_BUILD 0)
-  ENDIF (NOT VTK_USE_PATENTED)
-
 ELSE (VTK_BINARY_DIR )
   SET (PARAVIEW_CAN_BUILD 0)
   MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_DIR")

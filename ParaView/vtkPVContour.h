@@ -37,7 +37,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
 #include "vtkKWListBox.h"
-#include "vtkKitwareContourFilter.h"
 
 class VTK_EXPORT vtkPVContour : public vtkPVSource
 {

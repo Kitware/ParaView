@@ -29,6 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVApplication.h"
 #include "vtkStringList.h"
 #include "vtkPVSourceInterface.h"
+#include "vtkContourFilter.h"
 
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -243,8 +244,8 @@ void vtkPVContour::ContourValuesAcceptCallback()
 void vtkPVContour::ContourValuesResetCallback()
 {
   int i;
-  vtkKitwareContourFilter* contour =
-    (vtkKitwareContourFilter*)this->GetVTKSource();
+  vtkContourFilter* contour =
+    (vtkContourFilter*)this->GetVTKSource();
   int numContours = contour->GetNumberOfContours();
   char newValue[128];
   
@@ -261,8 +262,8 @@ void vtkPVContour::SaveInTclScript(ofstream* file)
 {
   char* tempName;
   int i;
-  vtkKitwareContourFilter *source =
-    (vtkKitwareContourFilter*)this->GetVTKSource();
+  vtkContourFilter *source =
+    (vtkContourFilter*)this->GetVTKSource();
 
   if (this->DefaultScalarsName)
     {
