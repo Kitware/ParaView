@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.193");
+vtkCxxRevisionMacro(vtkPVApplication, "1.194");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1321,6 +1321,16 @@ void vtkPVApplication::Start(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Exit()
 {  
+  // Avoid recursive exit calls during window destruction.
+  if(this->InExit)
+    {
+    return;
+    }
+  
+  // Remove the ParaView output window so errors during exit will
+  // still be displayed.
+  vtkOutputWindow::SetInstance(0);
+  
   this->vtkKWApplication::Exit();
   if ( this->AboutDialog )
     {
