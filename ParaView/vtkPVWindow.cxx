@@ -2247,6 +2247,7 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
   vtkDirectory* dir = vtkDirectory::New();
   if(!dir->Open(directory))
     {
+    dir->Delete();
     return 0;
     }
   
