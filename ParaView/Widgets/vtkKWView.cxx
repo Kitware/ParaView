@@ -42,14 +42,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWView.h"
 
 #include "vtkBMPWriter.h"
+#include "vtkImageData.h"
 #include "vtkJPEGWriter.h"
 #include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWCornerAnnotation.h"
-#include "vtkKWEvent.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWGenericComposite.h"
 #include "vtkKWIcon.h"
@@ -97,7 +98,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.88");
+vtkCxxRevisionMacro(vtkKWView, "1.89");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1489,7 +1490,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.88 $");
+  this->ExtractRevision(os,"$Revision: 1.89 $");
 }
 
 //----------------------------------------------------------------------------
