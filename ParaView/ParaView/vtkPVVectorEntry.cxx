@@ -64,17 +64,18 @@ vtkPVVectorEntry* vtkPVVectorEntry::New()
 //---------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
 {
-  this->LabelWidget = vtkKWLabel::New();
+  this->LabelWidget  = vtkKWLabel::New();
   this->LabelWidget->SetParent(this);
-  this->Entries = vtkKWWidgetCollection::New();
-  this->SubLabels = vtkKWWidgetCollection::New();
+  this->Entries      = vtkKWWidgetCollection::New();
+  this->SubLabels    = vtkKWWidgetCollection::New();
 
-  this->ScriptValue = NULL;
-  this->DataType = VTK_FLOAT;
+  this->ScriptValue  = NULL;
+  this->DataType     = VTK_FLOAT;
   this->SubLabelTxts = vtkStringList::New();
 
   this->VectorLength = 1;
-  this->EntryLabel = 0;
+  this->EntryLabel   = 0;
+  this->ReadOnly     = 0;
 }
 
 //---------------------------------------------------------------------------
@@ -198,10 +199,18 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
     entry = vtkKWEntry::New();
     entry->SetParent(this);
     entry->Create(pvApp, "-width 2");
-    this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
-                 entry->GetWidgetName(), this->GetTclName());
+    if ( this->ReadOnly ) 
+      {
+      entry->ReadOnlyOn();
+      }
+    else
+      {
+      this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
+		   entry->GetWidgetName(), this->GetTclName());
+      }
     this->Script("pack %s -side left -fill x -expand t",
-                 entry->GetWidgetName());
+		 entry->GetWidgetName());
+    
     this->Entries->AddItem(entry);
     entry->Delete();
     }
@@ -311,7 +320,7 @@ void vtkPVVectorEntry::SetValue(char** values, int num)
     }
   for (idx = 0; idx < num; ++idx)
     {
-    entry = this->GetEntry(idx);
+    entry = this->GetEntry(idx);    
     entry->SetValue(values[idx]);
     }
   this->ModifiedCallback();
@@ -447,6 +456,7 @@ void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone,
     pvve->SetLabel(this->EntryLabel);
     pvve->SetDataType(this->DataType);
     pvve->SetVectorLength(this->VectorLength);
+    pvve->SetReadOnly(this->ReadOnly);
     int i, len = this->SubLabelTxts->GetLength();
     for (i=0; i<len; i++)
       {
@@ -469,6 +479,12 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   if(!element->GetScalarAttribute("length", &this->VectorLength))
     {
     this->VectorLength = 1;
+    }
+
+  // Setup the VectorLength.
+  if(!element->GetScalarAttribute("readonly", &this->ReadOnly))
+    {
+    this->ReadOnly = 0;
     }
   
   // Setup the DataType.

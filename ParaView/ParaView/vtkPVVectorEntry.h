@@ -132,6 +132,12 @@ public:
   // before create.
   void SetSubLabel(int i, const char* sublabl);
 
+  // Description:
+  // Set or get whether the entry is read only or not.
+  vtkSetClampMacro(ReadOnly, int, 0, 1);
+  vtkBooleanMacro(ReadOnly, int);
+  vtkGetMacro(ReadOnly, int);
+
 //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
@@ -156,6 +162,10 @@ protected:
 
   int DataType;
   int VectorLength;
+
+  // Description
+  // Set this to 1 to be read only
+  int ReadOnly;
 
   char *ScriptValue;
 

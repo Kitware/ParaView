@@ -79,6 +79,12 @@ public:
   void SetWidth(int width);
   vtkGetMacro(Width, int);
 
+  // Description:
+  // Set or get readonly flag. This flags makes entry read only.
+  void SetReadOnly(int);
+  vtkBooleanMacro(ReadOnly, int);
+  vtkGetMacro(ReadOnly, int);
+
 protected:
   vtkKWEntry();
   ~vtkKWEntry();
@@ -88,6 +94,8 @@ protected:
   
   char *ValueString;
   int Width;
+  int ReadOnly;
+
 private:
   vtkKWEntry(const vtkKWEntry&); // Not implemented
   void operator=(const vtkKWEntry&); // Not Implemented

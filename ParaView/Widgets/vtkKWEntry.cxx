@@ -51,7 +51,8 @@ vtkStandardNewMacro( vtkKWEntry );
 vtkKWEntry::vtkKWEntry()
 {
   this->ValueString = NULL;
-  this->Width = -1;
+  this->Width       = -1;
+  this->ReadOnly    = 0;
 }
 
 vtkKWEntry::~vtkKWEntry()
@@ -80,26 +81,37 @@ float vtkKWEntry::GetValueAsFloat()
 
 void vtkKWEntry::SetValue(const char *s)
 {
+  int ro = 0;
+  if ( this->ReadOnly )
+    {
+    this->ReadOnlyOff();
+    ro = 1;
+    }
   this->Script("%s delete 0 end", this->GetWidgetName());
   if (s)
     {
     this->Script("%s insert 0 {%s}", this->GetWidgetName(),s);
     }
+  if ( ro )
+    {
+    this->ReadOnlyOn();
+    }
 }
 
 void vtkKWEntry::SetValue(int i)
 {
-  this->Script("%s delete 0 end", this->GetWidgetName());
-  this->Script("%s insert 0 %d", this->GetWidgetName(),i);
+  char tmp[1024];
+  sprintf(tmp, "%d", i);
+  this->SetValue(tmp);
 }
 
 void vtkKWEntry::SetValue(float f, int size)
 {
   char tmp[1024];
-  
-  this->Script("%s delete 0 end",this->GetWidgetName());
-  sprintf(tmp,"%%s insert 0 %%.%df",size);
-  this->Script(tmp,this->GetWidgetName(),f);
+  char format[1024];
+  sprintf(format,"%%.%df",size);
+  sprintf(tmp,format, f);
+  this->SetValue(tmp);
 }
 
 void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
@@ -125,6 +137,23 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
   else
     {
     this->Script("entry %s -textvariable %sValue %s",wname,wname,args);
+    }
+  if ( this->ReadOnly )
+    {
+    this->Script("%s configure -state disabled", wname);
+    }
+}
+
+void vtkKWEntry::SetReadOnly(int ro)
+{
+  this->ReadOnly = ro;
+  if ( ro && this->GetWidgetName() )
+    {
+    this->Script("%s configure -state disabled", this->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s configure -state normal", this->GetWidgetName());
     }
 }
 
