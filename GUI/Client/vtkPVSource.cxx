@@ -65,7 +65,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.423");
+vtkCxxRevisionMacro(vtkPVSource, "1.424");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -2560,4 +2560,5 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "CubeAxesVisibility: " << this->CubeAxesVisibility << endl;
   os << indent << "PointLabelVisibility: " << this->PointLabelVisibility << endl;
+  os << indent << "OverideAutoAccept: " << (this->OverideAutoAccept?"yes":"no") << endl;
 }
