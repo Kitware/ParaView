@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTkUtilities);
-vtkCxxRevisionMacro(vtkKWTkUtilities, "1.1");
+vtkCxxRevisionMacro(vtkKWTkUtilities, "1.2");
 
 //----------------------------------------------------------------------------
 void vtkKWTkUtilities::GetRGBColor(Tcl_Interp *interp,
@@ -216,7 +216,7 @@ int vtkKWTkUtilities::UpdatePhoto(Tcl_Interp *interp,
   int res = vtkKWTkUtilities::UpdatePhoto(
     interp,
     photo_name,
-    static_cast<const unsigned char*>(flip->GetOutput()->GetScalarPointer()),
+    static_cast<unsigned char*>(flip->GetOutput()->GetScalarPointer()),
     ext[1] - ext[0] + 1, 
     ext[3] - ext[2] + 1,
     image->GetNumberOfScalarComponents(),
