@@ -142,7 +142,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.54");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -364,7 +364,7 @@ public:
     this->UpdateStartEndValueFromEntry();
     float max = this->TimeEnd;
     float min = this->TimeStart;
-    float range = (max - min) + 1;
+    float range = (max - min);
 
     // formula is:
     // (((((time - tmin) / trange) / tstep) * range) + min) * step
@@ -920,8 +920,10 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->ScriptEditor->SetParent(this->ActionFrame->GetFrame());
   this->ScriptEditor->Create(this->Application, "-relief sunken -bd 2");
 
-  this->Script("bind %s <KeyPress> {%s ScriptEditorCallback}",
-               this->ScriptEditor->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <FocusOut> {%s ScriptEditorCallback}",
+    this->ScriptEditor->GetWidgetName(), this->GetTclName());
+  this->Script("bind %s <KeyPress-Return> {%s ScriptEditorCallback}",
+    this->ScriptEditor->GetWidgetName(), this->GetTclName());
 
   // Save frame stuff
   this->SaveFrame->SetParent(this);
@@ -1139,7 +1141,6 @@ void vtkPVAnimationInterface::TimeSpanEntryCallback()
   cout << "TimeSpanEntryCallback" << endl;
   this->LastEntryIndex = -1;
   this->SetTimeSpan(this->TimeSpanEntry->GetValueAsFloat());
-  this->UpdateNewScript();
 }
 
 //-----------------------------------------------------------------------------
@@ -2077,6 +2078,11 @@ vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::GetSourceEntry(int idx)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateNewScript()
 {
+  if ( this->InPlay )
+    {
+    abort();
+    }
+  cout << "UpdateNewScript" << endl;
   ostrstream str;
   //str << "puts \"------------- start --------------\"" << endl;
   vtkCollectionIterator* it = this->AnimationEntriesIterator;
@@ -2105,6 +2111,31 @@ void vtkPVAnimationInterface::UpdateNewScript()
     {
     this->ScriptEditor->SetValue(0);
     }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationInterface::ScriptEditorCallback()
+{
+  const char* script = this->ScriptEditor->GetValue();
+  unsigned int cc;
+  ostrstream str;
+  str << "SetScript {";
+  for ( cc = 0; cc< strlen(script); cc ++ )
+    {
+    int ch = script[cc];
+    switch ( ch )
+      {
+      case '\"': str << "\\\""; break;
+      case '{': str << "\\{"; break;
+      case '}': str << "\\}"; break;
+      case '\n': str << "\\\n"; break;
+      case '\\': str << "\\\\"; break;
+    default: str << (char)ch; break;
+      }
+    }
+  str << "}" << ends;
+  //cout << "Script: " << str.str() << endl;
+  str.rdbuf()->freeze(0);
 }
 
 //-----------------------------------------------------------------------------

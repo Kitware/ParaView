@@ -150,6 +150,10 @@ public:
   void ScriptCheckButtonCallback();
 
   // Description:
+  // When script is changed manually, save it to trace file.
+  void ScriptEditorCallback();
+
+  // Description:
   // This method gets called when the loop button is pressed
   void LoopCheckButtonCallback();
 
