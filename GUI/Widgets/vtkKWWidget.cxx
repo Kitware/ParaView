@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.104");
+vtkCxxRevisionMacro(vtkKWWidget, "1.105");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -467,7 +467,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.104 $");
+  this->ExtractRevision(os,"$Revision: 1.105 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1742,11 +1742,16 @@ struct vtkKWWidgetTkColormapData {  /* Hold color information for a window */
 };
 
 static void
-vtkKWWidgetTkImageGetColor(vtkKWWidgetTkColormapData* cdata,
-  unsigned long pixel, double *red, double *green, double *blue)
-//TkColormapData *cdata;              /* Colormap data */
-//unsigned long pixel;                /* Pixel value to look up */
-//double *red, *green, *blue;         /* Color data to return */
+vtkKWWidgetTkImageGetColor(vtkKWWidgetTkColormapData* 
+#ifdef WIN32
+#else
+                           cdata
+#endif
+                           ,
+                           unsigned long pixel, 
+                           double *red, 
+                           double *green, 
+                           double *blue)
 #ifdef WIN32
 
 /*
