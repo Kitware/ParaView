@@ -36,6 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWActorComposite.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWChangeColorButton.h"
 #include "vtkKWLabel.h"
 #include "vtkKWPushButton.h"
 #include "vtkKWScale.h"
@@ -189,6 +190,10 @@ public:
   // Description:
   // Save out the mapper and actor to a file.
   void Save(ofstream *file, const char *sourceName);
+
+  // Description:
+  // Callback for the change color button.
+  void ChangeActorColor(float r, float g, float b);
   
 protected:
 
@@ -210,6 +215,8 @@ protected:
   vtkKWLabel *ColorMenuLabel;
   vtkKWOptionMenu *ColorMenu;
 
+  vtkKWChangeColorButton *ColorButton;
+  
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
 

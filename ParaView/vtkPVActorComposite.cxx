@@ -36,7 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSource.h"
 #include "vtkImageOutlineFilter.h"
 #include "vtkGeometryFilter.h"
-#include "vtkFastGeometryFilter.h"
+#include "vtkDataSetSurfaceFilter.h"
 #include "vtkTexture.h"
 #include "vtkScalarBarActor.h"
 #include "vtkCubeAxesActor2D.h"
@@ -84,6 +84,8 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
 
+  this->ColorButton = vtkKWChangeColorButton::New();
+  
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
@@ -221,6 +223,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   
   this->ColorMenu->Delete();
   this->ColorMenu = NULL;
+
+  this->ColorButton->Delete();
+  this->ColorButton = NULL;
   
   this->RepresentationMenuLabel->Delete();
   this->RepresentationMenuLabel = NULL;  
@@ -334,6 +339,11 @@ void vtkPVActorComposite::CreateProperties()
   this->ColorMenu->SetParent(this->Properties);
   this->ColorMenu->Create(this->Application, "");    
 
+  this->ColorButton->SetParent(this->Properties);
+  this->ColorButton->Create(this->Application, "");
+  this->ColorButton->SetText("Actor Color");
+  this->ColorButton->SetCommand(this, "ChangeActorColor");
+  
   this->RepresentationMenuLabel->SetParent(this->Properties);
   this->RepresentationMenuLabel->Create(this->Application, "");
   this->RepresentationMenuLabel->SetLabel("Data set representation:");
@@ -408,6 +418,8 @@ void vtkPVActorComposite::CreateProperties()
 	       this->ColorMenuLabel->GetWidgetName());
   this->Script("pack %s",
                this->ColorMenu->GetWidgetName());
+  this->Script("pack %s",
+               this->ColorButton->GetWidgetName());
   this->Script("pack %s",
                this->RepresentationMenuLabel->GetWidgetName());
   this->Script("pack %s",
@@ -535,6 +547,20 @@ void vtkPVActorComposite::UpdateProperties()
       }
     }
 
+}
+
+void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (this->Mapper->GetScalarVisibility())
+    {
+    return;
+    }
+  
+  pvApp->BroadcastScript("[%s GetProperty] SetColor %f %f %f",
+                         this->ActorTclName, r, g, b);
+  this->GetView()->Render();
 }
 
 void vtkPVActorComposite::ResetColorRange()
@@ -998,8 +1024,7 @@ void vtkPVActorComposite::SetMode(int mode)
       {
       char tclName[150];
       sprintf(tclName, "ActorCompositeGeometry%d", this->InstanceCount);
-      //pvApp->MakeTclObject("vtkGeometryFilter", tclName);
-      pvApp->MakeTclObject("vtkFastGeometryFilter", tclName);
+      pvApp->MakeTclObject("vtkDataSetSurfaceFilter", tclName);
       this->SetGeometryTclName(tclName);
       }
     pvApp->BroadcastScript("%s SetInput %s", this->GeometryTclName,
@@ -1242,7 +1267,7 @@ void vtkPVActorComposite::Save(ofstream *file, const char *sourceName)
     }
   else if (this->Mode == VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
     {
-    *file << "vtkFastGeometryFilter " << this->GeometryTclName << "\n\t"
+    *file << "vtkDataSetSurfaceFilter " << this->GeometryTclName << "\n\t"
           << this->GeometryTclName << " SetInput [" << sourceName
           << " GetOutput";
     if (strncmp(sourceName, "EnSight", 7) == 0)
