@@ -2,8 +2,20 @@ proc ChangeDemoText { newtext } {
     .control.main.info configure -text "$newtext" -justify left
 }
 
+proc StopDemo { } {
+    global pvDemoShouldStop
+
+    ChangeDemoText "ParaView demo exiting.\nPlease wait."
+    .control.main.stop configure -state disabled
+    set pvDemoShouldStop 1
+}
+
 proc CheckForDemoFile { file } {
     global Application foundFiles DemoDir
+
+    if {$foundFiles == 0} {
+        return 0
+    }
 
     if ![file exists $DemoDir/$file] {
 	vtkKWMessageDialog _adialog
@@ -3444,7 +3456,7 @@ proc warp_run {} {
     $warp(vtkTemp469) SetVisibility 0
 }
 
-$Application ExitOnReturnOn
+#$Application ExitOnReturnOn
 
 set foundFiles 1
 
@@ -3458,19 +3470,25 @@ CheckForDemoFile blow.vtk
 if $foundFiles {
     set pvDemoShouldStop 0
 
-    wm protocol .paraview WM_DELETE_WINDOW {ChangeDemoText "ParaView demo exiting.\nPlease wait.";set pvDemoShouldStop 1}
+    wm protocol .paraview WM_DELETE_WINDOW {StopDemo}
 
-    toplevel .control
-    wm title .control "demo control panel"
-    frame .control.main -width 350 -height 200
-    label .control.main.info -text "ParaView demo initializing.\n Please wait."  -wraplength 300
-    button .control.main.stop -text "Stop Demo" -command {ChangeDemoText "ParaView demo exiting.\nPlease wait.";.control.main.stop configure -state disable; set pvDemoShouldStop 1} -bg red
-    pack .control.main
-    place .control.main.info -rely 0 -relx 0.5 -anchor n
-    place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
+    if {![winfo exists .control]} {
+        toplevel .control
+        wm withdraw .control
+        wm title .control "demo control panel"
+        frame .control.main -width 350 -height 200
+        label .control.main.info  -wraplength 300
+        button .control.main.stop -text "Stop Demo" -command {StopDemo} -bg red
+        pack .control.main
+        place .control.main.info -rely 0 -relx 0.5 -anchor n
+        place .control.main.stop  -rely 0.95 -relx 0.5 -anchor s
+        
+        wm transient .control .paraview  
+    }
 
-    wm transient .control .paraview
-
+    wm deiconify .control
+    .control.main.stop configure -state normal
+    .control.main.info configure -text "ParaView demo initializing.\n Please wait." 
     grab .control.main.stop
 
     clip_init
@@ -3498,4 +3516,47 @@ if $foundFiles {
     }
 
 }
-$Application Exit
+
+if { [info exists pvDemoCommandLine] } {
+    $Application Exit
+} else {
+    global clip extract iso streams threshold warp
+
+    catch {$clip(vtkTemp572) DeleteCallback}
+    catch {$clip(vtkTemp507) DeleteCallback}
+    catch {$clip(vtkTemp384) DeleteCallback}
+
+    catch {$extract(vtkTemp780) DeleteCallback}
+    catch {$extract(vtkTemp703) DeleteCallback}
+    catch {$extract(vtkTemp598) DeleteCallback}
+    catch {$extract(vtkTemp478) DeleteCallback}
+    catch {$extract(vtkTemp384) DeleteCallback}
+
+    catch {$iso(vtkTemp820) DeleteCallback}
+    catch {$iso(vtkTemp739) DeleteCallback}
+    catch {$iso(vtkTemp674) DeleteCallback}
+    catch {$iso(vtkTemp565) DeleteCallback}
+    catch {$iso(vtkTemp449) DeleteCallback}
+    catch {$iso(vtkTemp384) DeleteCallback}
+
+    catch {$streams(vtkTemp900) DeleteCallback}
+    catch {$streams(vtkTemp786) DeleteCallback}
+    catch {$streams(vtkTemp679) DeleteCallback}
+    catch {$streams(vtkTemp597) DeleteCallback}
+    catch {$streams(vtkTemp478) DeleteCallback}
+    catch {$streams(vtkTemp384) DeleteCallback}
+
+    catch {$threshold(vtkTemp482) DeleteCallback}
+    catch {$threshold(vtkTemp384) DeleteCallback}
+
+    catch {$warp(vtkTemp450) DeleteCallback}
+    catch {$warp(vtkTemp384) DeleteCallback}
+
+    $clip(vtkTemp24) EventuallyRender
+
+    grab release .control.main.stop
+    wm withdraw .control
+
+    wm protocol .paraview WM_DELETE_WINDOW { [$Application GetMainWindow] Exit }
+}
+

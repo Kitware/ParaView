@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.10");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.11");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1043,6 +1043,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   if (playDemo)
     {
+    this->Script("set pvDemoCommandLine 1");
     ui->PlayDemo();
     }
   else
