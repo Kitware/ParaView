@@ -183,6 +183,8 @@ protected:
   void UpdateTimeStep();
   void UpdateAvailableFiles();
 
+  int Initialized;
+
 private:
   vtkPVFileEntry(const vtkPVFileEntry&); // Not implemented
   void operator=(const vtkPVFileEntry&); // Not implemented

@@ -68,7 +68,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.70");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.71");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -95,6 +95,8 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->FileListSelect = vtkKWListSelectOrder::New();
   this->ListObserverTag = 0;
   this->IgnoreFileListEvents = 0;
+
+  this->Initialized = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -148,6 +150,7 @@ const char* vtkPVFileEntry::GetLabel()
   return this->LabelWidget->GetLabel();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVFileEntry::SetBalloonHelpString(const char *str)
 {
 
@@ -584,6 +587,17 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     {
     vtkKWDirectoryUtilities::GetFilenameName(fileName, file);
     this->FileListSelect->AddFinalElement(file, 1);
+    }
+
+  if ( !this->Initialized )
+    {
+    this->Property->RemoveAllFiles();
+    int cc;
+    for ( cc = 0; cc < this->FileListSelect->GetNumberOfElementsOnFinalList(); cc ++ )
+      {
+      this->Property->AddFile(this->FileListSelect->GetElementFromFinalList(cc));
+      }
+    this->Initialized = 1;
     }
 
   files->Delete();
