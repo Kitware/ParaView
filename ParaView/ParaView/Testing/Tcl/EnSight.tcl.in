@@ -6,7 +6,7 @@ set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
 
-$pv(vtkTemp1) Open {E:/ParaView/ParaView/data/Data/elements.case}
+$pv(vtkTemp1) Open {$DataDir/Data/elements.case}
 set pv(vtkTemp104) [$pv(vtkTemp1) GetPreviousPVSource 1]
 set pv(vtkTemp145) [$pv(vtkTemp1) GetPreviousPVSource 0]
 
