@@ -39,6 +39,11 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkKWRegisteryUtilities - A Win32 implementation of the registery
+// .SECTION Description
+// This class abstracts the storing of data that can be restored
+// when the program executes again. It is designed specifically for 
+// Win32 platform.
 
 #ifndef __vtkKWWin32RegisteryUtilities_h
 #define __vtkKWWin32RegisteryUtilities_h

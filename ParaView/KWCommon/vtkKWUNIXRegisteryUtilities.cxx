@@ -52,13 +52,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_IOS_NOCREATE | ios::nocreate
 #endif
 
-#define MStrDup(x) \
-   x ? strcpy( new char[ strlen(x) + 1 ], x ) : 0
-
 #define BUFFER_SIZE 1024
 
 vtkStandardNewMacro( vtkKWUNIXRegisteryUtilities );
-vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.5");
+vtkCxxRevisionMacro(vtkKWUNIXRegisteryUtilities, "1.6");
 
 //----------------------------------------------------------------------------
 vtkKWUNIXRegisteryUtilities::vtkKWUNIXRegisteryUtilities()

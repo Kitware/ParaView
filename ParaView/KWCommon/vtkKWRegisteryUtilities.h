@@ -39,6 +39,12 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkKWRegisteryUtilities - A registery class
+// .SECTION Description
+// This class abstracts the storing of data that can be restored
+// when the program executes again. On Win32 platform it is 
+// implemented using the registery and on unix as a file in
+// the user's home directory.
 
 #ifndef __vtkKWRegisteryUtilities_h
 #define __vtkKWRegisteryUtilities_h
@@ -47,7 +53,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
 {
-  public:
+public:
+  // Description:
+  // Standard New and type methods
   static vtkKWRegisteryUtilities* New();
   vtkTypeRevisionMacro(vtkKWRegisteryUtilities, vtkObject);
   void PrintSelf(ostream& os, vtkIndent indent);
@@ -78,6 +86,14 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
   // Description:
   // Close the registry. 
   int Close();
+
+  // Description:
+  // Read from local or global scope. On Windows this mean from local machine
+  // or local user. On unix this will read from $HOME/.Projectrc or 
+  // /etc/Project
+  vtkSetClampMacro(GlobalScope, int, 0, 1);
+  vtkBooleanMacro(GlobalScope, int);
+  vtkGetMacro(GlobalScope, int);
   
   // Description:
   // Set or get the toplevel registry key.
@@ -147,10 +163,11 @@ class VTK_EXPORT vtkKWRegisteryUtilities : public vtkObject
   int Changed;
   int Empty;
    
-  private:
+private:
   char *TopLevel;  
   int Locked;
-private:
+  int GlobalScope;
+
   vtkKWRegisteryUtilities(const vtkKWRegisteryUtilities&); // Not implemented
   void operator=(const vtkKWRegisteryUtilities&); // Not implemented
 };
