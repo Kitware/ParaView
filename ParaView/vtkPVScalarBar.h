@@ -49,12 +49,6 @@ public:
   vtkTypeMacro(vtkPVScalarBar, vtkKWComposite);
 
   // Description:
-  // This is a parallel object.  A clone will exist in every process.
-  // After the object is constructed, clone should be called to
-  /// create duplicate objects with the same tcl name.
-  void Clone(vtkPVApplication *pvApp);  
-  
-  // Description:
   // Get the scalar bar.  (need to override pure virtual function in
   // vtkKWComposite)
   vtkProp *GetProp();
@@ -62,7 +56,6 @@ public:
   // Description:
   // Create/Show the UI.
   void CreateProperties();
-  void ShowProperties();
 
   // Description:
   // Set/Get the underlying vtkScalarBarActor.

@@ -47,11 +47,7 @@ vtkPVData::vtkPVData()
   this->VTKDataTclName = NULL;
   this->PVSource = NULL;
   
-  this->ActorCompositeButton = vtkKWPushButton::New();
   this->PVSourceCollection = vtkPVSourceCollection::New();
-
-  // Has an initialization component in CreateParallelTclObjects.
-  this->ActorComposite = vtkPVActorComposite::New();
 }
 
 //----------------------------------------------------------------------------
@@ -59,15 +55,6 @@ vtkPVData::~vtkPVData()
 {
   this->SetVTKData(NULL, NULL);
   this->SetPVSource(NULL);
-
-  if (this->ActorComposite)
-    {
-    this->ActorComposite->Delete();
-    this->ActorComposite = NULL;
-    }
-  
-  this->ActorCompositeButton->Delete();
-  this->ActorCompositeButton = NULL;
 
   this->PVSourceCollection->Delete();
   this->PVSourceCollection = NULL;  
@@ -83,28 +70,10 @@ vtkPVData* vtkPVData::New()
 //----------------------------------------------------------------------------
 void vtkPVData::SetApplication(vtkPVApplication *pvApp)
 {
-  this->ActorComposite->CreateParallelTclObjects(pvApp);
-  this->vtkKWWidget::SetApplication(pvApp);
+  this->CreateParallelTclObjects(pvApp);
+  this->vtkPVActorComposite::SetApplication(pvApp);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVData::Select(vtkKWView *v)
-{
-  if (this->ActorComposite)
-    {
-    this->ActorComposite->Select(v);
-    }  
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::Deselect(vtkKWView *v)
-{
-  if (this->ActorComposite)
-    {
-    this->ActorComposite->Deselect(v);
-    }  
-}
 
 //----------------------------------------------------------------------------
 // Tcl does the reference counting, so we are not going to put an 
@@ -136,35 +105,11 @@ void vtkPVData::SetVTKData(vtkDataSet *data, const char *tclName)
     // the data tcl name is set.  These dependancies on the order things are set
     // leads me to think there sould be one initialize method which sets all the variables.
     
-    this->ActorComposite->SetInput(this);
+    this->SetInput(this);
     }
 }
 
 
-
-
-//----------------------------------------------------------------------------
-int vtkPVData::Create(char *args)
-{
-  if (this->Application == NULL)
-    {
-    vtkErrorMacro("Application has not been set yet.");
-    return 0;
-    }
-  
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
-
-  this->ActorCompositeButton->SetParent(this);
-  this->ActorCompositeButton->Create(this->Application, "");
-  this->ActorCompositeButton->SetLabel("Get Actor Composite");
-  this->ActorCompositeButton->SetCommand(this, "ShowActorComposite");
-  this->Script("pack %s", this->ActorCompositeButton->GetWidgetName());
-
-  
-  
-  return 1;
-}
 
 
 //----------------------------------------------------------------------------
@@ -247,31 +192,6 @@ int vtkPVData::GetNumberOfCells()
 }
 
 
-
-//----------------------------------------------------------------------------
-vtkPVActorComposite* vtkPVData::GetActorComposite()
-{
-  return this->ActorComposite;
-}
-
-//----------------------------------------------------------------------------
-vtkPVApplication* vtkPVData::GetPVApplication()
-{
-  if (this->Application == NULL)
-    {
-    return NULL;
-    }
-  
-  if (this->Application->IsA("vtkPVApplication"))
-    {  
-    return (vtkPVApplication*)(this->Application);
-    }
-  else
-    {
-    vtkErrorMacro("Bad typecast");
-    return NULL;
-    } 
-}
 
 //----------------------------------------------------------------------------
 // MAYBE WE SHOULD NOT REFERENCE COUNT HERE BECAUSE NO ONE BUT THE 

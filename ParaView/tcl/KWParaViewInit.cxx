@@ -2,6 +2,9 @@
 int vtkClipPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkClipPlaneNewCommand();
+int vtkCutMaterialCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkCutMaterialNewCommand();
 int vtkCutPlaneCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkCutPlaneNewCommand();
@@ -35,6 +38,9 @@ ClientData vtkPVActorCompositeNewCommand();
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVApplicationNewCommand();
+int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVArrayCalculatorNewCommand();
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVDataNewCommand();
@@ -107,6 +113,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
 {
   vtkTclCreateNew(interp,(char *) "vtkClipPlane", vtkClipPlaneNewCommand,
                   vtkClipPlaneCommand);
+  vtkTclCreateNew(interp,(char *) "vtkCutMaterial", vtkCutMaterialNewCommand,
+                  vtkCutMaterialCommand);
   vtkTclCreateNew(interp,(char *) "vtkCutPlane", vtkCutPlaneNewCommand,
                   vtkCutPlaneCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
@@ -129,6 +137,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVActorCompositeCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVApplication", vtkPVApplicationNewCommand,
                   vtkPVApplicationCommand);
+  vtkTclCreateNew(interp,(char *) "vtkPVArrayCalculator", vtkPVArrayCalculatorNewCommand,
+                  vtkPVArrayCalculatorCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVData", vtkPVDataNewCommand,
                   vtkPVDataCommand);
   vtkTclCreateNew(interp,(char *) "vtkPVDataSetReaderInterface", vtkPVDataSetReaderInterfaceNewCommand,

@@ -29,22 +29,22 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #ifndef __vtkPVData_h
 #define __vtkPVData_h
 
+#include "vtkPVActorComposite.h"
 #include "vtkDataSet.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVSourceCollection.h"
 
-class vtkPVActorComposite;
 class vtkPVSource;
 class vtkKWView;
 class vtkPVApplication;
 class vtkKWMenuButton;
 
 
-class VTK_EXPORT vtkPVData : public vtkKWWidget
+class VTK_EXPORT vtkPVData : public vtkPVActorComposite
 {
 public:
   static vtkPVData* New();
-  vtkTypeMacro(vtkPVData, vtkKWWidget);
+  vtkTypeMacro(vtkPVData, vtkPVActorComposite);
 
   // Description:
   // This also creates the parallel vtk objects for the composite.
@@ -58,29 +58,11 @@ public:
   virtual vtkPVData *MakeObject(){vtkErrorMacro("No MakeObject");return NULL;}
   
   // Description:
-  // Creates common widgets.
-  // Returns 0 if there was an error.
-  virtual int Create(char *args);
-  
-  // Description:
-  // Just packs and unpacks actor composite's properties.
-  void Select(vtkKWView *v);
-  void Deselect(vtkKWView *v);
-  
-  // Description:
-  // This composite actually has an actor that displays the data.
-  vtkPVActorComposite* GetActorComposite();
-  
-  // Description:
   // DO NOT CALL THIS IF YOU ARE NOT A PVSOURCE!
   // The composite sets this so this data widget will know who owns it.
   void SetPVSource(vtkPVSource *source);
   vtkGetObjectMacro(PVSource, vtkPVSource);
   
-  // Description:
-  // Casts to vtkPVApplication.
-  vtkPVApplication *GetPVApplication();
-
   // Description:
   // This is for setting up the links between VTK objects and PV object.
   // This call also sets the input to the mapper.
@@ -124,9 +106,6 @@ protected:
   
   vtkDataSet *VTKData;
   char *VTKDataTclName;
-  
-  vtkPVActorComposite *ActorComposite;
-  vtkKWPushButton *ActorCompositeButton;
   
   // This points to the source widget that owns this data widget.
   vtkPVSource *PVSource;

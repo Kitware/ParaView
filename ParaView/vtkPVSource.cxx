@@ -30,7 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSource.h"
 #include "vtkPVApplication.h"
-#include "vtkPVActorComposite.h"
 #include "vtkKWView.h"
 #include "vtkKWScale.h"
 #include "vtkPVRenderView.h"
@@ -376,7 +375,6 @@ void vtkPVSource::Deselect(vtkKWView *v)
 {
   int idx;
   vtkPVData *data;
-  vtkPVActorComposite *ac;
 
   // invoke super
   this->vtkKWComposite::Deselect(v); 
@@ -430,13 +428,13 @@ void vtkPVSource::SetName (const char* arg)
 void vtkPVSource::SetVisibility(int v)
 {
   int i;
-  vtkPVActorComposite *ac;
+  vtkPVData *ac;
   
   for (i = 0; i < this->NumberOfPVOutputs; ++i)
     {
     if (this->PVOutputs[i])
       {
-      ac = this->PVOutputs[i]->GetActorComposite();
+      ac = this->PVOutputs[i];
       if (ac)
 	{
 	ac->SetVisibility(v);
@@ -478,11 +476,10 @@ void vtkPVSource::AcceptCallback()
   if ( ! this->Initialized)
     { // This is the first 2time, initialize data.    
     vtkPVData *input;
-    vtkPVActorComposite *ac;
+    vtkPVData *ac;
     
-    ac = this->GetPVOutput(0)->GetActorComposite();
+    ac = this->GetPVOutput(0);
     window->GetMainView()->AddComposite(ac);
-    ac->SetApplication(this->Application);
     ac->SetPropertiesParent(window->GetMainView()->GetActorParent());    
     ac->CreateProperties();
     ac->Initialize();
@@ -490,7 +487,7 @@ void vtkPVSource::AcceptCallback()
     input = this->GetNthPVInput(0);
     if (input)
       {
-      input->GetActorComposite()->SetVisibility(0);
+      input->SetVisibility(0);
       }
     window->GetMainView()->ResetCamera();
 
@@ -526,7 +523,7 @@ void vtkPVSource::CancelCallback()
 //---------------------------------------------------------------------------
 void vtkPVSource::DeleteCallback()
 {
-  vtkPVActorComposite *ac;
+  vtkPVData *ac;
   vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
   vtkPVSource *prev;
   int i;
@@ -562,7 +559,7 @@ void vtkPVSource::DeleteCallback()
   this->GetWindow()->SetCurrentPVSource(prev);
   if (prev)
     {
-    prev->GetPVOutput(0)->GetActorComposite()->VisibilityOn();
+    prev->GetPVOutput(0)->VisibilityOn();
     prev->ShowProperties();
     }
   else
@@ -581,7 +578,7 @@ void vtkPVSource::DeleteCallback()
     {
     if (this->PVOutputs[i])
       {
-      ac = this->GetPVOutput(i)->GetActorComposite();
+      ac = this->GetPVOutput(i);
       this->GetWindow()->GetMainView()->RemoveComposite(ac);
       }
     }    
