@@ -77,6 +77,10 @@ public:
   virtual vtkProp *GetProp() {return this->Actor;};
   virtual vtkActor *GetActor() {return this->Actor;};
   
+  // Description:
+  // Get the mapper for the composite
+  vtkGetObjectMacro( Mapper, vtkPolyDataMapper );
+  
 protected:
   vtkKWActorComposite();
   ~vtkKWActorComposite();
