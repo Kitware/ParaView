@@ -24,7 +24,7 @@
 #include <vtkDataSetSubdivisionAlgorithm.h>
 #include <vtkSubdivisionAlgorithm.h>
 
-vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.3");
+vtkCxxRevisionMacro(vtkTempTessellatorFilter, "1.4");
 vtkStandardNewMacro(vtkTempTessellatorFilter);
 
 // ========================================
@@ -375,10 +375,10 @@ double extraLinHexParams[12][3] =
   { 1.0, 0.5, 1.0 },
   { 0.5, 1.0, 1.0 },
   { 0.0, 0.5, 1.0 },
-  { 0.0, 0.5, 0.5 },
-  { 0.5, 0.0, 0.5 },
-  { 1.0, 0.5, 0.5 },
-  { 0.5, 1.0, 0.5 },
+  { 0.0, 0.0, 0.5 },
+  { 1.0, 0.0, 0.5 },
+  { 1.0, 1.0, 0.5 },
+  { 0.0, 1.0, 0.5 },
 };
 
 double extraQuadHexParams[7][3] =
