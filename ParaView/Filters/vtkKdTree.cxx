@@ -45,7 +45,7 @@
 
 #include <algorithm>
 
-vtkCxxRevisionMacro(vtkKdTree, "1.9");
+vtkCxxRevisionMacro(vtkKdTree, "1.10");
 
 // methods for vtkKdNode -------------------------------------------
 
@@ -71,12 +71,6 @@ const char *vtkKdNode::LevelMarker[20]={
 "                  ",
 "                   "
 };
-
-
-static void* vtkIdMemCpy(vtkIdType* dest, vtkIdType* src, size_t n)
-{
-  return memcpy(dest, src, n);
-}
 
 vtkKdNode::vtkKdNode()
 {  
@@ -561,7 +555,7 @@ void vtkKdNode::PrintVerboseNode(int depth)
 
 // Timing data ---------------------------------------------
 
-#include <vtkTimerLog.h>
+#include "vtkTimerLog.h"
 
 #define MSGSIZE 60
 
@@ -892,7 +886,7 @@ void vtkKdTree::GetRegionsAtLevel(int level, vtkKdNode **nodes)
 
   return;
 }
-void vtkKdTree::GetLeafNodeIds(vtkKdNode *node, vtkIdList *ids)
+void vtkKdTree::GetLeafNodeIds(vtkKdNode *node, vtkIntArray *ids)
 {
   if (node->Id < 0)
     {
@@ -901,7 +895,7 @@ void vtkKdTree::GetLeafNodeIds(vtkKdNode *node, vtkIdList *ids)
     }
   else
     {
-    ids->InsertNextId(node->Id);
+    ids->InsertNextValue(node->Id);
     }
   return;
 }
@@ -1879,6 +1873,74 @@ for (ii=0, jj=0; ii<lsize; ii++)    \
 }                                \
 newsize = jj;                     \
 }
+int vtkKdTree::FindInSortedList(int *list, int size, int val)
+{
+  int loc = -1;
+
+  if (size < 8)
+    {
+    for (int i=0; i<size; i++)
+      {
+      if (list[i] == val)
+        { 
+        loc = i;
+        break;
+        }
+      }
+
+      return loc;
+    }
+
+  int L, R, M;
+  L=0;
+  R=size-1;
+
+  while (R > L)  
+    {
+    if (R == L+1)
+      {
+      if (list[R] == val)
+        {
+        loc = R;
+        }
+      else if (list[L] == val)  
+        {
+        loc = L;
+        }
+      break;
+      }
+
+    M = (R + L) / 2;
+
+    if (list[M] > val)  
+      {
+      R = M;
+      continue;
+      }
+    else if (list[M] < val)
+      {
+      L = M;
+      continue;
+      }
+    else
+      {
+      loc = M;
+      break;
+      }
+    }
+  return loc;
+}
+
+int vtkKdTree::FoundId(vtkIntArray *ar, int val)
+{
+  int size = ar->GetNumberOfTuples();
+  int *ptr = ar->GetPointer(0);
+
+  int where = vtkKdTree::FindInSortedList(ptr, size, val);
+
+  return (where > -1);
+}
+
 int vtkKdTree::findRegion(vtkKdNode *node, float x, float y, float z)
 {
   int regionId;
@@ -1903,15 +1965,15 @@ int vtkKdTree::findRegion(vtkKdNode *node, float x, float y, float z)
 }
 void vtkKdTree::CreateCellLists()
 {
-  this->CreateCellLists(this->DataSets[0], (vtkIdType *)NULL, 0);
+  this->CreateCellLists(this->DataSets[0], (int *)NULL, 0);
   return;
 }
-void vtkKdTree::CreateCellLists(vtkIdType *regionList, int listSize)
+void vtkKdTree::CreateCellLists(int *regionList, int listSize)
 {
   this->CreateCellLists(this->DataSets[0], regionList, listSize);
   return;
 }
-void vtkKdTree::CreateCellLists(int dataSet, vtkIdType *regionList, int listSize)
+void vtkKdTree::CreateCellLists(int dataSet, int *regionList, int listSize)
 {
   if ((dataSet < 0) || (dataSet >= NumDataSets))
     {
@@ -1922,7 +1984,7 @@ void vtkKdTree::CreateCellLists(int dataSet, vtkIdType *regionList, int listSize
   this->CreateCellLists(this->DataSets[dataSet], regionList, listSize);
   return;
 }
-void vtkKdTree::CreateCellLists(vtkDataSet *set, vtkIdType *regionList, int listSize)
+void vtkKdTree::CreateCellLists(vtkDataSet *set, int *regionList, int listSize)
 {
   int i, AllRegions;
 
@@ -1945,7 +2007,7 @@ void vtkKdTree::CreateCellLists(vtkDataSet *set, vtkIdType *regionList, int list
     }
   else 
     {
-    list->regionIds = new vtkIdType [listSize];
+    list->regionIds = new int [listSize];
   
     if (!list->regionIds)
       {
@@ -1953,7 +2015,7 @@ void vtkKdTree::CreateCellLists(vtkDataSet *set, vtkIdType *regionList, int list
       return;
       }
 
-    vtkIdMemCpy(list->regionIds, regionList, sizeof(vtkIdType) * listSize);
+    memcpy(list->regionIds, regionList, sizeof(int) * listSize);
     SORTLIST(list->regionIds, listSize);
     REMOVEDUPLICATES(list->regionIds, listSize, list->nRegions);
   
@@ -2244,11 +2306,12 @@ int vtkKdTree::GetRegionContainingPoint(float x, float y, float z)
 {
   return vtkKdTree::findRegion(this->Top, x, y, z);
 }
-int vtkKdTree::MinimalNumberOfConvexSubRegions(vtkIdList *regionIdList,
+int vtkKdTree::MinimalNumberOfConvexSubRegions(vtkIntArray *regionIdList,
                                                float **convexSubRegions)
 {
   int i;
-  int nids = regionIdList->GetNumberOfIds();
+  int nids = regionIdList->GetNumberOfTuples();
+  int *ids = regionIdList->GetPointer(0);
 
   if (nids < 1)
     {
@@ -2257,16 +2320,14 @@ int vtkKdTree::MinimalNumberOfConvexSubRegions(vtkIdList *regionIdList,
 
   if (nids == 1)
     {
-    int id = regionIdList->GetId(0);
-
-    if ( (id < 0) || (id >= this->NumRegions))
+    if ( (ids[0] < 0) || (ids[0] >= this->NumRegions))
       {
       return 0;
       }
 
     float *bounds = new float [6];
 
-    this->RegionList[id]->GetBounds(bounds);
+    this->RegionList[ids[0]]->GetBounds(bounds);
 
     *convexSubRegions = bounds;
 
@@ -2276,10 +2337,11 @@ int vtkKdTree::MinimalNumberOfConvexSubRegions(vtkIdList *regionIdList,
   // create a sorted list of unique region Ids
 
   int *idList = new int [nids];
+  int nUniqueIds;
 
-  memcpy(idList, regionIdList->GetPointer(0), nids * sizeof(vtkIdType));
+  memcpy(idList, ids, nids * sizeof(int));
 
-  vtkstd::sort(idList, idList + nids);
+  SORTLIST(idList, nids);
 
   if ( (idList[0] < 0) || (idList[nids-1] >= this->NumRegions)) 
     {
@@ -2287,23 +2349,12 @@ int vtkKdTree::MinimalNumberOfConvexSubRegions(vtkIdList *regionIdList,
     return 0;
     }
 
-  int nidIndex=0;
+  REMOVEDUPLICATES(idList, nids, nUniqueIds);
 
-  for (i=1; i<nids; i++)
-    {
-    if (idList[i] != idList[nidIndex])
-      {
-
-      nidIndex++;
-
-      if (nidIndex < i) idList[nidIndex] = idList[i];
-      }
-    }
-  nids = nidIndex + 1;
+  vtkKdNode **regions = new vtkKdNode * [nUniqueIds];
   
-  vtkKdNode **regions = new vtkKdNode * [nids];
-  
-  int nregions = vtkKdTree::__ConvexSubRegions(idList, nids, this->Top, regions);
+  int nregions = vtkKdTree::__ConvexSubRegions(idList, nUniqueIds, 
+                                             this->Top, regions);
   
   float *bounds = new float [nregions * 6];
   
@@ -2368,57 +2419,82 @@ int vtkKdTree::__ConvexSubRegions(int *ids, int len, vtkKdNode *tree, vtkKdNode 
     return (numNodesLeft + numNodesRight);
     }
 }
-int vtkKdTree::DepthOrderRegions(vtkIdList *regionIds,
-                       vtkCamera *camera, vtkIdList *orderedList)
+int vtkKdTree::DepthOrderRegions(vtkIntArray *regionIds,
+                       vtkCamera *camera, vtkIntArray *orderedList)
 {
-  int numRegions = this->DepthOrderAllRegions(camera, orderedList);
+  int nRegions = regionIds->GetNumberOfTuples();
+  int nUniqueRegions = 0;
+  int *sorted = NULL;
 
-  if (numRegions == 0)
+  if (nRegions > 0)
     {
-    return 0;
+    int *regionPtr = regionIds->GetPointer(0);
+    sorted = new int [nRegions];
+
+    memcpy(sorted, regionPtr, sizeof(int) * nRegions);
+
+    SORTLIST(sorted, nRegions);
+    REMOVEDUPLICATES(sorted, nRegions, nUniqueRegions);
     }
 
-  if (regionIds == NULL)
+  vtkIntArray *IdsOfInterest = NULL;
+
+  if (sorted)
     {
-    return numRegions;
-    }
+    IdsOfInterest = vtkIntArray::New();
+    IdsOfInterest->SetArray(sorted, nUniqueRegions, 0); 
+    } 
 
-  orderedList->IntersectWith(*regionIds);  // maintains order
+  int size = this->_DepthOrderRegions(IdsOfInterest, camera, orderedList);
 
-  orderedList->Squeeze();
-
-  return orderedList->GetNumberOfIds();
+  IdsOfInterest->Delete();
+ 
+  return size;
 }
-int vtkKdTree::DepthOrderAllRegions(vtkCamera *camera, vtkIdList *orderedList)
+int vtkKdTree::DepthOrderAllRegions(vtkCamera *camera, vtkIntArray *orderedList)
+{
+  return this->_DepthOrderRegions(NULL, camera, orderedList);
+}     
+int vtkKdTree::_DepthOrderRegions(vtkIntArray *IdsOfInterest,
+                                 vtkCamera *camera, vtkIntArray *orderedList)
 {
   int nextId = 0;
 
-  orderedList->Reset();
-  orderedList->SetNumberOfIds(this->NumRegions);
+  int numValues = (IdsOfInterest ? IdsOfInterest->GetNumberOfTuples() :
+                                   this->NumRegions);
+
+  orderedList->Initialize();
+  orderedList->SetNumberOfValues(numValues);
 
   float dir[3];
 
   camera->GetDirectionOfProjection(dir);
 
-  int size = vtkKdTree::__DepthOrderRegions(this->Top, orderedList, dir, nextId);
+  int size = 
+    vtkKdTree::__DepthOrderRegions(this->Top, orderedList, IdsOfInterest, dir, nextId);
 
   if (size < 0)
     {
     vtkErrorMacro(<<"vtkKdTree::DepthOrderRegions k-d tree structure is corrupt");
-    orderedList->Reset();
-    orderedList->SetNumberOfIds(0);
+    orderedList->Initialize();
     return 0;
     }
     
   return size;
 }     
-int vtkKdTree::__DepthOrderRegions(vtkKdNode *node, vtkIdList *list, float *dir,
-                                   int nextId)
+int vtkKdTree::__DepthOrderRegions(vtkKdNode *node, 
+                                   vtkIntArray *list, vtkIntArray *IdsOfInterest,
+                                   float *dir, int nextId)
 {
   if (node->Left == NULL)
     {
-    list->SetId(nextId, node->Id);
-    return nextId+1;
+    if (!IdsOfInterest || vtkKdTree::FoundId(IdsOfInterest, node->Id))
+      {
+      list->SetValue(nextId, node->Id);
+      nextId = nextId+1;
+      }
+
+      return nextId;
     }   
                                
   int cutPlane = node->Dim;
@@ -2433,11 +2509,13 @@ int vtkKdTree::__DepthOrderRegions(vtkKdNode *node, vtkIdList *list, float *dir,
   vtkKdNode *closeNode = (closest < 0) ? node->Left : node->Right;
   vtkKdNode *farNode  = (closest >= 0) ? node->Left: node->Right;
     
-  int nextNextId = __DepthOrderRegions(closeNode, list, dir, nextId);
+  int nextNextId = vtkKdTree::__DepthOrderRegions(closeNode, list, 
+                                         IdsOfInterest, dir, nextId);
 
   if (nextNextId == -1) return -1;
     
-  nextNextId = __DepthOrderRegions(farNode, list, dir, nextNextId);
+  nextNextId = vtkKdTree::__DepthOrderRegions(farNode, list, 
+                                     IdsOfInterest, dir, nextNextId);
 
   return nextNextId;
 }

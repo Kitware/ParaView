@@ -44,10 +44,11 @@
 #ifndef __vtkKdTree_h
 #define __vtkKdTree_h
 
-#include <vtkLocator.h>
+#include "vtkLocator.h"
 
 class vtkTimerLog;
 class vtkIdList;
+class vtkIntArray;
 class vtkPoints;
 class vtkCellArray;
 class vtkRenderer;
@@ -266,11 +267,11 @@ public:
     //   When CreateCellLists is called again, the lists created
     //   on the previous call  are deleted.
     
-    void CreateCellLists(int DataSet, vtkIdType *regionReqList, 
+    void CreateCellLists(int DataSet, int *regionReqList, 
                          int reqListSize);
-    void CreateCellLists(vtkDataSet *set, vtkIdType *regionReqList,
+    void CreateCellLists(vtkDataSet *set, int *regionReqList,
                          int reqListSize);
-    void CreateCellLists(vtkIdType *regionReqList, int listSize);
+    void CreateCellLists(int *regionReqList, int listSize);
     void CreateCellLists(); 
     
     // Description:
@@ -339,7 +340,7 @@ public:
     //    is no region on the list which blocks a region that appears
     //    earlier on the list.)
 
-    int DepthOrderAllRegions(vtkCamera *camera, vtkIdList *orderedList);
+    int DepthOrderAllRegions(vtkCamera *camera, vtkIntArray *orderedList);
     
     // Description:
     //    Given a vtkCamera, and a list of k-d tree region IDs, this
@@ -348,7 +349,8 @@ public:
     //    camera's direction of projection.  The number of regions in
     //    the ordered list is returned.
     
-    int DepthOrderRegions(vtkIdList *regionIds, vtkCamera *camera, vtkIdList *orderedList);
+    int DepthOrderRegions(vtkIntArray *regionIds, vtkCamera *camera, 
+                          vtkIntArray *orderedList);
 
     // Description:
     //    Determine whether a region of the spatial decomposition 
@@ -464,7 +466,7 @@ public:
     //   regionIdList form a box already, a "1" is returned and the
     //   second argument contains the bounds of the box.
     
-    int MinimalNumberOfConvexSubRegions(vtkIdList *regionIdList,
+    int MinimalNumberOfConvexSubRegions(vtkIntArray *regionIdList,
                                         float **convexRegionBounds);
     
     // Description:
@@ -567,10 +569,10 @@ protected:
     void GetRegionsAtLevel(int level, vtkKdNode **nodes);
 
     // Description:
-    //    Adds to the vtkIdList the list of region IDs of all leaf
+    //    Adds to the vtkIntArray the list of region IDs of all leaf
     //    nodes in the given node.
 
-    static void GetLeafNodeIds(vtkKdNode *node, vtkIdList *ids);
+    static void GetLeafNodeIds(vtkKdNode *node, vtkIntArray *ids);
 
     // Description:
     //   Returns the total number of cells in all the data sets
@@ -612,7 +614,7 @@ private:
 
     struct _cellList{
       vtkDataSet *dataSet;        // cell lists for which data set
-      vtkIdType *regionIds;       // NULL if listing all regions
+      int *regionIds;            // NULL if listing all regions
       int nRegions;
       vtkIdList **cells;
       vtkIdList **boundaryCells;
@@ -648,6 +650,10 @@ private:
                                   vtkCell *cell, int cellRegion=-1);
 
     void _printTree(int verbose);
+
+    int _DepthOrderRegions(vtkIntArray *IdsOfInterest,
+                           vtkCamera *camera, vtkIntArray *orderedList);
+
     static void __printTree(vtkKdNode *kd, int depth, int verbose);
 //ETX
     static int MidValue(int dim, float *c1, int nvals, double &coord);
@@ -655,7 +661,13 @@ private:
     static int Select(int dim, float *c1, int nvals, double &coord);
     static float findMaxLeftHalf(int dim, float *c1, int K);
     static void _Select(int dim, float *X, int L, int R, int K);
-    static int __DepthOrderRegions(vtkKdNode *node, vtkIdList *list, float dir[3], int size);
+    static int __DepthOrderRegions(vtkKdNode *node,
+                                   vtkIntArray *list, vtkIntArray *IdsOfInterest,
+                                   float *dir, int nextId);
+    static int FindInSortedList(int *list, int size, int val);
+    static int FoundId(vtkIntArray *ar, int val);
+
+
 
 //BTX
     static int ComputeLevel(vtkKdNode *kd);
