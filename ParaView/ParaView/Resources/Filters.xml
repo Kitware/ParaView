@@ -865,9 +865,9 @@ help="Set the name of the array to hold the results of this computation"/>
                help="Adjusts the parameters of the sphere to cut with."/>
       </Item>
     </SelectWidget>
-    <ContourEntry label="Cut Offset Values" trace_name="Cut Values" 
-                  initial_value="0" 
-                  help="List of current offset values. This can be used to create multiple cut planes/spheres with different centers. Each entry represents a new cut with center shifted by the offset value."/>
+    <CutEntry label="Cut Offset Values" trace_name="Cut Values" 
+              initial_value="0" input_menu="im1"
+              help="List of current offset values. This can be used to create multiple cut planes/spheres with different centers. Each entry represents a new cut with center shifted by the offset value."/>
   </Module>
   <Module name="Clip" root_name="Clip"
           module_type="Filter" button_image="PVClipButton"
@@ -985,7 +985,7 @@ help="Set the name of the array to hold the results of this computation"/>
              help="Choose which scalar array you want to contour."/>
   <ScalarRangeLabel id="srl" trace_name="ScalarRangeLabel" array_menu="am"/>
   <ContourEntry label="Contour Values" trace_name="Contour Values"
-                help="List of current contour values." scalar_range="srl"/>
+                array_menu="am" help="List of current contour values."/>
     <LabeledToggle label="Compute Normals"
                    variable="ComputeNormals" 
                    help="Select whether to compute normals"/>
@@ -996,6 +996,7 @@ help="Set the name of the array to hold the results of this computation"/>
                    variable="ComputeScalars" 
                    help="Select whether to compute scalars"/>
   </Module>
+
   <Module name="Glyph" root_name="Glyph" 
           module_type="Filter" button_image="PVGlyphButton"
           replace_input="0" 
