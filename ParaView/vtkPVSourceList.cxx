@@ -246,13 +246,13 @@ void vtkPVSourceList::ToggleVisibility(int compIdx, int button)
   if (comp)
     {
     // Toggle visibility
-    if (comp->GetVisibility())
+    if (comp->GetPVData()->GetActorComposite()->GetVisibility())
       {
-      comp->VisibilityOff();
+      comp->GetPVData()->GetActorComposite()->VisibilityOff();
       }
     else
       {
-      comp->VisibilityOn();
+      comp->GetPVData()->GetActorComposite()->VisibilityOn();
       }
     comp->GetView()->Render();
     }
@@ -319,20 +319,30 @@ int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in)
 
   // Draw the icon indicating visibility.
   result = NULL;
-  switch (comp->GetVisibility())
+  if (comp->GetPVData() == NULL)
     {
-    case 0:
-      this->Script("%s create image %d %d -image visoffbm",
-                   this->Canvas->GetWidgetName(), x, y);
-      result = this->Application->GetMainInterp()->result;
-      x += 9;
-      break;
-    case 1:
-      this->Script("%s create image %d %d -image visonbm",
-                   this->Canvas->GetWidgetName(), x, y);
-      result = this->Application->GetMainInterp()->result;
-      x += 9;
-      break;
+    this->Script("%s create image %d %d -image visonbm",
+                 this->Canvas->GetWidgetName(), x, y);
+    result = this->Application->GetMainInterp()->result;
+    x += 9;
+    }
+  else
+    {
+    switch (comp->GetPVData()->GetActorComposite()->GetVisibility())
+      {
+      case 0:
+        this->Script("%s create image %d %d -image visoffbm",
+                     this->Canvas->GetWidgetName(), x, y);
+        result = this->Application->GetMainInterp()->result;
+        x += 9;
+        break;
+      case 1:
+        this->Script("%s create image %d %d -image visonbm",
+                     this->Canvas->GetWidgetName(), x, y);
+        result = this->Application->GetMainInterp()->result;
+        x += 9;
+        break;
+      }
     }
   if (result)
     {
