@@ -730,9 +730,10 @@ vtkPVImageSource *vtkPVWindow::CreateFractalVolume()
 
   // Set up the defaults.
   ms = vtkImageMandelbrotSource::SafeDownCast(pvs->GetVTKSource());
-  ms->SetOriginCX(-0.733569, 0.24405, 0.296116, 0.0);
-  ms->SetSampleCX(1.38125e-005, 1.38125e-005, 1.0e-004, 1.0e-004);
-  ms->SetWholeExtent(-50, 50, -50, 50, -50, 50);
+  ms->SetOriginCX(0, 0, 0, 0);
+  ms->SetSampleCX(0.025, 0.025, 0.025, 0.025);
+  ms->SetWholeExtent(-50, 50, -50, 50, 0, 100);
+  ms->SetProjectionAxes(2, 3, 1);
   /* Small values get munged through tcl?
   this->Script("%s SetOriginCX -0.733569 0.24405 0.296116 0.0253163", 
                pvs->GetVTKSourceTclName());

@@ -37,7 +37,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWPushButton.h"
 #include "vtkKWEntry.h"
 #include "vtkPVWindow.h"
-#include "vtkPVAssignment.h"
 
 #include "vtkPVApplication.h"
 #include "vtkKWMenuButton.h"

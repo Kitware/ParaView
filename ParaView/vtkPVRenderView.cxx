@@ -40,15 +40,14 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
-#endif
-
-#ifdef VTK_USE_MESA
+#else
+#if VTK_USE_MESA
 #include "vtkMesaRenderWindow.h"
 #include "vtkMesaRenderer.h"
 #endif
-
 #include "vtkOpenGLRenderWindow.h"
 #include "vtkOpenGLRenderer.h"
+#endif
 
 #include "vtkTimerLog.h"
 

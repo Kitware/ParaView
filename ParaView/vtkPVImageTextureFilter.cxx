@@ -174,6 +174,7 @@ void vtkPVImageTextureFilter::ComputeInputUpdateExtents( vtkDataObject *o)
   
   if (this->Assignment)
     {
+    this->Assignment->SetWholeExtent(this->Extent);
     aExt = this->Assignment->GetExtent();
     
     vtkDebugMacro(<< this->Assignment << " AssignExtent: " << aExt[0] << ", " 

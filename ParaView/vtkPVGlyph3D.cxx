@@ -33,6 +33,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVWindow.h"
 #include "vtkPVActorComposite.h"
 #include "vtkKWView.h"
+#include "vtkPVAssignment.h"
 
 int vtkPVGlyph3DCommand(ClientData cd, Tcl_Interp *interp,
 			int argc, char *argv[]);
@@ -63,12 +64,22 @@ void vtkPVGlyph3D::AcceptCallback()
   
   if (this->vtkPVSource::GetNthPVInput(1) == NULL)
     {
+    vtkPVApplication *pvApp = this->GetPVApplication();
+    vtkPVAssignment *assignment;
     vtkPVPolyDataSource *cone;
     cone = this->GetWindow()->CreateCone();    
     cone->SetName("glyphCone");
     cone->AcceptCallback();
     this->SetSource(cone->GetPVOutput());
     cone->GetPVOutput()->GetActorComposite()->SetVisibility(0);
+    pvApp->BroadcastScript("[%s GetActorComposite] SetVisibility 0", 
+                           cone->GetPVOutput()->GetTclName());
+
+    // The glyph needs the whole source.
+    assignment = cone->GetPVOutput()->GetAssignment();
+    assignment->SetPiece(0, 1);
+    pvApp->BroadcastScript("%s SetPiece 0 1", assignment->GetTclName());
+
     }
 
   this->vtkPVDataSetToPolyDataFilter::AcceptCallback();  

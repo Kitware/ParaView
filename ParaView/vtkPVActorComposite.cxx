@@ -559,7 +559,8 @@ void vtkPVActorComposite::SetMode(int mode)
       outline->Delete();
       return;
       }
-    if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE)
+    // Empty texture segfaults.
+    if (0 && this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_TEXTURE_MODE)
       {
       if (this->TextureFilter)
 	{
@@ -592,5 +593,8 @@ void vtkPVActorComposite::SetMode(int mode)
   geom->SetInput(this->DataSetInput);
   this->vtkKWActorComposite::SetInput(geom->GetOutput());
   geom->Delete();
+
+  // Hack hack hack
+  this->Mapper->SetScalarRange(0, 100);
 }
 

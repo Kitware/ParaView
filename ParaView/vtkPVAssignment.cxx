@@ -81,6 +81,7 @@ void vtkPVAssignment::Clone(vtkPVApplication *pvApp)
 
   this->Translator->SetPiece(0);
   this->Translator->SetNumberOfPieces(num);
+  //this->Translator->SetNumberOfPieces(2);
   
   for (id = 1; id < num; ++id)
     {
