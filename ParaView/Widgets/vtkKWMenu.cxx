@@ -488,6 +488,16 @@ void vtkKWMenu::SetState(const char* item, int state)
   this->SetState(index, state);
 }
 
+void vtkKWMenu::ConfigureItem(int index, const char* conf)
+{
+  ostrstream str;
+  str << this->GetWidgetName() << " entryconfigure "
+      << index << " " << conf << ends;
+  this->Script(str.str());
+  str.rdbuf()->freeze(0);
+}
+
+
 void vtkKWMenu::SetEntryCommand(int index, vtkKWObject* object, 
 			   const char* MethodAndArgString)
 {

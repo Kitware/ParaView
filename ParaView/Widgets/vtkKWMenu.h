@@ -173,6 +173,10 @@ public:
   void SetEntryCommand(int index, vtkKWObject* object, const char* MethodAndArgString);
   void SetEntryCommand(const char* item, vtkKWObject* object, const char* method);
 
+  // Description:
+  // Configure the item at given index.
+  void ConfigureItem(int index, const char*);
+
 //BTX
   enum { Normal = 0, Active, Disabled };
 //ETX
