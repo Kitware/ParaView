@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.9.2.3");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.9.2.4");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -204,10 +204,12 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     this->MinMax[i]->Create(pvApp);
     this->MinMax[i]->SetMinimumLabel(labels[i]);
     this->MinMax[i]->GetMinScale()->SetEndCommand(this, "ModifiedCallback");
+    this->MinMax[i]->GetMinScale()->SetEntryCommand(this, "ModifiedCallback");
     this->MinMax[i]->GetMinScale()->SetDisplayEntryAndLabelOnTop(1);
     this->MinMax[i]->GetMinScale()->DisplayEntry();
     this->MinMax[i]->GetMinScale()->DisplayLabel(" Min:");
     this->MinMax[i]->GetMaxScale()->SetEndCommand(this, "ModifiedCallback");
+    this->MinMax[i]->GetMaxScale()->SetEntryCommand(this, "ModifiedCallback");
     this->MinMax[i]->GetMaxScale()->SetDisplayEntryAndLabelOnTop(1);
     this->MinMax[i]->GetMaxScale()->DisplayEntry();
     this->MinMax[i]->GetMaxScale()->DisplayLabel(" Max:");
