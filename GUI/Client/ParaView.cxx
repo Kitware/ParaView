@@ -153,11 +153,16 @@ int MyMain(int argc, char *argv[])
     vtkKWApplication::SetWidgetVisibility(0);
     }
 
+  int new_argc = 0;
+  char** new_argv = 0;
+  options->GetRemainingArguments(&new_argc, &new_argv);
+
   ostrstream err;
-  interp = vtkPVApplication::InitializeTcl(argc, argv, &err);
+  interp = vtkPVApplication::InitializeTcl(new_argc, new_argv, &err);
   err << ends;
   if (!interp)
     {
+    options->Delete();
 #ifdef _WIN32
     ::MessageBox(0, err.str(), 
                  "ParaView error: InitializeTcl failed", MB_ICONERROR|MB_OK);
@@ -172,26 +177,6 @@ int MyMain(int argc, char *argv[])
     return 1;
     }
   err.rdbuf()->freeze(0);
-
-  // Create the application to parse the command line arguments.
-  app = vtkPVApplication::New();
-  app->SetOptions(options);
-
-  if (myId == 0)
-    {
-    if (app->ParseCommandLineArguments(argc, argv))
-      {
-      retVal = 1;
-      app->SetStartGUI(0);
-      }
-    // Get the application settings from the registery
-    // It has to be called now, after ParseCommandLineArguments, which can 
-    // change the registery level (also, it can not be called in the application
-    // constructor or even the KWApplication constructor since we need the
-    // application name to be set)
-    
-    app->GetApplicationSettingsFromRegistery();
-    }
 
   // Create the process module for initializing the processes.
   // Only the root server processes args.
@@ -248,6 +233,26 @@ int MyMain(int argc, char *argv[])
     }
   
   
+  // Create the application to parse the command line arguments.
+  app = vtkPVApplication::New();
+  app->SetOptions(options);
+
+  if (myId == 0)
+    {
+    if (app->ParseCommandLineArguments(argc, argv))
+      {
+      retVal = 1;
+      app->SetStartGUI(0);
+      }
+    // Get the application settings from the registery
+    // It has to be called now, after ParseCommandLineArguments, which can 
+    // change the registery level (also, it can not be called in the application
+    // constructor or even the KWApplication constructor since we need the
+    // application name to be set)
+    
+    app->GetApplicationSettingsFromRegistery();
+    }
+
   app->SetProcessModule(pm);
   pm->InitializeInterpreter();
   bool needLog = false;
