@@ -97,6 +97,29 @@ public:
   virtual void AddVersion(const char *cname, const char *version);
   void ExtractRevision(ostream& os,const char *revIn);
   int CompareVersions(const char *v1, const char *v2);
+  
+  // This method returns 1 if the trace for this object has been 
+  // initialized. If it has not, it tries to initialize the object
+  // by invoking an event.  If this does not work, it returns 0.
+  virtual int InitializeTrace();
+
+  // Description:
+  // If the a callback initializes the widget, then it can indicate so
+  // by setting this flag.
+  vtkSetMacro(TraceInitialized, int);
+  vtkGetMacro(TraceInitialized, int);
+  vtkBooleanMacro(TraceInitialized, int);
+
+  // Description:
+  // Setting the reference object and its command will allow this
+  // object to be initialized in the trace when necessary.
+  // When command is called on the reference object, it should
+  // return this object. Note:  We do not reference count
+  // the reference object.  It could be done in the future.
+  void SetTraceReferenceObject(vtkKWObject* o) {this->TraceReferenceObject = o;}
+  vtkGetObjectMacro(TraceReferenceObject, vtkKWObject);
+  vtkSetStringMacro(TraceReferenceCommand);
+  vtkGetStringMacro(TraceReferenceCommand);
 
 //BTX
   // Description:
@@ -121,7 +144,23 @@ protected:
   
   // this instance variable holds the command functions for this class.
   int (*CommandFunction)(ClientData, Tcl_Interp *, int, char *[]);
+
+  // Support for tracing activity to a script.
+  // This flag indicates that a variable has been defined in the 
+  // trace file for this widget.
+  int TraceInitialized;
+  // This object can be obtained from the reference object on the script.
+  vtkKWObject *TraceReferenceObject;
+  // This string is the method and args that can be used to get this object
+  // from the reference object.
+  char *TraceReferenceCommand;
+  // Convenience method that initializes and handles formating the trace command.
+  // The formated string should contain a command that looks like:
+  // "$kw(%s) SetValue %d", this->GetTclName(), this->GetValue().  
+  void AddTraceEntry(const char *EventString, ...);
+
 //ETX
+
 };
 
 #endif

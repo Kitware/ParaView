@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdarg.h>
 #include "vtkTclUtil.h"
 #include "vtkKWApplication.h"
+#include "vtkKWEvent.h"
 #include "vtkKWObject.h"
 #include "vtkObjectFactory.h"
 
@@ -63,6 +64,9 @@ vtkKWObject::vtkKWObject()
   this->NumberOfVersions = 0;
   this->Versions = NULL;
   this->VersionsLoaded = 0;
+  this->TraceInitialized = 0;
+  this->TraceReferenceObject = NULL;
+  this->TraceReferenceCommand = NULL;
 }
 
 vtkKWObject::~vtkKWObject()
@@ -82,6 +86,8 @@ vtkKWObject::~vtkKWObject()
     }
   
   this->SetApplication(NULL);
+  this->SetTraceReferenceObject(NULL);
+  this->SetTraceReferenceCommand(NULL);
 }
 
 
@@ -107,7 +113,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.14 $");
+  this->ExtractRevision(os,"$Revision: 1.15 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -328,3 +334,59 @@ const char *vtkKWObject::GetVersion(const char *cname)
     }
   return NULL;
 }
+
+
+//----------------------------------------------------------------------------
+int vtkKWObject::InitializeTrace()
+{
+  // There is no need to do anything if there is no trace file.
+  if(this->Application == NULL || this->Application->GetTraceFile() == NULL)
+    {
+    return 0;
+    }
+
+  if (this->TraceInitialized)
+    {
+    return 1;
+    }
+
+  if (this->TraceReferenceObject && this->TraceReferenceCommand)
+    {
+    if (this->TraceReferenceObject->InitializeTrace())
+      {
+      this->Application->AddTraceEntry("set kw(%s) [$kw(%s) %s]",
+                                       this->GetTclName(), 
+                                       this->TraceReferenceObject->GetTclName(),
+                                       this->TraceReferenceCommand);
+      this->TraceInitialized = 1;
+      }
+    }
+
+  return this->TraceInitialized;
+}  
+
+//----------------------------------------------------------------------------
+void vtkKWObject::AddTraceEntry(const char *format, ...)
+{
+  ostream *os;
+
+  if (this->Application == NULL || this->InitializeTrace() == 0)
+    {
+    return;
+    }
+  os = this->Application->GetTraceFile();
+  if (os == NULL)
+    {
+    return;
+    }
+
+  char event[6000];
+
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(event, format, var_args);
+  va_end(var_args);
+
+  *os << event << endl;
+}
+

@@ -180,23 +180,16 @@ protected:
   int   BalloonHelpInitialized;
   void  SetUpBalloonHelpBindings();
   
-  // Tracing support:
-  // This flag indicates that a variable has been defined in the 
-  // trace file for this widget.
-  int TraceInitialized;
+  // Tracing support specific to widgets.  This method will initialize
+  // a widget useing its parent as reference.  This method returns 1
+  // if the widget was initialized successfully.  This widget needs
+  // a TraceName unique between the children of the parent in order for
+  // this method to work.  The parent also has to be able to be initialized.
+  virtual int InitializeTrace();
   // We need a unique way to get the widget from the parent.  This
   // is unfortunate, but necessary.  With out this name set, the
   // trace cannot be initialized for this widget.
   char *TraceName;
-  // The subclass can use this method to initialize the widget in the trace file.
-  // It returns 1 if successful.
-  virtual int InitializeTrace();
-  // Convenience method that initializes and handles formating the trace command.
-  // The formated string should contain a command that looks like:
-  // "$kw(%s) SetValue %d", this->GetTclName(), this->GetValue().  
-//BTX
-  int AddTraceEntry(const char *EventString, ...);
-//ETX
 };
 
 

@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWApplication.h"
 #include "vtkKWWidget.h"
+#include "vtkKWEvent.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWWindow.h"
 
@@ -65,7 +66,6 @@ vtkKWWidget::vtkKWWidget()
   this->BalloonHelpJustification = 0;
   this->BalloonHelpInitialized   = 0;
 
-  this->TraceInitialized = 0;
   this->TraceName = NULL;
 }
 
@@ -307,7 +307,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.23 $");
+  this->ExtractRevision(os,"$Revision: 1.24 $");
 }
 
 vtkKWWindow* vtkKWWidget::GetWindow()
@@ -351,11 +351,43 @@ vtkKWWidget *vtkKWWidget::GetChildWidget(const char *traceName)
 
 int vtkKWWidget::InitializeTrace()
 {
+  // There is no need to do anything if there is no trace file.
+  if(this->Application == NULL || this->Application->GetTraceFile() == NULL)
+    {
+    return 0;
+    }
+
   if (this->TraceInitialized)
     {
     return 1;
     }
 
+  // Give any callback the oportunity to initialize the event.
+  // I think I will remove this eventually.  Right now, PVSources use
+  // this to initialize the PVWidgets.
+  this->InvokeEvent(vtkKWEvent::InitializeTraceEvent, 0);
+  if (this->TraceInitialized)
+    {
+    return 1;
+    }
+
+  // The new general way to initialize objects (from vtkKWObject).
+  if (this->TraceReferenceObject && this->TraceReferenceCommand)
+    {
+    if (this->TraceReferenceObject->InitializeTrace())
+      {
+      this->Application->AddTraceEntry("set kw(%s) [$kw(%s) %s]",
+                                       this->GetTclName(), 
+                                       this->TraceReferenceObject->GetTclName(),
+                                       this->TraceReferenceCommand);
+      this->TraceInitialized = 1;
+      return 1;
+      }
+    }
+
+  // The only other possibility is to have the parent initialize the childs trace.
+  // This will only work if we have a parent and this child has a trace name.
+  // The name is the way to get the children from the parent.
   if (this->Parent == NULL || this->TraceName == NULL)
     {
     return 0;
@@ -364,38 +396,15 @@ int vtkKWWidget::InitializeTrace()
     {
     return 0;
     }
-    
-  // Set the variable becasue AddTraceEntry also calls InitializeTrace.
+
+  // Default method for initializing varible form parent.
+  // Only works if someone has given this widget a named.
+  // The name must be different than all the parents other children.    
+  this->Application->AddTraceEntry("set $kw(%s) [$kw(%s) GetChildWidget %s]",
+                                  this->GetTclName(), this->Parent->GetTclName(),
+                                  this->TraceName);
   this->TraceInitialized = 1;
-  this->AddTraceEntry("set $kw($s) [$kw(%s) GetChildWidget %s]",
-                      this->GetTclName(), this->Parent->GetTclName(),
-                      this->TraceName);
   return 1;
 }  
 
-int vtkKWWidget::AddTraceEntry(const char *format, ...)
-{
-  ostream *os;
-
-  if (this->Application == NULL || this->InitializeTrace() == 0)
-    {
-    return 0;
-    }
-  os = this->Application->GetTraceFile();
-  if (os == NULL)
-    {
-    return 0;
-    }
-
-  char event[6000];
-
-  va_list var_args;
-  va_start(var_args, format);
-  vsprintf(event, format, var_args);
-  va_end(var_args);
-
-  *os << event << endl;
-
-  return 1;
-}
 
