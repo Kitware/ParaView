@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.4");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.5");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -48,6 +48,11 @@ vtkPVAnimationCueTree::vtkPVAnimationCueTree()
     vtkKWParameterValueFunctionEditor::LineStyleDash);
   this->TimeLine->SetPointStyle(
     vtkKWParameterValueFunctionEditor::PointStyleCursorDown);
+  this->TimeLine->SetFirstPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleCursorRight);
+  this->TimeLine->SetLastPointStyle(
+    vtkKWParameterValueFunctionEditor::PointStyleCursorLeft);
+
   this->TimeLine->DisableAddAndRemoveOn(); //points cannot be added directly.
   this->SetVirtual(1);
 
