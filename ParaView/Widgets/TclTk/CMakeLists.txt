@@ -19,12 +19,20 @@ SET (files
   lib/tk8.4/tkfbox.tcl
 )
 
-IF (CXX_TEST_PATH)
-  FOREACH (file ${files})
-    CONFIGURE_FILE(
-      ${KWWIDGETS_SOURCE_DIR}/TclTk/${file}
-      ${CXX_TEST_PATH}/${CMAKE_CFG_INTDIR}/TclTk/${file}
-      COPYONLY
-    )
-  ENDFOREACH (file ${files})
+IF(CMAKE_CONFIGURATION_TYPES)
+  SET(WIDGETS_CONFIG_TYPES ${CMAKE_CONFIGURATION_TYPES})
+ELSE(CMAKE_CONFIGURATION_TYPES)
+  SET(WIDGETS_CONFIG_TYPES .)
+ENDIF(CMAKE_CONFIGURATION_TYPES)
+  
+IF (CXX_TEST_PATH)  
+  FOREACH(config ${WIDGETS_CONFIG_TYPES})
+    FOREACH (file ${files})
+      CONFIGURE_FILE(
+        ${KWWIDGETS_SOURCE_DIR}/TclTk/${file}
+        ${CXX_TEST_PATH}/${config}/TclTk/${file}
+        COPYONLY
+      )
+    ENDFOREACH (file)
+  ENDFOREACH(config)
 ENDIF (CXX_TEST_PATH)
