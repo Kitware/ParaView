@@ -106,7 +106,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.257");
+vtkCxxRevisionMacro(vtkPVApplication, "1.258");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1993,6 +1993,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Running as a client\n";
     os << indent << "Port: " << this->Port << endl;
+    os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
     os << indent << "Host: " << (this->HostName?this->HostName:"(none)") << endl;
     os << indent << "Render Host: " << (this->RenderServerHostName?this->RenderServerHostName:"(none)") << endl;
     os << indent << "Username: " 
@@ -2004,6 +2005,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "Running as a server\n";
     os << indent << "Port: " << this->Port << endl;
+    os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
     os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
     }
   if (this->RenderServerMode)
@@ -2015,6 +2017,7 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
     else
       {
       os << indent << "Running as a render server\n";
+      os << indent << "RenderServerPort: " << this->RenderServerPort << endl;
       os << indent << "Port: " << this->Port << endl;
       os << indent << "ReverseConnection: " << this->ReverseConnection << endl;
       }
