@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.10.2.2");
+vtkCxxRevisionMacro(vtkPVWriter, "1.10.2.3");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -150,83 +150,90 @@ void vtkPVWriter::Write(const char* fileName, vtkPVSource* pvs,
 int vtkPVWriter::WriteOneFile(const char* fileName, vtkPVSource* pvs,
                               int numProcs, int ghostLevel)
 {
-  return 0;
-#if 0  
   vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  const char* dataTclName = pvs->GetPart()->GetVTKDataTclName();
+  vtkClientServerID dataID = pvs->GetPart()->GetVTKDataID();
   int success = 1;
-  
-  if(!this->Parallel)
-    {
-    // Create the writer and configure it.
-    pm->ServerScript("%s writer", this->WriterClassName);
-    pm->ServerScript("writer SetFileName {%s}", fileName);
-    pm->ServerScript("writer SetInput %s", dataTclName);
-    if (this->DataModeMethod)
-      {
-      pm->ServerScript("writer %s", this->DataModeMethod);
-      }
-    
-    // Write the data.
-    pm->ServerScript("writer Write");
-    pm->ServerScript("writer GetErrorCode");
-    int retVal = vtkKWObject::GetIntegerResult(pvApp);
-    if (retVal == vtkErrorCode::OutOfDiskSpaceError)
-      {
-      vtkKWMessageDialog::PopupMessage(
-        pvApp, pvApp->GetMainWindow(),
-        "Write Error", "There is insufficient disk space to save this data. "
-        "The file(s) already written will be deleted.");
-      success = 0;
-      }
 
-    // Cleanup.
-    pm->ServerScript("writer Delete");
+  // Create the writer and configure it.
+  vtkClientServerID writerID = pm->NewStreamObject(this->WriterClassName);
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << writerID << "SetFileName" << fileName
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << writerID << "SetInput" << dataID
+                  << vtkClientServerStream::End;
+  if (this->DataModeMethod)
+    {
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << writerID << this->DataModeMethod
+                    << vtkClientServerStream::End;
     }
-  else
-    {    
-    // Create the writer and configure it.
-    pm->ServerScript("%s writer", this->WriterClassName);
-    pm->ServerScript("writer SetFileName %s", fileName);
-    pm->ServerScript("writer SetInput %s", dataTclName);
-    if(this->DataModeMethod)
-      {
-      pm->ServerScript("writer %s", this->DataModeMethod);
-      }
-    pm->ServerScript("writer SetNumberOfPieces %d", numProcs);
-    pm->ServerScript("writer SetGhostLevel %d", ghostLevel);    
-    pm->ServerScript(
-      "writer SetStartPiece [[$Application GetProcessModule] GetPartitionId]\n"
-      "writer SetEndPiece [[$Application GetProcessModule] GetPartitionId]");
-    
+
+  if(this->Parallel)
+    {
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << writerID << "SetNumberOfPieces" << numProcs
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << writerID << "SetGhostLevel" << ghostLevel
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << pm->GetProcessModuleID() << "GetPartitionId"
+                    << vtkClientServerStream::End
+                    << vtkClientServerStream::Invoke
+                    << writerID << "SetStartPiece"
+                    << vtkClientServerStream::LastResult
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << pm->GetProcessModuleID() << "GetPartitionId"
+                    << vtkClientServerStream::End
+                    << vtkClientServerStream::Invoke
+                    << writerID << "SetEndPiece"
+                    << vtkClientServerStream::LastResult
+                    << vtkClientServerStream::End;
+
     // Tell each process's writer whether it should write the summary
     // file.  This assumes that the writer is a vtkXMLWriter.  When we
     // add more writers, we will need a separate writer module.
-    pm->ServerScript(
-      "vtkPVSummaryHelper helper\n"
-      "helper SetWriter writer\n"
-      "helper SetController [$Application GetController]\n"
-      "helper SynchronizeSummaryFiles\n"
-      "helper Delete\n"
-      );
-    
-    // Write the data.
-    pm->ServerScript("writer Write");
-    pm->ServerScript("writer GetErrorCode");
-    int retVal = vtkKWObject::GetIntegerResult(pvApp);
-    if (retVal == vtkErrorCode::OutOfDiskSpaceError)
-      {
-      vtkKWMessageDialog::PopupMessage(
-        pvApp, pvApp->GetMainWindow(),
-        "Write Error", "There is insufficient disk space to save this data. "
-        "The file(s) already written will be deleted.");
-      success = 0;
-      }
-    
-    // Cleanup.
-    pm->ServerScript("writer Delete");
+    vtkClientServerID helperID = pm->NewStreamObject("vtkPVSummaryHelper");
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << helperID << "SetWriter" << writerID
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << pm->GetApplicationID() << "GetController"
+                    << vtkClientServerStream::End
+                    << vtkClientServerStream::Invoke
+                    << helperID << "SetController"
+                    << vtkClientServerStream::LastResult
+                    << vtkClientServerStream::End;
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << helperID << "SynchronizeSummaryFiles"
+                    << vtkClientServerStream::End;
+    pm->DeleteStreamObject(helperID);
     }
+
+  // Write the data.
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << writerID << "Write"
+                  << vtkClientServerStream::End;
+  pm->GetStream() << vtkClientServerStream::Invoke
+                  << writerID << "GetErrorCode"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
+  int retVal;
+  if(pm->GetLastServerResult().GetArgument(0, 0, &retVal) &&
+     retVal == vtkErrorCode::OutOfDiskSpaceError)
+    {
+    vtkKWMessageDialog::PopupMessage(
+      pvApp, pvApp->GetMainWindow(),
+      "Write Error", "There is insufficient disk space to save this data. "
+      "The file(s) already written will be deleted.");
+    success = 0;
+    }
+
+  // Cleanup.
+  pm->DeleteStreamObject(writerID);
+  pm->SendStreamToServer();
   return success;
-#endif
 }
