@@ -6,11 +6,18 @@
         command="SetGlyphType" 
         number_of_elements="1"
         default_values="9" >
-       <EnumarationDomain 
-          values="Vertex:1 Dash:2 Cross:3 
-                  ThickCross:4 Triangle:5 Square:6
-                  Circle:7 Diamond:8 Arrow:9
-                  ThickArrow:10" />
+       <EnumerationDomain name="enum">
+         <Entry value="1" text="Vertex"/>
+         <Entry value="2" text="Dash"/>
+         <Entry value="3" text="Cross"/>
+         <Entry value="4" text="ThickCross"/>
+         <Entry value="5" text="Triangle"/>
+         <Entry value="6" text="Square"/>
+         <Entry value="7" text="Circle"/>
+         <Entry value="8" text="Diamond"/>
+         <Entry value="9" text="Arrow"/>
+         <Entry value="10" text="ThickArrow"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -18,7 +25,7 @@
         command="SetFilled" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End 2DGlyph -->
    </SourceProxy>
@@ -29,7 +36,8 @@
         name="Text"
         command="SetText"
         number_of_elements="1"
-        default_values="{3D Text}" />
+        default_values="{3D Text}">
+     </StringVectorProperty>
    <!-- End 3DText -->
    </SourceProxy>
 
@@ -39,7 +47,7 @@
          command="SetTipResolution"
          number_of_elements="1"
          default_values="6" >
-        <IntRangeDomain min="1" max="128" />
+        <IntRangeDomain name="range" min="1" max="128" />
       </IntVectorProperty>
 
 <!-- TODO Why the arbitrary ranges? Check the arrow sources-->
@@ -48,7 +56,7 @@
          command="SetTipRadius"
          number_of_elements="1"
          default_values="0.1" >
-        <DoubleRangeDomain min="0" max="10" />
+        <DoubleRangeDomain name="range" min="0" max="10" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -56,7 +64,7 @@
          command="SetTipLength"
          number_of_elements="1"
          default_values="0.35" >
-        <DoubleRangeDomain min="0" max="1" />
+        <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -64,7 +72,7 @@
          command="SetShaftResolution"
          number_of_elements="1"
          default_values="6" >
-        <IntRangeDomain min="0" max="128" />
+        <IntRangeDomain name="range" min="0" max="128" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -72,7 +80,7 @@
          command="SetShaftRadius"
          number_of_elements="1"
          default_values="0.03" >
-        <DoubleRangeDomain min="0" max="5" />
+        <DoubleRangeDomain name="range" min="0" max="5" />
       </DoubleVectorProperty>
    <!-- End Arrow -->
    </SourceProxy>
@@ -84,7 +92,7 @@
          number_of_elements="1"
          default_values="1.0" >
 <!-- TODO Is Inf the best way? -->
-        <DoubleRangeDomain min="0" />
+        <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -99,7 +107,7 @@
         command="SetSymmetric" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Axes -->
    </SourceProxy>
@@ -110,7 +118,7 @@
          command="SetXLength"
          number_of_elements="1"
          default_values="1.0" >
-        <DoubleRangeDomain min="0" />
+        <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -118,7 +126,7 @@
          command="SetYLength"
          number_of_elements="1"
          default_values="1.0" >
-        <DoubleRangeDomain min="0" />
+        <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -126,7 +134,7 @@
          command="SetZLength"
          number_of_elements="1"
          default_values="1.0" >
-        <DoubleRangeDomain min="0" />
+        <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -144,7 +152,7 @@
          command="SetResolution"
          number_of_elements="1"
          default_values="6" >
-        <IntRangeDomain min="0" max="512" />
+        <IntRangeDomain name="range" min="0" max="512" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -159,7 +167,7 @@
          command="SetHeight"
          number_of_elements="1"
          default_values="1.0" >
-        <DoubleRangeDomain min="0" />
+        <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -174,7 +182,7 @@
         command="SetCapping" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Cone -->
    </SourceProxy>
@@ -185,7 +193,7 @@
          command="SetResolution"
          number_of_elements="1"
          default_values="6" >
-        <IntRangeDomain min="2" max="512" />
+        <IntRangeDomain name="range" min="2" max="512" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -193,7 +201,7 @@
          command="SetHeight"
          number_of_elements="1"
          default_values="1.0" >
-        <DoubleRangeDomain min="0" />
+        <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -201,7 +209,7 @@
          command="SetRadius"
          number_of_elements="1"
          default_values="0.5" >
-        <DoubleRangeDomain min="0" />
+        <DoubleRangeDomain name="range" min="0" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -216,7 +224,7 @@
         command="SetCapping" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Cylinder -->
    </SourceProxy>
@@ -241,7 +249,7 @@
          command="SetResolution"
          number_of_elements="1"
          default_values="6" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
    <!-- End Line -->
    </SourceProxy>
@@ -280,7 +288,7 @@
          command="SetMaximumNumberOfIterations"
          number_of_elements="1"
          default_values="100" >
-        <IntRangeDomain min="1" max="5000" />
+        <IntRangeDomain name="range" min="1" max="5000" />
       </IntVectorProperty>
    <!-- End Mandelbrot -->
    </SourceProxy>
@@ -291,7 +299,7 @@
          command="SetXSize"
          number_of_elements="1"
          default_values="20" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -299,7 +307,7 @@
          command="SetYSize"
          number_of_elements="1"
          default_values="20" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -307,7 +315,7 @@
          command="SetRunFactor"
          number_of_elements="1"
          default_values="20" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -315,7 +323,7 @@
          command="SetMagnetFactor"
          number_of_elements="1"
          default_values="4" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -323,7 +331,7 @@
          command="SetRandomSeed"
          number_of_elements="1"
          default_values="111" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
      <IntVectorProperty 
@@ -331,7 +339,7 @@
         command="SetShowSolution" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Maze -->
    </SourceProxy>
@@ -363,7 +371,7 @@
          command="SetXResolution"
          number_of_elements="1"
          default_values="1" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -371,7 +379,7 @@
          command="SetYResolution"
          number_of_elements="1"
          default_values="1" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
    <!-- End Plane -->
    </SourceProxy>
@@ -420,7 +428,7 @@
          command="SetThetaResolution"
          number_of_elements="1"
          default_values="8" >
-        <IntRangeDomain min="3" max="1024" />
+        <IntRangeDomain name="range" min="3" max="1024" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -428,7 +436,7 @@
          command="SetStartTheta"
          number_of_elements="1"
          default_values="0" >
-        <DoubleRangeDomain min="0" max="360" />
+        <DoubleRangeDomain name="range" min="0" max="360" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -436,7 +444,7 @@
          command="SetEndTheta"
          number_of_elements="1"
          default_values="0" >
-        <DoubleRangeDomain min="0" max="360" />
+        <DoubleRangeDomain name="range" min="0" max="360" />
       </DoubleVectorProperty>
 
       <IntVectorProperty
@@ -444,7 +452,7 @@
          command="SetPhiResolution"
          number_of_elements="1"
          default_values="8" >
-        <IntRangeDomain min="3" max="1024" />
+        <IntRangeDomain name="range" min="3" max="1024" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -452,7 +460,7 @@
          command="SetStartPhi"
          number_of_elements="1"
          default_values="0" >
-        <DoubleRangeDomain min="0" max="360" />
+        <DoubleRangeDomain name="range" min="0" max="360" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -460,7 +468,7 @@
          command="SetEndPhi"
          number_of_elements="1"
          default_values="0" >
-        <DoubleRangeDomain min="0" max="360" />
+        <DoubleRangeDomain name="range" min="0" max="360" />
       </DoubleVectorProperty>
    <!-- End Sphere -->
    </SourceProxy>
@@ -485,7 +493,7 @@
          command="SetThetaResolution"
          number_of_elements="1"
          default_values="16" >
-        <IntRangeDomain min="8" max="1024" />
+        <IntRangeDomain name="range" min="8" max="1024" />
       </IntVectorProperty>
 
       <IntVectorProperty
@@ -493,7 +501,7 @@
          command="SetPhiResolution"
          number_of_elements="1"
          default_values="16" >
-        <IntRangeDomain min="4" max="1024" />
+        <IntRangeDomain name="range" min="4" max="1024" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -501,7 +509,7 @@
          command="SetThickness"
          number_of_elements="1"
          default_values="0.3333" >
-        <DoubleRangeDomain min="0.0001" max="1" />
+        <DoubleRangeDomain name="range" min="0.0001" max="1" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -509,7 +517,7 @@
          command="SetThetaRoundness"
          number_of_elements="1"
          default_values="1" >
-        <DoubleRangeDomain min="0" max="1" />
+        <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -517,7 +525,7 @@
          command="SetPhiRoundness"
          number_of_elements="1"
          default_values="1" >
-        <DoubleRangeDomain min="0" max="1" />
+        <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -532,7 +540,7 @@
         command="SetToroidal" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End SuperQuadric -->
    </SourceProxy>

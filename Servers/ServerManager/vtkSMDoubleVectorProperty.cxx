@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleVectorProperty);
-vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.10");
+vtkCxxRevisionMacro(vtkSMDoubleVectorProperty, "1.11");
 
 struct vtkSMDoubleVectorPropertyInternals
 {
@@ -282,6 +282,7 @@ void vtkSMDoubleVectorProperty::SaveState(
           << i << "\" " << "value=\"" << this->GetElement(i) << "\"/>"
           << endl;
     }
+  this->Superclass::SaveState(name, file, indent);
   *file << indent << "</Property>" << endl;
 }
 

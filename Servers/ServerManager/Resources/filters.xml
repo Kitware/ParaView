@@ -7,7 +7,7 @@
          command="AddInput"
          clean_command="RemoveAllInputs"
          multiple_input="1">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -22,7 +22,7 @@
          command="AddInput"
          clean_command="RemoveAllInputs"
          multiple_input="1">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -36,7 +36,7 @@
          command="AddInput"
          clean_command="RemoveAllInputs"
          multiple_input="1">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -48,7 +48,7 @@
       <InputProperty
          name="Input"
          command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -58,7 +58,7 @@
         command="SetVertexCells" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End CellCenters -->
    </SourceProxy>
@@ -67,7 +67,7 @@
       <InputProperty
          name="Input"
          command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -77,7 +77,7 @@
         command="SetPassCellData" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End CellDataToPointData -->
    </SourceProxy>
@@ -86,7 +86,7 @@
       <InputProperty
          name="Input"
          command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -96,7 +96,7 @@
         command="SetPieceInvariant" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -104,7 +104,7 @@
         command="SetTolerance"
         number_of_elements="1"
         default_values="0.0" >
-       <DoubleRangeDomain min="0" max="1" />
+       <DoubleRangeDomain name="range" min="0" max="1" />
      </DoubleVectorProperty>
 
       <DoubleVectorProperty
@@ -119,7 +119,7 @@
         command="SetToleranceIsAbsolute" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -127,7 +127,7 @@
         command="SetConvertLinesToPoints" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -135,7 +135,7 @@
         command="SetConvertPolysToLines" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -143,7 +143,7 @@
         command="SetConvertStripsToPolys" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -151,7 +151,7 @@
         command="SetPointMerging" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End CleanPolyData -->
    </SourceProxy>
@@ -160,7 +160,7 @@
       <InputProperty
          name="Input"
          command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -172,7 +172,7 @@
       <InputProperty
          name="Input"
          command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -184,7 +184,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -201,7 +201,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -211,7 +211,7 @@
         command="SetInvertMeanCurvature" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -219,8 +219,10 @@
         command="SetCurvatureType" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="Gaussian:0 Mean:1" />
+       <EnumerationDomain>
+         <Entry value="0" text="Gaussian"/>
+         <Entry value="1" text="Mean"/>
+       </EnumerationDomain>
      </IntVectorProperty>
    <!-- End Curvatures -->
    </SourceProxy>
@@ -229,7 +231,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -240,7 +242,7 @@
          command="SetTargetReduction"
          number_of_elements="1"
          default_values="0.9" >
-        <DoubleRangeDomain min="0" max="1" />
+        <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -248,7 +250,7 @@
         command="SetPreserveTopology" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -256,7 +258,7 @@
         command="SetFeatureAngle"
         number_of_elements="1"
         default_values="15.0" >
-       <DoubleRangeDomain min="0" max="180" />
+       <DoubleRangeDomain name="range" min="0" max="180" />
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -264,7 +266,7 @@
         command="SetBoundaryVertexDeletion" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End DecimatePro -->
    </SourceProxy>
@@ -273,7 +275,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -284,8 +286,11 @@
         command="SetBoundaryMode" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="{Assign cells uniquely}:0 {Duplicate cells}:1 {Divide cells}:2" />
+       <EnumerationDomain>
+         <Entry value="0" text="Assign cells uniquely"/>
+         <Entry value="1" text="Duplicate cells"/>
+         <Entry value="2" text="Divide cells"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <StringVectorProperty 
@@ -298,7 +303,7 @@
         command="SetUseMinimalMemory" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End D3 -->
    </SourceProxy>
@@ -307,7 +312,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -340,14 +345,14 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
       </InputProperty>
 
      <ProxyProperty name="ClipPlane" command="SetClipPlane">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
      </ProxyProperty>
@@ -365,7 +370,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -379,7 +384,7 @@
         command="AddInput"
         clean_command="RemoveAllInputs"
         multiple_input="1">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -398,7 +403,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -410,7 +415,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -448,8 +453,11 @@
         command="SetAttributeMode" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="default:0 point_data:1 cell_data:2" />
+       <EnumerationDomain>
+         <Entry value="0" text="default"/>
+         <Entry value="1" text="point_data"/>
+         <Entry value="2" text="cell_data"/>
+       </EnumerationDomain>
      </IntVectorProperty>
    <!-- End Calculator -->
    </SourceProxy>
@@ -458,7 +466,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -469,7 +477,7 @@
         command="SetBoundaryEdges" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -477,7 +485,7 @@
         command="SetFeatureEdges" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -485,7 +493,7 @@
         command="SetNonManifoldEdges" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -493,7 +501,7 @@
         command="SetManifoldEdges" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -501,7 +509,7 @@
         command="SetColoring" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -509,7 +517,7 @@
         command="SetFeatureAngle"
         number_of_elements="1"
         default_values="30.0" >
-       <DoubleRangeDomain min="0" max="180" />
+       <DoubleRangeDomain name="range" min="0" max="180" />
      </DoubleVectorProperty>
    <!-- End FeatureEdges -->
    </SourceProxy>
@@ -518,7 +526,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -533,8 +541,10 @@
         command="SetDimensionality" 
         number_of_elements="1"
         default_values="3" >
-       <EnumarationDomain 
-          values="Two:2 Three:3" />
+       <EnumerationDomain>
+         <Entry value="2" text="Two"/>
+         <Entry value="3" text="Three"/>
+       </EnumerationDomain>
      </IntVectorProperty>
    <!-- End Gradient -->
    </SourceProxy>
@@ -543,7 +553,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -558,8 +568,10 @@
         command="SetDimensionality" 
         number_of_elements="1"
         default_values="3" >
-       <EnumarationDomain 
-          values="Two:2 Three:3" />
+       <EnumerationDomain>
+         <Entry value="2" text="Two"/>
+         <Entry value="3" text="Three"/>
+       </EnumerationDomain>
      </IntVectorProperty>
    <!-- End Gradient -->
    </SourceProxy>
@@ -570,7 +582,7 @@
         command="AddInput"
         clean_command="RemoveAllInputs"
         multiple_input="1">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -582,7 +594,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -607,7 +619,7 @@
         command="SetCapping" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -615,7 +627,7 @@
         command="SetPieceInvariant" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End LinearExtrusionFilter -->
    </SourceProxy>
@@ -624,7 +636,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -635,7 +647,7 @@
         command="SetNumberOfSubdivisions" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End LoopSubdivisionFilter -->
    </SourceProxy>
@@ -644,7 +656,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -655,7 +667,7 @@
         command="SetOnRatio" 
         number_of_elements="1"
         default_values="2" > 
-       <IntRangeDomain min="1"/>
+       <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -663,7 +675,7 @@
         command="SetMaximumNumberOfPoints" 
         number_of_elements="1"
         default_values="5000" > 
-       <IntRangeDomain min="0"/>
+       <IntRangeDomain name="range" min="0"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -671,7 +683,7 @@
         command="SetOffset" 
         number_of_elements="1"
         default_values="0" > 
-       <IntRangeDomain min="0"/>
+       <IntRangeDomain name="range" min="0"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -679,7 +691,7 @@
         command="SetRandomMode" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -687,7 +699,7 @@
         command="SetGenerateVertices" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End MaskPoints -->
    </SourceProxy>
@@ -696,7 +708,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -720,7 +732,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -731,7 +743,7 @@
         command="SetFeatureAngle" 
         number_of_elements="1"
         default_values="30" > 
-       <DoubleRangeDomain min="0" max="180"/>
+       <DoubleRangeDomain name="range" min="0" max="180"/>
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -739,7 +751,7 @@
         command="SetSplitting" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -747,7 +759,7 @@
         command="SetConsistency" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -755,7 +767,7 @@
         command="SetFlipNormals" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -763,7 +775,7 @@
         command="SetNonManifoldTraversal" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -771,7 +783,7 @@
         command="SetComputeCellNormals" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -779,7 +791,7 @@
         command="SetPieceInvariant" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End  PolyDataNormals -->
    </SourceProxy>
@@ -788,7 +800,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -800,7 +812,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -811,7 +823,7 @@
         command="SetCornerFactor"
         number_of_elements="1"
         default_values="0.2" >
-       <DoubleRangeDomain min="0.001" max="0.5" />
+       <DoubleRangeDomain name="range" min="0.001" max="0.5" />
      </DoubleVectorProperty>
    <!-- End  OutlineCornerFilter -->
    </SourceProxy>
@@ -822,7 +834,7 @@
         command="AddInput"
         clean_command="RemoveAllInputs"
         multiple_input="1">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -834,7 +846,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -845,7 +857,7 @@
         command="SetRandomMode" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End PieceScalars -->
    </SourceProxy>
@@ -854,7 +866,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -865,7 +877,7 @@
         command="SetPassPointData" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End CellDataToPointData -->
    </SourceProxy>
@@ -874,7 +886,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -891,7 +903,7 @@
         command="SetUseInputPoints" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -899,7 +911,7 @@
         command="SetUseFeatureEdges" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -907,7 +919,7 @@
         command="SetUseFeaturePoints" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -915,7 +927,7 @@
         command="SetCopyCellData" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End QuadricClustering -->
    </SourceProxy>
@@ -924,7 +936,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -935,7 +947,7 @@
         command="SetMinimumSpeed" 
         number_of_elements="1"
         default_values="0" > 
-       <DoubleRangeDomain min="0" />
+       <DoubleRangeDomain name="range" min="0" />
      </DoubleVectorProperty>
 
      <DoubleVectorProperty 
@@ -943,7 +955,7 @@
         command="SetMaximumSpeed" 
         number_of_elements="1"
         default_values="0" > 
-       <DoubleRangeDomain min="0" />
+       <DoubleRangeDomain name="range" min="0" />
      </DoubleVectorProperty>
    <!-- End BrownianPoints -->
    </SourceProxy>
@@ -952,7 +964,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -963,8 +975,17 @@
         command="SetPlane" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="{X Min}:0 {Y Min}:1 {Z Max}:2 {X Max}:3 {Y Max}:4 {Z Max}:5 X:6 Y:7 Z:8" />
+       <EnumerationDomain>
+         <Entry value="0" text="X Min"/>
+         <Entry value="1" text="Y Min"/>
+         <Entry value="2" text="Z Min"/>
+         <Entry value="3" text="X Max"/>
+         <Entry value="4" text="Y Max"/>
+         <Entry value="5" text="Z Max"/>
+         <Entry value="6" text="X"/>
+         <Entry value="7" text="Y"/>
+         <Entry value="8" text="Z"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -980,7 +1001,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1008,7 +1029,7 @@
         command="SetAngle"
         number_of_elements="1"
         default_values="1" >
-       <DoubleRangeDomain min="0" max="360" />
+       <DoubleRangeDomain name="range" min="0" max="360" />
      </DoubleVectorProperty>
 
      <IntVectorProperty 
@@ -1016,7 +1037,7 @@
         command="SetUseDefaultNormal" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1031,7 +1052,7 @@
         command="SetVaryWidth" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End RibbonFilter -->
    </SourceProxy>
@@ -1041,7 +1062,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1052,7 +1073,7 @@
         command="SetResolution" 
         number_of_elements="1"
         default_values="12" > 
-       <IntRangeDomain min="1"/>
+       <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1060,7 +1081,7 @@
         command="SetCapping" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1090,7 +1111,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1101,7 +1122,7 @@
          command="SetShrinkFactor"
          number_of_elements="1"
          default_values="0.5" >
-        <DoubleRangeDomain min="0" max="1" />
+        <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
    <!-- End ShrinkFilter -->
    </SourceProxy>
@@ -1110,7 +1131,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1121,7 +1142,7 @@
         command="SetNumberOfIterations" 
         number_of_elements="1"
         default_values="20" > 
-       <IntRangeDomain min="0"/>
+       <IntRangeDomain name="range" min="0"/>
      </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -1129,7 +1150,7 @@
          command="SetConvergence"
          number_of_elements="1"
          default_values="0.0" >
-        <DoubleRangeDomain min="0" max="1" />
+        <DoubleRangeDomain name="range" min="0" max="1" />
       </DoubleVectorProperty>
    <!-- End SmoothPolyDataFilter -->
    </SourceProxy>
@@ -1138,7 +1159,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1149,7 +1170,7 @@
         command="SetMaximumLength" 
         number_of_elements="1"
         default_values="1000" > 
-       <IntRangeDomain min="4" max="100000"/>
+       <IntRangeDomain name="range" min="4" max="100000"/>
      </IntVectorProperty>
    <!-- End Stripper -->
    </SourceProxy>
@@ -1158,7 +1179,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1169,7 +1190,7 @@
         command="SetNumberOfSubdivisions" 
         number_of_elements="1"
         default_values="1" > 
-       <IntRangeDomain min="1" max="4"/>
+       <IntRangeDomain name="range" min="1" max="4"/>
      </IntVectorProperty>
    <!-- End Subdivide -->
    </SourceProxy>
@@ -1178,7 +1199,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1190,14 +1211,14 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
       </InputProperty>
 
      <ProxyProperty name="Transform" command="SetTransform">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
               <Group name="transforms"/>
            </ProxyGroupDomain>
      </ProxyProperty>
@@ -1208,7 +1229,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1220,7 +1241,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1231,7 +1252,7 @@
         command="SetNumberOfSides" 
         number_of_elements="1"
         default_values="6" > 
-       <IntRangeDomain min="3"/>
+       <IntRangeDomain name="range" min="3"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1239,7 +1260,7 @@
         command="SetCapping" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -1254,8 +1275,11 @@
         command="SetVaryRadius" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="Off:0 {By Scalar}:1 {By Vector}:2" />
+       <EnumerationDomain>
+         <Entry value="0" text="Off"/>
+         <Entry value="1" text="By Scalar"/>
+         <Entry value="2" text="By Vector"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -1271,7 +1295,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1301,7 +1325,7 @@
         command="SetUseNormal" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1309,7 +1333,7 @@
         command="SetXYPlane" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End WarpScalar -->
    </SourceProxy>
@@ -1318,7 +1342,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1343,14 +1367,14 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
       </InputProperty>
 
      <ProxyProperty name="CutFunction" command="SetCutFunction">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
               <Group name="implicit_functions"/>
            </ProxyGroupDomain>
      </ProxyProperty>
@@ -1371,14 +1395,14 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
       </InputProperty>
 
      <ProxyProperty name="ClipFunction" command="SetClipFunction">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
                <Group name="implicit_functions"/>
            </ProxyGroupDomain>
      </ProxyProperty>
@@ -1388,7 +1412,7 @@
         command="SetInsideOut" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <StringVectorProperty 
@@ -1409,7 +1433,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1424,8 +1448,10 @@
         name="AttributeMode" 
         command="SetAttributeMode"
         number_of_elements="1">
-       <EnumarationDomain 
-          values="point_data:1 cell_data:2" />
+       <EnumerationDomain>
+         <Entry value="1" text="point_data"/>
+         <Entry value="2" text="cell_data"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <DoubleVectorProperty 
@@ -1438,7 +1464,7 @@
         command="SetAllScalars" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Threshold -->
    </SourceProxy>
@@ -1447,7 +1473,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1473,7 +1499,7 @@
         command="SetComputeNormals" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1481,7 +1507,7 @@
         command="SetComputeGradients" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1489,7 +1515,7 @@
         command="SetComputeScalars" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Contour -->
    </SourceProxy>
@@ -1499,7 +1525,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1508,7 +1534,7 @@
      <InputProperty
         name="Source"
         command="SetSource">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="glyph_sources"/>
            </ProxyGroupDomain>
       </InputProperty>
@@ -1528,7 +1554,7 @@
         command="SetOrient" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1536,8 +1562,12 @@
         command="SetScaleMode" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="scalar:0 vector:1 vector_components:2 off:3" />
+       <EnumerationDomain>
+         <Entry value="0" text="scalar"/>
+         <Entry value="1" text="vector"/>
+         <Entry value="2" text="vector_components"/>
+         <Entry value="3" text="off"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1559,7 +1589,7 @@
         command="SetUseMaskPoints" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1567,7 +1597,7 @@
         command="SetRandomMode" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End Glyph -->
    </SourceProxy>
@@ -1576,7 +1606,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="glyph_sources"/>
            </ProxyGroupDomain>
       </InputProperty>
@@ -1606,7 +1636,7 @@
         command="SetIncludeBoundary" 
         number_of_elements="1"
         default_values="0" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End ExtractGrid -->
    </SourceProxy>
@@ -1615,7 +1645,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="glyph_sources"/>
            </ProxyGroupDomain>
       </InputProperty>
@@ -1623,7 +1653,7 @@
      <InputProperty
         name="Source"
         command="SetSource">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="probe_sources"/>
            </ProxyGroupDomain>
       </InputProperty>
@@ -1636,7 +1666,7 @@
         command="AddInput"
         clean_command="RemoveAllInputs"
         multiple_input="1">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="glyph_sources"/>
            </ProxyGroupDomain>
       </InputProperty>
@@ -1651,8 +1681,10 @@
         command="SetMaximumPropagationUnit" 
         number_of_elements="1"
         default_values="1" >
-       <EnumarationDomain 
-          values="Time:0 Length:1" />
+       <EnumerationDomain>
+         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1667,8 +1699,11 @@
         command="SetInitialIntegrationStepUnit" 
         number_of_elements="1"
         default_values="2" >
-       <EnumarationDomain 
-          values="Time:0 Length:1 {Cell Length}:2" />
+       <EnumerationDomain>
+         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
+         <Entry value="2" text="Cell Length"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1683,8 +1718,11 @@
         command="SetIntegrationDirection" 
         number_of_elements="1"
         default_values="2" >
-       <EnumarationDomain 
-          values="{FORWARD}:0 {BACKWARD}:1 {BOTH}:2" />
+       <EnumerationDomain>
+         <Entry value="0" text="FORWARD"/>
+         <Entry value="1" text="BACKWARD"/>
+         <Entry value="2" text="BOTH"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -1692,8 +1730,11 @@
         command="SetIntegratorType" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="{Runge-Kutta 2}:0 {Runge-Kutta 4}:1 {Runge-Kutta 4-5}:2" />
+       <EnumerationDomain>
+         <Entry value="0" text="Runge-Kutta 2"/>
+         <Entry value="1" text="Runge-Kutta 4"/>
+         <Entry value="2" text="Runge-Kutta 4-5"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1708,8 +1749,11 @@
         command="SetMinimumIntegrationStepUnit" 
         number_of_elements="1"
         default_values="2" >
-       <EnumarationDomain 
-          values="Time:0 Length:1 {Cell Length}:2" />
+       <EnumerationDomain>
+         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
+         <Entry value="2" text="Cell Length"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1724,8 +1768,11 @@
         command="SetMaximumIntegrationStepUnit" 
         number_of_elements="1"
         default_values="2" >
-       <EnumarationDomain 
-          values="Time:0 Length:1 {Cell Length}:2" />
+       <EnumerationDomain>
+         <Entry value="0" text="Time"/>
+         <Entry value="1" text="Length"/>
+         <Entry value="2" text="Cell Length"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <DoubleVectorProperty
@@ -1755,7 +1802,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -1773,8 +1820,10 @@
         command="SetPickCell" 
         number_of_elements="1"
         default_values="1" >
-       <EnumarationDomain 
-          values="Point:0 Cell:1" />
+       <EnumerationDomain>
+         <Entry value="0" text="Point"/>
+         <Entry value="1" text="Cell"/>
+       </EnumerationDomain>
      </IntVectorProperty>
    </SourceProxy>
 

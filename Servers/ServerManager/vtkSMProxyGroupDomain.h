@@ -64,8 +64,6 @@ protected:
   vtkSMProxyGroupDomain();
   ~vtkSMProxyGroupDomain();
 
-  virtual void SaveState(const char*, ofstream*, vtkIndent) {};
-
   // Description:
   // Set the appropriate ivars from the xml element. Should
   // be overwritten by subclass if adding ivars.

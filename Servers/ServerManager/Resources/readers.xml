@@ -6,7 +6,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <IntVectorProperty 
         name="TimestepAsIndex"
         command="SetTimestepAsIndex"
@@ -19,7 +21,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -42,7 +46,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -65,7 +71,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -88,7 +96,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -111,7 +121,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -134,7 +146,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -157,7 +171,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -180,7 +196,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -203,7 +221,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -226,7 +246,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="CellArrayStatus"
         command="SetCellArrayStatus"
@@ -249,7 +271,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
    <!-- End legacyreader -->
    </SourceProxy>
 
@@ -267,15 +291,19 @@
      <StringVectorProperty
         name="CaseFileName"
         command="SetCaseFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="ByteOrder" 
         command="SetByteOrder" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="BigEndian:0 LittleEndian:1" />
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="BigEndian"/>
+         <Entry value="1" text="LittleEndian"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -307,7 +335,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
      <StringVectorProperty
         name="PointArrayStatus"
         command="SetPointArrayStatus"
@@ -328,7 +358,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
    <!-- End vrmlreader -->
    </SourceProxy>
 
@@ -336,7 +368,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
    <!-- End pdbreader -->
    </SourceProxy>
 
@@ -344,7 +378,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
       <IntVectorProperty
          name="TimeStep"
          command="SetTimeStep"
@@ -358,7 +394,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="QFileName"
@@ -370,7 +408,7 @@
         command="SetBinaryFile" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -413,8 +451,10 @@
         command="SetByteOrder" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="BigEndian:0 LittleEndian:1" />
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="BigEndian"/>
+         <Entry value="1" text="LittleEndian"/>
+       </EnumerationDomain>
      </IntVectorProperty>
    <!-- End P3DReader -->
    </SourceProxy>
@@ -423,7 +463,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
    <!-- End stlreader -->
    </SourceProxy>
 
@@ -431,7 +473,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
    <!-- End stlreader -->
    </SourceProxy>
 
@@ -439,7 +483,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
       <DoubleVectorProperty
          name="HBScale"
@@ -461,7 +507,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
       <DoubleVectorProperty
          name="Radius"
@@ -491,15 +539,19 @@
      <StringVectorProperty
         name="CaseFileName"
         command="SetCaseFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <IntVectorProperty 
         name="ByteOrder" 
         command="SetByteOrder" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="BigEndian:0 LittleEndian:1" />
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="BigEndian"/>
+         <Entry value="1" text="LittleEndian"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -545,8 +597,18 @@
         command="SetDataScalarType" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="char:2 {unsigned char}:3 short:4 {unsigned short}:5 int:6 {unsigned int}:7 long:8 {unsigned long}:9 float:10 double:11" />
+       <EnumerationDomain name="enum">
+         <Entry value="2" text="char"/>
+         <Entry value="3" text="unsigned char"/>
+         <Entry value="4" text="short"/>
+         <Entry value="5" text="unsigned short"/>
+         <Entry value="6" text="int"/>
+         <Entry value="7" text="unsigned int"/>
+         <Entry value="8" text="long"/>
+         <Entry value="9" text="unsigned long"/>
+         <Entry value="10" text="float"/>
+         <Entry value="11" text="double"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -554,8 +616,10 @@
         command="SetDataByteOrder" 
         number_of_elements="1"
         default_values="0" >
-       <EnumarationDomain 
-          values="BigEndian:0 LittleEndian:1" />
+       <EnumerationDomain name="enum">
+         <Entry value="0" text="BigEndian"/>
+         <Entry value="1" text="LittleEndian"/>
+       </EnumerationDomain>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -603,7 +667,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -654,7 +720,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="XMLFileName"
@@ -731,7 +799,7 @@
         command="SetGenerateBlockIdCellArray" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -739,7 +807,7 @@
         command="SetGenerateGlobalNodeIdArray" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -747,7 +815,7 @@
         command="SetGenerateGlobalElementIdArray" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -755,7 +823,7 @@
         command="SetGenerateFileIdArray" 
         number_of_elements="1"
         default_values="1" > 
-       <BooleanDomain/>
+       <BooleanDomain name="bool"/>
      </IntVectorProperty>
    <!-- End ExodusReader -->
    </SourceProxy>
@@ -765,7 +833,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="VariableArrayStatus"
@@ -795,7 +865,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
 
      <StringVectorProperty
         name="CellArrayStatus"
@@ -820,7 +892,9 @@
      <StringVectorProperty
         name="FileName"
         command="SetFileName"
-        number_of_elements="1" />
+        number_of_elements="1">
+        <StringListDomain name="files"/>
+     </StringVectorProperty>
    <!-- End Meta Image Reader -->
    </SourceProxy>
   </ProxyGroup>

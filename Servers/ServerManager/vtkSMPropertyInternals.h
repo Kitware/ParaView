@@ -26,7 +26,8 @@
 
 struct vtkSMPropertyInternals
 {
-  vtkstd::vector<vtkSmartPointer<vtkSMDomain> > Domains;
+  typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMDomain> > DomainMap;
+  DomainMap Domains;
 
   typedef vtkstd::map<vtkStdString, vtkSmartPointer<vtkSMProperty> > PropertyMap;
   PropertyMap SubProperties;

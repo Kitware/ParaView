@@ -97,6 +97,12 @@ public:
   void SetUncheckedElement(unsigned int idx, int value);
 
   // Description:
+  // Returns the size of unchecked elements. Usually this is
+  // the same as the number of elements but can be different
+  // before a domain check is performed.
+  virtual unsigned int GetNumberOfUncheckedElements();
+
+  // Description:
   // If ArgumentIsArray is true, multiple elements are passed in as
   // array arguments. For example, For example, if
   // RepeatCommand is true, NumberOfElementsPerCommand is 2, the
@@ -122,12 +128,6 @@ protected:
   int ArgumentIsArray;
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
-
-  // Description:
-  // Returns the size of unchecked elements. Usually this is
-  // the same as the number of elements but can be different
-  // before a domain check is performed.
-  virtual unsigned int GetNumberOfUncheckedElements();
 
   // Description:
   // Sets the size of unchecked elements. Usually this is

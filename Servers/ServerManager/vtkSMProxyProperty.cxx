@@ -16,6 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkSMDomainIterator.h"
 #include "vtkSMProxy.h"
 #include "vtkSMProxyGroupDomain.h"
 #include "vtkSMProxyManager.h"
@@ -26,7 +27,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyProperty);
-vtkCxxRevisionMacro(vtkSMProxyProperty, "1.7");
+vtkCxxRevisionMacro(vtkSMProxyProperty, "1.8");
 
 struct vtkSMProxyPropertyInternals
 {
@@ -187,10 +188,11 @@ void vtkSMProxyProperty::SaveState(
   unsigned int numProxies = this->GetNumberOfProxies();
   for (unsigned int idx=0; idx<numProxies; idx++)
     {
-    for (unsigned int i=0; i<this->GetNumberOfDomains(); i++)
+    this->DomainIterator->Begin();
+    while (!this->DomainIterator->IsAtEnd())
       {
       vtkSMProxyGroupDomain* dom = vtkSMProxyGroupDomain::SafeDownCast(
-        this->GetDomain(i));
+        this->DomainIterator->GetDomain());
       if (dom)
         {
         unsigned int numGroups = dom->GetNumberOfGroups();
@@ -204,6 +206,7 @@ void vtkSMProxyProperty::SaveState(
             }
           }
         }
+      this->DomainIterator->Next();
       }
     }
   unsigned int numFoundProxies = proxies.size();

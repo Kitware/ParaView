@@ -22,11 +22,12 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMStringVectorProperty);
-vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.8");
+vtkCxxRevisionMacro(vtkSMStringVectorProperty, "1.9");
 
 struct vtkSMStringVectorPropertyInternals
 {
   vtkstd::vector<vtkStdString> Values;
+  vtkstd::vector<vtkStdString> UncheckedValues;
   vtkstd::vector<int> ElementTypes;
 };
 
@@ -136,10 +137,23 @@ void vtkSMStringVectorProperty::AppendCommandToStream(
 }
 
 //---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::SetNumberOfUncheckedElements(unsigned int num)
+{
+  this->Internals->UncheckedValues.resize(num);
+}
+
+//---------------------------------------------------------------------------
 void vtkSMStringVectorProperty::SetNumberOfElements(unsigned int num)
 {
   this->Internals->Values.resize(num);
+  this->Internals->UncheckedValues.resize(num);
   this->Modified();
+}
+
+//---------------------------------------------------------------------------
+unsigned int vtkSMStringVectorProperty::GetNumberOfUncheckedElements()
+{
+  return this->Internals->UncheckedValues.size();
 }
 
 //---------------------------------------------------------------------------
@@ -155,18 +169,49 @@ const char* vtkSMStringVectorProperty::GetElement(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
-void vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
+const char* vtkSMStringVectorProperty::GetUncheckedElement(unsigned int idx)
+{
+  return this->Internals->UncheckedValues[idx].c_str();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMStringVectorProperty::SetUncheckedElement(
+  unsigned int idx, const char* value)
+{
+  if (idx >= this->GetNumberOfUncheckedElements())
+    {
+    this->SetNumberOfUncheckedElements(idx+1);
+    }
+  this->Internals->UncheckedValues[idx] = value;
+}
+
+//---------------------------------------------------------------------------
+int vtkSMStringVectorProperty::SetElement(unsigned int idx, const char* value)
 {
   if (this->IsReadOnly)
     {
-    return;
+    return 0;
     }
+
+  for(unsigned int i=0; i<this->GetNumberOfElements(); i++)
+    {
+    this->SetUncheckedElement(i, this->GetElement(i));
+    }
+
+  this->SetUncheckedElement(idx, value);
+  if (!this->IsInDomains())
+    {
+    this->SetNumberOfUncheckedElements(this->GetNumberOfElements());
+    return 0;
+    }
+  
   if (idx >= this->GetNumberOfElements())
     {
     this->SetNumberOfElements(idx+1);
     }
   this->Internals->Values[idx] = value;
   this->Modified();
+  return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -211,6 +256,7 @@ void vtkSMStringVectorProperty::SaveState(
           << (this->GetElement(i)?this->GetElement(i):"") << "\"/>"
           << endl;
     }
+  this->Superclass::SaveState(name, file, indent);
   *file << indent << "</Property>" << endl;
 }
 

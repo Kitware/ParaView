@@ -33,6 +33,7 @@
 class vtkClientServerStream;
 class vtkPVXMLElement;
 class vtkSMDomain;
+class vtkSMDomainIterator;
 class vtkSMProxy;
 class vtkSMXMLParser;
 //BTX
@@ -78,6 +79,11 @@ public:
   // Returns true if all values are in all domains, false otherwise.
   int IsInDomains();
 
+  // Description:
+  // Overloaded to break the reference loop caused by the 
+  // internal domain iterator.
+  virtual void UnRegister(vtkObjectBase* obj);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -86,6 +92,7 @@ protected:
   friend class vtkSMProxyManager;
   friend class vtkSMProxy;
   friend class vtkSMSubPropertyIterator;
+  friend class vtkSMDomainIterator;
   friend class vtkSMSourceProxy;
 
   // Description:
@@ -110,15 +117,11 @@ protected:
   // Properties can have one or more domains. These are assigned by
   // the proxy manager and can be used to obtain information other
   // than given by the type of the propery and its values.
-  void AddDomain(vtkSMDomain* dom);
+  void AddDomain(const char* name, vtkSMDomain* dom);
 
   // Description:
-  // Returns a domain. Does not perform bounds check.
-  vtkSMDomain* GetDomain(unsigned int idx);
-
-  // Description:
-  // Returns the number of domains.
-  unsigned int GetNumberOfDomains();
+  // Returns a domain give a name. 
+  vtkSMDomain* GetDomain(const char* name);
 
   // Description:
   // The name assigned by the xnl parser. Used to get the property
@@ -134,6 +137,8 @@ protected:
   // Description:
   vtkSetMacro(IsReadOnly, int);
 
+  virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
+
   char* Command;
 
   vtkSMPropertyInternals* PInternals;
@@ -143,6 +148,8 @@ protected:
   int IsReadOnly;
 
   char* XMLName;
+
+  vtkSMDomainIterator* DomainIterator;
 
 private:
   vtkSMProperty(const vtkSMProperty&); // Not implemented

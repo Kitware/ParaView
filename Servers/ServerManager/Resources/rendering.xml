@@ -6,7 +6,7 @@
      <InputProperty
         name="Input"
         command="SetInput">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
              <Group name="sources"/>
              <Group name="filters"/>
            </ProxyGroupDomain>
@@ -72,7 +72,7 @@
             number_of_elements="1" /> 
 
          <ProxyProperty name="LookupTable" command="SetLookupTable">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
             <Group name="lookup_tables"/>
            </ProxyGroupDomain>
          </ProxyProperty>
@@ -155,7 +155,7 @@
      <ProxyProperty name="Displayers" 
                     command="AddDisplayer"
                     update_self="1">
-        <ProxyGroupDomain>
+        <ProxyGroupDomain name="groups">
           <Group name="rendering"/>
         </ProxyGroupDomain>
      </ProxyProperty>

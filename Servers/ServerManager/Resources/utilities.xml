@@ -6,7 +6,7 @@
          command="SetNumberOfTableValues"
          number_of_elements="1"
          default_values="32" >
-        <IntRangeDomain min="1" />
+        <IntRangeDomain name="range" min="1" />
       </IntVectorProperty>
 
       <DoubleVectorProperty
@@ -45,7 +45,7 @@
          command="SetVectorMode"
          number_of_elements="1" 
          default_values="1">
-       <EnumarationDomain 
+       <EnumarationDomain name="enum" 
           values="MAGNITUDE:0 COMPONENT:1" />
       </IntVectorProperty>
     </LookupTableProxy>
@@ -88,7 +88,7 @@
   <ProxyGroup name="transforms">
     <Proxy name="Transform" class="vtkTransform">
       <ProxyProperty name="Matrix" command="SetMatrix">
-           <ProxyGroupDomain>
+           <ProxyGroupDomain name="groups">
               <Group name="matrices"/>
            </ProxyGroupDomain>
      </ProxyProperty>

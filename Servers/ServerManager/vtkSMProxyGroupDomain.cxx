@@ -26,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxyGroupDomain);
-vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMProxyGroupDomain, "1.5");
 
 struct vtkSMProxyGroupDomainInternals
 {
@@ -55,7 +55,6 @@ int vtkSMProxyGroupDomain::IsInDomain(vtkSMProperty* property)
   vtkSMProxyProperty* pp = vtkSMProxyProperty::SafeDownCast(property);
   if (pp)
     {
-    unsigned int numMatches = 0;
     unsigned int numProxies = pp->GetNumberOfProxies();
     for (unsigned int i=0; i<numProxies; i++)
       {

@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.2");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -60,10 +60,10 @@ int vtkSMDoubleRangeDomain::IsInDomain(vtkSMProperty* property)
     vtkSMDoubleVectorProperty::SafeDownCast(property);
   if (dp)
     {
-    unsigned int numElems = dp->GetNumberOfElements();
+    unsigned int numElems = dp->GetNumberOfUncheckedElements();
     for (unsigned int i=0; i<numElems; i++)
       {
-      if (!this->IsInDomain(i, dp->GetElement(i)))
+      if (!this->IsInDomain(i, dp->GetUncheckedElement(i)))
         {
         return 0;
         }
@@ -187,8 +187,68 @@ void vtkSMDoubleRangeDomain::SetEntry(
 }
 
 //---------------------------------------------------------------------------
-int vtkSMDoubleRangeDomain::ReadXMLAttributes(vtkPVXMLElement* /*element*/)
+void vtkSMDoubleRangeDomain::SaveState(
+  const char* name, ofstream* file, vtkIndent indent)
 {
+  *file << indent 
+        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
+        << endl;
+  unsigned int size = this->DRInternals->Entries.size();
+  unsigned int i;
+  for(i=0; i<size; i++)
+    {
+    if (this->DRInternals->Entries[i].MinSet)
+      {
+      *file << indent.GetNextIndent() 
+            << "<Min index=\"" << i << "\" value=\"" 
+            << this->DRInternals->Entries[i].Min
+            << "\"/>" << endl;
+      }
+    }
+  for(i=0; i<size; i++)
+    {
+    if (this->DRInternals->Entries[i].MaxSet)
+      {
+      *file << indent.GetNextIndent() 
+            << "<Max index=\"" << i << "\" value=\"" 
+            << this->DRInternals->Entries[i].Max
+            << "\"/>" << endl;
+      }
+    }
+      
+  *file << indent
+        << "</Domain>" << endl;
+    
+}
+
+//---------------------------------------------------------------------------
+int vtkSMDoubleRangeDomain::ReadXMLAttributes(vtkPVXMLElement* element)
+{
+  const int MAX_NUM = 128;
+  double values[MAX_NUM];
+
+  int numRead = element->GetVectorAttribute("min",
+                                            MAX_NUM,
+                                            values);
+  if (numRead > 0)
+    {
+    for (unsigned int i=0; i<(unsigned int)numRead; i++)
+      {
+      this->AddMinimum(i, values[i]);
+      }
+    }
+
+  numRead = element->GetVectorAttribute("max",
+                                        MAX_NUM,
+                                        values);
+  if (numRead > 0)
+    {
+    for (unsigned int i=0; i<(unsigned int)numRead; i++)
+      {
+      this->AddMaximum(i, values[i]);
+      }
+    }
+
   return 1;
 }
 

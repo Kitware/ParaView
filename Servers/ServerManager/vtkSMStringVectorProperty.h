@@ -50,7 +50,9 @@ public:
 
   // Description:
   // Set the value of 1 element. The vector is resized as necessary.
-  void SetElement(unsigned int idx, const char* value);
+  // Returns 0 if Set fails either because the property is read only
+  // or the value is not in all domains. Returns 1 otherwise.
+  int SetElement(unsigned int idx, const char* value);
 
   // Description:
   // Returns the value of 1 element.
@@ -65,6 +67,25 @@ public:
   // Possible values are: INT, DOUBLE, STRING.
   void SetElementType(unsigned int idx, int type);
 
+  // Description:
+  // Returns the value of 1 unchecked element. These are used by
+  // domains. SetElement() first sets the value of 1 unchecked
+  // element and then calls IsInDomain and updates the value of
+  // the corresponding element only if IsInDomain passes.
+  const char* GetUncheckedElement(unsigned int idx);
+
+  // Description:
+  // Set the value of 1 unchecked element. This can be used to
+  // check if a value is in all domains of the property. Call
+  // this and call IsInDomains().
+  void SetUncheckedElement(unsigned int idx, const char* value);
+
+  // Description:
+  // Returns the size of unchecked elements. Usually this is
+  // the same as the number of elements but can be different
+  // before a domain check is performed.
+  virtual unsigned int GetNumberOfUncheckedElements();
+
   //BTX
   enum ElementTypes{ INT, DOUBLE, STRING };
   //ETX
@@ -76,6 +97,12 @@ protected:
   vtkSMStringVectorPropertyInternals* Internals;
 
   int GetElementType(unsigned int idx);
+
+  // Description:
+  // Sets the size of unchecked elements. Usually this is
+  // the same as the number of elements but can be different
+  // before a domain check is performed.
+  virtual void SetNumberOfUncheckedElements(unsigned int num);
 
   //BTX  
   // Description:

@@ -84,6 +84,12 @@ public:
   double GetElement(unsigned int idx);
 
   // Description:
+  // Returns the size of unchecked elements. Usually this is
+  // the same as the number of elements but can be different
+  // before a domain check is performed.
+  virtual unsigned int GetNumberOfUncheckedElements();
+
+  // Description:
   // Returns the value of 1 unchecked element. These are used by
   // domains. SetElement() first sets the value of 1 unchecked
   // element and then calls IsInDomain and updates the value of
@@ -130,12 +136,6 @@ protected:
   int ArgumentIsArray;
 
   virtual void SaveState(const char* name, ofstream* file, vtkIndent indent);
-
-  // Description:
-  // Returns the size of unchecked elements. Usually this is
-  // the same as the number of elements but can be different
-  // before a domain check is performed.
-  virtual unsigned int GetNumberOfUncheckedElements();
 
   // Description:
   // Sets the size of unchecked elements. Usually this is

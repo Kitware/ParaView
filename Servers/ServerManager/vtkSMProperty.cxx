@@ -18,6 +18,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
 #include "vtkSMDomain.h"
+#include "vtkSMDomainIterator.h"
 #include "vtkSMInstantiator.h"
 #include "vtkSMSubPropertyIterator.h"
 #include "vtkSmartPointer.h"
@@ -27,7 +28,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.9");
+vtkCxxRevisionMacro(vtkSMProperty, "1.10");
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
@@ -38,6 +39,8 @@ vtkSMProperty::vtkSMProperty()
   this->PInternals = new vtkSMPropertyInternals;
   this->XMLName = 0;
   this->IsReadOnly = 0;
+  this->DomainIterator = vtkSMDomainIterator::New();
+  this->DomainIterator->SetProperty(this);
 }
 
 //---------------------------------------------------------------------------
@@ -46,39 +49,71 @@ vtkSMProperty::~vtkSMProperty()
   this->SetCommand(0);
   delete this->PInternals;
   this->SetXMLName(0);
+  this->DomainIterator->Delete();
+}
+
+//-----------------------------------------------------------------------------
+// UnRegister is overloaded because the object has a reference to itself
+// through the domain iterator.
+void vtkSMProperty::UnRegister(vtkObjectBase* obj)
+{
+  if (this->ReferenceCount == 2)
+    {
+    this->Superclass::UnRegister(obj);
+
+    vtkSMDomainIterator *tmp = this->DomainIterator;
+    tmp->Register(0);
+    tmp->SetProperty(0);
+    tmp->UnRegister(0);
+    return;
+    }
+  this->Superclass::UnRegister(obj);
+
 }
 
 //---------------------------------------------------------------------------
 int vtkSMProperty::IsInDomains()
 {
-  vtkstd::vector<vtkSmartPointer<vtkSMDomain> >::iterator it =
-    this->PInternals->Domains.begin();
-  for(; it != this->PInternals->Domains.end(); it++)
+  this->DomainIterator->Begin();
+  while(!this->DomainIterator->IsAtEnd())
     {
-    if (!it->GetPointer()->IsInDomain(this))
+    if (!this->DomainIterator->GetDomain()->IsInDomain(this))
       {
       return 0;
       }
+    this->DomainIterator->Next();
     }
   return 1;
 }
 
 //---------------------------------------------------------------------------
-void vtkSMProperty::AddDomain(vtkSMDomain* domain)
+void vtkSMProperty::AddDomain(const char* name, vtkSMDomain* domain)
 {
-  this->PInternals->Domains.push_back(domain);
+  // Check if the proxy already exists. If it does, we will
+  // replace it
+  vtkSMPropertyInternals::DomainMap::iterator it =
+    this->PInternals->Domains.find(name);
+
+  if (it != this->PInternals->Domains.end())
+    {
+    vtkWarningMacro("Domain " << name  << " already exists. Replacing");
+    }
+
+  this->PInternals->Domains[name] = domain;
 }
 
 //---------------------------------------------------------------------------
-vtkSMDomain* vtkSMProperty::GetDomain(unsigned int idx)
+vtkSMDomain* vtkSMProperty::GetDomain(const char* name)
 {
-  return this->PInternals->Domains[idx];
-}
+  vtkSMPropertyInternals::DomainMap::iterator it =
+    this->PInternals->Domains.find(name);
 
-//---------------------------------------------------------------------------
-unsigned int vtkSMProperty::GetNumberOfDomains()
-{
-  return this->PInternals->Domains.size();
+  if (it == this->PInternals->Domains.end())
+    {
+    return 0;
+    }
+
+  return it->second.GetPointer();
 }
 
 //---------------------------------------------------------------------------
@@ -177,13 +212,35 @@ int vtkSMProperty::ReadXMLAttributes(vtkPVXMLElement* element)
     vtkSMDomain* domain = vtkSMDomain::SafeDownCast(object);
     if (domain)
       {
-      domain->ReadXMLAttributes(domainEl);
-      this->AddDomain(domain);
+      if (domain->ReadXMLAttributes(domainEl))
+        {
+        const char* dname = domainEl->GetAttribute("name");
+        if (dname)
+          {
+          domain->SetXMLName(dname);
+          this->AddDomain(dname, domain);
+          }
+        }
       domain->Delete();
       }
     }
 
   return 1;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::SaveState(const char* name, ofstream* file, vtkIndent indent)
+{
+  this->DomainIterator->Begin();
+  while(!this->DomainIterator->IsAtEnd())
+    {
+    ostrstream dname;
+    dname << name << "." << this->DomainIterator->GetKey() << ends;
+    this->DomainIterator->GetDomain()->SaveState(
+      dname.str(), file, indent.GetNextIndent());
+    delete[] dname.str();
+    this->DomainIterator->Next();
+    }
 }
 
 //---------------------------------------------------------------------------

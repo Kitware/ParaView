@@ -4,6 +4,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMApplication.cxx
   vtkSMBooleanDomain.cxx
   vtkSMDomain.cxx
+  vtkSMDomainIterator.cxx
   vtkSMDoubleRangeDomain.cxx
   vtkSMDoubleVectorProperty.cxx
   vtkSMEnumerationDomain.cxx
@@ -23,6 +24,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMProxyIterator.cxx
   vtkSMProxyManager.cxx
   vtkSMProxyProperty.cxx
+  vtkSMStringListDomain.cxx
   vtkSMStringVectorProperty.cxx
   vtkSMSubPropertyIterator.cxx
   vtkSMVectorProperty.cxx

@@ -23,7 +23,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMEnumerationDomain);
-vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMEnumerationDomain, "1.2");
 
 struct vtkSMEnumerationDomainInternals
 {
@@ -76,11 +76,11 @@ int vtkSMEnumerationDomain::IsInDomain(vtkSMProperty* property)
   vtkSMIntVectorProperty* ip = vtkSMIntVectorProperty::SafeDownCast(property);
   if (ip)
     {
-    unsigned int numElems = ip->GetNumberOfElements();
+    unsigned int numElems = ip->GetNumberOfUncheckedElements();
     for (unsigned int i=0; i<numElems; i++)
       {
       unsigned int idx;
-      if (!this->IsInDomain(ip->GetElement(i), idx))
+      if (!this->IsInDomain(ip->GetUncheckedElement(i), idx))
         {
         return 0;
         }
@@ -95,6 +95,10 @@ int vtkSMEnumerationDomain::IsInDomain(vtkSMProperty* property)
 int vtkSMEnumerationDomain::IsInDomain(int val, unsigned int& idx)
 {
   unsigned int numEntries = this->GetNumberOfEntries();
+  if (numEntries == 0)
+    {
+    return 1;
+    }
 
   for (unsigned int i=0; i<numEntries; i++)
     {
@@ -108,8 +112,60 @@ int vtkSMEnumerationDomain::IsInDomain(int val, unsigned int& idx)
 }
 
 //---------------------------------------------------------------------------
-int vtkSMEnumerationDomain::ReadXMLAttributes(vtkPVXMLElement* /*element*/)
+void vtkSMEnumerationDomain::SaveState(
+  const char* name, ofstream* file, vtkIndent indent)
 {
+  *file << indent 
+        << "<Domain name=\"" << this->XMLName << "\" id=\"" << name << "\">"
+        << endl;
+  unsigned int size = this->GetNumberOfEntries();
+  for(unsigned int i=0; i<size; i++)
+    {
+    *file << indent.GetNextIndent() 
+          << "<Entry value=\"" << this->GetEntryValue(i)
+          << "\" text=\"" << this->GetEntryText(i)
+          << "\"/>" << endl;
+    }
+      
+  *file << indent
+        << "</Domain>" << endl;
+    
+}
+
+//---------------------------------------------------------------------------
+int vtkSMEnumerationDomain::ReadXMLAttributes(vtkPVXMLElement* element)
+{
+  // Loop over the top-level elements.
+  unsigned int i;
+  for(i=0; i < element->GetNumberOfNestedElements(); ++i)
+    {
+    vtkPVXMLElement* selement = element->GetNestedElement(i);
+    if ( strcmp("Entry", selement->GetName()) != 0 )
+      {
+      vtkErrorMacro(<< "Unknown element type: " << selement->GetName()
+                    << ". Can not parse domain xml.");
+      return 0;
+      }
+    const char* text = selement->GetAttribute("text");
+    if (!text)
+      {
+      vtkErrorMacro(<< "Can not find required attribute: text. "
+                    << "Can not parse domain xml.");
+      return 0;
+      }
+
+    int value;
+    if (!selement->GetScalarAttribute("value", &value))
+      {
+      vtkErrorMacro(<< "Can not find required attribute: text. "
+                    << "Can not parse domain xml.");
+      return 0;
+      }
+
+    this->EInternals->Entries.push_back(
+      vtkSMEnumerationDomainInternals::EntryType(text, value));
+    
+    }
   return 1;
 }
 

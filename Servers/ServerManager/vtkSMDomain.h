@@ -52,6 +52,14 @@ protected:
   // be overwritten by subclass if adding ivars.
   virtual int ReadXMLAttributes(vtkPVXMLElement*) {return 1;};
 
+  char* XMLName;
+
+  // Description:
+  // Assigned by the XML parser. The name assigned in the XML
+  // configuration. Can be used to figure out the origin of the
+  // domain.
+  vtkSetStringMacro(XMLName);
+
 private:
   vtkSMDomain(const vtkSMDomain&); // Not implemented
   void operator=(const vtkSMDomain&); // Not implemented
