@@ -1353,6 +1353,7 @@ void vtkPVSource::UpdateNavigationCanvas()
   vtkPVSource *source;
   vtkPVSourceCollection *outs, *moreOuts;
   vtkPVData *moreOut;
+  int i;
   
   // Clear the canvas
   this->Script("%s delete all",
@@ -1361,49 +1362,75 @@ void vtkPVSource::UpdateNavigationCanvas()
   // Put the inputs in the canvas.
   if (this->Inputs)
     {
-    source = this->Inputs[0]->GetPVSource();
-    if (source)
+    y = 10;
+    for (i = 0; i < this->NumberOfInputs; i++)
       {
-      // Draw the name of the assembly.
-      this->Script(
-         "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-         this->NavigationCanvas->GetWidgetName(), 20, 10, source->GetName(), font);
-
-      result = this->Application->GetMainInterp()->result;
-      tmp = new char[strlen(result)+1];
-      strcpy(tmp,result);
-      this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
-                   this->NavigationCanvas->GetWidgetName(), tmp,
-	           this->GetTclName(), source->GetTclName());
-
-      // Get the bounding box for the name. We may need to highlight it.
-      this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(), tmp);
-      delete [] tmp;
-      tmp = NULL;
-      result = this->Application->GetMainInterp()->result;
-      sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
-      yMid = (int)(0.5 * (bbox[1]+bbox[3]));
-
-      // Draw a line from input to source.
-      this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                   this->NavigationCanvas->GetWidgetName(), bbox[2], yMid,
-                   125, yMid);
-      if (source->GetInputs())
+      source = this->Inputs[i]->GetPVSource();
+      if (source)
         {
-        if (source->GetNthInput(0)->GetPVSource())
+        // Draw the name of the assembly.
+        this->Script(
+          "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
+          this->NavigationCanvas->GetWidgetName(), 20, y,
+          source->GetName(), font);
+        
+        result = this->Application->GetMainInterp()->result;
+        tmp = new char[strlen(result)+1];
+        strcpy(tmp,result);
+        this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
+                     this->NavigationCanvas->GetWidgetName(), tmp,
+                     this->GetTclName(), source->GetTclName());
+        
+        // Get the bounding box for the name. We may need to highlight it.
+        this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(),
+                      tmp);
+        delete [] tmp;
+        tmp = NULL;
+        result = this->Application->GetMainInterp()->result;
+        sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
+        if (i == 0)
           {
-          // Draw ellipsis indicating that this source has a source.
-          this->Script("%s create line %d %d %d %d",
-                       this->NavigationCanvas->GetWidgetName(), 6, yMid, 8,
-                       yMid);
-          this->Script("%s create line %d %d %d %d",
-                       this->NavigationCanvas->GetWidgetName(), 10, yMid, 12,
-                       yMid);
-          this->Script("%s create line %d %d %d %d",
-                       this->NavigationCanvas->GetWidgetName(), 14, yMid, 16,
-                       yMid);
+          // only want to set xMid and yMid once
+          yMid = (int)(0.5 * (bbox[1]+bbox[3]));
+          xMid = (int)(0.5 * (bbox[2]+120));
+          }
+        
+        // Draw a line from input to source.
+        if (y == 10)
+          {
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+                       this->NavigationCanvas->GetWidgetName(), bbox[2], yMid,
+                       125, yMid);
+          }
+        else
+          {
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
+                       this->NavigationCanvas->GetWidgetName(), xMid, yMid,
+                       xMid, yMid+15);
+          yMid += 15;
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
+                       this->NavigationCanvas->GetWidgetName(), bbox[2],
+                       yMid, xMid, yMid);
+          }
+        
+        if (source->GetInputs())
+          {
+          if (source->GetNthInput(0)->GetPVSource())
+            {
+            // Draw ellipsis indicating that this source has a source.
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(), 6, yMid, 8,
+                         yMid);
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(), 10, yMid, 12,
+                         yMid);
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(), 14, yMid, 16,
+                         yMid);
+            }
           }
         }
+      y += 15;
       }
     }
 
@@ -1421,7 +1448,7 @@ void vtkPVSource::UpdateNavigationCanvas()
   result = this->Application->GetMainInterp()->result;
   sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
   yMid = (int)(0.5 * (bbox[1]+bbox[3]));
-  xMid = (int)(0.5 * (bbox[2] + 235));
+  xMid = (int)(0.5 * (bbox[2] + 245));
 
   // Put the outputs in the canvas.
   outs = NULL;
@@ -1438,7 +1465,8 @@ void vtkPVSource::UpdateNavigationCanvas()
       // Draw the name of the assembly.
       this->Script(
          "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-         this->NavigationCanvas->GetWidgetName(), 250, y, source->GetName(), font);
+         this->NavigationCanvas->GetWidgetName(), 250, y,
+         source->GetName(), font);
 
       result = this->Application->GetMainInterp()->result;
       tmp = new char[strlen(result)+1];
@@ -1467,7 +1495,8 @@ void vtkPVSource::UpdateNavigationCanvas()
                      yMid+15);
         yMid += 15;
         this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-            this->NavigationCanvas->GetWidgetName(), xMid, yMid, 245, yMid);
+                     this->NavigationCanvas->GetWidgetName(), xMid, yMid,
+                     245, yMid);
         }
       if (moreOut = source->GetPVData())
         {
