@@ -5,9 +5,7 @@ FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
 IF ( VTK_BINARY_DIR )
   LOAD_CACHE(${VTK_BINARY_DIR} EXCLUDE
                                BUILD_SHARED_LIBS
-                               BUILD_TESTING
-                               EXECUTABLE_OUTPUT_PATH
-                               LIBRARY_OUTPUT_PATH)
+                               BUILD_TESTING)
   INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
   SUBDIRS(Widgets ParaView)
   SUBDIR_DEPENDS(ParaView Widgets)
