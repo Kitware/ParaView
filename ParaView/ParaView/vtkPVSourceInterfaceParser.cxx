@@ -44,11 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 
-#ifdef USE_INTERNAL_EXPAT
-#  include "xmlparse.h"
-#else 
-#  include "expat.h"
-#endif
+#include "expat.h"
 
 //----------------------------------------------------------------------------
 vtkPVSourceInterfaceParser* vtkPVSourceInterfaceParser::New()
