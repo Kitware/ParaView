@@ -42,12 +42,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLoadSaveDialog.h"
 
 #include "vtkKWApplication.h"
+#include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkString.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.13");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.13.2.1");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -90,13 +91,27 @@ int vtkKWLoadSaveDialog::Invoke()
 {
   this->Application->SetDialogUp(1);
   char *path = NULL;
-  this->Script("%s -title \"%s\" -defaultextension {%s} "
-               "-filetypes {%s} -initialdir {%s}", 
-               (this->SaveDialog) ? "tk_getSaveFile" : "tk_getOpenFile", 
-               this->Title, 
-               (this->DefaultExt ? this->DefaultExt : ""),
-               this->FileTypes, 
-               (this->LastPath ? this->LastPath : "."));
+  ostrstream command;
+  command << (this->SaveDialog ? "tk_getSaveFile" : "tk_getOpenFile")
+          << " -title {" << this->Title
+          << "}"
+          << " -defaultextension {" 
+          << (this->DefaultExt ? this->DefaultExt : "")
+          << "}"
+          << " -filetypes {" << this->FileTypes << "}"
+          << " -initialdir { " 
+          << (this->LastPath ? this->LastPath : ".")
+          << "}";
+
+  vtkKWWindow* window = this->GetWindow();
+  if (window)
+    {
+    command << " -parent " << window->GetWidgetName();
+    }
+  command << ends;
+  this->Script(command.str());
+  command.rdbuf()->freeze(0);
+
   path = this->Application->GetMainInterp()->result;
   if ( path && strlen(path) )
     {

@@ -102,7 +102,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.15");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.16");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -638,6 +638,7 @@ void vtkPVApplication::SaveTraceFile(const char* fname)
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->GetMainWindow()->RetrieveLastPath(exportDialog, "SaveTracePath");
+  exportDialog->SetParent(this->GetMainWindow());
   exportDialog->Create(this, 0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");

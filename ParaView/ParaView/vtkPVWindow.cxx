@@ -126,7 +126,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.20");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.21");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1702,6 +1702,7 @@ void vtkPVWindow::OpenCallback()
 
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(loadDialog, "OpenPath");
+  loadDialog->SetParent(this);
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView File");
   loadDialog->SetDefaultExt(".vtk");
@@ -2240,6 +2241,7 @@ void vtkPVWindow::WriteData()
   
   vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(saveDialog, "SaveDataFile");
+  saveDialog->SetParent(this);
   saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
@@ -2309,6 +2311,7 @@ void vtkPVWindow::ExportVTKScript()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "ExportVTKLastPath");
+  exportDialog->SetParent(this);
   exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save VTK Script");
@@ -3299,6 +3302,7 @@ void vtkPVWindow::SaveTrace()
 {
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "SaveTracePath");
+  exportDialog->SetParent(this);
   exportDialog->Create(this->Application,0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
@@ -3482,6 +3486,7 @@ int vtkPVWindow::OpenPackage()
   int res = 0;
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(loadDialog, "PackagePath");
+  loadDialog->SetParent(this);
   loadDialog->Create(this->Application,0);
   loadDialog->SetTitle("Open ParaView Package");
   loadDialog->SetDefaultExt(".xml");
@@ -3868,7 +3873,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.20 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.21 $");
 }
 
 //----------------------------------------------------------------------------
