@@ -148,6 +148,10 @@ public:
   virtual void Enter(int /*x*/, int /*y*/) {}
 
   // Description:
+  // Convenience method to set the visibility of all annotations.
+  virtual void SetAnnotationsVisibility(int v);
+
+  // Description:
   // Get and control the corner annotation.
   virtual void SetCornerAnnotationVisibility(int v);
   virtual int  GetCornerAnnotationVisibility();

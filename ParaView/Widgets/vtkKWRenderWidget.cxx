@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.56");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.57");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -684,6 +684,13 @@ void vtkKWRenderWidget::Close()
   this->SetCornerAnnotationVisibility(0);
   this->SetHeaderAnnotationVisibility(0);
   */
+}
+
+//----------------------------------------------------------------------------
+void vtkKWRenderWidget::SetAnnotationsVisibility(int v)
+{
+  this->SetCornerAnnotationVisibility(v);
+  this->SetHeaderAnnotationVisibility(v);
 }
 
 //----------------------------------------------------------------------------
