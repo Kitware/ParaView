@@ -141,7 +141,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.360");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.361");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1123,25 +1123,25 @@ void vtkPVRenderView::CreateViewProperties()
   // Set every different lights from the light kit
   this->KeyLightLabel->SetParent(this->LightParameterFrame->GetFrame());
   this->KeyLightLabel->Create(this->GetApplication(), 0);
-  this->KeyLightLabel->SetText("Key Light:");
+  this->KeyLightLabel->SetText("Key :");
   this->KeyLightLabel->SetBalloonHelpString(
     "Set the key light.");
 
   this->FillLightLabel->SetParent(this->LightParameterFrame->GetFrame());
   this->FillLightLabel->Create(this->GetApplication(), 0);
-  this->FillLightLabel->SetText("Fill Light:");
+  this->FillLightLabel->SetText("Fill:");
   this->FillLightLabel->SetBalloonHelpString(
     "Set the fill light.");
 
   this->BackLightLabel->SetParent(this->LightParameterFrame->GetFrame());
   this->BackLightLabel->Create(this->GetApplication(), 0);
-  this->BackLightLabel->SetText("Back Light:");
+  this->BackLightLabel->SetText("Back:");
   this->BackLightLabel->SetBalloonHelpString(
     "Set the back light.");
 
   this->HeadLightLabel->SetParent(this->LightParameterFrame->GetFrame());
   this->HeadLightLabel->Create(this->GetApplication(), 0);
-  this->HeadLightLabel->SetText("Head Light:");
+  this->HeadLightLabel->SetText("Head:");
   this->HeadLightLabel->SetBalloonHelpString(
     "Set the head light.");
 
@@ -1149,17 +1149,14 @@ void vtkPVRenderView::CreateViewProperties()
                                                             vtkLightKit::Intensity, 
                                                             vtkLightKit::Elevation, 
                                                             vtkLightKit::Azimuth };
-  const double KeyLightResolution[]  = { 0.01, 0.05, 1, 1 };
   const vtkLightKit::LightKitSubType FillLightSubType[] = { vtkLightKit::Warmth, 
                                                             vtkLightKit::KFRatio, 
                                                             vtkLightKit::Elevation, 
                                                             vtkLightKit::Azimuth };
-  const double FillLightResolution[]  = { 0.01, 0.1, 1, 1 };
   const vtkLightKit::LightKitSubType BackLightSubType[] = { vtkLightKit::Warmth, 
                                                             vtkLightKit::KBRatio, 
                                                             vtkLightKit::Elevation, 
                                                             vtkLightKit::Azimuth };
-  const double BackLightResolution[]  = { 0.01, 0.1, 1, 1 };
   const vtkLightKit::LightKitSubType HeadLightSubType[] = { vtkLightKit::Warmth, 
                                                             vtkLightKit::KHRatio };
   const double HeadLightResolution[]  = { 0.01, 0.1 };
@@ -1171,13 +1168,12 @@ void vtkPVRenderView::CreateViewProperties()
     this->KeyLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
     this->KeyLightScale[cc]->PopupScaleOn();
     this->KeyLightScale[cc]->Create(this->GetApplication(), 0);
-    this->KeyLightScale[cc]->SetResolution(KeyLightResolution[cc]);
     this->KeyLightScale[cc]->DisplayEntry();
     this->KeyLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->KeyLightScale[cc]->ExpandEntryOn();
     this->KeyLightScale[cc]->GetEntry()->SetWidth(5);
     this->KeyLightScale[cc]->DisplayLabel ( 
-      vtkLightKit::GetStringFromSubType( KeyLightSubType[cc] ));
+      vtkLightKit::GetShortStringFromSubType( KeyLightSubType[cc] ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TKeyLight, KeyLightSubType[cc]);
     sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TKeyLight, KeyLightSubType[cc]);
     this->KeyLightScale[cc]->SetCommand(this, command);
@@ -1192,13 +1188,12 @@ void vtkPVRenderView::CreateViewProperties()
     this->FillLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
     this->FillLightScale[cc]->PopupScaleOn();
     this->FillLightScale[cc]->Create(this->GetApplication(), 0);
-    this->FillLightScale[cc]->SetResolution(FillLightResolution[cc]);
     this->FillLightScale[cc]->DisplayEntry();
     this->FillLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->FillLightScale[cc]->ExpandEntryOn();
     this->FillLightScale[cc]->GetEntry()->SetWidth(5);
     this->FillLightScale[cc]->DisplayLabel ( 
-      vtkLightKit::GetStringFromSubType( FillLightSubType[cc] ));
+      vtkLightKit::GetShortStringFromSubType( FillLightSubType[cc] ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TFillLight, FillLightSubType[cc]);
     sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TFillLight, FillLightSubType[cc]);
     this->FillLightScale[cc]->SetCommand(this, command);
@@ -1213,13 +1208,12 @@ void vtkPVRenderView::CreateViewProperties()
     this->BackLightScale[cc]->SetParent(this->LightParameterFrame->GetFrame());
     this->BackLightScale[cc]->PopupScaleOn();
     this->BackLightScale[cc]->Create(this->GetApplication(), 0);
-    this->BackLightScale[cc]->SetResolution(BackLightResolution[cc]);
     this->BackLightScale[cc]->DisplayEntry();
     this->BackLightScale[cc]->DisplayEntryAndLabelOnTopOff();
     this->BackLightScale[cc]->ExpandEntryOn();
     this->BackLightScale[cc]->GetEntry()->SetWidth(5);
     this->BackLightScale[cc]->DisplayLabel (
-      vtkLightKit::GetStringFromSubType( BackLightSubType[cc] ));
+      vtkLightKit::GetShortStringFromSubType( BackLightSubType[cc] ));
     sprintf(command,   "LightCallback %d %d", vtkLightKit::TBackLight, BackLightSubType[cc]);
     sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::TBackLight, BackLightSubType[cc]);
     this->BackLightScale[cc]->SetCommand(this, command);
@@ -1242,7 +1236,7 @@ void vtkPVRenderView::CreateViewProperties()
       this->HeadLightScale[cc]->ExpandEntryOn();
       this->HeadLightScale[cc]->GetEntry()->SetWidth(5);
       this->HeadLightScale[cc]->DisplayLabel (
-        vtkLightKit::GetStringFromSubType( HeadLightSubType[cc] ));
+        vtkLightKit::GetShortStringFromSubType( HeadLightSubType[cc] ));
       sprintf(command,   "LightCallback %d %d", vtkLightKit::THeadLight, HeadLightSubType[cc]);
       sprintf(endcommand,"LightEndCallback %d %d", vtkLightKit::THeadLight, HeadLightSubType[cc]);
       this->HeadLightScale[cc]->SetCommand(this, command);
@@ -1264,7 +1258,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->MaintainLuminanceButton->SetCommand(this, "MaintainLuminanceCallback");
   // This would be nice if there was an InitializeScale'function like for KWCheckButton too
  
-  this->Script("grid %s -sticky nws",
+  this->Script("grid %s - -sticky nws",
                this->UseLightButton->GetWidgetName());
 
   int button_pady = 1;
@@ -1301,7 +1295,7 @@ void vtkPVRenderView::CreateViewProperties()
   this->Script("grid %s -sticky nws",
                this->BackLightLabel->GetWidgetName());
 
-  this->Script("grid %s %s %s %s -sticky news -pady %d",
+  this->Script("grid %s %s %s %s - -sticky news -pady %d",
                this->HeadLightLabel->GetWidgetName(),
                this->HeadLightScale[0]->GetWidgetName(),
                this->HeadLightScale[1]->GetWidgetName(),
