@@ -185,6 +185,13 @@ void vtkPVArraySelection::Reset()
 
   // See if we need to create new check buttons.
   this->Script("%s GetFileName", this->VTKReaderTclName);
+
+  // Filename not set
+  if (this->Application->GetMainInterp()->result[0] == '\0')
+    {
+    return;
+    }
+
   if (this->FileName == NULL || 
       strcmp(this->FileName, this->Application->GetMainInterp()->result) != 0)
     {
