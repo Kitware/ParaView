@@ -3,13 +3,8 @@
   Program:   Visualization Toolkit
   Module:    vtkWeightedRedistributePolyData.cxx
   Language:  C++
-<<<<<<< vtkWeightedRedistributePolyData.cxx
   Date:      $Date$
   Version:   $Revision$
-=======
-  Date:      $Date$
-  Version:   $Revision$
->>>>>>> 1.3
 
 
 Copyright (c) 1993-2001 Ken Martin, Will Schroeder, Bill Lorensen 
@@ -43,45 +38,66 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-==================================================================*/
+=========================================================================*/
+
+/*======================================================================
+// This software and ancillary information known as vtk_ext (and
+// herein called "SOFTWARE") is made available under the terms
+// described below.  The SOFTWARE has been approved for release with
+// associated LA_CC Number 99-44, granted by Los Alamos National
+// Laboratory in July 1999.
+//
+// Unless otherwise indicated, this SOFTWARE has been authored by an
+// employee or employees of the University of California, operator of
+// the Los Alamos National Laboratory under Contract No. W-7405-ENG-36
+// with the United States Department of Energy.
+//
+// The United States Government has rights to use, reproduce, and
+// distribute this SOFTWARE.  The public may copy, distribute, prepare
+// derivative works and publicly display this SOFTWARE without charge,
+// provided that this Notice and any statement of authorship are
+// reproduced on all copies.
+//
+// Neither the U. S. Government, the University of California, nor the
+// Advanced Computing Laboratory makes any warranty, either express or
+// implied, nor assumes any liability or responsibility for the use of
+// this SOFTWARE.
+//
+// If SOFTWARE is modified to produce derivative works, such modified
+// SOFTWARE should be clearly marked, so as not to confuse it with the
+// version available from Los Alamos National Laboratory.
+======================================================================*/
 #include "vtkWeightedRedistributePolyData.h"
 
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 
-#define NUM_CELL_TYPES 4
-
-//-------------------------------------------------------------------
+//----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.4");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.5");
 
-//-------------------------------------------------------------------
-
+//----------------------------------------------------------------------------
 vtkWeightedRedistributePolyData::vtkWeightedRedistributePolyData()
 {
   this->Weights= NULL;
 }
 
-//-------------------------------------------------------------------
-
+//----------------------------------------------------------------------------
 vtkWeightedRedistributePolyData::~vtkWeightedRedistributePolyData()
 {
-  delete [] Weights;
+  delete [] this->Weights;
 }
 
-//-------------------------------------------------------------------
-
-void vtkWeightedRedistributePolyData::PrintSelf
-  (ostream& os, vtkIndent indent)
+//----------------------------------------------------------------------------
+void vtkWeightedRedistributePolyData::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkRedistributePolyData::PrintSelf(os,indent);
+  this->vtkRedistributePolyData::PrintSelf(os,indent);
 }
 
 
 //*****************************************************************
-void vtkWeightedRedistributePolyData::SetWeights
-  ( const int startProc, const int stopProc, const float weight )
+void vtkWeightedRedistributePolyData::SetWeights( int startProc, int stopProc, float weight )
 {
   int myId, numProcs;
   if (!this->Controller)
@@ -92,21 +108,17 @@ void vtkWeightedRedistributePolyData::SetWeights
   numProcs = this->Controller->GetNumberOfProcesses();
   myId = this->Controller->GetLocalProcessId();
 
-  // ... Only set weights on processor 0 to avoid extra 
-  //  communication. ...
+  // ... Only set weights on processor 0 to avoid extra communication. ...
   if (myId == 0) 
-    {
+  {
     int np;
-    if (Weights == NULL) 
-      {
-      Weights = new float[numProcs];
-      for (np = 0;  np < numProcs; np++) { Weights[np] = 1.;}
-      }
-    for (np = startProc;  np <= stopProc; np++) 
-      { 
-      Weights[np] = weight;
-      }
+    if (this->Weights == NULL) 
+    {
+      this->Weights = new float[numProcs];
+      for (np = 0;  np < numProcs; np++) this->Weights[np] = 1.;
     }
+    for (np = startProc;  np <= stopProc; np++) { this->Weights[np] = weight; }
+  }
 }
 
 //*****************************************************************
@@ -122,27 +134,11 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
   // get total number of polys and figure out how many each processor should have
 
   vtkPolyData *input = this->GetInput();
+  vtkCellArray *polys = input->GetPolys();
+  vtkIdType numLocalCells = polys->GetNumberOfCells(); 
 
-  int type;
-  vtkCellArray* inputCellArrays[NUM_CELL_TYPES];
-  inputCellArrays[0] = input->GetVerts();
-  inputCellArrays[1] = input->GetLines();
-  inputCellArrays[2] = input->GetPolys();
-  inputCellArrays[3] = input->GetStrips();
-
-  
-  vtkIdType numLocalCells[NUM_CELL_TYPES];
-  for (type=0; type<NUM_CELL_TYPES; type++)
-    {
-    if (inputCellArrays[type])
-      {
-      numLocalCells[type] = inputCellArrays[type]->GetNumberOfCells(); 
-      }
-    else
-      {
-      numLocalCells[type] = 0;
-      }
-    }
+  //int avgCells = 0;
+  vtkIdType leftovers = 0;
 
   int i;
   int myId, numProcs;
@@ -157,131 +153,73 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
   int id;
   if (myId == 0)
     {
-    if (Weights == NULL) 
+    if (this->Weights == NULL) 
       {
-      // ... no weights have been set so this is a uniform balance 
-      //  case ...
-      Weights = new float[numProcs];
-      for (id = 0;  id < numProcs; id++) {Weights[id] = 1./ numProcs;}
+      // ... no weights have been set so this is a uniform balance case ...
+      this->Weights = new float[numProcs];
+      for (id = 0;  id < numProcs; id++) { this->Weights[id] = 1./ numProcs; }
       }
     else
       {
       // ... weights have been set so normalize to add to 1. ...
       float weight_sum = 0.;
-      for (id=0; id<numProcs; id++) {weight_sum += Weights[id];}
+      for (id=0; id<numProcs; id++) { weight_sum += this->Weights[id]; }
 
       float weight_scale = 0.;
       if (weight_sum>0) weight_scale = 1. / weight_sum;
-      for (id=0; id<numProcs; id++) {Weights[id] *= weight_scale;}
+      for (id=0; id<numProcs; id++) { this->Weights[id] *= weight_scale; }
       }
     }
 
   vtkCommSched* remoteSched = new vtkCommSched[numProcs];
 
-  vtkIdType totalCells[NUM_CELL_TYPES];
-  vtkIdType numRemoteCells[NUM_CELL_TYPES];
-  vtkIdType* goalNumCells[NUM_CELL_TYPES];
-  vtkIdType leftovers[NUM_CELL_TYPES];
-  int numProcZero[NUM_CELL_TYPES];
-  for (type=0; type<NUM_CELL_TYPES; type++) numProcZero[type] = 0;
+  vtkIdType totalCells;
+  vtkIdType numRemoteCells=0;
+  vtkIdType* goalNumCells=0;
+  int numProcZero = 0;
   if (myId!=0)
     {
-    this->Controller->Send((vtkIdType*)(numLocalCells), 
-                           NUM_CELL_TYPES, 0, NUM_LOC_CELLS_TAG); 
+    this->Controller->
+      Send((vtkIdType*)(&numLocalCells), 1, 0, NUM_LOC_CELLS_TAG); 
     } 
   else
     {
-    remoteSched[0].NumberOfCells = new vtkIdType[NUM_CELL_TYPES];
-    for (type=0; type<NUM_CELL_TYPES; type++)
+    totalCells = numLocalCells;
+    remoteSched[0].NumberOfCells = numLocalCells;
+    for (id = 1; id < numProcs; id++)
       {
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-      totalCells[type] = numLocalCells[type];
-      remoteSched[0].NumberOfCells[type] = numLocalCells[type];
-=======
       this->Controller->Receive((vtkIdType*)(&numRemoteCells), 1, id,
                                 NUM_LOC_CELLS_TAG);
       totalCells += numRemoteCells;
       remoteSched[id].NumberOfCells = numRemoteCells;
->>>>>>> 1.3
       }
-    for (id = 1; id < numProcs; id++)
+    goalNumCells = new vtkIdType [numProcs]; 
+    for (id = 0; id < numProcs; id++) 
       {
-      this->Controller->Receive((vtkIdType*)(&numRemoteCells), 
-                                NUM_CELL_TYPES, id, 
-                                NUM_LOC_CELLS_TAG);
-      remoteSched[id].NumberOfCells = new vtkIdType[NUM_CELL_TYPES];
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        {
-        totalCells[type] += numRemoteCells[type];
-        remoteSched[id].NumberOfCells[type] = numRemoteCells[type];
-        }
+      goalNumCells[id] = static_cast<vtkIdType>(totalCells * this->Weights[id]);
+      if (goalNumCells[id]==0) { numProcZero++; }
       }
 
-  
-    for (type=0; type<NUM_CELL_TYPES; type++) 
-      {
-      goalNumCells[type] = new vtkIdType [numProcs]; 
-      for (id = 0; id < numProcs; id++) 
-        {
-        goalNumCells[type][id] = totalCells[type] * Weights[id];
-        if (goalNumCells[type][id]==0) { numProcZero[type]++;}
-        }
-      }
-
-    for (type=0; type<NUM_CELL_TYPES; type++)
-      {
-      leftovers[type] = 0;
-      vtkIdType sumCells = 0;
-      for (id = 0; id < numProcs; id++) 
-        {
-        sumCells += goalNumCells[type][id];
-        }
-      leftovers[type] = totalCells[type] - sumCells;
-      }
+    vtkIdType sumCells = 0;
+    for (id = 0; id < numProcs; id++) { sumCells += goalNumCells[id]; }
+    leftovers = totalCells - sumCells;
     }
 
-  // ... order processors to minimize the number of sends (replace 
-  //  with more efficient sort later) ... 
-  int schedLen1;
-  int schedLen2;
+  // ... order processors to minimize the number of sends (replace with more 
+  //   efficient sort later) ... 
+  int schedLen1=0;
+  int schedLen2=0;
   int* schedArray1;
   vtkIdType* schedArray2;
 
   int temp;
   if (myId==0)
     {
-    for (id = 0; id < numProcs; id++) {remoteSched[id].SendCount = 0;}
-
-    // ... create temporary variable that will be stored in the
-    //  remoteSchedules after reordering and compiling all types ...
-    int* rsCntSend[NUM_CELL_TYPES];
-    int** rsSendTo[NUM_CELL_TYPES];
-    vtkIdType** rsSendNum[NUM_CELL_TYPES];
-
-    int *sendToTemp;
-    vtkIdType *sendNumTemp;
-
-    int *order;
+    int *order = new int[numProcs];
     int id2;
-    for (type=0; type<NUM_CELL_TYPES; type++)
+    for (id = 0; id < numProcs; id++) order[id] = id;
+    for (id = 0; id < numProcs; id++)
       {
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-      order = new int[numProcs];
-      for (id = 0; id < numProcs; id++) {order[id] = id;}
-      for (id = 0; id < numProcs; id++)
-        {
-        for (id2 = id+1; id2 < numProcs; id2++)
-          {
-          if ((remoteSched[order[id]].NumberOfCells[type] - 
-               goalNumCells[type][order[id]]) < 
-              (remoteSched[order[id2]].NumberOfCells[type] - 
-               goalNumCells[type][order[id2]]))
-            {
-            temp = order[id];
-            order[id] = order[id2];
-            order[id2] = temp;
-            }
-=======
       for (id2 = id+1; id2 < numProcs; id2++)
         {
         //if (remoteSched[order[id]].numCells < remoteSched[order[id2]].numCells)
@@ -291,45 +229,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
           temp = order[id];
           order[id] = order[id2];
           order[id2] = temp;
->>>>>>> 1.3
           }
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-        }
-    
-      // now figure out what processors to send cells between
-      sendToTemp  = new int[numProcs];
-      sendNumTemp = new vtkIdType[numProcs];
-
-      vtkIdType numToSend, numToReceive;
-
-      int start = 0;
-      int last = numProcs-1;
-      int cnt = 0;
-
-      int recflag = 0; // turn on if receive should get extra 
-                       // leftover cell, without flag this gets lost
-
-      rsCntSend[type] = new int[numProcs];
-      rsSendTo[type] = new int*[numProcs];
-      rsSendNum[type] = new vtkIdType*[numProcs];
-
-      for (id = 0; id < numProcs; id++) { rsCntSend[type][id] = 0;}
-
-      while (start<last)
-        {
-        int ostart = order[start];
-        int olast = order[last];
-
-        numToSend = remoteSched[ostart].NumberOfCells[type]-
-          goalNumCells[type][ostart];
-
-        // put in special test for when weights are exactly 0 
-        // to make sure all points are removed
-        if ((leftovers[type])>0 && (goalNumCells[type][ostart]!=0))
-          {
-          numToSend--;
-          leftovers[type]--;
-=======
         }
       }
     // now figure out what processors to send cells between
@@ -368,156 +268,21 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         if (start == last) 
           {
           vtkErrorMacro("error: start =last");
->>>>>>> 1.3
           }
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-        cnt = 0;
-        while (numToSend>0)
-          {
-          if (start == last) cerr<<"error: start =last"<<endl;
-          numToReceive = goalNumCells[type][olast]-
-            remoteSched[olast].NumberOfCells[type];
-          if (leftovers[type]>=(last-start-numProcZero[type]) || 
-              (recflag==1))
-            {
-            // ... receiving processors are going to get some of 
-            //  the leftover cells too ...
-            numToReceive++;
-            if (!recflag) {leftovers[type]--;}  // if flag, this 
-                                                // has already been
-                                                // subtracted
-            recflag = 1;  
-            }
-          if (numToSend >= numToReceive)
-            {
-            sendToTemp[cnt] = olast;
-            sendNumTemp[cnt++] = numToReceive;
-            numToSend -= numToReceive;
-            remoteSched[ostart].NumberOfCells[type] -= numToReceive;
-            remoteSched[olast].NumberOfCells[type]  += numToReceive;
-            last--;
-            recflag = 0; // extra leftover point will have been 
-                         // used
-            }
-          else
-            {
-            sendToTemp[cnt] = olast;
-            sendNumTemp[cnt++] = numToSend;
-            remoteSched[ostart].NumberOfCells[type] -= numToSend;
-            remoteSched[olast].NumberOfCells[type]  += numToSend;
-            numToSend = 0;
-            }
-        } // end while (numToSend>0)
-        rsCntSend[type][ostart] = cnt;
-        rsSendTo[type][ostart]  = new int[cnt];
-        rsSendNum[type][ostart] = new vtkIdType[cnt];
-        for (int i=0; i<cnt;i++)
-=======
         //numToReceive = avgCells-remoteSched[order[last]].numCells;
         numToReceive = goalNumCells[order[last]]-
           remoteSched[order[last]].NumberOfCells;
         if (leftovers>=(last-start-numProcZero) || (recflag==1))
->>>>>>> 1.3
           {
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-          rsSendTo[type][ostart][i]  = sendToTemp[i];
-          rsSendNum[type][ostart][i] = sendNumTemp[i];
-=======
           // ... receiving processors are going to get some of the 
           //   leftover cells too ...
           numToReceive++;
           if (!recflag) leftovers--;  // if flag, this has already been
           // subtracted
           recflag = 1;  
->>>>>>> 1.3
           }
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-        start++;
-        } // end while start<last loop 
-      } // end loop over type
-
-
-    // ... combine results for all types ...
-
-    for (id=0; id<numProcs; id++)
-      {
-      // ... the number of processors sent to must be less than 
-      //  the sum over all types ...
-      int maxCntSend = 0;
-      for (type=0; type<NUM_CELL_TYPES; type++) 
-        {
-        maxCntSend+=rsCntSend[type][id];
-        }
-      int* tempSend = new int[maxCntSend];
-      int j;
-
-      int currSendCnt = 0;
-
-      // ... now add other processors being sent by other types ..
-
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        {
-        for (i=0; i<rsCntSend[type][id]; i++)
-          {
-          int alreadyInList = 0; 
-          for (j=0; j<currSendCnt; j++)
-            {
-            if (rsSendTo[type][id][i]== tempSend[j])
-              {
-              alreadyInList = 1; 
-              break;
-              }
-            }
-          if (!alreadyInList)
-            {
-            tempSend[currSendCnt] = rsSendTo[type][id][i];
-            currSendCnt++;
-            } // end !already in list
-          } // end loop over rsCntSend
-        } // end loop over type
-      remoteSched[id].SendCount = currSendCnt;
-      remoteSched[id].SendTo = new int[currSendCnt];
-      remoteSched[id].SendNumber = new vtkIdType*[NUM_CELL_TYPES];
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        {
-        remoteSched[id].SendNumber[type] = new int[currSendCnt];
-        }
-
-      for (i=0; i<currSendCnt; i++)
-        {
-        remoteSched[id].SendTo[i] = tempSend[i];
-      
-        for (type=0; type<NUM_CELL_TYPES; type++)
-=======
         if (numToSend >= numToReceive)
->>>>>>> 1.3
           {
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-          // ... initialize to zero in case this type doesn't
-          //  send any cells ...
-          remoteSched[id].SendNumber[type][i] = 0;
-
-          // ... now loop through all processors sent to
-          //  by this type and if one is the same as the
-          //  current one being sent to, change the number sent ...
-
-          for (j=0; j<rsCntSend[type][id]; j++)
-            {
-            if (rsSendTo[type][id][j] == tempSend[i])
-              {
-              remoteSched[id].SendNumber[type][i] = 
-                rsSendNum[type][id][j];
-          
-              }
-            }
-          } // end loop over type
-        } // end loop over number of processors processors sent to
-
-      // ... clean up ...
-      delete [] tempSend;
-      } // end loop over procs
-
-=======
           sendToTemp[cnt] = order[last];
           sendNumTemp[cnt++] = numToReceive;
           numToSend -= numToReceive;
@@ -546,9 +311,8 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         }
       start++;
       }
->>>>>>> 1.3
 
-    for (id = 0; id < numProcs; id++) { remoteSched[id].ReceiveCount = 0;} 
+    for (id = 0; id < numProcs; id++) { remoteSched[id].ReceiveCount = 0; }
 
     // ... count up how processors a processor will be receiving from ...
     for (id = 0; id < numProcs; id++) 
@@ -560,51 +324,24 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
         }
       }
 
-    // ... allocate memory to store the processor to receive from 
-    //  and how many to receive ...
+    // ... allocate memory to store the processor to receive from and how 
+    //   many to receive ...
     for (id = 0; id < numProcs; id++) 
       {
       remoteSched[id].ReceiveFrom = 
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-        new int [remoteSched[id].ReceiveCount]; 
-      remoteSched[id].ReceiveNumber= new vtkIdType* [NUM_CELL_TYPES]; 
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        {
-        remoteSched[id].ReceiveNumber[type]  = 
-          new vtkIdType [remoteSched[id].ReceiveCount]; 
-        }
-=======
         new int [remoteSched[id].ReceiveCount]; 
       remoteSched[id].ReceiveNumber = 
         new vtkIdType [remoteSched[id].ReceiveCount]; 
->>>>>>> 1.3
       }
 
-    // ... reinitialize the count so records are stored in the 
-    //  correct place ...
-    for (id = 0; id < numProcs; id++) 
-      {
-      remoteSched[id].ReceiveCount = 0;
-      } 
+    // ... reinitialize the count so records are stored in the correct place ...
+    for (id = 0; id < numProcs; id++) { remoteSched[id].ReceiveCount = 0; }
 
-    // ... store which processors will be received from and how 
-    //   many cells will be received ...
+    // ... store which processors will be received from and how many cells 
+    //   will be received ...
     for (id = 0; id < numProcs; id++) 
       {
       for (i=0;i<remoteSched[id].SendCount;i++) 
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-        {
-        int recId = remoteSched[id].SendTo[i];
-        int remCntRec = remoteSched[recId].ReceiveCount;
-        remoteSched[recId].ReceiveFrom[remCntRec] = id; 
-        for (type=0; type<NUM_CELL_TYPES; type++)
-          {
-          remoteSched[recId].ReceiveNumber[type][remCntRec]  
-            = remoteSched[id].SendNumber[type][i]; 
-          }
-        remoteSched[recId].ReceiveCount++;
-        }
-=======
         {
         int recId = remoteSched[id].SendTo[i];
         int remCntRec = remoteSched[recId].ReceiveCount;
@@ -613,69 +350,37 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
           remoteSched[id].SendNumber[i]; 
         remoteSched[recId].ReceiveCount++;
         }
->>>>>>> 1.3
       }
 
+    // ... now send the schedule as an array of ints (all rec are ints so 
+    //     this is okay) ...
+    // ... not any more! ...
     for (id = 1; id < numProcs; id++)
       {
       // ... number of ints ...
-      schedLen1 = 2 + remoteSched[id].SendCount + 
-         remoteSched[id].ReceiveCount;
+      schedLen1 = 2 + remoteSched[id].SendCount + remoteSched[id].ReceiveCount;
 
       // ... number of vtkIdTypes ...
-      schedLen2 = NUM_CELL_TYPES*(1 + remoteSched[id].SendCount + 
-         remoteSched[id].ReceiveCount);
+      schedLen2 = 1 + remoteSched[id].SendCount + remoteSched[id].ReceiveCount;
 
       schedArray1 = new int [schedLen1];
       schedArray2 = new vtkIdType [schedLen2];
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        schedArray2[type] = remoteSched[id].NumberOfCells[type];
+      schedArray2[0] = remoteSched[id].NumberOfCells;
       schedArray1[0] = remoteSched[id].SendCount;
       schedArray1[1] = remoteSched[id].ReceiveCount;
       int arraycnt1 = 2;
-      int arraycnt2 = NUM_CELL_TYPES;
+      int arraycnt2 = 1;
       if (remoteSched[id].SendCount > 0)
         {
         for (i=0;i<remoteSched[id].SendCount;i++) 
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-          {
-           schedArray1[arraycnt1++] = remoteSched[id].SendTo[i];
-           for (type=0; type<NUM_CELL_TYPES; type++)
-             {
-             schedArray2[arraycnt2++] = 
-               remoteSched[id].SendNumber[type][i];
-             }
-          }
-        }
-=======
           {
           schedArray1[arraycnt1++] = remoteSched[id].SendTo[i];
           schedArray2[arraycnt2++] = remoteSched[id].SendNumber[i];
           }
         }
->>>>>>> 1.3
       if (remoteSched[id].ReceiveCount > 0)
         {
         for (i=0;i<remoteSched[id].ReceiveCount;i++) 
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-          {
-           schedArray1[arraycnt1++] = remoteSched[id].ReceiveFrom[i];
-           for (type=0; type<NUM_CELL_TYPES; type++)
-             {
-             schedArray2[arraycnt2++] = 
-               remoteSched[id].ReceiveNumber[type][i];
-             }
-          }
-        }
-      this->Controller->Send((int*)(&schedLen1), 1, id, 
-                             SCHED_LEN_1_TAG); 
-      this->Controller->Send((int*)(&schedLen2), 1, id, 
-                             SCHED_LEN_2_TAG); 
-      this->Controller->Send((int*)schedArray1, schedLen1, id, 
-                             SCHED_1_TAG); 
-      this->Controller->Send((vtkIdType*)schedArray2, schedLen2, 
-                             id, SCHED_2_TAG); 
-=======
           {
           schedArray1[arraycnt1++] = remoteSched[id].ReceiveFrom[i];
           schedArray2[arraycnt2++] = remoteSched[id].ReceiveNumber[i];
@@ -685,131 +390,70 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
       this->Controller->Send((int*)(&schedLen2), 1, id, SCHED_LEN_2_TAG); 
       this->Controller->Send((int*)schedArray1, schedLen1, id, SCHED_1_TAG); 
       this->Controller->Send((vtkIdType*)schedArray2, schedLen2, id, SCHED_2_TAG); 
->>>>>>> 1.3
       delete [] schedArray1;
       delete [] schedArray2;
       } 
 
     // ... initialize the local schedule to return ...
-    for (type=0; type<NUM_CELL_TYPES; type++)
-      {
-      localSched->NumberOfCells[type] = 
-        remoteSched[0].NumberOfCells[type];
-      }
+    localSched->NumberOfCells = remoteSched[0].NumberOfCells;
     localSched->SendCount  = remoteSched[0].SendCount;
     localSched->ReceiveCount   = remoteSched[0].ReceiveCount;
     localSched->SendTo   = new int [localSched->SendCount];
     localSched->ReceiveFrom  = new int [localSched->ReceiveCount];
-    localSched->SendNumber  = new vtkIdType* [NUM_CELL_TYPES];
-    localSched->ReceiveNumber   = new vtkIdType* [NUM_CELL_TYPES];
-    for (type=0; type<NUM_CELL_TYPES; type++)
-      {
-      localSched->SendNumber[type]  = 
-        new vtkIdType [localSched->SendCount];
-      localSched->ReceiveNumber[type]   = 
-        new vtkIdType [localSched->ReceiveCount];
-      }
+    localSched->SendNumber  = new vtkIdType [localSched->SendCount];
+    localSched->ReceiveNumber   = new vtkIdType [localSched->ReceiveCount];
     for (i=0;i<localSched->SendCount; i++)
       {
       localSched->SendTo[i]  = remoteSched[0].SendTo[i];
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        {
-        localSched->SendNumber[type][i] = 
-          remoteSched[0].SendNumber[type][i];
-        }
+      localSched->SendNumber[i] = remoteSched[0].SendNumber[i];
       }
     for (i=0;i<localSched->ReceiveCount; i++)
       {
       localSched->ReceiveFrom[i] = remoteSched[0].ReceiveFrom[i];
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        {
-        localSched->ReceiveNumber[type][i]  = 
-          remoteSched[0].ReceiveNumber[type][i];
-        }
+      localSched->ReceiveNumber[i]  = remoteSched[0].ReceiveNumber[i];
       }
 
     delete [] order;
     delete [] sendToTemp;
     delete [] sendNumTemp;
-    for (type=0; type<NUM_CELL_TYPES; type++) 
-      {
-      delete [] goalNumCells[type];
-      }
+    delete [] goalNumCells;
     }
   else
     {
     // myId != 0
-    int schedLen1;
-    int schedLen2;
-    this->Controller->Receive((int*)(&schedLen1), 1, 0, 
-      SCHED_LEN_1_TAG); 
-    this->Controller->Receive((int*)(&schedLen2), 1, 0, 
-      SCHED_LEN_2_TAG); 
+    //schedLen1;
+    //schedLen2;
+    this->Controller->Receive((int*)(&schedLen1), 1, 0, SCHED_LEN_1_TAG); 
+    this->Controller->Receive((int*)(&schedLen2), 1, 0, SCHED_LEN_2_TAG); 
     schedArray1       = new int [schedLen1];
     schedArray2 = new vtkIdType [schedLen2];
-    this->Controller->Receive(schedArray1, schedLen1, 0, 
-      SCHED_1_TAG); 
-    this->Controller->Receive(schedArray2, schedLen2, 0, 
-      SCHED_2_TAG); 
+    this->Controller->Receive(schedArray1, schedLen1, 0, SCHED_1_TAG); 
+    this->Controller->Receive(schedArray2, schedLen2, 0, SCHED_2_TAG); 
 
-    for (type=0; type<NUM_CELL_TYPES; type++)
-      {
-      localSched->NumberOfCells[type] = schedArray2[type];
-      }
+    localSched->NumberOfCells = schedArray2[0];
     localSched->SendCount  = schedArray1[0];
     localSched->ReceiveCount   = schedArray1[1];
     int arraycnt1 = 2;
-    int arraycnt2 = NUM_CELL_TYPES;
+    int arraycnt2 = 1;
     if (localSched->SendCount > 0)
       {
       localSched->SendTo  = new int [localSched->SendCount];
-      localSched->SendNumber = new vtkIdType*[NUM_CELL_TYPES];
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        {
-        localSched->SendNumber[type] = 
-          new vtkIdType [localSched->SendCount];
-        }
+      localSched->SendNumber = new vtkIdType [localSched->SendCount];
       for (i=0;i<localSched->SendCount;i++) 
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-        {
-        localSched->SendTo[i]  = schedArray1[arraycnt1++];
-        for (type=0; type<NUM_CELL_TYPES; type++)
-          {
-          localSched->SendNumber[type][i] = schedArray2[arraycnt2++];
-          }
-        }
-=======
         {
         localSched->SendTo[i]  = schedArray1[arraycnt1++];
         localSched->SendNumber[i] = schedArray2[arraycnt2++];
         }
->>>>>>> 1.3
       }
     if (localSched->ReceiveCount > 0)
       {
       localSched->ReceiveFrom = new int [localSched->ReceiveCount];
-      localSched->ReceiveNumber  = new vtkIdType*[NUM_CELL_TYPES];
-      for (type=0; type<NUM_CELL_TYPES; type++)
-        {
-        localSched->ReceiveNumber[type]  = 
-          new vtkIdType [localSched->ReceiveCount];
-        }
+      localSched->ReceiveNumber  = new vtkIdType [localSched->ReceiveCount];
       for (i=0;i<localSched->ReceiveCount;i++) 
-<<<<<<< vtkWeightedRedistributePolyData.cxx
-        {
-        localSched->ReceiveFrom[i] = schedArray1[arraycnt1++]; 
-        for (type=0; type<NUM_CELL_TYPES; type++)
-          {
-          localSched->ReceiveNumber[type][i]  = 
-            schedArray2[arraycnt2++];
-          }
-        }
-=======
         {
         localSched->ReceiveFrom[i] = schedArray1[arraycnt1++]; 
         localSched->ReceiveNumber[i]  = schedArray2[arraycnt2++];
         }
->>>>>>> 1.3
       }
     delete [] schedArray1;
     delete [] schedArray2;
