@@ -122,8 +122,8 @@ void vtkKWFlyInteractor::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                 this->Label->GetWidgetName());
   
   this->SpeedSlider->Create(app,"-resolution 0.1 -orient horizontal -bd 2");
-  this->SpeedSlider->SetRange(0, 5);
-  this->SpeedSlider->SetValue(2.0);    
+  this->SpeedSlider->SetRange(0, 50);
+  this->SpeedSlider->SetValue(20.0);    
   this->SpeedSlider->SetBalloonHelpString("Change the flying speed");
   this->Script( "pack %s -side left -expand 0 -fill none",
                 this->SpeedSlider->GetWidgetName());
@@ -163,7 +163,7 @@ void vtkKWFlyInteractor::Deselect()
 //----------------------------------------------------------------------------
 void vtkKWFlyInteractor::AButtonPress(int num, int x, int y)
 {
-  float speed = this->SpeedSlider->GetValue();
+  float speed = static_cast<float>(this->SpeedSlider->GetValue())/10;
   int xmin, ymin;
   double *range;
   const char *renWidgetName = this->RenderView->GetVTKWidget()->GetWidgetName();
