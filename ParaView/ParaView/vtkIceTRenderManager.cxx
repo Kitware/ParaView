@@ -45,7 +45,7 @@ const int ICET_INFO_SIZE = sizeof(struct IceTInformation)/sizeof(int);
 // vtkIceTRenderManager implementation.
 //******************************************************************
 
-vtkCxxRevisionMacro(vtkIceTRenderManager, "1.9");
+vtkCxxRevisionMacro(vtkIceTRenderManager, "1.10");
 vtkStandardNewMacro(vtkIceTRenderManager);
 
 vtkCxxSetObjectMacro(vtkIceTRenderManager, SortingKdTree, vtkPKdTree);
@@ -526,23 +526,29 @@ void vtkIceTRenderManager::ReceiveWindowInformation()
 void vtkIceTRenderManager::PreRenderProcessing()
 {
   vtkDebugMacro("PreRenderProcessing");
+  vtkCamera* cam;
+  vtkRenderWindow* renWin = this->RenderWindow;
+  vtkRendererCollection *rens = renWin->GetRenderers();
+  vtkRenderer* ren;
+  int i;
 
+  rens->InitTraversal();
+  ren = rens->GetNextItem();
+  if (ren == NULL)
+    {
+    vtkErrorMacro("Missing renderer.");
+    return;
+    }
+  cam = ren->GetActiveCamera();
+  if (cam == NULL)
+    {
+    vtkErrorMacro("Missing camera.");
+    return;
+    }
+  
   // Code taken from my tile display module.
   if (!this->UseCompositing)
     {
-    vtkCamera* cam;
-    vtkRenderWindow* renWin = this->RenderWindow;
-    vtkRendererCollection *rens;
-    vtkRenderer* ren;
-
-    rens = renWin->GetRenderers();
-    rens->InitTraversal();
-    ren = rens->GetNextItem();
-    if (ren)
-      {
-      cam = ren->GetActiveCamera();
-      }
-
     int x, y;
     int tileIdx = this->Controller->GetLocalProcessId();
     y = tileIdx/this->NumTilesX;
@@ -554,13 +560,12 @@ void vtkIceTRenderManager::PreRenderProcessing()
 
     return;
     }
-
+  else
+    {
+    cam->SetWindowCenter(0.0, 0.0);
+    }
 
   this->UpdateIceTContext();
-
-  vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
-  vtkRenderer *ren;
-  int i;
   for (rens->InitTraversal(), i = 0; (ren = rens->GetNextItem()); i++)
     {
     vtkIceTRenderer *icetRen = vtkIceTRenderer::SafeDownCast(ren);
@@ -612,20 +617,7 @@ void vtkIceTRenderManager::PostRenderProcessing()
   // Try to put the camera back the way it was.
   if (!this->UseCompositing)
     {
-    vtkCamera* cam;
-    vtkRenderWindow* renWin = this->RenderWindow;
-    vtkRendererCollection *rens;
-    vtkRenderer* ren;
-
-    rens = renWin->GetRenderers();
-    rens->InitTraversal();
-    ren = rens->GetNextItem();
-    if (ren)
-      {
-      cam = ren->GetActiveCamera();
-      cam->SetWindowCenter(0.0, 0.0);
-      return;
-      }
+    return;
     }
   
   this->Controller->Barrier();
