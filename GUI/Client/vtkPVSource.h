@@ -169,6 +169,11 @@ public:
   // particular source.
   virtual void SetName(const char *name);
   char* GetName();
+
+  //Description:
+  //Overrides the AutoAccept. Very usefull for class like vtkArrayCalculator
+  vtkSetMacro(OverideAutoAccept,int);
+  vtkGetMacro(OverideAutoAccept,int);
     
   // Description:
   // The (short) label that can be used to give a more descriptive
@@ -548,6 +553,7 @@ protected:
   char      *Label;
   char      *ShortHelp;
   char      *LongHelp;
+  int       OverideAutoAccept;
 
   // This is the module name.
   char      *ModuleName;

@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSourceNotebook);
-vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.6");
+vtkCxxRevisionMacro(vtkPVSourceNotebook, "1.6.2.1");
 
 //----------------------------------------------------------------------------
 int vtkPVSourceNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -410,7 +410,7 @@ void vtkPVSourceNotebook::SetAutoAccept(int val)
     {
     this->AcceptButton->SetLabel("Auto Accept");
     // Just in case the source is already modified.
-    this->AcceptButtonCallback();
+    this->SetAcceptButtonColorToModified();
     }
   else
     {
@@ -455,18 +455,25 @@ void vtkPVSourceNotebook::SetAcceptButtonColorToModified()
     {
     return;
     }
-  this->AcceptButtonRed = 1;
-  if (this->AutoAccept == 1)
+  if( this->PVSource ) // only accept if there is a source
     {
-    this->EventuallyAccept();
-    return;
+    this->AcceptButtonRed = 1;
     }
-  if (this->AutoAccept == 2)
+  if ( this->PVSource 
+   && !this->PVSource->GetOverideAutoAccept())
     {
-    this->AcceptButtonCallback();
-    return;
+    if (this->AutoAccept == 1)
+      {
+      this->EventuallyAccept();
+      return;
+      }
+    if (this->AutoAccept == 2)
+      {
+      this->AcceptButtonCallback();
+      return;
+      }
     }
-    
+
   if ( this->GetPVApplication()->GetMainWindow()->GetInDemo() )
     {
     return;
@@ -611,9 +618,6 @@ void vtkPVSourceNotebook::EventuallyAcceptCallBack()
   this->TimerToken = NULL;
   this->AcceptButtonCallback();
 }
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVSourceNotebook::PrintSelf(ostream& os, vtkIndent indent)
