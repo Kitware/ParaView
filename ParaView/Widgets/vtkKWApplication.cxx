@@ -69,7 +69,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.114");
+vtkCxxRevisionMacro(vtkKWApplication, "1.115");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -87,7 +87,8 @@ vtkKWApplication::vtkKWApplication()
   this->MinorVersion = 0;
   this->ApplicationVersionName = vtkString::Duplicate("Kitware10");
   this->ApplicationReleaseName = vtkString::Duplicate("unknown");
-  
+  this->ApplicationPath = NULL;
+
   this->InExit = 0;
   this->DialogUp = 0;
   this->TraceFile = NULL;
@@ -123,6 +124,8 @@ vtkKWApplication::vtkKWApplication()
     vtkErrorMacro("Interpreter not set. This probably means that Tcl was not initialized properly...");
     return;
     }
+
+  this->SetApplicationPath(this->Script("info nameofexecutable"));
 
   //vtkTclGetObjectFromPointer(this->MainInterp, (void *)this, 
   //                           vtkKWApplicationCommand);
@@ -191,6 +194,7 @@ vtkKWApplication::~vtkKWApplication()
   this->SetApplicationName(NULL);
   this->SetApplicationVersionName(NULL);
   this->SetApplicationReleaseName(NULL);
+  this->SetApplicationPath(NULL);
 
   if (this->TraceFile)
     {
@@ -353,72 +357,6 @@ const char* vtkKWApplication::SimpleScript(const char* script)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWApplication::SetApplicationName(const char *_arg)
-{
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ApplicationName to " << _arg ); 
-  if ( _arg && vtkString::Equals(this->ApplicationName,_arg) )
-    { 
-    return;
-    } 
-  if (this->ApplicationName) 
-    { 
-    delete [] this->ApplicationName; 
-    } 
-  if (_arg) 
-    { 
-    this->ApplicationName = vtkString::Duplicate(_arg);
-    } 
-   else 
-    { 
-    this->ApplicationName = NULL; 
-    } 
-  this->Modified(); 
-}
-
-void vtkKWApplication::SetApplicationVersionName(const char *_arg)
-{
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ApplicationVersionName to " << _arg ); 
-  if ( this->ApplicationVersionName && _arg && (!strcmp(this->ApplicationVersionName,_arg)))
-    { 
-    return;
-    } 
-  if (this->ApplicationVersionName) 
-    { 
-    delete [] this->ApplicationVersionName; 
-    } 
-  if (_arg) 
-    { 
-    this->ApplicationVersionName = vtkString::Duplicate(_arg);
-    } 
-   else 
-    { 
-    this->ApplicationVersionName = NULL; 
-    } 
-  this->Modified(); 
-}
-
-void vtkKWApplication::SetApplicationReleaseName(const char *_arg)
-{
-  vtkDebugMacro(<< this->GetClassName() << " (" << this << "): setting ApplicationReleaseName to " << _arg ); 
-  if ( this->ApplicationReleaseName && _arg && (!strcmp(this->ApplicationReleaseName,_arg)))
-    { 
-    return;
-    } 
-  if (this->ApplicationReleaseName) 
-    { 
-    delete [] this->ApplicationReleaseName; 
-    } 
-  if (_arg) 
-    { 
-    this->ApplicationReleaseName = vtkString::Duplicate(_arg);
-    } 
-   else 
-    { 
-    this->ApplicationReleaseName = NULL; 
-    } 
-  this->Modified(); 
-}
-
 void vtkKWApplication::Close(vtkKWWindow *win)
 {
   if ( this->Windows )
@@ -858,7 +796,9 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow* master)
     return;
     }
   ostrstream str;
-  str << "Application : " << this->GetApplicationName() << "\nVersion : " << this->GetApplicationVersionName() << "\nRelease : " << this->GetApplicationReleaseName() << ends;
+  str << "Application : " << this->GetApplicationName() 
+      << "\nVersion : " << this->GetApplicationVersionName() 
+      << "\nRelease : " << this->GetApplicationReleaseName() << ends;
 
   char* msg = str.str();
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();

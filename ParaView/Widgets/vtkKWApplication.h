@@ -75,7 +75,7 @@ public:
   virtual void Start(int argc, char *argv[]);
 
   // Description:
-  // class static method to initialize Tcl/Tk
+  // Initialize Tcl/Tk
   static Tcl_Interp *InitializeTcl(int argc, char *argv[]);
   
   // Description:
@@ -110,31 +110,34 @@ public:
   
   // Description:
   // Set/Get the ApplicationName
-  void SetApplicationName(const char *);
+  vtkSetStringMacro(ApplicationName);
   vtkGetStringMacro(ApplicationName);
 
   // Description:
-  // ParaView version is always MajorVersion.MinorVersion.
-  // Change these in the constructor.
+  // Set/Get the major and minor version.
   vtkGetMacro(MajorVersion, int);
   vtkGetMacro(MinorVersion, int);
 
   // Description:
   // Set/Get the ApplicationVersionName - this is the name + version number
-  void SetApplicationVersionName(const char *);
+  vtkSetStringMacro(ApplicationVersionName);
   vtkGetStringMacro(ApplicationVersionName);
 
   // Description:
   // Set/Get the ApplicationReleaseName - this is the release of the 
   // application version, typically beta 1, beta 2, final, patch 1, patch 2
-  void SetApplicationReleaseName(const char *);
+  vtkSetStringMacro(ApplicationReleaseName);
   vtkGetStringMacro(ApplicationReleaseName);
+  
+  // Description:
+  // Get the full path to the current executable/application
+  vtkGetStringMacro(ApplicationPath);
   
   // Description:
   // Load script from a file. Resturn if script was successful.
   int LoadScript(const char* filename);
 
-//BTX
+  //BTX
   // Description:
   // A convienience method to invoke some tcl script code and
   // perform arguement substitution.
@@ -151,7 +154,7 @@ public:
   // pointer.
   const char* ScriptInternal(const char* format, va_list var_args1,
                              va_list var_args2);
-//ETX
+  //ETX
 
   // Description:
   // Test some of the features that cannot be tested from the tcl.
@@ -189,9 +192,9 @@ public:
   // This can be used to trace the application.
   // Look at vtkKWWidgets to see how it is used.
   ofstream *GetTraceFile() {return this->TraceFile;}
-//BTX
+  //BTX
   virtual void AddTraceEntry(const char* format, ...);
-//ETX
+  //ETX
   virtual int GetApplicationKey() {return -1;};
 
   // Description:
@@ -246,10 +249,10 @@ public:
   // When storing multiple arguments, separate with spaces.
   // If the level is lower than current registery level, operation 
   // will be successfull.
-//BTX
+  //BTX
   int SetRegisteryValue(int level, const char* subkey, const char* key, 
                         const char* format, ...);
-//ETX
+  //ETX
   int GetRegisteryValue(int level, const char* subkey, const char* key, 
                         char* value);
   int DeleteRegisteryValue(int level, const char* subkey, const char* key);
@@ -303,6 +306,9 @@ protected:
   char *ApplicationReleaseName;
   int MajorVersion;
   int MinorVersion;
+
+  vtkSetStringMacro(ApplicationPath);
+  char *ApplicationPath;
 
   int ApplicationExited;
 
