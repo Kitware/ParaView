@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.291");
+vtkCxxRevisionMacro(vtkPVSource, "1.292");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -284,6 +284,7 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
       "No Application. Create the source before setting the input.");
     return;
     }
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
   // Handle visibility of old and new input.
   if (this->ReplaceInput)
     {
@@ -326,8 +327,8 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
         }
       else
         {
-        pvApp->BroadcastScript("%s Add%s %s", sourceTclName, inputName,
-                               part->GetVTKDataTclName());
+        pm->ServerScript("%s Add%s %s", sourceTclName, inputName,
+                         part->GetVTKDataTclName());
         }      
       }
     else
@@ -339,8 +340,8 @@ void vtkPVSource::SetPVInput(int idx, vtkPVSource *pvs)
         }
       else
         {
-        pvApp->BroadcastScript("%s Set%s %s", sourceTclName, inputName,
-                               part->GetVTKDataTclName());
+        pm->ServerScript("%s Set%s %s", sourceTclName, inputName,
+                         part->GetVTKDataTclName());
         }
       }
     }
@@ -2612,7 +2613,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.291 $");
+  this->ExtractRevision(os,"$Revision: 1.292 $");
 }
 
 //----------------------------------------------------------------------------
