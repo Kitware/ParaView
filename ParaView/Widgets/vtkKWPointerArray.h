@@ -57,14 +57,11 @@ public:
   vtkTypeMacro(vtkKWPointerArray,vtkObject);
 
   // Description:
-  // Set and get the number of buckets.
-  // NOTE: when setting the number of buckets, the code is missing
-  // that will reorganize the hash elements in the buckets.
-  vtkSetMacro( ArraySize, unsigned int );
+  // Set and get the size real size of the array
   vtkGetMacro( ArraySize, unsigned int );
 
   // Description:
-  // Get the number of entries stored in the hash table
+  // Get the number of entries stored in the array
   vtkGetMacro( Size, unsigned int );
   
   // Description:
@@ -77,19 +74,13 @@ public:
   void *Lookup( unsigned long );
 
   // Description:
-  // Insert: Insert an item into the hash table
+  // Append: appends an item to the end of array
   // Return values:
-  // nonzero     The item was inserted successfully
-  // zero        The item could not be inserted. Either the function could
-  //             not allocate the amount of memory necessary to store it,
-  //             or the hash table already contains an item with the same
-  //             key, or the hash function returned an error.
-  // Note:
-  // If you know for sure that key values are in fact unique identifiers,
-  // that is, that the calling functions will never try to make the hash
-  // table contain two items with the same key at the same time, you can
-  // speed up the function considerably by deleting the first statement.
+  // nonzero     The item was appended successfully
+  // zero        The item could not be appended.
   int Append( void * );
+
+  int Prepend( void * );
 
   // Description:
   // Remove an item from the hash table
@@ -105,10 +96,18 @@ public:
   void Clean();
 
 private:
+  vtkSetMacro( ArraySize, unsigned int );
+
   vtkKWPointerArray();
   ~vtkKWPointerArray();
   vtkKWPointerArray(const vtkKWPointerArray&);  // Not implemented.
   void operator=(const vtkKWPointerArray&);  // Not implemented.
+
+  // Description:
+  // Make sure there is enough space for the array.
+  // If argument skip is one, the data will be shifted up
+  // by one.
+  int AllocateSpace(int skip);
 
   // Description:
   // Table of array elements

@@ -55,6 +55,123 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRegisteryUtilities.h"
 #endif
 #include "KitwareLogo.h"
+#include "vtkKWPointerArray.h"
+
+#define NUMBER_OF_RECENT_FILES 5
+
+class vtkKWWindowMenuEntry
+{
+public:
+  static vtkKWWindowMenuEntry *New() 
+    {return new vtkKWWindowMenuEntry;};
+
+  void Delete() {
+    this->UnRegister(); }
+  void Register() { this->ReferenceCount ++; }
+  void Register(vtkObject *) {
+    this->Register(); }
+  void UnRegister()
+    {
+      if (--this->ReferenceCount <= 0)
+	{
+	delete this;
+	}
+    }
+  void UnRegister(vtkObject *) {
+    this->UnRegister(); }
+  
+  int Same( const char *filename, vtkKWObject *target, 
+	    const char *command )
+    {
+      if ( !this->Command || !this->File || !filename || !command) 
+	{
+	return 0;
+	}
+      int res1 = strcmp(filename, this->File)==0;
+      int res2 = strcmp(command, this->Command)==0;
+      return res2;
+    }
+  int InsertToMenu(int pos, vtkKWMenu *menu);
+  void SetFile(const char *file)
+    {
+      if ( this->File )
+	{
+	free ( this->File );
+	this->File = 0;
+	}
+      if ( file )
+	{
+	this->File = strdup( file );
+	}
+    }
+  void SetCommand(const char *command)
+    {
+      if ( this->Command )
+	{
+	free ( this->Command );
+	this->Command = 0;
+	}
+      if ( command )
+	{
+	this->Command = strdup( command );
+	}
+    }
+  void SetTarget(vtkKWObject *target)
+    {
+      this->Target = target;
+    }
+  char *GetFile() { return this->File; }
+  char *GetCommand() { return this->Command; }
+  
+  static int TotalCount;
+
+private:
+  int ReferenceCount;
+
+  vtkKWWindowMenuEntry()
+    {
+      this->File    = 0;
+      this->Target  = 0;
+      this->Command = 0;
+      this->ReferenceCount = 1;
+      this->TotalCount ++;
+    }
+  ~vtkKWWindowMenuEntry();
+  char *File;
+  char *Command;
+  vtkKWObject *Target;  
+};
+
+int vtkKWWindowMenuEntry::TotalCount = 0;
+
+vtkKWWindowMenuEntry::~vtkKWWindowMenuEntry()
+{
+  if ( this->File )
+    {
+    free( this->File );
+    }
+  if ( this->Command )
+    {
+    free( this->Command );
+    }
+  this->TotalCount --;
+}
+
+int vtkKWWindowMenuEntry::InsertToMenu( int pos, vtkKWMenu *menu )
+{
+  if ( this->File && this->Target && this->Command )
+    {
+    char *file = strdup(this->File);
+    file[0] = pos + '0';
+    menu->InsertCommand( menu->GetIndex("Close") - 1, 
+			 file, this->Target, this->Command, 0 );
+    //cout << "Insert to menu: " << file << " (" << this->Command << ")"
+    //<< endl;
+    free( file );
+    return 1;
+    }
+  return 0;
+}
 
 //------------------------------------------------------------------------------
 vtkKWWindow* vtkKWWindow::New()
@@ -126,6 +243,7 @@ vtkKWWindow::vtkKWWindow()
   this->MenuWindow = NULL;
   this->MenuProperties = NULL;
   this->NumberOfMRUFiles = 0;
+  this->RealNumberOfMRUFiles = 0;
   this->PrintTargetDPI = 100;
 
   this->SupportHelp = 1;
@@ -134,10 +252,16 @@ vtkKWWindow::vtkKWWindow()
   this->SetWindowClass("KitwareWidget");
 
   this->PromptBeforeClose = 1;
+
+  this->RecentFiles = 0;
 }
 
 vtkKWWindow::~vtkKWWindow()
 {
+  if ( this->RecentFiles )
+    {
+    this->RecentFiles->Delete();
+    }
   this->Notebook->Delete();
   this->SetPropertiesParent(NULL);
   this->SetSelectedView(NULL);
@@ -453,7 +577,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->MenuFile->SetTearOff(0);
   this->MenuFile->Create(app,"");
   this->Menu->AddCascade("File", this->MenuFile, 0);
-  this->MenuFile->AddCommand("Load Script", this, "LoadScript");
+  this->MenuFile->AddCommand("Load Script", this, "LoadScript", 0);
 
   // add render quality setting
   this->PageMenu->SetTearOff(0);
@@ -463,19 +587,19 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
     this->PageMenu->CreateRadioButtonVariable(this,"PageSetup");
   // now add our own menu options 
   this->Script( "set %s 0", rbv );
-  this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint1");
-  this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint2");
-  this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint3");
+  this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint1", 0);
+  this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint2", 1);
+  this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint3", 0);
   delete [] rbv;
   // add the Print option
 
 #ifdef _WIN32
-  this->MenuFile->AddCascade("Page Setup", this->PageMenu,0);
+  this->MenuFile->AddCascade("Page Setup", this->PageMenu,8);
 #endif
 
   this->MenuFile->AddSeparator();
-  this->MenuFile->AddCommand("Close", this, "Close");
-  this->MenuFile->AddCommand("Exit", this, "Exit");
+  this->MenuFile->AddCommand("Close", this, "Close", 0);
+  this->MenuFile->AddCommand("Exit", this, "Exit", 1);
   // install the menu bar into this window
   this->InstallMenu(this->Menu);
   this->MenuHelp->SetTearOff(0);
@@ -484,14 +608,14 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
     {
     this->Menu->AddCascade("Help", this->MenuHelp, 0);
     }
-  this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp");
-  this->MenuHelp->AddCommand("About", this, "DisplayAbout");
+  this->MenuHelp->AddCommand("OnLine Help", this, "DisplayHelp", 0);
+  this->MenuHelp->AddCommand("About", this, "DisplayAbout", 0);
 
   rbv = 
     this->GetMenuProperties()->CreateRadioButtonVariable(
       this->GetMenuProperties(),"Radio");
-  this->GetMenuProperties()->AddRadioButton(0,"  Hide Properties", 
-                                            rbv, this, "HideProperties");
+  this->GetMenuProperties()->AddRadioButton(0," Hide Properties", 
+                                            rbv, this, "HideProperties", 1);
   delete [] rbv;
 }
 
@@ -682,21 +806,12 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
       if (strlen(File) > 1)
         {
         char *cmd = new char [strlen(Cmd) + strlen(File) + 10];
-        sprintf(cmd,"%s {%s}",Cmd, File);
-        if (strlen(File) > 40)
-          {
-          File[36] = '.';
-          File[37] = '.';
-          File[38] = '.';
-          File[39] = '\0';
-          }
-        this->GetMenuFile()->InsertCommand(
-          this->GetMenuFile()->GetIndex("Close") - 1,
-          File, target, cmd);
-        this->NumberOfMRUFiles++;
-        delete [] cmd;
+        sprintf(cmd,"%s {%s}", Cmd, File);
+	this->InsertRecentFileToMenu(File, target, cmd);
+	delete [] cmd;
         }    
       }
+    this->UpdateRecentMenu();
     }
   RegCloseKey(hKey);
   
@@ -748,13 +863,14 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
     
     // remove the old entry number 4
     vtkKWRegisteryUtilities::ReadAValue(hKey, File,"File4","");
+    /*
     if (strlen(File) > 1)
       {
       this->GetMenuFile()->DeleteMenuItem(
         this->GetMenuFile()->GetIndex("Close") - 2);
       this->NumberOfMRUFiles--;
       }
-    
+    */
     // move the other three down
     vtkKWRegisteryUtilities::ReadAValue(hKey, File,"File3","");
     vtkKWRegisteryUtilities::ReadAValue(hKey, Cmd,"File3Cmd","");
@@ -787,6 +903,11 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
       {
       char cmd[1024];
       sprintf(cmd,"%s {%s}",command, name);
+      //cout << "Insert: " << name << " - " << cmd  << endl;
+      this->InsertRecentFileToMenu(name, target, cmd);
+      this->UpdateRecentMenu();
+      /*
+      char *file = new char [strlen(File) + 3];
       if (strlen(name) > 40)
         {
         char *name2 = new char [strlen(name)+1];
@@ -804,9 +925,15 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
         this->GetMenuFile()->InsertCommand(
           this->GetFileMenuIndex()+2,name,target,cmd);
         }
+      */
       }
     else
       {
+      cout << "What is this" << endl;
+      cout << "?????????????????????????????????????????????????" << endl;
+      cout << "?????????????????????????????????????????????????" << endl;
+      cout << "?????????????????????????????????????????????????" << endl;
+      /*
       char cmd[1024];
       sprintf(cmd,"%s {%s}",command, name);
       if (strlen(name) > 40)
@@ -826,6 +953,7 @@ void vtkKWWindow::AddRecentFile(char *key, char *name,vtkKWObject *target,
         this->GetMenuFile()->InsertCommand(
           this->GetMenuFile()->GetIndex("Close")-1,name,target,cmd);
         }
+      */
       }
     }
   RegCloseKey(hKey);
@@ -848,7 +976,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.38 $");
+  this->ExtractRevision(os,"$Revision: 1.39 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -868,4 +996,139 @@ int vtkKWWindow::ExitDialog()
   delete[] ttl;
  
   return ret;
+}
+
+void vtkKWWindow::UpdateRecentMenu()
+{  
+  int cc;
+  for ( cc = 0; cc < this->RealNumberOfMRUFiles; cc ++ )
+    {
+    this->GetMenuFile()->DeleteMenuItem(
+      this->GetMenuFile()->GetIndex("Close") - 2);
+    }
+  this->RealNumberOfMRUFiles = 0;
+  if ( this->RecentFiles )
+    {
+    for ( cc = 0; cc<NUMBER_OF_RECENT_FILES; cc++ ) 
+      {
+      vtkKWWindowMenuEntry *kc;
+      if ( ( kc = (vtkKWWindowMenuEntry *)this->RecentFiles->Lookup(cc) ) )
+	{
+	kc->InsertToMenu(cc, this->GetMenuFile());
+	this->RealNumberOfMRUFiles ++;
+	}
+      }
+    }
+}
+
+void vtkKWWindow::InsertRecentFileToMenu(const char *filename, 
+					 vtkKWObject *target, 
+					 const char *command)
+{
+  //cout << "Insert: " << filename << endl;
+  this->PrintRecentFiles();
+  char *file = new char [strlen(filename) + 3];
+  if ( strlen(filename) <= 40 )
+    {
+    sprintf(file, "  %s", filename);
+    }
+  else
+    {
+    int ii;
+    int lastI, lastJ;
+    for(ii=0; ii<=15; ii++)
+      {
+      if ( filename[ii] == '/' )
+	{
+	lastI = ii;
+	}
+      }
+    for(ii=strlen(filename); ii>=(strlen(filename)-25); ii--)
+      {
+      if ( filename[ii] == '/' )
+	{
+	lastJ = ii;
+	}
+      }
+    char format[20];
+    sprintf(format, "  %%.%ds...%%s", lastI+1);
+    sprintf(file, format, filename, filename + lastJ);
+    }
+  //sprintf(file, "%d %.40s%s", i, filename, (strlen(filename)>40)?"...":"");
+
+  if ( !this->RecentFiles )
+    {
+    this->RecentFiles = vtkKWPointerArray::New();
+    }
+
+  //cout << "We have recent files: "
+  //     << this->RecentFiles << ", now let us put something in" << endl;
+  
+  // Find current one
+  vtkKWWindowMenuEntry *recent = 0;
+  vtkKWWindowMenuEntry *kc = 0;
+  int cc;
+  for ( cc = 0; cc < this->RecentFiles->GetSize(); cc ++ )
+    {
+    kc = (vtkKWWindowMenuEntry *)
+      this->RecentFiles->Lookup(cc);
+    if ( kc->Same( file, target, command ) )
+      {
+      recent = kc;
+      // delete it from array
+      //cout << "Delete from array: " << kc->GetFile() << endl;
+      this->RecentFiles->Remove(cc);
+      break;
+      }
+    }
+
+  if ( ! recent )
+    {
+    recent = vtkKWWindowMenuEntry::New();
+    recent->SetFile( file );
+    recent->SetTarget( target );
+    recent->SetCommand( command );
+    this->NumberOfMRUFiles++;
+   }
+
+  // prepend it to array  
+  this->RecentFiles->Prepend( recent );
+  while ( this->RecentFiles->GetSize() >= NUMBER_OF_RECENT_FILES )
+    {
+    if ( ( kc = (vtkKWWindowMenuEntry *)
+	   this->RecentFiles->Lookup(NUMBER_OF_RECENT_FILES-1) ) )
+      {
+      kc->Delete();
+      this->RecentFiles->Remove(NUMBER_OF_RECENT_FILES-1);
+      }
+    }
+
+  delete [] file;
+  this->PrintRecentFiles();
+  //cout << "---------------------------------------" << endl;
+}
+
+void vtkKWWindow::PrintRecentFiles()
+{
+  if ( !this->RecentFiles )
+    {
+    cout << "No recent files" << endl;
+    return;
+    }
+  
+  cout << "Recent files: " << endl;
+  int cc;
+  for( cc=0; cc< this->RecentFiles->GetSize(); cc ++ )
+    {
+    vtkKWWindowMenuEntry *kc;
+    kc = (vtkKWWindowMenuEntry *)this->RecentFiles->Lookup(cc);
+    if ( kc )
+      {
+      cout << " - " << kc->GetFile() << endl;      
+      }
+    else
+      {
+      cout << " -- null " << endl;
+      }
+    }
 }

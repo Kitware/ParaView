@@ -56,6 +56,7 @@ class vtkKWViewCollection;
 class vtkKWMenu;
 class vtkKWProgressGauge;
 class vtkKWView;
+class vtkKWPointerArray;
 
 class VTK_EXPORT vtkKWWindow : public vtkKWWidget
 {
@@ -190,12 +191,18 @@ protected:
   vtkKWWindow(const vtkKWWindow&) {};
   void operator=(const vtkKWWindow&) {};
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
+
+  void InsertRecentFileToMenu(const char *filename, 
+			      vtkKWObject *taret, 
+			      const char *command);
+  void UpdateRecentMenu();
   
   int ExitDialog();
 
   vtkKWNotebook *Notebook;
   virtual void CreateStatusImage();
   int NumberOfMRUFiles;
+  int RealNumberOfMRUFiles;
   vtkKWView *SelectedView;
   vtkKWViewCollection *Views;
   vtkKWMenu *Menu;
@@ -221,6 +228,10 @@ protected:
   int SupportHelp;
   char *WindowClass;
   int PromptBeforeClose;
+
+  vtkKWPointerArray *RecentFiles;
+
+  void PrintRecentFiles();
 };
 
 

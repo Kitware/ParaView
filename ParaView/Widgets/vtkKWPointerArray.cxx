@@ -107,24 +107,33 @@ vtkKWPointerArray::Lookup( unsigned long item )
   return this->Table[ item ];
 }
 
-// Description:
-// Insert: Insert an item into the hash table
-// Return values:
-// nonzero     The item was inserted successfully
-// zero        The item could not be inserted. Either the function could
-//             not allocate the amount of memory necessary to store it,
-//             or the hash table already contains an item with the same
-//             key, or the hash function returned an error.
-// Note:
-// If you know for sure that key values are in fact unique identifiers,
-// that is, that the calling functions will never try to make the hash
-// table contain two items with the same key at the same time, you can
-// speed up the function considerably by deleting the first statement.
 
+// Description:
+// Append: appends an item to the end of array
+// Return values:
+// nonzero     The item was appended successfully
+// zero        The item could not be appended.
 int
 vtkKWPointerArray::Append(void* data)
 {
-  if ( this->Size == this->ArraySize )
+  if ( !this->AllocateSpace(0) )
+    {
+    return 0;
+    }
+  this->Table[this->Size] = data;
+  this->Size ++;
+  return 1;
+}
+
+// Description:
+// Make sure there is enough space for the array
+int vtkKWPointerArray::AllocateSpace(int skip)
+{
+  if ( skip < 0 || skip > 1 )
+    {
+    return 0;
+    }
+  if ( this->Size >= this->ArraySize )
     {
     void ** tmparray = new void*[ this->ArraySize * 2 ];    
     if ( !tmparray )
@@ -135,7 +144,7 @@ vtkKWPointerArray::Append(void* data)
     unsigned int cc;
     for ( cc=0; cc < this->Size; cc++ )
       {
-      tmparray[cc] = this->Table[cc];
+      tmparray[cc+skip] = this->Table[cc];
       }    
     if ( this->Table )
       {
@@ -143,7 +152,30 @@ vtkKWPointerArray::Append(void* data)
       }
     this->Table = tmparray;
     }
-  this->Table[this->Size] = data;
+  else if ( skip )
+    {
+    unsigned int cc;
+    for ( cc=this->Size; cc > 0; cc -- )
+      {
+      this->Table[cc] = this->Table[cc-1];
+      }
+    }
+  return 1;
+}
+
+// Description:
+// Prepend: Prepends an item to the beginning of array
+// Return values:
+// nonzero     The item was appended successfully
+// zero        The item could not be appended.
+int
+vtkKWPointerArray::Prepend(void* data)
+{
+  if ( !this->AllocateSpace(1) )
+    {
+    return 0;
+    }
+  this->Table[0] = data;
   this->Size ++;
   return 1;
 }
