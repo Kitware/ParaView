@@ -32,15 +32,18 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWidget.h"
 #include "vtkKWLabel.h"
 #include "vtkImageReader.h"
+#include "vtkPVSource.h"
 
-class VTK_EXPORT vtkPVImageReader : public vtkKWWidget
+class VTK_EXPORT vtkPVImageReader : public vtkPVSource
 {
 public:
   static vtkPVImageReader* New();
-  vtkTypeMacro(vtkPVImageReader,vtkKWWidget);
+  vtkTypeMacro(vtkPVImageReader, vtkPVSource);
 
   void Create(vtkKWApplication *app, char *args);
-  vtkImageData* GetOutput();
+  
+  vtkGetObjectMacro(ImageReader, vtkImageReader);
+  
   void ReadImage();
   
 protected:

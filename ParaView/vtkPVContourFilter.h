@@ -53,8 +53,7 @@ protected:
   ~vtkPVContourFilter();
   vtkPVContourFilter(const vtkPVContourFilter&) {};
   void operator=(const vtkPVContourFilter&) {};
-    
-  vtkKWLabel *Label;
+  
   vtkKWWidget *Accept;
   vtkKWEntry *ContourValueEntry;
   vtkKWLabel *ContourValueLabel;

@@ -25,11 +25,10 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
+#include "vtkPVData.h"
 #include "vtkPVPolyData.h"
-#include "vtkPVComposite.h"
 #include "vtkPVShrinkPolyData.h"
 #include "vtkPVElevationFilter.h"
-#include "vtkPVContourFilter.h"
 #include "vtkKWView.h"
 
 #include "vtkKWScale.h"
@@ -46,34 +45,10 @@ int vtkPVPolyDataCommand(ClientData cd, Tcl_Interp *interp,
 vtkPVPolyData::vtkPVPolyData()
 {
   this->CommandFunction = vtkPVPolyDataCommand;
-
-  this->Data = NULL;
-
-  this->Label = vtkKWLabel::New();
-  
-  this->FiltersMenuButton = vtkPVMenuButton::New();
-  
-  this->Mapper = vtkPolyDataMapper::New();
-  this->Actor = vtkActor::New();
-  
-  this->Composite = vtkPVComposite::New();
 }
 
 vtkPVPolyData::~vtkPVPolyData()
 {
-  this->SetPolyData(NULL);
-  
-  this->Label->Delete();
-  this->Label = NULL;
-  
-  this->FiltersMenuButton->Delete();
-  this->FiltersMenuButton = NULL;
-  
-  this->Mapper->Delete();
-  this->Mapper = NULL;
-  
-  this->Actor->Delete();
-  this->Actor = NULL;
 }
 
 vtkPVPolyData* vtkPVPolyData::New()
@@ -158,118 +133,23 @@ void vtkPVPolyData::Elevation()
   newComp->Delete();
 }
 
-void vtkPVPolyData::Contour()
-{
-  vtkPVContourFilter *contour;
-  vtkPVPolyData *pd;
-  vtkPVComposite *newComp;
-  float *range;
-  
-  contour = vtkPVContourFilter::New();
-  contour->GetContour()->SetInput(this->GetPolyData());
-  
-  range = this->GetPolyData()->GetScalarRange();
-  contour->GetContour()->SetValue(0, (range[1]-range[0])/2.0);
-  
-  pd = vtkPVPolyData::New();
-  pd->SetPolyData(contour->GetContour()->GetOutput());
-    
-  newComp = vtkPVComposite::New();
-  newComp->SetData(pd);
-  newComp->SetSource(contour);
-  
-  vtkPVWindow *window = this->Composite->GetWindow();
-  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
-  newComp->CreateProperties(this->Application, "");
-  this->Composite->GetView()->AddComposite(newComp);
-  this->Composite->GetProp()->VisibilityOff();
-  
-  newComp->SetWindow(window);
-  
-  window->SetCurrentDataComposite(newComp);
-  
-  pd->Composite->GetView()->Render();
-  
-  pd->Delete();
-  newComp->Delete();
-}
-
 void vtkPVPolyData::Create(vtkKWApplication *app, char *args)
 {
-  // must set the application
-  if (this->Application)
-    {
-    vtkErrorMacro("Label already created");
-    return;
-    }
+  vtkPVData::AddCommonWidgets(app, args);
+  
   this->SetApplication(app);
   
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
-  
-  this->Label->SetParent(this);
-  this->Label->Create(app, "");
-  this->Label->SetLabel("vtkPVPolyData label");
-  this->Script("pack %s", this->Label->GetWidgetName());
-
-  this->GetPolyData()->Update();
-  
-  this->FiltersMenuButton->SetParent(this);
-  this->FiltersMenuButton->Create(app, "");
-  this->FiltersMenuButton->SetButtonText("Filters");
   this->FiltersMenuButton->AddCommand("vtkShrinkPolyData", this,
 				      "Shrink");
   this->FiltersMenuButton->AddCommand("vtkElevationFilter", this,
 				      "Elevation");
-  this->FiltersMenuButton->AddCommand("vtkContourFilter", this,
-				      "Contour");
-  if (this->GetPolyData()->GetPointData()->GetScalars() == NULL)
-    {
-    this->Script("%s entryconfigure 3 -state disabled",
-		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
-    }
-  else
-    {
-    this->Script("%s entryconfigure 3 -state normal",
-		 this->FiltersMenuButton->GetMenu()->GetWidgetName());
-    }
-  
-  this->Script("pack %s", this->FiltersMenuButton->GetWidgetName());
-  
-  this->Mapper->SetInput(this->GetPolyData());
-  this->Actor->SetMapper(this->Mapper);
-}
-
-vtkProp* vtkPVPolyData::GetProp()
-{
-  return this->Actor;
-}
-
-void vtkPVPolyData::SetComposite(vtkPVComposite *comp)
-{
-  if (this->Composite == comp)
-    {
-    return;
-    }
-  this->Modified();
-
-  if (this->Composite)
-    {
-    vtkPVComposite *tmp = this->Composite;
-    this->Composite = NULL;
-    tmp->UnRegister(this);
-    }
-  if (comp)
-    {
-    this->Composite = comp;
-    comp->Register(this);
-    }
 }
 
 void vtkPVPolyData::SetPolyData(vtkPolyData *data)
 {
   this->SetData(data);
   this->Mapper->SetInput(data);
+  this->Actor->SetMapper(this->Mapper);
 }
 
 vtkPolyData *vtkPVPolyData::GetPolyData()

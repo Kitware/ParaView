@@ -26,41 +26,21 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 #include "vtkPVImage.h"
-#include "vtkMath.h"
+#include "vtkPVImageClip.h"
 #include "vtkPVComposite.h"
+#include "vtkPVWindow.h"
+#include "vtkOutlineFilter.h"
+
+int vtkPVImageCommand(ClientData cd, Tcl_Interp *interp,
+		      int argc, char *argv[]);
 
 vtkPVImage::vtkPVImage()
 {
-  this->Image = NULL;
-
-  this->Label = vtkKWLabel::New();  
-  
-  this->Outline = vtkOutlineSource::New();
-  this->Mapper = vtkPolyDataMapper::New();
-  this->Actor = vtkActor::New();
-
-  this->Outline->SetBounds(0, 255, 0, 255, 0, 92 * 1.8);
-  this->Mapper->SetInput(Outline->GetOutput());
-  this->Actor->SetMapper(Mapper);
-  
-  this->Comp = vtkPVComposite::New();
+  this->CommandFunction = vtkPVImageCommand;
 }
 
 vtkPVImage::~vtkPVImage()
 {
-  this->SetImage(NULL);
-  
-  this->Label->Delete();
-  this->Label = NULL;
-  
-  this->Outline->Delete();
-  this->Outline = NULL;
-  
-  this->Mapper->Delete();
-  this->Mapper = NULL;
-  
-  this->Actor->Delete();
-  this->Actor = NULL;
 }
 
 vtkPVImage* vtkPVImage::New()
@@ -68,31 +48,87 @@ vtkPVImage* vtkPVImage::New()
   return new vtkPVImage();
 }
 
+void vtkPVImage::Clip()
+{
+  vtkPVImageClip *clip;
+  vtkPVImage *id;
+  vtkPVComposite *newComp;
+  int *extents;
+  
+  extents = this->GetImageData()->GetExtent();
+  extents[5] = (extents[4] + extents[5])/2;
+  extents[4] = extents[5];
+  
+  clip = vtkPVImageClip::New();
+  clip->GetImageClip()->SetInput(this->GetImageData());
+  
+  clip->GetImageClip()->ClipDataOn();
+  clip->GetImageClip()->SetOutputWholeExtent(extents);
+  clip->GetImageClip()->Update();
+
+  id = vtkPVImage::New();
+  id->SetImageData(clip->GetImageClip()->GetOutput());
+  id->GetImageData()->Update();
+  
+  newComp = vtkPVComposite::New();
+  newComp->SetData(id);
+  newComp->SetSource(clip);
+  
+  vtkPVWindow *window = this->Composite->GetWindow();
+  newComp->SetPropertiesParent(window->GetDataPropertiesParent());
+  newComp->CreateProperties(this->Application, "");
+  this->Composite->GetView()->AddComposite(newComp);
+  this->Composite->GetProp()->VisibilityOff();
+  
+  newComp->SetWindow(window);
+  
+  window->SetCurrentDataComposite(newComp);
+  
+  id->Composite->GetView()->Render();
+  
+  id->Delete();
+  newComp->Delete();
+  clip->Delete();
+}
+
 void vtkPVImage::Create(vtkKWApplication *app, char *args)
 {
-  // must set the application
-  if (this->Application)
-    {
-    vtkErrorMacro("Label already created");
-    return;
-    }
+  vtkPVData::AddCommonWidgets(app, args);
+  
   this->SetApplication(app);
   
-  // create the top level
-  this->Script("frame %s %s", this->GetWidgetName(), args);
+  this->FiltersMenuButton->AddCommand("vtkImageClip", this,
+				      "Clip");
+}
+
+void vtkPVImage::SetImageData(vtkImageData *data)
+{
+  vtkOutlineFilter *outline;
+  int *dim;
   
-  this->Label->SetParent(this);
-  this->Label->Create(this->Application, "");
-  this->Label->SetLabel("vtkPVImage label");
-  this->Script("pack %s", this->Label->GetWidgetName());
+  data->Update();
+  dim = data->GetDimensions();
+  outline = vtkOutlineFilter::New();
+  outline->SetInput(data);
+  
+  this->SetData(data);
+  if ((dim[0] > 1) && (dim[1] > 1) && (dim[2] > 1))
+    {
+    this->Mapper->SetInput(outline->GetOutput());
+    }
+  else
+    {
+    this->Mapper->SetInput(data);
+    }
+  
+  this->GetData()->Update();
+  this->Mapper->SetScalarRange(this->GetData()->GetScalarRange());
+  this->Actor->SetMapper(this->Mapper);
+  
+  outline->Delete();
 }
 
-vtkProp* vtkPVImage::GetProp()
+vtkImageData* vtkPVImage::GetImageData()
 {
-  return this->Actor;
-}
-
-void vtkPVImage::SetComposite(vtkPVComposite *comp)
-{
-  this->Comp = comp;
+  return (vtkImageData*)this->Data;
 }

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVElevationFilter.h
+  Module:    vtkPVImageClip.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,60 +26,49 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVElevationFilter_h
-#define __vtkPVElevationFilter_h
+#ifndef __vtkPVImageClip_h
+#define __vtkPVImageClip_h
 
 #include "vtkKWLabel.h"
-#include "vtkElevationFilter.h"
+#include "vtkImageClip.h"
 #include "vtkKWEntry.h"
-#include "vtkKWScale.h"
+#include "vtkKWLabel.h"
 #include "vtkPVSource.h"
 
-class VTK_EXPORT vtkPVElevationFilter : public vtkPVSource
+
+class VTK_EXPORT vtkPVImageClip : public vtkPVSource
 {
 public:
-  static vtkPVElevationFilter* New();
-  vtkTypeMacro(vtkPVElevationFilter, vtkPVSource);
+  static vtkPVImageClip* New();
+  vtkTypeMacro(vtkPVImageClip, vtkPVSource);
 
   void Create(vtkKWApplication *app, char *args);
-
-  vtkGetObjectMacro(Elevation, vtkElevationFilter);
   
-  void ElevationParameterChanged();
+  void ExtentsChanged();
+
+  vtkGetObjectMacro(ImageClip, vtkImageClip);
   
 protected:
-  vtkPVElevationFilter();
-  ~vtkPVElevationFilter();
-  vtkPVElevationFilter(const vtkPVElevationFilter&) {};
-  void operator=(const vtkPVElevationFilter&) {};
-  
-  vtkKWLabel *LowPointLabel;
-  vtkKWLabel *HighPointLabel;
-  vtkKWLabel *RangeLabel;
-  vtkKWWidget *LowPointFrame;
-  vtkKWWidget *HighPointFrame;
-  vtkKWWidget *RangeFrame;
-  
-  vtkKWEntry *LowPointXEntry;
-  vtkKWEntry *LowPointYEntry;
-  vtkKWEntry *LowPointZEntry;
-  vtkKWEntry *HighPointXEntry;
-  vtkKWEntry *HighPointYEntry;
-  vtkKWEntry *HighPointZEntry;
-  vtkKWEntry *RangeMinEntry;
-  vtkKWEntry *RangeMaxEntry;
-  vtkKWLabel *LowPointXLabel;
-  vtkKWLabel *LowPointYLabel;
-  vtkKWLabel *LowPointZLabel;
-  vtkKWLabel *HighPointXLabel;
-  vtkKWLabel *HighPointYLabel;
-  vtkKWLabel *HighPointZLabel;
-  vtkKWLabel *RangeMinLabel;
-  vtkKWLabel *RangeMaxLabel;
+  vtkPVImageClip();
+  ~vtkPVImageClip();
+  vtkPVImageClip(const vtkPVImageClip&) {};
+  void operator=(const vtkPVImageClip&) {};
   
   vtkKWWidget *Accept;
+  vtkKWEntry *ClipXMinEntry;
+  vtkKWLabel *ClipXMinLabel;
+  vtkKWEntry *ClipXMaxEntry;
+  vtkKWLabel *ClipXMaxLabel;
+  vtkKWEntry *ClipYMinEntry;
+  vtkKWLabel *ClipYMinLabel;
+  vtkKWEntry *ClipYMaxEntry;
+  vtkKWLabel *ClipYMaxLabel;
+  vtkKWEntry *ClipZMinEntry;
+  vtkKWLabel *ClipZMinLabel;
+  vtkKWEntry *ClipZMaxEntry;
+  vtkKWLabel *ClipZMaxLabel;
 
-  vtkElevationFilter *Elevation;
+  vtkImageClip  *ImageClip;
 };
 
 #endif

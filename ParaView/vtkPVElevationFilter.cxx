@@ -39,10 +39,7 @@ vtkPVElevationFilter::vtkPVElevationFilter()
 {
   this->CommandFunction = vtkPVElevationFilterCommand;
   
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
-  
-    this->LowPointLabel = vtkKWLabel::New();
+  this->LowPointLabel = vtkKWLabel::New();
   this->LowPointLabel->SetParent(this);
   this->LowPointFrame = vtkKWWidget::New();
   this->LowPointFrame->SetParent(this);
@@ -98,10 +95,7 @@ vtkPVElevationFilter::vtkPVElevationFilter()
 
 vtkPVElevationFilter::~vtkPVElevationFilter()
 {
-  this->Label->Delete();
-  this->Label = NULL;
-  
-    this->LowPointLabel->Delete();
+  this->LowPointLabel->Delete();
   this->LowPointLabel = NULL;
   this->LowPointXEntry->Delete();
   this->LowPointXEntry = NULL;
@@ -174,11 +168,6 @@ void vtkPVElevationFilter::Create(vtkKWApplication *app, char *args)
   
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
-  
-  this->Label->Create(this->Application, "");
-  this->Label->SetLabel("vtkElevationFilter label");
-  
-  this->Script("pack %s", this->Label->GetWidgetName());
   
   low = this->GetElevation()->GetLowPoint();
   high = this->GetElevation()->GetHighPoint();

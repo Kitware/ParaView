@@ -47,7 +47,6 @@ vtkPVComposite* vtkPVComposite::New()
   return new vtkPVComposite();
 }
 
-
 vtkPVComposite::~vtkPVComposite()
 {
   this->Notebook->SetParent(NULL);
@@ -174,7 +173,7 @@ void vtkPVComposite::SetSource(vtkPVSource *source)
     }
 }
 
-void vtkPVComposite::SetData(vtkPVPolyData *data)
+void vtkPVComposite::SetData(vtkPVData *data)
 {
   if (this->Data == data)
     {
@@ -184,7 +183,7 @@ void vtkPVComposite::SetData(vtkPVPolyData *data)
 
   if (this->Data)
     {
-    vtkPVPolyData *tmp = this->Data;
+    vtkPVData *tmp = this->Data;
     this->Data = NULL;
     tmp->SetComposite(NULL);
     tmp->UnRegister(this);

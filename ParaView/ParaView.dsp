@@ -205,6 +205,14 @@ SOURCE=.\vtkPVElevationFilterTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVImageReader.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageReaderTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVMenuButton.cxx
 # End Source File
 # Begin Source File
@@ -543,6 +551,10 @@ InputName=vtkPVElevationFilter
 
 !ENDIF 
 
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVImageReader.h
 # End Source File
 # Begin Source File
 

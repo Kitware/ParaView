@@ -52,8 +52,7 @@ protected:
   ~vtkPVShrinkPolyData();
   vtkPVShrinkPolyData(const vtkPVShrinkPolyData&) {};
   void operator=(const vtkPVShrinkPolyData&) {};
-    
-  vtkKWLabel *Label;
+  
   vtkKWWidget *Accept;
   vtkKWScale *ShrinkFactorScale;
 

@@ -52,7 +52,6 @@ vtkPVSource* vtkPVSource::New()
   return new vtkPVSource();
 }
 
-
 void vtkPVSource::SetComposite(vtkPVComposite *comp)
 {
   if (this->Composite == comp)

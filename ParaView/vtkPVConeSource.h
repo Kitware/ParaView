@@ -53,8 +53,7 @@ protected:
   ~vtkPVConeSource();
   vtkPVConeSource(const vtkPVConeSource&) {};
   void operator=(const vtkPVConeSource&) {};
-    
-  vtkKWLabel *Label;
+  
   vtkKWLabel *HeightLabel;
   vtkKWEntry *HeightEntry;
   vtkKWLabel *RadiusLabel;

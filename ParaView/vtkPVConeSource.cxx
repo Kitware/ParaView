@@ -39,8 +39,6 @@ vtkPVConeSource::vtkPVConeSource()
 {
   this->CommandFunction = vtkPVConeSourceCommand;
   
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
   this->HeightLabel = vtkKWLabel::New();
   this->HeightLabel->SetParent(this);
   this->RadiusLabel = vtkKWLabel::New();
@@ -60,9 +58,6 @@ vtkPVConeSource::vtkPVConeSource()
 
 vtkPVConeSource::~vtkPVConeSource()
 {
-  this->Label->Delete();
-  this->Label = NULL;
-  
   this->HeightLabel->Delete();
   this->HeightLabel = NULL;
   this->RadiusLabel->Delete();
@@ -101,11 +96,6 @@ void vtkPVConeSource::Create(vtkKWApplication *app, char *args)
   
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
-  
-  this->Label->Create(this->Application, "");
-  this->Label->SetLabel("vtkPVConeSource label");
-  
-  this->Script("pack %s", this->Label->GetWidgetName());
   
   this->RadiusLabel->Create(this->Application, "");
   this->RadiusLabel->SetLabel("Radius:");

@@ -33,38 +33,30 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkProp.h"
 #include "vtkImageData.h"
 #include "vtkOutlineSource.h"
-#include "vtkKWLabel.h"
-#include "vtkPolyDataMapper.h"
+#include "vtkPVData.h"
 
 class vtkPVComposite;
 
-class VTK_EXPORT vtkPVImage : public vtkKWWidget
+class VTK_EXPORT vtkPVImage : public vtkPVData
 {
 public:
   static vtkPVImage* New();
   vtkTypeMacro(vtkPVImage,vtkKWWidget);
   
   void Create(vtkKWApplication *app, char *args);
-
-  vtkProp* GetProp();
-
-  vtkSetObjectMacro(Image, vtkImageData);
-  vtkGetObjectMacro(Image, vtkImageData);
   
-  void SetComposite(vtkPVComposite *comp);
+  void SetImageData(vtkImageData *data);
+  vtkImageData *GetImageData();
+  
+  void Clip();
   
 protected:
   vtkPVImage();
   ~vtkPVImage();
   vtkPVImage(const vtkPVImage&) {};
   void operator=(const vtkPVImage&) {};
-
-  vtkKWLabel *Label;
-  vtkImageData *Image;
-  vtkOutlineSource *Outline;
-  vtkPolyDataMapper *Mapper;
-  vtkActor *Actor;
-  vtkPVComposite *Comp;
+  
+  vtkSetObjectMacro(Data, vtkDataSet);
 };
 
 #endif

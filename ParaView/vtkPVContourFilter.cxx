@@ -39,8 +39,6 @@ vtkPVContourFilter::vtkPVContourFilter()
 {
   this->CommandFunction = vtkPVContourFilterCommand;
   
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
   this->Accept = vtkKWWidget::New();
   this->Accept->SetParent(this);
   this->ContourValueEntry = vtkKWEntry::New();
@@ -52,10 +50,7 @@ vtkPVContourFilter::vtkPVContourFilter()
 }
 
 vtkPVContourFilter::~vtkPVContourFilter()
-{
-  this->Label->Delete();
-  this->Label = NULL;
-  
+{ 
   this->Accept->Delete();
   this->Accept = NULL;
   
@@ -85,11 +80,6 @@ void vtkPVContourFilter::Create(vtkKWApplication *app, char *args)
   
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
-  
-  this->Label->Create(this->Application, "");
-  this->Label->SetLabel("vtkContourFilter label");
-  
-  this->Script("pack %s", this->Label->GetWidgetName());
   
   this->ContourValueLabel->Create(this->Application, "");
   this->ContourValueLabel->SetLabel("Contour Value:");

@@ -38,7 +38,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkKWComposite.h"
 #include "vtkPVSource.h"
-#include "vtkPVPolyData.h"
+#include "vtkPVData.h"
 
 class vtkPVWindow;
 
@@ -59,8 +59,8 @@ public:
   vtkKWWidget *GetPropertiesParent();
   vtkKWWidget *GetProperties();
 
-  void SetData(vtkPVPolyData *data);
-  vtkGetObjectMacro(Data, vtkPVPolyData);
+  void SetData(vtkPVData *data);
+  vtkGetObjectMacro(Data, vtkPVData);
 
   void SetSource(vtkPVSource *source);
   vtkGetObjectMacro(Source, vtkPVSource);
@@ -76,7 +76,7 @@ protected:
   ~vtkPVComposite();
   
   vtkKWNotebook *Notebook;
-  vtkPVPolyData *Data;
+  vtkPVData *Data;
   vtkPVSource *Source;
   vtkPVWindow *Window;
   

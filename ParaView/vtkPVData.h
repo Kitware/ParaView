@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVPolyData.h
+  Module:    vtkPVData.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,38 +26,49 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#ifndef __vtkPVPolyData_h
-#define __vtkPVPolyData_h
+#ifndef __vtkPVData_h
+#define __vtkPVData_h
 
-#include "vtkPolyData.h"
-#include "vtkKWWidget.h"
-#include "vtkKWScale.h"
+#include "vtkProp.h"
+#include "vtkDataSetMapper.h"
+#include "vtkPVMenuButton.h"
+#include "vtkActor.h"
 #include "vtkDataSet.h"
-#include "vtkPVData.h"
 
 class vtkPVComposite;
 
-class VTK_EXPORT vtkPVPolyData : public vtkPVData
+class VTK_EXPORT vtkPVData : public vtkKWWidget
 {
 public:
-  static vtkPVPolyData* New();
-  vtkTypeMacro(vtkPVPolyData, vtkKWWidget);
+  static vtkPVData* New();
+  vtkTypeMacro(vtkPVData, vtkKWWidget);
   
-  void Create(vtkKWApplication *app, char *args);
+  virtual void Create(vtkKWApplication *app, char *args) {}
+  void AddCommonWidgets(vtkKWApplication *app, char *args);
 
-  void SetPolyData(vtkPolyData *data);
-  vtkPolyData *GetPolyData();
+  vtkProp* GetProp();
+
+  // Description:
+  // DO NOT CALL THIS IF YOU ARE NOT A COMPOSITE!
+  void SetComposite(vtkPVComposite *pvComp);
   
-  void Shrink();
-  void Elevation();
+  vtkGetObjectMacro(Data, vtkDataSet);
+  vtkSetObjectMacro(Data, vtkDataSet);
+
+  void Contour();
   
 protected:
-  vtkPVPolyData();
-  ~vtkPVPolyData();
-  vtkPVPolyData(const vtkPVPolyData&) {};
-  void operator=(const vtkPVPolyData&) {};
-
-  vtkSetObjectMacro(Data, vtkDataSet);
+  vtkPVData();
+  ~vtkPVData();
+  
+  vtkPVData(const vtkPVData&) {};
+  void operator=(const vtkPVData&) {};
+  
+  vtkPVMenuButton *FiltersMenuButton;
+  vtkDataSet *Data;
+  vtkDataSetMapper *Mapper;
+  vtkActor *Actor;
+  vtkPVComposite *Composite;
 };
 
 #endif

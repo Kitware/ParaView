@@ -54,7 +54,7 @@ void vtkPVImageReader::Create(vtkKWApplication *app, char *args)
   // must set the application
   if (this->Application)
     {
-    vtkErrorMacro("Label already created");
+    vtkErrorMacro("vtkPVImageReader already created");
     return;
     }
   this->SetApplication(app);
@@ -68,16 +68,10 @@ void vtkPVImageReader::Create(vtkKWApplication *app, char *args)
   this->Script("pack %s", this->Label->GetWidgetName());
 }
 
-vtkImageData* vtkPVImageReader::GetOutput()
-{
-  return this->ImageReader->GetOutput();
-}
-
 void vtkPVImageReader::ReadImage()
 {
-  this->ImageReader->SetFilePrefix("/home/lawcc/vtkdata/headsq/quarter");
-  this->ImageReader->SetDataSpacing(4, 4, 1.8);
-  this->ImageReader->SetDataExtent(0, 63, 0, 63, 1, 93);
   this->ImageReader->SetDataByteOrderToLittleEndian();
+  this->ImageReader->SetDataExtent(0, 63, 0, 63, 1, 93);
+  this->ImageReader->SetFilePrefix("../../vtkdata/headsq/quarter");
+  this->ImageReader->SetDataSpacing(4, 4, 1.8);
 }
-

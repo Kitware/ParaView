@@ -39,8 +39,6 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
 {
   this->CommandFunction = vtkPVShrinkPolyDataCommand;
   
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
   this->Accept = vtkKWWidget::New();
   this->Accept->SetParent(this);
   this->ShrinkFactorScale = vtkKWScale::New();
@@ -49,10 +47,7 @@ vtkPVShrinkPolyData::vtkPVShrinkPolyData()
 }
 
 vtkPVShrinkPolyData::~vtkPVShrinkPolyData()
-{
-  this->Label->Delete();
-  this->Label = NULL;
-  
+{ 
   this->Accept->Delete();
   this->Accept = NULL;
   
@@ -80,11 +75,6 @@ void vtkPVShrinkPolyData::Create(vtkKWApplication *app, char *args)
   
   // create the top level
   this->Script("frame %s %s", this->GetWidgetName(), args);
-  
-  this->Label->Create(this->Application, "");
-  this->Label->SetLabel("vtkShrinkPolyData label");
-  
-  this->Script("pack %s", this->Label->GetWidgetName());
   
   this->ShrinkFactorScale->Create(this->Application,
 			    "-showvalue 1 -resolution 0.1");

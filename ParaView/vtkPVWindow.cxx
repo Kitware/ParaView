@@ -25,7 +25,6 @@ PARTICULAR PURPOSE, AND NON-INFRINGEMENT.  THIS SOFTWARE IS PROVIDED ON AN
 MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
-
 #include "vtkPVApplication.h"
 #include "vtkKWToolbar.h"
 #include "vtkPVWindow.h"
@@ -38,15 +37,13 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkInteractorStyleCamera.h"
 
 #include "vtkMath.h"
-#include "vtkImageReader.h"
-#include "vtkOutlineSource.h"
 #include "vtkSynchronizedTemplates3D.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkActor.h"
-#include "vtkKWScale.h"
 
 #include "vtkPVComposite.h"
 #include "vtkPVConeSource.h"
+#include "vtkPVPolyData.h"
+#include "vtkPVImageReader.h"
+#include "vtkPVImage.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -338,7 +335,6 @@ void vtkPVWindow::NewCone()
   comp->Delete();
   
   this->MainView->ResetCamera();
-  
   this->MainView->Render();
 }
 
@@ -346,19 +342,26 @@ void vtkPVWindow::NewCone()
 // Setup the pipeline
 void vtkPVWindow::NewVolume()
 {
-/*  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
+  vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVComposite *comp;
+  vtkPVImageReader *reader = vtkPVImageReader::New();
+  vtkPVImage *image = vtkPVImage::New();
+  
+  reader->ReadImage();
+  image->SetImageData(reader->GetImageReader()->GetOutput());
   
   comp = vtkPVComposite::New();
+  comp->SetSource(reader);
+  comp->SetData(image);
   comp->SetPropertiesParent(this->GetDataPropertiesParent());
   comp->CreateProperties(pvApp, "");
   this->MainView->AddComposite(comp);
+  comp->SetWindow(this);
   this->SetCurrentDataComposite(comp);
   comp->Delete();
   
   this->MainView->ResetCamera();
   this->MainView->Render();
-  */
 }
 
 //----------------------------------------------------------------------------
