@@ -46,6 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
 #include "vtkKWEventMap.h"
+#include "vtkKWEvent.h"
 #include "vtkKWGenericRenderWindowInteractor.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
@@ -60,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.28");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.29");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -107,6 +108,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->Interactor->SetRenderWidget(this);
   
   this->EventMap = vtkKWEventMap::New();
+  this->EventIdentifier = -1;
   
   this->InExpose = 0;
 
@@ -141,6 +143,9 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   
   this->RenderWindow->AddObserver(vtkCommand::CursorChangedEvent,
                                   this->Observer);
+
+  this->Cursor2DVisibility = 0;
+  this->Cursor2DColor[0] = this->Cursor2DColor[1] = this->Cursor2DColor[2] = 1.0;
 }
 
 //----------------------------------------------------------------------------
@@ -353,6 +358,15 @@ void vtkKWRenderWidget::RemoveInteractionBindings()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::MouseMove(int vtkNotUsed(num), int x, int y)
 {
+  if (this->Cursor2DVisibility)
+    {
+    float fargs[3];
+    fargs[0] = x;
+    fargs[1] = y;
+    fargs[2] = this->EventIdentifier;
+    this->InvokeEvent(vtkKWEvent::Cursor2DPositionChangedEvent, fargs);
+    }
+
   this->Interactor->SetMoveEventInformationFlipY(x, y);
   this->Interactor->MouseMoveEvent();
 }
@@ -941,4 +955,5 @@ void vtkKWRenderWidget::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarScale: " << this->ScalarScale << endl;
   os << indent << "CurrentCamera: " << this->CurrentCamera << endl;
   os << indent << "Units: " << (this->Units ? this->Units : "(none)") << endl;
+  os << indent << "EventIdentifier: " << this->EventIdentifier << endl;
 }
