@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.23");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.24");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -678,13 +678,13 @@ int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
   
   // Let Tcl find the library.  Add the executable's location to the
   // list of possible paths.
-  this->Window->GetPVApplication()->BroadcastScript(
+  this->Window->GetPVApplication()->GetProcessModule()->ServerScript(
     "::paraview::load_component %s [file dirname [info nameofexecutable]]",
     name);
   
   // Returns empty string if successful.
   const char* result =
-    this->Window->GetPVApplication()->GetMainInterp()->result;
+    this->Window->GetPVApplication()->GetProcessModule()->GetRootResult();
   if(strcmp(result, "") != 0)
     {
     vtkErrorMacro("Error loading Library component " << name);

@@ -219,7 +219,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.47");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.48");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -795,6 +795,7 @@ void vtkPVClientServerModule::BroadcastScriptRMI(const char *str)
   // Execute the script locally.  
   // Do reverse order, because 0 will block.
   this->Application->SimpleScript(str);
+  this->SetRootResult(this->Application->GetMainInterp()->result);
 }
 
 
