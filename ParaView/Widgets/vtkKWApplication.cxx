@@ -904,6 +904,67 @@ int vtkKWApplication::LoadScript(const char* filename)
 }
 
 //----------------------------------------------------------------------------
+float vtkKWApplication::GetFloatRegisteryValue(int level, const char* subkey, 
+                                               const char* key)
+{
+  if ( this->GetRegisteryLevel() < 0 ||
+       this->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
+  float res = 0;
+  char buffer[1024];
+  if ( this->GetRegisteryValue( 
+         level, subkey, key, buffer ) )
+    {
+    res = atof(buffer);
+    }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::GetIntRegisteryValue(int level, const char* subkey, 
+                                      const char* key)
+{
+  if ( this->GetRegisteryLevel() < 0 ||
+       this->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
+
+  int res = 0;
+  char buffer[1024];
+  if ( this->GetRegisteryValue( 
+         level, subkey, key, buffer ) )
+    {
+    res = atoi(buffer);
+    }
+  return res;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::BooleanRegisteryCheck(int level, const char* key, 
+                                            const char* trueval)
+{
+  if ( this->GetRegisteryLevel() < 0 ||
+       this->GetRegisteryLevel() < level )
+    {
+    return 0;
+    }
+  char buffer[1024];
+  int allset = 0;
+  if ( this->GetRegisteryValue(level, "RunTime", key, buffer) )
+    {
+    if ( !strncmp(buffer+1, trueval+1, vtkString::Length(trueval)-1) )
+      {
+      allset = 1;
+      }
+    }
+  return allset;
+}
+
+
+//----------------------------------------------------------------------------
 void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

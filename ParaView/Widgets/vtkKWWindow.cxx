@@ -1016,7 +1016,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.101 $");
+  this->ExtractRevision(os,"$Revision: 1.102 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1184,38 +1184,13 @@ void vtkKWWindow::InsertRecentFileToMenu(const char *filename,
 float vtkKWWindow::GetFloatRegisteryValue(int level, const char* subkey, 
                                           const char* key)
 {
-  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
-       this->GetApplication()->GetRegisteryLevel() < level )
-    {
-    return 0;
-    }
-  float res = 0;
-  char buffer[1024];
-  if ( this->GetApplication()->GetRegisteryValue( 
-         level, subkey, key, buffer ) )
-    {
-    res = atof(buffer);
-    }
-  return res;
+  return this->GetApplication()->GetFloatRegisteryValue(level, subkey, key);
 }
 
 int vtkKWWindow::GetIntRegisteryValue(int level, const char* subkey, 
                                       const char* key)
 {
-  if ( this->GetApplication()->GetRegisteryLevel() < 0 ||
-       this->GetApplication()->GetRegisteryLevel() < level )
-    {
-    return 0;
-    }
-
-  int res = 0;
-  char buffer[1024];
-  if ( this->GetApplication()->GetRegisteryValue( 
-         level, subkey, key, buffer ) )
-    {
-    res = atoi(buffer);
-    }
-  return res;
+  return this->GetApplication()->GetIntRegisteryValue(level, subkey, key);
 }
 void vtkKWWindow::SaveLastPath(vtkKWLoadSaveDialog *dialog, const char* key)
 {
@@ -1265,17 +1240,7 @@ void vtkKWWindow::RetrieveColor(int level, const char* key, float rgb[3])
 int vtkKWWindow::BooleanRegisteryCheck(int level, const char* key, 
                                        const char* trueval)
 {
-  char buffer[1024];
-  int allset = 0;
-  if ( this->GetApplication()->GetRegisteryValue(
-         level, "RunTime", key, buffer) )
-    {
-    if ( !strncmp(buffer+1, trueval+1, vtkString::Length(trueval)-1) )
-      {
-      allset = 1;
-      }
-    }
-  return allset;
+  return this->GetApplication()->BooleanRegisteryCheck(level, key, trueval);
 }
 
 

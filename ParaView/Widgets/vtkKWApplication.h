@@ -182,13 +182,11 @@ public:
 //ETX
   virtual int GetApplicationKey() {return -1;};
 
-//BTX
   // Description:
   // Return the Registery object. It is created on first use
   // and deleted on exiting the application.
   vtkKWRegisteryUtilities *GetRegistery( const char* toplevel);
   vtkKWRegisteryUtilities *GetRegistery( );
-//ETX
 
   // Description:
   // Set or get the current registery level. If the called
@@ -231,19 +229,33 @@ public:
   // cancel/no.
   void SetMessageDialogResponse(const char* dialogname, int response);
 
-//BTX
   //Description:
   // Set or get the registery value for the application.
   // When storing multiple arguments, separate with spaces.
   // If the level is lower than current registery level, operation 
   // will be successfull.
+//BTX
   int SetRegisteryValue(int level, const char* subkey, const char* key, 
-			const char* format, ...);
+                        const char* format, ...);
+//ETX
   int GetRegisteryValue(int level, const char* subkey, const char* key, 
-			char*value);
+                        char* value);
   int DeleteRegisteryValue(int level, const char* subkey, const char* key);
   
-//ETX
+  // Description:
+  // Perform a boolean check of the value in registery. If the value
+  // at the key is trueval, then return true, otherwise return false.
+  int BooleanRegisteryCheck(int level, const char* key, 
+                            const char* trueval);
+
+  // Description:
+  // Get float registery value (zero if not found).
+  // If the level is lower than current registery level, operation 
+  // will be successfull.
+  float GetFloatRegisteryValue(int level, const char* subkey, 
+                               const char* key);
+  int   GetIntRegisteryValue(int level, const char* subkey, const char* key);
+  
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
