@@ -68,6 +68,7 @@ class VTK_EXPORT vtkKWEvent
     ContourAnnotationComputeStatisticsEvent,
     ContourAnnotationLineWidthChangedEvent,
     ContourAnnotationOpacityChangedEvent,
+    ContourAnnotationRemoveAllEvent,
     ContourAnnotationRemoveEvent,
     ContourAnnotationSurfacePropertyChangedEvent,
     ContourAnnotationSurfaceQualityChangedEvent,
