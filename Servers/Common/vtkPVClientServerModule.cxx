@@ -13,6 +13,7 @@
 
 =========================================================================*/
 #include "vtkPVClientServerModule.h"
+
 #include "vtkPVServerInformation.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
@@ -44,7 +45,9 @@
 #include "vtkKWRemoteExecute.h"
 #include "vtkPVOptions.h"
 #ifndef _WIN32
-#include <unistd.h>
+# include <unistd.h>
+#else
+# include "vtkWindows.h"
 #endif
 #include <vtkstd/string>
 #include "vtkProcessModuleGUIHelper.h"
@@ -148,7 +151,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.22");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.23");
 
 
 //----------------------------------------------------------------------------

@@ -13,15 +13,17 @@
 
 =========================================================================*/
 #include "vtkPVProcessModuleGUIHelper.h"
-#include "vtkPVApplication.h"
-#include "vtkPVProcessModule.h"
-#include "vtkPVConnectDialog.h"
-#include "vtkPVClientServerModule.h"
-#include "vtkPVWindow.h"
-#include "vtkObjectFactory.h"
-#include "vtkPVGUIClientOptions.h"
 
-vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.10");
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
+#include "vtkPVClientServerModule.h"
+#include "vtkPVConnectDialog.h"
+#include "vtkPVGUIClientOptions.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVWindow.h"
+#include "vtkWindows.h"
+
+vtkCxxRevisionMacro(vtkPVProcessModuleGUIHelper, "1.11");
 vtkStandardNewMacro(vtkPVProcessModuleGUIHelper);
 
 vtkCxxSetObjectMacro(vtkPVProcessModuleGUIHelper, PVApplication, vtkPVApplication);
