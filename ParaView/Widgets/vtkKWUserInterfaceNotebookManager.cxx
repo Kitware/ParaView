@@ -42,13 +42,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWUserInterfaceNotebookManager.h"
 
+#include "vtkCollectionIterator.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWUserInterfacePanel.h"
+#include "vtkKWWidgetCollection.h"
 #include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.4");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.5");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -248,7 +252,7 @@ void vtkKWUserInterfaceNotebookManager::RaisePage(int id)
 
   // Make sure the panel is shown (and created)
 
-  this->Show(panel);
+  this->ShowPanel(panel);
   
   // Since each page has a unique id, whatever the panel it belongs to, just 
   // raise the corresponding notebook page.
@@ -282,7 +286,7 @@ void vtkKWUserInterfaceNotebookManager::RaisePage(
 
   // Make sure the panel is shown (and created)
 
-  this->Show(panel);
+  this->ShowPanel(panel);
   
   // Raise the notebook page that has this specific title among the notebook 
   // pages that share the same tag (i.e. among the pages that belong to the same 
@@ -300,7 +304,7 @@ void vtkKWUserInterfaceNotebookManager::RaisePage(
 
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::Show(
+int vtkKWUserInterfaceNotebookManager::ShowPanel(
   vtkKWUserInterfacePanel *panel)
 {
   if (!this->IsCreated())
@@ -359,12 +363,12 @@ int vtkKWUserInterfaceNotebookManager::Show(
 }
 
 //----------------------------------------------------------------------------
-int vtkKWUserInterfaceNotebookManager::Raise(
+int vtkKWUserInterfaceNotebookManager::RaisePanel(
   vtkKWUserInterfacePanel *panel)
 {
   // First show the panel
 
-  if (!this->Show(panel))
+  if (!this->ShowPanel(panel))
     {
     return 0;
     }
@@ -424,6 +428,53 @@ int vtkKWUserInterfaceNotebookManager::RemovePageWidgets(
   this->Notebook->RemovePagesMatchingTag(tag);
 
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWUserInterfaceNotebookManager::UpdatePanel(
+  vtkKWUserInterfacePanel *panel)
+{
+  if (!panel)
+    {
+    vtkErrorMacro("Can not update a NULL panel.");
+    return;
+    }
+  
+  if (!this->HasPanel(panel))
+    {
+    vtkErrorMacro("Can not update a panel that is not "
+                  "in the manager.");
+    return;
+    }
+
+  // Get the pages parent, and check if there are labeled frame that can be
+  // switch from one page to the other (share the same parent)
+
+  vtkKWWidget *parent = this->GetPagesParentWidget(panel);
+  if (!parent)
+    {
+    return;
+    }
+
+  vtkCollectionIterator *it = parent->GetChildren()->NewIterator();
+  for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
+    {
+    vtkKWLabeledFrame *frame = vtkKWLabeledFrame::SafeDownCast(it->GetObject());
+    if (!frame)
+      {
+      vtkKWWidget *widget = vtkKWWidget::SafeDownCast(it->GetObject());
+      if (widget && widget->GetChildren()->GetNumberOfItems() == 1)
+        {
+        frame = vtkKWLabeledFrame::SafeDownCast(
+          widget->GetChildren()->GetLastKWWidget());
+        }
+      }
+    if (frame)
+      {
+      // cout << panel->GetName() << " : " << frame->GetLabel()->GetLabel() << endl;
+      }
+    }
+  it->Delete();
 }
 
 //----------------------------------------------------------------------------

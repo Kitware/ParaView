@@ -156,15 +156,22 @@ public:
   // Description:
   // Show a panel. It will make sure the pages reserved by the manager for 
   // this panel are shown.
-  // Raise() behaves like Show(), but it will also try to bring
+  // RaisePanel() behaves like ShowPanel(), but it will also try to bring
   // up the first page of the panel to the front (i.e., "select" it).
   // Note that you should use the panel's own API to show/raise a panel: this
   // will automatically call this method with the proper panel parameter
   // (see vtkKWUserInterfacePanel::Show/Raise()).
   // Return 1 on success, 0 on error.
-  virtual int Show(vtkKWUserInterfacePanel *panel) = 0;
-  virtual int Raise(vtkKWUserInterfacePanel *panel) 
-    { return this->Show(panel); };
+  virtual int ShowPanel(vtkKWUserInterfacePanel *panel) = 0;
+  virtual int RaisePanel(vtkKWUserInterfacePanel *panel) 
+    { return this->ShowPanel(panel); };
+
+  // Description:
+  // Update a panel according to the manager settings (i.e., it just performs 
+  // manager-specific changes on the panel). Note that it does not call the
+  // panel's Update() method, on the opposite the panel's Update() will call this
+  // method if the panel has a UIM set.
+  virtual void UpdatePanel(vtkKWUserInterfacePanel *panel) = 0;
 
 protected:
   vtkKWUserInterfaceManager();
