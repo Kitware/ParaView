@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.24");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.25");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -59,6 +59,7 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
   this->LastPath = 0;
 
   this->SaveDialog = 0;
+  this->ChooseDirectory = 0;
   this->DefaultExtension = 0;
 
   this->SetTitle("Open Text Document");
@@ -93,17 +94,41 @@ int vtkKWLoadSaveDialog::Invoke()
   this->Application->SetDialogUp(1);
   char *path = NULL;
   ostrstream command;
-  command << (this->SaveDialog ? "tk_getSaveFile" : "tk_getOpenFile")
-          << " -title {" << this->Title
-          << "}"
-          << " -defaultextension {" 
-          << (this->DefaultExtension ? this->DefaultExtension : "")
-          << "}"
-          << " -filetypes {" << this->FileTypes << "}"
+
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
+  if (this->ChooseDirectory)
+    {
+    command << "tk_chooseDirectory";
+    }
+  else
+    {
+#endif
+    command << (this->SaveDialog ? "tk_getSaveFile" : "tk_getOpenFile");
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
+    }
+#endif
+
+  command << " -title {" << this->Title << "}"
           << " -initialdir {" 
           << ((this->LastPath && strlen(this->LastPath)>0)? this->LastPath : ".")
           << "}";
 
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
+  if (this->ChooseDirectory)
+    {
+    command << " -mustexist 1";
+    }
+  else
+    {
+#endif
+    command << " -defaultextension {" 
+            << (this->DefaultExtension ? this->DefaultExtension : "")
+            << "}"
+            << " -filetypes {" << this->FileTypes << "}";
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
+    }
+#endif
+  
   vtkKWWindow* window = this->GetWindow();
   if (window)
     {
@@ -125,13 +150,24 @@ int vtkKWLoadSaveDialog::Invoke()
 
   if (path && strlen(path))
     {
-    this->Script("encoding convertfrom identity %s", 
+    this->Script("encoding convertfrom identity {%s}", 
                  this->Application->GetMainInterp()->result);
 
     path = this->Application->GetMainInterp()->result;
 
     this->SetFileName(path);
-    this->GenerateLastPath(path);
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
+    if (this->ChooseDirectory)
+      {
+      this->SetLastPath(path);
+      }
+    else
+      {
+#endif
+      this->GenerateLastPath(path);
+#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION >= 3)
+      }
+#endif
     res = 1;
     }
   else
@@ -179,5 +215,6 @@ void vtkKWLoadSaveDialog::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "LastPath: " << (this->LastPath?this->LastPath:"none")
      << endl;
   os << indent << "SaveDialog: " << this->GetSaveDialog() << endl;
+  os << indent << "ChooseDirectory: " << this->GetChooseDirectory() << endl;
   os << indent << "Title: " << (this->Title?this->Title:"none") << endl;
 }
