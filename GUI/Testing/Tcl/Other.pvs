@@ -25,7 +25,8 @@ $pvWindow OpenPackage "$DataDir/Data/Package.xml"
 set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp21) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp285) [$kw(vtkTemp1) CreatePVSource testConeSource]
-$kw(vtkTemp285) LabelEntryCallback
+
+[$kw(vtkTemp285) GetNotebook] LabelEntryCallback
 $kw(vtkTemp285) SetLabel "This is a cone"
 $kw(vtkTemp285) AcceptCallback
 set kw(vtkTemp331) [$kw(vtkTemp285) GetPVWidget {Resolution}]
