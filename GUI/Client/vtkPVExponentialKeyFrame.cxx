@@ -22,7 +22,7 @@
 #include "vtkSMExponentialKeyFrameProxy.h"
 
 vtkStandardNewMacro(vtkPVExponentialKeyFrame);
-vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.1");
+vtkCxxRevisionMacro(vtkPVExponentialKeyFrame, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVExponentialKeyFrame::vtkPVExponentialKeyFrame()
@@ -67,6 +67,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->BaseThumbWheel->ExpandEntryOn();
   this->BaseThumbWheel->GetEntry()->BindCommand(this, "BaseChangedCallback");
   this->BaseThumbWheel->SetEndCommand(this, "BaseChangedCallback");
+  this->BaseThumbWheel->SetEntryCommand(this, "BaseChangedCallback");
 
   this->StartPowerLabel->SetParent(this);
   this->StartPowerLabel->Create(app, 0);
@@ -83,6 +84,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->StartPowerThumbWheel->ExpandEntryOn();
   this->StartPowerThumbWheel->GetEntry()->BindCommand(this, "StartPowerChangedCallback");
   this->StartPowerThumbWheel->SetEndCommand(this, "StartPowerChangedCallback");
+  this->StartPowerThumbWheel->SetEntryCommand(this, "StartPowerChangedCallback");
 
   this->EndPowerLabel->SetParent(this);
   this->EndPowerLabel->Create(app, 0);
@@ -99,6 +101,7 @@ void vtkPVExponentialKeyFrame::ChildCreate(vtkKWApplication* app)
   this->EndPowerThumbWheel->ExpandEntryOn();
   this->EndPowerThumbWheel->GetEntry()->BindCommand(this, "EndPowerChangedCallback");
   this->EndPowerThumbWheel->SetEndCommand(this, "EndPowerChangedCallback");
+  this->EndPowerThumbWheel->SetEntryCommand(this, "EndPowerChangedCallback");
 
   this->Script("grid %s %s -sticky ew",
     this->BaseLabel->GetWidgetName(),

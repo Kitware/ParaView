@@ -22,7 +22,7 @@
 #include "vtkSMSinusoidKeyFrameProxy.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.2");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVSinusoidKeyFrame::vtkPVSinusoidKeyFrame()
@@ -67,6 +67,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->PhaseThumbWheel->ExpandEntryOn();
   this->PhaseThumbWheel->SetBalloonHelpString("Specify the phase of the parameter's"
     " sine waveform in degrees.");
+  this->PhaseThumbWheel->SetEntryCommand(this, "PhaseChangedCallback");
   this->PhaseThumbWheel->GetEntry()->BindCommand(this, "PhaseChangedCallback");
   this->PhaseThumbWheel->SetEndCommand(this, "PhaseChangedCallback");
 
@@ -88,6 +89,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->FrequencyThumbWheel->SetBalloonHelpString("Specify the number of waveform "
     "cycles until the next key frame.");
   this->FrequencyThumbWheel->GetEntry()->BindCommand(this, "FrequencyChangedCallback");
+  this->FrequencyThumbWheel->SetEntryCommand(this, "FrequencyChangedCallback");
   this->FrequencyThumbWheel->SetEndCommand(this, "FrequencyChangedCallback");
 
   this->OffsetLabel->SetParent(this);
@@ -108,6 +110,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
   this->OffsetThumbWheel->SetBalloonHelpString("Specify the positive offset for the crest "
     "of the sine waveform.");
   this->OffsetThumbWheel->GetEntry()->BindCommand(this, "OffsetChangedCallback");
+  this->OffsetThumbWheel->SetEntryCommand(this, "OffsetChangedCallback");
   this->OffsetThumbWheel->SetEndCommand(this, "OffsetChangedCallback");
 
   this->Script("grid %s %s -sticky ew",
