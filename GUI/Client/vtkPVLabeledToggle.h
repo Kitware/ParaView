@@ -104,9 +104,6 @@ protected:
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
   
-  int DefaultValue;
-  vtkSetMacro(DefaultValue, int);
-
 private:
   vtkPVLabeledToggle(const vtkPVLabeledToggle&); // Not implemented
   void operator=(const vtkPVLabeledToggle&); // Not implemented

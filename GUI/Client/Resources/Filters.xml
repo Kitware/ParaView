@@ -29,8 +29,7 @@ The Balance filter is available when ParaView is run in parallel. It does load-b
                input_name="Input"/>
     <VectorEntry label="Number of Processes" trace_name="NumberOfProcesses"
                  property="NumberOfProcesses"
-                 type="int"
-                 default_value="1"/>
+                 type="int"/>
     <Documentation>
 The All to N filter is available when ParaView is run in parallel. It redistributes the data so that it is located on the number of processes specified in the Number of Processes entry box. It also does load-balancing of the data among these processes. This filter operates on polygonal data and produces polygonal output.
     </Documentation>
@@ -99,8 +98,7 @@ The Append Datasets filter operates on multiple data sets of any type (polygonal
     <LabeledToggle label="Generate vertices"
                    trace_name="VertexCells"
                    property="VertexCells"
-                   help="Generate vertex as geometry of just points."
-                   default_value="0"/>
+                   help="Generate vertex as geometry of just points."/>
     <Documentation>
 The Cell Centers filter places a point at the center of each cell in the input data set. The center computed is the parametric center of the cell, not necessarily the geometric or bounding box center. The cell attributes of the input will be associated with these newly created points of the output. The Input menu allows the user to select the data set to which this filter will be applied. If the Generate vertices option is checked, then vertex cells will also be created for each point in the output. This is useful because vertex cells are rendered, but points are not. The points themselves could be used for placing glyphs (using the Glyph filter). The Cell Centers filter takes any type of data set as input and produces a polygonal data set as output.
     </Documentation>
@@ -124,8 +122,7 @@ The Cell Centers filter places a point at the center of each cell in the input d
     <LabeledToggle label="Pass cell data"
                    trace_name="PassCellData"
                    property="PassCellData"
-                   help=" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output."
-                   default_value="0"/>
+                   help=" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output."/>
     <Documentation>
 The Cell Data to Point Data filter averages the values of the cell attributes of the cells surrounding a point to compute point attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass cell data option is checked, then the input cell attributes will also be copied to the cell attributes of the output; otherwise the output will only have point attributes. The Cell Data to Point Data filter operates on any type of data set, and the output data set is of the same type as the input.
     </Documentation>
@@ -145,8 +142,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
     <LabeledToggle label="Piece invariant"
                    trace_name="PieceInvariant"
                    property="PieceInvariant"
-                   help="Turn this on to remove seams when running in parallel."
-                   default_value="1"/>
+                   help="Turn this on to remove seams when running in parallel."/>
     <Scale variable="Tolerance"
            trace_name="Tolerance"
            help="The tolerance in terms of fraction of bounding box length."
@@ -164,28 +160,23 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
     <LabeledToggle label="Tolerance is absolute"
                    trace_name="ToleranceIsAbsolute"
                    property="ToleranceIsAbsolute"
-                   help="Turn this on to use the absolute tolerance."
-                   default_value="0"/>
+                   help="Turn this on to use the absolute tolerance."/>
     <LabeledToggle label="Convert lines to points"
                    trace_name="ConvertLinesToPoints"
                    property="ConvertLinesToPoints"
-                   help="Turn on/off conversion of degenerate lines to points."
-                   default_value="1"/>
+                   help="Turn on/off conversion of degenerate lines to points."/>
     <LabeledToggle label="Convert polys to lines"
                    trace_name="ConvertPolysToLines"
                    property="ConvertPolysToLines"
-                   help="Turn on/off conversion of degenerate polys to lines."
-                   default_value="1"/>
+                   help="Turn on/off conversion of degenerate polys to lines."/>
     <LabeledToggle label="Convert strips to polys"
                    trace_name="ConvertStripsToPolys"
                    property="ConvertStripsToPolys"
-                   help="Turn on/off conversion of degenerate strips to polys."
-                   default_value="1"/>
+                   help="Turn on/off conversion of degenerate strips to polys."/>
     <LabeledToggle label="Point merging"
                    trace_name="PointMerging"
                    property="PointMerging"
-                   help="Turn this On to control wheter points merging is performed."
-                   default_value="1"/>
+                   help="Turn this On to control wheter points merging is performed."/>
     <Documentation>
 The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged). The Input menu allows the user to select the data set to which this filter will be applied. If the Point merging option is on, then points will be merged if they are within the specified Tolerance or Absolute tolerance, depending on whether the Tolerance is absolute box is checked. (Tolerance is specified as a fraction of the length of the diagonal of the bounding box of the data set; Absolute tolerance is specified in the spatial units of the input data set.)
 The transforming of degenerate cells into their appropriate forms is controlled by three check boxes on the user interface: Convert lines to points, Convert polys to lines, and Convert strips to polys. If any of these is unchecked, then degenerate cells of that type will not be converted to another type of cell.
@@ -265,8 +256,7 @@ The Crop filter extracts an area/volume of interest from a 2D image or a 3D volu
     <LabeledToggle label="Invert mean curvature"
                    trace_name="InvertMeanCurvature"
                    property="InvertMeanCurvature"
-                   help="Turn this on to invert the mean curvature calculation for meshes with inward pointing normals."
-                   default_value="0"/>
+                   help="Turn this on to invert the mean curvature calculation for meshes with inward pointing normals."/>
     <SelectionList property="CurvatureType"
                    label="Curvature type"
                    trace_name="CurvatureType"
@@ -303,8 +293,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
     <LabeledToggle label="Preserve topology"
                    trace_name="PreserveTopology"
                    property="PreserveTopology"
-                   help="If off, better reduction can occur, but model may break up."
-                   default_value="0"/>
+                   help="If off, better reduction can occur, but model may break up."/>
     <Scale label="Feature angle"
            trace_name="FeatureAngle"
            variable="FeatureAngle"
@@ -317,8 +306,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
     <LabeledToggle label="Boundary deletable"
                    trace_name="BoundaryVertexDeletion"
                    property="BoundaryVertexDeletion"
-                   help="If off, decimate will not remove points on the boundary."
-                   default_value="1"/>
+                   help="If off, decimate will not remove points on the boundary."/>
     <Documentation>
 The Decimate filter reduces the number of triangles in a polygonal data set. Because this filter only operates on triangles, first run the Triangulate filter on a data set that contains polygons other than triangles. The Input menu allows the user to select the data set to which this filter will be applied. The Reduction target slider specifies the desired reduction in the total number of polygons (e.g., if the Reduction target value is 0.9, the Decimate filter will attempt to produce an output data set that is 10% the size of the input.) If the Preserve topology option is on, decimation will not split the data set or produce holes, but it may keep the filter from reaching the reduction target. The Feature angle slider value is used in determining where the data set may be split. If the angle between two adjacent triangles is >= the Feature angle value, then their boundary is considered a feature edge where the data set can be split. If the Boundary deletable option is on, then vertices on the boundary of the data set can be removed. Turning this option off preserves the boundary of the data set, but it may cause the filter not to reach its reduction target.
     </Documentation>
@@ -350,8 +338,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
     <LabeledToggle label="Minimal memory"
                    trace_name="UseMinimalMemory" 
                    property="UseMinimalMemory" 
-                   help="Force communication routines to use minimal memory, which is slower"
-                   default_value="0"/>
+                   help="Force communication routines to use minimal memory, which is slower"/>
     <Documentation>
 The D3 filter is available when ParaView is run in parallel. It operates on any type of data set to evenly divide it across the processors into spatially contiguous regions. The Boundary Cells menu determines how cells that lie on processor boundaries are handled. The Assign cells uniquely option assigns each boundary cell to exactly one process, which is useful for isosurfacing. Selecting Duplicate cells causes the cells on the boundaries to be copied to each process that shares that boundary. The Divide cells option breaks cells across process boundary lines so that pieces of the cell lie in different processes. This option is useful for volume rendering. The Global Id Array Name entry determines the name of the array containing global point ids. Such an array is necessary for processing ghost cells and is useful for removing duplicate points when merging sub-grids. The output of this filter is of type unstructured grid.
     </Documentation>
@@ -377,7 +364,6 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
                  trace_name="ScalarRange"
                  property="ScalarRange"
                  type="float" length="2"
-                 default_value="0.0 1.0"
                  help="Set the range of scalar values to generate" />
     <LineWidget trace_name="Line"
                 point1_variable="LowPoint"
@@ -591,28 +577,23 @@ The Calculator filter is available on the Toolbar.
     <LabeledToggle label="Boundary edges"
                    trace_name="BoundaryEdges"
                    property="BoundaryEdges"
-                   help="Turn this off if you do not want to extract boundary edges."
-                   default_value="1"/>
+                   help="Turn this off if you do not want to extract boundary edges."/>
     <LabeledToggle label="Feature edges"
                    trace_name="FeatureEdges"
                    property="FeatureEdges"
-                   help="Turn this off if you do not want to extract feature edges."
-                   default_value="1"/>
+                   help="Turn this off if you do not want to extract feature edges."/>
     <LabeledToggle label="Non-manifold edges"
                    trace_name="NonManifoldEdges"
                    property="NonManifoldEdges"
-                   help="Turn this off if you do not want to extract non-manifold edges."
-                   default_value="1"/>
+                   help="Turn this off if you do not want to extract non-manifold edges."/>
     <LabeledToggle label="Manifold edges"
                    trace_name="ManifoldEdges"
                    property="ManifoldEdges"
-                   help="Turn this on if you want to extract manifold edges."
-                   default_value="0"/>
+                   help="Turn this on if you want to extract manifold edges."/>
     <LabeledToggle label="Coloring"
                    trace_name="Coloring"
                    property="Coloring"
-                   help="Turn this off if you do not want to color the edges by type."
-                   default_value="1"/>
+                   help="Turn this off if you do not want to color the edges by type."/>
     <Scale label="Feature angle"
            trace_name="FeatureAngle"
            variable="FeatureAngle"
@@ -732,25 +713,21 @@ The Group Parts filter causes different data sets to be grouped into a collectio
     <VectorEntry label="Scale factor"
                  trace_name="ScaleFactor"
                  property="ScaleFactor" type="float"
-                 help="Set the extrusion scale factor"
-                 default_value="1.0"/>
+                 help="Set the extrusion scale factor"/>
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Vector"
                  trace_name="Vector"
                  property="Vector"
                  type="float" length="3"
-                 help="Set the direction for the extrusion"
-                 default_value="0.0 0.0 1.0"/>
+                 help="Set the direction for the extrusion"/>
     <LabeledToggle label="Capping"
                    trace_name="Capping"
                    property="Capping"
-                   help="Select whether to draw endcaps" 
-                   default_value="1"/>
+                   help="Select whether to draw endcaps"/>
     <LabeledToggle label="Piece invariant"
                    trace_name="PieceInvariant"
                    property="PieceInvariant"
-                   help="Turn this off if you do want to process ghost levels and do not mind seams."
-                   default_value="0"/>
+                   help="Turn this off if you do want to process ghost levels and do not mind seams."/>
     <Documentation>
 The Linear Extrusion filter creates a swept surface by translating the input data set along a specified vector. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The three Vector entry boxes specify the X, Y, and Z components of the vector along which to sweep the input. The value of the Scale factor entry determines the distance along the vector the data set will be translated. (A scale factor of 0.5 will move the data set half the length of the vector, and a scale factor of 2 will move it twice the vector's length.)
 The Capping check box indicates whether to cap the ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then if capping is on, two copies of the data set will be displayed on output (the second translated from the first one along the specified vector). If instead capping is off, then an input closed solid will produce no output.
@@ -818,13 +795,11 @@ The Loop Subdivision filter increases the granularity of a polygonal mesh. It wo
                 help="Start with this point."/>
     <LabeledToggle label="Random" trace_name="Random"
                    property="RandomMode"
-                   help="Select whether to randomly select points, or subsample regularly."
-                   default_value="0"/>
+                   help="Select whether to randomly select points, or subsample regularly."/>
     <LabeledToggle label="Generate vertices"
                    trace_name="GenerateVertices"
                    property="GenerateVertices"
-                   help="Convienience feature to display points."
-                   default_value="0"/>
+                   help="Convienience feature to display points."/>
     <Documentation>
 The Mask Points filter reduces the number of points in the data set. It operates on any type of data set, but produces only points / vertices. This filter is often used before the Glyph filter, but now the basic point-masking functionality is available on the Parameters page for the Glyph filter.
 The Input menu allows the user to select the data set to which this filter will be applied. The value in the On ratio thumb wheel specifies the ratio of points to retain in the output. (For example, if the on ratio is 3, then the output will contain 1/3 as many points -- up to the Max. points value -- as the input.) The Max. points thumb wheel determines the maximum number of points that will appear in the output. The Offset thumb wheel specifies the point in the data set from which to start masking. If the Random check box is marked, then the output points will be selected randomly from the input; otherwise every nth point (specified by the on ratio) will be selected. Selecting points at random is helpful to avoid striping when masking the points of a structured data set. If the Generate vertices option is checked, then a vertex cell will be created for each point in the output.
@@ -854,8 +829,7 @@ The Input menu allows the user to select the data set to which this filter will 
                  trace_name="KernelSize"
                  property="KernelSize" type="int"
                  length="3"
-                 help="Determines the smoothing neighborhood."
-                 default_value="1 1 1"/>
+                 help="Determines the smoothing neighborhood."/>
     <Documentation>
 The Median filter operates on uniform rectilinear (image or volume) data and produces uniform rectilinear output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernel Size). From the Input menu, the user can select the data set on which to perform this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction. Since the median operation removes outliers, this filter is useful for removing high-intensity, low-probability noise (shot noise).
     </Documentation>
@@ -884,33 +858,27 @@ The Median filter operates on uniform rectilinear (image or volume) data and pro
     <LabeledToggle label="Splitting"
                    trace_name="Splitting"
                    property="Splitting"
-                   help="Turn on/off the splitting of sharp edges."
-                   default_value="1"/>
+                   help="Turn on/off the splitting of sharp edges."/>
     <LabeledToggle label="Consistency"
                    trace_name="Consistency"
                    property="Consistency"
-                   help="Turn on/off the enforcement of consistent polygon ordering."
-                   default_value="1"/>
+                   help="Turn on/off the enforcement of consistent polygon ordering."/>
     <LabeledToggle label="Flip normals"
                    trace_name="FlipNormals"
                    property="FlipNormals"
-                   help="Flipping reverves the meaning of front and back."
-                   default_value="0"/>
+                   help="Flipping reverves the meaning of front and back."/>
     <LabeledToggle label="Non-manifold"
                    trace_name="NonManifoldTraversal"
                    property="NonManifoldTraversal"
-                   help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops."
-                   default_value="1"/>
+                   help="Turn on/off traversal across non-manifold edges. This will prevent problems where the consistency of polygonal ordering is corrupted due to topological loops."/>
     <LabeledToggle label="Cell normals"
                    trace_name="ComputeCellNormals"
                    property="ComputeCellNormals"
-                   help="Turn on/off the computation of cell normals."
-                   default_value="0"/>
+                   help="Turn on/off the computation of cell normals."/>
     <LabeledToggle label="Piece invariant"
                    trace_name="PieceInvariant"
                    property="PieceInvariant"
-                   help="Turn this off if you do not want to process ghost levels and do not mind seams."
-                   default_value="1"/>
+                   help="Turn this off if you do not want to process ghost levels and do not mind seams."/>
     <Documentation>
 The Normals generation filter generates surface normals at the points of the input polygonal data set to provide smooth shading of the data set. The resulting data set is also polygonal. The filter works by calculating a normal vector for each polygon in the data set and then averaging the normals at the shared points.
 In creating surface normals, if the angle between two polygons at a shared edge is larger than the value of the Feature angle slider, then that edge is considered a feature edge. If Splitting is turned on, then the mesh will be split along feature edges, allowing points to be duplicated. Because the duplicated points are no longer shared between the polygons meeting at the feature edge, a normal at these points will be created per polygon rather than averaging the polygon normals to produce one normal at each point. This allows the feature edges to remain "sharp" after shading.
@@ -1031,8 +999,7 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
     <LabeledToggle label="Random"
                    trace_name="RandomMode"
                    property="RandomMode"
-                   help="Select whether to use random colors for the various pieces"
-                   default_value="0"/>
+                   help="Select whether to use random colors for the various pieces"/>
     <Documentation>
 The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on. If the Random option is selected, the unique value per piece will be chosen at random; otherwise it will match the process id. This filter operates on any type of data when ParaView is run in parallel. The output data set type is the same as that of the input.
     </Documentation>
@@ -1057,8 +1024,7 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
     <LabeledToggle label="Pass point data"
                    trace_name="PassPointData"
                    property="PassPointData"
-                   help="If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output."
-                   default_value="0"/>
+                   help="If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output."/>
     <Documentation>
 The Point Data to Cell Data filter averages the values of the point attributes of the points of a cell to compute cell attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass point data option is checked, then the input point attributes will also be copied to the point attributes of the output; otherwise the output will only have cell attributes. The Point Data to Cell Data filter operates on any type of data set, and the output data set is of the same type as the input.
     </Documentation>
@@ -1083,28 +1049,23 @@ The Point Data to Cell Data filter averages the values of the point attributes o
                  property="NumberOfDivisions"
                  type="int"
                  length="3"
-                 help="Set the number of bins in each dimension"
-                 default_value="50 50 50"/>
+                 help="Set the number of bins in each dimension"/>
     <LabeledToggle label="Use input points"
                    trace_name="UseInputPoints"
                    property="UseInputPoints"
-                   help="Select whether to use points from the input in the output or to calculate optimum representative points for each bin"
-                   default_value="0"/>
+                   help="Select whether to use points from the input in the output or to calculate optimum representative points for each bin"/>
     <LabeledToggle label="Use feature edges"
                    trace_name="UseFeatureEdges"
                    property="UseFeatureEdges"
-                   help="Select whether to use feature edge quadrics to match up the boundaries between pieces"
-                   default_value="0"/>
+                   help="Select whether to use feature edge quadrics to match up the boundaries between pieces"/>
     <LabeledToggle label="Use feature points"
                    trace_name="UseFeaturePoints"
                    property="UseFeaturePoints"
-                   help="Select whether to use feature point quadrics to align piece boundaries"
-                   default_value="0"/>
+                   help="Select whether to use feature point quadrics to align piece boundaries"/>
     <LabeledToggle label="Copy cell data"
                    trace_name="CopyCellData"
                    property="CopyCellData"
-                   help="Should cell data be copied from output to input?"
-                   default_value="0"/>
+                   help="Should cell data be copied from output to input?"/>
     <Documentation>
 The Quadric Clustering filter produces a reduced-resolution polygonal approximation of the input polygonal data set. This filter is the one used by ParaView for computing LODs. It uses spatial binning to reduce the number of points in the data set; points that lie within the same spatial bin are collapsed into one representative point. The Divisions entries specify the number of bins along the X, Y, and Z axes of the data set. If Use input points is on, the representative point for each bin is selected from one of the input points that lies in that bin; the input point that produces the least error is chosen. Without this option selected, the location of the representative point is calculated to produce the least error possible for that bin, but the point will most likely not be one of the input points.
 To better align pieces of the data set assigned to different processors, select Use feature edges and Use feature points. Use feature edges adjusts the representative points that contain boundary edges (along processor divisions), and Use feature points further influences the position of the feature points along the boundaries.
@@ -1186,12 +1147,10 @@ The Random Vectors filter generates a point-centered array of random vectors. It
                  trace_name="Center"
                  property="Center"
                  type="float"
-                 help="The center of the mirror plane."
-                 default_value="0.0"/>
+                 help="The center of the mirror plane."/>
     <LabeledToggle property="CopyInput" trace_name="CopyInput"
                    label="Copy Input"
-                   help="Include both the input and its reflection in the output."
-                   default_value="1"/>
+                   help="Include both the input and its reflection in the output."/>
     <Documentation>
 The Reflection filter reflects the input data set across the specified plane. If the Copy Input check box is marked, the output is the union of the input data set and its reflection. Otherwise the output will contain only the reflection of the input data. If the value chosen from the Plane menu is X, Y, or Z, the value of the Center entry determines where the plane is placed along the specified axis. The other six entries, X Min, X Max, etc., place the reflection plane at the specified face of the bounding box of the input data set. This filter operates on any type of data set and produces an unstructured grid output.
     </Documentation>
@@ -1246,21 +1205,18 @@ The Reflection filter reflects the input data set across the specified plane. If
     <LabeledToggle label="Use default normal"
                    trace_name="UseDefaultNormal"
                    property="UseDefaultNormal"
-                   help="When this option is off, default normals will be generated if the input contains no normals. If on, the Default normal will be used."
-                   default_value="0"/>
+                   help="When this option is off, default normals will be generated if the input contains no normals. If on, the Default normal will be used."/>
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Default normal"
                  trace_name="DefaultNormal"
                  property="DefaultNormal"
                  type="float"
                  length="3"
-                 help="Specify the normal to use if Use default normal is on."
-                 default_value="0.0 0.0 1.0"/>
+                 help="Specify the normal to use if Use default normal is on."/>
     <LabeledToggle label="Vary width"
                    trace_name="VaryWidth"
                    property="VaryWidth"
-                   help="Turn on/off the variation of ribbon width with scalar value."
-                   default_value="0"/>
+                   help="Turn on/off the variation of ribbon width with scalar value."/>
     <Documentation>
 The Ribbon filter creates ribbons from the lines in the input data set. This filter is useful for visualizing streamlines. Both the input and output of this filter are polygonal data. The input data set must also have at least one point-centered vector array.
 The vectors and scalars for use in this filter can be selected from the Vectors and Scalars menus respectively. If the Vary width option is on, the width of the ribbons will be scaled according to the selected scalars. If Use default normal is off, the selected vector array will be used as the normals of the ribbons. If Use default normal is on, the normal for the ribbons is specified by the values in the Default normal entry boxes.
@@ -1288,28 +1244,24 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
                 default_value="12"/>
     <LabeledToggle label="Capping"
                    trace_name="Capping"
-                   property="Capping"
-                   default_value="1"/>
+                   property="Capping"/>
     <VectorEntry label="Angle"
                  trace_name="Angle"
                  property="Angle"
                  help="Set the angle of rotation."
-                 type="float"
-                 default_value="360.0"/>
+                 type="float"/>
     <!-- Translation value chosen does not change processing speed of this filter or cause it to crash. -->
     <VectorEntry label="Translation"
                  trace_name="Translation"
                  property="Translation"
                  type="float"
-                 help="The total amount of translation along the z-axis."
-                 default_value="0.0"/>
+                 help="The total amount of translation along the z-axis."/>
     <!-- DeltaRadius value chosen does not change processing speed of this filter or cause it to crash. -->
     <VectorEntry label="Delta radius"
                  trace_name="DeltaRadius"
                  property="DeltaRadius"
                  type="float"
-                 help="The change in radius during sweep process."
-                 default_value="0.0"/>
+                 help="The change in radius during sweep process."/>
     <Documentation>
 The Rotational Extrusion filter forms a surface by rotating the input about the Z axis. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The value of the Resolution thumb wheel specifies the number of steps taken in rotating from 0 to the value specified in the Angle entry box. The Translation entry box determines the distance along the Z axis to be covered as the data set is rotated. Specifying a non-zero Translation value allows you to create a corkscrew or spring effect. The Delta radius entry box controls how much the radius of the rotation increases as the new data set is swept out.
 The Capping check box controls whether to close the open ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then either two copies of the data set will be drawn or no surface will be drawn. No surface is drawn if either capping is on or if the two surfaces would occupy exactly the same 3D space (e.g., Angle is a multiple of 360, and Translation and Delta radius are 0).
@@ -1361,8 +1313,7 @@ The Shrink filter causes the individual cells of a data set to break apart from 
                  trace_name="ShrinkFactor"
                  property="ShrinkFactor"
                  type="float"
-                 help="Set the amount to shrink by"
-                 default_value="0.5"/>
+                 help="Set the amount to shrink by"/>
   </Module>
     -->
   <Module name="SmoothPolyDataFilter"
@@ -1471,7 +1422,6 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
                  trace_name="ChordError"
                  property="ChordError" type="float"
                  help="The maximum chord error allowed at any edge midpoint in the output tessellation."
-                 default_value="0.0001" data_range=".0000000001 1"
                  />
     <TempTessellatorEntry label="Max Field Error" trace_name="FieldError2"
                       variable="FieldError2" type="float"
@@ -1483,7 +1433,7 @@ The Subdivide filter iteratively divides each triangle in the data set into 4 ne
     <VectorEntry label="Max Num Of Subdivisions"
                  trace_name="MaximumNumberOfSubdivisions"
                  property="MaximumNumberOfSubdivisions" type="int"
-                 default_value="1" data_range="0 8"/>
+                 range="0 8"/>
     <Documentation>
 The Tessellate filter tessellates cells with nonlinear geometry and/or scalar fields into a simplicial complex with linearly interpolated field values that more closely approximate the original field. This is useful for the quadratic cells supported by VTK. There are several settings that affect the tessellation.
 The Output Dimension specifies whether nonlinear cells should have their volumes, surfaces, or edges tessellated. When the Output Dimension is 3, 3-D cells produce tetrahedra, 2-D cells produce triangles, and 1-D cells produce line segments. When the Output Dimension is 2, 3-D cells will have their boundaries tessellated with triangles. When the Output Dimension is 1, then all cells except points produce line segments.
@@ -1582,8 +1532,7 @@ The Transform filter allows you to specify the position, size, and orientation o
     <LabeledToggle label="Capping"
                    trace_name="Capping"
                    property="Capping"
-                   help="Select whether to draw endcaps on the tube"
-                   default_value="0"/>
+                   help="Select whether to draw endcaps on the tube"/>
     <ScaleFactorEntry label="Radius"
                       property="Radius"
                       input_menu="im"
@@ -1608,8 +1557,7 @@ The Transform filter allows you to specify the position, size, and orientation o
                  trace_name="RadiusFactor"
                  property="RadiusFactor"
                  type="float"
-                 help="Set the maximum tube radius in terms of a multiple of the minimum radius"
-                 default_value="10"/>
+                 help="Set the maximum tube radius in terms of a multiple of the minimum radius"/>
     <Documentation>
 The Tube filter creates tubes around the lines in the input polygonal data set. The output is also polygonal. The Num. sides value determines the number of faces around the circumference of the tube. The Capping toggle specifies whether to close the end of the tube with a polygon. The Radius entry determines the radius of the tube (or the minimum radius if you are varying the radius). From the Vary radius menu, you can select whether the radius of the tube should vary, and if so, whether it should be by scalar or by vector. If the radius is varied by scalar, the tube radius is based on the point-based scalar values. If it is varied by vector, the vector magnitude is used. If you are varying the radius, the value in the Radius factor entry determines the maximum radius by specifying a multiplier of the Radius value.
     </Documentation>
@@ -1642,26 +1590,22 @@ The Tube filter creates tubes around the lines in the input polygonal data set. 
                  property="ScaleFactor"
                  trace_name="ScaleFactor"
                  type="float"
-                 help="Displacement is vector times scale."
-                 default_value="1.0"/>
+                 help="Displacement is vector times scale."/>
     <!-- keeping vector entries with length > 1 -->
     <VectorEntry label="Normal"
                  property="Normal"
                  trace_name="Normal"
                  type="float"
                  length="3"
-                 help="Warp direction."
-                 default_value="0.0 0.0 1.0"/>
+                 help="Warp direction."/>
     <LabeledToggle label="Use normal"
                    trace_name="UseNormal"
                    property="UseNormal"
-                   help="Use instance model normals rather than instance normal."
-                   default_value="0"/>
+                   help="Use instance model normals rather than instance normal."/>
     <LabeledToggle label="X-Y plane"
                    trace_name="XYPlane"
                    property="XYPlane"
-                   help="Z value is used to warp the surface, scalars to color surface."
-                   default_value="0"/>
+                   help="Z value is used to warp the surface, scalars to color surface."/>
     <Documentation>
 The Warp (scalar) filter translates the points of the input data set along a vector by a distance determined by the specified scalars (selected from the Scalars menu). The Scale factor entry allows you to rescale the scalar values used in warping the data.
 The Normal entries specify the direction in which to warp the geometry if the Use normal option is checked. If Use normal and X-Y plane are off, the data set will be warped along its normals array. (If no normals array exists, the Normal value will be used.) If X-Y plane is on, the Z-values in the data set are considered to be scalars, and warping is done along the Z axis. This is useful for creating carpet plots. Any scalars in the data set are copied to the output, so the data can be colored by them.
@@ -1699,8 +1643,7 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
                  trace_name="ScaleFactor"
                  property="ScaleFactor"
                  type="float"
-                 help="Displacement is vector times scale."
-                 default_value="1.0"/>
+                 help="Displacement is vector times scale."/>
     <Documentation>
 The Warp (vector) filter translates the points of the input data set using a specified vector array. The vector array chosen specifies a vector per point in the input. Each point is translated along its vector by the value in the Scale factor entry box. This filter operates on polygonal, curvilinear, and unstructured grid data sets. Because this filter only changes the positions of the points, the output data set type is the same as that of the input. This filter is available on the Toolbar.
     </Documentation>
@@ -1837,8 +1780,7 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
     <LabeledToggle label="Inside Out"
                    trace_name="InsideOut"
                    property="InsideOut"
-                   help="Switches which part to keep."
-                   default_value="0"/>
+                   help="Switches which part to keep."/>
     <Documentation>
 The Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
 If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function. If Scalars is selected, then the user must specify a scalar array to clip according to. The clip filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.
@@ -1886,7 +1828,6 @@ This filter operates on all types of data sets, and it returns unstructured grid
     <LabeledToggle label="All Scalars"
                    trace_name="AllScalars"
                    property="AllScalars"
-                   default_value="1"
                    help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data."/>
     <Documentation>
 The Threshold filter extracts the portions of the input data set whose scalars lie within the specified range. This filter operates on either point-centered or cell-centered data. To select between these two options, select either Point Data or Cell Data from the Attribute Mode menu. Once the Attribute Mode has been selected, choose the scalar array from which to threshold the data from the Scalars menu. The Lower Threshold and Upper Threshold sliders determine the range of the scalars to retain in the output. The All Scalars check box only takes effect when the Attribute Mode is set to Point Data. If the All Scalars option is checked, then a cell will only be passed to the output if the scalar values of all of its points lie within the range indicated by the Lower Threshold and Upper Threshold sliders. If unchecked, then a cell will be added to the output if the specified scalar value for any of its points is within the chosen range. This filter operates on any type of data set and produces unstructured grid output. The Threshold filter is available on the Toolbar.
@@ -1943,17 +1884,14 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                   help="List of current contour values." />
     <LabeledToggle label="Compute Normals"
                    property="ComputeNormals"
-                   default_value="1"
                    trace_name="Compute Normals"
                    help="Select whether to compute normals" />
     <LabeledToggle label="Compute Gradients"
                    property="ComputeGradients"
-                   default_value="0"
                    trace_name="Compute Gradients"
                    help="Select whether to compute gradients"/>
     <LabeledToggle label="Compute Scalars"
                    property="ComputeScalars"
-                   default_value="0"
                    trace_name="Compute Scalars"
                    help="Select whether to compute scalars" />
     <Documentation>
@@ -2006,12 +1944,10 @@ The Contour filter operates on any type of data set, but the input is required t
     <LabeledToggle label="Mask Points"
                    trace_name="MaskPoints"
                    property="UseMaskPoints"
-                   default_value="1"
                    help="Create no more than specified maximum number of glyphs" />
     <LabeledToggle label="Random Masking"
                    trace_name="RandomMask"
                    property="RandomMode"
-                   default_value="1"
                    help="Choose points at random to mask" />
     <Documentation>
 The Glyph filter generates a glyph (i.e., an arrow, cone, line, sphere, or 2D glyph) at each point in the input data set. The glyphs can be oriented and scaled by the input point-centered scalars and vectors.
@@ -2182,8 +2118,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                      property="InitialIntegrationStep"
                      type="float"
                      trace_name="InitLen"
-                     help="Initial step length"
-                     default_value="0.5"/>
+                     help="Initial step length"/>
       </Item>
     </ContainerWidget>
     <SelectionList trace_name="IntegrationDirection"
@@ -2231,8 +2166,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                          property="MinimumIntegrationStep"
                          type="float"
                          trace_name="MinLen"
-                         help="Minimum step length  used in the integation"
-                         default_value="0.01"/>
+                         help="Minimum step length  used in the integation"/>
           </Item>
         </ContainerWidget>
       </Item>
@@ -2258,8 +2192,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                          property="MaximumIntegrationStep"
                          type="float"
                          trace_name="MaxLen"
-                         help="Maximum step length used in the integration"
-                         default_value="1.0"/>
+                         help="Maximum step length used in the integration"/>
           </Item>
         </ContainerWidget>
       </Item>
@@ -2268,8 +2201,7 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                    trace_name="MaximumError"
                    property="MaximumError"
                    type="float"
-                   help="Maximum error allowed in the integration"
-                   default_value="0.000001"/>
+                   help="Maximum error allowed in the integration"/>
       </Item>
       </ContainerWidget>
       </Item>
@@ -2278,14 +2210,12 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                  trace_name="MaximumNumberOfSteps"
                  property="MaximumNumberOfSteps"
                  type="int"
-                 help="Maximum number of steps."
-                 default_value="2000"/>
+                 help="Maximum number of steps."/>
     <VectorEntry label="Term. Speed"
                  trace_name="TerminalSpeed"
                  property="TerminalSpeed"
                  type="float"
-                 help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"
-                 default_value="0.000000000001"/>
+                 help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"/>
     <Documentation>
 The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
 The Max. Propagation entry box allows you to specify the maximum length of the streamlines. From the Max. Propagation menu, you can select the units to be either Time (the time a particle would travel with steady flow) or Length (in the data set's spatial coordinates).
@@ -2350,7 +2280,6 @@ This filter operates on any type of data set, provided it has point-centered vec
     <LabeledToggle label="Include boundary"
                    property="IncludeBoundary"
                    trace_name="IncludeBoundary"
-                   default_value="0"
                    help="Select whether to always include the boundary of the grid in the output"/>
     <Documentation>
 The Extract Grid filter returns a subgrid of a structured input data set (uniform rectilinear, curvilinear, or nonuniform rectilinear). The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For example, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample Rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the Toolbar.

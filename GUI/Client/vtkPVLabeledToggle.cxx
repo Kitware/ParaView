@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.29");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -34,7 +34,6 @@ vtkPVLabeledToggle::vtkPVLabeledToggle()
   this->Label->SetParent(this);
   this->CheckButton = vtkKWCheckButton::New();
   this->CheckButton->SetParent(this);
-  this->DefaultValue = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -241,7 +240,6 @@ void vtkPVLabeledToggle::CopyProperties(vtkPVWidget* clone,
       pvlt->SetTraceName(label);
       pvlt->SetTraceNameState(vtkPVWidget::SelfInitialized);
       }
-    pvlt->SetDefaultValue(this->DefaultValue);
     }
   else 
     {
@@ -266,17 +264,6 @@ int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
     this->Label->SetLabel(this->VariableName);
     }
 
-  const char* defaultValue = element->GetAttribute("default_value");
-  if (defaultValue)
-    {
-    this->DefaultValue = atoi(defaultValue);
-    }
-  else
-    {
-    vtkErrorMacro("No default value is specified. Setting to 1");
-    this->DefaultValue = 1;
-    }
-  
   return 1;
 }
 

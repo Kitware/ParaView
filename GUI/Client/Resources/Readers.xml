@@ -175,8 +175,7 @@
     <Source class="vtkHDF5RawImageReader"/>
     <VectorEntry length="3" label="Stride"
                  property="Stride" trace_name="Stride" type="int"
-                 help="Read a subset of data spaced by the stride."
-                 default_value="1 1 1"/>
+                 help="Read a subset of data spaced by the stride."/>
     <ArraySelection attribute_name="Point"
                     trace_name="PointArrays"/>
   </Module>
@@ -209,8 +208,7 @@
     <Source class="vtkXYZMolReader"/>
     <VectorEntry property="TimeStep" label="TimeStep"
                  trace_name="TimeStep" type="int"
-                 help="Set the TimeStep"
-                 default_value="0"/>
+                 help="Set the TimeStep"/>
   </Module>
   <Module name="P3DReader"
           class="vtkPVPLOT3DReaderModule"
@@ -226,33 +224,27 @@
     <LabeledToggle label="Binary"
                    trace_name="BinaryFile"
                    property="BinaryFile"
-                   help="Is this a binary file?"
-                   default_value="1"/>
+                   help="Is this a binary file?"/>
     <LabeledToggle label="Multi-block"
                    trace_name="MultiGrid"
                    property="MultiGrid"
-                   help="Does this file have multiple block information"
-                   default_value="0"/>
+                   help="Does this file have multiple block information"/>
     <LabeledToggle label="Fortran byte count"
                    trace_name="HasByteCount"
                    property="HasByteCount"
-                   help="Does this file use Fortran leading-trailing byte counts"
-                   default_value="0"/>
+                   help="Does this file use Fortran leading-trailing byte counts"/>
     <LabeledToggle label="I blanking"
                    trace_name="IBlanking"
                    property="IBlanking"
-                   help="Any visibility information?"
-                   default_value="0"/>
+                   help="Any visibility information?"/>
     <LabeledToggle label="2D geometry"
                    trace_name="TwoDimensionalGeometry"
                    property="TwoDimensionalGeometry"
-                   help="Is there only data for two dimensions?"
-                   default_value="0"/>
+                   help="Is there only data for two dimensions?"/>
     <LabeledToggle label="Force read"
                    trace_name="ForceRead"
                    property="ForceRead"
-                   help="Read even if file looks corrupt?"
-                   default_value="0"/>
+                   help="Read even if file looks corrupt?"/>
     <SelectionList label="Byte order"
                    trace_name="ByteOrder"
                    property="ByteOrder"
@@ -287,12 +279,10 @@
     <Source class="vtkGaussianCubeReader"/>
     <VectorEntry property="HBScale" label="HBScale"
                  trace_name="HBScale" type="float"
-                 help="Set the HB scale"
-                 default_value="1.0"/>
+                 help="Set the HB scale"/>
     <VectorEntry property="BScale" label="BScale"
                  trace_name="BScale" type="float"
-                 help="Set the B scale"
-                 default_value="1.0"/>
+                 help="Set the B scale"/>
   </Module>
   <Module name="popreader"
           class="vtkPVAdvancedReaderModule"
@@ -303,20 +293,17 @@
     <Source class="vtkPOPReader"/>
     <VectorEntry property="Radius" label="Radius"
                  trace_name="Radius" type="float"
-                 help="Set the radius of the data set"
-                 default_value="60000"/>
+                 help="Set the radius of the data set"/>
     <VectorEntry label="Clip Extent"
                  property="ClipExtent" type="int"
                  length="6"
                  trace_name="ClipExtent"
-                 help="For reading a smaller extent."
-                 default_value="-2147483647 2147483647 -2147483647 2147483647 -2147483647 2147483647"/>
+                 help="For reading a smaller extent."/>
     <VectorEntry label="Ghost Levels"
                  trace_name="NumberOfGhostLevels"
                  property="NumberOfGhostLevels"
                  type="int"
-                 help="Set the number of ghost levels to read."
-                 default_value="1"/>
+                 help="Set the number of ghost levels to read."/>
   </Module>
   <Module name="ensightMS"
           class="vtkPVEnSightReaderModule"
@@ -385,23 +372,19 @@
     <VectorEntry label="Origin"
                  trace_name="Origin" property="DataOrigin"
                  type="float" length="3"
-                 help="Set the position of the point with index (0,0,0)"
-                 default_value="0.0 0.0 0.0"/>
+                 help="Set the position of the point with index (0,0,0)"/>
     <VectorEntry label="Spacing"
                  trace_name="Spacing" property="DataSpacing"
                  type="float" length="3"
-                 help="Set the size of a voxel in each dimension."
-                 default_value="1.0 1.0 1.0"/>
+                 help="Set the size of a voxel in each dimension."/>
     <VectorEntry label="Extent"
                  trace_name="Extent" property="DataExtent"
                  type="int" length="6"
-                 help="Set the min and max values of the data in each dimension"
-                 default_value="0 0 0 0 0 0"/>
+                 help="Set the min and max values of the data in each dimension"/>
     <VectorEntry label="Num. components"
                  trace_name="NumberOfScalarComponents"
                  property="NumberOfScalarComponents" type="int"
-                 help="How many componenets does each pixel have. (i.e. RGB would be 3.)"
-                 default_value="1"/>
+                 help="How many componenets does each pixel have. (i.e. RGB would be 3.)"/>
     <StringEntry label="Array name"
                  trace_name="ArrayName"
                  variable="ScalarArrayName"
@@ -424,7 +407,6 @@
     <VectorEntry label="Stride"
                  trace_name="stride" property="Stride" type="int"
                  length="3"
-                 default_value="1 1 1"
                  help="Set the number of steps to skip between each point (structured data only)."/>
     <XDMFParameters trace_name="xdmf_parameters" variable="ParameterIndex"
                     label="Parameters" />
@@ -497,29 +479,28 @@
 	<LabeledToggle label="Apply Displacements"
                    property="ApplyDisplacements"
                    trace_name="apply_displacements"
-                   help="Select whether the reader automatically applies displacements" default_value="1"/>
+                   help="Select whether the reader automatically applies displacements"/>
 	<VectorEntry label="Displacement Scale"
                  trace_name="DisplacementMagnitude"
                  property="DisplacementMagnitude"
                  type="float"
-                 help="The magnitude of the applied displacement."
-                 default_value="1.0"/>
+                 help="The magnitude of the applied displacement."/>
     <LabeledToggle label="Block Ids"
                    property="GenerateBlockIdCellArray"
                    trace_name="block_ids"
-                   help="Select whether the reader generates block ids" default_value="1"/>
+                   help="Select whether the reader generates block ids"/>
     <LabeledToggle label="Global Node Ids"
                    property="GenerateGlobalNodeIdArray"
                    trace_name="global_node_ids"
-                   help="Select whether the reader generates global node ids" default_value="1"/>
+                   help="Select whether the reader generates global node ids"/>
     <LabeledToggle label="Global Element Ids"
                    property="GenerateGlobalElementIdArray"
                    trace_name="global_element_ids"
-                   help="Select whether the reader generates global element ids" default_value="0"/>
+                   help="Select whether the reader generates global element ids"/>
     <LabeledToggle label="File Ids"
                    property="GenerateFileIdArray"
                    trace_name="global_file_ids"
-                   help="Select whether the reader generates cell based disk file ids" default_value="0"/>
+                   help="Select whether the reader generates cell based disk file ids"/>
   </Module>
 #endif
 #ifdef PARAVIEW_USE_SAF

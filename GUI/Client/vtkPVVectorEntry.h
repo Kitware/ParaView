@@ -187,9 +187,6 @@ protected:
 
   vtkStringList* SubLabelTxts;
 
-  float DefaultValues[6];
-  vtkSetVector6Macro(DefaultValues, float);
-  
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
                               vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);

@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.52");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.53");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -56,7 +56,6 @@ vtkPVVectorEntry::vtkPVVectorEntry()
   for ( cc = 0; cc < 6; cc ++ )
     {
     this->EntryValues[cc] = 0;
-    this->DefaultValues[cc] = 0;
     }
 }
 
@@ -703,7 +702,6 @@ void vtkPVVectorEntry::CopyProperties(vtkPVWidget* clone,
       {
       pvve->SubLabelTxts->SetString(i, this->SubLabelTxts->GetString(i));
       }
-    pvve->SetDefaultValues(this->DefaultValues);
     pvve->SetUseWidgetRange(this->UseWidgetRange);
     pvve->SetWidgetRange(this->WidgetRange);
     }
@@ -784,41 +782,6 @@ int vtkPVVectorEntry::ReadXMLAttributes(vtkPVXMLElement* element,
       }
     }
 
-  const char *defaultValue = element->GetAttribute("default_value");
-  if (defaultValue)
-    {
-    switch(this->VectorLength)
-      {
-      case 1:
-        sscanf(defaultValue, "%f", &this->DefaultValues[0]);
-        break;
-      case 2:
-        sscanf(defaultValue, "%f %f", &this->DefaultValues[0],
-               &this->DefaultValues[1]);
-        break;
-      case 3:
-        sscanf(defaultValue, "%f %f %f", &this->DefaultValues[0],
-               &this->DefaultValues[1], &this->DefaultValues[2]);
-        break;
-      case 4:
-        sscanf(defaultValue, "%f %f %f %f", &this->DefaultValues[0],
-               &this->DefaultValues[1], &this->DefaultValues[2],
-               &this->DefaultValues[3]);
-        break;
-      case 5:
-        sscanf(defaultValue, "%f %f %f %f %f", &this->DefaultValues[0],
-               &this->DefaultValues[1], &this->DefaultValues[2],
-               &this->DefaultValues[3], &this->DefaultValues[4]);
-        break;
-      case 6:
-        sscanf(defaultValue, "%f %f %f %f %f %f", &this->DefaultValues[0],
-               &this->DefaultValues[1], &this->DefaultValues[2],
-               &this->DefaultValues[3], &this->DefaultValues[4],
-               &this->DefaultValues[5]);
-        break;
-      }
-    }
-  
   const char *range = element->GetAttribute("data_range");
   if (range)
     {
