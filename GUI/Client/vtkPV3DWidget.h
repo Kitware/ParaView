@@ -44,7 +44,7 @@ public:
   // Description:
   // Set the widget visibility.
   void SetVisibility();
-  void SetVisibility(int val);
+  virtual void SetVisibility(int val);
   void SetVisibilityNoTrace(int val);
   vtkBooleanMacro(Visibility, int);
 
