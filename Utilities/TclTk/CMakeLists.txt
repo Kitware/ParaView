@@ -13,6 +13,19 @@
 
 PROJECT(TclTk)
 
+IF(NOT TclTk_INSTALL_BIN_DIR)
+  SET(TclTk_INSTALL_BIN_DIR /bin)
+ENDIF(NOT TclTk_INSTALL_BIN_DIR)
+IF(NOT TclTk_INSTALL_LIB_TCL_DIR)
+  SET(TclTk_INSTALL_LIB_TCL_DIR /lib/tcl8.4)
+ENDIF(NOT TclTk_INSTALL_LIB_TCL_DIR)
+IF(NOT TclTk_INSTALL_LIB_TK_DIR)
+  SET(TclTk_INSTALL_LIB_TK_DIR /lib/tcl8.4)
+ENDIF(NOT TclTk_INSTALL_LIB_TK_DIR)
+IF(NOT TclTk_INSTALL_LIB_TKDND_DIR)
+  SET(TclTk_INSTALL_LIB_TKDND_DIR /lib/tkdnd)
+ENDIF(NOT TclTk_INSTALL_LIB_TKDND_DIR)
+
 IF(UNIX)
   SET(VTK_TCL_TK_STATIC 1 CACHE INTERNAL "Build with static Tcl/Tk support. TCL_LIBRARY and TK_LIBRARY must point to the corresponding Tcl/Tk static libraries (example, tcl84sx.lib, tk84sx.lib)." FORCE)
   SET(TclTk_BINARY_DIR_TCLBIN "${TclTk_BINARY_DIR}/tcl8.4.5/unix")
@@ -82,19 +95,20 @@ ELSE(UNIX)
 
   IF(BUILD_SHARED_LIBS)
     SET(SUFFIX "")
-    FOREACH(config ${CONFIG_TYPES})
-      SET(DLLS 
-        TclTk8.4.5Win/bin/tcl84.dll 
-        TclTk8.4.5Win/bin/tk84.dll
-        tkdnd/lib/tkdnd/libtkdnd.dll)
-      FOREACH(dll ${DLLS})
-        GET_FILENAME_COMPONENT(dllname ${dll} NAME)
+    SET(DLLS
+      TclTk8.4.5Win/bin/tcl84.dll
+      TclTk8.4.5Win/bin/tk84.dll
+      tkdnd/lib/tkdnd/libtkdnd.dll)
+    FOREACH(dll ${DLLS})
+      GET_FILENAME_COMPONENT(dllname ${dll} NAME)
+      FOREACH(config ${CONFIG_TYPES})
         CONFIGURE_FILE(
           ${TclTk_SOURCE_DIR}/${dll}
           ${APPLICATION_BINARY_DIR}/bin/${config}/${dllname}
           COPYONLY)
-      ENDFOREACH(dll)
-    ENDFOREACH(config)
+      ENDFOREACH(config)
+      INSTALL_FILES(${TclTk_INSTALL_BIN_DIR} FILES ${TclTk_SOURCE_DIR}/${dll})
+    ENDFOREACH(dll)
   ELSE (BUILD_SHARED_LIBS)
     SET(SUFFIX "sx")
   ENDIF (BUILD_SHARED_LIBS)
@@ -130,8 +144,8 @@ VTK_COPY_TCL_TK_SUPPORT_FILES_TO_DIR(
   "${VTK_TK_SUPPORT_LIBRARY_PATH}"
   "${APPLICATION_BINARY_DIR}/lib")
 
-INSTALL_FILES(/lib/tcl8.4 FILES ${TCL_SUPPORT_FILES})
-INSTALL_FILES(/lib/tk8.4 FILES ${TK_SUPPORT_FILES})
+INSTALL_FILES(${TclTk_INSTALL_LIB_TCL_DIR} FILES ${TCL_SUPPORT_FILES})
+INSTALL_FILES(${TclTk_INSTALL_LIB_TK_DIR} FILES ${TK_SUPPORT_FILES})
 
 # More support files
 
@@ -143,7 +157,7 @@ IF (NOT UNIX)
     CONFIGURE_FILE ("${TKDND_SUPPORT_LIBRARY_PATH}/${file}" 
                     "${APPLICATION_BINARY_DIR}/lib/tkdnd/${file}" COPYONLY)
   ENDFOREACH (file)
-  INSTALL_FILES(/lib/tkdnd FILES ${TKDND_SUPPORT_FILES})
+  INSTALL_FILES(${TclTk_INSTALL_LIB_TKDND_DIR} FILES ${TKDND_SUPPORT_FILES})
 ENDIF (NOT UNIX)
 
 SET (TABLELIST_SUPPORT_LIBRARY_PATH "${TclTk_SOURCE_DIR}/tablelist/lib")
