@@ -169,8 +169,9 @@ public:
   void GetBackgroundColor(float *r, float *g, float *b);
   
   // Description:
-  // Query if widget has Tk configuration option
+  // Query if widget has Tk configuration option, and get the option as int
   int HasConfigurationOption(const char* option);
+  int GetConfigurationOptionAsInt(const char* option);
   
   // Description:
   // Query if widget is packed
