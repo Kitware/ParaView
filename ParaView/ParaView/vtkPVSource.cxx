@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.1");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1220,7 +1220,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     {
     return;
     } 
-  this->MarkSourcesForUpdate(1);
 
   window = this->GetPVWindow();
 
@@ -1233,6 +1232,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // the VTK source.  (The vtkPLOT3DReader is a good example of this.)
   this->UpdateVTKSourceParameters();
   
+  this->MarkSourcesForUpdate(1);
+
   // Moved from creation of the source. (InitializeClone)
   // Initialize the output if necessary.
   // This has to be after the widgets are accepted (UpdateVTKSOurceParameters)
