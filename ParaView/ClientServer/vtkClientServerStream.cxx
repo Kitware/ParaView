@@ -142,11 +142,11 @@ public:
   int Invalid;
 
   // Access to protected members of vtkClientServerStream.
-  vtkClientServerStream& Write(vtkClientServerStream& css,
-                               const void* data, size_t length)
+  static vtkClientServerStream& Write(vtkClientServerStream& css,
+                                      const void* data, size_t length)
     { return css.Write(data, length); }
-  const unsigned char* GetValue(const vtkClientServerStream& css,
-                                int message, int value)
+  static const unsigned char* GetValue(const vtkClientServerStream& css,
+                                       int message, int value)
     { return css.GetValue(message, value); }
 };
 
@@ -364,19 +364,18 @@ vtkClientServerStream::operator << (vtkObjectBase* obj)
 // Template and macro to implement all insertion operators in the same way.
 template <class T>
 vtkClientServerStream&
-vtkClientServerStreamOperatorSL(vtkClientServerStream* self,
-                                vtkClientServerStreamInternals* internal, T x)
+vtkClientServerStreamOperatorSL(vtkClientServerStream* self, T x)
 {
   // Store the type first, then the value.
   typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
   *self << vtkClientServerTypeTraits<Type>::Value();
-  return internal->Write(*self, &x, sizeof(x));
+  return vtkClientServerStreamInternals::Write(*self, &x, sizeof(x));
 }
 
 #define VTK_CLIENT_SERVER_OPERATOR(type)                             \
   vtkClientServerStream& vtkClientServerStream::operator << (type x) \
     {                                                                \
-    return vtkClientServerStreamOperatorSL(this, this->Internal, x); \
+    return vtkClientServerStreamOperatorSL(this, x);                 \
     }
 VTK_CLIENT_SERVER_OPERATOR(char)
 VTK_CLIENT_SERVER_OPERATOR(int)
@@ -677,11 +676,11 @@ int vtkClientServerStreamGetArgument(vtkClientServerStream::Types type,
 template <class T>
 int
 vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
-                                      vtkClientServerStreamInternals* internal,
                                       int midx, int argument, T* value)
 {
   typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
-  if(const unsigned char* data = internal->GetValue(*self, midx, 1+argument))
+  if(const unsigned char* data =
+     vtkClientServerStreamInternals::GetValue(*self, midx, 1+argument))
     {
     // Get the type of the value in the stream.
     vtkTypeUInt32 tp;
@@ -700,8 +699,8 @@ vtkClientServerStreamGetArgumentValue(const vtkClientServerStream* self,
   int vtkClientServerStream::GetArgument(int message, int argument,         \
                                          type* value) const                 \
   {                                                                         \
-    return vtkClientServerStreamGetArgumentValue(this, this->Internal,      \
-                                                 message, argument, value); \
+    return vtkClientServerStreamGetArgumentValue(this, message,             \
+                                                 argument, value);          \
   }
 VTK_CSS_GET_ARGUMENT(signed char)
 VTK_CSS_GET_ARGUMENT(char)
@@ -725,12 +724,12 @@ VTK_CSS_GET_ARGUMENT(vtkTypeUInt64)
 template <class T>
 int
 vtkClientServerStreamGetArgumentArray(const vtkClientServerStream* self,
-                                      vtkClientServerStreamInternals* internal,
                                       int midx, int argument, T* value,
                                       vtkTypeUInt32 length)
 {
   typedef VTK_CSS_TYPENAME vtkTypeFromNative<T>::Type Type;
-  if(const unsigned char* data = internal->GetValue(*self, midx, 1+argument))
+  if(const unsigned char* data =
+     vtkClientServerStreamInternals::GetValue(*self, midx, 1+argument))
     {
     // Get the type of the value in the stream.
     vtkTypeUInt32 tp;
@@ -757,14 +756,13 @@ vtkClientServerStreamGetArgumentArray(const vtkClientServerStream* self,
   return 0;
 }
 
-#define VTK_CSS_GET_ARGUMENT_ARRAY(type)                                \
-  int vtkClientServerStream::GetArgument(int message, int argument,     \
-                                         type* value,                   \
-                                         vtkTypeUInt32 length) const    \
-  {                                                                     \
-    return vtkClientServerStreamGetArgumentArray(this, this->Internal,  \
-                                                 message, argument,     \
-                                                 value, length);        \
+#define VTK_CSS_GET_ARGUMENT_ARRAY(type)                                  \
+  int vtkClientServerStream::GetArgument(int message, int argument,       \
+                                         type* value,                     \
+                                         vtkTypeUInt32 length) const      \
+  {                                                                       \
+    return vtkClientServerStreamGetArgumentArray(this, message, argument, \
+                                                 value, length);          \
   }
 VTK_CSS_GET_ARGUMENT_ARRAY(signed char)
 VTK_CSS_GET_ARGUMENT_ARRAY(char)
