@@ -124,9 +124,32 @@ int SetApplicationIconCmd(ClientData clientdata,
                     0,
                     0,
                     0);
-  if (hIcon == NULL)
+
+  // Set icon
+
+  if (hIcon != NULL)
     {
+    set_small = 0;
+    if (argc > 3)
+      {
+      if (!strcmp(argv[3], "small"))
+        {
+        set_small = 1;
+        }
+      else if (strcmp(argv[3], "big"))
+        {
+        sprintf(interp->result, "Error: %s (expecting 'big' or 'small')", 
+                argv[3]);
+        return TCL_ERROR;
+        }
+      }
+
+    // SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LPARAM)hIcon);
+    SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LONG)hIcon);
+    }
 #if 0
+  else
+    {
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                   FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                   NULL,
@@ -137,30 +160,10 @@ int SetApplicationIconCmd(ClientData clientdata,
                   NULL);
     sprintf(interp->result, "%s", (LPCTSTR)lpMsgBuf);
     LocalFree(lpMsgBuf);
-#endif
     return TCL_ERROR;
     }
+#endif
 
-  // Set icon
-
-  set_small = 0;
-  if (argc > 3)
-    {
-    if (!strcmp(argv[3], "small"))
-      {
-      set_small = 1;
-      }
-    else if (strcmp(argv[3], "big"))
-      {
-      sprintf(interp->result, "Error: %s (expecting 'big' or 'small')", 
-              argv[3]);
-      return TCL_ERROR;
-      }
-    }
-
-//  SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LPARAM)hIcon);
-  SetClassLong(winHandle, set_small ? GCL_HICONSM : GCL_HICON, (LONG)hIcon);
-  
 #endif // WIN32
 
   return TCL_OK;
