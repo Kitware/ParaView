@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.14");
+vtkCxxRevisionMacro(vtkPVPick, "1.14.2.1");
 
 
 //----------------------------------------------------------------------------
@@ -52,6 +52,7 @@ vtkPVPick::vtkPVPick()
   this->DisplayHasBeenAddedToTheRenderModule = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVPick::~vtkPVPick()
 {  
   if (this->GetPVApplication() && this->GetPVApplication()->GetProcessModule()->GetRenderModule())

@@ -275,7 +275,7 @@ public:
   vtkBooleanMacro(ReplaceInput, int);
 
   // Description:
-  // Access to PVWidgets indexed by their name.
+  // Access to PVWidgets indexed by their name (= trace_name).
   vtkPVWidget *GetPVWidget(const char *name);
 
   // Description:

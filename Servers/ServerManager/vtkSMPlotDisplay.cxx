@@ -14,24 +14,12 @@
 =========================================================================*/
 #include "vtkSMPlotDisplay.h"
 
-#include "vtkPVRenderModule.h"
-#include "vtkImageData.h"
 #include "vtkObjectFactory.h"
-#include "vtkProp3D.h"
-#include "vtkPVProcessModule.h"
+#include "vtkPVRenderModule.h"
 #include "vtkSMPart.h"
 #include "vtkSMSourceProxy.h"
 #include "vtkPVProcessModule.h"
-#include "vtkPVConfig.h"
 #include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
-#include "vtkProperty.h"
-#include "vtkRectilinearGrid.h"
-#include "vtkStructuredGrid.h"
-#include "vtkString.h"
-#include "vtkTimerLog.h"
-#include "vtkToolkits.h"
-#include "vtkFieldDataToAttributeDataFilter.h"
 #include "vtkClientServerStream.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
@@ -44,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPlotDisplay);
-vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.3.2.3");
+vtkCxxRevisionMacro(vtkSMPlotDisplay, "1.3.2.4");
 
 
 //----------------------------------------------------------------------------
@@ -90,8 +78,7 @@ vtkPolyData* vtkSMPlotDisplay::GetCollectedData()
     {
     return NULL;
     }
-  vtkMPIMoveData* dp;
-  dp = vtkMPIMoveData::SafeDownCast(
+  vtkMPIMoveData* dp = vtkMPIMoveData::SafeDownCast(
       pm->GetObjectFromID(this->DuplicateProxy->GetID(0)));
   if (dp == NULL)
     {
@@ -105,8 +92,8 @@ vtkPolyData* vtkSMPlotDisplay::GetCollectedData()
 //----------------------------------------------------------------------------
 void vtkSMPlotDisplay::CreateVTKObjects(int num)
 {
-  vtkPVProcessModule* pm;
-  pm = vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
+  vtkPVProcessModule* pm = 
+    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
   vtkClientServerStream stream;
 
   if (num != 1)
@@ -364,6 +351,133 @@ void vtkSMPlotDisplay::SetInput(vtkSMSourceProxy* input)
 }
 
 //----------------------------------------------------------------------------
+void vtkSMPlotDisplay::UpdateInput(vtkSMSourceProxy* input, int *selection)
+{
+  vtkPVDataInformation* dataInfo = input->GetDataInformation();
+  vtkPVDataSetAttributesInformation* pdi = dataInfo->GetPointDataInformation();
+  vtkPVArrayInformation* arrayInfo;
+  const char* arrayName = 0;
+
+  vtkClientServerStream stream;
+
+  vtkPVProcessModule *pm = this->GetProcessModule();  
+
+  // Set vtkData as input to duplicate filter.
+  stream << vtkClientServerStream::Invoke 
+         << this->DuplicateProxy->GetID(0) 
+         << "SetInput" << input->GetPart(0)->GetID(0) 
+         << vtkClientServerStream::End;
+  // Only the server has data.
+  pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
+
+  // Clear previous plots.
+  stream << vtkClientServerStream::Invoke 
+         << this->XYPlotActorProxy->GetID(0) 
+         << "RemoveAllInputs" 
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << this->XYPlotActorProxy->GetID(0) 
+         << "SetYTitle" << ""
+         << vtkClientServerStream::End;
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+
+  int numArrays = dataInfo->GetPointDataInformation()->GetNumberOfArrays();
+  float cstep = 1.0 / numArrays;
+  float ccolor = 0;
+  int arrayCount = 0;
+  if ( !selection )
+    {
+    int i =0;
+      {
+      arrayInfo = pdi->GetArrayInformation(i);
+      arrayName = arrayInfo->GetName();
+      if (arrayInfo->GetNumberOfComponents() == 1)
+        {
+        stream << vtkClientServerStream::Invoke 
+          << this->UpdateSuppressorProxy->GetID(0) << "GetOutput"
+          << vtkClientServerStream::End;
+        stream << vtkClientServerStream::Invoke 
+          << this->XYPlotActorProxy->GetID(0) 
+          << "AddInput" << vtkClientServerStream::LastResult 
+          << arrayName << 0
+          << vtkClientServerStream::End;
+        stream << vtkClientServerStream::Invoke 
+          << this->XYPlotActorProxy->GetID(0) 
+          << "SetPlotLabel" << i << arrayName 
+          << vtkClientServerStream::End;
+        float r, g, b;
+        vtkMath::HSVToRGB(ccolor, 1, 1, &r, &g, &b);
+        stream << vtkClientServerStream::Invoke 
+          << this->XYPlotActorProxy->GetID(0) 
+          << "SetPlotColor" << i << r << g << b 
+          << vtkClientServerStream::End;
+        ccolor += cstep;
+        arrayCount ++;
+        }      
+      }  
+    }
+  else
+    { 
+    int j = 0;
+    for ( int i = 0; i < numArrays; i++)
+      {
+      if( selection[i])
+        {
+        arrayInfo = pdi->GetArrayInformation(i);
+        arrayName = arrayInfo->GetName();
+        if (arrayInfo->GetNumberOfComponents() == 1)
+          {
+          stream << vtkClientServerStream::Invoke 
+            << this->UpdateSuppressorProxy->GetID(0) << "GetOutput"
+            << vtkClientServerStream::End;
+          stream << vtkClientServerStream::Invoke 
+            << this->XYPlotActorProxy->GetID(0) 
+            << "AddInput" << vtkClientServerStream::LastResult 
+            << arrayName << 0
+            << vtkClientServerStream::End;
+          stream << vtkClientServerStream::Invoke 
+            << this->XYPlotActorProxy->GetID(0) 
+            << "SetPlotLabel" << j++ << arrayName 
+            << vtkClientServerStream::End;
+          float r, g, b;
+          vtkMath::HSVToRGB(ccolor, 1, 1, &r, &g, &b);
+          stream << vtkClientServerStream::Invoke 
+            << this->XYPlotActorProxy->GetID(0) 
+            << "SetPlotColor" << i << r << g << b 
+            << vtkClientServerStream::End;
+          }
+        }
+          ccolor += cstep;
+          arrayCount ++;
+      }  
+    }
+  if ( arrayCount > 1 )
+    {
+    stream << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorProxy->GetID(0) 
+                    << "LegendOn"
+                    << vtkClientServerStream::End;
+    }
+  else 
+    {
+    stream << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorProxy->GetID(0) 
+                    << "LegendOff"
+                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorProxy->GetID(0) 
+                    << "SetYTitle" << arrayName
+                    << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+                    << this->XYPlotActorProxy->GetID(0) 
+                    << "SetPlotColor" << 0 << 1 << 1 << 1
+                    << vtkClientServerStream::End;
+    }
+  pm->SendStream(
+    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+}
+//----------------------------------------------------------------------------
 void vtkSMPlotDisplay::AddToRenderer(vtkPVRenderModule* rm)
 {
   vtkClientServerID rendererID = rm->GetRenderer2DID();
@@ -404,17 +518,15 @@ void vtkSMPlotDisplay::RemoveFromRenderer(vtkPVRenderModule* rm)
 
   // There will be only one, but this is more general and protects
   // against the user calling this method before "MakeVTKObjects".
-  int i, num;
-  num = this->XYPlotActorProxy->GetNumberOfIDs();
+  int num = this->XYPlotActorProxy->GetNumberOfIDs();
   vtkClientServerStream stream;
-  for (i = 0; i < num; ++i)
+  for (int i = 0; i < num; ++i)
     {
     // Enable XYPlotActor on server for tiled display.
-    stream << vtkClientServerStream::Invoke 
-                    << rendererID
-                    << "RemoveActor"
-                    << this->XYPlotActorProxy->GetID(i) 
-                    << vtkClientServerStream::End;
+    stream 
+      << vtkClientServerStream::Invoke << rendererID << "RemoveActor"
+      << this->XYPlotActorProxy->GetID(i) 
+      << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::RENDER_SERVER, stream);
     }
 }
