@@ -174,7 +174,6 @@ IF (PARAVIEW_USE_ICE_T)
   SET( ParaViewClient_SRCS
     ${ParaViewClient_SRCS}
     vtkPVDeskTopRenderModuleUI.cxx
-    vtkPVIceTDisplayRenderModuleUI.cxx
     vtkPVIceTRenderModuleUI.cxx
     )
 
