@@ -49,7 +49,8 @@ public:
   // Description:
   // Get the current selected string in the list
   const char *GetSelection();
-
+  int GetSelectionIndex();
+  
   // Description:
   // Add entries to an option menu, with or without a command.
   void InsertEntry(int index, const char *name);

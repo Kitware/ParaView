@@ -81,7 +81,15 @@ const char* vtkKWListBox::GetItem(int index)
   return this->Item;
 }
 
+int vtkKWListBox::GetSelectionIndex()
+{
+  this->Script("%s.list curselection", this->GetWidgetName(),
+	       this->GetWidgetName());
+  char* result = this->Application->GetMainInterp()->result;
+  return atoi(result);
+}
 
+  
 const char *vtkKWListBox::GetSelection()
 {
   this->Script("%s.list get [%s.list curselection]", this->GetWidgetName(),

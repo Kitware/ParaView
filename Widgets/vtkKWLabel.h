@@ -45,13 +45,20 @@ public:
   // Description:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app, char *args);
-
+  
+  const char* GetLabel() 
+    {
+      return this->Label;
+    }
+  void SetLabel(const char*);
+  
 protected:
-  vtkKWLabel() {};
-  ~vtkKWLabel() {};
+  vtkKWLabel();
+  ~vtkKWLabel();
   vtkKWLabel(const vtkKWLabel&) {};
   void operator=(const vtkKWLabel&) {};
-  
+private:
+  char* Label;
 };
 
 
