@@ -48,7 +48,7 @@ public:
 
   // Description:
   // Raise the specified tab to be on the top.
-  void Raise(int n);
+  virtual void Raise(int n);
   void Raise(const char *name);
   void RaiseCurrent(){this->Raise(this->Current);};
 
