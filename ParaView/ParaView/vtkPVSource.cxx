@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.248.2.13");
+vtkCxxRevisionMacro(vtkPVSource, "1.248.2.14");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -495,7 +495,7 @@ void vtkPVSource::CreateProperties()
                this->LabelEntry->GetLabel()->GetWidgetName(),label1_opt);
   this->Script("pack %s -fill x -expand t", 
                this->LabelEntry->GetEntry()->GetWidgetName());
-  this->Script("bind %s <KeyPress-Return> {%s DescriptionEntryCallback}",
+  this->Script("bind %s <KeyPress-Return> {%s LabelEntryCallback}",
                this->LabelEntry->GetEntry()->GetWidgetName(), 
                this->GetTclName());
 
@@ -793,7 +793,7 @@ void vtkPVSource::SetLabel(const char* arg)
   this->GetPVApplication()->AddTraceEntry("$kw(%s) SetLabel {%s}",
                                           this->GetTclName(),
                                           this->Label);
-  this->GetPVApplication()->AddTraceEntry("$kw(%s) DescriptionEntryCallback",
+  this->GetPVApplication()->AddTraceEntry("$kw(%s) LabelEntryCallback",
                                           this->GetTclName());
 }
 
@@ -2127,7 +2127,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.248.2.13 $");
+  this->ExtractRevision(os,"$Revision: 1.248.2.14 $");
 }
 
 //----------------------------------------------------------------------------
