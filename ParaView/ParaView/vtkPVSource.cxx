@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.339");
+vtkCxxRevisionMacro(vtkPVSource, "1.340");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -538,8 +538,6 @@ void vtkPVSource::GatherDataInformation()
 //----------------------------------------------------------------------------
 void vtkPVSource::Update()
 {
-  int enabled = this->GetPVWindow()->GetEnabled();
-  this->GetPVWindow()->SetEnabled(0);
   vtkPVPart *part;
 
   this->Parts->InitTraversal();
@@ -549,10 +547,6 @@ void vtkPVSource::Update()
       {
       part->GetPartDisplay()->Update();
       }
-    }
-  if ( enabled )
-    {
-    this->GetPVWindow()->EnabledOn();
     }
 }
 
@@ -1288,6 +1282,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     return;
     } 
 
+  int enabled = this->GetPVWindow()->GetEnabled();
+  this->GetPVWindow()->SetEnabled(0);
+
   window = this->GetPVWindow();
 
   this->SetAcceptButtonColorToWhite();
@@ -1320,6 +1317,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
       { // I suppose we should try and delete the source.
       vtkErrorMacro("Could not get output.");
       this->DeleteCallback();    
+      if ( enabled )
+        {
+        this->GetPVWindow()->EnabledOn();
+        }
       return;
       }
 
@@ -1425,6 +1426,10 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   else
     {
     window->UpdateFilterMenu();
+    }
+  if ( enabled )
+    {
+    this->GetPVWindow()->EnabledOn();
     }
 }
 
