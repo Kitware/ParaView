@@ -59,6 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWMenu.h"
+#include "vtkKWEvent.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -518,10 +519,34 @@ void vtkKWView::CreateViewProperties()
 
 void vtkKWView::SetHeaderTextColor( float r, float g, float b )
 {
+  float *ff = this->GetHeaderTextColor();
+  if ( ff[0] == r && ff[1] == g && ff[2] == b )
+    {
+    return;
+    }
+
+  this->HeaderColor->SetColor( r, g, b );
   this->HeaderProp->GetProperty()->SetColor( r, g, b );
   this->Render();
+  float color[3];
+  color[0] = r;
+  color[1] = g;
+  color[2] = b;
+  this->InvokeEvent( vtkKWEvent::AnnotationColorChangedEvent, color );
 }
 
+float* vtkKWView::GetHeaderTextColor()
+{
+  return this->HeaderProp->GetProperty()->GetColor( );
+}
+
+void vtkKWView::GetHeaderTextColor( float *r, float *g, float *b )
+{
+  float *ff = this->GetHeaderTextColor();
+  *r = ff[0];
+  *g = ff[1];
+  *b = ff[2];
+}
 
 void vtkKWView::ShowViewProperties()
 {
@@ -1246,7 +1271,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.50 $");
+  this->ExtractRevision(os,"$Revision: 1.51 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 
@@ -1289,7 +1314,42 @@ unsigned char *vtkKWView::GetMemoryData()
 
 void vtkKWView::SetBackgroundColor( float r, float g, float b )
 {
+  float *ff = this->Renderer->GetBackground( );
+  if ( ff[0] == r && ff[1] == g && ff[2] == b )
+    {
+    return;
+    }
+
+  this->BackgroundColor->SetColor( r, g, b );
   this->Renderer->SetBackground( r, g, b );
   this->Render();
+  float color[3];
+  color[0] = r;
+  color[1] = g;
+  color[2] = b;
+  this->InvokeEvent( vtkKWEvent::BackgroundColorChangedEvent, color );
 }
 
+float* vtkKWView::GetBackgroundColor( )
+{
+  return this->Renderer->GetBackground( );
+}
+
+void vtkKWView::GetBackgroundColor( float *r, float *g, float *b )
+{
+  float *ff = this->Renderer->GetBackground( );
+  *r = ff[0];
+  *g = ff[1];
+  *b = ff[2];
+}
+
+
+void vtkKWView::SetCornerTextColor( float rgb[3] )
+{
+  this->CornerAnnotation->SetTextColor( rgb );
+}
+
+float *vtkKWView::GetCornerTextColor()
+{
+  return this->CornerAnnotation->GetTextColor();
+}

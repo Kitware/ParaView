@@ -41,6 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkKWEvent.h"
 #include "vtkKWObject.h"
+#include "vtkCommand.h"
 
 static const char *vtkKWEventStrings[] = {
   "KWWidgetEvents",
@@ -79,6 +80,12 @@ static const char *vtkKWEventStrings[] = {
   "ContourAnnotationRemoveEvent",
   "ContourAnnotationChangeColorEvent",
   "ContourAnnotationChangeLineWidthEvent",
+  "BackgroundColorChangedEvent",
+  "AnnotationColorChangedEvent",
+  "ChangeProjectionEvent",
+  "PerspectiveViewAngleChangedEvent",
+  "LightboxResolutionChangedEvent",
+  "ChangePrinterDPIEvent",
   "InitializeTraceEvent"
 };
 
@@ -89,7 +96,7 @@ const char *vtkKWEvent::GetStringFromEventId(unsigned long event)
   // find length of table
   if (!numevents)
     {
-    while (vtkVolViewCommandEventStrings[numevents] != NULL)
+    while (vtkKWEventStrings[numevents] != NULL)
       {
       numevents++;
       }
@@ -98,13 +105,12 @@ const char *vtkKWEvent::GetStringFromEventId(unsigned long event)
     {
     return vtkCommand::GetStringFromEventId(event);
     }
-  if ( event < 
 
   event -= 2000;
 
   if (event < numevents)
     {
-    return vtkVolViewCommandEventStrings[event];
+    return vtkKWEventStrings[event];
     }
   else
     {

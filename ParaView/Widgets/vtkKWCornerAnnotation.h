@@ -98,6 +98,8 @@ public:
   // Description:
   // Change the color of the annotation
   void SetTextColor(float r, float g, float b);
+  void SetTextColor(float *rgb)
+    { this->SetTextColor(rgb[0], rgb[1], rgb[2]); }
   float *GetTextColor() {return this->CornerProp->GetProperty()->GetColor();};
 
   

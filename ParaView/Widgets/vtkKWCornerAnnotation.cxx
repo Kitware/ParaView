@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkCornerAnnotation.h"
 #include "vtkKWApplication.h"
+#include "vtkKWEvent.h"
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
@@ -200,8 +201,20 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
 
 void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
 {
+  float *ff = this->CornerProp->GetProperty()->GetColor();
+  if ( ff[0] == r && ff[1] == g && ff[2] == b )
+    {
+    return;
+    }
+
+  this->CornerColor->SetColor( r, g, b );
   this->CornerProp->GetProperty()->SetColor( r, g, b );
   this->View->Render();
+  float color[3];
+  color[0] = r;
+  color[1] = g;
+  color[2] = b;
+  this->InvokeEvent( vtkKWEvent::AnnotationColorChangedEvent, color );
 }
 
 void vtkKWCornerAnnotation::OnDisplayCorner() 
@@ -330,6 +343,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.19 $");
+  this->ExtractRevision(os,"$Revision: 1.20 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }

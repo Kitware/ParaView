@@ -281,6 +281,15 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // Change the color of the annotation text
   virtual void SetHeaderTextColor( float r, float g, float b );
+  virtual void SetHeaderTextColor( float rgb[3] )
+    { this->SetHeaderTextColor( rgb[0], rgb[1], rgb[2] ); }
+  virtual void GetHeaderTextColor( float *r, float *g, float *b );
+  virtual float *GetHeaderTextColor();
+
+  // Description:
+  // Change the color of the corner annotation text
+  virtual void SetCornerTextColor( float rgb[3] );
+  virtual float *GetCornerTextColor();
 
   // Description:
   // Turn interactivity on / off - used for UI components that want 
@@ -291,7 +300,11 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // Set the background color
   virtual void SetBackgroundColor( float r, float g, float b );
-
+  virtual void SetBackgroundColor( float *rgb )
+    { this->SetBackgroundColor( rgb[0], rgb[1], rgb[2] ); }
+  virtual void GetBackgroundColor( float *r, float *g, float *b );
+  virtual float* GetBackgroundColor();
+  
   // Description:
   // Set the name to be used in the Properties menu for the view properties
   // sheet entry

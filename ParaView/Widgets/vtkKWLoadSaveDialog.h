@@ -86,6 +86,10 @@ public:
   vtkGetStringMacro(OpenFile);
 
   // Description:
+  // Set default extention.
+  vtkSetStringMacro(DefaultExt);
+
+  // Description:
   // Set or reset the SaveDialog. If set, the dialog will be
   // save file dialog. If reset, the dialog will be load 
   // dialog
@@ -114,6 +118,7 @@ protected:
     char *InitialDir;  
     char *Title;
     char *OpenFile;
+    char *DefaultExt;
 
     int SaveDialog;
     int Done;

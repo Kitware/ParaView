@@ -54,6 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWRegisteryUtilities.h"
 #include "KitwareLogo.h"
 #include "vtkKWPointerArray.h"
+#include "vtkKWEvent.h"
 
 class vtkKWWindowMenuEntry
 {
@@ -622,9 +623,9 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
     this->PageMenu->CreateRadioButtonVariable(this,"PageSetup");
   // now add our own menu options 
   this->Script( "set %s 0", rbv );
-  this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint1", 0);
-  this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint2", 1);
-  this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint3", 0);
+  this->PageMenu->AddRadioButton(0,"100 DPI",rbv,this,"OnPrint1 1", 0);
+  this->PageMenu->AddRadioButton(1,"150 DPI",rbv,this,"OnPrint2 1", 1);
+  this->PageMenu->AddRadioButton(2,"300 DPI",rbv,this,"OnPrint3 1", 0);
   delete [] rbv;
   // add the Print option
   this->MenuFile->AddCascade("Page Setup", this->PageMenu,8);
@@ -651,17 +652,44 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   delete [] rbv;
 }
 
-void vtkKWWindow::OnPrint1() 
+void vtkKWWindow::OnPrint1(int propagate) 
 {
   this->PrintTargetDPI = 100;
+  if ( propagate )
+    {
+    float dpi = 1;
+    this->InvokeEvent(vtkKWEvent::ChangePrinterDPIEvent, &dpi);
+    }
+  else
+    {
+    this->PageMenu->Invoke( this->PageMenu->GetIndex("100 DPI") );
+    }
 }
-void vtkKWWindow::OnPrint2() 
+void vtkKWWindow::OnPrint2(int propagate) 
 {
   this->PrintTargetDPI = 150;
+  if ( propagate )
+    {
+    float dpi = 2;
+    this->InvokeEvent(vtkKWEvent::ChangePrinterDPIEvent, &dpi);
+    }
+  else
+    {
+    this->PageMenu->Invoke( this->PageMenu->GetIndex("150 DPI") );
+    }
 }
-void vtkKWWindow::OnPrint3() 
+void vtkKWWindow::OnPrint3(int propagate) 
 {
   this->PrintTargetDPI = 300;
+  if ( propagate )
+    {
+    float dpi = 3;
+    this->InvokeEvent(vtkKWEvent::ChangePrinterDPIEvent, &dpi);
+    }
+  else
+    {
+    this->PageMenu->Invoke( this->PageMenu->GetIndex("300 DPI") );
+    }
 }
 
 void vtkKWWindow::ShowProperties()
@@ -798,7 +826,7 @@ void vtkKWWindow::CreateStatusImage()
   delete [] block.pixelPtr;
 }
 
-void vtkKWWindow::StoreRecentMenuToRegistery(char *key)
+void vtkKWWindow::StoreRecentMenuToRegistery(char * vtkNotUsed(key))
 {
   char KeyNameP[10];
   char CmdNameP[10];
@@ -810,27 +838,23 @@ void vtkKWWindow::StoreRecentMenuToRegistery(char *key)
 
   //cout << "Store recent menu to registry; MRU: " 
   //     << this->RealNumberOfMRUFiles << endl;
-  vtkKWRegisteryUtilities *reg = this->GetApplication()->GetRegistery();
-  reg->SetTopLevel( key ? key : 
-		    this->GetApplication()->GetApplicationName() );
-  
   //cout << "Storing recent files: " << endl;
-  this->PrintRecentFiles();
+  //this->PrintRecentFiles();
 
   for (i = 0; i < this->NumberOfRecentFiles; i++)
     {
     sprintf(KeyNameP, "File%d", i);
     sprintf(CmdNameP, "File%dCmd", i);
-    reg->DeleteValue( "MRU", KeyNameP );
-    reg->DeleteValue( "MRU", CmdNameP );    
+    this->DeleteRegisteryValue( "MRU", KeyNameP );
+    this->DeleteRegisteryValue( "MRU", CmdNameP );    
     if ( this->RecentFiles )
       {
       vtkKWWindowMenuEntry *vp = reinterpret_cast<vtkKWWindowMenuEntry *>(
 	this->RecentFiles->Lookup(i) );
       if ( vp )
 	{
-	reg->SetValue("MRU", KeyNameP, vp->GetFullFile());
-	reg->SetValue("MRU", CmdNameP, vp->GetCommand());
+	this->SetRegisteryValue("MRU", KeyNameP, vp->GetFullFile());
+	this->SetRegisteryValue("MRU", CmdNameP, vp->GetCommand());
 	}
       }
     }
@@ -841,32 +865,26 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
   char KeyNameP[10];
   char CmdNameP[10];
   //cout << "vtkKWWindow::AddRecentFilesToMenu()" << endl;
-  vtkKWRegisteryUtilities *reg = this->GetApplication()->GetRegistery();
-  if ( reg->Open( key ? key : this->GetApplication()->GetApplicationName(),
-		  "MRU", vtkKWRegisteryUtilities::READONLY ) )
-    {
-    int i;
-    char File[1024];
-    char Cmd[1024];
-    this->GetMenuFile()->InsertSeparator(
-      this->GetMenuFile()->GetIndex("Close") - 1);
+  int i;
+  char File[1024];
+  char Cmd[1024];
+  this->GetMenuFile()->InsertSeparator(
+    this->GetMenuFile()->GetIndex("Close") - 1);
 
-    for (i = this->NumberOfRecentFiles-1; i >=0; i--)
+  for (i = this->NumberOfRecentFiles-1; i >=0; i--)
+    {
+    sprintf(KeyNameP, "File%d", i);
+    sprintf(CmdNameP, "File%dCmd", i);
+    if ( this->GetRegisteryValue("MRU", KeyNameP, File) )
       {
-      sprintf(KeyNameP, "File%d", i);
-      sprintf(CmdNameP, "File%dCmd", i);
-      if ( reg->ReadValue("MRU", KeyNameP, File) )
+      if ( this->GetRegisteryValue("MRU", CmdNameP, Cmd) )
 	{
-	if ( reg->ReadValue("MRU", CmdNameP, Cmd) )
+	if (strlen(File) > 1)
 	  {
-	  if (strlen(File) > 1)
-	    {
-	    this->InsertRecentFileToMenu(File, target, Cmd);
-	    }
+	  this->InsertRecentFileToMenu(File, target, Cmd);
 	  }
 	}
       }
-    reg->Close();
     }
   this->UpdateRecentMenu(key);
 }
@@ -899,7 +917,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.59 $");
+  this->ExtractRevision(os,"$Revision: 1.60 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -932,7 +950,7 @@ int vtkKWWindow::ExitDialog()
   return ret;
 }
 
-void vtkKWWindow::UpdateRecentMenu(char *key)
+void vtkKWWindow::UpdateRecentMenu(char * vtkNotUsed(key))
 {  
   int cc;
   for ( cc = 0; cc < this->RealNumberOfMRUFiles; cc ++ )
@@ -954,7 +972,7 @@ void vtkKWWindow::UpdateRecentMenu(char *key)
 	}
       }
     }
-  this->PrintRecentFiles();
+  //this->PrintRecentFiles();
 }
 
 void vtkKWWindow::InsertRecentFileToMenu(const char *filename, 
@@ -1080,30 +1098,85 @@ void vtkKWWindow::PrintRecentFiles()
 
 
 int vtkKWWindow::SetRegisteryValue(const char* subkey, const char* key, 
-				   const char*value)
+				   const char* format, ...)
 {
   int res = 0;
+  char buffer[100];
+  char value[16000];
+  sprintf(buffer, "%s\\%s", 
+	  this->GetApplication()->GetApplicationVersionName(),
+	  subkey);
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(value, format, var_args);
+  va_end(var_args);
+  
   vtkKWRegisteryUtilities *reg 
     = this->GetApplication()->GetRegistery(
       this->GetApplication()->GetApplicationName());
-  res = reg->SetValue(subkey, key, value);
-  cout << "SetRegisteryValue(" << subkey << ", " << key << ", "
-       << value << ")" << endl;
+  res = reg->SetValue(buffer, key, value);
+  //cout << "SetRegisteryValue(" << buffer << ", " << key << ", "
+  //     << value << ")" << endl;
   return res;
 }
+
+int vtkKWWindow::DeleteRegisteryValue(const char* subkey, const char* key)
+{
+  int res = 0;
+  char buffer[100];
+  sprintf(buffer, "%s\\%s", 
+	  this->GetApplication()->GetApplicationVersionName(),
+	  subkey);
+  
+  vtkKWRegisteryUtilities *reg 
+    = this->GetApplication()->GetRegistery(
+      this->GetApplication()->GetApplicationName());
+  res = reg->DeleteValue(buffer, key);
+  //cout << "DeleteRegisteryValue(" << buffer << ", " << key << ")" << endl;
+  return res;
+}
+
 int vtkKWWindow::GetRegisteryValue(const char* subkey, const char* key, 
-				   char*value)
+				   char* value)
+{
+  int res = 0;
+  char buff[1024];
+  *value = 0;
+  char buffer[100];
+  sprintf(buffer, "%s\\%s", 
+	  this->GetApplication()->GetApplicationVersionName(),
+	  subkey);
+
+  vtkKWRegisteryUtilities *reg 
+    = this->GetApplication()->GetRegistery(
+      this->GetApplication()->GetApplicationName());
+  res = reg->ReadValue(buffer, key, buff);
+  //cout << "GetRegisteryValue(" << buffer << ", " << key << ")" << endl;
+  if ( *buff )
+    {
+    strcpy(value, buff);
+    }  
+  return res;
+}
+
+float vtkKWWindow::GetFloatRegisteryValue(const char* subkey, const char* key)
+{
+  float res = 0;
+  char buffer[1024];
+  if ( this->GetRegisteryValue( subkey, key, buffer ) )
+    {
+    res = atof(buffer);
+    }
+  return res;
+}
+
+int vtkKWWindow::GetIntRegisteryValue(const char* subkey, const char* key)
 {
   int res = 0;
   char buffer[1024];
-  *value = 0;
-  vtkKWRegisteryUtilities *reg 
-    = this->GetApplication()->GetRegistery(
-      this->GetApplication()->GetApplicationName());
-  res = reg->ReadValue(subkey, key, buffer);
-  if ( *buffer )
+  if ( this->GetRegisteryValue( subkey, key, buffer ) )
     {
-    strcpy(value, buffer);
-    }  
+    res = atoi(buffer);
+    }
   return res;
 }

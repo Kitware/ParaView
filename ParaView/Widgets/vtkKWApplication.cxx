@@ -616,6 +616,7 @@ void vtkKWApplication::AddTraceEntry(const char *format, ...)
 
 vtkKWRegisteryUtilities *vtkKWApplication::GetRegistery( const char*toplevel )
 {
+  this->GetRegistery();
   this->Registery->SetTopLevel( toplevel );
   return this->Registery;
 }

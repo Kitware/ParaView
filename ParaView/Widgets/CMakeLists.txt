@@ -12,6 +12,7 @@ vtkKWCompositeCollection
 vtkKWCornerAnnotation 
 vtkKWDialog 
 vtkKWEntry 
+vtkKWEvent
 vtkKWExtent 
 vtkKWFileDialog
 vtkKWGenericComposite 
@@ -81,6 +82,7 @@ ENDIF (WIN32)
 WRAP_EXCLUDE_FILES(
   kwinit 
   vtktcl 
+  vtkKWEvent
   vtkKWHashTable 
   vtkKWTclCommand 
   vtkContainer

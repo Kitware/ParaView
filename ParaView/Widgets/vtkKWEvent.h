@@ -45,11 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkKWEvent_h
 
 
+#include "vtkKWObject.h"
 
-
-class vtkKWEvent
+class VTK_EXPORT vtkKWEvent
 {
   public:
+  static const char* GetStringFromEventId(unsigned long event);
   enum {
     KWWidgetEvents = 2000,
     // VV
@@ -88,6 +89,12 @@ class vtkKWEvent
     ContourAnnotationRemoveEvent,
     ContourAnnotationChangeColorEvent,
     ContourAnnotationChangeLineWidthEvent,
+    BackgroundColorChangedEvent,
+    AnnotationColorChangedEvent,
+    ChangeProjectionEvent,
+    PerspectiveViewAngleChangedEvent,
+    LightboxResolutionChangedEvent,
+    ChangePrinterDPIEvent,
     // PV
     InitializeTraceEvent
   };
