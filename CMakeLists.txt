@@ -336,6 +336,11 @@ IF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPlus")
 ENDIF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPlus")
 
 #########################################################################
+# Configure LOOKMARKS
+OPTION(PARAVIEW_USE_LOOKMARKS "Build ParaView with visual bookmarking capability" ON)
+
+
+#########################################################################
 # Import external projects, such as EXODUS and SAF
 
 SET(PARAVIEW_ADDITIONAL_LIBRARIES)
@@ -392,7 +397,7 @@ ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
 SET(PARAVIEW_EXTRA_EXTERNAL_MODULES
   "" CACHE STRING "Extra modules that ParaView will try to import. The modules have to provide ParaViewImport.cmake file.")
 MARK_AS_ADVANCED(PARAVIEW_EXTRA_EXTERNAL_MODULES)
-FOREACH(external EXODUS SAF LOOKMARKS ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
+FOREACH(external EXODUS SAF ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})
@@ -401,9 +406,6 @@ FOREACH(external EXODUS SAF LOOKMARKS ${PARAVIEW_EXTRA_EXTERNAL_MODULES})
       ../vtkSNL/IO
       ../../vtkSNL/IO
       ../../../vtkSNL/IO
-      ../vtkSNL/Common/Lookmarks
-      ../../vtkSNL/Common/Lookmarks
-      ../../../vtkSNL/Common/Lookmarks
       )
 
     IF(EXISTS ${${external}_SOURCE_DIR}/${external}ParaViewImport.cmake)
