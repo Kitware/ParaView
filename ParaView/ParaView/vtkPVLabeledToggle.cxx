@@ -39,11 +39,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVApplication.h"
 #include "vtkPVLabeledToggle.h"
+
+#include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
 #include "vtkPVXMLElement.h"
+#include "vtkKWLabel.h"
+#include "vtkKWCheckButton.h"
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle* vtkPVLabeledToggle::New()
@@ -231,4 +234,22 @@ int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLabeledToggle::SetLabel(const char *str) 
+{
+  this->Label->SetLabel(str); this->SetTraceName(str);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVLabeledToggle::GetLabel() 
+{ 
+  return this->Label->GetLabel();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVLabeledToggle::GetState() 
+{ 
+  return this->CheckButton->GetState(); 
 }

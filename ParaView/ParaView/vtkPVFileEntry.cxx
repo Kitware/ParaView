@@ -39,11 +39,15 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVApplication.h"
 #include "vtkPVFileEntry.h"
+
+#include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
 #include "vtkPVXMLElement.h"
+#include "vtkKWLabel.h"
+#include "vtkKWPushButton.h"
+#include "vtkKWEntry.h"
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry* vtkPVFileEntry::New()
@@ -294,6 +298,11 @@ int vtkPVFileEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   this->SetExtension(extension);
   
   return 1;
+}
+
+const char* vtkPVFileEntry::GetValue() 
+{
+  return this->Entry->GetValue();
 }
 
 //----------------------------------------------------------------------------

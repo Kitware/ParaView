@@ -46,10 +46,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVFileEntry_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
+
+class vtkKWLabel;
+class vtkKWPushButton;
+class vtkKWEntry;
+class vtkPVSource;
+
+//BTX
+template<class KeyType,class DataType> class vtkArrayMap;
+//ETX
 
 class VTK_EXPORT vtkPVFileEntry : public vtkPVObjectWidget
 {
@@ -80,7 +85,7 @@ public:
   // Description:
   // This method allows scripts to modify the widgets value.
   virtual void SetValue(const char* fileName);
-  const char* GetValue() {return this->Entry->GetValue();}
+  const char* GetValue();
 
   // Description:
   // Called when the browse button is pressed.

@@ -46,9 +46,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVLabeledToggle_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkKWCheckButton.h"
-#include "vtkKWLabel.h"
+
+class vtkKWApplication;
+class vtkKWLabel;
+class vtkKWCheckButton;
 
 class VTK_EXPORT vtkPVLabeledToggle : public vtkPVObjectWidget
 {
@@ -58,8 +59,8 @@ public:
 
   // Description:
   // Setting the label also sets the name.
-  void SetLabel(const char *str) {this->Label->SetLabel(str); this->SetTraceName(str);}
-  const char* GetLabel() { return this->Label->GetLabel();}
+  void SetLabel(const char *str);
+  const char* GetLabel();
 
   void Create(vtkKWApplication *pvApp);
   
@@ -78,7 +79,7 @@ public:
   // Description:
   // This method allows scripts to modify the widgets value.
   void SetState(int val);
-  int GetState() { return this->CheckButton->GetState(); }
+  int GetState();
 
   // Description:
   // This class redefines SetBalloonHelpString since it
@@ -92,7 +93,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVLabeledToggle* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+				     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
