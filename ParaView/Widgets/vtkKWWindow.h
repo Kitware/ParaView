@@ -387,7 +387,7 @@ protected:
   vtkKWWidget        *ProgressFrame;
 
   vtkKWFrame      *TrayFrame;
-  vtkKWImageLabel *TrayImage;
+  vtkKWImageLabel *TrayImageError;
 
   vtkKWLabel *StatusLabel;
   char       *StatusImageName;

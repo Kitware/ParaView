@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.156");
+vtkCxxRevisionMacro(vtkKWWindow, "1.157");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -253,8 +253,8 @@ vtkKWWindow::vtkKWWindow()
   this->TrayFrame = vtkKWFrame::New();
   this->TrayFrame->SetParent(this->StatusFrame);
 
-  this->TrayImage = vtkKWImageLabel::New();
-  this->TrayImage->SetParent(this->TrayFrame);
+  this->TrayImageError = vtkKWImageLabel::New();
+  this->TrayImageError->SetParent(this->TrayFrame);
 
   this->Notebook = vtkKWNotebook::New();
   
@@ -352,7 +352,7 @@ vtkKWWindow::~vtkKWWindow()
   this->ProgressFrame->Delete();
   this->ProgressGauge->Delete();
   this->TrayFrame->Delete();
-  this->TrayImage->Delete();
+  this->TrayImageError->Delete();
   
   if (this->MenuEdit)
     {
@@ -690,14 +690,17 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
   this->TrayFrame->Create(app, 0);
   this->Script("%s configure -borderwidth 0", 
                this->TrayFrame->GetWidgetName());
-  this->TrayImage->Create(app, "");
+  this->Script(
+    "pack %s -side left -ipadx 0 -ipady 0 -padx 0 -pady 0 -fill both", 
+    this->TrayFrame->GetWidgetName());
+  this->TrayImageError->Create(app, "");
   this->Script("%s configure -relief sunken -bd 2",
-               this->TrayImage->GetWidgetName());
+               this->TrayImageError->GetWidgetName());
   vtkKWIcon *ico = vtkKWIcon::New();
   ico->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
-  this->TrayImage->SetImageData(ico);
+  this->TrayImageError->SetImageData(ico);
   ico->Delete();
-  this->TrayImage->SetBind(this, "<Button-1>", "ProcessErrorClick");
+  this->TrayImageError->SetBind(this, "<Button-1>", "ProcessErrorClick");
   
   // To force the toolbar on top, I am creating a separate "MiddleFrame" 
   // for the ViewFrame and PropertiesParent
@@ -1364,30 +1367,27 @@ void vtkKWWindow::SetErrorIcon(int s)
 {
   if (s) 
     {
-    this->Script("pack %s -side left -ipady 0 -padx 2 -fill both", 
-               this->TrayFrame->GetWidgetName());
     this->Script("pack %s -fill both -ipadx 4 -expand yes", 
-                 this->TrayImage->GetWidgetName());
+                 this->TrayImageError->GetWidgetName());
     if ( s > 1 )
       {
       //cout << "Configure with color red" << endl;
       vtkKWIcon *ico = vtkKWIcon::New();
       ico->SetImageData(vtkKWIcon::ICON_SMALLERRORRED);
-      this->TrayImage->SetImageData(ico);
+      this->TrayImageError->SetImageData(ico);
       ico->Delete();
       }
     else
       {
       vtkKWIcon *ico = vtkKWIcon::New();
       ico->SetImageData(vtkKWIcon::ICON_SMALLERROR);
-      this->TrayImage->SetImageData(ico);
+      this->TrayImageError->SetImageData(ico);
       ico->Delete();
       }
     }
   else
     {
-    this->Script("pack forget %s", this->TrayImage->GetWidgetName());
-    this->Script("pack forget %s", this->TrayFrame->GetWidgetName());
+    this->Script("pack forget %s", this->TrayImageError->GetWidgetName());
     }
 }
 
