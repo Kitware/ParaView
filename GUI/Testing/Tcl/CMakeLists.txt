@@ -39,6 +39,7 @@ SET(PROJECT_TESTS
   ConeCubeCylSQ
   CTH
   CutContours
+  D3
   Data
   Delete
   DeleteSource
