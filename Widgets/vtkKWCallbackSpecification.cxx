@@ -46,6 +46,8 @@ vtkKWCallbackSpecification::vtkKWCallbackSpecification()
 vtkKWCallbackSpecification::~vtkKWCallbackSpecification()
 {
   this->SetNextCallback(NULL);
+  delete [] this->CommandString;
+  delete [] this->EventString;
 }
 
 vtkKWCallbackSpecification* vtkKWCallbackSpecification::New()
