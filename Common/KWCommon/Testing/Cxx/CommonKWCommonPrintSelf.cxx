@@ -16,7 +16,6 @@
 #include "vtkKWArguments.h"
 #include "vtkKWDirectoryUtilities.h"
 #include "vtkKWIcon.h"
-#include "vtkKWMath.h"
 #include "vtkKWProcessStatistics.h"
 #include "vtkKWRegisteryUtilities.h"
 #include "vtkKWRemoteExecute.h"
@@ -35,7 +34,6 @@ int main(int , char* [])
   c = vtkKWArguments::New(); c->Print( cout ); c->Delete();
   c = vtkKWDirectoryUtilities::New(); c->Print( cout ); c->Delete();
   c = vtkKWIcon::New(); c->Print( cout ); c->Delete();
-  c = vtkKWMath::New(); c->Print( cout ); c->Delete();
   c = vtkKWProcessStatistics::New(); c->Print( cout ); c->Delete();
   c = vtkKWRegisteryUtilities::New(); c->Print( cout ); c->Delete();
   c = vtkKWRemoteExecute::New(); c->Print( cout ); c->Delete();
