@@ -1,0 +1,32 @@
+'\"
+'\" Copyright (c) 1993 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH tell n 8.1 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+tell \- Return current access position for an open channel
+.SH SYNOPSIS
+\fBtell \fIchannelId\fR
+.BE
+
+.SH DESCRIPTION
+.PP
+.VS 8.1
+Returns an integer string giving the current access position in
+\fIchannelId\fR.  This value returned is a byte offset that can be passed to
+\fBseek\fR in order to set the channel to a particular position.  Note
+that this value is in terms of bytes, not characters like \fBread\fR.
+.VE 8.1
+The value returned is -1 for channels that do not support
+seeking.
+
+.SH KEYWORDS
+access position, channel, seeking

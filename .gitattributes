@@ -14,6 +14,7 @@ newversion       crlf=input
 rmt              crlf=input
 rolodex          crlf=input
 square           crlf=input
+tcltk-man2html.tcl  crlf=input
 tcolor           crlf=input
 timer            crlf=input
 widget           crlf=input

@@ -1,0 +1,1 @@
+proc {[magic mojo proc]} {} {}
