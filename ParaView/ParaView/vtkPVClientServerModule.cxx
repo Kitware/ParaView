@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.65");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.66");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -341,7 +341,7 @@ int vtkPVClientServerModule::OpenConnectionDialog(int* start)
   char servers[1024];
   servers[0] = 0;
   pvApp->GetRegisteryValue(2, "RunTime", "Servers", servers);
-  this->Script("wm withdraw .");
+  pvApp->Script("wm withdraw .");
   vtkPVConnectDialog* dialog = 
     vtkPVConnectDialog::New();
   dialog->SetHostname(this->Hostname);
