@@ -62,7 +62,7 @@ The output of the 2D Glyph source is polygonal data.
                default_value="3D Text"/>
   <Documentation>
 The 3D Text source displays a text string as polygonal text. There is only one parameter for 3D Text:
-Text: Specify the text string to be displayed. The ASCII alphanumberic characters a-z, A-Z, and 0-9 are supported; so are ASCII punctuation marks. The only supported control character is "\n", which inserts a new line in the text string. The default value is "3D Text".
+Text: Specify the text string to be displayed. The ASCII alphanumeric characters a-z, A-Z, and 0-9 are supported; so are ASCII punctuation marks. The only supported control character is "\n", which inserts a new line in the text string. The default value is "3D Text".
 The output of the 3D text source is polygonal data.
   </Documentation>
 </Module>
@@ -122,11 +122,11 @@ The output of the 3D text source is polygonal data.
   <Documentation>
 The Arrow source appends a cylinder to a cone to form an arrow. The parameters for the Arrow source are as follows.
 Tip resolution: Set the number of faces in the representation of the tip of the arrow (the cone). As the resolution increases, the cone will become smoother. The default value is 6.
-Tip radius: Specify the radius of the tip of the arrow (the cone). The length of the whole arrow is 1.0 unit. The default value is 0.1 unit.
-Tip length: Specify the length of the tip. The value ranges between 0.0 units and 1.0 unit (the length of the whole arrow). The default is 0.35 unit.
+Tip radius: Specify the radius of the tip of the arrow (the cone). The length of the whole arrow is 1.0 unit. The default value is 0.1 units.
+Tip length: Specify the length of the tip. The value ranges between 0.0 units and 1.0 unit (the length of the whole arrow). The default is 0.35 units.
 Shaft resolution: Set the number of faces of the shaft of the arrow (the cylinder). As the resolution increases, the cylinder will become smoother. The default value of is 6.
-Shaft radius: Specify the radius of the shaft of the arrow (the cylinder). The length of the whole arrow is 1.0 unit. The default value is 0.03 unit.
-The output of the Arrow source is polygonal data. This polygonal data will not contain normals, so rendering of the arrow will be performed using flat shading. The appearance of the arrow can be improved without singificantly increasing the resolution of the tip and shaft by generating normals (Normals generation filter).
+Shaft radius: Specify the radius of the shaft of the arrow (the cylinder). The length of the whole arrow is 1.0 unit. The default value is 0.03 units.
+The output of the Arrow source is polygonal data. This polygonal data will not contain normals, so rendering of the arrow will be performed using flat shading. The appearance of the arrow can be improved without significantly increasing the resolution of the tip and shaft by generating normals (Normals generation filter).
   </Documentation>
 </Module>
 
@@ -283,9 +283,9 @@ The output of the Line source is polygonal data.
                display_entry="1" display_value="0" entry_and_label_on_top="0"
                help="The limit on computational iterations. Values less than 2.0 after this many iterations are considered in the set."/>
   <Documentation>
-The Mandelbrot source can be used to add a uniform rectilinear grid with scalar values derived from the Mandelbrot set to the 3D scene. The equation used is z = z^2 + C (where z and C are complex). The scalar values in the grid are the number of iterations of the equation it takes for the magnitude of the value to become greater than 2. In the equation, the initial value of z is 0. The real component of C is maped onto the X axis; the imaginary component of C is mapped onto the Y axis; and the imaginary component of the initial value is mapped onto the Z axis. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The following parameters of the Mandelbrot source can be controlled:
+The Mandelbrot source can be used to add a uniform rectilinear grid with scalar values derived from the Mandelbrot set to the 3D scene. The equation used is z = z^2 + C (where z and C are complex). The scalar values in the grid are the number of iterations of the equation it takes for the magnitude of the value to become greater than 2. In the equation, the initial value of z is 0. The real component of C is mapped onto the X axis; the imaginary component of C is mapped onto the Y axis; and the imaginary component of the initial value is mapped onto the Z axis. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The following parameters of the Mandelbrot source can be controlled:
 Extent: These six values indicate the X, Y, and Z extent of the output data. The first two numbers are the minimum and maximum X extent; the next two are the minimum and maximum Y extent; and the final two are the minimum and maximum Z extent. The numbers are inclusive, so the default values of 0, 250, 0, 250, 0, 0 indicate that the dimensions of the output will be 251 x 251 x 1.
-Sub-space: These three values allow the user to set the projection from the 4D space to the axes of the 3D volume. By default, the real component of C (represented by 0) is mapped to the X axis; the imaginary component of C (represented by 1) is mapped to the Y axis; and the real compoent of X , the initial value (represented by 2) is mapped to the Z axis. The imaginary component of X is represented by 3. All values entered must be between 0 and 3, inclusive.
+Sub-space: These three values allow the user to set the projection from the 4D space to the axes of the 3D volume. By default, the real component of C (represented by 0) is mapped to the X axis; the imaginary component of C (represented by 1) is mapped to the Y axis; and the real component of X , the initial value (represented by 2) is mapped to the Z axis. The imaginary component of X is represented by 3. All values entered must be between 0 and 3, inclusive.
 Origin: These four values indicate the components of C (real and imaginary) and the components of the initial value, X (real and imaginary). The first two numbers represent the real and imaginary components of C, and the last two indicate the real and imaginary components of X. The default values are -1.75, -1.25, 0, and 0.
 Size: These four values indicate the length of the output in each of the four dimensions. (The three dimensions specified in the Sub-space will determine which of these values specify the length of the axes in the output.) The default values are 2.5, 2.5, 2, and 1.5
 Max. iterations: This number indicates the maximum number of iteration to perform in order to determine if the value will go above 2. The default value is 100.
@@ -316,12 +316,12 @@ The output of the Mandelbrot source is image (uniform rectilinear) data.
                help="Show the solution path." />
   <Documentation>
 The Maze source can be used to display a 2D maze in the 3D scene. The following parameters can be specified:
-XSize: Specify the size of the maze in the X dimension. The default value is 20.
-YSize: Specify the size of the maze in the Y dimension. The default value is 20.
-RunFactor: This value, which must be at least 2, determines the length of each run (straight segment) of the maze. The default value is 20.
-MagnetFactor: This value, which must greater than 0, determines how the path through the maze turns. With a value of 1, all directions have an equal probability of being chosen. Larger values tend to choose paths that lie next to existing paths, creating longer runs and more interesting mazes. The default value is 4.
-RandomSeed: This value is used in determining the final maze. The default value is 111.
-ShowResolution: This check box toggles the visibility of the maze's solution. By default it is off.
+X Size: Specify the size of the maze in the X dimension. The default value is 20.
+Y Size: Specify the size of the maze in the Y dimension. The default value is 20.
+Run Factor: This value, which must be at least 2, determines the length of each run (straight segment) of the maze. The default value is 20.
+Magnet Factor: This value, which must greater than 0, determines how the path through the maze turns. With a value of 1, all directions have an equal probability of being chosen. Larger values tend to choose paths that lie next to existing paths, creating longer runs and more interesting mazes. The default value is 4.
+Random Seed: This value is used in determining the final maze. The default value is 111.
+Show Resolution: This check box toggles the visibility of the maze's solution. By default it is off.
 The output of the Maze source is polygonal data.
   </Documentation>
 </Module>
@@ -406,7 +406,7 @@ End Theta: The End Theta value can be adjusted to form only a portion of a spher
 Phi Resolution: This number represents the number of divisions between Start Phi and End Phi on the sphere. The phi divisions are similar to latitude lines on the earth. The default Phi Resolution value is 8.
 Start Phi: To form a complete sphere, the Start Phi value should be 0 degrees, and the End Phi value should be 180 degrees. The Start Phi value can be adjusted to form only a portion of a sphere. The default value is 0 degrees.
 End Phi: The End Phi value can be adjusted to form only a portion of a sphere. The default End Phi value is 180 degrees.
-Ths output of the Sphere source is polygonal data with point normals defined.
+The output of the Sphere source is polygonal data with point normals defined.
   </Documentation>
 </Module>
 
@@ -489,7 +489,7 @@ The output of the Superquadric source is polygonal data with point normals and t
                variable="StandardDeviation" type="float" default_value="0.5" 
                help="Standard deviation of the gaussian" />
   <Documentation>
-The Wavelet source can be used to create a regular rectilinear grid in up to three dimeisions with values varying according to the following periodic function:
+The Wavelet source can be used to create a regular rectilinear grid in up to three dimensions with values varying according to the following periodic function:
 OS = M * G * (XM * sin(XF * x) + YM * sin(YF * y) + ZM * cos(ZF * z))
 OS is the output scalar; M represents the maximum value; G represents the Gaussian; XM, YM, and ZM are the X, Y, and Z magnitude values; and XF, YF, and ZF are the X, Y, and Z frequency values. If a two-dimensional extent is specified, the resulting image will be displayed. If a three-dimensional extent is used, then the bounding box of the volume will be displayed. The Wavelet source has the following parameters:
 Extent: These six values indicate the X, Y, and Z extent of the output data. The first two values represent the minimum and maximum X indices, the next two are the minimum and maximum Y indices, and the last two are the minimum and maximum Z indices. By default each axis ranges from -10 to 10.
@@ -501,7 +501,7 @@ Z Freq.: This is the ZF value from the above equation. The default value is 40.
 X Mag.: This is the XM value from the above equation. The default value is 10.
 Y Mag.: This is the YM value from the above equation. The default value is 18.
 Z Mag.: This is the ZM value from the above equation. The default value is 5.
-Standard dev.: The standard deviation is used in the generation of the Gaussian value in the above equation. The default value value is 0.5.
+Standard dev.: The standard deviation is used in the generation of the Gaussian value in the above equation. The default value is 0.5.
 The output of the Wavelet source is image (uniform rectilinear) data.
   </Documentation>
 </Module>
