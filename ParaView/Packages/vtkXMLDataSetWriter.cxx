@@ -30,7 +30,7 @@
 #include "vtkXMLStructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 
-vtkCxxRevisionMacro(vtkXMLDataSetWriter, "1.1");
+vtkCxxRevisionMacro(vtkXMLDataSetWriter, "1.2");
 vtkStandardNewMacro(vtkXMLDataSetWriter);
 
 //----------------------------------------------------------------------------
@@ -114,7 +114,7 @@ int vtkXMLDataSetWriter::Write()
     vtkErrorMacro("Cannot write dataset type: "
                   << input->GetDataObjectType());
     return 0;
-    }  
+    }
   
   // Copy the settings to the writer.
   writer->SetDebug(this->GetDebug());
