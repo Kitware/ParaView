@@ -53,7 +53,7 @@ RELEASE_UTILITIES_CVS="ParaView/Utilities/Release"
 PREFIX="/usr/local"
 
 # Directory relative to PREFIX where documentation should be placed.
-DOC_DIR="/doc/paraview"
+DOC_DIR="/doc/ParaView-${VERSION}"
 
 # No default compiler.  The config file must provide it.
 CC=""
