@@ -24,7 +24,7 @@ int CheckName(const char *name, char **names)
 template<class DType>
 int TestList(DType*)
 {
-  unsigned int cc;
+  vtkIdType cc;
   int error = 0;
   char* names[] = {
     "Andy",
@@ -208,7 +208,7 @@ int TestList(DType*)
   strings->Delete();
 
   strings = DType::New();
-  unsigned long maxsize = 0;
+  vtkIdType maxsize = 0;
   if ( strings->SetSize(15) == VTK_OK )
     {
     maxsize = 15;
@@ -217,7 +217,7 @@ int TestList(DType*)
     {
     if ( !maxsize || cc < maxsize )
       {
-      if ( strings->InsertItem( 0, separate ) != VTK_OK )
+      if ( strings->InsertItem( (cc)?(cc-1):0, separate ) != VTK_OK )
 	{
 	C_ERROR(strings) << "Problem inserting item: " << cc << endl;
 	C_ERROR(strings) << "Size: " << strings->GetNumberOfItems() << endl;
@@ -226,7 +226,7 @@ int TestList(DType*)
       }
     else
       {
-      if ( strings->InsertItem( 0, separate ) == VTK_OK )
+      if ( strings->InsertItem( (cc)?(cc-1):0, separate ) == VTK_OK )
 	{
 	C_ERROR(strings) << "Should not be able to insert item: " 
 			 << cc << endl;

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkVector.h
+  Module:    vtkReferenceCountedVector.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,39 +39,31 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkVector - a dynamic vector
+// .NAME vtkReferenceCountedVector - a dynamic vector
 
-#ifndef __vtkVector_h
-#define __vtkVector_h
+#ifndef __vtkReferenceCountedVector_h
+#define __vtkReferenceCountedVector_h
 
-#include "vtkAbstractList.h"
+#include "vtkVector.h"
 
 template <class DType>
-class vtkVector : public vtkAbstractList<DType>
+class vtkReferenceCountedVector : public vtkVector<DType>
 {
 public:
-  vtkContainerTypeMacro(vtkVector<DType>, vtkAbstractList<DType>);
+  vtkContainerTypeMacro(vtkReferenceCountedVector<DType>, 
+			vtkVector<DType>);
   
-  static vtkVector<DType> *New() { return new vtkVector<DType>(); }  
+  static vtkReferenceCountedVector<DType> *New() 
+    { return new vtkReferenceCountedVector<DType>(); }  
   
   // Description:
   // Append an Item to the end of the vector.
   virtual int AppendItem(DType a);
   
   // Description:
-  // Insert an Item to the front of the linked list.
-  virtual int PrependItem(DType a);
-  
-  // Description:
   // Insert an Item to the specific location in the vector.
   virtual int InsertItem(vtkIdType loc, DType a);
   
-  // Description:
-  // Sets the Item at the specific location in the list to a new value.
-  // It also checks if the item can be set.
-  // It returns VTK_OK if successfull.
-  virtual int SetItem(vtkIdType loc, DType a);
-
   // Description:
   // Sets the Item at the specific location in the list to a new value.
   // This method does not perform any error checking.
@@ -82,73 +74,16 @@ public:
   virtual int RemoveItem(vtkIdType id);
   
   // Description:
-  // Return an item that was previously added to this vector. 
-  virtual int GetItem(vtkIdType id, DType& ret);
-      
-  // Description:
-  // Find an item in the vector. Return one if it was found, zero if it was
-  // not found. The location of the item is returned in res.
-  virtual int FindItem(DType a, vtkIdType &res);
-
-  // Description:
-  // Find an item in the vector using a comparison routine. 
-  // Return VTK_OK if it was found, VTK_ERROR if it was
-  // not found. The location of the item is returned in res.
-  virtual int FindItem(DType a, 
-		       vtkAbstractListCompareFunction(DType, compare), 
-		       vtkIdType &res);
-  
-  // Description:
-  // Return the number of items currently held in this container. This
-  // different from GetSize which is provided for some containers. GetSize
-  // will return how many items the container can currently hold.
-  virtual vtkIdType GetNumberOfItems() { return this->NumberOfItems; }
-  
-  // Description:
-  // Returns the number of items the container can currently hold.
-  virtual vtkIdType GetSize() { return this->Size; }
-
-  // Description:
   // Removes all items from the container.
   virtual void RemoveAllItems();
 
-  // Description:
-  // Set the capacity of the vector.
-  // It returns VTK_OK if successfull.
-  // If capacity is set, the vector will not resize.
-  virtual int SetSize(vtkIdType size);
-
-  // Description:
-  // Allow or disallow resizing. If resizing is disallowed, when
-  // inserting too many elements, it will return VTK_ERROR.
-  // Initially allowed.
-  void SetResize(int r) { this->Resize = r; }
-  void ResizeOn() { this->SetResize(1); }
-  void ResizeOff() { this->SetResize(0); }
-  int GetResize() { return this->Resize; }
-
-  // Description:
-  // Display the content of the list.
-  void DebugList();
-
 protected:
-  vtkVector() {
-    this->Array = 0; this->NumberOfItems = 0; this->Size = 0; 
-    this->Resize = 1; }
-  virtual ~vtkVector() {
-    if (this->Array)
-      {
-      delete [] this->Array;
-      }
-  }
-  vtkIdType NumberOfItems;
-  vtkIdType Size;
-  int Resize;
-  DType *Array;
+  vtkReferenceCountedVector() {}
+  virtual ~vtkReferenceCountedVector();
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
-#include "vtkVector.txx"
+#include "vtkReferenceCountedVector.txx"
 #endif 
 
 #endif

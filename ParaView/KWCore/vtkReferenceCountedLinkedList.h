@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkLinkedList.h
+  Module:    vtkReferenceCountedLinkedList.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,29 +39,32 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-// .NAME vtkLinkedList - a templated linked list
+// .NAME vtkReferenceCountedLinkedList - a templated linked list
 
-#ifndef __vtkLinkedList_h
-#define __vtkLinkedList_h
+#ifndef __vtkReferenceCountedLinkedList_h
+#define __vtkReferenceCountedLinkedList_h
 
-#include "vtkAbstractList.h"
+#include "vtkLinkedList.h"
 
-template <class DType> class vtkLinkedListNode;
+template <class DType> 
+class vtkReferenceCountedLinkedListNode;
 
 template <class DType>
-class vtkLinkedList : public vtkAbstractList<DType>
+class vtkReferenceCountedLinkedList : public vtkLinkedList<DType>
 {
 public:
-  vtkContainerTypeMacro(vtkLinkedList<DType>, vtkAbstractList<DType>);
+  vtkContainerTypeMacro(vtkReferenceCountedLinkedList<DType>, 
+			vtkLinkedList<DType>);
   
-  static vtkLinkedList<DType> *New() { return new vtkLinkedList<DType>(); }  
+  static vtkReferenceCountedLinkedList<DType> *New() 
+    { return new vtkReferenceCountedLinkedList<DType>(); }  
   
   // Description:
   // Append an Item to the end of the linked list.
   virtual int AppendItem(DType a);
   
   // Description:
-  // Insert an Item to the front of the linked list.
+  // Prepend an Item to the beginning of the linked list.
   virtual int PrependItem(DType a);
   
   // Description:
@@ -84,65 +87,20 @@ public:
   virtual int RemoveItem(vtkIdType id);
   
   // Description:
-  // Return an item that was previously added to this linked list. 
-  virtual int GetItem(vtkIdType id, DType& ret);
-      
-  // Description:
-  // Find an item in the linked list. Return VTK_OK if it was found
-  // od VTK_ERROR if not found. The location of the item is returned in res.
-  virtual int FindItem(DType a, vtkIdType &res);
-
-  // Description:
-  // Find an item in the linked list using a comparison routine. 
-  // Return VTK_OK if it was found
-  // od VTK_ERROR if not found. The location of the item is returned in res.
-  virtual int FindItem(DType a, 
-		       vtkAbstractListCompareFunction(DType, compare), 
-		       vtkIdType &res);
-  
-  // Description:
-  // Return the number of items currently held in this container. This
-  // different from GetSize which is provided for some containers. GetSize
-  // will return how many items the container can currently hold.
-  virtual vtkIdType GetNumberOfItems() { return this->NumberOfItems; }
-  
-  // Description:
-  // Returns the number of items the container can currently hold.
-  // Since capacity is arbitrary for the linked list, this will 
-  // always return the current number of elements.
-  virtual vtkIdType GetSize() { return this->NumberOfItems; }
-
-  // Description:
   // Removes all items from the container.
   virtual void RemoveAllItems();
-
-  // Description:
-  // Since linked list does not have the notion of capacity,
-  // this method always return VTK_ERROR.
-  virtual int SetSize(vtkIdType ) { return VTK_ERROR; }
 
   // Description:
   // This method dumps debug of the linked list.
   virtual void DebugList();
 
 protected:
-  vtkLinkedList() {
-    this->Head = 0; this->Tail = 0;
-    this->NumberOfItems = 0; 
-  }
-  virtual ~vtkLinkedList();
-
-  // Description:
-  // Find a node with given index.
-  virtual vtkLinkedListNode<DType>* FindNode(vtkIdType i);
-
-  vtkIdType NumberOfItems;
-  vtkLinkedListNode<DType> *Head;
-  vtkLinkedListNode<DType> *Tail;
+  vtkReferenceCountedLinkedList() {}
+  virtual ~vtkReferenceCountedLinkedList();
 };
 
 #ifdef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
-#include "vtkLinkedList.txx"
+#include "vtkReferenceCountedLinkedList.txx"
 #endif 
 
 #endif

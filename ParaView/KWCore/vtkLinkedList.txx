@@ -97,7 +97,7 @@ int vtkLinkedList<DType>::PrependItem(DType a)
 // Description:
 // Insert an Item to the specific location in the vector.
 template <class DType>
-int vtkLinkedList<DType>::InsertItem(unsigned long loc, DType a)
+int vtkLinkedList<DType>::InsertItem(vtkIdType loc, DType a)
 {
   if ( loc > this->NumberOfItems )
     {
@@ -133,7 +133,7 @@ int vtkLinkedList<DType>::InsertItem(unsigned long loc, DType a)
 // It also checks if the item can be set.
 // It returns VTK_OK if successfull.
 template <class DType>
-int vtkLinkedList<DType>::SetItem(unsigned long loc, DType a)
+int vtkLinkedList<DType>::SetItem(vtkIdType loc, DType a)
 {
   vtkLinkedListNode<DType> *curr = this->FindNode(loc);
   if ( !curr )
@@ -148,7 +148,7 @@ int vtkLinkedList<DType>::SetItem(unsigned long loc, DType a)
 // Sets the Item at the specific location in the list to a new value.
 // It returns VTK_OK if successfull.
 template <class DType>
-void vtkLinkedList<DType>::SetItemNoCheck(unsigned long loc, DType a)
+void vtkLinkedList<DType>::SetItemNoCheck(vtkIdType loc, DType a)
 {
   this->FindNode(loc)->Data = a;
 }
@@ -156,7 +156,7 @@ void vtkLinkedList<DType>::SetItemNoCheck(unsigned long loc, DType a)
 // Description:
 // Remove an Item from the vector
 template <class DType>
-int vtkLinkedList<DType>::RemoveItem(unsigned long id) 
+int vtkLinkedList<DType>::RemoveItem(vtkIdType id) 
 {
   vtkLinkedListNode<DType> *curr = 0;
   if ( !this->Head )
@@ -199,7 +199,7 @@ int vtkLinkedList<DType>::RemoveItem(unsigned long id)
 // Description:
 // Return an item that was previously added to this vector. 
 template <class DType>
-int vtkLinkedList<DType>::GetItem(unsigned long id, DType& ret) 
+int vtkLinkedList<DType>::GetItem(vtkIdType id, DType& ret) 
 {
   vtkLinkedListNode<DType> *curr = this->FindNode(id);
   if ( !curr )
@@ -214,9 +214,9 @@ int vtkLinkedList<DType>::GetItem(unsigned long id, DType& ret)
 // Find an item in the vector. Return one if it was found, zero if it was
 // not found. The location of the item is returned in res.
 template <class DType>
-int vtkLinkedList<DType>::FindItem(DType a, unsigned long &res) 
+int vtkLinkedList<DType>::FindItem(DType a, vtkIdType &res) 
 {
-  unsigned long cc = 0;
+  vtkIdType cc = 0;
   vtkLinkedListNode<DType> *curr;
   for ( curr = this->Head; curr; curr = curr->Next )
     {
@@ -237,13 +237,13 @@ template <class DType>
 int vtkLinkedList<DType>::FindItem(
   DType a, 
   vtkAbstractListCompareFunction(DType, compare),
-  unsigned long &res) 
+  vtkIdType &res) 
 {
-  unsigned long cc = 0;
+  vtkIdType cc = 0;
   vtkLinkedListNode<DType> *curr;
   for ( curr = this->Head; curr; curr = curr->Next )
     {
-    if ( compare(curr->Data, a) )
+    if ( compare(curr->Data, a) == 0 )
       {
       res = cc;
       return VTK_OK;
@@ -269,9 +269,9 @@ void vtkLinkedList<DType>::RemoveAllItems()
 }
 
 template <class DType>
-vtkLinkedListNode<DType>* vtkLinkedList<DType>::FindNode(unsigned long i)
+vtkLinkedListNode<DType>* vtkLinkedList<DType>::FindNode(vtkIdType i)
 {
-  unsigned long cc        = 0;
+  vtkIdType cc = 0;
   vtkLinkedListNode<DType> *curr = 0;
   for ( curr=this->Head; curr; curr = curr->Next )
     {
@@ -305,10 +305,12 @@ void vtkLinkedList<DType>::DebugList()
 {
   vtkLinkedListNode<DType> *curr;
   int cc = 0; 
+  cout << "List: " << this->GetClassName() << endl;
   for ( curr = this->Head; curr; curr = curr->Next )
     {
-    cout << "Node: " << curr << " Next: " << curr->Next 
+    cout << "Node [" << cc << "]: " << curr << " Next: " << curr->Next 
 	 << " Data: " << curr->Data << endl;
+    cc ++;
     }
 }
 

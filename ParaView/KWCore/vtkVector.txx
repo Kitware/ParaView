@@ -39,7 +39,7 @@ int vtkVector<DType>::AppendItem(DType a)
       this->Size = 2;
       }
     DType *newArray = new DType [this->Size*2];
-    unsigned long i;
+    vtkIdType i;
     for (i = 0; i < this->NumberOfItems; ++i)
       {
       newArray[i] = this->Array[i];
@@ -67,9 +67,17 @@ int vtkVector<DType>::PrependItem(DType a)
 // Description:
 // Insert an Item to the specific location in the vector.
 template <class DType>
-int vtkVector<DType>::InsertItem(unsigned long loc, DType a)
+int vtkVector<DType>::InsertItem(vtkIdType loc, DType a)
 {
-  unsigned long i;
+  if ( loc > this->NumberOfItems )
+    {
+    return VTK_ERROR;
+    }
+  if ( loc ==  this->NumberOfItems )
+    {
+    return this->AppendItem(a);
+    }
+  vtkIdType i;
   if ((this->NumberOfItems + 1) > this->Size)
     {
     if ( !this->Resize )
@@ -82,7 +90,11 @@ int vtkVector<DType>::InsertItem(unsigned long loc, DType a)
       this->Size = 2;
       }
     DType *newArray = new DType [this->Size*2];
-    for (i = 0; i < this->NumberOfItems; ++i)
+    for (i = 0; i < loc; i++ )
+      {
+      newArray[i] = this->Array[i];
+      }
+    for ( i = loc; i < this->NumberOfItems; i++ )
       {
       newArray[i+1] = this->Array[i];
       }
@@ -110,7 +122,7 @@ int vtkVector<DType>::InsertItem(unsigned long loc, DType a)
 // It also checks if the item can be set.
 // It returns VTK_OK if successfull.
 template <class DType>
-int vtkVector<DType>::SetItem(unsigned long loc, DType a)
+int vtkVector<DType>::SetItem(vtkIdType loc, DType a)
 {
   if ( loc == this->NumberOfItems )
     {
@@ -128,7 +140,7 @@ int vtkVector<DType>::SetItem(unsigned long loc, DType a)
 // Sets the Item at the specific location in the list to a new value.
 // It returns VTK_OK if successfull.
 template <class DType>
-void vtkVector<DType>::SetItemNoCheck(unsigned long loc, DType a)
+void vtkVector<DType>::SetItemNoCheck(vtkIdType loc, DType a)
 {
   this->Array[loc] = a;
 }
@@ -136,13 +148,13 @@ void vtkVector<DType>::SetItemNoCheck(unsigned long loc, DType a)
 // Description:
 // Remove an Item from the vector
 template <class DType>
-int vtkVector<DType>::RemoveItem(unsigned long id) 
+int vtkVector<DType>::RemoveItem(vtkIdType id) 
 {
   if (id >= this->NumberOfItems)
     {
     return VTK_ERROR;
     }
-  unsigned long i;
+  vtkIdType i;
   this->NumberOfItems--;
   
   if ( this->NumberOfItems < (this->Size / 3) && this->Size > 10 &&
@@ -177,7 +189,7 @@ int vtkVector<DType>::RemoveItem(unsigned long id)
 // Description:
 // Return an item that was previously added to this vector. 
 template <class DType>
-int vtkVector<DType>::GetItem(unsigned long id, DType& ret) 
+int vtkVector<DType>::GetItem(vtkIdType id, DType& ret) 
 {
   ret = 0;
   if (id < this->NumberOfItems)
@@ -192,9 +204,9 @@ int vtkVector<DType>::GetItem(unsigned long id, DType& ret)
 // Find an item in the vector. Return one if it was found, zero if it was
 // not found. The location of the item is returned in res.
 template <class DType>
-int vtkVector<DType>::FindItem(DType a, unsigned long &res) 
+int vtkVector<DType>::FindItem(DType a, vtkIdType &res) 
 {
-  unsigned long i;
+  vtkIdType i;
   for (i = 0; i < this->NumberOfItems; ++i)
     {
     if (this->Array[i] == a)
@@ -208,17 +220,17 @@ int vtkVector<DType>::FindItem(DType a, unsigned long &res)
 
 // Description:
 // Find an item in the vector using a comparison routine. 
-// Return one if it was found, zero if it was
+// Return VTK_OK if it was found, VTK_ERROR if it was
 // not found. The location of the item is returned in res.
 template <class DType>
-int vtkVector<DType>::FindItem(DType a, 
-			       vtkAbstractListCompareFunction(DType, compare),
-			       unsigned long &res) 
+int vtkVector<DType>::FindItem(
+  DType a, vtkAbstractListCompareFunction(DType, compare), 
+  vtkIdType &res) 
 {
-  unsigned long i;
+  vtkIdType i;
   for (i = 0; i < this->NumberOfItems; ++i)
     {
-    if ( compare(this->Array[i], a) )
+    if ( compare(this->Array[i], a) == 0 )
       {
       res = i;
       return VTK_OK;
@@ -247,7 +259,7 @@ void vtkVector<DType>::RemoveAllItems()
 // It returns VTK_OK if successfull.
 // If capacity is set, the vector will not resize down.
 template <class DType>
-int vtkVector<DType>::SetSize(unsigned long size)
+int vtkVector<DType>::SetSize(vtkIdType size)
 {
   if ( size < this->GetNumberOfItems() )
     {
@@ -257,7 +269,7 @@ int vtkVector<DType>::SetSize(unsigned long size)
   DType *newArray = new DType[ size ];
   if ( this->Array )
     {
-    unsigned long cc;
+    vtkIdType cc;
     for ( cc = 0; cc < this->GetNumberOfItems(); cc ++ )
       {
       newArray[cc] = this->Array[cc];
@@ -269,4 +281,15 @@ int vtkVector<DType>::SetSize(unsigned long size)
   return VTK_OK;
 }
  
+template <class DType>
+void vtkVector<DType>::DebugList()
+{
+  vtkIdType cc;
+  cout << "List: " << this->GetClassName() << endl;
+  for ( cc = 0; cc < this->NumberOfItems; cc ++ )
+    {
+    cout << "Item [" << cc << "]: " << this->Array[cc] << endl;
+    }
+}
+
 #endif
