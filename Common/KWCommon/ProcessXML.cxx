@@ -16,8 +16,9 @@
 
 #include <vtkstd/string>
 #include <vtkstd/vector>
-#include "kwsys/SystemTools.hxx"
-#include "kwsys/RegularExpression.hxx"
+#include <kwsys/SystemTools.hxx>
+#include <kwsys/RegularExpression.hxx>
+#include <kwsys/ios/fstream>
 
 class Output
 {
