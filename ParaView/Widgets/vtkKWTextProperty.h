@@ -72,6 +72,11 @@ public:
   // Create a Tk widget
   virtual void Create(vtkKWApplication *app);
 
+  // Description
+  // Refresh/Update the interface according to the value of the text property
+  // and actor2d
+  virtual void Update();
+
   // Description:
   // Set/Get the text property to control.
   virtual void SetTextProperty(vtkTextProperty*);
@@ -176,6 +181,24 @@ public:
   // Description:
   // Save out the text properties to a file.
   void SaveInTclScript(ofstream *file, const char *tcl_name = 0);
+
+  // Description:
+  // Event structure, and update the UI according to this event
+  //BTX
+  class EventStruct
+  {
+  public:
+    float Color[3];
+    int   FontFamily;
+    int   Bold;
+    int   Italic;
+    int   Shadow;
+    float Opacity;
+  };
+  virtual void FillEvent(EventStruct *event);
+  static void UpdateTextPropertyAccordingToEvent(
+    vtkTextProperty *tprop, EventStruct *event);
+  //ETX
 
 protected:
   vtkKWTextProperty();
