@@ -338,6 +338,24 @@ int vtkPVSphereWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSphereWidget::ActualPlaceWidget()
+{
+  vtkSphereWidget *widget = static_cast<vtkSphereWidget*>( this->Widget3D );
+  float center[3];
+  float radius;
+  int cc;
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    center[cc] = atof(this->CenterEntry[cc]->GetValue());
+    }
+  radius = atof(this->RadiusEntry->GetValue());
+ 
+  this->Superclass::ActualPlaceWidget();
+  this->SetCenter(center[0], center[1], center[2]);
+  this->SetRadius(radius);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetCenter(float x, float y, float z)
 {
   this->CenterEntry[0]->SetValue(x, 5);

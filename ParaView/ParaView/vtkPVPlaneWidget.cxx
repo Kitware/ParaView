@@ -434,7 +434,7 @@ void vtkPVPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       pvApp->BroadcastScript("%s SetOrigin %f %f %f", planeTclName,
                              0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
 			     0.5*(bds[4]+bds[5]));
-      pvApp->BroadcastScript("%s SetNormal 1 1 1", planeTclName);
+      pvApp->BroadcastScript("%s SetNormal 1 0 0", planeTclName);
       this->Reset();
       }
     }
