@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVSource.h"
-#include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -26,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputGroupRequirement);
-vtkCxxRevisionMacro(vtkPVInputGroupRequirement, "1.5");
+vtkCxxRevisionMacro(vtkPVInputGroupRequirement, "1.6");
 
 //----------------------------------------------------------------------------
 vtkPVInputGroupRequirement::vtkPVInputGroupRequirement()

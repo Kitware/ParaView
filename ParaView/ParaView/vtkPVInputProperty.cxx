@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputProperty);
-vtkCxxRevisionMacro(vtkPVInputProperty, "1.9");
+vtkCxxRevisionMacro(vtkPVInputProperty, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVInputProperty::vtkPVInputProperty()
@@ -69,7 +69,8 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
 
   // First check the data has the correct arrays.
   this->Requirements->InitTraversal();
-  while ( (ir = (vtkPVInputRequirement*)(this->Requirements->GetNextItemAsObject())))
+  while ( (ir = 
+           (vtkPVInputRequirement*)(this->Requirements->GetNextItemAsObject())))
     {
     if ( ! ir->GetIsValidInput(input, pvs) )
       {
@@ -166,14 +167,15 @@ int vtkPVInputProperty::GetIsValidInput(vtkPVSource *input, vtkPVSource *pvs)
 }
 
 //----------------------------------------------------------------------------
-int vtkPVInputProperty::GetIsValidField(int field, 
-                                 vtkPVDataSetAttributesInformation* fieldInfo)
+int vtkPVInputProperty::GetIsValidField(
+  int field, vtkPVDataSetAttributesInformation* fieldInfo)
 {
   vtkPVInputRequirement *ir;
 
   // First check the field has the correct arrays.
   this->Requirements->InitTraversal();
-  while ( (ir = (vtkPVInputRequirement*)(this->Requirements->GetNextItemAsObject())))
+  while ( (ir = 
+           (vtkPVInputRequirement*)(this->Requirements->GetNextItemAsObject())))
     {
     if ( ! ir->GetIsValidField(field, fieldInfo) )
       {
@@ -195,7 +197,8 @@ void vtkPVInputProperty::Copy(vtkPVInputProperty *in)
   
   vtkPVInputRequirement *ir;
   in->Requirements->InitTraversal();
-  while ( (ir = (vtkPVInputRequirement*)(in->Requirements->GetNextItemAsObject())))
+  while ( (ir = 
+           (vtkPVInputRequirement*)(in->Requirements->GetNextItemAsObject())))
     {
     this->AddRequirement(ir);
     }

@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVSource.h"
-#include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -26,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputArrayRequirement);
-vtkCxxRevisionMacro(vtkPVInputArrayRequirement, "1.6");
+vtkCxxRevisionMacro(vtkPVInputArrayRequirement, "1.7");
 
 //----------------------------------------------------------------------------
 vtkPVInputArrayRequirement::vtkPVInputArrayRequirement()
@@ -38,7 +37,7 @@ vtkPVInputArrayRequirement::vtkPVInputArrayRequirement()
 
 //----------------------------------------------------------------------------
 int vtkPVInputArrayRequirement::ReadXMLAttributes(vtkPVXMLElement* element,
-                                                 vtkPVXMLPackageParser*)
+                                                  vtkPVXMLPackageParser*)
 {
   const char* rAttr;
 
@@ -140,8 +139,8 @@ int vtkPVInputArrayRequirement::GetIsValidInput(vtkPVSource* input, vtkPVSource*
 }
 
 //----------------------------------------------------------------------------
-int vtkPVInputArrayRequirement::GetIsValidField(int field, 
-                                 vtkPVDataSetAttributesInformation* fieldInfo)
+int vtkPVInputArrayRequirement::GetIsValidField(
+  int field, vtkPVDataSetAttributesInformation* fieldInfo)
 {  
   // If attribute does not match ???
   if (this->Attribute != -1 && this->Attribute != field)

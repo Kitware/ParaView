@@ -22,7 +22,6 @@
 
 
 class vtkDataSet;
-class vtkPVData;
 class vtkPVDataSetAttributesInformation;
 
 #include "vtkPVInputRequirement.h"

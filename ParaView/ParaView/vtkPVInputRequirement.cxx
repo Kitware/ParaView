@@ -15,7 +15,6 @@
 #include "vtkPVInputRequirement.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
@@ -23,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputRequirement);
-vtkCxxRevisionMacro(vtkPVInputRequirement, "1.5");
+vtkCxxRevisionMacro(vtkPVInputRequirement, "1.6");
 
 
 //----------------------------------------------------------------------------

@@ -23,11 +23,10 @@
 #ifndef __vtkPVInputRequirement_h
 #define __vtkPVInputRequirement_h
 
-class vtkPVData;
-class vtkPVXMLElement;
-class vtkPVXMLPackageParser;
 class vtkPVDataSetAttributesInformation;
 class vtkPVSource;
+class vtkPVXMLElement;
+class vtkPVXMLPackageParser;
 
 #include "vtkObject.h"
 
