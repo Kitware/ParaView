@@ -95,7 +95,14 @@ void vtkPVContour::CreateProperties()
   this->ContourValuesList->Create(pvApp, "");
   this->ContourValuesList->SetHeight(5);
   this->ContourValuesList->SetBalloonHelpString("List of the current contour values");
-  
+  this->Script("bind %s <Delete> {%s DeleteValueCallback}",
+               this->ContourValuesList->GetWidgetName(),
+               this->GetTclName());
+  // We need focus for delete binding.
+  this->Script("bind %s <Enter> {focus %s}",
+               this->ContourValuesList->GetWidgetName(),
+               this->ContourValuesList->GetWidgetName());
+
   this->AcceptCommands->AddString("%s ContourValuesAcceptCallback",
                                   this->GetTclName());
   this->ResetCommands->AddString("%s ContourValuesResetCallback",
@@ -117,6 +124,10 @@ void vtkPVContour::CreateProperties()
   this->NewValueEntry->Create(pvApp, "");
   this->NewValueEntry->SetValue("");
   this->NewValueEntry->SetBalloonHelpString("Enter a new contour value");
+  this->Script("bind %s <KeyPress-Return> {%s AddValueCallback}",
+               this->NewValueEntry->GetWidgetName(),
+               this->GetTclName());
+
   
   this->AddValueButton->SetParent(this->NewValueFrame);
   this->AddValueButton->Create(pvApp, "-text \"Add Value\"");
