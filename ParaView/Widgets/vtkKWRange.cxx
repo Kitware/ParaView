@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.4");
+vtkCxxRevisionMacro(vtkKWRange, "1.5");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -68,7 +68,7 @@ vtkCxxRevisionMacro(vtkKWRange, "1.4");
 // For some reasons, the end-point of a line/box is not drawn in some
 // Tk versions. Comply with that.
 
-#if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION < 4)
+#ifndef _WIN32
 #define LSTRANGE 0
 #else
 #define LSTRANGE 1
