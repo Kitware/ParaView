@@ -14,6 +14,22 @@ CONFIGURE_FILE(
 ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/CombustorTest.tcl.in
 ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CombustorTest.tcl)
 
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Arrow.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Arrow.tcl)
+
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Axes.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Axes.tcl)
+
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl)
+
+CONFIGURE_FILE(
+${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/Extrusion.tcl.in
+${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Extrusion.tcl)
+
 ADD_TEST(BlowTest ${PARAVIEW_EXECUTABLE}
                   ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/BlowTest.tcl)
 
@@ -25,3 +41,15 @@ ADD_TEST(SphereTest ${PARAVIEW_EXECUTABLE}
 
 ADD_TEST(CombustorTest ${PARAVIEW_EXECUTABLE}
                     ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/CombustorTest.tcl)
+
+ADD_TEST(Arrow ${PARAVIEW_EXECUTABLE}
+                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Arrow.tcl)
+
+ADD_TEST(Axes ${PARAVIEW_EXECUTABLE}
+                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Axes.tcl)
+
+ADD_TEST(Mandelbrot ${PARAVIEW_EXECUTABLE}
+                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Mandelbrot.tcl)
+
+ADD_TEST(Extrusion ${PARAVIEW_EXECUTABLE}
+                    ${PARAVIEW_BINARY_DIR}/ParaView/Testing/Tcl/Extrusion.tcl)

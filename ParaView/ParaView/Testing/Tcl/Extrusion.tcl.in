@@ -1,0 +1,40 @@
+set DataDir "@PARAVIEW_DATA_ROOT@"
+
+set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
+set pv(vtkTemp89) [$pv(vtkTemp1) GetGlyphSource Arrow]
+set pv(vtkTemp93) [$pv(vtkTemp1) GetGlyphSource Cone]
+set pv(vtkTemp97) [$pv(vtkTemp1) GetGlyphSource Sphere]
+
+vtkPVDataSetReaderInterface rInt
+rInt SetDataFileName "$DataDir/Data/blow.vtk"
+rInt SetSourceClassName vtkPDataSetReader
+rInt SetApplication Application
+rInt SetPVWindow $pv(vtkTemp1)
+set pv(vtkTemp100) [rInt CreateCallback]
+
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp100)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+$pv(vtkTemp100) AcceptCallback
+set pv(vtkTemp157) [$pv(vtkTemp1) CreatePVSource vtkRotationalExtrusionFilter]
+$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp157)
+$pv(vtkTemp1) ShowCurrentSourceProperties
+set pv(vtkTemp175) [$pv(vtkTemp157) GetPVWidget {Angle}]
+$pv(vtkTemp175) SetValue 90
+set pv(vtkTemp178) [$pv(vtkTemp157) GetPVWidget {Translation}]
+$pv(vtkTemp178) SetValue 10
+set pv(vtkTemp181) [$pv(vtkTemp157) GetPVWidget {DeltaRadius}]
+$pv(vtkTemp181) SetValue 15
+$pv(vtkTemp157) AcceptCallback
+$pv(vtkTemp1) ResetCameraCallback
+
+# Fix the size of the image.
+RenWin1 SetSize 300 300
+RenWin1 Render
+update
+
+source $DataDir/Utility/rtImage.tcl
+pvImageTest $DataDir/Baseline/Extrusion.png 10
+
+rInt Delete   
+Application Exit
