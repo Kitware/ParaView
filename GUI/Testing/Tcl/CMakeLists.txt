@@ -70,6 +70,7 @@ IF(RUN_WITH_MPI)
       ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
       -D ${PVClientTestData}
       -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
       -V ${PVClientTestData}/Baseline/${tfile}.png
       ${PARAVIEW_MPI_POSTFLAGS})
     IF (PARAVIEW_TEST_COMPOSITING)
@@ -79,6 +80,7 @@ IF(RUN_WITH_MPI)
         -UC
         -D ${PVClientTestData}
         -C ${PVCompareImages}
+        -T ${ParaView_BINARY_DIR}/Testing/Temporary
         -V ${PVClientTestData}/Baseline/${tfile}.png
         ${PARAVIEW_MPI_POSTFLAGS})
     ENDIF (PARAVIEW_TEST_COMPOSITING)
@@ -90,6 +92,7 @@ FOREACH (tfile ${PROJECT_TESTS})
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
     -C ${PVCompareImages}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -V ${PVClientTestData}/Baseline/${tfile}.png)
   # repeat the test with the client server driver
   ADD_TEST("${tfile}ClientServer-ParaView" ${PARAVIEW_CS_EXECUTABLE}
@@ -97,6 +100,7 @@ FOREACH (tfile ${PROJECT_TESTS})
     ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
     -D ${PVClientTestData}
     -C ${PVCompareImages}
+    -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -V ${PVClientTestData}/Baseline/${tfile}.png)
 ENDFOREACH (tfile)
 
@@ -127,5 +131,6 @@ ADD_TEST(OtherTests-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry --start-e
 ADD_TEST (AnimationImages-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry
   ${PVClientTests_SOURCE_DIR}/Tcl/AnimationImages.pvs
   -D ${PVClientTestData}
+  -T ${ParaView_BINARY_DIR}/Testing/Temporary
   -C ${PVClientTests_SOURCE_DIR}/Tcl/ComparePNGs.tcl
   -V ${PVClientTestData}/Baseline/AnimationImages.png)
