@@ -24,12 +24,8 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIRenderModule);
-vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.5");
+vtkCxxRevisionMacro(vtkPVMPIRenderModule, "1.6");
 
-
-
-//***************************************************************************
-//===========================================================================
 
 //----------------------------------------------------------------------------
 vtkPVMPIRenderModule::vtkPVMPIRenderModule()
@@ -65,7 +61,6 @@ void vtkPVMPIRenderModule::SetProcessModule(vtkProcessModule *pm)
 
   if (this->ProcessModule->GetOptions()->GetClientMode() || this->ProcessModule->GetOptions()->GetServerMode())
     {
-    this->Composite = NULL;
     this->CompositeID = 
       pm->NewStreamObject("vtkClientCompositeManager", stream);
     // Clean up this mess !!!!!!!!!!!!!
@@ -89,8 +84,8 @@ void vtkPVMPIRenderModule::SetProcessModule(vtkProcessModule *pm)
     this->CompositeID = pm->NewStreamObject("vtkPVTreeComposite", stream);
     pm->SendStream(
       vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
-    this->Composite = vtkPVTreeComposite::SafeDownCast(
-      pm->GetObjectFromID(this->CompositeID));
+    //this->Composite = vtkPVTreeComposite::SafeDownCast(
+    //  pm->GetObjectFromID(this->CompositeID));
 
     //this->Composite->RemoveObservers(vtkCommand::AbortCheckEvent);
     //vtkCallbackCommand* abc = vtkCallbackCommand::New();
@@ -128,7 +123,7 @@ void vtkPVMPIRenderModule::SetProcessModule(vtkProcessModule *pm)
     }
 
   stream << vtkClientServerStream::Invoke
-         <<  this->CompositeID 
+         << this->CompositeID 
          << "SetRenderWindow"
          << this->RenderWindowID
          << vtkClientServerStream::End;

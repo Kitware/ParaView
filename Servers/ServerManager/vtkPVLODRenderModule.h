@@ -23,8 +23,6 @@
 
 #include "vtkPVSimpleRenderModule.h"
 
-class vtkPVTreeComposite;
-
 class VTK_EXPORT vtkPVLODRenderModule : public vtkPVSimpleRenderModule
 {
 public:

@@ -22,7 +22,6 @@
 
 class vtkInteractorObserver;
 class vtkSMInteractorObserverProxyObserver;
-class vtkRenderer;
 
 class VTK_EXPORT vtkSMInteractorObserverProxy : public vtkSMDisplayerProxy
 {
@@ -48,7 +47,6 @@ public:
    virtual void UpdateVTKObjects();
 
 protected:
-//BTX
   vtkSMInteractorObserverProxy();
   ~vtkSMInteractorObserverProxy();
   
@@ -72,11 +70,12 @@ protected:
   virtual void ExecuteEvent(vtkObject*, unsigned long, void*);
 
   vtkSMInteractorObserverProxyObserver* Observer;
+//BTX
   friend class vtkSMInteractorObserverProxyObserver;
+//ETX
 private:
   vtkSMInteractorObserverProxy(const vtkSMInteractorObserverProxy&); // Not implemented
   void operator=(const vtkSMInteractorObserverProxy&); // Not implemented
-//ETX  
 };
 
 

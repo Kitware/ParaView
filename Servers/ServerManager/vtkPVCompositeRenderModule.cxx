@@ -16,7 +16,6 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkTimerLog.h"
-#include "vtkPVTreeComposite.h"
 #include "vtkRenderWindow.h"
 #include "vtkRenderer.h"
 #include "vtkPVProcessModule.h"
@@ -28,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.10");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -37,10 +36,7 @@ vtkPVCompositeRenderModule::vtkPVCompositeRenderModule()
   this->LocalRender = 1;
   this->CompositeThreshold = 20.0;
 
-  this->Composite                = 0;
   this->CompositeID.ID           = 0;
-  this->InteractiveCompositeTime = 0;
-  this->StillCompositeTime       = 0;
 
   this->CollectionDecision      = -1;
   this->LODCollectionDecision   = -1;
@@ -54,12 +50,6 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
 {
   vtkPVProcessModule *pm = this->ProcessModule;
 
-  if (this->Composite && this->AbortCheckTag)
-    {
-    this->Composite->RemoveObserver(this->AbortCheckTag);
-    this->AbortCheckTag = 0;
-    }
- 
   // Tree Composite
   if (this->CompositeID.ID && pm)
     {
@@ -68,12 +58,6 @@ vtkPVCompositeRenderModule::~vtkPVCompositeRenderModule()
     pm->SendStream(
       vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
     this->CompositeID.ID = 0;
-    this->Composite = NULL;
-    }
-  else if (this->Composite)
-    {
-    this->Composite->Delete();
-    this->Composite = NULL;
     }
 }
 
@@ -340,15 +324,6 @@ void vtkPVCompositeRenderModule::InteractiveRender()
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Interactive Render");
 
-  // These times are used to determine reduction factor.
-  // Not needed for still rendering !!!
-  if (this->Composite)
-    {
-    this->InteractiveRenderTime = this->Composite->GetMaxRenderTime();
-    this->InteractiveCompositeTime = this->Composite->GetCompositeTime()
-      + this->Composite->GetGetBuffersTime()
-      + this->Composite->GetSetBuffersTime();
-    }
   pm->SendCleanupPendingProgress();
 }
 
@@ -364,46 +339,46 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
   float getBuffersTime, setBuffersTime, transmitTime;
   float newReductionFactor;
   float maxReductionFactor;
-  
+ 
   newReductionFactor = 1;
   if (this->ReductionFactor > 1)
     {
     // We have to come up with a more consistent way to compute reduction.
     newReductionFactor = this->ReductionFactor;
-    if (this->Composite)
+    if (this->CompositeID.ID)
       {
-      // Leave halve time for compositing.
-      renderTime = renderTime * 0.5;
-      // Try to factor in user preference.
-      renderTime = renderTime / (float)(this->ReductionFactor);
-      // Compute time for each pixel on the last render.
-      area = windowSize[0] * windowSize[1];
-      reductionFactor = (float)this->Composite->GetImageReductionFactor();
-      reducedArea = (int)(area / (reductionFactor * reductionFactor));
-      getBuffersTime = this->Composite->GetGetBuffersTime();
-      setBuffersTime = this->Composite->GetSetBuffersTime();
-      transmitTime = this->Composite->GetCompositeTime();
-
-      // Do not consider SetBufferTime because 
-      //it is not dependent on reduction factor.,
-      timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
-      newReductionFactor = sqrt(area * timePerPixel / renderTime);
-  
-      // Do not let the width go below 150.
-      maxReductionFactor = windowSize[0] / 150.0;
-      if (maxReductionFactor > this->ReductionFactor)
-        {
-        maxReductionFactor = this->ReductionFactor;
-        }
-
-      if (newReductionFactor > maxReductionFactor)
-        {
-        newReductionFactor = maxReductionFactor;
-        }
-      if (newReductionFactor < 1.0)
-        {
-        newReductionFactor = 1.0;
-        }
+      //      TODO
+//      // Leave halve time for compositing.
+//      renderTime = renderTime * 0.5;
+//      // Try to factor in user preference.
+//      renderTime = renderTime / (float)(this->ReductionFactor);
+//      // Compute time for each pixel on the last render.
+//      area = windowSize[0] * windowSize[1];
+//      reductionFactor = (float)this->Composite->GetImageReductionFactor();
+//      reducedArea = (int)(area / (reductionFactor * reductionFactor));
+//      getBuffersTime = this->Composite->GetGetBuffersTime();
+//      setBuffersTime = this->Composite->GetSetBuffersTime();
+//      transmitTime = this->Composite->GetCompositeTime();
+//
+//      // Do not consider SetBufferTime because 
+//      //it is not dependent on reduction factor.,
+//      timePerPixel = (getBuffersTime + transmitTime) / reducedArea;
+//      newReductionFactor = sqrt(area * timePerPixel / renderTime);
+//  
+//      // Do not let the width go below 150.
+//      maxReductionFactor = windowSize[0] / 150.0;
+//      if (maxReductionFactor > this->ReductionFactor)
+//        {
+//        maxReductionFactor = this->ReductionFactor;
+//        }
+//      if (newReductionFactor > maxReductionFactor)
+//        {
+//        newReductionFactor = maxReductionFactor;
+//        }
+//      if (newReductionFactor < 1.0)
+//        {
+//        newReductionFactor = 1.0;
+//        }
       }
     }
 
@@ -431,7 +406,7 @@ void vtkPVCompositeRenderModule::SetCompositeThreshold(float threshold)
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModule::SetUseCompositeWithFloat(int val)
 {
-  if (this->Composite)
+  if (this->CompositeID.ID)
     {
     vtkPVProcessModule* pm = this->ProcessModule;
     vtkClientServerStream stream;
@@ -456,7 +431,7 @@ void vtkPVCompositeRenderModule::SetUseCompositeWithFloat(int val)
 //----------------------------------------------------------------------------
 void vtkPVCompositeRenderModule::SetUseCompositeWithRGBA(int val)
 {
-  if (this->Composite)
+  if (this->CompositeID.ID)
     {
     vtkPVProcessModule* pm = this->ProcessModule;
     vtkClientServerStream stream;
@@ -515,7 +490,7 @@ int vtkPVCompositeRenderModule::MakeCollectionDecision()
   this->CollectionDecision = decision;
     
   this->Displays->InitTraversal();
-  while ( (object=this->Displays->GetNextItemAsObject()) )
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkSMCompositePartDisplay::SafeDownCast(object);
     if (pDisp)
@@ -573,13 +548,7 @@ float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
 {
   if (this->LocalRender)
     {
-    return this->Superclass::GetZBufferValue(x, y);
-    }
-
-  // Only MPI has a pointer to a composite.
-  if (this->Composite)
-    {
-    return this->Composite->GetZ(x, y);
+    return this->Superclass::GetZBufferValue(x,y);
     }
 
   // If client-server...
@@ -619,11 +588,6 @@ void vtkPVCompositeRenderModule::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "CompositeID: " << this->CompositeID.ID << endl;
     }
-
-  os << indent << "InteractiveCompositeTime: " 
-     << this->GetInteractiveCompositeTime() << endl;
-  os << indent << "StillCompositeTime: " 
-     << this->GetStillCompositeTime() << endl;
 
   os << indent << "ReductionFactor: " << this->ReductionFactor << endl;
   os << indent << "SquirtLevel: " << this->SquirtLevel << endl;

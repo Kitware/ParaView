@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.24");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.25");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -505,23 +505,26 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
 
     // Connect the geometry to the update suppressor.
     stream << vtkClientServerStream::Invoke << this->GeometryProxy->GetID(i)
-          << "GetOutput" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(i) << "SetInput" 
-          << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+           << "GetOutput" << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(i)
+           << "SetInput" << vtkClientServerStream::LastResult 
+           << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
     // Now create the mapper.
     stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i) 
-          << "UseLookupTableScalarRangeOn" << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i) << "InterpolateScalarsBeforeMappingOn" 
-          << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << this->UpdateSuppressorProxy->GetID(i) << "GetPolyDataOutput" 
-          <<  vtkClientServerStream::End;
+           << "UseLookupTableScalarRangeOn" << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i) 
+           << "InterpolateScalarsBeforeMappingOn" 
+           << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->UpdateSuppressorProxy->GetID(i) << "GetPolyDataOutput" 
+           <<  vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i) << "SetInput" 
-          << vtkClientServerStream::LastResult << vtkClientServerStream::End;
+           << vtkClientServerStream::LastResult << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i)
-          << "SetImmediateModeRendering" 
-          << pm->GetUseImmediateMode() << vtkClientServerStream::End;
+           << "SetImmediateModeRendering" 
+           << pm->GetUseImmediateMode() << vtkClientServerStream::End;
     pm->SendStream(
       vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
       
@@ -777,7 +780,7 @@ void vtkSMPartDisplay::SetColor(float r, float g, float b)
 void vtkSMPartDisplay::Update()
 {
   // Current problem is that there is no input for the UpdateSuppressor object
-  if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy != 0 )
+  if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy )
     {
     vtkClientServerStream stream;
     stream << vtkClientServerStream::Invoke 
@@ -806,17 +809,16 @@ void vtkSMPartDisplay::CacheUpdate(int idx, int total)
 {
   vtkProcessModule *pm = vtkProcessModule::GetProcessModule();
   vtkClientServerStream stream;
-  stream << vtkClientServerStream::Invoke 
-         << this->UpdateSuppressorProxy->GetID(0)
-         << "CacheUpdate" 
-         << idx 
-         << total 
-         << vtkClientServerStream::End;
+  stream 
+    << vtkClientServerStream::Invoke 
+    << this->UpdateSuppressorProxy->GetID(0) << "CacheUpdate" << idx << total 
+    << vtkClientServerStream::End;
   // I don't like calling Modified directly, but I need the scalars to be
   // remapped through the lookup table, and this causes that to happen.
-  stream << vtkClientServerStream::Invoke 
-         << this->MapperProxy->GetID(0) << "Modified"
-         << vtkClientServerStream::End;
+  stream 
+    << vtkClientServerStream::Invoke 
+    << this->MapperProxy->GetID(0) << "Modified"
+    << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 

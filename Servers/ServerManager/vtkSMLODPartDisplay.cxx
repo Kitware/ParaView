@@ -36,9 +36,10 @@
 #include "vtkToolkits.h"
 #include "vtkSMProxy.h"
 #include "vtkSMStringVectorProperty.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.14");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.15");
 
 
 //----------------------------------------------------------------------------
@@ -113,8 +114,8 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
 {
   int i;
   // hack until input uses proxy input.
-  vtkPVProcessModule* pm = static_cast<vtkPVProcessModule*>(
-    vtkProcessModule::GetProcessModule());
+  vtkPVProcessModule* pm = 
+    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
   if ( !pm )
     {
     vtkErrorMacro("Set the ProcessModule before you connect.");
@@ -169,7 +170,7 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
     {
     this->LODVolumeMapperProxy = vtkSMProxy::New();
     this->LODVolumeMapperProxy->SetVTKClassName("vtkPolyDataMapper");
-    this->LODVolumeMapperProxy->SetServersSelf(  vtkProcessModule::CLIENT
+    this->LODVolumeMapperProxy->SetServersSelf( vtkProcessModule::CLIENT
                                                  | vtkProcessModule::RENDER_SERVER);
     this->LODVolumeMapperProxy->AddProperty("InterpolateColorsFlag",
                                             this->InterpolateColorsFlagProperty);
@@ -231,10 +232,12 @@ void vtkSMLODPartDisplay::CreateVTKObjects(int num)
     pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
     stream
-      << vtkClientServerStream::Invoke << this->LODDeciProxy->GetID(i) << "GetOutput"
+      << vtkClientServerStream::Invoke
+      << this->LODDeciProxy->GetID(i) << "GetOutput"
       << vtkClientServerStream::End
-      << vtkClientServerStream::Invoke << this->LODUpdateSuppressorProxy->GetID(i)
-      << "SetInput" << vtkClientServerStream::LastResult
+      << vtkClientServerStream::Invoke 
+      << this->LODUpdateSuppressorProxy->GetID(i) << "SetInput" 
+      << vtkClientServerStream::LastResult
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::DATA_SERVER, stream);
 
@@ -534,13 +537,12 @@ void vtkSMLODPartDisplay::SetLODResolution(int res)
 //----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::Update()
 {
-  vtkPVProcessModule* pm = static_cast<vtkPVProcessModule*>(
-    vtkProcessModule::GetProcessModule());
+  vtkPVProcessModule* pm =
+    vtkPVProcessModule::SafeDownCast(vtkProcessModule::GetProcessModule());
 
   if ( ! this->GeometryIsValid && this->UpdateSuppressorProxy )
     {
     vtkClientServerStream stream;
-
     int i, num;
     num = this->UpdateSuppressorProxy->GetNumberOfIDs();
     for (i = 0; i < num; ++i)
@@ -588,7 +590,7 @@ void vtkSMLODPartDisplay::InvalidateGeometry()
 //----------------------------------------------------------------------------
 void vtkSMLODPartDisplay::RemoveAllCaches()
 {
-  if (!this->UpdateSuppressorProxy)
+  if (!this->UpdateSuppressorProxy || !this->LODUpdateSuppressorProxy)
     {
     return;
     }
@@ -608,6 +610,7 @@ void vtkSMLODPartDisplay::RemoveAllCaches()
     }
   else if (!this->UpdateSuppressorProxy->GetNumberOfIDs())
     {
+    assert(!this->LODUpdateSuppressorProxy->GetNumberOfIDs());
     vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
       vtkProcessModule::GetProcessModule());
     this->SetInputInternal(this->Source, pm);
@@ -617,7 +620,6 @@ void vtkSMLODPartDisplay::RemoveAllCaches()
       }
     }
 }
-
 
 //----------------------------------------------------------------------------
 // Assume that this method is only called when the part is visible.
@@ -645,8 +647,7 @@ void vtkSMLODPartDisplay::CacheUpdate(int idx, int total)
     << vtkClientServerStream::Invoke
     << this->LODMapperProxy->GetID(0) << "Modified"
     << vtkClientServerStream::End;
-  pm->SendStream(
-    vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER, stream);
+  pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
 }
 
 

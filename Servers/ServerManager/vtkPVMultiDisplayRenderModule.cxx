@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.11");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVMultiDisplayRenderModule::vtkPVMultiDisplayRenderModule()
@@ -65,7 +65,6 @@ void vtkPVMultiDisplayRenderModule::SetProcessModule(vtkProcessModule *pm)
            << vtkClientServerStream::End;
     }
 
-  this->Composite = NULL;
   this->CompositeID = pm->NewStreamObject("vtkMultiDisplayManager", stream);
   int *tileDim = this->ProcessModule->GetOptions()->GetTileDimensions();
   stream << vtkClientServerStream::Invoke

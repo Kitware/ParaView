@@ -25,7 +25,6 @@
 
 #include "vtkPVLODRenderModule.h"
 
-
 class VTK_EXPORT vtkPVCompositeRenderModule : public vtkPVLODRenderModule
 {
 public:
@@ -62,22 +61,9 @@ public:
   void SetUseCompositeWithFloat(int val);
   void SetUseCompositeWithRGBA(int val);
   virtual void SetUseCompositeCompression(int val);
-  
-  // Description:
-  // The center of rotation picker needs the compositers zbuffer.
-  // Remove this method.  Change picking the center of rotation.
-  
-  // Temporarily remove this to see what breaks.
-  //BTX
-  vtkPVTreeComposite *GetComposite() {return this->Composite;}
-  //ETX
-  vtkGetMacro(CompositeID, vtkClientServerID);
 
-  // Description:
-  // These were originally for debugging.  I am planning on removing them !!!
-  vtkGetMacro(StillCompositeTime, double);
-  vtkGetMacro(InteractiveCompositeTime, double);
-
+  int GetCompositeID() { return this->CompositeID.ID; }
+  
   // Description:
   // These use the total memory size of the visible
   // geoemtry and decimated LOD to make a collection decision.
@@ -110,12 +96,9 @@ protected:
 
   float CompositeThreshold;
 
-  vtkPVTreeComposite *Composite;
   vtkClientServerID CompositeID;
 
-  double StillCompositeTime;
-  double InteractiveCompositeTime;
-
+private:
   vtkPVCompositeRenderModule(const vtkPVCompositeRenderModule&); // Not implemented
   void operator=(const vtkPVCompositeRenderModule&); // Not implemented
 };
