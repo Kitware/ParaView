@@ -72,6 +72,7 @@ public:
   // Description:
   // Set the text.
   void SetText(const char* txt);
+  const char* GetText();
 
 protected:
 

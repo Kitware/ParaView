@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkKWCheckButton.cxx
+  Module:    vtkPVDataSetFileEntry.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,109 +39,39 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkPVDataSetFileEntry - File entry that checks type.
+// .SECTION Description
+// This file entry will accept VTK files.  First time any VTK file
+// will do.  Once a file is picked, then any following file has to have 
+// the same data type.
+
+#ifndef __vtkPVDataSetFileEntry_h
+#define __vtkPVDataSetFileEntry_h
+
+#include "vtkPVFileEntry.h"
 #include "vtkKWApplication.h"
-#include "vtkKWCheckButton.h"
-#include "vtkObjectFactory.h"
+#include "vtkDataSetReader.h"
 
-
-
-//------------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWCheckButton );
-
-
-vtkKWCheckButton::vtkKWCheckButton() 
+class VTK_EXPORT vtkPVDataSetFileEntry : public vtkPVFileEntry
 {
-  this->IndicatorOn = 1;
-  this->MyText = 0;
-}
+public:
+  static vtkPVDataSetFileEntry* New();
+  vtkTypeMacro(vtkPVDataSetFileEntry, vtkPVFileEntry);
 
-void vtkKWCheckButton::SetIndicator(int ind)
-{
-  if (ind != this->IndicatorOn)
-    {
-    this->IndicatorOn = ind;
-    if (this->Application)
-      {
-      if (ind)
-	{
-	this->Script("%s configure -indicatoron 1", this->GetWidgetName());
-	}
-      else
-	{
-	this->Script("%s configure -indicatoron 0", this->GetWidgetName());
-	}
-      }
-    }
-}
+  // Description:
+  // Called when accept button is pushed.  
+  // Sets objects variable to the widgets value.
+  // Adds a trace entry.  Side effect is to turn modified flag off.
+  virtual void Accept();
 
-void vtkKWCheckButton::SetText(const char* txt)
-{
-  this->SetMyText(txt);
+protected:
+  vtkPVDataSetFileEntry();
+  ~vtkPVDataSetFileEntry();
+  vtkPVDataSetFileEntry(const vtkPVDataSetFileEntry&) {};
+  void operator=(const vtkPVDataSetFileEntry&) {};
   
-  if (this->Application)
-    {
-    if (this->MyText)
-      {
-      this->Script("%s configure -text {%s}", this->GetWidgetName(), this->MyText);
-      }
-    }
-}
+  vtkDataSetReader *TypeReader;
+  int Type;
+};
 
-const char* vtkKWCheckButton::GetText()
-{
-  return this->MyText;
-}
-
-int vtkKWCheckButton::GetState()
-{
-  this->Script("set %sValue",this->GetWidgetName());
-  
-  return vtkKWObject::GetIntegerResult(this->Application);
-}
-
-void vtkKWCheckButton::SetState(int s)
-{
-  if (s)
-    {
-    this->Script("%s select",this->GetWidgetName());
-    }
-  else
-    {
-    this->Script("%s deselect",this->GetWidgetName());
-    }
-}
-
-
-void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
-{
-  const char *wname;
-
-  // must set the application
-  if (this->Application)
-    {
-    vtkErrorMacro("CheckButton already created");
-    return;
-    }
-
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
-  if (!this->IndicatorOn)
-    {
-    this->Script("checkbutton %s -indicatoron 0 -variable %sValue %s",
-		 wname,wname,args);
-    }
-  else
-    {
-    this->Script("checkbutton %s -variable %sValue %s",
-		 wname,wname,args);
-    }
-
-  if (this->MyText)
-    {
-    this->Script("%s configure -text %s", this->GetWidgetName(), this->MyText);
-    }
-
-}
-
+#endif

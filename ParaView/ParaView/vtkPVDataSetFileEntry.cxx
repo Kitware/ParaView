@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkKWCheckButton.cxx
+  Module:    vtkPVDataSetFileEntry.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,109 +39,64 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
-#include "vtkKWCheckButton.h"
+#include "vtkPVDataSetFileEntry.h"
+#include "vtkPVWindow.h"
 #include "vtkObjectFactory.h"
 
-
-
-//------------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWCheckButton );
-
-
-vtkKWCheckButton::vtkKWCheckButton() 
+//----------------------------------------------------------------------------
+vtkPVDataSetFileEntry* vtkPVDataSetFileEntry::New()
 {
-  this->IndicatorOn = 1;
-  this->MyText = 0;
-}
-
-void vtkKWCheckButton::SetIndicator(int ind)
-{
-  if (ind != this->IndicatorOn)
+  // First try to create the object from the vtkObjectFactory
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVDataSetFileEntry");
+  if (ret)
     {
-    this->IndicatorOn = ind;
-    if (this->Application)
-      {
-      if (ind)
-	{
-	this->Script("%s configure -indicatoron 1", this->GetWidgetName());
-	}
-      else
-	{
-	this->Script("%s configure -indicatoron 0", this->GetWidgetName());
-	}
-      }
+    return (vtkPVDataSetFileEntry*)ret;
     }
+  // If the factory was unable to create the object, then create it here.
+  return new vtkPVDataSetFileEntry;
 }
 
-void vtkKWCheckButton::SetText(const char* txt)
+//----------------------------------------------------------------------------
+vtkPVDataSetFileEntry::vtkPVDataSetFileEntry()
 {
-  this->SetMyText(txt);
-  
-  if (this->Application)
+  this->TypeReader = vtkDataSetReader::New();
+  this->Type = -1;
+}
+
+//----------------------------------------------------------------------------
+vtkPVDataSetFileEntry::~vtkPVDataSetFileEntry()
+{
+  this->TypeReader->Delete();
+  this->TypeReader = NULL;
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVDataSetFileEntry::Accept()
+{
+  int newType;
+
+  this->TypeReader->SetFileName(this->GetValue());
+  newType = this->TypeReader->ReadOutputType();
+
+  if (newType == -1)
     {
-    if (this->MyText)
-      {
-      this->Script("%s configure -text {%s}", this->GetWidgetName(), this->MyText);
-      }
+    this->GetPVApplication()->GetMainWindow()->WarningMessage("Could not read file.");
+    this->Reset();
+    return;
     }
-}
-
-const char* vtkKWCheckButton::GetText()
-{
-  return this->MyText;
-}
-
-int vtkKWCheckButton::GetState()
-{
-  this->Script("set %sValue",this->GetWidgetName());
-  
-  return vtkKWObject::GetIntegerResult(this->Application);
-}
-
-void vtkKWCheckButton::SetState(int s)
-{
-  if (s)
+  if (this->Type == -1)
     {
-    this->Script("%s select",this->GetWidgetName());
+    this->Type = newType;
     }
-  else
+  if (this->Type != newType)
     {
-    this->Script("%s deselect",this->GetWidgetName());
-    }
-}
-
-
-void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
-{
-  const char *wname;
-
-  // must set the application
-  if (this->Application)
-    {
-    vtkErrorMacro("CheckButton already created");
+    this->GetPVApplication()->GetMainWindow()->WarningMessage("Output type does not match previous file.");
+    this->Reset();
     return;
     }
 
-  this->SetApplication(app);
-
-  // create the top level
-  wname = this->GetWidgetName();
-  if (!this->IndicatorOn)
-    {
-    this->Script("checkbutton %s -indicatoron 0 -variable %sValue %s",
-		 wname,wname,args);
-    }
-  else
-    {
-    this->Script("checkbutton %s -variable %sValue %s",
-		 wname,wname,args);
-    }
-
-  if (this->MyText)
-    {
-    this->Script("%s configure -text %s", this->GetWidgetName(), this->MyText);
-    }
+  this->vtkPVFileEntry::Accept();
 
 }
-

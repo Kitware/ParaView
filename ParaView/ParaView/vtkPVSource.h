@@ -56,6 +56,7 @@ class vtkKWPushButton;
 class vtkPVApplication;
 class vtkPVInputMenu;
 class vtkPVArrayMenu;
+class vtkPVArraySelection;
 class vtkSource;
 class vtkPVData;
 class vtkPVWindow;
@@ -171,6 +172,11 @@ public:
   // Create a menu to select the active scalars of the input..
   vtkPVArrayMenu *AddArrayMenu(const char* label, int attributeType, 
                                int numComponents, const char* help);
+
+  // Description:
+  // This widget is for readers that selectively read arrays.
+  vtkPVArraySelection *AddArraySelection(const char *attributeName, 
+                                         const char *help);
 
   // Description:
   // Adds a widget that displays the scalar range of the input array.

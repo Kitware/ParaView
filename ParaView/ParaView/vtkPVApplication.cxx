@@ -536,6 +536,7 @@ void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
   this->Controller->Send(range, 2, 0, 1969);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVApplication::SendDataArrayRange(vtkDataSet *data, char *arrayName)
 {
   float range[2];

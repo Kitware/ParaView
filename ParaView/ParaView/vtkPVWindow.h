@@ -353,6 +353,10 @@ protected:
 private:
   static const char* StandardSourceInterfaces;
   static const char* StandardFilterInterfaces;
+
+  // Flag to see if we could load the XDMFReader library
+  int XDMF;
+  vtkPVSource *OpenXML(const char *openFileName, const char *rootName);
 };
 
 

@@ -81,6 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVFileEntry.h"
 
 #include "vtkPVDemoPaths.h"
 
@@ -179,6 +180,8 @@ vtkPVWindow::vtkPVWindow()
   this->SetScriptType("ParaView");
 
   this->SetMenuPropertiesTitle("View");
+
+  this->XDMF = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -761,6 +764,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
 	       this->GetWidgetName(), this->GetTclName());
 
+
+  this->Script("catch {load vtkARLTCL.dll}");
+  if (this->GetIntegerResult(app) == 0)
+    {
+    this->XDMF = 1;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -900,12 +909,22 @@ void vtkPVWindow::OpenCallback()
   }
   
   char *openFileName = NULL;
+  if (this->XDMF)
+    {
 #ifdef _WIN32  
-  this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
+    this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {*.xml;*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{XDMF files} {.xml}} {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
 #else
-  this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {.vtk .pvtk .case .pop .stl}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
+    this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {.xml .vtk .pvtk .case .pop .stl}}  {{XDMF files} {.xml}} {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
 #endif
-  
+    }
+  else
+    {
+#ifdef _WIN32  
+    this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
+#else
+    this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {.vtk .pvtk .case .pop .stl}}  {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
+#endif
+    }
   openFileName = new char[strlen(this->GetPVApplication()->GetMainInterp()->result) + 1];
   strcpy(openFileName, this->GetPVApplication()->GetMainInterp()->result);
 
@@ -1005,6 +1024,10 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     {
     sInt = this->GetSourceInterface("vtkSTLReader");
     }
+  else if (this->XDMF && strcmp(extension, ".xml") == 0)
+    {
+    return this->OpenXML(openFileName, rootName);
+    }
   else
     {
     vtkErrorMacro("Unknown file extension");
@@ -1038,6 +1061,71 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   return pvs;
 }
 
+//----------------------------------------------------------------------------
+vtkPVSource *vtkPVWindow::OpenXML(const char *openFileName,
+                                  const char *rootName)
+{
+  static int        count = 0;
+  char              sourceTclName[200];
+  char              outputTclName[200];
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVSource*      pvs;
+  vtkPVData*        pvd;
+  vtkDataSet*       d;
+
+  ++count;
+  sprintf(sourceTclName, "%s_%d", rootName, count);
+
+  // Create the reader and output.
+  pvApp->BroadcastScript("vtkARLXDMFReader %s", sourceTclName);
+  pvApp->BroadcastScript("%s SetFileName {%s}", sourceTclName, openFileName);
+  sprintf(outputTclName, "%sOutput", sourceTclName);
+  d = (vtkDataSet *)(pvApp->MakeTclObject("vtkRectilinearGrid", outputTclName));
+  pvApp->BroadcastScript("%s SetOutput %s", sourceTclName, outputTclName);   
+  // Need to updat the information before Reset is called but after output is set.
+  pvApp->BroadcastScript("%s UpdateInformation", sourceTclName);
+
+  // Create the PVSource.
+  pvs = vtkPVSource::New();
+  pvs->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  pvs->SetApplication(pvApp);
+  // Just trying out a different way of setting object and name.
+  this->Script("%s SetVTKSource %s %s", pvs->GetTclName(), sourceTclName, sourceTclName);
+  pvs->SetName(sourceTclName);  
+  pvs->SetView(this->GetMainView());
+  pvs->CreateProperties();
+
+  // Create the widgets.  
+  pvs->AddFileEntry("FileName", "FileName","xml", 
+                    "XML may support different file types in the future.");
+  pvs->AddArraySelection("Cell", "Choose which arrays to load"); 
+
+  // The location/order of this is important.  (Geoemtry empty input.)
+  this->SetCurrentPVSource(pvs);
+  this->ShowCurrentSourceProperties();
+
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetPVApplication(pvApp);
+  pvd->SetVTKData(d, outputTclName);
+
+  // Connect the pvSource and pvData.
+  pvs->SetPVOutput(pvd);
+
+  this->AddPVSource(pvs);
+
+  this->GetPVApplication()->AddTraceEntry("set kw(%s) [$kw(%s) Open %s]",
+                                          pvs->GetTclName(),
+                                          this->GetTclName(), openFileName);
+  pvs->SetTraceInitialized(1);
+
+  pvs->Delete();
+  pvd->Delete();
+
+  return pvs;
+}
+
+//----------------------------------------------------------------------------
 int vtkPVWindow::OpenRecentFile( char* path)
 {
   if ( this->Open( path ) )

@@ -62,6 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWLabeledFrame.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVArrayMenu.h"
+#include "vtkPVArraySelection.h"
 #include "vtkUnstructuredGridSource.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVFileEntry.h"
@@ -1329,6 +1330,30 @@ vtkPVArrayMenu *vtkPVSource::AddArrayMenu(const char *label,
   return arrayMenu;
 }
 
+//----------------------------------------------------------------------------
+vtkPVArraySelection *vtkPVSource::AddArraySelection(const char *attributeName, 
+                                                    const char *help)
+{
+  vtkPVArraySelection *pvw;
+  char traceName[200];
+
+  pvw = vtkPVArraySelection::New();
+  pvw->SetAttributeName(attributeName);
+  pvw->SetVTKReaderTclName(this->GetVTKSourceTclName());
+  sprintf(traceName, "%sArraySelection", attributeName);
+  pvw->SetTraceName(traceName);
+
+  pvw->SetParent(this->ParameterFrame->GetFrame());
+  pvw->SetModifiedCommand(this->GetTclName(), "ChangeAcceptButtonColor");
+  pvw->Create(this->Application);
+  pvw->SetBalloonHelpString(help);
+
+  this->Script("pack %s -side top -fill x -expand t",
+               pvw->GetWidgetName());
+  this->AddPVWidget(pvw);
+  pvw->Delete();
+  return pvw;
+}
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle *vtkPVSource::AddLabeledToggle(char *label, char *varName, 

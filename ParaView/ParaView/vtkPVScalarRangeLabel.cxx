@@ -145,7 +145,7 @@ void vtkPVScalarRangeLabel::Update()
 
   this->Range[0] = VTK_LARGE_FLOAT;
   this->Range[1] = -VTK_LARGE_FLOAT;
-  pvApp->BroadcastScript("Application SendDataArrayRange %s %s",
+  pvApp->BroadcastScript("Application SendDataArrayRange %s {%s}",
                          pvd->GetVTKDataTclName(),
                          array->GetName());
   

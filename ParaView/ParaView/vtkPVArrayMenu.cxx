@@ -379,14 +379,14 @@ void vtkPVArrayMenu::Accept()
 
   if (this->ArrayName)
     {
-    pvApp->BroadcastScript("%s Select%s%s %s", 
+    pvApp->BroadcastScript("%s Select%s%s {%s}", 
                            this->ObjectTclName,
                            this->InputName,
                            attributeName,
                            this->ArrayName);
     if (this->ModifiedFlag)
       {
-      this->AddTraceEntry("$kw(%s) SetValue %s", 
+      this->AddTraceEntry("$kw(%s) SetValue {%s}", 
                            this->GetTclName(), 
                            this->ArrayName);
       }
@@ -412,7 +412,7 @@ void vtkPVArrayMenu::Accept()
                            this->SelectedComponent);
     if (this->ModifiedFlag)
       {
-      this->AddTraceEntry("$kw(%s) SetSelectedComponent %s", 
+      this->AddTraceEntry("$kw(%s) SetSelectedComponent {%s}", 
                            this->GetTclName(), 
                            this->ArrayName);
       }
@@ -533,7 +533,7 @@ void vtkPVArrayMenu::UpdateArrayMenu()
       if (this->NumberOfComponents <= 0 || this->ShowComponentMenu ||
           array->GetNumberOfComponents() == this->NumberOfComponents) 
         {
-        sprintf(methodAndArgs, "ArrayMenuEntryCallback %s", array->GetName());
+        sprintf(methodAndArgs, "ArrayMenuEntryCallback {%s}", array->GetName());
         this->ArrayMenu->AddEntryWithCommand(array->GetName(), 
                                       this, methodAndArgs);
         if (first == NULL)

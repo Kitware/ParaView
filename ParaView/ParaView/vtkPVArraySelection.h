@@ -107,6 +107,11 @@ protected:
   vtkKWPushButton* AllOffButton;
 
   vtkCollection* ArrayCheckButtons;
+
+  // Description:
+  // Stores the file name to descide when to rebuild the array check list.
+  vtkSetStringMacro(FileName);
+  char *FileName;
 };
 
 #endif

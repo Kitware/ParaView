@@ -1129,7 +1129,7 @@ void vtkPVData::UpdateProperties()
         numComps = array->GetNumberOfComponents();
         for (j = 0; j < numComps; ++j)
           {
-          sprintf(cmd, "ColorByPointFieldComponent %s %d",
+          sprintf(cmd, "ColorByPointFieldComponent {%s} %d",
                   fieldData->GetArrayName(i), j);
           if (numComps == 1)
             {
@@ -1394,7 +1394,7 @@ void vtkPVData::ColorByPropertyInternal()
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByPointFieldComponent(const char *name, int comp)
 {
-  this->AddTraceEntry("$kw(%s) ColorByPointFieldComponent %s %d", 
+  this->AddTraceEntry("$kw(%s) ColorByPointFieldComponent {%s} %d", 
                       this->GetTclName(), name, comp);
   this->ColorByPointFieldComponentInternal(name, comp);
 }
@@ -1408,16 +1408,16 @@ void vtkPVData::ColorByPointFieldComponentInternal(const char *name,
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
                          this->MapperTclName);
-  pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
+  pvApp->BroadcastScript("%s ColorByArrayComponent {%s} %d",
                          this->MapperTclName, name, comp);
 
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUsePointFieldData",
                          this->LODMapperTclName);
-  pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
+  pvApp->BroadcastScript("%s ColorByArrayComponent {%s} %d",
                          this->LODMapperTclName, name, comp);
 
-  this->Script("%s SetTitle %s", this->GetScalarBarTclName(), name);
+  this->Script("%s SetTitle {%s}", this->GetScalarBarTclName(), name);
   
   this->ResetColorRange();
 
@@ -1446,16 +1446,16 @@ void vtkPVData::ColorByCellFieldComponentInternal(const char *name,
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->MapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
                          this->MapperTclName);
-  pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
+  pvApp->BroadcastScript("%s ColorByArrayComponent {%s} %d",
                          this->MapperTclName, name, comp);
 
   pvApp->BroadcastScript("%s ScalarVisibilityOn", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetScalarModeToUseCellFieldData",
                          this->LODMapperTclName);
-  pvApp->BroadcastScript("%s ColorByArrayComponent %s %d",
+  pvApp->BroadcastScript("%s ColorByArrayComponent {%s} %d",
                          this->LODMapperTclName, name, comp);
 
-  this->Script("%s SetTitle %s", this->GetScalarBarTclName(), name);
+  this->Script("%s SetTitle {%s}", this->GetScalarBarTclName(), name);
   
   this->ResetColorRange();
 
@@ -2113,8 +2113,8 @@ void vtkPVData::SaveInTclScript(ofstream *file)
     if (strcmp(scalarMode, "UsePointFieldData") == 0 ||
         strcmp(scalarMode, "UseCellFieldData") == 0)
       {
-      *file << "\t" << this->MapperTclName << " ColorByArrayComponent "
-            << this->Mapper->GetArrayName() << " "
+      *file << "\t" << this->MapperTclName << " ColorByArrayComponent {"
+            << this->Mapper->GetArrayName() << "} "
             << this->Mapper->GetArrayComponent() << "\n";
       }
   
