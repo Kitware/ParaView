@@ -347,8 +347,6 @@ public:
   vtkGetMacro(CollectThreshold, float);
   vtkBooleanMacro(CollectThreshold, float);
 
-
-
   // Description:
   // Store current camera at a specified position. This stores all the
   // camera parameters and generates a small icon.
@@ -367,6 +365,10 @@ public:
   // Show the names in sources browser.
   void SourcesBrowserAlwaysShowNameCallback();
   void SetSourcesBrowserAlwaysShowName(int s);
+
+  // Description:
+  // Switch to the View Properties menu back and forth
+  void SwitchBackAndForthToViewProperties();
 
 protected:
   vtkPVRenderView();
@@ -468,6 +470,9 @@ protected:
   vtkPVRenderViewObserver* Observer;
 
   vtkKWPushButton *PropertiesButton;
+
+  char *MenuLabelSwitchBackAndForthToViewProperties;
+  vtkSetStringMacro(MenuLabelSwitchBackAndForthToViewProperties);
 
   vtkPVRenderView(const vtkPVRenderView&); // Not implemented
   void operator=(const vtkPVRenderView&); // Not implemented

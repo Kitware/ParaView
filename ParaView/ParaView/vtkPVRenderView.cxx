@@ -104,7 +104,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.13");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.213.2.14");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -246,6 +246,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->Observer->PVRenderView = this;
 
   this->PropertiesButton = vtkKWPushButton::New();
+  this->MenuLabelSwitchBackAndForthToViewProperties = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -473,6 +474,7 @@ vtkPVRenderView::~vtkPVRenderView()
 
   this->PropertiesButton->Delete();
   this->PropertiesButton = NULL;
+  this->SetMenuLabelSwitchBackAndForthToViewProperties(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -730,6 +732,10 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   // active color.
   this->PropertiesButton->Create(
     app, "-bd 0 -bg #008 -padx 0 -pady 0 -highlightthickness 0 -relief flat");
+  this->PropertiesButton->SetCommand(this, "SwitchBackAndForthToViewProperties");
+  this->PropertiesButton->SetBalloonHelpString(
+    "Switch back and forth between the current view properties and the" 
+    VTK_PV_VIEW_MENU_LABEL ".");
   ostrstream viewprops;
   viewprops << this->PropertiesButton->GetWidgetName() << ".propsimg" << ends;
   this->Script("image create photo %s", viewprops.str());
@@ -745,12 +751,10 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     vtkWarningMacro(<< "Error creating photo (view properties)");
     }
   this->Script(
-    "%s configure -bg [%s cget -bg] -image %s -command {%s invoke \"%s\"}",
+    "%s configure -bg [%s cget -bg] -image %s",
     this->PropertiesButton->GetWidgetName(),
     this->Label->GetWidgetName(),
-    viewprops.str(),
-    this->GetPVWindow()->GetMenuView()->GetWidgetName(),
-    VTK_PV_VIEW_MENU_LABEL);
+    viewprops.str());
   viewprops.rdbuf()->freeze(0);
 
   this->Script("pack %s %s -side left -anchor w -padx 2",
@@ -927,6 +931,54 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   delete [] local;
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SwitchBackAndForthToViewProperties()
+{
+  vtkKWWindow *win = this->GetPVWindow();
+  if (!win)
+    {
+    return;
+    }
+
+  vtkKWMenu *viewmenu = win->GetMenuView();
+  if (!viewmenu)
+    {
+    return;
+    }
+
+  if (!viewmenu->IsItemPresent(VTK_PV_VIEW_MENU_LABEL))
+    {
+    return;
+    }
+  int prop_position = viewmenu->GetIndex(VTK_PV_VIEW_MENU_LABEL);
+
+  // First check where we are in the view menu
+
+  int position = viewmenu->GetCheckedRadioButtonItem(viewmenu, "Radio");
+  if (position < 0)
+    {
+    return;
+    }
+
+  // Now if we are not in the view prop, save the old pos and go to it
+  // otherwise restore the old one
+
+  if (position != prop_position)
+    {
+    this->SetMenuLabelSwitchBackAndForthToViewProperties(this->Script(
+      "%s entrycget %d -label", viewmenu->GetWidgetName(), position));
+    viewmenu->Invoke(prop_position);
+    }
+  else
+    {
+    if (this->MenuLabelSwitchBackAndForthToViewProperties &&
+        viewmenu->IsItemPresent(this->MenuLabelSwitchBackAndForthToViewProperties))
+      {
+      viewmenu->Invoke(
+        viewmenu->GetIndex(this->MenuLabelSwitchBackAndForthToViewProperties));
+      }
+    }
+}
 
 //----------------------------------------------------------------------------
 vtkKWWidget *vtkPVRenderView::GetSourceParent()
@@ -2515,7 +2567,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.213.2.13 $");
+  this->ExtractRevision(os,"$Revision: 1.213.2.14 $");
 }
 
 //------------------------------------------------------------------------------
