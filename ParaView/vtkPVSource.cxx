@@ -487,12 +487,16 @@ void vtkPVSource::ChangeScalars()
     {
     pvApp->BroadcastScript("%s Delete", this->ChangeScalarsFilterTclName);
     }
-  pvApp->BroadcastScript("vtkSimpleFieldDataToAttributeDataFilter %s",
+  pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
                          this->ChangeScalarsFilterTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetInput]",
                          this->ChangeScalarsFilterTclName,
                          this->VTKSourceTclName);
-  pvApp->BroadcastScript("%s SetFieldName %s",
+  pvApp->BroadcastScript("%s SetInputFieldToPointDataField",
+                         this->ChangeScalarsFilterTclName);
+  pvApp->BroadcastScript("%s SetOutputAttributeDataToPointData",
+                         this->ChangeScalarsFilterTclName);
+  pvApp->BroadcastScript("%s SetScalarComponent 0 %s 0",
                          this->ChangeScalarsFilterTclName,
                          this->DefaultScalarsName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
@@ -728,15 +732,15 @@ void vtkPVSource::AcceptCallback()
   this->UpdateProperties();
   this->GetView()->Render();
 
-  window->GetSourcesMenu()->DeleteAllMenuItems();
+  window->GetSelectMenu()->DeleteAllMenuItems();
   numSources = window->GetSources()->GetNumberOfItems();
   
   for (i = 0; i < numSources; i++)
     {
     source = (vtkPVSource*)window->GetSources()->GetItemAsObject(i);
     sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
-    window->GetSourcesMenu()->AddCommand(source->GetName(), window,
-                                         methodAndArg);
+    window->GetSelectMenu()->AddCommand(source->GetName(), window,
+                                        methodAndArg);
     }
 }
 
@@ -807,17 +811,17 @@ void vtkPVSource::DeleteCallback()
 		 this->View->GetPropertiesParent()->GetWidgetName());
     }
       
-  // We need to remove this source from the SourcesMenu
+  // We need to remove this source from the SelectMenu
   this->GetWindow()->GetSources()->RemoveItem(this);
-  this->GetWindow()->GetSourcesMenu()->DeleteAllMenuItems();
+  this->GetWindow()->GetSelectMenu()->DeleteAllMenuItems();
   numSources = this->GetWindow()->GetSources()->GetNumberOfItems();
   for (i = 0; i < numSources; i++)
     {
     source = (vtkPVSource*)this->GetWindow()->GetSources()->GetItemAsObject(i);
     sprintf(methodAndArg, "SetCurrentPVSource %s", source->GetTclName());
-    this->GetWindow()->GetSourcesMenu()->AddCommand(source->GetName(),
-                                                    this->GetWindow(),
-                                                    methodAndArg);
+    this->GetWindow()->GetSelectMenu()->AddCommand(source->GetName(),
+                                                   this->GetWindow(),
+                                                   methodAndArg);
     }
   
   // Remove all of the actors mappers. from the renderer.
@@ -1138,7 +1142,7 @@ void vtkPVSource::Save(ofstream *file)
 
   if (this->DefaultScalarsName)
     {
-    *file << "vtkSimpleFieldDataToAttributeDataFilter "
+    *file << "vtkFieldDataToAttributeDataFilter "
           << this->ChangeScalarsFilterTclName << "\n\t"
           << this->ChangeScalarsFilterTclName << " SetInput [";
     if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
@@ -1169,8 +1173,12 @@ void vtkPVSource::Save(ofstream *file)
       *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
             << " GetOutput]\n";
       }
-    *file << this->ChangeScalarsFilterTclName << " SetFieldName "
-          << this->DefaultScalarsName << "\n\n";
+    *file << this->ChangeScalarsFilterTclName
+          << " SetInputFieldToPointDataField\n";
+    *file << this->ChangeScalarsFilterTclName
+          << " SetOutputAttributeDataToPointData\n";
+    *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
+          << this->DefaultScalarsName << " 0\n\n";
     }
   
   if (this->VTKSource)

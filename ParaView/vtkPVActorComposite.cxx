@@ -72,8 +72,15 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->Properties = vtkKWWidget::New();
   this->Name = NULL;
+
+  this->ScalarBarFrame = vtkKWLabeledFrame::New();
+  this->ColorFrame = vtkKWLabeledFrame::New();
+  this->DisplayStyleFrame = vtkKWLabeledFrame::New();
+  this->StatsFrame = vtkKWWidget::New();
   
   this->NumCellsLabel = vtkKWLabel::New();
+  this->NumPointsLabel = vtkKWLabel::New();
+  
   this->BoundsLabel = vtkKWLabel::New();
   this->XRangeLabel = vtkKWLabel::New();
   this->YRangeLabel = vtkKWLabel::New();
@@ -84,6 +91,9 @@ vtkPVActorComposite::vtkPVActorComposite()
   this->ColorMenuLabel = vtkKWLabel::New();
   this->ColorMenu = vtkKWOptionMenu::New();
 
+  this->ColorMapMenuLabel = vtkKWLabel::New();
+  this->ColorMapMenu = vtkKWOptionMenu::New();
+  
   this->ColorButton = vtkKWChangeColorButton::New();
   
   this->RepresentationMenuLabel = vtkKWLabel::New();
@@ -206,6 +216,9 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->NumCellsLabel->Delete();
   this->NumCellsLabel = NULL;
   
+  this->NumPointsLabel->Delete();
+  this->NumPointsLabel = NULL;
+  
   this->BoundsLabel->Delete();
   this->BoundsLabel = NULL;
   this->XRangeLabel->Delete();
@@ -224,6 +237,11 @@ vtkPVActorComposite::~vtkPVActorComposite()
   this->ColorMenu->Delete();
   this->ColorMenu = NULL;
 
+  this->ColorMapMenuLabel->Delete();
+  this->ColorMapMenuLabel = NULL;
+  this->ColorMapMenu->Delete();
+  this->ColorMapMenu = NULL;
+  
   this->ColorButton->Delete();
   this->ColorButton = NULL;
   
@@ -299,7 +317,15 @@ vtkPVActorComposite::~vtkPVActorComposite()
     pvApp->BroadcastScript("%s Delete", this->GeometryTclName);
     this->SetGeometryTclName(NULL);
     }
-  
+
+  this->ScalarBarFrame->Delete();
+  this->ScalarBarFrame = NULL;
+  this->ColorFrame->Delete();
+  this->ColorFrame = NULL;
+  this->DisplayStyleFrame->Delete();
+  this->DisplayStyleFrame = NULL;
+  this->StatsFrame->Delete();
+  this->StatsFrame = NULL;
 }
 
 
@@ -312,9 +338,24 @@ void vtkPVActorComposite::CreateProperties()
   this->Properties->Create(this->Application, "frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
                this->Properties->GetWidgetName());
-  
-  this->NumCellsLabel->SetParent(this->Properties);
+ 
+  this->ScalarBarFrame->SetParent(this->Properties);
+  this->ScalarBarFrame->Create(this->Application);
+  this->ScalarBarFrame->SetLabel("Scalar Bar");
+  this->ColorFrame->SetParent(this->Properties);
+  this->ColorFrame->Create(this->Application);
+  this->ColorFrame->SetLabel("Color");
+  this->DisplayStyleFrame->SetParent(this->Properties);
+  this->DisplayStyleFrame->Create(this->Application);
+  this->DisplayStyleFrame->SetLabel("Display Style");
+  this->StatsFrame->SetParent(this->Properties);
+  this->StatsFrame->Create(this->Application, "frame", "");
+ 
+  this->NumCellsLabel->SetParent(this->StatsFrame);
   this->NumCellsLabel->Create(this->Application, "");
+  this->NumPointsLabel->SetParent(this->StatsFrame);
+  this->NumPointsLabel->Create(this->Application, "");
+  
   this->BoundsLabel->SetParent(this->Properties);
   this->BoundsLabel->Create(this->Application, "");
   this->BoundsLabel->SetLabel("bounds:");
@@ -332,22 +373,36 @@ void vtkPVActorComposite::CreateProperties()
   this->AmbientScale->SetResolution(0.1);
   this->AmbientScale->SetCommand(this, "AmbientChanged");
   
-  this->ColorMenuLabel->SetParent(this->Properties);
+  this->ColorMenuLabel->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenuLabel->Create(this->Application, "");
   this->ColorMenuLabel->SetLabel("Color by variable:");
   
-  this->ColorMenu->SetParent(this->Properties);
+  this->ColorMenu->SetParent(this->ColorFrame->GetFrame());
   this->ColorMenu->Create(this->Application, "");    
 
-  this->ColorButton->SetParent(this->Properties);
+  this->ColorButton->SetParent(this->ColorFrame->GetFrame());
   this->ColorButton->Create(this->Application, "");
   this->ColorButton->SetText("Actor Color");
   this->ColorButton->SetCommand(this, "ChangeActorColor");
   
-  this->RepresentationMenuLabel->SetParent(this->Properties);
+  this->ColorMapMenuLabel->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ColorMapMenuLabel->Create(this->Application, "");
+  this->ColorMapMenuLabel->SetLabel("Color map:");
+  
+  this->ColorMapMenu->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ColorMapMenu->Create(this->Application, "");
+  this->ColorMapMenu->AddEntryWithCommand("Red to Blue", this,
+                                          "ChangeColorMap");
+  this->ColorMapMenu->AddEntryWithCommand("Blue to Red", this,
+                                          "ChangeColorMap");
+  this->ColorMapMenu->AddEntryWithCommand("Grayscale", this,
+                                          "ChangeColorMap");
+  this->ColorMapMenu->SetValue("Red to Blue");
+  
+  this->RepresentationMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenuLabel->Create(this->Application, "");
-  this->RepresentationMenuLabel->SetLabel("Data set representation:");
-  this->RepresentationMenu->SetParent(this->Properties);
+  this->RepresentationMenuLabel->SetLabel("Representation:");
+  this->RepresentationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->RepresentationMenu->Create(this->Application, "");
   this->RepresentationMenu->AddEntryWithCommand("Wireframe", this,
                                                 "DrawWireframe");
@@ -357,10 +412,10 @@ void vtkPVActorComposite::CreateProperties()
                                                 "DrawPoints");
   this->RepresentationMenu->SetValue("Surface");
   
-  this->InterpolationMenuLabel->SetParent(this->Properties);
+  this->InterpolationMenuLabel->SetParent(this->DisplayStyleFrame->GetFrame());
   this->InterpolationMenuLabel->Create(this->Application, "");
-  this->InterpolationMenuLabel->SetLabel("Shading Interpolation:");
-  this->InterpolationMenu->SetParent(this->Properties);
+  this->InterpolationMenuLabel->SetLabel("Interpolation:");
+  this->InterpolationMenu->SetParent(this->DisplayStyleFrame->GetFrame());
   this->InterpolationMenu->Create(this->Application, "");
   this->InterpolationMenu->AddEntryWithCommand("Flat", this,
 					       "SetInterpolationToFlat");
@@ -375,14 +430,14 @@ void vtkPVActorComposite::CreateProperties()
                             this->CompositeCheck->GetWidgetName(),
                             this->GetTclName());
 
-  this->ScalarBarCheck->SetParent(this->Properties);
-  this->ScalarBarCheck->Create(this->Application, "-text ScalarBar");
+  this->ScalarBarCheck->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarCheck->Create(this->Application, "-text Visibility");
   this->Application->Script("%s configure -command {%s ScalarBarCheckCallback}",
                             this->ScalarBarCheck->GetWidgetName(),
                             this->GetTclName());
 
-  this->ScalarBarOrientationCheck->SetParent(this->Properties);
-  this->ScalarBarOrientationCheck->Create(this->Application, "-text \"Vertical (scalar bar orientation)\"");
+  this->ScalarBarOrientationCheck->SetParent(this->ScalarBarFrame->GetFrame());
+  this->ScalarBarOrientationCheck->Create(this->Application, "-text Vertical");
   this->ScalarBarOrientationCheck->SetState(1);
   this->ScalarBarOrientationCheck->SetCommand(this, "ScalarBarOrientationCallback");
   
@@ -404,8 +459,10 @@ void vtkPVActorComposite::CreateProperties()
                             this->GetTclName());
   this->VisibilityCheck->SetState(1);
 
-  this->Script("pack %s",
-	       this->NumCellsLabel->GetWidgetName());
+  this->Script("pack %s", this->StatsFrame->GetWidgetName());
+  this->Script("pack %s %s -side left",
+	       this->NumCellsLabel->GetWidgetName(),
+               this->NumPointsLabel->GetWidgetName());
   this->Script("pack %s",
 	       this->BoundsLabel->GetWidgetName());
   this->Script("pack %s",
@@ -414,26 +471,25 @@ void vtkPVActorComposite::CreateProperties()
 	       this->YRangeLabel->GetWidgetName());
   this->Script("pack %s",
 	       this->ZRangeLabel->GetWidgetName());
-  this->Script("pack %s",
-	       this->ColorMenuLabel->GetWidgetName());
-  this->Script("pack %s",
-               this->ColorMenu->GetWidgetName());
-  this->Script("pack %s",
+  this->Script("pack %s -fill x", this->ColorFrame->GetWidgetName());
+  this->Script("pack %s %s %s -side left",
+	       this->ColorMenuLabel->GetWidgetName(),
+               this->ColorMenu->GetWidgetName(),
                this->ColorButton->GetWidgetName());
-  this->Script("pack %s",
-               this->RepresentationMenuLabel->GetWidgetName());
-  this->Script("pack %s",
-               this->RepresentationMenu->GetWidgetName());
-  this->Script("pack %s",
-               this->InterpolationMenuLabel->GetWidgetName());
-  this->Script("pack %s",
+  this->Script("pack %s -fill x", this->ScalarBarFrame->GetWidgetName());
+  this->Script("pack %s %s %s %s -side left",
+               this->ScalarBarCheck->GetWidgetName(),
+               this->ScalarBarOrientationCheck->GetWidgetName(),
+               this->ColorMapMenuLabel->GetWidgetName(),
+               this->ColorMapMenu->GetWidgetName());
+  this->Script("pack %s -fill x", this->DisplayStyleFrame->GetWidgetName());
+  this->Script("pack %s %s %s %s -side left",
+               this->RepresentationMenuLabel->GetWidgetName(),
+               this->RepresentationMenu->GetWidgetName(),
+               this->InterpolationMenuLabel->GetWidgetName(),
                this->InterpolationMenu->GetWidgetName());
   this->Script("pack %s",
                this->CompositeCheck->GetWidgetName());
-  this->Script("pack %s",
-               this->ScalarBarCheck->GetWidgetName());
-  this->Script("pack %s",
-               this->ScalarBarOrientationCheck->GetWidgetName());
   this->Script("pack %s",
                this->CubeAxesCheck->GetWidgetName());
   this->Script("pack %s",
@@ -474,7 +530,10 @@ void vtkPVActorComposite::UpdateProperties()
   sprintf(tmp, "number of cells: %d", 
 	  this->GetPVData()->GetNumberOfCells());
   this->NumCellsLabel->SetLabel(tmp);
-
+  sprintf(tmp, "number of points: %d",
+          this->GetPVData()->GetNumberOfPoints());
+  this->NumPointsLabel->SetLabel(tmp);
+  
   sprintf(tmp, "x range: %f to %f", bounds[0], bounds[1]);
   this->XRangeLabel->SetLabel(tmp);
   sprintf(tmp, "y range: %f to %f", bounds[2], bounds[3]);
@@ -550,6 +609,41 @@ void vtkPVActorComposite::ChangeActorColor(float r, float g, float b)
   
   pvApp->BroadcastScript("[%s GetProperty] SetColor %f %f %f",
                          this->ActorTclName, r, g, b);
+  this->GetView()->Render();
+}
+
+void vtkPVActorComposite::ChangeColorMap()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (strcmp(this->ColorMapMenu->GetValue(), "Red to Blue") == 0)
+    {
+    pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0.666667",
+                           this->MapperTclName);
+    pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 1 1",
+                           this->MapperTclName);
+    pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
+                           this->MapperTclName);
+    }
+  else if (strcmp(this->ColorMapMenu->GetValue(), "Blue to Red") == 0)
+    {
+    pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0.666667 0",
+                           this->MapperTclName);
+    pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 1 1",
+                           this->MapperTclName);
+    pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
+                           this->MapperTclName);
+    }
+  else
+    {
+    pvApp->BroadcastScript("[%s GetLookupTable] SetHueRange 0 0",
+                           this->MapperTclName);
+    pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 0 0",
+                           this->MapperTclName);
+    pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 0 1",
+                           this->MapperTclName);
+    }
+  
   this->GetView()->Render();
 }
 

@@ -89,6 +89,11 @@ public:
   int GetNumberOfCells();
   
   // Description:
+  // This method collects the number of points from all processes.
+  // It expects the data to be up to date.
+  int GetNumberOfPoints();
+
+  // Description:
   // We are keeping the forward links.  I have not 
   // considered deleting objects properly.
   // These methods are used internally. They are not meant to be called

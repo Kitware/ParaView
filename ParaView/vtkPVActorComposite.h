@@ -43,6 +43,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWOptionMenu.h"
+#include "vtkKWLabeledFrame.h"
 #include "vtkPVApplication.h"
 #include "vtkDataSetMapper.h"
 
@@ -149,6 +150,10 @@ public:
   void ColorByCellFieldComponent(char *name, int comp);
 
   // Description:
+  // Callback for color map menu
+  void ChangeColorMap();
+  
+  // Description:
   // Methods called when item chosen from RepresentationMenu
   void DrawWireframe();
   void DrawSurface();
@@ -203,6 +208,7 @@ protected:
   vtkKWWidget *Properties;
   char *Name;
   vtkKWLabel *NumCellsLabel;
+  vtkKWLabel *NumPointsLabel;
   vtkKWLabel *BoundsLabel;
   vtkKWLabel *XRangeLabel;
   vtkKWLabel *YRangeLabel;
@@ -210,10 +216,18 @@ protected:
   
   vtkKWScale *AmbientScale;
   
+  vtkKWLabeledFrame *ScalarBarFrame;
+  vtkKWLabeledFrame *ColorFrame;
+  vtkKWLabeledFrame *DisplayStyleFrame;
+  vtkKWWidget *StatsFrame;
+  
   vtkKWLabel *ColorMenuLabel;
   vtkKWOptionMenu *ColorMenu;
 
   vtkKWChangeColorButton *ColorButton;
+
+  vtkKWLabel *ColorMapMenuLabel;
+  vtkKWOptionMenu *ColorMapMenu;
   
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;

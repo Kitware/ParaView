@@ -191,7 +191,32 @@ int vtkPVData::GetNumberOfCells()
   return numCells;
 }
 
+//----------------------------------------------------------------------------
+// Data is expected to be updated.
+int vtkPVData::GetNumberOfPoints()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkMultiProcessController *controller = pvApp->GetController();
+  int tmp, numPoints, id, numProcs;
+  
+  if (this->VTKData == NULL)
+    {
+    return 0;
+    }
 
+  pvApp->BroadcastScript("Application SendDataNumberOfPoints %s", 
+			this->VTKDataTclName);
+  
+  numPoints = this->VTKData->GetNumberOfPoints();
+  
+  numProcs = controller->GetNumberOfProcesses();
+  for (id = 1; id < numProcs; ++id)
+    {
+    controller->Receive(&tmp, 1, id, 1969);
+    numPoints += tmp;
+    }
+  return numPoints;
+}
 
 //----------------------------------------------------------------------------
 // MAYBE WE SHOULD NOT REFERENCE COUNT HERE BECAUSE NO ONE BUT THE 

@@ -85,7 +85,7 @@ public:
   
   vtkKWCompositeCollection *GetSources();
     
-  vtkGetObjectMacro(SourcesMenu, vtkKWMenu);
+  vtkGetObjectMacro(SelectMenu, vtkKWMenu);
   
   // Description:
   // Callback from the reset camera button.
@@ -131,9 +131,10 @@ protected:
   void operator=(const vtkPVWindow&) {};
 
   vtkPVRenderView *MainView;
-  vtkKWMenu *CreateMenu;
+  vtkKWMenu *SourceMenu;
   vtkKWMenu *FilterMenu;
-  vtkKWMenu *SourcesMenu;
+  vtkKWMenu *SelectMenu;
+  vtkKWMenu *VTKMenu;
   
   vtkInteractorStyleTrackballCamera *CameraStyle;
   

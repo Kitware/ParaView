@@ -293,6 +293,18 @@ void vtkPVApplication::SendDataNumberOfCells(vtkDataSet *data)
   this->Controller->Send(&num, 1, 0, 1968);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVApplication::SendDataNumberOfPoints(vtkDataSet *data)
+{
+  int num;
+  
+  if (this->Controller->GetLocalProcessId() == 0)
+    {
+    return;
+    }
+  num = data->GetNumberOfPoints();
+  this->Controller->Send(&num, 1, 0, 1969);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)

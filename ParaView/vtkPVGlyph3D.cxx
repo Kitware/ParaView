@@ -368,7 +368,7 @@ void vtkPVGlyph3D::Save(ofstream *file)
   
   if (this->DefaultScalarsName)
     {
-    *file << "vtkSimpleFieldDataToAttributeDataFilter "
+    *file << "vtkFieldDataToAttributeDataFilter "
           << this->ChangeScalarsFilterTclName << "\n\t"
           << this->ChangeScalarsFilterTclName << " SetInput [";
     if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
@@ -399,8 +399,12 @@ void vtkPVGlyph3D::Save(ofstream *file)
       *file << this->GetNthPVInput(0)->GetPVSource()->GetVTKSourceTclName()
             << " GetOutput]\n\t";
       }
-    *file << this->ChangeScalarsFilterTclName << " SetFieldName "
-          << this->DefaultScalarsName << "\n\n";
+    *file << this->ChangeScalarsFilterTclName
+          << " SetInputFieldToPointDataField\n";
+    *file << this->ChangeScalarsFilterTclName
+          << " SetOutputAttributeDataToPointData\n";
+    *file << this->ChangeScalarsFilterTclName << " SetScalarComponent 0 "
+          << this->DefaultScalarsName << " 0\n\n";
     }
 
   *file << this->VTKSource->GetClassName() << " "

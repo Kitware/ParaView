@@ -109,6 +109,7 @@ public:
   // These should probably be consolidated into one GetDataInfo method.
   void SendDataBounds(vtkDataSet *data);
   void SendDataNumberOfCells(vtkDataSet *data);
+  void SendDataNumberOfPoints(vtkDataSet *data);
   void SendMapperColorRange(vtkPolyDataMapper *mapper);
   
 protected:
