@@ -864,16 +864,14 @@ void vtkPVSource::UpdateProperties()
   // --------------------------------------
   // Change the state of the delete button based on if there are any users.
   // Only filters at the end of a pipeline can be deleted.
-  if ((this->GetPVOutput(0) &&
-       this->GetPVOutput(0)->GetNumberOfPVConsumers() > 0) ||
-      !this->IsDeletable)
+  if ( this->DeleteCheck() )
       {
-      this->Script("%s configure -state disabled",
+      this->Script("%s configure -state normal",
                    this->DeleteButton->GetWidgetName());
       }
     else
       {
-      this->Script("%s configure -state normal",
+      this->Script("%s configure -state disabled",
                    this->DeleteButton->GetWidgetName());
       }
   
@@ -889,6 +887,15 @@ void vtkPVSource::UpdateProperties()
     }
 }
 
+//----------------------------------------------------------------------------
+int vtkPVSource::DeleteCheck()
+{
+  return !((this->GetPVOutput(0) &&
+	    this->GetPVOutput(0)->GetNumberOfPVConsumers() > 0) ||
+	   !this->IsDeletable);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSource::SetParametersParent(vtkKWWidget *parent)
 {
   if (this->ParametersParent == parent)

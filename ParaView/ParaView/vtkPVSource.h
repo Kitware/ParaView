@@ -136,6 +136,10 @@ public:
   virtual void PreAcceptCallback();
 
   // Description:
+  // Determine if this source can be deleted.
+  virtual int DeleteCheck();
+
+  // Description:
   // Internal method; called by AcceptCallback.
   // Hide flag is used for hidding creation of 
   // the glyph sources from the user.
