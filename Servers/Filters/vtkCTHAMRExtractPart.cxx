@@ -43,7 +43,7 @@
 #include "vtkGarbageCollector.h"
 #include "vtkCTHAMRSurface.h"
 
-vtkCxxRevisionMacro(vtkCTHAMRExtractPart, "1.1");
+vtkCxxRevisionMacro(vtkCTHAMRExtractPart, "1.2");
 vtkStandardNewMacro(vtkCTHAMRExtractPart);
 vtkCxxSetObjectMacro(vtkCTHAMRExtractPart,ClipPlane,vtkPlane);
 
@@ -228,7 +228,7 @@ void vtkCTHAMRExtractPart::Execute()
   clip->SetValue(CTH_AMR_SURFACE_VALUE);
   if (this->ClipPlane)
     {
-    // We need another clip for the plan.  Sneak it in.
+    // We need another clip for the plane.  Sneak it in.
     vtkClipPolyData *clip2 = clip;
     clip = vtkClipPolyData::New();
     clip->SetInput(clip2->GetOutput());
@@ -451,12 +451,18 @@ void vtkCTHAMRExtractPart::ExecutePart(const char* arrayName,
     {
     return;
     }
+    
+  // All outside never has any polydata.  
   double *range = array->GetRange();
-  if (range[0] > CTH_AMR_SURFACE_VALUE || range[1] < CTH_AMR_SURFACE_VALUE)
+  if (range[1] < CTH_AMR_SURFACE_VALUE)
     {
     return;
     }
-  
+  if (this->ClipPlane == 0 && range[0] > CTH_AMR_SURFACE_VALUE)
+    {
+    return;
+    }
+    
   block->GetPointData()->SetActiveScalars(arrayName);
 
   this->Image->ShallowCopy(block);
