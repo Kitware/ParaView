@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.535");
+vtkCxxRevisionMacro(vtkPVWindow, "1.536");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2470,24 +2470,15 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
         << this->GetPVApplication()->GetMajorVersion()
         << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
-#ifdef PV_NOT_SUPPORTING_BATCH_SCRIPTS_WITH_COMPONENTS
-  if (this->PackageNames->GetNumberOfItems() > 0)
-    {
-    *file << vtkPVApplication::LoadComponentProc << endl;
-    vtkLinkedListIterator<const char*>* it = this->PackageNames->NewIterator();
-    while (!it->IsDoneWithTraversal())
-      {
-      const char* name = 0;
-      if (it->GetData(name) == VTK_OK && name)
-        {
-        *file << "::paraview::load_component " << name << endl;
-        }
-      it->GoToNextItem();
-      }
-    it->Delete();
-    }
-  *file << endl << endl;
-#endif
+
+  *file << endl << "#Initialization" << endl;
+
+  *file << endl << "vtkSMApplication app" << endl;
+  *file << "app Initialize args" << endl;
+
+  *file << endl << "vtkSMObject foo" << endl;
+  *file << "set proxyManager [foo GetProxyManager]" << endl;
+  *file << "foo Delete" << endl << endl;
 
   const char* extension = 0;
   const char* writerName = 0;
@@ -2525,8 +2516,12 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   this->GetMainView()->SaveInBatchScript(file);
   if (offScreenFlag)
     {
-    *file << "RenWin1 SetOffScreenRendering 1\n\n";
+    *file << "  [$Ren1 GetProperty OffScreenRendering] SetElement 0 1\n";
     }    
+  else
+    {
+    *file << "  [$Ren1 GetProperty OffScreenRendering] SetElement 0 0\n";
+    }
 
   // Save out the VTK data pipeline.
   vtkArrayMapIterator<const char*, vtkPVSourceCollection*>* it =
@@ -2569,46 +2564,27 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     }
   cit->Delete();
 
-  // Set up the composite manager.
-  // We do not know if it will be run in parallel.
-  *file << "\n\nvtkPVBatchCompositeManager compManager\n\t";
-  *file << "compManager SetRenderWindow RenWin1 \n\t";
-  *file << "compManager InitializePieces\n\n";
-  *file << "if {[catch {set myProcId [[compManager GetController] "
-      "GetLocalProcessId]}]} {set myProcId 0 } \n";
-  *file << "if {[catch {set numberOfProcs [[compManager GetController] "
-      "GetNumberOfProcesses]}]} {set numberOfProcs 1 } \n\n";
+// TODO replace this
+//   if (geometryFileName)
+//     {
+//     //*file << "if {$numberOfProcs > 1} {\n";
+//     //*file << "\tvtkXMLPPolyDataWriter GeometryWriter\n";
+//     //*file << "\tGeometryWriter SetNumberOfPieces $numberOfProcs" << endl;
+//     //*file << "\tGeometryWriter SetStartPiece $myProcId\n";
+//     //*file << "\tGeometryWriter SetEndPiece $myProcId\n";
+//     //*file << "} else {\n";
+//     //*file << "\tvtkXMLPolyDataWriter GeometryWriter\n";
+//     //*file << "}\n";
+//     //*file << "GeometryWriter SetDataModeToBinary" << endl;
+//     //*file << "GeometryWriter EncodeAppendedDataOff" << endl;
+//     *file << "vtkCollectPolyData CollectionFilter\n";
+//     *file << "vtkPolyData TempPolyData\n";
+//     *file << "vtkXMLPolyDataWriter GeometryWriter\n";
+//     *file << "\tGeometryWriter SetInput TempPolyData\n";
+//     *file << "[CollectionFilter GetOutput] SetUpdateNumberOfPieces $numberOfProcs\n";
+//     *file << "[CollectionFilter GetOutput] SetUpdatePiece $myProcId\n";
 
-  // Create the image writer if necessary.
-  if (imageFileName && vtkString::Length(imageFileName) > 0)
-    {
-    if ( extension && writerName)
-      {
-      *file << writerName << " ImageWriter\n\t";
-      *file << "ImageWriter SetInput [compManager GetOutput]\n\n";
-      }
-    }
-
-  if (geometryFileName)
-    {
-    //*file << "if {$numberOfProcs > 1} {\n";
-    //*file << "\tvtkXMLPPolyDataWriter GeometryWriter\n";
-    //*file << "\tGeometryWriter SetNumberOfPieces $numberOfProcs" << endl;
-    //*file << "\tGeometryWriter SetStartPiece $myProcId\n";
-    //*file << "\tGeometryWriter SetEndPiece $myProcId\n";
-    //*file << "} else {\n";
-    //*file << "\tvtkXMLPolyDataWriter GeometryWriter\n";
-    //*file << "}\n";
-    //*file << "GeometryWriter SetDataModeToBinary" << endl;
-    //*file << "GeometryWriter EncodeAppendedDataOff" << endl;
-    *file << "vtkCollectPolyData CollectionFilter\n";
-    *file << "vtkPolyData TempPolyData\n";
-    *file << "vtkXMLPolyDataWriter GeometryWriter\n";
-    *file << "\tGeometryWriter SetInput TempPolyData\n";
-    *file << "[CollectionFilter GetOutput] SetUpdateNumberOfPieces $numberOfProcs\n";
-    *file << "[CollectionFilter GetOutput] SetUpdatePiece $myProcId\n";
-
-    }
+//     }
 
   if (animationFlag)
     {
@@ -2616,23 +2592,29 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
                                                 geometryFileName);
     }
   else
-    { // Just do one frame.
-    if (imageFileName)
-      {
-      *file << "RenWin1 Render\n";
-      *file << "compManager Composite\n";
-      *file << "if {$myProcId == 0} {\n";
-      *file << "\t" << "ImageWriter SetFileName {" << imageFileName << "}\n";
-      *file << "\t" << "ImageWriter Write\n";
-      *file << "}\n\n";
-      }
-
-    if (geometryFileName)
-      {
-      this->SaveGeometryInBatchFile(file, geometryFileName, -1);
-      }
+    {
+    *file << endl << "$Ren1 UpdateVTKObjects; $Ren1 StillRender" << endl;
+    *file << "$Ren1 WriteImage {" << imageFileName << "}\n";
     }
-  *file << "vtkCommand DeleteAllObjects\n";
+//   else
+//     { // Just do one frame.
+//     if (imageFileName)
+//       {
+//       *file << "RenWin1 Render\n";
+//       *file << "compManager Composite\n";
+//       *file << "if {$myProcId == 0} {\n";
+//       *file << "\t" << "ImageWriter SetFileName {" << imageFileName << "}\n";
+//       *file << "\t" << "ImageWriter Write\n";
+//       *file << "}\n\n";
+//       }
+
+// TODO replace this
+//     if (geometryFileName)
+//       {
+//       this->SaveGeometryInBatchFile(file, geometryFileName, -1);
+//       }
+//     }
+//   *file << "vtkCommand DeleteAllObjects\n";
 
   file->flush();
   if (file->fail())

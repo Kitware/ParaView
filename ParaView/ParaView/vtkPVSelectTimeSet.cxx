@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.34");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.35");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -230,6 +230,14 @@ void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name,
 
 
 //-----------------------------------------------------------------------------
+void vtkPVSelectTimeSet::SaveInBatchScript(ofstream *file)
+{
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+        <<  " GetProperty " << this->SetCommand << "] SetElements1 "
+        << this->Property->GetScalar(0) << endl;
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AcceptInternal(vtkClientServerID sourceID)
 {
   if (this->ModifiedFlag)
@@ -368,7 +376,7 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   
   // I do not under stand why the trace name is used for the
   // menu entry, but Berk must know.
-  ai->SetLabelAndScript(this->GetTraceName(), NULL);
+  ai->SetLabelAndScript(this->GetTraceName(), NULL, this->GetTraceName());
   ai->SetCurrentProperty(this->Property);
   ai->Update();
 }

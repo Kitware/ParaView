@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.319");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.320");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1795,43 +1795,67 @@ vtkPVWindow *vtkPVRenderView::GetPVWindow()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::SaveInBatchScript(ofstream* file)
 {
+  int i;
+
+  *file << "set Ren1 [$proxyManager NewProxy rendering DefaultRenderer]" << endl;
+  double* color = this->GetRenderer()->GetBackground();
+  *file << "  [$Ren1 GetProperty BackgroundColor] SetElements3 "; 
+  for(i=0; i<3; i++)
+    {
+    *file << color[i] << " ";
+    }
+  *file << endl;
+  int *size = this->GetRenderWindow()->GetSize();
+  *file << "  [$Ren1 GetProperty Size] SetElements2 "; 
+  for(i=0; i<2; i++)
+    {
+    *file << size[i] << " ";
+    }
+  *file << endl;
+
   vtkCamera *camera;
-  double position[3];
-  double focalPoint[3];
-  double viewUp[3];
-  double viewAngle;
-  double clippingRange[2];
-  double *color;
-  int *size;
-
-  size = this->GetRenderWindow()->GetSize();
-  *file << "vtkRenderer " << "Ren1" << "\n\t";
-  color = this->GetRenderer()->GetBackground();
-  *file << "Ren1" << " SetBackground "
-        << color[0] << " " << color[1] << " " << color[2] << endl;
-  *file << "vtkRenderWindow " << "RenWin1" << "\n\t"
-        << "RenWin1" << " AddRenderer "
-        << "Ren1" << "\n\t";
-  *file << "RenWin1" << " SetSize " << size[0] << " " << size[1] << endl;
-
   camera = this->GetRenderer()->GetActiveCamera();
+
+  double position[3];
   camera->GetPosition(position);
-  camera->GetFocalPoint(focalPoint);
-  camera->GetViewUp(viewUp);
-  viewAngle = camera->GetViewAngle();
-  camera->GetClippingRange(clippingRange);
+  *file << "  [$Ren1 GetProperty CameraPosition] SetElements3 ";
+  for(i=0; i<3; i++)
+    {
+    *file << position[i] << " ";
+    }
+  *file << endl;
   
-  *file << "# camera parameters\n"
-        << "set camera [" << "Ren1" << " GetActiveCamera]\n\t"
-        << "$camera SetPosition " << position[0] << " " << position[1] << " "
-        << position[2] << "\n\t"
-        << "$camera SetFocalPoint " << focalPoint[0] << " " << focalPoint[1]
-        << " " << focalPoint[2] << "\n\t"
-        << "$camera SetViewUp " << viewUp[0] << " " << viewUp[1] << " "
-        << viewUp[2] << "\n\t"
-        << "$camera SetViewAngle " << viewAngle << "\n\t"
-        << "$camera SetClippingRange " << clippingRange[0] << " "
-        << clippingRange[1] << "\n";
+  double focalPoint[3];
+  camera->GetFocalPoint(focalPoint);
+  *file << "  [$Ren1 GetProperty CameraFocalPoint] SetElements3 ";
+  for(i=0; i<3; i++)
+    {
+    *file << focalPoint[i] << " ";
+    }
+  *file << endl;
+
+  double viewUp[3];
+  camera->GetViewUp(viewUp);
+  *file << "  [$Ren1 GetProperty CameraViewUp] SetElements3 "; 
+  for(i=0; i<3; i++)
+    {
+    *file << viewUp[i] << " ";
+    }
+  *file << endl;
+
+  double viewAngle;
+  viewAngle = camera->GetViewAngle();
+  *file << "  [$Ren1 GetProperty CameraViewAngle] SetElements1 "
+        << viewAngle << endl;
+
+  double clippingRange[2];
+  camera->GetClippingRange(clippingRange);
+  *file << "  [$Ren1 GetProperty CameraClippingRange] SetElements2 ";
+  for(i=0; i<2; i++)
+    {
+    *file << clippingRange[i] << " ";
+    }
+  *file << endl;
 }
 
 

@@ -22,13 +22,14 @@
 #include "vtkPVStringWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkClientServerStream.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.29");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.30");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -297,30 +298,13 @@ const char* vtkPVStringEntry::GetValue()
 }
 
 
-//----------------------------------------------------------------------------
-void vtkPVStringEntry::SaveInBatchScriptForPart(ofstream *file, 
-                                                vtkClientServerID sourceID)
+//-----------------------------------------------------------------------------
+void vtkPVStringEntry::SaveInBatchScript(ofstream *file)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  
-  if (sourceID.ID == 0 || this->VariableName == NULL)
-    {
-    vtkErrorMacro(<< this->GetClassName()
-                  << " must not have SaveInBatchScript method.");
-    return;
-    } 
-
-  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
-  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                  << (vtkstd::string("Get") 
-                      + vtkstd::string(this->VariableName)).c_str()
-                  << vtkClientServerStream::End;
-  ostrstream result;
-  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
-  result << ends;
-  *file << " {" << result.str() << "}\n";
-  delete [] result.str();
+  const char* str = this->Property->GetString();
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+        << " GetProperty " << this->VariableName << "] SetElement 0 {"
+        << str << "}" << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -38,6 +38,7 @@ public:
   vtkGetMacro(NumberOfScalars, int);
 
   virtual void SetAnimationTime(float time);
+  virtual void SetAnimationTimeInBatch(ofstream *file, float val);
   
 protected:
   vtkPVScalarListWidgetProperty();

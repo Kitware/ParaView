@@ -37,6 +37,7 @@ public:
   virtual void AcceptInternal() {}
 
   virtual void SetAnimationTime(float) {}
+  virtual void SetAnimationTimeInBatch(ofstream *, float) {}
   //BTX
   vtkSetMacro(VTKSourceID,vtkClientServerID);
   //ETX

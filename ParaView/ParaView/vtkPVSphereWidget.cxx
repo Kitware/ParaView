@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.33");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -209,12 +209,21 @@ void vtkPVSphereWidget::UpdateVTKObject(const char*)
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SaveInBatchScript(ofstream *file)
 {
-  *file << "vtkSphere " << "pvTemp" << this->SphereID << endl;
-  *file << "\tpvTemp" << this->SphereID << " SetCenter ";
-  *file << this->LastAcceptedCenter[0] << " " << this->LastAcceptedCenter[1] << " " 
-    << this->LastAcceptedCenter[2] << endl;
-  *file << "\t" << "pvTemp" << this->SphereID << " SetRadius ";
-  *file << this->LastAcceptedRadius << endl;
+  *file << endl;
+  *file << "set pvTemp" <<  this->SphereID.ID
+        << " [$proxyManager NewProxy implicit_functions Sphere]"
+        << endl;
+  *file << "  [$pvTemp" << this->SphereID.ID << " GetProperty Center] "
+        << "SetElements3 " 
+        << this->LastAcceptedCenter[0] << " "
+        << this->LastAcceptedCenter[1] << " "
+        << this->LastAcceptedCenter[2] << " "
+        << endl;
+  *file << "  [$pvTemp" << this->SphereID.ID << " GetProperty Radius] "
+        << "SetElements1 "
+        << this->LastAcceptedRadius << endl << endl;
+  *file << "  $pvTemp" << this->SphereID.ID << " UpdateVTKObjects" << endl;
+  *file << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -62,7 +62,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.345");
+vtkCxxRevisionMacro(vtkPVSource, "1.346");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -1866,15 +1866,21 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
   
   // Save the object in the script.
   *file << "\n"; 
-  int numSources, sourceIdx;
-  numSources = this->GetNumberOfVTKSources();
-  for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
+  const char* module_group = 0;
+  vtkPVSource* input0 = this->GetPVInput(0);
+  if (input0)
     {
-    *file << this->GetSourceClassName()
-          << " pvTemp" << this->GetVTKSourceID(sourceIdx) << "\n";
+    module_group = "filters";
     }
+  else
+    {
+    module_group = "sources";
+    }
+  *file << "set pvTemp" <<  this->GetVTKSourceID(0)
+        << " [$proxyManager NewProxy " << module_group << " " 
+        << this->GetModuleName() << "]"
+        << endl;
 
-  // Handle this here.
   this->SetInputsInBatchScript(file);
 
   // Let the PVWidgets set up the object.
@@ -1890,16 +1896,8 @@ void vtkPVSource::SaveInBatchScript(ofstream *file)
     }
   it->Delete();
 
-  // Sub-classes which need to update the source before
-  // connecting it to other objects should set UpdateSourceInBatch
-  // to 1 (for example, vtkPVEnSightReaderModule)
-  if (this->UpdateSourceInBatch)
-    {
-    for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
-      {
-      *file << "pvTemp" << this->GetVTKSourceID(sourceIdx) << " Update\n";
-      }
-    }
+  *file << "  $pvTemp" <<  this->GetVTKSourceID(0)
+        << " UpdateVTKObjects" << endl;
 
   // Add the mapper, actor, scalar bar actor ...
   this->GetPVOutput()->SaveInBatchScript(file);
@@ -1988,6 +1986,12 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
 {
   int numInputs = this->GetNumberOfPVInputs();
 
+  if (this->VTKMultipleInputsFlag)
+    {
+    *file <<  "  $pvTemp" << this->GetVTKSourceID(0) 
+          << " SetHasMultipleInputs 1" << endl;
+    }
+
   for (int inpIdx=0; inpIdx<numInputs; inpIdx++)
     {
     // Just PVInput 0 for now.
@@ -2015,51 +2019,20 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
       inputName = "Input";
       }
 
-    int numParts = pvs->GetNumberOfParts();
+    *file << "  $pvTemp" <<  this->GetVTKSourceID(0) 
+          << " SetInput " << inpIdx << " $pvTemp" << pvs->GetVTKSourceID(0);
 
     if (this->VTKMultipleInputsFlag)
-      { 
-      vtkClientServerID sourceID = this->GetVTKSourceID(0);
-      if (sourceID.ID == 0)
-        { // Sanity check.
-        vtkErrorMacro("Missing tcl name.");
-        return;
-        }
-      
-      // Only one filter takes all parts as input.
-      for (int partIdx = 0; partIdx < numParts; ++partIdx)
-        {
-        vtkPVPart* part = pvs->GetPart(partIdx);
-        
-        *file << "\t";
-        *file << "pvTemp" << sourceID << " Add" << inputName  << " [pvTemp" 
-              << pvs->GetVTKSourceID(part->GetVTKSourceIndex()) 
-              << " GetOutput " << part->GetVTKOutputIndex() << "]\n";
-        }      
+      {
+      *file << " Add" << inputName;
       }
     else
       {
-      // Multiple filters process all parts
-      int numSources = this->GetNumberOfVTKSources();
-      for (int sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
-        {
-        vtkClientServerID sourceID = this->GetVTKSourceID(sourceIdx);
-        // This is to handle the case when there are multiple
-        // inputs and the first one has multiple parts. For
-        // example, in the Glyph filter, when the input has multiple
-        // parts, the glyph source has to be applied to each.
-        // In that case, sourceTclName == glyph input, 
-        // inputName == glyph source.
-        int partIdx = sourceIdx % numParts;
-        vtkPVPart* part = pvs->GetPart(partIdx);
-        *file << "\t";
-        *file << "pvTemp" << sourceID << " Set" << inputName << " [pvTemp" 
-              << pvs->GetVTKSourceID(part->GetVTKSourceIndex()) 
-              << " GetOutput " << part->GetVTKOutputIndex() << "]\n";
-
-        }
+      *file << " Set" << inputName;
       }
+    *file << endl;
     }
+
 }
 
 

@@ -17,8 +17,10 @@
 #include "vtkClientServerID.h"
 #include "vtkKWEntry.h"
 #include "vtkKWLabel.h"
+#include "vtkKWMenu.h"
 #include "vtkKWThumbWheel.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
 #include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVSource.h"
@@ -27,7 +29,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.2");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.3");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -185,6 +187,42 @@ vtkPVThumbWheel* vtkPVThumbWheel::ClonePrototype(
 {
   vtkPVWidget *clone = this->ClonePrototypeInternal(pvSource, map);
   return vtkPVThumbWheel::SafeDownCast(clone);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVThumbWheel::SaveInBatchScript(ofstream *file)
+{
+  float scalar = this->ThumbWheel->GetValue();
+
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+        <<  " GetProperty " << this->VariableName << "] SetElements1 "
+        << scalar << endl;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVThumbWheel::AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+                                                vtkPVAnimationInterfaceEntry *ai)
+{
+  char methodAndArgs[500];
+
+  sprintf(methodAndArgs, "AnimationMenuCallback %s", ai->GetTclName()); 
+  menu->AddCommand(this->Label->GetLabel(), this, methodAndArgs, 0,"");
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
+{
+  if (ai->InitializeTrace(NULL))
+    {
+    this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)",
+                        this->GetTclName(), ai->GetTclName());
+    }
+  
+  ai->SetLabelAndScript(this->Label->GetLabel(), NULL, this->GetTraceName());
+  ai->SetCurrentProperty(this->Property);
+  ai->SetTimeStart(this->ThumbWheel->GetMinimumValue());
+  ai->SetTimeEnd(this->ThumbWheel->GetMinimumValue());
+  ai->Update();
 }
 
 //-----------------------------------------------------------------------------

@@ -20,12 +20,13 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVIndexWidgetProperty.h"
+#include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 #include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.42");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.43");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -183,6 +184,14 @@ void vtkPVSelectionList::SetLabel(const char* label)
 const char *vtkPVSelectionList::GetLabel()
 {
   return this->Label->GetLabel();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVSelectionList::SaveInBatchScript(ofstream *file)
+{
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+        <<  " GetProperty " << this->VariableName << "] SetElements1 "
+        << this->Property->GetIndex() << endl;
 }
 
 //----------------------------------------------------------------------------

@@ -20,8 +20,12 @@
 #include "vtkPVWidget.h"
 #include "vtkClientServerStream.h"
 
+#include "vtkPVObjectWidget.h"
+#include "vtkPVSelectTimeSet.h"
+#include "vtkPVSource.h"
+
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.10");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.11");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -139,6 +143,37 @@ void vtkPVScalarListWidgetProperty::SetAnimationTime(float time)
   this->SetScalars(1, &time);
   this->Widget->ModifiedCallback();
   this->Widget->Reset();
+}
+
+void vtkPVScalarListWidgetProperty::SetAnimationTimeInBatch(
+  ofstream *file, float val)
+{
+  if (this->Widget->GetPVSource())
+    {
+    vtkPVObjectWidget* ov = vtkPVObjectWidget::SafeDownCast(this->Widget);
+    if (ov)
+      {
+      *file << "if { [[$pvTemp" <<  ov->GetPVSource()->GetVTKSourceID(0) 
+            << " GetProperty " << ov->GetVariableName() 
+            << "] GetClassName] == \"vtkSMIntVectorProperty\"} {" << endl;
+      *file << "  set value [expr round(" << val << ")]" << endl;
+      *file << "} else {" << endl;
+      *file << "  set value " << val << endl;
+      *file << "}" << endl;
+      *file << "[$pvTemp" << ov->GetPVSource()->GetVTKSourceID(0)
+            << " GetProperty " << ov->GetVariableName()
+            << "] SetElement 0 $value"<< endl;
+      }
+    vtkPVSelectTimeSet* st = vtkPVSelectTimeSet::SafeDownCast(this->Widget);
+    if (st)
+      {
+      *file << "[$pvTemp" << st->GetPVSource()->GetVTKSourceID(0)
+            << " GetProperty " << st->GetSetCommand()
+            << "] SetElement 0 [expr round(" << val << ")]" << endl;
+      }
+    *file << "$pvTemp" << this->Widget->GetPVSource()->GetVTKSourceID(0)
+          << " UpdateVTKObjects" << endl;
+    }
 }
 
 void vtkPVScalarListWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)
