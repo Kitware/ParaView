@@ -186,7 +186,9 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
   this->RayCastMapper->SetInput(input);
   this->VolumeProMapper->SetInput(input);
   this->HiResTextureMapper->SetInput(input);
-
+  
+  this->RayCastMapper->GetGradientEstimator()->Update();
+  
   input->GetDimensions( size );
 
   // if there is an opportunity for a 1/16th size volume then do it
@@ -252,6 +254,7 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
     this->LowResTextureMapper->SetInput( this->LowResResampler->GetOutput() );
     
     this->LowResTextureMapper->GetGradientEstimator()->ZeroPadOff();
+    this->LowResTextureMapper->GetGradientEstimator()->Update();
     
     this->LowResTextureID = 
       this->LODVolume->AddLOD( this->LowResTextureMapper,
@@ -319,6 +322,7 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
     this->MedResTextureMapper->SetInput( this->MedResResampler->GetOutput() );
 
     this->MedResTextureMapper->GetGradientEstimator()->ZeroPadOff();
+    this->MedResTextureMapper->GetGradientEstimator()->Update();
     
     this->MedResTextureID = 
       this->LODVolume->AddLOD( this->MedResTextureMapper,
@@ -358,5 +362,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.10 $");
+  this->ExtractRevision(os,"$Revision: 1.11 $");
 }
