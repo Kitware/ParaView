@@ -92,13 +92,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
 
+#include "ParaViewRC.h"
+
 #include "htmlhelp.h"
 #include "direct.h"
 #endif
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.149");
+vtkCxxRevisionMacro(vtkPVApplication, "1.150");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -597,6 +599,17 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->CreateSplashScreen();
     this->SplashScreen->SetProgressMessage("Initializing application...");
     }
+
+  // Application Icon 
+#ifdef _WIN32
+  this->Script("SetApplicationIcon %s.exe %d big",
+               this->GetApplicationName(),
+               IDI_PARAVIEWICO32);
+  // No, we can't set the same icon, even if it has both 32x32 and 16x16
+  this->Script("SetApplicationIcon %s.exe %d small",
+               this->GetApplicationName(),
+               IDI_PARAVIEWICO16);
+#endif
 
   vtkOutputWindow::GetInstance()->PromptUserOn();
 

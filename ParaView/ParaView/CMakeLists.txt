@@ -150,7 +150,15 @@ IF (WIN32)
   LINK_LIBRARIES( wsock32 )
 ENDIF (WIN32)
 
-ADD_EXECUTABLE(ParaView WIN32 ParaView.cxx) 
+SOURCE_FILES(ParaViewBinary_SRCS
+	ParaView.cxx)
+
+IF(WIN32)
+  SOURCE_FILES(ParaViewBinary_SRCS
+    ParaView.rc)
+ENDIF(WIN32)
+
+ADD_EXECUTABLE(ParaView WIN32 ParaViewBinary_SRCS) 
 
 LINK_LIBRARIES( vtkpng vtkzlib vtkjpeg vtktiff )
 
