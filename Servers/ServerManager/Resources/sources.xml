@@ -199,8 +199,8 @@
 
    <SourceProxy name="CTHFractal" class="vtkCTHFractal">
       <IntVectorProperty
-         name="Dimension"
-         command="SetDimension"
+         name="Dimensions"
+         command="SetDimensions"
          number_of_elements="1"
          default_values="10" >
         <IntRangeDomain name="range" min="2" max="64" />
