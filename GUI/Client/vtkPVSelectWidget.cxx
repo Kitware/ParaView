@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.49");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.50");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -457,7 +457,11 @@ vtkPVWidget *vtkPVSelectWidget::GetPVWidget(const char* label)
   idx = this->FindIndex(label, this->Labels);
   vtkPVWidgetProperty *prop =
     (vtkPVWidgetProperty*)(this->WidgetProperties->GetItemAsObject(idx));
-  return prop->GetWidget();
+  if (prop)
+    {
+    return prop->GetWidget();
+    }
+  return NULL;
 }
 
 //-----------------------------------------------------------------------------
