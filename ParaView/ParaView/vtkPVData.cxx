@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.140");
+vtkCxxRevisionMacro(vtkPVData, "1.141");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -181,10 +181,12 @@ vtkPVData::vtkPVData()
 
   this->ActorControlFrame = vtkKWLabeledFrame::New();
   this->TranslateLabel = vtkKWLabel::New();
+  this->ScaleLabel = vtkKWLabel::New();
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
     this->TranslateEntry[cc] = vtkKWEntry::New();
+    this->ScaleEntry[cc] = vtkKWEntry::New();
     }
   this->OpacityLabel = vtkKWLabel::New();
   this->Opacity = vtkKWScale::New();
@@ -304,10 +306,12 @@ vtkPVData::~vtkPVData()
 
   this->ActorControlFrame->Delete();
   this->TranslateLabel->Delete();
+  this->ScaleLabel->Delete();
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
     this->TranslateEntry[cc]->Delete();
+    this->ScaleEntry[cc]->Delete();
     }
   this->OpacityLabel->Delete();
   this->Opacity->Delete();
@@ -1306,6 +1310,10 @@ void vtkPVData::CreateProperties()
   this->TranslateLabel->Create(this->Application, 0);
   this->TranslateLabel->SetLabel("Translate");
 
+  this->ScaleLabel->SetParent(this->ActorControlFrame->GetFrame());
+  this->ScaleLabel->Create(this->Application, 0);
+  this->ScaleLabel->SetLabel("Scale");
+
   int cc;
   for ( cc = 0; cc < 3; cc ++ )
     {
@@ -1314,6 +1322,13 @@ void vtkPVData::CreateProperties()
     this->TranslateEntry[cc]->SetValue(0, 4);
     this->Script("bind %s <Key-Return> { %s SetActorTranslate }",
                  this->TranslateEntry[cc]->GetWidgetName(),
+                 this->GetTclName());
+
+    this->ScaleEntry[cc]->SetParent(this->ActorControlFrame->GetFrame());
+    this->ScaleEntry[cc]->Create(this->Application, 0);
+    this->ScaleEntry[cc]->SetValue(1, 4);
+    this->Script("bind %s <Key-Return> { %s SetActorScale }",
+                 this->ScaleEntry[cc]->GetWidgetName(),
                  this->GetTclName());
     }
   this->OpacityLabel->SetParent(this->ActorControlFrame->GetFrame());
@@ -1331,6 +1346,11 @@ void vtkPVData::CreateProperties()
                this->TranslateEntry[0]->GetWidgetName(),
                this->TranslateEntry[1]->GetWidgetName(),
                this->TranslateEntry[2]->GetWidgetName());
+  this->Script("grid %s %s %s %s -sticky ew",
+               this->ScaleLabel->GetWidgetName(),
+               this->ScaleEntry[0]->GetWidgetName(),
+               this->ScaleEntry[1]->GetWidgetName(),
+               this->ScaleEntry[2]->GetWidgetName());
   this->Script("grid %s %s - -  -sticky ew",
                this->OpacityLabel->GetWidgetName(),
                this->Opacity->GetWidgetName());
@@ -2752,6 +2772,44 @@ void vtkPVData::GetActorTranslate(float* point)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::SetActorScale()
+{
+  float point[3];
+  this->GetActorScale(point);
+  this->SetActorScale(point);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorScale(float* point)
+{
+  this->SetActorScale(point[0], point[1], point[2]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetActorScale(float x, float y, float z)
+{
+  this->ScaleEntry[0]->SetValue(x, 4);
+  this->ScaleEntry[1]->SetValue(y, 4);
+  this->ScaleEntry[2]->SetValue(z, 4);
+  this->GetPVApplication()->BroadcastScript("%s SetScale %f %f %f",
+                                            this->PropTclName, x, y, z);
+  this->AddTraceEntry("$kw(%s) SetActorScale %f %f %f",
+                      this->GetTclName(), x, y, z);  
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::GetActorScale(float* point)
+{
+  point[0] = this->ScaleEntry[0]->GetValueAsFloat();
+  point[1] = this->ScaleEntry[1]->GetValueAsFloat();
+  point[2] = this->ScaleEntry[2]->GetValueAsFloat();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::SetScalarBarOrientationToVertical()
 {
   this->ScalarBarOrientationCheck->SetState(1);
@@ -2802,7 +2860,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.140 $");
+  this->ExtractRevision(os,"$Revision: 1.141 $");
 }
 
 //----------------------------------------------------------------------------
@@ -2828,6 +2886,10 @@ void vtkPVData::SerializeSelf(ostream& os, vtkIndent indent)
      << this->TranslateEntry[1]->GetValue() << " " 
      << this->TranslateEntry[1]->GetValue() << endl;
   os << indent << "Opacity " << this->Opacity->GetValue() << endl;
+  os << indent << "ActorScale " 
+     << this->ScaleEntry[0]->GetValue() << " "
+     << this->ScaleEntry[1]->GetValue() << " " 
+     << this->ScaleEntry[1]->GetValue() << endl;
 }
 
 //------------------------------------------------------------------------------
@@ -2912,6 +2974,21 @@ void vtkPVData::SerializeToken(istream& is, const char token[1024])
         }
       }
     this->SetActorTranslate(cor);
+    }
+  else if ( vtkString::Equals(token, "ActorScale") )
+    {
+    float cor[3];
+    int cc;
+    for ( cc = 0; cc < 3; cc ++ )
+      {
+      cor[cc] = 0.0;
+      if (! (is >> cor[cc]) )
+        {
+        vtkErrorMacro("Problem Parsing session file");
+        return;
+        }
+      }
+    this->SetActorScale(cor);
     }
   else if ( vtkString::Equals(token, "ColorRange") )
     {

@@ -169,6 +169,13 @@ public:
   void SetActorTranslate();
   
   // Description:
+  // Scale the actor. Also modify the entry widget that controles the scaling.
+  void SetActorScale(float* p);
+  void SetActorScale(float x, float y, float z);
+  void GetActorScale(float* p);
+  void SetActorScale();
+  
+  // Description:
   // Set the transparency of the actor.
   void SetOpacity(float f);
   void OpacityChangedCallback();
@@ -491,6 +498,8 @@ protected:
   vtkKWLabeledFrame* ActorControlFrame;
   vtkKWLabel* TranslateLabel;
   vtkKWEntry* TranslateEntry[3];
+  vtkKWLabel* ScaleLabel;
+  vtkKWEntry* ScaleEntry[3];
   vtkKWScale* Opacity;
   vtkKWLabel* OpacityLabel;
 
