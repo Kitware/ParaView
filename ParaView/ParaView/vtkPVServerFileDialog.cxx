@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.1");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.2");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -891,11 +891,6 @@ void vtkPVServerFileDialog::Update()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* dirs = vtkStringList::New();
   vtkStringList* files = vtkStringList::New();
-  const char* perm = "readable";
-  if(this->SaveDialog)
-    {
-    perm = "writable";
-    }
   
   // Make sure we have a directory.
   if(!this->LastPath)
@@ -907,7 +902,7 @@ void vtkPVServerFileDialog::Update()
 
   // Read the list of subdirectories and files.
   if(!(this->GetPVApplication()->GetProcessModule()
-       ->GetDirectoryListing(this->LastPath, dirs, files, perm)))
+       ->GetDirectoryListing(this->LastPath, dirs, files, this->SaveDialog)))
     {
     // Directory did not exist, use current directory instead.
     pm->RootScript("pwd");
@@ -915,7 +910,7 @@ void vtkPVServerFileDialog::Update()
     this->ConvertLastPath();
     
     // We will now succeed.
-    pm->GetDirectoryListing(this->LastPath, dirs, files, perm);
+    pm->GetDirectoryListing(this->LastPath, dirs, files, this->SaveDialog);
     }
   
   this->Script("%s delete all", this->FileList->GetWidgetName());

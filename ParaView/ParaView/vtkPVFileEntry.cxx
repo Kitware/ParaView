@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.9");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.52.2.10");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -433,7 +433,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
     sprintf(format, "%%s/%%s%%0%dd.%%s", ncnt);
     sprintf(secondformat, "%%s/%%s%%d.%%s");
     this->Entry->DeleteAllValues();
-    pm->GetDirectoryListing(path, dirs, files, "readable");
+    pm->GetDirectoryListing(path, dirs, files, 0);
     int cnt = 0;
     for ( cc = 0; cc < files->GetLength(); cc ++ )
       {

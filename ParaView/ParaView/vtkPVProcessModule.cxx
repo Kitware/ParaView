@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.13");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.14");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -137,9 +137,6 @@ int vtkPVProcessModule::Start(int argc, char **argv)
 #endif // PV_HAVE_TRAPS_FOR_SIGNALS
   app->SetProcessModule(this);
   app->Script("wm withdraw .");
-
-  this->InitializeTclMethodImplementations();
-
 
   this->ClientServerStream = new vtkClientServerStream;
   this->ClientInterpreter = vtkClientServerInterpreter::New();
@@ -418,49 +415,70 @@ const char* vtkPVProcessModule::GetRootResult()
 void vtkPVProcessModule::SetApplication(vtkKWApplication* arg)
 {
   this->Superclass::SetApplication(arg);
-  this->InitializeTclMethodImplementations();
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProcessModule::GetDirectoryListing(const char* dir,
-                                            vtkStringList* dirs,
-                                            vtkStringList* files)
-{
-  return this->GetDirectoryListing(dir, dirs, files, "readable");
 }
 
 //----------------------------------------------------------------------------
 int vtkPVProcessModule::GetDirectoryListing(const char* dir,
                                             vtkStringList* dirs,
                                             vtkStringList* files,
-                                            const char* perm)
+                                            int save)
 {
-  char* result = vtkString::Duplicate(this->Application->Script(
-    "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
-    dir, perm));
-  if(strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
+  // Get the listing from the server.
+  vtkClientServerID lid = this->NewStreamObject("vtkPVServerFileListing");
+  this->GetStream() << vtkClientServerStream::Invoke
+                    << lid << "GetFileListing" << dir << save
+                    << vtkClientServerStream::End;
+  this->SendStreamToServer();
+  vtkClientServerStream result;
+  if(!this->GetLastServerResult().GetArgument(0, 0, &result))
     {
-    dirs->RemoveAllItems();
-    files->RemoveAllItems();
-    delete [] result;
+    vtkErrorMacro("Error getting file list result from server.");
+    this->DeleteStreamObject(lid);
+    this->SendStreamToServer();
     return 0;
     }
-  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
-                             vtkStringListCommand);
-  char* dirsTcl = vtkString::Duplicate(
-    Tcl_GetStringResult(this->Application->GetMainInterp()));
-  vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), files,
-                             vtkStringListCommand);
-  char* filesTcl = vtkString::Duplicate(
-    Tcl_GetStringResult(this->Application->GetMainInterp()));
-  this->Application->Script(
-    "::paraview::vtkPVProcessModule::ParseDirectoryListing {%s} {%s} {%s}",
-    result, dirsTcl, filesTcl
-    );
-  delete [] dirsTcl;
-  delete [] filesTcl;
-  delete [] result;
-  return 1;
+  this->DeleteStreamObject(lid);
+  this->SendStreamToServer();
+
+  // Parse the listing.
+  dirs->RemoveAllItems();
+  files->RemoveAllItems();
+  if(result.GetNumberOfMessages() == 2)
+    {
+    int i;
+    // The first message lists directories.
+    for(i=0; i < result.GetNumberOfArguments(0); ++i)
+      {
+      const char* d;
+      if(result.GetArgument(0, i, &d))
+        {
+        dirs->AddString(d);
+        }
+      else
+        {
+        vtkErrorMacro("Error getting directory name from listing.");
+        }
+      }
+
+    // The second message lists files.
+    for(i=0; i < result.GetNumberOfArguments(1); ++i)
+      {
+      const char* f;
+      if(result.GetArgument(1, i, &f))
+        {
+        files->AddString(f);
+        }
+      else
+        {
+        vtkErrorMacro("Error getting file name from listing.");
+        }
+      }
+    return 1;
+    }
+  else
+    {
+    return 0;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -468,53 +486,6 @@ vtkKWLoadSaveDialog* vtkPVProcessModule::NewLoadSaveDialog()
 {
   vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New();
   return dialog;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVProcessModule::InitializeTclMethodImplementations()
-{
-  if ( !this->Application )
-    {
-    return;
-    }
-  this->Application->Script(
-    "namespace eval ::paraview::vtkPVProcessModule {\n"
-    "  proc GetDirectoryListing { dir perm {exp {[A-Za-z0-9]*}} } {\n"
-    "    set files {}\n"
-    "    set dirs {}\n"
-    "    if {$dir == {<GET_DRIVE_LETTERS>}} {\n"
-    "      foreach drive [file volumes] {\n"
-    "        if {![catch {file stat $drive .}]} {\n"
-    "          lappend dirs $drive\n"
-    "        }\n"
-    "      }\n"
-    "      return [list $dirs $files]\n"
-    "    }\n"
-    "    if {$dir != {}} {\n"
-    "      set cwd [pwd]\n"
-    "      if {[catch {cd $dir}]} {\n"
-    "        return {<NO_SUCH_DIRECTORY>}\n"
-    "      }\n"
-    "    }\n"
-    "    set entries [glob -nocomplain $exp]\n"
-    "    foreach f [lsort -dictionary $entries] {\n"
-    "      if {[file isfile $f] && [file $perm $f]} {\n"
-    "        lappend files $f\n"
-    "      } elseif {[file isdirectory $f] && [file readable $f]} {\n"
-    "        lappend dirs $f\n"
-    "      }\n"
-    "    }\n"
-    "    if {$dir != {}} { cd $cwd }\n"
-    "    return [list $dirs $files]\n"
-    "  }\n"
-    "  proc ParseDirectoryListing { lst dirs files } {\n"
-    "    $dirs RemoveAllItems\n"
-    "    $files RemoveAllItems\n"
-    "    foreach f [lindex $lst 0] { $dirs AddString $f }\n"
-    "    foreach f [lindex $lst 1] { $files AddString $f }\n"
-    "  }\n"
-    "}\n"
-    );
 }
 
 //----------------------------------------------------------------------------

@@ -24,6 +24,7 @@ SET( ParaViewServer_SRCS
   vtkExtractCTHPart.cxx
   vtkMultiDisplayManager.cxx
   vtkPVServerArraySelection.cxx
+  vtkPVServerFileListing.cxx
   vtkPVServerObject.cxx
   vtkSelectInputs.cxx
   vtkXMLCollectionReader.cxx

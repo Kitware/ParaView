@@ -147,10 +147,8 @@ public:
   // Description:
   // Get a directory listing for the given directory.  Returns 1 for
   // success, and 0 for failure (when the directory does not exist).
-  int GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                          vtkStringList* files);
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                                  vtkStringList* files, const char* perm);
+                                  vtkStringList* files, int save);
   
   // Description:
   // Get a reference to a vtkDataObject from the server-side root node
@@ -233,7 +231,7 @@ protected:
   vtkClientServerInterpreter* ClientInterpreter;
   vtkClientServerStream* ClientServerStream;
   vtkClientServerID UniqueID;
-private:  
+private:
   vtkPVProcessModule(const vtkPVProcessModule&); // Not implemented
   void operator=(const vtkPVProcessModule&); // Not implemented
 };

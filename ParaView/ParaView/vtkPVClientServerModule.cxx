@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.11");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.12");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1111,41 +1111,17 @@ void vtkPVClientServerModule::PrintSelf(ostream& os, vtkIndent indent)
 int vtkPVClientServerModule::GetDirectoryListing(const char* dir,
                                                  vtkStringList* dirs,
                                                  vtkStringList* files,
-                                                 const char* perm)
+                                                 int save)
 {
   if(this->ClientMode)
     {
-    this->RootScript(
-      "::paraview::vtkPVProcessModule::GetDirectoryListing {%s} {%s}",
-      dir, perm);
-    char* result = vtkString::Duplicate(this->GetRootResult());
-    if(!result || strcmp(result, "<NO_SUCH_DIRECTORY>") == 0)
-      {
-      dirs->RemoveAllItems();
-      files->RemoveAllItems();
-      delete [] result;
-      return 0;
-      }
-    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), dirs,
-                               vtkStringListCommand);
-    char* dirsTcl = vtkString::Duplicate(
-      Tcl_GetStringResult(this->Application->GetMainInterp()));
-    vtkTclGetObjectFromPointer(this->Application->GetMainInterp(), files,
-                               vtkStringListCommand);
-    char* filesTcl = vtkString::Duplicate(
-      Tcl_GetStringResult(this->Application->GetMainInterp()));
-    this->Application->Script(
-      "::paraview::vtkPVProcessModule::ParseDirectoryListing {%s} {%s} {%s}",
-      result, dirsTcl, filesTcl
-      );
-    delete [] dirsTcl;
-    delete [] filesTcl;
-    delete [] result;
-    return 1;
+    return this->Superclass::GetDirectoryListing(dir, dirs, files, save);
     }
   else
     {
-    return this->Superclass::GetDirectoryListing(dir, dirs, files, perm);
+    dirs->RemoveAllItems();
+    files->RemoveAllItems();
+    return 0;
     }
 }
 

@@ -136,7 +136,7 @@ public:
   // Get a directory listing for the given directory.  This
   // implementation will always give a listing on the server side.
   virtual int GetDirectoryListing(const char* dir, vtkStringList* dirs,
-                                  vtkStringList* files, const char* perm);
+                                  vtkStringList* files, int save);
   
   // Description:
   // Get a file selection dialog instance.
