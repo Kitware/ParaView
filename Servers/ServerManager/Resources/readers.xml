@@ -767,11 +767,20 @@
         number_of_elements="1" />
 
      <IntVectorProperty 
+        name="FileRangeInfo"
+        command="GetFileRange"
+        information_only="1"/>
+
+     <IntVectorProperty 
         name="FileRange"
         command="SetFileRange"
         number_of_elements="2" 
         default_values="0 0">
-       <IntRangeDomain name="range"/>
+      <IntRangeDomain name="range">
+         <RequiredProperties>
+            <Property name="FileRangeInfo" function="Range"/>
+         </RequiredProperties>
+      </IntRangeDomain>
      </IntVectorProperty>
 
      <IntVectorProperty 
@@ -801,7 +810,7 @@
      <IntVectorProperty 
         name="DisplayType"
         command="SetDisplayType"
-        number_of_elements="1"
+        number_of_elements="1" 
         default_values="1"/>
 
      <StringVectorProperty

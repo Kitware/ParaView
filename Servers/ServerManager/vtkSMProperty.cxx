@@ -30,7 +30,7 @@
 #include "vtkSMPropertyInternals.h"
 
 vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.16");
+vtkCxxRevisionMacro(vtkSMProperty, "1.17");
 
 vtkCxxSetObjectMacro(vtkSMProperty, Proxy, vtkSMProxy);
 
@@ -160,7 +160,7 @@ void vtkSMProperty::UpdateDependentDomains()
   this->DomainIterator->Begin();
   while(!this->DomainIterator->IsAtEnd())
     {
-    this->DomainIterator->GetDomain()->Update(this);
+    this->DomainIterator->GetDomain()->Update(0);
     this->DomainIterator->Next();
     }
 
@@ -364,6 +364,8 @@ void vtkSMProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ImmediateUpdate:" << this->ImmediateUpdate << endl;
   os << indent << "UpdateSelf:" << this->UpdateSelf << endl;
   os << indent << "IsReadOnly:" << this->IsReadOnly << endl;
+  os << indent << "XMLName:" 
+     <<  (this->XMLName ? this->XMLName : "(null)") << endl;
 
   vtkSMSubPropertyIterator* iter = vtkSMSubPropertyIterator::New();
   iter->SetProperty(this);

@@ -139,7 +139,8 @@ protected:
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
 
   // Description:
-  virtual void UpdateInformation(vtkClientServerID objectId);
+  // Fills the values of the vector using Command.
+  virtual void UpdateInformation(int serverids, vtkClientServerID objectId);
 //ETX
 
   vtkSMDoubleVectorPropertyInternals* Internals;

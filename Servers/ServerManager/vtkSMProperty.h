@@ -130,6 +130,11 @@ public:
   static int GetModifiedAtCreation();
   static void SetModifiedAtCreation(int check);
 
+  // Description:
+  // The name assigned by the xml parser. Used to get the property
+  // from a proxy.
+  vtkGetStringMacro(XMLName);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -150,7 +155,11 @@ protected:
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
 
   // Description:
-  virtual void UpdateInformation(vtkClientServerID) {};
+  // If this is an information property (InformationOnly is true),
+  // this method fills the vector with the values obtained from
+  // the server using the Command (using the provided server id
+  // -only root node- and object id).
+  virtual void UpdateInformation(int, vtkClientServerID) {};
   //ETX
 
   // Description:
@@ -174,7 +183,6 @@ protected:
   // The name assigned by the xml parser. Used to get the property
   // from a proxy.
   vtkSetStringMacro(XMLName);
-  vtkGetStringMacro(XMLName);
 
   // Description:
   // Add a sub-property with the given name.

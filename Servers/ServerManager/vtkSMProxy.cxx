@@ -30,7 +30,7 @@
 #include <vtkstd/algorithm>
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.19");
+vtkCxxRevisionMacro(vtkSMProxy, "1.20");
 
 vtkCxxSetObjectMacro(vtkSMProxy, XMLElement, vtkPVXMLElement);
 
@@ -504,6 +504,7 @@ void vtkSMProxy::UpdateInformation()
   if (numObjects > 0)
     {
     vtkSMProxyInternals::PropertyInfoMap::iterator it;
+    // Update all properties.
     for (it  = this->Internals->Properties.begin();
          it != this->Internals->Properties.end();
          ++it)
@@ -511,7 +512,20 @@ void vtkSMProxy::UpdateInformation()
       vtkSMProperty* prop = it->second.Property.GetPointer();
       if (prop->GetInformationOnly())
         {
-        prop->UpdateInformation(this->Internals->IDs[0]);
+        prop->UpdateInformation(this->Servers, this->Internals->IDs[0]);
+        }
+      }
+
+    // Make sure all dependent domains are updated. UpdateInformation()
+    // might have produced new information that invalidates the domains.
+    for (it  = this->Internals->Properties.begin();
+         it != this->Internals->Properties.end();
+         ++it)
+      {
+      vtkSMProperty* prop = it->second.Property.GetPointer();
+      if (prop->GetInformationOnly())
+        {
+        prop->UpdateDependentDomains();
         }
       }
     }

@@ -145,7 +145,7 @@ protected:
     vtkSMProxy*, vtkClientServerStream* stream, vtkClientServerID objectId );
 
   // Description:
-  virtual void UpdateInformation(vtkClientServerID objectId);
+  virtual void UpdateInformation(int serverIds, vtkClientServerID objectId);
   //ETX
 
 private:
