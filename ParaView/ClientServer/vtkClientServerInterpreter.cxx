@@ -41,7 +41,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include <numeric>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.1");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.2");
 
 template class vtkHashMap<unsigned long, vtkClientServerMessage *>;
 template class vtkHashMap<const char *, vtkClientServerCommandFunction>;
@@ -91,6 +91,8 @@ vtkClientServerInterpreter::~vtkClientServerInterpreter()
 
   delete[] this->MessageBuffer;
 
+  this->ServerProgressTimer->Delete();
+  this->ClientProgressTimer->Delete();
 }
 
 int vtkClientServerInterpreter::AssignResultToID(vtkClientServerMessage *msg)
