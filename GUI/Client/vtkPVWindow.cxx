@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.582");
+vtkCxxRevisionMacro(vtkPVWindow, "1.583");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1784,7 +1784,6 @@ void vtkPVWindow::OpenCallback()
   str << "{{ParaView Files} {" << this->FileExtensions << "}} "
       << this->FileDescriptions << " {{All Files} {*}}" << ends;
 
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
   this->RetrieveLastPath(loadDialog, "OpenPath");
   loadDialog->Create(this->GetApplication(),0);
