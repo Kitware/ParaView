@@ -147,11 +147,8 @@ public:
   void SetBlockPointExtent(int blockId, int level, 
                            int eo, int e1, int e2, 
                            int e3, int e4, int e5);
-  int* GetBlockPointDimensions(int blockId);
   void GetBlockPointDimensions(int blockId, int dims[3]);
-  int* GetBlockCellDimensions(int blockId);
   void GetBlockCellDimensions(int blockId, int dims[3]);
-  int* GetBlockPointExtent(int blockId);
   void GetBlockPointExtent(int blockId, int ext[6]);
   int* GetBlockCellExtent(int blockId);
   void GetBlockCellExtent(int blockId, int ext[6]);
@@ -206,10 +203,6 @@ protected:
   vtkFloatArray* BlockOrigins;
   vtkFloatArray* BlockSpacings;
   vtkIntArray* BlockLevels;
-
-  // A temporary array used to return dimensions.
-  int TemporaryDimensions[3];
-  int TemporaryExtent[6];
 
   // Hidden methods
   void SetUpdateExtent(int, int ,int, int, int, int) {}
