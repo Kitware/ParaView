@@ -434,7 +434,7 @@ void vtkPVApplication::SendMapperColorRange(vtkPolyDataMapper *mapper)
 {
   float range[2];
   
-  if (this->Controller->GetLocalProcessId == 0)
+  if (this->Controller->GetLocalProcessId() == 0)
     {
     return;
     }
@@ -447,7 +447,7 @@ void vtkPVApplication::SendDataArrayRange(vtkDataSet *data, char *arrayName)
 {
   float range[2];
   
-  if (this->Controller->GetLocalProcessId == 0)
+  if (this->Controller->GetLocalProcessId() == 0)
     {
     return;
     }
