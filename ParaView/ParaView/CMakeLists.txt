@@ -101,6 +101,7 @@ SET( ParaView_SRCS
   vtkPVNavigationWindow.cxx
   vtkPVNumberOfOutputsInformation.cxx
   vtkPVObjectWidget.cxx
+  vtkPVOrientScaleWidget.cxx
   vtkPVPart.cxx
   vtkPVPartDisplay.cxx
   vtkPVPLOT3DReaderModule.cxx

@@ -50,29 +50,23 @@ $kw(vtkTemp294) SetColorRange 0.300000 0.433010
 set kw(vtkTemp97) [$kw(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set kw(vtkTemp320) [$kw(vtkTemp300) GetPVWidget {Glyph}]
 $kw(vtkTemp320) SetCurrentValue $kw(vtkTemp97)
-set kw(vtkTemp309) [$kw(vtkTemp300) GetPVWidget {Orient}]
-$kw(vtkTemp309) SetCurrentValue 0
-set kw(vtkTemp310) [$kw(vtkTemp300) GetPVWidget {Scale Factor}]
-#Off
-$kw(vtkTemp310) SetValue "1"
+set kw(vtkTemp309) [$kw(vtkTemp300) GetPVWidget {OrientScale}]
+$kw(vtkTemp309) SetOrientMode Vector
+$kw(vtkTemp309) SetScaleFactor 1
 $kw(vtkTemp300) AcceptCallback
 
 
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp260)
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp300)
-set kw(vtkTemp308) [$kw(vtkTemp300) GetPVWidget {Scale Mode}]
-#Vector Magnitude
-$kw(vtkTemp308) SetCurrentValue 1
+set kw(vtkTemp308) [$kw(vtkTemp300) GetPVWidget {OrientScale}]
+$kw(vtkTemp308) SetScaleMode "Vector Magnitude"
 $kw(vtkTemp300) AcceptCallback
-#Vector Components
-$kw(vtkTemp308) SetCurrentValue 2
+$kw(vtkTemp308) SetScaleMode "Vector Components"
 $kw(vtkTemp300) AcceptCallback
-#Data Scaling Off
-$kw(vtkTemp308) SetCurrentValue 3
+$kw(vtkTemp308) SetScaleMode "Data Scaling Off"
 $kw(vtkTemp300) AcceptCallback
-#Scalar
-$kw(vtkTemp308) SetCurrentValue 0
-$kw(vtkTemp310) SetValue "1"
+$kw(vtkTemp308) SetScaleMode "Scalar"
+$kw(vtkTemp308) SetScaleFactor 1
 $kw(vtkTemp300) AcceptCallback
 
 set kw(vtkTemp339) [$kw(vtkTemp300) GetPVOutput]

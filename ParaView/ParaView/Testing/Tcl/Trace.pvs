@@ -49,12 +49,10 @@ set pv(vtkTemp239) [$pv(vtkTemp230) GetPVWidget {Glyph}]
 $pv(vtkTemp239) SetCurrentValue $pv(vtkTemp89)
 $pv(vtkTemp230) AcceptCallback
 $pv(vtkTemp239) SetCurrentValue $pv(vtkTemp93)
-set pv(vtkTemp251) [$pv(vtkTemp230) GetPVWidget {Scale Factor}]
-$pv(vtkTemp251) SetValue 2
+set pv(vtkTemp251) [$pv(vtkTemp230) GetPVWidget {OrientScale}]
+$pv(vtkTemp251) SetScaleFactor 2
 $pv(vtkTemp230) AcceptCallback
-set pv(vtkTemp245) [$pv(vtkTemp230) GetPVWidget {Orient}]
-#Off
-$pv(vtkTemp245) SetCurrentValue 0
+$pv(vtkTemp251) SetOrientMode "Off"
 $pv(vtkTemp230) AcceptCallback
 set pv(vtkTemp265) [$pv(vtkTemp1) CreatePVSource DataSetSurfaceFilter]
 set pv(vtkTemp274) [$pv(vtkTemp265) GetPVWidget {Input}]

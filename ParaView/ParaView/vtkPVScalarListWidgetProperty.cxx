@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.2");
+vtkCxxRevisionMacro(vtkPVScalarListWidgetProperty, "1.3");
 
 vtkPVScalarListWidgetProperty::vtkPVScalarListWidgetProperty()
 {
@@ -155,6 +155,16 @@ void vtkPVScalarListWidgetProperty::AddScalar(float scalar)
   delete [] scalars;
   this->Scalars[i] = scalar;
   this->NumberOfScalars++;
+}
+
+void vtkPVScalarListWidgetProperty::SetScalar(int idx, float scalar)
+{
+  if (idx >= this->NumberOfScalars)
+    {
+    return;
+    }
+  
+  this->Scalars[idx] = scalar;
 }
 
 float vtkPVScalarListWidgetProperty::GetScalar(int idx)

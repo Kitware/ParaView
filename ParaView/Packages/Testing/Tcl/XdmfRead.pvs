@@ -46,14 +46,11 @@ set kw(vtkTemp1094) [$kw(vtkTemp2) CreatePVSource Glyph]
 set kw(vtkTemp1120) [$kw(vtkTemp1094) GetPVWidget {Glyph}]
 set kw(vtkTemp178) [$kw(vtkTemp2) GetPVSource GlyphSources Arrow0]
 $kw(vtkTemp1120) SetCurrentValue $kw(vtkTemp178)
-set kw(vtkTemp1107) [$kw(vtkTemp1094) GetPVWidget {Orient}]
-$kw(vtkTemp1107) SetCurrentValue {Vector}
-set kw(vtkTemp1108) [$kw(vtkTemp1107) GetPVWidget {Vector}]
-$kw(vtkTemp1108) SetValue {}
-set kw(vtkTemp1114) [$kw(vtkTemp1094) GetPVWidget {Scale Mode}]
-$kw(vtkTemp1114) SetCurrentValue {Scalar}
-set kw(vtkTemp1115) [$kw(vtkTemp1114) GetPVWidget {Scalar}]
-$kw(vtkTemp1115) SetValue {DataTwo}
+set kw(vtkTemp1107) [$kw(vtkTemp1094) GetPVWidget {OrientScale}]
+$kw(vtkTemp1107) SetOrientMode {Vector}
+$kw(vtkTemp1107) SetVectors {}
+$kw(vtkTemp1107) SetScaleMode {Scalar}
+$kw(vtkTemp1107) SetScalars {DataTwo}
 $kw(vtkTemp1094) AcceptCallback
 $kw(vtkTemp1094) DeleteCallback
 $kw(vtkTemp2) SetCurrentPVSourceCallback $kw(vtkTemp932)

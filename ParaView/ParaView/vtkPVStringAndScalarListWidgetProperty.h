@@ -84,8 +84,9 @@ public:
   void AddString(char *string);
   
   // Description:
-  // Return the string indicated by idx from the list of strings to pass
+  // Set/get the string indicated by idx from the list of strings to pass
   // to VTK.
+  void SetString(int idx, char *string);
   const char* GetString(int idx);
   
   // Description:

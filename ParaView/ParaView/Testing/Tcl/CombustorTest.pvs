@@ -86,11 +86,9 @@ set pvGlyph [$pvWindow CreatePVSource Glyph]
 $pvGlyph AcceptCallback
 
 [$pvGlyph GetPVOutput] ColorByProperty
-set GlyphScaleEntry [$pvGlyph GetPVWidget {Scale Factor}]
-$GlyphScaleEntry SetValue 3.0
-set GlyphScaleMode [$pvGlyph GetPVWidget {Scale Mode}]
-#Scalar
-$GlyphScaleMode SetCurrentValue 0
+set GlyphOrientScale [$pvGlyph GetPVWidget {OrientScale}]
+$GlyphOrientScale SetScaleFactor 3.0
+$GlyphOrientScale SetScaleMode Scalar
 $pvGlyph AcceptCallback
 [$pvGlyph GetPVOutput] SetVisibility 0
 

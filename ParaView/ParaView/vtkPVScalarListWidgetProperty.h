@@ -82,12 +82,14 @@ public:
   float* GetScalars() { return this->Scalars; }
   
   // Description:
-  // Return the scalar value indicated by idx from the list of scalar values
+  // Set/get the scalar value indicated by idx from the list of scalar values
   // to pass to VTK.
+  void SetScalar(int idx, float scalar);
   float GetScalar(int idx);
 
   // Description:
-  // Get the total number of scalars being sent to the specified VTK object.
+  // Set the total number of scalars being sent to the specified VTK
+  // object.
   vtkGetMacro(NumberOfScalars, int);
 
   // Description:

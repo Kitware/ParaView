@@ -834,12 +834,9 @@ proc extract_init {} {
 
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp598)
     set extract(vtkTemp780) [$extract(vtkTemp1) CreatePVSource Glyph]
-    set extract(vtkTemp795) [$extract(vtkTemp780) GetPVWidget {Orient}]
-    set extract(vtkTemp794) [$extract(vtkTemp780) GetPVWidget {Vectors}]
-    $extract(vtkTemp794) SetValue {Momentum}
-    set extract(vtkTemp799) [$extract(vtkTemp780) GetPVWidget {Scale Mode}]
-    #Data Scaling Off
-    $extract(vtkTemp799) SetCurrentValue 3
+    set extract(vtkTemp794) [$extract(vtkTemp780) GetPVWidget {OrientScale}]
+    $extract(vtkTemp794) SetVectors {Momentum}
+    $extract(vtkTemp794) SetScaleMode "Data Scaling Off"
     set extract(vtkTemp143) [$extract(vtkTemp1) GetPVSource GlyphSources Arrow0]
     set extract(vtkTemp804) [$extract(vtkTemp780) GetPVWidget {Glyph}]
     $extract(vtkTemp804) SetCurrentValue $extract(vtkTemp143)

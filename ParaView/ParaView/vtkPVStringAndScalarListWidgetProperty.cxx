@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkStringList.h"
 
 vtkStandardNewMacro(vtkPVStringAndScalarListWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.2");
+vtkCxxRevisionMacro(vtkPVStringAndScalarListWidgetProperty, "1.3");
 
 vtkPVStringAndScalarListWidgetProperty::vtkPVStringAndScalarListWidgetProperty()
 {
@@ -129,6 +129,11 @@ void vtkPVStringAndScalarListWidgetProperty::SetStrings(int num,
 void vtkPVStringAndScalarListWidgetProperty::AddString(char *string)
 {
   this->Strings->AddString(string);
+}
+
+void vtkPVStringAndScalarListWidgetProperty::SetString(int idx, char *string)
+{
+  this->Strings->SetString(idx, string);
 }
 
 const char* vtkPVStringAndScalarListWidgetProperty::GetString(int idx)
