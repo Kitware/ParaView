@@ -711,39 +711,25 @@ void vtkKWView::Print()
       ((float)cxDIB*(float)cyPage/(float)cyInch))
     {
     rcDest.top = cyPage;
-    rcDest.right = ((float)(cyPage*cxInch*cxDIB)) /
-      ((float)(cyInch*cyDIB));
+    rcDest.right = (static_cast<float>(cyPage)*cxInch*cxDIB) /
+      (static_cast<float>(cyInch)*cyDIB);
     }
   else
     {
     rcDest.right = cxPage;
-    rcDest.top = ((float)(cxPage*cyInch*cyDIB)) /
-      ((float)(cxInch*cxDIB));
+    rcDest.top = (static_cast<float>(cxPage)*cyInch*cyDIB) /
+      (static_cast<float>(cxInch)*cxDIB);
     } 
   
   int DPI = vtkWin->GetDPI();
   
-  // check to see if we want a scale of one
-  if (this->RequireUnityScale())
-    {
-    this->SetupMemoryRendering(size[0],size[1], ghdc);
-    this->Render();
-    SetStretchBltMode(ghdc,HALFTONE);
-    StretchBlt(ghdc,0,0,
-	       rcDest.right, rcDest.top, (HDC)this->GetMemoryDC(),
-	       0, 0, size[0], size[1], SRCCOPY);
-    }
-  else
-    {
-    this->SetupMemoryRendering(rcDest.right/scale,
-			       rcDest.top/scale, ghdc);
-    this->Render();
-    SetStretchBltMode(ghdc,HALFTONE);
-    StretchBlt(ghdc,0,0,
-	       rcDest.right, rcDest.top, (HDC)this->GetMemoryDC(),
-	       0, 0, rcDest.right/scale, rcDest.top/scale, SRCCOPY);
-    }
-
+  this->SetupMemoryRendering(rcDest.right/scale,
+                             rcDest.top/scale, ghdc);
+  this->Render();
+  SetStretchBltMode(ghdc,HALFTONE);
+  StretchBlt(ghdc,0,0,
+             rcDest.right, rcDest.top, (HDC)this->GetMemoryDC(),
+             0, 0, rcDest.right/scale, rcDest.top/scale, SRCCOPY);
   
   this->ResumeScreenRendering();
   EndPage   (ghdc);
@@ -756,6 +742,19 @@ void vtkKWView::Print()
 #else
 
   vtkWindowToImageFilter *w2i = vtkWindowToImageFilter::New();
+  int DPI;
+  if (this->GetParentWindow())
+    {
+    DPI = this->GetParentWindow()->GetPrintTargetDPI();
+    }
+  if (DPI >= 150)
+    {
+    w2i->SetMagnification(2);
+    }
+  if (DPI >= 300)
+    {
+    w2i->SetMagnification(3);
+    }
   w2i->SetInput(vtkWin);
   w2i->Update();
   
@@ -1244,7 +1243,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.44 $");
+  this->ExtractRevision(os,"$Revision: 1.45 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

@@ -202,10 +202,6 @@ public:
   void UnRegister(vtkObject *o);
 
   // Description::
-  // Indicate when printing if a higher resolution output can be used.
-  virtual int RequireUnityScale() {return 0;};
-
-  // Description::
   // Set the title of this view.
   virtual void SetTitle(const char *);
 
