@@ -39,6 +39,7 @@ SET( ParaView_SRCS
   vtkPVCalculatorWidget.cxx
   vtkPVCameraIcon.cxx
   vtkPVCameraManipulator.cxx
+  vtkPVClassNameInformation.cxx
   vtkPVClientServerModule.cxx
   vtkPVClipDataSet.cxx
   vtkPVColorMap.cxx
@@ -118,6 +119,7 @@ SET( ParaView_SRCS
   vtkPVMultiDisplayRenderModule.cxx
   vtkPVMultiDisplayRenderModuleUI.cxx
   vtkPVNavigationWindow.cxx
+  vtkPVNumberOfOutputsInformation.cxx
   vtkPVObjectWidget.cxx
   vtkPVPart.cxx
   vtkPVPartDisplay.cxx

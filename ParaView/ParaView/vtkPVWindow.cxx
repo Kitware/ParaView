@@ -79,6 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
+#include "vtkPVClassNameInformation.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
 #include "vtkPVData.h"
@@ -141,7 +142,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.5");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.6");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2113,11 +2114,13 @@ void vtkPVWindow::WriteData()
     }
   
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->RootScript("%s GetClassName",
-                 this->GetCurrentPVSource()->GetPart()->GetVTKDataTclName());
+  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
+  pm->GatherInformation(part->GetClassNameInformation(),
+                        part->GetVTKDataTclName());
   // Instantiator does not work for static builds and VTK objects.
   vtkDataSet* data;
-  const char* dataClassName = pm->GetRootResult();
+  const char* dataClassName =
+    part->GetClassNameInformation()->GetVTKClassName();
   if (strcmp(dataClassName, "vtkImageData") == 0)
     {
     data = vtkImageData::New();
@@ -2284,11 +2287,13 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel,
   vtkPVWriter* writer = 0;
   
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
-  pm->RootScript("%s GetClassName",
-                 this->GetCurrentPVSource()->GetPart()->GetVTKDataTclName());
-
+  vtkPVPart *part = this->GetCurrentPVSource()->GetPart();
+  pm->GatherInformation(part->GetClassNameInformation(),
+                        part->GetVTKDataTclName());
+  
   vtkDataSet* data;
-  const char* dataClassName = pm->GetRootResult();
+  const char* dataClassName =
+    part->GetClassNameInformation()->GetVTKClassName();
   if (strcmp(dataClassName, "vtkImageData") == 0)
     {
     data = vtkImageData::New();

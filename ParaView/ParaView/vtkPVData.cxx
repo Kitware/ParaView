@@ -78,6 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVColorMap.h"
 #include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVSource.h"
 #include "vtkPVWindow.h"
@@ -103,7 +104,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.2");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.3");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2227,9 +2228,11 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           vtkErrorMacro("We ran out of sources.");
           return;
           }
-        pm->RootScript("%s GetNumberOfOutputs",
-                       this->GetPVSource()->GetVTKSourceTclName(sourceCount));
-        numOutputs = atoi(pm->GetRootResult());
+        vtkPVSource *source = this->GetPVSource();
+        pm->GatherInformation(source->GetNumberOfOutputsInformation(),
+                              (char*)(source->GetVTKSourceTclName(sourceCount)));
+        numOutputs =
+          source->GetNumberOfOutputsInformation()->GetNumberOfOutputs();
         outputCount = 0;
         }
 

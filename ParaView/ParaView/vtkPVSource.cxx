@@ -65,6 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkPVInputProperty.h"
+#include "vtkPVNumberOfOutputsInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
@@ -81,7 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.4");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.5");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -97,6 +98,8 @@ vtkPVSource::vtkPVSource()
   this->DataInformation = vtkPVDataInformation::New();
   this->DataInformationValid = 0;
 
+  this->NumberOfOutputsInformation = vtkPVNumberOfOutputsInformation::New();
+  
   // Number of instances cloned from this prototype
   this->PrototypeInstanceCount = 0;
 
@@ -189,6 +192,9 @@ vtkPVSource::~vtkPVSource()
   this->DataInformation->Delete();
   this->DataInformation = NULL;
 
+  this->NumberOfOutputsInformation->Delete();
+  this->NumberOfOutputsInformation = NULL;
+  
   if (this->PVConsumers)
     {
     delete [] this->PVConsumers;
@@ -2006,9 +2012,9 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
       for (sourceCount = 0; sourceCount < numSources; ++sourceCount)
         {
         // Loop through all of the outputs of this vtk source (multiple outputs).
-        pm->RootScript("%s GetNumberOfOutputs",
-                       pvs->GetVTKSourceTclName(sourceCount));
-        numOutputs = atoi(pm->GetRootResult());
+        pm->GatherInformation(this->NumberOfOutputsInformation,
+                              (char*)(pvs->GetVTKSourceTclName(sourceCount)));
+        numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
         for (outputCount = 0; outputCount < numOutputs; ++outputCount)
           {
           *file << "\t";
@@ -2047,9 +2053,9 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         return;
         }
       outputCount = 0;
-      pm->RootScript("%s GetNumberOfOutputs",
-                     pvs->GetVTKSourceTclName(sourceCount));
-      numOutputs = atoi(pm->GetRootResult());
+      pm->GatherInformation(this->NumberOfOutputsInformation,
+                            (char*)(pvs->GetVTKSourceTclName(sourceCount)));
+      numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
       }
 
     vtkPVInputProperty* ip = this->GetInputProperty(idx);
@@ -2429,8 +2435,9 @@ int vtkPVSource::InitializeData()
   for (sourceIdx = 0; sourceIdx < numSources; ++sourceIdx)
     {
     sourceTclName = this->GetVTKSourceTclName(sourceIdx);
-    pm->RootScript("%s GetNumberOfOutputs", sourceTclName);
-    numOutputs = atoi(pm->GetRootResult());
+    pm->GatherInformation(this->NumberOfOutputsInformation,
+                          (char*)(sourceTclName));
+    numOutputs = this->NumberOfOutputsInformation->GetNumberOfOutputs();
 
     for (idx = 0; idx < numOutputs; ++idx)
       {
@@ -2529,4 +2536,6 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
     {
     this->GetInputProperty(idx)->PrintSelf(os, i2);
     }
+  os << indent << "NumberOfOutputsInformation: "
+     << this->NumberOfOutputsInformation << endl;
 }

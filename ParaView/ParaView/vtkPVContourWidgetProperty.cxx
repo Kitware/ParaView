@@ -43,13 +43,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVClassNameInformation.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVScalarRangeLabel.h"
 #include "vtkPVSource.h"
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVContourWidgetProperty);
-vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.1.2.4");
 
 void vtkPVContourWidgetProperty::SetAnimationTime(float time)
 {
@@ -89,9 +90,10 @@ void vtkPVContourWidgetProperty::AcceptInternal()
   vtkPVProcessModule *pm =
     this->Widget->GetPVApplication()->GetProcessModule();
   
-  pm->RootScript("%s IsA vtkContourFilter", this->VTKSourceTclName);
-  int res = atoi(pm->GetRootResult());
-  if (res)
+  vtkPVClassNameInformation *cni = vtkPVClassNameInformation::New();
+  pm->GatherInformation(cni, this->VTKSourceTclName);
+  if (!strcmp(cni->GetVTKClassName(), "vtkPVContourFilter") ||
+      !strcmp(cni->GetVTKClassName(), "vtkPVKitwareContourFilter"))
     {
     this->Widget->SetUseWidgetRange(1);
     vtkPVScalarRangeLabel *label = vtkPVScalarRangeLabel::SafeDownCast(
@@ -105,6 +107,7 @@ void vtkPVContourWidgetProperty::AcceptInternal()
       this->Widget->SetWidgetRange(range);
       }
     }
+  cni->Delete();
 }
 
 void vtkPVContourWidgetProperty::PrintSelf(ostream &os, vtkIndent indent)

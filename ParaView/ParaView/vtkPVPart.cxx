@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVDataInformation.h"
+#include "vtkPVClassNameInformation.h"
 #include "vtkPVConfig.h"
 #include "vtkPVRenderView.h"
 #include "vtkKWCheckButton.h"
@@ -66,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.1");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -94,6 +95,8 @@ vtkPVPart::vtkPVPart()
   // Create a unique id for creating tcl names.
   ++instanceCount;
   this->InstanceCount = instanceCount;
+  
+  this->ClassNameInformation = vtkPVClassNameInformation::New();
 }
 
 //----------------------------------------------------------------------------
@@ -127,6 +130,9 @@ vtkPVPart::~vtkPVPart()
       }
     this->SetGeometryTclName(NULL);
     }
+  
+  this->ClassNameInformation->Delete();
+  this->ClassNameInformation = NULL;
 }
 
 
@@ -314,8 +320,9 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
   // The vtkData object will be moved to the output of the piece filter.
-  if((pm->RootScript("%s IsA vtkPolyData", this->VTKDataTclName),
-      atoi(pm->GetRootResult())))
+  pm->GatherInformation(this->ClassNameInformation, this->VTKDataTclName);
+  char *className = this->ClassNameInformation->GetVTKClassName();
+  if (!strcmp(className, "vtkPolyData"))
     {
     pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
     pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
@@ -339,8 +346,7 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
         "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitPData}}");
       }
     }
-  else if((pm->RootScript("%s IsA vtkUnstructuredGrid", this->VTKDataTclName),
-           atoi(pm->GetRootResult())))
+  else if (!strcmp(className, "vtkUnstructuredGrid"))
     {
     pm->ServerScript("%s UpdateInformation", this->VTKDataTclName);
     pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
@@ -364,30 +370,27 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
         "pvTemp AddObserver EndEvent {$Application LogEndEvent {Execute TransmitUGrid}}");
       }
     }
-    else if((pm->RootScript("%s IsA vtkImageData", this->VTKDataTclName),
-             atoi(pm->GetRootResult())))
+  else if (!strcmp(className, "vtkImageData"))
+    {
+    if (getenv("PV_LOCK_SAFE") == NULL)
       {
-      if (getenv("PV_LOCK_SAFE") == NULL)
-        {
-        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
-        }
+      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
       }
-    else if((pm->RootScript("%s IsA vtkStructuredGrid", this->VTKDataTclName),
-             atoi(pm->GetRootResult())))
+    }
+  else if (!strcmp(className, "vtkStructuredGrid"))
+    {
+    if (getenv("PV_LOCK_SAFE") == NULL)
       {
-      if (getenv("PV_LOCK_SAFE") == NULL)
-        {
-        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
-        }
+      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
       }
-    else if((pm->RootScript("%s IsA vtkRectilinearGrid", this->VTKDataTclName),
-             atoi(pm->GetRootResult())))
+    }
+  else if (!strcmp(className, "vtkRectilinearGrid"))
+    {
+    if (getenv("PV_LOCK_SAFE") == NULL)
       {
-      if (getenv("PV_LOCK_SAFE") == NULL)
-        {
-        pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
-        }
+      pm->ServerSimpleScript("vtkStructuredCacheFilter pvTemp");
       }
+    }
   else
     {
     return;
@@ -434,7 +437,7 @@ void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Name: " << (this->Name?this->Name:"none") << endl;
   os << indent << "GeometryTclName: " << (this->GeometryTclName?this->GeometryTclName:"none") << endl;
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
-
+  os << indent << "ClassNameInformation: " << this->ClassNameInformation << endl;
 }
 
 

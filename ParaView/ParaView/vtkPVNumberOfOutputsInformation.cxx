@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInformation.cxx
+  Module:    vtkPVNumberOfOutputsInformation.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,54 +39,49 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVInformation.h"
+#include "vtkPVNumberOfOutputsInformation.h"
+
 #include "vtkObjectFactory.h"
+#include "vtkSource.h"
 
+vtkStandardNewMacro(vtkPVNumberOfOutputsInformation);
+vtkCxxRevisionMacro(vtkPVNumberOfOutputsInformation, "1.1.2.1");
 
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVInformation);
-vtkCxxRevisionMacro(vtkPVInformation, "1.2.4.1");
-
-//----------------------------------------------------------------------------
-vtkPVInformation::vtkPVInformation()
+vtkPVNumberOfOutputsInformation::vtkPVNumberOfOutputsInformation()
 {
-  this->RootOnly = 0;
+  this->NumberOfOutputs = 0;
+  this->RootOnly = 1;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::CopyFromObject(vtkObject*)
+vtkPVNumberOfOutputsInformation::~vtkPVNumberOfOutputsInformation()
 {
-  vtkErrorMacro("CopyFromObject not implemented.");
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::CopyFromMessage(unsigned char*)
+void vtkPVNumberOfOutputsInformation::CopyFromObject(vtkObject *data)
 {
-  vtkErrorMacro("CopyFromMessage not implemented.");
+  vtkSource *src = vtkSource::SafeDownCast(data);
+  if (!src)
+    {
+    vtkErrorMacro("Could not downcast vtkSource.");
+    return;
+    }
+  
+  this->NumberOfOutputs = src->GetNumberOfOutputs();
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::AddInformation(vtkPVInformation* vtkNotUsed(info))
+void vtkPVNumberOfOutputsInformation::CopyFromMessage(unsigned char *msg)
 {
-  vtkErrorMacro("AddInformation not implemented.");
+  memcpy((unsigned char*)&this->NumberOfOutputs, msg, sizeof(int));
 }
 
-//----------------------------------------------------------------------------
-int vtkPVInformation::GetMessageLength()
+void vtkPVNumberOfOutputsInformation::WriteMessage(unsigned char *msg)
 {
-  vtkErrorMacro("GetMessageLength not implemented.");
-  return 0;
+  memcpy(msg, (unsigned char*)&this->NumberOfOutputs, sizeof(int));
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::WriteMessage(unsigned char*)
+void vtkPVNumberOfOutputsInformation::PrintSelf(ostream &os, vtkIndent indent)
 {
-  vtkErrorMacro("WriteMessage not implemented.");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInformation::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "RootOnly: " << this->RootOnly;
+  this->Superclass::PrintSelf(os, indent);
+  
+  os << indent << "NumberOfOutputs: " << this->NumberOfOutputs << endl;
 }

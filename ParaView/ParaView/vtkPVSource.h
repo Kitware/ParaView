@@ -77,6 +77,7 @@ class vtkStringList;
 class vtkCollection;
 class vtkPVPart;
 class vtkPVDataInformation;
+class vtkPVNumberOfOutputsInformation;
 
 class VTK_EXPORT vtkPVSource : public vtkKWObject
 {
@@ -453,6 +454,11 @@ public:
   // interface will use this method to stop updates too (flag)?
   void MarkSourcesForUpdate(int flag);
 
+  // Description:
+  // Access to the vtkPVNumberOfOutputsInformation object.
+  vtkGetObjectMacro(NumberOfOutputsInformation,
+                    vtkPVNumberOfOutputsInformation);
+  
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -465,6 +471,8 @@ protected:
   vtkPVDataInformation *DataInformation;
   int DataInformationValid;
 
+  vtkPVNumberOfOutputsInformation *NumberOfOutputsInformation;
+  
   // Description:
   // Create a menu to select the input.
   virtual vtkPVInputMenu *AddInputMenu(char* label, char* inputName, 

@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.1");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.2");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -317,9 +317,18 @@ void vtkPVProcessModule::GatherInformation(vtkPVInformation* info,
   // method.
   this->TemporaryInformation = info;
   // Some objects are not created on the client (data.
-  this->ServerScript(
-    "[$Application GetProcessModule] GatherInformationInternal %s %s",
-    info->GetClassName(), objectTclName); 
+  if (!info->GetRootOnly())
+    {
+    this->ServerScript(
+      "[$Application GetProcessModule] GatherInformationInternal %s %s",
+      info->GetClassName(), objectTclName); 
+    }
+  else
+    {
+    this->RootScript(
+      "[$Application GetProcessModule] GatherInformationInternal %s %s",
+      info->GetClassName(), objectTclName); 
+    }
   this->TemporaryInformation = NULL; 
 }
 

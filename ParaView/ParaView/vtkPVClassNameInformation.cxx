@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInformation.cxx
+  Module:    vtkPVClassNameInformation.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,54 +39,82 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
-#include "vtkPVInformation.h"
+#include "vtkPVClassNameInformation.h"
+
 #include "vtkObjectFactory.h"
 
+vtkStandardNewMacro(vtkPVClassNameInformation);
+vtkCxxRevisionMacro(vtkPVClassNameInformation, "1.1.2.1");
 
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVInformation);
-vtkCxxRevisionMacro(vtkPVInformation, "1.2.4.1");
-
-//----------------------------------------------------------------------------
-vtkPVInformation::vtkPVInformation()
+vtkPVClassNameInformation::vtkPVClassNameInformation()
 {
-  this->RootOnly = 0;
+  this->VTKClassName = NULL;
+  this->RootOnly = 1;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::CopyFromObject(vtkObject*)
+vtkPVClassNameInformation::~vtkPVClassNameInformation()
 {
-  vtkErrorMacro("CopyFromObject not implemented.");
+  if (this->VTKClassName)
+    {
+    this->SetVTKClassName(NULL);
+    }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::CopyFromMessage(unsigned char*)
+void vtkPVClassNameInformation::CopyFromObject(vtkObject *data)
 {
-  vtkErrorMacro("CopyFromMessage not implemented.");
+  if (!data)
+    {
+    vtkErrorMacro("Cannot get class name from NULL object.");
+    return;
+    }
+  
+  this->SetVTKClassName(data->GetClassName());
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::AddInformation(vtkPVInformation* vtkNotUsed(info))
+void vtkPVClassNameInformation::CopyFromMessage(unsigned char *msg)
 {
-  vtkErrorMacro("AddInformation not implemented.");
+  if (!msg)
+    {
+    return;
+    }
+  
+  this->SetVTKClassName(NULL);
+
+  int len = *msg;
+  msg++;
+  
+  this->VTKClassName = new char[len + 1];
+  strncpy(this->VTKClassName, (char*)(msg), len);
+  this->VTKClassName[len] = '\0';
 }
 
-//----------------------------------------------------------------------------
-int vtkPVInformation::GetMessageLength()
+int vtkPVClassNameInformation::GetMessageLength()
 {
-  vtkErrorMacro("GetMessageLength not implemented.");
-  return 0;
+  int length = sizeof(int);
+  
+  if (this->VTKClassName)
+    {
+    length += static_cast<int>(strlen(this->VTKClassName));
+    }
+  
+  return length;
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::WriteMessage(unsigned char*)
+void vtkPVClassNameInformation::WriteMessage(unsigned char *msg)
 {
-  vtkErrorMacro("WriteMessage not implemented.");
+  int len = strlen(this->VTKClassName);
+  *msg = static_cast<unsigned char>(len);
+  msg++;
+  int i;
+  for (i = 0; i < len; i++)
+    {
+    msg[i] = static_cast<unsigned char>(this->VTKClassName[i]);
+    }
 }
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::PrintSelf(ostream& os, vtkIndent indent)
+void vtkPVClassNameInformation::PrintSelf(ostream &os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "RootOnly: " << this->RootOnly;
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "VTKClassName: "
+     << (this->VTKClassName ? this->VTKClassName : "(none)") << endl;
 }

@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInformation.cxx
+  Module:    vtkPVNumberOfOutputsInformation.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,54 +39,47 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkPVNumberOfOutputsInformation - Holds number of outputs
+// .SECTION Description
+// This information object collects the number of outputs from the
+// sources.  This is separate from vtkPVDataInformation because the number of
+// outputs can be determined before Update is called.
+
+#ifndef __vtkPVNumberOfOutputsInformation_h
+#define __vtkPVNumberOfOutputsInformation_h
+
 #include "vtkPVInformation.h"
-#include "vtkObjectFactory.h"
 
-
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVInformation);
-vtkCxxRevisionMacro(vtkPVInformation, "1.2.4.1");
-
-//----------------------------------------------------------------------------
-vtkPVInformation::vtkPVInformation()
+class VTK_EXPORT vtkPVNumberOfOutputsInformation : public vtkPVInformation
 {
-  this->RootOnly = 0;
-}
+public:
+  static vtkPVNumberOfOutputsInformation* New();
+  vtkTypeRevisionMacro(vtkPVNumberOfOutputsInformation, vtkPVInformation);
+  void PrintSelf(ostream &os, vtkIndent indent);
+  
+  // Description:
+  // Get number of outputs for a particular source.
+  vtkGetMacro(NumberOfOutputs, int);
+  
+  // Description:
+  // Transfer information about a single object into this object.
+  virtual void CopyFromObject(vtkObject *data);
+  virtual void CopyFromMessage(unsigned char *msg);
+  
+  // Description:
+  // Serialize message.
+  virtual int GetMessageLength() { return sizeof(int); }
+  virtual void WriteMessage(unsigned char *msg);
+  
+protected:
+  vtkPVNumberOfOutputsInformation();
+  ~vtkPVNumberOfOutputsInformation();
+  
+  int NumberOfOutputs;
+  
+private:
+  vtkPVNumberOfOutputsInformation(const vtkPVNumberOfOutputsInformation&); // Not implemented
+  void operator=(const vtkPVNumberOfOutputsInformation&); // Not implemented
+};
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::CopyFromObject(vtkObject*)
-{
-  vtkErrorMacro("CopyFromObject not implemented.");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInformation::CopyFromMessage(unsigned char*)
-{
-  vtkErrorMacro("CopyFromMessage not implemented.");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInformation::AddInformation(vtkPVInformation* vtkNotUsed(info))
-{
-  vtkErrorMacro("AddInformation not implemented.");
-}
-
-//----------------------------------------------------------------------------
-int vtkPVInformation::GetMessageLength()
-{
-  vtkErrorMacro("GetMessageLength not implemented.");
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInformation::WriteMessage(unsigned char*)
-{
-  vtkErrorMacro("WriteMessage not implemented.");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInformation::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "RootOnly: " << this->RootOnly;
-}
+#endif

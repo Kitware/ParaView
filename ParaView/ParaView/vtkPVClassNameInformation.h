@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkPVInformation.cxx
+  Module:    vtkPVClassNameInformation.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -39,54 +39,48 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
+// .NAME vtkPVClassNameInformation - Holds class name
+// .SECTION Description
+// This information object gets the class name of the input VTK object.  This
+// is separate from vtkPVDataInformation because it can be determined before
+// Update is called and because it operates on any VTK object.
+
+#ifndef __vtkPVClassNameInformation_h
+#define __vtkPVClassNameInformation_h
+
 #include "vtkPVInformation.h"
-#include "vtkObjectFactory.h"
 
-
-//----------------------------------------------------------------------------
-vtkStandardNewMacro(vtkPVInformation);
-vtkCxxRevisionMacro(vtkPVInformation, "1.2.4.1");
-
-//----------------------------------------------------------------------------
-vtkPVInformation::vtkPVInformation()
+class VTK_EXPORT vtkPVClassNameInformation : public vtkPVInformation
 {
-  this->RootOnly = 0;
-}
+public:
+  static vtkPVClassNameInformation* New();
+  vtkTypeRevisionMacro(vtkPVClassNameInformation, vtkPVInformation);
+  void PrintSelf(ostream &os, vtkIndent indent);
+  
+  // Description:
+  // Get class name of VTK object.
+  vtkGetStringMacro(VTKClassName);
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::CopyFromObject(vtkObject*)
-{
-  vtkErrorMacro("CopyFromObject not implemented.");
-}
+  // Description:
+  // Transfer information about a single object into this object.
+  virtual void CopyFromObject(vtkObject *data);
+  virtual void CopyFromMessage(unsigned char *msg);
+  
+  // Description:
+  // Serialize message.
+  virtual int GetMessageLength();
+  virtual void WriteMessage(unsigned char *msg);
+  
+protected:
+  vtkPVClassNameInformation();
+  ~vtkPVClassNameInformation();
+  
+  char *VTKClassName;
+  vtkSetStringMacro(VTKClassName);
+  
+private:
+  vtkPVClassNameInformation(const vtkPVClassNameInformation&); // Not implemented
+  void operator=(const vtkPVClassNameInformation&); // Not implemented
+};
 
-//----------------------------------------------------------------------------
-void vtkPVInformation::CopyFromMessage(unsigned char*)
-{
-  vtkErrorMacro("CopyFromMessage not implemented.");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInformation::AddInformation(vtkPVInformation* vtkNotUsed(info))
-{
-  vtkErrorMacro("AddInformation not implemented.");
-}
-
-//----------------------------------------------------------------------------
-int vtkPVInformation::GetMessageLength()
-{
-  vtkErrorMacro("GetMessageLength not implemented.");
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInformation::WriteMessage(unsigned char*)
-{
-  vtkErrorMacro("WriteMessage not implemented.");
-}
-
-//----------------------------------------------------------------------------
-void vtkPVInformation::PrintSelf(ostream& os, vtkIndent indent)
-{
-  this->Superclass::PrintSelf(os,indent);
-  os << indent << "RootOnly: " << this->RootOnly;
-}
+#endif
