@@ -211,13 +211,11 @@ void vtkPVArrayCalculator::CreateProperties()
   this->AttributeModeLabel->SetLabel("Attribute Mode:");
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
   this->AttributeModeMenu->Create(pvApp, "");
-  this->AttributeModeMenu->AddEntryWithCommand("Default", this,
-                                               "ChangeAttributeMode default");
   this->AttributeModeMenu->AddEntryWithCommand("Point Data", this,
                                                "ChangeAttributeMode point");
   this->AttributeModeMenu->AddEntryWithCommand("Cell Data", this,
                                                "ChangeAttributeMode cell");
-  this->AttributeModeMenu->SetCurrentEntry("Default");
+  this->AttributeModeMenu->SetCurrentEntry("Point Data");
   this->Script("pack %s %s -side left",
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
@@ -450,7 +448,7 @@ void vtkPVArrayCalculator::CreateProperties()
   this->VectorsMenu->SetParent(this->CalculatorFrame->GetFrame());
   this->VectorsMenu->Create(pvApp, "");
   this->VectorsMenu->SetButtonText("vectors");
-  this->ChangeAttributeMode("default");
+  this->ChangeAttributeMode("point");
   this->Script("grid %s -row 5 -column 3 -columnspan 4 -sticky news",
                this->ScalarsMenu->GetWidgetName());
   this->Script("grid %s -row 6 -column 3 -columnspan 4 -sticky news",
@@ -497,14 +495,6 @@ void vtkPVArrayCalculator::ChangeAttributeMode(const char* newMode)
     {
     this->Calculator->SetAttributeModeToUseCellData();
     fd = this->Calculator->GetInput()->GetCellData()->GetFieldData();
-    }
-  else if (strcmp(newMode, "default") == 0)
-    {
-    this->Calculator->SetAttributeModeToDefault();
-    if (!(fd = this->Calculator->GetInput()->GetPointData()->GetFieldData()))
-      {
-      fd = this->Calculator->GetInput()->GetCellData()->GetFieldData();
-      }
     }
   
   if (fd)

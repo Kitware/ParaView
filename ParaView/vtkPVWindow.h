@@ -124,6 +124,10 @@ public:
   // Callback from the calculator button.
   void CalculatorCallback();
   
+  // Description:
+  // Callback from the threshold button.
+  void ThresholdCallback();
+  
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -144,6 +148,7 @@ protected:
   vtkKWPushButton *CurrentActorButton;
 
   vtkKWPushButton *CalculatorButton;
+  vtkKWPushButton *ThresholdButton;
   
   vtkKWCompositeCollection *Sources;
   vtkKWLabeledFrame *ApplicationAreaFrame;

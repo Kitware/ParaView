@@ -38,6 +38,7 @@ vtkPVSource \
 vtkPVSourceCollection \
 vtkPVSourceInterface \
 vtkPVSourceList \
+vtkPVThreshold \
 vtkPVWindow \
 vtkSimpleFieldDataToAttributeDataFilter \
 vtkSingleContourFilter \

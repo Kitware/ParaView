@@ -51,6 +51,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVEnSightReaderInterface.h"
 #include "vtkPVDataSetReaderInterface.h"
 #include "vtkPVArrayCalculator.h"
+#include "vtkPVThreshold.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -82,6 +83,7 @@ vtkPVWindow::vtkPVWindow()
   this->CurrentActorButton = vtkKWPushButton::New();
 
   this->CalculatorButton = vtkKWPushButton::New();
+  this->ThresholdButton = vtkKWPushButton::New();
   
   this->Sources = vtkKWCompositeCollection::New();
   
@@ -114,6 +116,9 @@ vtkPVWindow::~vtkPVWindow()
   
   this->CalculatorButton->Delete();
   this->CalculatorButton = NULL;
+  
+  this->ThresholdButton->Delete();
+  this->ThresholdButton = NULL;
   
   this->SourceList->Delete();
   this->SourceList = NULL;
@@ -223,6 +228,12 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CalculatorButton->SetCommand(this, "CalculatorCallback");
   this->Script("pack %s -side left -pady 0 -fill none -expand no",
                this->CalculatorButton->GetWidgetName());
+  
+  this->ThresholdButton->SetParent(this->Toolbar);
+  this->ThresholdButton->Create(app, "-text Threshold");
+  this->ThresholdButton->SetCommand(this, "ThresholdCallback");
+  this->Script("pack %s -side left -pady 0 -fill none -expand no",
+               this->ThresholdButton->GetWidgetName());
   
   // This button doesn't do anything useful right now.  It was put in originally
   // so we could switch between interactor styles.
@@ -536,9 +547,70 @@ void vtkPVWindow::CalculatorCallback()
   pvApp->BroadcastScript("%s SetOutput %s", calc->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());
   
-//  calc->ShowProperties();
-  
   calc->Delete();
+
+  ++instanceCount;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::ThresholdCallback()
+{
+  static int instanceCount = 0;
+  char tclName[256];
+  vtkSource *s;
+  vtkDataSet *d;
+  vtkPVThreshold *threshold;
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVData *pvd;
+  vtkPVData *current;
+  const char* outputDataType;
+  
+  // Before we do anything, let's see if we can determine the output type.
+  current = this->GetCurrentPVData();
+  if (current == NULL)
+    {
+    vtkErrorMacro("Cannot threshold; no input");
+    return;
+    }
+  outputDataType = "vtkUnstructuredGrid";
+  
+  // Create the vtkSource.
+  sprintf(tclName, "%s%d", "Threshold", instanceCount);
+  // Create the object through tcl on all processes.
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkThreshold", tclName));
+  if (s == NULL)
+    {
+    vtkErrorMacro("Could not get pointer from object.");
+    return;
+    }
+  
+  threshold = vtkPVThreshold::New();
+  threshold->SetPropertiesParent(this->GetMainView()->GetSourceParent());
+  threshold->SetApplication(pvApp);
+  threshold->SetVTKSource(s, tclName);
+  threshold->SetNthPVInput(0, this->GetCurrentPVData());
+  threshold->CreateProperties();
+  threshold->SetName(tclName);
+
+  this->GetMainView()->AddComposite(threshold);
+  this->SetCurrentPVSource(threshold);
+  this->GetMainView()->ShowSourceParent();
+
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  sprintf(tclName, "%sOutput%d", "Threshold", instanceCount);
+  // Create the object through tcl on all processes.
+
+  d = (vtkDataSet *)(pvApp->MakeTclObject(outputDataType, tclName));
+  pvd->SetVTKData(d, tclName);
+
+  // Connect the source and data.
+  threshold->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", threshold->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  
+  threshold->Delete();
 
   ++instanceCount;
 }
