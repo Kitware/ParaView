@@ -66,10 +66,10 @@ MACRO(PV_WRAP_VTK_CS kit ukit deps)
   INCLUDE(${VTK_KITS_DIR}/vtk${kit}Kit.cmake)
   FOREACH(class ${VTK_${ukit}_CLASSES})
     SET(full_name "${VTK_${ukit}_HEADER_DIR}/${class}.h")
-    IF("${class}" MATCHES "^[\\/|.\\/|.\\\\|.:\\/|.:\\\\]")
+    IF("${class}" MATCHES "^(\\/|.\\/|.\\\\|.:\\/|.:\\\\)")
       # handle full paths
       SET(full_name "${class}.h")
-    ENDIF("${class}" MATCHES "^[\\/|.\\/|.\\\\|.:\\/|.:\\\\]")
+    ENDIF("${class}" MATCHES "^(\\/|.\\/|.\\\\|.:\\/|.:\\\\)")
     IF(NOT VTK_CLASS_WRAP_EXCLUDE_${class})
       IF(VTK_CLASS_ABSTRACT_${class})
         SET_SOURCE_FILES_PROPERTIES(${full_name}
