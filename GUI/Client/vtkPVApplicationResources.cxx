@@ -475,7 +475,9 @@ void vtkPVApplication::ConfigureAbout()
       }
     this->Script("pack %s -side bottom",
                  this->SaveRuntimeInfoButton->GetWidgetName());
-    this->AboutRuntimeInfo->SetHeight(16);
+    this->AboutRuntimeInfo->SetHeight(14);
+    this->AboutRuntimeInfo->GetTextWidget()->ConfigureOptions(
+      "-font {Helvetica 9}");
     }
 }
 
