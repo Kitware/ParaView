@@ -68,10 +68,6 @@ vtkKWScale::vtkKWScale()
   this->ScaleWidget->SetParent(this);
   this->Range[0] = 0;
   this->Range[1] = 1;  
-
-  this->SetStartCommand(0, 0);
-  this->SetEndCommand(0, 0);
-  this->SetCommand(0,0);
 }
 
 vtkKWScale::~vtkKWScale()
@@ -101,14 +97,7 @@ vtkKWScale::~vtkKWScale()
 
 void vtkKWScale::SetValue(float s)
 {
-  this->Script("%s set %f", this->ScaleWidget->GetWidgetName(),s);
-  if (this->Entry)
-    {
-    this->Entry->SetValue(s,2);
-    }
-  this->Value = s;
-
-  this->Script( "update idletasks");
+  this->ScaleValueChanged(s);
 }
 
 
@@ -182,6 +171,7 @@ void vtkKWScale::DisplayEntry()
   this->Script("bind %s <Return> {%s EntryValueChanged}",
                this->Entry->GetWidgetName(), this->GetTclName());
   this->Script("pack %s -side right -padx 2", this->Entry->GetWidgetName());
+  this->Entry->SetValue(this->GetValue(), 2);
 }
 
 void vtkKWScale::DisplayLabel(const char *name)
@@ -206,7 +196,10 @@ void vtkKWScale::EntryValueChanged()
 {
   this->Value = this->Entry->GetValueAsFloat();
   this->Script("%s set %f", this->ScaleWidget->GetWidgetName(), this->Value);
-  this->Script("eval %s",this->Command);
+  if ( this->Command )
+    {
+    this->Script("eval %s",this->Command);
+    }
 }
 
 void vtkKWScale::InvokeStartCommand()
@@ -231,6 +224,10 @@ void vtkKWScale::ScaleValueChanged(float num)
     {
     return;
     }
+
+  this->Script("%s set %f", this->ScaleWidget->GetWidgetName(),num);
+  
+  
   this->Value = num;
   if (this->Entry)
     {
@@ -240,6 +237,7 @@ void vtkKWScale::ScaleValueChanged(float num)
     {
     this->Script("eval %s",this->Command);
     }
+  this->Script( "update idletasks");
 }
 
 
@@ -249,15 +247,12 @@ void vtkKWScale::SetStartCommand(vtkKWObject* Object, const char * MethodAndArgS
     {
     delete [] this->StartCommand;
     }
-  ostrstream command;
   if ( !Object )
     {
-    command << "{}" << ends;
+    return;
     }
-  else
-    {
-    command << Object->GetTclName() << " " << MethodAndArgString << ends;
-    }
+  ostrstream command;
+  command << Object->GetTclName() << " " << MethodAndArgString << ends;
   this->StartCommand = command.str();
 }
 
@@ -267,15 +262,12 @@ void vtkKWScale::SetEndCommand(vtkKWObject* Object, const char * MethodAndArgStr
     {
     delete [] this->EndCommand;
     }
-  ostrstream command;
   if ( !Object )
     {
-    command << "{}" << ends;
+    return;
     }
-  else
-    {
-    command << Object->GetTclName() << " " << MethodAndArgString << ends;
-    }
+  ostrstream command;
+  command << Object->GetTclName() << " " << MethodAndArgString << ends;
   this->EndCommand = command.str();
 }
 
@@ -286,15 +278,12 @@ void vtkKWScale::SetCommand(vtkKWObject* CalledObject, const char *CommandString
     {
     delete [] this->Command;
     }
-  ostrstream command;
   if ( !CalledObject )
     {
-    command << "{}" << ends;
+    return;
     }
-  else
-    {
-    command << CalledObject->GetTclName() << " " << CommandString << ends;
-    }
+  ostrstream command;
+  command << CalledObject->GetTclName() << " " << CommandString << ends;
   this->Command = command.str();
 }
 
