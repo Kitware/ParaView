@@ -186,7 +186,6 @@ int MPEG2_putseq_one(int cframe, int max)
     }
 
   sprintf(name,vtkMPEG2WriterStr->tplorg,realframe+vtkMPEG2WriterStr->frame0);
-  printf("Frame number: %s (%d, %d)\n", name, realframe, vtkMPEG2WriterStr->frame0);
   MPEG2_readframe(name,neworg);
 
   if (vtkMPEG2WriterStr->fieldpic)

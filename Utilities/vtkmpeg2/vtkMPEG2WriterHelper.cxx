@@ -107,7 +107,6 @@ int vtkMPEG2WriterInternal::StoreImage(const char* name, vtkImageData* iid)
     {
     return 0;
     }
-  cout << "Store image: " << name << endl;
   vtkImageData* id = vtkImageData::New();
   this->ImageFlip->SetInput(iid);
   this->ImageFlip->Update();
@@ -120,7 +119,6 @@ int vtkMPEG2WriterInternal::StoreImage(const char* name, vtkImageData* iid)
 //---------------------------------------------------------------------------
 unsigned char* vtkMPEG2WriterInternal::GetImagePtr(const char* fname)
 {
-  cout << "Try to retrieve image: " << fname << endl;
   if ( !fname )
     {
     return 0;
@@ -131,7 +129,6 @@ unsigned char* vtkMPEG2WriterInternal::GetImagePtr(const char* fname)
     {
     return 0;
     }
-  cout << "Retrieve image: " << fname << endl;
   vtkImageData* id = it->second.GetPointer();
   return static_cast<unsigned char*>(id->GetScalarPointer());
 }
@@ -149,7 +146,6 @@ int vtkMPEG2WriterInternal::RemoveImage(const char* fname)
     {
     return 0;
     }
-  cout << "Remove image: " << fname << endl;
   this->ImagesMap.erase(it, it);
   return 0;
 }
@@ -158,7 +154,7 @@ int vtkMPEG2WriterInternal::RemoveImage(const char* fname)
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkMPEG2WriterHelper);
-vtkCxxRevisionMacro(vtkMPEG2WriterHelper, "1.2.2.1");
+vtkCxxRevisionMacro(vtkMPEG2WriterHelper, "1.2.2.2");
 
 //---------------------------------------------------------------------------
 vtkMPEG2WriterHelper::vtkMPEG2WriterHelper()
@@ -198,7 +194,6 @@ vtkImageData *vtkMPEG2WriterHelper::GetInput()
 //---------------------------------------------------------------------------
 void vtkMPEG2WriterHelper::Start()
 {
-  cout << "vtkMPEG2WriterHelper::Start();" << endl;
   // Error checking
   this->Error = 1;
   
@@ -230,7 +225,6 @@ void vtkMPEG2WriterHelper::Start()
 //---------------------------------------------------------------------------
 void vtkMPEG2WriterHelper::Write()
 {
-  cout << "vtkMPEG2WriterHelper::Write()" << endl;
   if ( !this->Internals )
     {
     vtkErrorMacro("Movie not started");
@@ -272,7 +266,6 @@ void vtkMPEG2WriterHelper::Write()
   int last = MPEG2_putseq_one(this->ActualWrittenTime, this->Time);
   if ( last >= 0 )
     {
-    cout << "Done with frame: " << last << endl;
     sprintf(buffer, str->tplorg, last + str->frame0);
     this->Internals->RemoveImage(buffer);
     this->ActualWrittenTime ++;
@@ -284,7 +277,7 @@ void vtkMPEG2WriterHelper::Write()
 void vtkMPEG2WriterHelper::Initialize()
 {
   vtkMPEG2Structure* str = this->Internals->GetMPEG2Structure();
-  str->quiet = 0;
+  str->quiet = 1;
 
   /* read parameter file */
   this->Internals->ReadParmFile();
@@ -324,14 +317,12 @@ void vtkMPEG2WriterHelper::Initialize()
 void vtkMPEG2WriterHelper::End()
 {
   vtkMPEG2Structure* str = this->Internals->GetMPEG2Structure();
-  cout << "vtkMPEG2WriterHelper::End();" << endl;
   int last;
   while ( (last = MPEG2_putseq_one(this->ActualWrittenTime, this->Time-1)) >= 0 )
     {
     char buffer[1024];
     sprintf(buffer, str->tplorg, last + str->frame0);
     this->Internals->RemoveImage(buffer);
-    cout << "Done with frame: " << last << endl;
     this->ActualWrittenTime ++;
     }
 
@@ -536,16 +527,16 @@ void vtkMPEG2WriterInternal::ReadParmFile( )
   this->Structure->low_delay = 0;
   this->Structure->constrparms = 0;
   this->Structure->profile = 4;
-  this->Structure->level = 8;
-  this->Structure->prog_seq = 0;
+  this->Structure->level = 4;
+  this->Structure->prog_seq = 1;
   this->Structure->chroma_format = 1;
-  this->Structure->video_format = 2;
+  this->Structure->video_format = 0;
   this->Structure->color_primaries = 5;
   this->Structure->transfer_characteristics = 5;
   this->Structure->matrix_coefficients = 4;
   this->Structure->display_horizontal_size = this->Dim[0];
   this->Structure->display_vertical_size = this->Dim[1];
-  this->Structure->dc_prec = 0;
+  this->Structure->dc_prec = 2;
   this->Structure->topfirst = 1;
   this->Structure->frame_pred_dct_tab[0] = this->Structure->frame_pred_dct_tab[1] = this->Structure->frame_pred_dct_tab[2] = 0;
   this->Structure->conceal_tab[0] = this->Structure->conceal_tab[1] = this->Structure->conceal_tab[2] = 0;
