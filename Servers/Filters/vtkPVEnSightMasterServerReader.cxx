@@ -25,6 +25,10 @@
 #include "vtkToolkits.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkMultiProcessController.h"
+#include "vtkTransmitPolyDataPiece.h"
+#include "vtkTransmitUnstructuredGridPiece.h"
+#include "vtkCellData.h"
+#include "vtkPointData.h"
 
 #ifdef VTK_USE_MPI
 # include "vtkMPICommunicator.h"
@@ -37,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.20");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.21");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -292,7 +296,60 @@ void vtkPVEnSightMasterServerReader::ExecuteInformation()
     this->InformationError = 1;
     return;
     }
+  for (int i= 0;i < this->NumberOfOutputs; ++i)
+    {
+    this->Outputs[i]->SetMaximumNumberOfPieces(-1);
+    }
 }
+
+
+//----------------------------------------------------------------------------
+// We need this method because we cannot get the output until we execute.
+void vtkPVEnSightMasterServerReader::Update()
+{
+  int i;
+  int myId = 0;
+  int numProcs = 1;
+  
+  if (this->Controller)
+    {
+    myId = this->Controller->GetLocalProcessId();
+    numProcs = this->Controller->GetNumberOfProcesses();
+    }
+  
+  this->UpdateInformation();
+  this->Execute();
+
+  // The superclass thinks it is reading the whole data set.
+  // This subclass tells the output that it is only a piece.
+  for (i = 0; i < this->NumberOfOutputs; ++i)
+    {
+    if (this->Outputs[i])
+      {
+      // This gets transfered to the Piece/NumberOfPieces
+      // when 'DataHasBeenGenerated' is called.
+      this->Outputs[i]->SetUpdatePiece(myId);
+      this->Outputs[i]->SetUpdateNumberOfPieces(numProcs);
+      }
+    }
+
+  // Set the extent translator on the outputs.
+  this->ExtentTranslator->SetProcessId(myId);
+  for(i=0; i < this->Internal->NumberOfOutputs; ++i)
+    {
+    this->GetOutput(i)->SetExtentTranslator(this->ExtentTranslator);
+    }
+  
+  for (i = 0; i < this->GetNumberOfOutputs(); i++)
+    {
+    if ( this->GetOutput(i) )
+      {
+      this->GetOutput(i)->DataHasBeenGenerated();
+      }
+    }
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVEnSightMasterServerReader::Execute()
@@ -400,29 +457,66 @@ void vtkPVEnSightMasterServerReader::Execute()
         }
       }
     }
-    
-  // The superclass thinks it is reading the whole data set.
-  // This subclass tells the output that it is only a piece.
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  for (i = 0; i < this->NumberOfOutputs; ++i)
+  
+  // Load balance non SOS files.
+  if (this->Controller && this->NumberOfPieces == 1 &&
+      this->Controller->GetNumberOfProcesses() > 1)
     {
-    if (this->Outputs[i])
-      {
-      // This gets transfered to the Piece/NumberOfPieces
-      // when 'DataHasBeenGenerated' is called.
-      this->Outputs[i]->SetUpdatePiece(piece);
-      this->Outputs[i]->SetUpdateNumberOfPieces(numProcs);
-      this->Outputs[i]->SetMaximumNumberOfPieces(-1);
-      }
-    }
-
-  // Set the extent translator on the outputs.
-  this->ExtentTranslator->SetProcessId(piece);
-  for(i=0; i < this->Internal->NumberOfOutputs; ++i)
-    {
-    this->GetOutput(i)->SetExtentTranslator(this->ExtentTranslator);
+    this->Balance();
     }
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVEnSightMasterServerReader::Balance()
+{
+  int i;
+  vtkDataSet* out;
+
+  for (i = 0; i < this->GetNumberOfOutputs(); i++)
+    {
+    out = this->GetOutput(i);
+    vtkPolyData* pdOut = vtkPolyData::SafeDownCast(out);
+    vtkUnstructuredGrid* ugOut = vtkUnstructuredGrid::SafeDownCast(out);
+    if (pdOut)
+      {
+      vtkTransmitPolyDataPiece* extract= vtkTransmitPolyDataPiece::New();
+      vtkPolyData* tmp = vtkPolyData::New();
+      tmp->CopyStructure(ugOut);
+      tmp->GetPointData()->ShallowCopy(ugOut->GetPointData());
+      tmp->GetCellData()->ShallowCopy(ugOut->GetCellData());
+      extract->SetInput(tmp);
+      tmp->Delete();
+      tmp = extract->GetOutput();
+      tmp->SetUpdateNumberOfPieces(this->Controller->GetNumberOfProcesses());
+      tmp->SetUpdatePiece(this->Controller->GetLocalProcessId());
+      tmp->Update();
+      pdOut->CopyStructure(tmp);
+      pdOut->GetPointData()->ShallowCopy(tmp->GetPointData());
+      pdOut->GetCellData()->ShallowCopy(tmp->GetCellData());
+      extract->Delete();
+      }
+    else if (ugOut)
+      {
+      vtkTransmitUnstructuredGridPiece* extract= vtkTransmitUnstructuredGridPiece::New();
+      vtkUnstructuredGrid* tmp = vtkUnstructuredGrid::New();
+      tmp->CopyStructure(ugOut);
+      tmp->GetPointData()->ShallowCopy(ugOut->GetPointData());
+      tmp->GetCellData()->ShallowCopy(ugOut->GetCellData());
+      extract->SetInput(tmp);
+      tmp->Delete();
+      tmp = extract->GetOutput();
+      tmp->SetUpdateNumberOfPieces(this->Controller->GetNumberOfProcesses());
+      tmp->SetUpdatePiece(this->Controller->GetLocalProcessId());
+      tmp->Update();
+      ugOut->CopyStructure(tmp);
+      ugOut->GetPointData()->ShallowCopy(tmp->GetPointData());
+      ugOut->GetCellData()->ShallowCopy(tmp->GetCellData());
+      extract->Delete();
+      }
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVEnSightMasterServerReader::ExecuteError()
