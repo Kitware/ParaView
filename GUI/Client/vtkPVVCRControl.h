@@ -38,6 +38,8 @@ public:
   void SetGoToPreviousCommand(vtkKWObject* calledObject, const char* commandString);
   void SetGoToNextCommand(vtkKWObject* calledObject, const char* commandString);
   void SetLoopCheckCommand(vtkKWObject* calledObject, const char* commandString);
+  void SetRecordCheckCommand(vtkKWObject* calledObject, const char* commandString);
+  void SetRecordStateCommand(vtkKWObject* calledObject, const char* commandString);
 
   virtual void Create(vtkKWApplication* app);
   virtual void UpdateEnableState();
@@ -48,6 +50,9 @@ public:
   void SetLoopButtonState(int state);
   int GetLoopButtonState();
 
+  void SetRecordCheckButtonState(int state);
+  int GetRecordCheckButtonState();
+    
   void PlayCallback();
   void StopCallback();
   void GoToBeginningCallback();
@@ -55,6 +60,8 @@ public:
   void GoToPreviousCallback();
   void GoToNextCallback();
   void LoopCheckCallback();
+  void RecordCheckCallback();
+  void RecordStateCallback();
 
 protected:
   vtkPVVCRControl();
@@ -68,6 +75,8 @@ protected:
   vtkKWPushButton *GoToPreviousButton;
   vtkKWPushButton *GoToNextButton;
   vtkKWCheckButton *LoopCheckButton;
+  vtkKWCheckButton *RecordCheckButton;
+  vtkKWPushButton *RecordStateButton;
 
   char* PlayCommand;
   char* StopCommand;
@@ -76,6 +85,9 @@ protected:
   char* GoToPreviousCommand;
   char* GoToNextCommand;
   char* LoopCheckCommand;
+  char* RecordCheckCommand;
+  char* RecordStateCommand;
+
   vtkSetStringMacro(PlayCommand);
   vtkSetStringMacro(StopCommand);
   vtkSetStringMacro(GoToBeginningCommand);
@@ -83,6 +95,8 @@ protected:
   vtkSetStringMacro(GoToPreviousCommand);
   vtkSetStringMacro(GoToNextCommand);
   vtkSetStringMacro(LoopCheckCommand);
+  vtkSetStringMacro(RecordCheckCommand);
+  vtkSetStringMacro(RecordStateCommand);
 
   void InvokeCommand(const char* command);
 private:

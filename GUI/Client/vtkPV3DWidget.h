@@ -70,6 +70,20 @@ public:
   virtual void Deselect();
 
   // Description:
+  // Register the animatable proxies and make them available for animation.
+  // Called by vtkPVSelectWidget when the widget is selected. This
+  // is to make sure that only the selected widget shows up in the
+  // animation interface and thus avoids confusion.
+  virtual void EnableAnimation() { };
+
+  // Description:
+  // Unregister animatable proxies so that they are not available for
+  // animation. Called by vtkPVSelectWidget when this widget is deselected.
+  // is to make sure that only the selected widget shows up in the
+  // animation interface and thus avoids confusion.
+  virtual void DisableAnimation() { };
+  
+  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void PlaceWidget();
 

@@ -166,15 +166,20 @@ public:
   void SetAnimatedElement(int index);
 
   // Description:
-  // Initializes the PropertyStatusManager status. This saves the current status
-  // of the property animated by this cue.
-  virtual void InitializeStatus();
+  // Start Recording. Once recording has been started new key frames cannot be added directly.
+  virtual void StartRecording();
+
+  // Description:
+  // Stop Recording.
+  virtual void StopRecording();
+
+  virtual void RecordState(double ntime, double offset, int onlyFocus);
 
   // Description:
   // Adds a new key frame is the property animated by this cue has changed since last
   // call to InitializeStatus(). ntime is the time at which this key frame will be added.
   // If onlyFocus is 1, the new key frame is added only if this cue has the focus.
-  virtual void KeyFramePropertyChanges(double ntime, int onlyFocus);
+//  virtual void KeyFramePropertyChanges(double ntime, double offset, int onlyFocus);
 
   // Description:
   // Get the animation cue proxy associated with this cue. If this cue is Virtual, 
@@ -200,6 +205,7 @@ public:
   // Time marker is a vartical line used to indicate the current time.
   // This method sets the timemarker of the timeline for this cue alone.
   virtual void SetTimeMarker(double time);
+  double GetTimeMarker();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -249,6 +255,18 @@ public:
   // This returns the tcl script/string that evaluates the
   // name correctly at runtime.
   const char* GetTclNameCommand();
+
+  // Description:
+  // Updates the visibility of the cue.
+  // If the animated property is not "animateable", then it is
+  // visible only in Advanced mode.
+  virtual void UpdateCueVisibility(int advanced);
+  vtkGetMacro(CueVisibility, int);
+
+  // Description:
+  // Detachs the cue. i.e. removes it from scene etc. and prepares it
+  // to be deleted.
+  virtual void Detach();
 
 protected:
   vtkPVAnimationCue();
@@ -345,12 +363,19 @@ protected:
   void RegisterProxies();
   void UnregisterProxies();
   int ProxiesRegistered;
+  int CueVisibility;
+  int InRecording;
 
   // Description:
   // Keyframes assigned unique names. The names are dependent on the 
   // order for the cue in which they are created. KeyFramesCreatedCount
   // keeps track of the order.
   int KeyFramesCreatedCount;
+
+  // Description:
+  // This variable indicates if a keyframe was added in the previous call to
+  // RecordState
+  int PreviousStepKeyFrameAdded;
 
 private:
   vtkPVAnimationCue(const vtkPVAnimationCue&); // Not implemented.

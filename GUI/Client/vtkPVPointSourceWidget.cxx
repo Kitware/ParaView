@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.43");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.44");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -80,18 +80,52 @@ vtkPVPointSourceWidget::~vtkPVPointSourceWidget()
   this->SetSourceProxyName(0);
   if(this->SourceProxy)
     {
-    const char* proxyName = proxyM->GetProxyName("animateable",
-      this->SourceProxy);
-    if (proxyName)
-      {
-      proxyM->UnRegisterProxy("animateable", proxyName);
-      }
+    this->DisableAnimation();
     this->SourceProxy->Delete();
     this->SourceProxy = 0;
     }
   this->RadiusWidget->Delete();
   this->NumberOfPointsWidget->Delete();
   this->SetInputMenu(NULL);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::EnableAnimation()
+{
+  this->Superclass::EnableAnimation();   
+  if (this->PVSource && this->SourceProxy)
+    {
+    vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ".PointSource" << ends;
+        pm->RegisterProxy("animateable", animName.str(), this->SourceProxy);
+        animName.rdbuf()->freeze(0);
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVPointSourceWidget::DisableAnimation()
+{
+  this->Superclass::DisableAnimation();
+  if (this->SourceProxy)
+    {
+    vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+
+    const char* proxyName = proxyM->GetProxyName("animateable",
+      this->SourceProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -168,24 +202,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   ostrstream str;
   str << "PointSource" << proxyNum << ends;
   this->SetSourceProxyName(str.str());
-  pm->RegisterProxy("sources", this->SourceProxyName, this->SourceProxy);
-
-  if (this->PVSource)
-    {
-    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
-    if (sproxy)
-      {
-      const char* root = pm->GetProxyName("animateable", sproxy);
-      if (root)
-        {
-        ostrstream animName;
-        animName << root << ";PointSource" << ends;
-        pm->RegisterProxy("animateable", animName.str(), this->SourceProxy);
-        animName.rdbuf()->freeze(0);
-        }
-      }
-    }
-  
+  pm->RegisterProxy("sources", this->SourceProxyName, this->SourceProxy);  
   proxyNum++;
   str.rdbuf()->freeze(0);
 

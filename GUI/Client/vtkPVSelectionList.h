@@ -45,6 +45,14 @@ public:
   // The string name is displayed in the list, and the integer value
   // is used to set and get the current selection programmatically.
   void AddItem(const char *name, int value);
+
+  // Description:
+  // Get the value for the first match of the name in added items..
+  int GetValue(const char* name);
+  
+  // Description:
+  // Remove all items.
+  void RemoveAllItems();
   
   // Description:
   // Set the label of the menu.
@@ -123,7 +131,10 @@ public:
   // Description:
   // Save this widget to a file.
   virtual void SaveInBatchScript(ofstream *file);
- 
+
+  // Description:
+  // Get number of items in the selection list.
+  int GetNumberOfItems();
 protected:
   vtkPVSelectionList();
   ~vtkPVSelectionList();

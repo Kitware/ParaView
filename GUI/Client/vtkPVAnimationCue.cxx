@@ -75,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.10");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.11");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -143,6 +143,8 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->PropertyStatusManager = NULL;
   this->Name = NULL;
   this->TclNameCommand = 0;
+  this->CueVisibility = 1;
+  this->InRecording = 0;
   this->KeyFramesCreatedCount = 0;
 }
 
@@ -437,8 +439,10 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
 
   // First, synchronize the system state to the keyframe time to get proper
   // domain and property values.
-  pvAM->SetCurrentTime(time);
-
+  if (!this->InRecording)
+    {
+    pvAM->SetCurrentTime(time);
+    }
   
   ostrstream str ;
   str << "KeyFrameName_" << this->KeyFramesCreatedCount++ << ends;
@@ -462,6 +466,18 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
   keyframe->Delete();
 
   this->InitializeKeyFrameUsingCurrentState(keyframe);
+  if (!this->InRecording)
+    {
+    if (id == 0)
+      {
+      keyframe->SetValueToMinimum();
+      }
+    else if (id == this->GetNumberOfKeyFrames()-1)
+      {
+      keyframe->SetValueToMaximum();
+      }
+    }
+
   this->TimeLine->SelectPoint(id);
   return id;
 }
@@ -469,8 +485,8 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::InitializeKeyFrameUsingCurrentState(vtkPVKeyFrame* keyframe)
 {
-  keyframe->InitializeKeyValueUsingCurrentState();
   keyframe->InitializeKeyValueDomainUsingCurrentState();
+  keyframe->InitializeKeyValueUsingCurrentState();
 }
 
 //-----------------------------------------------------------------------------
@@ -525,6 +541,12 @@ int vtkPVAnimationCue::RemoveKeyFrame(int id)
 void vtkPVAnimationCue::SetTimeMarker(double time)
 {
   this->TimeLine->SetTimeMarker(time);
+}
+
+//-----------------------------------------------------------------------------
+double vtkPVAnimationCue::GetTimeMarker()
+{
+  return this->TimeLine->GetTimeMarker();
 }
 
 //-----------------------------------------------------------------------------
@@ -860,7 +882,9 @@ void vtkPVAnimationCue::PackWidget()
   if (label_frame_width != 1)
     {
     ostrstream str;
-    str << "-width " << label_frame_width << ends;
+    // the addition 50 is added to take care for the expansion of label 
+    // when it becomes bold.
+    str << "-width " << (label_frame_width + 50) << ends;
     this->Frame->ConfigureOptions(str.str());
     str.rdbuf()->freeze(0);
     }
@@ -871,7 +895,7 @@ void vtkPVAnimationCue::UnpackWidget()
 {
   if (!this->IsCreated())
     {
-    vtkErrorMacro("Widget must be created before packing");
+    vtkErrorMacro("Widget must be created before unpacking");
     return;
     }
   this->Script("pack forget %s",
@@ -953,11 +977,14 @@ void vtkPVAnimationCue::GetFocus()
 void vtkPVAnimationCue::GetSelfFocus()
 {
   this->Focus = 1;
-  this->TimeLine->GetFocus();
   // TODO: change color
   vtkKWTkUtilities::ChangeFontWeightToBold(
     this->GetApplication()->GetMainInterp(), this->Label->GetWidgetName());
   this->InvokeEvent(vtkKWEvent::FocusInEvent);
+  // The event is invoked before the timeline gets focus, so that
+  // when the timeline get's focus and sets the selected key frame,
+  // the VAnimation interface will also show that key frame.
+  this->TimeLine->GetFocus();
 }
 
 //-----------------------------------------------------------------------------
@@ -1043,17 +1070,48 @@ void vtkPVAnimationCue::SetAnimatedElement(int index)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::InitializeStatus()
+void vtkPVAnimationCue::StartRecording()
 {
+  if (this->InRecording)
+    {
+    return;
+    }
   if (this->PropertyStatusManager)
     {
     this->PropertyStatusManager->InitializeStatus();
     }
+  this->InRecording = 1;
+  if (!this->Virtual)
+    {
+    this->TimeLine->DisableAddAndRemoveOn();
+    }
+  this->PreviousStepKeyFrameAdded = 0;
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCue::KeyFramePropertyChanges(double ntime, int onlyFocus)
+void vtkPVAnimationCue::StopRecording()
 {
+  if (!this->InRecording)
+    {
+    return;
+    }
+  this->InRecording = 0;
+  if (!this->Virtual)
+    {
+    this->TimeLine->SetDisableAddAndRemove(0);
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCue::RecordState(double ntime, double offset,
+  int onlyFocus)
+{
+  if (!this->InRecording)
+    {
+    vtkErrorMacro("Not in recording mode.");  
+    return;
+    }
+  
   if (this->Virtual || !this->PropertyStatusManager || 
     (onlyFocus && !this->HasFocus()))
     {
@@ -1066,23 +1124,84 @@ void vtkPVAnimationCue::KeyFramePropertyChanges(double ntime, int onlyFocus)
   if (!this->PropertyStatusManager->HasPropertyChanged(
       vtkSMVectorProperty::SafeDownCast(property), index ))
     {
+    this->PreviousStepKeyFrameAdded = 0;
     return;
     }
   // animated property has changed.
   // add a keyframe at ntime.
-  int id = this->AddNewKeyFrame(ntime);
-  if (id == -1)
+  this->TimeLine->DisableAddAndRemoveOff();
+
+  if (!this->PreviousStepKeyFrameAdded)
+    {
+    int id = this->AddNewKeyFrame(ntime);
+    if (id == -1)
+      {
+      vtkErrorMacro("Failed to add new key frame");
+      return;
+      }
+    this->GetKeyFrame(id)->InitializeKeyValueUsingProperty(
+      this->PropertyStatusManager->GetInternalProperty(vtkSMVectorProperty::SafeDownCast(property)),
+      index);
+    }
+  int id2 = this->AddNewKeyFrame(ntime + offset);
+  if (id2 == -1)
     {
     vtkErrorMacro("Failed to add new key frame");
+    return;
     }
+  this->PreviousStepKeyFrameAdded = 1;
+  this->TimeLine->DisableAddAndRemoveOn();
+  if (this->PropertyStatusManager)
+    {
+    this->PropertyStatusManager->InitializeStatus();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCue::Detach()
+{
+  this->RemoveFocus();
+  this->UnpackWidget();
+  this->SetParent(NULL);
+  // We don't explictly remove from Scene or delete all key frames
+  // since that happens when the cue is destroyed.
+  // Also, that will help us catch any forgetten reference to the cue.
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationCue::RemoveAllKeyFrames()
 {
+  if (this->Virtual)
+    {
+    return;
+    }
   // Don;t directly remove the keyframes...instead pretend that 
   // the timeline nodes are being deleted.
   this->TimeLine->RemoveAll();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCue::UpdateCueVisibility(int advanced)
+{
+  if (this->Virtual)
+    {
+    // cannot determine visibility for virtual cues.
+    return;
+    }
+  
+  vtkSMProperty* property = this->CueProxy->GetAnimatedProperty();
+  if (!property)
+    {
+    return;
+    }
+  if (advanced || property->GetAnimateable())
+    {
+    this->CueVisibility = 1;
+    }
+  else
+    {
+    this->CueVisibility = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -1141,6 +1260,11 @@ void vtkPVAnimationCue::SaveState(ofstream* file)
     return;
     }
 
+  // We do remove all keyframes in the state file to get rid of any
+  // default animations added while creating PVSources. We must remove the
+  // animations, since the state saves the default animations (if any) also.
+  *file << "$kw(" << this->GetTclName() << ") RemoveAllKeyFrames" << endl;
+
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(
     this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
@@ -1184,4 +1308,5 @@ void vtkPVAnimationCue::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PVAnimationScene: " << this->PVAnimationScene << endl;
   os << indent << "PVSource: " << this->PVSource << endl;
   os << indent << "TimeLine: " << this->TimeLine << endl;
+  os << indent << "CueVisibility: " << this->CueVisibility << endl;
 }

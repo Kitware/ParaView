@@ -17,8 +17,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkKWEvent.h"
 #include "vtkPVAnimationCue.h"
+#include "vtkPVApplication.h"
+#include "vtkPVWindow.h"
 vtkStandardNewMacro(vtkPVTimeLine);
-vtkCxxRevisionMacro(vtkPVTimeLine, "1.3");
+vtkCxxRevisionMacro(vtkPVTimeLine, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVTimeLine::vtkPVTimeLine()
@@ -68,6 +70,12 @@ void vtkPVTimeLine::SetTimeMarker(double time)
     return;
     }
   this->SetParameterCursorPosition(time);
+}
+
+//----------------------------------------------------------------------------
+double vtkPVTimeLine::GetTimeMarker()
+{
+  return this->GetParameterCursorPosition();
 }
 
 //----------------------------------------------------------------------------
@@ -285,6 +293,8 @@ void vtkPVTimeLine::StartInteractionCallback(int x, int y)
 {
   this->AddTraceEntry("$kw(%s) StartInteractionCallback %d %d", 
     this->GetTclName(), x, y);
+  vtkPVApplication::SafeDownCast(this->GetApplication())->GetMainWindow()
+    ->ShowAnimationPanes();
   this->Superclass::StartInteractionCallback(x,y);
 }
 

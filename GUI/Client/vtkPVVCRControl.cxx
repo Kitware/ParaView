@@ -22,7 +22,7 @@
 #include "vtkKWFrame.h"
 
 vtkStandardNewMacro(vtkPVVCRControl);
-vtkCxxRevisionMacro(vtkPVVCRControl, "1.1");
+vtkCxxRevisionMacro(vtkPVVCRControl, "1.2");
 //-----------------------------------------------------------------------------
 vtkPVVCRControl::vtkPVVCRControl()
 {
@@ -33,6 +33,9 @@ vtkPVVCRControl::vtkPVVCRControl()
   this->GoToPreviousButton = vtkKWPushButton::New();
   this->GoToNextButton = vtkKWPushButton::New();
   this->LoopCheckButton = vtkKWCheckButton::New();
+  this->RecordCheckButton = vtkKWCheckButton::New();
+  this->RecordStateButton = vtkKWPushButton::New();
+
   this->InPlay = 0;
 
   this->PlayCommand=0;
@@ -55,6 +58,8 @@ vtkPVVCRControl::~vtkPVVCRControl()
   this->GoToPreviousButton->Delete();
   this->GoToNextButton->Delete();
   this->LoopCheckButton->Delete();
+  this->RecordStateButton->Delete();
+  this->RecordCheckButton->Delete();
   this->SetPlayCommand(0);
   this->SetStopCommand(0);
   this->SetGoToBeginningCommand(0);
@@ -62,7 +67,8 @@ vtkPVVCRControl::~vtkPVVCRControl()
   this->SetGoToPreviousCommand(0);
   this->SetGoToNextCommand(0);
   this->SetLoopCheckCommand(0);
-
+  this->SetRecordCheckCommand(0);
+  this->SetRecordStateCommand(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -83,6 +89,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   icon->SetImage(vtkKWIcon::ICON_TRANSPORT_PLAY);
   this->PlayButton->SetImageOption(icon);
   this->PlayButton->SetCommand(this, "PlayCallback");
+  this->PlayButton->SetBalloonHelpString("Play the animation.");
 
   // Animation Control: Stop button to stop the animation.
   this->StopButton->SetParent(this->GetFrame());
@@ -90,6 +97,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   icon->SetImage(vtkKWIcon::ICON_TRANSPORT_STOP);
   this->StopButton->SetImageOption(icon);
   this->StopButton->SetCommand(this, "StopCallback");
+  this->StopButton->SetBalloonHelpString("Stop the animation.");
 
   // Animation Control: "go to beginning" button.
   this->GoToBeginningButton->SetParent(this->GetFrame());
@@ -97,12 +105,14 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   icon->SetImage(vtkKWIcon::ICON_TRANSPORT_BEGINNING);
   this->GoToBeginningButton->SetImageOption(icon);
   this->GoToBeginningButton->SetCommand(this, "GoToBeginningCallback");
+  this->GoToBeginningButton->SetBalloonHelpString("Go to the start of the animation.");
 
   // Animation Control: "go to end" button.
   this->GoToEndButton->SetParent(this->GetFrame());
   this->GoToEndButton->Create(app, "");
   icon->SetImage(vtkKWIcon::ICON_TRANSPORT_END);
   this->GoToEndButton->SetImageOption(icon);
+  this->GoToEndButton->SetBalloonHelpString("Go to the end of the animation.");
   this->GoToEndButton->SetCommand(this, "GoToEndCallback");
 
   // Animation Control: "go to previous frame" button.
@@ -110,6 +120,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   this->GoToPreviousButton->Create(app, 0);
   icon->SetImage(vtkKWIcon::ICON_TRANSPORT_REWIND_TO_KEY);
   this->GoToPreviousButton->SetImageOption(icon);
+  this->GoToPreviousButton->SetBalloonHelpString("Go to the previous frame.");
   this->GoToPreviousButton->SetCommand(this, "GoToPreviousCallback");
 
   // Animation Control: "go to next frame" button.
@@ -117,6 +128,7 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   this->GoToNextButton->Create(app, 0);
   icon->SetImage(vtkKWIcon::ICON_TRANSPORT_FAST_FORWARD_TO_KEY);
   this->GoToNextButton->SetImageOption(icon);
+  this->GoToNextButton->SetBalloonHelpString("Go to the next frame.");
   this->GoToNextButton->SetCommand(this, "GoToNextCallback");
 
   //  Animation Control: loop button to loop the animation.
@@ -126,21 +138,28 @@ void vtkPVVCRControl::Create(vtkKWApplication* app)
   this->LoopCheckButton->SetIndicator(0);
   icon->SetImage(vtkKWIcon::ICON_TRANSPORT_LOOP);
   this->LoopCheckButton->SetImageOption(icon);
+  this->LoopCheckButton->SetBalloonHelpString("Specify if the animation is to be played in a loop.");
   this->LoopCheckButton->SetCommand(this, "LoopCheckCallback");
+  
+
+  this->RecordCheckButton->SetParent(this->GetFrame());
+  this->RecordCheckButton->Create(app, "-image PVRecord" );
+  this->RecordCheckButton->SetState(0);
+  this->RecordCheckButton->SetIndicator(0);
+  this->RecordCheckButton->SetBalloonHelpString("Start/Stop recording of the animation.");
+  this->RecordCheckButton->SetCommand(this, "RecordCheckCallback");
+
+  this->RecordStateButton->SetParent(this->GetFrame());
+  this->RecordStateButton->Create(app, "-image PVRecordState");
+  this->RecordStateButton->SetCommand(this, "RecordStateCallback");
+  this->RecordStateButton->SetBalloonHelpString("Record the current state of the system as key frames.");
+  
 
   //  Animation Control: pack the transport buttons
-  /*
-  this->Script("pack %s %s %s %s %s %s %s -side left -fill both -padx 1", 
-    this->GoToBeginningButton->GetWidgetName(), 
-    this->GoToPreviousButton->GetWidgetName(),
-    this->PlayButton->GetWidgetName(), 
-    this->StopButton->GetWidgetName(),
-    this->GoToNextButton->GetWidgetName(),
-    this->GoToEndButton->GetWidgetName(), 
-    this->LoopCheckButton->GetWidgetName());
-  */
   this->AddWidget(this->GoToBeginningButton);
   this->AddWidget(this->GoToPreviousButton);
+  this->AddWidget(this->RecordCheckButton);
+  this->AddWidget(this->RecordStateButton);
   this->AddWidget(this->PlayButton);
   this->AddWidget(this->StopButton);
   this->AddWidget(this->GoToNextButton);
@@ -189,6 +208,29 @@ void vtkPVVCRControl::SetGoToNextCommand(vtkKWObject* calledObject, const char* 
 void vtkPVVCRControl::SetLoopCheckCommand(vtkKWObject* calledObject, const char* commandString)
 {
   this->SetObjectMethodCommand(&this->LoopCheckCommand, calledObject, commandString);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVCRControl::SetRecordCheckCommand(vtkKWObject* calledObject, const char* commandString)
+{
+  this->SetObjectMethodCommand(&this->RecordCheckCommand, calledObject, commandString);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVCRControl::SetRecordStateCommand(vtkKWObject* calledObject, const char* commandString)
+{
+  this->SetObjectMethodCommand(&this->RecordStateCommand, calledObject, commandString);
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVCRControl::SetRecordCheckButtonState(int state)
+{
+  this->RecordCheckButton->SetState(state);
+}
+//-----------------------------------------------------------------------------
+int vtkPVVCRControl::GetRecordCheckButtonState()
+{
+  return this->RecordCheckButton->GetState();
 }
 
 //-----------------------------------------------------------------------------
@@ -244,7 +286,20 @@ void vtkPVVCRControl::LoopCheckCallback()
 {
   this->InvokeCommand(this->LoopCheckCommand);
 }
+//-----------------------------------------------------------------------------
+void vtkPVVCRControl::RecordStateCallback()
+{
+  this->InvokeCommand(this->RecordStateCommand);
+}
 
+//-----------------------------------------------------------------------------
+void vtkPVVCRControl::RecordCheckCallback()
+{
+  this->InvokeCommand(this->RecordCheckCommand);
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkPVVCRControl::InvokeCommand(const char *command)
 {
@@ -267,12 +322,20 @@ void vtkPVVCRControl::UpdateEnableState()
   this->Enabled = this->GetInPlay();
   this->PropagateEnableState(this->StopButton);
 
+  // These widgets are only enabled when recording.
+  this->Enabled = this->GetRecordCheckButtonState();
+  this->PropagateEnableState(this->RecordStateButton);
+
   //These widgets are on when playing or when GUI is enabled.
   this->Enabled = this->GetInPlay() || enabled;
   this->PropagateEnableState(this->LoopCheckButton);
 
-  //These widgets are disabled when playing.
-  this->Enabled = enabled && !this->GetInPlay();
+  //These widgets are on when recording or when gui is enabled and not playing.
+  this->Enabled = (enabled && !this->GetInPlay() ) || this->GetRecordCheckButtonState();
+  this->PropagateEnableState(this->RecordCheckButton);
+
+  //These widgets are disabled when playing or recording.
+  this->Enabled = enabled && !this->GetInPlay() && !this->GetRecordCheckButtonState();
   this->PropagateEnableState(this->PlayButton);
   this->PropagateEnableState(this->GoToBeginningButton);
   this->PropagateEnableState(this->GoToEndButton);

@@ -117,13 +117,16 @@ public:
   virtual void SetTimeMarker( double time);
 
   // Description:
-  // Initializes the PropertyStatusManager status. 
-  // Calls InitializeStatus on all the children cues.
-  virtual void InitializeStatus();
+  // Start Recording.
+  virtual void StartRecording();
 
   // Description:
-  // Calls KeyFramePropertyChanges on all the children cues.
-  virtual void KeyFramePropertyChanges(double ntime, int onlyFocus);
+  // Stop Recording.
+  virtual void StopRecording();
+
+  // Description:
+  // Calls RecordState on all the children cues.
+  virtual void RecordState(double ntime, double offset, int onlyFocus);
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -142,6 +145,17 @@ public:
   // Description:
   // Remove All Key frames from this cue.
   virtual void RemoveAllKeyFrames();
+
+  // Description:
+  // Updates the visibility of the cue.
+  // If the animated property is not "animateable", then it is
+  // visible only in Advanced mode.
+  virtual void UpdateCueVisibility(int advanced);
+
+  // Description:
+  // Detachs the cue. i.e. removes it from scene etc. and prepares it
+  // to be deleted.
+  virtual void Detach();
 
 protected:
   vtkPVAnimationCueTree();

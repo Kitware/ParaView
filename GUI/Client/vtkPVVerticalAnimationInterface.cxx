@@ -39,7 +39,7 @@
 #include "vtkKWCheckButton.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.2");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.3");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 0
@@ -92,14 +92,11 @@ vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
   this->TypeLabel = vtkKWLabel::New();
   this->TypeMenuButton = vtkKWMenuButton::New();
   
-  this->RecorderFrame = vtkKWLabeledFrame::New();
-  this->InitStateButton = vtkKWPushButton::New();
-  this->KeyFrameChangesButton = vtkKWPushButton::New();
-  this->RecordAllLabel = vtkKWLabel::New();
   this->RecordAllButton = vtkKWCheckButton::New();
 
   this->SaveFrame = vtkKWLabeledFrame::New();
   this->CacheGeometryCheck = vtkKWCheckButton::New();
+  this->AdvancedAnimationCheck = vtkKWCheckButton::New();
  
   this->AnimationCue = NULL;
   this->Observer = vtkPVVerticalAnimationInterfaceObserver::New();
@@ -130,14 +127,11 @@ vtkPVVerticalAnimationInterface::~vtkPVVerticalAnimationInterface()
   this->IndexLabel->Delete();
   this->IndexScale->Delete();
   
-  this->RecorderFrame->Delete();
-  this->InitStateButton->Delete();
-  this->KeyFrameChangesButton->Delete();
-  this->RecordAllLabel->Delete();
   this->RecordAllButton->Delete();
 
   this->SaveFrame->Delete();
   this->CacheGeometryCheck->Delete();
+  this->AdvancedAnimationCheck->Delete();
   
   this->SetActiveKeyFrame(NULL);
 }
@@ -189,47 +183,6 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->Script("pack %s -side top -fill both -expand t -anchor center",
     this->ScenePropertiesFrame->GetWidgetName());
  
-  // RECORDER FRAME
-  this->RecorderFrame->SetParent(this->TopFrame->GetFrame());
-  this->RecorderFrame->ShowHideFrameOn();
-  this->RecorderFrame->Create(app, 0);
-  this->RecorderFrame->SetLabel("Animation Recorder");
-  this->Script("pack %s -side top -fill both -expand t -anchor center",
-    this->RecorderFrame->GetWidgetName());
-
-  this->RecordAllLabel->SetParent(this->RecorderFrame->GetFrame());
-  this->RecordAllLabel->Create(app, 0);
-  this->RecordAllLabel->SetLabel("Everything:");
-
-  this->RecordAllButton->SetParent(this->RecorderFrame->GetFrame());
-  this->RecordAllButton->Create(app, 0);
-  this->RecordAllButton->SetState(this->AnimationManager->GetRecordAll());
-  this->RecordAllButton->SetCommand(this, "RecordAllChangedCallback");
-  this->RecordAllButton->SetBalloonHelpString("Specify if changes in all properties "
-    "are to be recorded or only those in the selected property.");
-
-  this->InitStateButton->SetParent(this->RecorderFrame->GetFrame());
-  this->InitStateButton->Create(app, 0);
-  this->InitStateButton->SetLabel("Init State");
-  this->InitStateButton->SetCommand(this, "InitStateCallback");
-
-  this->KeyFrameChangesButton->SetParent(this->RecorderFrame->GetFrame());
-  this->KeyFrameChangesButton->Create(app, 0);
-  this->KeyFrameChangesButton->SetLabel("Key frame changes");
-  this->KeyFrameChangesButton->SetCommand(this, "KeyFrameChangesCallback");
-
-  this->Script("grid propagate %s 1", this->RecorderFrame->GetFrame()->GetWidgetName());
-  this->Script("grid %s %s - -sticky ew", this->RecordAllLabel->GetWidgetName(), 
-    this->RecordAllButton->GetWidgetName());
-  this->Script("grid %s - %s -sticky ew", this->InitStateButton->GetWidgetName(),
-    this->KeyFrameChangesButton->GetWidgetName());
-  this->Script("grid columnconfigure %s 0 -weight 0",
-    this->RecorderFrame->GetFrame()->GetWidgetName());
-  this->Script("grid columnconfigure %s 1 -weight 2",
-    this->RecorderFrame->GetFrame()->GetWidgetName());
-  this->Script("grid columnconfigure %s 2 -weight 2",
-    this->RecorderFrame->GetFrame()->GetWidgetName());
-  
   // KEYFRAME PROPERTIES FRAME
   this->KeyFramePropertiesFrame->SetParent(this->TopFrame->GetFrame());
   this->KeyFramePropertiesFrame->ShowHideFrameOn();
@@ -278,10 +231,11 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   // SAVE FRAME
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
   this->SaveFrame->ShowHideFrameOn();
-  this->SaveFrame->SetLabel("Cacheing");
+  this->SaveFrame->SetLabel("Animation Settings");
   this->SaveFrame->Create(app, 0);
   this->Script("pack %s -side top -fill both -expand t -anchor center",
     this->SaveFrame->GetWidgetName());
+
 
   this->CacheGeometryCheck->SetParent(this->SaveFrame->GetFrame());
   this->CacheGeometryCheck->Create(app, 0);
@@ -291,7 +245,27 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->CacheGeometryCheck->SetBalloonHelpString(
     "Specify caching of geometry for the animation. Note that cache can be "
     "used only in Sequence mode.");
-  this->Script("grid %s -sticky ew", this->CacheGeometryCheck->GetWidgetName());
+  this->Script("grid %s -sticky w", this->CacheGeometryCheck->GetWidgetName());
+
+  this->RecordAllButton->SetParent(this->SaveFrame->GetFrame());
+  this->RecordAllButton->Create(app, 0);
+  this->RecordAllButton->SetText("Record All properties");
+  this->RecordAllButton->SetState(this->AnimationManager->GetRecordAll());
+  this->RecordAllButton->SetCommand(this, "RecordAllChangedCallback");
+  this->RecordAllButton->SetBalloonHelpString("Specify if changes in all properties "
+    "are to be recorded or only for the highlighted property.");
+  this->Script("grid %s -sticky w", this->RecordAllButton->GetWidgetName());
+
+  this->AdvancedAnimationCheck->SetParent(this->SaveFrame->GetFrame());
+  this->AdvancedAnimationCheck->Create(app, 0);
+  this->AdvancedAnimationCheck->SetText("Show Advanced Animation View");
+  this->AdvancedAnimationCheck->SetCommand(this, "AdvancedAnimationViewCallback");
+  this->AdvancedAnimationCheck->SetState(this->AnimationManager->GetAdvancedView());
+  this->AdvancedAnimationCheck->SetBalloonHelpString(
+    "When checked, all properties that can be animated are shown. Otherwise only a "
+    "small usually used subset of these properties are shown in the keyframe animation "
+    "interface.");
+  this->Script("grid %s  -sticky w", this->AdvancedAnimationCheck->GetWidgetName());
 
   this->Update();
 }
@@ -420,6 +394,19 @@ void vtkPVVerticalAnimationInterface::SetCacheGeometry(int cache)
 }
 
 //-----------------------------------------------------------------------------
+void vtkPVVerticalAnimationInterface::AdvancedAnimationViewCallback()
+{
+  this->SetAdvancedAnimationView(this->AdvancedAnimationCheck->GetState());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVVerticalAnimationInterface::SetAdvancedAnimationView(int advanced)
+{
+  this->AnimationManager->SetAdvancedView(advanced);
+  this->AddTraceEntry("$kw(%s) SetAdvancedAnimationView %d", this->GetTclName(),
+    advanced);
+}
+//-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::InitializeObservers(vtkPVAnimationCue* cue)
 {
   cue->AddObserver(vtkKWParameterValueFunctionEditor::SelectionChangedEvent,
@@ -545,17 +532,6 @@ void vtkPVVerticalAnimationInterface::RecordAllChangedCallback()
   this->AnimationManager->SetRecordAll(state);
 }
 
-//-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::InitStateCallback()
-{
-  this->AnimationManager->InitializeAnimatedPropertyStatus();
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVVerticalAnimationInterface::KeyFrameChangesCallback()
-{
-  this->AnimationManager->KeyFramePropertyChanges();
-}
 
 //-----------------------------------------------------------------------------
 void vtkPVVerticalAnimationInterface::UpdateEnableState()
@@ -564,13 +540,9 @@ void vtkPVVerticalAnimationInterface::UpdateEnableState()
   this->PropagateEnableState(this->TypeMenuButton);
   this->PropagateEnableState(this->TypeImage);
   this->PropagateEnableState(this->IndexScale);
-  this->PropagateEnableState(this->InitStateButton);
-  this->PropagateEnableState(this->RecordAllLabel);
   this->PropagateEnableState(this->RecordAllButton);
-  this->PropagateEnableState(this->KeyFrameChangesButton);
   this->PropagateEnableState(this->ScenePropertiesFrame);
   this->PropagateEnableState(this->KeyFramePropertiesFrame);
-  this->PropagateEnableState(this->RecorderFrame);
   this->PropagateEnableState(this->SelectKeyFrameLabel);
   if (this->ActiveKeyFrame)
     {

@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.10");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.11");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -259,8 +259,11 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->VCRControl->SetGoToPreviousCommand(this, "GoToPrevious");
   this->VCRControl->SetGoToNextCommand(this,"GoToNext");
   this->VCRControl->SetLoopCheckCommand(this,"LoopCheckButtonCallback");
+  this->VCRControl->SetRecordCheckCommand(this, "RecordCheckCallback");
+  this->VCRControl->SetRecordStateCommand(this, "RecordState");
   this->Script("grid %s -columnspan 2 -sticky {}",
     this->VCRControl->GetWidgetName());
+  this->VCRControl->UpdateEnableState();
 
   this->VCRToolbar->SetParent(this->Window->GetLowerToolbars()->GetToolbarsFrame());
   this->VCRToolbar->Create(app);
@@ -271,6 +274,8 @@ void vtkPVAnimationScene::Create(vtkKWApplication* app, const char* args)
   this->VCRToolbar->SetGoToPreviousCommand(this, "GoToPrevious");
   this->VCRToolbar->SetGoToNextCommand(this,"GoToNext");
   this->VCRToolbar->SetLoopCheckCommand(this,"ToolbarLoopCheckButtonCallback");
+  this->VCRToolbar->SetRecordCheckCommand(this, "ToolbarRecordCheckButtonCallback");
+  this->VCRToolbar->SetRecordStateCommand(this, "RecordState");
   this->Window->AddLowerToolbar(this->VCRToolbar, VTK_PV_TOOLBARS_ANIMATION_LABEL, 0);
   this->VCRToolbar->UpdateEnableState();
 
@@ -816,6 +821,61 @@ void vtkPVAnimationScene::ToolbarLoopCheckButtonCallback()
 
 
 //-----------------------------------------------------------------------------
+void vtkPVAnimationScene::ToolbarRecordCheckButtonCallback()
+{
+  if (this->VCRToolbar->GetRecordCheckButtonState())
+    {
+    this->StartRecording();
+    }
+  else
+    {
+    this->StopRecording();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::RecordCheckCallback()
+{
+  if (this->VCRControl->GetRecordCheckButtonState())
+    {
+    this->StartRecording();
+    }
+  else
+    {
+    this->StopRecording();
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::StartRecording()
+{
+  this->AddTraceEntry("$kw(%s) StartRecording", this->GetTclName());
+  this->AnimationManager->StartRecording();
+  this->VCRToolbar->SetRecordCheckButtonState(1);
+  this->VCRControl->SetRecordCheckButtonState(1);
+  this->VCRControl->UpdateEnableState();
+  this->VCRToolbar->UpdateEnableState();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::StopRecording()
+{
+  this->AnimationManager->StopRecording();
+  this->VCRToolbar->SetRecordCheckButtonState(0);
+  this->VCRControl->SetRecordCheckButtonState(0);
+  this->VCRControl->UpdateEnableState();
+  this->VCRToolbar->UpdateEnableState();
+  this->AddTraceEntry("$kw(%s) StopRecording", this->GetTclName());
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationScene::RecordState()
+{
+  this->AddTraceEntry("$kw(%s) RecordState", this->GetTclName());
+  this->AnimationManager->RecordState();
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVAnimationScene::FrameRateChangedCallback()
 {
   this->SetFrameRate(this->FrameRateThumbWheel->GetEntry()->GetValueAsFloat());
@@ -837,7 +897,11 @@ void vtkPVAnimationScene::SetFrameRate(double fps)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::InvalidateAllGeometries()
 {
-  vtkProcessModule::GetProcessModule()->GetRenderModule()->InvalidateAllGeometries();
+  vtkPVRenderModule* rm = vtkProcessModule::GetProcessModule()->GetRenderModule();
+  if (rm)
+    {
+    rm->InvalidateAllGeometries();
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -920,14 +984,15 @@ void vtkPVAnimationScene::TimeScaleCallback()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::AddAnimationCue(vtkPVAnimationCue *pvCue)
 {
-
   this->AnimationSceneProxy->AddCue(pvCue->GetCueProxy());
+  this->InvalidateAllGeometries();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::RemoveAnimationCue(vtkPVAnimationCue* pvCue)
 {
   this->AnimationSceneProxy->RemoveCue(pvCue->GetCueProxy());
+  this->InvalidateAllGeometries();
 }
 
 //-----------------------------------------------------------------------------

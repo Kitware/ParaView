@@ -43,7 +43,7 @@
 #include "vtkSMSourceProxy.h"
 #include "vtkCommand.h"
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.53");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.54");
 
 vtkCxxSetObjectMacro(vtkPVSphereWidget, InputMenu, vtkPVInputMenu);
 
@@ -77,7 +77,7 @@ vtkPVSphereWidget::vtkPVSphereWidget()
 vtkPVSphereWidget::~vtkPVSphereWidget()
 {
   int i;
-
+  this->UnsetPropertyObservers();
   this->SetInputMenu(NULL);
   this->Labels[0]->Delete();
   this->Labels[1]->Delete();
@@ -98,11 +98,7 @@ vtkPVSphereWidget::~vtkPVSphereWidget()
       {
       proxyM->UnRegisterProxy("implicit_functions", proxyName);
       }
-    proxyName = proxyM->GetProxyName("animateable", this->ImplicitFunctionProxy);
-    if (proxyName)
-      {
-      proxyM->UnRegisterProxy("animateable", proxyName);
-      }
+    this->UnregisterAnimateableProxies();
     this->ImplicitFunctionProxy->Delete();
     this->ImplicitFunctionProxy = 0;
     }
@@ -542,27 +538,15 @@ void vtkPVSphereWidget::Create( vtkKWApplication *app)
   pm->RegisterProxy("implicit_functions",str.str(),this->ImplicitFunctionProxy);
   delete[] str.str();
 
-  if (this->PVSource)
-    {
-    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
-    if (sproxy)
-      {
-      const char* root = pm->GetProxyName("animateable", sproxy);
-      if (root)
-        {
-        ostrstream animName;
-        animName << root << ";Sphere" << ends;
-        pm->RegisterProxy(
-          "animateable", animName.str(), this->ImplicitFunctionProxy);
-        delete[] animName.str();
-        }
-      }
-    }
   this->SetupPropertyObservers();
 }
 //----------------------------------------------------------------------------
 void vtkPVSphereWidget::SetupPropertyObservers()
 {
+  if (!this->ImplicitFunctionProxy)
+    {
+    return;
+    }
   vtkSMProperty*p = this->ImplicitFunctionProxy->GetProperty("Center");
   if (p)
     {
@@ -572,6 +556,25 @@ void vtkPVSphereWidget::SetupPropertyObservers()
   if (p)
     {
     this->AddPropertyObservers(p);
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::UnsetPropertyObservers()
+{
+  if (!this->ImplicitFunctionProxy)
+    {
+    return;
+    }
+  vtkSMProperty*p = this->ImplicitFunctionProxy->GetProperty("Center");
+  if (p)
+    {
+    this->RemovePropertyObservers(p);
+    }
+  p = this->ImplicitFunctionProxy->GetProperty("Radius");
+  if (p)
+    {
+    this->RemovePropertyObservers(p);
     }
 }
 
@@ -791,6 +794,45 @@ void vtkPVSphereWidget::UpdateEnableState()
 
   this->PropagateEnableState(this->Labels[0]);
   this->PropagateEnableState(this->Labels[1]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::RegisterAnimateableProxies()
+{
+  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  if (this->PVSource && this->ImplicitFunctionProxy)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ".Sphere" << ends;
+        pm->RegisterProxy(
+          "animateable", animName.str(), this->ImplicitFunctionProxy);
+        delete[] animName.str();
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSphereWidget::UnregisterAnimateableProxies()
+{
+  if (!this->ImplicitFunctionProxy)
+    {
+    return;
+    }
+  vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+
+  const char* proxyName = proxyM->GetProxyName("animateable", this->ImplicitFunctionProxy);
+  if (proxyName)
+    {
+    proxyM->UnRegisterProxy("animateable", proxyName);
+    }
+
 }
 
 //----------------------------------------------------------------------------

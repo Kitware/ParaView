@@ -147,6 +147,16 @@ public:
   // and calls ModifiedCallback.
   void UpdateOffsetRange();
 
+  // Description:
+  // Register the animatable proxies and make them avaiblable for animation.
+  // Called by vtkPVSelectWidget when the widget is selected.
+  virtual void EnableAnimation(){ this->RegisterAnimateableProxies();} ;
+
+  // Description:
+  // Unregister animatable proxies so that they are not available for
+  // animation. Called by vtkPVSelectWidget when this widget is deselected.
+  virtual void DisableAnimation() { this->UnregisterAnimateableProxies();} ;
+
 protected:
   vtkPVImplicitPlaneWidget();
   ~vtkPVImplicitPlaneWidget();
@@ -167,7 +177,7 @@ protected:
   // called on the WidgetProxy()
   void GetCenterInternal(double pts[3]);
   void GetNormalInternal(double pts[3]);
-  
+
   vtkPVInputMenu *InputMenu;
 
   vtkKWEntry *CenterEntry[3];
@@ -188,23 +198,25 @@ protected:
   vtkSMProxy *ImplicitFunctionProxy;
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
-                        vtkPVXMLPackageParser* parser);
+    vtkPVXMLPackageParser* parser);
 
   void CommonReset();
 
   void SetupPropertyObservers();
-
-//BTX
+  void UnsetPropertyObservers();
+  //BTX
   // Description:
   // Creates and returns a copy of this widget. It will create
   // a new instance of the same type as the current object
   // using NewInstance() and then copy some necessary state 
   // parameters.
   virtual vtkPVWidget* ClonePrototypeInternal(
-                                       vtkPVSource* pvSource,
-                                       vtkArrayMap<vtkPVWidget*, 
-                                       vtkPVWidget*>* map);
-//ETX
+    vtkPVSource* pvSource,
+    vtkArrayMap<vtkPVWidget*, 
+    vtkPVWidget*>* map);
+  //ETX
+  void RegisterAnimateableProxies();
+  void UnregisterAnimateableProxies();
 private:
   vtkPVImplicitPlaneWidget(const vtkPVImplicitPlaneWidget&); // Not implemented
   void operator=(const vtkPVImplicitPlaneWidget&); // Not implemented

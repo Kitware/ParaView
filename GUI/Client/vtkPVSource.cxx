@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.414");
+vtkCxxRevisionMacro(vtkPVSource, "1.415");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1083,8 +1083,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     else
       {
       ostrstream animName_with_warning_C4701;
-      animName_with_warning_C4701 << this->GetSourceList() << ";" 
-                                  << this->GetName() << ";"
+      animName_with_warning_C4701 << this->GetSourceList() << "." 
+                                  << this->GetName() << "."
                                   << "Display"
                                   << ends;
       proxm->RegisterProxy(
@@ -2196,7 +2196,7 @@ void vtkPVSource::RegisterProxy(const char* sourceList, vtkPVSource* clone)
     sourceList = "Sources";
     }
   ostrstream animName_with_warning_C4701;
-  animName_with_warning_C4701 << sourceList << ";" 
+  animName_with_warning_C4701 << sourceList << "." 
                               << clone->GetName()
                               << ends;
   proxm->RegisterProxy(

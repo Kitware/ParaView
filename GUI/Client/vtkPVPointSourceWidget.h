@@ -102,6 +102,20 @@ public:
   virtual vtkSMProxy* GetProxyByName(const char*)
     { return reinterpret_cast<vtkSMProxy*>(this->SourceProxy); }
   
+  // Description:
+  // Register the animatable proxies and make them available for animation.
+  // Called by vtkPVSelectWidget when the widget is selected. This
+  // is to make sure that only the selected widget shows up in the
+  // animation interface and thus avoids confusion.
+  virtual void EnableAnimation();
+
+  // Description:
+  // Unregister animatable proxies so that they are not available for
+  // animation. Called by vtkPVSelectWidget when this widget is deselected.
+  // is to make sure that only the selected widget shows up in the
+  // animation interface and thus avoids confusion.
+  virtual void DisableAnimation();
+
 protected:
   vtkPVPointSourceWidget();
   ~vtkPVPointSourceWidget();

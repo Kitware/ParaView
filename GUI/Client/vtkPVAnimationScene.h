@@ -57,7 +57,8 @@ public:
   void ToolbarLoopCheckButtonCallback();
   void TimeScaleCallback();
   void FrameRateChangedCallback();
-    
+  void ToolbarRecordCheckButtonCallback();
+  void RecordCheckCallback();
 
   // Description:
   int  IsInPlay();
@@ -70,6 +71,11 @@ public:
   // Goes to the next/previous frame (incremented by 1/framerate).
   void GoToNext();
   void GoToPrevious();
+
+
+  void StartRecording();
+  void StopRecording();
+  void RecordState();
 
   // Description:
   // Get/Set the duration for which the scene is played in seconds.

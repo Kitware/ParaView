@@ -140,7 +140,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.656");
+vtkCxxRevisionMacro(vtkPVWindow, "1.657");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -239,6 +239,8 @@ vtkPVWindow::vtkPVWindow()
   
   this->LowerFrame = vtkKWSplitFrame::New();
   this->LowerFrame->SetFrame1Size(480);
+  this->LowerFrame->SetFrame1MinimumSize(0);
+  this->LowerFrame->SetFrame2MinimumSize(0);
 
   this->TimerLogDisplay = NULL;
   this->ErrorLogDisplay = NULL;
@@ -1193,8 +1195,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->LowerToolbars->Create(app,0);
   this->LowerToolbars->ShowBottomSeparatorOff();
 
-  this->LowerFrame->SetFrame1MinimumSize(1);
-  this->LowerFrame->SetFrame2MinimumSize(1);
   this->LowerFrame->Frame2VisibilityOff();
 
   this->LowerFrame->SetSeparatorSize(5);
@@ -1459,11 +1459,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->AnimationManager->SetVerticalParent(this->GetPropertiesParent());
   this->AnimationManager->Create(app, "-relief flat");
   this->AnimationManager->ShowHAnimationInterface();
-  this->AnimationManager->RestoreWindowGeometry();
   
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
   this->MenuFile->SetState(VTK_PV_OPEN_DATA_MENU_LABEL, vtkKWMenu::Disabled);
+
+  if (app->GetSaveWindowGeometry())
+    {
+    this->RestorePVWindowGeometry();
+    }
 
   if (this->InitializeDefaultInterfaces)
     {
@@ -5212,7 +5216,7 @@ void vtkPVWindow::SaveWindowGeometry()
   if (this->IsCreated())
     {
     this->GetApplication()->SetRegisteryValue(
-      2, "Geometry", "WindowHorzizontalFrame1Size",
+      2, "Geometry", "WindowHorizontalFrame1Size",
       "%d", this->LowerFrame->GetFrame1Size());
 
     this->AnimationManager->SaveWindowGeometry();
@@ -5221,19 +5225,19 @@ void vtkPVWindow::SaveWindowGeometry()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::RestoreWindowGeometry()
+void vtkPVWindow::RestorePVWindowGeometry()
 {
-  this->Superclass::RestoreWindowGeometry();
   if (this->GetApplication()->HasRegisteryValue(
-      2, "Geometry", "WindowHorzizontalFrame1Size"))
+      2, "Geometry", "WindowHorizontalFrame1Size"))
     {
     int reg_size = this->GetApplication()->GetIntRegisteryValue(
-      2, "Geometry", "WindowHorzizontalFrame1Size");
+      2, "Geometry", "WindowHorizontalFrame1Size");
     if (reg_size >= this->LowerFrame->GetFrame1MinimumSize())
       {
       this->LowerFrame->SetFrame1Size(reg_size);
       }
     }
+  this->AnimationManager->RestoreWindowGeometry();
 }
 
 //-----------------------------------------------------------------------------

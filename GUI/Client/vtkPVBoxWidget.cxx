@@ -41,7 +41,7 @@
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.48");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVBoxWidget, InputMenu, vtkPVInputMenu);
 
@@ -75,6 +75,7 @@ vtkPVBoxWidget::vtkPVBoxWidget()
 //----------------------------------------------------------------------------
 vtkPVBoxWidget::~vtkPVBoxWidget()
 {
+  this->UnsetPropertyObservers();
   this->SetInputMenu(NULL);
   this->ControlFrame->Delete();
   this->TranslateLabel->Delete();
@@ -613,6 +614,7 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
   str1 << "vtkPVBoxWidget_Box" << instanceCount << ends;
   pm->RegisterProxy("implicit_functions", str1.str(), this->BoxProxy);
   delete[] str1.str();
+  /*
   if (this->PVSource)
     {
     vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
@@ -622,19 +624,19 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
       if (root)
         {
         ostrstream animName;
-        animName << root << ";Box" << ends;
+        animName << root << ".Box" << ends;
         pm->RegisterProxy("animateable", animName.str(), this->BoxProxy);
         delete[] animName.str();
         }
       }
     }
-
+  */
   this->BoxTransformProxy = pm->NewProxy("transforms", "Transform2");
   ostrstream str2;
   str2 << "vtkPVBoxWidget_BoxTransform" << instanceCount << ends;
   pm->RegisterProxy("transforms", str2.str(), this->BoxTransformProxy);
   delete[] str2.str();
-  if (this->PVSource)
+/*  if (this->PVSource)
     {
     vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
     if (sproxy)
@@ -643,13 +645,14 @@ void vtkPVBoxWidget::Create( vtkKWApplication *app)
       if (root)
         {
         ostrstream animName;
-        animName << root << ";BoxTransform" << ends;
+        animName << root << ".BoxTransform" << ends;
         pm->RegisterProxy(
           "animateable", animName.str(), this->BoxTransformProxy);
         delete[] animName.str();
         }
       }
     }
+    */
   this->SetupPropertyObservers();
   instanceCount++;
 }
@@ -910,6 +913,10 @@ void vtkPVBoxWidget::ExecuteEvent(vtkObject* wdg, unsigned long event, void* p)
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::SetupPropertyObservers()
 {
+  if (!this->BoxTransformProxy || ! this->BoxProxy)
+    {
+    return;
+    }
   const char* properties[] = {"Scale","Position","Rotation", 0 };
   int i;
   for (i=0;properties[i]; i++)
@@ -924,6 +931,31 @@ void vtkPVBoxWidget::SetupPropertyObservers()
     if (pB)
       {
       this->AddPropertyObservers(pB);
+      }
+    } 
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::UnsetPropertyObservers()
+{
+  if (!this->BoxTransformProxy || ! this->BoxProxy)
+    {
+    return;
+    }
+  const char* properties[] = {"Scale","Position","Rotation", 0 };
+  int i;
+  for (i=0;properties[i]; i++)
+    {
+    vtkSMProperty* pT = this->BoxTransformProxy->GetProperty(properties[i]);
+    vtkSMProperty* pB = this->BoxProxy->GetProperty(properties[i]);
+    
+    if (pT)
+      {
+      this->RemovePropertyObservers(pT);
+      }
+    if (pB)
+      {
+      this->RemovePropertyObservers(pB);
       }
     } 
 }
@@ -999,6 +1031,58 @@ void vtkPVBoxWidget::UpdateEnableState()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::RegisterAnimateableProxies()
+{
+  vtkSMProxyManager *pm = vtkSMObject::GetProxyManager();
+  if (this->PVSource)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root && this->BoxProxy)
+        {
+        ostrstream animName;
+        animName << root << ".Box" << ends;
+        pm->RegisterProxy("animateable", animName.str(), this->BoxProxy);
+        animName.rdbuf()->freeze(0);
+        }
+
+      if (root && this->BoxTransformProxy)
+        {
+        ostrstream animName;
+        animName << root << ".BoxTransform" << ends;
+        pm->RegisterProxy(
+          "animateable", animName.str(), this->BoxTransformProxy);
+        animName.rdbuf()->freeze(0);
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVBoxWidget::UnregisterAnimateableProxies()
+{
+  const char* proxyName;
+  vtkSMProxyManager *proxyM= vtkSMObject::GetProxyManager();
+  if (this->BoxProxy)
+    {
+    proxyName = proxyM->GetProxyName("animateable", this->BoxProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
+    }
+  if (this->BoxTransformProxy)
+    {
+    proxyName = proxyM->GetProxyName("animateable", this->BoxTransformProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
+    }
+}
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::Update()
 {

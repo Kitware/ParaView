@@ -22,7 +22,7 @@
 #include "vtkSMSinusoidKeyFrameProxy.h"
 
 vtkStandardNewMacro(vtkPVSinusoidKeyFrame);
-vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.1");
+vtkCxxRevisionMacro(vtkPVSinusoidKeyFrame, "1.2");
 
 //-----------------------------------------------------------------------------
 vtkPVSinusoidKeyFrame::vtkPVSinusoidKeyFrame()
@@ -92,7 +92,7 @@ void vtkPVSinusoidKeyFrame::ChildCreate(vtkKWApplication* app)
 
   this->OffsetLabel->SetParent(this);
   this->OffsetLabel->Create(app, 0);
-  this->OffsetLabel->SetLabel("Wave Offset:");
+  this->OffsetLabel->SetLabel("Amplitude:");
 
   this->OffsetThumbWheel->SetParent(this);
   this->OffsetThumbWheel->PopupModeOn();

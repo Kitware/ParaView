@@ -594,7 +594,10 @@ protected:
   // Description:
   // Save/Restore window geometry
   virtual void SaveWindowGeometry();
-  virtual void RestoreWindowGeometry();
+
+  // Description:
+  // Restore the PVWindow geometry alone.
+  virtual void RestorePVWindowGeometry();
 
   // Main render window
   vtkPVRenderView *MainView;

@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.9");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.10");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -137,9 +137,10 @@ void vtkPVAnimationCueTree::AddChild(vtkPVAnimationCue* child)
   child->SetTraceReferenceObject(this);
   child->SetTraceReferenceCommand(str.str());
   str.rdbuf()->freeze(0);
-
   child->Create(this->GetApplication(), "-relief flat");
   child->PackWidget();
+  // Set the time marker for the child so it's not out of sync.
+  child->SetTimeMarker(this->GetTimeMarker());
   this->Children->AddItem(child);
   this->InitializeObservers(child);
   this->DrawChildConnections(child);
@@ -155,11 +156,25 @@ void vtkPVAnimationCueTree::RemoveChild(vtkPVAnimationCue* child)
   // It is essential to remove focus form the child, so if any of the active cue's 
   // which is being shown in the VAnimationInterface is removed, 
   // the VAnimationInterface will let go of the cue (due to focus out).
-  child->RemoveFocus();
-  child->UnpackWidget();
-  child->SetParent(NULL);
+  child->Detach();
   this->Children->RemoveItem(child);
   this->AdjustEndPoints();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCueTree::Detach()
+{
+  vtkCollectionIterator* iter = this->Children->NewIterator();
+  vtkPVAnimationCue* t = NULL;
+    
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    t = vtkPVAnimationCue::SafeDownCast(iter->GetCurrentObject());
+    t->Detach();
+    }
+  iter->Delete();
+  this->Children->RemoveAllItems();
+  this->Superclass::Detach();
 }
 
 //-----------------------------------------------------------------------------
@@ -505,29 +520,43 @@ void vtkPVAnimationCueTree::SetTimeBounds(double bounds[2], int enable_scaling)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCueTree::InitializeStatus()
+void vtkPVAnimationCueTree::StartRecording()
 {
-  this->Superclass::InitializeStatus(); 
+  this->Superclass::StartRecording(); 
   vtkCollectionIterator* iter = this->Children->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkPVAnimationCue* child_cue = vtkPVAnimationCue::SafeDownCast(
       iter->GetCurrentObject());
-    child_cue->InitializeStatus(); 
+    child_cue->StartRecording(); 
     }
   iter->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationCueTree::KeyFramePropertyChanges(double ntime, int onlyFocus)
+void vtkPVAnimationCueTree::StopRecording()
 {
-  this->Superclass::KeyFramePropertyChanges(ntime, onlyFocus);
   vtkCollectionIterator* iter = this->Children->NewIterator();
   for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
     {
     vtkPVAnimationCue* child_cue = vtkPVAnimationCue::SafeDownCast(
       iter->GetCurrentObject());
-    child_cue->KeyFramePropertyChanges(ntime ,onlyFocus); 
+    child_cue->StopRecording(); 
+    }
+  iter->Delete();
+  this->Superclass::StopRecording(); 
+}
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCueTree::RecordState(double ntime, double offset,
+  int onlyFocus)
+{
+  this->Superclass::RecordState(ntime, offset, onlyFocus);
+  vtkCollectionIterator* iter = this->Children->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkPVAnimationCue* child_cue = vtkPVAnimationCue::SafeDownCast(
+      iter->GetCurrentObject());
+    child_cue->RecordState(ntime , offset, onlyFocus); 
     } 
   iter->Delete();
 }
@@ -575,8 +604,35 @@ void vtkPVAnimationCueTree::SaveState(ofstream* file)
       iter->GetCurrentObject());
     *file << "set kw(" << child->GetTclName() << ") [$kw("
       << this->GetTclName() << ") GetChild \"" <<
-      child->GetName() << "\"]" << endl;
+      (child->GetTclNameCommand()? child->GetTclNameCommand() : child->GetName())
+      << "\"]" << endl;
     child->SaveState(file);
+    }
+  iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCueTree::UpdateCueVisibility(int advanced)
+{
+  this->Superclass::UpdateCueVisibility(advanced);
+
+  this->CueVisibility = advanced;
+
+  vtkCollectionIterator* iter = this->Children->NewIterator();
+  for (iter->InitTraversal(); !iter->IsDoneWithTraversal(); iter->GoToNextItem())
+    {
+    vtkPVAnimationCue* child = vtkPVAnimationCue::SafeDownCast(
+      iter->GetCurrentObject());
+    child->UpdateCueVisibility(advanced);
+    if (child->GetCueVisibility())
+      {
+      child->PackWidget();
+      this->CueVisibility = 1;
+      }
+    else
+      {
+      child->UnpackWidget();
+      }
     }
   iter->Delete();
 }

@@ -73,8 +73,6 @@ class vtkPVAnimationCue;
 class vtkPVSource;
 class vtkPVKeyFrame;
 class vtkSMStringVectorProperty;
-class vtkKWToolbar;
-class vtkKWPushButton;
 
 class VTK_EXPORT vtkPVAnimationManager : public vtkKWWidget
 {
@@ -171,15 +169,13 @@ public:
   vtkGetMacro(RecordAll, int);
  
   // Description:
-  // This methods runs over all the animatable properties (property cues)
-  // and notes their current values. Call to KeyFrameChanges compares
-  // the property values to these noted values to generate key frames.
-  void InitializeAnimatedPropertyStatus();
+  // Record state records the current state of the animation.
+  void RecordState();
 
-  // Description:
-  // Changes in animatable properties since the last call to 
-  // InitializeAnimatedPropertyStatus are recorded as a keyframes.
-  void KeyFramePropertyChanges();
+  // Description:;
+  // Enable/Disable recording.
+  void StartRecording();
+  void StopRecording();
 
   // Description:
   // Update the "enable" state of the object and its internal parts.
@@ -220,6 +216,18 @@ public:
   // Description:
   // Remove all the keyframes in the animation.
   void RemoveAllKeyFrames();
+
+  // Description:
+  // Advanced animation view indicates whether to show only the properties 
+  // marked as animatebale in the ServerManager XML or all the propeties
+  // that can be animated. This helps is reducing teh clutter.
+  vtkGetMacro(AdvancedView, int);
+  void SetAdvancedView(int advanced);
+
+  // Description:
+  // Get's the cue tree for an animateable proxy registed with the proxyname.
+  vtkPVAnimationCueTree* GetAnimationCueTreeForProxy(const char* proxyname);
+
 protected:
   vtkPVAnimationManager();
   ~vtkPVAnimationManager();
@@ -276,9 +284,9 @@ protected:
 
   vtkPVAnimationCueTree* GetAnimationCueTreeForSource(vtkPVSource* pvSource);
 
-  vtkKWToolbar* KeyFramesToolbar;
-  vtkKWPushButton* InitStateButton;
-  vtkKWPushButton* AddKeyFramesButton;
+  int AdvancedView;
+  int InRecording;
+  double RecordingIncrement;
 private:
   vtkPVAnimationManager(const vtkPVAnimationManager&); // Not implemented.
   void operator=(const vtkPVAnimationManager&); // Not implemented.

@@ -27,6 +27,7 @@
 #include "vtkSMProxyManager.h"
 #include "vtkSmartPointer.h"
 #include "vtkString.h"
+#include "vtkPVAnimationCue.h"
 #include "vtkPVAnimationCueTree.h"
 #include "vtkSMPropertyIterator.h"
 #include "vtkSMProperty.h"
@@ -51,9 +52,6 @@
 #include "vtkProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkCollectionIterator.h"
-#include "vtkKWToolbar.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWToolbarSet.h"
 
 #include <vtkstd/map>
 #include <vtkstd/string>
@@ -61,7 +59,7 @@
 #define VTK_PV_ANIMATION_GROUP "animateable"
 
 vtkStandardNewMacro(vtkPVAnimationManager);
-vtkCxxRevisionMacro(vtkPVAnimationManager, "1.14");
+vtkCxxRevisionMacro(vtkPVAnimationManager, "1.15");
 vtkCxxSetObjectMacro(vtkPVAnimationManager, HorizantalParent, vtkKWWidget);
 vtkCxxSetObjectMacro(vtkPVAnimationManager, VerticalParent, vtkKWWidget);
 //*****************************************************************************
@@ -127,10 +125,10 @@ vtkPVAnimationManager::vtkPVAnimationManager()
   this->Observer = vtkPVAnimationManagerObserver::New();
   this->Observer->SetTarget(this);
   this->RecordAll = 1;
+  this->InRecording = 0;
+  this->RecordingIncrement = 0.1;
 
-  this->KeyFramesToolbar = vtkKWToolbar::New();
-  this->InitStateButton = vtkKWPushButton::New();
-  this->AddKeyFramesButton = vtkKWPushButton::New();
+  this->AdvancedView = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -144,10 +142,6 @@ vtkPVAnimationManager::~vtkPVAnimationManager()
   this->ProxyIterator->Delete();
   delete this->Internals;
   this->Observer->Delete();
-
-  this->KeyFramesToolbar->Delete();
-  this->InitStateButton->Delete();
-  this->AddKeyFramesButton->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -169,6 +163,11 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow* pvWin = pvApp->GetMainWindow();
 
+  if (pvApp->HasRegisteryValue(2,"RunTime","AdvancedAnimationView"))
+    {
+    this->AdvancedView = pvApp->GetIntRegisteryValue(2, "RunTime", "AdvancedAnimationView");
+    }
+
   this->HAnimationInterface->SetParent(this->HorizantalParent);
   this->HAnimationInterface->Create(app, "-relief flat");
 
@@ -186,23 +185,19 @@ void vtkPVAnimationManager::Create(vtkKWApplication* app, const char* )
   this->Script("pack %s -anchor n -side top -expand t -fill both",
     this->AnimationScene->GetWidgetName());
 
-  pvWin->AddLowerToolbar(this->KeyFramesToolbar, "Recorder", 0);
-  this->KeyFramesToolbar->SetParent(pvWin->GetLowerToolbars()->GetToolbarsFrame());
-  this->KeyFramesToolbar->Create(app);
- 
-  this->InitStateButton->SetParent(this->KeyFramesToolbar->GetFrame());
-  this->InitStateButton->Create(app, "-image PVInitState");
-  this->InitStateButton->SetCommand(this, "InitializeAnimatedPropertyStatus");
-  this->InitStateButton->SetBalloonHelpString(
-    "Set a reference point for all animatable properties, so that any changes can be noted.");
-  this->KeyFramesToolbar->AddWidget(this->InitStateButton);
+}
 
-  this->AddKeyFramesButton->SetParent(this->KeyFramesToolbar->GetFrame());
-  this->AddKeyFramesButton->Create(app, "-image PVKeyFrameChanges");
-  this->AddKeyFramesButton->SetCommand(this, "KeyFramePropertyChanges");
-  this->AddKeyFramesButton->SetBalloonHelpString(
-    "Record all the changes in animatable properties, and add them as key frames.");
-  this->KeyFramesToolbar->AddWidget(this->AddKeyFramesButton);
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::SetAdvancedView(int advanced)
+{
+  if (this->AdvancedView == advanced)
+    {
+    return;
+    }
+  this->AdvancedView = advanced;
+  this->Update();
+  this->GetApplication()->SetRegisteryValue(2, "RunTime",
+    "AdvancedAnimationView", "%d", advanced);
 }
 
 //-----------------------------------------------------------------------------
@@ -222,28 +217,41 @@ void vtkPVAnimationManager::ShowAnimationInterfaces()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::ShowVAnimationInterface()
 {
-  this->VAnimationInterface->UnpackSiblings();
-  this->Script("pack %s -anchor n -side top -expand t -fill both",
-    this->VAnimationInterface->GetWidgetName());
+  if (!this->VAnimationInterface->IsPacked())
+    {
+    this->VAnimationInterface->UnpackSiblings();
+    this->Script("pack %s -anchor n -side top -expand t -fill both",
+      this->VAnimationInterface->GetWidgetName());
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::ShowHAnimationInterface()
 {
-  this->Script("pack %s -anchor n -side top -expand t -fill both",
-    this->HAnimationInterface->GetWidgetName());
+  if (!this->HAnimationInterface->IsPacked())
+    {
+    this->Script("pack %s -anchor n -side top -expand t -fill both",
+      this->HAnimationInterface->GetWidgetName());
+    }
 }
 
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::Update()
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
   this->ValidateAndAddSpecialCues();
 
   //1) validate if any of the old sources have disappeared.
   this->ValidateOldSources();
   //2) add any new sources.
   this->AddNewSources();
-  
+  this->HAnimationInterface->GetParentTree()->UpdateCueVisibility(
+    this->AdvancedView); 
+  this->Script("update");
+  this->HAnimationInterface->ResizeCallback();
 }
 
 //-----------------------------------------------------------------------------
@@ -251,6 +259,7 @@ void vtkPVAnimationManager::ValidateOldSources()
 {
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow *pvWindow = (pvApp)? pvApp->GetMainWindow() : NULL;
+  vtkSMProxyManager *proxyManager = vtkSMObject::GetProxyManager();
   if (!pvWindow)
     {
     return;
@@ -266,11 +275,7 @@ void vtkPVAnimationManager::ValidateOldSources()
       iter++; 
       continue;
       }
-    /*
-     * For removal from the map to work propely on Sun, we have to 
-     * retart the iteration from the begining. To avoid repeated checks,
-     * we used the verified_until index.
-     */
+
     int deleted = 0;
     const char* sourcekey = iter->first.c_str();
     char* listname = this->GetSourceListName(sourcekey);
@@ -278,6 +283,7 @@ void vtkPVAnimationManager::ValidateOldSources()
     char* subsourcename = this->GetSubSourceName(sourcekey);
 
     vtkPVSource* pvSource = pvWindow->GetPVSource(listname, sourcename);
+    
     if (strcmp(listname,"_dont_validate_") == 0)
       {
       // provides for special cues that are not PVSources.
@@ -295,11 +301,25 @@ void vtkPVAnimationManager::ValidateOldSources()
         //deletes all the subsources as well.
         }
       // if it is a subsource, then it will get deleted when the parent will be deleted.
-      // This should never occur as subsources are never directly added to the base node.
       this->Internals->PVAnimationCues.erase(iter);
-      current_index = -1;
-      iter = this->Internals->PVAnimationCues.begin(); 
       deleted = 1;
+      }
+    else if (pvSource && subsourcename && 
+      proxyManager->GetProxy(VTK_PV_ANIMATION_GROUP,sourcekey) == NULL)
+      {
+      // some pvSource (actually some widget in the source) might have
+      // unregistered this proxy. So remove it.
+      vtkPVAnimationCueTree* pvParent = this->GetAnimationCueTreeForSource(pvSource);
+      if (pvParent)
+        {
+        pvParent->RemoveChild(iter->second);
+        this->Internals->PVAnimationCues.erase(iter);
+        deleted = 1;
+        }
+      else
+        {
+        vtkErrorMacro("Failed to find parent tree.");
+        }
       }
     else if (pvSource && subsourcename == NULL)
       {
@@ -308,7 +328,12 @@ void vtkPVAnimationManager::ValidateOldSources()
       iter->second->SetLabelText(label);
       delete []label;     
       }
-    if (!deleted)
+    if (deleted)
+      {
+      current_index = -1;
+      iter = this->Internals->PVAnimationCues.begin(); 
+      }
+    else 
       {
       iter++;
       verified_until++;
@@ -390,10 +415,8 @@ void vtkPVAnimationManager::AddNewSources()
       char* sourcekey = this->GetSourceKey(proxyname);
       pvParentTree = vtkPVAnimationCueTree::SafeDownCast(
         this->Internals->PVAnimationCues[sourcekey]);
-      // Set the pvSource for the source tree so that 
-      // GetAnimationCueTreeForSource can work properly.
-      pvParentTree->SetPVSource(pvSource);
       delete [] sourcekey;
+      
       if (!pvParentTree)
         {
         vtkErrorMacro("Error while building animatable objects list!" << proxyname);
@@ -405,21 +428,17 @@ void vtkPVAnimationManager::AddNewSources()
         }
       else
         {
-        ostrstream str;
-        str << pvParentTree->GetName() << "." << subsourcename << ends;
-        pvCue->SetName(str.str());
+        // Set the pvSource for the source tree so that 
+        // GetAnimationCueTreeForSource can work properly.
         pvCue->SetPVSource(pvSource);
-        str.rdbuf()->freeze(0);
+        pvCue->SetName(proxyname);
         pvParentTree->AddChild(pvCue);
         }
       }
     else
       {
-      ostrstream str;
-      str << "_Scene_" << "." << proxyname << ends;
-      pvCue->SetName(str.str());
+      pvCue->SetName(proxyname);
       pvCue->SetPVSource(pvSource);
-      str.rdbuf()->freeze(0);
       this->HAnimationInterface->AddAnimationCueTree(pvCue);
       }
 
@@ -487,6 +506,7 @@ int vtkPVAnimationManager::AddProperties(vtkPVSource* pvSource, vtkSMProxy* prox
       cueTree->SetPVSource(pvSource);
       cueTreeName.rdbuf()->freeze(0);
       pvCueTree->AddChild(cueTree);
+      this->InitializeObservers(cueTree);
       cueTree->Delete();
        
       for (int i=0; i < numOfElements; i++)
@@ -632,7 +652,7 @@ char* vtkPVAnimationManager::GetSourceListName(const char* proxyname)
     }
   char* listname = new char[vtkString::Length(proxyname)+1];
   listname[0] = 0;
-  sscanf(proxyname,"%[^;];",listname);
+  sscanf(proxyname,"%[^.].",listname);
   return listname;
 }
 
@@ -648,7 +668,7 @@ char* vtkPVAnimationManager::GetSourceName(const char* proxyname)
   char* sourcename =  new char[vtkString::Length(proxyname)+1];
   listname[0] = 0;
   sourcename[0] = 0;
-  sscanf(proxyname,"%[^;];%[^;]",listname,sourcename);
+  sscanf(proxyname,"%[^.].%[^.]",listname,sourcename);
   delete [] listname;
   return sourcename;
 }
@@ -658,7 +678,7 @@ char* vtkPVAnimationManager::GetSourceKey(const char* proxyname)
 {
   char* listname = this->GetSourceListName(proxyname);
   char* sourcename  = this->GetSourceName(proxyname);
-  char* key = vtkString::Append(listname,";",sourcename);
+  char* key = vtkString::Append(listname,".",sourcename);
   delete [] listname;
   delete [] sourcename;
   return key;
@@ -678,7 +698,7 @@ char* vtkPVAnimationManager::GetSubSourceName(const char* proxyname)
   listname[0] = 0;
   sourcename[0] = 0;
   subsourcename[0] = 0;
-  sscanf(proxyname,"%[^;];%[^;];%s",listname,sourcename,subsourcename);
+  sscanf(proxyname,"%[^.].%[^.].%s",listname,sourcename,subsourcename);
   delete [] listname;
   delete [] sourcename;
   if (vtkString::Length(subsourcename) > 0)
@@ -779,41 +799,55 @@ vtkPVKeyFrame* vtkPVAnimationManager::ReplaceKeyFrame(vtkPVAnimationCue* pvCue,
   return keyFrame;
 }
 
+
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::InitializeAnimatedPropertyStatus()
+void vtkPVAnimationManager::StartRecording()
 {
-  //we could run thru the collection of PVCues this class has.
-  //But why bother when the vtkPVHorizontalAnimationInterface has a
-  //PVCue that is parent of all?
-  this->AddTraceEntry("$kw(%s) InitializeAnimatedPropertyStatus",
-    this->GetTclName());
-  this->HAnimationInterface->InitializeAnimatedPropertyStatus();
-  
+  if (this->InRecording)
+    {
+    return;
+    }
+  this->InRecording = 1;
+  this->RecordingIncrement = 0.1;
+  this->HAnimationInterface->StartRecording();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationManager::KeyFramePropertyChanges()
+void vtkPVAnimationManager::StopRecording()
 {
-  this->AddTraceEntry("$kw(%s) KeyFramePropertyChanges",
-    this->GetTclName());
+  if (!this->InRecording)
+    {
+    return;
+    }
+  this->InRecording = 0;
+  this->HAnimationInterface->StopRecording();
+}
+
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationManager::RecordState()
+{
+  if (!this->InRecording)
+    {
+    vtkErrorMacro("Not in recording.");
+    return;
+    }
   // determine the paramter to insert the key frame.
   double curbounds[2] = {0, 0};
   this->HAnimationInterface->GetTimeBounds(curbounds);
-  double parameter = curbounds[1] + 0.1;
-  if (parameter > 1)
+  double parameter = curbounds[1];
+  if (parameter + this->RecordingIncrement > 1)
     {
-    curbounds[1] -= 0.1;
+    curbounds[1] -= this->RecordingIncrement;
     this->HAnimationInterface->SetTimeBounds(curbounds,1);
-    parameter = curbounds[1] + 0.1;
+    parameter -= this->RecordingIncrement;
+    this->RecordingIncrement *= ( 1.0 - this->RecordingIncrement); 
     }
-
-  this->HAnimationInterface->KeyFramePropertyChanges(parameter, 
+  this->Script("update");
+  this->HAnimationInterface->RecordState(parameter, this->RecordingIncrement,
     !this->RecordAll);
-  this->InitializeAnimatedPropertyStatus();
-
 }
 
-//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void vtkPVAnimationManager::SaveState(ofstream* file)
 {
@@ -1126,10 +1160,12 @@ void vtkPVAnimationManager::AddDefaultAnimation(vtkPVSource* pvSource)
       const char* propertyname = child->GetAnimatedPropertyName();
       if (propertyname && strcmp(propertyname,"FileName")==0)
         {
-        int id1 = child->AddNewKeyFrame(0.0);
-        int id2 = child->AddNewKeyFrame(1.0);
-        child->GetKeyFrame(id1)->SetKeyValue(0);
-        child->GetKeyFrame(id2)->SetKeyValue(numOfTimeSteps-1);
+        child->AddNewKeyFrame(0.0);
+        child->AddNewKeyFrame(1.0);
+        //int id1 = child->AddNewKeyFrame(0.0);
+        //int id2 = child->AddNewKeyFrame(1.0);
+        //child->GetKeyFrame(id1)->SetKeyValue(0);
+        //child->GetKeyFrame(id2)->SetKeyValue(numOfTimeSteps-1);
         break;
         }
       }
@@ -1151,6 +1187,27 @@ vtkPVAnimationCueTree* vtkPVAnimationManager::GetAnimationCueTreeForSource(
       }
     }
   return NULL;
+}
+
+//-----------------------------------------------------------------------------
+vtkPVAnimationCueTree* vtkPVAnimationManager::GetAnimationCueTreeForProxy(
+  const char* proxyname)
+{
+  char* sourcekey = this->GetSourceKey(proxyname);
+  if (!sourcekey)
+    {
+    vtkErrorMacro("Cannot find source for proxy " << proxyname);
+    return NULL;
+    }
+  vtkPVAnimationManagerInternals::StringToPVCueMap::iterator iter;
+  iter = this->Internals->PVAnimationCues.find(sourcekey);
+  if (iter == this->Internals->PVAnimationCues.end())
+    {
+    vtkErrorMacro("Cannot find source for proxy " << proxyname);
+    return NULL;
+    }
+  vtkPVAnimationCueTree* tree =  vtkPVAnimationCueTree::SafeDownCast(iter->second);
+  return vtkPVAnimationCueTree::SafeDownCast(tree->GetChild(proxyname));
 }
 
 //-----------------------------------------------------------------------------

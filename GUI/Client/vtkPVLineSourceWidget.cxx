@@ -28,7 +28,7 @@
 #include "vtkSM3DWidgetProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.31");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -54,15 +54,46 @@ vtkPVLineSourceWidget::~vtkPVLineSourceWidget()
       {
       proxyM->UnRegisterProxy("sources", proxyName);
       }
-    proxyName = proxyM->GetProxyName("animateable", this->SourceProxy);
-    if (proxyName)
-      {
-      proxyM->UnRegisterProxy("animateable", proxyName);
-      }
+    this->DisableAnimation();
     this->SourceProxy->Delete();
     this->SourceProxy = 0;
     }
   this->SetInputMenu(NULL);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::EnableAnimation()
+{
+  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  if (this->PVSource && this->SourceProxy)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ".LineSource" << ends;
+        pm->RegisterProxy("animateable", animName.str(), this->SourceProxy);
+        delete[] animName.str();
+        }
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVLineSourceWidget::DisableAnimation()
+{
+  if (this->SourceProxy)
+    {
+    vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+    const char* proxyName = proxyM->GetProxyName("animateable", this->SourceProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -75,21 +106,6 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   ostrstream str;
   str << "LineSource" << proxyNum << ends;
   pm->RegisterProxy("sources", str.str(), this->SourceProxy);
-  if (this->PVSource)
-    {
-    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
-    if (sproxy)
-      {
-      const char* root = pm->GetProxyName("animateable", sproxy);
-      if (root)
-        {
-        ostrstream animName;
-        animName << root << ";LineSource" << ends;
-        pm->RegisterProxy("animateable", animName.str(), this->SourceProxy);
-        delete[] animName.str();
-        }
-      }
-    }
   proxyNum++;
   delete[] str.str();
 

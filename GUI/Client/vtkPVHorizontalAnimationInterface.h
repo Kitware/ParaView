@@ -49,8 +49,9 @@ public:
 
   void SetTimeMarker(double ntime);
 
-  void InitializeAnimatedPropertyStatus();
-  void KeyFramePropertyChanges(double ntime, int onlyFocus);
+  void StartRecording();
+  void StopRecording();
+  void RecordState(double ntime, double offset, int onlyFocus);
 
   // Description:
   // Set the timeline parameter bounds. This moves the timeline end points.

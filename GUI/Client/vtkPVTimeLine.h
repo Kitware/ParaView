@@ -71,7 +71,10 @@ public:
 
   void SetAnimationCue(vtkPVAnimationCue* cue);
 
+  // Description:
+  // Set/Get the time position marker for the timeline.
   void SetTimeMarker(double time);
+  double GetTimeMarker();
 
   // Description:
   // Must be called if the keyframes are changed externally. 

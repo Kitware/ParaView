@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.52");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.53");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -296,6 +296,30 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
       this->Menu->SetValue(name);
       }
     }
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSelectionList::GetValue(const char* name)
+{
+  return this->Names->GetIndex(name);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSelectionList::RemoveAllItems()
+{
+  this->Names->RemoveAllItems();
+  if (this->Menu->IsCreated())
+    {
+    this->Menu->DeleteAllEntries();
+    }
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkPVSelectionList::GetNumberOfItems()
+{
+  return this->Names->GetLength();
 }
 
 //----------------------------------------------------------------------------

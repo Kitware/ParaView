@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.47");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.48");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -84,7 +84,9 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
 //----------------------------------------------------------------------------
 vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
 {
-
+  // We unset the property observers, since we don't want to catch any events
+  // while this thing it getting destroyed, it can crash otherwise!
+  this->UnsetPropertyObservers();
   this->SetInputMenu(NULL);
   int i;
   this->Labels[0]->Delete();
@@ -113,11 +115,7 @@ vtkPVImplicitPlaneWidget::~vtkPVImplicitPlaneWidget()
       {
       proxyM->UnRegisterProxy("implicit_functions", proxyName);
       }
-    proxyName = proxyM->GetProxyName("animateable", this->ImplicitFunctionProxy);
-    if (proxyName)
-      {
-      proxyM->UnRegisterProxy("animateable", proxyName);
-      }
+    this->UnregisterAnimateableProxies();
     this->ImplicitFunctionProxy->Delete();
     this->ImplicitFunctionProxy = 0;
     }
@@ -705,23 +703,6 @@ void vtkPVImplicitPlaneWidget::Create(vtkKWApplication *app)
   proxyNum++;
   pm->RegisterProxy("implicit_functions",str.str(),this->ImplicitFunctionProxy);
   delete[] str.str();
-
-  if (this->PVSource)
-    {
-    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
-    if (sproxy)
-      {
-      const char* root = pm->GetProxyName("animateable", sproxy);
-      if (root)
-        {
-        ostrstream animName;
-        animName << root << ";Plane" << ends;
-        pm->RegisterProxy(
-          "animateable", animName.str(), this->ImplicitFunctionProxy);
-        delete[] animName.str();
-        }
-      }
-    }
   this->SetupPropertyObservers();
 }
 
@@ -1067,6 +1048,10 @@ void vtkPVImplicitPlaneWidget::UpdateEnableState()
 //-----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::SetupPropertyObservers()
 {
+  if (!this->ImplicitFunctionProxy)
+    {
+    return;
+    }
   vtkSMProperty* p = this->ImplicitFunctionProxy->GetProperty("Origin");
   if (p)
     {
@@ -1086,9 +1071,69 @@ void vtkPVImplicitPlaneWidget::SetupPropertyObservers()
 
 
 //-----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::UnsetPropertyObservers()
+{
+  if (!this->ImplicitFunctionProxy)
+    {
+    return;
+    }
+  vtkSMProperty* p = this->ImplicitFunctionProxy->GetProperty("Origin");
+  if (p)
+    {
+    this->RemovePropertyObservers(p);
+    }
+  p = this->ImplicitFunctionProxy->GetProperty("Normal");
+  if (p)
+    {
+    this->RemovePropertyObservers(p);
+    }
+  p = this->ImplicitFunctionProxy->GetProperty("Offset");
+  if (p)
+    {
+    this->RemovePropertyObservers(p);
+    }
+}
+
+//-----------------------------------------------------------------------------
 void vtkPVImplicitPlaneWidget::UpdateVTKObjects()
 {
   this->ImplicitFunctionProxy->UpdateVTKObjects();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::RegisterAnimateableProxies()
+{
+  vtkSMProxyManager* pm = vtkSMObject::GetProxyManager();
+  if (this->PVSource && this->ImplicitFunctionProxy)
+    {
+    vtkSMSourceProxy* sproxy = this->PVSource->GetProxy();
+    if (sproxy)
+      {
+      const char* root = pm->GetProxyName("animateable", sproxy);
+      if (root)
+        {
+        ostrstream animName;
+        animName << root << ".Plane" << ends;
+        pm->RegisterProxy(
+          "animateable", animName.str(), this->ImplicitFunctionProxy);
+        delete[] animName.str();
+        }
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVImplicitPlaneWidget::UnregisterAnimateableProxies()
+{
+  vtkSMProxyManager* proxyM = vtkSMObject::GetProxyManager();
+  if (this->ImplicitFunctionProxy)
+    {
+    const char* proxyName = proxyM->GetProxyName("animateable", this->ImplicitFunctionProxy);
+    if (proxyName)
+      {
+      proxyM->UnRegisterProxy("animateable", proxyName);
+      }
+    }
 }
 
 //-----------------------------------------------------------------------------

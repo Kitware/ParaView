@@ -27,6 +27,7 @@ class vtkKWLabel;
 class vtkKWPushButton;
 class vtkPVKeyFrameObserver;
 class vtkPVAnimationCue;
+class vtkSMProperty;
 
 class VTK_EXPORT vtkPVKeyFrame : public vtkKWWidget
 {
@@ -49,6 +50,10 @@ public:
   // Description:
   // Initialized Key Value using current animated property value.
   virtual void InitializeKeyValueUsingCurrentState();
+
+  // Description:
+  // Initilizes the Key Value using the property element at given index.
+  virtual void InitializeKeyValueUsingProperty(vtkSMProperty* property, int index);
  
   // Description:
   // Initialize the Key Value bounds using current animatied property value
@@ -66,6 +71,13 @@ public:
   void TimeChangedCallback();
   void MinimumCallback();
   void MaximumCallback();
+
+ 
+  // Description:
+  // These methods set the current Key value to min or max if
+  // they exist. Otherwise the value remains unchanged.
+  void SetValueToMinimum();
+  void SetValueToMaximum();
 
   virtual void PrepareForDisplay();
  
@@ -112,8 +124,18 @@ protected:
   vtkPVKeyFrameObserver* Observer;
   virtual void ExecuteEvent(vtkObject* , unsigned long event, void*);
 //ETX
+
+  // Description:
+  // This methods creates the widget to display the keyframe value.
+  // It can be of 3 types: vtkPVSelectionList, vtkKWCheckButton, vtkKWThumbWheel.
+  // Which to create depends on the domain of the animated property.
+  // This merely creates the widget.
   void CreateValueWidget();  
 
+  // Description:
+  // This method updates the domain for the key frame value using the current domain
+  // for the animated property.
+  void UpdateDomain();
   // Description:
   // Update the values from the vtkSMKeyFrameProxy.
   virtual void UpdateValuesFromProxy();

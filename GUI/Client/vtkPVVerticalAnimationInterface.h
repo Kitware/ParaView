@@ -63,9 +63,10 @@ public:
 
   void IndexChangedCallback();
   void RecordAllChangedCallback();
-  void InitStateCallback();
-  void KeyFrameChangesCallback();
   void CacheGeometryCheckCallback();
+  void AdvancedAnimationViewCallback();
+
+  void SetAdvancedAnimationView(int advanced);
 
   void SaveState(ofstream* file);
 
@@ -75,6 +76,7 @@ public:
   vtkGetMacro(CacheGeometry, int);
 
   void SetKeyFrameIndex(int index);
+
 protected:
   vtkPVVerticalAnimationInterface();
   ~vtkPVVerticalAnimationInterface();
@@ -92,14 +94,11 @@ protected:
   vtkKWScale* IndexScale;
   vtkKWLabel* SelectKeyFrameLabel;
 
-  vtkKWLabeledFrame* RecorderFrame;
-  vtkKWPushButton* InitStateButton;
-  vtkKWPushButton* KeyFrameChangesButton;
-  vtkKWLabel* RecordAllLabel;
   vtkKWCheckButton* RecordAllButton;
 
   vtkKWLabeledFrame* SaveFrame;
   vtkKWCheckButton* CacheGeometryCheck;
+  vtkKWCheckButton* AdvancedAnimationCheck;
   
   vtkPVAnimationCue* AnimationCue;
   vtkPVKeyFrame* ActiveKeyFrame;

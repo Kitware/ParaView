@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.62");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.63");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -613,6 +613,10 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
     {
     pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
     pvw->Deselect();
+    if (vtkPV3DWidget::SafeDownCast(pvw))
+      {
+      vtkPV3DWidget::SafeDownCast(pvw)->DisableAnimation();
+      }
     this->Script("pack forget %s", pvw->GetWidgetName());
     }
   this->CurrentIndex = idx;
@@ -621,6 +625,10 @@ void vtkPVSelectWidget::SetCurrentIndex(int idx)
   pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
   this->Script("pack %s -side top -fill both -expand t", pvw->GetWidgetName());
   pvw->Select();
+  if (vtkPV3DWidget::SafeDownCast(pvw))
+    {
+    vtkPV3DWidget::SafeDownCast(pvw)->EnableAnimation();
+    }
 
   this->ModifiedCallback();
 }

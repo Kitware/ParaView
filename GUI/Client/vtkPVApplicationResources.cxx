@@ -79,6 +79,8 @@
 #include "Resources/vtkPVSinusoid.h"
 #include "Resources/vtkPVKeyFrameChanges.h"
 #include "Resources/vtkPVInitState.h"
+#include "Resources/vtkPVRecord.h"
+#include "Resources/vtkPVRecordState.h"
 
 
 // Splash screen
@@ -437,6 +439,20 @@ void vtkPVApplication::CreateButtonPhotos()
     image_PVInitState_height,
     image_PVInitState_pixel_size,
     image_PVInitState_buffer_length);
+
+  this->CreatePhoto("PVRecord",
+    image_PVRecord,
+    image_PVRecord_width,
+    image_PVRecord_height,
+    image_PVRecord_pixel_size,
+    image_PVRecord_buffer_length);
+
+  this->CreatePhoto("PVRecordState",
+    image_PVRecordState,
+    image_PVRecordState_width,
+    image_PVRecordState_height,
+    image_PVRecordState_pixel_size,
+    image_PVRecordState_buffer_length);
 }
 
 //----------------------------------------------------------------------------

@@ -112,6 +112,17 @@ public:
   //BTX
   virtual void Create(vtkKWApplication *app);
   //ETX
+
+  // Description:
+  // Register the animatable proxies and make them avaiblable for animation.
+  // Called by vtkPVSelectWidget when the widget is selected.
+  virtual void EnableAnimation(){ this->RegisterAnimateableProxies();} ;
+
+  // Description:
+  // Unregister animatable proxies so that they are not available for
+  // animation. Called by vtkPVSelectWidget when this widget is deselected.
+  virtual void DisableAnimation() { this->UnregisterAnimateableProxies();} ;
+
 protected:
   vtkPVSphereWidget();
   ~vtkPVSphereWidget();
@@ -173,6 +184,9 @@ protected:
   //ETX
   
   void SetupPropertyObservers();
+  void UnsetPropertyObservers();
+  void RegisterAnimateableProxies();
+  void UnregisterAnimateableProxies();
 private:
   vtkPVSphereWidget(const vtkPVSphereWidget&); // Not implemented
   void operator=(const vtkPVSphereWidget&); // Not implemented

@@ -32,7 +32,7 @@
 #include "vtkKWParameterValueFunctionEditor.h"
 
 vtkStandardNewMacro(vtkPVHorizontalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.8");
+vtkCxxRevisionMacro(vtkPVHorizontalAnimationInterface, "1.9");
 
 //-----------------------------------------------------------------------------
 vtkPVHorizontalAnimationInterface::vtkPVHorizontalAnimationInterface()
@@ -142,16 +142,22 @@ void vtkPVHorizontalAnimationInterface::SetTimeMarker(double ntime)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVHorizontalAnimationInterface::InitializeAnimatedPropertyStatus()
+void vtkPVHorizontalAnimationInterface::StartRecording()
 {
-  this->ParentTree->InitializeStatus();
+  this->ParentTree->StartRecording();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVHorizontalAnimationInterface::KeyFramePropertyChanges(double ntime,
-  int onlyFocus)
+void vtkPVHorizontalAnimationInterface::StopRecording()
 {
-  this->ParentTree->KeyFramePropertyChanges(ntime, onlyFocus);
+  this->ParentTree->StopRecording();
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVHorizontalAnimationInterface::RecordState(double ntime,
+  double offset, int onlyFocus)
+{
+  this->ParentTree->RecordState(ntime, offset, onlyFocus);
 }
 
 //-----------------------------------------------------------------------------
@@ -183,6 +189,10 @@ void vtkPVHorizontalAnimationInterface::ExecuteEvent(vtkObject* ,
 //-----------------------------------------------------------------------------
 void vtkPVHorizontalAnimationInterface::ResizeCallback()
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
 // This wierd stuff is needed since the scrollable frame cannot stretch to fill
 // up the parent. This leads to wierd looking GUI when the animation interface
 // doesn't have too vertical many entires.
