@@ -39,7 +39,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.2");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.3");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -154,6 +154,8 @@ void vtkCTHExtractAMRPart::Execute()
 
   inputCopy->ShallowCopy(input);
 
+  vtkTimerLog::MarkStartEvent("CellToPoint");
+
   // If there are no ghost cells, then try our fancy way of
   // computing cell volume fractions.  It finds all point cells
   // including cells from neighboring blocks that touch the point.
@@ -192,6 +194,8 @@ void vtkCTHExtractAMRPart::Execute()
       inputCopy->GetCellData()->RemoveArray(arrayName);
       }
     } 
+
+  vtkTimerLog::MarkEndEvent("CellToPoint");
 
   // Create an append for each part (one part per output).
   num = this->VolumeArrayNames->GetNumberOfStrings();
@@ -334,8 +338,6 @@ void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
   vtkAppendPolyData *append1;
   vtkAppendPolyData *append2 = NULL;
 
-  vtkTimerLog::MarkStartEvent("Execute Part");
-
   block->GetPointData()->SetActiveScalars(arrayName);
 
   // Create the contour surface.
@@ -351,9 +353,7 @@ void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
   contour->SetValue(0, 0.5);
   //contour->SelectInputScalars(arrayName);
 
-  vtkTimerLog::MarkStartEvent("CTH Contour");
   contour->Update();
-  vtkTimerLog::MarkEndEvent("CTH Contour");
 
   // Create the capping surface for the contour and append.
   append1 = vtkAppendPolyData::New();
@@ -362,9 +362,7 @@ void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
   surface->SetInput(block);
   tmp = surface->GetOutput();
 
-  vtkTimerLog::MarkStartEvent("Surface");
   tmp->Update();
-  vtkTimerLog::MarkEndEvent("surface");
 
   // Clip surface less than volume fraction 0.5.
   clip0 = vtkClipPolyData::New();
@@ -372,14 +370,10 @@ void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
   clip0->SetValue(0.5);
   //clip0->SelectInputScalars(arrayName);
   tmp = clip0->GetOutput();
-  vtkTimerLog::MarkStartEvent("Clip Surface");
   tmp->Update();
-  vtkTimerLog::MarkEndEvent("Clip Surface");
   append1->AddInput(clip0->GetOutput());
 
-  vtkTimerLog::MarkStartEvent("Append");
   append1->Update();
-  vtkTimerLog::MarkEndEvent("Append");
 
   tmp = append1->GetOutput();
   
@@ -432,7 +426,6 @@ void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
     append2->Delete();
     }
 
-  vtkTimerLog::MarkEndEvent("Execute Part");
 }
 
 //------------------------------------------------------------------------------
@@ -547,17 +540,30 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
                                   vtkFloatArray *pointVolumeFraction, vtkCTHData* data)
 {
   int x, y, z, maxX, maxY, maxZ;
+  float *pPoint0;
   float *pPoint;
   float *pCell0;
   float *pCell;
   int cInc[6];
   int pIncX, pIncY, pIncZ;
   int blockId, numBlocks;
-
+  vtkIdList* blockList = vtkIdList::New();
   int *dims = data->GetDimensions();
   pIncX = 1;
   pIncY = dims[0];
   pIncZ = pIncY * dims[1];
+  vtkDataArray* array;
+  int* cellLevelArray;
+  int numCellsPerBlock = data->GetNumberOfCellsPerBlock();
+  int numPtsPerBlock = data->GetNumberOfPointsPerBlock();
+
+  array = data->GetCellData()->GetArray("Depth");
+  if (array == NULL)
+    {
+    vtkErrorMacro("Until BlockLevel is part of vtkCTHData, we need a depth array.");
+    return;
+    }
+  cellLevelArray = (int*)(array->GetVoidPointer(0));  
 
   // All neighbor cell incs except 0 and 1.
   // Funny order is for cache locality.
@@ -574,46 +580,73 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
 
   // It might be faster to have a separate loop for interior points.
   // Loop over all points.
-  pPoint = pointVolumeFraction->GetPointer(0);
+  pPoint0 = pointVolumeFraction->GetPointer(0);
   pCell0 = (float*)(cellVolumeFraction->GetVoidPointer(0));
-  pCell = pCell0;
   numBlocks = data->GetNumberOfBlocks();
-  for (blockId = 0; blockId < numBlocks; ++blockId)
-    {
-    // Loop all points.
-    for (z = 0; z <= maxZ; ++z)
-      {
-      for (y = 0; y <= maxY; ++y)
-        {
-        for (x = 0; x <= maxX; ++x)
-          {
-          if (z == 0 || y == 0 || x == 0)
-            {
-            *pPoint = this->ComputeSharedPoint(blockId, x, y, z, pCell0, data);
-            ++pPoint;
-            // Do not increment the cell pointer for negative boundary faces.
-            }
-          else if (z == maxZ || y == maxY || x == maxX)
-            {
-            *pPoint = this->ComputeSharedPoint(blockId, x, y, z, pCell0, data);
-            ++pPoint;
-            ++pCell;
-            }
-          else
-            {
-            // This fast path for interior point should speed things up.
-            // Average the eight neighboring cells.
-            *pPoint = (pCell[0] + pCell[1] + pCell[cInc[0]] + pCell[cInc[1]]
-                     + pCell[cInc[2]] + pCell[cInc[3]] + pCell[cInc[4]]
-                     + pCell[cInc[5]]) * 0.125;
-            ++pPoint;
-            ++pCell;
-            }      
-          }
-        }
-      }    
-    }
 
+  // Now lets loop over blocks. Low levels first.
+  // Processing the low levels first will allow me to force some
+  // boundary points (that are not on neighbor grid points) to obey
+  // linear interpolation of neighbor's face.
+  int blocksFinished = 0;
+  int level = 0;
+  while (blocksFinished < numBlocks)
+    { // Look for all blocks with level.
+    for (blockId = 0; blockId < numBlocks; ++blockId)
+      {
+      // We should really have level a better part of the data set structure.
+      // Look to level array for now.
+      if (cellLevelArray[blockId*numCellsPerBlock] == level)
+        {
+        // Mark a block as finished (before we start processing the block).
+        ++blocksFinished;
+        // Move pointers to start of block.
+        pCell = pCell0 + (blockId*numCellsPerBlock);
+        pPoint = pPoint0 + (blockId*numPtsPerBlock);
+        // Make a list of neighbors so each point does not need to look through
+        // all the blocks.  With a better data structure, we might have
+        // a method to return neighbors of indexed by block face.
+        this->FindBlockNeighbors(data, blockId, blockList);
+        // Loop over all points in this block.
+        for (z = 0; z <= maxZ; ++z)
+          {
+          for (y = 0; y <= maxY; ++y)
+            {
+            for (x = 0; x <= maxX; ++x)
+              {
+              if (z == 0 || y == 0 || x == 0)
+                {
+                *pPoint = this->ComputeSharedPoint(blockId, blockList, 
+                                                   x, y, z, pCell0, pPoint0, data);
+                ++pPoint;
+                // Do not increment the cell pointer for negative boundary faces.
+                }
+              else if (z == maxZ || y == maxY || x == maxX)
+                {
+                *pPoint = this->ComputeSharedPoint(blockId, blockList, 
+                                                   x, y, z, pCell0, pPoint0, data);
+                ++pPoint;
+                ++pCell;
+                }
+              else
+                {
+                // This fast path for interior point should speed things up.
+                // Average the eight neighboring cells.
+                *pPoint = (pCell[0] + pCell[1] + pCell[cInc[0]] + pCell[cInc[1]]
+                         + pCell[cInc[2]] + pCell[cInc[3]] + pCell[cInc[4]]
+                         + pCell[cInc[5]]) * 0.125;
+                ++pPoint;
+                ++pCell;
+                }      
+              } // x loop
+            } // y loop
+          } // z loop
+        } // if (cellLevelArray[blockId*numCellsPerBlock] == level)
+      } // for (blockId = 0; blockId < numBlocks; ++blockId)
+      // Move to next level.
+      ++level;
+    } // while (blocksFinished < numBlocks)
+  blockList->Delete();
   pointVolumeFraction->SetName(cellVolumeFraction->GetName());
 }
 
@@ -622,27 +655,202 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
 //------------------------------------------------------------------------------
 // I am trying a better way of converting cell data to point data.
 // This should olny be used when there are no ghost cells.
-// For each point ,verage all cells touching the point.
-float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, int x, int y, int z, 
-                                                float* pCell, vtkCTHData* input)
+// For each point, average all cells touching the point.
+// Weight the cell by inverse of spacing.
+// We need the point array only for linear interpolation constraint.
+float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList,
+                                               int x, int y, int z, 
+                                               float* pCell, float* pPoint, 
+                                               vtkCTHData* input)
 {
   int* dims = input->GetDimensions();
-  vtkIdType id, num;
+  float* spacing;
   float sum = 0.0;
+  float weight;
+  float sumWeight = 0.0;
+  float epsilon;
+  float* origin;
+  float outside[3];
+  int numPtsPerBlock = input->GetNumberOfPointsPerBlock();
+  int numCellsPerBlock = input->GetNumberOfCellsPerBlock();
+  int i, id, num;
+  int x0, x1, y0, y1, z0, z1;
+  float dx, dy, dz;
+  float pt[3];
+  int pMaxX = dims[0]-1;
+  int pMaxY = dims[1]-1;
+  int pMaxZ = dims[2]-1;
+  int cMaxX = pMaxX-1;
+  int cMaxY = pMaxY-1;
+  int cMaxZ = pMaxZ-1;
+  int cIncY = dims[0]-1;
+  int cIncZ = (dims[1]-1)*cIncY;
 
-  id = x + dims[0]*(y + dims[1]*(z + blockId*dims[2]));
-  this->FindPointCells(input, id, this->IdList);
-
-  //  average cells values.
-  num = this->IdList->GetNumberOfIds();
-  for (id = 0; id < num; ++id)
+  // First add cells local to block.
+  spacing = input->GetBlockSpacing(blockId);
+  // Assume x, y and z spacing are the same.
+  weight = 1.0/spacing[0];
+  id = (blockId * numCellsPerBlock) + x + y*cIncY + z*cIncZ;
+  if (x > 0 && y > 0 && z > 0)
     {
-    sum += pCell[this->IdList->GetId(id)];
+    sumWeight += weight;
+    sum += weight*pCell[id - 1 - cIncY - cIncZ];
+    }
+  if (x < pMaxX && y > 0 && z > 0)
+    {
+    sumWeight += weight;
+    sum += weight*pCell[id - cIncY - cIncZ];
+    }
+  if (x > 0 && y < pMaxY && z > 0)
+    {
+    sumWeight += weight;
+    sum += weight*pCell[id - 1 - cIncZ];
+    }
+  if (x < pMaxX && y < pMaxY && z > 0)
+    {
+    sumWeight += weight;
+    sum += weight*pCell[id - cIncZ];
+    }
+  if (x > 0 && y > 0 && z < pMaxZ)
+    {
+    sumWeight += weight;
+    sum += weight*pCell[id - 1 - cIncY];
+    }
+  if (x < pMaxX && y > 0 && z < pMaxZ)
+    {
+    sumWeight += weight;
+    sum += weight*pCell[id - cIncY];
+    }
+  if (x > 0 && y < pMaxY && z < pMaxZ)
+    {
+    sumWeight += weight;
+    sum += weight*pCell[id - 1];
+    }
+  if (x < pMaxX && y < pMaxY && z < pMaxZ)
+    {
+    sumWeight += weight;
+    sum += weight*pCell[id];
     }
 
-  return sum / (float)(num); 
+  // Next find all the block that share the point.
+  // Compute point in world space.
+  origin = input->GetBlockOrigin(blockId);
+  pt[0] = origin[0] + (float)x * spacing[0];
+  pt[1] = origin[1] + (float)y * spacing[1];
+  pt[2] = origin[2] + (float)z * spacing[2];
+  epsilon = spacing[0] / 1000.0;
+
+  num = blockList->GetNumberOfIds();
+  for (i = 0; i < num; ++i)
+    {
+    id = blockList->GetId(i);
+    origin = input->GetBlockOrigin(id);
+    if (pt[0] > origin[0]-epsilon && pt[1] > origin[1]-epsilon &&
+        pt[2] > origin[2]-epsilon)
+      {
+      spacing = input->GetBlockSpacing(id);
+      weight = 1.0/spacing[0];
+      outside[0] = origin[0] + spacing[0]*(float)(dims[0]-1);
+      outside[1] = origin[1] + spacing[1]*(float)(dims[1]-1);
+      outside[2] = origin[2] + spacing[2]*(float)(dims[2]-1);
+      if (pt[0] < outside[0]+epsilon && pt[1] < outside[1]+epsilon &&
+          pt[2] < outside[2]+epsilon)
+        { // Point is contained in block.
+        // Compute point index.
+        x = (int)((pt[0]+epsilon - origin[0]) / spacing[0]);
+        y = (int)((pt[1]+epsilon - origin[1]) / spacing[1]);
+        z = (int)((pt[2]+epsilon - origin[2]) / spacing[2]);
+        // Sanity check:  We expect that blocks only share faces.
+        if (x>0 && x<pMaxX && y>0 && y<pMaxY && z>0 && z<pMaxZ)
+          {
+          vtkErrorMacro("Expecting a boundary point.");
+          }
+        // Compute remainder (whether point is on grid).
+        // This should really just be a flag because
+        // we do not use the remainder for interpolation.
+        // We just assume that offgrid point fall in middle
+        // (0.5) of faces.
+        dx = pt[0] - origin[0] - (spacing[0] * (float)x);
+        dy = pt[1] - origin[1] - (spacing[1] * (float)y);
+        dz = pt[2] - origin[2] - (spacing[2] * (float)z);
+
+        // This assumes neighbor blocks differ only by one level.
+        // Here is where we force points to obey linear interpolation
+        // of neighbor.  This will produce an iso surface with no cracks.
+        // This is not necessary if point lies on neighbors grid.
+        if (dx > epsilon || dy > epsilon || dz > epsilon)
+          {
+          int pIncZ = dims[0]*dims[1];
+          float* cornerPoint = pPoint + id*numPtsPerBlock + x + y*dims[0] + z*pIncZ;
+          // Since there are only six cases (3 edges and 3 faces),
+          // just have a condition for each.
+          if (dx > epsilon && dy <= epsilon && dz <= epsilon)
+            { // x edge
+            return 0.5 * (cornerPoint[0] + cornerPoint[1]);
+            }
+          else if (dx <= epsilon && dy > epsilon && dz <= epsilon)
+            { // y edge
+            return 0.5 * (cornerPoint[0] + cornerPoint[dims[0]]);
+            }
+          else if (dx <= epsilon && dy <= epsilon && dz > epsilon)
+            { // z edge
+            return 0.5 * (cornerPoint[0] + cornerPoint[pIncZ]);
+            }
+          else if (dx > epsilon && dy > epsilon && dz <= epsilon)
+            { // xy face
+            return 0.25 * (cornerPoint[0] + cornerPoint[1] + 
+                           cornerPoint[dims[0]] + cornerPoint[1+dims[0]]);
+            }
+          else if (dx > epsilon && dy <= epsilon && dz > epsilon)
+            { // xz face
+            return 0.25 * (cornerPoint[0] + cornerPoint[1] + 
+                           cornerPoint[pIncZ] + cornerPoint[1+pIncZ]);
+            }
+          else if (dx <= epsilon && dy > epsilon && dz > epsilon)
+            { // yz face
+            return 0.25 * (cornerPoint[0] + cornerPoint[dims[0]] + 
+                           cornerPoint[pIncZ] + cornerPoint[dims[0]+pIncZ]);
+            }
+          else
+            { // Point in middle of cell.  Drop through.
+            vtkErrorMacro("Bondary point in middle of neighbor cell.");
+            }
+          }
+        // Handle last point (max boundary face).
+        // Treat them like an interior (off grid) point.
+        if (x == pMaxX) {x = pMaxX-1; dx += spacing[0];}
+        if (y == pMaxY) {y = pMaxY-1; dy += spacing[0];}
+        if (z == pMaxZ) {z = pMaxZ-1; dz += spacing[0];}
+
+        // Compute the extent (min/max block) of cells touching point. 
+        x0 = x1 = x;
+        y0 = y1 = y;
+        z0 = z1 = z;
+        if (dx < epsilon && x > 0) {--x0;}
+        if (dy < epsilon && y > 0) {--y0;}
+        if (dz < epsilon && z > 0) {--z0;}
+        // Now loop over cells adding to idList.
+        for (z = z0; z <= z1; ++z)
+          {
+          for (y = y0; y <= y1; ++y)
+            {
+            for (x = x0; x <= x1; ++x)
+              {
+              sumWeight += weight;
+              sum += weight*pCell[id*numCellsPerBlock 
+                                  + x + y*cIncY + z*cIncZ];
+              }
+            }
+          }
+        } // End: < outside (pt in block bounds)
+      } // End: > origin (min bounds).
+    } // End: block loop.
+
+  //  average cells values.
+  return sum / sumWeight; 
 }
 
+/*
 //------------------------------------------------------------------------------
 // Should really be in the data object.
 // Returns cells even if a face contains the point.
@@ -785,11 +993,62 @@ void vtkCTHExtractAMRPart::FindPointCells(vtkCTHData* self, vtkIdType ptId,
       } // End: Not same block.
     } // End: block loop.
 }
+*/
 
+//------------------------------------------------------------------------------
+// Note, this only works with no ghost levels.
+void vtkCTHExtractAMRPart::FindBlockNeighbors(vtkCTHData* self, int blockId, vtkIdList* blockList)
+{
+  float *origin;
+  float *spacing;
+  int *dims;
+  float bds0[6];
+  float bds1[6];
+  vtkIdType id, num;
+  float e;
 
+  blockList->Initialize();
+  dims = self->GetDimensions();
+  origin = self->GetBlockOrigin(blockId);
+  spacing = self->GetBlockSpacing(blockId);
+  bds0[0] = origin[0];
+  bds0[1] = origin[0]+spacing[0]*(float)(dims[0]-1);
+  bds0[2] = origin[1];
+  bds0[3] = origin[1]+spacing[1]*(float)(dims[1]-1);
+  bds0[4] = origin[2];
+  bds0[5] = origin[2]+spacing[2]*(float)(dims[2]-1);
+  // Tolerance
+  e = (spacing[0]+spacing[1]+spacing[2]) / 1000.0;
 
-
-
+  num = self->GetNumberOfBlocks();
+  for (id = 0; id < num; ++id)
+    {
+    if (id != blockId)
+      {
+      origin = self->GetBlockOrigin(id);
+      spacing = self->GetBlockSpacing(id);
+      bds1[0] = origin[0];
+      bds1[1] = origin[0]+spacing[0]*(float)(dims[0]-1);
+      bds1[2] = origin[1];
+      bds1[3] = origin[1]+spacing[1]*(float)(dims[1]-1);
+      bds1[4] = origin[2];
+      bds1[5] = origin[2]+spacing[2]*(float)(dims[2]-1);
+      // Intersection of bounds
+      if (bds1[0]>bds0[0]) {bds1[0] = bds0[0];}
+      if (bds1[1]<bds0[1]) {bds1[1] = bds0[1];}
+      if (bds1[2]>bds0[2]) {bds1[2] = bds0[2];}
+      if (bds1[3]<bds0[3]) {bds1[3] = bds0[3];}
+      if (bds1[4]>bds0[4]) {bds1[4] = bds0[4];}
+      if (bds1[5]<bds0[5]) {bds1[5] = bds0[5];}
+      // Check for overlap.
+      if (bds1[0] < bds1[1]+e && bds1[2] < bds1[3]+e && bds1[4] < bds1[5]+e)
+        { // All three projections are touching.
+        blockList->InsertNextId(id);
+        }
+      }
+    }
+}
+      
 
 
 

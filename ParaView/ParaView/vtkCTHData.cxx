@@ -42,7 +42,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.2");
+vtkCxxRevisionMacro(vtkCTHData, "1.3");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -75,6 +75,14 @@ vtkCTHData::~vtkCTHData()
   this->BlockOrigins = NULL;
   this->BlockSpacings->Delete();
   this->BlockSpacings = NULL;
+}
+
+//----------------------------------------------------------------------------
+void vtkCTHData::Initialize()
+{
+  this->Superclass::Initialize();
+  this->BlockOrigins->Initialize();
+  this->BlockSpacings->Initialize();
 }
 
 //----------------------------------------------------------------------------
@@ -179,6 +187,18 @@ void vtkCTHData::SetBlockOrigin(int blockId, float ox, float oy, float oz)
   origin[2] = oz;
   this->SetBlockOrigin(blockId, origin); 
 }
+
+
+//----------------------------------------------------------------------------
+int vtkCTHData::InsertNextBlock()
+{
+  float t[3];
+  t[0] = t[1] = t[2] = 0.0;
+  this->BlockOrigins->InsertNextTuple(t);
+  this->BlockSpacings->InsertNextTuple(t);
+  return this->GetNumberOfBlocks()-1;
+}
+
 
 //----------------------------------------------------------------------------
 void vtkCTHData::SetBlockOrigin(int blockId, float* origin)

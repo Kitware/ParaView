@@ -29,36 +29,57 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.2");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.3");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
 vtkCTHFractal::vtkCTHFractal()
 {
   this->Dimensions = 10;
-  this->FractalValue = 8.5;
-  this->GhostLevels = 1;
+  this->FractalValue = 9.5;
+  this->MaximumLevel = 6;
+  this->GhostLevels = 0;
+
+  this->Levels = vtkIntArray::New();
 }
 
 //----------------------------------------------------------------------------
 vtkCTHFractal::~vtkCTHFractal()
 {
+  this->Levels->Delete();
+  this->Levels = NULL;
 }
 
 //----------------------------------------------------------------------------
 void vtkCTHFractal::SetDimensions(int xDim, int yDim, int zDim)
 {
-  this->GetOutput()->SetDimensions(xDim + (2*this->GhostLevels),
-                                   yDim + (2*this->GhostLevels),
-                                   zDim + (2*this->GhostLevels));
+  this->GetOutput()->SetDimensions(xDim + 1 + (2*this->GhostLevels),
+                                   yDim + 1 + (2*this->GhostLevels),
+                                   zDim + 1 + (2*this->GhostLevels));
   this->GetOutput()->SetNumberOfGhostLevels(this->GhostLevels);
 }
 
 //----------------------------------------------------------------------------
+// This handles any alterations necessary for ghost levels.
 void vtkCTHFractal::SetBlockInfo(int blockId, 
                                  float ox, float oy, float oz,
-                                 float sx, float sy, float sz)
+                                 float xSize, float ySize, float zSize)
 {
+  // Compute spacing;
+  int dims[3];
+  this->GetOutput()->GetDimensions(dims);
+  float sx, sy, sz;
+  
+  // Cell dimensions of block with no ghost levels.
+  // Wee need to compute this to get spacing.
+  dims[0] -= 1+ 2*this->GhostLevels;
+  dims[1] -= 1+ 2*this->GhostLevels;
+  dims[2] -= 1+ 2*this->GhostLevels;
+
+  sx = xSize / dims[0];
+  sy = ySize / dims[1];
+  sz = zSize / dims[2];
+
   ox -= sx * this->GhostLevels;
   oy -= sy * this->GhostLevels;
   oz -= sz * this->GhostLevels;
@@ -66,330 +87,198 @@ void vtkCTHFractal::SetBlockInfo(int blockId,
   this->GetOutput()->SetBlockSpacing(blockId, sx, sy, sz);
 }
 
-/*
 //----------------------------------------------------------------------------
 void vtkCTHFractal::Execute()
 {
-  int blockId = 0;
   vtkCTHData* output = this->GetOutput();
-
-  // This is 10x10x10 in cells.
-  int dim = this->Dimensions;
-  float xOrigin = -1.75;
-  float yOrigin = -1.25;
-  float zOrigin = 0.0;
+  float ox = -1.75;
+  float oy = -1.25;
+  float oz = 0.0;
   float xSize = 2.5;
   float ySize = 2.5;
   float zSize = 2.0;
+  int blockId = 0;
 
-  float ox1, oy1, oz1;
-  float sx1, sy1, sz1;
-  float mx1, my1, mz1;
-
-
-  this->SetDimensions(dim+1, dim+1, dim+1);
-  // Each refinement adds seven (adds eight takes away 1).
-  output->SetNumberOfBlocks(8);
-
-  // Lowest resolution 8
-  sx1 = xSize / (2.0 * dim);
-  sy1 = ySize / (2.0 * dim);
-  sz1 = zSize / (2.0 * dim);
-  ox1 = xOrigin;
-  oy1 = yOrigin;
-  oz1 = zOrigin;
-
-  mx1 = ox1 + xSize / 2.0;
-  my1 = oy1 + ySize / 2.0;
-  mz1 = oz1 + zSize / 2.0;
-  
-  this->SetBlockInfo(blockId++, ox1, oy1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, oy1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, ox1, my1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, my1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, ox1, oy1, mz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, oy1, mz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, ox1, my1, mz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, my1, mz1, sx1, sy1, sz1);
+  // This is 10x10x10 in cells.
+  this->SetDimensions(this->Dimensions, this->Dimensions, this->Dimensions);
+  this->Levels->Initialize();
+  this->Traverse(blockId, 0, output, ox, oy, oz, xSize, ySize, zSize);
 
   this->AddFractalArray();
   this->AddBlockIdArray();
-  this->AddDepthArray(sx1);
+  this->AddDepthArray();
 
   if (this->GhostLevels > 0)
     {
     this->AddGhostLevelArray();
     }
 }
-*/
-
-/*
-//----------------------------------------------------------------------------
-void vtkCTHFractal::Execute()
-{
-  int blockId = 0;
-  vtkCTHData* output = this->GetOutput();
-
-  // This is 10x10x10 in cells.
-  int dim = this->Dimensions;
-  float xOrigin = -1.75;
-  float yOrigin = -1.25;
-  float zOrigin = 0.0;
-  float xSize = 2.5;
-  float ySize = 2.5;
-  float zSize = 2.0;
-
-  float ox1, oy1, oz1;
-  float sx1, sy1, sz1;
-  float mx1, my1, mz1;
-
-  float ox2, oy2, oz2;
-  float sx2, sy2, sz2;
-  float mx2, my2, mz2;
-
-  this->SetDimensions(dim+1, dim+1, dim+1);
-  // Each refinement adds seven (adds eight takes away 1).
-  output->SetNumberOfBlocks(15);
-
-  // Lowest resolution 8
-  sx1 = xSize / (2.0 * dim);
-  sy1 = ySize / (2.0 * dim);
-  sz1 = zSize / (2.0 * dim);
-  ox1 = xOrigin;
-  oy1 = yOrigin;
-  oz1 = zOrigin;
-
-  sx2 = 0.5 * sx1;
-  sy2 = 0.5 * sy1;
-  sz2 = 0.5 * sz1;
-
-  mx1 = ox1 + xSize / 2.0;
-  my1 = oy1 + ySize / 2.0;
-  mz1 = oz1 + zSize / 2.0;
   
-  this->SetBlockInfo(blockId++, ox1, oy1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, oy1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, ox1, my1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, my1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, ox1, oy1, mz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, oy1, mz1, sx1, sy1, sz1);
-  //this->SetBlockInfo(blockId++, ox1, my1, mz1, sx1, sy1, sz1);
-  // Refine -x, +y, +z
-  ox2 = ox1;
-  oy2 = my1;
-  oz2 = mz1;
-  mx2 = ox2 + xSize / 4.0;
-  my2 = oy2 + ySize / 4.0;
-  mz2 = oz2 + zSize / 4.0;
-    this->SetBlockInfo(blockId++, ox2, oy2, oz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, mx2, oy2, oz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, ox2, my2, oz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, mx2, my2, oz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, ox2, oy2, mz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, mx2, oy2, mz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, ox2, my2, mz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, mx2, my2, mz2, sx2, sy2, sz2);
-  this->SetBlockInfo(blockId++, mx1, my1, mz1, sx1, sy1, sz1);
 
-  this->AddFractalArray();
-  this->AddBlockIdArray();
-  this->AddDepthArray(sx1);
+//----------------------------------------------------------------------------
+#define cthTest(x,y,z,l) \
+  (x>ox1)&&(x<ox1+sx1)&&(y>oy1)&&(y<oy1+sy1)&&(z>oz1)&&(z<oz1+sz1)&&(level<l) 
 
-  if (this->GhostLevels > 0)
+
+
+int vtkCTHFractal::LineTest2(float x0, float y0, float z0, 
+                             float x1, float y1, float z1,
+                             float ox, float oy, float oz,
+                             float sx, float sy, float sz,
+                             int level, int target) 
+{
+  float mx = ox + sx;
+  float my = oy + sy;
+  float mz = oz + sz;
+  // intersect line with plane.
+  float x, y, z;
+  float k;
+
+  // Special case ane point is inside box.
+  if (x0 > ox && x0 < mx && y0 > oy && y0 < my && z0 > oz && z0 < mz)
     {
-    this->AddGhostLevelArray();
+    return (level < target);
     }
-}
-*/
-//----------------------------------------------------------------------------
-void vtkCTHFractal::Execute()
-{
-  int blockId = 0;
-  vtkCTHData* output = this->GetOutput();
-
-  // This is 10x10x10 in cells.
-  int dim = this->Dimensions;
-  float xOrigin = -1.75;
-  float yOrigin = -1.25;
-  float zOrigin = 0.0;
-  float xSize = 2.5;
-  float ySize = 2.5;
-  float zSize = 2.0;
-
-  float ox1, oy1, oz1;
-  float sx1, sy1, sz1;
-  float mx1, my1, mz1;
-
-  float ox2, oy2, oz2;
-  float sx2, sy2, sz2;
-  float mx2, my2, mz2;
-
-  float ox3, oy3, oz3;
-  float sx3, sy3, sz3;
-  float mx3, my3, mz3;
-
-  float ox4, oy4, oz4;
-  float sx4, sy4, sz4;
-  float mx4, my4, mz4;
-
-  float ox5, oy5, oz5;
-  float sx5, sy5, sz5;
-  float mx5, my5, mz5;
-
-  this->SetDimensions(dim+1, dim+1, dim+1);
-  // Each refinement adds seven (adds eight takes away 1).
-  output->SetNumberOfBlocks(57);
-
-  // Lowest resolution 8
-  sx1 = xSize / (2.0 * dim);
-  sy1 = ySize / (2.0 * dim);
-  sz1 = zSize / (2.0 * dim);
-
-  sx2 = sx1 / 2.0;
-  sy2 = sy1 / 2.0;
-  sz2 = sz1 / 2.0;
-
-  sx3 = sx2 / 2.0;
-  sy3 = sy2 / 2.0;
-  sz3 = sz2 / 2.0;
-
-  sx4 = sx3 / 2.0;
-  sy4 = sy3 / 2.0;
-  sz4 = sz3 / 2.0;
-
-  sx5 = sx4 / 2.0;
-  sy5 = sy4 / 2.0;
-  sz5 = sz4 / 2.0;
-
-  ox1 = xOrigin;
-  oy1 = yOrigin;
-  oz1 = zOrigin;
-
-  mx1 = ox1 + xSize / 2.0;
-  my1 = oy1 + ySize / 2.0;
-  mz1 = oz1 + zSize / 2.0;
-  
-  this->SetBlockInfo(blockId++, ox1, oy1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, oy1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, ox1, my1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, my1, oz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, ox1, oy1, mz1, sx1, sy1, sz1);
-  this->SetBlockInfo(blockId++, mx1, oy1, mz1, sx1, sy1, sz1);
-  //this->SetBlockInfo(blockId++, ox1, my1, mz1, sx1, sy1, sz1);
-  // Refine -x, +y, +z
-  ox2 = ox1;
-  oy2 = my1;
-  oz2 = mz1;
-  mx2 = ox2 + xSize / 4.0;
-  my2 = oy2 + ySize / 4.0;
-  mz2 = oz2 + zSize / 4.0;
-    //this->SetBlockInfo(blockId++, ox2, oy2, oz2, sx2, sy2, sz2);
-    // Refine -x, -y, -z
-    ox3 = ox2;
-    oy3 = oy2;
-    oz3 = oz2;
-    mx3 = ox3 + xSize / 8.0;
-    my3 = oy3 + ySize / 8.0;
-    mz3 = oz3 + zSize / 8.0;
-      //this->SetBlockInfo(blockId++, ox3, oy3, oz3, sx3, sy3, sz3);
-      // Refine -x, -y, -z
-      ox4 = ox3;
-      oy4 = oy3;
-      oz4 = oz3;
-      mx4 = ox4 + xSize / 16.0;
-      my4 = oy4 + ySize / 16.0;
-      mz4 = oz4 + zSize / 16.0;
-        this->SetBlockInfo(blockId++, ox4, oy4, oz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, mx4, oy4, oz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, ox4, my4, oz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, mx4, my4, oz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, ox4, oy4, mz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, mx4, oy4, mz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, ox4, my4, mz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, mx4, my4, mz4, sx4, sy4, sz4);
-      this->SetBlockInfo(blockId++, mx3, oy3, oz3, sx3, sy3, sz3);
-      //this->SetBlockInfo(blockId++, ox3, my3, oz3, sx3, sy3, sz3);
-      // Refine -x, +y, -z
-      ox4 = ox3;
-      oy4 = my3;
-      oz4 = oz3;
-      mx4 = ox4 + xSize / 16.0;
-      my4 = oy4 + ySize / 16.0;
-      mz4 = oz4 + zSize / 16.0;
-        this->SetBlockInfo(blockId++, ox4, oy4, oz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, mx4, oy4, oz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, ox4, my4, oz4, sx4, sy4, sz4);
-        this->SetBlockInfo(blockId++, mx4, my4, oz4, sx4, sy4, sz4);
-        //this->SetBlockInfo(blockId++, ox4, oy4, mz4, sx4, sy4, sz4);
-        // Refine -x, -y, +z
-        ox5 = ox4;
-        oy5 = oy4;
-        oz5 = mz4;
-        mx5 = ox5 + xSize / 32.0;
-        my5 = oy5 + ySize / 32.0;
-        mz5 = oz5 + zSize / 32.0;
-          this->SetBlockInfo(blockId++, ox5, oy5, oz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, mx5, oy5, oz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, ox5, my5, oz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, mx5, my5, oz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, ox5, oy5, mz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, mx5, oy5, mz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, ox5, my5, mz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, mx5, my5, mz5, sx5, sy5, sz5);
-        this->SetBlockInfo(blockId++, mx4, oy4, mz4, sx4, sy4, sz4);
-        //this->SetBlockInfo(blockId++, ox4, my4, mz4, sx4, sy4, sz4);
-        // Refine -x, +y, +z
-        ox5 = ox4;
-        oy5 = my4;
-        oz5 = mz4;
-        mx5 = ox5 + xSize / 32.0;
-        my5 = oy5 + ySize / 32.0;
-        mz5 = oz5 + zSize / 32.0;
-          this->SetBlockInfo(blockId++, ox5, oy5, oz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, mx5, oy5, oz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, ox5, my5, oz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, mx5, my5, oz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, ox5, oy5, mz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, mx5, oy5, mz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, ox5, my5, mz5, sx5, sy5, sz5);
-          this->SetBlockInfo(blockId++, mx5, my5, mz5, sx5, sy5, sz5);
-        this->SetBlockInfo(blockId++, mx4, my4, mz4, sx4, sy4, sz4);
-      this->SetBlockInfo(blockId++, mx3, my3, oz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, ox3, oy3, mz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, mx3, oy3, mz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, ox3, my3, mz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, mx3, my3, mz3, sx3, sy3, sz3);
-    this->SetBlockInfo(blockId++, mx2, oy2, oz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, ox2, my2, oz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, mx2, my2, oz2, sx2, sy2, sz2);
-    //this->SetBlockInfo(blockId++, ox2, oy2, mz2, sx2, sy2, sz2);
-    // Refine -x, -y, +z
-    ox3 = ox2;
-    oy3 = oy2;
-    oz3 = mz2;
-    mx3 = ox3 + xSize / 8.0;
-    my3 = oy3 + ySize / 8.0;
-    mz3 = oz3 + zSize / 8.0;
-      this->SetBlockInfo(blockId++, ox3, oy3, oz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, mx3, oy3, oz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, ox3, my3, oz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, mx3, my3, oz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, ox3, oy3, mz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, mx3, oy3, mz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, ox3, my3, mz3, sx3, sy3, sz3);
-      this->SetBlockInfo(blockId++, mx3, my3, mz3, sx3, sy3, sz3);
-    this->SetBlockInfo(blockId++, mx2, oy2, mz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, ox2, my2, mz2, sx2, sy2, sz2);
-    this->SetBlockInfo(blockId++, mx2, my2, mz2, sx2, sy2, sz2);
-  this->SetBlockInfo(blockId++, mx1, my1, mz1, sx1, sy1, sz1);
-
-  this->AddFractalArray();
-  this->AddBlockIdArray();
-  this->AddDepthArray(sx1);
-
-  if (this->GhostLevels > 0)
+  if (x1 > ox && x1 < mx && y1 > oy && y1 < my && z1 > oz && z1 < mz)
     {
-    this->AddGhostLevelArray();
+    return (level < target);
+    }
+
+  // Do not worry about divide by zero.
+  // min x
+  x = ox;
+  k = (x- x0) / (x1-x0);
+  if (k >=0.0 && k <= 1.0)
+    {
+    y = y0 + k*(y1-y0);
+    z = z0 + k*(z1-z0);
+    if (y >= oy && y <= my && z >= oz && z <= mz)
+      {
+      return (level < target);
+      }
+    } 
+  // max x
+  x = mx;
+  k = (x- x0) / (x1-x0);
+  if (k >=0.0 && k <= 1.0)
+    {
+    y = y0 + k*(y1-y0);
+    z = z0 + k*(z1-z0);
+    if (y >= oy && y <= my && z >= oz && z <= mz)
+      {
+      return (level < target);
+      }
+    } 
+  // min y
+  y = oy;
+  k = (y- y0) / (y1-y0);
+  if (k >=0.0 && k <= 1.0)
+    {
+    x = x0 + k*(x1-x0);
+    z = z0 + k*(z1-z0);
+    if (x >= ox && x <= mx && z >= oz && z <= mz)
+      {
+      return (level < target);
+      }
+    } 
+  // max y
+  y = my;
+  k = (y- y0) / (y1-y0);
+  if (k >=0.0 && k <= 1.0)
+    {
+    x = x0 + k*(x1-x0);
+    z = z0 + k*(z1-z0);
+    if (x >= ox && x <= mx && z >= oz && z <= mz)
+      {
+      return (level < target);
+      }
+    } 
+  // min z
+  z = oz;
+  k = (z- z0) / (z1-z0);
+  if (k >=0.0 && k <= 1.0)
+    {
+    x = x0 + k*(x1-x0);
+    y = y0 + k*(y1-y0);
+    if (y >= oy && y <= my && x >= ox && x <= mx)
+      {
+      return (level < target);
+      }
+    } 
+
+  return 0;
+}
+
+int vtkCTHFractal::LineTest(float x0, float y0, float z0, 
+                            float x1, float y1, float z1,
+                            float ox, float oy, float oz,
+                            float sx, float sy, float sz,
+                            int level, int target) 
+{
+  // First check to see if the line intersects this block.
+  if (this->LineTest2(x0, y0, z0, x1, y1, z1, ox, oy, oz, sx, sy, sz, level, target))
+    {
+    return 1;
+    }
+
+  // If the line intersects our neighbor, then our levels cannot differ by mopre than one.
+  // Assume that our neighbor is half our size.
+  target = target - 1;
+  ox = ox - 0.5*sx;
+  oy = oy - 0.5*sy;
+  oz = oz - 0.5*sz;
+  sx = sx * 2.0;
+  sy = sy * 2.0;
+  sz = sz * 2.0;
+
+  if (this->LineTest2(x0, y0, z0, x1, y1, z1, ox, oy, oz, sx, sy, sz, level, target))
+    {
+    return 1;
+    }
+  return 0;
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkCTHFractal::Traverse(int &blockId, int level, vtkCTHData* output, 
+                             float ox1, float oy1, float oz1,
+                             float sx1, float sy1, float sz1)
+{
+  if (this->LineTest(-1.64662,0.56383,1.16369, -1.05088,0.85595,0.87104, ox1,oy1,oz1, sx1,sy1,sz1, level, this->MaximumLevel) ||
+      this->LineTest(-1.05088,0.85595,0.87104, -0.61430,1.00347,0.59553, ox1,oy1,oz1, sx1,sy1,sz1, level, this->MaximumLevel) )
+    { // break block into eight.
+    ++level;
+    float mx1, my1, mz1;
+    float sx2, sy2, sz2;
+    int* dims = output->GetDimensions();
+    // Compute the midpoint of old block.
+    mx1 = ox1 + 0.5 * sx1;
+    my1 = oy1 + 0.5 * sy1;
+    mz1 = oz1 + 0.5 * sz1;
+    // Compute the size of the new blocks.
+    sx2 = sx1 * 0.5;
+    sy2 = sy1 * 0.5;
+    sz2 = sz1 * 0.5;
+    // Traverse the 8 new blocks.
+    this->Traverse(blockId, level, output, ox1, oy1, oz1, sx2, sy2, sz2);
+    this->Traverse(blockId, level, output, mx1, oy1, oz1, sx2, sy2, sz2);
+    this->Traverse(blockId, level, output, ox1, my1, oz1, sx2, sy2, sz2);
+    this->Traverse(blockId, level, output, mx1, my1, oz1, sx2, sy2, sz2);
+    this->Traverse(blockId, level, output, ox1, oy1, mz1, sx2, sy2, sz2);
+    this->Traverse(blockId, level, output, mx1, oy1, mz1, sx2, sy2, sz2);
+    this->Traverse(blockId, level, output, ox1, my1, mz1, sx2, sy2, sz2);
+    this->Traverse(blockId, level, output, mx1, my1, mz1, sx2, sy2, sz2);
+    }
+  else
+    {
+    if (output->InsertNextBlock() != blockId)
+      {
+      vtkErrorMacro("blockId wrong.")
+      return;
+      }
+    this->Levels->InsertValue(blockId, level);
+    this->SetBlockInfo(blockId++, ox1, oy1, oz1, sx1, sy1, sz1);
     }
 }
 
@@ -449,7 +338,7 @@ void vtkCTHFractal::AddFractalArray()
       }
     }
   
-  array->SetName("Fractal");
+  array->SetName("Fractal Volume Fraction");
   output->GetCellData()->AddArray(array);
   array->Delete();
   fractalSource->Delete();
@@ -490,7 +379,7 @@ void vtkCTHFractal::AddBlockIdArray()
 
 
 //----------------------------------------------------------------------------
-void vtkCTHFractal::AddDepthArray(float sx1)
+void vtkCTHFractal::AddDepthArray()
 {
   vtkCTHData* output = this->GetOutput();
   int numCells = output->GetNumberOfCells();
@@ -513,7 +402,7 @@ void vtkCTHFractal::AddDepthArray(float sx1)
   for (blockId = 0; blockId < numBlocks; ++blockId)
     {
     spacing = output->GetBlockSpacing(blockId);
-    depth = (int)((sx1 / spacing[0]) + 0.5);
+    depth = this->Levels->GetValue(blockId);
     for (blockCellId = 0; blockCellId < numCellsPerBlock; ++blockCellId)
       {
       depthArray->InsertNextValue(depth);
@@ -597,5 +486,9 @@ void vtkCTHFractal::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Dimensions: " << this->Dimensions << endl;
+  os << indent << "FractalValue: " << this->FractalValue << endl;
+  os << indent << "MaximumLevel: " << this->MaximumLevel << endl;
+
+
 }
 

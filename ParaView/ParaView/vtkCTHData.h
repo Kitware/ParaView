@@ -135,6 +135,14 @@ public:
   void SetBlockSpacing(int blockId, float* spacing);
   void SetBlockSpacing(int blockId, float sx, float sy, float sz);
   float* GetBlockSpacing(int blockId);
+
+  // Description:
+  // A way to add blocks if you do not know how many there will
+  // eventually be.  Of course all blocks should be defined
+  // before you start adding attribute arrays.
+  // This call returns the next block id.  The new block
+  // origin and spacing are initialized to 0.
+  int InsertNextBlock();
   
   // Must only be called with vtkCTHData (or subclass) as input
   void CopyTypeSpecificInformation( vtkDataObject *image );
@@ -151,6 +159,7 @@ public:
 
   vtkSetMacro(NumberOfGhostLevels, int);
   vtkGetMacro(NumberOfGhostLevels, int);
+  virtual void Initialize();
 
 protected:
   vtkCTHData();

@@ -87,9 +87,10 @@ protected:
 
   void ExecuteCellDataToPointData2(vtkDataArray *cellVolumeFraction, 
                             vtkFloatArray *pointVolumeFraction, vtkCTHData* data);
-  float ComputeSharedPoint(int blockId, int x, int y, int z, 
-                            float* pCell, vtkCTHData* output);
-  void FindPointCells(vtkCTHData* self, vtkIdType ptId, vtkIdList* idList);
+  void FindBlockNeighbors(vtkCTHData* self, int blockId, vtkIdList* blockList);
+  float ComputeSharedPoint(int blockId, vtkIdList* blockList, int x, int y, int z, 
+                            float* pCell, float* pPoint, vtkCTHData* output);
+  //void FindPointCells(vtkCTHData* self, vtkIdType ptId, vtkIdList* idList);
 
 
 

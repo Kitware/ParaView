@@ -7,6 +7,12 @@
   <VectorEntry label="Dimension" trace_name="Dimension"
                variable="Dimensions" type="int"
                help="XYZ cell dimensions of a block"/>
+  <VectorEntry label="FractalValue" trace_name="FractalValue"
+               variable="FractalValue" type="float"
+               help="Map this value to 0.5 for use as a volume fraction."/>
+  <VectorEntry label="MaximumLevel" trace_name="MaximumLevel"
+               variable="MaximumLevel" type="int"
+               help="Determines how deep to refine the grid."/>
   <LabeledToggle variable="GhostLevels" trace_name="GhostLevels" help="Set whether to generate overlapping ghost levels."/>
 </Module>
 

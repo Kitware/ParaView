@@ -28,6 +28,7 @@
 #include "vtkCTHSource.h"
 
 class vtkCTHData;
+class vtkIntArray;
 
 class VTK_EXPORT vtkCTHFractal : public vtkCTHSource
 {
@@ -36,6 +37,19 @@ public:
 
   vtkTypeRevisionMacro(vtkCTHFractal,vtkCTHSource);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Essentially the iso surface value.
+  // The fractal array is scaled to map this value to 0.5 for use as a volume fraction.
+  vtkSetMacro(FractalValue, float);
+  vtkGetMacro(FractalValue, float);  
+
+  // Description:
+  // Any blocks touching a predefined line will be subdivided to this level.
+  // Other blocks are subdivided so that neighboring blocks only differ
+  // by one level.
+  vtkSetMacro(MaximumLevel, int);
+  vtkGetMacro(MaximumLevel, int);
 
   // Description:
   // XYZ dimensions of cells.
@@ -53,6 +67,20 @@ protected:
   ~vtkCTHFractal();
 
   virtual void Execute();
+  void Traverse(int &blockId, int level, vtkCTHData* output, 
+                float ox1, float oy1, float oz1,
+                float sx1, float sy1, float sz1);
+
+  int LineTest2(float x0, float y0, float z0, 
+               float x1, float y1, float z1,
+               float ox, float oy, float oz,
+               float sx, float sy, float sz, int level, int target); 
+  int LineTest(float x0, float y0, float z0, 
+               float x1, float y1, float z1,
+               float ox, float oy, float oz,
+               float sx, float sy, float sz, int level, int target); 
+
+
   void SetDimensions(int xDim, int yDim, int zDim);
   void SetBlockInfo(int blockId, 
                     float ox, float oy, float oz,
@@ -60,15 +88,17 @@ protected:
 
   void AddFractalArray();
   void AddBlockIdArray();
-  void AddDepthArray(float sx1);
+  void AddDepthArray();
   void AddGhostLevelArray();
 
 private:
   void InternalImageDataCopy(vtkCTHFractal *src);
 
+  int MaximumLevel;
   int Dimensions;
   float FractalValue;
   int GhostLevels;
+  vtkIntArray *Levels;
 
 private:
   vtkCTHFractal(const vtkCTHFractal&);  // Not implemented.
