@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.18");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.19");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -556,7 +556,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithFloatCallback(int val)
     this->CompositeWithFloatCheck->SetState(val);
     }
  
-  if (this->CompositeRenderModule->GetComposite())
+  if (this->CompositeRenderModule->GetCompositeID())
     {
     this->CompositeRenderModule->SetUseCompositeWithFloat(val);
     // Limit of composite manager.
@@ -596,7 +596,7 @@ void vtkPVCompositeRenderModuleUI::CompositeWithRGBACallback(int val)
     {
     this->CompositeWithRGBACheck->SetState(val);
     }
-  if (this->CompositeRenderModule->GetComposite())
+  if (this->CompositeRenderModule->GetCompositeID())
     {
     this->CompositeRenderModule->SetUseCompositeWithRGBA(val);
     // Limit of composite manager.
