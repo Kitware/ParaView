@@ -21,6 +21,7 @@ if {[info exists argc]} {
 # This test is to see if the array menu gets updated properly
 # when the input menu is changed.
 
+$kw(vtkTemp22) SetOrientationAxesVisibility 0
 
 set kw(vtkTemp273) [$kw(vtkTemp1) CreatePVSource SphereSource]
 set kw(vtkTemp290) [$kw(vtkTemp273) GetPVWidget {Theta Resolution}]

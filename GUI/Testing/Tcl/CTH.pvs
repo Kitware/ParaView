@@ -16,6 +16,7 @@ if {[info exists argc]} {
     }
 } 
 
+$kw(vtkTemp19) SetOrientationAxesVisibility 0
 
 set kw(vtkTemp781) [$kw(vtkTemp5) InitializeReadCustom "XMLRectilinearGridReader" "$DataDir/Data/cth.vtr"]
 $kw(vtkTemp5) ReadFileInformation $kw(vtkTemp781) "$DataDir/Data/cth.vtr"

@@ -16,6 +16,7 @@ if {[info exists argc]} {
     }
 } 
 
+$kw(vtkTemp18) SetOrientationAxesVisibility 0
 
 set kw(vtkTemp897) [$kw(vtkTemp4) CreatePVSource MazeSource]
 set kw(vtkTemp903) [$kw(vtkTemp897) GetPVWidget {XSize}]

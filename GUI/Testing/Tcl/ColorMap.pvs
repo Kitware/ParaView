@@ -16,6 +16,8 @@ if {[info exists argc]} {
     }
 } 
 
+$kw(vtkTemp16) SetOrientationAxesVisibility 0
+
 set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource ConeSource]
 $kw(vtkTemp224) AcceptCallback
 set kw(vtkTemp260) [$kw(vtkTemp1) CreatePVSource ElevationFilter]

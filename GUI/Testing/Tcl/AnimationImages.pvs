@@ -16,6 +16,8 @@ if {[info exists argc]} {
     }
 }
 
+$kw(vtkTemp43) SetOrientationAxesVisibility 0
+
 # Create sphere
 set kw(vtkTemp898) [$kw(vtkTemp1) CreatePVSource SphereSource]
 set kw(vtkTemp904) [$kw(vtkTemp898) GetPVWidget {Center}]

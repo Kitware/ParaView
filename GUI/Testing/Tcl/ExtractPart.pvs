@@ -16,6 +16,7 @@ if {[info exists argc]} {
     }
 } 
 
+$kw(vtkTemp17) SetOrientationAxesVisibility 0
 
 set kw(vtkTemp544) [$kw(vtkTemp1) CreatePVSource ConeSource]
 set kw(vtkTemp550) [$kw(vtkTemp544) GetPVWidget {Resolution}]

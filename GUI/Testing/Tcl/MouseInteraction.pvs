@@ -16,6 +16,8 @@ if {[info exists argc]} {
     }
 } 
 
+$kw(vtkTemp18) SetOrientationAxesVisibility 0
+
 # create superquadric
 set kw(vtkTemp897) [$kw(vtkTemp4) CreatePVSource SuperquadricSource]
 set kw(vtkTemp903) [$kw(vtkTemp897) GetPVWidget {Center}]

@@ -25,6 +25,7 @@ if {[info exists argc]} {
 # This input list test is the first test that compares text files
 # instead of images.
 
+$pv(vtkTemp43) SetOrientationAxesVisibility 0
 $pv(vtkTemp43) SetBackgroundColor 0 0 0
 set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]

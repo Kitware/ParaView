@@ -16,6 +16,7 @@ if {[info exists argc]} {
     }
 } 
 
+$pv(vtkTemp43) SetOrientationAxesVisibility 0
 
 set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]

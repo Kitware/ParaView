@@ -16,6 +16,8 @@ if {[info exists argc]} {
     }
 } 
 
+$kw(vtkTemp21) SetOrientationAxesVisibility 0
+
 $kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
 
 set kw(vtkTemp285) [$kw(vtkTemp1) CreatePVSource DataSetTriangleFilter]

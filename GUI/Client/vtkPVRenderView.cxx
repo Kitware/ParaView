@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.322");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.323");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1072,12 +1072,12 @@ void vtkPVRenderView::CreateViewProperties()
     {
     this->OrientationAxesCheck->SetState(
       pvwindow->GetIntRegisteryValue(2, "RunTime", "OrientationAxesVisibility"));
-    this->OrientationAxesCheckCallback();
     }
   else
     {
-    this->OrientationAxesCheck->SetState(0);
+    this->OrientationAxesCheck->SetState(1);
     }
+  this->OrientationAxesCheckCallback();
   
   // Orientation axes settings: interactive check
   
@@ -1094,7 +1094,7 @@ void vtkPVRenderView::CreateViewProperties()
     }
   else
     {
-    this->OrientationAxesInteractiveCheck->SetState(1);
+    this->OrientationAxesInteractiveCheck->SetState(0);
     }
   
   this->OrientationAxesInteractiveCallback();

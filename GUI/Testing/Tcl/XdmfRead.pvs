@@ -14,6 +14,7 @@ puts "${DataDir}/Data/Test1.xmf"
 
 set kw(vtkTemp2) [$Application GetMainWindow]
 set kw(vtkTemp18) [$kw(vtkTemp2) GetMainView]
+$kw(vtkTemp18) SetOrientationAxesVisibility 0
 set kw(vtkTemp582) [$kw(vtkTemp2) InitializeReadCustom "XdmfReader" "${DataDir}/Data/Test1.xmf"]
 $kw(vtkTemp582) SetDomain {Domain0}
 $kw(vtkTemp582) EnableGrid {Solids}

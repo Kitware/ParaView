@@ -16,6 +16,8 @@ if {[info exists argc]} {
     }
 } 
 
+$kw(vtkTemp18) SetOrientationAxesVisibility 0
+
 set kw(vtkTemp898) [$kw(vtkTemp4) InitializeReadCustom "PVDReader" "$DataDir/Data/chombo3d.pvd"]
 $kw(vtkTemp4) ReadFileInformation $kw(vtkTemp898) "$DataDir/Data/chombo3d.pvd"
 $kw(vtkTemp4) FinalizeRead $kw(vtkTemp898) "$DataDir/Data/chombo3d.pvd"
