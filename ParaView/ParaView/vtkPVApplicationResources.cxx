@@ -53,20 +53,26 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // Buttons
 
-#include "Resources/vtkKWFlyButton.h"
-#include "Resources/vtkKWPickCenterButton.h"
-#include "Resources/vtkKWResetViewButton.h"
-#include "Resources/vtkKWRotateViewButton.h"
-#include "Resources/vtkKWTranslateViewButton.h"
-#include "Resources/vtkPV3DCursor.h"
+#include "Resources/vtkPV3DCursorButton.h"
 #include "Resources/vtkPVCalculatorButton.h"
 #include "Resources/vtkPVClipButton.h"
 #include "Resources/vtkPVContourButton.h"
 #include "Resources/vtkPVCutButton.h"
+#include "Resources/vtkPVEditCenterButtonClose.h"
+#include "Resources/vtkPVEditCenterButtonOpen.h"
 #include "Resources/vtkPVExtractGridButton.h"
+#include "Resources/vtkPVFlyButton.h"
 #include "Resources/vtkPVGlyphButton.h"
+#include "Resources/vtkPVHideCenterButton.h"
+#include "Resources/vtkPVPickCenterButton.h"
 #include "Resources/vtkPVProbeButton.h"
+#include "Resources/vtkPVResetCenterButton.h"
+#include "Resources/vtkPVResetViewButton.h"
+#include "Resources/vtkPVRotateViewButton.h"
+#include "Resources/vtkPVShowCenterButton.h"
+#include "Resources/vtkPVStreamTracerButton.h"
 #include "Resources/vtkPVThresholdButton.h"
+#include "Resources/vtkPVTranslateViewButton.h"
 #include "Resources/vtkPVVectorDisplacementButton.h"
 
 // Splash screen
@@ -76,144 +82,155 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreateButtonPhotos()
 {
-  this->CreatePhoto("KWResetViewButton", 
-                    KW_RESET_VIEW_BUTTON, 
-                    KW_RESET_VIEW_BUTTON_WIDTH, 
-                    KW_RESET_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("PVResetViewButton", 
+                    image_PVResetViewButton, 
+                    image_PVResetViewButton_width, 
+                    image_PVResetViewButton_height,
+                    image_PVResetViewButton_pixel_size);
 
-  this->CreatePhoto("KWTranslateViewButton", 
-                    KW_TRANSLATE_VIEW_BUTTON, 
-                    KW_TRANSLATE_VIEW_BUTTON_WIDTH, 
-                    KW_TRANSLATE_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("PVTranslateViewButton", 
+                    image_PVTranslateViewButton, 
+                    image_PVTranslateViewButton_width, 
+                    image_PVTranslateViewButton_height,
+                    image_PVTranslateViewButton_pixel_size);
 
-  this->CreatePhoto("KWActiveTranslateViewButton", 
-                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON, 
-                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON_WIDTH, 
-                    KW_ACTIVE_TRANSLATE_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("PVTranslateViewButtonActive", 
+                    image_PVTranslateViewButtonActive, 
+                    image_PVTranslateViewButtonActive_width, 
+                    image_PVTranslateViewButtonActive_height,
+                    image_PVTranslateViewButtonActive_pixel_size);
 
-  this->CreatePhoto("KWFlyButton", 
-                    KW_FLY_BUTTON, 
-                    KW_FLY_BUTTON_WIDTH, 
-                    KW_FLY_BUTTON_HEIGHT);
+  this->CreatePhoto("PVFlyButton", 
+                    image_PVFlyButton, 
+                    image_PVFlyButton_width, 
+                    image_PVFlyButton_height,
+                    image_PVFlyButton_pixel_size);
 
-  this->CreatePhoto("KWActiveFlyButton", 
-                    KW_ACTIVE_FLY_BUTTON, 
-                    KW_ACTIVE_FLY_BUTTON_WIDTH, 
-                    KW_ACTIVE_FLY_BUTTON_HEIGHT);
+  this->CreatePhoto("PVFlyButtonActive", 
+                    image_PVFlyButtonActive, 
+                    image_PVFlyButtonActive_width, 
+                    image_PVFlyButtonActive_height,
+                    image_PVFlyButtonActive_pixel_size);
 
-  this->CreatePhoto("KWRotateViewButton", 
-                    KW_ROTATE_VIEW_BUTTON, 
-                    KW_ROTATE_VIEW_BUTTON_WIDTH, 
-                    KW_ROTATE_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("PVRotateViewButton", 
+                    image_PVRotateViewButton, 
+                    image_PVRotateViewButton_width, 
+                    image_PVRotateViewButton_height,
+                    image_PVRotateViewButton_pixel_size);
 
-  this->CreatePhoto("KWActiveRotateViewButton", 
-                    KW_ACTIVE_ROTATE_VIEW_BUTTON, 
-                    KW_ACTIVE_ROTATE_VIEW_BUTTON_WIDTH, 
-                    KW_ACTIVE_ROTATE_VIEW_BUTTON_HEIGHT);
+  this->CreatePhoto("PVRotateViewButtonActive", 
+                    image_PVRotateViewButtonActive, 
+                    image_PVRotateViewButtonActive_width, 
+                    image_PVRotateViewButtonActive_height,
+                    image_PVRotateViewButtonActive_pixel_size);
 
-  this->CreatePhoto("KWPickCenterButton", 
-                    KW_PICK_CENTER_BUTTON, 
-                    KW_PICK_CENTER_BUTTON_WIDTH, 
-                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  this->CreatePhoto("PVPickCenterButton", 
+                    image_PVPickCenterButton, 
+                    image_PVPickCenterButton_width, 
+                    image_PVPickCenterButton_height,
+                    image_PVPickCenterButton_pixel_size);
   
-  /* I'm using the same one here */
-
-  this->CreatePhoto("KWResetCenterButton", 
-                    KW_PICK_CENTER_BUTTON, 
-                    KW_PICK_CENTER_BUTTON_WIDTH, 
-                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  this->CreatePhoto("PVResetCenterButton", 
+                    image_PVResetCenterButton, 
+                    image_PVResetCenterButton_width, 
+                    image_PVResetCenterButton_height,
+                    image_PVResetCenterButton_pixel_size);
   
-  /* I'm using the same one here */
-
-  this->CreatePhoto("KWShowCenterButton", 
-                    KW_PICK_CENTER_BUTTON, 
-                    KW_PICK_CENTER_BUTTON_WIDTH, 
-                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  this->CreatePhoto("PVShowCenterButton", 
+                    image_PVShowCenterButton, 
+                    image_PVShowCenterButton_width, 
+                    image_PVShowCenterButton_height,
+                    image_PVShowCenterButton_pixel_size);
   
-  /* I'm using the same one here */
-
-  this->CreatePhoto("KWHideCenterButton", 
-                    KW_PICK_CENTER_BUTTON, 
-                    KW_PICK_CENTER_BUTTON_WIDTH, 
-                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  this->CreatePhoto("PVHideCenterButton", 
+                    image_PVHideCenterButton, 
+                    image_PVHideCenterButton_width, 
+                    image_PVHideCenterButton_height,
+                    image_PVHideCenterButton_pixel_size);
   
-  /* I'm using the same one here */
-
-  this->CreatePhoto("KWEditCenterButtonOpen", 
-                    KW_PICK_CENTER_BUTTON, 
-                    KW_PICK_CENTER_BUTTON_WIDTH, 
-                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  this->CreatePhoto("PVEditCenterButtonOpen", 
+                    image_PVEditCenterButtonOpen, 
+                    image_PVEditCenterButtonOpen_width, 
+                    image_PVEditCenterButtonOpen_height,
+                    image_PVEditCenterButtonOpen_pixel_size);
   
-  /* I'm using the same one here */
-
-  this->CreatePhoto("KWEditCenterButtonClose", 
-                    KW_PICK_CENTER_BUTTON, 
-                    KW_PICK_CENTER_BUTTON_WIDTH, 
-                    KW_PICK_CENTER_BUTTON_HEIGHT);
+  this->CreatePhoto("PVEditCenterButtonClose", 
+                    image_PVEditCenterButtonClose, 
+                    image_PVEditCenterButtonClose_width, 
+                    image_PVEditCenterButtonClose_height,
+                    image_PVEditCenterButtonClose_pixel_size);
   
   this->CreatePhoto("PVCalculatorButton", 
-                    PV_CALCULATOR_BUTTON,
-                    PV_CALCULATOR_BUTTON_WIDTH, 
-                    PV_CALCULATOR_BUTTON_HEIGHT);
+                    image_PVCalculatorButton, 
+                    image_PVCalculatorButton_width, 
+                    image_PVCalculatorButton_height,
+                    image_PVCalculatorButton_pixel_size);
 
   this->CreatePhoto("PVThresholdButton", 
-                    PV_THRESHOLD_BUTTON,
-                    PV_THRESHOLD_BUTTON_WIDTH, 
-                    PV_THRESHOLD_BUTTON_HEIGHT);
+                    image_PVThresholdButton, 
+                    image_PVThresholdButton_width, 
+                    image_PVThresholdButton_height,
+                    image_PVThresholdButton_pixel_size);
 
   this->CreatePhoto("PVContourButton", 
-                    PV_CONTOUR_BUTTON,
-                    PV_CONTOUR_BUTTON_WIDTH, 
-                    PV_CONTOUR_BUTTON_HEIGHT);
+                    image_PVContourButton, 
+                    image_PVContourButton_width, 
+                    image_PVContourButton_height,
+                    image_PVContourButton_pixel_size);
 
   this->CreatePhoto("PVProbeButton", 
-                    PV_PROBE_BUTTON,
-                    PV_PROBE_BUTTON_WIDTH, 
-                    PV_PROBE_BUTTON_HEIGHT);
+                    image_PVProbeButton, 
+                    image_PVProbeButton_width, 
+                    image_PVProbeButton_height,
+                    image_PVProbeButton_pixel_size);
 
   this->CreatePhoto("PVGlyphButton", 
-                    PV_GLYPH_BUTTON,
-                    PV_GLYPH_BUTTON_WIDTH, 
-                    PV_GLYPH_BUTTON_HEIGHT);
+                    image_PVGlyphButton, 
+                    image_PVGlyphButton_width, 
+                    image_PVGlyphButton_height,
+                    image_PVGlyphButton_pixel_size);
 
   this->CreatePhoto("PV3DCursorButton", 
-                    PV_3D_CURSOR_BUTTON,
-                    PV_3D_CURSOR_BUTTON_WIDTH, 
-                    PV_3D_CURSOR_BUTTON_HEIGHT);
+                    image_PV3DCursorButton, 
+                    image_PV3DCursorButton_width, 
+                    image_PV3DCursorButton_height,
+                    image_PV3DCursorButton_pixel_size);
 
-  this->CreatePhoto("PVActive3DCursorButton", 
-                    PV_ACTIVE_3D_CURSOR_BUTTON,
-                    PV_ACTIVE_3D_CURSOR_BUTTON_WIDTH, 
-                    PV_ACTIVE_3D_CURSOR_BUTTON_HEIGHT);
+  this->CreatePhoto("PV3DCursorButtonActive", 
+                    image_PV3DCursorButtonActive, 
+                    image_PV3DCursorButtonActive_width, 
+                    image_PV3DCursorButtonActive_height,
+                    image_PV3DCursorButtonActive_pixel_size);
 
   this->CreatePhoto("PVCutButton", 
-                    PV_CUT_BUTTON,
-                    PV_CUT_BUTTON_WIDTH, 
-                    PV_CUT_BUTTON_HEIGHT);
+                    image_PVCutButton, 
+                    image_PVCutButton_width, 
+                    image_PVCutButton_height,
+                    image_PVCutButton_pixel_size);
 
   this->CreatePhoto("PVClipButton", 
-                    PV_CLIP_BUTTON,
-                    PV_CLIP_BUTTON_WIDTH, 
-                    PV_CLIP_BUTTON_HEIGHT);
+                    image_PVClipButton, 
+                    image_PVClipButton_width, 
+                    image_PVClipButton_height,
+                    image_PVClipButton_pixel_size);
 
   this->CreatePhoto("PVExtractGridButton", 
-                    PV_EXTRACT_GRID_BUTTON,
-                    PV_EXTRACT_GRID_BUTTON_WIDTH, 
-                    PV_EXTRACT_GRID_BUTTON_HEIGHT);
+                    image_PVExtractGridButton, 
+                    image_PVExtractGridButton_width, 
+                    image_PVExtractGridButton_height,
+                    image_PVExtractGridButton_pixel_size);
 
   this->CreatePhoto("PVVectorDisplacementButton", 
-                    PV_VECTOR_DISPLACEMENT_BUTTON,
-                    PV_VECTOR_DISPLACEMENT_BUTTON_WIDTH, 
-                    PV_VECTOR_DISPLACEMENT_BUTTON_HEIGHT);
+                    image_PVVectorDisplacementButton, 
+                    image_PVVectorDisplacementButton_width, 
+                    image_PVVectorDisplacementButton_height,
+                    image_PVVectorDisplacementButton_pixel_size);
 
-  /* Yes, I'm using the Vector displacement attributes because the .h
-     has not been generated for that button, it will once everybody is
-     happy with those new icons :)
-  */
   this->CreatePhoto("PVStreamTracerButton", 
-                    PV_VECTOR_DISPLACEMENT_BUTTON,
-                    PV_VECTOR_DISPLACEMENT_BUTTON_WIDTH, 
-                    PV_VECTOR_DISPLACEMENT_BUTTON_HEIGHT);
+                    image_PVStreamTracerButton, 
+                    image_PVStreamTracerButton_width, 
+                    image_PVStreamTracerButton_height,
+                    image_PVStreamTracerButton_pixel_size);
 }
 
 //----------------------------------------------------------------------------
@@ -221,17 +238,17 @@ void vtkPVApplication::CreateSplashScreen()
 {
   this->SplashScreen->Create(this, "-bg #FFFFFF");
   vtkKWImageLabel *image = this->SplashScreen->GetImage();
-  image->SetImageData(image_vtkPVSplashScreen,
-                      image_vtkPVSplashScreen_width, 
-                      image_vtkPVSplashScreen_height,
-                      3);
+  image->SetImageData(image_PVSplashScreen,
+                      image_PVSplashScreen_width, 
+                      image_PVSplashScreen_height,
+                      image_PVSplashScreen_pixel_size);
   this->SplashScreen->Show();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVApplication::CreatePhoto(char *name, 
                                    unsigned char *data, 
-                                   int width, int height,
+                                   int width, int height, int pixel_size,
                                    char *filename)
 {
   // Try to use the filename if provided
@@ -272,7 +289,7 @@ void vtkPVApplication::CreatePhoto(char *name,
   // Otherwise use the provided data
 
   if (!vtkKWTkUtilities::UpdatePhoto(this->GetMainInterp(),
-                                     name, data, width, height, 3))
+                                     name, data, width, height, pixel_size))
     {
     vtkWarningMacro("Error updating Tk photo " << name);
     }
