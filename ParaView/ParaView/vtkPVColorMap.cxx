@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.46");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.47");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -815,24 +815,23 @@ void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
     {
     return;
     }
-  this->NumberOfVectorComponents = num;
 
   // Get rid of old arrays.
   // Use for delete.  This number shold not be changed after creation.
-  for (idx = 0; idx < this->NumberOfVectorComponents; ++idx)
+  if (this->VectorComponentTitles)
     {
-    if (this->VectorComponentTitles && this->VectorComponentTitles[idx])
+    for (idx = 0; idx < this->NumberOfVectorComponents; ++idx)
       {
       delete [] this->VectorComponentTitles[idx];
       this->VectorComponentTitles[idx] = NULL;
       }
     }
-  if (this->VectorComponentTitles)
-    {
-    delete this->VectorComponentTitles;
-    this->VectorComponentTitles = NULL;
-    }
+
+  delete this->VectorComponentTitles;
+  this->VectorComponentTitles = NULL;
   
+  this->NumberOfVectorComponents = num;
+
   // Set defaults for component titles.
   if (num > 0)
     {
