@@ -13,8 +13,7 @@ MACRO(CS_INITIALIZE_WRAP)
   MARK_AS_ADVANCED(VTK_WRAP_ClientServer_EXE)
 ENDMACRO(CS_INITIALIZE_WRAP)
 
-# Macro to create ClientServer wrappers classes in a single VTK kit.
-MACRO(PV_WRAP_VTK_CS kit ukit deps)
+MACRO(PV_PRE_WRAP_VTK_CS libname kit ukit deps)
   SET(vtk${kit}CS_HEADERS)
   INCLUDE(${VTK_KITS_DIR}/vtk${kit}Kit.cmake)
   FOREACH(class ${VTK_${ukit}_CLASSES})
@@ -32,7 +31,12 @@ MACRO(PV_WRAP_VTK_CS kit ukit deps)
           ${full_name})
     ENDIF(NOT VTK_CLASS_WRAP_EXCLUDE_${class})
   ENDFOREACH(class)
-  VTK_WRAP_ClientServer(vtk${kit}CS vtk${kit}CS_SRCS "${vtk${kit}CS_HEADERS}")
+  VTK_WRAP_ClientServer("${libname}" "vtk${kit}CS_SRCS" "${vtk${kit}CS_HEADERS}")
+ENDMACRO(PV_PRE_WRAP_VTK_CS kit ukit deps)
+
+# Macro to create ClientServer wrappers classes in a single VTK kit.
+MACRO(PV_WRAP_VTK_CS kit ukit deps)
+  PV_PRE_WRAP_VTK_CS("vtk${kit}CS" "${kit}" "${ukit}" "${deps}")
   ADD_LIBRARY(vtk${kit}CS ${vtk${kit}CS_SRCS})
   TARGET_LINK_LIBRARIES(vtk${kit}CS vtkClientServer vtk${kit})
   FOREACH(dep ${deps})
