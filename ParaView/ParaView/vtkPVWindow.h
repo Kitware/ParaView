@@ -148,6 +148,10 @@ public:
   void SaveInTclScript();
 
   // Description:
+  // Copy the trace file to a file with the specified file name.
+  void SaveTrace();  
+  
+  // Description:
   // Save the pipeline ParaView Tcl script
   void SaveWorkspace();
 

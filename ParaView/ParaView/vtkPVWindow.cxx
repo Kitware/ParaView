@@ -422,6 +422,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   
   this->MenuFile->InsertCommand(2, "Export VTK Script", this, "SaveInTclScript");
   //this->MenuFile->InsertCommand(3, "Save Workspace", this, "SaveWorkspace");
+  this->MenuFile->InsertCommand(3, "Save Trace File", this, "SaveTrace");
   
   this->MenuFile->InsertCommand(4, "Command Prompt", this,
                                 "DisplayCommandPrompt");
@@ -2254,6 +2255,48 @@ void vtkPVWindow::StartLog()
 void vtkPVWindow::StopLog()
 {
   this->GetPVApplication()->StopLog();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SaveTrace()
+{
+  ofstream *trace = this->GetPVApplication()->GetTraceFile();
+  if ( ! trace)
+    {
+    return;
+    }
+  
+  ofstream *newTrace;
+  ifstream *oldTrace;
+  char *filename, line[100];
+  
+  this->Script("tk_getSaveFile -filetypes {{{ParaView Script} {.pvs}}} -defaultextension .pvs");
+  filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
+  sprintf(filename, "%s", this->Application->GetMainInterp()->result);
+  
+  if (strcmp(filename, "") == 0)
+    {
+    delete [] filename;
+    return;
+    }
+  
+  trace->close();
+  
+  oldTrace = new ifstream("ParaViewTrace.pvs");
+  newTrace = new ofstream(filename);
+  
+  while ( ! oldTrace->eof())
+    {
+    oldTrace->getline(line, 100);
+    *newTrace << line << endl;
+    }
+  
+  oldTrace->close();
+  newTrace->close();
+  delete oldTrace;
+  delete newTrace;
+  
+  trace->open("ParaViewTrace.pvs", ios::in | ios::app);
 }
 
 //----------------------------------------------------------------------------
