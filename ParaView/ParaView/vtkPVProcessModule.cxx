@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.14");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.15");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -267,6 +267,7 @@ void vtkPVProcessModule::ServerSimpleScript(const char *str)
   // Do this so that only the client server process module
   // needs to implement this method.
   this->BroadcastSimpleScript(str);
+  this->SetRootResult(this->Application->GetMainInterp()->result);
 }
 
 //----------------------------------------------------------------------------

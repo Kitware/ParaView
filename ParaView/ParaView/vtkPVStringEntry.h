@@ -128,6 +128,10 @@ protected:
   vtkSetStringMacro(DefaultValue);
   vtkGetStringMacro(DefaultValue);
 
+  vtkSetStringMacro(InitSourceVariable);
+  vtkGetStringMacro(InitSourceVariable);
+  char* InitSourceVariable;
+
   vtkPVStringWidgetProperty *Property;
   
 //BTX

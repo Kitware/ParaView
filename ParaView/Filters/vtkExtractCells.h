@@ -35,7 +35,10 @@
 //    executes, it will set up the ugrid, point and cell arrays, with no points, 
 //    cells or data.
 
-#include <vtkDataSetToUnstructuredGridFilter.h>
+#ifndef __vtkExtractCells_h
+#define __vtkExtractCells_h
+
+#include "vtkDataSetToUnstructuredGridFilter.h"
 #include <vtkstd/set>     // for the internal cell ID list
 
 class vtkIdList;
@@ -97,3 +100,4 @@ private:
   int SubSetUGridCellArraySize;
   char InputIsUgrid;
 };
+#endif

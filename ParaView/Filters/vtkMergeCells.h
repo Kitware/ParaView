@@ -44,12 +44,14 @@
 //    arrays (3) this class knows duplicate points may be appearing in
 //    the DataSets and can filter those out, (4) this class is not a filter.
 
-#include <vtkObject.h>
-#include <vtkUnstructuredGrid.h>
-#include <vtkDataSetAttributes.h>
+#ifndef __vtkMergeCells_h
+#define __vtkMergeCells_h
+
+#include "vtkObject.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkDataSetAttributes.h"
 #include <map>
 
-class vtkIdList;
 class vtkDataSet;
 
 class VTK_EXPORT vtkMergeCells : public vtkObject
@@ -150,3 +152,4 @@ private:
 
   int nextGrid;
 };
+#endif

@@ -3,13 +3,13 @@
   <Filter class="vtkBalancedRedistributePolyData">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Balance the number of cells on all processes." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Balance the number of cells on all processes." input_name="Input"/>
 </Module>
 <Module name="AllToN" root_name="AllToN" module_type="Filter" multiprocess_support="multiple_processes" long_help="Redistribute data to a subset of available processes." short_help="Repartition data filter.">
   <Filter class="vtkAllToNRedistributePolyData">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Redistribute polydata to a subset of processes." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Redistribute polydata to a subset of processes." input_name="Input"/>
   <VectorEntry trace_name="NumberOfProcesses" variable="NumberOfProcesses" type="int" default_value="1"/>
 </Module>
 <Module name="AppendAttributes" menu_name="Append Attributes" root_name="AppendAttr" module_type="Filter" long_help="Copies geometry from first input.  Puts all of the arrays into the output." short_help="Puts all input arrays into the single output.">
@@ -37,7 +37,7 @@
   <Filter class="vtkCellCenters">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Generate vertices" trace_name="VertexCells" variable="VertexCells" help="Generate vertex as geometry of just points." default_value="0"/>
 </Module>
 <Module name="CellDataToPointData" root_name="CellToPoint" module_type="Filter" long_help="Create point attributes by averaging cell attributes." short_help="Convert cell data to point data.">
@@ -47,14 +47,14 @@
       <FixedTypeRequirement/>
     </Input>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Pass cell data" trace_name="PassCellData" variable="PassCellData" help=" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output." default_value="0"/>
 </Module>
 <Module name="CleanPolyData" menu_name="Clean" root_name="CleanPD" module_type="Filter" long_help="Merge coincident points if they do not meet a feature edge critera." short_help="Merge coincident points.">
   <Filter class="vtkCleanPolyData">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Piece invariant" trace_name="PieceInvariant" variable="PieceInvariant" help="Turn this on to remove seams when running in parallel." default_value="1"/>
   <VectorEntry variable="Tolerance" trace_name="Tolerance" type="float" help="The tolerance in terms of fraction of bounding box length." default_value="0.0" data_range="0 1"/>
   <VectorEntry label="Absolute tolerance" variable="AbsoluteTolerance" trace_name="AbsoluteTolerance" type="float" help="The tolerance in absolute terms." default_value="1.0"/>
@@ -68,26 +68,26 @@
   <Filter class="vtkCleanUnstructuredGrid">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="PVConnectivityFilter" menu_name="Connectivity" root_name="Connect" module_type="Filter" long_help="Mark connected components with integer point attribute array." short_help="Find connected components.">
   <Filter class="vtkPVConnectivityFilter">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="ImageClip" menu_name="Crop" root_name="ImageClip" module_type="Filter" replace_input="0" long_help="Efficiently extract an area/volume of interest from a 2-d image or 3-d volume." short_help="Extract a volume of interest.">
   <Filter class="vtkImageClip">
     <Input name="Input" class="vtkImageData"/>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ExtentEntry label="Extent to crop" trace_name="OutputWholeExtent" variable="OutputWholeExtent" input_menu="im" help="Set the min/max extents in each dimension of the output"/>
 </Module>
 <Module name="Curvatures" menu_name="Curvature" root_name="Curvatures" module_type="Filter" long_help="This filter will compute the gaussian or mean curvature of the mesh at each point." short_help="Compute the curvature at each point.">
   <Filter class="vtkCurvatures">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Invert mean curvature" trace_name="InvertMeanCurvature" variable="InvertMeanCurvature" help="Turn this on to invert the mean curvature calculation for meshes with inward pointing normals." default_value="0"/>
   <SelectionList variable="CurvatureType" label="Curvature type" trace_name="CurvatureType" help="Select the curvature type." default_value="0">
     <Item name="Gaussian" value="0"/>
@@ -98,7 +98,7 @@
   <Filter class="vtkDecimatePro">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Reduction target" trace_name="TargetReduction" variable="TargetReduction" type="float" help="Value between 0 and 1. Desired reduction of the total number of triangles." default_value="0.90" data_range="0 1"/>
   <LabeledToggle label="Preserve topology" trace_name="PreserveTopology" variable="PreserveTopology" help="If off, better reduction can occur, but model may break up." default_value="0"/>
   <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists). Topology can be split along feature edges." default_value="15.0" data_range="0 180"/>
@@ -108,40 +108,31 @@
   <Filter class="vtkDistributedDataFilter">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Clip cells" trace_name="ClipCells" variable="ClipCells" help="Turn this on if you want cells clipped to spatial boundary regions." default_value="0"/>
   <LabeledToggle label="Include all intersecting cells" trace_name="IncludeAllIntersectingCells" variable="IncludeAllIntersectingCells" help="Turn this on if you want all cells that intersect spatial boundaries." default_value="0"/>
   <StringEntry variable="GlobalIdArrayName" trace_name="GlobalIdArrayName" help="Provide name of global node ID array so redistributed data does not duplicate node IDs" />
 </Module>
-<Module name="Dialate"  root_name="Dialate"  module_type="Filter">
-  <Filter class="vtkPVImageContinuousDilate3D">
-    <Input name="Input" class="vtkImageData">
-      <ArrayRequirement attribute="Point" components="1"/>
-    </Input>
-  </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <ArrayMenu input_name="Input" attribute_type="Scalars" label="Scalars" input_menu="im" number_of_components="1" help="Select the input scalars to process."/>
-  <VectorEntry label="Kernel Size" variable="KernelSize" type="int" length="3" help="Determines the dilation neighborhood." default_value="1 1 1"/>
-</Module>
-<Module name="ElevationFilter" menu_name="Elevation" root_name="Elevation" module_type="Filter" long_help="Create point attribute array by projecting points onto an elevation vector." short_help="Create a point array representing elevation.">
+<Module name="ElevationFilter" menu_name="Elevation" root_name="Elevation" 
+        module_type="Filter" 
+        long_help="Create point attribute array by projecting points onto an elevation vector." 
+        short_help="Create a point array representing elevation.">
   <Filter class="vtkElevationFilter">
     <Input name="Input" class="vtkDataSet">
       <FixedTypeRequirement/>
     </Input>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
-  <VectorEntry label="Scalar range" trace_name="ScalarRange" variable="ScalarRange" type="float" length="2" help="Set the range of scalar values to generate" default_value="0.0 1.0"/>
-  <LineWidget trace_name="Line" point1_variable="LowPoint" point2_variable="HighPoint" point1_label="Low Point" point2_label="High Point" use_label="0" show_resolution="0" help="Set the minimum and maximum point for elevation"/>
-</Module>
-<Module name="Erode"  root_name="Erode" module_type="Filter">
-  <Filter class="vtkPVImageContinuousErode3D">
-    <Input name="Input" class="vtkImageData">
-      <ArrayRequirement attribute="Point" components="1"/>
-    </Input>
-  </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <ArrayMenu input_name="Input" attribute_type="Scalars" label="Scalars" input_menu="im" number_of_components="1" help="Select the input scalars to process."/>
-  <VectorEntry label="Kernel Size" variable="KernelSize" type="int" length="3" help="Determines the erosion neighborhood." default_value="1 1 1"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." 
+             input_name="Input"/>
+  <VectorEntry label="Scalar range" trace_name="ScalarRange" 
+               variable="ScalarRange" type="float" length="2" 
+               default_value="0.0 1.0" 
+               help="Set the range of scalar values to generate" />
+  <LineWidget trace_name="Line" 
+              point1_variable="LowPoint" point2_variable="HighPoint" 
+              point1_label="Low Point" point2_label="High Point" 
+              use_label="0" show_resolution="0" 
+              help="Set the minimum and maximum point for elevation"/>
 </Module>
 <Module name="CTHPartAMR" menu_name="Extract CTH Parts" root_name="CTHPartAMR" module_type="Filter" long_help="Create a surface from a CTH volume fraction." short_help="Extract a part from a CTH dataset.">
   <Filter class="vtkCTHExtractAMRPart">
@@ -149,14 +140,14 @@
       <ArrayRequirement attribute="Cell" components="1"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <SelectCTHArrays input_menu="im" trace_name="ArraySelection" help="Select the volume fraction arrays for generating parts."/>
-  <SelectWidget variable="Clipping" type="int">
+  <SelectWidget variable="Clipping" trace_name="Clipping" type="int">
     <Item label="On" value="1">
       <ImplicitPlaneWidget use_label="0" trace_name="Plane" variable="ClipPlane" input_menu="im" help="Adjusts the parameters of the plane to clip with."/>
     </Item>
     <Item label="Off"  value="0">
-      <DummyWidget/>
+      <DummyWidget trace_name="Dummy"/>
     </Item>
   </SelectWidget>
 </Module>
@@ -166,14 +157,14 @@
       <ArrayRequirement attribute="Cell" components="1"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <SelectCTHArrays input_menu="im" trace_name="ArraySelection" help="Select the volume fraction arrays for generating parts."/>
-  <SelectWidget variable="Clipping" type="int">
+  <SelectWidget variable="Clipping" trace_name="Clipping" type="int">
     <Item label="On" value="1">
       <ImplicitPlaneWidget use_label="0" trace_name="Plane" variable="ClipPlane" input_menu="im" help="Adjusts the parameters of the plane to clip with."/>
     </Item>
     <Item label="Off"  value="0">
-      <DummyWidget/>
+      <DummyWidget trace_name="Dummy"/>
     </Item>
   </SelectWidget>
 </Module>
@@ -181,16 +172,26 @@
   <Filter class="vtkExtractEdges">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
-<Module name="ExtractGrid" root_name="ExtractGrid" module_type="Filter" replace_input="0" long_help="Extract a subgrid from a curvilinear grid with the option of setting subsample strides." short_help="Extract a subgrid or subsample.">
+<Module name="ExtractGrid" root_name="ExtractGrid" module_type="Filter" 
+        replace_input="0" 
+        long_help="Extract a subgrid from a curvilinear grid with the option of setting subsample strides." 
+        short_help="Extract a subgrid or subsample.">
   <Filter class="vtkExtractGrid">
-    <Input name="Input" class="vtkStructuredGrid"/>
+    <Input name="Input" class="vtkStructuredData"/>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
-  <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension" default_value="1 1 1"/>
-  <LabeledToggle label="Include boundary" variable="IncludeBoundary" help="Select whether to always include the boundary of the grid in the output" default_value="0"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." 
+             input_name="Input"/>
+  <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" 
+               help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
+  <VectorEntry label="Sample rate" trace_name="SampleRate" 
+               variable="SampleRate" type="int" length="3" 
+               default_value="1 1 1"
+               help="Set the sampling rate for each dimension" />
+  <LabeledToggle label="Include boundary" variable="IncludeBoundary"
+                 trace_name="IncludeBoundary" default_value="0" 
+                 help="Select whether to always include the boundary of the grid in the output"/>
 </Module>
 <Module name="ExtractParts" menu_name="Extract Parts" root_name="ExtractParts" module_type="Filter" long_help="Extract a subset of parts from a group." short_help="Extract a subset of parts from a group.">
   <Filter class="vtkSelectInputs">
@@ -204,7 +205,7 @@
   <Filter class="vtkExtractVOI">
     <Input name="Input" class="vtkImageData"/>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
   <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension" default_value="1 1 1"/>
 </Module>
@@ -212,7 +213,7 @@
   <Filter class="vtkExtractRectilinearGrid">
     <Input name="Input" class="vtkRectilinearGrid"/>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ExtentEntry variable="VOI" trace_name="VOI" input_menu="im" help="Set the min/max values of the volume of interest (VOI). The output will have the (I,J,K) extent specified here."/>
   <VectorEntry label="Sample rate" trace_name="SampleRate" variable="SampleRate" type="int" length="3" help="Set the sampling rate for each dimension" default_value="1 1 1"/>
   <LabeledToggle label="Include boundary" variable="IncludeBoundary" trace_name="IncludeBoundary" help="Select whether to always include the boundary of the grid in the output" default_value="0"/>
@@ -221,7 +222,7 @@
   <Filter class="vtkDataSetSurfaceFilter">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="ExtractVoids" menu_name="Extract Voids" class="vtkPVExtractGeometryByScalar" root_name="ExtractVoids" module_type="Filter" long_help="This filter works with connectivity filter.  It removes regions based on region id." short_help="Remove geometry based on integer id array.">
   <Filter class="vtkKWExtractGeometryByScalar">
@@ -235,7 +236,7 @@
       <FixedTypeRequirement/>
     </Input>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <StringEntry variable="ResultArrayName" trace_name="ResultArray" help="Set the name of the array to hold the results of this computation" default_value="Result"/>
   <CalculatorWidget trace_name="Equation" help="Enter the equation for the new array."/>
 </Module>
@@ -243,42 +244,31 @@
   <Filter class="vtkFeatureEdges">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Boundary edges" trace_name="BoundaryEdges" variable="BoundaryEdges" help="Turn this off if you do not want to extract boundary edges." default_value="1"/>
   <LabeledToggle label="Feature edges" trace_name="FeatureEdges" variable="FeatureEdges" help="Turn this off if you do not want to extract feature edges." default_value="1"/>
   <LabeledToggle label="Non-manifold edges" trace_name="NonManifoldEdges" variable="NonManifoldEdges" help="Turn this off if you do not want to extract non-manifold edges." default_value="1"/>
   <LabeledToggle variable="Coloring" trace_name="Coloring" help="Turn this off if you do not want to color the edges by type." default_value="1"/>
   <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="This angle is used to define a feature edge. (i.e., if the surface normal between two adjacent triangles is >= Feature angle, an edge exists).." default_value="30.0" data_range="0 180"/>
 </Module>
-<!--
-  <Module name="ImageGaussianSmooth" menu_name="Gaussian Smooth" root_name="GaussSmooth" module_type="Filter">
-    <Filter class="vtkImageGaussianSmooth">
-      <Input name="Input" class="vtkImageData" > 
-        <ArrayRequirement attribute="Point" components="1" /> 
-      </Input> 
-    </Filter>
-    <InputMenu id="im" label="Input" help="Set the input to this filter." 
-               input_name="Input"/> 
-    <ArrayMenu input_name="Input" attribute_type="Scalars"
-               label="Scalars" input_menu="im" number_of_components="1"
-               help="Select the input scalars to process."/>
-    <VectorEntry label="Standard dev." trace_name="StandardDeviations" variable="StandardDeviations" type="float" length="3" help="Standard deviations for x, y and z axes." default_value="2.0 2.0 2.0"/>
-    <VectorEntry label="Radius factors" trace_name="RadiusFactors" variable="RadiusFactors" type="float" length="3" help="Kernel size is this factor times standard deviation." default_value="1.5 1.5 1.5"/>
-    <SelectionList variable="Dimensionality" trace_name="Dimensionality" help="Select whether to perform a 2d or 3d gradient" default_value="3">
-      <Item name="2" value="0"/>
-      <Item name="3" value="1"/>
-    </SelectionList>
-  </Module>
--->
-<Module name="Gradient" menu_name="Gradient" root_name="Grad" module_type="Filter">
+<Module name="Gradient" menu_name="Gradient" root_name="Grad" 
+        module_type="Filter">
   <Filter class="vtkPVImageGradient">
     <Input name="Input" class="vtkImageData">
       <ArrayRequirement attribute="Point" components="1"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <ArrayMenu input_name="Input" attribute_type="Scalars" label="Scalars" input_menu="im" number_of_components="1" help="Select the input scalars to process."/>
-  <VectorEntry variable="Dimensionality" type="int" help="Pick a value 2 for XY images, 3 for volumes." default_value="2" data_range="2 3"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." 
+             input_name="Input"/>
+  <ArrayMenu input_name="Input" attribute_type="Scalars" label="Scalars" 
+             trace_name="ArrayMenu" input_menu="im" number_of_components="1" 
+             help="Select the input scalars to process."/>
+  <SelectionList variable="Dimensionality" trace_name="Dimensionality"  
+                   default_value="3" 
+                   help="Select whether to perform a 2d or 3d gradient">
+    <Item name="2" value="2"/>
+    <Item name="3" value="3"/>
+  </SelectionList>
 </Module>
 <Module name="GradientMagnitude" menu_name="Gradient Magnitude" root_name="GradM" module_type="Filter">
   <Filter class="vtkPVImageGradientMagnitude">
@@ -286,8 +276,11 @@
       <ArrayRequirement attribute="Point" components="1"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <ArrayMenu input_name="Input" attribute_type="Scalars" label="Scalars" input_menu="im" help="Select the input scalars to process."/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." 
+             input_name="Input"/>
+  <ArrayMenu input_name="Input" attribute_type="Scalars" label="Scalars" 
+             trace_name="ArrayMenu" input_menu="im" 
+             help="Select the input scalars to process."/>
 </Module>
 <Module name="GroupParts" menu_name="Group Parts" root_name="GroupParts" module_type="Filter" replace_input="1" long_help="Group parts." short_help="Group multiple inputs into one collection.">
   <Filter class="vtkGroup">
@@ -299,7 +292,7 @@
   <Filter class="vtkPLinearExtrusionFilter">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Scale factor" trace_name="ScaleFactor" variable="ScaleFactor" type="float" help="Set the extrusion scale factor" default_value="1.0"/>
   <VectorEntry variable="Vector" trace_name="Vector" type="float" length="3" help="Set the direction for the extrusion" default_value="0.0 0.0 1.0"/>
   <LabeledToggle variable="Capping" trace_name="Capping" help="Select whether to draw endcaps" default_value="1"/>
@@ -309,14 +302,14 @@
   <Filter class="vtkLoopSubdivisionFilter">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Number of divisions" trace_name="NumberOfSubdivisions" variable="NumberOfSubdivisions" type="int" help="Each subdivision changes single triangles into four triangles." default_value="1"/>
 </Module>
 <Module name="MaskPoints" menu_name="Mask Points" root_name="MaskPts" module_type="Filter" long_help="Reduce the number of points.  This filter is often used before glyphing.  Generating vertices is an option." short_help="Reduce the number of points.">
   <Filter class="vtkMaskPoints">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="On ratio" trace_name="OnRatio" variable="OnRatio" type="int" help="The ratio of points retained." default_value="2"/>
   <VectorEntry label="Max. points" trace_name="MaximumNumberOfPoints" variable="MaximumNumberOfPoints" type="int" help="Limit the number of points." default_value="9223372036854775807"/>
   <VectorEntry variable="Offset" trace_name="Offset" type="int" help="Start with this point." default_value="0"/>
@@ -329,7 +322,7 @@
       <ArrayRequirement attribute="Point" components="1"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ArrayMenu input_name="Input" attribute_type="Scalars" label="Scalars" trace_name="Scalars" input_menu="im" number_of_components="1" help="Select the input scalars to process."/>
   <VectorEntry label="Kernel Size" trace_name="KernelSize" variable="KernelSize" type="int" length="3" help="Determines the smoothing nieghborhood." default_value="1 1 1"/>
 </Module>
@@ -337,7 +330,7 @@
   <Filter class="vtkPPolyDataNormals">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Feature angle" trace_name="FeatureAngle" variable="FeatureAngle" type="float" help="Points are duplicated along features over this angle (0->180)" default_value="30.0" data_range="0 180"/>
   <LabeledToggle variable="Splitting" trace_name="Splitting" help="Turn on/off the splitting of sharp edges." default_value="1"/>
   <LabeledToggle variable="Consistency" trace_name="Consistency" help="Turn on/off the enforcement of consistent polygon ordering." default_value="1"/>
@@ -350,25 +343,25 @@
   <Filter class="vtkCTHOutlineFilter">
     <Input name="Input" class="vtkCTHData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="StructuredGridOutlineFilter" menu_name="Outline (curvilinear)" root_name="GOutline" module_type="Filter">
   <Filter class="vtkStructuredGridOutlineFilter">
     <Input name="Input" class="vtkStructuredGrid"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="OutlineFilter" menu_name="Outline" root_name="Outline" module_type="Filter" replace_input="0" long_help="This filter generates a bounding box representation of the input." short_help="Generates a bounding box.">
   <Filter class="vtkPOutlineFilter">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="OutlineCornerFilter" menu_name="Outline Corners" root_name="COutline" module_type="Filter" replace_input="0" long_help="This filter generates a bounding box representation of the input.  It only displays the corners of the bounding box." short_help="Generates corners of a bounding box.">
   <Filter class="vtkPOutlineCornerFilter">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Corner factor" trace_name="CornerFactor" variable="CornerFactor" type="float" help="The relative size of the corners to the length of the corresponding bounds. (0.001 -> 0.5)" default_value="0.2" data_range="0.001 0.5"/>
 </Module>
 <Module name="PartScalars" menu_name="Part Id Scalars" root_name="ColorParts" module_type="Filter" long_help="This filter uses colors to show how data is partitioned across parts." short_help="Generate point scalars from part id.">
@@ -377,13 +370,13 @@
       <GroupRequirement quantity="Multiple"/>
     </Input>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="PieceScalars" menu_name="Process Id Scalars" root_name="ColorPieces" module_type="Filter" multiprocess_support="multiple_processes" long_help="This filter uses colors to show how data is partitioned across processes." short_help="Generate point scalars from process id.">
   <Filter class="vtkPieceScalars">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Random" trace_name="RandomMode" variable="RandomMode" help="Select whether to use random colors for the various pieces" default_value="0"/>
 </Module>
 <!--
@@ -405,14 +398,14 @@
       <FixedTypeRequirement/>
     </Input>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <LabeledToggle label="Pass point data" trace_name="PassPointData" variable="PassPointData" help="If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output." default_value="0"/>
 </Module>
 <Module name="QuadricClustering" menu_name="Quadric Clustering" root_name="QC" module_type="Filter" long_help="This filter is the same filter used to generate level of detail for ParaView.  It uses a structure grid of bins and merges all points contained in each bin." short_help="Simplify polygonal models.">
   <Filter class="vtkQuadricClustering">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Spacing" trace_name="DivisionSpacing" variable="DivisionSpacing" type="float" length="3" help="Set the spacing of the bins in each dimension" default_value="1.0 1.0 1.0"/>
   <LabeledToggle label="Use input points" trace_name="UseInputPoints" variable="UseInputPoints" help="Select whether to use points from the input in the output or to calculate optimum representative points for each bin" default_value="0"/>
   <LabeledToggle label="Use feature edges" trace_name="UseFeatureEdges" variable="UseFeatureEdges" help="Select whether to use feature edge quadrics to match up the boundaries between pieces" default_value="0"/>
@@ -423,7 +416,7 @@
   <Filter class="vtkBrownianPoints">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Min. speed" trace_name="MinimumSpeed" variable="MinimumSpeed" type="float" help="The minimum size of the random point vectors generated." default_value="0.0"/>
   <VectorEntry label="Max. speed" trace_name="MaximumSpeed" variable="MaximumSpeed" type="float" help="The maximum size of the random point vectors generated." default_value="1.0"/>
 </Module>
@@ -431,7 +424,7 @@
   <Filter class="vtkReflectionFilter">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <SelectionList variable="Plane" trace_name="Plane" help="Select which plane of the bounding box to reflect across" default_value="0">
     <Item name="X" value="6"/>
     <Item name="Y" value="7"/>
@@ -451,9 +444,9 @@
       <ArrayRequirement attribute="Point" components="3"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ArrayMenu input_name="Input" trace_name="Vectors" attribute_type="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input normals to process."/>
-  <VectorEntry variable="Width" trace_name="Width" type="float" help="The half width of the ribbon (or minimum)." default_value="0.5"/>
+  <ScaleFactorEntry variable="Width" input_menu="im" trace_name="Width" type="float" scale_factor="0.01" help="The half width of the ribbon (or minimum)."/>
   <VectorEntry variable="Angle" trace_name="Angle" type="float" help="The offset angle of the ribbon from the line normal (0->360)." default_value="0.0" data_range="0 360"/>
   <VectorEntry label="Default normal" trace_name="DefaultNormal" variable="DefaultNormal" type="float" length="3" help="When this option is on, default normals will be calculated if the input contains no normals" default_value="0.0 0.0 1.0"/>
   <LabeledToggle label="Vary width" trace_name="VaryWidth" variable="VaryWidth" help="Turn on/off the variation of ribbon width with scalar value." default_value="0"/>
@@ -462,7 +455,7 @@
   <Filter class="vtkRotationalExtrusionFilter">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry variable="Resolution" trace_name="Resolution" type="int" default_value="12"/>
   <LabeledToggle variable="Capping" trace_name="Capping" default_value="1"/>
   <VectorEntry variable="Angle" trace_name="Angle" type="float" help="Set the angle of rotation." default_value="360.0"/>
@@ -473,7 +466,7 @@
   <Filter class="vtkShrinkFilter">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by" default_value="0.5" data_range="0 1"/>
 </Module>
 <!--
@@ -483,7 +476,7 @@
   <Filter class="vtkShrinkPolyData">
     <Input name="Input" class="vtkPolyData" /> 
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter."
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter."
              input_name="Input"/>
   <VectorEntry label="Shrink factor" trace_name="ShrinkFactor" variable="ShrinkFactor" type="float" help="Set the amount to shrink by" default_value="0.5"/>
 </Module>
@@ -492,7 +485,7 @@
   <Filter class="vtkSmoothPolyDataFilter">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Num. iterations" trace_name="NumberOfIterations" variable="NumberOfIterations" type="int" help="Number of iterations. More iterations produces better smoothing." default_value="20"/>
   <VectorEntry variable="Convergence" trace_name="Convergence" type="float" help="Convergence criterion for the iteration process. Smaller numbers result in more smoothing iterations (0->1)." default_value="0.0" data_range="0 1"/>
 </Module>
@@ -500,7 +493,7 @@
   <Filter class="vtkStripper">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Max. length" trace_name="MaximumLength" variable="MaximumLength" type="int" help="Stop stripping after this many triangles." default_value="1000" data_range="4 100000"/>
 </Module>
 <Module name="Subdivide" root_name="Subdivide" module_type="Filter" button_help="Subdivide the poly data into more polygons" long_help="This filter iteratively divide triangles into four smaller triangles.  New points are placed linearly so the output surface matches the input surface." short_help="Creates a surface with more triangles than the input.">
@@ -513,19 +506,19 @@
   <Filter class="vtkDataSetTriangleFilter">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="TriangleFilter" menu_name="Triangulate" root_name="Tri" module_type="Filter" long_help="This filter converts polygons and traingle strips to basic triangles." short_help="Convert polygonal data to triangles.">
   <Filter class="vtkTriangleFilter">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
 </Module>
 <Module name="TransformFilter" menu_name="Transform" root_name="Trans" module_type="Filter" long_help="This filter applies transformation to the polygons." short_help="Transform polygonal data.">
   <Filter class="vtkTransformFilter">
     <Input name="Input" class="vtkPointSet"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" label="Input" help="Set the input to this filter." input_name="Input"/>
   <SelectWidget label="Transform Widget" trace_name="Transform Widget" variable="Transform" type="object">
     <Item label="Box" value="BoxTransform">
       <BoxWidget use_label="0" trace_name="Box" help="Adjusts the parameters of the box to clip with."/>
@@ -536,10 +529,10 @@
   <Filter class="vtkTubeFilter">
     <Input name="Input" class="vtkPolyData"/>
   </Filter>
-  <InputMenu label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <VectorEntry label="Num. sides" variable="NumberOfSides" trace_name="NumberOfSides" type="int" help="Set the number of sides for the tube" default_value="3"/>
   <LabeledToggle variable="Capping" trace_name="Capping" help="Select whether to draw endcaps on the tube" default_value="0"/>
-  <VectorEntry variable="Radius" trace_name="Radius" type="float" help="Set the radius of the tube" default_value="0.5"/>
+  <ScaleFactorEntry variable="Radius" input_menu="im" trace_name="Radius" type="float" scale_factor="0.01" help="Set the radius of the tube" />
   <SelectionList label="Vary radius" trace_name="VaryRadius" variable="VaryRadius" help="Select whether/how to vary the radius of the tube" default_value="0">
     <Item name="Off" value="0"/>
     <Item name="ByScalar" value="1"/>
@@ -553,7 +546,7 @@
       <ArrayRequirement attribute="Point" components="1"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ArrayMenu input_name="Input" attribute_type="Scalars" trace_name="Scalars" label="Scalars" input_menu="im" help="Select the input scalars to process."/>
   <VectorEntry label="Scale factor" variable="ScaleFactor" trace_name="ScaleFactor" type="float" help="Displacement is vector times scale." default_value="1.0"/>
   <VectorEntry variable="Normal" trace_name="Normal" type="float" length="3" help="Warp direction." default_value="0.0 0.0 1.0"/>
@@ -566,7 +559,7 @@
       <ArrayRequirement attribute="Point" components="3"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ArrayMenu input_name="Input" attribute_type="Vectors" trace_name="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input vectors to process."/>
   <VectorEntry label="Scale factor" trace_name="ScaleFactor" variable="ScaleFactor" type="float" help="Displacement is vector times scale." default_value="1.0"/>
 </Module>
@@ -580,7 +573,7 @@
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
 #endif
-  <InputMenu id="im1" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im1" label="Input" help="Set the input to this filter." input_name="Input"/>
     <BoundsDisplay show_hide_frame="1" label="Input Bounds" trace_name="Input Bounds" input_menu="im1"/>
     <SelectWidget type="object" label="Cut Function" trace_name="Cut Function" variable="CutFunction">
       <Item label="Plane" value="Plane">
@@ -596,7 +589,7 @@
   <Filter class="vtkPVClipDataSet">
     <Input name="Input" class="vtkDataSet"/>
   </Filter>
-  <InputMenu id="im1" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im1" label="Input" help="Set the input to this filter." input_name="Input"/>
   <BoundsDisplay show_hide_frame="1" label="Input Bounds" trace_name="Input Bounds" input_menu="im1"/>
   <SelectWidget type="object" label="Clip Function" trace_name="Clip Function" variable="ClipFunction">
     <Item label="Plane" value="Plane">
@@ -609,7 +602,7 @@
       <BoxWidget use_label="0" trace_name="Box" help="Adjusts the parameters of the box to clip with."/>
     </Item>
     <Item label="Scalars">
-      <ContainerWidget>
+      <ContainerWidget trace_name="ScalarClip">
         <Item>
           <ScalarRangeLabel trace_name="ScalarRange" array_menu="it3.am1"/>
         </Item>
@@ -624,19 +617,38 @@
   </SelectWidget>
   <LabeledToggle label="Inside Out" trace_name="InsideOut" variable="InsideOut" help="Switches which part to keep." default_value="0"/>
 </Module>
-<Module name="Threshold" root_name="Threshold" button_image="PVThresholdButton" button_help="Extract cells that satisfy a threshold criterion." module_type="Filter" long_help="This filter extracts cells that have point scalars in the specified range." short_help="Extract cells that satisfy a threshold criterion.">
+<Module name="Threshold" root_name="Threshold" 
+        button_image="PVThresholdButton" module_type="Filter" 
+        button_help="Extract cells that satisfy a threshold criterion." 
+        long_help="This filter extracts cells that have point scalars in the specified range." 
+        short_help="Extract cells that satisfy a threshold criterion.">
   <Filter class="vtkPVThresholdFilter">
     <Input name="Input" class="vtkDataSet">
       <ArrayRequirement components="1"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" trace_name="Input" help="Set the input to this filter." input_name="Input"/>
-  <FieldMenu id="fm" trace_name="FieldMenu" help="Choose cell or point field to threshold." input_menu="im"/>
-  <ArrayMenu id="am" input_name="Input" attribute_type="Scalars" trace_name="Scalars" label="Scalars" help="Choose the threshold scalar array." field_menu="fm"/>
-  <MinMax trace_name="MinMax" array_menu="am" min_label="Lower Threshold" max_label="Upper Threshold" min_help="Choose the lower value of the threshold" max_help="Choose the upper value of the threshold" get_min_command="GetLowerThreshold" get_max_command="GetUpperThreshold" set_command="ThresholdBetween"/>
-  <LabeledToggle label="All Scalars" trace_name="AllScalars" variable="AllScalars"  help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data." default_value="1"/>
+  <InputMenu trace_name="Input" id="im" label="Input" input_name="Input"
+             help="Set the input to this filter." />
+  <FieldMenu id="fm" trace_name="FieldMenu" input_menu="im"
+             help="Choose cell or point field to threshold." />
+  <ArrayMenu id="am" input_name="Input" attribute_type="Scalars" 
+             trace_name="Scalars" label="Scalars"  field_menu="fm"
+             help="Choose the threshold scalar array."/>
+  <MinMax trace_name="MinMax" array_menu="am" min_label="Lower Threshold" 
+          max_label="Upper Threshold" 
+          min_help="Choose the lower value of the threshold" 
+          max_help="Choose the upper value of the threshold" 
+          get_min_command="GetLowerThreshold" 
+          get_max_command="GetUpperThreshold" set_command="ThresholdBetween"/>
+  <LabeledToggle label="All Scalars" trace_name="AllScalars" 
+                 variable="AllScalars"  default_value="1" 
+                 help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data."/>
 </Module>
-<Module name="Contour" root_name="Contour" button_image="PVContourButton" button_help="Generate isolines or isosurfaces." module_type="Filter" replace_input="0" long_help="Generate isolines or isosurfaces using point scalars." short_help="Generate isolines or isosurfaces.">
+<Module name="Contour" root_name="Contour" button_image="PVContourButton"
+        module_type="Filter" replace_input="0"  
+        button_help="Generate isolines or isosurfaces." 
+        long_help="Generate isolines or isosurfaces using point scalars." 
+        short_help="Generate isolines or isosurfaces.">
 #ifdef VTK_USE_PATENTED
   <Filter class="vtkPVKitwareContourFilter">
     <Input name="Input" class="vtkDataSet">
@@ -651,26 +663,58 @@
   </Filter>
 #endif
 // Do not change the tracename of the input menu, it is used by vtkPVContour
-  <InputMenu id="im" label="Input" trace_name="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" input_name="Input"
+             help="Set the input to this filter." />
 // Do not change the tracename of the array menu, it is used by vtkPVContour
-  <ArrayMenu id="am" input_name="Input" attribute_type="Scalars" label="Scalars" trace_name="Scalars" input_menu="im" number_of_components="1" help="Choose which scalar array you want to contour."/>
+  <ArrayMenu id="am" input_name="Input" attribute_type="Scalars" 
+             label="Scalars" trace_name="Scalars" input_menu="im" 
+             number_of_components="1" 
+             help="Choose which scalar array you want to contour."/>
   <ScalarRangeLabel id="srl" trace_name="ScalarRangeLabel" array_menu="am"/>
-  <ContourEntry label="Contour Values" trace_name="Contour Values" help="List of current contour values." array_menu="am" set_number_command="SetNumberOfContours" set_contour_command="SetValue"/>
-  <LabeledToggle label="Compute Normals" variable="ComputeNormals" help="Select whether to compute normals" default_value="1"/>
-  <LabeledToggle label="Compute Gradients" variable="ComputeGradients" help="Select whether to compute gradients" default_value="0"/>
-  <LabeledToggle label="Compute Scalars" variable="ComputeScalars" help="Select whether to compute scalars" default_value="0"/>
+  <ContourEntry label="Contour Values" trace_name="Contour Values" 
+                array_menu="am" set_number_command="SetNumberOfContours" 
+                set_contour_command="SetValue" 
+                help="List of current contour values." />
+  <LabeledToggle label="Compute Normals" variable="ComputeNormals"
+                 default_value="1" trace_name="Compute Normals"
+                 help="Select whether to compute normals" />
+  <LabeledToggle label="Compute Gradients" variable="ComputeGradients"  
+                 default_value="0" trace_name="Compute Gradients"
+                 help="Select whether to compute gradients"/>
+  <LabeledToggle label="Compute Scalars" variable="ComputeScalars" 
+                 default_value="0" trace_name="Compute Scalars"
+                 help="Select whether to compute scalars" />
 </Module>
-<Module name="Glyph" root_name="Glyph" module_type="Filter" button_image="PVGlyphButton" replace_input="0" button_help="Generate a glyph (symbol) at each point of the dataset. These can be colored, scaled and oriented" long_help="This filters generates an arrow, sphere, or cone at each point of the input data set.  The glyphs can be oriented and scale by the input point attributes." short_help="Generate a glyph symbol at each point of the input data set.">
+<Module name="Glyph" root_name="Glyph" module_type="Filter" 
+        button_image="PVGlyphButton" replace_input="0" 
+        button_help="Generate a glyph (symbol) at each point of the dataset. These can be colored, scaled and oriented" 
+        long_help="This filters generates an arrow, sphere, or cone at each point of the input data set.  The glyphs can be oriented and scale by the input point attributes." 
+        short_help="Generate a glyph symbol at each point of the input data set.">
   <Filter class="vtkPVGlyphFilter">
     <Input name="Input" class="vtkDataSet"/>
     <Input name="Source" class="vtkPolyData"/>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
-  <InputMenu id="im2" label="Glyph" help="Select the glyph source." input_name="Source" source_list="GlyphSources"/>
-  <OrientScaleWidget trace_name="OrientScale" input_menu="im" scalars_command="SelectInputScalars" vectors_command="SelectInputVectors" orient_command="SetOrient" scale_mode_command="SetScaleMode" scale_factor_command="SetScaleFactor" default_orient_mode="1" default_scale_mode ="1"/>
-  <VectorEntry label="Max. Number of Glyphs" trace_name="Max Glyphs" variable="MaximumNumberOfPoints" type="int" help="Set the maximum number of points to glyph" default_value="5000"/>
-  <LabeledToggle label="Mask Points" trace_name="MaskPoints" variable="UseMaskPoints" help="Create no more than specified maximum number of glyphs" default_value="1"/>
-  <LabeledToggle label="Random Masking" trace_name="RandomMask" variable="RandomMode" help="Choose points at random to mask" default_value="0"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." 
+             input_name="Input"/>
+  <InputMenu trace_name="Glyph" id="im2" label="Glyph" help="Select the glyph source." 
+             input_name="Source" source_list="GlyphSources"/>
+  <OrientScaleWidget trace_name="OrientScale" input_menu="im" 
+                     scalars_command="SelectInputScalars" 
+                     vectors_command="SelectInputVectors" 
+                     orient_command="SetOrient" 
+                     scale_mode_command="SetScaleMode" 
+                     scale_factor_command="SetScaleFactor" 
+                     default_orient_mode="1" 
+                     default_scale_mode ="1"/>
+  <VectorEntry label="Max. Number of Glyphs" trace_name="Max Glyphs" 
+               variable="MaximumNumberOfPoints" type="int" default_value="5000"
+               help="Set the maximum number of points to glyph" />
+  <LabeledToggle label="Mask Points" trace_name="MaskPoints" 
+                 variable="UseMaskPoints" default_value="1"
+                 help="Create no more than specified maximum number of glyphs" />
+  <LabeledToggle label="Random Masking" trace_name="RandomMask" 
+                 variable="RandomMode" default_value="0"
+                 help="Choose points at random to mask" />
 </Module>
 <Module name="Probe" class="vtkPVProbe" root_name="Probe" button_image="PVProbeButton" button_help="Sample data values at a point or along a line" module_type="Filter" long_help="Sample data attributes at a point or along a line.  Probed lines will be displayed in a graph of the attributes." short_help="Sample data values at a point or along a line.">
   <Filter class="vtkPProbeFilter">
@@ -678,7 +722,7 @@
       <GroupRequirement quantity="Single"/>
     </Input>
   </Filter>
-  <SelectWidget type="object" label="Probe object" variable="Input">
+  <SelectWidget type="object" label="Probe object" trace_name="Probe object" variable="Input">
     <Item label="Point" value="Output">
       <PointSourceWidget trace_name="Point"/>
     </Item>
@@ -693,9 +737,9 @@
       <ArrayRequirement attribute="Point" components="3"/>
     </Input>
   </Filter>
-  <InputMenu id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
+  <InputMenu trace_name="Input" id="im" label="Input" help="Set the input to this filter." input_name="Input"/>
   <ArrayMenu input_name="Input" attribute_type="Vectors" trace_name="Vectors" label="Vectors" input_menu="im" number_of_components="3" help="Select the input vectors to use."/>
-  <SelectWidget type="object" label="Seed" variable="Source">
+  <SelectWidget type="object" trace_name="Seed" label="Seed" variable="Source">
     <Item label="Point Cloud" value="Output">
       <PointSourceWidget trace_name="Point"/>
     </Item>
@@ -711,7 +755,7 @@
       </SelectionList>
     </Item>
     <Item>
-      <VectorEntry label="" variable="MaximumPropagation" type="float" trace_name="MaxPropLen" help="Maximum propagation" default_value="1.0"/>
+      <ScaleFactorEntry label="" variable="MaximumPropagation" type="float" trace_name="MaxPropLen" scale_factor="1.0" input_menu="im" help="Maximum propagation" />
     </Item>
   </ContainerWidget>
   <ContainerWidget pack_direction="left" trace_name="InitLen">
@@ -726,20 +770,20 @@
       <VectorEntry label="" variable="InitialIntegrationStep" type="float" trace_name="InitLen" help="Initial step length" default_value="0.5"/>
     </Item>
   </ContainerWidget>
-  <SelectionList trace_name="IntegrationDirection" variable="IntegrationDirection"  option_width="15" default_value="0">
+  <SelectionList trace_name="IntegrationDirection" variable="IntegrationDirection"  option_width="15" default_value="2">
     <Item name="FORWARD" value="0"/>
     <Item name="BACKWARD" value="1"/>
     <Item name="BOTH" value="2"/>
   </SelectionList>
   <SelectWidget type="int" variable="IntegratorType" trace_name="IntegrationType">
     <Item label="Runge-Kutta 2" value="0">
-      <DummyWidget/>
+      <DummyWidget trace_name="Dummy1"/>
     </Item>
     <Item label="Runge-Kutta 4" value="1">
-      <DummyWidget/>
+      <DummyWidget trace_name="Dummy2"/>
     </Item>
     <Item label="Runge-Kutta 4-5" value="2">
-      <ContainerWidget>
+      <ContainerWidget trace_name="MinLen">
         <Item>
           <ContainerWidget pack_direction="left" trace_name="MinLen">
             <Item>

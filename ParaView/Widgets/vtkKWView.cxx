@@ -74,12 +74,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkViewport.h"
 #include "vtkWindowToImageFilter.h"
 
-#ifdef _WIN32
+#if defined(PARAVIEW_USE_WIN32_RW)
 #include "vtkWin32OpenGLRenderWindow.h"
-#elif __APPLE_CC__
+#elif defined(PARAVIEW_USE_CARBON_RW)
 #include "vtkCarbonRenderWindow.h"
 #include "vtkKWMessageDialog.h"
-#else
+#elif defined(PARAVIEW_USE_COCOA_RW)
+#include "vtkCocoaRenderWindow.h"
+#include "vtkKWMessageDialog.h"
+#else //PARAVIEW_USE_X_RW
 #include "vtkXOpenGLRenderWindow.h"
 #include "vtkKWMessageDialog.h"
 int vtkKWViewFoundMatch;
@@ -103,7 +106,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.114.2.1");
+vtkCxxRevisionMacro(vtkKWView, "1.114.2.2");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -302,7 +305,7 @@ int vtkKWView::ShouldIAbort()
 {
   int flag = 0;
   
-#ifdef _WIN32
+#ifdef PARAVIEW_USE_WIN32_RW
   MSG msg;
 
   // Check all four - can't get the range right in one call without
@@ -365,9 +368,7 @@ int vtkKWView::ShouldIAbort()
       flag = 1;
       }
     }
-#elif __APPLE_CC__
- 
-#else
+#elif defined(PARAVIEW_USE_X_RW)
   XEvent report;
   
   vtkKWViewFoundMatch = 0;
@@ -377,6 +378,7 @@ int vtkKWView::ShouldIAbort()
   XSync(dpy,0);
   flag = vtkKWViewFoundMatch;
 #endif
+//What to do for CARBON or COCOA?
 
 
   int flag2 = this->CheckForOtherAbort();
@@ -1558,19 +1560,19 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.114.2.1 $");
+  this->ExtractRevision(os,"$Revision: 1.114.2.2 $");
 }
 
 //----------------------------------------------------------------------------
 void vtkKWView::SetupMemoryRendering(
-#ifdef _WIN32
+#ifdef PARAVIEW_USE_WIN32_RW
   int x, int y, void *cd
 #else
   int, int, void*
 #endif
   ) 
 {
-#ifdef _WIN32
+#ifdef PARAVIEW_USE_WIN32_RW
   if (!cd)
     {
     cd = this->RenderWindow->GetGenericContext();
@@ -1583,7 +1585,7 @@ void vtkKWView::SetupMemoryRendering(
 //----------------------------------------------------------------------------
 void vtkKWView::ResumeScreenRendering() 
 {
-#ifdef _WIN32
+#ifdef PARAVIEW_USE_WIN32_RW
   vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->ResumeScreenRendering();
 #endif
@@ -1592,7 +1594,7 @@ void vtkKWView::ResumeScreenRendering()
 //----------------------------------------------------------------------------
 void *vtkKWView::GetMemoryDC()
 {
-#ifdef _WIN32   
+#ifdef PARAVIEW_USE_WIN32_RW
   return (void *)vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->GetMemoryDC();
 #else
@@ -1603,7 +1605,7 @@ void *vtkKWView::GetMemoryDC()
 //----------------------------------------------------------------------------
 unsigned char *vtkKWView::GetMemoryData()
 {
-#ifdef _WIN32   
+#ifdef PARAVIEW_USE_WIN32_RW
   return vtkWin32OpenGLRenderWindow::
     SafeDownCast(this->RenderWindow)->GetMemoryData();
 #else

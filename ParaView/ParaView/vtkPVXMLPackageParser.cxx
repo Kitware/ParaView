@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ctype.h>
 
-vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.22.4.1");
+vtkCxxRevisionMacro(vtkPVXMLPackageParser, "1.22.4.2");
 vtkStandardNewMacro(vtkPVXMLPackageParser);
 
 #ifndef VTK_NO_EXPLICIT_TEMPLATE_INSTANTIATION
@@ -148,7 +148,8 @@ vtkPVInputRequirement* vtkPVXMLPackageParser::CreatePVInputRequirement(
 }
 
 //----------------------------------------------------------------------------
-vtkPVWidget* vtkPVXMLPackageParser::GetPVWidget(vtkPVXMLElement* element)
+vtkPVWidget* vtkPVXMLPackageParser::GetPVWidget(vtkPVXMLElement* element,
+                                                vtkPVSource* pvm)
 {
   vtkPVWidget* pvWidget = 0;
   // Check if the widget has alread been created.
@@ -157,6 +158,9 @@ vtkPVWidget* vtkPVXMLPackageParser::GetPVWidget(vtkPVXMLElement* element)
     // If not, create one.
     pvWidget = this->CreatePVWidget(element);
     if(!pvWidget) { return 0; }
+
+    // Needed for debugging
+    pvWidget->SetPVSource(pvm);
     
     // Add it to the map.
     this->WidgetMap->SetItem(element, pvWidget);
@@ -553,7 +557,7 @@ int vtkPVXMLPackageParser::CreateModule(vtkPVXMLElement* me, vtkPVSource* pvm)
     else
       {
       // Assume it is a widget.
-      vtkPVWidget* widget = this->GetPVWidget(element);
+      vtkPVWidget* widget = this->GetPVWidget(element, pvm);
       if(widget)
         {
         pvm->AddPVWidget(widget);
@@ -678,13 +682,13 @@ int vtkPVXMLPackageParser::LoadLibrary(vtkPVXMLElement* le)
   
   // Let Tcl find the library.  Add the executable's location to the
   // list of possible paths.
-  this->Window->GetPVApplication()->BroadcastScript(
+  this->Window->GetPVApplication()->GetProcessModule()->ServerScript(
     "::paraview::load_component %s [file dirname [info nameofexecutable]]",
     name);
   
   // Returns empty string if successful.
   const char* result =
-    this->Window->GetPVApplication()->GetMainInterp()->result;
+    this->Window->GetPVApplication()->GetProcessModule()->GetRootResult();
   if(strcmp(result, "") != 0)
     {
     vtkErrorMacro("Error loading Library component " << name);
@@ -743,7 +747,7 @@ void vtkPVXMLPackageParser::CreateManipulator(vtkPVXMLElement* ma)
     {
     vtkPVXMLElement* element = ma->GetNestedElement(i);
     const char* variable = element->GetAttribute("variable");
-    vtkPVWidget* widget = this->GetPVWidget(element);
+    vtkPVWidget* widget = this->GetPVWidget(element, 0);
     if(widget && variable)
       {
       this->Window->AddManipulatorArgument(types, name, variable, widget);

@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.7");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.8");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -88,6 +88,7 @@ vtkPVExtentEntry::vtkPVExtentEntry()
   this->Property = NULL;
 
   this->AnimationAxis = 0;
+  this->UseCellExtent = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -126,8 +127,16 @@ void vtkPVExtentEntry::Update()
   else
     {
     int *ext = input->GetDataInformation()->GetExtent();
-    this->SetRange(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
-    this->SetValue(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+    if (!this->UseCellExtent)
+      {
+      this->SetRange(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+      this->SetValue(ext[0], ext[1], ext[2], ext[3], ext[4], ext[5]);
+      }
+    else
+      {
+      this->SetRange(ext[0], ext[1]-1, ext[2], ext[3]-1, ext[4], ext[5]-1);
+      this->SetValue(ext[0], ext[1]-1, ext[2], ext[3]-1, ext[4], ext[5]-1);
+      }
     }
 }
 
@@ -501,6 +510,7 @@ void vtkPVExtentEntry::CopyProperties(vtkPVWidget* clone,
   if (pvee)
     {
     pvee->SetLabel(this->Label);
+    pvee->UseCellExtent = this->UseCellExtent;
 
     if (this->InputMenu)
       {
@@ -540,6 +550,13 @@ int vtkPVExtentEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     vtkErrorMacro("No input_menu attribute.");
     return 0;
+    }
+
+  // Setup the cell_extent.
+  if(!element->GetScalarAttribute("use_cell_extent",
+                                  &this->UseCellExtent))
+    {
+    this->UseCellExtent = 0;
     }
   
   vtkPVXMLElement* ime = element->LookupElement(input_menu);

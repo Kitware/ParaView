@@ -345,8 +345,20 @@ public:
   virtual void CheckForUpdates();
 
   // Description:
+  // Test if we have some logic to report a bug and
+  // eventually report a bug check.
+  virtual int CanEmailFeedback();
+  virtual void EmailFeedback();
+  vtkSetStringMacro(EmailFeedbackAddress);
+  vtkGetStringMacro(EmailFeedbackAddress);
+
+  // Description:
   // Convenience method to call UpdateEnableState on all windows
   virtual void UpdateEnableStateForAllWindows();
+
+  // Description:
+  // Convenience method to get the operating system version
+  virtual int GetSystemVersion(ostream &os);
 
 protected:
   vtkKWApplication();
@@ -377,6 +389,10 @@ protected:
   char *ApplicationInstallationDirectory;
   virtual void FindApplicationInstallationDirectory();
 
+  virtual void AddEmailFeedbackBody(ostream &);
+  virtual void AddEmailFeedbackSubject(ostream &);
+  char *EmailFeedbackAddress;
+
   int ApplicationExited;
 
   // For Balloon help
@@ -386,6 +402,10 @@ protected:
   vtkSetStringMacro(BalloonHelpPending);
   vtkKWWidget *BalloonHelpWidget;
   int ShowBalloonHelp;
+
+  vtkGetStringMacro(DisplayHelpStartingPage);
+  vtkSetStringMacro(DisplayHelpStartingPage);
+  char *DisplayHelpStartingPage;
 
   static int WidgetVisibility;
   int InExit;
@@ -440,6 +460,8 @@ protected:
   // Return VTK_ERROR if not found.
   static int CheckForValuedArgument(
     int argc, char* argv[], const char *arg, int &index, int &value_pos);
+
+  virtual int GetCheckForUpdatesPath(ostream &path);
 
 private:
   vtkKWApplication(const vtkKWApplication&);   // Not implemented.

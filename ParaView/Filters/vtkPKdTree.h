@@ -47,7 +47,7 @@
 class vtkMultiProcessController;
 class vtkCommunicator;
 class vtkSubGroup;
-class vtkIdList;
+class vtkIntArray;
 
 class VTK_EXPORT vtkPKdTree : public vtkKdTree
 {
@@ -174,7 +174,7 @@ public:
   //    Writes the list of region IDs assigned to the specified
   //    process.  Returns the number of regions in the list. 
 
-  int GetRegionAssignmentList(int procId, vtkIdList *list);
+  int GetRegionAssignmentList(int procId, vtkIntArray *list);
 
   // Description:
   //   Returns 1 if the process has data for the given region,
@@ -205,7 +205,7 @@ public:
   //   region to the supplied list, returns the number of
   //   processes added.
 
-  int GetProcessListForRegion(int regionId, vtkIdList *processes);
+  int GetProcessListForRegion(int regionId, vtkIntArray *processes);
 
   // Description:
   //   Writes the number of cells each process has for the region
@@ -226,9 +226,9 @@ public:
 
   // Description:
   //   Adds the region IDs for which this process has data to
-  //   the supplied vtkIdList.  Retruns the number of regions.
+  //   the supplied vtkIntArray.  Retruns the number of regions.
 
-  int GetRegionListForProcess(int processId, vtkIdList *regions);
+  int GetRegionListForProcess(int processId, vtkIntArray *regions);
 
   // Description:
   //   Writes to the supplied list the number of cells this
@@ -249,7 +249,7 @@ public:
   //    Return a list of all processes in order from front to
   //    back, given a vtkCamera
 
-  int DepthOrderAllProcesses(vtkCamera *camera, vtkIdList *orderedList);
+  int DepthOrderAllProcesses(vtkCamera *camera, vtkIntArray *orderedList);
 
   // Description:
   //    This class doesn't have enough public methods, so I am adding
@@ -271,6 +271,8 @@ protected:
 
   vtkPKdTree();
   ~vtkPKdTree();
+
+  void SingleProcessBuildLocator();
 
 private:
 
@@ -445,7 +447,6 @@ public:
   int tag;
 
 private:
-  static void mergeUnique(int *list, int len, vtkIdList *ids);
   int computeFanInTargets();
   void restoreRoot(int rootLoc);
   void moveRoot(int rootLoc);

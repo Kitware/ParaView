@@ -152,6 +152,7 @@ public:
   //   by all processes, or it will hang.
 
   void Execute();
+  void SingleProcessExecute();
   void ExecuteInformation();
 
 
@@ -193,14 +194,14 @@ private:
   vtkPKdTree *Kdtree;
   vtkMultiProcessController *Controller;
 
+  int NumProcesses;
+  int MyId;
+
   char *GlobalIdArrayName;
 
   int RetainKdtree;
   int IncludeAllIntersectingCells;
   int ClipCells;
-
-  int NumProcesses;
-  int MyLocalId;
 
   int Timing;
 

@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.5.4.2");
+vtkCxxRevisionMacro(vtkPVValueList, "1.5.4.3");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -294,6 +294,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   this->GenerateEntry->SetDisplayEntryAndLabelOnTop(0);
   this->GenerateEntry->DisplayEntry();
   this->GenerateEntry->SetRange(1, vtkPVValueList::MAX_NUMBER_ENTRIES);
+  this->GenerateEntry->SetValue(1);
   this->GenerateEntry->SetResolution(1);
   this->GenerateEntry->GetEntry()->SetWidth(7);
   this->GenerateEntry->SetBalloonHelpString(
@@ -532,7 +533,6 @@ void vtkPVValueList::GenerateValuesCallback()
   if (numContours == 1)
     {
     this->AddValue((range[1] + range[0])/2.0);
-    this->Update();
     return;
     }
 

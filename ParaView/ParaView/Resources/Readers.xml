@@ -11,8 +11,8 @@
          extensions=".vtp"
          file_description="VTK PolyData Files">
   <Source class="vtkXMLPolyDataReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection"/>
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLUnstructuredGridReader"
          root_name="XMLUnstructuredGridReader" 
@@ -21,8 +21,8 @@
          extensions=".vtu"
          file_description="VTK UnstructuredGrid Files">
   <Source class="vtkXMLUnstructuredGridReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLImageDataReader"
          root_name="XMLImageDataReader" 
@@ -31,8 +31,8 @@
          extensions=".vti"
          file_description="VTK ImageData Files">
   <Source class="vtkXMLImageDataReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLStructuredGridReader"
          root_name="XMLStructuredGridReader" 
@@ -41,8 +41,8 @@
          extensions=".vts"
          file_description="VTK StructuredGrid Files">
   <Source class="vtkXMLStructuredGridReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLRectilinearGridReader"
          root_name="XMLRectilinearGridReader" 
@@ -51,8 +51,8 @@
          extensions=".vtr"
          file_description="VTK RectilinearGrid Files">
   <Source class="vtkXMLRectilinearGridReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLPPolyDataReader"
          root_name="XMLPPolyDataReader" 
@@ -61,8 +61,8 @@
          extensions=".pvtp"
          file_description="VTK PolyData Files (partitioned)">
   <Source class="vtkXMLPPolyDataReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLPUnstructuredGridReader"
          root_name="XMLPUnstructuredGridReader" 
@@ -71,8 +71,8 @@
          extensions=".pvtu"
          file_description="VTK UnstructuredGrid Files (partitioned)">
   <Source class="vtkXMLPUnstructuredGridReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLPImageDataReader"
          root_name="XMLPImageDataReader" 
@@ -81,8 +81,8 @@
          extensions=".pvti"
          file_description="VTK ImageData Files (partitioned)">
   <Source class="vtkXMLPImageDataReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLPStructuredGridReader"
          root_name="XMLPStructuredGridReader" 
@@ -91,8 +91,8 @@
          extensions=".pvts"
          file_description="VTK StructuredGrid Files (partitioned)">
   <Source class="vtkXMLPStructuredGridReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
  <Module name="XMLPRectilinearGridReader"
          root_name="XMLPRectilinearGridReader" 
@@ -101,8 +101,8 @@
          extensions=".pvtr"
          file_description="VTK RectilinearGrid Files (partitioned)">
   <Source class="vtkXMLPRectilinearGridReader"/>
-  <ArraySelection attribute_name="Point" />
-  <ArraySelection attribute_name="Cell" />
+  <ArraySelection attribute_name="Point" trace_name="PointSelection" />
+  <ArraySelection attribute_name="Cell" trace_name="CellSelection"/>
  </Module>
   <Module name="legacyreader" class="vtkPVReaderModule" root_name="LegaVTK" 
           module_type="Reader"
@@ -143,7 +143,7 @@
   <VectorEntry length="3" variable="Stride" trace_name="Stride" type="int" 
                help="Read a subset of data spaced by the stride."
                default_value="1 1 1"/>
-  <ArraySelection attribute_name="Point"/>
+  <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
  </Module>
  <Module name="vrmlreader" class="vtkPVReaderModule" root_name="VRML" 
           module_type="Reader"
@@ -213,8 +213,8 @@
           extensions=".g" file_description="BYU Files">
     <Source class="vtkBYUReader"/>
   </Module>
-  <Module name="gaussiancubereader" class="vtkPVAdvancedReaderModule" root_name="GaussianCube" 
-          module_type="Reader"
+  <Module name="gaussiancubereader" class="vtkPVAdvancedReaderModule" 
+          root_name="GaussianCube" module_type="Reader"
           extensions=".cube" file_description="Gaussian Cube Files">
     <Source class="vtkGaussianCubeReader"/>
     <VectorEntry variable="HBScale" trace_name="HBScale" type="float" 
@@ -228,7 +228,7 @@
           extensions=".pop" file_description="POP Ocean Files">
     <Source class="vtkPOPReader"/>
     <VectorEntry variable="Radius" trace_name="Radius" type="float" 
-                 help="Set the radius of the data set" defulat_value="60000"/>
+                 help="Set the radius of the data set" default_value="60000"/>
     <VectorEntry label="Clip Extent" variable="ClipExtent" type="int"
                  length="6" trace_name="ClipExtent"
                  help="For reading a smaller extent."
@@ -244,7 +244,8 @@
           module_type="Reader"
           extensions=".sos" file_description="EnSight Master Server Files">
     <Source class="vtkPVEnSightMasterServerReader"/>
-    <SelectTimeSet label="Select time value" trace_name="TimeSet" set_command="SetTimeValue"/>
+    <SelectTimeSet label="Select time value" trace_name="TimeSet" 
+                   set_command="SetTimeValue"/>
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>
@@ -255,12 +256,11 @@
         short_help="Read raw regular rectilinear grid data from a file">
   <Source class="vtkImageReader"/>
   <StringEntry label="File pattern" trace_name="FilePattern" 
-               variable="FilePattern" help="Set the format string for building filename. In creating the filename, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z"
-               default_value="%s.%d"/>
+               variable="FilePattern" default_value="%s.%d"
+               help="Set the format string for building filename. In creating the filename, %s will be replaced by the prefix and %d by a digit which represents the slice number in Z"/>
   <SelectionList label="Data type" trace_name="DataScalarType" 
-                 variable="DataScalarType" 
-                 help="Select the pixel type in the file: short, int, float ..."
-                 default_value="4">
+                 variable="DataScalarType" default_value="4"
+                 help="Select the pixel type in the file: short, int, float ...">
     <Item name="char" value="2"/>
     <Item name="unsigned char" value="3"/>
     <Item name="short" value="4"/>
@@ -322,22 +322,28 @@
 #endif
 #ifdef PARAVIEW_USE_EXODUS
  <Module name="ExodusReader" root_name="ExodusReader" 
-   output="vtkUnstructuredGrid" 
-   class="vtkPVAdvancedReaderModule" module_type="Reader" extensions=".e .ex2 .exo .gen .0 .00 .000" 
-   file_description="Exodus Reader">
+         output="vtkUnstructuredGrid" 
+         class="vtkPVAdvancedReaderModule" module_type="Reader" 
+         extensions=".e .ex2 .exo .gen .0 .00 .000" 
+         file_description="Exodus Reader">
   <Source class="vtkPExodusReader"/>
-  <ArraySelection attribute_name="Cell" />
-  <ArraySelection attribute_name="Point" />
+  <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
+  <ArraySelection trace_name="cell_array_sel" attribute_name="Point" />
   <StringEntry variable="FilePrefix" extension="*" label="File prefix" 
+               init_source="FilePrefix"
+               trace_name="file_prefix"
                help="Set the file root. Used with file pattern to format a file name." />
 
   <StringEntry variable="FilePattern" label="File Pattern" 
+               init_source="FilePattern"
+               trace_name="file_pattern"
                help="Pattern used to load files. There are two parts to it prefix (%s) and the file number (%i)" />
 
   <VectorEntry variable="FileRange" label="Range of files" type="int"
+               trace_name="file_range"
                length="2" help="Range of files that are loaded" />
 
-  <Scale variable="TimeStep" type="int" label="Time step"
+  <Scale variable="TimeStep" type="int" label="Time step" trace_name="TimeStep"
                help="Set the current timestep." range_source="TimeStepRange" />
 
  </Module>

@@ -68,7 +68,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.9");
+vtkCxxRevisionMacro(vtkPVWidget, "1.36.2.10");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -399,6 +399,15 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
     this->SetTraceName(trace_name); 
     this->SetTraceNameState(vtkPVWidget::XMLInitialized);
     }
+  else
+    {
+    vtkErrorMacro("Widget is missing required trace_name attribute."
+                  << " Source name: " << this->PVSource->GetName()
+                  << ", widget class: " << this->GetClassName());
+    // For now, do not raise error. Otherwise, old configuration
+    // files might not work.
+    // return 0;
+    }
 
   if(!element->GetScalarAttribute("suppress_reset", &this->SuppressReset))
     {
@@ -446,7 +455,7 @@ int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
 vtkPVWidget* vtkPVWidget::GetPVWidgetFromParser(vtkPVXMLElement* element,
                                                 vtkPVXMLPackageParser* parser)
 {
-  return parser->GetPVWidget(element);
+  return parser->GetPVWidget(element, 0);
 }
 
 //-----------------------------------------------------------------------------

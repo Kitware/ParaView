@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.8");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.9");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -66,6 +66,8 @@ vtkPVStringEntry::vtkPVStringEntry()
   this->EntryLabel = 0;
   this->DefaultValue = 0;
   this->Property = 0;
+
+  this->InitSourceVariable = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -77,6 +79,7 @@ vtkPVStringEntry::~vtkPVStringEntry()
   this->LabelWidget = NULL;
   this->SetEntryLabel(0);
   this->SetProperty(0);
+  this->SetInitSourceVariable(0);;
 }
 
 void vtkPVStringEntry::SetLabel(const char* label)
@@ -229,6 +232,27 @@ void vtkPVStringEntry::ResetInternal()
   // Command to update the UI.
   this->SetValue(this->Property->GetString());
 
+  if ( this->ObjectID.ID && this->InitSourceVariable )
+    {
+    vtkstd::string method = "Get";
+    method += this->InitSourceVariable;
+    vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+    pm->GetStream() << vtkClientServerStream::Invoke
+                    << this->ObjectID << method.c_str()
+                    << vtkClientServerStream::End;
+    pm->SendStreamToServer();
+    const char* value;
+    if(pm->GetLastServerResult().GetArgument(0, 0, &value))
+      {
+      this->SetValue(value);
+      }
+    else
+      {
+      vtkErrorMacro("Error getting \"" << this->InitSourceVariable
+                    << "\" value from server.");
+      }
+    }
+
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;
@@ -253,6 +277,7 @@ void vtkPVStringEntry::CopyProperties(vtkPVWidget* clone,
     {
     pvse->SetLabel(this->EntryLabel);
     pvse->SetDefaultValue(this->DefaultValue);
+    pvse->SetInitSourceVariable(this->InitSourceVariable);
     }
   else 
     {
@@ -275,6 +300,12 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
   else
     {
     this->SetLabel(this->VariableName);
+    }
+
+  const char* init_source = element->GetAttribute("init_source");
+  if ( init_source )
+    {
+    this->SetInitSourceVariable(init_source);
     }
   
   // Set the default value.

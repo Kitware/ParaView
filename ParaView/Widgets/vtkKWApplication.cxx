@@ -71,6 +71,8 @@ static Tcl_Interp *Et_Interp = 0;
 #endif
 
 #ifdef _WIN32
+#include <process.h>
+#include <mapi.h>
 #include <htmlhelp.h>
 #include "kwappicon.h"
 #endif
@@ -87,7 +89,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.137.2.2");
+vtkCxxRevisionMacro(vtkKWApplication, "1.137.2.3");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -109,8 +111,11 @@ vtkKWApplication::vtkKWApplication()
   this->ApplicationPrettyName = NULL;
   this->ApplicationInstallationDirectory = NULL;
 
-  this->LimitedEditionModeName = NULL;
-  this->SetLimitedEditionModeName("limited edition");
+  this->LimitedEditionModeName = vtkString::Duplicate("limited edition");
+
+  this->EmailFeedbackAddress = NULL;
+
+  this->DisplayHelpStartingPage = vtkString::Duplicate("Introduction.htm");
 
   this->InExit = 0;
   this->DialogUp = 0;
@@ -238,6 +243,10 @@ vtkKWApplication::~vtkKWApplication()
   this->SetApplicationReleaseName(NULL);
   this->SetApplicationPrettyName(NULL);
   this->SetApplicationInstallationDirectory(NULL);
+
+  this->SetEmailFeedbackAddress(NULL);
+
+  this->SetDisplayHelpStartingPage(NULL);
 
   if (this->TraceFile)
     {
@@ -723,18 +732,21 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
 
   // Init Tk
 
-  status = Tk_Init(interp);
-  if (status != TCL_OK)
+  if (vtkKWApplication::WidgetVisibility)
     {
-    if (err)
+    status = Tk_Init(interp);
+    if (status != TCL_OK)
       {
-      *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
+      if (err)
+        {
+        *err << "Tk_Init error: " << Tcl_GetStringResult(interp) << endl;
+        }
+      return NULL;
       }
-    return NULL;
+    
+    Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
     }
-
-  Tcl_StaticPackage(interp, "Tk", Tk_Init, 0);
-
+    
 #endif
   
   // create the SetApplicationIcon command
@@ -854,7 +866,12 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
     {
     temp << this->ApplicationInstallationDirectory << "/";
     }
-  temp << this->ApplicationName << ".chm::/Introduction.htm" << ends;
+  temp << this->ApplicationName << ".chm";
+  if (this->DisplayHelpStartingPage)
+    {
+    temp << "::/" << this->DisplayHelpStartingPage;
+    }
+  temp << ends;
   
   if (!HtmlHelp(NULL, temp.str(), HH_DISPLAY_TOPIC, 0))
     {
@@ -1612,14 +1629,442 @@ int vtkKWApplication::CheckForValuedArgument(
 }
 
 //----------------------------------------------------------------------------
+int vtkKWApplication::GetCheckForUpdatesPath(ostream &path)
+{
+#ifdef _WIN32
+  this->FindApplicationInstallationDirectory();
+  if (this->ApplicationInstallationDirectory)
+    {
+    ostrstream upd;
+    upd << this->ApplicationInstallationDirectory << "/WiseUpdt.exe" << ends;
+    int res = vtkKWDirectoryUtilities::FileExists(upd.str());
+    upd.rdbuf()->freeze(0);
+    if (res)
+      {
+      path << upd.str();
+      }
+    return res;
+    }
+#endif
+
+  // To remove compiler warning on unused variable
+  (void)path;
+
+  return 0;
+}
+
+//----------------------------------------------------------------------------
 int vtkKWApplication::HasCheckForUpdates()
 {
+#ifdef _WIN32
+  ostrstream upd;
+  int res = this->GetCheckForUpdatesPath(upd);
+  upd.rdbuf()->freeze(0);
+  return res;
+#else
   return 0;
+#endif
 }
 
 //----------------------------------------------------------------------------
 void vtkKWApplication::CheckForUpdates()
 {
+  if (!this->HasCheckForUpdates())
+    {
+    return;
+    }
+
+#ifdef _WIN32
+  ostrstream upd;
+  if (this->GetCheckForUpdatesPath(upd))
+    {
+    upd << ends;
+    _spawnl(_P_NOWAIT, upd.str(), upd.str(), NULL);
+    }
+  upd.rdbuf()->freeze(0);
+#endif
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::GetSystemVersion(ostream &os)
+{
+#ifdef _WIN32
+  OSVERSIONINFOEX osvi;
+  BOOL bOsVersionInfoEx;
+
+  // Try calling GetVersionEx using the OSVERSIONINFOEX structure.
+  // If that fails, try using the OSVERSIONINFO structure.
+
+  ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+  osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+  if (!(bOsVersionInfoEx = GetVersionEx((OSVERSIONINFO *)&osvi)))
+    {
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    if (!GetVersionEx((OSVERSIONINFO *)&osvi)) 
+      {
+      return 0;
+      }
+    }
+  
+  switch (osvi.dwPlatformId)
+    {
+    // Test for the Windows NT product family.
+
+    case VER_PLATFORM_WIN32_NT:
+      
+      // Test for the specific product family.
+
+      if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
+        {
+        os << "Microsoft Windows Server 2003 family";
+        }
+
+      if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
+        {
+        os << "Microsoft Windows XP";
+        }
+
+      if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
+        {
+        os << "Microsoft Windows 2000";
+        }
+
+      if (osvi.dwMajorVersion <= 4)
+        {
+        os << "Microsoft Windows NT";
+        }
+
+      // Test for specific product on Windows NT 4.0 SP6 and later.
+
+      if (bOsVersionInfoEx)
+        {
+        // Test for the workstation type.
+
+#if (_MSC_VER >= 1300) 
+        if (osvi.wProductType == VER_NT_WORKSTATION)
+          {
+          if (osvi.dwMajorVersion == 4)
+            {
+            os << " Workstation 4.0";
+            }
+          else if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
+            {
+            os << " Home Edition";
+            }
+          else
+            {
+            os << " Professional";
+            }
+          }
+            
+        // Test for the server type.
+
+        else if (osvi.wProductType == VER_NT_SERVER)
+          {
+          if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
+            {
+            if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+              {
+              os << " Datacenter Edition";
+              }
+            else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+              {
+              os << " Enterprise Edition";
+              }
+            else if (osvi.wSuiteMask == VER_SUITE_BLADE)
+              {
+              os << " Web Edition";
+              }
+            else
+              {
+              os << " Standard Edition";
+              }
+            }
+          
+          else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
+            {
+            if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+              {
+              os << " Datacenter Server";
+              }
+            else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+              {
+              os << " Advanced Server";
+              }
+            else
+              {
+              os << " Server";
+              }
+            }
+
+          else  // Windows NT 4.0 
+            {
+            if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+              {
+              os << " Server 4.0, Enterprise Edition";
+              }
+            else
+              {
+              os << " Server 4.0";
+              }
+            }
+          }
+#endif // Visual Studio 7 and up
+        }
+
+      // Test for specific product on Windows NT 4.0 SP5 and earlier
+
+      else  
+        {
+        HKEY hKey;
+        #define BUFSIZE 80
+        char szProductType[BUFSIZE];
+        DWORD dwBufLen=BUFSIZE;
+        LONG lRet;
+
+        lRet = RegOpenKeyEx(
+          HKEY_LOCAL_MACHINE,
+          "SYSTEM\\CurrentControlSet\\Control\\ProductOptions",
+          0, KEY_QUERY_VALUE, &hKey);
+        if (lRet != ERROR_SUCCESS)
+          {
+          return 0;
+          }
+
+        lRet = RegQueryValueEx(hKey, "ProductType", NULL, NULL,
+                               (LPBYTE) szProductType, &dwBufLen);
+
+        if ((lRet != ERROR_SUCCESS) || (dwBufLen > BUFSIZE))
+          {
+          return 0;
+          }
+
+        RegCloseKey(hKey);
+
+        if (lstrcmpi("WINNT", szProductType) == 0)
+          {
+          os << " Workstation";
+          }
+        if (lstrcmpi("LANMANNT", szProductType) == 0)
+          {
+          os << " Server";
+          }
+        if (lstrcmpi("SERVERNT", szProductType) == 0)
+          {
+          os << " Advanced Server";
+          }
+
+        os << " " << osvi.dwMajorVersion << "." << osvi.dwMinorVersion;
+        }
+
+      // Display service pack (if any) and build number.
+
+      if (osvi.dwMajorVersion == 4 && 
+          lstrcmpi(osvi.szCSDVersion, "Service Pack 6") == 0)
+        {
+        HKEY hKey;
+        LONG lRet;
+
+        // Test for SP6 versus SP6a.
+
+        lRet = RegOpenKeyEx(
+          HKEY_LOCAL_MACHINE,
+          "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009",
+          0, KEY_QUERY_VALUE, &hKey);
+
+        if (lRet == ERROR_SUCCESS)
+          {
+          os << " Service Pack 6a (Build " 
+             << (osvi.dwBuildNumber & 0xFFFF) << ")";
+          }
+        else // Windows NT 4.0 prior to SP6a
+          {
+          os << " " << osvi.szCSDVersion << " (Build " 
+             << (osvi.dwBuildNumber & 0xFFFF) << ")";
+          }
+        
+        RegCloseKey(hKey);
+        }
+      else // Windows NT 3.51 and earlier or Windows 2000 and later
+        {
+        os << " " << osvi.szCSDVersion << " (Build " 
+           << (osvi.dwBuildNumber & 0xFFFF) << ")";
+        }
+
+      break;
+
+      // Test for the Windows 95 product family.
+
+    case VER_PLATFORM_WIN32_WINDOWS:
+
+      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 0)
+        {
+        os << "Microsoft Windows 95";
+        if (osvi.szCSDVersion[1] == 'C' || osvi.szCSDVersion[1] == 'B')
+          {
+          os << " OSR2";
+          }
+        }
+
+      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 10)
+        {
+        os << "Microsoft Windows 98";
+        if (osvi.szCSDVersion[1] == 'A')
+          {
+          os << " SE";
+          }
+        }
+
+      if (osvi.dwMajorVersion == 4 && osvi.dwMinorVersion == 90)
+        {
+        os << "Microsoft Windows Millennium Edition";
+        } 
+      break;
+
+    case VER_PLATFORM_WIN32s:
+      
+      os <<  "Microsoft Win32s";
+      break;
+    }
+#endif
+
+  // Here to suppress compiler warning on unused variable
+  (void)os;
+
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::CanEmailFeedback()
+{
+#ifdef _WIN32
+  HMODULE g_hMAPI = ::LoadLibrary("MAPI32.DLL");
+  int has_mapi = g_hMAPI ? 1 : 0;
+  ::FreeLibrary(g_hMAPI);
+  return (has_mapi && this->EmailFeedbackAddress) ? 1 : 0;
+#else
+  return 0;
+#endif
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddEmailFeedbackBody(ostream &os)
+{
+  os << this->GetApplicationPrettyName() 
+     << " (" 
+     << this->GetApplicationVersionName() 
+     << " " 
+     << this->GetApplicationReleaseName()
+     << ")" << endl;
+
+  this->GetSystemVersion(os);
+
+#ifdef _WIN32
+  SYSTEM_INFO siSysInfo;
+  GetSystemInfo(&siSysInfo); 
+  os << ", " << siSysInfo.dwNumberOfProcessors << " CPU(s)";
+#endif
+  
+  os << endl;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddEmailFeedbackSubject(ostream &os)
+{
+  os << this->GetApplicationName() << " User Feedback";
+}
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::EmailFeedback()
+{
+  if (!this->CanEmailFeedback())
+    {
+    return;
+    }
+
+#ifdef _WIN32
+
+  // Load MAPI
+
+  HMODULE g_hMAPI = ::LoadLibrary("MAPI32.DLL");
+  if (!g_hMAPI)
+    {
+    return;
+    }
+
+  // Recipient To: (no SMTP: for Mozilla)
+
+  MapiRecipDesc recip_to = 
+    {
+      0L,
+      MAPI_TO,
+      NULL,
+      this->EmailFeedbackAddress,
+      0L,
+      NULL
+    };
+
+  // Body of the message
+
+  ostrstream body;
+  this->AddEmailFeedbackBody(body);
+  body << endl << ends;
+
+  // The email itself
+
+  ostrstream email_subject;
+  this->AddEmailFeedbackSubject(email_subject);
+  email_subject << ends;
+
+  MapiMessage email = 
+    {
+      0, 
+      email_subject.str(),
+      body.str(),
+      NULL, 
+      NULL, 
+      NULL, 
+      0, 
+      NULL,
+      1, 
+      &recip_to, 
+      0, 
+      NULL
+    };
+
+  // Send it
+
+  ULONG err = ((LPMAPISENDMAIL)GetProcAddress(g_hMAPI, "MAPISendMail"))(
+    0L,
+    0L,
+    &email,
+    MAPI_DIALOG | MAPI_LOGON_UI,
+    0L);
+
+  if (err != SUCCESS_SUCCESS)
+    {
+    ostrstream msg;
+    msg << "Sorry, an error occurred while trying to email feedback. "
+        << "Please make sure that your default email client has been "
+        << "configured properly. The Microsoft Simple MAPI (Messaging "
+        << "Application Program Interface) is used to perform this "
+        << "operation and it might not be accessible as long as your "
+        << "default email client is not running simultaneously. If you "
+        << "continue to have problems please use your email client to "
+        << "send us feedback at " << this->EmailFeedbackAddress << "."
+        << ends;
+
+    vtkKWMessageDialog::PopupMessage(
+      this, 0, email_subject.str(), msg.str(), vtkKWMessageDialog::ErrorIcon);
+    msg.rdbuf()->freeze(0);
+    }
+
+  body.rdbuf()->freeze(0);
+  email_subject.rdbuf()->freeze(0);
+
+  ::FreeLibrary(g_hMAPI);
+#endif
 }
 
 //----------------------------------------------------------------------------
@@ -1635,6 +2080,10 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << this->GetApplicationVersionName() << endl;
   os << indent << "ApplicationPrettyName: " 
      << this->GetApplicationPrettyName() << endl;
+  os << indent << "EmailFeedbackAddress: "
+     << (this->GetEmailFeedbackAddress() ? this->GetEmailFeedbackAddress() :
+         "(none)")
+     << endl;
   os << indent << "ShowBalloonHelp: " << (this->ShowBalloonHelp ? "on":"off") << endl;
   os << indent << "BalloonHelpDelay: " << this->GetBalloonHelpDelay() << endl;
   os << indent << "DialogUp: " << this->GetDialogUp() << endl;

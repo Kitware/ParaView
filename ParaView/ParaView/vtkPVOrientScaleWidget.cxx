@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.6.2.1");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.6.2.2");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -298,6 +298,7 @@ void vtkPVOrientScaleWidget::Trace(ofstream *file)
 void vtkPVOrientScaleWidget::Update()
 {
   this->UpdateArrayMenus();
+  this->UpdateModeMenus();
   this->UpdateScaleFactor();
   this->Superclass::Update();
 }
@@ -437,6 +438,80 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
     }
 }
 
+void vtkPVOrientScaleWidget::UpdateModeMenus()
+{
+  vtkKWMenu *scaleMenu = this->ScaleModeMenu->GetMenu();
+  vtkKWMenu *orientMenu = this->OrientModeMenu->GetMenu();
+  
+  int numScalars = this->ScalarsMenu->GetNumberOfEntries();
+  int numVectors = this->VectorsMenu->GetNumberOfEntries();
+
+  const char *scaleMode = this->ScaleModeMenu->GetValue();
+  
+  if (numScalars == 0)
+    {
+    // disabled
+    scaleMenu->SetState("Scalar", 2);
+    if (!strcmp(scaleMode, "Scalar"))
+      {
+      if (numVectors == 0)
+        {
+        this->ScaleModeMenu->SetValue("Data Scaling Off");
+        }
+      else
+        {
+        this->ScaleModeMenu->SetValue("Vector Magnitude");
+        }
+      }
+    }
+  else
+    {
+    // normal
+    scaleMenu->SetState("Scalar", 0);
+    }
+  
+  if (numVectors == 0)
+    {
+    // disabled
+    orientMenu->SetState("Vector", 2);
+    scaleMenu->SetState("Vector Magnitude", 2);
+    scaleMenu->SetState("Vector Components", 2);
+    if (!strcmp(this->OrientModeMenu->GetValue(), "Vector"))
+      {
+      this->OrientModeMenu->SetValue("Off");
+      }
+    if (!strcmp(scaleMode, "Vector Magnitude") ||
+        !strcmp(scaleMode, "Vector Components"))
+      {
+      if (numScalars == 0)
+        {
+        this->ScaleModeMenu->SetValue("Data Scaling Off");
+        }
+      else
+        {
+        this->ScaleModeMenu->SetValue("Scalar");
+        }
+      }
+    }
+  else
+    {
+    // normal
+    orientMenu->SetState("Vector", 0);
+    scaleMenu->SetState("Vector Magnitude", 0);
+    scaleMenu->SetState("Vector Components", 0);
+    }
+  
+  if (!this->AcceptCalled)
+    {
+    this->DefaultOrientMode = this->OrientModeMenu->GetMenu()->GetIndex(
+      this->OrientModeMenu->GetValue());
+    this->DefaultScaleMode = this->ScaleModeMenu->GetMenu()->GetIndex(
+      this->ScaleModeMenu->GetValue());
+    }
+  
+  this->UpdateScaleFactor();
+}
+
 void vtkPVOrientScaleWidget::UpdateScaleFactor()
 {
   if (!this->InputMenu)
@@ -461,7 +536,9 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
   maxBnds = (bnds[5] - bnds[4] > maxBnds) ? (bnds[5] - bnds[4]) : maxBnds;
   maxBnds *= 0.1;
 
+  double absMaxRange = 0;
   const char* scaleMode = this->ScaleModeMenu->GetValue();
+
   if (!strcmp(scaleMode, "Scalar"))
     {
     const char *arrayName = this->ScalarsMenu->GetValue();
@@ -471,10 +548,9 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       if (aInfo)
         {
         double *range = aInfo->GetComponentRange(0);
-        if (range[0]+range[1] != 0)
-          {
-          maxBnds /= (range[1] + range[0])*0.5;
-          }
+        absMaxRange = fabs(range[0]);
+        absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
+          absMaxRange;
         }
       }
     }
@@ -486,18 +562,10 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
       aInfo = pdInfo->GetArrayInformation(arrayName);
       if (aInfo)
         {
-        double *range0 = aInfo->GetComponentRange(0);
-        double *range1 = aInfo->GetComponentRange(1);
-        double *range2 = aInfo->GetComponentRange(2);
-        double avg[3];
-        avg[0] = (range0[0] + range0[1]) * 0.5;
-        avg[1] = (range1[0] + range1[1]) * 0.5;
-        avg[2] = (range2[0] + range2[1]) * 0.5;
-        if (avg[0] != 0 || avg[1] != 0 || avg[2] != 0)
-          {
-          double mag = sqrt(avg[0]*avg[0] + avg[1]*avg[1] + avg[2]*avg[2]);
-          maxBnds /= mag;
-          }
+        double *range = aInfo->GetComponentRange(-1);
+        absMaxRange = fabs(range[0]);
+        absMaxRange = (fabs(range[1]) > absMaxRange) ? fabs(range[1]) :
+          absMaxRange;
         }
       }
     }
@@ -512,18 +580,26 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
         double *range0 = aInfo->GetComponentRange(0);
         double *range1 = aInfo->GetComponentRange(1);
         double *range2 = aInfo->GetComponentRange(2);
-        double avg[3];
-        avg[0] = (range0[0] + range0[1]) * 0.5;
-        avg[1] = (range1[0] + range1[1]) * 0.5;
-        avg[2] = (range2[0] + range2[1]) * 0.5;
-        if (avg[0] + avg[1] + avg[2] != 0)
-          {
-          maxBnds /= (avg[0] + avg[1] + avg[2])/3.0;
-          }
+        absMaxRange = fabs(range0[0]);
+        absMaxRange = (fabs(range0[1]) > absMaxRange) ? fabs(range0[1]) :
+          absMaxRange;
+        absMaxRange = (fabs(range1[0]) > absMaxRange) ? fabs(range1[0]) :
+          absMaxRange;
+        absMaxRange = (fabs(range1[1]) > absMaxRange) ? fabs(range1[1]) :
+          absMaxRange;
+        absMaxRange = (fabs(range2[0]) > absMaxRange) ? fabs(range2[0]) :
+          absMaxRange;
+        absMaxRange = (fabs(range2[1]) > absMaxRange) ? fabs(range2[1]) :
+          absMaxRange;
         }
       }
     }
   
+  if (absMaxRange != 0)
+    {
+    maxBnds /= absMaxRange;
+    }
+
   this->ScaleFactorEntry->SetValue(maxBnds);
   if (!this->AcceptCalled)
     {
@@ -675,7 +751,7 @@ void vtkPVOrientScaleWidget::ResetInternal()
   this->ScaleModeMenu->SetValue(
     this->ScaleModeMenu->GetEntryLabel((int)scalars[1]));
   this->ScaleFactorEntry->SetValue(scalars[2]);
- 
+  
   if (this->AcceptCalled)
     {
     this->ModifiedFlag = 0;

@@ -39,10 +39,9 @@
 #ifndef __vtkPointsProjectedHull_h
 #define __vtkPointsProjectedHull_h
 
-//#include <vtksnlGraphicsWin32Header.h>
-#include <vtkObjectFactory.h>
-#include <vtkSetGet.h>
-#include <vtkPoints.h>
+#include "vtkObjectFactory.h"
+#include "vtkSetGet.h"
+#include "vtkPoints.h"
 
 
 class VTK_EXPORT vtkPointsProjectedHull : public vtkPoints
