@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.43");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.44");
 
 //----------------------------------------------------------------------------
 class vtkKWRenderWidgetObserver : public vtkCommand
@@ -108,7 +108,7 @@ vtkKWRenderWidget::vtkKWRenderWidget()
 
   this->CornerAnnotation = vtkCornerAnnotation::New();
   this->CornerAnnotation->SetMaximumLineHeight(0.07);
-  this->CornerAnnotation->VisibilityOn();
+  this->CornerAnnotation->VisibilityOff();
 
   this->HeaderProp = vtkTextActor::New();
   this->HeaderProp->GetTextProperty()->SetJustificationToCentered();
