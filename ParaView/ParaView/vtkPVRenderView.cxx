@@ -87,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.209");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.210");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1193,7 +1193,8 @@ void vtkPVRenderView::CreateViewProperties()
   this->Script("pack %s -side top -padx 2 -pady 2 -anchor w",
                this->Display3DWidgets->GetWidgetName());
 
-  this->Notebook->AddPage("Camera", "Camera and viewing navigation properties page");
+  this->Notebook->AddPage("Camera", 
+                          "Camera and viewing navigation properties page");
   vtkKWWidget* page = this->Notebook->GetFrame("Camera");
 
   vtkKWFrame* frame = vtkKWFrame::New();
@@ -1286,18 +1287,9 @@ void vtkPVRenderView::CreateViewProperties()
 
   this->Notebook->Raise("General");
 
-  if ( this->Application->BooleanRegisteryCheck(2, "SourcesBrowser",
-                                                "SelectionWindow") )
-    {
-    this->ShowSelectionWindowCallback(0);
-    }
-  else
-    {
-    this->ShowNavigationWindowCallback(0);
-    }
-
-  if ( !this->Application->GetRegisteryValue(2, "RunTime", "Display3DWidgets", 0) ||
-       pvwindow->GetIntRegisteryValue(2, "RunTime", "Display3DWidgets") )
+  if ( 
+    !this->Application->GetRegisteryValue(2, "RunTime", "Display3DWidgets", 0) ||
+    pvwindow->GetIntRegisteryValue(2, "RunTime", "Display3DWidgets") )
     {
     this->SetDisplay3DWidgets(1);
     }
@@ -2348,7 +2340,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.209 $");
+  this->ExtractRevision(os,"$Revision: 1.210 $");
 }
 
 //------------------------------------------------------------------------------
