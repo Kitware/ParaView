@@ -70,6 +70,7 @@ vtkPVPlaneWidget::vtkPVPlaneWidget()
   int cc;
 
   vtkPlaneWidget *plane = vtkPlaneWidget::New();
+  plane->SetPlaceFactor(1.0);
   this->Widget3D = plane;
   this->Labels[0] = vtkKWLabel::New();
   this->Labels[1] = vtkKWLabel::New();  
