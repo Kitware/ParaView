@@ -33,7 +33,7 @@
 
 class vtkXMLCollectionReaderInternals;
 
-class VTK_IO_EXPORT vtkXMLCollectionReader : public vtkXMLReader
+class VTK_EXPORT vtkXMLCollectionReader : public vtkXMLReader
 {
 public:
   static vtkXMLCollectionReader* New();
