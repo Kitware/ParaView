@@ -168,6 +168,7 @@ void vtkPVNavigationWindow::Update(vtkPVSource *currentSource)
 	    "%s create line %d %d %d %d -fill gray50 -arrow last",
 	    this->Canvas->GetWidgetName(), bboxIn[2], yMid,
 	    bboxSource[0], yMid);
+	  delete[] tmp;
           }
         else
           {
