@@ -13,7 +13,6 @@ IF(PYTHON_EXECUTABLE AND VTK_HEADER_TESTING_PY)
 	   "${KWWidgets_SOURCE_DIR}"
            icons.h
            kwinit.h
-           kwappicon.h
            vtkKWEvent.h
            vtkKWWidgets.h
            vtkbwidgets.h

@@ -45,7 +45,7 @@ static Tcl_Interp *Et_Interp = 0;
 #include <process.h>
 #include <mapi.h>
 #include <htmlhelp.h>
-#include "kwappicon.h"
+#include "Utilities/vtkKWSetApplicationIconTclCommand.h"
 #endif
 
 // I need those two Tcl functions. They usually are declared in tclIntDecls.h,
@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.185");
+vtkCxxRevisionMacro(vtkKWApplication, "1.186");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -707,7 +707,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     
   // create the SetApplicationIcon command
 #ifdef _WIN32
-  ApplicationIcon_DoInit(interp);
+  vtkKWSetApplicationIconTclCommand_DoInit(interp);
 #endif
 
   // Initialize VTK

@@ -38,11 +38,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <winuser.h>
 #include <winbase.h>
 
-#include <kwappicon.h>
+#include "vtkKWSetApplicationIconTclCommand.h"
 
 //----------------------------------------------------------------------------
 
-int SetApplicationIconCmd(ClientData clientdata, 
+int vtkKWSetApplicationIconCmd(ClientData clientdata, 
                           Tcl_Interp *interp, 
                           int argc, 
 #if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION >= 4 && TCL_RELEASE_LEVEL >= TCL_FINAL_RELEASE)
@@ -66,7 +66,7 @@ int SetApplicationIconCmd(ClientData clientdata,
 
   if (argc < 3)
     {
-    interp->result = "Usage: SetApplicationIcon app_name icon_res_id [small|big]";
+    interp->result = "Usage: vtkKWSetApplicationIcon app_name icon_res_id [small|big]";
     return TCL_ERROR;
     }
   
@@ -171,11 +171,11 @@ int SetApplicationIconCmd(ClientData clientdata,
 
 //----------------------------------------------------------------------------
 
-int ApplicationIcon_DoInit(Tcl_Interp *interp)
+int vtkKWSetApplicationIconTclCommand_DoInit(Tcl_Interp *interp)
 {
   Tcl_CreateCommand(interp, 
-                    "SetApplicationIcon", 
-                    SetApplicationIconCmd,
+                    "vtkKWSetApplicationIcon", 
+                    vtkKWSetApplicationIconCmd,
                     (ClientData)NULL,
                     (Tcl_CmdDeleteProc*)NULL);
   return TCL_OK;

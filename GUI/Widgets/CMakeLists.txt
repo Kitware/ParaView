@@ -185,11 +185,11 @@ ENDIF (VTK_TCL_TK_COPY_SUPPORT_LIBRARY)
 
 IF (WIN32)
   SET( KWWidgets_SRCS ${KWWidgets_SRCS}
-    kwappicon.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
     vtkKWWin32RegisteryUtilities.cxx
     )
   SET_SOURCE_FILES_PROPERTIES(
-    kwappicon 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vtkKWSetApplicationIconTclCommand.c
     WRAP_EXCLUDE
     )
 ELSE (WIN32)
