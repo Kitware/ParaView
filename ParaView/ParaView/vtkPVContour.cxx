@@ -51,7 +51,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVArrayMenu.h"
 #include "vtkPVContourEntry.h"
-#include "vtkPVData.h"
 #include "vtkPVInputMenu.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVScalarRangeLabel.h"
@@ -59,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContour);
-vtkCxxRevisionMacro(vtkPVContour, "1.55");
+vtkCxxRevisionMacro(vtkPVContour, "1.56");
 
 //----------------------------------------------------------------------------
 int vtkPVContourCommand(ClientData cd, Tcl_Interp *interp,
