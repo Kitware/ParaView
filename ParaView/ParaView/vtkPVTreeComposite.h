@@ -54,15 +54,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMPIController.h"
 #endif
 
-#include "vtkTreeComposite.h"
+#include "vtkCompositeManager.h"
 #include "vtkPVRenderView.h"
 
 
-class VTK_EXPORT vtkPVTreeComposite : public vtkTreeComposite
+class VTK_EXPORT vtkPVTreeComposite : public vtkCompositeManager
 {
 public:
   static vtkPVTreeComposite *New();
-  vtkTypeMacro(vtkPVTreeComposite,vtkTreeComposite);
+  vtkTypeMacro(vtkPVTreeComposite,vtkCompositeManager);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:

@@ -126,7 +126,8 @@ vtkPVRenderView::vtkPVRenderView()
   this->TriangleStripsCheck = vtkKWCheckButton::New();
   this->ImmediateModeCheck = vtkKWCheckButton::New();
   this->InterruptRenderCheck = vtkKWCheckButton::New();
-  this->UseCharCheck = vtkKWCheckButton::New();
+  this->CompositeWithFloatCheck = vtkKWCheckButton::New();
+  this->CompositeWithRGBACheck = vtkKWCheckButton::New();
 }
 
 //----------------------------------------------------------------------------
@@ -194,8 +195,11 @@ vtkPVRenderView::~vtkPVRenderView()
   this->InterruptRenderCheck->Delete();
   this->InterruptRenderCheck = NULL;
 
-  this->UseCharCheck->Delete();
-  this->UseCharCheck = NULL;
+  this->CompositeWithFloatCheck->Delete();
+  this->CompositeWithFloatCheck = NULL;
+
+  this->CompositeWithRGBACheck->Delete();
+  this->CompositeWithRGBACheck = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -313,8 +317,10 @@ void vtkPVRenderView::PrepareForDelete()
 #ifdef VTK_USE_MPI
     pvwindow->SetRegisteryValue(2, "RunTime", "InterruptRender", "%d",
 				this->InterruptRenderCheck->GetState());
-    pvwindow->SetRegisteryValue(2, "RunTime", "UseCharInComposite", "%d",
-				this->UseCharCheck->GetState());
+    pvwindow->SetRegisteryValue(2, "RunTime", "UseFloatInComposite", "%d",
+				this->CompositeWithFloatCheck->GetState());
+    pvwindow->SetRegisteryValue(2, "RunTime", "UseRGBAInComposite", "%d",
+				this->CompositeWithRGBACheck->GetState());
 #endif
     }
 
@@ -524,27 +530,45 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->InterruptRenderCheck->SetBalloonHelpString("Toggle the use of asynchronous MPI calls to interrupt renders. When off, renders can not be interrupted.");
   
-  this->UseCharCheck->SetParent(this->RenderParametersFrame->GetFrame());
-  this->UseCharCheck->Create(this->Application, "-text \"Use char Values in Compositing\"");
-  this->UseCharCheck->SetCommand(this, "UseCharCallback");
+  this->CompositeWithFloatCheck->SetParent(this->RenderParametersFrame->GetFrame());
+  this->CompositeWithFloatCheck->Create(this->Application, "-text \"Composite With Floats\"");
+  this->CompositeWithRGBACheck->SetParent(this->RenderParametersFrame->GetFrame());
+  this->CompositeWithRGBACheck->Create(this->Application, "-text \"Composite RGBA\"");
+  
+  this->CompositeWithFloatCheck->SetCommand(this, "CompositeWithFloatCallback");
   if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
-						 "UseCharInComposite", 0))
+						 "UseFloatInComposite", 0))
     {
-    this->UseCharCheck->SetState(pvwindow->GetIntRegisteryValue(
-      2, "RunTime", "UseCharInComposite"));
-    this->UseCharCallback();
+    this->CompositeWithFloatCheck->SetState(pvwindow->GetIntRegisteryValue(
+      2, "RunTime", "UseFloatInComposite"));
+    this->CompositeWithFloatCallback();
     }
   else
     {
-    this->UseCharCheck->SetState(1);
+    this->CompositeWithFloatCheck->SetState(0);
     }
-  this->UseCharCheck->SetBalloonHelpString("Toggle the use of char data when compositing. If rendering defects occur, try turning this off.");
+  this->CompositeWithFloatCheck->SetBalloonHelpString("Toggle the use of char/float values when compositing. If rendering defects occur, try turning this on.");
   
-  this->Script("pack %s %s %s %s -side top -anchor w",
+  this->CompositeWithRGBACheck->SetCommand(this, "CompositeWithRGBACallback");
+  if (pvwindow && pvwindow->GetRegisteryValue(2, "RunTime", 
+						 "UseRGBAInComposite", 0))
+    {
+    this->CompositeWithRGBACheck->SetState(pvwindow->GetIntRegisteryValue(
+      2, "RunTime", "UseRGBAInComposite"));
+    this->CompositeWithRGBACallback();
+    }
+  else
+    {
+    this->CompositeWithRGBACheck->SetState(0);
+    }
+  this->CompositeWithRGBACheck->SetBalloonHelpString("Toggle the use of RGB/RGBA values when compositing. This is here to bypass some bugs in some graphics card drivers.");
+  
+  this->Script("pack %s %s %s %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName(),
                this->InterruptRenderCheck->GetWidgetName(),
-               this->UseCharCheck->GetWidgetName());
+               this->CompositeWithFloatCheck->GetWidgetName(),
+               this->CompositeWithRGBACheck->GetWidgetName());
 #else
   this->Script("pack %s %s -side top -anchor w",
                this->TriangleStripsCheck->GetWidgetName(),
@@ -1013,13 +1037,38 @@ void vtkPVRenderView::InterruptRenderCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::UseCharCallback()
+void vtkPVRenderView::CompositeWithFloatCallback()
 {
   if (this->Composite)
     {
+    int val = ( ! this->CompositeWithFloatCheck->GetState());
     this->GetPVApplication()->BroadcastScript("%s SetUseChar %d",
                                               this->CompositeTclName,
-                                              this->UseCharCheck->GetState());
+                                              val);
+    // Limit of composite manager.
+    if (val == 0) // float
+      {
+      this->CompositeWithRGBACheck->SetState(1);
+      }
+    this->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderView::CompositeWithRGBACallback()
+{
+  if (this->Composite)
+    {
+    int val = ( ! this->CompositeWithRGBACheck->GetState());
+    this->GetPVApplication()->BroadcastScript("%s SetUseRGB %d",
+                                              this->CompositeTclName,
+                                              val);
+    // Limit of composite manager.
+    if (val == 1) // RGB
+      {
+      this->CompositeWithFloatCheck->SetState(0);
+      }
+    this->EventuallyRender();
     }
 }
 

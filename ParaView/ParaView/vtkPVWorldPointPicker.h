@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVWorldPointPicker_h
 
 #include "vtkWorldPointPicker.h"
-#include "vtkTreeComposite.h"
+#include "vtkPVTreeComposite.h"
 
 
 class VTK_EXPORT vtkPVWorldPointPicker : public vtkWorldPointPicker
@@ -62,8 +62,8 @@ public:
 
   // Description:
   // To use compositied z buffer value, we must have access to the compositer.
-  vtkSetObjectMacro(Composite, vtkTreeComposite);
-  vtkGetObjectMacro(Composite, vtkTreeComposite);
+  vtkSetObjectMacro(Composite, vtkPVTreeComposite);
+  vtkGetObjectMacro(Composite, vtkPVTreeComposite);
 
   // Description:
   // A pick method that uses composited zbuffer.
@@ -76,7 +76,7 @@ protected:
   vtkPVWorldPointPicker(const vtkPVWorldPointPicker&) {};
   void operator=(const vtkPVWorldPointPicker&) {};
 
-  vtkTreeComposite *Composite;
+  vtkPVTreeComposite *Composite;
 };
 
 #endif

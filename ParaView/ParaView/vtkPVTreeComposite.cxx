@@ -134,7 +134,7 @@ void vtkPVTreeComposite::ComputeVisiblePropBounds(vtkRenderer *ren,
   // Get the bounds from the rest of the processes.
   for (id = 1; id < num; ++id)
     {
-    this->Controller->Receive(tmp, 6, id, vtkTreeComposite::BOUNDS_TAG);
+    this->Controller->Receive(tmp, 6, id, vtkCompositeManager::BOUNDS_TAG);
     if (tmp[0] < bounds[0]) {bounds[0] = tmp[0];}
     if (tmp[1] > bounds[1]) {bounds[1] = tmp[1];}
     if (tmp[2] < bounds[2]) {bounds[2] = tmp[2];}
@@ -196,7 +196,7 @@ vtkPVTreeComposite::~vtkPVTreeComposite()
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkTreeComposite::PrintSelf(os, indent);
+  vtkCompositeManager::PrintSelf(os, indent);
 }
 
 
@@ -659,21 +659,21 @@ vtkPVTreeComposite::~vtkPVTreeComposite()
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::PrintSelf(ostream& os, vtkIndent indent)
 {
-  vtkTreeComposite::PrintSelf(os, indent);
+  vtkCompositeManager::PrintSelf(os, indent);
 }
 
 
 //----------------------------------------------------------------------------
 void vtkPVTreeComposite::CheckForAbortRender()
 {
-  this->vtkTreeComposite::CheckForAbortRender();
+  this->vtkCompositeManager::CheckForAbortRender();
 }
 
 
 //----------------------------------------------------------------------------
 int vtkPVTreeComposite::CheckForAbortComposite()
 {
-  return this->vtkTreeComposite::CheckForAbortComposite();
+  return this->vtkCompositeManager::CheckForAbortComposite();
 }
 
 

@@ -218,7 +218,8 @@ public:
   
   // Description:
   // Callback for the use char check button
-  void UseCharCallback();
+  void CompositeWithFloatCallback();
+  void CompositeWithRGBACallback();
   
   // Description:
   // Get the triangle strips check button.
@@ -265,7 +266,8 @@ protected:
   vtkKWCheckButton *TriangleStripsCheck;
   vtkKWCheckButton *ImmediateModeCheck;
   vtkKWCheckButton *InterruptRenderCheck;
-  vtkKWCheckButton *UseCharCheck;
+  vtkKWCheckButton *CompositeWithFloatCheck;
+  vtkKWCheckButton *CompositeWithRGBACheck;
 
   vtkPVNavigationWindow *NavigationWindow;
   
