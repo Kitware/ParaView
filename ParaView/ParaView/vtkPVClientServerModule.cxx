@@ -113,7 +113,7 @@ void vtkPVRelayRemoteScript(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.11");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.12");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -519,16 +519,22 @@ int vtkPVClientServerModule::GetNumberOfPartitions()
 }
 
 
-
 //----------------------------------------------------------------------------
 // This method is broadcast to all processes.
 void vtkPVClientServerModule::GatherDataInformation(vtkDataSet *data)
 {
   int length;
   unsigned char *msg;
+  int myId = this->Controller->GetLocalProcessId();
+
+  if (data == NULL)
+    {
+    vtkErrorMacro("Data Tcl name must be wrong.");
+    return;
+    }
 
   if (this->ClientMode)
-    { // Just get the information from the server.
+    { // Client just receives information from the server.
     this->SocketController->Receive(&length, 1, 1, 398798);
     msg = new unsigned char[length];
     this->SocketController->Receive(msg, length, 1, 398799);
@@ -538,10 +544,9 @@ void vtkPVClientServerModule::GatherDataInformation(vtkDataSet *data)
     return;
     }
 
-  int myId = this->Controller->GetLocalProcessId();
-  vtkPVDataInformation *tmp = vtkPVDataInformation::New();
   if (myId != 0)
     {
+    vtkPVDataInformation *tmp = vtkPVDataInformation::New();
     tmp->CopyFromData(data);
     msg = tmp->NewMessage(length);
     this->Controller->Send(&length, 1, 0, 398798);
@@ -553,31 +558,36 @@ void vtkPVClientServerModule::GatherDataInformation(vtkDataSet *data)
     return;
     }
 
-  // Node 0 of server:  Collect and send to client.
+  // Node 0.
   int numProcs = this->Controller->GetNumberOfProcesses();
   int idx;
+  vtkPVDataInformation *tmp1 = vtkPVDataInformation::New();
   vtkPVDataInformation *tmp2 = vtkPVDataInformation::New();
+  tmp1->CopyFromData(data);
   for (idx = 1; idx < numProcs; ++idx)
     {
     this->Controller->Receive(&length, 1, idx, 398798);
     msg = new unsigned char[length];
-    this->SocketController->Receive(msg, length, idx, 398799);
-    tmp->CopyFromMessage(msg);
-    tmp2->AddInformation(tmp);
+    this->Controller->Receive(msg, length, idx, 398799);
+    tmp2->CopyFromMessage(msg);
+    tmp1->AddInformation(tmp2);
     delete [] msg;
     msg = NULL;
     }
-  msg = tmp2->NewMessage(length);
+  tmp2->Delete();
+  tmp2 = NULL;
+
+  // Send final information to client over socket connection.
+  msg = tmp1->NewMessage(length);
   this->SocketController->Send(&length, 1, 1, 398798);
   this->SocketController->Send(msg, length, 1, 398799);
   delete [] msg;
   msg = NULL;
-  tmp->Delete();
-  tmp = NULL;  
-  tmp2->Delete();
-  tmp2 = NULL;
+  tmp1->Delete();
+  tmp1 = NULL;
+
 }    
- 
+
 
 
 

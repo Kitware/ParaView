@@ -96,10 +96,6 @@ public:
   void RelayScriptRMI(const char *str);
     
   // Description:
-  // This method should eventually replace "CompleteArrays" ...
-  virtual void GatherDataInformation(vtkDataSet *data);
-
-  // Description:
   // Get the Partition piece. -1 means no partition assigned to this process.
   virtual int GetPartitionId();
 
@@ -121,6 +117,10 @@ public:
   // This is a socket controller used to communicate
   // between the client and process 0 of the server.
   vtkGetObjectMacro(SocketController, vtkSocketController);
+
+  // Description:
+  // Module dependant method for collecting data information from all procs.
+  virtual void GatherDataInformation(vtkDataSet *data);
 
 protected:
   vtkPVClientServerModule();
