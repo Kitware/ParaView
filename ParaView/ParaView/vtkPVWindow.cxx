@@ -965,7 +965,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     pvs->SetTraceReferenceObject(this);
     {
     ostrstream s;
-    s << "GetSource GlyphSources " << pvs->GetName() << ends;
+    s << "GetPVSource GlyphSources " << pvs->GetName() << ends;
     pvs->SetTraceReferenceCommand(s.str());
     s.rdbuf()->freeze(0);
     }
