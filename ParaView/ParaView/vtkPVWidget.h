@@ -244,7 +244,13 @@ public:
   virtual void AcceptInternal(const char* sourceTclName);
   virtual void ResetInternal();
 
+  // Description:
+  // Set the property to use with this widget.  Overridden in subclasses.
   virtual void SetProperty(vtkPVWidgetProperty *) {}
+  
+  // Description:
+  // Create the right property for use with this widget.  Overridden in
+  // subclasses.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
   vtkSetMacro(UseWidgetRange, int);

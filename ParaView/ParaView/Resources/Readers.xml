@@ -128,7 +128,7 @@
       <Item name="little endian" value="1"/>
     </SelectionList>
     
-    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
+    <SelectTimeSet label="Select time value" trace_name="TimeSet" set_command="SetTimeValue"/>
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>
@@ -244,7 +244,7 @@
           module_type="Reader"
           extensions=".sos" file_description="EnSight Master Server Files">
     <Source class="vtkPVEnSightMasterServerReader"/>
-    <SelectTimeSet label="Select time value" trace_name="TimeSet"/>
+    <SelectTimeSet label="Select time value" trace_name="TimeSet" set_command="SetTimeValue"/>
     <ArraySelection attribute_name="Point" trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell" trace_name="CellArrays"/>
   </Module>

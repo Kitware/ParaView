@@ -53,7 +53,7 @@ class vtkKWEntry;
 class vtkPVSource;
 class vtkKWScale;
 class vtkKWFrame;
-class vtkPVStringWidgetProperty;
+class vtkPVFileEntryProperty;
 
 //BTX
 template<class KeyType,class DataType> class vtkArrayMap;
@@ -142,13 +142,19 @@ public:
   void SetTimeStep(int ts);
 
   // Description:
+  // Used internally. Method to save widget parameters into vtk tcl script.
   void SaveInBatchScriptForPart(ofstream* file, const char* sourceTclName);
 
   // Description:
   // Get the range of files.
   vtkGetVector2Macro(Range, int);
 
+  // Description:
+  // Set the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  
+  // Description:
+  // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
   
 protected:
@@ -180,7 +186,7 @@ protected:
   int FileNameLength;
   int Range[2];
 
-  vtkPVStringWidgetProperty *Property;
+  vtkPVFileEntryProperty *Property;
 
   //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,

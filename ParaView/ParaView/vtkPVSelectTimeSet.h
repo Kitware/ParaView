@@ -54,6 +54,7 @@ class vtkKWLabel;
 class vtkKWMenu;
 class vtkKWLabeledFrame;
 class vtkDataArrayCollection;
+class vtkPVScalarListWidgetProperty;
 
 class VTK_EXPORT vtkPVSelectTimeSet : public vtkPVObjectWidget
 {
@@ -68,13 +69,13 @@ public:
   // Called when accept button is pushed.  
   // Sets objects variable to the widgets value.
   // Adds a trace entry.  Side effect is to turn modified flag off.
-  virtual void Accept();
+  virtual void AcceptInternal(const char*);
   
   // Description:
   // Called when the reset button is pushed.
   // Sets widget's value to the object-variable's value.
   // Side effect is to turn the modified flag off.
-  virtual void Reset();
+  virtual void ResetInternal();
 
   // Description:
   // Adds a script to the menu of the animation interface.
@@ -121,6 +122,19 @@ public:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
+  // Description:
+  // Set the property to use with this widget.
+  virtual void SetProperty(vtkPVWidgetProperty *prop);
+  
+  // Description:
+  // Create the right property for use with this widget.
+  virtual vtkPVWidgetProperty* CreateAppropriateProperty();
+  
+  // Description:
+  // Set/get the command to pass the value to VTK.
+  vtkSetStringMacro(SetCommand);
+  vtkGetStringMacro(SetCommand);
+  
 protected:
   vtkPVSelectTimeSet();
   ~vtkPVSelectTimeSet();
@@ -128,6 +142,10 @@ protected:
   vtkPVSelectTimeSet(const vtkPVSelectTimeSet&); // Not implemented
   void operator=(const vtkPVSelectTimeSet&); // Not implemented
 
+  vtkPVScalarListWidgetProperty *Property;
+
+  char *SetCommand;
+  
   vtkSetStringMacro(FrameLabel);
   vtkGetStringMacro(FrameLabel);
 

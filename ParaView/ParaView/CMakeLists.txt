@@ -59,6 +59,7 @@ SET( ParaView_SRCS
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx
+  vtkPVFileEntryProperty.cxx
   vtkPVGenericRenderWindowInteractor.cxx
   vtkPVGeometryFilter.cxx
   vtkPVGhostLevelDialog.cxx

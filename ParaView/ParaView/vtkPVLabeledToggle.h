@@ -90,7 +90,12 @@ public:
                                      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
+  // Description:
+  // Set the property to use with this widget.
   virtual void SetProperty(vtkPVWidgetProperty *prop);
+  
+  // Description:
+  // Create the right property for use with this widget.
   virtual vtkPVWidgetProperty* CreateAppropriateProperty();
 
 protected:
