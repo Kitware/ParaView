@@ -42,10 +42,11 @@
 #include "vtkPVArrayInformation.h"
 #include "vtkPVGeometryInformation.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVClassNameInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.6");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.7");
 
 
 //----------------------------------------------------------------------------s
@@ -588,9 +589,10 @@ void vtkSMPartDisplay::SetInput(vtkSMSourceProxy* input)
   
   for (i = 0; i < num; ++i)
     {
-    vtkPVDataInformation*dInfo = input->GetDataInformation();
-    //if (strcmp(className, "vtkUnstructuredGrid") == 0 )
-    if (dInfo->GetDataSetType() == VTK_UNSTRUCTURED_GRID)
+    vtkPVClassNameInformation* cnInfo =
+      input->GetPart(i)->GetClassNameInformation();
+    if (cnInfo->GetVTKClassName() &&
+        strcmp(cnInfo->GetVTKClassName(), "vtkUnstructuredGrid") == 0 )
       {
       // Must loop through inputs .... fixme
       stream << vtkClientServerStream::Invoke << this->VolumeFieldFilterProxy->GetID(i)
