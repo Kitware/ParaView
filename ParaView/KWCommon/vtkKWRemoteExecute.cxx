@@ -81,14 +81,13 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWRemoteExecute );
-vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.13");
+vtkCxxRevisionMacro(vtkKWRemoteExecute, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWRemoteExecute::vtkKWRemoteExecute()
 {
   this->Internals = new vtkKWRemoteExecuteInternal;
   this->RemoteHost = 0;
-  this->ProcessRunning = 0;
   this->Result = NOT_RUN;
 
   this->SSHUser = 0;
@@ -157,7 +156,6 @@ int vtkKWRemoteExecute::RunRemoteCommand(const char* args)
   vtkMultiThreader* th = this->MultiThreader;
   this->ProcessThreadId = th->SpawnThread(
     (vtkThreadFunctionType)(vtkKWRemoteExecute::RunCommandThread), this);
-  this->ProcessRunning = 1;
   this->Result = vtkKWRemoteExecute::RUNNING;
   return 1;
 }
@@ -229,10 +227,6 @@ void* vtkKWRemoteExecute::RunCommandThread(void* vargs)
   else
     {
     self->Result = vtkKWRemoteExecute::FAIL;
-    }
-  if ( self ) 
-    {
-    self->ProcessRunning = 1;
     }
   return 0;
 }
