@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.620");
+vtkCxxRevisionMacro(vtkPVWindow, "1.621");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -535,8 +535,11 @@ void vtkPVWindow::PrepareForDelete()
     this->Toolbar->Delete();
     this->Toolbar = NULL;
     }
-  this->ToolbarMenuButton->Delete();
-  this->ToolbarMenuButton = 0;
+  if ( this->ToolbarMenuButton )
+    {
+    this->ToolbarMenuButton->Delete();
+    this->ToolbarMenuButton = 0;
+    }
 
   if (this->PickCenterButton)
     {
