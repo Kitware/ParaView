@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.18");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.19");
 
 
 //----------------------------------------------------------------------------
@@ -119,17 +119,28 @@ vtkPVLODPartDisplayInformation* vtkPVLODPartDisplay::GetInformation()
 
 
 //----------------------------------------------------------------------------
-void vtkPVLODPartDisplay::ConnectToData(vtkClientServerID dataID)
+void vtkPVLODPartDisplay::SetInput(vtkPVPart* input)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
   // Superclass connects the full res pipeline.
-  this->Superclass::ConnectToData(dataID);
-  
-  stream 
-    << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
-    << dataID << vtkClientServerStream::End;
+  this->Superclass::SetInput(input);
+ 
+  if (input == NULL)
+    {
+    vtkClientServerID nullID;
+    nullID.ID = 0;
+    stream 
+      << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
+      << nullID << vtkClientServerStream::End;
+    }
+  else
+    { 
+    stream 
+      << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
+      << input->GetVTKDataID() << vtkClientServerStream::End;
+    }
   pm->SendStreamToServer();
 }
 

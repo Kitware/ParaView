@@ -56,11 +56,9 @@ public:
   virtual void SetScalarVisibility(int val);
   virtual void ColorByArray(vtkPVColorMap *colorMap, int field);
 
-  //BTX
   // Description:
   // Connect the VTK data object to the display pipeline.
-  virtual void ConnectToData(vtkClientServerID);
-  //ETX
+  virtual void SetInput(vtkPVPart* input);
 
   // Description:
   // This method updates the piece that has been assigned to this process.

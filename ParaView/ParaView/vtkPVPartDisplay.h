@@ -23,7 +23,7 @@
 #define __vtkPVPartDisplay_h
 
 
-#include "vtkObject.h"
+#include "vtkPVDisplay.h"
 
 #include "vtkClientServerID.h" // Needed for PropID ...
 
@@ -36,7 +36,7 @@ class vtkProperty;
 class vtkPVPart;
 class vtkPVColorMap;
 
-class VTK_EXPORT vtkPVPartDisplay : public vtkObject
+class VTK_EXPORT vtkPVPartDisplay : public vtkPVDisplay
 {
 public:
   static vtkPVPartDisplay* New();
@@ -73,11 +73,9 @@ public:
   virtual void SetPVApplication(vtkPVApplication *pvApp);
   vtkGetObjectMacro(PVApplication,vtkPVApplication);
 
-  //BTX
   // Description:
   // Connect the VTK data object to the display pipeline.
-  virtual void ConnectToData(vtkClientServerID );
-  //ETX
+  virtual void SetInput(vtkPVPart* input);
 
   // Description:
   // This method updates the piece that has been assigned to this process.

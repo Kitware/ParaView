@@ -19,6 +19,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkProp3D.h"
 #include "vtkPVApplication.h"
+#include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkPVRenderView.h"
@@ -34,7 +35,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositePartDisplay);
-vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.17");
+vtkCxxRevisionMacro(vtkPVCompositePartDisplay, "1.18");
 
 
 //----------------------------------------------------------------------------
@@ -77,16 +78,28 @@ vtkPVCompositePartDisplay::~vtkPVCompositePartDisplay()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCompositePartDisplay::ConnectToData(vtkClientServerID dataID)
+void vtkPVCompositePartDisplay::SetInput(vtkPVPart* input)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  // The input of course is the geometry filter.
-  pm->GetStream()
-    << vtkClientServerStream::Invoke
-    << this->GeometryID << "SetInput" << dataID
-    << vtkClientServerStream::End;
+  if (input == NULL)
+    {
+    vtkClientServerID nullID;
+    nullID.ID = 0;
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->GeometryID << "SetInput" << nullID
+      << vtkClientServerStream::End;
+    }
+  else
+    {  
+    // The input of course is the geometry filter.
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->GeometryID << "SetInput" << input->GetVTKDataID()
+      << vtkClientServerStream::End;
+    }
   pm->SendStreamToServer();
 }
 

@@ -33,6 +33,7 @@ class vtkRectilinearGrid;
 class vtkUnstructuredGrid;
 class vtkOutlineSource;
 class vtkMultiProcessController;
+class vtkCallbackCommand;
 
 class VTK_EXPORT vtkPVGeometryFilter : public vtkPolyDataSource
 {
@@ -105,7 +106,14 @@ protected:
 
   int CheckAttributes(vtkDataObject* input);
 
-private:
+  // Callback registered with the InternalProgressObserver.
+  static void InternalProgressCallbackFunction(vtkObject*, unsigned long,
+                                               void* clientdata, void*);
+  void InternalProgressCallback();
+  // The observer to report progress from the internal readers.
+  vtkCallbackCommand* InternalProgressObserver;
+
+  private:
   vtkPVGeometryFilter(const vtkPVGeometryFilter&); // Not implemented
   void operator=(const vtkPVGeometryFilter&); // Not implemented
 };

@@ -95,6 +95,7 @@ SET( ParaViewClient_SRCS
   vtkPVDataSetAttributesInformation.cxx
   vtkPVDataSetFileEntry.cxx
   vtkPVDataSetReaderModule.cxx
+  vtkPVDisplay.cxx
   vtkPVDummyWidget.cxx
   vtkPVEnSightReaderModule.cxx
   vtkPVErrorLogDisplay.cxx
@@ -143,6 +144,7 @@ SET( ParaViewClient_SRCS
   vtkPVPLOT3DReaderModule.cxx
   vtkPVPart.cxx
   vtkPVPartDisplay.cxx
+  vtkPVPlotDisplay.cxx
   vtkPVPointSourceWidget.cxx
   vtkPVPointWidget.cxx
   vtkPVProbe.cxx
@@ -240,6 +242,7 @@ SET_SOURCE_FILES_PROPERTIES(
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPV3DWidget
+  vtkPVDisplay
   vtkPVInformation
   vtkPVJoystickFly
   vtkPVObjectWidget

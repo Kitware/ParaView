@@ -28,6 +28,7 @@
 #include "vtkStructuredGrid.h"
 #include "vtkString.h"
 #include "vtkPVColorMap.h"
+#include "vtkPVPart.h"
 #include "vtkTimerLog.h"
 #include "vtkToolkits.h"
 #include "vtkFieldDataToAttributeDataFilter.h"
@@ -37,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.23");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.24");
 
 
 //----------------------------------------------------------------------------
@@ -121,7 +122,7 @@ void vtkPVPartDisplay::InvalidateGeometry()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPartDisplay::ConnectToData(vtkClientServerID dataID)
+void vtkPVPartDisplay::SetInput(vtkPVPart* input)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   if ( !pvApp )
@@ -131,9 +132,21 @@ void vtkPVPartDisplay::ConnectToData(vtkClientServerID dataID)
     }
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
-  stream 
-    << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
-    << dataID << vtkClientServerStream::End;
+
+  if (input == NULL)
+    {
+    vtkClientServerID nullID;
+    nullID.ID = 0;
+    stream 
+      << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
+      << nullID << vtkClientServerStream::End;
+    }
+  else
+    {
+    stream 
+      << vtkClientServerStream::Invoke << this->GeometryID <<  "SetInput" 
+      << input->GetVTKDataID() << vtkClientServerStream::End;
+    }
   pm->SendStreamToServer();
 }
 
