@@ -124,7 +124,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.536");
+vtkCxxRevisionMacro(vtkPVWindow, "1.537");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2474,7 +2474,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   *file << endl << "#Initialization" << endl;
 
   *file << endl << "vtkSMApplication app" << endl;
-  *file << "app Initialize args" << endl;
+  *file << "app Initialize" << endl;
 
   *file << endl << "vtkSMObject foo" << endl;
   *file << "set proxyManager [foo GetProxyManager]" << endl;
