@@ -31,9 +31,10 @@
 #include "vtkMultiProcessController.h"
 #include "vtkDoubleArray.h"
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.21");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.22");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
+//----------------------------------------------------------------------------
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
 {
   this->ReplaceActors = 1;
@@ -44,11 +45,13 @@ vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
   this->RemoteDisplay = 1;
 }
 
+//----------------------------------------------------------------------------
 vtkDesktopDeliveryClient::~vtkDesktopDeliveryClient()
 {
   this->SquirtBuffer->Delete();
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::SetUseCompositing(int v)
 {
   this->Superclass::SetUseCompositing(v);
@@ -59,8 +62,8 @@ void vtkDesktopDeliveryClient::SetUseCompositing(int v)
     }
 }
 
-void
-vtkDesktopDeliveryClient::SetController(vtkMultiProcessController *controller)
+//----------------------------------------------------------------------------
+void vtkDesktopDeliveryClient::SetController(vtkMultiProcessController *controller)
 {
   vtkDebugMacro("SetController");
 
@@ -79,6 +82,7 @@ vtkDesktopDeliveryClient::SetController(vtkMultiProcessController *controller)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::SetRenderWindow(vtkRenderWindow *renWin)
 {
   //Make sure the renWin has at least one renderer
@@ -96,6 +100,37 @@ void vtkDesktopDeliveryClient::SetRenderWindow(vtkRenderWindow *renWin)
   this->Superclass::SetRenderWindow(renWin);
 }
 
+//----------------------------------------------------------------------------
+// Called only on the client.
+float vtkDesktopDeliveryClient::GetZBufferValue(int x, int y)
+{
+  float z;
+  int pArg[3];
+
+  if (this->UseCompositing == 0)
+    {
+    // This could cause a problem between setting this ivar and rendering.
+    // We could always composite, and always consider client z.
+    float *pz;
+    pz = this->RenderWindow->GetZbufferData(x, y, x, y);
+    z = *pz;
+    delete [] pz;
+    return z;
+    }
+  
+  // TODO:
+  // This first int is to check for byte swapping.
+//  pArg[0] = 1;
+//  pArg[1] = x;
+//  pArg[2] = y;
+//  this->ClientController->TriggerRMI(1, (void*)pArg, sizeof(int)*3, 
+//                                vtkClientCompositeManager::GATHER_Z_RMI_TAG);
+//  this->ClientController->Receive(&z, 1, 1, vtkClientCompositeManager::CLIENT_Z_TAG);
+  z = 1.0;
+  return z;
+}
+
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::SendWindowInformation()
 {
   vtkDesktopDeliveryServer::SquirtOptions squirt_options;
@@ -108,13 +143,14 @@ void vtkDesktopDeliveryClient::SendWindowInformation()
              vtkDesktopDeliveryServer::SQUIRT_OPTIONS_TAG);
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::PreRenderProcessing()
 {
   // Get remote display flag
   this->Controller->Receive(&this->RemoteDisplay, 1, this->ServerProcessId,
-                vtkDesktopDeliveryServer::REMOTE_DISPLAY_TAG);
+                            vtkDesktopDeliveryServer::REMOTE_DISPLAY_TAG);
 
-  if ( ! this->RemoteDisplay)
+  if (!this->RemoteDisplay)
     {
     if (this->ImageReductionFactor > 1)
       {
@@ -132,6 +168,7 @@ void vtkDesktopDeliveryClient::PreRenderProcessing()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::PostRenderProcessing()
 {
   // Adjust render time for actual render on server.
@@ -154,8 +191,8 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
     this->ReducedImageSize[0] = ip.ImageSize[0];
     this->ReducedImageSize[1] = ip.ImageSize[1];
     this->ReducedImage->SetNumberOfComponents(ip.NumberOfComponents);
-    if (   (this->FullImageSize[0] == this->ReducedImageSize[0])
-        && (this->FullImageSize[1] == this->ReducedImageSize[1]) )
+    if ( this->FullImageSize[0] == this->ReducedImageSize[0]
+      && this->FullImageSize[1] == this->ReducedImageSize[1] )
       {
       this->FullImage->SetNumberOfComponents(ip.NumberOfComponents);
       this->FullImage->SetNumberOfTuples(  this->FullImageSize[0]
@@ -206,8 +243,9 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
   this->RemoteImageProcessingTime = tm.ImageProcessingTime;
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
-                            double bounds[6])
+                                                        double bounds[6])
 {
   this->Superclass::ComputeVisiblePropBounds(ren, bounds);
 
@@ -217,14 +255,8 @@ void vtkDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
 
     ren->GetActors()->RemoveAllItems();
 
-    // Convert doubles to float for vtkCubeSource
-    // Does anyone know why vtkCubeSource doesn't
-    // take doubles for SetBounds?
-    double fbounds[6];
-    for(int i=0;i<6;++i) fbounds[i]=bounds[i];
-
     vtkCubeSource* source = vtkCubeSource::New();
-    source->SetBounds(fbounds);
+    source->SetBounds(bounds);
 
     vtkPolyDataMapper* mapper = vtkPolyDataMapper::New();
     mapper->SetInput(source->GetOutput());
@@ -239,10 +271,10 @@ void vtkDesktopDeliveryClient::ComputeVisiblePropBounds(vtkRenderer *ren,
     }
 }
 
-void vtkDesktopDeliveryClient
-    ::SetImageReductionFactorForUpdateRate(double DesiredUpdateRate)
+//----------------------------------------------------------------------------
+void vtkDesktopDeliveryClient::SetImageReductionFactorForUpdateRate(double desiredUpdateRate)
 {
-  this->Superclass::SetImageReductionFactorForUpdateRate(DesiredUpdateRate);
+  this->Superclass::SetImageReductionFactorForUpdateRate(desiredUpdateRate);
   if (this->Squirt)
     {
     if (this->ImageReductionFactor == 1)
@@ -256,8 +288,9 @@ void vtkDesktopDeliveryClient
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::SquirtDecompress(vtkUnsignedCharArray *in,
-                        vtkUnsignedCharArray *out)
+                                                vtkUnsignedCharArray *out)
 {
   int count=0;
   int index=0;
@@ -266,14 +299,14 @@ void vtkDesktopDeliveryClient::SquirtDecompress(vtkUnsignedCharArray *in,
   unsigned int *_rawCompressedBuffer;
 
   // Get compressed buffer size
-  int CompSize = in->GetNumberOfTuples();
+  int compSize = in->GetNumberOfTuples();
 
   // Access raw arrays directly
   _rawColorBuffer = (unsigned int *)out->GetPointer(0);
   _rawCompressedBuffer = (unsigned int *)in->GetPointer(0);
 
   // Go through compress buffer and extract RLE format into color buffer
-  for(int i=0; i<CompSize; i++)
+  for(int i=0; i<compSize; i++)
     {
     // Get color and count
     current_color = _rawCompressedBuffer[i];
@@ -296,9 +329,10 @@ void vtkDesktopDeliveryClient::SquirtDecompress(vtkUnsignedCharArray *in,
 
   // Save out compression stats.
   vtkTimerLog::FormatAndMarkEvent("Squirt ratio: %f",
-                  (float)CompSize/(float)index);
+                  (float)compSize/(float)index);
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryClient::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -306,11 +340,11 @@ void vtkDesktopDeliveryClient::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ServerProcessId: " << this->ServerProcessId << endl;
 
   os << indent << "ReplaceActors: "
-     << (this->ReplaceActors ? "on" : "off") << endl;
+     << (this->ReplaceActors ? "On" : "Off") << endl;
   os << indent << "RemoteDisplay: "
-     << (this->RemoteDisplay ? "on" : "off") << endl;
+     << (this->RemoteDisplay ? "On" : "Off") << endl;
   os << indent << "Squirt: "
-     << (this->Squirt? "on" : "off") << endl;
+     << (this->Squirt? "On" : "Off") << endl;
 
   os << indent << "RemoteImageProcessingTime: "
      << this->RemoteImageProcessingTime << endl;

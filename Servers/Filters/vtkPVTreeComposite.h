@@ -183,5 +183,4 @@ private:
   void operator=(const vtkPVTreeComposite&); // Not implemented
 };
 
-// ifndef __vtkPVTreeComposite_h
 #endif

@@ -144,6 +144,5 @@ private:
   void operator=(const vtkDesktopDeliveryServer &);    //Not implemented
 };
 
-
-#endif //__vtkDesktopDeliveryServer_h
+#endif
 

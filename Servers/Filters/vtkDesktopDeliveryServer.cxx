@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notice for more information.
 #include "vtkTimerLog.h"
 #include "vtkLightCollection.h"
 #include "vtkCallbackCommand.h"
-#include "vtkVersion.h"
 #include "vtkMultiProcessController.h"
 
 static void SatelliteStartRender(vtkObject *caller,
@@ -41,9 +40,10 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                                        unsigned long vtkNotUsed(event),
                                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.16");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.17");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
+//----------------------------------------------------------------------------
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
 {
   this->ParallelRenderManager = NULL;
@@ -51,12 +51,14 @@ vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
   this->SquirtBuffer = vtkUnsignedCharArray::New();
 }
 
+//----------------------------------------------------------------------------
 vtkDesktopDeliveryServer::~vtkDesktopDeliveryServer()
 {
   this->SetParallelRenderManager(NULL);
   this->SquirtBuffer->Delete();
 }
 
+//----------------------------------------------------------------------------
 void
 vtkDesktopDeliveryServer::SetController(vtkMultiProcessController *controller)
 {
@@ -76,6 +78,7 @@ vtkDesktopDeliveryServer::SetController(vtkMultiProcessController *controller)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer
 ::SetParallelRenderManager(vtkParallelRenderManager *prm)
 {
@@ -182,6 +185,7 @@ void vtkDesktopDeliveryServer
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::SetRenderWindow(vtkRenderWindow *renWin)
 {
   this->Superclass::SetRenderWindow(renWin);
@@ -202,6 +206,7 @@ void vtkDesktopDeliveryServer::SetRenderWindow(vtkRenderWindow *renWin)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::SetRemoteDisplay(int flag)
 {
   vtkDebugMacro(<< this->GetClassName() << " (" << this
@@ -229,6 +234,7 @@ void vtkDesktopDeliveryServer::SetRemoteDisplay(int flag)
 }
 
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::ReceiveWindowInformation()
 {
   vtkDesktopDeliveryServer::SquirtOptions squirt_options;
@@ -241,6 +247,7 @@ void vtkDesktopDeliveryServer::ReceiveWindowInformation()
   this->SquirtCompressionLevel = squirt_options.CompressLevel;
 }  
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::PreRenderProcessing()
 {
   vtkDebugMacro("PreRenderProcessing");
@@ -281,6 +288,7 @@ void vtkDesktopDeliveryServer::PreRenderProcessing()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::PostRenderProcessing()
 {
   vtkDebugMacro("PostRenderProcessing");
@@ -311,7 +319,6 @@ void vtkDesktopDeliveryServer::PostRenderProcessing()
       this->Controller->Send(this->SquirtBuffer->GetPointer(0), ip.BufferSize,
                              this->RootProcessId,
                              vtkDesktopDeliveryServer::IMAGE_TAG);
-
       }
     else
       {
@@ -334,7 +341,7 @@ void vtkDesktopDeliveryServer::PostRenderProcessing()
                            vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
     }
 
-  // Send timing metics
+  // Send timing metrics
   vtkDesktopDeliveryServer::TimingMetrics tm;
   if (this->ParallelRenderManager)
     {
@@ -359,6 +366,7 @@ void vtkDesktopDeliveryServer::PostRenderProcessing()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::SetRenderWindowSize()
 {
   if (this->RemoteDisplay)
@@ -375,20 +383,21 @@ void vtkDesktopDeliveryServer::SetRenderWindowSize()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::ReadReducedImage()
 {
   if (this->ParallelRenderManager)
     {
     int *size = this->ParallelRenderManager->GetReducedImageSize();
-    if (   (this->ReducedImageSize[0] != size[0])
-           || (this->ReducedImageSize[1] != size[1]) )
+    if ( this->ReducedImageSize[0] != size[0]
+      || this->ReducedImageSize[1] != size[1] )
       {
       vtkDebugMacro(<< "Coupled parallel render manager reports unexpected reduced image size\n"
                     << "Expected size: " << this->ReducedImageSize[0] << " "
                     << this->ReducedImageSize[1] << "\n"
                     << "Reported size: " << size[0] << " " << size[1]);
-      if (   (this->ReducedImageSize[0] == this->FullImageSize[0])
-             && (this->ReducedImageSize[1] == this->FullImageSize[1]) )
+      if ( this->ReducedImageSize[0] == this->FullImageSize[0]
+        && this->ReducedImageSize[1] == this->FullImageSize[1] )
         {
         vtkWarningMacro(<< "The coupled render manager has apparently resized the window.\n"
                         << "Operation will still work normally, but the client may waste many cycles\n"
@@ -406,6 +415,7 @@ void vtkDesktopDeliveryServer::ReadReducedImage()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::LocalComputeVisiblePropBounds(vtkRenderer *ren,
                                                              double bounds[6])
 {
@@ -419,6 +429,7 @@ void vtkDesktopDeliveryServer::LocalComputeVisiblePropBounds(vtkRenderer *ren,
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::SquirtCompress(vtkUnsignedCharArray *in,
                                               vtkUnsignedCharArray *out)
 {
@@ -460,9 +471,8 @@ void vtkDesktopDeliveryServer::SquirtCompress(vtkUnsignedCharArray *in,
     index++;
 
     // Compute Run
-    while(   (   (current_color&compress_mask)
-                 == (_rawColorBuffer[index]&compress_mask))
-             && (index<end_index) && (count<255))
+    while(  (  (current_color & compress_mask) == (_rawColorBuffer[index] & compress_mask))
+            && (index < end_index) && (count < 255))
       {
       index++;
       count++;
@@ -480,6 +490,7 @@ void vtkDesktopDeliveryServer::SquirtCompress(vtkUnsignedCharArray *in,
   out->SetNumberOfTuples(comp_index);
 }
 
+//----------------------------------------------------------------------------
 void vtkDesktopDeliveryServer::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
@@ -491,6 +502,7 @@ void vtkDesktopDeliveryServer::PrintSelf(ostream& os, vtkIndent indent)
 }
 
 
+//----------------------------------------------------------------------------
 static void SatelliteStartRender(vtkObject *caller,
                                  unsigned long vtkNotUsed(event),
                                  void *clientData, void *)
@@ -503,6 +515,8 @@ static void SatelliteStartRender(vtkObject *caller,
     }
   self->SatelliteStartRender();
 }
+
+//----------------------------------------------------------------------------
 static void SatelliteEndRender(vtkObject *caller,
                                unsigned long vtkNotUsed(event),
                                void *clientData, void *)
@@ -516,6 +530,7 @@ static void SatelliteEndRender(vtkObject *caller,
   self->SatelliteEndRender();
 }
 
+//----------------------------------------------------------------------------
 static void SatelliteStartParallelRender(vtkObject *caller,
                                          unsigned long vtkNotUsed(event),
                                          void *clientData, void *)
@@ -528,6 +543,8 @@ static void SatelliteStartParallelRender(vtkObject *caller,
     }
   self->SatelliteStartRender();
 }
+
+//----------------------------------------------------------------------------
 static void SatelliteEndParallelRender(vtkObject *caller,
                                        unsigned long vtkNotUsed(event),
                                        void *clientData, void *)

@@ -94,8 +94,17 @@ public:
 
   // For ParaView
   void SetSquirtLevel (int l)
-  { if (l == 0) {this->SquirtOff();} else {
-    this->SquirtOn(); this->SetSquirtCompressionLevel(l-1);}}
+  { 
+    if (l == 0)
+      {
+      this->SquirtOff();
+      }
+    else
+      {
+      this->SquirtOn(); 
+      this->SetSquirtCompressionLevel(l-1);
+      }
+  }
 
   // Description:
   // Enables or disables SQUIRT compression for image delivery.  By
@@ -112,11 +121,12 @@ public:
   vtkGetMacro(SquirtCompressionLevel, int);
   vtkSetClampMacro(SquirtCompressionLevel, int, 0, 5);
 
-  virtual void SetImageReductionFactorForUpdateRate(double DesiredUpdateRate);
+  virtual void SetImageReductionFactorForUpdateRate(double desiredUpdateRate);
+  float GetZBufferValue(int x, int y);
 
 protected:
   vtkDesktopDeliveryClient();
-  virtual ~vtkDesktopDeliveryClient();
+  ~vtkDesktopDeliveryClient();
 
   virtual void PreRenderProcessing();
   virtual void PostRenderProcessing();
@@ -143,9 +153,8 @@ protected:
   
 private:
   vtkDesktopDeliveryClient(const vtkDesktopDeliveryClient &); //Not implemented
-  void operator=(const vtkDesktopDeliveryClient &);    //Not implemented
+  void operator=(const vtkDesktopDeliveryClient &); //Not implemented
 };
 
-
-#endif //__vtkDesktopDeliveryClient_h
+#endif
 
