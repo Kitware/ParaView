@@ -341,6 +341,7 @@
         update_self="1"
         information_property="Position1Info"
         default_values="0.81 0.25">
+        <DoubleRangeDomain name="range" min="0 0" max="1 1" />
       </DoubleVectorProperty>
       
       <DoubleVectorProperty
@@ -350,6 +351,7 @@
         update_self="1"
         information_property="Position2Info"
         default_values="0.13 0.5">
+        <DoubleRangeDomain name="range" min="0 0" max="1 1" />
       </DoubleVectorProperty>
       
       <StringVectorProperty
