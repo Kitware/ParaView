@@ -14,11 +14,13 @@
 =========================================================================*/
 #include "vtkPVConnectivityFilter.h"
 
+#include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPointData.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVConnectivityFilter, "1.5");
+vtkCxxRevisionMacro(vtkPVConnectivityFilter, "1.6");
 vtkStandardNewMacro(vtkPVConnectivityFilter);
 
 vtkPVConnectivityFilter::vtkPVConnectivityFilter()
@@ -27,17 +29,25 @@ vtkPVConnectivityFilter::vtkPVConnectivityFilter()
   this->ColorRegions = 1;
 }
 
-void vtkPVConnectivityFilter::Execute()
+int vtkPVConnectivityFilter::RequestData(
+  vtkInformation *request,
+  vtkInformationVector **inputVector,
+  vtkInformationVector *outputVector)
 {
-  this->Superclass::Execute();
+  int retVal =
+    this->Superclass::RequestData(request, inputVector, outputVector);
+  vtkInformation *outInfo = outputVector->GetInformationObject(0);
+  vtkUnstructuredGrid *output = vtkUnstructuredGrid::SafeDownCast(
+    outInfo->Get(vtkDataObject::DATA_OBJECT()));
   if (this->ColorRegions)
     {
-    vtkDataArray* scalars = this->GetOutput()->GetPointData()->GetScalars();
+    vtkDataArray* scalars = output->GetPointData()->GetScalars();
     if (scalars)
       {
       scalars->SetName("RegionId");
       }
     }
+  return retVal;
 }
 
 void vtkPVConnectivityFilter::PrintSelf(ostream& os, vtkIndent indent)

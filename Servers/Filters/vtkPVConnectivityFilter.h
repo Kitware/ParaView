@@ -36,7 +36,7 @@ protected:
   vtkPVConnectivityFilter();
   ~vtkPVConnectivityFilter() {};
 
-  void Execute();
+  virtual int RequestData(vtkInformation *, vtkInformationVector **, vtkInformationVector *);
   
 private:
   vtkPVConnectivityFilter(const vtkPVConnectivityFilter&);  // Not implemented
