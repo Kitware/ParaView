@@ -73,9 +73,9 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
   sscanf( this->Application->GetMainInterp()->result, "%d %d %d",
 	  &r, &g, &b );
   
-  r = (static_cast<float>(r) / 65535.0)*255.0;
-  g = (static_cast<float>(g) / 65535.0)*255.0;
-  b = (static_cast<float>(b) / 65535.0)*255.0;
+  r = static_cast<int>((static_cast<float>(r) / 65535.0)*255.0);
+  g = static_cast<int>((static_cast<float>(g) / 65535.0)*255.0);
+  b = static_cast<int>((static_cast<float>(b) / 65535.0)*255.0);
   this->Script("image create photo -height %d -width %d", width, height);
   this->SetImageDataLabel(this->Application->GetMainInterp()->result);
   Tk_PhotoHandle photo;
@@ -100,9 +100,9 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
     {
     float alpha = static_cast<float>(*(dd+3)) / 255.0;
 
-    *(pp)   = r*(1-alpha) + *(dd) * alpha;
-    *(pp+1) = r*(1-alpha) + *(dd+1) * alpha;
-    *(pp+2) = r*(1-alpha) + *(dd+2) * alpha;
+    *(pp)   = static_cast<int>(r*(1-alpha) + *(dd) * alpha);
+    *(pp+1) = static_cast<int>(r*(1-alpha) + *(dd+1) * alpha);
+    *(pp+2) = static_cast<int>(r*(1-alpha) + *(dd+2) * alpha);
     *(pp+3) = *(dd+3);
 
     pp+=4;
