@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.37");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVTreeComposite, RenderView, vtkPVRenderView);
 
@@ -335,6 +335,7 @@ vtkPVTreeComposite::vtkPVTreeComposite()
   this->Initialized = 0;
   
   this->UseChar = 1;
+  this->UseCompositing = 0;
 }
 
   
