@@ -485,9 +485,7 @@ void vtkKWCenterOfRotation::SetRenderView(vtkPVRenderView *view)
 void vtkKWCenterOfRotation::ResetCenterActorSize()
 {
   vtkActorCollection *actors;
-  vtkActor *a;
-  float bounds[6], *temp;
-  int idx;
+  float bounds[6];
   vtkRenderer *ren;
 
   if (this->RenderView == NULL)
@@ -504,7 +502,17 @@ void vtkKWCenterOfRotation::ResetCenterActorSize()
   actors = ren->GetActors();
   actors->InitTraversal();
 
+  int centerVisibility=0;
+  if (this->CenterActor->GetVisibility())
+    {
+    centerVisibility=1;
+    this->CenterActor->VisibilityOff();
+    }
   this->RenderView->ComputeVisiblePropBounds(bounds);
+  if (centerVisibility)
+    {
+    this->CenterActor->VisibilityOn();
+    }
   if (bounds[0] < bounds[1])
     {
     this->CenterActor->SetScale(0.25 * (bounds[1]-bounds[0]), 
