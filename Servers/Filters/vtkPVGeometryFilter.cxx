@@ -38,7 +38,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.32");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.33");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -288,15 +288,65 @@ void vtkPVGeometryFilter::HierarchicalBoxExecute(vtkHierarchicalBoxDataSet *inpu
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::DataSetExecute(vtkDataSet *input)
 {
-  vtkOutlineSource* outline = vtkOutlineSource::New();
   vtkPolyData *output = this->GetOutput();
 
-  outline->SetBounds(input->GetBounds());
-  outline->Update();
+  double bds[6];
+  int procid = 0;
+  int numProcs = 1;
 
-  output->SetPoints(outline->GetOutput()->GetPoints());
-  output->SetLines(outline->GetOutput()->GetLines());
-  outline->Delete();
+  if (this->Controller )
+    {
+    procid = this->Controller->GetLocalProcessId();
+    numProcs = this->Controller->GetNumberOfProcesses();
+    }
+
+  input->GetBounds(bds);
+
+  if ( procid )
+    {
+    // Satellite node
+    this->Controller->Send(bds, 6, 0, 792390);
+    }
+  else
+    {
+    int idx;
+    double tmp[6];
+
+    for (idx = 1; idx < numProcs; ++idx)
+      {
+      this->Controller->Receive(tmp, 6, idx, 792390);
+      if (tmp[0] < bds[0])
+        {
+        bds[0] = tmp[0];
+        }
+      if (tmp[1] > bds[1])
+        {
+        bds[1] = tmp[1];
+        }
+      if (tmp[2] < bds[2])
+        {
+        bds[2] = tmp[2];
+        }
+      if (tmp[3] > bds[3])
+        {
+        bds[3] = tmp[3];
+        }
+      if (tmp[4] < bds[4])
+        {
+        bds[4] = tmp[4];
+        }
+      if (tmp[5] > bds[5])
+        {
+        bds[5] = tmp[5];
+        }
+      }
+    // only output in process 0.
+    this->OutlineSource->SetBounds(bds);
+    this->OutlineSource->Update();
+    
+    output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
+    output->SetLines(this->OutlineSource->GetOutput()->GetLines());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -451,63 +501,7 @@ void vtkPVGeometryFilter::UnstructuredGridExecute(vtkUnstructuredGrid* input)
   
   this->OutlineFlag = 1;
 
-  double bds[6];
-  int procid = 0;
-  int numProcs = 1;
-
-  if (this->Controller )
-    {
-    procid = this->Controller->GetLocalProcessId();
-    numProcs = this->Controller->GetNumberOfProcesses();
-    }
-
-  input->GetBounds(bds);
-
-  if ( procid )
-    {
-    // Satellite node
-    this->Controller->Send(bds, 6, 0, 792390);
-    }
-  else
-    {
-    int idx;
-    double tmp[6];
-
-    for (idx = 1; idx < numProcs; ++idx)
-      {
-      this->Controller->Receive(tmp, 6, idx, 792390);
-      if (tmp[0] < bds[0])
-        {
-        bds[0] = tmp[0];
-        }
-      if (tmp[1] > bds[1])
-        {
-        bds[1] = tmp[1];
-        }
-      if (tmp[2] < bds[2])
-        {
-        bds[2] = tmp[2];
-        }
-      if (tmp[3] > bds[3])
-        {
-        bds[3] = tmp[3];
-        }
-      if (tmp[4] < bds[4])
-        {
-        bds[4] = tmp[4];
-        }
-      if (tmp[5] > bds[5])
-        {
-        bds[5] = tmp[5];
-        }
-      }
-    // only output in process 0.
-    this->OutlineSource->SetBounds(bds);
-    this->OutlineSource->Update();
-    
-    output->SetPoints(this->OutlineSource->GetOutput()->GetPoints());
-    output->SetLines(this->OutlineSource->GetOutput()->GetLines());
-    }
+  this->DataSetExecute(input);
 }
 
 //----------------------------------------------------------------------------
@@ -541,16 +535,7 @@ void vtkPVGeometryFilter::PolyDataExecute(vtkPolyData *input)
     }
   
   this->OutlineFlag = 1;
-  double bounds[6];
-  input->GetBounds(bounds);
-  
-  vtkOutlineSource *outline = vtkOutlineSource::New();
-  outline->SetBounds(bounds);
-  outline->Update();
-  
-  out->SetPoints(outline->GetOutput()->GetPoints());
-  out->SetLines(outline->GetOutput()->GetLines());
-  outline->Delete();
+  this->DataSetExecute(input);
 }
 
 //----------------------------------------------------------------------------
