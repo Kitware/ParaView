@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataSetReaderModule);
-vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8.2.1");
+vtkCxxRevisionMacro(vtkPVDataSetReaderModule, "1.8.2.2");
 
 int vtkPVDataSetReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -125,7 +125,7 @@ int vtkPVDataSetReaderModule::ReadFile(const char* fname,
   const char* desc = this->RemovePath(fname);
   if (desc)
     {
-    pvs->SetDescriptionNoTrace(desc);
+    pvs->SetLabelNoTrace(desc);
     }
   pvApp->BroadcastScript("%s SetFileName %s", tclName, fname);
   
