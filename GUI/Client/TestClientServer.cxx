@@ -111,10 +111,12 @@ int main(int argc, char* argv[])
   vtkstd::vector<vtkstd::string> mpiFlags;
   vtkstd::vector<vtkstd::string> mpiPostFlags;
   vtkstd::string mpiNumProcFlag;
-  int serverNumProc = 1;
-  int renderNumProc = 1;
+  vtkstd::string serverNumProcess;
+  vtkstd::string renderServerNumProcess;
 #ifdef VTK_MPIRUN_EXE
   mpiRun = VTK_MPIRUN_EXE;
+  int serverNumProc = 1;
+  int renderNumProc = 1;
 
 #ifdef VTK_MPI_MAX_NUMPROCS
   serverNumProc = VTK_MPI_MAX_NUMPROCS;
@@ -134,9 +136,9 @@ int main(int argc, char* argv[])
 # endif  
   char buf[1024];
   sprintf(buf, "%d", serverNumProc);
-  vtkstd::string serverNumProcess = buf;
-   sprintf(buf, "%d", renderNumProc);
-  vtkstd::string renderServerNumProcess = buf;
+  serverNumProcess = buf;
+  sprintf(buf, "%d", renderNumProc);
+  renderServerNumProcess = buf;
 #endif
   // Allocate process managers.
   kwsysProcess* renderServer = 0;
