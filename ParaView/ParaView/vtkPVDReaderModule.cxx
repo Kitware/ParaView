@@ -45,11 +45,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVRenderView.h"
 #include "vtkPVScale.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.1.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -141,5 +142,35 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
   else
     {
     return this->vtkPVReaderModule::ReadFileInformation(fname);
+    }
+}
+
+//----------------------------------------------------------------------------
+int vtkPVDReaderModule::GetNumberOfTimeSteps()
+{
+  if(this->HaveTime)
+    {
+    return static_cast<int>(this->TimeScale->GetRangeMax() -
+                            this->TimeScale->GetRangeMin())+1;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVDReaderModule::SetRequestedTimeStep(int step)
+{
+  if(this->HaveTime)
+    {
+    this->TimeScale->SetValue(step + this->TimeScale->GetRangeMin());
+    this->AcceptCallback();
+    this->GetPVApplication()->GetMainView()->EventuallyRender();
+    this->Script("update");
+    }
+  else
+    {
+    vtkErrorMacro("Cannot call SetRequestedTimeStep with no time steps.");
     }
 }

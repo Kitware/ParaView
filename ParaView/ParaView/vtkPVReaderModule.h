@@ -143,7 +143,20 @@ public:
   // Puts the file entry at the begining of the list for batch files.
   // The file name has to be set before array selection.
   void AddPVFileEntry(vtkPVFileEntry *pvw);
-
+  
+  // Description:
+  // Get the number of time steps that can be provided by this reader.
+  // Timesteps are available either from an animation file or from a
+  // time-series of files as detected by the file entry widget.
+  // Returns 0 if time steps are not available, and the number of
+  // timesteps otherwise.
+  virtual int GetNumberOfTimeSteps();
+  
+  // Description:
+  // Set the time step that should be provided by the reader.  This
+  // value is ignored unless GetNumberOfTimeSteps returns 1 or more.
+  virtual void SetRequestedTimeStep(int);
+  
 protected:
   vtkPVReaderModule();
   ~vtkPVReaderModule();
