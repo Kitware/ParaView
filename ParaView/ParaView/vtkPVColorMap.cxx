@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.30");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.31");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1595,7 +1595,7 @@ void vtkPVColorMap::UpdateScalarBarTitle()
     {
     ostrstream ostr;
     ostr << this->ScalarBarTitle << " " 
-         << this->VectorComponentTitles[this->VectorComponent];
+         << this->VectorComponentTitles[this->VectorComponent] << ends;
     this->ScalarBar->GetScalarBarActor()->SetTitle(ostr.str());
     this->ScalarBarVectorTitleEntry->SetValue(
                         this->VectorComponentTitles[this->VectorComponent]);
