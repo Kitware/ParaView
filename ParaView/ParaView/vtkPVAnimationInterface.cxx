@@ -125,7 +125,7 @@ static unsigned char image_goto_end[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.7");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.8");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -527,8 +527,8 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeScale->DisplayEntry();
   this->TimeScale->DisplayEntryAndLabelOnTopOff();
   this->TimeScale->DisplayLabel("Time:");
-  this->TimeScale->SetEndCommand(this, "CurrentTimeCallback");
-  this->TimeScale->SetEntryCommand(this, "CurrentTimeCallback");
+  this->TimeScale->SetEndCommand(this, "TimeScaleCallback");
+  this->TimeScale->SetEntryCommand(this, "TimeScaleCallback");
 
   this->Script("pack %s -side top -expand t -fill x", 
                this->TimeScale->GetWidgetName());
@@ -547,11 +547,27 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeStartEntry->SetLabel("Start:");
   this->TimeStartEntry->SetValue(this->TimeStart, 2);
 
+  this->Script("bind %s <KeyPress-Return> {%s TimeStartEntryCallback}",
+               this->TimeStartEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+
+  this->Script("bind %s <FocusOut> {%s TimeStartEntryCallback}",
+               this->TimeStartEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+
   this->TimeStepEntry->SetParent(this->TimeFrame);
   this->TimeStepEntry->Create(this->Application);
   this->TimeStepEntry->GetEntry()->SetWidth(6);
   this->TimeStepEntry->SetLabel("Step:");
   this->TimeStepEntry->SetValue(this->TimeStep, 2);
+
+  this->Script("bind %s <KeyPress-Return> {%s TimeStepEntryCallback}",
+               this->TimeStepEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+
+  this->Script("bind %s <FocusOut> {%s TimeStepEntryCallback}",
+               this->TimeStepEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
 
   this->TimeEndEntry->SetParent(this->TimeFrame);
   this->TimeEndEntry->Create(this->Application);
@@ -559,36 +575,18 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
   this->TimeEndEntry->SetLabel("End:");
   this->TimeEndEntry->SetValue(this->TimeEnd, 2);
 
+  this->Script("bind %s <KeyPress-Return> {%s TimeEndEntryCallback}",
+               this->TimeEndEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+
+  this->Script("bind %s <FocusOut> {%s TimeEndEntryCallback}",
+               this->TimeEndEntry->GetEntry()->GetWidgetName(),
+               this->GetTclName());
+
   this->Script("pack %s %s %s -side left -expand t -fill x", 
                this->TimeStartEntry->GetWidgetName(),
                this->TimeStepEntry->GetWidgetName(),
                this->TimeEndEntry->GetWidgetName());
-
-  // Animation Control: Setup call backs that change the animation pararmeters.
-
-  this->Script("bind %s <KeyPress-Return> {%s EntryCallback}",
-               this->TimeStartEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("bind %s <FocusOut> {%s EntryCallback}",
-               this->TimeStartEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("bind %s <KeyPress-Return> {%s EntryCallback}",
-               this->TimeStepEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("bind %s <FocusOut> {%s EntryCallback}",
-               this->TimeStepEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("bind %s <KeyPress-Return> {%s EntryCallback}",
-               this->TimeEndEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
-
-  this->Script("bind %s <FocusOut> {%s EntryCallback}",
-               this->TimeEndEntry->GetEntry()->GetWidgetName(),
-               this->GetTclName());
 
   // Action frame
 
@@ -689,51 +687,116 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 
   this->UpdateSourceMenu();
   this->UpdateMethodMenu();
-  this->UpdateButtonsStatus();
+  this->UpdateInterface();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimationInterface::UpdateButtonsStatus()
+void vtkPVAnimationInterface::UpdateInterface()
 {
-  if (this->InPlay)
+  if (this->PlayButton && this->PlayButton->IsCreated())
     {
-    if (this->PlayButton->GetApplication())
+    if (this->InPlay)
       {
       this->PlayButton->Disable();
       }
-    if (this->StopButton->GetApplication())
-      {
-      this->StopButton->Enable();
-      }
-    if (this->GoToBeginningButton->GetApplication())
-      {
-      this->GoToBeginningButton->Disable();
-      }
-    if (this->GoToEndButton->GetApplication())
-      {
-      this->GoToEndButton->Disable();
-      }
-    }
-  else
-    {
-    if (this->PlayButton->GetApplication())
+    else
       {
       this->PlayButton->Enable();
       }
-    if (this->StopButton->GetApplication())
+    }
+
+  if (this->StopButton && this->StopButton->IsCreated())
+    {
+    if (this->InPlay)
+      {
+      this->StopButton->Enable();
+      }
+    else
       {
       this->StopButton->Disable();
       }
-    if (this->GoToBeginningButton->GetApplication())
+    }
+
+  if (this->GoToBeginningButton && this->GoToBeginningButton->IsCreated())
+    {
+    if (this->InPlay)
+      {
+      this->GoToBeginningButton->Disable();
+      }
+    else
       {
       this->GoToBeginningButton->Enable();
       }
-    if (this->GoToEndButton->GetApplication())
+    }
+
+  if (this->GoToEndButton && this->GoToEndButton->IsCreated())
+    {
+    if (this->InPlay)
+      {
+      this->GoToEndButton->Disable();
+      }
+    else
       {
       this->GoToEndButton->Enable();
       }
     }
-  if (this->LoopCheckButton->GetApplication())
+
+  if (this->TimeStartEntry && this->TimeStartEntry->IsCreated())
+    {
+    this->TimeStartEntry->SetValue(this->TimeStart, 2);
+    if (this->InPlay)
+      {
+      this->TimeStartEntry->EnabledOff();
+      }
+    else
+      {
+      this->TimeStartEntry->EnabledOn();
+      }
+    }
+
+  if (this->TimeEndEntry && this->TimeEndEntry->IsCreated())
+    {
+    this->TimeEndEntry->SetValue(this->TimeEnd, 2);
+    if (this->InPlay)
+      {
+      this->TimeEndEntry->EnabledOff();
+      }
+    else
+      {
+      this->TimeEndEntry->EnabledOn();
+      }
+    }
+
+  if (this->TimeStepEntry && this->TimeStepEntry->IsCreated())
+    {
+    this->TimeStepEntry->SetValue(this->TimeStep, 2);
+    if (this->InPlay)
+      {
+      this->TimeStepEntry->EnabledOff();
+      }
+    else
+      {
+      this->TimeStepEntry->EnabledOn();
+      }
+    }
+
+  if (this->TimeScale && this->TimeScale->IsCreated())
+    {
+    this->TimeScale->SetRange(this->TimeStart, this->TimeEnd);
+    this->TimeScale->SetResolution(this->TimeStep);
+    if (this->InPlay)
+      {
+      // We do not disable it so that the slider will still be updated
+      // during "Play"
+      this->TimeScale->UnBind();
+      }
+    else
+      {
+      this->TimeScale->Bind();
+      }
+    }
+
+  if (this->LoopCheckButton && this->LoopCheckButton->IsCreated())
     {
     this->LoopCheckButton->SetState(this->Loop);
     }
@@ -742,104 +805,119 @@ void vtkPVAnimationInterface::UpdateButtonsStatus()
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetTimeStart(float t)
 {
+  if (this->TimeStart == t)
+    {
+    return;
+    }
   this->TimeStart = t;
+  this->Modified();
 
-  if (this->Application)
+  if (this->TimeStartEntry->IsCreated())
     {
     this->TimeStartEntry->SetValue(this->TimeStart, 2);
     }
 
+  if (this->TimeScale->IsCreated())
+    {
+    this->TimeScale->SetRange(this->TimeStart, this->TimeEnd);
+    }
+
+  this->AddTraceEntry("$kw(%s) SetTimeStart {%f}", 
+                      this->GetTclName(), this->TimeStart);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::TimeStartEntryCallback()
+{
+  this->SetTimeStart(this->TimeStartEntry->GetValueAsFloat());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetTimeEnd(float t)
 {
+  if (this->TimeEnd == t)
+    {
+    return;
+    }
   this->TimeEnd = t;
+  this->Modified();
 
-  if (this->Application)
+  if (this->TimeEndEntry->IsCreated())
     {
     this->TimeEndEntry->SetValue(this->TimeEnd, 2);
     }
 
+  if (this->TimeScale->IsCreated())
+    {
+    this->TimeScale->SetRange(this->TimeStart, this->TimeEnd);
+    }
+
+  this->AddTraceEntry("$kw(%s) SetTimeEnd {%f}", 
+                      this->GetTclName(), this->TimeEnd);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::TimeEndEntryCallback()
+{
+  this->SetTimeEnd(this->TimeEndEntry->GetValueAsFloat());
 }
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetTimeStep(float t)
 {
+  if (this->TimeStep == t)
+    {
+    return;
+    }
   this->TimeStep = t;
+  this->Modified();
 
-  if (this->Application)
+  if (this->TimeStepEntry->IsCreated())
     {
     this->TimeStepEntry->SetValue(this->TimeStep, 2);
     }
 
+  if (this->TimeScale->IsCreated())
+    {
+    this->TimeScale->SetResolution(this->TimeStep);
+    }
+
+  this->AddTraceEntry("$kw(%s) SetTimeStep {%f}", 
+                      this->GetTclName(), this->TimeStep);
 }
 
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::TimeStepEntryCallback()
+{
+  this->SetTimeStep(this->TimeStepEntry->GetValueAsFloat());
+}
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::EntryCallback()
 {
-  this->TimeStart = this->TimeStartEntry->GetValueAsFloat();
-  this->TimeEnd = this->TimeEndEntry->GetValueAsFloat();
-  this->TimeStep = this->TimeStepEntry->GetValueAsFloat();
-
-  this->TimeScale->SetRange(this->TimeStart, this->TimeEnd);
-  this->TimeScale->SetResolution(this->TimeStep);
-
-  this->AddTraceEntry("$kw(%s) SetTimeStart {%f}", this->GetTclName(), 
-                      this->TimeStart);
-  this->AddTraceEntry("$kw(%s) SetTimeEnd {%f}", this->GetTclName(), 
-                      this->TimeEnd);
-  this->AddTraceEntry("$kw(%s) SetTimeStep {%f}", this->GetTclName(), 
-                      this->TimeStep);
-  this->AddTraceEntry("$kw(%s) EntryCallback", this->GetTclName());
+  this->TimeStartEntryCallback();
+  this->TimeEndEntryCallback();
+  this->TimeStepEntryCallback();
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimationInterface::EntryUpdate()
+void vtkPVAnimationInterface::SetLoop(int v)
 {
-  this->TimeStartEntry->SetValue(this->TimeStart, 2);
-  this->TimeEndEntry->SetValue(this->TimeEnd, 2);
-  this->TimeStepEntry->SetValue(this->TimeStep, 2);
-
-  this->TimeScale->SetRange(this->TimeStart, this->TimeEnd);
-  this->TimeScale->SetResolution(this->TimeStep);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVAnimationInterface::CurrentTimeCallback()
-{
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
-  if (pvApp)
+  if (this->Loop == v)
     {
-    pvApp->BroadcastScript("set pvTime %f", this->GetCurrentTime());
-    pvApp->BroadcastScript("catch {%s}", this->ScriptEditor->GetValue());
-    if (this->ControlledWidget)
-      {
-      this->ControlledWidget->ModifiedCallback();
-      this->ControlledWidget->Reset();
-      }
-    if (this->View)
-      {
-      this->View->Render();
-      }
-    this->AddTraceEntry("$kw(%s) SetCurrentTime %f", this->GetTclName(),
-                        this->GetCurrentTime());
-    this->AddTraceEntry("$kw(%s) CurrentTimeCallback", this->GetTclName());
-    if (this->Window && this->Window->GetMainView())
-      {
-      this->AddTraceEntry("$kw(%s) ResetCameraClippingRange", 
-                          this->Window->GetMainView()->GetTclName());
-      }
-
-    this->AddTraceEntry("update");
+    return;
     }
+  this->Loop = v;
+  this->Modified();
+
+  this->AddTraceEntry("$kw(%s) SetLoop %d", \
+                      this->GetTclName(), this->GetLoop());
 }
 
 //----------------------------------------------------------------------------
-float vtkPVAnimationInterface::GetCurrentTime()
+void vtkPVAnimationInterface::LoopCheckButtonCallback()
 {
-  return this->TimeScale->GetValue();
+  this->SetLoop(this->LoopCheckButton->GetState());
 }
 
 //----------------------------------------------------------------------------
@@ -911,36 +989,88 @@ void vtkPVAnimationInterface::SetPVSource(vtkPVSource *source)
 }
 
 //----------------------------------------------------------------------------
+float vtkPVAnimationInterface::GetCurrentTime()
+{
+  return this->TimeScale->GetValue();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetCurrentTime(float time)
 {  
   this->TimeScale->SetValue(time);
-  // Will the scale make the call back or should we?
+
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  if (pvApp)
+    {
+    pvApp->BroadcastScript("set pvTime %f", this->GetCurrentTime());
+    pvApp->BroadcastScript("catch {%s}", this->ScriptEditor->GetValue());
+
+    if (this->ControlledWidget)
+      {
+      this->ControlledWidget->ModifiedCallback();
+      this->ControlledWidget->Reset();
+      }
+
+    if (this->View)
+      {
+      this->View->EventuallyRender();
+      }
+
+    this->AddTraceEntry("$kw(%s) SetCurrentTime %f", 
+                        this->GetTclName(), this->GetCurrentTime());
+
+    // Allow the application GUI to be refreshed (ex: in a trace file)
+
+    this->Script("update");
+    }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::TimeScaleCallback()
+{
+  this->SetCurrentTime(this->TimeScale->GetValue());
+}
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::Play()
 {  
-  float t, sgn;
+  // If playing, do not do anything
 
   if (this->InPlay)
     {
     return;
     }
   this->InPlay = 1;
-  this->UpdateButtonsStatus();
 
   // Make sure we have the up to date entries for end and step.
+
   this->EntryCallback();
 
-  //this->AddTraceEntry("$kw(%s) Play", this->GetTclName());
+  // Update the buttons according to the play status
+
+  this->UpdateInterface();
 
   // We need a different end test if the step is negative.
+
+  float t, sgn;
   sgn = 1.0;
   if (this->TimeStep < 0)
     {
     sgn = -1.0;
     }
+
+  // NOTE: the object registers itself for the following reason. The call
+  // to "update" in the loop below (through SetCurrentTime()) enables the
+  // user to exit the application. 
+  // In that case all objects, including this one, are deleted, and this 
+  // object's ivars will be trashed, resulting in a crash.
+  // To prevent this object from being deleted, it registers itself before
+  // the loop, and unregisters itself after the loop. If objects deletion
+  // were scheduled, they will happen When UnRegister() is called.
+  // Of course, the loop has to end, so the parent of this object should
+  // make a call to Stop() before deleting it.
+
+  this->Register(this);
 
   this->StopFlag = 0;
   do
@@ -949,7 +1079,6 @@ void vtkPVAnimationInterface::Play()
     if (t >= this->GetTimeEnd())
       {
       this->SetCurrentTime(this->GetTimeStart());
-      this->CurrentTimeCallback();
       t = this->GetCurrentTime();
       }
     while ((sgn*t) < (sgn*this->TimeEnd) && !this->StopFlag)
@@ -960,14 +1089,16 @@ void vtkPVAnimationInterface::Play()
         t = this->TimeEnd;
         }
       this->SetCurrentTime(t);
-      this->CurrentTimeCallback();
-      // Allow the stop button to do its thing.
-      this->Script("update");
+      // The stop button can be used here because SetCurrentTime()
+      // makes a call to "update"
       }
     } while (this->Loop && !this->StopFlag);
 
   this->InPlay = 0;
-  this->UpdateButtonsStatus();
+  this->StopFlag = 0;
+  this->UpdateInterface();
+
+  this->UnRegister(this);
 }
 
 //----------------------------------------------------------------------------
@@ -977,41 +1108,15 @@ void vtkPVAnimationInterface::Stop()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVAnimationInterface::LoopCheckButtonCallback()
-{
-  this->SetLoop(this->LoopCheckButton->GetState());
-}
-
-//----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SetLoop(int v)
-{
-  if (this->Loop == v)
-    {
-    return;
-    }
-  this->Loop = v;
-  this->Modified();
-
-  if (this->Application)
-    {
-    this->AddTraceEntry("$kw(%s) SetLoop %d", \
-                        this->GetTclName(), this->GetLoop());
-    this->UpdateButtonsStatus();
-    }
-}
-
-//----------------------------------------------------------------------------
 void vtkPVAnimationInterface::GoToBeginning()
 {  
   this->SetCurrentTime(this->GetTimeStart());
-  this->CurrentTimeCallback();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::GoToEnd()
 {  
   this->SetCurrentTime(this->GetTimeEnd());
-  this->CurrentTimeCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -1081,7 +1186,6 @@ void vtkPVAnimationInterface::SetLabelAndScript(const char* label,
     }
 }
 
-
 //----------------------------------------------------------------------------
 const char* vtkPVAnimationInterface::GetScript()
 {
@@ -1111,8 +1215,6 @@ void vtkPVAnimationInterface::UpdateMethodMenu()
     }
 }
 
-
-
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetWindow(vtkPVWindow *window)
 {
@@ -1124,7 +1226,6 @@ void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 {
   this->View = renderView;
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveInTclScript(ofstream *file, 
