@@ -131,7 +131,7 @@ vtkPVApplication::vtkPVApplication()
   this->Log = NULL;
   this->LogFileName = NULL;
 
-
+  this->ExitStatus = 0;
   // For some reason "GetObjectFromPointer" is returning vtkTemp0 instead
   /// of Application.  Lets force it.
   //if (this->TclName != NULL)
@@ -330,6 +330,9 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->CreateButtonPhotos();
   ui->Create(this,"");
+
+  // ui has ref. count of at least 1 because of AddItem() above
+  ui->Delete();
   
   if (argc > 1 && argv[1])
     {
@@ -348,7 +351,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     }
 
-  ui->Delete();
   this->vtkKWApplication::Start(argc,argv);
 }
 

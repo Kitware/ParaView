@@ -148,6 +148,15 @@ public:
   void CompleteArrays(vtkMapper *mapper, char *mapperTclName);
   void SendCompleteArrays(vtkMapper *mapper);
 
+
+  // Description:
+  // This value will be returned by ParaView at exit.
+  // Use this from scripts if you want ParaView exit with an
+  // error status (for example to indicate that a regression test 
+  // failed)
+  vtkSetMacro(ExitStatus, int);
+  vtkGetMacro(ExitStatus, int);
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
@@ -162,7 +171,9 @@ protected:
   void CreatePhoto(char *name, unsigned char *data, int width, int height);
   int CheckRegistration();
   int PromptRegistration(char *,char *);
-  
+
+  int ExitStatus;
+
   vtkMultiProcessController *Controller;
 };
 
