@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.31");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.32");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -135,14 +135,16 @@ void vtkPVMinMax::SetMaximumHelp(const char* help)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("PVScale already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(pvApp);
 
   // For getting the widget in a script.
+
   const char* label = this->MinLabel->GetLabel();
   if (label && label[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
@@ -151,10 +153,6 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
     this->SetTraceName(label);
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-
-
-  // create the top level
-  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
   this->MinFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x -expand t", 

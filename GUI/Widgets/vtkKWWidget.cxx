@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.102");
+vtkCxxRevisionMacro(vtkKWWidget, "1.103");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -169,7 +169,7 @@ int vtkKWWidget::Create(vtkKWApplication *app,
 
   if (!app)
     {
-    vtkErrorMacro("Can not create widget without application");
+    vtkErrorMacro("Can not create widget with NULL application. Make sure you did not SafeDowncast a vtkKWApplication to a more specific subclass.");
     return 0;
     }
 
@@ -463,7 +463,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.102 $");
+  this->ExtractRevision(os,"$Revision: 1.103 $");
 }
 
 //----------------------------------------------------------------------------

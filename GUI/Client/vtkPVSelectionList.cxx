@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.44");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.45");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -115,15 +115,13 @@ void vtkPVSelectionList::Disable()
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("Object has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
-
-  // create the top level
-  this->Script("frame %s", this->GetWidgetName());
 
   this->Label->SetParent(this);
   this->Label->Create(app, "-width 18 -justify right");

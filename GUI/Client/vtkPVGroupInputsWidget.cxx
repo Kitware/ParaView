@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.24");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -58,15 +58,13 @@ vtkPVGroupInputsWidget::~vtkPVGroupInputsWidget()
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("PVGroupInputsWidget already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
-
-  // create the top level
-  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
   this->PartSelectionList->SetParent(this);
   this->PartSelectionList->ScrollbarOff();

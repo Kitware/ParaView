@@ -23,7 +23,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVGhostLevelDialog );
-vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.6");
+vtkCxxRevisionMacro(vtkPVGhostLevelDialog, "1.7");
 
 int vtkPVGhostLevelDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -92,9 +92,9 @@ void vtkPVGhostLevelDialog::Create(vtkKWApplication *app, const char *args)
 
   this->ButtonFrame->Create(app, 0);
 
-  this->SelFrame1->Create(app, "-borderwidth 3 -relief flat");
-  this->SelFrame2->Create(app, "-borderwidth 3 -relief flat");
-  this->SelFrame3->Create(app, "-borderwidth 3 -relief flat");
+  this->SelFrame1->Create(app, "-bd 3 -relief flat");
+  this->SelFrame2->Create(app, "-bd 3 -relief flat");
+  this->SelFrame3->Create(app, "-bd 3 -relief flat");
 
   this->SelButton1->Create(app, "-text 0");
   this->SelButton1->SetCommand(this, "SetGhostLevel 0");
@@ -112,7 +112,7 @@ void vtkPVGhostLevelDialog::Create(vtkKWApplication *app, const char *args)
                             this->SelButton3->GetWidgetName());
 
   this->Separator->Create(app, 
-                          "-borderwidth 1 -height 3 -relief sunken");
+                          "-bd 1 -height 3 -relief sunken");
 
   this->Label->Create(app, "");
 

@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.328");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.329");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -576,20 +576,19 @@ void vtkPVRenderView::Close()
 //----------------------------------------------------------------------------
 void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0"))
     {
-    vtkErrorMacro("RenderView already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
 
-  char *local;
-  const char *wname;
-  
-  local = new char [strlen(args)+100];
+  this->ConfigureOptions(args);
 
   // Need to make sure it destructs right before this view does.
   // It's the whole TKRenderWidget destruction pain.
+
   if (this->RenderModule == NULL)
     {
     this->RenderModule = this->GetPVApplication()->GetRenderModule();
@@ -597,9 +596,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     }
 
   // Create the frames
-
-  wname = this->GetWidgetName();
-  this->Script("frame %s -bd 0 %s",wname,args);
 
   this->Frame->Create(app,"frame","-bd 3 -relief ridge");
   this->Script("pack %s -expand yes -fill both -side top -anchor nw",
@@ -665,6 +661,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
 
   // Add the -rw argument
 
+  char *local = new char [strlen(args)+100];
   sprintf(local,"%s -rw Addr=%p",args,this->GetRenderWindow());
   this->Script("vtkTkRenderWidget %s %s",
                this->VTKWidget->GetWidgetName(),local);

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.14");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.15");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -65,7 +65,8 @@ void vtkKWBoundsDisplay::Create(vtkKWApplication *app,
     return;
     }
 
-  this->vtkKWLabeledFrame::Create(app, 0);
+  this->Superclass::Create(app, 0);
+
   this->SetLabel("Bounds");
 
   this->XRangeLabel->SetParent(this->GetFrame());

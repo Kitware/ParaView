@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.7");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModuleUI, "1.8");
 
 int vtkPVIceTDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -98,17 +98,18 @@ void vtkPVIceTDisplayRenderModuleUI::SetRenderModule(vtkPVRenderModule* rm)
 //----------------------------------------------------------------------------
 void vtkPVIceTDisplayRenderModuleUI::Create(vtkKWApplication *app, const char *)
 {
-  vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
-  // Skip over LOD res and threshold.
-  int row = 4;
-  
   if (this->IsCreated())
     {
     vtkErrorMacro("RenderModuleUI already created");
     return;
     }
+
   this->Superclass::Create(app, NULL);
 
+  vtkPVApplication *pvapp = vtkPVApplication::SafeDownCast(app);
+  
+  // Skip over LOD res and threshold.
+  int row = 4;
 
   // Determines which reduction/subsampling factor to use.
   this->ReductionLabel->SetParent(this->LODScalesFrame);

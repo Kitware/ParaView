@@ -146,7 +146,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.20");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.21");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -192,15 +192,13 @@ void vtkPVXDMFParameters::CheckModifiedCallback()
 //----------------------------------------------------------------------------
 void vtkPVXDMFParameters::Create(vtkKWApplication *pvApp)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("XDMFParameters already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(pvApp);
-
-  // create the top level
-  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
   this->Frame = vtkKWLabeledFrame::New();
   this->Frame->SetParent(this);

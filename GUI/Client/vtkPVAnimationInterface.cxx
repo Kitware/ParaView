@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.130");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.131");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -402,26 +402,17 @@ vtkPVAnimationInterface::~vtkPVAnimationInterface()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *frameArgs)
+void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
 {  
-  if (this->IsCreated())
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", args))
     {
-    vtkErrorMacro("Widget has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-  if (pvApp == NULL)
-    {
-    vtkErrorMacro("Need the subclass vtkPVApplication to create this object.");
-    return;
-    }
-
-  this->SetApplication(app);
-
-  // Create the frame for this widget.
-
-  this->Script("frame %s %s", this->GetWidgetName(), frameArgs);
 
   this->TopFrame->SetParent(this);
   this->TopFrame->ScrollableOn();
@@ -1776,12 +1767,14 @@ vtkPVApplication* vtkPVAnimationInterface::GetPVApplication()
 vtkPVAnimationInterfaceEntry* vtkPVAnimationInterface::AddEmptySourceItem()
 {
   vtkPVAnimationInterfaceEntry* entry = vtkPVAnimationInterfaceEntry::New();
-  entry->SetApplication(this->GetApplication());
-  entry->SetParent(this);
   this->AnimationEntries->AddItem(entry);
+  int idx = this->AnimationEntries->GetNumberOfItems()-1;
+
+  // yes, this is ugly, but somebody added a second SetParent with a different
+  // signature, so they look the same, but both are needed.
+  entry->SetParent(this);
   entry->SetParent(this->AnimationEntryInformation->GetFrame());
   entry->SetTraceReferenceObject(this);
-  int idx = this->AnimationEntries->GetNumberOfItems()-1;
   entry->SetCurrentIndex(idx);
   entry->Create(this->GetPVApplication(), 0);
   this->UpdateEntries();

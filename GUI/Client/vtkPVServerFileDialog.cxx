@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.32");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.33");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -239,18 +239,15 @@ void vtkPVServerFileDialog::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
 {
-  if (this->IsCreated())
+  // Call the superclass to set the appropriate flags then create manually
+
+  if (!this->vtkKWWidget::Create(app, NULL, NULL))
     {
-    vtkErrorMacro("Server file dialog already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
- 
-  this->SetApplication(app);
 
-  const char *wname;
-  
-  // create the top level
-  wname = this->GetWidgetName();
+  const char *wname = this->GetWidgetName();
   if (this->MasterWindow)
     {
     this->Script("toplevel %s -class %s", 

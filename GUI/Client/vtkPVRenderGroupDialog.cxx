@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVRenderGroupDialog );
-vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.5");
+vtkCxxRevisionMacro(vtkPVRenderGroupDialog, "1.6");
 
 int vtkPVRenderGroupDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -136,22 +136,19 @@ void vtkPVRenderGroupDialog::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkPVRenderGroupDialog::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "toplevel", NULL))
     {
-    vtkErrorMacro("Interactor already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
   
-  this->SetApplication(app);
-  
-  const char *wname;
-  int idx;
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("toplevel %s", wname);
+  const char *wname = this->GetWidgetName();
   this->Script("wm title %s \"%s\"", wname, this->Title);
   this->Script("wm iconname %s \"vtk\"", wname);
+
+  int idx;
 
   if (this->MasterWindow)
     {

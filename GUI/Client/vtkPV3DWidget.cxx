@@ -33,7 +33,7 @@
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.52");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.53");
 
 //===========================================================================
 //***************************************************************************
@@ -100,23 +100,17 @@ vtkPV3DWidget::~vtkPV3DWidget()
 
 
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
+void vtkPV3DWidget::Create(vtkKWApplication *app)
 {
-  const char* wname;
-  
-  if (this->IsCreated())
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("3D Widget already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(kwApp);
-
-  this->SetApplication(pvApp);
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
 
   vtkKWWidget* parent = this;
 

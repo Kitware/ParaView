@@ -27,7 +27,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro( vtkPVPluginsDialog );
-vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.3");
+vtkCxxRevisionMacro(vtkPVPluginsDialog, "1.4");
 
 int vtkPVPluginsDialogCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -71,7 +71,11 @@ vtkPVPluginsDialog::~vtkPVPluginsDialog()
 //----------------------------------------------------------------------------
 void vtkPVPluginsDialog::Create(vtkKWApplication *app, const char *args)
 {
-  //  vtkRequire("app_exists",app!=NULL);
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("vtkPVPluginsDialog already created");
+    return;
+    }
 
   // Invoke super method
   this->Superclass::Create(app, args);

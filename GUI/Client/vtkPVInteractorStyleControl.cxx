@@ -41,7 +41,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.36");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.37");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -525,16 +525,13 @@ vtkPVInteractorStyleControl::GetManipulator(const char* name)
 //-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("ScrollableFrame already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
-
-  const char *wname;
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat",wname);
   
   this->LabeledFrame->ShowHideFrameOn();
   this->LabeledFrame->Create(app, 0);

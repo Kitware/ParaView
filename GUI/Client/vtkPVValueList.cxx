@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.15");
+vtkCxxRevisionMacro(vtkPVValueList, "1.16");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -147,16 +147,14 @@ void vtkPVValueList::SetLabel(const char* str)
 //-----------------------------------------------------------------------------
 void vtkPVValueList::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("Object has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
 
-  // create the top level
-  this->Script("frame %s", this->GetWidgetName());
-  
   this->ContourValuesFrame->SetParent(this); 
   this->ContourValuesFrame->Create(app, "");
   this->Script("pack %s -expand yes -fill x",

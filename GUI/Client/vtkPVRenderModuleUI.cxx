@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.8");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.9");
 
 int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -70,16 +70,13 @@ void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
 //----------------------------------------------------------------------------
 void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0"))
     {
-    vtkErrorMacro("Widget has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-
-  this->SetApplication(app);
-
-  // Create this widgets frame.
-  this->Script("frame %s -bd 0",this->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

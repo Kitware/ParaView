@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWPopupFrame );
-vtkCxxRevisionMacro(vtkKWPopupFrame, "1.4");
+vtkCxxRevisionMacro(vtkKWPopupFrame, "1.5");
 
 int vtkKWPopupFrameCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -62,7 +62,7 @@ void vtkKWPopupFrame::Create(vtkKWApplication *app,
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-borderwidth 0 -relief flat"))
+  if (!this->Superclass::Create(app, "frame", "-bd 0 -relief flat"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

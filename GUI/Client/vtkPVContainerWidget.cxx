@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.25");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -55,15 +55,13 @@ vtkPVContainerWidget::~vtkPVContainerWidget()
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("Object has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
-
-  // create the top level
-  this->Script("frame %s", this->GetWidgetName());
 
   vtkCollectionIterator *it = this->WidgetProperties->NewIterator();
   it->InitTraversal();

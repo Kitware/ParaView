@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWProgressGauge );
-vtkCxxRevisionMacro(vtkKWProgressGauge, "1.21");
+vtkCxxRevisionMacro(vtkKWProgressGauge, "1.22");
 
 int vtkKWProgressGaugeCommand(ClientData cd, Tcl_Interp *interp,
                               int argc, char *argv[]);
@@ -55,7 +55,7 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, const char *args)
 
   const char *wname = this->GetWidgetName();
 
-  this->Script("canvas %s.display -borderwidth 0  -highlightthickness 0 -width %d -height %d %s",
+  this->Script("canvas %s.display -bd 0  -highlightthickness 0 -width %d -height %d %s",
                wname, this->Length, this->Height, (args ? args : ""));
 
   this->Script("pack %s.display -expand yes", wname);

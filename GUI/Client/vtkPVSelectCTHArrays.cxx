@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.13");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.14");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -82,18 +82,15 @@ vtkPVSelectCTHArrays::~vtkPVSelectCTHArrays()
 //----------------------------------------------------------------------------
 void vtkPVSelectCTHArrays::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("PVWidget already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-
-  // create the top level
-  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
-
   
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create(pvApp, "frame", "");

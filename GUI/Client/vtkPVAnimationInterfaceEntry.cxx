@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.35");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -201,7 +201,16 @@ void vtkPVAnimationInterfaceEntry::SetCurrentIndex(int idx)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
 {
+  // Call the superclass to set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, NULL, NULL))
+    {
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    return;
+    }
+
   this->SourceMethodFrame->Create(pvApp, 0);
+
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this->SourceMethodFrame->GetFrame());
   frame->Create(pvApp, 0);

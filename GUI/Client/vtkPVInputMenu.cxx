@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.59");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.60");
 
 
 //----------------------------------------------------------------------------
@@ -75,15 +75,13 @@ void vtkPVInputMenu::SetLabel(const char* label)
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("PVInputMenu has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
-
-  // create the top level
-  this->Script("frame %s", this->GetWidgetName());
 
   this->Label->SetParent(this);
   this->Label->Create(app, "-width 18 -justify right");

@@ -27,7 +27,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.16");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.17");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -127,21 +127,17 @@ void vtkPVSourcesNavigationWindow::Reconfigure()
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *args)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", args))
     {
-    vtkErrorMacro("Window already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
 
-  const char *wname;
-
+  const char *wname = this->GetWidgetName();
   ostrstream opts;
   
-  // create the top level
-  wname = this->GetWidgetName();
-
-  this->Script("frame %s %s", wname, (args?args:""));
   if (this->Width > 0 && this->Height > 0)
     {
     opts << " -width " << this->Width << " -height " << this->Height;

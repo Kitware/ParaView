@@ -26,7 +26,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.5");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.6");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -200,15 +200,13 @@ void vtkPVCameraControl::Roll(double angle)
 
 void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0"))
     {
-    vtkErrorMacro("vtkPVCameraControl has already been created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  
-  this->SetApplication(app);
-  
-  this->Script("frame %s -bd 0", this->GetWidgetName());
   
   this->ElevationButton->SetParent(this);
   this->ElevationButton->Create(app, 0);

@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.17");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.18");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -59,6 +59,12 @@ vtkPVCameraIcon::~vtkPVCameraIcon()
 //----------------------------------------------------------------------------
 void vtkPVCameraIcon::Create(vtkKWApplication *pvApp, const char *args)
 {
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("vtkPVCameraIcon already created");
+    return;
+    }
+
   this->Superclass::Create(pvApp, args);
 
   this->SetBind(this, "<Button-1>", "RestoreCamera");

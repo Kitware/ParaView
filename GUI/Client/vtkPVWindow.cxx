@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.579");
+vtkCxxRevisionMacro(vtkPVWindow, "1.580");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -896,25 +896,32 @@ void vtkPVWindow::SetInteractor(vtkPVGenericRenderWindowInteractor *interactor)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
 {
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("vtkPVWindow already created");
+    return;
+    }
+
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-  
   if (pvApp == NULL)
     {
     vtkErrorMacro("vtkPVWindow::Create needs a vtkPVApplication.");
     return;
     }
 
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pvApp->SetBalloonHelpDelay(1);
-
   // Make sure the widget is name appropriately: paraview instead of a number.
   // On X11, the window name is the same as the widget name.
+
   this->WidgetName = vtkString::Duplicate(".paraview");
+
   // Invoke super method first.
   this->vtkKWWindow::Create(pvApp,"");
 
   // Hide the main window until after all user interface is initialized.
   this->Script( "wm withdraw %s", this->GetWidgetName());
+
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  pvApp->SetBalloonHelpDelay(1);
 
   // Allow the user to interactively resize the properties parent.
   // The left panel size (Frame1) is restored by vtkKWWindow

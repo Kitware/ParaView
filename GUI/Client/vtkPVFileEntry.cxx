@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.83");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.84");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -192,18 +192,14 @@ void vtkPVFileEntry::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("FileEntry already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(pvApp);
 
-  const char* wname;
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
   vtkKWFrame* frame = vtkKWFrame::New();
   frame->SetParent(this);
   frame->Create(pvApp, 0);

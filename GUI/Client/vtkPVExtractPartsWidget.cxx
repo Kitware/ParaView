@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.17");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.18");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -71,19 +71,16 @@ vtkPVExtractPartsWidget::~vtkPVExtractPartsWidget()
 //----------------------------------------------------------------------------
 void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("PVWidget already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
 
-  // create the top level
-  this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
 
-  
   this->ButtonFrame->SetParent(this);
   this->ButtonFrame->Create(pvApp, "frame", "");
   this->Script("pack %s -side top -fill x",

@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.21");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.22");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -48,15 +48,13 @@ vtkPVLineSourceWidget::~vtkPVLineSourceWidget()
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("Object has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
-
-  // create the top level
-  this->Script("frame %s", this->GetWidgetName());
 
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
   vtkPVProcessModule* pm = pvApp->GetProcessModule();

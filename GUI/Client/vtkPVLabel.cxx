@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabel);
-vtkCxxRevisionMacro(vtkPVLabel, "1.9");
+vtkCxxRevisionMacro(vtkPVLabel, "1.10");
 
 //----------------------------------------------------------------------------
 vtkPVLabel::vtkPVLabel()
@@ -74,18 +74,13 @@ void vtkPVLabel::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVLabel::Create(vtkKWApplication *pvApp)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("LabeledToggle already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(pvApp);
-  
-  const char* wname;
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   // Now a label
   this->Label->Create(pvApp, "-width 18 -justify right");

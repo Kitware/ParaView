@@ -31,19 +31,29 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.16");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.17");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
 {
-  char buffer[1024];
-  sprintf(buffer, "Cannot connect to the server %s:%d.\nPlease specify server to connect:",
-    this->HostnameString, this->PortInt);
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("vtkPVConnectDialog already created");
+    return;
+    }
+
   this->SetOptions(
     vtkKWMessageDialog::Beep | vtkKWMessageDialog::YesDefault |
     vtkKWMessageDialog::WarningIcon );
   this->SetStyleToOkCancel();
+
   this->Superclass::Create(app, 0);
+
+  char buffer[1024];
+  sprintf(buffer, 
+          "Cannot connect to the server %s:%d.\nPlease specify server to connect:",
+          this->HostnameString, this->PortInt);
+
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
   this->SetMasterWindow(pvApp->GetMainWindow());
   this->SetText(buffer);

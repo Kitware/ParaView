@@ -21,7 +21,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTraceFileDialog );
-vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.6");
+vtkCxxRevisionMacro(vtkPVTraceFileDialog, "1.7");
 
 int vtkPVTraceFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -54,10 +54,18 @@ vtkPVTraceFileDialog::~vtkPVTraceFileDialog()
 //-----------------------------------------------------------------------------
 void vtkPVTraceFileDialog::Create(vtkKWApplication *app, const char *args)
 {
+  // Check if already created
+
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("TraceFileDialogx already created");
+    return;
+    }
+
   // invoke super method
   this->Superclass::Create(app,args);
 
-  this->SaveFrame->Create(app, "-borderwidth 3 -relief flat");
+  this->SaveFrame->Create(app, "-bd 3 -relief flat");
 
   this->SaveButton->Create(app, "-text Save -width 16");
   this->SaveButton->SetCommand(this, "Save");

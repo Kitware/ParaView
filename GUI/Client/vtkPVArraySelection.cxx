@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.44");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.45");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -110,24 +110,13 @@ vtkPVArraySelection::~vtkPVArraySelection()
 //----------------------------------------------------------------------------
 void vtkPVArraySelection::Create(vtkKWApplication *app)
 {
-  const char *wname;
-  
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("ArraySelection already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  
-  this->SetApplication(app);
-  
-  if (!app)
-    {
-    return;
-    }
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   this->LabeledFrame->SetParent(this);
   this->LabeledFrame->ShowHideFrameOn();

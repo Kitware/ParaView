@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.17");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.18");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -141,18 +141,15 @@ void vtkPVTimerLogDisplay::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to set the appropriate flags then create manually
+
+  if (!this->vtkKWWidget::Create(app, NULL, NULL))
     {
-    vtkErrorMacro("Interactor already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  
-  this->SetApplication(app);
-  
-  const char *wname;
-  
-  // create the top level
-  wname = this->GetWidgetName();
+
+  const char *wname = this->GetWidgetName();
   if (this->MasterWindow)
     {
     this->Script("toplevel %s -class %s", 

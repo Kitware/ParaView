@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.9");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.10");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -114,14 +114,13 @@ void vtkPVTempTessellatorEntry::PrintSelf( ostream& os, vtkIndent indent )
 
 void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("Object has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
-
-  this->Script( "frame %s", this->GetWidgetName() );
 
   vtkTessellatorEntryData* d = this->Data;
 

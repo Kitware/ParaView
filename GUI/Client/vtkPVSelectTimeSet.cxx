@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.38");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.39");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -102,13 +102,13 @@ const char* vtkPVSelectTimeSet::GetLabel()
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 2 -relief flat"))
     {
-    vtkErrorMacro("SelectTimeSet already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(pvApp);
-  
 
   // For getting the widget in a script.
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
@@ -118,12 +118,6 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
   
-  const char* wname;
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -relief flat -borderwidth 2", wname);
-
   this->LabeledFrame->Create(this->GetApplication(), 0);
   if (this->FrameLabel)
     {
@@ -137,10 +131,10 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
   this->Script("pack %s", this->TimeLabel->GetWidgetName());
   
   this->TreeFrame->Create(this->GetApplication(), "ScrolledWindow", 
-                          "-relief sunken -borderwidth 2");
+                          "-relief sunken -bd 2");
 
   this->Tree->Create(this->GetApplication(), "Tree", 
-                     "-background white -borderwidth 0 -width 15 -padx 2 "
+                     "-background white -bd 0 -width 15 -padx 2 "
                      "-redraw 1 -relief flat -selectbackground red");
   this->Script("%s bindText <ButtonPress-1>  {%s SetTimeValueCallback}",
                this->Tree->GetWidgetName(), this->GetTclName());

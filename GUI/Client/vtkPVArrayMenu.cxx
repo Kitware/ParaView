@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.55");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.56");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -162,17 +162,15 @@ void vtkPVArrayMenu::SetShowComponentMenu(int flag)
 //----------------------------------------------------------------------------
 void vtkPVArrayMenu::Create(vtkKWApplication *app)
 {
-  vtkKWWidget *extraFrame;
+  // Call the superclass to create the widget and set the appropriate flags
 
-  if (this->IsCreated())
+  if (!this->vtkKWWidget::Create(app, "frame", NULL))
     {
-    vtkErrorMacro("Object has already been created.");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
 
-  // create the top level
-  this->Script("frame %s", this->GetWidgetName());
+  vtkKWWidget *extraFrame;
 
   // Extra frame is needed because of the range label.
   extraFrame = vtkKWWidget::New();

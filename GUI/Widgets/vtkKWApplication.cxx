@@ -59,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.163");
+vtkCxxRevisionMacro(vtkKWApplication, "1.164");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -141,7 +141,7 @@ vtkKWApplication::vtkKWApplication()
   if (vtkKWApplication::WidgetVisibility)
     {
     this->BalloonHelpWindow->Create(
-      this, "toplevel", "-background black -borderwidth 1 -relief flat");
+      this, "toplevel", "-background black -bd 1 -relief flat");
     this->BalloonHelpLabel->SetParent(this->BalloonHelpWindow);    
     this->BalloonHelpLabel->Create(
       this, "-background LightYellow -foreground black -justify left "

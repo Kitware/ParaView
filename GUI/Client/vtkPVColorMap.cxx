@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.91");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.92");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -357,30 +357,22 @@ vtkPVColorMap::~vtkPVColorMap()
 //----------------------------------------------------------------------------
 void vtkPVColorMap::Create(vtkKWApplication *app)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-  const char* wname;
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
+
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
+    {
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
+    return;
+    }
+  
+  this->CreateParallelTclObjects(pvApp);
+
+  // Now for the UI.
+
   const char *grid_settings = "-padx 1 -pady 2";
   const char *label_settings = "-anchor w";
-  
-  if (this->IsCreated())
-    {
-    vtkErrorMacro("PVColorMap already created");
-    return;
-    }
-  // Superclass create takes a KWApplication, but we need a PVApplication.
-  if (pvApp == NULL)
-    {
-    vtkErrorMacro("Need a PV application");
-    return;
-    }
-  this->SetApplication(app);
-  this->CreateParallelTclObjects(pvApp);
-  
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
-  
-  // Now for the UI.
 
   // Color map
 
@@ -849,7 +841,7 @@ void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
 //----------------------------------------------------------------------------
 void vtkPVColorMap::CreateParallelTclObjects(vtkPVApplication *pvApp)
 {
-  this->vtkKWWidget::SetApplication(pvApp);
+  this->vtkKWObject::SetApplication(pvApp);
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
   
   this->LookupTableID = pm->NewStreamObject("vtkLookupTable");

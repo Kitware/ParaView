@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.6");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.7");
 
 int vtkPVErrorLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -81,7 +81,14 @@ void vtkPVErrorLogDisplay::Clear()
 //----------------------------------------------------------------------------
 void vtkPVErrorLogDisplay::Create(vtkKWApplication *app)
 {
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("vtkPVErrorLogDisplay already created");
+    return;
+    }
+
   this->Superclass::Create(app);
+
   this->Script("pack forget  %s %s %s %s",
                this->ThresholdLabel->GetWidgetName(),
                this->ThresholdMenu->GetWidgetName(),

@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.63");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.64");
 
 //----------------------------------------------------------------------------
 int vtkKWMessageDialogCommand(ClientData cd, Tcl_Interp *interp,
@@ -149,7 +149,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
   if (nb_buttons >= 1)
     {
-    this->OKFrame->Create(app, "-borderwidth 3 -relief flat");
+    this->OKFrame->Create(app, "-bd 3 -relief flat");
     this->OKButton->Create(app, "-width 16");
     this->OKButton->SetTextOption(this->OKButtonText);
     this->OKButton->SetCommand(this, "OK");
@@ -160,7 +160,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
   if (nb_buttons >= 3)
     {
-    this->OtherFrame->Create(app, "-borderwidth 3 -relief flat");
+    this->OtherFrame->Create(app, "-bd 3 -relief flat");
     this->OtherButton->Create(app, "-width 16");
     this->OtherButton->SetTextOption(this->OtherButtonText);
     this->OtherButton->SetCommand(this, "Other");
@@ -171,7 +171,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 
   if (nb_buttons >= 2)
     {
-    this->CancelFrame->Create(app, "-borderwidth 3 -relief flat");
+    this->CancelFrame->Create(app, "-bd 3 -relief flat");
     this->CancelButton->Create(app, "-width 16");
     this->CancelButton->SetTextOption(this->CancelButtonText);
     this->CancelButton->SetCommand(this, "Cancel");
@@ -232,7 +232,7 @@ void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
                this->BottomFrame->GetWidgetName());
   this->Script("pack %s -side top -fill x -pady 2 -expand y",
                this->ButtonFrame->GetWidgetName());
-  this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -borderwidth 0");
+  this->Icon->Create(app,"-width 0 -pady 0 -padx 0 -bd 0");
   this->Script("pack %s -side left -fill y",
                this->Icon->GetWidgetName());
   this->Script("pack forget %s", this->Icon->GetWidgetName());
@@ -371,14 +371,14 @@ void vtkKWMessageDialog::SetIcon()
     }
   else
     {
-    this->Script("%s configure -width 0 -pady 0 -padx 0 -borderwidth 0",
+    this->Script("%s configure -width 0 -pady 0 -padx 0 -bd 0",
                  this->Icon->GetWidgetName());
     this->Script("pack forget %s", this->Icon->GetWidgetName());
     return;
     }  
   
   this->Script("%s configure -anchor n "
-               "-pady 5 -padx 4 -borderwidth 4",
+               "-pady 5 -padx 4 -bd 4",
                this->Icon->GetWidgetName());
   this->Script("pack %s -pady 17 -side left -fill y", 
                this->Icon->GetWidgetName());

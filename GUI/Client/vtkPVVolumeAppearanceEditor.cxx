@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.6");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.7");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -185,25 +185,22 @@ void vtkPVVolumeAppearanceEditor::SetPVRenderView(vtkPVRenderView *rv)
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(app, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("PVColorMap already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  this->SetApplication(app);
+
+  // Superclass create takes a KWApplication, but we need a PVApplication.
 
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-  const char* wname;
-  
-  // Superclass create takes a KWApplication, but we need a PVApplication.
   if (pvApp == NULL)
     {
     vtkErrorMacro("Need a PV application");
     return;
     }
-  
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   this->ScalarOpacityFrame = vtkKWLabeledFrame::New();
   this->ScalarOpacityFrame->SetParent(this);

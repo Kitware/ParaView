@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.38");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.39");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -153,15 +153,16 @@ void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 {
-  if (this->IsCreated())
+  // Call the superclass to create the widget and set the appropriate flags
+
+  if (!this->vtkKWWidget::Create(pvApp, "frame", "-bd 0 -relief flat"))
     {
-    vtkErrorMacro("VectorEntry already created");
+    vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
     }
-  
-  const char* wname;
-  
+
   // For getting the widget in a script.
+
   if (this->Label && this->Label[0] &&
       (this->TraceNameState == vtkPVWidget::Uninitialized ||
        this->TraceNameState == vtkPVWidget::Default) )
@@ -170,14 +171,10 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  this->SetApplication(pvApp);
-
-  // create the top level
-  wname = this->GetWidgetName();
-  this->Script("frame %s -borderwidth 0 -relief flat", wname);
-
   this->LabeledFrame->Create(pvApp, 0);
+
   // Now a label
+
   if (this->Label && this->Label[0] != '\0')
     {
     this->LabeledFrame->SetLabel(this->Label);

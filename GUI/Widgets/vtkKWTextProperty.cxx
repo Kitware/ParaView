@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.33");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.34");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -196,7 +196,7 @@ void vtkKWTextProperty::Create(vtkKWApplication *app)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-borderwidth 0 -relief flat"))
+  if (!this->Superclass::Create(app, "frame", "-bd 0 -relief flat"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;

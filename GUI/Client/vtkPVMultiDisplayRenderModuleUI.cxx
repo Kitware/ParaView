@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.5");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModuleUI, "1.6");
 
 int vtkPVMultiDisplayRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -42,6 +42,12 @@ vtkPVMultiDisplayRenderModuleUI::~vtkPVMultiDisplayRenderModuleUI()
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayRenderModuleUI::Create(vtkKWApplication *app, const char *)
 {
+  if (this->IsCreated())
+    {
+    vtkErrorMacro("vtkPVMultiDisplayRenderModuleUI already created");
+    return;
+    }
+
   this->Superclass::Create(app, NULL);
 
   // We do not have these options.

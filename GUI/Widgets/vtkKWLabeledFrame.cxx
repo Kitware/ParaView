@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledFrame );
-vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.37");
+vtkCxxRevisionMacro(vtkKWLabeledFrame, "1.38");
 
 int vtkKWLabeledFrameCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -183,7 +183,7 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
 {
   // Call the superclass to create the widget and set the appropriate flags
 
-  if (!this->Superclass::Create(app, "frame", "-borderwidth 0 -relief flat"))
+  if (!this->Superclass::Create(app, "frame", "-bd 0 -relief flat"))
     {
     vtkErrorMacro("Failed creating widget " << this->GetClassName());
     return;
@@ -192,13 +192,13 @@ void vtkKWLabeledFrame::Create(vtkKWApplication *app, const char* args)
   this->ConfigureOptions(args);
 
   this->Border->SetParent(this);
-  this->Border->Create(app, "frame", "-borderwidth 0 -relief flat");
+  this->Border->Create(app, "frame", "-bd 0 -relief flat");
 
   this->Groove->SetParent(this);
-  this->Groove->Create(app, "frame", "-borderwidth 2 -relief groove");
+  this->Groove->Create(app, "frame", "-bd 2 -relief groove");
 
   this->Border2->SetParent(this->Groove);
-  this->Border2->Create(app, "frame", "-borderwidth 0 -relief flat");
+  this->Border2->Create(app, "frame", "-bd 0 -relief flat");
 
   this->Frame->SetParent(this->Groove);
   this->Frame->Create(app, "");

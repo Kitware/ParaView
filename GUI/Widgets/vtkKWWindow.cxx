@@ -46,7 +46,7 @@
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.190");
+vtkCxxRevisionMacro(vtkKWWindow, "1.191");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 #define VTK_KW_RECENT_FILES_MAX 20
@@ -484,7 +484,7 @@ void vtkKWWindow::Create(vtkKWApplication *app, const char *args)
   // Status frame : progress frame
 
   this->ProgressFrame->SetParent(this->StatusFrame);
-  this->ProgressFrame->Create(app, "-relief sunken -borderwidth 2");
+  this->ProgressFrame->Create(app, "-relief sunken -bd 2");
 
   this->Script("pack %s -side left -padx 2 -fill y", 
                this->ProgressFrame->GetWidgetName());

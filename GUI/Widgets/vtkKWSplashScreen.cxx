@@ -19,7 +19,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWSplashScreen );
-vtkCxxRevisionMacro(vtkKWSplashScreen, "1.20");
+vtkCxxRevisionMacro(vtkKWSplashScreen, "1.21");
 
 //----------------------------------------------------------------------------
 vtkKWSplashScreen::vtkKWSplashScreen()
@@ -58,7 +58,7 @@ void vtkKWSplashScreen::Create(vtkKWApplication *app, const char *args)
 
   // Create and pack the canvas
 
-  this->Canvas->Create(app, "-borderwidth 0 -highlightthickness 0");
+  this->Canvas->Create(app, "-bd 0 -highlightthickness 0");
   this->Canvas->ConfigureOptions(args);
 
   this->Script("pack %s -side top -fill both -expand y",
