@@ -147,7 +147,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.29");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.30");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1657,6 +1657,7 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
   this->Script("catch {unset pvDemoFromDashboard}");
   if (fromDashboard)
     {
+    this->Script("update");
     this->Script("set pvDemoFromDashboard 1");
     }
 
