@@ -44,17 +44,46 @@
 #include "vtkXYPlotWidget.h"
 #include "vtkPVPlotDisplay.h"
 #include "vtkPVRenderModule.h"
+#include "vtkCommand.h"
 
 #include <vtkstd/string>
  
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.117");
+vtkCxxRevisionMacro(vtkPVProbe, "1.118");
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
 
 #define PV_TAG_PROBE_OUTPUT 759362
+
+//===========================================================================
+//***************************************************************************
+class vtkXYPlotWidgetObserver : public vtkCommand
+{
+public:
+  static vtkXYPlotWidgetObserver *New() 
+    {return new vtkXYPlotWidgetObserver;};
+
+  vtkXYPlotWidgetObserver()
+    {
+      this->PVProbe = 0;
+    }
+
+  virtual void Execute(vtkObject* wdg, unsigned long event,  
+                       void* calldata)
+    {
+      if ( this->PVProbe )
+        {
+        this->PVProbe->ExecuteEvent(wdg, event, calldata);
+        }
+    }
+
+  vtkPVProbe* PVProbe;
+};
+
+
+
 
 //----------------------------------------------------------------------------
 vtkPVProbe::vtkPVProbe()
@@ -73,6 +102,7 @@ vtkPVProbe::vtkPVProbe()
   this->ProbeFrame = vtkKWWidget::New();
   
   this->XYPlotWidget = 0;
+  this->XYPlotObserver = NULL;
   
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -104,7 +134,12 @@ vtkPVProbe::~vtkPVProbe()
     this->XYPlotWidget->Delete();
     this->XYPlotWidget = 0;
     }
-
+  if (this->XYPlotObserver)
+    {
+    this->XYPlotObserver->Delete();
+    this->XYPlotObserver = NULL;
+    }
+    
   this->SelectedPointLabel->Delete();
   this->SelectedPointLabel = NULL;
   this->SelectedPointFrame->Delete();
@@ -179,8 +214,69 @@ void vtkPVProbe::CreateProperties()
       {
       this->XYPlotWidget->SetInteractor(iren);
       }
+
+    // This observer synchronizes all processes when
+    // the widget changes the plot.
+    this->XYPlotObserver = vtkXYPlotWidgetObserver::New();
+    this->XYPlotObserver->PVProbe = this;
+    this->XYPlotWidget->AddObserver(vtkCommand::InteractionEvent, 
+                                    this->XYPlotObserver);
+    this->XYPlotWidget->AddObserver(vtkCommand::StartInteractionEvent, 
+                                    this->XYPlotObserver);
+    this->XYPlotWidget->AddObserver(vtkCommand::EndInteractionEvent, 
+                                    this->XYPlotObserver);
     }
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVProbe::ExecuteEvent(vtkObject* vtkNotUsed(wdg), 
+                              unsigned long event,  
+                              void* vtkNotUsed(calldata))
+{
+  switch ( event )
+    {
+    case vtkCommand::StartInteractionEvent:
+      //this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOn();
+      break;
+    case vtkCommand::EndInteractionEvent:
+      //this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOff();
+      //this->RenderView();
+      vtkXYPlotActor* xypa = this->XYPlotWidget->GetXYPlotActor();
+      double *pos1 = xypa->GetPositionCoordinate()->GetValue();
+      double *pos2 = xypa->GetPosition2Coordinate()->GetValue();
+      //this->AddTraceEntry("$kw(%s) SetScalarBarPosition1 %lf %lf", 
+      //                    this->GetTclName(), pos1[0], pos1[1]);
+      //this->AddTraceEntry("$kw(%s) SetScalarBarPosition2 %lf %lf", 
+      //                    this->GetTclName(), pos2[0], pos2[1]);
+      //this->AddTraceEntry("$kw(%s) SetScalarBarOrientation %d",
+      //                    this->GetTclName(), sact->GetOrientation());
+
+      // Synchronize the server scalar bar.
+      vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << this->PlotDisplay->GetXYPlotActorID() 
+                      << "GetPositionCoordinate" 
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << vtkClientServerStream::LastResult 
+                      << "SetValue" << pos1[0] << pos1[1]
+                      << vtkClientServerStream::End;
+
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << this->PlotDisplay->GetXYPlotActorID() 
+                      << "GetPosition2Coordinate" 
+                      << vtkClientServerStream::End;
+      pm->GetStream() << vtkClientServerStream::Invoke 
+                      << vtkClientServerStream::LastResult 
+                      << "SetValue" << pos2[0] << pos2[1]
+                      << vtkClientServerStream::End;
+      pm->SendStreamToServer();
+
+      break;
+    }
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVProbe::AcceptCallbackInternal()
