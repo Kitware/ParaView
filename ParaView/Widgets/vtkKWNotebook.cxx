@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.40");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.41");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -1013,6 +1013,24 @@ int vtkKWNotebook::GetPageTag(vtkKWNotebook::Page *page)
     }
 
   return page->Tag;
+}
+
+//------------------------------------------------------------------------------
+char* vtkKWNotebook::GetPageTitle(int id)
+{
+  return this->GetPageTitle(this->GetPage(id));
+}
+
+//------------------------------------------------------------------------------
+char* vtkKWNotebook::GetPageTitle(vtkKWNotebook::Page *page)
+{
+  if (page == NULL || !this->IsCreated())
+    {
+    vtkErrorMacro("Can not query page title.");
+    return 0;
+    }
+
+  return page->Title;
 }
 
 //------------------------------------------------------------------------------
@@ -2016,6 +2034,39 @@ void vtkKWNotebook::SetPagesCanBePinned(int arg)
       }
     it->Delete();
     }
+}
+
+//----------------------------------------------------------------------------
+int vtkKWNotebook::GetPageIdContainingCoordinatesInTab(int x, int y)
+{
+  if (!this->IsCreated())
+    {
+    return -1;
+    }
+
+  int found = -1;
+  vtkKWNotebook::Page *page = NULL;
+  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
+
+  it->InitTraversal();
+  while (!it->IsDoneWithTraversal())
+    {
+    if (it->GetData(page) == VTK_OK && 
+        page->Visibility &&
+        page->TabFrame->IsCreated() &&
+        vtkKWTkUtilities::ContainsCoordinates(
+          this->GetApplication()->GetMainInterp(),
+          page->TabFrame->GetWidgetName(),
+          x, y))
+      {
+      found = page->Id;
+      break;
+      }
+    it->GoToNextItem();
+    }
+  it->Delete();
+
+  return found;
 }
 
 //----------------------------------------------------------------------------
