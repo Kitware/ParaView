@@ -120,7 +120,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.3");
+vtkCxxRevisionMacro(vtkPVApplication, "1.214.2.4");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1893,7 +1893,9 @@ char* vtkPVApplication::GetDemoPath()
             this->GetApplicationInstallationDirectory());
     if (stat(temp1, &fs) == 0) 
       {
-      this->SetDemoPath(this->GetApplicationInstallationDirectory());
+      sprintf(temp1, "%s/Demos",
+              this->GetApplicationInstallationDirectory());
+      this->SetDemoPath(temp1);
       found=1;
       }
     }
