@@ -125,6 +125,4 @@ IF (PARAVIEW_CAN_BUILD)
  INCLUDE (${PARAVIEW_BINARY_DIR}/LocalUserOptions.cmake OPTIONAL)
  INCLUDE (${PARAVIEW_SOURCE_DIR}/LocalUserOptions.cmake OPTIONAL)
 
- INSTALL_FILES(/share/ParaView/Documentation/UsersGuide Documentation/HTML/UsersGuide/.*\\.html)
-
 ENDIF (PARAVIEW_CAN_BUILD)
