@@ -46,7 +46,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.1");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.2");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -118,6 +118,9 @@ vtkClientCompositeManager::vtkClientCompositeManager()
 
   this->Compositer = vtkCompressCompositer::New();
   //this->Compositer = vtkTreeCompositer::New();
+
+  this->UseChar = 1;
+  this->UseRGB = 1;
 }
 
   
