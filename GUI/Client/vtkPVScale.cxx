@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.37");
+vtkCxxRevisionMacro(vtkPVScale, "1.38");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -267,10 +267,18 @@ void vtkPVScale::SaveInBatchScript(ofstream *file)
     {
     scalar = scaleValue;
     }
+  
+  *file << "  if { [[$pvTemp" <<  this->PVSource->GetVTKSourceID(0) 
+        << " GetProperty " << this->VariableName
+        << "] GetClassName] == \"vtkSMIntVectorProperty\"} {" << endl;
+  *file << "    set value [expr round(" << scalar << ")]" << endl;
+  *file << "  } else {" << endl;
+  *file << "    set value " << scalar << endl;
+  *file << "  }" << endl;
 
   *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
-        <<  " GetProperty " << this->VariableName << "] SetElements1 "
-        << scalar << endl;
+        <<  " GetProperty " << this->VariableName << "] SetElements1 $value"
+        << endl;
 }
 
 
