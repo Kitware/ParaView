@@ -122,9 +122,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_PV_SAVE_DATA_MENU_LABEL "Save Data"
 #define VTK_PV_SELECT_SOURCE_MENU_LABEL "Select"
 
+#include <unistd.h>
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.11");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.12");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -773,8 +775,7 @@ void vtkPVWindow::InitializeInteractorInterfaces(vtkKWApplication *app)
   reset_cam->SetParent(this->InteractorToolbar->GetFrame());
   reset_cam->Create(app, "-image PVResetViewButton");
   reset_cam->SetCommand(this, "ResetCameraCallback");
-  reset_cam->SetBalloonHelpString(
-    "Reset the view to show all the visible parts.");
+  reset_cam->SetBalloonHelpString("Reset the view to show everything visible.");
   this->InteractorToolbar->AddWidget(reset_cam);
   reset_cam->Delete();
 
@@ -1097,14 +1098,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
       extract->SetToolbarModule(1);
       this->AddToolbarButton("ExtractGrid", "PVExtractGridButton", 0,
                              "ExtractGridCallback",
-                             "Extract a sub grid from a structured data set.");
+                             "Extract a subgrid from a structured data set.");
       }
 
     vtkPVSource *pvs=0;
     
     // Create the sources that can be used for glyphing.
     // ===== Arrow
-    pvs = this->CreatePVSource("ArrowSource", "GlyphSources", 0);
+    pvs = this->CreatePVSource("ArrowSource", "GlyphSources", 0, 0);
     pvs->IsPermanentOn();
     pvs->HideDisplayPageOn();
     pvs->HideInformationPageOn();
@@ -1118,7 +1119,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     }
     
     // ===== Cone
-    pvs = this->CreatePVSource("ConeSource", "GlyphSources", 0);
+    pvs = this->CreatePVSource("ConeSource", "GlyphSources", 0, 0);
     pvs->IsPermanentOn();
     pvs->HideDisplayPageOn();
     pvs->HideInformationPageOn();
@@ -1132,7 +1133,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     }
     
     // ===== Sphere
-    pvs = this->CreatePVSource("SphereSource", "GlyphSources", 0);
+    pvs = this->CreatePVSource("SphereSource", "GlyphSources", 0, 0);
     pvs->IsPermanentOn();
     pvs->HideDisplayPageOn();
     pvs->HideInformationPageOn();
@@ -2575,7 +2576,13 @@ void vtkPVWindow::UpdateSourceMenu()
         char methodAndArgs[150];
         it->GetKey(key);
         sprintf(methodAndArgs, "CreatePVSource %s", key);
-        this->SourceMenu->AddCommand(key, this, methodAndArgs);
+        const char* menuName = proto->GetMenuName();
+        if (!menuName)
+          {
+          menuName = key;
+          }
+        this->SourceMenu->AddCommand(menuName, this, methodAndArgs,
+                                     proto->GetShortHelp());
         }
       }
     it->GoToNextItem();
@@ -2635,15 +2642,23 @@ void vtkPVWindow::UpdateFilterMenu()
             char methodAndArgs[150];
             sprintf(methodAndArgs, "CreatePVSource %s", key);
 
+            const char* menuName = proto->GetMenuName();
+            if (!menuName)
+              {
+              menuName = key;
+              }
+
             if (numSources % 30 == 0 )
               {
-              this->FilterMenu->AddGeneric("command", key, this, methodAndArgs,
-                                           "-columnbreak 1", 0);
+              this->FilterMenu->AddGeneric("command", menuName, this, 
+                                           methodAndArgs, "-columnbreak 1", 
+                                           proto->GetShortHelp());
               }
             else
               {
-              this->FilterMenu->AddGeneric("command", key, this, methodAndArgs,
-                                           0, 0);
+              this->FilterMenu->AddGeneric("command", menuName, this, 
+                                           methodAndArgs, 0, 
+                                           proto->GetShortHelp());
               }
             }
           else
@@ -3063,7 +3078,7 @@ vtkPVSource *vtkPVWindow::ExtractGridCallback()
   int type = this->CurrentPVData->GetVTKData()->GetDataObjectType();
   if (type == VTK_IMAGE_DATA || type == VTK_STRUCTURED_POINTS)
     {
-    return this->CreatePVSource("ImageClip"); 
+    return this->CreatePVSource("ExtractVOI"); 
     }
   if (type == VTK_STRUCTURED_GRID)
     {
@@ -3247,7 +3262,8 @@ int vtkPVWindow::SaveTrace(const char* filename)
 // Create a new data object/source by cloning a module prototype.
 vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
                                          const char* sourceList,
-                                         int addTraceEntry)
+                                         int addTraceEntry,
+                                         int grabFocus)
 {
   vtkPVSource *pvs = 0;
   vtkPVSource* clone = 0;
@@ -3278,7 +3294,10 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
       return 0;
       }
     
-    clone->SetModuleName(moduleName);
+    if (grabFocus)
+      {
+      clone->GrabFocus();
+      }
 
     if (addTraceEntry)
       {
@@ -3756,7 +3775,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391.2.11 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.12 $");
 }
 
 //----------------------------------------------------------------------------

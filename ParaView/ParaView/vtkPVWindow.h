@@ -281,11 +281,11 @@ public:
   // These methods create a new data source/object given a name and a 
   // source list.
   vtkPVSource *CreatePVSource(const char *className)
-    { return this->CreatePVSource(className, 0, 1); }
+    { return this->CreatePVSource(className, 0, 1, 1); }
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList)
-    { return this->CreatePVSource(className, sourceList, 1); }
+    { return this->CreatePVSource(className, sourceList, 1, 1); }
   vtkPVSource *CreatePVSource(const char *className, const char* sourceList,
-                              int addTraceEntry);
+                              int addTraceEntry, int grabFocus);
   
   // Description:
   // Access to the interactor styles from tcl.
