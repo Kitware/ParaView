@@ -270,23 +270,23 @@ void vtkPVGlyph3D::ChangeScaleMode()
   
   if (strcmp(newMode, "Scalar") == 0)
     {
-    pvApp->BroadcastScript("[%s GetVTKSource] SetScaleModeToScaleByScalar",
-                           this->GetTclName());
+    pvApp->BroadcastScript("%s SetScaleModeToScaleByScalar",
+                           this->GetVTKSourceTclName());
     }
   else if (strcmp(newMode, "Vector") == 0)
     {
-    pvApp->BroadcastScript("[%s GetVTKSource] SetScaleModeToScaleByVector",
-                           this->GetTclName());
+    pvApp->BroadcastScript("%s SetScaleModeToScaleByVector",
+                           this->GetVTKSourceTclName());
     }
   else if (strcmp(newMode, "Vector Components") == 0)
     {
-    pvApp->BroadcastScript("[%s GetVTKSource] SetScaleModeToScaleByVectorComponents",
-                           this->GetTclName());
+    pvApp->BroadcastScript("%s SetScaleModeToScaleByVectorComponents",
+                           this->GetVTKSourceTclName());
     }
   else if (strcmp(newMode, "Data Scaling Off") == 0)
     {
-    pvApp->BroadcastScript("[%s GetVTKSource] SetScaleModeToDataScalingOff",
-                           this->GetTclName());
+    pvApp->BroadcastScript("%s SetScaleModeToDataScalingOff",
+                           this->GetVTKSourceTclName());
     }
   if (newMode)
     {
@@ -303,18 +303,18 @@ void vtkPVGlyph3D::ChangeVectorMode()
   
   if (strcmp(newMode, "Normal") == 0)
     {
-    pvApp->BroadcastScript("[%s GetVTKSource] SetVectorModeToUseNormal",
-                           this->GetTclName());
+    pvApp->BroadcastScript("%s SetVectorModeToUseNormal",
+                           this->GetVTKSourceTclName());
     }
   else if (strcmp(newMode, "Vector") == 0)
     {
-    pvApp->BroadcastScript("[%s GetVTKSource] SetVectorModeToUseVector",
-                           this->GetTclName());
+    pvApp->BroadcastScript("%s SetVectorModeToUseVector",
+                           this->GetVTKSourceTclName());
     }
   else if (strcmp(newMode, "Vector Rotation Off") == 0)
     {
-    pvApp->BroadcastScript("[%s GetVTKSource] SetVectorModeToVectorRotationOff",
-                           this->GetTclName());
+    pvApp->BroadcastScript("%s SetVectorModeToVectorRotationOff",
+                           this->GetVTKSourceTclName());
     }
   if (newMode)
     {
@@ -354,8 +354,8 @@ void vtkPVGlyph3D::ChangeSource()
   tclName = this->GlyphSourceMenu->GetValue();
   this->SetGlyphSourceTclName(tclName);
   
-  pvApp->BroadcastScript("[%s GetVTKSource] SetSource %s",
-                         this->GetTclName(), tclName);
+  pvApp->BroadcastScript("%s SetSource %s",
+			 this->GetVTKSourceTclName(), tclName);
 }
 
 void vtkPVGlyph3D::Save(ofstream *file)
