@@ -18,7 +18,7 @@
 #include "vtkXMLDataElement.h"
 
 vtkStandardNewMacro(vtkXMLProp3DReader);
-vtkCxxRevisionMacro(vtkXMLProp3DReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLProp3DReader, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLProp3DReader::GetRootElementName()
@@ -43,26 +43,26 @@ int vtkXMLProp3DReader::Parse(vtkXMLDataElement *elem)
 
   // Get attributes
 
-  float fbuffer3[3];
+  double dbuffer3[3];
 
-  if (elem->GetVectorAttribute("Position", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Position", 3, dbuffer3) == 3)
     {
-    obj->SetPosition(fbuffer3);
+    obj->SetPosition(dbuffer3);
     }
   
-  if (elem->GetVectorAttribute("Origin", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Origin", 3, dbuffer3) == 3)
     {
-    obj->SetOrigin(fbuffer3);
+    obj->SetOrigin(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("Scale", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Scale", 3, dbuffer3) == 3)
     {
-    obj->SetScale(fbuffer3);
+    obj->SetScale(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("Orientation", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Orientation", 3, dbuffer3) == 3)
     {
-    obj->SetOrientation(fbuffer3);
+    obj->SetOrientation(dbuffer3);
     }
 
   return 1;

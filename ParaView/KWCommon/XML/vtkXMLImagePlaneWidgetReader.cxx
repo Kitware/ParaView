@@ -23,7 +23,7 @@
 #include "vtkXMLTextPropertyReader.h"
 
 vtkStandardNewMacro(vtkXMLImagePlaneWidgetReader);
-vtkCxxRevisionMacro(vtkXMLImagePlaneWidgetReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLImagePlaneWidgetReader, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLImagePlaneWidgetReader::GetRootElementName()
@@ -48,22 +48,22 @@ int vtkXMLImagePlaneWidgetReader::Parse(vtkXMLDataElement *elem)
 
   // Get attributes
 
-  float fbuffer3[3];
+  double dbuffer3[3];
   int ival;
 
-  if (elem->GetVectorAttribute("Origin", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Origin", 3, dbuffer3) == 3)
     {
-    obj->SetOrigin(fbuffer3);
+    obj->SetOrigin(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("Point1", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Point1", 3, dbuffer3) == 3)
     {
-    obj->SetPoint1(fbuffer3);
+    obj->SetPoint1(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("Point2", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Point2", 3, dbuffer3) == 3)
     {
-    obj->SetPoint2(fbuffer3);
+    obj->SetPoint2(dbuffer3);
     }
 
   if (elem->GetScalarAttribute("ResliceInterpolate", ival))

@@ -21,7 +21,7 @@
 #include "vtkXMLPlaneWidgetWriter.h"
 
 vtkStandardNewMacro(vtkXMLPlaneWidgetReader);
-vtkCxxRevisionMacro(vtkXMLPlaneWidgetReader, "1.3");
+vtkCxxRevisionMacro(vtkXMLPlaneWidgetReader, "1.4");
 
 //----------------------------------------------------------------------------
 char* vtkXMLPlaneWidgetReader::GetRootElementName()
@@ -46,7 +46,7 @@ int vtkXMLPlaneWidgetReader::Parse(vtkXMLDataElement *elem)
 
   // Get attributes
 
-  float fbuffer3[3];
+  double dbuffer3[3];
   int ival;
 
   if (elem->GetScalarAttribute("Resolution", ival))
@@ -54,29 +54,29 @@ int vtkXMLPlaneWidgetReader::Parse(vtkXMLDataElement *elem)
     obj->SetResolution(ival);
     }
 
-  if (elem->GetVectorAttribute("Origin", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Origin", 3, dbuffer3) == 3)
     {
-    obj->SetOrigin(fbuffer3);
+    obj->SetOrigin(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("Point1", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Point1", 3, dbuffer3) == 3)
     {
-    obj->SetPoint1(fbuffer3);
+    obj->SetPoint1(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("Point2", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Point2", 3, dbuffer3) == 3)
     {
-    obj->SetPoint2(fbuffer3);
+    obj->SetPoint2(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("Center", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Center", 3, dbuffer3) == 3)
     {
-    obj->SetCenter(fbuffer3);
+    obj->SetCenter(dbuffer3);
     }
 
-  if (elem->GetVectorAttribute("Normal", 3, fbuffer3) == 3)
+  if (elem->GetVectorAttribute("Normal", 3, dbuffer3) == 3)
     {
-    obj->SetNormal(fbuffer3);
+    obj->SetNormal(dbuffer3);
     }
 
   if (elem->GetScalarAttribute("Representation", ival))
