@@ -18,12 +18,14 @@
 #include "vtkDuplicatePolyData.h"
 
 #include "vtkAppendPolyData.h"
-#include "vtkObjectFactory.h"
+#include "vtkCellData.h"
 #include "vtkMultiProcessController.h"
-#include "vtkSocketController.h"
+#include "vtkObjectFactory.h"
+#include "vtkPointData.h"
 #include "vtkPolyData.h"
+#include "vtkSocketController.h"
 
-vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.6");
+vtkCxxRevisionMacro(vtkDuplicatePolyData, "1.7");
 vtkStandardNewMacro(vtkDuplicatePolyData);
 
 vtkCxxSetObjectMacro(vtkDuplicatePolyData,Controller, vtkMultiProcessController);

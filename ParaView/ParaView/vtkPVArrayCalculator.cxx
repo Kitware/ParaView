@@ -42,7 +42,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVArrayCalculator.h"
 
 #include "vtkArrayCalculator.h"
+#include "vtkCellData.h"
 #include "vtkDataSet.h"
+#include "vtkFieldData.h"
 #include "vtkFieldData.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -54,17 +56,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVData.h"
-#include "vtkPVPart.h"
 #include "vtkPVInputMenu.h"
+#include "vtkPVPart.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVWidgetCollection.h"
 #include "vtkPVWindow.h"
+#include "vtkPointData.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayCalculator);
-vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.51");
+vtkCxxRevisionMacro(vtkPVArrayCalculator, "1.52");
 
 int vtkPVArrayCalculatorCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);

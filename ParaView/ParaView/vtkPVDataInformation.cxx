@@ -41,14 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVDataInformation.h"
 
+#include "vtkCellData.h"
+#include "vtkCollection.h"
 #include "vtkDataSet.h"
 #include "vtkObjectFactory.h"
-#include "vtkCollection.h"
 #include "vtkPVDataSetAttributesInformation.h"
+#include "vtkPointData.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.1");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.2");
 
 
 //----------------------------------------------------------------------------

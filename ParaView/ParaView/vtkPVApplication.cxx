@@ -50,8 +50,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "vtkCallbackCommand.h"
+#include "vtkCellData.h"
 #include "vtkCharArray.h"
 #include "vtkDataSet.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkDirectory.h"
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
@@ -70,12 +73,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkOutputWindow.h"
 #include "vtkPVData.h"
 #include "vtkPVHelpPaths.h"
+#include "vtkPVHelpPaths.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVRenderGroupDialog.h"
 #include "vtkPVRenderGroupDialog.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSourceInterfaceDirectories.h"
+#include "vtkPVSourceInterfaceDirectories.h"
 #include "vtkPVTraceFileDialog.h"
 #include "vtkPVWindow.h"
+#include "vtkPointData.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProbeFilter.h"
@@ -89,11 +97,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkPolyData.h"
-#include "vtkPVHelpPaths.h"
-#include "vtkPVSourceInterfaceDirectories.h"
-#include "vtkPVRenderGroupDialog.h"
-#include "vtkPVProcessModule.h"
 
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -110,7 +113,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.170");
+vtkCxxRevisionMacro(vtkPVApplication, "1.171");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,

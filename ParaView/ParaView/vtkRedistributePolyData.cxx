@@ -65,36 +65,34 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // SOFTWARE should be clearly marked, so as not to confuse it with the
 // version available from Los Alamos National Laboratory.
 =========================================================================*/
-
 #include "vtkRedistributePolyData.h"
 
+#include "vtkCellArray.h"
+#include "vtkCellData.h"
+#include "vtkCharArray.h"
+#include "vtkDataSetAttributes.h"
+#include "vtkDoubleArray.h"
+#include "vtkFloatArray.h"
+#include "vtkIdTypeArray.h"
+#include "vtkIntArray.h"
+#include "vtkLongArray.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
-
-#include "vtkPolyDataWriter.h"
-#include "vtkUnsignedCharArray.h"
-#include "vtkFloatArray.h"
-#include "vtkCharArray.h"
-#include "vtkIntArray.h"
-#include "vtkUnsignedLongArray.h"
-#include "vtkDoubleArray.h"
-#include "vtkLongArray.h"
+#include "vtkPointData.h"
 #include "vtkPolyData.h"
-
+#include "vtkPolyDataWriter.h"
 #include "vtkShortArray.h"
-#include "vtkUnsignedIntArray.h"
+#include "vtkString.h"
+#include "vtkTimerLog.h"
 #include "vtkUnsignedCharArray.h"
+#include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkDataSetAttributes.h"
-
-#include "vtkTimerLog.h"
-#include "vtkString.h"
 
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.19");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.20");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);

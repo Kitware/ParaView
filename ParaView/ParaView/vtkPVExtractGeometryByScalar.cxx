@@ -42,22 +42,23 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVExtractGeometryByScalar.h"
 
 #include "vtkDataSet.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVComponentSelection.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
 #include "vtkPVPart.h"
 #include "vtkPVWindow.h"
 
 //---------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractGeometryByScalar);
-vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.8");
+vtkCxxRevisionMacro(vtkPVExtractGeometryByScalar, "1.9");
 
 int vtkPVExtractGeometryByScalarCommand(ClientData cd, Tcl_Interp *interp,
                                         int argc, char *argv[]);

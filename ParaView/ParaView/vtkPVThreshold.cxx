@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVThreshold.h"
 
 #include "vtkDataSet.h"
+#include "vtkDataSetAttributes.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -49,13 +50,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWPushButton.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVArrayInformation.h"
 #include "vtkPVData.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
-#include "vtkPVArrayInformation.h"
-#include "vtkPVPart.h"
 #include "vtkPVLabeledToggle.h"
 #include "vtkPVMinMax.h"
+#include "vtkPVPart.h"
 #include "vtkPVWindow.h"
 #include "vtkSource.h"
 #include "vtkStringList.h"
@@ -63,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.52");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.53");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);

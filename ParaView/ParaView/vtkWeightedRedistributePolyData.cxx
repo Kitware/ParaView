@@ -66,9 +66,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // SOFTWARE should be clearly marked, so as not to confuse it with the
 // version available from Los Alamos National Laboratory.
 ======================================================================*/
-
 #include "vtkWeightedRedistributePolyData.h"
 
+#include "vtkCellArray.h"
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.14");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.15");
 
 //-------------------------------------------------------------------
 
