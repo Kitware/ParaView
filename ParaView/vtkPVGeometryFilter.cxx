@@ -225,7 +225,6 @@ void vtkPVGeometryFilter::Execute()
 //----------------------------------------------------------------------------
 void vtkPVGeometryFilter::ExecuteInformation()
 {
-  vtkPolyData *output = this->GetOutput();
   vtkDataSet *ds = this->GetInput();
   vtkImageData *input = vtkImageData::SafeDownCast(ds);
 
@@ -241,5 +240,4 @@ void vtkPVGeometryFilter::ExecuteInformation()
   // Let OutlineSource do all the work
   //
   this->vtkSource::ExecuteInformation();
-
 }

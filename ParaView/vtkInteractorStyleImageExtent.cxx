@@ -287,8 +287,7 @@ void vtkInteractorStyleImageExtent::TranslateZ(int vtkNotUsed(dx), int dy)
   
   if (this->TranslateAxis == 1)
     {
-    this->Extent[0] += (float)(dy) / (float)(size[1]) *
-      (float)(ext[1] - ext[0]);
+    this->Extent[0] += dy / size[1] * (ext[1] - ext[0]);
     if (this->Extent[0] > ext[1])
       {
       this->Extent[0] = ext[1];
@@ -301,8 +300,7 @@ void vtkInteractorStyleImageExtent::TranslateZ(int vtkNotUsed(dx), int dy)
     }
   else if (this->TranslateAxis == 2)
     {
-    this->Extent[2] += (float)(dy) / (float)(size[1]) *
-      (float)(ext[3] - ext[2]);
+    this->Extent[2] += dy / size[1] * (ext[3] - ext[2]);
     if (this->Extent[2] > ext[3])
       {
       this->Extent[2] = ext[3];
@@ -315,8 +313,7 @@ void vtkInteractorStyleImageExtent::TranslateZ(int vtkNotUsed(dx), int dy)
     }
   else if (this->TranslateAxis == 3)
     {
-    this->Extent[4] += (float)(dy) / (float)(size[1]) *
-      (float)(ext[5] - ext[4]);
+    this->Extent[4] += dy / size[1] * (ext[5] - ext[4]);
     if (this->Extent[4] > ext[5])
       {
       this->Extent[4] = ext[5];
@@ -329,8 +326,7 @@ void vtkInteractorStyleImageExtent::TranslateZ(int vtkNotUsed(dx), int dy)
     }
   else if (this->TranslateAxis == -1)
     {
-    this->Extent[0] -= (float)(dy) / (float)(size[1]) *
-      (float)(ext[1] - ext[0]);
+    this->Extent[0] -= dy / size[1] * (ext[1] - ext[0]);
     if (this->Extent[0] > ext[1])
       {
       this->Extent[0] = ext[1];
@@ -343,8 +339,7 @@ void vtkInteractorStyleImageExtent::TranslateZ(int vtkNotUsed(dx), int dy)
     }
   else if (this->TranslateAxis == -2)
     {
-    this->Extent[2] -= (float)(dy) / (float)(size[1]) *
-      (float)(ext[3] - ext[2]);
+    this->Extent[2] -= dy / size[1] * (ext[3] - ext[2]);
     if (this->Extent[2] > ext[3])
       {
       this->Extent[2] = ext[3];
@@ -357,8 +352,7 @@ void vtkInteractorStyleImageExtent::TranslateZ(int vtkNotUsed(dx), int dy)
     }
   else if (this->TranslateAxis == -3)
     {
-    this->Extent[4] -= (float)(dy) / (float)(size[1]) *
-      (float)(ext[5] - ext[4]);
+    this->Extent[4] -= dy / size[1] * (ext[5] - ext[4]);
     if (this->Extent[4] > ext[5])
       {
       this->Extent[4] = ext[5];

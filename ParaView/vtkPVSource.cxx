@@ -966,8 +966,6 @@ void vtkPVSource::AcceptCallback()
 //----------------------------------------------------------------------------
 void vtkPVSource::ResetCallback()
 {
-  vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
-  
   if ( ! this->Initialized)
     { // Accept has not been called yet.  Delete the object.
     // What about the local grab?
@@ -991,7 +989,6 @@ void vtkPVSource::ResetCallback()
 void vtkPVSource::DeleteCallback()
 {
   vtkPVData *ac;
-  vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
   vtkPVSource *prev;
   int i;
   int numSources;
@@ -1350,8 +1347,6 @@ void vtkPVSource::SetNumberOfPVOutputs(int num)
 //---------------------------------------------------------------------------
 void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *pvd)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
   if (idx < 0)
     {
     vtkErrorMacro(<< "SetNthPVOutput: " << idx << ", cannot set output. ");

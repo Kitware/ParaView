@@ -405,7 +405,7 @@ void vtkPOPReader::ReadInformationFile()
   this->DepthValues->Reset();
   this->SetUFlowFileName(NULL);
   this->SetVFlowFileName(NULL);
-  this->UFlowFileOffset = this->VFlowFileOffset = NULL;
+  this->UFlowFileOffset = this->VFlowFileOffset = 0;
   file = new ifstream(this->FileName, ios::in);
   
   while (1)

@@ -224,7 +224,7 @@ void vtkKWWindow::Close()
 
   // Give each view a chance to close
   this->Views->InitTraversal();
-  while(v = this->Views->GetNextKWView())
+  while ((v = this->Views->GetNextKWView()))
     {
     v->Close();
     }
@@ -477,7 +477,7 @@ void vtkKWWindow::UnRegister(vtkObject *o)
         
         this->DeletingChildren = 1;
         this->Children->InitTraversal();
-        while(child = this->Children->GetNextKWWidget())
+        while ((child = this->Children->GetNextKWWidget()))
           {
           child->SetParent(NULL);
           }
@@ -487,7 +487,7 @@ void vtkKWWindow::UnRegister(vtkObject *o)
           this->SetSelectedView(NULL);
           }
         this->Views->InitTraversal();
-        while(v = this->Views->GetNextKWView())
+        while ((v = this->Views->GetNextKWView()))
           {
           v->SetParentWindow(NULL);
           }
@@ -794,5 +794,5 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.22 $");
+  this->ExtractRevision(os,"$Revision: 1.23 $");
 }

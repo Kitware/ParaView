@@ -371,8 +371,6 @@ vtkPVActorComposite::~vtkPVActorComposite()
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::CreateProperties()
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();  
-    
   this->Properties->SetParent(this->GetPVData()->GetPVSource()->GetNotebook()->GetFrame("Display"));
   this->Properties->Create(this->Application, "frame","");
   this->Script("pack %s -pady 2 -fill x -expand yes",
@@ -1042,7 +1040,6 @@ void vtkPVActorComposite::Initialize()
   
   tclName = this->GetPVRenderView()->GetRendererTclName();
   
-  sprintf(newTclName, "");
   sprintf(newTclName, "CubeAxes%d", this->InstanceCount);
   this->SetCubeAxesTclName(newTclName);
   this->Script("vtkCubeAxesActor2D %s", this->GetCubeAxesTclName());
@@ -1057,7 +1054,7 @@ void vtkPVActorComposite::Initialize()
                this->GetCubeAxesTclName(), tclName);
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
-  if (array = this->PVData->GetVTKData()->GetPointData()->GetActiveScalars())
+  if ((array = this->PVData->GetVTKData()->GetPointData()->GetActiveScalars()))
     {
     char *arrayName = (char*)array->GetName();
     char tmp[350];
@@ -1077,9 +1074,6 @@ void vtkPVActorComposite::Initialize()
 // In fact is it the same object.
 void vtkPVActorComposite::SetInput(vtkPVData *data)
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  char *vtkDataTclName = NULL;
-  
   if (this->PVData == data)
     {
     return;

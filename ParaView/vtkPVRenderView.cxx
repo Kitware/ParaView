@@ -294,7 +294,6 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
     return;
     }
   this->SetApplication(app);
-  Tcl_Interp *interp = this->Application->GetMainInterp();
 
   // create the frame
   wname = this->GetWidgetName();
@@ -518,7 +517,7 @@ void vtkPVRenderView::UpdateNavigationWindow(vtkPVSource *currentSource)
                        this->NavigationCanvas->GetWidgetName(), xMid, yMid,
                        245, yMid);
           }
-        if (moreOut = source->GetPVOutput(0))
+        if ((moreOut = source->GetPVOutput(0)))
           {
           if (moreOut->GetNumberOfPVConsumers() > 0)
             {

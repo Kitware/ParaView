@@ -521,7 +521,6 @@ void vtkInteractorStylePlaneSource::HandleIndicator(int x, int y)
   float display[3], point[4], corner[4], *origin;
   float sphereCx, sphereCy, sphereCz;
   float temp, centerDistDisplay, rad;
-  int renderFlag = 0;
   float dist;
   int closestCornerId;
   float closestCorner[3];

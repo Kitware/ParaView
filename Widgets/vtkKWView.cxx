@@ -364,7 +364,7 @@ void vtkKWView::Close()
   this->SetSelectedComposite(NULL);
   
   this->Composites->InitTraversal();
-  while(c = this->Composites->GetNextKWComposite())
+  while((c = this->Composites->GetNextKWComposite()))
     {
     c->Close();
     c->SetView(NULL);
@@ -827,11 +827,11 @@ void vtkKWView::EditCopy()
   w2i->SetInput(vtkWin);
   w2i->Update();
 
+#ifdef _WIN32
   // get the pointer to the data
   unsigned char *ptr = 
     (unsigned char *)(w2i->GetOutput()->GetScalarPointer());
   
-#ifdef _WIN32
   LPBITMAPINFOHEADER  lpbi;       // pointer to BITMAPINFOHEADER
   DWORD               dwLen;      // size of memory block
   HANDLE              hDIB = NULL;  // handle to DIB, temp handle
@@ -1028,12 +1028,12 @@ void vtkKWView::UnRegister(vtkObject *o)
         
         this->DeletingChildren = 1;
         this->Children->InitTraversal();
-        while(child = this->Children->GetNextKWWidget())
+        while ((child = this->Children->GetNextKWWidget()))
           {
           child->SetParent(NULL);
           }
         this->Composites->InitTraversal();
-        while(c = this->Composites->GetNextKWComposite())
+        while ((c = this->Composites->GetNextKWComposite()))
           {
           c->SetView(NULL);
           }
@@ -1194,7 +1194,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.37 $");
+  this->ExtractRevision(os,"$Revision: 1.38 $");
 }
 
 void vtkKWView::SetupMemoryRendering(int x, int y, void *cd) 

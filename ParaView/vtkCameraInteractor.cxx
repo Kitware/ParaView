@@ -42,7 +42,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 //----------------------------------------------------------------------------
 vtkCameraInteractor::vtkCameraInteractor()
 {
-  this->SaveX = this->SaveY = this->SaveY = 0.0;
+  this->SaveX = this->SaveY = 0;
   this->Center[0] = this->Center[1] = this->Center[2] = 0.0;
   this->ZoomScale = 0.0;
 
@@ -433,10 +433,10 @@ void vtkCameraInteractor::RollMotion(int x2, int y2)
 
   // compute the angle of rotation 
   // first compute the two vectors (center to mouse)
-  x1 -= this->DisplayCenter[0];
-  y1 -= this->DisplayCenter[1];
-  x2 -= this->DisplayCenter[0];
-  y2 -= this->DisplayCenter[1];
+  x1 -= (int)this->DisplayCenter[0];
+  y1 -= (int)this->DisplayCenter[1];
+  x2 -= (int)this->DisplayCenter[0];
+  y2 -= (int)this->DisplayCenter[1];
 
   // compute cross product (only z needs to be computed)
   zCross = x1 * y2 - y1 * x2;

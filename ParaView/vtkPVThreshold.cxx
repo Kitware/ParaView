@@ -74,7 +74,6 @@ void vtkPVThreshold::CreateProperties()
 {
   vtkPVApplication* pvApp = this->GetPVApplication();
   float range[2];
-  vtkDataSet *thresholdInput = this->GetNthPVInput(0)->GetVTKData();
   
   this->vtkPVSource::CreateProperties();
   
@@ -249,7 +248,6 @@ void vtkPVThreshold::ChangeAttributeMode(const char* newMode)
 void vtkPVThreshold::SaveInTclScript(ofstream *file)
 {
   char* tempName;
-  vtkThreshold *source = (vtkThreshold*)this->GetVTKSource();
   char *charFound;
   int pos;
   

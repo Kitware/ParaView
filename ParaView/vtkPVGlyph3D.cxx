@@ -377,7 +377,6 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
 {
   char sourceTclName[256];
   char* tempName;
-  vtkGlyph3D *source = (vtkGlyph3D*)this->GetVTKSource();
   char *charFound;
   int pos;
   

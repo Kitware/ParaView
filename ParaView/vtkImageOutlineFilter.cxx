@@ -220,8 +220,6 @@ void vtkImageOutlineFilter::Execute()
 //----------------------------------------------------------------------------
 void vtkImageOutlineFilter::ExecuteInformation()
 {
-  vtkPolyData *output = this->GetOutput();
-  
   vtkDebugMacro(<< "Creating dataset outline");
 
   //

@@ -437,19 +437,16 @@ void vtkKWApplication::BalloonHelpDisplay(vtkKWWidget *widget)
   this->Script( "winfo rootx %s", widget->GetParent()->GetWidgetName());
   int xw = vtkKWObject::GetIntegerResult(this);
   this->Script( "winfo rooty %s", widget->GetParent()->GetWidgetName());
-  int yw = vtkKWObject::GetIntegerResult(this);
 
   // get the size of the balloon window
   this->Script( "winfo reqwidth %s", this->BalloonHelpLabel->GetWidgetName());
   int dx = vtkKWObject::GetIntegerResult(this);
   this->Script( "winfo reqheight %s", this->BalloonHelpLabel->GetWidgetName());
-  int dy = vtkKWObject::GetIntegerResult(this);
   
   // get the size of the parent window of the one needing help
   this->Script( "winfo width %s", widget->GetParent()->GetWidgetName());
   int dxw = vtkKWObject::GetIntegerResult(this);
   this->Script( "winfo height %s", widget->GetParent()->GetWidgetName());
-  int dyw = vtkKWObject::GetIntegerResult(this);
   
   // Set the position of the window relative to the mouse.
   int just = widget->GetBalloonHelpJustification();

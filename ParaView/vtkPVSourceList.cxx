@@ -402,7 +402,7 @@ int vtkPVSourceList::Update(vtkPVSource *comp, int y, int in)
   delete [] tmp;
   tmp = NULL;
   result = this->Application->GetMainInterp()->result;
-  sscanf(result, "%d %d %d %d %s %d", bbox, bbox+1, bbox+2, bbox+3);
+  sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
   
   // Highlight the name based on the picked status. 
   if (comp->GetWindow()->GetCurrentPVSource() == comp)

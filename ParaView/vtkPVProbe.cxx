@@ -439,8 +439,6 @@ void vtkPVProbe::AcceptCallback()
     char arrayData[256];
     char tempArray[32];
     
-    sprintf(label, "");
-    
     for (i = 0; i < numArrays; i++)
       {
       array = pd->GetArray(i);
