@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.39");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -311,6 +311,36 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   this->Entry->SetValue(fileName); 
 
+  int already_set = 0;
+  int cc;
+
+  if ( this->Prefix && this->Format && this->Path && this->Ext )
+    {
+    char* name = new char[ this->FileNameLength + 2 ];
+    // Things are already set. Let us check if this file uses same pattern
+
+    for ( cc = this->Range[0]; cc <= this->Range[1]; cc ++ )
+      {
+      sprintf(name, this->Format, this->Path, this->Prefix, cc, this->Ext);
+      if ( vtkString::Equals(name, fileName) )
+        {
+        already_set = 1;
+        break;
+        }
+      }
+    delete [] name;
+    }
+
+  if ( already_set )
+    {
+    // Already set, so just return
+    this->InSetValue = 0;
+    this->ModifiedCallback();
+    return;
+    }
+
+  // Have to regenerate prefix, pattern...
+
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkStringList* files = vtkStringList::New();
   vtkStringList* dirs = vtkStringList::New();
@@ -324,7 +354,6 @@ void vtkPVFileEntry::SetValue(const char* fileName)
 
   int in_ext = 1;
   int in_num = 0;
-  int cc;
 
   int h5Flag = 0;
   if (strcmp(ext, "h5") == 0)
@@ -367,8 +396,9 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       number[ncnt-cc-1] = tmp;
       }
     char format[100];
+    char secondformat[100];
     sprintf(format, "%%s/%%s%%0%dd.%%s", ncnt);
-    this->SetFormat(format);
+    sprintf(secondformat, "%%s/%%s%%d.%%s");
     this->Entry->DeleteAllValues();
     pm->GetDirectoryListing(path, dirs, files, "readable");
     int cnt = 0;
@@ -415,7 +445,52 @@ void vtkPVFileEntry::SetValue(const char* fileName)
           }
         }
       }
+    foundone = 0;
+    int smin = med+cnt;
+    int smax = med-cnt;
+    for ( cc = med-cnt; cc < med+cnt; cc ++ )
+      {
+      sprintf(rfname, secondformat, path, file, cc, ext);
+      if ( vtkKWDirectoryUtilities::FileExists(rfname) )
+        {
+        this->Entry->AddValue(rfname);
+        //cout << "File: " << rfname << endl;
+        if ( smax < cc )
+          {
+          smax = cc;
+          }
+        if ( smin > cc )
+          {
+          smin = cc;
+          }
+        foundone = 1;
+        }
+      else if ( foundone )
+        {
+        if ( smin > smax || med < smin || med > smax )
+          {
+          smin = cc;
+          }
+        else
+          {
+          break;
+          }
+        }
+      }
     delete [] rfname;
+    // If second range is bigger than first range, use second format
+    if ( (smax - smin) >= (max - min) )
+      {
+      this->SetFormat(secondformat);
+      min = smin;
+      max = smax;
+      // cout << "Use second format" << endl;
+      }
+    else
+      {
+      this->SetFormat(format);
+      // cout << "Use first format" << endl;
+      }
     if ( this->Entry->GetNumberOfValues() > 1 )
       {
       this->Script("pack %s -side bottom -expand 1 -fill x", this->TimestepFrame->GetWidgetName());
