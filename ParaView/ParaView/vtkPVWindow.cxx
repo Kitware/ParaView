@@ -1297,7 +1297,9 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->RetrieveColor(2, "RenderViewBG", rgb); 
   if (rgb[0] == -1)
     {
-    rgb[0] = rgb[1] = rgb[2] = 0;
+    rgb[0] = 0.33;
+    rgb[1] = 0.35;
+    rgb[2] = 0.43;
     }
   this->MainView->SetBackgroundColor(rgb);
   this->Script( "pack %s -expand yes -fill both", 
