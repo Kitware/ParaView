@@ -22,7 +22,6 @@
 
 #include "vtkObject.h"
 
-class vtkRenderer;
 class vtkRenderWindow;
 
 class VTK_EXPORT vtkPVRenderViewProxy : public vtkObject
@@ -34,8 +33,11 @@ public:
   virtual void EventuallyRender() = 0;
   virtual vtkRenderWindow* GetRenderWindow() = 0;
   virtual void Render() = 0;
+
 protected:
-  vtkPVRenderViewProxy() {    }
+  vtkPVRenderViewProxy() {};
+  ~vtkPVRenderViewProxy() {};
+
 private:
   vtkPVRenderViewProxy(const vtkPVRenderViewProxy&); // Not implemented
   void operator=(const vtkPVRenderViewProxy&); // Not implemented

@@ -32,8 +32,8 @@ public:
   virtual float GetZBufferValue(int x, int y) = 0;
 
 protected:
-  vtkPVRenderModuleProxy();
-  ~vtkPVRenderModuleProxy();
+  vtkPVRenderModuleProxy() {};
+  ~vtkPVRenderModuleProxy() {};
 
 private:
   vtkPVRenderModuleProxy(const vtkPVRenderModuleProxy&); // Not implemented
