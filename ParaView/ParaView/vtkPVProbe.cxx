@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.70");
+vtkCxxRevisionMacro(vtkPVProbe, "1.71");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -571,6 +571,7 @@ int vtkPVProbe::GetDimensionality()
 }
 
 
+//----------------------------------------------------------------------------
 void vtkPVProbe::HSVtoRGB(float h, float s, float v, float *r, float *g, float *b)
 {
   float R, G, B;
