@@ -434,6 +434,7 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
   pwf->AddPoint( (max/ 50.0), 1.0);
   pwf->AddPoint(         max, 1.0);
   this->VolumeProMapper->GradientOpacityModulationOn();
+  this->LowResVolumeProMapper->GradientOpacityModulationOn();
 
   if ( this->GetView() )
     {
@@ -452,5 +453,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.14 $");
+  this->ExtractRevision(os,"$Revision: 1.15 $");
 }
