@@ -102,6 +102,14 @@ SOURCE=.\tcl\KWWidgetsInit.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkCornerAnnotation.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkCornerAnnotationTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWApplication.cxx
 # End Source File
 # Begin Source File
@@ -387,6 +395,35 @@ SOURCE=.\vtkKWWindowTcl.cxx
 # Begin Source File
 
 SOURCE=.\kwinit.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkCornerAnnotation.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkCornerAnnotation.h
+InputName=vtkCornerAnnotation
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkCornerAnnotation.h
+InputName=vtkCornerAnnotation
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

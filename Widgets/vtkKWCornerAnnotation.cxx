@@ -29,10 +29,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWWindow.h"
 #include "vtkKWView.h"
 #include "vtkObjectFactory.h"
+#include "vtkCornerAnnotation.h"
 
 
-
-//------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkKWCornerAnnotation* vtkKWCornerAnnotation::New()
 {
   // First try to create the object from the vtkObjectFactory
@@ -77,33 +77,13 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
     this->CornerLabel[i]->SetParent(this->CornerFrame[i]);
     this->CornerText[i] = vtkKWText::New();
     this->CornerText[i]->SetParent(this->CornerFrame[i]);
-    this->CornerMapper[i] = vtkTextMapper::New();
-    this->CornerMapper[i]->SetFontSize(15);  
-    this->CornerMapper[i]->ShadowOff();  
-    this->CornerProp[i] = vtkScaledTextActor::New();
-    this->CornerProp[i]->SetMaximumLineHeight(0.25);
-    this->CornerProp[i]->SetWidth(0.47);
-    this->CornerProp[i]->SetHeight(0.25);
-    this->CornerProp[i]->SetMapper(this->CornerMapper[i]);
-    this->CornerComposite[i] = vtkKWGenericComposite::New();
-    this->CornerComposite[i]->SetProp(this->CornerProp[i]);
     }
 
-  this->CornerProp[0]->GetPositionCoordinate()->SetValue(0.01,0.02);
-  this->CornerMapper[0]->SetJustificationToLeft();
-  this->CornerMapper[0]->SetVerticalJustificationToBottom();
-
-  this->CornerProp[1]->GetPositionCoordinate()->SetValue(0.52,0.02);
-  this->CornerMapper[1]->SetJustificationToRight();
-  this->CornerMapper[1]->SetVerticalJustificationToBottom();
+  this->CornerProp = vtkCornerAnnotation::New();
+  this->CornerProp->SetMaximumLineHeight(0.08);
+  this->CornerComposite = vtkKWGenericComposite::New();
+  this->CornerComposite->SetProp(this->CornerProp);
   
-  this->CornerProp[2]->GetPositionCoordinate()->SetValue(0.01,0.73);
-  this->CornerMapper[2]->SetJustificationToLeft();
-  this->CornerMapper[2]->SetVerticalJustificationToTop();
-  
-  this->CornerProp[3]->GetPositionCoordinate()->SetValue(0.52,0.73);
-  this->CornerMapper[3]->SetJustificationToRight();
-  this->CornerMapper[3]->SetVerticalJustificationToTop();
 }
 
 vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
@@ -117,12 +97,11 @@ vtkKWCornerAnnotation::~vtkKWCornerAnnotation()
   for (int i = 0; i < 4; i++)
     {
     this->CornerFrame[i]->Delete();
-    this->CornerComposite[i]->Delete();
-    this->CornerProp[i]->Delete();
-    this->CornerMapper[i]->Delete();
     this->CornerLabel[i]->Delete();
     this->CornerText[i]->Delete();
     }
+  this->CornerComposite->Delete();
+  this->CornerProp->Delete();
 }
 
 void vtkKWCornerAnnotation::ShowProperties()
@@ -136,10 +115,7 @@ void vtkKWCornerAnnotation::Close()
 {
   if (this->CornerButton->GetState())
     {
-    this->View->RemoveComposite(this->CornerComposite[0]);
-    this->View->RemoveComposite(this->CornerComposite[1]);
-    this->View->RemoveComposite(this->CornerComposite[2]);
-    this->View->RemoveComposite(this->CornerComposite[3]);
+    this->View->RemoveComposite(this->CornerComposite);
     this->CornerButton->SetState(0);
     }
 }
@@ -207,10 +183,7 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app)
 
 void vtkKWCornerAnnotation::SetTextColor( float r, float g, float b )
 {
-  this->CornerProp[0]->GetProperty()->SetColor( r, g, b );
-  this->CornerProp[1]->GetProperty()->SetColor( r, g, b );
-  this->CornerProp[2]->GetProperty()->SetColor( r, g, b );
-  this->CornerProp[3]->GetProperty()->SetColor( r, g, b );
+  this->CornerProp->GetProperty()->SetColor( r, g, b );
   this->View->Render();
 }
 
@@ -218,19 +191,16 @@ void vtkKWCornerAnnotation::OnDisplayCorner()
 {
   if (this->CornerButton->GetState())
     {
+    this->View->AddComposite(this->CornerComposite);
     for (int i = 0; i < 4; i++)
       {
-      this->View->AddComposite(this->CornerComposite[i]);
-      this->CornerMapper[i]->SetInput(this->CornerText[i]->GetValue());
+      this->CornerProp->SetText(i,this->CornerText[i]->GetValue());
       }
     this->View->Render();
     }
   else
     {
-    for (int i = 0; i < 4; i++)
-      {
-      this->View->RemoveComposite(this->CornerComposite[i]);
-      }
+    this->View->RemoveComposite(this->CornerComposite);
     this->View->Render();
     }
 }
@@ -258,7 +228,7 @@ void vtkKWCornerAnnotation::SetCornerText(const char *text, int corner)
 
 void vtkKWCornerAnnotation::CornerChanged(int i) 
 {
-  this->CornerMapper[i]->SetInput(this->CornerText[i]->GetValue());
+  this->CornerProp->SetText(i,this->CornerText[i]->GetValue());
   if (this->CornerButton->GetState())
     {
     this->View->Render();
@@ -344,6 +314,6 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.3 $");
+  this->ExtractRevision(os,"$Revision: 1.4 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }

@@ -39,6 +39,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWView.h"
+class vtkCornerAnnotation;
 
 class VTK_EXPORT vtkKWCornerAnnotation : public vtkKWLabeledFrame
 {
@@ -98,9 +99,8 @@ protected:
   vtkKWWidget            *CornerFrame[4];
   vtkKWWidget            *CornerLabel[4];
   vtkKWText              *CornerText[4];
-  vtkScaledTextActor     *CornerProp[4];
-  vtkTextMapper          *CornerMapper[4];
-  vtkKWGenericComposite  *CornerComposite[4];
+  vtkCornerAnnotation    *CornerProp;
+  vtkKWGenericComposite  *CornerComposite;
 
   vtkKWView *View;
 };
