@@ -95,7 +95,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.10");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.11");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);
@@ -888,7 +888,7 @@ void vtkRedistributePolyData::CopyDataArrays
 void vtkRedistributePolyData::CopyCellBlockDataArrays
 (vtkDataSetAttributes* fromPd, vtkDataSetAttributes* toPd,
  vtkIdType numToCopy, vtkIdType startCell, 
- int offset, int myId )
+ vtkIdType offset, int myId )
 //*******************************************************************
 {
 

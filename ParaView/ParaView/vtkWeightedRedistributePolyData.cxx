@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.7");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.8");
 
 //-------------------------------------------------------------------
 
@@ -241,7 +241,8 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
       goalNumCells[type] = new vtkIdType [numProcs]; 
       for (id = 0; id < numProcs; id++) 
         {
-        goalNumCells[type][id] = totalCells[type] * Weights[id];
+        goalNumCells[type][id] = 
+          static_cast<vtkIdType>( totalCells[type] * Weights[id] );
         if (goalNumCells[type][id]==0) { numProcZero[type]++;}
         }
       }
@@ -428,7 +429,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
       remoteSched[id].SendNumber = new vtkIdType*[NUM_CELL_TYPES];
       for (type=0; type<NUM_CELL_TYPES; type++)
         {
-        remoteSched[id].SendNumber[type] = new int[currSendCnt];
+        remoteSched[id].SendNumber[type] = new vtkIdType[currSendCnt];
         }
 
       for (i=0; i<currSendCnt; i++)
