@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.48");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.49");
 
 vtkCxxSetObjectMacro(vtkPVProcessModule, Application, vtkKWApplication);
 
@@ -108,18 +108,6 @@ void vtkPVProcessModule::Exit()
 vtkPVApplication* vtkPVProcessModule::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->Application);
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProcessModule::GetPartitionId()
-{
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-int vtkPVProcessModule::GetNumberOfPartitions()
-{
-  return 1;
 }
 
 //----------------------------------------------------------------------------

@@ -63,14 +63,6 @@ public:
   vtkPVApplication *GetPVApplication();
 
   // Description:
-  // Get the partition piece.  -1 means no assigned piece.
-  virtual int GetPartitionId();
-
-  // Description:
-  // Get the number of processes participating in sharing the data.
-  virtual int GetNumberOfPartitions();
-  
-  // Description:
   // Set the application instance for this class.
   virtual void SetApplication (vtkKWApplication* arg);
   
