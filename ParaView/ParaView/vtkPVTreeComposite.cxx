@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.49");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.50");
 
 
 //=========================================================================
@@ -293,7 +293,7 @@ void vtkPVTreeComposite::StartRender()
 void vtkPVTreeComposite::InternalStartRender()
 {
   vtkParallelRenderManager::RenderWindowInfoInt winInfoInt;
-  vtkParallelRenderManager::RenderWindowInfoFloat winInfoFloat;
+  vtkParallelRenderManager::RenderWindowInfoDouble winInfoDouble;
   vtkParallelRenderManager::RendererInfoInt renInfoInt;
   vtkParallelRenderManager::RendererInfoDouble renInfoDouble;
   vtkParallelRenderManager::LightInfoDouble lightInfoDouble;
@@ -353,7 +353,7 @@ void vtkPVTreeComposite::InternalStartRender()
 //  winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   winInfoInt.NumberOfRenderers = 1;
   winInfoInt.UseCompositing = this->UseCompositing;
-  winInfoFloat.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
+  winInfoDouble.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
   
   if ( size[0] == 0 || size[1] == 0 )
     {
@@ -382,10 +382,10 @@ void vtkPVTreeComposite::InternalStartRender()
                      vtkParallelRenderManager::WIN_INFO_INT_SIZE,
                      id, 
                      vtkCompositeRenderManager::WIN_INFO_INT_TAG);
-    controller->Send((float*)(&winInfoFloat),
-                     vtkParallelRenderManager::WIN_INFO_FLOAT_SIZE,
+    controller->Send((double*)(&winInfoDouble),
+                     vtkParallelRenderManager::WIN_INFO_DOUBLE_SIZE,
                      id, 
-                     vtkCompositeRenderManager::WIN_INFO_FLOAT_TAG);
+                     vtkCompositeRenderManager::WIN_INFO_DOUBLE_TAG);
     }
   
   // Make sure the satellite renderers have the same camera I do.
