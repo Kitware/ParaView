@@ -511,12 +511,7 @@ void vtkPVPlaneWidget::SetCenter()
     val[cc] = atof(this->CenterEntry[cc]->GetValue());
     }
   this->SetCenter(val[0], val[1], val[2]);
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
+  this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
 }
@@ -531,12 +526,7 @@ void vtkPVPlaneWidget::SetNormal()
     val[cc] = atof(this->NormalEntry[cc]->GetValue());
     }
   this->SetNormal(val[0], val[1], val[2]);
-  vtkPVGenericRenderWindowInteractor* iren = 
-    this->PVSource->GetPVWindow()->GetGenericInteractor();
-  if(iren)
-    {
-    iren->Render();
-    }
+  this->Render();
   this->ModifiedCallback();
   this->ValueChanged = 0;
 }
