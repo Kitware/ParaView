@@ -68,7 +68,7 @@
 #endif
 
 vtkStandardNewMacro(vtkPVAnimationScene);
-vtkCxxRevisionMacro(vtkPVAnimationScene, "1.12");
+vtkCxxRevisionMacro(vtkPVAnimationScene, "1.13");
 #define VTK_PV_PLAYMODE_SEQUENCE_TITLE "Sequence"
 #define VTK_PV_PLAYMODE_REALTIME_TITLE "Real Time"
 
@@ -405,6 +405,7 @@ void vtkPVAnimationScene::CreateProxy()
 void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext, 
   int width, int height, int aspectRatio)
 {
+  this->GoToBeginning();
   if (this->WindowToImageFilter || this->ImageWriter || this->MovieWriter)
     {
     vtkErrorMacro("Incosistent state. Save aborted.");
@@ -481,7 +482,6 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
   // Play the animation.
   int oldMode = this->GetPlayMode();
   this->SetPlayModeToSequence();
-  this->GoToBeginning();
   this->Play();
   this->SetPlayMode(oldMode);
 
@@ -522,6 +522,8 @@ void vtkPVAnimationScene::SaveImages(const char* fileRoot, const char* ext,
 //-----------------------------------------------------------------------------
 void vtkPVAnimationScene::SaveGeometry(const char* filename)
 {
+  // Start at the beginning.
+  this->GoToBeginning();
   vtkSMXMLPVAnimationWriterProxy* animWriter = 
     vtkSMXMLPVAnimationWriterProxy::SafeDownCast(vtkSMObject::GetProxyManager()
       ->NewProxy("writers","XMLPVAnimationWriter"));
@@ -566,7 +568,6 @@ void vtkPVAnimationScene::SaveGeometry(const char* filename)
   // Play the animation.
   int oldMode = this->GetPlayMode();
   this->SetPlayModeToSequence();
-  this->GoToBeginning();
   this->Play();
   this->SetPlayMode(oldMode);
  
@@ -622,8 +623,11 @@ void vtkPVAnimationScene::ExecuteEvent(vtkObject* , unsigned long event,
         {
         this->RenderView->ForceRender();
         }
-      this->SaveImages();
-      this->SaveGeometry(info->CurrentTime);
+      if (event != vtkCommand::EndAnimationCueEvent)
+        {
+        this->SaveImages();
+        this->SaveGeometry(info->CurrentTime);
+        }
       }
     break;
     }
