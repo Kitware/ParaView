@@ -45,7 +45,7 @@ int vtkPVAnimationWriterMakeDirectory(const char* dirname)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationWriter);
-vtkCxxRevisionMacro(vtkPVAnimationWriter, "1.1.2.3");
+vtkCxxRevisionMacro(vtkPVAnimationWriter, "1.1.2.4");
 
 //----------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ public:
   
   // Create the file name for the given input during this animation
   // step.
-  vtkstd::string CreateFileName(int index);
+  vtkstd::string CreateFileName(int index, const char* path);
 };
 
 //----------------------------------------------------------------------------
@@ -287,12 +287,14 @@ void vtkPVAnimationWriter::WriteTime(double time)
     entry.Time = time;
     entry.Part = this->Internal->InputPartNumbers[i];
     entry.Group = this->Internal->InputGroupNames[i];    
-    entry.FileName = this->Internal->CreateFileName(i);
+    entry.FileName = this->Internal->CreateFileName(i, 0);
+    vtkstd::string fullName =
+      this->Internal->CreateFileName(i, this->Internal->FilePath.c_str());
     
     // Write this animation entry if its input has changed.
     if(changed)
       {
-      this->Internal->Writers[i]->SetFileName(entry.FileName.c_str());
+      this->Internal->Writers[i]->SetFileName(fullName.c_str());
       this->Internal->Writers[i]->Write();
       }
     
@@ -470,12 +472,16 @@ void vtkPVAnimationWriter::CreateWriters()
 }
 
 //----------------------------------------------------------------------------
-vtkstd::string vtkPVAnimationWriterInternals::CreateFileName(int index)
+vtkstd::string vtkPVAnimationWriterInternals::CreateFileName(int index,
+                                                             const char* path)
 { 
   // Start with the directory and file name prefix.
   ostrstream fn_with_warning_C4701;  
+  if(path)
+    {
+    fn_with_warning_C4701 << path;
+    }
   fn_with_warning_C4701
-    << this->FilePath.c_str()
     << this->FilePrefix.c_str() << "/"
     << this->FilePrefix.c_str() << "_";
   
