@@ -39,7 +39,7 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkCallbackCommand.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.40");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.41");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -601,7 +601,7 @@ int vtkPVGeometryFilter::FillInputPortInformation(int port,
     {
     return 0;
     }
-  info->Set(vtkInformation::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
+  info->Set(vtkAlgorithm::INPUT_REQUIRED_DATA_TYPE(), "vtkDataObject");
   return 1;
 }
 
