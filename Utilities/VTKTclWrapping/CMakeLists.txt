@@ -20,6 +20,10 @@ INCLUDE("${VTKTclWrapping_SOURCE_DIR}/vtkWrapTcl.cmake")
 VTK_WRAP_TCL3(vtkCommonTCL vtkTCLSources "${VTK_TCL_FILES}" "")
 
 INCLUDE_DIRECTORIES(${TCL_INCLUDE_PATH})
-ADD_LIBRARY(vtkCommonTCL ${vtkTCLSources})
-TARGET_LINK_LIBRARIES(vtkCommonTCL vtkCommon)
+ADD_LIBRARY(vtkCommonTCL ${vtkTCLSources} "${ParaView_SOURCE_DIR}/VTK/Common/vtkTclUtil.cxx")
+TARGET_LINK_LIBRARIES(vtkCommonTCL 
+  vtkCommon
+  ${TCL_LIBRARY}
+  ${TK_LIBRARY}
+  )
 
