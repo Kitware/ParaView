@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.456");
+vtkCxxRevisionMacro(vtkPVWindow, "1.457");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1665,7 +1665,7 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
             "%s/Demos/Demo1.pvs", app->GetApplicationInstallationDirectory());
     if (stat(temp1, &fs) == 0) 
       {
-      this->Script("set DemoDir %s/Demos", 
+      this->Script("set DemoDir {%s/Demos}", 
                    app->GetApplicationInstallationDirectory());
       this->LoadScript(temp1);
       found=1;
@@ -1686,7 +1686,7 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
 
   if (stat(demoFile, &fs) == 0) 
     {
-    this->Script("set DemoDir %s", newPath);
+    this->Script("set DemoDir {%s}", newPath);
     this->LoadScript(demoFile);
     found=1;
     }
@@ -1706,7 +1706,7 @@ void vtkPVWindow::PlayDemo(int fromDashboard)
       sprintf(temp1, "%s/Demo1.pvs", *dir);
       if (stat(temp1, &fs) == 0) 
         {
-        this->Script("set DemoDir %s", *dir);
+        this->Script("set DemoDir {%s}", *dir);
         this->LoadScript(temp1);
         found=1;
         break;
