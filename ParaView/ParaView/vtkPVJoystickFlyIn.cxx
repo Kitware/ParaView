@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 
-vtkCxxRevisionMacro(vtkPVJoystickFlyIn, "1.1");
+vtkCxxRevisionMacro(vtkPVJoystickFlyIn, "1.2");
 vtkStandardNewMacro(vtkPVJoystickFlyIn);
 
 //-------------------------------------------------------------------------
@@ -66,8 +66,6 @@ vtkPVJoystickFlyIn::~vtkPVJoystickFlyIn()
 void vtkPVJoystickFlyIn::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << indent << "Center: " << this->Center[0] << ", " 
-     << this->Center[1] << ", " << this->Center[2] << endl;
 }
 
 

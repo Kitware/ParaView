@@ -54,7 +54,6 @@ class vtkRenderer;
 class VTK_EXPORT vtkPVJoystickFly : public vtkPVCameraManipulator
 {
 public:
-  static vtkPVJoystickFly *New();
   vtkTypeRevisionMacro(vtkPVJoystickFly, vtkPVCameraManipulator);
   void PrintSelf(ostream& os, vtkIndent indent);
   
