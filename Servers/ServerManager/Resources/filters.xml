@@ -2017,21 +2017,21 @@
      <IntVectorProperty 
         name="SampleRateI" 
         command="SetSampleRateI"
-        number_of_elements="1">
+        number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="SampleRateJ" 
         command="SetSampleRateJ"
-        number_of_elements="1">
+        number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
 
      <IntVectorProperty 
         name="SampleRateK" 
         command="SetSampleRateK"
-        number_of_elements="1">
+        number_of_elements="1" default_values="1">
        <IntRangeDomain name="range" min="1"/>
      </IntVectorProperty>
 
