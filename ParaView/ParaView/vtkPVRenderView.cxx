@@ -130,10 +130,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->ZMinViewButton = vtkKWPushButton::New();
   
   this->ParallelRenderParametersFrame = vtkKWLabeledFrame::New();
-  this->ParallelRenderParametersFrame->SetParent( this->GeneralProperties );
-
   this->RenderParametersFrame = vtkKWLabeledFrame::New();
-  this->RenderParametersFrame->SetParent( this->GeneralProperties );
 
   this->TriangleStripsCheck = vtkKWCheckButton::New();
   this->ParallelProjectionCheck = vtkKWCheckButton::New();
@@ -149,7 +146,6 @@ vtkPVRenderView::vtkPVRenderView()
   this->FrameRateScale = vtkKWScale::New();
 
   this->LODFrame = vtkKWLabeledFrame::New();
-  this->LODFrame->SetParent( this->GeneralProperties );
  
   this->LODThresholdFrame = vtkKWWidget::New();
   this->LODThresholdLabel = vtkKWLabel::New();
@@ -775,10 +771,9 @@ void vtkPVRenderView::CreateViewProperties()
 
   vtkPVWindow* pvwindow = this->GetPVWindow();
   vtkPVApplication* pvapp = this->GetPVApplication();
-  //this->RenderParametersFrame->ShowHideFrameOn();
+  //this->RenderParametersFrame->ShowHideFrameOn();  
 
-  
-
+  this->RenderParametersFrame->SetParent( this->GeneralProperties->GetFrame() );
   this->RenderParametersFrame->ShowHideFrameOn();
   this->RenderParametersFrame->Create(this->Application);
   this->RenderParametersFrame->SetLabel("Advanced Render Parameters");
@@ -886,6 +881,7 @@ void vtkPVRenderView::CreateViewProperties()
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName());
 
+  this->LODFrame->SetParent( this->GeneralProperties->GetFrame() );
   this->LODFrame->ShowHideFrameOn();
   this->LODFrame->Create(this->Application);
   this->LODFrame->SetLabel("LOD Parameters");
@@ -1002,6 +998,8 @@ void vtkPVRenderView::CreateViewProperties()
 
   if (pvapp->GetController()->GetNumberOfProcesses() > 1)
     {
+    this->ParallelRenderParametersFrame->SetParent( 
+      this->GeneralProperties->GetFrame() );
     this->ParallelRenderParametersFrame->ShowHideFrameOn();
     this->ParallelRenderParametersFrame->Create(this->Application);
     this->ParallelRenderParametersFrame->SetLabel(
@@ -1102,7 +1100,7 @@ void vtkPVRenderView::CreateViewProperties()
                  this->CompositeCompressionCheck->GetWidgetName());
     }
 
-  this->ParaViewOptionsFrame->SetParent(this->GeneralProperties);
+  this->ParaViewOptionsFrame->SetParent(this->GeneralProperties->GetFrame());
   this->ParaViewOptionsFrame->ShowHideFrameOn();
   this->ParaViewOptionsFrame->Create(this->Application);
   this->ParaViewOptionsFrame->SetLabel("ParaView Options");
@@ -2258,7 +2256,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.186 $");
+  this->ExtractRevision(os,"$Revision: 1.187 $");
 }
 
 //------------------------------------------------------------------------------
