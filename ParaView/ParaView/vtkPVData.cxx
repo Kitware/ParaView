@@ -53,7 +53,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
-#include "vtkPVAxesWidget.h"
 #include "vtkImageData.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWChangeColorButton.h"
@@ -104,7 +103,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.231");
+vtkCxxRevisionMacro(vtkPVData, "1.232");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -123,8 +122,6 @@ vtkPVData::vtkPVData()
   this->PropertiesParent = NULL; 
 
   this->CubeAxes = NULL;
-
-  this->AxesWidget = NULL;
 
   // Create a unique id for creating tcl names.
   ++instanceCount;
@@ -172,7 +169,6 @@ vtkPVData::vtkPVData()
   
   this->ScalarBarCheck = vtkKWCheckButton::New();
   this->CubeAxesCheck = vtkKWCheckButton::New();
-  this->AxesWidgetCheck = vtkKWCheckButton::New();
   this->VisibilityCheck = vtkKWCheckButton::New();
   this->Visibility = 1;
 
@@ -306,20 +302,12 @@ vtkPVData::~vtkPVData()
     this->CubeAxes->Delete();
     }
 
-  if (this->AxesWidget)
-    {
-    this->AxesWidget->Delete();
-    }
-  
   this->ScalarBarCheck->Delete();
   this->ScalarBarCheck = NULL;  
 
   this->CubeAxesCheck->Delete();
   this->CubeAxesCheck = NULL;
 
-  this->AxesWidgetCheck->Delete();
-  this->AxesWidgetCheck = NULL;
-  
   this->VisibilityCheck->Delete();
   this->VisibilityCheck = NULL;
   
@@ -430,7 +418,6 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 void vtkPVData::DeleteCallback()
 {
   this->SetCubeAxesVisibility(0);
-  this->SetAxesWidgetVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -2020,10 +2007,6 @@ void vtkPVData::Initialize()
   this->CubeAxes->SetCamera(ren->GetActiveCamera());
   this->CubeAxes->SetInertia(20);
 
-  this->AxesWidget = vtkPVAxesWidget::New();
-  this->AxesWidget->SetParentRenderer(pvApp->GetRenderModule()->GetRenderer());
-  this->AxesWidget->SetInteractor(pvApp->GetMainWindow()->GetInteractor());
-
   // Choose the representation based on the data.
   // Polydata is always surface.
   // Structured data is surface when 2d, outline when 3d.
@@ -2195,18 +2178,6 @@ void vtkPVData::SetCubeAxesVisibility(int val)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVData::SetAxesWidgetVisibility(int state)
-{
-  if (this->AxesWidgetCheck->GetState() != state)
-    {
-    this->AddTraceEntry("$kw(%s) SetAxesVisibility %d", this->GetTclName(),
-                        state);
-    this->AxesWidgetCheck->SetState(state);
-    }
-  this->AxesWidget->SetEnabled(state);
-}
-
-//----------------------------------------------------------------------------
 void vtkPVData::ScalarBarCheckCallback()
 {
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
@@ -2223,18 +2194,6 @@ void vtkPVData::CubeAxesCheckCallback()
                       this->CubeAxesCheck->GetState());
   this->SetCubeAxesVisibility(this->CubeAxesCheck->GetState());
   if ( this->GetPVRenderView() )
-    {
-    this->GetPVRenderView()->EventuallyRender();
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkPVData::AxesWidgetCheckCallback()
-{
-  this->AddTraceEntry("$kw(%s) SetAxesWidgetVisibility %d", this->GetTclName(),
-                      this->AxesWidgetCheck->GetState());
-  this->SetAxesWidgetVisibility(this->AxesWidgetCheck->GetState());
-  if (this->GetPVRenderView())
     {
     this->GetPVRenderView()->EventuallyRender();
     }
@@ -2679,22 +2638,6 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   else
     {
     os << indent << "CubeAxes: none" << endl;
-    }
-  if(this->AxesWidget)
-    {
-    os << indent << "AxesWidget: " << this->AxesWidget << endl;
-    }
-  else
-    {
-    os << indent << "AxesWidget: none" << endl;
-    }
-  if(this->AxesWidgetCheck)
-    {
-    os << indent << "AxesWidgetCheck: " << this->AxesWidgetCheck << endl;
-    }
-  else
-    {
-    os << indent << "AxesWidgetCheck: none" << endl;
     }
   os << indent << "PVSource: " << this->GetPVSource() << endl;
   os << indent << "PropertiesParent: " << this->GetPropertiesParent() << endl;
