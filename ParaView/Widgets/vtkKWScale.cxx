@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.38");
+vtkCxxRevisionMacro(vtkKWScale, "1.39");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -76,6 +76,8 @@ vtkKWScale::vtkKWScale()
   this->StartCommand = NULL;
   this->EndCommand   = NULL;
   this->EntryCommand = NULL;
+
+  this->SmartResize = 0;
 
   this->Value      = 0;
   this->Resolution = 1;
@@ -263,24 +265,24 @@ void vtkKWScale::DisplayLabel(const char *label)
 {
   this->SetNormalLabel(label);
 
-  if ( ! this->ShortLabel )
+  if (!this->ShortLabel)
     {
     this->SetShortLabel(label);
     }
   
-  if (this->Label && this->Label->IsCreated())
+  if (!this->Label)
     {
-    this->Script("%s configure -text {%s}",
-                 this->Label->GetWidgetName(), label);
-    return;
+    this->Label = vtkKWWidget::New();
     }
 
-  this->Label = vtkKWWidget::New();
-  this->Label->SetParent(this);
-  ostrstream temp;
-  temp << "-text {" << label << "}" << ends;
-  this->Label->Create(this->Application, "label", temp.str());
-  temp.rdbuf()->freeze(0);
+  if (!this->Label->IsCreated())
+    {
+    this->Label->SetParent(this);
+    this->Label->Create(this->Application, "label", "");
+    }
+
+  this->Script("%s configure -text {%s}",
+               this->Label->GetWidgetName(), label);
 
   this->PackWidget();
 }
@@ -316,6 +318,11 @@ void vtkKWScale::SetExpandEntry(int arg)
 // ---------------------------------------------------------------------------
 void vtkKWScale::PackWidget()
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
   if (this->Scale && this->Scale->IsCreated())
     {
     if (this->DisplayEntryAndLabelOnTop && !this->PopupScale)
@@ -330,19 +337,26 @@ void vtkKWScale::PackWidget()
       }
     }
 
+  int is_label_empty = 1;
+
   if (this->Label && this->Label->IsCreated())
     {
     this->Script("pack forget %s", this->Label->GetWidgetName());
-    if (this->DisplayEntryAndLabelOnTop || this->PopupScale)
+    const char *res =this->Script("%s cget -text", this->Label->GetWidgetName());
+    is_label_empty = (!res || !*res);
+    if (!is_label_empty)
       {
-      this->Script("pack %s -side left -padx 0 -fill y", 
-                   this->Label->GetWidgetName());
-      }
-    else
-      {
-      this->Script("pack %s -side left -padx 0 -fill y -before %s", 
-                   this->Label->GetWidgetName(), 
-                   this->Scale->GetWidgetName());
+      if (this->DisplayEntryAndLabelOnTop || this->PopupScale)
+        {
+        this->Script("pack %s -side left -padx 0 -fill y", 
+                     this->Label->GetWidgetName());
+        }
+      else
+        {
+        this->Script("pack %s -side left -padx 0 -fill y -before %s", 
+                     this->Label->GetWidgetName(), 
+                     this->Scale->GetWidgetName());
+        }
       }
     }
 
@@ -375,7 +389,7 @@ void vtkKWScale::PackWidget()
       this->PopupPushButton && this->PopupPushButton->IsCreated())
     {
     this->Script("pack forget %s", this->PopupPushButton->GetWidgetName());
-    if (this->Label || this->Entry)
+    if (this->Entry || (this->Label && !is_label_empty))
       {
       this->Script("pack %s -side left -padx 1 -fill y -ipadx 1 -after %s", 
                    this->PopupPushButton->GetWidgetName(),
@@ -832,12 +846,15 @@ void vtkKWScale::SetEnabled(int e)
 
 void vtkKWScale::Resize()
 {
-  if ( ! this->Label)
+  if (!this->SmartResize || 
+      !this->IsCreated() || 
+      !this->Label || 
+      this->PopupScale)
     {
     return;
     }
   
-  this->Script("winfo width %s", this->GetWidgetName());
+  this->Script("winfo reqwidth %s", this->GetWidgetName());
   int width = vtkKWObject::GetIntegerResult(this->Application);
   
   if (width < this->ShortWidth)
@@ -853,7 +870,7 @@ void vtkKWScale::Resize()
     {
     this->Script("%s configure -text {%s}",
                  this->Label->GetWidgetName(), this->ShortLabel);
-    if (this->Entry && ! this->Entry->IsPacked())
+    if (this->Entry && !this->Entry->IsPacked())
       {
       this->PackWidget();
       }
@@ -862,7 +879,7 @@ void vtkKWScale::Resize()
     {
     this->Script("%s configure -text {%s}",
                  this->Label->GetWidgetName(), this->NormalLabel);
-    if (this->Entry && ! this->Entry->IsPacked())
+    if (this->Entry && !this->Entry->IsPacked())
       {
       this->PackWidget();
       }
@@ -881,6 +898,8 @@ void vtkKWScale::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "PopupPushButton: " << this->PopupPushButton << endl;
   os << indent << "DisplayEntryAndLabelOnTop: " 
      << (this->DisplayEntryAndLabelOnTop ? "On" : "Off") << endl;
+  os << indent << "SmartResize: " 
+     << (this->SmartResize ? "On" : "Off") << endl;
   os << indent << "PupupScale: " 
      << (this->PopupScale ? "On" : "Off") << endl;
   os << indent << "ExpandEntry: " 

@@ -89,7 +89,6 @@ public:
   void DisplayLabel(const char *l);  
   vtkGetObjectMacro(Label, vtkKWWidget);
   vtkGetObjectMacro(Entry, vtkKWEntry);
-
   vtkSetStringMacro(ShortLabel);
   vtkGetStringMacro(ShortLabel);
   
@@ -156,8 +155,18 @@ public:
   void Bind();
   void UnBind();
 
+  // Description:
+  // Set/Get the resize mode to be smart. In that mode, some elements like the
+  // label and the entry will disappear if the widget gets to small.
+  vtkSetMacro(SmartResize, int);
+  vtkGetMacro(SmartResize, int);
+  vtkBooleanMacro(SmartResize, int);  
+
   void Resize();
-  
+
+  // Description
+  // Advanced access to some internal widgets
+
 protected:
   vtkKWScale();
   ~vtkKWScale();
@@ -165,6 +174,7 @@ protected:
   int         DisplayEntryAndLabelOnTop;
   int         PopupScale;
   int         ExpandEntry;
+  int         SmartResize;
 
   char        *Command;
   char        *StartCommand;
