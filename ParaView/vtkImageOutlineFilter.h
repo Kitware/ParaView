@@ -48,13 +48,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkImageOutlineFilter_h
 
 #include "vtkPolyDataSource.h"
+#include "vtkImageData.h"
 class vtkOutlineSource;
 
 class VTK_EXPORT vtkImageOutlineFilter : public vtkPolyDataSource
 {
 public:
   static vtkImageOutlineFilter *New();
-  vtkTypeMacro(vtkImageOutlineFilter,vtkDataSetToPolyDataFilter);
+  vtkTypeMacro(vtkImageOutlineFilter,vtkPolyDataSource);
 
   // Description:
   // Set/Get the source for the scalar data to contour.
