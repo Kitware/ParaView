@@ -55,7 +55,6 @@ SET( ParaView_SRCS
   vtkPVExtentEntry.cxx
   vtkPVExtentTranslator.cxx 
   vtkPVExtentWidgetProperty.cxx
-  vtkPVExtractGeometryByScalar.cxx
   vtkPVExtractPartsWidget.cxx
   vtkPVFieldMenu.cxx
   vtkPVFileEntry.cxx

@@ -6,7 +6,6 @@ SET(Filters_SRCS
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkGroup.cxx
-  vtkKWExtractGeometryByScalar.cxx
   vtkMergeArrays.cxx
   vtkMultiOut2.cxx
   vtkMultiOut3.cxx
