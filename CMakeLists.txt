@@ -14,7 +14,7 @@ ENDIF(INSOURCE)
 # ParaView version number.  An even minor number corresponds to releases.
 SET(PARAVIEW_VERSION_MAJOR 1)
 SET(PARAVIEW_VERSION_MINOR 8)
-SET(PARAVIEW_VERSION_PATCH 1)
+SET(PARAVIEW_VERSION_PATCH 2)
 SET(PARAVIEW_VERSION "${PARAVIEW_VERSION_MAJOR}.${PARAVIEW_VERSION_MINOR}")
 SET(PARAVIEW_VERSION_FULL "${PARAVIEW_VERSION}.${PARAVIEW_VERSION_PATCH}")
 SET(CMAKE_MODULE_PATH ${ParaView_SOURCE_DIR}/CMake)
@@ -23,8 +23,24 @@ SET (LIBRARY_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
 SET (EXECUTABLE_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
   "Single output directory for building all executables.")
 
+#########################################################################
+# prepare for a release 
+FIND_PROGRAM(NSIS_MAKENSIS NAMES makensis 
+  PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\NSIS]
+  DOC "Where is makensis.exe located"
+)
+MARK_AS_ADVANCED(NSIS_MAKENSIS)
+FIND_PROGRAM(WINZIP_WZZIP NAMES wzzip
+  PATHS   "C:/Program Files/WinZip" 
+  DOC "Where is makensis.exe located"
+)
+MARK_AS_ADVANCED(WINZIP_WZZIP)
 CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/ParaView.nsi.in
   ${ParaView_BINARY_DIR}/Utilities/Release/ParaView.nsi IMMEDIATE @ONLY)
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/Win32Release.sh.in
+  ${ParaView_BINARY_DIR}/Utilities/Release/Win32Release.sh IMMEDIATE @ONLY)
+CONFIGURE_FILE(${ParaView_SOURCE_DIR}/Utilities/Release/paraview_release.sh.in
+  ${ParaView_BINARY_DIR}/Utilities/Release/paraview_release.sh IMMEDIATE @ONLY)
 
 # The client server wrapper macro needs this name for
 # BUILD_SHARED_LIBS so it can work both inside and outside the tree.

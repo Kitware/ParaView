@@ -1,0 +1,10 @@
+Changes in 1.8.2
+
+- added log10 button to calculator
+- fixe the array calculator to handle cell data
+- fixed memory leak in MPI sends for vtkParallelRenderManager
+- fixed a "no-input" issue with vtkDistributedDataFilter (D3) 
+- fix for non-IceT compositor and offscreen rendering accessing the display
+- fix for the Data Caching on the Animation Tab
+- fix to updating contour filter scalar range 
+- fix for EnSight readers to better handle valid EnSight files
