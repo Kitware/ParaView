@@ -54,7 +54,6 @@ void pvTestDriver::SeparateArguments(const char* str,
   vtkstd::string arg = str;
   vtkstd::string::size_type pos1 = 0;
   vtkstd::string::size_type pos2 = arg.find_first_of(" ;");
-  cerr << "SeparateArguments:" <<  str << endl;
   if(pos2 == arg.npos)
     {
     flags.push_back(str);
