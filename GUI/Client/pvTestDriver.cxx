@@ -83,7 +83,7 @@ void pvTestDriver::CollectConfiguredOptions()
   this->MPIRun = VTK_MPIRUN_EXE;
 #else
   cerr << "Error: VTK_MPIRUN_EXE must be set of VTK_USE_MPI is on.\n";
-  return -1;
+  return;
 #endif
   int serverNumProc = 1;
   int renderNumProc = 1;
@@ -96,7 +96,7 @@ void pvTestDriver::CollectConfiguredOptions()
   this->MPINumProcessFlag = VTK_MPI_NUMPROC_FLAG;
 # else
   cerr << "Error VTK_MPI_NUMPROC_FLAG must be defined to run test if MPI is on.\n";
-  return -1;
+  return;
 # endif
 # ifdef VTK_MPI_PREFLAGS
   this->SeparateArguments(VTK_MPI_PREFLAGS, this->MPIFlags);
