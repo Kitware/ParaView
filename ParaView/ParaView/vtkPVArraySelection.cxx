@@ -41,19 +41,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVArraySelection.h"
 
+#include "vtkArrayMap.txx"
+#include "vtkCollection.h"
+#include "vtkKWCheckButton.h"
+#include "vtkKWLabel.h"
+#include "vtkKWLabeledFrame.h"
+#include "vtkKWPushButton.h"
+#include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVSource.h"
-#include "vtkKWPushButton.h"
-#include "vtkKWCheckButton.h"
-#include "vtkCollection.h"
-#include "vtkObjectFactory.h"
-#include "vtkArrayMap.txx"
 #include "vtkPVXMLElement.h"
-#include "vtkKWLabeledFrame.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.19");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.20");
 
 //----------------------------------------------------------------------------
 int vtkPVArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -75,6 +76,8 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->ArrayCheckButtons = vtkCollection::New();
 
   this->FileName = NULL;
+
+  this->NoArraysLabel = vtkKWLabel::New();
 }
 
 //----------------------------------------------------------------------------
@@ -100,6 +103,9 @@ vtkPVArraySelection::~vtkPVArraySelection()
 
   this->ArrayCheckButtons->Delete();
   this->ArrayCheckButtons = NULL;
+
+  this->NoArraysLabel->Delete();
+  this->NoArraysLabel = 0;
 
   this->SetFileName(NULL);
 }
@@ -166,6 +172,10 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
   app->Script("pack %s -side top -expand f -anchor w",
               this->CheckFrame->GetWidgetName());
 
+  this->NoArraysLabel->SetParent(this->CheckFrame);
+  this->NoArraysLabel->Create(app, 0);
+  this->NoArraysLabel->SetLabel("No arrays");
+
   // This creates the check buttons and packs the button frame.
   this->Reset();
 }
@@ -218,12 +228,17 @@ void vtkPVArraySelection::Reset()
         this->ArrayCheckButtons->AddItem(checkButton);
         checkButton->Delete();
         }
+      if ( numArrays == 0 )
+        {
+        this->Script("grid %s -row 0 -sticky w", this->NoArraysLabel->GetWidgetName());
+        }
       }
     }
 
   // Now set the state of the check buttons.
   this->ArrayCheckButtons->InitTraversal();
-  while ( (checkButton = (vtkKWCheckButton*)(this->ArrayCheckButtons->GetNextItemAsObject())) )
+  while ( (checkButton = (vtkKWCheckButton*)(
+             this->ArrayCheckButtons->GetNextItemAsObject())) )
     {
     //this->Script("%s SetState [%s Get%sArrayStatus {%s}]", 
     //             checkButton->GetTclName(), this->VTKReaderTclName,

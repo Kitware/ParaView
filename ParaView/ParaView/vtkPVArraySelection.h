@@ -49,11 +49,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVWidget.h"
 
+class vtkCollection;
+class vtkKWLabel;
+class vtkKWLabeledFrame;
+class vtkKWPushButton;
 class vtkKWRadioButton;
 class vtkPVData;
-class vtkKWPushButton;
-class vtkCollection;
-class vtkKWLabeledFrame;
 
 class VTK_EXPORT vtkPVArraySelection : public vtkPVWidget
 {
@@ -130,6 +131,7 @@ protected:
 
   vtkKWWidget *CheckFrame;
   vtkCollection* ArrayCheckButtons;
+  vtkKWLabel *NoArraysLabel;
 
   // Description:
   // Stores the file name to descide when to rebuild the array check list.
