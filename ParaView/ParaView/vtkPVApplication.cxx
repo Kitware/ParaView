@@ -119,7 +119,7 @@ static void vtkPVAppProcessMessage(vtkObject* vtkNotUsed(object),
     }
   str << ends;
   self->AddTraceEntry("# %s\n#", str.str());
-  cout << "# " << str.str() << endl;
+  //cout << "# " << str.str() << endl;
   str.rdbuf()->freeze(0);
 }
 
