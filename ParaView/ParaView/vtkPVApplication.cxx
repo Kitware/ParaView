@@ -101,7 +101,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.247.2.5");
+vtkCxxRevisionMacro(vtkPVApplication, "1.247.2.6");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -542,13 +542,13 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "--group-file", "-gf",
   "--group-file=fname where fname is the name of the input file listing number of processors to render on.",
 */
+#endif
   "--use-tiled-display", "-td",
   "Duplicate the final data to all nodes and tile node displays 1-N into one large display.",
   "--tile-dimensions-x", "-tdx",
   "-tdx=X where X is number of displays in each row of the display.",
   "--tile-dimensions-y", "-tdy",
   "-tdy=Y where Y is number of displays in each column of the display.",
-#endif
   "--crash-on-errors", "",
   "",
 #ifdef VTK_USE_MANGLED_MESA
@@ -963,6 +963,7 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //        }
 //      this->SetGroupFileName(newarg);
 //      }
+#endif
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-tiled-display",
                                           index) == VTK_OK ||
@@ -1013,7 +1014,6 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
         }
       }
     }
-#endif
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
        == VTK_OK || 
