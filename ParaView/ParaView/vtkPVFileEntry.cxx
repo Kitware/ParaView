@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.33");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.34");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -238,12 +238,10 @@ void vtkPVFileEntry::EntryChangedCallback()
 void vtkPVFileEntry::SetTimeStep(int ts)
 {
   this->TimeStep = ts;
-  cout << "vtkPVFileEntry::SetTimeStep: " << ts << endl;
   if ( !(this->FileNameLength && this->Format && this->Path && this->Prefix && this->Ext) )
     {
     return;
     }
-  cout << "set timestep to: " << ts << endl;
   char* name = new char [ this->FileNameLength ];
   sprintf(name, this->Format, this->Path, this->Prefix, ts, this->Ext);
   if ( !vtkKWDirectoryUtilities::FileExists(name) )
@@ -436,7 +434,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       }
     delete [] name;
     str << "}" << ends;
-    cout << str.str() << endl;
+    //cout << str.str() << endl;
     this->Script(str.str());
     str.rdbuf()->freeze(0);
     }
@@ -619,7 +617,7 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterface *ai)
   ai->SetCurrentTime(ts);
   ai->SetTimeStep(1.0);
   ai->SetTimeEnd(this->Range[1]);
-  cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
+  //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
 }
 
 //----------------------------------------------------------------------------
