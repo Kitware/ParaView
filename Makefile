@@ -1,6 +1,6 @@
-VTKSRC = /home/lawcc/vtk
-VTKBIN = /home/lawcc/vtk
-VIEWSDIR = /home/lawcc/Views
+VTKSRC = /viz/ccl/vtk
+VTKBIN = /viz/ccl/vtk
+VIEWSDIR = /viz/ccl/Views
 
 
 all: doWidgets doParaView
