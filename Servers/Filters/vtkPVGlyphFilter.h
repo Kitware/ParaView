@@ -12,7 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVGlyphFilter -
+// .NAME vtkPVGlyphFilter - Glyph filter
+//
+// .SECTION Description
+// This is a subclass of vtkGlyph3D that allows selection of input scalars
+
 #ifndef __vtkPVGlyphFilter_h
 #define __vtkPVGlyphFilter_h
 

@@ -12,7 +12,10 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVClipDataSet -
+// .NAME vtkPVClipDataSet - Clip filter
+//
+// .SECTION Description
+// This is a subclass of vtkClipDataSet that allows selection of input scalars
 
 #ifndef __vtkPVClipDataSet_h
 #define __vtkPVClipDataSet_h

@@ -12,7 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVContourFilter -
+// .NAME vtkPVContourFilter - Contour filter
+//
+// .SECTION Description
+// This is a subclass of vtkContourFilter that allows selection of input scalars
+
 #ifndef __vtkPVContourFilter_h
 #define __vtkPVContourFilter_h
 
