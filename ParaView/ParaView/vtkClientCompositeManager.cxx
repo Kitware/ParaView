@@ -41,7 +41,6 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedCharArray.h"
 // Until we trigger LOD from AllocatedRenderTime ...
-#include "vtkPVApplication.h"
 #include "vtkByteSwap.h"
 
 #include "vtkOutlineFilter.h"
@@ -57,7 +56,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.34");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.35");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
