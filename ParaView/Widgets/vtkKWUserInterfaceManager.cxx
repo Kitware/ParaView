@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.3");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.4");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -66,16 +66,16 @@ vtkKWUserInterfaceManager::~vtkKWUserInterfaceManager()
 {
   // Delete all panels
 
-  vtkKWUserInterfaceManager::PanelSlot *panel = NULL;
+  vtkKWUserInterfaceManager::PanelSlot *panel_slot = NULL;
   vtkKWUserInterfaceManager::PanelsContainerIterator *it = 
     this->Panels->NewIterator();
 
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    if (it->GetData(panel) == VTK_OK)
+    if (it->GetData(panel_slot) == VTK_OK)
       {
-      delete panel;
+      delete panel_slot;
       }
     it->GoToNextItem();
     }
@@ -213,7 +213,7 @@ int vtkKWUserInterfaceManager::AddPanel(vtkKWUserInterfacePanel *panel)
     return this->GetPanelId(panel);
     }
 
-  // Add the panel to the manager
+  // Add the panel slot to the manager
 
   vtkKWUserInterfaceManager::PanelSlot *panel_slot = 
     new vtkKWUserInterfaceManager::PanelSlot;
