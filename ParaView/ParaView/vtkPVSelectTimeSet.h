@@ -79,11 +79,11 @@ public:
   // Description:
   // Adds a script to the menu of the animation interface.
   virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
-					 vtkPVAnimationInterface *ai);
+                                         vtkPVAnimationInterface *ai);
 
   // Description:
   // This is the labeled frame around the timeset tree.
-  vtkGetObjectMacro(Frame, vtkKWLabeledFrame);
+  vtkGetObjectMacro(LabeledFrame, vtkKWLabeledFrame);
 
   // Description:
   // Label displayed on the labeled frame.
@@ -112,7 +112,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVSelectTimeSet* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                                 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:
@@ -128,11 +128,11 @@ protected:
   vtkKWWidget* Tree;
   vtkKWWidget* TreeFrame;
   vtkKWLabel* TimeLabel;
-  vtkKWLabeledFrame* Frame;
+  vtkKWLabeledFrame* LabeledFrame;
 
   void AddRootNode(const char* name, const char* text);
   void AddChildNode(const char* parent, const char* name, 
-		    const char* text, const char* data);
+                    const char* text, const char* data);
 
   float TimeValue;
   char* FrameLabel;
@@ -141,7 +141,7 @@ protected:
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
-			      vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+                              vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
   
   int ReadXMLAttributes(vtkPVXMLElement* element,

@@ -178,7 +178,7 @@ int vtkPVEnSightReaderModule::InitialTimeSelection(
     firstSelect->SetReader(reader);
     firstSelect->Reset();
     this->Application->Script("pack %s -side top -fill x -expand t", 
-			      firstSelect->GetWidgetName());
+                              firstSelect->GetWidgetName());
 
     vtkKWFrame* frame = vtkKWFrame::New();
     frame->SetParent(timeDialog);
@@ -189,7 +189,7 @@ int vtkPVEnSightReaderModule::InitialTimeSelection(
     okbutton->Create(this->Application,"button","-text OK -width 16");
     okbutton->SetCommand(timeDialog, "OK");
     this->Script("pack %s -side left -expand yes",
-		 okbutton->GetWidgetName());
+                 okbutton->GetWidgetName());
     okbutton->Delete();
 
     vtkKWWidget* cancelbutton = vtkKWWidget::New();
@@ -197,7 +197,7 @@ int vtkPVEnSightReaderModule::InitialTimeSelection(
     cancelbutton->Create(this->Application,"button","-text CANCEL -width 16");
     cancelbutton->SetCommand(timeDialog, "Cancel");
     this->Script("pack %s -side left -expand yes",
-		 cancelbutton->GetWidgetName());
+                 cancelbutton->GetWidgetName());
     cancelbutton->Delete();
 
     this->Script("pack %s -side top -expand yes", frame->GetWidgetName());
@@ -240,7 +240,7 @@ int vtkPVEnSightReaderModule::CanReadFile(const char* fname)
 
 //----------------------------------------------------------------------------
 void vtkPVEnSightReaderModule::DisplayErrorMessage(const char* message,
-						   int warning)
+                                                   int warning)
 {
   vtkPVWindow* window = this->GetPVWindow();
 
@@ -249,14 +249,14 @@ void vtkPVEnSightReaderModule::DisplayErrorMessage(const char* message,
     if (warning)
       {
       vtkKWMessageDialog::PopupMessage(
-	this->Application, window,
-	"Warning",  message, vtkKWMessageDialog::WarningIcon);
+        this->Application, window,
+        "Warning",  message, vtkKWMessageDialog::WarningIcon);
       }
     else
       {
       vtkKWMessageDialog::PopupMessage(
-	this->Application, window,
-	"Error",  message, vtkKWMessageDialog::ErrorIcon);
+        this->Application, window,
+        "Error",  message, vtkKWMessageDialog::ErrorIcon);
       }
     }
   else
@@ -292,17 +292,17 @@ vtkEnSightReader* vtkPVEnSightReaderModule::VerifyMasterFile(
     pvApp->MakeTclObject("vtkPVEnSightVerifier", this->VerifierTclName));
 
   pvApp->BroadcastScript("%s SetController [Application GetController]", 
-			 this->VerifierTclName);
+                         this->VerifierTclName);
   pvApp->BroadcastScript("%s SetCaseFileName \"%s\"", this->VerifierTclName,
-			 filename);
+                         filename);
   pvApp->BroadcastScript("%s VerifyVersion", this->VerifierTclName);
 
   if ( this->Verifier->GetLastError() != vtkPVEnSightVerifier::OK )
     {
     this->DisplayErrorMessage("Error while reading the master file. Either "
-			      "one of the case files listed in the "
-			      "master file can not be read or the versions "
-			      "of the case files do not match.", 0);
+                              "one of the case files listed in the "
+                              "master file can not be read or the versions "
+                              "of the case files do not match.", 0);
     return 0;
     }
 
@@ -313,27 +313,27 @@ vtkEnSightReader* vtkPVEnSightReaderModule::VerifyMasterFile(
     {
     case vtkGenericEnSightReader::ENSIGHT_6:
       reader = static_cast<vtkEnSightReader*>
-	(pvApp->MakeTclObject("vtkEnSight6Reader", tclName));
+        (pvApp->MakeTclObject("vtkEnSight6Reader", tclName));
       break;
     case vtkGenericEnSightReader::ENSIGHT_6_BINARY:
       reader = static_cast<vtkEnSightReader*>
-	(pvApp->MakeTclObject("vtkEnSight6BinaryReader", tclName));
+        (pvApp->MakeTclObject("vtkEnSight6BinaryReader", tclName));
       break;
     case vtkGenericEnSightReader::ENSIGHT_GOLD:
       reader = static_cast<vtkEnSightReader*>
-	(pvApp->MakeTclObject("vtkEnSightGoldReader", tclName));
+        (pvApp->MakeTclObject("vtkEnSightGoldReader", tclName));
       break;
     case vtkGenericEnSightReader::ENSIGHT_GOLD_BINARY:
       reader = static_cast<vtkEnSightReader*>
-	(pvApp->MakeTclObject("vtkEnSightGoldBinaryReader", tclName));
+        (pvApp->MakeTclObject("vtkEnSightGoldBinaryReader", tclName));
       break;
     default:
       vtkErrorMacro("Unrecognized file type " 
-		    << this->Verifier->GetEnSightVersion());
+                    << this->Verifier->GetEnSightVersion());
     }
 
   pvApp->BroadcastScript("%s SetCaseFileName [%s GetPieceCaseFileName]",
-			 tclName, this->VerifierTclName);
+                         tclName, this->VerifierTclName);
   
 
   return reader;
@@ -349,17 +349,17 @@ vtkEnSightReader* vtkPVEnSightReaderModule::VerifyMasterFile(
 //----------------------------------------------------------------------------
 #ifdef VTK_USE_MPI
 void vtkPVEnSightReaderModule::VerifyTimeSets(vtkPVApplication *pvApp,
-					      const char* tclName)
+                                              const char* tclName)
 {
 
   pvApp->BroadcastScript("%s ReadAndVerifyTimeSets %s", this->VerifierTclName,
-			 tclName);
+                         tclName);
 
   if ( this->Verifier->GetLastError() != vtkPVEnSightVerifier::OK )
     {
     this->DisplayErrorMessage("The time information of the case files in "
-			      "the master file do not match. This might "
-			      "cause inconsistent behaviour.", 1);
+                              "the master file do not match. This might "
+                              "cause inconsistent behaviour.", 1);
     }
 }
 #else
@@ -371,18 +371,18 @@ void vtkPVEnSightReaderModule::VerifyTimeSets(vtkPVApplication *, const char* )
 //----------------------------------------------------------------------------
 #ifdef VTK_USE_MPI
 int vtkPVEnSightReaderModule::VerifyParts(vtkPVApplication *pvApp,
-					  const char* tclName)
+                                          const char* tclName)
 {
 
   pvApp->BroadcastScript("%s ReadAndVerifyParts %s", this->VerifierTclName,
-			 tclName);
+                         tclName);
 
   if ( this->Verifier->GetLastError() != vtkPVEnSightVerifier::OK )
     {
     this->DisplayErrorMessage("The numbers or the types of the parts "
-			      "in the different case files do not match. "
-			      "ParaView can only load case files with "
-			      "matching parts in parallel.", 0);
+                              "in the different case files do not match. "
+                              "ParaView can only load case files with "
+                              "matching parts in parallel.", 0);
     return VTK_ERROR;
     }
   return VTK_OK;
@@ -397,7 +397,7 @@ int vtkPVEnSightReaderModule::VerifyParts(vtkPVApplication *, const char*)
 
 //----------------------------------------------------------------------------
 int vtkPVEnSightReaderModule::ReadFile(const char* fname, 
-				       vtkPVReaderModule*& clone)
+                                       vtkPVReaderModule*& clone)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVWindow* window = this->GetPVWindow();
@@ -412,8 +412,8 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname,
 
 //----------------------------------------------------------------------------
 int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
-				       vtkPVApplication* pvApp,
-				       vtkPVWindow* window)
+                                       vtkPVApplication* pvApp,
+                                       vtkPVWindow* window)
 {
   char *tclName, *outputTclName, *connectionTclName;
   vtkDataSet *d;
@@ -444,19 +444,19 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     {
     case vtkGenericEnSightReader::ENSIGHT_6:
       reader = static_cast<vtkEnSightReader*>
-	(pvApp->MakeTclObject("vtkEnSight6Reader", tclName));
+        (pvApp->MakeTclObject("vtkEnSight6Reader", tclName));
       break;
     case vtkGenericEnSightReader::ENSIGHT_6_BINARY:
       reader = static_cast<vtkEnSightReader*>
-	(pvApp->MakeTclObject("vtkEnSight6BinaryReader", tclName));
+        (pvApp->MakeTclObject("vtkEnSight6BinaryReader", tclName));
       break;
     case vtkGenericEnSightReader::ENSIGHT_GOLD:
       reader = static_cast<vtkEnSightReader*>
-	(pvApp->MakeTclObject("vtkEnSightGoldReader", tclName));
+        (pvApp->MakeTclObject("vtkEnSightGoldReader", tclName));
       break;
     case vtkGenericEnSightReader::ENSIGHT_GOLD_BINARY:
       reader = static_cast<vtkEnSightReader*>
-	(pvApp->MakeTclObject("vtkEnSightGoldBinaryReader", tclName));
+        (pvApp->MakeTclObject("vtkEnSightGoldBinaryReader", tclName));
       break;
 #ifdef VTK_USE_MPI
     case vtkGenericEnSightReader::ENSIGHT_MASTER_SERVER:
@@ -494,9 +494,9 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       }
 
     pvApp->BroadcastScript("%s SetFilePath \"%s\"", tclName,
-			   reader->GetFilePath());
+                           reader->GetFilePath());
     pvApp->BroadcastScript("%s SetCaseFileName \"%s\"", tclName,
-			   reader->GetCaseFileName());
+                           reader->GetCaseFileName());
 
     reader->UpdateInformation();
     }
@@ -509,23 +509,23 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     if (!pvApp->GetRunningParaViewScript())
       {
       if ( this->InitialTimeSelection(tclName, reader, time) == 0 )
-	{
-	pvApp->BroadcastScript("%s Delete", tclName);
-	delete[] tclName;
-	this->DeleteVerifier();
-	return VTK_ERROR;
-	}
+        {
+        pvApp->BroadcastScript("%s Delete", tclName);
+        delete[] tclName;
+        this->DeleteVerifier();
+        return VTK_ERROR;
+        }
       }
     pvApp->BroadcastScript("%s SetTimeValue %12.5e", tclName, time);
     }
 
   ostrstream namestr;
   namestr << "_tmp_ensightreadermodule" << this->PrototypeInstanceCount 
-	  << ends;
+          << ends;
   char* name = namestr.str();
   pvApp->AddTraceEntry("vtkPVEnSightReaderModule %s", name);
   pvApp->AddTraceEntry("%s ReadFile %s %12.5e Application $kw(%s)", name, 
-		       fname, time, window->GetTclName());
+                       fname, time, window->GetTclName());
   pvApp->AddTraceEntry("%s Delete", name);
   delete[] name;
 
@@ -552,7 +552,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   if (numOutputs < 1)
     {
     this->DisplayErrorMessage("This file contains no parts or can not be "
-			      "read. Please check the file for errors.", 0);
+                              "read. Please check the file for errors.", 0);
     return VTK_ERROR;
     }
 
@@ -574,7 +574,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
   // the current source, we initialize it's variable with
   // GetCurrentPVSource
   pvApp->AddTraceEntry("set kw(%s) [$kw(%s) GetCurrentPVSource]",
-		       pvs->GetTclName(), window->GetTclName());
+                       pvs->GetTclName(), window->GetTclName());
 
   window->GetMainView()->DisableRenderingFlagOn();
 
@@ -591,9 +591,9 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     d = static_cast<vtkDataSet*>(pvApp->MakeTclObject(
       reader->GetOutput(i)->GetClassName(), outputTclName));
     pvApp->BroadcastScript("%s ShallowCopy [%s GetOutput %d]",
-			   outputTclName, tclName, i);
+                           outputTclName, tclName, i);
     pvApp->BroadcastScript("%s ReplaceNthOutput %d %s", tclName, i, 
-			   outputTclName);
+                           outputTclName);
 
     extentTranslatorName = 0;
     if (masterFile)
@@ -607,9 +607,9 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       extentTranslatorName = new char [strlen(outputTclName)+4];
       sprintf(extentTranslatorName, "%sExt", outputTclName);
       pvApp->BroadcastScript("vtkMultiPartExtentTranslator %s",
-			     extentTranslatorName);
+                             extentTranslatorName);
       pvApp->BroadcastScript("%s SetExtentTranslator %s",
-			     outputTclName, extentTranslatorName);
+                             outputTclName, extentTranslatorName);
       }
 
     pvd = vtkPVData::New();
@@ -625,7 +625,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       // simply shallow copy their input to their output.
       connection = vtkPVSource::New();
       connection->SetParametersParent(
-	window->GetMainView()->GetPropertiesParent());
+        window->GetMainView()->GetPropertiesParent());
       connection->SetApplication(pvApp);
       connectionTclName = new char[strlen(tclName)+2 + ((i+1)%10)+1];
       sprintf(connectionTclName, "%s_%d", tclName, i+1);
@@ -640,16 +640,16 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       outputTclName = new char[strlen(connectionTclName)+7 + (i%10)+1];
       sprintf(outputTclName, "%sOutput%d", connectionTclName, i);
       d = static_cast<vtkDataSet*>(pvApp->MakeTclObject(
-	reader->GetOutput(i)->GetClassName(), outputTclName));
+        reader->GetOutput(i)->GetClassName(), outputTclName));
       
       if (masterFile)
-	{
-	// We use an extent translator to make sure that the
-	// structured parts we load are not broken further into
-	// pieces by the pipeline. See the comment above.
-	pvApp->BroadcastScript("%s SetExtentTranslator %s",
-			       outputTclName, extentTranslatorName);
-	}
+        {
+        // We use an extent translator to make sure that the
+        // structured parts we load are not broken further into
+        // pieces by the pipeline. See the comment above.
+        pvApp->BroadcastScript("%s SetExtentTranslator %s",
+                               outputTclName, extentTranslatorName);
+        }
       
       connectionOutput = vtkPVData::New();
       connectionOutput->SetPVApplication(pvApp);
@@ -662,12 +662,12 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       // (if it is verified that the Display pages for these outputs
       // are not necessary, this can be removed)
       if ( i > 0 )
-	{
-	pvd->CreateProperties();
-	}
+        {
+        pvd->CreateProperties();
+        }
       connection->SetPVInput(pvd);
       pvApp->BroadcastScript("%s SetOutput %s", connectionTclName, 
-			     outputTclName);
+                             outputTclName);
 
       connectionOutput->Delete();
       delete [] outputTclName;
@@ -680,10 +680,10 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       // In the trace, the connection points are named by looking at
       // the outputs/consumers of the reader (CurrentPVSource)
       pvApp->AddTraceEntry("set kw(%s) "
-			   "[[[$kw(%s) GetCurrentPVSource] GetPVOutput %d] "
-			   "GetPVConsumer 0]",
-			   connection->GetTclName(), 
-			   window->GetTclName(), i);
+                           "[[[$kw(%s) GetCurrentPVSource] GetPVOutput %d] "
+                           "GetPVConsumer 0]",
+                           connection->GetTclName(), 
+                           window->GetTclName(), i);
       
       connection->Delete();
       }
@@ -709,14 +709,14 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
     select->SetPVSource(pvs);
     select->SetLabel("Select time value");
     select->Create(pvApp);
-    select->GetFrame()->ShowHideFrameOn();
+    select->GetLabeledFrame()->ShowHideFrameOn();
     select->SetObjectTclName(tclName);
     select->SetTraceName("selectTimeSet");
     select->SetModifiedCommand(pvs->GetTclName(), 
- 			       "SetAcceptButtonColorToRed");
+                               "SetAcceptButtonColorToRed");
     select->SetReader(reader);
     pvApp->Script("pack %s -side top -fill x -expand t", 
- 		  select->GetWidgetName());
+                  select->GetWidgetName());
     pvs->AddPVWidget(select);
     select->Delete();
     }

@@ -62,14 +62,14 @@ vtkStandardNewMacro(vtkPVSelectTimeSet);
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
 {
   
-  this->Frame = vtkKWLabeledFrame::New();
-  this->Frame->SetParent(this);
+  this->LabeledFrame = vtkKWLabeledFrame::New();
+  this->LabeledFrame->SetParent(this);
   
   this->TimeLabel = vtkKWLabel::New();
-  this->TimeLabel->SetParent(this->Frame->GetFrame());
+  this->TimeLabel->SetParent(this->LabeledFrame->GetFrame());
 
   this->TreeFrame = vtkKWWidget::New();
-  this->TreeFrame->SetParent(this->Frame->GetFrame());
+  this->TreeFrame->SetParent(this->LabeledFrame->GetFrame());
 
   this->Tree = vtkKWWidget::New();
   this->Tree->SetParent(this->TreeFrame);
@@ -84,7 +84,7 @@ vtkPVSelectTimeSet::vtkPVSelectTimeSet()
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
 {
-  this->Frame->Delete();
+  this->LabeledFrame->Delete();
   this->Tree->Delete();
   this->TreeFrame->Delete();
   this->TimeLabel->Delete();
@@ -104,7 +104,7 @@ void vtkPVSelectTimeSet::SetLabel(const char* label)
   this->SetFrameLabel(label);
   if (this->Application)
     {
-    this->Frame->SetLabel(label);
+    this->LabeledFrame->SetLabel(label);
     }
 }
 
@@ -134,10 +134,10 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
   wname = this->GetWidgetName();
   this->Script("frame %s -relief flat -borderwidth 2", wname);
 
-  this->Frame->Create(this->Application);
+  this->LabeledFrame->Create(this->Application);
   if (this->FrameLabel)
     {
-    this->Frame->SetLabel(this->FrameLabel);
+    this->LabeledFrame->SetLabel(this->FrameLabel);
     }
   this->TimeLabel->Create(this->Application, "");
 
@@ -160,7 +160,7 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
   this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
 
   this->Script("pack %s -side top -expand t -fill x", 
-               this->Frame->GetWidgetName());
+               this->LabeledFrame->GetWidgetName());
 
 }
 
@@ -390,6 +390,6 @@ void vtkPVSelectTimeSet::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
   os << indent << "TimeValue: " << this->TimeValue << endl;
-  os << indent << "Frame: " << this->Frame << endl;
+  os << indent << "LabeledFrame: " << this->LabeledFrame << endl;
   os << indent << "Reader: " << this->Reader << endl;
 }
