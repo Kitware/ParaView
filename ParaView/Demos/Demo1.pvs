@@ -3605,6 +3605,7 @@ proc warp_run {} {
 
     $warp(vtkTemp469) DrawSurface
     $warp(vtkTemp469) SetVisibility 1
+    update
 
     $warp(vtkTemp24) SetCameraState 91.248 12.000 0.000  -56.063 12.000 0.000  0.000 -0.004 -1.000
     for {set i 2} {$i < 11} {incr i 1} {
@@ -3615,6 +3616,7 @@ proc warp_run {} {
         $warp(vtkTemp469) ColorByPointField "thickness$i" 1
         $warp(vtkTemp462) SetValue "displacement$i"
         $warp(vtkTemp450) AcceptCallback
+        update
         if $pvDemoShouldStop {
             return
         }
@@ -3622,6 +3624,7 @@ proc warp_run {} {
     }
     [$warp(vtkTemp1) GetPVColorMap "thickness10" 1] SetScalarBarVisibility 0
     $warp(vtkTemp469) DrawWireframe
+    update
     for {set i 2} {$i < 11} {incr i 1} {
         [$warp(vtkTemp1) GetPVColorMap "thickness[expr $i-1]" 1] SetScalarBarVisibility 0
         [$warp(vtkTemp1) GetPVColorMap "thickness$i" 1] SetScalarBarVisibility 1
@@ -3630,6 +3633,7 @@ proc warp_run {} {
         $warp(vtkTemp469) ColorByPointField "thickness$i" 1
         $warp(vtkTemp462) SetValue "displacement$i"
         $warp(vtkTemp450) AcceptCallback
+        update
         if $pvDemoShouldStop {
             return
         }
