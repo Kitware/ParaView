@@ -49,7 +49,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.14");
+vtkCxxRevisionMacro(vtkKWLabel, "1.15");
 
 //-----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -91,8 +91,9 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Label already created");
     return;
@@ -112,6 +113,10 @@ void vtkKWLabel::Create(vtkKWApplication *app, const char *args)
     this->Script("label %s -text {%s} -justify left %s", 
                  wname, this->Label, (args?args:""));
     }
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------

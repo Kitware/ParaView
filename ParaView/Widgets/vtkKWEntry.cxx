@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWEntry );
-vtkCxxRevisionMacro(vtkKWEntry, "1.12");
+vtkCxxRevisionMacro(vtkKWEntry, "1.13");
 
 vtkKWEntry::vtkKWEntry()
 {
@@ -119,8 +119,9 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Entry already created");
     return;
@@ -144,6 +145,10 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
     {
     this->Script("%s configure -state disabled", wname);
     }
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 void vtkKWEntry::SetReadOnly(int ro)

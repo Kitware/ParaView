@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.9");
+vtkCxxRevisionMacro(vtkKWFrame, "1.10");
 
 vtkKWFrame::vtkKWFrame()
 {
@@ -72,8 +72,9 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
 {
   const char *wname;
   
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("ScrollableFrame already created");
     return;
@@ -113,6 +114,10 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
 
     this->Frame = this;
     }
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------

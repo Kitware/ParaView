@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.15");
+vtkCxxRevisionMacro(vtkKWExtent, "1.16");
 
 
 
@@ -100,8 +100,9 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Extent already created");
     return;
@@ -151,6 +152,10 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
     this->YMaxScale->GetWidgetName(),
     this->ZMinScale->GetWidgetName(),
     this->ZMaxScale->GetWidgetName());
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 
