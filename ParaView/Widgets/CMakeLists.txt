@@ -1,6 +1,7 @@
 PROJECT(Widgets)
 INCLUDE_REGULAR_EXPRESSION("^(vtk|kw|icons).*$")
 SET( KWWidgets_SRCS
+${VTK_TCL_HOME}/vtktcl.c
 vtkCornerAnnotation.cxx
 vtkKWActorComposite.cxx 
 vtkKWApplication.cxx 
@@ -54,6 +55,7 @@ vtkKWSaveImageDialog.cxx
 vtkKWScale.cxx 
 vtkKWSegmentedProgressGauge.cxx
 vtkKWSelectionFrame.cxx
+vtkKWSimpleEntryDialog.cxx
 vtkKWSplashScreen.cxx
 vtkKWSplitFrame.cxx
 vtkKWTclInteractor.cxx
@@ -72,7 +74,6 @@ vtkKWWidgetCollection.cxx
 vtkKWWindow.cxx 
 vtkKWWindowCollection.cxx 
 vtkKWXtEmbeddedWidget.cxx 
-${VTK_TCL_HOME}/vtktcl.c
 )
 
 SET_SOURCE_FILES_PROPERTIES(
