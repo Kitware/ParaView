@@ -404,6 +404,15 @@ void vtkKWMenu::Invoke(int position)
   this->Script("%s invoke %d", this->GetWidgetName(), position);
 }
 
+void vtkKWMenu::Invoke(const char* item)
+{
+  if ( !this->IsItemPresent(item) )
+    {
+    return;
+    }
+  this->Invoke(this->GetIndex(item));
+}
+
 void vtkKWMenu::DeleteMenuItem(int position)
 {
   this->Script("catch {%s delete %d}", this->GetWidgetName(), position);

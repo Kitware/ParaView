@@ -135,6 +135,7 @@ public:
   // Description:
   // Call the menu item callback at the given index
   void Invoke(int position);
+  void Invoke(const char* name);
 
   // Description:
   // Delete the menu item at the given position.
