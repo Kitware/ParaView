@@ -146,8 +146,9 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());   
 
-  if (strcmp(this->SourceClassName, "vtkImageMandelbrotSource") == 0 ||
-      strcmp(this->SourceClassName, "vtkImageReader") == 0)
+//  if (strcmp(this->SourceClassName, "vtkImageMandelbrotSource") == 0 ||
+//      strcmp(this->SourceClassName, "vtkImageReader") == 0)
+  if (!this->InputClassName)
     {
     sprintf(extentTclName, "Translator%d", this->InstanceCount);
     pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);
@@ -156,7 +157,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     pvApp->BroadcastScript("%s SetExtentTranslator %s",
 			   pvd->GetVTKDataTclName(), extentTclName);
     }
-  if (pvd->GetVTKData()->IsA("vtkImageData") && this->InputClassName)
+  else
+//  if (pvd->GetVTKData()->IsA("vtkImageData") && this->InputClassName)
     {
     pvApp->BroadcastScript(
       "%s SetExtentTranslator [[%s GetInput] GetExtentTranslator]",
@@ -202,8 +204,9 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
       }
     else if (mInt->GetWidgetType() == VTK_PV_METHOD_WIDGET_EXTENT)
       {
-      this->Script("eval %s SetOutputWholeExtent [[%s GetInput] GetWholeExtent]",
-		   pvs->GetVTKSourceTclName(), pvs->GetVTKSourceTclName());
+      this->Script("eval %s %s [[%s GetInput] GetWholeExtent]",
+		   pvs->GetVTKSourceTclName(), mInt->GetSetCommand(),
+		   pvs->GetVTKSourceTclName());
       pvs->AddVector6Entry(mInt->GetVariableName(), "", "", "", "", "", "",
 			   mInt->GetSetCommand(),
 			   mInt->GetGetCommand(),

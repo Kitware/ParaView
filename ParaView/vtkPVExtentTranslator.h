@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVExtentTranslator_h
 
 #include "vtkExtentTranslator.h"
-#include "vtkImageData.h"
+#include "vtkDataSet.h"
 
 
 class VTK_EXPORT vtkPVExtentTranslator : public vtkExtentTranslator
@@ -79,9 +79,9 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // This is the original upstream image source.
-  vtkSetObjectMacro(OriginalSource,vtkImageData);
-  vtkGetObjectMacro(OriginalSource,vtkImageData);
+  // This is the original upstream data set
+  vtkSetObjectMacro(OriginalSource, vtkDataSet);
+  vtkGetObjectMacro(OriginalSource,vtkDataSet);
 
   int PieceToExtent();
 
@@ -91,8 +91,7 @@ protected:
   vtkPVExtentTranslator(const vtkPVExtentTranslator&) {};
   void operator=(const vtkPVExtentTranslator&) {};
 
-  vtkImageData *OriginalSource;
+  vtkDataSet *OriginalSource;
 };
 
 #endif
-
