@@ -190,7 +190,7 @@ void vtkKWVolumeComposite::SetInput(vtkImageData *input)
 
   if ( this->GetView() )
     {
-    this->GetView()->GetWindow()->GetProgressGauge()->SetValue(0);
+    this->GetView()->GetWindow()->GetProgressGauge()->SetValue(5);
     }
   
   input->Update();
@@ -453,5 +453,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.15 $");
+  this->ExtractRevision(os,"$Revision: 1.16 $");
 }

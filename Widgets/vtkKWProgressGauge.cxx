@@ -55,15 +55,12 @@ vtkKWProgressGauge::vtkKWProgressGauge()
   this->Height = 20;
   this->Value = 0;
   this->BarColor = strcpy(new char[5], "blue");
-  this->BackgroundColor = strcpy(new char[5], "gray");
 }
 
 
 vtkKWProgressGauge::~vtkKWProgressGauge()
 {
   delete [] this->BarColor;
-  delete [] this->BackgroundColor;
-  this->BackgroundColor = NULL;
   this->BarColor = NULL;
 }
 
@@ -83,15 +80,14 @@ void vtkKWProgressGauge::Create(vtkKWApplication *app, char *args)
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s", wname);
-  this->Script("canvas %s.display -borderwidth 0  -highlightthickness 0 -width %d -height %d -bg %s %s",
-	       wname, this->Length, this->Height, 
-	       this->BackgroundColor, args);
+  this->Script("canvas %s.display -borderwidth 0  -highlightthickness 0 -width %d -height %d %s",
+	       wname, this->Length, this->Height, args);
   this->Script("pack %s.display -expand yes", wname);
   // initialize the bar color to the background so it does
   // not show up until used
   this->Script(
-    "%s.display create rectangle 0 0 0 0 -outline \"\" -fill gray -tags bar", 
-	       wname, this->BackgroundColor);
+    "%s.display create rectangle 0 0 0 0 -outline \"\"  -tags bar", 
+	       wname );
   this->Script(
     "%s.display create text [expr 0.5 * %d] "
     "%d "
@@ -119,8 +115,8 @@ void vtkKWProgressGauge::SetValue(int value)
     // up as a pixel...
     this->Script("%s.display itemconfigure value -text {}", wname);
     this->Script("%s.display coords bar 0 0 0 0", wname);
-    this->Script("%s.display itemconfigure bar -fill %s", 
-		 wname, this->BackgroundColor);
+    this->Script("%s.display itemconfigure bar -fill {}", 
+		 wname);
     }
   else
     {
