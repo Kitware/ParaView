@@ -94,7 +94,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.13");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.14");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
@@ -357,7 +357,7 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
 {
-  cout << "SwitchScriptTime: " << i << endl;
+  //cout << "SwitchScriptTime: " << i << endl;
   vtkKWApplication* pvApp = this->StartTimeEntry->GetApplication();
   pvApp->Script("pack forget %s %s %s %s",
     this->DummyFrame->GetWidgetName(),
@@ -787,7 +787,7 @@ void vtkPVAnimationInterfaceEntry::SaveState(ofstream* file)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterfaceEntry::SetScript(const char* scr)
 {
-  cout << "SetScript: " << scr << endl;
+  //cout << "SetScript: " << scr << endl;
   if ( vtkString::Equals(scr, this->Script) )
     {
     return;
@@ -803,7 +803,7 @@ void vtkPVAnimationInterfaceEntry::SetScript(const char* scr)
     {
     return;
     }
-  cout << "SetScriptEditor: " << scr << endl;
+  //cout << "SetScriptEditor: " << scr << endl;
   this->ScriptEditor->SetValue(scr);
 }
 
