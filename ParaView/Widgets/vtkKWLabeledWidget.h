@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWidget.h"
 
 class vtkKWApplication;
-class vtkKWLabel;
+class vtkKWImageLabel;
 
 class VTK_EXPORT vtkKWLabeledWidget : public vtkKWWidget
 {
@@ -67,7 +67,7 @@ public:
 
   // Description:
   // Get the internal label
-  vtkGetObjectMacro(Label, vtkKWLabel);
+  vtkGetObjectMacro(Label, vtkKWImageLabel);
 
   // Description:
   // Convenience method to set the contents label.
@@ -94,7 +94,7 @@ protected:
   vtkKWLabeledWidget();
   ~vtkKWLabeledWidget();
 
-  vtkKWLabel      *Label;
+  vtkKWImageLabel      *Label;
 
   int ShowLabel;
 
