@@ -185,7 +185,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.155");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.156");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -956,7 +956,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
                                       vtkKWObject::GetFloatResult(pvApp));
           if (entry->GetPVSource() && entry->GetPVSource()->GetProxy())
             {
-            entry->GetPVSource()->GetProxy()->UpdateVTKObjects();
+            entry->GetPVSource()->UpdateVTKObjects();
             entry->GetPVSource()->ResetCallback();
             }
           }

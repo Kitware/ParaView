@@ -20,22 +20,23 @@
 
 #include "vtkKWWidget.h"
 
-class vtkPVApplication;
-class vtkKWWidget;
 class vtkKWFrame;
 class vtkKWLabel;
-class vtkKWMenuButton;
 class vtkKWLabeledEntry;
-class vtkPVSource;
-class vtkPVAnimationInterface;
-class vtkKWRange;
-class vtkPVAnimationInterfaceEntryObserver;
-class vtkKWText;
 class vtkKWLabeledOptionMenu;
+class vtkKWMenuButton;
+class vtkKWPushButton;
+class vtkKWRange;
 class vtkKWScale;
+class vtkKWText;
 class vtkKWThumbWheel;
-class vtkSMProperty;
+class vtkKWWidget;
+class vtkPVAnimationInterface;
+class vtkPVAnimationInterfaceEntryObserver;
+class vtkPVApplication;
+class vtkPVSource;
 class vtkSMDomain;
+class vtkSMProperty;
 
 class VTK_EXPORT vtkPVAnimationInterfaceEntry : public vtkKWWidget
 {
@@ -200,6 +201,15 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
 
+  // Description:
+  // Widget who support resetting range should set this to true
+  // and bind the right method to ResetRangeButton in their
+  // AnimationMenuCallback.
+  vtkGetMacro(ResetRangeButtonState, int);
+  vtkSetMacro(ResetRangeButtonState, int);
+
+  vtkGetObjectMacro(ResetRangeButton, vtkKWPushButton);
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();
@@ -229,6 +239,9 @@ protected:
   vtkKWText*         ScriptEditor;
   vtkKWFrame*        ScriptEditorFrame;
   vtkKWWidget*       ScriptEditorScroll;
+
+  vtkKWPushButton*   ResetRangeButton;
+  int ResetRangeButtonState;
 
   vtkKWObject*       SaveStateObject;
   char*              SaveStateScript;
