@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.19");
+vtkCxxRevisionMacro(vtkKWApplicationSettingsInterface, "1.20");
 
 int vtkKWApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -686,21 +686,20 @@ void vtkKWApplicationSettingsInterface::ResetDragAndDropCallback()
     return;
     }
 
-  if (vtkKWMessageDialog::PopupOkCancel( 
+  vtkKWMessageDialog::PopupMessage( 
         this->Application, this->Window, 
         "Reset Interface", 
         "All Drag & Drop events performed so far will be discarded. "
         "Note that your interface will be reset the next time you "
         "start this application.",
-        vtkKWMessageDialog::WarningIcon))
+        vtkKWMessageDialog::WarningIcon);
+
+  vtkKWUserInterfaceNotebookManager *uim_nb = 
+    vtkKWUserInterfaceNotebookManager::SafeDownCast(
+      this->Window->GetUserInterfaceManager());
+  if (uim_nb)
     {
-    vtkKWUserInterfaceNotebookManager *uim_nb = 
-      vtkKWUserInterfaceNotebookManager::SafeDownCast(
-        this->Window->GetUserInterfaceManager());
-    if (uim_nb)
-      {
-      uim_nb->DeleteAllDragAndDropEntries();
-      }
+    uim_nb->DeleteAllDragAndDropEntries();
     }
 }
 
