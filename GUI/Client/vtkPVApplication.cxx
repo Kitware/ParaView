@@ -109,7 +109,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.293");
+vtkCxxRevisionMacro(vtkPVApplication, "1.294");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1393,6 +1393,7 @@ void vtkPVApplication::Initialize()
 
   this->SMApplication->Initialize();
   vtkSMProperty::SetModifiedAtCreation(0);
+  vtkSMProperty::SetCheckDomains(0);
 
   vtkSMProxyManager* proxm = vtkSMObject::GetProxyManager();
   proxm->InstantiateGroupPrototypes("filters");
