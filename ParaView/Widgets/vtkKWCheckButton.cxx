@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCheckButton );
-vtkCxxRevisionMacro(vtkKWCheckButton, "1.12");
+vtkCxxRevisionMacro(vtkKWCheckButton, "1.13");
 
 
 vtkKWCheckButton::vtkKWCheckButton() 
@@ -144,12 +144,12 @@ void vtkKWCheckButton::Create(vtkKWApplication *app, const char *args)
   if (!this->IndicatorOn)
     {
     this->Script("checkbutton %s -indicatoron 0 -variable %sValue %s",
-                 wname,wname,args);
+                 wname,wname,(args?args:""));
     }
   else
     {
     this->Script("checkbutton %s -variable %sValue %s",
-                 wname,wname,args);
+                 wname,wname,(args?args:""));
     }
 
   if (this->MyText)
