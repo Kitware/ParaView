@@ -37,6 +37,7 @@ extern "C" int Vtkcontribtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkgraphicstcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkimagingtcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkpatentedtcl_Init(Tcl_Interp *interp);
+extern "C" int Vtkparalleltcl_Init(Tcl_Interp *interp);
 
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
