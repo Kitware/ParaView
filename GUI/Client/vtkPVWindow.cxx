@@ -221,7 +221,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.636");
+vtkCxxRevisionMacro(vtkPVWindow, "1.637");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1004,6 +1004,30 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
                                      1, "Delete all modules in ParaView");
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVWindow::SetToolbarVisibility(const char* identifier, int state)
+{
+  if (!strcmp(identifier, "animation"))
+    {
+    this->Superclass::SetToolbarVisibility(this->AnimationToolbar, 
+      VTK_PV_TOOLBARS_ANIMATION_LABEL, state);
+    }
+  else if (!strcmp(identifier, "tools"))
+    {
+    this->Superclass::SetToolbarVisibility(this->Toolbar, 
+      VTK_PV_TOOLBARS_TOOLS_LABEL, state);
+    }
+  else if(!strcmp(identifier, "camera"))
+    {
+    this->Superclass::SetToolbarVisibility(this->PickCenterToolbar,
+      VTK_PV_TOOLBARS_CAMERA_LABEL, state);
+    }
+  else if (!strcmp(identifier, "interaction"))
+    {
+    this->Superclass::SetToolbarVisibility(this->InteractorToolbar, 
+      VTK_PV_TOOLBARS_INTERACTION_LABEL, state);
+    }
+}
 //-----------------------------------------------------------------------------
 void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 {
@@ -1955,7 +1979,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
 
   //this->Toolbars->SetToolbarVisibility(
   //  this->PickCenterToolbar, pick_toolbar_vis);
-  this->SetToolbarVisibility(this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL, pick_toolbar_vis);
+  this->Superclass::SetToolbarVisibility(this->PickCenterToolbar, VTK_PV_TOOLBARS_CAMERA_LABEL, pick_toolbar_vis);
   this->MainView->EventuallyRender();
 }
 
