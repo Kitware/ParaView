@@ -41,7 +41,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVOptions);
-vtkCxxRevisionMacro(vtkPVOptions, "1.25");
+vtkCxxRevisionMacro(vtkPVOptions, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVOptions::vtkPVOptions()
@@ -169,7 +169,7 @@ void vtkPVOptions::Initialize()
                            "Tell the application to enable stereo rendering"
                            " (only when running on a single process).",
                            vtkPVOptions::PVCLIENT | vtkPVOptions::PARAVIEW);
-  this->AddArgument("--server-host", "-dsh", &this->ServerHostName,
+  this->AddArgument("--server-host", "-sh", &this->ServerHostName,
                     "Tell the client the host name of the data server.",
                     vtkPVOptions::PVCLIENT);
   this->AddArgument("--data-server-host", "-dsh", &this->DataServerHostName,
