@@ -57,6 +57,7 @@ vtkKWRange.cxx
 vtkKWRenderWidget.cxx 
 vtkKWSaveImageDialog.cxx 
 vtkKWScalarBarAnnotation.cxx 
+vtkKWScalarComponentSelectionWidget.cxx
 vtkKWScale.cxx 
 vtkKWScaleSet.cxx 
 vtkKWSegmentedProgressGauge.cxx
