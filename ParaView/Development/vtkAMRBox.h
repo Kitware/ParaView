@@ -23,8 +23,9 @@
 
 #include "vtkObject.h"
 
-struct VTK_EXPORT vtkAMRBox
+class VTK_EXPORT vtkAMRBox
 {
+public:
   int LoCorner[3];
   int HiCorner[3];
 
@@ -87,3 +88,9 @@ struct VTK_EXPORT vtkAMRBox
 };
 
 #endif
+
+
+
+
+
+
