@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVServerArraySelection - Server-side helper for vtkPVProbe.
+// .NAME vtkPVServerProbe - Server-side helper for vtkPVProbe.
 // .SECTION Description
 
 #ifndef __vtkPVServerProbe_h
