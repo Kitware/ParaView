@@ -36,7 +36,6 @@ ENDIF (WIN32)
 
 
 FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
-SET ( VTK_BINARY_DIR "c:/vtkbin")
 
 
 # load in the values from VTK if found
@@ -50,12 +49,17 @@ IF ( VTK_BINARY_DIR )
                                INCLUDE_INTERNALS
                                 VTK_BINARY_PATH
                                 VTK_LIBRARY_PATH)
-  INCLUDE (C:/VTK/vtkCMakeOptions.cmake)
+  INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
 
   IF ( NOT VTK_WRAP_TCL )
     MESSAGE("ParaView requires VTK to be built with Tcl bindings. Please rebuild VTK with Tcl bindings and re-run CMake")
     SET (PARAVIEW_CAN_BUILD 0)
   ENDIF ( NOT VTK_WRAP_TCL )
+
+  IF (NOT VTK_USE_HYBRID)
+    MESSAGE("ParaView requires VTK to be built with hybrid support. Please rebuild VTK with hybrid and re-run CMake")
+    SET (PARAVIEW_CAN_BUILD 0)
+  ENDIF (NOT VTK_USE_HYBRID)
 
   IF (NOT VTK_USE_RENDERING)
     MESSAGE("ParaView requires VTK to be built with rendering support. Please rebuild VTK with rendering and re-run CMake")
