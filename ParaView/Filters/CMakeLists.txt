@@ -45,6 +45,7 @@ IF(VTK_USE_MPI)
       vtkDistributedDataFilter.cxx
       vtkKdTree.cxx
       vtkMergeCells.cxx
+      vtkMPIDuplicatePolyData.cxx
       vtkPKdTree.cxx
       vtkPVDuplicatePolyData.cxx
       vtkRedistributePolyData.cxx
