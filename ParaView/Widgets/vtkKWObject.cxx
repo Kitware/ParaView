@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkTclUtil.h"
 
 #include <stdarg.h>
+#include <ctype.h>
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
@@ -116,7 +117,7 @@ void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
 void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.23 $");
+  this->ExtractRevision(os,"$Revision: 1.24 $");
 }
 
 void vtkKWObject::Serialize(istream& is)
@@ -441,44 +442,58 @@ void vtkKWObject::PrintSelf(ostream& os, vtkIndent indent)
 //----------------------------------------------------------------------------
 int vtkKWObject::EstimateFormatLength(const char* format, va_list ap)
 {
-  const char* cur = format;
-  
   // Quick-hack attempt at estimating the length of the string.
-  // Should never under-estimate unless a construct of the form
-  // "%IIIs" is used, where III is an integer greater than 128.
+  // Should never under-estimate.
   
-  // Start with the length of the format itself.
+  // Start with the length of the format string itself.
   int length = strlen(format);
   
-  // Add to the length for each %foo format sequence.
+  // Increase the length for every argument in the format.
+  const char* cur = format;
   while(*cur)
     {
-    char ch = *cur++;
-    char next = *cur;
-    if(ch == '%')
+    if(*cur++ == '%')
       {
-      if(next == '%')
+      // Skip "%%" since it doesn't correspond to a va_arg.
+      if(*cur != '%')
         {
-        // Skip "%%" since it doesn't correspond to a va_arg.
-        ++cur;
-        }
-      else if(next == 's')
-        {
-        // Use the length of the string.
-        char* s = va_arg(ap, char*);
-        if(s)
+        while(!int(isalpha(*cur)))
           {
-          length += strlen(s);
+          ++cur;
+          }
+        switch (*cur)
+          {
+          case 's':
+            {
+            // Check the length of the string.
+            char* s = va_arg(ap, char*);
+            if(s)
+              {
+              length += strlen(s);
+              }
+            } break;
+          case 'e':
+          case 'f':
+            {
+            // Assume the argument contributes no more than 64 characters.
+            length += 64;
+            
+            // Eat the argument.
+            va_arg(ap, double);
+            } break;
+          default:
+            {
+            // Assume the argument contributes no more than 64 characters.
+            length += 64;
+            
+            // Eat the argument.
+            va_arg(ap, int);
+            } break;
           }
         }
-      else
-        {
-        // Assume the argument contributes no more than 128 characters.
-        length += 128;
-        
-        // Eat the argument.
-        (void)va_arg(ap, int);        
-        }
+      
+      // Move past the characters just tested.
+      ++cur;
       }
     }
   
