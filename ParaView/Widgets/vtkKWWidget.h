@@ -119,6 +119,10 @@ public:
   void SetBind(const char *event, const char *command);
 
   // Description:
+  // This method unsets the bind for specific event.
+  void UnsetBind(const char *event);
+
+  // Description:
   // A method to set binding on the object.
   // This method sets binding:
   // bind this->GetWidgetName() event { widget command }  
