@@ -22,7 +22,7 @@
 #include <algorithm>
 #include <set>
 
-vtkCxxRevisionMacro(vtkExtractCells, "1.2");
+vtkCxxRevisionMacro(vtkExtractCells, "1.3");
 vtkStandardNewMacro(vtkExtractCells);
 
 void vtkExtractCells::FreeCellList()
@@ -235,8 +235,8 @@ int vtkExtractCells::findInSortedList(vtkIdList *idList, vtkIdType id)
   L=0; 
   R=numids-1;
 
-  int *ids = (int *)idList->GetPointer(0);
-  int Id = (int)id;
+  vtkIdType *ids = (vtkIdType *)idList->GetPointer(0);
+  vtkIdType Id = (vtkIdType)id;
 
   int loc = -1;
 
@@ -284,7 +284,7 @@ vtkIdList *vtkExtractCells::reMapPointIds(vtkDataSet *grid)
 
     int nIds = ptIds->GetNumberOfIds();
 
-    int *ptId = ptIds->GetPointer(0);
+    vtkIdType *ptId = ptIds->GetPointer(0);
 
     for (int j=0; j<nIds; j++){
       ptList.insert(*ptId++);
