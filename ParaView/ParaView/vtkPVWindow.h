@@ -144,8 +144,12 @@ public:
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   
   // Description:
+  // Access from script for regression test.
+  void SaveInTclScript(const char *filename, int vtkFlag);
+
+  // Description:
   // Save the pipeline as a tcl script.
-  void SaveInTclScript();
+  void ExportVTKScript();
 
   // Description:
   // Copy the trace file to a file with the specified file name.

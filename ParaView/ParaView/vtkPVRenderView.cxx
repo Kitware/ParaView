@@ -1000,7 +1000,8 @@ void vtkPVRenderView::SetInteractor(vtkKWInteractor *interactor)
 
 }
 
-void vtkPVRenderView::SaveInTclScript(ofstream *file)
+//----------------------------------------------------------------------------
+void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag)
 {
   vtkCamera *camera;
   float position[3];
@@ -1009,13 +1010,16 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file)
   float viewAngle;
   float clippingRange[2];
 
-  *file << "vtkRenderer " << this->RendererTclName << "\n"
-        << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
-        << this->RenderWindowTclName << " AddRenderer "
-        << this->RendererTclName << "\n"
-        << "vtkRenderWindowInteractor iren\n\t"
-        << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
-  
+  if (vtkFlag)
+    {
+    *file << "vtkRenderer " << this->RendererTclName << "\n"
+          << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
+          << this->RenderWindowTclName << " AddRenderer "
+          << this->RendererTclName << "\n"
+          << "vtkRenderWindowInteractor iren\n\t"
+          << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
+    }
+
   camera = this->GetRenderer()->GetActiveCamera();
   camera->GetPosition(position);
   camera->GetFocalPoint(focalPoint);
@@ -1024,19 +1028,19 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file)
   camera->GetClippingRange(clippingRange);
   
   *file << "# camera parameters\n"
-        << "vtkCamera camera\n\t"
-        << "camera SetPosition " << position[0] << " " << position[1] << " "
+        << "set camera [" << this->RendererTclName << " GetActiveCamera]\n\t"
+        << "$camera SetPosition " << position[0] << " " << position[1] << " "
         << position[2] << "\n\t"
-        << "camera SetFocalPoint " << focalPoint[0] << " " << focalPoint[1]
+        << "$camera SetFocalPoint " << focalPoint[0] << " " << focalPoint[1]
         << " " << focalPoint[2] << "\n\t"
-        << "camera SetViewUp " << viewUp[0] << " " << viewUp[1] << " "
+        << "$camera SetViewUp " << viewUp[0] << " " << viewUp[1] << " "
         << viewUp[2] << "\n\t"
-        << "camera SetViewAngle " << viewAngle << "\n\t"
-        << "camera SetClippingRange " << clippingRange[0] << " "
-        << clippingRange[1] << "\n"
-        << this->RendererTclName << " SetActiveCamera camera\n\n";
+        << "$camera SetViewAngle " << viewAngle << "\n\t"
+        << "$camera SetClippingRange " << clippingRange[0] << " "
+        << clippingRange[1] << "\n";
 }
 
+//----------------------------------------------------------------------------
 void vtkPVRenderView::AddActorsToTclScript(ofstream *file)
 {
   int i;

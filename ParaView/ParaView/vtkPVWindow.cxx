@@ -458,7 +458,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->AdvancedMenu->AddCommand("Load ParaView Script", this, "LoadScript", 0,
 				 "Load ParaView Script (.pvs)");
   this->AdvancedMenu->InsertCommand(2, "Export VTK Script", this,
-				    "SaveInTclScript", 7,
+				    "ExportVTKScript", 7,
 				    "Write a script which can be "
     "parsed by the vtk executable");
   // Log stuff (not traced)
@@ -1158,11 +1158,8 @@ void vtkPVWindow::WriteData()
 // and may in the future use the same methods.
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::SaveInTclScript()
+void vtkPVWindow::ExportVTKScript()
 {
-  ofstream *file;
-  vtkCollection *sources;
-  vtkPVSource *pvs;
   char *filename;
   
   this->Script("tk_getSaveFile -filetypes {{{Tcl Scripts} {.tcl}} {{All Files} {.*}}} -defaultextension .tcl");
@@ -1172,7 +1169,17 @@ void vtkPVWindow::SaveInTclScript()
     {
     return;
     }
-  
+
+  this->SaveInTclScript(filename, 1);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
+{
+  ofstream *file;
+  vtkCollection *sources;
+  vtkPVSource *pvs;
+      
   file = new ofstream(filename, ios::out);
   if (file->fail())
     {
@@ -1183,13 +1190,20 @@ void vtkPVWindow::SaveInTclScript()
     }
 
   *file << "# ParaView Version " << this->GetPVApplication()->GetMajorVersion()
-	<< "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
+	   << "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
 
-  *file << "package require vtk\n"
-        << "package require vtkinteraction\n"
-        << "# create a rendering window and renderer\n";
-  
-  this->GetMainView()->SaveInTclScript(file);
+  if (vtkFlag)
+    {
+    *file << "package require vtk\n"
+          << "package require vtkinteraction\n"
+          << "# create a rendering window and renderer\n";
+    }
+  else
+    {
+    *file << "# Script generated for regression test within ParaView.\n";
+    }
+
+  this->GetMainView()->SaveInTclScript(file, vtkFlag);
   
   // Loop through sources ...
   sources = this->GetSources();
@@ -1230,11 +1244,14 @@ void vtkPVWindow::SaveInTclScript()
 
   this->GetMainView()->AddActorsToTclScript(file);
     
-  *file << "# enable user interface interactor\n"
-        << "iren SetUserMethod {wm deiconify .vtkInteract}\n"
-        << "iren Initialize\n\n"
-        << "# prevent the tk window from showing up then start the event loop\n"
-        << "wm withdraw .\n";
+  if (vtkFlag)
+    {
+    *file << "# enable user interface interactor\n"
+          << "iren SetUserMethod {wm deiconify .vtkInteract}\n"
+          << "iren Initialize\n\n"
+          << "# prevent the tk window from showing up then start the event loop\n"
+          << "wm withdraw .\n";
+    }
 
   if (file)
     {
@@ -1246,6 +1263,7 @@ void vtkPVWindow::SaveInTclScript()
 }
 
 //----------------------------------------------------------------------------
+// This was never completed.
 void vtkPVWindow::SaveWorkspace()
 {
   ofstream *file;
@@ -1272,9 +1290,8 @@ void vtkPVWindow::SaveWorkspace()
 
   *file << "# ParaView Workspace Version  " << this->GetPVApplication()->GetMajorVersion()
 	<< "." << this->GetPVApplication()->GetMinorVersion() << "\n\n";
-
   
-  this->GetMainView()->SaveInTclScript(file);
+  this->GetMainView()->SaveInTclScript(file, 1);
   
   // Loop through sources ...
   sources = this->GetSources();
@@ -2654,6 +2671,10 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Boolean name=\"VertexCells\" help=\"Generate vertex as geometry of just points.\"/>\n"
 "</Filter>\n"
 "\n"
+"<Filter class=\"vtkCellDataToPointData\" root=\"CellToPoint\" input=\"vtkDataSet\" output=\"vtkDataSet\">\n"
+"  <Boolean name=\"PassCellData\" help=\" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output.\"/>\n"
+"</Filter>\n"
+"\n"
 "<Filter class=\"vtkCleanPolyData\" root=\"CleanPD\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
 "  <Boolean name=\"PieceInvariant\" help=\"Turn this off if you do not want pieces or do not mind seams.\"/>\n"
 "</Filter>\n"
@@ -2957,10 +2978,6 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 //  "\n"
 //  "<Filter class=\"vtkCellCenters\" root=\"Centers\" input=\"vtkDataSet\" output=\"vtkPolyData\">\n"
 //  "  <Boolean name=\"VertexCells\" help=\"Generate vertex as geometry of just points.\"/>\n"
-//  "</Filter>\n"
-//  "\n"
-//  "<Filter class=\"vtkCellDataToPointData\" root=\"CellToPoint\" input=\"vtkDataSet\" output=\"vtkDataSet\">\n"
-//  "  <Boolean name=\"PassCellData\" help=\" Control whether the input cell data is to be passed to the output. If on, then the input cell data is passed through to the output; otherwise, only generated point data is placed into the output.\"/>\n"
 //  "</Filter>\n"
 //  "\n"
 //  "<Filter class=\"vtkCellDerivatives\" root=\"CellDeriv\" input=\"vtkDataSet\" output=\"vtkDataSet\">\n"

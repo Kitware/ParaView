@@ -157,7 +157,7 @@ public:
 
   // Description:
   // Save the renderer and render window to a file.
-  void SaveInTclScript(ofstream *file);
+  void SaveInTclScript(ofstream *file, int vtkFlag);
   void AddActorsToTclScript(ofstream *file);
 
   // Description:
