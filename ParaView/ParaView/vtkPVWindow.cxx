@@ -91,6 +91,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWizard.h"
 #include "vtkPVXMLPackageParser.h"
 #include "vtkPolyDataMapper.h"
+#include "vtkRenderWindow.h"
 #include "vtkToolkits.h"
 
 #ifdef _WIN32
@@ -877,6 +878,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   
   this->GenericInteractor->SetPVRenderView(this->MainView);
   this->ChangeInteractorStyle(1);
+  int *windowSize = this->MainView->GetRenderWindow()->GetSize();
+  this->Configure(windowSize[0], windowSize[1]);
  
   // set up bindings for the interactor  
   const char *wname = this->MainView->GetVTKWidget()->GetWidgetName();
