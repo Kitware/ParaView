@@ -182,6 +182,7 @@ class VTK_EXPORT vtkKWEvent
     VolumeOrientationMarkerColorChangedEvent,
     VolumeOrientationMarkerVisibilityChangedEvent,
     VolumePropertyChangedEvent,
+    VolumePropertyChangingEvent,
     VolumeReformatBoxVisibilityChangedEvent,
     VolumeReformatChangedEvent,
     VolumeReformatManipulationStyleChangedEvent,
