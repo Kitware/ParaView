@@ -75,7 +75,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.109");
+vtkCxxRevisionMacro(vtkKWApplication, "1.110");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -171,6 +171,8 @@ vtkKWApplication::vtkKWApplication()
     {
     this->ShowBalloonHelp = 1;
     }
+
+  this->ApplicationExited = 0;
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -488,6 +490,7 @@ void vtkKWApplication::Exit()
   this->InExit = 0;
   this->Cleanup();
 
+  this->ApplicationExited = 1;
   return;
 }
     
@@ -1168,4 +1171,5 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
     }
   os << indent << "HasSplashScreen: " << (this->HasSplashScreen ? "on":"off") << endl;
   os << indent << "ShowSplashScreen: " << (this->ShowSplashScreen ? "on":"off") << endl;
+  os << indent << "ApplicationExited: " << this->ApplicationExited << endl;
 }

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.13");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.14");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -242,8 +242,15 @@ void vtkKWTclInteractor::Evaluate()
   this->Script("set commandList [linsert $commandList end [concat {%s}]]",
                this->CommandEntry->GetValue());
   this->Script("%s insert end \"\n\"", this->DisplayText->GetWidgetName());
+  this->Register(this);
   this->Script("catch {eval [list %s]} _tmp_err",  
                this->CommandEntry->GetValue());
+  if ( this->Application->GetApplicationExited() )
+    {
+    this->UnRegister(this);
+    return;
+    }
+  this->UnRegister(this);
   this->Script("set _tmp_err");
   this->Script("%s insert end {%s}", 
                this->DisplayText->GetWidgetName(),

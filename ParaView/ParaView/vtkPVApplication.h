@@ -222,6 +222,7 @@ public:
 
   //BTX
   static const char* const LoadComponentProc;
+  static const char* const ExitProc;
   //ETX
 
   void DisplayTCLError(const char* message);

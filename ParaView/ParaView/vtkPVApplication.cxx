@@ -114,7 +114,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.183");
+vtkCxxRevisionMacro(vtkPVApplication, "1.184");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -256,6 +256,13 @@ Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
   
   // Create the component loader procedure in Tcl.
   char* script = vtkString::Duplicate(vtkPVApplication::LoadComponentProc);  
+  if (Tcl_GlobalEval(interp, script) != TCL_OK)
+    {
+    // ????
+    }  
+  delete [] script;
+
+  script = vtkString::Duplicate(vtkPVApplication::ExitProc);  
   if (Tcl_GlobalEval(interp, script) != TCL_OK)
     {
     // ????
@@ -1711,6 +1718,9 @@ const char* const vtkPVApplication::LoadComponentProc =
 
 
 
+//----------------------------------------------------------------------------
+const char* const vtkPVApplication::ExitProc =
+"proc exit {} { global Application; $Application Exit }";
 
 
 

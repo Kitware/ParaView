@@ -275,6 +275,11 @@ public:
   vtkSetMacro(ShowSplashScreen, int);
   vtkBooleanMacro(ShowSplashScreen, int);
 
+  // Description:
+  // At the end of Exit(), this is set to true. Other objects
+  // can use this to cleanup properly.
+  vtkGetMacro(ApplicationExited, int);
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -296,6 +301,8 @@ protected:
   char *ApplicationReleaseName;
   int MajorVersion;
   int MinorVersion;
+
+  int ApplicationExited;
 
   // For Balloon help
   vtkKWWidget *BalloonHelpWindow;
