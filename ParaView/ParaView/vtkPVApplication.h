@@ -164,8 +164,10 @@ public:
   vtkGetMacro(MinorVersion, int);
 
   // Description:
-  // Show help.
+  // Display the on-line help and about dialog for this application.
+  // Over-writing vtkKWApplication defaults.
   void DisplayHelp();
+  virtual void DisplayAbout(vtkKWWindow *);
 
   virtual int GetApplicationKey() 
     {
