@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.26");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.27");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1071,7 +1071,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
                  this->FileList->GetWidgetName(), tmp,
                  this->GetTclName(), name, tmp, this->GetTclName());
     }
-          
+  delete [] tmp;
   return yNext;
 }
 
