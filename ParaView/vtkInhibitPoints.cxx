@@ -124,7 +124,7 @@ void vtkInhibitPoints::Execute()
   int progressInterval=numPts/20 +1;
 
 
-  for (ptId = 0; ptId < numPts && !abort;  ++ptId)
+  for (ptId = 0; ptId < numPts && numPassed < 10000 && !abort;  ++ptId)
     {
     // Perform check.
     x =  input->GetPoint(ptId);
