@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.12");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.13");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -330,7 +330,6 @@ void vtkPVSaveBatchScriptDialog::SaveGeometryCheckCallback()
 void vtkPVSaveBatchScriptDialog::ImageFileNameBrowseButtonCallback()
 {
   ostrstream str;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
   loadDialog->Create(this->GetPVApplication(), 0);
   loadDialog->SetTitle("Select File Pattern");
@@ -380,7 +379,6 @@ void vtkPVSaveBatchScriptDialog::ImageFileNameBrowseButtonCallback()
 void vtkPVSaveBatchScriptDialog::GeometryFileNameBrowseButtonCallback()
 {
   ostrstream str;
-  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkKWLoadSaveDialog* loadDialog = this->GetPVApplication()->NewLoadSaveDialog();
   loadDialog->Create(this->GetPVApplication(), 0);
   loadDialog->SetTitle("Select Geometry File Pattern");
