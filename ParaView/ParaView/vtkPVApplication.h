@@ -87,7 +87,8 @@ public:
   void RemoteScript(int remoteId, char *EventString, ...);
 
   // Description:
-  // Can only be called by process 0.  It executes a script on every other process.
+  // Can only be called by process 0.  It executes a script on every other
+  // process.
   void BroadcastScript(char *EventString, ...);
 //ETX
   void RemoteSimpleScript(int remoteId, const char *str);
@@ -139,14 +140,14 @@ public:
   
   // Description:
   // A start at recording macros in ParaView.  Create a custom trace file
-  // that can be loaded back into paraview.  
-  // Window variables get initialized when the file is opened.
-  // Note: The trace entries get diverted to this file.
-  // This is only used for testing at the moment.  It is restricted to using
-  // sources created after the recording is started.  The macro also cannot use
-  // the glyph sources.  To make mocro recording available to the user,
-  // then there must be a way of setting arguments (existing sources) to the 
-  // macro, and a way of prompting the user to set the arguments when the
+  // that can be loaded back into paraview.  Window variables get
+  // initialized when the file is opened.
+  // Note: The trace entries get diverted to this file.  This is only used
+  // for testing at the moment.  It is restricted to using sources created
+  // after the recording is started.  The macro also cannot use the glyph
+  // sources.  To make mocro recording available to the user, then there
+  // must be a way of setting arguments (existing sources) to the macro,
+  // and a way of prompting the user to set the arguments when the
   // macro/script is loaded.
   void StartRecordingScript(char *filename);
   void StopRecordingScript();
@@ -180,15 +181,15 @@ public:
     };
 
   // Description:
-  // Need to put a global flag that indicates interactive rendering.
-  // All process must be consistent in choosing LODs because
-  // of the vtkCollectPolydata filter.
+  // Need to put a global flag that indicates interactive rendering.  All
+  // process must be consistent in choosing LODs because of the
+  // vtkCollectPolydata filter.
   void SetGlobalLODFlag(int val);
   static int GetGlobalLODFlag();
 
   // Description:
-  // For loggin from Tcl start and end execute events.
-  // We do not have c pointers to all filters.
+  // For loggin from Tcl start and end execute events.  We do not have c
+  // pointers to all filters.
   void LogStartEvent(char* str);
   void LogEndEvent(char* str);
 
@@ -218,12 +219,13 @@ protected:
   int RunningParaViewScript;
 
   vtkMultiProcessController *Controller;
-
+  
   vtkPVOutputWindow *OutputWindow;
 
   static int CheckForArgument(int argc, char* argv[], const char* arg,
 			      int& index);
   static int IsParaViewScriptFile(const char* arg);
+  char* CreateHelpString();
 
   //BTX
   enum

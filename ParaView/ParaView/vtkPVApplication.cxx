@@ -81,6 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkTclUtil.h"
 #include "vtkTimerLog.h"
+#include "vtkToolkits.h"
 #include "vtkUnsignedCharArray.h"
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
@@ -441,7 +442,46 @@ int vtkPVApplication::CheckForArgument(int argc, char* argv[],
 }
 
 const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] = 
-{ "--start-empty" , "--enable-mangled-mesa", "" };
+{ "--start-empty" , "-e", 
+  "Start ParaView without any default modules.", 
+#ifdef VTK_MANGLE_MESA
+  "--use-software-rendering", "-s", 
+  "Use software (Mesa) rendering (supports off-screen rendering).", 
+#endif
+  "--help", "",
+  "Displays available command line arguments.",
+  "" 
+};
+
+char* vtkPVApplication::CreateHelpString()
+{
+  ostrstream error;
+  error << "Valid arguments are: " << endl;
+
+  int j=0;
+  const char* argument1 = ArgumentList[j];
+  const char* argument2 = ArgumentList[j+1];
+  const char* help = ArgumentList[j+2];
+  while (argument1 && argument1[0])
+    {
+    error << argument1;
+    if (argument2[0])
+      {
+      error << ", " << argument2;
+      }
+    error << " : " << help << endl;
+    j += 3;
+    argument1 = ArgumentList[j];
+    if (argument1 && argument1[0]) 
+      {
+      argument2 = ArgumentList[j+1];
+      help = ArgumentList[j+2];
+      }
+    }
+  error << ends;
+  return error.str();
+  
+}
 
 int vtkPVApplication::IsParaViewScriptFile(const char* arg)
 {
@@ -466,7 +506,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->Script("option add *font {{MS Sans Serif} 8}");
 #else
   this->Script("option add *font -adobe-helvetica-medium-r-normal--12-120-75-75-p-67-iso8859-1");
-//  this->Script("option add *font -adobe-helvetica-medium-r-normal--11-80-100-100-p-56-iso8859-1");
   this->Script("option add *highlightThickness 0");
   this->Script("option add *highlightBackground #ccc");
   this->Script("option add *activeBackground #eee");
@@ -498,30 +537,51 @@ void vtkPVApplication::Start(int argc, char*argv[])
       if (argv[i])
 	{
 	int  j=0;
-	const char* argument = ArgumentList[j];
-	while (argument && argument[0])
+	const char* argument1 = ArgumentList[j];
+	const char* argument2 = ArgumentList[j+1];
+	while (argument1 && argument1[0])
 	  {
-	  if ( strcmp(argv[i], argument) == 0 )
+	  if ( strcmp(argv[i], argument1) == 0 || 
+	       strcmp(argv[i], argument2) == 0)
 	    {
 	    valid = 1;
 	    }
-	  argument = ArgumentList[++j];
+	  j += 3;
+	  argument1 = ArgumentList[j];
+	  if (argument1 && argument1[0]) {argument2 = ArgumentList[j+1];}
 	  }
 	}
       if (!valid)
 	{
-	vtkErrorMacro("Unrecognized argument " << argv[i] << ".");
+	char* error = this->CreateHelpString();
+	vtkErrorMacro("Unrecognized argument " << argv[i] << "." << endl
+		      << error);
+	delete[] error;
 	this->Exit();
 	return;
 	}
       }
     }
 
-  int index;
+  int index=-1;
 
-  if ( vtkPVApplication::CheckForArgument(argc, argv, "--enable-mangled-mesa",
-					  index) 
-       == VTK_OK )
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--help",
+					  index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-h",
+					  index) == VTK_OK )
+    {
+    char* error = this->CreateHelpString();
+    vtkWarningMacro(<<error);
+    delete[] error;
+    this->Exit();
+    return;
+    }
+
+#ifdef VTK_MANGLE_MESA
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-software-rendering",
+					  index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-s",
+					  index) == VTK_OK )
     {
     this->BroadcastScript("vtkGraphicsFactory _graphics_fact\n"
 			  "_graphics_fact SetUseMesaClasses 1\n"
@@ -530,6 +590,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 			  "_imaging_fact SetUseMesaClasses 1\n"
 			  "_imaging_fact Delete");
     }
+#endif
 
   vtkPVWindow *ui = vtkPVWindow::New();
   this->Windows->AddItem(ui);
@@ -544,7 +605,9 @@ void vtkPVApplication::Start(int argc, char*argv[])
   this->CreateButtonPhotos();
 
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--start-empty", index) 
-       == VTK_OK )
+       == VTK_OK || 
+       vtkPVApplication::CheckForArgument(argc, argv, "-e", index) 
+       == VTK_OK)
     {
     ui->InitializeDefaultInterfacesOff();
     }
