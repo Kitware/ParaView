@@ -1151,7 +1151,7 @@ proc extract_init {} {
     set extract(vtkTemp478) [$extract(vtkTemp1) CreatePVSource ExtractGrid]
     $extract(vtkTemp478) AcceptCallback
     [$extract(vtkTemp478) GetPVOutput] DrawSurface
-
+    
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp384)
     set extract(vtkTemp598) [$extract(vtkTemp1) CreatePVSource Cut]
     set extract(vtkTemp644) [$extract(vtkTemp598) GetPVWidget {Cut Function}]
@@ -1162,7 +1162,7 @@ proc extract_init {} {
     $extract(vtkTemp645) RemoveAllValues
     $extract(vtkTemp645) AddValue 0.000000
     $extract(vtkTemp598) AcceptCallback
-
+    
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp598)
     set extract(vtkTemp780) [$extract(vtkTemp1) CreatePVSource Glyph]
     set extract(vtkTemp794) [$extract(vtkTemp780) GetPVWidget {OrientScale}]
@@ -1181,132 +1181,201 @@ proc extract_init {} {
 }
 
 proc extract_run {} {
-    global DemoDir  pvDemoShouldStop Application extract speed
-
+  global DemoDir  pvDemoShouldStop Application extract speed
     if $pvDemoShouldStop {
-        return
+      return
     }
 
-    ChangeDemoText "Running Extract/Cut Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
+  ChangeDemoText "Running Extract/Cut Demo:\n A sub-region of a dataset can be extracted by cutting or clipping with an arbitrary plane (all data types), specifying a threshold criteria to exclude cells (all data types) and/or specifying a VOI (volume of interest - structured data types only)"
 
-    $extract(vtkTemp1) ShowCurrentSourcePropertiesCallback
+  $extract(vtkTemp1) ShowCurrentSourcePropertiesCallback
+  $extract(vtkTemp384) SetVisibility 1
+  $extract(vtkTemp478) SetVisibility 1
+  $extract(vtkTemp478) AcceptCallback
+  $extract(vtkTemp24) SetCameraState -20.670 -21.233 30.605  24.238 11.733 29.298  -0.048 0.105 0.993
+  $extract(vtkTemp1) ShowAnimationPanes
+  set extract(vtkTemp956) [$extract(vtkTemp478) GetPVWidget {VOI}]
+  $extract(vtkTemp956) SetValue 0 0 0 32 0 24
+  $extract(vtkTemp478) AcceptCallback
 
-    $extract(vtkTemp384) SetVisibility 1
+  set extract(vtkTemp1055) [$extract(vtkTemp1) GetAnimationManager]
+  set extract(vtkTemp480) [$extract(vtkTemp1055) GetAnimationScene]
+  set extract(vtkTemp458) [$extract(vtkTemp1055) GetVAnimationInterface]
+  set extract(vtkTemp447) [$extract(vtkTemp1055) GetHAnimationInterface]
+  set extract(vtkTemp450) [$extract(vtkTemp447) GetParentTree]
+  set extract(vtkTemp814) [$extract(vtkTemp450) GetChild "Sources.[$extract(vtkTemp478) GetName]"]
+  set extract(vtkTemp824) [$extract(vtkTemp814) GetChild "Sources.[$extract(vtkTemp478) GetName].VOI"]
+  $extract(vtkTemp824) GetFocus
+  set extract(vtkTemp826) [$extract(vtkTemp824) GetChild "Sources.[$extract(vtkTemp478) GetName].VOI.VOI.0"]
+  $extract(vtkTemp826) RemoveAllKeyFrames
+  #Add 1st Key frame.
+  set tempid [$extract(vtkTemp826) CreateAndAddKeyFrame 0 0]
+  set extract(vtkTemp1065) [$extract(vtkTemp826) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $extract(vtkTemp1065) SetKeyValue 0
+  $extract(vtkTemp1065) SetKeyTime 0
+  
+  #Add 2nd Key Frame
+  set tempid [$extract(vtkTemp826) CreateAndAddKeyFrame 1 0]
+  set extract(vtkTemp1078) [$extract(vtkTemp826) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $extract(vtkTemp1078) SetKeyValue 56
+  $extract(vtkTemp1078) SetKeyTime 1
+  
+  $extract(vtkTemp450) SetExpanded 1
+  $extract(vtkTemp814) SetExpanded 1
+  $extract(vtkTemp824) SetExpanded 1
 
-    $extract(vtkTemp478) SetVisibility 1
-    $extract(vtkTemp24) SetCameraState -20.670 -21.233 30.605  24.238 11.733 29.298  -0.048 0.105 0.993
-    $extract(vtkTemp1) ShowAnimationProperties
-    set extract(vtkTemp106) [$extract(vtkTemp1) GetAnimationInterface]
-    set extract(vtkTemp1032) [$extract(vtkTemp106) GetSourceEntry 0]
-    $extract(vtkTemp1032) SetPVSource $extract(vtkTemp478)
-    set extract(vtkTemp956) [$extract(vtkTemp478) GetPVWidget {VOI}]
-    $extract(vtkTemp956) SetValue 0 0 0 32 0 24
-    $extract(vtkTemp478) AcceptCallback
-    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 0
-    $extract(vtkTemp106) SetCurrentTime 0 1
-    $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp478)
-    $extract(vtkTemp1) ShowAnimationProperties
-   $extract(vtkTemp106) SetNumberOfFrames [expr 56 / $speed]
-    $extract(vtkTemp1032) SetTimeStart 0.0
-    $extract(vtkTemp1032) SetTimeEnd 56.0
-
-   for {set i 1} {$i < [expr 56 / $speed]} {incr i} {
-      $extract(vtkTemp106) SetCurrentTime $i 1
-      if $pvDemoShouldStop {
-         return
-      }
-   }
-
-    $extract(vtkTemp956) SetValue 0 56 0 0 0 24
-    $extract(vtkTemp478) AcceptCallback
-    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 2
-
-    $extract(vtkTemp106) SetCurrentTime 0 1
-   $extract(vtkTemp106) SetNumberOfFrames [expr 32 / $speed]
-    $extract(vtkTemp1032) SetTimeStart 0.0
-    $extract(vtkTemp1032) SetTimeEnd 32.0
-
-   for {set i 0} {$i < [expr 32 / $speed]} {incr i} {
-      $extract(vtkTemp106) SetCurrentTime $i 1
-      if $pvDemoShouldStop {
-         return
-      }
-   }
-
-    $extract(vtkTemp956) SetValue 0 56 0 32 0 0
-    $extract(vtkTemp478) AcceptCallback
-    $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 4
-
-    if $pvDemoShouldStop {
-        return
-    }
-
-   $extract(vtkTemp106) SetNumberOfFrames [ expr 24 / $speed]
-    $extract(vtkTemp1032) SetTimeStart 0.0
-    $extract(vtkTemp1032) SetTimeEnd 24.0
-
-   for {set i 0} {$i < [expr 24 / $speed]} {incr i} {
-      $extract(vtkTemp106) SetCurrentTime $i 1
-      if $pvDemoShouldStop {
-         return
-      }
-   }
-
-   $extract(vtkTemp478) SetVisibility 0
-   if $pvDemoShouldStop {
+  $extract(vtkTemp1) HideHorizontalPane
+  # State for vtkPVAnimationScene
+  $extract(vtkTemp480) SetDuration [expr 56 / $speed]
+  $extract(vtkTemp480) SetPlayMode 0
+  $extract(vtkTemp480) SetFrameRate 1
+  $extract(vtkTemp480) SetLoop 0
+  $extract(vtkTemp480) SetCurrentTime 0
+  $extract(vtkTemp480) Play
+  
+  $extract(vtkTemp826) RemoveAllKeyFrames
+  
+  if $pvDemoShouldStop {
       return
    }
+  $extract(vtkTemp956) SetValue 0 56 0 0 0 24
+  $extract(vtkTemp478) AcceptCallback
 
-    $extract(vtkTemp615) SetVisibility 0
-    $extract(vtkTemp598) SetVisibility 1
-   $extract(vtkTemp106) SetNumberOfFrames [expr 10 / $speed]
-    set extract(vtkTemp1032) [$extract(vtkTemp106) GetSourceEntry 0]
-    $extract(vtkTemp1032) SetPVSource $extract(vtkTemp598)
-    set extract(vtkTemp957) [$extract(vtkTemp598) GetPVWidget {Cut Values}]
-    $extract(vtkTemp957) AnimationMenuCallback $extract(vtkTemp1032)
-    $extract(vtkTemp1032) SetTimeStart -1.0
-    $extract(vtkTemp1032) SetTimeEnd 3.0
+  #Create next cue.
+  set extract(vtkTemp830) [$extract(vtkTemp824) GetChild "Sources.[$extract(vtkTemp478) GetName].VOI.VOI.2"]
+  $extract(vtkTemp830) RemoveAllKeyFrames
+  #Add 1st Key frame.
+  set tempid [$extract(vtkTemp830) CreateAndAddKeyFrame 0 0]
+  set extract(vtkTemp1065) [$extract(vtkTemp830) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $extract(vtkTemp1065) SetKeyValue 0
+  $extract(vtkTemp1065) SetKeyTime 0
+  
+  #Add 2nd Key Frame
+  set tempid [$extract(vtkTemp830) CreateAndAddKeyFrame 1 0]
+  set extract(vtkTemp1078) [$extract(vtkTemp830) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $extract(vtkTemp1078) SetKeyValue 32
+  $extract(vtkTemp1078) SetKeyTime 1
 
-   for {set i 0} {$i < [expr 10 / $speed]} {incr i} {
-      $extract(vtkTemp106) SetCurrentTime $i 1
-      update
-      if $pvDemoShouldStop {
-         return
-      }
+  # State for vtkPVAnimationScene
+  $extract(vtkTemp480) SetDuration [expr 32 / $speed]
+  $extract(vtkTemp480) SetPlayMode 0
+  $extract(vtkTemp480) SetFrameRate 1
+  $extract(vtkTemp480) SetLoop 0
+  $extract(vtkTemp480) SetCurrentTime 0
+   $extract(vtkTemp480) Play
+  
+  $extract(vtkTemp830) RemoveAllKeyFrames
+  
+  if $pvDemoShouldStop {
+      return
    }
+  
+  $extract(vtkTemp956) SetValue 0 56 0 32 0 0
+  $extract(vtkTemp478) AcceptCallback
+  
+   #Create next cue.
+  set extract(vtkTemp830) [$extract(vtkTemp824) GetChild "Sources.[$extract(vtkTemp478) GetName].VOI.VOI.4"]
+  $extract(vtkTemp830) RemoveAllKeyFrames
+  #Add 1st Key frame.
+  set tempid [$extract(vtkTemp830) CreateAndAddKeyFrame 0 0]
+  set extract(vtkTemp1065) [$extract(vtkTemp830) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $extract(vtkTemp1065) SetKeyValue 0
+  $extract(vtkTemp1065) SetKeyTime 0
+  
+  #Add 2nd Key Frame
+  set tempid [$extract(vtkTemp830) CreateAndAddKeyFrame 1 0]
+  set extract(vtkTemp1078) [$extract(vtkTemp830) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $extract(vtkTemp1078) SetKeyValue 24
+  $extract(vtkTemp1078) SetKeyTime 1
 
-    $extract(vtkTemp598) SetVisibility 0
-
-
-    ChangeDemoText "Running Glyph Demo:\n Vectors fields can be inspected by applying glyphs (currently arrows -vector arrows-, cones and spheres) to the points in a dataset. The glyphs can be scaled by scalars, vector component or vector magnitude and can be oriented using a vector field."
-
-    $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp780)
-    $extract(vtkTemp780) SetVisibility 1
-    set extract(vtkTemp807) [$extract(vtkTemp780) GetPVOutput]
-    $extract(vtkTemp807) ChangeActorColor 0.996078 0.117647 0.125490
-
-   for {set i 0} {$i < [expr 10 / $speed]} {incr i} {
-      $extract(vtkTemp106) SetCurrentTime $i 1
-      update
-      if $pvDemoShouldStop {
-         return
-      }
+  # State for vtkPVAnimationScene
+  $extract(vtkTemp480) SetDuration [expr 24 / $speed]
+  $extract(vtkTemp480) SetPlayMode 0
+  $extract(vtkTemp480) SetFrameRate 1
+  $extract(vtkTemp480) SetLoop 0
+  $extract(vtkTemp480) SetCurrentTime 0
+   $extract(vtkTemp480) Play
+  
+  $extract(vtkTemp830) RemoveAllKeyFrames
+  $extract(vtkTemp478) SetVisibility 0
+  
+  if $pvDemoShouldStop {
+      return
    }
+  $extract(vtkTemp615) SetVisibility 0
+  $extract(vtkTemp598) SetVisibility 1
 
-    $extract(vtkTemp780) SetVisibility 0
 
-    if $pvDemoShouldStop {
-        return
-    }
-    $extract(vtkTemp384) SetVisibility 0
+  set extract(vtkTemp923) [$extract(vtkTemp450) GetChild "Sources.[$extract(vtkTemp598) GetName]"]
+  $extract(vtkTemp923) SetExpanded 0
+  $extract(vtkTemp923) RemoveAllKeyFrames
+  set extract(vtkTemp929) [$extract(vtkTemp923) GetChild "Sources.[$extract(vtkTemp598) GetName].Plane"]
+  $extract(vtkTemp929) SetExpanded 0
+  set extract(vtkTemp830) [$extract(vtkTemp929) GetChild "Sources.[$extract(vtkTemp598) GetName].Plane.Offset.0"]
+  $extract(vtkTemp830) RemoveAllKeyFrames
+  
+  #Add 1st Key frame.
+  set tempid [$extract(vtkTemp830) CreateAndAddKeyFrame 0 0]
+  set extract(vtkTemp1065) [$extract(vtkTemp830) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $extract(vtkTemp1065) SetKeyValue -1.0
+  $extract(vtkTemp1065) SetKeyTime 0
+  
+  #Add 2nd Key Frame
+  set tempid [$extract(vtkTemp830) CreateAndAddKeyFrame 1 0]
+  set extract(vtkTemp1078) [$extract(vtkTemp830) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $extract(vtkTemp1078) SetKeyValue 3.0
+  $extract(vtkTemp1078) SetKeyTime 1
 
-    $extract(vtkTemp24) EventuallyRender
+  # State for vtkPVAnimationScene
+  $extract(vtkTemp480) SetDuration [expr 10 / $speed]
+  $extract(vtkTemp480) SetPlayMode 0
+  $extract(vtkTemp480) SetFrameRate 1
+  $extract(vtkTemp480) SetLoop 0
+  $extract(vtkTemp480) SetCurrentTime 0
+  $extract(vtkTemp480) Play
+
+  
+  $extract(vtkTemp598) SetVisibility 0
+  if $pvDemoShouldStop {
+    return
+  } 
+  ChangeDemoText "Running Glyph Demo:\n Vectors fields can be inspected by applying glyphs (currently arrows -vector arrows-, cones and spheres) to the points in a dataset. The glyphs can be scaled by scalars, vector component or vector magnitude and can be oriented using a vector field."
+
+  $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp780)
+  $extract(vtkTemp780) SetVisibility 1
+  set extract(vtkTemp807) [$extract(vtkTemp780) GetPVOutput]
+  $extract(vtkTemp807) ChangeActorColor 0.996078 0.117647 0.125490
+ 
+  # State for vtkPVAnimationScene
+  $extract(vtkTemp480) SetDuration [expr 10 / $speed]
+  $extract(vtkTemp480) SetPlayMode 0
+  $extract(vtkTemp480) SetFrameRate 1
+  $extract(vtkTemp480) SetLoop 0
+  $extract(vtkTemp480) SetCurrentTime 0
+  $extract(vtkTemp480) Play
+ 
+  $extract(vtkTemp780) SetVisibility 0
+  $extract(vtkTemp830) RemoveAllKeyFrames
+
+  if $pvDemoShouldStop {
+      return
+  }
+  $extract(vtkTemp384) SetVisibility 0
+
+  $extract(vtkTemp24) EventuallyRender
 
 }
 
 proc iso_init {} {
     global DemoDir  pvDemoShouldStop Application iso
-
     if $pvDemoShouldStop {
         return
     }
@@ -1394,152 +1463,174 @@ proc iso_init {} {
 }
 
 proc iso_run {} {
-    global DemoDir  pvDemoShouldStop Application iso speed
+  global DemoDir  pvDemoShouldStop Application iso speed
 
     if $pvDemoShouldStop {
-        return
+      return
     }
 
-    ChangeDemoText "Running Isosurface/Contour Demo :\n Contours and isosurfaces can be extracted from all data types using scalars or vector components. The results can be colored by any other variable or processed further. When possible, structured data contours/isosurfaces are extracted with fast and efficient algorithms which make use of the special data layout."
+  ChangeDemoText "Running Isosurface/Contour Demo :\n Contours and isosurfaces can be extracted from all data types using scalars or vector components. The results can be colored by any other variable or processed further. When possible, structured data contours/isosurfaces are extracted with fast and efficient algorithms which make use of the special data layout."
 
-    $iso(vtkTemp1) ShowCurrentSourcePropertiesCallback
+  $iso(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
-    $iso(vtkTemp457) RemoveAllValues
-    $iso(vtkTemp457) AddValue 0.000000
-    $iso(vtkTemp449) AcceptCallback
+  $iso(vtkTemp457) RemoveAllValues
+  $iso(vtkTemp457) AddValue 0.000000
+  $iso(vtkTemp449) AcceptCallback
 
-    $iso(vtkTemp384) SetVisibility 1
+  $iso(vtkTemp384) SetVisibility 1
 
+  if $pvDemoShouldStop {
+    return
+  }
+  $iso(vtkTemp529) SetScalarBarVisibility 1
+  $iso(vtkTemp529) SetScalarBarPosition1 0.270895 0.055553
+  $iso(vtkTemp529) SetScalarBarPosition2 0.500000 0.130000
+  $iso(vtkTemp529) SetScalarBarOrientation 0
+
+  $iso(vtkTemp24) SetCameraState -0.168 0.122 6.968  -0.000 -0.000 -0.000  -0.004 1.000 -0.018
+
+  $iso(vtkTemp449) SetVisibility 1
+
+  $iso(vtkTemp449) AcceptCallback
+  if $pvDemoShouldStop {
+    return
+  }
+
+  DemoAfter 1000
+
+  $iso(vtkTemp457) RemoveAllValues
+  $iso(vtkTemp457) AddValue 0.000000
+  $iso(vtkTemp449) AcceptCallback
+
+  set iso(vtkTemp1190) [$iso(vtkTemp1) GetAnimationManager]
+  set iso(vtkTemp480) [$iso(vtkTemp1190) GetAnimationScene]
+  set iso(vtkTemp458) [$iso(vtkTemp1190) GetVAnimationInterface]
+  set iso(vtkTemp447) [$iso(vtkTemp1190) GetHAnimationInterface]
+
+  set iso(vtkTemp450) [$iso(vtkTemp447) GetParentTree]
+  set iso(vtkTemp782) [$iso(vtkTemp450) GetChild "Sources.[$iso(vtkTemp449) GetName]"]
+  set iso(vtkTemp790) [$iso(vtkTemp782) GetChild "Sources.[$iso(vtkTemp449) GetName].ContourValues.0"]
+  $iso(vtkTemp790) GetFocus
+  $iso(vtkTemp790) RemoveAllKeyFrames
+
+  $iso(vtkTemp1) ShowAnimationPanes
+  $iso(vtkTemp1) HideHorizontalPane
+  set tempid [$iso(vtkTemp790) CreateAndAddKeyFrame 0 0]
+  set iso(vtkTemp1228) [$iso(vtkTemp790) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $iso(vtkTemp1228) SetKeyValue -0.00951249
+  $iso(vtkTemp1228) SetKeyTime 0
+
+  set tempid [$iso(vtkTemp790) CreateAndAddKeyFrame 1 0]
+  set iso(vtkTemp1245) [$iso(vtkTemp790) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $iso(vtkTemp1245) SetKeyValue 2
+  $iso(vtkTemp1245) SetKeyTime 1
+
+  # State for vtkPVAnimationScene
+  $iso(vtkTemp480) SetDuration [expr 100 / $speed]
+  $iso(vtkTemp480) SetPlayMode 0
+  $iso(vtkTemp480) SetFrameRate 1
+  $iso(vtkTemp480) SetLoop 0
+  for {set i 0} {$i <= [expr 60 / $speed]} {incr i} {
+    $iso(vtkTemp480) SetCurrentTime $i
+    DemoAfter 50
     if $pvDemoShouldStop {
-        return
+      return
     }
-    $iso(vtkTemp529) SetScalarBarVisibility 1
-    $iso(vtkTemp529) SetScalarBarPosition1 0.270895 0.055553
-    $iso(vtkTemp529) SetScalarBarPosition2 0.500000 0.130000
-    $iso(vtkTemp529) SetScalarBarOrientation 0
+  }
+  $iso(vtkTemp790) RemoveAllKeyFrames
+  $iso(vtkTemp457) RemoveAllValues
+  $iso(vtkTemp457) AddValue 0.000000
+  $iso(vtkTemp449) AcceptCallback
+  $iso(vtkTemp24) ForceRender
+  update
+  if $pvDemoShouldStop {
+    return
+  }
+  DemoAfter 700
+  $iso(vtkTemp457) RemoveAllValues
+  $iso(vtkTemp457) AddValue 0.000000
+  $iso(vtkTemp457) AddValue 0.200000
+  $iso(vtkTemp449) AcceptCallback
+  $iso(vtkTemp24) ForceRender
+  update
+  if $pvDemoShouldStop {
+    return
+  }
+  DemoAfter 700
+  $iso(vtkTemp457) RemoveAllValues
+  $iso(vtkTemp457) AddValue 0.000000
+  $iso(vtkTemp457) AddValue 0.200000
+  $iso(vtkTemp457) AddValue 0.300000
+  $iso(vtkTemp449) AcceptCallback
+  $iso(vtkTemp24) ForceRender
+  update
+  if $pvDemoShouldStop {
+    return
+  }
+  DemoAfter 700
+  $iso(vtkTemp457) RemoveAllValues
+  $iso(vtkTemp457) AddValue 0.000000
+  $iso(vtkTemp457) AddValue 0.200000
+  $iso(vtkTemp457) AddValue 0.300000
+  $iso(vtkTemp457) AddValue 0.600000
+  $iso(vtkTemp449) AcceptCallback
+  $iso(vtkTemp24) ForceRender
+  update
+  if $pvDemoShouldStop {
+    return
+  }
+  DemoAfter 2000
 
-    $iso(vtkTemp24) SetCameraState -0.168 0.122 6.968  -0.000 -0.000 -0.000  -0.004 1.000 -0.018
+  $iso(vtkTemp1) HideProperties
+  $iso(vtkTemp24) SetCameraState 1.736 3.553 6.396  1.474 -0.089 0.457  -0.006 0.881 -0.472
 
-    $iso(vtkTemp449) SetVisibility 1
+  $iso(vtkTemp739) SetVisibility 1
+  $iso(vtkTemp565) SetVisibility 1
+  $iso(vtkTemp674) SetVisibility 1
+  $iso(vtkTemp820) SetVisibility 1
+  if $pvDemoShouldStop {
+    return
+  }
 
-    $iso(vtkTemp449) AcceptCallback
-    if $pvDemoShouldStop {
-        return
-    }
+  set iso(vtkTemp782) [$iso(vtkTemp450) GetChild "Sources.[$iso(vtkTemp739) GetName]"]
+  set iso(vtkTemp1006) [$iso(vtkTemp782) GetChild "Sources.[$iso(vtkTemp739) GetName].VOI"]
+  set iso(vtkTemp790) [$iso(vtkTemp1006) GetChild "Sources.[$iso(vtkTemp739) GetName].VOI.VOI.2"]
+  $iso(vtkTemp790) GetFocus
+  $iso(vtkTemp790) RemoveAllKeyFrames
 
-    $iso(vtkTemp457) RemoveAllValues
-    $iso(vtkTemp457) AddValue 0.000000
-    $iso(vtkTemp449) AcceptCallback
+  set tempid [$iso(vtkTemp790) CreateAndAddKeyFrame 0 0]
+  set iso(vtkTemp1228) [$iso(vtkTemp790) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $iso(vtkTemp1228) SetKeyValue 0
+  $iso(vtkTemp1228) SetKeyTime 0
 
-    #$iso(vtkTemp1) ShowAnimationProperties
-    set iso(vtkTemp106) [$iso(vtkTemp1) GetAnimationInterface]
-    set iso(vtkTemp1032) [$iso(vtkTemp106) GetSourceEntry 0]
-    $iso(vtkTemp1032) SetPVSource $iso(vtkTemp449)
-   $iso(vtkTemp106) SetNumberOfFrames [expr 100/$speed]
-    $iso(vtkTemp1032) SetTimeStart 0.0
-    $iso(vtkTemp1032) SetTimeEnd 100.0
+  set tempid [$iso(vtkTemp790) CreateAndAddKeyFrame 1 0]
+  set iso(vtkTemp1245) [$iso(vtkTemp790) GetKeyFrame $tempid ]
+  #State of a Key Frame 
+  $iso(vtkTemp1245) SetKeyValue 29
+  $iso(vtkTemp1245) SetKeyTime 1
 
-    $iso(vtkTemp1032) SetTimeEnd 0.600000
-    [$iso(vtkTemp449) GetPVWidget {Contour Values}] AnimationMenuCallback $iso(vtkTemp1032)
+  # State for vtkPVAnimationScene
+  $iso(vtkTemp480) SetDuration [expr 29 / $speed]
+  $iso(vtkTemp480) SetPlayMode 0
+  $iso(vtkTemp480) SetFrameRate 1
+  $iso(vtkTemp480) SetLoop 0
+  $iso(vtkTemp480) Play
 
-    if $pvDemoShouldStop {
-        return
-    }
-    DemoAfter 1000
+  $iso(vtkTemp790) RemoveAllKeyFrames
+  DemoAfter 1000
 
-   for {set i 0} {$i <= [expr 60 / $speed]} {incr i} {
-      $iso(vtkTemp106) SetCurrentTime $i 1
-      DemoAfter 50
-      if $pvDemoShouldStop {
-         return
-      }
-   }
+  $iso(vtkTemp1) ShowProperties
 
-    $iso(vtkTemp457) RemoveAllValues
-    $iso(vtkTemp457) AddValue 0.000000
-    $iso(vtkTemp449) AcceptCallback
-    $iso(vtkTemp24) ForceRender
-    update
-    if $pvDemoShouldStop {
-        return
-    }
-    DemoAfter 700
-    $iso(vtkTemp457) RemoveAllValues
-    $iso(vtkTemp457) AddValue 0.000000
-    $iso(vtkTemp457) AddValue 0.200000
-    $iso(vtkTemp449) AcceptCallback
-    $iso(vtkTemp24) ForceRender
-    update
-    if $pvDemoShouldStop {
-        return
-    }
-    DemoAfter 700
-    $iso(vtkTemp457) RemoveAllValues
-    $iso(vtkTemp457) AddValue 0.000000
-    $iso(vtkTemp457) AddValue 0.200000
-    $iso(vtkTemp457) AddValue 0.300000
-    $iso(vtkTemp449) AcceptCallback
-    $iso(vtkTemp24) ForceRender
-    update
-    if $pvDemoShouldStop {
-        return
-    }
-    DemoAfter 700
-    $iso(vtkTemp457) RemoveAllValues
-    $iso(vtkTemp457) AddValue 0.000000
-    $iso(vtkTemp457) AddValue 0.200000
-    $iso(vtkTemp457) AddValue 0.300000
-    $iso(vtkTemp457) AddValue 0.600000
-    $iso(vtkTemp449) AcceptCallback
-    $iso(vtkTemp24) ForceRender
-    update
-    if $pvDemoShouldStop {
-        return
-    }
-    DemoAfter 2000
-
-    $iso(vtkTemp1) HideProperties
-    $iso(vtkTemp24) SetCameraState 1.736 3.553 6.396  1.474 -0.089 0.457  -0.006 0.881 -0.472
-
-    $iso(vtkTemp739) SetVisibility 1
-    $iso(vtkTemp565) SetVisibility 1
-    $iso(vtkTemp674) SetVisibility 1
-    $iso(vtkTemp820) SetVisibility 1
-    if $pvDemoShouldStop {
-        return
-    }
-
-
-    $iso(vtkTemp756) SetValue 0 29 0 0 0 29 
-    $iso(vtkTemp739) AcceptCallback
-
-    set iso(vtkTemp1032) [$iso(vtkTemp106) GetSourceEntry 0]
-    $iso(vtkTemp1032) SetPVSource $iso(vtkTemp739)
-    set iso(vtkTemp958) [$iso(vtkTemp739) GetPVWidget {VOI}]
-    $iso(vtkTemp958) AnimationMenuCallback $iso(vtkTemp1032) 2
-   $iso(vtkTemp106) SetNumberOfFrames [expr 29 / $speed]
-    $iso(vtkTemp1032) SetTimeStart 0.0
-    $iso(vtkTemp1032) SetTimeEnd 29.0
-
-   for {set i 0} {$i < [expr 29 / $speed]} {incr i} {
-      $iso(vtkTemp106) SetCurrentTime $i 1
-      DemoAfter 50
-      if $pvDemoShouldStop {
-         return
-      }
-   }
-
-    DemoAfter 1000
-
-    $iso(vtkTemp1) ShowProperties
-
-    $iso(vtkTemp674) SetVisibility 0
-    $iso(vtkTemp565) SetVisibility 0
-    $iso(vtkTemp739) SetVisibility 0
-    $iso(vtkTemp449) SetVisibility 0
-    $iso(vtkTemp384) SetVisibility 0
-    $iso(vtkTemp820) SetVisibility 0
-    $iso(vtkTemp529) SetScalarBarVisibility 0
+  $iso(vtkTemp674) SetVisibility 0
+  $iso(vtkTemp565) SetVisibility 0
+  $iso(vtkTemp739) SetVisibility 0
+  $iso(vtkTemp449) SetVisibility 0
+  $iso(vtkTemp384) SetVisibility 0
+  $iso(vtkTemp820) SetVisibility 0
+  $iso(vtkTemp529) SetScalarBarVisibility 0
 }
 
 
@@ -4509,15 +4600,14 @@ if ![info exists DemoDir] {
         threshold_init
         warp_init
         stream_init
-
         while {1} {
             iso_run
             warp_run
             stream_run
-            extract_run
+             extract_run
             clip_run
             threshold_run
-            
+            break     
             if $pvDemoShouldStop {
                 break
             }
