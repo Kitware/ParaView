@@ -28,6 +28,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkPVSourceInterface.h"
 #include "vtkStringList.h"
+#include "vtkPVExtentTranslator.h"
 
 int vtkPVSourceInterfaceCommand(ClientData cd, Tcl_Interp *interp,
 			        int argc, char *argv[]);
@@ -72,7 +73,7 @@ vtkPVSourceInterface* vtkPVSourceInterface::New()
 //----------------------------------------------------------------------------
 vtkPVSource *vtkPVSourceInterface::CreateCallback()
 {
-  char tclName[100];
+  char tclName[100], extentTclName[100];
   const char *outputDataType;
   vtkDataSet *d;
   vtkPVData *pvd;
@@ -116,8 +117,8 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     {
     vtkPVData *current = this->PVWindow->GetCurrentPVData();
     pvs->SetNthPVInput(0, current);
-    }  
-
+    }
+  
   // Add the new Source to the View, and make it current.
   this->PVWindow->GetMainView()->AddComposite(pvs);
   pvs->CreateProperties();
@@ -144,7 +145,24 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
   // Relay the connection to the VTK objects.  
   pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
 			 pvd->GetVTKDataTclName());   
-  
+
+  if (strcmp(this->SourceClassName, "vtkImageMandelbrotSource") == 0 ||
+      strcmp(this->SourceClassName, "vtkImageReader") == 0)
+    {
+    sprintf(extentTclName, "Translator%d", this->InstanceCount);
+    pvApp->MakeTclObject("vtkPVExtentTranslator", extentTclName);
+    pvApp->BroadcastScript("%s SetOriginalSource [%s GetOutput]",
+			   extentTclName, pvs->GetVTKSourceTclName());
+    pvApp->BroadcastScript("%s SetExtentTranslator %s",
+			   pvd->GetVTKDataTclName(), extentTclName);
+    }
+  if (pvd->GetVTKData()->IsA("vtkImageData") && this->InputClassName)
+    {
+    pvApp->BroadcastScript(
+      "%s SetExtentTranslator [[%s GetInput] GetExtentTranslator]",
+      pvd->GetVTKDataTclName(), pvs->GetVTKSourceTclName());
+    }
+
   // Loop through the methods creating widgets.
   this->MethodInterfaces->InitTraversal();
   while ( (mInt = ((vtkPVMethodInterface*)(this->MethodInterfaces->GetNextItemAsObject()))) )

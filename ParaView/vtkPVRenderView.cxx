@@ -646,6 +646,10 @@ void vtkPVRenderView::StartRender()
           (transmitTime * reductionFactor * reductionFactor)) / area;
 
   newReductionFactor = sqrt(area * timePerPixel / renderTime);
+  
+  // effectively turning this off for now
+  newReductionFactor = 1;
+  
   this->GetComposite()->SetReductionFactor(newReductionFactor);
 }
 
