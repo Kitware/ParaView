@@ -638,6 +638,92 @@
    <!-- End ElevationFilter -->
    </SourceProxy>
 
+   <SourceProxy name="CTHAMRCellToPointData" class="vtkCTHAMRCellToPointData">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkCTHData"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="cell"
+                            number_of_components="1"/>
+     </InputProperty>
+
+     <StringVectorProperty 
+        name="AddVolumeArrayName" 
+        command="AddVolumeArrayName" 
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        number_of_elements="1" /> 
+
+     <IntVectorProperty 
+        name="IgnoreGhostLevels" 
+        command="SetIgnoreGhostLevels" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+   <!-- End CTHAMRCellToPointData -->
+   </SourceProxy>
+
+   <SourceProxy name="CTHAMRContour" class="vtkCTHAMRContour">
+    <InputProperty
+       name="Input"
+       command="SetInput">
+          <ProxyGroupDomain name="groups">
+            <Group name="sources"/>
+            <Group name="filters"/>
+          </ProxyGroupDomain>
+          <DataTypeDomain name="input_type">
+            <DataType value="vtkCTHData"/>
+          </DataTypeDomain>
+          <InputArrayDomain name="input_array" attribute_type="cell"
+                            number_of_components="1"/>
+     </InputProperty>
+
+     <StringVectorProperty 
+        name="SelectInputScalars" 
+        command="SelectInputScalars" 
+        number_of_elements="1"> 
+          <ArrayListDomain name="array_list" attribute_type="Scalars">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+            </RequiredProperties>
+          </ArrayListDomain>
+     </StringVectorProperty>
+
+     <DoubleVectorProperty
+        name="ContourValues"
+        command="SetValue"
+        set_number_command="SetNumberOfContours"
+        number_of_elements="0"
+        repeat_command="1"
+        number_of_elements_per_command="1"
+        use_index="1">
+          <ArrayRangeDomain name="scalar_range">
+            <RequiredProperties>
+               <Property name="Input" function="Input"/>
+               <Property name="SelectInputScalars" function="ArraySelection"/>
+            </RequiredProperties>
+          </ArrayRangeDomain>         
+     </DoubleVectorProperty>
+
+     <IntVectorProperty 
+        name="IgnoreGhostLevels" 
+        command="SetIgnoreGhostLevels" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+   <!-- End CTHAMRContour -->
+   </SourceProxy>
+
    <SourceProxy name="CTHPart" class="vtkExtractCTHPart">
     <InputProperty
        name="Input"
@@ -668,7 +754,7 @@
    <!-- End CTHPart -->
    </SourceProxy>
 
-   <SourceProxy name="CTHOutlineFilter" class="vtkCTHOutlineFilter">
+   <SourceProxy name="CTHAMROutline" class="vtkCTHOutlineFilter">
      <InputProperty
         name="Input"
         command="SetInput">
@@ -680,10 +766,10 @@
              <DataType value="vtkCTHData"/>
            </DataTypeDomain>
       </InputProperty>
-   <!-- End CTHOutlineAMR -->
+   <!-- End CTHAMROutline -->
    </SourceProxy>
 
-   <SourceProxy name="CTHPartAMR" class="vtkCTHExtractAMRPart">
+   <SourceProxy name="CTHAMRPart" class="vtkCTHExtractAMRPart">
     <InputProperty
        name="Input"
        command="SetInput">
@@ -710,7 +796,16 @@
         repeat_command="1"
         number_of_elements_per_command="1"
         number_of_elements="1" /> 
-   <!-- End CTHPartAMR -->
+
+     <IntVectorProperty 
+        name="IgnoreGhostLevels" 
+        command="SetIgnoreGhostLevels" 
+        number_of_elements="1"
+        default_values="1" > 
+       <BooleanDomain name="bool"/>
+     </IntVectorProperty>
+
+   <!-- End CTHAMRPart -->
    </SourceProxy>
 
    <SourceProxy name="ExtractEdges" class="vtkExtractEdges">

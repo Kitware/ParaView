@@ -197,7 +197,7 @@
    <!-- End Cone -->
    </SourceProxy>
 
-   <SourceProxy name="CTHFractal" class="vtkCTHFractal">
+   <SourceProxy name="CTHAMRFractal" class="vtkCTHFractal">
       <IntVectorProperty
          name="Dimensions"
          command="SetDimensions"
@@ -229,7 +229,7 @@
          default_values="0">
         <BooleanDomain name="bool"/>
       </IntVectorProperty>
-   <!-- End CTHSource -->
+   <!-- End CTHAMRFractal -->
    </SourceProxy>
 
    <SourceProxy name="CylinderSource" class="vtkCylinderSource">
