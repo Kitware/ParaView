@@ -145,11 +145,12 @@ protected:
   int ProcessCommandNew(const vtkClientServerStream& css, int midx);
   int ProcessCommandInvoke(const vtkClientServerStream& css, int midx);
   int ProcessCommandDelete(const vtkClientServerStream& css, int midx);
-  int ProcessCommandAssignResult(const vtkClientServerStream& css, int midx);
+  int ProcessCommandAssign(const vtkClientServerStream& css, int midx);
 
-  // Expand all the id_value arguments of a message.
+  // Expand all the id_value arguments of a message starting with the
+  // given argument index.
   int ExpandMessage(const vtkClientServerStream& in, int inIndex,
-                    vtkClientServerStream& out);
+                    int startArgument, vtkClientServerStream& out);
 
 private:
 

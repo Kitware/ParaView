@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.10");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.11");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -230,8 +230,8 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
       result = this->ProcessCommandInvoke(css, message); break;
     case vtkClientServerStream::Delete:
       result = this->ProcessCommandDelete(css, message); break;
-    case vtkClientServerStream::AssignResult:
-      result = this->ProcessCommandAssignResult(css, message); break;
+    case vtkClientServerStream::Assign:
+      result = this->ProcessCommandAssign(css, message); break;
     default:
       {
       // Command is not known.
@@ -379,7 +379,7 @@ vtkClientServerInterpreter
 {
   // Create a message with all known id_value arguments expanded.
   vtkClientServerStream msg;
-  this->ExpandMessage(css, midx, msg);
+  this->ExpandMessage(css, midx, 0, msg);
 
   // Now that id_values have been expanded, we do not need the last
   // result.  Reset the result to empty before processing the message.
@@ -496,17 +496,26 @@ vtkClientServerInterpreter
 //----------------------------------------------------------------------------
 int
 vtkClientServerInterpreter
-::ProcessCommandAssignResult(const vtkClientServerStream& msg, int midx)
+::ProcessCommandAssign(const vtkClientServerStream& css, int midx)
 {
+  // Create a message with all known id_value arguments expanded
+  // except for the first argument.
+  vtkClientServerStream msg;
+  this->ExpandMessage(css, midx, 1, msg);
+
+  // Now that id_values have been expanded, we do not need the last
+  // result.  Reset the result to empty before processing the message.
+  this->LastResultMessage->Reset();
+
+  // Make sure the first argument is an id.
   vtkClientServerID id;
-  if(msg.GetNumberOfArguments(midx) == 1 && msg.GetArgument(midx, 0, &id))
+  if(msg.GetNumberOfArguments(0) >= 1 && msg.GetArgument(0, 0, &id))
     {
     // Make sure the given ID is valid.
     if(id.ID == 0)
       {
-      this->LastResultMessage->Reset();
       *this->LastResultMessage
-        << vtkClientServerStream::Error << "Cannot assign result to ID 0."
+        << vtkClientServerStream::Error << "Cannot assign to ID 0."
         << vtkClientServerStream::End;
       return 0;
       }
@@ -515,7 +524,6 @@ vtkClientServerInterpreter
     vtkClientServerStream* tmp;
     if(this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
       {
-      this->LastResultMessage->Reset();
       ostrstream error;
       error << "Attempt to assign existing ID " << id.ID << "." << ends;
       *this->LastResultMessage
@@ -525,11 +533,19 @@ vtkClientServerInterpreter
       return 0;
       }
 
+    // Copy the expanded message to the result message except for the
+    // first argument.
+    *this->LastResultMessage << vtkClientServerStream::Reply;
+    for(int a=1; a < msg.GetNumberOfArguments(0); ++a)
+      {
+      *this->LastResultMessage << msg.GetArgument(0, a);
+      }
+    *this->LastResultMessage << vtkClientServerStream::End;
+
     // Copy the result to store it in the map.  The result itself
     // remains unchanged.
     tmp = new vtkClientServerStream(*this->LastResultMessage);
     this->IDToMessageMap->SetItem(id.ID, tmp);
-
     return 1;
     }
   else
@@ -537,15 +553,16 @@ vtkClientServerInterpreter
     this->LastResultMessage->Reset();
     *this->LastResultMessage
       << vtkClientServerStream::Error
-      << "Invalid arguments to vtkClientServerStream::AssignResult."
+      << "Invalid arguments to vtkClientServerStream::Assign."
       << vtkClientServerStream::End;
     }
+
   return 0;
 }
 
 //----------------------------------------------------------------------------
 int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
-                                              int inIndex,
+                                              int inIndex, int startArgument,
                                               vtkClientServerStream& out)
 {
   // Reset the output and make sure we have input.
@@ -558,33 +575,32 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
   // Copy the command.
   out << in.GetCommand(inIndex);
 
-  // Copy all arguments while expanding id_value arguments.
-  for(int a=0; a < in.GetNumberOfArguments(inIndex); ++a)
+  // Just copy the first arguments.
+  int a;
+  for(a=0; a < startArgument && a < in.GetNumberOfArguments(inIndex); ++a)
+    {
+    out << in.GetArgument(inIndex, a);
+    }
+
+  // Expand id_value for remaining arguments.
+  for(a=startArgument; a < in.GetNumberOfArguments(inIndex); ++a)
     {
     if(in.GetArgumentType(inIndex, a) == vtkClientServerStream::id_value)
       {
       vtkClientServerID id;
       in.GetArgument(inIndex, a, &id);
 
-      if(id.ID > 0)
+      // If the ID is in the map, expand it.  Otherwise, leave it.
+      if(const vtkClientServerStream* tmp = this->GetMessageFromID(id))
         {
-        // If the ID is in the map, expand it.  Otherwise, leave it.
-        if(const vtkClientServerStream* tmp = this->GetMessageFromID(id))
+        for(int b=0; b < tmp->GetNumberOfArguments(0); ++b)
           {
-          for(int b=0; b < tmp->GetNumberOfArguments(0); ++b)
-            {
-            out << tmp->GetArgument(0, b);
-            }
-          }
-        else
-          {
-          out << in.GetArgument(inIndex, a);
+          out << tmp->GetArgument(0, b);
           }
         }
       else
         {
-        // Transform a 0 id into a NULL pointer.
-        out << static_cast<vtkObjectBase*>(0);
+        out << in.GetArgument(inIndex, a);
         }
       }
     else if(in.GetArgumentType(inIndex, a) ==
@@ -613,16 +629,10 @@ int vtkClientServerInterpreter::ExpandMessage(const vtkClientServerStream& in,
 const vtkClientServerStream*
 vtkClientServerInterpreter::GetMessageFromID(vtkClientServerID id)
 {
-  if(id.ID > 0)
+  // Find the message in the map.
+  vtkClientServerStream* tmp;
+  if(id.ID > 0 && this->IDToMessageMap->GetItem(id.ID, tmp) == VTK_OK)
     {
-    // Find the message in the map.
-    vtkClientServerStream* tmp;
-    if(this->IDToMessageMap->GetItem(id.ID, tmp) != VTK_OK)
-      {
-      vtkErrorMacro("Attempt to get message for ID " << id.ID
-                    << " that is not in the hash table.");
-      return 0;
-      }
     return tmp;
     }
   else

@@ -1516,7 +1516,7 @@ vtkClientServerStream::GetTypeFromString(const char* name)
 // This must be kept in-sync with the enumeration.
 static const char* const vtkClientServerStreamCommandNames[] =
 {
-  "New", "Invoke", "Delete", "AssignResult",
+  "New", "Invoke", "Delete", "Assign",
   "Reply", "Error", "EndOfCommands",
   0
 };

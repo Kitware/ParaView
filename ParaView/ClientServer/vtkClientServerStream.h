@@ -49,7 +49,7 @@ public:
   // Enumeration of message types that may be stored in a stream.
   // This must be kept in sync with the string table in this class's
   // .cxx file.
-  enum Commands { New, Invoke, Delete, AssignResult,
+  enum Commands { New, Invoke, Delete, Assign,
                   Reply, Error, EndOfCommands};
 
   // Description:

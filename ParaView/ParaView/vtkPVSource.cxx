@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.7");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.8");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -658,7 +658,7 @@ int vtkPVSource::GetNumberOfVTKSources()
 //----------------------------------------------------------------------------
 vtkClientServerID vtkPVSource::GetVTKSourceID(int idx)
 {
-  return this->VTKSourceIDs->at(idx);
+  return (*this->VTKSourceIDs)[idx];
 }
 
 //----------------------------------------------------------------------------
@@ -2006,7 +2006,7 @@ void vtkPVSource::SetInputsInBatchScript(ofstream *file)
         stream << vtkClientServerStream::Invoke << pvs->GetVTKSourceID(sourceCount) <<
           "GetNumberOfOutputs" << vtkClientServerStream::End;
         pm->SendStreamToServer();
-        vtkClientServerStream* amsg = pm->GetLastResultStream();
+        vtkClientServerStream* amsg = pm->GetLastServerResult();
         if(!amsg->GetArgument(0, 0, &numOutputs))
           {
           vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
@@ -2438,7 +2438,7 @@ int vtkPVSource::InitializeData()
     stream << vtkClientServerStream::Invoke << sourceID <<
       "GetNumberOfOutputs" << vtkClientServerStream::End;
     pm->SendStreamToServer();
-    const vtkClientServerStream* amsg = pm->GetLastResultStream();
+    const vtkClientServerStream* amsg = pm->GetLastServerResult();
     if(!amsg->GetArgument(0, 0, &numOutputs))
       {
       vtkErrorMacro("wrong return type for GetNumberOfOutputs call");
@@ -2450,7 +2450,9 @@ int vtkPVSource::InitializeData()
       stream << vtkClientServerStream::Invoke << sourceID 
              << "GetOutput" << idx <<  vtkClientServerStream::End;
       vtkClientServerID dataID = pm->GetUniqueID();
-      stream << vtkClientServerStream::AssignResult << dataID << vtkClientServerStream::End;
+      stream << vtkClientServerStream::Assign << dataID
+             << vtkClientServerStream::LastResult
+             << vtkClientServerStream::End;
       pm->SendStreamToServer();
       part = vtkPVPart::New();
       part->SetPVApplication(pvApp);
