@@ -314,7 +314,7 @@
   <ArraySelection trace_name="point_array_sel" attribute_name="Cell" />
   <ArraySelection trace_name="cell_array_sel" attribute_name="Point" />
   <VectorEntry label="Stride" trace_name="stride" variable="Stride" type="int"
-               length="3"
+               length="3" default_value="1 1 1"
                help="Set the number of steps to skip between each point (structured data only)."/>
   <XDMFParameters trace_name="xdmf_parameters" label="Parameters" />
               
