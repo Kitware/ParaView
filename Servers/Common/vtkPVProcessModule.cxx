@@ -45,7 +45,7 @@ int vtkPVProcessModule::GlobalLODFlag = 0;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.2");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVProcessModule::vtkPVProcessModule()
@@ -74,6 +74,10 @@ vtkPVProcessModule::vtkPVProcessModule()
 //----------------------------------------------------------------------------
 vtkPVProcessModule::~vtkPVProcessModule()
 { 
+  if(this->GUIHelper)
+    {
+    this->GUIHelper->Delete();
+    }
   this->FinalizeInterpreter();
 }
 
