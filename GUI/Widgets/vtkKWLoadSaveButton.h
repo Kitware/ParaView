@@ -11,9 +11,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWPopupButton - a button that triggers a load/save dialog
+// .NAME vtkKWLoadSaveButton - a button that triggers a load/save dialog
 // .SECTION Description
-// The vtkKWPopupButton class creates a push button that
+// The vtkKWLoadSaveButton class creates a push button that
 // will popup a vtkKWLoadSaveDialog and display the chosen filename as
 // the button label.
 
