@@ -164,6 +164,7 @@ void vtkKWWidget::Create(vtkKWApplication *app, const char *name,
   const char* type = this->GetType();
   if ( !vtkString::Equals(type, "Frame") && 
        !vtkString::Equals(type, "Menu")  && 
+       !vtkString::Equals(type, "Label")  && 
        !vtkString::Equals(type, "Canvas") && 
        !vtkString::Equals(type, "Scrollbar") && 
        !vtkString::Equals(type, "Toplevel") )
@@ -341,7 +342,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWObject::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.34 $");
+  this->ExtractRevision(os,"$Revision: 1.35 $");
 }
 
 //------------------------------------------------------------------------------
@@ -476,6 +477,7 @@ void vtkKWWidget::SetEnabled(int e)
     if ( !vtkString::Equals(type, "Frame") && 
 	 !vtkString::Equals(type, "Menu")  && 
 	 !vtkString::Equals(type, "Canvas") && 
+	 !vtkString::Equals(type, "Label") && 
 	 !vtkString::Equals(type, "Scrollbar") && 
 	 !vtkString::Equals(type, "Toplevel"))
       {

@@ -55,6 +55,7 @@ class VTK_EXPORT vtkKWOptionMenu : public vtkKWWidget
 public:
   static vtkKWOptionMenu* New();
   vtkTypeMacro(vtkKWOptionMenu,vtkKWWidget);
+  void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
   // Create a Tk widget

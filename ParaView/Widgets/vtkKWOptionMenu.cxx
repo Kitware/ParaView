@@ -164,3 +164,8 @@ void vtkKWOptionMenu::Create(vtkKWApplication *app, const char *args)
 }
 
 
+void vtkKWOptionMenu::PrintSelf(ostream& os, vtkIndent indent)
+{
+  this->Superclass::PrintSelf(os, indent);
+  os << indent << "Menu: " << this->Menu << endl;
+}
