@@ -341,9 +341,9 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
 //------------------------------------------------------------------------------
 void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
-  vtkKWObject::SerializeRevision(os,indent);
+  this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.38 $");
+  this->ExtractRevision(os,"$Revision: 1.39 $");
 }
 
 //------------------------------------------------------------------------------
