@@ -17,9 +17,9 @@
 #include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionInterface, "1.1");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionInterface, "1.2");
 
-int vtkKWParameterValueFunctionInterface(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
+int vtkKWParameterValueFunctionInterfaceCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
 void vtkKWParameterValueFunctionInterface::Create(vtkKWApplication *app, 

@@ -33,7 +33,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.18");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.19");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -4239,7 +4239,6 @@ void vtkKWParameterValueFunctionEditor::RedrawRangeTicks()
     this->GetCanvasScalingFactors(factors);
 
     double *p_v_range = this->GetVisibleParameterRange();
-    double *p_w_range = this->GetWholeParameterRange();
     double *v_v_range = this->GetVisibleValueRange();
     double *v_w_range = this->GetWholeValueRange();
 

@@ -30,7 +30,7 @@
 //----------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWHistogram);
-vtkCxxRevisionMacro(vtkKWHistogram, "1.1");
+vtkCxxRevisionMacro(vtkKWHistogram, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWHistogram::vtkKWHistogram()
@@ -841,7 +841,6 @@ vtkImageData* vtkKWHistogram::GetImage(
 
   double bin_real;
   double next_bin_real;
-  int flag = 0;
   double max_occurrence = 0.0;
 
   double * resampled_histogram = new double[desc->Width];
