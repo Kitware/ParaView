@@ -168,6 +168,10 @@ vtkPVSource *vtkPVDataSetReaderInterface::CreateCallback()
   pvApp->BroadcastScript("%s Delete", tclName);
   
   ++this->InstanceCount;
+  
+  // so we get prompted for a file name if another data set reader is created
+  this->SetDataFileName(NULL);
+  
   return pvs;
 } 
 
