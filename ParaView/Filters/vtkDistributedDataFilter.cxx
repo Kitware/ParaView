@@ -92,7 +92,7 @@ static char * makeEntry(const char *s)
 
 // Timing data ---------------------------------------------
 
-vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.21");
+vtkCxxRevisionMacro(vtkDistributedDataFilter, "1.22");
 
 vtkStandardNewMacro(vtkDistributedDataFilter);
 
@@ -119,7 +119,7 @@ vtkDistributedDataFilter::vtkDistributedDataFilter()
   this->IncludeAllIntersectingCells = 0;
   this->ClipCells = 0;
 
-  this->Timing = 1;
+  this->Timing = 0;
   this->TimerLog = NULL;
 }
 
