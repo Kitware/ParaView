@@ -189,7 +189,6 @@ SET( ParaViewClient_SRCS
   vtkPVVolumePropertyWidget.cxx
   vtkPVWidget.cxx
   vtkPVWindow.cxx
-  vtkPVWindowResources.cxx
   vtkPVWriter.cxx
   vtkPVXDMFParameters.cxx
   vtkXDMFReaderModule.cxx
@@ -242,7 +241,6 @@ ENDIF (PARAVIEW_USE_ICE_T)
 
 SET_SOURCE_FILES_PROPERTIES(
   vtkPVApplicationResources
-  vtkPVWindowResources
   WRAP_EXCLUDE
   )
 
