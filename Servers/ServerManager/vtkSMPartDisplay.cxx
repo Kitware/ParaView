@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.25");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.26");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -517,6 +517,11 @@ void vtkSMPartDisplay::CreateVTKObjects(int num)
     stream << vtkClientServerStream::Invoke << this->MapperProxy->GetID(i) 
            << "InterpolateScalarsBeforeMappingOn" 
            << vtkClientServerStream::End;
+    stream << vtkClientServerStream::Invoke 
+           << this->UpdateSuppressorProxy->GetID(i) 
+           << "SetOutputType" 
+           << "vtkPolyData"
+           <<  vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke 
            << this->UpdateSuppressorProxy->GetID(i) << "GetPolyDataOutput" 
            <<  vtkClientServerStream::End;

@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notice for more information.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPointLabelDisplay);
-vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.6");
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -177,6 +177,11 @@ void vtkSMPointLabelDisplay::CreateVTKObjects(int num)
   stream << vtkClientServerStream::Invoke
          << this->PointLabelActorProxy->GetID(0) << "SetMapper" 
          << this->PointLabelMapperProxy->GetID(0)
+         << vtkClientServerStream::End;
+  stream << vtkClientServerStream::Invoke 
+         << this->UpdateSuppressorProxy->GetID(0) 
+         << "SetOutputType"
+         << "vtkUnstructuredGrid"
          << vtkClientServerStream::End;
   stream << vtkClientServerStream::Invoke 
          << this->UpdateSuppressorProxy->GetID(0) << "GetUnstructuredGridOutput"

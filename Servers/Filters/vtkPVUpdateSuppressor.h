@@ -19,37 +19,17 @@
 #ifndef __vtkPVUpdateSuppressor_h
 #define __vtkPVUpdateSuppressor_h
 
-#include "vtkDataSetSource.h"
+#include "vtkDataSetAlgorithm.h"
 
-class vtkPolyData;
-class vtkUnstructuredGrid;
-
-class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataSetSource
+class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataSetAlgorithm
 {
 public:
-  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkDataSetSource);
+  vtkTypeRevisionMacro(vtkPVUpdateSuppressor,vtkDataSetAlgorithm);
   void PrintSelf(ostream& os, vtkIndent indent);
-
-  // Description:
-  // These methods assume the user knows the output type,
-  // a creates the output if necessary even when the input has
-  // not been set yet.
-  virtual vtkPolyData* GetPolyDataOutput();
-  virtual vtkUnstructuredGrid* GetUnstructuredGridOutput();
-
-  // Description:
-  // Check input type and make the output the same type.
-  virtual vtkDataSet* GetOutput();
 
   // Description:
   // Construct with user-specified implicit function.
   static vtkPVUpdateSuppressor *New();
-
-  // Description:
-  // The pipeline knows nothing about this input.  The pipeline thinks
-  // that this is a source.
-  void SetInput(vtkDataSet* input);
-  vtkDataSet* GetInput(){return this->Input;}
 
   // Description:
   // Methods for saving, clearing and updating flip books.
@@ -72,13 +52,14 @@ public:
   vtkSetMacro(UpdateNumberOfPieces, int);
   vtkGetMacro(UpdateNumberOfPieces, int);
 
+  // Description:
+  // Set the output type. If not specified, the output type will be
+  // the same as the input.
+  vtkSetStringMacro(OutputType);
+
 protected:
   vtkPVUpdateSuppressor();
   ~vtkPVUpdateSuppressor();
-
-  void Execute();
-
-  vtkDataSet* Input;
 
   int UpdatePiece;
   int UpdateNumberOfPieces;
@@ -87,6 +68,14 @@ protected:
 
   vtkDataSet** CachedGeometry;
   int CachedGeometryLength;
+
+  // Create a default executive.
+  virtual vtkExecutive* CreateDefaultExecutive();
+
+  virtual int RequestDataObject(vtkInformation*, 
+                                vtkInformationVector**, 
+                                vtkInformationVector*);
+  char* OutputType;
 
 private:
   vtkPVUpdateSuppressor(const vtkPVUpdateSuppressor&);  // Not implemented.

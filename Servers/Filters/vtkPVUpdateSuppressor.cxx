@@ -19,93 +19,39 @@
 #include "vtkDataSet.h"
 #include "vtkDemandDrivenPipeline.h"
 #include "vtkInformation.h"
+#include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
+#include "vtkSource.h"
 #include "vtkUnstructuredGrid.h"
+#include "vtkUpdateSuppressorPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.22");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.23");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
-vtkCxxSetObjectMacro(vtkPVUpdateSuppressor,Input,vtkDataSet);
 
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::vtkPVUpdateSuppressor()
 {
-  this->Input = 0;
-
   this->UpdatePiece = 0;
   this->UpdateNumberOfPieces = 1;
 
   this->CachedGeometry = NULL;
   this->CachedGeometryLength = 0;
+
+  this->OutputType = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
 {
-  this->SetInput(0);
   this->RemoveAllCaches();
-}
-
-//-----------------------------------------------------------------------------
-vtkPolyData* vtkPVUpdateSuppressor::GetPolyDataOutput()
-{
-  vtkPolyData* pd;
-  if (this->NumberOfOutputs == 0 || this->Outputs[0] == 0)
-    {
-    pd = vtkPolyData::New();
-    this->SetOutput(pd);
-    pd->Delete();
-    return pd;
-    }
-  pd = vtkPolyData::SafeDownCast(this->Outputs[0]);
-  if (pd == 0)
-    {
-    vtkErrorMacro("Could not get the poly data output.");
-    }
-  return pd;
-}
-
-//-----------------------------------------------------------------------------
-vtkUnstructuredGrid* vtkPVUpdateSuppressor::GetUnstructuredGridOutput()
-{
-  vtkUnstructuredGrid* ug;
-  if (this->NumberOfOutputs == 0 || this->Outputs[0] == 0)
-    {
-    ug = vtkUnstructuredGrid::New();
-    this->SetOutput(ug);
-    ug->Delete();
-    return ug;
-    }
-    
-  ug = vtkUnstructuredGrid::SafeDownCast(this->Outputs[0]);
-  if (ug == 0)
-    {
-    vtkErrorMacro("Could not get the unstructured grid output.");
-    }
-  return ug;
-}
-
-//----------------------------------------------------------------------------
-vtkDataSet* vtkPVUpdateSuppressor::GetOutput()
-{
-  if (this->NumberOfOutputs < 1 || this->Outputs[0] == 0)
-    {
-    vtkDataSet* input = this->GetInput();
-    if (input == 0)
-      {
-      return 0;
-      }
-    vtkDataSet* output = input->NewInstance();
-    this->SetOutput(output);
-    output->Delete();
-    }
-  return static_cast<vtkDataSet*>(this->Outputs[0]);
+  this->SetOutputType(0);
 }
 
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::ForceUpdate()
 {
-  vtkDataSet *input = this->GetInput();
+  vtkDataSet *input = vtkDataSet::SafeDownCast(this->GetInput());
   vtkDataSet *output = this->GetOutput();
 
   if (input == 0)
@@ -163,15 +109,37 @@ void vtkPVUpdateSuppressor::ForceUpdate()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVUpdateSuppressor::Execute()
+int vtkPVUpdateSuppressor::RequestDataObject(
+  vtkInformation* request, 
+  vtkInformationVector** inputVector, 
+  vtkInformationVector* outputVector)
 {
-  vtkDataSet *input = this->GetInput();
-  vtkDataSet *output = this->GetOutput();
-  if (!input || !output)
+  if (!this->OutputType)
     {
-    return;
-    }  
-  output->ShallowCopy(input);
+    return this->Superclass::RequestDataObject(
+      request, inputVector, outputVector);
+    }
+
+  // for each output
+  for(int i=0; i < this->GetNumberOfOutputPorts(); ++i)
+    {
+    vtkInformation* info = outputVector->GetInformationObject(i);
+    vtkDataObject *output = info->Get(vtkDataObject::DATA_OBJECT());
+    
+    if (!output || !output->IsA(this->OutputType)) 
+      {
+      output = vtkDemandDrivenPipeline::NewDataObject(this->OutputType);
+      if (!output)
+        {
+        return 0;
+        }
+      output->SetPipelineInformation(info);
+      output->Delete();
+      this->GetOutputPortInformation(0)->Set(
+        vtkDataObject::DATA_EXTENT_TYPE(), output->GetExtentType());
+      }
+    }
+  return 1;
 }
 
 //----------------------------------------------------------------------------
@@ -240,12 +208,17 @@ void vtkPVUpdateSuppressor::CacheUpdate(int idx, int num)
     }
 }
 
+//----------------------------------------------------------------------------
+vtkExecutive* vtkPVUpdateSuppressor::CreateDefaultExecutive()
+{
+  return vtkUpdateSuppressorPipeline::New();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVUpdateSuppressor::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "Input: (" << this->Input << ")\n";
   os << indent << "UpdatePiece: " << this->UpdatePiece << endl;
   os << indent << "UpdateNumberOfPieces: " << this->UpdateNumberOfPieces << endl;
 }
