@@ -510,13 +510,23 @@ protected:
   // Flag to tell whether the source is grabbed or not.
   int SourceGrabbed;
 
+  // Not used any more, should be deleted
   virtual int ClonePrototypeInternal(int makeCurrent, vtkPVSource*& clone);
+
+  // For generality, clone prototype internal is split in two
+  // steps. The first step does the actual cloning, while the second
+  // step sets the pvData. The vtkPVSource::ClonePrototype(...)
+  // actually calls both of them.
+  virtual int ClonePrototypeInternal1(int makeCurrent, vtkPVSource*& clone);
+  virtual int ClonePrototypeInternal2(int makeCurrent, vtkPVSource* clone);
 
   int ToolbarModule;
 
 //BTX
   vtkVector<const char*>* InputClassNames;
 //ETX
+
+  vtkPVSource* Prototype;
 
 private:
   vtkPVSource(const vtkPVSource&); // Not implemented
