@@ -262,6 +262,7 @@ void vtkPVTreeComposite::RootAbortCheck()
 
   if (!this->RenderView)
     {
+    vtkWarningMacro("No RenderView: Poosible lock up condition.");
     return;
     }
 
