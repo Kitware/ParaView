@@ -62,7 +62,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.6");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.7");
 
 
 //----------------------------------------------------------------------------
@@ -378,7 +378,7 @@ void vtkPVPartDisplay::ColorByArray(vtkPVColorMap *colorMap,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVPartDisplay::PrintSelfostream& os, vtkIndent indent)
+void vtkPVPartDisplay::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Visibility: " << this->Visibility << endl;
