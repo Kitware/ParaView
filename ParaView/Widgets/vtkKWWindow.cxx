@@ -848,30 +848,24 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.37 $");
+  this->ExtractRevision(os,"$Revision: 1.38 $");
 }
 
 int vtkKWWindow::ExitDialog()
 {
-  vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
-  dlg->SetStyleToYesNo();
-
   ostrstream title;
   title << "Exit " << this->GetApplication()->GetApplicationName() << ends;
   char* ttl = title.str();
-  dlg->SetTitle(ttl);
-  delete[] ttl;
-
-  dlg->Create(this->GetApplication(),"");
   ostrstream str;
   str << "Are you sure you want to exit " << this->GetApplication()->GetApplicationName() << "?" << ends;
   char* msg = str.str();
-  dlg->SetText(msg);
-  dlg->SetIcon(vtkKWMessageDialog::Question);
   
-  int ret = dlg->Invoke();  
-  dlg->Delete();
+  int ret = vtkKWMessageDialog::PopupYesNo(
+    this->GetApplication(), vtkKWMessageDialog::Question,
+    ttl, msg);
+
   delete[] msg;
+  delete[] ttl;
  
   return ret;
 }
