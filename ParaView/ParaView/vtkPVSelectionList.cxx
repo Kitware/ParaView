@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.41");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.42");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -270,6 +270,11 @@ void vtkPVSelectionList::SetCurrentValue(int value)
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::SelectCallback(const char *name, int value)
 {
+  if (this->CurrentValue == value)
+    {
+    return;
+    }
+  
   this->CurrentValue = value;
   this->SetCurrentName(name);
   
