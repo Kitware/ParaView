@@ -62,6 +62,7 @@ class vtkKWNotebook;
 class vtkKWProgressGauge;
 class vtkKWRadioButton;
 class vtkKWSplitFrame;
+class vtkKWTclInteractor;
 class vtkKWView;
 class vtkKWViewCollection;
 
@@ -311,6 +312,14 @@ public:
   void OnInterfaceSettingsChange();
   vtkGetObjectMacro(InterfaceSettingsFrame,vtkKWLabeledFrame);
 
+  // Description:
+  // Display the tcl interactor.
+  void DisplayCommandPrompt();
+  
+  // Description:
+  // Access to the Tcl interactor.
+  vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
+
 protected:
   vtkKWWindow();
   ~vtkKWWindow();
@@ -394,6 +403,8 @@ protected:
   // This vector holds the list of most recently used files.
   vtkVector<vtkKWWindowMenuEntry*> *RecentFilesVector;
 //ETX
+
+  vtkKWTclInteractor *TclInteractor;
 
 private:
   vtkKWWindow(const vtkKWWindow&); // Not implemented

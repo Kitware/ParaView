@@ -91,7 +91,6 @@ class vtkKWPushButton;
 class vtkKWRadioButton;
 class vtkKWRotateCameraInteractor;
 class vtkKWScale;
-class vtkKWTclInteractor;
 class vtkKWToolbar;
 class vtkPVAnimationInterface;
 class vtkPVApplication;
@@ -326,10 +325,6 @@ public:
   void UpdateFilterMenu();
 
   // Description:
-  // Display the tcl interactor.
-  void DisplayCommandPrompt();
-  
-  // Description:
   // Experimenting with wizards. Has to cleaned up - Berk
   void WizardCallback();
 
@@ -476,10 +471,6 @@ public:
   vtkLinkedList<vtkPVReaderModule*>* GetReaderList() { return this->ReaderList; }
   //ETX
 
-  // Description:
-  // Access to the Tcl interactor.
-  vtkGetObjectMacro(TclInteractor, vtkKWTclInteractor);
-
   // Descrition:
   // Show/Hide the sources long help.
   virtual void SetShowSourcesLongHelp(int);
@@ -584,7 +575,6 @@ protected:
   void InitializeToolbars(vtkKWApplication* app);
   void InitializeInteractorInterfaces(vtkKWApplication* app);
 
-  vtkKWTclInteractor *TclInteractor;
   vtkPVTimerLogDisplay *TimerLogDisplay;
   vtkPVErrorLogDisplay *ErrorLogDisplay;
 

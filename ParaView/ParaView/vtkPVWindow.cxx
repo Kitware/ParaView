@@ -65,7 +65,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
-#include "vtkKWTclInteractor.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkLinkedList.txx"
@@ -128,7 +127,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.398");
+vtkCxxRevisionMacro(vtkPVWindow, "1.399");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -214,7 +213,6 @@ vtkPVWindow::vtkPVWindow()
 
   this->TimerLogDisplay = NULL;
   this->ErrorLogDisplay = NULL;
-  this->TclInteractor = NULL;
 
   // Set the extension and the type (name) of the script for
   // this application. They are all Tcl scripts but we give
@@ -339,12 +337,6 @@ vtkPVWindow::~vtkPVWindow()
     this->ErrorLogDisplay = NULL;
     }
 
-  if (this->TclInteractor)
-    {
-    this->TclInteractor->Delete();
-    this->TclInteractor = NULL;
-    }
-
   if (this->FileExtensions)
     {
     delete [] this->FileExtensions;
@@ -399,13 +391,6 @@ void vtkPVWindow::CloseNoPrompt()
     this->ErrorLogDisplay->SetMasterWindow(NULL);
     this->ErrorLogDisplay->Delete();
     this->ErrorLogDisplay = NULL;
-    }
-
-  if (this->TclInteractor )
-    {
-    this->TclInteractor->SetMasterWindow(NULL);
-    this->TclInteractor->Delete();
-    this->TclInteractor = NULL;
     }
 
   this->vtkKWWindow::CloseNoPrompt();
@@ -3490,27 +3475,6 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::DisplayCommandPrompt()
-{
-  if ( ! this->TclInteractor )
-    {
-    this->TclInteractor = vtkKWTclInteractor::New();
-    ostrstream title;
-    if (this->GetTitle())
-      {
-      title << this->GetTitle() << " : ";
-      }
-    title << "Command Prompt" << ends;
-    this->TclInteractor->SetTitle(title.str());
-    title.rdbuf()->freeze(0);
-    this->TclInteractor->SetMasterWindow(this);
-    this->TclInteractor->Create(this->GetPVApplication());
-    }
-  
-  this->TclInteractor->Display();
-}
-
-//----------------------------------------------------------------------------
 void vtkPVWindow::LoadScript(const char *name)
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
@@ -3915,7 +3879,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.398 $");
+  this->ExtractRevision(os,"$Revision: 1.399 $");
 }
 
 //----------------------------------------------------------------------------
@@ -4311,6 +4275,5 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
      << this->InitializeDefaultInterfaces << endl;
   os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
   os << indent << "Interaction: " << (this->Interaction?"on":"off") << endl;
-  os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
   os << indent << "ShowSourcesLongHelp: " << (this->ShowSourcesLongHelp?"on":"off") << endl;
 }

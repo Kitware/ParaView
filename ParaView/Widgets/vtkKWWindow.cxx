@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
 #include "vtkKWSplitFrame.h"
+#include "vtkKWTclInteractor.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWView.h"
 #include "vtkKWViewCollection.h"
@@ -70,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.130");
+vtkCxxRevisionMacro(vtkKWWindow, "1.131");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -299,10 +300,18 @@ vtkKWWindow::vtkKWWindow()
   this->InterfaceSettingsSaveWindowGeometry = 0;
   this->InterfaceSettingsShowSplashScreenCheck = 0;
   this->InterfaceSettingsShowBalloonHelpCheck = 0;
+
+  this->TclInteractor = NULL;
 }
 
 vtkKWWindow::~vtkKWWindow()
 {
+  if (this->TclInteractor)
+    {
+    this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
+    }
+
   if ( this->RecentFilesVector )
     {
     vtkKWWindowMenuEntry *kc = 0;
@@ -328,7 +337,6 @@ vtkKWWindow::~vtkKWWindow()
     this->Views->Delete();
     this->Views = NULL;
     }
-
 
 #if (TK_MAJOR_VERSION == 8) && (TK_MINOR_VERSION <= 2)
   // This "hack" is here to get around a Tk bug ( Bug: 3402 )
@@ -494,6 +502,13 @@ void vtkKWWindow::Close()
   
 void vtkKWWindow::CloseNoPrompt()
 {
+  if (this->TclInteractor )
+    {
+    this->TclInteractor->SetMasterWindow(NULL);
+    this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
+    }
+
   // If it's the last win, save its geometry
 
   if (this->Application->GetWindows()->GetNumberOfItems() <= 1 &&
@@ -1300,7 +1315,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.130 $");
+  this->ExtractRevision(os,"$Revision: 1.131 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1667,6 +1682,27 @@ char* vtkKWWindow::GetTitle()
 }
 
 //----------------------------------------------------------------------------
+void vtkKWWindow::DisplayCommandPrompt()
+{
+  if ( ! this->TclInteractor )
+    {
+    this->TclInteractor = vtkKWTclInteractor::New();
+    ostrstream title;
+    if (this->GetTitle())
+      {
+      title << this->GetTitle() << " : ";
+      }
+    title << "Command Prompt" << ends;
+    this->TclInteractor->SetTitle(title.str());
+    title.rdbuf()->freeze(0);
+    this->TclInteractor->SetMasterWindow(this);
+    this->TclInteractor->Create(this->Application);
+    }
+  
+  this->TclInteractor->Display();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -1688,6 +1724,7 @@ void vtkKWWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "StatusFrame: " << this->GetStatusFrame() << endl;
   os << indent << "ViewFrame: " << this->GetViewFrame() << endl;
   os << indent << "WindowClass: " << this->GetWindowClass() << endl;  
+  os << indent << "TclInteractor: " << this->GetTclInteractor() << endl;
   os << indent << "Title: " 
      << ( this->GetTitle() ? this->GetTitle() : "(none)" ) << endl;  
   os << indent << "InterfaceSettingsFrame: " << this->GetInterfaceSettingsFrame() << endl;
