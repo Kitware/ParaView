@@ -21,7 +21,7 @@
 #include "vtkRenderer.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkPVTrackballPan, "1.6");
+vtkCxxRevisionMacro(vtkPVTrackballPan, "1.7");
 vtkStandardNewMacro(vtkPVTrackballPan);
 
 //-------------------------------------------------------------------------
@@ -56,26 +56,26 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
     return;
     }
 
-  // These are different because y is flipped.
-  int *size = ren->GetSize();
-  float dx = (float)(x - rwi->GetLastEventPosition()[0]) / (float)(size[1]);
-  float dy = (float)(rwi->GetLastEventPosition()[1] - y) / (float)(size[1]);
-
   vtkCamera *camera = ren->GetActiveCamera();
+  double pos[3], fp[3];
+  camera->GetPosition(pos);
+  camera->GetFocalPoint(fp);
+
   if (camera->GetParallelProjection())
     {
     camera->OrthogonalizeViewUp();
     double *up = camera->GetViewUp();
     double *vpn = camera->GetViewPlaneNormal();
     double right[3];
-    double pos[3];
-    double fp[3];
     double scale, tmp;
     camera->GetViewUp(up);
     camera->GetViewPlaneNormal(vpn);
     vtkMath::Cross(vpn, up, right);
-    camera->GetPosition(pos);
-    camera->GetFocalPoint(fp);
+
+    // These are different because y is flipped.
+    int *size = ren->GetSize();
+    float dx = (float)(x - rwi->GetLastEventPosition()[0]) / (float)(size[1]);
+    float dy = (float)(rwi->GetLastEventPosition()[1] - y) / (float)(size[1]);
 
     scale = camera->GetParallelScale();
     dx *= scale * 2.0;
@@ -95,9 +95,45 @@ void vtkPVTrackballPan::OnMouseMove(int x, int y, vtkRenderer *ren,
     }
   else
     {
-    float viewAngle = camera->GetViewAngle();  
-    camera->Yaw(viewAngle * dx);
-    camera->Pitch(viewAngle * dy);
+    double depth, worldPt[4], lastWorldPt[4];
+    ren->SetWorldPoint(fp);
+    ren->WorldToDisplay();
+    depth = ren->GetDisplayPoint()[2];
+    
+    ren->SetDisplayPoint(x, y, depth);
+    ren->DisplayToWorld();
+    ren->GetWorldPoint(worldPt);
+    if (worldPt[3])
+      {
+      worldPt[0] /= worldPt[3];
+      worldPt[1] /= worldPt[3];
+      worldPt[2] /= worldPt[3];
+      worldPt[3] = 1.0;
+      }
+    
+    ren->SetDisplayPoint(rwi->GetLastEventPosition()[0],
+                         rwi->GetLastEventPosition()[1],
+                         depth);
+    ren->DisplayToWorld();
+    ren->GetWorldPoint(lastWorldPt);
+    if (lastWorldPt[3])
+      {
+      lastWorldPt[0] /= lastWorldPt[3];
+      lastWorldPt[1] /= lastWorldPt[3];
+      lastWorldPt[2] /= lastWorldPt[3];
+      lastWorldPt[3] = 1.0;
+      }
+    
+    pos[0] += lastWorldPt[0] - worldPt[0];
+    pos[1] += lastWorldPt[1] - worldPt[1];
+    pos[2] += lastWorldPt[2] - worldPt[2];
+
+    fp[0] += lastWorldPt[0] - worldPt[0];
+    fp[1] += lastWorldPt[1] - worldPt[1];
+    fp[2] += lastWorldPt[2] - worldPt[2];
+
+    camera->SetPosition(pos);
+    camera->SetFocalPoint(fp);
     }
   ren->ResetCameraClippingRange();
   rwi->Render();
