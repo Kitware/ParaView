@@ -33,7 +33,7 @@
 
 //#include "vtkRef.h"
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.18");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.19");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -308,4 +308,5 @@ void vtkDesktopDeliveryClient::PrintSelf(ostream& os, vtkIndent indent)
      << this->RemoteImageProcessingTime << endl;
   os << indent << "TransferTime: " << this->TransferTime << endl;
   os << indent << "SquirtCompressionLevel: " << this->SquirtCompressionLevel << endl;
+  os << indent << "UseTileDisplay: " << this->UseTileDisplay << endl;
 }
