@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.10");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.11");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1984,6 +1984,10 @@ int vtkPVWindow::ReadFileInformation(vtkPVReaderModule* clone,
       "$kw(%s) ReadFileInformation $kw(%s) \"%s\"", 
       this->GetTclName(), clone->GetTclName(), fileName);
     }
+  else
+    {
+    clone->Delete();
+    }
 
   return retVal;
 }
@@ -2046,6 +2050,7 @@ int vtkPVWindow::OpenWithReader(const char *fileName,
   retVal = this->FinalizeRead(clone, fileName);
   if (retVal != VTK_OK)
     {
+    // Clone should delete itself on an error
     return retVal;
     }
   return VTK_OK;
