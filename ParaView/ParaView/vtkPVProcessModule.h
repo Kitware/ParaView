@@ -216,6 +216,11 @@ public:
   // Also reset the vtkClientServerStream object.
   virtual void SendStreamToClientAndServer();
 
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClientAndServerRoot();
+
   //BTX
   // Description:
   // Get the interpreter used on the local process.

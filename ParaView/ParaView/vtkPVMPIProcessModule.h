@@ -103,6 +103,11 @@ public:
   virtual void SendStreamToClientAndServer();
 
   // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  // Also reset the vtkClientServerStream object.
+  virtual void SendStreamToClientAndServerRoot();
+
+  // Description:
   // The primary method for building pipelines on remote proceses
   // is to use tcl.
   virtual void RemoteSimpleScript(int remoteId, const char *str);

@@ -270,7 +270,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.18");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.19");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -1238,11 +1238,7 @@ void vtkPVClientServerModule::SendStreamToServer()
 //----------------------------------------------------------------------------
 void vtkPVClientServerModule::SendStreamToServerRoot()
 {
-  const unsigned char* data;
-  size_t len;
-  this->ClientServerStream->GetData(&data, &len);
-  this->SocketController->TriggerRMI(1, (void*)(data), len,
-                                     VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
+  this->SendStreamToServerRootInternal();
   this->ClientServerStream->Reset();
 }
 
@@ -1257,6 +1253,20 @@ void vtkPVClientServerModule::SendStreamToClientAndServer()
 
   // Send to server first, then to client.
   this->SendStreamToServerInternal();
+  this->SendStreamToClient();
+}
+
+void vtkPVClientServerModule::SendStreamToClientAndServerRoot()
+{
+  if(!this->ClientMode)
+    {
+    vtkErrorMacro("Attempt to call SendStreamToClientAndServerRoot "
+                  "on server node.");
+    return;
+    }
+
+  // Send to server root first, then to client.
+  this->SendStreamToServerRootInternal();
   this->SendStreamToClient();
 }
 
@@ -1283,6 +1293,16 @@ void vtkPVClientServerModule::SendStreamToServerInternal()
   this->ClientServerStream->GetData(&data, &len);
   this->SocketController->TriggerRMI(1, (void*)(data), len,
                                      VTK_PV_CLIENTSERVER_RMI_TAG);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVClientServerModule::SendStreamToServerRootInternal()
+{
+  const unsigned char* data;
+  size_t len;
+  this->ClientServerStream->GetData(&data, &len);
+  this->SocketController->TriggerRMI(1, (void*)(data), len,
+                                     VTK_PV_CLIENTSERVER_ROOT_RMI_TAG);
 }
 
 //----------------------------------------------------------------------------

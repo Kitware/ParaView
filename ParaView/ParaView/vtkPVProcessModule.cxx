@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.22");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.23");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -513,6 +513,12 @@ void vtkPVProcessModule::SendStreamToServerRoot()
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::SendStreamToClientAndServer()
+{
+  this->SendStreamToServer();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVProcessModule::SendStreamToClientAndServerRoot()
 {
   this->SendStreamToServer();
 }

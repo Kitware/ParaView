@@ -178,6 +178,10 @@ public:
   // Send current ClientServerStream data to the server and the client.
   virtual void SendStreamToClientAndServer();
 
+  // Description:
+  // Send current ClientServerStream data to the server root and the client.
+  virtual void SendStreamToClientAndServerRoot();
+
   //BTX
   // Description:
   // Return a message containing the result of the last SendMessages call.
@@ -203,6 +207,7 @@ protected:
   void SendLastClientServerResult();
 
   void SendStreamToServerInternal();
+  void SendStreamToServerRootInternal();
   void Connect();
 
   int NumberOfServerProcesses;
