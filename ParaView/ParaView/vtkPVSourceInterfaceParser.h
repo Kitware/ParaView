@@ -122,6 +122,9 @@ protected:
   // Called by BeginElement to report unknown element type.
   void ReportUnknownElement(const char*);
   
+  // Called by BeginElement to report stray element type.
+  void ReportStrayElement(const char*);
+
   // Called by Parse to report an XML syntax error.
   void ReportXmlParseError();
   

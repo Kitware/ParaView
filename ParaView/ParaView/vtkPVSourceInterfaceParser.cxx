@@ -195,6 +195,13 @@ void vtkPVSourceInterfaceParser::ReportUnknownElement(const char* element)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVSourceInterfaceParser::ReportStrayElement(const char* element)
+{
+  vtkErrorMacro("Stray XML element in Interfaces file "
+                << this->FileName << ": " << element);
+}
+
+//----------------------------------------------------------------------------
 void vtkPVSourceInterfaceParser::ReportXmlParseError()
 {
   vtkErrorMacro("Error parsing XML in Interfaces file "
@@ -542,6 +549,12 @@ void vtkPVSourceInterfaceParser::SelectionElementBegin(const char** atts)
 //----------------------------------------------------------------------------
 void vtkPVSourceInterfaceParser::ChoiceElementBegin(const char** atts)
 {
+  if (!this->PVMethodInterface)
+    {
+    this->ReportStrayElement("Choice");
+    return;
+    }
+
   const char* name=0;
   const char* value_s=0;
   int value=0;
