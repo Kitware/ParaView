@@ -89,7 +89,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.151");
+vtkCxxRevisionMacro(vtkKWApplication, "1.152");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -111,10 +111,11 @@ vtkKWApplication::vtkKWApplication()
   this->ApplicationPrettyName = NULL;
   this->ApplicationInstallationDirectory = NULL;
 
-  this->LimitedEditionModeName = NULL;
-  this->SetLimitedEditionModeName("limited edition");
+  this->LimitedEditionModeName = vtkString::Duplicate("limited edition");
 
   this->EmailFeedbackAddress = NULL;
+
+  this->DisplayHelpStartingPage = vtkString::Duplicate("Introduction.htm");
 
   this->InExit = 0;
   this->DialogUp = 0;
@@ -244,6 +245,8 @@ vtkKWApplication::~vtkKWApplication()
   this->SetApplicationInstallationDirectory(NULL);
 
   this->SetEmailFeedbackAddress(NULL);
+
+  this->SetDisplayHelpStartingPage(NULL);
 
   if (this->TraceFile)
     {
@@ -860,7 +863,12 @@ void vtkKWApplication::DisplayHelp(vtkKWWindow* master)
     {
     temp << this->ApplicationInstallationDirectory << "/";
     }
-  temp << this->ApplicationName << ".chm::/Introduction.htm" << ends;
+  temp << this->ApplicationName << ".chm";
+  if (this->DisplayHelpStartingPage)
+    {
+    temp << "::/" << this->DisplayHelpStartingPage;
+    }
+  temp << ends;
   
   if (!HtmlHelp(NULL, temp.str(), HH_DISPLAY_TOPIC, 0))
     {
@@ -1727,6 +1735,7 @@ int vtkKWApplication::GetSystemVersion(ostream &os)
         {
         // Test for the workstation type.
 
+#if (_MSC_VER >= 1300) 
         if (osvi.wProductType == VER_NT_WORKSTATION)
           {
           if (osvi.dwMajorVersion == 4)
@@ -1795,6 +1804,7 @@ int vtkKWApplication::GetSystemVersion(ostream &os)
               }
             }
           }
+#endif // Visual Studio 7 and up
         }
 
       // Test for specific product on Windows NT 4.0 SP5 and earlier

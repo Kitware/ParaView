@@ -403,6 +403,10 @@ protected:
   vtkKWWidget *BalloonHelpWidget;
   int ShowBalloonHelp;
 
+  vtkGetStringMacro(DisplayHelpStartingPage);
+  vtkSetStringMacro(DisplayHelpStartingPage);
+  char *DisplayHelpStartingPage;
+
   static int WidgetVisibility;
   int InExit;
   int DialogUp;
