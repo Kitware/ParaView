@@ -137,6 +137,14 @@ public:
   // This method saves state of animation entry.
   void SaveState(ofstream *file);
 
+  // Description:
+  // Set the save state script.
+  vtkSetStringMacro(SaveStateScript);
+  void SetSaveStateObject(vtkKWObject* o)
+    {
+    this->SaveStateObject = o;
+    }
+
 protected:
   vtkPVAnimationInterfaceEntry();
   ~vtkPVAnimationInterfaceEntry();
@@ -156,6 +164,7 @@ protected:
   vtkKWRange*        TimeRange;
 
 
+  vtkKWObject*       SaveStateObject;
   char*              SaveStateScript;
   char*              Script;
   char*              CurrentMethod;

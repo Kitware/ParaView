@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.34");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.35");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -558,14 +558,22 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
     if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
       {
       sprintf(script, "%s Set%s [expr round($pvTime)]", 
-              this->ObjectTclName, this->VariableName);
+        this->ObjectTclName, this->VariableName);
       }
     else
       {
       sprintf(script, "%s Set%s $pvTime", 
-              this->ObjectTclName, this->VariableName);
+        this->ObjectTclName, this->VariableName);
       }
     ai->SetLabelAndScript(this->LabelWidget->GetLabel(), script);
+    if (this->DataType == VTK_INT || this->DataType == VTK_LONG)
+      {
+      ai->SetTypeToInt();
+      }
+    sprintf(script, "AnimationMenuCallback $kw(%s)", 
+      ai->GetTclName());
+    ai->SetSaveStateScript(script);
+    ai->SetSaveStateObject(this);
     ai->Update();
     }
   // What if there are more than one entry?

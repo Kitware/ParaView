@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.24");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.25");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -391,6 +391,10 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   sprintf(script, "%s SetTimeValue $pvTime", 
           this->PVSource->GetVTKSourceTclName());
   ai->SetLabelAndScript(this->GetTraceName(), script);
+  sprintf(script, "AnimationMenuCallback $kw(%s)", 
+    ai->GetTclName());
+  ai->SetSaveStateScript(script);
+  ai->SetSaveStateObject(this);
   ai->Update();
 }
 

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.43");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.44");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -680,13 +680,13 @@ void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
 {
   char script[5000];
-  
+
   if (ai->InitializeTrace(NULL))
     {
     this->AddTraceEntry("$kw(%s) AnimationMenuCallback $kw(%s)", 
-                        this->GetTclName(), ai->GetTclName());
+      this->GetTclName(), ai->GetTclName());
     }
-  
+
   sprintf(script, "%s SetFileName [ lindex $%s_files [expr round($pvTime)] ]",
     this->GetPVSource()->GetVTKSourceTclName(),
     this->GetPVSource()->GetVTKSourceTclName());
@@ -698,6 +698,10 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   ai->SetTimeEnd(this->Range[1]);
   ai->SetTypeToInt();
   //cout << "Set time to: " << ai->GetTimeStart() << " - " << ai->GetTimeEnd() << endl;
+  sprintf(script, "AnimationMenuCallback $kw(%s)", 
+    ai->GetTclName());
+  ai->SetSaveStateScript(script);
+  ai->SetSaveStateObject(this);
   ai->Update();
 }
 
