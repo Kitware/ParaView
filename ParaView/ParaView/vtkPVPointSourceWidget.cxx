@@ -51,7 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.8");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.9");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -241,6 +241,7 @@ void vtkPVPointSourceWidget::Trace(ofstream *file)
     return;
     }
 
+  this->PointWidget->Trace(file);
   this->RadiusWidget->Trace(file);
   this->NumberOfPointsWidget->Trace(file);
 }
