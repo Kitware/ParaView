@@ -96,8 +96,7 @@ vtkPVApplication::vtkPVApplication()
 
   this->Controller = NULL;
 
-  vtkOutputWindow::GetInstance()->PromptUserOn();
-
+  vtkOutputWindow::GetInstance()->PromptUserOff();
 
   // For some reason "GetObjectFromPointer" is returning vtkTemp0 instead
   /// of Application.  Lets force it.

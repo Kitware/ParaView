@@ -1248,16 +1248,25 @@ void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
   // This is where we will need a SetCommand from the interface ...
   if (this->ChangeScalarsFilterTclName && idx == 0)
     {
-    pvApp->BroadcastScript("%s SetInput %s",
-                           this->ChangeScalarsFilterTclName,
-                           pvd->GetVTKDataTclName());
+    pvApp->BroadcastScript("%s Delete",
+                           this->ChangeScalarsFilterTclName);
     }
   else
     {
-    pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
-			   pvd->GetVTKDataTclName());
+    char tclName[256];
+    sprintf(tclName, "ChangeScalars%d", this->InstanceCount);
+    this->SetChangeScalarsFilterTclName(tclName);
     }
 
+  // I don't know why we are not using "MakeTclObject".
+  pvApp->BroadcastScript("vtkFieldDataToAttributeDataFilter %s",
+                        this->ChangeScalarsFilterTclName);
+  pvApp->BroadcastScript("%s SetInput %s",
+                         this->ChangeScalarsFilterTclName,
+                         pvd->GetVTKDataTclName());
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+                         this->VTKSourceTclName,
+                         this->ChangeScalarsFilterTclName);
   
   this->Modified();
 }
