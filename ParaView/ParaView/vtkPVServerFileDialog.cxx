@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.14");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.15");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -533,7 +533,11 @@ void vtkPVServerFileDialog::LoadSaveCallback()
   if (this->SelectedDirectory)
     {
     ostrstream newdir;
-    if (last >= 0 && dir[last] == '/')
+    if (strcmp(dir, "Available Drives") == 0)
+      {
+      newdir << this->SelectedDirectory << ends;
+      }
+    else if (last >= 0 && dir[last] == '/')
       { // special case for root. Avoid "//" in path.
       newdir << dir << this->SelectedDirectory << ends;
       }
@@ -578,39 +582,42 @@ void vtkPVServerFileDialog::CancelCallback()
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::DownDirectoryCallback()
 {
-  char *newdir;
-  char *p;
-  char *last;
-  int count = 0;
-
-  newdir = new char[strlen(this->LastPath) + 1];
-  strcpy(newdir, this->LastPath);
-
-  p = newdir;
-  while (*p != '\0')
+  // If this is the top-level directory on a Windows drive letter,
+  // present a list of drive letters.
+  if((this->LastPath[0] != '/') &&
+     (this->LastPath[1] == ':') &&
+     (this->LastPath[2] == '/') &&
+     (this->LastPath[3] == 0))
     {
-    if (*p == '/')
-      {
-      last = p;
-      count++;
-      }
-    ++p;
+    this->SetLastPath("<GET_DRIVE_LETTERS>");
+    this->Update();
+    return;
     }
   
-  // Do not remove the last slash.
-  if (count > 1)
+  char* newdir = new char[strlen(this->LastPath) + 1];
+  strcpy(newdir, this->LastPath);
+  
+  int count = 0;
+  char* last = newdir;
+  for(char* p = newdir; *p ; ++p)
+    {
+    if(*p == '/')
+      {
+      last = p;
+      ++count;
+      }
+    }
+  
+  if(count > 1)
     {
     *last = '\0';
-    this->SetLastPath(newdir);
     }
-  if (count == 1)
+  else if(count == 1)
     {
-    last[1] = '\0';
-    this->SetLastPath(newdir);
+    *(last+1) = '\0';
     }
-  // If count == 0;
-  // already at top level.
-  // what to do about switching disks?
+  this->SetLastPath(newdir);
+  
   delete [] newdir;
   this->Update();
 }
@@ -970,7 +977,14 @@ void vtkPVServerFileDialog::Update()
   
   this->Script("%s delete all", this->FileList->GetWidgetName());
   this->SetSelectBoxId(NULL);
-  this->DirectoryDisplay->SetLabel(this->LastPath);
+  if(this->LastPath[0] != '<')
+    {
+    this->DirectoryDisplay->SetLabel(this->LastPath);
+    }
+  else
+    {
+    this->DirectoryDisplay->SetLabel("Available Drives");
+    }
   
   // Construct the gui representation.
   int y = 10;

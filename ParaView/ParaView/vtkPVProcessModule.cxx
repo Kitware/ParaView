@@ -77,7 +77,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.11");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.12");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -455,6 +455,14 @@ void vtkPVProcessModule::InitializeTclMethodImplementations()
     "  proc GetDirectoryListing { dir perm {exp {[A-Za-z0-9]*}} } {\n"
     "    set files {}\n"
     "    set dirs {}\n"
+    "    if {$dir == {<GET_DRIVE_LETTERS>}} {\n"
+    "      foreach drive [file volumes] {\n"
+    "        if {![catch {file stat $drive .}]} {\n"
+    "          lappend dirs $drive\n"
+    "        }\n"
+    "      }\n"
+    "      return [list $dirs $files]\n"
+    "    }\n"
     "    if {$dir != {}} {\n"
     "      set cwd [pwd]\n"
     "      if {[catch {cd $dir}]} {\n"
