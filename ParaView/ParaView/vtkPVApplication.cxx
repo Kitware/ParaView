@@ -616,6 +616,12 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
 
+  this->Script("proc bgerror { m } { Application DisplayTCLError $m }");
+  vtkPVOutputWindow *window = vtkPVOutputWindow::New();
+  window->SetWindowCollection( this->Windows );
+  this->OutputWindow = window;
+  vtkOutputWindow::SetInstance(this->OutputWindow);
+
   // If any of the argumens has a .pvs extension, load it as a script.
   for (i=1; i < argc; i++)
     {
@@ -627,11 +633,6 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     }
 
-  this->Script("proc bgerror { m } { Application DisplayTCLError $m }");
-  vtkPVOutputWindow *window = vtkPVOutputWindow::New();
-  window->SetWindowCollection( this->Windows );
-  this->OutputWindow = window;
-  vtkOutputWindow::SetInstance(this->OutputWindow);
   this->vtkKWApplication::Start(argc,argv);
   vtkOutputWindow::SetInstance(0);
   this->OutputWindow->Delete();
