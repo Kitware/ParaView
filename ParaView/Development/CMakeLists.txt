@@ -2,53 +2,6 @@ PROJECT(Development)
 INCLUDE_REGULAR_EXPRESSION("^vtk.*$")
 
 SET(Development_SRCS
-   vtkAMRBox.h
-   vtkUniformGrid.cxx
-
-   vtkCompositeDataSet.cxx
-   vtkCompositeDataIterator.cxx
-   vtkCompositeDataVisitor.cxx 
-
-   vtkMultiBlockDataSet.cxx
-   vtkMultiBlockDataIterator.cxx
-   vtkMultiBlockDataVisitor.cxx 
-
-   vtkHierarchicalDataSet.cxx
-   vtkHierarchicalDataIterator.cxx
-
-   vtkHierarchicalBoxDataSet.cxx
-   vtkHierarchicalBoxVisitor.cxx 
-
-   vtkCompositeDataVisitorCommand.cxx
-   vtkApplyFilterCommand.cxx
-   vtkMultiBlockApplyFilterCommand.cxx
-   vtkHierarchicalBoxApplyFilterCommand.cxx
-
-   vtkHierarchicalBoxSource.cxx
-   vtkHierarchicalBoxToHierarchicalBoxFilter.cxx
-   vtkHierarchicalBoxToPolyDataFilter.cxx
-   vtkHierarchicalBoxOutlineFilter.cxx
-   vtkHierarchicalBoxCutter.cxx
-   vtkHierarchicalBoxCellDataToPointData.cxx
-   vtkHierarchicalBoxContour.cxx
-   )
-
-SET_SOURCE_FILES_PROPERTIES(
-   vtkApplyFilterCommand.cxx
-   vtkCompositeDataSet.cxx
-   vtkCompositeDataIterator.cxx
-   vtkCompositeDataVisitor.cxx 
-   vtkCompositeDataVisitorCommand.cxx
-   vtkHierarchicalDataSet.cxx
-   vtkHierarchicalBoxToPolyDataFilter.cxx
-   vtkHierarchicalBoxSource.cxx
-   vtkHierarchicalBoxToHierarchicalBoxFilter.cxx
-   ABSTRACT
-   )
-
-SET_SOURCE_FILES_PROPERTIES(
-   vtkAMRBox.h
-   WRAP_EXCLUDE
    )
 
 IF(NOT PARAVIEW_NO_HDF5)
@@ -58,23 +11,25 @@ IF(NOT PARAVIEW_NO_HDF5)
      )
 ENDIF(NOT PARAVIEW_NO_HDF5)
 
-ADD_LIBRARY(vtkPVDevelopment ${Development_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVDevelopment vtkHybrid)
+IF(Development_SRCS)
+  ADD_LIBRARY(vtkPVDevelopment ${Development_SRCS})
+  TARGET_LINK_LIBRARIES(vtkPVDevelopment vtkHybrid)
 
-IF(NOT PARAVIEW_NO_HDF5)
-  TARGET_LINK_LIBRARIES(vtkPVDevelopment ${PARAVIEW_HDF5_LIBRARIES})
-ENDIF(NOT PARAVIEW_NO_HDF5)
+  IF(NOT PARAVIEW_NO_HDF5)
+    TARGET_LINK_LIBRARIES(vtkPVDevelopment ${PARAVIEW_HDF5_LIBRARIES})
+  ENDIF(NOT PARAVIEW_NO_HDF5)
 
 # Create TCL wrappers for development library.
-VTK_WRAP_TCL2(vtkPVDevelopmentTCL DevelopmentTCL_SRCS ${Development_SRCS})
-ADD_LIBRARY(vtkPVDevelopmentTCL ${DevelopmentTCL_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVDevelopmentTCL vtkHybridTCL vtkPVDevelopment)
+  VTK_WRAP_TCL2(vtkPVDevelopmentTCL DevelopmentTCL_SRCS ${Development_SRCS})
+  ADD_LIBRARY(vtkPVDevelopmentTCL ${DevelopmentTCL_SRCS})
+  TARGET_LINK_LIBRARIES(vtkPVDevelopmentTCL vtkHybridTCL vtkPVDevelopment)
 
-# Create ClientServer wrappers for development library.
-VTK_WRAP_ClientServer(vtkPVDevelopmentCS DevelopmentCS_SRCS ${Development_SRCS})
-ADD_LIBRARY(vtkPVDevelopmentCS ${DevelopmentCS_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVDevelopmentCS vtkHybridCS vtkPVDevelopment)
+  # Create ClientServer wrappers for development library.
+  VTK_WRAP_ClientServer(vtkPVDevelopmentCS DevelopmentCS_SRCS ${Development_SRCS})
+  ADD_LIBRARY(vtkPVDevelopmentCS ${DevelopmentCS_SRCS})
+  TARGET_LINK_LIBRARIES(vtkPVDevelopmentCS vtkHybridCS vtkPVDevelopment)
 
-IF(BUILD_SHARED_LIBS)
-  INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkPVDevelopmentTCL)
-ENDIF(BUILD_SHARED_LIBS)
+  IF(BUILD_SHARED_LIBS)
+    INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkPVDevelopmentTCL)
+  ENDIF(BUILD_SHARED_LIBS)
+ENDIF(Development_SRCS)
