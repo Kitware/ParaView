@@ -316,8 +316,6 @@ protected:
   vtkKWCheckButton *ScriptCheckButton;
   vtkKWText *ScriptEditor;
 
-  // The source selected.
-  vtkPVSource *PVSource;
   vtkPVWidget *ControlledWidget;
 
   // The formated string to evaluate.

@@ -178,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.175");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.176");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -201,8 +201,6 @@ vtkPVAnimationInterface::vtkPVAnimationInterface()
   this->Loop = 0;
 
   this->SavingData = 0;
-
-  this->PVSource = NULL;
 
   this->View = NULL;
   this->Window = NULL;
@@ -1639,10 +1637,13 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
       if(source->GetVisibility())
         {
         const char* sourceName = source->GetName();
-        // Not a perfect solution ...
-        // We should probably move most of this stuff into a special server manager object.
-        vtkClientServerID animCompleteArraysID = pm->NewStreamObject("vtkCompleteArrays");
-        this->PVSource->GetPartDisplay()->ConnectGeometryForWriting(animCompleteArraysID, "SetInput");
+        // Not a perfect solution ...  We should probably move most of this
+        // stuff into a special server manager object.
+
+        vtkClientServerID animCompleteArraysID = 
+          pm->NewStreamObject("vtkCompleteArrays");
+        source->GetPartDisplay()->ConnectGeometryForWriting(
+          animCompleteArraysID, "SetInput");
         arrays.push_back(animCompleteArraysID);
         
         pm->GetStream() << vtkClientServerStream::Invoke 
@@ -2339,7 +2340,6 @@ void vtkPVAnimationInterface::UpdateEnableState()
   this->PropagateEnableState(this->ScriptCheckButtonFrame);
   this->PropagateEnableState(this->ScriptCheckButton);
   this->PropagateEnableState(this->ScriptEditor);
-  this->PropagateEnableState(this->PVSource);
   this->PropagateEnableState(this->ControlledWidget);
   this->PropagateEnableState(this->SaveFrame);
   this->PropagateEnableState(this->SaveButtonFrame);
