@@ -462,25 +462,47 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   
   this->vtkKWObject::SetApplication(pvApp);
   
+  // Create the one geometry filter,
+  // which creates the poly data from all data sets.
   sprintf(tclName, "Geometry%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
+  // Keep track of how long each geometry filter takes to execute.
   pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
                          "{Execute Geometry}}", this->GeometryTclName);
   pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
                          "{Execute Geometry}}", this->GeometryTclName);
 
-  sprintf(tclName, "UpdateSupressor%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVUpdateSupressor %s", tclName);
-  this->SetUpdateSupressorTclName(tclName);
 
-  sprintf(tclName, "LODUpdateSupressor%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPVUpdateSupressor %s", tclName);
-  this->SetLODUpdateSupressorTclName(tclName);
+  // Create the decimation filter which branches the LOD pipeline.
+  sprintf(tclName, "LODDeci%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkQuadricClustering %s", tclName);
+  this->LODDeciTclName = NULL;
+  this->SetLODDeciTclName(tclName);
+  // Keep track of how long each decimation filter takes to execute.
+  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute Decimate}}", 
+                         this->LODDeciTclName);
+  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute Decimate}}", 
+                         this->LODDeciTclName);
+  // The input of course is the geometry filter.
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                         this->LODDeciTclName, this->GeometryTclName);
+  pvApp->BroadcastScript("%s CopyCellDataOn", this->LODDeciTclName);
+  pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
+  pvApp->BroadcastScript("%s UseInternalTrianglesOff", this->LODDeciTclName);
+  // These options reduce seams, but makes the decimation too slow.
+  //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
+  //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
+  // This should be changed to origin and spacing determined globally.
+  pvApp->BroadcastScript("%s SetNumberOfDivisions 50 50 50", 
+                         this->LODDeciTclName); 
 
 #ifdef VTK_USE_MPI
+  // Create the collection filters which allow small models to render locally.  
+  // They also redistributed data for SGI pipes option.
+  // ===== Primary branch:
   sprintf(tclName, "Collect%d", this->InstanceCount);
-
+  // Different filter for SGI pipe redistribution.
 #ifdef PV_USE_SGI_PIPES
   pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
   pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
@@ -491,67 +513,14 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->CollectTclName, this->GeometryTclName);
-  
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
-                           "{Execute Collect}}", this->CollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
-                           "{Execute Collect}}", this->CollectTclName);
-
-#endif
-
-  // Get rid of previous object created by the superclass.
-  if (this->Mapper)
-    {
-    this->Mapper->Delete();
-    this->Mapper = NULL;
-    }
-  // Make a new tcl object.
-  sprintf(tclName, "Mapper%d", this->InstanceCount);
-  this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper",
-                                                          tclName);
-  this->MapperTclName = NULL;
-  this->SetMapperTclName(tclName);
-
-  pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->MapperTclName);
-  pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
-
-  if (this->CollectTclName)
-    {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->UpdateSupressorTclName,
-                           this->CollectTclName);
-    }
-  else
-    {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->UpdateSupressorTclName,
-                           this->GeometryTclName);
-    }
-
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
-                         this->UpdateSupressorTclName);
-  
-  
-  sprintf(tclName, "LODDeci%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkQuadricClustering %s", tclName);
-  this->LODDeciTclName = NULL;
-  this->SetLODDeciTclName(tclName);
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute Decimate}}", 
-                         this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute Decimate}}", 
-                         this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                         this->LODDeciTclName, this->GeometryTclName);
-  pvApp->BroadcastScript("%s CopyCellDataOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s UseInputPointsOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s UseInternalTrianglesOff", this->LODDeciTclName);
-  //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
-  //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetNumberOfDivisions 50 50 50", 
-                         this->LODDeciTclName);
-
-#ifdef VTK_USE_MPI
+  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute Collect}}", 
+                         this->CollectTclName);
+  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute Collect}}", 
+                         this->CollectTclName);
+  //
+  // ===== LOD branch:
   sprintf(tclName, "LODCollect%d", this->InstanceCount);
+  // Different filter for SGI pipe redistribution.
 #ifdef PV_USE_SGI_PIPES
   pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
   pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
@@ -562,34 +531,79 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
-                         "{Execute LODCollect}}", this->LODCollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
-                         "{Execute LODCollect}}", this->LODCollectTclName);
+  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute LODCollect}}", 
+                         this->LODCollectTclName);
+  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute LODCollect}}", 
+                         this->LODCollectTclName);
 #endif
 
-  if (this->LODCollectTclName)
+
+
+
+  // Now create the update supressors which keep the renderers/mappers
+  // from updating the pipeline.  These are here to ensure that all
+  // processes get updated at the same time.
+  // ===== Primary branch:
+  sprintf(tclName, "UpdateSupressor%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkPVUpdateSupressor %s", tclName);
+  this->SetUpdateSupressorTclName(tclName);
+  if (this->CollectTclName)
     {
     pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODCollectTclName,
-                           this->LODDeciTclName);
+                           this->UpdateSupressorTclName, 
+                           this->CollectTclName);
     }
   else
     {
     pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-                           this->LODUpdateSupressorTclName,
+                           this->UpdateSupressorTclName, 
+                           this->GeometryTclName);
+    }
+  //
+  // ===== LOD branch:
+  sprintf(tclName, "LODUpdateSupressor%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkPVUpdateSupressor %s", tclName);
+  this->SetLODUpdateSupressorTclName(tclName);
+  if (this->LODCollectTclName)
+    {
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                           this->LODUpdateSupressorTclName, 
+                           this->LODCollectTclName);
+    }
+  else
+    {
+    pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                           this->LODUpdateSupressorTclName, 
                            this->LODDeciTclName);
     }
 
+
+  // Now create the mappers for the two branches.
+  // Make a new tcl object.
+  // ===== Primary branch:
+  sprintf(tclName, "Mapper%d", this->InstanceCount);
+  this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper",
+                                                          tclName);
+  this->MapperTclName = NULL;
+  this->SetMapperTclName(tclName);
+  pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->MapperTclName);
+  pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->MapperTclName);
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+                         this->UpdateSupressorTclName);
+  //
+  // ===== LOD branch:
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
-  pvApp->BroadcastScript("vtkPolyDataMapper %s", tclName);
+  this->Mapper = (vtkPolyDataMapper*)pvApp->MakeTclObject("vtkPolyDataMapper",
+                                                          tclName);
   this->LODMapperTclName = NULL;
   this->SetLODMapperTclName(tclName);
-
   pvApp->BroadcastScript("%s UseLookupTableScalarRangeOn", this->LODMapperTclName);
   pvApp->BroadcastScript("%s SetColorModeToMapScalars", this->LODMapperTclName);
- 
-  // Make a new tcl object.
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->LODMapperTclName,
+                         this->LODUpdateSupressorTclName);
+  
+  
+  // Now the two branches merge at the LOD actor.
   sprintf(tclName, "Actor%d", this->InstanceCount);
   this->Prop = (vtkProp*)pvApp->MakeTclObject("vtkPVLODActor", tclName);
   this->SetPropTclName(tclName);
@@ -600,8 +614,6 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetPropertyTclName(tclName);
   pvApp->BroadcastScript("%s SetAmbient 0.15", this->PropertyTclName);
   pvApp->BroadcastScript("%s SetDiffuse 0.85", this->PropertyTclName);
-
-  
   pvApp->BroadcastScript("%s SetProperty %s", this->PropTclName, 
                          this->PropertyTclName);
   pvApp->BroadcastScript("%s SetMapper %s", this->PropTclName, 
@@ -609,6 +621,8 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetLODMapper %s", this->PropTclName,
                          this->LODMapperTclName);
   
+
+
   // Hard code assignment based on processes.
   numProcs = pvApp->GetController()->GetNumberOfProcesses();
 
@@ -1928,33 +1942,10 @@ void vtkPVData::Initialize()
   char *tclName;
   char newTclName[100];
   
-  if (this->GetVTKData()->IsA("vtkPolyData"))
-    {
-    pvApp->BroadcastScript("%s SetInput %s",
+  pvApp->BroadcastScript("%s SetInput %s",
                                this->GeometryTclName,
                                this->GetVTKDataTclName());
-    }
-  else
-    {
-    // Keep the conditional becuase I want to try eliminating the geometry
-    // filter with poly data.
-    pvApp->BroadcastScript("%s SetInput %s",
-                               this->GeometryTclName,
-                               this->GetVTKDataTclName());
-    }
   
-  if (this->LODCollectTclName)
-    {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                           this->LODMapperTclName,
-                           this->LODCollectTclName);
-    }
-  else
-    {
-    pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-                           this->LODMapperTclName,
-                           this->LODDeciTclName);
-    }
 
   vtkDebugMacro( << "Initialize --------")
   this->UpdateProperties();
@@ -2617,7 +2608,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.125 $");
+  this->ExtractRevision(os,"$Revision: 1.126 $");
 }
 
 //----------------------------------------------------------------------------
