@@ -37,12 +37,12 @@ ENDFOREACH (tfile)
 
 ADD_TEST(PrintSelf-Packages ${TCL_TCLSH}
          ${VTK_SOURCE_DIR}/Common/Testing/Tcl/PrintSelfCheck.tcl  
-         ${PARAVIEW_SOURCE_DIR}/ParaView)
+         ${PARAVIEW_SOURCE_DIR}/Packages)
 
 #ADD_TEST(TestWrongArgument ${PARAVIEW_EXECUTABLE} -bla)
 
 ADD_TEST(TestSetObjectMacro-Packages ${TCL_TCLSH}
          ${KWCommon_SOURCE_DIR}/Testing/Tcl/FindString.tcl
-         "${PARAVIEW_SOURCE_DIR}/ParaView/vtk\\\\*.h"
+         "${PARAVIEW_SOURCE_DIR}/Packages/vtk\\\\*.h"
          "vtkSetObjectMacro")
 
