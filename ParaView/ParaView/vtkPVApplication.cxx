@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.11");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.12");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -264,6 +264,9 @@ vtkPVApplication::vtkPVApplication()
 
   this->UseRenderingGroup = 0;
   this->GroupFileName = 0;
+
+  this->UseTiledDisplay = 0;
+  this->TileDimensions[0] = this->TileDimensions[1] = 1;
 
   // GUI style & consistency
 
@@ -519,10 +522,18 @@ const char vtkPVApplication::ArgumentList[vtkPVApplication::NUM_ARGS][128] =
   "Start ParaView without any default modules.", 
   "--disable-registry", "-dr", 
   "Do not use registry when running ParaView (for testing).", 
+#ifdef VTK_USE_MPI
   "--use-rendering-group", "-p",
   "Use a subset of processes to render.",
   "--group-file", "-gf",
   "--group-file=fname where fname is the name of the input file listing number of processors to render on.",
+  "--use-tiled-display", "-td",
+  "Duplicate the final data to all nodes and tile node displays 1-N into one large display.",
+  "--tile-dimensions-x", "-tdx",
+  "-tdx=X where X is number of displays in each row of the display.",
+  "--tile-dimensions-y", "-tdy",
+  "-tdy=Y where Y is number of displays in each column of the display.",
+#endif
 #ifdef VTK_MANGLE_MESA
   "--use-software-rendering", "-r", 
   "Use software (Mesa) rendering (supports off-screen rendering).", 
@@ -767,6 +778,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     this->RegisteryLevel = 0;
     }
 
+#ifdef VTK_USE_MPI
   if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-rendering-group",
                                           index) == VTK_OK ||
        vtkPVApplication::CheckForArgument(argc, argv, "-p",
@@ -792,6 +804,51 @@ void vtkPVApplication::Start(int argc, char*argv[])
       }
     this->SetGroupFileName(newarg);
     }
+
+  if ( vtkPVApplication::CheckForArgument(argc, argv, "--use-tiled-display",
+                                          index) == VTK_OK ||
+       vtkPVApplication::CheckForArgument(argc, argv, "-td",
+                                          index) == VTK_OK )
+    {
+    this->UseTiledDisplay = 1;
+
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-x",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-tdx",
+                                          index) == VTK_OK )
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (int i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->TileDimensions[0] = atoi(newarg);
+      }
+    if ( vtkPVApplication::CheckForArgument(argc, argv, "--tile-dimensions-y",
+                                            index) == VTK_OK ||
+         vtkPVApplication::CheckForArgument(argc, argv, "-tdy",
+                                          index) == VTK_OK )
+      {
+      // Strip string to equals sign.
+      const char* newarg=0;
+      int len = (int)(strlen(argv[index]));
+      for (int i=0; i<len; i++)
+        {
+        if (argv[index][i] == '=')
+          {
+          newarg = &(argv[index][i+1]);
+          }
+        }
+      this->TileDimensions[1] = atoi(newarg);
+      }
+    }
+#endif
+
 
 #ifdef VTK_MANGLE_MESA
   
@@ -1739,6 +1796,12 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "NumberOfPipes: " << this->NumberOfPipes << endl;
   os << indent << "UseRenderingGroup: " << (this->UseRenderingGroup?"on":"off") 
      << endl;
+  if (this->UseTiledDisplay)
+    { 
+    os << indent << "UseTiledDisplay: On\n";
+    os << indent << "TileDimensions: " << this->TileDimensions[0]
+       << ", " << this->TileDimensions[1] << endl;
+    }
   os << indent << "Display3DWidgets: " << (this->Display3DWidgets?"on":"off") 
      << endl;
   os << indent << "TraceFileName: " 

@@ -80,7 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.22");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.23");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -518,6 +518,10 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
     pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
                            pvApp->GetNumberOfPipes());
     }
+  else if (pvApp->GetUseTiledDisplay())
+    {
+    pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
+    }
   else
     {
     pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
@@ -539,6 +543,10 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
     pvApp->BroadcastScript("vtkAllToNRedistributePolyData %s", tclName);
     pvApp->BroadcastScript("%s SetNumberOfProcesses %d", tclName,
                            pvApp->GetNumberOfPipes());
+    }
+  else if (pvApp->GetUseTiledDisplay())
+    {
+    pvApp->BroadcastScript("vtkDuplicatePolyData %s", tclName);
     }
   else
     {
@@ -3286,7 +3294,10 @@ void vtkPVData::SetCollectThreshold(float threshold)
   
   vtkPVApplication *pvApp = this->GetPVApplication();
     
-  if (!pvApp->GetUseRenderingGroup() && this->CollectTclName)
+  // Threshold is only used whit vtkCollectPolyData.
+  // We need rendering modules ...
+  if (!pvApp->GetUseRenderingGroup() && !pvApp->GetUseTiledDisplay() && 
+      this->CollectTclName)
     {
     pvApp->BroadcastScript("%s SetThreshold %d", this->CollectTclName,
                            static_cast<unsigned long>(threshold*1000.0));
@@ -3301,7 +3312,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.22 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.23 $");
 }
 
 //----------------------------------------------------------------------------
