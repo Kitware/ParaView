@@ -138,7 +138,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.467");
+vtkCxxRevisionMacro(vtkPVWindow, "1.468");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1488,6 +1488,16 @@ void vtkPVWindow::MouseAction(int action,int button,
                               int x,int y, int shift,int control)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkRenderer* ren = this->MainView->GetRenderer();
+  if ( !ren )
+    {
+    return;
+    }
+
+  ren->SetDisplayPoint(x, y, 0);
+  ren->DisplayToWorld();
+  float xyz[4];
+  ren->GetWorldPoint(xyz);
 
   if ( action == 0 )
     {
@@ -1495,22 +1505,22 @@ void vtkPVWindow::MouseAction(int action,int button,
       {
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteLeftPress %d %d %d %d", 
-                             x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteLeftPress %f %f %f %d %d", 
+                             xyz[0], xyz[1], xyz[2], control, shift);
       }
     else if (button == 2)
       {
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMiddlePress %d %d %d %d", 
-                             x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMiddlePress %f %f %f %d %d", 
+                             xyz[0], xyz[1], xyz[2], control, shift);
       }
     else if (button == 3)
       {
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteRightPress %d %d %d %d", 
-                             x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteRightPress %f %f %f %d %d", 
+                             xyz[0], xyz[1], xyz[2], control, shift);
       }    
     }
   else if ( action == 1 )
@@ -1519,25 +1529,25 @@ void vtkPVWindow::MouseAction(int action,int button,
       {
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteLeftRelease %d %d %d %d", 
-                             x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteLeftRelease %f %f %f %d %d", 
+                             xyz[0], xyz[1], xyz[2], control, shift);
       }
     else if (button == 2)
       {
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMiddleRelease %d %d %d %d", 
-                             x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMiddleRelease %f %f %f %d %d", 
+                             xyz[0], xyz[1], xyz[2], control, shift);
       }
     else if (button == 3)
       {
       // Send the same event to the satellite to synchronize the 3D widgets.
       // Maybe I should itegrate this into the PV interactor.
-      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteRightRelease %d %d %d %d", 
-                             x, y, control, shift);
+      pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteRightRelease %f %f %f %d %d", 
+                             xyz[0], xyz[1], xyz[2], control, shift);
       }    
 
-    vtkCamera* cam = this->MainView->GetRenderer()->GetActiveCamera();
+    vtkCamera* cam = ren->GetActiveCamera();
     //float* parallelScale = cam->GetParallelScale();
     double* position      = cam->GetPosition();
     double* focalPoint    = cam->GetFocalPoint();
@@ -1555,7 +1565,7 @@ void vtkPVWindow::MouseAction(int action,int button,
     {
     // Send the same event to the satellite to synchronize the 3D widgets.
     // Maybe I should itegrate this into the PV interactor.
-    pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMove %d %d", x, y);
+    pvApp->BroadcastScript("pvRenderWindowInteractor SatelliteMove %f %f %f", xyz[0], xyz[1], xyz[2]);
     }
 }
 
