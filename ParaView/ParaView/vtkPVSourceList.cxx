@@ -261,7 +261,6 @@ void vtkPVSourceList::Update(vtkPVSource* current, vtkPVSourceCollection* col)
 {
   this->CurrentSource = current;
   vtkPVSource *comp;
-  int num, idx;
   int y, in;
   
   this->Script("%s delete all",
