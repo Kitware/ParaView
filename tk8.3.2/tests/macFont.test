@@ -1,0 +1,302 @@
+# This file is a Tcl script to test out the procedures in tkMacFont.c. 
+# It is organized in the standard fashion for Tcl tests.
+#
+# Some of these tests are visually oriented and cannot be checked
+# programmatically (such as "does an underlined font appear to be
+# underlined?"); these tests attempt to exercise the code in question,
+# but there are no results that can be checked.  
+#
+# Copyright (c) 1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
+
+if {$tcl_platform(platform)!="macintosh"} {
+    puts "skipping: Mac only tests..."
+    ::tcltest::cleanupTests
+    return
+}
+
+catch {destroy .b}
+toplevel .b
+update idletasks
+
+set courier {Courier 12}
+set cx [font measure $courier 0]
+
+set fixed {Monaco 12}
+label .b.l -padx 0 -pady 0 -bd 0 -highlightthickness 0 -justify left -text "0" -font $fixed
+pack .b.l
+canvas .b.c -closeenough 0
+
+set t [.b.c create text 0 0 -anchor nw -just left -font $courier]
+pack .b.c
+update
+
+set ax [winfo reqwidth .b.l]
+set ay [winfo reqheight .b.l]
+proc getsize {} {
+    update
+    return "[winfo reqwidth .b.l] [winfo reqheight .b.l]"
+}
+
+set ::tcltest::testConfig(gothic) 0
+set gothic {gothic 12}
+set mx [font measure  $gothic \u4e4e]
+if {[font actual $gothic -family] != [font actual system -family]} {
+    set ::tcltest::testConfig(gothic) 1
+}
+
+test macFont-1.1 {TkpFontPkgInit} {
+} {}
+
+test macfont-2.1 {TkpGetNativeFont: not native} {
+    list [catch {font measure {} xyz} msg] $msg
+} {1 {font "" doesn't exist}}
+test macFont-2.2 {TkpGetNativeFont: native} {
+    font measure system "0"
+    font measure application "0"
+    set x {}
+} {}
+
+test macFont-3.1 {TkpGetFontFromAttributes: no family} {
+    font actual {-underline 1} -family
+} [font actual system -family]
+test macFont-3.2 {TkpGetFontFromAttributes: long family name} {
+    set x "12345678901234567890123456789012345678901234567890"
+    set x "$x$x$x$x$x$x"
+    font actual "-family $x" -family
+} [font actual system -family]
+test macFont-3.3 {TkpGetFontFromAttributes: family} {
+    font actual {-family Courier} -family
+} {Courier}
+test macFont-3.4 {TkpGetFontFromAttributes: Times fonts} {
+    set x {}
+    lappend x [font actual {-family "Times"} -family]
+    lappend x [font actual {-family "Times New Roman"} -family]
+} {Times Times}
+test macFont-3.5 {TkpGetFontFromAttributes: Courier fonts} {
+    set x {}
+    lappend x [font actual {-family "Courier"} -family]
+    lappend x [font actual {-family "Courier New"} -family]
+} {Courier Courier}
+test macFont-3.6 {TkpGetFontFromAttributes: Helvetica fonts} {
+    set x {}
+    lappend x [font actual {-family "Geneva"} -family]
+    lappend x [font actual {-family "Helvetica"} -family]
+    lappend x [font actual {-family "Arial"} -family]
+} {Geneva Helvetica Helvetica}
+test macFont-3.7 {TkpGetFontFromAttributes: try aliases} {
+    font actual {arial 10} -family
+} {Helvetica}    
+test macFont-3.8 {TkpGetFontFromAttributes: try fallbacks} {
+    font actual {{ms sans serif} 10} -family
+} {Chicago}
+test macFont-3.9 {TkpGetFontFromAttributes: styles} {
+    font actual {-weight normal} -weight
+} {normal}
+test macFont-3.10 {TkpGetFontFromAttributes: styles} {
+    font actual {-weight bold} -weight
+} {bold}
+test macFont-3.11 {TkpGetFontFromAttributes: styles} {
+    font actual {-slant roman} -slant
+} {roman}
+test macFont-3.12 {TkpGetFontFromAttributes: styles} {
+    font actual {-slant italic} -slant
+} {italic}
+test macFont-3.13 {TkpGetFontFromAttributes: styles} {
+    font actual {-underline false} -underline
+} {0}
+test macFont-3.14 {TkpGetFontFromAttributes: styles} {
+    font actual {-underline true} -underline
+} {1}
+test macFont-3.15 {TkpGetFontFromAttributes: styles} {
+    font actual {-overstrike false} -overstrike
+} {0}
+test macFont-3.16 {TkpGetFontFromAttributes: styles} {
+    font actual {-overstrike true} -overstrike
+} {0}
+
+test macFont-4.1 {TkpDeleteFont} {
+    font actual {-family xyz}
+    set x {}
+} {}
+
+test macFont-5.1 {TkpGetFontFamilies} {
+    expr {[lsearch [font families] Geneva] > 0}
+} {1}
+
+test macFont-6.1 {TkpGetSubFonts} {gothic} {
+    .b.l config -text "abc\u4e4e" 
+    update
+    set x [testfont subfonts $fixed]
+} "Monaco [font actual $gothic -family]"    
+
+test macFont-7.1 {Tk_MeasureChars: unbounded right margin} {
+    .b.l config -wrap 0 -text "000000"
+    getsize
+} "[expr $ax*6] $ay"
+test macFont-7.2 {Tk_MeasureChars: static width buffer exceeded} {
+    .b.l config -wrap 100000 -text "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    getsize
+} "[expr $ax*256] $ay"
+test macFont-7.3 {Tk_MeasureChars: all chars did fit} {
+    .b.l config -wrap [expr $ax*10] -text "00000000"
+    getsize
+} "[expr $ax*8] $ay"
+test macFont-7.4 {Tk_MeasureChars: not all chars fit} {
+    .b.l config -wrap [expr $ax*6] -text "00000000"
+    getsize
+} "[expr $ax*6] [expr $ay*2]"
+test macFont-7.5 {Tk_MeasureChars: already saw space in line} {
+    .b.l config -wrap [expr $ax*12] -text "000000    0000000"
+    getsize
+} "[expr $ax*7] [expr $ay*2]"
+test macFont-7.6 {Tk_MeasureChars: internal spaces significant} {
+    .b.l config -wrap [expr $ax*12] -text "000  00   00000"
+    getsize
+} "[expr $ax*7] [expr $ay*2]"
+test macFont-7.7 {Tk_MeasureChars: include last partial char} {
+    .b.c dchars $t 0 end
+    .b.c insert $t 0 "0000"
+    .b.c index $t @[expr int($ax*2.5)],1
+} {2}
+test macFont-7.8 {Tk_MeasureChars: at least one char on line} { 
+    .b.l config -text "000000" -wrap 1
+    getsize
+} "$ax [expr $ay*6]"
+test macFont-7.9 {Tk_MeasureChars: whole words} {
+    .b.l config -wrap [expr $ax*8] -text "000000 0000"
+    getsize
+} "[expr $ax*6] [expr $ay*2]"
+test macFont-7.10 {Tk_MeasureChars: make first part of word fit} {
+    .b.l config -wrap [expr $ax*12] -text "0000000000000000"
+    getsize
+} "[expr $ax*12] [expr $ay*2]"
+test macFont-7.11 {Tk_MeasureChars: numBytes == 0} {
+    font measure system {}
+} {0}
+test macFont-7.12 {Tk_MeasureChars: maxLength < 0} {
+    font measure $courier abcd
+} "[expr $cx*4]"
+test macFont-7.13 {Tk_MeasureChars: loop on each char} {
+    font measure $courier abcd
+} "[expr $cx*4]"
+test macFont-7.14 {Tk_MeasureChars: p == end} {
+    font measure $courier abcd
+} "[expr $cx*4]"
+test macFont-7.15 {Tk_MeasureChars: p > end} {
+    font measure $courier abc\xc2
+} "[expr $cx*4]"
+test macFont-7.16 {Tk_MeasureChars: thisFamilyPtr != lastFamilyPtr} {gothic} {
+    font measure $courier abc\u4e4edef
+} [expr $cx*6+$mx]
+test macFont-7.17 {Tk_MeasureChars: measure no chars (in loop)} {gothic} {
+    font measure $courier \u4e4edef
+} [expr $mx+$cx*3]
+test macFont-7.18 {Tk_MeasureChars: final measure} {gothic} {
+    font measure $courier \u4e4edef
+} [expr $mx+$cx*3]
+test macFont-7.19 {Tk_MeasureChars: final measure (no chars)} {gothic} {
+    font measure $courier \u4e4e
+} [expr $mx]
+test macFont-7.20 {Tk_MeasureChars: maxLength >= 0} {
+    .b.l config -wrap [expr $ax*8] -text "000"
+    getsize
+} "[expr $ax*3] $ay"
+test macFont-7.21 {Tk_MeasureChars: loop on each char} {
+    .b.l config -wrap [expr $ax*8] -text "000"
+    getsize
+} "[expr $ax*3] $ay"
+test macFont-7.22 {Tk_MeasureChars: p == end} {
+    .b.l config -wrap [expr $ax*8] -text "000"
+    getsize
+} "[expr $ax*3] $ay"
+test macFont-7.23 {Tk_MeasureChars: p > end} {
+    .b.l config -wrap [expr $ax*8] -text "00\xc2"
+    getsize
+} "[expr $ax*3] $ay"
+test macFont-7.24 {Tk_MeasureChars: thisFamilyPtr != lastFamilyPtr} {gothic} {
+    .b.l config -wrap [expr $ax*8] -text "00\u4e4e00"
+    getsize
+} "[expr $ax*4+$mx] $ay"
+test macFont-7.25 {Tk_MeasureChars: measure no chars (in loop)} {gothic} {
+    .b.l config -wrap [expr $ax*8] -text "\u4e4e00"
+    getsize
+} "[expr $mx+$ax*2] $ay"
+test macFont-7.26 {Tk_MeasureChars: rest == NULL} {gothic} {
+    .b.l config -wrap [expr $ax*20] -text "000000\u4e4e\u4e4e00"
+    getsize
+} "[expr $ax*8+$mx*2] $ay"
+test macFont-7.27 {Tk_MeasureChars: rest != NULL in first segment} {gothic} {
+    .b.l config -wrap [expr $ax*5] -text "000000\u4e4e\u4e4f00"
+    getsize
+} "[expr $ax*5] [expr $ay*3]"
+test macFont-7.28 {Tk_MeasureChars: rest != NULL in next segment} {gothic} {
+    # even some of the "0"s would fit after \u4e4d, they should all wrap to next line.  
+    .b.l config -wrap [expr $ax*8] -text "\u4e4d\u4e4d000000\u4e4e\u4e4f00"
+    getsize
+} "[expr $ax*6+$mx] [expr $ay*3]"
+test macFont-7.29 {Tk_MeasureChars: final measure} {gothic} {
+    .b.l config -wrap [expr $ax*8] -text "\u4e4e00"
+    getsize
+} "[expr $mx+$ax*2] $ay"
+test macFont-7.30 {Tk_MeasureChars: final measure (no chars)} {gothic} {
+    .b.l config -wrap [expr $ax*8] -text "\u4e4e"
+    getsize
+} "$mx $ay"
+test macFont-7.31 {Tk_MeasureChars: rest == NULL} {
+    .b.l config -wrap [expr $ax*1000] -text 0000
+    getsize
+} "[expr $ax*4] $ay"
+test macFont-7.32 {Tk_MeasureChars: rest != NULL} {
+    .b.l config -wrap [expr $ax*6] -text "00000000"
+    getsize
+} "[expr $ax*6] [expr $ay*2]"
+
+test macFont-8.1 {Tk_DrawChars procedure} {
+    .b.l config -text "a"
+    update
+} {}
+
+test macFont-9.1 {AllocMacFont: use old font} {
+    font create xyz
+    button .c -font xyz
+    font configure xyz -family times
+    update
+    destroy .c
+    font delete xyz
+} {}
+test macFont-9.2 {AllocMacFont: extract info from style} {
+    font actual {Monaco 9 bold italic underline overstrike}
+} {-family Monaco -size 9 -weight bold -slant italic -underline 1 -overstrike 0}
+test macFont-9.3 {AllocMacFont: extract text metrics} {
+    font metric {Geneva 10} -fixed
+} {0}
+test macFont-9.4 {AllocMacFont: extract text metrics} {
+    font metric "Monaco 9" -fixed
+} {1}
+
+destroy .b
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
