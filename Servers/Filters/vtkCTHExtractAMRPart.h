@@ -12,12 +12,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkCTHExtractAMRPart - A source to test my new CTH AMR data object.
+// .NAME vtkCTHExtractAMRPart - A source to test the new CTH AMR data object.
+//
 // .SECTION Description
-// vtkCTHExtractAMRPart is a collection of image datas.  All have the same dimensions.
-// Each block has a different origin and spacing.  It uses mandelbrot
-// to create cell data.  I scale the fractal array to look like a volme fraction.
-// I may also add block id and level as extra cell arrays.
+// vtkCTHExtractAMRPart is a collection of image datas. All have the same 
+// dimensions. Each block has a different origin and spacing. It uses mandelbrot
+// to create cell data. I scale the fractal array to look like a volume 
+// fraction. I may also add block id and level as extra cell arrays.
 
 #ifndef __vtkCTHExtractAMRPart_h
 #define __vtkCTHExtractAMRPart_h
@@ -90,7 +91,6 @@ protected:
 private:
   void InternalImageDataCopy(vtkCTHExtractAMRPart *src);
 
-private:
   vtkCTHExtractAMRPart(const vtkCTHExtractAMRPart&);  // Not implemented.
   void operator=(const vtkCTHExtractAMRPart&);  // Not implemented.
 };
