@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.12");
+vtkCxxRevisionMacro(vtkKWListBox, "1.13");
 
 
 int vtkKWListBoxCommand(ClientData cd, Tcl_Interp *interp,
@@ -173,8 +173,9 @@ void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
 
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("OptionListBox already created");
     return;
@@ -200,6 +201,10 @@ void vtkKWListBox::Create(vtkKWApplication *app, const char *args)
   
   this->Script("pack %s -side right -fill y", this->Scrollbar->GetWidgetName());
   this->Script("pack %s -side left -expand 1 -fill both", this->Listbox->GetWidgetName());
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 
