@@ -71,7 +71,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.134");
+vtkCxxRevisionMacro(vtkKWApplication, "1.135");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -95,6 +95,7 @@ vtkKWApplication::vtkKWApplication()
   this->InExit = 0;
   this->DialogUp = 0;
   this->TraceFile = NULL;
+  this->LimitedEditionMode = 0;
 
   this->ExitStatus = 0;
 
@@ -1297,6 +1298,53 @@ int vtkKWApplication::BooleanRegisteryCheck(int level,
   return allset;
 }
 
+//----------------------------------------------------------------------------
+void vtkKWApplication::SetLimitedEditionMode(int v)
+{
+  if (this->LimitedEditionMode == v)
+    {
+    return;
+    }
+
+  this->LimitedEditionMode = v;
+  this->Modified();
+
+}
+
+//----------------------------------------------------------------------------
+int vtkKWApplication::GetLimitedEditionModeAndWarn(const char *feature)
+{
+  if (this->LimitedEditionMode)
+    {
+    ostrstream title_str;
+    title_str << this->GetApplicationName() << " Limited Edition" << ends;
+
+    ostrstream feature_str;
+    if (feature)
+      {
+      feature_str << " (" << feature << ")";
+      }
+    feature_str << ends;
+
+    ostrstream msg_str;
+    msg_str << this->GetApplicationName() 
+            << " is running in Limited Edition Mode. "
+            << "The feature you are trying to use" << feature_str.str() 
+            << " is not available in this mode. "
+            << "You may consider acquiring the Full Version to unlock it."
+            << ends;
+
+    vtkKWMessageDialog::PopupMessage(
+      this, 0, title_str.str(), msg_str.str(), 
+      vtkKWMessageDialog::WarningIcon);
+
+    title_str.rdbuf()->freeze(0);
+    feature_str.rdbuf()->freeze(0);
+    msg_str.rdbuf()->freeze(0);
+    }
+
+  return this->LimitedEditionMode;
+}
 
 //----------------------------------------------------------------------------
 void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
@@ -1333,6 +1381,6 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->ApplicationInstallationDirectory ? ApplicationInstallationDirectory : "None") << endl;
   os << indent << "SaveWindowGeometry: " 
      << (this->SaveWindowGeometry ? "On" : "Off") << endl;
+  os << indent << "LimitedEditionMode: " 
+     << (this->LimitedEditionMode ? "On" : "Off") << endl;
 }
-
-

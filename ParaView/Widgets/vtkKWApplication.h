@@ -309,6 +309,16 @@ public:
   // level set).
   virtual void GetApplicationSettingsFromRegistery();
 
+  // Descrition:
+  // Set/Get if the application is running in limited edition mode.
+  // GetLimitedEditionModeAndWarn will return the limited edition mode ; if 
+  // the mode is true, it will also display a popup warning stating that a
+  // feature (string parameter) is not available in this mode.
+  virtual void SetLimitedEditionMode(int arg);
+  vtkBooleanMacro(LimitedEditionMode, int);
+  vtkGetMacro(LimitedEditionMode, int);
+  virtual int GetLimitedEditionModeAndWarn(const char *feature);
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -350,7 +360,8 @@ protected:
   int DialogUp;
 
   int ExitStatus;
-  
+  int LimitedEditionMode;
+
   ofstream *TraceFile;
 
   vtkKWRegisteryUtilities *Registery;
