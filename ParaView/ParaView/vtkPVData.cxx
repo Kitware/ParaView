@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.161.2.14");
+vtkCxxRevisionMacro(vtkPVData, "1.161.2.15");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1222,12 +1222,14 @@ void vtkPVData::CreateProperties()
     "If your dataset contains points/verticies, "
     "this scale adjusts the diameter of the rendered points.");
   this->PointSizeScale->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->PointSizeScale->PopupScaleOn();
   this->PointSizeScale->Create(this->Application, "");
   this->PointSizeScale->SetRange(1, 5);
   this->PointSizeScale->SetResolution(1);
   this->PointSizeScale->SetValue(1);
   this->PointSizeScale->DisplayEntry();
   this->PointSizeScale->DisplayEntryAndLabelOnTopOff();
+  this->PointSizeScale->SetBalloonHelpString("Set the point size.");
   this->Script("%s configure -width 5", 
                this->PointSizeScale->GetEntry()->GetWidgetName());
   this->PointSizeScale->SetCommand(this, "ChangePointSize");
@@ -1243,12 +1245,14 @@ void vtkPVData::CreateProperties()
     "this scale adjusts the width of the rendered lines.");
   
   this->LineWidthScale->SetParent(this->DisplayStyleFrame->GetFrame());
+  this->LineWidthScale->PopupScaleOn();
   this->LineWidthScale->Create(this->Application, "");
   this->LineWidthScale->SetRange(1, 5);
   this->LineWidthScale->SetResolution(1);
   this->LineWidthScale->SetValue(1);
   this->LineWidthScale->DisplayEntry();
   this->LineWidthScale->DisplayEntryAndLabelOnTopOff();
+  this->LineWidthScale->SetBalloonHelpString("Set the line width.");
   this->Script("%s configure -width 5", 
                this->LineWidthScale->GetEntry()->GetWidgetName());
   this->LineWidthScale->SetCommand(this, "ChangeLineWidth");
@@ -1276,15 +1280,17 @@ void vtkPVData::CreateProperties()
                this->PointSizeLabel->GetWidgetName(),
                this->PointSizeScale->GetWidgetName());
 
-  this->Script("grid %s -sticky news -padx %d",
-               this->PointSizeScale->GetWidgetName(), col_1_padx);
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->PointSizeScale->GetWidgetName(), 
+               col_1_padx, button_pady);
 
   this->Script("grid %s %s -sticky wns",
                this->LineWidthLabel->GetWidgetName(),
                this->LineWidthScale->GetWidgetName());
 
-  this->Script("grid %s -sticky news -padx %d",
-               this->LineWidthScale->GetWidgetName(), col_1_padx);
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->LineWidthScale->GetWidgetName(),
+               col_1_padx, button_pady);
 
   // Now synchronize all those grids to have them aligned
 
@@ -2994,7 +3000,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.161.2.14 $");
+  this->ExtractRevision(os,"$Revision: 1.161.2.15 $");
 }
 
 //----------------------------------------------------------------------------
