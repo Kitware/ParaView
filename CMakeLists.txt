@@ -108,6 +108,9 @@ ENDFOREACH(kit)
 SET(VTKZLIB_INCLUDE_DIR
   ${ParaView_SOURCE_DIR}/VTK/Utilities/zlib
   ${ParaView_BINARY_DIR}/VTK/Utilities/zlib)
+SET(VTKEXPAT_INCLUDE_DIR
+  ${ParaView_SOURCE_DIR}/VTK/Utilities/expat
+  ${ParaView_BINARY_DIR}/VTK/Utilities/expat)
 
 #########################################################################
 # Configure HDF5
