@@ -41,7 +41,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWDialog );
-vtkCxxRevisionMacro(vtkKWDialog, "1.32");
+vtkCxxRevisionMacro(vtkKWDialog, "1.33");
 
 int vtkKWDialogCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -57,7 +57,6 @@ vtkKWDialog::vtkKWDialog()
   this->BeepType = 0;
   this->MasterWindow = 0;
   this->InvokeAtPointer = 0;
-  this->Grab = 1;
 }
 
 vtkKWDialog::~vtkKWDialog()
@@ -136,10 +135,7 @@ int vtkKWDialog::Invoke()
 
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
-  if ( this->Grab )
-    {
-    this->Script("grab %s",this->GetWidgetName());
-    }
+  this->Grab();
   if ( this->Beep )
     {
     this->Script("bell");
@@ -151,10 +147,7 @@ int vtkKWDialog::Invoke()
     {
     Tcl_DoOneEvent(0);    
     }
-  if ( this->Grab )
-    {
-    this->Script("grab release %s",this->GetWidgetName());
-    }
+  this->ReleaseGrab();
 
   this->Application->SetDialogUp(0);
   return (this->Done-1);
@@ -168,13 +161,13 @@ void vtkKWDialog::Display()
   this->Script("wm deiconify %s",this->GetWidgetName());
   this->Script("focus %s",this->GetWidgetName());
   this->Script("update idletasks");
-  this->Script("grab %s",this->GetWidgetName());
+  this->Grab();
 }
 
 void vtkKWDialog::Cancel()
 {
   this->Script("wm withdraw %s",this->GetWidgetName());
-  this->Script("grab release %s",this->GetWidgetName());
+  this->ReleaseGrab();
 
   this->Done = 1;  
   if (this->Command && strlen(this->Command) > 0)
@@ -186,7 +179,7 @@ void vtkKWDialog::Cancel()
 void vtkKWDialog::OK()
 {
   this->Script("wm withdraw %s",this->GetWidgetName());
-  this->Script("grab release %s",this->GetWidgetName());
+  this->ReleaseGrab();
   this->Done = 2;  
   if (this->Command && strlen(this->Command) > 0)
     {
