@@ -220,7 +220,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.652");
+vtkCxxRevisionMacro(vtkPVWindow, "1.653");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -5085,6 +5085,7 @@ void vtkPVWindow::UpdateToolbarAspect()
       this->LowerToolbars->Unpack();
       }
     }
+  this->UpdateEnableState();
 }
 
 //-----------------------------------------------------------------------------
