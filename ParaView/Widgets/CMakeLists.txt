@@ -42,7 +42,7 @@ vtkKWVolumeComposite
 vtkKWWindow 
 vtkKWWindowCollection 
 vtkKWXtEmbeddedWidget 
-${VTK_SOURCE_DIR}/Wrapping/vtktcl 
+${VTK_SOURCE_DIR}/Wrapping/Tcl/vtktcl 
 )
 
 ABSTRACT_FILES(
