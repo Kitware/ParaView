@@ -93,6 +93,8 @@ vtkArrowSource
 vtkExtentTranslator
 vtkOpenGLProperty
 vtkPointSet
+vtkCompositer
+vtkCompositeManager
 # paraview classes
 vtkGenericRenderWindowInteractor
 vtkPVArrowSource
@@ -108,6 +110,8 @@ vtkPVClientServerModule
 vtkPVMPIProcessModule
 vtkKWObject
 vtkKWApplication
+vtkPVTreeComposite
+vtkCompressCompositer
 )
 
 IF(VTK_USE_X)
