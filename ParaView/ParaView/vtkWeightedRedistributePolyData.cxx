@@ -78,7 +78,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.12.2.1");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.12.2.2");
 
 //-------------------------------------------------------------------
 
@@ -363,6 +363,7 @@ void vtkWeightedRedistributePolyData::MakeSchedule ( vtkCommSched* localSched)
             remoteSched[ostart].NumberOfCells[type] -= numToReceive;
             remoteSched[olast].NumberOfCells[type]  += numToReceive;
             last--;
+            olast = order[last];
             recflag = 0; // extra leftover point will have been 
                          // used
             }
