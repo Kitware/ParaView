@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.61");
+vtkCxxRevisionMacro(vtkKWWidget, "1.62");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -346,7 +346,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.61 $");
+  this->ExtractRevision(os,"$Revision: 1.62 $");
 }
 
 //------------------------------------------------------------------------------
@@ -877,6 +877,13 @@ int vtkKWWidget::AddDragAndDropTarget(vtkKWWidget *widget)
   target->Target = widget;
 
   return 1;
+}
+
+// ---------------------------------------------------------------------------
+int vtkKWWidget::HasDragAndDropTarget(vtkKWWidget *widget)
+{
+  vtkKWWidget::DragAndDropTarget *found = this->GetDragAndDropTarget(widget);
+  return found ? 1 : 0;
 }
 
 // ---------------------------------------------------------------------------

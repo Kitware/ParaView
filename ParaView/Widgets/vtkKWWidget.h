@@ -251,6 +251,7 @@ public:
     vtkKWWidget *target, vtkKWObject *object, const char *method);
   virtual int SetDragAndDropEndCommand(
     vtkKWWidget *target, vtkKWObject *object, const char *method);
+  virtual int HasDragAndDropTarget(vtkKWWidget *target);
 
   // Description:
   // Set/Get the Drag and Drop anchor. This is the actual widget (or part of)
