@@ -2688,13 +2688,7 @@ void vtkPVData::ScalarBarOrientationCallback()
 void vtkPVData::OpacityChangedCallback()
 {
   float val = this->Opacity->GetValue();
-  this->SetOpacity(val);
-}
 
-//----------------------------------------------------------------------------
-void vtkPVData::SetOpacity(float val)
-{  
-  this->Opacity->SetValue(val);
   this->GetPVApplication()->BroadcastScript("[ %s GetProperty ] SetOpacity %f",
                                             this->PropTclName, val);
   this->AddTraceEntry("$kw(%s) SetOpacity %f", this->GetTclName(),
@@ -2703,6 +2697,12 @@ void vtkPVData::SetOpacity(float val)
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::SetOpacity(float val)
+{ 
+  this->Opacity->SetValue(val);
 }
 
 //----------------------------------------------------------------------------
@@ -2794,7 +2794,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.134 $");
+  this->ExtractRevision(os,"$Revision: 1.135 $");
 }
 
 //----------------------------------------------------------------------------
