@@ -106,6 +106,14 @@ SOURCE=.\vtkKWApplicationTcl.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkKWChangeColorButton.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWChangeColorButtonTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkKWCheckButton.cxx
 # End Source File
 # Begin Source File
@@ -368,6 +376,35 @@ InputName=vtkKWApplication
 # Begin Custom Build
 InputPath=.\vtkKWApplication.h
 InputName=vtkKWApplication
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkKWChangeColorButton.h
+
+!IF  "$(CFG)" == "Widgets - Win32 Release"
+
+# Begin Custom Build
+InputPath=.\vtkKWChangeColorButton.h
+InputName=vtkKWChangeColorButton
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "Widgets - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkKWChangeColorButton.h
+InputName=vtkKWChangeColorButton
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -16,6 +16,7 @@ vtkKWView
 
 CONCRETE = \
 vtkKWApplication \
+vtkKWChangeColorButton \
 vtkKWCheckButton \
 vtkKWCompositeCollection \
 vtkKWDialog \
