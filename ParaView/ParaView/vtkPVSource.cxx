@@ -508,7 +508,7 @@ void vtkPVSource::UpdateScalarsMenu()
     defaultSet = 1;
     } 
 
-  fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
+  fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData();
   
   if (fd)
     {
@@ -557,7 +557,7 @@ void vtkPVSource::UpdateVectorsMenu()
     defaultSet = 1;
     } 
 
-  fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData()->GetFieldData();
+  fd = this->GetNthPVInput(0)->GetVTKData()->GetPointData();
   
   if (fd)
     {

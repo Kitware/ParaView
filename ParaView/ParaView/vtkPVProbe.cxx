@@ -914,7 +914,7 @@ void vtkPVProbe::UpdateScalarsMenu()
                                                      "vtkDataSet",
                                                      pvApp->GetMainInterp(),
                                                      error));
-  fd = dataSet->GetPointData()->GetFieldData();
+  fd = dataSet->GetPointData();
   
   if (fd)
     {
