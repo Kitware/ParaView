@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.13");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.14");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -880,6 +880,11 @@ int vtkClientServerInterpreter::LoadInternal(const char* moduleName,
     {
     vtkErrorMacro("Cannot load module \"" << moduleName << "\" from \""
                   << fullPath << "\".");
+    const char* error = vtkDynamicLoader::LastError();
+    if (error)
+      {
+      vtkErrorMacro(<<error);
+      }
     return 0;
     }
 
