@@ -361,7 +361,7 @@ MACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
   SET(ExtraParaViewServer_SRCS ${ExtraParaViewServer_SRCS} ${SRCS})
 ENDMACRO(PARAVIEW_INCLUDE_WRAPPED_SOURCES SRCS)
 
-FOREACH(external EXODUS SAF)
+FOREACH(external EXODUS SAF LOOKMARKS)
   OPTION(PARAVIEW_USE_${external} "Build using ${external} library. Requires access to ${external} libraries" OFF)
   MARK_AS_ADVANCED(PARAVIEW_USE_${external})
   IF(PARAVIEW_USE_${external})
