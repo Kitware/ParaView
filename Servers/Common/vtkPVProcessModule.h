@@ -165,14 +165,6 @@ public:
   vtkGetMacro(UseImmediateMode,int);
 
   // Description:
-  // Set and get the application options
-  vtkGetObjectMacro(Options, vtkPVOptions);
-  virtual void SetOptions(vtkPVOptions* op)
-    {
-    this->Options = op;
-    }
-
-  // Description:
   // Propagate from the options so that it is available in CS
   int GetRenderNodePort();
   char* GetMachinesFileName();
