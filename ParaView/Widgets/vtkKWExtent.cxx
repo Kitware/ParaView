@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWExtent );
-vtkCxxRevisionMacro(vtkKWExtent, "1.17");
+vtkCxxRevisionMacro(vtkKWExtent, "1.18");
 
 //----------------------------------------------------------------------------
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
@@ -58,6 +58,8 @@ vtkKWExtent::vtkKWExtent()
 {
   this->CommandFunction = vtkKWExtentCommand;
   this->Command = NULL;
+
+  this->PackMinMaxTogether = 0;
 
   this->XMinScale = vtkKWScale::New();
   this->XMinScale->SetParent(this);
@@ -145,18 +147,67 @@ void vtkKWExtent::Create(vtkKWApplication *app, const char *args)
   this->ZMaxScale->DisplayEntry();
   this->ZMaxScale->DisplayLabel("Maximum Z (Units)");
 
-  this->Script(
-    "pack %s %s %s %s %s %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
-    this->XMinScale->GetWidgetName(),
-    this->XMaxScale->GetWidgetName(),
-    this->YMinScale->GetWidgetName(),
-    this->YMaxScale->GetWidgetName(),
-    this->ZMinScale->GetWidgetName(),
-    this->ZMaxScale->GetWidgetName());
+  // Pack the label and the option menu
+
+  this->Pack();
 
   // Update enable state
 
   this->UpdateEnableState();
+}
+
+// ----------------------------------------------------------------------------
+void vtkKWExtent::Pack()
+{
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
+  // Unpack everything
+
+  this->XMinScale->UnpackSiblings();
+
+  // Repack everything
+
+  ostrstream tk_cmd;
+
+  if (this->PackMinMaxTogether)
+    {
+    tk_cmd << "grid "
+           << this->XMinScale->GetWidgetName() << " "
+           << this->XMaxScale->GetWidgetName() << " "
+           << "-padx 2 -pady 2 -sticky news" << endl
+           << "grid "
+           << this->YMinScale->GetWidgetName() << " "
+           << this->YMaxScale->GetWidgetName() << " "
+           << "-padx 2 -pady 2 -sticky news" << endl
+           << "grid "
+           << this->ZMinScale->GetWidgetName() << " "
+           << this->ZMaxScale->GetWidgetName() << " "
+           << "-padx 2 -pady 2 -sticky news" << endl
+           << "grid columnconfigure "
+           << this->XMinScale->GetParent()->GetWidgetName() << " "
+           << " 0 -weight 1" << endl
+           << "grid columnconfigure "
+           << this->XMinScale->GetParent()->GetWidgetName() << " "
+           << " 1 -weight 1";
+    }
+  else
+    {
+    tk_cmd << "pack "
+           << this->XMinScale->GetWidgetName() << " "
+           << this->XMaxScale->GetWidgetName() << " "
+           << this->YMinScale->GetWidgetName() << " "
+           << this->YMaxScale->GetWidgetName() << " "
+           << this->ZMinScale->GetWidgetName() << " "
+           << this->ZMaxScale->GetWidgetName() << " "
+           << "-padx 2 -pady 2 -fill x -expand yes -anchor w";
+    }
+  
+  tk_cmd << ends;
+  this->Script(tk_cmd.str());
+  tk_cmd.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
@@ -420,9 +471,26 @@ void vtkKWExtent::UpdateEnableState()
     }
 }
 
+// ----------------------------------------------------------------------------
+void vtkKWExtent::SetPackMinMaxTogether(int _arg)
+{
+  if (this->PackMinMaxTogether == _arg)
+    {
+    return;
+    }
+  this->PackMinMaxTogether = _arg;
+  this->Modified();
+
+  this->Pack();
+}
+
 //----------------------------------------------------------------------------
 void vtkKWExtent::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
   os << indent << "Extent: " << this->GetExtent() << endl;
+
+  os << indent << "PackMinMaxTogether: " 
+     << (this->PackMinMaxTogether ? "On" : "Off") << endl;
 }

@@ -111,6 +111,12 @@ public:
   virtual void SetDisableCommands(int);
   vtkBooleanMacro(DisableCommands, int);
 
+  // Description:
+  // Pack the min and max scale together on the same line.
+  virtual void SetPackMinMaxTogether(int);
+  vtkBooleanMacro(PackMinMaxTogether, int);
+  vtkGetMacro(PackMinMaxTogether, int);
+
 protected:
   vtkKWExtent();
   ~vtkKWExtent();
@@ -123,6 +129,12 @@ protected:
   vtkKWScale  *YMaxScale;
   vtkKWScale  *ZMinScale;
   vtkKWScale  *ZMaxScale;
+
+  int PackMinMaxTogether;
+
+  // Pack or repack the widget
+
+  virtual void Pack();
 
   // Update the enable state. This should propagate similar calls to the
   // internal widgets.
