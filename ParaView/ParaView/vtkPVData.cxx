@@ -70,6 +70,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVRenderModuleUI.h"
 
 // Just for the definition of VTK_POINT_DATA_FIELD ...
 #include "vtkFieldDataToAttributeDataFilter.h"
@@ -81,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.252");
+vtkCxxRevisionMacro(vtkPVData, "1.253");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2086,8 +2087,10 @@ void vtkPVData::Initialize()
     }
   else if (dataSetType == VTK_UNSTRUCTURED_GRID)
     {
+    float outlineThreshold = this->GetPVRenderView()->GetRenderModuleUI()
+                                 ->GetOutlineThreshold();    
     if (this->GetPVSource()->GetDataInformation()->GetNumberOfCells() 
-          < 5000000)
+          < outlineThreshold * 1000000.0)
       {
       this->SetRepresentation(VTK_PV_SURFACE_LABEL);
       }

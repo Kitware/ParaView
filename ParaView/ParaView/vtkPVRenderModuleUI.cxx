@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.5");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.6");
 
 int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -31,6 +31,8 @@ int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
 vtkPVRenderModuleUI::vtkPVRenderModuleUI()
 {
   this->CommandFunction = vtkPVRenderModuleUICommand;
+
+  this->OutlineThreshold = 5.0;
 }
 
 

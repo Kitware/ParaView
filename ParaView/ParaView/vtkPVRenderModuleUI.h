@@ -50,9 +50,16 @@ public:
   // Export the render module to a file.
   virtual void SaveState(ofstream *) {}
   
+  // Description:
+  // This threshold determines the default representation that will be
+  // used for unstructured grid.  The units of this value are mega cells.
+  vtkGetMacro(OutlineThreshold, float);
+
 protected:
   vtkPVRenderModuleUI();
   ~vtkPVRenderModuleUI();
+
+  float OutlineThreshold;
  
   vtkPVRenderModuleUI(const vtkPVRenderModuleUI&); // Not implemented
   void operator=(const vtkPVRenderModuleUI&); // Not implemented
