@@ -1,4 +1,4 @@
-Application ExitOnReturnOn
+$Application ExitOnReturnOn
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
     for {set i 0} {$i < $argcm1} {incr i} {
@@ -9,14 +9,14 @@ if {[info exists argc]} {
 } 
 
 # Disable popup message dialogs.
-set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp1) [$Application GetMainWindow]
 $kw(vtkTemp1) SetUseMessageDialog 0
 
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
 # Choose the file name/type based on whether we are in parallel mode.
-set kw(vtkTemp1000) [Application GetController]
+set kw(vtkTemp1000) [$Application GetController]
 set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
 
 set ext "vtk"
@@ -33,7 +33,7 @@ if { [catch {
   
   # Barrier after write.  We don't want to delete files before they
   # are written.
-  Application BroadcastSimpleScript { [Application GetController] Barrier }
+  $Application BroadcastSimpleScript { [$Application GetController] Barrier }
 
   file delete -force vtkParaViewWriteTest.$ext
   file delete -force vtkParaViewWriteTestGhost.$ext
@@ -51,7 +51,7 @@ if { [catch {
   file delete -force vtkParaViewWriteTest.tcl
 } res ] != 0 } {
 	puts "Error: $res"
-	Application SetExitStatus 1
+	$Application SetExitStatus 1
 }
 
-Application Exit
+$Application Exit

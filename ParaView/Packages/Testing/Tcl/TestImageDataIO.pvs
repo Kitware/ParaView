@@ -1,5 +1,5 @@
-# Application should exit when this script is finished.
-Application ExitOnReturnOn
+# $Application should exit when this script is finished.
+$Application ExitOnReturnOn
 
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
@@ -11,7 +11,7 @@ if {[info exists argc]} {
 } 
 
 # Disable popup message dialogs.
-set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp43) [$kw(vtkTemp1) GetMainView]
 $pv(vtkTemp43) SetBackgroundColor 0 0 0
 
@@ -27,7 +27,7 @@ set kw(vtkTemp266) [$kw(vtkTemp257) GetPVWidget {File Name}]
 $kw(vtkTemp266) SetValue "$DataDir/Data/ironProt.vtk"
 
 # Choose the file name/type based on whether we are in parallel mode.
-set kw(vtkTemp1000) [Application GetController]
+set kw(vtkTemp1000) [$Application GetController]
 set nprocs [$kw(vtkTemp1000) GetNumberOfProcesses]
 
 set ext "vti"
@@ -61,7 +61,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
     }
 }
 

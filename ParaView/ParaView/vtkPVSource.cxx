@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.237");
+vtkCxxRevisionMacro(vtkPVSource, "1.238");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -245,6 +245,7 @@ vtkPVSource::~vtkPVSource()
   this->InputClassNames = 0;
 
   this->SetModuleName(0);
+
 }
 
 //----------------------------------------------------------------------------
@@ -359,10 +360,10 @@ void vtkPVSource::SetVTKSource(vtkSource *source, const char *tclName)
                   tclName, this->GetTclName());
     
     pvApp->BroadcastScript(
-      "%s SetStartMethod {Application LogStartEvent {Execute %s}}", 
+      "%s SetStartMethod {$Application LogStartEvent {Execute %s}}", 
       tclName, tclName);
     pvApp->BroadcastScript(
-      "%s SetEndMethod {Application LogEndEvent {Execute %s}}", 
+      "%s SetEndMethod {$Application LogEndEvent {Execute %s}}", 
       tclName, tclName);
 
 
@@ -451,7 +452,9 @@ void vtkPVSource::CreateProperties()
 
   this->NameLabel->SetParent(this->DescriptionFrame);
   this->NameLabel->Create(this->Application);
-  this->NameLabel->GetLabel1()->SetLabel("Name");
+  this->NameLabel->GetLabel1()->SetLabel("Name:");
+  this->Script("%s configure -anchor w", 
+               this->NameLabel->GetLabel2()->GetWidgetName());
   this->Script("%s config -width 18", 
                this->NameLabel->GetLabel1()->GetWidgetName());
   this->Script("pack %s -fill x -expand t", 
@@ -459,7 +462,9 @@ void vtkPVSource::CreateProperties()
 
   this->TypeLabel->SetParent(this->DescriptionFrame);
   this->TypeLabel->Create(this->Application);
-  this->TypeLabel->GetLabel1()->SetLabel("Type");
+  this->TypeLabel->GetLabel1()->SetLabel("Type:");
+  this->Script("%s configure -anchor w", 
+               this->TypeLabel->GetLabel2()->GetWidgetName());
   this->Script("%s config -width 18", 
                this->TypeLabel->GetLabel1()->GetWidgetName());
   this->Script("pack %s -fill x -expand t", 
@@ -467,7 +472,7 @@ void vtkPVSource::CreateProperties()
 
   this->DescriptionEntry->SetParent(this->DescriptionFrame);
   this->DescriptionEntry->Create(this->Application);
-  this->DescriptionEntry->GetLabel()->SetLabel("Description");
+  this->DescriptionEntry->GetLabel()->SetLabel("Description:");
   this->Script("%s config -width 18", 
                this->DescriptionEntry->GetLabel()->GetWidgetName());
   this->Script("pack %s -fill x -expand t", 
@@ -547,12 +552,17 @@ void vtkPVSource::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateDescriptionFrame()
 {
-  if (this->NameLabel->IsCreated())
+  if (!this->Application)
+    {
+    return;
+    }
+
+  if (this->NameLabel && this->NameLabel->IsCreated())
     {
     this->NameLabel->GetLabel2()->SetLabel(this->Name ? this->Name : "");
     }
 
-  if (this->TypeLabel->IsCreated())
+  if (this->TypeLabel && this->TypeLabel->IsCreated())
     {
     if (this->GetVTKSource()) 
       {
@@ -576,7 +586,7 @@ void vtkPVSource::UpdateDescriptionFrame()
       }
     }
 
-  if (this->DescriptionEntry->IsCreated())
+  if (this->DescriptionEntry && this->DescriptionEntry->IsCreated())
     {
     this->DescriptionEntry->GetEntry()->SetValue(this->Description);
     }
@@ -2028,7 +2038,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.237 $");
+  this->ExtractRevision(os,"$Revision: 1.238 $");
 }
 
 //----------------------------------------------------------------------------

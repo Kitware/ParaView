@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.148");
+vtkCxxRevisionMacro(vtkPVData, "1.149");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -468,9 +468,9 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
   // Keep track of how long each geometry filter takes to execute.
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent "
+  pvApp->BroadcastScript("%s SetStartMethod {$Application LogStartEvent "
                          "{Execute Geometry}}", this->GeometryTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent "
+  pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent "
                          "{Execute Geometry}}", this->GeometryTclName);
 
 
@@ -480,9 +480,9 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->LODDeciTclName = NULL;
   this->SetLODDeciTclName(tclName);
   // Keep track of how long each decimation filter takes to execute.
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute Decimate}}", 
+  pvApp->BroadcastScript("%s SetStartMethod {$Application LogStartEvent {Execute Decimate}}", 
                          this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute Decimate}}", 
+  pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent {Execute Decimate}}", 
                          this->LODDeciTclName);
   // The input of course is the geometry filter.
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
@@ -514,9 +514,9 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->CollectTclName, this->GeometryTclName);
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute Collect}}", 
+  pvApp->BroadcastScript("%s SetStartMethod {$Application LogStartEvent {Execute Collect}}", 
                          this->CollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute Collect}}", 
+  pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent {Execute Collect}}", 
                          this->CollectTclName);
   //
   // ===== LOD branch:
@@ -532,9 +532,9 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->SetLODCollectTclName(tclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
                          this->LODCollectTclName, this->LODDeciTclName);
-  pvApp->BroadcastScript("%s SetStartMethod {Application LogStartEvent {Execute LODCollect}}", 
+  pvApp->BroadcastScript("%s SetStartMethod {$Application LogStartEvent {Execute LODCollect}}", 
                          this->LODCollectTclName);
-  pvApp->BroadcastScript("%s SetEndMethod {Application LogEndEvent {Execute LODCollect}}", 
+  pvApp->BroadcastScript("%s SetEndMethod {$Application LogEndEvent {Execute LODCollect}}", 
                          this->LODCollectTclName);
 #endif
 
@@ -824,7 +824,7 @@ void vtkPVData::GetBounds(float bounds[6])
 
   if (!this->RenderOnlyLocally)
     {
-    pvApp->BroadcastScript("Application SendDataBounds %s", 
+    pvApp->BroadcastScript("$Application SendDataBounds %s", 
                            this->VTKDataTclName);
     
     num = controller->GetNumberOfProcesses();
@@ -877,7 +877,7 @@ int vtkPVData::GetNumberOfCells()
 
   if (!this->RenderOnlyLocally)
     {
-    pvApp->BroadcastScript("Application SendDataNumberOfCells %s", 
+    pvApp->BroadcastScript("$Application SendDataNumberOfCells %s", 
                            this->VTKDataTclName);
     
     numProcs = controller->GetNumberOfProcesses();
@@ -908,7 +908,7 @@ int vtkPVData::GetNumberOfPoints()
   
   if (!this->RenderOnlyLocally)
     {
-    pvApp->BroadcastScript("Application SendDataNumberOfPoints %s", 
+    pvApp->BroadcastScript("$Application SendDataNumberOfPoints %s", 
                            this->VTKDataTclName);
     
     numProcs = controller->GetNumberOfProcesses();
@@ -2823,7 +2823,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.148 $");
+  this->ExtractRevision(os,"$Revision: 1.149 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3007,7 +3007,7 @@ void vtkPVData::GetArrayComponentRange(float *range, int pointDataFlag,
 
   if (!this->RenderOnlyLocally)
     {
-    pvApp->BroadcastScript("Application SendDataArrayRange %s %d {%s} %d",
+    pvApp->BroadcastScript("$Application SendDataArrayRange %s %d {%s} %d",
                            this->GetVTKDataTclName(),
                            pointDataFlag, array->GetName(), component);
     

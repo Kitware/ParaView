@@ -98,7 +98,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.135");
+vtkCxxRevisionMacro(vtkPVApplication, "1.136");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -714,7 +714,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
     if (numPipes > numProcs) numPipes = numProcs;
     if (numPipes < 1) numPipes = 1;
     }
-  this->BroadcastScript("Application SetNumberOfPipes %d", numPipes);
+  this->BroadcastScript("$Application SetNumberOfPipes %d", numPipes);
 
   // assuming that the number of pipes is the same as the number of procs
   char *displayString;
@@ -753,7 +753,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
       //    cerr << "display string root = " << displayStringRoot << endl;
       sprintf(displayCommand, "DISPLAY=%s%d", displayStringRoot, id);
       //    cerr << "display command = " << displayCommand << endl;
-      this->RemoteScript(id, "Application SetEnvironmentVariable {%s}", 
+      this->RemoteScript(id, "$Application SetEnvironmentVariable {%s}", 
                          displayCommand);
       }
     }
@@ -794,7 +794,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
   // ui has ref. count of at least 1 because of AddItem() above
   ui->Delete();
 
-  this->Script("proc bgerror { m } { Application DisplayTCLError $m }");
+  this->Script("proc bgerror { m } { global Application; $Application DisplayTCLError $m }");
   vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   window->SetWindowCollection( this->Windows );
   this->OutputWindow = window;
@@ -1037,7 +1037,7 @@ void vtkPVApplication::StartRecordingScript(char *filename)
 {
   if (this->TraceFile)
     {
-    *this->TraceFile << "Application StartRecordingScript " << filename << endl;
+    *this->TraceFile << "$Application StartRecordingScript " << filename << endl;
     this->StopRecordingScript();
     }
 
@@ -1051,7 +1051,7 @@ void vtkPVApplication::StartRecordingScript(char *filename)
     }
 
   // Initialize a couple of variables in the trace file.
-  this->AddTraceEntry("set kw(%s) [Application GetMainWindow]",
+  this->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
                       this->GetMainWindow()->GetTclName());
   this->GetMainWindow()->SetTraceInitialized(1);
 }
@@ -1087,7 +1087,7 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
   numProcs = this->Controller->GetNumberOfProcesses();
   for (i = 1; i < numProcs; ++i)
     {
-    this->RemoteScript(i, "Application SendCompleteArrays %s", mapperTclName);
+    this->RemoteScript(i, "$Application SendCompleteArrays %s", mapperTclName);
     this->Controller->Receive(&nonEmptyFlag, 1, i, 987243);
     if (nonEmptyFlag)
       { // This process has data.  Receive all the arrays, type and component.
@@ -1303,7 +1303,7 @@ void vtkPVApplication::SetGlobalLODFlag(int val)
     num = this->Controller->GetNumberOfProcesses();
     for (idx = 1; idx < num; ++idx)
       {
-      this->RemoteScript(idx, "Application SetGlobalLODFlag %d", val);
+      this->RemoteScript(idx, "$Application SetGlobalLODFlag %d", val);
       }
     }
 }

@@ -1,4 +1,4 @@
-Application ExitOnReturnOn
+$Application ExitOnReturnOn
 
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
@@ -9,7 +9,7 @@ if {[info exists argc]} {
     }
 }
     
-set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp20) [$kw(vtkTemp1) GetMainView]
 $kw(vtkTemp1) Open "$DataDir/Data/ironProt.vtk"
 set kw(vtkTemp276) [vtkTemp1 GetCurrentPVSource]
@@ -135,8 +135,8 @@ $kw(vtkTemp20) SetCameraState 56.267 -54.829 -26.954  7.680 133.676 102.063  0.8
 
 # Retrace
 update
-Application StopRecordingScript
-[ Application GetMainWindow ] DeleteAllSources
+$Application StopRecordingScript
+[ $Application GetMainWindow ] DeleteAllSources
 # Source the trace to regenerate the sources.
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
@@ -156,7 +156,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeCompressionCallback 1
@@ -166,7 +166,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeWithRGBACallback 0
@@ -176,7 +176,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeCompressionCallback 0
@@ -186,7 +186,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeCompressionCallback 1
@@ -196,7 +196,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeCompressionCallback 0
@@ -206,7 +206,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeWithRGBACallback 1
@@ -216,7 +216,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeWithRGBACallback 0
@@ -226,7 +226,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeWithFloatCallback 1
@@ -236,7 +236,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeWithFloatCallback 0
@@ -246,7 +246,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeCompressionCallback 1
@@ -256,7 +256,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeWithRGBACallback 0
@@ -266,7 +266,7 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
 $kw(vtkTemp20) CompositeCompressionCallback 0
@@ -276,10 +276,10 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
    
-Application Exit
+$Application Exit
 
 

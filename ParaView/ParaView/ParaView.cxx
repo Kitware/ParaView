@@ -88,21 +88,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     // We need to pass the local controller to the UI process.
     interp = vtkPVApplication::InitializeTcl(pvArgs->argc,pvArgs->argv);
     
-    // To bypass vtkKWApplicaion assigning vtkKWApplicationCommand
-    // to the tcl command, create the application from tcl.
-    if (Tcl_Eval(interp, "vtkPVApplication Application") != TCL_OK)
-      {
-      cerr << "Error returned from tcl script.\n" << interp->result << endl;
-      }
-    int    error;
-    vtkPVApplication *app = (vtkPVApplication *)(
-      vtkTclGetPointerFromObject("Application","vtkPVApplication",
-                                 interp,error));
-    if (app == NULL)
-      {
-      vtkGenericWarningMacro("Could not get application pointer.");
-      return;
-      }  
+    vtkPVApplication *app = vtkPVApplication::New();
 
 #ifdef PV_USE_SGI_PIPES
   int numPipes = 1;
@@ -114,15 +100,7 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     app->Script("wm withdraw .");
     app->Start(pvArgs->argc,pvArgs->argv);
     int status = app->GetExitStatus();
-    if (Tcl_Eval(interp, "Application Delete") != TCL_OK)
-      {
-      cerr << "Could not delete application.\n";
-      *(pvArgs->RetVal) = -1;
-      }
-    else
-      {
-      *(pvArgs->RetVal) = status;
-      }
+    app->Delete();
     }
   else
     {
@@ -136,24 +114,12 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
     // We should use the application tcl name in the future.
     // All object in the satellite processes must be created through tcl.
     // (To assign the correct name).
-    if (Tcl_Eval(interp, "vtkPVApplication Application") != TCL_OK)
-      {
-      cerr << "Error returned from tcl script.\n" << interp->result << endl;
-      }
-    int    error;
-    vtkPVApplication *app = (vtkPVApplication *)(
-      vtkTclGetPointerFromObject("Application","vtkPVApplication",
-                                 interp,error));
-    if (app == NULL)
-      {
-      vtkGenericWarningMacro("Could not get application pointer.");
-      return;
-      }  
-    //app->SetupTrapsForSignals(myId);   
+    vtkPVApplication *app = vtkPVApplication::New();
     app->SetController(controller);
     controller->AddRMI(vtkPVSlaveScript, (void *)(app), 
                        VTK_PV_SLAVE_SCRIPT_RMI_TAG);
     controller->ProcessRMIs();
+    app->Delete();
     }
 
   Tcl_DeleteInterp(interp);

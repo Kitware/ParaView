@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.3");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.4");
 
 //------------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -292,7 +292,7 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(const char* module,
     char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
     str1 << "[ " << module << " GetPVOutput ] SetVisibility $" 
          << var << ";"
-         << "[ [ Application GetMainWindow ] GetMainView ] EventuallyRender" 
+         << "[ [ $Application GetMainWindow ] GetMainView ] EventuallyRender" 
          <<  ends;
     this->PopupMenu->SetEntryCommand("Visibility", str1.str());
     if ( app->EvaluateBooleanExpression("[ %s GetPVOutput ] GetVisibility",

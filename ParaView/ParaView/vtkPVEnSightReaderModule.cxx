@@ -70,7 +70,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.20");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.21");
 
 int vtkPVEnSightReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -367,7 +367,7 @@ vtkEnSightReader* vtkPVEnSightReaderModule::VerifyMasterFile(
   this->Verifier = static_cast<vtkPVEnSightVerifier*>(
     pvApp->MakeTclObject("vtkPVEnSightVerifier", this->VerifierTclName));
 
-  pvApp->BroadcastScript("%s SetController [Application GetController]", 
+  pvApp->BroadcastScript("%s SetController [$Application GetController]", 
                          this->VerifierTclName);
   pvApp->BroadcastScript("%s SetCaseFileName \"%s\"", this->VerifierTclName,
                          filename);
@@ -707,7 +707,7 @@ int vtkPVEnSightReaderModule::ReadFile(const char* fname, float timeValue,
       }
     }
   
-  pvApp->AddTraceEntry("%s ReadFile %s %12.5e Application $kw(%s)", name, 
+  pvApp->AddTraceEntry("%s ReadFile %s %12.5e $Application $kw(%s)", name, 
                        fname, time, window->GetTclName());
   pvApp->AddTraceEntry("%s Delete", name);
   delete[] name;

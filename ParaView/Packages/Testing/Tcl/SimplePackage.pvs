@@ -1,4 +1,4 @@
-Application ExitOnReturnOn
+$Application ExitOnReturnOn
 
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
@@ -36,14 +36,14 @@ if { [catch {
   [ $cone GetPVOutput ] CenterCamera
   $pvWindow SaveInTclScript vtkParaViewWriteTest.tcl 1 1
   file delete -force vtkParaViewWriteTest.tcl 
-  Application Print
-  if { [ Application SelfTest ] == 0 } {
-	Application SetExitStatus 0
+  $Application Print
+  if { [ $Application SelfTest ] == 0 } {
+	$Application SetExitStatus 0
   }
 } result ]  != 0 } {
 	puts "Script failed..."
 	puts $result	
-	Application SetExitStatus 1
+	$Application SetExitStatus 1
 }
 
-Application Exit
+$Application Exit

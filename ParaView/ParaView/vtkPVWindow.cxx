@@ -111,7 +111,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.357");
+vtkCxxRevisionMacro(vtkPVWindow, "1.358");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -890,7 +890,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->InitializeInteractorInterfaces(app);
 
   // Initialize a couple of variables in the trace file.
-  pvApp->AddTraceEntry("set kw(%s) [Application GetMainWindow]",
+  pvApp->AddTraceEntry("set kw(%s) [$Application GetMainWindow]",
                        this->GetTclName());
   this->SetTraceInitialized(1);
   // We have to set this variable after the window variable is set,
@@ -1499,7 +1499,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 
-  this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
+  //this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
 }
 
 
@@ -2882,28 +2882,21 @@ void vtkPVWindow::EnableToolbarButtons()
   while ( !it->IsDoneWithTraversal() )
     {
     vtkKWPushButton* button = 0;
-    if (it->GetData(button) == VTK_OK && button)
+    const char* key = 0;
+    if (it->GetData(button) == VTK_OK && button && it->GetKey(key) && key)
       {
-      button->EnabledOn();
+      vtkPVSource* proto;
+      if ( this->Prototypes->GetItem(key, proto) == VTK_OK && proto)
+        {
+        if ( proto->GetIsValidInput(this->CurrentPVData) )
+          {
+          button->EnabledOn();
+          }
+        }
       }
     it->GoToNextItem();
     }
   it->Delete();
-
-  // The ExtractGrid button (if there is one) is context dependent.
-  // It is enabled only of the current data is image data, structured
-  // points, rectilinear grid or structured grid.
-  int type = this->CurrentPVData->GetVTKData()->GetDataObjectType();
-  if (type != VTK_IMAGE_DATA && type != VTK_STRUCTURED_POINTS &&
-      type != VTK_RECTILINEAR_GRID && type != VTK_STRUCTURED_GRID)
-    {
-    vtkKWPushButton* button = 0;
-    if (this->ToolbarButtons->GetItem("ExtractGrid", button) == VTK_OK && 
-        button)
-      {
-      button->EnabledOff();
-      }
-    }
 
 
 }
@@ -3584,7 +3577,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.357 $");
+  this->ExtractRevision(os,"$Revision: 1.358 $");
 }
 
 //----------------------------------------------------------------------------

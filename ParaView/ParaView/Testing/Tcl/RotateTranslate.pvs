@@ -8,7 +8,7 @@ if {[info exists argc]} {
 } 
 
 
-set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
 set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
@@ -274,8 +274,8 @@ $pv(vtkTemp79) MotionCallback 0 93
 
 # Retrace
 update
-Application StopRecordingScript
-[ Application GetMainWindow ] DeleteAllSources
+$Application StopRecordingScript
+[ $Application GetMainWindow ] DeleteAllSources
 # Source the trace to regenerate the sources.
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
@@ -291,8 +291,8 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
     }
 }
    
-Application Exit
+$Application Exit

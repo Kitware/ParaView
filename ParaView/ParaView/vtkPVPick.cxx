@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.4");
+vtkCxxRevisionMacro(vtkPVPick, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVPick, InputMenu, vtkPVInputMenu);
 
@@ -712,7 +712,7 @@ void vtkPVPick::UpdateProbe()
   
   this->GetNthPVOutput(0)->Update();
   
-  pvApp->BroadcastScript("Application SendProbeData %s",
+  pvApp->BroadcastScript("$Application SendProbeData %s",
                          this->GetVTKSourceTclName());
 
   outputTclName = this->GetNthPVOutput(0)->GetVTKDataTclName();

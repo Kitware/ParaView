@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.10");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.11");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -144,7 +144,7 @@ void vtkPVScalarRangeLabel::Update()
 
   this->Range[0] = VTK_LARGE_FLOAT;
   this->Range[1] = -VTK_LARGE_FLOAT;
-  pvApp->BroadcastScript("Application SendDataArrayRange %s 1 {%s} 0",
+  pvApp->BroadcastScript("$Application SendDataArrayRange %s 1 {%s} 0",
                          pvd->GetVTKDataTclName(),
                          array->GetName());
   

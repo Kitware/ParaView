@@ -1,4 +1,4 @@
-Application ExitOnReturnOn
+$Application ExitOnReturnOn
 
 for {set i  0} {$i < [expr $argc - 1]} {incr i} {
    if {[lindex $argv $i] == "-A"} {
@@ -64,7 +64,7 @@ proc rtOtherTest { fileid } {
            b Delete
         } fres ] != 0 } {
           puts "Error pass 1 for class $a: $fres"
-	  Application SetExitStatus 1
+	  $Application SetExitStatus 1
         }
         if { [ catch {
            $a b 
@@ -74,7 +74,7 @@ proc rtOtherTest { fileid } {
            c Delete
         } fres ] != 0 } {
           puts "Error pass 2 for class $a: $fres"
-	  Application SetExitStatus 1
+	  $Application SetExitStatus 1
         }
     }
 }
@@ -83,5 +83,5 @@ proc rtOtherTest { fileid } {
 
 rtOtherTest stdout
 
-Application Exit
+$Application Exit
 

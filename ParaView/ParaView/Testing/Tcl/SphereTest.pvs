@@ -51,8 +51,8 @@ $extractOutput SetVisibility 1
 
 # Retrace
 update
-Application StopRecordingScript
-[ Application GetMainWindow ] DeleteAllSources
+$Application StopRecordingScript
+[ $Application GetMainWindow ] DeleteAllSources
 # Source the trace to regenerate the sources.
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
@@ -72,10 +72,10 @@ for {set i 0} {$i < 100} {incr i 1} {
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 	if {[lindex $argv $i] == "-C"} {
 	    source [lindex $argv [expr $i + 1]]
-	    $Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	    $Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
 	}
 }
 
-Application Exit
+$Application Exit
 
 

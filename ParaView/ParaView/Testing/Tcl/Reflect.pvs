@@ -8,7 +8,7 @@ if {[info exists argc]} {
 } 
 
 
-set kw(vtkTemp1) [Application GetMainWindow]
+set kw(vtkTemp1) [$Application GetMainWindow]
 set kw(vtkTemp29) [$kw(vtkTemp1) GetMainView]
 set kw(vtkTemp224) [$kw(vtkTemp1) CreatePVSource ImageMandelbrotSource]
 set kw(vtkTemp235) [$kw(vtkTemp224) GetPVWidget {Extent}]
@@ -41,8 +41,8 @@ $kw(vtkTemp325) AcceptCallback
 
 # Retrace
 update
-Application StopRecordingScript
-[ Application GetMainWindow ] DeleteAllSources
+$Application StopRecordingScript
+[ $Application GetMainWindow ] DeleteAllSources
 # Source the trace to regenerate the sources.
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
@@ -58,11 +58,11 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
     }
 }
 
-Application Exit
+$Application Exit
 
 
 

@@ -11,7 +11,7 @@ if {[info exists argc]} {
 # The intent of this test is to generate a trace
 # and source it to show that the trace worked.
 
-set pv(vtkTemp1) [Application GetMainWindow]
+set pv(vtkTemp1) [$Application GetMainWindow]
 set pv(vtkTemp43) [$pv(vtkTemp1) GetMainView]
 $pv(vtkTemp43) SetBackgroundColor 0 0 0
 set pv(vtkTemp89) [$pv(vtkTemp1) GetPVSource GlyphSources Arrow0]
@@ -96,7 +96,7 @@ $kw(vtkTemp327) AcceptCallback
 
 # OK, turn off the trace so that the file we source is not open.
 
-Application StopRecordingScript
+$Application StopRecordingScript
 
 # Delete all the sources
 
@@ -134,10 +134,10 @@ update
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     if {[lindex $argv $i] == "-C"} {
 	source [lindex $argv [expr $i + 1]]
-	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
+	$Application SetExitStatus [CompareImage [[$Application GetMainWindow] GetMainView]]
     }
 }
    
-Application Exit
+$Application Exit
 
 
