@@ -43,11 +43,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
+#include "vtkPVApplication.h"
 #include "vtkPVFileEntry.h"
+#include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.40");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.41");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -79,10 +81,10 @@ int vtkPVEnSightReaderModule::InitializeData()
 {
   int numSources = this->GetNumberOfVTKSources();
   int i;
-  vtkPVApplication* pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   for(i = 0; i < numSources; ++i)
     {
-    pvApp->BroadcastScript("%s Update", this->GetVTKSourceTclName(i));
+    pm->ServerScript("%s Update", this->GetVTKSourceTclName(i));
     }
   return this->Superclass::InitializeData();
 }
