@@ -79,6 +79,11 @@ public:
   virtual int ReadFileInformation(const char* fname);
   virtual int Finalize(const char* fname);
 
+  // Description:
+  // Saves the pipeline in a ParaView script.  This is similar
+  // to saveing a trace, except only the last state is stored.
+  virtual void SaveState(ofstream *file);
+
   vtkSetStringMacro(Domain);
   vtkSetStringMacro(Grid);
 

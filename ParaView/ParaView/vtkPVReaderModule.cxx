@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.29");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.30");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -298,11 +298,33 @@ void vtkPVReaderModule::SaveState(ofstream *file)
     {
     return;
     }
-  *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") OpenCustom {" 
-        << this->GetModuleName() << "} {" 
-        << this->FileEntry->GetValue() << "}\n"; 
+  
   *file << "set kw(" << this->GetTclName() << ") [$kw("
-        << this->GetPVWindow()->GetTclName() << ") GetCurrentPVSource]\n";
+        << this->GetPVWindow()->GetTclName() << ") InitializeReadCustom \""
+        << this->GetModuleName() << "\" \"" << this->FileEntry->GetValue() 
+        << "\"]" << endl;
+  *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
+        << "ReadFileInformation $kw(" << this->GetTclName() << ") \""
+        << this->FileEntry->GetValue() << "\"" << endl;
+  *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
+        << "FinalizeRead $kw(" << this->GetTclName() << ") \""
+        << this->FileEntry->GetValue() << "\"" << endl;
+
+  // Let the PVWidgets set up the object.
+  int numWidgets = this->Widgets->GetNumberOfItems();
+  for (int i = 0; i < numWidgets; i++)
+    {
+    vtkPVWidget* widget = 
+      vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
+    if (widget)
+      {
+      widget->SaveState(file);
+      }
+    }
+
+  // Call accept.
+  *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
+
   this->VisitedFlag = 1;
 }
 

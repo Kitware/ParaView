@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.6");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.7");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -269,6 +269,53 @@ void vtkXDMFReaderModule::UpdateDomains(const char* ob)
     delete [] dname;
     }
  
+}
+
+//----------------------------------------------------------------------------
+void vtkXDMFReaderModule::SaveState(ofstream *file)
+{
+  if (this->VisitedFlag)
+    {
+    return;
+    }
+  
+  *file << "set kw(" << this->GetTclName() << ") [$kw("
+        << this->GetPVWindow()->GetTclName() << ") InitializeReadCustom \""
+        << this->GetModuleName() << "\" \"" << this->FileEntry->GetValue() 
+        << "\"]" << endl;
+  if ( this->Domain )
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetDomain " << this->Domain
+          << endl;
+    }
+  if ( this->Grid )
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetGrid " << this->Grid
+          << endl;
+    }
+  *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
+        << "ReadFileInformation $kw(" << this->GetTclName() << ") \""
+        << this->FileEntry->GetValue() << "\"" << endl;
+  *file << "$kw(" << this->GetPVWindow()->GetTclName() << ") "
+        << "FinalizeRead $kw(" << this->GetTclName() << ") \""
+        << this->FileEntry->GetValue() << "\"" << endl;
+
+  // Let the PVWidgets set up the object.
+  int numWidgets = this->Widgets->GetNumberOfItems();
+  for (int i = 0; i < numWidgets; i++)
+    {
+    vtkPVWidget* widget = 
+      vtkPVWidget::SafeDownCast(this->Widgets->GetItemAsObject(i));
+    if (widget)
+      {
+      widget->SaveState(file);
+      }
+    }
+
+  // Call accept.
+  *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
+
+  this->VisitedFlag = 1;
 }
 
 //----------------------------------------------------------------------------

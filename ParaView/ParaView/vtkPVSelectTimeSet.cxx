@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.20");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.21");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -188,6 +188,11 @@ void vtkPVSelectTimeSet::SetTimeValue(float time)
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
 {
+  if (this->TimeSets->GetNumberOfItems() == 0)
+    {
+    return;
+    }
+
   if ( strncmp(item, "timeset", strlen("timeset")) == 0 )
     {
     this->Script("if [%s itemcget %s -open] "
@@ -305,14 +310,18 @@ void vtkPVSelectTimeSet::Reset()
   float actualTimeValue = atof(pm->GetRootResult());
   int matchFound = 0;
 
+  this->ModifiedFlag = 0;
+
   if (this->TimeSets->GetNumberOfItems() == 0)
     {
     this->Script("pack forget %s", this->TreeFrame->GetWidgetName());
     this->TimeLabel->SetLabel("No timesets available.");
     return;
     }
-
-  this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
+  else
+    {
+    this->Script("pack %s -expand t -fill x", this->TreeFrame->GetWidgetName());
+    }
 
   this->TimeSets->InitTraversal();
   vtkDataArray* da;
@@ -349,7 +358,6 @@ void vtkPVSelectTimeSet::Reset()
     }
   
   this->SetTimeValue(actualTimeValue);
-  this->ModifiedFlag = 0;
 }
 
 //-----------------------------------------------------------------------------
