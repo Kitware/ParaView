@@ -33,7 +33,7 @@
 
 //#include "vtkRef.h"
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.16");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient, "1.17");
 vtkStandardNewMacro(vtkDesktopDeliveryClient);
 
 vtkDesktopDeliveryClient::vtkDesktopDeliveryClient()
@@ -132,12 +132,13 @@ void vtkDesktopDeliveryClient::PostRenderProcessing()
   this->RenderTime += this->Timer->GetElapsedTime();
 
   vtkDesktopDeliveryServer::ImageParams ip;
-  this->Controller->Receive((int *)(&ip),
-                            vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
-                            this->ServerProcessId,
-                            vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
+  int comm_success =
+    this->Controller->Receive((int *)(&ip),
+                              vtkDesktopDeliveryServer::IMAGE_PARAMS_SIZE,
+                              this->ServerProcessId,
+                              vtkDesktopDeliveryServer::IMAGE_PARAMS_TAG);
 
-  if (ip.RemoteDisplay)
+  if (comm_success && ip.RemoteDisplay)
     {
     // Receive image.
     this->Timer->StartTimer();
