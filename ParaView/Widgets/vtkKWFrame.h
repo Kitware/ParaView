@@ -65,6 +65,13 @@ public:
   // Get the vtkKWWidget for the internal frame.
   vtkKWWidget *GetFrame() {return this->Frame;};
 
+  // Description:
+  // By default this is a simple frame. BY turning Scrollable on it becomes
+  // a scrolled frame. This must be set prior to creation.
+  vtkSetMacro(Scrollable,int);
+  vtkGetMacro(Scrollable,int);
+  vtkBooleanMacro(Scrollable,int);
+  
 protected:
   vtkKWFrame();
   ~vtkKWFrame();
@@ -74,7 +81,8 @@ protected:
   vtkKWWidget *ScrollFrame;
 
   char* FrameId;
-
+  int Scrollable;
+  
 private:
   vtkKWFrame(const vtkKWFrame&); // Not implemented
   void operator=(const vtkKWFrame&); // Not implemented

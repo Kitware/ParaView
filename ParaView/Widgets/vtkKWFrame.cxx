@@ -47,12 +47,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWFrame );
-vtkCxxRevisionMacro(vtkKWFrame, "1.10");
+vtkCxxRevisionMacro(vtkKWFrame, "1.11");
 
 vtkKWFrame::vtkKWFrame()
 {
   this->ScrollFrame = 0;
   this->Frame = 0;
+  this->Scrollable = 0;
 }
 
 vtkKWFrame::~vtkKWFrame()
@@ -70,6 +71,12 @@ vtkKWFrame::~vtkKWFrame()
 
 void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
 {
+  
+  if (args)
+    {
+    int a = *(int *)0;
+    }
+  
   const char *wname;
   
   // Set the application
@@ -124,4 +131,5 @@ void vtkKWFrame::Create(vtkKWApplication *app, const char* args)
 void vtkKWFrame::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "Scrollable " << this->Scrollable << "\n";
 }
