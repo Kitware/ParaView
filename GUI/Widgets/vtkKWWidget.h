@@ -356,6 +356,7 @@ public:
 protected:
   vtkKWWidget();
   ~vtkKWWidget();
+
   virtual void SerializeRevision(ostream& os, vtkIndent indent);
 
   //BTX
@@ -427,6 +428,7 @@ protected:
   // If no_curly_braces is true, curly braces will be removed from the
   // string, so that the resulting string can be used to set an option
   // using the usual {%s} syntax.
+
   const char* ConvertTclStringToInternalString(
     const char *str, int no_curly_braces = 1);
   const char* ConvertInternalStringToTclString(
@@ -442,6 +444,8 @@ private:
   // to avoid accessing GetChildren(). 
 
   vtkKWWidgetCollection *Children; 
+
+  int WidgetIsCreated;
 
   vtkKWWidget(const vtkKWWidget&); // Not implemented
   void operator=(const vtkKWWidget&); // Not implemented

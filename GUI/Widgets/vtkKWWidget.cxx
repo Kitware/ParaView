@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.103");
+vtkCxxRevisionMacro(vtkKWWidget, "1.104");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -53,6 +53,8 @@ vtkKWWidget::vtkKWWidget()
   this->TraceName                = NULL;
 
   this->Enabled                  = 1;
+
+  this->WidgetIsCreated          = 0;
 
   // Drag and Drop
 
@@ -175,6 +177,8 @@ int vtkKWWidget::Create(vtkKWApplication *app,
 
   this->SetApplication(app);
 
+  this->WidgetIsCreated = 1;
+
   if (type)
     {
     if (args)
@@ -218,7 +222,7 @@ int vtkKWWidget::Create(vtkKWApplication *app,
 // ---------------------------------------------------------------------------
 int vtkKWWidget::IsCreated()
 {
-  return (this->GetApplication() != NULL);
+  return (this->GetApplication() != NULL && this->WidgetIsCreated);
 }
 
 //----------------------------------------------------------------------------
@@ -463,7 +467,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.103 $");
+  this->ExtractRevision(os,"$Revision: 1.104 $");
 }
 
 //----------------------------------------------------------------------------
@@ -492,9 +496,9 @@ int vtkKWWidget::InitializeTrace(ofstream* file)
   int *pInit;
   int stateFlag = 0;
   
-  if(!this->IsCreated())
+  if(!this->GetApplication())
     {
-    vtkErrorMacro("Tracing before widget is created.");
+    vtkErrorMacro("Tracing before application is set on the widget.");
     return 0;
     }
 
