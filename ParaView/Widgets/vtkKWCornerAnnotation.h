@@ -129,6 +129,7 @@ public:
   virtual void SetMaximumLineHeightNoTrace(float);
   virtual void MaximumLineHeightCallback();
   virtual void MaximumLineHeightEndCallback();
+  vtkGetObjectMacro(MaximumLineHeightScale, vtkKWScale);
 
   // Description:
   // GUI components access
@@ -146,9 +147,29 @@ public:
   // Override to pass down to children.
   virtual void SetEnabled(int);
 
+  // Description:
+  // Update the GUI according to the value of the ivars
+  void Update();
+
+  // Description:
+  // Set the event invoked when the color of the annotation is changed.
+  // The AnnotationChangedEvent will be invoked too.
+  // Defaults to vtkKWEvent::AnnotationColorChangedEvent
+  vtkSetMacro(AnnotationColorChangedEvent, int)
+  vtkGetMacro(AnnotationColorChangedEvent, int)
+
+  // Description:
+  // Set the event invoked when the anything in the annotation is changed.
+  // Defaults to vtkKWEvent::ViewAnnotationChangedEvent
+  vtkSetMacro(AnnotationChangedEvent, int);
+  vtkGetMacro(AnnotationChangedEvent, int);
+
 protected:
   vtkKWCornerAnnotation();
   ~vtkKWCornerAnnotation();
+
+  int AnnotationColorChangedEvent;
+  int AnnotationChangedEvent;
 
   vtkCornerAnnotation    *CornerProp;
 
@@ -166,9 +187,6 @@ protected:
   vtkKWScale             *MaximumLineHeightScale;
   vtkKWTextProperty      *TextPropertyWidget;
 
-  // Update the GUI according to the value of the ivars
-
-  void Update();
   void Render();
 
 private:

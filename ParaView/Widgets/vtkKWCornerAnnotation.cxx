@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.42");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.43");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -70,6 +70,9 @@ int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
 vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 {
   this->CommandFunction = vtkKWCornerAnnotationCommand;
+
+  this->AnnotationColorChangedEvent = vtkKWEvent::AnnotationColorChangedEvent;
+  this->AnnotationChangedEvent = vtkKWEvent::ViewAnnotationChangedEvent;
 
   // CornerProp will either point to InternalCornerProp in vtkKWView mode, or
   // vtkKWRenderWidget::GetCornerProp() in vtkKWRenderWidget mode.
@@ -524,10 +527,9 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
         {
         this->View->AddComposite(this->InternalCornerComposite);
         }
-      if (this->RenderWidget &&
-          !this->RenderWidget->HasProp(this->CornerProp))
+      if (this->RenderWidget)
         {
-        this->RenderWidget->AddProp(this->CornerProp);
+        this->RenderWidget->CornerAnnotationOn();
         }
       }
     else
@@ -539,10 +541,9 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
         {
         this->View->RemoveComposite(this->InternalCornerComposite);
         }
-      if (this->RenderWidget &&
-          this->RenderWidget->HasProp(this->CornerProp))
+      if (this->RenderWidget)
         {
-        this->RenderWidget->RemoveProp(this->CornerProp);
+        this->RenderWidget->CornerAnnotationOff();
         }
       }
     }
@@ -551,7 +552,7 @@ void vtkKWCornerAnnotation::SetVisibility(int state)
     {
     this->Update();
     this->Render();
-    this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
+    this->InvokeEvent(this->AnnotationChangedEvent, 0);
     this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), state);
     }
 }
@@ -581,7 +582,7 @@ void vtkKWCornerAnnotation::SetMaximumLineHeightNoTrace(float v)
     {
     this->Render();
     }
-  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
+  this->InvokeEvent(this->AnnotationChangedEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -640,7 +641,7 @@ void vtkKWCornerAnnotation::SetTextColor(float r, float g, float b)
 void vtkKWCornerAnnotation::TextColorCallback()
 {
   float *color = this->GetTextColor();
-  this->InvokeEvent(vtkKWEvent::AnnotationColorChangedEvent, color);
+  this->InvokeEvent(this->AnnotationColorChangedEvent, color);
 }
 
 //----------------------------------------------------------------------------
@@ -650,7 +651,7 @@ void vtkKWCornerAnnotation::TextPropertyCallback()
     {
     this->Render();
     }
-  this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
+  this->InvokeEvent(this->AnnotationChangedEvent, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -677,7 +678,7 @@ void vtkKWCornerAnnotation::SetCornerText(const char *text, int corner)
       {
       this->Render();
       }
-    this->InvokeEvent(vtkKWEvent::ViewAnnotationChangedEvent, 0);
+    this->InvokeEvent(this->AnnotationChangedEvent, 0);
     this->AddTraceEntry("$kw(%s) SetCornerText {%s} %d", 
                         this->GetTclName(), text, corner);
     }
@@ -759,7 +760,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.42 $");
+  this->ExtractRevision(os,"$Revision: 1.43 $");
   vtkKWLabeledFrame::SerializeRevision(os,indent);
 }
 
@@ -811,6 +812,11 @@ void vtkKWCornerAnnotation::SetEnabled(int e)
 void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+
+  os << indent << "AnnotationColorChangedEvent: " 
+     << this->AnnotationColorChangedEvent << endl;
+  os << indent << "AnnotationChangedEvent: " 
+     << this->AnnotationChangedEvent << endl;
   os << indent << "CornerProp: " << this->GetCornerProp() << endl;
   os << indent << "View: " << this->GetView() << endl;
   os << indent << "RenderWidget: " << this->GetRenderWidget() << endl;
