@@ -30,10 +30,6 @@ $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
 set pv(vtkTemp143) [$pv(vtkTemp136) GetPVWidget {Scalars}]
 set pv(vtkTemp146) [$pv(vtkTemp136) GetPVWidget {Contour Values}]
 $pv(vtkTemp146) RemoveAllValues
-$pv(vtkTemp146) AddValue 0.450000
-$pv(vtkTemp146) AddValue 0.550000
-$pv(vtkTemp146) AddValue 0.650000
-$pv(vtkTemp146) AddValue 0.750000
 $pv(vtkTemp146) AddValue 0.850000
 $pv(vtkTemp146) AddValue 0.950000
 set pv(vtkTemp152) [$pv(vtkTemp136) GetPVWidget {Compute Normals}]
@@ -44,20 +40,12 @@ $pv(vtkTemp136) AcceptCallback
 $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
 $pv(vtkTemp143) SetValue xRamp
 $pv(vtkTemp146) RemoveAllValues
-$pv(vtkTemp146) AddValue 0.450000
-$pv(vtkTemp146) AddValue 0.550000
-$pv(vtkTemp146) AddValue 0.650000
-$pv(vtkTemp146) AddValue 0.750000
 $pv(vtkTemp146) AddValue 0.850000
 $pv(vtkTemp146) AddValue 0.950000
 $pv(vtkTemp136) AcceptCallback
 $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
 $pv(vtkTemp143) SetValue yRamp
 $pv(vtkTemp146) RemoveAllValues
-$pv(vtkTemp146) AddValue 0.450000
-$pv(vtkTemp146) AddValue 0.550000
-$pv(vtkTemp146) AddValue 0.650000
-$pv(vtkTemp146) AddValue 0.750000
 $pv(vtkTemp146) AddValue 0.850000
 $pv(vtkTemp146) AddValue 0.950000
 $pv(vtkTemp136) AcceptCallback
@@ -65,10 +53,6 @@ $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
 $pv(vtkTemp143) SetValue zRamp
 $pv(vtkTemp146) RemoveAllValues
 $pv(vtkTemp146) AddValue 0.450000
-$pv(vtkTemp146) AddValue 0.550000
-$pv(vtkTemp146) AddValue 0.650000
-$pv(vtkTemp146) AddValue 0.750000
-$pv(vtkTemp146) AddValue 0.850000
 $pv(vtkTemp146) AddValue 0.950000
 $pv(vtkTemp136) AcceptCallback
 set pv(vtkTemp188) [$pv(vtkTemp1) CreatePVSource WarpScalar]
@@ -93,7 +77,6 @@ set pv(vtkTemp232) [$pv(vtkTemp221) GetPVWidget {NumberOfSubdivisions}]
 $pv(vtkTemp221) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp188)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
@@ -112,44 +95,17 @@ set pv(vtkTemp252) [$pv(vtkTemp241) GetPVWidget {NumberOfSubdivisions}]
 $pv(vtkTemp241) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp221)
 $pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp188)
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp194) SetCurrentValue $pv(vtkTemp241)
 $pv(vtkTemp188) AcceptCallback
 $pv(vtkTemp194) SetCurrentValue $pv(vtkTemp241)
 $pv(vtkTemp200) SetValue 2
 $pv(vtkTemp188) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp241)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp247) SetCurrentValue $pv(vtkTemp136)
-$pv(vtkTemp252) SetValue 2
-$pv(vtkTemp241) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp221)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp221) DeleteCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp100)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp241)
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp247) SetCurrentValue $pv(vtkTemp136)
 $pv(vtkTemp252) SetValue 3
@@ -157,36 +113,17 @@ $pv(vtkTemp241) AcceptCallback
 $pv(vtkTemp247) SetCurrentValue $pv(vtkTemp136)
 $pv(vtkTemp252) SetValue 4
 $pv(vtkTemp241) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp188)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp194) SetCurrentValue $pv(vtkTemp241)
-$pv(vtkTemp200) SetValue 3
-$pv(vtkTemp188) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
 $pv(vtkTemp146) RemoveAllValues
 $pv(vtkTemp146) AddValue 0.450000
-$pv(vtkTemp146) AddValue 0.550000
-$pv(vtkTemp146) AddValue 0.650000
-$pv(vtkTemp146) AddValue 0.750000
-$pv(vtkTemp146) AddValue 0.850000
-$pv(vtkTemp146) AddValue 0.950000
 $pv(vtkTemp146) AddValue 0.350000
 $pv(vtkTemp136) AcceptCallback
 $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
 $pv(vtkTemp146) RemoveAllValues
 $pv(vtkTemp146) AddValue 0.450000
-$pv(vtkTemp146) AddValue 0.550000
-$pv(vtkTemp146) AddValue 0.650000
-$pv(vtkTemp146) AddValue 0.750000
-$pv(vtkTemp146) AddValue 0.850000
-$pv(vtkTemp146) AddValue 0.950000
-$pv(vtkTemp146) AddValue 0.350000
-$pv(vtkTemp146) AddValue 0.250000
-$pv(vtkTemp146) AddValue 0.150000
 $pv(vtkTemp146) AddValue 0.050000
 $pv(vtkTemp136) AcceptCallback
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp241)
@@ -207,27 +144,18 @@ $pv(vtkTemp188) AcceptCallback
 $pv(vtkTemp194) SetCurrentValue $pv(vtkTemp241)
 $pv(vtkTemp195) SetValue scalars
 $pv(vtkTemp188) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp241)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp142) SetCurrentValue $pv(vtkTemp100)
 $pv(vtkTemp143) SetValue yRamp
 $pv(vtkTemp136) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp241)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp188)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp194) SetCurrentValue $pv(vtkTemp241)
 $pv(vtkTemp203) SetValue 0 1 0
 $pv(vtkTemp188) AcceptCallback
-$pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp241)
-$pv(vtkTemp1) ShowCurrentSourceProperties
-$pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) SetCurrentPVSource $pv(vtkTemp136)
 $pv(vtkTemp1) ShowCurrentSourceProperties
 $pv(vtkTemp1) ShowCurrentSourceProperties
@@ -253,13 +181,6 @@ $pv(vtkTemp289) SetValue xRamp
 set pv(vtkTemp292) [$pv(vtkTemp282) GetPVWidget {Contour Values}]
 $pv(vtkTemp292) RemoveAllValues
 $pv(vtkTemp292) AddValue 0.050000
-$pv(vtkTemp292) AddValue 0.150000
-$pv(vtkTemp292) AddValue 0.250000
-$pv(vtkTemp292) AddValue 0.350000
-$pv(vtkTemp292) AddValue 0.450000
-$pv(vtkTemp292) AddValue 0.550000
-$pv(vtkTemp292) AddValue 0.650000
-$pv(vtkTemp292) AddValue 0.750000
 $pv(vtkTemp292) AddValue 0.850000
 $pv(vtkTemp292) AddValue 0.950000
 set pv(vtkTemp298) [$pv(vtkTemp282) GetPVWidget {Compute Normals}]

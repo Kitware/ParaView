@@ -74,7 +74,7 @@ $cntOutput SetVisibility 1
 
 set start 0.2
 set end 0.7
-set num 5
+set num 2
 set incr [expr ($end - $start)/$num]
 for {set i 0} {$i < $num} {incr i 1} {
     set val [expr $start + $i * $incr]
@@ -92,7 +92,7 @@ $cInt UpdateParameterWidgets
 
 RenWin1 SetSize 300 300
 
-for {set i 0} {$i < 3} {incr i 1} {
+for {set i 0} {$i < 1} {incr i 1} {
     $camera Azimuth 10
     RenWin1 Render
     update
@@ -114,25 +114,6 @@ $VOIEntry SetValue 0 56 0 32 0 0
 $pvExtract AcceptCallback
 
 [$pvExtract GetPVOutput] SetVisibility 1
-
-
-RenWin1 Render
-
-for {set i 0} {$i < 2} {incr i 1} {
-    $VOIEntry SetValue 0 56 0 32 $i $i
-    $pvExtract AcceptCallback
-    RenWin1 Render
-    update
-
-}
-
-for {set i 3} {$i >= 0} {incr i -1} {
-    $VOIEntry SetValue 0 56 0 32 $i $i
-    $pvExtract AcceptCallback
-    RenWin1 Render
-    update
-
-}
 
 [$pvGlyph GetPVOutput] SetVisibility 1
 

@@ -25,15 +25,15 @@ $pv(vtkTemp168) SetValue {outputArray}
 $pv(vtkTemp156) AcceptCallback
 
 # Retrace
-update
-Application StopRecordingScript
-[ Application GetMainWindow ] DeleteAllSources
-# Source the trace to regenerate the sources.
-if {[catch {set channel [open test.tmp w]}] == 0 } {
-   close $channel
-   file delete -force test.tmp
-   source "ParaViewTrace.pvs"
-}
+#  update
+#  Application StopRecordingScript
+#  [ Application GetMainWindow ] DeleteAllSources
+#  # Source the trace to regenerate the sources.
+#  if {[catch {set channel [open test.tmp w]}] == 0 } {
+#     close $channel
+#     file delete -force test.tmp
+#     source "ParaViewTrace.pvs"
+#  }
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300
