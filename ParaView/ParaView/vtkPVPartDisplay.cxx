@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.17");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.18");
 
 
 //----------------------------------------------------------------------------
@@ -313,7 +313,11 @@ void vtkPVPartDisplay::CacheUpdate(int idx, int total)
   vtkPVProcessModule *pm = pvApp->GetProcessModule();
   vtkClientServerStream& stream = pm->GetStream();
   stream << vtkClientServerStream::Invoke << this->UpdateSuppressorID 
-         << "CacheUpdate" << idx << total << vtkClientServerStream::End; 
+         << "CacheUpdate" << idx << total << vtkClientServerStream::End;
+  // I don't like calling Modified directly, but I need the scalars to be
+  // remapped through the lookup table, and this causes that to happen.
+  stream << vtkClientServerStream::Invoke << this->MapperID << "Modified"
+         << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
 }
 
