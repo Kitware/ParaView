@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.1");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.7.2.2");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -140,9 +140,11 @@ void vtkPVSourcesNavigationWindow::Reconfigure()
     {
     this->Script("grid remove %s", this->ScrollBar->GetWidgetName());
     }
+  // You don't want to stick the visible part right at the border of the
+  // canvas, but let some space (2 pixels on top and left)
   this->Script("%s configure -scrollregion \"%d %d %d %d\"", 
                this->Canvas->GetWidgetName(), 
-               bbox[0], bbox[1], bbox[2], bbox[3]);
+               bbox[0] - 2, bbox[1] - 2, bbox[2], bbox[3]);
   this->PostChildUpdate();
 }
 
