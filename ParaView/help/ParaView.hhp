@@ -1,0 +1,43 @@
+[OPTIONS]
+Compiled File=ParaView.chm
+Title=ParaViewHelp
+Contents File=ParaView.hhc
+Index File=ParaView.hhk
+Default topic=Introduction.htm
+Default Window=NewWindow
+Error log file=
+Display compile progress=No
+Display compile notes=No
+Full-text search=Yes
+Binary Index=No
+Auto Index=No
+Enhanced decompilation=No
+Binary TOC=No
+Flat=No
+
+[WINDOWS]
+NewWindow="New Window Caption","ParaView.hhc","ParaView.hhk","","",,,,,0x420,0,0x200e,[0,0,500,400],0x0,0x0,,0,0,0
+
+[FILES]
+Glyph.htm
+Threshold.htm
+Calculator.htm
+Isosurface_(Contour).htm
+Loading_Data.htm
+Win32.htm
+Linux_Unix.htm
+Downloading.htm
+Filters_Introduction.htm
+Introduction.htm
+eHelp.xml
+
+ParaView.brs
+ehlpdhtm.js
+[ALIAS]
+#include ParaView.ali
+
+[MAP]
+
+[TEXT POPUPS]
+
+
