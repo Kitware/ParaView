@@ -39,7 +39,6 @@ class vtkPVApplication;
 class vtkPVData;
 class vtkPVInputMenu;
 class vtkPVInputProperty;
-class vtkPVLabel;
 class vtkPVRenderView;
 class vtkPVSourceCollection;
 class vtkPVWidget;
