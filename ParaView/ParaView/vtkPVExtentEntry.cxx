@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.11");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.12");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -461,12 +461,9 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
                   << vtkClientServerStream::LastResult << "GetWholeExtent"
                   << vtkClientServerStream::End;
   pm->SendStreamToServerRoot();
-  for(int i =0; i < 6; ++i)
+  if(!pm->GetLastServerResult().GetArgument(0, 0, ext, 6))
     {
-    if(!pm->GetLastServerResult().GetArgument(0, 0, ext+i))
-      {
-      vtkErrorMacro("Bad return value from GetWholeExtent");
-      }
+    vtkErrorMacro("Bad return value from GetWholeExtent");
     }
 
   if (mode == 0)
