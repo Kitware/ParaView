@@ -17,14 +17,14 @@
 #include "vtkClientServerInterpreter.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVProcessModule.h"
-#include "vtkSource.h"
+#include "vtkAlgorithm.h"
 #include "vtkClientServerStream.h"
 
 #include <vtkstd/string>
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerArraySelection);
-vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.1");
+vtkCxxRevisionMacro(vtkPVServerArraySelection, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkPVServerArraySelectionInternals
@@ -53,7 +53,8 @@ void vtkPVServerArraySelection::PrintSelf(ostream& os, vtkIndent indent)
 
 //----------------------------------------------------------------------------
 const vtkClientServerStream&
-vtkPVServerArraySelection::GetArraySettings(vtkSource* source, const char* arrayname)
+vtkPVServerArraySelection
+::GetArraySettings(vtkAlgorithm* source, const char* arrayname)
 {
   // Reset the stream for a new list of array names.
   this->Internal->Result.Reset();
