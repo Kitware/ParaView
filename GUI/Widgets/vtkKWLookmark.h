@@ -42,8 +42,6 @@ class vtkKWText;
 class vtkKWLabeledCheckButton;
 class vtkKWRadioButtonSet;
 
-// vtkSetObjectMacro seems to require that this be included - is there a workaround?
-//#include "vtkPVLookmark.h"
 
 class VTK_EXPORT vtkKWLookmark : public vtkKWWidget
 {
@@ -89,12 +87,6 @@ public:
   // Description:
   // If TRUE, use the default dataset when loading lookmark, else use the currently selected one in source list
   int IsLockedToDataset();
-
-  // Description:
-  // Each vtkKWLookmark object must know about its vtkPVLookmark counterpart for when a lookmark is renamed
-  // Its the cleanest way I could think of telling the vtkPVLookmark object about the renaming.
-//  vtkGetObjectMacro(Lookmark,vtkPVLookmark);
-//  vtkSetObjectMacro(Lookmark,vtkPVLookmark);
 
   // Description: 
   // Convenience method for deleting the widget
