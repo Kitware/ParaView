@@ -1527,7 +1527,7 @@ void vtkPVActorComposite::ScalarBarOrientationCallback()
     {
     this->Script("[%s GetPositionCoordinate] SetValue 0.87 0.25",
                  this->GetScalarBarTclName());
-    this->Script("%s SetOrietationToVertical", this->GetScalarBarTclName());
+    this->Script("%s SetOrientationToVertical", this->GetScalarBarTclName());
     this->Script("%s SetHeight 0.5", this->GetScalarBarTclName());
     this->Script("%s SetWidth 0.13", this->GetScalarBarTclName());
     }
