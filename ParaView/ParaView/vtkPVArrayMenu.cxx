@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.46");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.47");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -359,26 +359,17 @@ void vtkPVArrayMenu::AcceptInternal(vtkClientServerID sourceID)
     return;
     }
 
-  char **cmds = new char*[2];
-  char *string;
-  int *numStrings = new int[2];
-  int *numScalars = new int[2];
-  
   if (this->ArrayName)
     {
-    cmds[0] = new char[strlen(this->InputName)+strlen(attributeName)+7];
-    sprintf(cmds[0], "Select%s%s", this->InputName, attributeName);
-    numScalars[0] = this->ShowComponentMenu;
-    numStrings[0] = 1;
-    this->Property->SetVTKCommands(1, cmds, numStrings, numScalars);
-    string = new char[strlen(this->ArrayName)+1];
-    sprintf(string, this->ArrayName);
+    int numScalars = this->ShowComponentMenu;
+    int numStrings = 1;
+    char* cmd = new char[strlen(this->InputName)+strlen(attributeName)+7];
+    sprintf(cmd, "Select%s%s", this->InputName, attributeName);
+    this->Property->SetVTKCommands(1, &cmd, &numStrings, &numScalars);
     this->Property->SetStrings(1, &this->ArrayName);
     }
   else
     {
-    cmds[0] = new char[strlen(this->InputName)+strlen(attributeName)+7];
-    sprintf(cmds[0], "Select%s%s", this->InputName, attributeName);
     this->Property->SetStrings(0, NULL);
     }
 
