@@ -27,7 +27,6 @@
 #include "vtkPVApplication.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVInteractorStyle.h"
-#include "vtkPVPushButton.h"
 #include "vtkPVScale.h"
 #include "vtkPVVectorEntry.h"
 #include "vtkPVWidget.h"
@@ -42,7 +41,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.33");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.34");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -312,7 +311,6 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     return;
     }
   vtkPVScale* scale = vtkPVScale::SafeDownCast(widget);
-  vtkPVPushButton* pushButton = vtkPVPushButton::SafeDownCast(widget);
   vtkPVVectorEntry* vectorEntry = vtkPVVectorEntry::SafeDownCast(widget);
   char* value = 0;
   if ( scale )
@@ -321,10 +319,6 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     str << "[ " << scale->GetTclName() << " GetValue ]" << ends;
     value = vtkString::Duplicate(str.str());
     str.rdbuf()->freeze(0);
-    }
-  else if ( pushButton )
-    {
-    value = vtkString::Duplicate("");
     }
   else if ( vectorEntry )
     {
@@ -765,12 +759,7 @@ void vtkPVInteractorStyleControl::ResetWidget(vtkPVCameraManipulator* man,
     return;
     }
   //vtkPVScale* scale = vtkPVScale::SafeDownCast(pw);
-  vtkPVPushButton* pushButton = vtkPVPushButton::SafeDownCast(pw);
   vtkPVVectorEntry* vectorEntry = vtkPVVectorEntry::SafeDownCast(pw);
-  if ( pushButton )
-    {
-    return;
-    }
   if ( vectorEntry )
     {
     this->CurrentManipulator = man;
