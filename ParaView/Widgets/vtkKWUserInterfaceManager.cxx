@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 //------------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.2");
+vtkCxxRevisionMacro(vtkKWUserInterfaceManager, "1.3");
 
 int vtkKWUserInterfaceManagerCommand(ClientData cd, Tcl_Interp *interp,
                                      int argc, char *argv[]);
@@ -257,7 +257,7 @@ int vtkKWUserInterfaceManager::RemovePanel(vtkKWUserInterfacePanel *panel)
 
   vtkKWUserInterfaceManager::PanelSlot *panel_slot = this->GetPanelSlot(panel);
 
-  int pos = 0;
+  vtkIdType pos = 0;
   if (this->Panels->FindItem(panel_slot, pos) != VTK_OK)
     {
     vtkErrorMacro("Error while removing a panel from the manager "

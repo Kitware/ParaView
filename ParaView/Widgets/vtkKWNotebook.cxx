@@ -84,7 +84,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.32");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.33");
 
 //------------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
@@ -585,7 +585,7 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
     return 0;
     }
 
-  int pos = 0;
+  vtkIdType pos = 0;
   if (this->Pages->FindItem(page, pos) != VTK_OK)
     {
     vtkErrorMacro("Error while removing a page from the notebook "
