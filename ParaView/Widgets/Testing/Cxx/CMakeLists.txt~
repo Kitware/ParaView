@@ -1,7 +1,0 @@
-ADD_EXECUTABLE( TestHashTable TestHashTable )
-ADD_EXECUTABLE( TestPointerArray TestPointerArray )
-
-LINK_LIBRARIES( 
-    vtkKWWidgetsTcl
-    vtkCommon
-)
