@@ -145,7 +145,7 @@ void vtkPVSendStreamToClientServerNodeRMI(void *localArg, void *remoteArg,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.68");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.69");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -519,6 +519,16 @@ void vtkPVClientServerModule::ConnectToRemote()
       {
       this->RenderServerSocket = vtkSocketController::New();
       this->RenderServerSocket->SetCommunicator(commRenderServer);
+      }
+    else
+      {
+      vtkErrorMacro("Could not connect to render server on host: " << this->RenderServerHostName 
+                    << " Port: " << this->RenderServerPort); 
+      comm->Delete();
+      commRenderServer->Delete();
+      pvApp->Exit();
+      this->ReturnValue = 1;
+      return;
       }
     }
 

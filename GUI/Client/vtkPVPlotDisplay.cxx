@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPlotDisplay);
-vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.5");
+vtkCxxRevisionMacro(vtkPVPlotDisplay, "1.6");
 
 
 //----------------------------------------------------------------------------
@@ -473,6 +473,7 @@ void vtkPVPlotDisplay::Update()
            << this->XYPlotActorID
            << "Modified" << vtkClientServerStream::End;
     this->GeometryIsValid = 1;
+    pm->SendStreamToClientAndRenderServer();
     }
 }
 
