@@ -239,7 +239,7 @@ void vtkPVApplication::Exit()
     {
     if (id != myId)
       {
-      this->Controller->TriggerRMI(id, VTK_BREAK_RMI_TAG);
+      this->Controller->TriggerRMI(id, vtkMultiProcessController::BREAK_RMI_TAG);
       }
     }
   this->vtkKWApplication::Exit();

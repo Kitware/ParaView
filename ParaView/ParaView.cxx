@@ -276,7 +276,8 @@ int main(int argc, char *argv[])
   pvArgs.argv = argv;
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();  
-  controller->Initialize(argc, argv);
+//  controller->Initialize(argc, argv);
+  controller->Initialize(&argc, &argv);
   //controller->SetNumberOfProcesses(2);
 
   controller->SetSingleMethod(Process_Init, (void *)(&pvArgs));
