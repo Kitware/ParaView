@@ -53,7 +53,7 @@ class VTK_EXPORT vtkPVPLOT3DReaderModule : public vtkPVAdvancedReaderModule
 {
 public:
   static vtkPVPLOT3DReaderModule* New();
-  vtkTypeRevisionMacro(vtkPVPLOT3DReaderModule, vtkPVReaderModule);
+  vtkTypeRevisionMacro(vtkPVPLOT3DReaderModule, vtkPVAdvancedReaderModule);
   void PrintSelf(ostream& os, vtkIndent indent);
     
   // Description:
