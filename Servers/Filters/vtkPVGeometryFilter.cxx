@@ -45,7 +45,7 @@
 #include "vtkStructuredGridOutlineFilter.h"
 #include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.47");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.48");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -612,7 +612,6 @@ void vtkPVGeometryFilter::CTHDataExecute(
 {
   if (!this->UseOutline)
     {
-    vtkPolyData *output = this->GetOutput();
     vtkCTHData* inCopy = vtkCTHData::New();
     inCopy->ShallowCopy(input);
     vtkCTHAMRSurface *surface = vtkCTHAMRSurface::New();
