@@ -53,6 +53,7 @@ class vtkKWListBox;
 class vtkKWEntry;
 class vtkKWPushButton;
 class vtkKWLabel;
+class vtkContourValues;
 
 class VTK_EXPORT vtkPVContourEntry : public vtkPVWidget
 {
@@ -73,7 +74,7 @@ public:
   
   // Description:
   // Access to this widget from a script.
-  void AddValue(char* val);
+  void AddValue(float val);
   void RemoveAllValues();
 
   // Description:
@@ -122,6 +123,10 @@ protected:
   vtkPVContourEntry();
   ~vtkPVContourEntry();
 
+  // Update UI from ContourValues object.
+  void Update();
+
+  vtkContourValues *ContourValues;
   vtkKWLabel* ContourValuesLabel;
   vtkKWListBox *ContourValuesList;
   vtkKWWidget* NewValueFrame;
@@ -129,7 +134,6 @@ protected:
   vtkKWEntry* NewValueEntry;
   vtkKWPushButton* AddValueButton;
   vtkKWPushButton* DeleteValueButton;
-
 
   vtkPVContourEntry(const vtkPVContourEntry&); // Not implemented
   void operator=(const vtkPVContourEntry&); // Not implemented

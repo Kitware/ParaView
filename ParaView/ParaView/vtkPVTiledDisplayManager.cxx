@@ -43,7 +43,7 @@
  #include <mpi.h>
 #endif
 
-vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.8");
+vtkCxxRevisionMacro(vtkPVTiledDisplayManager, "1.9");
 vtkStandardNewMacro(vtkPVTiledDisplayManager);
 
 vtkCxxSetObjectMacro(vtkPVTiledDisplayManager, RenderView, vtkObject);
@@ -1261,6 +1261,7 @@ void vtkPVTiledDisplayManager::PrintSelf(ostream& os, vtkIndent indent)
     {
     os << indent << "RenderWindow: (none)\n";
     }
+  os << indent << "UseCompositing: " << this->UseCompositing << "\n";
   os << indent << "LODReductionFactor: " << this->LODReductionFactor << "\n";
   
   os << indent << "Tile Dimensions: " << this->TileDimensions[0] << ", "

@@ -67,7 +67,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVWidget, "1.31");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -238,7 +238,8 @@ void vtkPVWidget::ModifiedCallback()
 {
   this->ModifiedFlag = 1;
   
-  if (this->ModifiedCommandObjectTclName && this->ModifiedCommandMethod)
+  if (this->ModifiedCommandObjectTclName && this->ModifiedCommandMethod &&
+      this->Application)
     {
     this->Script("%s %s", this->ModifiedCommandObjectTclName,
                  this->ModifiedCommandMethod);
@@ -430,7 +431,7 @@ void vtkPVWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWidget ";
-  this->ExtractRevision(os,"$Revision: 1.30 $");
+  this->ExtractRevision(os,"$Revision: 1.31 $");
 }
 
 //-----------------------------------------------------------------------------

@@ -96,7 +96,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.195");
+vtkCxxRevisionMacro(vtkPVData, "1.196");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2503,13 +2503,13 @@ void vtkPVData::SaveState(ofstream *file)
     *file << "$kw(" << this->GetTclName() << ") SetCubeAxesVisibility 1\n";
     }
 
-  i1 = this->PointSizeThumbWheel->GetValue();
+  i1 = (int)(this->PointSizeThumbWheel->GetValue());
   if (i1 != 1)
     {
     *file << "$kw(" << this->GetTclName() << ") SetPointSize " << i1 << endl;
     }
     
-  i1 = this->LineWidthThumbWheel->GetValue();
+  i1 = (int)(this->LineWidthThumbWheel->GetValue());
   if (i1 != 1)
     {
     *file << "$kw(" << this->GetTclName() << ") SetLineWidth " << i1 << endl;
@@ -3041,7 +3041,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.195 $");
+  this->ExtractRevision(os,"$Revision: 1.196 $");
 }
 
 //----------------------------------------------------------------------------
