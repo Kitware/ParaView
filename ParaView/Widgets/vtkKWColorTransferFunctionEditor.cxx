@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWColorTransferFunctionEditor);
-vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.13");
+vtkCxxRevisionMacro(vtkKWColorTransferFunctionEditor, "1.14");
 
 #define VTK_KW_CTF_EDITOR_RGB_LABEL "RGB"
 #define VTK_KW_CTF_EDITOR_HSV_LABEL "HSV"
@@ -212,22 +212,14 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   float rgb[3] = { 1.0, 1.0, 1.0 };
   this->ColorTransferFunction->GetColor(parameter, rgb);
 
-  // Add the point and redraw if a point was really added
-  // If we the point was inserted before the selection, shift the selection
+  // Add the point
 
   int old_size = this->GetFunctionSize();
+
   id = this->ColorTransferFunction->AddRGBPoint(
     parameter, rgb[0], rgb[1], rgb[2]);
-  if (old_size != this->GetFunctionSize())
-    {
-    this->RedrawCanvasPoint(id);
-    if (this->HasSelection() && id <= this->SelectedPoint)
-      {
-      this->SelectPoint(this->SelectedPoint + 1);
-      }
-    }
 
-  return 1;
+  return (old_size != this->GetFunctionSize());
 }
 
 //----------------------------------------------------------------------------
@@ -244,22 +236,14 @@ int vtkKWColorTransferFunctionEditor::AddFunctionPointAtParameter(
   float rgb[3] = { 1.0, 1.0, 1.0 };
   this->ColorTransferFunction->GetColor(parameter, rgb);
 
-  // Add the point and redraw if a point was really added
-  // If we the point was inserted before the selection, shift the selection
+  // Add the point
 
   int old_size = this->GetFunctionSize();
+
   id = this->ColorTransferFunction->AddRGBPoint(
     parameter, rgb[0], rgb[1], rgb[2]);
-  if (old_size != this->GetFunctionSize())
-    {
-    this->RedrawCanvasPoint(id);
-    if (this->HasSelection() && id <= this->SelectedPoint)
-      {
-      this->SelectPoint(this->SelectedPoint + 1);
-      }
-    }
 
-  return 1;
+  return (old_size != this->GetFunctionSize());
 }
 
 //----------------------------------------------------------------------------
@@ -369,36 +353,20 @@ int vtkKWColorTransferFunctionEditor::MoveFunctionPointToParameter(
 //----------------------------------------------------------------------------
 int vtkKWColorTransferFunctionEditor::RemoveFunctionPoint(int id)
 {
-  if (!this->IsCreated() || 
-      !this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
+  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
       !this->FunctionPointCanBeRemoved(id))
     {
     return 0;
     }
 
-  // If selected, deselect first
-
-  if (id == this->SelectedPoint)
-    {
-    this->ClearSelection();
-    }
-
-  // Remove the point and redraw if a point was really removed
-  // If we the point was removed before the selection, shift the selection
+  // Remove the point
 
   int old_size = this->GetFunctionSize();
+
   this->ColorTransferFunction->RemovePoint(
     this->ColorTransferFunction->GetDataPointer()[id * 4]);
-  if (old_size != this->GetFunctionSize())
-    {
-    this->RedrawCanvasElements();
-    if (this->HasSelection() && id < this->SelectedPoint)
-      {
-      this->SelectPoint(this->SelectedPoint - 1);
-      }
-    }
 
-  return 1;
+  return (old_size != this->GetFunctionSize());
 }
 
 //----------------------------------------------------------------------------

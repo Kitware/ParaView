@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkKWPiecewiseFunctionEditor);
-vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.13");
+vtkCxxRevisionMacro(vtkKWPiecewiseFunctionEditor, "1.14");
 
 //----------------------------------------------------------------------------
 vtkKWPiecewiseFunctionEditor::vtkKWPiecewiseFunctionEditor()
@@ -223,21 +223,13 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtCanvasCoordinates(
   float parameter = (float)((double)x / factors[0]);
   float value = (float)(v_w_range[1] - ((double)y / factors[1]));
 
-  // Add the point and redraw if a point was really added
-  // If we the point was inserted before the selection, shift the selection
+  // Add the point
 
   int old_size = this->GetFunctionSize();
-  id = this->PiecewiseFunction->AddPoint(parameter, value);
-  if (old_size != this->GetFunctionSize())
-    {
-    this->RedrawCanvasPoint(id);
-    if (this->HasSelection() && id <= this->SelectedPoint)
-      {
-      this->SelectPoint(this->SelectedPoint + 1);
-      }
-    }
 
-  return 1;
+  id = this->PiecewiseFunction->AddPoint(parameter, value);
+
+  return (old_size != this->GetFunctionSize());
 }
 
 //----------------------------------------------------------------------------
@@ -253,21 +245,13 @@ int vtkKWPiecewiseFunctionEditor::AddFunctionPointAtParameter(
 
   float value = this->PiecewiseFunction->GetValue(parameter);
 
-  // Add the point and redraw if a point was really added
-  // If we the point was inserted before the selection, shift the selection
+  // Add the point
 
   int old_size = this->GetFunctionSize();
-  id = this->PiecewiseFunction->AddPoint(parameter, value);
-  if (old_size != this->GetFunctionSize())
-    {
-    this->RedrawCanvasPoint(id);
-    if (this->HasSelection() && id <= this->SelectedPoint)
-      {
-      this->SelectPoint(this->SelectedPoint + 1);
-      }
-    }
 
-  return 1;
+  id = this->PiecewiseFunction->AddPoint(parameter, value);
+
+  return (old_size != this->GetFunctionSize());
 }
 
 //----------------------------------------------------------------------------
@@ -418,36 +402,20 @@ int vtkKWPiecewiseFunctionEditor::MoveFunctionPointToParameter(
 //----------------------------------------------------------------------------
 int vtkKWPiecewiseFunctionEditor::RemoveFunctionPoint(int id)
 {
-  if (!this->IsCreated() || 
-      !this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
+  if (!this->HasFunction() || id < 0 || id >= this->GetFunctionSize() ||
       !this->FunctionPointCanBeRemoved(id))
     {
     return 0;
     }
 
-  // If selected, deselect first
-
-  if (id == this->SelectedPoint)
-    {
-    this->ClearSelection();
-    }
-
-  // Remove the point and redraw if a point was really removed
-  // If we the point was removed before the selection, shift the selection
+  // Remove the point
 
   int old_size = this->GetFunctionSize();
+
   this->PiecewiseFunction->RemovePoint(
     this->PiecewiseFunction->GetDataPointer()[id * 2]);
-  if (old_size != this->GetFunctionSize())
-    {
-    this->RedrawCanvasElements();
-    if (this->HasSelection() && id < this->SelectedPoint)
-      {
-      this->SelectPoint(this->SelectedPoint - 1);
-      }
-    }
 
-  return 1;
+  return (old_size != this->GetFunctionSize());
 }
 
 //----------------------------------------------------------------------------
