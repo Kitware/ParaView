@@ -15,6 +15,7 @@
 #include "vtkKWText.h"
 #include "vtkObjectFactory.h"
 #include "vtkKWTkUtilities.h"
+#include <vtkstd/string>
 
 #define VTK_KWTEXT_BOLD_MARKER "**"
 #define VTK_KWTEXT_BOLD_TAG "_boldtag_"
@@ -27,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWText);
-vtkCxxRevisionMacro(vtkKWText, "1.24");
+vtkCxxRevisionMacro(vtkKWText, "1.25");
 
 //----------------------------------------------------------------------------
 vtkKWText::vtkKWText()
