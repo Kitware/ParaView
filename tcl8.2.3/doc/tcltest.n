@@ -1,0 +1,730 @@
+'\"
+'\" Copyright (c) 1990-1994 The Regents of the University of California
+'\" Copyright (c) 1994-1997 Sun Microsystems, Inc.
+'\" Copyright (c) 1998-1999 Scriptics Corporation
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH "Tcltest" n 8.2 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+Tcltest \- Test harness support code and utilities
+.SH SYNOPSIS
+\fBpackage require tcltest ?1.0?\fP
+.sp
+\fB::tcltest::test \fIname desc ?constraint? script expectedAnswer\fR
+.sp
+\fB::tcltest::cleanupTests \fI?runningMultipleTests?\fR
+.sp
+\fB::tcltest::getMatchingTestFiles\fR
+.sp
+\fB::tcltest::makeFile \fIcontents name\fR
+.sp
+\fB::tcltest::removeFile \fIname\fR
+.sp
+\fB::tcltest::makeDirectory \fIname\fR
+.sp
+\fB::tcltest::removeDirectory \fIname\fR
+.sp
+\fB::tcltest::viewFile \fIname\fR
+.sp
+\fB::tcltest::normalizeMsg \fImsg\fR
+.sp
+\fB::tcltest::bytestring \fIstring\fR
+.sp
+\fB::tcltest::saveState\fR
+.sp
+\fB::tcltest::restoreState\fR
+.sp
+\fB::tcltest::threadReap\fR
+.BE
+.SH DESCRIPTION
+.PP
+The \fBtcltest\fR package provides the user with utility tools for
+writing and running tests in the Tcl test suite.  It can also be used
+to create a customized test harness for an extension. 
+.PP
+The Tcl test suite consists of multiple .test files, each of which
+contains multiple test cases.  Each test case consists of a call to
+the test command, which specifies the name of  test, a short
+description, any constraints that apply to the test case, the script
+to be run, and expected results.  See the sections \fI"Tests,"\fR
+\fI"Test Constraints,"\fR and \fI"Test Files and How to Run Them"\fR
+for more details. 
+.PP
+It is also possible to add to this test harness to create your own
+customized test harness implementation.  For more defails, see the
+section \fI"How to Customize the Test Harness"\fR.
+.PP
+This approach to testing was designed and initially implemented by
+Mary Ann May-Pumphrey of Sun Microsystems in the early 1990's.  Many
+thanks to her for donating her work back to the public Tcl release.
+.SH COMMANDS
+.TP
+\fB::tcltest::test\fP \fIname desc ?constraints? script expectedAnswer\fR 
+The \fB::tcltest::test\fR command is used \fIscript\fR and compare the
+its result to \fIexpectedAnswer\fR. It prints an error message if the two do
+not match.  If \fB::tcltest::verbose\fR contains "p" or "s", it also prints
+out a message if the test passed or was skipped.  The test will be
+skipped if it doesn't match the \fB::tcltest::match\fR variable, if it
+matches an element in \fB::tcltest::skip\fR, or if one of the elements
+of \fIconstraint\fR turns out not to be true.  The 
+\fB::tcltest::test\fR command has no defined return values.  See the
+\fI"Writing a new test"\fR section for more details on this command.  
+.TP
+\fB::tcltest::cleanupTests\fP \fI?calledFromAll?\fR
+This command should be called at the end of a test file.  It prints
+statistics about the tests run and removes files that were created by
+\fB::tcltest::makeDirectory\fR and \fB::tcltest::makeFile\fR.  Names
+of files and directories created outside of 
+\fB::tcltest::makeFile\fR and \fB::tcltest::makeDirectory\fR and
+never deleted are printed to \fB::tcltest::outputChannel\fR.  This command
+also restores the original shell environment, as described by the ::env
+array. \fIcalledFromAll\fR should be specified when
+\fB::tcltest::cleanupTests\fR is called from an "all.tcl" file.  Tcl files
+files are generally used to run multiple tests.  For more details on how to
+run multiple tests, please see the section \fI"Running test files"\fR.
+This proc has no defined return value.
+.TP
+\fB::tcltest::getMatchingTestFiles\fP
+This command is used when you want to run multiple test files.  It returns
+the list of tests that should be sourced in an 'all.tcl' file.  See the
+section \fI"Running test files"\fR for more information.
+.TP
+\fB::tcltest::makeFile\fP \fIcontents name\fR
+Create a file that will be automatically be removed by
+\fB::tcltest::cleanupTests\fR at the end of a test file.
+This proc has no defined return value.
+.TP
+\fB::tcltest::removeFile\fP \fIname\fR
+Force the file referenced by \fIname\fR to be removed.  This file name
+should be relative to \fI::tcltest::temporaryDirectory\fR.  This proc has no
+defined return values.
+.TP
+\fB::tcltest::makeDirectory\fP \fIname\fR
+Create a directory named \fIname\fR that will automatically be removed
+by \fB::tcltest::cleanupTests\fR at the end of a test file.  This proc
+has no defined return value.
+.TP
+\fB::tcltest::removeDirectory\fP \fIname\fR
+Force the directory referenced by \fIname\fR to be removed. This proc
+has no defined return value. 
+.TP
+\fB::tcltest::viewFile\fP \fIfile\fR
+Returns the contents of \fIfile\fR.
+.TP
+\fB::tcltest::normalizeMsg\fP \fImsg\fR
+Remove extra newlines from \fImsg\fR.
+.TP
+\fB::tcltest::bytestring\fP \fIstring\fR
+Construct a string that consists of the requested sequence of bytes,
+as opposed to a string of properly formed UTF-8 characters using the
+value supplied in \fIstring\fR.  This allows the tester to create
+denormalized or improperly formed strings to pass to C procedures that
+are supposed to accept strings with embedded NULL types and confirm
+that a string result has a certain pattern of bytes.
+.TP
+\fB::tcltest::saveState\fP
+\fB::tcltest::restoreState\fP
+Save and restore the procedure and global variable names.
+A test file might contain calls to \fB::tcltest::saveState\fR and
+\fB::tcltest:restoreState\fR if it creates or deletes global variables
+or procs. 
+.TP
+\fB::tcltest::threadReap\fP
+\fB::tcltest::threadReap\fR only works if \fItestthread\fR is
+defined, generally by compiling tcltest.  If \fItestthread\fR is
+defined, \fB::tcltest::threadReap\fR kills all threads except for the
+main thread.  It gets the ID of the main thread by calling
+\fItestthread names\fR during initialization.  This value is stored in
+\fI::tcltest::mainThread\fR. \fB::tcltest::threadReap\fR returns the
+number of existing threads at completion.
+.SH TESTS
+The \fBtest\fR procedure runs a test script and prints an error
+message if the script's result does not match the expected result.
+The following is the spec for the \fBtest\fR command:
+.DS
+test <name> <description> ?<constraint>? <script> <expectedAnswer>
+.DE
+The <name> argument should follow the pattern:
+.DS
+<target>-<majorNum>.<minorNum>
+.DE
+For white-box (regression) tests, the target should be the name of the
+C function or Tcl procedure being tested.  For black-box tests, the
+target should be the name of the feature being tested.  Related tests
+should share a major number. 
+.PP
+The <description> argument is a short textual description of the test,
+to help humans understand what it tests.  The name of a Tcl or C
+function being tested should be included for regression tests.  If the
+test case exists to reproduce a bug, include the bug ID in the
+description. 
+.PP
+The optional <constraints> argument can be list of one or more
+keywords or an expression.  If the <constraints> argument consists of
+keywords, each of these keywords must be the name of an element in the array
+\fI::tcltest::testConstraints\fR.  If any of these elements is false or does
+not exist, the test is skipped.  If the <constraints> argument
+consists of an expression, that expression is evaluated. If the
+expression evaluates to true, then the test is run.  
+.PP
+Add appropriate constraints (e.g.,
+unixOnly) to any tests that should not always be run.  For example, a
+test that should only be run on Unix should look like the following:
+.PP
+.DS
+test getAttribute-1.1 {testing file permissions} {unixOnly} {
+    lindex [file attributes foo.tcl] 5
+} {00644}
+.DE
+.PP
+An example of a test that contains an expression:
+.PP
+.DS
+test unixNotfy-1.1 {Tcl_DeleteFileHandler} {unixOnly && !testthread} {
+    catch {vwait x}
+    set f [open foo w]
+    fileevent $f writable {set x 1}
+    vwait x
+    close $f
+    list [catch {vwait x} msg] $msg
+} {1 {can't wait for variable "x":  would wait forever}}
+.DE
+.PP
+See the "Test Constraints" section for a list of built-in
+constraints and information on how to add your own constraints.
+.PP
+The <script> argument contains the script to run to carry out the
+test.  It must return a result that can be checked for correctness.
+If your script requires that a file be created on the fly, please use
+the ::tcltest::makeFile procedure.  If your test requires that a small
+file (<50 lines) be checked in, please consider creating the file on
+the fly using the ::tcltest::makeFile procedure.  Files created by the
+::tcltest::makeFile procedure will automatically be removed by the
+::tcltest::cleanupTests call at the end of each test file.
+.PP
+The <expectedAnswer> argument will be compared against the result of
+evaluating the <script> argument.  If they match, the test passes,
+otherwise the test fails.
+.SH "TCLTEST NAMEPSACE VARIABLES"
+The following variables are also defined in the \fBtcltest\fR namespace and
+can be used by tests:
+.TP
+\fB::tcltest::outputChannel\fR
+output file ID - defaults to stdout and can be specified using
+-outfile on the command line.  
+Any test that prints test related output should send
+that output to \fI::tcltest::outputChannel\fR rather than letting
+that output default to stdout.
+.TP
+\fB::tcltest::errorChannel\fR
+error file ID - defaults to stderr and can be specified using -errfile
+on the command line.  
+Any test that prints error messages should send
+that output to \fI::tcltest::errorChannel\fR rather than printing
+directly to stderr.
+.TP
+\fB::tcltest::mainThread\fR
+main thread ID - defaults to 1.  This is the only thread that is not
+killed by ::tcltest::threadReap and is set according to the return
+value of \fItestthread names\fR at initialization.
+.TP
+\fB::tcltest::originalEnv\fR
+copy of the global "env" array at the beginning of the test run.  This
+array is used to restore the "env" array to its original state when
+\fI::tcltest::cleanupTests\fR is called.
+.TP
+\fB::tcltest::workingDirectory\fR
+the directory in which the test suite was launched.
+.TP
+\fB::tcltest::temporaryDirectory\fR
+the output directory - defaults to \fI::tcltest::workingDirectory\fR and can be
+specified using -tmpdir on the command line.
+.TP
+\fB::tcltest::testsDirectory\fR
+where the tests reside - defaults to \fI::tcltest::workingDirectory\fR
+if the script cannot determine where the \fItests\fR directory is
+located.  This variable should be explicitly set if tests are being
+run from an all.tcl file.
+.TP
+\fB::tcltest::tcltest\fR
+the name of the executable used to invoke the test suite.  
+.SH "TEST CONSTRAINTS"
+Constraints are used to determine whether a test should be skipped.
+Each constraint is stored as an index in the array
+\fI::tcltest::testConstraints\fR.  For example, the unixOnly constraint is
+defined as the following:
+.DS
+set ::tcltest::testConstraints(unixOnly) \\
+    [string equal $tcl_platform(platform) "unix"]
+.DE
+If a test is constrained by "unixOnly", then it will only be run if
+the value of ::tcltest::testConstraints(unixOnly) is true.  Several
+constraints are defined in the \fBtcltest\fR package.  To add file- or
+test-specific constraints, you can set the desired index of the
+::tcltest::testsConstraints array in your own test file.
+.PP
+The following is a list of constraints defined in the \fBtcltest\fR package:
+.TP
+\fIunix\fR
+test can only be run on any UNIX platform
+.TP
+\fIpc\fR
+test can only be run on any Windows platform
+.TP
+\fInt\fR
+test can only be run on any Windows NT platform
+.TP
+\fI95\fR
+test can only be run on any Windows 95 platform
+.TP
+\fI98\fR
+test can only be run on any Windows 98 platform
+.TP
+\fImac\fR
+test can only be run on any Mac platform
+.TP
+\fIunixOrPc\fR
+test can only be run on a UNIX or PC platform
+.TP
+\fImacOrPc\fR
+test can only be run on a Mac or PC platform
+.TP
+\fImacOrUnix\fR
+test can only be run on a Mac or UNIX platform
+.TP
+\fItempNotPc\fR
+test can not be run on Windows.  This flag is used to temporarily
+disable a test. 
+.TP
+\fItempNotMac\fR
+test can not be run on a Mac.  This flag is used
+to temporarily disable a test.
+.TP
+\fIunixCrash\fR
+test crashes if it's run on UNIX.  This flag is used to temporarily
+disable a test. 
+.TP
+\fIpcCrash\fR
+test crashes if it's run on Windows.  This flag is used to temporarily
+disable a test. 
+.TP
+\fImacCrash\fR
+test crashes if it's run on a Mac.  This flag is used to temporarily
+disable a test. 
+.TP
+\fIemptyTest\fR
+test is empty, and so not worth running, but it remains as a
+place-holder for a test to be written in the future.  This constraint
+always causes tests to be skipped.
+.TP
+\fIknownBug\fR
+test is known to fail and the bug is not yet fixed.  This constraint
+always causes tests to be skipped unless the user specifies otherwise.
+See the "Introduction" section for more details.
+.TP
+\fInonPortable\fR
+test can only be run in the master Tcl/Tk development environment.
+Some tests are inherently non-portable because they depend on things
+like word length, file system configuration, window manager, etc.
+These tests are only run in the main Tcl development directory where
+the configuration is well known.  This constraint always causes tests
+to be skipped unless the user specifies otherwise.  
+.TP
+\fIuserInteraction\fR
+test requires interaction from the user.  This constraint always
+causes tests to be skipped unless the user specifies otherwise.  
+.TP
+\fIinteractive\fR
+test can only be run in if the interpreter is in interactive mode,
+that is the global tcl_interactive variable is set to 1.
+.TP
+\fInonBlockFiles\fR
+test can only be run if platform supports setting files into
+nonblocking mode 
+.TP
+\fIasyncPipeClose\fR
+test can only be run if platform supports async flush and async close
+on a pipe 
+.TP
+\fIunixExecs\fR
+test can only be run if this machine has commands such as 'cat', 'echo',
+etc. available.  
+.TP
+\fIhasIsoLocale\fR
+test can only be run if can switch to an ISO locale
+.TP
+\fIroot\fR
+test can only run if Unix user is root
+.TP
+\fInotRoot\fR
+test can only run if Unix user is not root
+.TP
+\fIeformat\fR
+test can only run if app has a working version of sprintf with respect
+to the "e" format of floating-point numbers.
+.TP
+\fIstdio\fR
+test can only be run if the current app can be spawned via a pipe
+.SH "RUNNING TEST FILES"
+Use the following command to run a test file that uses package
+tcltest:
+.DS
+<shell> <testFile> ?<option> ?<value>?? ...
+.DE
+Command line options include (tcltest namespace variables that
+correspond to each flag are listed at the end of each flag description
+in parenthesis): 
+.RS
+.TP
+\fB-help\fR
+display usage information.
+.TP
+\fB-verbose <level>\fR
+set the level of verbosity to a substring of "bps".  See the "Test
+output" section for an explanation of this option.  (::tcltest::verbose)
+.TP
+\fB-match <matchList>\fR
+only run tests that match one or more of the glob patterns in
+<matchList>.  (::tcltest::match)
+.TP
+\fB-skip <skipList>\fR
+do not run tests that match one or more of the glob patterns in
+<skipList>.  (::tcltest::skip)
+.TP
+\fB-file <globPatternList>\fR
+only source test files that match any of the items in
+<globPatternList> relative to ::tcltest::testsDirectory.  
+This option
+only makes sense if you are running tests using "all.tcl" as the
+<testFile> instead of running single test files directly.
+(::tcltest::matchFiles) 
+.TP
+\fB-notfile <globPatternList>\fR
+source files except for those that match any of the items in
+<globPatternList> relative to ::tcltest::testsDirectory.
+This option
+only makes sense if you are running tests using "all.tcl" as the
+<testFile> instead of running single test files directly.
+(::tcltest::skipFiles) 
+.TP
+\fB-constraints <list>\fR
+tests with any constraints in <list> will not be skipped.  Note that
+elements of <list> must exactly match the existing constraints.  This
+is useful if you want to make sure that tests with a particular
+constraint are run (for example, if the tester wants to run all tests
+with the knownBug constraint).
+(::tcltest::testConstraints(\fIconstraintName\fR))
+.TP
+\fB-limitconstraints <bool>\fR
+If the argument to this flag is 1, the test harness limits test runs
+to those tests that match the constraints listed by the -constraints
+flag. Use of this flag requires use of the -constraints flag.  The
+default value for this flag is 0 (false).  This is useful if you want
+to run \fBonly\fR those tests that match the constraints listed using
+the -constraints option.  A tester might want to do this if he were
+interested in running only those tests that are constrained to be
+unixOnly and no other tests.
+(::tcltest::limitConstraints)
+.TP
+\fB-tmpdir <directoryName>\fR
+put any temporary files (created with ::tcltest::makeFile and
+::tcltest::makeDirectory) into the named directory.  The default
+location is ::tcltest::workingDirectory.  (::tcltest::temporaryDirectory)
+.TP
+\fB-preservecore <level>\fR
+check for core files.  This flag is used to determine how much
+checking should be done for core files.  The default value for
+\fIlevel\fR is 0.  Levels are defined as:
+.RS
+.IP 0
+No checking - do not check for core files at the end of each test
+command, but do check for them whenever ::tcltest::cleanupTests is
+called from an all.tcl file. 
+.IP 1
+Check for core files at the end of each test command and whenever
+::tcltest::cleanupTests is called from all.tcl.
+.IP 2
+Check for core files at the end of all test commands and whenever
+::tcltest::cleanupTests is called from all.tcl.  Save any core files
+produced in ::tcltest::temporaryDirectory.
+.RE
+.sp
+(::tcltest::preserveCore)
+.TP
+\fB-debug <debugLevel>\fR
+print debug information to stdout.  This is used to debug code in the
+test harness.  The default debug level is 0.  Levels are defined as:
+.RS
+.IP 0
+Do not display any debug information.
+.IP 1
+Display information regarding whether a test is skipped because it
+doesn't match any of the tests that were specified using -match or
+::tcltest::match (userSpecifiedNonMatch) or matches any of the tests
+specified by -skip or ::tcltest::skip (userSpecifiedSkip).  
+.IP 2
+Display the flag array parsed by the command line processor, the
+contents of the ::env array, and all user-defined variables that exist
+in the current namespace as they are used.
+.IP 3
+Display information regarding what individual procs in the test
+harness are doing.
+.RE
+.sp
+(::tcltest::debug)
+.TP
+\fB-outfile <filename>\fR 
+print output generated by the tcltest package to the named file.  This
+defaults to stdout.  Note that debug output always goes to stdout,
+regardless of this flag's setting.  (::tcltest::outputChannel)
+.TP
+\fB-errfile <filename>\fR
+print errors generated by the tcltest package to the named file.  This
+defaults to stderr.  (::tcltest::errorChannel)
+.RE
+.PP
+A second way to run tets is to start up a shell, load the
+\fBtcltest\fR package, and then source an appropriate test file or use
+the test command.  To use the options in interactive mode, set
+their corresponding tcltest namespace variables after loading the
+package.
+.PP
+See \fI"Test Constraints"\fR for all built-in constraint names
+that can be used in the \fB::tcltest::testConstraints\fR array. 
+See \fI"Tcltest namespace variables"\fR for details on other variables
+defined in the \fBtcltest\fR namespace.
+.PP
+A final way to run tests would be to specify which test files to run
+within an \fIall.tcl\fR (or otherwise named) file.  This is the
+approach used by the Tcl test suite.  This file loads the tcltest
+package, sets the location of
+the test directory (::tcltest::testsDirectory), determines which test
+files to run, sources each of these files, calls
+::tcltest::cleanupTests and then exits.
+.PP
+A more elaborate \fIall.tcl\fR file might do some pre- and
+post-processing before sourcing 
+each .test file, use separate interpreters for each file, or handle
+complex directory structures. 
+For an example of an all.tcl file,
+please see the "Examples" section of this document.
+.SH "TEST OUTPUT"
+After all specified test files are run, the number of tests
+passed, skipped, and failed is printed to
+\fB::tcltest::outputChannel\fR.  Aside from this 
+statistical information, output can be controlled on a per-test basis
+by the \fB::tcltest::verbose\fR variable.
+.PP
+\fB::tcltest::verbose\fR can be set to any substring or permutation 
+of "bps". In the string "bps", the 'b' stands for a test's "body", 
+the 'p' stands for "passed" tests, and the 's' stands for "skipped" 
+tests. The default value of \fB::tcltest::verbose\fR is "b".  If 'b'
+is present, then the entire body of the test is printed for each
+failed test, otherwise only the test's name, desired output, and
+actual output, are printed for each failed test.  If 'p' is present,
+then a line is printed for each passed test, otherwise no line is
+printed for passed tests.  If 's' is present, then a line (containing
+the consraints that cause the test to be skipped) is printed for each
+skipped test, otherwise no line is printed for skipped tests.
+.PP
+You can set \fB::tcltest::verbose\fR either interactively (after the
+\fBtcltest\fR package has been loaded) or by using the command line
+argument \fB-verbose\fR, for example:
+.DS
+tclsh socket.test -verbose bps
+.DE
+.SH "CONTENTS OF A TEST FILE"
+Test files should begin by loading the \fBtcltest\fR package:
+.DS
+package require tcltest
+namespace import ::tcltest::*
+.DE
+Test files should end by cleaning up after themselves and calling
+\fB::tcltest::cleanupTests\fR.  The \fB::tcltest::cleanupTests\fR
+procedure prints statistics about the number of tests that passed,
+skipped, and failed, and removes all files that were created using the
+\fB::tcltest::makeFile\fR and \fB::tcltest::makeDirectory\fR procedures.
+.DS
+# Remove files created by these tests
+# Change to original working directory
+# Unset global arrays
+::tcltest::cleanupTests
+return
+.DE
+When naming test files, file names should end with a .test extension.
+The names of test files that contain regression (or glass-box) tests
+should correspond to the Tcl or C code file that they are testing.
+For example, the test file for the C file "tclCmdAH.c" is "cmdAH.test".  
+Test files that contain black-box tests should match the pattern "*_bb.test".
+.SH "SELECTING TESTS FOR EXECUTION WITHIN A FILE"
+.PP
+Normally, all the tests in a file are run whenever the file is
+sourced.  An individual test will be skipped if one of the following
+conditions is met:
+.IP [1]
+the \fIname\fR of the tests does not match (using glob style matching)
+one or more elements in the \fB::tcltest::match\fR variable
+.IP [2]
+the \fIname\fR of the tests matches (using glob style matching) one or
+more elements in the \fB::tcltest::skip\fR variable 
+.IP [3]
+the \fIconstraints\fR argument to the \fB::tcltest::test\fR call, if
+given, contains one or more false elements. 
+.PP
+You can set \fB::tcltest::match\fR and/or \fB::tcltest::skip\fR
+either interactively (after the \fBtcltest\fR package has been
+sourced), or by using the command line arguments \fB-match\fR and
+\fB-skip\fR, for example: 
+.PP
+.CS
+tclsh info.test -match '*-5.* *-7.*' -skip '*-7.1*'
+.CE
+.PP
+Be sure to use the proper quoting convention so that your shell does
+not perform the glob substitution on the match or skip patterns you
+specify.
+.PP
+Predefined constraints (e.g. \fIknownBug\fR and \fInonPortable\fR) can be
+overridden either interactively (after the \fBtcltest\fR package has been
+sourced) by setting the proper
+\fB::tcltest::testConstraints(\fIconstraint\fB)\fR variable 
+or by using the \fB-constraints\fR command line option with the name of the
+constraint in the argument.  The following example shows how to run
+tests that are constrained by the \fIknownBug\fR and \fInonPortable\fR
+restrictions:
+.PP
+.CS
+tclsh all.tcl -constraints "knownBug nonPortable"
+.CE
+.PP
+See the \fI"Constraints"\fR package for information about using
+built-in constraints and adding new ones.
+.SH "HOW TO CUSTOMIZE THE TEST HARNESS"
+To create your own custom test harness, create a .tcl file that contains your
+namespace.  Within this file, require package \fBtcltest\fR.  Commands
+that can be redefined to customize the test harness include:
+.TP
+\fB::tcltest::PrintUsageInfoHook\fP
+print additional usage information specific to your situation.
+.TP
+\fB::tcltest::processCmdLineArgsFlagHook\fP
+tell the test harness about additional flags that you want it to understand.
+.TP
+\fB::tcltest::processCmdLineArgsHook\fR \fIflags\fP
+process the additional flags that you told the harness about in
+::tcltest::processCmdLineArgsFlagHook.
+.TP
+\fB::tcltest::initConstraintsHook\fP
+used to add additional built-in constraints to those already defined
+by \fBtcltest\fR.  
+.TP
+\fB::tcltest::cleanupTestsHook\fP
+do additional cleanup 
+.PP
+.PP
+To add new flags to your customized test harness, redefine
+\fB::tcltest::processCmdLineArgsAddFlagHook\fR to define additional flags to be
+parsed and \fB::tcltest::processCmdLineArgsHook\fR to actually process them.
+For example:
+.DS
+proc ::tcltest::processCmdLineArgsAddFlagHook {} {
+    return [list -flag1 -flag2]
+}
+
+proc ::tcltest::processCmdLineArgsHook {flagArray} {
+    array set flag $flagArray
+
+    if {[info exists flag(-flag1)]} {
+        # Handle flag1
+    }
+
+    if {[info exists flag(-flag2)]} {
+        # Handle flag2
+    }
+
+    return
+}
+.DE
+You may also want to add usage information for these flags.  This
+information would be displayed whenever the user specifies -help.  To
+define additional usage information, define your own
+::tcltest::PrintUsageInfoHook proc.  Within this proc, you should
+print out additional usage information for any flags that you've
+implemented. 
+.PP
+To add new built-in
+constraints to the test harness, define your own version of
+\fB::tcltest::initConstraintsHook\fR. 
+Within your proc, you can add to the \fB::tcltest::testConstraints\fR array.
+For example:
+.DS
+proc ::tcltest::initConstraintsHook {} {
+    set ::tcltest::testConstraints(win95Or98) \\
+            [expr {$::tcltest::testConstraints(95) || \\
+            $::tcltest::testConstraints(98)}]
+}
+.DE
+.PP
+Finally, if you want to add additional cleanup code to your harness
+you can define your own \fB::tcltest::cleanupTestsHook\fR.  For example:
+.DS
+proc ::tcltest::cleanupTestsHook {} {
+    # Add your cleanup code here
+}
+.DE
+.SH EXAMPLES
+.IP [1] 
+A simple test file (foo.test)
+.DS
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    import namespace ::tcltest::*
+}
+
+test foo-1.1 {save 1 in variable name foo} {} {
+    set foo 1
+} {1}
+
+::tcltest::cleanupTests
+return
+.DE
+.IP [2] 
+A simple all.tcl
+.DS
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    import namespace ::tcltest::*
+}
+
+set ::tcltest::testSingleFile false
+set ::tcltest::testsDirectory [file dir [info script]]
+
+foreach file [::tcltest::getMatchingTestFiles] {
+    if {[catch {source $file} msg]} {
+        puts stdout $msg
+    }
+}
+
+::tclttest::cleanupTests 1
+return
+.DE
+.IP [3] 
+Running a single test
+.DS
+tclsh foo.test
+.DE
+.IP [4] 
+Running multiple tests
+.DS
+tclsh all.tcl -file 'foo*.test' -notfile 'foo2.test'
+.DE
+.SH KEYWORDS
+test, test harness, test suite
+

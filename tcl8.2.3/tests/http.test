@@ -1,0 +1,320 @@
+# Commands covered:  http::config, http::geturl, http::wait, http::reset
+#
+# This file contains a collection of tests for the http script library.
+# Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1991-1993 The Regents of the University of California.
+# Copyright (c) 1994-1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+if {[catch {package require http 2.2}]} {
+    if {[info exist http2]} {
+	catch {puts "Cannot load http 2.2 package"}
+	return
+    } else {
+	catch {puts "Running http 2.2 tests in slave interp"}
+	set interp [interp create http2]
+	$interp eval [list set http2 "running"]
+	$interp eval [list source [info script]]
+	interp delete $interp
+	return
+    }
+}
+
+
+set port 8010
+set bindata "This is binary data\x0d\x0amore\x0dmore\x0amore\x00null"
+catch {unset data}
+
+# Ensure httpd file exists
+
+set origFile [file join $::tcltest::testsDirectory httpd]
+set newFile [file join $::tcltest::workingDirectory httpd]
+if {![file exists $newFile]} {
+    file copy $origFile $newFile
+    set removeHttpd 1
+}
+set httpdFile [file join $::tcltest::workingDirectory httpd]
+
+if {[info commands testthread] == "testthread" && [file exists $httpdFile]} {
+    set httpthread [testthread create "
+	source $httpdFile
+	testthread wait
+    "]
+    testthread send $httpthread [list set port $port]
+    testthread send $httpthread [list set bindata $bindata]
+    testthread send $httpthread {httpd_init $port}
+    puts "Running httpd in thread $httpthread"
+} else {
+    if ![file exists $httpdFile] {
+	puts "Cannot read $httpdFile script, http test skipped"
+	unset port
+	return
+    }
+    source $httpdFile
+    if [catch {httpd_init $port} listen] {
+	puts "Cannot start http server, http test skipped"
+	unset port
+	return
+    }
+}
+
+
+test http-1.1 {http::config} {
+    http::config
+} {-accept */* -proxyfilter http::ProxyRequired -proxyhost {} -proxyport {} -useragent {Tcl http client package 2.2}}
+
+test http-1.2 {http::config} {
+    http::config -proxyfilter
+} http::ProxyRequired
+
+test http-1.3 {http::config} {
+    catch {http::config -junk}
+} 1
+
+test http-1.4 {http::config} {
+    set savedconf [http::config]
+    http::config -proxyhost nowhere.come -proxyport 8080 -proxyfilter myFilter -useragent "Tcl Test Suite"
+    set x [http::config]
+    eval http::config $savedconf
+    set x
+} {-accept */* -proxyfilter myFilter -proxyhost nowhere.come -proxyport 8080 -useragent {Tcl Test Suite}}
+
+test http-1.5 {http::config} {
+    catch {http::config -proxyhost {} -junk 8080}
+} 1
+
+test http-2.1 {http::reset} {
+    catch {http::reset http#1}
+} 0
+
+test http-3.1 {http::geturl} {
+    catch {http::geturl -bogus flag}
+} 1
+test http-3.2 {http::geturl} {
+    catch {http::geturl http:junk} err
+    set err
+} {Unsupported URL: http:junk}
+
+set url [info hostname]:$port
+test http-3.3 {http::geturl} {
+    set token [http::geturl $url]
+    http::data $token
+} "<html><head><title>HTTP/1.0 TEST</title></head><body>
+<h1>Hello, World!</h1>
+<h2>GET /</h2>
+</body></html>"
+
+set tail /a/b/c
+set url [info hostname]:$port/a/b/c
+set binurl [info hostname]:$port/binary
+
+test http-3.4 {http::geturl} {
+    set token [http::geturl $url]
+    http::data $token
+} "<html><head><title>HTTP/1.0 TEST</title></head><body>
+<h1>Hello, World!</h1>
+<h2>GET $tail</h2>
+</body></html>"
+
+proc selfproxy {host} {
+    global port
+    return [list [info hostname] $port]
+}
+test http-3.5 {http::geturl} {
+    http::config -proxyfilter selfproxy
+    set token [http::geturl $url]
+    http::config -proxyfilter http::ProxyRequired
+    http::data $token
+} "<html><head><title>HTTP/1.0 TEST</title></head><body>
+<h1>Hello, World!</h1>
+<h2>GET http://$url</h2>
+</body></html>"
+
+test http-3.6 {http::geturl} {
+    http::config -proxyfilter bogus
+    set token [http::geturl $url]
+    http::config -proxyfilter http::ProxyRequired
+    http::data $token
+} "<html><head><title>HTTP/1.0 TEST</title></head><body>
+<h1>Hello, World!</h1>
+<h2>GET $tail</h2>
+</body></html>"
+
+test http-3.7 {http::geturl} {
+    set token [http::geturl $url -headers {Pragma no-cache}]
+    http::data $token
+} "<html><head><title>HTTP/1.0 TEST</title></head><body>
+<h1>Hello, World!</h1>
+<h2>GET $tail</h2>
+</body></html>"
+
+test http-3.8 {http::geturl} {
+    set token [http::geturl $url -query Name=Value&Foo=Bar]
+    http::data $token
+} "<html><head><title>HTTP/1.0 TEST</title></head><body>
+<h1>Hello, World!</h1>
+<h2>POST $tail</h2>
+<h2>Query</h2>
+<dl>
+<dt>Name<dd>Value
+<dt>Foo<dd>Bar
+</dl>
+</body></html>"
+
+test http-3.9 {http::geturl} {
+    set token [http::geturl $url -validate 1]
+    http::code $token
+} "HTTP/1.0 200 OK"
+
+
+test http-4.1 {http::Event} {
+    set token [http::geturl $url]
+    upvar #0 $token data
+    array set meta $data(meta)
+    expr ($data(totalsize) == $meta(Content-Length))
+} 1
+
+test http-4.2 {http::Event} {
+    set token [http::geturl $url]
+    upvar #0 $token data
+    array set meta $data(meta)
+    string compare $data(type) [string trim $meta(Content-Type)]
+} 0
+
+test http-4.3 {http::Event} {
+    set token [http::geturl $url]
+    http::code $token
+} {HTTP/1.0 200 Data follows}
+
+test http-4.4 {http::Event} {
+    set out [open testfile w]
+    set token [http::geturl $url -channel $out]
+    close $out
+    set in [open testfile]
+    set x [read $in]
+    close $in
+    file delete testfile
+    set x
+} "<html><head><title>HTTP/1.0 TEST</title></head><body>
+<h1>Hello, World!</h1>
+<h2>GET $tail</h2>
+</body></html>"
+
+test http-4.5 {http::Event} {
+    set out [open testfile w]
+    set token [http::geturl $url -channel $out]
+    close $out
+    upvar #0 $token data
+    file delete testfile
+    expr $data(currentsize) == $data(totalsize)
+} 1
+
+test http-4.6 {http::Event} {
+    set out [open testfile w]
+    set token [http::geturl $binurl -channel $out]
+    close $out
+    set in [open testfile]
+    fconfigure $in -translation binary
+    set x [read $in]
+    close $in
+    file delete testfile
+    set x
+} "$bindata$binurl"
+
+proc myProgress {token total current} {
+    global progress httpLog
+    if {[info exists httpLog] && $httpLog} {
+	puts "progress $total $current"
+    }
+    set progress [list $total $current]
+}
+if 0 {
+    # This test hangs on Windows95 because the client never gets EOF
+    set httpLog 1
+    test http-4.6 {http::Event} {
+	set token [http::geturl $url -blocksize 50 -progress myProgress]
+	set progress
+    } {111 111}
+}
+test http-4.7 {http::Event} {
+    set token [http::geturl $url -progress myProgress]
+    set progress
+} {111 111}
+test http-4.8 {http::Event} {
+    set token [http::geturl $url]
+    http::status $token
+} {ok}
+test http-4.9 {http::Event} {
+    set token [http::geturl $url -progress myProgress]
+    http::code $token
+} {HTTP/1.0 200 Data follows}
+test http-4.10 {http::Event} {
+    set token [http::geturl $url -progress myProgress]
+    http::size $token
+} {111}
+test http-4.11 {http::Event} nonPortable {
+    set token [http::geturl $url -timeout 1 -command {#}]
+    http::reset $token
+    http::status $token
+} {reset}
+test http-4.12 {http::Event} nonPortable {
+    set token [http::geturl $url?timeout=10 -timeout 1 -command {#}]
+    http::wait $token
+    http::status $token
+} {timeout}
+
+test http-5.1 {http::formatQuery} {
+    http::formatQuery name1 value1 name2 "value two"
+} {name1=value1&name2=value+two}
+
+test http-5.2 {http::formatQuery} {
+    http::formatQuery name1 ~bwelch name2 \xa1\xa2\xa2
+} {name1=%7ebwelch&name2=%a1%a2%a2}
+
+test http-5.3 {http::formatQuery} {
+    http::formatQuery lines "line1\nline2\nline3"
+} {lines=line1%0d%0aline2%0d%0aline3}
+
+test http-6.1 {http::ProxyRequired} {
+    http::config -proxyhost [info hostname] -proxyport $port
+    set token [http::geturl $url]
+    http::wait $token
+    http::config -proxyhost {} -proxyport {}
+    upvar #0 $token data
+    set data(body)
+} "<html><head><title>HTTP/1.0 TEST</title></head><body>
+<h1>Hello, World!</h1>
+<h2>GET http://$url</h2>
+</body></html>"
+
+# cleanup
+catch {unset url}
+catch {unset port}
+catch {unset data}
+if {[info exists httpthread]} {
+    testthread send -async $httpthread {
+	testthread exit
+    }
+} else {
+    close $listen
+}
+
+if {[info exist removeHttpd]} {
+    removeFile $httpdFile
+}
+
+::tcltest::cleanupTests
+return

@@ -1,0 +1,418 @@
+# 
+# winPipe.test --
+#
+# This file contains a collection of tests for tclWinPipe.c
+#
+# Sourcing this file into Tcl runs the tests and generates output for 
+# errors.  No output means no errors were found.
+#
+# Copyright (c) 1996 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+set bindir [file join [pwd] [file dirname [info nameofexecutable]]]
+set cat16 [file join  $bindir cat16.exe]
+set cat32 [file join $bindir cat32.exe]
+
+set ::tcltest::testConstraints(cat32) [file exists $cat32]
+set ::tcltest::testConstraints(cat16) [file exists $cat16]
+
+if {[catch {puts console1 ""}]} {
+    set ::tcltest::testConstraints(AllocConsole) 1
+} else {
+    set ::tcltest::testConstraints(.console) 1
+}
+
+set big bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\n
+append big $big
+append big $big	
+append big $big
+append big $big
+append big $big
+append big $big
+
+set f [open "little" w] 
+puts -nonewline $f "little"
+close $f
+
+set f [open "big" w]
+puts -nonewline $f $big
+close $f
+
+proc contents {file} {
+    set f [open $file r]
+    set r [read $f]
+    close $f
+    set r
+}
+
+set f [open more w]
+puts $f {
+    while {[eof stdin] == 0} {
+	puts -nonewline [read stdin]
+    }
+}
+close $f
+
+test winpipe-1.1 {32 bit comprehensive tests: from little file} {pcOnly stdio cat32} {
+    exec $cat32 < little > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} {little stderr32}
+test winpipe-1.2 {32 bit comprehensive tests: from big file} {pcOnly stdio cat32} {
+    exec $cat32 < big > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{$big} stderr32"
+test winpipe-1.3 {32 bit comprehensive tests: a little from pipe} {nt stdio cat32} {
+    exec $::tcltest::tcltest more < little | $cat32 > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} {little stderr32}
+test winpipe-1.4 {32 bit comprehensive tests: a lot from pipe} {nt stdio cat32} {
+    exec $::tcltest::tcltest more < big | $cat32 > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{$big} stderr32"
+test winpipe-1.5 {32 bit comprehensive tests: a lot from pipe} {95 stdio cat32} {
+    exec command /c type big |& $cat32 > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{$big} stderr32"
+test winpipe-1.6 {32 bit comprehensive tests: from console} \
+	{pcOnly stdio cat32 AllocConsole} {
+    # would block waiting for human input
+} {}
+test winpipe-1.7 {32 bit comprehensive tests: from NUL} {pcOnly stdio cat32} {
+    exec $cat32 < nul > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} {{} stderr32}
+test winpipe-1.8 {32 bit comprehensive tests: from socket} {pcOnly stdio cat32} {
+    # doesn't work
+} {}
+test winpipe-1.9 {32 bit comprehensive tests: from nowhere} \
+	{pcOnly stdio cat32 .console} {
+    exec $cat32 > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} {{} stderr32}
+test winpipe-1.10 {32 bit comprehensive tests: from file handle} \
+	{pcOnly stdio cat32} {
+    set f [open "little" r]
+    exec $cat32 <@$f > stdout 2> stderr
+    close $f
+    list [contents stdout] [contents stderr]
+} {little stderr32}
+test winpipe-1.11 {32 bit comprehensive tests: read from application} \
+	{pcOnly stdio cat32} {
+    set f [open "|$cat32 < little" r]
+    gets $f line
+    catch {close $f} msg
+    list $line $msg
+} {little stderr32}
+test winpipe-1.12 {32 bit comprehensive tests: a little to file} \
+	{pcOnly stdio cat32} {
+    exec $cat32 < little > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} {little stderr32}
+test winpipe-1.13 {32 bit comprehensive tests: a lot to file} \
+	{pcOnly stdio cat32} {
+    exec $cat32 < big > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{$big} stderr32"
+test winpipe-1.14 {32 bit comprehensive tests: a little to pipe} \
+	{pcOnly stdio cat32} {
+    exec $cat32 < little | $::tcltest::tcltest more > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} {little stderr32}
+test winpipe-1.15 {32 bit comprehensive tests: a lot to pipe} \
+	{pcOnly stdio cat32} {
+    exec $cat32 < big | $::tcltest::tcltest more > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{$big} stderr32"
+test winpipe-1.16 {32 bit comprehensive tests: to console} {pcOnly stdio cat32} {
+    catch {exec $cat32 << "You should see this\n" >@stdout} msg
+    set msg
+} stderr32
+test winpipe-1.17 {32 bit comprehensive tests: to NUL} {pcOnly stdio cat32} {
+    # some apps hang when sending a large amount to NUL.  $cat32 isn't one.
+    catch {exec $cat32 < big > nul} msg
+    set msg
+} stderr32
+test winpipe-1.18 {32 bit comprehensive tests: to nowhere} \
+	{pcOnly stdio cat32 .console} {
+    exec $cat32 < big >&@stdout 
+} {}
+test winpipe-1.19 {32 bit comprehensive tests: to file handle} {pcOnly stdio cat32} {
+    set f1 [open "stdout" w]
+    set f2 [open "stderr" w]
+    exec $cat32 < little >@$f1 2>@$f2
+    close $f1
+    close $f2
+    list [contents stdout] [contents stderr]
+} {little stderr32}
+test winpipe-1.20 {32 bit comprehensive tests: write to application} \
+	{pcOnly stdio cat32} {
+    set f [open "|$cat32 > stdout" w]
+    puts -nonewline $f "foo"
+    catch {close $f} msg
+    list [contents stdout] $msg
+} {foo stderr32}
+test winpipe-1.21 {32 bit comprehensive tests: read/write application} \
+	{pcOnly stdio cat32} {
+    set f [open "|$cat32" r+]
+    puts $f $big
+    puts $f \032
+    flush $f
+    set r [read $f 64]
+    catch {close $f}
+    set r
+} "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+test winpipe-1.22 {Checking command.com for Win95/98 hanging} \
+	{pcOnly stdio} {
+    exec command.com /c dir /b
+    set result 1
+} 1
+
+test winpipe-2.1 {16 bit comprehensive tests: from little file} {pcOnly stdio cat16} {
+    exec $cat16 < little > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "little stderr16"
+test winpipe-2.2 {16 bit comprehensive tests: from big file} {pcOnly stdio cat16} {
+    exec $cat16 < big > stdout 2> stderr
+    list [contents stdout] [contents stderr] 
+} "{$big} stderr16"
+test winpipe-2.3 {16 bit comprehensive tests: a little from pipe} {pcOnly stdio cat16} {
+    exec $::tcltest::tcltest more < little | $cat16 > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} {little stderr16}
+test winpipe-2.4 {16 bit comprehensive tests: a lot from pipe} {nt stdio cat16} {
+    exec $cat16 < big | $cat16 > stdout 2> stderr
+    list [contents stdout] [contents stderr] 
+} "{$big} stderr16stderr16"
+test winpipe-2.5 {16 bit comprehensive tests: a lot from pipe} {95 stdio cat16} {
+    exec $::tcltest::tcltest more < big | $cat16 > stdout 2> stderr
+    list [contents stdout] [contents stderr] 
+} "{$big} stderr16"
+test winpipe-2.6 {16 bit comprehensive tests: from console} \
+	{pcOnly stdio cat16 AllocConsole} {
+    # would block waiting for human input
+} {}		     
+test winpipe-2.7 {16 bit comprehensive tests: from NUL} {nt stdio cat16} {
+    exec $cat16 < nul > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{} stderr16"
+test winpipe-2.8 {16 bit comprehensive tests: from socket} {pcOnly stdio cat16} {
+    # doesn't work
+} {}
+test winpipe-2.9 {16 bit comprehensive tests: from nowhere} {pcOnly stdio cat16 .console} {
+    exec $cat16 > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{} stderr16"
+test winpipe-2.10 {16 bit comprehensive tests: from file handle} {pcOnly stdio cat16} {
+    set f [open "little" r]
+    exec $cat16 <@$f > stdout 2> stderr
+    close $f
+    list [contents stdout] [contents stderr]
+} "little stderr16"
+test winpipe-2.11 {16 bit comprehensive tests: read from application} {pcOnly stdio cat16} {
+    set f [open "|$cat16 < little" r]
+    gets $f line
+    catch {close $f} msg
+    list $line $msg
+} "little stderr16"
+test winpipe-2.12 {16 bit comprehensive tests: a little to file} {pcOnly stdio cat16} {
+    exec $cat16 < little > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "little stderr16"
+test winpipe-2.13 {16 bit comprehensive tests: a lot to file} {pcOnly stdio cat16} {
+    exec $cat16 < big > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{$big} stderr16"
+test winpipe-2.14 {16 bit comprehensive tests: a little to pipe} {pcOnly stdio cat16} {
+    exec $cat16 < little | $::tcltest::tcltest more > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} {little stderr16}
+test winpipe-2.15 {16 bit comprehensive tests: a lot to pipe} {pcOnly stdio cat16} {
+    exec $cat16 < big | $::tcltest::tcltest more > stdout 2> stderr
+    list [contents stdout] [contents stderr]
+} "{$big} stderr16"
+test winpipe-2.16 {16 bit comprehensive tests: to console} {pcOnly stdio cat16} {
+    catch {exec $cat16 << "You should see this\n" >@stdout} msg
+    set msg
+} [lindex stderr16 0]
+test winpipe-2.17 {16 bit comprehensive tests: to NUL} {nt stdio cat16} {
+    # some apps hang when sending a large amount to NUL.  cat16 isn't one.
+    catch {exec $cat16 < big > nul} msg
+    set msg
+} stderr16
+test winpipe-2.18 {16 bit comprehensive tests: to nowhere} {pcOnly stdio cat16 .console} {
+    exec $cat16 < big >&@stdout 
+} {}
+test winpipe-2.19 {16 bit comprehensive tests: to file handle} {pcOnly stdio cat16} {
+    set f1 [open "stdout" w]
+    set f2 [open "stderr" w]
+    exec $cat16 < little >@$f1 2>@$f2
+    close $f1
+    close $f2
+    list [contents stdout] [contents stderr]
+} "little stderr16"
+test winpipe-2.20 {16 bit comprehensive tests: write to application} {pcOnly stdio cat16} {
+    set f [open "|$cat16 > stdout" w]
+    puts -nonewline $f "foo"
+    catch {close $f} msg
+    list [contents stdout] $msg
+} "foo stderr16"
+test winpipe-2.21 {16 bit comprehensive tests: read/write application} {nt stdio cat16} {
+    set f [open "|$cat16" r+]
+    puts $f $big
+    puts $f \032
+    flush $f
+    set r [read $f 64]
+    catch {close $f}
+    set r
+} "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+file delete more
+
+test winpipe-4.1 {Tcl_WaitPid} {nt stdio} {
+    proc readResults {f} {
+	global x result
+	if { [eof $f] } {
+	    close $f
+	    set x 1
+	} else {
+	    set line [read $f ]
+	    set result "$result$line"
+	}
+    }
+
+    set f [open "|$cat32 < big 2> stderr" r]
+    fconfigure $f  -buffering none -blocking 0
+    fileevent $f readable "readResults $f"
+    set x 0
+    set result ""
+    vwait x
+    list $result $x [contents stderr]
+} "{$big} 1 stderr32"
+
+close [open nothing w]
+
+catch {set env_tmp $env(TMP)}
+catch {set env_temp $env(TEMP)}
+
+set env(TMP) c:/
+set env(TEMP) c:/
+
+test winpipe-5.1 {TclpCreateTempFile: cleanup temp files} {pcOnly stdio} {
+    set x {}
+    set existing [glob -nocomplain c:/tcl*.tmp]
+    exec $::tcltest::tcltest < nothing 
+    foreach p [glob -nocomplain c:/tcl*.tmp] {
+	if {[lsearch $existing $p] == -1} {
+	    lappend x $p
+	}
+    }
+    set x
+} {}
+test winpipe-5.2 {TclpCreateTempFile: TMP and TEMP not defined} {pcOnly stdio} {
+    set tmp $env(TMP)
+    set temp $env(TEMP)
+    unset env(TMP)
+    unset env(TEMP)
+    exec $::tcltest::tcltest < nothing
+    set env(TMP) $tmp
+    set env(TEMP) $temp
+    set x {}
+} {}
+test winpipe-5.3 {TclpCreateTempFile: TMP specifies non-existent directory} \
+	{pcOnly stdio} {
+    set tmp $env(TMP)
+    set env(TMP) snarky
+    exec $::tcltest::tcltest < nothing
+    set env(TMP) $tmp
+    set x {}
+} {}
+test winpipe-5.4 {TclpCreateTempFile: TEMP specifies non-existent directory} \
+	{pcOnly stdio} {
+    set tmp $env(TMP)
+    set temp $env(TEMP)
+    unset env(TMP)
+    set env(TEMP) snarky
+    exec $::tcltest::tcltest < nothing
+    set env(TMP) $tmp
+    set env(TEMP) $temp
+    set x {}
+} {}
+
+test winpipe-6.1 {PipeSetupProc & PipeCheckProc: read threads} \
+	{pcOnly stdio cat32} {
+    set f [open "|$cat32" r+]
+    fconfigure $f -blocking 0
+    fileevent $f writable { set x writable }
+    set x {}
+    vwait x
+    fileevent $f writable {}
+    fileevent $f readable { lappend x readable }
+    after 100 { lappend x timeout }
+    vwait x
+    puts $f foobar
+    flush $f
+    vwait x
+    lappend x [read $f]
+    after 100 { lappend x timeout }
+    vwait x
+    lappend x [catch {close $f} msg] $msg
+} {writable timeout readable {foobar
+} timeout 1 stderr32}
+test winpipe-6.2 {PipeSetupProc & PipeCheckProc: write threads} \
+	{pcOnly stdio cat32} {
+    set f [open "|$cat32" r+]
+    fconfigure $f -blocking 0
+    fileevent $f writable { set x writable }
+    set x {}
+    vwait x
+    puts -nonewline $f $big$big$big$big
+    flush $f
+    after 100 { lappend x timeout }
+    vwait x
+    lappend x [catch {close $f} msg] $msg
+} {writable timeout 0 {}}
+
+makeFile {
+    puts "[list $argv0 $argv]"
+} echoArgs.tcl
+
+test winpipe-7.1 {BuildCommandLine: null arguments} {pcOnly stdio} {
+    exec $::tcltest::tcltest echoArgs.tcl foo "" bar
+} {echoArgs.tcl {foo {} bar}}
+test winpipe-7.2 {BuildCommandLine: null arguments} {pcOnly stdio} {
+    exec $::tcltest::tcltest echoArgs.tcl foo \" bar
+} {echoArgs.tcl {foo {"} bar}}
+
+# restore old values for env(TMP) and env(TEMP)
+
+if {[catch {set env(TMP) $env_tmp}]} {
+    unset env(TMP)
+}
+if {[catch {set env(TEMP) $env_temp}]} {
+    unset env(TEMP)
+}
+
+# cleanup
+file delete big little stdout stderr nothing echoArgs.tcl
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+

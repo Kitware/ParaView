@@ -1,0 +1,57 @@
+# This file is a Tcl script to test the code in tkEvent.c.  It is
+# organized in the standard fashion for Tcl tests.
+#
+# Copyright (c) 1994 The Regents of the University of California.
+# Copyright (c) 1994-1995 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
+
+foreach i [winfo children .] {
+    destroy $i
+}
+wm geometry . {}
+raise .
+
+# XXX This test file is woefully incomplete.  Right now it only tests
+# a few of the procedures in tkEvent.c.  Please add more tests whenever
+# possible.
+
+test event-1.1 {Tk_HandleEvent procedure, filter events for dead windows} {
+    button .b -text Test
+    pack .b
+    bindtags .b .b
+    update
+    bind .b <Destroy> {
+	lappend x destroy
+	event generate .b <1>
+    }
+    bind .b <1> {
+	lappend x button
+    }
+    set x {}
+    destroy .b
+    set x
+} {destroy}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

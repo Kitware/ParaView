@@ -1,0 +1,291 @@
+# This file contains a collection of tests for tclUtf.c
+# Sourcing this file into Tcl runs the tests and generates output for
+# errors.  No output means no errors were found.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+catch {unset x}
+
+test utf-1.1 {Tcl_UniCharToUtf: 1 byte sequences} {
+    set x \x01
+} [bytestring "\x01"]
+test utf-1.2 {Tcl_UniCharToUtf: 2 byte sequences} {
+    set x "\x00"
+} [bytestring "\xc0\x80"]
+test utf-1.3 {Tcl_UniCharToUtf: 2 byte sequences} {
+    set x "\xe0"
+} [bytestring "\xc3\xa0"]
+test utf-1.4 {Tcl_UniCharToUtf: 3 byte sequences} {
+    set x "\u4e4e"
+} [bytestring "\xe4\xb9\x8e"]
+
+test utf-2.1 {Tcl_UtfToUniChar: low ascii} {
+    string length "abc"
+} {3}
+test utf-2.2 {Tcl_UtfToUniChar: naked trail bytes} {
+    string length [bytestring "\x82\x83\x84"]
+} {3}
+test utf-2.3 {Tcl_UtfToUniChar: lead (2-byte) followed by non-trail} {
+    string length [bytestring "\xC2"]
+} {1}
+test utf-2.4 {Tcl_UtfToUniChar: lead (2-byte) followed by trail} {
+    string length [bytestring "\xC2\xa2"]
+} {1}
+test utf-2.5 {Tcl_UtfToUniChar: lead (3-byte) followed by non-trail} {
+    string length [bytestring "\xE2"]
+} {1}
+test utf-2.6 {Tcl_UtfToUniChar: lead (3-byte) followed by 1 trail} {
+    string length [bytestring "\xE2\xA2"]
+} {2}
+test utf-2.7 {Tcl_UtfToUniChar: lead (3-byte) followed by 2 trail} {
+    string length [bytestring "\xE4\xb9\x8e"]
+} {1}
+test utf-2.8 {Tcl_UtfToUniChar: longer UTF sequences not supported} {
+    string length [bytestring "\xF4\xA2\xA2\xA2"]
+} {4}
+
+test utf-3.1 {Tcl_UtfCharComplete} {
+} {}
+
+test utf-4.1 {Tcl_NumUtfChars: zero length} {
+    string length ""
+} {0}
+test utf-4.2 {Tcl_NumUtfChars: length 1} {
+    string length [bytestring "\xC2\xA2"]
+} {1}
+test utf-4.3 {Tcl_NumUtfChars: long string} {
+    string length [bytestring "abc\xC2\xA2\xe4\xb9\x8e\uA2\u4e4e"]
+} {7}
+
+test utf-5.1 {Tcl_UtfFindFirsts} {
+} {}
+
+test utf-6.1 {Tcl_UtfNext} {
+} {}
+
+test utf-7.1 {Tcl_UtfPrev} {
+} {}
+
+test utf-8.1 {Tcl_UniCharAtIndex: index = 0} {
+    string index abcd 0
+} {a}
+test utf-8.2 {Tcl_UniCharAtIndex: index = 0} {
+    string index \u4e4e\u25a 0
+} "\u4e4e"
+test utf-8.3 {Tcl_UniCharAtIndex: index > 0} {
+    string index abcd 2
+} {c}
+test utf-8.4 {Tcl_UniCharAtIndex: index > 0} {
+    string index \u4e4e\u25a\xff\u543 2
+} "\uff"
+
+test utf-9.1 {Tcl_UtfAtIndex: index = 0} {
+    string range abcd 0 2
+} {abc}
+test utf-9.2 {Tcl_UtfAtIndex: index > 0} {
+    string range \u4e4e\u25a\xff\u543klmnop 1 5
+} "\u25a\xff\u543kl"
+
+
+test utf-10.1 {Tcl_UtfBackslash: dst == NULL} {
+    set x \n
+} {
+}
+test utf-10.2 {Tcl_UtfBackslash: \u subst} {
+    set x \ua2
+} [bytestring "\xc2\xa2"]
+test utf-10.3 {Tcl_UtfBackslash: longer \u subst} {
+    set x \u4e21
+} [bytestring "\xe4\xb8\xa1"]
+test utf-10.4 {Tcl_UtfBackslash: stops at first non-hex} {
+    set x \u4e2k
+} "[bytestring \xd3\xa2]k"
+test utf-10.5 {Tcl_UtfBackslash: stops after 4 hex chars} {
+    set x \u4e216
+} "[bytestring \xe4\xb8\xa1]6"
+proc bsCheck {char num} {
+    global errNum
+    test utf-10.$errNum {backslash substitution} {
+	scan $char %c value
+	set value
+    } $num
+    incr errNum
+}
+set errNum 6
+bsCheck \b	8
+bsCheck \e	101
+bsCheck \f	12
+bsCheck \n	10
+bsCheck \r	13
+bsCheck \t	9
+bsCheck \v	11
+bsCheck \{	123
+bsCheck \}	125
+bsCheck \[	91
+bsCheck \]	93
+bsCheck \$	36
+bsCheck \ 	32
+bsCheck \;	59
+bsCheck \\	92
+bsCheck \Ca	67
+bsCheck \Ma	77
+bsCheck \CMa	67
+bsCheck \8a	8
+bsCheck \14	12
+bsCheck \141	97
+bsCheck b\0	98
+bsCheck \x	120
+bsCheck \xa	10
+bsCheck \xA	10
+bsCheck \x41	65
+bsCheck \x541	65
+bsCheck \u	117
+bsCheck \uk	117
+bsCheck \u41	65
+bsCheck \ua	10
+bsCheck \uA	10
+bsCheck \340	224
+bsCheck \ua1	161
+bsCheck \u4e21	20001
+
+test utf-11.1 {Tcl_UtfToUpper} {
+    string toupper {}
+} {}
+test utf-11.2 {Tcl_UtfToUpper} {
+    string toupper abc
+} ABC
+test utf-11.3 {Tcl_UtfToUpper} {
+    string toupper \u00e3ab
+} \u00c3AB
+test utf-11.4 {Tcl_UtfToUpper} {
+    string toupper \u01e3ab
+} \u01e2AB
+
+test utf-12.1 {Tcl_UtfToLower} {
+    string tolower {}
+} {}
+test utf-12.2 {Tcl_UtfToLower} {
+    string tolower ABC
+} abc
+test utf-12.3 {Tcl_UtfToLower} {
+    string tolower \u00c3AB
+} \u00e3ab
+test utf-12.4 {Tcl_UtfToLower} {
+    string tolower \u01e2AB
+} \u01e3ab
+
+test utf-13.1 {Tcl_UtfToTitle} {
+    string totitle {}
+} {}
+test utf-13.2 {Tcl_UtfToTitle} {
+    string totitle abc
+} Abc
+test utf-13.3 {Tcl_UtfToTitle} {
+    string totitle \u00e3ab
+} \u00c3ab
+test utf-13.4 {Tcl_UtfToTitle} {
+    string totitle \u01f3ab
+} \u01f2ab
+
+test utf-14.1 {Tcl_UtfNcasecmp} {
+    string compare -nocase a b
+} -1
+test utf-14.2 {Tcl_UtfNcasecmp} {
+    string compare -nocase b a
+} 1
+test utf-14.3 {Tcl_UtfNcasecmp} {
+    string compare -nocase B a
+} 1
+test utf-14.4 {Tcl_UtfNcasecmp} {
+    string compare -nocase aBcB abca
+} 1
+
+test utf-15.1 {Tcl_UniCharToUpper, negative delta} {
+    string toupper aA
+} AA
+test utf-15.2 {Tcl_UniCharToUpper, positive delta} {
+    string toupper \u0178\u00ff
+} \u0178\u0178
+test utf-15.3 {Tcl_UniCharToUpper, no delta} {
+    string toupper !
+} !
+
+test utf-16.1 {Tcl_UniCharToLower, negative delta} {
+    string tolower aA
+} aa
+test utf-16.2 {Tcl_UniCharToLower, positive delta} {
+    string tolower \u0178\u00ff
+} \u00ff\u00ff
+test utf-17.1 {Tcl_UniCharToLower, no delta} {
+    string tolower !
+} !
+
+test utf-18.1 {Tcl_UniCharToTitle, add one for title} {
+    string totitle \u01c4
+} \u01c5
+test utf-18.2 {Tcl_UniCharToTitle, subtract one for title} {
+    string totitle \u01c6
+} \u01c5
+test utf-18.3 {Tcl_UniCharToTitle, subtract delta for title (positive)} {
+    string totitle \u017f
+} \u0053
+test utf-18.4 {Tcl_UniCharToTitle, subtract delta for title (negative)} {
+    string totitle \u00ff
+} \u0178
+test utf-18.5 {Tcl_UniCharToTitle, no delta} {
+    string totitle !
+} !
+
+test utf-19.1 {TclUniCharLen} {
+    list [regexp \\d abc456def foo] $foo
+} {1 4}
+
+test utf-20.1 {TclUniCharNcmp} {
+} {}
+
+test utf-21.1 {TclUniCharIsAlnum} {
+} {}
+
+test utf-22.1 {TclUniCharIsWordChar} {
+    string wordend "xyz123_bar fg" 0
+} 10
+test utf-22.2 {TclUniCharIsWordChar} {
+    string wordend "x\u5080z123_bar\u203c fg" 0
+} 10
+    
+test utf-23.1 {TclUniCharIsAlpha} {
+} {}
+
+test utf-24.1 {TclUniCharIsDigit} {
+} {}
+
+test utf-24.2 {TclUniCharIsSpace} {
+} {}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,52 @@
+# This file is a Tcl script to test new object types in Tk.
+# It is organized in the standard fashion for Tcl tests.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
+
+foreach i [winfo children .] {
+    destroy $i
+}
+wm geometry . {}
+raise .
+
+test obj-1.1 {TkGetPixelsFromObj} {
+} {}
+
+test obj-2.1 {FreePixelInternalRep} {
+} {}
+
+test obj-3.1 {DupPixelInternalRep} {
+} {}
+
+test obj-4.1 {SetPixelFromAny} {
+} {}
+
+
+
+eval destroy [winfo children .]
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
+

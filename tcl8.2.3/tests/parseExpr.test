@@ -1,0 +1,638 @@
+# This file contains a collection of tests for the procedures in the
+# file tclParseExpr.c.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+# Note that the Tcl expression parser (tclParseExpr.c) does not check
+# the semantic validity of the expressions it parses. It does not check,
+# for example, that a math function actually exists, or that the operands
+# of "<<" are integers.
+
+if {[info commands testexprparser] == {}} {
+    puts "This application hasn't been compiled with the \"testexprparser\""
+    puts "command, so I can't test the Tcl expression parser."
+    ::tcltest::cleanupTests
+    return 
+}
+
+test parseExpr-1.1 {Tcl_ParseExpr procedure, computing string length} {
+    testexprparser [bytestring "1+2\0 +3"] -1
+} {- {} 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-1.2 {Tcl_ParseExpr procedure, computing string length} {
+    testexprparser "1  + 2" -1
+} {- {} 0 subexpr {1  + 2} 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-1.3 {Tcl_ParseExpr procedure, error getting initial lexeme} {nonPortable} {
+    list [catch {testexprparser {12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-1.4 {Tcl_ParseExpr procedure, error in conditional expression} {
+    list [catch {testexprparser {foo+} -1} msg] $msg
+} {1 {syntax error in expression "foo+"}}
+test parseExpr-1.5 {Tcl_ParseExpr procedure, lexemes after the expression} {
+    list [catch {testexprparser {1+2 345} -1} msg] $msg
+} {1 {syntax error in expression "1+2 345"}}
+
+test parseExpr-2.1 {ParseCondExpr procedure, valid test subexpr} {
+    testexprparser {2>3? 1 : 0} -1
+} {- {} 0 subexpr {2>3? 1 : 0} 11 operator ? 0 subexpr 2>3 5 operator > 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-2.2 {ParseCondExpr procedure, error in test subexpr} {
+    list [catch {testexprparser {0 || foo} -1} msg] $msg
+} {1 {syntax error in expression "0 || foo"}}
+test parseExpr-2.3 {ParseCondExpr procedure, next lexeme isn't "?"} {
+    testexprparser {1+2} -1
+} {- {} 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-2.4 {ParseCondExpr procedure, next lexeme is "?"} {
+    testexprparser {1+2 ? 3 : 4} -1
+} {- {} 0 subexpr {1+2 ? 3 : 4} 11 operator ? 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-2.5 {ParseCondExpr procedure, bad lexeme after "?"} {nonPortable} {
+    list [catch {testexprparser {1+2 ? 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-2.6 {ParseCondExpr procedure, valid "then" subexpression} {
+    testexprparser {1? 3 : 4} -1
+} {- {} 0 subexpr {1? 3 : 4} 7 operator ? 0 subexpr 1 1 text 1 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-2.7 {ParseCondExpr procedure, error in "then" subexpression} {
+    list [catch {testexprparser {1? fred : martha} -1} msg] $msg
+} {1 {syntax error in expression "1? fred : martha"}}
+test parseExpr-2.8 {ParseCondExpr procedure, lexeme after "then" subexpr isn't ":"} {
+    list [catch {testexprparser {1? 2 martha 3} -1} msg] $msg
+} {1 {syntax error in expression "1? 2 martha 3"}}
+test parseExpr-2.9 {ParseCondExpr procedure, valid "else" subexpression} {
+    testexprparser {27||3? 3 : 4&&9} -1
+} {- {} 0 subexpr {27||3? 3 : 4&&9} 15 operator ? 0 subexpr 27||3 5 operator || 0 subexpr 27 1 text 27 0 subexpr 3 1 text 3 0 subexpr 3 1 text 3 0 subexpr 4&&9 5 operator && 0 subexpr 4 1 text 4 0 subexpr 9 1 text 9 0 {}}
+test parseExpr-2.10 {ParseCondExpr procedure, error in "else" subexpression} {
+    list [catch {testexprparser {1? 2 : martha} -1} msg] $msg
+} {1 {syntax error in expression "1? 2 : martha"}}
+
+test parseExpr-3.1 {ParseLorExpr procedure, valid logical and subexpr} {
+    testexprparser {1&&2 || 3} -1
+} {- {} 0 subexpr {1&&2 || 3} 9 operator || 0 subexpr 1&&2 5 operator && 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-3.2 {ParseLorExpr procedure, error in logical and subexpr} {
+    list [catch {testexprparser {1&&foo || 3} -1} msg] $msg
+} {1 {syntax error in expression "1&&foo || 3"}}
+test parseExpr-3.3 {ParseLorExpr procedure, next lexeme isn't "||"} {
+    testexprparser {1&&2? 1 : 0} -1
+} {- {} 0 subexpr {1&&2? 1 : 0} 11 operator ? 0 subexpr 1&&2 5 operator && 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-3.4 {ParseLorExpr procedure, next lexeme is "||"} {
+    testexprparser {1&&2 || 3} -1
+} {- {} 0 subexpr {1&&2 || 3} 9 operator || 0 subexpr 1&&2 5 operator && 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-3.5 {ParseLorExpr procedure, bad lexeme after "||"} {nonPortable} {
+    list [catch {testexprparser {1&&2 || 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-3.6 {ParseLorExpr procedure, valid RHS subexpression} {
+    testexprparser {1&&2 || 3 || 4} -1
+} {- {} 0 subexpr {1&&2 || 3 || 4} 13 operator || 0 subexpr {1&&2 || 3} 9 operator || 0 subexpr 1&&2 5 operator && 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-3.7 {ParseLorExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1&&2 || 3 || martha} -1} msg] $msg
+} {1 {syntax error in expression "1&&2 || 3 || martha"}}
+
+test parseExpr-4.1 {ParseLandExpr procedure, valid LHS "|" subexpr} {
+    testexprparser {1|2 && 3} -1
+} {- {} 0 subexpr {1|2 && 3} 9 operator && 0 subexpr 1|2 5 operator | 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-4.2 {ParseLandExpr procedure, error in LHS "|" subexpr} {
+    list [catch {testexprparser {1&&foo && 3} -1} msg] $msg
+} {1 {syntax error in expression "1&&foo && 3"}}
+test parseExpr-4.3 {ParseLandExpr procedure, next lexeme isn't "&&"} {
+    testexprparser {1|2? 1 : 0} -1
+} {- {} 0 subexpr {1|2? 1 : 0} 11 operator ? 0 subexpr 1|2 5 operator | 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-4.4 {ParseLandExpr procedure, next lexeme is "&&"} {
+    testexprparser {1|2 && 3} -1
+} {- {} 0 subexpr {1|2 && 3} 9 operator && 0 subexpr 1|2 5 operator | 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-4.5 {ParseLandExpr procedure, bad lexeme after "&&"} {nonPortable} {
+    list [catch {testexprparser {1|2 && 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-4.6 {ParseLandExpr procedure, valid RHS subexpression} {
+    testexprparser {1|2 && 3 && 4} -1
+} {- {} 0 subexpr {1|2 && 3 && 4} 13 operator && 0 subexpr {1|2 && 3} 9 operator && 0 subexpr 1|2 5 operator | 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-4.7 {ParseLandExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1|2 && 3 && martha} -1} msg] $msg
+} {1 {syntax error in expression "1|2 && 3 && martha"}}
+
+test parseExpr-5.1 {ParseBitOrExpr procedure, valid LHS "^" subexpr} {
+    testexprparser {1^2 | 3} -1
+} {- {} 0 subexpr {1^2 | 3} 9 operator | 0 subexpr 1^2 5 operator ^ 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-5.2 {ParseBitOrExpr procedure, error in LHS "^" subexpr} {
+    list [catch {testexprparser {1|foo | 3} -1} msg] $msg
+} {1 {syntax error in expression "1|foo | 3"}}
+test parseExpr-5.3 {ParseBitOrExpr procedure, next lexeme isn't "|"} {
+    testexprparser {1^2? 1 : 0} -1
+} {- {} 0 subexpr {1^2? 1 : 0} 11 operator ? 0 subexpr 1^2 5 operator ^ 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-5.4 {ParseBitOrExpr procedure, next lexeme is "|"} {
+    testexprparser {1^2 | 3} -1
+} {- {} 0 subexpr {1^2 | 3} 9 operator | 0 subexpr 1^2 5 operator ^ 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-5.5 {ParseBitOrExpr procedure, bad lexeme after "|"} {nonPortable} {
+    list [catch {testexprparser {1^2 | 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-5.6 {ParseBitOrExpr procedure, valid RHS subexpression} {
+    testexprparser {1^2 | 3 | 4} -1
+} {- {} 0 subexpr {1^2 | 3 | 4} 13 operator | 0 subexpr {1^2 | 3} 9 operator | 0 subexpr 1^2 5 operator ^ 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-5.7 {ParseBitOrExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1^2 | 3 | martha} -1} msg] $msg
+} {1 {syntax error in expression "1^2 | 3 | martha"}}
+
+test parseExpr-6.1 {ParseBitXorExpr procedure, valid LHS "&" subexpr} {
+    testexprparser {1&2 ^ 3} -1
+} {- {} 0 subexpr {1&2 ^ 3} 9 operator ^ 0 subexpr 1&2 5 operator & 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-6.2 {ParseBitXorExpr procedure, error in LHS "&" subexpr} {
+    list [catch {testexprparser {1^foo ^ 3} -1} msg] $msg
+} {1 {syntax error in expression "1^foo ^ 3"}}
+test parseExpr-6.3 {ParseBitXorExpr procedure, next lexeme isn't "^"} {
+    testexprparser {1&2? 1 : 0} -1
+} {- {} 0 subexpr {1&2? 1 : 0} 11 operator ? 0 subexpr 1&2 5 operator & 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-6.4 {ParseBitXorExpr procedure, next lexeme is "^"} {
+    testexprparser {1&2 ^ 3} -1
+} {- {} 0 subexpr {1&2 ^ 3} 9 operator ^ 0 subexpr 1&2 5 operator & 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-6.5 {ParseBitXorExpr procedure, bad lexeme after "^"} {nonPortable} {
+    list [catch {testexprparser {1&2 ^ 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-6.6 {ParseBitXorExpr procedure, valid RHS subexpression} {
+    testexprparser {1&2 ^ 3 ^ 4} -1
+} {- {} 0 subexpr {1&2 ^ 3 ^ 4} 13 operator ^ 0 subexpr {1&2 ^ 3} 9 operator ^ 0 subexpr 1&2 5 operator & 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-6.7 {ParseBitXorExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1&2 ^ 3 ^ martha} -1} msg] $msg
+} {1 {syntax error in expression "1&2 ^ 3 ^ martha"}}
+
+test parseExpr-7.1 {ParseBitAndExpr procedure, valid LHS equality subexpr} {
+    testexprparser {1==2 & 3} -1
+} {- {} 0 subexpr {1==2 & 3} 9 operator & 0 subexpr 1==2 5 operator == 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-7.2 {ParseBitAndExpr procedure, error in LHS equality subexpr} {
+    list [catch {testexprparser {1!=foo & 3} -1} msg] $msg
+} {1 {syntax error in expression "1!=foo & 3"}}
+test parseExpr-7.3 {ParseBitAndExpr procedure, next lexeme isn't "&"} {
+    testexprparser {1==2? 1 : 0} -1
+} {- {} 0 subexpr {1==2? 1 : 0} 11 operator ? 0 subexpr 1==2 5 operator == 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-7.4 {ParseBitAndExpr procedure, next lexeme is "&"} {
+    testexprparser {1>2 & 3} -1
+} {- {} 0 subexpr {1>2 & 3} 9 operator & 0 subexpr 1>2 5 operator > 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-7.5 {ParseBitAndExpr procedure, bad lexeme after "&"} {nonPortable} {
+    list [catch {testexprparser {1==2 & 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-7.6 {ParseBitAndExpr procedure, valid RHS subexpression} {
+    testexprparser {1<2 & 3 & 4} -1
+} {- {} 0 subexpr {1<2 & 3 & 4} 13 operator & 0 subexpr {1<2 & 3} 9 operator & 0 subexpr 1<2 5 operator < 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-7.7 {ParseBitAndExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1==2 & 3>2 & martha} -1} msg] $msg
+} {1 {syntax error in expression "1==2 & 3>2 & martha"}}
+
+test parseExpr-7.1 {ParseEqualityExpr procedure, valid LHS relational subexpr} {
+    testexprparser {1<2 == 3} -1
+} {- {} 0 subexpr {1<2 == 3} 9 operator == 0 subexpr 1<2 5 operator < 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-7.2 {ParseEqualityExpr procedure, error in LHS relational subexpr} {
+    list [catch {testexprparser {1>=foo == 3} -1} msg] $msg
+} {1 {syntax error in expression "1>=foo == 3"}}
+test parseExpr-7.3 {ParseEqualityExpr procedure, next lexeme isn't "==" or "!="} {
+    testexprparser {1<2? 1 : 0} -1
+} {- {} 0 subexpr {1<2? 1 : 0} 11 operator ? 0 subexpr 1<2 5 operator < 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-7.4 {ParseEqualityExpr procedure, next lexeme is "==" or "!=} {
+    testexprparser {1<2 == 3} -1
+} {- {} 0 subexpr {1<2 == 3} 9 operator == 0 subexpr 1<2 5 operator < 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-7.5 {ParseEqualityExpr procedure, next lexeme is "==" or "!="} {
+    testexprparser {1<2 != 3} -1
+} {- {} 0 subexpr {1<2 != 3} 9 operator != 0 subexpr 1<2 5 operator < 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-7.6 {ParseEqualityExpr procedure, bad lexeme after "==" or "!="} {nonPortable} {
+    list [catch {testexprparser {1<2 == 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-7.7 {ParseEqualityExpr procedure, valid RHS subexpression} {
+    testexprparser {1<2 == 3 == 4} -1
+} {- {} 0 subexpr {1<2 == 3 == 4} 13 operator == 0 subexpr {1<2 == 3} 9 operator == 0 subexpr 1<2 5 operator < 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-7.8 {ParseEqualityExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1<2 == 3 != martha} -1} msg] $msg
+} {1 {syntax error in expression "1<2 == 3 != martha"}}
+
+test parseExpr-8.1 {ParseRelationalExpr procedure, valid LHS shift subexpr} {
+    testexprparser {1<<2 < 3} -1
+} {- {} 0 subexpr {1<<2 < 3} 9 operator < 0 subexpr 1<<2 5 operator << 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-8.2 {ParseRelationalExpr procedure, error in LHS shift subexpr} {
+    list [catch {testexprparser {1>=foo < 3} -1} msg] $msg
+} {1 {syntax error in expression "1>=foo < 3"}}
+test parseExpr-8.3 {ParseRelationalExpr procedure, next lexeme isn't relational op} {
+    testexprparser {1<<2? 1 : 0} -1
+} {- {} 0 subexpr {1<<2? 1 : 0} 11 operator ? 0 subexpr 1<<2 5 operator << 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-8.4 {ParseRelationalExpr procedure, next lexeme is relational op} {
+    testexprparser {1<<2 < 3} -1
+} {- {} 0 subexpr {1<<2 < 3} 9 operator < 0 subexpr 1<<2 5 operator << 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-8.5 {ParseRelationalExpr procedure, next lexeme is relational op} {
+    testexprparser {1>>2 > 3} -1
+} {- {} 0 subexpr {1>>2 > 3} 9 operator > 0 subexpr 1>>2 5 operator >> 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-8.6 {ParseRelationalExpr procedure, next lexeme is relational op} {
+    testexprparser {1<<2 <= 3} -1
+} {- {} 0 subexpr {1<<2 <= 3} 9 operator <= 0 subexpr 1<<2 5 operator << 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-8.7 {ParseRelationalExpr procedure, next lexeme is relational op} {
+    testexprparser {1<<2 >= 3} -1
+} {- {} 0 subexpr {1<<2 >= 3} 9 operator >= 0 subexpr 1<<2 5 operator << 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-8.8 {ParseRelationalExpr procedure, bad lexeme after relational op} {nonPortable} {
+    list [catch {testexprparser {1<<2 < 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-8.9 {ParseRelationalExpr procedure, valid RHS subexpression} {
+    testexprparser {1<<2 < 3 < 4} -1
+} {- {} 0 subexpr {1<<2 < 3 < 4} 13 operator < 0 subexpr {1<<2 < 3} 9 operator < 0 subexpr 1<<2 5 operator << 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-8.8 {ParseRelationalExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1<<2 < 3 > martha} -1} msg] $msg
+} {1 {syntax error in expression "1<<2 < 3 > martha"}}
+
+test parseExpr-9.1 {ParseShiftExpr procedure, valid LHS add subexpr} {
+    testexprparser {1+2 << 3} -1
+} {- {} 0 subexpr {1+2 << 3} 9 operator << 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-9.2 {ParseShiftExpr procedure, error in LHS add subexpr} {
+    list [catch {testexprparser {1-foo << 3} -1} msg] $msg
+} {1 {syntax error in expression "1-foo << 3"}}
+test parseExpr-9.3 {ParseShiftExpr procedure, next lexeme isn't "<<" or ">>"} {
+    testexprparser {1+2? 1 : 0} -1
+} {- {} 0 subexpr {1+2? 1 : 0} 11 operator ? 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-9.4 {ParseShiftExpr procedure, next lexeme is "<<" or ">>} {
+    testexprparser {1+2 << 3} -1
+} {- {} 0 subexpr {1+2 << 3} 9 operator << 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-9.5 {ParseShiftExpr procedure, next lexeme is "<<" or ">>"} {
+    testexprparser {1+2 >> 3} -1
+} {- {} 0 subexpr {1+2 >> 3} 9 operator >> 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-9.6 {ParseShiftExpr procedure, bad lexeme after "<<" or ">>"} {nonPortable} {
+    list [catch {testexprparser {1+2 << 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-9.7 {ParseShiftExpr procedure, valid RHS subexpression} {
+    testexprparser {1+2 << 3 << 4} -1
+} {- {} 0 subexpr {1+2 << 3 << 4} 13 operator << 0 subexpr {1+2 << 3} 9 operator << 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-9.8 {ParseShiftExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1+2 << 3 >> martha} -1} msg] $msg
+} {1 {syntax error in expression "1+2 << 3 >> martha"}}
+
+test parseExpr-10.1 {ParseAddExpr procedure, valid LHS multiply subexpr} {
+    testexprparser {1*2 + 3} -1
+} {- {} 0 subexpr {1*2 + 3} 9 operator + 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-10.2 {ParseAddExpr procedure, error in LHS multiply subexpr} {
+    list [catch {testexprparser {1/foo + 3} -1} msg] $msg
+} {1 {syntax error in expression "1/foo + 3"}}
+test parseExpr-10.3 {ParseAddExpr procedure, next lexeme isn't "+" or "-"} {
+    testexprparser {1*2? 1 : 0} -1
+} {- {} 0 subexpr {1*2? 1 : 0} 11 operator ? 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-10.4 {ParseAddExpr procedure, next lexeme is "+" or "-} {
+    testexprparser {1*2 + 3} -1
+} {- {} 0 subexpr {1*2 + 3} 9 operator + 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-10.5 {ParseAddExpr procedure, next lexeme is "+" or "-"} {
+    testexprparser {1*2 - 3} -1
+} {- {} 0 subexpr {1*2 - 3} 9 operator - 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-10.6 {ParseAddExpr procedure, bad lexeme after "+" or "-"} {nonPortable} {
+    list [catch {testexprparser {1*2 + 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-10.7 {ParseAddExpr procedure, valid RHS subexpression} {
+    testexprparser {1*2 + 3 + 4} -1
+} {- {} 0 subexpr {1*2 + 3 + 4} 13 operator + 0 subexpr {1*2 + 3} 9 operator + 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-10.8 {ParseAddExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1*2 + 3 - martha} -1} msg] $msg
+} {1 {syntax error in expression "1*2 + 3 - martha"}}
+
+test parseExpr-10.1 {ParseAddExpr procedure, valid LHS multiply subexpr} {
+    testexprparser {1*2 + 3} -1
+} {- {} 0 subexpr {1*2 + 3} 9 operator + 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-10.2 {ParseAddExpr procedure, error in LHS multiply subexpr} {
+    list [catch {testexprparser {1/foo + 3} -1} msg] $msg
+} {1 {syntax error in expression "1/foo + 3"}}
+test parseExpr-10.3 {ParseAddExpr procedure, next lexeme isn't "+" or "-"} {
+    testexprparser {1*2? 1 : 0} -1
+} {- {} 0 subexpr {1*2? 1 : 0} 11 operator ? 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-10.4 {ParseAddExpr procedure, next lexeme is "+" or "-} {
+    testexprparser {1*2 + 3} -1
+} {- {} 0 subexpr {1*2 + 3} 9 operator + 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-10.5 {ParseAddExpr procedure, next lexeme is "+" or "-"} {
+    testexprparser {1*2 - 3} -1
+} {- {} 0 subexpr {1*2 - 3} 9 operator - 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-10.6 {ParseAddExpr procedure, bad lexeme after "+" or "-"} {nonPortable} {
+    list [catch {testexprparser {1*2 + 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-10.7 {ParseAddExpr procedure, valid RHS subexpression} {
+    testexprparser {1*2 + 3 + 4} -1
+} {- {} 0 subexpr {1*2 + 3 + 4} 13 operator + 0 subexpr {1*2 + 3} 9 operator + 0 subexpr 1*2 5 operator * 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-10.8 {ParseAddExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {1*2 + 3 - martha} -1} msg] $msg
+} {1 {syntax error in expression "1*2 + 3 - martha"}}
+
+test parseExpr-11.1 {ParseMultiplyExpr procedure, valid LHS unary subexpr} {
+    testexprparser {+2 * 3} -1
+} {- {} 0 subexpr {+2 * 3} 7 operator * 0 subexpr +2 3 operator + 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-11.2 {ParseMultiplyExpr procedure, error in LHS unary subexpr} {nonPortable} {
+    list [catch {testexprparser {-12345678901234567890 * 3} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-11.3 {ParseMultiplyExpr procedure, next lexeme isn't "*", "/", or "%"} {
+    testexprparser {+2? 1 : 0} -1
+} {- {} 0 subexpr {+2? 1 : 0} 9 operator ? 0 subexpr +2 3 operator + 0 subexpr 2 1 text 2 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-11.4 {ParseMultiplyExpr procedure, next lexeme is "*", "/", or "%"} {
+    testexprparser {-123 * 3} -1
+} {- {} 0 subexpr {-123 * 3} 7 operator * 0 subexpr -123 3 operator - 0 subexpr 123 1 text 123 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-11.5 {ParseMultiplyExpr procedure, next lexeme is "*", "/", or "%"} {
+    testexprparser {+-456 / 3} -1
+} {- {} 0 subexpr {+-456 / 3} 9 operator / 0 subexpr +-456 5 operator + 0 subexpr -456 3 operator - 0 subexpr 456 1 text 456 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-11.6 {ParseMultiplyExpr procedure, next lexeme is "*", "/", or "%"} {
+    testexprparser {+-456 % 3} -1
+} {- {} 0 subexpr {+-456 % 3} 9 operator % 0 subexpr +-456 5 operator + 0 subexpr -456 3 operator - 0 subexpr 456 1 text 456 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-11.7 {ParseMultiplyExpr procedure, bad lexeme after "*", "/", or "%"} {nonPortable} {
+    list [catch {testexprparser {--++5 / 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-11.8 {ParseMultiplyExpr procedure, valid RHS subexpression} {
+    testexprparser {-2 / 3 % 4} -1
+} {- {} 0 subexpr {-2 / 3 % 4} 11 operator % 0 subexpr {-2 / 3} 7 operator / 0 subexpr -2 3 operator - 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-11.9 {ParseMultiplyExpr procedure, error in RHS subexpression} {
+    list [catch {testexprparser {++2 / 3 * martha} -1} msg] $msg
+} {1 {syntax error in expression "++2 / 3 * martha"}}
+
+test parseExpr-12.1 {ParseUnaryExpr procedure, first token is unary operator} {
+    testexprparser {+2} -1
+} {- {} 0 subexpr +2 3 operator + 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-12.2 {ParseUnaryExpr procedure, first token is unary operator} {
+    testexprparser {-2} -1
+} {- {} 0 subexpr -2 3 operator - 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-12.3 {ParseUnaryExpr procedure, first token is unary operator} {
+    testexprparser {~2} -1
+} {- {} 0 subexpr ~2 3 operator ~ 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-12.4 {ParseUnaryExpr procedure, first token is unary operator} {
+    testexprparser {!2} -1
+} {- {} 0 subexpr !2 3 operator ! 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-12.5 {ParseUnaryExpr procedure, error in lexeme after unary op} {nonPortable} {
+    list [catch {testexprparser {-12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-12.6 {ParseUnaryExpr procedure, simple unary expr after unary op} {
+    testexprparser {+"1234"} -1
+} {- {} 0 subexpr +\"1234\" 3 operator + 0 subexpr {"1234"} 1 text 1234 0 {}}
+test parseExpr-12.7 {ParseUnaryExpr procedure, another unary expr after unary op} {
+    testexprparser {~!{fred}} -1
+} {- {} 0 subexpr ~!{fred} 5 operator ~ 0 subexpr !{fred} 3 operator ! 0 subexpr {{fred}} 1 text fred 0 {}}
+test parseExpr-12.8 {ParseUnaryExpr procedure, error in unary expr after unary op} {
+    list [catch {testexprparser {+-||27} -1} msg] $msg
+} {1 {syntax error in expression "+-||27"}}
+test parseExpr-12.9 {ParseUnaryExpr procedure, error in unary expr after unary op} {
+    list [catch {testexprparser {+-||27} -1} msg] $msg
+} {1 {syntax error in expression "+-||27"}}
+test parseExpr-12.10 {ParseUnaryExpr procedure, first token is not unary op} {
+    testexprparser {123} -1
+} {- {} 0 subexpr 123 1 text 123 0 {}}
+test parseExpr-12.11 {ParseUnaryExpr procedure, not unary expr, complex primary expr} {
+    testexprparser {(1+2)} -1
+} {- {} 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-12.12 {ParseUnaryExpr procedure, not unary expr, error in primary expr} {nonPortable} {
+    list [catch {testexprparser {(12345678901234567890)} -1} msg] $msg
+} {1 {integer value too large to represent}}
+
+test parseExpr-13.1 {ParsePrimaryExpr procedure, just parenthesized subexpr} {
+    testexprparser {({abc}/{def})} -1
+} {- {} 0 subexpr {{abc}/{def}} 5 operator / 0 subexpr {{abc}} 1 text abc 0 subexpr {{def}} 1 text def 0 {}}
+test parseExpr-13.2 {ParsePrimaryExpr procedure, bad lexeme after "("} {nonPortable} {
+    list [catch {testexprparser {(12345678901234567890)} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-13.3 {ParsePrimaryExpr procedure, valid parenthesized subexpr} {
+    testexprparser {({abc}? 2*4 : -6)} -1
+} {- {} 0 subexpr {{abc}? 2*4 : -6} 13 operator ? 0 subexpr {{abc}} 1 text abc 0 subexpr 2*4 5 operator * 0 subexpr 2 1 text 2 0 subexpr 4 1 text 4 0 subexpr -6 3 operator - 0 subexpr 6 1 text 6 0 {}}
+test parseExpr-13.4 {ParsePrimaryExpr procedure, error in parenthesized subexpr} {
+    list [catch {testexprparser {(? 123 : 456)} -1} msg] $msg
+} {1 {syntax error in expression "(? 123 : 456)"}}
+test parseExpr-13.5 {ParsePrimaryExpr procedure, missing ")" after in parenthesized subexpr} {
+    list [catch {testexprparser {({abc}/{def}} -1} msg] $msg
+} {1 {syntax error in expression "({abc}/{def}"}}
+test parseExpr-13.6 {ParsePrimaryExpr procedure, primary is literal} {
+    testexprparser {12345} -1
+} {- {} 0 subexpr 12345 1 text 12345 0 {}}
+test parseExpr-13.7 {ParsePrimaryExpr procedure, primary is literal} {
+    testexprparser {12345.6789} -1
+} {- {} 0 subexpr 12345.6789 1 text 12345.6789 0 {}}
+test parseExpr-13.8 {ParsePrimaryExpr procedure, primary is var reference} {
+    testexprparser {$a} -1
+} {- {} 0 subexpr {$a} 2 variable {$a} 1 text a 0 {}}
+test parseExpr-13.9 {ParsePrimaryExpr procedure, primary is var reference} {
+    testexprparser {$a(hello$there)} -1
+} {- {} 0 subexpr {$a(hello$there)} 5 variable {$a(hello$there)} 4 text a 0 text hello 0 variable {$there} 1 text there 0 {}}
+test parseExpr-13.10 {ParsePrimaryExpr procedure, primary is var reference} {
+    testexprparser {$a()} -1
+} {- {} 0 subexpr {$a()} 3 variable {$a()} 2 text a 0 text {} 0 {}}
+test parseExpr-13.11 {ParsePrimaryExpr procedure, error in var reference} {
+    list [catch {testexprparser {$a(} -1} msg] $msg
+} {1 {missing )}}
+test parseExpr-13.12 {ParsePrimaryExpr procedure, primary is quoted string} {
+    testexprparser {"abc $xyz def"} -1
+} {- {} 0 subexpr {"abc $xyz def"} 5 word {"abc $xyz def"} 4 text {abc } 0 variable {$xyz} 1 text xyz 0 text { def} 0 {}}
+test parseExpr-13.13 {ParsePrimaryExpr procedure, error in quoted string} {
+    list [catch {testexprparser {"$a(12"} -1} msg] $msg
+} {1 {missing )}}
+test parseExpr-13.14 {ParsePrimaryExpr procedure, quoted string has multiple tokens} {
+    testexprparser {"abc [xyz] $def"} -1
+} {- {} 0 subexpr {"abc [xyz] $def"} 6 word {"abc [xyz] $def"} 5 text {abc } 0 command {[xyz]} 0 text { } 0 variable {$def} 1 text def 0 {}}
+test parseExpr-13.15 {ParsePrimaryExpr procedure, primary is command} {
+    testexprparser {[def]} -1
+} {- {} 0 subexpr {[def]} 1 command {[def]} 0 {}}
+test parseExpr-13.16 {ParsePrimaryExpr procedure, primary is multiple commands} {
+    testexprparser {[one; two; three; four;]} -1
+} {- {} 0 subexpr {[one; two; three; four;]} 1 command {[one; two; three; four;]} 0 {}}
+test parseExpr-13.17 {ParsePrimaryExpr procedure, primary is multiple commands} {
+    testexprparser {[one; two; three; four;]} -1
+} {- {} 0 subexpr {[one; two; three; four;]} 1 command {[one; two; three; four;]} 0 {}}
+test parseExpr-13.18 {ParsePrimaryExpr procedure, missing close bracket} {
+    list [catch {testexprparser {[one} -1} msg] $msg
+} {1 {missing close-bracket}}
+test parseExpr-13.19 {ParsePrimaryExpr procedure, primary is braced string} {
+    testexprparser {{hello world}} -1
+} {- {} 0 subexpr {{hello world}} 1 text {hello world} 0 {}}
+test parseExpr-13.20 {ParsePrimaryExpr procedure, error in primary, which is braced string} {
+    list [catch {testexprparser "\{abc\\\n" -1} msg] $msg
+} {1 {missing close-brace}}
+test parseExpr-13.21 {ParsePrimaryExpr procedure, primary is braced string with multiple tokens} {
+    testexprparser "\{  \\
+ +123 \}" -1
+} {- {} 0 subexpr \{\ \ \\\n\ +123\ \} 4 word \{\ \ \\\n\ +123\ \} 3 text {  } 0 backslash \\\n\  0 text {+123 } 0 {}}
+test parseExpr-13.22 {ParsePrimaryExpr procedure, primary is function call} {
+    testexprparser {foo(123)} -1
+} {- {} 0 subexpr foo(123) 3 operator foo 0 subexpr 123 1 text 123 0 {}}
+test parseExpr-13.23 {ParsePrimaryExpr procedure, bad lexeme after function name} {nonPortable} {
+    list [catch {testexprparser {foo 12345678901234567890 123)} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-13.24 {ParsePrimaryExpr procedure, lexeme after function name isn't "("} {
+    list [catch {testexprparser {foo 27.4 123)} -1} msg] $msg
+} {1 {syntax error in expression "foo 27.4 123)"}}
+test parseExpr-13.25 {ParsePrimaryExpr procedure, bad lexeme after "("} {nonPortable} {
+    list [catch {testexprparser {foo(12345678901234567890)} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-13.26 {ParsePrimaryExpr procedure, function call, one arg} {
+    testexprparser {foo(27*4)} -1
+} {- {} 0 subexpr foo(27*4) 7 operator foo 0 subexpr 27*4 5 operator * 0 subexpr 27 1 text 27 0 subexpr 4 1 text 4 0 {}}
+test parseExpr-13.27 {ParsePrimaryExpr procedure, error in function arg} {
+    list [catch {testexprparser {foo(*1-2)} -1} msg] $msg
+} {1 {syntax error in expression "foo(*1-2)"}}
+test parseExpr-13.28 {ParsePrimaryExpr procedure, error in function arg} {
+    list [catch {testexprparser {foo(*1-2)} -1} msg] $msg
+} {1 {syntax error in expression "foo(*1-2)"}}
+test parseExpr-13.29 {ParsePrimaryExpr procedure, function call, comma after arg} {
+    testexprparser {foo(27-2, (-2*[foo]))} -1
+} {- {} 0 subexpr {foo(27-2, (-2*[foo]))} 15 operator foo 0 subexpr 27-2 5 operator - 0 subexpr 27 1 text 27 0 subexpr 2 1 text 2 0 subexpr {-2*[foo]} 7 operator * 0 subexpr -2 3 operator - 0 subexpr 2 1 text 2 0 subexpr {[foo]} 1 command {[foo]} 0 {}}
+test parseExpr-13.30 {ParsePrimaryExpr procedure, bad lexeme after comma} {nonPortable} {
+    list [catch {testexprparser {foo(123, 12345678901234567890)} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-13.31 {ParsePrimaryExpr procedure, lexeme not "," or ")" after arg} {
+    list [catch {testexprparser {foo(123 [foo])} -1} msg] $msg
+} {1 {syntax error in expression "foo(123 [foo])"}}
+test parseExpr-13.32 {ParsePrimaryExpr procedure, bad lexeme after primary} {nonPortable} {
+    list [catch {testexprparser {123 12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+
+test parseExpr-14.1 {GetLexeme procedure, whitespace before lexeme} {
+    testexprparser {   123} -1
+} {- {} 0 subexpr 123 1 text 123 0 {}}
+test parseExpr-14.2 {GetLexeme procedure, whitespace before lexeme} {
+    testexprparser {  \
+456} -1
+} {- {} 0 subexpr 456 1 text 456 0 {}}
+test parseExpr-14.3 {GetLexeme procedure, no lexeme after whitespace} {
+    testexprparser { 123 \
+   } -1
+} {- {} 0 subexpr 123 1 text 123 0 {}}
+test parseExpr-14.4 {GetLexeme procedure, integer lexeme} {
+    testexprparser {000} -1
+} {- {} 0 subexpr 000 1 text 000 0 {}}
+test parseExpr-14.5 {GetLexeme procedure, integer lexeme too big} {nonPortable} {
+    list [catch {testexprparser {12345678901234567890} -1} msg] $msg
+} {1 {integer value too large to represent}}
+test parseExpr-14.6 {GetLexeme procedure, bad integer lexeme} {
+    list [catch {testexprparser {0999} -1} msg] $msg
+} {1 {syntax error in expression "0999"}}
+test parseExpr-14.7 {GetLexeme procedure, double lexeme} {
+    testexprparser {0.999} -1
+} {- {} 0 subexpr 0.999 1 text 0.999 0 {}}
+test parseExpr-14.8 {GetLexeme procedure, double lexeme} {
+    testexprparser {.123} -1
+} {- {} 0 subexpr .123 1 text .123 0 {}}
+test parseExpr-14.9 {GetLexeme procedure, double lexeme} {nonPortable unixOnly} {
+    testexprparser {nan} -1
+} {- {} 0 subexpr nan 1 text nan 0 {}}
+test parseExpr-14.10 {GetLexeme procedure, double lexeme} {nonPortable unixOnly} {
+    testexprparser {NaN} -1
+} {- {} 0 subexpr NaN 1 text NaN 0 {}}
+test parseExpr-14.11 {GetLexeme procedure, bad double lexeme too big} {
+    list [catch {testexprparser {123.e+99999999999999} -1} msg] $msg
+} {1 {floating-point value too large to represent}}
+test parseExpr-14.12 {GetLexeme procedure, bad double lexeme} {
+    list [catch {testexprparser {123.4x56} -1} msg] $msg
+} {1 {syntax error in expression "123.4x56"}}
+test parseExpr-14.13 {GetLexeme procedure, lexeme is "["} {
+    testexprparser {[foo]} -1
+} {- {} 0 subexpr {[foo]} 1 command {[foo]} 0 {}}
+test parseExpr-14.14 {GetLexeme procedure, lexeme is open brace} {
+    testexprparser {{bar}} -1
+} {- {} 0 subexpr {{bar}} 1 text bar 0 {}}
+test parseExpr-14.15 {GetLexeme procedure, lexeme is "("} {
+    testexprparser {(123)} -1
+} {- {} 0 subexpr 123 1 text 123 0 {}}
+test parseExpr-14.16 {GetLexeme procedure, lexeme is ")"} {
+    testexprparser {(2*3)} -1
+} {- {} 0 subexpr 2*3 5 operator * 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.17 {GetLexeme procedure, lexeme is "$"} {
+    testexprparser {$wombat} -1
+} {- {} 0 subexpr {$wombat} 2 variable {$wombat} 1 text wombat 0 {}}
+test parseExpr-14.18 {GetLexeme procedure, lexeme is '"'} {
+    testexprparser {"fred"} -1
+} {- {} 0 subexpr {"fred"} 1 text fred 0 {}}
+test parseExpr-14.19 {GetLexeme procedure, lexeme is ","} {
+    testexprparser {foo(1,2)} -1
+} {- {} 0 subexpr foo(1,2) 5 operator foo 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-14.20 {GetLexeme procedure, lexeme is "*"} {
+    testexprparser {$a*$b} -1
+} {- {} 0 subexpr {$a*$b} 7 operator * 0 subexpr {$a} 2 variable {$a} 1 text a 0 subexpr {$b} 2 variable {$b} 1 text b 0 {}}
+test parseExpr-14.21 {GetLexeme procedure, lexeme is "/"} {
+    testexprparser {5/6} -1
+} {- {} 0 subexpr 5/6 5 operator / 0 subexpr 5 1 text 5 0 subexpr 6 1 text 6 0 {}}
+test parseExpr-14.22 {GetLexeme procedure, lexeme is "%"} {
+    testexprparser {5%[xxx]} -1
+} {- {} 0 subexpr {5%[xxx]} 5 operator % 0 subexpr 5 1 text 5 0 subexpr {[xxx]} 1 command {[xxx]} 0 {}}
+test parseExpr-14.23 {GetLexeme procedure, lexeme is "+"} {
+    testexprparser {1+2} -1
+} {- {} 0 subexpr 1+2 5 operator + 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-14.24 {GetLexeme procedure, lexeme is "-"} {
+    testexprparser {.12-0e27} -1
+} {- {} 0 subexpr .12-0e27 5 operator - 0 subexpr .12 1 text .12 0 subexpr 0e27 1 text 0e27 0 {}}
+test parseExpr-14.25 {GetLexeme procedure, lexeme is "?" or ":"} {
+    testexprparser {$b? 1 : 0} -1
+} {- {} 0 subexpr {$b? 1 : 0} 8 operator ? 0 subexpr {$b} 2 variable {$b} 1 text b 0 subexpr 1 1 text 1 0 subexpr 0 1 text 0 0 {}}
+test parseExpr-14.26 {GetLexeme procedure, lexeme is "<"} {
+    testexprparser {2<3} -1
+} {- {} 0 subexpr 2<3 5 operator < 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.27 {GetLexeme procedure, lexeme is "<<"} {
+    testexprparser {2<<3} -1
+} {- {} 0 subexpr 2<<3 5 operator << 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.28 {GetLexeme procedure, lexeme is "<="} {
+    testexprparser {2<=3} -1
+} {- {} 0 subexpr 2<=3 5 operator <= 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.29 {GetLexeme procedure, lexeme is ">"} {
+    testexprparser {2>3} -1
+} {- {} 0 subexpr 2>3 5 operator > 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.30 {GetLexeme procedure, lexeme is ">>"} {
+    testexprparser {2>>3} -1
+} {- {} 0 subexpr 2>>3 5 operator >> 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.31 {GetLexeme procedure, lexeme is ">="} {
+    testexprparser {2>=3} -1
+} {- {} 0 subexpr 2>=3 5 operator >= 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.32 {GetLexeme procedure, lexeme is "=="} {
+    testexprparser {2==3} -1
+} {- {} 0 subexpr 2==3 5 operator == 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.33 {GetLexeme procedure, bad lexeme starting with "="} {
+    list [catch {testexprparser {2=+3} -1} msg] $msg
+} {1 {syntax error in expression "2=+3"}}
+test parseExpr-14.34 {GetLexeme procedure, lexeme is "!="} {
+    testexprparser {2!=3} -1
+} {- {} 0 subexpr 2!=3 5 operator != 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.35 {GetLexeme procedure, lexeme is "!"} {
+    testexprparser {!2} -1
+} {- {} 0 subexpr !2 3 operator ! 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-14.36 {GetLexeme procedure, lexeme is "&&"} {
+    testexprparser {2&&3} -1
+} {- {} 0 subexpr 2&&3 5 operator && 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.37 {GetLexeme procedure, lexeme is "&"} {
+    testexprparser {1&2} -1
+} {- {} 0 subexpr 1&2 5 operator & 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-14.38 {GetLexeme procedure, lexeme is "^"} {
+    testexprparser {1^2} -1
+} {- {} 0 subexpr 1^2 5 operator ^ 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-14.39 {GetLexeme procedure, lexeme is "||"} {
+    testexprparser {2||3} -1
+} {- {} 0 subexpr 2||3 5 operator || 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.40 {GetLexeme procedure, lexeme is "|"} {
+    testexprparser {1|2} -1
+} {- {} 0 subexpr 1|2 5 operator | 0 subexpr 1 1 text 1 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-14.41 {GetLexeme procedure, lexeme is "~"} {
+    testexprparser {~2} -1
+} {- {} 0 subexpr ~2 3 operator ~ 0 subexpr 2 1 text 2 0 {}}
+test parseExpr-14.42 {GetLexeme procedure, lexeme is func name} {
+    testexprparser {george()} -1
+} {- {} 0 subexpr george() 1 operator george 0 {}}
+test parseExpr-14.43 {GetLexeme procedure, lexeme is func name} {
+    testexprparser {harmonic_ratio(2,3)} -1
+} {- {} 0 subexpr harmonic_ratio(2,3) 5 operator harmonic_ratio 0 subexpr 2 1 text 2 0 subexpr 3 1 text 3 0 {}}
+test parseExpr-14.44 {GetLexeme procedure, unknown lexeme} {
+    list [catch {testexprparser {@27} -1} msg] $msg
+} {1 {syntax error in expression "@27"}}
+
+test parseExpr-15.1 {PrependSubExprTokens procedure, expand token array} {
+    testexprparser {[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]} -1
+} {- {} 0 subexpr {[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]} 13 operator && 0 subexpr {[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]} 9 operator && 0 subexpr {[string compare [format %c $i] [string index $a $i]]&&[string compare [format %c $i] [string index $a $i]]} 5 operator && 0 subexpr {[string compare [format %c $i] [string index $a $i]]} 1 command {[string compare [format %c $i] [string index $a $i]]} 0 subexpr {[string compare [format %c $i] [string index $a $i]]} 1 command {[string compare [format %c $i] [string index $a $i]]} 0 subexpr {[string compare [format %c $i] [string index $a $i]]} 1 command {[string compare [format %c $i] [string index $a $i]]} 0 subexpr {[string compare [format %c $i] [string index $a $i]]} 1 command {[string compare [format %c $i] [string index $a $i]]} 0 {}}
+
+test parse-16.1 {LogSyntaxError procedure, error in expr longer than 60 chars} {
+    list [catch {testexprparser {(+0123456)*(+0123456)*(+0123456)*(+0123456)*(+0123456)*(+0123456)*(+0123456)/} -1} msg] $msg
+} {1 {syntax error in expression "(+0123456)*(+0123456)*(+0123456)*(+0123456)*(+0123456)*(+012"}}
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+

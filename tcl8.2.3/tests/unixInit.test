@@ -1,0 +1,203 @@
+# The file tests the functions in the tclUnixInit.c file.
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1997 by Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+if {[info exists env(TCL_LIBRARY)]} {
+    set oldlibrary $env(TCL_LIBRARY)
+    unset env(TCL_LIBRARY)
+}
+catch {set oldlang $env(LANG)}
+set env(LANG) C
+
+# Some tests will fail if they are run on a machine that doesn't have
+# this Tcl version installed (as opposed to built) on it.
+if {[catch {
+    set f [open "|[list $::tcltest::tcltest]" w+]
+    exec kill -PIPE [pid $f]
+    close $f
+}]} {
+    set ::tcltest::testConstraints(installedTcl) 0
+} else {
+    set ::tcltest::testConstraints(installedTcl) 1
+}
+test unixInit-1.1 {TclpInitPlatform: ignore SIGPIPE} {unixOnly installedTcl} {
+    set x {}
+
+    # Watch out for a race condition here.  If tcltest is too slow to start
+    # then we'll kill it before it has a chance to set up its signal handler.
+    
+    set f [open "|[list $::tcltest::tcltest]" w+]
+    puts $f "puts hi"
+    flush $f
+    gets $f
+    exec kill -PIPE [pid $f]
+    lappend x [catch {close $f}]
+
+    set f [open "|[list $::tcltest::tcltest]" w+]
+    puts $f "puts hi"
+    flush $f
+    gets $f
+    exec kill [pid $f]
+    lappend x [catch {close $f}]
+
+    set x
+} {0 1}
+
+proc getlibpath "{program [list $::tcltest::tcltest]}" {
+    set f [open "|$program" w+]
+    fconfigure $f -buffering none
+    puts $f {puts $tcl_libPath; exit}
+    set path [gets $f]
+    close $f
+    return $path
+}
+
+# Some tests require the testgetdefenc command
+
+set ::tcltest::testConstraints(testgetdefenc) \
+	[expr {[info commands testgetdefenc] != {}}]
+
+test unixInit-2.0 {TclpInitLibraryPath: setting tclDefaultEncodingDir} \
+	{unixOnly testgetdefenc} {
+    set origDir [testgetdefenc]
+    testsetdefenc slappy
+    set path [testgetdefenc]
+    testsetdefenc $origDir
+    set path
+} {slappy}
+test unixInit-2.1 {TclpInitLibraryPath: value of installLib, developLib} \
+	{unixOnly installedTcl} {
+    set path [getlibpath]
+
+    set installLib lib/tcl[info tclversion]
+    if {[string match {*[ab]*} [info patchlevel]]} {
+	set developLib tcl[info patchlevel]/library
+    } else {
+        set developLib tcl[info tclversion]/library
+    }
+    set prefix [file dirname [file dirname $::tcltest::tcltest]]
+
+    set x {}
+    lappend x [string compare [lindex $path 0] $prefix/$installLib]
+    lappend x [string compare [lindex $path 4] [file dirname $prefix]/$developLib]
+    set x
+} {0 0}
+test unixInit-2.2 {TclpInitLibraryPath: TCL_LIBRARY} {unixOnly installedTcl} {
+    # ((str != NULL) && (str[0] != '\0')) 
+
+    set env(TCL_LIBRARY) sparkly
+    set path [getlibpath]
+    unset env(TCL_LIBRARY)
+
+    lindex $path 0
+} "sparkly"
+test unixInit-2.3 {TclpInitLibraryPath: TCL_LIBRARY wrong version} \
+	{unixOnly installedTcl} {
+    # ((pathc > 0) && (strcasecmp(installLib + 4, pathv[pathc - 1]) != 0))
+
+    set env(TCL_LIBRARY) /a/b/tcl1.7
+    set path [getlibpath]
+    unset env(TCL_LIBRARY)
+
+    lrange $path 0 1
+} [list /a/b/tcl1.7 /a/b/tcl[info tclversion]]
+test unixInit-2.4 {TclpInitLibraryPath: TCL_LIBRARY: INTL} \
+	{unixOnly installedTcl} {
+    # Child process translates env variable from native encoding.
+
+    set env(TCL_LIBRARY) "\xa7"
+    set x [lindex [getlibpath] 0]
+    unset env(TCL_LIBRARY)
+    unset env(LANG)
+
+    set x
+} "\xa7"
+test unixInit-2.5 {TclpInitLibraryPath: compiled-in library path} \
+	{emptyTest unixOnly} {
+    # cannot test
+} {}
+test unixInit-2.6 {TclpInitLibraryPath: executable relative} \
+	{unixOnly installedTcl} {
+    file delete -force /tmp/sparkly
+    file mkdir /tmp/sparkly/bin
+    file copy $::tcltest::tcltest /tmp/sparkly/bin/tcltest
+
+    file mkdir /tmp/sparkly/lib/tcl[info tclversion]
+    close [open /tmp/sparkly/lib/tcl[info tclversion]/init.tcl w]
+
+    set x [lrange [getlibpath /tmp/sparkly/bin/tcltest] 0 1]
+    file delete -force /tmp/sparkly
+    set x
+} [list /tmp/sparkly/lib/tcl[info tclversion] /tmp/lib/tcl[info tclversion]]
+test unixInit-2.7 {TclpInitLibraryPath: compiled-in library path} \
+	{emptyTest unixOnly} {
+    # would need test command to get defaultLibDir and compare it to
+    # [lindex $auto_path end]
+} {}
+test unixInit-3.1 {TclpSetInitialEncodings} {unixOnly installedTcl} {
+    set env(LANG) C
+
+    set f [open "|[list $::tcltest::tcltest]" w+]
+    fconfigure $f -buffering none
+    puts $f {puts [encoding system]; exit}
+    set enc [gets $f]
+    close $f
+    unset env(LANG)
+
+    set enc
+} {iso8859-1}
+test unixInit-3.2 {TclpSetInitialEncodings} {unixOnly installedTcl} {
+    set env(LANG) japanese
+
+    set f [open "|[list $::tcltest::tcltest]" w+]
+    fconfigure $f -buffering none
+    puts $f {puts [encoding system]; exit}
+    set enc [gets $f]
+    close $f
+    unset env(LANG)
+
+    switch $tcl_platform(os) {
+	HP-UX {set expectedEncoding shiftjis}
+	default {set expectedEncoding euc-jp}
+    }
+    string compare $enc $expectedEncoding
+} 0
+    
+test unixInit-4.1 {TclpSetVariables} {unixOnly} {
+    # just make sure they exist
+
+    set a [list $tcl_library $tcl_pkgPath $tcl_platform(os)]
+    set a [list $tcl_platform(osVersion) $tcl_platform(machine)]
+    set tcl_platform(platform)
+} "unix"
+
+test unixInit-5.1 {Tcl_Init} {emptyTest unixOnly} {
+    # test initScript
+} {}
+
+test unixInit-6.1 {Tcl_SourceRCFile} {emptyTest unixOnly} {
+} {}
+    
+# cleanup
+if {[info exists oldlibrary]} {
+    set env(TCL_LIBRARY) $oldlibrary
+}
+catch {unset env(LANG); set env(LANG) $oldlang}
+::tcltest::cleanupTests
+return
+

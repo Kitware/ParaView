@@ -1,0 +1,546 @@
+# This file contains tests for the tclBasic.c source file. Tests appear in
+# the same order as the C code that they test. The set of tests is
+# currently incomplete since it currently includes only new tests for
+# code changed for the addition of Tcl namespaces. Other variable-
+# related tests appear in several other test files including
+# assocd.test, cmdInfo.test, eval.test, expr.test, interp.test,
+# and trace.test.
+#
+# Sourcing this file into Tcl runs the tests and generates output for
+# errors. No output means no errors were found.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+#
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+catch {namespace delete test_ns_basic}
+catch {interp delete test_interp}
+catch {rename p ""}
+catch {rename q ""}
+catch {rename cmd ""}
+catch {unset x}
+
+test basic-1.1 {Tcl_CreateInterp, creates interp's global namespace} {
+    catch {interp delete test_interp}
+    interp create test_interp
+    interp eval test_interp {
+        namespace eval test_ns_basic {
+            proc p {} {
+                return [namespace current]
+            }
+        }
+    }
+    list [interp eval test_interp {test_ns_basic::p}] \
+         [interp delete test_interp]
+} {::test_ns_basic {}}
+
+test basic-2.1 {TclHideUnsafeCommands} {emptyTest} {
+} {}
+
+test basic-3.1 {Tcl_CallWhenDeleted: see dcall.test} {emptyTest} {
+} {}
+
+test basic-4.1 {Tcl_DontCallWhenDeleted: see dcall.test} {emptyTest} {
+} {}
+
+test basic-5.1 {Tcl_SetAssocData: see assoc.test} {emptyTest} {
+} {}
+
+test basic-6.1 {Tcl_DeleteAssocData: see assoc.test} {emptyTest} {
+} {}
+
+test basic-7.1 {Tcl_GetAssocData: see assoc.test} {emptyTest} {
+} {}
+
+test basic-8.1 {Tcl_InterpDeleted} {emptyTest} {
+} {}
+
+test basic-9.1 {Tcl_DeleteInterp: see interp.test} {emptyTest} {
+} {}
+
+test basic-10.1 {DeleteInterpProc, destroys interp's global namespace} {
+    catch {interp delete test_interp}
+    interp create test_interp
+    interp eval test_interp {
+        namespace eval test_ns_basic {
+            namespace export p
+            proc p {} {
+                return [namespace current]
+            }
+        }
+        namespace eval test_ns_2 {
+            namespace import ::test_ns_basic::p
+            variable v 27
+            proc q {} {
+                variable v
+                return "[p] $v"
+            }
+        }
+    }
+    list [interp eval test_interp {test_ns_2::q}] \
+         [interp eval test_interp {namespace delete ::}] \
+         [catch {interp eval test_interp {set a 123}} msg] $msg \
+         [interp delete test_interp]
+} {{::test_ns_basic 27} {} 1 {invalid command name "set"} {}}
+
+test basic-11.1 {HiddenCmdsDeleteProc, invalidate cached refs to deleted hidden cmd} {
+    catch {interp delete test_interp}
+    interp create test_interp
+    interp eval test_interp {
+        proc p {} {
+            return 27
+        }
+    }
+    interp alias {} localP test_interp p
+    list [interp eval test_interp {p}] \
+         [localP] \
+         [test_interp hide p] \
+         [catch {localP} msg] $msg \
+         [interp delete test_interp] \
+         [catch {localP} msg] $msg
+} {27 27 {} 1 {invalid command name "p"} {} 1 {invalid command name "localP"}}
+
+# NB: More tests about hide/expose are found in interp.test
+
+test basic-12.1 {Tcl_HideCommand, names of hidden cmds can't have namespace qualifiers} {
+    catch {interp delete test_interp}
+    interp create test_interp
+    interp eval test_interp {
+        namespace eval test_ns_basic {
+            proc p {} {
+                return [namespace current]
+            }
+        }
+    }
+    list [catch {test_interp hide test_ns_basic::p x} msg] $msg \
+	 [catch {test_interp hide x test_ns_basic::p} msg1] $msg1 \
+         [interp delete test_interp]
+} {1 {can only hide global namespace commands (use rename then hide)} 1 {cannot use namespace qualifiers as hidden commandtoken (rename)} {}}
+
+test basic-12.2 {Tcl_HideCommand, a hidden cmd remembers its containing namespace} {
+    catch {namespace delete test_ns_basic}
+    catch {rename cmd ""}
+    proc cmd {} {   ;# note that this is global
+        return [namespace current]
+    }
+    namespace eval test_ns_basic {
+        proc hideCmd {} {
+            interp hide {} cmd
+        }
+        proc exposeCmd {} {
+            interp expose {} cmd
+        }
+        proc callCmd {} {
+            cmd
+        }
+    }
+    list [test_ns_basic::callCmd] \
+         [test_ns_basic::hideCmd] \
+         [catch {cmd} msg] $msg \
+         [test_ns_basic::exposeCmd] \
+         [test_ns_basic::callCmd] \
+         [namespace delete test_ns_basic]
+} {:: {} 1 {invalid command name "cmd"} {} :: {}}
+
+test basic-13.1 {Tcl_ExposeCommand, a command stays in the global namespace and can not go to another namespace} {
+    catch {namespace delete test_ns_basic}
+    catch {rename cmd ""}
+    proc cmd {} {   ;# note that this is global
+        return [namespace current]
+    }
+    namespace eval test_ns_basic {
+        proc hideCmd {} {
+            interp hide {} cmd
+        }
+        proc exposeCmdFailing {} {
+            interp expose {} cmd ::test_ns_basic::newCmd
+        }
+        proc exposeCmdWorkAround {} {
+            interp expose {} cmd;
+	    rename cmd ::test_ns_basic::newCmd;
+        }
+        proc callCmd {} {
+            cmd
+        }
+    }
+    list [test_ns_basic::callCmd] \
+         [test_ns_basic::hideCmd] \
+         [catch {test_ns_basic::exposeCmdFailing} msg] $msg \
+         [test_ns_basic::exposeCmdWorkAround] \
+         [test_ns_basic::newCmd] \
+         [namespace delete test_ns_basic]
+} {:: {} 1 {can not expose to a namespace (use expose to toplevel, then rename)} {} ::test_ns_basic {}}
+test basic-13.2 {Tcl_ExposeCommand, invalidate cached refs to cmd now being exposed} {
+    catch {rename p ""}
+    catch {rename cmd ""}
+    proc p {} {
+        cmd
+    }
+    proc cmd {} {
+        return 42
+    }
+    list [p] \
+         [interp hide {} cmd] \
+         [proc cmd {} {return Hello}] \
+         [cmd] \
+         [rename cmd ""] \
+         [interp expose {} cmd] \
+         [p]
+} {42 {} {} Hello {} {} 42}
+
+if {[info commands testcreatecommand] == ""} {
+    puts "This application hasn't been compiled with the testcreatecommand"
+    puts "command.  Skipping affected tests."
+} else {
+test basic-14.1 {Tcl_CreateCommand, new cmd goes into a namespace specified in its name, if any} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    list [testcreatecommand create] \
+	 [test_ns_basic::createdcommand] \
+	 [testcreatecommand delete]
+} {{} {CreatedCommandProc in ::test_ns_basic} {}}
+test basic-14.2 {Tcl_CreateCommand, namespace code ignore single ":"s in middle or end of names} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {rename value:at: ""}
+    list [testcreatecommand create2] \
+	 [value:at:] \
+	 [testcreatecommand delete2]
+} {{} {CreatedCommandProc2 in ::} {}}
+}
+
+test basic-15.1 {Tcl_CreateObjCommand, new cmd goes into a namespace specified in its name, if any} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    namespace eval test_ns_basic {}
+    proc test_ns_basic::cmd {} {  ;# proc requires that ns already exist
+        return [namespace current]
+    }
+    list [test_ns_basic::cmd] \
+         [namespace delete test_ns_basic]
+} {::test_ns_basic {}}
+
+test basic-16.1 {TclInvokeStringCommand} {emptyTest} {
+} {}
+
+test basic-17.1 {TclInvokeObjCommand} {emptyTest} {
+} {}
+
+test basic-18.1 {TclRenameCommand, name of existing cmd can have namespace qualifiers} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {rename cmd ""}
+    namespace eval test_ns_basic {
+        proc p {} {
+            return "p in [namespace current]"
+        }
+    }
+    list [test_ns_basic::p] \
+         [rename test_ns_basic::p test_ns_basic::q] \
+         [test_ns_basic::q] 
+} {{p in ::test_ns_basic} {} {p in ::test_ns_basic}}
+test basic-18.2 {TclRenameCommand, existing cmd must be found} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    list [catch {rename test_ns_basic::p test_ns_basic::q} msg] $msg
+} {1 {can't rename "test_ns_basic::p": command doesn't exist}}
+test basic-18.3 {TclRenameCommand, delete cmd if new name is empty} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    namespace eval test_ns_basic {
+        proc p {} {
+            return "p in [namespace current]"
+        }
+    }
+    list [info commands test_ns_basic::*] \
+         [rename test_ns_basic::p ""] \
+         [info commands test_ns_basic::*]
+} {::test_ns_basic::p {} {}}
+test basic-18.4 {TclRenameCommand, bad new name} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    namespace eval test_ns_basic {
+        proc p {} {
+            return "p in [namespace current]"
+        }
+    }
+    rename test_ns_basic::p :::george::martha
+} {}
+test basic-18.5 {TclRenameCommand, new name must not already exist} {
+    namespace eval test_ns_basic {
+        proc q {} {
+            return 42
+        }
+    }
+    list [catch {rename test_ns_basic::q :::george::martha} msg] $msg
+} {1 {can't rename to ":::george::martha": command already exists}}
+test basic-18.6 {TclRenameCommand, check for command shadowing by newly renamed cmd} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {rename p ""}
+    catch {rename q ""}
+    proc p {} {
+        return "p in [namespace current]"
+    }
+    proc q {} {
+        return "q in [namespace current]"
+    }
+    namespace eval test_ns_basic {
+        proc callP {} {
+            p
+        }
+    }
+    list [test_ns_basic::callP] \
+         [rename q test_ns_basic::p] \
+         [test_ns_basic::callP]
+} {{p in ::} {} {q in ::test_ns_basic}}
+
+test basic-19.1 {Tcl_SetCommandInfo} {emptyTest} {
+} {}
+
+if {[info commands testcmdtoken] == {}} {
+    puts "This application hasn't been compiled with the \"testcmdtoken\""
+    puts "command, so I can't test Tcl_GetCommandInfo."
+} else {
+test basic-20.1 {Tcl_GetCommandInfo, names for commands created inside namespaces} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {rename p ""}
+    catch {rename q ""}
+    catch {unset x}
+    set x [namespace eval test_ns_basic::test_ns_basic2 {
+        # the following creates a cmd in the global namespace
+        testcmdtoken create p
+    }]
+    list [testcmdtoken name $x] \
+         [rename ::p q] \
+         [testcmdtoken name $x]
+} {{p ::p} {} {q ::q}}
+test basic-20.2 {Tcl_GetCommandInfo, names for commands created outside namespaces} {
+    catch {rename q ""}
+    set x [testcmdtoken create test_ns_basic::test_ns_basic2::p]
+    list [testcmdtoken name $x] \
+         [rename test_ns_basic::test_ns_basic2::p q] \
+         [testcmdtoken name $x]
+} {{p ::test_ns_basic::test_ns_basic2::p} {} {q ::q}}
+}
+
+test basic-21.1 {Tcl_GetCommandName} {emptyTest} {
+} {}
+
+test basic-22.1 {Tcl_GetCommandFullName} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    namespace eval test_ns_basic1 {
+        namespace export cmd*
+        proc cmd1 {} {}
+        proc cmd2 {} {}
+    }
+    namespace eval test_ns_basic2 {
+        namespace export *
+        namespace import ::test_ns_basic1::*
+        proc p {} {}
+    }
+    namespace eval test_ns_basic3 {
+        namespace import ::test_ns_basic2::*
+        proc q {} {}
+        list [namespace which -command foreach] \
+             [namespace which -command q] \
+             [namespace which -command p] \
+             [namespace which -command cmd1] \
+             [namespace which -command ::test_ns_basic2::cmd2]
+    }
+} {::foreach ::test_ns_basic3::q ::test_ns_basic3::p ::test_ns_basic3::cmd1 ::test_ns_basic2::cmd2}
+
+test basic-23.1 {Tcl_DeleteCommand} {emptyTest} {
+} {}
+
+test basic-24.1 {Tcl_DeleteCommandFromToken, invalidate all compiled code if cmd has compile proc} {
+    catch {interp delete test_interp}
+    catch {unset x}
+    interp create test_interp
+    interp eval test_interp {
+        proc useSet {} {
+            return [set a 123]
+        }
+    }
+    set x [interp eval test_interp {useSet}]
+    interp eval test_interp {
+        rename set ""
+        proc set {args} {
+            return "set called with $args"
+        }
+    }
+    list $x \
+         [interp eval test_interp {useSet}] \
+         [interp delete test_interp]
+} {123 {set called with a 123} {}}
+test basic-24.2 {Tcl_DeleteCommandFromToken, deleting commands changes command epoch} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {rename p ""}
+    proc p {} {
+        return "global p"
+    }
+    namespace eval test_ns_basic {
+        proc p {} {
+            return "namespace p"
+        }
+        proc callP {} {
+            p
+        }
+    }
+    list [test_ns_basic::callP] \
+         [rename test_ns_basic::p ""] \
+         [test_ns_basic::callP]
+} {{namespace p} {} {global p}}
+test basic-24.3 {Tcl_DeleteCommandFromToken, delete imported cmds that refer to a deleted cmd} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {rename p ""}
+    namespace eval test_ns_basic {
+        namespace export p
+        proc p {} {return 42}
+    }
+    namespace eval test_ns_basic2 {
+        namespace import ::test_ns_basic::*
+        proc callP {} {
+            p
+        }
+    }
+    list [test_ns_basic2::callP] \
+         [info commands test_ns_basic2::*] \
+         [rename test_ns_basic::p ""] \
+         [catch {test_ns_basic2::callP} msg] $msg \
+         [info commands test_ns_basic2::*]
+} {42 {::test_ns_basic2::callP ::test_ns_basic2::p} {} 1 {invalid command name "p"} ::test_ns_basic2::callP}
+
+test basic-25.1 {TclCleanupCommand} {emptyTest} {
+} {}
+
+test basic-26.1 {Tcl_EvalObj: preserve object while evaling it} {
+    # If object isn't preserved, errorInfo would be set to
+    # "foo\n    while executing\n\"garbage bytes\"" because the object's
+    # string would have been freed, leaving garbage bytes for the error
+    # message.
+
+    proc bgerror {args} {set ::x $::errorInfo}
+    set f [open test1 w]
+    fileevent $f writable "fileevent $f writable {}; error foo"
+    set x {}
+    vwait x
+    close $f
+    file delete test1
+    rename bgerror {}
+    set x
+} "foo\n    while executing\n\"error foo\""
+
+test basic-27.1 {Tcl_ExprLong} {emptyTest} {
+} {}
+
+test basic-28.1 {Tcl_ExprDouble} {emptyTest} {
+} {}
+
+test basic-29.1 {Tcl_ExprBoolean} {emptyTest} {
+} {}
+
+test basic-30.1 {Tcl_ExprLongObj} {emptyTest} {
+} {}
+
+test basic-31.1 {Tcl_ExprDoubleObj} {emptyTest} {
+} {}
+
+test basic-32.1 {Tcl_ExprBooleanObj} {emptyTest} {
+} {}
+
+test basic-33.1 {TclInvoke} {emptyTest} {
+} {}
+
+test basic-34.1 {TclGlobalInvoke} {emptyTest} {
+} {}
+
+test basic-35.1 {TclObjInvokeGlobal} {emptyTest} {
+} {}
+
+test basic-36.1 {TclObjInvoke, lookup of "unknown" command} {
+    catch {eval namespace delete [namespace children :: test_ns_*]}
+    catch {interp delete test_interp}
+    interp create test_interp
+    interp eval test_interp {
+        proc unknown {args} {
+            return "global unknown"
+        }
+        namespace eval test_ns_basic {
+            proc unknown {args} {
+                return "namespace unknown"
+            }
+        }
+    }
+    list [interp alias test_interp newAlias test_interp doesntExist] \
+         [catch {interp eval test_interp {newAlias}} msg] $msg \
+         [interp delete test_interp]
+} {newAlias 0 {global unknown} {}}
+
+test basic-37.1 {Tcl_ExprString: see expr.test} {emptyTest} {
+} {}
+
+test basic-38.1 {Tcl_ExprObj} {emptyTest} {
+} {}
+
+if {[info commands testcmdtrace] == {}} {
+    puts "This application hasn't been compiled with the \"testcmdtrace\""
+    puts "command, so I can't test Tcl_CreateTrace."
+} else {
+test basic-39.1 {Tcl_CreateTrace, correct command and argc/argv arguments of trace proc} {
+    testcmdtrace tracetest {set stuff [expr 14 + 16]}
+} {{expr 14 + 16} {expr 14 + 16} {set stuff [expr 14 + 16]} {set stuff 30}}
+test basic-39.2 {Tcl_CreateTrace, correct command and argc/argv arguments of trace proc} {
+    testcmdtrace tracetest {set stuff [info tclversion]}
+} {{info tclversion} {info tclversion} {set stuff [info tclversion]} {set stuff 8.2}}
+test basic-39.3 {Tcl_CreateTrace, correct command and argc/argv arguments of trace proc} {
+    testcmdtrace deletetest {set stuff [info tclversion]}
+} 8.2
+}
+
+test basic-40.1 {Tcl_DeleteTrace} {emptyTest} {
+} {}
+
+test basic-41.1 {Tcl_AddErrorInfo} {emptyTest} {
+} {}
+
+test basic-42.1 {Tcl_AddObjErrorInfo} {emptyTest} {
+} {}
+
+test basic-43.1 {Tcl_VarEval} {emptyTest} {
+} {}
+
+test basic-44.1 {Tcl_GlobalEval} {emptyTest} {
+} {}
+
+test basic-45.1 {Tcl_SetRecursionLimit: see interp.test} {emptyTest} {
+} {}
+
+test basic-46.1 {Tcl_AllowExceptions} {emptyTest} {
+} {}
+
+# cleanup
+catch {eval namespace delete [namespace children :: test_ns_*]}
+catch {namespace delete george}
+catch {interp delete test_interp}
+catch {rename p ""}
+catch {rename q ""}
+catch {rename cmd ""}
+catch {rename value:at: ""}
+catch {unset x}
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,153 @@
+# xmfbox.test -- 
+#
+#	This file is a Tcl script to test the file dialog that's used
+#	when the tk_strictMotif flag is set. Because the file dialog
+#	runs in a modal loop, the only way to test it sufficiently is
+#	to call the internal Tcl procedures in xmfbox.tcl directly.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
+
+set testPWD [pwd]
+eval destroy [winfo children .]
+catch {unset foo}
+
+catch {unset data foo}
+
+proc cleanup {} {
+    global testPWD
+
+    set err0 [catch {
+	cd $testPWD
+    } msg0]
+
+    set err1 [catch {
+	if [file exists ./~nosuchuser1] {
+	    file delete ./~nosuchuser1
+	}
+    } msg1]
+
+    set err2 [catch {
+	if [file exists ./~nosuchuser2] {
+	    file delete ./~nosuchuser2
+	}
+    } msg2]
+
+    set err3 [catch {
+	if [file exists ./~nosuchuser3] {
+	    file delete ./~nosuchuser3
+	}
+    } msg3]
+
+    set err4 [catch {
+	if [file exists ./~nosuchuser4] {
+	    file delete ./~nosuchuser4
+	}
+    } msg4]
+
+    if {$err0 || $err1 || $err2 || $err3 || $err4} {
+	error [list $msg0 $msg1 $msg2 $msg3 $msg4] 
+    }
+    catch {unset foo}
+    catch {destroy .foo}
+}
+
+test xmfbox-1.1 {tkMotifFDialog_Create, -parent switch} {unixOnly} {
+    catch {unset foo}
+    set x [tkMotifFDialog_Create foo open {-parent .}]
+    catch {destroy $x}
+    set x
+} .foo
+
+test xmfbox-1.2 {tkMotifFDialog_Create, -parent switch} {unixOnly} {
+    catch {unset foo}
+    toplevel .bar
+    set x [tkMotifFDialog_Create foo open {-parent .bar}]
+    catch {destroy $x}
+    catch {destroy .bar}
+    set x
+} .bar.foo
+
+test xmfbox-2.1 {tkMotifFDialog_InterpFilter, ~ in dir names} {unixOnly} {
+    cleanup
+    file mkdir ./~nosuchuser1
+    set x [tkMotifFDialog_Create foo open {}]
+    $foo(fEnt) delete 0 end
+    $foo(fEnt) insert 0 [pwd]/~nosuchuser1
+    set kk [tkMotifFDialog_InterpFilter $x]
+} [list $testPWD/~nosuchuser1 *]
+
+test xmfbox-2.2 {tkMotifFDialog_InterpFilter, ~ in file names} {unixOnly} {
+    cleanup
+    close [open ./~nosuchuser1 {CREAT TRUNC WRONLY}]
+    set x [tkMotifFDialog_Create foo open {}]
+    $foo(fEnt) delete 0 end
+    $foo(fEnt) insert 0 [pwd]/~nosuchuser1
+    set kk [tkMotifFDialog_InterpFilter $x]
+} [list $testPWD ./~nosuchuser1]
+
+test xmfbox-2.3 {tkMotifFDialog_Update, ~ in file names} {unixOnly} {
+    cleanup
+    close [open ./~nosuchuser1 {CREAT TRUNC WRONLY}]
+    set x [tkMotifFDialog_Create foo open {}]
+    $foo(fEnt) delete 0 end
+    $foo(fEnt) insert 0 [pwd]/~nosuchuser1
+    tkMotifFDialog_InterpFilter $x
+    tkMotifFDialog_Update $x
+    $foo(fList) get end
+} ~nosuchuser1
+
+test xmfbox-2.4 {tkMotifFDialog_LoadFile, ~ in file names} {unixOnly} {
+    cleanup
+    close [open ./~nosuchuser1 {CREAT TRUNC WRONLY}]
+    set x [tkMotifFDialog_Create foo open {}]
+    set i [lsearch [$foo(fList) get 0 end] ~nosuchuser1]
+    expr {$i >= 0}
+} 1
+
+test xmfbox-2.5 {tkMotifFDialog_BrowseFList, ~ in file names} {unixOnly} {
+    cleanup
+    close [open ./~nosuchuser1 {CREAT TRUNC WRONLY}]
+    set x [tkMotifFDialog_Create foo open {}]
+    set i [lsearch [$foo(fList) get 0 end] ~nosuchuser1]
+    $foo(fList) selection clear 0 end
+    $foo(fList) selection set $i
+    tkMotifFDialog_BrowseFList $x
+    $foo(sEnt) get
+} $testPWD/~nosuchuser1
+
+test xmfbox-2.5 {tkMotifFDialog_ActivateFList, ~ in file names} {unixOnly} {
+    cleanup
+    close [open ./~nosuchuser1 {CREAT TRUNC WRONLY}]
+    set x [tkMotifFDialog_Create foo open {}]
+    set i [lsearch [$foo(fList) get 0 end] ~nosuchuser1]
+    $foo(fList) selection clear 0 end
+    $foo(fList) selection set $i
+    tkMotifFDialog_BrowseFList $x
+    tkMotifFDialog_ActivateFList $x
+    list $foo(selectPath) $foo(selectFile) $tkPriv(selectFilePath)
+} [list $testPWD ~nosuchuser1 $testPWD/~nosuchuser1]
+
+# cleanup
+cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+

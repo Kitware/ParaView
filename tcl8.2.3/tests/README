@@ -1,0 +1,147 @@
+README -- Tcl test suite design document.
+
+RCS: @(#) Id
+
+Contents:
+---------
+
+    1. Introduction
+    2. Incompatibilities with prior Tcl versions
+
+1. Introduction:
+----------------
+
+This directory contains a set of validation tests for the Tcl commands
+and C Library procedures for Tcl.  Each of the files whose name ends
+in ".test" is intended to fully exercise the functions in the C source
+file that corresponds to the file prefix.  The C functions and/or Tcl
+commands tested by a given file are listed in the first line of the
+file.
+
+You can run the tests in three ways:
+
+    (a) type "make test" in ../unix; this will run all of the tests.
+
+    (b) type "tcltest <testFile> ?<option> <value>?
+	Command line options include:
+
+	-help                display usage information
+
+	-verbose <level>     set the level of verbosity to a substring
+			     of "bps".  See the "Test output" section
+			     of the tcltest man page for an
+			     explanation of this option. 
+
+	-match <matchList>   only run tests that match one or more of
+			     the glob patterns in <matchList>
+
+	-skip <skipList>     do not run tests that match one or more
+			     of the glob patterns in <skipList>
+
+	-file <globPatternList>  
+		             only source test files that match one or
+		             more of the glob patterns in
+		             <globPatternList> (relative to the
+		             "tests" directory).  This option only
+		             applies when you run the test suite with
+		             the "all.tcl" file.
+
+	-notfile <globPatternList>  
+	                     do not source test files that match one
+	                     or more of the patterns in
+	                     <globPatternList> (relative to the
+	                     "tests" directory).  This option only
+	                     applies when you run the test suite with
+	                     the "all.tcl" file.
+
+	-constraints <list>  tests with any constraints in <list> will
+			     not be skipped.  Not that elements of
+			     <list> must exactly match the existing
+			     constraints.
+
+        -limitconstraints <bool>
+                             If 1, limit test runs to those tests that
+                             match the constraints listed using the
+                             -constraints flag.  Use of this flag
+                             requires use of the -constraints flag.
+                             The default value is 0.
+
+        -tmpdir <dirname>    put temporary files created by
+                             ::tcltest::makeFile and
+                             ::tcltest::makeDirectory in the named
+                             directory.  The default location is
+                             ::tcltest::workingDirectory.
+
+        -preservecore <level>
+                             check for core files.  If level is 0,
+                             check for core files only when
+                             cleanupTests is called from an all.tcl
+                             file.  If 1, also check at the end of
+                             every test command.  If 2, also save core
+                             files in ::tcltest::temporaryDirectory.
+                             The default level is 0.
+ 
+    (c) start up tcltest in this directory, then "source" the test
+        file (for example, type "source parse.test").  To run all
+	of the tests, type "source all.tcl".  To use the options in
+	interactive mode, you can set their corresponding tcltest
+	namespace variables after loading the tcltest package.
+	For example, some of the tcltest variables are:
+		  ::tcltest::match
+		  ::tcltest::skip
+		  ::tcltest::testConstraints(nonPortable)
+		  ::tcltest::testConstraints(knownBug)
+		  ::tcltest::testConstraints(userInteractive)
+
+Please see the tcltest man page for more information regarding how to
+write and run tests.
+
+Please note that the all.tcl file will source your new test file if
+the filename matches the tests/*.test pattern (as it should).  The
+names of test files that contain regression (or glass-box) tests
+should correspond to the Tcl or C code file that they are testing.
+For example, the test file for the C file "tclCmdAH.c" is
+"cmdAH.test".  Test files that contain black-box tests may not
+correspond to any Tcl or C code file so they should match the pattern
+"*_bb.test". 
+
+Be sure your new test file can be run from any working directory.
+
+Be sure no temporary files are left behind by your test file.
+
+Be sure your tests can run cross-platform in both a build environment
+as well as an installation environment.  If your test file contains
+tests that should not be run in one or more of those cases, please use
+the constraints mechanism to skip those tests.
+
+2. Incompatibilities with prior Tcl versions:
+---------------------------------------------
+
+1) Global variables such as VERBOSE, TESTS, and testConfig are now
+   renamed to use the new "tcltest" namespace.
+
+   old name   new name
+   --------   --------
+   VERBOSE    ::tcltest::verbose
+   TESTS      ::tcltest::match
+   testConfig ::tcltest::testConstraints
+
+2) VERBOSE values are no longer numeric.  
+
+3) When you run "make test", the working dir for the test suite is now
+   the one from which you called "make test", rather than the "tests"
+   directory.  This change allows for both unix and windows test
+   suites to be run simultaneously without interference with each
+   other or with existing files.  All tests must now run independently
+   of their working directory.
+
+4) The "all" and "visual" files are now called "all.tcl" and
+   "visual_bb.test".
+
+5) The "defs" file no longer exists.
+
+6) Instead of creating a doAllTests file in the tests directory, to
+   run all nonPortable tests, just use the "-constraints nonPortable"
+   command line flag.  If you are running interactively, you can set
+   the ::tcltest::testConstraints(nonPortable) variable to 1 (after
+   loading the tcltest package).

@@ -1,0 +1,168 @@
+# This file tests the tclWinDde.c file.
+#
+# This file contains a collection of tests for one or more of the Tcl
+# built-in commands.  Sourcing this file into Tcl runs the tests and
+# generates output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1999 by Scriptics Corporation.
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    package require tcltest
+    namespace import ::tcltest::*
+}
+
+if {$tcl_platform(platform) == "windows"} {
+    if [catch {
+	set lib [lindex [glob [file join [pwd] [file dirname \
+		[info nameofexecutable]] tcldde*.dll]] 0]
+	load $lib dde
+    }] {
+	puts "Unable to find the dde package. Skipping registry tests."
+	::tcltest::cleanupTests
+	return
+    }
+}
+
+set scriptName script1.tcl
+
+
+proc createChildProcess { ddeServerName } {
+    
+    file delete -force $::scriptName
+    
+    set f [open $::scriptName w+]
+    puts $f {
+	if [catch {
+	    set lib [lindex [glob [file join [pwd] [file dirname \
+		    [info nameofexecutable]] tcldde*.dll]] 0]
+	    load $lib dde
+	}] {
+	    puts "Unable to find the dde package. Skipping registry tests."
+	    ::tcltest::cleanupTests
+	    return
+	}
+    }
+    puts $f "dde servername $ddeServerName"
+    puts $f {
+	puts ready
+	vwait done
+	update
+	exit
+    }
+    close $f
+    
+    set f [open "|$tcltest::tcltest $::scriptName" r]
+    gets $f
+    return $f
+}
+
+test winDde-1.1 {Settings the server's topic name} {pcOnly} {
+    list [dde servername foobar] [dde servername] [dde servername self]
+}  {foobar foobar self}
+
+test winDde-2.1 {Checking for other services} {pcOnly} {
+    expr [llength [dde services {} {}]] >= 0
+} 1
+
+test winDde-2.2 {Checking for existence, with service and topic specified} \
+	{pcOnly} {
+    llength [dde services TclEval self]
+} 1
+
+test winDde-2.3 {Checking for existence, with only the service specified} \
+	{pcOnly} {
+    expr [llength [dde services TclEval {}]] >= 1
+} 1
+
+test winDde-3.1 {DDE execute locally} {pcOnly} {
+    set a ""
+    dde execute TclEval self {set a "foo"}
+    set a
+} foo
+
+test winDde-3.2 {DDE execute -async locally} {pcOnly} {
+    set a ""
+    dde execute -async TclEval self {set a "foo"}
+    update
+    set a
+} foo
+
+test winDde-3.3 {DDE request locally} {pcOnly} {
+    set a ""
+    dde execute TclEval self {set a "foo"}
+    dde request TclEval self a
+} foo
+
+test winDde-3.4 {DDE eval locally} {pcOnly} {
+    set a ""
+    dde eval self set a "foo"
+} foo
+
+test winDde-4.1 {DDE execute remotely} {pcOnly} {
+    set a ""
+    set child [createChildProcess child]
+    dde execute TclEval child {set a "foo"}
+
+    dde execute TclEval child {set done 1}
+
+    set a
+} ""
+
+test winDde-4.2 {DDE execute remotely} {pcOnly} {
+    set a ""
+    set child [createChildProcess child]
+    dde execute -async TclEval child {set a "foo"}
+
+    dde execute TclEval child {set done 1}
+
+    set a
+} ""
+
+test winDde-4.3 {DDE request locally} {pcOnly} {
+    set a ""
+    set child [createChildProcess child]
+    dde execute TclEval child {set a "foo"}
+    set a [dde request TclEval child a]
+
+    
+    dde execute TclEval child {set done 1}
+
+    set a
+} foo
+
+test winDde-4.4 {DDE eval locally} {pcOnly} {
+    set a ""
+    set child [createChildProcess child]
+    set a [dde eval child set a "foo"]
+
+    dde execute TclEval child {set done 1}
+
+    set a
+} foo
+
+test winDde-5.1 {check for bad arguments} {pcOnly} {
+    catch {dde execute "" "" "" ""} result
+    set result
+} {wrong # args: should be "dde execute ?-async? serviceName topicName value"}
+
+test winDde-5.2 {check for bad arguments} {pcOnly} {
+    catch {dde execute "" "" ""} result
+    set result
+} {cannot execute null data}
+
+test winDde-5.3 {check for bad arguments} {pcOnly} {
+    catch {dde execute -foo "" "" ""} result
+    set result
+} {wrong # args: should be "dde execute ?-async? serviceName topicName value"}
+
+
+#cleanup
+file delete -force $::scriptName
+::tcltest::cleanupTests
+return
+

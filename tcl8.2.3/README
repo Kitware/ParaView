@@ -1,0 +1,206 @@
+README:  Tcl
+    This is the Tcl 8.2.3 source distribution.
+    You can get this release from:
+        http://www.scriptics.com/registration/8.2.3.tml
+
+RCS: @(#) Id
+
+Contents
+--------
+    1. Introduction
+    2. Documentation
+    3. Compiling and installing Tcl
+    4. Development tools
+    5. Tcl newsgroup
+    6. Tcl contributed archive
+    7. Tcl Resource Center
+    8. Mailing lists
+    9. Support and Training
+    10. Thank You
+
+1. Introduction
+---------------
+Tcl provides a powerful platform for creating integration
+applications that tie together diverse applications, protocols,
+devices, and frameworks.  When paired with the Tk toolkit, Tcl
+provides the fastest and most powerful way to create GUI applications
+that run on PCs, Unix, and the Macintosh.  Tcl can also be used for a
+variety of web-related tasks and for creating powerful command
+languages for applications.
+
+Tcl is maintained, enhanced, and distributed freely as a
+service to the Tcl community by Scriptics Corporation.
+The official home for Tcl/Tk is on the Scriptics Web site:
+
+    http://www.scriptics.com
+
+Tcl is a freely available open source package.  You can do virtually
+anything you like with it, such as modifying it, redistributing it,
+and selling it either in whole or in part.  See the file
+"license.terms" for complete information.
+
+2. Documentation
+---------------
+
+Extensive documentation is available at our website.  The
+home page for this release is
+    http://www.scriptics.com/software/8.2.html
+
+Information about new features in 8.2 can be found at
+    http://www.scriptics.com/software/whatsnew82.html
+
+Detailed release notes can be found at
+    http://www.scriptics.com/software/relnotes/tcl8.2.3
+
+Information about Tcl itself can be found at
+    http://www.scriptics.com/scripting/
+
+There are many Tcl books on the market.  Most are listed at
+    http://www.scriptics.com/resource/doc/books/
+
+2a. Unix Documentation
+----------------------
+
+The "doc" subdirectory in this release contains a complete set of
+reference manual entries for Tcl.  Files with extension ".1" are for
+programs (for example, tclsh.1); files with extension ".3" are for C
+library procedures; and files with extension ".n" describe Tcl
+commands.  The file "doc/Tcl.n" gives a quick summary of the Tcl
+language syntax.  To print any of the man pages on Unix, cd to the
+"doc" directory and invoke your favorite variant of troff using the
+normal -man macros, for example
+
+		ditroff -man Tcl.n
+
+to print Tcl.n.  If Tcl has been installed correctly and your "man"
+program supports it, you should be able to access the Tcl manual entries
+using the normal "man" mechanisms, such as
+
+		man Tcl
+
+2b. Windows Documentation
+-------------------------
+
+The "doc" subdirectory in this release contains a complete set of
+Windows help files for Tcl.  Once you install this Tcl release, a
+shortcut to the Windows help Tcl documentation will appear in the
+"Start" menu:
+
+	Start | Programs | Tcl | Tcl Help
+
+3. Compiling and installing Tcl
+-------------------------------
+
+There are brief notes in the unix/README, win/README, and mac/README
+about compiling on these different platforms.  There is additional
+information about building Tcl from sources at
+    http://www.scriptics.com/support/howto/compile.html
+
+
+4. TclPro Development tools
+--------------------
+
+A high quality set of commercial development tools is now available to
+accelerate your Tcl application development.  Scriptics' TclPro
+product provides a debugger, static code checker, packaging utility,
+and bytecode compiler.  Visit the Scriptics Web site at:
+
+	http://www.scriptics.com/tclpro
+
+for more information on TclPro and for a free evaluation download.
+
+5. Tcl newsgroup
+----------------
+
+There is a network news group "comp.lang.tcl" intended for the
+exchange of information about Tcl, Tk, and related applications.  The
+newsgroup is a great place to ask general information questions.  For
+bug reports, please see the "Support and bug fixes" section below.
+
+6. Tcl contributed archive
+--------------------------
+
+Many people have created exciting packages and applications based on Tcl
+and/or Tk and made them freely available to the Tcl community.  An archive
+of these contributions is kept on the machine ftp.neosoft.com.  You
+can access the archive using anonymous FTP; the Tcl contributed archive is
+in the directory "/pub/tcl".  The archive also contains several FAQ
+("frequently asked questions") documents that provide solutions to problems
+that are commonly encountered by TCL newcomers.
+
+7. Tcl Resource Center
+----------------------
+
+Visit http://www.scriptics.com/resource/ to see an annotated index of
+many Tcl resources available on the World Wide Web.  This includes
+papers, books, and FAQs, as well as development tools, extensions,
+applications, binary releases, and patches.  You can also recommend
+additional URLs for the resource center using the forms labeled "Add a
+Resource".
+
+8. Mailing lists
+----------------
+
+A couple of  Mailing List have been set up to discuss Macintosh or
+Windows related Tcl issues.  To subscribe send a message to:
+	
+	wintcl-request@tclconsortium.org
+	mactcl-request@tclconsortium.org
+	
+In the body of the message (the subject will be ignored) put:
+	
+	subscribe mactcl Joe Smith
+	
+Replace Joe Smith with your real name, of course.  (Use wintcl
+instead of mactcl if you're interested in the Windows list.)  If you
+would just like to receive more information about the list without
+subscribing put the line:
+
+	information mactcl
+	
+(or wintcl) in the body instead.
+
+9. Support and Training
+------------------------
+
+Scriptics is very interested in receiving bug reports, patches, and
+suggestions for improvements.  We prefer that you send this
+information to us via the bug form on the Scriptics Web site, rather
+than emailing us directly.  The bug form is at:
+
+	http://www.scriptics.com/support/bugForm.html
+
+The bug form was designed to give uniform structure to bug reports as
+well as to solicit enough information to minimize followup questions.
+The bug form also includes an option to automatically post your report
+on comp.lang.tcl.  We strongly recommend that you select this option
+because someone else who reads comp.lang.tcl may be able to offer a
+solution.
+
+We will log and follow-up on each bug, although we cannot promise a
+specific turn-around time.  Enhancements may take longer and may not
+happen at all unless there is widespread support for them (we're
+trying to slow the rate at which Tcl/Tk turns into a kitchen sink).
+It's very difficult to make incompatible changes to Tcl/Tk at this
+point, due to the size of the installed base.
+
+The Tcl community is too large for us to provide much individual
+support for users.  If you need help we suggest that you post
+questions to comp.lang.tcl.  We read the newsgroup and will attempt to
+answer esoteric questions for which no-one else is likely to know the
+answer.  In addition, Tcl/Tk support and training are available
+commercially from Scriptics at:
+
+	http://www.scriptics.com/training
+
+Also see the following Web site for links to other organizations that
+offer Tcl/Tk training:
+
+	http://www.scriptics.com/resource/commercial/training
+
+10. Thank You
+-------------
+
+We'd like to express our thanks to the Tcl community for all the
+helpful suggestions, bug reports, and patches we have received.
+Tcl/Tk has improved vastly and will continue to do so with your help.

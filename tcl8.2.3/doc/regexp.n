@@ -1,0 +1,102 @@
+'\"
+'\" Copyright (c) 1998 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH regexp n 8.1 Tcl "Tcl Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+regexp \- Match a regular expression against a string
+
+.SH SYNOPSIS
+\fBregexp \fR?\fIswitches\fR? \fIexp string \fR?\fImatchVar\fR? ?\fIsubMatchVar subMatchVar ...\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+Determines whether the regular expression \fIexp\fR matches part or
+all of \fIstring\fR and returns 1 if it does, 0 if it doesn't.
+(Regular expression matching is described in the \fBre_syntax\fR
+reference page.)
+.LP
+If additional arguments are specified after \fIstring\fR then they
+are treated as the names of variables in which to return
+information about which part(s) of \fIstring\fR matched \fIexp\fR.
+\fIMatchVar\fR will be set to the range of \fIstring\fR that
+matched all of \fIexp\fR.  The first \fIsubMatchVar\fR will contain
+the characters in \fIstring\fR that matched the leftmost parenthesized
+subexpression within \fIexp\fR, the next \fIsubMatchVar\fR will
+contain the characters that matched the next parenthesized
+subexpression to the right in \fIexp\fR, and so on.
+.PP
+If the initial arguments to \fBregexp\fR start with \fB\-\fR then
+they are treated as switches.  The following switches are
+currently supported:
+.TP 15
+\fB\-nocase\fR
+Causes upper-case characters in \fIstring\fR to be treated as
+lower case during the matching process.
+.TP 15
+\fB\-indices\fR
+Changes what is stored in the \fIsubMatchVar\fRs. 
+Instead of storing the matching characters from \fIstring\fR,
+each variable
+will contain a list of two decimal strings giving the indices
+in \fIstring\fR of the first and last characters in the matching
+range of characters.
+.VS 8.1
+.TP 15
+\fB\-expanded\fR
+Enables use of the expanded regular expression syntax where
+whitespace and comments are ignored.  This is the same as specifying
+the \fB(?x)\fR embedded option (see METASYNTAX, below).
+.TP 15
+\fB\-line\fR
+Enables newline-sensitive matching.  By default, newline is a
+completely ordinary character with no special meaning.  With this
+flag, `[^' bracket expressions and `.' never match newline, `^'
+matches an empty string after any newline in addition to its normal
+function, and `$' matches an empty string before any newline in
+addition to its normal function.  This flag is equivalent to
+specifying both \fB\-linestop\fR and \fB\-lineanchor\fR, or the
+\fB(?n)\fR embedded option (see METASYNTAX, below).
+.TP 15
+\fB\-linestop\fR
+Changes the behavior of `[^' bracket expressions and `.' so that they
+stop at newlines.  This is the same as specifying the \fB(?p)\fR
+embedded option (see METASYNTAX, below).
+.TP 15
+\fB\-lineanchor\fR
+Changes the behavior of `^' and `$' (the ``anchors'') so they match the
+beginning and end of a line respectively.  This is the same as
+specifying the \fB(?w)\fR embedded option (see METASYNTAX, below).
+.TP 15
+\fB\-about\fR
+Instead of attempting to match the regular expression, returns a list
+containing information about the regular expression.  The first
+element of the list is a subexpression count.  The second element is a
+list of property names that describe various attributes of the regular
+expression. This switch is primarily intended for debugging purposes.
+.VE 8.1
+.TP 15
+\fB\-\|\-\fR
+Marks the end of switches.  The argument following this one will
+be treated as \fIexp\fR even if it starts with a \fB\-\fR.
+.PP
+If there are more \fIsubMatchVar\fR's than parenthesized
+subexpressions within \fIexp\fR, or if a particular subexpression
+in \fIexp\fR doesn't match the string (e.g. because it was in a
+portion of the expression that wasn't matched), then the corresponding
+\fIsubMatchVar\fR will be set to ``\fB\-1 \-1\fR'' if \fB\-indices\fR
+has been specified or to an empty string otherwise.
+
+.SH "SEE ALSO"
+re_syntax(n)
+
+.SH KEYWORDS
+match, regular expression, string

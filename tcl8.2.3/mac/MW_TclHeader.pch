@@ -1,0 +1,49 @@
+/*
+ * MW_TclHeader.pch --
+ *
+ *  This file is the source for a pre-compilied header that gets used
+ *  for all files in the Tcl projects.  This make compilies go a bit
+ *  faster.  This file is only intended to be used in the MetroWerks
+ *  CodeWarrior environment.  It essentially acts as a place to set 
+ *  compiler flags.  See MetroWerks documention for more details.
+ *
+ * Copyright (c) 1995-1997 Sun Microsystems, Inc.
+ *
+ * See the file "license.terms" for information on usage and redistribution
+ * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+ *
+ * RCS: @(#) Id
+ */
+
+/*
+ * To use the compilied header you need to set the "Prefix file" in
+ * the "C/C++ Language" preference panel to point to the created
+ * compilied header.  The name of the header depends on the
+ * architecture we are compiling for (see the code below).  For
+ * example, for a 68k app the prefix file should be: MW_TclHeader68K.
+ */
+#if __POWERPC__
+#pragma precompile_target "MW_TclHeaderPPC"
+#elif __CFM68K__
+#pragma precompile_target "MW_TclHeaderCFM68K"
+#else
+#pragma precompile_target "MW_TclHeader68K"
+#endif
+
+#include "tclMacCommonPch.h"
+
+/*
+ * Place any includes below that will are needed by the majority of the
+ * and is OK to be in any file in the system.  The pragma's are used
+ * to control what functions are exported in the Tcl shared library.
+ */
+
+#pragma export on
+#include "tcl.h"
+#include "tclMac.h"
+#include "tclInt.h"
+#include "MoreFiles.h"
+#include "MoreFilesExtras.h"
+
+#pragma export reset
+

@@ -1,0 +1,72 @@
+'\"
+'\" Copyright (c) 1992 The Regents of the University of California.
+'\" Copyright (c) 1994-1996 Sun Microsystems, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+'\" RCS: @(#) Id
+'\" 
+.so man.macros
+.TH tk n 4.0 Tk "Tk Built-In Commands"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+tk \- Manipulate Tk internal state
+.SH SYNOPSIS
+\fBtk\fR \fIoption \fR?\fIarg arg ...\fR?
+.BE
+
+.SH DESCRIPTION
+.PP
+The \fBtk\fR command provides access to miscellaneous
+elements of Tk's internal state.
+Most of the information manipulated by this command pertains to the
+application as a whole, or to a screen or display, rather than to a
+particular window.
+The command can take any of a number of different forms
+depending on the \fIoption\fR argument.  The legal forms are:
+.TP
+\fBtk appname \fR?\fInewName\fR?
+If \fInewName\fR isn't specified, this command returns the name
+of the application (the name that may be used in \fBsend\fR
+commands to communicate with the application).
+If \fInewName\fR is specified, then the name of the application
+is changed to \fInewName\fR.
+If the given name is already in use, then a suffix of the form
+``\fB #2\fR'' or ``\fB #3\fR'' is appended in order to make the name unique.
+The command's result is the name actually chosen.
+\fInewName\fR should not start with a capital letter.
+This will interfere with option processing, since names starting with
+capitals are assumed to be classes;  as a result, Tk may not
+be able to find some options for the application.
+If sends have been disabled by deleting the \fBsend\fR command,
+this command will reenable them and recreate the \fBsend\fR
+command.
+.VS
+.TP
+\fBtk scaling \fR?\fB\-displayof \fIwindow\fR? ?\fInumber\fR?
+.
+Sets and queries the current scaling factor used by Tk to convert between
+physical units (for example, points, inches, or millimeters) and pixels.  The
+\fInumber\fR argument is a floating point number that specifies the number of
+pixels per point on \fIwindow\fR's display.  If the \fIwindow\fR argument is
+omitted, it defaults to the main window.  If the \fInumber\fR argument is 
+omitted, the current value of the scaling factor is returned.
+.RS
+.PP
+A ``point'' is a unit of measurement equal to 1/72 inch.  A scaling factor
+of 1.0 corresponds to 1 pixel per point, which is equivalent to a standard
+72 dpi monitor.  A scaling factor of 1.25 would mean 1.25 pixels per point,
+which is the setting for a 90 dpi monitor; setting the scaling factor to
+1.25 on a 72 dpi monitor would cause everything in the application to be
+displayed 1.25 times as large as normal.  The initial value for the scaling
+factor is set when the application starts, based on properties of the
+installed monitor, but it can be changed at any time.  Measurements made
+after the scaling factor is changed will use the new scaling factor, but it
+is undefined whether existing widgets will resize themselves dynamically to
+accomodate the new scaling factor.
+.RE
+.VE
+.SH KEYWORDS
+application name, send

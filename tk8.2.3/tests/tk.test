@@ -1,0 +1,96 @@
+# This file is a Tcl script to test the tk command.
+# It is organized in the standard fashion for Tcl tests.
+#
+# Copyright (c) 1997 Sun Microsystems, Inc.
+# Copyright (c) 1998-1999 by Scriptics Corporation.
+# All rights reserved.
+#
+# RCS: @(#) Id
+
+if {[lsearch [namespace children] ::tcltest] == -1} {
+    source [file join [pwd] [file dirname [info script]] defs.tcl]
+}
+
+test tk-1.1 {tk command: general} {
+    list [catch {tk} msg] $msg
+} {1 {wrong # args: should be "tk option ?arg?"}}
+test tk-1.2 {tk command: general} {
+    list [catch {tk xyz} msg] $msg
+} {1 {bad option "xyz": must be appname or scaling}}
+
+set appname [tk appname]
+test tk-2.1 {tk command: appname} {
+    list [catch {tk appname xyz abc} msg] $msg
+} {1 {wrong # args: should be "tk appname ?newName?"}}
+test tk-2.2 {tk command: appname} {
+    tk appname foobazgarply
+} {foobazgarply}
+test tk-2.3 {tk command: appname} {unixOnly} {
+    tk appname bazfoogarply
+    expr {[lsearch -exact [winfo interps] [tk appname]] >= 0}
+} {1}
+test tk-2.4 {tk command: appname} {
+    tk appname $appname
+} $appname
+tk appname $appname
+    
+set scaling [tk scaling]
+test tk-3.1 {tk command: scaling} {
+    list [catch {tk scaling -displayof} msg] $msg
+} {1 {value for "-displayof" missing}}
+test tk-3.2 {tk command: scaling: get current} {
+    tk scaling 1
+    format %.2g [tk scaling]
+} 1
+test tk-3.3 {tk command: scaling: get current} {
+    tk scaling -displayof . 1.25
+    format %.3g [tk scaling]
+} 1.25
+test tk-3.4 {tk command: scaling: set new} {
+    list [catch {tk scaling xyz} msg] $msg
+} {1 {expected floating-point number but got "xyz"}}
+test tk-3.5 {tk command: scaling: set new} {
+    list [catch {tk scaling -displayof . xyz} msg] $msg
+} {1 {expected floating-point number but got "xyz"}}
+test tk-3.6 {tk command: scaling: set new} {
+    tk scaling 1
+    format %.2g [tk scaling]
+} 1
+test tk-3.7 {tk command: scaling: set new} {
+    tk scaling -displayof . 1.25
+    format %.3g [tk scaling]
+} 1.25
+test tk-3.8 {tk command: scaling: negative} {
+    tk scaling -1
+    expr {[tk scaling] > 0}
+} {1}
+test tk-3.9 {tk command: scaling: too big} {
+    tk scaling 1000000
+    expr {[tk scaling] < 10000}
+} {1}    
+test tk-3.10 {tk command: scaling: widthmm} {
+    tk scaling 1.25
+    expr {int((25.4*[winfo screenwidth .])/(72*1.25)+0.5)-[winfo screenmmwidth .]}
+} {0}
+test tk-3.11 {tk command: scaling: heightmm} {
+    tk scaling 1.25
+    expr {int((25.4*[winfo screenheight .])/(72*1.25)+0.5)-[winfo screenmmheight .]}
+} {0}
+tk scaling $scaling
+
+# cleanup
+::tcltest::cleanupTests
+return
+
+
+
+
+
+
+
+
+
+
+
+
+
