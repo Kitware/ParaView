@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.59");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.60");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -587,6 +587,8 @@ void vtkPVFileEntry::AcceptInternal(const char* sourceTclName)
   this->Property->SetTimeStep(this->TimeStep);
   this->Property->SetVTKSourceTclName(sourceTclName);
   this->Property->SetVTKCommand(cmd);
+
+  delete[] cmd;
   
   vtkPVReaderModule* rm = vtkPVReaderModule::SafeDownCast(this->PVSource);
   if (rm && fname && fname[0])
@@ -744,6 +746,7 @@ void vtkPVFileEntry::SetProperty(vtkPVWidgetProperty *prop)
     char *cmd = new char[strlen(this->VariableName)+4];
     sprintf(cmd, "Set%s", this->VariableName);
     this->Property->SetVTKCommand(cmd);
+    delete[] cmd;
     }
 }
 
