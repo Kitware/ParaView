@@ -795,10 +795,10 @@ proc extract_init {} {
 
     set extract(vtkTemp1) [$Application GetMainWindow]
     set extract(vtkTemp24) [$extract(vtkTemp1) GetMainView]
-    $extract(vtkTemp1) OpenCustom "PLOT3D Files" "$DemoDir/combxyz.bin"
+    $extract(vtkTemp1) OpenCustom "PLOT3D Files" "$DemoDir/combbin.xyz"
     set extract(vtkTemp384) [$extract(vtkTemp1) GetCurrentPVSource]
     set extract(vtkTemp398) [$extract(vtkTemp384) GetPVWidget {QFileName}]
-    $extract(vtkTemp398) SetValue "$DemoDir/combq.bin"
+    $extract(vtkTemp398) SetValue "$DemoDir/combbin.q"
     $extract(vtkTemp384) AcceptCallback
 
     set extract(vtkTemp478) [$extract(vtkTemp1) CreatePVSource ExtractGrid]
@@ -1420,10 +1420,10 @@ proc stream_init {} {
     }
     set streams(vtkTemp1) [$Application GetMainWindow]
     set streams(vtkTemp24) [$streams(vtkTemp1) GetMainView]
-    $streams(vtkTemp1) OpenCustom "PLOT3D Files" "$DemoDir/postxyz.bin"
+    $streams(vtkTemp1) OpenCustom "PLOT3D Files" "$DemoDir/postbin.xyz"
     set streams(vtkTemp384) [$streams(vtkTemp1) GetCurrentPVSource]
     set streams(vtkTemp398) [$streams(vtkTemp384) GetPVWidget {QFileName}]
-    $streams(vtkTemp398) SetValue "$DemoDir/postq.bin"
+    $streams(vtkTemp398) SetValue "$DemoDir/postbin.q"
     set streams(vtkTemp411) [$streams(vtkTemp384) GetPVWidget {IBlanking}]
     $streams(vtkTemp411) SetState 1
     $streams(vtkTemp384) AcceptCallback
@@ -3466,10 +3466,10 @@ if ![info exists DemoDir] {
 
     set foundFiles 1
 
-    CheckForDemoFile combxyz.bin
-    CheckForDemoFile combq.bin
-    CheckForDemoFile postxyz.bin
-    CheckForDemoFile postq.bin
+    CheckForDemoFile combbin.xyz
+    CheckForDemoFile combbin.q
+    CheckForDemoFile postbin.xyz
+    CheckForDemoFile postbin.q
     CheckForDemoFile quadric.vtk
     CheckForDemoFile blow.vtk
 
