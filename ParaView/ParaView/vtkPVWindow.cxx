@@ -47,6 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCamera.h"
 #include "vtkCollection.h"
 #include "vtkCollectionIterator.h"
+#include "vtkDataSet.h"
 #include "vtkDirectory.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
@@ -115,7 +116,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.366");
+vtkCxxRevisionMacro(vtkPVWindow, "1.367");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3739,7 +3740,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.366 $");
+  this->ExtractRevision(os,"$Revision: 1.367 $");
 }
 
 //----------------------------------------------------------------------------

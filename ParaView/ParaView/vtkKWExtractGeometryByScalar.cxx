@@ -40,9 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkKWExtractGeometryByScalar.h"
-#include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkKWExtractGeometryByScalar, "1.1");
+#include "vtkIdList.h"
+#include "vtkObjectFactory.h"
+#include "vtkUnstructuredGrid.h"
+
+vtkCxxRevisionMacro(vtkKWExtractGeometryByScalar, "1.2");
 vtkStandardNewMacro(vtkKWExtractGeometryByScalar);
 
 vtkKWExtractGeometryByScalar::vtkKWExtractGeometryByScalar()

@@ -73,12 +73,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMath.h"
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
+#include "vtkPolyData.h"
 
 #define NUM_CELL_TYPES 4
 
 //-------------------------------------------------------------------
 vtkStandardNewMacro(vtkWeightedRedistributePolyData);
-vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.6");
+vtkCxxRevisionMacro(vtkWeightedRedistributePolyData, "1.7");
 
 //-------------------------------------------------------------------
 

@@ -80,6 +80,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedLongArray.h"
 #include "vtkDoubleArray.h"
 #include "vtkLongArray.h"
+#include "vtkPolyData.h"
 
 #include "vtkShortArray.h"
 #include "vtkUnsignedIntArray.h"
@@ -94,7 +95,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 
 vtkStandardNewMacro(vtkRedistributePolyData);
-vtkCxxRevisionMacro(vtkRedistributePolyData, "1.9");
+vtkCxxRevisionMacro(vtkRedistributePolyData, "1.10");
 
 vtkCxxSetObjectMacro(vtkRedistributePolyData, Controller, 
                      vtkMultiProcessController);

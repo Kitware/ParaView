@@ -18,18 +18,18 @@
 #include "vtkPVEnSightVerifier.h"
 
 #include "vtkDataArrayCollection.h"
+#include "vtkDataSet.h"
 #include "vtkEnSightMasterServerReader.h"
 #include "vtkEnSightReader.h"
 #include "vtkGenericEnSightReader.h"
 #include "vtkMPIController.h"
-
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVEnSightVerifier, "1.4");
+vtkCxxRevisionMacro(vtkPVEnSightVerifier, "1.5");
 vtkStandardNewMacro(vtkPVEnSightVerifier);
 
 vtkCxxSetObjectMacro(vtkPVEnSightVerifier, Controller, 
-		     vtkMPIController);
+                     vtkMPIController);
 
 //----------------------------------------------------------------------------
 vtkPVEnSightVerifier::vtkPVEnSightVerifier()
@@ -73,16 +73,16 @@ int vtkPVEnSightVerifier::CheckForError(int status)
 
       // 0th node checks if any of the status' is not VTK_OK
       if ( myid == 0 )
-	{
-	for (int i=0; i<numProcs; i++)
-	  {
-	  if ( res[i] != VTK_OK )
-	    {
-	    result = VTK_ERROR;
-	    break;
-	    }
-	  }
-	}
+        {
+        for (int i=0; i<numProcs; i++)
+          {
+          if ( res[i] != VTK_OK )
+            {
+            result = VTK_ERROR;
+            break;
+            }
+          }
+        }
       delete[] res;
 
       // Broadcast the result to all processes
@@ -97,7 +97,7 @@ int vtkPVEnSightVerifier::CheckForError(int status)
 //----------------------------------------------------------------------------
 template <class T>
 int vtkPVEnSightVerifierCompareValues(T* data, int numVals, 
-				      vtkMPIController* controller)
+                                      vtkMPIController* controller)
 {
 
   if (controller)
@@ -116,19 +116,19 @@ int vtkPVEnSightVerifierCompareValues(T* data, int numVals,
       int result = VTK_OK;
       // 0th node checks if any of the values is not the same as first
       if ( myid == 0 )
-	{
-	for (int i=1; i<numProcs; i++)
-	  {
-	  for (int j=0; j<numVals; j++)
-	    {
-	    if ( values[i*numVals+j] != values[j] )
-	      {
-	      result = VTK_ERROR;
-	      break;
-	      }
-	    }
-	  }
-	}
+        {
+        for (int i=1; i<numProcs; i++)
+          {
+          for (int j=0; j<numVals; j++)
+            {
+            if ( values[i*numVals+j] != values[j] )
+              {
+              result = VTK_ERROR;
+              break;
+              }
+            }
+          }
+        }
 
       delete[] values;
       // Broadcast the result to all processes
@@ -174,7 +174,7 @@ int vtkPVEnSightVerifier::CompareTimeSets(vtkEnSightReader* reader)
     totalNumSteps += numTimeSteps[i];
     }
   if ( vtkPVEnSightVerifierCompareValues(numTimeSteps, numTimeSets,
-					 this->Controller) != VTK_OK )
+                                         this->Controller) != VTK_OK )
     {
     delete[] numTimeSteps;
     return vtkPVEnSightVerifier::NUMBER_OF_STEPS_MISMATCH;
@@ -196,7 +196,7 @@ int vtkPVEnSightVerifier::CompareTimeSets(vtkEnSightReader* reader)
     }
 
   if ( vtkPVEnSightVerifierCompareValues(timeValues, totalNumSteps,
-					 this->Controller) != VTK_OK )
+                                         this->Controller) != VTK_OK )
     {
     delete[] timeValues;
     return vtkPVEnSightVerifier::TIME_VALUES_MISMATCH;
@@ -237,7 +237,7 @@ int vtkPVEnSightVerifier::CompareParts(vtkEnSightReader* reader)
     }
 
   if (vtkPVEnSightVerifierCompareValues(outputTypes, numOutputs, 
-					this->Controller) != VTK_OK)
+                                        this->Controller) != VTK_OK)
     {
     delete[] outputTypes;
     return vtkPVEnSightVerifier::OUTPUT_TYPE_MISMATCH;

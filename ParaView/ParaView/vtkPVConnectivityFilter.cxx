@@ -40,9 +40,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVConnectivityFilter.h"
-#include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVConnectivityFilter, "1.1");
+#include "vtkObjectFactory.h"
+#include "vtkUnstructuredGrid.h"
+
+vtkCxxRevisionMacro(vtkPVConnectivityFilter, "1.2");
 vtkStandardNewMacro(vtkPVConnectivityFilter);
 
 vtkPVConnectivityFilter::vtkPVConnectivityFilter()

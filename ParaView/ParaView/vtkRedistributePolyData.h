@@ -76,6 +76,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPolyDataToPolyDataFilter.h"
 
+class vtkDataArray;
+class vtkDataSetAttributes;
 class vtkMultiProcessController;
 
 class VTK_EXPORT vtkRedistributePolyData : public vtkPolyDataToPolyDataFilter 

@@ -17,14 +17,15 @@
 =========================================================================*/
 #include "vtkPickDataSetFilter.h"
 
-#include "vtkTransform.h"
+#include "vtkCellArray.h"
+#include "vtkFloatArray.h"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+#include "vtkTransform.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkFloatArray.h"
-#include "vtkCellArray.h"
+#include "vtkUnstructuredGrid.h"
 
-vtkCxxRevisionMacro(vtkPickDataSetFilter, "1.3");
+vtkCxxRevisionMacro(vtkPickDataSetFilter, "1.4");
 vtkStandardNewMacro(vtkPickDataSetFilter);
 
 
