@@ -42,7 +42,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <ctype.h>
 #include "vtkKWTclCommand.h"
-#include <iostream.h>
 #include "vtkKWObject.h"
 
 //----------------------------------------------------------------
