@@ -43,7 +43,7 @@ int vtkKWLabelCommand(ClientData cd, Tcl_Interp *interp,
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabel );
-vtkCxxRevisionMacro(vtkKWLabel, "1.26");
+vtkCxxRevisionMacro(vtkKWLabel, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWLabel::vtkKWLabel()
@@ -237,7 +237,7 @@ void vtkKWLabel::AdjustWrapLengthToWidthCallback()
 
   if (width < (wraplength - 5) || width > (wraplength + 5))
     {
-    this->Script("%s config -wraplength %d", this->GetWidgetName(), width);
+    this->Script("%s config -wraplength %d", this->GetWidgetName(), width - 5);
     }
 }
 
