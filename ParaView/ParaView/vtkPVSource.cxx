@@ -81,7 +81,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.309.2.11");
+vtkCxxRevisionMacro(vtkPVSource, "1.309.2.12");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -1390,7 +1390,15 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
   // causes the filter to execute.
   pvd->UpdateProperties();
 
-  window->UpdateFilterMenu();
+  vtkPVDataInformation *pvdi = this->GetDataInformation();
+  if (!pvdi->GetNumberOfCells() || !pvdi->GetNumberOfPoints())
+    {
+    window->DisableFilterMenu();
+    }
+  else
+    {
+    window->UpdateFilterMenu();
+    }
 }
 
 //----------------------------------------------------------------------------

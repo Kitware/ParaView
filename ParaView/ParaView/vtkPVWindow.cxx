@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.14");
+vtkCxxRevisionMacro(vtkPVWindow, "1.462.2.15");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3031,6 +3031,14 @@ void vtkPVWindow::UpdateFilterMenu()
                          vtkKWMenu::Disabled);
     }
   
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVWindow::DisableFilterMenu()
+{
+  this->DisableToolbarButtons();
+  this->Menu->SetState(VTK_PV_VTK_FILTERS_MENU_LABEL,
+                       vtkKWMenu::Disabled);
 }
 
 //-----------------------------------------------------------------------------
