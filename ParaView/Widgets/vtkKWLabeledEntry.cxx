@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledEntry );
-vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.6.2.1");
+vtkCxxRevisionMacro(vtkKWLabeledEntry, "1.6.2.2");
 
 int vtkKWLabeledEntryCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -133,6 +133,19 @@ int vtkKWLabeledEntry::GetValueAsInt()
 float vtkKWLabeledEntry::GetValueAsFloat()
 {
   return this->Entry->GetValueAsFloat();
+}
+
+void vtkKWLabeledEntry::SetEnabled(int e)
+{
+  if ( this->Enabled == e )
+    {
+    return;
+    }
+  this->Enabled = e;
+  this->Modified();
+
+  this->Entry->SetEnabled(e);
+  this->Label->SetEnabled(e);
 }
 
 //----------------------------------------------------------------------------

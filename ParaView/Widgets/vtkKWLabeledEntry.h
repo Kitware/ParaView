@@ -89,6 +89,10 @@ public:
   int GetValueAsInt();
   float GetValueAsFloat();
 
+  // Description:
+  // Set or get enabled state.
+  virtual void SetEnabled(int);
+
 protected:
   vtkKWLabeledEntry();
   ~vtkKWLabeledEntry();
