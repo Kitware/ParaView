@@ -47,7 +47,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -895,7 +895,7 @@ void vtkPVImplicitPlaneWidget::GetNormal(double pt[3])
     return;
     }
   this->WidgetProxy->UpdateInformation();
-  this->GetCenterInternal(pt);
+  this->GetNormalInternal(pt);
 }
 
 //----------------------------------------------------------------------------
