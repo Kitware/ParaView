@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.37");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.38");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -158,6 +158,7 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 void vtkPVSelectTimeSet::SetTimeValue(float time)
 {
   if (this->TimeValue != time ||
+      !this->TimeLabel->GetLabel() ||
       !strcmp(this->TimeLabel->GetLabel(), "No timesets available."))
     { 
     this->TimeValue = time; 
