@@ -18,6 +18,7 @@ SET( ParaView_SRCS
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
   vtkPVAnimationInterfaceEntry.cxx
+  vtkPVAnimationWriter.cxx
   vtkPVApplication.cxx 
   vtkPVApplicationResources.cxx 
   vtkPVApplicationSettingsInterface.cxx
