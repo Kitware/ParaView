@@ -15,7 +15,6 @@
 #include "vtkKWColorPresetSelector.h"
 
 #include "vtkColorTransferFunction.h"
-#include "vtkKWHistogram.h"
 #include "vtkKWLabel.h"
 #include "vtkKWApplication.h"
 #include "vtkKWIcon.h"
@@ -29,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWColorPresetSelector);
-vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.2");
+vtkCxxRevisionMacro(vtkKWColorPresetSelector, "1.3");
 
 vtkCxxSetObjectMacro(vtkKWColorPresetSelector,ColorTransferFunction,vtkColorTransferFunction);
 

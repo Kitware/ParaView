@@ -29,14 +29,13 @@
 #include "vtkKWText.h"
 #include "vtkKWLabel.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkCollectionIterator.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmarkFolder );
-vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.4");
+vtkCxxRevisionMacro( vtkKWLookmarkFolder, "1.5");
 
 int vtkKWLookmarkFolderCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);

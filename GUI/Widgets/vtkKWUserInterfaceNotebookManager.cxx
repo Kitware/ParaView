@@ -19,18 +19,16 @@
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWNotebook.h"
-#include "vtkKWSerializer.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWUserInterfacePanel.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.26");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.27");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);

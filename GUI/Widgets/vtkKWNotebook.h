@@ -30,8 +30,6 @@ class vtkKWMenu;
 //BTX
 template<class DataType> class vtkLinkedList;
 template<class DataType> class vtkLinkedListIterator;
-template<class DataType> class vtkVector;
-template<class DataType> class vtkVectorIterator;
 //ETX
 
 class VTK_EXPORT vtkKWNotebook : public vtkKWWidget

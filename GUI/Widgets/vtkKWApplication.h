@@ -35,10 +35,6 @@ class vtkKWWindow;
 class vtkKWWindowCollection;
 class vtkKWText;
 
-//BTX
-template<class KeyType,class DataType> class vtkAbstractMap;
-//ETX
-
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
 public:

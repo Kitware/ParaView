@@ -13,7 +13,6 @@
 =========================================================================*/
 #include "vtkKWApplication.h"
 
-#include "vtkArrayMap.txx"
 #include "vtkCollectionIterator.h"
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWBWidgets.h"
@@ -61,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.181");
+vtkCxxRevisionMacro(vtkKWApplication, "1.182");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);

@@ -29,7 +29,6 @@
 #include "vtkKWText.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkObjectFactory.h"
-#include "vtkString.h"
 #include "vtkKWIcon.h"
 #include "vtkKWRadioButtonSet.h"
 #include "vtkKWRadioButton.h"
@@ -37,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLookmark );
-vtkCxxRevisionMacro( vtkKWLookmark, "1.4");
+vtkCxxRevisionMacro( vtkKWLookmark, "1.5");
 
 int vtkKWLookmarkCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);

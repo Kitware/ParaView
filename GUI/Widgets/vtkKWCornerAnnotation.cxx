@@ -24,17 +24,15 @@
 #include "vtkKWPopupButton.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWScale.h"
-#include "vtkKWSerializer.h"
 #include "vtkKWText.h"
 #include "vtkKWTextProperty.h"
 #include "vtkObjectFactory.h"
 #include "vtkProperty2D.h"
-#include "vtkString.h"
 #include "vtkTextProperty.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.82");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.83");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
