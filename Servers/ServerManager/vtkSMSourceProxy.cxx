@@ -26,7 +26,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMSourceProxy);
-vtkCxxRevisionMacro(vtkSMSourceProxy, "1.4");
+vtkCxxRevisionMacro(vtkSMSourceProxy, "1.5");
 
 struct vtkSMSourceProxyInternals
 {
@@ -316,7 +316,6 @@ void vtkSMSourceProxy::SetInput(
     cm->SendStreamToServers(&stream, 
                             this->GetNumberOfServerIDs(),
                             this->GetServerIDs());
-    stream.Print(cout);
     }
   else
     {
@@ -340,7 +339,6 @@ void vtkSMSourceProxy::SetInput(
     cm->SendStreamToServers(&stream, 
                             this->GetNumberOfServerIDs(),
                             this->GetServerIDs());
-    stream.Print(cout);
     }
 }
 

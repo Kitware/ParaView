@@ -19,7 +19,7 @@
 #include "vtkSMCommunicationModule.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.1");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -49,7 +49,6 @@ void vtkSMLookupTableProxy::Build()
  cm->SendStreamToServers(&stream, 
                          this->GetNumberOfServerIDs(),
                          this->GetServerIDs());
- stream.Print(cout);
 }
 
 //---------------------------------------------------------------------------

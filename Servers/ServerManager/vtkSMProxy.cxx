@@ -26,7 +26,7 @@
 #include "vtkStdString.h"
 
 vtkStandardNewMacro(vtkSMProxy);
-vtkCxxRevisionMacro(vtkSMProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMProxy, "1.3");
 
 struct vtkSMProxyInternals
 {
@@ -238,7 +238,6 @@ void vtkSMProxy::PushProperty(
     it->second.Property.GetPointer()->AppendCommandToStream(&str, id);
     vtkSMCommunicationModule* cm = this->GetCommunicationModule();
     cm->SendStreamToServer(&str, serverid);
-    str.Print(cout);
     }
 }
 
@@ -286,7 +285,6 @@ void vtkSMProxy::UpdateVTKObjects()
     cm->SendStreamToServers(&str, 
                             this->GetNumberOfServerIDs(), 
                             this->GetServerIDs());
-    str.Print(cout);
     }
 
 }
@@ -309,7 +307,6 @@ void vtkSMProxy::AddVTKObject(vtkClientServerID id)
   cm->SendStreamToServers(&str, 
                           this->GetNumberOfServerIDs(),
                           this->GetServerIDs());
-  str.Print(cout);
 }
 
 //---------------------------------------------------------------------------
@@ -332,7 +329,6 @@ void vtkSMProxy::UnRegisterVTKObjects()
   cm->SendStreamToServers(&stream, 
                           this->GetNumberOfServerIDs(),
                           this->GetServerIDs());
-  stream.Print(cout);
 
   this->Internals->IDs.clear();
 }
@@ -364,7 +360,6 @@ void vtkSMProxy::CreateVTKObjects(int numObjects)
   cm->SendStreamToServers(&stream, 
                           this->GetNumberOfServerIDs(),
                           this->GetServerIDs());
-  stream.Print(cout);
 }
 
 //---------------------------------------------------------------------------

@@ -22,7 +22,7 @@
 #include "vtkSMDoubleVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
@@ -210,7 +210,6 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
                           this->GetNumberOfServerIDs(),
                           this->GetServerIDs());
 
-  str.Print(cout);
   str.Reset();
 
   this->WindowToImage->SetVTKClassName("vtkWindowToImageFilter");
@@ -269,7 +268,6 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename)
   cm->SendStreamToServers(&str, 
                           this->ImageWriter->GetNumberOfServerIDs(),
                           this->ImageWriter->GetServerIDs());
-  str.Print(cout);
   str.Reset();
 
 }
@@ -293,7 +291,6 @@ void vtkSMDisplayWindowProxy::AddDisplay(vtkSMDisplayerProxy* display)
   cm->SendStreamToServers(&str, 
                           this->GetNumberOfServerIDs(),
                           this->GetServerIDs());
-  str.Print(cout);
   str.Reset();
 }
 
@@ -319,7 +316,6 @@ void vtkSMDisplayWindowProxy::StillRender()
 //  cm->SendStreamToServers(&str, 
 //                          this->GetNumberOfServerIDs(),
 //                          this->GetServerIDs());
-  str.Print(cout);
   str.Reset();
 }
 
