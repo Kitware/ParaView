@@ -26,7 +26,7 @@
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.33");
+vtkCxxRevisionMacro(vtkKWRange, "1.34");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -108,11 +108,12 @@ vtkKWRange::vtkKWRange()
 
   this->ZoomButtons         = NULL;
 
+  this->ClampRange = 1;
+
   this->ConstrainRanges();
 
   this->ConstrainResolution();
 
-  this->ClampRange = 1;
 }
 
 //----------------------------------------------------------------------------
