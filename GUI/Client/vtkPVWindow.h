@@ -109,10 +109,7 @@ class vtkLinkedList;
 #define VTK_PV_SOURCE_MENU_LABEL       " Source"
 #define VTK_PV_ANIMATION_MENU_INDEX    3
 #define VTK_PV_ANIMATION_MENU_LABEL    " Animation"
-#ifdef PARAVIEW_USE_LOOKMARKS
-#define VTK_PV_LOOKMARKMANAGER_MENU_INDEX    4
-#define VTK_PV_LOOKMARKMANAGER_MENU_LABEL    " Lookmark Manager"
-#endif
+
 
 class VTK_EXPORT vtkPVWindow : public vtkKWWindow
 {
@@ -536,18 +533,11 @@ public:
   void ToolbarMenuCheckCallback(const char* buttonName);
 
   // Description:
-  // Callback to View --> Lookmark Manager menu selection
-  void ShowLookmarkManagerCallback();
-  
-  // Description:
-  // Called when the window is created
-  void CreateLookmarkManager();
+  // Display the Lookmark Manager.
+  void DisplayLookmarkManager();
 
 #ifdef PARAVIEW_USE_LOOKMARKS
   //BTX
-  // Description: 
-  // When on, this prevents the left panel from changing as a filter gets created (ShowCurrentSourceProperties does not execute)
-  vtkSetMacro(HideSourcePanel,int);
   // Description: 
   // When on and SaveState() is called, only sources that "contribute to the view" are saved to the session script.
   vtkSetMacro(SaveVisibleSourcesOnlyFlag,int);
@@ -728,7 +718,6 @@ private:
 
 #ifdef PARAVIEW_USE_LOOKMARKS
   vtkPVLookmarkManager *PVLookmarkManager;
-  int HideSourcePanel;
   int SaveVisibleSourcesOnlyFlag;
 #endif
 

@@ -133,7 +133,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.623");
+vtkCxxRevisionMacro(vtkPVWindow, "1.624");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -308,7 +308,6 @@ vtkPVWindow::vtkPVWindow()
 
   #ifdef PARAVIEW_USE_LOOKMARKS
   this->PVLookmarkManager = NULL;
-  this->HideSourcePanel = 0;
   this->SaveVisibleSourcesOnlyFlag = 0;
   #endif
 }
@@ -438,6 +437,15 @@ void vtkPVWindow::CloseNoPrompt()
     this->ErrorLogDisplay->Delete();
     this->ErrorLogDisplay = NULL;
     }
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  if (this->PVLookmarkManager )
+    {
+    this->PVLookmarkManager->SetMasterWindow(NULL);
+    this->PVLookmarkManager->Delete();
+    this->PVLookmarkManager = NULL;
+    }
+#endif
 
   this->vtkKWWindow::CloseNoPrompt();
 }
@@ -719,24 +727,6 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     "in a loop");
   delete [] rbv;
 
-  // View menu: Shows the Lookmark Manager
-
-  #ifdef PARAVIEW_USE_LOOKMARKS
-  rbv =
-    this->GetMenuView()->CreateRadioButtonVariable(
-      this->GetMenuView(),"Radio");
- 
-  this->GetMenuView()->AddRadioButton(
-    VTK_PV_LOOKMARKMANAGER_MENU_INDEX,
-    VTK_PV_LOOKMARKMANAGER_MENU_LABEL,
-    rbv,
-    this,
-    "ShowLookmarkManagerCallback",
-    1,
-    "Display the lookmark manager for the current session");
-  delete [] rbv;
-  #endif
-
   // File menu: 
 
   // We do not need Close in the file menu since we don't
@@ -859,6 +849,14 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
     5, "Error Log", this, 
     "ShowErrorLog", 2, 
     "Show log of all errors and warnings");
+
+#ifdef PARAVIEW_USE_LOOKMARKS
+  // Display Lookmark Manager
+  this->GetMenuWindow()->InsertCommand(
+    4, "Lookmark Manager", this, 
+    "DisplayLookmarkManager", 8, 
+    "Create and Manage Your Lookmarks");
+#endif
 
   // Preferences sub-menu
 
@@ -1330,11 +1328,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   this->AnimationInterface->SetView(this->GetMainView());
   this->AnimationInterface->SetParent(this->GetPropertiesParent());
   this->AnimationInterface->Create(app, "-relief flat");
-
-  // Interface for the Lookmark Manager
-  #ifdef PARAVIEW_USE_LOOKMARKS
-  this->CreateLookmarkManager();
-  #endif
 
   // File->Open Data File is disabled unless reader modules are loaded.
   // AddFileType() enables this entry.
@@ -3747,10 +3740,6 @@ void vtkPVWindow::ShowCurrentSourcePropertiesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::ShowCurrentSourceProperties()
 {
-  #ifdef PARAVIEW_USE_LOOKMARKS
-  if(this->HideSourcePanel)
-    return;
-  #endif
 
   // Bring up the properties panel
   
@@ -3802,36 +3791,18 @@ void vtkPVWindow::ShowAnimationProperties()
                this->AnimationInterface->GetWidgetName());
 }
 
-//-----------------------------------------------------------------------------
-void vtkPVWindow::ShowLookmarkManagerCallback()
+//----------------------------------------------------------------------------
+void vtkPVWindow::DisplayLookmarkManager()
 {
 #ifdef PARAVIEW_USE_LOOKMARKS
-  // Bring up the properties panel
-  this->ShowProperties();
- 
-  // We need to update the properties-menu radio button too!
-  this->GetMenuView()->CheckRadioButton(
-    this->GetMenuView(), "Radio", VTK_PV_LOOKMARKMANAGER_MENU_INDEX);
- 
-  // Get rid of the page already packed.
-  this->PVLookmarkManager->GetLmkPanelFrame()->UnpackSiblings();
- 
-  // Put our page in.
-  this->Script("pack %s -anchor n -side top -expand t -fill x",
-               this->PVLookmarkManager->GetLmkPanelFrame()->GetWidgetName());
-#endif
-}
-
-//-----------------------------------------------------------------------------
-void vtkPVWindow::CreateLookmarkManager()
-{
-#ifdef PARAVIEW_USE_LOOKMARKS
-  if( ! this->PVLookmarkManager )
+  if ( ! this->PVLookmarkManager )
     {
     this->PVLookmarkManager = vtkPVLookmarkManager::New();
-    this->PVLookmarkManager->SetPVApplication(this->GetPVApplication());
-    this->PVLookmarkManager->CreateProperties();
+    this->PVLookmarkManager->SetMasterWindow(this);
+    this->PVLookmarkManager->Create(this->GetApplication());
     }
+  
+  this->PVLookmarkManager->Display();
 #endif
 }
 
@@ -4959,7 +4930,6 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
 
   // Lookmarks part:
 #ifdef PARAVIEW_USE_LOOKMARKS
-  os << indent << "HideSourcePanel: " << this->HideSourcePanel << endl;
   os << indent << "SaveVisibleSourcesOnlyFlag: " << this->SaveVisibleSourcesOnlyFlag << endl;
   os << indent << "PVLookmarkManager: ";
   if( this->PVLookmarkManager )
