@@ -82,6 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVFileEntry.h"
+#include "vtkPVWizard.h"
 
 #include "vtkPVDemoPaths.h"
 
@@ -775,6 +776,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   if (this->GetIntegerResult(app) == 0)
     {
     this->XDMF = 1;
+    this->MenuFile->InsertCommand(2, "CTH Wizard", this, "WizardCallback",0);
     }
 }
 
@@ -2725,6 +2727,24 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
 }
 
 
+
+//----------------------------------------------------------------------------
+void vtkPVWindow::WizardCallback()
+{
+  if (this->XDMF == 0)
+    {
+    return;
+    }
+
+  vtkPVWizard *w = vtkPVWizard::New();
+  w->SetParent(this);
+  w->Create(this->Application, "");
+  w->Invoke(this);
+  w->Delete();
+}
+
+
+
 // Define the standard source interfaces.
 const char* vtkPVWindow::StandardSourceInterfaces =
 "<Interfaces>\n"
@@ -3435,3 +3455,8 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 //  "</Filter>\n"
 //  "\n"
 //  "</Interfaces>\n";
+
+
+
+
+

@@ -60,7 +60,7 @@ public:
   
 protected:
   vtkPVEnSightReaderInterface();
-  ~vtkPVEnSightReaderInterface() {};
+  ~vtkPVEnSightReaderInterface();
   vtkPVEnSightReaderInterface(const vtkPVEnSightReaderInterface&) {};
   void operator=(const vtkPVEnSightReaderInterface&) {};
 

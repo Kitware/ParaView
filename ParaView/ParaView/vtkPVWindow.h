@@ -277,6 +277,10 @@ public:
   // Display the tcl interactor
   void DisplayCommandPrompt();
   
+  // Description:
+  // Experimenting with wizards.
+  void WizardCallback();
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();

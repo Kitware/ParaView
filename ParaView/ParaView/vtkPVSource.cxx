@@ -1392,7 +1392,8 @@ vtkPVFileEntry *vtkPVSource::AddFileEntry(char *label, char *varName,
   entry->SetParent(this->ParameterFrame->GetFrame());
   entry->SetObjectVariable(this->GetVTKSourceTclName(), varName);
   entry->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
-  entry->Create(this->Application, label, ext, help);
+  entry->Create(this->Application, ext, help);
+  entry->SetLabel(label);
 
   this->Script("pack %s -fill x -expand t", entry->GetWidgetName());
 

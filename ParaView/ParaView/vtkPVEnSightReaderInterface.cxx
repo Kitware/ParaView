@@ -59,6 +59,12 @@ vtkPVEnSightReaderInterface::vtkPVEnSightReaderInterface()
 }
 
 //----------------------------------------------------------------------------
+vtkPVEnSightReaderInterface::~vtkPVEnSightReaderInterface()
+{
+  this->SetCaseFileName(NULL);
+}
+
+//----------------------------------------------------------------------------
 vtkPVEnSightReaderInterface* vtkPVEnSightReaderInterface::New()
 {
   // First try to create the object from the vtkObjectFactory

@@ -57,7 +57,12 @@ public:
   static vtkPVFileEntry* New();
   vtkTypeMacro(vtkPVFileEntry, vtkPVObjectWidget);
 
-  void Create(vtkKWApplication *pvApp, char *label, 
+  // Description:
+  // The label can be set before or after create is called.
+  void SetLabel(const char* label);
+  const char* GetLabel();
+
+  void Create(vtkKWApplication *pvApp, 
               char *ext, char *help);
   
   // Description:
@@ -87,11 +92,11 @@ protected:
   vtkPVFileEntry(const vtkPVFileEntry&) {};
   void operator=(const vtkPVFileEntry&) {};
   
-  vtkKWLabel *Label;
+  vtkKWLabel *LabelWidget;
   vtkKWPushButton *BrowseButton;
   vtkKWEntry *Entry;
 
-  char *Extension;
+  char* Extension;
   vtkSetStringMacro(Extension);
 };
 

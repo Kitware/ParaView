@@ -51,6 +51,7 @@ vtkPVTreeComposite
 vtkPVVectorEntry
 vtkPVWidget
 vtkPVWindow 
+vtkPVWizard
 vtkPVWorldPointPicker 
 vtkStringList 
 )

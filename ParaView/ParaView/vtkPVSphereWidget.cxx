@@ -58,19 +58,15 @@ vtkPVSphereWidget::vtkPVSphereWidget()
 {
   this->CommandFunction = vtkPVSphereWidgetCommand;
 
+  this->ResetButton = vtkKWPushButton::New();
+
   this->CenterEntry = vtkPVVectorEntry::New();
   this->CenterEntry->SetTraceReferenceObject(this);
   this->CenterEntry->SetTraceReferenceCommand("GetCenterEntry");
-  this->CenterResetButton = vtkKWPushButton::New();
 
-  this->NormalEntry = vtkPVVectorEntry::New();
-  this->NormalEntry->SetTraceReferenceObject(this);
-  this->NormalEntry->SetTraceReferenceCommand("GetNormalEntry");
-  this->NormalButtonFrame = vtkKWWidget::New();
-  this->NormalCameraButton = vtkKWPushButton::New();
-  this->NormalXButton = vtkKWPushButton::New();
-  this->NormalYButton = vtkKWPushButton::New();
-  this->NormalZButton = vtkKWPushButton::New();
+  this->RadiusEntry = vtkPVVectorEntry::New();
+  this->RadiusEntry->SetTraceReferenceObject(this);
+  this->RadiusEntry->SetTraceReferenceCommand("GetNormalEntry");
 
   this->SphereTclName = NULL;
 
@@ -81,23 +77,12 @@ vtkPVSphereWidget::vtkPVSphereWidget()
 //----------------------------------------------------------------------------
 vtkPVSphereWidget::~vtkPVSphereWidget()
 {
+  this->ResetButton->Delete();
+  this->ResetButton = NULL;
   this->CenterEntry->Delete();
   this->CenterEntry = NULL;
-  this->CenterResetButton->Delete();
-  this->CenterResetButton = NULL;
-
-  this->NormalEntry->Delete();
-  this->NormalEntry = NULL;
-  this->NormalButtonFrame->Delete();
-  this->NormalButtonFrame = NULL;
-  this->NormalCameraButton->Delete();
-  this->NormalCameraButton = NULL;
-  this->NormalXButton->Delete();
-  this->NormalXButton = NULL;
-  this->NormalYButton->Delete();
-  this->NormalYButton = NULL;
-  this->NormalZButton->Delete();
-  this->NormalZButton = NULL;
+  this->RadiusEntry->Delete();
+  this->RadiusEntry = NULL;
 
   if (this->SphereTclName)
     {

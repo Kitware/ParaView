@@ -58,8 +58,8 @@ vtkPVFileEntry* vtkPVFileEntry::New()
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
 {
-  this->Label = vtkKWLabel::New();
-  this->Label->SetParent(this);
+  this->LabelWidget = vtkKWLabel::New();
+  this->LabelWidget->SetParent(this);
   this->Entry = vtkKWEntry::New();
   this->Entry->SetParent(this);
   this->BrowseButton = vtkKWPushButton::New();
@@ -74,13 +74,27 @@ vtkPVFileEntry::~vtkPVFileEntry()
   this->BrowseButton = NULL;
   this->Entry->Delete();
   this->Entry = NULL;
-  this->Label->Delete();
-  this->Label = NULL;
+  this->LabelWidget->Delete();
+  this->LabelWidget = NULL;
   this->SetExtension(NULL);
 }
 
 //----------------------------------------------------------------------------
-void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label,
+void vtkPVFileEntry::SetLabel(const char* label)
+{
+  // For getting the widget in a script.
+  this->SetTraceName(label);
+  this->LabelWidget->SetLabel(label);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVFileEntry::GetLabel()
+{
+  return this->LabelWidget->GetLabel();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVFileEntry::Create(vtkKWApplication *pvApp,
                             char *ext, char *help)
 {
   const char* wname;
@@ -91,8 +105,6 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label,
     return;
     }
   
-  // For getting the widget in a script.
-  this->SetTraceName(label);
   this->SetApplication(pvApp);
 
   // create the top level
@@ -100,21 +112,21 @@ void vtkPVFileEntry::Create(vtkKWApplication *pvApp, char *label,
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   // Now a label
-  if (label && label[0] != '\0')
+  this->LabelWidget->Create(pvApp, "-width 18 -justify right");
+  if (help)
     {
-    this->Label->Create(pvApp, "-width 18 -justify right");
-    this->Label->SetLabel(label);
-    if (help)
-      {
-      this->Label->SetBalloonHelpString(help);
-      }
-    this->Script("pack %s -side left", this->Label->GetWidgetName());
+    this->LabelWidget->SetBalloonHelpString(help);
     }
+  this->Script("pack %s -side left", this->LabelWidget->GetWidgetName());
   
   // Now the entry
   this->Entry->Create(pvApp, "");
   this->Script("bind %s <KeyPress> {%s ModifiedCallback}",
                this->Entry->GetWidgetName(), this->GetTclName());
+  // Change the order of the bindings so that the
+  // modified command gets called after the entry changes.
+  this->Script("bindtags %s [concat Entry [lreplace [bindtags %s] 1 1]]", 
+               this->Entry->GetWidgetName(), this->Entry->GetWidgetName());
   if (help)
     { 
     this->Entry->SetBalloonHelpString(help);
