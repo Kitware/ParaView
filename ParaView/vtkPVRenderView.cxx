@@ -330,7 +330,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
   this->NavigationFrame->SetLabel("Navigation");
   this->Script("pack %s -fill x -expand t -side top", this->NavigationFrame->GetWidgetName());
   this->NavigationCanvas->SetParent(this->NavigationFrame->GetFrame());
-  this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -width 360 -bg white"); 
+  this->NavigationCanvas->Create(this->Application, "canvas", "-height 45 -width 440 -bg white"); 
   this->Script("pack %s -fill x -expand t -side top", this->NavigationCanvas->GetWidgetName());
 
   // Application has to be set before we can get a tcl name.

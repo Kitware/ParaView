@@ -2121,6 +2121,18 @@ void vtkPVWindow::ReadSourceInterfaces()
   sInt->Delete();
   sInt = NULL;
 
+  // ---- DataSetSurfaceFilter ----.
+  sInt = vtkPVSourceInterface::New();
+  sInt->SetApplication(pvApp);
+  sInt->SetPVWindow(this);
+  sInt->SetSourceClassName("vtkDataSetSurfaceFilter");
+  sInt->SetRootName("Surface");
+  sInt->SetInputClassName("vtkDataSet");
+  sInt->SetOutputClassName("vtkPolyData");
+  this->SourceInterfaces->AddItem(sInt);
+  sInt->Delete();
+  sInt = NULL;
+
   // ---- DecimatePro ----.
   sInt = vtkPVSourceInterface::New();
   sInt->SetApplication(pvApp);
