@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.22");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.23");
 
 
 
@@ -352,7 +352,8 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
 {
   float renderTime = 1.0 / this->RenderWindow->GetDesiredUpdateRate();
   int *windowSize = this->RenderWindow->GetSize();
-  int area, reducedArea, reductionFactor;
+  int area, reducedArea;
+  float reductionFactor;
   float timePerPixel;
   float getBuffersTime, setBuffersTime, transmitTime;
   float newReductionFactor;
@@ -371,8 +372,8 @@ void vtkPVCompositeRenderModule::ComputeReductionFactor()
       renderTime = renderTime / (float)(this->ReductionFactor);
       // Compute time for each pixel on the last render.
       area = windowSize[0] * windowSize[1];
-      reductionFactor = this->Composite->GetImageReductionFactor();
-      reducedArea = area / (reductionFactor * reductionFactor);
+      reductionFactor = (float)this->Composite->GetImageReductionFactor();
+      reducedArea = (int)(area / (reductionFactor * reductionFactor));
       getBuffersTime = this->Composite->GetGetBuffersTime();
       setBuffersTime = this->Composite->GetSetBuffersTime();
       transmitTime = this->Composite->GetCompositeTime();

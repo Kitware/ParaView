@@ -37,7 +37,7 @@
 
 //#include <vtkRef.h>
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryClient2, "1.1");
+vtkCxxRevisionMacro(vtkDesktopDeliveryClient2, "1.2");
 vtkStandardNewMacro(vtkDesktopDeliveryClient2);
 
 vtkDesktopDeliveryClient2::vtkDesktopDeliveryClient2()
@@ -459,9 +459,9 @@ void vtkDesktopDeliveryClient2::StartRender()
   this->FullImageSize[1] = size[1];
   //Round up.
   this->ReducedImageSize[0] =
-    (size[0]+this->ImageReductionFactor-1)/this->ImageReductionFactor;
+    (int)((size[0]+this->ImageReductionFactor-1)/this->ImageReductionFactor);
   this->ReducedImageSize[1] =
-    (size[1]+this->ImageReductionFactor-1)/this->ImageReductionFactor;
+    (int)((size[1]+this->ImageReductionFactor-1)/this->ImageReductionFactor);
 
   // Collect and distribute information about current state of RenderWindow
   vtkRendererCollection *rens = this->RenderWindow->GetRenderers();
@@ -471,7 +471,7 @@ void vtkDesktopDeliveryClient2::StartRender()
   winInfoInt.ReducedSize[1] = this->ReducedImageSize[1];
 //  winInfoInt.NumberOfRenderers = rens->GetNumberOfItems();
   winInfoInt.NumberOfRenderers = 1;
-  winInfoInt.ImageReductionFactor = this->ImageReductionFactor;
+  winInfoDouble.ImageReductionFactor = this->ImageReductionFactor;
   winInfoInt.UseCompositing = this->UseCompositing;
   winInfoDouble.DesiredUpdateRate = this->RenderWindow->GetDesiredUpdateRate();
 

@@ -219,7 +219,7 @@ protected:
   // Description:
   // Used to keep track of when the ImageReductionFactor changes, which
   // means the tiles have gotten dirty.
-  int LastKnownImageReductionFactor;
+  double LastKnownImageReductionFactor;
 
   int FullImageSharesData;
   int ReducedImageSharesData;

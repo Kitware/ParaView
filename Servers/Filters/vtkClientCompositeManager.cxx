@@ -55,7 +55,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.38");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.39");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -66,12 +66,12 @@ struct vtkClientCompositeIntInfo
   // I am sending the origianl window size.  
   // The server can composite an image of any size.
   int WindowSize[2];
-  int ImageReductionFactor;
   int SquirtLevel;
 };
 
 struct vtkClientCompositeDoubleInfo 
 {
+  double ImageReductionFactor;
   double CameraPosition[3];
   double CameraFocalPoint[3];
   double CameraViewUp[3];
@@ -334,8 +334,8 @@ void vtkClientCompositeManager::StartRender()
     return;
     }
 
-  struct vtkClientCompositeIntInfo winInfo;
-  struct vtkClientCompositeDoubleInfo renInfo;
+  struct vtkClientCompositeIntInfo intInfo;
+  struct vtkClientCompositeDoubleInfo doubleInfo;
   int *size;
   vtkRendererCollection *rens;
   vtkRenderer* ren;
@@ -376,16 +376,16 @@ void vtkClientCompositeManager::StartRender()
   // Trigger the satellite processes to start their render routine.
   rens = this->RenderWindow->GetRenderers();
   size = this->RenderWindow->GetSize();
-  winInfo.WindowSize[0] = size[0];
-  winInfo.WindowSize[1] = size[1];
-  winInfo.ImageReductionFactor = this->InternalReductionFactor;
-  winInfo.SquirtLevel = this->SquirtLevel;
+  intInfo.WindowSize[0] = size[0];
+  intInfo.WindowSize[1] = size[1];
+  doubleInfo.ImageReductionFactor = this->InternalReductionFactor;
+  intInfo.SquirtLevel = this->SquirtLevel;
   
   controller->TriggerRMI(1, vtkClientCompositeManager::RENDER_RMI_TAG);
 
   // Synchronize the size of the windows.
   // Let the socket controller deal with byte swapping.
-  controller->Send((int*)(&winInfo), 
+  controller->Send((int*)(&intInfo), 
                    sizeof(vtkClientCompositeIntInfo)/sizeof(int), 1, 
                    vtkClientCompositeManager::WIN_INFO_TAG);
   
@@ -397,28 +397,28 @@ void vtkClientCompositeManager::StartRender()
   lc = ren->GetLights();
   lc->InitTraversal();
   light = lc->GetNextItem();
-  cam->GetPosition(renInfo.CameraPosition);
-  cam->GetFocalPoint(renInfo.CameraFocalPoint);
-  cam->GetViewUp(renInfo.CameraViewUp);
-  cam->GetClippingRange(renInfo.CameraClippingRange);
-  renInfo.CameraViewAngle = cam->GetViewAngle();
+  cam->GetPosition(doubleInfo.CameraPosition);
+  cam->GetFocalPoint(doubleInfo.CameraFocalPoint);
+  cam->GetViewUp(doubleInfo.CameraViewUp);
+  cam->GetClippingRange(doubleInfo.CameraClippingRange);
+  doubleInfo.CameraViewAngle = cam->GetViewAngle();
   if (cam->GetParallelProjection())
     {
-    renInfo.ParallelScale = cam->GetParallelScale();
+    doubleInfo.ParallelScale = cam->GetParallelScale();
     }
   else
     {
-    renInfo.ParallelScale = 0.0;
+    doubleInfo.ParallelScale = 0.0;
     }
   if (light)
     {
-    light->GetPosition(renInfo.LightPosition);
-    light->GetFocalPoint(renInfo.LightFocalPoint);
+    light->GetPosition(doubleInfo.LightPosition);
+    light->GetFocalPoint(doubleInfo.LightFocalPoint);
     }
-  ren->GetBackground(renInfo.Background);
+  ren->GetBackground(doubleInfo.Background);
   ren->Clear();
   // Let the socket controller deal with byte swapping.
-  controller->Send((double*)(&renInfo), 
+  controller->Send((double*)(&doubleInfo), 
                    sizeof(struct vtkClientCompositeDoubleInfo)/sizeof(double),
                    1, vtkClientCompositeManager::REN_INFO_TAG);
   
@@ -582,8 +582,8 @@ void vtkClientCompositeManager::RenderRMI()
 void vtkClientCompositeManager::SatelliteStartRender()
 {
   int j, myId, numProcs;
-  vtkClientCompositeIntInfo winInfo;
-  vtkClientCompositeDoubleInfo renInfo;
+  vtkClientCompositeIntInfo intInfo;
+  vtkClientCompositeDoubleInfo doubleInfo;
   vtkRendererCollection *rens;
   vtkRenderer* ren;
   vtkCamera *cam = 0;
@@ -607,39 +607,39 @@ void vtkClientCompositeManager::SatelliteStartRender()
     otherId = 0;
     }
   
-  vtkInitializeClientCompositeDoubleInfoMacro(renInfo);
+  vtkInitializeClientCompositeDoubleInfoMacro(doubleInfo);
   
   // Receive the window size.
-  int winInfoSize = sizeof(struct vtkClientCompositeIntInfo)/sizeof(int);
-  controller->Receive((int*)(&winInfo), winInfoSize, 
+  int intInfoSize = sizeof(struct vtkClientCompositeIntInfo)/sizeof(int);
+  controller->Receive((int*)(&intInfo), intInfoSize, 
                       otherId, vtkClientCompositeManager::WIN_INFO_TAG);
 
   // In case the render window is smaller than requested.
   // This assumes that all server processes will have the
   // same (or larger) maximum render window size.
   int* screenSize = renWin->GetScreenSize();
-  if (winInfo.WindowSize[0] > screenSize[0] ||
-      winInfo.WindowSize[1] > screenSize[1])
+  if (intInfo.WindowSize[0] > screenSize[0] ||
+      intInfo.WindowSize[1] > screenSize[1])
     {
     if (myId == 0)
       {
       // We need to keep the same aspect ratio.
       int newSize[2];
       float k1, k2;
-      k1 = (float)screenSize[0]/(float)winInfo.WindowSize[0];
-      k2 = (float)screenSize[1]/(float)winInfo.WindowSize[1];
+      k1 = (float)screenSize[0]/(float)intInfo.WindowSize[0];
+      k2 = (float)screenSize[1]/(float)intInfo.WindowSize[1];
       if (k1 < k2)
         {
         newSize[0] = screenSize[0];
-        newSize[1] = (int)((float)(winInfo.WindowSize[1]) * k1);
+        newSize[1] = (int)((float)(intInfo.WindowSize[1]) * k1);
         }
       else
         {
-        newSize[0] = (int)((float)(winInfo.WindowSize[0]) * k2);
+        newSize[0] = (int)((float)(intInfo.WindowSize[0]) * k2);
         newSize[1] = screenSize[1];
         }
-      winInfo.WindowSize[0] = newSize[0];
-      winInfo.WindowSize[1] = newSize[1];
+      intInfo.WindowSize[0] = newSize[0];
+      intInfo.WindowSize[1] = newSize[1];
       }
     else
       { // Sanity check that all server 
@@ -648,20 +648,19 @@ void vtkClientCompositeManager::SatelliteStartRender()
       }
     }
 
-  renWin->SetSize(winInfo.WindowSize);
+  renWin->SetSize(intInfo.WindowSize);
 
   if (myId == 0)
     {  
     // Relay info to server satellite processes.
     for (j = 1; j < numProcs; ++j)
       {
-      this->Controller->Send((int*)(&winInfo), winInfoSize, 
+      this->Controller->Send((int*)(&intInfo), intInfoSize, 
                              j, vtkClientCompositeManager::WIN_INFO_TAG);
       }
     }
         
-  this->InternalReductionFactor = winInfo.ImageReductionFactor;
-  this->SquirtLevel = winInfo.SquirtLevel;
+  this->SquirtLevel = intInfo.SquirtLevel;
 
   // Synchronize the cameras on all processes.
   rens = renWin->GetRenderers();
@@ -677,14 +676,15 @@ void vtkClientCompositeManager::SatelliteStartRender()
     }
   int doubleInfoSize=sizeof(struct vtkClientCompositeDoubleInfo)/sizeof(double);
 
-  controller->Receive((double*)(&renInfo), 
+  controller->Receive((double*)(&doubleInfo), 
                       doubleInfoSize,
                       otherId, vtkClientCompositeManager::REN_INFO_TAG);
+  this->InternalReductionFactor = doubleInfo.ImageReductionFactor;
   if (myId == 0)
     {  // Relay info to server satellite processes.
     for (j = 1; j < numProcs; ++j)
       {
-      this->Controller->Send((double*)(&renInfo), 
+      this->Controller->Send((double*)(&doubleInfo), 
                       doubleInfoSize, 
                       j, vtkClientCompositeManager::REN_INFO_TAG);
       }
@@ -698,14 +698,14 @@ void vtkClientCompositeManager::SatelliteStartRender()
     lc = ren->GetLights();
     lc->InitTraversal();
     light = lc->GetNextItem();
-    cam->SetPosition(renInfo.CameraPosition);
-    cam->SetFocalPoint(renInfo.CameraFocalPoint);
-    cam->SetViewUp(renInfo.CameraViewUp);
-    cam->SetClippingRange(renInfo.CameraClippingRange);
-    if (renInfo.ParallelScale != 0.0)
+    cam->SetPosition(doubleInfo.CameraPosition);
+    cam->SetFocalPoint(doubleInfo.CameraFocalPoint);
+    cam->SetViewUp(doubleInfo.CameraViewUp);
+    cam->SetClippingRange(doubleInfo.CameraClippingRange);
+    if (doubleInfo.ParallelScale != 0.0)
       {
       cam->ParallelProjectionOn();
-      cam->SetParallelScale(renInfo.ParallelScale);
+      cam->SetParallelScale(doubleInfo.ParallelScale);
       }
     else
       {
@@ -713,17 +713,18 @@ void vtkClientCompositeManager::SatelliteStartRender()
       }
     if (light)
       {
-      light->SetPosition(renInfo.LightPosition);
-      light->SetFocalPoint(renInfo.LightFocalPoint);
+      light->SetPosition(doubleInfo.LightPosition);
+      light->SetFocalPoint(doubleInfo.LightFocalPoint);
       }
-    ren->SetBackground(renInfo.Background);
+    ren->SetBackground(doubleInfo.Background);
     ren->SetViewport(0, 0, 1.0/(float)this->InternalReductionFactor, 
                      1.0/(float)this->InternalReductionFactor);
     }
 
   // This makes sure the arrays are large enough.
-  this->SetPDataSize(winInfo.WindowSize[0]/winInfo.ImageReductionFactor, 
-                     winInfo.WindowSize[1]/winInfo.ImageReductionFactor);
+  this->SetPDataSize
+      ((int)(intInfo.WindowSize[0]/doubleInfo.ImageReductionFactor),
+       (int)(intInfo.WindowSize[1]/doubleInfo.ImageReductionFactor));
 }
 
 //-------------------------------------------------------------------------

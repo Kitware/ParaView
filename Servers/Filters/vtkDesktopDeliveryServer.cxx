@@ -43,7 +43,7 @@ static void SatelliteEndParallelRender(vtkObject *caller,
                        unsigned long vtkNotUsed(event),
                        void *clientData, void *);
 
-vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.8");
+vtkCxxRevisionMacro(vtkDesktopDeliveryServer, "1.9");
 vtkStandardNewMacro(vtkDesktopDeliveryServer);
 
 vtkDesktopDeliveryServer::vtkDesktopDeliveryServer()
@@ -333,8 +333,8 @@ void vtkDesktopDeliveryServer::SetRenderWindowSize()
     int *size = this->RenderWindow->GetSize();
     this->FullImageSize[0] = size[0];
     this->FullImageSize[1] = size[1];
-    this->ReducedImageSize[0] = size[0]/this->ImageReductionFactor;
-    this->ReducedImageSize[1] = size[1]/this->ImageReductionFactor;
+    this->ReducedImageSize[0] = (int)(size[0]/this->ImageReductionFactor);
+    this->ReducedImageSize[1] = (int)(size[1]/this->ImageReductionFactor);
     }
 }
 

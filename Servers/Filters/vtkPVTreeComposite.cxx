@@ -50,7 +50,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.55");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.56");
 
 
 //=========================================================================
@@ -346,9 +346,9 @@ void vtkPVTreeComposite::InternalStartRender()
     {
     winInfoInt.FullSize[0] = size[0];
     winInfoInt.FullSize[1] = size[1];
-    winInfoInt.ImageReductionFactor = this->ImageReductionFactor;
-    winInfoInt.ReducedSize[0] = size[0] / this->ImageReductionFactor;
-    winInfoInt.ReducedSize[1] = size[1] / this->ImageReductionFactor;
+    winInfoDouble.ImageReductionFactor = this->ImageReductionFactor;
+    winInfoInt.ReducedSize[0] = (int)(size[0] / this->ImageReductionFactor);
+    winInfoInt.ReducedSize[1] = (int)(size[1] / this->ImageReductionFactor);
     vtkRenderer* renderer =
       ((vtkRenderer*)this->RenderWindow->GetRenderers()->GetItemAsObject(0));
     renderer->SetViewport(0, 0, 1.0/this->ImageReductionFactor, 
@@ -358,7 +358,7 @@ void vtkPVTreeComposite::InternalStartRender()
     {
     winInfoInt.FullSize[0] = winInfoInt.ReducedSize[0] = size[0];
     winInfoInt.FullSize[1] = winInfoInt.ReducedSize[1] = size[1];
-    winInfoInt.ImageReductionFactor = 1;
+    winInfoDouble.ImageReductionFactor = 1;
     }
   //  winInfo.NumberOfRenderers = rens->GetNumberOfItems();
   winInfoInt.NumberOfRenderers = 1;
@@ -1525,8 +1525,8 @@ float vtkPVTreeComposite::GetZ(int x, int y)
   
   if (this->ImageReductionFactor > 1)
     {
-    idx = (x + (y * this->FullImageSize[0] / this->ImageReductionFactor)) 
-             / this->ImageReductionFactor;
+    idx = (int)((x + (y * this->FullImageSize[0] / this->ImageReductionFactor)) 
+                / this->ImageReductionFactor);
     }
   else 
     {

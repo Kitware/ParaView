@@ -168,7 +168,7 @@ protected:
   void ReceiveAndSetColorBuffer();
 
   vtkObject *RenderView;
-  int InternalReductionFactor;
+  double InternalReductionFactor;
 
   int PDataSize[2];
   vtkDataArray *PData;
