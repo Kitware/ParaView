@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMLODPartDisplay);
-vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.15");
+vtkCxxRevisionMacro(vtkSMLODPartDisplay, "1.16");
 
 
 //----------------------------------------------------------------------------
@@ -594,7 +594,7 @@ void vtkSMLODPartDisplay::RemoveAllCaches()
     {
     return;
     }
-  if (this->UpdateSuppressorProxy->GetNumberOfIDs())
+  if (this->UpdateSuppressorProxy->GetNumberOfIDs() > 0)
     {
     vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
     vtkClientServerStream stream;
@@ -608,9 +608,8 @@ void vtkSMLODPartDisplay::RemoveAllCaches()
       << vtkClientServerStream::End;
     pm->SendStream(vtkProcessModule::CLIENT_AND_SERVERS, stream);
     }
-  else if (!this->UpdateSuppressorProxy->GetNumberOfIDs())
+  else
     {
-    assert(!this->LODUpdateSuppressorProxy->GetNumberOfIDs());
     vtkPVProcessModule *pm = vtkPVProcessModule::SafeDownCast(
       vtkProcessModule::GetProcessModule());
     this->SetInputInternal(this->Source, pm);
