@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.34");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.35");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -312,7 +312,7 @@ void vtkPVStringEntry::SaveInBatchScript(ofstream *file)
     }
 
   *file << "  [$pvTemp" << sourceID << " GetProperty " << this->SMPropertyName
-        << "] SetElement 0 " << this->GetValue() << endl;
+        << "] SetElement 0 {" << this->GetValue() << "}" << endl;
 }
 
 //----------------------------------------------------------------------------
