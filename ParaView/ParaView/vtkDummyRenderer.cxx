@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-vtkCxxRevisionMacro(vtkDummyRenderer, "1.2");
+vtkCxxRevisionMacro(vtkDummyRenderer, "1.3");
 
 // Create a vtkDummyRenderer with a black background, a white ambient light, 
 // two-sided lighting turned on, a viewport of (0,0,1,1), and backface culling
@@ -91,7 +91,7 @@ void vtkDummyRenderer::DevicePickRender()
 {
 }
 
-void vtkDummyRenderer::StartPick(unsigned int pickFromSize)
+void vtkDummyRenderer::StartPick(unsigned int vtkNotUsed(pickFromSize))
 {
 }
 

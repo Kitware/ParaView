@@ -225,7 +225,8 @@ void vtkKWCenterOfRotation::PrepareForDelete()
 
 
 //----------------------------------------------------------------------------
-void vtkKWCenterOfRotation::Create(vtkKWApplication *app, char *args)
+void vtkKWCenterOfRotation::Create(vtkKWApplication *app, 
+                                   char* vtkNotUsed(args))
 {
   // must set the application
   if (this->Application)
@@ -559,11 +560,13 @@ void vtkKWCenterOfRotation::Update()
 
 //----------------------------------------------------------------------------
 // I put these here for bounding box pick which is not implemented yet.
-void vtkKWCenterOfRotation::AButtonPress(int num, int x, int y)
+void vtkKWCenterOfRotation::AButtonPress(int vtkNotUsed(num), 
+                                         int vtkNotUsed(x), int vtkNotUsed(y))
 {
 }
 //----------------------------------------------------------------------------
-void vtkKWCenterOfRotation::Button1Motion(int x, int y)
+void vtkKWCenterOfRotation::Button1Motion(int vtkNotUsed(x), 
+                                          int vtkNotUsed(y))
 {
 }
 

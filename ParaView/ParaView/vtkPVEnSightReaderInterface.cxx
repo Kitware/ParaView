@@ -77,9 +77,9 @@ vtkPVSource *vtkPVEnSightReaderInterface::CreateCallback(const char* name,
 {
   char *tclName, *outputTclName, *srcTclName, *tmp;
   vtkDataSet *d;
-  vtkPVData *pvd;
+  vtkPVData *pvd = 0;
   vtkGenericEnSightReader *reader;
-  vtkPVSource *pvs;
+  vtkPVSource *pvs = 0;
   vtkPVApplication *pvApp = this->GetPVApplication();
   int numOutputs, i;
   char *fullPath;

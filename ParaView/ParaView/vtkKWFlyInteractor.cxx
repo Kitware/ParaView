@@ -99,7 +99,7 @@ vtkKWFlyInteractor::~vtkKWFlyInteractor()
 
 
 //----------------------------------------------------------------------------
-void vtkKWFlyInteractor::Create(vtkKWApplication *app, char *args)
+void vtkKWFlyInteractor::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 {
   // must set the application
   if (this->Application)
@@ -217,7 +217,9 @@ void vtkKWFlyInteractor::AButtonPress(int num, int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWFlyInteractor::AButtonRelease(int num, int x, int y)
+void vtkKWFlyInteractor::AButtonRelease(int vtkNotUsed(num), 
+                                        int vtkNotUsed(x), 
+                                        int vtkNotUsed(y))
 {
   if (this->RenderView == NULL)
     {

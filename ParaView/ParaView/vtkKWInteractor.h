@@ -81,13 +81,16 @@ public:
 
   // Description:
   // The render view forwards these messages.
-  virtual void AButtonPress(int num, int x, int y) {};
-  virtual void AButtonRelease(int num, int x, int y) {};
-  virtual void Button1Motion(int x, int y) {};
-  virtual void Button2Motion(int x, int y) {};
-  virtual void Button3Motion(int x, int y) {};
-  virtual void MotionCallback(int x, int y) {};
-  virtual void AKeyPress(char key, int x, int y) {};  
+  virtual void AButtonPress(int vtkNotUsed(num), int vtkNotUsed(x), 
+                            int vtkNotUsed(y)) {};
+  virtual void AButtonRelease(int vtkNotUsed(num), int vtkNotUsed(x), 
+                              int vtkNotUsed(y)) {};
+  virtual void Button1Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {};
+  virtual void Button2Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {};
+  virtual void Button3Motion(int vtkNotUsed(x), int vtkNotUsed(y)) {};
+  virtual void MotionCallback(int vtkNotUsed(x), int vtkNotUsed(y)) {};
+  virtual void AKeyPress(char vtkNotUsed(key), int vtkNotUsed(x), 
+                         int vtkNotUsed(y)) {};  
   
   // Description:
   // Get rid of all references.  A quick and dirty way

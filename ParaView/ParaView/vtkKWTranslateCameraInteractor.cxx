@@ -95,7 +95,8 @@ vtkKWTranslateCameraInteractor::~vtkKWTranslateCameraInteractor()
 
 
 //----------------------------------------------------------------------------
-void vtkKWTranslateCameraInteractor::Create(vtkKWApplication *app, char *args)
+void vtkKWTranslateCameraInteractor::Create(vtkKWApplication *app, 
+                                            char* vtkNotUsed(args))
 {
   // must set the application
   if (this->Application)

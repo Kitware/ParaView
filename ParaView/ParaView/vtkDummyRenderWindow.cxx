@@ -19,7 +19,7 @@
 #include "vtkCommand.h"
 
 
-vtkCxxRevisionMacro(vtkDummyRenderWindow, "1.2");
+vtkCxxRevisionMacro(vtkDummyRenderWindow, "1.3");
 
 // Construct an instance of  vtkDummyRenderWindow with its screen size 
 // set to 300x300, borders turned on, positioned at (0,0), double 
@@ -98,7 +98,8 @@ float *vtkDummyRenderWindow::GetZbufferData(int x1, int y1, int x2, int y2)
   return buf;
 }
 
-float *vtkDummyRenderWindow::GetRGBAPixelData(int x1,int y1,int x2,int y2,int front)
+float *vtkDummyRenderWindow::GetRGBAPixelData(int x1,int y1,int x2,int y2,
+                                              int vtkNotUsed(front))
 {
   float *buf;
   int num = (x2-x1+1)*(y2-y1+1)*4;
@@ -113,8 +114,10 @@ float *vtkDummyRenderWindow::GetRGBAPixelData(int x1,int y1,int x2,int y2,int fr
   return buf;
 }
 
-unsigned char* vtkDummyRenderWindow::GetRGBACharPixelData(int x1,int y1,int x2,int y2,
-                                                 int front)
+unsigned char* 
+vtkDummyRenderWindow::GetRGBACharPixelData(int x1,int y1,
+                                           int x2,int y2,
+                                           int vtkNotUsed(front))
 {
   unsigned char *buf;
   int num = (x2-x1+1)*(y2-y1+1)*4;

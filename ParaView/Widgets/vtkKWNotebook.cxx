@@ -358,7 +358,11 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon)
 
 // Add a page to the notebook
 void vtkKWNotebook::AddPage(const char *title, const char *ballon, 
-			    vtkKWIcon *icon)
+                            vtkKWIcon *
+#ifdef USE_NOTEBOOK_ICONS
+                            icon
+#endif
+                            )
 {
   int cnt;
 

@@ -689,11 +689,12 @@ void vtkPVSourceInterfaceParser::ExtentElementEnd()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVSourceInterfaceParser::SetStandardMethodInterface(const char* element,
-                                                            const char* name,
-                                                            const char* set,
-                                                            const char* get,
-                                                            const char* help)
+void vtkPVSourceInterfaceParser::
+SetStandardMethodInterface(const char* element,
+                           const char* name,
+                           const char* set,
+                           const char* vtkNotUsed(get),
+                           const char* help)
 {
   // I changed SetCommand and GetCommand to simply VariableName.
   // I am putting a hack here temporarily to see if the change will work out.

@@ -5,6 +5,10 @@
 
 #if defined ( _MSC_VER )
 #pragma warning ( disable : 4115 )
+#pragma warning ( disable : 4125 )
+#pragma warning ( disable : 4244 )
+#pragma warning ( disable : 4100 )
+#pragma warning ( disable : 4210 )
 #endif
 
 #define INTERFACE 1

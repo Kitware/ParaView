@@ -44,8 +44,9 @@ struct vtkPVArgs
 
 
 
-void vtkPVSlaveScript(void *localArg, void *remoteArg, int remoteArgLength,
-		      int remoteProcessId)
+void vtkPVSlaveScript(void *localArg, void *remoteArg, 
+                      int vtkNotUsed(remoteArgLength),
+                      int vtkNotUsed(remoteProcessId))
 {
   vtkPVApplication *self = (vtkPVApplication *)(localArg);
 
@@ -180,8 +181,9 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
 #ifdef _WIN32
 #include <windows.h>
 
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-    LPSTR lpCmdLine, int nShowCmd)
+int __stdcall WinMain(HINSTANCE vtkNotUsed(hInstance), 
+                      HINSTANCE vtkNotUsed(hPrevInstance),
+                      LPSTR lpCmdLine, int vtkNotUsed(nShowCmd))
 {
   int argc, retVal=0;
   char **argv;

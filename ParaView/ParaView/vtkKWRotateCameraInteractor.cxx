@@ -119,7 +119,8 @@ void vtkKWRotateCameraInteractor::PrepareForDelete()
 
 
 //----------------------------------------------------------------------------
-void vtkKWRotateCameraInteractor::Create(vtkKWApplication *app, char *args)
+void vtkKWRotateCameraInteractor::Create(vtkKWApplication *app, 
+                                         char* vtkNotUsed(args))
 {
   // must set the application
   if (this->Application)

@@ -74,7 +74,8 @@ vtkKWInteractor::~vtkKWInteractor()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWInteractor::Create(vtkKWApplication *app, char *args)
+void vtkKWInteractor::Create(vtkKWApplication *app, 
+                             char* vtkNotUsed(args))
 {
   // must set the application
   if (this->Application)

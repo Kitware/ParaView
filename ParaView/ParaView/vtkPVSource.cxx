@@ -246,7 +246,7 @@ void vtkPVSource::SetPVOutput(vtkPVData *pvd)
 
 //----------------------------------------------------------------------------
 // Functions to update the progress bar
-void vtkPVSourceStartProgress(void *arg)
+void vtkPVSourceStartProgress(void* vtkNotUsed(arg))
 {
   //vtkPVSource *me = (vtkPVSource*)arg;
   //vtkSource *vtkSource = me->GetVTKSource();
@@ -259,7 +259,7 @@ void vtkPVSourceStartProgress(void *arg)
   //  }
 }
 //----------------------------------------------------------------------------
-void vtkPVSourceReportProgress(void *arg)
+void vtkPVSourceReportProgress(void* vtkNotUsed(arg))
 {
   //vtkPVSource *me = (vtkPVSource*)arg;
   //vtkSource *vtkSource = me->GetVTKSource();
@@ -270,7 +270,7 @@ void vtkPVSourceReportProgress(void *arg)
   //  }
 }
 //----------------------------------------------------------------------------
-void vtkPVSourceEndProgress(void *arg)
+void vtkPVSourceEndProgress(void* vtkNotUsed(arg))
 {
   //vtkPVSource *me = (vtkPVSource*)arg;
   

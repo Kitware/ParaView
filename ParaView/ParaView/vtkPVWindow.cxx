@@ -406,7 +406,7 @@ void vtkPVWindow::Close()
 
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::Create(vtkKWApplication *app, char *args)
+void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 {
   vtkPVSourceInterface *sInt;
   vtkPVSource *pvs;

@@ -332,13 +332,14 @@ int vtkPVApplication::AcceptEvaluation()
 }
 
 //----------------------------------------------------------------------------
-int VerifyKey(unsigned long key, const char *name, int id)
+int VerifyKey(unsigned long vtkNotUsed(key), const char* vtkNotUsed(name), int vtkNotUsed(id))
 {
  return 1;
 }
 
 //----------------------------------------------------------------------------
-int vtkPVApplication::PromptRegistration(char *name, char *IDS)
+int vtkPVApplication::PromptRegistration(char* vtkNotUsed(name), 
+                                         char* vtkNotUsed(IDS))
 {
   return 1;
 }
@@ -723,7 +724,7 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
     if (nonEmptyFlag)
       { // This process has data.  Receive all the arrays, type and component.
       int num;
-      vtkDataArray *array;
+      vtkDataArray *array = 0;
       char *name;
       int nameLength;
       int type;
@@ -984,8 +985,11 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
     {
     sprintf(temp,"%s.chm::/UsersGuide/index.html",this->ApplicationName);
     }
-  HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
-#else
+  if ( HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0) )
+    {
+    return;
+    }
+#endif
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
   dlg->SetMasterWindow(master);
@@ -995,5 +999,4 @@ void vtkPVApplication::DisplayHelp(vtkKWWindow* master)
     "this application. You can view this help using a standard web browser.");
   dlg->Invoke();  
   dlg->Delete();
-#endif
 }
