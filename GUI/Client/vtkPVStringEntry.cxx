@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.35");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.36");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -230,8 +230,7 @@ void vtkPVStringEntry::ResetInternal()
                     << "\" value from server.");
       }
     }
-
-  if (svp)
+  else if (svp)
     {
     this->SetValue(svp->GetElement(0));
     }
