@@ -49,7 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWActorComposite );
-vtkCxxRevisionMacro(vtkKWActorComposite, "1.10");
+vtkCxxRevisionMacro(vtkKWActorComposite, "1.11");
 
 //------------------------------------------------------------------------------
 int vtkKWActorCompositeCommand(ClientData cd, Tcl_Interp *interp,
@@ -91,7 +91,7 @@ void vtkKWActorComposite::SetInput(vtkPolyData *input)
 void vtkKWActorComposite::CreateProperties()
 {
   // invoke superclass always
-  this->vtkKWComposite::CreateProperties();
+  this->Superclass::CreateProperties();
 }
 
 //------------------------------------------------------------------------------

@@ -46,21 +46,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWWindowCollection);
-vtkCxxRevisionMacro(vtkKWWindowCollection, "1.6");
+vtkCxxRevisionMacro(vtkKWWindowCollection, "1.7");
 
 void vtkKWWindowCollection::AddItem(vtkKWWindow *a) 
 {
-  this->vtkCollection::AddItem((vtkObject *)a);
+  this->Superclass::AddItem((vtkObject *)a);
 }
 
 void vtkKWWindowCollection::RemoveItem(vtkKWWindow *a) 
 {
-  this->vtkCollection::RemoveItem((vtkObject *)a);
+  this->Superclass::RemoveItem((vtkObject *)a);
 }
 
 int vtkKWWindowCollection::IsItemPresent(vtkKWWindow *a) 
 {
-  return this->vtkCollection::IsItemPresent((vtkObject *)a);
+  return this->Superclass::IsItemPresent((vtkObject *)a);
 }
 
 vtkKWWindow *vtkKWWindowCollection::GetNextKWWindow() 

@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWMessageDialog );
-vtkCxxRevisionMacro(vtkKWMessageDialog, "1.39");
+vtkCxxRevisionMacro(vtkKWMessageDialog, "1.40");
 
 
 
@@ -115,7 +115,7 @@ vtkKWMessageDialog::~vtkKWMessageDialog()
 void vtkKWMessageDialog::Create(vtkKWApplication *app, const char *args)
 {
   // invoke super method
-  this->vtkKWDialog::Create(app,args);
+  this->Superclass::Create(app,args);
   
   this->MessageDialogFrame->Create(app,"frame","");
   this->Label->SetLineType(vtkKWLabel::MultiLine);

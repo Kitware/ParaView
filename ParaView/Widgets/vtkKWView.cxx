@@ -104,7 +104,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.104");
+vtkCxxRevisionMacro(vtkKWView, "1.105");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -1361,7 +1361,7 @@ void vtkKWView::UnRegister(vtkObjectBase *o)
       }
     }
   
-  this->vtkObject::UnRegister(o);
+  this->Superclass::UnRegister(o);
 }
 
 //----------------------------------------------------------------------------
@@ -1433,7 +1433,7 @@ void vtkKWView::InteractOff()
 void vtkKWView::SerializeSelf(ostream& os, vtkIndent indent)
 {
   // invoke superclass
-  this->vtkKWWidget::SerializeSelf(os,indent);
+  this->Superclass::SerializeSelf(os,indent);
 
   // write out the composite
   if (this->PropertiesCreated)
@@ -1524,7 +1524,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.104 $");
+  this->ExtractRevision(os,"$Revision: 1.105 $");
 }
 
 //----------------------------------------------------------------------------

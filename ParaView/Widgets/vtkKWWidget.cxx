@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.55");
+vtkCxxRevisionMacro(vtkKWWidget, "1.56");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -230,7 +230,7 @@ void vtkKWWidget::UnRegister(vtkObjectBase *o)
       }
     }
   
-  this->vtkObject::UnRegister(o);
+  this->Superclass::UnRegister(o);
 }
 
 //------------------------------------------------------------------------------
@@ -329,7 +329,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.55 $");
+  this->ExtractRevision(os,"$Revision: 1.56 $");
 }
 
 //------------------------------------------------------------------------------

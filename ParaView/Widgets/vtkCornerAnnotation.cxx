@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.29");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.30");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -114,7 +114,7 @@ vtkCornerAnnotation::~vtkCornerAnnotation()
 // resources to release.
 void vtkCornerAnnotation::ReleaseGraphicsResources(vtkWindow *win)
 {
-  this->vtkActor2D::ReleaseGraphicsResources(win);
+  this->Superclass::ReleaseGraphicsResources(win);
   for (int i = 0; i < 4; i++)
     {
     this->TextActor[i]->ReleaseGraphicsResources(win);

@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWOKCancelDialog );
-vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.5");
+vtkCxxRevisionMacro(vtkKWOKCancelDialog, "1.6");
 
 
 
@@ -80,7 +80,7 @@ vtkKWOKCancelDialog::~vtkKWOKCancelDialog()
 void vtkKWOKCancelDialog::Create(vtkKWApplication *app, const char *args)
 {
   // invoke super method
-  this->vtkKWDialog::Create(app,args);
+  this->Superclass::Create(app,args);
   
   this->Message->Create(app,"label","");
   this->ButtonFrame->Create(app,"frame","");

@@ -50,8 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWWidget.h"
 
-// Sorry, I need vtkKWTextProperty::EventStruct
-#include "vtkKWTextProperty.h"
+#include "vtkKWTextProperty.h" // Sorry, I need vtkKWTextProperty::EventStruct
 
 class vtkCornerAnnotation;
 class vtkKWChangeColorButton;

@@ -45,21 +45,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWComposite.h"
 
 vtkStandardNewMacro( vtkKWCompositeCollection );
-vtkCxxRevisionMacro(vtkKWCompositeCollection, "1.5");
+vtkCxxRevisionMacro(vtkKWCompositeCollection, "1.6");
 
 void vtkKWCompositeCollection::AddItem(vtkKWComposite *a) 
 {
-  this->vtkCollection::AddItem((vtkObject *)a);
+  this->Superclass::AddItem((vtkObject *)a);
 }
 
 void vtkKWCompositeCollection::RemoveItem(vtkKWComposite *a) 
 {
-  this->vtkCollection::RemoveItem((vtkObject *)a);
+  this->Superclass::RemoveItem((vtkObject *)a);
 }
 
 int vtkKWCompositeCollection::IsItemPresent(vtkKWComposite *a) 
 {
-  return this->vtkCollection::IsItemPresent((vtkObject *)a);
+  return this->Superclass::IsItemPresent((vtkObject *)a);
 }
 
 vtkKWComposite *vtkKWCompositeCollection::GetNextKWComposite() 
