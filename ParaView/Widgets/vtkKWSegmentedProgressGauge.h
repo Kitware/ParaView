@@ -36,9 +36,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NAME vtkKWSegmentedProgressGauge - a segmented progress bar widget
 // .SECTION Description
 // vtkKWSegmentedProgressGauge is a widget to display progress for tasks
-// that can be logically broken into (up to 4) segments rather than
+// that can be logically broken into (up to 10) segments rather than
 // continuous progress (e.g., rendering LODs).  Each segment has a different
-// color, varying between red (earliest segment) to green (last segment).
+// color that can be independently set.
 
 #ifndef __vtkKWSegmentedProgressGauge_h
 #define __vtkKWSegmentedProgressGauge_h
@@ -77,7 +77,14 @@ public:
   vtkGetMacro(Width, int);
   vtkSetMacro(Height, int);
   vtkGetMacro(Height, int);
-  
+
+  // Description:
+  // Set/Get the color for a particular segment.
+  void SetSegmentColor( int index, float r, float g, float b );
+  void SetSegmentColor( int index, float color[3] )
+    {this->SetSegmentColor( index, color[0], color[1], color[2] );}
+  void GetSegmentColor( int index, float color[3] );
+      
 protected:
   vtkKWSegmentedProgressGauge();
   ~vtkKWSegmentedProgressGauge();
@@ -89,6 +96,8 @@ protected:
   int Width;
   int Height;
 
+  float SegmentColor[10][3];
+  
   int Segment;
   int Value;
   

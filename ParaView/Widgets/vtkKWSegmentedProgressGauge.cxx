@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.6");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.7");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -52,6 +52,13 @@ vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
   
   this->Segment = 0;
   this->Value = 0;
+  
+  for ( int i = 0; i < 10; i++ )
+    {
+    this->SegmentColor[i][0] = 0;
+    this->SegmentColor[i][1] = static_cast<float>(i)/9;
+    this->SegmentColor[i][2] = 1.0 - static_cast<float>(i)/9;
+    }
 }
 
 vtkKWSegmentedProgressGauge::~vtkKWSegmentedProgressGauge()
@@ -99,22 +106,6 @@ void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
                  this->Height, i);
     }
 
-  switch (this->NumberOfSegments)
-    {
-    case 1:
-      this->Script("set color0 green1");
-      break;
-    case 2:
-      this->Script("set color0 red1; set color1 green1");
-      break;
-    case 3:
-      this->Script("set color0 red1; set color1 yellow1; set color2 green1");
-      break;
-    case 4:
-      this->Script("set color0 red1; set color1 orange1; set color2 yellow1; set color3 green1");
-      break;
-    }
-
   // Update enable state
 
   this->UpdateEnableState();
@@ -147,8 +138,14 @@ void vtkKWSegmentedProgressGauge::SetValue(int segment, int value)
     {
     if (i <= this->Segment)
       {
-      this->Script("%s itemconfigure bar%d -fill $color%d",
-                   this->ProgressCanvas->GetWidgetName(), i, i);
+      char colorString[32];
+      sprintf( colorString, "#%02x%02x%02x",
+               static_cast<int>(this->SegmentColor[i][0]*255 + 0.5),
+               static_cast<int>(this->SegmentColor[i][1]*255 + 0.5),
+               static_cast<int>(this->SegmentColor[i][2]*255 + 0.5) );
+               
+      this->Script("%s itemconfigure bar%d -fill %s",
+                   this->ProgressCanvas->GetWidgetName(), i, colorString);
       }
     else
       {
@@ -179,7 +176,7 @@ void vtkKWSegmentedProgressGauge::SetValue(int segment, int value)
 
 void vtkKWSegmentedProgressGauge::SetNumberOfSegments(int number)
 {
-  if (number < 1 || number > 4)
+  if (number < 1 || number > 10)
     {
     return;
     }
@@ -207,22 +204,34 @@ void vtkKWSegmentedProgressGauge::SetNumberOfSegments(int number)
                  (int)((i+1)*(this->Width/(float)this->NumberOfSegments)),
                  this->Height, i);
     }
+}
 
-  switch (this->NumberOfSegments)
+void vtkKWSegmentedProgressGauge::SetSegmentColor( int index, float r, float g, float b )
+{
+  if ( index < 0 || index > 9 )
     {
-    case 1:
-      this->Script("set color0 green1");
-      break;
-    case 2:
-      this->Script("set color0 red1; set color1 green1");
-      break;
-    case 3:
-      this->Script("set color0 red1; set color1 yellow1; set color2 green1");
-      break;
-    case 4:
-      this->Script("set color0 red1; set color1 orange1; set color2 yellow1; set color3 green1");
-      break;
+    vtkErrorMacro("Invalid index in SetSegmentColor: " << index );
+    return;
     }
+  
+  this->SegmentColor[index][0] = r;
+  this->SegmentColor[index][1] = g;
+  this->SegmentColor[index][2] = b;
+  
+  this->Modified();
+}
+
+void vtkKWSegmentedProgressGauge::GetSegmentColor( int index, float color[3] )
+{
+  if ( index < 0 || index > 9 )
+    {
+    vtkErrorMacro("Invalid index in SetSegmentColor: " << index );
+    return;
+    }
+  
+  color[0] = this->SegmentColor[index][0];
+  color[1] = this->SegmentColor[index][1];
+  color[2] = this->SegmentColor[index][2];
 }
 
 void vtkKWSegmentedProgressGauge::PrintSelf(ostream& os, vtkIndent indent)
