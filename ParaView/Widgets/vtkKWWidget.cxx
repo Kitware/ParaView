@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.97");
+vtkCxxRevisionMacro(vtkKWWidget, "1.98");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -331,7 +331,7 @@ void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.97 $");
+  this->ExtractRevision(os,"$Revision: 1.98 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1689,18 +1689,21 @@ vtkKWWidgetTkImageGetColor(vtkKWWidgetTkColormapData* cdata,
 #endif
 
 //----------------------------------------------------------------------------
-int vtkKWWidget::TakeScreenDump(const char* fname)
+int vtkKWWidget::TakeScreenDump(const char* fname,
+  int top, int bottom, int left, int right)
 {
   if ( !this->IsCreated() )
     {
     return 0;
     }
   const char* w = this->GetWidgetName();
-  return this->TakeScreenDump(w, fname);
+  return this->TakeScreenDump(w, fname,
+    top, bottom, left, right);
 }
 
 //----------------------------------------------------------------------------
-int vtkKWWidget::TakeScreenDump(const char* wname, const char* fname)
+int vtkKWWidget::TakeScreenDump(const char* wname, const char* fname,
+  int top, int bottom, int left, int right)
 {
   int res = 0;
   if ( !fname )
@@ -1731,6 +1734,11 @@ int vtkKWWidget::TakeScreenDump(const char* wname, const char* fname)
     {
     return 0;
     }
+
+  xx -= left;
+  yy -= top;
+  ww += left + right;
+  hh += top + bottom;
 
   Tk_Window image_window;
 
