@@ -489,6 +489,597 @@ int vtkPVSource::GetVisibility()
 }
 
 
+//----------------------------------------------------------------------------
+void vtkPVSource::AcceptCallback()
+{
+  int i;
+  vtkPVWindow *window;
+
+  window = this->GetWindow();
+  
+  // Call the commands to set ivars from widget values.
+  for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
+    {
+    this->Script(this->AcceptCommands->GetString(i));
+    }  
+  
+  // Initialize the output if necessary.
+  if ( ! this->Initialized)
+    { // This is the first time, initialize data.    
+    vtkPVData *input;
+    vtkPVActorComposite *ac;
+    
+    ac = this->GetPVOutput(0)->GetActorComposite();
+    ac->ResetScalarRange();
+    window->GetMainView()->AddComposite(ac);
+    // Make the last data invisible.
+    input = this->GetNthPVInput(0);
+    if (input)
+      {
+      input->GetActorComposite()->SetVisibility(0);
+      }
+    window->GetMainView()->ResetCamera();
+
+    // Set the current data of the window.
+    window->SetCurrentPVData(this->GetNthPVOutput(0));
+    
+    // Remove the local grab
+    this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
+    this->Initialized = 1;
+    }
+
+  window->GetMainView()->SetSelectedComposite(this);  
+  this->UpdateNavigationCanvas();
+  this->GetView()->Render();
+  window->GetSourceList()->Update();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::CancelCallback()
+{
+  vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
+  
+  if ( ! this->Initialized)
+    { // Accept has not been called yet.  Delete the object.
+    // What about the local grab?
+    this->DeleteCallback();
+    return;
+    }
+
+  this->UpdateParameterWidgets();
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::DeleteCallback()
+{
+  vtkPVActorComposite *ac;
+  vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
+  vtkPVSource *prev;
+  int i;
+  
+  if ( ! this->Initialized)
+    {
+    // Remove the local grab
+    this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
+    this->Initialized = 1;
+    }
+  
+  for (i = 0; i < this->NumberOfPVOutputs; ++i)
+    {
+    if (this->PVOutputs[i] && 
+	this->PVOutputs[i]->GetPVSourceUsers()->GetNumberOfItems() > 0)
+      { // Button should be deactivated.
+      vtkErrorMacro("An output is used.  We cannot delete this source.");
+      return;
+      }
+    }
+  
+  // Remove this source from the inputs users collection.
+  for (i = 0; i < this->GetNumberOfPVInputs(); i++)
+    {
+    if (this->PVInputs[i])
+      {
+      this->PVInputs[i]->RemovePVSourceFromUsers(this);
+      }
+    }
+    
+  // Look for a source to make current.
+  prev = this->GetWindow()->GetPreviousPVSource();
+  this->GetWindow()->SetCurrentPVSource(prev);
+  if (prev)
+    {
+    prev->GetPVOutput(0)->GetActorComposite()->VisibilityOn();
+    prev->ShowProperties();
+    }
+  else
+    {
+    // Unpack the properties.  This is required if prev is NULL.
+    this->Script("catch {eval pack forget [pack slaves %s]}",
+		 this->View->GetPropertiesParent()->GetWidgetName());
+    }
+      
+  // We need to remove this source from the Source List.    
+  this->GetWindow()->GetSourceList()->GetSources()->RemoveItem(this);
+  this->GetWindow()->GetSourceList()->Update();    
+
+  // Remove all of the actors mappers. from the renderer.
+  for (i = 0; i < this->NumberOfPVOutputs; ++i)
+    {
+    if (this->PVOutputs[i])
+      {
+      ac = this->GetPVOutput(i)->GetActorComposite();
+      this->GetWindow()->GetMainView()->RemoveComposite(ac);
+      }
+    }    
+  
+  // Remove all of the outputs
+  for (i = 0; i < this->NumberOfPVOutputs; ++i)
+    {
+    if (this->PVOutputs[i])
+      {
+      this->PVOutputs[i]->UnRegister(this);
+      this->PVOutputs[i] = NULL;
+      }
+    }
+  
+  this->GetView()->Render();
+  // I hope this will delete this source.
+  this->GetWindow()->GetMainView()->RemoveComposite(this);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateParameterWidgets()
+{
+  int num, i;
+  char *cmd;
+
+  // Copy the ivars from the vtk object to the UI.
+  num = this->CancelCommands->GetLength();
+  for (i = 0; i < num; ++i)
+    {
+    cmd = this->CancelCommands->GetString(i);
+    if (cmd)
+      {
+      this->Script(cmd);
+      }
+    } 
+}
+
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AcceptHelper(char *method, char *args)
+{
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  vtkDebugMacro("AcceptHelper2 " << name << ", " << method << ", " << args);
+
+  pvApp->Script("%s %s %s", name, method, args);
+  pvApp->BroadcastScript("%s %s %s", name,  method, args);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::UpdateNavigationCanvas()
+{
+  static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
+  char *result;
+  int bbox[4], bboxOut[4];
+  int xMid, yMid, y;
+  char *tmp;
+  vtkPVSource *source;
+  vtkPVSourceCollection *outs, *moreOuts;
+  vtkPVData *moreOut;
+  int i;
+  
+  // Clear the canvas
+  this->Script("%s delete all",
+               this->NavigationCanvas->GetWidgetName());
+
+  // Put the inputs in the canvas.
+  if (this->PVInputs)
+    {
+    y = 10;
+    for (i = 0; i < this->NumberOfPVInputs; i++)
+      {
+      source = this->PVInputs[i]->GetPVSource();
+      if (source)
+        {
+        // Draw the name of the assembly.
+        this->Script(
+          "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
+          this->NavigationCanvas->GetWidgetName(), 20, y,
+          source->GetName(), font);
+        
+        result = this->Application->GetMainInterp()->result;
+        tmp = new char[strlen(result)+1];
+        strcpy(tmp,result);
+        this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
+                     this->NavigationCanvas->GetWidgetName(), tmp,
+                     this->GetTclName(), source->GetTclName());
+        
+        // Get the bounding box for the name. We may need to highlight it.
+        this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(),
+                      tmp);
+        delete [] tmp;
+        tmp = NULL;
+        result = this->Application->GetMainInterp()->result;
+        sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
+        if (i == 0)
+          {
+          // only want to set xMid and yMid once
+          yMid = (int)(0.5 * (bbox[1]+bbox[3]));
+          xMid = (int)(0.5 * (bbox[2]+120));
+          }
+        
+        // Draw a line from input to source.
+        if (y == 10)
+          {
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+                       this->NavigationCanvas->GetWidgetName(), bbox[2], yMid,
+                       125, yMid);
+          }
+        else
+          {
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
+                       this->NavigationCanvas->GetWidgetName(), xMid, yMid,
+                       xMid, yMid+15);
+          yMid += 15;
+          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
+                       this->NavigationCanvas->GetWidgetName(), bbox[2],
+                       yMid, xMid, yMid);
+          }
+        
+        if (source->GetPVInputs())
+          {
+          if (source->GetNthPVInput(0)->GetPVSource())
+            {
+            // Draw ellipsis indicating that this source has a source.
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(), 6, yMid, 8,
+                         yMid);
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(), 10, yMid, 12,
+                         yMid);
+            this->Script("%s create line %d %d %d %d",
+                         this->NavigationCanvas->GetWidgetName(), 14, yMid, 16,
+                         yMid);
+            }
+          }
+        }
+      y += 15;
+      }
+    }
+
+  // Draw the name of the assembly.
+  this->Script(
+    "%s create text %d %d -text {%s} -font %s -anchor w -tags x",
+    this->NavigationCanvas->GetWidgetName(), 130, 10, this->GetName(), font);
+  result = this->Application->GetMainInterp()->result;
+  tmp = new char[strlen(result)+1];
+  strcpy(tmp,result);
+  // Get the bounding box for the name. We may need to highlight it.
+  this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(), tmp);
+  delete [] tmp;
+  tmp = NULL;
+  result = this->Application->GetMainInterp()->result;
+  sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
+  yMid = (int)(0.5 * (bbox[1]+bbox[3]));
+  xMid = (int)(0.5 * (bbox[2] + 245));
+
+  // Put the outputs in the canvas.
+  outs = NULL;
+  if (this->PVOutputs)
+    {
+    y = 10;
+//    for (i = 0; i < this->NumberOfPVOutputs; i++)
+    if (this->PVOutputs[0])
+      {
+      outs = this->PVOutputs[0]->GetPVSourceUsers();
+
+      if (outs)
+	{
+	outs->InitTraversal();
+	while ( (source = outs->GetNextPVSource()) )
+	  {
+	  // Draw the name of the assembly.
+	  this->Script(
+	    "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
+	    this->NavigationCanvas->GetWidgetName(), 250, y,
+	    source->GetName(), font);
+	  
+	  result = this->Application->GetMainInterp()->result;
+	  tmp = new char[strlen(result)+1];
+	  strcpy(tmp,result);
+	  this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
+		       this->NavigationCanvas->GetWidgetName(), tmp,
+		       this->GetTclName(), source->GetTclName());
+	  // Get the bounding box for the name. We may need to highlight it.
+	  this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(), tmp);
+	  delete [] tmp;
+	  tmp = NULL;
+	  result = this->Application->GetMainInterp()->result;
+	  sscanf(result, "%d %d %d %d", bboxOut, bboxOut+1, bboxOut+2, bboxOut+3);
+	  
+	  // Draw to output.
+	  if (y == 10)
+	    { // first is a special case (single line).
+	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+			 this->NavigationCanvas->GetWidgetName(), bbox[2], yMid,
+			 245, yMid);
+	    }
+	  else
+	    {
+	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
+			 this->NavigationCanvas->GetWidgetName(), xMid, yMid, xMid,
+			 yMid+15);
+	    yMid += 15;
+	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
+			 this->NavigationCanvas->GetWidgetName(), xMid, yMid,
+			 245, yMid);
+	    }
+	  if (moreOut = source->GetPVOutput(0))
+	    {
+	    if (moreOuts = moreOut->GetPVSourceUsers())
+	      {
+	      moreOuts->InitTraversal();
+	      if (moreOuts->GetNextPVSource())
+		{
+		this->Script("%s create line %d %d %d %d",
+			     this->NavigationCanvas->GetWidgetName(),
+			     bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
+		this->Script("%s create line %d %d %d %d",
+			     this->NavigationCanvas->GetWidgetName(),
+			     bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
+		this->Script("%s create line %d %d %d %d",
+			     this->NavigationCanvas->GetWidgetName(),
+			     bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
+		}
+	      }
+	    }
+	  y += 15;
+	  }
+	}
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+// Why do we need this.  Isn't show properties and Raise handled by window?
+void vtkPVSource::SelectSource(vtkPVSource *source)
+{
+  if (source)
+    {
+    this->GetWindow()->SetCurrentPVSource(source);
+    source->ShowProperties();
+    source->GetNotebook()->Raise(0);
+    }
+}
+
+typedef vtkPVData *vtkPVDataPointer;
+//---------------------------------------------------------------------------
+void vtkPVSource::SetNumberOfPVInputs(int num)
+{
+  int idx;
+  vtkPVDataPointer *inputs;
+
+  // in case nothing has changed.
+  if (num == this->NumberOfPVInputs)
+    {
+    return;
+    }
+  
+  // Allocate new arrays.
+  inputs = new vtkPVDataPointer[num];
+
+  // Initialize with NULLs.
+  for (idx = 0; idx < num; ++idx)
+    {
+    inputs[idx] = NULL;
+    }
+
+  // Copy old inputs
+  for (idx = 0; idx < num && idx < this->NumberOfPVInputs; ++idx)
+    {
+    inputs[idx] = this->PVInputs[idx];
+    }
+  
+  // delete the previous arrays
+  if (this->PVInputs)
+    {
+    delete [] this->PVInputs;
+    this->PVInputs = NULL;
+    this->NumberOfPVInputs = 0;
+    }
+  
+  // Set the new array
+  this->PVInputs = inputs;
+  
+  this->NumberOfPVInputs = num;
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+// In the future, this should consider the vtkPVSourceInterface.
+void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (idx < 0)
+    {
+    vtkErrorMacro(<< "SetNthPVInput: " << idx << ", cannot set input. ");
+    return;
+    }
+  
+  // Expand array if necessary.
+  if (idx >= this->NumberOfPVInputs)
+    {
+    this->SetNumberOfPVInputs(idx + 1);
+    }
+  
+  // Does this change anything?  Yes, it keeps the object from being modified.
+  if (pvd == this->PVInputs[idx])
+    {
+    return;
+    }
+  
+  if (this->PVInputs[idx])
+    {
+    this->PVInputs[idx]->RemovePVSourceFromUsers(this);
+    this->PVInputs[idx]->UnRegister(this);
+    this->PVInputs[idx] = NULL;
+    }
+  
+  if (pvd)
+    {
+    pvd->Register(this);
+    pvd->AddPVSourceToUsers(this);
+    this->PVInputs[idx] = pvd;
+    }
+
+  // Relay the change to the VTK objects.  
+  // This is where we will need a SetCommand from the interface ...
+  pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::RemoveAllPVInputs()
+{
+  if ( this->PVInputs )
+    {
+    for (int idx = 0; idx < this->NumberOfPVInputs; ++idx)
+      {
+      if ( this->PVInputs[idx] )
+        {
+        this->PVInputs[idx]->UnRegister(this);
+        this->PVInputs[idx] = NULL;
+        }
+      }
+
+    delete [] this->PVInputs;
+    this->PVInputs = NULL;
+    this->NumberOfPVInputs = 0;
+    this->Modified();
+    }
+}
+
+//---------------------------------------------------------------------------
+vtkPVData *vtkPVSource::GetNthPVInput(int idx)
+{
+  if (idx >= this->NumberOfPVInputs)
+    {
+    return NULL;
+    }
+  
+  return (vtkPVData *)(this->PVInputs[idx]);
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::SetNumberOfPVOutputs(int num)
+{
+  int idx;
+  vtkPVDataPointer *outputs;
+
+  // in case nothing has changed.
+  if (num == this->NumberOfPVOutputs)
+    {
+    return;
+    }
+  
+  // Allocate new arrays.
+  outputs = new vtkPVDataPointer[num];
+
+  // Initialize with NULLs.
+  for (idx = 0; idx < num; ++idx)
+    {
+    outputs[idx] = NULL;
+    }
+
+  // Copy old outputs
+  for (idx = 0; idx < num && idx < this->NumberOfPVOutputs; ++idx)
+    {
+    outputs[idx] = this->PVOutputs[idx];
+    }
+  
+  // delete the previous arrays
+  if (this->PVOutputs)
+    {
+    delete [] this->PVOutputs;
+    this->PVOutputs = NULL;
+    this->NumberOfPVOutputs = 0;
+    }
+  
+  // Set the new array
+  this->PVOutputs = outputs;
+  
+  this->NumberOfPVOutputs = num;
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *pvd)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  
+  if (idx < 0)
+    {
+    vtkErrorMacro(<< "SetNthPVOutput: " << idx << ", cannot set output. ");
+    return;
+    }
+  
+  if (this->NumberOfPVOutputs <= idx)
+    {
+    this->SetNumberOfPVOutputs(idx+1);
+    }
+  
+  // Does this change anything?  Yes, it keeps the object from being modified.
+  if (pvd == this->PVOutputs[idx])
+    {
+    return;
+    }
+  
+  if (this->PVOutputs[idx])
+    {
+    // Manage backward pointer.
+    this->PVOutputs[idx]->SetPVSource(this);
+    this->PVOutputs[idx]->UnRegister(this);
+    this->PVOutputs[idx] = NULL;
+    }
+  
+  if (pvd)
+    {
+    pvd->Register(this);
+    this->PVOutputs[idx] = pvd;
+    // Manage backward pointer.
+    pvd->SetPVSource(this);
+    }
+
+  this->Modified();
+}
+
+//---------------------------------------------------------------------------
+vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
+{
+  if (idx >= this->NumberOfPVOutputs)
+    {
+    return NULL;
+    }
+  
+  return (vtkPVData *)(this->PVOutputs[idx]);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVSource::Save(ofstream *file)
+{
+}
+
+
 
 //----------------------------------------------------------------------------
 vtkKWCheckButton *vtkPVSource::AddLabeledToggle(char *label, char *setCmd, char *getCmd, 
@@ -1367,586 +1958,4 @@ void vtkPVSource::AddModeListItem(char *name, int value)
   this->LastSelectionList->AddItem(name, value);
 }
 
-//----------------------------------------------------------------------------
-void vtkPVSource::AcceptCallback()
-{
-  int i;
-  vtkPVWindow *window;
-
-  window = this->GetWindow();
-  
-  // Call the commands to set ivars from widget values.
-  for (i = 0; i < this->AcceptCommands->GetLength(); ++i)
-    {
-    this->Script(this->AcceptCommands->GetString(i));
-    }  
-  
-  // Initialize the output if necessary.
-  if ( ! this->Initialized)
-    { // This is the first time, initialize data.    
-    vtkPVData *input;
-    vtkPVActorComposite *ac;
-    
-    ac = this->GetPVOutput(0)->GetActorComposite();
-    ac->ResetScalarRange();
-    window->GetMainView()->AddComposite(ac);
-    // Make the last data invisible.
-    input = this->GetNthPVInput(0);
-    if (input)
-      {
-      input->GetActorComposite()->SetVisibility(0);
-      }
-    window->GetMainView()->ResetCamera();
-
-    // Set the current data of the window.
-    window->SetCurrentPVData(this->GetNthPVOutput(0));
-    
-    // Remove the local grab
-    this->Script("grab release %s", this->ParameterFrame->GetWidgetName());    
-    this->Initialized = 1;
-    }
-
-  window->GetMainView()->SetSelectedComposite(this);  
-  this->UpdateNavigationCanvas();
-  this->GetView()->Render();
-  window->GetSourceList()->Update();
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::CancelCallback()
-{
-  vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
-  
-  if (this->PVOutputs == NULL || this->PVOutputs[0] == NULL)
-    { // Accept has not been called yet.  Delete the object.
-    // What about the local grab?
-    this->DeleteCallback();
-    return;
-    }
-
-  this->UpdateParameterWidgets();
-}
-
-//---------------------------------------------------------------------------
-void vtkPVSource::DeleteCallback()
-{
-  vtkPVActorComposite *ac;
-  vtkPVApplication *pvApp = (vtkPVApplication*)this->Application;
-  vtkPVSource *prev;
-  int i;
-  
-  for (i = 0; i < this->NumberOfPVOutputs; ++i)
-    {
-    if (this->PVOutputs[i] && 
-	this->PVOutputs[i]->GetPVSourceUsers()->GetNumberOfItems() > 0)
-      { // Button should be deactivated.
-      vtkErrorMacro("An output is used.  We cannot delete this source.");
-      return;
-      }
-    }
-  
-  // Remove this source from the inputs users collection.
-  for (i = 0; i < this->GetNumberOfPVInputs(); i++)
-    {
-    if (this->PVInputs[i])
-      {
-      this->PVInputs[i]->RemovePVSourceFromUsers(this);
-      }
-    }
-    
-  // Look for a source to make current.
-  prev = this->GetWindow()->GetPreviousPVSource();
-  this->GetWindow()->SetCurrentPVSource(prev);
-  if (prev)
-    {
-    prev->GetPVOutput(0)->GetActorComposite()->VisibilityOn();
-    prev->ShowProperties();
-    }
-  else
-    {
-    // Unpack the properties.  This is required if prev is NULL.
-    this->Script("catch {eval pack forget [pack slaves %s]}",
-		 this->View->GetPropertiesParent()->GetWidgetName());
-    }
-      
-  // We need to remove this source from the Source List.    
-  this->GetWindow()->GetSourceList()->GetSources()->RemoveItem(this);
-  this->GetWindow()->GetSourceList()->Update();    
-
-  // Remove all of the actors mappers. from the renderer.
-  for (i = 0; i < this->NumberOfPVOutputs; ++i)
-    {
-    if (this->PVOutputs[i])
-      {
-      ac = this->GetPVOutput(i)->GetActorComposite();
-      this->GetWindow()->GetMainView()->RemoveComposite(ac);
-      }
-    }    
-  
-  // Remove all of the outputs
-  for (i = 0; i < this->NumberOfPVOutputs; ++i)
-    {
-    if (this->PVOutputs[i])
-      {
-      this->PVOutputs[i]->UnRegister(this);
-      this->PVOutputs[i] = NULL;
-      }
-    }
-  
-  this->GetView()->Render();
-  // I hope this will delete this source.
-  this->GetWindow()->GetMainView()->RemoveComposite(this);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::UpdateParameterWidgets()
-{
-  int num, i;
-  char *cmd;
-
-  // Copy the ivars from the vtk object to the UI.
-  num = this->CancelCommands->GetLength();
-  for (i = 0; i < num; ++i)
-    {
-    cmd = this->CancelCommands->GetString(i);
-    if (cmd)
-      {
-      this->Script(cmd);
-      }
-    } 
-}
-
-
-//----------------------------------------------------------------------------
-void vtkPVSource::AcceptHelper(char *method, char *args)
-{
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::AcceptHelper2(char *name, char *method, char *args)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  vtkDebugMacro("AcceptHelper2 " << name << ", " << method << ", " << args);
-
-  pvApp->Script("%s %s %s", name, method, args);
-  pvApp->BroadcastScript("%s %s %s", name,  method, args);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::UpdateNavigationCanvas()
-{
-  static char *font = "-adobe-helvetica-medium-r-normal-*-14-100-100-100-p-76-iso8859-1";
-  char *result;
-  int bbox[4], bboxOut[4];
-  int xMid, yMid, y;
-  char *tmp;
-  vtkPVSource *source;
-  vtkPVSourceCollection *outs, *moreOuts;
-  vtkPVData *moreOut;
-  int i;
-  
-  // Clear the canvas
-  this->Script("%s delete all",
-               this->NavigationCanvas->GetWidgetName());
-
-  // Put the inputs in the canvas.
-  if (this->PVInputs)
-    {
-    y = 10;
-    for (i = 0; i < this->NumberOfPVInputs; i++)
-      {
-      source = this->PVInputs[i]->GetPVSource();
-      if (source)
-        {
-        // Draw the name of the assembly.
-        this->Script(
-          "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-          this->NavigationCanvas->GetWidgetName(), 20, y,
-          source->GetName(), font);
-        
-        result = this->Application->GetMainInterp()->result;
-        tmp = new char[strlen(result)+1];
-        strcpy(tmp,result);
-        this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
-                     this->NavigationCanvas->GetWidgetName(), tmp,
-                     this->GetTclName(), source->GetTclName());
-        
-        // Get the bounding box for the name. We may need to highlight it.
-        this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(),
-                      tmp);
-        delete [] tmp;
-        tmp = NULL;
-        result = this->Application->GetMainInterp()->result;
-        sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
-        if (i == 0)
-          {
-          // only want to set xMid and yMid once
-          yMid = (int)(0.5 * (bbox[1]+bbox[3]));
-          xMid = (int)(0.5 * (bbox[2]+120));
-          }
-        
-        // Draw a line from input to source.
-        if (y == 10)
-          {
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-                       this->NavigationCanvas->GetWidgetName(), bbox[2], yMid,
-                       125, yMid);
-          }
-        else
-          {
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-                       this->NavigationCanvas->GetWidgetName(), xMid, yMid,
-                       xMid, yMid+15);
-          yMid += 15;
-          this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-                       this->NavigationCanvas->GetWidgetName(), bbox[2],
-                       yMid, xMid, yMid);
-          }
-        
-        if (source->GetPVInputs())
-          {
-          if (source->GetNthPVInput(0)->GetPVSource())
-            {
-            // Draw ellipsis indicating that this source has a source.
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(), 6, yMid, 8,
-                         yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(), 10, yMid, 12,
-                         yMid);
-            this->Script("%s create line %d %d %d %d",
-                         this->NavigationCanvas->GetWidgetName(), 14, yMid, 16,
-                         yMid);
-            }
-          }
-        }
-      y += 15;
-      }
-    }
-
-  // Draw the name of the assembly.
-  this->Script(
-    "%s create text %d %d -text {%s} -font %s -anchor w -tags x",
-    this->NavigationCanvas->GetWidgetName(), 130, 10, this->GetName(), font);
-  result = this->Application->GetMainInterp()->result;
-  tmp = new char[strlen(result)+1];
-  strcpy(tmp,result);
-  // Get the bounding box for the name. We may need to highlight it.
-  this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(), tmp);
-  delete [] tmp;
-  tmp = NULL;
-  result = this->Application->GetMainInterp()->result;
-  sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
-  yMid = (int)(0.5 * (bbox[1]+bbox[3]));
-  xMid = (int)(0.5 * (bbox[2] + 245));
-
-  // Put the outputs in the canvas.
-  outs = NULL;
-  if (this->PVOutputs)
-    {
-    y = 10;
-//    for (i = 0; i < this->NumberOfPVOutputs; i++)
-    if (this->PVOutputs[0])
-      {
-      outs = this->PVOutputs[0]->GetPVSourceUsers();
-
-      if (outs)
-	{
-	outs->InitTraversal();
-	while ( (source = outs->GetNextPVSource()) )
-	  {
-	  // Draw the name of the assembly.
-	  this->Script(
-	    "%s create text %d %d -text {%s} -font %s -anchor w -tags x -fill blue",
-	    this->NavigationCanvas->GetWidgetName(), 250, y,
-	    source->GetName(), font);
-	  
-	  result = this->Application->GetMainInterp()->result;
-	  tmp = new char[strlen(result)+1];
-	  strcpy(tmp,result);
-	  this->Script("%s bind %s <ButtonPress-1> {%s SelectSource %s}",
-		       this->NavigationCanvas->GetWidgetName(), tmp,
-		       this->GetTclName(), source->GetTclName());
-	  // Get the bounding box for the name. We may need to highlight it.
-	  this->Script( "%s bbox %s",this->NavigationCanvas->GetWidgetName(), tmp);
-	  delete [] tmp;
-	  tmp = NULL;
-	  result = this->Application->GetMainInterp()->result;
-	  sscanf(result, "%d %d %d %d", bboxOut, bboxOut+1, bboxOut+2, bboxOut+3);
-	  
-	  // Draw to output.
-	  if (y == 10)
-	    { // first is a special case (single line).
-	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-			 this->NavigationCanvas->GetWidgetName(), bbox[2], yMid,
-			 245, yMid);
-	    }
-	  else
-	    {
-	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow none",
-			 this->NavigationCanvas->GetWidgetName(), xMid, yMid, xMid,
-			 yMid+15);
-	    yMid += 15;
-	    this->Script("%s create line %d %d %d %d -fill gray50 -arrow last",
-			 this->NavigationCanvas->GetWidgetName(), xMid, yMid,
-			 245, yMid);
-	    }
-	  if (moreOut = source->GetPVOutput(0))
-	    {
-	    if (moreOuts = moreOut->GetPVSourceUsers())
-	      {
-	      moreOuts->InitTraversal();
-	      if (moreOuts->GetNextPVSource())
-		{
-		this->Script("%s create line %d %d %d %d",
-			     this->NavigationCanvas->GetWidgetName(),
-			     bboxOut[2]+10, yMid, bboxOut[2]+12, yMid);
-		this->Script("%s create line %d %d %d %d",
-			     this->NavigationCanvas->GetWidgetName(),
-			     bboxOut[2]+14, yMid, bboxOut[2]+16, yMid);
-		this->Script("%s create line %d %d %d %d",
-			     this->NavigationCanvas->GetWidgetName(),
-			     bboxOut[2]+18, yMid, bboxOut[2]+20, yMid);
-		}
-	      }
-	    }
-	  y += 15;
-	  }
-	}
-      }
-    }
-}
-
-//----------------------------------------------------------------------------
-// Why do we need this.  Isn't show properties and Raise handled by window?
-void vtkPVSource::SelectSource(vtkPVSource *source)
-{
-  if (source)
-    {
-    this->GetWindow()->SetCurrentPVSource(source);
-    source->ShowProperties();
-    source->GetNotebook()->Raise(0);
-    }
-}
-
-typedef vtkPVData *vtkPVDataPointer;
-//---------------------------------------------------------------------------
-void vtkPVSource::SetNumberOfPVInputs(int num)
-{
-  int idx;
-  vtkPVDataPointer *inputs;
-
-  // in case nothing has changed.
-  if (num == this->NumberOfPVInputs)
-    {
-    return;
-    }
-  
-  // Allocate new arrays.
-  inputs = new vtkPVDataPointer[num];
-
-  // Initialize with NULLs.
-  for (idx = 0; idx < num; ++idx)
-    {
-    inputs[idx] = NULL;
-    }
-
-  // Copy old inputs
-  for (idx = 0; idx < num && idx < this->NumberOfPVInputs; ++idx)
-    {
-    inputs[idx] = this->PVInputs[idx];
-    }
-  
-  // delete the previous arrays
-  if (this->PVInputs)
-    {
-    delete [] this->PVInputs;
-    this->PVInputs = NULL;
-    this->NumberOfPVInputs = 0;
-    }
-  
-  // Set the new array
-  this->PVInputs = inputs;
-  
-  this->NumberOfPVInputs = num;
-  this->Modified();
-}
-
-//---------------------------------------------------------------------------
-// In the future, this should consider the vtkPVSourceInterface.
-void vtkPVSource::SetNthPVInput(int idx, vtkPVData *pvd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (idx < 0)
-    {
-    vtkErrorMacro(<< "SetNthPVInput: " << idx << ", cannot set input. ");
-    return;
-    }
-  
-  // Expand array if necessary.
-  if (idx >= this->NumberOfPVInputs)
-    {
-    this->SetNumberOfPVInputs(idx + 1);
-    }
-  
-  // Does this change anything?  Yes, it keeps the object from being modified.
-  if (pvd == this->PVInputs[idx])
-    {
-    return;
-    }
-  
-  if (this->PVInputs[idx])
-    {
-    this->PVInputs[idx]->RemovePVSourceFromUsers(this);
-    this->PVInputs[idx]->UnRegister(this);
-    this->PVInputs[idx] = NULL;
-    }
-  
-  if (pvd)
-    {
-    pvd->Register(this);
-    pvd->AddPVSourceToUsers(this);
-    this->PVInputs[idx] = pvd;
-    }
-
-  // Relay the change to the VTK objects.  
-  // This is where we will need a SetCommand from the interface ...
-  pvApp->BroadcastScript("%s SetInput %s", this->GetVTKSourceTclName(),
-			 pvd->GetVTKDataTclName());
-  
-  this->Modified();
-}
-
-//---------------------------------------------------------------------------
-void vtkPVSource::RemoveAllPVInputs()
-{
-  if ( this->PVInputs )
-    {
-    for (int idx = 0; idx < this->NumberOfPVInputs; ++idx)
-      {
-      if ( this->PVInputs[idx] )
-        {
-        this->PVInputs[idx]->UnRegister(this);
-        this->PVInputs[idx] = NULL;
-        }
-      }
-
-    delete [] this->PVInputs;
-    this->PVInputs = NULL;
-    this->NumberOfPVInputs = 0;
-    this->Modified();
-    }
-}
-
-//---------------------------------------------------------------------------
-vtkPVData *vtkPVSource::GetNthPVInput(int idx)
-{
-  if (idx >= this->NumberOfPVInputs)
-    {
-    return NULL;
-    }
-  
-  return (vtkPVData *)(this->PVInputs[idx]);
-}
-
-//---------------------------------------------------------------------------
-void vtkPVSource::SetNumberOfPVOutputs(int num)
-{
-  int idx;
-  vtkPVDataPointer *outputs;
-
-  // in case nothing has changed.
-  if (num == this->NumberOfPVOutputs)
-    {
-    return;
-    }
-  
-  // Allocate new arrays.
-  outputs = new vtkPVDataPointer[num];
-
-  // Initialize with NULLs.
-  for (idx = 0; idx < num; ++idx)
-    {
-    outputs[idx] = NULL;
-    }
-
-  // Copy old outputs
-  for (idx = 0; idx < num && idx < this->NumberOfPVOutputs; ++idx)
-    {
-    outputs[idx] = this->PVOutputs[idx];
-    }
-  
-  // delete the previous arrays
-  if (this->PVOutputs)
-    {
-    delete [] this->PVOutputs;
-    this->PVOutputs = NULL;
-    this->NumberOfPVOutputs = 0;
-    }
-  
-  // Set the new array
-  this->PVOutputs = outputs;
-  
-  this->NumberOfPVOutputs = num;
-  this->Modified();
-}
-
-//---------------------------------------------------------------------------
-void vtkPVSource::SetNthPVOutput(int idx, vtkPVData *pvd)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  
-  if (idx < 0)
-    {
-    vtkErrorMacro(<< "SetNthPVOutput: " << idx << ", cannot set output. ");
-    return;
-    }
-  
-  if (this->NumberOfPVOutputs <= idx)
-    {
-    this->SetNumberOfPVOutputs(idx+1);
-    }
-  
-  // Does this change anything?  Yes, it keeps the object from being modified.
-  if (pvd == this->PVOutputs[idx])
-    {
-    return;
-    }
-  
-  if (this->PVOutputs[idx])
-    {
-    // Manage backward pointer.
-    this->PVOutputs[idx]->SetPVSource(this);
-    this->PVOutputs[idx]->UnRegister(this);
-    this->PVOutputs[idx] = NULL;
-    }
-  
-  if (pvd)
-    {
-    pvd->Register(this);
-    this->PVOutputs[idx] = pvd;
-    // Manage backward pointer.
-    pvd->SetPVSource(this);
-    }
-
-  this->Modified();
-}
-
-//---------------------------------------------------------------------------
-vtkPVData *vtkPVSource::GetNthPVOutput(int idx)
-{
-  if (idx >= this->NumberOfPVOutputs)
-    {
-    return NULL;
-    }
-  
-  return (vtkPVData *)(this->PVOutputs[idx]);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::Save(ofstream *file)
-{
-}
 
