@@ -454,10 +454,12 @@ public:
   void DisableNavigationWindow();
 
   // Description:
-  // Go to interaction or back to regular rendering speed.
-  virtual void SetInteraction(int s);
-  vtkBooleanMacro(Interaction,int);
-  vtkGetMacro(Interaction,int);
+  // Called by PV3DWidgets.
+  // All inteteractor stuff should be moved to 
+  // PVRenderView or PVRenderModule !!!!!!!!
+  virtual void SetInteractiveRenderEnabled(int s);
+  vtkBooleanMacro(InteractiveRenderEnabled,int);
+  vtkGetMacro(InteractiveRenderEnabled,int);
 
   // Description:
   // Read interface description from XML.
@@ -654,7 +656,7 @@ protected:
 
   int CenterActorVisibility;
 
-  int Interaction;
+  int InteractiveRenderEnabled;
 
   void UpdateStatusImage();
 

@@ -137,7 +137,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.454");
+vtkCxxRevisionMacro(vtkPVWindow, "1.455");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -147,7 +147,7 @@ vtkPVWindow::vtkPVWindow()
 {
   this->Interactor = 0;
 
-  this->Interaction = 0;
+  this->InteractiveRenderEnabled = 0;
   this->NamesToSources = 0;
   this->SetWindowClass("ParaView");
   this->SetTitle("Kitware ParaView");
@@ -4217,25 +4217,11 @@ void vtkPVWindow::DeleteAllSources()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVWindow::SetInteraction(int s)
+void vtkPVWindow::SetInteractiveRenderEnabled(int s)
 {
-  this->Interaction = s;
+  this->InteractiveRenderEnabled = s;
   vtkPVGenericRenderWindowInteractor* rwi = this->Interactor;
-  vtkRenderWindow* rw = this->GetMainView()->GetRenderWindow();
-  if ( !rwi || !rw )
-    {
-    return;
-    }
-  if ( s )
-    {
-    rw->SetDesiredUpdateRate(rwi->GetDesiredUpdateRate());
-    //cout << "Interaction on" << endl;
-    }
-  else
-    {    
-    rw->SetDesiredUpdateRate(rwi->GetStillUpdateRate());
-    //cout << "Interaction off" << endl;
-    }
+  rwi->SetInteractiveRenderEnabled(s);
 }
 
 //-----------------------------------------------------------------------------
@@ -4292,6 +4278,8 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "InitializeDefaultInterfaces: " 
      << this->InitializeDefaultInterfaces << endl;
   os << indent << "UseMessageDialog: " << this->UseMessageDialog << endl;
-  os << indent << "Interaction: " << (this->Interaction?"on":"off") << endl;
-  os << indent << "ShowSourcesLongHelp: " << (this->ShowSourcesLongHelp?"on":"off") << endl;
+  os << indent << "InteractiveRenderEnabled: " 
+     << (this->InteractiveRenderEnabled?"on":"off") << endl;
+  os << indent << "ShowSourcesLongHelp: " 
+     << (this->ShowSourcesLongHelp?"on":"off") << endl;
 }

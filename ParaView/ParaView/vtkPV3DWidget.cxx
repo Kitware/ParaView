@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.36");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.37");
 
 //===========================================================================
 //***************************************************************************
@@ -343,11 +343,11 @@ void vtkPV3DWidget::ExecuteEvent(vtkObject*, unsigned long event, void*)
     }
   else if ( event == vtkCommand::StartInteractionEvent )
     {
-    this->PVSource->GetPVWindow()->InteractionOn();
+    this->PVSource->GetPVWindow()->InteractiveRenderEnabledOn();
     }
   else if ( event == vtkCommand::EndInteractionEvent )
     {
-    this->PVSource->GetPVWindow()->InteractionOff();
+    this->PVSource->GetPVWindow()->InteractiveRenderEnabledOff();
     }
   else
     {

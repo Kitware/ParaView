@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkTransform.h"
 
-vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.6");
+vtkCxxRevisionMacro(vtkPVCameraManipulator, "1.7");
 vtkStandardNewMacro(vtkPVCameraManipulator);
 
 vtkCxxSetObjectMacro(vtkPVCameraManipulator,Application,vtkPVApplication);
@@ -82,12 +82,12 @@ vtkPVCameraManipulator::~vtkPVCameraManipulator()
 
 void vtkPVCameraManipulator::StartInteraction()
 {
-  this->Application->GetMainWindow()->InteractionOn();
+  this->Application->GetMainWindow()->InteractiveRenderEnabledOn();
 }
 
 void vtkPVCameraManipulator::EndInteraction()
 {
-  this->Application->GetMainWindow()->InteractionOff();
+  this->Application->GetMainWindow()->InteractiveRenderEnabledOff();
 }
 
 //-------------------------------------------------------------------------

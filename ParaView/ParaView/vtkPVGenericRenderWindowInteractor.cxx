@@ -48,13 +48,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGenericRenderWindowInteractor);
-vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.11");
+vtkCxxRevisionMacro(vtkPVGenericRenderWindowInteractor, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVGenericRenderWindowInteractor::vtkPVGenericRenderWindowInteractor()
 {
   this->PVRenderView = NULL;
   this->ReductionFactor = 1;
+  this->InteractiveRenderEnabled = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -95,8 +96,14 @@ void vtkPVGenericRenderWindowInteractor::Render()
     }
 
   // This should fix the problem of the plane widget render 
-  // updating the pipeline too early, but what will it break.
-  this->PVRenderView->EventuallyRender();
+  if (this->InteractiveRenderEnabled)
+    {
+    this->PVRenderView->Render();
+    }
+  else
+    {
+    this->PVRenderView->EventuallyRender();
+    }
 }
 
 // Special methods for forwarding events to satellite processes.
@@ -322,4 +329,6 @@ void vtkPVGenericRenderWindowInteractor::PrintSelf(ostream& os, vtkIndent indent
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "PVRenderView: " << this->GetPVRenderView() << endl;
+  os << indent << "InteractiveRenderEnabled: " 
+     << this->InteractiveRenderEnabled << endl;
 }

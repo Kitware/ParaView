@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.55");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.56");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2076,10 +2076,10 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
   switch ( event )
     {
     case vtkCommand::StartInteractionEvent:
-      this->PVRenderView->GetPVWindow()->InteractionOn();
+      this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOn();
       break;
     case vtkCommand::EndInteractionEvent:
-      this->PVRenderView->GetPVWindow()->InteractionOff();
+      this->PVRenderView->GetPVWindow()->InteractiveRenderEnabledOff();
       this->PVRenderView->EventuallyRender();
       vtkScalarBarActor* sact = this->ScalarBar->GetScalarBarActor();
       float *pos1 = sact->GetPositionCoordinate()->GetValue();

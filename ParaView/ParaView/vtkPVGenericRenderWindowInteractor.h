@@ -63,6 +63,15 @@ public:
   // Set the event onformation, but remember keys from before.
   void SetMoveEventInformationFlipY(int x, int y);
 
+
+  // Description:
+  // 3D widgets call render on this interactor directly.
+  // They call SetInteractive to tell whether to use still or interactive rendering.
+  // This class just forwards the render request to ParaView's RenderModule.
+  // DesiredUpdateRate is ignored.
+  vtkSetMacro(InteractiveRenderEnabled,int);
+  vtkGetMacro(InteractiveRenderEnabled,int);
+  vtkBooleanMacro(InteractiveRenderEnabled,int);
   virtual void Render();
   
   // Description:
@@ -75,9 +84,6 @@ public:
   void SatelliteRightRelease(int x, int y, int control, int shift);
   void SatelliteMove(int x, int y);
 
-
-
-
 protected:
   vtkPVGenericRenderWindowInteractor();
   ~vtkPVGenericRenderWindowInteractor();
@@ -86,6 +92,7 @@ protected:
   
   vtkPVRenderView *PVRenderView;
   int ReductionFactor;
+  int InteractiveRenderEnabled;
 
 private:
   vtkPVGenericRenderWindowInteractor(const vtkPVGenericRenderWindowInteractor&); // Not implemented
