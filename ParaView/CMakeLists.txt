@@ -260,3 +260,4 @@ ENDIF (PARAVIEW_CAN_BUILD)
 
 # Tell the KW components where to install their libraries.
 SET(KW_INSTALL_LIB_DIR /lib/paraview-${PARAVIEW_VERSION})
+
