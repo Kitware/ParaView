@@ -82,6 +82,35 @@ public:
   // Returns the main frame of the toolbar. Put all the widgets
   // in the main frame.
   vtkGetObjectMacro(Frame, vtkKWWidget);
+
+  // Description:
+  // Returns the separator of the toolbar. No real need to modify
+  // it, but useful for testing.
+  vtkGetObjectMacro(Separator, vtkKWWidget);
+
+  // Description:
+  // Set/Get the flat aspect of the toolbar (flat or 3D GUI style)
+  void SetFlatAspect(int);
+  vtkBooleanMacro(FlatAspect, int);
+  vtkGetMacro(FlatAspect, int);
+  static int GetGlobalFlatAspect();
+  static void SetGlobalFlatAspect(int val);
+  static void GlobalFlatAspectOn() 
+    { vtkKWToolbar::SetGlobalFlatAspect(1); };
+  static void GlobalFlatAspectOff() 
+    { vtkKWToolbar::SetGlobalFlatAspect(0); };
+
+  // Description:
+  // Set/Get the flat aspect of the widgets (flat or 3D GUI style)
+  void SetWidgetsFlatAspect(int);
+  vtkBooleanMacro(WidgetsFlatAspect, int);
+  vtkGetMacro(WidgetsFlatAspect, int);
+  static int GetGlobalWidgetsFlatAspect();
+  static void SetGlobalWidgetsFlatAspect(int val);
+  static void GlobalWidgetsFlatAspectOn() 
+    { vtkKWToolbar::SetGlobalWidgetsFlatAspect(1); };
+  static void GlobalWidgetsFlatAspectOff() 
+    { vtkKWToolbar::SetGlobalWidgetsFlatAspect(0); };
   
 protected:
   vtkKWToolbar();
@@ -91,10 +120,16 @@ protected:
   int Expanding;
 
   vtkKWWidget* Frame;
-
+  vtkKWWidget* Separator;
+  
 //BTX
   vtkVector<vtkKWWidget*>* Widgets;
 //ETX
+
+  int FlatAspect;
+  int WidgetsFlatAspect;
+
+  void Pack();
 
 private:
   vtkKWToolbar(const vtkKWToolbar&); // Not implemented

@@ -54,9 +54,30 @@ template class VTK_EXPORT vtkVectorIterator<vtkKWWidget*>;
 
 #endif
 
+static int vtkKWToolbarGlobalFlatAspect = 0;
+static int vtkKWToolbarGlobalWidgetsFlatAspect = 0;
+
+int vtkKWToolbar::GetGlobalFlatAspect() 
+{ 
+  return vtkKWToolbarGlobalFlatAspect; 
+}
+void vtkKWToolbar::SetGlobalFlatAspect(int val) 
+{ 
+  vtkKWToolbarGlobalFlatAspect = val; 
+};
+
+int vtkKWToolbar::GetGlobalWidgetsFlatAspect() 
+{ 
+  return vtkKWToolbarGlobalWidgetsFlatAspect; 
+}
+void vtkKWToolbar::SetGlobalWidgetsFlatAspect(int val) 
+{ 
+  vtkKWToolbarGlobalWidgetsFlatAspect = val; 
+};
+
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWToolbar );
-vtkCxxRevisionMacro(vtkKWToolbar, "1.13");
+vtkCxxRevisionMacro(vtkKWToolbar, "1.14");
 
 
 int vtkKWToolbarCommand(ClientData cd, Tcl_Interp *interp,
@@ -71,7 +92,13 @@ vtkKWToolbar::vtkKWToolbar()
   this->Frame = vtkKWWidget::New();
   this->Frame->SetParent(this);
 
+  this->Separator = vtkKWWidget::New();
+  this->Separator->SetParent(this);
+
   this->Widgets = vtkVector<vtkKWWidget*>::New();
+
+  this->FlatAspect = vtkKWToolbar::GetGlobalFlatAspect();
+  this->WidgetsFlatAspect = vtkKWToolbar::GetGlobalWidgetsFlatAspect();
 }
 
 //----------------------------------------------------------------------------
@@ -79,6 +106,10 @@ vtkKWToolbar::~vtkKWToolbar()
 {
   this->Frame->Delete();
   this->Frame = 0;
+
+  this->Separator->Delete();
+  this->Separator = 0;
+
   this->Widgets->Delete();
 }
 
@@ -91,7 +122,8 @@ void vtkKWToolbar::AddWidget(vtkKWWidget* widget)
 //----------------------------------------------------------------------------
 void vtkKWToolbar::Create(vtkKWApplication *app)
 {
-  // must set the application
+  // Must set the application
+
   if (this->Application)
     {
     vtkErrorMacro("widget already created");
@@ -99,17 +131,27 @@ void vtkKWToolbar::Create(vtkKWApplication *app)
     }
   this->SetApplication(app);
 
-  // create the main frame for this widget
-  this->Script("frame %s -relief raised -bd 1", this->GetWidgetName());
+  // Note that there are two frames here. It used to be mandatory in the past. 
+  // Let's keep it like this in case we want to add something in the toolbar
+  // like a "grip" on the left for example, to detach/drag the toolbar.
 
+  // Create the main frame for this widget
+
+  this->Script("frame %s -pady 2", this->GetWidgetName());
+  this->Script("pack %s -side left -anchor nw -expand y -fill both -ipadx 0 -padx 2",
+               this->GetWidgetName());
+  
   this->Script("bind %s <Configure> {%s ScheduleResize}",
                this->GetWidgetName(), this->GetTclName());
 
-  this->Frame->Create(app, "frame", "");
-  this->Script("pack %s -side left -expand yes   -anchor nw ",
-               this->Frame->GetWidgetName());
+  // Create the widgets container itself
 
+  this->Frame->Create(app, "frame", "-bd 0 -padx 0 -pady 0");
 
+  // Create a "toolbar separator" for the flat aspect
+
+  this->Separator->Create(app, "frame", "-bd 2 -relief raised");
+  this->Pack();
 }
 
 //----------------------------------------------------------------------------
@@ -163,6 +205,14 @@ void vtkKWToolbar::UpdateWidgets()
             << row << " -column " << num << " -sticky nsew " << endl;
           num++;
           if ( num == numPerRow ) { row++; num=0;}
+          if (this->WidgetsFlatAspect)
+            {
+            s << "catch { " << widget->GetWidgetName() << " config -relief flat }" << endl;
+            }
+          else
+            {
+            s << "catch { " << widget->GetWidgetName() << " config -relief raised }" << endl;
+            }
           }
         it->GoToNextItem();
         }
@@ -184,8 +234,56 @@ void vtkKWToolbar::Resize()
 
 
 //----------------------------------------------------------------------------
+void vtkKWToolbar::Pack()
+{
+  if (this->FlatAspect)
+    {
+    this->Script("%s config -relief flat -bd 0 -padx 0", 
+                 this->GetWidgetName());
+    this->Script("pack %s -side left -anchor nw -expand n -fill y -ipadx 2",
+                 this->Frame->GetWidgetName());
+    this->Script("pack %s -before %s -side left -anchor nw -expand n -fill y -ipadx 1",
+                 this->Separator->GetWidgetName(),
+                 this->Frame->GetWidgetName());
+    }
+  else
+    {
+    this->Script("%s config -relief raised -bd 1 -padx 3", 
+                 this->GetWidgetName());
+    this->Script("pack forget %s", this->Separator->GetWidgetName());
+    this->Script("pack %s -side left -anchor nw -expand n -fill y -ipadx 0",
+                 this->Frame->GetWidgetName());
+    }
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWToolbar::SetFlatAspect(int f)
+{
+  if (this->FlatAspect == f)
+    {
+    return;
+    }
+  this->FlatAspect = f;
+  this->Modified();
+  this->Pack();
+}
+
+//-----------------------------------------------------------------------------
+void vtkKWToolbar::SetWidgetsFlatAspect(int f)
+{
+  if (this->WidgetsFlatAspect == f)
+    {
+    return;
+    }
+  this->WidgetsFlatAspect = f;
+  this->Modified();
+  this->UpdateWidgets();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWToolbar::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Frame: " << this->Frame << endl;
+  os << indent << "Separator: " << this->Separator << endl;
 }
