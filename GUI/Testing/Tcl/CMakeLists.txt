@@ -121,6 +121,7 @@ REMOVE (PROJECT_TESTS
   MouseInteraction
   TestDemo
   TestPackage
+  Write
   XdmfRead
 )
 
