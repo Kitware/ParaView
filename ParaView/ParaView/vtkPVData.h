@@ -200,7 +200,7 @@ public:
   // the state change to all of the satellite processes.
   void SetVisibility(int v);
   void SetVisibilityInternal(int v);
-  int GetVisibility();
+  vtkGetMacro(Visibility, int);
   vtkBooleanMacro(Visibility, int);
   void VisibilityCheckCallback();
     
@@ -428,6 +428,9 @@ protected:
   vtkKWScale *LineWidthScale;
   
   vtkKWCheckButton *VisibilityCheck;
+  // Need a separate value for visibility to properly manage 
+  // color map "UseCount".
+  int Visibility;
     
   char *PropTclName;
   vtkSetStringMacro(PropTclName);

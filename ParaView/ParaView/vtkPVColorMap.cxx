@@ -71,7 +71,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.27");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.28");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -119,11 +119,14 @@ vtkPVColorMap::vtkPVColorMap()
   // Used to be in vtkPVActorComposite
   static int instanceCount = 0;
 
+  this->UseCount = 0;
+
   this->ScalarBarTitle = NULL;
   this->ScalarBarLabelFormat = NULL;
   this->ArrayName = NULL;
   this->NumberOfVectorComponents = 0;
   this->ScalarBarVisibility = 0;
+  this->InternalScalarBarVisibility = 0;
   this->ScalarRange[0] = 0.0;
   this->ScalarRange[1] = 1.0;
   this->Initialized = 0;
@@ -1366,12 +1369,24 @@ vtkPVApplication* vtkPVColorMap::GetPVApplication()
     } 
 }
 
+//----------------------------------------------------------------------------
+void vtkPVColorMap::IncrementUseCount()
+{
+  ++this->UseCount;
+  this->UpdateInternalScalarBarVisibility();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::DecrementUseCount()
+{
+  --this->UseCount;
+  this->UpdateInternalScalarBarVisibility();
+}
+
 
 //----------------------------------------------------------------------------
 void vtkPVColorMap::SetScalarBarVisibility(int val)
 {
-  vtkRenderer *ren;
-
   if (this->ScalarBarVisibility == val)
     {
     return;
@@ -1388,6 +1403,29 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
     this->ScalarBarCheck->SetState(0);
     }
 
+  this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
+                      val);
+  
+  this->UpdateInternalScalarBarVisibility();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVColorMap::UpdateInternalScalarBarVisibility()
+{
+  vtkRenderer *ren;
+  int visible = this->ScalarBarVisibility;
+
+  if (this->UseCount == 0)
+    {
+    visible = 0;
+    }
+
+  if (this->InternalScalarBarVisibility == visible)
+    {
+    return;
+    }
+  this->InternalScalarBarVisibility = visible;
+
 
   if (!this->GetPVRenderView())
     {
@@ -1400,13 +1438,13 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
     {
     return;
     }
-  
+
   // I am going to add and remove it from the renderer instead of using
   // visibility.  Composites should really have multiple props.
   
   if (ren)
     {
-    if (val)
+    if (visible)
       {
       this->ScalarBar->SetEnabled(1);
       // This is here in case process 0 has not geometry.  
@@ -1419,9 +1457,6 @@ void vtkPVColorMap::SetScalarBarVisibility(int val)
       this->ScalarBar->SetEnabled(0);
       }
     }
-
-  this->AddTraceEntry("$kw(%s) SetScalarBarVisibility %d", this->GetTclName(),
-                      val);
 }
 
 
@@ -1799,6 +1834,7 @@ void vtkPVColorMap::ExecuteEvent(vtkObject* vtkNotUsed(wdg),
 void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "UseCount: " << this->UseCount << endl;
   os << indent << "ScalarBarTitle: " 
      << (this->ScalarBarTitle ? this->ScalarBarTitle : "none" )
      << endl;

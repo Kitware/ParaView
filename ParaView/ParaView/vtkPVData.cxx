@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.164");
+vtkCxxRevisionMacro(vtkPVData, "1.165");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -167,6 +167,7 @@ vtkPVData::vtkPVData()
   this->CubeAxesCheck = vtkKWCheckButton::New();
 
   this->VisibilityCheck = vtkKWCheckButton::New();
+  this->Visibility = 1;
 
   this->ResetCameraButton = vtkKWPushButton::New();
 
@@ -197,9 +198,14 @@ vtkPVData::vtkPVData()
 
 //----------------------------------------------------------------------------
 vtkPVData::~vtkPVData()
-{
+{  
   if (this->PVColorMap)
     {
+    // Use count to manage color map visibility.
+    if (this->Visibility)
+      {
+      this->PVColorMap->DecrementUseCount();
+      }
     this->PVColorMap->UnRegister(this);
     this->PVColorMap = 0;
     }
@@ -415,12 +421,10 @@ void vtkPVData::SetPVColorMap(vtkPVColorMap *colorMap)
 
   if (this->PVColorMap)
     {
-    // If no one is using the color map any more, 
-    // turn the scalar bar visibility off.
-    // Only the Window will hold a reference.
-    if (this->PVColorMap->GetReferenceCount() <= 2 )
+    // Use count to manage color map visibility.
+    if (this->Visibility)
       {
-      this->PVColorMap->SetScalarBarVisibility(0);
+      this->PVColorMap->DecrementUseCount();
       }
     this->PVColorMap->UnRegister(this);
     this->PVColorMap = NULL;
@@ -429,6 +433,10 @@ void vtkPVData::SetPVColorMap(vtkPVColorMap *colorMap)
   this->PVColorMap = colorMap;
   if (this->PVColorMap)
     {
+    if (this->Visibility)
+      {
+      this->PVColorMap->IncrementUseCount();
+      }
     this->PVColorMap->Register(this);
     
     if (this->ScalarBarCheck->IsCreated())
@@ -700,7 +708,6 @@ void vtkPVData::ForceUpdate(vtkPVApplication* pvApp)
 void vtkPVData::DeleteCallback()
 {
   this->SetCubeAxesVisibility(0);
-  this->SetScalarBarVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -2405,6 +2412,24 @@ void vtkPVData::SetVisibilityInternal(int v)
   vtkPVApplication *pvApp;
   pvApp = (vtkPVApplication*)(this->Application);
 
+  if (this->Visibility == v)
+    {
+    return;
+    }
+  this->Visibility = v;
+
+  // Use count to manage color map visibility.
+  if (this->PVColorMap)
+    {
+    if (v)
+      {
+      this->PVColorMap->IncrementUseCount();
+      }
+    else
+      {
+      this->PVColorMap->DecrementUseCount();
+      }
+    }
 
   if (this->VisibilityCheck->GetApplication())
     {
@@ -2422,12 +2447,6 @@ void vtkPVData::SetVisibilityInternal(int v)
     {
     pvApp->BroadcastScript("[%s GetInput] ReleaseData", this->MapperTclName);
     }
-}
-  
-//----------------------------------------------------------------------------
-int vtkPVData::GetVisibility()
-{
-  return this->VisibilityCheck->GetState();
 }
 
 //----------------------------------------------------------------------------
@@ -2969,7 +2988,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.164 $");
+  this->ExtractRevision(os,"$Revision: 1.165 $");
 }
 
 //----------------------------------------------------------------------------

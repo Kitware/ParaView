@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.11");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.12");
 
 //----------------------------------------------------------------------------
 vtkPVSelectTimeSet::vtkPVSelectTimeSet()
@@ -356,7 +356,6 @@ void vtkPVSelectTimeSet::AddAnimationScriptsToMenu(vtkKWMenu *menu,
 void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterface *ai)
 {
   char script[500];
-  int ext[6];
 
   if (ai->InitializeTrace())
     {

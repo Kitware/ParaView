@@ -241,6 +241,12 @@ public:
   void VectorModeComponentCallback();
   void VectorComponentCallback(int component);
 
+  // Description:
+  // Data objects use this to "register" their use of the map.
+  // Scalar bar becomes invisible when use count reaches zero.
+  void IncrementUseCount();
+  void DecrementUseCount();
+
 //BTX
   enum VectorModes {
     MAGNITUDE=0,
@@ -278,6 +284,8 @@ protected:
   void UpdateVectorComponentMenu();
   void UpdateScalarBarLabelFormat();
   void UpdateLookupTable();
+  // Visibility depends on check and UseCount.
+  void UpdateInternalScalarBarVisibility();
   void RGBToHSV(float rgb[3], float hsv[3]);
 
   vtkLookupTable* LookupTable;
@@ -287,6 +295,7 @@ protected:
   vtkPVRenderView *PVRenderView;
   int Initialized;
   int ScalarBarVisibility;
+  int InternalScalarBarVisibility;
 
   // User interaface.
   vtkKWLabeledFrame* ColorMapFrame;
@@ -334,6 +343,10 @@ protected:
 
   // For Saving into a tcl script.
   int VisitedFlag;
+
+  // For determining how many data objects are using the color map.
+  //  This is used to make the scalar bar invisible when not used.
+  int UseCount;
 
   vtkPVColorMap(const vtkPVColorMap&); // Not implemented
   void operator=(const vtkPVColorMap&); // Not implemented
