@@ -90,7 +90,7 @@ inline int vtkKWCompositeCollection::IsItemPresent(vtkKWComposite *a)
 
 inline vtkKWComposite *vtkKWCompositeCollection::GetNextKWComposite() 
 { 
-  return (vtkKWComposite *)(this->GetNextItemAsObject());
+  return vtkKWComposite::SafeDownCast(this->GetNextItemAsObject());
 }
 
 inline vtkKWComposite *vtkKWCompositeCollection::GetLastKWComposite() 
@@ -101,7 +101,7 @@ inline vtkKWComposite *vtkKWCompositeCollection::GetLastKWComposite()
     }
   else
     {
-    return (vtkKWComposite *)(this->Bottom->Item);
+    return vtkKWComposite::SafeDownCast(this->Bottom->Item);
     }
 }
 
