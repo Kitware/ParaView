@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 
     // Look for server output.
     timeout = 0.1;
-    serverPipe = kwsysProcess_WaitForData(client, &data, &length, &timeout);
+    serverPipe = kwsysProcess_WaitForData(server, &data, &length, &timeout);
     if(serverPipe == kwsysProcess_Pipe_STDOUT)
       {
       cout.write(data, length);
