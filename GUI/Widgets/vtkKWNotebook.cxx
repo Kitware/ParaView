@@ -21,10 +21,11 @@
 #include "vtkKWMenu.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWWidgetsConfigure.h"
-#include "vtkLinkedList.txx"
-#include "vtkLinkedListIterator.txx"
 #include "vtkMath.h"
 #include "vtkObjectFactory.h"
+
+#include <vtkstd/list>
+#include <vtkstd/algorithm>
 
 // The amount of padding that is to be added to the internal vertical padding
 // of the selected tab (basically defines the additional height of the 
@@ -59,11 +60,25 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWNotebook);
-vtkCxxRevisionMacro(vtkKWNotebook, "1.65");
+vtkCxxRevisionMacro(vtkKWNotebook, "1.66");
 
 //----------------------------------------------------------------------------
 int vtkKWNotebookCommand(ClientData cd, Tcl_Interp *interp,
                          int argc, char *argv[]);
+
+
+//----------------------------------------------------------------------------
+class vtkKWNotebookInternals
+{
+public:
+
+  typedef vtkstd::list<vtkKWNotebook::Page*> PagesContainer;
+  typedef vtkstd::list<vtkKWNotebook::Page*>::iterator PagesContainerIterator;
+  typedef vtkstd::list<vtkKWNotebook::Page*>::reverse_iterator PagesContainerReverseIterator;
+
+  PagesContainer Pages;
+  PagesContainer MostRecentPages;
+};
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::Page::Delete()
@@ -158,9 +173,9 @@ vtkKWNotebook::vtkKWNotebook()
   this->TabsFrame       = vtkKWWidget::New();
   this->TabPopupMenu    = 0;
 
-  this->Pages           = vtkKWNotebook::PagesContainer::New();
-  this->MostRecentPages = vtkKWNotebook::PagesContainer::New();
+  // Internal structs
 
+  this->Internals = new vtkKWNotebookInternals;
 }
 
 //----------------------------------------------------------------------------
@@ -192,27 +207,22 @@ vtkKWNotebook::~vtkKWNotebook()
 
   // Delete all pages
 
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      page->Delete();
-      delete page;
+      if (*it)
+        {
+        (*it)->Delete();
+        delete *it;
+        }
       }
-    it->GoToNextItem();
+    delete this->Internals;
     }
-  it->Delete();
-
-  // Delete the container
-
-  this->Pages->Delete();
-
-  // Empty the most recent pages
-
-  this->MostRecentPages->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -276,136 +286,107 @@ void vtkKWNotebook::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetPage(int id)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::Page *found = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  // Return the page corresponding to that id
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Id == id)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      found = page;
-      break;
+      if (*it && (*it)->Id == id)
+        {
+        return (*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title)
 {
-  if (title == NULL)
+  if (title && this->Internals)
     {
-    return NULL;
-    }
-
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::Page *found = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  // Return the page corresponding to that title
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(page) == VTK_OK && 
-        page->Title && 
-        !strcmp(title, page->Title))
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      found = page;
-      break;
+      if (*it && (*it)->Title && !strcmp(title, (*it)->Title))
+        {
+        return (*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetPage(const char *title, int tag)
 {
-  if (title == NULL)
+  if (title && this->Internals)
     {
-    return NULL;
-    }
-
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::Page *found = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  // Return the page corresponding to that title and that tag
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(page) == VTK_OK &&
-        page->Tag == tag &&
-        page->Title && 
-        !strcmp(title, page->Title))
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      found = page;
-      break;
+      if (*it && (*it)->Tag == tag && 
+          (*it)->Title && !strcmp(title, (*it)->Title))
+        {
+        return (*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetFirstVisiblePage()
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::Page *found = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  // Return the first visible page
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Visibility)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      found = page;
-      break;
+      if (*it && (*it)->Visibility)
+        {
+        return (*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkKWNotebook::Page* vtkKWNotebook::GetFirstPageMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::Page *found = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  // Return the first page matching tag
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      found = page;
-      break;
+      if (*it && (*it)->Tag == tag)
+        {
+        return (*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -434,22 +415,19 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstPackedPageNotMatchingTag(int tag)
   int i;
   for (i = 0 ; i < nb_slaves && !found; i++)
     {
-    vtkKWNotebook::Page *page = NULL;
-    vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      if (it->GetData(page) == VTK_OK && 
-          page->Tag != tag && 
-          !strcmp(slaves[i], page->TabFrame->GetWidgetName()))
+      if (*it && (*it)->Tag != tag && 
+          !strcmp(slaves[i], (*it)->TabFrame->GetWidgetName()))
         {
-        found = page;
+        found = *it;
         break;
         }
-      it->GoToNextItem();
       }
-    it->Delete();
     }
 
   // Deallocate slaves
@@ -466,26 +444,28 @@ vtkKWNotebook::Page* vtkKWNotebook::GetFirstPackedPageNotMatchingTag(int tag)
 //----------------------------------------------------------------------------
 unsigned int vtkKWNotebook::GetNumberOfPages()
 {
-  return (unsigned int)this->Pages->GetNumberOfItems();
+  return (unsigned int)this->Internals->Pages.size();
 }
 
 //----------------------------------------------------------------------------
 unsigned int  vtkKWNotebook::GetNumberOfPagesMatchingTag(int tag)
 {
   unsigned int count = 0;
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      count++;
+      if (*it && (*it)->Tag == tag)
+        {
+        ++count;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   return count;
 }
@@ -494,19 +474,21 @@ unsigned int  vtkKWNotebook::GetNumberOfPagesMatchingTag(int tag)
 unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
 {
   unsigned int count = 0;
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Visibility)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      count++;
+      if (*it && (*it)->Visibility)
+        {
+        ++count;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   return count;
 }
@@ -515,19 +497,21 @@ unsigned int vtkKWNotebook::GetNumberOfVisiblePages()
 unsigned int vtkKWNotebook::GetNumberOfVisiblePagesMatchingTag(int tag)
 {
   unsigned int count = 0;
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Visibility && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      count++;
+      if (*it && (*it)->Visibility && (*it)->Tag == tag)
+        {
+        ++count;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   return count;
 }
@@ -544,44 +528,37 @@ int vtkKWNotebook::GetVisiblePageId(int idx)
     return this->GetMostRecentPageId(idx);
     }
 
-  // If not, consider the unpinned page first
-
-  vtkIdType found = -1;
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && 
-        page->Visibility && !page->Pinned && !idx--)
-      {
-      found = page->Id;
-      break;
-      }
-    it->GoToNextItem();
-    }
+    // If not, consider the unpinned page first
 
-  // Not found ? Now consider the pinned page
-
-  if (found < 0)
-    {
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    int idx2 = idx;
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      if (it->GetData(page) == VTK_OK && 
-          page->Visibility && page->Pinned && !idx--)
+      if (*it && (*it)->Visibility && !(*it)->Pinned && !idx2--)
         {
-        found = page->Id;
-        break;
+        return (*it)->Id;
         }
-      it->GoToNextItem();
+      }
+
+    // Not found ? Now consider the pinned page
+
+    idx2 = idx;
+    it = this->Internals->Pages.begin();
+    for (; it != end; ++it)
+      {
+      if (*it && (*it)->Visibility && (*it)->Pinned && !idx2--)
+        {
+        return (*it)->Id;
+        }
       }
     }
 
-  it->Delete();
-
-  return found;
+  return NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -635,30 +612,24 @@ vtkKWWidget *vtkKWNotebook::GetFrame(const char *title, int tag)
 //----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageIdFromFrameWidgetName(const char *frame_wname)
 {
-  if (!this->IsCreated() || !frame_wname)
+  if (this->IsCreated() && frame_wname && this->Internals)
     {
-    return -1;
-    }
-
-  int found = -1;
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(page) == VTK_OK && 
-        page->Frame->IsCreated() &&
-        !strcmp(page->Frame->GetWidgetName(), frame_wname))
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      found = page->Id;
-      break;
+      if (*it && (*it)->Frame && 
+          (*it)->Frame->IsCreated() &&
+          !strcmp((*it)->Frame->GetWidgetName(), frame_wname))
+        {
+        return (*it)->Id;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -698,12 +669,7 @@ int vtkKWNotebook::AddPage(const char *title,
   // Create a new page, insert it in the container
   
   vtkKWNotebook::Page *page = new vtkKWNotebook::Page;
-  if (this->Pages->AppendItem(page) != VTK_OK)
-    {
-    vtkErrorMacro("Error while adding a page to the notebook");
-    delete page;
-    return -1;
-    }
+  this->Internals->Pages.push_back(page);
 
   // Each page has a unique ID in the notebook lifetime
   // It is visible and not pinned by default
@@ -918,19 +884,19 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
 
   // Remove the page from the container
 
-  vtkIdType pos = 0;
-  if (this->Pages->FindItem(page, pos) != VTK_OK)
+  vtkKWNotebookInternals::PagesContainerIterator pos = 
+    vtkstd::find(this->Internals->Pages.begin(),
+                 this->Internals->Pages.end(),
+                 page);
+
+  if (pos == this->Internals->Pages.end())
     {
     vtkErrorMacro("Error while removing a page from the notebook "
                   "(can not find the page).");
     return 0;
     }
 
-  if (this->Pages->RemoveItem(pos) != VTK_OK)
-    {
-    vtkErrorMacro("Error while removing a page from the notebook.");
-    return 0;
-    }
+  this->Internals->Pages.erase(pos);
 
   // Delete the page
 
@@ -953,23 +919,26 @@ int vtkKWNotebook::RemovePage(vtkKWNotebook::Page *page)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::RemovePagesMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerReverseIterator rit = 
+      this->Internals->Pages.rbegin();
+    vtkKWNotebookInternals::PagesContainerReverseIterator rend = 
+      this->Internals->Pages.rend();
+    while (rit != rend)
       {
-      it->GoToNextItem();
-      this->RemovePage(page);
-      }
-    else
-      {
-      it->GoToNextItem();
+      if (*rit && (*rit)->Tag == tag)
+        {
+        vtkKWNotebook::Page *page = *rit;
+        ++rit;
+        this->RemovePage(page);
+        }
+      else
+        {
+        ++rit;
+        }
       }
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1505,138 +1474,158 @@ void vtkKWNotebook::TogglePageVisibility(vtkKWNotebook::Page *page)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::HideAllPages()
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      this->HidePage(page);
+      if (*it)
+        {
+        this->HidePage(*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      this->ShowPage(page);
+      if (*it && (*it)->Tag == tag)
+        {
+        this->ShowPage(*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesMatchingTagReverse(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->GoToLastItem();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerReverseIterator rit = 
+      this->Internals->Pages.rbegin();
+    vtkKWNotebookInternals::PagesContainerReverseIterator rend = 
+      this->Internals->Pages.rend();
+    for (; rit != rend; ++rit)
       {
-      this->ShowPage(page);
+      if (*rit && (*rit)->Tag == tag)
+        {
+        this->ShowPage(*rit);
+        }
       }
-    it->GoToPreviousItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::HidePagesMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      this->HidePage(page);
+      if (*it && (*it)->Tag == tag)
+        {
+        this->HidePage(*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::ShowPagesNotMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag != tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      this->ShowPage(page);
+      if (*it && (*it)->Tag != tag)
+        {
+        this->ShowPage(*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::HidePagesNotMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag != tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      this->HidePage(page);
+      if (*it && (*it)->Tag != tag)
+        {
+        this->HidePage(*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 int vtkKWNotebook::AddToMostRecentPages(vtkKWNotebook::Page *page)
-{
-  vtkIdType idx;
-  if (page == NULL || this->MostRecentPages->FindItem(page, idx) == VTK_OK)
-    {
-    return 0;
-    }
-
-  this->MostRecentPages->PrependItem(page);
-  return 1;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWNotebook::RemoveFromMostRecentPages(vtkKWNotebook::Page *page)
 {
   if (page == NULL)
     {
     return 0;
     }
 
-  vtkIdType idx = 0;
-  while (this->MostRecentPages->FindItem(page, idx) == VTK_OK)
+  vtkKWNotebookInternals::PagesContainerIterator pos = 
+    vtkstd::find(this->Internals->MostRecentPages.begin(),
+                 this->Internals->MostRecentPages.end(),
+                 page);
+
+  if (pos != this->Internals->MostRecentPages.end())
     {
-    this->MostRecentPages->RemoveItem(idx);
+    return 0;
     }
 
+  this->Internals->MostRecentPages.push_front(*pos);
+  return 1;
+}
+
+//----------------------------------------------------------------------------
+int vtkKWNotebook::RemoveFromMostRecentPages(vtkKWNotebook::Page *page)
+{
+  if (!this->Internals || page == NULL)
+    {
+    return 0;
+    }
+
+  vtkKWNotebookInternals::PagesContainerIterator pos = 
+    vtkstd::find(this->Internals->MostRecentPages.begin(),
+                 this->Internals->MostRecentPages.end(),
+                 page);
+
+  if (pos == this->Internals->MostRecentPages.end())
+    {
+    return 0;
+    }
+
+  this->Internals->MostRecentPages.erase(pos);
   return 1;
 }
 
@@ -1650,18 +1639,23 @@ int vtkKWNotebook::PutOnTopOfMostRecentPages(vtkKWNotebook::Page *page)
 //----------------------------------------------------------------------------
 int vtkKWNotebook::GetMostRecentPageId(int idx)
 {
-  if (idx < 0 || idx >= this->MostRecentPages->GetNumberOfItems())
+  if (this->Internals &&
+      idx >= 0 && idx < (int)this->Internals->MostRecentPages.size())
     {
-    return -1;
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->MostRecentPages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->MostRecentPages.end();
+    for (; it != end; ++it)
+      {
+      if (*it && !idx--)
+        {
+        return (*it)->Id;
+        }
+      }
     }
 
-  vtkKWNotebook::Page *page = NULL;
-  if (this->MostRecentPages->GetItem(idx, page) != VTK_OK)
-    {
-    return -1;
-    }
-
-  return page->Id;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -1727,37 +1721,39 @@ void vtkKWNotebook::UnpinPage(vtkKWNotebook::Page *page)
 //----------------------------------------------------------------------------
 void vtkKWNotebook::PinPagesMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      this->PinPage(page);
+      if (*it && (*it)->Tag == tag)
+        {
+        this->PinPage(*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
 void vtkKWNotebook::UnpinPagesMatchingTag(int tag)
 {
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Tag == tag)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      this->UnpinPage(page);
+      if (*it && (*it)->Tag == tag)
+        {
+        this->UnpinPage(*it);
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -1830,19 +1826,21 @@ int vtkKWNotebook::GetPagePinned(vtkKWNotebook::Page *page)
 unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
 {
   unsigned int count = 0;
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
 
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Pinned)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      count++;
+      if (*it && (*it)->Pinned)
+        {
+        ++count;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   return count;
 }
@@ -1850,23 +1848,22 @@ unsigned int vtkKWNotebook::GetNumberOfPinnedPages()
 //----------------------------------------------------------------------------
 int vtkKWNotebook::GetPinnedPageId(int idx)
 {
-  vtkIdType found = -1;
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Pinned && !idx--)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      found = page->Id;
-      break;
+      if (*it && (*it)->Pinned && !idx--)
+        {
+        return (*it)->Id;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -2366,27 +2363,29 @@ void vtkKWNotebook::SetShowIcons(int arg)
 
   ostrstream cmd;
 
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
+  if (this->Internals)
     {
-    if (it->GetData(page) == VTK_OK && page->Icon)
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      if (this->ShowIcons)
+      if (*it && (*it)->Icon)
         {
-        cmd << "pack " << page->ImageLabel->GetWidgetName() 
-                << " -side left -before " << page->Label->GetWidgetName() 
-                << endl;
-        }
-      else
-        {
-        cmd << "pack forget " << page->ImageLabel->GetWidgetName() << endl;
+        if (this->ShowIcons)
+          {
+          cmd << "pack " << (*it)->ImageLabel->GetWidgetName() 
+              << " -side left -before " << (*it)->Label->GetWidgetName() 
+              << endl;
+          }
+        else
+          {
+          cmd << "pack forget " << (*it)->ImageLabel->GetWidgetName() << endl;
+          }
         }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
   cmd << ends;
   this->Script(cmd.str());
@@ -2484,7 +2483,7 @@ void vtkKWNotebook::SetShowOnlyMostRecentPages(int arg)
 
   // Empty the most recent pages buffer
 
-  this->MostRecentPages->RemoveAllItems();
+  this->Internals->MostRecentPages.clear();
 
   // If we are enabling this feature, put the current tabs in the most
   // recent pages
@@ -2503,24 +2502,21 @@ void vtkKWNotebook::SetShowOnlyMostRecentPages(int arg)
       int i;
       for (i = nb_slaves - 1; i >= 0; i--)
         {
-        vtkKWNotebook::Page *page = NULL;
-        vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-        it->InitTraversal();
-        while (!it->IsDoneWithTraversal())
+        vtkKWNotebookInternals::PagesContainerIterator it = 
+          this->Internals->Pages.begin();
+        vtkKWNotebookInternals::PagesContainerIterator end = 
+          this->Internals->Pages.end();
+        for (; it != end; ++it)
           {
-          if (it->GetData(page) == VTK_OK && 
-              !strcmp(slaves[i], page->TabFrame->GetWidgetName()))
+          if (*it && (*it)->TabFrame && (*it)->TabFrame->IsCreated() &&
+              !strcmp(slaves[i], (*it)->TabFrame->GetWidgetName()))
             {
-            this->AddToMostRecentPages(page);
+            this->AddToMostRecentPages(*it);
             break;
             }
-          it->GoToNextItem();
           }
-        it->Delete();
-
         delete [] slaves[i];
         }
-      
       delete [] slaves;
       }
     }
@@ -2554,51 +2550,54 @@ void vtkKWNotebook::ConstrainVisiblePages()
 
   if (this->ShowAllPagesWithSameTag)
     {
-    vtkKWNotebook::Page *page = NULL;
-    vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    if (this->Internals)
       {
-      if (it->GetData(page) == VTK_OK && page->Visibility)
+      vtkKWNotebookInternals::PagesContainerIterator it = 
+        this->Internals->Pages.begin();
+      vtkKWNotebookInternals::PagesContainerIterator end = 
+        this->Internals->Pages.end();
+      for (; it != end; ++it)
         {
-        this->ShowPagesMatchingTag(page->Tag);
+        if (*it && (*it)->Visibility)
+          {
+          this->ShowPagesMatchingTag((*it)->Tag);
+          }
         }
-      it->GoToNextItem();
       }
-    it->Delete();
     }
 
   // Show only the most recent pages
 
   if (this->ShowOnlyMostRecentPages && 
       this->NumberOfMostRecentPages > 0 && 
-      this->MostRecentPages->GetNumberOfItems() >this->NumberOfMostRecentPages)
+      ((int)this->Internals->MostRecentPages.size() >
+       this->NumberOfMostRecentPages))
     {
     int diff = 
-      this->MostRecentPages->GetNumberOfItems()-this->NumberOfMostRecentPages;
+      this->Internals->MostRecentPages.size() - this->NumberOfMostRecentPages;
 
-    vtkIdType key = 0;
-    vtkKWNotebook::Page *page = NULL;
-    vtkKWNotebook::PagesContainerIterator *it = 
-      this->MostRecentPages->NewIterator();
+    // There are more pages than allowed, try to remove some of them
 
-    // There are move pages than allowed, try to remove some of them
-
-    it->GoToLastItem();
-    while (diff && !it->IsDoneWithTraversal())
+    vtkKWNotebookInternals::PagesContainerReverseIterator rit = 
+      this->Internals->MostRecentPages.rbegin();
+    vtkKWNotebookInternals::PagesContainerReverseIterator rit2;
+    vtkKWNotebookInternals::PagesContainerReverseIterator rend = 
+      this->Internals->MostRecentPages.rend();
+    while (diff && rit != rend)
       {
-      int res = (it->GetKey(key) == VTK_OK && it->GetData(page) == VTK_OK);
-      it->GoToPreviousItem();
-      if (res && 
-          this->CanBeHidden(page) &&
-          this->MostRecentPages->RemoveItem(key) == VTK_OK)
+      if (*rit && this->CanBeHidden(*rit))
         {
+        vtkKWNotebook::Page *page = *rit;
+        ++rit;
+        this->RemoveFromMostRecentPages(page);
         this->HidePage(page);
         diff--;
         }
+      else
+        {
+        ++rit;
+        }
       }
-    it->Delete();
     }
 }
 
@@ -2614,53 +2613,46 @@ void vtkKWNotebook::SetPagesCanBePinned(int arg)
 
   if (this->IsCreated() && !this->PagesCanBePinned)
     {
-    vtkKWNotebook::Page *page = NULL;
-    vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      if (it->GetData(page) == VTK_OK && page->Pinned)
+      if (*it && (*it)->Pinned)
         {
-        this->UnpinPage(page);
+        this->UnpinPage(*it);
         }
-      it->GoToNextItem();
       }
-    it->Delete();
     }
 }
 
 //----------------------------------------------------------------------------
 int vtkKWNotebook::GetPageIdContainingCoordinatesInTab(int x, int y)
 {
-  if (!this->IsCreated())
+  if (this->IsCreated() && this->Internals)
     {
-    return -1;
-    }
-
-  int found = -1;
-  vtkKWNotebook::Page *page = NULL;
-  vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-  it->InitTraversal();
-  while (!it->IsDoneWithTraversal())
-    {
-    if (it->GetData(page) == VTK_OK && 
-        page->Visibility &&
-        page->TabFrame->IsCreated() &&
-        vtkKWTkUtilities::ContainsCoordinates(
-          this->GetApplication()->GetMainInterp(),
-          page->TabFrame->GetWidgetName(),
-          x, y))
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      found = page->Id;
-      break;
+      if (*it && 
+          (*it)->Visibility &&
+          (*it)->TabFrame &&
+          (*it)->TabFrame->IsCreated() &&
+          vtkKWTkUtilities::ContainsCoordinates(
+            this->GetApplication()->GetMainInterp(),
+            (*it)->TabFrame->GetWidgetName(),
+            x, y))
+        {
+        return (*it)->Id;
+        }
       }
-    it->GoToNextItem();
     }
-  it->Delete();
 
-  return found;
+  return -1;
 }
 
 //----------------------------------------------------------------------------
@@ -2683,29 +2675,27 @@ void vtkKWNotebook::UpdateEnableState()
     this->Mask->SetEnabled(this->Enabled);
     }
 
-  if (this->Pages)
+  if (this->Internals)
     {
-    vtkKWNotebook::Page *page = NULL;
-    vtkKWNotebook::PagesContainerIterator *it = this->Pages->NewIterator();
-
-    it->InitTraversal();
-    while (!it->IsDoneWithTraversal())
+    vtkKWNotebookInternals::PagesContainerIterator it = 
+      this->Internals->Pages.begin();
+    vtkKWNotebookInternals::PagesContainerIterator end = 
+      this->Internals->Pages.end();
+    for (; it != end; ++it)
       {
-      if (it->GetData(page) == VTK_OK)
+      if (*it)
         {
-        page->SetEnabled(this->Enabled);
+        (*it)->SetEnabled(this->Enabled);
         if (this->Enabled)
           {
-          this->BindPage(page);
+          this->BindPage(*it);
           }
         else
           {
-          this->UnBindPage(page);
+          this->UnBindPage(*it);
           }
         }
-      it->GoToNextItem();
       }
-    it->Delete();
     }
 }
 

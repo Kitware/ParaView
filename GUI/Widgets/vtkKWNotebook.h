@@ -26,11 +26,7 @@ class vtkKWFrame;
 class vtkKWIcon;
 class vtkKWLabel;
 class vtkKWMenu;
-
-//BTX
-template<class DataType> class vtkLinkedList;
-template<class DataType> class vtkLinkedListIterator;
-//ETX
+class vtkKWNotebookInternals;
 
 class VTK_EXPORT vtkKWNotebook : public vtkKWWidget
 {
@@ -348,12 +344,10 @@ protected:
     vtkKWIcon       *Icon;
   };
 
-  // The pages container and its iterator
+  // PIMPL Encapsulation for STL containers
 
-  typedef vtkLinkedList<Page*> PagesContainer;
-  typedef vtkLinkedListIterator<Page*> PagesContainerIterator;
-  PagesContainer *Pages;
-  PagesContainer *MostRecentPages;
+  vtkKWNotebookInternals *Internals;
+  friend class vtkKWNotebookInternals;
 
   // Return a pointer to a page.
   // If a page title is provided instead of a page id, the first page matching
