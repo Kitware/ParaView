@@ -8,6 +8,19 @@ if {[info exists argc]} {
     }
 } 
 
+
+
+# Also test to see if the ExtentEntry gets initialized properly.
+# Create a text file. "out.txt" is a special name
+if { [catch {set fp [open "out.txt" w]}] != 0 } {
+  $Application SetExitStatus 2
+  $Application Exit
+  exit
+}
+
+
+
+
 proc AdjustContourValue { cnt val } {
     set entry [$cnt GetPVWidget {Contour Values}]
     $entry RemoveAllValues
@@ -15,6 +28,8 @@ proc AdjustContourValue { cnt val } {
     $entry AddValueCallback
     $cnt AcceptCallback
 }
+
+
 
 
 # hack to get the window.
@@ -39,6 +54,27 @@ $pvWindow SetCurrentPVSource $kw(vtkTemp292)
 
 set pvExtract [$pvWindow CreatePVSource ExtractGrid]
 set VOIEntry [$pvExtract GetPVWidget {VOI}]
+
+#----------- Text comparison ------------
+# Save the default extent in the test text file.
+puts $fp "Default range of the ExtentEntry:"
+puts $fp [$VOIEntry GetRange]
+close $fp
+
+# compare the text file with the regression version.
+source $DataDir/Utility/rtText.tcl
+pvFileTest $DataDir/Baseline/CombustorTest.txt
+file delete -force out.txt
+
+if {[$Application GetExitStatus]} {
+  $Application Exit
+}
+#----------------------------------------
+
+
+# continue with the reast of the test/
+
+
 $VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
@@ -92,7 +128,6 @@ for {set i 0} {$i < 1} {incr i 1} {
     $camera Azimuth 10
     RenWin1 Render
     update
-
 }
 
 $cntOutput SetVisibility 0
@@ -144,4 +179,7 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     }
 }
 
-$Application Exit
+
+
+
+

@@ -75,6 +75,10 @@ close $fp
 source $DataDir/Utility/rtText.tcl
 pvFileTest $DataDir/Baseline/ArrayMenuChangeInput.txt
 file delete -force out.txt
+if {[$Application GetExitStatus]} {
+  $Application Exit
+}
+
 
 # Continue with the rest of the test.
  

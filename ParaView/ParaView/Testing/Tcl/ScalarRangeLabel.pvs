@@ -102,6 +102,9 @@ close $fp
 source $DataDir/Utility/rtText.tcl
 pvFileTest $DataDir/Baseline/ScalarRangeLabel.txt
 file delete -force out.txt
+if {[$Application GetExitStatus]} {
+  $Application Exit
+}
 
 # might as well do the image comparison.
 

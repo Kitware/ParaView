@@ -59,6 +59,9 @@ if { [catch {set fp [open "out.txt" w]}] == 0 } {
   source $DataDir/Utility/rtText.tcl
   pvFileTest $DataDir/Baseline/VectorTextSpace.txt
   file delete -force out.txt
+  if {[$Application GetExitStatus]} {
+    $Application Exit
+  }
 }
 
 # Continue with the rest of the test.
