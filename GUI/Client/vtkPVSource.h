@@ -503,10 +503,6 @@ protected:
 
   vtkPVColorMap *PVColorMap;
   
-  // Description:
-  // This method collects data information from all processes.
-  void GatherDataInformation();
-  vtkPVDataInformation *DataInformation;
   int DataInformationValid;
 
   vtkPVNumberOfOutputsInformation *NumberOfOutputsInformation;

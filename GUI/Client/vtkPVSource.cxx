@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.403");
+vtkCxxRevisionMacro(vtkPVSource, "1.404");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -363,48 +363,28 @@ vtkSMPart* vtkPVSource::GetPart(int idx)
 //----------------------------------------------------------------------------
 vtkPVDataInformation* vtkPVSource::GetDataInformation()
 {
+  vtkPVDataInformation* info = this->Proxy->GetDataInformation();
   if (this->DataInformationValid == 0)
     {
-    this->GatherDataInformation();
-    
     // Where else should I put this?
     //law int fixme; // Although this should probably go into vtkPVSource::Update,
     // I am going to get rid of this refernece anyway. (Or should I?)
     // Window will know to update the InformationGUI when the current PVSource
     // is changed, but how will it detect that a source has changed?
     // Used to only update the information.  We could make it specific to info again ...
-    this->Notebook->Update();
+    this->DataInformationValid = 1;
+    if (this->Notebook)
+      {
+      this->Notebook->Update();
+      }
     }
-  return this->Proxy->GetDataInformation();
+  return info;
 }
 
 //----------------------------------------------------------------------------
 void vtkPVSource::InvalidateDataInformation()
 {
   this->DataInformationValid = 0;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVSource::GatherDataInformation()
-{
-  vtkSMPart *part;
-  int i, num;
-
-  //law int fixme;  // Try just calling gather on the partdisplay.
-
-  num = this->GetNumberOfParts();
-  for (i = 0; i < num; ++i)
-    {
-    part = this->GetPart(i);
-    part->GatherDataInformation();
-    }
-  this->DataInformationValid = 1;
-
-  // Used to only update the display gui ...
-  if (this->Notebook)
-    {
-    this->Notebook->Update();
-    }
 }
 
 //----------------------------------------------------------------------------
@@ -1079,6 +1059,9 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     pDisp->SetInput(this->GetProxy());
     // Render module keeps a list of all the displays.
     rm->AddDisplay(pDisp);
+
+    this->Proxy->SetPartDisplay(pDisp);
+    //pDisp->Update();
     
     // Hookup cube axes display.
     this->CubeAxesDisplay->SetInput(this->Proxy);
@@ -1153,6 +1136,8 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     }
   else
     {
+    // This executes the filter (from update suppressor)
+    this->PartDisplay->Update();
     this->GetPVWindow()->UpdateEnableState();
     }
 
@@ -2267,7 +2252,8 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
     pvs->Delete();
     return VTK_ERROR;
     }
-  pvs->Proxy->CreateVTKObjects(numSources);
+  // Force the proxy to create numSources objects
+  pvs->Proxy->GetID(numSources-1);
 
   for (idx = 0; idx < numSources; ++idx)
     {
