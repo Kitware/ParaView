@@ -901,6 +901,12 @@
           <InputArrayDomain name="input_array"/>
      </InputProperty>
 
+     <Property
+        name="RemoveAllVariables"
+        command="RemoveAllVariables"
+        immediate_update="1">
+     </Property>
+
      <StringVectorProperty 
         name="ResultArrayName" 
         command="SetResultArrayName" 

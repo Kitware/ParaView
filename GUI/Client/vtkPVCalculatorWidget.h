@@ -179,6 +179,7 @@ protected:
   char *SMScalarVariablePropertyName;
   char *SMVectorVariablePropertyName;
   char *SMAttributeModePropertyName;
+  char *SMRemoveAllVariablesPropertyName;
 
   void SetSMFunctionProperty(vtkSMProperty *prop);
   vtkSMProperty* GetSMFunctionProperty();
@@ -188,6 +189,8 @@ protected:
   vtkSMProperty* GetSMVectorVariableProperty();
   void SetSMAttributeModeProperty(vtkSMProperty *prop);
   vtkSMProperty* GetSMAttributeModeProperty();
+  void SetSMRemoveAllVariablesProperty(vtkSMProperty *prop);
+  vtkSMProperty* GetSMRemoveAllVariablesProperty();
 
   vtkSetStringMacro(SMFunctionPropertyName);
   vtkGetStringMacro(SMFunctionPropertyName);
@@ -197,6 +200,8 @@ protected:
   vtkGetStringMacro(SMVectorVariablePropertyName);
   vtkSetStringMacro(SMAttributeModePropertyName);
   vtkGetStringMacro(SMAttributeModePropertyName);
+  vtkSetStringMacro(SMRemoveAllVariablesPropertyName);
+  vtkGetStringMacro(SMRemoveAllVariablesPropertyName);
 
 //BTX
   virtual void CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
@@ -215,6 +220,7 @@ private:
   vtkSMProperty *SMScalarVariableProperty;
   vtkSMProperty *SMVectorVariableProperty;
   vtkSMProperty *SMAttributeModeProperty;
+  vtkSMProperty *SMRemoveAllVariablesProperty;
 };
 
 #endif

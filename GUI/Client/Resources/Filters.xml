@@ -868,6 +868,7 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
                       scalar_property="AddScalarVariable"
                       vector_property="AddVectorVariable"
                       attribute_mode_property="AttributeMode"
+                      remove_all_variables_property="RemoveAllVariables"
                       help="Enter the equation for the new array."/>
     <LabeledToggle label="Replace invalid results"
                    trace_name="ReplaceInvalidValues"

@@ -46,7 +46,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.36");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.37");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -58,6 +58,8 @@ vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMVectorVariableProperty,
                      vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMAttributeModeProperty,
                      vtkSMProperty);
+vtkCxxSetObjectMacro(vtkPVCalculatorWidget, SMRemoveAllVariablesProperty,
+  vtkSMProperty);
 
 //----------------------------------------------------------------------------
 vtkPVCalculatorWidget::vtkPVCalculatorWidget()
@@ -127,10 +129,12 @@ vtkPVCalculatorWidget::vtkPVCalculatorWidget()
   this->SMScalarVariablePropertyName = 0;
   this->SMVectorVariablePropertyName = 0;
   this->SMAttributeModePropertyName = 0;
+  this->SMRemoveAllVariablesPropertyName = 0;
   this->SMFunctionProperty = 0;
   this->SMScalarVariableProperty = 0;
   this->SMVectorVariableProperty = 0;
   this->SMAttributeModeProperty = 0;
+  this->SMRemoveAllVariablesProperty = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -241,10 +245,13 @@ vtkPVCalculatorWidget::~vtkPVCalculatorWidget()
   this->SetSMScalarVariablePropertyName(0);
   this->SetSMVectorVariablePropertyName(0);
   this->SetSMAttributeModePropertyName(0);
+  this->SetSMRemoveAllVariablesPropertyName(0);
+  
   this->SetSMFunctionProperty(0);
   this->SetSMScalarVariableProperty(0);
   this->SetSMVectorVariableProperty(0);
   this->SetSMAttributeModeProperty(0);
+  this->SetSMRemoveAllVariablesProperty(0);
 }
 
 //----------------------------------------------------------------------------
@@ -792,12 +799,11 @@ void vtkPVCalculatorWidget::Accept()
 {
   int i;
 
-  vtkClientServerStream stream;
-  vtkPVProcessModule *pm = this->GetPVApplication()->GetProcessModule();
-  stream << vtkClientServerStream::Invoke
-         << this->PVSource->GetVTKSourceID(0) << "RemoveAllVariables"
-         << vtkClientServerStream::End;
-  pm->SendStream(vtkProcessModule::DATA_SERVER, stream, 0);
+  vtkSMProperty *removeAllVariablesProp = this->GetSMRemoveAllVariablesProperty();
+  if (removeAllVariablesProp)
+    {
+    removeAllVariablesProp->Modified();
+    }
 
   vtkSMStringVectorProperty *functionProp =
     vtkSMStringVectorProperty::SafeDownCast(this->GetSMFunctionProperty());
@@ -1248,6 +1254,26 @@ vtkSMProperty* vtkPVCalculatorWidget::GetSMAttributeModeProperty()
 }
 
 //----------------------------------------------------------------------------
+vtkSMProperty* vtkPVCalculatorWidget::GetSMRemoveAllVariablesProperty()
+{
+  if (this->SMRemoveAllVariablesProperty)
+    {
+    return this->SMRemoveAllVariablesProperty;
+    }
+
+  if (!this->GetPVSource() || ! this->GetPVSource()->GetProxy())
+    {
+    return 0;
+    }
+  this->SetSMRemoveAllVariablesProperty(
+    this->GetPVSource()->GetProxy()->GetProperty(
+      this->GetSMRemoveAllVariablesPropertyName()));
+
+  return this->SMRemoveAllVariablesProperty;
+  
+}
+
+//----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::CopyProperties(vtkPVWidget *clone, 
            vtkPVSource *pvSource, vtkArrayMap<vtkPVWidget*, vtkPVWidget*> *map)
 {
@@ -1259,6 +1285,7 @@ void vtkPVCalculatorWidget::CopyProperties(vtkPVWidget *clone,
     cw->SetSMScalarVariablePropertyName(this->SMScalarVariablePropertyName);
     cw->SetSMVectorVariablePropertyName(this->SMVectorVariablePropertyName);
     cw->SetSMAttributeModePropertyName(this->SMAttributeModePropertyName);
+    cw->SetSMRemoveAllVariablesPropertyName(this->SMRemoveAllVariablesPropertyName);
     }
   else
     {
@@ -1299,7 +1326,12 @@ int vtkPVCalculatorWidget::ReadXMLAttributes(vtkPVXMLElement *element,
     {
     this->SetSMAttributeModePropertyName(attribute_mode_property);
     }
-  
+  const char *remove_all_variables_property =
+    element->GetAttribute("remove_all_variables_property");
+  if (remove_all_variables_property)
+    {
+    this->SetSMRemoveAllVariablesPropertyName(remove_all_variables_property);
+    }
   return 1;
 }
 
