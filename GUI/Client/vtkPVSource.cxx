@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.413");
+vtkCxxRevisionMacro(vtkPVSource, "1.414");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1061,14 +1061,6 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     { // This is the first time, initialize data. 
     // I used to see if the display gui was properly set, but that was a legacy
     // check.  I removed the check.
-    this->Initialized = 1;
-    // We need to set the intialized flag at the beginning of this if, otherwise
-    // when the SetCurrentPVSource is called, if Initialized==0, it forces
-    // a reset on the all the widgets. Ideally, this should not have any side effects,
-    // since all widgets have just been accepted, before the reset is called.
-    // However, some widgets (such as vtkPVInputMenu (which has now been rectified) 
-    // affect don't show this behaviour
-    // and may lead to a call to ModifiedCallback() which makes the button green again.
      
     // Create the display and add it to the render module.
     vtkPVRenderModule* rm = 
@@ -1169,6 +1161,12 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
     // I put it at the end so the InputFixedTypeRequirement will work.
     this->UnGrabFocus();
     this->SetDefaultColorParameters();
+    // One may be tempted to move this to the start of this if condition,
+    // to avoid badly behaving PVWidgets reset calls to lead to
+    // modification of the Accept button state, but that leads to 
+    // crashes. So it's a good idea to recode the ResetInternal
+    // method of the problematic PVWidget instead.
+    this->Initialized = 1;
     }
   else
     {
