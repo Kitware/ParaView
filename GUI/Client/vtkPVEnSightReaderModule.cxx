@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.47");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.48");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -77,7 +77,7 @@ int vtkPVEnSightReaderModule::ReadFileInformation(const char* fname)
     int numSources = this->GetNumberOfVTKSources();
     for(i=0; i < numSources; ++i)
       {
-      pm->GetStream() << vtkClientServerStream::Invoke << pm->GetApplicationID()
+      pm->GetStream() << vtkClientServerStream::Invoke << pm->GetProcessModuleID()
                       << "GetController"
                       << vtkClientServerStream::End;
       pm->GetStream() << vtkClientServerStream::Invoke << this->GetVTKSourceID(i) 
