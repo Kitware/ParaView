@@ -30,7 +30,6 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkStringList.h"
 #include "vtkPVSourceInterface.h"
 #include "vtkObjectFactory.h"
-#include "vtkTclUtil.h"
 
 int vtkPVProbeCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -81,6 +80,8 @@ vtkPVProbe::vtkPVProbe()
   this->ProbeSourceTclName = NULL;
   
   this->Dimensionality = -1;
+  
+  this->PVProbeSource = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -135,12 +136,17 @@ vtkPVProbe::~vtkPVProbe()
   this->Z2Entry = NULL;
   this->EndPoint2Frame->Delete();
   this->EndPoint2Frame = NULL;
+  
+  this->DivisionsEntry->Delete();
+  this->DivisionsEntry = NULL;
 
   this->SetPointButton->Delete();
   this->SetPointButton = NULL;
   
   this->ProbeFrame->Delete();
   this->ProbeFrame = NULL;
+
+  this->SetPVProbeSource(NULL);
 }
 
 //----------------------------------------------------------------------------
@@ -159,7 +165,6 @@ vtkPVProbe* vtkPVProbe::New()
 //----------------------------------------------------------------------------
 void vtkPVProbe::CreateProperties()
 {
-  int error;
   float bounds[6];
   vtkKWWidget *frame;
   vtkPVApplication* pvApp = this->GetPVApplication();
