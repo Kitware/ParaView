@@ -259,6 +259,10 @@ public:
   void ColorByCellField(const char *name, int numComps);
   
   // Description:
+  // Select which point field to use for volume rendering
+  void VolumeRenderPointField(const char *name);
+  
+  // Description:
   // This allows you to set the propertiesParent to any widget you like.  
   // If you do not specify a parent, then the views->PropertyParent is used.  
   // If the composite does not have a view, then a top level window is created.
@@ -334,7 +338,8 @@ protected:
   void ColorByCellFieldInternal(const char *name, int numComps);
   void SetColorRangeInternal(double min, double max);
   void SetActorColor(double r, double g, double b);
-
+  void VolumeRenderPointFieldInternal(const char *name);
+  
   // A flag that helps UpdateProperties determine 
   // whether to set the default color.
   int ColorSetByUser;
@@ -354,6 +359,7 @@ protected:
   vtkKWScale *AmbientScale;
   
   vtkKWLabeledFrame *ColorFrame;
+  vtkKWLabeledFrame *VolumeAppearanceFrame;
   vtkKWLabeledFrame *DisplayStyleFrame;
   vtkKWLabeledFrame *StatsFrame;
   vtkKWLabeledFrame *ViewFrame;
@@ -363,7 +369,10 @@ protected:
 
   vtkKWChangeColorButton *ColorButton;
   vtkKWPushButton *EditColorMapButton;
-  
+
+  vtkKWLabel *VolumeScalarsMenuLabel;
+  vtkKWOptionMenu *VolumeScalarsMenu;
+
   vtkKWLabel *RepresentationMenuLabel;
   vtkKWOptionMenu *RepresentationMenu;
   vtkKWLabel *InterpolationMenuLabel;
@@ -409,6 +418,10 @@ protected:
   double PreviousSpecular;
   int PreviousWasSolid;
 
+  // Switch between showing the properties for actors and volumes
+  void ShowVolumeAppearance();
+  void ShowActorAppearance();
+  
   vtkPVColorMap *PVColorMap;
 
   // Adding point labelling back in.  This only works in single-process mode.

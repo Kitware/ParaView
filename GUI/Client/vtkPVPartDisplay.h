@@ -139,8 +139,18 @@ public:
   // fixme:  does this really need to be here?
   // Get the tcl name of the vtkPVGeometryFilter.
   vtkClientServerID GetGeometryID() {return this->GeometryID;}
- 
 
+  // Description:
+  // Select the point field to use for volume rendering
+  void VolumeRenderPointField(const char *name);
+
+  // Description:
+  // Turn on/off volume rendering. This controls which prop is 
+  // visible since both geometric and volumetric pipelines exist
+  // simultaneously.
+  void VolumeRenderModeOn();
+  void VolumeRenderModeOff();
+  
 protected:
   vtkPVPartDisplay();
   ~vtkPVPartDisplay();
@@ -174,6 +184,8 @@ protected:
   vtkClientServerID VolumeMapperID;
   vtkClientServerID VolumeOpacityID;
   vtkClientServerID VolumeColorID;
+  vtkClientServerID VolumeTetraFilterID;
+  vtkClientServerID VolumeFieldFilterID;
 
   vtkVolume         *Volume;
   
@@ -184,6 +196,8 @@ protected:
 
   vtkPolyDataMapper *Mapper;
 
+  int VolumeRenderMode;
+  
   // This method gets called by SetPVApplication.
   virtual void CreateParallelTclObjects(vtkPVApplication *pvApp);
 

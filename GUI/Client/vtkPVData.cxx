@@ -82,7 +82,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.264");
+vtkCxxRevisionMacro(vtkPVData, "1.265");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -110,6 +110,7 @@ vtkPVData::vtkPVData()
   this->InformationFrame = vtkKWFrame::New();
 
   this->ColorFrame = vtkKWLabeledFrame::New();
+  this->VolumeAppearanceFrame = vtkKWLabeledFrame::New();
   this->DisplayStyleFrame = vtkKWLabeledFrame::New();
   this->StatsFrame = vtkKWLabeledFrame::New();
   this->ViewFrame = vtkKWLabeledFrame::New();
@@ -135,6 +136,9 @@ vtkPVData::vtkPVData()
   
   this->ColorButton = vtkKWChangeColorButton::New();
 
+  this->VolumeScalarsMenuLabel = vtkKWLabel::New();
+  this->VolumeScalarsMenu = vtkKWOptionMenu::New();
+  
   this->RepresentationMenuLabel = vtkKWLabel::New();
   this->RepresentationMenu = vtkKWOptionMenu::New();
   
@@ -242,6 +246,9 @@ vtkPVData::~vtkPVData()
   this->ColorButton->Delete();
   this->ColorButton = NULL;
   
+  this->VolumeScalarsMenuLabel->Delete();
+  this->VolumeScalarsMenuLabel = NULL;
+  
   this->RepresentationMenuLabel->Delete();
   this->RepresentationMenuLabel = NULL;  
   this->RepresentationMenu->Delete();
@@ -295,6 +302,8 @@ vtkPVData::~vtkPVData()
   
   this->ColorFrame->Delete();
   this->ColorFrame = NULL;
+  this->VolumeAppearanceFrame->Delete();
+  this->VolumeAppearanceFrame = NULL;
   this->DisplayStyleFrame->Delete();
   this->DisplayStyleFrame = NULL;
   this->StatsFrame->Delete();
@@ -603,8 +612,33 @@ void vtkPVData::CreateProperties()
   this->MapScalarsCheck->EnabledOff();
   this->EditColorMapButton->EnabledOff();
 
-  // Display style
+  // Volume Appearance
+  this->VolumeAppearanceFrame->SetParent(this->Properties->GetFrame());
+  this->VolumeAppearanceFrame->ShowHideFrameOn();
+  this->VolumeAppearanceFrame->Create(this->Application, 0);
+  this->VolumeAppearanceFrame->SetLabel("Volume Appearance");
 
+  this->VolumeScalarsMenuLabel->
+    SetParent(this->VolumeAppearanceFrame->GetFrame());
+  this->VolumeScalarsMenuLabel->Create(this->Application, "");
+  this->VolumeScalarsMenuLabel->SetLabel("View Scalars:");
+  this->VolumeScalarsMenuLabel->SetBalloonHelpString(
+    "Select scalars to view with volume rendering.");
+  
+  this->VolumeScalarsMenu->SetParent(this->VolumeAppearanceFrame->GetFrame());
+  this->VolumeScalarsMenu->Create(this->Application, "");   
+  this->VolumeScalarsMenu->SetBalloonHelpString(
+    "Select scalars to view with volume rendering.");
+
+  this->Script("grid %s %s -sticky wns",
+               this->VolumeScalarsMenuLabel->GetWidgetName(),
+               this->VolumeScalarsMenu->GetWidgetName());
+
+  this->Script("grid %s -sticky news -padx %d -pady %d",
+               this->VolumeScalarsMenu->GetWidgetName(),
+               col_1_padx, button_pady);
+
+  // Display style
   this->DisplayStyleFrame->SetParent(this->Properties->GetFrame());
   this->DisplayStyleFrame->ShowHideFrameOn();
   this->DisplayStyleFrame->Create(this->Application, 0);
@@ -632,9 +666,6 @@ void vtkPVData::CreateProperties()
                                                 "DrawWireframe");
   this->RepresentationMenu->AddEntryWithCommand(VTK_PV_POINTS_LABEL, this,
                                                 "DrawPoints");
-// Remove this option for 1.4 release
-//  this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
-//                                                "DrawVolume");
 
   this->RepresentationMenu->SetBalloonHelpString(
     "Choose what geometry should be used to represent the dataset.");
@@ -737,10 +768,11 @@ void vtkPVData::CreateProperties()
 
   // Now synchronize all those grids to have them aligned
 
-  const char *widgets[3];
+  const char *widgets[4];
   widgets[0] = this->ViewFrame->GetFrame()->GetWidgetName();
   widgets[1] = this->ColorFrame->GetFrame()->GetWidgetName();
-  widgets[2] = this->DisplayStyleFrame->GetFrame()->GetWidgetName();
+  widgets[2] = this->VolumeAppearanceFrame->GetFrame()->GetWidgetName();
+  widgets[3] = this->DisplayStyleFrame->GetFrame()->GetWidgetName();
 
   int weights[2];
   weights[0] = col_0_weight;
@@ -751,7 +783,7 @@ void vtkPVData::CreateProperties()
   factors[1] = col_1_factor;
 
   vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
-    this->GetPVApplication()->GetMainInterp(), 3, widgets, factors, weights);
+    this->GetPVApplication()->GetMainInterp(), 4, widgets, factors, weights);
   
   // Actor Control
 
@@ -1053,7 +1085,7 @@ void vtkPVData::UpdatePropertiesInternal()
     }
 
   vtkPVDataInformation* dataInfo = source->GetDataInformation();
-  char tmp[350], cmd[1024], defCmd[350];
+  char tmp[350], cmd[1024], volCmd[1024], defCmd[350];
   double bounds[6];
   int i, numArrays, numComps;
   vtkPVDataSetAttributesInformation *attrInfo;
@@ -1198,14 +1230,18 @@ void vtkPVData::UpdatePropertiesInternal()
   this->ColorMenu->AddEntryWithCommand("Property",
                                        this, "ColorByProperty");
 
+  this->VolumeScalarsMenu->ClearEntries();
+  
   attrInfo = dataInfo->GetPointDataInformation();
   numArrays = attrInfo->GetNumberOfArrays();
+  int firstField = 1;
   for (i = 0; i < numArrays; i++)
     {
     arrayInfo = attrInfo->GetArrayInformation(i);
     numComps = arrayInfo->GetNumberOfComponents();
     sprintf(cmd, "ColorByPointField {%s} %d", 
             arrayInfo->GetName(), numComps);
+    sprintf(volCmd, "VolumeRenderPointField {%s}", arrayInfo->GetName());
     if (numComps > 1)
       {
       sprintf(tmp, "Point %s (%d)", arrayInfo->GetName(), numComps);
@@ -1213,6 +1249,12 @@ void vtkPVData::UpdatePropertiesInternal()
     else
       {
       sprintf(tmp, "Point %s", arrayInfo->GetName());
+      this->VolumeScalarsMenu->AddEntryWithCommand(tmp, this, volCmd);
+      if ( firstField )
+        {
+        this->VolumeScalarsMenu->SetValue( tmp );
+        firstField = 0;
+        }
       }
     this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
     if (strcmp(tmp, currentColorBy) == 0)
@@ -1230,6 +1272,7 @@ void vtkPVData::UpdatePropertiesInternal()
       strcpy(defCmd, tmp);
       defPoint = 1;
       defArray = arrayInfo;
+      this->VolumeScalarsMenu->SetValue( tmp );
       }
     }
 
@@ -1320,6 +1363,18 @@ void vtkPVData::UpdatePropertiesInternal()
       this->ColorMenu->SetValue("Property");
       this->ColorByPropertyInternal();
       }
+    }
+
+  // Determine if this is unstructured grid data and add the 
+  // volume rendering option
+  if ( this->RepresentationMenu->HasEntry( VTK_PV_VOLUME_LABEL ) )
+    {
+      this->RepresentationMenu->DeleteEntry( VTK_PV_VOLUME_LABEL );
+    }
+  if (dataType == VTK_UNSTRUCTURED_GRID)
+    {
+      this->RepresentationMenu->AddEntryWithCommand(VTK_PV_VOLUME_LABEL, this,
+                                                    "DrawVolume");
     }
 }
 
@@ -1444,6 +1499,49 @@ void vtkPVData::ColorByPropertyInternal()
     }
 }
 
+
+//----------------------------------------------------------------------------
+// Select which point field to use for volume rendering
+//
+void vtkPVData::VolumeRenderPointField(const char *name)
+{
+  if (name == NULL)
+    {
+    return;
+    }
+
+  this->AddTraceEntry("$kw(%s) VolumeRenderPointField {%s}", 
+                      this->GetTclName(), name);
+
+  char *str;
+  str = new char [strlen(name) + 16];
+  sprintf(str, "Point %s", name);
+  this->VolumeScalarsMenu->SetValue(str);
+  delete [] str;
+
+  this->VolumeRenderPointFieldInternal(name);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::VolumeRenderPointFieldInternal(const char *name)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int num, idx;
+  vtkPVPart *part;
+
+  num = this->GetPVSource()->GetNumberOfParts();
+  for (idx = 0; idx < num; ++idx)
+    {
+    part = this->GetPVSource()->GetPart(idx);
+    part->GetPartDisplay()->VolumeRenderPointField( name );
+    } 
+
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::ColorByPointField(const char *name, int numComps)
@@ -1678,28 +1776,19 @@ void vtkPVData::DrawWireframe()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if ( ( part->GetPartDisplay()->GetProp() &&
-           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
-         ( part->GetPartDisplay()->GetVolume() &&
-           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
-      {
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetPropID()
-        << "VisibilityOn" << vtkClientServerStream::End;
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetVolumeID()
-        << "VisibilityOff" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
-      }
+    part->GetPartDisplay()->VolumeRenderModeOff();
+    this->ShowActorAppearance();
+
     if (part->GetPartDisplay()->GetPropertyID().ID != 0)
       {
       if (this->PreviousWasSolid)
         {
-        this->PreviousAmbient = part->GetPartDisplay()->GetProperty()->GetAmbient();
-        this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
-        this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
+        this->PreviousAmbient = 
+          part->GetPartDisplay()->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = 
+          part->GetPartDisplay()->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = 
+          part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0;
       pm->GetStream() 
@@ -1765,28 +1854,19 @@ void vtkPVData::DrawPoints()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if ( ( part->GetPartDisplay()->GetProp() &&
-           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
-         ( part->GetPartDisplay()->GetVolume() &&
-           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
-      {
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetPropID()
-        << "VisibilityOn" << vtkClientServerStream::End;
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetVolumeID()
-        << "VisibilityOff" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
-      }
+    part->GetPartDisplay()->VolumeRenderModeOff();
+    this->ShowActorAppearance();
+
     if (part->GetPartDisplay()->GetProperty())
       {
       if (this->PreviousWasSolid)
         {
-        this->PreviousAmbient = part->GetPartDisplay()->GetProperty()->GetAmbient();
-        this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
-        this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
+        this->PreviousAmbient = 
+          part->GetPartDisplay()->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = 
+          part->GetPartDisplay()->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = 
+          part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0;
       pm->GetStream() 
@@ -1852,21 +1932,8 @@ void vtkPVData::DrawVolume()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if ( ( part->GetPartDisplay()->GetProp() &&
-           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
-         ( part->GetPartDisplay()->GetVolume() &&
-           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
-      {
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetPropID()
-        << "VisibilityOff" << vtkClientServerStream::End;
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetVolumeID()
-        << "VisibilityOn" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
-      }
+    part->GetPartDisplay()->VolumeRenderModeOn();
+    this->ShowVolumeAppearance();
     }
   
   if ( this->GetPVRenderView() )
@@ -1897,21 +1964,9 @@ void vtkPVData::DrawSurface()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if ( ( part->GetPartDisplay()->GetProp() &&
-           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
-         ( part->GetPartDisplay()->GetVolume() &&
-           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
-      {
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetPropID()
-        << "VisibilityOn" << vtkClientServerStream::End;
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetVolumeID()
-        << "VisibilityOff" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
-      }
+    part->GetPartDisplay()->VolumeRenderModeOff();
+    this->ShowActorAppearance();
+
     if (part->GetPartDisplay()->GetProperty())
       {
       if (!this->PreviousWasSolid)
@@ -1919,19 +1974,23 @@ void vtkPVData::DrawSurface()
         pm->GetStream() 
           << vtkClientServerStream::Invoke 
           << part->GetPartDisplay()->GetPropertyID()
-          << "SetAmbient" << this->PreviousAmbient << vtkClientServerStream::End;
+          << "SetAmbient" << this->PreviousAmbient 
+          << vtkClientServerStream::End;
         pm->GetStream() 
           << vtkClientServerStream::Invoke 
           << part->GetPartDisplay()->GetPropertyID()
-          << "SetDiffuse" << this->PreviousDiffuse << vtkClientServerStream::End;
+          << "SetDiffuse" << this->PreviousDiffuse 
+          << vtkClientServerStream::End;
         pm->GetStream() 
           << vtkClientServerStream::Invoke
           << part->GetPartDisplay()->GetPropertyID()
-          << "SetSpecular" << this->PreviousSpecular << vtkClientServerStream::End;
+          << "SetSpecular" << this->PreviousSpecular 
+          << vtkClientServerStream::End;
         pm->GetStream() 
           << vtkClientServerStream::Invoke 
           << part->GetPartDisplay()->GetPropertyID()
-          << "SetRepresentationToSurface" << vtkClientServerStream::End;
+          << "SetRepresentationToSurface" 
+          << vtkClientServerStream::End;
         pm->SendStreamToClientAndRenderServer();
         }
       }
@@ -1982,28 +2041,19 @@ void vtkPVData::DrawOutline()
   for (idx = 0; idx < num; ++idx)
     {
     part = this->GetPVSource()->GetPart(idx);
-    if ( ( part->GetPartDisplay()->GetProp() &&
-           part->GetPartDisplay()->GetProp()->GetVisibility() ) ||
-         ( part->GetPartDisplay()->GetVolume() &&
-           part->GetPartDisplay()->GetVolume()->GetVisibility() ) )
-      {
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetPropID()
-        << "VisibilityOn" << vtkClientServerStream::End;
-      pm->GetStream() 
-        << vtkClientServerStream::Invoke
-        << part->GetPartDisplay()->GetVolumeID()
-        << "VisibilityOff" << vtkClientServerStream::End;
-      pm->SendStreamToClientAndRenderServer();
-      }
+    part->GetPartDisplay()->VolumeRenderModeOff();
+    this->ShowActorAppearance();
+
     if (part->GetPartDisplay()->GetProperty())
       {
       if (this->PreviousWasSolid)
         {
-        this->PreviousAmbient = part->GetPartDisplay()->GetProperty()->GetAmbient();
-        this->PreviousDiffuse = part->GetPartDisplay()->GetProperty()->GetDiffuse();
-        this->PreviousSpecular = part->GetPartDisplay()->GetProperty()->GetSpecular();
+        this->PreviousAmbient = 
+          part->GetPartDisplay()->GetProperty()->GetAmbient();
+        this->PreviousDiffuse = 
+          part->GetPartDisplay()->GetProperty()->GetDiffuse();
+        this->PreviousSpecular = 
+          part->GetPartDisplay()->GetProperty()->GetSpecular();
         }
       this->PreviousWasSolid = 0; 
       pm->GetStream() 
@@ -2041,6 +2091,40 @@ void vtkPVData::DrawOutline()
     }
 }
 
+
+//----------------------------------------------------------------------------
+// Change visibility / enabled state of widgets for actor properties
+//
+void vtkPVData::ShowActorAppearance()
+{
+  this->Script("pack forget %s", 
+               this->VolumeAppearanceFrame->GetWidgetName() );
+  
+  this->Script("pack %s -after %s -fill x -expand t -pady 2", 
+               this->ColorFrame->GetWidgetName(),
+               this->ViewFrame->GetWidgetName() );
+  
+  this->OpacityScale->EnabledOn();
+  this->UpdateEnableState();
+}
+
+//----------------------------------------------------------------------------
+// Change visibility / enabled state of widgets for volume properties
+//
+void vtkPVData::ShowVolumeAppearance()
+{
+  this->Script("pack forget %s", 
+               this->ColorFrame->GetWidgetName() );
+  
+  this->Script("pack %s -after %s -fill x -expand t -pady 2", 
+               this->VolumeAppearanceFrame->GetWidgetName(),
+               this->ViewFrame->GetWidgetName() );
+  
+  this->OpacityScale->EnabledOff();
+  this->UpdateEnableState();
+}
+
+  
 //----------------------------------------------------------------------------
 void vtkPVData::SetInterpolation(const char* repr)
 {
@@ -2904,6 +2988,7 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
   os << indent << "ColorMap: " << this->PVColorMap << endl;
   os << indent << "ColorMenu: " << this->ColorMenu << endl;
+  os << indent << "VolumeScalarsMenu: " << this->VolumeScalarsMenu << endl;
   os << indent << "ResetCameraButton: " << this->ResetCameraButton << endl;
   os << indent << "EditColorMapButton: " << this->EditColorMapButton << endl;
   if(this->CubeAxes)
@@ -3035,6 +3120,11 @@ void vtkPVData::SetActorTranslateNoTrace(double x, double y, double z)
       << part->GetPartDisplay()->GetPropID()
       << "SetPosition" << x << y << z
       << vtkClientServerStream::End;
+    pm->GetStream() 
+      << vtkClientServerStream::Invoke 
+      << part->GetPartDisplay()->GetVolumeID()
+      << "SetPosition" << x << y << z
+      << vtkClientServerStream::End;
     pm->SendStreamToClientAndRenderServer();
     }
 
@@ -3122,6 +3212,11 @@ void vtkPVData::SetActorScaleNoTrace(double x, double y, double z)
     pm->GetStream() 
         << vtkClientServerStream::Invoke 
         << part->GetPartDisplay()->GetPropID()
+        << "SetScale" << x << y << z 
+        << vtkClientServerStream::End;
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetVolumeID()
         << "SetScale" << x << y << z 
         << vtkClientServerStream::End;
     pm->SendStreamToClientAndRenderServer();
@@ -3214,6 +3309,11 @@ void vtkPVData::SetActorOrientationNoTrace(double x, double y, double z)
         << part->GetPartDisplay()->GetPropID()
         << "SetOrientation" << x << y << z 
         << vtkClientServerStream::End;
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetVolumeID()
+        << "SetOrientation" << x << y << z 
+        << vtkClientServerStream::End;
     pm->SendStreamToClientAndRenderServer();
     }
 
@@ -3303,6 +3403,11 @@ void vtkPVData::SetActorOriginNoTrace(double x, double y, double z)
         << part->GetPartDisplay()->GetPropID()
         << "SetOrigin" << x << y << z 
         << vtkClientServerStream::End;
+    pm->GetStream() 
+        << vtkClientServerStream::Invoke 
+        << part->GetPartDisplay()->GetVolumeID()
+        << "SetOrigin" << x << y << z 
+        << vtkClientServerStream::End;
     pm->SendStreamToClientAndRenderServer();
     }
 
@@ -3339,7 +3444,7 @@ void vtkPVData::ActorOriginCallback()
   this->SetActorOriginNoTrace(point[0], point[1], point[2]);
   if ( this->GetPVRenderView() )
     {
-    this->GetPVRenderView()->EventuallyRender();
+    this->GetPVRenderView()->Render();
     }
 }
 
@@ -3398,11 +3503,14 @@ void vtkPVData::UpdateEnableState()
   this->PropagateEnableState(this->ExtentDisplay);
   this->PropagateEnableState(this->AmbientScale);
   this->PropagateEnableState(this->ColorFrame);
+  this->PropagateEnableState(this->VolumeAppearanceFrame);
   this->PropagateEnableState(this->DisplayStyleFrame);
   this->PropagateEnableState(this->StatsFrame);
   this->PropagateEnableState(this->ViewFrame);
   this->PropagateEnableState(this->ColorMenuLabel);
   this->PropagateEnableState(this->ColorMenu);
+  this->PropagateEnableState(this->VolumeScalarsMenuLabel);
+  this->PropagateEnableState(this->VolumeScalarsMenu);
   if ( this->PVColorMap )
     {
     this->ColorButton->SetEnabled(0);

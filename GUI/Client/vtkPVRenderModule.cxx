@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.30");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.31");
 
 //===========================================================================
 //***************************************************************************
@@ -492,8 +492,12 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
         {  
         vtkPVProcessModule *pm = pvApp->GetProcessModule();
         vtkClientServerStream& stream = pm->GetStream();
-        stream << vtkClientServerStream::Invoke << this->RendererID << "RemoveProp"
+        stream << vtkClientServerStream::Invoke << this->RendererID 
+               << "RemoveProp"
                << pDisp->GetPropID() << vtkClientServerStream::End;
+        stream << vtkClientServerStream::Invoke << this->RendererID 
+               << "RemoveProp"
+               << pDisp->GetVolumeID() << vtkClientServerStream::End;
         pm->SendStreamToClientAndRenderServer();
         }
       part->SetPartDisplay(NULL);
