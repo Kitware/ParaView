@@ -27,7 +27,7 @@
 
 #include "vtkDataSet.h"
 
-#define VTK_CTH_DATA 10
+#define VTK_CTH_DATA 1239
 
 class vtkDataArray;
 class vtkFloatArray;

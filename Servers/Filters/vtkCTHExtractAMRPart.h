@@ -86,7 +86,7 @@ protected:
                             vtkFloatArray *pointVolumeFraction, vtkCTHData* data);
   void FindBlockNeighbors(vtkCTHData* self, int blockId, vtkIdList* blockList);
   float ComputeSharedPoint(int blockId, vtkIdList* blockList, int x, int y, int z, 
-                            float* pCell, float* pPoint, vtkCTHData* output);
+                           double* pCell, float* pPoint, vtkCTHData* output);
   //void FindPointCells(vtkCTHData* self, vtkIdType ptId, vtkIdList* idList);
 
   vtkPlane* ClipPlane;

@@ -21,12 +21,12 @@
 #include "vtkCellData.h"
 #include "vtkIntArray.h"
 #include "vtkUnsignedCharArray.h"
-#include "vtkFloatArray.h"
+#include "vtkDoubleArray.h"
 #include "vtkImageMandelbrotSource.h"
 
 
 
-vtkCxxRevisionMacro(vtkCTHFractal, "1.9");
+vtkCxxRevisionMacro(vtkCTHFractal, "1.10");
 vtkStandardNewMacro(vtkCTHFractal);
 
 //----------------------------------------------------------------------------
@@ -299,9 +299,9 @@ void vtkCTHFractal::AddFractalArray()
   int numCells = output->GetNumberOfCells();
   int numBlocks = output->GetNumberOfBlocks();
   int numCellsPerBlock = output->GetNumberOfCellsPerBlock();
-  vtkFloatArray* array = vtkFloatArray::New();
+  vtkDoubleArray* array = vtkDoubleArray::New();
   int blockId;
-  float* arrayPtr;
+  double* arrayPtr;
   vtkDataArray* fractal;
   float* fractalPtr;
   vtkImageMandelbrotSource* fractalSource = vtkImageMandelbrotSource::New();
@@ -317,7 +317,7 @@ void vtkCTHFractal::AddFractalArray()
     array->Delete();
     return;
     }
-  arrayPtr = (float*)(array->GetPointer(0));
+  arrayPtr = (double*)(array->GetPointer(0));
 
   // hack
   output->GetBlockPointDimensions(0, dims);

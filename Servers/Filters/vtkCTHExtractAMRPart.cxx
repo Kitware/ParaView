@@ -42,7 +42,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.11");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.12");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -195,19 +195,23 @@ void vtkCTHExtractAMRPart::Execute()
         inputCopy->Delete();
         return;
         }
-      if (cellVolumeFraction->GetDataType() != VTK_FLOAT)
+      pointVolumeFraction = vtkFloatArray::New();
+      pointVolumeFraction->SetNumberOfTuples(inputCopy->GetNumberOfPoints());
+      if (cellVolumeFraction->GetDataType() == VTK_DOUBLE)
         {
+        this->ExecuteCellDataToPointData2(cellVolumeFraction, 
+                                          pointVolumeFraction, 
+                                          inputCopy);
+        }
+      else
+        {
+        pointVolumeFraction->Delete();
+        pointVolumeFraction = 0;
         vtkErrorMacro("Expecting volume fraction to be of type float.");
         inputCopy->Delete();
         return;
         }
 
-      pointVolumeFraction = vtkFloatArray::New();
-      pointVolumeFraction->SetNumberOfTuples(inputCopy->GetNumberOfPoints());
-
-      this->ExecuteCellDataToPointData2(cellVolumeFraction, 
-                                        pointVolumeFraction, 
-                                        inputCopy);
       inputCopy->GetPointData()->AddArray(pointVolumeFraction);
       pointVolumeFraction->Delete();
       inputCopy->GetCellData()->RemoveArray(arrayName);
@@ -306,18 +310,21 @@ void vtkCTHExtractAMRPart::ExecuteBlock(vtkImageData* block,
         vtkErrorMacro("Could not find cell array " << arrayName);
         return;
         }
-      if (cellVolumeFraction->GetDataType() != VTK_FLOAT)
+      if (cellVolumeFraction->GetDataType() == VTK_FLOAT ||
+          cellVolumeFraction->GetDataType() == VTK_DOUBLE)
+        {
+        pointVolumeFraction = vtkFloatArray::New();
+        pointVolumeFraction->SetNumberOfTuples(block->GetNumberOfPoints());
+        this->ExecuteCellDataToPointData(cellVolumeFraction, 
+                                         pointVolumeFraction, 
+                                         dims);        
+        }
+      else
         {
         vtkErrorMacro("Expecting volume fraction to be of type float.");
         return;
         }
 
-      pointVolumeFraction = vtkFloatArray::New();
-      pointVolumeFraction->SetNumberOfTuples(block->GetNumberOfPoints());
-
-      this->ExecuteCellDataToPointData(cellVolumeFraction, 
-                                       pointVolumeFraction, 
-                                       dims);
       block->GetPointData()->AddArray(pointVolumeFraction);
       pointVolumeFraction->Delete();
       block->GetCellData()->RemoveArray(arrayName);
@@ -490,18 +497,14 @@ void vtkCTHExtractAMRPart::ExecutePart(const char* arrayName,
   appendCache->ShallowCopy(this->FinalAppend->GetOutput());
 }
 
-//------------------------------------------------------------------------------
-void vtkCTHExtractAMRPart::ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
-                                  vtkFloatArray *pointVolumeFraction, int *dims)
+template <class T>
+void vtkExecuteCellDataToPointData(T* pCell,float* pPoint, int dims[3])
 {
   int count;
   int i, j, k;
   int iEnd, jEnd, kEnd;
   int jInc, kInc;
-  float *pPoint;
-  float *pCell;
-
-  pointVolumeFraction->SetName(cellVolumeFraction->GetName());
+  float* pPointStart = pPoint;
 
   iEnd = dims[0]-1;
   jEnd = dims[1]-1;
@@ -509,9 +512,6 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData(vtkDataArray *cellVolumeFr
   // Increments are for the point array.
   jInc = dims[0];
   kInc = (dims[1]) * jInc;
-  
-  pPoint = pointVolumeFraction->GetPointer(0);
-  pCell = (float*)(cellVolumeFraction->GetVoidPointer(0));
 
   // Initialize the point data to 0.
   memset(pPoint, 0,  dims[0]*dims[1]*dims[2]*sizeof(float));
@@ -547,7 +547,7 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData(vtkDataArray *cellVolumeFr
   // Now a second pass to normalize the point values.
   // Loop through the points.
   count = 1;
-  pPoint = pointVolumeFraction->GetPointer(0);
+  pPoint = pPointStart;
   for (k = 0; k <= kEnd; ++k)
     {
     // Just a fancy fast way to compute the number of cell neighbors of a point.
@@ -581,13 +581,41 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData(vtkDataArray *cellVolumeFr
           {
           count = count >> 1;
           }
-        *pPoint = *pPoint / (float)(count);
+        *pPoint = *pPoint / (T)(count);
         ++pPoint;
         }
       }
     }
 }
+//------------------------------------------------------------------------------
+void vtkCTHExtractAMRPart::ExecuteCellDataToPointData(vtkDataArray *cellVolumeFraction, 
+                                  vtkFloatArray *pointVolumeFraction, int *dims)
+{
+  float *pPoint;
 
+  pointVolumeFraction->SetName(cellVolumeFraction->GetName());
+  if (cellVolumeFraction->GetDataType() == VTK_FLOAT)
+    {
+    pPoint = pointVolumeFraction->GetPointer(0);
+    float* pCell = (float*)(cellVolumeFraction->GetVoidPointer(0));
+    vtkExecuteCellDataToPointData(pCell,pPoint,dims);
+    }
+  else if (cellVolumeFraction->GetDataType() == VTK_DOUBLE)
+    {
+    pPoint = pointVolumeFraction->GetPointer(0);
+    double* pCell = (double*)(cellVolumeFraction->GetVoidPointer(0));
+    vtkExecuteCellDataToPointData(pCell,pPoint,dims);
+    }
+  else
+    {
+    vtkErrorMacro("Expecting double or float array.");
+    }
+}
+
+
+
+
+// A bit harder to template.  Do it later.
 //------------------------------------------------------------------------------
 // I am trying a better way of converting cell data to point data.
 // This should olny be used when there are no ghost cells.
@@ -598,8 +626,8 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
   int x, y, z, maxX, maxY, maxZ;
   float *pPoint0;
   float *pPoint;
-  float *pCell0;
-  float *pCell;
+  double *pCell0;
+  double *pCell;
   int cInc[6];
   int pIncX, pIncY, pIncZ;
   int blockId, numBlocks;
@@ -628,7 +656,7 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
   // It might be faster to have a separate loop for interior points.
   // Loop over all points.
   pPoint0 = pointVolumeFraction->GetPointer(0);
-  pCell0 = (float*)(cellVolumeFraction->GetVoidPointer(0));
+  pCell0 = (double*)(cellVolumeFraction->GetVoidPointer(0));
   numBlocks = data->GetNumberOfBlocks();
 
   // Now lets loop over blocks. Low levels first.
@@ -713,7 +741,7 @@ void vtkCTHExtractAMRPart::ExecuteCellDataToPointData2(vtkDataArray *cellVolumeF
 // We need the point array only for linear interpolation constraint.
 float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList,
                                                int x, int y, int z, 
-                                               float* pCell, float* pPoint, 
+                                               double* pCell, float* pPoint, 
                                                vtkCTHData* input)
 {
   // hack
@@ -786,7 +814,7 @@ float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList
     sum += weight*pCell[id];
     }
 
-  // Next find all the block that share the point.
+  // Next find all the blocks that share the point.
   // Compute point in world space.
   origin = input->GetBlockOrigin(blockId);
   pt[0] = origin[0] + (double)x * spacing[0];
