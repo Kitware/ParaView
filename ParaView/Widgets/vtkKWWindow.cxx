@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkString.h"
 #include "vtkVector.txx"
 
-vtkSetObjectImplementationMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
+vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
 {
@@ -990,7 +990,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.96 $");
+  this->ExtractRevision(os,"$Revision: 1.97 $");
 }
 
 int vtkKWWindow::ExitDialog()
