@@ -266,11 +266,17 @@
      </SubProxy>
 
      <SubProxy>
-#ifdef VTK_USE_MPI
+#if defined(VTK_USE_MPI) && defined(_WIN32)
        <Proxy name="composite" class="vtkPVTreeComposite">
 #else
        <Proxy name="composite" class="vtkCompositeRenderManager">
 #endif
+         <DoubleVectorProperty
+           name="ImageReductionFactor"
+           command="SetImageReductionFactor"
+           number_of_elements="1"
+           default_values="1">
+         </DoubleVectorProperty>
        </Proxy>
      </SubProxy>
    </DisplayWindowProxy>
