@@ -8,11 +8,6 @@ SET(Filters_SRCS
   vtkGroup.cxx
   vtkMazeSource.cxx
   vtkMergeArrays.cxx
-  vtkMergeCells.cxx
-  vtkBoxClipDataSet.cxx
-  vtkKdTree.cxx
-  vtkDistributedDataFilter.cxx
-  vtkPKdTree.cxx
   vtkMultiOut2.cxx
   vtkMultiOut3.cxx
   vtkMultiOut.cxx
@@ -44,12 +39,17 @@ SET(Filters_SRCS
 
 IF(VTK_USE_MPI)
   SET(Filters_SRCS ${Filters_SRCS}
-    vtkPVDuplicatePolyData.cxx
-    vtkTiledDisplaySchedule.cxx
-    vtkAllToNRedistributePolyData.cxx
-    #vtkBalancedRedistributePolyData.cxx
-    vtkRedistributePolyData.cxx
-    vtkWeightedRedistributePolyData.cxx
+      #vtkBalancedRedistributePolyData.cxx
+      vtkAllToNRedistributePolyData.cxx
+      vtkBoxClipDataSet.cxx
+      vtkDistributedDataFilter.cxx
+      vtkKdTree.cxx
+      vtkMergeCells.cxx
+      vtkPKdTree.cxx
+      vtkPVDuplicatePolyData.cxx
+      vtkRedistributePolyData.cxx
+      vtkTiledDisplaySchedule.cxx
+      vtkWeightedRedistributePolyData.cxx
     )
 ENDIF(VTK_USE_MPI)
 
