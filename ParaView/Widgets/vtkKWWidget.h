@@ -185,6 +185,7 @@ public:
   // Unpack widget, unpack siblings (slave's of parent widget)
   void Unpack();
   void UnpackSiblings();
+  void UnpackChildren();
   
   // Description:
   // Adjusts the placement of the baloon help
