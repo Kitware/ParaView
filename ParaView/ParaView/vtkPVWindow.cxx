@@ -123,7 +123,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.522");
+vtkCxxRevisionMacro(vtkPVWindow, "1.523");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2383,12 +2383,6 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SaveBatchScript(const char* filename)
 {
-  vtkPVSource *pvs;
-  int offScreenFlag = 0;
-  int animationFlag = 0;
-  const char *imageFileName = NULL;
-  const char *geometryFileName = NULL;
-  ofstream* file;
   char* ptr;
   char* fileExt = NULL;
   char* fileRoot = NULL;
@@ -2420,14 +2414,6 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     ++fileExt;
     }
 
-  // We may want different questions if there is no animation.
-  const char *script = this->AnimationInterface->GetScript();
-  if (script && script[0] && this->AnimationInterface->GetScriptAvailable() && 
-    this->AnimationInterface->IsAnimationValid())
-    {
-    animationFlag = 1;
-    }
-
   // SaveBatchScriptDialog
   vtkPVSaveBatchScriptDialog* dialog = vtkPVSaveBatchScriptDialog::New();
   dialog->SetMasterWindow(this);
@@ -2447,19 +2433,35 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     dialog = NULL;
     return;
     }
+  this->SaveBatchScript(filename, 
+    dialog->GetOffScreen(),
+    dialog->GetImagesFileName(),
+    dialog->GetGeometryFileName());
+  dialog->Delete();
+  dialog = NULL;
+}
+
+void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const char* imageFileName, const char* geometryFileName)
+{
+  vtkPVSource *pvs;
+  int animationFlag = 0;
+  ofstream* file;
+
+  // We may want different questions if there is no animation.
+  const char *script = this->AnimationInterface->GetScript();
+  if (script && script[0] && this->AnimationInterface->GetScriptAvailable() && 
+    this->AnimationInterface->IsAnimationValid())
+    {
+    animationFlag = 1;
+    }
 
   // Should I continue to save the batch script if it
   // does not save an image or geometry?
-  offScreenFlag = dialog->GetOffScreen();
-  imageFileName = dialog->GetImagesFileName();
-  geometryFileName = dialog->GetGeometryFileName();
 
   file = new ofstream(filename, ios::out);
   if (file->fail())
     {
     vtkErrorMacro("Could not open file " << filename);
-    dialog->Delete();
-    dialog = NULL;
     delete file;
     return;
     }
@@ -2643,8 +2645,6 @@ void vtkPVWindow::SaveBatchScript(const char* filename)
     unlink(filename);
     }
   
-  dialog->Delete();
-  dialog = NULL;
   delete file;
 }
 

@@ -182,6 +182,7 @@ public:
   // Description:
   // Access from script for regression test.
   void SaveBatchScript(const char *filename);
+  void SaveBatchScript(const char *filename, int offScreenFlag, const char* imageFileName, const char* geometryFileName);
 
   // Description:
   // This should part of a render module !!!!!
