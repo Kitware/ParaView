@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.28");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.28.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -410,10 +410,11 @@ void vtkPVLineWidget::SaveInTclScript(ofstream *file)
                  this->ObjectTclName, this->Point2Variable);
     result = this->Application->GetMainInterp()->result;
     *file << " " << result << "\n";
+    }
 
   // Resolution
   if (this->ResolutionVariable)
-    
+    {
     *file << "\t" << this->ObjectTclName << " Set" << this->ResolutionVariable;
     this->Script("set tempValue [%s Get%s]", 
                  this->ObjectTclName, this->ResolutionVariable);
