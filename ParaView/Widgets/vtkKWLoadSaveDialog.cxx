@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.21");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.22");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -121,10 +121,8 @@ int vtkKWLoadSaveDialog::Invoke()
   // convertfrom identity seems to do the trick to convert back to
   // an ASCII-8 string that can be understood by the system.
 
-#if _WIN32
   this->Script("encoding convertfrom identity %s", 
                this->Application->GetMainInterp()->result);
-#endif
 
   path = this->Application->GetMainInterp()->result;
 
