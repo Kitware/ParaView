@@ -40,9 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVStringEntry.h"
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
+
 #include "vtkArrayMap.txx"
+#include "vtkKWEntry.h"
+#include "vtkKWLabel.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
@@ -256,4 +259,10 @@ int vtkPVStringEntry::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   
   return 1;
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVStringEntry::GetValue() 
+{
+  return this->Entry->GetValue();
 }

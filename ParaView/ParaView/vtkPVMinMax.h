@@ -46,9 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVMinMax_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkKWScale.h"
-#include "vtkKWLabel.h"
+
+class vtkKWScale;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkPVMinMax : public vtkPVObjectWidget
 {
@@ -74,11 +74,11 @@ public:
   // Description:
   // This method allows scripts to modify the widgets value.
   void SetMinValue(float val);
-  float GetMinValue() { return this->MinScale->GetValue(); }
+  float GetMinValue();
   void SetMaxValue(float val);
-  float GetMaxValue() { return this->MaxScale->GetValue(); }
+  float GetMaxValue();
   void SetResolution(float res);
-  float GetResolution() { return this->MinScale->GetResolution(); }
+  float GetResolution();
   void SetRange(float min, float max);
 
   // Description:

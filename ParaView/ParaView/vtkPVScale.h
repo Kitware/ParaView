@@ -46,9 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVScale_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkKWScale.h"
-#include "vtkKWLabel.h"
+
+class vtkKWScale;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkPVScale : public vtkPVObjectWidget
 {
@@ -73,7 +73,7 @@ public:
   // Description:
   // This method allows scripts to modify the widgets value.
   void SetValue(float val);
-  float GetValue() { return this->Scale->GetValue(); }
+  float GetValue();
 
   // Description:
   // The label.
@@ -99,7 +99,7 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVScale* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+			     vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
 //ETX
 
 protected:

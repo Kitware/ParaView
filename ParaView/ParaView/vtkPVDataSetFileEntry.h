@@ -49,8 +49,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVDataSetFileEntry_h
 
 #include "vtkPVFileEntry.h"
-#include "vtkKWApplication.h"
-#include "vtkDataSetReader.h"
+
+class vtkDataSetReader;
 
 class VTK_EXPORT vtkPVDataSetFileEntry : public vtkPVFileEntry
 {
@@ -71,7 +71,8 @@ public:
   // using NewInstance() and then copy some necessary state 
   // parameters.
   vtkPVDataSetFileEntry* ClonePrototype(vtkPVSource* pvSource,
-				 vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map);
+					vtkArrayMap<vtkPVWidget*, 
+					vtkPVWidget*>* map);
 //ETX
 
 protected:

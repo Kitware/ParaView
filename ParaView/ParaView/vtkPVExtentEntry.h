@@ -50,11 +50,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVExtentEntry_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkKWLabel.h"
-#include "vtkKWWidgetCollection.h"
 
 class vtkKWEntry;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkPVExtentEntry : public vtkPVObjectWidget
 {
@@ -82,7 +80,8 @@ public:
   
   // Description:
   // adds a script to the menu of the animation interface.
-  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnimationInterface *ai);
+  virtual void AddAnimationScriptsToMenu(vtkKWMenu *menu, 
+					 vtkPVAnimationInterface *ai);
 
   // Description:
   // This method gets called when the user selects this widget to animate.
@@ -116,8 +115,6 @@ protected:
   vtkKWEntry *ZMinEntry;
   vtkKWEntry *ZMaxEntry;
 
-  vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented
-  void operator=(const vtkPVExtentEntry&); // Not implemented
 
   vtkSetStringMacro(EntryLabel);
   vtkGetStringMacro(EntryLabel);
@@ -130,6 +127,10 @@ protected:
   
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
+
+private:
+  vtkPVExtentEntry(const vtkPVExtentEntry&); // Not implemented
+  void operator=(const vtkPVExtentEntry&); // Not implemented
 };
 
 #endif

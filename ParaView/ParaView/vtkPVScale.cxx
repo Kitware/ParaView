@@ -40,9 +40,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVScale.h"
-#include "vtkPVApplication.h"
-#include "vtkObjectFactory.h"
+
 #include "vtkArrayMap.txx"
+#include "vtkKWLabel.h"
+#include "vtkKWScale.h"
+#include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
@@ -239,6 +242,12 @@ void vtkPVScale::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     {
     vtkErrorMacro("Internal error. Could not downcast clone to PVScale.");
     }
+}
+
+//----------------------------------------------------------------------------
+float vtkPVScale::GetValue() 
+{ 
+  return this->Scale->GetValue(); 
 }
 
 //----------------------------------------------------------------------------

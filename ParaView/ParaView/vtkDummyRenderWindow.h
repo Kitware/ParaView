@@ -29,10 +29,6 @@
 #define __vtkDummyRenderWindow_h
 
 #include "vtkRenderWindow.h"
-#include <stdio.h>
-#include "vtkGraphicsFactory.h"
-
-
 
 class VTK_EXPORT vtkDummyRenderWindow : public vtkRenderWindow
 {

@@ -40,10 +40,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVMinMax.h"
+
 #include "vtkPVApplication.h"
 #include "vtkObjectFactory.h"
 #include "vtkArrayMap.txx"
 #include "vtkPVXMLElement.h"
+#include "vtkKWScale.h"
+#include "vtkKWLabel.h"
 
 //----------------------------------------------------------------------------
 vtkPVMinMax* vtkPVMinMax::New()
@@ -395,6 +398,17 @@ int vtkPVMinMax::ReadXMLAttributes(vtkPVXMLElement* element,
   return 1;
 }
 
+//----------------------------------------------------------------------------
+float vtkPVMinMax::GetMinValue() 
+{ return this->MinScale->GetValue(); }
+
+//----------------------------------------------------------------------------
+float vtkPVMinMax::GetMaxValue() 
+{ return this->MaxScale->GetValue(); }
+
+//----------------------------------------------------------------------------
+float vtkPVMinMax::GetResolution() 
+{ return this->MinScale->GetResolution(); }
 
 //----------------------------------------------------------------------------
 void vtkPVMinMax::PrintSelf(ostream& os, vtkIndent indent)

@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVData.h"
 #include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
+#include "vtkKWLabel.h"
 
 //----------------------------------------------------------------------------
 vtkPVExtentEntry* vtkPVExtentEntry::New()

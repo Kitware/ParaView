@@ -46,9 +46,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define __vtkPVStringEntry_h
 
 #include "vtkPVObjectWidget.h"
-#include "vtkKWApplication.h"
-#include "vtkKWEntry.h"
-#include "vtkKWLabel.h"
+
+class vtkKWEntry;
+class vtkKWLabel;
 
 class VTK_EXPORT vtkPVStringEntry : public vtkPVObjectWidget
 {
@@ -73,7 +73,7 @@ public:
   // Description:
   // This method allows scripts to modify the widgets value.
   void SetValue(const char* fileName);
-  const char* GetValue() {return this->Entry->GetValue();}
+  const char* GetValue();
 
   // Description:
   // The label.
