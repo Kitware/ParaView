@@ -536,7 +536,7 @@ help="Set the name of the array to hold the results of this computation" default
     <Filter class="vtkPickDataSetFilter">
       <Input name="Input" class="vtkDataSet" /> 
     </Filter>
-  <LabeledToggle label="Search cells" trace_name="SearchCells" variable="SearchCells" help="Set when cells are supposed to be searched. Otherwise points will be searched." default_value/>
+  <LabeledToggle label="Search cells" trace_name="SearchCells" variable="SearchCells" help="Set when cells are supposed to be searched. Otherwise points will be searched."/>
   <PointWidget variable="SamplePoint" help="Sample point that we are picking."/>
   </Module>
 -->

@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.1");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -86,7 +86,11 @@ vtkPVLineWidget::vtkPVLineWidget()
 
   this->ShowResolution = 1;
 
-  this->SuppressReset = 1;
+  this->LastAcceptedPoint1[0] = -0.5;
+  this->LastAcceptedPoint1[1] = this->LastAcceptedPoint1[2] = 0;
+  this->LastAcceptedPoint2[0] = 0.5;
+  this->LastAcceptedPoint2[1] = this->LastAcceptedPoint2[2] = 0;
+  this->LastAcceptedResolution = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -349,6 +353,14 @@ void vtkPVLineWidget::UpdateVTKObject(const char* sourceTclName)
                           this->Point2[1]->GetValueAsFloat(),
                           this->Point2[2]->GetValueAsFloat());
 
+  this->SetLastAcceptedPoint1(this->Point1[0]->GetValueAsFloat(),
+                              this->Point1[1]->GetValueAsFloat(),
+                              this->Point1[2]->GetValueAsFloat());
+  this->SetLastAcceptedPoint2(this->Point2[0]->GetValueAsFloat(),
+                              this->Point2[1]->GetValueAsFloat(),
+                              this->Point2[2]->GetValueAsFloat());
+  this->SetLastAcceptedResolution(this->ResolutionEntry->GetValueAsFloat());
+  
   char acceptCmd[1024];
   if ( this->Point1Variable && sourceTclName )    {    
     sprintf(acceptCmd, "%s Set%s %f %f %f", sourceTclName, 
@@ -406,8 +418,7 @@ void vtkPVLineWidget::ActualPlaceWidget()
                                             bds[0], bds[1], bds[2], bds[3],
                                             bds[4], bds[5]);
 
-  // We want to use these defaults, not the default setting of the line source.
-  //this->UpdateVTKObject(this->ObjectTclName);
+  this->UpdateVTKObject(this->ObjectTclName);
 }
 
 //----------------------------------------------------------------------------
@@ -449,7 +460,7 @@ void vtkPVLineWidget::SaveInBatchScriptForPart(ofstream *file,
 
 
 //----------------------------------------------------------------------------
-void vtkPVLineWidget::ResetInternal(const char* sourceTclName)
+void vtkPVLineWidget::ResetInternal()
 {
   if (this->SuppressReset)
     {
@@ -459,25 +470,14 @@ void vtkPVLineWidget::ResetInternal(const char* sourceTclName)
     {
     return;
     }
-  if ( this->Point1Variable && sourceTclName )
-    {
-    this->Script("eval %s SetPoint1 [ %s Get%s ]",
-                 this->GetTclName(), sourceTclName, 
-                 this->Point1Variable);
-    }
-  if ( this->Point2Variable && sourceTclName )
-    {
-    this->Script("eval %s SetPoint2 [ %s Get%s ]",
-                 this->GetTclName(), sourceTclName, 
-                 this->Point2Variable);
-    }
-  if ( this->ResolutionVariable && sourceTclName )
-    {
-    this->Script("%s SetResolution [ %s Get%s ]",
-                 this->GetTclName(), sourceTclName, 
-                 this->ResolutionVariable);
-    }
-  this->Superclass::ResetInternal(sourceTclName);
+
+  this->SetPoint1(this->LastAcceptedPoint1[0], this->LastAcceptedPoint1[1],
+                  this->LastAcceptedPoint1[2]);
+  this->SetPoint2(this->LastAcceptedPoint2[0], this->LastAcceptedPoint2[1],
+                  this->LastAcceptedPoint2[2]);
+  this->SetResolution(this->LastAcceptedResolution);
+
+  this->Superclass::ResetInternal();
 }
 
 //----------------------------------------------------------------------------

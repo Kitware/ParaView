@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.39");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.39.2.1");
 
 //===========================================================================
 //***************************************************************************
@@ -236,7 +236,7 @@ void vtkPV3DWidget::AcceptInternal(const char*)
 }
 
 //----------------------------------------------------------------------------
-void vtkPV3DWidget::ResetInternal(const char*)
+void vtkPV3DWidget::ResetInternal()
 {
   this->ModifiedFlag = 0;
   this->ValueChanged = 0;

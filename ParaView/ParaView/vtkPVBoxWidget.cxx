@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.12.2.1");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -142,7 +142,7 @@ vtkPVBoxWidget::~vtkPVBoxWidget()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
+void vtkPVBoxWidget::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
@@ -166,7 +166,7 @@ void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
     this->TranslateThumbWheel[2]->SetValue(this->StoredPosition[2]);
     this->UpdateBox(1);
     }
-  this->Superclass::ResetInternal(sourceTclName);
+  this->Superclass::ResetInternal();
 }
 
 //----------------------------------------------------------------------------

@@ -94,7 +94,7 @@ public:
 
   // Description:
   // Called when the PVSources reset button is called.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
     
   // Description:
   // Called when the PVSources accept button is called.
@@ -125,6 +125,9 @@ protected:
   vtkKWLabel* Labels[2];
   vtkKWLabel* CoordinateLabel[3];
 
+  float LastAcceptedPosition[3];
+  vtkSetVector3Macro(LastAcceptedPosition, float);
+  
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
 

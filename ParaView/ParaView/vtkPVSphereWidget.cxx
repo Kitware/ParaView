@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.25.4.1");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -80,6 +80,10 @@ vtkPVSphereWidget::vtkPVSphereWidget()
   this->RadiusEntry = vtkKWEntry::New();
   this->CenterResetButton = vtkKWPushButton::New();
   this->SphereTclName = 0;
+  
+  this->LastAcceptedCenter[0] = this->LastAcceptedCenter[1] =
+    this->LastAcceptedCenter[2] = 0.0;
+  this->LastAcceptedRadius = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -130,20 +134,17 @@ void vtkPVSphereWidget::CenterResetCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVSphereWidget::ResetInternal(const char* sourceTclName)
+void vtkPVSphereWidget::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
     return;
     }
-  if ( this->SphereTclName )
-    {
-    this->Script("eval %s SetCenter [ %s GetCenter ]", 
-                 this->GetTclName(), this->SphereTclName);
-    this->Script("eval %s SetRadius [ %s GetRadius ]", 
-                 this->GetTclName(), this->SphereTclName);
-    }
-  this->Superclass::ResetInternal(sourceTclName);
+
+  this->SetCenter(this->LastAcceptedCenter);
+  this->SetRadius(this->LastAcceptedRadius);
+  
+  this->Superclass::ResetInternal();
 }
 
 //----------------------------------------------------------------------------
@@ -188,6 +189,8 @@ void vtkPVSphereWidget::AcceptInternal(const char* sourceTclName)
                            val[0], val[1], val[2]);
     pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName,
                            rad);
+    this->SetLastAcceptedCenter(val);
+    this->SetLastAcceptedRadius(rad);
     }
   this->Superclass::AcceptInternal(sourceTclName);
 }
@@ -407,9 +410,14 @@ void vtkPVSphereWidget::ChildCreate(vtkPVApplication* pvApp)
       pvApp->BroadcastScript("%s SetCenter %f %f %f", this->SphereTclName,
                              0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                              0.5*(bds[4]+bds[5]));
+      this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                      0.5*(bds[4]+bds[5]));
+      this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                                  0.5*(bds[4]+bds[5]));
       pvApp->BroadcastScript("%s SetRadius %f", this->SphereTclName,
                              0.5*(bds[1]-bds[0]));
-      this->Reset();
+      this->SetRadius(0.5*(bds[1]-bds[0]));
+      this->SetLastAcceptedRadius(0.5*(bds[1]-bds[0]));
       }
     }
 

@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.20.4.1");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -78,6 +78,9 @@ vtkPVPointWidget::vtkPVPointWidget()
     this->CoordinateLabel[cc] = vtkKWLabel::New();
    }
   this->PositionResetButton = vtkKWPushButton::New();
+  
+  this->LastAcceptedPosition[0] = this->LastAcceptedPosition[1] =
+    this->LastAcceptedPosition[2] = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -121,20 +124,18 @@ void vtkPVPointWidget::PositionResetCallback()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::ResetInternal(const char* sourceTclName)
+void vtkPVPointWidget::ResetInternal()
 {
   if ( ! this->ModifiedFlag)
     {
     return;
     }
   // Reset point
-  if ( this->VariableName && sourceTclName )
-    {
-    this->Script("eval %s SetPosition [ %s Get%s ]",
-                 this->GetTclName(), sourceTclName, 
-                 this->VariableName);
-    }
-  this->Superclass::ResetInternal(sourceTclName);
+  this->SetPosition(this->LastAcceptedPosition[0],
+                    this->LastAcceptedPosition[1],
+                    this->LastAcceptedPosition[2]);
+  
+  this->Superclass::ResetInternal();
 }
 
 
@@ -180,6 +181,10 @@ void vtkPVPointWidget::UpdateVTKObject()
             this->PositionEntry[2]->GetValueAsFloat());
     pvApp->BroadcastScript(acceptCmd);
     }
+  
+  this->SetLastAcceptedPosition(this->PositionEntry[0]->GetValueAsFloat(),
+                                this->PositionEntry[1]->GetValueAsFloat(),
+                                this->PositionEntry[2]->GetValueAsFloat());
 }
 
 

@@ -111,7 +111,7 @@ public:
   // Description:
   // Move widget state to VTK object or back.
   virtual void AcceptInternal(const char* sourceTclName);
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
 
 protected:
   vtkPV3DWidget();

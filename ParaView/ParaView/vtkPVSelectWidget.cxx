@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.23.4.1");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -278,6 +278,7 @@ void vtkPVSelectWidget::ResetInternal(const char* sourceTclName)
     {
     vtkPVWidget *pvw;
     pvw = (vtkPVWidget*)(this->Widgets->GetItemAsObject(this->CurrentIndex));
+    pvw->ResetInternal();
     pvw->ResetInternal(sourceTclName);
     }
 }

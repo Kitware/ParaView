@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.18.4.1");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -97,6 +97,11 @@ vtkPVImplicitPlaneWidget::vtkPVImplicitPlaneWidget()
   this->NormalYButton = vtkKWPushButton::New();
   this->NormalZButton = vtkKWPushButton::New();
   this->PlaneTclName = 0;
+  
+  this->LastAcceptedCenter[0] = this->LastAcceptedCenter[1] =
+    this->LastAcceptedCenter[2] = 0;
+  this->LastAcceptedNormal[0] = this->LastAcceptedNormal[1] = 0;
+  this->LastAcceptedNormal[2] = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -213,7 +218,7 @@ void vtkPVImplicitPlaneWidget::NormalZCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::ResetInternal(const char* sourceTclName)
+void vtkPVImplicitPlaneWidget::ResetInternal()
 {
   vtkPVApplication *pvApp;
 
@@ -224,14 +229,11 @@ void vtkPVImplicitPlaneWidget::ResetInternal(const char* sourceTclName)
 
   pvApp = this->GetPVApplication();
   pvApp->BroadcastScript("%s SetDrawPlane 0", this->Widget3DTclName);
-  if ( this->PlaneTclName )
-    {
-    this->Script("eval %s SetCenter [ %s GetOrigin ]", 
-                 this->GetTclName(), this->PlaneTclName);
-    this->Script("eval %s SetNormal [ %s GetNormal ]", 
-                 this->GetTclName(), this->PlaneTclName);
-    }
-  this->Superclass::ResetInternal(sourceTclName);
+
+  this->SetCenter(this->LastAcceptedCenter);
+  this->SetNormal(this->LastAcceptedNormal);
+
+  this->Superclass::ResetInternal();
 }
 
 //----------------------------------------------------------------------------
@@ -279,6 +281,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
     pvApp->BroadcastScript("%s SetOrigin %f %f %f", 
                            this->PlaneTclName,
                            val[0], val[1], val[2]);
+    this->SetLastAcceptedCenter(val);
     for ( cc = 0; cc < 3; cc ++ )
       {
       val[cc] = atof( this->NormalEntry[cc]->GetValue() );
@@ -287,6 +290,7 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(const char* sourceTclName)
     pvApp->BroadcastScript("%s SetNormal %f %f %f", 
                            this->PlaneTclName,
                            val[0], val[1], val[2]);
+    this->SetLastAcceptedNormal(val);
     }
 
   this->Superclass::AcceptInternal(sourceTclName);
@@ -605,8 +609,13 @@ void vtkPVImplicitPlaneWidget::ChildCreate(vtkPVApplication* pvApp)
       pvApp->BroadcastScript("%s SetOrigin %f %f %f", this->PlaneTclName,
                              0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
                              0.5*(bds[4]+bds[5]));
+      this->SetLastAcceptedCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                                  0.5*(bds[4]+bds[5]));
+      this->SetCenter(0.5*(bds[0]+bds[1]), 0.5*(bds[2]+bds[3]),
+                      0.5*(bds[4]+bds[5]));
       pvApp->BroadcastScript("%s SetNormal 0 0 1", this->PlaneTclName);
-      this->Reset();
+      this->SetLastAcceptedNormal(0, 0, 1);
+      this->SetNormal(0, 0, 1);
       }
     }
 

@@ -106,7 +106,7 @@ public:
 
   // Description:
   // Called when the PVSources reset button is called.
-  virtual void ResetInternal(const char* sourceTclName);
+  virtual void ResetInternal();
     
   // Description:
   // Called when the PVSources accept button is called.
@@ -140,6 +140,10 @@ protected:
   char *SphereTclName;
   vtkSetStringMacro(SphereTclName);
 
+  float LastAcceptedCenter[3];
+  float LastAcceptedRadius;
+  vtkSetVector3Macro(LastAcceptedCenter, float);
+  vtkSetMacro(LastAcceptedRadius, float);
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
