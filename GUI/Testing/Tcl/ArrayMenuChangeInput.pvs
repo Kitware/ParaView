@@ -54,7 +54,8 @@ $kw(vtkTemp509) ColorByProperty
 
 $kw(vtkTemp1) SetCurrentPVSourceCallback $kw(vtkTemp273)
 set kw(vtkTemp309) [$kw(vtkTemp273) GetPVOutput]
-$kw(vtkTemp309) ColorByPointField {Normals} 3
+#$kw(vtkTemp309) ColorByPointField {Normals} 3
+$kw(vtkTemp309) ColorByArray {Normals} 3
 set kw(vtkTemp310) [$kw(vtkTemp309) GetPVColorMap]
 $kw(vtkTemp310) VectorModeComponentCallback
 $kw(vtkTemp310) VectorComponentCallback 0

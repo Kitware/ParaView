@@ -30,7 +30,7 @@
 #include "vtkSMRenderModuleProxy.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.22.2.1");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.22.2.2");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -615,8 +615,8 @@ void vtkPVCompositeRenderModuleUI::CompositeCompressionCallback(int val)
     this->RenderModuleProxy->GetProperty("UseCompositeCompression"));
   if (!ivp)
     {
-    vtkErrorMacro("Cannot find property UseCompositeCompression on "
-      "RenderModuleProxy.");
+//    vtkErrorMacro("Cannot find property UseCompositeCompression on "
+//      "RenderModuleProxy.");
     return;
     }
   ivp->SetElement(0, val);

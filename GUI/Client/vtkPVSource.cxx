@@ -64,7 +64,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.427.2.5");
+vtkCxxRevisionMacro(vtkPVSource, "1.427.2.6");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 #if defined(PARAVIEW_USE_SERVERMANAGER_RENDERING)
   vtkCxxSetObjectMacro(vtkPVSource,DisplayProxy, vtkSMDisplayProxy);
@@ -1518,7 +1518,10 @@ void vtkPVSource::SetDefaultColorParameters()
 //----------------------------------------------------------------------------
 void vtkPVSource::ColorByArray(const char* arrayname, int field)
 {
-  // TODO: must add to trace.
+  this->GetPVApplication()->AddTraceEntry(
+    "$kw(%s) ColorByArray {%s} %d",
+    this->GetTclName(), arrayname, field);
+
   if (field != vtkSMDisplayProxy::POINT_FIELD_DATA &&
     field != vtkSMDisplayProxy::CELL_FIELD_DATA)
     {
