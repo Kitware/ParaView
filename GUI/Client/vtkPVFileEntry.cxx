@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.82");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.83");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -180,7 +180,7 @@ void vtkPVFileEntry::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
     this->Entry->SetBalloonHelpString(this->BalloonHelpString);
@@ -192,16 +192,15 @@ void vtkPVFileEntry::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVFileEntry::Create(vtkKWApplication *pvApp)
 {
-  const char* wname;
-  
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("FileEntry already created");
     return;
     }
-  
   this->SetApplication(pvApp);
 
+  const char* wname;
+  
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.54");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.55");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -117,7 +117,7 @@ void vtkPVArrayMenu::SetFieldSelection(int field)
     }
   this->FieldSelection = field;
 
-  if (this->Application == NULL)
+  if (this->GetApplication() == NULL)
     {
     return;
     }
@@ -164,7 +164,7 @@ void vtkPVArrayMenu::Create(vtkKWApplication *app)
 {
   vtkKWWidget *extraFrame;
 
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
     return;
@@ -573,7 +573,7 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   vtkPVArrayInformation *ai;
   int currentComponent;
 
-  if (this->Application == NULL)
+  if (!this->IsCreated())
     {
     this->SelectedComponent = 0;
     return;

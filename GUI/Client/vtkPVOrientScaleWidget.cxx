@@ -33,7 +33,7 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.16");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
@@ -142,12 +142,11 @@ vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
 //----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Orient scale widget has already been created.");
     return;
     }
-  
   this->SetApplication(app);
   
   // create the top level

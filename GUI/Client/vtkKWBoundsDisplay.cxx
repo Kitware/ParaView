@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWBoundsDisplay);
-vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.13");
+vtkCxxRevisionMacro(vtkKWBoundsDisplay, "1.14");
 
 int vtkKWBoundsDisplayCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -59,8 +59,7 @@ vtkKWBoundsDisplay::~vtkKWBoundsDisplay()
 void vtkKWBoundsDisplay::Create(vtkKWApplication *app,
                                 const char* vtkNotUsed(args))
 {
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("BoundsDisplay already created");
     return;

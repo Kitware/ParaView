@@ -18,7 +18,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDummyWidget);
-vtkCxxRevisionMacro(vtkPVDummyWidget, "1.4");
+vtkCxxRevisionMacro(vtkPVDummyWidget, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVDummyWidget::vtkPVDummyWidget()
@@ -33,7 +33,7 @@ vtkPVDummyWidget::~vtkPVDummyWidget()
 //----------------------------------------------------------------------------
 void vtkPVDummyWidget::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
     return;

@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectCTHArrays);
-vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.12");
+vtkCxxRevisionMacro(vtkPVSelectCTHArrays, "1.13");
 vtkCxxSetObjectMacro(vtkPVSelectCTHArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectCTHArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -82,14 +82,14 @@ vtkPVSelectCTHArrays::~vtkPVSelectCTHArrays()
 //----------------------------------------------------------------------------
 void vtkPVSelectCTHArrays::Create(vtkKWApplication *app)
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("PVWidget already created");
     return;
     }
   this->SetApplication(app);
+
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
 
   // create the top level
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
@@ -156,7 +156,7 @@ void vtkPVSelectCTHArrays::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetLabel(arrayName);
-      label->Create(this->Application, "");
+      label->Create(this->GetApplication(), "");
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->ArrayLabelCollection->AddItem(label);

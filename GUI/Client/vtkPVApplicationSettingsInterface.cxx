@@ -25,7 +25,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplicationSettingsInterface);
-vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.15");
+vtkCxxRevisionMacro(vtkPVApplicationSettingsInterface, "1.16");
 
 int vtkPVApplicationSettingsInterfaceCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -196,7 +196,7 @@ void vtkPVApplicationSettingsInterface::Update()
     return;
     }
 
-  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
 
   // Interface settings : show sources description
 
@@ -229,7 +229,7 @@ void vtkPVApplicationSettingsInterface::ShowSourcesDescriptionCallback()
  this->GetApplication()->SetRegisteryValue(
    2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_DESCRIPTION_REG_KEY, "%d", flag);
 
- vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+ vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
  if (app)
    {
    app->SetShowSourcesLongHelp(flag);
@@ -250,7 +250,7 @@ void vtkPVApplicationSettingsInterface::ShowTraceFilesCallback()
   this->GetApplication()->SetRegisteryValue(
     2, "RunTime", VTK_PV_ASI_SHOW_TRACE_FILES_REG_KEY, "%d", flag);
 
-  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
   if (app)
     {
     app->SetSourcesBrowserAlwaysShowName(flag);
@@ -271,7 +271,7 @@ void vtkPVApplicationSettingsInterface::ShowSourcesNameCallback()
  this->GetApplication()->SetRegisteryValue(
    2, "RunTime", VTK_PV_ASI_SHOW_SOURCES_NAME_REG_KEY, "%d", flag);
 
- vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->Application);
+ vtkPVApplication *app = vtkPVApplication::SafeDownCast(this->GetApplication());
  if (app)
    {
    app->SetSourcesBrowserAlwaysShowName(flag);

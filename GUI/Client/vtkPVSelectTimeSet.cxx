@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.36");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.37");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -87,7 +87,7 @@ vtkPVSelectTimeSet::~vtkPVSelectTimeSet()
 void vtkPVSelectTimeSet::SetLabel(const char* label)
 {
   this->SetFrameLabel(label);
-  if (this->Application)
+  if (this->GetApplication())
     {
     this->LabeledFrame->SetLabel(label);
     }
@@ -102,13 +102,13 @@ const char* vtkPVSelectTimeSet::GetLabel()
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
 {
-  const char* wname;
-  
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("SelectTimeSet already created");
     return;
     }
+  this->SetApplication(pvApp);
+  
 
   // For getting the widget in a script.
   if ((this->TraceNameState == vtkPVWidget::Uninitialized ||
@@ -118,28 +118,28 @@ void vtkPVSelectTimeSet::Create(vtkKWApplication *pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
   
-  this->SetApplication(pvApp);
+  const char* wname;
   
   // create the top level
   wname = this->GetWidgetName();
   this->Script("frame %s -relief flat -borderwidth 2", wname);
 
-  this->LabeledFrame->Create(this->Application, 0);
+  this->LabeledFrame->Create(this->GetApplication(), 0);
   if (this->FrameLabel)
     {
     this->LabeledFrame->SetLabel(this->FrameLabel);
     }
-  this->TimeLabel->Create(this->Application, "");
+  this->TimeLabel->Create(this->GetApplication(), "");
 
   char label[32];
   sprintf(label, "Time value: %12.5e", 0.0);
   this->TimeLabel->SetLabel(label);
   this->Script("pack %s", this->TimeLabel->GetWidgetName());
   
-  this->TreeFrame->Create(this->Application, "ScrolledWindow", 
+  this->TreeFrame->Create(this->GetApplication(), "ScrolledWindow", 
                           "-relief sunken -borderwidth 2");
 
-  this->Tree->Create(this->Application, "Tree", 
+  this->Tree->Create(this->GetApplication(), "Tree", 
                      "-background white -borderwidth 0 -width 15 -padx 2 "
                      "-redraw 1 -relief flat -selectbackground red");
   this->Script("%s bindText <ButtonPress-1>  {%s SetTimeValueCallback}",
@@ -191,7 +191,7 @@ void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
                item);
   this->Script("%s itemcget %s -data", this->Tree->GetWidgetName(),
                item);
-  const char* result = this->Application->GetMainInterp()->result;
+  const char* result = this->GetApplication()->GetMainInterp()->result;
   if (result[0] == '\0')
     {
     return;
@@ -208,7 +208,7 @@ void vtkPVSelectTimeSet::SetTimeValueCallback(const char* item)
 //-----------------------------------------------------------------------------
 void vtkPVSelectTimeSet::AddRootNode(const char* name, const char* text)
 {
-  if (!this->Application)
+  if (!this->GetApplication())
     {
     return;
     }
@@ -220,7 +220,7 @@ void vtkPVSelectTimeSet::AddRootNode(const char* name, const char* text)
 void vtkPVSelectTimeSet::AddChildNode(const char* parent, const char* name, 
                                       const char* text, const char* data)
 {
-  if (!this->Application)
+  if (!this->GetApplication())
     {
     return;
     }
@@ -245,7 +245,7 @@ void vtkPVSelectTimeSet::AcceptInternal(vtkClientServerID sourceID)
     this->Script("%s selection get", this->Tree->GetWidgetName());
     this->AddTraceEntry("$kw(%s) SetTimeValueCallback {%s}", 
                         this->GetTclName(), 
-                        this->Application->GetMainInterp()->result);
+                        this->GetApplication()->GetMainInterp()->result);
     }
 
   this->Property->SetVTKSourceID(sourceID);
@@ -265,7 +265,7 @@ void vtkPVSelectTimeSet::Trace(ofstream *file)
 
   this->Script("%s selection get", this->Tree->GetWidgetName());
   *file << "$kw(" << this->GetTclName() << ") SetTimeValueCallback {"
-        << this->Application->GetMainInterp()->result << "}" << endl;
+        << this->GetApplication()->GetMainInterp()->result << "}" << endl;
 }
 
 

@@ -32,7 +32,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.49");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.50");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -162,7 +162,7 @@ void vtkPVLineWidget::SetPoint1(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::GetPoint1(double pt[3])
 {
-  if (this->Application == NULL)
+  if (!this->IsCreated())
     {
     vtkErrorMacro("Not created yet.");
     return;
@@ -207,7 +207,7 @@ void vtkPVLineWidget::SetPoint2(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVLineWidget::GetPoint2(double pt[3])
 {
-  if (this->Application == NULL)
+  if (!this->IsCreated())
     {
     vtkErrorMacro("Not created yet.");
     return;
@@ -276,7 +276,7 @@ void vtkPVLineWidget::SetResolution(int i)
 //----------------------------------------------------------------------------
 int vtkPVLineWidget::GetResolution()
 {
-  if (this->Application == NULL)
+  if (!this->IsCreated())
     {
     vtkErrorMacro("Not created yet.");
     return 0;
@@ -609,7 +609,7 @@ void vtkPVLineWidget::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
     this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);

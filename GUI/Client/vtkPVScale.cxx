@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.39");
+vtkCxxRevisionMacro(vtkPVScale, "1.40");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -96,7 +96,7 @@ void vtkPVScale::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
     this->Scale->SetBalloonHelpString(this->BalloonHelpString);
@@ -165,11 +165,13 @@ void vtkPVScale::EntryCheckModifiedCallback()
 //----------------------------------------------------------------------------
 void vtkPVScale::Create(vtkKWApplication *pvApp)
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("PVScale already created");
     return;
     }
+  this->SetApplication(pvApp);
+
 
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&
@@ -180,8 +182,6 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
   
-  this->SetApplication(pvApp);
-
   // create the top level
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
 
@@ -194,11 +194,11 @@ void vtkPVScale::Create(vtkKWApplication *pvApp)
   this->Scale->SetParent(this);
   if (this->DisplayValueFlag)
     {
-    this->Scale->Create(this->Application, "-showvalue 1");
+    this->Scale->Create(this->GetApplication(), "-showvalue 1");
     }
   else
     {
-    this->Scale->Create(this->Application, "-showvalue 0");
+    this->Scale->Create(this->GetApplication(), "-showvalue 0");
     }
 
   this->Scale->SetCommand(this, "CheckModifiedCallback");
@@ -315,9 +315,9 @@ void vtkPVScale::AcceptInternal(vtkClientServerID sourceID)
 //---------------------------------------------------------------------------
 void vtkPVScale::Trace()
 {
-  if (this->Application && this->Application->GetTraceFile())
+  if (this->GetApplication() && this->GetApplication()->GetTraceFile())
     {
-    this->Trace(this->Application->GetTraceFile());
+    this->Trace(this->GetApplication()->GetTraceFile());
     }
 }
 

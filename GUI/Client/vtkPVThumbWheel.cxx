@@ -29,7 +29,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.3");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.4");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -54,15 +54,15 @@ vtkPVThumbWheel::~vtkPVThumbWheel()
 //-----------------------------------------------------------------------------
 void vtkPVThumbWheel::Create(vtkKWApplication *pvApp)
 {
-  const char *wname;
-  
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("PVThumbWheel already created");
     return;
     }
   
   this->SetApplication(pvApp);
+  
+  const char *wname;
   
   // create the top level
   wname = this->GetWidgetName();
@@ -173,7 +173,7 @@ void vtkPVThumbWheel::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Label->SetBalloonHelpString(this->BalloonHelpString);
     this->ThumbWheel->SetBalloonHelpString(this->BalloonHelpString);

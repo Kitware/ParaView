@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.14");
+vtkCxxRevisionMacro(vtkPVValueList, "1.15");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -147,7 +147,7 @@ void vtkPVValueList::SetLabel(const char* str)
 //-----------------------------------------------------------------------------
 void vtkPVValueList::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
     return;
@@ -340,7 +340,7 @@ void vtkPVValueList::Update()
   int num, idx;
   char str[256];
 
-  if (this->Application == NULL || this->Property == NULL)
+  if (this->GetApplication() == NULL || this->Property == NULL)
     {
     return;
     }
@@ -429,7 +429,7 @@ void vtkPVValueList::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->ContourValuesList->SetBalloonHelpString(this->BalloonHelpString);
     this->BalloonHelpInitialized = 1;

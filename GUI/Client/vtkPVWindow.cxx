@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.578");
+vtkCxxRevisionMacro(vtkPVWindow, "1.579");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -573,9 +573,9 @@ void vtkPVWindow::PrepareForDelete()
     this->MainView = NULL;
     }
 
-  if (this->Application)
+  if (this->GetApplication())
     {
-    this->Application->SetRegisteryValue(2, "RunTime", "CenterActorVisibility",
+    this->GetApplication()->SetRegisteryValue(2, "RunTime", "CenterActorVisibility",
                                          "%d", this->CenterActorVisibility);
     }
 
@@ -723,12 +723,12 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   this->PreferencesMenu = vtkKWMenu::New();
   this->PreferencesMenu->SetParent(this->MenuFile);
   this->PreferencesMenu->SetTearOff(0);
-  this->PreferencesMenu->Create(this->Application, "");  
+  this->PreferencesMenu->Create(this->GetApplication(), "");  
   this->PreferencesMenu->InsertCommand(0, "Plug-ins", this,
                                        "DisplayPluginWindow", 7,
                                        "Manage available plug-ins");
   
-  this->PluginsDialog->Create(this->Application,0);
+  this->PluginsDialog->Create(this->GetApplication(),0);
   this->PluginsDialog->SetMasterWindow(this);
 
   //this->MenuFile->InsertCascade(clidx++,"Preferences", this->PreferencesMenu, 8);
@@ -749,18 +749,18 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   // Create the select menu (for selecting user created and default
   // (i.e. glyphs) data objects/sources)
   this->SelectMenu->SetParent(this->GetMenu());
-  this->SelectMenu->Create(this->Application, "-tearoff 0");
+  this->SelectMenu->Create(this->GetApplication(), "-tearoff 0");
   this->Menu->InsertCascade(2, VTK_PV_SELECT_SOURCE_MENU_LABEL, this->SelectMenu, 0);
   
   // Create the menu for selecting the glyphs.  
   this->GlyphMenu->SetParent(this->SelectMenu);
-  this->GlyphMenu->Create(this->Application, "-tearoff 0");
+  this->GlyphMenu->Create(this->GetApplication(), "-tearoff 0");
   this->SelectMenu->AddCascade("Glyphs", this->GlyphMenu, 0,
                                  "Select one of the glyph sources.");  
 
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->GetMenu());
-  this->SourceMenu->Create(this->Application, "-tearoff 0");
+  this->SourceMenu->Create(this->GetApplication(), "-tearoff 0");
   this->Menu->InsertCascade(3, VTK_PV_VTK_SOURCES_MENU_LABEL, 
                             this->SourceMenu, 0,
                             "Choose a source from a list of "
@@ -768,7 +768,7 @@ void vtkPVWindow::InitializeMenus(vtkKWApplication* vtkNotUsed(app))
   
   // Create the menu for creating data sources (filters).  
   this->FilterMenu->SetParent(this->GetMenu());
-  this->FilterMenu->Create(this->Application, "-tearoff 0");
+  this->FilterMenu->Create(this->GetApplication(), "-tearoff 0");
   this->Menu->InsertCascade(4, VTK_PV_VTK_FILTERS_MENU_LABEL, 
                             this->FilterMenu, 2,
                             "Choose a filter from a list of "
@@ -932,7 +932,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, const char* vtkNotUsed(args))
   
   this->UpdateStatusImage();
   this->ProgressGauge->SetHeight(
-    vtkKWTkUtilities::GetPhotoHeight(this->Application->GetMainInterp(), 
+    vtkKWTkUtilities::GetPhotoHeight(this->GetApplication()->GetMainInterp(), 
                                      this->StatusImageName) - 4);
 
   // Init menus
@@ -1692,7 +1692,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->MainView->SetParent(this->ViewFrame);
   this->MainView->SetPropertiesParent(this->GetPropertiesParent());
   this->AddView(this->MainView);
-  this->MainView->Create(this->Application,"-width 200 -height 200");
+  this->MainView->Create(this->GetApplication(),"-width 200 -height 200");
   this->MainView->MakeSelected();
   this->MainView->ShowViewProperties();
   this->MainView->SetupBindings();
@@ -1762,7 +1762,7 @@ void vtkPVWindow::OpenCallback()
       "modules.";
     if (this->UseMessageDialog)
       {
-      vtkKWMessageDialog::PopupMessage(this->Application, this,
+      vtkKWMessageDialog::PopupMessage(this->GetApplication(), this,
                                        "Error",  error,
                                        vtkKWMessageDialog::ErrorIcon);
       }
@@ -1780,7 +1780,7 @@ void vtkPVWindow::OpenCallback()
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
   vtkKWLoadSaveDialog* loadDialog = pm->NewLoadSaveDialog();
   this->RetrieveLastPath(loadDialog, "OpenPath");
-  loadDialog->Create(this->Application,0);
+  loadDialog->Create(this->GetApplication(),0);
   loadDialog->SetParent(this);
   loadDialog->SetTitle("Open ParaView File");
   loadDialog->SetDefaultExtension(".vtp");
@@ -1897,7 +1897,7 @@ int vtkPVWindow::Open(char *openFileNameUnSafe, int store)
   error.rdbuf()->freeze(0);     
   if (this->UseMessageDialog)
     {
-    if ( vtkKWMessageDialog::PopupOkCancel(this->Application, this,
+    if ( vtkKWMessageDialog::PopupOkCancel(this->GetApplication(), this,
                                            "Open Error",  error.str(),
                                            vtkKWMessageDialog::ErrorIcon |
                                            vtkKWMessageDialog::CancelDefault |
@@ -2118,7 +2118,7 @@ void vtkPVWindow::WriteVTKFile(const char* filename, int ghostLevel,
     if (this->UseMessageDialog)
       {
       vtkKWMessageDialog::PopupMessage(
-        this->Application, this, "Error Saving File", 
+        this->GetApplication(), this, "Error Saving File", 
         msg.str(), 
         vtkKWMessageDialog::ErrorIcon);
       }
@@ -2146,7 +2146,7 @@ void vtkPVWindow::WriteData()
   if(!this->GetCurrentPVSource())
     {
     vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Error Saving File", 
+      this->GetApplication(), this, "Error Saving File", 
       "No data set is selected.", 
       vtkKWMessageDialog::ErrorIcon);
     return;
@@ -2186,7 +2186,7 @@ void vtkPVWindow::WriteData()
   else
     {
     vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Error Saving File", 
+      this->GetApplication(), this, "Error Saving File", 
       "Error getting data type from root node.",
       vtkKWMessageDialog::ErrorIcon);
     return;
@@ -2243,7 +2243,7 @@ void vtkPVWindow::WriteData()
         << "." << ends;
 
     vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Error Saving File", 
+      this->GetApplication(), this, "Error Saving File", 
       msg.str(),
       vtkKWMessageDialog::ErrorIcon);
     msg.rdbuf()->freeze(0);
@@ -2261,7 +2261,7 @@ void vtkPVWindow::WriteData()
   saveDialog->SetParent(this);
   saveDialog->SetTitle(VTK_PV_SAVE_DATA_MENU_LABEL);
   saveDialog->SetFileTypes(types);
-  saveDialog->Create(this->Application, 0);
+  saveDialog->Create(this->GetApplication(), 0);
   // Ask the user for the filename.
 
   delete [] types;
@@ -2280,7 +2280,7 @@ void vtkPVWindow::WriteData()
       vtkPVReaderModule::SafeDownCast(this->GetCurrentPVSource());
     if(reader && (reader->GetNumberOfTimeSteps() > 1) &&
        vtkKWMessageDialog::PopupYesNo(
-         this->Application, this, "Timesteps",
+         this->GetApplication(), this, "Timesteps",
          "The current source provides multiple time steps.  "
          "Do you want to save all time steps?", 0))
       {
@@ -2292,7 +2292,7 @@ void vtkPVWindow::WriteData()
     if(parallel)
       {
       vtkPVGhostLevelDialog* dlg = vtkPVGhostLevelDialog::New();
-      dlg->Create(this->Application, "");
+      dlg->Create(this->GetApplication(), "");
       dlg->SetMasterWindow(this);
       dlg->SetTitle("Select ghost levels");
 
@@ -2378,7 +2378,7 @@ void vtkPVWindow::SaveSMState()
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "SaveSMStatePath");
   exportDialog->SetParent(this);
-  exportDialog->Create(this->Application,0);
+  exportDialog->Create(this->GetApplication(),0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save SM State");
   exportDialog->SetDefaultExtension(".pvsm");
@@ -2402,7 +2402,7 @@ void vtkPVWindow::SaveBatchScript()
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "SaveBatchLastPath");
   exportDialog->SetParent(this);
-  exportDialog->Create(this->Application,0);
+  exportDialog->Create(this->GetApplication(),0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save Batch Script");
   exportDialog->SetDefaultExtension(".pvb");
@@ -2522,7 +2522,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
     extension = this->ExtractFileExtension(imageFileName);
     if ( !extension)
       {
-      vtkKWMessageDialog::PopupMessage(this->Application, this,
+      vtkKWMessageDialog::PopupMessage(this->GetApplication(), this,
                                        "Error",  "Filename has no extension."
                                        " Can not requested identify file"
                                        " format."
@@ -2538,7 +2538,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
         ostrstream err;
         err << "Unrecognized extension: " << extension << "." 
             << " No image file will be generated." << ends;
-        vtkKWMessageDialog::PopupMessage(this->Application, this,
+        vtkKWMessageDialog::PopupMessage(this->GetApplication(), this,
                                          "Error",  err.str(),
                                          vtkKWMessageDialog::ErrorIcon);
         err.rdbuf()->freeze(0);
@@ -2712,7 +2712,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   if (file->fail())
     {
     vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Write Error",
+      this->GetApplication(), this, "Write Error",
       "There is insufficient disk space to save this batch script. The file "
       "will be deleted.");
     file->close();
@@ -2855,7 +2855,7 @@ void vtkPVWindow::SaveState()
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "SaveStateLastPath");
   exportDialog->SetParent(this);
-  exportDialog->Create(this->Application,0);
+  exportDialog->Create(this->GetApplication(),0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save State");
   exportDialog->SetDefaultExtension(".pvs");
@@ -2995,7 +2995,7 @@ void vtkPVWindow::SaveState(const char* filename)
   if (file->fail())
     {
     vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Write Error",
+      this->GetApplication(), this, "Write Error",
       "There is insufficient disk space to save the session state. The file "
       "will be deleted.");
     file->close();
@@ -3597,7 +3597,7 @@ void vtkPVWindow::ShowAnimationProperties()
 //-----------------------------------------------------------------------------
 vtkPVApplication *vtkPVWindow::GetPVApplication()
 {
-  return vtkPVApplication::SafeDownCast(this->Application);
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
 }
 
 
@@ -3640,7 +3640,7 @@ void vtkPVWindow::SaveTrace()
   vtkKWLoadSaveDialog* exportDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(exportDialog, "SaveTracePath");
   exportDialog->SetParent(this);
-  exportDialog->Create(this->Application,0);
+  exportDialog->Create(this->GetApplication(),0);
   exportDialog->SaveDialogOn();
   exportDialog->SetTitle("Save ParaView Trace");
   exportDialog->SetDefaultExtension(".pvs");
@@ -3697,7 +3697,7 @@ int vtkPVWindow::SaveTrace(const char* filename)
   if (newTrace.fail())
     {
     vtkKWMessageDialog::PopupMessage(
-      this->Application, this, "Write Error",
+      this->GetApplication(), this, "Write Error",
       "There is insufficient disk space to save this session trace. The file "
       "will be deleted.");
     newTrace.close();
@@ -3810,7 +3810,7 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* moduleName,
 //-----------------------------------------------------------------------------
 void vtkPVWindow::LoadScript(const char *name)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
 
   this->AddRecentFile(name, this, "LoadScript");
 
@@ -3826,7 +3826,7 @@ int vtkPVWindow::OpenPackage()
   vtkKWLoadSaveDialog* loadDialog = vtkKWLoadSaveDialog::New();
   this->RetrieveLastPath(loadDialog, "PackagePath");
   loadDialog->SetParent(this);
-  loadDialog->Create(this->Application,0);
+  loadDialog->Create(this->GetApplication(),0);
   loadDialog->SetTitle("Open ParaView Package");
   loadDialog->SetDefaultExtension(".xml");
   loadDialog->SetFileTypes("{{ParaView Package Files} {*.xml}} {{All Files} {*}}");
@@ -4000,7 +4000,7 @@ void vtkPVWindow::WizardCallback()
 
 //    vtkPVWizard *w = vtkPVWizard::New();
 //    w->SetParent(this);
-//    w->Create(this->Application, "");
+//    w->Create(this->GetApplication(), "");
 //    w->Invoke(this);
 //    w->Delete();
 }
@@ -4323,7 +4323,7 @@ void vtkPVWindow::DeleteAllSourcesCallback()
     return;
     }
   if ( vtkKWMessageDialog::PopupYesNo(
-         this->Application, this, "DeleteAllTheSources",
+         this->GetApplication(), this, "DeleteAllTheSources",
          "Delete All Modules", 
          "Are you sure you want to delete all the modules?", 
          vtkKWMessageDialog::QuestionIcon | vtkKWMessageDialog::RememberYes |
@@ -4336,7 +4336,7 @@ void vtkPVWindow::DeleteAllSourcesCallback()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::DeleteAllSources()
 {
-  vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
+  vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->GetApplication());
   pvApp->AddTraceEntry("# User selected delete all modules");
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
   while ( col->GetNumberOfItems() > 0 )

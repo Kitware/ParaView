@@ -44,7 +44,7 @@
 #include "vtkPlane.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.31");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.32");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -160,7 +160,7 @@ void vtkPVBoxWidget::ActualPlaceWidget()
 {
   this->Superclass::ActualPlaceWidget();
   vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-    this->Application);
+    this->GetApplication());
   vtkPVProcessModule* pm = pvApp->GetProcessModule(); 
   // now make sure the widget is placed on the server
   // since this is the only 3d widget on the server....
@@ -181,7 +181,7 @@ void vtkPVBoxWidget::ActualPlaceWidget()
 //----------------------------------------------------------------------------
 void vtkPVBoxWidget::AcceptInternal(vtkClientServerID sourceID)  
 {
-  vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(this->Application);
+  vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(this->GetApplication());
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
   this->PlaceWidget(); 
@@ -348,7 +348,7 @@ void vtkPVBoxWidget::SetBalloonHelpString(const char *str)
       }
     }
 
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->BalloonHelpInitialized = 1;
     }
@@ -383,22 +383,22 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
   this->SetFrameLabel("Box Widget");
 
   this->ControlFrame->SetParent(this->Frame->GetFrame());
-  this->ControlFrame->Create(this->Application, 0);
+  this->ControlFrame->Create(this->GetApplication(), 0);
 
   this->TranslateLabel->SetParent(this->ControlFrame->GetFrame());
-  this->TranslateLabel->Create(this->Application, 0);
+  this->TranslateLabel->Create(this->GetApplication(), 0);
   this->TranslateLabel->SetLabel("Translate:");
   this->TranslateLabel->SetBalloonHelpString(
     "Translate the geometry relative to the dataset location.");
 
   this->ScaleLabel->SetParent(this->ControlFrame->GetFrame());
-  this->ScaleLabel->Create(this->Application, 0);
+  this->ScaleLabel->Create(this->GetApplication(), 0);
   this->ScaleLabel->SetLabel("Scale:");
   this->ScaleLabel->SetBalloonHelpString(
     "Scale the geometry relative to the size of the dataset.");
 
   this->OrientationLabel->SetParent(this->ControlFrame->GetFrame());
-  this->OrientationLabel->Create(this->Application, 0);
+  this->OrientationLabel->Create(this->GetApplication(), 0);
   this->OrientationLabel->SetLabel("Orientation:");
   this->OrientationLabel->SetBalloonHelpString(
     "Orient the geometry relative to the dataset origin.");
@@ -410,7 +410,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     this->TranslateThumbWheel[cc]->PopupModeOn();
     this->TranslateThumbWheel[cc]->SetValue(0.0);
     this->TranslateThumbWheel[cc]->SetResolution(0.001);
-    this->TranslateThumbWheel[cc]->Create(this->Application, 0);
+    this->TranslateThumbWheel[cc]->Create(this->GetApplication(), 0);
     this->TranslateThumbWheel[cc]->DisplayEntryOn();
     this->TranslateThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->TranslateThumbWheel[cc]->ExpandEntryOn();
@@ -431,7 +431,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
     this->ScaleThumbWheel[cc]->SetMinimumValue(0.0);
     this->ScaleThumbWheel[cc]->ClampMinimumValueOn();
     this->ScaleThumbWheel[cc]->SetResolution(0.001);
-    this->ScaleThumbWheel[cc]->Create(this->Application, 0);
+    this->ScaleThumbWheel[cc]->Create(this->GetApplication(), 0);
     this->ScaleThumbWheel[cc]->DisplayEntryOn();
     this->ScaleThumbWheel[cc]->DisplayEntryAndLabelOnTopOff();
     this->ScaleThumbWheel[cc]->ExpandEntryOn();
@@ -446,7 +446,7 @@ void vtkPVBoxWidget::ChildCreate(vtkPVApplication* pvApp)
 
     this->OrientationScale[cc]->SetParent(this->ControlFrame->GetFrame());
     this->OrientationScale[cc]->PopupScaleOn();
-    this->OrientationScale[cc]->Create(this->Application, 0);
+    this->OrientationScale[cc]->Create(this->GetApplication(), 0);
     this->OrientationScale[cc]->SetRange(0, 360);
     this->OrientationScale[cc]->SetResolution(.001);
     this->OrientationScale[cc]->SetValue(0);

@@ -18,7 +18,7 @@
 #include "vtkPVProcessModule.h"
 #include "vtkClientServerStream.h"
 
-vtkCxxRevisionMacro(vtkPVSourceWidget, "1.12");
+vtkCxxRevisionMacro(vtkPVSourceWidget, "1.13");
 
 //----------------------------------------------------------------------------
 vtkPVSourceWidget::vtkPVSourceWidget()
@@ -34,7 +34,7 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
   if (this->OutputID.ID)
     {
     vtkPVApplication* pvApp = 
-      vtkPVApplication::SafeDownCast(this->Application);
+      vtkPVApplication::SafeDownCast(this->GetApplication());
     if (pvApp)
       {
       pvApp->GetProcessModule()->DeleteStreamObject(this->OutputID);
@@ -45,7 +45,7 @@ vtkPVSourceWidget::~vtkPVSourceWidget()
   if (this->SourceID.ID)
     {
     vtkPVApplication* pvApp = 
-      vtkPVApplication::SafeDownCast(this->Application);
+      vtkPVApplication::SafeDownCast(this->GetApplication());
     if (pvApp)
       {  
       pvApp->GetProcessModule()->DeleteStreamObject(this->SourceID);

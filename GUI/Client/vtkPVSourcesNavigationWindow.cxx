@@ -27,7 +27,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSourcesNavigationWindow );
-vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.15");
+vtkCxxRevisionMacro(vtkPVSourcesNavigationWindow, "1.16");
 
 //-----------------------------------------------------------------------------
 vtkPVSourcesNavigationWindow::vtkPVSourcesNavigationWindow()
@@ -127,16 +127,14 @@ void vtkPVSourcesNavigationWindow::Reconfigure()
 //-----------------------------------------------------------------------------
 void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *args)
 {
-  const char *wname;
-
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Window already created");
     return;
     }
-
   this->SetApplication(app);
+
+  const char *wname;
 
   ostrstream opts;
   
@@ -162,7 +160,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
 
   char* optstr = opts.str();
   this->Canvas->SetParent(this);
-  this->Canvas->Create(this->Application, optstr); 
+  this->Canvas->Create(this->GetApplication(), optstr); 
   delete[] optstr;
 
   ostrstream command;
@@ -170,7 +168,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   command << "-command \"" <<  this->Canvas->GetWidgetName()
           << " yview\"" << ends;
   char* commandStr = command.str();
-  this->ScrollBar->Create(this->Application, "scrollbar", commandStr);
+  this->ScrollBar->Create(this->GetApplication(), "scrollbar", commandStr);
   delete[] commandStr;
 
   this->Script("%s configure -yscrollcommand \"%s set\"", 
@@ -184,7 +182,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   this->Script("grid columnconfig %s 0 -weight 1", wname);
   this->Script("grid rowconfig %s 0 -weight 1", wname);
   this->PopupMenu->SetParent(this);
-  this->PopupMenu->Create(this->Application, "-tearoff 0");
+  this->PopupMenu->Create(this->GetApplication(), "-tearoff 0");
   this->PopupMenu->AddCommand("Delete", this, "DeleteWidget", 0, 
                               "Delete current widget");
   char *var = this->PopupMenu->CreateCheckButtonVariable(this, "Visibility");
@@ -194,7 +192,7 @@ void vtkPVSourcesNavigationWindow::Create(vtkKWApplication *app, const char *arg
   this->PopupMenu->AddCascade("Representation", 0, 0);
   this->PopupMenu->AddCascade("Interpolation", 0, 0);
   /*
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   this->PopupMenu->AddCascade(
     "VTK Filters", pvApp->GetMainWindow()->GetFilterMenu(),
     4, "Choose a filter from a list of VTK filters");
@@ -213,7 +211,7 @@ void vtkPVSourcesNavigationWindow::SetWidth(int width)
   this->Modified();
   this->Width = width;
 
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     this->Script("%s configure -width %d", this->Canvas->GetWidgetName(), 
                     width);
@@ -231,7 +229,7 @@ void vtkPVSourcesNavigationWindow::SetHeight(int height)
   this->Modified();
   this->Height = height;
 
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     this->Script("%s configure -height %d", this->Canvas->GetWidgetName(), 
                  height);
@@ -249,9 +247,9 @@ void vtkPVSourcesNavigationWindow::SetAlwaysShowName(int val)
   this->AlwaysShowName = val;
   this->Modified();
 
-  if (this->Application)
+  if (this->GetApplication())
     {
-    vtkPVApplication* app = vtkPVApplication::SafeDownCast(this->Application);
+    vtkPVApplication* app = vtkPVApplication::SafeDownCast(this->GetApplication());
     if (app)
       {
       vtkPVWindow* window = app->GetMainWindow();
@@ -276,7 +274,7 @@ void vtkPVSourcesNavigationWindow::DisplayModulePopupMenu(const char* module,
                                                    int x, int y)
 {
   //cout << "Popup for module: " << module << " at " << x << ", " << y << endl;
-  vtkKWApplication *app = this->Application;
+  vtkKWApplication *app = this->GetApplication();
   ostrstream str;
   if ( app->EvaluateBooleanExpression("%s IsDeletable", module) )
     {
@@ -345,7 +343,7 @@ void vtkPVSourcesNavigationWindow::ExecuteCommandOnModule(
 //-----------------------------------------------------------------------------
 char* vtkPVSourcesNavigationWindow::GetTextRepresentation(vtkPVSource* comp)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->GetApplication());
   return pvApp->GetTextRepresentation(comp);
 }
 

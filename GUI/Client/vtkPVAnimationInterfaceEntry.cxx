@@ -68,7 +68,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.34");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentProperty,
                      vtkPVWidgetProperty);
@@ -880,7 +880,7 @@ void vtkPVAnimationInterfaceEntry::Prepare()
 //-----------------------------------------------------------------------------
 vtkPVApplication* vtkPVAnimationInterfaceEntry::GetPVApplication()
 {
-  return vtkPVApplication::SafeDownCast(this->Application);
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------

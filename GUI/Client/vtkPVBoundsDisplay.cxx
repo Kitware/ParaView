@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.18");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.19");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, InputMenu, vtkPVInputMenu);
@@ -60,8 +60,7 @@ vtkPVBoundsDisplay::~vtkPVBoundsDisplay()
 //----------------------------------------------------------------------------
 void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
 {
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("BoundsDisplay already created");
     return;
@@ -84,7 +83,7 @@ void vtkPVBoundsDisplay::Create(vtkKWApplication *app)
 void vtkPVBoundsDisplay::SetLabel(const char* label)
 {
   this->SetFrameLabel(label);
-  if (this->Application && this->FrameLabel)
+  if (this->GetApplication() && this->FrameLabel)
     {
     this->Widget->SetLabel(this->FrameLabel);
     }

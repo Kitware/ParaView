@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.22");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.23");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -58,9 +58,9 @@ vtkPVGroupInputsWidget::~vtkPVGroupInputsWidget()
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::Create(vtkKWApplication *app)
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
-    vtkErrorMacro("PVWidget already created");
+    vtkErrorMacro("PVGroupInputsWidget already created");
     return;
     }
   this->SetApplication(app);
@@ -145,7 +145,7 @@ void vtkPVGroupInputsWidget::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetLabel(this->PartSelectionList->GetItem(idx));
-      label->Create(this->Application, "");
+      label->Create(this->GetApplication(), "");
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->PartLabelCollection->AddItem(label);

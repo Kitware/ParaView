@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabel);
-vtkCxxRevisionMacro(vtkPVLabel, "1.8");
+vtkCxxRevisionMacro(vtkPVLabel, "1.9");
 
 //----------------------------------------------------------------------------
 vtkPVLabel::vtkPVLabel()
@@ -64,7 +64,7 @@ void vtkPVLabel::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Label->SetBalloonHelpString(this->BalloonHelpString);
     this->BalloonHelpInitialized = 1;
@@ -74,15 +74,14 @@ void vtkPVLabel::SetBalloonHelpString(const char *str)
 //----------------------------------------------------------------------------
 void vtkPVLabel::Create(vtkKWApplication *pvApp)
 {
-  const char* wname;
-  
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("LabeledToggle already created");
     return;
     }
-
   this->SetApplication(pvApp);
+  
+  const char* wname;
   
   // create the top level
   wname = this->GetWidgetName();

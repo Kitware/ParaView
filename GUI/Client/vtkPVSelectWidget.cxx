@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.46");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.47");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -80,9 +80,10 @@ vtkPVSelectWidget::~vtkPVSelectWidget()
 //-----------------------------------------------------------------------------
 void vtkPVSelectWidget::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated() != NULL)
     {
     vtkErrorMacro("Object has already been created.");
+    return;
     }
   this->SetApplication(app);
 
@@ -123,7 +124,7 @@ void vtkPVSelectWidget::Create(vtkKWApplication *app)
     widget = prop->GetWidget();
     if (!widget->GetApplication())
       {
-      widget->Create(this->Application);
+      widget->Create(this->GetApplication());
       }
     }
 
@@ -155,7 +156,7 @@ void vtkPVSelectWidget::SetLabel(const char* label)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  if (this->Application)
+  if (this->GetApplication())
     {
     this->LabeledFrame->SetLabel(label);
     }
@@ -433,7 +434,7 @@ void vtkPVSelectWidget::AddItem(const char* labelVal, vtkPVWidget *pvw,
     this->Values->AddString("");
     }
 
-  if (this->Application)
+  if (this->GetApplication())
     {
     this->Menu->AddEntryWithCommand(labelVal, this, "MenuCallback");
     if (this->CurrentIndex < 0)

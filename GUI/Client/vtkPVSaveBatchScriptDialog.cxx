@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVSaveBatchScriptDialog );
-vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.9");
+vtkCxxRevisionMacro(vtkPVSaveBatchScriptDialog, "1.10");
 
 int vtkPVSaveBatchScriptDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -120,7 +120,7 @@ void vtkPVSaveBatchScriptDialog::SetMasterWindow(vtkKWWindow* win)
     if (this->MasterWindow) 
       { 
       this->MasterWindow->Register(this); 
-      if (this->Application)
+      if (this->IsCreated())
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
                      this->MasterWindow->GetWidgetName());
@@ -134,16 +134,15 @@ void vtkPVSaveBatchScriptDialog::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkPVSaveBatchScriptDialog::Create(vtkKWApplication *app)
 {
-  const char *wname;
-  
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Interactor already created");
     return;
     }
   
   this->SetApplication(app);
+  
+  const char *wname;
   
   // create the top level
   wname = this->GetWidgetName();
@@ -516,7 +515,7 @@ void vtkPVSaveBatchScriptDialog::Cancel()
 //----------------------------------------------------------------------------
 vtkPVApplication *vtkPVSaveBatchScriptDialog::GetPVApplication()
 {
-  return vtkPVApplication::SafeDownCast(this->Application);
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
 }
 
 

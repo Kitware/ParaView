@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.30");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.31");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -135,11 +135,12 @@ void vtkPVMinMax::SetMaximumHelp(const char* help)
 //----------------------------------------------------------------------------
 void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("PVScale already created");
     return;
     }
+  this->SetApplication(pvApp);
 
   // For getting the widget in a script.
   const char* label = this->MinLabel->GetLabel();
@@ -151,7 +152,6 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
 
-  this->SetApplication(pvApp);
 
   // create the top level
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());
@@ -179,7 +179,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
     }
 
   this->MinScale->SetParent(this->MinFrame);
-  this->MinScale->Create(this->Application, "");
+  this->MinScale->Create(this->GetApplication(), "");
   this->MinScale->SetDisplayEntryAndLabelOnTop(0);
   this->MinScale->DisplayEntry();
   this->MinScale->SetRange(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);
@@ -213,7 +213,7 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
     {
     this->MaxScale->SetParent(this->MinFrame);
     }
-  this->MaxScale->Create(this->Application, "");
+  this->MaxScale->Create(this->GetApplication(), "");
   this->MaxScale->SetDisplayEntryAndLabelOnTop(0);
   this->MaxScale->DisplayEntry();
   this->MaxScale->SetRange(-VTK_LARGE_FLOAT, VTK_LARGE_FLOAT);

@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.32");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.33");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -418,7 +418,7 @@ void vtkPVImplicitPlaneWidget::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
     this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);

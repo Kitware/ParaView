@@ -41,7 +41,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 #endif
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.47");
+vtkCxxRevisionMacro(vtkPVWidget, "1.48");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -221,7 +221,7 @@ void vtkPVWidget::ModifiedCallback()
   this->ModifiedFlag = 1;
   
   if (this->ModifiedCommandObjectTclName && this->ModifiedCommandMethod &&
-      this->Application)
+      this->GetApplication())
     {
     this->Script("%s %s", this->ModifiedCommandObjectTclName,
                  this->ModifiedCommandMethod);
@@ -240,7 +240,7 @@ void vtkPVWidget::AcceptedCallback()
 
 vtkPVApplication *vtkPVWidget::GetPVApplication() 
 {
-  return vtkPVApplication::SafeDownCast(this->Application);
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
 }
 
 //-----------------------------------------------------------------------------

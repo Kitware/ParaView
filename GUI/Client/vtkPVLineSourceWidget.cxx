@@ -23,7 +23,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLineSourceWidget);
-vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVLineSourceWidget, "1.21");
 
 int vtkPVLineSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -48,9 +48,10 @@ vtkPVLineSourceWidget::~vtkPVLineSourceWidget()
 //----------------------------------------------------------------------------
 void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
+    return;
     }
   this->SetApplication(app);
 
@@ -77,7 +78,7 @@ void vtkPVLineSourceWidget::Create(vtkKWApplication *app)
   this->LineWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
                                        "SetAcceptButtonColorToModified");
   
-  this->LineWidget->Create(this->Application);
+  this->LineWidget->Create(app);
   this->Script("pack %s -side top -fill both -expand true",
                this->LineWidget->GetWidgetName());
 }

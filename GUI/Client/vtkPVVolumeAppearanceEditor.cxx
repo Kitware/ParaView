@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVolumeAppearanceEditor);
-vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.5");
+vtkCxxRevisionMacro(vtkPVVolumeAppearanceEditor, "1.6");
 
 int vtkPVVolumeAppearanceEditorCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -185,14 +185,16 @@ void vtkPVVolumeAppearanceEditor::SetPVRenderView(vtkPVRenderView *rv)
 //----------------------------------------------------------------------------
 void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 {
-  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
-  const char* wname;
-  
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("PVColorMap already created");
     return;
     }
+  this->SetApplication(app);
+
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
+  const char* wname;
+  
   // Superclass create takes a KWApplication, but we need a PVApplication.
   if (pvApp == NULL)
     {
@@ -200,26 +202,24 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
     return;
     }
   
-  this->SetApplication(app);
-  
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat", wname);
   
   this->ScalarOpacityFrame = vtkKWLabeledFrame::New();
   this->ScalarOpacityFrame->SetParent(this);
   this->ScalarOpacityFrame->ShowHideFrameOn();
-  this->ScalarOpacityFrame->Create(this->Application, "");
+  this->ScalarOpacityFrame->Create(this->GetApplication(), "");
   this->ScalarOpacityFrame->SetLabel("Volume Scalar Opacity");
 
   this->ColorFrame = vtkKWLabeledFrame::New();
   this->ColorFrame->SetParent(this);
   this->ColorFrame->ShowHideFrameOn();
-  this->ColorFrame->Create(this->Application, "");
+  this->ColorFrame->Create(this->GetApplication(), "");
   this->ColorFrame->SetLabel("Volume Scalar Color");
 
   this->ScalarOpacityRampLabel = vtkKWLabel::New();
   this->ScalarOpacityRampLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityRampLabel->Create( this->Application, "" );
+  this->ScalarOpacityRampLabel->Create( this->GetApplication(), "" );
   this->ScalarOpacityRampLabel->SetLabel("Scalar Opacity Ramp:");
   this->ScalarOpacityRampLabel->SetBalloonHelpString(
     "Set the range for the scalar opacity ramp used to display the volume rendered data." );
@@ -227,17 +227,17 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->ScalarOpacityRampRange = vtkKWRange::New();
   this->ScalarOpacityRampRange->SetParent(this->ScalarOpacityFrame->GetFrame());
   this->ScalarOpacityRampRange->ShowEntriesOn();
-  this->ScalarOpacityRampRange->Create(this->Application);
+  this->ScalarOpacityRampRange->Create(this->GetApplication());
   this->ScalarOpacityRampRange->SetEndCommand( this, "ScalarOpacityRampChanged" );
   
   this->ScalarOpacityStartValueLabel = vtkKWLabel::New();
   this->ScalarOpacityStartValueLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityStartValueLabel->Create( this->Application, "" );
+  this->ScalarOpacityStartValueLabel->Create( this->GetApplication(), "" );
   this->ScalarOpacityStartValueLabel->SetLabel("Ramp Start Opacity:");  
   
   this->ScalarOpacityStartValueScale = vtkKWScale::New();
   this->ScalarOpacityStartValueScale->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityStartValueScale->Create( this->Application, "" );
+  this->ScalarOpacityStartValueScale->Create( this->GetApplication(), "" );
   this->ScalarOpacityStartValueScale->SetRange( 0.0, 1.0 );
   this->ScalarOpacityStartValueScale->SetResolution( 0.01 );
   this->ScalarOpacityStartValueScale->DisplayEntry();
@@ -246,12 +246,12 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   
   this->ScalarOpacityEndValueLabel = vtkKWLabel::New();
   this->ScalarOpacityEndValueLabel->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityEndValueLabel->Create( this->Application, "" );
+  this->ScalarOpacityEndValueLabel->Create( this->GetApplication(), "" );
   this->ScalarOpacityEndValueLabel->SetLabel("Ramp End Opacity:");  
 
   this->ScalarOpacityEndValueScale = vtkKWScale::New();
   this->ScalarOpacityEndValueScale->SetParent( this->ScalarOpacityFrame->GetFrame() );
-  this->ScalarOpacityEndValueScale->Create( this->Application, "" );
+  this->ScalarOpacityEndValueScale->Create( this->GetApplication(), "" );
   this->ScalarOpacityEndValueScale->SetRange( 0.0, 1.0 );
   this->ScalarOpacityEndValueScale->SetResolution( 0.01 );
   this->ScalarOpacityEndValueScale->DisplayEntry();
@@ -273,7 +273,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
 
   this->ColorRampLabel = vtkKWLabel::New();
   this->ColorRampLabel->SetParent( this->ColorFrame->GetFrame() );
-  this->ColorRampLabel->Create( this->Application, "" );
+  this->ColorRampLabel->Create( this->GetApplication(), "" );
   this->ColorRampLabel->SetLabel("Color Ramp:");
   this->ColorRampLabel->SetBalloonHelpString(
     "Set the range for the color ramp used to display the volume rendered data." );
@@ -281,24 +281,24 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->ColorRampRange = vtkKWRange::New();
   this->ColorRampRange->SetParent(this->ColorFrame->GetFrame());
   this->ColorRampRange->ShowEntriesOn();
-  this->ColorRampRange->Create(this->Application);
+  this->ColorRampRange->Create(this->GetApplication());
   this->ColorRampRange->SetEndCommand( this, "ColorRampChanged" );
 
   this->ColorEditorFrame = vtkKWWidget::New();
   this->ColorEditorFrame->SetParent(this->ColorFrame->GetFrame());
-  this->ColorEditorFrame->Create(this->Application, "frame", "");
+  this->ColorEditorFrame->Create(this->GetApplication(), "frame", "");
 
   this->ColorStartValueButton = vtkKWChangeColorButton::New();
   this->ColorStartValueButton->SetParent(this->ColorEditorFrame);
   this->ColorStartValueButton->ShowLabelOff();
-  this->ColorStartValueButton->Create(this->Application, "");
+  this->ColorStartValueButton->Create(this->GetApplication(), "");
   this->ColorStartValueButton->SetColor(1.0, 0.0, 0.0);
   this->ColorStartValueButton->SetCommand(this, "ColorButtonCallback");
   this->ColorStartValueButton->SetBalloonHelpString("Select the minimum color.");
 
   this->ColorMapLabel = vtkKWLabel::New();
   this->ColorMapLabel->SetParent(this->ColorEditorFrame);
-  this->ColorMapLabel->Create(this->Application, 
+  this->ColorMapLabel->Create(this->GetApplication(), 
                     "-relief flat -bd 0 -highlightthickness 0 -padx 0 -pady 0");
   this->Script("bind %s <Configure> {%s ColorMapLabelConfigureCallback %s}", 
                this->ColorMapLabel->GetWidgetName(), 
@@ -307,7 +307,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   this->ColorEndValueButton = vtkKWChangeColorButton::New();
   this->ColorEndValueButton->SetParent(this->ColorEditorFrame);
   this->ColorEndValueButton->ShowLabelOff();
-  this->ColorEndValueButton->Create(this->Application, "");
+  this->ColorEndValueButton->Create(this->GetApplication(), "");
   this->ColorEndValueButton->SetColor(0.0, 0.0, 1.0);
   this->ColorEndValueButton->SetCommand(this, "ColorButtonCallback");
   this->ColorEndValueButton->SetBalloonHelpString("Select the maximum color.");
@@ -331,7 +331,7 @@ void vtkPVVolumeAppearanceEditor::Create(vtkKWApplication *app)
   // Back button
   this->BackButton = vtkKWPushButton::New();
   this->BackButton->SetParent(this);
-  this->BackButton->Create(this->Application, "-text {Back}");
+  this->BackButton->Create(this->GetApplication(), "-text {Back}");
   this->BackButton->SetCommand(this, "BackButtonCallback");
 
   this->Script("pack %s %s %s -side top -anchor n -fill x -padx 2 -pady 2", 
@@ -389,10 +389,10 @@ void vtkPVVolumeAppearanceEditor::UpdateMap(int width, int height)
 
   vtkPVApplication *pvApp = NULL;
   
-  if ( this->Application )
+  if ( this->GetApplication() )
     {
     pvApp =
-      vtkPVApplication::SafeDownCast(this->Application);    
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
     }
   
   if ( !this->PVSource || !this->ArrayInfo || !pvApp ||
@@ -462,10 +462,10 @@ void vtkPVVolumeAppearanceEditor::SetPVSourceAndArrayInfo(vtkPVSource *source,
   
   vtkPVApplication *pvApp = NULL;
   
-  if ( this->Application )
+  if ( this->GetApplication() )
     {
     pvApp =
-      vtkPVApplication::SafeDownCast(this->Application);    
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
     }
   
   if ( this->PVSource && this->ArrayInfo && pvApp &&
@@ -535,10 +535,10 @@ void vtkPVVolumeAppearanceEditor::ScalarOpacityRampChangedInternal()
 {
   vtkPVApplication *pvApp = NULL;
   
-  if ( this->Application )
+  if ( this->GetApplication() )
     {
     pvApp =
-      vtkPVApplication::SafeDownCast(this->Application);    
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
     }
   
   if ( this->PVSource && this->ArrayInfo && pvApp )
@@ -595,10 +595,10 @@ void vtkPVVolumeAppearanceEditor::ColorRampChangedInternal()
 {
   vtkPVApplication *pvApp = NULL;
   
-  if ( this->Application )
+  if ( this->GetApplication() )
     {
     pvApp =
-      vtkPVApplication::SafeDownCast(this->Application);    
+      vtkPVApplication::SafeDownCast(this->GetApplication());    
     }
   
   if ( this->PVSource && this->ArrayInfo && pvApp )

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWriter);
-vtkCxxRevisionMacro(vtkPVWriter, "1.15");
+vtkCxxRevisionMacro(vtkPVWriter, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVWriter::vtkPVWriter()
@@ -84,7 +84,7 @@ int vtkPVWriter::CanWriteData(vtkDataSet* data, int parallel, int numParts)
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVWriter::GetPVApplication()
 {
-  return vtkPVApplication::SafeDownCast(this->Application);
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------

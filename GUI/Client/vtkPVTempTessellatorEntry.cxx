@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTempTessellatorEntry);
-vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.8");
+vtkCxxRevisionMacro(vtkPVTempTessellatorEntry, "1.9");
 
 //-----------------------------------------------------------------------------
 class vtkTessellatorEntryData
@@ -114,12 +114,13 @@ void vtkPVTempTessellatorEntry::PrintSelf( ostream& os, vtkIndent indent )
 
 void vtkPVTempTessellatorEntry::Create( vtkKWApplication* app )
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
     return;
     }
   this->SetApplication(app);
+
   this->Script( "frame %s", this->GetWidgetName() );
 
   vtkTessellatorEntryData* d = this->Data;
@@ -175,7 +176,7 @@ void vtkPVTempTessellatorEntry::Update()
 {
   vtkTessellatorEntryData* d = this->Data;
 
-  if (this->Application == NULL || d->Property == NULL)
+  if (this->GetApplication() == NULL || d->Property == NULL)
     return;
 
   d->ScalarFieldList->DeleteAll();

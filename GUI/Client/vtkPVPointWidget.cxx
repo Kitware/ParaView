@@ -35,7 +35,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.31");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -367,7 +367,7 @@ void vtkPVPointWidget::SetPosition(double x, double y, double z)
 //----------------------------------------------------------------------------
 void vtkPVPointWidget::GetPosition(double pt[3])
 {
-  if (pt == NULL || this->Application == NULL)
+  if (pt == NULL || this->GetApplication() == NULL)
     {
     vtkErrorMacro("Cannot get your point.");
     return;

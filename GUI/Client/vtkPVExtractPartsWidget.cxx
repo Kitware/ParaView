@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.16");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.17");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -73,7 +73,7 @@ void vtkPVExtractPartsWidget::Create(vtkKWApplication *app)
 {
   vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
 
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("PVWidget already created");
     return;
@@ -151,7 +151,7 @@ void vtkPVExtractPartsWidget::Inactivate()
       label = vtkKWLabel::New();
       label->SetParent(this);
       label->SetLabel(this->PartSelectionList->GetItem(idx));
-      label->Create(this->Application, "");
+      label->Create(this->GetApplication(), "");
       this->Script("pack %s -side top -anchor w",
                    label->GetWidgetName());
       this->PartLabelCollection->AddItem(label);

@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.15");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.16");
 
 //----------------------------------------------------------------------------
 void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
@@ -155,7 +155,7 @@ void vtkPVConnectDialog::OK()
     servers += ",";
     servers += this->Hostname->GetEntry()->GetValueFromIndex(cc);
     }
-  this->Application->SetRegisteryValue(2, "RunTime", "ConnectionServers", servers.c_str());
+  this->GetApplication()->SetRegisteryValue(2, "RunTime", "ConnectionServers", servers.c_str());
 
   this->Superclass::OK();
 }

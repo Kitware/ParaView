@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.12");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.13");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -99,7 +99,7 @@ vtkPVInputProperty* vtkPVFieldMenu::GetInputProperty()
 //----------------------------------------------------------------------------
 void vtkPVFieldMenu::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
     return;

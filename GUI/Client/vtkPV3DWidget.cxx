@@ -33,7 +33,7 @@
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPV3DWidget, "1.51");
+vtkCxxRevisionMacro(vtkPV3DWidget, "1.52");
 
 //===========================================================================
 //***************************************************************************
@@ -104,7 +104,7 @@ void vtkPV3DWidget::Create(vtkKWApplication *kwApp)
 {
   const char* wname;
   
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("3D Widget already created");
     return;

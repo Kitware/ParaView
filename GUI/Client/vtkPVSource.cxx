@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.362");
+vtkCxxRevisionMacro(vtkPVSource, "1.363");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -626,14 +626,14 @@ vtkPVWindow* vtkPVSource::GetPVWindow()
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVSource::GetPVApplication()
 {
-  if (this->Application == NULL)
+  if (this->GetApplication() == NULL)
     {
     return NULL;
     }
   
-  if (this->Application->IsA("vtkPVApplication"))
+  if (this->GetApplication()->IsA("vtkPVApplication"))
     {  
-    return (vtkPVApplication*)(this->Application);
+    return (vtkPVApplication*)(this->GetApplication());
     }
   else
     {
@@ -652,7 +652,7 @@ void vtkPVSource::CreateProperties()
     }
 
   this->Notebook->SetParent(this->ParametersParent);
-  this->Notebook->Create(this->Application,"");
+  this->Notebook->Create(this->GetApplication(),"");
 
   // Set up the pages of the notebook.
   if (!this->HideParametersPage)
@@ -665,7 +665,7 @@ void vtkPVSource::CreateProperties()
     this->Parameters->SetParent(this->ParametersParent);
     }
 
-  this->Parameters->Create(this->Application,"frame","");
+  this->Parameters->Create(this->GetApplication(),"frame","");
   if (!this->HideParametersPage)
     {
     this->Script("pack %s -pady 2 -fill x -expand yes",
@@ -682,14 +682,14 @@ void vtkPVSource::CreateProperties()
   // parameters will be properly aligned (i.e. gridded)
 
   this->DescriptionFrame ->SetParent(this->Parameters);
-  this->DescriptionFrame->Create(this->Application, "frame", "");
+  this->DescriptionFrame->Create(this->GetApplication(), "frame", "");
   this->Script("pack %s -fill both -expand t -side top -padx 2 -pady 2", 
                this->DescriptionFrame->GetWidgetName());
 
   const char *label1_opt = "-width 12 -anchor e";
 
   this->NameLabel->SetParent(this->DescriptionFrame);
-  this->NameLabel->Create(this->Application);
+  this->NameLabel->Create(this->GetApplication());
   this->NameLabel->SetLabel("Name:");
   this->Script("%s configure -anchor w", 
                this->NameLabel->GetLabel2()->GetWidgetName());
@@ -698,11 +698,11 @@ void vtkPVSource::CreateProperties()
   this->Script("pack %s -fill x -expand t", 
                this->NameLabel->GetLabel2()->GetWidgetName());
   vtkKWTkUtilities::ChangeFontWeightToBold(
-    this->Application->GetMainInterp(),
+    this->GetApplication()->GetMainInterp(),
     this->NameLabel->GetLabel2()->GetWidgetName());
 
   this->TypeLabel->SetParent(this->DescriptionFrame);
-  this->TypeLabel->Create(this->Application);
+  this->TypeLabel->Create(this->GetApplication());
   this->TypeLabel->GetLabel()->SetLabel("Class:");
   this->Script("%s configure -anchor w", 
                this->TypeLabel->GetLabel2()->GetWidgetName());
@@ -712,7 +712,7 @@ void vtkPVSource::CreateProperties()
                this->TypeLabel->GetLabel2()->GetWidgetName());
 
   this->LabelEntry->SetParent(this->DescriptionFrame);
-  this->LabelEntry->Create(this->Application);
+  this->LabelEntry->Create(this->GetApplication());
   this->LabelEntry->GetLabel()->SetLabel("Label:");
   this->Script("%s config %s", 
                this->LabelEntry->GetLabel()->GetWidgetName(),label1_opt);
@@ -723,7 +723,7 @@ void vtkPVSource::CreateProperties()
                this->GetTclName());
 
   this->LongHelpLabel->SetParent(this->DescriptionFrame);
-  this->LongHelpLabel->Create(this->Application);
+  this->LongHelpLabel->Create(this->GetApplication());
   this->LongHelpLabel->GetLabel()->SetLabel("Description:");
   this->LongHelpLabel->GetLabel2()->AdjustWrapLengthToWidthOn();
   this->Script("%s configure -anchor w", 
@@ -747,42 +747,42 @@ void vtkPVSource::CreateProperties()
   // The main parameter frame
 
   this->MainParameterFrame->SetParent(this->Parameters);
-  this->MainParameterFrame->Create(this->Application, "frame", "");
+  this->MainParameterFrame->Create(this->GetApplication(), "frame", "");
   this->Script("pack %s -fill both -expand t -side top", 
                this->MainParameterFrame->GetWidgetName());
 
   this->ButtonFrame->SetParent(this->MainParameterFrame);
-  this->ButtonFrame->Create(this->Application, "frame", "");
+  this->ButtonFrame->Create(this->GetApplication(), "frame", "");
   this->Script("pack %s -fill both -expand t -side top", 
                this->ButtonFrame->GetWidgetName());
 
   this->ParameterFrame->SetParent(this->MainParameterFrame);
 
   this->ParameterFrame->ScrollableOn();
-  this->ParameterFrame->Create(this->Application,0);
+  this->ParameterFrame->Create(this->GetApplication(),0);
   this->Script("pack %s -fill both -expand t -side top", 
                this->ParameterFrame->GetWidgetName());
 
   vtkKWWidget *frame = vtkKWWidget::New();
   frame->SetParent(this->ButtonFrame);
-  frame->Create(this->Application, "frame", "");
+  frame->Create(this->GetApplication(), "frame", "");
   this->Script("pack %s -fill x -expand t", frame->GetWidgetName());  
   
   this->AcceptButton->SetParent(frame);
-  this->AcceptButton->Create(this->Application, 
+  this->AcceptButton->Create(this->GetApplication(), 
                              "-text Accept");
   this->AcceptButton->SetCommand(this, "PreAcceptCallback");
   this->AcceptButton->SetBalloonHelpString(
     "Cause the current values in the user interface to take effect");
 
   this->ResetButton->SetParent(frame);
-  this->ResetButton->Create(this->Application, "-text Reset");
+  this->ResetButton->Create(this->GetApplication(), "-text Reset");
   this->ResetButton->SetCommand(this, "ResetCallback");
   this->ResetButton->SetBalloonHelpString(
     "Revert to the previous parameters of the module.");
 
   this->DeleteButton->SetParent(frame);
-  this->DeleteButton->Create(this->Application, "-text Delete");
+  this->DeleteButton->Create(this->GetApplication(), "-text Delete");
   this->DeleteButton->SetCommand(this, "DeleteCallback");
   this->DeleteButton->SetBalloonHelpString(
     "Remove the current module.  "
@@ -811,7 +811,7 @@ void vtkPVSource::CreateProperties()
     pvwProp = static_cast<vtkPVWidgetProperty*>(it->GetObject());
     pvWidget = pvwProp->GetWidget();
     pvWidget->SetParent(this->ParameterFrame->GetFrame());
-    pvWidget->Create(this->Application);
+    pvWidget->Create(this->GetApplication());
     this->Script("pack %s -side top -fill x -expand t", 
                  pvWidget->GetWidgetName());
     it->GoToNextItem();
@@ -822,7 +822,7 @@ void vtkPVSource::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVSource::UpdateDescriptionFrame()
 {
-  if (!this->Application)
+  if (!this->GetApplication())
     {
     return;
     }
@@ -1046,7 +1046,7 @@ void vtkPVSource::SetLabel(const char* arg)
 
   this->SetLabelNoTrace(arg);
 
-  if ( !this->Application )
+  if ( !this->GetApplication() )
     {
     return;
     }
@@ -1160,9 +1160,9 @@ void vtkPVSource::AcceptCallbackInternal()
   int dialogAlreadyUp=0;
   // This is here to prevent the user from killing the
   // application from inside the accept callback.
-  if (!this->Application->GetDialogUp())
+  if (!this->GetApplication()->GetDialogUp())
     {
-    this->Application->SetDialogUp(1);
+    this->GetApplication()->SetDialogUp(1);
     }
   else
     {
@@ -1173,7 +1173,7 @@ void vtkPVSource::AcceptCallbackInternal()
                                           this->GetTclName());
   if (!dialogAlreadyUp)
     {
-    this->Application->SetDialogUp(0);
+    this->GetApplication()->SetDialogUp(0);
     }
 
 
@@ -1483,7 +1483,7 @@ void vtkPVSource::DeleteCallback()
       
       // Show the 3D View settings
       vtkPVApplication *pvApp = 
-        vtkPVApplication::SafeDownCast(this->Application);
+        vtkPVApplication::SafeDownCast(this->GetApplication());
       vtkPVWindow *iwindow = pvApp->GetMainWindow();
       this->Script("%s invoke \"%s\"", 
                    iwindow->GetMenuView()->GetWidgetName(),
@@ -2169,7 +2169,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 
   vtkPVSource* pvs = this->NewInstance();
   // Copy properties
-  pvs->SetApplication(this->Application);
+  pvs->SetApplication(this->GetApplication());
   pvs->SetReplaceInput(this->ReplaceInput);
   pvs->SetParametersParent(this->ParametersParent);
 
@@ -2190,7 +2190,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
 
   pvs->SetModuleName(this->ModuleName);
 
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(pvs->Application);
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(pvs->GetApplication());
   if (!pvApp)
     {
     vtkErrorMacro("vtkPVApplication is not set properly. Aborting clone.");

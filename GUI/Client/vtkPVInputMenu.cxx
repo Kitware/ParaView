@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVInputMenu);
-vtkCxxRevisionMacro(vtkPVInputMenu, "1.58");
+vtkCxxRevisionMacro(vtkPVInputMenu, "1.59");
 
 
 //----------------------------------------------------------------------------
@@ -75,9 +75,9 @@ void vtkPVInputMenu::SetLabel(const char* label)
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
-    vtkErrorMacro("Object has already been created.");
+    vtkErrorMacro("PVInputMenu has already been created.");
     return;
     }
   this->SetApplication(app);
@@ -187,7 +187,7 @@ void vtkPVInputMenu::MenuEntryCallback(vtkPVSource *pvs)
   if ( this->CheckForLoop(pvs) )
     {
     vtkKWMessageDialog::PopupMessage(
-        this->Application, this->GetPVApplication()->GetMainWindow(),
+        this->GetApplication(), this->GetPVApplication()->GetMainWindow(),
         "ParaView Error", 
         "This operation would result in a loop in the pipeline. "
         "Since loops in the pipeline can result in infinite loops, "
@@ -210,7 +210,7 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
     }
 
   this->CurrentValue = pvs;
-  if (this->Application == NULL)
+  if (this->GetApplication() == NULL)
     {
     return;
     }

@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.37");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -138,7 +138,7 @@ void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->LabeledFrame->SetBalloonHelpString(this->BalloonHelpString);
     for (int i=0; i<3; i++)
@@ -153,13 +153,13 @@ void vtkPVExtentEntry::SetBalloonHelpString( const char *str )
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
 {
-  const char* wname;
-  
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("VectorEntry already created");
     return;
     }
+  
+  const char* wname;
   
   // For getting the widget in a script.
   if (this->Label && this->Label[0] &&
@@ -300,7 +300,7 @@ void vtkPVExtentEntry::SetRange(int v0, int v1, int v2,
   this->Range[4] = v4;
   this->Range[5] = v5;
 
-  if (this->Application)
+  if (this->GetApplication())
     {
     this->MinMax[0]->SetRange(v0, v1);
     this->MinMax[1]->SetRange(v2, v3);
@@ -407,7 +407,7 @@ void vtkPVExtentEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   // Lets create a cascade menu to keep things neat.
   cascadeMenu = vtkKWMenu::New();
   cascadeMenu->SetParent(menu);
-  cascadeMenu->Create(this->Application, "-tearoff 0");
+  cascadeMenu->Create(this->GetApplication(), "-tearoff 0");
   menu->AddCascade(this->GetTraceName(), cascadeMenu, 0,
                              "Choose a plane of the extent to animate.");  
   // X

@@ -31,7 +31,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.49");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.50");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -123,7 +123,7 @@ void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
       }
     }
 
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->LabelWidget->SetBalloonHelpString(this->BalloonHelpString);
     this->SubLabels->InitTraversal();
@@ -145,16 +145,17 @@ void vtkPVVectorEntry::SetBalloonHelpString(const char *str)
 //-----------------------------------------------------------------------------
 void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
 {
-  const char* wname;
-  int i;
-  vtkKWEntry* entry;
-  vtkKWLabel* subLabel;
-
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("VectorEntry already created");
     return;
     }
+  this->SetApplication(pvApp);
+
+  const char* wname;
+  int i;
+  vtkKWEntry* entry;
+  vtkKWLabel* subLabel;
 
   // For getting the widget in a script.
   if (this->EntryLabel && this->EntryLabel[0] &&
@@ -164,8 +165,6 @@ void vtkPVVectorEntry::Create(vtkKWApplication *pvApp)
     this->SetTraceName(this->EntryLabel);
     this->SetTraceNameState(vtkPVWidget::SelfInitialized);
     }
-
-  this->SetApplication(pvApp);
 
   // create the top level
   wname = this->GetWidgetName();

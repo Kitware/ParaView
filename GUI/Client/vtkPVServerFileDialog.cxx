@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.31");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.32");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -226,7 +226,7 @@ void vtkPVServerFileDialog::SetMasterWindow(vtkKWWindow* win)
     this->MasterWindow = win; 
     if (this->MasterWindow) 
       { 
-      if (this->Application)
+      if (this->IsCreated())
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
                      this->MasterWindow->GetWidgetName());
@@ -239,17 +239,16 @@ void vtkPVServerFileDialog::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
 {
-  const char *wname;
-  
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Server file dialog already created");
     return;
     }
-  
+ 
   this->SetApplication(app);
 
+  const char *wname;
+  
   // create the top level
   wname = this->GetWidgetName();
   if (this->MasterWindow)
@@ -311,7 +310,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
   command << "-command \"" <<  this->FileList->GetWidgetName()
           << " yview\"" << ends;
   char* commandStr = command.str();
-  this->ScrollBar->Create(this->Application, "scrollbar", commandStr);
+  this->ScrollBar->Create(this->GetApplication(), "scrollbar", commandStr);
   delete[] commandStr;
   this->Script("%s configure -yscrollcommand \"%s set\"", 
                this->FileList->GetWidgetName(),
@@ -427,7 +426,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
   // Icons
   ostrstream folder;
   folder << this->GetWidgetName() << ".folderimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
                                      folder.str(), 
                                      image_PVFolder, 
                                      image_PVFolder_width, 
@@ -442,7 +441,7 @@ void vtkPVServerFileDialog::Create(vtkKWApplication *app, const char *)
 
   ostrstream document;
   document << this->GetWidgetName() << ".documentimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
                                      document.str(), 
                                      image_PVDocument, 
                                      image_PVDocument_width, 
@@ -463,7 +462,7 @@ int vtkPVServerFileDialog::Invoke()
   // Get rid of back slashes.
   this->ConvertLastPath();
 
-  this->Application->SetDialogUp(1);
+  this->GetApplication()->SetDialogUp(1);
   this->UpdateExtensionsMenu();
   // Side effect of UpdateExtensionsMenu is to Update.
   //this->Update();
@@ -523,7 +522,7 @@ int vtkPVServerFileDialog::Invoke()
     {
     this->Script("after 100; update");
     }
-  this->Application->SetDialogUp(0);
+  this->GetApplication()->SetDialogUp(0);
   return this->ReturnValue;
 }
 
@@ -877,7 +876,7 @@ int vtkPVServerFileDialog::CheckExtension(const char* name)
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVServerFileDialog::GetPVApplication()
 {
-  return vtkPVApplication::SafeDownCast(this->Application);
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------
@@ -975,10 +974,10 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
   // Create an image on the left of the label.
   this->Script("%s create image %d %d", this->FileList->GetWidgetName(), 
                x + image_icon_max_width / 2, y);
-  if (this->Application->GetMainInterp()->result)
+  if (this->GetApplication()->GetMainInterp()->result)
     {
     tmp = 
-      vtkString::Duplicate(this->Application->GetMainInterp()->result);
+      vtkString::Duplicate(this->GetApplication()->GetMainInterp()->result);
     if (directory)
       {
       this->Script("%s bind %s <ButtonPress-1> {%s SelectDirectory {%s} %s}",
@@ -1015,7 +1014,7 @@ int vtkPVServerFileDialog::Insert(const char* name, int y, int directory)
                this->FileList->GetWidgetName(), x, y, name, font);
 
   // Make the name hot for picking.
-  result = this->Application->GetMainInterp()->result;
+  result = this->GetApplication()->GetMainInterp()->result;
   tmp = new char[strlen(result)+1];
   strcpy(tmp,result);
   if (directory)
@@ -1055,13 +1054,13 @@ void vtkPVServerFileDialog::SelectFile(const char* name, const char* id)
 
   // Get the bounding box for the name. We need to highlight it.
   this->Script( "%s bbox %s",this->FileList->GetWidgetName(), id);
-  result = this->Application->GetMainInterp()->result;
+  result = this->GetApplication()->GetMainInterp()->result;
   sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
 
   this->Script("%s create rectangle %d %d %d %d -fill yellow -outline {}",
                this->FileList->GetWidgetName(), 
                bbox[0], bbox[1], bbox[2], bbox[3]);
-  this->SetSelectBoxId(this->Application->GetMainInterp()->result);
+  this->SetSelectBoxId(this->GetApplication()->GetMainInterp()->result);
   this->Script( "%s lower %s",this->FileList->GetWidgetName(), this->SelectBoxId);
 
   this->FileNameEntry->SetValue(name);
@@ -1083,13 +1082,13 @@ void vtkPVServerFileDialog::SelectDirectory(const char* name, const char* id)
 
   // Get the bounding box for the name. We need to highlight it.
   this->Script( "%s bbox %s",this->FileList->GetWidgetName(), id);
-  result = this->Application->GetMainInterp()->result;
+  result = this->GetApplication()->GetMainInterp()->result;
   sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
 
   this->Script("%s create rectangle %d %d %d %d -fill yellow -outline {}",
                this->FileList->GetWidgetName(), 
                bbox[0], bbox[1], bbox[2], bbox[3]);
-  this->SetSelectBoxId(this->Application->GetMainInterp()->result);
+  this->SetSelectBoxId(this->GetApplication()->GetMainInterp()->result);
   this->Script( "%s lower %s",this->FileList->GetWidgetName(), this->SelectBoxId);
 
   this->FileNameEntry->SetValue("");

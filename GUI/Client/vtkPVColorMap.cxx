@@ -50,7 +50,7 @@
 #include "vtkPVRenderModule.h"
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.90");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.91");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -362,7 +362,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   const char *grid_settings = "-padx 1 -pady 2";
   const char *label_settings = "-anchor w";
   
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("PVColorMap already created");
     return;
@@ -386,27 +386,27 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->ColorMapFrame->SetParent(this);
   this->ColorMapFrame->ShowHideFrameOn();
-  this->ColorMapFrame->Create(this->Application, 0);
+  this->ColorMapFrame->Create(app, 0);
   this->ColorMapFrame->SetLabel("Color Map");
 
   // Color map: parameter name
 
   this->ArrayNameLabel->SetParent(this->ColorMapFrame->GetFrame());
-  this->ArrayNameLabel->Create(this->Application, "-anchor w");
+  this->ArrayNameLabel->Create(app, "-anchor w");
   this->ArrayNameLabel->SetLabel("Parameter: ");
 
   // Color map: range
 
   this->ColorRangeFrame->SetParent(this->ColorMapFrame->GetFrame());
-  this->ColorRangeFrame->Create(this->Application, "frame", "");
+  this->ColorRangeFrame->Create(app, "frame", "");
 
   this->ColorRangeResetButton->SetParent(this->ColorRangeFrame);
-  this->ColorRangeResetButton->Create(this->Application, 
+  this->ColorRangeResetButton->Create(app, 
                                       "-text {Reset Range}");
   this->ColorRangeResetButton->SetCommand(this, "ResetScalarRange");
 
   this->ColorRangeMinEntry->SetParent(this->ColorRangeFrame);
-  this->ColorRangeMinEntry->Create(this->Application);
+  this->ColorRangeMinEntry->Create(app);
   this->ColorRangeMinEntry->SetLabel("Min:");
   this->ColorRangeMinEntry->GetEntry()->SetWidth(10);
   this->Script("bind %s <KeyPress-Return> {%s ColorRangeEntryCallback}",
@@ -417,7 +417,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
                this->GetTclName()); 
 
   this->ColorRangeMaxEntry->SetParent(this->ColorRangeFrame);
-  this->ColorRangeMaxEntry->Create(this->Application);
+  this->ColorRangeMaxEntry->Create(app);
   this->ColorRangeMaxEntry->SetLabel("Max:");
   this->ColorRangeMaxEntry->GetEntry()->SetWidth(
     this->ColorRangeMinEntry->GetEntry()->GetWidth());
@@ -438,17 +438,17 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   // Color map: gradient editor
 
   this->ColorEditorFrame->SetParent(this->ColorMapFrame->GetFrame());
-  this->ColorEditorFrame->Create(this->Application, "frame", "");
+  this->ColorEditorFrame->Create(app, "frame", "");
 
   this->StartColorButton->SetParent(this->ColorEditorFrame);
   this->StartColorButton->ShowLabelOff();
-  this->StartColorButton->Create(this->Application, "");
+  this->StartColorButton->Create(app, "");
   this->StartColorButton->SetColor(1.0, 0.0, 0.0);
   this->StartColorButton->SetCommand(this, "StartColorButtonCallback");
   this->StartColorButton->SetBalloonHelpString("Select the minimum color.");
 
   this->Map->SetParent(this->ColorEditorFrame);
-  this->Map->Create(this->Application, 
+  this->Map->Create(app, 
                     "-relief flat -bd 0 -highlightthickness 0 -padx 0 -pady 0");
   this->Script("bind %s <Configure> {%s MapConfigureCallback %s}", 
                this->Map->GetWidgetName(), 
@@ -456,13 +456,13 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->EndColorButton->SetParent(this->ColorEditorFrame);
   this->EndColorButton->ShowLabelOff();
-  this->EndColorButton->Create(this->Application, "");
+  this->EndColorButton->Create(app, "");
   this->EndColorButton->SetColor(0.0, 0.0, 1.0);
   this->EndColorButton->SetCommand(this, "EndColorButtonCallback");
   this->EndColorButton->SetBalloonHelpString("Select the maximum color.");
 
   this->PresetsMenuButton->SetParent(this->ColorEditorFrame);
-  this->PresetsMenuButton->Create(this->Application, "-indicator 0");
+  this->PresetsMenuButton->Create(app, "-indicator 0");
   this->PresetsMenuButton->SetBalloonHelpString("Select a preset color map.");
   this->PresetsMenuButton->AddCommand(
     "Blue to Red", 
@@ -494,7 +494,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   // Color map: resolution
 
   this->NumberOfColorsScale->SetParent(this->ColorMapFrame->GetFrame());
-  this->NumberOfColorsScale->Create(this->Application, "");
+  this->NumberOfColorsScale->Create(app, "");
   this->NumberOfColorsScale->SetRange(2, 256);
   this->NumberOfColorsScale->SetValue(256);
   this->NumberOfColorsScale->DisplayLabel("Resolution:");
@@ -520,11 +520,11 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     {
     this->VectorFrame->SetParent(this);
     this->VectorFrame->ShowHideFrameOn();
-    this->VectorFrame->Create(this->Application, 0);
+    this->VectorFrame->Create(app, 0);
     this->VectorFrame->SetLabel("Vector");
 
     this->VectorModeMenu->SetParent(this->VectorFrame->GetFrame());
-    this->VectorModeMenu->Create(this->Application, "");
+    this->VectorModeMenu->Create(app, "");
     this->VectorModeMenu->AddEntryWithCommand("Magnitude", this, 
                                           "VectorModeMagnitudeCallback");
     this->VectorModeMenu->AddEntryWithCommand("Component", this, 
@@ -532,7 +532,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     this->VectorModeMenu->SetValue("Magnitude");
 
     this->VectorComponentMenu->SetParent(this->VectorFrame->GetFrame());
-    this->VectorComponentMenu->Create(this->Application, "");
+    this->VectorComponentMenu->Create(app, "");
     this->UpdateVectorComponentMenu();
     this->Script("pack %s -side left -expand f -fill both -padx 2",
                  this->VectorModeMenu->GetWidgetName());
@@ -546,14 +546,14 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
 
   this->ScalarBarFrame->SetParent(this);
   this->ScalarBarFrame->ShowHideFrameOn();
-  this->ScalarBarFrame->Create(this->Application, 0);
+  this->ScalarBarFrame->Create(app, 0);
   this->ScalarBarFrame->SetLabel("Scalar Bar");
 
   // Scalar bar : Visibility
 
   this->ScalarBarCheck->SetParent(this->ScalarBarFrame->GetFrame());
-  this->ScalarBarCheck->Create(this->Application, "-text Visibility");
-  this->Application->Script(
+  this->ScalarBarCheck->Create(app, "-text Visibility");
+  app->Script(
     "%s configure -command {%s ScalarBarCheckCallback}",
     this->ScalarBarCheck->GetWidgetName(),
     this->GetTclName());
@@ -561,15 +561,15 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   // Scalar bar : Title control
 
   this->ScalarBarTitleFrame->SetParent(this->ScalarBarFrame->GetFrame());
-  this->ScalarBarTitleFrame->Create(this->Application, "frame", "-bd 0");
+  this->ScalarBarTitleFrame->Create(app, "frame", "-bd 0");
 
   this->ScalarBarTitleLabel->SetParent(this->ScalarBarTitleFrame);
   this->ScalarBarTitleLabel->SetLabel("Title:");
-  this->ScalarBarTitleLabel->Create(this->Application, label_settings);
+  this->ScalarBarTitleLabel->Create(app, label_settings);
   
   this->ScalarBarTitleEntry->SetParent(this->ScalarBarTitleFrame);
   this->ScalarBarTitleEntry->SetWidth(10);
-  this->ScalarBarTitleEntry->Create(this->Application, "");
+  this->ScalarBarTitleEntry->Create(app, "");
   this->Script("bind %s <KeyPress-Return> {%s ScalarBarTitleEntryCallback}",
                this->ScalarBarTitleEntry->GetWidgetName(),
                this->GetTclName());
@@ -580,7 +580,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   this->ScalarBarVectorTitleEntry->SetParent(this->ScalarBarTitleFrame);
   this->ScalarBarVectorTitleEntry->SetWidth(
     this->ScalarBarTitleEntry->GetWidth() / 2);
-  this->ScalarBarVectorTitleEntry->Create(this->Application, "");
+  this->ScalarBarVectorTitleEntry->Create(app, "");
   this->Script(
     "bind %s <KeyPress-Return> {%s ScalarBarVectorTitleEntryCallback}",
                this->ScalarBarVectorTitleEntry->GetWidgetName(),
@@ -594,7 +594,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     this->ScalarBar->GetScalarBarActor()->GetTitleTextProperty());
   this->TitleTextPropertyWidget->SetActor2D(
     this->ScalarBar->GetScalarBarActor());
-  this->TitleTextPropertyWidget->Create(this->Application);
+  this->TitleTextPropertyWidget->Create(app);
   this->TitleTextPropertyWidget->SetChangedCommand(this, "RenderView");
   this->TitleTextPropertyWidget->SetTraceReferenceObject(this);
   this->TitleTextPropertyWidget->SetTraceReferenceCommand(
@@ -624,16 +624,16 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   // Scalar bar : Label control
 
   this->ScalarBarLabelFormatFrame->SetParent(this->ScalarBarFrame->GetFrame());
-  this->ScalarBarLabelFormatFrame->Create(this->Application, "frame", "-bd 0");
+  this->ScalarBarLabelFormatFrame->Create(app, "frame", "-bd 0");
 
   this->ScalarBarLabelFormatLabel->SetParent(this->ScalarBarLabelFormatFrame);
   this->ScalarBarLabelFormatLabel->SetLabel("Labels:");
-  this->ScalarBarLabelFormatLabel->Create(this->Application, label_settings);
+  this->ScalarBarLabelFormatLabel->Create(app, label_settings);
   
   this->ScalarBarLabelFormatEntry->SetParent(this->ScalarBarLabelFormatFrame);
   this->ScalarBarLabelFormatEntry->SetWidth(
     this->ScalarBarTitleEntry->GetWidth());
-  this->ScalarBarLabelFormatEntry->Create(this->Application, "");
+  this->ScalarBarLabelFormatEntry->Create(app, "");
   this->Script("bind %s <KeyPress-Return> {%s ScalarBarLabelFormatEntryCallback}",
                this->ScalarBarLabelFormatEntry->GetWidgetName(),
                this->GetTclName());
@@ -651,7 +651,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
     this->ScalarBar->GetScalarBarActor()->GetLabelTextProperty());
   this->LabelTextPropertyWidget->SetActor2D(
     this->ScalarBar->GetScalarBarActor());
-  this->LabelTextPropertyWidget->Create(this->Application);
+  this->LabelTextPropertyWidget->Create(app);
   this->LabelTextPropertyWidget->SetChangedCommand(this, "RenderView");
   this->LabelTextPropertyWidget->SetTraceReferenceObject(this);
   this->LabelTextPropertyWidget->SetTraceReferenceCommand(
@@ -704,7 +704,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   factors[1] = 0.0;
 
   vtkKWTkUtilities::SynchroniseGridsColumnMinimumSize(
-    this->Application->GetMainInterp(), 2, widgets, factors, weights);
+    this->GetApplication()->GetMainInterp(), 2, widgets, factors, weights);
 
   // Scalar bar : pack/grid
 
@@ -718,7 +718,7 @@ void vtkPVColorMap::Create(vtkKWApplication *app)
   // Back button
 
   this->BackButton->SetParent(this);
-  this->BackButton->Create(this->Application, "-text {Back}");
+  this->BackButton->Create(app, "-text {Back}");
   this->BackButton->SetCommand(this, "BackButtonCallback");
 
   // Pack
@@ -784,7 +784,7 @@ void vtkPVColorMap::SetNumberOfVectorComponents(int  num)
 {
   int idx;
 
-  if (this->Application && num != 0)
+  if (this->GetApplication() && num != 0)
     {
     vtkErrorMacro("You must set the number of vector components before "
                   "you create this color map.");
@@ -1499,7 +1499,7 @@ void vtkPVColorMap::ResetScalarRangeInternal()
     component = -1;
     }
 
-  if (this->Application == NULL || this->PVRenderView == NULL)
+  if (this->GetApplication() == NULL || this->PVRenderView == NULL)
     {
     vtkErrorMacro("Trying to reset scalar range without application and view.");
     return;
@@ -1565,14 +1565,14 @@ void vtkPVColorMap::ResetScalarRangeInternal()
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVColorMap::GetPVApplication()
 {
-  if (this->Application == NULL)
+  if (this->GetApplication() == NULL)
     {
     return NULL;
     }
   
-  if (this->Application->IsA("vtkPVApplication"))
+  if (this->GetApplication()->IsA("vtkPVApplication"))
     {  
-    return (vtkPVApplication*)(this->Application);
+    return (vtkPVApplication*)(this->GetApplication());
     }
   else
     {

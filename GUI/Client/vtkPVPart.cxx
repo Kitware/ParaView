@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.50");
+vtkCxxRevisionMacro(vtkPVPart, "1.51");
 
 vtkCxxSetObjectMacro(vtkPVPart, SMPart, vtkSMPart);
 
@@ -270,14 +270,14 @@ vtkClientServerID vtkPVPart::GetVTKDataID()
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVPart::GetPVApplication()
 {
-  if (this->Application == NULL)
+  if (this->GetApplication() == NULL)
     {
     return NULL;
     }
   
-  if (this->Application->IsA("vtkPVApplication"))
+  if (this->GetApplication()->IsA("vtkPVApplication"))
     {  
-    return (vtkPVApplication*)(this->Application);
+    return (vtkPVApplication*)(this->GetApplication());
     }
   else
     {

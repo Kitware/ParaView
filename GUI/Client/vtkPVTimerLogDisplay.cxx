@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.16");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.17");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -127,7 +127,7 @@ void vtkPVTimerLogDisplay::SetMasterWindow(vtkKWWindow* win)
     if (this->MasterWindow) 
       { 
       this->MasterWindow->Register(this); 
-      if (this->Application)
+      if (this->IsCreated())
         {
         this->Script("wm transient %s %s", this->GetWidgetName(), 
                      this->MasterWindow->GetWidgetName());
@@ -141,16 +141,15 @@ void vtkPVTimerLogDisplay::SetMasterWindow(vtkKWWindow* win)
 //----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
 {
-  const char *wname;
-  
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Interactor already created");
     return;
     }
   
   this->SetApplication(app);
+  
+  const char *wname;
   
   // create the top level
   wname = this->GetWidgetName();
@@ -369,8 +368,8 @@ void vtkPVTimerLogDisplay::Save()
   char *filename;
 
   this->Script("tk_getSaveFile -filetypes {{{Text} {.txt}}} -defaultextension .txt -initialfile ParaViewLog.txt");
-  filename = new char[strlen(this->Application->GetMainInterp()->result)+1];
-  sprintf(filename, "%s", this->Application->GetMainInterp()->result);
+  filename = new char[strlen(this->GetApplication()->GetMainInterp()->result)+1];
+  sprintf(filename, "%s", this->GetApplication()->GetMainInterp()->result);
   
   if (strcmp(filename, "") == 0)
     {
@@ -575,7 +574,7 @@ vtkPVTimerInformation* vtkPVTimerLogDisplay::GetTimerInformation()
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVTimerLogDisplay::GetPVApplication()
 {
-  return vtkPVApplication::SafeDownCast(this->Application);
+  return vtkPVApplication::SafeDownCast(this->GetApplication());
 }
 
 //----------------------------------------------------------------------------

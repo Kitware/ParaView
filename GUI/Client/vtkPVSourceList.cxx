@@ -29,7 +29,7 @@
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.34");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -168,7 +168,7 @@ void vtkPVSourceList::ChildCreate()
 
   ostrstream vison;
   vison << this->GetWidgetName() << ".visonimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
                                      vison.str(), 
                                      image_eye_open, 
                                      image_eye_open_width, 
@@ -183,7 +183,7 @@ void vtkPVSourceList::ChildCreate()
 
   ostrstream visoff;
   visoff << this->GetWidgetName() << ".visoffimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
                                      visoff.str(), 
                                      image_eye_gray, 
                                      image_eye_gray_width, 
@@ -198,7 +198,7 @@ void vtkPVSourceList::ChildCreate()
 
   ostrstream visnovis;
   visnovis << this->GetWidgetName() << ".visnovisimg" << ends;
-  if (!vtkKWTkUtilities::UpdatePhoto(this->Application->GetMainInterp(),
+  if (!vtkKWTkUtilities::UpdatePhoto(this->GetApplication()->GetMainInterp(),
                                      visnovis.str(), 
                                      image_eye_novis, 
                                      image_eye_novis_width, 
@@ -268,7 +268,7 @@ void vtkPVSourceList::ChildUpdate(vtkPVSource* current)
   vtkPVSource *comp;
   int y, in;
   
-  vtkPVApplication* app = vtkPVApplication::SafeDownCast(this->Application);
+  vtkPVApplication* app = vtkPVApplication::SafeDownCast(this->GetApplication());
   vtkPVWindow* window = app->GetMainWindow();
   vtkPVSourceCollection* col = window->GetSourceList("Sources");
   
@@ -389,10 +389,10 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in,int current)
 
   this->Script("%s create image %d %d", this->Canvas->GetWidgetName(), 
                in + image_icon_max_width / 2, y);
-  if (this->Application->GetMainInterp()->result)
+  if (this->GetApplication()->GetMainInterp()->result)
     {
     tmp = 
-      vtkString::Duplicate(this->Application->GetMainInterp()->result);
+      vtkString::Duplicate(this->GetApplication()->GetMainInterp()->result);
     this->Script("%s bind %s <ButtonPress-1> {%s ToggleVisibility %d %s 1}",
                  this->Canvas->GetWidgetName(), tmp,
                  this->GetTclName(), compIdx, tmp);
@@ -414,7 +414,7 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in,int current)
   delete [] text;
 
   // Make the name hot for picking.
-  result = this->Application->GetMainInterp()->result;
+  result = this->GetApplication()->GetMainInterp()->result;
   tmp = new char[strlen(result)+1];
   strcpy(tmp,result);
   if (this->CreateSelectionBindings)
@@ -432,7 +432,7 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in,int current)
   this->Script( "%s bbox %s",this->Canvas->GetWidgetName(), tmp);
   delete [] tmp;
   tmp = NULL;
-  result = this->Application->GetMainInterp()->result;
+  result = this->GetApplication()->GetMainInterp()->result;
   sscanf(result, "%d %d %d %d", bbox, bbox+1, bbox+2, bbox+3);
   
   // Highlight the name based on the picked status. 
@@ -442,7 +442,7 @@ int vtkPVSourceList::UpdateSource(vtkPVSource *comp, int y, int in,int current)
     this->Script("%s create rectangle %d %d %d %d -fill yellow -outline {}",
                  this->Canvas->GetWidgetName(), 
                  bbox[0], bbox[1], bbox[2], bbox[3]);
-    tmp = vtkString::Duplicate(this->Application->GetMainInterp()->result);
+    tmp = vtkString::Duplicate(this->GetApplication()->GetMainInterp()->result);
     this->Script( "%s lower %s",this->Canvas->GetWidgetName(), tmp);
     delete [] tmp;
     tmp = NULL;

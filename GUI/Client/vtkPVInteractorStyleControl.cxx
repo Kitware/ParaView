@@ -41,7 +41,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.35");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.36");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -190,7 +190,7 @@ void vtkPVInteractorStyleControl::AddManipulator(const char* name,
 //-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::UpdateMenus()
 {
-  if ( this->Application )
+  if ( this->GetApplication() )
     {
     this->ReadRegistery();
     vtkPVInteractorStyleControlInternal::ManipulatorMap::iterator it;
@@ -226,7 +226,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
       if ( !it->second->IsCreated() )
         {
         it->second->SetParent(this->ArgumentsFrame);
-        it->second->Create(this->Application);
+        it->second->Create(this->GetApplication());
         ostrstream str;
         str << "ChangeArgument " << it->first.c_str() << " " 
           << it->second->GetTclName() << ends;
@@ -236,7 +236,7 @@ void vtkPVInteractorStyleControl::UpdateMenus()
         char manipulator[100];
         char buffer[100];
         sprintf(manipulator, "Manipulator%s", it->first.c_str());
-        if ( this->Application->GetRegisteryValue(2, "RunTime", manipulator,
+        if ( this->GetApplication()->GetRegisteryValue(2, "RunTime", manipulator,
             buffer) &&
           *buffer > 0 )
           {
@@ -304,7 +304,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
   int error =0;
   vtkPVWidget *widget = static_cast<vtkPVWidget*>(
     vtkTclGetPointerFromObject(swidget, "vtkPVWidget", 
-                               this->Application->GetMainInterp(), error));
+                               this->GetApplication()->GetMainInterp(), error));
   if ( !widget )
     {
     vtkErrorMacro("Change argument called without valid widget");
@@ -372,9 +372,9 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     // This is a hack. 
     if ( vtkString::Length(value) > 0 && !vectorEntry ) 
       {
-      const char* val = this->Application->EvaluateString("%s", value);
+      const char* val = this->GetApplication()->EvaluateString("%s", value);
       char *rname = vtkString::Append("Manipulator", name);      
-      this->Application->SetRegisteryValue(2, "RunTime", rname, val);
+      this->GetApplication()->SetRegisteryValue(2, "RunTime", rname, val);
       delete[] rname;
       }
     }
@@ -455,7 +455,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   if ( !clone )
     {
     clone = manipulator->NewInstance();
-    vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
+    vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->GetApplication());
     clone->SetApplication(pvApp);
     this->ManipulatorCollection->AddItem(clone); 
     clone->Delete();
@@ -471,7 +471,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
 //-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::SetLabel(const char* label)
 {
-  if ( this->LabeledFrame && this->Application )
+  if ( this->LabeledFrame)
     {
     ostrstream str;
     str << "Camera Control for " << label << ends;
@@ -525,14 +525,13 @@ vtkPVInteractorStyleControl::GetManipulator(const char* name)
 //-----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 {
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("ScrollableFrame already created");
     return;
     }
-
   this->SetApplication(app);
+
   const char *wname;
   wname = this->GetWidgetName();
   this->Script("frame %s -borderwidth 0 -relief flat",wname);
@@ -608,7 +607,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
   this->UpdateMenus();
 
   this->ArgumentsFrame->SetParent(this->LabeledFrame->GetFrame());
-  this->ArgumentsFrame->Create(this->Application, 0);
+  this->ArgumentsFrame->Create(app, 0);
   this->Script("pack %s -expand true -fill x -side top", 
                this->ArgumentsFrame->GetWidgetName());
 }
@@ -616,7 +615,7 @@ void vtkPVInteractorStyleControl::Create(vtkKWApplication *app, const char*)
 //----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::ReadRegistery()
 {
-  if ( !this->Application || !this->RegisteryName )
+  if ( !this->GetApplication() || !this->RegisteryName )
     {
     vtkErrorMacro("Application and type of Interactor Style Controler"
                   " have to be defined");
@@ -632,7 +631,7 @@ void vtkPVInteractorStyleControl::ReadRegistery()
     buffer[0] = 0;
     sprintf(manipulator, "ManipulatorT%sM%dK%d", 
             this->RegisteryName, mouse, key);
-    if ( this->Application->GetRegisteryValue(2, "RunTime", manipulator,
+    if ( this->GetApplication()->GetRegisteryValue(2, "RunTime", manipulator,
                                               buffer) &&
          *buffer > 0 &&
          this->GetManipulator(buffer) )
@@ -645,7 +644,7 @@ void vtkPVInteractorStyleControl::ReadRegistery()
 //----------------------------------------------------------------------------
 void vtkPVInteractorStyleControl::StoreRegistery()
 {
-  if ( !this->Application || !this->RegisteryName )
+  if ( !this->GetApplication() || !this->RegisteryName )
     {
     return;
     }
@@ -658,7 +657,7 @@ void vtkPVInteractorStyleControl::StoreRegistery()
     
     sprintf(manipulator, "ManipulatorT%sM%dK%d", 
             this->RegisteryName, mouse, key);
-    this->Application->SetRegisteryValue(2, "RunTime", manipulator,
+    this->GetApplication()->SetRegisteryValue(2, "RunTime", manipulator,
                                          this->Menus[cc]->GetValue());
     }
 }
@@ -766,7 +765,7 @@ void vtkPVInteractorStyleControl::ResetWidget(vtkPVCameraManipulator* man,
     this->Script("[ %s GetCurrentManipulator ] Get%s", this->GetTclName(),
                  name);
     strstream str;
-    str << this->Application->GetMainInterp()->result << ends;
+    str << this->GetApplication()->GetMainInterp()->result << ends;
     float f[6] = { 0, 0, 0, 0, 0, 0 };
     int cc;
     for ( cc = 0; cc < vectorEntry->GetVectorLength(); cc ++ )

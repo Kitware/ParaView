@@ -26,7 +26,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVCameraControl);
-vtkCxxRevisionMacro(vtkPVCameraControl, "1.4");
+vtkCxxRevisionMacro(vtkPVCameraControl, "1.5");
 
 vtkCxxSetObjectMacro(vtkPVCameraControl, InteractorStyle,
                      vtkPVInteractorStyleCenterOfRotation);
@@ -200,7 +200,7 @@ void vtkPVCameraControl::Roll(double angle)
 
 void vtkPVCameraControl::Create(vtkKWApplication *app, const char *)
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("vtkPVCameraControl has already been created");
     return;

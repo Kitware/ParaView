@@ -42,7 +42,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCalculatorWidget);
-vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVCalculatorWidget, "1.21");
 
 int vtkPVCalculatorWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -221,14 +221,14 @@ vtkPVCalculatorWidget::~vtkPVCalculatorWidget()
 //----------------------------------------------------------------------------
 void vtkPVCalculatorWidget::Create(vtkKWApplication *app)
 {
-  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
-
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("PVWidget already created");
     return;
     }
   this->SetApplication(app);
+
+  vtkPVApplication* pvApp = vtkPVApplication::SafeDownCast(app);
 
   // create the top level
   this->Script("frame %s -borderwidth 0 -relief flat", this->GetWidgetName());

@@ -29,7 +29,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.27");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -125,9 +125,10 @@ void vtkPVPointSourceWidget::SaveInBatchScript(ofstream *file)
 //-----------------------------------------------------------------------------
 void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
+    return;
     }
   this->SetApplication(app);
 
@@ -151,7 +152,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->RadiusWidget->SetModifiedCommand(this->GetPVSource()->GetTclName(), 
                                        "SetAcceptButtonColorToModified");
   
-  this->RadiusWidget->Create(this->Application);
+  this->RadiusWidget->Create(app);
   this->RadiusProperty = this->RadiusWidget->CreateAppropriateProperty();
   this->RadiusProperty->SetWidget(this->RadiusWidget);
   this->RadiusWidget->SetInputMenu(this->InputMenu);
@@ -213,7 +214,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
   this->NumberOfPointsWidget->SetModifiedCommand(
     this->GetPVSource()->GetTclName(), "SetAcceptButtonColorToModified");
   
-  this->NumberOfPointsWidget->Create(this->Application);
+  this->NumberOfPointsWidget->Create(app);
   this->NumberOfPointsProperty =
     this->NumberOfPointsWidget->CreateAppropriateProperty();
   this->NumberOfPointsProperty->SetWidget(this->NumberOfPointsWidget);
@@ -225,7 +226,7 @@ void vtkPVPointSourceWidget::Create(vtkKWApplication *app)
                  this->NumberOfPointsWidget->GetWidgetName());
     }
   
-  this->PointWidget->Create(this->Application);
+  this->PointWidget->Create(app);
   this->Script("pack %s -side top -fill both -expand true",
                this->PointWidget->GetWidgetName());
 

@@ -38,7 +38,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.43");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.44");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -112,8 +112,7 @@ void vtkPVArraySelection::Create(vtkKWApplication *app)
 {
   const char *wname;
   
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("ArraySelection already created");
     return;
@@ -281,7 +280,7 @@ void vtkPVArraySelection::ResetInternal()
         {
         checkButton = vtkKWCheckButton::New();
         checkButton->SetParent(this->CheckFrame);
-        checkButton->Create(this->Application, "");
+        checkButton->Create(this->GetApplication(), "");
         this->Script("%s SetText {%s}", checkButton->GetTclName(), 
                      this->Selection->GetArrayName(idx));
         this->Script("grid %s -row %d -sticky w", checkButton->GetWidgetName(), row);

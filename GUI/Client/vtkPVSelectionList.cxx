@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectionList);
-vtkCxxRevisionMacro(vtkPVSelectionList, "1.43");
+vtkCxxRevisionMacro(vtkPVSelectionList, "1.44");
 
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -93,7 +93,7 @@ void vtkPVSelectionList::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Label->SetBalloonHelpString(this->BalloonHelpString);
     this->Menu->SetBalloonHelpString(this->BalloonHelpString);
@@ -115,7 +115,7 @@ void vtkPVSelectionList::Disable()
 //----------------------------------------------------------------------------
 void vtkPVSelectionList::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
     return;
@@ -240,7 +240,7 @@ void vtkPVSelectionList::AddItem(const char *name, int value)
 
   // It should be possible to add items without creating
   // the widget. This is necessary for the prototypes.
-  if (this->Application)
+  if (this->GetApplication())
     {
     sprintf(tmp, "SelectCallback {%s} %d", name, value);
     this->Menu->AddEntryWithCommand(name, this, tmp);

@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.19");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.20");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -61,8 +61,7 @@ vtkPVScalarRangeLabel::~vtkPVScalarRangeLabel()
 //----------------------------------------------------------------------------
 void vtkPVScalarRangeLabel::Create(vtkKWApplication *app)
 {
-  // must set the application
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("ScalarRangeLabel already created");
     return;

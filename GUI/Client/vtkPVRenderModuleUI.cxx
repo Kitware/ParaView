@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.7");
+vtkCxxRevisionMacro(vtkPVRenderModuleUI, "1.8");
 
 int vtkPVRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -44,14 +44,14 @@ vtkPVRenderModuleUI::~vtkPVRenderModuleUI()
 //----------------------------------------------------------------------------
 vtkPVApplication* vtkPVRenderModuleUI::GetPVApplication()
 {
-  if (this->Application == NULL)
+  if (this->GetApplication() == NULL)
     {
     return NULL;
     }
   
-  if (this->Application->IsA("vtkPVApplication"))
+  if (this->GetApplication()->IsA("vtkPVApplication"))
     {  
-    return (vtkPVApplication*)(this->Application);
+    return (vtkPVApplication*)(this->GetApplication());
     }
   else
     {
@@ -70,7 +70,7 @@ void vtkPVRenderModuleUI::SetRenderModule(vtkPVRenderModule *)
 //----------------------------------------------------------------------------
 void vtkPVRenderModuleUI::Create(vtkKWApplication* app, const char *)
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Widget has already been created.");
     return;

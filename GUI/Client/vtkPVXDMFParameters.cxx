@@ -146,7 +146,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.19");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.20");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -192,12 +192,11 @@ void vtkPVXDMFParameters::CheckModifiedCallback()
 //----------------------------------------------------------------------------
 void vtkPVXDMFParameters::Create(vtkKWApplication *pvApp)
 {
-  if (this->Application)
+  if (this->IsCreated())
     {
     vtkErrorMacro("XDMFParameters already created");
     return;
     }
-
   this->SetApplication(pvApp);
 
   // create the top level

@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.23");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.24");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -55,9 +55,10 @@ vtkPVContainerWidget::~vtkPVContainerWidget()
 //----------------------------------------------------------------------------
 void vtkPVContainerWidget::Create(vtkKWApplication *app)
 {
-  if (this->Application != NULL)
+  if (this->IsCreated())
     {
     vtkErrorMacro("Object has already been created.");
+    return;
     }
   this->SetApplication(app);
 
@@ -77,7 +78,7 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
     widget = prop->GetWidget();
     if (!widget->GetApplication())
       {
-      widget->Create(this->Application);
+      widget->Create(app);
       this->Script("pack %s -side %s -fill both -expand true",
                    widget->GetWidgetName(), this->PackDirection);
       }

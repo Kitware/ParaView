@@ -35,7 +35,7 @@
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVSphereWidget);
-vtkCxxRevisionMacro(vtkPVSphereWidget, "1.38");
+vtkCxxRevisionMacro(vtkPVSphereWidget, "1.39");
 
 int vtkPVSphereWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -150,7 +150,7 @@ void vtkPVSphereWidget::AcceptInternal(vtkClientServerID sourceID)
   if ( this->SphereID.ID )
     {
     vtkPVApplication *pvApp = static_cast<vtkPVApplication*>(
-      this->Application); 
+      this->GetApplication()); 
     vtkPVProcessModule* pm = pvApp->GetProcessModule();
     double val[3];
     int cc;
@@ -272,7 +272,7 @@ void vtkPVSphereWidget::SetBalloonHelpString(const char *str)
       }
     }
   
-  if ( this->Application && !this->BalloonHelpInitialized )
+  if ( this->GetApplication() && !this->BalloonHelpInitialized )
     {
     this->Labels[0]->SetBalloonHelpString(this->BalloonHelpString);
     this->Labels[1]->SetBalloonHelpString(this->BalloonHelpString);
