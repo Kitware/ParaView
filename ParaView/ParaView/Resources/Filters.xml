@@ -724,7 +724,7 @@
                  trace_name="KernelSize"
                  variable="KernelSize" type="int"
                  length="3"
-                 help="Determines the smoothing nieghborhood."
+                 help="Determines the smoothing neighborhood."
                  default_value="1 1 1"/>
   </Module>
   <Module name="PolyDataNormals"
