@@ -231,10 +231,6 @@ void vtkGetRemoteGhostCells::Execute()
 	polyData->Allocate(input->GetNumberOfCells());
 	this->Controller->Receive((int*)(&numRemotePoints), 1, id,
 				  VTK_NUM_POINTS_TAG);
-	if (myId == 1)
-	  {
-	  cerr << "received " << numRemotePoints << " points" << endl;
-	  }
 	remotePoints = new float[numRemotePoints*3];
 	this->Controller->Receive(remotePoints, numRemotePoints*3, id,
 				  VTK_POINT_COORDS_TAG);
@@ -266,10 +262,6 @@ void vtkGetRemoteGhostCells::Execute()
       
 	this->Controller->Send(polyData, id, VTK_POLY_DATA_TAG);
 	this->Controller->Send(cellIdMap, cellIdCount, id, VTK_CELL_ID_TAG);
-	if (myId == 1)
-	  {
-	  cerr << "sent " << polyData->GetNumberOfCells() << " cells" << endl;
-	  }
 	insertedCells->Reset();
 	polyData->Reset();
 	polyDataPoints->Reset();
@@ -298,11 +290,6 @@ void vtkGetRemoteGhostCells::Execute()
 	    }
 	  } // for all cells sent by this process
 	output->CopyCells(remotePolyData, newCells, outputLocator);
-	if (myId == 0)
-	  {
-	  cerr << "output has " << output->GetNumberOfCells() << " cells"
-	       << endl;
-	  }
 	delete [] cellIdMap;
 	} // if not my process
       } // for all processes
