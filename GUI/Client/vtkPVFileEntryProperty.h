@@ -54,6 +54,11 @@ public:
   // Description:
   // Get the file with given index.
   const char* GetFile(int idx);
+
+  // Description:
+  // Get and set the directory name.
+  vtkSetStringMacro(DirectoryName);
+  vtkGetStringMacro(DirectoryName);
   
 protected:
   vtkPVFileEntryProperty();
@@ -61,6 +66,7 @@ protected:
   
   int TimeStep;
   vtkPVFileEntryPropertyList *Files;
+  char* DirectoryName;
   
 private:
   vtkPVFileEntryProperty(const vtkPVFileEntryProperty&); // Not implemented

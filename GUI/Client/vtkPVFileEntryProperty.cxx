@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVFileEntryProperty);
-vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.4");
+vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.5");
 
 class vtkPVFileEntryPropertyList : vtkstd::vector<vtkstd::string>
 {
@@ -85,6 +85,7 @@ public:
 vtkPVFileEntryProperty::vtkPVFileEntryProperty()
 {
   this->TimeStep = 0;
+  this->DirectoryName = 0;
   this->Files = new vtkPVFileEntryPropertyList;
 }
 
@@ -93,6 +94,7 @@ vtkPVFileEntryProperty::~vtkPVFileEntryProperty()
 {
   delete this->Files;
   this->Files = 0;
+  this->SetDirectoryName(0);
 }
 
 //----------------------------------------------------------------------------

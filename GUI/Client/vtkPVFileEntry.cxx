@@ -71,7 +71,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.80");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.81");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -605,6 +605,8 @@ void vtkPVFileEntry::SetValue(const char* fileName)
       this->Property->AddFile(this->FileListSelect->GetElementFromFinalList(kk));
       }
     char* cfile = new char[ strlen(fileName) + 1];
+    vtkKWDirectoryUtilities::GetFilenamePath(fileName, cfile);
+    this->Property->SetDirectoryName(cfile);
     vtkKWDirectoryUtilities::GetFilenameName(fileName, cfile);
     for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
       {
@@ -803,7 +805,7 @@ void vtkPVFileEntry::SaveInBatchScript(ofstream* file)
     int cc;
     for ( cc = 0; cc < this->Property->GetNumberOfFiles(); cc ++ )
       {
-      *file << "\"" << this->Property->GetFile(cc) << "\" ";
+      *file << "\"" << this->Property->GetDirectoryName() << "/" << this->Property->GetFile(cc) << "\" ";
       }
     *file << "}" << endl;
 
