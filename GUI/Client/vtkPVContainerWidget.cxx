@@ -22,7 +22,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVContainerWidget);
-vtkCxxRevisionMacro(vtkPVContainerWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVContainerWidget, "1.31");
 
 int vtkPVContainerWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -70,7 +70,7 @@ void vtkPVContainerWidget::Create(vtkKWApplication *app)
   
   while( !it->IsDoneWithTraversal() )
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (!widget->GetApplication())
       {
       widget->Create(app);
@@ -99,7 +99,7 @@ int vtkPVContainerWidget::GetModifiedFlag()
   
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (widget->GetModifiedFlag())
       {
       it->Delete();
@@ -123,7 +123,7 @@ void vtkPVContainerWidget::PostAccept()
   
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (widget)
       {
       widget->PostAccept();
@@ -144,7 +144,7 @@ void vtkPVContainerWidget::Accept()
 
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->Accept();
     it->GoToNextItem();
     }
@@ -164,7 +164,7 @@ void vtkPVContainerWidget::AddAnimationScriptsToMenu(vtkKWMenu *menu, vtkPVAnima
 
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->AddAnimationScriptsToMenu(menu, ai);
     it->GoToNextItem();
     }
@@ -188,7 +188,7 @@ void vtkPVContainerWidget::Trace(ofstream *file)
   
   while( !it->IsDoneWithTraversal() )
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->Trace(file);
     it->GoToNextItem();
     }
@@ -206,7 +206,7 @@ void vtkPVContainerWidget::Initialize()
   
   while( !it->IsDoneWithTraversal() )
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->Initialize();
     it->GoToNextItem();
     }
@@ -224,7 +224,7 @@ void vtkPVContainerWidget::ResetInternal()
   
   while( !it->IsDoneWithTraversal() )
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->ResetInternal();
     it->GoToNextItem();
     }
@@ -243,7 +243,7 @@ void vtkPVContainerWidget::Select()
   
   while( !it->IsDoneWithTraversal() )
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->Select();
     it->GoToNextItem();
     }
@@ -262,7 +262,7 @@ void vtkPVContainerWidget::Deselect()
   
   while( !it->IsDoneWithTraversal() )
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->Deselect();
     it->GoToNextItem();
     }
@@ -309,7 +309,7 @@ vtkPVWidget* vtkPVContainerWidget::GetPVWidget(const char* traceName)
   
   while( !it->IsDoneWithTraversal() )
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (widget->GetTraceName() && 
         strcmp(traceName,widget->GetTraceName()) == 0) 
       {
@@ -332,7 +332,7 @@ void vtkPVContainerWidget::SaveInBatchScript(ofstream *file)
   
   while( !it->IsDoneWithTraversal() )
     {
-    widget = static_cast<vtkPVWidget*>(it->GetObject());
+    widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->SaveInBatchScript(file);
     it->GoToNextItem();
     }
@@ -378,7 +378,7 @@ vtkPVWidget* vtkPVContainerWidget::ClonePrototypeInternal(
     
     for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
       {
-      widget = static_cast<vtkPVWidget*>(it->GetObject());
+      widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
       clone = widget->ClonePrototype(pvSource, map);
       clone->SetParent(pvCont);
       pvCont->AddPVWidget(clone);
@@ -466,7 +466,7 @@ void vtkPVContainerWidget::UpdateEnableState()
     !it->IsDoneWithTraversal();
     it->GoToNextItem() )
     {
-    vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetObject());
+    vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetCurrentObject());
     if (widget)
       {
       widget->SetEnabled(this->Enabled);

@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.84");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.85");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -891,13 +891,13 @@ void vtkKWRenderWidget::ResumeScreenRendering()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddProp(vtkProp *prop)
 {
-  this->GetRenderer()->AddProp(prop);
+  this->GetRenderer()->AddViewProp(prop);
 }
 
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddOverlayProp(vtkProp *prop)
 {
-  this->GetOverlayRenderer()->AddProp(prop);
+  this->GetOverlayRenderer()->AddViewProp(prop);
 }
 
 //----------------------------------------------------------------------------
@@ -934,8 +934,8 @@ void vtkKWRenderWidget::RemoveProp(vtkProp* p)
 void vtkKWRenderWidget::RemovePropInternal(vtkProp* prop)
 {
   // safe to call both, vtkViewport does a check first
-  this->GetRenderer()->RemoveProp(prop);
-  this->GetOverlayRenderer()->RemoveProp(prop);
+  this->GetRenderer()->RemoveViewProp(prop);
+  this->GetOverlayRenderer()->RemoveViewProp(prop);
 }
 
 //----------------------------------------------------------------------------

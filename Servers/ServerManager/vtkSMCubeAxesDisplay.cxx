@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMCubeAxesDisplay);
-vtkCxxRevisionMacro(vtkSMCubeAxesDisplay, "1.2");
+vtkCxxRevisionMacro(vtkSMCubeAxesDisplay, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -107,7 +107,7 @@ void vtkSMCubeAxesDisplay::AddToRenderer(vtkClientServerID rendererID)
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << rendererID << "AddProp"
+      << rendererID << "AddViewProp"
       << this->CubeAxesProxy->GetID(i) << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke
@@ -141,7 +141,7 @@ void vtkSMCubeAxesDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << rendererID << "RemoveProp"
+      << rendererID << "RemoveViewProp"
       << this->CubeAxesProxy->GetID(i) << vtkClientServerStream::End;
     pm->GetStream()
       << vtkClientServerStream::Invoke

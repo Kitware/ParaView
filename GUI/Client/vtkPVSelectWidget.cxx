@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.61");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.62");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -348,7 +348,7 @@ void vtkPVSelectWidget::Initialize()
     !it->IsDoneWithTraversal();
     it->GoToNextItem() )
     {
-    vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetObject());
+    vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetCurrentObject());
     if (widget)
       {
       widget->Initialize();
@@ -792,7 +792,7 @@ void vtkPVSelectWidget::UpdateEnableState()
     !it->IsDoneWithTraversal();
     it->GoToNextItem() )
     {
-    vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetObject());
+    vtkPVWidget* widget = vtkPVWidget::SafeDownCast(it->GetCurrentObject());
     if (widget)
       {
       widget->SetEnabled(this->Enabled);

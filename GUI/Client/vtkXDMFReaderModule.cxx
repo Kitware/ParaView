@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.27");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.28");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -416,7 +416,7 @@ void vtkXDMFReaderModule::SaveState(ofstream *file)
   int numWidgets = this->Widgets->GetNumberOfItems();
   for (int i = 0; i < numWidgets; i++)
     {
-    vtkPVWidget* pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    vtkPVWidget* pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     pvw->SaveState(file);
     it->GoToNextItem();
     }

@@ -38,7 +38,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectArrays);
-vtkCxxRevisionMacro(vtkPVSelectArrays, "1.1");
+vtkCxxRevisionMacro(vtkPVSelectArrays, "1.2");
 vtkCxxSetObjectMacro(vtkPVSelectArrays, InputMenu, vtkPVInputMenu);
 
 int vtkPVSelectArraysCommand(ClientData cd, Tcl_Interp *interp,
@@ -582,7 +582,7 @@ void vtkPVSelectArrays::UpdateEnableState()
   vtkCollectionIterator* sit = this->ArrayLabelCollection->NewIterator();
   for ( sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem() )
     {
-    this->PropagateEnableState(vtkKWWidget::SafeDownCast(sit->GetObject()));
+    this->PropagateEnableState(vtkKWWidget::SafeDownCast(sit->GetCurrentObject()));
     }
   sit->Delete();
 

@@ -61,7 +61,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.178");
+vtkCxxRevisionMacro(vtkKWApplication, "1.179");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -1488,7 +1488,7 @@ void vtkKWApplication::UpdateEnableStateForAllWindows()
   vtkCollectionIterator *it = this->Windows->NewIterator();
   for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    vtkKWWindow* win = vtkKWWindow::SafeDownCast(it->GetObject());
+    vtkKWWindow* win = vtkKWWindow::SafeDownCast(it->GetCurrentObject());
     if (win)
       {
       win->UpdateEnableState();

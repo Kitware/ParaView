@@ -90,7 +90,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.136");
+vtkCxxRevisionMacro(vtkKWView, "1.137");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -431,7 +431,7 @@ void vtkKWView::Close()
     {
     c->Close();
     c->SetView(NULL);
-    this->GetViewport()->RemoveProp(c->GetProp());
+    this->GetViewport()->RemoveViewProp(c->GetProp());
     }
   this->Composites->RemoveAllItems();
 }
@@ -738,7 +738,7 @@ void vtkKWView::AddComposite(vtkKWComposite *c)
   this->Composites->AddItem(c);
   if (c->GetProp() != NULL)
     {
-    this->GetViewport()->AddProp(c->GetProp());
+    this->GetViewport()->AddViewProp(c->GetProp());
     }
 }
 
@@ -746,7 +746,7 @@ void vtkKWView::AddComposite(vtkKWComposite *c)
 void vtkKWView::RemoveComposite(vtkKWComposite *c)
 {
   c->SetView(NULL);
-  this->GetViewport()->RemoveProp(c->GetProp());
+  this->GetViewport()->RemoveViewProp(c->GetProp());
   this->Composites->RemoveItem(c);
 }
 
@@ -1569,7 +1569,7 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.136 $");
+  this->ExtractRevision(os,"$Revision: 1.137 $");
 }
 
 //----------------------------------------------------------------------------

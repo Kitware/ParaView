@@ -40,7 +40,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVInteractorStyleControl );
-vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.39");
+vtkCxxRevisionMacro(vtkPVInteractorStyleControl, "1.40");
 
 vtkCxxSetObjectMacro(vtkPVInteractorStyleControl,ManipulatorCollection,
                      vtkCollection);
@@ -136,7 +136,7 @@ vtkPVInteractorStyleControl::~vtkPVInteractorStyleControl()
     while(!it->IsDoneWithTraversal())
       {
       vtkPVCameraManipulator* m = static_cast<vtkPVCameraManipulator*>(
-        it->GetObject());
+        it->GetCurrentObject());
       m->RemoveObserver(this->Observer);
       it->GoToNextItem();
       }
@@ -348,7 +348,7 @@ void vtkPVInteractorStyleControl::ChangeArgument(const char* name,
     while ( !cit->IsDoneWithTraversal() )
       {
       vtkPVCameraManipulator* cman 
-        = static_cast<vtkPVCameraManipulator*>(cit->GetObject());
+        = static_cast<vtkPVCameraManipulator*>(cit->GetCurrentObject());
       if ( *vit == cman->GetManipulatorName() )
         {
         this->CurrentManipulator = cman;
@@ -419,7 +419,7 @@ void vtkPVInteractorStyleControl::SetCurrentManipulator(
   while(!it->IsDoneWithTraversal())
     {
     vtkPVCameraManipulator* access 
-      = static_cast<vtkPVCameraManipulator*>(it->GetObject());
+      = static_cast<vtkPVCameraManipulator*>(it->GetCurrentObject());
     
     // Find previous one that matches the layout
     if ( access->GetButton() == mouse+1 &&
@@ -765,7 +765,7 @@ void vtkPVInteractorStyleControl::SaveState(ofstream *file)
   while (!it->IsDoneWithTraversal())
     {
     vtkPVCameraManipulator *m = static_cast<vtkPVCameraManipulator*>(
-      it->GetObject());
+      it->GetCurrentObject());
     *file << "$kw(" << this->GetTclName() << ") SetCurrentManipulator "
           << m->GetButton() - 1 << " ";
     if (m->GetShift())

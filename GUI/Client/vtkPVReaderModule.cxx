@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.56");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.57");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -290,7 +290,7 @@ void vtkPVReaderModule::SaveState(ofstream *file)
   int numWidgets = this->Widgets->GetNumberOfItems();
   for (int i = 0; i < numWidgets; i++)
     {
-    vtkPVWidget* widget = static_cast<vtkPVWidget*>(it->GetObject());
+    vtkPVWidget* widget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     widget->SaveState(file);
     it->GoToNextItem();
     }
@@ -315,7 +315,7 @@ void vtkPVReaderModule::AddPVFileEntry(vtkPVFileEntry* fileEntry)
   
   vtkCollectionIterator *it = this->Widgets->NewIterator();
   it->InitTraversal();
-  while ( (pvw = static_cast<vtkPVWidget*>(it->GetObject())) )
+  while ( (pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject())) )
     {
     newWidgets->AddItem(pvw);
     it->GoToNextItem();

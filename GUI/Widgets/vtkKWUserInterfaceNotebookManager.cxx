@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWUserInterfaceNotebookManager);
-vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.25");
+vtkCxxRevisionMacro(vtkKWUserInterfaceNotebookManager, "1.26");
 
 int vtkKWUserInterfaceNotebookManagerCommand(ClientData cd, Tcl_Interp *interp,
                                              int argc, char *argv[]);
@@ -664,7 +664,7 @@ void vtkKWUserInterfaceNotebookManager::UpdatePanelDragAndDrop(
   it->InitTraversal();
   while (!it->IsDoneWithTraversal())
     {
-    vtkKWWidget *widget = vtkKWWidget::SafeDownCast(it->GetObject());
+    vtkKWWidget *widget = vtkKWWidget::SafeDownCast(it->GetCurrentObject());
     vtkKWWidget *anchor = 0;
 
     // Enable/Disable Drag & Drop for that widget, 
@@ -812,7 +812,7 @@ vtkKWUserInterfaceNotebookManager::GetDragAndDropWidgetFromLabelAndLocation(
   child_it->InitTraversal(); 
   while (!child_it->IsDoneWithTraversal())
     {
-    vtkKWWidget *child = vtkKWWidget::SafeDownCast(child_it->GetObject());
+    vtkKWWidget *child = vtkKWWidget::SafeDownCast(child_it->GetCurrentObject());
     if (child && child->IsPacked())
       {
       const char *label = this->GetDragAndDropWidgetLabel(child);
@@ -1360,7 +1360,7 @@ void vtkKWUserInterfaceNotebookManager::DragAndDropEndCallback(
   while (!sibbling_it->IsDoneWithTraversal())
     {
     vtkKWWidget *sibbling = 
-      vtkKWWidget::SafeDownCast(sibbling_it->GetObject());
+      vtkKWWidget::SafeDownCast(sibbling_it->GetCurrentObject());
     vtkKWWidget *anchor = 0;
 
     // If a compliant sibbling was found, move the dragged widget after it

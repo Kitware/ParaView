@@ -110,7 +110,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.327");
+vtkCxxRevisionMacro(vtkPVApplication, "1.328");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
@@ -1217,7 +1217,7 @@ void vtkPVApplication::SetShowSourcesLongHelp(int v)
     cit->InitTraversal();
     while (!cit->IsDoneWithTraversal())
       {
-      pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+      pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject()); 
       pvs->UpdateProperties();
       cit->GoToNextItem();
       }

@@ -136,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.344");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.345");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -249,7 +249,7 @@ void vtkPVRenderView::Add2DComposite(vtkKWComposite *c)
   this->Composites->AddItem(c);  
   if (c->GetProp() != NULL)  
     {  
-    this->GetRenderer2D()->AddProp(c->GetProp());  
+    this->GetRenderer2D()->AddViewProp(c->GetProp());  
     }  
 }  
    
@@ -259,7 +259,7 @@ void vtkPVRenderView::Remove2DComposite(vtkKWComposite *c)
 {  
   
   c->SetView(NULL);  
-  this->GetRenderer2D()->RemoveProp(c->GetProp());  
+  this->GetRenderer2D()->RemoveViewProp(c->GetProp());  
   this->Composites->RemoveItem(c);  
 }  
 

@@ -178,7 +178,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.172");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.173");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -949,7 +949,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
     for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
       {
       vtkPVAnimationInterfaceEntry* entry
-        = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+        = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
       if ( entry->GetCustomScript() )
         {
         if ( entry->GetScript() )
@@ -993,7 +993,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
       for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
         {
         vtkPVAnimationInterfaceEntry* entry
-          = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+          = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
         if ( entry->GetPVSource() )
           {
           entry->GetPVSource()->GetNotebook()->SetAcceptButtonColorToUnmodified();
@@ -1005,7 +1005,7 @@ void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
       for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
         {
         vtkPVAnimationInterfaceEntry *entry =
-          vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+          vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
         if (entry->GetPVSource())
           {
           entry->GetPVSource()->GetNotebook()->SetAcceptButtonColorToModified();
@@ -1747,7 +1747,7 @@ int vtkPVAnimationInterface::IsAnimationValid()
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
     vtkPVAnimationInterfaceEntry* entry
-      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
     if ( entry->IsActionValid() )
       {
       return 1;
@@ -1787,7 +1787,7 @@ void vtkPVAnimationInterface::SaveInBatchScript(ofstream *file,
     for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
       {
       vtkPVAnimationInterfaceEntry* entry
-        = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+        = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
       if ( entry->GetCustomScript() )
         {
         }
@@ -2016,7 +2016,7 @@ void vtkPVAnimationInterface::UpdateEntries()
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
     vtkPVAnimationInterfaceEntry* entry
-      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
     entry->CreateLabel(idx);
     const char* label = entry->GetLabel();
     sprintf(command, "ShowEntryInFrameCallback %d", idx);
@@ -2095,7 +2095,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
     for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
       {
       vtkPVAnimationInterfaceEntry* entry
-        = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+        = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
       entry->Prepare();
       // TODO: Why is this referring to only 1 VTK source (0)?
       if ( entry->GetPVSource() && entry->GetPVSource()->GetVTKSourceID(0).ID != 0 )
@@ -2139,7 +2139,7 @@ void vtkPVAnimationInterface::UpdateNewScript()
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
     vtkPVAnimationInterfaceEntry* entry
-      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
     if ( entry->GetScript() )
       {
       str << entry->GetTimeEquation(this->NumberOfFrames) << endl;
@@ -2220,7 +2220,7 @@ void vtkPVAnimationInterface::DeleteSource(vtkPVSource* src)
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem(), cc++ )
     {
     vtkPVAnimationInterfaceEntry* entry
-      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetObject());
+      = vtkPVAnimationInterfaceEntry::SafeDownCast(it->GetCurrentObject());
     if ( entry->GetPVSource() == src )
       {
       this->DeleteSourceItem(cc);
@@ -2319,7 +2319,7 @@ void vtkPVAnimationInterface::UpdateEnableState()
       !this->AnimationEntriesIterator->IsDoneWithTraversal();
       this->AnimationEntriesIterator->GoToNextItem() )
       {
-      vtkKWWidget* widget = vtkKWWidget::SafeDownCast(this->AnimationEntriesIterator->GetObject());
+      vtkKWWidget* widget = vtkKWWidget::SafeDownCast(this->AnimationEntriesIterator->GetCurrentObject());
       if ( widget )
         {
         widget->SetEnabled(this->Enabled);

@@ -28,7 +28,7 @@
 #include "vtkString.h"
 
 vtkStandardNewMacro(vtkPVSourceList);
-vtkCxxRevisionMacro(vtkPVSourceList, "1.37");
+vtkCxxRevisionMacro(vtkPVSourceList, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVSourceList,Sources,vtkPVSourceCollection);
 
@@ -286,7 +286,7 @@ void vtkPVSourceList::ChildUpdate(vtkPVSource* current)
   int lasty = 0, thisy = 0;
   while ( !it->IsDoneWithTraversal() )
     {
-    comp = vtkPVSource::SafeDownCast(it->GetObject());
+    comp = vtkPVSource::SafeDownCast(it->GetCurrentObject());
     if ( current == comp )
       {
       lasty = y;

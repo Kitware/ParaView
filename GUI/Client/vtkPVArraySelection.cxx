@@ -42,7 +42,7 @@ class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.61");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.62");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -283,7 +283,7 @@ void vtkPVArraySelection::UpdateGUI()
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
     check->SetState(this->Selection->ArrayIsEnabled(check->GetText()));
     }
   it->Delete();
@@ -323,7 +323,7 @@ void vtkPVArraySelection::Trace(ofstream *file)
   vtkCollectionIterator* it = this->ArrayCheckButtons->NewIterator();
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
     *file << "$kw(" << this->GetTclName() << ") SetArrayStatus {"
           << check->GetText() << "} " << check->GetState() << endl;
     }
@@ -366,7 +366,7 @@ void vtkPVArraySelection::SetPropertyFromGUI()
     int elemCount = 0;
     for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
       {
-      vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
+      vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
       const char* aname = check->GetText();
       int state = check->GetState();
       // Only send changes to the server. If the state of the
@@ -486,7 +486,7 @@ void vtkPVArraySelection::SaveInBatchScript(ofstream *file)
   numElems=0;
   for(it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
-    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetObject());
+    vtkKWCheckButton* check = static_cast<vtkKWCheckButton*>(it->GetCurrentObject());
     // Since they default to on.
     if(this->Selection->ArrayIsEnabled(check->GetText()))
       {
@@ -575,7 +575,7 @@ void vtkPVArraySelection::UpdateEnableState()
     !it->IsDoneWithTraversal();
     it->GoToNextItem() )
     {
-    this->PropagateEnableState(vtkKWWidget::SafeDownCast(it->GetObject()));
+    this->PropagateEnableState(vtkKWWidget::SafeDownCast(it->GetCurrentObject()));
     }
   it->Delete();
   this->PropagateEnableState(this->NoArraysLabel);

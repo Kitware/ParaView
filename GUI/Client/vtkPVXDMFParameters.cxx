@@ -84,7 +84,7 @@ public:
     vtkCollectionIterator* sit = this->GetWidgetsIterator();
     for ( sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem() )
       {
-      vtkKWScale* scale = (vtkKWScale*)sit->GetObject();
+      vtkKWScale* scale = (vtkKWScale*)sit->GetCurrentObject();
       if ( scale )
         {
         scale->SetParent(0);
@@ -150,7 +150,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.27");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.28");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -334,7 +334,7 @@ void vtkPVXDMFParameters::Accept()
       int idx=0;
       for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
         {
-        vtkKWScale* scale = (vtkKWScale*)it->GetObject();
+        vtkKWScale* scale = (vtkKWScale*)it->GetCurrentObject();
         const char* label = scale->GetShortLabel();
         vtkPVXDMFParametersInternals::Parameter* par =
           this->Internals->GetParameter(label);
@@ -379,7 +379,7 @@ void vtkPVXDMFParameters::Trace(ofstream *file)
   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
   for (it->GoToFirstItem(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
-    vtkKWScale* scale = (vtkKWScale*)it->GetObject();
+    vtkKWScale* scale = (vtkKWScale*)it->GetCurrentObject();
     const char* label = scale->GetShortLabel();
     //cout << "Looking at scale: " << label << endl;
     vtkPVXDMFParametersInternals::Parameter* p = this->Internals->GetParameter(label);
@@ -546,7 +546,7 @@ void vtkPVXDMFParameters::UpdateEnableState()
   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
   for (it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem() )
     {
-    vtkKWScale* scale = (vtkKWScale*)it->GetObject();
+    vtkKWScale* scale = (vtkKWScale*)it->GetCurrentObject();
     this->PropagateEnableState(scale);
     }
 }

@@ -33,7 +33,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPick);
-vtkCxxRevisionMacro(vtkPVPick, "1.12");
+vtkCxxRevisionMacro(vtkPVPick, "1.13");
 
 
 //----------------------------------------------------------------------------
@@ -163,7 +163,7 @@ void vtkPVPick::ClearDataLabels()
   for ( it->InitTraversal(); !it->IsDoneWithTraversal(); it->GoToNextItem())
     {
     vtkKWLabel *label =
-      static_cast<vtkKWLabel*>(it->GetObject());
+      static_cast<vtkKWLabel*>(it->GetCurrentObject());
     if (label == NULL)
       {
       vtkErrorMacro("Only labels should be in this collection.");

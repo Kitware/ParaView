@@ -24,7 +24,7 @@
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.7");
+vtkCxxRevisionMacro(vtkPVInteractorStyle, "1.8");
 vtkStandardNewMacro(vtkPVInteractorStyle);
 
 //-------------------------------------------------------------------------
@@ -78,7 +78,7 @@ void vtkPVInteractorStyle::SetCenterOfRotation(float x, float y, float z)
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
-    m = static_cast<vtkPVCameraManipulator*>(it->GetObject());
+    m = static_cast<vtkPVCameraManipulator*>(it->GetCurrentObject());
     m->SetCenter(x, y, z);
     it->GoToNextItem();
     }

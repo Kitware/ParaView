@@ -136,7 +136,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.627");
+vtkCxxRevisionMacro(vtkPVWindow, "1.628");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1653,7 +1653,7 @@ void vtkPVWindow::ResizeCenterActor()
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
-    pvs = static_cast<vtkPVSource*>( it->GetObject() );
+    pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
     if (pvs->GetVisibility())
       {
       if (first)
@@ -1824,7 +1824,7 @@ vtkPVSource *vtkPVWindow::GetPVSource(const char* listname, char* sourcename)
     it->InitTraversal();
     while ( !it->IsDoneWithTraversal() )
       {
-      pvs = static_cast<vtkPVSource*>( it->GetObject() );
+      pvs = static_cast<vtkPVSource*>( it->GetCurrentObject() );
       if (strcmp(sourcename, pvs->GetName()) == 0)
         {
         it->Delete();
@@ -2740,7 +2740,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
       collIt->InitTraversal();
       while ( !collIt->IsDoneWithTraversal() )
         {
-        pvs = static_cast<vtkPVSource*>(collIt->GetObject()); 
+        pvs = static_cast<vtkPVSource*>(collIt->GetCurrentObject()); 
         pvs->SetVisitedFlag(0);
         collIt->GoToNextItem();
         }
@@ -2762,7 +2762,7 @@ void vtkPVWindow::SaveBatchScript(const char *filename, int offScreenFlag, const
   cit->InitTraversal();
   while ( !cit->IsDoneWithTraversal() )
     {
-    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+    pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject()); 
     pvs->SaveInBatchScript(file);
     cit->GoToNextItem();
     }
@@ -3086,7 +3086,7 @@ void vtkPVWindow::SaveState(const char* filename)
       cit->InitTraversal();
       while ( !cit->IsDoneWithTraversal() )
         {
-        pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+        pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject()); 
         pvs->SetVisitedFlag(0);
         cit->GoToNextItem();
         }
@@ -3103,7 +3103,7 @@ void vtkPVWindow::SaveState(const char* filename)
   cit->InitTraversal();
   while ( !cit->IsDoneWithTraversal() )
     {
-    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+    pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject()); 
     #ifdef PARAVIEW_USE_LOOKMARKS
     if(this->SaveVisibleSourcesOnlyFlag && pvs->GetVisibility())
       pvs->SaveState(file);
@@ -3121,7 +3121,7 @@ void vtkPVWindow::SaveState(const char* filename)
   cit->InitTraversal();
   while ( !cit->IsDoneWithTraversal() )
     {
-    pvs = static_cast<vtkPVSource*>(cit->GetObject()); 
+    pvs = static_cast<vtkPVSource*>(cit->GetCurrentObject()); 
     #ifdef PARAVIEW_USE_LOOKMARKS
     if(this->SaveVisibleSourcesOnlyFlag && pvs->GetVisitedFlag())
       pvs->SaveStateVisibility(file);
@@ -3576,7 +3576,7 @@ void vtkPVWindow::UpdateSelectMenu()
     it->InitTraversal();
     while ( !it->IsDoneWithTraversal() )
       {
-      source = static_cast<vtkPVSource*>(it->GetObject());
+      source = static_cast<vtkPVSource*>(it->GetCurrentObject());
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
       char* label = this->GetPVApplication()->GetTextRepresentation(source);
@@ -3597,7 +3597,7 @@ void vtkPVWindow::UpdateSelectMenu()
     it->InitTraversal();
     while ( !it->IsDoneWithTraversal() )
       {
-      source = static_cast<vtkPVSource*>(it->GetObject());
+      source = static_cast<vtkPVSource*>(it->GetCurrentObject());
       sprintf(methodAndArg, "SetCurrentPVSourceCallback %s", 
               source->GetTclName());
       char* label = this->GetPVApplication()->GetTextRepresentation(source);
@@ -4383,7 +4383,7 @@ vtkPVColorMap* vtkPVWindow::GetPVColorMap(const char* parameterName,
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
-    cm = static_cast<vtkPVColorMap*>(it->GetObject());
+    cm = static_cast<vtkPVColorMap*>(it->GetCurrentObject());
     if (cm->MatchArrayName(parameterName, numberOfComponents))
       {
       it->Delete();
@@ -4713,7 +4713,7 @@ void vtkPVWindow::UpdateEnableState()
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
-    this->PropagateEnableState(static_cast<vtkPVColorMap*>(it->GetObject()));
+    this->PropagateEnableState(static_cast<vtkPVColorMap*>(it->GetCurrentObject()));
     it->GoToNextItem();
     }
   it->Delete();
@@ -4816,7 +4816,7 @@ void vtkPVWindow::UpdateMenuState()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::SetProgress(const char* text, int val)
 {
-  double lastprog = vtkTimerLog::GetCurrentTime();
+  double lastprog = vtkTimerLog::GetUniversalTime();
   if ( !this->ExpectProgress )
     {
     this->LastProgress = lastprog;
@@ -4848,7 +4848,7 @@ void vtkPVWindow::StartProgress()
   this->MainView->StartBlockingRender();
   this->ExpectProgress = 1;
   this->ModifiedEnableState = 0;
-  this->LastProgress = vtkTimerLog::GetCurrentTime();
+  this->LastProgress = vtkTimerLog::GetUniversalTime();
 }
 
 //-----------------------------------------------------------------------------
@@ -4856,7 +4856,7 @@ void vtkPVWindow::EndProgress(int enabled)
 {
   this->ExpectProgress = 0;
   this->GetProgressGauge()->SetValue(0);
-  this->LastProgress = vtkTimerLog::GetCurrentTime();
+  this->LastProgress = vtkTimerLog::GetUniversalTime();
   this->SetStatusText("");
 
   this->MainView->EndBlockingRender();

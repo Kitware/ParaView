@@ -27,7 +27,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPointLabelDisplay);
-vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.2");
+vtkCxxRevisionMacro(vtkSMPointLabelDisplay, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -262,7 +262,7 @@ void vtkSMPointLabelDisplay::AddToRenderer(vtkClientServerID rendererID)
       << vtkClientServerStream::End;    
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << rendererID << "AddProp"
+      << rendererID << "AddViewProp"
       << this->PointLabelActorProxy->GetID(i) << vtkClientServerStream::End;
     }
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
@@ -285,7 +285,7 @@ void vtkSMPointLabelDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
     {
     pm->GetStream()
       << vtkClientServerStream::Invoke
-      << rendererID << "RemoveProp"
+      << rendererID << "RemoveViewProp"
       << this->PointLabelActorProxy->GetID(i) << vtkClientServerStream::End;
     }
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);

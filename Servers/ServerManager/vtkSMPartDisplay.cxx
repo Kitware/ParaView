@@ -45,7 +45,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPartDisplay);
-vtkCxxRevisionMacro(vtkSMPartDisplay, "1.17");
+vtkCxxRevisionMacro(vtkSMPartDisplay, "1.18");
 
 //----------------------------------------------------------------------------
 vtkSMPartDisplay::vtkSMPartDisplay()
@@ -1513,9 +1513,9 @@ void vtkSMPartDisplay::AddToRenderer(vtkClientServerID rendererID)
   for (i = 0; i < num; ++i)
     {
     vtkClientServerStream& stream = pm->GetStream();
-    stream << vtkClientServerStream::Invoke << rendererID << "AddProp"
+    stream << vtkClientServerStream::Invoke << rendererID << "AddViewProp"
             << this->PropProxy->GetID(i) << vtkClientServerStream::End;
-    stream << vtkClientServerStream::Invoke << rendererID << "AddProp"
+    stream << vtkClientServerStream::Invoke << rendererID << "AddViewProp"
             << this->VolumeProxy->GetID(i) << vtkClientServerStream::End;
     }
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
@@ -1531,10 +1531,10 @@ void vtkSMPartDisplay::RemoveFromRenderer(vtkClientServerID rendererID)
     {
     vtkClientServerStream& stream = pm->GetStream();
     stream << vtkClientServerStream::Invoke << rendererID 
-           << "RemoveProp"
+           << "RemoveViewProp"
            << this->PropProxy->GetID(i) << vtkClientServerStream::End;
     stream << vtkClientServerStream::Invoke << rendererID 
-           << "RemoveProp"
+           << "RemoveViewProp"
            << this->VolumeProxy->GetID(i) << vtkClientServerStream::End;
     }
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);

@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.402");
+vtkCxxRevisionMacro(vtkPVSource, "1.403");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -435,7 +435,7 @@ void vtkPVSource::UpdateEnableState()
     int i;
     for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
       {
-      pvWidget = static_cast<vtkPVWidget*>(it->GetObject());
+      pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
       pvWidget->SetEnabled(this->Enabled);
       it->GoToNextItem();
       }
@@ -568,7 +568,7 @@ void vtkPVSource::CreateProperties()
   int i;
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
-    pvWidget = static_cast<vtkPVWidget*>(it->GetObject());
+    pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     pvWidget->SetParent(this->ParameterFrame->GetFrame());
     pvWidget->Create(this->GetApplication());
     if (!pvWidget->GetHideGUI())
@@ -650,7 +650,7 @@ void vtkPVSource::Select()
   it->InitTraversal();
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
-    pvWidget = static_cast<vtkPVWidget*>(it->GetObject());
+    pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     pvWidget->Select();
     it->GoToNextItem();
     }
@@ -675,7 +675,7 @@ void vtkPVSource::Deselect(int)
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
 
-    pvWidget = static_cast<vtkPVWidget*>(it->GetObject());
+    pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     pvWidget->Deselect();
     it->GoToNextItem();
     }
@@ -1442,7 +1442,7 @@ void vtkPVSource::DeleteCallback()
     it->InitTraversal();
     while ( !it->IsDoneWithTraversal() )
       {
-      prev = static_cast<vtkPVSource*>( it->GetObject() );
+      prev = static_cast<vtkPVSource*>( it->GetCurrentObject() );
       if ( prev != this )
         {
         break;
@@ -1509,7 +1509,7 @@ void vtkPVSource::Reset()
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     // Do not try to reset the widget if it is not initialized
     if (pvw && (pvw->GetModifiedFlag() || !this->Initialized) || 
         !this->DataInformationValid)
@@ -1532,7 +1532,7 @@ void vtkPVSource::UpdateVTKObjects()
   vtkCollectionIterator *it = this->Widgets->NewIterator();
   while( !it->IsDoneWithTraversal() )
     {
-    vtkPVWidget* pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    vtkPVWidget* pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (pvw)
       {
       pvw->UpdateVTKObjects();
@@ -1553,7 +1553,7 @@ void vtkPVSource::UpdateVTKSourceParameters()
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (pvw && (!this->Initialized || pvw->GetModifiedFlag()))
       {
       pvw->Accept();
@@ -1569,7 +1569,7 @@ void vtkPVSource::UpdateVTKSourceParameters()
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (pvw)
       {
       pvw->PostAccept();
@@ -1821,7 +1821,7 @@ void vtkPVSource::SaveFilterInBatchScript(ofstream *file)
   it->InitTraversal();
   while ( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     pvw->SaveInBatchScript(file);
     it->GoToNextItem();
     }
@@ -1941,7 +1941,7 @@ void vtkPVSource::SaveState(ofstream *file)
   it->InitTraversal();
   for (i = 0; i < numWidgets; i++)
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     pvw->SaveState(file);
     it->GoToNextItem();
     }
@@ -2318,7 +2318,7 @@ int vtkPVSource::ClonePrototypeInternal(vtkPVSource*& clone)
   int i;
   for (i = 0; i < this->Widgets->GetNumberOfItems(); i++)
     {
-    pvWidget = static_cast<vtkPVWidget*>(it->GetObject());
+    pvWidget = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     clonedWidget = pvWidget->ClonePrototype(pvs, widgetMap);
     pvs->AddPVWidget(clonedWidget);
     clonedWidget->Delete();
@@ -2345,7 +2345,7 @@ void vtkPVSource::InitializeWidgets()
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (pvw && vtkPVInputMenu::SafeDownCast(pvw))
       {
       pvw->Initialize();
@@ -2357,7 +2357,7 @@ void vtkPVSource::InitializeWidgets()
   it->InitTraversal();
   while( !it->IsDoneWithTraversal() )
     {
-    pvw = static_cast<vtkPVWidget*>(it->GetObject());
+    pvw = static_cast<vtkPVWidget*>(it->GetCurrentObject());
     if (pvw && !vtkPVInputMenu::SafeDownCast(pvw))
       {
       pvw->Initialize();

@@ -31,7 +31,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.24");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.25");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -337,7 +337,7 @@ void vtkPVExtractPartsWidget::UpdateEnableState()
   vtkCollectionIterator* sit = this->PartLabelCollection->NewIterator();
   for ( sit->InitTraversal(); !sit->IsDoneWithTraversal(); sit->GoToNextItem() )
     {
-    this->PropagateEnableState(vtkKWWidget::SafeDownCast(sit->GetObject()));
+    this->PropagateEnableState(vtkKWWidget::SafeDownCast(sit->GetCurrentObject()));
     }
   sit->Delete();
 }
