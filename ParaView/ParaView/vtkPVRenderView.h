@@ -363,7 +363,6 @@ public:
 
   // Description:
   // Show the names in sources browser.
-  void SourcesBrowserAlwaysShowNameCallback();
   void SetSourcesBrowserAlwaysShowName(int s);
 
   // Description:
@@ -417,7 +416,6 @@ protected:
 
   vtkKWLabeledFrame *InterfaceSettingsFrame;
   vtkKWCheckButton *Display3DWidgets;
-  vtkKWCheckButton *SourcesBrowserAlwaysShowName;
 
   vtkKWWidget *LODScalesFrame;
   vtkKWLabel *LODResolutionLabel;

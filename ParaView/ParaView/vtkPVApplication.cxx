@@ -56,11 +56,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkDoubleArray.h"
 #include "vtkFloatArray.h"
 #include "vtkIntArray.h"
+#include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWDialog.h"
 #include "vtkKWEvent.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLoadSaveDialog.h"
-#include "vtkPVTraceFileDialog.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWWindowCollection.h"
 #include "vtkLongArray.h"
@@ -68,8 +68,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
+#include "vtkPVData.h"
+#include "vtkPVHelpPaths.h"
+#include "vtkPVProcessModule.h"
+#include "vtkPVRenderGroupDialog.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSourceInterfaceDirectories.h"
+#include "vtkPVTraceFileDialog.h"
 #include "vtkPVWindow.h"
+#include "vtkPolyData.h"
 #include "vtkPolyDataMapper.h"
 #include "vtkProbeFilter.h"
 #include "vtkRenderWindow.h"
@@ -82,12 +89,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkUnsignedIntArray.h"
 #include "vtkUnsignedLongArray.h"
 #include "vtkUnsignedShortArray.h"
-#include "vtkPolyData.h"
-#include "vtkPVHelpPaths.h"
-#include "vtkPVSourceInterfaceDirectories.h"
-#include "vtkPVRenderGroupDialog.h"
-#include "vtkPVData.h"
-#include "vtkPVProcessModule.h"
 
 #include <sys/stat.h>
 #include <stdarg.h>
@@ -104,7 +105,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.167");
+vtkCxxRevisionMacro(vtkPVApplication, "1.168");
 
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,

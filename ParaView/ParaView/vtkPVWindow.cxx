@@ -40,7 +40,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 #include "vtkPVWindow.h"
-#include "vtkPVProcessModule.h"
 
 #include "vtkActor.h"
 #include "vtkArrayMap.txx"
@@ -61,12 +60,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWMessageDialog.h"
 #include "vtkKWNotebook.h"
 #include "vtkKWProgressGauge.h"
+#include "vtkKWPushButton.h"
 #include "vtkKWRadioButton.h"
 #include "vtkKWScale.h"
 #include "vtkKWSplashScreen.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
+#include "vtkKWUserInterfaceNotebookManager.h"
 #include "vtkLinkedList.txx"
 #include "vtkLinkedListIterator.txx"
 #include "vtkMath.h"
@@ -74,6 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 #include "vtkPVAnimationInterface.h"
 #include "vtkPVApplication.h"
+#include "vtkPVApplicationSettingsInterface.h"
 #include "vtkPVCameraManipulator.h"
 #include "vtkPVColorMap.h"
 #include "vtkPVData.h"
@@ -81,12 +83,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVErrorLogDisplay.h"
 #include "vtkPVGenericRenderWindowInteractor.h"
 #include "vtkPVGhostLevelDialog.h"
+#include "vtkPVInitialize.h"
 #include "vtkPVInteractorStyle.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
 #include "vtkPVInteractorStyleControl.h"
-//#include "vtkPVInteractorStyleFly.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVReaderModule.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVSelectCustomReader.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceInterfaceDirectories.h"
@@ -98,9 +102,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkString.h"
 #include "vtkToolkits.h"
-#include "vtkPVInitialize.h"
-#include "vtkPVSelectCustomReader.h"
-#include "vtkKWPushButton.h"
 
 #ifdef _WIN32
 #include "vtkKWRegisteryUtilities.h"
@@ -115,10 +116,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PV_NOCREATE 
 #endif
 
-#define VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY "ToolbarFlatFrame"
-#define VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY "ToolbarFlatButtons"
-#define VTK_PV_SHOW_SOURCES_LONG_HELP_REG_KEY "ShowSourcesLongHelp"
-
 #define VTK_PV_VTK_FILTERS_MENU_LABEL "Filter"
 #define VTK_PV_VTK_SOURCES_MENU_LABEL "Source"
 #define VTK_PV_OPEN_DATA_MENU_LABEL "Open Data"
@@ -127,7 +124,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.401");
+vtkCxxRevisionMacro(vtkPVWindow, "1.402");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -275,17 +272,15 @@ vtkPVWindow::vtkPVWindow()
 
   this->PVColorMaps = vtkCollection::New();
 
-  this->ToolbarSettingsFrame = 0;
-  this->ToolbarSettingsFlatFrameCheck = 0;
-  this->ToolbarSettingsFlatButtonsCheck = 0;
-
   this->CenterActorVisibility = 1;
 
-  this->ShowSourcesLongHelpCheckButton = vtkKWCheckButton::New();
   this->ShowSourcesLongHelp = 1;
 
   this->MenusDisabled = 0;
   this->ToolbarButtonsDisabled = 0;
+
+  this->UserInterfaceManager = 0;
+  this->ApplicationSettingsInterface = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -298,6 +293,20 @@ vtkPVWindow::~vtkPVWindow()
     }
 
   this->PrepareForDelete();
+
+  // First delete the interface panels
+
+  if (this->ApplicationSettingsInterface)
+    {
+    this->ApplicationSettingsInterface->Delete();
+    }
+
+  // Then the interface manager
+
+  if (this->UserInterfaceManager)
+    {
+    this->UserInterfaceManager->Delete();
+    }
 
   //this->FlyButton->Delete();
   //this->FlyButton = NULL;
@@ -358,22 +367,6 @@ vtkPVWindow::~vtkPVWindow()
     this->PVColorMaps->Delete();
     this->PVColorMaps = NULL;
     }
-
-  if (this->ToolbarSettingsFrame)
-    {
-    this->ToolbarSettingsFrame->Delete();
-    }
-  if (this->ToolbarSettingsFlatFrameCheck)
-    {
-    this->ToolbarSettingsFlatFrameCheck->Delete();
-    }
-  if (this->ToolbarSettingsFlatButtonsCheck)
-    {
-    this->ToolbarSettingsFlatButtonsCheck->Delete();
-    }
-
-  this->ShowSourcesLongHelpCheckButton->Delete();
-  this->ShowSourcesLongHelpCheckButton = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -879,6 +872,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Hide the main window until after all user interface is initialized.
   this->Script( "wm withdraw %s", this->GetWidgetName());
 
+  // If we have a user interface manager, it's time to create it
+
+  vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
+  if (uim && !uim->IsCreated())
+    {
+    uim->Create(app);
+    }
+
   // Allow the user to interactively resize the properties parent.
   // The left panel size (Frame1) is restored by vtkKWWindow
   this->MiddleFrame->SetSeparatorSize(5);
@@ -1184,7 +1185,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
     {
     pvApp->GetSplashScreen()->SetProgressMessage("Creating UI (preferences)...");
     }
-  this->AddPreferencesProperties();
 
   // Update toolbar aspect
   this->UpdateToolbarAspect();
@@ -1723,156 +1723,43 @@ void vtkPVWindow::OpenCallback()
   delete [] openFileName;
 }
 
-void vtkPVWindow::AddPreferencesProperties()
+vtkKWUserInterfaceManager* vtkPVWindow::GetUserInterfaceManager()
 {
-  // The "Toolbar settings" frame (GUI settings)
-
-  if (!this->ToolbarSettingsFrame)
+  if (!this->UserInterfaceManager)
     {
-    this->ToolbarSettingsFrame = vtkKWLabeledFrame::New();
+    this->UserInterfaceManager = vtkKWUserInterfaceNotebookManager::New();
+    this->UserInterfaceManager->SetNotebook(this->Notebook);
     }
-
-  this->ToolbarSettingsFrame->SetParent(
-    this->Notebook->GetFrame(VTK_KW_PREFERENCES_PAGE_LABEL));
-  this->ToolbarSettingsFrame->ShowHideFrameOn();
-  this->ToolbarSettingsFrame->Create(this->Application, 0);
-  this->ToolbarSettingsFrame->SetLabel("Toolbar Settings");
-  
-  // Flat aspect ?
-
-  if (!this->ToolbarSettingsFlatFrameCheck)
-    {
-    this->ToolbarSettingsFlatFrameCheck = vtkKWCheckButton::New();
-    }
-
-  this->ToolbarSettingsFlatFrameCheck->SetParent(
-    this->ToolbarSettingsFrame->GetFrame());
-  this->ToolbarSettingsFlatFrameCheck->Create(
-    this->Application, "-text {Flat frame}");
-  if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY))
-    {
-    this->ToolbarSettingsFlatFrameCheck->SetState(
-      this->Application->GetIntRegisteryValue(
-        2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY));
-    }
-  else
-    {
-    this->ToolbarSettingsFlatFrameCheck->SetState(
-      vtkKWToolbar::GetGlobalFlatAspect());
-    }
-  this->ToolbarSettingsFlatFrameCheck->SetCommand(
-    this, "OnToolbarSettingsChange");
-
-  // Flat buttons aspect ?
-
-  if (!this->ToolbarSettingsFlatButtonsCheck)
-    {
-    this->ToolbarSettingsFlatButtonsCheck = vtkKWCheckButton::New();
-    }
-
-  this->ToolbarSettingsFlatButtonsCheck->SetParent(
-    this->ToolbarSettingsFrame->GetFrame());
-  this->ToolbarSettingsFlatButtonsCheck->Create(
-    this->Application, "-text {Flat buttons}");
-  if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY))
-    {
-    this->ToolbarSettingsFlatButtonsCheck->SetState(
-      this->Application->GetIntRegisteryValue(
-        2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY));
-    }
-  else
-    {
-    this->ToolbarSettingsFlatButtonsCheck->SetState(
-      vtkKWToolbar::GetGlobalWidgetsFlatAspect());
-    }
-  this->ToolbarSettingsFlatButtonsCheck->SetCommand(
-    this, "OnToolbarSettingsChange");
-
-  // Pack inside the frame
-
-  this->Script("pack %s %s -side top -anchor w -expand no -fill none",
-               this->ToolbarSettingsFlatFrameCheck->GetWidgetName(),
-               this->ToolbarSettingsFlatButtonsCheck->GetWidgetName());
-
-  // Get the first slave packed in the pref page, and pack everything before
-  // it if it exists
-
-  const char *slave = this->Script(
-    "lindex [pack slaves %s] 0",
-    this->ToolbarSettingsFrame->GetParent()->GetWidgetName());
-
-  ostrstream pack_before;
-  if (slave && *slave)
-    {
-    pack_before << " -before " << slave;
-    }
-  pack_before << ends;
-
-  this->Script
-    ("pack %s %s -side top -anchor w -expand yes -fill x -padx 2 -pady 2",
-     this->ToolbarSettingsFrame->GetWidgetName(),
-     pack_before.str());
-  pack_before.rdbuf()->freeze(0);
-
-  // Interface settings: show sources long help
-  // This settings will be added at the "Application Settings" level. 
-
-  this->ShowSourcesLongHelpCheckButton->SetParent(
-    this->GetInterfaceSettingsFrame()->GetFrame());
-  this->ShowSourcesLongHelpCheckButton->Create(this->Application, "");
-  this->ShowSourcesLongHelpCheckButton->SetText(
-    "Show sources description");
-  this->ShowSourcesLongHelpCheckButton->SetCommand(
-    this, "ShowSourcesLongHelpCheckButtonCallback");
-  this->ShowSourcesLongHelpCheckButton->SetBalloonHelpString(
-    "This advanced option adjusts whether the sources description "
-    "are shown in the parameters page.");
-
-  if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_PV_SHOW_SOURCES_LONG_HELP_REG_KEY) &&
-      !this->Application->GetIntRegisteryValue(
-        2, "RunTime", VTK_PV_SHOW_SOURCES_LONG_HELP_REG_KEY))
-    {
-    this->SetShowSourcesLongHelp(0);
-    }
-  else
-    {
-    this->SetShowSourcesLongHelp(1);
-    }
-
-  this->Script("pack %s -side top -anchor w -expand no -fill none",
-               this->ShowSourcesLongHelpCheckButton->GetWidgetName());
+  return this->UserInterfaceManager;
 }
 
-void vtkPVWindow::OnToolbarSettingsChange()
+vtkKWApplicationSettingsInterface* vtkPVWindow::GetApplicationSettingsInterface()
 {
-  if (this->ToolbarSettingsFlatFrameCheck)
-    {
-    this->Application->SetRegisteryValue(
-      2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY,
-      "%d", this->ToolbarSettingsFlatFrameCheck->GetState());
-    }
+  // If not created, create the application settings interface, connect it
+  // to the current window, and manage it with the current interface manager.
 
-  if (this->ToolbarSettingsFlatButtonsCheck)
+  if (!this->ApplicationSettingsInterface)
     {
-    this->Application->SetRegisteryValue(
-      2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY,
-      "%d", this->ToolbarSettingsFlatButtonsCheck->GetState());
-    }
+    this->ApplicationSettingsInterface= vtkPVApplicationSettingsInterface::New();
+    this->ApplicationSettingsInterface->SetWindow(this);
 
-  this->UpdateToolbarAspect();
+    vtkKWUserInterfaceManager *uim = this->GetUserInterfaceManager();
+    if (uim)
+      {
+      this->ApplicationSettingsInterface->SetUserInterfaceManager(uim);
+      }
+    }
+  return this->ApplicationSettingsInterface;
 }
 
 void vtkPVWindow::UpdateToolbarAspect()
 {
   int flat_frame;
   if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY))
+    2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY))
     {
     flat_frame = this->Application->GetIntRegisteryValue(
-      2, "RunTime", VTK_PV_TOOLBAR_FLAT_FRAME_REG_KEY);
+      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_FRAME_REG_KEY);
     }
   else
     {
@@ -1881,10 +1768,10 @@ void vtkPVWindow::UpdateToolbarAspect()
 
   int flat_buttons;
   if (this->Application->HasRegisteryValue(
-    2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY))
+    2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY))
     {
     flat_buttons = this->Application->GetIntRegisteryValue(
-      2, "RunTime", VTK_PV_TOOLBAR_FLAT_BUTTONS_REG_KEY);
+      2, "RunTime", VTK_PV_ASI_TOOLBAR_FLAT_BUTTONS_REG_KEY);
     }
   else
     {
@@ -1905,18 +1792,15 @@ void vtkPVWindow::UpdateToolbarAspect()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::ShowSourcesLongHelpCheckButtonCallback()
-{
-  int val = this->ShowSourcesLongHelpCheckButton->GetState();
-  this->SetShowSourcesLongHelp(val);
-  this->Application->SetRegisteryValue(
-    2, "RunTime", VTK_PV_SHOW_SOURCES_LONG_HELP_REG_KEY, val ? "1" : "0");
-}
-
-//----------------------------------------------------------------------------
 void vtkPVWindow::SetShowSourcesLongHelp(int v)
 {
-  this->ShowSourcesLongHelpCheckButton->SetState(v);
+  vtkPVApplicationSettingsInterface *asi = 
+    vtkPVApplicationSettingsInterface::SafeDownCast(
+      this->GetApplicationSettingsInterface());
+  if (asi && asi->GetShowSourcesDescriptionCheckButton())
+    {
+    asi->GetShowSourcesDescriptionCheckButton()->SetState(v ? 1 : 0);
+    }
 
   if (this->ShowSourcesLongHelp == v)
     {
@@ -3946,7 +3830,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.401 $");
+  this->ExtractRevision(os,"$Revision: 1.402 $");
 }
 
 //----------------------------------------------------------------------------

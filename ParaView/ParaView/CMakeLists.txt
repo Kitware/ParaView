@@ -15,6 +15,7 @@ vtkPVAdvancedReaderModule.cxx
 vtkPVAnimationInterface.cxx
 vtkPVApplication.cxx 
 vtkPVApplicationResources.cxx 
+vtkPVApplicationSettingsInterface.cxx
 vtkPVArrayCalculator.cxx 
 vtkPVArrayMenu.cxx 
 vtkPVArraySelection.cxx

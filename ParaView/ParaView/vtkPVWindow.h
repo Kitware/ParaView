@@ -92,8 +92,10 @@ class vtkKWRadioButton;
 class vtkKWRotateCameraInteractor;
 class vtkKWScale;
 class vtkKWToolbar;
+class vtkKWUserInterfaceNotebookManager;
 class vtkPVAnimationInterface;
 class vtkPVApplication;
+class vtkPVApplicationSettingsInterface;
 class vtkPVCameraManipulator;
 class vtkPVColorMap;
 class vtkPVData;
@@ -101,7 +103,6 @@ class vtkPVErrorLogDisplay;
 class vtkPVGenericRenderWindowInteractor;
 class vtkPVInteractorStyle;
 class vtkPVInteractorStyleCenterOfRotation;
-//class vtkPVInteractorStyleFly;
 class vtkPVReaderModule;
 class vtkPVRenderView;
 class vtkPVSource;
@@ -469,10 +470,6 @@ public:
   void DisableNavigationWindow();
 
   // Description:
-  // Callback to handle toolbar settings change
-  void OnToolbarSettingsChange();
-
-  // Description:
   // Go to interaction or back to regular rendering speed.
   virtual void SetInteraction(int s);
   vtkBooleanMacro(Interaction,int);
@@ -494,7 +491,17 @@ public:
   virtual void SetShowSourcesLongHelp(int);
   vtkGetMacro(ShowSourcesLongHelp, int);
   vtkBooleanMacro(ShowSourcesLongHelp, int);
-  void ShowSourcesLongHelpCheckButtonCallback();
+
+  // Description:
+  // Get the user interface manager.
+  virtual vtkKWUserInterfaceManager* GetUserInterfaceManager();
+
+  // Description:
+  // Get the application settings interface. 
+  virtual vtkKWApplicationSettingsInterface *GetApplicationSettingsInterface();
+
+  // Callback: update the toolbar aspects once toolbar settings have been changed
+  void UpdateToolbarAspect();
 
 protected:
   vtkPVWindow();
@@ -504,16 +511,10 @@ protected:
   virtual void SerializeSelf(ostream& os, vtkIndent indent);
   virtual void SerializeToken(istream& is, const char token[1024]);
 
-  virtual void AddPreferencesProperties();
-
   int OpenWithReader(const char *fileName, vtkPVReaderModule* reader);
   vtkPVReaderModule* InitializeRead(vtkPVReaderModule* proto, 
                                     const char *fileName);
 
-  vtkKWLabeledFrame *ToolbarSettingsFrame;
-  vtkKWCheckButton  *ToolbarSettingsFlatFrameCheck;
-  vtkKWCheckButton  *ToolbarSettingsFlatButtonsCheck;
- 
   // Main render window
   vtkPVRenderView *MainView;
 
@@ -656,8 +657,6 @@ protected:
   // Create error log display.
   void CreateErrorLogDisplay();
 
-  void UpdateToolbarAspect();
-
   void HideCenterActor();
   void ShowCenterActor();
 
@@ -667,12 +666,14 @@ protected:
 
   void UpdateStatusImage();
 
-  vtkKWCheckButton *ShowSourcesLongHelpCheckButton;
   int ShowSourcesLongHelp;
 
   // To avoid disabling menus multiple times.
   int MenusDisabled;
   int ToolbarButtonsDisabled;
+
+  vtkPVApplicationSettingsInterface *ApplicationSettingsInterface;
+  vtkKWUserInterfaceNotebookManager *UserInterfaceManager;
 
 private:
 
