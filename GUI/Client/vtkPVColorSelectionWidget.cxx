@@ -24,7 +24,7 @@
 #include "vtkPVArrayInformation.h"
 
 vtkStandardNewMacro(vtkPVColorSelectionWidget);
-vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVColorSelectionWidget, "1.1.2.2");
 //-----------------------------------------------------------------------------
 vtkPVColorSelectionWidget::vtkPVColorSelectionWidget()
 {
@@ -110,7 +110,12 @@ void vtkPVColorSelectionWidget::AddArray(const char* pre_text,
 int vtkPVColorSelectionWidget::FormLabel(vtkPVArrayInformation* arrayInfo,
   int field, char *label)
 {
-   if (field != vtkSMDisplayProxy::POINT_FIELD_DATA &&
+  if (!arrayInfo)
+    {
+    vtkErrorMacro("Invalid arrayinfo.");
+    return 0;
+    }
+  if (field != vtkSMDisplayProxy::POINT_FIELD_DATA &&
     field != vtkSMDisplayProxy::CELL_FIELD_DATA)
     {
     vtkErrorMacro("Field  must be POINT_FIELD_DATA or CELL_FIELD_DATA.");
