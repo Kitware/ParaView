@@ -11,9 +11,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKWListBox
+// .NAME vtkKWListBox - List Box
 // .SECTION Description
-// A widget that can have a list of items with a scroll bar.
+// A widget that can have a list of items with a scroll bar. 
+// It uses a scrollbar (yscroll only) and listbox
+// You can configure it into: single, browse, multiple, or extended
 
 #ifndef __vtkKWListBox_h
 #define __vtkKWListBox_h

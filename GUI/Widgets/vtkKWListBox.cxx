@@ -11,14 +11,15 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkKWApplication.h"
 #include "vtkKWListBox.h"
+
+#include "vtkKWApplication.h"
 #include "vtkObjectFactory.h"
 
 
 //----------------------------------------------------------------------------
-vtkStandardNewMacro( vtkKWListBox );
-vtkCxxRevisionMacro(vtkKWListBox, "1.30");
+vtkStandardNewMacro(vtkKWListBox);
+vtkCxxRevisionMacro(vtkKWListBox, "1.31");
 
 
 //----------------------------------------------------------------------------

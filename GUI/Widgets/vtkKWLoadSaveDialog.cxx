@@ -21,7 +21,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLoadSaveDialog );
-vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.36");
+vtkCxxRevisionMacro(vtkKWLoadSaveDialog, "1.37");
 
 vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
 {
@@ -40,6 +40,7 @@ vtkKWLoadSaveDialog::vtkKWLoadSaveDialog()
   this->SetFileTypes("{{Text Document} {.txt}}");
 }
 
+//----------------------------------------------------------------------------
 vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
 {
   this->SetFileTypes(NULL);
@@ -50,6 +51,7 @@ vtkKWLoadSaveDialog::~vtkKWLoadSaveDialog()
   this->SetLastPath(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
 {
   // Call the superclass to set the appropriate flags then create manually
@@ -63,6 +65,7 @@ void vtkKWLoadSaveDialog::Create(vtkKWApplication *app, const char* /*args*/)
   // Nothing else here for now
 }
 
+//----------------------------------------------------------------------------
 int vtkKWLoadSaveDialog::Invoke()
 {
   this->GetApplication()->SetDialogUp(1);

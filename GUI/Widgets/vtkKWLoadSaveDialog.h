@@ -46,7 +46,7 @@ public:
 
   // Description:
   // Set/Get the file types the dialog will open or save
-  // Should be in TK format
+  // Should be in TK format. Default is: "{{Text Document} {.txt}}"
   vtkSetStringMacro(FileTypes);
   vtkGetStringMacro(FileTypes);
 
