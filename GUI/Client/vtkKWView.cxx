@@ -24,12 +24,10 @@
 #include "vtkKWApplication.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWCompositeCollection.h"
 #include "vtkPVCornerAnnotation.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
-#include "vtkKWGenericComposite.h"
 #include "vtkKWIcon.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledFrame.h"
@@ -90,7 +88,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.1");
+vtkCxxRevisionMacro(vtkKWView, "1.2");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,
@@ -135,7 +133,6 @@ vtkKWView::vtkKWView()
   this->ParentWindow = NULL;
   this->PropertiesParent = NULL;
   this->CommandFunction = vtkKWViewCommand;
-  this->Composites = vtkKWCompositeCollection::New();
   this->SharedPropertiesParent = 0;
   this->Notebook = vtkKWNotebook::New();
 
@@ -205,7 +202,6 @@ vtkKWView::~vtkKWView()
   this->Notebook->SetParent(NULL);
   this->Notebook->Delete();
   this->VTKWidget->Delete();
-  this->Composites->Delete();
   this->Label->Delete();
   this->Frame->Delete();
   this->Frame2->Delete();
@@ -335,22 +331,10 @@ void vtkKWView::SetStillUpdateRates( int count, float *rates )
 //----------------------------------------------------------------------------
 void vtkKWView::Close()
 {
-  vtkKWComposite *c;
-       
   if (this->PropertiesCreated)
     {
     this->CornerAnnotation->Close();
     }
-    
-  this->Composites->InitTraversal();
-  while((c = this->Composites->GetNextKWComposite()))
-    {
-    cerr << "Closing composite " << c  << endl;
-    c->Close();
-    c->SetView(NULL);
-    this->GetViewport()->RemoveViewProp(c->GetProp());
-    }
-  this->Composites->RemoveAllItems();
 }
 
 //----------------------------------------------------------------------------
@@ -533,36 +517,6 @@ void vtkKWView::PackProperties()
                    this->PropertiesParent->GetWidgetName());
       }
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWView::AddComposite(vtkKWComposite *c)
-{
-  c->SetView(this);
-  // never allow a composite to be added twice
-  if (this->Composites->IsItemPresent(c))
-    {
-    return;
-    }
-  this->Composites->AddItem(c);
-  if (c->GetProp() != NULL)
-    {
-    this->GetViewport()->AddViewProp(c->GetProp());
-    }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWView::RemoveComposite(vtkKWComposite *c)
-{
-  c->SetView(NULL);
-  this->GetViewport()->RemoveViewProp(c->GetProp());
-  this->Composites->RemoveItem(c);
-}
-
-//----------------------------------------------------------------------------
-int vtkKWView::HasComposite(vtkKWComposite *c)
-{
-  return this->Composites->IsItemPresent(c);
 }
 
 //----------------------------------------------------------------------------
@@ -1171,16 +1125,13 @@ void vtkKWView::UnRegister(vtkObjectBase *o)
     // delete the children if we are about to be deleted
     // the last '1' is for the CornerAnnotation ref
     if (this->ReferenceCount == 
-        (this->Composites->GetNumberOfItems() + 1 +
-         (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0) + 
-         1))
+        (1 + 1 +
+         (this->HasChildren() ? this->GetChildren()->GetNumberOfItems() : 0) ))
       {
-      if (!(this->Composites->IsItemPresent((vtkKWComposite *)o) ||
-            (this->HasChildren() && 
+      if (!((this->HasChildren() && 
              this->GetChildren()->IsItemPresent((vtkKWWidget *)o))))
         {
         vtkKWWidget *child;
-        vtkKWComposite *c;
         
         this->DeletingChildren = 1;
         if (this->HasChildren())
@@ -1191,12 +1142,6 @@ void vtkKWView::UnRegister(vtkObjectBase *o)
             {
             child->SetParent(NULL);
             }
-          }
-        this->Composites->InitTraversal();
-        while ((c = this->Composites->GetNextKWComposite()))
-          {
-          cerr << "Deleting composite " << c << " " << c->GetClassName() << endl;
-          c->SetView(NULL);
           }
         this->CornerAnnotation->SetView(NULL);
         this->DeletingChildren = 0;

@@ -34,12 +34,9 @@
 class vtkKWApplication;
 class vtkKWChangeColorButton;
 class vtkKWCheckButton;
-class vtkKWComposite;
-class vtkKWCompositeCollection;
 class vtkPVCornerAnnotation;
 class vtkKWEntry;
 class vtkKWFrame;
-class vtkKWGenericComposite;
 class vtkKWLabeledFrame;
 class vtkKWLabel;
 class vtkKWMenu;
@@ -151,17 +148,6 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   virtual void ResumeScreenRendering();
   virtual unsigned char *GetMemoryData();
   virtual void *GetMemoryDC();
-  
-  // Description:
-  // Add/Get/Remove the composites.
-  virtual void AddComposite(vtkKWComposite *c);
-  virtual void Add2DComposite(vtkKWComposite *) {}
-  virtual void RemoveComposite(vtkKWComposite *c);
-  virtual void Remove2DComposite(vtkKWComposite *) {}
-  virtual int HasComposite(vtkKWComposite *c);
-  //BTX
-  vtkKWCompositeCollection *GetComposites() {return this->Composites;};
-  //ETX
   
   // Description:
   // Get the attachment point for the Composits properties.
@@ -349,7 +335,6 @@ protected:
   int SharedPropertiesParent;
   float Center[2];
   vtkKWWindow *ParentWindow;
-  vtkKWCompositeCollection *Composites;
   vtkKWWidget *PropertiesParent;
   vtkKWWidget *VTKWidget;
   vtkKWLabel *Label;

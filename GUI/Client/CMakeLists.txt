@@ -48,11 +48,6 @@ SET( ParaViewClientNotWrapped_SRCS
 SET( ParaViewClient_SRCS
   vtkKWBoundsDisplay.cxx
   vtkKWView.cxx
-  vtkKWViewCollection.cxx
-  vtkKWActorComposite.cxx 
-  vtkKWComposite.cxx 
-  vtkKWCompositeCollection.cxx 
-  vtkKWGenericComposite.cxx 
   vtkPV3DWidget.cxx
   vtkPVAdvancedReaderModule.cxx
   vtkPVAnimationInterface.cxx
@@ -197,15 +192,12 @@ IF (PARAVIEW_USE_ICE_T)
 ENDIF (PARAVIEW_USE_ICE_T)
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkKWCompositeCollection.cxx
-  vtkKWViewCollection.cxx
   vtkPVApplicationResources
   vtkPVWindowResources
   WRAP_EXCLUDE
   )
 
 SET_SOURCE_FILES_PROPERTIES(
-  vtkKWComposite.cxx
   vtkKWView.cxx
   vtkPV3DWidget
   vtkPVJoystickFly

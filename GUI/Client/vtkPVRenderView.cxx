@@ -15,6 +15,7 @@
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
 
+#include "vtkCornerAnnotation.h"
 #include "vtkInstantiator.h"
 #include "vtkBMPWriter.h"
 #include "vtkCamera.h"
@@ -28,8 +29,6 @@
 #include "vtkKWApplicationSettingsInterface.h"
 #include "vtkKWChangeColorButton.h"
 #include "vtkKWCheckButton.h"
-#include "vtkKWComposite.h"
-#include "vtkKWCompositeCollection.h"
 #include "vtkPVCornerAnnotation.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
@@ -43,7 +42,6 @@
 #include "vtkKWScale.h"
 #include "vtkKWSplitFrame.h"
 #include "vtkKWWindowCollection.h"
-#include "vtkMultiProcessController.h"
 #include "vtkObjectFactory.h"
 #include "vtkPNGWriter.h"
 #include "vtkPNMWriter.h"
@@ -67,8 +65,6 @@
 #include "vtkPVSourceCollection.h"
 #include "vtkPVSourceList.h"
 #include "vtkPVWindow.h"
-#include "vtkPolyData.h"
-#include "vtkPolyDataMapper.h"
 #include "vtkPostScriptWriter.h"
 #include "vtkRenderer.h"
 #include "vtkRendererCollection.h"
@@ -136,7 +132,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.349");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.350");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -235,37 +231,16 @@ vtkPVRenderView::vtkPVRenderView()
 
 
 //----------------------------------------------------------------------------
-// Only used for corner annotation.
-void vtkPVRenderView::Add2DComposite(vtkKWComposite *c)  
+void vtkPVRenderView::AddAnnotationProp(vtkPVCornerAnnotation *c)  
 {  
-  //int fixme;  // this should be in render module.  
-   
-  c->SetView(this);  
-  // never allow a composite to be added twice  
-  if (this->Composites->IsItemPresent(c))  
-    {  
-    return;  
-    }  
-  this->Composites->AddItem(c);  
-  if (c->GetProp() != NULL)  
-    {  
-    this->GetRenderer2D()->AddViewProp(c->GetProp());  
-    }  
+  this->GetRenderer2D()->AddViewProp(c->GetCornerAnnotation());  
 }  
    
 //----------------------------------------------------------------------------
-// Only used for corner annotation.
-void vtkPVRenderView::Remove2DComposite(vtkKWComposite *c)  
+void vtkPVRenderView::RemoveAnnotationProp(vtkPVCornerAnnotation *c)  
 {  
-  c->SetView(NULL);  
-  this->GetRenderer2D()->RemoveViewProp(c->GetProp());  
-  this->Composites->RemoveItem(c);  
+  this->GetRenderer2D()->RemoveViewProp(c->GetCornerAnnotation());  
 }  
-
-
-
-
-
 
 //----------------------------------------------------------------------------
 vtkRenderWindow* vtkPVRenderView::GetRenderWindow()

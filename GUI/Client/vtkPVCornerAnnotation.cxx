@@ -14,14 +14,13 @@
 #include "vtkPVCornerAnnotation.h"
 
 #include "vtkCornerAnnotation.h"
-#include "vtkKWGenericComposite.h"
 #include "vtkKWTextProperty.h"
-#include "vtkKWView.h"
+#include "vtkPVRenderView.h"
 #include "vtkObjectFactory.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVCornerAnnotation );
-vtkCxxRevisionMacro(vtkPVCornerAnnotation, "1.1");
+vtkCxxRevisionMacro(vtkPVCornerAnnotation, "1.2");
 
 int vtkPVCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -29,26 +28,29 @@ int vtkPVCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVCornerAnnotation::vtkPVCornerAnnotation()
 {
-  this->InternalCornerComposite  = NULL;
-  this->View             = NULL;
+  this->InternalCornerAnnotation = NULL;
+
+  this->View= NULL;
 }
 
 //----------------------------------------------------------------------------
 vtkPVCornerAnnotation::~vtkPVCornerAnnotation()
 {
-  if (this->InternalCornerComposite)
-    {
-    this->InternalCornerComposite->Delete();
-    this->InternalCornerComposite = NULL;
-    }
-
   this->SetView(NULL);
+
+  if (this->InternalCornerAnnotation)
+    {
+    this->InternalCornerAnnotation->Delete();
+    this->InternalCornerAnnotation = NULL;
+    }
 }
 
 //----------------------------------------------------------------------------
-void vtkPVCornerAnnotation::SetView(vtkKWView *_arg)
+void vtkPVCornerAnnotation::SetView(vtkKWView *vw)
 { 
-  if (this->View == _arg) 
+  vtkPVRenderView* rw = vtkPVRenderView::SafeDownCast(vw);
+
+  if (this->View == rw) 
     {
     return;
     }
@@ -58,7 +60,7 @@ void vtkPVCornerAnnotation::SetView(vtkKWView *_arg)
     this->View->UnRegister(this); 
     }
 
-  this->View = _arg;
+  this->View = rw;
 
   // We are now in vtkKWView mode, create the corner prop and the composite
 
@@ -69,21 +71,13 @@ void vtkPVCornerAnnotation::SetView(vtkKWView *_arg)
       {
       this->InternalCornerAnnotation = vtkCornerAnnotation::New();
       this->InternalCornerAnnotation->SetMaximumLineHeight(0.07);
-      }
-    if (!this->InternalCornerComposite)
-      {
-      this->InternalCornerComposite = vtkKWGenericComposite::New();
+      this->InternalCornerAnnotation->VisibilityOff();
       }
     this->CornerAnnotation = this->InternalCornerAnnotation;
     }
   else
     {
     this->CornerAnnotation = NULL;
-    }
-
-  if (this->InternalCornerComposite)
-    {
-    this->InternalCornerComposite->SetProp(this->CornerAnnotation);
     }
 
   this->Modified();
@@ -104,9 +98,7 @@ int vtkPVCornerAnnotation::GetVisibility()
   // annotation, not the state of the checkbutton
 
   return (this->CornerAnnotation &&
-          this->CornerAnnotation->GetVisibility() &&
-          this->View &&  
-          this->View->HasComposite(this->InternalCornerComposite)) ? 1 : 0;
+          this->CornerAnnotation->GetVisibility()) ? 1 : 0;
 }
 
 //----------------------------------------------------------------------------
@@ -122,21 +114,17 @@ void vtkPVCornerAnnotation::SetVisibility(int state)
     if (state)
       {
       this->CornerAnnotation->VisibilityOn();
-      if (this->View && 
-          this->InternalCornerComposite &&
-          !this->View->HasComposite(this->InternalCornerComposite))
+      if (this->View)
         {
-        this->View->Add2DComposite(this->InternalCornerComposite);
+        this->View->AddAnnotationProp(this);
         }
       }
     else
       {
       this->CornerAnnotation->VisibilityOff();
-      if (this->View && 
-          this->InternalCornerComposite &&
-          this->View->HasComposite(this->InternalCornerComposite))
+      if (this->View)
         {
-        this->View->Remove2DComposite(this->InternalCornerComposite);
+        this->View->RemoveAnnotationProp(this);
         }
       }
     }

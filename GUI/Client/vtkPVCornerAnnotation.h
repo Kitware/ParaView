@@ -22,7 +22,9 @@
 
 #include "vtkKWCornerAnnotation.h"
 
+class vtkCornerAnnotation;
 class vtkKWView;
+class vtkPVRenderView;
 
 class VTK_EXPORT vtkPVCornerAnnotation : public vtkKWCornerAnnotation
 {
@@ -34,7 +36,7 @@ public:
   // Description:
   // Set/Get the vtkKWView  that owns this annotation.
   virtual void SetView(vtkKWView*);
-  vtkGetObjectMacro(View,vtkKWView);
+  vtkGetObjectMacro(View,vtkPVRenderView);
 
   // Description:
   // Export the corner annotation to a file.
@@ -50,11 +52,11 @@ protected:
   vtkPVCornerAnnotation();
   ~vtkPVCornerAnnotation();
 
-  vtkKWView               *View;
+  vtkPVRenderView* View;
 
   virtual void Render();
 
-  vtkKWGenericComposite   *InternalCornerComposite;
+  vtkCornerAnnotation     *InternalCornerAnnotation;
 
 private:
   vtkPVCornerAnnotation(const vtkPVCornerAnnotation&); // Not implemented
