@@ -149,8 +149,9 @@ $kw(vtkTemp17) SetCameraState 12.8281 -41.2598 -35.7789 -1.86549 10.1548 8.9481 
 #  }
 
 # Fix the size of the image.
-RenWin1 SetSize 300 300
-RenWin1 Render
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+$RenWin1 Render
 update
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {

@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPartDisplay);
-vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.6");
+vtkCxxRevisionMacro(vtkPVPartDisplay, "1.12.2.7");
 
 
 //----------------------------------------------------------------------------
@@ -121,14 +121,16 @@ vtkPVPartDisplay::~vtkPVPartDisplay()
     }
   this->Property = NULL;
   
-  if (this->UpdateSuppressorID.ID)
+  if (pm && this->UpdateSuppressorID.ID)
     {
     pm->DeleteStreamObject(this->UpdateSuppressorID);
     }
-  pm->SendStreamToClientAndServer();
+  if(pm)
+    {
+    pm->SendStreamToClientAndServer();
+    }
 
   this->SetPart(NULL);
-
   this->SetPVApplication( NULL);
 }
 

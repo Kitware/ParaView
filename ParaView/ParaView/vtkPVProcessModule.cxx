@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.18");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.19");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -535,6 +535,12 @@ vtkObjectBase* vtkPVProcessModule::GetObjectFromID(vtkClientServerID id)
   return this->Interpreter->GetObjectFromID(id);
 }
 
+vtkObjectBase* vtkPVProcessModule::GetObjectFromIntID(unsigned int idin)
+{
+  vtkClientServerID id;
+  id.ID = idin;
+  return this->GetObjectFromID(id);
+}
 
 //----------------------------------------------------------------------------
 void vtkPVProcessModule::DeleteStreamObject(vtkClientServerID id)

@@ -219,19 +219,14 @@ public:
   // from the widget values.
   virtual void UpdateVTKSourceParameters();
 
-  // Description:
-  // Set the vtk source that will be a part of the pipeline.
-  // The pointer to this class is not used.
-  // (VTKSourceTclName is used instead.)
-  const char *GetVTKSourceTclName(int idx);
-  const char *GetVTKSourceTclName();
-  
   void AddVTKSource(const char *tclName);
   void RemoveAllVTKSources();
   int GetNumberOfVTKSources();
   vtkClientServerID GetVTKSourceID(int idx);
+  unsigned int GetVTKSourceIDAsInt(int idx);
   // Legacy
   vtkClientServerID GetVTKSourceID() {return this->GetVTKSourceID(0);}
+  unsigned int GetVTKSourceIDAsInt() {return this->GetVTKSourceIDAsInt(0);}
 
 
   void AddVTKSource(vtkClientServerID);
@@ -501,7 +496,6 @@ protected:
   // for this source. Used by sources like Glyphs
   int HideInformationPage;
 //BTX
-  vtkStringList *VTKSourceTclNames;
   vtkClientServerIDList* VTKSourceIDs;
   vtkClientServerIDList* VTKSourceOuputIDs;
 //ETX

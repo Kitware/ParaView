@@ -46,7 +46,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVServerObject);
-vtkCxxRevisionMacro(vtkPVServerObject, "1.1.2.1");
+vtkCxxRevisionMacro(vtkPVServerObject, "1.1.2.2");
 vtkCxxSetObjectMacro(vtkPVServerObject, ProcessModule, vtkPVProcessModule);
 
 //----------------------------------------------------------------------------
@@ -64,5 +64,13 @@ vtkPVServerObject::~vtkPVServerObject()
 //----------------------------------------------------------------------------
 void vtkPVServerObject::PrintSelf(ostream& os, vtkIndent indent)
 {
-  this->Superclass::PrintSelf(os,indent);
+  this->Superclass::PrintSelf(os,indent); 
+  if(this->ProcessModule)
+    {
+    os << indent << "ProcessModule: " << *this->ProcessModule << endl;
+    }
+  else
+    {
+    os << indent << "ProcessModule: NULL" << endl;
+    }
 }

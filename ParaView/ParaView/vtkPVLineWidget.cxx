@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVProcessModule.h"
 
 vtkStandardNewMacro(vtkPVLineWidget);
-vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.9");
+vtkCxxRevisionMacro(vtkPVLineWidget, "1.38.2.10");
 
 //----------------------------------------------------------------------------
 vtkPVLineWidget::vtkPVLineWidget()
@@ -387,8 +387,8 @@ void vtkPVLineWidget::UpdateVTKObject(vtkClientServerID sourceID)
     sprintf(acceptCmd, "Set%s", this->Point2Variable);
     pm->GetStream() << vtkClientServerStream::Invoke << sourceID
                     << acceptCmd << this->Point1[0]->GetValueAsFloat()
-                    << this->Point1[1]->GetValueAsFloat()
-                    << this->Point1[2]->GetValueAsFloat()
+                    << this->Point2[1]->GetValueAsFloat()
+                    << this->Point2[2]->GetValueAsFloat()
                     << vtkClientServerStream::End;
     }
   if ( this->ResolutionVariable && sourceID.ID )

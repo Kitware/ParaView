@@ -145,7 +145,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.23");
+vtkCxxRevisionMacro(vtkPVWindow, "1.475.2.24");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -419,7 +419,11 @@ void vtkPVWindow::CloseNoPrompt()
 void vtkPVWindow::PrepareForDelete()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
+  vtkPVProcessModule* pm = 0;
+  if(pvApp)
+    {
+    pm = pvApp->GetProcessModule();
+    }
   
   if (pvApp && this->CenterSourceID.ID)
     {
@@ -602,7 +606,10 @@ void vtkPVWindow::PrepareForDelete()
     this->GlyphMenu->Delete();
     this->GlyphMenu = NULL;
     }
-  pm->SendStreamToClientAndServer();
+  if(pm)
+    {
+    pm->SendStreamToClientAndServer();
+    }
 }
 
 

@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.14.4.2");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.14.4.3");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -149,7 +149,11 @@ vtkPVRenderModule::~vtkPVRenderModule()
       }
     this->RenderWindowID.ID = 0;
     }
-  pm->SendStreamToClientAndServer();
+  if(pm)
+    {
+    pm->SendStreamToClientAndServer();
+    }
+  
   this->SetPVApplication(NULL);
 }
 

@@ -78,7 +78,8 @@ if {[$Application GetExitStatus]} {
 $VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
-RenWin1 SetSize 300 300
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
 
 [$pvExtract GetPVOutput] SetVisibility 0
 
@@ -95,7 +96,8 @@ $pvGlyph AcceptCallback
 
 set cntOutput [$cInt GetPVOutput]
 
-set camera [Ren1 GetActiveCamera]
+set Ren1 [[[$Application GetMainWindow] GetMainView] GetRenderer]
+set camera [$Ren1 GetActiveCamera]
 $camera SetPosition -29.1076 -40.3242 38.8874
 $camera SetFocalPoint 8.255 0 29.7631
 $camera SetViewUp -0.00809309 0.227813 0.973671
@@ -123,11 +125,12 @@ $cntOutput ColorByPointField Momentum 3
 $cntOutput SetScalarBarVisibility 1
 $cInt UpdateParameterWidgets
 
-RenWin1 SetSize 300 300
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
 
 for {set i 0} {$i < 1} {incr i 1} {
     $camera Azimuth 10
-    RenWin1 Render
+    $RenWin1 Render
     update
 }
 
@@ -158,7 +161,7 @@ $camera SetClippingRange 15.0904 64.6074
 
 $VOIEntry SetValue 0 0 0 32 3 20
 $pvExtract AcceptCallback
-RenWin1 Render
+$RenWin1 Render
 
 set extOutput [$pvExtract GetPVOutput]
 $extOutput ColorByPointField {Density} 1
@@ -167,7 +170,7 @@ $extOutput SetScalarBarVisibility 1
 for {set i 55} {$i < 56} {incr i 1} {
     $VOIEntry SetValue $i $i 0 32 3 20
     $pvExtract AcceptCallback
-    RenWin1 Render
+    $RenWin1 Render
     update
 }
 

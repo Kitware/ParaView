@@ -30,8 +30,10 @@ $pv(vtkTemp1) ResetCameraCallback
 $pv(vtkTemp1) SetCurrentPVSourceCallback $pv(vtkTemp98)
 $pv(vtkTemp1) ShowCurrentSourcePropertiesCallback
 
+
 # Position the camera
-set camera [Ren1 GetActiveCamera]
+set Ren1 [[[$Application GetMainWindow] GetMainView] GetRenderer]
+set camera [$Ren1 GetActiveCamera]
 $camera  SetPosition 7.96507 9.75632 6.90566
 $camera SetFocalPoint 0.190213 2.17507 -0.136077
 $camera SetViewUp 0.252184 0.506968 -0.824249
@@ -51,8 +53,9 @@ $camera SetClippingRange 8.34501 19.084
 #}
 
 # Fix the size of the image.
-RenWin1 SetSize 300 300
-RenWin1 Render
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+$RenWin1 Render
 update
 
 for {set i  1} {$i < [expr $argc - 1]} {incr i} {

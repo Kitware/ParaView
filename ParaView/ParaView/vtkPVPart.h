@@ -151,20 +151,20 @@ public:
   void SetPartDisplay(vtkPVPartDisplay* pDisp);
 
   // Description:
-  // VTKSourceIndex points to the VTKSourceTclName in this
+  // VTKSourceIndex points to the VTKSourceID in this
   // part's PVSource. The tcl name of the VTK source that produced
   // the data in this part can be obtained with
-  // source->GetVTKSourceTclName(part->GetVTKSourceIndex())
+  // source->GetVTKSourceID(part->GetVTKSourceIndex())
   // This is used during batch file generation.
   vtkGetMacro(VTKSourceIndex, int);
   vtkSetMacro(VTKSourceIndex, int);
 
   // Description:
-  // VTKOutputIndex together with  VTKSourceTclName is used
+  // VTKOutputIndex together with  VTKSourceID is used
   // to obtain the source of the data object in this part.
   // For example, the output in this data object is obtained
   // with "%s GetOutput %d",
-  // source->GetVTKSourceTclName(part->GetVTKSourceIndex()),
+  // source->GetVTKSourceID(part->GetVTKSourceIndex()),
   // part->GetVTKOutputIndex()
   // This is used during batch file generation.
   vtkGetMacro(VTKOutputIndex, int);

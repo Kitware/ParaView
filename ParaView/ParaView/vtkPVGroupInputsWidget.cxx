@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.13.4.3");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.13.4.4");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -202,7 +202,7 @@ void vtkPVGroupInputsWidget::AcceptInternal(vtkClientServerID vtkSourceID)
 
   // Now loop through the input mask setting the selection states.
   pvApp->GetProcessModule()->GetStream() << 
-    vtkClientServerStream::Invoke << vtkSourceID << "RemoveAllItems" << 
+    vtkClientServerStream::Invoke << vtkSourceID << "RemoveAllInputs" << 
     vtkClientServerStream::End;
   pvApp->GetProcessModule()->SendStreamToServer();
   this->PVSource->RemoveAllPVInputs();  

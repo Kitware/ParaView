@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVStringWidgetProperty);
-vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.6");
+vtkCxxRevisionMacro(vtkPVStringWidgetProperty, "1.1.2.7");
 
 vtkPVStringWidgetProperty::vtkPVStringWidgetProperty()
 {
@@ -110,6 +110,7 @@ void vtkPVStringWidgetProperty::PrintSelf(ostream& os, vtkIndent indent)
   
   os << indent << "String: " << (this->String ? this->String : "(none)")
      << endl;
+  os << indent << "ObjectID: " << this->ObjectID << endl;
   os << indent << "VTKCommand: " << (this->VTKCommand ? this->VTKCommand :
                                      "(none")
      << endl;

@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.20");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.21");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -676,8 +676,20 @@ int vtkPVSource::GetNumberOfVTKSources()
 }
 
 //----------------------------------------------------------------------------
+unsigned int vtkPVSource::GetVTKSourceIDAsInt(int idx)
+{
+  vtkClientServerID id = this->GetVTKSourceID(idx);
+  return id.ID;
+}
+
+//----------------------------------------------------------------------------
 vtkClientServerID vtkPVSource::GetVTKSourceID(int idx)
 {
+  if(static_cast<size_t>(idx) >= this->VTKSourceIDs->size())
+    {
+    vtkClientServerID id = {0};
+    return id;
+    }
   return (*this->VTKSourceIDs)[idx];
 }
 
@@ -2542,13 +2554,4 @@ void vtkPVSource::PrintSelf(ostream& os, vtkIndent indent)
      << this->NumberOfOutputsInformation << endl;
 }
 
-const char *vtkPVSource::GetVTKSourceTclName(int)
-{
-  return "";
-}
-
-const char *vtkPVSource::GetVTKSourceTclName()
-{
-  return "";
-}
 

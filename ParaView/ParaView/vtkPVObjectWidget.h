@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .NOTE
 // Since we have created the AcceptInternal method that has the object tcl
 // name as an argument, many classes do not need this superclass or
-// use its ivar ObjectTclName.  I have not removed the class because I believe
+// use its ivar ObjectID.  I have not removed the class because I believe
 // some widgets use this class when the object is a PV object and not a VTK object.
 // I will have to clean this up later
 
@@ -70,9 +70,6 @@ public:
   // some objects state/ivars.  This is one way the object/variable
   // can be specified. Subclasses may have seperate or addition
   // variables for specifying the relationship.
-//  void SetObjectVariable(const char *objectTclName, const char *var);
-//  vtkSetStringMacro(ObjectTclName);
-//  vtkGetStringMacro(ObjectTclName);
   vtkSetMacro(ObjectID,vtkClientServerID);
   vtkSetStringMacro(VariableName);
   vtkGetStringMacro(VariableName);

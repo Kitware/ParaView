@@ -159,6 +159,11 @@ public:
   // Description:
   // Get a file selection dialog instance.
   virtual vtkKWLoadSaveDialog* NewLoadSaveDialog();
+  // Description:
+  // Get an object from an int id.  This is only useful in
+  // when in client mode and calling this from tcl where vtkClientServerID
+  // is not wrapped.
+  virtual vtkObjectBase* GetObjectFromIntID(unsigned int);
 //BTX  
   // Description:
   // Return the client server stream
