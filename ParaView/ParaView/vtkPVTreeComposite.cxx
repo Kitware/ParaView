@@ -319,8 +319,12 @@ vtkPVTreeComposite::vtkPVTreeComposite()
   if (this->MPIController == NULL)
     {
     vtkErrorMacro("This objects requires an MPI controller.");
+    this->LocalProcessId = 0;
     }
-  this->LocalProcessId = this->Controller->GetLocalProcessId();
+  else
+    {
+    this->LocalProcessId = this->Controller->GetLocalProcessId();
+    }
   this->RenderAborted = 0;
   
   this->RenderView = NULL;
