@@ -51,7 +51,7 @@ int vtkPVPointSourceWidget::InstanceCount = 0;
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPointSourceWidget);
-vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVPointSourceWidget, "1.10");
 
 int vtkPVPointSourceWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -209,7 +209,7 @@ int vtkPVPointSourceWidget::GetModifiedFlag()
  
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::ResetInternal(const char* sourceTclName)
+void vtkPVPointSourceWidget::ResetInternal(const char* vtkNotUsed(sourceTclName))
 {
   // Ignore the source passed in.  We are updating our
   // own point source.
@@ -220,7 +220,7 @@ void vtkPVPointSourceWidget::ResetInternal(const char* sourceTclName)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVPointSourceWidget::AcceptInternal(const char* sourceTclName)
+void vtkPVPointSourceWidget::AcceptInternal(const char* vtkNotUsed(sourceTclName))
 {
   // Ignore the source passed in.  We are updating our
   // own point source.

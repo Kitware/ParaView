@@ -51,7 +51,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.11");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.12");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -195,9 +195,9 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
 
 
 //-------------------------------------------------------------------------
-void vtkClientCompositeManagerResetCamera(vtkObject *caller,
+void vtkClientCompositeManagerResetCamera(vtkObject *vtkNotUsed(caller),
                                           unsigned long vtkNotUsed(event), 
-                                          void *clientData, void *)
+                                          void *vtkNotUsed(clientData), void *)
 {
   /*
   vtkClientCompositeManager *self = (vtkClientCompositeManager *)clientData;
@@ -208,8 +208,8 @@ void vtkClientCompositeManagerResetCamera(vtkObject *caller,
 }
 
 //-------------------------------------------------------------------------
-void vtkClientCompositeManagerResetCameraClippingRange(vtkObject *caller, 
-                   unsigned long vtkNotUsed(event),void *clientData, void *)
+void vtkClientCompositeManagerResetCameraClippingRange(vtkObject *vtkNotUsed(caller), 
+                   unsigned long vtkNotUsed(event),void *vtkNotUsed(clientData), void *)
 {
   /*
   vtkClientCompositeManager *self = (vtkClientCompositeManager *)clientData;
@@ -649,7 +649,7 @@ void vtkClientCompositeManager::DoubleBuffer(vtkDataArray* localP,
 
 
 //-------------------------------------------------------------------------
-void vtkClientCompositeManager::ResetCamera(vtkRenderer *ren)
+void vtkClientCompositeManager::ResetCamera(vtkRenderer *vtkNotUsed(ren))
 {
   /*
   float bounds[6];
@@ -675,7 +675,7 @@ void vtkClientCompositeManager::ResetCamera(vtkRenderer *ren)
 }
 
 //-------------------------------------------------------------------------
-void vtkClientCompositeManager::ResetCameraClippingRange(vtkRenderer *ren)
+void vtkClientCompositeManager::ResetCameraClippingRange(vtkRenderer *vtkNotUsed(ren))
 {
   /*
   float bounds[6];

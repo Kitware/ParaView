@@ -19,11 +19,11 @@
 
 #include "vtkObjectFactory.h"
 
-vtkCxxRevisionMacro(vtkPVClipDataSet, "1.1");
+vtkCxxRevisionMacro(vtkPVClipDataSet, "1.2");
 vtkStandardNewMacro(vtkPVClipDataSet);
 
 //----------------------------------------------------------------------------
-vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction *cf)
+vtkPVClipDataSet::vtkPVClipDataSet(vtkImplicitFunction *vtkNotUsed(cf))
 {
 }
 

@@ -57,10 +57,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVConnectDialog);
-vtkCxxRevisionMacro(vtkPVConnectDialog, "1.7");
+vtkCxxRevisionMacro(vtkPVConnectDialog, "1.8");
 
 //----------------------------------------------------------------------------
-void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* opts)
+void vtkPVConnectDialog::Create(vtkKWApplication* app, const char* vtkNotUsed(opts))
 {
   char buffer[1024];
   sprintf(buffer, "Cannot connect to the server %s:%d.\nPlease specify server to connect:",

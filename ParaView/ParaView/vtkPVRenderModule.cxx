@@ -75,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.7");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.8");
 
 //int vtkPVRenderModuleCommand(ClientData cd, Tcl_Interp *interp,
 //                             int argc, char *argv[]);
@@ -360,7 +360,7 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
 }
 
 
-int vtkPVRenderModule::UpdateAllPVData(int interactive)
+int vtkPVRenderModule::UpdateAllPVData(int vtkNotUsed(interactive))
 {
   vtkObject* object;
   vtkPVPartDisplay* pDisp;

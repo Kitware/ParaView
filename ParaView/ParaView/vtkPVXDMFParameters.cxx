@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.3");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.4");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -263,9 +263,8 @@ void vtkPVXDMFParameters::AddXDMFParameter(const char* pname, int value, int min
 }
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::AcceptInternal(const char* sourceTclName)
+void vtkPVXDMFParameters::AcceptInternal(const char* vtkNotUsed(sourceTclName))
 {
-  vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
 
   vtkCollectionIterator* it = this->Internals->GetWidgetsIterator();
@@ -327,7 +326,7 @@ void vtkPVXDMFParameters::Trace(ofstream *file)
 
 
 //----------------------------------------------------------------------------
-void vtkPVXDMFParameters::ResetInternal(const char* sourceTclName)
+void vtkPVXDMFParameters::ResetInternal(const char* vtkNotUsed(sourceTclName))
 {
   this->UpdateFromReader();
   this->ModifiedFlag = 0;
@@ -438,8 +437,6 @@ void vtkPVXDMFParameters::AnimationMenuCallback(vtkPVAnimationInterface *ai, con
 //----------------------------------------------------------------------------
 void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
 {
-  int firstOff = 1;
-
   if (this->VTKReaderTclName == NULL)
     {
     vtkErrorMacro("VTKReader has not been set.");
@@ -466,4 +463,7 @@ void vtkPVXDMFParameters::SaveInBatchScript(ofstream *file)
 void vtkPVXDMFParameters::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
+  os << indent << "VTKReaderTclName: " 
+    << (this->VTKReaderTclName?this->VTKReaderTclName:"<none>") << endl;
+  os << indent << "Frame: " << this->Frame << endl;
 }

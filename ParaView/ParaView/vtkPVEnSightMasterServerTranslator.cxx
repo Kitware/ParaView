@@ -45,7 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerTranslator);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerTranslator, "1.2");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerTranslator, "1.3");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightMasterServerTranslator::vtkPVEnSightMasterServerTranslator()
@@ -68,9 +68,9 @@ void vtkPVEnSightMasterServerTranslator::PrintSelf(ostream& os, vtkIndent indent
 
 //----------------------------------------------------------------------------
 int
-vtkPVEnSightMasterServerTranslator::PieceToExtentThreadSafe(int piece,
-                                                            int numPieces, 
-                                                            int ghostLevel, 
+vtkPVEnSightMasterServerTranslator::PieceToExtentThreadSafe(int vtkNotUsed(piece),
+                                                            int vtkNotUsed(numPieces), 
+                                                            int vtkNotUsed(ghostLevel), 
                                                             int *wholeExtent, 
                                                             int *resultExtent, 
                                                             int splitMode, 

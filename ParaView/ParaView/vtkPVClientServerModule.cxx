@@ -209,7 +209,7 @@ void vtkPVSendDataObject(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.36");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.37");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -275,8 +275,8 @@ void vtkPVClientServerInit(vtkMultiProcessController *, void *arg )
 }
 
 //----------------------------------------------------------------------------
-void vtkPVClientServerModule::ErrorCallback(vtkObject *caller, 
-  unsigned long eid, void *clientdata, void *calldata)
+void vtkPVClientServerModule::ErrorCallback(vtkObject *vtkNotUsed(caller), 
+  unsigned long vtkNotUsed(eid), void *vtkNotUsed(clientdata), void *calldata)
 {
   cout << (char*)calldata << endl;
 }

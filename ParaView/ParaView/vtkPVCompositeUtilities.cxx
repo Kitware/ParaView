@@ -30,7 +30,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.4");
+vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.5");
 vtkStandardNewMacro(vtkPVCompositeUtilities);
 
 
@@ -327,7 +327,8 @@ int vtkPVCompositeUtilities::GetCompressedLength(vtkFloatArray *zArray)
 
     if (zRun == zIn)
       { 
-      *zIn++;
+      //*zIn++;
+      zIn++;
       }
     }
   return length;

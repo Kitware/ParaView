@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXMLPVCollectionWriter);
-vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.4");
+vtkCxxRevisionMacro(vtkXMLPVCollectionWriter, "1.5");
 
 class vtkXMLPVCollectionWriterInternals
 {
@@ -81,6 +81,10 @@ vtkXMLPVCollectionWriter::~vtkXMLPVCollectionWriter()
 void vtkXMLPVCollectionWriter::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "GhostLevel: " << this->GhostLevel << endl;
+  os << indent << "NumberOfPieces: " << this->NumberOfPieces<< endl;
+  os << indent << "Piece: " << this->Piece<< endl;
+  os << indent << "WriteCollectionFile: " << this->WriteCollectionFile<< endl;
 }
 
 //----------------------------------------------------------------------------

@@ -118,7 +118,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.194");
+vtkCxxRevisionMacro(vtkPVApplication, "1.195");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -1746,6 +1746,9 @@ void vtkPVApplication::PrintSelf(ostream& os, vtkIndent indent)
      << (this->TraceFileName ? this->TraceFileName : "(none)") << endl;
   os << indent << "Argv0: " 
      << (this->Argv0 ? this->Argv0 : "(none)") << endl;
+
+  os << indent << "RenderModuleName: " 
+    << (this->RenderModuleName?this->RenderModuleName:"(null)") << endl;
 }
 
 void vtkPVApplication::DisplayTCLError(const char* message)

@@ -88,7 +88,7 @@ public:
 
   // Description:
   // Empty method to keep superclass from complaining.
-  virtual void Trace(ofstream *file) {};
+  virtual void Trace(ofstream *) {};
 
 protected:
   vtkPVPushButton();

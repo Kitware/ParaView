@@ -88,7 +88,7 @@ void vtkPVSlaveScript(void *localArg, void *remoteArg,
 
  //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMPIProcessModule);
-vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.12");
+vtkCxxRevisionMacro(vtkPVMPIProcessModule, "1.13");
 
 int vtkPVMPIProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -124,7 +124,7 @@ vtkPVMPIProcessModule::~vtkPVMPIProcessModule()
 // Each process starts with this method.  One process is designated as
 // "master" and starts the application.  The other processes are slaves to
 // the application.
-void vtkPVMPIProcessModuleInit(vtkMultiProcessController *controller, void *arg )
+void vtkPVMPIProcessModuleInit(vtkMultiProcessController *vtkNotUsed(controller), void *arg )
 {
   vtkPVMPIProcessModule *self = (vtkPVMPIProcessModule *)arg;
   self->Initialize();

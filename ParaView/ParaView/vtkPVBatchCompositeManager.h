@@ -81,7 +81,7 @@ protected:
   
   void ExecuteInformation();
   void Execute();
-  void Execute(vtkImageData* image) {this->Execute();}
+  void Execute(vtkImageData*) {this->Execute();}
   
   vtkRenderWindow* RenderWindow;
   vtkMultiProcessController* Controller;
