@@ -1413,15 +1413,15 @@
     </XYPlotDisplayProxy>
     
     <CubeAxesDisplayProxy name="CubeAxesDisplay">
-       <ProxyProperty
+       <InputProperty
         name="Input"
-        command="SetInput"
+        command="SetInput-not-used"
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-      </ProxyProperty>
+      </InputProperty>
       <Property
         name="Update"
         command="Update"
@@ -1455,15 +1455,15 @@
     </CubeAxesDisplayProxy>
     
     <SimpleDisplayProxy name="SimpleDisplay">
-      <ProxyProperty
+      <InputProperty
         name="Input"
-        command="SetInput"
+        command="SetInput_not_used"
         update_self="1">
         <ProxyGroupDomain name="groups">
           <Group name="sources"/>
           <Group name="filters"/>
         </ProxyGroupDomain>
-      </ProxyProperty>
+      </InputProperty>
       <Property
         name="Update"
         command="Update"

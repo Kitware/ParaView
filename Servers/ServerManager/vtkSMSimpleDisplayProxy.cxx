@@ -36,7 +36,7 @@
 #include "vtkPVUpdateSuppressor.h"
 
 vtkStandardNewMacro(vtkSMSimpleDisplayProxy);
-vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.2");
+vtkCxxRevisionMacro(vtkSMSimpleDisplayProxy, "1.1.2.3");
 //-----------------------------------------------------------------------------
 vtkSMSimpleDisplayProxy::vtkSMSimpleDisplayProxy()
 {
@@ -140,6 +140,13 @@ void vtkSMSimpleDisplayProxy::CreateVTKObjects(int numObjects)
     }
 
   this->Superclass::CreateVTKObjects(numObjects);
+}
+
+//-----------------------------------------------------------------------------
+void vtkSMSimpleDisplayProxy::AddInput(vtkSMSourceProxy* input, const char*, 
+  int, int)
+{
+  this->SetInput(input);
 }
 
 //-----------------------------------------------------------------------------

@@ -46,6 +46,11 @@ public:
   virtual void RemoveFromRenderModule(vtkSMRenderModuleProxy*);
 
   // Description:
+  // Called when setting input using the Input property.
+  // Internally calls SetInput.
+  void AddInput(vtkSMSourceProxy* input, const char*, int, int);
+
+  // Description:
   // Connects the parts data to the plot actor.
   // All point data arrays are ploted for now.
   // Data must already be updated.

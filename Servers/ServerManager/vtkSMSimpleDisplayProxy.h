@@ -26,6 +26,7 @@
 class vtkSMProxy;
 class vtkPVDataInformation;
 class vtkPVArrayInformation;
+class vtkSMSourceProxy;
 
 class VTK_EXPORT vtkSMSimpleDisplayProxy : public vtkSMDisplayProxy
 {
@@ -37,6 +38,11 @@ public:
   // Description:
   // For flip books.
   virtual void CacheUpdate(int idx, int total);
+
+  // Description:
+  // Method gets called to set input when using Input property.
+  // Internally leads to a call to SetInput.
+  virtual void AddInput(vtkSMSourceProxy* input, const char*, int, int);
 
   // Description:
   // Connect the VTK data object to display pipeline.

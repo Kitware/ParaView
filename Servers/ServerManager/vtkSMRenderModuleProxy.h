@@ -135,7 +135,7 @@ protected:
   friend class vtkSMScalarBarWidgetProxy;
   friend class vtkSMCubeAxesDisplayProxy;
   friend class vtkSMXYPlotDisplayProxy;
-
+  friend class vtkSMInteractorObserverProxy;
   //ETX
   // Just a convienience method.
   int GetDisplayVisibility(vtkSMDisplayProxy* pDisp);
