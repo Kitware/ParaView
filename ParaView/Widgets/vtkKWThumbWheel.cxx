@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWThumbWheel );
-vtkCxxRevisionMacro(vtkKWThumbWheel, "1.11");
+vtkCxxRevisionMacro(vtkKWThumbWheel, "1.12");
 
 // ---------------------------------------------------------------------------
 int vtkKWThumbWheelCommand(ClientData cd, 
@@ -730,7 +730,7 @@ void vtkKWThumbWheel::Bind()
       this->Script("bind %s <Leave> {%s WithdrawPopupCallback}",
                    this->TopLevel->GetWidgetName(), this->GetTclName());
       int j;
-      for (j = 0 ; j < 3; i++)
+      for (j = 0 ; j < 3; j++)
         {
         this->Script("bind %s <Button-%d> {+bind %s <Leave> {}}",
                      this->ThumbWheel->GetWidgetName(),
