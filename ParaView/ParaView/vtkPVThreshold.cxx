@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.48.2.1");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.48.2.2");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -113,7 +113,9 @@ void vtkPVThreshold::CreateProperties()
   this->AttributeModeLabel->SetParent(this->AttributeModeFrame);
   this->AttributeModeLabel->Create(pvApp, "");
   this->AttributeModeLabel->SetLabel("Attribute Mode:");
-  this->AttributeModeLabel->SetBalloonHelpString("Select whether to operate on point or cell data");
+  this->AttributeModeLabel->SetBalloonHelpString(
+    "Select whether to operate on point or cell data");
+
   this->AttributeModeMenu->SetParent(this->AttributeModeFrame);
   this->AttributeModeMenu->Create(pvApp, "");
   this->AttributeModeMenu->AddEntryWithCommand("Point Data", this,
@@ -121,14 +123,18 @@ void vtkPVThreshold::CreateProperties()
   this->AttributeModeMenu->AddEntryWithCommand("Cell Data", this,
                                                "ChangeAttributeMode cell");
   this->AttributeModeMenu->SetCurrentEntry("Point Data");
-  this->AttributeModeMenu->SetBalloonHelpString("Select whether to operate on point or cell data");
+  this->AttributeModeMenu->SetBalloonHelpString(
+    "Select whether to operate on point or cell data");
+
   this->Script("pack %s %s -side left",
                this->AttributeModeLabel->GetWidgetName(),
                this->AttributeModeMenu->GetWidgetName());
   
-  if (this->GetPVInput()->GetVTKData()->GetPointData()->GetScalars())
+  vtkDataArray* scalars =
+    this->GetPVInput()->GetVTKData()->GetPointData()->GetScalars();
+  if (scalars)
     {
-    this->GetPVInput()->GetVTKData()->GetPointData()->GetScalars()->GetRange(range);
+    scalars->GetRange(range);
     }
   else
     {
@@ -138,7 +144,8 @@ void vtkPVThreshold::CreateProperties()
   
   this->MinMaxScale->SetParent(this->GetParameterFrame()->GetFrame());
   this->MinMaxScale->SetObjectVariable(this->GetVTKSourceTclName(), "");
-  this->MinMaxScale->SetModifiedCommand(this->GetTclName(), "SetAcceptButtonColorToRed");
+  this->MinMaxScale->SetModifiedCommand(this->GetTclName(), 
+                                        "SetAcceptButtonColorToRed");
   this->MinMaxScale->SetRange(range[0], range[1]);
   this->MinMaxScale->SetResolution((range[1] - range[0]) / 100.0);
   this->MinMaxScale->SetMinimumLabel("Lower Threshold");
@@ -159,7 +166,10 @@ void vtkPVThreshold::CreateProperties()
                                            "AllScalars");
   this->AllScalarsCheck->SetModifiedCommand(this->GetTclName(), 
                                            "SetAcceptButtonColorToRed");
-  this->AllScalarsCheck->SetBalloonHelpString("If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data.");
+  this->AllScalarsCheck->SetBalloonHelpString(
+    "If AllScalars is checked, then a cell is only included if all "
+    "its points are within the threshold. This is only relevant for "
+    "point data.");
   this->AllScalarsCheck->Create(pvApp);
   this->AddPVWidget(this->AllScalarsCheck);
   this->AllScalarsCheck->SetState(1);
