@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.36");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.37");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -442,7 +442,7 @@ int vtkCornerAnnotation::RenderOpaqueGeometry(vtkViewport *viewport)
         max_width = (width_01 > width_23) ? width_01 : width_23;
         }
 
-      fontSize = pow(fontSize,0.7)*pow(10,0.3);
+      fontSize = static_cast<int>(pow(fontSize,0.7)*pow(10,0.3));
       this->FontSize = fontSize;
       for (i = 0; i < 4; i++)
         {
