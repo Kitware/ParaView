@@ -53,11 +53,6 @@ public:
   void SetInteractor();
   
   // Description:
-  // Set/Get the selected point.
-  vtkSetVector3Macro(SelectedPoint, float);
-  vtkGetVector3Macro(SelectedPoint, float);
-  
-  // Description:
   // Called when the accept button is clicked.
   void UpdateProbe();
 
@@ -84,10 +79,30 @@ public:
   void UseLine();
 
   // Description:
-  // Callback for SetPoint button
-  void SetPoint();
-
+  // Set the vtkPVData object whose VTK data will be used as the source for
+  // vtkProbeFilter.
   vtkSetObjectMacro(PVProbeSource, vtkPVData);
+
+  // Description:
+  // Set the entries for SelectedPoint, EndPoint1, and EndPoint2.
+  void SetSelectedPoint(float point[3]);
+  void SetEndPoint1(float point[3]);
+  void SetEndPoint2(float point[3]);
+
+  // Description:
+  // Get the dimensionality of the input to vtkProbeFilter.
+  vtkGetMacro(Dimensionality, int);
+  
+  // Description:
+  // Get the current end point id of the line input to vtkProbeFilter.
+  vtkGetMacro(CurrentEndPoint, int);
+  void SetCurrentEndPoint(int id);
+
+  // Description:
+  // Change the 3D cursor to match the values in the UI.
+  void ChangeXPosition();
+  void ChangeYPosition();
+  void ChangeZPosition();
   
 protected:
   vtkPVProbe();
@@ -124,15 +139,11 @@ protected:
   vtkKWLabeledEntry *End2ZEntry;
   vtkKWLabeledEntry *DivisionsEntry;
   
-  vtkKWPushButton *SetPointButton;
-  
   vtkKWSelectPointInteractor *Interactor;
   
-  float SelectedPoint[3];
-  float EndPoint1[3];
-  float EndPoint2[3];
   int Dimensionality; // point = 0, line = 1
-
+  int CurrentEndPoint;
+  
   vtkPVData *PVProbeSource;
   
   char *XYPlotTclName;

@@ -45,8 +45,15 @@ public:
   static vtkKWSelectPointInteractor* New();
   vtkTypeMacro(vtkKWSelectPointInteractor,vtkKWInteractor);
 
+  // Description:
+  // Set/Get the selected point.
   vtkGetVector3Macro(SelectedPoint, float);
-
+  void SetSelectedPoint(float point[3]);
+  void SetSelectedPoint(float X, float Y, float Z);
+  void SetSelectedPointX(float X);
+  void SetSelectedPointY(float Y);
+  void SetSelectedPointZ(float Z);  
+  
   void SetBounds(float bounds[6]);
 
   // mouse callbacks
@@ -55,6 +62,8 @@ public:
   
   void SetCursorVisibility(int value);
 
+  void SetPVProbe(vtkPVProbe *probe);
+  
 protected:
   vtkKWSelectPointInteractor();
   ~vtkKWSelectPointInteractor();
@@ -76,6 +85,7 @@ protected:
   vtkActor *ZSphere2Actor; // id = 5
   int CurrentSphereId;
   float Bounds[6];
+  vtkPVProbe *PVProbe;
 };
 
 #endif

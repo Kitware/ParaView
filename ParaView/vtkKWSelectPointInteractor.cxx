@@ -62,6 +62,8 @@ vtkKWSelectPointInteractor::vtkKWSelectPointInteractor()
   this->CurrentSphereId = -1;
   this->Bounds[0] = this->Bounds[2] = this->Bounds[4] = 0;
   this->Bounds[1] = this->Bounds[3] = this->Bounds[5] = -1;
+  
+  this->PVProbe = NULL;
 }
 
 vtkKWSelectPointInteractor *vtkKWSelectPointInteractor::New()
@@ -114,13 +116,14 @@ void vtkKWSelectPointInteractor::SetBounds(float bounds[6])
   vtkPolyDataMapper *sphereMapper;
   vtkRenderer *renderer;
   int i;
+  float scale, tempScale;
   
   for (i = 0; i < 6; i++)
     {
     this->Bounds[i] = bounds[i];
     if (i % 2 == 1)
       {
-      this->SelectedPoint[i/2] = (bounds[i] - bounds[i-1])/2;
+      this->SelectedPoint[i/2] = bounds[i-1] + (bounds[i] - bounds[i-1])/2;
       focalPoint[i/2] = this->SelectedPoint[i/2];
       }
     }
@@ -136,18 +139,28 @@ void vtkKWSelectPointInteractor::SetBounds(float bounds[6])
   this->Cursor->SetFocalPoint(focalPoint);
   renderer->AddActor(this->CursorActor);
   
+  scale = this->Bounds[1] - this->Bounds[0];
+  if ((tempScale = this->Bounds[3] - this->Bounds[2]) > scale)
+    {
+    scale = tempScale;
+    }
+  if ((tempScale = this->Bounds[5] - this->Bounds[4]) > scale)
+    {
+    scale = tempScale;
+    }
+  
   this->XSphere1Actor->SetMapper(sphereMapper);
-  this->XSphere1Actor->SetScale((this->Bounds[3]-this->Bounds[2])/20.0);
+  this->XSphere1Actor->SetScale(scale/20.0);
   this->XSphere2Actor->SetMapper(sphereMapper);
-  this->XSphere2Actor->SetScale((this->Bounds[3]-this->Bounds[2])/20.0);
+  this->XSphere2Actor->SetScale(scale/20.0);
   this->YSphere1Actor->SetMapper(sphereMapper);
-  this->YSphere1Actor->SetScale((this->Bounds[5]-this->Bounds[4])/20.0);
+  this->YSphere1Actor->SetScale(scale/20.0);
   this->YSphere2Actor->SetMapper(sphereMapper);
-  this->YSphere2Actor->SetScale((this->Bounds[5]-this->Bounds[4])/20.0);
+  this->YSphere2Actor->SetScale(scale/20.0);
   this->ZSphere1Actor->SetMapper(sphereMapper);
-  this->ZSphere1Actor->SetScale((this->Bounds[1]-this->Bounds[0])/20.0);
+  this->ZSphere1Actor->SetScale(scale/20.0);
   this->ZSphere2Actor->SetMapper(sphereMapper);
-  this->ZSphere2Actor->SetScale((this->Bounds[1]-this->Bounds[0])/20.0);
+  this->ZSphere2Actor->SetScale(scale/20.0);
   
   position[0] = this->Bounds[1];
   position[1] = focalPoint[1];
@@ -235,20 +248,26 @@ void vtkKWSelectPointInteractor::Button1Motion(int x, int y)
   vtkRenderer *renderer = this->RenderView->GetRenderer();
   int *size;
   int newY, i;
-  float newWorldPt[4], focalPt[3];
+  float newWorldPt[4], focalPt[3], sphereCenter[3], sphereDisplay[3];
+  int dimensionality, endPtId;
   
   if (!renderer || this->CurrentSphereId == -1)
     {
     return;
     }
   
+  this->GetSphereCoordinates(this->CurrentSphereId, sphereCenter);
+  renderer->SetWorldPoint(sphereCenter[0], sphereCenter[1],
+                          sphereCenter[2], 1);
+  renderer->WorldToDisplay();
+  renderer->GetDisplayPoint(sphereDisplay);
+  
   this->Cursor->GetFocalPoint(focalPt);
 
   size = renderer->GetSize();
   newY = size[1] - y;
 
-  renderer->SetDisplayPoint(x, newY,
-                            this->RenderView->GetComposite()->GetZ(x, newY));
+  renderer->SetDisplayPoint(x, newY, sphereDisplay[2]);
   renderer->DisplayToWorld();
   renderer->GetWorldPoint(newWorldPt);  
   
@@ -321,6 +340,27 @@ void vtkKWSelectPointInteractor::Button1Motion(int x, int y)
   this->SelectedPoint[1] = focalPt[1];
   this->SelectedPoint[2] = focalPt[2];
 
+  if (this->PVProbe)
+    {
+    dimensionality = this->PVProbe->GetDimensionality();
+    if (dimensionality == 0)
+      {
+      this->PVProbe->SetSelectedPoint(this->SelectedPoint);
+      }
+    else if (dimensionality == 1)
+      {
+      endPtId = this->PVProbe->GetCurrentEndPoint();
+      if (endPtId == 1)
+        {
+        this->PVProbe->SetEndPoint1(this->SelectedPoint);
+        }
+      else if (endPtId == 2)
+        {
+        this->PVProbe->SetEndPoint2(this->SelectedPoint);
+        }
+      }
+    }
+  
   this->RenderView->Render();
 }
 
@@ -388,4 +428,94 @@ void vtkKWSelectPointInteractor::SetCursorVisibility(int value)
   this->ZSphere1Actor->SetVisibility(value);
   this->ZSphere2Actor->SetVisibility(value);
   this->RenderView->Render();
+}
+
+void vtkKWSelectPointInteractor::SetPVProbe(vtkPVProbe *probe)
+{
+  this->PVProbe = probe;
+}
+
+void vtkKWSelectPointInteractor::SetSelectedPoint(float X, float Y, float Z)
+{
+  this->SelectedPoint[0] = X;
+  this->SelectedPoint[1] = Y;
+  this->SelectedPoint[2] = Z;
+  
+  if (this->SelectedPoint[0] < this->Bounds[0])
+    {
+    this->SelectedPoint[0] = this->Bounds[0];
+    }
+  else if (this->SelectedPoint[0] > this->Bounds[1])
+    {
+    this->SelectedPoint[0] = this->Bounds[1];
+    }
+  if (this->SelectedPoint[1] < this->Bounds[2])
+    {
+    this->SelectedPoint[1] = this->Bounds[2];
+    }
+  else if (this->SelectedPoint[1] > this->Bounds[3])
+    {
+    this->SelectedPoint[1] = this->Bounds[3];
+    }
+  if (this->SelectedPoint[2] < this->Bounds[4])
+    {
+    this->SelectedPoint[2] = this->Bounds[4];
+    }
+  else if (this->SelectedPoint[2] > this->Bounds[5])
+    {
+    this->SelectedPoint[2] = this->Bounds[5];
+    }
+  
+  if (this->PVProbe->GetDimensionality() == 0)
+    {
+    this->PVProbe->SetSelectedPoint(this->SelectedPoint);
+    }
+  else
+    {
+    if (this->PVProbe->GetCurrentEndPoint() == 1)
+      {
+      this->PVProbe->SetEndPoint1(this->SelectedPoint);
+      }
+    else
+      {
+      this->PVProbe->SetEndPoint2(this->SelectedPoint);
+      }
+    }
+  
+  this->Cursor->SetFocalPoint(this->SelectedPoint);
+  
+  this->XSphere1Actor->SetPosition(this->Bounds[1], this->SelectedPoint[1],
+                                   this->SelectedPoint[2]);
+  this->XSphere2Actor->SetPosition(this->Bounds[0], this->SelectedPoint[1],
+                                   this->SelectedPoint[2]);
+  this->YSphere1Actor->SetPosition(this->SelectedPoint[0], this->Bounds[3],
+                                   this->SelectedPoint[2]);
+  this->YSphere2Actor->SetPosition(this->SelectedPoint[0], this->Bounds[2],
+                                   this->SelectedPoint[2]);
+  this->ZSphere1Actor->SetPosition(this->SelectedPoint[0],
+                                   this->SelectedPoint[1], this->Bounds[5]);
+  this->ZSphere2Actor->SetPosition(this->SelectedPoint[0],
+                                   this->SelectedPoint[1], this->Bounds[4]);
+
+  this->RenderView->Render();
+}
+
+void vtkKWSelectPointInteractor::SetSelectedPoint(float point[3])
+{
+  this->SetSelectedPoint(point[0], point[1], point[2]);
+}
+
+void vtkKWSelectPointInteractor::SetSelectedPointX(float X)
+{
+  this->SetSelectedPoint(X, this->SelectedPoint[1], this->SelectedPoint[2]);
+}
+
+void vtkKWSelectPointInteractor::SetSelectedPointY(float Y)
+{
+  this->SetSelectedPoint(this->SelectedPoint[0], Y, this->SelectedPoint[2]);
+}
+
+void vtkKWSelectPointInteractor::SetSelectedPointZ(float Z)
+{
+  this->SetSelectedPoint(this->SelectedPoint[0], this->SelectedPoint[1], Z);
 }
