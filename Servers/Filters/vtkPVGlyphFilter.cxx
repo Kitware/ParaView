@@ -20,7 +20,7 @@
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.10");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.11");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -69,9 +69,42 @@ void vtkPVGlyphFilter::Execute()
   if (this->UseMaskPoints)
     {
     this->Superclass::SetInput(this->MaskPoints->GetOutput());
+    vtkIdType maxNumPts = this->MaximumNumberOfPoints;
     vtkIdType numPts = this->MaskPoints->GetInput()->GetNumberOfPoints();
-    vtkIdType maxNumPts =
-      this->MaximumNumberOfPoints / this->NumberOfProcesses;
+    // Although this is not perfectly process invariant, it is better
+    // than we had before (divide by number of processes).
+    vtkIdType totalNumPts = numPts;
+    vtkMultiProcessController *controller;
+    controller = vtkMultiProcessController::GetGlobalController();
+    if (controller)
+      {
+      vtkIdType tmp;
+      // This could be done much easier with MPI specific calls.
+      if (controller->GetLocalProcessId() == 0)
+        {
+        int i;
+        // Sum points on all processes.
+        for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
+          {
+          controller->Receive(&tmp, 1, i, 349870);
+          totalNumPts += tmp;
+          }
+        // Send results back to all processes.
+        for (i = 1; i < controller->GetNumberOfProcesses(); ++i)
+          {
+          controller->Send(&totalNumPts, 1, i, 349871);
+          }
+        }
+      else
+        {
+        controller->Send(&numPts, 1, 0, 349870);
+        controller->Receive(&totalNumPts, 1, 0, 349871);
+        }
+      // What fraction of the points will this processes get allocated?
+      maxNumPts = (vtkIdType)(
+        (double)(maxNumPts)*(double)(numPts)/(double)(totalNumPts));
+      }
+
     maxNumPts = (maxNumPts < 1) ? 1 : maxNumPts;
     this->MaskPoints->SetMaximumNumberOfPoints(maxNumPts);
     this->MaskPoints->SetOnRatio(numPts / maxNumPts);
