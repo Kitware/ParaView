@@ -1,0 +1,89 @@
+CMAKE_MINIMUM_REQUIRED (VERSION 1.8)
+PROJECT(ParaView)
+
+SET(CMAKE_MODULE_PATH ${ParaView_SOURCE_DIR}/CMake)
+SET (LIBRARY_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
+  "Single output directory for building all libraries.")
+SET (EXECUTABLE_OUTPUT_PATH ${ParaView_BINARY_DIR}/bin CACHE INTERNAL
+  "Single output directory for building all executables.")
+
+#########################################################################
+# Configure Testing
+OPTION(BUILD_TESTING "Build ParaView Complete Testing" OFF)
+OPTION(PARAVIEW_TESTING_DART_SERVER "Use ParaView tree for Dart server. Should be OFF" OFF)
+MARK_AS_ADVANCED(BUILD_TESTING PARAVIEW_TESTING_DART_SERVER)
+IF(BUILD_TESTING)
+  ENABLE_TESTING()
+  IF(PARAVIEW_TESTING_DART_SERVER)
+    INCLUDE (${CMAKE_ROOT}/Modules/FindDart.cmake)
+  ELSE(PARAVIEW_TESTING_DART_SERVER)
+    SET(DART_ROOT "" CACHE INTERNAL "" FORCE)
+  ENDIF(PARAVIEW_TESTING_DART_SERVER)
+  INCLUDE (${CMAKE_ROOT}/Modules/Dart.cmake)
+ENDIF(BUILD_TESTING)
+
+#########################################################################
+# Configure TclTk
+IF(UNIX)
+  # On UNIX, Tcl needs the math library.
+  IF(UNIX)
+    LINK_LIBRARIES(-lm)
+  ENDIF(UNIX)
+
+  # If using X with Tk, we need to link to X when we link
+  # to Tk in order to support static linking.
+  IF(CMAKE_HAS_X)
+    LINK_LIBRARIES(-lXt ${CMAKE_X_LIBS})
+  ENDIF(CMAKE_HAS_X)
+ENDIF(UNIX)
+
+SUBDIRS(Utilities/TclTk)
+
+#########################################################################
+# Configure VTK
+# force some values to be set by default as they are required by ParaView
+SET(VTK_USE_HYBRID_FORCE ON)
+SET(VTK_WRAP_TCL OFF CACHE INTERNAL "" FORCE)
+SET(VTK_USE_PARALLEL_FORCE ON)
+SET(VTK_USE_RENDERING ON CACHE INTERNAL "" FORCE)
+
+SET(VTK_USE_VOLUMEPRO_FORCE OFF)
+SET(VTK_WRAP_PYTHON OFF CACHE INTERNAL "" FORCE)
+SET(VTK_WRAP_JAVA OFF CACHE INTERNAL "" FORCE)
+SET(VTK_USE_GL2PS_FORCE OFF)
+
+SET(VTK_DIR "${ParaView_BINARY_DIR}/VTK")
+
+SUBDIRS(VTK)
+IF(EXISTS "${VTK_DIR}/VTKLibraryDepends.cmake")
+ELSE(EXISTS "${VTK_DIR}/VTKLibraryDepends.cmake")
+  SET(VTK_NO_LIBRARY_DEPENDS 1)
+ENDIF(EXISTS "${VTK_DIR}/VTKLibraryDepends.cmake")
+IF(EXISTS "${VTK_DIR}/VTKConfig.cmake")
+  FIND_PACKAGE(VTK QUIET)
+  IF(VTK_FOUND)
+    INCLUDE(${VTK_USE_FILE})
+  ENDIF(VTK_FOUND)
+ENDIF(EXISTS "${VTK_DIR}/VTKConfig.cmake")
+
+
+#########################################################################
+# Configure HDF5
+SUBDIRS(Utilities/hdf5)
+
+#########################################################################
+# Configure Xdmf
+SUBDIRS(Utilities/Xdmf)
+
+#########################################################################
+# Configure Xdmf
+SUBDIRS(Common)
+
+#########################################################################
+# Configure VTKClientServer wrapping
+SUBDIRS(Utilities/VTKClientServer)
+
+#########################################################################
+# Configure Tcl wrapping
+SUBDIRS(Utilities/VTKTclWrapping)
+

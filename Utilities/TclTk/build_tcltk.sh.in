@@ -1,0 +1,27 @@
+#!/bin/sh
+
+build_tcl=true
+build_tk=true
+if [ -f @TclTk_BINARY_DIR@/tcl8.4.5/unix/tclsh -a \
+  -f @TclTk_BINARY_DIR@/tcl8.4.5/unix/libtcl8.4.a -a \
+  -f @TclTk_BINARY_DIR@/tcl8.4.5/unix/libtclstub8.4.a ]; then
+  build_tcl=false;
+fi
+if [ -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtk8.4.a -a \
+  -f @TclTk_BINARY_DIR@/tk8.4.5/unix/libtkstub8.4.a ]; then
+  build_tk=false;
+fi
+
+if [ "x$build_tcl" = "xtrue" ]; then
+  cd "@TclTk_BINARY_DIR@/tcl8.4.5/unix"
+  "@CMAKE_MAKE_PROGRAM@"
+else
+  echo "-- Found existing Tcl, not rebuilding"
+fi
+
+if [ "x$build_tcl" = "xtrue" -o "x$build_tk" = "xtrue" ]; then
+  cd "@TclTk_BINARY_DIR@/tk8.4.5/unix"
+  "@CMAKE_MAKE_PROGRAM@"
+else
+  echo "-- Found existing Tk, not rebuilding"
+fi

@@ -44,10 +44,12 @@ MACRO(VTK_WRAP_TCL3 TARGET SRC_LIST_NAME SOURCES COMMANDS)
         # new source file is nameTcl.cxx, add to resulting list
         SET(${SRC_LIST_NAME} ${${SRC_LIST_NAME}} 
           ${TMP_FILENAME}Tcl.cxx)
+
+        MESSAGE("TMP_FILENAME: ${TMP_FILENAME}")
         
         # add custom command to output
         ADD_CUSTOM_COMMAND(
-          OUTPUT ${TMP_FILENAME}Tcl.cxx
+          OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TMP_FILENAME}Tcl.cxx
           DEPENDS ${EXECUTABLE_OUTPUT_PATH}/vtkWrapTcl ${VTK_WRAP_HINTS} ${TMP_INPUT}
           COMMAND ${VTK_WRAP_TCL_EXE}
           ARGS ${TMP_INPUT} ${VTK_WRAP_HINTS} ${TMP_CONCRETE} 
@@ -71,7 +73,7 @@ MACRO(VTK_WRAP_TCL3 TARGET SRC_LIST_NAME SOURCES COMMANDS)
       )
     
     ADD_CUSTOM_COMMAND(
-      OUTPUT ${TARGET}Init.cxx
+      OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.cxx
       DEPENDS ${EXECUTABLE_OUTPUT_PATH}/vtkWrapTclInit 
       ${CMAKE_CURRENT_BINARY_DIR}/${TARGET}Init.data
       COMMAND ${VTK_WRAP_TCL_INIT_EXE}
