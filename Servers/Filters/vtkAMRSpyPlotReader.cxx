@@ -31,7 +31,7 @@
 
 #include "spcth_interface.h"
 
-vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.8");
+vtkCxxRevisionMacro(vtkAMRSpyPlotReader, "1.9");
 vtkStandardNewMacro(vtkAMRSpyPlotReader);
 vtkCxxSetObjectMacro(vtkAMRSpyPlotReader,Controller,vtkMultiProcessController);
 
@@ -486,6 +486,11 @@ void vtkAMRSpyPlotReader::UpdateMetaData(const char* fname)
 //------------------------------------------------------------------------------
 void vtkAMRSpyPlotReader::Execute()
 {
+    // Hack to handle rectilinear grids. Find average spacing.
+    double sumSpacing[3];
+    sumSpacing[0] = sumSpacing[1] = sumSpacing[2] = 0.0;
+  int number_of_blocks;
+
   SPCTH* spcth = 0;
   double blockSpacing[3];
   double toplevel_origin[3] = { 0, 0, 0 };
@@ -558,7 +563,8 @@ void vtkAMRSpyPlotReader::Execute()
     
     vtkDebugMacro("Processing File: " << it->first.c_str());
     spcth = it->second;
-    int number_of_blocks = spcth_getNumberOfDataBlocksForCurrentTime(spcth);
+    number_of_blocks = spcth_getNumberOfDataBlocksForCurrentTime(spcth);
+        
     for ( block = 0; block < number_of_blocks; ++ block )
       {
       int cc;
@@ -581,6 +587,7 @@ void vtkAMRSpyPlotReader::Execute()
         // We only really need to do this once ...
         toplevel_spacing[cc] = blockSpacing[cc]
           * pow(static_cast<double>(2), static_cast<double>(level));
+        sumSpacing[cc] += toplevel_spacing[cc];    
         }
       vtkDebugMacro("Spacing: " << toplevel_spacing[0] << " " << toplevel_spacing[1] << " " << toplevel_spacing[2]);
       int dim = 0;
@@ -608,29 +615,56 @@ void vtkAMRSpyPlotReader::Execute()
   if (this->Controller)
     {
     int idx;
-    double otherOrigin[3];
+    double otherOriginSpacingNum[7];
     int numProcs = this->Controller->GetNumberOfProcesses();
     int myId = this->Controller->GetLocalProcessId();
     if (myId == 0)
       {
+      double numBlocks = (double)(number_of_blocks);
       // Get all origins to find the smallest.
       for (idx = 1; idx < numProcs; ++idx)
         {
-        this->Controller->Receive(otherOrigin, 3, idx, 288300);
-        toplevel_origin[0] = vtkMIN(toplevel_origin[0],otherOrigin[0]);
-        toplevel_origin[1] = vtkMIN(toplevel_origin[1],otherOrigin[1]);
-        toplevel_origin[2] = vtkMIN(toplevel_origin[2],otherOrigin[2]);
+        this->Controller->Receive(otherOriginSpacingNum, 7, idx, 288300);
+        toplevel_origin[0] = vtkMIN(toplevel_origin[0],otherOriginSpacingNum[0]);
+        toplevel_origin[1] = vtkMIN(toplevel_origin[1],otherOriginSpacingNum[1]);
+        toplevel_origin[2] = vtkMIN(toplevel_origin[2],otherOriginSpacingNum[2]);
+        sumSpacing[0] += otherOriginSpacingNum[3];
+        sumSpacing[1] += otherOriginSpacingNum[4];
+        sumSpacing[2] += otherOriginSpacingNum[5];
+        numBlocks += otherOriginSpacingNum[6];
         }
       // Send it back to all processes.
+      otherOriginSpacingNum[0] = toplevel_origin[0];
+      otherOriginSpacingNum[1] = toplevel_origin[1];
+      otherOriginSpacingNum[2] = toplevel_origin[2];
+      otherOriginSpacingNum[3] = otherOriginSpacingNum[3] / otherOriginSpacingNum[6];
+      otherOriginSpacingNum[4] = otherOriginSpacingNum[4] / otherOriginSpacingNum[6];
+      otherOriginSpacingNum[5] = otherOriginSpacingNum[5] / otherOriginSpacingNum[6];
       for (idx = 1; idx < numProcs; ++idx)
         {
-        this->Controller->Send(toplevel_origin, 3, idx, 288301);
+        this->Controller->Send(otherOriginSpacingNum, 6, idx, 288301);
         }
+      toplevel_spacing[0] = otherOriginSpacingNum[3];
+      toplevel_spacing[1] = otherOriginSpacingNum[4];
+      toplevel_spacing[2] = otherOriginSpacingNum[5];
       }
     else
       {
-      this->Controller->Send(toplevel_origin, 3, 0, 288300);
-      this->Controller->Receive(toplevel_origin, 3, 0, 288301);
+      otherOriginSpacingNum[0] = toplevel_origin[0];
+      otherOriginSpacingNum[1] = toplevel_origin[1];
+      otherOriginSpacingNum[2] = toplevel_origin[2];
+      otherOriginSpacingNum[3] = sumSpacing[0];
+      otherOriginSpacingNum[4] = sumSpacing[1];
+      otherOriginSpacingNum[5] = sumSpacing[2];
+      otherOriginSpacingNum[6] = (double)(number_of_blocks);
+      this->Controller->Send(otherOriginSpacingNum, 7, 0, 288300);
+      this->Controller->Receive(otherOriginSpacingNum, 6, 0, 288301);
+      toplevel_origin[0] = otherOriginSpacingNum[0];
+      toplevel_origin[1] = otherOriginSpacingNum[1];
+      toplevel_origin[2] = otherOriginSpacingNum[2];
+      toplevel_spacing[0] = otherOriginSpacingNum[3];
+      toplevel_spacing[1] = otherOriginSpacingNum[4];
+      toplevel_spacing[2] = otherOriginSpacingNum[5];      
       }
     }
 
