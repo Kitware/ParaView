@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectWidget);
-vtkCxxRevisionMacro(vtkPVSelectWidget, "1.30");
+vtkCxxRevisionMacro(vtkPVSelectWidget, "1.31");
 
 int vtkPVSelectWidgetCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -190,6 +190,7 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
       vtkClientServerID id = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget())
         ->GetObjectByName(this->GetCurrentVTKValue());
       this->Property->SetObjectID(id);
+      cout << "Id: " << id << endl;;
       }
     else
       {
@@ -207,6 +208,7 @@ void vtkPVSelectWidget::AcceptInternal(vtkClientServerID sourceId)
     }
 
   this->ModifiedFlag = 0;
+  this->Print(cout);
 }
 
 //-----------------------------------------------------------------------------
@@ -452,17 +454,23 @@ void vtkPVSelectWidget::SaveInBatchScriptForPart(ofstream *file,
                                                  vtkClientServerID sourceID)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                  << (vtkstd::string("Get") 
-                      + vtkstd::string(this->VariableName)).c_str()
-                  << vtkClientServerStream::End; 
-  ostrstream result;
-  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
-  result << ends;
+
+  ostrstream elem;
+  if(this->ElementType == OBJECT)
+    { 
+    vtkPVWidgetProperty *pvwp;
+    pvwp = vtkPVWidgetProperty::SafeDownCast(this->WidgetProperties->GetItemAsObject(this->CurrentIndex));
+    vtkClientServerID id = vtkPVObjectWidget::SafeDownCast(pvwp->GetWidget())
+      ->GetObjectByName(this->GetCurrentVTKValue());
+    elem << "pvTemp" << id << ends;
+    }
+  else
+    {
+    elem << this->GetCurrentVTKValue() << ends;
+    }
   *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName
-        << " " << result.str() << endl;
-  delete [] result.str();
+        << " " << elem.str() <<  endl;
+  elem.rdbuf()->freeze(0);
 }
 
 //-----------------------------------------------------------------------------
