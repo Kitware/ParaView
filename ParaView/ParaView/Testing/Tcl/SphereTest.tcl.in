@@ -49,10 +49,11 @@
 	$camera Azimuth 10
 	RenWin1 Render
 	update
-
     }
     
     source $DataDir/Utility/rtImage.tcl
     pvImageTest $DataDir/Baseline/SphereTest.png 10
    
     Application Exit
+
+
