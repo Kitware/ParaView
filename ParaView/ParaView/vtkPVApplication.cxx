@@ -698,6 +698,7 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
   int i, j;
   int numProcs;
   int nonEmptyFlag;
+  int activeAttributes[5];
 
   if (mapper->GetInput() == NULL || this->Controller == NULL ||
       mapper->GetInput()->GetNumberOfPoints() > 0 ||
@@ -769,7 +770,14 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
         mapper->GetInput()->GetPointData()->AddArray(array);
         array->Delete();
         } // end of loop over point arrays.
-
+      // Which scalars, ... are active?
+      this->Controller->Receive(activeAttributes, 5, i, 987258);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[0],0);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[1],1);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[2],2);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[3],3);
+      mapper->GetInput()->GetPointData()->SetActiveAttribute(activeAttributes[4],4);
+ 
       // Next Cell data.
       this->Controller->Receive(&num, 1, i, 987244);
       for (j = 0; j < num; ++j)
@@ -818,6 +826,13 @@ void vtkPVApplication::CompleteArrays(vtkMapper *mapper, char *mapperTclName)
         mapper->GetInput()->GetCellData()->AddArray(array);
         array->Delete();
         } // end of loop over cell arrays.
+      // Which scalars, ... are active?
+      this->Controller->Receive(activeAttributes, 5, i, 987258);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[0],0);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[1],1);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[2],2);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[3],3);
+      mapper->GetInput()->GetCellData()->SetActiveAttribute(activeAttributes[4],4);
       
       // We only need information from one.
       return;
@@ -838,6 +853,7 @@ void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
   int nameLength;
   const char *name;
   vtkDataArray *array;
+  int activeAttributes[5];
 
   if (mapper->GetInput() == NULL ||
       (mapper->GetInput()->GetNumberOfPoints() == 0 &&
@@ -872,6 +888,8 @@ void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
     // I am pretty sure that Send does not modify the string.
     this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
     }
+  mapper->GetInput()->GetPointData()->GetAttributeIndices(activeAttributes);
+  this->Controller->Send(activeAttributes, 5, 0, 987258);
 
   // Next cell data.
   num = mapper->GetInput()->GetCellData()->GetNumberOfArrays();
@@ -894,6 +912,8 @@ void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
     this->Controller->Send(&nameLength, 1, 0, 987247);
     this->Controller->Send(const_cast<char*>(name), nameLength, 0, 987248);
     }
+  mapper->GetInput()->GetCellData()->GetAttributeIndices(activeAttributes);
+  this->Controller->Send(activeAttributes, 5, 0, 987258);
 }
 
 

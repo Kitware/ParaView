@@ -861,6 +861,8 @@ void vtkPVActorComposite::ChangeColorMapToRedBlue()
                          this->MapperTclName);
   pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
                          this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] Build",
+                         this->MapperTclName);
 }
 
 
@@ -878,6 +880,8 @@ void vtkPVActorComposite::ChangeColorMapToBlueRed()
                          this->MapperTclName);
   pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 1 1",
                          this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] Build",
+                         this->MapperTclName);
 }
 
 
@@ -894,6 +898,8 @@ void vtkPVActorComposite::ChangeColorMapToGrayscale()
   pvApp->BroadcastScript("[%s GetLookupTable] SetSaturationRange 0 0",
                          this->MapperTclName);
   pvApp->BroadcastScript("[%s GetLookupTable] SetValueRange 0 1",
+                         this->MapperTclName);
+  pvApp->BroadcastScript("[%s GetLookupTable] Build",
                          this->MapperTclName);
 }
 
