@@ -13,11 +13,14 @@
 =========================================================================*/
 // .NAME vtkKW@WidgetType@Set - a concrete set of vtkKW@WidgetType@
 // .SECTION Description
-// A composite widget to conveniently store a set of vtkKW@WidgetType@. 
+// A composite widget to conveniently store, allocate, create and pack a 
+// set of vtkKW@WidgetType@. 
 // Each vtkKW@WidgetType@ is created, removed or queried based
 // on a unique ID provided by the user (ids are *not* handled by the class
 // since it is likely that they will be defined as enum's or #define by
 // the user for easier retrieval).
+// As a subclass of vtkKWWidgetSet, it inherits methods to set the widgets
+// visibility individually, set the layout parameters, and query each widget.
 // Widgets are packed (gridded) in the order they were added.
 // .SECTION See Also
 // vtkKWWidgetSet

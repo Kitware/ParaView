@@ -11,12 +11,13 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkKW@WidgetType@Labeled - a @WidgetType@ associated to a label
+// .NAME vtkKW@WidgetType@Labeled - a vtkKW@WidgetType@ associated to a vtkKWLabel
 // .SECTION Description
-// This class creates a composite widget associating a @WidgetType@ to a label.
+// This class creates a composite widget associating a vtkKW@WidgetType@ to a
+// vtkKWLabel.
 // As a subclass of vtkKWWidgetLabeled, it inherits a label and methods to
 // set its position and visibility. Note that the default label position 
-// implemented in this class is on the left of the @WidgetType@, but 
+// implemented in this class is on the left of the vtkKW@WidgetType@, but 
 // specific positions listed in vtkKWWidgetLabeled are supported as well.
 // .SECTION See Also
 // vtkKWWidgetLabeled
