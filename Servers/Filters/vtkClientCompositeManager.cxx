@@ -18,7 +18,6 @@
 #endif
 
 #include "vtkClientCompositeManager.h"
-#include "vtkCompositeManager.h"
 
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
@@ -56,7 +55,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkClientCompositeManager, "1.36");
+vtkCxxRevisionMacro(vtkClientCompositeManager, "1.37");
 vtkStandardNewMacro(vtkClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkClientCompositeManager,Compositer,vtkCompositer);
@@ -143,29 +142,29 @@ vtkClientCompositeManager::~vtkClientCompositeManager()
 
   if (this->PData)
     {
-    vtkCompositeManager::DeleteArray(this->PData);
+    vtkCompositer::DeleteArray(this->PData);
     this->PData = NULL;
     }
   if (this->ZData)
     {
-    vtkCompositeManager::DeleteArray(this->ZData);
+    vtkCompositer::DeleteArray(this->ZData);
     this->ZData = NULL;
     }
 
   if (this->PData2)
     {
-    vtkCompositeManager::DeleteArray(this->PData2);
+    vtkCompositer::DeleteArray(this->PData2);
     this->PData2 = NULL;
     }
   if (this->ZData2)
     {
-    vtkCompositeManager::DeleteArray(this->ZData2);
+    vtkCompositer::DeleteArray(this->ZData2);
     this->ZData2 = NULL;
     }
 
   if (this->SquirtArray)
     {
-    vtkCompositeManager::DeleteArray(this->SquirtArray);
+    vtkCompositer::DeleteArray(this->SquirtArray);
     this->SquirtArray = NULL;
     }
   this->SetCompositer(NULL);
@@ -421,7 +420,7 @@ void vtkClientCompositeManager::StartRender()
   // Let the socket controller deal with byte swapping.
   controller->Send((double*)(&renInfo), 
                    sizeof(struct vtkClientCompositeDoubleInfo)/sizeof(double),
-                   1, vtkCompositeManager::REN_INFO_TAG);
+                   1, vtkClientCompositeManager::REN_INFO_TAG);
   
   this->ReceiveAndSetColorBuffer();
 }
@@ -613,7 +612,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
   // Receive the window size.
   int winInfoSize = sizeof(struct vtkClientCompositeIntInfo)/sizeof(int);
   controller->Receive((int*)(&winInfo), winInfoSize, 
-                      otherId, vtkCompositeManager::WIN_INFO_TAG);
+                      otherId, vtkClientCompositeManager::WIN_INFO_TAG);
 
   // In case the render window is smaller than requested.
   // This assumes that all server processes will have the
@@ -657,7 +656,7 @@ void vtkClientCompositeManager::SatelliteStartRender()
     for (j = 1; j < numProcs; ++j)
       {
       this->Controller->Send((int*)(&winInfo), winInfoSize, 
-                             j, vtkCompositeManager::WIN_INFO_TAG);
+                             j, vtkClientCompositeManager::WIN_INFO_TAG);
       }
     }
         
@@ -680,14 +679,14 @@ void vtkClientCompositeManager::SatelliteStartRender()
 
   controller->Receive((double*)(&renInfo), 
                       doubleInfoSize,
-                      otherId, vtkCompositeManager::REN_INFO_TAG);
+                      otherId, vtkClientCompositeManager::REN_INFO_TAG);
   if (myId == 0)
     {  // Relay info to server satellite processes.
     for (j = 1; j < numProcs; ++j)
       {
       this->Controller->Send((double*)(&renInfo), 
                       doubleInfoSize, 
-                      j, vtkCompositeManager::REN_INFO_TAG);
+                      j, vtkClientCompositeManager::REN_INFO_TAG);
       }
     }
   if (ren == NULL)
@@ -922,17 +921,17 @@ void vtkClientCompositeManager::ReallocPDataArrays()
 
   if (this->PData)
     {
-    vtkCompositeManager::DeleteArray(this->PData);
+    vtkCompositer::DeleteArray(this->PData);
     this->PData = NULL;
     } 
   if (this->PData2)
     {
-    vtkCompositeManager::DeleteArray(this->PData2);
+    vtkCompositer::DeleteArray(this->PData2);
     this->PData2 = NULL;
     } 
   if (this->SquirtArray)
     {
-    vtkCompositeManager::DeleteArray(this->SquirtArray);
+    vtkCompositer::DeleteArray(this->SquirtArray);
     this->SquirtArray = NULL;
     } 
 
@@ -945,18 +944,18 @@ void vtkClientCompositeManager::ReallocPDataArrays()
         {
         this->SquirtArray = vtkUnsignedCharArray::New();
         }
-      vtkCompositeManager::ResizeUnsignedCharArray(
+      vtkCompositer::ResizeUnsignedCharArray(
           this->SquirtArray, 4, numTuples);
       }
     }
   this->PData = vtkUnsignedCharArray::New();
-  vtkCompositeManager::ResizeUnsignedCharArray(
+  vtkCompositer::ResizeUnsignedCharArray(
       static_cast<vtkUnsignedCharArray*>(this->PData),
       numComps, numTuples);
   if (numProcs > 1)
     { // Not client (numProcs == 1)
     this->PData2 = vtkUnsignedCharArray::New();
-    vtkCompositeManager::ResizeUnsignedCharArray(
+    vtkCompositer::ResizeUnsignedCharArray(
         static_cast<vtkUnsignedCharArray*>(this->PData2),
         numComps, numTuples);
     }
@@ -996,27 +995,27 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
     {
     if (this->PData)
       {
-      vtkCompositeManager::DeleteArray(this->PData);
+      vtkCompositer::DeleteArray(this->PData);
       this->PData = NULL;
       }
     if (this->PData2)
       {
-      vtkCompositeManager::DeleteArray(this->PData2);
+      vtkCompositer::DeleteArray(this->PData2);
       this->PData2 = NULL;
       }
     if (this->SquirtArray)
       {
-      vtkCompositeManager::DeleteArray(this->SquirtArray);
+      vtkCompositer::DeleteArray(this->SquirtArray);
       this->SquirtArray = NULL;
       }
     if (this->ZData)
       {
-      vtkCompositeManager::DeleteArray(this->ZData);
+      vtkCompositer::DeleteArray(this->ZData);
       this->ZData = NULL;
       }
     if (this->ZData2)
       {
-      vtkCompositeManager::DeleteArray(this->ZData2);
+      vtkCompositer::DeleteArray(this->ZData2);
       this->ZData2 = NULL;
       }
     return;
@@ -1034,7 +1033,7 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
         {
         this->SquirtArray = vtkUnsignedCharArray::New();
         }
-      vtkCompositeManager::ResizeUnsignedCharArray(
+      vtkCompositer::ResizeUnsignedCharArray(
           this->SquirtArray, 4, numPixels);
       }
     }
@@ -1045,14 +1044,14 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
       {
       this->ZData = vtkFloatArray::New();
       }
-    vtkCompositeManager::ResizeFloatArray(
+    vtkCompositer::ResizeFloatArray(
       static_cast<vtkFloatArray*>(this->ZData), 
       1, numPixels);
     if (!this->ZData2)
       {
       this->ZData2 = vtkFloatArray::New();
       }
-    vtkCompositeManager::ResizeFloatArray(
+    vtkCompositer::ResizeFloatArray(
       static_cast<vtkFloatArray*>(this->ZData2), 
       1, numPixels);
     }
@@ -1072,7 +1071,7 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
     {
     this->PData = vtkUnsignedCharArray::New();
     }
-  vtkCompositeManager::ResizeUnsignedCharArray(
+  vtkCompositer::ResizeUnsignedCharArray(
     static_cast<vtkUnsignedCharArray*>(this->PData), 
     numComps, numPixels);
   if (numProcs > 1)
@@ -1081,7 +1080,7 @@ void vtkClientCompositeManager::SetPDataSize(int x, int y)
       {
       this->PData2 = vtkUnsignedCharArray::New();
       }
-    vtkCompositeManager::ResizeUnsignedCharArray(
+    vtkCompositer::ResizeUnsignedCharArray(
       static_cast<vtkUnsignedCharArray*>(this->PData2), 
       numComps, numPixels);
     }

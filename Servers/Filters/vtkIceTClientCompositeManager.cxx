@@ -18,7 +18,6 @@
 #endif
 
 #include "vtkIceTClientCompositeManager.h"
-#include "vtkCompositeManager.h"
 
 #include "vtkCallbackCommand.h"
 #include "vtkCamera.h"
@@ -46,7 +45,7 @@
 #endif
 
 
-vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.11");
+vtkCxxRevisionMacro(vtkIceTClientCompositeManager, "1.12");
 vtkStandardNewMacro(vtkIceTClientCompositeManager);
 
 vtkCxxSetObjectMacro(vtkIceTClientCompositeManager,IceTManager,vtkIceTRenderManager);
@@ -292,7 +291,7 @@ void vtkIceTClientCompositeManager::StartRender()
     // Let the socket controller deal with byte swapping.
     controller->Send((double*)(&renInfo), 
                      sizeof(struct vtkClientRendererInfo)/sizeof(double), 
-                     1, vtkCompositeManager::REN_INFO_TAG);
+                     1, vtkIceTClientCompositeManager::REN_INFO_TAG);
 //    }
   int i = 0;
   controller->Receive(&i, 1, 1, vtkIceTClientCompositeManager::ACKNOWLEDGE_RMI);
@@ -352,11 +351,8 @@ void vtkIceTClientCompositeManager::SatelliteStartRender()
   vtkInitializeClientRendererInfoMacro(renInfo);
   
   // Receive the window size.
-  //controller->Receive((char*)(&winInfo), 
-  //                    sizeof(struct vtkClientRenderWindowInfo), 
-  //                    otherId, vtkCompositeManager::WIN_INFO_TAG);
   controller->Receive((int*)(&winInfo), 5, otherId, 
-                      vtkCompositeManager::WIN_INFO_TAG);
+                      vtkIceTClientCompositeManager::WIN_INFO_TAG);
 
   this->ImageReductionFactor = winInfo.ImageReductionFactor;
   this->UseCompositing = winInfo.UseCompositing;
@@ -384,7 +380,7 @@ void vtkIceTClientCompositeManager::SatelliteStartRender()
       }
     controller->Receive((double*)(&renInfo), 
                         sizeof(struct vtkClientRendererInfo)/sizeof(double),
-                        otherId, vtkCompositeManager::REN_INFO_TAG);
+                        otherId, vtkIceTClientCompositeManager::REN_INFO_TAG);
     if (ren == NULL)
       {
       vtkErrorMacro("Renderer mismatch.");

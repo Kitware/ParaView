@@ -17,9 +17,9 @@
  #include <mpi.h>
 #endif
 
+#include "vtkCompositer.h"
 #include "vtkPVCompositeUtilities.h"
 #include "vtkMultiProcessController.h"
-#include "vtkCompositeManager.h"
 #include "vtkPVCompositeBuffer.h"
 #include "vtkObjectFactory.h"
 #include "vtkCollection.h"
@@ -27,7 +27,7 @@
 #include "vtkUnsignedCharArray.h"
 #include "vtkTimerLog.h"
 
-vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.9");
+vtkCxxRevisionMacro(vtkPVCompositeUtilities, "1.10");
 vtkStandardNewMacro(vtkPVCompositeUtilities);
 
 
@@ -123,8 +123,8 @@ vtkFloatArray* vtkPVCompositeUtilities::NewFloatArray(int numTuples,
     // what should be our default size?
     best->SetNumberOfComponents(numComps);
     best->SetNumberOfTuples(numTuples);
-    vtkCompositeManager::ResizeFloatArray(best, 
-                               numComps, numTuples);
+    vtkCompositer::ResizeFloatArray(best, 
+                                    numComps, numTuples);
     memoryTotal += best->GetActualMemorySize();
     this->FloatArrayCollection->AddItem(best);
     }
@@ -192,8 +192,8 @@ vtkPVCompositeUtilities::NewUnsignedCharArray(int numTuples,
     // what should be our default size?
     best->SetNumberOfComponents(numComps);
     best->SetNumberOfTuples(numTuples);
-    vtkCompositeManager::ResizeUnsignedCharArray(best, 
-                                      numComps, numTuples);
+    vtkCompositer::ResizeUnsignedCharArray(best, 
+                                           numComps, numTuples);
 
     memoryTotal += best->GetActualMemorySize();
     this->UnsignedCharArrayCollection->AddItem(best);
