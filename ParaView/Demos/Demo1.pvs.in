@@ -68,14 +68,12 @@ proc SphereDemoInit {} {
     
     set sInt [$pvWindow GetSourceInterface "vtkSphereSource"]
     set pvSphere [$sInt CreateCallback]
-    [$pvSphere GetVTKSource] SetThetaResolution 16
-    $pvSphere UpdateParameterWidgets
+    [$pvSphere GetPVWidget {Theta Resolution}] SetValue 16
     $pvSphere AcceptCallback
     
     set sInt2 [$pvWindow GetSourceInterface "vtkShrinkPolyData"]
     set pvShrink [$sInt2 CreateCallback]
-    [$pvShrink GetVTKSource] SetShrinkFactor 0.9
-    $pvShrink UpdateParameterWidgets
+    [$pvShrink GetPVWidget {ShrinkFactor}] SetValue 0.9
     $pvShrink AcceptCallback
 
     set eInt [$pvWindow GetSourceInterface "vtkElevationFilter"]
@@ -144,9 +142,8 @@ proc CombustorDemoInit {} {
     # Create the reader
     set pInt [$pvWindow GetSourceInterface "vtkPLOT3DReader"]
     set pvPlot3D [$pInt CreateCallback]
-    [$pvPlot3D GetVTKSource] SetXYZFileName $DataDir/combxyz.bin
-    [$pvPlot3D GetVTKSource] SetQFileName $DataDir/combq.bin
-    $pvPlot3D UpdateParameterWidgets
+    [$pvPlot3D GetPVWidget {XYZFileName}] SetValue $DataDir/combxyz.bin
+    [$pvPlot3D GetPVWidget {QFileName}] SetValue $DataDir/combq.bin
     $pvPlot3D AcceptCallback
     
     # Create the contour filter
@@ -158,8 +155,7 @@ proc CombustorDemoInit {} {
     set eInt [$pvWindow GetSourceInterface "vtkExtractGrid"]
     set pvExtract [$eInt CreateCallback]
     
-    [$pvExtract GetVTKSource] SetVOI 0 56 0 32 0 0 
-    $pvExtract UpdateParameterWidgets
+    [$pvExtract GetPVWidget {VOI}] SetValue 0 56 0 32 0 0 
     $pvExtract AcceptCallback
     
     [$pvExtract GetPVOutput] SetVisibility 0
@@ -168,8 +164,7 @@ proc CombustorDemoInit {} {
     $pvGlyph AcceptCallback
     
     [$pvGlyph GetPVOutput] ColorByProperty
-    [$pvGlyph GetVTKSource] SetScaleFactor 3.0
-    $pvGlyph UpdateParameterWidgets
+    [$pvGlyph GetPVWidget {Scale Factor}] SetValue 3.0
     $pvGlyph AcceptCallback
 
     [$pvGlyph GetPVOutput] SetVisibility 0
@@ -230,7 +225,6 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
     $cntOutput SetScalarBarVisibility 1
     $cntOutput SetScalarBarOrientationToHorizontal
     $cntOutput ColorByPointFieldComponent Momentum 0
-    $cInt UpdateParameterWidgets
     $pvWindow DisableMenus
     
     .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n\n Density isosurface colored by the first component\n of the momentum vector." -justify left
@@ -256,8 +250,7 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
     $camera SetViewAngle 30
     $camera SetClippingRange 18.5955 61.8423
 
-    [$pvExtract GetVTKSource] SetVOI 0 56 0 32 0 0 
-    $pvExtract UpdateParameterWidgets
+    [$pvExtract GetPVWidget {VOI}] SetValue 0 56 0 32 0 0 
     $pvExtract AcceptCallback
 
     [$pvExtract GetPVOutput] SetVisibility 1
@@ -268,8 +261,7 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
     .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n\n Horizantal plane extracted." -justify left
 
     for {set i 0} {$i < 24} {incr i 1} {
-	[$pvExtract GetVTKSource] SetVOI 0 56 0 32 $i $i
-	$pvExtract UpdateParameterWidgets
+	[$pvExtract GetPVWidget {VOI}] SetValue 0 56 0 32 $i $i
 	$pvExtract AcceptCallback
 	$pvWindow DisableMenus
 	RenWin1 Render
@@ -283,8 +275,7 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
     }
     
     for {set i 23} {$i >= 0} {incr i -1} {
-	[$pvExtract GetVTKSource] SetVOI 0 56 0 32 $i $i
-	$pvExtract UpdateParameterWidgets
+	[$pvExtract GetPVWidget {VOI}] SetValue 0 56 0 32 $i $i
 	$pvExtract AcceptCallback
 	$pvWindow DisableMenus
 	RenWin1 Render
@@ -305,14 +296,13 @@ proc CombustorDemoRun {cInt pvPlot3D pvExtract pvGlyph} {
     $camera SetViewAngle 30
     $camera SetClippingRange 15.0904 64.6074
 
-    [$pvExtract GetVTKSource] SetVOI 0 0 0 32 3 20
+    [$pvExtract GetPVWidget {VOI}] SetValue 0 0 0 32 3 20
     RenWin1 Render
     
     .control.main.info configure -text "Running Combustor Demo :\n This demo demonstrates the isosurface generation,\n grid extraction and glyphing capabilities of ParaView.\n\n Vertical plane extracted and glyphs oriented and\n scaled with momentum." -justify left
 
     for {set i 1} {$i < 56} {incr i 1} {
-	[$pvExtract GetVTKSource] SetVOI $i $i 0 32 3 20
-	$pvExtract UpdateParameterWidgets
+	[$pvExtract GetPVWidget {VOI}] SetValue $i $i 0 32 3 20
 	$pvExtract AcceptCallback
 	$pvWindow DisableMenus
 	RenWin1 Render
@@ -346,19 +336,16 @@ proc BlowMoldingDemoInit {} {
     
     set wInt [$pvWindow GetSourceInterface "vtkWarpVector"]
     set pvWarp [$wInt CreateCallback]
-    $pvWarp UpdateParameterWidgets
     $pvWarp AcceptCallback
 
     set lsInt [$pvWindow GetSourceInterface "vtkLoopSubdivisionFilter"]
     set pvSub [$lsInt CreateCallback] 
-    [$pvSub GetVTKSource] SetNumberOfSubdivisions 2
-    $pvSub UpdateParameterWidgets
+    [$pvSub GetPVWidget {NumberOfSubdivisions}] SetValue 2
     $pvSub AcceptCallback
 
     set nInt [$pvWindow GetSourceInterface "vtkPPolyDataNormals"]
     set pvNormals [$nInt CreateCallback]
-    [$pvNormals GetVTKSource] SetFeatureAngle 60
-    $pvNormals UpdateParameterWidgets
+    [$pvNormals GetPVWidget {FeatureAngle}] SetValue 60
     $pvNormals AcceptCallback
     
     set warpOutput [$pvWarp GetPVOutput]
