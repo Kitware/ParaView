@@ -150,6 +150,7 @@ class VTK_EXPORT vtkKWEvent
     ShiftLeftMouseOptionChangedEvent,
     ShiftMiddleMouseOptionChangedEvent,
     ShiftRightMouseOptionChangedEvent,
+    SplineSurfaceAddEvent,
     StandardInteractivityChangedEvent,
     SurfacePropertyChangedEvent,
     SurfacePropertyChangingEvent,

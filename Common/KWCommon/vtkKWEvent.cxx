@@ -140,6 +140,7 @@ static const char *vtkKWEventStrings[] = {
   "ShiftLeftMouseOptionChangedEvent",
   "ShiftMiddleMouseOptionChangedEvent",
   "ShiftRightMouseOptionChangedEvent",
+  "SplineSurfaceAddEvent",
   "StandardInteractivityChangedEvent",
   "SurfacePropertyChangedEvent",
   "SurfacePropertyChangingEvent",
