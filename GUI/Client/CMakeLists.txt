@@ -33,6 +33,8 @@ SET(ParaViewServer_SRCS ${ParaViewServer_SRCS}
   )
 
 SET( ParaViewClientNotWrapped_SRCS
+  vtkKWGenericMovieWriter.cxx
+  vtkMPEG2Writer.cxx
   vtkPVAnimationBatchHelper.cxx
   vtkPVAxesActor.cxx
   vtkPVAxesWidget.cxx
@@ -164,6 +166,7 @@ INCLUDE_DIRECTORIES(
   ${VTKCLIENTSERVER_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
   ${XDMF_INCLUDE_DIRS}
+  ${VTKMPEG2_INCLUDE_DIRS}
   )
 IF(VTK_USE_MPI)
   INCLUDE_DIRECTORIES(${MPI_INCLUDE_PATH})
@@ -190,6 +193,7 @@ SET_SOURCE_FILES_PROPERTIES(
   )
 
 SET_SOURCE_FILES_PROPERTIES(
+  vtkKWGenericMovieWriter.cxx
   vtkPV3DWidget
   vtkPVJoystickFly
   vtkPVObjectWidget
@@ -233,7 +237,8 @@ ADD_LIBRARY(vtkKWParaView ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
   ${ParaViewServerNonWrapped_SRCS}
   ${ParaViewSharedNotWrapped_SRCS}
   ${ParaView_SRCS})
-TARGET_LINK_LIBRARIES(vtkKWParaView vtkKWWidgetsTCL vtkPVServerManagerTCL)
+TARGET_LINK_LIBRARIES(vtkKWParaView 
+  vtkKWWidgetsTCL vtkPVServerManagerTCL vtkMPEG2Encode)
 
 IF(PARAVIEW_PLUS_BUILD)
   INCLUDE_DIRECTORIES(${PARAVIEW_PLUS_INCLUDE_DIRS})

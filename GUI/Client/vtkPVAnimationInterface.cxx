@@ -14,63 +14,54 @@
 =========================================================================*/
 #include "vtkPVAnimationInterface.h"
 
+#include "vtkCollectionIterator.h"
+#include "vtkCommand.h"
+#include "vtkCompleteArrays.h"
 #include "vtkErrorCode.h"
+#include "vtkJPEGWriter.h"
 #include "vtkKWCheckButton.h"
 #include "vtkKWEntry.h"
+#include "vtkKWEvent.h"
 #include "vtkKWFrame.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWLabeledFrame.h"
 #include "vtkKWLabeledOptionMenu.h"
+#include "vtkKWLoadSaveDialog.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWOptionMenu.h"
 #include "vtkKWPushButton.h"
+#include "vtkKWRange.h"
 #include "vtkKWScale.h"
 #include "vtkKWText.h"
 #include "vtkKWView.h"
+#include "vtkMPEG2Writer.h"
 #include "vtkObjectFactory.h"
+#include "vtkPNGWriter.h"
 #include "vtkPVAnimationBatchHelper.h"
+#include "vtkPVAnimationInterfaceEntry.h"
 #include "vtkPVApplication.h"
+#include "vtkPVConfig.h"
 #include "vtkPVDisplayGUI.h"
+#include "vtkPVProcessModule.h"
 #include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPVSource.h"
 #include "vtkPVSourceCollection.h"
+#include "vtkPVSourceNotebook.h"
 #include "vtkPVWidget.h"
 #include "vtkPVWidgetCollection.h"
+#include "vtkPVWindow.h"
+#include "vtkRenderWindow.h"
 #include "vtkSMDomain.h"
+#include "vtkSMPartDisplay.h"
 #include "vtkSMProperty.h"
 #include "vtkSMSourceProxy.h"
-#include "vtkPVWindow.h"
-#include "vtkKWLoadSaveDialog.h"
-#include "vtkJPEGWriter.h"
-#include "vtkTIFFWriter.h"
-#include "vtkPNGWriter.h"
-#include "vtkRenderWindow.h"
-#include "vtkPVProcessModule.h"
-#include "vtkSMPartDisplay.h"
-#include "vtkWindowToImageFilter.h"
-#include "vtkCompleteArrays.h"
-#include "vtkPVSourceNotebook.h"
-
-#include "vtkPVAnimationInterfaceEntry.h"
-#include "vtkCollectionIterator.h"
 #include "vtkString.h"
-#include "vtkKWRange.h"
-#include "vtkCommand.h"
-#include "vtkKWEvent.h"
-#include "vtkPVConfig.h"
-
-#ifdef PARAVIEW_PLUS_BUILD
-# include "vtkMPEG2Writer.h"
-# ifdef _WIN32
-#  include "vtkAVIWriter.h"
-# else
-#  include "vtkMovieWriter.h"
-# endif
-#endif
+#include "vtkTIFFWriter.h"
+#include "vtkWindowToImageFilter.h"
 
 #ifndef _WIN32
 # include <unistd.h>
@@ -185,7 +176,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.165");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.166");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1221,12 +1212,8 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   saveDialog->SetTitle("Save Animation Images");
   ostrstream ostr;
   ostr << "{{JPEG Images} {.jpg}} {{TIFF Images} {.tif}} {{PNG Images} {.png}}";
-#ifdef PARAVIEW_PLUS_BUILD
-# ifdef _WIN32
-  ostr << " {{AVI movie file} {.avi}}";
-# endif
-  ostr << " {{MPEG movie file} {.mpg}}";
-#endif
+  ostr << " {{MPEG2 movie file} {.mp2}}";
+
   ostr << ends;
 
   saveDialog->SetFileTypes(ostr.str());
@@ -1422,9 +1409,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   vtkWindowToImageFilter* winToImage;
   vtkImageWriter* writer = 0;
   (void)aspectRatio;
-#ifdef PARAVIEW_PLUS_BUILD
   vtkKWGenericMovieWriter* awriter = 0;
-#endif
   char *fileName;
   int fileCount;
   int t;
@@ -1459,23 +1444,14 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     writer = vtkPNGWriter::New();
     }
-#ifdef PARAVIEW_PLUS_BUILD
-# ifdef _WIN32
-  else if (strcmp(ext,"avi") == 0 )
-    {
-    awriter = vtkAVIWriter::New();
-    }
-# endif
-  else if (strcmp(ext, "mpg") == 0)
+  else if (strcmp(ext, "mp2") == 0)
     {
     awriter = vtkMPEG2Writer::New();
-    //awriter = vtkMovieWriter::New();
 //    if ( aspectRatio > 0 && aspectRatio <= 4 )
 //      {
 //      vtkMPEG2Writer::SafeDownCast(awriter)->SetAspectRatio(aspectRatio);
 //      }
     }
-#endif
   else
     {
     vtkErrorMacro("Unknown extension " << ext << ", try: jpg, tif or png.");
@@ -1490,7 +1466,6 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     {
     writer->SetInput(winToImage->GetOutput());
     }
-#ifdef PARAVIEW_PLUS_BUILD
   else if ( awriter )
     {
     awriter->SetInput(winToImage->GetOutput());
@@ -1498,7 +1473,6 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     awriter->SetFileName(fileName);
     awriter->Start();
     }
-#endif
 
   // Loop through all of the time steps.
   t = this->GetGlobalStart();
@@ -1522,13 +1496,11 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
       writer->Write();
       errcode = writer->GetErrorCode();
       }
-#ifdef PARAVIEW_PLUS_BUILD
     else if ( awriter )
       {
       awriter->Write();
       errcode = awriter->GetErrorCode() + awriter->GetError();
       }
-#endif
     if ( errcode == vtkErrorCode::OutOfDiskSpaceError)
       {
       if ( writer )
@@ -1559,14 +1531,12 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
     writer->Delete();
     writer = NULL;
     }
-#ifdef PARAVIEW_PLUS_BUILD
   else if ( awriter )
     {
     awriter->SetInput(0);
     awriter->Delete();
     awriter = 0;
     }
-#endif
   delete [] fileName;
   fileName = NULL;
   
