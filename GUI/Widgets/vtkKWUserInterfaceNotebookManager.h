@@ -164,7 +164,7 @@ public:
   virtual int DeleteAllDragAndDropEntries();
 
   // Description:
-  // Convenience function used to serialize/save/restore Drag&Drop entries to
+  // Convenience function used to save/restore Drag&Drop entries to
   // a text file. 
   // GetDragAndDropEntry() can be used to get a Drag&Drop entry parameters 
   // as plain text string. 
@@ -258,7 +258,7 @@ protected:
   // Description:
   // Assuming that the widget can be Drag&Dropped given our framework, 
   // return a label that will be used to identify it. This is mostly used to
-  // serialize a D&D event to a text string/file.
+  // save a D&D event to a text string/file.
   virtual char* GetDragAndDropWidgetLabel(vtkKWWidget *widget);
 
   // Description:

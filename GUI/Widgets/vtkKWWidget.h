@@ -358,8 +358,6 @@ protected:
   vtkKWWidget();
   ~vtkKWWidget();
 
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-
   //BTX
   friend class vtkKWFrame;
   //ETX

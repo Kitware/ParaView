@@ -59,12 +59,6 @@ public:
   virtual void SetCommand(vtkKWObject* Object, const char *MethodAndArgString);
 
   // Description:
-  // Chaining method to serialize an object and its superclasses.
-  virtual void SerializeSelf(ostream& os, vtkIndent indent);
-  virtual void SerializeToken(istream& is, const char *token);
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-
-  // Description:
   // Set the string that enables balloon help for this widget.
   // Override to pass down to children.
   virtual void SetBalloonHelpString(const char *str);

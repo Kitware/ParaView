@@ -37,7 +37,6 @@
 #include "vtkKWNotebook.h"
 #include "vtkKWSaveImageDialog.h"
 #include "vtkKWSegmentedProgressGauge.h"
-#include "vtkKWSerializer.h"
 #include "vtkKWUserInterfaceManager.h"
 #include "vtkKWWidgetCollection.h"
 #include "vtkKWWindow.h"
@@ -87,7 +86,7 @@ Bool vtkKWRenderViewPredProc(Display *vtkNotUsed(disp), XEvent *event,
 }
 #endif
 
-vtkCxxRevisionMacro(vtkKWView, "1.5");
+vtkCxxRevisionMacro(vtkKWView, "1.6");
 
 //----------------------------------------------------------------------------
 int vtkKWViewCommand(ClientData cd, Tcl_Interp *interp,

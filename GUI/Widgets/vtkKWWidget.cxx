@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWWidget );
-vtkCxxRevisionMacro(vtkKWWidget, "1.110");
+vtkCxxRevisionMacro(vtkKWWidget, "1.111");
 
 int vtkKWWidgetCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -462,14 +462,6 @@ void vtkKWWidget::SetBalloonHelpString(const char *str)
     this->SetUpBalloonHelpBindings();
     this->BalloonHelpInitialized = 1;
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWWidget::SerializeRevision(ostream& os, vtkIndent indent)
-{
-  this->Superclass::SerializeRevision(os,indent);
-  os << indent << "vtkKWWidget ";
-  this->ExtractRevision(os,"$Revision: 1.110 $");
 }
 
 //----------------------------------------------------------------------------

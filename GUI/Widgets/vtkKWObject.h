@@ -61,18 +61,6 @@ public:
   static float GetFloatResult(vtkKWApplication *);
 
   // Description:
-  // Chaining method to serialize an object and its superclasses.
-  virtual void Serialize(ostream& os, vtkIndent indent);
-  virtual void SerializeRevision(ostream& os, vtkIndent indent);
-  virtual void Serialize(istream& is);
-  virtual void SerializeSelf(ostream& /*os*/, vtkIndent /*indent*/) {};
-  virtual void SerializeToken(istream& is, const char *token);
-  virtual const char *GetVersion(const char *);
-  virtual void AddVersion(const char *cname, const char *version);
-  void ExtractRevision(ostream& os,const char *revIn);
-  int CompareVersions(const char *v1, const char *v2);
-  
-  // Description:
   // This method returns 1 if the trace for this object has been 
   // initialized. If it has not, it tries to initialize the object
   // by invoking an event.  If this does not work, it returns 0.
@@ -119,10 +107,6 @@ protected:
   vtkKWObject();
   ~vtkKWObject();
 
-  char **Versions;
-  int   NumberOfVersions;
-  int   VersionsLoaded;
-  
   // this instance variable holds the command functions for this class.
   int (*CommandFunction)(ClientData, Tcl_Interp *, int, char *[]);
 

@@ -14,7 +14,6 @@
 #include "vtkKWObject.h"
 
 #include "vtkKWApplication.h"
-#include "vtkKWSerializer.h"
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
 
@@ -25,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWObject );
-vtkCxxRevisionMacro(vtkKWObject, "1.47");
+vtkCxxRevisionMacro(vtkKWObject, "1.48");
 
 int vtkKWObjectCommand(ClientData cd, Tcl_Interp *interp,
                        int argc, char *argv[]);
@@ -36,9 +35,6 @@ vtkKWObject::vtkKWObject()
   this->TclName = NULL;
   this->Application = NULL;  
   this->CommandFunction = vtkKWObjectCommand;
-  this->NumberOfVersions = 0;
-  this->Versions = NULL;
-  this->VersionsLoaded = 0;
   this->TraceInitialized = 0;
   this->TraceReferenceObject = NULL;
   this->TraceReferenceCommand = NULL;
@@ -51,102 +47,11 @@ vtkKWObject::~vtkKWObject()
     {
     delete [] this->TclName;
     }
-  for (int i = 0; i < this->NumberOfVersions; i++)
-    {
-    delete [] this->Versions[i*2];
-    delete [] this->Versions[i*2+1];    
-    }
-  if (this->Versions)
-    {
-    delete [] this->Versions;
-    }
-  
   this->SetApplication(NULL);
   this->SetTraceReferenceObject(NULL);
   this->SetTraceReferenceCommand(NULL);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkKWObject::Serialize(ostream& os, vtkIndent indent)
-{
-  os << this->GetClassName() << endl;
-  os << indent << "  {\n";
-  os << indent << "  Versions\n";
-  os << indent << "    {\n";
-  this->SerializeRevision(os, indent.GetNextIndent().GetNextIndent());
-  os << indent << "    }\n";
-  this->SerializeSelf(os, indent.GetNextIndent());
-  os << indent << "  }\n";
-}
-
-//----------------------------------------------------------------------------
-void vtkKWObject::ExtractRevision(ostream& os,const char *revIn)
-{
-  char rev[128];
-  sscanf(revIn,"$Revision: %s",rev);
-  os << rev << endl;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWObject::SerializeRevision(ostream& os, vtkIndent indent)
-{
-  os << indent << "vtkKWObject ";
-  this->ExtractRevision(os,"$Revision: 1.47 $");
-}
-
-//----------------------------------------------------------------------------
-void vtkKWObject::Serialize(istream& is)
-{
-  char token[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
-  char tmp[VTK_KWSERIALIZER_MAX_TOKEN_LENGTH];
-
-  // get the class name
-  this->VersionsLoaded = 0;
-  vtkKWSerializer::GetNextToken(&is,token);
-  if (strcmp(token,this->GetClassName()))
-    {
-    vtkDebugMacro("A class name mismatch has occured.");
-    }
-  vtkKWSerializer::ReadNextToken(&is,"{",this);
-
-  // for each token process it
-  do
-    {
-    vtkKWSerializer::GetNextToken(&is,token);
-    if (token[0] == '{')
-      {
-      vtkKWSerializer::FindClosingBrace(&is,this);
-      }
-    else
-      {
-      // get the version istory first
-      if (!strcmp(token,"Versions"))
-        {
-        vtkKWSerializer::GetNextToken(&is,token);
-        do
-          {
-          if (token[0] != '{')
-            {
-            vtkKWSerializer::GetNextToken(&is,tmp);
-            this->AddVersion(token,tmp);
-            }
-          vtkKWSerializer::GetNextToken(&is,token);
-          }
-        while (token[0] != '}');
-        this->VersionsLoaded = 1;
-        vtkKWSerializer::GetNextToken(&is,token);
-        }
-      this->SerializeToken(is,token);
-      }
-    }
-  while (token[0] != '}' && is.tellg() >= 0);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWObject::SerializeToken(istream& /*is*/, const char * /*token*/)
-{
-}
 
 //----------------------------------------------------------------------------
 const char *vtkKWObject::GetTclName()
@@ -232,102 +137,6 @@ void vtkKWObject::SetApplication (vtkKWApplication* arg)
     this->Modified();
     }
 }
-
-//----------------------------------------------------------------------------
-void vtkKWObject::AddVersion(const char *cname, const char *version)
-{
-  // allocate more space
-  int cnt;
-  
-  char **objs = new char *[2*(this->NumberOfVersions+1)];
-
-  // copy the old to the new
-  for (cnt = 0; cnt < this->NumberOfVersions*2; cnt++)
-    {
-    objs[cnt] = this->Versions[cnt];
-    }
-  if (this->Versions)
-    {
-    delete [] this->Versions;
-    }
-  this->Versions = objs;
-  char *classname = new char [strlen(cname)+1];
-  sprintf(classname,"%s",cname);
-  this->Versions[this->NumberOfVersions*2] = classname;
-
-  
-  // compute the revision, strip out extra junk
-  char *revision = new char [strlen(version)+1];
-  sprintf(revision,"%s",version);
-  this->Versions[this->NumberOfVersions*2+1] = revision;
-  this->NumberOfVersions++;
-}
-
-//----------------------------------------------------------------------------
-int vtkKWObject::CompareVersions(const char *v1, const char *v2)
-{
-  if (!v1 && !v2)
-    {
-    return 0;
-    }
-  if (!v1)
-    {
-    return -1;
-    }
-  if (!v2)
-    {
-    return 1;
-    }
-  // both v1 and v2 are non NULL
-  int nVer1 = 0;
-  int nVer2 = 0;
-  int ver1[7];
-  int ver2[7];
-  nVer1 = sscanf(v1,"%i.%i.%i.%i.%i.%i.%i", ver1, ver1+1, ver1+2,
-                 ver1+3, ver1+4, ver1+5, ver1+6);
-  nVer2 = sscanf(v2,"%i.%i.%i.%i.%i.%i.%i", ver2, ver2+1, ver2+2,
-                 ver2+3, ver2+4, ver2+5, ver2+6);
-
-  int pos = 0;
-  // compare revisions
-  while (pos < nVer1 && pos < nVer2)
-    {
-    if (ver1[pos] < ver2[pos])
-      {
-      return -1;
-      }
-    if (ver1[pos] > ver2[pos])
-      {
-      return 1;
-      }    
-                pos++;
-    }
-  // revisions match but maybe one has more .2.3.4.2
-  if (nVer1 < nVer2)
-    {
-    return -1;
-    }
-  if (nVer1 > nVer2)
-    {
-    return 1;
-    }
-  // They are identical in every way
-  return 0;
-}
-
-//----------------------------------------------------------------------------
-const char *vtkKWObject::GetVersion(const char *cname)
-{
-  for (int i = 0; i < this->NumberOfVersions; i++)
-    {
-    if (!strcmp(this->Versions[i*2],cname))
-      {
-      return this->Versions[i*2+1];
-      }
-    }
-  return NULL;
-}
-
 
 //----------------------------------------------------------------------------
 int vtkKWObject::InitializeTrace(ofstream* file)

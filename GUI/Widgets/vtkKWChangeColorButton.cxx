@@ -20,7 +20,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWChangeColorButton);
-vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.50");
+vtkCxxRevisionMacro(vtkKWChangeColorButton, "1.51");
 
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -473,43 +473,6 @@ void vtkKWChangeColorButton::SetCommand( vtkKWObject* CalledObject,
                                          const char *CommandString )
 {
   this->SetObjectMethodCommand(&this->Command, CalledObject, CommandString);
-}
-
-//----------------------------------------------------------------------------
-// Description:
-// Chaining method to serialize an object and its superclasses.
-void vtkKWChangeColorButton::SerializeSelf(ostream& os, vtkIndent indent)
-{
-  // invoke superclass
-  this->Superclass::SerializeSelf(os,indent);
-  os << indent << "Color " << this->Color[0] << " " << this->Color[1] <<
-    " " << this->Color[2] << endl;
-}
-
-//----------------------------------------------------------------------------
-void vtkKWChangeColorButton::SerializeToken(istream& is, const char *token)
-{
-  double clr[3];
-  if (!strcmp(token,"Color"))
-    {
-    is >> clr[0] >> clr[1] >> clr[2];
-    this->SetColor(clr);
-    if ( this->Command )
-      {
-      this->Script("eval %s %lf %lf %lf", this->Command, 
-                   clr[0], clr[1], clr[2]);
-      }
-    return;
-    }
-  vtkKWWidget::SerializeToken(is, token);
-}
-
-//----------------------------------------------------------------------------
-void vtkKWChangeColorButton::SerializeRevision(ostream& os, vtkIndent indent)
-{
-  vtkKWWidget::SerializeRevision(os,indent);
-  os << indent << "vtkKWChangeColorButton ";
-  this->ExtractRevision(os,"$Revision: 1.50 $");
 }
 
 //----------------------------------------------------------------------------
