@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.7");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.1.2.8");
 
 //----------------------------------------------------------------------------
 // Internal container instantiations.
@@ -169,6 +169,7 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
                      << "---------------------------------------\n";
     *this->LogStream << "Processing ";
     css.PrintMessage(*this->LogStream, message);
+    this->LogStream->flush();
     }
 
   // Look for known commands in the message.
@@ -205,12 +206,13 @@ vtkClientServerInterpreter::ProcessOneMessage(const vtkClientServerStream& css,
     if(this->LastResultMessage->GetNumberOfMessages() > 0)
       {
       *this->LogStream << "Result ";
-      this->LastResultMessage->Print(*this->LogStream);
-      }
+      this->LastResultMessage->Print(*this->LogStream); 
+     }
     else
       {
       *this->LogStream << "Empty Result\n";
       }
+    this->LogStream->flush();
     }
 
   // Report an error if the command failed with an error message.
@@ -324,6 +326,7 @@ vtkClientServerInterpreter
       {
       *this->LogStream << "Invoking ";
       msg.Print(*this->LogStream);
+      this->LogStream->flush();
       }
 
     // Find the command function for this object's type.
