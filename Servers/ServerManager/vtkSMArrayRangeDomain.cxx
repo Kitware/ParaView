@@ -27,7 +27,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkSMArrayRangeDomain);
-vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.1");
+vtkCxxRevisionMacro(vtkSMArrayRangeDomain, "1.2");
 
 //---------------------------------------------------------------------------
 vtkSMArrayRangeDomain::vtkSMArrayRangeDomain()
@@ -94,11 +94,11 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
   unsigned int numProxs = ip->GetNumberOfUncheckedProxies();
   for (i=0; i<numProxs; i++)
     {
-    vtkSMSourceProxy* sp = 
+    vtkSMSourceProxy* source = 
       vtkSMSourceProxy::SafeDownCast(ip->GetUncheckedProxy(i));
-    if (sp)
+    if (source)
       {
-      this->Update(arrayName, ip, sp);
+      this->Update(arrayName, ip, source);
       return;
       }
     }
@@ -108,11 +108,11 @@ void vtkSMArrayRangeDomain::Update(vtkSMProperty* prop)
   numProxs = ip->GetNumberOfProxies();
   for (i=0; i<numProxs; i++)
     {
-    vtkSMSourceProxy* sp = 
+    vtkSMSourceProxy* source = 
       vtkSMSourceProxy::SafeDownCast(ip->GetProxy(i));
-    if (sp)
+    if (source)
       {
-      this->Update(arrayName, ip, sp);
+      this->Update(arrayName, ip, source);
       return;
       }
     }

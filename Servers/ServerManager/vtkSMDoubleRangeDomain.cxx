@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDoubleRangeDomain);
-vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMDoubleRangeDomain, "1.5");
 
 struct vtkSMDoubleRangeDomainInternals
 {
@@ -105,7 +105,7 @@ unsigned int vtkSMDoubleRangeDomain::GetNumberOfEntries()
 //---------------------------------------------------------------------------
 void vtkSMDoubleRangeDomain::SetNumberOfEntries(unsigned int size)
 {
-  return this->DRInternals->Entries.resize(size);
+  this->DRInternals->Entries.resize(size);
 }
 
 //---------------------------------------------------------------------------
