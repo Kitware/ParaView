@@ -28,6 +28,7 @@ vtkKWLabeledEntry.cxx
 vtkKWLabeledFrame.cxx 
 vtkKWLabeledLabel.cxx 
 vtkKWLabeledLabelSet.cxx
+vtkKWLabeledLoadSaveButton.cxx
 vtkKWLabeledOptionMenu.cxx 
 vtkKWLabeledPopupButton.cxx 
 vtkKWLabeledPushButton.cxx
@@ -37,6 +38,7 @@ vtkKWLabeledScaleSet.cxx
 vtkKWLabeledText.cxx 
 vtkKWLabeledWidget.cxx 
 vtkKWListBox.cxx 
+vtkKWLoadSaveButton.cxx
 vtkKWLoadSaveDialog.cxx
 vtkKWMenu.cxx 
 vtkKWMenuButton.cxx 
