@@ -20,7 +20,7 @@ VTK_WRAP_ClientServer(PVLocal PVLocalCS_SRCS "${PVLocal_SRCS}")
 
 # Build the package as a plugin for ParaView.
 ADD_LIBRARY(PVLocal MODULE ${PVLocal_SRCS} ${PVLocalCS_SRCS})
-TARGET_LINK_LIBRARIES(PVLocal vtkClientServer vtkGraphics)
+TARGET_LINK_LIBRARIES(PVLocal vtkClientServer vtkGraphicsCS)
 
 # Place the package configuration file into the build tree.
 CONFIGURE_FILE(${PVLocal_SOURCE_DIR}/PVLocal.xml.in
