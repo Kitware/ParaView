@@ -30,26 +30,26 @@ IF(USE_INCLUDED_TCLTK)
   IF(UNIX)
     IF(RUN_CONFIGURE)
       EXEC_PROGRAM(
-       "${ParaViewComplete_SOURCE_DIR}/tcl8.3.2/unix/configure --disable-shared"
-       ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix)
+       "${ParaViewComplete_SOURCE_DIR}/tcl8.4.5/unix/configure --disable-shared"
+       ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix)
       EXEC_PROGRAM(
-       "${ParaViewComplete_SOURCE_DIR}/tk8.3.2/unix/configure --disable-shared"
-       ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix)
+       "${ParaViewComplete_SOURCE_DIR}/tk8.4.5/unix/configure --disable-shared"
+       ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix)
     ENDIF(RUN_CONFIGURE)
 
-    SET(TCL_LIBRARY ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix/libtcl8.3.a 
+    SET(TCL_LIBRARY ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix/libtcl8.4.a 
        CACHE FILEPATH "Path to tcl library")
     SET(TCL_STUB_LIBRARY 
-       ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix/libtclstub8.3.a 
+       ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix/libtclstub8.4.a 
        CACHE FILEPATH "Path to tcl stub library")
-    SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tcl8.3.2/generic 
+    SET(TCL_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tcl8.4.5/generic 
         CACHE PATH "Path to tcl include")
-    SET(TK_LIBRARY ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix/libtk8.3.a 
+    SET(TK_LIBRARY ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix/libtk8.4.a 
        CACHE FILEPATH "Path to tk library")
     SET(TK_STUB_LIBRARY 
-       ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix/libtkstub8.3.a 
+       ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix/libtkstub8.4.a 
        CACHE FILEPATH "Path to tk stub library")
-    SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.3.2/generic 
+    SET(TK_INCLUDE_PATH ${ParaViewComplete_SOURCE_DIR}/tk8.4.5/generic 
         CACHE PATH "Path to tk include")
     IF (CMAKE_MAJOR_VERSION MATCHES [1-9][0-9]*)
       IF (CMAKE_MINOR_VERSION MATCHES [3-9][0-9]*)
@@ -70,14 +70,14 @@ IF(USE_INCLUDED_TCLTK)
 
     IF (CMAKE_ESCAPES_SC)
       ADD_CUSTOM_TARGET(maketcl ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix\; $(MAKE) )
+        cd ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix\; $(MAKE) )
       ADD_CUSTOM_TARGET(maketk ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix\; $(MAKE) )
+        cd ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix\; $(MAKE) )
     ELSE (CMAKE_ESCAPES_SC)
       ADD_CUSTOM_TARGET(maketcl ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tcl8.3.2/unix; $(MAKE) )
+        cd ${ParaViewComplete_BINARY_DIR}/tcl8.4.5/unix; $(MAKE) )
       ADD_CUSTOM_TARGET(maketk ALL 
-        cd ${ParaViewComplete_BINARY_DIR}/tk8.3.2/unix; $(MAKE) )
+        cd ${ParaViewComplete_BINARY_DIR}/tk8.4.5/unix; $(MAKE) )
     ENDIF (CMAKE_ESCAPES_SC)
   
   ELSE(UNIX)
