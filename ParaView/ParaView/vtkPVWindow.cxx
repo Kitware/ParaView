@@ -58,7 +58,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVSource.h"
 #include "vtkPVData.h"
-#include "vtkPVActorComposite.h"
 
 #include "vtkPVSourceInterface.h"
 #include "vtkPVSourceInterfaceParser.h"
@@ -88,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctype.h>
 
 #ifdef _WIN32
-#include "vtkKWWin32RegisteryUtilities.h"
+#include "vtkKWRegisteryUtilities.h"
 #endif
 
 #ifndef VTK_USE_ANSI_STDLIB
@@ -820,7 +819,7 @@ void vtkPVWindow::PlayDemo()
   char loc[1024];
   char temp[1024];
   
-  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  vtkKWRegisteryUtilities *reg = this->GetApplication()->GetRegistery();
   sprintf(temp, "%i", this->GetApplication()->GetApplicationKey());
   reg->SetTopLevel(temp);
   if (reg->ReadValue("Inst", loc, "Loc"))
@@ -845,8 +844,6 @@ void vtkPVWindow::PlayDemo()
     found=1;
     }
 
-  reg->Delete();
-  
 #endif // _WIN32  
 
   // Look in binary and installation directories

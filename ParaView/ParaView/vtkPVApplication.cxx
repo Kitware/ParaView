@@ -85,7 +85,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _WIN32
 #include "htmlhelp.h"
-#include "vtkKWWin32RegisteryUtilities.h"
+#include "vtkKWRegisteryUtilities.h"
 #endif
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
@@ -929,7 +929,7 @@ void vtkPVApplication::DisplayHelp()
 #ifdef _WIN32
   char temp[1024];
   char loc[1024];
-  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  vtkKWRegisteryUtilities *reg = this->GetRegistery();
   sprintf(temp, "%i", this->GetApplicationKey());
   reg->SetTopLevel(temp);
   if (reg->ReadValue("Inst", "Loc", loc))
@@ -942,7 +942,6 @@ void vtkPVApplication::DisplayHelp()
     sprintf(temp,"%s.chm::/UsersGuide/index.html",this->ApplicationName);
     }
   HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
-  reg->Delete();
 #else
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();
   dlg->SetTitle("ParaView Help");
