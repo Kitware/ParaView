@@ -468,7 +468,7 @@ void vtkPVWindow::Open()
   this->Script("set openFileName [tk_getOpenFile -filetypes {{{VTK files} {.vtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]");
   openFileName = this->GetPVApplication()->GetMainInterp()->result;
 
-  if (!openFileName)
+  if (strcmp(openFileName, "") == 0)
     {
     return;
     }
