@@ -280,8 +280,8 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
 	// (handles non-power of 2 cases)
 	if (id < numProcs) 
 	  {
-	  cerr << "phase " << i << " receiver: " << myId 
-	       << " receives data from " << id << endl;
+	  //cerr << "phase " << i << " receiver: " << myId 
+	  //     << " receives data from " << id << endl;
 	  controller->Receive(remoteZdata, zdata_size, id, 99);
 	  controller->Receive(remotePdata, pdata_size, id, 99);
 
@@ -295,8 +295,8 @@ void vtkTreeComposite(vtkRenderWindow *renWin,
 	id = myId-pow2(i);
 	if (id < numProcs) 
 	  {
-	  cerr << i << " sender: " << myId << " sends data to "
-	         << id << endl;
+	  //cerr << i << " sender: " << myId << " sends data to "
+	  //       << id << endl;
 	  controller->Send(localZdata, zdata_size, id, 99);
 	  controller->Send(localPdata, pdata_size, id, 99);
 	  }

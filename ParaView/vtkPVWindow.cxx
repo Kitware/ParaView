@@ -35,6 +35,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkInteractorStylePlaneSource.h"
 #include "vtkInteractorStyleCamera.h"
 
+#include "vtkMath.h"
 #include "vtkImageReader.h"
 #include "vtkOutlineSource.h"
 #include "vtkSynchronizedTemplates3D.h"
@@ -149,8 +150,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->Script( "wm deiconify %s", this->GetWidgetName());
 
   // Setup an interactor style.
-  this->SetupTest();
-  //this->SetupVolumeIso();
+  //this->SetupTest();
+  this->SetupVolumeIso();
 
 }
 
@@ -243,7 +244,11 @@ void vtkPVWindow::SetupVolumeIso()
     
     pvApp->RemoteSimpleScript(id, "vtkPolyDataMapper IsoMapper");
     pvApp->RemoteSimpleScript(id, "IsoMapper SetInput [Iso GetOutput]");
+    pvApp->RemoteSimpleScript(id, "IsoMapper ScalarVisibilityOff");
     pvApp->RemoteSimpleScript(id, "vtkActor IsoActor");
+    pvApp->RemoteScript(id, "[IsoActor GetProperty] SetColor %f %f %f",
+			vtkMath::Random(), vtkMath::Random(), vtkMath::Random());
+    
     pvApp->RemoteSimpleScript(id, "IsoActor SetMapper IsoMapper");
     pvApp->RemoteSimpleScript(id, "[RenderSlave GetRenderer] AddActor IsoActor");
     }
