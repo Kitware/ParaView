@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWLabeledLabel );
-vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.1");
+vtkCxxRevisionMacro(vtkKWLabeledLabel, "1.1.2.1");
 
 int vtkKWLabeledLabelCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -92,7 +92,7 @@ void vtkKWLabeledLabel::Create(vtkKWApplication *app)
   this->Label1->Create(app, "");
   this->Label2->Create(app, "");
 
-  this->Script("pack %s %s -side left", 
+  this->Script("pack %s %s -side left -anchor nw", 
                this->Label1->GetWidgetName(),
                this->Label2->GetWidgetName());
 }
