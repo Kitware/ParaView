@@ -18,10 +18,11 @@ $kw(vtkTemp999) SetPoint1 0 0 0
 $kw(vtkTemp999) SetPoint2 0 0 1
 $kw(vtkTemp260) AcceptCallback
 set kw(vtkTemp294) [$kw(vtkTemp260) GetPVOutput]
-$kw(vtkTemp294) ChangeColorMapToBlueRed
-$kw(vtkTemp294) ChangeColorMapToGrayscale
-$kw(vtkTemp294) ChangeColorMapToRedBlue
-$kw(vtkTemp294) SetScalarBarVisibility 1
+set kw(vtkTemp336) [$kw(vtkTemp1) GetPVColorMap {Elevation}]
+$kw(vtkTemp336) SetColorSchemeToBlueRed
+$kw(vtkTemp336) SetColorSchemeToGrayscale
+$kw(vtkTemp336) SetColorSchemeToRedBlue
+$kw(vtkTemp336) SetScalarBarVisibility 1
 $kw(vtkTemp294) DrawWireframe
 $kw(vtkTemp294) SetPointSize 3
 $kw(vtkTemp294) SetLineWidth 3
@@ -33,15 +34,12 @@ $kw(vtkTemp294) ColorByProperty
 $kw(vtkTemp294) ChangeActorColor 1.000000 0.070588 1.000000
 $kw(vtkTemp294) ColorByPointFieldComponent {Elevation} 0
 $kw(vtkTemp294) SetColorRange 0.100000 0.433010
-$kw(vtkTemp294) SetColorRange 0.100000 0.433010
-$kw(vtkTemp294) SetColorRange 0.200000 0.433010
 $kw(vtkTemp294) SetColorRange 0.200000 0.433010
 $kw(vtkTemp294) SetColorRange 0.000000 0.433010
 $kw(vtkTemp294) SetColorRange 0.300000 0.433010
+$kw(vtkTemp336) SetColorSchemeToBlueRed
 $kw(vtkTemp294) SetColorRange 0.300000 0.433010
-$kw(vtkTemp294) ChangeColorMapToBlueRed
-$kw(vtkTemp294) SetColorRange 0.300000 0.433010
-$kw(vtkTemp294) ChangeColorMapToRedBlue
+$kw(vtkTemp336) SetColorSchemeToRedBlue
 $kw(vtkTemp294) SetColorRange 0.300000 0.433010
 $kw(vtkTemp294) SetColorRange 0.300000 0.433010
 $kw(vtkTemp294) SetCubeAxesVisibility 1
@@ -69,8 +67,8 @@ $kw(vtkTemp300) AcceptCallback
 $kw(vtkTemp309) SetCurrentValue {2}
 $kw(vtkTemp300) AcceptCallback
 set kw(vtkTemp339) [$kw(vtkTemp300) GetPVOutput]
-$kw(vtkTemp339) ChangeColorMapToBlueRed
-$kw(vtkTemp339) ChangeColorMapToRedBlue
+$kw(vtkTemp336) SetColorSchemeToBlueRed
+$kw(vtkTemp336) SetColorSchemeToRedBlue
 $kw(vtkTemp1) ShowAnimationProperties
 set kw(vtkTemp67) [$kw(vtkTemp1) GetAnimationInterface]
 $kw(vtkTemp67) SetPVSource $kw(vtkTemp300)
@@ -83,7 +81,7 @@ update
 update
 Application StopRecordingScript
 [ Application GetMainWindow ] DeleteAllSources
-# Source the trace to regenerate the sources.
+ Source the trace to regenerate the sources.
 if {[catch {set channel [open test.tmp w]}] == 0 } {
    close $channel
    file delete -force test.tmp
