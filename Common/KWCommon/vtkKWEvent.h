@@ -171,6 +171,7 @@ class VTK_EXPORT vtkKWEvent
     SplineSurfaceRepresentationChangedEvent,
     SplineSurfaceVisibilityChangedEvent,
     SplineSurfaceHandlePositionChangedEvent,
+    SplineSurface2DHandlePositionChangedEvent,
     StandardInteractivityChangedEvent,
     SurfacePropertyChangedEvent,
     SurfacePropertyChangingEvent,
