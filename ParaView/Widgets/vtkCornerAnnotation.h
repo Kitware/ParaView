@@ -125,6 +125,12 @@ public:
   // Set/Get the text property of all corners.
   virtual void SetTextProperty(vtkTextProperty *p);
   vtkGetObjectMacro(TextProperty,vtkTextProperty);
+
+  // Description:
+  // Even if there is an image actor, should <slice> and <image> be displayed?
+  vtkBooleanMacro(ShowSliceAndImage, int);
+  vtkSetMacro(ShowSliceAndImage, int);
+  vtkGetMacro(ShowSliceAndImage, int);
   
 protected:
   vtkCornerAnnotation();
@@ -148,6 +154,8 @@ protected:
   int            LastSize[2];
   vtkTextMapper *TextMapper[4];
   int MinimumFontSize;
+  
+  int ShowSliceAndImage;
   
   // search for replacable tokens and replace
   void ReplaceText(vtkImageActor *ia,  vtkImageMapToWindowLevelColors *wl);

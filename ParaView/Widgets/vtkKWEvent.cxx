@@ -127,6 +127,7 @@ static const char *vtkKWEventStrings[] = {
   "MultiPassStillRenderEndEvent",
   "MultiPassStillRenderStageChangedEvent",
   "ObliqueProbeColorChangedEvent",
+  "ObliqueProbeMovementEvent",
   "ObliqueProbeResetEvent",
   "ObliqueProbeScalarsVisibilityChangedEvent",
   "ObliqueProbeVisibilityChangedEvent",

@@ -53,7 +53,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro(vtkCornerAnnotation);
-vtkCxxRevisionMacro(vtkCornerAnnotation, "1.30");
+vtkCxxRevisionMacro(vtkCornerAnnotation, "1.31");
 
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,ImageActor,vtkImageActor);
 vtkSetObjectImplementationMacro(vtkCornerAnnotation,WindowLevel,
@@ -90,6 +90,8 @@ vtkCornerAnnotation::vtkCornerAnnotation()
   
   this->LevelShift = 0;
   this->LevelScale = 1;
+  
+  this->ShowSliceAndImage = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -156,7 +158,7 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
       while (rpos)
         {
         *rpos = '\0';
-        if (ia)
+        if (ia && this->ShowSliceAndImage)
           {
           sprintf(text2,"%sImage: %i%s",text,image,rpos+7);
           }
@@ -173,7 +175,7 @@ void vtkCornerAnnotation::ReplaceText(vtkImageActor *ia,
       while (rpos)
         {
         *rpos = '\0';
-        if (ia)
+        if (ia && this->ShowSliceAndImage)
           {
           sprintf(text2,"%sSlice: %i%s",text,image,rpos+7);
           }
