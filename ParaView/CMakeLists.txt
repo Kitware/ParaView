@@ -50,6 +50,8 @@ ELSE(ParaViewComplete_BINARY_DIR)
   # if vtk was found include the use vtk file
   IF (USE_VTK_FILE)
     INCLUDE(${USE_VTK_FILE})
+    FIND_FILE (VTK_WRAP_HINTS hints ${VTK_SOURCE_DIR}/Wrapping)
+    MARK_AS_ADVANCED(VTK_WRAP_HINTS)
   ELSE(USE_VTK_FILE)
     SET (PARAVIEW_CAN_BUILD 0)
     MESSAGE("ParaView requires VTK to build. Please set VTK_BINARY_PATH to directory where vtkConfigure.h and UseVTK.cmake are found.")
