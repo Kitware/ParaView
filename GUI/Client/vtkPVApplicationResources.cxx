@@ -283,12 +283,13 @@ void vtkPVApplication::AddAboutText(ostream &os)
      << "This is version " << this->MajorVersion << "." << this->MinorVersion
      << ", release " << this->GetApplicationReleaseName() << endl;
 
-  ostrstream tmpos;
+  ostrstream str;
   vtkIndent indent;
-  this->Options->PrintSelf( tmpos, indent.GetNextIndent() );
-  tmpos << ends;
-  vtkstd::string tmp = tmpos.str();
+  this->Options->PrintSelf( str, indent.GetNextIndent() );
+  str << ends;
+  vtkstd::string tmp = str.str();
   os << endl << tmp.substr( tmp.find( "Runtime information:" ) );
+  str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------
