@@ -76,7 +76,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVTreeComposite);
-vtkCxxRevisionMacro(vtkPVTreeComposite, "1.43");
+vtkCxxRevisionMacro(vtkPVTreeComposite, "1.44");
 
 
 //=========================================================================
@@ -560,7 +560,8 @@ void vtkPVTreeComposite::WriteFullFloatImage()
   if (this->MagnifyImages && (this->ImageReductionFactor > 1))
     {
     this->MagnifyReducedFloatImage();
-    this->SetRenderWindowPixelData(this->FullFloatImage, this->FullImageSize);
+    this->SetRenderWindowFloatPixelData(this->FullFloatImage,
+                                        this->FullImageSize);
     }
   else
     {
@@ -568,8 +569,8 @@ void vtkPVTreeComposite::WriteFullFloatImage()
     // changed.
     if (this->ReducedImageUpToDate)
       {
-      this->SetRenderWindowPixelData(this->ReducedFloatImage,
-                                     this->ReducedImageSize);
+      this->SetRenderWindowFloatPixelData(this->ReducedFloatImage,
+                                          this->ReducedImageSize);
       }
     }
 
@@ -688,8 +689,8 @@ void vtkPVTreeComposite::ReadReducedImage()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTreeComposite::SetRenderWindowPixelData(vtkFloatArray *pixels,
-                                                  const int pixelDimensions[2])
+void vtkPVTreeComposite::SetRenderWindowFloatPixelData(vtkFloatArray *pixels,
+                                                       const int pixelDimensions[2])
 {
   this->RenderWindow->SetRGBAPixelData(0, 0,
                                        pixelDimensions[0]-1,
@@ -1319,7 +1320,7 @@ void vtkPVTreeComposite::CheckForAbortRender()
 //----------------------------------------------------------------------------
 int vtkPVTreeComposite::CheckForAbortComposite()
 {
-  return this->vtkCompositeRenderManager::CheckForAbortComposite();
+  return 0;
 }
 
 #endif  // VTK_USE_MPI

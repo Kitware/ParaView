@@ -192,8 +192,8 @@ protected:
   void ReallocDataArrays();
   virtual void ReadReducedImage();
   virtual void MagnifyReducedFloatImage();
-  virtual void SetRenderWindowPixelData(vtkFloatArray *pixels,
-                                        const int pixelDimensions[2]);
+  virtual void SetRenderWindowFloatPixelData(vtkFloatArray *pixels,
+                                             const int pixelDimensions[2]);
   
   int ExitInteractorTag;
 
