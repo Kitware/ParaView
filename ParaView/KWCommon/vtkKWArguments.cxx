@@ -43,9 +43,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkObjectFactory.h"
 
+#ifdef _MSC_VER
+#pragma warning (push, 2)
+#endif
+
 #include <vector>
 #include <map>
 #include <string>
+#include <set>
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 //----------------------------------------------------------------------------
 //============================================================================
@@ -76,18 +85,20 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWArguments );
-vtkCxxRevisionMacro(vtkKWArguments, "1.4");
+vtkCxxRevisionMacro(vtkKWArguments, "1.5");
 
 //----------------------------------------------------------------------------
 vtkKWArguments::vtkKWArguments()
 {
   this->Internals = new vtkKWArgumentsInternal;
+  this->Help = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWArguments::~vtkKWArguments()
 {
   delete this->Internals;
+  this->SetHelp(0);
 }
 
 //----------------------------------------------------------------------------
@@ -227,15 +238,17 @@ void vtkKWArguments::GetRemainingArguments(int* argc, char*** argv)
 
 //----------------------------------------------------------------------------
 void vtkKWArguments::AddCallback(const char* argument, int type, 
-  CallbackType callback, void* call_data)
+  CallbackType callback, void* call_data, const char* help)
 {
   vtkKWArguments::CallbackStructure s;
   s.Argument     = argument;
   s.ArgumentType = type;
   s.Callback     = callback;
   s.CallData     = call_data;
+  s.Help         = help;
 
   this->Internals->Callbacks[argument] = s;
+  this->GenerateHelp();
 }
 
 //----------------------------------------------------------------------------
@@ -253,6 +266,7 @@ void vtkKWArguments::AddCallbacks(CallbackStructure* callbacks)
       vtkKWArgumentsInternal::CallbacksMap::value_type(callbacks[cc].Argument,
                                                        callbacks[cc]));
     }
+  this->GenerateHelp();
 }
 
 //----------------------------------------------------------------------------
@@ -266,6 +280,105 @@ void vtkKWArguments::SetUnknownArgumentCallback(
   vtkKWArguments::ErrorCallbackType callback)
 {
   this->Internals->UnknownArgumentCallback = callback;
+}
+
+//----------------------------------------------------------------------------
+void vtkKWArguments::GenerateHelp()
+{
+  ostrstream str;
+  vtkKWArgumentsInternal::CallbacksMap::iterator it;
+  typedef vtkstd::map<vtkstd::string, vtkstd::set<vtkstd::string> > MapArgs;
+  MapArgs mp;
+  MapArgs::iterator mpit, smpit;
+  for ( it = this->Internals->Callbacks.begin();
+    it != this->Internals->Callbacks.end();
+    it ++ )
+    {
+    vtkKWArguments::CallbackStructure *cs = &(it->second);
+    mpit = mp.find(cs->Help);
+    if ( mpit != mp.end() )
+      {
+      mpit->second.insert(it->first);
+      mp[it->first].insert(it->first);
+      }
+    else
+      {
+      mp[it->first].insert(it->first);
+      }
+    }
+  for ( it = this->Internals->Callbacks.begin();
+    it != this->Internals->Callbacks.end();
+    it ++ )
+    {
+    vtkKWArguments::CallbackStructure *cs = &(it->second);
+    mpit = mp.find(cs->Help);
+    if ( mpit != mp.end() )
+      {
+      mpit->second.insert(it->first);
+      smpit = mp.find(it->first);
+      vtkstd::set<vtkstd::string>::iterator sit;
+      for ( sit = smpit->second.begin(); sit != smpit->second.end(); sit++ )
+        {
+        mpit->second.insert(*sit);
+        }
+      mp.erase(smpit);
+      }
+    else
+      {
+      mp[it->first].insert(it->first);
+      }
+    }
+ 
+  vtkstd::string::size_type maxlen = 0;
+  for ( mpit = mp.begin();
+    mpit != mp.end();
+    mpit ++ )
+    {
+    vtkstd::set<vtkstd::string>::iterator sit;
+    for ( sit = mpit->second.begin(); sit != mpit->second.end(); sit++ )
+      {
+      vtkstd::string::size_type clen = sit->size();
+      switch ( this->Internals->Callbacks[*sit].ArgumentType )
+        {
+        case vtkKWArguments::NO_ARGUMENT:     clen += 0; break;
+        case vtkKWArguments::CONCAT_ARGUMENT: clen += 6; break;
+        case vtkKWArguments::SPACE_ARGUMENT:  clen += 7; break;
+        case vtkKWArguments::EQUAL_ARGUMENT:  clen += 7; break;
+        }
+      if ( clen > maxlen )
+        {
+        maxlen = clen;
+        }
+      }
+    }
+  char format[80];
+  sprintf(format, "%%%ds", maxlen);
+  for ( mpit = mp.begin();
+    mpit != mp.end();
+    mpit ++ )
+    {
+    vtkstd::set<vtkstd::string>::iterator sit;
+    for ( sit = mpit->second.begin(); sit != mpit->second.end(); sit++ )
+      {
+      str << endl;
+      char argument[100];
+      sprintf(argument, sit->c_str());
+      switch ( this->Internals->Callbacks[*sit].ArgumentType )
+        {
+        case vtkKWArguments::NO_ARGUMENT: break;
+        case vtkKWArguments::CONCAT_ARGUMENT: strcat(argument, "option"); break;
+        case vtkKWArguments::SPACE_ARGUMENT:  strcat(argument, " option"); break;
+        case vtkKWArguments::EQUAL_ARGUMENT:  strcat(argument, "=option"); break;
+        }
+      char buffer[80];
+      sprintf(buffer, format, argument);
+      str << buffer;
+      }
+    str << "\t" << this->Internals->Callbacks[mpit->first].Help <<  endl;
+    }
+  str << ends;
+  this->SetHelp(str.str());
+  str.rdbuf()->freeze(0);
 }
 
 //----------------------------------------------------------------------------

@@ -25,15 +25,15 @@ int unknown_argument(const char* argument, void* call_data)
 }
 
 vtkKWArguments::CallbackStructure callbacks[] = {
-    { "-A", vtkKWArguments::NO_ARGUMENT, argument, random_ptr },
-    { "-B", vtkKWArguments::SPACE_ARGUMENT, argument, random_ptr },
-    { "-C", vtkKWArguments::EQUAL_ARGUMENT, argument, random_ptr },
-    { "-D", vtkKWArguments::CONCAT_ARGUMENT, argument, random_ptr },
-    { "--long1", vtkKWArguments::NO_ARGUMENT, argument, random_ptr },
-    { "--long2", vtkKWArguments::SPACE_ARGUMENT, argument, random_ptr },
-    { "--long3", vtkKWArguments::EQUAL_ARGUMENT, argument, random_ptr },
-    { "--long4", vtkKWArguments::CONCAT_ARGUMENT, argument, random_ptr },
-    { 0, 0, 0, 0 }
+    { "-A", vtkKWArguments::NO_ARGUMENT, argument, random_ptr, "Some option -A. This option has a multiline comment. It should demonstrate how the code splits lines." },
+    { "-B", vtkKWArguments::SPACE_ARGUMENT, argument, random_ptr, "Option -B takes argument with space" },
+    { "-C", vtkKWArguments::EQUAL_ARGUMENT, argument, random_ptr, "Option -C takes argument after =" },
+    { "-D", vtkKWArguments::CONCAT_ARGUMENT, argument, random_ptr, "This option takes concatinated argument" },
+    { "--long1", vtkKWArguments::NO_ARGUMENT, argument, random_ptr, "-A"},
+    { "--long2", vtkKWArguments::SPACE_ARGUMENT, argument, random_ptr, "-B" },
+    { "--long3", vtkKWArguments::EQUAL_ARGUMENT, argument, random_ptr, "Same as -C but a bit different" },
+    { "--long4", vtkKWArguments::CONCAT_ARGUMENT, argument, random_ptr, "-C" },
+    { 0, 0, 0, 0, 0 }
     };
 
 int main(int argc, char* argv[])
@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
     cerr << "Problem parsing arguments" << endl;
     res = 1;
     }
+  cout << "Help: " << arg->GetHelp() << endl;
   arg->Delete();
   return res;
 }

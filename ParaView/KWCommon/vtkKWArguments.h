@@ -72,6 +72,7 @@ public:
     int ArgumentType;
     CallbackType Callback;
     void* CallData;
+    const char* Help;
     };
   
   // Description:
@@ -94,9 +95,10 @@ public:
 
   // Description:
   // This method will add a callback for a specific argument. The arguments to
-  // it are argument, argument type, callback method, and call data.
+  // it are argument, argument type, callback method, and call data. The
+  // argument help specifies the help string used with this option.
   void AddCallback(const char* argument, int type, CallbackType callback, 
-                   void* call_data);
+                   void* call_data, const char* help);
 
   // Description:
   // This method registers callbacks for argument types from array of
@@ -113,12 +115,19 @@ public:
   // delete[] on it.
   void GetRemainingArguments(int* argc, char*** argv);
 
+  // Description:
+  // Return string containing help.
+  vtkGetStringMacro(Help);
+
 protected:
   vtkKWArguments();
   ~vtkKWArguments();
 
-  vtkKWArgumentsInternal* Internals;
+  vtkSetStringMacro(Help);
+  void GenerateHelp();
 
+  vtkKWArgumentsInternal* Internals;
+  char* Help;
 
 private:
   vtkKWArguments(const vtkKWArguments&); // Not implemented
