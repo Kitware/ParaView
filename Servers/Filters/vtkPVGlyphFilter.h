@@ -39,10 +39,6 @@ public:
   vtkGetMacro(MaximumNumberOfPoints, int);
 
   // Description:
-  // Set the input to this filter.
-  virtual void SetInput(vtkDataSet *input);
-  
-  // Description:
   // Get the number of processes used to run this filter.
   vtkGetMacro(NumberOfProcesses, int);
   

@@ -23,7 +23,7 @@
 #include "vtkPolyData.h"
 #include "vtkStreamingDemandDrivenPipeline.h"
 
-vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.16");
+vtkCxxRevisionMacro(vtkPVGlyphFilter, "1.17");
 vtkStandardNewMacro(vtkPVGlyphFilter);
 
 //-----------------------------------------------------------------------------
@@ -48,13 +48,6 @@ vtkPVGlyphFilter::~vtkPVGlyphFilter()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVGlyphFilter::SetInput(vtkDataSet *input)
-{
-  this->MaskPoints->SetInput(input);
-  this->Superclass::SetInput(this->MaskPoints->GetOutput());
-}
-
-//-----------------------------------------------------------------------------
 void vtkPVGlyphFilter::SetRandomMode(int mode)
 {
   this->MaskPoints->SetRandomMode(mode);
@@ -76,9 +69,17 @@ int vtkPVGlyphFilter::RequestData(
 
   if (this->UseMaskPoints)
     {
-    this->Superclass::SetInput(this->MaskPoints->GetOutput());
+    vtkInformation *inInfo = inputVector[0]->GetInformationObject(0);
+    vtkDataSet* input = vtkDataSet::SafeDownCast(
+      inInfo->Get(vtkDataObject::DATA_OBJECT()));
+    vtkDataSet* inputCopy = input->NewInstance();
+    inputCopy->ShallowCopy(input);
+    this->MaskPoints->SetInput(inputCopy);
+    inputCopy->Delete();
+
     vtkIdType maxNumPts = this->MaximumNumberOfPoints;
-    vtkIdType numPts = static_cast<vtkDataSet*>(this->MaskPoints->GetInput(0))->GetNumberOfPoints();
+    vtkIdType numPts = inputCopy->GetNumberOfPoints();
+
     // Although this is not perfectly process invariant, it is better
     // than we had before (divide by number of processes).
     vtkIdType totalNumPts = numPts;
@@ -121,20 +122,34 @@ int vtkPVGlyphFilter::RequestData(
     // This update caused input to be executed with number of pieces of 1.
     vtkInformation *maskPointsInfo =
       this->MaskPoints->GetOutputPortInformation(0);
-    maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
-                        outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
-    maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
-                        outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
-    maskPointsInfo->Set(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
-                        outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
+    maskPointsInfo->Set(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_PIECES()));
+    maskPointsInfo->Set(
+      vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_PIECE_NUMBER()));
+    maskPointsInfo->Set(
+      vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS(),
+      outInfo->Get(vtkStreamingDemandDrivenPipeline::UPDATE_NUMBER_OF_GHOST_LEVELS()));
     this->MaskPoints->Update();
     }
-  else
-    {
-    this->Superclass::SetInput(static_cast<vtkDataSet*>(this->MaskPoints->GetInput(0)));
-    }
+
+  vtkInformationVector* inputVs[2];
+
+  vtkInformationVector* inputV = inputVector[0];
+  inputVs[0] = vtkInformationVector::New();
+  inputVs[0]->SetNumberOfInformationObjects(1);
+  vtkInformation* inInfo = vtkInformation::New();
+  inInfo->Copy(inputV->GetInformationObject(0));
+  inInfo->Set(vtkDataObject::DATA_OBJECT(), this->MaskPoints->GetOutput());
+  inputVs[0]->SetInformationObject(0, inInfo);
+  inInfo->Delete();
+  inputVs[1] = inputVector[1];
   
-  return this->Superclass::RequestData(request, inputVector, outputVector);
+  int retVal = this->Superclass::RequestData(request, inputVs, outputVector);
+  inputVs[0]->Delete();
+
+  return retVal;
 }
 
 //-----------------------------------------------------------------------------
