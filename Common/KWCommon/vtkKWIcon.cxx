@@ -24,7 +24,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.26");
+vtkCxxRevisionMacro(vtkKWIcon, "1.27");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -296,6 +296,142 @@ void vtkKWIcon::SetImage(int image)
         image_cut_buffer_length);
       break;
 
+    case vtkKWIcon::ICON_DOC_AIF:
+      this->SetImage(
+        image_doc_aif, 
+        image_doc_aif_width, image_doc_aif_height,
+        image_doc_aif_pixel_size, 
+        image_doc_aif_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_ASF:
+      this->SetImage(
+        image_doc_asf, 
+        image_doc_asf_width, image_doc_asf_height,
+        image_doc_asf_pixel_size, 
+        image_doc_asf_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_CHM:
+      this->SetImage(
+        image_doc_chm, 
+        image_doc_chm_width, image_doc_chm_height,
+        image_doc_chm_pixel_size, 
+        image_doc_chm_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_EXE:
+      this->SetImage(
+        image_doc_exe, 
+        image_doc_exe_width, image_doc_exe_height,
+        image_doc_exe_pixel_size, 
+        image_doc_exe_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_HLP:
+      this->SetImage(
+        image_doc_hlp, 
+        image_doc_hlp_width, image_doc_hlp_height,
+        image_doc_hlp_pixel_size, 
+        image_doc_hlp_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_HTTP:
+      this->SetImage(
+        image_doc_http, 
+        image_doc_http_width, image_doc_http_height,
+        image_doc_http_pixel_size, 
+        image_doc_http_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_MP3:
+      this->SetImage(
+        image_doc_mp3, 
+        image_doc_mp3_width, image_doc_mp3_height,
+        image_doc_mp3_pixel_size, 
+        image_doc_mp3_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_MPEG:
+      this->SetImage(
+        image_doc_mpeg, 
+        image_doc_mpeg_width, image_doc_mpeg_height,
+        image_doc_mpeg_pixel_size, 
+        image_doc_mpeg_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_MSI:
+      this->SetImage(
+        image_doc_msi, 
+        image_doc_msi_width, image_doc_msi_height,
+        image_doc_msi_pixel_size, 
+        image_doc_msi_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_PDF:
+      this->SetImage(
+        image_doc_pdf, 
+        image_doc_pdf_width, image_doc_pdf_height,
+        image_doc_pdf_pixel_size, 
+        image_doc_pdf_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_POSTSCRIPT:
+      this->SetImage(
+        image_doc_postscript, 
+        image_doc_postscript_width, image_doc_postscript_height,
+        image_doc_postscript_pixel_size, 
+        image_doc_postscript_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_POWERPOINT:
+      this->SetImage(
+        image_doc_powerpoint, 
+        image_doc_powerpoint_width, image_doc_powerpoint_height,
+        image_doc_powerpoint_pixel_size, 
+        image_doc_powerpoint_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_QUICKTIME:
+      this->SetImage(
+        image_doc_quicktime, 
+        image_doc_quicktime_width, image_doc_quicktime_height,
+        image_doc_quicktime_pixel_size, 
+        image_doc_quicktime_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_REALAUDIO:
+      this->SetImage(
+        image_doc_realaudio, 
+        image_doc_realaudio_width, image_doc_realaudio_height,
+        image_doc_realaudio_pixel_size, 
+        image_doc_realaudio_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_TXT:
+      this->SetImage(
+        image_doc_txt, 
+        image_doc_txt_width, image_doc_txt_height,
+        image_doc_txt_pixel_size, 
+        image_doc_txt_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_WORD:
+      this->SetImage(
+        image_doc_word, 
+        image_doc_word_width, image_doc_word_height,
+        image_doc_word_pixel_size, 
+        image_doc_word_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_DOC_ZIP:
+      this->SetImage(
+        image_doc_zip, 
+        image_doc_zip_width, image_doc_zip_height,
+        image_doc_zip_pixel_size, 
+        image_doc_zip_buffer_length);
+      break;
+
     case vtkKWIcon::ICON_ERROR:
       this->SetImage(
         image_error, 
@@ -326,6 +462,14 @@ void vtkKWIcon::SetImage(int image)
         image_folder_width, image_folder_height,
         image_folder_pixel_size, 
         image_folder_buffer_length);
+      break;
+
+    case vtkKWIcon::ICON_FOLDER_OPEN:
+      this->SetImage(
+        image_folder_open, 
+        image_folder_open_width, image_folder_open_height,
+        image_folder_open_pixel_size, 
+        image_folder_open_buffer_length);
       break;
 
     case vtkKWIcon::ICON_GENERAL:
@@ -375,6 +519,14 @@ void vtkKWIcon::SetImage(int image)
         image_macros_pixel_size, 
         image_macros_buffer_length);
       break;      
+
+    case vtkKWIcon::ICON_MAG_GLASS:
+      this->SetImage(
+        image_mag_glass,
+        image_mag_glass_width, image_mag_glass_height,
+        image_mag_glass_pixel_size,
+        image_mag_glass_buffer_length);
+      break;
 
     case vtkKWIcon::ICON_MATERIAL:
       this->SetImage(
@@ -591,6 +743,22 @@ void vtkKWIcon::SetImage(int image)
         image_trashcan_width, image_trashcan_height,
         image_trashcan_pixel_size, 
         image_trashcan_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TREE_CLOSE:
+      this->SetImage(
+        image_tree_close, 
+        image_tree_close_width, image_tree_close_height,
+        image_tree_close_pixel_size, 
+        image_tree_close_buffer_length);
+      break;
+      
+    case vtkKWIcon::ICON_TREE_OPEN:
+      this->SetImage(
+        image_tree_open, 
+        image_tree_open_width, image_tree_open_height,
+        image_tree_open_pixel_size, 
+        image_tree_open_buffer_length);
       break;
       
     case vtkKWIcon::ICON_WARNING:
