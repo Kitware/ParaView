@@ -5,9 +5,6 @@ ClientData vtkColorByProcessNewCommand();
 int vtkDummyRenderWindowInteractorCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkDummyRenderWindowInteractorNewCommand();
-int vtkGetRemoteGhostCellsCommand(ClientData cd, Tcl_Interp *interp,
-             int argc, char *argv[]);
-ClientData vtkGetRemoteGhostCellsNewCommand();
 int vtkImageOutlineFilterCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkImageOutlineFilterNewCommand();
@@ -163,8 +160,6 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkColorByProcessCommand);
   vtkTclCreateNew(interp,(char *) "vtkDummyRenderWindowInteractor", vtkDummyRenderWindowInteractorNewCommand,
                   vtkDummyRenderWindowInteractorCommand);
-  vtkTclCreateNew(interp,(char *) "vtkGetRemoteGhostCells", vtkGetRemoteGhostCellsNewCommand,
-                  vtkGetRemoteGhostCellsCommand);
   vtkTclCreateNew(interp,(char *) "vtkImageOutlineFilter", vtkImageOutlineFilterNewCommand,
                   vtkImageOutlineFilterCommand);
   vtkTclCreateNew(interp,(char *) "vtkInteractorStyleCamera", vtkInteractorStyleCameraNewCommand,

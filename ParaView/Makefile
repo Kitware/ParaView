@@ -16,7 +16,6 @@ vtkInteractorStyleExtent
 CONCRETE = \
 vtkColorByProcess \
 vtkDummyRenderWindowInteractor \
-vtkGetRemoteGhostCells \
 vtkImageOutlineFilter \
 vtkInteractorStyleCamera \
 vtkInteractorStyleGridExtent \
