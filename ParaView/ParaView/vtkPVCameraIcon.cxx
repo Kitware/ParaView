@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCameraIcon);
-vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4.2.3");
+vtkCxxRevisionMacro(vtkPVCameraIcon, "1.4.2.4");
 
 vtkCxxSetObjectMacro(vtkPVCameraIcon,RenderView,vtkPVRenderView);
 
@@ -88,7 +88,7 @@ void vtkPVCameraIcon::Create(vtkKWApplication *pvApp, const char *args)
   this->SetBind(this, "<Button-1>", "RestoreCamera");
   this->SetBind(this, "<Button-3>", "StoreCamera");
   this->SetBalloonHelpString(
-    "Click left mouse button to retrieve camera the position, right mouse button to store a camera position.");
+    "Click left mouse button to retrieve the camera position, right mouse button to store a camera position.");
 
   // Get the size of the label, and try to adjust the padding so that
   // its width/height match the expect icon size (cannot be done
