@@ -368,4 +368,13 @@
  
  </Module>
 #endif
+
+  <Module name="AVSucdReader" class="vtkPVAdvancedReaderModule"
+          root_name="UCD"  output="vtkUnstructuredGrid" module_type="Reader"
+         extensions=".inp" file_description="AVS UCD Binary/ASCII Files">
+   <Source class="vtkAVSucdReader"/>
+   <ArraySelection trace_name="point_array_sel" attribute_name="Point"/>
+   <ArraySelection trace_name="cell_array_sel" attribute_name="Cell"/>
+  </Module>
+ 
 </ModuleInterfaces>
