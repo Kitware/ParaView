@@ -72,6 +72,11 @@ public:
   // Description:
   // Also Update the bounds display.
   virtual void UpdateParameterWidgets();
+
+  // Description:
+  // Called when Accept is presed.
+  // Needed to get around a Tcl problem.
+  virtual void AcceptCallback();
     
 protected:
   vtkPVCutPlane();

@@ -205,11 +205,11 @@ void vtkPVCutPlane::CreateProperties()
                                  this->VTKSourceTclName, "GetOrigin"); 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
-                        this->GetTclName(), this->VTKSourceTclName, "SetOrigin",
-                        this->CenterXEntry->GetTclName(),
-                        this->CenterYEntry->GetTclName(), 
-                        this->CenterZEntry->GetTclName());
+  //this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
+  //                      this->GetTclName(), this->VTKSourceTclName, "SetOrigin",
+  //                      this->CenterXEntry->GetTclName(),
+  //                      this->CenterYEntry->GetTclName(), 
+  //                      this->CenterZEntry->GetTclName());
 
   // Normal -------------------------
   this->NormalFrame->SetParent(this->GetParameterFrame()->GetFrame());
@@ -285,11 +285,11 @@ void vtkPVCutPlane::CreateProperties()
                                  this->VTKSourceTclName, "GetNormal"); 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
-                        this->GetTclName(), this->VTKSourceTclName, "SetNormal",
-                        this->NormalXEntry->GetTclName(),
-                        this->NormalYEntry->GetTclName(), 
-                        this->NormalZEntry->GetTclName());
+  //this->AcceptCommands->AddString("%s AcceptHelper2 %s %s \"[%s GetValue] [%s GetValue] [%s GetValue]\"",
+  //                      this->GetTclName(), this->VTKSourceTclName, "SetNormal",
+  //                      this->NormalXEntry->GetTclName(),
+  //                      this->NormalYEntry->GetTclName(), 
+  //                      this->NormalZEntry->GetTclName());
 
 
   // Offset -------------------------
@@ -316,13 +316,32 @@ void vtkPVCutPlane::CreateProperties()
                                  this->VTKSourceTclName, "GetOffset"); 
   // Format a command to move value from widget to vtkObjects (on all processes).
   // The VTK objects do not yet have to have the same Tcl name!
-  this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
-                        this->GetTclName(), this->VTKSourceTclName, "SetOffset",
-                        this->OffsetEntry->GetTclName());
+  //this->AcceptCommands->AddString("%s AcceptHelper2 %s %s [%s GetValue]",
+  //                      this->GetTclName(), this->VTKSourceTclName, "SetOffset",
+  //                      this->OffsetEntry->GetTclName());
 
   this->UpdateProperties();
   this->UpdateParameterWidgets();
   this->CenterResetCallback();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCutPlane::AcceptCallback()
+{
+  if (this->Application && this->VTKSourceTclName)
+    {
+    this->Script("%s SetOrigin %f %f %f", this->VTKSourceTclName,
+                 this->CenterXEntry->GetTclName(), 
+                 this->CenterYEntry->GetTclName(), 
+                 this->CenterZEntry->GetTclName());
+    this->Script("%s SetNormal %f %f %f", this->VTKSourceTclName,
+                 this->NormalXEntry->GetTclName(), 
+                 this->NormalYEntry->GetTclName(), 
+                 this->NormalZEntry->GetTclName());
+    this->Script("%s SetOffset %f", this->VTKSourceTclName,
+                 this->OffsetEntry->GetTclName());
+    }
+  this->vtkPVSource::AcceptCallback();
 }
 
 
