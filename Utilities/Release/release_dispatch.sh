@@ -2,9 +2,9 @@
 
 MACHINES=""
 MACHINES="${MACHINES} naboo"
-MACHINES="${MACHINES} shannara"
-MACHINES="${MACHINES} destiny"
-MACHINES="${MACHINES} rapture"
+#MACHINES="${MACHINES} shannara"
+#MACHINES="${MACHINES} destiny"
+#MACHINES="${MACHINES} rapture"
 
 run()
 {
