@@ -25,6 +25,7 @@
         number_of_elements="1"
         default_values="0"
         update_self="1">
+        <BooleanDomain name="bool"/>
      </IntVectorProperty>
 
      <IntVectorProperty
@@ -95,6 +96,7 @@
              command="SetVisibility"
              number_of_elements="1"
              default_values="1">
+             <BooleanDomain name="bool"/>
           </IntVectorProperty>
 
           <DoubleVectorProperty
