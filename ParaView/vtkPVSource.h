@@ -264,6 +264,13 @@ public:
   // Needed to clean up properly.
   vtkSetStringMacro(ExtentTranslatorTclName);
 
+  // Description:
+  // This flag determines whether a source will make its input invisible or not.
+  // By default, this flag is on.
+  vtkSetMacro(ReplaceInput, int);
+  vtkGetMacro(ReplaceInput, int);
+  vtkBooleanMacro(ReplaceInput, int);
+
 protected:
   vtkPVSource();
   ~vtkPVSource();
@@ -337,6 +344,9 @@ protected:
 
   vtkPVSourceInterface *Interface;
   
+  // Whether the source should make its input invisible.
+  int ReplaceInput;
+
   int InstanceCount;
 };
 

@@ -115,6 +115,8 @@ vtkPVSource::vtkPVSource()
   this->Interface = NULL;
 
   this->ExtentTranslatorTclName = NULL;
+
+  this->ReplaceInput = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -933,8 +935,11 @@ void vtkPVSource::AcceptCallback()
     input = this->GetNthPVInput(0);
     if (input)
       {
-      input->SetVisibility(0);
-      input->GetVisibilityCheck()->SetState(0);
+      if (this->ReplaceInput)
+        {
+        input->SetVisibility(0);
+        input->GetVisibilityCheck()->SetState(0);
+        }
       }
     // The best test I could come up with to only reset
     // the camera when the first source is created.

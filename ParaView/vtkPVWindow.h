@@ -99,7 +99,14 @@ public:
   void SetCurrentPVData(vtkPVData *data);
   vtkGetObjectMacro(CurrentPVData, vtkPVData);
   
+  // Description:
+  // This list contains all the sources created by the user.
+  // It is used to create input menus for filters.
   vtkKWCompositeCollection *GetSources();
+
+  // Description:
+  // This is a special list of precreated sources that can be used to glyph.
+  vtkKWCompositeCollection *GetGlyphSources();
     
   vtkGetObjectMacro(SelectMenu, vtkKWMenu);
   vtkGetObjectMacro(SourceMenu, vtkKWMenu);
@@ -234,6 +241,8 @@ protected:
   vtkKWCheckButton *ReductionCheck;
   
   vtkKWCompositeCollection *Sources;
+  // Special list of static sources that can be used for glyphing.
+  vtkKWCompositeCollection *GlyphSources;
   vtkKWLabeledFrame *ApplicationAreaFrame;
 
   // Used internally.  Down casts vtkKWApplication to vtkPVApplication
@@ -261,6 +270,7 @@ protected:
 
   // Interfaces for "special" filters.
   vtkPVSourceInterface *ThresholdInterface;
+  vtkPVSourceInterface *CutPlaneInterface;
   
 private:
   static const char* StandardSourceInterfaces;

@@ -357,11 +357,12 @@ void vtkPVData::InsertExtractPiecesIfNecessary()
   // The vtkData object will be moved to the output of the piece filter.
   if (this->VTKData->IsA("vtkPolyData"))
     {
-    pvApp->BroadcastSimpleScript("vtkExtractPolyDataPiece pvTemp");
+    //pvApp->BroadcastSimpleScript("vtkExtractPolyDataPiece pvTemp");
+    pvApp->BroadcastSimpleScript("vtkTransmitPolyDataPiece pvTemp");
     }
   else if (this->VTKData->IsA("vtkUnstructuredGrid"))
     {
-    pvApp->BroadcastSimpleScript("vtkExtractUnstructuredGridPiece pvTemp");
+    pvApp->BroadcastSimpleScript("vtkTransmitUnstructuredGridPiece pvTemp");
     }
   else
     {

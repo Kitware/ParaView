@@ -69,6 +69,7 @@ vtkPVSourceInterface::vtkPVSourceInterface()
   this->CommandFunction = vtkPVSourceInterfaceCommand;
   this->PVWindow = NULL;
 
+  this->ReplaceInput = 1;
 }
 
 //----------------------------------------------------------------------------
@@ -151,6 +152,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     }
   
   pvs = vtkPVSource::New();
+  pvs->SetReplaceInput(this->ReplaceInput);
   pvs->SetPropertiesParent(this->PVWindow->GetMainView()->GetPropertiesParent());
   pvs->SetApplication(pvApp);
   pvs->SetInterface(this);

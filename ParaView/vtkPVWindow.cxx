@@ -125,6 +125,7 @@ vtkPVWindow::vtkPVWindow()
   this->ReductionCheck = vtkKWCheckButton::New();
   
   this->Sources = vtkKWCompositeCollection::New();
+  this->GlyphSources = vtkKWCompositeCollection::New();
   
   this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
   
@@ -166,6 +167,55 @@ vtkPVWindow::vtkPVWindow()
   mInt->Delete();
   mInt = NULL;
 
+  // I plan to offload the animation, reseting, synchrinization and saving
+  // tasks of the interface to pvSourceWidgets.  Until then,
+  // this is the easiest way to get CutPlane working is with an interface
+  // (even though it is not created with an interface).
+  // The threshold interface above is just an uncompleted experiment.
+  this->CutPlaneInterface = vtkPVSourceInterface::New();
+  //this->CutPlaneInterface->SetApplication(???):
+  this->CutPlaneInterface->SetPVWindow(this);
+  this->CutPlaneInterface->SetSourceClassName("vtkCutPlane");
+  this->CutPlaneInterface->SetRootName("CutPlane");
+  this->CutPlaneInterface->SetInputClassName("vtkDataSet");
+  this->CutPlaneInterface->SetOutputClassName("vtkPolyData");
+  // Offset:
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Offset");
+  mInt->SetSetCommand("SetOffset");
+  mInt->SetGetCommand("GetOffset");
+  mInt->AddFloatArgument();
+  this->CutPlaneInterface->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Center:
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Origin");
+  mInt->SetSetCommand("SetOrigin");
+  mInt->SetGetCommand("GetOrigin");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  this->CutPlaneInterface->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+  // Normal:
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("Normal");
+  mInt->SetSetCommand("SetNormal");
+  mInt->SetGetCommand("GetNormal");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  this->CutPlaneInterface->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+
+
+
+
+
+
 
 }
 
@@ -176,6 +226,9 @@ vtkPVWindow::~vtkPVWindow()
 
   this->Sources->Delete();
   this->Sources = NULL;
+
+  this->GlyphSources->Delete();
+  this->GlyphSources = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -331,6 +384,12 @@ void vtkPVWindow::PrepareForDelete()
     this->ThresholdInterface = NULL;
     }
   
+  if (this->CutPlaneInterface)
+    {
+    this->CutPlaneInterface->Delete();
+    this->CutPlaneInterface = NULL;
+    }
+  
   this->SetCurrentPVData(NULL);
   //if (this->CurrentInteractor != NULL)
   //  {
@@ -351,12 +410,23 @@ void vtkPVWindow::Close()
 void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 {
   vtkPVSourceInterface *sInt;
+  vtkPVSource *pvs;
+  vtkPVData   *pvd;
+  vtkSource   *s;
+  vtkDataSet  *d;
+  vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(app);
   vtkKWInteractor *interactor;
   vtkKWRadioButton *button;
   vtkKWWidget *pushButton;
   
+  if (pvApp == NULL)
+    {
+    vtkErrorMacro("vtkPVWindow::Create needs a vtkPVApplication.");
+    return;
+    }
+
   // invoke super method first
-  this->vtkKWWindow::Create(app,"");
+  this->vtkKWWindow::Create(pvApp,"");
 
   // We need an application before we can read the interface.
   this->ReadSourceInterfaces();
@@ -525,7 +595,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the main view
   // we keep a handle to them as well
-  this->CreateMainView((vtkPVApplication*)app);
+  this->CreateMainView(pvApp);
 
   // Set up the button to reset the camera.
   pushButton = vtkKWWidget::New();
@@ -607,6 +677,75 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->AnimationInterface->Create(app, "-bd 2 -relief raised");
 
   this->Script( "wm deiconify %s", this->GetWidgetName());  
+
+  // Create the sources that can be used for glyphing.
+  // ===== Arrow
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkArrowSource", "pvGlyphArrow"));
+  pvs = vtkPVSource::New();
+  pvs->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  pvs->SetApplication(pvApp);
+  pvs->SetVTKSource(s, "pvGlyphArrow");
+  pvs->SetName("Arrow");
+  //pvs->SetInterface(this->CutPlaneInterface);
+  //pvs->CreateProperties();
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  // Create the object through tcl on all processes.
+  d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphArrowOutput"));
+  pvd->SetVTKData(d, "pvGlyphArrowOutput");
+  // Connect the source and data.
+  pvs->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  this->GlyphSources->AddItem(pvs);
+  pvs->Delete();
+  pvd->Delete();
+  // ===== Cone
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkConeSource", "pvGlyphCone"));
+  pvs = vtkPVSource::New();
+  pvs->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  pvs->SetApplication(pvApp);
+  pvs->SetVTKSource(s, "pvGlyphCone");
+  pvs->SetName("Cone");
+  //pvs->SetInterface(this->CutPlaneInterface);
+  //pvs->CreateProperties();
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  // Create the object through tcl on all processes.
+  d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphConeOutput"));
+  pvd->SetVTKData(d, "pvGlyphConeOutput");
+  // Connect the source and data.
+  pvs->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  this->GlyphSources->AddItem(pvs);
+  pvs->Delete();
+  pvd->Delete();
+  // ===== Sphere
+  s = (vtkSource *)(pvApp->MakeTclObject("vtkSphereSource", "pvGlyphSphere"));
+  pvs = vtkPVSource::New();
+  pvs->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
+  pvs->SetApplication(pvApp);
+  pvs->SetVTKSource(s, "pvGlyphSphere");
+  pvs->SetName("Sphere");
+  //pvs->SetInterface(this->CutPlaneInterface);
+  //pvs->CreateProperties();
+  // Create the output.
+  pvd = vtkPVData::New();
+  pvd->SetApplication(pvApp);
+  // Create the object through tcl on all processes.
+  d = (vtkDataSet *)(pvApp->MakeTclObject("vtkPolyData", "pvGlyphSphereOutput"));
+  pvd->SetVTKData(d, "pvGlyphSphereOutput");
+  // Connect the source and data.
+  pvs->SetNthPVOutput(0, pvd);
+  pvApp->BroadcastScript("%s SetOutput %s", pvs->GetVTKSourceTclName(),
+			 pvd->GetVTKDataTclName());
+  this->GlyphSources->AddItem(pvs);
+  pvs->Delete();
+  pvd->Delete();
+  
 }
 
 //----------------------------------------------------------------------------
@@ -1026,9 +1165,9 @@ void vtkPVWindow::SetCurrentPVData(vtkPVData *pvd)
     while ( (sInt = (vtkPVSourceInterface*)(this->SourceInterfaces->GetNextItemAsObject())))
       {
       if (sInt->GetIsValidInput(pvd))
-	{
-	this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
-	}
+        {
+        this->FilterMenu->AddCommand(sInt->GetSourceClassName()+3, sInt, "CreateCallback");
+        }
       }
     }
 }
@@ -1080,6 +1219,12 @@ vtkPVSource* vtkPVWindow::GetCurrentPVSource()
 vtkKWCompositeCollection* vtkPVWindow::GetSources()
 {
   return this->Sources;
+}
+
+//----------------------------------------------------------------------------
+vtkKWCompositeCollection* vtkPVWindow::GetGlyphSources()
+{
+  return this->GlyphSources;
 }
 
 //----------------------------------------------------------------------------
@@ -1230,7 +1375,7 @@ void vtkPVWindow::CutPlaneCallback()
   cutPlane->SetVTKSource(s, tclName);
   cutPlane->SetNthPVInput(0, this->GetCurrentPVData());
   cutPlane->SetName(tclName);
-  cutPlane->SetInterface(this->ThresholdInterface);
+  cutPlane->SetInterface(this->CutPlaneInterface);
 
   this->GetMainView()->AddComposite(cutPlane);
   cutPlane->CreateProperties();
@@ -2039,12 +2184,6 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Vector name=\"UpVector\" type=\"float\" length=\"3\" help=\"Specify the normal vector of the plane to cut by\"/>\n"
 "</Filter>\n"
 "\n"
-"<Filter class=\"vtkCutPlane\" root=\"CutPlane\" input=\"vtkDataSet\" output=\"vtkPolyData\">\n"
-"  <Vector name=\"Origin\" type=\"float\" length=\"3\" help=\"Set the x, y, z coordinates of the origin of the plane\"/>\n"
-"  <Vector name=\"Normal\" type=\"float\" length=\"3\" help=\"Set the normal vector to the plane\"/>\n"
-"  <Boolean name=\"GenerateCutScalars\" help=\"Select whether to generate scalars from the implicit function values or from the input scalar data\"/>\n"
-"</Filter>\n"
-"\n"
 "<Filter class=\"vtkDataSetSurfaceFilter\" root=\"Surface\" input=\"vtkDataSet\" output=\"vtkPolyData\"/>\n"
 "\n"
 "<Filter class=\"vtkDecimatePro\" root=\"Deci\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
@@ -2079,14 +2218,6 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <Extent name=\"VOI\" help=\"Set the min/max values of the volume of interest (VOI)\"/>\n"
 "  <Vector name=\"SampleRate\" type=\"int\" length=\"3\" help=\"Set the sampling rate for each dimension\"/>\n"
 "  <Boolean name=\"IncludeBoundary\" help=\"Select whether to always include the boundary of the grid in the output\"/>\n"
-"</Filter>\n"
-"\n"
-"<Filter class=\"vtkExtractPolyDataPiece\" root=\"PDPiece\" input=\"vtkPolyData\" output=\"vtkPolyData\">\n"
-"  <Boolean name=\"GhostCells\" set=\"SetCreateGhostCells\" get=\"GetCreateGhostCells\" help=\"Select whether to generate ghost cells\"/>\n"
-"</Filter>\n"
-"\n"
-"<Filter class=\"vtkExtractUnstructuredGridPiece\" root=\"UGPiece\" input=\"vtkUnstructuredGrid\" output=\"vtkUnstructuredGrid\">\n"
-"  <Boolean name=\"GhostCells\" set=\"SetCreateGhostCells\" get=\"GetCreateGhostCells\" help=\"Select whether to generate ghost cells\"/>\n"
 "</Filter>\n"
 "\n"
 "<Filter class=\"vtkImageClip\" root=\"ImageClip\" input=\"vtkImageData\" output=\"vtkImageData\">\n"

@@ -254,7 +254,7 @@ void vtkPVActorComposite::CreateParallelTclObjects(vtkPVApplication *pvApp)
   // This allows us to debug the parallel features of the
   // application and VTK on only one process.
   int debugNum = numProcs;
-  if (getenv("PV_HALF_DEBUG") != NULL)
+  if (getenv("PV_DEBUG_HALF") != NULL)
     {
     debugNum *= 2;
     }

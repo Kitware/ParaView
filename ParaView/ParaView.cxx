@@ -130,15 +130,18 @@ void Process_Init(vtkMultiProcessController *controller, void *arg )
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nShowCmd)
 {
-  int argc;
-  char *argv[5];
+  int argc, tmp;
+  char *argv[500];
   vtkPVArgs pvArgs;
 
-  argv[0] = new char [strlen(lpCmdLine)+1];
-  argv[1] = new char [strlen(lpCmdLine)+1];
-  argv[2] = new char [strlen(lpCmdLine)+1];
-  argv[3] = new char [strlen(lpCmdLine)+1];
-  argv[4] = new char [strlen(lpCmdLine)+1];
+  argv[0] = (char*)malloc(1024);
+  ::GetModuleFileName(0, argv[0],1024);
+  argv[1] = (char*)malloc(strlen(lpCmdLine)+10000);
+  argv[2] = (char*)malloc(strlen(lpCmdLine)+100);
+  argv[3] = (char*)malloc(strlen(lpCmdLine)+100);
+  argv[4] = (char*)malloc(strlen(lpCmdLine)+100);
+
+//  argv[1] = new char [strlen(lpCmdLine)+100];
 
   unsigned int i;
   // parse a few of the command line arguments
@@ -179,7 +182,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     }
 
   vtkMultiProcessController *controller = vtkMultiProcessController::New();
-  controller->Initialize(&argc, (char***)(&argv));
+  tmp = 1;
+  controller->Initialize(&tmp, (char***)(&argv));
 
 #ifndef VTK_USE_MPI
   controller->SetNumberOfProcesses(1);
@@ -197,11 +201,13 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   controller->Delete();
   
-  delete [] argv[0];
-  delete [] argv[1];
-  delete [] argv[2];
-  delete [] argv[3];
-  delete [] argv[4];
+  free(argv[0]);
+  free(argv[1]);
+  free(argv[2]);
+  free(argv[3]);
+  free(argv[4]);
+
+//  delete [] argv[1];
   return 0;
 }
 #else

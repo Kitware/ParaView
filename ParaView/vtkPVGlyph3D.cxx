@@ -71,6 +71,9 @@ vtkPVGlyph3D::vtkPVGlyph3D()
   this->OrientCheck = vtkKWCheckButton::New();
   this->ScaleCheck = vtkKWCheckButton::New();
   this->ScaleEntry = vtkKWLabeledEntry::New();
+
+  // Glyph adds too its input, so sould not replace it.
+  this->ReplaceInput = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -348,19 +351,19 @@ void vtkPVGlyph3D::ChangeVectorMode()
 void vtkPVGlyph3D::UpdateSourceMenu()
 {
   int i;
-  vtkKWCompositeCollection *sources = this->GetWindow()->GetSources();
-  vtkPVSource *currentSource;
+  vtkKWCompositeCollection *sources = this->GetWindow()->GetGlyphSources();
+  vtkPVSource *source;
   char *tclName = NULL;
   
   this->GlyphSourceMenu->ClearEntries();
   for (i = 0; i < sources->GetNumberOfItems(); i++)
     {
-    currentSource = (vtkPVSource*)sources->GetItemAsObject(i);
-    if (currentSource->GetNthPVOutput(0))
+    source = (vtkPVSource*)sources->GetItemAsObject(i);
+    if (source->GetNthPVOutput(0))
       {
-      if (currentSource->GetNthPVOutput(0)->GetVTKData()->IsA("vtkPolyData"))
+      if (source->GetNthPVOutput(0)->GetVTKData()->IsA("vtkPolyData"))
         {
-        tclName = currentSource->GetNthPVOutput(0)->GetVTKDataTclName();
+        tclName = source->GetNthPVOutput(0)->GetVTKDataTclName();
         if (!this->GlyphSourceTclName)
           {
           this->SetGlyphSourceTclName(tclName);
