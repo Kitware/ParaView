@@ -90,6 +90,9 @@ public:
   vtkGetObjectMacro(Label, vtkKWWidget);
   vtkGetObjectMacro(Entry, vtkKWEntry);
 
+  vtkSetStringMacro(ShortLabel);
+  vtkGetStringMacro(ShortLabel);
+  
   // Description:
   // Set/Get the position of the label and/or entry (on top, or on the side).
   virtual void SetDisplayEntryAndLabelOnTop(int flag);
@@ -153,6 +156,8 @@ public:
   void Bind();
   void UnBind();
 
+  void Resize();
+  
 protected:
   vtkKWScale();
   ~vtkKWScale();
@@ -178,6 +183,13 @@ protected:
   vtkKWWidget *TopLevel;
   vtkKWPushButton *PopupPushButton;
 
+  char *NormalLabel;
+  char *ShortLabel;
+  int MediumWidth;
+  int ShortWidth;
+  
+  vtkSetStringMacro(NormalLabel);
+  
   void PackWidget();
   void UpdateEntryResolution();
 

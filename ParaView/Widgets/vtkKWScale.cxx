@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // ---------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScale );
-vtkCxxRevisionMacro(vtkKWScale, "1.35");
+vtkCxxRevisionMacro(vtkKWScale, "1.36");
 
 int vtkKWScaleCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -92,6 +92,12 @@ vtkKWScale::vtkKWScale()
   this->DisplayEntryAndLabelOnTop = 1;
   this->PopupScale = 0;
   this->ExpandEntry = 0;
+
+  this->NormalLabel = NULL;
+  this->ShortLabel = NULL;
+  
+  this->MediumWidth = 200;
+  this->ShortWidth = 100;
 }
 
 // ---------------------------------------------------------------------------
@@ -150,6 +156,8 @@ vtkKWScale::~vtkKWScale()
     this->PopupPushButton->Delete();
     this->PopupPushButton = NULL;
     }
+  
+  this->SetShortLabel(NULL);
 }
 
 // ---------------------------------------------------------------------------
@@ -253,6 +261,13 @@ void vtkKWScale::DisplayEntry()
 // ---------------------------------------------------------------------------
 void vtkKWScale::DisplayLabel(const char *label)
 {
+  this->SetNormalLabel(label);
+
+  if ( ! this->ShortLabel )
+    {
+    this->SetShortLabel(label);
+    }
+  
   if (this->Label && this->Label->IsCreated())
     {
     this->Script("%s configure -text {%s}",
@@ -378,6 +393,9 @@ void vtkKWScale::PackWidget()
 // ---------------------------------------------------------------------------
 void vtkKWScale::Bind()
 {
+  this->Script("bind %s <Configure> {%s Resize}",
+               this->GetWidgetName(), this->GetTclName());
+  
   if (this->Scale && this->Scale->IsCreated())
     {
     this->Script("bind %s <ButtonPress> {%s InvokeStartCommand}",
@@ -809,6 +827,45 @@ void vtkKWScale::SetEnabled(int e)
       this->PopupPushButton && this->PopupPushButton->IsCreated())
     {
     this->PopupPushButton->SetEnabled(e);
+    }
+}
+
+void vtkKWScale::Resize()
+{
+  if ( ! this->Label)
+    {
+    return;
+    }
+  
+  this->Script("winfo width %s", this->GetWidgetName());
+  int width = vtkKWObject::GetIntegerResult(this->Application);
+  
+  if (width < this->ShortWidth)
+    {
+    this->Script("%s configure -text {}",
+                 this->Label->GetWidgetName());
+    if (this->Entry && this->Entry->IsPacked())
+      {
+      this->Script("pack forget %s", this->Entry->GetWidgetName());
+      }
+    }
+  else if (width < this->MediumWidth)
+    {
+    this->Script("%s configure -text {%s}",
+                 this->Label->GetWidgetName(), this->ShortLabel);
+    if (this->Entry && ! this->Entry->IsPacked())
+      {
+      this->PackWidget();
+      }
+    }
+  else
+    {
+    this->Script("%s configure -text {%s}",
+                 this->Label->GetWidgetName(), this->NormalLabel);
+    if (this->Entry && ! this->Entry->IsPacked())
+      {
+      this->PackWidget();
+      }
     }
 }
 
