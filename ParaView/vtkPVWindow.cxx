@@ -48,8 +48,8 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVSourceList.h"
 #include "vtkPVActorComposite.h"
 #include "vtkPVAnimation.h"
+#include "vtkPVRunTimeContour.h"
 #include "vtkSuperquadricSource.h"
-#include "vtkRunTimeContour.h"
 
 //----------------------------------------------------------------------------
 vtkPVWindow* vtkPVWindow::New()
@@ -133,6 +133,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
 
   // create the top level
   this->MenuFile->InsertCommand(0,"New Window", this, "NewWindow");
+  this->MenuFile->InsertCommand(2, "Save Camera", this, "Save");
 
   // Create the menu for creating data sources.  
   this->CreateMenu->SetParent(this->GetMenu());
@@ -277,35 +278,54 @@ vtkPVPolyDataSource *vtkPVWindow::CreateCone()
 }
 
 //----------------------------------------------------------------------------
-vtkPVPolyDataSource *vtkPVWindow::CreateRunTimeContour()
+vtkPVRunTimeContour *vtkPVWindow::CreateRunTimeContour()
 {
   static int instanceCount = 0;
   vtkPVSource *pvs;
   vtkPVApplication *pvApp = this->GetPVApplication();
   float range[2];
+  vtkKWPushButton *button = vtkKWPushButton::New();
+  vtkKWScale *scale;
+  char command[50];
+  vtkRunTimeContour *rtc;
   
   // Create the pvSource. Clone the PVSource and the vtkSource.
   // Link the PVSource to the vtkSource.
-  pvs = pvApp->MakePVSource("vtkPVPolyDataSource","vtkRunTimeContour",
-                            "RunTimeContour", ++instanceCount);
+  pvs = pvApp->MakePVSource("vtkPVRunTimeContour", "vtkRunTimeContour",
+			    "RunTimeContour", ++instanceCount);
   if (pvs == NULL) {return NULL;}
   
+  // Set the default file name
+  pvApp->Script("%s SetFileName [tk_getOpenFile -filetypes {{{} {.vtk}}}]",
+                pvs->GetVTKSourceTclName());
+
   // Add the new Source to the View, and make it current.
   this->MainView->AddComposite(pvs);
   this->SetCurrentSource(pvs);
 
-  ((vtkRunTimeContour*)pvs->GetVTKSource())->GetRange(range);
-  
   // Add some source specific widgets.
   // Normally these would be added in the create method.
-  pvs->AddScale("ContourValue", "SetContourValue", "GetContourValue", 
-		range[0], range[1], 0.1);
+  pvs->AddFileEntry("FileName:", "SetFileName", "GetFileName", "vtk");
+  scale = pvs->AddScale("ContourValue:", "SetContourValue", "GetContourValue", 
+			0, 1, 0.1);
+  rtc = vtkRunTimeContour::SafeDownCast(pvs->GetVTKSource());
+  rtc->SetContourScale(scale);
   pvs->UpdateParameterWidgets();
+  
+  pvs->GetWidgets()->AddItem(button);
+  button->SetParent(pvs->GetParameterFrame()->GetFrame());
+  button->Create(pvApp, "");
+  button->SetLabel("Update");
+  sprintf(command, "{%s UpdateWidgets}", pvs->GetVTKSourceTclName());
+  this->Script("%s configure -command %s", button->GetWidgetName(), command);
+  this->Script("pack %s -side left", button->GetWidgetName());
+  
+  button->Delete();
 
   // Clean up. (How about on the other processes?)
   // We cannot create an object in tcl and delete it in C++.
   //pvs->Delete();
-  return vtkPVPolyDataSource::SafeDownCast(pvs);
+  return vtkPVRunTimeContour::SafeDownCast(pvs);
 }
 
 //----------------------------------------------------------------------------
@@ -719,7 +739,39 @@ void vtkPVWindow::NewWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::Save()
 {
-  // this is where we'll save out the camera parameters and this pipeline  
+  // Save out the camera parameters.  These are the ones used for the run-time
+  // simulation.  We may need to add other parameters later.
+  FILE *cameraFile;
+  vtkCamera *camera = this->GetMainView()->GetRenderer()->GetActiveCamera();
+  float position[3];
+  float focalPoint[3];
+  float viewUp[3];
+  float viewAngle;
+  float clippingRange[2];
+  
+  if ((cameraFile = fopen("camera.pv", "w")) == NULL)
+    {
+    vtkErrorMacro("Couldn't open file: camera.pv");
+    return;
+    }
+
+  camera->GetPosition(position);
+  camera->GetFocalPoint(focalPoint);
+  camera->GetViewUp(viewUp);
+  viewAngle = camera->GetViewAngle();
+  camera->GetClippingRange(clippingRange);
+  
+  fprintf(cameraFile, "position %.6f %.6f %.6f\n", position[0], position[1],
+	  position[2]);
+  fprintf(cameraFile, "focal point %.6f %.6f %.6f\n", focalPoint[0],
+	  focalPoint[1], focalPoint[2]);
+  fprintf(cameraFile, "view up %.6f %.6f %.6f\n", viewUp[0], viewUp[1],
+	  viewUp[2]);
+  fprintf(cameraFile, "view angle %.6f\n", viewAngle);
+  fprintf(cameraFile, "clipping range %.6f %.6f", clippingRange[0],
+	  clippingRange[1]);
+
+  fclose (cameraFile);
 }
 
 //----------------------------------------------------------------------------

@@ -50,6 +50,7 @@ vtkPVPolyData \
 vtkPVPolyDataSource \
 vtkPVPolyDataToPolyDataFilter \
 vtkPVRenderView \
+vtkPVRunTimeContour \
 vtkPVSelectionList \
 vtkPVSource \
 vtkPVSourceCollection \

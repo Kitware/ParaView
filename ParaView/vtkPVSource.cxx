@@ -1265,7 +1265,6 @@ vtkKWScale *vtkPVSource::AddScale(char *label, char *setCmd, char *getCmd,
   return slider;
 }
 
-
 //----------------------------------------------------------------------------
 vtkPVSelectionList *vtkPVSource::AddModeList(char *label, char *setCmd, char *getCmd,
                                              vtkKWObject *o)

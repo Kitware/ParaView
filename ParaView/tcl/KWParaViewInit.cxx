@@ -107,6 +107,9 @@ ClientData vtkPVPolyDataToPolyDataFilterNewCommand();
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVRenderViewNewCommand();
+int vtkPVRunTimeContourCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkPVRunTimeContourNewCommand();
 int vtkPVSelectionListCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkPVSelectionListNewCommand();
@@ -228,6 +231,8 @@ int VTK_EXPORT Vtkkwparaviewtcl_Init(Tcl_Interp *interp)
                   vtkPVPolyDataToPolyDataFilterCommand);
   vtkTclCreateNew(interp,"vtkPVRenderView", vtkPVRenderViewNewCommand,
                   vtkPVRenderViewCommand);
+  vtkTclCreateNew(interp,"vtkPVRunTimeContour", vtkPVRunTimeContourNewCommand,
+                  vtkPVRunTimeContourCommand);
   vtkTclCreateNew(interp,"vtkPVSelectionList", vtkPVSelectionListNewCommand,
                   vtkPVSelectionListCommand);
   vtkTclCreateNew(interp,"vtkPVSource", vtkPVSourceNewCommand,

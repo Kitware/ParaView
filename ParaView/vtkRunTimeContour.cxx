@@ -61,12 +61,12 @@ vtkRunTimeContour::vtkRunTimeContour()
 {
   this->Reader = vtkStructuredPointsReader::New();
   this->Contour = vtkSingleContourFilter::New();
+  this->ContourScale = NULL;
 
-  this->Reader->SetFileName("/home/henderson/vtk/contrib/examplesCxx/standin.vtk");
-  this->Reader->Update();
-  this->Reader->GetOutput()->GetScalarRange(this->Range);
+  this->Range[0] = 0.0;
+  this->Range[1] = 1.0;
+  
   this->Contour->SetInput(this->Reader->GetOutput());
-  this->Contour->SetFirstValue((this->Range[1] - this->Range[0])/2.0);
 }
 
 //----------------------------------------------------------------------------
@@ -89,9 +89,23 @@ void vtkRunTimeContour::Execute()
 }
 
 //----------------------------------------------------------------------------
+void vtkRunTimeContour::UpdateWidgets()
+{
+  this->Reader->Modified();
+  this->Reader->Update();
+  this->Reader->GetOutput()->GetScalarRange(this->Range);
+  if (this->ContourScale->GetValue() < this->Range[0])
+    {
+    this->ContourScale->SetRange(this->Range[0], this->Range[1]);
+    this->SetContourValue((this->Range[1] - this->Range[0])/2.0);
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkRunTimeContour::SetContourValue(float value)
 {
   this->Contour->SetFirstValue(value);
+  this->ContourScale->SetValue(value);
   this->Modified();
 }
 
@@ -99,4 +113,17 @@ void vtkRunTimeContour::SetContourValue(float value)
 float vtkRunTimeContour::GetContourValue()
 {
   return this->Contour->GetFirstValue();
+}
+
+//----------------------------------------------------------------------------
+void vtkRunTimeContour::SetFileName(char *filename)
+{
+  this->Reader->SetFileName(filename);
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+char *vtkRunTimeContour::GetFileName()
+{
+  return this->Reader->GetFileName();
 }

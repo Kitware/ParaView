@@ -40,6 +40,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVImageSource.h"
 #include "vtkPVSourceList.h"
 #include "vtkInteractorStyleTrackballCamera.h"
+#include "vtkPVRunTimeContour.h"
 
 class vtkKWNotebook;
 class vtkKWToolbar;
@@ -62,7 +63,7 @@ public:
   void CreateFractalVolume();
   vtkPVPolyDataSource *CreateCone();
   vtkPVPolyDataSource *CreateSTLReader();
-  vtkPVPolyDataSource *CreateRunTimeContour();
+  vtkPVRunTimeContour *CreateRunTimeContour();
   vtkPVPolyDataSource *CreateSphere();
   vtkPVPolyDataSource *CreateAxes();
   vtkPVPolyDataSource *CreateCube();
@@ -73,7 +74,7 @@ public:
   vtkPVPolyDataSource *CreatePoints();
   vtkPVPolyDataSource *CreateSuperQuadric();
   void CreateAnimation();
-
+  
   // Description:
   // I assume this creates a new applciation window.
   void NewWindow();
@@ -117,7 +118,7 @@ public:
   vtkGetObjectMacro(Toolbar, vtkKWToolbar);
   
   // Description:
-  // This probably does nothing for now.
+  // Save the camera parameters.
   void Save();
 
 protected:

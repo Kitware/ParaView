@@ -116,7 +116,7 @@ public:
   
   // Description:
   // Called when the accept button is pressed.
-  void AcceptCallback();
+  virtual void AcceptCallback();
   
   // Description:
   // Called when the cancel button is pressed.
@@ -165,7 +165,7 @@ public:
   vtkKWScale *AddScale(char *label, char *setCmd, char *getCmd, 
                        float min, float max, float resolution,
                        vtkKWObject *o = NULL);
-
+  
   // Description:
   // Creates a list for delecting a mode.
   // The methods are called on the object (VTKSource if o=NULL).
@@ -191,6 +191,11 @@ public:
   void SelectSource(vtkPVSource *source);
   
   vtkGetObjectMacro(DeleteButton, vtkKWPushButton);
+  vtkGetObjectMacro(AcceptButton, vtkKWPushButton);
+  
+  vtkGetObjectMacro(Widgets, vtkKWWidgetCollection);
+  
+  vtkGetObjectMacro(ParameterFrame, vtkKWLabeledFrame);
   
 protected:
   vtkPVSource();
@@ -241,9 +246,3 @@ protected:
 };
 
 #endif
-
-
-
-
-
-

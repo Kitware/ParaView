@@ -51,6 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPolyDataSource.h"
 #include "vtkStructuredPointsReader.h"
 #include "vtkSingleContourFilter.h"
+#include "vtkKWScale.h"
 
 class VTK_EXPORT vtkRunTimeContour : public vtkPolyDataSource 
 {
@@ -67,8 +68,19 @@ public:
   float GetContourValue();
   
   // Description:
+  // Set/Get the file name.
+  void SetFileName(char *filename);
+  char* GetFileName();
+  
+  // Description:
   // Get the scalar range of the data.
   vtkGetVector2Macro(Range, float);
+
+  // Description:
+  // Method to update the widgets this class contains
+  void UpdateWidgets();
+  
+  vtkSetObjectMacro(ContourScale, vtkKWScale);
   
 protected:
   vtkRunTimeContour();
@@ -81,6 +93,7 @@ protected:
   vtkStructuredPointsReader *Reader;
   vtkSingleContourFilter *Contour;
   float Range[2];
+  vtkKWScale *ContourScale;
 };
 
 #endif
