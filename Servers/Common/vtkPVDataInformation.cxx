@@ -34,7 +34,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVDataInformation);
-vtkCxxRevisionMacro(vtkPVDataInformation, "1.4");
+vtkCxxRevisionMacro(vtkPVDataInformation, "1.5");
 
 //----------------------------------------------------------------------------
 vtkPVDataInformation::vtkPVDataInformation()
@@ -258,6 +258,8 @@ void vtkPVDataInformation::CopyFromGenericDataSet(vtkGenericDataSet *data)
 
   this->SetDataClassName(data->GetClassName());
   this->DataSetType = data->GetDataObjectType();
+
+  this->NumberOfDataSets = 1;
 
   // Look for a name stored in Field Data.
   vtkDataArray *nameArray = data->GetFieldData()->GetArray("Name");
