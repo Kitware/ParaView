@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.13.2.3");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.13.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVMinMax::vtkPVMinMax()
@@ -191,6 +191,8 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
 
   this->MinScale->SetParent(this->MinFrame);
   this->MinScale->Create(this->Application, "");
+  this->MinScale->SetDisplayEntryAndLabelOnTop(0);
+  this->MinScale->DisplayEntry();
   this->MinScale->SetCommand(this, "MinValueCallback");
   this->Script("pack %s -side left -fill x -expand t -padx 5", 
                this->MinScale->GetWidgetName());
@@ -222,6 +224,8 @@ void vtkPVMinMax::Create(vtkKWApplication *pvApp)
     this->MaxScale->SetParent(this->MinFrame);
     }
   this->MaxScale->Create(this->Application, "");
+  this->MaxScale->SetDisplayEntryAndLabelOnTop(0);
+  this->MaxScale->DisplayEntry();
   this->MaxScale->SetCommand(this, "MaxValueCallback");
   this->Script("pack %s -side left -fill x -expand t -padx 5", 
                this->MaxScale->GetWidgetName());

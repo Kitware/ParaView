@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.9.2.2");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.9.2.3");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -204,9 +204,11 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
     this->MinMax[i]->Create(pvApp);
     this->MinMax[i]->SetMinimumLabel(labels[i]);
     this->MinMax[i]->GetMinScale()->SetEndCommand(this, "ModifiedCallback");
+    this->MinMax[i]->GetMinScale()->SetDisplayEntryAndLabelOnTop(1);
     this->MinMax[i]->GetMinScale()->DisplayEntry();
     this->MinMax[i]->GetMinScale()->DisplayLabel(" Min:");
     this->MinMax[i]->GetMaxScale()->SetEndCommand(this, "ModifiedCallback");
+    this->MinMax[i]->GetMaxScale()->SetDisplayEntryAndLabelOnTop(1);
     this->MinMax[i]->GetMaxScale()->DisplayEntry();
     this->MinMax[i]->GetMaxScale()->DisplayLabel(" Max:");
     }
@@ -309,14 +311,47 @@ void vtkPVExtentEntry::SetRange(int v0, int v1, int v2,
 void vtkPVExtentEntry::SetValue(int v0, int v1, int v2, 
                                 int v3, int v4, int v5)
 {
-  this->MinMax[0]->SetMaxValue(v1);
-  this->MinMax[0]->SetMinValue(v0);
+  if ( v1 >= v0 )
+    {
+    if ( (float)v1 < this->MinMax[0]->GetMinValue() )
+      {
+      this->MinMax[0]->SetMinValue(v0);
+      this->MinMax[0]->SetMaxValue(v1);
+      }
+    else
+      {
+      this->MinMax[0]->SetMaxValue(v1);
+      this->MinMax[0]->SetMinValue(v0);
+      }
+    }
 
-  this->MinMax[1]->SetMaxValue(v3);
-  this->MinMax[1]->SetMinValue(v2);
+  if ( v3 >= v2 )
+    {
+    if ( (float)v3 < this->MinMax[1]->GetMinValue() )
+      {
+      this->MinMax[1]->SetMinValue(v2);
+      this->MinMax[1]->SetMaxValue(v3);
+      }
+    else
+      {
+      this->MinMax[1]->SetMaxValue(v3);
+      this->MinMax[1]->SetMinValue(v2);
+      }
+    }
 
-  this->MinMax[2]->SetMaxValue(v5);
-  this->MinMax[2]->SetMinValue(v4);
+  if ( v5 >= v4 )
+    {
+    if ( (float)v5 < this->MinMax[2]->GetMinValue() )
+      {
+      this->MinMax[2]->SetMinValue(v4);
+      this->MinMax[2]->SetMaxValue(v5);
+      }
+    else
+      {
+      this->MinMax[2]->SetMaxValue(v5);
+      this->MinMax[2]->SetMinValue(v4);
+      }
+    }
 
   this->ModifiedCallback();
 }
