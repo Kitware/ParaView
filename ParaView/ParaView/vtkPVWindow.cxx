@@ -1620,6 +1620,7 @@ void vtkPVWindow::RemovePVSource(vtkPVSource *pvs)
   if (pvs)
     { 
     this->Sources->RemoveItem(pvs);
+    this->UpdateSelectMenu();
     }
 }
 
