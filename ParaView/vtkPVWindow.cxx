@@ -1169,7 +1169,8 @@ void vtkPVWindow::ProbeCallback()
   probe->SetPropertiesParent(this->GetMainView()->GetPropertiesParent());
   probe->SetApplication(pvApp);
   probe->SetVTKSource(s, tclName);
-  probe->SetProbeSourceTclName(this->GetCurrentPVData()->GetTclName());
+  probe->SetProbeSourceTclName(this->GetCurrentPVData()->GetVTKDataTclName());
+  probe->SetPVProbeSource(this->GetCurrentPVData());
   probe->SetName(tclName);
 
   this->GetMainView()->AddComposite(probe);

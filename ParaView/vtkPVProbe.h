@@ -87,6 +87,8 @@ public:
   // Description:
   // Callback for SetPoint button
   void SetPoint();
+
+  vtkSetObjectMacro(PVProbeSource, vtkPVData);
   
 protected:
   vtkPVProbe();
@@ -129,6 +131,8 @@ protected:
   float EndPoint1[3];
   float EndPoint2[3];
   int Dimensionality; // point = 0, line = 1, plane = 2
+
+  vtkPVData *PVProbeSource;
 };
 
 #endif

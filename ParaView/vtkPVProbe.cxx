@@ -160,10 +160,6 @@ void vtkPVProbe::CreateProperties()
   float bounds[6];
   vtkKWWidget *frame;
   vtkPVApplication* pvApp = this->GetPVApplication();
-  vtkPVData *pvd =
-    (vtkPVData*)(vtkTclGetPointerFromObject(this->ProbeSourceTclName,
-                                            "vtkPVData",
-                                            pvApp->GetMainInterp(), error));
   
   this->vtkPVSource::CreateProperties();
 
@@ -316,7 +312,7 @@ void vtkPVProbe::CreateProperties()
   
   this->SetInteractor();
   
-  pvd->GetBounds(bounds);
+  this->PVProbeSource->GetBounds(bounds);
   this->Interactor->SetBounds(bounds);
   
   this->Script("grab release %s", this->ParameterFrame->GetWidgetName());
@@ -476,7 +472,7 @@ void vtkPVProbe::UpdateProbe()
     {
     }
   
-  pvApp->BroadcastScript("%s SetSource [%s GetVTKData]",
+  pvApp->BroadcastScript("%s SetSource %s",
                          this->GetVTKSourceTclName(),
                          this->ProbeSourceTclName);
 }
