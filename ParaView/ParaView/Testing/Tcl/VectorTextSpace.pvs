@@ -50,7 +50,7 @@ if { [catch {set fp [open "out.txt" w]}] == 0 } {
   $pvSources InitTraversal
   set pvs [$pvSources GetNextItemAsObject]
   while { $pvs != {} } {
-    set pvsName [$pvs GetVTKSourceTclName]
+    set pvsName [$pvs GetVTKSourceIDAsInt]
     puts $fp $pvsName
     set pvs [$pvSources GetNextItemAsObject]
   }
