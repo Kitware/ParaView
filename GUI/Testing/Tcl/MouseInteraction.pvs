@@ -341,7 +341,7 @@ $kw(vtkTemp4) SetInteractorEventInformation 223 138 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "RightButtonReleaseEvent"
 
 # Move
-#[$kw(vtkTemp18) GetManipulatorControl3D] SetCurrentManipulator 0 "Move"
+[$kw(vtkTemp18) GetManipulatorControl3D] SetCurrentManipulator 0 "Move"
 $kw(vtkTemp4) SetInteractorEventInformation 116 119 0 0 0 0 0
 $kw(vtkTemp4) InvokeInteractorEvent "LeftButtonPressEvent"
 $kw(vtkTemp4) SetInteractorEventInformation 116 120 0 0 0 0 0
