@@ -282,12 +282,12 @@ public:
   // Access to the interactor styles from tcl.
   vtkGetObjectMacro(CameraStyle3D, vtkPVInteractorStyle);
   vtkGetObjectMacro(CameraStyle2D, vtkPVInteractorStyle);
-  
+  //ETX
+
   // Description:
   // Get the source list called "listname". The default source
   // lists are "Sources" and "GlyphSources".
   vtkPVSourceCollection *GetSourceList(const char* listname);
-  //ETX
 
   // Description: 
   // Re-populate the select menu from the list of existing data
@@ -409,6 +409,10 @@ public:
   // (e.g. Temperature).
   vtkPVColorMap* GetPVColorMap(const char* parameterName, 
                                int numberOfComponents);
+
+  // Description:
+  // Return the collection of all colormaps.
+  vtkCollection* GetPVColorMaps();
 
   // Description:
   // Propagates the center to the manipulators.
