@@ -20,7 +20,7 @@
 #include "vtkCellData.h"
 #include "vtkFieldData.h"
 
-vtkCxxRevisionMacro(vtkGroup, "1.6");
+vtkCxxRevisionMacro(vtkGroup, "1.7");
 vtkStandardNewMacro(vtkGroup);
 
 //----------------------------------------------------------------------------
@@ -79,6 +79,8 @@ vtkDataSet* vtkGroup::GetOutput(int idxOut)
       this->SetNumberOfOutputs(idxOut+1);
       }
     this->Outputs[idxOut] = output;
+    output->Register(this);
+    output->Delete();
     output->SetSource(this);
     return static_cast<vtkDataSet*>(output);
     }

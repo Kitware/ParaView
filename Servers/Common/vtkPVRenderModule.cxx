@@ -30,7 +30,7 @@
 #include "vtkPVOptions.h"
 
 //----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.4");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.5");
 
 //===========================================================================
 //***************************************************************************
@@ -87,6 +87,8 @@ vtkPVRenderModule::vtkPVRenderModule()
 
   this->Observer = vtkPVRenderModuleObserver::New();
   this->Observer->PVRenderModule = this;
+  this->BackgroundColor[0] = this->BackgroundColor[1] =
+    this->BackgroundColor[2] = 0.0;
 }
 
 //----------------------------------------------------------------------------
@@ -341,6 +343,19 @@ void vtkPVRenderModule::SetBackgroundColor(float r, float g, float b)
   stream << vtkClientServerStream::Invoke << this->RendererID << "SetBackground"
          << r << g << b << vtkClientServerStream::End;
   pm->SendStream(vtkProcessModule::CLIENT|vtkProcessModule::RENDER_SERVER);
+
+  // Save so we can get the color.
+  this->BackgroundColor[0] = r;
+  this->BackgroundColor[1] = g;
+  this->BackgroundColor[2] = b;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderModule::GetBackgroundColor(float *rgb)
+{
+  rgb[0] = this->BackgroundColor[0];
+  rgb[1] = this->BackgroundColor[1];
+  rgb[2] = this->BackgroundColor[2];
 }
 
 //----------------------------------------------------------------------------

@@ -18,27 +18,31 @@
 // It executes in parallel on distributed data sets.  
 // It assumes MPI we have an MPI controller.  The data remains distributed.
 // The user sets a point, and the filter finds the nearest
-// input point or cell.  Layers of cells can be grown through 
-// point connectivity.  The output is the input point/cell/region.  
-// I will have an interface that allows paraview to
-// get the attributes of the picked point or cell.
+// input point or cell.  
 
 #ifndef __vtkPickFilter_h
 #define __vtkPickFilter_h
 
-#include "vtkDataSetToUnstructuredGridFilter.h"
+#include "vtkUnstructuredGridSource.h"
 
 class vtkMultiProcessController;
 class vtkIdList;
 class vtkIntArray;
 class vtkPoints;
+class vtkDataSet;
 
-class VTK_EXPORT vtkPickFilter : public vtkDataSetToUnstructuredGridFilter
+class VTK_EXPORT vtkPickFilter : public vtkUnstructuredGridSource
 {
 public:
   static vtkPickFilter *New();
-  vtkTypeRevisionMacro(vtkPickFilter,vtkDataSetToUnstructuredGridFilter);
+  vtkTypeRevisionMacro(vtkPickFilter,vtkUnstructuredGridSource);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Multiple inputs for multiblock.
+  void AddInput(vtkDataSet* input);
+  vtkDataSet* GetInput(int idx);
+  void RemoveAllInputs();
 
   // Description:
   // Set your picking point here.
@@ -53,20 +57,6 @@ public:
   vtkBooleanMacro(PickCell,int);
   
   // Description:
-  // This value specifies how many layers to grow 
-  // around the picked point or cell. Default value is 0.
-  vtkSetMacro(NumberOfLayers, int);  
-  vtkGetMacro(NumberOfLayers, int);  
-
-  // Description:
-  // By default this is on.  
-  // When this is on and NumberOfLevels larger than zero, 
-  // this filter generates point and cell arrays containg the level.
-  vtkSetMacro(GenerateLayerAttribute, int);  
-  vtkGetMacro(GenerateLayerAttribute, int);  
-  vtkBooleanMacro(GenerateLayerAttribute, int);  
-
-  // Description:
   // This is set by default (if compiled with MPI).
   // User can override this default.
   void SetController(vtkMultiProcessController* controller);
@@ -80,16 +70,10 @@ protected:
   void CellExecute();
   int CompareProcesses(double bestDist2);
 
-  // For the Onion peel (growing layers)
-  void Grow(int level, vtkIdList* regionCellIds, vtkIntArray* regionCellLevels);
-  void GetInputLayerPoints(vtkPoints* pts, int level, vtkDataSet* input);
-  void GatherPoints(vtkPoints* pts);
-  void CreateOutput(vtkIdList* regionCellIds, vtkIntArray* regionCellLevels);
+  void CreateOutput(vtkIdList* regionCellIds);
 
   // Flag that toggles between picking cells or picking points.
   int PickCell;
-  int NumberOfLayers;
-  int GenerateLayerAttribute;
 
   // Input pick point.
   double WorldPoint[3];
@@ -100,11 +84,14 @@ protected:
   vtkIdList* PointMap;
   // Index is the output id, value is the input id.
   vtkIdList* RegionPointIds;
-  // Index is the output id, value is the level/layer.
-  vtkIntArray* RegionPointLevels;
+
+  // I need this because I am converting this filter
+  // to have multiple inputs, and removing the layer feature
+  // at the same time.  Maps can only be from one input.
+  int BestInputIndex;
 
   // Returns outputId.
-  vtkIdType InsertIdInPointMap(vtkIdType inId, int level);
+  vtkIdType InsertIdInPointMap(vtkIdType inId);
   void InitializePointMap(vtkIdType numerOfInputPoints);
   void DeletePointMap();
   int ListContainsId(vtkIdList* ids, vtkIdType id);

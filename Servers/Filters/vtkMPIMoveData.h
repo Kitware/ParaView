@@ -37,6 +37,14 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // These methods assume the user knows the output type,
+  // a creates the output if necessary even when the input has
+  // not been set yet.
+  virtual vtkPolyData* GetPolyDataOutput();
+  virtual vtkUnstructuredGrid* GetUnstructuredGridOutput();
+  virtual vtkDataSet* GetOutput();
+
+  // Description:
   // Objects for communication.
   // The controller is an MPI controller used to communicate
   // between processes within one server (render or data).

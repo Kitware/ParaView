@@ -19,9 +19,10 @@
 #include "vtkObjectFactory.h"
 #include "vtkDataSet.h"
 #include "vtkPolyData.h"
+#include "vtkUnstructuredGrid.h"
 #include "vtkCollection.h"
 
-vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.19");
+vtkCxxRevisionMacro(vtkPVUpdateSuppressor, "1.20");
 vtkStandardNewMacro(vtkPVUpdateSuppressor);
 vtkCxxSetObjectMacro(vtkPVUpdateSuppressor,Input,vtkDataSet);
 
@@ -44,11 +45,43 @@ vtkPVUpdateSuppressor::~vtkPVUpdateSuppressor()
   this->RemoveAllCaches();
 }
 
-//----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 vtkPolyData* vtkPVUpdateSuppressor::GetPolyDataOutput()
 {
-  vtkDataSet* o = this->GetOutput();
-  return vtkPolyData::SafeDownCast(o);
+  vtkPolyData* pd;
+  if (this->NumberOfOutputs == 0 || this->Outputs[0] == 0)
+    {
+    pd = vtkPolyData::New();
+    this->SetOutput(pd);
+    pd->Delete();
+    return pd;
+    }
+  pd = vtkPolyData::SafeDownCast(this->Outputs[0]);
+  if (pd == 0)
+    {
+    vtkErrorMacro("Could not get the poly data output.");
+    }
+  return pd;
+}
+
+//-----------------------------------------------------------------------------
+vtkUnstructuredGrid* vtkPVUpdateSuppressor::GetUnstructuredGridOutput()
+{
+  vtkUnstructuredGrid* ug;
+  if (this->NumberOfOutputs == 0 || this->Outputs[0] == 0)
+    {
+    ug = vtkUnstructuredGrid::New();
+    this->SetOutput(ug);
+    ug->Delete();
+    return ug;
+    }
+    
+  ug = vtkUnstructuredGrid::SafeDownCast(this->Outputs[0]);
+  if (ug == 0)
+    {
+    vtkErrorMacro("Could not get the unstructured grid output.");
+    }
+  return ug;
 }
 
 //----------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 #include "vtkDataSetSource.h"
 
 class vtkPolyData;
+class vtkUnstructuredGrid;
 
 class VTK_EXPORT vtkPVUpdateSuppressor : public vtkDataSetSource
 {
@@ -30,8 +31,11 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Cast output to a polydata.  Return NULL if this is not possible.
-  vtkPolyData* GetPolyDataOutput();
+  // These methods assume the user knows the output type,
+  // a creates the output if necessary even when the input has
+  // not been set yet.
+  virtual vtkPolyData* GetPolyDataOutput();
+  virtual vtkUnstructuredGrid* GetUnstructuredGridOutput();
 
   // Description:
   // Check input type and make the output the same type.

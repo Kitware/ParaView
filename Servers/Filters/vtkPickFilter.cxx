@@ -30,7 +30,7 @@
 #include "vtkMPICommunicator.h"
 #endif
 
-vtkCxxRevisionMacro(vtkPickFilter, "1.4");
+vtkCxxRevisionMacro(vtkPickFilter, "1.5");
 vtkStandardNewMacro(vtkPickFilter);
 vtkCxxSetObjectMacro(vtkPickFilter,Controller,vtkMultiProcessController);
 
@@ -43,12 +43,10 @@ vtkPickFilter::vtkPickFilter ()
   this->Controller = 0;
   this->SetController(vtkMultiProcessController::GetGlobalController());
   this->WorldPoint[0] = this->WorldPoint[1] = this->WorldPoint[2] = 0.0;
-  this->NumberOfLayers = 0;
 
   this->PointMap = 0;
   this->RegionPointIds = 0;
-  this->RegionPointLevels = 0;
-  this->GenerateLayerAttribute = 0;
+  this->BestInputIndex = -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -57,10 +55,42 @@ vtkPickFilter::~vtkPickFilter ()
   this->SetController(0);
 }
 
+//----------------------------------------------------------------------------
+// Specify the input data or filter.
+vtkDataSet *vtkPickFilter::GetInput(int idx)
+{
+  if (this->NumberOfInputs <= idx)
+    {
+    return NULL;
+    }
+  
+  return (vtkDataSet *)(this->Inputs[idx]);
+}
+
+//----------------------------------------------------------------------------
+// Specify the input data or filter.
+void vtkPickFilter::AddInput(vtkDataSet *input)
+{
+  int i = this->GetNumberOfInputs();
+  this->vtkProcessObject::SetNthInput(i, input);
+}
+
+//----------------------------------------------------------------------------
+// Specify the input data or filter.
+void vtkPickFilter::RemoveAllInputs()
+{
+  int num, idx;
+  num = this->NumberOfInputs;
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->SetNthInput(idx, NULL);
+    }
+}
+
 //-----------------------------------------------------------------------------
 void vtkPickFilter::Execute()
 {
-  this->InitializePointMap(this->GetInput()->GetNumberOfPoints());
+  this->BestInputIndex = -1;
 
   if (this->PickCell)
     {
@@ -83,54 +113,64 @@ void vtkPickFilter::PointExecute()
   double bestDistance2;
   vtkIdType bestId = 0;
   double tmp;
-  vtkDataSet* input = this->GetInput();
+  int numInputs = this->GetNumberOfInputs();
+  int inputIdx;
+  vtkDataSet* input;
   vtkIdType numPts, ptId;
+
+  if (numInputs == 0)
+    {
+    return;
+    }
 
   // Find the nearest point in the input.
   bestDistance2 = VTK_LARGE_FLOAT;
-  numPts = input->GetNumberOfPoints();
-  for (ptId = 0; ptId < numPts; ++ptId)
+  this->BestInputIndex = -1;
+
+  for (inputIdx = 0; inputIdx < numInputs; ++inputIdx)
     {
-    input->GetPoint(ptId, pt);
-    tmp = pt[0]-this->WorldPoint[0];
-    distance2 = tmp*tmp;
-    tmp = pt[1]-this->WorldPoint[1];
-    distance2 += tmp*tmp;
-    tmp = pt[2]-this->WorldPoint[2];
-    distance2 += tmp*tmp;
-    if (distance2 < bestDistance2)
+    input = this->GetInput(inputIdx);
+    numPts = input->GetNumberOfPoints();
+    for (ptId = 0; ptId < numPts; ++ptId)
       {
-      bestId = ptId;
-      bestDistance2 = distance2;
-      bestPt[0] = pt[0];
-      bestPt[1] = pt[1];
-      bestPt[2] = pt[2];
+      input->GetPoint(ptId, pt);
+      tmp = pt[0]-this->WorldPoint[0];
+      distance2 = tmp*tmp;
+      tmp = pt[1]-this->WorldPoint[1];
+      distance2 += tmp*tmp;
+      tmp = pt[2]-this->WorldPoint[2];
+      distance2 += tmp*tmp;
+      if (distance2 < bestDistance2)
+        {
+        bestId = ptId;
+        this->BestInputIndex = inputIdx;
+        bestDistance2 = distance2;
+        bestPt[0] = pt[0];
+        bestPt[1] = pt[1];
+        bestPt[2] = pt[2];
+        }
       }
     }
 
   // Keep only the best seed among the processes.
   vtkIdList* regionCellIds = vtkIdList::New();
-  vtkIntArray* regionCellLevels = vtkIntArray::New();
   if ( ! this->CompareProcesses(bestDistance2) && numPts > 0)
     {
-    this->InsertIdInPointMap(bestId, 0);
+    // Only one point in map.
+    this->InitializePointMap(1);
+    this->InsertIdInPointMap(bestId);
     }
 
-  for (int idx = 0; idx < this->NumberOfLayers; ++idx)
-    {
-    this->Grow(idx+1,regionCellIds, regionCellLevels);
-    }
-
-  this->CreateOutput(regionCellIds, regionCellLevels);
+  this->CreateOutput(regionCellIds);
   regionCellIds->Delete();
-  regionCellLevels->Delete();
 }
 
 //-----------------------------------------------------------------------------
 void vtkPickFilter::CellExecute()
 {
   // Loop over all of the cells.
-  vtkDataSet* input = this->GetInput();
+  vtkDataSet* input;
+  int numInputs, inputIdx;
   vtkIdType cellId;
   vtkCell* cell;
   int inside;
@@ -143,132 +183,62 @@ void vtkPickFilter::CellExecute()
   vtkIdType numCells;
   vtkIdType bestId = -1;
 
-
-  weights = new double[input->GetMaxCellSize()];
-  numCells = input->GetNumberOfCells();
-  for (cellId=0; cellId < numCells; cellId++)
+  numInputs = this->NumberOfInputs;
+  if (numInputs == 0)
     {
-    cell = input->GetCell(cellId);
-    inside = cell->EvaluatePosition(this->WorldPoint, closestPoint, 
-                                    subId, pcoords, dist2, weights);
-    // Inside does not work the way I thought for 2D cells.
-    //if (inside)
-    //  {
-    //  dist2= 0.0;
-    //  }
-    if (dist2 < bestDist2)
-      {
-      bestId = cellId;
-      bestDist2 = dist2;
-      }
+    return;
     }
-  delete [] weights;
-  weights = NULL;
+
+  for (inputIdx = 0; inputIdx < numInputs; ++inputIdx)
+    {
+    input = this->GetInput(inputIdx);
+    weights = new double[input->GetMaxCellSize()];
+    numCells = input->GetNumberOfCells();
+    for (cellId=0; cellId < numCells; cellId++)
+      {
+      cell = input->GetCell(cellId);
+      inside = cell->EvaluatePosition(this->WorldPoint, closestPoint, 
+                                      subId, pcoords, dist2, weights);
+      // Inside does not work the way I thought for 2D cells.
+      //if (inside)
+      //  {
+      //  dist2= 0.0;
+      //  }
+      if (dist2 < bestDist2)
+        {
+        bestId = cellId;
+        bestDist2 = dist2;
+        this->BestInputIndex = inputIdx;
+        }
+      }
+    delete [] weights;
+    weights = NULL;
+    }
 
   // Keep only the best seed cell among the processes.
   vtkIdList* regionCellIds = vtkIdList::New();
-  vtkIntArray* regionCellLevels = vtkIntArray::New();
   if ( ! this->CompareProcesses(bestDist2) && bestId >= 0)
     {
+    vtkDataSet* input = this->GetInput(this->BestInputIndex);
+    this->InitializePointMap(input->GetNumberOfPoints());
     regionCellIds->InsertNextId(bestId);
-    regionCellLevels->InsertNextValue(0);
     // Insert the cell points.
     vtkIdList* cellPtIds = vtkIdList::New();
-    this->GetInput()->GetCellPoints(bestId, cellPtIds);
+    input->GetCellPoints(bestId, cellPtIds);
     vtkIdType i;
     for (i = 0; i < cellPtIds->GetNumberOfIds(); ++i)
       {
-      this->InsertIdInPointMap(cellPtIds->GetId(i), 0);
+      this->InsertIdInPointMap(cellPtIds->GetId(i));
       }
     cellPtIds->Delete();
     }
 
-  // Grow the layers
-  for (int idx = 0; idx < this->NumberOfLayers; ++idx)
-    {
-    this->Grow(idx+1, regionCellIds, regionCellLevels);
-    }
-
-  this->CreateOutput(regionCellIds, regionCellLevels);
+  this->CreateOutput(regionCellIds);
   regionCellIds->Delete();
-  regionCellLevels->Delete();
 }
 
 //-----------------------------------------------------------------------------
-void vtkPickFilter::Grow(int level, vtkIdList* regionCellIds, 
-                         vtkIntArray* regionCellLevels)
-{
-  vtkDataSet* input = this->GetInput();
-  vtkPoints* pts = vtkPoints::New();
-  vtkIdList* ptCellIds = vtkIdList::New();
-  vtkIdList* cellPtIds = vtkIdList::New();
-  double pt[3];
-  vtkIdType i, j, k;
-
-  // This is similar to growing ghost cells, but we know
-  // the starting seed/cell is small.
-
-  // The first step is to get point ids from the last level.
-  // Region boundary points have not been propagated across processes yet.
-  // We need to gather the xyz locations and use 
-  // a locator to get the local ids.
-
-  // Get the XYZ points for the last level (local points).
-  this->GetInputLayerPoints(pts, level-1, input);
-  // Gather region  boundary points (last level) from all processes.
-  this->GatherPoints(pts);
-
-  // Use a locator to find local ids and add them to the region.
-  // (discard non local pts).
-  vtkIdType numPts, cellId, ptId, pt2Id;
-  int ptLevel;
-  numPts = pts->GetNumberOfPoints();
-  for (i = 0; i < numPts; ++i)
-    {
-    pts->GetPoint(i, pt);
-    ptId = this->FindPointId(pt, input);
-    if (ptId >= 0)
-      {
-      this->InsertIdInPointMap(ptId, level-1);
-      }
-    }
-
-  // Find the next level of cells for the region.
-  numPts = this->RegionPointIds->GetNumberOfIds();
-  for (i = 0; i < numPts; ++i)
-    {
-    ptId = this->RegionPointIds->GetId(i);
-    ptLevel = this->RegionPointLevels->GetValue(i);
-    if (ptLevel == level-1)
-      { // Boundary Point: Find all connected cells.
-      input->GetPointCells(ptId, ptCellIds);
-      for (j = 0; j < ptCellIds->GetNumberOfIds(); j++)
-        {
-        cellId = ptCellIds->GetId(j);
-        if ( ! this->ListContainsId(regionCellIds, cellId))
-          { // Insert the new cell into the region.
-          regionCellIds->InsertNextId(cellId);
-          regionCellLevels->InsertNextValue(level);
-          // Add this cells points to the region also.
-          input->GetCellPoints(cellId, cellPtIds);
-          for (k = 0; k < cellPtIds->GetNumberOfIds(); k++)
-            {
-            pt2Id = cellPtIds->GetId(k);
-            // Insert the new point into the region.
-            this->InsertIdInPointMap(pt2Id, level);
-            }
-          }
-        }
-      }
-    }
-
-  pts->Delete();
-  ptCellIds->Delete();
-  cellPtIds->Delete();
-}
-
-//-----------------------------------------------------------------------------
-vtkIdType vtkPickFilter::InsertIdInPointMap(vtkIdType inId, int level)
+vtkIdType vtkPickFilter::InsertIdInPointMap(vtkIdType inId)
 {
   vtkIdType outId;
   outId = this->PointMap->GetId(inId);
@@ -279,7 +249,6 @@ vtkIdType vtkPickFilter::InsertIdInPointMap(vtkIdType inId, int level)
   outId = this->RegionPointIds->GetNumberOfIds();
   this->PointMap->SetId(inId, outId);
   this->RegionPointIds->InsertNextId(inId);
-  this->RegionPointLevels->InsertNextValue(level);
   return outId;
 }
 
@@ -293,7 +262,6 @@ void vtkPickFilter::InitializePointMap(vtkIdType numberOfInputPoints)
   this->PointMap = vtkIdList::New();
   this->PointMap->Allocate(numberOfInputPoints);
   this->RegionPointIds = vtkIdList::New();
-  this->RegionPointLevels = vtkIntArray::New();
 
   vtkIdType i;
   for (i = 0; i < numberOfInputPoints; ++i)
@@ -315,95 +283,6 @@ void vtkPickFilter::DeletePointMap()
     this->RegionPointIds->Delete();
     this->RegionPointIds = NULL;
     }
-  if (this->RegionPointLevels)
-    {
-    this->RegionPointLevels->Delete();
-    this->RegionPointLevels = NULL;
-    }
-}
-
-//-----------------------------------------------------------------------------
-void vtkPickFilter::GetInputLayerPoints(vtkPoints* pts, int level, 
-                                        vtkDataSet* input)
-{
-  double pt[3];
-  vtkIdType i, numPts;
-
-  pts->Initialize();
-  numPts = this->RegionPointIds->GetNumberOfIds();
-  for (i = 0; i < numPts; ++i)
-    {
-    if (this->RegionPointLevels->GetValue(i) == level)
-      {
-      input->GetPoint(this->RegionPointIds->GetId(i), pt);
-      pts->InsertNextPoint(pt);
-      }
-    }
-}
-
-//-----------------------------------------------------------------------------
-#ifdef VTK_USE_MPI
-void vtkPickFilter::GatherPoints(vtkPoints* pts)
-#else
-void vtkPickFilter::GatherPoints(vtkPoints*)
-#endif
-{
-#ifdef VTK_USE_MPI
-  vtkMPICommunicator* com = NULL;
-  if (this->Controller == NULL)
-    {
-    return;
-    }
-  com = vtkMPICommunicator::SafeDownCast(this->Controller->GetCommunicator());
-  if (com == NULL)
-    {
-    return;
-    }
-  int idx, sum;
-  int numProcs = this->Controller->GetNumberOfProcesses();
-  int size = pts->GetNumberOfPoints() * 3;
-  int* recvLengths = new int[numProcs * 2];
-  int* recvOffsets = recvLengths+numProcs;
-  com->AllGather(&size, recvLengths, 1);
-  // Compute the displacements.
-  sum = 0;
-  for (idx = 0; idx < numProcs; ++idx)
-    {
-    recvOffsets[idx] = sum;
-    sum += recvLengths[idx];
-    }
-
-  // Gather the points from all processes.
-  if (pts->GetDataType() == VTK_FLOAT)
-    {
-    float* ptr = static_cast<float*>(pts->GetVoidPointer(0));
-    float* allPts = new float[sum];
-    com->AllGatherV(ptr, allPts, size, recvLengths, recvOffsets);
-    pts->Initialize();
-    pts->Allocate(sum/3);
-    for (idx = 0; idx < sum; idx += 3)
-      {
-      pts->InsertPoint(idx, allPts+idx);
-      }
-    }
-  else if (pts->GetDataType() == VTK_DOUBLE)
-    {
-    double* ptr = static_cast<double*>(pts->GetVoidPointer(0));
-    double* allPts = new double[sum];
-    com->AllGatherV(ptr, allPts, size, recvLengths, recvOffsets);
-    pts->Initialize();
-    pts->Allocate(sum/3);
-    for (idx = 0; idx < sum; idx += 3)
-      {
-      pts->InsertPoint(idx, allPts+idx);
-      }
-    }
-  else
-    {
-    vtkErrorMacro("I only handle double and float points.");
-    } 
-  delete [] recvLengths;
-#endif // VTK_USE_MPI
 }
 
 //-----------------------------------------------------------------------------
@@ -451,10 +330,14 @@ int vtkPickFilter::CompareProcesses(double bestDist2)
 }
 
 //-----------------------------------------------------------------------------
-void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds, 
-                                 vtkIntArray* regionCellLevels)
+// I made this general so we could grow the region from the seed.
+void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds)
 {
-  vtkDataSet* input = this->GetInput();
+  if (this->BestInputIndex < 0)
+    {
+    return;
+    }
+  vtkDataSet* input = this->GetInput(this->BestInputIndex);
   vtkUnstructuredGrid* output = this->GetOutput();
   double pt[3];
   // Preserve the original Ids.
@@ -516,25 +399,6 @@ void vtkPickFilter::CreateOutput(vtkIdList* regionCellIds,
   output->GetPointData()->AddArray(ptIds);
   ptIds->Delete();
   ptIds = NULL;
-
-  if (this->GenerateLayerAttribute)
-    {
-    vtkIntArray* levelArray;
-    levelArray = vtkIntArray::New();
-    levelArray->DeepCopy(this->RegionPointLevels);
-    levelArray->SetName("Pick Level");
-    output->GetPointData()->AddArray(levelArray);
-    levelArray->Delete();
-
-    levelArray = vtkIntArray::New();
-    levelArray->DeepCopy(regionCellLevels);
-    levelArray->SetName("Pick Level");
-    output->GetCellData()->AddArray(levelArray);
-    levelArray->Delete();
-    output->GetCellData()->SetActiveScalars("Pick Level");
-    }
-
-
 }
 
 
@@ -603,9 +467,6 @@ void vtkPickFilter::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Pick: "
      << (this->PickCell ? "Cell" : "Point")
      << endl;
-
-  os << indent << "NumberOfLayers: " << this->NumberOfLayers << endl;
-  os << indent << "GenerateLayerAttribute: " << this->GenerateLayerAttribute << endl;
 }
 
 

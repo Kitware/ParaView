@@ -27,12 +27,12 @@ int main(int , char* [])
   maze->Update(); //For GetCenter
   
   vtkPickFilter *pick = vtkPickFilter::New();
-  pick->SetInput( maze->GetOutput() );
+  
+  int fixme;  // why is this a problem.
+  //pick->SetInput( maze->GetOutput() );
   pick->SetWorldPoint ( maze->GetOutput()->GetCenter() );
   pick->GetWorldPoint ();
   pick->SetPickCell ( 1 );
-  pick->SetNumberOfLayers ( 1 );
-  pick->GenerateLayerAttributeOn ();
   pick->Update();
 
   vtkMPIDuplicatePolyData *duplicate = vtkMPIDuplicatePolyData::New();

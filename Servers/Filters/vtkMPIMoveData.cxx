@@ -35,7 +35,7 @@
 #include "vtkMPIMToNSocketConnection.h"
 #include "vtkSocketCommunicator.h"
 
-vtkCxxRevisionMacro(vtkMPIMoveData, "1.4");
+vtkCxxRevisionMacro(vtkMPIMoveData, "1.5");
 vtkStandardNewMacro(vtkMPIMoveData);
 
 vtkCxxSetObjectMacro(vtkMPIMoveData,Controller, vtkMultiProcessController);
@@ -79,6 +79,56 @@ vtkMPIMoveData::~vtkMPIMoveData()
   this->ClearBuffer();
 }
 
+//-----------------------------------------------------------------------------
+// Since this data set to data set fitler may not have an input,
+// We need to circumvent the check by the superclass.
+vtkDataSet* vtkMPIMoveData::GetOutput()
+{
+  if (this->NumberOfOutputs > 0)
+    {
+    return static_cast<vtkDataSet*>(this->Outputs[0]);
+    }
+  return this->Superclass::GetOutput();
+}
+
+//-----------------------------------------------------------------------------
+vtkPolyData* vtkMPIMoveData::GetPolyDataOutput()
+{
+  vtkPolyData* pd;
+  if (this->NumberOfOutputs == 0 || this->Outputs[0] == 0)
+    {
+    pd = vtkPolyData::New();
+    this->SetOutput(pd);
+    pd->Delete();
+    return pd;
+    }
+  pd = vtkPolyData::SafeDownCast(this->Outputs[0]);
+  if (pd == 0)
+    {
+    vtkErrorMacro("Could not get the poly data output.");
+    }
+  return pd;
+}
+
+//-----------------------------------------------------------------------------
+vtkUnstructuredGrid* vtkMPIMoveData::GetUnstructuredGridOutput()
+{
+  vtkUnstructuredGrid* ug;
+  if (this->NumberOfOutputs == 0 || this->Outputs[0] == 0)
+    {
+    ug = vtkUnstructuredGrid::New();
+    this->SetOutput(ug);
+    ug->Delete();
+    return ug;
+    }
+    
+  ug = vtkUnstructuredGrid::SafeDownCast(this->Outputs[0]);
+  if (ug == 0)
+    {
+    vtkErrorMacro("Could not get the unstructured grid output.");
+    }
+  return ug;
+}
 
 //-----------------------------------------------------------------------------
 void vtkMPIMoveData::ExecuteInformation()

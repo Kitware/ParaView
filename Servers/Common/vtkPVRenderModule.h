@@ -39,8 +39,8 @@ class vtkPVWindow;
 class vtkRenderer;
 class vtkRenderWindow;
 class vtkCollection;
-class vtkPVPartDisplay;
-class vtkPVDisplay;
+class vtkSMPartDisplay;
+class vtkSMDisplay;
 class vtkPVRenderModuleObserver;
 
 class VTK_EXPORT vtkPVRenderModule : public vtkObject
@@ -60,19 +60,14 @@ public:
   virtual void ComputeVisiblePropBounds( double bounds[6] ) = 0; 
   
   // Description:
-  // This method is executed in all processes.
-  virtual void AddSource(vtkSMSourceProxy *pvs) = 0;
-  virtual void RemoveSource(vtkSMSourceProxy *pvs) = 0;
-
-  // Description:
   // This is used for special plot displays.
   // It is a way to have the render module update displays
   // that are not part displays created by AddSource.
   // I do not expect that this will be a permenant method.
   // As we create more types of displays, I will have to
   // find a different way of managing them.
-  virtual void AddDisplay(vtkPVDisplay* disp) = 0;
-  virtual void RemoveDisplay(vtkPVDisplay* disp) = 0;
+  virtual void AddDisplay(vtkSMDisplay* disp) = 0;
+  virtual void RemoveDisplay(vtkSMDisplay* disp) = 0;
   
   // Description:
   // Renders using Still/FullRes or interactive/LODs
@@ -98,6 +93,7 @@ public:
   // Change the background color.
   void SetBackgroundColor(float r, float g, float b);
   virtual void SetBackgroundColor(float *c) {this->SetBackgroundColor(c[0],c[1],c[2]);}
+  void GetBackgroundColor(float* rgb);
 
   // Description:
   // Callback for the triangle strips check button
@@ -147,17 +143,21 @@ public:
   // can stay in sync
   void StartRenderEvent();
 
+  // Description
+  // Subclass can create their own vtkSMPartDisplay object by
+  // implementing this method.
+  // PartDisplays are specific to the render module.  
+  // So far, others displays are not.
+  virtual vtkSMPartDisplay* CreatePartDisplay() = 0;
+
   vtkClientServerID GetInteractorID() { return this->InteractorID;}
   //BTX
   void SetInteractorID(vtkClientServerID id) {this->InteractorID = id;}
   //ETX
+
 protected:
   vtkPVRenderModule();
   ~vtkPVRenderModule();
-
-  // Subclass can create their own vtkPVPartDisplay object by
-  // implementing this method.
-  virtual vtkPVPartDisplay* CreatePartDisplay() = 0;
 
   // This collection keeps a reference to all PartDisplays created
   // by this module.
@@ -171,6 +171,7 @@ protected:
   vtkRenderWindow*  RenderWindow;
   vtkRenderer*      Renderer;
   vtkRenderer*      Renderer2D;
+  float             BackgroundColor[3];
 
   //int Interactive;
   int TotalVisibleMemorySizeValid;
