@@ -864,6 +864,17 @@ int vtkKWApplication::DeleteRegisteryValue(int level, const char* subkey,
 }
 
 //----------------------------------------------------------------------------
+int vtkKWApplication::SelfTest()
+{
+  int res = 0;
+  this->EvaluateString("foo");
+  res += (!this->EvaluateBooleanExpression("proc a {} { return 1; }; a"));
+  res += this->EvaluateBooleanExpression("proc a {} { return 0; }; a");
+
+  return (res == 0);
+}
+
+//----------------------------------------------------------------------------
 void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);

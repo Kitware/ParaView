@@ -136,6 +136,10 @@ public:
 //ETX
 
   // Description:
+  // Test some of the features that cannot be tested from the tcl.
+  int SelfTest();
+
+  // Description:
   // Internal Balloon help callbacks.
   void BalloonHelpTrigger(vtkKWWidget *widget);
   void BalloonHelpDisplay(vtkKWWidget *widget);

@@ -233,9 +233,12 @@ public:
   void ScalarBarOrientationCallback();
   void SetScalarBarOrientationToVertical();
   void SetScalarBarOrientationToHorizontal();
+  vtkGetObjectMacro(ScalarBarCheck, vtkKWCheckButton);
   
   void SetCubeAxesVisibility(int val);
   void CubeAxesCheckCallback();
+
+  vtkGetObjectMacro(CubeAxesCheck, vtkKWCheckButton);
 
   void CenterCamera();
   

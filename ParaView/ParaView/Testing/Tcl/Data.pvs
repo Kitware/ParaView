@@ -23,6 +23,8 @@ $kw(vtkTemp137) ChangeActorColor 0.501961 1.000000 0.000000
 $kw(vtkTemp1) Open "$DataDir/Data/vox8_bin.vtk"
 set kw(vtkTemp171) [$kw(vtkTemp1) GetCurrentPVSource]
 set kw(vtkTemp172) [$kw(vtkTemp171) GetPVOutput]
+$kw(vtkTemp172) DrawPoints
+$kw(vtkTemp172) DrawSurface
 $kw(vtkTemp172) DrawWireframe
 $kw(vtkTemp172) ColorByProperty
 $kw(vtkTemp1) ResetCameraCallback
@@ -62,7 +64,10 @@ $kw(vtkTemp251) AcceptCallback
 set kw(vtkTemp287) [$kw(vtkTemp251) GetPVOutput]
 $kw(vtkTemp287) SetLineWidth 1
 $kw(vtkTemp287) SetPointSize 1
+$kw(vtkTemp287) SetInterpolationToGouraud
 $kw(vtkTemp287) SetInterpolationToFlat
+$kw(vtkTemp287) SetAmbient .2
+$kw(vtkTemp287) AmbientChanged
 
 [$kw(vtkTemp1) GetMainView] SetCameraState 4.145 5.676 5.818  0.124 -0.063 0.701  -0.232 0.733 -0.640
 

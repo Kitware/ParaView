@@ -101,6 +101,8 @@ ADD_TEST(PrintSelf-ParaView ${TCL_TCLSH}
          ${VTK_SOURCE_DIR}/Common/Testing/Tcl/PrintSelfCheck.tcl  
          ${PARAVIEW_SOURCE_DIR}/ParaView)
 
+ADD_TEST(TestWrongArgument ${PARAVIEW_EXECUTABLE} -bla)
+
 ADD_TEST(TestSetObjectMacro-ParaView ${TCL_TCLSH}
          ${KWCommon_SOURCE_DIR}/Testing/Tcl/FindString.tcl
          "${PARAVIEW_SOURCE_DIR}/ParaView/vtk\\\\*.h"

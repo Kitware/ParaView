@@ -21,7 +21,8 @@ set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 [ $pv(vtkTemp43) GetCornerAnnotation ] SetCornerText "2" 2
 [ $pv(vtkTemp43) GetCornerAnnotation ] SetCornerText "3" 3
 [ $pv(vtkTemp43) GetCornerAnnotation ] SetVisibility 1
-$pv(vtkTemp43) SetHeaderTextColor 1 1 1
+$pv(vtkTemp43) SetHeaderTextColor 1 .5 .8
+puts [ $pv(vtkTemp43) GetHeaderTextColor ]
 $pv(vtkTemp43) HeaderChanged
 $pv(vtkTemp43) OnDisplayHeader
 
@@ -42,6 +43,9 @@ $pv(vtkTemp188) SetCurrentValue $pv(vtkTemp97)
 set pv(vtkTemp200) [$pv(vtkTemp179) GetPVWidget {Scale Factor}]
 $pv(vtkTemp200) SetValue .5
 $pv(vtkTemp179) AcceptCallback
+
+$pv(vtkTemp43) SaveAsImage vtkParaViewWriteTest.tif
+file delete -force vtkParaViewWriteTest.tif
 
 # Fix the size of the image.
 RenWin1 SetSize 300 300
