@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.62");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.63");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -67,8 +67,8 @@ vtkKWRenderWidget::vtkKWRenderWidget()
   this->OverlayRenderer = vtkRenderer::New();
   this->RenderWindow = vtkRenderWindow::New();
   this->RenderWindow->SetNumberOfLayers(2);
-  this->RenderWindow->AddRenderer(this->Renderer);
   this->RenderWindow->AddRenderer(this->OverlayRenderer);
+  this->RenderWindow->AddRenderer(this->Renderer);
   
   this->Printing = 0;
   this->RenderMode = vtkKWRenderWidget::STILL_RENDER;
