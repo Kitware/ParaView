@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModule);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.3");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModule, "1.7.2.4");
 
 
 
@@ -597,9 +597,8 @@ float vtkPVCompositeRenderModule::GetZBufferValue(int x, int y)
       << this->CompositeID << "GetZBufferValue" << x << y
       << vtkClientServerStream::End;
     pm->SendStreamToClient();
-    const vtkClientServerStream* result = pm->GetLastClientResult();
     float z = 0;
-    if(result->GetArgument(0, 0, &z))
+    if(pm->GetLastClientResult().GetArgument(0, 0, &z))
       {
       return z;
       }

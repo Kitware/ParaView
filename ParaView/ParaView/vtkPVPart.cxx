@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.4");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.5");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -313,9 +313,8 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
          << this->VTKDataID << "IsA" << "vtkPolyData" 
          << vtkClientServerStream::End;
   pm->SendStreamToServer();
-  const vtkClientServerStream* amsg = pm->GetLastServerResult();
   int ispolydata = 0;
-  if(!amsg->GetArgument(0, 0, &ispolydata))
+  if(!pm->GetLastServerResult().GetArgument(0, 0, &ispolydata))
     {
     vtkErrorMacro("bad return from IsA call");
     }

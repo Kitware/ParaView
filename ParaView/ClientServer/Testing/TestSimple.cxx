@@ -51,8 +51,8 @@ Server::Server()
 
 void Server::GetResultMessageData(const unsigned char** data, size_t* len)
 {
-  const vtkClientServerStream* ames = this->ClientServerInterpreter->GetLastResult();
-  if(!(ames && ames->GetNumberOfMessages() > 0 && ames->GetData(data, len)))
+  const vtkClientServerStream& ames = this->ClientServerInterpreter->GetLastResult();
+  if(!(ames.GetNumberOfMessages() > 0 && ames.GetData(data, len)))
     {
     *data  = 0;
     *len = 0;

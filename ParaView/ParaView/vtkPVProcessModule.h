@@ -175,7 +175,7 @@ public:
   vtkClientServerID NewStreamObject(const char*);
   void DeleteStreamObject(vtkClientServerID);
   
-  // Description: 
+  // Description:
   // Return the vtk object associated with the given id.
   // If this is running in client/server mode then 0 is returned.
   // If the client and server are in the same process the object pointer
@@ -185,12 +185,12 @@ public:
   // Description:
   // Return a message containing the result of the last SendMessages call.
   // In client/server mode this causes a round trip to the server.
-  virtual const vtkClientServerStream* GetLastServerResult();
+  virtual const vtkClientServerStream& GetLastServerResult();
 
   // Description:
   // Return a message containing the result of the last call made on
   // the client.
-  virtual const vtkClientServerStream* GetLastClientResult();
+  virtual const vtkClientServerStream& GetLastClientResult();
 //ETX
   // Description:
 

@@ -174,12 +174,12 @@ public:
   // Description:
   // Return a message containing the result of the last SendMessages call.
   // In client/server mode this causes a round trip to the server.
-  virtual const vtkClientServerStream* GetLastServerResult();
+  virtual const vtkClientServerStream& GetLastServerResult();
 
   // Description:
   // Return a message containing the result of the last call made on
   // the client.
-  virtual const vtkClientServerStream* GetLastClientResult();
+  virtual const vtkClientServerStream& GetLastClientResult();
   friend void vtkPVClientServerLastResultRMI(  void *, void* , int ,int );
   //ETX
 protected:

@@ -260,7 +260,7 @@ void vtkPVSendPolyData(void* arg, void*, int, int)
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVClientServerModule);
-vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.4");
+vtkCxxRevisionMacro(vtkPVClientServerModule, "1.44.2.5");
 
 int vtkPVClientServerModuleCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -357,7 +357,7 @@ void vtkPVClientServerModule::Initialize()
   if(this->ClientMode)
     {
     this->ClientInterpreter = vtkClientServerInterpreter::New();
-    this->ClientInterpreter->SetLogFile("c:/pvClient.out");
+    this->ClientInterpreter->SetLogFile("pvClient.out");
     Vtkparaviewcswrapped_Initialize(this->ClientInterpreter);
     this->GetStream()
       << vtkClientServerStream::Assign
@@ -369,7 +369,7 @@ void vtkPVClientServerModule::Initialize()
   else
     {
     this->ServerInterpreter = vtkClientServerInterpreter::New();
-    this->ServerInterpreter->SetLogFile("c:/pvServer.out");
+    this->ServerInterpreter->SetLogFile("pvServer.out");
     Vtkparaviewcswrapped_Initialize(this->ServerInterpreter);
     this->GetStream()
       << vtkClientServerStream::Assign
@@ -1113,35 +1113,51 @@ void vtkPVClientServerModule::ProcessMessage(unsigned char* msg, size_t len)
   this->ServerInterpreter->ProcessStream(msg, len);
 }
 
-const vtkClientServerStream* vtkPVClientServerModule::GetLastClientResult()
+const vtkClientServerStream& vtkPVClientServerModule::GetLastClientResult()
 {
   return this->ClientInterpreter->GetLastResult();
 }
 
-const vtkClientServerStream* vtkPVClientServerModule::GetLastServerResult()
-{  
+const vtkClientServerStream& vtkPVClientServerModule::GetLastServerResult()
+{
   if(!this->Application)
     {
     vtkErrorMacro("Missing application object.");
-    return 0;
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule missing Application object."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
     }
-  
+
   if(!this->ClientMode)
     {
-    vtkErrorMacro("NotExpecting this call on the server.");
-    return 0;
+    vtkErrorMacro("GetLastServerResult() should not be called on the server.");
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule::GetLastServerResult() should not be called on the server."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
     }
-  int length;    
+  int length;
   this->SocketController->TriggerRMI(1, "", VTK_PV_CLIENT_SERVER_LAST_RESULT_TAG);
   this->SocketController->Receive(&length, 1, 1, VTK_PV_ROOT_RESULT_LENGTH_TAG);
   if(length <= 0)
     {
-    return 0;
+    this->LastServerResultStream->Reset();
+    *this->LastServerResultStream
+      << vtkClientServerStream::Error
+      << "vtkPVClientServerModule::GetLastServerResult() received no data from the server."
+      << vtkClientServerStream::End;
+    return *this->LastServerResultStream;
     }
   unsigned char* result = new unsigned char[length];
   this->SocketController->Receive((char*)result, length, 1, VTK_PV_ROOT_RESULT_TAG);
   this->LastServerResultStream->SetData(result, length);
-  return this->LastServerResultStream;
+  delete [] result;
+  return *this->LastServerResultStream;
 }
 
 void vtkPVClientServerModule::SendStreamToClient()
