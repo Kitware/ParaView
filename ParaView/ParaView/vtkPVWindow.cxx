@@ -2478,7 +2478,7 @@ void vtkPVWindow::SetCurrentPVSourceCallback(vtkPVSource *pvs)
   else
     {
     this->GetPVApplication()->AddTraceEntry(
-      "$kw(%s) SetCurrentPVSourceCallback NULL", this->GetTclName());
+      "$kw(%s) SetCurrentPVSourceCallback {}", this->GetTclName());
     }
 }
 
@@ -3493,7 +3493,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.339 $");
+  this->ExtractRevision(os,"$Revision: 1.340 $");
 }
 
 //----------------------------------------------------------------------------
