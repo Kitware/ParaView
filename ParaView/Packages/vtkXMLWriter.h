@@ -219,9 +219,11 @@ protected:
   int WriteWordTypeAttribute(const char* name, int dataType);
   int WriteStringAttribute(const char* name, const char* value);
   
-  unsigned long WriteDataArrayAppended(vtkDataArray* a, vtkIndent indent);
+  unsigned long WriteDataArrayAppended(vtkDataArray* a, vtkIndent indent,
+                                       const char* alternateName=0);
   void WriteDataArrayAppendedData(vtkDataArray* a, unsigned long pos);
-  void WriteDataArrayInline(vtkDataArray* a, vtkIndent indent);
+  void WriteDataArrayInline(vtkDataArray* a, vtkIndent indent,
+                            const char* alternateName=0);
   void WriteInlineData(void* data, int numWords, int wordType,
                        vtkIndent indent);
   

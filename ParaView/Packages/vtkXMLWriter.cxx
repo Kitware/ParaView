@@ -27,7 +27,7 @@
 #include "vtkPoints.h"
 #include "vtkUnsignedCharArray.h"
 
-vtkCxxRevisionMacro(vtkXMLWriter, "1.4");
+vtkCxxRevisionMacro(vtkXMLWriter, "1.5");
 vtkCxxSetObjectMacro(vtkXMLWriter, Compressor, vtkDataCompressor);
 
 //----------------------------------------------------------------------------
@@ -813,13 +813,21 @@ int vtkXMLWriter::WriteAsciiData(void* data, int numWords, int wordType,
 
 //----------------------------------------------------------------------------
 unsigned long vtkXMLWriter::WriteDataArrayAppended(vtkDataArray* a,
-                                                   vtkIndent indent)
+                                                   vtkIndent indent,
+                                                   const char* alternateName)
 {
   ostream& os = *(this->Stream);
   os << indent << "<DataArray";
   this->WriteWordTypeAttribute("type", a->GetDataType());
-  const char* arrayName = a->GetName();
-  if(arrayName) { this->WriteStringAttribute("Name", arrayName); }
+  if(alternateName)
+    {
+    this->WriteStringAttribute("Name", alternateName);
+    }
+  else
+    {
+    const char* arrayName = a->GetName();
+    if(arrayName) { this->WriteStringAttribute("Name", arrayName); }
+    }
   if(a->GetNumberOfComponents() > 1)
     {
     this->WriteScalarAttribute("NumberOfComponents",
@@ -842,13 +850,21 @@ void vtkXMLWriter::WriteDataArrayAppendedData(vtkDataArray* a,
 }
 
 //----------------------------------------------------------------------------
-void vtkXMLWriter::WriteDataArrayInline(vtkDataArray* a, vtkIndent indent)
+void vtkXMLWriter::WriteDataArrayInline(vtkDataArray* a, vtkIndent indent,
+                                        const char* alternateName)
 {
   ostream& os = *(this->Stream);
   os << indent << "<DataArray";
   this->WriteWordTypeAttribute("type", a->GetDataType());
-  const char* arrayName = a->GetName();
-  if(arrayName) { this->WriteStringAttribute("Name", arrayName); }
+  if(alternateName)
+    {
+    this->WriteStringAttribute("Name", alternateName);
+    }
+  else
+    {
+    const char* arrayName = a->GetName();
+    if(arrayName) { this->WriteStringAttribute("Name", arrayName); }
+    }
   if(a->GetNumberOfComponents() > 1)
     {
     this->WriteScalarAttribute("NumberOfComponents",

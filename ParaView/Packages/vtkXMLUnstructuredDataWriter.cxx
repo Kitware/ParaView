@@ -26,7 +26,7 @@
 #include "vtkPoints.h"
 #include "vtkDataSetAttributes.h"
 
-vtkCxxRevisionMacro(vtkXMLUnstructuredDataWriter, "1.2");
+vtkCxxRevisionMacro(vtkXMLUnstructuredDataWriter, "1.3");
 
 //----------------------------------------------------------------------------
 vtkXMLUnstructuredDataWriter::vtkXMLUnstructuredDataWriter()
@@ -317,15 +317,7 @@ void vtkXMLUnstructuredDataWriter::WriteCellsInline(const char* name,
   this->WriteDataArrayInline(this->CellOffsets, indent.GetNextIndent());
   if(types)
     {
-    // Write the array through a proxy object that shares the array's
-    // memory.  This allows us to set the name of the array to be
-    // written.
-    vtkDataArray* a = types->NewInstance();
-    a->SetNumberOfComponents(types->GetNumberOfComponents());
-    a->SetName("types");
-    a->SetVoidArray(types->GetVoidPointer(0), types->GetMaxId()+1, 1);
-    this->WriteDataArrayInline(a, indent.GetNextIndent());
-    a->Delete();
+    this->WriteDataArrayInline(types, indent.GetNextIndent(), "types");
     }
   os << indent << "</" << name << ">\n";
 }
@@ -345,14 +337,8 @@ vtkXMLUnstructuredDataWriter::WriteCellsAppended(const char* name,
                                               indent.GetNextIndent());
   if(types)
     {
-    // Write the array through a proxy object that shares the array's
-    // information.  This allows us to set the name of the array to be
-    // written.
-    vtkDataArray* a = types->NewInstance();
-    a->SetNumberOfComponents(types->GetNumberOfComponents());
-    a->SetName("types");
-    positions[2] = this->WriteDataArrayAppended(a, indent.GetNextIndent());
-    a->Delete();
+    positions[2] = this->WriteDataArrayAppended(types, indent.GetNextIndent(),
+                                                "types");
     }
   os << indent << "</" << name << ">\n";
   return positions;
