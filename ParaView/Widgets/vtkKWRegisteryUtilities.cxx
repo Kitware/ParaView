@@ -42,78 +42,227 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkKWRegisteryUtilities.h"
 
-void vtkKWRegisteryUtilities::ReadAValue(HKEY hKey,char *val,char *key, 
-					 char *adefault)
+vtkKWRegisteryUtilities::vtkKWRegisteryUtilities()
 {
-  DWORD dwType, dwSize;
-  
-  dwType = REG_SZ;
-  dwSize = 1023;
-  if(RegQueryValueEx(hKey,key, NULL, &dwType, 
-                     (BYTE *)val, &dwSize) != ERROR_SUCCESS)
+  this->TopLevel = 0;
+  this->Opened = 0;
+  this->Locked = 0;
+}
+
+vtkKWRegisteryUtilities::~vtkKWRegisteryUtilities()
+{
+  this->SetTopLevel(0);
+  if ( this->Opened )
     {
-    strcpy(val,adefault);
+    vtkErrorMacro("vtkKWRegisteryUtilities::Close should be "
+		  "called here. The registry is not closed.");
+    // this->Close();
+    int i = *(int *)0;
     }
 }
 
-unsigned long vtkKWRegisteryUtilities::DeleteKey(HKEY hKey, char *key)
+int vtkKWRegisteryUtilities::Open(const char *toplevel,
+				  const char *subkey, int readonly)
 {
-  unsigned long res = 0;
-  res =  RegDeleteKey( hKey, key );
-  cout << "Delete key: " << key << " (" << res << ")" << endl;
-  LPVOID lpMsgBuf;
-  FormatMessage( 
-    FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-    FORMAT_MESSAGE_FROM_SYSTEM | 
-    FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
-    GetLastError(),
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-    (LPTSTR) &lpMsgBuf,
-    0,
-    NULL 
-    );
-// Process any inserts in lpMsgBuf.
-// ...
-// Display the string.
-  cout << (LPCTSTR)lpMsgBuf << endl;
-// Free the buffer.
-  LocalFree( lpMsgBuf );    
- 
+  int res = 0;
+  if ( this->GetLocked() )
+    {
+    return 0;
+    }
+  if ( this->Opened )
+    {
+    if ( !this->Close() )
+      {
+      return 0;
+      }
+    }
+  if ( !toplevel )
+    {
+    cout << "vtkKWRegisteryUtilities::Opened() Toplevel not defined" << endl;
+    return 0;
+    }
+
+  if ( this->IsSpace(toplevel[0]) || this->IsSpace(toplevel[strlen(toplevel)-1]) )
+    {
+    vtkErrorMacro("Toplevel has to start with letter or number and end with one");
+    return 0;
+    }
+
+  if ( readonly == vtkKWRegisteryUtilities::READONLY )
+    {
+    res = this->OpenInternal(toplevel, subkey, readonly);
+    }
+  else
+    {
+    res = this->OpenInternal(toplevel, subkey, readonly);
+    this->SetLocked(1);
+    }
+  
+  if ( res )
+    {
+    this->Opened = 1;
+    this->SetTopLevel( toplevel );
+    cout << "Registry opened" << endl;
+    }
   return res;
 }
 
-unsigned long vtkKWRegisteryUtilities::DeleteValue(HKEY hKey, char *value)
+int vtkKWRegisteryUtilities::Close()
 {
-  unsigned long res = 0;
-  res =  RegDeleteValue( hKey, value );
-  cout << "Delete value: " << value << " (" << res << ")" << endl;
-  LPVOID lpMsgBuf;
-  FormatMessage( 
-    FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-    FORMAT_MESSAGE_FROM_SYSTEM | 
-    FORMAT_MESSAGE_IGNORE_INSERTS,
-    NULL,
-    GetLastError(),
-    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
-    (LPTSTR) &lpMsgBuf,
-    0,
-    NULL 
-    );
-// Process any inserts in lpMsgBuf.
-// ...
-// Display the string.
-  cout << (LPCTSTR)lpMsgBuf << endl;
-// Free the buffer.
-  LocalFree( lpMsgBuf );    
- 
+  int res = 0;
+  if ( this->Opened )
+    {
+    res = this->CloseInternal();
+    }
+
+  if ( res )
+    {
+    this->Opened = 0;
+    this->SetLocked(0);
+    cout << "Registry Closed" << endl;
+    }
   return res;
 }
 
-unsigned long vtkKWRegisteryUtilities::SetValue(HKEY hKey,char *key,char *value)
+int vtkKWRegisteryUtilities::ReadValue(const char *subkey, 
+				       char *value, 
+				       const char *key)
 {
-  unsigned long res = 0;
-  res = RegSetValueEx(hKey, key, 0, REG_SZ, 
-		(CONST BYTE *)(const char *)value, strlen(value)+1);
+  int res = 1;
+  int open = 0;
+  if ( !this->Opened )
+    {
+    if ( !this->Open(this->GetTopLevel(), subkey, 
+		     vtkKWRegisteryUtilities::READONLY) )
+      {
+      return 0;
+      }
+    open = 1;
+    }
+  res = this->ReadValueInternal(value, key);
+
+  if ( open )
+    {
+    if ( !this->Close() )
+      {
+      res = 0;
+      }
+    }
+
   return res;
+}
+
+int vtkKWRegisteryUtilities::DeleteKey(const char *subkey, 
+				       const char *key)
+{
+  int res = 1;
+  int open = 0;
+  if ( !this->Opened )
+    {
+    if ( !this->Open(this->GetTopLevel(), subkey, 
+		     vtkKWRegisteryUtilities::READWRITE) )
+      {
+      return 0;
+      }
+    open = 1;
+    }
+
+  res = this->DeleteKeyInternal(key);
+
+  if ( open )
+    {
+    if ( !this->Close() )
+      {
+      res = 0;
+      }
+    }
+  return res;
+}
+
+int vtkKWRegisteryUtilities::DeleteValue(const char *subkey, const char *key)
+{
+  int res = 1;
+  int open = 0;
+  if ( !this->Opened )
+    {
+    if ( !this->Open(this->GetTopLevel(), subkey, 
+		     vtkKWRegisteryUtilities::READWRITE) )
+      {
+      return 0;
+      }
+    open = 1;
+    }
+
+  res = this->DeleteValueInternal(key);
+
+  if ( open )
+    {
+    if ( !this->Close() )
+      {
+      res = 0;
+      }
+    }
+  return res;
+}
+
+int vtkKWRegisteryUtilities::SetValue(const char *subkey, const char *key, 
+				      const char *value)
+{
+  int res = 1;
+  int open = 0;
+  if ( !this->Opened )
+    {
+    if ( !this->Open(this->GetTopLevel(), subkey, 
+		     vtkKWRegisteryUtilities::READWRITE) )
+      {
+      return 0;
+      }
+    open = 1;
+    }
+
+  res = this->SetValueInternal( key, value );
+  
+  if ( open )
+    {
+    if ( !this->Close() )
+      {
+      res = 0;
+      }
+    }
+  return res;
+}
+
+int vtkKWRegisteryUtilities::IsSpace(char c)
+{
+  return isspace(c);
+}
+
+char *vtkKWRegisteryUtilities::Strip(char *str)
+{
+  int cc;
+  int len;
+  char *nstr;
+  if ( !str )
+    {
+    return NULL;
+    }  
+  len = strlen(str);
+  nstr = str;
+  for( cc=0; cc<len; cc++ )
+    {
+    if ( !this->IsSpace( *nstr ) )
+      {
+      break;
+      }
+    nstr ++;
+    }
+  for( cc=(strlen(nstr)-1); cc>=0; cc-- )
+    {
+    if ( !this->IsSpace( nstr[cc] ) )
+      {
+      nstr[cc+1] = 0;
+      break;
+      }
+    }
+  return nstr;
 }

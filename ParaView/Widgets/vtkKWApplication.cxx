@@ -43,7 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWWindowCollection.h"
 #ifdef _WIN32
 #include <htmlhelp.h>
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWWin32RegisteryUtilities.h"
 #endif
 #include "vtkKWObject.h"
 #include "vtkTclUtil.h"
@@ -406,6 +406,7 @@ void vtkKWApplication::Start(int /*argc*/, char ** /*argv*/)
 void vtkKWApplication::DisplayHelp()
 {
 #ifdef _WIN32
+  /*
   char temp[1024];
   char fkey[1024];
   char loc[1024];
@@ -414,7 +415,7 @@ void vtkKWApplication::DisplayHelp()
   if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
 		  0, KEY_READ, &hKey) == ERROR_SUCCESS)
     {
-    vtkKWRegisteryUtilities::ReadAValue(hKey, loc,"Loc","");
+    vtkKWWin32RegisteryUtilities::ReadAValue(hKey, loc,"Loc","");
     RegCloseKey(hKey);
     sprintf(temp,"%s/%s.chm::/Introduction/Introduction.htm",
             loc,this->ApplicationName);
@@ -423,6 +424,24 @@ void vtkKWApplication::DisplayHelp()
     {
     sprintf(temp,"%s.chm::/Introduction/Introduction.htm",this->ApplicationName);
     }
+  */
+  char temp[1024];
+  char loc[1024];
+  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  sprintf(temp, "%i", this->GetApplicationKey());
+  reg->SetTopLevel( temp );
+  if ( reg->ReadValue( "Inst", loc, "Loc" ) )
+    {
+    sprintf(temp,"%s/%s.chm::/Introduction/Introduction.htm",
+            loc,this->ApplicationName);
+    }
+  else
+    {
+    sprintf(temp,"%s.chm::/Introduction/Introduction.htm",
+	    this->ApplicationName);
+    }
+  reg->Delete();
+  
   HtmlHelp(NULL, temp, HH_DISPLAY_TOPIC, 0);
 #else
   vtkKWMessageDialog *dlg = vtkKWMessageDialog::New();

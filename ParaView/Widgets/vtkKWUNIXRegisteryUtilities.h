@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkKWRegisteryUtilities.h
+  Module:    vtkKWUNIXRegisteryUtilities.h
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -40,112 +40,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =========================================================================*/
 
-#ifndef __vtkKWRegisteryUtilities_h
-#define __vtkKWRegisteryUtilities_h
+#ifndef __vtkKWUNIXRegisteryUtilities_h
+#define __vtkKWUNIXRegisteryUtilities_h
 
-#include "vtkKWObject.h"
+#include "vtkKWRegisteryUtilities.h"
 
-class VTK_EXPORT vtkKWRegisteryUtilities : public vtkKWObject
+class vtkKWHashTable;
+
+class VTK_EXPORT vtkKWUNIXRegisteryUtilities : public vtkKWRegisteryUtilities
 {
-  public:
-  static vtkKWRegisteryUtilities* New();
-  vtkTypeMacro(vtkKWRegisteryUtilities, vtkKWObject);
+public:
+  static vtkKWUNIXRegisteryUtilities* New();
+  vtkTypeMacro(vtkKWUNIXRegisteryUtilities, vtkKWRegisteryUtilities);
 
   // Description:
   // Read a value from the registry.
-  int ReadValue(const char *subkey, char *value, 
-		const char *key);
+  virtual int ReadValueInternal(char *value, const char *key); 
 
   // Description:
   // Delete a key from the registry.
-  int DeleteKey(const char *subkey, const char *key);
+  virtual int DeleteKeyInternal(const char *key);
 
   // Description:
   // Delete a value from a given key.
-  int DeleteValue(const char *subkey, const char *key);
+  virtual int DeleteValueInternal(const char *key);
 
   // Description:
   // Set value in a given key.
-  int SetValue(const char *subkey, const char *key, 
-	       const char *value);
+  virtual int SetValueInternal(const char *key, const char *value);
 
   // Description:
   // Open the registry at toplevel/subkey.
-  int Open(const char *toplevel, const char *subkey, 
-	   int readonly);
+  virtual int OpenInternal(const char *toplevel, const char *subkey, int readonly);
   
   // Description:
-  // Close the registry. 
-  int Close();
-  
-  // Description:
-  // Set or get the toplevel registry key.
-  vtkSetStringMacro(TopLevel);
-  vtkGetStringMacro(TopLevel);
+  // Close the registry.
+  virtual int CloseInternal();
 
-  // Description:
-  // Return true if registry opened
-  vtkGetMacro(Opened, int);
+protected:
+  vtkKWUNIXRegisteryUtilities();
+  virtual ~vtkKWUNIXRegisteryUtilities();
 
-  // Description:
-  // Should the registry be locked?
-  vtkGetMacro(Locked, int);
-
-  enum {
-    READONLY,
-    READWRITE,
-  };
-
-  protected:
-  vtkKWRegisteryUtilities();
-  virtual ~vtkKWRegisteryUtilities();
-
-  // Description:
-  // Should the registry be locked?
-  vtkSetClampMacro(Locked, int, 0, 1);
-  vtkBooleanMacro(Locked, int);
-
-  
-  // Description:
-  // Read a value from the registry.
-  virtual int ReadValueInternal(char *value, 
-				const char *key) = 0;
-  
-  // Description:
-  // Delete a key from the registry.
-  virtual int DeleteKeyInternal(const char *key) = 0;
-
-  // Description:
-  // Delete a value from a given key.
-  virtual int DeleteValueInternal(const char *key) = 0;
-
-  // Description:
-  // Set value in a given key.
-  virtual int SetValueInternal(const char *key, 
-			       const char *value) = 0;
-
-  // Description:
-  // Open the registry at toplevel/subkey.
-  virtual int OpenInternal(const char *toplevel, const char *subkey, 
-			   int readonly) = 0;
-  
-  // Description:
-  // Close the registry. 
-  virtual int CloseInternal() = 0;
-
-  // Description:
-  // Return true if the character is space.
-  int IsSpace(char c);
-
-  // Description:
-  // Strip trailing and ending spaces.
-  char *Strip(char *str);
-
-  int Opened;
-   
-  private:
-  char *TopLevel;  
-  int Locked;
+private:
+  vtkKWHashTable *Entries;
 };
 
 #endif

@@ -55,9 +55,13 @@ vtkKWView
 
 
 IF (WIN32)
-  SOURCE_FILES( KWWidgets_SRCS vtkKWRegisteryUtilities )
+  SOURCE_FILES( KWWidgets_SRCS 
+    vtkKWRegisteryUtilities
+    vtkKWWin32RegisteryUtilities
+  )
   WRAP_EXCLUDE_FILES(
     vtkKWRegisteryUtilities
+    vtkKWWin32RegisteryUtilities
     vtkKWTclCommand
   )
 ENDIF (WIN32)

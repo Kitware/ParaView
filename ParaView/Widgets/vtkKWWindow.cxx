@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWSplitFrame.h"
 #include "vtkKWWindowCollection.h"
 #ifdef _WIN32
-#include "vtkKWRegisteryUtilities.h"
+#include "vtkKWWin32RegisteryUtilities.h"
 #endif
 #include "KitwareLogo.h"
 #include "vtkKWPointerArray.h"
@@ -180,7 +180,7 @@ int vtkKWWindowMenuEntry::InsertToMenu( int pos, vtkKWMenu *menu )
     char *file = strcpy(new char[strlen(this->File)+1], this->File);
     file[0] = pos + '0';
     ostrstream str;
-    str << this->Command << " " << this->FullFile << ends;
+    str << this->Command << " \"" << this->FullFile << "\"" << ends;
     menu->InsertCommand( menu->GetIndex("Close") - 1, 
 			 file, this->Target, str.str(), 0 );
     delete [] file;
@@ -799,83 +799,47 @@ void vtkKWWindow::CreateStatusImage()
 
 void vtkKWWindow::StoreRecentMenuToRegistry(char *key)
 {
-#ifdef _WIN32
-  char fkey[1024];
-  
-  if (!key)
-    {
-    sprintf(fkey,"Software\\Kitware\\%s\\MRU",this->GetClassName());
-    }
-  else
-    {
-    sprintf(fkey,"Software\\Kitware\\%s\\MRU",key);
-    }
-  
-  HKEY hKey;
-  DWORD dwDummy;
 
-  if(RegCreateKeyEx(HKEY_CURRENT_USER, fkey,
-		    0, "", REG_OPTION_NON_VOLATILE, KEY_READ|KEY_WRITE, 
-		    NULL, &hKey, &dwDummy) != ERROR_SUCCESS) 
-    {    
-    return;
-    }
+#ifdef _WIN32
   char KeyNameP[10];
   char CmdNameP[10];
   unsigned int i;
+  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  reg->SetTopLevel( key ? key : this->GetClassName() );
 
   for (i = 0; i < this->NumberOfRecentFiles; i++)
     {
     sprintf(KeyNameP, "File%d", i);
     sprintf(CmdNameP, "File%dCmd", i);
-    vtkKWRegisteryUtilities::DeleteValue(hKey, KeyNameP);
-    vtkKWRegisteryUtilities::DeleteValue(hKey, CmdNameP);
+    reg->DeleteValue( "MRU", KeyNameP );
+    reg->DeleteValue( "MRU", CmdNameP );    
     if ( this->RecentFiles )
       {
       vtkKWWindowMenuEntry *vp = reinterpret_cast<vtkKWWindowMenuEntry *>(
 	this->RecentFiles->Lookup(i) );
       if ( vp )
 	{
-	vtkKWRegisteryUtilities::SetValue(hKey, KeyNameP, vp->GetFullFile());
-	vtkKWRegisteryUtilities::SetValue(hKey, CmdNameP, vp->GetCommand());
+	reg->SetValue("MRU", KeyNameP, vp->GetFullFile());
+	reg->SetValue("MRU", CmdNameP, vp->GetCommand());
 	}
       }
     }
-  
-  RegCloseKey(hKey);
-    
+  reg->Delete();
 #endif
 }
 
 void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
 {
 #ifdef _WIN32
-  int i;
-  char fkey[1024];
   char KeyNameP[10];
   char CmdNameP[10];
-  char Cmd[1024];
-  
-  if (!key)
+  vtkKWWin32RegisteryUtilities *reg = vtkKWWin32RegisteryUtilities::New();
+  if ( reg->Open( key ? key : this->GetClassName(),
+		  "MRU", vtkKWWin32RegisteryUtilities::READONLY ) )
     {
-    sprintf(fkey,"Software\\Kitware\\%s\\MRU",this->GetClassName());
-    }
-  else
-    {
-    sprintf(fkey,"Software\\Kitware\\%s\\MRU",key);
-    }
-  
-  HKEY hKey;
-  this->NumberOfMRUFiles = 0;
-  if(RegOpenKeyEx(HKEY_CURRENT_USER, fkey, 
-		  0, KEY_READ, &hKey) != ERROR_SUCCESS)
-    {
-    return;
-    }
-  else
-    {
+    int i;
     char File[1024];
-    
+    char Cmd[1024];
     this->GetMenuFile()->InsertSeparator(
       this->GetMenuFile()->GetIndex("Close") - 1);
 
@@ -883,16 +847,20 @@ void vtkKWWindow::AddRecentFilesToMenu(char *key, vtkKWObject *target)
       {
       sprintf(KeyNameP, "File%d", i);
       sprintf(CmdNameP, "File%dCmd", i);
-      vtkKWRegisteryUtilities::ReadAValue(hKey, File, KeyNameP,"");
-      vtkKWRegisteryUtilities::ReadAValue(hKey, Cmd, CmdNameP,"Open");
-      if (strlen(File) > 1)
-        {
-	this->InsertRecentFileToMenu(File, target, Cmd);
-        }    
+      if ( reg->ReadValue("MRU", File, KeyNameP) )
+	{
+	if ( reg->ReadValue("MRU", Cmd, CmdNameP) )
+	  {
+	  if (strlen(File) > 1)
+	    {
+	    this->InsertRecentFileToMenu(File, target, Cmd);
+	    }
+	  }
+	}
       }
+    reg->Close();
     }
-  RegCloseKey(hKey);
-  
+  reg->Delete();
   this->UpdateRecentMenu(key);
 #endif
 }
@@ -919,7 +887,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.52 $");
+  this->ExtractRevision(os,"$Revision: 1.53 $");
 }
 
 int vtkKWWindow::ExitDialog()
