@@ -27,6 +27,7 @@ vtkInteractorStylePlaneSource \
 vtkInteractorStyleSphere \
 vtkPVActorComposite \
 vtkPVApplication \
+vtkPVArrayCalculator \
 vtkPVData \
 vtkPVDataSetReaderInterface \
 vtkPVEnSightReaderInterface \
