@@ -625,7 +625,13 @@ void vtkPVRenderView::Create(vtkKWApplication *app, const char *args)
                this->VTKWidget->GetWidgetName());
   
   // Expose.
-  this->Script("bind %s <Expose> {%s Exposed}", this->GetTclName(),
+  this->Script("bind %s <Expose> {%s Exposed}", 
+               this->GetTclName(),
+               this->GetTclName());
+
+  // Configure
+  this->Script("bind %s <Configure> {%s Configured}", 
+               this->GetTclName(),
                this->GetTclName());
 
   this->SplitFrame->SetParent(this->GetPropertiesParent());
@@ -1119,6 +1125,19 @@ void vtkPVRenderView::Exposed()
   this->Script("update");
   this->EventuallyRender();
   this->InExpose = 0;
+}
+
+//----------------------------------------------------------------------------
+// called on Configure event. Configure events might not generate an
+// expose event if the size of the view gets smaller.
+// At the moment, just call Exposed(), which does what we want to do,
+// i.e. eventually render. If an Expose event was also generated after
+// that Configure event, it will be discard because of the InExpose ivar
+// logic (see above)
+
+void vtkPVRenderView::Configured()
+{
+  this->Exposed();
 }
 
 //----------------------------------------------------------------------------
@@ -1851,7 +1870,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.178 $");
+  this->ExtractRevision(os,"$Revision: 1.179 $");
 }
 
 //------------------------------------------------------------------------------

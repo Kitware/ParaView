@@ -1276,6 +1276,7 @@ void vtkPVWindow::MouseAction(int action,int button,
 //----------------------------------------------------------------------------
 void vtkPVWindow::Configure(int width, int height)
 {
+  this->MainView->Configured();
   this->GenericInteractor->UpdateSize(width, height);
   this->GenericInteractor->ConfigureEvent();
 }
@@ -3245,7 +3246,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.335 $");
+  this->ExtractRevision(os,"$Revision: 1.336 $");
 }
 
 //----------------------------------------------------------------------------

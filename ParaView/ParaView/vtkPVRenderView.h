@@ -147,8 +147,9 @@ public:
   void Update();
 
   // Description:
-  // Callback method bound to expose events.
+  // Callback method bound to expose or configure events.
   void Exposed();
+  void Configured();
   
   // Description:
   // Are we currently in interactive mode?
