@@ -216,11 +216,11 @@ void vtkPVRenderView::ShowSelectionWindowCallback(int registery)
 //----------------------------------------------------------------------------
 vtkPVRenderView::~vtkPVRenderView()
 {
-  if ( !this->Application )
+  vtkPVApplication *pvApp = 0;
+  if ( this->Application )
     {
-    return;
+    pvApp = this->GetPVApplication();
     }
-  vtkPVApplication *pvApp = this->GetPVApplication();
 
   this->ParaViewOptionsFrame->Delete();
   this->NavigationWindowButton->Delete();
