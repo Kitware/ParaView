@@ -1,8 +1,8 @@
 PLATFORM="x86-linux"
-CC="gcc322s"
-CXX="c++322s"
+CC="gcc332s"
+CXX="c++332s"
 CFLAGS=""
 CXXFLAGS="-Wno-deprecated"
-CMAKE="/home/kitware/CMakeReleaseRoot/Install/usr/local/bin/cmake"
-MAKE="make -j 2"
+CMAKE="/home/kitware/CMake18-install/bin/cmake"
+#MAKE="make -j 2"
 DISPLAY=:0.0
