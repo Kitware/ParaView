@@ -230,6 +230,8 @@ public:
                   float scaleX, float scaleY,
                   int screenSizeX, int screenSizeY);
 #endif
+  // Description:
+  // Are we printing ?
   vtkSetMacro(Printing, int);
   vtkGetMacro(Printing, int);
   
