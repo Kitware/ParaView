@@ -101,7 +101,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.10");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.11");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2455,8 +2455,8 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
         }
       if (this->PVColorMap)
         {
-        *file << part->GetPartDisplay()->GetMapperTclName() << " SetLookupTable " 
-              << this->PVColorMap->GetLookupTableTclName() << endl;
+        *file << part->GetPartDisplay()->GetMapperTclName() << " SetLookupTable pvTemp" 
+              << this->PVColorMap->GetLookupTableID() << endl;
         }
   
       *file << "vtkActor pvTemp" << part->GetPartDisplay()->GetPropID() << "\n\t"
