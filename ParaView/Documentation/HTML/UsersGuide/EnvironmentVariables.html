@@ -22,15 +22,15 @@
 <!-- End NavBar -->
 <h1>Environment Variables</h1>
 
-ParaView looks for a few environment variables that can be used to modifiy its behavior.
+ParaView looks for a few environment variables that can be used to modify its behavior.
 Environment variables are only accessed from the first process which contains the user 
 interface.  ParaView is responsible for broadcasting the effects of the modifications
-to all of the processes.
+to all processes.
 
 <h2>PV_INTERFACE_PATH</h2>
 
 <p>
-This variable is used for adding custon VTK filters to ParaView's user interface.
+This variable is used for adding custom VTK filters to ParaView's user interface.
 It should point to the directory which contains the XML descriptions of the
 additional filters or sources.
 </p>
@@ -42,7 +42,7 @@ This environment variable is important only when running with multiple processes
 It determines whether off screen rendering will be used for the satellite processes.
 The default behavior is for each node to map a window and use hardware rendering.
 When the assigned processors do not have access to a display, this environment
-variable should be set to "True" (any value will do).  When this varible is set,
+variable should be set to "True" (any value will do).  When this variable is set,
 ParaView only maps the render window of the first process.  Software render
 will be used for the other processes.  Of course, using software rendering will 
 affect ParaView's rendering performance.
@@ -50,7 +50,7 @@ affect ParaView's rendering performance.
 
 <p>
 It is important to note that currently, you must link against Mesa's OpenGL 
-libraries to get offscreen rendering on unix systems.
+libraries to get off-screen rendering on Unix systems.
 </p>
 
 <h2>PV_SEPARATE_RENDER_WINDOW</h2>
