@@ -21,7 +21,7 @@
 #include <vtkstd/map>
 #include "vtkStdString.h"
 
-vtkCxxRevisionMacro(vtkSMDomain, "1.6");
+vtkCxxRevisionMacro(vtkSMDomain, "1.7");
 
 struct vtkSMDomainInternals
 {
@@ -126,4 +126,5 @@ int vtkSMDomain::ReadXMLAttributes(vtkSMProperty* prop, vtkPVXMLElement* element
 void vtkSMDomain::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
+  os << indent << "XMLName: " << this->XMLName << endl;
 }
