@@ -29,7 +29,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro(vtkKWSegmentedProgressGauge);
-vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.2");
+vtkCxxRevisionMacro(vtkKWSegmentedProgressGauge, "1.3");
 
 vtkKWSegmentedProgressGauge::vtkKWSegmentedProgressGauge()
 {
@@ -57,8 +57,9 @@ void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
 {
   const char *wname;
   
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Segmented progress gauge already created");
     return;
@@ -105,6 +106,10 @@ void vtkKWSegmentedProgressGauge::Create(vtkKWApplication *app,
       this->Script("set color0 red1; set color1 orange1; set color2 yellow1; set color3 green1");
       break;
     }
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 void vtkKWSegmentedProgressGauge::SetValue(int segment, int value)

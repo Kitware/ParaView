@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Resources/vtkKWArrowDown.h"
 
 vtkStandardNewMacro(vtkKWSelectionFrame);
-vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.4");
+vtkCxxRevisionMacro(vtkKWSelectionFrame, "1.5");
 
 vtkCxxSetObjectMacro(vtkKWSelectionFrame, SelectObject, vtkKWObject);
 
@@ -89,8 +89,9 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
 {
   const char *wname;
   
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Selection frame already created");
     return;
@@ -135,6 +136,10 @@ void vtkKWSelectionFrame::Create(vtkKWApplication *app, const char *args)
   
   this->SetSelectObject(NULL);
   this->SetSelectMethod(NULL);
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 void vtkKWSelectionFrame::SetTitle(const char *title)
