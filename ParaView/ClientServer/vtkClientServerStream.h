@@ -70,6 +70,7 @@ public:
     string_value,
     id_value,
     vtk_object_pointer,
+    stream_value,
     LastResult,
     End
   };
@@ -146,6 +147,7 @@ public:
 #endif
   int GetArgument(int message, int argument, const char** value) const;
   int GetArgument(int message, int argument, char** value) const;
+  int GetArgument(int message, int argument, vtkClientServerStream* value) const;
   int GetArgument(int message, int argument, vtkClientServerID* value) const;
   int GetArgument(int message, int argument, vtkObjectBase** value) const;
 
@@ -204,6 +206,7 @@ public:
   vtkClientServerStream& operator << (vtkClientServerStream::Types);
   vtkClientServerStream& operator << (vtkClientServerStream::Argument);
   vtkClientServerStream& operator << (vtkClientServerStream::Array);
+  vtkClientServerStream& operator << (const vtkClientServerStream&);
   vtkClientServerStream& operator << (vtkClientServerID);
   vtkClientServerStream& operator << (vtkObjectBase*);
 
@@ -297,6 +300,8 @@ protected:
   unsigned char* ParseArray(int order, unsigned char* data,
                             unsigned char* end, unsigned int wordSize);
   unsigned char* ParseString(int order, unsigned char* data,
+                             unsigned char* end);
+  unsigned char* ParseStream(int order, unsigned char* data,
                              unsigned char* end);
 
   // Enumeration of possible byte orderings of data in the stream.

@@ -341,6 +341,30 @@ vtkClientServerStream::operator << (vtkClientServerStream::Array a)
 
 //----------------------------------------------------------------------------
 vtkClientServerStream&
+vtkClientServerStream::operator << (const vtkClientServerStream& css)
+{
+  const unsigned char* data;
+  size_t length;
+  // Do not allow object pointers to be passed in binary form.
+  if(this != &css && css.Internal->Objects.empty() &&
+     css.GetData(&data, &length))
+    {
+    // Store the stream_value type, then length, then data.
+    *this << vtkClientServerStream::stream_value;
+    vtkTypeUInt32 size = static_cast<vtkTypeUInt32>(length);
+    this->Write(&size, sizeof(size));
+    return this->Write(data, size);
+    }
+  else
+    {
+    // This is an invalid stream.
+    this->Internal->Invalid = 1;
+    return *this;
+    }
+}
+
+//----------------------------------------------------------------------------
+vtkClientServerStream&
 vtkClientServerStream::operator << (vtkClientServerID id)
 {
   // Store the id_value type and then the id value itself.
@@ -839,6 +863,35 @@ int vtkClientServerStream::GetArgument(int message, int argument,
 
 //----------------------------------------------------------------------------
 int vtkClientServerStream::GetArgument(int message, int argument,
+                                       vtkClientServerStream* value) const
+{
+  // Get a pointer to the type/value pair in the stream.
+  if(const unsigned char* data = this->GetValue(message, 1+argument))
+    {
+    // Get the type of the value in the stream.
+    vtkTypeUInt32 tp;
+    memcpy(&tp, data, sizeof(tp));
+    data += sizeof(tp);
+
+    // Make sure the type is a stream_value.
+    if(static_cast<vtkClientServerStream::Types>(tp) ==
+       vtkClientServerStream::stream_value)
+      {
+      // Get the length of the stream data.
+      vtkTypeUInt32 len;
+      memcpy(&len, data, sizeof(len));
+      data += sizeof(len);
+
+      // Set the data in the given stream.
+      size_t length = static_cast<size_t>(len);
+      return value->SetData(data, length);
+      }
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkClientServerStream::GetArgument(int message, int argument,
                                        vtkClientServerID* value) const
 {
   // Get a pointer to the type/value pair in the stream.
@@ -1117,6 +1170,8 @@ int vtkClientServerStream::ParseData()
           data = this->ParseArray(order, data, end, 8); break;
         case vtkClientServerStream::string_value:
           data = this->ParseString(order, data, end); break;
+        case vtkClientServerStream::stream_value:
+          data = this->ParseStream(order, data, end); break;
         case vtkClientServerStream::LastResult:
           // There are no data for this type.  Do nothing.
           break;
@@ -1269,6 +1324,15 @@ unsigned char* vtkClientServerStream::ParseString(int order,
 }
 
 //----------------------------------------------------------------------------
+unsigned char* vtkClientServerStream::ParseStream(int order,
+                                                  unsigned char* data,
+                                                  unsigned char* end)
+{
+  // Stream data are represented as an array of bytes.
+  return this->ParseArray(order, data, end, 1);
+}
+
+//----------------------------------------------------------------------------
 void vtkClientServerStream::PerformByteSwap(int dataByteOrder,
                                             unsigned char* data,
                                             unsigned int numWords,
@@ -1410,6 +1474,12 @@ vtkClientServerStream::GetArgument(int message, int argument) const
       case vtkClientServerStream::vtk_object_pointer:
         {
         result.Size = sizeof(tp) + sizeof(vtkObjectBase*);
+        } break;
+      case vtkClientServerStream::stream_value:
+        {
+        // A stream is represented as an array of 1 byte values.
+        vtkTypeUInt8* T = 0;
+        result.Size = sizeof(tp) + vtkClientServerStreamArraySize(data, T);
         } break;
       case vtkClientServerStream::LastResult:
         {
@@ -1641,7 +1711,8 @@ void vtkClientServerStream::PrintMessage(ostream& os, int message,
   os << this->GetStringFromCommand(this->GetCommand(message)) << "\n";
   for(int a=0; a < this->GetNumberOfArguments(message); ++a)
     {
-    os << indent.GetNextIndent();
+    vtkIndent indent2 = indent.GetNextIndent();
+    os << indent2;
     switch(this->GetArgumentType(message, a))
       {
       VTK_CSS_TEMPLATE_MACRO(value, vtkClientServerStreamPrintValue
@@ -1660,6 +1731,23 @@ void vtkClientServerStream::PrintMessage(ostream& os, int message,
         else
           {
           os << "(null)\n";
+          }
+        } break;
+      case vtkClientServerStream::stream_value:
+        {
+        vtkClientServerStream arg;
+        int result = this->GetArgument(message, a, &arg);
+        os << "Argument " << a << " = stream_value ";
+        if(result)
+          {
+          vtkIndent indent3 = indent2.GetNextIndent();
+          os << "{\n";
+          arg.Print(os, indent3);
+          os << indent3 << "}\n";
+          }
+        else
+          {
+          os << "invalid\n";
           }
         } break;
       case vtkClientServerStream::id_value:
