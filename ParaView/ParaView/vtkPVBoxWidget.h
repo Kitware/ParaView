@@ -74,6 +74,10 @@ public:
   vtkGetStringMacro(BoxTclName);
 
   // Description:
+  // The Tcl name of the VTK transform.
+  vtkGetStringMacro(BoxTransformTclName);
+
+  // Description:
   // This method sets the input to the 3D widget and places the widget.
   virtual void ActualPlaceWidget();
 

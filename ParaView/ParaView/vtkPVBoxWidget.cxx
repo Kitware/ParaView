@@ -68,7 +68,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCommand.h"
 
 vtkStandardNewMacro(vtkPVBoxWidget);
-vtkCxxRevisionMacro(vtkPVBoxWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVBoxWidget, "1.10");
 
 int vtkPVBoxWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -94,6 +94,13 @@ vtkPVBoxWidget::vtkPVBoxWidget()
     this->TranslateThumbWheel[cc] = vtkKWThumbWheel::New();
     this->ScaleThumbWheel[cc] = vtkKWThumbWheel::New();
     this->OrientationScale[cc] = vtkKWScale::New();
+
+    this->PositionGUI[cc] = 0.0;
+    this->ScaleGUI[cc]    = 1.0;
+    this->RotationGUI[cc] = 0.0;
+    this->StoredPosition[cc] = 0.0;
+    this->StoredScale[cc]    = 1.0;
+    this->StoredRotation[cc] = 0.0;
     }
 
   this->Initialized = 0;
@@ -145,10 +152,19 @@ void vtkPVBoxWidget::ResetInternal(const char* sourceTclName)
     {
     //this->Script("eval %s SetState [ %s GetState ]", 
     //this->GetTclName(), this->BoxTclName);
-    this->SetPositionGUI(this->StoredPosition);
-    this->SetRotationGUI(this->StoredRotation);
-    this->SetScaleGUI(this->StoredScale);
-    this->UpdateBox(0);
+    //this->SetPositionGUI(this->StoredPosition);
+    //this->SetRotationGUI(this->StoredRotation);
+    //this->SetScaleGUI(this->StoredScale);
+    this->OrientationScale[0]->SetValue(this->StoredRotation[0]);
+    this->OrientationScale[1]->SetValue(this->StoredRotation[1]);
+    this->OrientationScale[2]->SetValue(this->StoredRotation[2]);
+    this->ScaleThumbWheel[0]->SetValue(this->StoredScale[0]);
+    this->ScaleThumbWheel[1]->SetValue(this->StoredScale[1]);
+    this->ScaleThumbWheel[2]->SetValue(this->StoredScale[2]);
+    this->TranslateThumbWheel[0]->SetValue(this->StoredPosition[0]);
+    this->TranslateThumbWheel[1]->SetValue(this->StoredPosition[1]);
+    this->TranslateThumbWheel[2]->SetValue(this->StoredPosition[2]);
+    this->UpdateBox(1);
     }
   this->Superclass::ResetInternal(sourceTclName);
 }
@@ -647,6 +663,7 @@ void vtkPVBoxWidget::UpdateBox(int update)
     this->GetPositionFromGUI();
     this->GetRotationFromGUI();
     this->GetScaleFromGUI();
+    this->Initialized = 1;
     }
   trans->Translate(this->PositionGUI);
   trans->RotateZ(this->RotationGUI[2]);
