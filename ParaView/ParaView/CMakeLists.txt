@@ -1,6 +1,5 @@
 SOURCE_FILES( ParaView_SRCS
 vtkCameraInteractor 
-vtkCutMaterial 
 vtkImageOutlineFilter 
 vtkInteractor 
 vtkKWBoundsDisplay

@@ -178,7 +178,11 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s SetRenderWindow %s", this->CompositeTclName,
 			 this->RenderWindowTclName);
   pvApp->BroadcastScript("%s InitializeRMIs", this->CompositeTclName);
-  pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
+  str = getenv("PV_OFFSCREEN");
+  if ( str != NULL)
+    {
+    pvApp->BroadcastScript("%s InitializeOffScreen", this->CompositeTclName);
+    }
 
   // Tree compositer handles aborts now.
 #ifndef VTK_USE_MPI
@@ -276,40 +280,7 @@ void vtkPVRenderView::Close()
 {
   this->PrepareForDelete();
   vtkKWView::Close();
-}
-
-
-//----------------------------------------------------------------------------
-// Here we are going to change only the satellite procs.
-void vtkPVRenderView::OffScreenRenderingOn()
-{
-#ifdef VTK_USE_MESA  
-  int i, num;
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkMultiProcessController *controller;
-  
-  controller = pvApp->GetController();
-  num = 1;
-  if (controller)
-    {  
-    num = controller->GetNumberOfProcesses();
-    }
-  
-  for (i = 1; i < num; ++i)
-    {
-    pvApp->RemoteScript(i, "%s Delete", this->RendererTclName);
-    pvApp->RemoteScript(i, "%s Delete", this->RenderWindowTclName);
-    pvApp->RemoteScript(i, "vtkMesaRenderer %s", this->RendererTclName);
-    pvApp->RemoteScript(i, "vtkMesaRenderWindow %s", this->RenderWindowTclName);
-    pvApp->RemoteScript(i, "%s AddRenderer %s", 
-			this->RenderWindowTclName, this->RendererTclName);
-    pvApp->RemoteScript(i, "%s SetRenderWindow %s", 
-			this->CompositeTclName, this->RendererTclName);
-    }
-  
-#endif
-}
-  
+}  
 
 
 //----------------------------------------------------------------------------
