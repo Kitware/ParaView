@@ -52,7 +52,7 @@ public:
 
   void CheckSplit(const char* title, const char* file, int force=0)
     {
-    if ( (this->Stream.tellp() - this->CurrentPosition) > this->MaxLen ||
+    if ( (static_cast<long>(this->Stream.tellp()) - this->CurrentPosition) > this->MaxLen ||
       force )
       {
       this->Count ++;
