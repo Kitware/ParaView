@@ -176,8 +176,15 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     {
     pvs->PackVectorsMenu();
     }
-  
-  pvs->CreateInputList(this->InputClassName);
+
+  if (! this->InputClassName)
+    {
+    pvs->CreateInputList(NULL);
+    }
+  else
+    {
+    pvs->CreateInputList(pvs->GetNthPVInput(0)->GetVTKData()->GetClassName());
+    }
   this->PVWindow->SetCurrentPVSource(pvs);
 
   // Create the output.
