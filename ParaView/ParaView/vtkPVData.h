@@ -249,6 +249,7 @@ public:
   // Description:
   // Callback for the change color button.
   void ChangeActorColor(float r, float g, float b);
+  float* GetActorColor();
     
   // Description:
   // Get the name of the cube axes actor.
@@ -309,6 +310,9 @@ public:
   void SetMapScalarsFlag(int val);
   void MapScalarsCheckCallback();
 
+  vtkGetMacro(ColorSetByUser, int);
+  vtkGetMacro(ArraySetByUser, int);
+  
 protected:
   vtkPVData();
   ~vtkPVData();
@@ -331,10 +335,11 @@ protected:
   void SetActorColor(float r, float g, float b);
 
   // A flag that helps UpdateProperties determine 
-  // whether tho set the default color.
+  // whether to set the default color.
   int ColorSetByUser;
+  int ArraySetByUser;
   
-  // Not properties does not mean the same thing as vtk.
+  // Note properties does not mean the same thing as vtk.
   vtkKWFrame *Properties;
   vtkKWFrame *InformationFrame;
   vtkKWLabel *TypeLabel;

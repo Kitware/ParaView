@@ -103,7 +103,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.233");
+vtkCxxRevisionMacro(vtkPVData, "1.234");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -200,6 +200,7 @@ vtkPVData::vtkPVData()
   this->PVColorMap = NULL;
 
   this->ColorSetByUser = 0;
+  this->ArraySetByUser = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1058,16 +1059,18 @@ void vtkPVData::UpdatePropertiesInternal()
   int i, numArrays, numComps;
   vtkPVDataSetAttributesInformation *attrInfo;
   vtkPVArrayInformation *arrayInfo;
-  const char *currentColorBy;
-  int currentColorByFound = 0;
+  const char *currentColorBy, *inputColorBy = 0;
+  int currentColorByFound = 0, inputColorByFound = 0;
   vtkPVWindow *window;
-  int defPoint = 0;
-  vtkPVArrayInformation *defArray;
-
+  int defPoint = 0, inputPoint = 0;
+  vtkPVArrayInformation *defArray, *inputArray;
+  int inputColorSetByUser = 0, inputArraySetByUser = 0;
+  
   // Default is the scalars to use when current color is not found.
   // This is sort of a mess, and should be handled by a color selection widget.
   defCmd[0] = '\0'; 
   defArray = NULL;
+  inputArray = NULL;
 
   if (this->PVColorMap)
     {
@@ -1182,6 +1185,19 @@ void vtkPVData::UpdatePropertiesInternal()
     }
 
   currentColorBy = this->ColorMenu->GetValue();
+  // Initially, get the "color by" value from input (if it exists)
+  vtkPVSource *input = this->GetPVSource()->GetPVInput(0);
+  if (strlen(currentColorBy) == 0 && input)
+    {
+    inputColorBy = input->GetPVOutput()->GetColorMenu()->GetValue();
+    inputColorSetByUser = input->GetPVOutput()->GetColorSetByUser();
+    inputArraySetByUser = input->GetPVOutput()->GetArraySetByUser();
+    }
+  else
+    {
+    inputColorBy = "\0";
+    }
+  
   this->ColorMenu->ClearEntries();
   this->ColorMenu->AddEntryWithCommand("Property",
                                        this, "ColorByProperty");
@@ -1207,6 +1223,12 @@ void vtkPVData::UpdatePropertiesInternal()
     if (strcmp(tmp, currentColorBy) == 0)
       {
       currentColorByFound = 1;
+      }
+    if (strcmp(tmp, inputColorBy) == 0)
+      {
+      inputColorByFound = 1;
+      inputPoint = 1;
+      inputArray = arrayInfo;
       }
     if (attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
       {
@@ -1237,6 +1259,12 @@ void vtkPVData::UpdatePropertiesInternal()
       {
       currentColorByFound = 1;
       }
+    if (strcmp(tmp, inputColorBy) == 0 && !inputArray)
+      {
+      inputColorByFound = 1;
+      inputPoint = 0;
+      inputArray = arrayInfo;
+      }
     if (defArray == NULL && attrInfo->IsArrayAnAttribute(i) == vtkDataSetAttributes::SCALARS)
       {
       strcpy(defCmd, tmp);
@@ -1256,7 +1284,8 @@ void vtkPVData::UpdatePropertiesInternal()
   if ( ! currentColorByFound)
     {
     this->ColorSetByUser = 0;
-    if (defArray != NULL)
+    this->ArraySetByUser = 0;
+    if (defArray != NULL && !inputArraySetByUser && !inputColorSetByUser)
       {
       this->ColorMenu->SetValue(defCmd);
       if (defPoint)
@@ -1269,6 +1298,27 @@ void vtkPVData::UpdatePropertiesInternal()
         this->ColorByCellFieldInternal(defArray->GetName(), 
                                        defArray->GetNumberOfComponents());
         }
+      }
+    else if (inputColorByFound && inputArraySetByUser)
+      {
+      this->ColorMenu->SetValue(inputColorBy);
+      if (inputPoint)
+        {
+        this->ColorByPointFieldInternal(inputArray->GetName(),
+                                        inputArray->GetNumberOfComponents());
+        }
+      else
+        {
+        this->ColorByCellFieldInternal(inputArray->GetName(),
+                                       inputArray->GetNumberOfComponents());
+        }
+      }
+    else if (inputColorSetByUser)
+      {
+      this->ColorButton->SetColor(input->GetPVOutput()->GetActorColor());
+      this->ColorMenu->SetValue("Property");
+      this->ColorByPropertyInternal();
+      this->ColorSetByUser = 1;
       }
     else
       {
@@ -1308,9 +1358,18 @@ void vtkPVData::ChangeActorColor(float r, float g, float b)
     {
     this->GetPVRenderView()->EventuallyRender();
     }
+  
+  if (strcmp(this->ColorMenu->GetValue(), "Property") == 0)
+    {
+    this->ColorSetByUser = 1;
+    }
 }
 
-
+//----------------------------------------------------------------------------
+float* vtkPVData::GetActorColor()
+{
+  return this->GetPVSource()->GetPart(0)->GetPartDisplay()->GetProperty()->GetColor();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVData::SetColorRange(float min, float max)
@@ -1403,6 +1462,8 @@ void vtkPVData::ColorByPointField(const char *name, int numComps)
   this->AddTraceEntry("$kw(%s) ColorByPointField {%s} %d", 
                       this->GetTclName(), name, numComps);
 
+  this->ArraySetByUser = 1;
+  
   char *str;
   str = new char [strlen(name) + 16];
   if (numComps == 1)
@@ -1462,6 +1523,9 @@ void vtkPVData::ColorByCellField(const char *name, int numComps)
 
   this->AddTraceEntry("$kw(%s) ColorByCellField {%s} %d", 
                       this->GetTclName(), name, numComps);
+  
+  this->ArraySetByUser = 1;
+  
   // Set the menu value.
   char *str;
   str = new char [strlen(name) + 16];
@@ -2658,6 +2722,8 @@ void vtkPVData::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RepresentationMenu: " << this->RepresentationMenu << endl;
   os << indent << "InterpolationMenu: " << this->InterpolationMenu << endl;
   os << indent << "Visibility: " << this->Visibility << endl;
+  os << indent << "ArraySetByUser: " << this->ArraySetByUser << endl;
+  os << indent << "ColorSetByUser: " << this->ColorSetByUser << endl;
 }
 
 //----------------------------------------------------------------------------
