@@ -253,11 +253,14 @@ ADD_CUSTOM_COMMAND(
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Manipulators.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Sources.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Writers.xml
+  ${CMD}
   OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
   COMMAND ${CMD}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources
   Filters Manipulators Readers Sources Writers)
+
+ADD_DEPENDENCIES(vtkKWParaViewTCL ProcessXML)
 
 SET_SOURCE_FILES_PROPERTIES(vtkPVInitialize.cxx PROPERTIES OBJECT_DEPENDS 
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h)
