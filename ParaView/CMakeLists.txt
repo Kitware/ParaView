@@ -13,6 +13,7 @@ vtkKWSelectPointInteractor
 vtkKWTranslateCameraInteractor 
 vtkPOPReader 
 vtkPVActorComposite 
+vtkPVAnimationInterface
 vtkPVApplication 
 vtkPVArrayCalculator 
 vtkPVContour 

@@ -47,6 +47,7 @@ vtkKWEntry* vtkKWEntry::New()
 vtkKWEntry::vtkKWEntry()
 {
   this->ValueString = NULL;
+  this->Width = -1;
 }
 
 vtkKWEntry::~vtkKWEntry()
@@ -112,6 +113,29 @@ void vtkKWEntry::Create(vtkKWApplication *app, const char *args)
 
   // create the top level
   wname = this->GetWidgetName();
-  this->Script("entry %s -textvariable %sValue %s",wname,wname,args);
+  if (this->Width > 0)
+    {
+    this->Script("entry %s -width %d -textvariable %sValue %s",
+                 wname, this->Width, wname,args);
+    }
+  else
+    {
+    this->Script("entry %s -textvariable %sValue %s",wname,wname,args);
+    }
 }
 
+void vtkKWEntry::SetWidth(int width)
+{
+  if (this->Width == width)
+    {
+    return;
+    }
+
+  this->Modified();
+  this->Width = width;
+
+  if (this->Application != NULL)
+    {
+    this->Script("%s configure -width %d", this->GetWidgetName(), width);
+    }
+}

@@ -57,6 +57,7 @@ class vtkKWToolbar;
 class vtkKWScale;
 class vtkKWPushButton;
 class vtkKWInteractor;
+class vtkPVAnimationInterface;
 class vtkKWRotateCameraInteractor;
 
 
@@ -117,6 +118,10 @@ public:
   // Description:
   // Callback to show the page for the current source
   void ShowCurrentSourceProperties();
+
+  // Description:
+  // Callback to show the animation page.
+  void ShowAnimationProperties();
   
   // Description:
   // Need to be able to get the toolbar so I can add buttons from outside
@@ -239,6 +244,14 @@ protected:
   vtkCollection *SourceInterfaces;
   
   vtkPVData *CurrentPVData;
+
+  // The animation interface. I put it in window because
+  // if we ever get more that one renderer, the animation
+  // will save out the window with all renderers.
+  vtkPVAnimationInterface *AnimationInterface;
+
+  // Interfaces for "special" filters.
+  vtkPVSourceInterface *ThresholdInterface;
   
 private:
   static const char* StandardSourceInterfaces;

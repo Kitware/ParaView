@@ -57,6 +57,12 @@ public:
   int GetValueAsInt();
   float GetValueAsFloat();
   
+  // Description:
+  // The width is the number of charaters wide the entry box can fit.
+  // To keep from changing behavior of the entry,  the default
+  // value is -1 wich means the width is not explicitely set.
+  void SetWidth(int width);
+  vtkGetMacro(Width, int);
 
 protected:
   vtkKWEntry();
@@ -68,6 +74,7 @@ protected:
   vtkGetStringMacro(ValueString);
   
   char *ValueString;
+  int Width;
   
 };
 

@@ -73,6 +73,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkKWInteractor.h"
 
 #include "vtkPVSourceInterfaceDirectories.h"
+#include "vtkPVAnimationInterface.h"
 
 #include <ctype.h>
 
@@ -95,6 +96,8 @@ int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
 //----------------------------------------------------------------------------
 vtkPVWindow::vtkPVWindow()
 {  
+  vtkPVMethodInterface *mInt;
+
   this->CommandFunction = vtkPVWindowCommand;
   this->SourceMenu = vtkKWMenu::New();
   this->FilterMenu = vtkKWMenu::New();
@@ -134,6 +137,34 @@ vtkPVWindow::vtkPVWindow()
   this->MiddleFrame->SetFrame1MinimumWidth(5);
   this->MiddleFrame->SetFrame1Width(360);
   this->MiddleFrame->SetFrame2MinimumWidth(200);
+
+  // Frame used for animations.
+  this->AnimationInterface = vtkPVAnimationInterface::New();
+
+  // Special filters need interfaces also.
+  // For now this is just for animations,
+  // but should also be for serializing the filters.
+  this->ThresholdInterface = vtkPVSourceInterface::New();
+  //this->ThresholdInterface->SetApplication(???):
+  this->ThresholdInterface->SetPVWindow(this);
+  this->ThresholdInterface->SetSourceClassName("vtkThreshold");
+  this->ThresholdInterface->SetRootName("Threshold");
+  this->ThresholdInterface->SetInputClassName("vtkDataSet");
+  this->ThresholdInterface->SetOutputClassName("vtkUnstructuredGrid");
+  // Method
+  mInt = vtkPVMethodInterface::New();
+  mInt->SetVariableName("ThresholdRange");
+  mInt->SetSetCommand("ThresholdBetween");
+  // There is no simple get string.
+  //mInt->SetGetCommand("");
+  mInt->AddFloatArgument();
+  mInt->AddFloatArgument();
+  mInt->SetBalloonHelp("The range of the scalars to keep.");
+  this->ThresholdInterface->AddMethodInterface(mInt);
+  mInt->Delete();
+  mInt = NULL;
+
+
 }
 
 //----------------------------------------------------------------------------
@@ -279,6 +310,18 @@ void vtkPVWindow::PrepareForDelete()
     this->VTKMenu->Delete();
     this->VTKMenu = NULL;
     }
+
+  if (this->AnimationInterface)
+    {
+    this->AnimationInterface->Delete();
+    this->AnimationInterface = NULL;
+    }
+  
+  if (this->ThresholdInterface)
+    {
+    this->ThresholdInterface->Delete();
+    this->ThresholdInterface = NULL;
+    }
   
   this->SetCurrentPVData(NULL);
   //if (this->CurrentInteractor != NULL)
@@ -321,6 +364,14 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
                                             rbv, this,
                                             "ShowCurrentSourceProperties");
   delete [] rbv;
+
+  rbv = this->GetMenuProperties()->CreateRadioButtonVariable(
+           this->GetMenuProperties(),"Radio");
+  this->GetMenuProperties()->AddRadioButton(3, "Animation",
+                                            rbv, this,
+                                            "ShowAnimationProperties");
+  delete [] rbv;
+
 
   // create the top level
   this->MenuFile->InsertCommand(0, "Open Data File", this, "Open");
@@ -532,6 +583,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->RotateCameraInteractor->SetCenter(0.0, 0.0, 0.0);
   this->MainView->ResetCamera();
 
+  this->AnimationInterface->SetWindow(this);
+  this->AnimationInterface->SetView(this->GetMainView());
+  this->AnimationInterface->SetParent(this->MainView->GetPropertiesParent());
+  this->AnimationInterface->Create(app, "-bd 2 -relief raised");
+
   this->Script( "wm deiconify %s", this->GetWidgetName());  
 }
 
@@ -554,6 +610,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 }
+
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::NewWindow()
@@ -1120,6 +1177,7 @@ void vtkPVWindow::ThresholdCallback()
   threshold->SetVTKSource(s, tclName);
   threshold->SetNthPVInput(0, this->GetCurrentPVData());
   threshold->SetName(tclName);
+  threshold->SetInterface(this->ThresholdInterface);
 
   this->GetMainView()->AddComposite(threshold);
   threshold->CreateProperties();
@@ -1477,6 +1535,37 @@ void vtkPVWindow::ShowCurrentSourceProperties()
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWindow::ShowAnimationProperties()
+{
+  this->AnimationInterface->UpdateSourceMenu();
+
+  // Try to find a good default value for the source.
+  if (this->AnimationInterface->GetPVSource() == NULL)
+    {
+    vtkPVSource *pvs = this->GetCurrentPVSource();
+    if (pvs == NULL && this->GetSources()->GetNumberOfItems() > 0)
+      {
+      pvs = (vtkPVSource*)this->GetSources()->GetItemAsObject(0);
+      }
+    this->AnimationInterface->SetPVSource(pvs);
+    }
+
+  // What does this do?
+  this->ShowProperties();
+  
+  // We need to update the properties-menu radio button too!
+  this->GetMenuProperties()->CheckRadioButton(
+    this->GetMenuProperties(), "Radio", 3);
+
+  // Get rid of the page already packed.
+  this->Script("catch {eval pack forget [pack slaves %s]}",
+               this->MainView->GetPropertiesParent()->GetWidgetName());
+  // Put our page in.
+  this->Script("pack %s -side top -expand t -fill x -ipadx 3 -ipady 3",
+               this->AnimationInterface->GetWidgetName());
+}
+
+//----------------------------------------------------------------------------
 vtkPVApplication *vtkPVWindow::GetPVApplication()
 {
   return vtkPVApplication::SafeDownCast(this->Application);
@@ -1685,6 +1774,7 @@ const char* vtkPVWindow::StandardSourceInterfaces =
 "\n"
 "<Source class=\"vtkImageReader\" root=\"ImageRead\" output=\"vtkImageData\">\n"
 "  <String name=\"FilePrefix\" help=\"Set the prefix for the files for this image data.\"/>\n"
+"  <String name=\"FilePattern\" help=\"Set the format string.\"/>\n"
 "  <Scalar name=\"ScalarType\" set=\"SetDataScalarType\" get=\"GetDataScalarType\" type=\"int\" help=\"Set the scalar type for the data: unsigned char (3), short (4), unsigned short (5), int (6), float (10), double(11)\"/>\n"
 "  <Vector name=\"Extent\" set=\"SetDataExtent\" get=\"GetDataExtent\" type=\"int\" length=\"6\" help=\"Set the min and max values of the data in each dimension\"/>\n"
 "</Source>  \n"
