@@ -134,6 +134,12 @@ public:
   vtkGetStringMacro(OnChangeCommand);
 
   // Description:
+  // Set/Get the command executed each time a change is made to the
+  // color of the text property (the OnChangeCommand is run too).
+  vtkSetStringMacro(OnColorChangeCommand);
+  vtkGetStringMacro(OnColorChangeCommand);
+
+  // Description:
   // Show copy button. This button can be used to synchronize different
   // text property widgets.
   void SetShowCopy(int);
@@ -211,6 +217,7 @@ protected:
   vtkKWOptionMenu *VerticalJustificationOptionMenu;
 
   char *OnChangeCommand;
+  char *OnColorChangeCommand;
 
   int ShowCopy;
   vtkKWPushButton *CopyButton;

@@ -118,7 +118,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.6");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.1.2.7");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -156,6 +156,7 @@ vtkKWTextProperty::vtkKWTextProperty()
   this->VerticalJustificationOptionMenu = vtkKWOptionMenu::New();
 
   this->OnChangeCommand = NULL;
+  this->OnColorChangeCommand = NULL;
 
   this->ShowCopy = 0;
   this->CopyButton = vtkKWPushButton::New();
@@ -195,6 +196,7 @@ vtkKWTextProperty::~vtkKWTextProperty()
   this->VerticalJustificationOptionMenu = NULL;
 
   this->SetOnChangeCommand(NULL);
+  this->SetOnColorChangeCommand(NULL);
 
   this->CopyButton->Delete();
   this->CopyButton = NULL;
@@ -530,6 +532,11 @@ void vtkKWTextProperty::SetColor(float r, float g, float b)
   this->UpdateColorButton();
 
   this->AddTraceEntry("$kw(%s) SetColor %f %f %f", this->GetTclName(), r,g,b);
+
+  if (this->OnColorChangeCommand)
+    {
+    this->Script("eval %s", this->OnColorChangeCommand);
+    }
 
   if (this->OnChangeCommand)
     {
@@ -1030,6 +1037,8 @@ void vtkKWTextProperty::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ShowCopy: " << (this->ShowCopy ? "On" : "Off") << endl;
   os << indent << "OnChangeCommand: " 
      << (this->OnChangeCommand ? this->OnChangeCommand : "None") << endl;
+  os << indent << "OnColorChangeCommand: " 
+     << (this->OnColorChangeCommand ? this->OnColorChangeCommand : "None") << endl;
   os << indent << "CopyButton: " << this->CopyButton << endl;
   os << indent << "Label: " << this->Label << endl;
 }
