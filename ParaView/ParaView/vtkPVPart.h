@@ -88,20 +88,18 @@ public:
     {
     vtkErrorMacro("vtkPVPart::SetApplication should not be used. Use SetPVApplcation instead.");
     }
-      
-  // Description:
-  // This is for setting up the links between VTK objects and PV object.
-  // This call also sets the input to the mapper.
-  // SetVTKData should be called after the application has been set, but before
-  // PVData is used as input a filter or output of a source.
-  // We could change the object so that it creates its own data (during initialization), 
-  // but then we would have to tell it what type of data to create.
-  void SetVTKData(vtkDataSet *data, const char *name);
-  vtkGetObjectMacro(VTKData,vtkDataSet);  
 
   // Description:
-  // The tcl name of the vtk data object.  This should be the primary method of 
-  // manipulating the data since it exists on all processes.
+  // The tcl name of the vtk data object.  This should be the primary
+  // method of manipulating the data since it exists on all processes.
+  // This is for setting up the links between VTK objects and PV
+  // object.  This call also sets the input to the mapper.
+  // SetVTKDataTclName should be called after the application has been
+  // set, but befor PVData is used as input a filter or output of a
+  // source.  We could change the object so that it creates its own
+  // data (during initia but then we would have to tell it what type
+  // of data to create.
+  virtual void SetVTKDataTclName(const char* tclName);
   vtkGetStringMacro(VTKDataTclName);  
 
   // Description:
@@ -188,7 +186,6 @@ protected:
 
   vtkPVDataInformation *DataInformation;
   
-  vtkDataSet *VTKData;
   char *VTKDataTclName;
 
   // Problems with vtkLODActor led me to use these.

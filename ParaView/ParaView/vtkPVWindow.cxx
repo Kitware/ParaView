@@ -50,6 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkCollectionIterator.h"
 #include "vtkDataSet.h"
 #include "vtkDirectory.h"
+#include "vtkInstantiator.h"
 #include "vtkKWDirectoryUtilities.h"
 #include "vtkKWEntry.h"
 #include "vtkKWEvent.h"
@@ -128,7 +129,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.430");
+vtkCxxRevisionMacro(vtkPVWindow, "1.431");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -2296,7 +2297,24 @@ void vtkPVWindow::WriteData()
       vtkKWMessageDialog::ErrorIcon);
     return;
     }
-  vtkDataSet* data = this->GetCurrentPVSource()->GetPVPart()->GetVTKData();  
+  
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->RootScript("%s GetClassName",
+                 this->GetCurrentPVSource()->GetPVPart()->GetVTKDataTclName());
+  vtkObject* obj = vtkInstantiator::CreateInstance(pm->GetRootResult());
+  vtkDataSet* data = vtkDataSet::SafeDownCast(obj);
+  if(!data)
+    {
+    if(obj)
+      {
+      obj->Delete();
+      }
+    vtkKWMessageDialog::PopupMessage(
+      this->Application, this, "Error Saving File", 
+      "Error getting data type from root node.",
+      vtkKWMessageDialog::ErrorIcon);
+    return;
+    }
 
   // Check the number of processes.
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -2326,6 +2344,8 @@ void vtkPVWindow::WriteData()
     it->GoToNextItem();
     }
   it->Delete();
+  
+  data->Delete();
   
   // Make sure we have at least one writer.
   if(!defaultExtension)
@@ -2412,7 +2432,20 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
   // Find the writer that supports this file name and data type.
   vtkPVWriter* writer = 0;
   
-  vtkDataSet* data = this->GetCurrentPVSource()->GetPVPart()->GetVTKData();  
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  pm->RootScript("%s GetClassName",
+                 this->GetCurrentPVSource()->GetPVPart()->GetVTKDataTclName());
+  vtkObject* obj = vtkInstantiator::CreateInstance(pm->GetRootResult());
+  vtkDataSet* data = vtkDataSet::SafeDownCast(obj);
+  if(!data)
+    {
+    if(obj)
+      {
+      obj->Delete();
+      }
+    return 0;
+    }
+
   vtkLinkedListIterator<vtkPVWriter*>* it =
     this->FileWriterList->NewIterator();
   while(!it->IsDoneWithTraversal())
@@ -2429,6 +2462,7 @@ vtkPVWriter* vtkPVWindow::FindPVWriter(const char* fileName, int parallel)
     it->GoToNextItem();
     }
   it->Delete();
+  data->Delete();
   return writer;
 }
 
@@ -4014,7 +4048,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.430 $");
+  this->ExtractRevision(os,"$Revision: 1.431 $");
 }
 
 //-----------------------------------------------------------------------------
@@ -4393,7 +4427,6 @@ void vtkPVWindow::RemoveAllCaches()
 //-----------------------------------------------------------------------------
 void vtkPVWindow::CacheUpdate(int idx, int total)
 {
-  vtkPVApplication* pvApp = this->GetPVApplication();
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
   vtkPVSource* pvs;
   vtkPVPart* pvp;

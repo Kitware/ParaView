@@ -338,8 +338,6 @@ public:
   vtkPVPart *GetPVPart() {return this->GetPVPart(0);} 
   vtkPVPart *GetPVPart(int idx); 
   int GetNumberOfPVParts();
-  // This will create and set the part.
-  void SetVTKData(vtkDataSet *data, const char *name);
 
   // Descriptions:
   // Properties that describe the inputs to the filter of type

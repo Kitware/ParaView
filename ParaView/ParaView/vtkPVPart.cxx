@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.13");
+vtkCxxRevisionMacro(vtkPVPart, "1.14");
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -80,7 +80,6 @@ vtkPVPart::vtkPVPart()
   this->Name = NULL;
 
   this->DataInformation = vtkPVDataInformation::New();
-  this->VTKData = NULL;
   this->VTKDataTclName = NULL;
 
   // Used to be in vtkPVActorComposite
@@ -121,7 +120,6 @@ vtkPVPart::~vtkPVPart()
 
   this->DataInformation->Delete();
   this->DataInformation = NULL;
-  this->SetVTKData(NULL, NULL);
 
   // Used to be in vtkPVActorComposite........
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -579,9 +577,8 @@ void vtkPVPart::SetPVApplication(vtkPVApplication *pvApp)
   this->vtkKWObject::SetApplication(pvApp);
 }
 
-
 //----------------------------------------------------------------------------
-void vtkPVPart::SetVTKData(vtkDataSet *data, const char *tclName)
+void vtkPVPart::SetVTKDataTclName(const char* tclName)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
   
@@ -598,7 +595,7 @@ void vtkPVPart::SetVTKData(vtkDataSet *data, const char *tclName)
     }
   if (tclName)
     {
-    this->VTKDataTclName = new char[strlen(tclName) + 1];
+    this->VTKDataTclName = new char[strlen(tclName)+1];
     strcpy(this->VTKDataTclName, tclName);
     // Connect the data to the pipeline for displaying the data.
     pvApp->BroadcastScript("%s SetInput %s",
@@ -612,19 +609,7 @@ void vtkPVPart::SetVTKData(vtkDataSet *data, const char *tclName)
       this->Script("%s SetInput {}", this->GeometryTclName);
       }
     }
-
-  if (this->VTKData)
-    {
-    this->VTKData->UnRegister(this);
-    this->VTKData = NULL;
-    }
-  if (data)
-    {
-    this->VTKData = data;
-    data->Register(this);
-    }
 }
-
 
 //----------------------------------------------------------------------------
 void vtkPVPart::Update()
@@ -643,13 +628,12 @@ void vtkPVPart::Update()
 void vtkPVPart::InsertExtractPiecesIfNecessary()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVProcessModule* pm = pvApp->GetProcessModule();
 
-  if ( this->VTKData == NULL)
-    {
-    return;
-    }
-  this->VTKData->UpdateInformation();
-  if (this->VTKData->GetMaximumNumberOfPieces() != 1)
+  pm->RootScript("%s UpdateInformation", this->VTKDataTclName);
+  pm->RootScript("%s GetMaximumNumberOfPieces", this->VTKDataTclName);
+  
+  if (atoi(pm->GetRootResult()) != 1)
     { // The source can already produce pieces.
     return;
     }
@@ -657,7 +641,8 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   // We are going to create the piece filter with a dummy tcl name,
   // setup the pipeline, and remove tcl's reference to the objects.
   // The vtkData object will be moved to the output of the piece filter.
-  if (this->VTKData->IsA("vtkPolyData"))
+  if((pm->RootScript("%s IsA vtkPolyData", this->VTKDataTclName),
+      atoi(pm->GetRootResult())))
     {
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
@@ -670,7 +655,8 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
       pvApp->BroadcastSimpleScript("vtkTransmitPolyDataPiece pvTemp");
       }
     }
-  else if (this->VTKData->IsA("vtkUnstructuredGrid"))
+  else if((pm->RootScript("%s IsA vtkUnstructuredGrid", this->VTKDataTclName),
+           atoi(pm->GetRootResult())))
     {
     // Transmit is more efficient, but has the possiblity of hanging.
     // It will hang if all procs do not  call execute.
@@ -694,10 +680,9 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
   // This is a bit of a hack because we have to strip the '$' off of the current name.
   pvApp->BroadcastScript("set %s [pvTemp GetOutput]", this->VTKDataTclName+1);
   
-  // Record the name (doesn't change) and pointer of the new output.
-  this->Script("%s SetVTKData %s {%s}", this->GetTclName(),
-               this->VTKDataTclName, this->VTKDataTclName);
-
+  this->Script("%s SetVTKDataTclName {%s}", this->GetTclName(),
+               this->VTKDataTclName);
+  
   // Now delete Tcl's reference to the piece filter.
   pvApp->BroadcastSimpleScript("pvTemp Delete");
 }
@@ -754,7 +739,6 @@ void vtkPVPart::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Mapper: " << this->GetMapper() << endl;
   os << indent << "MapperTclName: " << (this->MapperTclName?this->MapperTclName:"none") << endl;
   os << indent << "PropTclName: " << (this->PropTclName?this->PropTclName:"none") << endl;
-  os << indent << "VTKData: " << this->GetVTKData() << endl;
   os << indent << "VTKDataTclName: " << (this->VTKDataTclName?this->VTKDataTclName:"none") << endl;
   os << indent << "PropertyTclName: " << (this->PropertyTclName?this->PropertyTclName:"none") << endl;
   os << indent << "CollectTclName: " << (this->CollectTclName?this->CollectTclName:"none") << endl;

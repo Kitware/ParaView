@@ -79,7 +79,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.288");
+vtkCxxRevisionMacro(vtkPVSource, "1.289");
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -488,24 +488,6 @@ void vtkPVSource::GatherDataInformation()
     this->GetPVOutput()->UpdateProperties();
     }
 }
-
-//----------------------------------------------------------------------------
-void vtkPVSource::SetVTKData(vtkDataSet *data, const char *name)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-
-  vtkPVPart *part = vtkPVPart::New();
-  part->SetPVApplication(pvApp);
-  part->SetVTKData(data, name);
-  pvApp->BroadcastScript("%s SetNumberOfDivisions %d %d %d", 
-                         part->GetLODDeciTclName(), this->LODResolution,
-                         this->LODResolution, this->LODResolution); 
-
-  pvApp->GetProcessModule()->InitializePVPartPartition(part);
-  this->PVParts->AddItem(part);
-  part->Delete();
-}
-
 
 
 //----------------------------------------------------------------------------
@@ -2368,8 +2350,8 @@ int vtkPVSource::InitializeData()
                              sourceTclName, idx);
       part = vtkPVPart::New();
       part->SetPVApplication(pvApp);
-      this->Script("%s SetVTKData ${%s} {${%s}}", part->GetTclName(),
-                   dataName, dataName);
+      this->Script("%s SetVTKDataTclName {${%s}}", part->GetTclName(),
+                   dataName);
       pvApp->GetProcessModule()->InitializePVPartPartition(part);
       this->AddPVPart(part);
       // This initialization should be done by a render module.
@@ -2625,7 +2607,7 @@ void vtkPVSource::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVSource ";
-  this->ExtractRevision(os,"$Revision: 1.288 $");
+  this->ExtractRevision(os,"$Revision: 1.289 $");
 }
 
 //----------------------------------------------------------------------------
