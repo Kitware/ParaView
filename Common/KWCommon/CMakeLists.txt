@@ -26,7 +26,7 @@ SET_SOURCE_FILES_PROPERTIES(
 IF (NOT DO_NOT_BUILD_XML_RW)
   INCLUDE_DIRECTORIES(
     ${KWCommon_SOURCE_DIR}/XML
-  )
+    )
   SET (KWCommon_SRCS ${KWCommon_SRCS}
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DWriter.cxx
@@ -63,7 +63,7 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLTextPropertyWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLVolumePropertyReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLVolumePropertyWriter.cxx
-  )
+    )
   IF (VTK_USE_HYBRID)
     SET (KWCommon_SRCS ${KWCommon_SRCS}
       ${KWCommon_SOURCE_DIR}/XML/vtkXML3DWidgetReader.cxx
@@ -76,14 +76,14 @@ IF (NOT DO_NOT_BUILD_XML_RW)
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLPolyDataSourceWidgetWriter.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarWidgetReader.cxx
       ${KWCommon_SOURCE_DIR}/XML/vtkXMLScalarBarWidgetWriter.cxx
-    )
+      )
   ENDIF (VTK_USE_HYBRID)
   SET_SOURCE_FILES_PROPERTIES(
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLIOBase.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
     ABSTRACT
-  )
+    )
 ENDIF (NOT DO_NOT_BUILD_XML_RW)
 
 IF (WIN32)
@@ -111,7 +111,7 @@ IF(ParaView_SOURCE_DIR)
   ENDIF(VTK_ZLIB_INCLUDE_DIRS)
 
   ADD_LIBRARY(vtkKWCommon ${KWCommon_SRCS})
-ELSE
+ELSE(ParaView_SOURCE_DIR)
   VTK_WRAP_TCL2(vtkKWCommonTCL KWCommonTCL_SRCS ${KWCommon_SRCS})
   ADD_LIBRARY(vtkKWCommonTCL ${KWCommonTCL_SRCS} ${KWCommon_SRCS})
 ENDIF(ParaView_SOURCE_DIR)
@@ -125,42 +125,51 @@ IF(KWSYS_NAMESPACE)
   ENDIF(ParaView_SOURCE_DIR)
 ENDIF(KWSYS_NAMESPACE)
 
-TARGET_LINK_LIBRARIES (vtkKWCommonTCL
-vtkImagingTCL 
-vtkGraphicsTCL 
-vtkIOTCL
-vtkFilteringTCL   
-vtkRenderingTCL   
-vtkImaging
-vtkGraphics
-vtkIO
-vtkFiltering
-vtkRendering
-)
+IF(ParaView_SOURCE_DIR)
+  TARGET_LINK_LIBRARIES (vtkKWCommon
+    vtkFiltering
+    vtkGraphics
+    vtkIO
+    vtkImaging
+    vtkRendering
+    )
+ELSE(ParaView_SOURCE_DIR)
+  TARGET_LINK_LIBRARIES (vtkKWCommonTCL
+    vtkImagingTCL 
+    vtkGraphicsTCL 
+    vtkIOTCL
+    vtkFilteringTCL   
+    vtkRenderingTCL   
+    vtkImaging
+    vtkGraphics
+    vtkIO
+    vtkFiltering
+    vtkRendering
+    )
 
-	IF (NOT DO_NOT_BUILD_XML_RW)
-		IF (VTK_USE_HYBRID)
-			TARGET_LINK_LIBRARIES (vtkKWCommonTCL
-				vtkHybridTCL 
-				vtkHybrid
-			)
-		ENDIF (VTK_USE_HYBRID)
-	ENDIF (NOT DO_NOT_BUILD_XML_RW)
+  IF (NOT DO_NOT_BUILD_XML_RW)
+    IF (VTK_USE_HYBRID)
+      TARGET_LINK_LIBRARIES (vtkKWCommonTCL
+        vtkHybridTCL 
+        vtkHybrid
+        )
+    ENDIF (VTK_USE_HYBRID)
+  ENDIF (NOT DO_NOT_BUILD_XML_RW)
 
-	IF(BUILD_SHARED_LIBS)
-		# Let parent project set KW_INSTALL_LIB_DIR to control library install
-		# location.
-		IF(NOT KW_INSTALL_LIB_DIR)
-			SET(KW_INSTALL_LIB_DIR /lib)
-		ENDIF(NOT KW_INSTALL_LIB_DIR)
-		INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWCommonTCL)
-	ENDIF(BUILD_SHARED_LIBS)
+  IF(BUILD_SHARED_LIBS)
+    # Let parent project set KW_INSTALL_LIB_DIR to control library install
+    # location.
+    IF(NOT KW_INSTALL_LIB_DIR)
+      SET(KW_INSTALL_LIB_DIR /lib)
+    ENDIF(NOT KW_INSTALL_LIB_DIR)
+    INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkKWCommonTCL)
+  ENDIF(BUILD_SHARED_LIBS)
 
-	IF(BUILD_TESTING)
-		SUBDIRS(Testing)
-	ENDIF(BUILD_TESTING)
+  IF(BUILD_TESTING)
+    SUBDIRS(Testing)
+  ENDIF(BUILD_TESTING)
 
-	SUBDIRS(Utilities)
+  SUBDIRS(Utilities)
 ENDIF(ParaView_SOURCE_DIR)
 
 OPTION(USE_NOTEBOOK_ICONS "Display Notebook with icons." OFF)
