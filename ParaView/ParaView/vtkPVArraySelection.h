@@ -93,7 +93,8 @@ public:
   void FillMenu();
   
   // Description:
-  // Get the value of the current menu entry
+  // Set/Get the value of the current menu entry
+  void SetValue(const char* value) {this->ArraySelectionMenu->SetValue(value);}
   char* GetValue() { return this->ArraySelectionMenu->GetValue(); }
 
   // Description:
