@@ -263,7 +263,7 @@ void vtkKWNotebook::Raise(int num)
   int width = vtkKWObject::GetIntegerResult(app);
   
 #ifdef _WIN32    
-  int h0 = bw * 2; // Should be 3
+  int h0 = bw * 2 + 2; // Should be 3
   int ww = 1;
   int hh = 3;
 #else
@@ -466,7 +466,7 @@ void vtkKWNotebook::AddPage(const char *title, const char *ballon,
 # endif
 
 #else
-    int h0 = 1;
+    int h0 = 3;
 #endif
     
     this->Script("place %s -x 10 -y 0 -relwidth 1.0 -height %d",
