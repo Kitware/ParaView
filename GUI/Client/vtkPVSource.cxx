@@ -67,7 +67,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.389");
+vtkCxxRevisionMacro(vtkPVSource, "1.390");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1294,6 +1294,8 @@ void vtkPVSource::DeleteCallback()
   vtkPVSource *current = 0;
   vtkPVWindow *window = this->GetPVWindow();
 
+  current = window->GetCurrentPVSource();
+  window->SetCurrentPVSourceCallback(0);
   if (this->GetNumberOfPVConsumers() > 0 )
     {
     vtkErrorMacro("An output is used.  We cannot delete this source.");
@@ -1383,7 +1385,6 @@ void vtkPVSource::DeleteCallback()
     it->Delete();
     }
 
-  current = window->GetCurrentPVSource();
   if ( this == current || window->GetSourceList("Sources")->GetNumberOfItems() == 1)
     {
     current = prev;
