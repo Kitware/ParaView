@@ -179,7 +179,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.133");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.134");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1202,7 +1202,7 @@ void vtkPVAnimationInterface::SaveImagesCallback()
   saveDialog->Create(this->GetApplication(), 0);
   saveDialog->SetTitle("Save Animation Images");
   ostrstream ostr;
-  ostr << "{{jpeg} {.jpg}} {{tiff} {.tif}} {{Portable Network Graphics} {.png}}";
+  ostr << "{{JPEG Images} {.jpg}} {{TIFF Images} {.tif}} {{PNG Images} {.png}}";
 #ifdef PARAVIEW_PRO_BUILD
 # ifdef _WIN32
   ostr << " {{AVI movie file} {.avi}}";
