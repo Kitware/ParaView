@@ -66,7 +66,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.1");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.2");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
@@ -1385,7 +1385,7 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
         }
       }
 
-    if (append_filters[j]->GetNumberOfInputs())
+    if (append_filters[j]->GetNumberOfInputConnections(0))
       {
       append_all->AddInput(append_filters[j]->GetOutput());
       append_filters[j]->Update();
@@ -1394,7 +1394,7 @@ int vtkKWSelectionFrameLayoutManager::AppendWidgetsToImageData(
 
   // Create the final output
 
-  if (append_all->GetNumberOfInputs())
+  if (append_all->GetNumberOfInputConnections(0))
     {
     append_all->Update();
     image->ShallowCopy(append_all->GetOutput());
