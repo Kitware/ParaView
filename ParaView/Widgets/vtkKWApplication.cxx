@@ -124,6 +124,7 @@ vtkKWApplication::vtkKWApplication()
   this->EventNotifier->SetApplication( this );
 
   this->InExit = 0;
+  this->TraceFile = NULL;
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -139,6 +140,13 @@ vtkKWApplication::~vtkKWApplication()
   this->SetApplicationName(NULL);
   this->SetApplicationVersionName(NULL);
   this->SetApplicationReleaseName(NULL);
+
+  if (this->TraceFile)
+    {
+    this->TraceFile->close();
+    delete this->TraceFile;
+    this->TraceFile = NULL;
+    }
 }
 
 void vtkKWApplication::Script(const char *format, ...)
@@ -190,6 +198,8 @@ void vtkKWApplication::SimpleScript(const char *event)
     }
   delete[] script;
 }
+
+
 
 void vtkKWApplication::SetApplicationName(const char *_arg)
 {
@@ -560,6 +570,7 @@ int vtkKWApplication::GetWidgetVisibility()
   return vtkKWApplication::WidgetVisibility;
 }
 
+//----------------------------------------------------------------------------
 void vtkKWApplication::DisplayAbout(vtkKWWindow *win)
 {
   ostrstream str;
@@ -571,3 +582,21 @@ void vtkKWApplication::DisplayAbout(vtkKWWindow *win)
   dlg->Invoke();  
   dlg->Delete();  
 }
+
+//----------------------------------------------------------------------------
+void vtkKWApplication::AddTraceEntry(char *format, ...)
+{
+  if (this->TraceFile == NULL)
+    {
+    return;
+    }
+  char event[6000];
+
+  va_list var_args;
+  va_start(var_args, format);
+  vsprintf(event, format, var_args);
+  va_end(var_args);
+
+  *(this->TraceFile) << event << endl;
+}
+
