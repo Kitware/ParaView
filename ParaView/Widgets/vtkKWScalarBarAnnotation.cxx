@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWScalarBarAnnotation );
-vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.3");
+vtkCxxRevisionMacro(vtkKWScalarBarAnnotation, "1.4");
 
 int vtkKWScalarBarAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                     int argc, char *argv[]);
@@ -71,7 +71,9 @@ vtkKWScalarBarAnnotation::vtkKWScalarBarAnnotation()
 {
   this->CommandFunction = vtkKWScalarBarAnnotationCommand;
 
-  this->AnnotationChangedEvent  = vtkKWEvent::ViewAnnotationChangedEvent;
+  this->AnnotationChangedEvent      = vtkKWEvent::ViewAnnotationChangedEvent;
+  this->ScalarComponentChangedEvent = vtkKWEvent::ScalarComponentChangedEvent;
+
   this->PopupTextProperty       = 0;
   this->ScalarBarWidget         = NULL;
   this->VolumeProperty          = NULL;
@@ -507,6 +509,22 @@ void vtkKWScalarBarAnnotation::Update()
       this->ComponentSelectionWidget->SetNumberOfComponents(
         this->NumberOfComponents);
       this->ComponentSelectionWidget->AllowComponentSelectionOn();
+
+      // Search inside the volume property to find which component we
+      // are visualizing right now (and use it as selection)
+
+      if (anno && anno->GetLookupTable())
+        {
+        for (int i = 0; i < VTK_MAX_VRCOMP; i++)
+          {
+          if (anno->GetLookupTable() == 
+              this->VolumeProperty->GetRGBTransferFunction(i))
+            {
+            this->ComponentSelectionWidget->SetSelectedComponent(i);
+            break;
+            }
+          }
+        }
       }
     else
       {
@@ -655,6 +673,9 @@ void vtkKWScalarBarAnnotation::SelectedComponentCallback(int n)
     {
     this->Render();
     }
+
+  float val = n;
+  this->InvokeEvent(ScalarComponentChangedEvent, &val);
 }
 
 //----------------------------------------------------------------------------
@@ -878,6 +899,8 @@ void vtkKWScalarBarAnnotation::PrintSelf(ostream& os, vtkIndent indent)
 
   os << indent << "AnnotationChangedEvent: " 
      << this->AnnotationChangedEvent << endl;
+  os << indent << "ScalarComponentChangedEvent: " 
+     << this->ScalarComponentChangedEvent << endl;
   os << indent << "ScalarBarWidget: " << this->GetScalarBarWidget() << endl;
   os << indent << "VolumeProperty: " << this->VolumeProperty << endl;
   os << indent << "PopupTextProperty: " 

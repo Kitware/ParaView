@@ -90,7 +90,8 @@ public:
 
   // Description:
   // Set/get the volume property that can be used to set the LUT of the
-  // scalar bar actor
+  // scalar bar actor (i.e. allow the user to choose which component to
+  // visualize)
   virtual void SetVolumeProperty(vtkVolumeProperty *prop);
   vtkGetObjectMacro(VolumeProperty, vtkVolumeProperty);
 
@@ -99,6 +100,12 @@ public:
   // by the volume property
   virtual void SetNumberOfComponents(int);
   vtkGetMacro(NumberOfComponents, int);
+
+  // Description:
+  // Set/Get the event invoked when the component is changed.
+  // Defaults to vtkKWEvent::ScalarComponentChangedEvent
+  vtkSetMacro(ScalarComponentChangedEvent, int);
+  vtkGetMacro(ScalarComponentChangedEvent, int);
 
   // Description:
   // Callbacks
@@ -126,6 +133,7 @@ protected:
 
   int PopupTextProperty;
   int AnnotationChangedEvent;
+  int ScalarComponentChangedEvent;
   int NumberOfComponents;
 
   vtkScalarBarWidget      *ScalarBarWidget;
