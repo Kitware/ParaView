@@ -42,6 +42,7 @@
 static Tcl_Interp *Et_Interp = 0;
 
 #ifdef _WIN32
+#include "vtkWindows.h"
 #include <process.h>
 #include <mapi.h>
 #include <htmlhelp.h>
@@ -60,7 +61,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.177");
+vtkCxxRevisionMacro(vtkKWApplication, "1.178");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);

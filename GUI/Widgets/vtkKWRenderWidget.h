@@ -18,6 +18,7 @@
 #define __vtkKWRenderWidget_h
 
 #include "vtkKWWidget.h"
+#include "vtkWindows.h" // needed for RECT HDC
 
 class vtkCamera;
 class vtkCornerAnnotation;

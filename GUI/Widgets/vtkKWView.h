@@ -29,6 +29,7 @@
 #define VTK_KW_VIEW_MENU_INDEX     10
 
 #include "vtkKWWidget.h"
+#include "vtkWindows.h" // needed for RECT HDC
 
 class vtkKWApplication;
 class vtkKWChangeColorButton;

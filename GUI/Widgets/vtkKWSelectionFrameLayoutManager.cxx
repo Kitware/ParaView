@@ -24,20 +24,21 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 #include "vtkImageData.h"
 #include "vtkKWApplication.h"
+#include "vtkKWEntry.h"
+#include "vtkKWLabeledEntry.h"
 #include "vtkKWMenu.h"
 #include "vtkKWMenuButton.h"
 #include "vtkKWMessageDialog.h"
 #include "vtkKWRenderWidget.h"
 #include "vtkKWSaveImageDialog.h"
 #include "vtkKWSelectionFrame.h"
+#include "vtkKWSimpleEntryDialog.h"
 #include "vtkKWTkUtilities.h"
 #include "vtkKWToolbar.h"
 #include "vtkKWWindow.h"
 #include "vtkObjectFactory.h"
 #include "vtkRenderWindow.h"
-#include "vtkKWSimpleEntryDialog.h"
-#include "vtkKWLabeledEntry.h"
-#include "vtkKWEntry.h"
+#include "vtkWindows.h"
 
 // Readers / Writers
 
@@ -56,6 +57,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include <vtkstd/vector>
 #include <vtkstd/string>
 
+
 #include "Resources/KWWindowLayout.h"
 
 #define VTK_KW_SFLMGR_LABEL_PATTERN "%d x %d"
@@ -67,7 +69,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWSelectionFrameLayoutManager);
-vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.5");
+vtkCxxRevisionMacro(vtkKWSelectionFrameLayoutManager, "1.6");
 
 //----------------------------------------------------------------------------
 class vtkKWSelectionFrameLayoutManagerInternals
