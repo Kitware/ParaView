@@ -2,7 +2,7 @@ PROJECT(ClientServer_LOADED_COMMANDS)
 
 SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_ANSI_CFLAGS}")
 INCLUDE_DIRECTORIES(${CMAKE_ROOT}/include ${CMAKE_ROOT}/Source)
-ADD_LIBRARY(cmVTK_WRAP_ClientServer SHARED cmClientServerWrap.c)
+ADD_LIBRARY(cmVTK_WRAP_ClientServer MODULE cmClientServerWrap.c)
 
 # Make sure we build with flags matching the CMake executable.
 IF(CMAKE_SYSTEM MATCHES "IRIX64")
