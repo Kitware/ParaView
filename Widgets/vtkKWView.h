@@ -101,7 +101,8 @@ public:
   // Print the image. This may pop up a dialog box etc.
   virtual void Print();
   int GetPrinting() {return this->Printing;};
-
+  vtkSetMacro(Printing,int);
+  
   // Description:
   // Set/Get the last position of the mouse.
   vtkSetVector2Macro(LastPosition,int);
