@@ -19,13 +19,13 @@
 #include "vtkCubeAxesActor2D.h"
 #include "vtkDataSetAttributes.h"
 #include "vtkDataSetSurfaceFilter.h"
-#include "vtkPVProcessModule.h"
 #include "vtkPVPart.h"
 #include "vtkPVPartDisplay.h"
 #include "vtkCollection.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVDataSetAttributesInformation.h"
 #include "vtkPVArrayInformation.h"
+#include "vtkPVLODPartDisplay.h"
 #include "vtkImageData.h"
 #include "vtkKWBoundsDisplay.h"
 #include "vtkKWChangeColorButton.h"
@@ -76,7 +76,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.238");
+vtkCxxRevisionMacro(vtkPVData, "1.239");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -174,6 +174,8 @@ vtkPVData::vtkPVData()
 
   this->ColorSetByUser = 0;
   this->ArraySetByUser = 0;
+  
+  this->PointLabelCheck = vtkKWCheckButton::New();
 }
 
 //----------------------------------------------------------------------------
@@ -302,6 +304,9 @@ vtkPVData::~vtkPVData()
 
   this->InformationFrame->Delete();
   this->InformationFrame = NULL;
+  
+  this->PointLabelCheck->Delete();
+  this->PointLabelCheck = NULL;
 }
 
 
@@ -392,6 +397,7 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
 void vtkPVData::DeleteCallback()
 {
   this->SetCubeAxesVisibility(0);
+  this->SetPointLabelVisibility(0);
 }
 
 //----------------------------------------------------------------------------
@@ -501,6 +507,12 @@ void vtkPVData::CreateProperties()
   this->CubeAxesCheck->SetBalloonHelpString(
     "Toggle the visibility of X,Y,Z scales for this dataset.");
 
+  this->PointLabelCheck->SetParent(this->ViewFrame->GetFrame());
+  this->PointLabelCheck->Create(this->Application, "-text {Label Point Ids}");
+  this->PointLabelCheck->SetCommand(this, "PointLabelCheckCallback");
+  this->PointLabelCheck->SetBalloonHelpString(
+    "Toggle the visibility of point id labels for this dataset.");
+  
   this->Script("grid %s %s -sticky wns",
                this->VisibilityCheck->GetWidgetName(),
                this->ResetCameraButton->GetWidgetName());
@@ -514,6 +526,13 @@ void vtkPVData::CreateProperties()
   
   this->Script("grid %s -sticky wns",
                this->CubeAxesCheck->GetWidgetName());
+
+  if ((this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions() == 1) &&
+      (!this->GetPVApplication()->GetClientMode()))
+    {
+    this->Script("grid %s -sticky wns",
+                 this->PointLabelCheck->GetWidgetName());
+    }
 
   // Color
   this->ColorFrame->SetParent(this->Properties->GetFrame());
@@ -2129,6 +2148,7 @@ void vtkPVData::SetVisibility(int v)
   this->AddTraceEntry("$kw(%s) SetVisibility %d", this->GetTclName(), v);
   this->GetPVSource()->SetVisibilityInternal(v);
   this->CubeAxes->SetVisibility(v);
+  this->SetPointLabelVisibility(v, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -2218,6 +2238,45 @@ void vtkPVData::SetCubeAxesVisibility(int val)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVData::SetPointLabelVisibility(int val, int changeButtonState)
+{
+  int state = this->PointLabelCheck->GetState();
+  
+  if (state != val && changeButtonState)
+    {
+    this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d",
+                        this->GetTclName(), val);
+    this->PointLabelCheck->SetState(val);
+    state = val;
+    }
+  
+  if ((val && !state) || (val && !this->Visibility))
+    {
+    return;
+    }
+  
+  int numParts = this->GetPVSource()->GetNumberOfParts();
+  int i;
+  vtkPVPart *part;
+  vtkPVLODPartDisplay *display;
+  
+  for (i = 0; i < numParts; i++)
+    {
+    part =  this->GetPVSource()->GetPart(i);
+    display = vtkPVLODPartDisplay::SafeDownCast(part->GetPartDisplay());
+    if (display)
+      {
+      display->SetPointLabelVisibility(val);
+      }
+    }
+  
+  if (this->GetPVRenderView())
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
 void vtkPVData::ScalarBarCheckCallback()
 {
   this->SetScalarBarVisibility(this->ScalarBarCheck->GetState());
@@ -2233,6 +2292,18 @@ void vtkPVData::CubeAxesCheckCallback()
   this->AddTraceEntry("$kw(%s) SetCubeAxesVisibility %d", this->GetTclName(),
                       this->CubeAxesCheck->GetState());
   this->SetCubeAxesVisibility(this->CubeAxesCheck->GetState());
+  if ( this->GetPVRenderView() )
+    {
+    this->GetPVRenderView()->EventuallyRender();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVData::PointLabelCheckCallback()
+{
+  this->AddTraceEntry("$kw(%s) SetPointLabelVisibility %d", this->GetTclName(),
+                      this->PointLabelCheck->GetState());
+  this->SetPointLabelVisibility(this->PointLabelCheck->GetState());
   if ( this->GetPVRenderView() )
     {
     this->GetPVRenderView()->EventuallyRender();
@@ -2552,6 +2623,10 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
           << cubeAxesBatchName << " SetInertia 20\n";
     *file << "pvTemp" << renID.ID << " AddProp " << cubeAxesBatchName << "\n";
     }
+  
+  if (this->PointLabelCheck->GetState())
+    {
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -2608,6 +2683,11 @@ void vtkPVData::SaveState(ofstream *file)
     *file << "$kw(" << this->GetTclName() << ") SetCubeAxesVisibility 1\n";
     }
 
+  if (this->PointLabelCheck->GetState())
+    {
+    *file << "$kw(" << this->GetTclName() << ") SetPointLabelVisibility 1\n";
+    }
+  
   i1 = (int)(this->PointSizeThumbWheel->GetValue());
   if (i1 != 1)
     {

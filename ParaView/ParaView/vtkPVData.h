@@ -285,6 +285,12 @@ public:
 
   vtkGetMacro(ColorSetByUser, int);
   vtkGetMacro(ArraySetByUser, int);
+
+  // Description:
+  // Methods for point labelling.  This feature only works in single-process
+  // mode.  To be changed/moved when we rework 2D rendering in ParaView.
+  void PointLabelCheckCallback();
+  void SetPointLabelVisibility(int val, int changeButtonState = 1);
   
 protected:
   vtkPVData();
@@ -384,6 +390,10 @@ protected:
 
   vtkPVColorMap *PVColorMap;
 
+  // Adding point labelling back in.  This only works in single-process mode.
+  // This code will be changed/moved when we rework 2D rendering in ParaView.
+  vtkKWCheckButton *PointLabelCheck;
+  
   void UpdatePropertiesInternal();
   void UpdateActorControlResolutions();
   void UpdateMapScalarsCheck(vtkPVDataSetAttributesInformation* info,

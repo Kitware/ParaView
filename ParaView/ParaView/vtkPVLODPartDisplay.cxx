@@ -21,9 +21,11 @@
 #include "vtkQuadricClustering.h"
 #include "vtkProp3D.h"
 #include "vtkPVApplication.h"
+#include "vtkPVPart.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVConfig.h"
 #include "vtkKWCheckButton.h"
+#include "vtkPVRenderModule.h"
 #include "vtkPVRenderView.h"
 #include "vtkPolyData.h"
 #include "vtkProperty.h"
@@ -38,7 +40,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLODPartDisplay);
-vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.10");
+vtkCxxRevisionMacro(vtkPVLODPartDisplay, "1.11");
 
 
 //----------------------------------------------------------------------------
@@ -48,6 +50,9 @@ vtkPVLODPartDisplay::vtkPVLODPartDisplay()
   this->LODMapperID.ID = 0;
   this->LODUpdateSuppressorID.ID = 0;
 
+  this->PointLabelMapperID.ID = 0;
+  this->PointLabelActorID.ID = 0;
+  
   this->Information = vtkPVLODPartDisplayInformation::New();
   this->InformationIsValid = 0;
   this->LODResolution = 50;
@@ -57,16 +62,16 @@ vtkPVLODPartDisplay::vtkPVLODPartDisplay()
 vtkPVLODPartDisplay::~vtkPVLODPartDisplay()
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
-    if ( pvApp )
-      {
+  if ( pvApp )
+    {
     vtkPVProcessModule* pm = pvApp->GetProcessModule();
     if(this->LODMapperID.ID)
       {
       pm->DeleteStreamObject(this->LODMapperID);
       this->LODMapperID.ID = 0;
-    }
+      }
     if(this->LODDeciID.ID)
-    {
+      {
       pm->DeleteStreamObject(this->LODDeciID);
       this->LODDeciID.ID = 0;
       }
@@ -74,6 +79,16 @@ vtkPVLODPartDisplay::~vtkPVLODPartDisplay()
       {
       pm->DeleteStreamObject(this->LODUpdateSuppressorID);
       this->LODUpdateSuppressorID.ID = 0;
+      }
+    if (this->PointLabelMapperID.ID)
+      {
+      pm->DeleteStreamObject(this->PointLabelMapperID);
+      this->PointLabelMapperID.ID = 0;
+      }
+    if (this->PointLabelActorID.ID)
+      {
+      pm->DeleteStreamObject(this->PointLabelActorID);
+      this->PointLabelActorID.ID = 0;
       }
     pm->SendStreamToClientAndServer();
     }
@@ -221,6 +236,16 @@ void vtkPVLODPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
     << vtkClientServerStream::LastResult
     << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
+
+  if (pm->GetNumberOfPartitions() == 1)
+    {
+    this->PointLabelMapperID = pm->NewStreamObject("vtkLabeledDataMapper");
+    this->PointLabelActorID = pm->NewStreamObject("vtkActor2D");
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << this->PointLabelActorID << "SetMapper" << this->PointLabelMapperID
+      << vtkClientServerStream::End;
+    }
 }
 
 
@@ -449,6 +474,51 @@ void vtkPVLODPartDisplay::SetDirectColorFlag(int val)
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVLODPartDisplay::SetPointLabelVisibility(int val)
+{
+  if (!this->PointLabelMapperID.ID || !this->PointLabelActorID.ID)
+    {
+    return;
+    }
+  
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  if (!pvApp)
+    {
+    return;
+    }
+  
+  vtkPVProcessModule *pm = pvApp->GetProcessModule();
+  
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << this->PointLabelMapperID << "SetInput"
+    << this->Part->GetVTKDataID()
+    << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke << this->PointLabelMapperID
+    << "GetLabelTextProperty" << vtkClientServerStream::End;
+  pm->GetStream()
+    << vtkClientServerStream::Invoke
+    << vtkClientServerStream::LastResult << "SetFontSize" << 24
+    << vtkClientServerStream::End;
+  
+  if (val)
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << pvApp->GetRenderModule()->GetRendererID() << "AddProp"
+      << this->PointLabelActorID << vtkClientServerStream::End;
+    }
+  else
+    {
+    pm->GetStream()
+      << vtkClientServerStream::Invoke
+      << pvApp->GetRenderModule()->GetRendererID() << "RemoveProp"
+      << this->PointLabelActorID << vtkClientServerStream::End;
+    }
+  pm->SendStreamToServer();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVLODPartDisplay::PrintSelf(ostream& os, vtkIndent indent)

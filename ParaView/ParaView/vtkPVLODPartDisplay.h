@@ -83,6 +83,12 @@ public:
   // Do not keep a reference to this object.
   vtkPVLODPartDisplayInformation* GetInformation();
 
+  // Description:
+  // Toggle the visibility of the point labels.  This feature only works
+  // in single-process mode.  To be changed/moved when we rework 2D rendering
+  // in ParaView.
+  void SetPointLabelVisibility(int val);
+  
 protected:
   vtkPVLODPartDisplay();
   ~vtkPVLODPartDisplay();
@@ -92,6 +98,11 @@ protected:
   vtkClientServerID LODUpdateSuppressorID;
   vtkClientServerID LODMapperID;
   vtkClientServerID LODDeciID;
+
+  // Adding point labelling back in.  This only works in single-process mode.
+  // This code will be changed/moved when we rework 2D rendering in ParaView.
+  vtkClientServerID PointLabelMapperID;
+  vtkClientServerID PointLabelActorID;
   
   // Description:
   // This method should be called immediately after the object is constructed.
