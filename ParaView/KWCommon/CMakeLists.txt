@@ -27,6 +27,8 @@ IF (NOT DO_NOT_BUILD_XML_RW)
   SET (KWCommon_SRCS ${KWCommon_SRCS}
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLActor2DWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLActorReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLActorWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLCameraReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLCameraWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLColorTransferFunctionReader.cxx
@@ -37,6 +39,8 @@ IF (NOT DO_NOT_BUILD_XML_RW)
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLObjectWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPiecewiseFunctionWriter.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLProp3DReader.cxx
+    ${KWCommon_SOURCE_DIR}/XML/vtkXMLProp3DWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropReader.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLPropWriter.cxx
     ${KWCommon_SOURCE_DIR}/XML/vtkXMLProperty2DReader.cxx
