@@ -57,6 +57,7 @@ SET(Filters_SRCS
   vtkSelectInputs.cxx
   vtkExtractCTHPart.cxx
   vtkStringList.cxx # Should go out
+	vtkTempTessellatorFilter.cxx # Remove after ParaView 1.4
   )
 
 SET_SOURCE_FILES_PROPERTIES(
@@ -122,6 +123,7 @@ SET(VTK_BINARY_DIR "${_VTK_BINARY_DIR}")
 INCLUDE_DIRECTORIES(
   ${PVFilters_BINARY_DIR}
   ${PVFilters_SOURCE_DIR}
+  ${PVCommon_SOURCE_DIR}
   ${KWCOMMON_INCLUDE_DIR}
   ${HDF5_INCLUDE_DIR}
   ${VTK_INCLUDE_DIR}
@@ -145,7 +147,7 @@ VTK_MAKE_INSTANTIATOR3(vtkPVFiltersInstantiator FiltersInst_SRCS
 
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS} ${FiltersInst_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkHybridCS vtkParallelCS vtkKWCommon)
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommon vtkPVCommon vtkHybridCS vtkParallelCS vtkKWCommon)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)
@@ -153,7 +155,7 @@ TARGET_LINK_LIBRARIES(vtkPVFilters ${PARAVIEW_HDF5_LIBRARIES})
 TARGET_LINK_LIBRARIES(vtkPVFilters vtkClientServer)
 
 ADD_EXECUTABLE(vtkTestFilters test.cxx)
-TARGET_LINK_LIBRARIES(vtkTestFilters vtkPVFiltersCS)
+TARGET_LINK_LIBRARIES(vtkTestFilters vtkPVFiltersCS vtkPVCommonCS)
 
 IF(PARAVIEW_USE_ICE_T)
   TARGET_LINK_LIBRARIES(vtkPVFilters icet icet_mpi icet_strategies)
