@@ -16,11 +16,9 @@
     <Source class="vtkXMLPolyDataReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection"/>
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLUnstructuredGridReader"
@@ -32,11 +30,9 @@
     <Source class="vtkXMLUnstructuredGridReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLImageDataReader"
@@ -48,11 +44,9 @@
     <Source class="vtkXMLImageDataReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLStructuredGridReader"
@@ -64,11 +58,9 @@
     <Source class="vtkXMLStructuredGridReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLRectilinearGridReader"
@@ -80,11 +72,9 @@
     <Source class="vtkXMLRectilinearGridReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLPPolyDataReader"
@@ -96,11 +86,9 @@
     <Source class="vtkXMLPPolyDataReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLPUnstructuredGridReader"
@@ -112,11 +100,9 @@
     <Source class="vtkXMLPUnstructuredGridReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLPImageDataReader"
@@ -128,11 +114,9 @@
     <Source class="vtkXMLPImageDataReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLPStructuredGridReader"
@@ -144,11 +128,9 @@
     <Source class="vtkXMLPStructuredGridReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="XMLPRectilinearGridReader"
@@ -160,11 +142,9 @@
     <Source class="vtkXMLPRectilinearGridReader"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointSelection" />
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellSelection"/>
   </Module>
   <Module name="legacyreader"
@@ -202,11 +182,9 @@
                    trace_name="TimeSet"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellArrays"/>
   </Module>
   <Module name="HDF5RawImageReader"
@@ -222,7 +200,6 @@
                  help="Read a subset of data spaced by the stride."/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointArrays"/>
   </Module>
   <Module name="vrmlreader"
@@ -356,11 +333,9 @@
                    property="SetTimeValue"/>
     <ArraySelection attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     trace_name="PointArrays"/>
     <ArraySelection attribute_name="Cell"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     trace_name="CellArrays"/>
   </Module>
   <Module name="ImageReader"
@@ -443,10 +418,8 @@
     <Source class="vtkXdmfReader"/>
     <ArraySelection trace_name="cell_array_sel"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     attribute_name="Cell" />
     <ArraySelection trace_name="point_array_sel" 
-                    information_property="PointArrayInfo"
                     property="PointArrayStatus"
                     attribute_name="Point" />
     <VectorEntry label="Stride"
@@ -498,12 +471,10 @@
     <ArraySelection trace_name="cell_array_sel"
                     property="CellArrayStatus"
                     attribute_name="Cell"
-                    information_property="CellArrayInfo"
                     label_text="Element Variables" />
     <ArraySelection trace_name="point_array_sel"
                     attribute_name="Point"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     label_text="Node Variables" />
 
     <SelectWidget type="int" 
@@ -513,14 +484,12 @@
       <Item label="Blocks" value="1">
         <ArraySelection trace_name="block_sel"
                         attribute_name="Block"
-                        information_property="BlockArrayInfo"
                         property="BlockArrayStatus"
                         label_text="Blocks"/>
       </Item>
       <Item label="Materials" value="2">
         <ArraySelection trace_name="material_sel"
                         attribute_name="Material"
-                        information_property="MaterialArrayInfo"
                         property="MaterialArrayStatus"
                         label_text="Materials"/>
       </Item>
@@ -586,11 +555,9 @@
 
     <ArraySelection trace_name="variable_sel"
                     property="VariableArrayStatus"
-                    information_property="VariableArrayInfo"
                     attribute_name="Variable"  />
     <ArraySelection trace_name="block_sel"
                     property="BlockArrayStatus"
-                    information_property="BlockArrayInfo"
                     attribute_name="Block"  />
     <BasicDSPFilterWidget trace_name="Apply basic time filtering"
                       help="Apply basic time filtering"/>
@@ -605,11 +572,9 @@
     <Source class="vtkAVSucdReader"/>
     <ArraySelection trace_name="point_array_sel"
                     property="PointArrayStatus"
-                    information_property="PointArrayInfo"
                     attribute_name="Point"/>
     <ArraySelection trace_name="cell_array_sel"
                     property="CellArrayStatus"
-                    information_property="CellArrayInfo"
                     attribute_name="Cell"/>
   </Module>
   <Module name="Meta Image Reader"

@@ -36,14 +36,12 @@
 #include <vtkstd/string>
 #include <vtkstd/set>
 
-vtkCxxSetObjectMacro(vtkPVArraySelection, SMInformationProperty, vtkSMProperty);
-
 typedef vtkstd::set<vtkstd::string> vtkPVArraySelectionArraySetBase;
 class vtkPVArraySelectionArraySet: public vtkPVArraySelectionArraySetBase {};
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArraySelection);
-vtkCxxRevisionMacro(vtkPVArraySelection, "1.53");
+vtkCxxRevisionMacro(vtkPVArraySelection, "1.54");
 
 //----------------------------------------------------------------------------
 int vtkDataArraySelectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -72,8 +70,6 @@ vtkPVArraySelection::vtkPVArraySelection()
   this->NoArraysLabel = vtkKWLabel::New();
   this->Selection = vtkDataArraySelection::New();
 
-  this->SMInformationProperty = 0;
-  this->SMInformationPropertyName = 0;
 }
 
 //----------------------------------------------------------------------------
@@ -107,28 +103,6 @@ vtkPVArraySelection::~vtkPVArraySelection()
 
   delete this->ArraySet;
 
-  this->SetSMInformationProperty(0);
-  this->SetSMInformationPropertyName(0);
-}
-
-//-----------------------------------------------------------------------------
-vtkSMProperty* vtkPVArraySelection::GetSMInformationProperty()
-{
-  if (this->SMInformationProperty)
-    {
-    return this->SMInformationProperty;
-    }
-
-  if (!this->GetPVSource() || !this->GetPVSource()->GetProxy())
-    {
-    return 0;
-    }
-
-  this->SetSMInformationProperty(
-    this->GetPVSource()->GetProxy()->GetProperty(
-      this->GetSMInformationPropertyName()));
-
-  return this->SMInformationProperty;
 }
 
 //----------------------------------------------------------------------------
@@ -217,8 +191,13 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
   vtkSMStringVectorProperty* svp = vtkSMStringVectorProperty::SafeDownCast(
     this->GetSMProperty());
 
-  vtkSMStringVectorProperty* isvp = vtkSMStringVectorProperty::SafeDownCast(
-    this->GetSMInformationProperty());
+  vtkSMStringVectorProperty* isvp = 0;
+
+  if (svp)
+    {
+    isvp = 
+      vtkSMStringVectorProperty::SafeDownCast(svp->GetInformationProperty());
+    }
   
   vtkSMStringVectorProperty* prop;
   if (fromReader)
@@ -229,7 +208,7 @@ void vtkPVArraySelection::UpdateSelections(int fromReader)
     {
     prop = svp;
     }
-  if (svp && isvp)
+  if (svp && prop)
     {
     vtkSMStringListRangeDomain* dom = vtkSMStringListRangeDomain::SafeDownCast(
       svp->GetDomain("array_list"));
@@ -569,7 +548,6 @@ void vtkPVArraySelection::CopyProperties(vtkPVWidget* clone,
     {
     pvas->SetAttributeName(this->AttributeName);
     pvas->SetLabelText(this->LabelText);
-    pvas->SetSMInformationPropertyName(this->GetSMInformationPropertyName());
     }
   else 
     {
@@ -592,12 +570,6 @@ int vtkPVArraySelection::ReadXMLAttributes(vtkPVXMLElement* element,
     {
     vtkErrorMacro("No attribute_name specified.");
     return 0;
-    }
-
-  const char* inf_property = element->GetAttribute("information_property");
-  if (inf_property)
-    {
-    this->SetSMInformationPropertyName(inf_property);
     }
 
   const char* label_text = element->GetAttribute("label_text");

@@ -111,21 +111,6 @@ protected:
   // This serves a dual purpose.  For tracing and for saving state.
   virtual void Trace(ofstream *file);
 
-  // Description:
-  // Set/get the SM property to use with this widget..
-  vtkSMProperty* GetSMInformationProperty();
-  void SetSMInformationProperty(vtkSMProperty* prop);
-
-  // Description:
-  // Need access to these so that container-type widgets can set the property
-  // name on the widgets they contain (e.g., vtkPVPointSourceWidget).
-  vtkSetStringMacro(SMInformationPropertyName);
-  vtkGetStringMacro(SMInformationPropertyName);
-
-  char* SMInformationPropertyName;
-
-  vtkSMProperty* SMInformationProperty;
-
   virtual void UpdateSelections(int fromReader);
   virtual void SetReaderSelectionsFromProperty();
 
