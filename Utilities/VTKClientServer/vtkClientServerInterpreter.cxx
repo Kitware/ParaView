@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 
 vtkStandardNewMacro(vtkClientServerInterpreter);
-vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.11");
+vtkCxxRevisionMacro(vtkClientServerInterpreter, "1.12");
 
 //----------------------------------------------------------------------------
 class vtkClientServerInterpreterInternals
@@ -795,7 +795,7 @@ int vtkClientServerInterpreter::Load(const char* moduleName,
     {
     for(const char*const* p = optionalPaths; *p; ++p)
       {
-      std::string path = *p;
+      vtkstd::string path = *p;
       if(path.length() > 0)
         {
         char end = *(path.end()-1);
