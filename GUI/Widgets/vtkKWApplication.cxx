@@ -59,7 +59,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.169");
+vtkCxxRevisionMacro(vtkKWApplication, "1.170");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -574,7 +574,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
       strcpy(dir_unix, util->ConvertToUnixSlashes(dir));
 
       // Installed KW application, otherwise build tree/windows
-      sprintf(buffer, "%s/..%s", dir_unix, KW_INSTALL_LIB_DIR);
+      sprintf(buffer, "%s/..%s/TclTk", dir_unix, KW_INSTALL_LIB_DIR);
       int exists = vtkKWDirectoryUtilities::FileExists(buffer);
       if (!exists)
         {
@@ -597,7 +597,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
         if (!has_tcllibpath_env)
         {
         char tcl_library[1024] = "";
-        sprintf(tcl_library, "%s/tcl%s", buffer, TCL_VERSION);
+        sprintf(tcl_library, "%s/lib/tcl%s", buffer, TCL_VERSION);
         if (vtkKWDirectoryUtilities::FileExists(tcl_library))
           {
           if (!Tcl_SetVar(interp, "tcl_library", tcl_library, 
@@ -626,7 +626,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
         if (!has_tklibpath_env)
           {
           char tk_library[1024] = "";
-          sprintf(tk_library, "%s/tk%s", buffer, TK_VERSION);
+          sprintf(tk_library, "%s/lib/tk%s", buffer, TK_VERSION);
           if (vtkKWDirectoryUtilities::FileExists(tk_library))
             {
             if (!Tcl_SetVar(interp, "tk_library", tk_library, 
