@@ -111,7 +111,6 @@ SET( KWWidgets_SRCS
   vtkKWWidgetCollection.cxx 
   vtkKWWindow.cxx 
   vtkKWWindowCollection.cxx 
-  vtkKWXtEmbeddedWidget.cxx 
   )
 
 IF (PARAVIEW_USE_LOOKMARKS)
