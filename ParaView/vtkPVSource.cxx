@@ -757,7 +757,12 @@ void vtkPVSource::AcceptCallback()
     }
   
   this->Script("update");
+  
+#ifdef _WIN32
   this->Script("%s configure -cursor arrow", window->GetWidgetName());
+#else
+  this->Script("%s configure -cursor left_ptr", window->GetWidgetName());
+#endif
 }
 
 //----------------------------------------------------------------------------
