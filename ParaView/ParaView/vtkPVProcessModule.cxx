@@ -55,6 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVConfig.h"
 #include "vtkPVDataInformation.h"
 #include "vtkPVPart.h"
+#include "vtkPVWindow.h"
 #include "vtkShortArray.h"
 #include "vtkSource.h"
 #include "vtkString.h"
@@ -80,7 +81,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.16");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.17");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -489,7 +490,9 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
 //----------------------------------------------------------------------------
 vtkKWLoadSaveDialog* vtkPVProcessModule::NewLoadSaveDialog()
 {
-  return vtkKWLoadSaveDialog::New();
+  vtkKWLoadSaveDialog* dialog = vtkKWLoadSaveDialog::New();
+  dialog->SetParent(this->GetPVApplication()->GetMainWindow());
+  return dialog;
 }
 
 //----------------------------------------------------------------------------
