@@ -126,6 +126,16 @@ public:
   // True if the volume pro mapper can do the task.
   vtkGetMacro(CanDoIntermixGeometry, int);
   vtkGetMacro(CanDoHardwareCursor, int);
+
+  // Description:
+  // Register and deregister the use of intermix intersecting geometry.
+  void RegisterIntermixIntersectingGeometry();
+  void DeregisterIntermixIntersectingGeometry();
+
+  // Description:
+  // Use or stop using cursor.
+  void UseCursor();
+  void StopUsingCursor();
   
 protected:
   vtkKWVolumeComposite();
@@ -164,6 +174,9 @@ protected:
   int                                  LowResVolumeProID;
   int                                  CanDoIntermixGeometry;
   int                                  CanDoHardwareCursor;
+
+  int                                  UseIntermixIntersectingGeometry;
+
 private:
   vtkKWVolumeComposite(const vtkKWVolumeComposite&); // Not implemented
   void operator=(const vtkKWVolumeComposite&); // Not implemented
