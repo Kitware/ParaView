@@ -45,7 +45,7 @@ template class VTK_EXPORT vtkArrayMapIterator<vtkPVWidget*, vtkPVWidget*>;
 vtkCxxSetObjectMacro(vtkPVWidget, SMProperty, vtkSMProperty);
 
 //-----------------------------------------------------------------------------
-vtkCxxRevisionMacro(vtkPVWidget, "1.51");
+vtkCxxRevisionMacro(vtkPVWidget, "1.52");
 
 //-----------------------------------------------------------------------------
 vtkPVWidget::vtkPVWidget()
@@ -364,10 +364,10 @@ void vtkPVWidget::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
 }
 
 //-----------------------------------------------------------------------------
-static int vtkPVWidgetIsSpace(char c)
-{
-  return isspace(c);
-}
+//static int vtkPVWidgetIsSpace(char c)
+//{
+//  return isspace(c);
+//}
 
 //-----------------------------------------------------------------------------
 vtkSMProperty* vtkPVWidget::GetSMProperty()
@@ -392,6 +392,7 @@ vtkSMProperty* vtkPVWidget::GetSMProperty()
 int vtkPVWidget::ReadXMLAttributes(vtkPVXMLElement* element,
                                    vtkPVXMLPackageParser* parser)
 {
+  (void)parser;
   const char* help = element->GetAttribute("help");
   if(help) { this->SetBalloonHelpString(help); }
   
