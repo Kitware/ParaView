@@ -323,19 +323,6 @@ IF (PARAVIEW_BUILD_GUI)
 ENDIF (PARAVIEW_BUILD_GUI)
 
 #########################################################################
-# Configure ParaViewPlus
-IF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPlus")
-  OPTION(PARAVIEW_PLUS_BUILD "Build ParaViewPlus part. Requires Kitware License and ParaViewPlus source" OFF)
-  MARK_AS_ADVANCED(PARAVIEW_PLUS_BUILD)
-  IF(PARAVIEW_PLUS_BUILD)
-    SUBDIRS(ParaViewPlus)
-    SET(PARAVIEW_PLUS_INCLUDE_DIRS
-      ${ParaView_SOURCE_DIR}/ParaViewPlus/IO
-      )
-  ENDIF(PARAVIEW_PLUS_BUILD)
-ENDIF(EXISTS "${ParaView_SOURCE_DIR}/ParaViewPlus")
-
-#########################################################################
 # Configure LOOKMARKS
 OPTION(PARAVIEW_USE_LOOKMARKS "Build ParaView with visual bookmarking capability" ON)
 
