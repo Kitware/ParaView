@@ -2,6 +2,9 @@
 int vtkKWApplicationCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWApplicationNewCommand();
+int vtkKWCallbackSpecificationCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWCallbackSpecificationNewCommand();
 int vtkKWChangeColorButtonCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWChangeColorButtonNewCommand();
@@ -20,6 +23,9 @@ ClientData vtkKWDialogNewCommand();
 int vtkKWEntryCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWEntryNewCommand();
+int vtkKWEventNotifierCommand(ClientData cd, Tcl_Interp *interp,
+             int argc, char *argv[]);
+ClientData vtkKWEventNotifierNewCommand();
 int vtkKWExtentCommand(ClientData cd, Tcl_Interp *interp,
              int argc, char *argv[]);
 ClientData vtkKWExtentNewCommand();
@@ -113,6 +119,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
 {
   vtkTclCreateNew(interp,"vtkKWApplication", vtkKWApplicationNewCommand,
                   vtkKWApplicationCommand);
+  vtkTclCreateNew(interp,"vtkKWCallbackSpecification", vtkKWCallbackSpecificationNewCommand,
+                  vtkKWCallbackSpecificationCommand);
   vtkTclCreateNew(interp,"vtkKWChangeColorButton", vtkKWChangeColorButtonNewCommand,
                   vtkKWChangeColorButtonCommand);
   vtkTclCreateNew(interp,"vtkKWCheckButton", vtkKWCheckButtonNewCommand,
@@ -125,6 +133,8 @@ int VTK_EXPORT Vtkkwwidgetstcl_Init(Tcl_Interp *interp)
                   vtkKWDialogCommand);
   vtkTclCreateNew(interp,"vtkKWEntry", vtkKWEntryNewCommand,
                   vtkKWEntryCommand);
+  vtkTclCreateNew(interp,"vtkKWEventNotifier", vtkKWEventNotifierNewCommand,
+                  vtkKWEventNotifierCommand);
   vtkTclCreateNew(interp,"vtkKWExtent", vtkKWExtentNewCommand,
                   vtkKWExtentCommand);
   vtkTclCreateNew(interp,"vtkKWGenericComposite", vtkKWGenericCompositeNewCommand,

@@ -109,7 +109,7 @@ vtkKWVolumeComposite::vtkKWVolumeComposite()
 
   this->RayCastID = 
     this->LODVolume->AddLOD( this->RayCastMapper,
-			     this->VolumeProperty, 11.0 );
+			     this->VolumeProperty, 11.0e10 );
 
   this->LowResTextureID = -1;
   this->MedResTextureID = -1;
@@ -348,5 +348,5 @@ void vtkKWVolumeComposite::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWComposite::SerializeRevision(os,indent);
   os << indent << "vtkKWVolumeComposite ";
-  this->ExtractRevision(os,"$Revision: 1.6 $");
+  this->ExtractRevision(os,"$Revision: 1.7 $");
 }

@@ -36,7 +36,7 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkObjectFactory.h"
 #include "vtkOutputWindow.h"
 #include "vtkKWWindow.h"
-
+#include "vtkKWEventNotifier.h"
 
 
 //------------------------------------------------------------------------------
@@ -89,6 +89,9 @@ vtkKWApplication::vtkKWApplication()
   this->Script("pack %s", this->BalloonHelpLabel->GetWidgetName());
   this->Script("wm overrideredirect %s 1", this->BalloonHelpWindow->GetWidgetName());
   this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
+
+  this->EventNotifier = vtkKWEventNotifier::New();
+  this->EventNotifier->SetApplication( this );
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -101,6 +104,8 @@ vtkKWApplication::~vtkKWApplication()
   this->BalloonHelpLabel->Delete();
   this->BalloonHelpLabel = NULL;
   this->SetBalloonHelpPending(NULL);
+
+  this->EventNotifier->Delete();
 }
 
 void vtkKWApplication::Script(char *format, ...)

@@ -212,6 +212,7 @@ public:
   void SetStillUpdateRates( int count, float *rates );
   vtkGetMacro( NumberOfStillUpdates, int );
   float *GetStillUpdateRates() { return this->StillUpdateRates; };
+  float GetStillUpdateRate(int i) { return this->StillUpdateRates[i]; };
 
   vtkSetClampMacro( RenderMode, int, 
 		    VTK_KW_INTERACTIVE_RENDER,
@@ -227,7 +228,12 @@ public:
     { this->RenderMode = VTK_KW_DISABLED_RENDER; };
 
 //BTX
+  // Description:
+  // Keep these methods public for use in non-member idle callback
+  // of vtkKWRenderView
   void SetMultiPassStillAbortCheckMethod(int (*f)(void *), void *arg);
+  int              (*MultiPassStillAbortCheckMethod)(void *);
+  void             *MultiPassStillAbortCheckMethodArg;
 //ETX
 
   // Description:
@@ -239,6 +245,12 @@ public:
   // Description:
   // Change the color of the annotation text
   void SetHeaderTextColor( float r, float g, float b );
+
+  // Description:
+  // Turn interactivity on / off - used for UI components that want 
+  // interactive rendering while values are being modified.
+  void InteractOn();
+  void InteractOff();
 
 protected:
   vtkKWView();
@@ -283,11 +295,6 @@ protected:
   int              NumberOfStillUpdates;
   int              RenderMode;
 
-//BTX
-  int              (*MultiPassStillAbortCheckMethod)(void *);
-//ETX
-
-  void             *MultiPassStillAbortCheckMethodArg;
   int Printing;
   float PrintTargetDPI;
 };

@@ -38,9 +38,11 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkKWObject.h"
 #include "tcl.h"
 #include "tk.h"
+
 class vtkKWWindowCollection;
 class vtkKWWindow;
 class vtkKWWidget;
+class vtkKWEventNotifier;
 
 class VTK_EXPORT vtkKWApplication : public vtkKWObject
 {
@@ -108,6 +110,10 @@ public:
   void BalloonHelpDisplay(vtkKWWidget *widget);
   void BalloonHelpCancel();
   
+  // Description:
+  // Get the event notifier so that callback can be set or events invoked.
+  vtkGetObjectMacro( EventNotifier, vtkKWEventNotifier );
+
 protected:
   vtkKWApplication();
   ~vtkKWApplication();
@@ -127,6 +133,8 @@ protected:
   vtkSetStringMacro(BalloonHelpPending);
 
   virtual int GetApplicationKey() {return -1;};
+
+  vtkKWEventNotifier *EventNotifier;
 };
 
 #endif

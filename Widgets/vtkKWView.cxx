@@ -820,7 +820,16 @@ void vtkKWView::HeaderChanged()
     }
 }
 
+void vtkKWView::InteractOn()
+{
+  this->SetRenderModeToInteractive();
+}
 
+void vtkKWView::InteractOff()
+{
+  this->SetRenderModeToStill();
+  this->Render();
+}
 
 // Description:
 // Chaining method to serialize an object and its superclasses.
@@ -908,5 +917,5 @@ void vtkKWView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWView ";
-  this->ExtractRevision(os,"$Revision: 1.9 $");
+  this->ExtractRevision(os,"$Revision: 1.10 $");
 }
