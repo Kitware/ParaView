@@ -96,7 +96,7 @@ class VTK_EXPORT vtkKWView : public vtkKWWidget
   // Description:
   // Sets up some default event handlers to allow
   // users to manipulate the view etc.
-  void SetupBindings();
+  virtual void SetupBindings();
 
   // Description:
   // Used to queue up expose event prior to processing.
