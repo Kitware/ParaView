@@ -816,7 +816,7 @@ const char* vtkPVInitialize::StandardFilterInterfaces=
 "         \">\n"
 "  <Filter type=\"vtkStreamTracer\"/>\n"
 "  <InputMenu id=\"im\" label=\"Input\" help=\"Set the input to this filter.\"\n"
-"             input_name=\"PVInput\" input_type=\"vtkPolyData\"/>\n"
+"             input_name=\"PVInput\" input_type=\"vtkDataSet\"/>\n"
 "  <ArrayMenu input_name=\"Input\" attribute_type=\"Vectors\" trace_name=\"Vectors\" \n"
 "             label=\"Vectors\" input_menu=\"im\" number_of_components=\"3\"\n"
 "             help=\"Select the input vectors to use.\"/>\n"
