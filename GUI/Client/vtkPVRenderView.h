@@ -277,6 +277,7 @@ public:
   void SetOrientationAxesInteractivity(int val);
   void OrientationAxesInteractiveCallback();
   void SetOrientationAxesOutlineColor(double r, double g, double b);
+  void SetOrientationAxesTextColor(double r, double g, double b);
 
   // Description:
   // Returns the UI created by the render module
@@ -346,6 +347,7 @@ protected:
   vtkKWCheckButton *OrientationAxesCheck;
   vtkKWCheckButton *OrientationAxesInteractiveCheck;
   vtkKWChangeColorButton *OrientationAxesOutlineColor;
+  vtkKWChangeColorButton *OrientationAxesTextColor;
   vtkPVAxesWidget *OrientationAxes;
 
   vtkKWSplitFrame *SplitFrame;

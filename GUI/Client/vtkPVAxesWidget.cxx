@@ -22,6 +22,7 @@
 #include "vtkPoints.h"
 #include "vtkPolyData.h"
 #include "vtkPolyDataMapper2D.h"
+#include "vtkProperty.h"
 #include "vtkProperty2D.h"
 #include "vtkPVAxesActor.h"
 #include "vtkRenderer.h"
@@ -29,7 +30,7 @@
 #include "vtkRenderWindowInteractor.h"
 
 vtkStandardNewMacro(vtkPVAxesWidget);
-vtkCxxRevisionMacro(vtkPVAxesWidget, "1.18");
+vtkCxxRevisionMacro(vtkPVAxesWidget, "1.19");
 
 vtkCxxSetObjectMacro(vtkPVAxesWidget, AxesActor, vtkPVAxesActor);
 vtkCxxSetObjectMacro(vtkPVAxesWidget, ParentRenderer, vtkRenderer);
@@ -782,6 +783,18 @@ void vtkPVAxesWidget::SetOutlineColor(double r, double g, double b)
 double* vtkPVAxesWidget::GetOutlineColor()
 {
   return this->OutlineActor->GetProperty()->GetColor();
+}
+
+void vtkPVAxesWidget::SetAxisLabelColor(double r, double g, double b)
+{
+  this->AxesActor->GetXAxisLabelProperty()->SetColor(r, g, b);
+  this->AxesActor->GetYAxisLabelProperty()->SetColor(r, g, b);
+  this->AxesActor->GetZAxisLabelProperty()->SetColor(r, g, b);
+}
+
+double* vtkPVAxesWidget::GetAxisLabelColor()
+{
+  return this->AxesActor->GetXAxisLabelProperty()->GetColor();
 }
 
 vtkRenderer* vtkPVAxesWidget::GetParentRenderer()

@@ -68,6 +68,11 @@ public:
   double *GetOutlineColor();
   
   // Description:
+  // Set/get the color of the axis labels of this widget.
+  void SetAxisLabelColor(double r, double g, double b);
+  double *GetAxisLabelColor();
+  
+  // Description:
   // Set/get the viewport to position/size this 3D widget.
   void SetViewport(double minX, double minY, double maxX, double maxY);
   double* GetViewport();

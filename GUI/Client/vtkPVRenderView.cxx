@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.331");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.332");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -209,6 +209,7 @@ vtkPVRenderView::vtkPVRenderView()
   this->OrientationAxesCheck = vtkKWCheckButton::New();
   this->OrientationAxesInteractiveCheck = vtkKWCheckButton::New();
   this->OrientationAxesOutlineColor = vtkKWChangeColorButton::New();
+  this->OrientationAxesTextColor = vtkKWChangeColorButton::New();
   this->OrientationAxes = vtkPVAxesWidget::New();
 
   int cc;
@@ -370,6 +371,7 @@ vtkPVRenderView::~vtkPVRenderView()
   this->OrientationAxesCheck->Delete();
   this->OrientationAxesInteractiveCheck->Delete();
   this->OrientationAxesOutlineColor->Delete();
+  this->OrientationAxesTextColor->Delete();
   this->OrientationAxes->Delete();
   
   if ( this->SelectionWindow )
@@ -1112,13 +1114,39 @@ void vtkPVRenderView::CreateViewProperties()
     }
   this->SetOrientationAxesOutlineColor(rgb[0], rgb[1], rgb[2]);
     
+  // Orientation axes settings: text color
+  
+  this->OrientationAxesTextColor->SetParent(
+    this->OrientationAxesFrame->GetFrame());
+  this->OrientationAxesTextColor->SetText("Set Axis Label Color");
+  this->OrientationAxesTextColor->Create(this->GetApplication(), 0);
+  this->OrientationAxesTextColor->SetCommand(this, "SetOrientationAxesTextColor");
+  if (pvapp && pvwindow)
+    {
+    pvwindow->RetrieveColor(2, "OrientationAxesText", rgb);
+    if (rgb[0] == -1)
+      {
+      rgb[0] = 1.0;
+      rgb[1] = 1.0;
+      rgb[2] = 1.0;
+      }
+    }
+  else
+    {
+    rgb[0] = 1.0;
+    rgb[1] = 1.0;
+    rgb[2] = 1.0;
+    }
+  this->SetOrientationAxesTextColor(rgb[0], rgb[1], rgb[2]);
+
   // Orientation axes settings: pack
   
   this->Script("pack %s %s -padx 2 -side top -anchor w",
                this->OrientationAxesCheck->GetWidgetName(),
                this->OrientationAxesInteractiveCheck->GetWidgetName());
-  this->Script("pack %s -padx 2 -fill x -side top -anchor w",
-               this->OrientationAxesOutlineColor->GetWidgetName());
+  this->Script("pack %s %s -padx 2 -fill x -side top -anchor w",
+               this->OrientationAxesOutlineColor->GetWidgetName(),
+               this->OrientationAxesTextColor->GetWidgetName());
 
   // Orientation axes widget
   
@@ -1921,6 +1949,9 @@ void vtkPVRenderView::SaveState(ofstream* file)
   color = this->OrientationAxesOutlineColor->GetColor();
   *file << "$kw(" << this->GetTclName() << ") SetOrientationAxesOutlineColor "
         << color[0] << " " << color[1] << " " << color[2] << endl;
+  color = this->OrientationAxesTextColor->GetColor();
+  *file << "$kw(" << this->GetTclName() << ") SetOrientationAxesTextColor "
+        << color[0] << " " << color[1] << " " << color[2] << endl;
   
   *file << "set kw(" << this->ManipulatorControl2D->GetTclName()
         << ") [$kw(" << this->GetTclName() << ") GetManipulatorControl2D]"
@@ -2254,6 +2285,22 @@ void vtkPVRenderView::SetOrientationAxesOutlineColor(double r, double g, double 
 }
 
 //----------------------------------------------------------------------------
+void vtkPVRenderView::SetOrientationAxesTextColor(double r, double g, double b)
+{
+  double *color = this->OrientationAxesTextColor->GetColor();
+  if (r != color[0] || g != color[1] || b != color[2])
+    {
+    this->OrientationAxesTextColor->SetColor(r, g, b);
+    }
+  this->AddTraceEntry("$kw(%s) SetOrientationAxesTextColor %lf %lf %lf",
+                      this->GetTclName(), r, g, b);
+  this->OrientationAxes->SetAxisLabelColor(r, g, b);
+  this->GetPVWindow()->SaveColor(2, "OrientationAxesText",
+                                 this->OrientationAxes->GetAxisLabelColor());
+  this->EventuallyRender();
+}
+
+//----------------------------------------------------------------------------
 void vtkPVRenderView::SetRenderWindowSize(int x, int y)
 {
   this->GetRenderWindow()->SetSize(x,y);
@@ -2397,6 +2444,7 @@ void vtkPVRenderView::UpdateEnableState()
   this->PropagateEnableState(this->OrientationAxesCheck);
   this->PropagateEnableState(this->OrientationAxesInteractiveCheck);
   this->PropagateEnableState(this->OrientationAxesOutlineColor);
+  this->PropagateEnableState(this->OrientationAxesTextColor);
   this->PropagateEnableState(this->SplitFrame);
   this->PropagateEnableState(this->NavigationFrame);
   this->PropagateEnableState(this->NavigationWindow);
