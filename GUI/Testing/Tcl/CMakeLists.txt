@@ -146,6 +146,23 @@ FOREACH (tfile ${PROJECT_TESTS})
     -C ${PVCompareImages}
     -T ${ParaView_BINARY_DIR}/Testing/Temporary
     -V ${PVClientTestData}/Baseline/${tfile}.png)
+  # repeat test in tiling mode if test tiling is on
+  IF (PARAVIEW_TEST_TILED_DISPLAY)
+    ADD_TEST(${tfile}-ParaView-TILED-MPI 
+      ${PARAVIEW_CS_EXECUTABLE}     
+      --test-server
+      ${TIMEOUT}
+      --server-preflags ${VTK_MPI_SERVER_PREFLAGS}
+      --client-postflags ${VTK_MPI_CLIENT_POSTFLAGS}
+      --disable-registry 
+      ${PVClientTests_SOURCE_DIR}/Tcl/${tfile}.pvs
+      -UC
+      -D ${PVClientTestData}
+      -C ${PVCompareImages}
+      -T ${ParaView_BINARY_DIR}/Testing/Temporary
+      -V ${PVClientTestData}/Baseline/${tfile}.png
+      )
+  ENDIF (PARAVIEW_TEST_TILED_DISPLAY)
 ENDFOREACH (tfile)
 
 # add some tests for the various ways that connections 
