@@ -22,6 +22,11 @@ SET(VTK_TCL_FILES
   "${ParaView_SOURCE_DIR}/VTK/Common/vtkObject.cxx"
   "${ParaView_SOURCE_DIR}/VTK/Common/vtkObjectBase.cxx")
 
+SET_SOURCE_FILES_PROPERTIES(
+  "${ParaView_SOURCE_DIR}/VTK/Common/vtkObjectBase.cxx"
+  ABSTRACT
+  )
+
 SET(EXE_EXT "")
 IF(WIN32)
   SET(EXE_EXT ".exe")
