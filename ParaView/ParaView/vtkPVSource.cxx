@@ -915,12 +915,13 @@ void vtkPVSource::DeleteCallback()
     }
   
   this->GetPVRenderView()->EventuallyRender();
-
-  this->GetPVWindow()->EnableMenus();
+  
+  window->EnableMenus();
   // This should delete this source.
-  this->GetPVWindow()->RemovePVSource("Sources", this);
+  // "this" will no longer be valid after the call.
+  window->RemovePVSource("Sources", this);
 
-  this->GetPVWindow()->SetCurrentPVSourceCallback(current);
+  window->SetCurrentPVSourceCallback(current);
 }
 
 //----------------------------------------------------------------------------
