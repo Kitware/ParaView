@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.22");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.23");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -64,6 +64,7 @@ vtkPVFileEntry::vtkPVFileEntry()
   this->BrowseButton = vtkKWPushButton::New();
   this->BrowseButton->SetParent(this);
   this->Extension = NULL;
+  this->SuppressReset = 1;
 }
 
 //----------------------------------------------------------------------------
