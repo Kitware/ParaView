@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThreshold);
-vtkCxxRevisionMacro(vtkPVThreshold, "1.47");
+vtkCxxRevisionMacro(vtkPVThreshold, "1.48");
 
 int vtkPVThresholdCommand(ClientData cd, Tcl_Interp *interp,
                           int argc, char *argv[]);
@@ -292,9 +292,9 @@ void vtkPVThreshold::UpdateScalars()
   this->MinMaxScale->SetMinValue(range[0]);
 }
 
-void vtkPVThreshold::SaveInTclScript(ofstream *file, int interactiveFlag, int vtkFlag)
+void vtkPVThreshold::SaveInTclScript(ofstream *file, int interactiveFlag, 
+                                     int vtkFlag)
 {
-  vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
   if (this->VisitedFlag)
     {

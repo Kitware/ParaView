@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.383");
+vtkCxxRevisionMacro(vtkPVWindow, "1.384");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1919,8 +1919,6 @@ int vtkPVWindow::Open(char *openFileName, int store)
                                            vtkKWMessageDialog::CancelDefault |
                                            vtkKWMessageDialog::Beep ) )
       {
-      vtkKWApplication* app = this->Application;
-
       vtkPVSelectCustomReader* dialog = vtkPVSelectCustomReader::New();
       vtkPVReaderModule* reader = dialog->SelectReader(this, openFileName);
       if ( !reader || this->OpenWithReader(openFileName, reader, 1) != VTK_OK )
@@ -2267,8 +2265,6 @@ const char* vtkPVWindow::ExtractFileExtension(const char* fname)
 //----------------------------------------------------------------------------
 void vtkPVWindow::ImportVTKScript(const char *name)
 {
-  vtkPVApplication* pvApp = static_cast<vtkPVApplication*>(this->Application);
-
   vtkPVSourceCollection* col = this->GetSourceList("Sources");
   while ( col->GetNumberOfItems() > 0 )
     {
@@ -3784,7 +3780,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.383 $");
+  this->ExtractRevision(os,"$Revision: 1.384 $");
 }
 
 //----------------------------------------------------------------------------

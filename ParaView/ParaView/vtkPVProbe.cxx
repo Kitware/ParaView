@@ -61,7 +61,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProbe);
-vtkCxxRevisionMacro(vtkPVProbe, "1.75");
+vtkCxxRevisionMacro(vtkPVProbe, "1.76");
 
 vtkCxxSetObjectMacro(vtkPVProbe, InputMenu, vtkPVInputMenu);
 
@@ -450,7 +450,6 @@ void vtkPVProbe::SaveInTclScript(ofstream *file, int interactiveFlag,
                                  int vtkFlag)
 {
   Tcl_Interp *interp = this->GetPVApplication()->GetMainInterp();
-  vtkPVSource *pvs = this->GetPVInput()->GetPVSource();
   
   if (this->VisitedFlag)
     {
