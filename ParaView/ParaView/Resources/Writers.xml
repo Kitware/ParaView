@@ -64,6 +64,6 @@
           writer="vtkDataSetWriter"
           data_mode_method="SetFileTypeToBinary"
           extension=".vtk"
-          file_description="VTK Files"/>
+          file_description="Legacy VTK Files"/>
 </ModuleInterfaces>
 
