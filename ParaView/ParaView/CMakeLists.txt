@@ -304,19 +304,19 @@ VTK_MAKE_INSTANTIATOR2(vtkParaViewInstantiator PVInstantiator_SRCS
   EXPORT_MACRO VTK_EXPORT
   HEADER_LOCATION ${PARAVIEW_BINARY_DIR}/ParaView)
 
+# Create Tcl wrappers for ParaView classes.
+VTK_WRAP_TCL2(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS}
+  ${ParaViewShared_SRCS} ${ParaViewClient_SRCS})
+ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
+  ${ParaView_SRCS})
+
 # Create ClientServer wrappers for ParaView classes.
 VTK_WRAP_ClientServer(vtkParaViewServerCS ParaViewServerCS_SRCS
   ${ParaViewShared_SRCS} ${ParaViewServer_SRCS}
   ${ParaViewExtraWrapper_SRCS})
 ADD_LIBRARY(vtkParaViewServerCS ${ParaViewServerCS_SRCS}
   ${ParaViewServer_SRCS})
-TARGET_LINK_LIBRARIES(vtkParaViewServerCS vtkPVFiltersCS vtkKWWidgetsTCL)
-
-# Create Tcl wrappers for ParaView classes.
-VTK_WRAP_TCL2(vtkKWParaViewTCL ParaViewTCL_SRCS ${PVInstantiator_SRCS}
-  ${ParaViewShared_SRCS} ${ParaViewClient_SRCS})
-ADD_LIBRARY(vtkKWParaViewTCL ${ParaViewTCL_SRCS} ${PVInstantiator_SRCS}
-  ${ParaView_SRCS})
+TARGET_LINK_LIBRARIES(vtkParaViewServerCS vtkPVFiltersCS vtkKWWidgetsTCL vtkKWParaViewTCL)
 
 IF(PARAVIEW_BUILD_DEVELOPMENT)
   FIND_LIBRARY(PARAVIEW_BLT_LIBRARY BLT

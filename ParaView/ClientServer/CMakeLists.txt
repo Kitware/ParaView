@@ -16,7 +16,7 @@ ADD_LIBRARY(vtkClientServer
   vtkType.h
   vtkTypeFromNative.h
   )
-TARGET_LINK_LIBRARIES(vtkClientServer vtkCommon)
+TARGET_LINK_LIBRARIES(vtkClientServer vtkKWCommonTCL)
 IF(BUILD_SHARED_LIBS)
   INSTALL_TARGETS(${KW_INSTALL_LIB_DIR} vtkClientServer)
 ENDIF(BUILD_SHARED_LIBS)

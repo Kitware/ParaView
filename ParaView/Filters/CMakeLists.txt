@@ -6,6 +6,7 @@ SET(Filters_SRCS
   vtkCleanUnstructuredGrid.cxx
   vtkColorByPart.cxx
   vtkGroup.cxx
+  vtkKdTree.cxx
   vtkMergeArrays.cxx
   vtkMultiOut2.cxx
   vtkMultiOut3.cxx
@@ -60,7 +61,7 @@ ENDIF(NOT PARAVIEW_NO_HDF5)
 
 # Create filters library.
 ADD_LIBRARY(vtkPVFilters ${Filters_SRCS})
-TARGET_LINK_LIBRARIES(vtkPVFilters vtkHybrid vtkParallel)
+TARGET_LINK_LIBRARIES(vtkPVFilters vtkKWCommonTCL vtkHybrid vtkParallel)
 IF (VTK_USE_PATENTED)
   TARGET_LINK_LIBRARIES(vtkPVFilters vtkPatented)
 ENDIF (VTK_USE_PATENTED)

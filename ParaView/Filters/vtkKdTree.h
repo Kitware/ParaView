@@ -67,7 +67,7 @@ class vtkCamera;
    }
 //BTX
 
-class vtkKdNode{
+class VTK_EXPORT vtkKdNode{
 public:
 
   vtkKdNode();
@@ -153,38 +153,31 @@ public:
 
     // Description:
     //    Omit partitions along the X axis, yielding shafts in the X direction
-    void OmitXPartitioning()
-      {this->Modified(); this->ValidDirections = (1 << vtkKdTree::ydim) | (1 << vtkKdTree::zdim);}
+  void OmitXPartitioning();
 
     // Description:
     //    Omit partitions along the Y axis, yielding shafts in the Y direction
-    void OmitYPartitioning()
-      {this->Modified(); this->ValidDirections = (1 << vtkKdTree::zdim) | (1 << vtkKdTree::xdim);}
+  void OmitYPartitioning();
 
     // Description:
     //    Omit partitions along the Z axis, yielding shafts in the Z direction
-    void OmitZPartitioning()
-      {this->Modified(); this->ValidDirections = (1 << vtkKdTree::xdim) | (1 << vtkKdTree::ydim);}
+  void OmitZPartitioning();
 
     // Description:
     //    Omit partitions along the X and Y axes, yielding slabs along Z
-    void OmitXYPartitioning()
-      {this->Modified(); this->ValidDirections = (1 << vtkKdTree::zdim);}
+  void OmitXYPartitioning();
 
     // Description:
     //    Omit partitions along the Y and Z axes, yielding slabs along X
-    void OmitYZPartitioning()
-      {this->Modified(); this->ValidDirections = (1 << vtkKdTree::xdim);}
+  void OmitYZPartitioning();
 
     // Description:
     //    Omit partitions along the Z and X axes, yielding slabs along Y
-    void OmitZXPartitioning()
-      {this->Modified(); this->ValidDirections = (1 << vtkKdTree::ydim);}
+  void OmitZXPartitioning();
 
     // Description:
     //    Partition along all three axes - this is the default
-    void OmitNoPartitioning()
-      {this->Modified(); this->ValidDirections = ((1 << vtkKdTree::xdim)|(1 << vtkKdTree::ydim)|(1 << vtkKdTree::zdim));}
+  void OmitNoPartitioning();
 
     // Description:
     //   Add a data set to the list of those included in spatial paritioning
