@@ -378,6 +378,43 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, char *frameArgs)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SetTimeStart(float t)
+{
+  this->TimeStart = t;
+
+  if (this->Application)
+    {
+    this->TimeStartEntry->SetValue(this->TimeStart, 2);
+    this->EntryCallback();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SetTimeEnd(float t)
+{
+  this->TimeEnd = t;
+
+  if (this->Application)
+    {
+    this->TimeEndEntry->SetValue(this->TimeEnd, 2);
+    this->EntryCallback();
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SetTimeStep(float t)
+{
+  this->TimeStep = t;
+
+  if (this->Application)
+    {
+    this->TimeStepEntry->SetValue(this->TimeStep, 2);
+    this->EntryCallback();
+    }
+}
+
+
+//----------------------------------------------------------------------------
 void vtkPVAnimationInterface::EntryCallback()
 {
   this->TimeStart = this->TimeStartEntry->GetValueAsFloat();
@@ -438,6 +475,18 @@ void vtkPVAnimationInterface::ScriptCheckButtonCallback()
     this->Script("pack forget %s", 
                  this->ScriptEditor->GetWidgetName());
     }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SetScriptCheckButtonState(int val)
+{
+  if (this->ScriptCheckButton->GetState() == val)
+    {
+    return;
+    }
+
+  this->ScriptCheckButton->SetState(val);
+  this->ScriptCheckButtonCallback();
 }
 
 //----------------------------------------------------------------------------
@@ -552,6 +601,17 @@ void vtkPVAnimationInterface::UpdateSourceMenu()
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SetScript(const char* script)
+{
+  this->ScriptEditor->SetValue(script);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkPVAnimationInterface::GetScript()
+{
+  return this->ScriptEditor->GetValue();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVAnimationInterface::UpdateMethodMenu()
@@ -706,12 +766,57 @@ void vtkPVAnimationInterface::SetMethodInterfaceIndex(int idx)
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetWindow(vtkPVWindow *window)
 {
   this->Window = window;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 {
   this->View = renderView;
 }
+
+
+//----------------------------------------------------------------------------
+void vtkPVAnimationInterface::SaveInTclScript(ofstream *file, 
+                                              const char *fileRoot)
+{
+  float t;
+  float sgn;
+  char countStr[100];
+
+  // We need a different end test if the step is negative.
+  sgn = 1.0;
+  if (this->TimeStep < 0)
+    {
+    sgn = -1.0;
+    }
+
+  t = this->GetTimeStart();
+  *file << "set pvTime " << t << "\n\n";
+  *file << this->GetScript() << endl;
+  sprintf(countStr, "%05d", (int)(t));
+  *file << "RenWin1 Render\n";
+  *file << "WinToImage Modified\n";
+  *file << "Writer SetFileName {" << fileRoot << countStr << ".jpg}\n";
+  *file << "Writer Write\n"; 
+
+  while ((sgn*t) < (sgn*this->TimeEnd))
+    {
+    t = t + this->TimeStep;
+    if ((sgn*t) > (sgn*this->TimeEnd))
+      {
+      t = this->TimeEnd;
+      }
+    *file << "set pvTime " << t << "\n\n";
+    *file << this->GetScript() << endl;
+    sprintf(countStr, "%05d", (int)(t));
+    *file << "RenWin1 Render\n";
+    *file << "WinToImage Modified\n";
+    *file << "Writer SetFileName {" << fileRoot << countStr << ".jpg}\n";
+    *file << "Writer Write\n"; 
+    }
+}
+

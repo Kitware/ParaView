@@ -281,6 +281,15 @@ public:
   // Experimenting with wizards.
   void WizardCallback();
 
+  // Description:
+  // Access to the animation interface for scripting.
+  vtkPVAnimationInterface* GetAnimationInterface() {return this->AnimationInterface;}
+
+  // Description:
+  // Experimenting with modules.
+  int LoadModule(const char *name);
+  int GetModuleLoaded(const char *name);
+
 protected:
   vtkPVWindow();
   ~vtkPVWindow();
@@ -358,8 +367,8 @@ private:
   static const char* StandardSourceInterfaces;
   static const char* StandardFilterInterfaces;
 
-  // Flag to see if we could load the XDMFReader library
-  int XDMF;
+  // Modules.
+  vtkStringList *Modules;
   vtkPVSource *OpenXML(const char *openFileName, const char *rootName);
 };
 

@@ -182,7 +182,7 @@ vtkPVWindow::vtkPVWindow()
 
   this->SetMenuPropertiesTitle("View");
 
-  this->XDMF = 0;
+  this->Modules = vtkStringList::New();
 }
 
 //----------------------------------------------------------------------------
@@ -201,6 +201,8 @@ vtkPVWindow::~vtkPVWindow()
     this->TclInteractor->Delete();
     }
   this->TclInteractor = NULL;
+
+  this->Modules->Delete();
 }
 
 //----------------------------------------------------------------------------
@@ -771,12 +773,11 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
 	       this->GetWidgetName(), this->GetTclName());
 
-
-  pvApp->BroadcastScript("catch {load vtkARLTCL.dll}");
-  if (this->GetIntegerResult(app) == 0)
+  // Try to load modules we know about.
+  if (this->LoadModule("vtkARLTCL.pvm"))
     {
-    this->XDMF = 1;
-    this->MenuFile->InsertCommand(2, "CTH Wizard", this, "WizardCallback",0);
+    // Load Modules should really look for wizards.
+    this->AdvancedMenu->InsertCommand(2, "CTH Wizard", this, "WizardCallback",0);
     }
 }
 
@@ -925,7 +926,9 @@ void vtkPVWindow::OpenCallback()
   }
   
   char *openFileName = NULL;
-  if (this->XDMF)
+
+  // Once again:  Load modules should be able to add extension and readers transparently.
+  if (this->GetModuleLoaded("vtkARLTCL.pvm"))
     {
 #ifdef _WIN32  
     this->Script("set openFileName [tk_getOpenFile -initialdir {%s} -filetypes {{{ParaView Files} {*.xml;*.vtk;*.pvtk;*.stl;*.pop;*.case}}  {{XDMF files} {.xml}} {{VTK files} {.vtk}} {{PVTK files} {.pvtk}} {{EnSight files} {.case}} {{POP files} {.pop}} {{STL files} {.stl}}}]", buffer);
@@ -1040,7 +1043,7 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
     {
     sInt = this->GetSourceInterface("vtkSTLReader");
     }
-  else if (this->XDMF && strcmp(extension, ".xml") == 0)
+  else if (this->GetModuleLoaded("vtkARLTCL.pvm") && strcmp(extension, ".xml") == 0)
     {
     return this->OpenXML(openFileName, rootName);
     }
@@ -1319,6 +1322,10 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
 {
   ofstream *file;
   vtkPVSource *pvs;
+  int num, idx;
+  int imageFlag = 0;
+  int animationFlag = 0;
+  char *path = NULL;
       
   file = new ofstream(filename, ios::out);
   if (file->fail())
@@ -1341,6 +1348,13 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
   else
     {
     *file << "# Script generated for regression test within ParaView.\n";
+    }
+
+  // Save the modules.
+  num = this->Modules->GetNumberOfStrings();
+  for (idx = 0; idx < num; ++idx)
+    {
+    *file << "catch {load " << this->Modules->GetString(idx) << "}\n";
     }
 
   this->GetMainView()->SaveInTclScript(file, vtkFlag);
@@ -1366,14 +1380,79 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
       pvs->SaveInTclScript(file);
       }
     }
-    
-  if (vtkFlag)
+  
+  // Descide what this script should do.
+  // Save an image or series of images, or run interactively.
+  const char *script = this->AnimationInterface->GetScript();
+  if (script && strlen(script) > 0)
     {
-    *file << "# enable user interface interactor\n"
-          << "iren SetUserMethod {wm deiconify .vtkInteract}\n"
-          << "iren Initialize\n\n"
-          << "# prevent the tk window from showing up then start the event loop\n"
-          << "wm withdraw .\n";
+    if (vtkKWMessageDialog::PopupYesNo(this->Application, this, 
+			       vtkKWMessageDialog::Question, "Animation", 
+			       "Do you want your script to generate an animation?"))
+      {
+      animationFlag = 1;
+      }
+    }
+  
+  if (animationFlag == 0)
+    {
+    if (vtkKWMessageDialog::PopupYesNo(this->Application, this, 
+			       vtkKWMessageDialog::Question, "Image", 
+			       "Do you want your script to save an image?"))
+      {
+      imageFlag = 1;
+      }
+    }
+
+  if (animationFlag || imageFlag)
+    {
+    this->Script("tk_getSaveFile -title {Save Image} -defaultextension {.jpg} -filetypes {{{JPEG Images} {.jpg}} {{PNG Images} {.png}} {{Binary PPM} {.ppm}} {{TIFF Images} {.tif}}}");
+    path = strcpy(new char[strlen(this->Application->GetMainInterp()->result)+1], 
+	                this->Application->GetMainInterp()->result);
+    }
+
+  if (path && strlen(path) > 0)
+    {
+    *file << "vtkWindowToImageFilter WinToImage\n\t";
+    *file << "WinToImage SetInput RenWin1\n";
+    *file << "vtkJPEGWriter Writer\n\t";
+    *file << "Writer SetInput [WinToImage GetOutput]\n";
+    if (vtkKWMessageDialog::PopupYesNo(this->Application, this, 
+			       vtkKWMessageDialog::Question, "Offscreen", 
+			       "Do you want offscreen rendering?"))
+      {
+      *file << "RenWin1 SetOffScreenRendering 1\n";
+      }    
+   
+    if (imageFlag)
+      {
+      *file << "RenWin1 Render\n";
+      *file << "Writer SetFileName {" << path << "}\n\t";
+      *file << "Writer Write\n";
+      }
+    if (animationFlag)
+      {
+      int length = strlen(path);
+      if (strcmp(path+length-4, ".jpg") == 0)
+        {
+        path[length-4] = '\0';
+        }
+      this->AnimationInterface->SaveInTclScript(file, path);
+      }
+    delete [] path;
+    *file << "vtkCommand DeleteAllObjects\n";
+    *file << "exit";
+    }
+  else
+    {
+    if (vtkFlag)
+      {
+      *file << "# enable user interface interactor\n"
+            << "iren SetUserMethod {wm deiconify .vtkInteract}\n"
+            << "iren Initialize\n\n"
+            << "# prevent the tk window from showing up then start the event loop\n"
+            << "wm withdraw .\n";
+      }
     }
 
   if (file)
@@ -1382,7 +1461,6 @@ void vtkPVWindow::SaveInTclScript(const char* filename, int vtkFlag)
     delete file;
     file = NULL;
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -2727,11 +2805,42 @@ int vtkPVWindow::ReadSourceInterfacesFromDirectory(const char* directory)
 }
 
 
+//----------------------------------------------------------------------------
+int vtkPVWindow:: LoadModule(const char *name)
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  pvApp->BroadcastScript("catch {load %s}", name);
+  if (this->GetIntegerResult(pvApp) == 0)
+    {
+    this->Modules->AddString(name);
+    return 1;
+    }
+  return 0;
+}
+
+//----------------------------------------------------------------------------
+int vtkPVWindow::GetModuleLoaded(const char *name)
+{
+  const char *module;
+  int num, idx;
+
+  num = this->Modules->GetNumberOfStrings();
+  for (idx = 0; idx < num; ++idx)
+    {
+    module = this->Modules->GetString(idx);
+    if (strcmp(module,name) == 0)
+      {
+      return 1;
+      }
+    }
+  return 0;
+}
 
 //----------------------------------------------------------------------------
 void vtkPVWindow::WizardCallback()
 {
-  if (this->XDMF == 0)
+  if (this->GetModuleLoaded("vtkARLTCL.pvm") == 0)
     {
     return;
     }

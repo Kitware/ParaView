@@ -63,11 +63,11 @@ public:
 
   // Description:
   // Access to the animation parmeters
-  vtkSetMacro(TimeStart, float);
+  void SetTimeStart(float t);
   vtkGetMacro(TimeStart, float);
-  vtkSetMacro(TimeEnd, float);
+  void SetTimeEnd(float t);
   vtkGetMacro(TimeEnd, float);
-  vtkSetMacro(TimeStep, float);
+  void SetTimeStep(float t);
   vtkGetMacro(TimeStep, float);
   void SetCurrentTime(float time);
   float GetCurrentTime();
@@ -130,6 +130,16 @@ public:
   // Description:
   // Method callback to toggle between source/method and script editor.
   void ScriptCheckButtonCallback();
+
+  // Description:
+  // Access to the interface from scripts.
+  void SetScriptCheckButtonState(int);
+  void SetScript(const char* script);
+  const char *GetScript();
+
+  // Description:
+  // Make the tcl script save the images of the animation.
+  void SaveInTclScript(ofstream *file, const char *fileRoot);
 
 protected:
   vtkPVAnimationInterface();

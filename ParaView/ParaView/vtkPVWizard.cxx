@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVWindow.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVSelectionList.h"
+#include "vtkPVAnimationInterface.h"
 #include "vtkKWLabel.h"
 #include "vtkKWLabeledEntry.h"
 #include "vtkKWPushButton.h"
@@ -77,7 +78,10 @@ vtkPVWizard::vtkPVWizard()
   this->ReaderTclName = NULL;
 
   this->FirstFileName = NULL;
+  this->FirstFileNumber = 0;
   this->LastFileName = NULL;
+  this->LastFileNumber = 0;
+  this->FilePattern = NULL;
   this->Stride = 0;
   this->MaterialChecks = vtkCollection::New();
   this->ColorArrayName = NULL;
@@ -116,6 +120,7 @@ vtkPVWizard::~vtkPVWizard()
 
   this->SetFirstFileName(NULL);
   this->SetLastFileName(NULL);
+  this->SetFilePattern(NULL);
   this->MaterialChecks->Delete();
   this->MaterialChecks = NULL;
   this->SetColorArrayName(NULL);
@@ -242,6 +247,88 @@ void vtkPVWizard::CheckForValidFile(int gate)
 }
 
 //----------------------------------------------------------------------------
+void vtkPVWizard::CheckForFilePattern()
+{
+  const char* lastFileName;
+  const char *ptr1, *ptr2;
+  int idx;
+  int numStart, numEnd;
+  int numDigits;
+  char numString[100];
+
+  lastFileName = this->FileEntry->GetValue();
+
+  if (lastFileName == NULL || lastFileName[0] == '\0')
+    {
+    return;
+    }
+
+  idx = strlen(lastFileName);
+  if (idx != (int)(strlen(this->FirstFileName)))
+    {
+    vtkErrorMacro("Expecting file names to be the same length.");
+    this->Done = 0;
+    return;
+    }
+
+  // Look for the numbers starting from the end of the string.
+  ptr1 = this->FirstFileName + idx;
+  ptr2 = lastFileName + idx-1;
+  while ( ! isdigit(*ptr1) || ! isdigit(*ptr2) )
+    {
+    --idx;
+    if (idx < 0)
+      {
+      vtkErrorMacro("Could not find the common file number.");
+      this->Done = 0;
+      return;
+      }
+    --ptr1;
+    --ptr2;
+    }
+  numEnd = idx;
+  while ( isdigit(*ptr1) && isdigit(*ptr2) && idx >= 0 )
+    {
+    --idx;
+    --ptr1;
+    --ptr2;
+    }
+  numStart = idx+1;
+  numDigits = numEnd-numStart+1;
+
+  // Extract the numbers.
+  strncpy(numString, this->FirstFileName+numStart, numDigits);
+  numString[numEnd-numStart+1] = '\0';
+  this->FirstFileNumber = atoi(numString);
+  strncpy(numString, lastFileName+numStart, numDigits);
+  numString[numEnd-numStart+1] = '\0';
+  this->LastFileNumber = atoi(numString);
+
+  if (this->LastFileNumber < this->FirstFileNumber)
+    {
+    vtkErrorMacro("File numbers " << ptr1 << " and " << ptr2 
+                  << " are not formed properly.");
+    this->Done = 0;
+    return;
+    }
+
+  // Extract the pattern.
+  if (this->FilePattern)
+    {
+    delete [] this->FilePattern;
+    this->FilePattern = NULL;
+    }
+  this->FilePattern = new char[strlen(lastFileName) + 10];
+  strncpy(this->FilePattern, lastFileName, numStart);
+  this->FilePattern[numStart] = '%';
+  sprintf(this->FilePattern+numStart+1, "0%dd%s", 
+          numDigits, lastFileName+numEnd+1);
+}
+
+
+
+
+//----------------------------------------------------------------------------
 int vtkPVWizard::Invoke(vtkPVWindow *pvWin)
 {
   this->Application->SetDialogUp(1);
@@ -293,6 +380,8 @@ void vtkPVWizard::SetupPipeline(vtkPVWindow *pvWin)
   // Setup the reader.
   this->Script("set cthReader [%s Open {%s}]", pvWin->GetTclName(),
                this->FirstFileName);
+  this->Script("[$cthReader GetPVWidget Stride] SetValue %d %d %d",
+               this->Stride, this->Stride, this->Stride);
   this->Script("[$cthReader GetPVWidget CellArraySelection] AllOffCallback");
   if (this->ColorArrayName)
     {
@@ -314,6 +403,7 @@ void vtkPVWizard::SetupPipeline(vtkPVWindow *pvWin)
 
   // Create the Iso surfaces.
   this->MaterialChecks->InitTraversal();
+  this->SetString(NULL);
   while ( (check = (vtkKWCheckButton*)(this->MaterialChecks->GetNextItemAsObject())) )
     {
     this->Script("%s SetCurrentPVSource $cthFilter", pvWin->GetTclName());
@@ -327,7 +417,31 @@ void vtkPVWizard::SetupPipeline(vtkPVWindow *pvWin)
       {
       this->Script("[$cthContour GetPVOutput] ColorByPointFieldComponent {%s} 0",
                    this->ColorArrayName);
+      // This is for displaying the color bar.  It has to be done at the end.
+      this->Script("%s SetString $cthContour", this->GetTclName()); 
       }
+    }
+
+  // This is for displaying the color bar.  It has to be done at the end.
+  if (this->String)
+    {
+    this->Script("%s SetCurrentPVSource %s", pvWin->GetTclName(), this->String);
+    this->Script("[%s GetPVOutput] SetScalarBarVisibility 1", this->String);
+    } 
+
+  // Now setup the animation page.
+  if (this->LastFileName && strlen(this->LastFileName) > 0)
+    {
+    vtkPVAnimationInterface *ai = pvWin->GetAnimationInterface();
+    this->Script("%s SetPVSource $cthReader", ai->GetTclName());
+    ai->SetScriptCheckButtonState(1);
+    this->Script("%s SetString [$cthReader GetVTKSource]", this->GetTclName());
+    this->Script("%s SetScript {%s SetFileName [format {%s} [expr int($pvTime)]]}", 
+                 ai->GetTclName(), this->String, this->FilePattern);
+    
+    ai->SetTimeStart(this->FirstFileNumber);
+    ai->SetTimeEnd(this->LastFileNumber);
+    ai->SetTimeStep(1.0);
     }
 }
 
@@ -371,7 +485,11 @@ void vtkPVWizard::QueryLastFileName()
   this->Done = 0;
   while (this->Done == 0)
     {
-    Tcl_DoOneEvent(0);    
+    Tcl_DoOneEvent(0);
+    if (this->Done == 1)
+      {
+      this->CheckForFilePattern();
+      }
     }
 
   this->SetLastFileName(this->FileEntry->GetValue());

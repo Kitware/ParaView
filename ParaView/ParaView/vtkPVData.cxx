@@ -2192,11 +2192,11 @@ void vtkPVData::SaveInTclScript(ofstream *file)
     *file << result << "\n\t"
           << this->ScalarBarTclName << " SetLookupTable ["
           << this->MapperTclName << " GetLookupTable]\n\t"
-          << this->ScalarBarTclName << " SetTitle ";
+          << this->ScalarBarTclName << " SetTitle {";
     this->Script("set tempResult [%s GetTitle]",
                  this->ScalarBarTclName);
     result = this->GetPVApplication()->GetMainInterp()->result;
-    *file << result << "\n";
+    *file << result << "}\n";
     *file << renTclName << " AddProp " << this->ScalarBarTclName << "\n";
     }
 

@@ -120,6 +120,11 @@ protected:
   void QueryColoredMaterials();
   void SetupPipeline(vtkPVWindow *pvWin);
 
+  // Description:
+  // This extracts the file pattern and numbers from the first and last file.
+  // If there is an error, then done is set to 0.
+  void CheckForFilePattern();
+
   vtkKWWidget *WizardFrame;
   vtkKWLabel *Label;
 
@@ -134,8 +139,12 @@ protected:
 
   vtkSetStringMacro(FirstFileName);
   char *FirstFileName;
+  int   FirstFileNumber;
   vtkSetStringMacro(LastFileName);
   char *LastFileName;
+  int   LastFileNumber;
+  vtkSetStringMacro(FilePattern);
+  char *FilePattern;
   int Stride;
   vtkCollection *MaterialChecks;
   vtkSetStringMacro(ColorArrayName);

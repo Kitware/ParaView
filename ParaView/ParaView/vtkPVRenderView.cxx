@@ -1017,14 +1017,21 @@ void vtkPVRenderView::SaveInTclScript(ofstream *file, int vtkFlag)
   float viewUp[3];
   float viewAngle;
   float clippingRange[2];
+  float *color;
+  int *size;
 
+  size = this->RenderWindow->GetSize();
   if (vtkFlag)
     {
-    *file << "vtkRenderer " << this->RendererTclName << "\n"
-          << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
+    *file << "vtkRenderer " << this->RendererTclName << "\n\t";
+    color = this->Renderer->GetBackground();
+    *file << this->RendererTclName << " SetBackground "
+          << color[0] << " " << color[1] << " " << color[2] << endl;
+    *file << "vtkRenderWindow " << this->RenderWindowTclName << "\n\t"
           << this->RenderWindowTclName << " AddRenderer "
-          << this->RendererTclName << "\n"
-          << "vtkRenderWindowInteractor iren\n\t"
+          << this->RendererTclName << "\n\t";
+    *file << this->RenderWindowTclName << " SetSize " << size[0] << " " << size[1] << endl;
+    *file << "vtkRenderWindowInteractor iren\n\t"
           << "iren SetRenderWindow " << this->RenderWindowTclName << "\n\n";
     *file << "vtkTreeComposite treeComp\n\t"
           << "treeComp SetRenderWindow " << this->RenderWindowTclName << "\n\n";
