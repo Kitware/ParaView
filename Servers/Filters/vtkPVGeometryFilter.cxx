@@ -40,7 +40,7 @@
 #include "vtkCallbackCommand.h"
 #include "vtkGarbageCollector.h"
 
-vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.42");
+vtkCxxRevisionMacro(vtkPVGeometryFilter, "1.43");
 vtkStandardNewMacro(vtkPVGeometryFilter);
 
 vtkCxxSetObjectMacro(vtkPVGeometryFilter, Controller, vtkMultiProcessController);
@@ -262,27 +262,30 @@ void vtkPVGeometryFilter::ExecuteCellNormals(vtkPolyData *output)
     {
     skip = 1;
     }
-  // An MPI gather or reduce would be easier ...
-  if (this->Controller->GetLocalProcessId() == 0)  
+  if( this->Controller )
     {
-    int tmp, idx;
-    for (idx = 1; idx < this->Controller->GetNumberOfProcesses(); ++idx)
+    // An MPI gather or reduce would be easier ...
+    if (this->Controller->GetLocalProcessId() == 0)  
       {
-      this->Controller->Receive(&tmp, 1, idx, 89743);
-      if (tmp)
+      int tmp, idx;
+      for (idx = 1; idx < this->Controller->GetNumberOfProcesses(); ++idx)
         {
-        skip = 1;
+        this->Controller->Receive(&tmp, 1, idx, 89743);
+        if (tmp)
+          {
+          skip = 1;
+          }
+        }
+      for (idx = 1; idx < this->Controller->GetNumberOfProcesses(); ++idx)
+        {
+        this->Controller->Send(&skip, 1, idx, 89744);
         }
       }
-    for (idx = 1; idx < this->Controller->GetNumberOfProcesses(); ++idx)
+    else
       {
-      this->Controller->Send(&skip, 1, idx, 89744);
+      this->Controller->Send(&skip, 1, 0, 89743);
+      this->Controller->Receive(&skip, 1, 0, 89744);
       }
-    }
-  else
-    {
-    this->Controller->Send(&skip, 1, 0, 89743);
-    this->Controller->Receive(&skip, 1, 0, 89744);
     }
   if (skip)
     {
