@@ -169,7 +169,7 @@ SET( ParaView_SRCS
 IF (VTK_USE_PATENTED)
   SET( ParaView_SRCS
     ${ParaView_SRCS}
-    vtkPVKitwareContourFilter)
+    vtkPVKitwareContourFilter.cxx)
 ENDIF (VTK_USE_PATENTED)
 
 IF(NOT PARAVIEW_NO_HDF5)
@@ -264,23 +264,39 @@ IF(MAKE_SYSTEM OR UNIX)
 ENDIF(MAKE_SYSTEM OR UNIX)
 SET(CMD ${EXECUTABLE_OUTPUT_PATH}${CFG_INIT}/ProcessXML${EXE_EXT})
 
-ADD_CUSTOM_COMMAND(
-  SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/ProcessXML.cxx
-  TARGET vtkKWParaViewTCL
-  DEPENDS 
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Filters.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Manipulators.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Sources.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Readers.xml
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Writers.xml
-  ${CMD}
-  OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
-  COMMAND ${CMD}
-  ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
-  ${CMAKE_CURRENT_SOURCE_DIR}/Resources
-  Filters Manipulators Readers Sources Writers)
-
-ADD_DEPENDENCIES(vtkKWParaViewTCL ProcessXML)
+SET(cmver "${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}")
+IF("${cmver}" GREATER 1.6)
+  ADD_CUSTOM_COMMAND(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
+    DEPENDS 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Filters.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Manipulators.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Sources.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Readers.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Writers.xml
+    ProcessXML
+    COMMAND ${CMD}
+    ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources
+    Filters Manipulators Readers Sources Writers)
+ELSE("${cmver}" GREATER 1.6)
+  ADD_CUSTOM_COMMAND(
+    SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/ProcessXML.cxx
+    TARGET vtkKWParaViewTCL
+    DEPENDS 
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Filters.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Manipulators.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Sources.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Readers.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Writers.xml
+    ${CMD}
+    OUTPUTS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
+    COMMAND ${CMD}
+    ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources
+    Filters Manipulators Readers Sources Writers)
+  ADD_DEPENDENCIES(vtkKWParaViewTCL ProcessXML)
+ENDIF("${cmver}" GREATER 1.6)
 
 SET_SOURCE_FILES_PROPERTIES(vtkPVInitialize.cxx PROPERTIES OBJECT_DEPENDS 
   ${CMAKE_CURRENT_BINARY_DIR}/vtkPVGeneratedModules.h)
