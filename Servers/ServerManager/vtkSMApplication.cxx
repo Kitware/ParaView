@@ -43,7 +43,7 @@ struct vtkSMApplicationInternals
 };
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.12");
+vtkCxxRevisionMacro(vtkSMApplication, "1.13");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -128,6 +128,11 @@ void vtkSMApplication::Initialize()
   delete[] init_string;
 
   init_string =  vtkSMDefaultModulesrenderingGetInterfaces();
+  parser->Parse(init_string);
+  parser->ProcessConfiguration(proxyM);
+  delete[] init_string;
+
+  init_string =  vtkSMDefaultModuleswritersGetInterfaces();
   parser->Parse(init_string);
   parser->ProcessConfiguration(proxyM);
   delete[] init_string;

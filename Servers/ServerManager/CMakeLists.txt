@@ -61,6 +61,7 @@ SET( ServerManagerCommon_SRCS
   vtkSMXDMFInformationHelper.cxx
   vtkSMXDMFPropertyDomain.cxx
   vtkSMVectorProperty.cxx
+  vtkSMWriterProxy.cxx
   vtkSMDisplay.cxx
   vtkSMPartDisplay.cxx
   vtkSMCompositePartDisplay.cxx
@@ -199,12 +200,13 @@ ADD_CUSTOM_COMMAND(
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/readers.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
+  ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
   kwProcessXML
   COMMAND ${CMD}
   ARGS ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h
   ${CMAKE_CURRENT_SOURCE_DIR}/Resources
   vtkSMDefaultModules Interface GetInterfaces
-  filters readers sources utilities rendering)
+  filters readers sources utilities rendering writers)
 
 SET_SOURCE_FILES_PROPERTIES(vtkSMApplication.cxx PROPERTIES OBJECT_DEPENDS 
   ${CMAKE_CURRENT_BINARY_DIR}/vtkSMGeneratedModules.h)
@@ -219,6 +221,7 @@ IF(BUILD_SHARED_LIBS)
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/rendering.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/sources.xml
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/utilities.xml
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/writers.xml
     )
 ENDIF(BUILD_SHARED_LIBS)
 
