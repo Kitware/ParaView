@@ -128,7 +128,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.238");
+vtkCxxRevisionMacro(vtkPVApplication, "1.239");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -245,6 +245,10 @@ public:
         delete [] rmessage;
         }
       }
+    else
+      {
+      this->Errors.push_back(t);
+      }
   }
   
   vtkPVOutputWindow()
@@ -256,7 +260,25 @@ public:
   
   void SetWindowCollection(vtkKWWindowCollection *windows)
   {
+    vtkKWWindowCollection* win = this->Windows;
     this->Windows = windows;
+    if ( !win )
+      {
+      ostrstream str;
+      int cc;
+      for ( cc = 0; cc < this->Errors.size(); cc ++ )
+        {
+        str << this->Errors[cc].c_str() << endl;
+        }
+      str << ends;
+      vtkKWWindow *win = this->Windows->GetLastKWWindow();
+      if ( cc > 0 )
+        {
+        win->ErrorMessage(str.str());
+        }
+      str.rdbuf()->freeze(0);
+      this->Errors.erase(this->Errors.begin(), this->Errors.end());
+      }
   }
 
   int GetErrorOccurred()
@@ -270,6 +292,7 @@ protected:
   vtkKWWindowCollection *Windows;
   int ErrorOccurred;
   int TestErrors;
+  vtkstd::vector<vtkstd::string> Errors;
 private:
   vtkPVOutputWindow(const vtkPVOutputWindow&);
   void operator=(const vtkPVOutputWindow&);
@@ -1046,6 +1069,10 @@ int vtkPVApplication::ParseCommandLineArguments(int argc, char*argv[])
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
+  vtkPVOutputWindow *window = vtkPVOutputWindow::New();
+  this->OutputWindow = window;
+  vtkOutputWindow::SetInstance(this->OutputWindow);
+
 
   // Find the installation directory (now that we have the app name)
   this->FindApplicationInstallationDirectory();
@@ -1285,10 +1312,7 @@ void vtkPVApplication::Start(int argc, char*argv[])
 
   this->Script("proc bgerror { m } "
                "{ global Application; $Application DisplayTCLError $m }");
-  vtkPVOutputWindow *window = vtkPVOutputWindow::New();
   window->SetWindowCollection( this->Windows );
-  this->OutputWindow = window;
-  vtkOutputWindow::SetInstance(this->OutputWindow);
 
   // Check if there is an existing ParaViewTrace file.
   if (this->ShowSplashScreen)
