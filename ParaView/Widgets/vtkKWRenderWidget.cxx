@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkWin32OpenGLRenderWindow.h"
 #endif
 
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.8");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.9");
 
 vtkKWRenderWidget::vtkKWRenderWidget()
 {
@@ -109,8 +109,9 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
   char *local;
   const char *wname;
   
-  // must set the application
-  if (this->Application)
+  // Set the application
+
+  if (this->IsCreated())
     {
     vtkErrorMacro("Render widget already created");
     return;
@@ -131,6 +132,10 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
   
   this->RenderWindow->Render();
   delete [] local;
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 void vtkKWRenderWidget::SetupBindings()
