@@ -237,5 +237,8 @@ void vtkKWExtent::SetCommand(vtkKWObject* CalledObject, const char *CommandStrin
 { 
   ostrstream command;
   command << CalledObject->GetTclName() << " " << CommandString << ends;
-  this->Command = command.str();
+
+  this->Command = new char [strlen(command.str())+1];
+  strcpy(this->Command,command.str());
+  command.rdbuf()->freeze(0);
 }
