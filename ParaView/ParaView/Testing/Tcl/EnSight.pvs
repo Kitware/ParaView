@@ -15,7 +15,9 @@ set pv(vtkTemp93) [$pv(vtkTemp1) GetPVSource GlyphSources Cone0]
 set pv(vtkTemp97) [$pv(vtkTemp1) GetPVSource GlyphSources Sphere0]
 
 $pv(vtkTemp1) ChangeInteractorStyle 1
-$pv(vtkTemp1) Open "$DataDir/Data/elements.case"
+vtkPVEnSightReaderModule _tmp_ensightreadermodule0
+_tmp_ensightreadermodule0 ReadFile  "$DataDir/Data/elements.case" 0.00000e+00 Application $pv(vtkTemp1)
+_tmp_ensightreadermodule0 Delete
 set pv(vtkTemp104) [$pv(vtkTemp1) GetPreviousPVSource 1]
 set pv(vtkTemp145) [$pv(vtkTemp1) GetPreviousPVSource 0]
 
@@ -45,5 +47,5 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
 	$Application SetExitStatus [CompareImage [[Application GetMainWindow] GetMainView]]
     }
 }
-   
+
 Application Exit
