@@ -31,7 +31,7 @@
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.54");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.55");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -299,10 +299,8 @@ void vtkPVReaderModule::SaveState(ofstream *file)
   *file << "$kw(" << this->GetTclName() << ") AcceptCallback" << endl;
 
   this->VisitedFlag = 1;
-  
-  // Let the output set its state.
-  //this->GetDisplayGUI()->SaveState(file);
-  //law int fixme;  // should we ask the part display to save the state?
+
+  this->SaveStateDisplay(file);
 }
 
 //----------------------------------------------------------------------------
