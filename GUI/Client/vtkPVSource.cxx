@@ -68,7 +68,7 @@
 
 
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.420");
+vtkCxxRevisionMacro(vtkPVSource, "1.421");
 vtkCxxSetObjectMacro(vtkPVSource,Notebook,vtkPVSourceNotebook);
 vtkCxxSetObjectMacro(vtkPVSource,PartDisplay,vtkSMPartDisplay);
 
@@ -1120,12 +1120,7 @@ void vtkPVSource::Accept(int hideFlag, int hideSource)
         }
       }
 
-    // Set the current data of the window.
-    if ( ! hideFlag)
-      {
-      window->SetCurrentPVSource(this);
-      }
-    else
+    if (hideFlag)
       {
       this->SetVisibilityNoTrace(0);
       }
@@ -2448,6 +2443,16 @@ int vtkPVSource::InitializeClone(int makeCurrent)
   this->CreateProperties();
 
   this->InitializeWidgets();
+
+  // If this is not a reader module, call UpdateInformation.
+  // Some filters may require UpdateInformation is called to
+  // initialize widgets.
+  // Unfortunately, there are some filters/modules with which
+  // this does not work. These are avoided.
+  if (!this->IsA("vtkPVReaderModule") && !this->IsA("vtkPVProbe"))
+    {
+    this->Proxy->UpdateInformation();
+    }
 
   // Display page must be created before source is selected.
   if (makeCurrent)
