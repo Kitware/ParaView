@@ -1,0 +1,70 @@
+$Application ExitOnReturnOn
+
+set kw(vtkTemp1) [$Application GetMainWindow]
+set kw(vtkTemp43) [$kw(vtkTemp1) GetMainView]
+
+if {[info exists argc]} { 
+    set argcm1 [expr $argc - 1]
+    for {set i 0} {$i < $argcm1} {incr i} {
+        if {[lindex $argv $i] == "-D" && $i < $argcm1} {
+		set DataDir [lindex $argv [expr $i + 1]]
+        }
+        if {[lindex $argv $i] == "-UC" && $i < $argcm1} {
+            set rmui [$pv(vtkTemp43) GetRenderModuleUI]
+            catch {$rmui SetCompositeThreshold 0}
+        }
+    }
+}
+
+# Create sphere
+set kw(vtkTemp898) [$kw(vtkTemp1) CreatePVSource SphereSource]
+set kw(vtkTemp904) [$kw(vtkTemp898) GetPVWidget {Center}]
+$kw(vtkTemp904) SetValue 0 0 0
+set kw(vtkTemp909) [$kw(vtkTemp898) GetPVWidget {Radius}]
+$kw(vtkTemp909) SetValue 0.5
+set kw(vtkTemp913) [$kw(vtkTemp898) GetPVWidget {Theta Resolution}]
+$kw(vtkTemp913) SetValue 8
+set kw(vtkTemp918) [$kw(vtkTemp898) GetPVWidget {Start Theta}]
+$kw(vtkTemp918) SetValue 0
+set kw(vtkTemp923) [$kw(vtkTemp898) GetPVWidget {End Theta}]
+$kw(vtkTemp923) SetValue 360
+set kw(vtkTemp928) [$kw(vtkTemp898) GetPVWidget {Phi Resolution}]
+$kw(vtkTemp928) SetValue 8
+set kw(vtkTemp933) [$kw(vtkTemp898) GetPVWidget {Start Phi}]
+$kw(vtkTemp933) SetValue 0
+set kw(vtkTemp938) [$kw(vtkTemp898) GetPVWidget {End Phi}]
+$kw(vtkTemp938) SetValue 180
+$kw(vtkTemp1) SetCenterOfRotation 0.000000 0.000000 0.000000
+$kw(vtkTemp898) AcceptCallback
+
+# Create animation
+$kw(vtkTemp1) ShowAnimationProperties
+set kw(vtkTemp164) [$kw(vtkTemp1) GetAnimationInterface]
+set kw(vtkTemp187) [$kw(vtkTemp164) GetSourceEntry 0]
+$kw(vtkTemp187) SetPVSource $kw(vtkTemp898)
+$kw(vtkTemp923) AnimationMenuCallback $kw(vtkTemp187)
+$kw(vtkTemp164) SetNumberOfFrames 3
+$kw(vtkTemp187) SetTimeStart 20.000000
+$kw(vtkTemp187) SetTimeEnd 200.000000
+
+# Fix the size of the image
+set RenWin1 [[[$Application GetMainWindow] GetMainView] GetRenderWindow]
+$RenWin1 SetSize 300 300
+
+# Save animation images
+$kw(vtkTemp164) SaveImages "$DataDir/Baseline/AnimationImages" {png}
+
+for {set i  1} {$i < [expr $argc - 1]} {incr i} {
+    if {[lindex $argv $i] == "-C"} {
+	source [lindex $argv [expr $i + 1]]
+	$Application SetExitStatus [ComparePNG "$DataDir/Baseline/AnimationImages0001"]
+    }
+}
+
+file delete "$DataDir/Baseline/AnimationImages0000.png"
+file delete "$DataDir/Baseline/AnimationImages0001.png"
+file delete "$DataDir/Baseline/AnimationImages0002.png"
+file delete "$DataDir/Baseline/AnimationImages0003.png"
+
+$Application Exit
+

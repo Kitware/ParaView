@@ -66,7 +66,7 @@ public:
   void SetNumberOfFrames(int t);
   vtkGetMacro(NumberOfFrames, int);
 
-  void SetCurrentTime(int time);
+  void SetCurrentTime(int time, int trace = 1);
   int GetCurrentTime();
 
   // Description:

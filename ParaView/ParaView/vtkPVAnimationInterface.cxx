@@ -170,7 +170,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.112");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.113");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -925,7 +925,7 @@ int vtkPVAnimationInterface::GetCurrentTime()
 }
 
 //-----------------------------------------------------------------------------
-void vtkPVAnimationInterface::SetCurrentTime(int time)
+void vtkPVAnimationInterface::SetCurrentTime(int time, int trace)
 {
   this->TimeScale->SetValue(time);
 
@@ -1011,9 +1011,11 @@ void vtkPVAnimationInterface::SetCurrentTime(int time)
         }
       }
 
-    this->AddTraceEntry("$kw(%s) SetCurrentTime %d", 
-                        this->GetTclName(), this->GetCurrentTime());
-
+    if (trace)
+      {
+      this->AddTraceEntry("$kw(%s) SetCurrentTime %d 1",
+                          this->GetTclName(), this->GetCurrentTime());
+      }
     
     // Allow the application GUI to be refreshed (ex: in a trace file)
 
@@ -1289,7 +1291,7 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
   
   while (t <= this->GetGlobalEnd())
     {
-    this->SetCurrentTime(t);
+    this->SetCurrentTime(t, 0);
 
     // Create a file name for this image.
     sprintf(fileName, "%s%04d.%s", fileRoot, fileCount, ext);
@@ -1474,7 +1476,7 @@ void vtkPVAnimationInterface::SaveGeometry(const char* fileName,
   for(int t = this->GetGlobalStart(); t <= this->GetGlobalEnd(); ++t)
     {
     // Update the animation to this time step.
-    this->SetCurrentTime(t);
+    this->SetCurrentTime(t, 0);
     this->View->EventuallyRender();
     this->Script("update");
     

@@ -125,3 +125,9 @@ ADD_TEST(OtherTests-ParaView ${PARAVIEW_EXECUTABLE} --disable-registry --start-e
   -D ${PARAVIEW_SOURCE_DIR}/Data
   -A ${VTK_TCL_HOME}
   )
+
+ADD_TEST (AnimationImages ${PARAVIEW_EXECUTABLE} --disable-registry
+  ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/AnimationImages.pvs
+  -D ${PARAVIEW_SOURCE_DIR}/Data
+  -C ${PARAVIEW_SOURCE_DIR}/ParaView/Testing/Tcl/ComparePNGs.tcl
+  -V ${PARAVIEW_SOURCE_DIR}/Data/Baseline/AnimationImages.png)

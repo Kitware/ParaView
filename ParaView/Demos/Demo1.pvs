@@ -879,118 +879,118 @@ proc extract_run {} {
     $extract(vtkTemp956) SetValue 0 0 0 32 0 24
     $extract(vtkTemp478) AcceptCallback
     $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 0
-    $extract(vtkTemp106) SetCurrentTime 0
+    $extract(vtkTemp106) SetCurrentTime 0 1
     $extract(vtkTemp1) SetCurrentPVSourceCallback $extract(vtkTemp478)
     $extract(vtkTemp1) ShowAnimationProperties
     $extract(vtkTemp106) SetNumberOfFrames 56
     $extract(vtkTemp1032) SetTimeStart 0.0
     $extract(vtkTemp1032) SetTimeEnd 56.0
 
-    $extract(vtkTemp106) SetCurrentTime 1
-    $extract(vtkTemp106) SetCurrentTime 2
-    $extract(vtkTemp106) SetCurrentTime 3
-    $extract(vtkTemp106) SetCurrentTime 4
-    $extract(vtkTemp106) SetCurrentTime 5
-    $extract(vtkTemp106) SetCurrentTime 6
-    $extract(vtkTemp106) SetCurrentTime 7
-    $extract(vtkTemp106) SetCurrentTime 8
-    $extract(vtkTemp106) SetCurrentTime 9
-    $extract(vtkTemp106) SetCurrentTime 10
-    $extract(vtkTemp106) SetCurrentTime 11
-    $extract(vtkTemp106) SetCurrentTime 12
-    $extract(vtkTemp106) SetCurrentTime 13
-    $extract(vtkTemp106) SetCurrentTime 14
+    $extract(vtkTemp106) SetCurrentTime 1 1
+    $extract(vtkTemp106) SetCurrentTime 2 1
+    $extract(vtkTemp106) SetCurrentTime 3 1
+    $extract(vtkTemp106) SetCurrentTime 4 1
+    $extract(vtkTemp106) SetCurrentTime 5 1
+    $extract(vtkTemp106) SetCurrentTime 6 1
+    $extract(vtkTemp106) SetCurrentTime 7 1
+    $extract(vtkTemp106) SetCurrentTime 8 1
+    $extract(vtkTemp106) SetCurrentTime 9 1
+    $extract(vtkTemp106) SetCurrentTime 10 1
+    $extract(vtkTemp106) SetCurrentTime 11 1
+    $extract(vtkTemp106) SetCurrentTime 12 1
+    $extract(vtkTemp106) SetCurrentTime 13 1
+    $extract(vtkTemp106) SetCurrentTime 14 1
 
     if $pvDemoShouldStop {
         return
     }
 
-    $extract(vtkTemp106) SetCurrentTime 15
-    $extract(vtkTemp106) SetCurrentTime 16
-    $extract(vtkTemp106) SetCurrentTime 17
-    $extract(vtkTemp106) SetCurrentTime 18
-    $extract(vtkTemp106) SetCurrentTime 19
-    $extract(vtkTemp106) SetCurrentTime 20
-    $extract(vtkTemp106) SetCurrentTime 21
-    $extract(vtkTemp106) SetCurrentTime 22
-    $extract(vtkTemp106) SetCurrentTime 23
-    $extract(vtkTemp106) SetCurrentTime 24
-    $extract(vtkTemp106) SetCurrentTime 25
-    $extract(vtkTemp106) SetCurrentTime 26
-    $extract(vtkTemp106) SetCurrentTime 27
-    $extract(vtkTemp106) SetCurrentTime 28
-    $extract(vtkTemp106) SetCurrentTime 29
-    $extract(vtkTemp106) SetCurrentTime 30
-    $extract(vtkTemp106) SetCurrentTime 31
-    $extract(vtkTemp106) SetCurrentTime 32
-    $extract(vtkTemp106) SetCurrentTime 33
+    $extract(vtkTemp106) SetCurrentTime 15 1
+    $extract(vtkTemp106) SetCurrentTime 16 1
+    $extract(vtkTemp106) SetCurrentTime 17 1
+    $extract(vtkTemp106) SetCurrentTime 18 1
+    $extract(vtkTemp106) SetCurrentTime 19 1
+    $extract(vtkTemp106) SetCurrentTime 20 1
+    $extract(vtkTemp106) SetCurrentTime 21 1
+    $extract(vtkTemp106) SetCurrentTime 22 1
+    $extract(vtkTemp106) SetCurrentTime 23 1
+    $extract(vtkTemp106) SetCurrentTime 24 1
+    $extract(vtkTemp106) SetCurrentTime 25 1
+    $extract(vtkTemp106) SetCurrentTime 26 1
+    $extract(vtkTemp106) SetCurrentTime 27 1
+    $extract(vtkTemp106) SetCurrentTime 28 1
+    $extract(vtkTemp106) SetCurrentTime 29 1
+    $extract(vtkTemp106) SetCurrentTime 30 1
+    $extract(vtkTemp106) SetCurrentTime 31 1
+    $extract(vtkTemp106) SetCurrentTime 32 1
+    $extract(vtkTemp106) SetCurrentTime 33 1
 
     if $pvDemoShouldStop {
         return
     }
 
-    $extract(vtkTemp106) SetCurrentTime 34
-    $extract(vtkTemp106) SetCurrentTime 35
-    $extract(vtkTemp106) SetCurrentTime 36
-    $extract(vtkTemp106) SetCurrentTime 37
-    $extract(vtkTemp106) SetCurrentTime 38
-    $extract(vtkTemp106) SetCurrentTime 39
-    $extract(vtkTemp106) SetCurrentTime 40
-    $extract(vtkTemp106) SetCurrentTime 41
-    $extract(vtkTemp106) SetCurrentTime 42
-    $extract(vtkTemp106) SetCurrentTime 43
-    $extract(vtkTemp106) SetCurrentTime 44
-    $extract(vtkTemp106) SetCurrentTime 45
-    $extract(vtkTemp106) SetCurrentTime 46
-    $extract(vtkTemp106) SetCurrentTime 47
-    $extract(vtkTemp106) SetCurrentTime 48
-    $extract(vtkTemp106) SetCurrentTime 49
-    $extract(vtkTemp106) SetCurrentTime 50
-    $extract(vtkTemp106) SetCurrentTime 51
-    $extract(vtkTemp106) SetCurrentTime 52
-    $extract(vtkTemp106) SetCurrentTime 53
-    $extract(vtkTemp106) SetCurrentTime 54
-    $extract(vtkTemp106) SetCurrentTime 55
+    $extract(vtkTemp106) SetCurrentTime 34 1
+    $extract(vtkTemp106) SetCurrentTime 35 1
+    $extract(vtkTemp106) SetCurrentTime 36 1
+    $extract(vtkTemp106) SetCurrentTime 37 1
+    $extract(vtkTemp106) SetCurrentTime 38 1
+    $extract(vtkTemp106) SetCurrentTime 39 1
+    $extract(vtkTemp106) SetCurrentTime 40 1
+    $extract(vtkTemp106) SetCurrentTime 41 1
+    $extract(vtkTemp106) SetCurrentTime 42 1
+    $extract(vtkTemp106) SetCurrentTime 43 1
+    $extract(vtkTemp106) SetCurrentTime 44 1
+    $extract(vtkTemp106) SetCurrentTime 45 1
+    $extract(vtkTemp106) SetCurrentTime 46 1
+    $extract(vtkTemp106) SetCurrentTime 47 1
+    $extract(vtkTemp106) SetCurrentTime 48 1
+    $extract(vtkTemp106) SetCurrentTime 49 1
+    $extract(vtkTemp106) SetCurrentTime 50 1
+    $extract(vtkTemp106) SetCurrentTime 51 1
+    $extract(vtkTemp106) SetCurrentTime 52 1
+    $extract(vtkTemp106) SetCurrentTime 53 1
+    $extract(vtkTemp106) SetCurrentTime 54 1
+    $extract(vtkTemp106) SetCurrentTime 55 1
 
     $extract(vtkTemp956) SetValue 0 56 0 0 0 24
     $extract(vtkTemp478) AcceptCallback
     $extract(vtkTemp956) AnimationMenuCallback $extract(vtkTemp1032) 1
 
-    $extract(vtkTemp106) SetCurrentTime 0
+    $extract(vtkTemp106) SetCurrentTime 0 1
     $extract(vtkTemp106) SetNumberOfFrames 32
     $extract(vtkTemp1032) SetTimeStart 0.0
     $extract(vtkTemp1032) SetTimeEnd 32.0
-    $extract(vtkTemp106) SetCurrentTime 1
-    $extract(vtkTemp106) SetCurrentTime 2
-    $extract(vtkTemp106) SetCurrentTime 3
-    $extract(vtkTemp106) SetCurrentTime 4
-    $extract(vtkTemp106) SetCurrentTime 5
-    $extract(vtkTemp106) SetCurrentTime 6
-    $extract(vtkTemp106) SetCurrentTime 7
-    $extract(vtkTemp106) SetCurrentTime 8
-    $extract(vtkTemp106) SetCurrentTime 9
-    $extract(vtkTemp106) SetCurrentTime 10
-    $extract(vtkTemp106) SetCurrentTime 11
-    $extract(vtkTemp106) SetCurrentTime 12
-    $extract(vtkTemp106) SetCurrentTime 13
-    $extract(vtkTemp106) SetCurrentTime 14
-    $extract(vtkTemp106) SetCurrentTime 15
-    $extract(vtkTemp106) SetCurrentTime 16
-    $extract(vtkTemp106) SetCurrentTime 17
-    $extract(vtkTemp106) SetCurrentTime 18
-    $extract(vtkTemp106) SetCurrentTime 19
-    $extract(vtkTemp106) SetCurrentTime 20
-    $extract(vtkTemp106) SetCurrentTime 21
-    $extract(vtkTemp106) SetCurrentTime 22
-    $extract(vtkTemp106) SetCurrentTime 23
-    $extract(vtkTemp106) SetCurrentTime 24
-    $extract(vtkTemp106) SetCurrentTime 25
-    $extract(vtkTemp106) SetCurrentTime 26
-    $extract(vtkTemp106) SetCurrentTime 27
-    $extract(vtkTemp106) SetCurrentTime 28
-    $extract(vtkTemp106) SetCurrentTime 29
-    $extract(vtkTemp106) SetCurrentTime 30
-    $extract(vtkTemp106) SetCurrentTime 31
+    $extract(vtkTemp106) SetCurrentTime 1 1
+    $extract(vtkTemp106) SetCurrentTime 2 1
+    $extract(vtkTemp106) SetCurrentTime 3 1
+    $extract(vtkTemp106) SetCurrentTime 4 1
+    $extract(vtkTemp106) SetCurrentTime 5 1
+    $extract(vtkTemp106) SetCurrentTime 6 1
+    $extract(vtkTemp106) SetCurrentTime 7 1
+    $extract(vtkTemp106) SetCurrentTime 8 1
+    $extract(vtkTemp106) SetCurrentTime 9 1
+    $extract(vtkTemp106) SetCurrentTime 10 1
+    $extract(vtkTemp106) SetCurrentTime 11 1
+    $extract(vtkTemp106) SetCurrentTime 12 1
+    $extract(vtkTemp106) SetCurrentTime 13 1
+    $extract(vtkTemp106) SetCurrentTime 14 1
+    $extract(vtkTemp106) SetCurrentTime 15 1
+    $extract(vtkTemp106) SetCurrentTime 16 1
+    $extract(vtkTemp106) SetCurrentTime 17 1
+    $extract(vtkTemp106) SetCurrentTime 18 1
+    $extract(vtkTemp106) SetCurrentTime 19 1
+    $extract(vtkTemp106) SetCurrentTime 20 1
+    $extract(vtkTemp106) SetCurrentTime 21 1
+    $extract(vtkTemp106) SetCurrentTime 22 1
+    $extract(vtkTemp106) SetCurrentTime 23 1
+    $extract(vtkTemp106) SetCurrentTime 24 1
+    $extract(vtkTemp106) SetCurrentTime 25 1
+    $extract(vtkTemp106) SetCurrentTime 26 1
+    $extract(vtkTemp106) SetCurrentTime 27 1
+    $extract(vtkTemp106) SetCurrentTime 28 1
+    $extract(vtkTemp106) SetCurrentTime 29 1
+    $extract(vtkTemp106) SetCurrentTime 30 1
+    $extract(vtkTemp106) SetCurrentTime 31 1
 
     $extract(vtkTemp956) SetValue 0 56 0 32 0 0
     $extract(vtkTemp478) AcceptCallback
@@ -1003,30 +1003,30 @@ proc extract_run {} {
     $extract(vtkTemp106) SetNumberOfFrames 24
     $extract(vtkTemp1032) SetTimeStart 0.0
     $extract(vtkTemp1032) SetTimeEnd 24.0
-    $extract(vtkTemp106) SetCurrentTime 0
-    $extract(vtkTemp106) SetCurrentTime 1
-    $extract(vtkTemp106) SetCurrentTime 2
-    $extract(vtkTemp106) SetCurrentTime 3
-    $extract(vtkTemp106) SetCurrentTime 4
-    $extract(vtkTemp106) SetCurrentTime 5
-    $extract(vtkTemp106) SetCurrentTime 6
-    $extract(vtkTemp106) SetCurrentTime 7
-    $extract(vtkTemp106) SetCurrentTime 8
-    $extract(vtkTemp106) SetCurrentTime 9
-    $extract(vtkTemp106) SetCurrentTime 10
-    $extract(vtkTemp106) SetCurrentTime 11
-    $extract(vtkTemp106) SetCurrentTime 12
-    $extract(vtkTemp106) SetCurrentTime 13
-    $extract(vtkTemp106) SetCurrentTime 14
-    $extract(vtkTemp106) SetCurrentTime 15
-    $extract(vtkTemp106) SetCurrentTime 16
-    $extract(vtkTemp106) SetCurrentTime 17
-    $extract(vtkTemp106) SetCurrentTime 18
-    $extract(vtkTemp106) SetCurrentTime 19
-    $extract(vtkTemp106) SetCurrentTime 20
-    $extract(vtkTemp106) SetCurrentTime 21
-    $extract(vtkTemp106) SetCurrentTime 22
-    $extract(vtkTemp106) SetCurrentTime 23
+    $extract(vtkTemp106) SetCurrentTime 0 1
+    $extract(vtkTemp106) SetCurrentTime 1 1
+    $extract(vtkTemp106) SetCurrentTime 2 1
+    $extract(vtkTemp106) SetCurrentTime 3 1
+    $extract(vtkTemp106) SetCurrentTime 4 1
+    $extract(vtkTemp106) SetCurrentTime 5 1
+    $extract(vtkTemp106) SetCurrentTime 6 1
+    $extract(vtkTemp106) SetCurrentTime 7 1
+    $extract(vtkTemp106) SetCurrentTime 8 1
+    $extract(vtkTemp106) SetCurrentTime 9 1
+    $extract(vtkTemp106) SetCurrentTime 10 1
+    $extract(vtkTemp106) SetCurrentTime 11 1
+    $extract(vtkTemp106) SetCurrentTime 12 1
+    $extract(vtkTemp106) SetCurrentTime 13 1
+    $extract(vtkTemp106) SetCurrentTime 14 1
+    $extract(vtkTemp106) SetCurrentTime 15 1
+    $extract(vtkTemp106) SetCurrentTime 16 1
+    $extract(vtkTemp106) SetCurrentTime 17 1
+    $extract(vtkTemp106) SetCurrentTime 18 1
+    $extract(vtkTemp106) SetCurrentTime 19 1
+    $extract(vtkTemp106) SetCurrentTime 20 1
+    $extract(vtkTemp106) SetCurrentTime 21 1
+    $extract(vtkTemp106) SetCurrentTime 22 1
+    $extract(vtkTemp106) SetCurrentTime 23 1
     $extract(vtkTemp478) SetVisibility 0
     if $pvDemoShouldStop {
         return
@@ -1041,25 +1041,25 @@ proc extract_run {} {
     $extract(vtkTemp957) AnimationMenuCallback $extract(vtkTemp1032)
     $extract(vtkTemp1032) SetTimeStart -1.0
     $extract(vtkTemp1032) SetTimeEnd 3.0
-    $extract(vtkTemp106) SetCurrentTime 0
+    $extract(vtkTemp106) SetCurrentTime 0 1
     update
-    $extract(vtkTemp106) SetCurrentTime 1
+    $extract(vtkTemp106) SetCurrentTime 1 1
     update
-    $extract(vtkTemp106) SetCurrentTime 2
+    $extract(vtkTemp106) SetCurrentTime 2 1
     update
-    $extract(vtkTemp106) SetCurrentTime 3
+    $extract(vtkTemp106) SetCurrentTime 3 1
     update
-    $extract(vtkTemp106) SetCurrentTime 4
+    $extract(vtkTemp106) SetCurrentTime 4 1
     update
-    $extract(vtkTemp106) SetCurrentTime 5
+    $extract(vtkTemp106) SetCurrentTime 5 1
     update
-    $extract(vtkTemp106) SetCurrentTime 6
+    $extract(vtkTemp106) SetCurrentTime 6 1
     update
-    $extract(vtkTemp106) SetCurrentTime 7
+    $extract(vtkTemp106) SetCurrentTime 7 1
     update
-    $extract(vtkTemp106) SetCurrentTime 8
+    $extract(vtkTemp106) SetCurrentTime 8 1
     update
-    $extract(vtkTemp106) SetCurrentTime 9
+    $extract(vtkTemp106) SetCurrentTime 9 1
     update
     if $pvDemoShouldStop {
         return
@@ -1073,25 +1073,25 @@ proc extract_run {} {
     $extract(vtkTemp780) SetVisibility 1
     set extract(vtkTemp807) [$extract(vtkTemp780) GetPVOutput]
     $extract(vtkTemp807) ChangeActorColor 0.996078 0.117647 0.125490
-    $extract(vtkTemp106) SetCurrentTime 0
+    $extract(vtkTemp106) SetCurrentTime 0 1
     update
-    $extract(vtkTemp106) SetCurrentTime 1
+    $extract(vtkTemp106) SetCurrentTime 1 1
     update
-    $extract(vtkTemp106) SetCurrentTime 2
+    $extract(vtkTemp106) SetCurrentTime 2 1
     update
-    $extract(vtkTemp106) SetCurrentTime 3
+    $extract(vtkTemp106) SetCurrentTime 3 1
     update
-    $extract(vtkTemp106) SetCurrentTime 4
+    $extract(vtkTemp106) SetCurrentTime 4 1
     update
-    $extract(vtkTemp106) SetCurrentTime 5
+    $extract(vtkTemp106) SetCurrentTime 5 1
     update
-    $extract(vtkTemp106) SetCurrentTime 6
+    $extract(vtkTemp106) SetCurrentTime 6 1
     update
-    $extract(vtkTemp106) SetCurrentTime 7
+    $extract(vtkTemp106) SetCurrentTime 7 1
     update
-    $extract(vtkTemp106) SetCurrentTime 8
+    $extract(vtkTemp106) SetCurrentTime 8 1
     update
-    $extract(vtkTemp106) SetCurrentTime 9
+    $extract(vtkTemp106) SetCurrentTime 9 1
     update
     $extract(vtkTemp780) SetVisibility 0
 
@@ -1238,76 +1238,76 @@ proc iso_run {} {
     }
     DemoAfter 1000
 
-    $iso(vtkTemp106) SetCurrentTime 0; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 2; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 3; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 4; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 5; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 6; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 7; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 8; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 9; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 10; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 11; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 0 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 1 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 2 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 3 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 4 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 5 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 6 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 7 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 8 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 9 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 10 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 11 1; DemoAfter 100
     if $pvDemoShouldStop {
         return
     }
-    $iso(vtkTemp106) SetCurrentTime 12; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 13; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 14; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 15; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 16; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 17; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 18; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 19; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 20; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 21; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 22; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 23; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 24; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 25; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 26; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 12 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 13 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 14 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 15 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 16 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 17 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 18 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 19 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 20 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 21 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 22 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 23 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 24 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 25 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 26 1; DemoAfter 100
     if $pvDemoShouldStop {
         return
     }
-    $iso(vtkTemp106) SetCurrentTime 27; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 28; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 29; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 30; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 31; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 32; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 33; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 34; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 35; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 36; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 37; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 38; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 39; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 40; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 41; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 42; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 43; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 44; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 27 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 28 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 29 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 30 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 31 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 32 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 33 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 34 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 35 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 36 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 37 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 38 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 39 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 40 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 41 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 42 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 43 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 44 1; DemoAfter 100
     if $pvDemoShouldStop {
         return
     }
-    $iso(vtkTemp106) SetCurrentTime 45; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 46; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 47; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 48; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 49; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 50; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 51; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 52; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 53; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 54; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 55; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 56; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 57; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 58; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 59; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 60; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 45 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 46 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 47 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 48 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 49 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 50 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 51 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 52 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 53 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 54 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 55 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 56 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 57 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 58 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 59 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 60 1; DemoAfter 100
     if $pvDemoShouldStop {
         return
     }
@@ -1371,39 +1371,39 @@ proc iso_run {} {
     $iso(vtkTemp1032) SetTimeStart 0.0
     $iso(vtkTemp1032) SetTimeEnd 29.0
 
-    $iso(vtkTemp106) SetCurrentTime 0
-    $iso(vtkTemp106) SetCurrentTime 1; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 2; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 3; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 4; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 5; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 6; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 7; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 8; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 9; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 10; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 11; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 12; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 0 1
+    $iso(vtkTemp106) SetCurrentTime 1 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 2 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 3 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 4 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 5 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 6 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 7 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 8 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 9 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 10 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 11 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 12 1; DemoAfter 100
     if $pvDemoShouldStop {
         return
     }
-    $iso(vtkTemp106) SetCurrentTime 13; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 14; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 15; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 16; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 17; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 18; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 19; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 20; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 21; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 22; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 23; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 24; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 25; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 26; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 27; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 28; DemoAfter 100
-    $iso(vtkTemp106) SetCurrentTime 29; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 13 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 14 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 15 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 16 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 17 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 18 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 19 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 20 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 21 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 22 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 23 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 24 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 25 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 26 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 27 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 28 1; DemoAfter 100
+    $iso(vtkTemp106) SetCurrentTime 29 1; DemoAfter 100
     if $pvDemoShouldStop {
         return
     }

@@ -82,7 +82,7 @@ $kw(vtkTemp1) ShowAnimationProperties
 set kw(vtkTemp67) [$kw(vtkTemp1) GetAnimationInterface]
 set kw(vtkTemp1032) [$kw(vtkTemp67) GetSourceEntry 0]
 $kw(vtkTemp1032) SetPVSource $kw(vtkTemp300)
-$kw(vtkTemp67) SetCurrentTime 0
+$kw(vtkTemp67) SetCurrentTime 0 1
 update
 
 # Retrace
