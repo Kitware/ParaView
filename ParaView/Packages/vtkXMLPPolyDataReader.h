@@ -1,0 +1,76 @@
+/*=========================================================================
+
+  Program:   Visualization Toolkit
+  Module:    vtkXMLPPolyDataReader.h
+  Language:  C++
+  Date:      $Date$
+  Version:   $Revision$
+
+  Copyright (c) 1993-2002 Ken Martin, Will Schroeder, Bill Lorensen 
+  All rights reserved.
+  See Copyright.txt or http://www.kitware.com/Copyright.htm for details.
+
+     This software is distributed WITHOUT ANY WARRANTY; without even 
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     PURPOSE.  See the above copyright notice for more information.
+
+=========================================================================*/
+// .NAME vtkXMLPPolyDataReader
+// .SECTION Description
+// vtkXMLPPolyDataReader
+
+#ifndef __vtkXMLPPolyDataReader_h
+#define __vtkXMLPPolyDataReader_h
+
+#include "vtkXMLPUnstructuredDataReader.h"
+
+class vtkPolyData;
+
+class VTK_IO_EXPORT vtkXMLPPolyDataReader : public vtkXMLPUnstructuredDataReader
+{
+public:
+  vtkTypeRevisionMacro(vtkXMLPPolyDataReader,vtkXMLPUnstructuredDataReader);
+  void PrintSelf(ostream& os, vtkIndent indent);  
+  static vtkXMLPPolyDataReader *New();
+  
+  // Description:
+  // Get/Set the reader's output.
+  void SetOutput(vtkPolyData *output);
+  vtkPolyData *GetOutput();
+  
+protected:
+  vtkXMLPPolyDataReader();
+  ~vtkXMLPPolyDataReader();
+  
+  const char* GetDataSetName();
+  void GetOutputUpdateExtent(int& piece, int& numberOfPieces, int& ghostLevel);
+  vtkIdType GetNumberOfCellsInPiece(int piece);
+  vtkIdType GetNumberOfVertsInPiece(int piece);
+  vtkIdType GetNumberOfLinesInPiece(int piece);
+  vtkIdType GetNumberOfStripsInPiece(int piece);
+  vtkIdType GetNumberOfPolysInPiece(int piece);
+  void SetupOutputTotals();
+  
+  void SetupOutputData();
+  void SetupNextPiece();
+  int ReadPieceData();
+  
+  void CopyArrayForCells(vtkDataArray* inArray, vtkDataArray* outArray);
+  vtkXMLDataReader* CreatePieceReader();
+  
+  // The size of the UpdatePiece.
+  vtkIdType TotalNumberOfVerts;
+  vtkIdType TotalNumberOfLines;
+  vtkIdType TotalNumberOfStrips;
+  vtkIdType TotalNumberOfPolys;
+  vtkIdType StartVert;
+  vtkIdType StartLine;
+  vtkIdType StartStrip;
+  vtkIdType StartPoly;
+  
+private:
+  vtkXMLPPolyDataReader(const vtkXMLPPolyDataReader&);  // Not implemented.
+  void operator=(const vtkXMLPPolyDataReader&);  // Not implemented.
+};
+
+#endif
