@@ -96,7 +96,7 @@ static unsigned char image_loop[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.3");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.28.2.4");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1047,6 +1047,7 @@ void vtkPVAnimationInterface::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "TimeEnd: " << this->GetTimeEnd();
   os << indent << "TimeStart: " << this->GetTimeStart();
   os << indent << "TimeStep: " << this->GetTimeStep();
+  os << indent << "Loop: " << this->GetLoop();
   os << indent << "View: " << this->GetView();
   os << indent << "Window: " << this->GetWindow();
 }
