@@ -220,7 +220,7 @@ static unsigned char image_prev[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.650");
+vtkCxxRevisionMacro(vtkPVWindow, "1.651");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -5500,6 +5500,8 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "AnimationManager: " << this->AnimationManager << endl;
   os << indent << "InteractorID: " << this->InteractorID << endl;
   os << indent << "InDemo: " << this->InDemo << endl;
+  os << indent << "AnimationToolbar: " << this->AnimationToolbar << endl;
+  os << indent << "LowerToolbars: " << this->LowerToolbars << endl;
 
   // Lookmarks part:
 #ifdef PARAVIEW_USE_LOOKMARKS
