@@ -255,6 +255,10 @@ public:
   vtkSetMacro(DisableRenderingFlag, int);
   vtkGetMacro(DisableRenderingFlag, int);
   vtkBooleanMacro(DisableRenderingFlag, int);
+
+  // Description:
+  // Get the widget that controls the interactor styles.
+  vtkGetObjectMacro(InteractorStyleControl, vtkPVInteractorStyleControl);
     
 protected:
 
