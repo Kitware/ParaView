@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 #include "vtkPVRenderModule.h"
 
+#include "vtkInstantiator.h"
 #include "vtkCamera.h"
 #include "vtkCollectionIterator.h"
 #include "vtkCallbackCommand.h"
@@ -111,7 +112,7 @@ static unsigned char image_properties[] =
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.250");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.251");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -923,16 +924,15 @@ void vtkPVRenderView::CreateViewProperties()
                this->TriangleStripsCheck->GetWidgetName(),
                this->ImmediateModeCheck->GetWidgetName());
 
-  this->RenderModuleUI = vtkPVRenderModuleUI::New();
+  vtkObject* rmui = vtkInstantiator::CreateInstance("vtkPVLODRenderModuleUI");
+  this->RenderModuleUI = vtkPVRenderModuleUI::SafeDownCast(rmui);
+  this->RenderModuleUI->SetRenderModule(pvapp->GetRenderModule());
   this->RenderModuleUI->SetParent(this->GeneralProperties->GetFrame());
   this->RenderModuleUI->Create(this->Application,0);
   this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
                this->RenderModuleUI->GetWidgetName());
 
-
   int row = 0;
-
-
 
 
   // Interface settings
@@ -1611,7 +1611,7 @@ void vtkPVRenderView::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVRenderView ";
-  this->ExtractRevision(os,"$Revision: 1.250 $");
+  this->ExtractRevision(os,"$Revision: 1.251 $");
 }
 
 //------------------------------------------------------------------------------

@@ -41,35 +41,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 // .NAME vtkPVRenderModuleUI - User interface for a rendering module.
 // .SECTION Description
-// This is going to be a superclass for a render module.
-// It was originally vtkPVRenderView.
+// This is a superclass for a render module.  We do not create this class ,
+// This is created by the vtkPVRenderView.
 
 #ifndef __vtkPVRenderModuleUI_h
 #define __vtkPVRenderModuleUI_h
 
 #include "vtkKWWidget.h"
 
-class vtkPVRenderModule;
-class vtkKWLabel;
-class vtkKWPushButton;
-class vtkKWRadioButton;
-class vtkKWLabeledFrame;
-class vtkKWScale;
-class vtkKWCheckButton;
-class vtkKWSplitFrame;
-class vtkLabeledFrame;
-class vtkMultiProcessController;
 class vtkPVApplication;
-class vtkPVCameraIcon;
-class vtkPVData;
-class vtkPVInteractorStyleControl;
-class vtkPVRenderModuleUIObserver;
-class vtkPVSource;
-class vtkPVSourceList;
-class vtkPVSourcesNavigationWindow;
-class vtkPVTreeComposite;
-class vtkPVWindow;
-
+class vtkPVRenderModule;
 
 class VTK_EXPORT vtkPVRenderModuleUI : public vtkKWWidget
 {
@@ -77,109 +58,25 @@ public:
   static vtkPVRenderModuleUI* New();
   vtkTypeRevisionMacro(vtkPVRenderModuleUI,vtkKWWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
-    
+      
   // Description:
-  // Create the TK widgets associated with the view.
-  virtual void Create(vtkKWApplication *app, const char *);
-  
+  // The subclass should implement this method and 
+  // downcast it to the right type.  It can then access
+  // any unique methods of the specific render module.
+  virtual void SetRenderModule(vtkPVRenderModule *rm);
+
+  // Description:
+  // Create the widget.
+  virtual void Create(vtkKWApplication* app, const char *args);
+
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
-    
-  // Description:
-  // Callback for the interrupt render check button
-  void InterruptRenderCheckCallback();
-  
-  // Description:
-  // Callback for the use char check button.  
-  // These are only public because they are callbacks.
-  // Cannot be used from a script because they do not 
-  // change the state of the check.
-  void CompositeWithFloatCallback();
-  void CompositeWithFloatCallback(int val);
-  void CompositeWithRGBACallback();
-  void CompositeWithRGBACallback(int val);
-  void CompositeCompressionCallback();
-  void CompositeCompressionCallback(int val);
-  
-  // Description:
-  // Threshold for individual actors as number of points.
-  void LODThresholdScaleCallback();
-
-  // Description:
-  // This method sets the threshold without tracing or
-  // changing the UI scale.
-  void SetLODThresholdInternal(float threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetLODThreshold(float);
-  vtkGetMacro(LODThreshold, float);
-  vtkBooleanMacro(LODThreshold, float);
-
-  // Description:
-  // LOD resolution determines how many cells are in decimated model.
-  void LODResolutionScaleCallback();
-  void LODResolutionLabelCallback();
-
-  // Description:
-  // This method sets the resolution without tracing or
-  // changing the UI scale.
-  void SetLODResolutionInternal(int threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetLODResolution(int);
-  vtkGetMacro(LODResolution, int);
-  vtkBooleanMacro(LODResolution, int);
-
-  // Description:
-  // Threshold for collecting data to a single process (MBytes).
-  void CollectThresholdScaleCallback();
-
-  // Description:
-  // This method sets the threshold without tracing or
-  // changing the UI scale.
-  void SetCollectThresholdInternal(float threshold);
-
-  // Description:
-  // This methods can be used from a script.  
-  // "Set" sets the value of the scale, and adds an entry to the trace.
-  void SetCollectThreshold(float);
-  vtkGetMacro(CollectThreshold, float);
-  vtkBooleanMacro(CollectThreshold, float);
-
+        
 protected:
   vtkPVRenderModuleUI();
   ~vtkPVRenderModuleUI();
  
-  int UseReductionFactor;
-  
-  vtkKWLabeledFrame *LODFrame;
-  vtkKWLabeledFrame *ParallelRenderParametersFrame;
-  vtkKWCheckButton *InterruptRenderCheck;
-  vtkKWCheckButton *CompositeWithFloatCheck;
-  vtkKWCheckButton *CompositeWithRGBACheck;
-  vtkKWCheckButton *CompositeCompressionCheck;
-
-  vtkKWWidget *LODScalesFrame;
-  vtkKWLabel *LODResolutionLabel;
-  vtkKWScale *LODResolutionScale;
-  vtkKWLabel *LODResolutionValue;
-  vtkKWLabel *LODThresholdLabel;
-  vtkKWScale *LODThresholdScale;
-  vtkKWLabel *LODThresholdValue;
-
-  vtkKWLabel *CollectThresholdLabel;
-  vtkKWScale *CollectThresholdScale;
-  vtkKWLabel *CollectThresholdValue;
-
-  float LODThreshold;
-  int LODResolution;
-  float CollectThreshold;
-
   vtkPVRenderModuleUI(const vtkPVRenderModuleUI&); // Not implemented
   void operator=(const vtkPVRenderModuleUI&); // Not implemented
 };
