@@ -442,7 +442,8 @@ void vtkCameraInteractor::RollMotion(int x2, int y2)
   zCross = x1 * y2 - y1 * x2;
   
   // divide by magnitudes to get angle
-  angle = 57.2958 * zCross / (sqrt(x1*x1 + y1*y1) * sqrt(x2*x2 + y2*y2));
+  angle = 57.2958 * zCross / (sqrt(static_cast<float>(x1*x1 + y1*y1)) * 
+			      sqrt(static_cast<float>(x2*x2 + y2*y2)));
 
   // set the transform
   this->Transform->Identity();
