@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightMasterServerReader);
-vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.6.2.6");
+vtkCxxRevisionMacro(vtkPVEnSightMasterServerReader, "1.6.2.7");
 
 vtkCxxSetObjectMacro(vtkPVEnSightMasterServerReader, Controller,
                      vtkMultiProcessController);
@@ -562,7 +562,8 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
   while(vtkPVEnSightMasterServerReaderGetLineFromStream(fin, line))
     {
     // This section determines the type of file: case of SOS.
-    if(!readingFormat && (line == "FORMAT"))
+    if(!readingFormat &&
+       vtkPVEnSightMasterServerReaderStartsWith(line.c_str(), "FORMAT"))
       {
       // The FORMAT section starts here.
       readingFormat = 1;
@@ -586,7 +587,7 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
         return VTK_ERROR;
         }
       // These are the special cases (case files).
-      if (strcmp(p,"ensight") == 0 || strcmp(p,"ensight gold")==0)
+      if (strncmp(p,"ensight",7) == 0 || strncmp(p,"ensight gold",12)==0)
         {
         // Handle the case file line an sos file with one server.
         numServers = 1;
@@ -595,7 +596,7 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
         // because we have nothing else to do from this state.
         // We assume the line "SERVERS" will not appear in any case file.
         }
-      else if (strcmp(p,"master_server gold") != 0)
+      else if (strncmp(p,"master_server gold",18) != 0)
         { // We might as well have this sanity check here.
         vtkErrorMacro("Unexpected file type: '"
                       << p << "'");
@@ -606,7 +607,9 @@ int vtkPVEnSightMasterServerReader::ParseMasterServerFile()
 
     // The rest of this stuff is for picking the number of servers
     // and case file names from the SOS file.
-    else if(!readingServers && (line == "SERVERS"))
+    else if(!readingServers &&
+            vtkPVEnSightMasterServerReaderStartsWith(line.c_str(),
+                                                     "SERVERS"))
       {
       // The SERVERS section starts here.
       readingServers = 1;
