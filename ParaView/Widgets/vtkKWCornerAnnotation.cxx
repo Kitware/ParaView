@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.55");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.56");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -75,7 +75,6 @@ vtkKWCornerAnnotation::vtkKWCornerAnnotation()
 {
   this->CommandFunction = vtkKWCornerAnnotationCommand;
 
-  this->AnnotationColorChangedEvent = vtkKWEvent::AnnotationColorChangedEvent;
   this->AnnotationChangedEvent = vtkKWEvent::ViewAnnotationChangedEvent;
 
   // CornerProp will either point to InternalCornerProp in vtkKWView mode, or
@@ -570,12 +569,6 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
   this->TextPropertyWidget->SetOnChangeCommand(onchangecommand.str());
   onchangecommand.rdbuf()->freeze(0);
 
-  ostrstream oncolorchangecommand;
-  oncolorchangecommand << this->GetTclName() 
-                       << " TextColorCallback" << ends;
-  this->TextPropertyWidget->SetOnColorChangeCommand(oncolorchangecommand.str());
-  oncolorchangecommand.rdbuf()->freeze(0);
-
   this->Script("pack %s -padx 2 -pady %d -side top -anchor nw -fill y", 
                this->TextPropertyWidget->GetWidgetName(),
                this->TextPropertyWidget->GetLongFormat() ? 0 : 2);
@@ -839,8 +832,8 @@ float *vtkKWCornerAnnotation::GetTextColor()
 //----------------------------------------------------------------------------
 void vtkKWCornerAnnotation::SetTextColor(float r, float g, float b)
 {
-  // The following call with eventually trigger the TextColorCallback
-  // and TextPropertyCallback (see Create()).
+  // The following call with eventually trigger the TextPropertyCallback 
+  // (see Create()).
 
   float *rgb = this->GetTextColor();
 
@@ -850,13 +843,6 @@ void vtkKWCornerAnnotation::SetTextColor(float r, float g, float b)
     {
     this->TextPropertyWidget->SetColor(r, g, b);
     }
-}
-
-//----------------------------------------------------------------------------
-void vtkKWCornerAnnotation::TextColorCallback()
-{
-  float *color = this->GetTextColor();
-  this->InvokeEvent(this->AnnotationColorChangedEvent, color);
 }
 
 //----------------------------------------------------------------------------
@@ -977,7 +963,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is,
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.55 $");
+  this->ExtractRevision(os,"$Revision: 1.56 $");
 }
 
 //----------------------------------------------------------------------------
@@ -1097,8 +1083,6 @@ void vtkKWCornerAnnotation::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "Frame: " << this->Frame << endl;
   os << indent << "CornerVisibilityButton: " 
      << this->CornerVisibilityButton << endl;
-  os << indent << "AnnotationColorChangedEvent: " 
-     << this->AnnotationColorChangedEvent << endl;
   os << indent << "AnnotationChangedEvent: " 
      << this->AnnotationChangedEvent << endl;
   os << indent << "CornerProp: " << this->GetCornerProp() << endl;
