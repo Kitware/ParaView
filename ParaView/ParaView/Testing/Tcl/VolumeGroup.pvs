@@ -1,4 +1,4 @@
-#$Application ExitOnReturnOn
+$Application ExitOnReturnOn
 
 if {[info exists argc]} { 
     set argcm1 [expr $argc - 1]
@@ -159,4 +159,4 @@ for {set i  1} {$i < [expr $argc - 1]} {incr i} {
     }
 }
    
-#$Application Exit
+$Application Exit
