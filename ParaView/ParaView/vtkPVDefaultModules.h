@@ -359,7 +359,7 @@ const char* vtkPVWindow::StandardFilterInterfaces=
 "  <LabeledToggle variable=\"IncludeBoundary\" help=\"Select whether to always include the boundary of the grid in the output\"/>\n"
 "</Module>\n"
 "\n"
-"<Module name=\"FeatureEdges\" root_name=\"FeatureEdges\" input=\"vtkPolyData\" output=\"vtkPolyData\" module_type=\"Filter\">\n"
+"<Module name=\"FeatureEdges\" root_name=\"FeatureEdges\" input=\"vtkPolyData\" output=\"vtkPolyData\" module_type=\"Filter\" replace_input=\"0\">\n"
 "  <Filter type=\"vtkFeatureEdges\"/>\n"
 "  <InputMenu label=\"Input\" help=\"Set the input to this filter.\"\n"
 "             input_name=\"PVInput\" input_type=\"vtkPolyData\"/>\n"
