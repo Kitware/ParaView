@@ -51,7 +51,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //------------------------------------------------------------------------------
 
 vtkStandardNewMacro(vtkKWPushButtonSet);
-vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.1");
+vtkCxxRevisionMacro(vtkKWPushButtonSet, "1.2");
 
 int vtkvtkKWPushButtonSetCommand(ClientData cd, Tcl_Interp *interp,
                                   int argc, char *argv[]);
@@ -153,11 +153,17 @@ void vtkKWPushButtonSet::Create(vtkKWApplication *app, const char *args)
   // Create the container frame
 
   this->Script("frame %s %s", this->GetWidgetName(), args ? args : "");
+
+  // Update enable state
+
+  this->UpdateEnableState();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWPushButtonSet::SetEnabled(int arg)
+void vtkKWPushButtonSet::UpdateEnableState()
 {
+  this->Superclass::UpdateEnableState();
+
   vtkKWPushButtonSet::ButtonSlot *button_slot = NULL;
   vtkKWPushButtonSet::ButtonsContainerIterator *it = 
     this->Buttons->NewIterator();
@@ -167,7 +173,7 @@ void vtkKWPushButtonSet::SetEnabled(int arg)
     {
     if (it->GetData(button_slot) == VTK_OK)
       {
-      button_slot->Button->SetEnabled(arg);
+      button_slot->Button->SetEnabled(this->Enabled);
       }
     it->GoToNextItem();
     }
