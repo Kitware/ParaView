@@ -59,8 +59,31 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Add a string element to the source list.
-  virtual void AddElement(const char*);
+  // Add a string element to the source list if it is not already there or on
+  // the final list. The optional argument force will make sure the item is
+  // added to the source list and removed from final if it is already there.
+  virtual void AddSourceElement(const char*, int force = 0);
+
+  // Description:
+  // Add a string element to the final list if it is not already there or on
+  // the final list. The optional argument force will make sure the item is
+  // added to the final list and removed from source if it is already there.
+  virtual void AddFinalElement(const char*, int force = 0);
+
+  // Description:
+  // Get the number of elements on the final list.
+  virtual int GetNumberOfElementsOnSourceList();
+  virtual int GetNumberOfElementsOnFinalList();
+
+  // Description:
+  // Get the element from the list.
+  virtual const char* GetElementFromSourceList(int idx);
+  virtual const char* GetElementFromFinalList(int idx);
+
+  // Description:
+  // Get the index of the item.
+  virtual int GetElementIndexFromSourceList(const char* element);
+  virtual int GetElementIndexFromFinalList(const char* element);
 
   // Description:
   // Callbacks.
@@ -88,6 +111,8 @@ protected:
   void MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2);
   void MoveSelectedList(vtkKWListBox* l1, vtkKWListBox* l2);
   void MoveList(vtkKWListBox* l1, vtkKWListBox* l2, const char* list);
+  void ShiftItems(vtkKWListBox* l1, int down);
+  void AddElement(vtkKWListBox* l1, vtkKWListBox* l2, const char* element, int force);
   
 private:
   vtkKWListSelectOrder(const vtkKWListSelectOrder&); // Not implemented

@@ -48,7 +48,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWListSelectOrder );
-vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.1");
+vtkCxxRevisionMacro(vtkKWListSelectOrder, "1.2");
 
 //----------------------------------------------------------------------------
 vtkKWListSelectOrder::vtkKWListSelectOrder()
@@ -100,6 +100,7 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
   vtkKWFrame* frame;
   this->SourceList->SetParent(this);
   this->SourceList->Create(app, 0);
+  this->SourceList->GetListbox()->Configure("-selectmode multiple");
   this->Script("pack %s -side left -expand true -fill both",
     this->SourceList->GetWidgetName());
   frame = vtkKWFrame::New();
@@ -134,6 +135,7 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
   frame->Create(app, 0);
   this->FinalList->SetParent(frame->GetFrame());
   this->FinalList->Create(app, 0);
+  this->FinalList->GetListbox()->Configure("-selectmode multiple");
   this->Script("pack %s -side top -expand true -fill both",
     this->FinalList->GetWidgetName());
   vtkKWFrame* btframe = vtkKWFrame::New();
@@ -143,9 +145,11 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
   this->UpButton->SetParent(btframe->GetFrame());
   this->UpButton->Create(app, 0);
   this->UpButton->SetLabel("Up");
+  this->UpButton->SetCommand(this, "UpCallback");
   this->DownButton->SetParent(btframe->GetFrame());
   this->DownButton->Create(app, 0);
   this->DownButton->SetLabel("Down");
+  this->DownButton->SetCommand(this, "DownCallback");
   this->Script("pack %s %s -side left -fill x",
     this->UpButton->GetWidgetName(),
     this->DownButton->GetWidgetName());
@@ -159,9 +163,35 @@ void vtkKWListSelectOrder::Create(vtkKWApplication *app, const char *args)
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::AddElement(const char* element)
+void vtkKWListSelectOrder::AddElement(vtkKWListBox* l1, vtkKWListBox* l2, 
+  const char* element, int force)
 {
-  this->SourceList->AppendUnique(element);
+  int idx = l2->GetItemIndex(element);
+  if ( idx >= 0 )
+    {
+    if ( force )
+      {
+      l2->DeleteRange(idx, idx);
+      l1->AppendUnique(element);
+      }
+    }
+  else
+    {
+    l1->AppendUnique(element);
+    }
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListSelectOrder::AddSourceElement(const char* element, int force /* = 0 */)
+{
+  this->AddElement(this->SourceList, this->FinalList, element, force);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListSelectOrder::AddFinalElement(const char* element, int force /* = 0 */)
+{
+  this->AddElement(this->FinalList, this->SourceList, element, force);
 }
 
 //----------------------------------------------------------------------------
@@ -189,10 +219,54 @@ void vtkKWListSelectOrder::RemoveAllCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::UpCallback() {}
+void vtkKWListSelectOrder::ShiftItems(vtkKWListBox* l1, int down)
+{
+  const char* list = this->Script("lsort -integer %s [ %s curselection ]", 
+    down?"-decreasing":"",
+    l1->GetListbox()->GetWidgetName());
+  char* selection = new char[ strlen(list) + 1 ];
+  strcpy(selection, list);
+  int idx = -1;
+  int size = l1->GetNumberOfItems();
+  istrstream sel(selection);
+  vtkstd::string item;
+  while(sel >> idx)
+    {
+    if ( idx < 0 )
+      {
+      break;
+      }
+    int newidx = idx - 1;
+    if ( down )
+      {
+      newidx = idx + 1;
+      }
+    if ( newidx >= 0 && newidx < size )
+      {
+      item = l1->GetItem(idx);
+      l1->DeleteRange(idx, idx);
+      l1->InsertEntry(newidx, item.c_str());
+      this->Script("%s selection set %d %d",
+        l1->GetListbox()->GetWidgetName(), newidx, newidx);
+      }
+
+    idx = -1;
+    }
+  delete [] selection;
+  this->Modified();
+}
 
 //----------------------------------------------------------------------------
-void vtkKWListSelectOrder::DownCallback() {}
+void vtkKWListSelectOrder::UpCallback()
+{
+  this->ShiftItems(this->FinalList, 0);
+}
+
+//----------------------------------------------------------------------------
+void vtkKWListSelectOrder::DownCallback()
+{
+  this->ShiftItems(this->FinalList, 1);
+}
 
 //----------------------------------------------------------------------------
 void vtkKWListSelectOrder::MoveWholeList(vtkKWListBox* l1, vtkKWListBox* l2)
@@ -222,18 +296,60 @@ void vtkKWListSelectOrder::MoveList(vtkKWListBox* l1, vtkKWListBox* l2,
   istrstream sel(selection);
   while(sel >> idx)
     {
-    cout << "Index: " << idx << endl;
+    if ( idx < 0 )
+      {
+      break;
+      }
     str = l1->GetItem(idx);
     l2->AppendUnique(str.c_str());
     vec.push_back(idx);
+    idx = -1;
     }
   while( vec.size() )
     {
     idx = vec[vec.size() - 1];
     l1->DeleteRange(idx,idx);
+    vec.erase(vec.end()-1);
     }
   delete [] selection;
   
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListSelectOrder::GetNumberOfElementsOnSourceList()
+{
+  return this->SourceList->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListSelectOrder::GetNumberOfElementsOnFinalList()
+{
+  return this->FinalList->GetNumberOfItems();
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWListSelectOrder::GetElementFromSourceList(int idx)
+{
+  return this->SourceList->GetItem(idx);
+}
+
+//----------------------------------------------------------------------------
+const char* vtkKWListSelectOrder::GetElementFromFinalList(int idx)
+{
+  return this->FinalList->GetItem(idx);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListSelectOrder::GetElementIndexFromSourceList(const char* element)
+{
+  return this->SourceList->GetItemIndex(element);
+}
+
+//----------------------------------------------------------------------------
+int vtkKWListSelectOrder::GetElementIndexFromFinalList(const char* element)
+{
+  return this->FinalList->GetItemIndex(element);
 }
 
 //----------------------------------------------------------------------------
