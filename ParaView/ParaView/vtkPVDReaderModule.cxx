@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDReaderModule);
-vtkCxxRevisionMacro(vtkPVDReaderModule, "1.2.2.3");
+vtkCxxRevisionMacro(vtkPVDReaderModule, "1.2.2.4");
 
 //----------------------------------------------------------------------------
 vtkPVDReaderModule::vtkPVDReaderModule()
@@ -100,12 +100,12 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
     << vtkClientServerStream::Invoke
     << this->GetVTKSourceID() << "UpdateAttributes"
     << vtkClientServerStream::End;
+  pm->SendStreamToServer();
   pm->GetStream()
     << vtkClientServerStream::Invoke
     << this->GetVTKSourceID() << "GetAttributeIndex" << "timestep"
     << vtkClientServerStream::End;
-  int fixme; // This was a rootscript
-  pm->SendStreamToServer();
+  pm->SendStreamToServerRoot();
   int index = -1;
   this->HaveTime = (pm->GetLastServerResult().GetArgument(0, 0, &index) &&
                     index >= 0)? 1 : 0;
@@ -118,11 +118,12 @@ int vtkPVDReaderModule::ReadFileInformation(const char* fname)
       << this->GetVTKSourceID() << "SetRestrictionAsIndex"
       << "timestep" << 0
       << vtkClientServerStream::End;
+    pm->SendStreamToServer();
     pm->GetStream()
       << vtkClientServerStream::Invoke
       << this->GetVTKSourceID() << "GetNumberOfAttributeValues" << index
       << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     int numValues = 0;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &numValues))
       {

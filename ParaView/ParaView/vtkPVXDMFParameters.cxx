@@ -163,7 +163,7 @@ vtkStandardNewMacro(vtkPVXDMFParametersInternals);
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVXDMFParameters);
-vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8.2.8");
+vtkCxxRevisionMacro(vtkPVXDMFParameters, "1.8.2.9");
 
 //----------------------------------------------------------------------------
 vtkPVXDMFParameters::vtkPVXDMFParameters()
@@ -244,7 +244,7 @@ void vtkPVXDMFParameters::UpdateFromReader()
                     << this->ServerSideID << "GetParameters"
                     << this->VTKReaderID
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();  // was a rootscript
+    pm->SendStreamToServerRoot();
     vtkClientServerStream parameters;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &parameters))
       {

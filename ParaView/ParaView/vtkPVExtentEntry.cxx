@@ -63,7 +63,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.9");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.25.2.10");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -457,7 +457,7 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   pm->GetStream() << vtkClientServerStream::Invoke 
                   << this->ObjectID << "GetWholeExtent" 
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer(); // Was a RootScript
+  pm->SendStreamToServerRoot();
   for(int i =0; i < 6; ++i)
     {
     if(!pm->GetLastServerResult().GetArgument(0, 0, ext+i))

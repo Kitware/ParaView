@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.3.4.4");
+vtkCxxRevisionMacro(vtkPVIceTDisplayRenderModule, "1.3.4.5");
 
 
 
@@ -84,17 +84,20 @@ vtkPVIceTDisplayRenderModule::~vtkPVIceTDisplayRenderModule()
     }
 
   // Tree Composite
-  if (this->CompositeID.ID && pvApp && pm)
+  if (this->DisplayManagerID.ID && pvApp && pm)
     { 
     pm->DeleteStreamObject(this->DisplayManagerID);
-    pm->SendStreamToServer();
+    pm->SendStreamToServer(); 
     this->DisplayManagerID.ID = 0;
     }
-  if (this->CompositeID.ID && pvApp && pm)
+   if (this->CompositeID.ID && pvApp && pm)
     {  
     pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStreamToClientAndServer();
-    this->Composite = NULL;
+    pm->SendStreamToClient(); 
+    pm->DeleteStreamObject(this->CompositeID);
+    pm->SendStreamToServerRoot(); 
+    this->CompositeID.ID = 0;
+    this->Composite = 0;
     }
   else if (this->Composite)
     {
@@ -138,7 +141,11 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   this->RenderWindow = 
     vtkRenderWindow::SafeDownCast(
       pm->GetObjectFromID(this->RenderWindowID));
-
+  pm->GetStream() << vtkClientServerStream::Invoke 
+                  << this->RenderWindowID
+                  << "FullScreenOn"
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServer();
   if (pvApp->GetUseStereoRendering())
     {
     this->RenderWindow->StereoCapableWindowOn();
@@ -149,15 +156,10 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << this->RenderWindowID << "AddRenderer" << this->RendererID
                   << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
-  
-  //cout << "Ren1: " << this->RendererTclName << " " << this->Renderer->GetClassName() << endl;
-  //cout << "RenWin1: " << this->RenderWindowTclName << " " << this->RenderWindow->GetClassName() << endl;
-
 
   this->Composite = NULL;
   this->DisplayManagerID = pm->NewStreamObject("vtkIceTRenderManager");
   pm->SendStreamToClientAndServer();
-  
   int *tileDim = pvApp->GetTileDimensions();
   cout << "Size: " << tileDim[0] << ", " << tileDim[1] << endl;
   pm->GetStream() <<  vtkClientServerStream::Invoke
@@ -165,7 +167,7 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << "SetTileDimensions"
                   << tileDim[0] << tileDim[1]
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->DisplayManagerID << "SetRenderWindow"
                   << this->RenderWindowID
@@ -188,7 +190,12 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
 
   // **********************************************************
   this->CompositeID = pm->NewStreamObject("vtkIceTClientCompositeManager");
-  pm->SendStreamToClientAndServer(); // was a rootscript
+  pm->SendStreamToClient();
+  pm->GetStream() << vtkClientServerStream::New
+                  << "vtkIceTClientCompositeManager" << this->CompositeID 
+                  << vtkClientServerStream::End;
+  pm->SendStreamToServerRoot();
+
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
   // How can we syncronize the process modules and render modules?
@@ -201,9 +208,7 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetClientFlag" << vtkClientServerStream::LastResult
-                  << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
-
+                  << vtkClientServerStream::End; 
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetRenderWindow"
                   << this->RenderWindowID
@@ -214,7 +219,11 @@ void vtkPVIceTDisplayRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "UseCompositingOn"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  // copy the stream before it is sent and reset
+  vtkClientServerStream copy = pm->GetStream();
+  pm->SendStreamToClient(); // send the stream to the client
+  pm->GetStream() = copy; // now copy the copy into the current stream
+  pm->SendStreamToServerRoot(); // send the same stream to the server root
 }
 
 //----------------------------------------------------------------------------
@@ -244,7 +253,7 @@ void vtkPVIceTDisplayRenderModule::StillRender()
   vtkTimerLog::MarkStartEvent("Still Render");
   vtkPVApplication* pvApp = this->PVApplication;
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  //pm->RootScript("RenWin1 Render");
+  pm->RootScript("RenWin1 Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Still Render");
   */
@@ -269,7 +278,7 @@ void vtkPVIceTDisplayRenderModule::InteractiveRender()
   vtkTimerLog::MarkStartEvent("Interactive Render");
   vtkPVApplication* pvApp = this->PVApplication;
   vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  //pm->RootScript("RenWin1 Render");
+  pm->RootScript("RenWin1 Render");
   this->RenderWindow->Render();
   vtkTimerLog::MarkEndEvent("Interactive Render");
   */

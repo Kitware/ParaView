@@ -103,7 +103,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.210.2.15");
+vtkCxxRevisionMacro(vtkPVData, "1.210.2.16");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -2394,7 +2394,7 @@ void vtkPVData::SaveInBatchScript(ofstream *file)
                         << this->GetPVSource()->GetVTKSourceID(sourceCount)
                         << "GetNumberOfOutputs" 
                         << vtkClientServerStream::End;
-        pm->SendStreamToServer();
+        pm->SendStreamToServerRoot();
         if(!pm->GetLastServerResult().GetArgument(0, 0, &numOutputs))
           {
           vtkErrorMacro("wrong return type for GetNumberOfOutputs call");

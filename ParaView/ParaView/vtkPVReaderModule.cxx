@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vtkstd/string>
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVReaderModule);
-vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.7");
+vtkCxxRevisionMacro(vtkPVReaderModule, "1.32.2.8");
 
 int vtkPVReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -167,7 +167,7 @@ int vtkPVReaderModule::CanReadFile(const char* fname)
     pm->SendStreamToServer();
     pm->GetLastServerResult().GetArgument(0, 0, &canRead);
     pm->DeleteStreamObject(tmpID);
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     }
   return canRead;
 }

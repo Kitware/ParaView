@@ -65,7 +65,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkXDMFReaderModule);
-vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.5");
+vtkCxxRevisionMacro(vtkXDMFReaderModule, "1.10.2.6");
 
 int vtkXDMFReaderModuleCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -321,10 +321,11 @@ void vtkXDMFReaderModule::UpdateGrids()
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID() << "UpdateInformation"
                   << vtkClientServerStream::End;
+  pm->SendStreamToServer();
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID() << "GetNumberOfGrids"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();  // was a rootscript
+  pm->SendStreamToServerRoot();
   int numGrids = 0;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &numGrids))
     {
@@ -338,7 +339,7 @@ void vtkXDMFReaderModule::UpdateGrids()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->GetVTKSourceID() << "GetGridName" << i
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     const char* gname;
     if(pm->GetLastServerResult().GetArgument(0, 0, &gname))
       {
@@ -373,10 +374,11 @@ void vtkXDMFReaderModule::UpdateDomains()
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID() << "UpdateInformation"
                   << vtkClientServerStream::End;
+  pm->SendStreamToServer();
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->GetVTKSourceID() << "GetNumberOfDomains"
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();  // was a rootscript
+  pm->SendStreamToServerRoot();
   int numDomains = 0;
   if(!pm->GetLastServerResult().GetArgument(0, 0, &numDomains))
     {
@@ -390,7 +392,7 @@ void vtkXDMFReaderModule::UpdateDomains()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->GetVTKSourceID() << "GetDomainName" << i
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     const char* dname;
     if(pm->GetLastServerResult().GetArgument(0, 0, &dname))
       {

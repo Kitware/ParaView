@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVPart);
-vtkCxxRevisionMacro(vtkPVPart, "1.28.2.10");
+vtkCxxRevisionMacro(vtkPVPart, "1.28.2.11");
 
 
 int vtkPVPartCommand(ClientData cd, Tcl_Interp *interp,
@@ -355,7 +355,7 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->VTKDataID << "GetMaximumNumberOfPieces"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer(); // Was a RootScript
+    pm->SendStreamToServerRoot();
     int num =0;
     pm->GetLastServerResult().GetArgument(0,0,&num);
     if (num != 1)
@@ -407,7 +407,7 @@ void vtkPVPart::InsertExtractPiecesIfNecessary()
     pm->GetStream() << vtkClientServerStream::Invoke 
                     << this->VTKDataID << "GetMaximumNumberOfPieces"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer(); // Was a RootScript
+    pm->SendStreamToServerRoot();
     int num =0;
     pm->GetLastServerResult().GetArgument(0,0,&num);
     if (num != 1)

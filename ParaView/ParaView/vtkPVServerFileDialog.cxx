@@ -64,7 +64,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVServerFileDialog );
-vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.4");
+vtkCxxRevisionMacro(vtkPVServerFileDialog, "1.22.2.5");
 
 int vtkPVServerFileDialogCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -616,7 +616,7 @@ void vtkPVServerFileDialog::LoadSaveCallback()
                     << this->ServerSideID << "FileIsDirectory"
                     << fileName.c_str()
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();  // was a rootscript
+    pm->SendStreamToServerRoot();
     int isdir = 0;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &isdir))
       {
@@ -928,7 +928,7 @@ void vtkPVServerFileDialog::Update()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ServerSideID << "GetCurrentWorkingDirectory"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer(); // was a rootscript
+    pm->SendStreamToServerRoot();
     const char* cwd;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &cwd))
       {
@@ -947,7 +947,7 @@ void vtkPVServerFileDialog::Update()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ServerSideID << "GetCurrentWorkingDirectory"
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer();
+    pm->SendStreamToServerRoot();
     const char* cwd;
     if(!pm->GetLastServerResult().GetArgument(0, 0, &cwd))
       {

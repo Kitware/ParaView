@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVIceTRenderModule);
-vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.2.4.3");
+vtkCxxRevisionMacro(vtkPVIceTRenderModule, "1.2.4.4");
 
 
 
@@ -81,18 +81,20 @@ vtkPVIceTRenderModule::~vtkPVIceTRenderModule()
     }
 
   // Tree Composite
-  if (this->DisplayManagerID.ID && pvApp && pm)
-    {
-    pm->DeleteStreamObject(this->DisplayManagerID);
-    pm->SendStreamToServer();
-    this->DisplayManagerID.ID = 0;
-    }
-  if (this->CompositeID.ID && pvApp && pm)
-    {  
-    pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStreamToClientAndServer();
-    this->Composite = NULL;
-    }
+   if (this->DisplayManagerID.ID && pvApp && pm)
+     {
+     pm->DeleteStreamObject(this->DisplayManagerID);
+     pm->SendStreamToServer();
+     this->DisplayManagerID.ID = 0;
+     }
+   if (this->CompositeID.ID && pvApp && pm)
+     {
+     pm->DeleteStreamObject(this->CompositeID);
+     pm->SendStreamToClient();
+     pm->DeleteStreamObject(this->CompositeID);
+     pm->SendStreamToServerRoot();
+     this->CompositeID.ID = 0;
+     }
 }
 
 //----------------------------------------------------------------------------
@@ -119,7 +121,7 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   // a circular reference.
   this->PVApplication = pvApp;
   this->PVApplication->Register(this);
-  
+
   this->RendererID = pm->NewStreamObject("vtkIceTRenderer");
   this->RenderWindowID = pm->NewStreamObject("vtkRenderWindow");
   pm->SendStreamToClientAndServer();
@@ -132,7 +134,8 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->RenderWindowID 
                   << "FullScreenOn" 
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->SendStreamToServer();
+
   if (pvApp->GetUseStereoRendering())
     {
     this->RenderWindow->StereoCapableWindowOn();
@@ -143,9 +146,6 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << this->RenderWindowID << "AddRenderer" << this->RendererID
                   << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
-  
-  //cout << "Ren1: " << this->RendererTclName << " " << this->Renderer->GetClassName() << endl;
-  //cout << "RenWin1: " << this->RenderWindowTclName << " " << this->RenderWindow->GetClassName() << endl;
 
   this->DisplayManagerID = pm->NewStreamObject("vtkIceTRenderManager");
   pm->SendStreamToClientAndServer();
@@ -157,12 +157,13 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << tileDim[0] << tileDim[1]
                   << vtkClientServerStream::End;
   pm->SendStreamToServer();
-  
+
   pm->GetStream() << vtkClientServerStream::Invoke
                   << this->DisplayManagerID << "SetRenderWindow"
                   << this->RenderWindowID
                   << vtkClientServerStream::End;
   pm->SendStreamToServer();
+
   pm->GetStream() << vtkClientServerStream::Invoke
                   << pm->GetProcessModuleID()
                   << "GetController"
@@ -171,15 +172,19 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << this->DisplayManagerID << "SetController"
                   << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End; 
- pm->GetStream() << vtkClientServerStream::Invoke
+  pm->GetStream() << vtkClientServerStream::Invoke
                   << this->DisplayManagerID 
                   << "InitializeRMIs"
                   << vtkClientServerStream::End;
   pm->SendStreamToServer();
 
+
   // **********************************************************
   this->CompositeID = pm->NewStreamObject("vtkIceTClientCompositeManager");
-  pm->SendStreamToClientAndServer(); // was a rootscript
+  vtkClientServerStream tmp = pm->GetStream();
+  pm->SendStreamToClient();
+  pm->GetStream() = tmp;
+  pm->SendStreamToServerRoot();
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
   // How can we syncronize the process modules and render modules?
@@ -192,28 +197,60 @@ void vtkPVIceTRenderModule::SetPVApplication(vtkPVApplication *pvApp)
                   << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetClientFlag" << vtkClientServerStream::LastResult
+                  << vtkClientServerStream::End; 
+  pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
+                  << "SetRenderWindow"
+                  << this->RenderWindowID
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
+                  << "InitializeRMIs"
+                  << vtkClientServerStream::End;
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "UseCompositingOn"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
-  
+  // copy the stream before it is sent and reset
+  vtkClientServerStream copy = pm->GetStream();
+  pm->SendStreamToClient(); // send the stream to the client
+  pm->GetStream() = copy; // now copy the copy into the current stream
+  pm->SendStreamToServerRoot(); // send the same stream to the server root
+
+  // The client server manager needs to set parameters on the IceT manager.
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetIceTManager" << this->DisplayManagerID
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServerRoot();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVIceTRenderModule::StillRender()
 {
+  // No reduction for still render.
+  /*
+  if (this->PVApplication && this->DisplayManagerTclName)
+    {
+    this->PVApplication->GetProcessModule()->RootScript("%s SetImageReductionFactor 1",
+                                         this->DisplayManagerTclName);
+    this->PVApplication->BroadcastScript("%s ParallelRenderingOn",
+                                         this->DisplayManagerTclName);
+    }
+  */
+
   this->Superclass::StillRender();
 }
 
 //----------------------------------------------------------------------------
 void vtkPVIceTRenderModule::InteractiveRender()
 {
+  /*
+  if (this->PVApplication && this->DisplayManagerTclName)
+    {
+    this->PVApplication->GetProcessModule()->RootScript("%s SetImageReductionFactor %d",
+                                         this->DisplayManagerTclName,
+                                         this->ReductionFactor);
+    this->PVApplication->BroadcastScript("%s ParallelRenderingOn",
+                                         this->DisplayManagerTclName);
+    }
+  */
   this->Superclass::InteractiveRender();
 }
 

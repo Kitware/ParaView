@@ -86,7 +86,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.17");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.24.2.18");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -321,7 +321,7 @@ void vtkPVProcessModule::GatherInformation(vtkPVInformation* info,
     << vtkClientServerStream::LastResult
     << "GatherInformationInternal" << info->GetClassName() << id
     << vtkClientServerStream::End;
-  this->SendStreamToServer();
+  this->SendStreamToServerRoot();
   this->TemporaryInformation = NULL;
 }
 
@@ -407,7 +407,7 @@ int vtkPVProcessModule::GetDirectoryListing(const char* dir,
   this->GetStream() << vtkClientServerStream::Invoke
                     << lid << "GetFileListing" << dir << save
                     << vtkClientServerStream::End;
-  this->SendStreamToServer();
+  this->SendStreamToServerRoot();
   vtkClientServerStream result;
   if(!this->GetLastServerResult().GetArgument(0, 0, &result))
     {

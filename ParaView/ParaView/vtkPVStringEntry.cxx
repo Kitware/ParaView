@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVStringEntry);
-vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.10");
+vtkCxxRevisionMacro(vtkPVStringEntry, "1.19.2.11");
 
 //----------------------------------------------------------------------------
 vtkPVStringEntry::vtkPVStringEntry()
@@ -240,7 +240,7 @@ void vtkPVStringEntry::ResetInternal()
     pm->GetStream() << vtkClientServerStream::Invoke
                     << this->ObjectID << method.c_str()
                     << vtkClientServerStream::End;
-    pm->SendStreamToServer(); // was a rootscript
+    pm->SendStreamToServerRoot();
     const char* value;
     if(pm->GetLastServerResult().GetArgument(0, 0, &value))
       {

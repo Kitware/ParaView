@@ -89,7 +89,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSource);
-vtkCxxRevisionMacro(vtkPVSource, "1.313.2.19");
+vtkCxxRevisionMacro(vtkPVSource, "1.313.2.20");
 
 
 int vtkPVSourceCommand(ClientData cd, Tcl_Interp *interp,
@@ -2442,18 +2442,28 @@ int vtkPVSource::InitializeData()
       vtkClientServerID translatorID = {0};
       if ( ! input)
         {  
-// Was a rootscript, this stuff needs fixing:        
-//         // Do not overwrite custom extent translators.
-//         // PVExtent translator should really be the default,
-//         // Then we would not need to do this.
-//         pm->RootScript("[${%s} GetExtentTranslator] GetClassName",
-//                        dataName); 
-//         if (strcmp(pm->GetRootResult(),"vtkExtentTranslator") == 0)
-        vtkClientServerID translatorID = pm->NewStreamObject("vtkPVExtentTranslator");
         stream << vtkClientServerStream::Invoke << dataID 
-               << "SetExtentTranslator" << translatorID 
+               << "GetExtentTranslator"
                << vtkClientServerStream::End;
-        pm->SendStreamToServer();
+        stream << vtkClientServerStream::Invoke 
+               << vtkClientServerStream::LastResult 
+               << "GetClassName"
+               << vtkClientServerStream::End; 
+        pm->SendStreamToServerRoot();
+        char* classname = 0;
+        if(!pm->GetLastServerResult().GetArgument(0,0,&classname))
+          {
+          vtkErrorMacro(<< "Faild to get server result.");
+          }
+        if(classname && strcmp(classname, "vtkExtentTranslator") == 0)
+          {
+          vtkClientServerID translatorID 
+            = pm->NewStreamObject("vtkPVExtentTranslator");
+          stream << vtkClientServerStream::Invoke << dataID 
+                 << "SetExtentTranslator" << translatorID 
+                 << vtkClientServerStream::End;
+          pm->SendStreamToServer();
+          }
         }
       part->InsertExtractPiecesIfNecessary();
       if (translatorID.ID != 0)

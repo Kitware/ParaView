@@ -54,7 +54,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVDeskTopRenderModule);
-vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.2.4.3");
+vtkCxxRevisionMacro(vtkPVDeskTopRenderModule, "1.2.4.4");
 
 
 
@@ -82,13 +82,15 @@ vtkPVDeskTopRenderModule::~vtkPVDeskTopRenderModule()
   if (this->DisplayManagerID.ID && pvApp && pm)
     {
     pm->DeleteStreamObject(this->DisplayManagerID);
-    pm->SendStreamToServer();
+    pm->SendStreamToServer(); 
     this->DisplayManagerID.ID = 0;
     }
   if (this->CompositeID.ID && pvApp && pm)
     {
     pm->DeleteStreamObject(this->CompositeID);
-    pm->SendStreamToServer();
+    pm->SendStreamToClient();
+    pm->DeleteStreamObject(this->CompositeID);
+    pm->SendStreamToServerRoot();
     this->CompositeID.ID = 0;
     }
 }
@@ -173,7 +175,7 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   // the same id
   pm->GetStream() << vtkClientServerStream::New << "vtkDesktopDeliveryServer"
                   <<  this->CompositeID <<  vtkClientServerStream::End;
-  pm->SendStreamToServer(); // Was a RootScript
+  pm->SendStreamToServerRoot();
 
   // Clean up this mess !!!!!!!!!!!!!
   // Even a cast to vtkPVClientServerModule would be better than this.
@@ -183,12 +185,16 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetController" << vtkClientServerStream::LastResult
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  vtkClientServerStream tmp = pm->GetStream();
+  pm->SendStreamToClient();
+  pm->GetStream() = tmp;
+  pm->SendStreamToServerRoot();
+  
 
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetParallelRenderManager" << this->DisplayManagerID
                   << vtkClientServerStream::End;
-  pm->SendStreamToServer();
+  pm->SendStreamToServerRoot();
 
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "SetRenderWindow"
@@ -200,7 +206,10 @@ void vtkPVDeskTopRenderModule::SetPVApplication(vtkPVApplication *pvApp)
   pm->GetStream() << vtkClientServerStream::Invoke << this->CompositeID
                   << "UseCompositingOn"
                   << vtkClientServerStream::End;
-  pm->SendStreamToClientAndServer();
+  tmp = pm->GetStream();
+  pm->SendStreamToClient();
+  pm->GetStream() = tmp;
+  pm->SendStreamToServerRoot();
 }
 
 //----------------------------------------------------------------------------
