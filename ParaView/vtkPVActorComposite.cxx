@@ -154,7 +154,7 @@ vtkPVActorComposite::vtkPVActorComposite()
   
   this->PVData = NULL;
   this->DataSetInput = NULL;
-  this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
+//  this->Mode = VTK_PV_ACTOR_COMPOSITE_POLY_DATA_MODE;
   
   //this->TextureFilter = NULL;  
 }
@@ -1412,6 +1412,7 @@ vtkPVApplication* vtkPVActorComposite::GetPVApplication()
 }
 
 //----------------------------------------------------------------------------
+/*
 void vtkPVActorComposite::SetMode(int mode)
 {
   vtkPVApplication *pvApp = this->GetPVApplication();
@@ -1443,6 +1444,7 @@ void vtkPVActorComposite::SetMode(int mode)
     pvApp->BroadcastScript("%s SetModeToSurface", this->GeometryTclName);
     }  
 }
+*/
 
 //----------------------------------------------------------------------------
 void vtkPVActorComposite::SetScalarBarVisibility(int val)
@@ -1623,99 +1625,35 @@ void vtkPVActorComposite::SaveInTclScript(ofstream *file, const char *sourceName
 
   renTclName = this->GetPVRenderView()->GetRendererTclName();
 
-  if (this->Mode == VTK_PV_ACTOR_COMPOSITE_IMAGE_OUTLINE_MODE)
+  *file << "vtkPVGeometryFilter " << this->GeometryTclName << "\n\t"
+        << this->GeometryTclName << " SetInput [" << sourceName
+        << " GetOutput";
+  if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
+                             "vtkGenericEnSightReader") == 0)
     {
-    // We no longer have an explicit outline filter.  Do the equivalent VTK pipeline.
-    *file << "vtkOutlineFilter Outline" << this->InstanceCount << "\n\t"
-          << "Outline" << this->InstanceCount << " SetInput [" << sourceName
-          << " GetOutput";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
-                               "vtkGenericEnSightReader") == 0)
+    dataTclName = this->GetPVData()->GetVTKDataTclName();
+    charFound = strrchr(dataTclName, 'O');
+    pos = charFound - dataTclName - 1;
+    newReaderNum = atoi(dataTclName + pos);
+    if (newReaderNum != readerNum)
       {
-      dataTclName = this->GetPVData()->GetVTKDataTclName();
-      charFound = strrchr(dataTclName, 'O');
-      pos = charFound - dataTclName - 1;
-      newReaderNum = atoi(dataTclName + pos);
-      if (newReaderNum != readerNum)
-        {
-        readerNum = newReaderNum;
-        outputNum = 0;
-        }
-      else
-        {
-        outputNum++;
-        }
-      *file << " " << outputNum << "]\n\n";
+      readerNum = newReaderNum;
+      outputNum = 0;
       }
     else
       {
-      *file << "]\n\n";
+      outputNum++;
       }
-    
-    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
-          << this->MapperTclName << " SetInput [Outline"
-          << this->InstanceCount << " GetOutput]\n\t";
-    }
-  else if (this->Mode == VTK_PV_ACTOR_COMPOSITE_DATA_SET_MODE)
-    {
-    *file << "vtkDataSetSurfaceFilter " << this->GeometryTclName << "\n\t"
-          << this->GeometryTclName << " SetInput [" << sourceName
-          << " GetOutput";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
-                               "vtkGenericEnSightReader") == 0)
-      {
-      dataTclName = this->GetPVData()->GetVTKDataTclName();
-      charFound = strrchr(dataTclName, 'O');
-      pos = charFound - dataTclName - 1;
-      newReaderNum = atoi(dataTclName + pos);
-      if (newReaderNum != readerNum)
-        {
-        readerNum = newReaderNum;
-        outputNum = 0;
-        }
-      else
-        {
-        outputNum++;
-        }
-      *file << " " << outputNum << "]\n\n";
-      }
-    else
-      {
-      *file << "]\n\n";
-      }
-    
-    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
-          << this->MapperTclName << " SetInput ["
-          << this->GeometryTclName << " GetOutput]\n\t";
+    *file << " " << outputNum << "]\n\n";
     }
   else
     {
-    *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
-          << this->MapperTclName << " SetInput [" << sourceName
-          << " GetOutput";
-    if (pvsInterface && strcmp(pvsInterface->GetSourceClassName(), 
-                               "vtkGenericEnSightReader") == 0)
-      {
-      dataTclName = this->GetPVData()->GetVTKDataTclName();
-      charFound = strrchr(dataTclName, 'O');
-      pos = charFound - dataTclName - 1;
-      newReaderNum = atoi(dataTclName + pos);
-      if (newReaderNum != readerNum)
-        {
-        readerNum = newReaderNum;
-        outputNum = 0;
-        }
-      else
-        {
-        outputNum++;
-        }
-      *file << " " << outputNum << "]\n\t";
-      }
-    else
-      {
-      *file << "]\n\t";
-      }
+    *file << "]\n\n";
     }
+  
+  *file << "vtkPolyDataMapper " << this->MapperTclName << "\n\t"
+        << this->MapperTclName << " SetInput ["
+        << this->GeometryTclName << " GetOutput]\n\t";
   
   *file << this->MapperTclName << " SetImmediateModeRendering "
         << this->Mapper->GetImmediateModeRendering() << "\n\t";

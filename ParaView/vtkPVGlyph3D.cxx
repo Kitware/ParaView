@@ -392,8 +392,8 @@ void vtkPVGlyph3D::ChangeSource()
 
 void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
 {
-  char sourceTclName[256];
-  char* tempName;
+  char sourceName[30];
+  char *tempName;
   char *charFound;
   int pos;
   vtkPVSourceInterface *pvsInterface = this->GetInterface();
@@ -447,6 +447,22 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
     *file << "\n";
     }
 
+  if (strcmp(this->GlyphSourceTclName, "pvGlyphArrowOutput") == 0)
+    {
+    sprintf(sourceName, "pvGlyphArrow%d", this->InstanceCount);
+    *file << "vtkArrowSource " << sourceName << "\n\n";
+    }
+  else if (strcmp(this->GlyphSourceTclName, "pvGlyphConeOutput") == 0)
+    {
+    sprintf(sourceName, "pvGlyphCone%d", this->InstanceCount);
+    *file << "vtkConeSource " << sourceName << "\n\n";
+    }
+  else if (strcmp(this->GlyphSourceTclName, "pvGlyphSphereOutput") == 0)
+    {
+    sprintf(sourceName, "pvGlyphSphere%d", this->InstanceCount);
+    *file << "vtkSphereSource " << sourceName << "\n\n";
+    }
+  
   *file << this->VTKSource->GetClassName() << " "
         << this->VTKSourceTclName << "\n";
   
@@ -483,35 +499,8 @@ void vtkPVGlyph3D::SaveInTclScript(ofstream *file)
     }
   
   *file << this->VTKSourceTclName << " SetSource [";
-  if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-              "EnSight", 7) == 0)
-    {
-    sprintf(sourceTclName, "EnSightReader");
-    tempName = strtok(this->GlyphSourceTclName, "O");
-    strcat(sourceTclName, this->GlyphSourceTclName+7);
-    *file << sourceTclName << " GetOutput ";
-    charFound = strrchr(this->GlyphSourceTclName, 't');
-    pos = charFound - this->GlyphSourceTclName + 1;
-    *file << this->GlyphSourceTclName+pos << "]\n\t";
-    }
-  else if (strncmp(this->GetNthPVInput(0)->GetVTKDataTclName(),
-                   "DataSet", 7) == 0)
-    {
-    sprintf(sourceTclName, "DataSetReader");
-    tempName = strtok(this->GlyphSourceTclName, "O");
-    strcat(sourceTclName, tempName+7);
-    *file << sourceTclName << " GetOutput]\n\t";
-    }
-  else
-    {
-    char *whichSource;
-    
-    charFound = strrchr(this->GlyphSourceTclName, 't');
-    pos = charFound - this->GlyphSourceTclName + 1;
-    whichSource = this->GlyphSourceTclName + pos;
-    tempName = strtok(this->GlyphSourceTclName, "O");
-    *file << tempName << whichSource <<" GetOutput]\n\t";
-    }
+
+  *file << sourceName <<" GetOutput]\n\t";
 
   *file << this->VTKSourceTclName << " SetScaleModeTo";
   if (strcmp(this->ScaleModeMenu->GetValue(), "Scalar") == 0)

@@ -169,7 +169,7 @@ vtkPVWindow::vtkPVWindow()
   mInt->Delete();
   mInt = NULL;
 
-  // I plan to offload the animation, reseting, synchrinization and saving
+  // I plan to offload the animation, reseting, synchronization and saving
   // tasks of the interface to pvSourceWidgets.  Until then,
   // this is the easiest way to get CutPlane working is with an interface
   // (even though it is not created with an interface).
@@ -232,7 +232,7 @@ vtkPVWindow::vtkPVWindow()
   mInt->SetSetCommand("SetOffset");
   mInt->SetGetCommand("GetOffset");
   mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
+  this->ClipPlaneInterface->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
   // Center:
@@ -243,7 +243,7 @@ vtkPVWindow::vtkPVWindow()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
+  this->ClipPlaneInterface->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
   // Normal:
@@ -254,11 +254,9 @@ vtkPVWindow::vtkPVWindow()
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
   mInt->AddFloatArgument();
-  this->CutPlaneInterface->AddMethodInterface(mInt);
+  this->ClipPlaneInterface->AddMethodInterface(mInt);
   mInt->Delete();
   mInt = NULL;
-
-
 }
 
 //----------------------------------------------------------------------------
@@ -567,13 +565,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->CutPlaneButton->Create(app, "-image PVCutPlaneButton");
   this->CutPlaneButton->SetCommand(this, "CutPlaneCallback");
   this->CutPlaneButton->SetBalloonHelpString("Cut with an implicit plane. It is identical to generating point scalars from an implicit plane, and taking an iso surface. This filter typically reduces the dimensionality of the data.  A 3D input data set will produce an 2D output plane.");
-
+  this->CutPlaneInterface->SetApplication(app);
+  
   this->ClipPlaneButton->SetParent(this->Toolbar);
   //this->ClipPlaneButton->Create(app, "-text Clip");
   this->ClipPlaneButton->Create(app, "-image PVClipPlaneButton");
   this->ClipPlaneButton->SetCommand(this, "ClipPlaneCallback");
   this->ClipPlaneButton->SetBalloonHelpString("Clip with an implicit plane.  Takes a portion of the data set away and does not reduce the dimensionality of the data set.  A 3d input data set will produce a 3d output data set.");
-
+  this->ClipPlaneInterface->SetApplication(app);
+  
   this->ThresholdButton->SetParent(this->Toolbar);
   this->ThresholdButton->Create(app, "-image PVThresholdButton");
   this->ThresholdButton->SetCommand(this, "ThresholdCallback");
@@ -1047,7 +1047,8 @@ void vtkPVWindow::SaveInTclScript()
 
   *file << "# ParaView Version 0.1\n\n";
 
-  *file << "package require vtktcl_interactor\n\n"
+  *file << "package require vtk\n"
+        << "package require vtkinteraction\n"
         << "# create a rendering window and renderer\n";
   
   this->GetMainView()->SaveInTclScript(file);

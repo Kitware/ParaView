@@ -21,7 +21,6 @@ vtkPVData
 vtkPVDataSetReaderInterface 
 vtkPVEnSightReaderInterface 
 vtkPVExtentTranslator 
-vtkPVGeometryFilter
 vtkPVGlyph3D 
 vtkPVInputMenu 
 vtkPVLODActor
