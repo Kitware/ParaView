@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentTranslator);
-vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.12");
+vtkCxxRevisionMacro(vtkPVExtentTranslator, "1.13");
 
 vtkCxxSetObjectMacro(vtkPVExtentTranslator, OriginalSource, vtkDataSet);
 
@@ -64,7 +64,7 @@ vtkPVExtentTranslator::~vtkPVExtentTranslator()
 }
 
 //-----------------------------------------------------------------------------
-int vtkPVExtentTranslator::ThreadSafePieceToExtent(int piece, int numPieces, 
+int vtkPVExtentTranslator::PieceToExtentThreadSafe(int piece, int numPieces, 
                                       int ghostLevel, int *wholeExtent, 
                                       int *resultExtent, int splitMode, 
                                       int byPoints)
@@ -108,31 +108,41 @@ int vtkPVExtentTranslator::ThreadSafePieceToExtent(int piece, int numPieces,
     resultExtent[3] += ghostLevel;
     resultExtent[4] -= ghostLevel;
     resultExtent[5] += ghostLevel;
+    }
     
-    if (resultExtent[0] < origWholeExt[0])
-      {
-      resultExtent[0] = origWholeExt[0];
-      }
-    if (resultExtent[1] > origWholeExt[1])
-      {
-      resultExtent[1] = origWholeExt[1];
-      }
-    if (resultExtent[2] < origWholeExt[2])
-      {
-      resultExtent[2] = origWholeExt[2];
-      }
-    if (resultExtent[3] > origWholeExt[3])
-      {
-      resultExtent[3] = origWholeExt[3];
-      }
-    if (resultExtent[4] < origWholeExt[4])
-      {
-      resultExtent[4] = origWholeExt[4];
-      }
-    if (resultExtent[5] > origWholeExt[5])
-      {
-      resultExtent[5] = origWholeExt[5];
-      }
+  if (resultExtent[0] < wholeExtent[0])
+    {
+    resultExtent[0] = wholeExtent[0];
+    }
+  if (resultExtent[1] > wholeExtent[1])
+    {
+    resultExtent[1] = wholeExtent[1];
+    }
+  if (resultExtent[2] < wholeExtent[2])
+    {
+    resultExtent[2] = wholeExtent[2];
+    }
+  if (resultExtent[3] > wholeExtent[3])
+    {
+    resultExtent[3] = wholeExtent[3];
+    }
+  if (resultExtent[4] < wholeExtent[4])
+    {
+    resultExtent[4] = wholeExtent[4];
+    }
+  if (resultExtent[5] > wholeExtent[5])
+    {
+    resultExtent[5] = wholeExtent[5];
+    }
+
+  if (resultExtent[0] > resultExtent[1] ||
+      resultExtent[2] > resultExtent[3] ||
+      resultExtent[4] > resultExtent[5])
+    {
+    // Nothing in this piece.
+    resultExtent[0] = resultExtent[2] = resultExtent[4] = 0;
+    resultExtent[1] = resultExtent[3] = resultExtent[5] = -1;
+    return 0;
     }
     
   return 1;
