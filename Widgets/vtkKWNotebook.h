@@ -78,6 +78,9 @@ public:
   vtkSetMacro(MinimumHeight,int);
   vtkGetMacro(MinimumWidth,int);
   vtkGetMacro(MinimumHeight,int);
+
+  vtkSetMacro(MaximumWidth,int);
+  vtkGetMacro(MaximumWidth,int);
   
 protected:
   vtkKWNotebook();
@@ -87,6 +90,7 @@ protected:
 
   int MinimumWidth;
   int MinimumHeight;
+  int MaximumWidth;
   int Current;
   int Height;
   int Pad;

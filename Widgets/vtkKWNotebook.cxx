@@ -77,6 +77,7 @@ vtkKWNotebook::vtkKWNotebook()
   this->MaskRight2 = vtkKWWidget::New();
   this->MaskRight2->SetParent(this->MaskRight);
 
+  this->MaximumWidth = 360;
   this->MinimumWidth = 360;
   this->MinimumHeight = 600;
   this->Expanding = 0;
@@ -404,6 +405,10 @@ void vtkKWNotebook::Resize()
   if (width < this->MinimumWidth)
     {
     width = this->MinimumWidth;
+    }
+  if (width > this->MaximumWidth)
+    {
+    width = this->MaximumWidth;
     }
   if (height < this->MinimumHeight)
     {
