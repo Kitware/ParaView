@@ -175,7 +175,7 @@ VTK_WRAP_TCL3(
   "${ServerManagerCommon_SRCS};${SMInstantiator_SRCS}"
   ""
   )
-SET(VTK_TCL_HOME "${ParaView_SOURCE_DIR/GUI}")
+SET(VTK_TCL_HOME ${PVGUI_SOURCE_DIR})
 ADD_LIBRARY(vtkPVServerManagerTCL ${ServerManagerTCL_SRCS}
   ${VTK_TCL_HOME}/vtktcl.c
   vtkPVProcessModuleBatchHelper.cxx)
