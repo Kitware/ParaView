@@ -795,7 +795,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char *args)
   this->UpdateSelectMenu();
 
   this->DisableFilterButtons();
-  //this->AddRecentFilesToMenu("Exit",this);
+  this->AddRecentFilesToMenu("Exit",this);
 
   this->Script("wm protocol %s WM_DELETE_WINDOW { %s Exit }",
 	       this->GetWidgetName(), this->GetTclName());
@@ -837,9 +837,7 @@ void vtkPVWindow::CreateMainView(vtkPVApplication *pvApp)
   this->Script( "pack %s -expand yes -fill both", 
                 this->MainView->GetWidgetName());  
 
-  this->MenuFile->InsertCommand(this->MenuFile->GetIndex("Exit"), 
-				"Play Demo", this, "PlayDemo");
-  this->MenuFile->InsertSeparator(this->MenuFile->GetIndex("Exit"));
+  this->MenuHelp->AddCommand("Play Demo", this, "PlayDemo", 0);
 }
 
 
@@ -1046,7 +1044,7 @@ vtkPVSource *vtkPVWindow::Open(char *openFileName)
   if ( pvs )
     {
     // Store MRU
-    //this->AddRecentFile(NULL, openFileName, this, "OpenRecentFile");
+    this->AddRecentFile(NULL, openFileName, this, "OpenRecentFile");
     }
 
   return pvs;
