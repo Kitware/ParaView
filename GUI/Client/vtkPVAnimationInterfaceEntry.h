@@ -237,8 +237,6 @@ protected:
   vtkKWFrame*        DummyFrame;
 
   vtkKWText*         ScriptEditor;
-  vtkKWFrame*        ScriptEditorFrame;
-  vtkKWWidget*       ScriptEditorScroll;
 
   vtkKWPushButton*   ResetRangeButton;
   int ResetRangeButtonState;

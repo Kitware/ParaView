@@ -427,7 +427,6 @@ protected:
   vtkKWMessageDialog *AboutDialog;
   vtkKWLabel         *AboutDialogImage;
   vtkKWText          *AboutRuntimeInfo;
-  vtkKWWidget        *AboutScrollBar;
 
   int CharacterEncoding;
 

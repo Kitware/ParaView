@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVTimerLogDisplay );
-vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.20");
+vtkCxxRevisionMacro(vtkPVTimerLogDisplay, "1.21");
 
 int vtkPVTimerLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -45,9 +45,7 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   this->ButtonFrame = vtkKWWidget::New();
   this->DismissButton = vtkKWPushButton::New();
   
-  this->DisplayFrame = vtkKWWidget::New();
   this->DisplayText = vtkKWText::New();
-  this->DisplayScrollBar = vtkKWWidget::New();
 
   this->ControlFrame = vtkKWWidget::New();
   this->SaveButton = vtkKWPushButton::New();
@@ -66,7 +64,6 @@ vtkPVTimerLogDisplay::vtkPVTimerLogDisplay()
   //this->CommandIndex = 0;
   this->MasterWindow = 0;
   this->Threshold = 0.01;
-  this->Writable = 0;
 
   this->TimerInformation = NULL;
 }
@@ -81,10 +78,6 @@ vtkPVTimerLogDisplay::~vtkPVTimerLogDisplay()
   
   this->DisplayText->Delete();
   this->DisplayText = NULL;
-  this->DisplayScrollBar->Delete();
-  this->DisplayScrollBar = NULL;
-  this->DisplayFrame->Delete();
-  this->DisplayFrame = NULL;
 
   this->ControlFrame->Delete();
   this->ControlFrame = NULL;
@@ -184,27 +177,16 @@ void vtkPVTimerLogDisplay::Create(vtkKWApplication *app)
   this->Script("wm protocol %s WM_DELETE_WINDOW {%s Dismiss}",
                wname, this->GetTclName());
     
-  char scrollBarCommand[100];
-  this->DisplayFrame->SetParent(this);
-  this->DisplayFrame->Create(app, "frame", "");
-  this->DisplayText->SetParent(this->DisplayFrame);
-  this->DisplayText->Create(app, "-setgrid true -width 60 -height 8 -wrap word -state disabled");
-  this->DisplayScrollBar->SetParent(this->DisplayFrame);
-  sprintf(scrollBarCommand, "-command \"%s yview\"",
-          this->DisplayText->GetWidgetName());
-  this->DisplayScrollBar->Create(app, "scrollbar", scrollBarCommand);
- 
-  this->Script("%s configure -yscrollcommand \"%s set\"",
-               this->DisplayText->GetWidgetName(),
-               this->DisplayScrollBar->GetWidgetName());
-  this->Script("pack %s -side left -expand 1 -fill both",
-               this->DisplayText->GetWidgetName());
-  this->Script("pack %s -side left -expand 0 -fill y",
-               this->DisplayScrollBar->GetWidgetName());
+  this->DisplayText->SetParent(this);
+  this->DisplayText->Create(app, "-setgrid true");
+  this->DisplayText->SetWidth(60);
+  this->DisplayText->SetHeight(8);
+  this->DisplayText->SetWrapToWord();
+  this->DisplayText->EditableTextOff();
+  this->DisplayText->UseVerticalScrollbarOn();
+
   this->Script("pack %s -side bottom -expand 1 -fill both",
-               this->DisplayFrame->GetWidgetName());
-
-
+               this->DisplayText->GetWidgetName());
 
   this->ControlFrame->SetParent(this);
   this->ControlFrame->Create(app, "frame", "");
@@ -401,33 +383,8 @@ void vtkPVTimerLogDisplay::Save(const char *fileName)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVTimerLogDisplay::EnableWrite()
-{
-  this->Script("%s configure -state normal", 
-               this->DisplayText->GetWidgetName());
-  this->Writable = 1;
-}
-
-//----------------------------------------------------------------------------
-void vtkPVTimerLogDisplay::DisableWrite()
-{
-  this->Writable = 0;
-  this->Script("%s yview end", this->DisplayText->GetWidgetName());
-  // Try to get the scroll bar to initialize properly (show correct portion).
-  this->Script("update");                   
-  this->Script("%s configure -state disabled",
-               this->DisplayText->GetWidgetName());
-}
-
-//----------------------------------------------------------------------------
 void vtkPVTimerLogDisplay::Append(const char* msg)
 {
-  int w = this->Writable;
-  if ( !w )
-    {
-    this->EnableWrite();
-    }
-
   if (msg == NULL)
     {
     return;
@@ -446,14 +403,14 @@ void vtkPVTimerLogDisplay::Append(const char* msg)
       }
     ++str;
     }
-  this->Script("%s insert end {%s%c}",
-               this->DisplayText->GetWidgetName(), newStr, '\n');
+  this->DisplayText->AppendValue(newStr);
+  this->DisplayText->AppendValue("\n");
   delete [] newStr;
 
-  if ( !w )
-    {
-    this->DisableWrite();
-    }
+  // Try to get the scroll bar to initialize properly (show correct portion).
+  this->Script("%s yview end", 
+               this->DisplayText->GetTextWidget()->GetWidgetName());
+  this->Script("update");                   
 }
 
 //----------------------------------------------------------------------------
@@ -499,7 +456,6 @@ void vtkPVTimerLogDisplay::DisplayLog()
  
   numLogs = this->TimerInformation->GetNumberOfLogs();
 
-  this->EnableWrite();
   this->DisplayText->SetValue("");
   for (id = 0; id < numLogs; ++id)
     {
@@ -550,7 +506,6 @@ void vtkPVTimerLogDisplay::DisplayLog()
     delete [] strCopy;
     strCopy = NULL;
     }
-  //this->DisableWrite();
 }
 
 
@@ -592,9 +547,7 @@ void vtkPVTimerLogDisplay::UpdateEnableState()
   this->PropagateEnableState(this->EnableLabel);
   this->PropagateEnableState(this->EnableCheck);
 
-  this->PropagateEnableState(this->DisplayFrame);
   this->PropagateEnableState(this->DisplayText);
-  this->PropagateEnableState(this->DisplayScrollBar);
 
   this->PropagateEnableState(this->ButtonFrame);
   this->PropagateEnableState(this->DismissButton);

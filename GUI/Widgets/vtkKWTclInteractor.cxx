@@ -24,7 +24,7 @@
 
 //-------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWTclInteractor );
-vtkCxxRevisionMacro(vtkKWTclInteractor, "1.21");
+vtkCxxRevisionMacro(vtkKWTclInteractor, "1.22");
 
 int vtkKWTclInteractorCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -41,9 +41,7 @@ vtkKWTclInteractor::vtkKWTclInteractor()
   this->CommandLabel = vtkKWLabel::New();
   this->CommandEntry = vtkKWEntry::New();
   
-  this->DisplayFrame = vtkKWFrame::New();
   this->DisplayText = vtkKWText::New();
-  this->DisplayScrollBar = vtkKWWidget::New();
   
   this->Title = NULL;
   this->SetTitle("VTK Interactor");
@@ -70,10 +68,6 @@ vtkKWTclInteractor::~vtkKWTclInteractor()
   
   this->DisplayText->Delete();
   this->DisplayText = NULL;
-  this->DisplayScrollBar->Delete();
-  this->DisplayScrollBar = NULL;
-  this->DisplayFrame->Delete();
-  this->DisplayFrame = NULL;
   
   this->SetTitle(NULL);
   this->SetMasterWindow(0);
@@ -166,24 +160,17 @@ void vtkKWTclInteractor::Create(vtkKWApplication *app)
   this->Script("pack %s -side left -expand 1 -fill x",
                this->CommandEntry->GetWidgetName());
   
-  char scrollBarCommand[100];
-  this->DisplayFrame->SetParent(this);
-  this->DisplayFrame->Create(app, "");
-  this->DisplayText->SetParent(this->DisplayFrame);
-  this->DisplayText->Create(app, "-setgrid true -width 60 -height 8 -wrap word -state disabled");
-  this->DisplayScrollBar->SetParent(this->DisplayFrame);
-  sprintf(scrollBarCommand, "-command \"%s yview\"",
-          this->DisplayText->GetWidgetName());
-  this->DisplayScrollBar->Create(app, "scrollbar", scrollBarCommand);
-  this->Script("%s configure -yscrollcommand \"%s set\"",
-               this->DisplayText->GetWidgetName(),
-               this->DisplayScrollBar->GetWidgetName());
-  this->Script("pack %s -side left -expand 1 -fill both",
-               this->DisplayText->GetWidgetName());
-  this->Script("pack %s -side left -expand 0 -fill y",
-               this->DisplayScrollBar->GetWidgetName());
+  this->DisplayText->SetParent(this);
+  this->DisplayText->Create(app, "-setgrid true");
+  this->DisplayText->SetWidth(60);
+  this->DisplayText->SetHeight(8);
+  this->DisplayText->SetWrapToWord();
+  this->DisplayText->EditableTextOff();
+  this->DisplayText->UseVerticalScrollbarOn();
+
   this->Script("pack %s -side bottom -expand 1 -fill both",
-               this->DisplayFrame->GetWidgetName());
+               this->DisplayText->GetWidgetName());
+
   this->Script("pack %s -pady 3m -padx 2m -side bottom -fill x",
                this->CommandFrame->GetWidgetName());
 
@@ -208,32 +195,37 @@ void vtkKWTclInteractor::Evaluate()
 {
   this->CommandIndex = this->TagNumber;
   this->TagNumber++;
-  
-  this->Script("%s configure -state normal",
-               this->DisplayText->GetWidgetName());
-  this->Script("%s insert end [concat {%s}] %d",
-               this->DisplayText->GetWidgetName(),
-               this->CommandEntry->GetValue(), this->CommandIndex);
+
+  char buffer_tag[32];
+  sprintf(buffer_tag, "%d", this->CommandIndex);
+
+  this->DisplayText->AppendValue(this->CommandEntry->GetValue(),
+                                 buffer_tag);
+  this->DisplayText->AppendValue("\n");
+
   this->Script("set commandList [linsert $commandList end [concat {%s}]]",
                this->CommandEntry->GetValue());
-  this->Script("%s insert end \"\n\"", this->DisplayText->GetWidgetName());
+
   this->Register(this);
+
   this->Script("catch {eval [list %s]} _tmp_err",  
                this->CommandEntry->GetValue());
+
   if ( this->GetApplication()->GetApplicationExited() )
     {
     this->UnRegister(this);
     return;
     }
   this->UnRegister(this);
+
   this->Script("set _tmp_err");
-  this->Script("%s insert end {%s}", 
-               this->DisplayText->GetWidgetName(),
-               this->GetApplication()->GetMainInterp()->result);
-  this->Script("%s insert end \"\n\n\"", this->DisplayText->GetWidgetName());
-  this->Script("%s configure -state disabled",
-               this->DisplayText->GetWidgetName());
-  this->Script("%s yview end", this->DisplayText->GetWidgetName());
+
+  vtkstd::string res(this->GetApplication()->GetMainInterp()->result);
+  this->DisplayText->AppendValue(res.c_str());
+  this->DisplayText->AppendValue("\n\n");
+
+  this->Script("%s yview end", 
+               this->DisplayText->GetTextWidget()->GetWidgetName());
   
   this->CommandEntry->SetValue("");
 }
@@ -241,11 +233,8 @@ void vtkKWTclInteractor::Evaluate()
 //----------------------------------------------------------------------------
 void vtkKWTclInteractor::AppendText(const char* text)
 {
-  this->Script("%s insert end {%s}", 
-               this->DisplayText->GetWidgetName(),
-               text);
-  this->Script("%s insert end \\n", 
-               this->DisplayText->GetWidgetName());
+  this->DisplayText->AppendValue(text);
+  this->DisplayText->AppendValue("\n");
 }
 
 //----------------------------------------------------------------------------
@@ -320,19 +309,9 @@ void vtkKWTclInteractor::UpdateEnableState()
     this->CommandEntry->SetEnabled(this->Enabled);
     }
 
-  if (this->DisplayFrame)
-    {
-    this->DisplayFrame->SetEnabled(this->Enabled);
-    }
-
   if (this->DisplayText)
     {
     this->DisplayText->SetEnabled(this->Enabled);
-    }
-
-  if (this->DisplayScrollBar)
-    {
-    this->DisplayScrollBar->SetEnabled(this->Enabled);
     }
 }
 

@@ -28,7 +28,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkPVErrorLogDisplay );
-vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.7");
+vtkCxxRevisionMacro(vtkPVErrorLogDisplay, "1.8");
 
 int vtkPVErrorLogDisplayCommand(ClientData cd, Tcl_Interp *interp,
                            int argc, char *argv[]);
@@ -100,7 +100,6 @@ void vtkPVErrorLogDisplay::Create(vtkKWApplication *app)
 void vtkPVErrorLogDisplay::Update()
 {
   int cc;
-  this->EnableWrite();
   this->DisplayText->SetValue("");
   if ( this->ErrorMessages )
     {
@@ -118,7 +117,6 @@ void vtkPVErrorLogDisplay::Update()
     this->DisplayText->SetValue("");
     this->Append("No errors");
     }
-  this->DisableWrite();
 }
 
 //----------------------------------------------------------------------------

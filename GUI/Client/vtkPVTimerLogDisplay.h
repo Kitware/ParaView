@@ -110,14 +110,6 @@ protected:
   virtual void Update();
   void DisplayLog();
 
-  // Description:
-  // Open log for writing.
-  void EnableWrite();
-
-  // Description:
-  // Close log for writing
-  void DisableWrite();
-
   void Append(const char*);
   
   vtkKWWindow*      MasterWindow;
@@ -132,16 +124,13 @@ protected:
   vtkKWLabel*       EnableLabel;
   vtkKWCheckButton* EnableCheck;
 
-  vtkKWWidget*      DisplayFrame;
   vtkKWText*        DisplayText;
-  vtkKWWidget*      DisplayScrollBar;
 
   vtkKWWidget*     ButtonFrame;
   vtkKWPushButton* DismissButton;
     
   char*   Title;
   float   Threshold;
-  int     Writable;
 
   vtkPVTimerInformation* TimerInformation;
 

@@ -37,7 +37,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWCornerAnnotation );
-vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.77");
+vtkCxxRevisionMacro(vtkKWCornerAnnotation, "1.78");
 
 int vtkKWCornerAnnotationCommand(ClientData cd, Tcl_Interp *interp,
                                  int argc, char *argv[]);
@@ -295,14 +295,16 @@ void vtkKWCornerAnnotation::Create(vtkKWApplication *app,
     {
     this->CornerText[i]->SetParent(this->CornerFrame);
     this->CornerText[i]->Create( app, 0);
-    this->Script("%s configure -height 3 -width 25 -wrap none",
-                 this->CornerText[i]->GetText()->GetWidgetName());
-    this->Script("bind %s <Return> {%s CornerTextCallback %i}",
-                 this->CornerText[i]->GetText()->GetWidgetName(), 
-                 this->GetTclName(), i);
-    this->Script("bind %s <FocusOut> {%s CornerTextCallback %i}",
-                 this->CornerText[i]->GetText()->GetWidgetName(), 
-                 this->GetTclName(), i);
+    vtkKWText *text = this->CornerText[i]->GetText();
+    text->SetHeight(3);
+    text->SetWidth(25);
+    text->SetWrapToNone();
+    this->Script(
+      "bind %s <Return> {%s CornerTextCallback %i}",
+      text->GetTextWidget()->GetWidgetName(), this->GetTclName(), i);
+    this->Script(
+      "bind %s <FocusOut> {%s CornerTextCallback %i}",
+      text->GetTextWidget()->GetWidgetName(), this->GetTclName(), i);
     }
 
   this->CornerText[0]->SetLabel("Lower left:");
@@ -761,7 +763,7 @@ void vtkKWCornerAnnotation::SerializeToken(istream& is, const char *token)
 void vtkKWCornerAnnotation::SerializeRevision(ostream& os, vtkIndent indent)
 {
   os << indent << "vtkKWCornerAnnotation ";
-  this->ExtractRevision(os,"$Revision: 1.77 $");
+  this->ExtractRevision(os,"$Revision: 1.78 $");
 }
 
 //----------------------------------------------------------------------------

@@ -77,7 +77,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterfaceEntry);
-vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.51");
+vtkCxxRevisionMacro(vtkPVAnimationInterfaceEntry, "1.52");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterfaceEntry, CurrentSMDomain,
                      vtkSMDomain);
@@ -104,8 +104,6 @@ vtkPVAnimationInterfaceEntry::vtkPVAnimationInterfaceEntry()
   this->TimeEquationFrequencyEntry = vtkKWThumbWheel::New();
   this->TimeEquationFrame = vtkKWWidget::New();
   this->TimeRange = vtkKWRange::New();
-  this->ScriptEditorFrame = vtkKWFrame::New();
-  this->ScriptEditorScroll = vtkKWWidget::New();
   this->ScriptEditor = vtkKWText::New();
   this->DummyFrame = vtkKWFrame::New();
 
@@ -290,11 +288,7 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
                 this->TimeEquationPhaseEntry->GetWidgetName(),
                 this->TimeEquationFrequencyEntry->GetWidgetName());
   
-  this->ScriptEditorFrame->SetParent(this->TimeScriptEntryFrame->GetFrame());
-  this->ScriptEditorFrame->Create(pvApp, 0);
-
-  this->ScriptEditor->SetParent(this->ScriptEditorFrame->GetFrame());
-  this->ScriptEditorScroll->SetParent(this->ScriptEditorFrame->GetFrame());
+  this->ScriptEditor->SetParent(this->TimeScriptEntryFrame->GetFrame());
 
   this->SourceMenuButton->GetMenu()->SetTearOff(0);
   this->MethodMenuButton->GetMenu()->SetTearOff(0);
@@ -310,8 +304,9 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
   this->EndTimeEntry->Create(pvApp, 0);
   this->ResetRangeButton->Create(pvApp, 0);
   this->TimeRange->Create(pvApp, 0);
-  this->ScriptEditor->Create(pvApp, "-height 8");
-  this->ScriptEditorScroll->Create(pvApp, "scrollbar", "-orient vertical");
+  this->ScriptEditor->Create(pvApp, NULL);
+  this->ScriptEditor->SetHeight(8);
+  this->ScriptEditor->UseVerticalScrollbarOn();
   this->DummyFrame->Create(pvApp, "-height 1");
 
   this->StartTimeEntry->SetLabel("Start value");
@@ -383,25 +378,6 @@ void vtkPVAnimationInterfaceEntry::Create(vtkPVApplication* pvApp, const char*)
     w->GetWidgetName(),
     w->GetWidgetName());
 
-  pvApp->Script(
-    "grid %s %s -sticky news", 
-    this->ScriptEditor->GetWidgetName(),
-    this->ScriptEditorScroll->GetWidgetName());
-
-  pvApp->Script(
-    "%s configure -yscrollcommand {%s set}",
-    this->ScriptEditor->GetWidgetName(),
-    this->ScriptEditorScroll->GetWidgetName());
-  pvApp->Script(
-    "%s configure -command {%s yview}",
-    this->ScriptEditorScroll->GetWidgetName(),
-    this->ScriptEditor->GetWidgetName());
-  pvApp->Script(
-    "grid rowconfigure %s 0 -weight 1\n"
-    "grid columnconfigure %s 0 -weight 1",
-    this->ScriptEditor->GetParent()->GetWidgetName(),
-    this->ScriptEditor->GetParent()->GetWidgetName());
-
   frame->Delete();
   this->UpdateStartEndValueToEntry();
   this->UpdateTimeEquationValuesToEntry();
@@ -436,8 +412,6 @@ vtkPVAnimationInterfaceEntry::~vtkPVAnimationInterfaceEntry()
   this->MethodMenuButton->Delete();
   this->Observer->Delete();
   this->ScriptEditor->Delete();
-  this->ScriptEditorFrame->Delete();
-  this->ScriptEditorScroll->Delete();
   this->SourceLabel->Delete();
   this->SourceMenuButton->Delete();
   this->SourceMethodFrame->Delete();
@@ -455,7 +429,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
   vtkKWApplication* pvApp = this->StartTimeEntry->GetApplication();
   pvApp->Script("catch {eval pack forget %s %s %s %s %s %s %s}",
                 this->DummyFrame->GetWidgetName(),
-                this->ScriptEditorFrame->GetWidgetName(),
+                this->ScriptEditor->GetWidgetName(),
                 this->StartTimeEntry->GetWidgetName(),
                 this->ResetRangeButton->GetWidgetName(),
                 this->EndTimeEntry->GetWidgetName(),
@@ -482,7 +456,7 @@ void vtkPVAnimationInterfaceEntry::SwitchScriptTime(int i)
   else if ( ! i )
     {
     pvApp->Script("pack %s -fill x -expand 1 -pady 2 -padx 2", 
-                  this->ScriptEditorFrame->GetWidgetName());
+                  this->ScriptEditor->GetWidgetName());
     this->CustomScript = 1;
     this->GetMethodMenuButton()->SetButtonText("Script");
     }
@@ -1003,8 +977,8 @@ void vtkPVAnimationInterfaceEntry::RemoveBinds()
   this->TimeEquationPhaseEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
   this->TimeEquationFrequencyEntry->GetEntry()->UnsetBind("<FocusOut>");
   this->TimeEquationFrequencyEntry->GetEntry()->UnsetBind("<KeyPress-Return>");
-  this->ScriptEditor->UnsetBind("<FocusOut>");
-  this->ScriptEditor->UnsetBind("<KeyPress>");
+  this->ScriptEditor->GetTextWidget()->UnsetBind("<FocusOut>");
+  this->ScriptEditor->GetTextWidget()->UnsetBind("<KeyPress>");
 }
 
 //-----------------------------------------------------------------------------
@@ -1026,11 +1000,11 @@ void vtkPVAnimationInterfaceEntry::SetupBinds()
     "UpdateTimeEquationValuesFromEntry");
   this->TimeEquationFrequencyEntry->GetEntry()->SetBind(this, "<KeyPress-Return>",
     "UpdateTimeEquationValuesFromEntry");
-  this->ScriptEditor->SetBind(this, "<FocusOut>",
+  this->ScriptEditor->GetTextWidget()->SetBind(this, "<FocusOut>",
     "ScriptEditorCallback");
-  this->ScriptEditor->SetBind(this, "<KeyPress-Return>",
+  this->ScriptEditor->GetTextWidget()->SetBind(this, "<KeyPress-Return>",
     "ScriptEditorCallback");
-  this->ScriptEditor->SetBind(this, "<KeyPress>",
+  this->ScriptEditor->GetTextWidget()->SetBind(this, "<KeyPress>",
     "MarkScriptEditorDirty");
 }
 
@@ -1290,8 +1264,6 @@ void vtkPVAnimationInterfaceEntry::UpdateEnableState()
   this->PropagateEnableState(this->TimeRange);
   this->PropagateEnableState(this->DummyFrame);
   this->PropagateEnableState(this->ScriptEditor);
-  this->PropagateEnableState(this->ScriptEditorFrame);
-  this->PropagateEnableState(this->ScriptEditorScroll);
 
   if (this->ResetRangeButtonState)
     {

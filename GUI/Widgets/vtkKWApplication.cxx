@@ -60,7 +60,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.175");
+vtkCxxRevisionMacro(vtkKWApplication, "1.176");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwwidgetstcl_Init(Tcl_Interp *interp);
@@ -111,7 +111,6 @@ vtkKWApplication::vtkKWApplication()
   this->AboutDialog      = 0;
   this->AboutDialogImage = 0;
   this->AboutRuntimeInfo = 0;
-  this->AboutScrollBar   = 0;
 
   // add the application as $app
 
@@ -204,11 +203,6 @@ vtkKWApplication::~vtkKWApplication()
     {
     this->AboutRuntimeInfo->Delete();
     this->AboutRuntimeInfo = NULL;
-    }
-  if( this->AboutScrollBar)
-    {
-    this->AboutScrollBar->Delete();
-    this->AboutScrollBar = NULL;
     }
 
   if (this->AboutDialog)
@@ -500,12 +494,6 @@ void vtkKWApplication::Exit()
     this->AboutRuntimeInfo = NULL;
     }
     
-  if (this->AboutScrollBar)
-    {
-    this->AboutScrollBar->Delete();
-    this->AboutScrollBar = NULL;
-    }
-
   if (this->AboutDialog)
     {
     this->AboutDialog->Delete();
@@ -1106,22 +1094,16 @@ void vtkKWApplication::ConfigureAbout()
       if (!this->AboutRuntimeInfo->IsCreated())
         {
         this->AboutRuntimeInfo->SetParent(this->AboutDialog->GetBottomFrame());
-        this->AboutRuntimeInfo->Create(this, "-setgrid true -width 60 -height 8 -wrap word -state disabled");
+        this->AboutRuntimeInfo->Create(this, "-setgrid true");
+        this->AboutRuntimeInfo->SetWidth(60);
+        this->AboutRuntimeInfo->SetHeight(8);
+        this->AboutRuntimeInfo->SetWrapToWord();
+        this->AboutRuntimeInfo->EditableTextOff();
+        this->AboutRuntimeInfo->UseVerticalScrollbarOn();
         double r, g, b;
-        this->AboutRuntimeInfo->GetParent()->GetBackgroundColor(&r, &g, &b);
-        this->AboutRuntimeInfo->SetBackgroundColor(r, g, b);
-        }
-
-      if (!this->AboutScrollBar)
-        {
-        this->AboutScrollBar = vtkKWWidget::New();
-        }
-      if (!this->AboutScrollBar->IsCreated())
-        {
-        this->AboutScrollBar->SetParent(this->AboutDialog->GetBottomFrame());
-        char scrollBarCommand[100];
-        sprintf(scrollBarCommand, "-command \"%s yview\"", this->AboutRuntimeInfo->GetWidgetName());
-        this->AboutScrollBar->Create(this, "scrollbar", scrollBarCommand);
+        this->AboutRuntimeInfo->GetTextWidget()->GetParent()
+          ->GetBackgroundColor(&r, &g, &b);
+        this->AboutRuntimeInfo->GetTextWidget()->SetBackgroundColor(r, g, b);
         }
 
       this->Script("%s config -image {%s}",
@@ -1137,13 +1119,8 @@ void vtkKWApplication::ConfigureAbout()
         this->AboutDialog->SetTextWidth(w);
         }
 
-      this->Script("%s configure -yscrollcommand \"%s set\"",
-                   this->AboutRuntimeInfo->GetWidgetName(),
-                   this->AboutScrollBar->GetWidgetName() );
       this->Script("pack %s -side left -padx 2 -expand 1 -fill both",
                    this->AboutRuntimeInfo->GetWidgetName());
-      this->Script("pack %s -side left -padx 2 -expand 0 -fill y",
-                   this->AboutScrollBar->GetWidgetName());
       this->Script("pack %s -side bottom",  // -expand 1 -fill both
                    this->AboutDialog->GetMessageDialogFrame()->GetWidgetName());
       }

@@ -93,9 +93,7 @@ protected:
   vtkKWFrame      *CommandFrame;
   vtkKWLabel      *CommandLabel;
   vtkKWEntry      *CommandEntry;
-  vtkKWFrame      *DisplayFrame;
   vtkKWText       *DisplayText;
-  vtkKWWidget     *DisplayScrollBar;
   
   char *Title;
   int TagNumber;

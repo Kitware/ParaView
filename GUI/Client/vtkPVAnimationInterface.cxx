@@ -184,7 +184,7 @@ public:
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.159");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.160");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -628,12 +628,14 @@ void vtkPVAnimationInterface::Create(vtkKWApplication *app, const char *args)
                this->ScriptCheckButton->GetWidgetName());
 
   this->ScriptEditor->SetParent(this->ActionFrame->GetFrame());
-  this->ScriptEditor->Create(app, "-relief sunken -bd 2");
+  this->ScriptEditor->Create(app, NULL);
+  this->ScriptEditor->GetTextWidget()->ConfigureOptions(
+    "-relief sunken -bd 2");
 
   this->Script("bind %s <FocusOut> {%s ScriptEditorCallback}",
-    this->ScriptEditor->GetWidgetName(), this->GetTclName());
+    this->ScriptEditor->GetTextWidget()->GetWidgetName(), this->GetTclName());
   this->Script("bind %s <KeyPress-Return> {%s ScriptEditorCallback}",
-    this->ScriptEditor->GetWidgetName(), this->GetTclName());
+    this->ScriptEditor->GetTextWidget()->GetWidgetName(), this->GetTclName());
 
   // Save frame stuff
   this->SaveFrame->SetParent(this->TopFrame->GetFrame());
