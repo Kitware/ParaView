@@ -110,6 +110,9 @@ protected:
   friend class vtkSMProxyObserver;
   friend class vtkSMSourceProxy;
   friend class vtkSMPropertyIterator;
+
+  // Temporary
+  friend class vtkPVSource;
 //ETX
 
   // Description:
@@ -169,34 +172,20 @@ protected:
   // instantiated. Use the following methods to set/get the server
   // IDs. Server IDs have to be set before the object is created.
   // Changing them after creation has no effect.
-  // Description:
-  // Return the number of servers on which the server objects exist
-  // (or will exist).
-  int GetNumberOfServerIDs();
+  // See vtkProcessModule.h for a list of all server types.
+  // To add a server, OR it's value with the servers ivar.
 
   // Description:
-  // Return a server id.
-  int GetServerID(int i);
+  // Return the servers.
+  vtkTypeUInt32 GetServers();
 
   // Description:
-  // Delete all server ids on all proxies (root and sub).
-  void ClearServerIDs();
+  // Set server ids on self and sub-proxies.
+  void SetServers(vtkTypeUInt32 servers);
 
   // Description:
-  // Delete all server ids on root proxy.
-  void ClearServerIDsSelf();
-
-  // Description:
-  // Return all server ids;
-  const int* GetServerIDs();
-
-  // Description:
-  // Add a given server id to all proxies (root and sub).
-  void AddServerID(int id);
-
-  // Description:
-  // Add a given server id to root proxy.
-  void AddServerIDToSelf(int id);
+  // Set server ids on self
+  void SetServersSelf(vtkTypeUInt32 servers);
 
 //BTX
   // This is a convenience method that pushes the value of one property
@@ -206,7 +195,7 @@ protected:
   // If possible, use UpdateVTKObjects() instead of this.
   void PushProperty(const char* name, 
                     vtkClientServerID id, 
-                    int serverid);
+                    vtkTypeUInt32 servers);
 //ETX
 
   // Note on property modified flags:
@@ -267,6 +256,7 @@ protected:
   char* XMLGroup;
   char* XMLName;
   int ObjectsCreated;
+  vtkTypeUInt32 Servers;
 
   vtkClientServerID SelfID;
 

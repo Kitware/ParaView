@@ -14,12 +14,13 @@
 =========================================================================*/
 #include "vtkSMPart.h"
 
-#include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVDataInformation.h"
+#include "vtkProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkSMPart);
-vtkCxxRevisionMacro(vtkSMPart, "1.2");
+vtkCxxRevisionMacro(vtkSMPart, "1.3");
 
 
 //----------------------------------------------------------------------------
@@ -33,6 +34,36 @@ vtkSMPart::~vtkSMPart()
 {  
 }
 
+//----------------------------------------------------------------------------
+vtkPVDataInformation* vtkSMPart::GetDataInformation()
+{
+  if (this->DataInformationValid == 0)
+    {
+    this->GatherDataInformation();
+    }
+  return this->DataInformation;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPart::InvalidateDataInformation()
+{
+  this->DataInformationValid = 0;
+}
+
+//----------------------------------------------------------------------------
+void vtkSMPart::GatherDataInformation()
+{
+  if (this->GetNumberOfIDs() < 1)
+    {
+    vtkErrorMacro("Part has no associated object, can not gather info.");
+    return;
+    }
+
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->GatherInformation(this->DataInformation, this->GetID(0));
+
+  this->DataInformationValid = 1;
+}
 
 //----------------------------------------------------------------------------
 void vtkSMPart::PrintSelf(ostream& os, vtkIndent indent)

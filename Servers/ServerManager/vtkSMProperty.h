@@ -67,6 +67,9 @@ public:
   vtkSetMacro(UpdateSelf, int);
   vtkGetMacro(UpdateSelf, int);
 
+  // Description:
+  vtkSMProperty* GetSubProperty(const char* name);
+
 protected:
   vtkSMProperty();
   ~vtkSMProperty();
@@ -74,6 +77,7 @@ protected:
   //BTX
   friend class vtkSMProxyManager;
   friend class vtkSMProxy;
+  friend class vtkSMSubPropertyIterator;
 
   // Description:
   // Append a command to update the vtk object with the property values(s).
@@ -111,6 +115,12 @@ protected:
   // The name assigned by the xnl parser. Used to get the property
   // from a proxy.
   vtkSetStringMacro(XMLName);
+
+  // Description:
+  void AddSubProperty(const char* name, vtkSMProperty* proxy);
+
+  // Description:
+  void RemoveSubProperty(const char* name);
 
   char* Command;
 

@@ -27,10 +27,12 @@
 #include "vtkSMProxy.h"
 #include "vtkClientServerID.h" // Needed for ClientServerID
 
+class vtkPVDataInformation;
 //BTX
 struct vtkSMSourceProxyInternals;
 //ETX
 class vtkSMPart;
+class vtkSMProperty;
 
 class VTK_EXPORT vtkSMSourceProxy : public vtkSMProxy
 {
@@ -84,6 +86,10 @@ protected:
   // Create n parts where n is the number of filters. Each part
   // correspond to one output of one filter.
   void CreateParts();
+  
+  // Description:
+  void ConvertDataInformationToProperty(
+    vtkPVDataInformation* info, vtkSMProperty* prop);
 
   int GetNumberOfParts();
   vtkSMPart* GetPart(int idx);

@@ -16,7 +16,7 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMCommunicationModule.h"
+#include "vtkProcessModule.h"
 #include "vtkSMDisplayerProxy.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMDoubleVectorProperty.h"
@@ -25,7 +25,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMDisplayWindowProxy);
-vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.7");
+vtkCxxRevisionMacro(vtkSMDisplayWindowProxy, "1.8");
 
 struct vtkSMDisplayWindowProxyInternals
 {
@@ -40,8 +40,7 @@ vtkSMDisplayWindowProxy::vtkSMDisplayWindowProxy()
 
   // TODO revise this: where should windowtoimage be?
   this->WindowToImage = vtkSMProxy::New();
-  this->WindowToImage->ClearServerIDs();
-  this->WindowToImage->AddServerID(0);
+  this->WindowToImage->SetServers(vtkProcessModule::CLIENT);
   
   this->DWInternals = new vtkSMDisplayWindowProxyInternals;
 
@@ -63,7 +62,7 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
     }
   this->Superclass::CreateVTKObjects(numObjects);
   
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
 
   vtkClientServerStream str;
   int i;
@@ -136,9 +135,7 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
 
   if (str.GetNumberOfMessages() > 0)
     {
-    cm->SendStreamToServers(&str, 
-                            this->GetNumberOfServerIDs(),
-                            this->GetServerIDs());
+    pm->SendStream(this->Servers, str, 0);
     }
 
   str.Reset();
@@ -156,9 +153,7 @@ void vtkSMDisplayWindowProxy::CreateVTKObjects(int numObjects)
     }
   
 
-  cm->SendStreamToServers(&str, 
-                          this->WindowToImage->GetNumberOfServerIDs(),
-                          this->WindowToImage->GetServerIDs());
+  pm->SendStream(this->WindowToImage->Servers, str, 0);
 }
 
 //---------------------------------------------------------------------------
@@ -173,8 +168,7 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
   vtkClientServerStream str;
 
   vtkSMProxy* imageWriter = vtkSMProxy::New();
-  imageWriter->ClearServerIDs();
-  imageWriter->AddServerID(0);
+  imageWriter->SetServers(vtkProcessModule::CLIENT);
 
   imageWriter->SetVTKClassName(writerName);
   imageWriter->CreateVTKObjects(1);
@@ -206,10 +200,8 @@ void vtkSMDisplayWindowProxy::WriteImage(const char* filename,
       << "Write" 
       << vtkClientServerStream::End;
 
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&str, 
-                          imageWriter->GetNumberOfServerIDs(),
-                          imageWriter->GetServerIDs());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(imageWriter->Servers, str, 0);
   str.Reset();
 
   imageWriter->Delete();
@@ -263,10 +255,8 @@ void vtkSMDisplayWindowProxy::AddDisplayer(vtkSMProxy* display)
         << actorProxy->GetID(i)
         << vtkClientServerStream::End;
     }
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&str, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(this->Servers, str, 0);
   str.Reset();
 }
 
@@ -281,13 +271,10 @@ void vtkSMDisplayWindowProxy::StillRender()
         << this->GetID(i) << "Render"
         << vtkClientServerStream::End;
     }
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
   // Call render on the client only. The composite manager should
   // take care of the rest.
-  int serverids = 0;
-  cm->SendStreamToServers(&str, 
-                          1,
-                          &serverids);
+  pm->SendStream(vtkProcessModule::CLIENT, str, 0);
   str.Reset();
 }
 

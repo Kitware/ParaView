@@ -16,8 +16,8 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
+#include "vtkProcessModule.h"
 #include "vtkProperty.h"
-#include "vtkSMCommunicationModule.h"
 #include "vtkSMDoubleVectorProperty.h"
 #include "vtkSMIntVectorProperty.h"
 #include "vtkSMPart.h"
@@ -27,7 +27,7 @@
 #include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMDisplayerProxy);
-vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.10");
+vtkCxxRevisionMacro(vtkSMDisplayerProxy, "1.11");
 
 //---------------------------------------------------------------------------
 vtkSMDisplayerProxy::vtkSMDisplayerProxy()
@@ -59,10 +59,8 @@ void vtkSMDisplayerProxy::SetColor(double r, double g, double b)
          << propertyID << "SetSpecularColor" << 1.0 << 1.0 << 1.0 
          << vtkClientServerStream::End;
 
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(this->Servers, stream, 0);
 }
 
 //---------------------------------------------------------------------------
@@ -116,10 +114,8 @@ void vtkSMDisplayerProxy::SetScalarVisibility(int vis)
            << vtkClientServerStream::End;
     }
 
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(this->Servers, stream, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -168,10 +164,8 @@ void vtkSMDisplayerProxy::DrawWireframe()
     << propertyProxy->GetID(0) << "SetRepresentationToWireframe" 
     << vtkClientServerStream::End;
 
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(this->Servers, stream, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -200,10 +194,8 @@ void vtkSMDisplayerProxy::DrawPoints()
     << propertyProxy->GetID(0) << "SetRepresentationToPoints" 
     << vtkClientServerStream::End;
 
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(this->Servers, stream, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -232,10 +224,8 @@ void vtkSMDisplayerProxy::DrawSurface()
     << propertyProxy->GetID(0) << "SetRepresentationToSurface" 
     << vtkClientServerStream::End;
 
-  vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-  cm->SendStreamToServers(&stream, 
-                          this->GetNumberOfServerIDs(),
-                          this->GetServerIDs());
+  vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+  pm->SendStream(this->Servers, stream, 0);
 }
 
 //---------------------------------------------------------------------------
@@ -334,10 +324,8 @@ void vtkSMDisplayerProxy::CreateVTKObjects(int numObjects)
 
   if (str.GetNumberOfMessages() > 0)
     {
-    vtkSMCommunicationModule* cm = this->GetCommunicationModule();
-    cm->SendStreamToServers(&str, 
-                            this->GetNumberOfServerIDs(),
-                            this->GetServerIDs());
+    vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+    pm->SendStream(this->Servers, str, 0);
     }
 }
 

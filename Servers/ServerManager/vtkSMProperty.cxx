@@ -17,20 +17,16 @@
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
 #include "vtkPVXMLElement.h"
-#include "vtkSMCommunicationModule.h"
 #include "vtkSMDomain.h"
 #include "vtkSMInstantiator.h"
 #include "vtkSmartPointer.h"
 
 #include <vtkstd/vector>
 
-vtkStandardNewMacro(vtkSMProperty);
-vtkCxxRevisionMacro(vtkSMProperty, "1.4");
+#include "vtkSMPropertyInternals.h"
 
-struct vtkSMPropertyInternals
-{
-  vtkstd::vector<vtkSmartPointer<vtkSMDomain> > Domains;
-};
+vtkStandardNewMacro(vtkSMProperty);
+vtkCxxRevisionMacro(vtkSMProperty, "1.5");
 
 //---------------------------------------------------------------------------
 vtkSMProperty::vtkSMProperty()
@@ -66,6 +62,48 @@ vtkSMDomain* vtkSMProperty::GetDomain(unsigned int idx)
 unsigned int vtkSMProperty::GetNumberOfDomains()
 {
   return this->PInternals->Domains.size();
+}
+
+//---------------------------------------------------------------------------
+vtkSMProperty* vtkSMProperty::GetSubProperty(const char* name)
+{
+  vtkSMPropertyInternals::PropertyMap::iterator it =
+    this->PInternals->SubProperties.find(name);
+
+  if (it == this->PInternals->SubProperties.end())
+    {
+    return 0;
+    }
+
+  return it->second.GetPointer();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::AddSubProperty(const char* name, vtkSMProperty* proxy)
+{
+  // Check if the proxy already exists. If it does, we will
+  // replace it
+  vtkSMPropertyInternals::PropertyMap::iterator it =
+    this->PInternals->SubProperties.find(name);
+
+  if (it != this->PInternals->SubProperties.end())
+    {
+    vtkWarningMacro("Property " << name  << " already exists. Replacing");
+    }
+
+  this->PInternals->SubProperties[name] = proxy;
+}
+
+//---------------------------------------------------------------------------
+void vtkSMProperty::RemoveSubProperty(const char* name)
+{
+  vtkSMPropertyInternals::PropertyMap::iterator it =
+    this->PInternals->SubProperties.find(name);
+
+  if (it != this->PInternals->SubProperties.end())
+    {
+    this->PInternals->SubProperties.erase(it);
+    }
 }
 
 //---------------------------------------------------------------------------

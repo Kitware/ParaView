@@ -16,10 +16,10 @@
 
 #include "vtkClientServerStream.h"
 #include "vtkObjectFactory.h"
-#include "vtkSMCommunicationModule.h"
+#include "vtkProcessModule.h"
 
 vtkStandardNewMacro(vtkSMLookupTableProxy);
-vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.2");
+vtkCxxRevisionMacro(vtkSMLookupTableProxy, "1.3");
 
 //---------------------------------------------------------------------------
 vtkSMLookupTableProxy::vtkSMLookupTableProxy()
@@ -45,10 +45,8 @@ void vtkSMLookupTableProxy::Build()
            << "Build" << vtkClientServerStream::End;
     }
 
- vtkSMCommunicationModule* cm = this->GetCommunicationModule();
- cm->SendStreamToServers(&stream, 
-                         this->GetNumberOfServerIDs(),
-                         this->GetServerIDs());
+ vtkProcessModule* pm = vtkProcessModule::GetProcessModule();
+ pm->SendStream(this->Servers, stream, 0);
 }
 
 //---------------------------------------------------------------------------

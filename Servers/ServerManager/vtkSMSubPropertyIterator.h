@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   ParaView
-  Module:    vtkSMPropertyIterator.h
+  Module:    vtkSMSubPropertyIterator.h
 
   Copyright (c) Kitware, Inc.
   All rights reserved.
@@ -12,38 +12,35 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMPropertyIterator - iterates over the properties of a proxy
+// .NAME vtkSMSubPropertyIterator -
 // .SECTION Description
-// vtkSMPropertyIterator is used to iterate over the properties of a
-// proxy. The properties of the root proxies as well as sub-proxies are
-// included in the iteration.
 
-#ifndef __vtkSMPropertyIterator_h
-#define __vtkSMPropertyIterator_h
+#ifndef __vtkSMSubPropertyIterator_h
+#define __vtkSMSubPropertyIterator_h
 
 #include "vtkSMObject.h"
 
 //BTX
-struct vtkSMPropertyIteratorInternals;
+struct vtkSMSubPropertyIteratorInternals;
 //ETX
 
+class vtkSMSubProperty;
 class vtkSMProperty;
-class vtkSMProxy;
 
-class VTK_EXPORT vtkSMPropertyIterator : public vtkSMObject
+class VTK_EXPORT vtkSMSubPropertyIterator : public vtkSMObject
 {
 public:
-  static vtkSMPropertyIterator* New();
-  vtkTypeRevisionMacro(vtkSMPropertyIterator, vtkSMObject);
+  static vtkSMSubPropertyIterator* New();
+  vtkTypeRevisionMacro(vtkSMSubPropertyIterator, vtkSMObject);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set the proxy to be used.
-  void SetProxy(vtkSMProxy* proxy);
+  // Set the property to be used.
+  void SetProperty(vtkSMProperty* property);
 
   // Description:
-  // Return the proxy.
-  vtkGetObjectMacro(Proxy, vtkSMProxy);
+  // Return the property.
+  vtkGetObjectMacro(Property, vtkSMProperty);
 
   // Description:
   // Go to the first property.
@@ -63,19 +60,19 @@ public:
 
   // Description:
   // Returns the property at the current iterator position.
-  vtkSMProperty* GetProperty();
+  vtkSMProperty* GetSubProperty();
 
 protected:
-  vtkSMPropertyIterator();
-  ~vtkSMPropertyIterator();
+  vtkSMSubPropertyIterator();
+  ~vtkSMSubPropertyIterator();
 
-  vtkSMProxy* Proxy;
+  vtkSMProperty* Property;
 
 private:
-  vtkSMPropertyIteratorInternals* Internals;
+  vtkSMSubPropertyIteratorInternals* Internals;
 
-  vtkSMPropertyIterator(const vtkSMPropertyIterator&); // Not implemented
-  void operator=(const vtkSMPropertyIterator&); // Not implemented
+  vtkSMSubPropertyIterator(const vtkSMSubPropertyIterator&); // Not implemented
+  void operator=(const vtkSMSubPropertyIterator&); // Not implemented
 };
 
 #endif

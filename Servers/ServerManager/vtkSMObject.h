@@ -23,7 +23,6 @@
 
 #include "vtkObject.h"
 
-class vtkSMCommunicationModule;
 class vtkSMProxyManager;
 
 class VTK_EXPORT vtkSMObject : public vtkObject
@@ -34,12 +33,6 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   // Description:
-  // The communication module singleton is used by server manager
-  // objects to communicate with servers.
-  static vtkSMCommunicationModule* GetCommunicationModule();
-  static void SetCommunicationModule(vtkSMCommunicationModule* cm);
-
-  // Description:
   // Proxy manager singleton stores all proxy groups and instances.
   static vtkSMProxyManager* GetProxyManager();
   static void SetProxyManager(vtkSMProxyManager* pm);
@@ -48,7 +41,6 @@ protected:
   vtkSMObject();
   ~vtkSMObject();
 
-  static vtkSMCommunicationModule* CommunicationModule;
   static vtkSMProxyManager* ProxyManager;
 
   // Description:

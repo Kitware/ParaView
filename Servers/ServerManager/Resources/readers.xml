@@ -130,7 +130,7 @@
    </SourceProxy>
 
    <SourceProxy name="XMLPPolyDataReader" 
-                class="vtkPXMLPolyDataReader">
+                class="vtkXMLPPolyDataReader">
      <StringVectorProperty
         name="FileName"
         command="SetFileName"

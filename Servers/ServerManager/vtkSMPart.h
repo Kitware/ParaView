@@ -22,7 +22,7 @@
 
 #include "vtkSMProxy.h"
 
-#include "vtkClientServerID.h" // Needed For Set Get VTKDataID
+class vtkPVDataInformation;
 
 class VTK_EXPORT vtkSMPart : public vtkSMProxy
 {
@@ -31,12 +31,26 @@ public:
   vtkTypeRevisionMacro(vtkSMPart, vtkSMProxy);
   void PrintSelf(ostream& os, vtkIndent indent);
 
+  //BTX
+  // Description:
+  vtkPVDataInformation* GetDataInformation();
+  //ETX
+  
+  // Description:
+  void GatherDataInformation();
+
+  // Description:
+  void InvalidateDataInformation();
+
 protected:
   vtkSMPart();
   ~vtkSMPart();
 
   vtkSMPart(const vtkSMPart&); // Not implemented
   void operator=(const vtkSMPart&); // Not implemented
+
+  vtkPVDataInformation *DataInformation;
+  int DataInformationValid;
 };
 
 #endif

@@ -15,13 +15,11 @@
 #include "vtkSMObject.h"
 
 #include "vtkObjectFactory.h"
-#include "vtkSMCommunicationModule.h"
 #include "vtkSMProxyManager.h"
 
 vtkStandardNewMacro(vtkSMObject);
-vtkCxxRevisionMacro(vtkSMObject, "1.3");
+vtkCxxRevisionMacro(vtkSMObject, "1.4");
 
-vtkSMCommunicationModule* vtkSMObject::CommunicationModule = 0;
 vtkSMProxyManager* vtkSMObject::ProxyManager = 0;
 
 //---------------------------------------------------------------------------
@@ -32,30 +30,6 @@ vtkSMObject::vtkSMObject()
 //---------------------------------------------------------------------------
 vtkSMObject::~vtkSMObject()
 {
-}
-
-//---------------------------------------------------------------------------
-vtkSMCommunicationModule* vtkSMObject::GetCommunicationModule()
-{
-  return vtkSMObject::CommunicationModule;
-}
-
-//---------------------------------------------------------------------------
-void vtkSMObject::SetCommunicationModule(vtkSMCommunicationModule* cm)
-{
-  if (vtkSMObject::CommunicationModule == cm)
-    {
-    return;
-    }
-  if (vtkSMObject::CommunicationModule)
-    {
-    vtkSMObject::CommunicationModule->UnRegister(0);
-    }
-  if (cm)
-    {
-    cm->Register(0);
-    }
-  vtkSMObject::CommunicationModule = cm;
 }
 
 //---------------------------------------------------------------------------
@@ -87,7 +61,5 @@ void vtkSMObject::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
 
-  os << indent << "Communication module: " << vtkSMObject::CommunicationModule
-     << endl;
   os << indent << "Proxy manager: " << vtkSMObject::ProxyManager << endl;
 }

@@ -19,7 +19,6 @@
 #include "vtkKWArguments.h"
 #include "vtkObjectFactory.h"
 #include "vtkSMProxyManager.h"
-#include "vtkSMSimpleCommunicationModule.h"
 #include "vtkSMXMLParser.h"
 #include "vtkString.h"
 
@@ -28,7 +27,7 @@
 #include "vtkSMGeneratedModules.h"
 
 vtkStandardNewMacro(vtkSMApplication);
-vtkCxxRevisionMacro(vtkSMApplication, "1.5");
+vtkCxxRevisionMacro(vtkSMApplication, "1.6");
 
 //---------------------------------------------------------------------------
 vtkSMApplication::vtkSMApplication()
@@ -55,10 +54,6 @@ void vtkSMApplication::Initialize()
 
   vtkPVServerManager_Initialize(
     vtkProcessModule::GetProcessModule()->GetInterpreter());
-
-  vtkSMSimpleCommunicationModule* cm = vtkSMSimpleCommunicationModule::New();
-  this->SetCommunicationModule(cm);
-  cm->Delete();
 
   vtkSMProxyManager* proxyM = vtkSMProxyManager::New();
   this->SetProxyManager(proxyM);
@@ -134,30 +129,11 @@ void vtkSMApplication::Initialize()
 //     }
   
   proxyM->Delete();
-
-  // TODO revise this
-  vtkClientServerStream str;
-
-  vtkClientServerID gf = cm->NewStreamObject("vtkGraphicsFactory", str);
-  str << vtkClientServerStream::Invoke
-      << gf << "SetUseMesaClasses" << 1
-      << vtkClientServerStream::End;
-  cm->DeleteStreamObject(gf, str);
-  vtkClientServerID imf = cm->NewStreamObject("vtkImagingFactory", str);
-  str << vtkClientServerStream::Invoke
-      << imf << "SetUseMesaClasses" << 1
-      << vtkClientServerStream::End;
-  cm->DeleteStreamObject(imf, str);
-
-  int serverids = 1;
-  cm->SendStreamToServers(&str, 1, &serverids);
-
 }
 
 //---------------------------------------------------------------------------
 void vtkSMApplication::Finalize()
 {
-  this->SetCommunicationModule(0);
   //this->GetProcessModule()->FinalizeInterpreter();
   this->SetProxyManager(0);
 
