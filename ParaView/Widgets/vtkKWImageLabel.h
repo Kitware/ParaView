@@ -64,8 +64,10 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Set image data (either using icon, or pixel data).
+  // Set image data using either icon, predefined icon index (see 
+  // vtkKWIcon.h) or pixel data).
   void SetImageData(vtkKWIcon *icon);
+  void SetImageData(int image_index);
   void SetImageData(const unsigned char* data, 
                     int width, int height, int pixel_size = 4);
   
@@ -73,6 +75,10 @@ public:
   // Set/Get the TK name of the image.
   vtkGetStringMacro(ImageDataName);
   virtual void SetImageDataName(const char*);
+
+  // Description:
+  // Set/Get the label string.
+  virtual void SetLabel(const char*);
 
 protected:
   vtkKWImageLabel();

@@ -48,29 +48,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWImageLabel );
-vtkCxxRevisionMacro(vtkKWImageLabel, "1.24");
+vtkCxxRevisionMacro(vtkKWImageLabel, "1.25");
 
+//----------------------------------------------------------------------------
 vtkKWImageLabel::vtkKWImageLabel()
 {
   this->ImageDataName = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkKWImageLabel::~vtkKWImageLabel()
 {
   this->SetImageDataName(0);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWImageLabel::Create(vtkKWApplication *app, const char *args)
 {
   this->Superclass::Create(app, args);
 }
 
+//----------------------------------------------------------------------------
 void vtkKWImageLabel::SetImageData(vtkKWIcon* icon)
 {
   this->SetImageData(icon->GetData(), 
-                     icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+                     icon->GetWidth(), 
+                     icon->GetHeight(), 
+                     icon->GetPixelSize());
 }
 
+//----------------------------------------------------------------------------
+void vtkKWImageLabel::SetImageData(int image_index)
+{
+  vtkKWIcon *icon = vtkKWIcon::New();
+  icon->SetImageData(image_index);
+  this->SetImageData(icon);
+  icon->Delete();
+}
+
+//----------------------------------------------------------------------------
 void vtkKWImageLabel::SetImageData(const unsigned char* data, 
                                    int width, int height,
                                    int pixel_size)
@@ -100,7 +116,8 @@ void vtkKWImageLabel::SetImageData(const unsigned char* data,
     }
 }
 
-void vtkKWImageLabel::SetImageDataName (const char* _arg)
+//----------------------------------------------------------------------------
+void vtkKWImageLabel::SetImageDataName(const char* _arg)
 {
   if (this->ImageDataName == NULL && _arg == NULL) 
     { 
@@ -130,17 +147,35 @@ void vtkKWImageLabel::SetImageDataName (const char* _arg)
 
   this->Modified();
 
-  if (this->Application && this->ImageDataName)
+  if (this->IsAlive())
     {
-    this->Script("%s configure -image %s", 
-                 this->GetWidgetName(), 
-                 this->ImageDataName);
+    if (this->ImageDataName)
+      {
+      this->Script("%s configure -image {%s}", 
+                   this->GetWidgetName(), this->ImageDataName);
+      }
+    else
+      {
+      this->Script("%s configure -image {}", this->GetWidgetName());
+      }
     }
 } 
+
+//----------------------------------------------------------------------------
+void vtkKWImageLabel::SetLabel(const char* _arg)
+{
+  this->Superclass::SetLabel(_arg);
+
+  // Whatever the label, -image always takes precedence, unless it's empty
+  // so change it accordingly
+
+  this->SetImageDataName(NULL);
+}
 
 //----------------------------------------------------------------------------
 void vtkKWImageLabel::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
-  os << indent << "ImageDataName: " << ( this->ImageDataName ?  this->ImageDataName : "(none)") << endl;
+  os << indent << "ImageDataName: " 
+     << ( this->ImageDataName ?  this->ImageDataName : "(none)") << endl;
 }
