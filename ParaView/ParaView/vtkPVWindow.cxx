@@ -342,6 +342,19 @@ vtkPVWindow::~vtkPVWindow()
 
   this->PVColorMaps->Delete();
   this->PVColorMaps = NULL;
+
+  if (this->ToolbarSettingsFrame)
+    {
+    this->ToolbarSettingsFrame->Delete();
+    }
+  if (this->ToolbarSettingsFlatFrameCheck)
+    {
+    this->ToolbarSettingsFlatFrameCheck->Delete();
+    }
+  if (this->ToolbarSettingsFlatButtonsCheck)
+    {
+    this->ToolbarSettingsFlatButtonsCheck->Delete();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -719,11 +732,12 @@ void vtkPVWindow::InitializeToolbars(vtkKWApplication *app)
 
   this->Toolbar->SetParent(this->GetToolbarFrame());
   this->Toolbar->Create(app);
-
+  
   this->Script("pack %s -side left -pady 0 -anchor n -fill none -expand no",
                this->InteractorToolbar->GetWidgetName());
   this->Script("pack  %s -side left -pady 0 -fill both -expand yes",
                this->Toolbar->GetWidgetName()); 
+  
 }
 
 //----------------------------------------------------------------------------
@@ -3493,7 +3507,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.340 $");
+  this->ExtractRevision(os,"$Revision: 1.341 $");
 }
 
 //----------------------------------------------------------------------------
@@ -3856,6 +3870,8 @@ void vtkPVWindow::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "SelectMenu: " << this->SelectMenu << endl;
   os << indent << "SourceMenu: " << this->SourceMenu << endl;
   os << indent << "Toolbar: " << this->GetToolbar() << endl;
+  os << indent << "PickCenterToolbar: " << this->GetPickCenterToolbar() << endl;
+  os << indent << "FlySpeedToolbar: " << this->GetFlySpeedToolbar() << endl;
   os << indent << "GenericInteractor: " << this->GenericInteractor << endl;
   os << indent << "GlyphMenu: " << this->GlyphMenu << endl;
   os << indent << "InitializeDefaultInterfaces: " 
