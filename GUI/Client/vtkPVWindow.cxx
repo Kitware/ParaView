@@ -137,7 +137,7 @@
 #include "vtkSMRenderModuleProxy.h"
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.2");
+vtkCxxRevisionMacro(vtkPVWindow, "1.678.2.3");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -3186,8 +3186,6 @@ void vtkPVWindow::SaveState(const char* filename)
   *file << "set kw(" << this->GetTclName() << ") [$Application GetMainWindow]" << endl;
   *file << "set kw(" << this->GetMainView()->GetTclName() 
         << ") [$kw(" << this->GetTclName() << ") GetMainView]" << endl;
-  *file << "set kw(" << this->AnimationInterface->GetTclName() 
-        << ") [$kw(" << this->GetTclName() << ") GetAnimationInterface]" << endl;
   *file << "set kw(" << this->AnimationManager->GetTclName()
     << ") [$kw(" << this->GetTclName() << ") GetAnimationManager]" << endl;
 
@@ -3295,13 +3293,8 @@ void vtkPVWindow::SaveState(const char* filename)
   // in which case it doesn't support animation saving yet
   if(this->SaveVisibleSourcesOnlyFlag == 0)
     {
-
-    // Save state of the animation interface
-    this->AnimationInterface->SaveState(file);
-
     // Save state of the new animation interface
     this->AnimationManager->SaveState(file);
-
     }
 
   //  Save state of the Volume Appearance editor
