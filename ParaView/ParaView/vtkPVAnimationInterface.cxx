@@ -143,7 +143,7 @@ static unsigned char image_goto_end[] =
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVAnimationInterface);
-vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.7");
+vtkCxxRevisionMacro(vtkPVAnimationInterface, "1.72.2.8");
 
 vtkCxxSetObjectMacro(vtkPVAnimationInterface,ControlledWidget, vtkPVWidget);
 
@@ -1069,11 +1069,12 @@ void vtkPVAnimationInterface::SetView(vtkPVRenderView *renderView)
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveImagesCallback()
 {
-  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
   this->GetWindow()->RetrieveLastPath(saveDialog, "SaveAnimationFile");
   saveDialog->SetParent(this);
-  saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
+  saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Images");
   saveDialog->SetDefaultExtension(".jpg");
   saveDialog->SetFileTypes("{{jpeg} {.jpg}} {{tiff} {.tif}} {{Portable Network Graphics} {.png}}");
@@ -1185,14 +1186,14 @@ void vtkPVAnimationInterface::SaveImages(const char* fileRoot,
 //-----------------------------------------------------------------------------
 void vtkPVAnimationInterface::SaveGeometryCallback()
 {
-  int numPartitions =
-    this->GetPVApplication()->GetProcessModule()->GetNumberOfPartitions();
+  vtkPVProcessModule* pm = this->GetPVApplication()->GetProcessModule();
+  int numPartitions = pm->GetNumberOfPartitions();
   
-  vtkKWLoadSaveDialog* saveDialog = vtkKWLoadSaveDialog::New();
+  vtkKWLoadSaveDialog* saveDialog = pm->NewLoadSaveDialog();
   this->GetWindow()->RetrieveLastPath(saveDialog, "SaveGeometryFile");
   saveDialog->SetParent(this);
-  saveDialog->Create(this->Application, 0);
   saveDialog->SaveDialogOn();
+  saveDialog->Create(this->Application, 0);
   saveDialog->SetTitle("Save Animation Geometry");
   saveDialog->SetDefaultExtension(".pvd");
   saveDialog->SetFileTypes("{{ParaView Data Files} {.pvd}}");
