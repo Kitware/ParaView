@@ -214,14 +214,6 @@ void vtkPVSource::SetPVOutput(vtkPVData *pvd)
   this->SetNthPVOutput(0, pvd);
 }
 
-
-//----------------------------------------------------------------------------
-// Functions to update the progress bar
-void vtkPVSource::UpdateScalars()
-{
-  // What did this do ??? ... 
-}
-
 //----------------------------------------------------------------------------
 // Functions to update the progress bar
 void vtkPVSourceStartProgress(void *arg)
@@ -838,8 +830,7 @@ void vtkPVSource::UpdateVTKSourceParameters()
 
     // We should be calling Accept on the widgets regardless of whether they
     // were modified.
-//    if (pvw && pvw->GetModifiedFlag())
-    if (pvw)
+    if (pvw && pvw->GetModifiedFlag())
       {
       if ( ! pvw->GetTraceVariableInitialized())
         {
@@ -1245,6 +1236,7 @@ vtkPVInputMenu *vtkPVSource::AddInputMenu(char *label, char *inputName, char *in
 
   inputMenu = vtkPVInputMenu::New();
   inputMenu->SetPVSource(this);
+  inputMenu->SetCurrentValue(this->GetPVWindow()->GetCurrentPVSource());
   inputMenu->SetSources(sources);
   inputMenu->SetParent(this->ParameterFrame->GetFrame());
   inputMenu->SetLabel(label);

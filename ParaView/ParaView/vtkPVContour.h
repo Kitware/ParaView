@@ -49,6 +49,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVSource.h"
 #include "vtkKWPushButton.h"
 #include "vtkPVLabeledToggle.h"
+#include "vtkPVArrayMenu.h"
 #include "vtkKWEntry.h"
 
 class VTK_EXPORT vtkPVContour : public vtkPVSource
@@ -64,8 +65,14 @@ public:
   // Description:
   // Save this source to a file.
   void SaveInTclScript(ofstream *file);
+
+  // Description:
+  // This does the same thing as the superclass, but also
+  // checks fopr scalars.
+  virtual void SetPVInput(vtkPVData *input);
   
-  virtual void UpdateScalars();
+  void ScalarArrayMenuCallback();
+  void UpdateScalarRangeLabel();
 
 protected:
   vtkPVContour();
@@ -73,6 +80,7 @@ protected:
   vtkPVContour(const vtkPVContour&) {};
   void operator=(const vtkPVContour&) {};
 
+  vtkPVArrayMenu *ScalarArrayMenu;
   vtkKWLabel *ScalarRangeLabel;
   
   void GetDataArrayRange(float range[2]);

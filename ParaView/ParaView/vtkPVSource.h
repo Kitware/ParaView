@@ -281,7 +281,6 @@ protected:
   // What did this do ??? ... 
   char *DefaultScalarsName;
   vtkSetStringMacro(DefaultScalarsName);
-  virtual void UpdateScalars();
 
   vtkPVRenderView* GetPVRenderView();
   

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "vtkPVArrayMenu.h"
 #include "vtkObjectFactory.h"
+#include "vtkKWMessageDialog.h"
 
 //----------------------------------------------------------------------------
 vtkPVArrayMenu* vtkPVArrayMenu::New()
@@ -470,7 +471,9 @@ void vtkPVArrayMenu::UpdateArrayMenu()
                this->DataSetCommandObjectTclName, this->DataSetCommandMethod);
   if (this->DataSet == NULL)
     {
-    vtkErrorMacro("Could not find vtk data set.");
+    this->SetArrayName(NULL);
+    this->ArrayMenu->SetValue("None");
+    vtkDebugMacro("Could not find vtk data set.");
     return;
     }
 
@@ -526,9 +529,9 @@ void vtkPVArrayMenu::UpdateArrayMenu()
         }
       else
         {
-        vtkWarningMacro("Could not find " << attributeName);
         // Here we may want to keep the previous value.
         this->SetArrayName(NULL);
+        this->ArrayMenu->SetValue("None");
         }
       }
 
@@ -602,7 +605,6 @@ void vtkPVArrayMenu::UpdateComponentMenu()
   array = field->GetArray(this->ArrayName);
   if (array == NULL)
     {
-    vtkErrorMacro("Could not find array.");
     return;
     }
   this->ArrayNumberOfComponents = array->GetNumberOfComponents();

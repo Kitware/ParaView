@@ -223,7 +223,7 @@ vtkPVSource *vtkPVSourceInterface::CreateCallback()
     // Not as load balanced, but more efficient reading.
     if (s->IsA("vtkPOPReader"))
       {
-      pvApp->BroadcastScript("%s SetSplitModeToYSlab", extentTclName);
+      //pvApp->BroadcastScript("%s SetSplitModeToYSlab", extentTclName);
       }
     }
   else

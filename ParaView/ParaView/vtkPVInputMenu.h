@@ -100,6 +100,13 @@ public:
   virtual void Reset();
 
   // Description:
+  // This method gets called when the user changes the widgets value,
+  // or a script changes the widgets value.  Ideally, this method should 
+  // be protected.  Input menus have the specifie behaviour that
+  // the widgets Accept method is called when ever the input menu is changed.
+  virtual void ModifiedCallback();
+
+  // Description:
   // Set the menus value as a string.
   // Used by the Accept and Reset callbacks.
   void SetCurrentValue(vtkPVSource *pvs);

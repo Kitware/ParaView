@@ -145,6 +145,16 @@ void vtkPVInputMenu::AddSources(vtkCollection *sources)
     this->SetCurrentValue((vtkPVSource*)(sources->GetNextItemAsObject()));
     this->ModifiedCallback();
     }
+
+  if (this->CurrentValue)
+    {
+    this->Menu->SetValue(this->CurrentValue->GetName());
+    }
+  else
+    {
+    this->Menu->SetValue("");
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -193,6 +203,10 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
     return;
     }
   this->CurrentValue = pvs;
+  if (this->Application == NULL)
+    {
+    return;
+    }
   if (pvs)
     {
     this->Menu->SetValue(pvs->GetName());
@@ -203,6 +217,16 @@ void vtkPVInputMenu::SetCurrentValue(vtkPVSource *pvs)
     }
   this->ModifiedCallback();
 }
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVInputMenu::ModifiedCallback()
+{
+  this->vtkPVWidget::ModifiedCallback();
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkPVInputMenu::Accept()
@@ -223,9 +247,6 @@ void vtkPVInputMenu::Accept()
     }
 
 
-  // Super does nothing.  We have to do everything here.
-  // Notice we are changing PVObjects here so we do not
-  // broadcast the script.
   if (this->CurrentValue)
     {
     this->Script("%s Set%s %s", this->PVSource->GetTclName(), this->InputName,
@@ -240,8 +261,6 @@ void vtkPVInputMenu::Accept()
     pvApp->AddTraceEntry("$pv(%s) SetCurrentValue {}", 
                          this->GetTclName());
     }
-
-  this->vtkPVWidget::Accept();
 }
 
 //----------------------------------------------------------------------------
@@ -253,11 +272,6 @@ void vtkPVInputMenu::Reset()
     return;
     }
 
-  // Super and source do nothing.  We have to do every thing here.
-
-  // Turn ModifiedFlag off here in case "AddSources" sets a default.
-  this->ModifiedFlag = 0;
-  
   // The list of possible inputs could have changed.
   this->AddSources(this->Sources);
 
@@ -265,6 +279,15 @@ void vtkPVInputMenu::Reset()
   // The catch is here because GlyphSource is initially NULL which causes an error.
   this->Script("catch {%s SetCurrentValue [[%s Get%s] GetPVSource]}", 
                this->GetTclName(), 
-               this->PVSource->GetTclName(), this->InputName);
-    
+               this->PVSource->GetTclName(), this->InputName);    
+
+  // Only turn modified off if the SetCurrentValue was successful.
+  if (this->GetIntegerResult(this->Application) == 0)
+    {
+    this->ModifiedFlag = 0;
+    }
+  else
+    {
+    this->ModifiedFlag = 1;
+    }
 }
