@@ -128,6 +128,21 @@ CONFIGURE_FILE(${ParaView_SOURCE_DIR}/VTK/Utilities/TclTk/.NoDartCoverage
   ${ParaView_BINARY_DIR}/VTK/.NoDartCoverage)
 SUBDIRS(VTK)
 
+
+# Set the ICET MPI variables from the VTK ones.
+# use a set cache internal so people don't try and use them
+SET(ICET_MPIRUN_EXE "${VTK_MPIRUN_EXE}" CACHE INTERNAL 
+  "This is set from VTK_MPIRUN_EXE.")
+SET(ICET_MPI_PREFLAGS 
+  "${VTK_MPI_NUMPROC_FLAG};${VTK_MPI_MAX_NUMPROCS};${VTK_MPI_PREFLAGS}" CACHE INTERNAL
+  "This is set from a combination of VTK_MPI_NUMPROC_FLAG VTK_MPI_MAX_NUMPROCS VTK_MPI_PREFLAGS.")
+SET(ICET_MPI_POSTFLAGS "${VTK_MPI_POSTFLAGS}"  CACHE INTERNAL
+  "This is set from VTK_MPI_POSTFLAGS.")
+SET(ICET_MPI_MAX_NUMPROCS "${VTK_MPI_MAX_NUMPROCS}"  CACHE INTERNAL
+  "This is set from VTK_MPI_MAX_NUMPROCS.")
+
+
+
 # This is a hack for now. Once the transition is over, this macro goes aways
 ADD_DEFINITIONS(-DPARAVIEW_NEW_SOURCE_ORGANIZATION)
 SET(VTK_INCLUDE_DIR
