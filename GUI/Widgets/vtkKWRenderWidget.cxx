@@ -36,7 +36,7 @@
 #endif
 
 vtkStandardNewMacro(vtkKWRenderWidget);
-vtkCxxRevisionMacro(vtkKWRenderWidget, "1.79");
+vtkCxxRevisionMacro(vtkKWRenderWidget, "1.80");
 
 //----------------------------------------------------------------------------
 vtkKWRenderWidget::vtkKWRenderWidget()
@@ -296,6 +296,11 @@ void vtkKWRenderWidget::Create(vtkKWApplication *app, const char *args)
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddBindings()
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
   // First remove the old one so that bindings don't get duplicated
 
   this->RemoveBindings();
@@ -321,11 +326,8 @@ void vtkKWRenderWidget::AddBindings()
                  wname, tname);
     }
 
-  if (this->IsCreated())
-    {
-    this->Script("bind %s <Configure> {%s Configure %%w %%h}",
-                 this->GetWidgetName(), tname);
-    }
+  this->Script("bind %s <Configure> {%s Configure %%w %%h}",
+               this->GetWidgetName(), tname);
   
   this->AddInteractionBindings();
 }
@@ -333,6 +335,11 @@ void vtkKWRenderWidget::AddBindings()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveBindings()
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
   if (this->VTKWidget->IsCreated())
     {
     const char *wname = this->VTKWidget->GetWidgetName();
@@ -344,10 +351,7 @@ void vtkKWRenderWidget::RemoveBindings()
     this->Script("bind %s <FocusOut> {}", wname);
     }
 
-  if (this->IsCreated())
-    {
-    this->Script("bind %s <Configure> {}", this->GetWidgetName());
-    }
+  this->Script("bind %s <Configure> {}", this->GetWidgetName());
 
   this->RemoveInteractionBindings();
 }
@@ -355,6 +359,11 @@ void vtkKWRenderWidget::RemoveBindings()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::AddInteractionBindings()
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
   // First remove the old one so that bindings don't get duplicated
 
   this->RemoveInteractionBindings();
@@ -452,6 +461,11 @@ void vtkKWRenderWidget::AddInteractionBindings()
 //----------------------------------------------------------------------------
 void vtkKWRenderWidget::RemoveInteractionBindings()
 {
+  if (!this->IsCreated())
+    {
+    return;
+    }
+
   if (this->VTKWidget->IsCreated())
     {
     const char *wname = this->VTKWidget->GetWidgetName();
