@@ -121,7 +121,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.391");
+vtkCxxRevisionMacro(vtkPVWindow, "1.391.2.1");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -880,8 +880,6 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // Invoke super method first.
   this->vtkKWWindow::Create(pvApp,"");
 
-  this->Script("wm geometry %s 900x700+0+0", this->GetWidgetName());
-  
   // Hide the main window until after all user interface is initialized.
   this->Script( "wm withdraw %s", this->GetWidgetName());
 
@@ -3788,7 +3786,7 @@ void vtkPVWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVWindow ";
-  this->ExtractRevision(os,"$Revision: 1.391 $");
+  this->ExtractRevision(os,"$Revision: 1.391.2.1 $");
 }
 
 //----------------------------------------------------------------------------
