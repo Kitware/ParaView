@@ -188,6 +188,7 @@ static const char *vtkKWEventStrings[] = {
   "WindowLayoutChangedEvent",
   "WindowLevelChangedEvent",
   "WindowLevelChangingEvent",
+  "WindowLevelEndEvent",
   "WindowLevelResetEvent",
   // PV
   "ErrorMessageEvent",
