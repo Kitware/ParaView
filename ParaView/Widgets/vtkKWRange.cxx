@@ -50,7 +50,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkObjectFactory.h"
 
 vtkStandardNewMacro( vtkKWRange );
-vtkCxxRevisionMacro(vtkKWRange, "1.10");
+vtkCxxRevisionMacro(vtkKWRange, "1.11");
 
 #define VTK_KW_RANGE_MIN_SLIDER_SIZE        2
 #define VTK_KW_RANGE_MIN_THICKNESS          (2*VTK_KW_RANGE_MIN_SLIDER_SIZE+1)
@@ -130,8 +130,6 @@ vtkKWRange::vtkKWRange()
 //----------------------------------------------------------------------------
 vtkKWRange::~vtkKWRange()
 {
-  this->UnBind();
-
   if (this->Command)
     {
     delete [] this->Command;
@@ -1504,35 +1502,36 @@ void vtkKWRange::RedrawRange()
       min  max
        |   |
        v   v
-       DL..H <- pos[0]
-       DL..H
-       DL..H
-       DL..H
-       DL..H <- pos[1]
+       H..LD <- pos[0]
+       H..LD
+       H..LD
+       H..LD
+       H..LD <- pos[1]
     */
+
     // '.' part (background)
   
     tk_cmd << canv << " coords " << tag << "b1 "
-           << min + 2 << " " << pos[0] << " " 
-           << max - 1 + RSTRANGE << " " << pos[1] + RSTRANGE << endl;
+           << min + 1 << " " << pos[0] << " " 
+           << max - 2 + RSTRANGE << " " << pos[1] + RSTRANGE << endl;
 
     // 'D' part (dark shadow)
 
     tk_cmd << canv << " coords " << tag << "l1 "
-           << min << " " << pos[0] << " "
-           << min << " " << pos[1] + LSTRANGE << endl;
+           << max << " " << pos[0] << " "
+           << max << " " << pos[1] + LSTRANGE << endl;
 
     // 'H' part (highlight)
 
     tk_cmd << canv << " coords " << tag << "l2 "
-           << max << " " << pos[0] << " "
-           << max << " " << pos[1] + LSTRANGE << endl;
+           << min << " " << pos[0] << " "
+           << min << " " << pos[1] + LSTRANGE << endl;
 
     // 'L' part (light shadow)
 
     tk_cmd << canv << " coords " << tag << "l3 "
-           << min + 1 << " " << pos[0] << " "
-           << min + 1 << " " << pos[1] + LSTRANGE << endl;
+           << max -1 << " " << pos[0] << " "
+           << max - 1 << " " << pos[1] + LSTRANGE << endl;
     }
 
   tk_cmd << ends;
