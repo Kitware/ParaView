@@ -138,6 +138,8 @@ vtkKWApplication::vtkKWApplication()
 		 this->BalloonHelpWindow->GetWidgetName());
     this->Script("wm withdraw %s", this->BalloonHelpWindow->GetWidgetName());
     }
+
+  this->ExitOnReturn = 0;
 }
 
 vtkKWApplication::~vtkKWApplication()
@@ -876,6 +878,29 @@ int vtkKWApplication::SelfTest()
 }
 
 //----------------------------------------------------------------------------
+int vtkKWApplication::LoadScript(const char* filename)
+{
+  int res = 1;
+  char* file = vtkString::Duplicate(filename);
+  // add this window as a variable
+  this->Script("set InitialWindow %s", this->GetTclName());
+  if ( Tcl_EvalFile(this->MainInterp, file) != TCL_OK )
+    {
+    vtkErrorMacro("\n    Script: \n" << filename << "\n    Returned Error on line "
+		  << this->MainInterp->errorLine << ": \n      "  
+		  << Tcl_GetStringResult(this->MainInterp) << endl);
+    res = 0;
+    }
+  delete [] file;
+
+  if ( this->ExitOnReturn )
+    {
+    this->Exit();
+    }
+  return res;
+}
+
+//----------------------------------------------------------------------------
 void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
@@ -890,4 +915,5 @@ void vtkKWApplication::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "RegisteryLevel: " << this->GetRegisteryLevel() << endl;
   os << indent << "UseMessageDialogs: " << this->GetUseMessageDialogs() 
      << endl;
+  os << indent << "ExitOnReturn: " << (this->ExitOnReturn ? "on":"off") << endl;
 }

@@ -825,16 +825,7 @@ void vtkKWWindow::LoadScript()
 
 void vtkKWWindow::LoadScript(const char *path)
 {
-  char* file = vtkString::Duplicate(path);
-  // add this window as a variable
-  this->Script("set InitialWindow %s", this->GetTclName());
-  if ( Tcl_EvalFile(this->Application->GetMainInterp(), file) != TCL_OK )
-    {
-    vtkErrorMacro("\n    Script: \n" << path << "\n    Returned Error on line "
-		  << this->Application->GetMainInterp()->errorLine << ": \n"  
-		  << this->Application->GetMainInterp()->result << endl);
-    }
-  delete [] file;
+  this->Application->LoadScript(path);
 }
 
 void vtkKWWindow::CreateStatusImage()
@@ -998,7 +989,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.94 $");
+  this->ExtractRevision(os,"$Revision: 1.95 $");
 }
 
 int vtkKWWindow::ExitDialog()
