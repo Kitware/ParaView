@@ -149,6 +149,7 @@ public:
   // Description:
   // Called when the accept button is pressed.
   virtual void AcceptCallback();
+  virtual void PreAcceptCallback();
   
   // Description:
   // Called when the reset button is pressed.
