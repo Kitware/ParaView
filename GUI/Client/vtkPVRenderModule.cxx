@@ -43,7 +43,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderModule);
-vtkCxxRevisionMacro(vtkPVRenderModule, "1.25");
+vtkCxxRevisionMacro(vtkPVRenderModule, "1.26");
 
 //===========================================================================
 //***************************************************************************
@@ -82,7 +82,7 @@ vtkPVRenderModule::vtkPVRenderModule()
   this->PVApplication = NULL;
   this->TotalVisibleMemorySizeValid = 0;
   
-  this->PartDisplays = vtkCollection::New();
+  this->Displays = vtkCollection::New();
 
   this->Renderer = 0;
   this->Renderer2D = 0;
@@ -117,8 +117,8 @@ vtkPVRenderModule::~vtkPVRenderModule()
     this->ResetCameraClippingRangeTag = 0;
     }
 
-  this->PartDisplays->Delete();
-  this->PartDisplays = NULL;
+  this->Displays->Delete();
+  this->Displays = NULL;
 
   
   if (this->Renderer)
@@ -339,8 +339,8 @@ void vtkPVRenderModule::CacheUpdate(int idx, int total)
 {
   vtkObject* object;
   vtkPVPartDisplay* pDisp;
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
     if (pDisp->GetVisibility())
@@ -355,8 +355,8 @@ void vtkPVRenderModule::InvalidateAllGeometries()
 {
   vtkObject* object;
   vtkPVPartDisplay* pDisp;
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
     pDisp->InvalidateGeometry();
@@ -374,13 +374,13 @@ void vtkPVRenderModule::ComputeVisiblePropBounds(double bds[6])
   // Compute the bounds for our sources.
   bds[0] = bds[2] = bds[4] = VTK_DOUBLE_MAX;
   bds[1] = bds[3] = bds[5] = -VTK_DOUBLE_MAX;
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
-    part = pDisp->GetPart();
-    if (part && pDisp->GetVisibility())
+    if (pDisp && pDisp->GetVisibility())
       {
+      part = pDisp->GetPart();
       tmp = part->GetDataInformation()->GetBounds();
       if (tmp[0] < bds[0]) { bds[0] = tmp[0]; }  
       if (tmp[1] > bds[1]) { bds[1] = tmp[1]; }  
@@ -398,6 +398,17 @@ void vtkPVRenderModule::ComputeVisiblePropBounds(double bds[6])
     }
 }
 
+//----------------------------------------------------------------------------
+void vtkPVRenderModule::AddDisplay(vtkPVDisplay* disp)
+{
+  this->Displays->AddItem(disp);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderModule::RemoveDisplay(vtkPVDisplay* disp)
+{
+  this->Displays->RemoveItem(disp);
+}
 
 //----------------------------------------------------------------------------
 vtkPVPartDisplay* vtkPVRenderModule::CreatePartDisplay()
@@ -424,7 +435,7 @@ void vtkPVRenderModule::AddPVSource(vtkPVSource *pvs)
     part = pvs->GetPart(idx);
     // Create a part display for each part.
     pDisp = this->CreatePartDisplay();
-    this->PartDisplays->AddItem(pDisp);
+    this->Displays->AddItem(pDisp);
     pDisp->SetPVApplication(pvApp);
     part->SetPartDisplay(pDisp);
     pDisp->SetPart(part);
@@ -461,7 +472,7 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
     pDisp = part->GetPartDisplay();
     if (pDisp)
       {
-      this->PartDisplays->RemoveItem(pDisp);
+      this->Displays->RemoveItem(pDisp);
       if (pDisp->GetPropID().ID != 0)
         {  
         vtkPVProcessModule *pm = pvApp->GetProcessModule();
@@ -477,15 +488,15 @@ void vtkPVRenderModule::RemovePVSource(vtkPVSource *pvs)
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderModule::UpdateAllPVData()
+void vtkPVRenderModule::UpdateAllDisplays()
 {
   vtkObject* object;
   vtkPVPartDisplay* pDisp;
   vtkPVApplication* pvApp = this->GetPVApplication();
   pvApp->SendPrepareProgress();
 
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetVisibility())
@@ -499,7 +510,7 @@ void vtkPVRenderModule::UpdateAllPVData()
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::InteractiveRender()
 {
-  this->UpdateAllPVData();
+  this->UpdateAllDisplays();
 
   vtkTimerLog::MarkStartEvent("Interactive Render");
   this->RenderWindow->Render();
@@ -509,7 +520,7 @@ void vtkPVRenderModule::InteractiveRender()
 //----------------------------------------------------------------------------
 void vtkPVRenderModule::StillRender()
 {
-  this->UpdateAllPVData();
+  this->UpdateAllDisplays();
 
   // Still Render can get called some funky ways.
   // Interactive renders get called through the PVInteractorStyles
@@ -534,8 +545,8 @@ void vtkPVRenderModule::SetUseTriangleStrips(int val)
 
   pvApp = this->GetPVApplication();
 
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
     if (pDisp && pDisp->GetPart())
@@ -581,8 +592,8 @@ void vtkPVRenderModule::SetUseImmediateMode(int val)
   vtkObject* object;
   vtkPVPartDisplay* pDisp;
 
-  this->PartDisplays->InitTraversal();
-  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+  this->Displays->InitTraversal();
+  while ( (object = this->Displays->GetNextItemAsObject()) )
     {
     pDisp = vtkPVPartDisplay::SafeDownCast(object);
     if (pDisp)
