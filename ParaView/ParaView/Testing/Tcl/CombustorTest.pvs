@@ -43,6 +43,8 @@ set VOIEntry [$pvExtract GetPVWidget {VOI}]
 $VOIEntry SetValue 0 56 0 32 0 0 
 $pvExtract AcceptCallback
 
+RenWin1 SetSize 300 300
+
 [$pvExtract GetPVOutput] SetVisibility 0
 
 set pvGlyph [$pvWindow CreatePVSource Glyph]
@@ -68,8 +70,6 @@ $camera SetClippingRange 34.7159 82.3051
 $cntOutput SetVisibility 1
 [$pvPlot3D GetPVOutput] SetVisibility 1
 
-RenWin1 SetSize 300 300
-
 set start 0.2
 set end 0.7
 set num 5
@@ -83,9 +83,9 @@ for {set i 0} {$i < $num} {incr i 1} {
 # Rotate isosuface
 AdjustContourValue $cInt 0.3
 
+$cntOutput ColorByPointFieldComponent Momentum 0
 $cntOutput SetScalarBarVisibility 1
 $cntOutput SetScalarBarOrientationToHorizontal
-$cntOutput ColorByPointFieldComponent Momentum 0
 $cInt UpdateParameterWidgets
 
 RenWin1 SetSize 300 300
@@ -143,6 +143,11 @@ $camera SetClippingRange 15.0904 64.6074
 $VOIEntry SetValue 0 0 0 32 3 20
 $pvExtract AcceptCallback
 RenWin1 Render
+
+set extOutput [$pvExtract GetPVOutput]
+$extOutput ColorByPointFieldComponent {Density} 0
+$extOutput SetScalarBarVisibility 1
+$extOutput SetScalarBarOrientationToHorizontal
 
 for {set i 55} {$i < 56} {incr i 1} {
     $VOIEntry SetValue $i $i 0 32 3 20
