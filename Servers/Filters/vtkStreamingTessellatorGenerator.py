@@ -874,7 +874,7 @@ void vtkStreamingTessellator::AdaptivelySample3Facet( double* v0, double* v1, do
 
     // Generate tetrahedra that are compatible except when edge
     // lengths are equal on indeterminately subdivided faces.
-    double* permuted[10];
+    double* permuted[14];
     double permlen[6]; // permuted edge lengths
     int C = vtkStreamingTessellator::EdgeCodesToCaseCodesPlusPermutation[ edgeCode ][0];
     int P = vtkStreamingTessellator::EdgeCodesToCaseCodesPlusPermutation[ edgeCode ][1];
