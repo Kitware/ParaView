@@ -199,29 +199,25 @@ VTK_THREAD_RETURN_TYPE vtkThreadedControllerStart( void *arg )
 {
   ThreadInfoStruct *info = (ThreadInfoStruct*)(arg);
   int threadId = info->ThreadID;
-  vtkThreadedController *controller0 = (vtkThreadedController*)(info->UserData);
+  vtkThreadedController *controller0 =(vtkThreadedController*)(info->UserData);
 
   controller0->Start(threadId);
   return VTK_THREAD_RETURN_VALUE;
 }
 
+//----------------------------------------------------------------------------
+// We are going to try something new.  We will pass the local controller
+// as the argument.
 void vtkThreadedController::Start(int threadId)
 {
-  ............................
-  // Store threadId in a table.
-#ifdef VTK_USE_PTHREADS  
-  this->ThreadIds[threadIdx] = pthread_self();
-#endif
-#ifdef VTK_USE_SPROC
-  this->ThreadIds[threadIdx] = PRDA->sys_prda.prda_sys.t_pid;
-#endif
+  vtkThreadedController *localController = this->Controllers[threadId];
 
   if (this->MultipleMethodFlag)
     {
     if (this->MultipleMethod[threadIdx])
       {
-      (this->MultipleMethod[threadIdx])
-	    ((void *)(this->MultipleData[threadIdx]));
+      localController->DataArguement = (void *)(this->MultipleData[threadIdx]);
+      (this->MultipleMethod[threadIdx])((void *)localController);
       }
     else
       {
@@ -232,7 +228,8 @@ void vtkThreadedController::Start(int threadId)
     {
     if (this->SingleMethod)
       {
-      (this->SingleMethod)( this->SingleData );
+      localController->DataArguement = (void *)(this->SingleData);
+      (this->SingleMethod)((void*)localController);
       }
     else
       {
@@ -267,48 +264,9 @@ void vtkThreadedController::MultipleMethodExecute()
   this->MultiThreader->SingleMethodExecute();
 }
 
-
-//----------------------------------------------------------------------------
-// I may need a mutex lock here. Although my own pid must have already been
-// set,  once before me could be in a funky state.
-int vtkThreadedController::GetLocalProcessId()
-{
-#ifdef VTK_USE_PTHREADS  
-  int idx;
-  pthread_t pid = pthread_self();
-  for (idx = 0; idx < this->NumberOfProcesses; ++idx)
-    {
-    if (pthread_equal(pid, this->ThreadIds[idx]))
-      {
-      return idx;
-      }
-    }
-  
-  vtkErrorMacro("Could Not Find my process id.");
-  return -1;
-#elif defined VTK_USE_SPROC
-  int idx;
-  pid_t pid = PRDA->sys_prda.prda_sys.t_pid;
-  for (idx = 0; idx < this->NumberOfProcesses; ++idx)
-    {
-    if (pid == this->ThreadIds[idx])
-      {
-      return idx;
-      }
-    }
-  
-  vtkErrorMacro("Could Not Find my process id.");
-  return -1;
-#else
-
-  vtkErrorMacro("ThreadedController only works with pthreads or sproc");
-  return -1;
-  
-#endif  
-}
-
   
 //----------------------------------------------------------------------------
+......................................
 // Handles message in object or in data string.
 int vtkThreadedController::Send(vtkObject *object, void *data, int length, 
 				int remoteProcessId, int tag)

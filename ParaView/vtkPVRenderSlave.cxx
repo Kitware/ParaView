@@ -1,7 +1,7 @@
 /*=========================================================================
 
   Program:   Visualization Toolkit
-  Module:    vtkPVRenderView.cxx
+  Module:    vtkPVRenderSlave.cxx
   Language:  C++
   Date:      $Date$
   Version:   $Revision$
@@ -26,39 +26,49 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 
 =========================================================================*/
 
-#include "vtkPVRenderView.h"
-#include "vtkDummyRenderWindowInteractor.h"
+#include "vtkPVRenderSlave.h"
+#include "vtkMesaRenderWindow.h"
+#include "vtkMesaRenderer.h"
 #include "vtkObjectFactory.h"
 
 
 
 //----------------------------------------------------------------------------
-vtkPVRenderView* vtkPVRenderView::New()
+vtkPVRenderSlave* vtkPVRenderSlave::New()
 {
   // First try to create the object from the vtkObjectFactory
-  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVRenderView");
+  vtkObject* ret = vtkObjectFactory::CreateInstance("vtkPVRenderSlave");
   if(ret)
     {
-    return (vtkPVRenderView*)ret;
+    return (vtkPVRenderSlave*)ret;
     }
   // If the factory was unable to create the object, then create it here.
-  return new vtkPVRenderView;
+  return new vtkPVRenderSlave;
 }
 
 
-int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
+int vtkPVRenderSlaveCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
 
 //----------------------------------------------------------------------------
-vtkPVRenderView::vtkPVRenderView()
+vtkPVRenderSlave::vtkPVRenderSlave()
 {
-  this->CommandFunction = vtkPVRenderViewCommand;
-  this->InteractorStyle = NULL;
-  this->Interactor = vtkDummyRenderWindowInteractor::New();
+  vtkMesaRenderWindow *mesaRenWindow;
+  vtkMesaRenderer *mesaRenderer;
+
+  mesaRenderWindow = vtkMesaRenderWindow::New();
+  mesaRenderWindow->SetOffScreenRenderer(1);
+  mesaRenderer = vtkMesaRenderer::New();
+  mesaRenderWindow->AddRenderer(mesaRenderer);
+
+  this->CommandFunction = vtkPVRenderSlaveCommand;
+  this->PVSlave = NULL;
+  this->RenderWindow = mesaRenderWindow;
+  this->Renderer = mesaRenderer;
 }
 
 //----------------------------------------------------------------------------
-vtkPVRenderView::~vtkPVRenderView()
+vtkPVRenderSlave::~vtkPVRenderSlave()
 {
   this->Interactor->Delete();
   this->Interactor = NULL;
@@ -66,7 +76,14 @@ vtkPVRenderView::~vtkPVRenderView()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
+void vtkPVRenderSlave::Render()
+{
+  this->RenderWindow->Render();
+  .....
+}
+
+//----------------------------------------------------------------------------
+void vtkPVRenderSlave::SetInteractorStyle(vtkInteractorStyle *style)
 {
   if (this->Interactor)
     {
@@ -86,7 +103,7 @@ void vtkPVRenderView::SetInteractorStyle(vtkInteractorStyle *style)
 } 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
+void vtkPVRenderSlave::Create(vtkKWApplication *app, char *args)
 {
   if (this->Application)
     {
@@ -112,7 +129,7 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
 
 //----------------------------------------------------------------------------
 // Called by a binding, so I must flip y.
-void vtkPVRenderView::MotionCallback(int x, int y)
+void vtkPVRenderSlave::MotionCallback(int x, int y)
 {
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
@@ -125,7 +142,7 @@ void vtkPVRenderView::MotionCallback(int x, int y)
 
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AButtonPress(int num, int x, int y)
+void vtkPVRenderSlave::AButtonPress(int num, int x, int y)
 {
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
@@ -148,7 +165,7 @@ void vtkPVRenderView::AButtonPress(int num, int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AButtonRelease(int num, int x, int y)
+void vtkPVRenderSlave::AButtonRelease(int num, int x, int y)
 {
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
@@ -171,7 +188,7 @@ void vtkPVRenderView::AButtonRelease(int num, int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Button1Motion(int x, int y)
+void vtkPVRenderSlave::Button1Motion(int x, int y)
 {
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
@@ -183,7 +200,7 @@ void vtkPVRenderView::Button1Motion(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Button2Motion(int x, int y)
+void vtkPVRenderSlave::Button2Motion(int x, int y)
 {
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
@@ -195,7 +212,7 @@ void vtkPVRenderView::Button2Motion(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::Button3Motion(int x, int y)
+void vtkPVRenderSlave::Button3Motion(int x, int y)
 {
   int *size = this->GetRenderer()->GetSize();
   y = size[1] - y;
@@ -207,7 +224,7 @@ void vtkPVRenderView::Button3Motion(int x, int y)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVRenderView::AKeyPress(char key, int x, int y)
+void vtkPVRenderSlave::AKeyPress(char key, int x, int y)
 {
   x = y;
 

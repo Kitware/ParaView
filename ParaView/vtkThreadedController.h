@@ -76,6 +76,12 @@ public:
   void Initialize(int argc, char *arcv[]);
 
   // Description:
+  // This returns the processId associated with this controller.
+  // Note: The correct controller is passed as an argument to
+  // the initial function (SingleMethod/MultipleMethod).
+  vtkGetMacro(LocalProcessId, int);
+
+  // Description:
   // Execute the SingleMethod (as define by SetSingleMethod) using
   // this->NumberOfProcesses processes.  You should not expect this to return.
   void SingleMethodExecute();
