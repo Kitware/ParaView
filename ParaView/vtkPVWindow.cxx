@@ -249,37 +249,23 @@ void vtkPVWindow::NewCone()
 {
   vtkPVApplication *pvApp = (vtkPVApplication *)this->Application;
   vtkPVConeSource *cone;
-  vtkPVPolyData *pvd;
-  vtkPVAssignment *a;
   
   // Create the pipeline objects in all processes.
   cone = vtkPVConeSource::New();
   cone->Clone(pvApp);
-  pvd = vtkPVPolyData::New();
-  pvd->Clone(pvApp);
-  a = vtkPVAssignment::New();
-  a->Clone(pvApp);
   
-  // Link the objects together (in all processes).
-  cone->SetOutput(pvd);
   cone->SetName("cone");
-  cone->SetAssignment(a);
   
   // Add the new Source to the View (in all processes).
   this->MainView->AddComposite(cone);
 
   // Select this Source
   this->SetCurrentSource(cone);
-
+  
   // Clean up. (How about on the other processes?)
   this->SourceList->Update();
   cone->Delete();
   cone = NULL;
-  a->Delete();
-  a = NULL;
-  
-  this->MainView->ResetCamera();
-  this->MainView->Render();
 }
 
 //----------------------------------------------------------------------------
@@ -288,32 +274,19 @@ void vtkPVWindow::NewVolume()
 {
   vtkPVApplication *pvApp = vtkPVApplication::SafeDownCast(this->Application);
   vtkPVImageReader *reader;
-  vtkPVImage *image;
-  vtkPVAssignment *a;
   
   reader = vtkPVImageReader::New();
   reader->Clone(pvApp);
-  image = vtkPVImage::New();
-  image->Clone(pvApp);
-  a = vtkPVAssignment::New();
-  a->Clone(pvApp);
   
   reader->GetImageReader()->UpdateInformation();
-  a->BroadcastWholeExtent(reader->GetImageReader()->GetOutput()->GetWholeExtent());
   
   // Does not actually read.  Just sets the file name ...
   reader->ReadImage();
-  
-  reader->SetOutput(image);
-  reader->SetAssignment(a);
   
   reader->SetName("volume");
   this->MainView->AddComposite(reader);
   this->SetCurrentSource(reader);
   this->SourceList->Update();
-  
-  this->MainView->ResetCamera();
-  this->MainView->Render();
 }
 
 //----------------------------------------------------------------------------
