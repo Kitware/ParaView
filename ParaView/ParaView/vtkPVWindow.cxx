@@ -248,10 +248,6 @@ vtkPVWindow::vtkPVWindow()
   this->SourceLists->SetItem("Sources", sources);
   sources->Delete();
 
-  vtkPVSourceCollection* renderingsources = vtkPVSourceCollection::New();
-  this->SourceLists->SetItem("RenderingSources", renderingsources);
-  renderingsources->Delete();
-
   // Keep a list of the toolbar buttons so that they can be 
   // disabled/enabled in certain situations.
   this->ToolbarButtons = vtkArrayMap<const char*, vtkKWPushButton*>::New();
@@ -1660,7 +1656,6 @@ int vtkPVWindow::Open(char *openFileName)
       if (rm->ReadFile(openFileName, clone) == VTK_OK && clone)
         {
         this->AddPVSource("Sources", clone);
-        this->AddPVSource("RenderingSources", clone);
         if (clone->GetAcceptAfterRead())
           {
           clone->Accept(0);
@@ -2818,7 +2813,6 @@ vtkPVSource *vtkPVWindow::CreatePVSource(const char* className,
     else
       {
       this->AddPVSource("Sources", clone);
-      this->AddPVSource("RenderingSources", clone);
       }
     clone->Delete();
     }

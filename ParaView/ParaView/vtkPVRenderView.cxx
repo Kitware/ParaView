@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVRenderView.h"
 
 #include "vtkCamera.h"
+#include "vtkCollectionIterator.h"
 #include "vtkDummyRenderWindow.h"
 #include "vtkDummyRenderer.h"
 #include "vtkKWChangeColorButton.h"
@@ -1120,16 +1121,20 @@ void vtkPVRenderView::UpdateAllPVData()
   vtkPVApplication *pvApp = this->GetPVApplication();
   vtkPVSourceCollection* col = 0;
   //cout << "Update all PVData" << endl;
-  col = pvwindow->GetSourceList("RenderingSources");
+  col = pvwindow->GetSourceList("Sources");
   if ( col )
     {
-    col->InitTraversal();
+    vtkCollectionIterator *it = col->NewIterator();
+    it->InitTraversal();
     vtkPVSource* source = 0;
-    while ( (source = col->GetNextPVSource()) )
+    while ( !it->IsDoneWithTraversal() )
       {
+      source = static_cast<vtkPVSource*>(it->GetObject());
       vtkPVData* data = source->GetPVOutput();
       data->ForceUpdate(pvApp);
+      it->GoToNextItem();
       }
+    it->Delete();
     }
 }
 
