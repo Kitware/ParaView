@@ -127,6 +127,14 @@ public:
   // Description:
   // Casts to vtkPVApplication.
   vtkPVApplication *GetPVApplication();
+
+  // Description:
+  // Composites
+  void Render();
+  
+  // Description:
+  // Update all the actors.
+  void Update();
   
 protected:
 

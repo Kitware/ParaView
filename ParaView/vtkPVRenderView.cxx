@@ -451,8 +451,22 @@ void vtkPVRenderView::Create(vtkKWApplication *app, char *args)
                this->VTKWidget->GetWidgetName(), this->GetTclName());
   
   // The start and end methods merge the processes renderers.
+  // Start and End methods are used to swap buffers correctly.
+  // It does not work when they're in a separate method.
   this->GetRenderer()->SetStartRenderMethod(vtkPVRenderViewStartRender, this);
-  this->GetRenderer()->SetEndRenderMethod(vtkPVRenderViewEndRender, this);  
+  this->GetRenderer()->SetEndRenderMethod(vtkPVRenderViewEndRender, this);
+}
+
+void vtkPVRenderView::Update()
+{
+  vtkActorCollection *ac = this->GetRenderer()->GetActors();
+  ac->InitTraversal();
+  vtkActor *a;
+  
+  while ((a = ac->GetNextItem()) != NULL)
+    {
+    a->Update();
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -670,6 +684,12 @@ void vtkPVRenderView::AddCompositeHack(vtkKWComposite *c)
     }
 }
 
+void vtkPVRenderView::Render()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  pvApp->BroadcastScript("%s Update", this->GetTclName());
+  this->vtkKWRenderView::Render();
+}
 
 //----------------------------------------------------------------------------
 void vtkPVRenderView::RenderHack()
@@ -710,6 +730,7 @@ void vtkPVRenderView::RenderHack()
     }
   
   renWin->SetSize(info.WindowSize);
+  
   renWin->Render();
 
   renWin->SetFileName("/home/lawcc/Views/ParaView/partial0.ppm");

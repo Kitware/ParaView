@@ -502,6 +502,14 @@ void vtkPVData::SetAssignment(vtkPVAssignment *a)
 //----------------------------------------------------------------------------
 void vtkPVData::Update()
 {
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  int myId = pvApp->GetController()->GetLocalProcessId();
+  
+  if (myId == 0)
+    {
+    pvApp->BroadcastScript("%s Update", this->GetTclName());
+    }
+  
   if (this->Data == NULL)
     {
     vtkErrorMacro("No data object to update.");

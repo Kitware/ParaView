@@ -45,6 +45,7 @@ vtkPVImageSlice \
 vtkPVImageSource \
 vtkPVMenuButton \
 vtkPVPolyData \
+vtkPVPolyDataNormals \
 vtkPVPolyDataSource \
 vtkPVPolyDataToPolyDataFilter \
 vtkPVRenderView \

@@ -98,9 +98,6 @@ void vtkGetRemoteGhostCells::Execute()
   numPoints = input->GetNumberOfPoints();
   polys = input->GetPolys();
   
-  cerr << "proc "<<procId<<" of "<<numProcs << endl;
-  if (procId == 0) cerr << "numPoints = " << numPoints << endl;
-  
   for (j = 0; j < numPoints; j++)
     {
     input->GetPoint(j, point);
@@ -141,8 +138,6 @@ void vtkGetRemoteGhostCells::Execute()
 	} // if not my process
       } // for all processes (send next point)
 
-    if (procId == 0) cerr << "sent next point" << endl;
-    
     for (id = 0; id < numProcs; id++)
       {
       if (id != procId)
@@ -155,9 +150,6 @@ void vtkGetRemoteGhostCells::Execute()
 	  this->Controller->Receive(point, 3, id, VTK_POINT_COORDS_TAG);
 	  if ((pointId = this->Locator->IsInsertedPoint(point)) >= 0)
 	    {
-//	    input->GetPointCells(pointId, cellIds);
-	    if (procId == 0) cerr << "numPoints: "
-				  << output->GetNumberOfPoints() << endl;
 	    output->GetPointCells(pointId, cellIds);
 	    numCells = cellIds->GetNumberOfIds();
 	    
@@ -165,7 +157,6 @@ void vtkGetRemoteGhostCells::Execute()
 				   VTK_NUM_CELLS_TAG);
 	    for (j = 0; j < numCells; j++)
 	      {
-//	      input->GetCell(cellIds->GetId(j), cell);
 	      output->GetCell(cellIds->GetId(j), cell);
 	      numCellPoints = cell->GetNumberOfPoints();
 	      this->Controller->Send((int*)(&numCellPoints), 1, id,
@@ -194,8 +185,6 @@ void vtkGetRemoteGhostCells::Execute()
 	} // if not my process
       } // for all processes (receive point; look for point cells)
     
-    if (procId == 0) cerr << "received point; sent cells" << endl;
-    
     for (id = 0; id < numProcs; id++)
       {
       if (id != procId)
@@ -213,15 +202,9 @@ void vtkGetRemoteGhostCells::Execute()
 	    if ((pointIds[k] = this->Locator->IsInsertedPoint(point)) == -1)
 	      {
 	      pointIds[k] = this->Locator->InsertNextPoint(point);
-	      if (procId == 0) cerr << "new point id: " << pointIds[k] << endl;
 	      points->InsertPoint(pointIds[k], point);
 	      } // point not in my data already
 	    } // for all points in this cell
-	  if (procId == 0)
-	    {
-	    cerr << "cell: " << pointIds[0] << " " << pointIds[1] << " "
-		 << pointIds[2] << endl;
-	    }
 	  polys->InsertNextCell(numCellPoints, pointIds);
 	  output->SetPoints(points);
 	  output->SetPolys(polys);
@@ -233,13 +216,8 @@ void vtkGetRemoteGhostCells::Execute()
 	} // if not my process
       } // for all processes
     i++;
-    if (procId == 0) cerr << " Point: " << i << endl;
     } // while more points
   
-  if (procId == 0) cerr << "exiting while loop" << endl;
-  
-//  output->SetPoints(points);
-//  output->SetPolys(polys);
   output->GetCellData()->SetGhostLevels(ghostLevels);
 
   points->Delete();

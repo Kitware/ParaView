@@ -62,6 +62,8 @@ public:
   
   void Shrink();
   void Glyph();
+  void GetGhostCells();
+  void PolyDataNormals();
   
 protected:
   vtkPVPolyData();

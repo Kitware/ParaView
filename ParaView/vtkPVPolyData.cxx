@@ -28,8 +28,10 @@ MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
 #include "vtkPVData.h"
 #include "vtkPVPolyData.h"
 #include "vtkPVShrinkPolyData.h"
+#include "vtkPVGetRemoteGhostCells.h"
 #include "vtkPVConeSource.h"
 #include "vtkPVGlyph3D.h"
+#include "vtkPVPolyDataNormals.h"
 #include "vtkKWView.h"
 
 #include "vtkKWScale.h"
@@ -88,6 +90,27 @@ void vtkPVPolyData::Shrink()
   shrink->Delete();
 }
 
+void vtkPVPolyData::PolyDataNormals()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVPolyDataNormals *normal;
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  
+  normal = vtkPVPolyDataNormals::New();
+  normal->Clone(pvApp);
+  
+  normal->SetInput(this);
+  
+  normal->SetName("normal");
+
+  this->GetPVSource()->GetView()->AddComposite(normal);
+
+  window->SetCurrentSource(normal);
+  window->GetSourceList()->Update();
+  
+  normal->Delete();
+}
+
 //----------------------------------------------------------------------------
 void vtkPVPolyData::Glyph()
 {
@@ -100,16 +123,38 @@ void vtkPVPolyData::Glyph()
   
   glyph->SetInput(this);
   glyph->SetScaleModeToDataScalingOff();
-    
+  
   glyph->SetName("glyph");
  
   this->GetPVSource()->GetView()->AddComposite(glyph);
   
   window->SetCurrentSource(glyph);
   window->GetSourceList()->Update();
-  
+
+  glyph->Delete();
 }
 
+//----------------------------------------------------------------------------
+void vtkPVPolyData::GetGhostCells()
+{
+  vtkPVApplication *pvApp = this->GetPVApplication();
+  vtkPVGetRemoteGhostCells *rgc;
+  vtkPVWindow *window = this->GetPVSource()->GetWindow();
+  
+  rgc = vtkPVGetRemoteGhostCells::New();
+  rgc->Clone(pvApp);
+  
+  rgc->SetInput(this);
+  
+  rgc->SetName("get ghost cells");
+  
+  this->GetPVSource()->GetView()->AddComposite(rgc);
+  
+  window->SetCurrentSource(rgc);
+  window->GetSourceList()->Update();
+
+  rgc->Delete();
+}
 
 //----------------------------------------------------------------------------
 int vtkPVPolyData::Create(char *args)
@@ -123,7 +168,11 @@ int vtkPVPolyData::Create(char *args)
 				      "Shrink");
   this->FiltersMenuButton->AddCommand("vtkGlyph3D", this,
 				      "Glyph");
-
+  this->FiltersMenuButton->AddCommand("vtkGetRemoteGhostCells", this,
+				      "GetGhostCells");
+  this->FiltersMenuButton->AddCommand("vtkPolyDataNormals", this,
+				      "PolyDataNormals");
+  
   return 1;
 }
 
