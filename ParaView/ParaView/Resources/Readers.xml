@@ -377,4 +377,9 @@
    <ArraySelection trace_name="cell_array_sel" attribute_name="Cell"/>
   </Module>
  
+  <Module name="Meta Image Reader" class="vtkPVReaderModule"
+         root_name="MIReader" module_type="Reader"
+         extensions=".mhd .mha" file_description="Meta Image Data Files">
+   <Source class="vtkMetaImageReader"/>
+  </Module>
 </ModuleInterfaces>
