@@ -25,7 +25,7 @@ if ![file exists $DataDir/combq.bin] {
     if ![file exists combq.bin] {
 	vtkKWMessageDialog _adialog
 	_adialog Create Application ""
-	_adialog SetText "Could not find the data file combq.bin. This usually means that ParaView was not install properly or that this script was loaded using 'Load Script' from the file menu."
+	_adialog SetText "Could not find the data file combq.bin\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
 	_adialog Invoke
 	_adialog Delete
 	set FoundFiles 0
@@ -38,7 +38,7 @@ if ![file exists $DataDir/blow.vtk] {
     if ![file exists blow.vtk] {
 	vtkKWMessageDialog _adialog
 	_adialog Create Application ""
-	_adialog SetText "Could not find the data file blow.vtk. This usually means that ParaView was not install properly or that this script was loaded using 'Load Script' from the file menu."
+	_adialog SetText "Could not find the data file blow.vtk\n. This usually means that ParaView was not installed properly\n or that this script was loaded using 'Load Script' from the file menu."
 	_adialog Invoke
 	_adialog Delete
 	set FoundFiles 0
@@ -451,6 +451,9 @@ proc BlowMoldingDemoRun { pvWarp pvSub pvNormals } {
 # hack to get the window.
 set pvWindow [lindex [vtkPVWindow ListInstances] 0]
 
+set pvDemoShouldExit 0
+set pvDemoStopNow 0
+
 if $FoundFiles {
 
     $pvWindow DisableMenus
@@ -467,8 +470,6 @@ if $FoundFiles {
     set Demos { SphereDemo CombustorDemo BlowMoldingDemo }
     set length [llength $Demos]
 
-    set pvDemoShouldExit 0
-    set pvDemoStopNow 0
 
     if ![info exists pvDemoShouldStop] {
 	global pvDemoShouldStop
