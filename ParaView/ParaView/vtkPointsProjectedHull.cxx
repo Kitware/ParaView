@@ -12,7 +12,7 @@
 
 #include "vtkPointsProjectedHull.h"
 
-vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.4");
+vtkCxxRevisionMacro(vtkPointsProjectedHull, "1.5");
 vtkStandardNewMacro(vtkPointsProjectedHull);
 
 static const int xdim=0, ydim=1, zdim=2;
@@ -199,6 +199,10 @@ int i,j;
   if ((this->npts == 0) || (this->GetMTime() > this->ptsTime)){
     getPoints();
   }
+  if ( this->npts == 0 )
+    {
+    return 0;
+    }
 
   switch (dir){
     case xdim:
