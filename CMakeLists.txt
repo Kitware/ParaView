@@ -1,12 +1,11 @@
 PROJECT(VIEWS) 
 
-SUBDIRS(Widgets ParaView)
-
 FIND_PATH( VTK_BINARY_DIR vtkConfigure.h )
 # load in the values from VTK if found
 IF ( VTK_BINARY_DIR )
   LOAD_CACHE(${VTK_BINARY_DIR})
   INCLUDE (${VTK_SOURCE_DIR}/vtkCMakeOptions.cmake)
+  SUBDIRS(Widgets ParaView)
 ENDIF (VTK_BINARY_DIR )
 
 INCLUDE (${CMAKE_ROOT}/Modules/FindMPI.cmake)

@@ -45,10 +45,7 @@ vtkPVWorldPointPicker
 vtkSimpleFieldDataToAttributeDataFilter 
 vtkSingleContourFilter 
 vtkStringList 
-${VTK_SOURCE_DIR}/Wrapping/vtktcl
 )
-
-WRAP_EXCLUDE_FILES(vtktcl)
 
 ABSTRACT_FILES(
 vtkInteractorStyleExtent 
@@ -89,6 +86,13 @@ ENDIF (TK_LIBRARY)
 
 ADD_EXECUTABLE(ParaView WIN32 ParaView) 
 LINK_LIBRARIES ( ${OPENGL_LIBRARY} )				    
+
+IF(CMAKE_HAS_X)
+LINK_LIBRARIES(-lXt)
+LINK_LIBRARIES(${CMAKE_X_LIBS})
+ADD_DEFINITIONS(${CMAKE_X_CFLAGS})
+ENDIF(CMAKE_HAS_X)
+
 TARGET_LINK_LIBRARIES (ParaView vtkKWParaViewTCL vtkKWWidgetsTCL vtkCommonTCL 
                        vtkFilteringTCL   
                        vtkGraphicsTCL 
