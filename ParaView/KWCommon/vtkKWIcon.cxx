@@ -52,7 +52,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //------------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWIcon );
-vtkCxxRevisionMacro(vtkKWIcon, "1.9");
+vtkCxxRevisionMacro(vtkKWIcon, "1.10");
 
 //----------------------------------------------------------------------------
 vtkKWIcon::vtkKWIcon()
@@ -61,13 +61,14 @@ vtkKWIcon::vtkKWIcon()
   this->InternalData = 0;
   this->Width        = 0;
   this->Height       = 0;
+  this->PixelSize    = 0;
   this->Internal     = 0;
 }
 
 //----------------------------------------------------------------------------
 vtkKWIcon::~vtkKWIcon()
 {
-  this->SetData(0,0,0);
+  this->SetData(0, 0, 0, 0);
 }
 
 //----------------------------------------------------------------------------
@@ -81,17 +82,19 @@ void vtkKWIcon::SetImageData(vtkImageData* id)
   id->Update();
 
   int *ext = id->GetWholeExtent();
-  if ( (ext[5] - ext[4]) > 0 )
+  if ((ext[5] - ext[4]) > 0)
     {
     vtkErrorMacro("Can only handle 2D image data");
     return;
     }
+
   int width  = ext[1] - ext[0]+1;
   int height = ext[3] - ext[2]+1;
   int components = id->GetNumberOfScalarComponents();
+
   vtkImageData *image = id;
   image->Register(this);
-  if ( components < 4 )
+  if (components < 4)
     {
     image->UnRegister(this);
     vtkImageConstantPad *pad = vtkImageConstantPad::New();
@@ -104,7 +107,7 @@ void vtkKWIcon::SetImageData(vtkImageData* id)
     pad->Delete();
     }
 
-  vtkImageFlip* flip = vtkImageFlip::New();
+  vtkImageFlip *flip = vtkImageFlip::New();
   flip->SetInput(image);
   flip->SetFilteredAxis(1);
   flip->Update();
@@ -112,17 +115,31 @@ void vtkKWIcon::SetImageData(vtkImageData* id)
 
   this->SetData(
     static_cast<unsigned char*>(flip->GetOutput()->GetScalarPointer()),
-    width, height);
-  flip->Delete();
+    width, height, 4);
 
+  flip->Delete();
 }
 
 //----------------------------------------------------------------------------
-void vtkKWIcon::SetImageData(const unsigned char* pixels, int width, int height, 
-                             int pixel_size, unsigned long buffer_length)
+void vtkKWIcon::SetImageData(vtkKWIcon* icon)
+{
+  if (!icon)
+    {
+    vtkErrorMacro("No icon specified");
+    return;
+    }
+
+  this->SetData(icon->GetData(), 
+                icon->GetWidth(), icon->GetHeight(), icon->GetPixelSize());
+}
+
+//----------------------------------------------------------------------------
+void vtkKWIcon::SetImageData(const unsigned char *data, 
+                             int width, int height, int pixel_size, 
+                             unsigned long buffer_length)
 {
   unsigned long nb_of_raw_bytes = width * height * pixel_size;
-  const unsigned char *data_ptr = pixels;
+  const unsigned char *data_ptr = data;
 
   // If the buffer_lenth has been provided, and if it's different than the
   // expected size of the raw image buffer, than it might have been compressed
@@ -177,10 +194,12 @@ void vtkKWIcon::SetImageData(const unsigned char* pixels, int width, int height,
       data_ptr = zlib_buffer;
       }
     }
-  if ( data_ptr )
+
+  if (data_ptr)
     {
-    this->SetData(data_ptr, width, height);
+    this->SetData(data_ptr, width, height, pixel_size);
     }
+
   if (base64)
     {
     delete [] base64_buffer;
@@ -194,11 +213,12 @@ void vtkKWIcon::SetImageData(const unsigned char* pixels, int width, int height,
 
 
 //----------------------------------------------------------------------------
-void vtkKWIcon::SetData(const unsigned char* data, int width, int height)
+void vtkKWIcon::SetData(const unsigned char *data, 
+                        int width, int height, int pixel_size)
 {
-  if ( this->Data || this->InternalData )
+  if (this->Data || this->InternalData)
     {
-    if ( this->Data )
+    if (this->Data)
       {
       delete [] this->Data;
       }
@@ -206,24 +226,27 @@ void vtkKWIcon::SetData(const unsigned char* data, int width, int height)
     this->InternalData = 0;
     this->Width        = 0;
     this->Height       = 0;
+    this->PixelSize    = 0;
     }
-  int len = width * height * 4;
-  if ( data && len > 0 )
+
+  int len = width * height * pixel_size;
+  if (data && len > 0)
     {
     this->Width  = width;
     this->Height = height;
-    this->Data = new unsigned char [ len ];
+    this->PixelSize = pixel_size;
+    this->Data = new unsigned char [len];
     memcpy(this->Data, data, len);
     }
 }
 
 //----------------------------------------------------------------------------
-void vtkKWIcon::SetInternalData(const unsigned char* data, 
-                                int width, int height)
+void vtkKWIcon::SetInternalData(const unsigned char *data, 
+                                int width, int height, int pixel_size)
 {
-  if ( this->Data || this->InternalData )
+  if (this->Data || this->InternalData)
     {
-    if ( this->Data )
+    if (this->Data)
       {
       delete [] this->Data;
       }
@@ -231,12 +254,15 @@ void vtkKWIcon::SetInternalData(const unsigned char* data,
     this->InternalData = 0;
     this->Width        = 0;
     this->Height       = 0;
+    this->PixelSize    = 0;
     }
-  int len = width * height * 4;
-  if ( data && len > 0 )
+
+  int len = width * height * pixel_size;
+  if (data && len > 0)
     {
     this->Width  = width;
     this->Height = height;
+    this->PixelSize = pixel_size;
     this->InternalData = data;
     }
 }
@@ -244,17 +270,19 @@ void vtkKWIcon::SetInternalData(const unsigned char* data,
 //----------------------------------------------------------------------------
 void vtkKWIcon::SetImageData(int image)
 {
-  if ( this->Internal == image )
+  if (this->Internal == image)
     {
     return;
     }
-  this->SetData(0,0,0);
-  if ( image == vtkKWIcon::ICON_NOICON )
+
+  this->SetData(0, 0, 0, 0);
+
+  if (image == vtkKWIcon::ICON_NOICON)
     {
     return;
     }
   
-  switch( image )
+  switch (image)
     {
     case vtkKWIcon::ICON_ANNOTATE:
       this->SetImageData(
@@ -406,10 +434,11 @@ void vtkKWIcon::SetImageData(int image)
 //----------------------------------------------------------------------------
 const unsigned char* vtkKWIcon::GetData()
 {
-  if ( this->InternalData )
+  if (this->InternalData)
     {
     return this->InternalData;
     }
+
   return this->Data;
 }
 
@@ -418,5 +447,6 @@ void vtkKWIcon::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os,indent);
   os << indent << "Width:  " << this->GetWidth() << endl
-     << indent << "Height: " << this->GetHeight() << endl;
+     << indent << "Height: " << this->GetHeight() << endl
+     << indent << "PixelSize: " << this->GetPixelSize() << endl;
 }

@@ -43,8 +43,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 // .SECTION Description
 // A simple icon wrapper. It can either be used with file icons.h to 
 // provide a unified interface for internal icons or a wrapper for 
-// custom icons. The icons are defined with width, height, and array
-// of unsigned char values; four values per pixel (RGBA).
+// custom icons. The icons are defined with width, height, pixel_size, and array
+// of unsigned char values.
 
 #ifndef __vtkKWIcon_h
 #define __vtkKWIcon_h
@@ -63,19 +63,10 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
-  // Set image data.
-  void SetImageData(vtkImageData*);
-
-  // Description:
   // Select an icon based on the icon name.
   void SetImageData(int image);
 
-  // Description:
-  // Set an icon based on pixel data.
-  void SetImageData(const unsigned char* pixels, int width, int height, 
-                    int pixel_size, unsigned long buffer_length);
-
-//BTX
+  //BTX
   // Description:
   // There are several predefined icons in the icons.h. Since we
   // want to save space, we only incldue that file to vtkKWIcons.cxx.
@@ -102,14 +93,29 @@ public:
     ICON_WARNING,
     LAST_ICON
   };
-//ETX
+  //ETX
+
+  // Description:
+  // Set image data from vtkImageData. 
+  // Pixel data is converted/padded to RGBA for backward compatibility.
+  void SetImageData(vtkImageData*);
+
+  // Description:
+  // Set image data from another vtkKWIcon.
+  void SetImageData(vtkKWIcon*);
+
+  // Description:
+  // Set image data from pixel data, eventually zlib and base64.
+  void SetImageData(const unsigned char* data, 
+                    int width, int height, int pixel_size, 
+                    unsigned long buffer_length);
 
   // Description:
   // Set icon to the custom data.
-  void SetData(const unsigned char* data, int width, int height);
+  void SetData(const unsigned char* data, int width, int height, int pixel_size);
 
   // Description:
-  // Get the raw image data (RGBA).
+  // Get the raw image data.
   const unsigned char* GetData();
 
   // Description:
@@ -120,6 +126,10 @@ public:
   // Get the height of the image.
   vtkGetMacro(Height, int);
   
+  // Description:
+  // Get the pixel size of the image.
+  vtkGetMacro(PixelSize, int);
+  
 protected:
   vtkKWIcon();
   ~vtkKWIcon();
@@ -127,13 +137,16 @@ protected:
   unsigned char* Data;
   int Width;
   int Height;
+  int PixelSize;
 
   // Description:
   // Set data to the internal image.
-  void SetInternalData(const unsigned char* data, int width, int height);
+  void SetInternalData(const unsigned char* data, 
+                       int width, int height, int pixel_size);
   
   const unsigned char* InternalData;
   int Internal;
+
 private:
   vtkKWIcon(const vtkKWIcon&); // Not implemented
   void operator=(const vtkKWIcon&); // Not implemented
