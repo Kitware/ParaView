@@ -42,7 +42,7 @@
 
 
 
-vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.4");
+vtkCxxRevisionMacro(vtkCTHExtractAMRPart, "1.5");
 vtkStandardNewMacro(vtkCTHExtractAMRPart);
 vtkCxxSetObjectMacro(vtkCTHExtractAMRPart,ClipPlane,vtkPlane);
 
@@ -681,9 +681,9 @@ float vtkCTHExtractAMRPart::ComputeSharedPoint(int blockId, vtkIdList* blockList
   int pMaxX = dims[0]-1;
   int pMaxY = dims[1]-1;
   int pMaxZ = dims[2]-1;
-  int cMaxX = pMaxX-1;
-  int cMaxY = pMaxY-1;
-  int cMaxZ = pMaxZ-1;
+  //int cMaxX = pMaxX-1;
+  //int cMaxY = pMaxY-1;
+  //int cMaxZ = pMaxZ-1;
   int cIncY = dims[0]-1;
   int cIncZ = (dims[1]-1)*cIncY;
 

@@ -41,7 +41,7 @@
 #include "vtkVoxel.h"
 #include "vtkImageData.h"
 
-vtkCxxRevisionMacro(vtkCTHData, "1.4");
+vtkCxxRevisionMacro(vtkCTHData, "1.5");
 vtkStandardNewMacro(vtkCTHData);
 
 //----------------------------------------------------------------------------
@@ -386,7 +386,7 @@ int vtkCTHData::GetBlockLevel(int blockId)
   if (blockId < 0 || blockId >= this->GetNumberOfBlocks())
     {
     vtkErrorMacro("Block out of range.");
-    return NULL;
+    return 0;
     }
   return this->BlockLevels->GetValue(blockId);
 }
@@ -1277,7 +1277,7 @@ void vtkCTHData::PrintSelf(ostream& os, vtkIndent indent)
   vtkIndent i2 = indent.GetNextIndent();
   int idx;
   // hack
-  int *dims = this->GetBlockPointDimensions(0);
+  //int *dims = this->GetBlockPointDimensions(0);
   int numBlocks = this->GetNumberOfBlocks();
   float* origin;
   float* spacing;
