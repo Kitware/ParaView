@@ -73,7 +73,6 @@ void vtkGetRemoteGhostCells::Execute()
   int validFlag, myId, numProcs, numPoints, pointId, *pointIds;
   float point[3];
   int numCells, numCellPoints;
-//  int morePoints = 1;
   vtkPolyData *input = this->GetInput();
   vtkPolyData *output = this->GetOutput();
   int i = 0, j, k, l, id;
@@ -129,31 +128,6 @@ void vtkGetRemoteGhostCells::Execute()
   output->SetPoints(points);
   output->SetPolys(polys);
   
-//  while (morePoints)
-//    {
-//    morePoints = 0;
-//    for (id = 0; id < numProcs; id++)
-//      {
-//      if (id != myId)
-//	{
-//	if (i < numPoints)
-//	  {
-//	  morePoints = 1;
-//	  validFlag = 1;
-//	  input->GetPoint(i, point);
-//	  this->Controller->Send((int*)(&validFlag), 1, id,
-//				 VTK_VALID_POINT_TAG);
-//	  this->Controller->Send(point, 3, id, VTK_POINT_COORDS_TAG);
-//	  }
-//	else
-//	  {
-//	  validFlag = 0;
-//	  this->Controller->Send((int*)(&validFlag), 1, id,
-//				 VTK_VALID_POINT_TAG);
-//	  }
-//	} // if not my process
-//    } // for all processes (send next point)
-
   for (id = 0; id < numProcs; id++)
     {
     if (id != myId)
@@ -167,12 +141,6 @@ void vtkGetRemoteGhostCells::Execute()
     {
     if (id != myId)
       {
-//      this->Controller->Receive((int*)(&validFlag), 1, id,
-//				VTK_VALID_POINT_TAG);
-//      if (validFlag)
-//	{
-//	morePoints = 1;
-//	this->Controller->Receive(point, 3, id, VTK_POINT_COORDS_TAG);
       this->Controller->Receive((int*)(&numRemotePoints[id]), 1, id,
 				VTK_NUM_POINTS_TAG);
       remotePoints = new float[numRemotePoints[id]*3];
@@ -213,13 +181,6 @@ void vtkGetRemoteGhostCells::Execute()
 				 VTK_NUM_CELLS_TAG);
 	  } // point not in my data (no cells to send)
 	} // for all points received from this process
-//	} // if valid point
-//      else
-//	{
-//	numCells = 0;
-//	this->Controller->Send((int*)(&numCells), 1, id,
-//			       VTK_NUM_CELLS_TAG);
-//	} // not valid point (need to send numCells = 0 anyway)
       delete [] remotePoints;
       } // if not my process
     } // for all processes (find point cells)
@@ -264,8 +225,6 @@ void vtkGetRemoteGhostCells::Execute()
 	} // for all points in this process
       } // if not my process
     } // for all processes
-//    i++;
-//    } // while more points
   
   output->GetCellData()->SetGhostLevels(ghostLevels);
   
