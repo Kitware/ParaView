@@ -60,18 +60,6 @@ public:
   virtual void Create(vtkKWApplication *app, const char *args);
 
   // Description:
-  // Method to set/get the resolution of the slider.  Be sure to set the
-  // resolution of the scale prior to setting the scale value.
-  virtual void SetResolution(double r);
-  vtkGetMacro(Resolution, double);
-  
-  // Description:
-  // Set/Get the value of the scale. If you are changing the default
-  // resolution of the scale, set it before setting the value.
-  virtual void SetValue(double v);
-  vtkGetMacro(Value, double);
-
-  // Description:
   // Set the range for this scale.
   virtual void SetRange(double min, double max);
   virtual void SetRange(float *range) { this->SetRange(range[0], range[1]); };
@@ -87,6 +75,24 @@ public:
   virtual double GetRangeMin() { return this->GetRange()[0]; };
   virtual double GetRangeMax() { return this->GetRange()[1]; };
 
+  // Description:
+  // Set/Get the value of the scale.
+  virtual void SetValue(double v);
+  vtkGetMacro(Value, double);
+
+  // Description:
+  // Method to set/get the resolution of the slider.
+  // Note that it does not snap either the range or the value of the scale.
+  // The range and the value can be any floating point number, and the entry
+  // associated to the scale can be used to set the value to anything within
+  // the range, despite the resolution. Think of the range as a way to set
+  // a value interactively, while still allowing the user to enter a precise
+  // value that could not be reached given the resolution. The resolution
+  // only controls the scale slider behaviour, i.e. specifies a nice step
+  // to which values can be snapped.
+  virtual void SetResolution(double r);
+  vtkGetMacro(Resolution, double);
+  
   // Description:
   // Set/get whether to display the range of the scale
   void SetDisplayRange(int flag);
