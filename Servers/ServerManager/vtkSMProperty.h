@@ -12,12 +12,17 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMProperty - abstract superclass for all SM properties
+// .NAME vtkSMProperty - superclass for all SM properties
 // .SECTION Description
-// vtkSMProperty is an abstract class that represents a parameter of
-// a vtk object stored on one or more client manager or server nodes.
-// It has a state and can push this state to the vtk object it
-// refers to.
+// Each isntance of vtkSMProperty or a sub-class represents a method 
+// and associated arguments (if any) of a  a vtk object stored on one 
+// or more client manager or server nodes. It may have a state and can push 
+// this state to the vtk object it refers to. vtkSMPropery only supports
+// methods with no arguments. Sub-classes support methods with different
+// arguments types and numbers.
+// .SECTION See Also
+// vtkSMProxyProperty vtkSMInputProperty vtkSMVectorProperty
+// vtkSMDoubleVectorPropery vtkSMIntVectorPropery vtkSMStringVectorProperty
 
 #ifndef __vtkSMProperty_h
 #define __vtkSMProperty_h
