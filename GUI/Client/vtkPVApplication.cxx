@@ -23,6 +23,7 @@
 #include "vtkMPIGroup.h"
 #endif
 
+#include "vtkPVServerInformation.h"
 #include "vtkCallbackCommand.h"
 #include "vtkCellData.h"
 #include "vtkCharArray.h"
@@ -111,7 +112,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.302");
+vtkCxxRevisionMacro(vtkPVApplication, "1.303");
 vtkCxxSetObjectMacro(vtkPVApplication, RenderModule, vtkPVRenderModule);
 
 
@@ -538,6 +539,13 @@ void vtkPVApplication::SetProcessModule(vtkPVProcessModule *pm)
     pm->SetReverseConnection(this->GetReverseConnection());
     pm->SetDemoPath(this->GetDemoPath());
     pm->SetServerMode(this->GetServerMode());
+    // Juggle the compositing flag to let server in on the decision
+    // whether to allow compositing / rendering on the server.
+    // Put the flag on the process module.
+    if (this->GetDisableComposite())
+      {
+      pm->GetServerInformation()->SetRemoteRendering(0);
+      }
     vtkPVProcessModuleGUIHelper* helper = vtkPVProcessModuleGUIHelper::New();
     helper->SetPVApplication(this);
     helper->SetPVProcessModule(pm);

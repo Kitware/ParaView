@@ -32,6 +32,12 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
 
   // Description:
+  // This method is called right before the application starts its
+  // main loop.  It was created to disable compositing after the 
+  // server information in the process module is valid.
+  virtual void Initialize();
+  
+  // Description:
   // Create the TK widgets associated with the view.
   virtual void Create(vtkKWApplication *app, const char *);
       

@@ -135,7 +135,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.333");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.334");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -998,6 +998,8 @@ void vtkPVRenderView::CreateViewProperties()
     this->RenderModuleUI->SetTraceReferenceCommand("GetRenderModuleUI");
     this->Script("pack %s -padx 2 -pady 2 -fill x -expand yes -anchor w",
       this->RenderModuleUI->GetWidgetName());
+    // Disable compositing if the server does not support remote rendering.
+    rmuio->Initialize();
     }
   else
     {

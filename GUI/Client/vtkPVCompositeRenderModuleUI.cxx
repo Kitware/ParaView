@@ -24,10 +24,11 @@
 #include "vtkKWFrame.h"
 #include "vtkTimerLog.h"
 #include "vtkPVRenderView.h"
+#include "vtkPVServerInformation.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVCompositeRenderModuleUI);
-vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.14");
+vtkCxxRevisionMacro(vtkPVCompositeRenderModuleUI, "1.15");
 
 int vtkPVCompositeRenderModuleUICommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -235,7 +236,7 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
 
     pvapp->Script("grid columnconfigure %s 2 -weight 1",
                   this->CompositeThresholdScale->GetParent()->GetWidgetName());
-
+    
 
     // Determines which reduction/subsampling factor to use.
     this->ReductionLabel->SetParent(this->LODScalesFrame);
@@ -414,19 +415,31 @@ void vtkPVCompositeRenderModuleUI::Create(vtkKWApplication *app, const char *)
                  this->CompositeWithRGBACheck->GetWidgetName(),
                  this->CompositeCompressionCheck->GetWidgetName());
 
-    // Consider the command line option that turns compositing off.
-    // This is to avoid compositing when it is not available
-    // on the server.
-    if (pvapp->GetDisableComposite())
-      {
-      this->CompositeOptionEnabled = 0;
-      }
-    if ( ! this->CompositeOptionEnabled)
-      {
-      this->CompositeCheck->SetState(0);
-      this->SetCompositeThreshold(VTK_LARGE_FLOAT);
-      this->CompositeCheck->EnabledOff();
-      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkPVCompositeRenderModuleUI::Initialize()
+{
+  vtkPVApplication* pvApp = this->GetPVApplication();
+  
+  if (pvApp == 0)
+    {
+    vtkErrorMacro("No application.");
+    return;
+    }
+  // Consider the command line option that turns compositing off.
+  // This is to avoid compositing when it is not available
+  // on the server.
+  if (!pvApp->GetProcessModule()->GetServerInformation()->GetRemoteRendering())
+    {
+    this->CompositeOptionEnabled = 0;
+    }
+  if ( ! this->CompositeOptionEnabled)
+    {
+    this->CompositeCheck->SetState(0);
+    this->SetCompositeThreshold(VTK_LARGE_FLOAT);
+    this->CompositeCheck->EnabledOff();
     }
 }
 
