@@ -1,0 +1,243 @@
+<html>
+<header>
+<title>ParaView Complete README</title>
+<!-- Created by: berk geveci,  12-Dec-2001 -->
+</header>
+
+<body>
+
+<h1>
+Welcome To ParaView
+</h1>
+    <UL>
+    <LI> <A HREF="#Copyright">Copyright Notice</A>
+    <LI> <A HREF="#Introduction">Introduction</A>
+        <UL>
+        <LI> <A HREF="#Origins">The Origins of ParaView</A>
+        <LI> <A HREF="#Features">Features</A>
+        </UL>
+    <LI> <A HREF="#Compiling">Compiling ParaView</A>
+    <LI> <A HREF="#Execution">Execution</A>
+    </UL>
+<HR>
+<A NAME="Copyright"><b><font size=3>Copyright Notice</font></b><br>
+<pre>
+Copyright (c) 2000-2001 Kitware Inc. 469 Clifton Corporate Parkway,
+Clifton Park, NY, 12065, USA.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+ * Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+ * Neither the name of Kitware nor the names of any contributors may be used
+   to endorse or promote products derived from this software without specific 
+   prior written permission.
+
+ * Modified source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE AUTHORS OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</pre>
+
+<h1><A NAME="Introduction">Introduction</a></h1>
+<font size=5>Welcome</font> to ParaView, an open-source, multi-platform, 
+parallel scientific  visualization application. Although it can be run on 
+a single processor,  ParaView is specifically designed to run on distributed 
+parallel computers. ParaView has been succesfully tested on Windows and Linux 
+workstations, clusters and SGI Origin 2000 systems. ParaView is a turnkey 
+application  written using the  <a href="http://www.visualizationtoolkit.org">
+Visualization Toolkit</a> and it has a framework based on a unique blend of 
+Tcl/Tk and C++. 
+<p>
+<font size=5>ParaView </font> is an extensible, open-source visualization system
+designed for parallel computing environments. It is built on the open-source
+<a href="http://www.visualizationtoolkit.org">VTK</a> software. It uses data
+streaming to process large datasets, supports parallel implementations of common
+algorithms, and uses parallel tree-composite rendering for a completely parallel
+solution.
+<p>
+
+<u><b><a name="Origins">The Origins of ParaView</a></b></u><br> 
+ParaView is being developed as part of a three-year contract awarded to
+Kitware, Inc. by a consortium of three National Labs:  Los Alamos,
+Sandia, and Livermore. The goal of the project is to develop scalable
+parallel processing tools with an emphasis on distributed memory
+implementations. The project includes parallel algorithms,
+infrastructure, I/O, support, and display devices. In addition, the
+turn-key application, ParaView, is being developed as part of this
+contract. One significant feature of the contract is that all software
+developed is to be delivered open source. Hence ParaView is available
+as an open-source system.
+<p>
+<u><b><a name="Features">Features</a></b></u><br> 
+The following summarizes the important features
+of ParaView:
+  <p>
+  <u><b>Software Architecture</b></u>
+      <ul>
+      <li>Open-source</li>
+      <li>Uses C++ to drive the Tk widget set.</li>
+      <li>Portable across Windows and Unix systems</li>
+      <li>Built on the standard open-source VTK visualization system</li>
+      <li>Modular GUI may be extended to support your own tools</li>
+      <li>The application may be extended at run-time via Tcl scripting</li>
+      <li>Transparent multi-processor support</li>
+      <li>Supports data-streaming. (Has been used to process 1-pedabyte data in a
+          single run on a 2048 processor machine.)</li>
+      <li>VTK or user-defined filters can be easily added.</li>
+      </ul>
+      <p>
+  <u><b>Visualization Capabilities</u></b>
+      <ul>
+      <li>Reads and writes a variety of data formats including EnSight, VTK, Plot3D, 
+          Wavefront, STL, etc.</li>
+      <li>Supports several source objects (e.g., lines, planes, spheres, implicit functions,
+          point clouds, etc.) used for probing, generating streamlines,
+          cutting, and representing geometry.</li>
+      <li>A large library of visualization filters are available. These include isocontouring,
+          cutting, clipping, color mapping, decimation, outlines, geometry extraction and glyphing.</li>
+      <li>Supports different interaction styles, switchable at run-time. Users can add their
+          own interaction styles.</li> 
+      <li>Annotation features such as scalar bars; 2D (fixed) and 3D (moves with object) 
+          text are available.</li>
+      <li>Picking</li>
+      <li>LOD displays allows for user trade-off between rendering fidelity and frame rate.</li>
+      </ul>
+      <p>
+  <u><b>Parallel Processing</u></b>
+      <ul>
+      <li>Supports parallel software rendering (tree composite with LOD)</li>
+      <li>Algorithms implemented in parallel</li>
+      <li>Data parallelism is supported</li>
+      <li>Supports MPI and shared memory architectures</li>
+      </ul>
+      <p>
+
+<h1><A NAME="Compiling">Compiling ParaView Complete</a></h1>
+This distribution of ParaView contains ParaView, VTK and Tcl/Tk 8.2.3. You
+do not have to download VTK or Tcl/Tk separately to compile. However, if you
+want to use your own VTK, you should not use this distribution. Instead, use
+the ParaView distribution which does not contain VTK.
+<p>
+<b><font size=3>Install CMake</font></b><br>
+To use ParaView, you will have to download and install CMake which is a
+build configuration utility.
+<p>
+<u><b>CMake</b></u> can be obtained from <a href="http://public.kitware.com/CMake">http://public.kitware.com/CMake</a>. See CMake documentation for installation
+instructions.
+<p>
+
+Next, <b><font size=3>build </font></b> ParaView differently depending on the
+operating system:
+<p>
+<b><font size=3>Run CMake and Compile</font></b><br>
+Once CMake is installed, you are ready to build VTK and ParaView. We highly
+recommend reading the CMake documentation if you are not familiar with CMake:
+<a href = "http://public.kitware.com/CMake/HTML/Documentation.html">http://public.kitware.com/CMake/HTML/Documentation.html</a>.
+(You can skip the Developer's Guide if you are not going to work with
+CMakeLists files.)
+In summary, ParaView Complete build consists of:<ol>
+<li> Running one of the CMake user interfaces </li>
+<li> Changing configuration options  </li>
+<li> Compiling (make on Unix, Visual Studio on Windows)</li>
+</ol>
+
+On Windows, you should use the CMakeSetup.exe application to setup
+the VTK and ParaView build. On Unix/Linux, you should use the CMake wizard
+(cmake -i) or the terminal interface (ccmake). See the CMake documentation
+for details.
+<p>
+ParaView Complete is designed such that all the default build options
+selected by CMake for VTK and ParaView are appropriate for building ParaView.
+However you might have to tell CMake the location of some include files and
+libraries (for example MPI libraries if you enabled MPI support).
+
+<h3>Unix Installation</h3><p>
+The following instructions only apply to UNIX systems.  
+
+First we will give you the quick and dirty way to build ParaView Complete:
+<p>
+<pre>
+  1) untar the ParaView Complete distribution
+  2) cd ParaViewComplete
+  4) cmake -i (run cmake in wizard mode, where you have to answer questions about the build)
+or
+  4) ccmake (run the terminal based interface to cmake where you interactively change build options)
+  5) if necessary change build options
+  6) make
+</pre>
+
+It is a very good idea to tell cmake what C and C++ compilers
+you will be using. This can avoid many build problems.
+On most systems you can pass this information to configure in the 
+following way:
+<pre>
+env CXX=/your/C++/compiler CC=/your/c/compiler cmake
+</pre>
+otherwise you must set CXX and CC in your environment and then
+run ccmake (or cmake -i).<p>
+
+If you are planning to build ParaView for multiple architectures then you can
+either make a copy of the entire ParaView tree for each architecture and then
+follow the instructions above. Or you can have one copy of
+the ParaView tree and compile it in a different manner (out-of-source). Instead of
+running cmake from the ParaViewComplete directory, create a new directory where
+you have some free disk space (not in the ParaViewComplete tree), a possible name
+would be paraview-solaris. cd into this directory and then run cmake similar to the
+following example:
+<pre>
+  ls /home/joe_user
+      ParaViewComplete paraview-solaris paraview-sgi
+
+  cd paraview-solaris
+  ccmake /home/joe_user/ParaViewComplete
+  or
+  cmake -i /home/joe_user/ParaViewComplete
+</pre>
+This will create makefiles in the paraview-solaris directory.  Then you can run
+make in paraview-solaris to compile ParaView Complete.  Repeat this process for
+each architecture you wish to build.<p>
+
+<h3>Windows Installation</h3><p>
+    The Windows build process uses the CMake GUI CMakeSetup. Then you use the 
+    compiler make utility to compile as follows.
+  <pre>
+  1) Install ParaView Complete distribution by unzipping into the appropriate
+     directory.
+
+  2) Execute CMakeSetup. This will pop-up a little
+     GUI that allows you to tailor the build. It then starts
+     building .dsw and .dsp files for Microsoft, or makefiles for Borland.
+     You'll have to tell CMakeSetup where you've placed your ParaViewComplete
+     source code, and where to build the object code and dll's (we'll call it
+     "paraviewbin").
+
+  3) When CMakeSetup completes, start up msdev and load ParaViewComplete.dsw.
+     Select ALL_BUILD project, and build it.
+
+</pre>
+We recommend a 300MByte minimum swap size or you might have trouble
+during the link phase.<p>
+
+<h1><A NAME="Execution">Execution</a></h1>
+For information about how to start and use ParaView, see the online
+documentation.
+
+</body>
+</html>
