@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkPVServerXDMFParameters - Server-side helper for vtkPVArraySelection.
+// .NAME vtkPVServerXDMFParameters - Server-side helper for vtkPVXDMFParameters.
 // .SECTION Description
 
 #ifndef __vtkPVServerXDMFParameters_h
