@@ -46,6 +46,11 @@ public:
   // controller.  In either case, the superclass's implementation of
   // this method is called.
   virtual int ReadFileInformation(const char* fname);
+
+  // Description:
+  // Save the pipeline to a batch file which can be run without
+  // a user interface.
+  virtual void SaveInBatchScript(ofstream *file);
   
 protected:
   vtkPVEnSightReaderModule();

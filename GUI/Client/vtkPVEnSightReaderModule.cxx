@@ -16,13 +16,13 @@
 
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
-#include "vtkPVApplication.h"
+#include "vtkPVData.h"
 #include "vtkPVFileEntry.h"
 #include "vtkPVProcessModule.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVEnSightReaderModule);
-vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.48");
+vtkCxxRevisionMacro(vtkPVEnSightReaderModule, "1.49");
 
 //----------------------------------------------------------------------------
 vtkPVEnSightReaderModule::vtkPVEnSightReaderModule()
@@ -64,6 +64,17 @@ int vtkPVEnSightReaderModule::InitializeData()
     }
   pm->SendStreamToServer();
   return this->Superclass::InitializeData();
+}
+
+//----------------------------------------------------------------------------
+void vtkPVEnSightReaderModule::SaveInBatchScript(ofstream *file)
+{
+  this->SaveFilterInBatchScript(file);
+  *file << "  $pvTemp" <<  this->GetVTKSourceID(0)
+        << " Update" 
+        << endl;
+  // Add the mapper, actor, scalar bar actor ...
+  this->GetPVOutput()->SaveInBatchScript(file);
 }
 
 //----------------------------------------------------------------------------
