@@ -51,7 +51,7 @@ public:
 
   // Description:
   // Turns visibility on or off.
-  virtual void SetVisibility(int v);
+  vtkSetMacro(Visibility,int);
   vtkGetMacro(Visibility,int);
 
   // Description:
@@ -108,8 +108,7 @@ protected:
   // This method gets called by SetProcessModule.
   virtual void CreateParallelTclObjects(vtkPVProcessModule *pm);
 
-  void HSVtoRGB(float h, float s, float v, float *r, float *g, float *b);
-
+private:
   vtkPVPlotDisplay(const vtkPVPlotDisplay&); // Not implemented
   void operator=(const vtkPVPlotDisplay&); // Not implemented
 };
