@@ -113,14 +113,6 @@ SOURCE=.\vtkDummyRenderWindowInteractorTcl.cxx
 # End Source File
 # Begin Source File
 
-SOURCE=.\vtkGetRemoteGhostCells.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkGetRemoteGhostCellsTcl.cxx
-# End Source File
-# Begin Source File
-
 SOURCE=.\vtkImageOutlineFilter.cxx
 # End Source File
 # Begin Source File
@@ -270,14 +262,6 @@ SOURCE=.\vtkPVDataSetToPolyDataFilterTcl.cxx
 # Begin Source File
 
 SOURCE=.\vtkPVDataTcl.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVExtentTranslator.cxx
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVExtentTranslatorTcl.cxx
 # End Source File
 # Begin Source File
 
@@ -943,46 +927,6 @@ SOURCE=.\vtkPVDataSetToPolyDataFilter.h
 # Begin Custom Build
 InputPath=.\vtkPVDataSetToPolyDataFilter.h
 InputName=vtkPVDataSetToPolyDataFilter
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVExtentTranslator.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVExtentTranslator.h
-InputName=vtkPVExtentTranslator
-
-"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
-
-# End Custom Build
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
-SOURCE=.\vtkPVGetRemoteGhostCells.h
-
-!IF  "$(CFG)" == "ParaView - Win32 Release"
-
-!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
-
-# Begin Custom Build
-InputPath=.\vtkPVGetRemoteGhostCells.h
-InputName=vtkPVGetRemoteGhostCells
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
