@@ -48,7 +48,7 @@ The All to N filter is available when ParaView is run in parallel. It redistribu
       </Input>
     </Filter>
     <Documentation>
-The Append Attributes filter takes multiple input datasets with the same geometry and merges their point and cell attributes to produce a single output containing all the point and cell attributes of the inputs. Any inputs without the same number of points and cells as the first input are ignored. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
+The Append Attributes filter takes multiple input data sets with the same geometry and merges their point and cell attributes to produce a single output containing all the point and cell attributes of the inputs. Any inputs without the same number of points and cells as the first input are ignored. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
   </Module>
   <Module name="AppendPolyData"
@@ -80,7 +80,7 @@ The Append Geometry filter operates on multiple polygonal data sets. The data se
       </Input>
     </Filter>
     <Documentation>
-The Append Datasets filter operates on multiple datasets of any type (polygonal, structured, etc.). It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
+The Append Datasets filter operates on multiple data sets of any type (polygonal, structured, etc.). It merges their geometry into a single data set. Only the point and cell attributes that all of the input data sets have in common will appear in the output. The input data sets must already be collected together, either as a result of a reader that loads multiple parts (e.g., EnSight reader) or because the Group Parts filter has been run to form a collection of data sets.
     </Documentation>
   </Module>
   <Module name="CellCenters"
@@ -102,7 +102,7 @@ The Append Datasets filter operates on multiple datasets of any type (polygonal,
                    help="Generate vertex as geometry of just points."
                    default_value="0"/>
     <Documentation>
-The Cell Centers filter places a point at the center of each cell in the input dataset. The center computed is the parametric center of the cell, not necessarily the geometric or bounding box center. The cell attributes of the input will be associated with these newly created points of the output. The Input menu allows the user to select the data set to which this filter will be applied. If the Generate vertices option is checked, then vertex cells will also be created for each point in the output. This is useful because vertex cells are rendered, but points are not. The points themselves could be used for placing glyphs (using the Glyph filter). The Cell Centers filter takes any type of data set as input and produces a polygonal data set as output.
+The Cell Centers filter places a point at the center of each cell in the input data set. The center computed is the parametric center of the cell, not necessarily the geometric or bounding box center. The cell attributes of the input will be associated with these newly created points of the output. The Input menu allows the user to select the data set to which this filter will be applied. If the Generate vertices option is checked, then vertex cells will also be created for each point in the output. This is useful because vertex cells are rendered, but points are not. The points themselves could be used for placing glyphs (using the Glyph filter). The Cell Centers filter takes any type of data set as input and produces a polygonal data set as output.
     </Documentation>
   </Module>
   <Module name="CellDataToPointData"
@@ -187,7 +187,7 @@ The Cell Data to Point Data filter averages the values of the cell attributes of
                    help="Turn this On to control wheter points merging is performed."
                    default_value="1"/>
     <Documentation>
-The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged). The Input menu allows the user to select the data set to which this filter will be applied. If the Point merging option is on, then points will be merged if they are within the specified Tolerance or Absolute tolerance, depending on whether the Tolerance is absolute box is checked. (Tolerance is specified as a fraction of the length of the diagonal of the bounding box of the data set; Absolute tolerance is specified in the distance units of the input data set.)
+The Clean filter takes polygonal data as input and generates polygonal data as output. This filter can merge duplicate points, remove unused points, and transform degenerate cells into their appropriate forms (e.g., a triangle is converted into a line if two of its points are merged). The Input menu allows the user to select the data set to which this filter will be applied. If the Point merging option is on, then points will be merged if they are within the specified Tolerance or Absolute tolerance, depending on whether the Tolerance is absolute box is checked. (Tolerance is specified as a fraction of the length of the diagonal of the bounding box of the data set; Absolute tolerance is specified in the spatial units of the input data set.)
 The transforming of degenerate cells into their appropriate forms is controlled by three check boxes on the user interface: Convert lines to points, Convert polys to lines, and Convert strips to polys. If any of these is unchecked, then degenerate cells of that type will not be converted to another type of cell.
 If the Piece invariant option is checked, the whole data set will be processed at once so that cleaning this data set always produces the same results. If the box is unchecked, the data set can be processed one piece at a time, so it is not necessary for the entire data set to fit into memory, but the results are not guaranteed to be the same as they would be if the Piece invariant option was on.
     </Documentation>
@@ -223,7 +223,7 @@ The Clean to Grid filter merges points that are within a tolerance of 1/100,000 
                help="Set the input to this filter."
                input_name="Input"/>
     <Documentation>
-The Connectivity filter assigns a region id to connected components of the input data set. (Region id is assigned as a point scalar value.) The Input menu allows the user to select the data set to which this filter will be applied. This filter takes any data set type as input and produces unstructured grid output.
+The Connectivity filter assigns a region id to connected components of the input data set. (The region id is assigned as a point scalar value.) The Input menu allows the user to select the data set to which this filter will be applied. This filter takes any data set type as input and produces unstructured grid output.
     </Documentation>
   </Module>
   <Module name="ImageClip"
@@ -246,7 +246,7 @@ The Connectivity filter assigns a region id to connected components of the input
                  input_menu="im"
                  help="Set the min/max extents in each dimension of the output"/>
     <Documentation>
-The Crop filter extracts an area/volume of interest from a 2D image or a 3D volume by allowing the user to specify the minimum and maximum extents of each dimension of the data. The Input menu allows the user to select the data set to which this filter will be applied. Both the input and output of this filter are of type uniform rectilinear (image) data.
+The Crop filter extracts an area/volume of interest from a 2D image or a 3D volume by allowing the user to specify the minimum and maximum extents of each dimension of the data. The Input menu allows the user to select the data set to which this filter will be applied. Both the input and output of this filter are uniform rectilinear data.
     </Documentation>
   </Module>
   <Module name="Curvatures"
@@ -320,7 +320,7 @@ The Curvature filter computes the curvature at each point in a polygonal data se
                    help="If off, decimate will not remove points on the boundary."
                    default_value="1"/>
     <Documentation>
-The Decimate filter reduces the number of triangles in a polygonal data set. Because this filter only operates on triangles, first run the Triangulate filter on a data set that contains polygons other than triangles. The Input menu allows the user to select the data set to which this filter will be applied. The Reduction target slider specifies the desired reduction in the total number of polygons (e.g., if the Reduction target value is 0.9, the Decimate filter will attempt to produce an output data set that is 10% the size of the input.) If the Preserve topology option is on, decimation will not split the data set or produce holes, but it may keep the filter from reaching the reduction target. The Feature angle slider value is used in determining where the data set may be split. If the angle between two adjacent triangles is &gt;= the Feature angle value, then their boundary is considered a feature edge where the data set can be split. If the Boundary deletable option is on, then vertices on the boundary of the data set can be removed. Turning this option off preserves the boundary of the data set, but it may cause the filter not to reach its reduction target.
+The Decimate filter reduces the number of triangles in a polygonal data set. Because this filter only operates on triangles, first run the Triangulate filter on a data set that contains polygons other than triangles. The Input menu allows the user to select the data set to which this filter will be applied. The Reduction target slider specifies the desired reduction in the total number of polygons (e.g., if the Reduction target value is 0.9, the Decimate filter will attempt to produce an output data set that is 10% the size of the input.) If the Preserve topology option is on, decimation will not split the data set or produce holes, but it may keep the filter from reaching the reduction target. The Feature angle slider value is used in determining where the data set may be split. If the angle between two adjacent triangles is >= the Feature angle value, then their boundary is considered a feature edge where the data set can be split. If the Boundary deletable option is on, then vertices on the boundary of the data set can be removed. Turning this option off preserves the boundary of the data set, but it may cause the filter not to reach its reduction target.
     </Documentation>
   </Module>
   <Module name="D3"
@@ -353,7 +353,7 @@ The Decimate filter reduces the number of triangles in a polygonal data set. Bec
                    help="Force communication routines to use minimal memory, which is slower"
                    default_value="0"/>
     <Documentation>
-The D3 filter is available when ParaView is run in parallel. It operates on any type of data set to evenly divide it across the processors into spatially contiguous regions. The Boundary Cells menu determines how cells that lie on processor boundaries are handled. The Assign cells uniquely option assigns each boundary cell to exactly one process, which is useful for isosurfacing. Selecting Duplicate cells causes the cells on the boundaries to be copied to each process that shares that boundary. The Divide cells option breaks cells across process boundary lines so that pieces of the cell lie in different processes. This option is useful for volume rendering. The Global Id Array Name entry determines the name of the array containing global point ids. Such an array is necessary for processing ghost cells and is useful for removing duplicate points when merging sub-grids. D3 will search for the array, or create it, if you don't provide the name. The output of this filter is of type unstructured grid.
+The D3 filter is available when ParaView is run in parallel. It operates on any type of data set to evenly divide it across the processors into spatially contiguous regions. The Boundary Cells menu determines how cells that lie on processor boundaries are handled. The Assign cells uniquely option assigns each boundary cell to exactly one process, which is useful for isosurfacing. Selecting Duplicate cells causes the cells on the boundaries to be copied to each process that shares that boundary. The Divide cells option breaks cells across process boundary lines so that pieces of the cell lie in different processes. This option is useful for volume rendering. The Global Id Array Name entry determines the name of the array containing global point ids. Such an array is necessary for processing ghost cells and is useful for removing duplicate points when merging sub-grids. The output of this filter is of type unstructured grid.
     </Documentation>
   </Module>
   <Module name="ElevationFilter"
@@ -388,8 +388,8 @@ The D3 filter is available when ParaView is run in parallel. It operates on any 
                 show_resolution="0"
                 help="Set the minimum and maximum point for elevation"/>
     <Documentation>
-The Elevation filter generates point scalar values for an input data set along a specified direction vector. The Input menu allows the user to select the data set to which this filter will be applied. Use the Scalar range entry boxes to specify the minimum and maximum scalar value to be generated. The Low Point and High Point define a line onto which each point of the dataset is projected. The minimum scalar value is associated with the Low Point and the maximum scalar value is associated with the High Point. The scalar value for each point in the data set is determined by the location along the line to with that point projects.
-The line can be specified interactively using the 3D line widget. See section 6.4 for more information about this widget.
+The Elevation filter generates point scalar values for an input data set along a specified direction vector. The Input menu allows the user to select the data set to which this filter will be applied. Use the Scalar range entry boxes to specify the minimum and maximum scalar value to be generated. The Low Point and High Point define a line onto which each point of the data set is projected. The minimum scalar value is associated with the Low Point, and the maximum scalar value is associated with the High Point. The scalar value for each point in the data set is determined by the location along the line to which that point projects.
+The line can be specified interactively using the 3D line widget. See section 7.4 for more information about this widget.
     </Documentation>
   </Module>
 #ifdef PARAVIEW_BUILD_DEVELOPMENT
@@ -458,7 +458,7 @@ The line can be specified interactively using the 3D line widget. See section 6.
     <Documentation>
 Extract CTH Parts is a specialized filter for visualizing the data from a CTH simulation. It first converts the selected cell-centered arrays to point-centered ones. It then contours each array at a value of 0.5. The user has the option of clipping the resulting surface(s) with a plane.
 If the Show All option is on, all the cell-centered scalar (single-component) arrays will be displayed in the array selection box; otherwise only the ones with "Fraction" or "fraction" in the name will be shown. (This behavior is because by default the CTH volume fraction arrays should be listed.) Clicking on the name of a particular array selects it. To choose multiple contiguous array names, click the first one and press the Shift key while clicking the last name you wish to select. If the names are not contiguous, press the Ctrl key while selecting the names from the list. The selected arrays will be contoured.
-If you wish to clip the contour surfaces with a plane, select "On" from the menu in the Clipping section on this Parameters tab. You can interactively position and orient the plane using the plane widget. (See section 6.4 for the details of using this widget or manually setting the plane's parameters.)
+If you wish to clip the contour surfaces with a plane, select On from the menu in the Clipping section on this Parameters tab. You can interactively position and orient the plane using the plane widget. (See section 7.4 for the details of using this widget or manually setting the plane's parameters.)
 This filter only operates on unstructured data. It produces polygonal output.
     </Documentation>
   </Module>
@@ -540,12 +540,12 @@ The Extract Surface filter extracts the polygons forming the outer surface of th
     <CalculatorWidget trace_name="Equation"
                       help="Enter the equation for the new array."/>
     <Documentation>
-The Calculator filter computes new data arrays as functions of existing scalar or vector arrays. The Input menu allows the user to select the data set to which this filter will be applied. The Result Array Name entry box allows the user to specify the name of the computed data array. The Attribute Mode menu selects whether to operate on point-centered arrays or cell-centered ones. If point-centered arrays are used, the resulting array will also be point-centered. The same is true for cell-centered arrays. The Calculator interface operates similarly to a scientific calculator. In creating the function to evaluate, the standard order of operations applies.
+The Calculator filter computes new data arrays as functions of existing scalar or vector arrays. The Input menu allows the user to select the data set to which this filter will be applied. The Result Array Name entry box allows the user to specify the name of the array containing the results of the computation. The Attribute Mode menu selects whether to operate on and produce results that are point-centered or cell-centered. If point-centered arrays are used, the resulting array will also be point-centered. The same is true for cell-centered arrays. The Calculator interface operates similarly to a scientific calculator. In creating the function to evaluate, the standard order of operations applies.
 Each of the calculator functions is described below. Unless otherwise noted, enclose the operand in parentheses using the ( and ) buttons.
 Clear: Erase the current function (displayed in the read-only text box above the calculator buttons).
 /: Divide one scalar by another. The operands for this function are not required to be enclosed in parentheses.
-*: Multiply two scalars or multiply a vector by a scalar (scalar multiple). The operands for this function are not required to be enclosed in parentheses.
--: Negate a scalar or vector (unary minus) or subtract one scalar or vector from another. The operands for this function are not required to be enclosed in parentheses.
+*: Multiply two scalars, or multiply a vector by a scalar (scalar multiple). The operands for this function are not required to be enclosed in parentheses.
+-: Negate a scalar or vector (unary minus), or subtract one scalar or vector from another. The operands for this function are not required to be enclosed in parentheses.
 +: Add two scalars or two vectors. The operands for this function are not required to be enclosed in parentheses.
 sin: Compute the sine of a scalar.
 cos: Compute the cosine of a scalar.
@@ -567,7 +567,7 @@ v1.v2: Compute the dot product of two vectors. The operands for this function ar
 mag: Compute the magnitude of a vector.
 norm: Normalize a vector.
 The operands are described below.
-The digits, 0 - 9, and the decimal point are used to enter constant scalar values.
+The digits 0 - 9 and the decimal point are used to enter constant scalar values.
 iHat, jHat, and kHat are vector constants representing unit vectors in the X, Y, and Z directions, respectively.
 The scalars menu lists the names of the scalar arrays and the components of the vector arrays of either the point-centered or cell-centered data. The vectors menu lists the names of the point-centered or cell-centered vector arrays. The function will be computed for each point (or cell) using the scalar or vector value of the array at that point (or cell).
 The filter operates on any type of data set, but the input data set must have at least one scalar or vector array. The arrays can be either point-centered or cell-centered. The Calculator filter's output is of the same data set type as the input.
@@ -623,12 +623,12 @@ The Calculator filter is available on the Toolbar.
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
-The Feature Edges filter extracts various types of edges from the input data set. The Input menu allows the user to select the data set to which this filter will be applied. Which edges are extracted depends on which check boxes are marked. The four types of edges are as follows.
+The Feature Edges filter extracts various types of edges from the input data set. Which edges are extracted depends on which check boxes are marked. The four types of edges are as follows.
 Boundary edges: line cells or edges used by only one polygon
-Feature edges: edges used by two polygons whose dihedral angle &gt; the value from the Feature angle slider
+Feature edges: edges used by two polygons whose dihedral angle > the value from the Feature angle slider
 Non-manifold edges: edges used by three or more polygons
 Manifold edges: edges used by exactly two polygons
-If the Coloring option is checked, then the extracted edges are assigned a scalar value based on the type of the edge.
+If the Coloring option is checked, then the extracted edges are assigned a scalar value based on the type of the edge. The Input menu allows the user to select the data set to which this filter will be applied.
 This filter operates on polygonal data and produces polygonal output.
     </Documentation>
   </Module>
@@ -660,7 +660,7 @@ This filter operates on polygonal data and produces polygonal output.
             value="3"/>
     </SelectionList>
     <Documentation>
-The Gradient filter computes the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu determines which from which scalar array the gradient will be computed. The Dimensionality menu selects whether the gradient will be calculated in 2 or 3 dimensions. If only 2 dimensions are used, gradients are only computed in X and Y. This filter uses central differences to compute the gradients. The Gradient filter operates on uniform rectilinear (image) data and produces image data output.
+The Gradient filter computes the gradient vector at each point in an image or volume. The Input menu allows the user to select the data set to which this filter will be applied. The Scalars menu determines from which scalar array the gradient will be computed. The Dimensionality menu selects whether the gradient will be calculated in 2 or 3 dimensions. If only 2 dimensions are used, gradients are only computed in X and Y. This filter uses central differences to compute the gradients. The Gradient filter operates on uniform rectilinear (image) data and produces image data output.
     </Documentation>
   </Module>
   <Module name="GradientMagnitude"
@@ -709,7 +709,7 @@ The Gradient Magnitude filter computes the magnitude of the gradient vector at e
     <GroupInputsWidget trace_name="inputs"
                        help="Choose inputs to group."/>
     <Documentation>
-The Group Parts filter causes different data sets to be grouped into a collection and treated as a single data set for filtering purposes. To select a single data set, click on its name. To select several sources whose names are contiguous in the list, select the first name, press and hold the Shift key, and (while still holding the Shift key) click the last name. To select several data sets whose names are non-contiguous, press and hold the Ctrl key while clicking the names. This filter operates on any type of data. The output type depends on the data sets selected for grouping.
+The Group Parts filter causes different data sets to be grouped into a collection and treated as a single data set for filtering purposes. All the data objects currently in ParaView will appear in the selection list. To select a single data set, click on its name. To select several sources whose names are contiguous in the list, select the first name, press and hold the Shift key, and (while still holding the Shift key) click the last name. To select several data sets whose names are non-contiguous, press and hold the Ctrl key while clicking the names. This filter operates on any type of data. The output type depends on the data sets selected for grouping.
     </Documentation>
   </Module>
   <Module name="LinearExtrusionFilter"
@@ -747,7 +747,7 @@ The Group Parts filter causes different data sets to be grouped into a collectio
                    help="Turn this off if you do want to process ghost levels and do not mind seams."
                    default_value="0"/>
     <Documentation>
-The Linear Extrusion filter creates a swept surface by translating the input data set along a specified vector. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The three Vector entry boxes specify the X, Y, and Z components of the vector along which to sweep the input. The value of the Scale factor determines the distance along the vector the data set will be translated. (A scale factor of 0.5 will move the data set half the length of the vector, and a scale factor of 2 will move it twice the vector's length.)
+The Linear Extrusion filter creates a swept surface by translating the input data set along a specified vector. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The three Vector entry boxes specify the X, Y, and Z components of the vector along which to sweep the input. The value of the Scale factor entry determines the distance along the vector the data set will be translated. (A scale factor of 0.5 will move the data set half the length of the vector, and a scale factor of 2 will move it twice the vector's length.)
 The Capping check box indicates whether to cap the ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then if capping is on, two copies of the data set will be displayed on output (the second translated from the first one along the specified vector). If instead capping is off, then an input closed solid will produce no output.
 The Piece invariant check box determines whether the output will be the same regardless of the number of processors used to compute the result. The difference is whether there are internal polygonal faces on the processor boundaries. This filter operates on polygonal data and produces polygonal data output.
     </Documentation>
@@ -775,7 +775,7 @@ The Piece invariant check box determines whether the output will be the same reg
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
-The Loop Subdivision filter increases the granularity of a polygonal mesh. It works by dividing each triangle in the input into four new triangles. This filter only operates on triangles, so a data set that contains other types of polygons should be passed through the Triangulate filter before applying this filter to it. The Input menu allows the user to select the data set to which this filter will be applied. The Number of divisions slider specifies the number of subdivision iterations to be performed. (For example, if the number of divisions is 2, the triangles in the initial mesh will each be divided into four new triangles. Then those new triangles will be further subdivided.) This filter only operates on polygonal data (specifically triangle meshes), and it produces polygonal output.
+The Loop Subdivision filter increases the granularity of a polygonal mesh. It works by dividing each triangle in the input into four new triangles. It is named for the person who devised this subdivision scheme. This filter only operates on triangles, so a data set that contains other types of polygons should be passed through the Triangulate filter before applying this filter to it. The Input menu allows the user to select the data set to which this filter will be applied. The Number of divisions slider specifies the number of subdivision iterations to be performed. (For example, if the number of divisions is 2, the triangles in the initial mesh will each be divided into four new triangles. Then those new triangles will be further subdivided.) This filter only operates on polygonal data (specifically triangle meshes), and it produces polygonal output.
     </Documentation>
   </Module>
   <Module name="MaskPoints"
@@ -852,7 +852,7 @@ The Input menu allows the user to select the data set to which this filter will 
                  help="Determines the smoothing neighborhood."
                  default_value="1 1 1"/>
     <Documentation>
-The Median filter operates on uniform rectilinear (image) data and produces image data output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernel Size). From the Input menu, the user can select the data set for performing this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction.
+The Median filter operates on uniform rectilinear (image or volume) data and produces uniform rectilinear output. It replaces the scalar value at each pixel / voxel with the median scalar value in the specified surrounding neighborhood (Kernel Size). From the Input menu, the user can select the data set on which to perform this calculation. The Scalar menu determines which scalar array will be used to determine the median. The Kernel Size entry boxes specify the number of pixels / voxels in each dimension to use in computing the median to assign to each pixel / voxel. If the kernel size in a particular dimension is 1, then the median will not be computed in that direction.
     </Documentation>
   </Module>
   <Module name="PolyDataNormals"
@@ -982,7 +982,7 @@ The Outline filter generates an axis-aligned bounding box for the input data set
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
-The Outline Corners filter generates the corners of a bounding box for the input data set (specified by the Input men). The Corner factor slider specifies the relative length of the corners along the corresponding edges. This filter produces polygonal output.
+The Outline Corners filter generates the corners of a bounding box for the input data set (specified by the Input menu). The Corner factor slider specifies the relative length of the corners along the corresponding edges. This filter produces polygonal output.
     </Documentation>
   </Module>
   <Module name="PartScalars"
@@ -1027,7 +1027,7 @@ The Part Id Scalars filter assigns a unique scalar value to each part in the inp
                    help="Select whether to use random colors for the various pieces"
                    default_value="0"/>
     <Documentation>
-The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on.
+The Process Id Scalars filter assigns a unique scalar value to each piece of the input according to which processor it resides on. If the Random option is selected, the unique value per piece will be chosen at random; otherwise it will match the process id. This filter operates on any type of data when ParaView is run in parallel. The output data set type is the same as that of the input.
     </Documentation>
   </Module>
   <Module name="PointDataToCellData"
@@ -1053,7 +1053,7 @@ The Process Id Scalars filter assigns a unique scalar value to each piece of the
                    help="If on, then the input point data is passed through to the output; otherwise, only generated cell data is placed into the output."
                    default_value="0"/>
     <Documentation>
-The Point Data to Cell Data filter averages the values of the point attributes of the points of a cell to compute cell attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass point data option is checked, then the input point attributes will also be copied to the point attributes of the output; otherwise the output will only have dell attributes. The Point Data to Cell Data filter operates on any type of data set, and the output data set is of the same type as the input.
+The Point Data to Cell Data filter averages the values of the point attributes of the points of a cell to compute cell attributes. The Input menu allows the user to select the data set to which this filter will be applied. If the Pass point data option is checked, then the input point attributes will also be copied to the point attributes of the output; otherwise the output will only have cell attributes. The Point Data to Cell Data filter operates on any type of data set, and the output data set is of the same type as the input.
     </Documentation>
   </Module>
   <Module name="QuadricClustering"
@@ -1185,7 +1185,7 @@ The Random Vectors filter generates a point-centered array of random vectors. It
                    help="Include both the input and its reflection in the output."
                    default_value="1"/>
     <Documentation>
-The Reflection filter reflects the input data set across the specified plane. The output is the union of the input data set and its reflection. If the value chosen from the Plane menu is X, Y, or Z, the value of the Center entry determines where the plane is placed along the specified axis. The other six entries, X Min, X Max, etc., place the reflection plane at the specified face of the bounding box of the input data set. This filter operates on any type of data set producing an unstructured grid output.
+The Reflection filter reflects the input data set across the specified plane. If the Copy Input check box is marked, the output is the union of the input data set and its reflection. Otherwise the output will contain only the reflection of the input data. If the value chosen from the Plane menu is X, Y, or Z, the value of the Center entry determines where the plane is placed along the specified axis. The other six entries, X Min, X Max, etc., place the reflection plane at the specified face of the bounding box of the input data set. This filter operates on any type of data set and produces an unstructured grid output.
     </Documentation>
   </Module>
   <Module name="RibbonFilter"
@@ -1254,8 +1254,8 @@ The Reflection filter reflects the input data set across the specified plane. Th
                    default_value="0"/>
     <Documentation>
 The Ribbon filter creates ribbons from the lines in the input data set. This filter is useful for visualizing streamlines. Both the input and output of this filter are polygonal data. The input data set must also have at least one point-centered vector array.
-The vectors and scalars for use in this filter can be selected from the Vectors and Scalars menus respectively. If the Vary width option is on, the width of the ribbons will be be scaled according to the selected scalars. If Use default normal is off, the selected vector array will be used as the normals of the ribbons. If Use default normals is on, the normal for the ribbons is specified by the values in the Default normal entry boxes.
-The Width entry box specifies half the width of the ribbons. If Vary width is on, then the Width value specified is the minimum width of the ribbons. The Angle value determines the orientation of the ribbons; it specifies the offset angle (in degrees) of the ribbon from the normal line.
+The vectors and scalars for use in this filter can be selected from the Vectors and Scalars menus respectively. If the Vary width option is on, the width of the ribbons will be scaled according to the selected scalars. If Use default normal is off, the selected vector array will be used as the normals of the ribbons. If Use default normal is on, the normal for the ribbons is specified by the values in the Default normal entry boxes.
+The Width entry box specifies half the width of the ribbons. If Vary width is on, then the Width value specified is half the minimum width of the ribbons. The Angle value determines the orientation of the ribbons; it specifies the offset angle (in degrees) of the ribbon from the normal line.
     </Documentation>
   </Module>
   <Module name="RotationalExtrusionFilter"
@@ -1299,7 +1299,7 @@ The Width entry box specifies half the width of the ribbons. If Vary width is on
                  default_value="0.0"/>
     <Documentation>
 The Rotational Extrusion filter forms a surface by rotating the input about the Z axis. This filter is intended to operate on 2D polygonal data. The Input menu allows the user to select the data set to which this filter will be applied. The value of the Resolution thumb wheel specifies the number of steps taken in rotating from 0 to the value specified in the Angle entry box. The Translation entry box determines the distance along the Z axis to be covered as the data set is rotated. Specifying a non-zero Translation value allows you to create a corkscrew or spring effect. The Delta radius entry box controls how much the radius of the rotation increases as the new data set is swept out.
-The Capping check box controls whether to close the open ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then either two copies of the data set will be drawn or no surface will be drawn. No surface is drawn if either capping is on or if the two surfaces would occupy exactly the same 3D space (e.g., Angle is a multiple of 360 and Translation and Delta radius are 0).
+The Capping check box controls whether to close the open ends of the swept surface. Capping works by placing a copy of the input data set on either end of the swept surface, so it behaves properly if the input is a 2D surface composed of filled polygons. If the input data set is a closed solid (e.g., a sphere), then either two copies of the data set will be drawn or no surface will be drawn. No surface is drawn if either capping is on or if the two surfaces would occupy exactly the same 3D space (e.g., Angle is a multiple of 360, and Translation and Delta radius are 0).
     </Documentation>
   </Module>
   <Module name="ShrinkFilter"
@@ -1383,7 +1383,7 @@ The Shrink filter causes the individual cells of a data set to break apart from 
            entry_and_label_on_top="0"
            display_value="0"/>
     <Documentation>
-The Smooth filter operates on a polygonal data set by iteratively adjusting the position of the points using Laplacian smoothing. (Because this filter only adjusts point positions, the output data set is also polygonal.) This results in better-shaped cells and more evenly distributed points. The Num. iterations thumb wheel specifies the maximum number of smoothing iterations to perform. The Convergence slider limits the maximum motion of any point. It is expressed as a fraction of the length of the diagonal of the bounding box of the data set. If the maximum point motion during a smoothing iteration is less than the Convergence value, the smoothing operation terminates. 
+The Smooth filter operates on a polygonal data set by iteratively adjusting the position of the points using Laplacian smoothing. (Because this filter only adjusts point positions, the output data set is also polygonal.) This results in better-shaped cells and more evenly distributed points. The Num. iterations thumb wheel specifies the maximum number of smoothing iterations to perform. The Convergence slider limits the maximum motion of any point. It is expressed as a fraction of the length of the diagonal of the bounding box of the data set. If the maximum point motion during a smoothing iteration is less than the Convergence value, the smoothing operation terminates.
     </Documentation>
   </Module>
   <Module name="Stripper"
@@ -1540,7 +1540,7 @@ The Triangulate filter decomposes polygonal data into only triangles, points, an
       </Item>
     </SelectWidget>
     <Documentation>
-The Transform filter allows you to specify the position, size, and orientation of polygonal, unstructured grid, and curvilinear data sets. You can interactively perform these affine transformations on the data by using the box widget, and the parameters can also be controlled manually. See section 6.4 for the details of using the box widget and manually setting its parameters. The output of this filter will have the same data set type as the input.
+The Transform filter allows you to specify the position, size, and orientation of polygonal, unstructured grid, and curvilinear data sets. You can interactively perform these affine transformations on the data by using the box widget, and the parameters can also be controlled manually. See section 7.4 for the details of using the box widget and manually setting its parameters. The output of this filter will have the same data set type as the input.
     </Documentation>
   </Module>
   <Module name="TubeFilter"
@@ -1595,7 +1595,7 @@ The Transform filter allows you to specify the position, size, and orientation o
                  help="Set the maximum tube radius in terms of a multiple of the minimum radius"
                  default_value="10"/>
     <Documentation>
-The Tube filter creates tubes around the lines in the input polygonal data set. The output is also polygonal. The Num. sides value determines the number of faces around the circumference of the tube. The Capping toggle specifies whether to close the end of the tube with a polygon. The Radius entry determines the radius of the tube (or the minimum radius if you are varying the radius). From the Vary radius menu, you can select whether the radius of the tube should vary, and if so, whether it should be by scalar or by vector. If the radius is varied by scalar, the tube radius is based on the point-based scalar values. If it is varied by vector, the vector magnitude is used. If you are varying the radius, the value in the Radius factor entry sets the maximum radius by specifying a multiplier of the Radius value.
+The Tube filter creates tubes around the lines in the input polygonal data set. The output is also polygonal. The Num. sides value determines the number of faces around the circumference of the tube. The Capping toggle specifies whether to close the end of the tube with a polygon. The Radius entry determines the radius of the tube (or the minimum radius if you are varying the radius). From the Vary radius menu, you can select whether the radius of the tube should vary, and if so, whether it should be by scalar or by vector. If the radius is varied by scalar, the tube radius is based on the point-based scalar values. If it is varied by vector, the vector magnitude is used. If you are varying the radius, the value in the Radius factor entry determines the maximum radius by specifying a multiplier of the Radius value.
     </Documentation>
   </Module>
   <Module name="WarpScalar"
@@ -1685,7 +1685,7 @@ This filter operates on polygonal, curvilinear, and unstructured grid data sets 
                  help="Displacement is vector times scale."
                  default_value="1.0"/>
     <Documentation>
-The Warp (vector) filter translates the points of the input data set using a specified vector array. The vector array chosen specifies a vector per point in the input. Each point is translated along its vector by the value in the Scale factor entry box. This filter operates on polygonal, curvilinear, and unstructured grid data sets. Because this filter only changes the positions of the points, the output data set type is the same as that of the input. This filter is available on the toolbar.
+The Warp (vector) filter translates the points of the input data set using a specified vector array. The vector array chosen specifies a vector per point in the input. Each point is translated along its vector by the value in the Scale factor entry box. This filter operates on polygonal, curvilinear, and unstructured grid data sets. Because this filter only changes the positions of the points, the output data set type is the same as that of the input. This filter is available on the Toolbar.
     </Documentation>
   </Module>
   <Module name="Cut"
@@ -1742,9 +1742,9 @@ The Warp (vector) filter translates the points of the input data set using a spe
               set_number_command="SetNumberOfContours"
               set_contour_command="SetValue"/>
     <Documentation>
-The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 6.4.
-By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the same units as the data set coordinates. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button or press Enter. To instead add a several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. To delete a value from the Cut Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
-The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to cut. The output of this filter is polygonal data.
+The Cut filter extracts the portion of the input data set that lies along the specified plane or sphere. From the Cut Function menu, you can select whether cutting will be performed with a plane or a sphere. The appropriate 3D widget (plane widget or sphere widget) will be displayed. The parameters of the cut function can be specified interactively using the 3D widget or manually using the traditional user interface controls. Instructions for using these 3D widgets and their corresponding user interfaces are found in section 7.4.
+By default, the cut lies on the specified plane or sphere. Using the Cut Offset Values portion of the interface, it is also possible to cut the data set at some offset from the original cut function. The Cut Offset Values are in the spatial units of the data set. To add a single offset, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced offsets, use the controls in the Generate range of values section. Select the number of offsets to generate using the Number of Values slider. The Range slider controls the interval in which to generate the offsets. Once the number of values and range have been selected, click the Generate button. The new offsets will be added to the Offset Values list. To delete a value from the Cut Offset Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list.
+The Cut filter takes any type of data set as input. Use the Input menu to choose a data set to cut. The output of this filter is polygonal data. This filter is available on the Toolbar.
     </Documentation>
   </Module>
   <Module name="Clip"
@@ -1821,8 +1821,8 @@ The Cut filter takes any type of data set as input. Use the Input menu to choose
                    help="Switches which part to keep."
                    default_value="0"/>
     <Documentation>
-The Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 6.4.
-If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function. If Scalars is selected, then the user must specify a scalar array to clip according to. The clip filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. If the Inside Out option is checked, the opposite portions of the data set will be returned.
+The Clip filter cuts away a portion of the input data set using a plane, a sphere, a box, or a scalar value. The menu in the Clip Function portion of the interface allows the user to select which implicit function to use or whether to clip using a scalar value. Making this selection loads the appropriate user interface. For the implicit functions, the appropriate 3D widget (plane, sphere, or box) is also displayed. The use of these 3D widgets, including their user interface components, is discussed in section 7.4.
+If an implicit function is selected, the clip filter returns that portion of the input data set that lies inside the function. If Scalars is selected, then the user must specify a scalar array to clip according to. The clip filter will return the portions of the data set whose value in the selected Scalars array is larger than the Clip value. Regardless of the selection from the Clip Function menu, if the Inside Out option is checked, the opposite portions of the data set will be returned.
 This filter operates on all types of data sets, and it returns unstructured grid data on output. This filter is available on the toolbar.
     </Documentation>
   </Module>
@@ -1868,7 +1868,7 @@ This filter operates on all types of data sets, and it returns unstructured grid
                    default_value="1"
                    help="If AllScalars is checked, then a cell is only included if all its points are within the threshold. This is only relevant for point data."/>
     <Documentation>
-The Threshold filter extracts the portions of the input data set whose scalars lie within the specified range. This filter operates on either point-centered or cell-centered data. To select between these two options, select either Point Data or Cell Data from the Attribute Mode menu. Once the Attribute Mode has been selected, choose the scalar array from which to threshold the data from the Scalars menu. The Lower Threshold and Upper Threshold sliders determine the range of the scalars to retain in the output. The All Scalars check box only takes effect when the Attribute Mode is set to Point Data. If the All Scalars option is checked, then a cell will only be passed to the output if the scalar values of all of its points lie within the range indicated by the Lower Threshold and Upper Threshold sliders. If unchecked, then a cell will be added to the output if the specified scalar value for any of its points is within the chosen range. This filter operates on any type of data set and produces unstructured grid output. The Threshold filter is available on the toolbar.
+The Threshold filter extracts the portions of the input data set whose scalars lie within the specified range. This filter operates on either point-centered or cell-centered data. To select between these two options, select either Point Data or Cell Data from the Attribute Mode menu. Once the Attribute Mode has been selected, choose the scalar array from which to threshold the data from the Scalars menu. The Lower Threshold and Upper Threshold sliders determine the range of the scalars to retain in the output. The All Scalars check box only takes effect when the Attribute Mode is set to Point Data. If the All Scalars option is checked, then a cell will only be passed to the output if the scalar values of all of its points lie within the range indicated by the Lower Threshold and Upper Threshold sliders. If unchecked, then a cell will be added to the output if the specified scalar value for any of its points is within the chosen range. This filter operates on any type of data set and produces unstructured grid output. The Threshold filter is available on the Toolbar.
     </Documentation>
   </Module>
   <Module name="Contour"
@@ -1935,9 +1935,9 @@ The Threshold filter extracts the portions of the input data set whose scalars l
                    help="Select whether to compute scalars" />
     <Documentation>
 The Contour filter computes isolines or isosurfaces using a selected point-centered scalar array. The available scalar arrays are listed in the Scalars menu. The scalar range of the selected array will be displayed.
-The interface for adding contour values is very similar to the one for selecting cut offsets (in the Cut filter). To add a single contour value, select the value from the New Value slider in the Add value portion of the interface and click the Add button or press Enter. To instead add several evenly spaced contours, use the controls in the Generate range of values section. Select the number of contour values to generate using the Number of Values slider. The Range slider controls the interval in which to generate the contour values. Once the number of values and range have been selected, click the Generate button. To delete a value from the Contour Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list. If no values are in the Contour Values list when Accept is pressed, the current value of the New Value slider will be used.
+The interface for adding contour values is very similar to the one for selecting cut offsets (in the Cut filter). To add a single contour value, select the value from the New Value slider in the Add value portion of the interface and click the Add button, or press Enter. To instead add several evenly spaced contours, use the controls in the Generate range of values section. Select the number of contour values to generate using the Number of Values slider. The Range slider controls the interval in which to generate the contour values. Once the number of values and range have been selected, click the Generate button. The new values will be added to the Contour Values list. To delete a value from the Contour Values list, select the value and click the Delete button. (If no value is selected, the last value in the list will be removed.) Clicking the Delete All button removes all the values in the list. If no values are in the Contour Values list when Accept is pressed, the current value of the New Value slider will be used.
 In addition to selecting contour values, you can also select additional computations to perform. If any of Compute Normals, Compute Gradients, or Compute Scalars is selected, the appropriate computation will be performed, and a corresponding point-centered array will be added to the output.
-The Contour filter operates on any type of data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal. This filter is available on the toolbar.
+The Contour filter operates on any type of data set, but the input is required to have at least one point-centered scalar (single-component) array. The output of this filter is polygonal. This filter is available on the Toolbar.
     </Documentation>
   </Module>
   <Module name="Glyph"
@@ -1992,12 +1992,12 @@ The Contour filter operates on any type of data set, but the input is required t
                    help="Choose points at random to mask" />
     <Documentation>
 The Glyph filter generates a glyph (i.e., an arrow, cone, line, sphere, or 2D glyph) at each point in the input data set. The glyphs can be oriented and scaled by the input point-centered scalars and vectors.
-From the Glyph menu, select which symbol should be drawn at each input point. The available choices are Arrow, Cone, Line, Sphere, and Glyph2D. To change the parameters of any of the glyphs (including which 2D glyph is drawn), choose the appropriate glyph from the Glyphs submenu of the Select menu. Change the desired parameter(s) and click Accept. To return to the Glyph interface, select this filter from the Selection/Navigation Window or from the Select menu.
-The Orient/Scale section of the interface determines how the point-centered scalars and vectors contribute to the orientation and scale of the widgets. The Orient Mode menu determines whether the glyphs are drawn in their original orientation (Off) or in an orientation determined by a vector array (Vector). If the input does not contain point-centered vectors, the Vector option in the Orient Mode menu will not be available.
-The Scale Mode menu determines how the scale of the glyphs will be determined. The options are to scale by the selected scalar array (Scalar), to scale by the magnitudes of the selected vector array (Vector Magnitude), to scale by each component of the selected vector array (Vector Components), or to draw the all the glyphs at the same scale (Data Scaling Off). If the input contains no point-centered scalar arrays, the Scalar option will be disabled. If it has no point-centered vector arrays, the Vector Magnitude and Vector Components entries will be unavailable. The value of the Scale Factor entry box is a multiplier that contributes to the final size of the glyphs.
+From the Glyph menu, select which symbol should be drawn at each input point. The available choices are Arrow, Cone, Line, Sphere, and Glyph2D. To change the parameters of any of the glyphs (including which 2D glyph is drawn), choose the appropriate glyph from the Glyphs submenu of the Select menu. Change the desired parameter(s) and click Accept. To return to the Glyph interface, select this filter from the Selection / Navigation Window or from the Select menu.
+The Orient / Scale section of the interface determines how the point-centered scalars and vectors contribute to the orientation and scale of the widgets. The Orient Mode menu determines whether the glyphs are drawn in their original orientation (Off) or in an orientation determined by a vector array (Vector). If the input does not contain point-centered vectors, the Vector option in the Orient Mode menu will not be available.
+The Scale Mode menu determines how the scale of the glyphs will be calculated. The options are to scale by the selected scalar array (Scalar), to scale by the magnitudes of the selected vector array (Vector Magnitude), to scale by each component of the selected vector array (Vector Components), or to draw the all the glyphs at the same scale (Data Scaling Off). If the input contains no point-centered scalar arrays, the Scalar option will be disabled. If it has no point-centered vector arrays, the Vector Magnitude and Vector Components entries will be unavailable. The value of the Scale Factor entry box is a multiplier that contributes to the final size of the glyphs.
 The Scalars and Vectors menus list the point-centered scalar (single-component) and vector (three-component) arrays in the input data set. These menus are enabled and disabled depending on the current Orient and Scale Mode selections.
 The Glyph Parameters tab also contains controls for masking the input points before glyphing. (This is a simplified version of the Mask Points filter interface.) To enable point masking, turn on the Mask Points option. When this is selected, the Max. Number of Glyphs thumbwheel sets an upper limit on the number of glyphs to display. If the Random Masking option is on, the input points to glyph will be randomly selected; otherwise every second point will be glyphed, starting from the first point id.
-The Glyph filter operates on any type of data set. Its output is polygonal. This filter is available on the toolbar.
+The Glyph filter operates on any type of data set. Its output is polygonal. This filter is available on the Toolbar.
     </Documentation>
   </Module>
   <Module name="Pick"
@@ -2026,7 +2026,7 @@ The Glyph filter operates on any type of data set. Its output is polygonal. This
       <Item name="Cell" value="1"/>
     </SelectionList>
     <Documentation>
-The Pick filter displays the underlying data nearest to a user-selected point. A point widget, with its usual controls in the display area and on the Parameters tab, is provided for choosing this point. (See section 6.4 for information about using the point widget.) If you select Point from the Pick Type menu, the values of the point-centered variables at the nearest point will be displayed on the Parameters tab. If you select Cell, the values of the cell-centered variables and of the point-centered variables for the points in that cell will be displayed on the Parameters tab. Also, the selected cell will be outlined in red in the display area, and the ids of the points within that cell will be labeled.
+The Pick filter displays the underlying data nearest to a user-selected point. A point widget, with its usual controls in the display area and on the Parameters tab, is provided for choosing this point. (See section 7.4 for information about using the point widget.) Pressing the "P" key positions the point widget at the point on the data set under the current cursor position. If you select Point from the Pick Type menu, the values of the point-centered variables at the nearest point will be displayed on the Parameters tab. If you select Cell, the values of the cell-centered variables and of the point-centered variables for the points in that cell will be displayed on the Parameters tab. Also, the selected cell will be outlined in red in the display area, and the ids of the points within that cell will be labeled.
 The Pick filter operates on any type of data and produces unstructured grid output.
     </Documentation>
   </Module>
@@ -2062,7 +2062,7 @@ The Pick filter operates on any type of data and produces unstructured grid outp
       </Item>
     </SelectWidget>
     <Documentation>
-The Probe filter samples the data set attributes of the current data set at a point or along a line. Selecting either Point or Line from the menu button in the Probe object portion of the interface displays the appropriate 3D widget and its associated user interface controls. See section 6.4 for more information about using 3D widgets.
+The Probe filter samples the data set attributes of the current data set at a point or along a line. Selecting either Point or Line from the menu button in the Probe object portion of the interface displays the appropriate 3D widget and its associated user interface controls. See section 7.4 for more information about using 3D widgets.
 If you are probing with a point, the values of the point-centered variables at the selected point will be listed on the Parameters tab for this filter. If you are probing with a line, the values of the point-centered variables along that line will be displayed in a 2D graph in the display area if Show XY-Plot is selected.
 Probing with a point is different from using the Pick filter at a point because the Pick filter displays the values for the input point closest to the selected point. Instead the Probe filter uses interpolation to determine the value at the selected point, whether or not it lies at an input point.
 The Probe filter operates on any type of data and produces polygonal output (a point or a line).
@@ -2263,13 +2263,13 @@ The Probe filter operates on any type of data and produces polygonal output (a p
                  help="Terminal speed. The integration will be stopped if the speed (absolute value) is smaller than this threshold"
                  default_value="0.000000000001"/>
     <Documentation>
-The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 6.4.
-The Max. Propagation entry box allows you to specify the maximum length of the streamlines. From the Max. Propagation menu, you can select the units to be either Time (the time a particle would travel with steady flow) or Length (in the data set's coordinates).
-The Init. Step Len. menu and entry specify the initial step size for integration. (For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.) The menu allows you to specify the units. Time and Length have the same meaning as for Max. Propagation. Cell Length specifies the step length as number of cells.
+The Stream Tracer filter generates streamlines in a vector field from a collection of seed points. The vector field used is selected from the Vectors menu, so the input data set is required to have point-centered vectors. The Seed portion of the interface allows you to select whether the seed points for this integration lie in a point cloud or along a line. Depending on which is selected, the appropriate 3D widget (point or line widget) is displayed along with traditional user interface controls for positioning the point cloud or line within the data set. Instructions for using the 3D widgets and the corresponding manual controls can be found in section 7.4.
+The Max. Propagation entry box allows you to specify the maximum length of the streamlines. From the Max. Propagation menu, you can select the units to be either Time (the time a particle would travel with steady flow) or Length (in the data set's spatial coordinates).
+The Init. Step Len. menu and entry specify the initial step size for integration. (For non-adaptive integrators, Runge-Kutta 2 and 4, the initial step size is used throughout the integration.) The menu allows you to specify the units. Time and Length have the same meaning as for Max. Propagation. Cell Length specifies the step length as a number of cells.
 The Integration Direction menu determines in which direction(s) the stream trace will be generated: FORWARD, BACKWARD, or BOTH.
 The Integrator Type section of the interface determines which calculation to use for integration: Runge-Kutta 2, Runge-Kutta 4, or Runge-Kutta 4-5. If Runge-Kutta 4-5 is selected, controls are displayed for specifying the minimum and maximum step length and the maximum error. The controls for specifying Min. Step Len. and Max. Step Len. are the same as those for Init. Step Len. The Runge-Kutta 4-5 integrator tries to choose the step size so that the estimated error is less than the value of the Maximum Error entry.
 If the integration takes more than Max. Steps to complete, if the speed goes below Term. Speed, if Max. Propagation is reached, or if a boundary of the input data set is crossed, integration terminates.
-This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the toolbar.
+This filter operates on any type of data set, provided it has point-centered vectors. The output is polygonal data containing polylines. This filter is available on the Toolbar.
     </Documentation>
   </Module>
   <Module name="ExtractGrid"
@@ -2329,7 +2329,67 @@ This filter operates on any type of data set, provided it has point-centered vec
                    default_value="0"
                    help="Select whether to always include the boundary of the grid in the output"/>
     <Documentation>
-The Extract Grid filter returns a subgrid of a structured input (image, volume, curvilinear, or nonuniform rectilinear) data set. The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For example, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the toolbar.
+The Extract Grid filter returns a subgrid of a structured input data set (uniform rectilinear, curvilinear, or nonuniform rectilinear). The VOI section of the interface provides six sliders for specifying the extents of the desired output along each of the I, J, and K axes. The Sample Rate thumb wheels control whether to subsample the input grid in each dimension. Values greater than 1 result in subsampling. For example, if the Sample Rate along the I axis is 2, then every other input point will be passed to the output. If the Sample Rate in any dimension is greater than 1, then selecting the Include boundary option will pass the values on the boundary of the data set to the output even if the boundary extent is not an even multiple of the sample rate. The output data set type of this filter is the same as the input type. This filter is available on the Toolbar.
     </Documentation>
   </Module>
+
+  <Module name="BandedPolyDataContour" 
+          root_name="BandedContour" 
+          module_type="Filter" 
+          replace_input="0" 
+          long_help="Filled contours are bands of cells that all have the same cell scalar value, and can therefore be colored the same." 
+          short_help="Produces filled contours."> 
+    <Filter class="vtkBandedPolyDataContourFilter"> 
+      <Input name="Input" class="vtkPolyData"> 
+        <ArrayRequirement attribute="Point" components="1"/> 
+      </Input> 
+    </Filter> 
+    // Do not change the tracename of the input menu, it is used by vtkPVContour 
+    <InputMenu trace_name="Input" 
+               id="im" 
+               label="Input" 
+               input_name="Input" 
+               help="Set the input to this filter." /> 
+    // Do not change the tracename of the array menu, it is used by vtkPVContour 
+    <ArrayMenu id="am" 
+               input_name="Input" 
+               attribute_type="Scalars" 
+               label="Scalars" 
+               trace_name="Scalars" 
+               input_menu="im" 
+               number_of_components="1" 
+               help="Choose which scalar array you want to contour."/> 
+    <ScalarRangeLabel id="srl" 
+                      trace_name="ScalarRangeLabel" 
+                      array_menu="am"/> 
+    <ContourEntry label="Contour Values" 
+                  trace_name="Contour Values" 
+                  array_menu="am" 
+                  set_number_command="SetNumberOfContours" 
+                  set_contour_command="SetValue" 
+                  help="List of current contour values." /> 
+    <LabeledToggle label="Set Clipping" 
+                   variable="Clipping" 
+                   default_value="0" 
+                   trace_name="Set Clipping" 
+                   help="Select whether to clip outside the range specified by the user" /> 
+    <LabeledToggle label="Generate Contour Edges" 
+                   variable="GenerateContourEdges" 
+                   default_value="0" 
+                   trace_name="Set Generate Contour Edges" 
+                   help="Select whether to compute contour edges"/> 
+    <SelectionList variable="ScalarMode" 
+                   trace_name="Set Scalar Mode" 
+                   label="Scalar Mode" 
+                   option_width="15" 
+                   help="Select whether the cell scalars are output as an integer index or a scalar value" 
+                   default_value="0"> 
+      <Item name="Index" 
+            value="0"/> 
+      <Item name="Value" 
+            value="1"/> 
+    </SelectionList> 
+    <Documentation> 
+    </Documentation> 
+  </Module> 
 </ModuleInterfaces>
