@@ -77,7 +77,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVData);
-vtkCxxRevisionMacro(vtkPVData, "1.138");
+vtkCxxRevisionMacro(vtkPVData, "1.139");
 
 int vtkPVDataCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1354,7 +1354,13 @@ void vtkPVData::CreateProperties()
 //----------------------------------------------------------------------------
 void vtkPVData::UpdateProperties()
 {
-  
+  vtkPVSource* source = this->GetPVSource();
+
+  if (!source)
+    {
+    return;
+    }
+
   char tmp[350], cmd[1024];
   float bounds[6];
   int i, j, numArrays, numComps;
@@ -1370,7 +1376,7 @@ void vtkPVData::UpdateProperties()
   // the data, not the rendered geometry.
   // It the solution communication in the PVLodActor?
   int numberOfPoints = this->GetNumberOfPoints();
-  if ( ! this->RenderOnlyLocally && this->GetPVRenderView() )
+  if ( ! this->RenderOnlyLocally )
     {
     if (numberOfPoints > this->GetPVRenderView()->GetLODThreshold())
       {
@@ -1403,7 +1409,7 @@ void vtkPVData::UpdateProperties()
     }
   this->UpdateTime.Modified();
 
-  if (this->GetPVSource()->GetHideDisplayPage())
+  if (source->GetHideDisplayPage())
     {
     return;
     }
@@ -2796,7 +2802,7 @@ void vtkPVData::SerializeRevision(ostream& os, vtkIndent indent)
 {
   this->Superclass::SerializeRevision(os,indent);
   os << indent << "vtkPVData ";
-  this->ExtractRevision(os,"$Revision: 1.138 $");
+  this->ExtractRevision(os,"$Revision: 1.139 $");
 }
 
 //----------------------------------------------------------------------------
