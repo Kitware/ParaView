@@ -35,7 +35,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVValueList);
-vtkCxxRevisionMacro(vtkPVValueList, "1.13");
+vtkCxxRevisionMacro(vtkPVValueList, "1.14");
 
 int vtkPVValueListCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -206,7 +206,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
                this->ContourValuesList->GetWidgetName());
   
   this->NewValueFrame->SetParent(this);
-  this->NewValueFrame->SetLabel("Add value:");
+  this->NewValueFrame->SetLabel("Add value");
   this->NewValueFrame->Create(app, "");
   
   this->Script("pack %s -expand yes -fill x",
@@ -214,7 +214,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   
   this->NewValueLabel->SetParent(this->NewValueFrame->GetFrame());
   this->NewValueLabel->Create(app, "");
-  this->NewValueLabel->SetLabel("New Value:");
+  this->NewValueLabel->SetLabel("New Value");
   this->NewValueLabel->SetBalloonHelpString("Enter a new value");
   this->NewValueLabel->SetWidth(17);
   this->NewValueLabel->SetBalloonHelpString(
@@ -254,7 +254,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
 
   this->GenerateFrame->SetParent(this);
   this->GenerateFrame->Create(app, "");
-  this->GenerateFrame->SetLabel("Generate range of values:");
+  this->GenerateFrame->SetLabel("Generate range of values");
   
   this->Script("pack %s -fill x -expand yes", 
                this->GenerateFrame->GetWidgetName());
@@ -266,7 +266,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
   
   this->GenerateLabel->SetParent(this->GenerateNumberFrame->GetFrame());
   this->GenerateLabel->Create(app, "");
-  this->GenerateLabel->SetLabel("Number of Values:");
+  this->GenerateLabel->SetLabel("Number of Values");
   this->GenerateLabel->SetWidth(17);
   
   this->GenerateEntry->SetParent(this->GenerateNumberFrame->GetFrame());
@@ -305,7 +305,7 @@ void vtkPVValueList::Create(vtkKWApplication *app)
 
   this->GenerateRangeLabel->SetParent(this->GenerateRangeFrame->GetFrame());
   this->GenerateRangeLabel->Create(app, "");
-  this->GenerateRangeLabel->SetLabel("Range:");
+  this->GenerateRangeLabel->SetLabel("Range");
   this->GenerateRangeLabel->SetWidth(17);
   this->GenerateRangeLabel->SetBalloonHelpString(
     "Set the minimum and maximum of the values to be added");

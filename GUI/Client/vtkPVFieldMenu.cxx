@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.9");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.10");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -112,7 +112,7 @@ void vtkPVFieldMenu::Create(vtkKWApplication *app)
 
   this->Label->SetParent(this);
   this->Label->Create(app, "-width 18 -justify right");
-  this->Label->SetLabel("Attribute Mode:");
+  this->Label->SetLabel("Attribute Mode");
   this->Label->SetBalloonHelpString(
     "Select whether to operate on point or cell data");
   this->Script("pack %s -side left", this->Label->GetWidgetName());
