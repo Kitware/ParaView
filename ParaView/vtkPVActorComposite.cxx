@@ -679,54 +679,61 @@ void vtkPVActorComposite::UpdateProperties()
     numArrays = fieldData->GetNumberOfArrays();
     for (i = 0; i < numArrays; i++)
       {
-      array = fieldData->GetArray(i);
-      numComps = array->GetNumberOfComponents();
-      for (j = 0; j < numComps; ++j)
+      if (fieldData->GetArrayName(i))
         {
-        sprintf(cmd, "ColorByPointFieldComponent %s %d",
-                fieldData->GetArrayName(i), j);
-        if (numComps == 1)
+        array = fieldData->GetArray(i);
+        numComps = array->GetNumberOfComponents();
+        for (j = 0; j < numComps; ++j)
           {
-          sprintf(tmp, "Point %s", fieldData->GetArrayName(i));
-          } 
-        else
-          {
-          sprintf(tmp, "Point %s %d", fieldData->GetArrayName(i), j);
+          sprintf(cmd, "ColorByPointFieldComponent %s %d",
+                  fieldData->GetArrayName(i), j);
+          if (numComps == 1)
+            {
+            sprintf(tmp, "Point %s", fieldData->GetArrayName(i));
+            }
+          else
+            {
+            sprintf(tmp, "Point %s %d", fieldData->GetArrayName(i), j);
+            }
+          this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+          if (strcmp(tmp, currentColorBy) == 0)
+            {
+            currentColorByFound = 1;
+            }
           }
-        this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-        if (strcmp(tmp, currentColorBy) == 0)
-          {
-          currentColorByFound = 1;
-          }
-        } 
+        }
       }
     }
+  
   fieldData = this->GetPVData()->GetVTKData()->GetCellData()->GetFieldData();
   if (fieldData)
     {
     numArrays = fieldData->GetNumberOfArrays();
     for (i = 0; i < numArrays; i++)
       {
-      array = fieldData->GetArray(i);
-      numComps = array->GetNumberOfComponents();
-      for (j = 0; j < numComps; ++j)
+      if (fieldData->GetArrayName(i))
         {
-        sprintf(cmd, "ColorByCellFieldComponent %s %d",
-                fieldData->GetArrayName(i), j);
-        if (numComps == 1)
+        array = fieldData->GetArray(i);
+        numComps = array->GetNumberOfComponents();
+        for (j = 0; j < numComps; ++j)
           {
-          sprintf(tmp, "Cell %s", fieldData->GetArrayName(i));
-          } 
-        else
-          {
-          sprintf(tmp, "Cell %s %d", fieldData->GetArrayName(i), j);
+          sprintf(cmd, "ColorByCellFieldComponent %s %d",
+                  fieldData->GetArrayName(i), j);
+          if (numComps == 1)
+            {
+            sprintf(tmp, "Cell %s", fieldData->GetArrayName(i));
+            } 
+          else
+            {
+            sprintf(tmp, "Cell %s %d", fieldData->GetArrayName(i), j);
+            }
+          this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
+          if (strcmp(tmp, currentColorBy) == 0)
+            {
+            currentColorByFound = 1;
+            }
           }
-        this->ColorMenu->AddEntryWithCommand(tmp, this, cmd);
-        if (strcmp(tmp, currentColorBy) == 0)
-          {
-          currentColorByFound = 1;
-          }
-        } 
+        }
       }
     }
   // If the current array we are coloring by has disappeared,
@@ -1169,7 +1176,9 @@ void vtkPVActorComposite::Initialize()
                this->GetCubeAxesTclName(), tclName);
   this->Script("%s SetInertia 20", this->GetCubeAxesTclName());
   
-  if ((array = this->PVData->GetVTKData()->GetPointData()->GetActiveScalars()))
+  if ((array =
+       this->PVData->GetVTKData()->GetPointData()->GetActiveScalars()) &&
+      (array->GetName()))
     {
     char *arrayName = (char*)array->GetName();
     char tmp[350];

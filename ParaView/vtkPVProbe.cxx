@@ -920,7 +920,8 @@ void vtkPVProbe::UpdateScalarsMenu()
     this->ScalarOperationMenu->ClearEntries();
     for (i = 0; i < fd->GetNumberOfArrays(); i++)
       {
-      if (fd->GetArray(i)->GetNumberOfComponents() == 1)
+      if ((fd->GetArray(i)->GetNumberOfComponents() == 1) &&
+          (fd->GetArrayName(i)))
         {
         this->ScalarOperationMenu->AddEntryWithCommand(fd->GetArrayName(i),
                                                        this, "ChangeScalars");
