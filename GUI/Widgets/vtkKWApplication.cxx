@@ -61,7 +61,7 @@ int vtkKWApplication::WidgetVisibility = 1;
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro( vtkKWApplication );
-vtkCxxRevisionMacro(vtkKWApplication, "1.183");
+vtkCxxRevisionMacro(vtkKWApplication, "1.184");
 
 extern "C" int Vtktcl_Init(Tcl_Interp *interp);
 extern "C" int Kwwidgetstcl_Init(Tcl_Interp *interp);
@@ -581,8 +581,7 @@ Tcl_Interp *vtkKWApplication::InitializeTcl(int argc,
     if (nameofexec && kwsys::SystemTools::FileExists(nameofexec))
       {
       char dir_unix[1024], buffer[1024];
-      kwsys_stl::string dir = 
-        kwsys::SystemTools::GetFilenamePath(nameofexec);
+      kwsys_stl::string dir = kwsys::SystemTools::GetFilenamePath(nameofexec);
       kwsys::SystemTools::ConvertToUnixSlashes(dir);
       strcpy(dir_unix, dir.c_str());
 
