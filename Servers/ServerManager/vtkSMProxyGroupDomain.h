@@ -16,7 +16,11 @@
 // .SECTION Description
 // The proxy group domain consists of all proxies in a list of groups.
 // This domain is commonly used together with vtkSMProxyPropery
-// .SECTION See Also
+// Valid XML elements are:
+// @verbatim
+// * <Group name=""> where name is the groupname used by the proxy
+// manager to refer to a group of proxies.
+// @endverbatim// .SECTION See Also
 // vtkSMDomain vtkSMProxyPropery
 
 #ifndef __vtkSMProxyGroupDomain_h

@@ -12,8 +12,14 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMNumberOfPartsDomain -
+// .NAME vtkSMNumberOfPartsDomain - restricts the number of parts of input
 // .SECTION Description
+// vtkSMInputArrayDomain requires that the source proxy pointed by the
+// property has an output with the specified multiplicity of parts:
+// SINGLE or MULTIPLE.  Valid XML attributes are:
+// @verbatim
+// * multiplicity - can be either single or multiple
+// @endverbatim
 // .SECTION See Also
 // vtkSMDomain 
 
@@ -46,6 +52,7 @@ public:
   int IsInDomain(vtkSMSourceProxy* proxy);
 
   // Description:
+  // Set/get the part multiplicity. Can be either SINGLE or MULTIPLE.
   vtkSetMacro(PartMultiplicity, unsigned char);
   vtkGetMacro(PartMultiplicity, unsigned char);
 

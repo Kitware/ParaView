@@ -16,6 +16,11 @@
 // .SECTION Description
 // vtkSMEnumerationDomain represents an enumeration of integer values
 // with associated descriptive strings.
+// Valid XML elements are:
+// @verbatim
+// * <Entry text="" value=""/> where text is the descriptive
+// string and value is the integer value.
+// @endverbatim
 // .SECTION See Also
 // vtkSMDomain 
 

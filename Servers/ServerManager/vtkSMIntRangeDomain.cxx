@@ -21,7 +21,7 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkSMIntRangeDomain);
-vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.4");
+vtkCxxRevisionMacro(vtkSMIntRangeDomain, "1.5");
 
 struct vtkSMIntRangeDomainInternals
 {
@@ -101,6 +101,18 @@ int vtkSMIntRangeDomain::IsInDomain(unsigned int idx, int val)
 }
 
 //---------------------------------------------------------------------------
+unsigned int vtkSMIntRangeDomain::GetNumberOfEntries()
+{
+  return this->IRInternals->Entries.size();
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntRangeDomain::SetNumberOfEntries(unsigned int size)
+{
+  this->IRInternals->Entries.resize(size);
+}
+
+//---------------------------------------------------------------------------
 int vtkSMIntRangeDomain::GetMinimum(unsigned int idx, int& exists)
 {
   exists = 0;
@@ -145,6 +157,16 @@ void vtkSMIntRangeDomain::RemoveMinimum(unsigned int idx)
 }
 
 //---------------------------------------------------------------------------
+void vtkSMIntRangeDomain::RemoveAllMinima()
+{
+  unsigned int numEntries = this->GetNumberOfEntries();
+  for(unsigned int idx=0; idx<numEntries; idx++)
+    {
+    this->SetEntry(idx, vtkSMIntRangeDomain::MIN, 0, 0);
+    }
+}
+
+//---------------------------------------------------------------------------
 void vtkSMIntRangeDomain::AddMaximum(unsigned int idx, int val)
 {
   this->SetEntry(idx, vtkSMIntRangeDomain::MAX, 1, val);
@@ -154,6 +176,16 @@ void vtkSMIntRangeDomain::AddMaximum(unsigned int idx, int val)
 void vtkSMIntRangeDomain::RemoveMaximum(unsigned int idx)
 {
   this->SetEntry(idx, vtkSMIntRangeDomain::MAX, 0, 0);
+}
+
+//---------------------------------------------------------------------------
+void vtkSMIntRangeDomain::RemoveAllMaxima()
+{
+  unsigned int numEntries = this->GetNumberOfEntries();
+  for(unsigned int idx=0; idx<numEntries; idx++)
+    {
+    this->SetEntry(idx, vtkSMIntRangeDomain::MAX, 0, 0);
+    }
 }
 
 //---------------------------------------------------------------------------

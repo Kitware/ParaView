@@ -16,6 +16,13 @@
 // .SECTION Description
 // vtkSMDoubleRangeDomain represents an interval in real space (using
 // double precision) specified using a min and a max value.
+// Valid XML attributes are:
+// @verbatim
+// * min 
+// * max
+// @endverbatim
+// Both min and max attributes can have one or more space space
+// separated (double) arguments.
 // .SECTION See Also
 // vtkSMDomain 
 

@@ -18,7 +18,11 @@
 // These data types are specified in the XML with the <DataType> element.
 // VTK class names are used. It is possible to specify a superclass
 // (i.e. vtkDataSet) for a more general domain. Works with vtkSMSourceProxy
-// only.
+// only. Valid XML elements are:
+// @verbatim
+// * <DataType value=""> where value is the classname for the data type
+// for example: vtkDataSet, vtkImageData,...
+// @endverbatim
 // .SECTION See Also
 // vtkSMDomain  vtkSMSourceProxy
 

@@ -12,8 +12,20 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-// .NAME vtkSMInputArrayDomain -
+// .NAME vtkSMInputArrayDomain - requires input has array of described type
 // .SECTION Description
+// vtkSMInputArrayDomain requires that the source proxy pointed by the
+// property has an output with one or more arrays of specified type.
+// Current restrictions include whether the array is part of point or
+// cell data and whether it has a given number of components. These
+// are specified in the XML file. Valid XML attributes are:
+// @verbatim
+// * attribute_type - cell or point
+// * number_of_components
+// @endverbatim
+// The attribute type can also be (optionally) obtained from a required
+// property FieldDataSelection which has a value of 
+// vtkDataSet::POINT_DATA_FIELD or  vtkDataSet::CELL_DATA_FIELD.
 // .SECTION See Also
 // vtkSMDomain 
 
@@ -42,21 +54,28 @@ public:
 
   // Description:
   // Returns true if input has one or more arrays that match the
-  // requirements
+  // requirements.
   int IsInDomain(vtkSMSourceProxy* proxy);
 
   // Description:
+  // Returns 1 if the array represented by the array information is
+  // a valid field. The attribute type (point or cell) as well as the 
+  // number of components are checked for a match
   int IsFieldValid(vtkSMSourceProxy* proxy, vtkPVArrayInformation* arrayInfo);
   int IsFieldValid(
     vtkSMSourceProxy* proxy, vtkPVArrayInformation* arrayInfo, int bypass);
   
   // Description:
+  // Set/get the attribute type. Valid values are: POINT, CELL, ANY.
+  // Text representations are: point, cell, any.
   vtkSetMacro(AttributeType, unsigned char);
   vtkGetMacro(AttributeType, unsigned char);
   const char* GetAttributeTypeAsString();
   virtual void SetAttributeType(const char* type);
 
   // Description:
+  // Set/get the required number of components. Set to 0 for
+  // no check.
   vtkSetMacro(NumberOfComponents, int);
   vtkGetMacro(NumberOfComponents, int);
 

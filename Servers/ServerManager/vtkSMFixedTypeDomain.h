@@ -15,9 +15,9 @@
 // .NAME vtkSMFixedTypeDomain - restricts the proxy to have the same type as previous proxy
 // .SECTION Description
 // vtkSMFixedTypeDomain is used by input properties of filters that can
-// not have different input types after it is set the first time. For
+// not have different input types after input is set the first time. For
 // example, a sub-class vtkDataSetToDataSetFilter, once connected in
-// a pipeline can not change it's input time, say, from vtkImageData to
+// a pipeline can not change it's input type, say, from vtkImageData to
 // vtkUnstructuredGrid because it's output can not change. 
 // .SECTION See Also
 // vtkSMDomain 
@@ -41,7 +41,7 @@ public:
   // The propery has to be a vtkSMProxyProperty which points
   // to a vtkSMSourceProxy. If the new (unchecked) source proxy
   // has the same number of parts and data types as the old
-  // one, it returns 1. Returns 0 otherwise.
+  // (checked) one, it returns 1. Returns 0 otherwise.
   virtual int IsInDomain(vtkSMProperty* property);
 
   // Description:
