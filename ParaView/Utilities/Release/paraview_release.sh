@@ -300,7 +300,7 @@ config()
         echo "${CONFIG_FILE} should specify CC, CXX, and PLATFORM." &&
         return 1
     fi
-    export CC CXX CFLAGS CXXFLAGS PATH LD_LIBRARY_PATH
+    export CC CXX CFLAGS CXXFLAGS PATH LD_LIBRARY_PATH DISPLAY
 }
 
 #-----------------------------------------------------------------------------

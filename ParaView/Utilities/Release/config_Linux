@@ -4,4 +4,4 @@ CXX="c++322s"
 CFLAGS=""
 CXXFLAGS=""
 CMAKE="/usr/local/bin/cmake"
-export DISPLAY=:0.0
+DISPLAY=:0.0
