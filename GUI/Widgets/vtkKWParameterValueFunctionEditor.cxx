@@ -32,7 +32,7 @@
 
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.34");
+vtkCxxRevisionMacro(vtkKWParameterValueFunctionEditor, "1.35");
 
 int vtkKWParameterValueFunctionEditorCommand(ClientData cd, Tcl_Interp *interp, int argc, char *argv[]);
 
@@ -1251,24 +1251,16 @@ void vtkKWParameterValueFunctionEditor::Create(vtkKWApplication *app,
 }
 
 //----------------------------------------------------------------------------
-void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app)
+void vtkKWParameterValueFunctionEditor::CreateLabel(vtkKWApplication *app, const char *args)
 {
-  // Override the parent's CreateLabel()
-  // This will also create the label on the fly, if needed
-  
-  vtkKWLabel *label = this->GetLabel();
-  if (label->IsCreated())
+  if (this->HasLabel() && this->GetLabel()->IsCreated())
     {
     return;
     }
 
-  label->SetParent(this);
-  label->Create(app, "-anchor w -bd 0");
+  this->Superclass::CreateLabel(app, NULL);
   vtkKWTkUtilities::ChangeFontWeightToBold(
-    app->GetMainInterp(), label->GetWidgetName());
-
-  label->SetBalloonHelpString(this->GetBalloonHelpString());
-  label->SetBalloonHelpJustification(this->GetBalloonHelpJustification());
+    app->GetMainInterp(), this->GetLabel()->GetWidgetName());
 }
 
 //----------------------------------------------------------------------------

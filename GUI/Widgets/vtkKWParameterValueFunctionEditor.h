@@ -1046,7 +1046,7 @@ protected:
   // Description:
   // Create some objects on the fly (lazy creation, to allow for a smaller
   // footprint)
-  virtual void CreateLabel(vtkKWApplication *app);
+  virtual void CreateLabel(vtkKWApplication *app, const char *args = 0);
   virtual void CreateParameterRange(vtkKWApplication *app);
   virtual void CreateValueRange(vtkKWApplication *app);
   virtual void CreateRangeLabel(vtkKWApplication *app);
