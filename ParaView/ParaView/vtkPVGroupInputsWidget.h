@@ -88,6 +88,12 @@ public:
   // Access metod necessary for scripting.
   void SetSelectState(vtkPVSource* input, int val);
 
+  // Description:
+  // No buttons yet, just used for tracing.
+  void AllOnCallback();
+  void AllOffCallback();
+
+
 protected:
   vtkPVGroupInputsWidget();
   ~vtkPVGroupInputsWidget();

@@ -27,7 +27,9 @@ SET(PROJECT_TESTS ArrayMenuChangeInput
                EnSight
                Extrusion
                ExtractGrid
+	       ExtractPart
                Glyph
+	       Group
                ImageReader
                Mandelbrot
                ProbeLine

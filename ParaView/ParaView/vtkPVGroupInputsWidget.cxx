@@ -55,7 +55,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.9");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.10");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -257,7 +257,6 @@ void vtkPVGroupInputsWidget::SetSelectState(vtkPVSource *input, int val)
   idx = 0;
   while ( (pvs = sources->GetNextPVSource()) )
     {
-    pvs = sources->GetNextPVSource();
     if (pvs == input)
       {
       this->PartSelectionList->SetSelectState(idx, val);
@@ -282,7 +281,7 @@ void vtkPVGroupInputsWidget::Trace(ofstream *file)
     {
     return;
     }
-
+  *file << "$kw(" << this->GetTclName() << ") AllOffCallback" << endl;
  
   this->Inputs->InitTraversal();
   while ( (pvs = this->Inputs->GetNextPVSource()) )
@@ -298,6 +297,64 @@ void vtkPVGroupInputsWidget::Trace(ofstream *file)
       }
     }
 }
+
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVGroupInputsWidget::AllOnCallback()
+{
+  int num, idx;
+
+  num = this->PartSelectionList->GetNumberOfItems();
+
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->PartSelectionList->SetSelectState(idx, 1);
+    }
+
+  this->ModifiedFlag = 1;
+}
+
+//----------------------------------------------------------------------------
+void vtkPVGroupInputsWidget::AllOffCallback()
+{
+  int num, idx;
+
+  num = this->PartSelectionList->GetNumberOfItems();
+
+  vtkPVApplication *pvApp = this->GetPVApplication();
+
+  for (idx = 0; idx < num; ++idx)
+    {
+    this->PartSelectionList->SetSelectState(idx, 0);
+    }
+
+  this->ModifiedFlag = 1;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
