@@ -65,7 +65,6 @@ SET( ParaViewClient_SRCS
   vtkPVConnectDialog.cxx
   vtkPVContainerWidget.cxx
   vtkPVContourEntry.cxx
-  vtkPVContourWidgetProperty.cxx
   vtkPVCutEntry.cxx
   vtkPVDReaderModule.cxx
   vtkPVDWriter.cxx
@@ -133,7 +132,7 @@ SET( ParaViewClient_SRCS
   vtkPVStringAndScalarListWidgetProperty.cxx
   vtkPVStringEntry.cxx
   vtkPVStringWidgetProperty.cxx
-	vtkPVTempTessellatorEntry.cxx
+  vtkPVTempTessellatorEntry.cxx
   vtkPVThumbWheel.cxx
   vtkPVTimerLogDisplay.cxx
   vtkPVTraceFileDialog.cxx
