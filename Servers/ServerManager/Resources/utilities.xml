@@ -49,7 +49,7 @@
          command="SetVectorMode"
          number_of_elements="1" 
          default_values="1">
-       <EnumarationDomain name="enum" 
+       <EnumerationDomain name="enum" 
           values="MAGNITUDE:0 COMPONENT:1" />
       </IntVectorProperty>
     </LookupTableProxy>
@@ -108,6 +108,52 @@
          argument_is_array="1"
          default_values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0">
       </DoubleVectorProperty>
+    </Proxy>
+  </ProxyGroup>
+
+  <ProxyGroup name="text_properties">
+    <Proxy name="TextProperty" class="vtkTextProperty">
+      <DoubleVectorProperty
+        name="Color"
+        command="SetColor"
+        number_of_elements="3"
+        default_values="1 1 1">
+      </DoubleVectorProperty>
+
+      <IntVectorProperty
+        name="FontFamily"
+        command="SetFontFamily"
+        number_of_elements="1"
+        default_values="0">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Bold"
+        command="SetBold"
+        number_of_elements="1"
+        default_values="1">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Italic"
+        command="SetItalic"
+        number_of_elements="1"
+        default_values="1">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Shadow"
+        command="SetShadow"
+        number_of_elements="1"
+        default_values="1">
+      </IntVectorProperty>
+
+      <IntVectorProperty
+        name="Opacity"
+        command="SetOpacity"
+        number_of_elements="1"
+        default_values="1">
+      </IntVectorProperty>
     </Proxy>
   </ProxyGroup>
 

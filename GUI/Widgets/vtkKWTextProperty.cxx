@@ -100,7 +100,7 @@ static unsigned char image_copy[] =
 
 // ----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkKWTextProperty);
-vtkCxxRevisionMacro(vtkKWTextProperty, "1.34");
+vtkCxxRevisionMacro(vtkKWTextProperty, "1.34.2.1");
 
 int vtkKWTextPropertyCommand(ClientData cd, Tcl_Interp *interp,
                       int argc, char *argv[]);
@@ -1111,6 +1111,57 @@ void vtkKWTextProperty::SaveInTclScript(ofstream *file,
     *file << name << " SetOpacity " << this->GetOpacity() << endl;
     }
 }
+
+//----------------------------------------------------------------------------
+// Special method to avoid duplicating code for TitleTextProperty and LabelTextProperty
+//
+void vtkKWTextProperty::SaveInBatchScript(const char* iden, ofstream *file)
+{
+  // This method was copy / paste / modified from vtkKWTextProperty::SaveInTclScript
+  // This is really a temporary solution and shouldn't be used in any future
+
+  //iden can basically be either pvTitle or pvLabel
+  *file << "set " << iden
+        << " [$proxyManager NewProxy text_properties TextProperty]"
+        << endl;
+  *file << "  $proxyManager RegisterProxy text_properties " << iden
+        << " $" << iden  << endl;
+  *file << "  $" << iden << " UnRegister {}" << endl;
+
+  double *rgb = this->GetColor();
+  *file << "  [$" << iden 
+        << " GetProperty Color] SetElements3 "
+        << rgb[0] << " "  << rgb[1] << " "  << rgb[2]
+        << endl;
+
+  vtkTextProperty *tprop = this->GetTextProperty();
+  *file << "  [$" << iden 
+        << " GetProperty FontFamily] SetElements1 "
+        << tprop->GetFontFamily() << endl;
+
+  *file << "  [$" << iden 
+        << " GetProperty Bold] SetElements1 "
+        << tprop->GetBold() << endl;
+
+  *file << "  [$" << iden 
+        << " GetProperty Italic] SetElements1 "
+        << tprop->GetItalic() << endl;
+
+  *file << "  [$" << iden 
+        << " GetProperty Shadow] SetElements1 "
+        << tprop->GetShadow() << endl;
+
+  *file << "  [$" << iden 
+        << " GetProperty Opacity] SetElements1 "
+        << this->GetOpacity() << endl;
+
+  *file << "  $" << iden << " UpdateVTKObjects"
+        << endl;  //Extremly important do not forget this line.
+
+  *file << endl;
+}
+
+
 
 //----------------------------------------------------------------------------
 void vtkKWTextProperty::UpdateEnableState()

@@ -127,7 +127,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVWindow);
-vtkCxxRevisionMacro(vtkPVWindow, "1.585.2.2");
+vtkCxxRevisionMacro(vtkPVWindow, "1.585.2.3");
 
 int vtkPVWindowCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -143,7 +143,15 @@ vtkPVWindow::vtkPVWindow()
 
   this->InteractiveRenderEnabled = 0;
   this->SetWindowClass("ParaView");
-  this->SetTitle("Kitware ParaView");
+  char* title = getenv("PARAVIEW_TITLE");
+  if( title )
+    {
+    this->SetTitle( title );
+    }
+  else
+    {
+    this->SetTitle( "Kitware ParaView" );
+    }
 
   this->CommandFunction = vtkPVWindowCommand;
   this->ModifiedEnableState = 0;

@@ -48,9 +48,11 @@
 #include "vtkScalarBarWidget.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVRenderModule.h"
+#include "vtkTextProperty.h"
+
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVColorMap);
-vtkCxxRevisionMacro(vtkPVColorMap, "1.95");
+vtkCxxRevisionMacro(vtkPVColorMap, "1.95.2.1");
 
 int vtkPVColorMapCommand(ClientData cd, Tcl_Interp *interp,
                      int argc, char *argv[]);
@@ -1829,52 +1831,85 @@ void vtkPVColorMap::SaveInBatchScript(ofstream *file)
 
 // TODO implement all this
 
-//    if (this->ScalarBarVisibility)
-//      {
-//      char scalarBarTclName[128];
-//      sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
-//      ostrstream actor;
+    if (this->ScalarBarVisibility)
+      {
+      
+      *file << endl;
 
-//      //*file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
-//      *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
-//      actor << scalarBarTclName << ends;
+      // First thing define the TextProperty (Title and Label )
+      ostrstream pvTitle, pvLabel;
+      pvTitle << "pvTitle" << this->ScalarBarActorID << ends;
+      this->TitleTextPropertyWidget->SaveInBatchScript( pvTitle.str(), file );
 
-//      *file << "\t" << actor.str() << " SetLookupTable pvTemp" 
-//            << this->LookupTableID << "\n";
+      pvLabel << "pvLabel" << this->ScalarBarActorID << ends;
+      this->LabelTextPropertyWidget->SaveInBatchScript( pvLabel.str(), file );
 
-//      *file << "\t" << actor.str() << " SetOrientation "
-//            << this->ScalarBar->GetScalarBarActor()->GetOrientation() << "\n";
+      *file << "set pvTemp" <<  this->ScalarBarActorID
+            << " [$proxyManager NewProxy rendering ScalarBarActor]"
+            << endl;
+      *file << "  $proxyManager RegisterProxy scalar_bar pvTemp"
+            << this->ScalarBarActorID << " $pvTemp" << this->ScalarBarActorID
+            << endl;
+      *file << "  $pvTemp" << this->ScalarBarActorID << " UnRegister {}" << endl;
 
-//      *file << "\t" << actor.str() << " SetWidth " 
-//            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty LookupTable] AddProxy $pvTemp"
+            << this->LookupTableID << endl;
 
-//      *file << "\t" << actor.str() << " SetHeight " 
-//            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty TitleTextProperty] AddProxy $" << pvTitle.str()
+            << endl;
 
-//      const double *pos = 
-//       this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
-//      *file << "\t[" << actor.str() << " GetPositionCoordinate] SetValue " 
-//            << pos[0] << " " << pos[1] << "\n";
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty LabelTextProperty] AddProxy $" << pvLabel.str()
+            << endl;
 
-//      *file << "\t" << actor.str() << " SetTitle {" 
-//            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty Orientation] SetElements1 "
+            << this->ScalarBar->GetScalarBarActor()->GetOrientation() << endl;
 
-//      *file << "\t" << actor.str() << " SetLabelFormat {" 
-//            << this->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}\n";
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty Width] SetElements1 " 
+            << this->ScalarBar->GetScalarBarActor()->GetWidth() << endl;
 
-//      ostrstream ttprop, tlprop;
-//      ttprop << "[" << actor.str() << " GetTitleTextProperty]" << ends;
-//      this->TitleTextPropertyWidget->SaveInTclScript(file, ttprop.str());
-//      ttprop.rdbuf()->freeze(0);
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty Height] SetElements1 " 
+            << this->ScalarBar->GetScalarBarActor()->GetHeight() << endl;
 
-//      tlprop << "[" << actor.str() << " GetLabelTextProperty]" << ends;
-//      this->LabelTextPropertyWidget->SaveInTclScript(file, tlprop.str());
-//      tlprop.rdbuf()->freeze(0);
+      const double *pos = 
+       this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty Position] SetElements2 " 
+            << pos[0] << " " << pos[1] << endl;
 
-//      *file << "Ren1" << " AddActor " << scalarBarTclName << endl;
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty Title] SetElement 0 {" 
+            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}" << endl;
 
-//      actor.rdbuf()->freeze(0);
-//      }
+      *file << "  [$pvTemp" << this->ScalarBarActorID 
+            << " GetProperty LabelFormat] SetElement 0 {" 
+            << this->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}" 
+            << endl;
+
+      pvTitle.rdbuf()->freeze(0);
+      pvLabel.rdbuf()->freeze(0);
+
+/*      ostrstream ttprop, tlprop;
+      ttprop << "[$pvTemp" << this->ScalarBarActorID  << " GetTitleTextProperty]" << ends;
+      this->TitleTextPropertyWidget->SaveInBatchScript(file, ttprop.str());
+      ttprop.rdbuf()->freeze(0);
+
+      tlprop << "[$pvTemp" << this->ScalarBarActorID  << " GetLabelTextProperty]" << ends;
+      this->LabelTextPropertyWidget->SaveInBatchScript(file, tlprop.str());
+      tlprop.rdbuf()->freeze(0);*/
+      
+      *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp" << this->ScalarBarActorID << endl;
+
+      *file << "  $pvTemp" << this->ScalarBarActorID << " UpdateVTKObjects"
+            << endl;
+      *file << endl;
+
+      }
 }
 
 //----------------------------------------------------------------------------
@@ -2542,3 +2577,48 @@ void vtkPVColorMap::PrintSelf(ostream& os, vtkIndent indent)
   os << indent << "ScalarBarCheck: " << this->ScalarBarCheck << endl;
 }
 
+
+
+    /*  char scalarBarTclName[128];
+      sprintf(scalarBarTclName, "ScalarBar%d", this->InstanceCount);
+      ostrstream actor;
+
+      //*file << "vtkScalarBarWidget " << scalarBarTclName << "\n";
+      *file << "vtkScalarBarActor " << scalarBarTclName << "\n";
+      actor << scalarBarTclName << ends;
+
+      *file << "\t" << actor.str() << " SetLookupTable pvTemp" 
+            << this->LookupTableID << "\n";
+
+      *file << "\t" << actor.str() << " SetOrientation "
+            << this->ScalarBar->GetScalarBarActor()->GetOrientation() << "\n";
+
+      *file << "\t" << actor.str() << " SetWidth " 
+            << this->ScalarBar->GetScalarBarActor()->GetWidth() << "\n";
+
+      *file << "\t" << actor.str() << " SetHeight " 
+            << this->ScalarBar->GetScalarBarActor()->GetHeight() << "\n";
+
+      const double *pos = 
+       this->ScalarBar->GetScalarBarActor()->GetPositionCoordinate()->GetValue();
+      *file << "\t[" << actor.str() << " GetPositionCoordinate] SetValue " 
+            << pos[0] << " " << pos[1] << "\n";
+
+      *file << "\t" << actor.str() << " SetTitle {" 
+            << this->ScalarBar->GetScalarBarActor()->GetTitle() << "}\n";
+
+      *file << "\t" << actor.str() << " SetLabelFormat {" 
+            << this->ScalarBar->GetScalarBarActor()->GetLabelFormat() << "}\n";
+
+      ostrstream ttprop, tlprop;
+      ttprop << "[" << actor.str() << " GetTitleTextProperty]" << ends;
+      this->TitleTextPropertyWidget->SaveInBatchScript(file, ttprop.str());
+      ttprop.rdbuf()->freeze(0);
+
+      tlprop << "[" << actor.str() << " GetLabelTextProperty]" << ends;
+      this->LabelTextPropertyWidget->SaveInBatchScript(file, tlprop.str());
+      tlprop.rdbuf()->freeze(0);
+
+      *file << "Ren1" << " AddActor " << scalarBarTclName << endl;
+
+      actor.rdbuf()->freeze(0);*/

@@ -159,6 +159,10 @@ public:
                        int tabify = 1);
 
   // Description:
+  // Temporary solution, don't use
+  void SaveInBatchScript(const char* iden, ofstream *file);
+
+  // Description:
   // Update the "enable" state of the object and its internal parts.
   // Depending on different Ivars (this->Enabled, the application's 
   // Limited Edition Mode, etc.), the "enable" state of the object is updated

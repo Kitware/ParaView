@@ -79,7 +79,8 @@
 #include "vtkToolkits.h"
 #include "vtkWindowToImageFilter.h"
 #include "vtkClientServerStream.h"
-
+#include "vtkCornerAnnotation.h"
+#include "vtkKWTextProperty.h"
 
 #ifdef _WIN32
 #include "vtkWin32OpenGLRenderWindow.h"
@@ -135,7 +136,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVRenderView);
-vtkCxxRevisionMacro(vtkPVRenderView, "1.332.2.1");
+vtkCxxRevisionMacro(vtkPVRenderView, "1.332.2.2");
 
 int vtkPVRenderViewCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -1888,7 +1889,49 @@ void vtkPVRenderView::SaveInBatchScript(ofstream* file)
     {
     *file << clippingRange[i] << " ";
     }
+
+  //Don't forget to save the corner annotation:
+  // As I don't have no ID for the corner annotation, let's use '000'
+  const char cornId[] = "000";
+  vtkCornerAnnotation *corn = this->CornerAnnotation->GetCornerAnnotation ();
   *file << endl;
+  *file << endl;
+  *file << "set pvTemp" << cornId
+        << " [$proxyManager NewProxy rendering CornerAnnotation]"
+        << endl;
+  *file << "  $proxyManager RegisterProxy corner_annotation pvTemp"
+        << cornId << " $pvTemp" << cornId << endl;
+  *file << "  $pvTemp" << cornId << " UnRegister {}" << endl;
+
+  *file << "  [$pvTemp" << cornId 
+        << " GetProperty MaximumLineHeight] SetElements1 "
+        << corn->GetMaximumLineHeight() << endl;
+
+  for(i=0; i<4; i++)
+    {
+    *file << "  [$pvTemp" << cornId 
+          << " GetProperty Text] SetElement " << i 
+          << " {";
+      if( corn->GetText( i ) )
+        {
+        *file << corn->GetText( i );
+        }
+    *file << "}" << endl;
+    }
+
+//  [$pvTemp201 GetProperty TextProperty] AddProxy $pvTitle200
+  vtkKWTextProperty *text = this->CornerAnnotation->GetTextPropertyWidget ();
+  const char cornTextProp[] = "cornTextProp";
+  text->SaveInBatchScript( cornTextProp , file );
+
+  *file << "  [$pvTemp" << cornId
+        << " GetProperty TextProperty] AddProxy $" << cornTextProp
+        << endl;
+
+  *file << "  $pvTemp" << cornId << " UpdateVTKObjects " << endl;
+  *file << "  [$Ren1 GetProperty Displayers] AddProxy $pvTemp" << cornId << endl;
+
+//  *file << endl;
 }
 
 
