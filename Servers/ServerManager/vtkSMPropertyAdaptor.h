@@ -117,10 +117,13 @@ public:
   // Returns either INT, DOUBLE, STRING, PROXY, BOOLEAN or UNKNOWN
   int GetElementType();
 
+  // Description:
+  int SetGenericValue(unsigned int idx, const char* value);
+
 //BTX
   enum PropertyTypes
   {
-    UNKNOWN,
+    UNKNOWN = 0,
     ENUMERATION,
     SELECTION,
     RANGE
@@ -128,7 +131,7 @@ public:
 
   enum ElementType
   {
-    INT,
+    INT = RANGE + 1,
     DOUBLE,
     STRING,
     BOOLEAN,
