@@ -22,9 +22,9 @@
 #include <vtkstd/vector>
 
 vtkStandardNewMacro(vtkPVFileEntryProperty);
-vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.7");
+vtkCxxRevisionMacro(vtkPVFileEntryProperty, "1.8");
 
-class vtkPVFileEntryPropertyList : vtkstd::vector<vtkstd::string>
+class vtkPVFileEntryPropertyList : public vtkstd::vector<vtkstd::string>
 {
   typedef vtkstd::vector<vtkstd::string> ListType;
 public:
