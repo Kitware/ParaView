@@ -75,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.11");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.12");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -441,7 +441,9 @@ int vtkPVAnimationCue::CreateAndAddKeyFrame(double time, int type)
   // domain and property values.
   if (!this->InRecording)
     {
-    pvAM->SetCurrentTime(time);
+    // Don't do this since it disturbs the entire system.
+    // Issues with domain sync are as such not addressed fully by doing this.
+    // pvAM->SetCurrentTime(time);
     }
   
   ostrstream str ;
