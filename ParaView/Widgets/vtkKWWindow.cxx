@@ -72,7 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.146");
+vtkCxxRevisionMacro(vtkKWWindow, "1.147");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -732,8 +732,6 @@ void vtkKWWindow::Create(vtkKWApplication *app, char *args)
                this->ViewFrame->GetWidgetName());
 
   this->ToolbarFrame->Create(app, "frame", "-bd 0");
-  this->Script("pack %s -side bottom -fill x -expand no",
-    this->ToolbarFrame->GetWidgetName());
   
   // Set up standard menus
   this->Menu->SetTearOff(0);
@@ -1122,7 +1120,7 @@ void vtkKWWindow::SerializeRevision(ostream& os, vtkIndent indent)
 {
   vtkKWWidget::SerializeRevision(os,indent);
   os << indent << "vtkKWWindow ";
-  this->ExtractRevision(os,"$Revision: 1.146 $");
+  this->ExtractRevision(os,"$Revision: 1.147 $");
 }
 
 int vtkKWWindow::ExitDialog()
@@ -1573,6 +1571,48 @@ void vtkKWWindow::UpdateToolbarAspect()
         {
         tb->SetFlatAspect(flat_frame);
         tb->SetWidgetsFlatAspect(flat_buttons);
+        }
+      it->GoToNextItem();
+      }
+    it->Delete();
+    }
+
+  // Now the split frame packing mechanism is so weird that I will have
+  // to unpack the toolbar frame myself in case it's empty, otherwise
+  // the middle frame won't claim the space used by the toolbar frame
+
+  if (this->ToolbarFrame && this->ToolbarFrame->IsCreated())
+    {
+    if (this->ToolbarFrame->GetNumberOfPackedChildren())
+      {
+      this->Script("pack %s -side top -fill x -expand no -before %s",
+                   this->ToolbarFrame->GetWidgetName(),
+                   this->MiddleFrame->GetWidgetName());
+      }
+    else
+      {
+      this->ToolbarFrame->Unpack();
+      }
+    }
+}
+
+//----------------------------------------------------------------------------
+void vtkKWWindow::UpdateEnableState()
+{
+  this->Superclass::UpdateEnableState();
+
+  // Update the toolbars
+
+  if (this->Toolbars)
+    {
+    vtkKWToolbar *tb = NULL;
+    vtkVectorIterator<vtkKWToolbar *> *it = this->Toolbars->NewIterator();
+    it->InitTraversal();
+    while (!it->IsDoneWithTraversal())
+      {
+      if (it->GetData(tb) == VTK_OK)
+        {
+        tb->SetEnabled(this->Enabled);
         }
       it->GoToNextItem();
       }

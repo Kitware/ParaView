@@ -425,12 +425,13 @@ protected:
 
   vtkKWTclInteractor *TclInteractor;
 
+  // Update the enable state. This should propagate similar calls to the
+  // internal widgets.
+  virtual void UpdateEnableState();
+
 private:
   vtkKWWindow(const vtkKWWindow&); // Not implemented
   void operator=(const vtkKWWindow&); // Not implemented
 };
 
-
 #endif
-
-
