@@ -193,6 +193,7 @@ static const char *vtkKWEventStrings[] = {
   "WindowInterfaceChangedEvent",
   "WindowLayoutChangedEvent",
   "WindowLevelChangedEvent",
+  "WindowLevelChangingEndEvent",
   "WindowLevelChangingEvent",
   "WindowLevelResetEvent",
   // PV

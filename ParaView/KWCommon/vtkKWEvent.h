@@ -203,6 +203,7 @@ class VTK_EXPORT vtkKWEvent
     WindowInterfaceChangedEvent,
     WindowLayoutChangedEvent,
     WindowLevelChangedEvent,
+    WindowLevelChangingEndEvent,
     WindowLevelChangingEvent,
     WindowLevelResetEvent,
     // PV
