@@ -201,6 +201,14 @@ SOURCE=.\vtkPVData.cxx
 # End Source File
 # Begin Source File
 
+SOURCE=.\vtkPVDataList.cxx
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVDataListTcl.cxx
+# End Source File
+# Begin Source File
+
 SOURCE=.\vtkPVDataTcl.cxx
 # End Source File
 # Begin Source File
@@ -583,6 +591,26 @@ SOURCE=.\vtkPVData.h
 # Begin Custom Build
 InputPath=.\vtkPVData.h
 InputName=vtkPVData
+
+"$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=.\vtkPVDataList.h
+
+!IF  "$(CFG)" == "ParaView - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "ParaView - Win32 Debug"
+
+# Begin Custom Build
+InputPath=.\vtkPVDataList.h
+InputName=vtkPVDataList
 
 "$(InputName)Tcl.cxx" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
 	..\..\vtk\pcmaker\vtkWrapTcl.exe $(InputName).h hints 1 > $(InputName)Tcl.cxx

@@ -78,6 +78,16 @@ void vtkInteractorStyleCamera::OnMouseMove(int vtkNotUsed(ctrl),
     this->FindPokedCamera(x, y);
     this->RotateXY(x - this->LastPos[0], y - this->LastPos[1]);
     }
+  else if (this->State == VTK_INTERACTOR_STYLE_CAMERA_PAN)
+    {
+    this->FindPokedCamera(x, y);
+    this->PanXY(x, y, this->LastPos[0], this->LastPos[1]);
+    }
+  else if (this->State == VTK_INTERACTOR_STYLE_CAMERA_ZOOM)
+    {
+    this->FindPokedCamera(x, y);
+    this->DollyXY(x - this->LastPos[0], y - this->LastPos[1]);
+    }
 
   this->LastPos[0] = x;
   this->LastPos[1] = y;
@@ -118,12 +128,97 @@ void vtkInteractorStyleCamera::RotateXY(int dx, int dy)
   rwi->Render();
 }
 
+//----------------------------------------------------------------------------
+void vtkInteractorStyleCamera::PanXY(int x, int y, int oldX, int oldY)
+{
+  vtkCamera *cam;
+  double viewFocus[4], focalDepth, viewPoint[3];
+  float newPickPoint[4], oldPickPoint[4], motionVector[3];
+  
+  if (this->CurrentRenderer == NULL)
+    {
+    return;
+    }
+
+  // calculate the focal depth since we'll be using it a lot
+  cam = this->CurrentRenderer->GetActiveCamera();
+  cam->GetFocalPoint(viewFocus);
+  this->ComputeWorldToDisplay(viewFocus[0], viewFocus[1],
+			      viewFocus[2], viewFocus);
+  focalDepth = viewFocus[2];
+
+  this->ComputeDisplayToWorld(double(x), double(y),
+			      focalDepth, newPickPoint);
+    
+  // has to recalc old mouse point since the viewport has moved,
+  // so can't move it outside the loop
+  this->ComputeDisplayToWorld(double(oldX),double(oldY),
+			      focalDepth, oldPickPoint);
+  
+  // camera motion is reversed
+  motionVector[0] = oldPickPoint[0] - newPickPoint[0];
+  motionVector[1] = oldPickPoint[1] - newPickPoint[1];
+  motionVector[2] = oldPickPoint[2] - newPickPoint[2];
+  
+  cam->GetFocalPoint(viewFocus);
+  cam->GetPosition(viewPoint);
+  cam->SetFocalPoint(motionVector[0] + viewFocus[0],
+		     motionVector[1] + viewFocus[1],
+		     motionVector[2] + viewFocus[2]);
+  cam->SetPosition(motionVector[0] + viewPoint[0],
+		   motionVector[1] + viewPoint[1],
+		   motionVector[2] + viewPoint[2]);
+      
+  vtkRenderWindowInteractor *rwi = this->Interactor;
+  if (this->CurrentLight)
+    {
+    /* get the first light */
+    this->CurrentLight->SetPosition(cam->GetPosition());
+    this->CurrentLight->SetFocalPoint(cam->GetFocalPoint());
+    }
+    
+  rwi->Render();
+}
+
+//----------------------------------------------------------------------------
+void vtkInteractorStyleCamera::DollyXY(int dx, int dy)
+{
+  vtkCamera *cam;
+  double dyf = this->MotionFactor * (double)(dy) / (double)(this->Center[1]);
+  double zoomFactor = pow((double)1.1, dyf);
+  
+  if (this->CurrentRenderer == NULL)
+    {
+    return;
+    }
+  
+  cam = this->CurrentRenderer->GetActiveCamera();
+  if (cam->GetParallelProjection())
+    {
+    cam->SetParallelScale(cam->GetParallelScale()/zoomFactor);
+    }
+  else
+    {
+    cam->Dolly(zoomFactor);
+    this->CurrentRenderer->ResetCameraClippingRange();
+    }
+  
+  vtkRenderWindowInteractor *rwi = this->Interactor;
+  if (this->CurrentLight)
+    {
+    /* get the first light */
+    this->CurrentLight->SetPosition(cam->GetPosition());
+    this->CurrentLight->SetFocalPoint(cam->GetFocalPoint());
+    }
+  
+  rwi->Render();
+}
 
 //----------------------------------------------------------------------------
 void vtkInteractorStyleCamera::OnLeftButtonDown(int ctrl, int shift, 
 						int x, int y) 
 {
-  cerr << "**** Button Down\n";
+  cerr << "**** Left Button Down\n";
   this->FindPokedRenderer(x, y);
   if (this->CurrentRenderer == NULL)
     {
@@ -144,7 +239,14 @@ void vtkInteractorStyleCamera::OnLeftButtonUp(int ctrl, int shift,
 void vtkInteractorStyleCamera::OnMiddleButtonDown(int ctrl, int shift, 
 						 int x, int y) 
 {
-  return;
+  cerr << "**** Middle Button Down\n";
+  this->FindPokedRenderer(x, y);
+  if (this->CurrentRenderer == NULL)
+    {
+    return;
+    }
+  
+  this->State = VTK_INTERACTOR_STYLE_CAMERA_PAN;
 }
 //----------------------------------------------------------------------------
 void vtkInteractorStyleCamera::OnMiddleButtonUp(int ctrl, int shift, 
@@ -157,7 +259,14 @@ void vtkInteractorStyleCamera::OnMiddleButtonUp(int ctrl, int shift,
 void vtkInteractorStyleCamera::OnRightButtonDown(int ctrl, int shift, 
 						int x, int y) 
 {
-  return;
+  cerr << "**** Right Button Down\n";
+  this->FindPokedRenderer(x, y);
+  if (this->CurrentRenderer == NULL)
+    {
+    return;
+    }
+  
+  this->State = VTK_INTERACTOR_STYLE_CAMERA_ZOOM;
 }
 
 //----------------------------------------------------------------------------
@@ -173,15 +282,3 @@ void vtkInteractorStyleCamera::PrintSelf(ostream& os, vtkIndent indent)
   vtkInteractorStyle::PrintSelf(os,indent);
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

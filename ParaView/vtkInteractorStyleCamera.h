@@ -58,8 +58,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define VTK_INTERACTOR_STYLE_CAMERA_NONE    0
 #define VTK_INTERACTOR_STYLE_CAMERA_ROTATE  1
-
-
+#define VTK_INTERACTOR_STYLE_CAMERA_PAN     2
+#define VTK_INTERACTOR_STYLE_CAMERA_ZOOM    3
 
 class VTK_EXPORT vtkInteractorStyleCamera : public vtkInteractorStyle
 {
@@ -89,6 +89,8 @@ protected:
   void operator=(const vtkInteractorStyleCamera&) {};
 
   void RotateXY(int dx, int dy);
+  void PanXY(int x, int y, int oldx, int oldy);
+  void DollyXY(int dx, int dy);
   
   int State;
   float MotionFactor;
