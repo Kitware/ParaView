@@ -75,7 +75,7 @@ static unsigned char image_open[] =
   "eNpjYGD4z0AEBgIGXJgWanC5YSDcQwgDAO0pqFg=";
 
 vtkStandardNewMacro(vtkPVAnimationCue);
-vtkCxxRevisionMacro(vtkPVAnimationCue, "1.12");
+vtkCxxRevisionMacro(vtkPVAnimationCue, "1.13");
 vtkCxxSetObjectMacro(vtkPVAnimationCue, TimeLineParent, vtkKWWidget);
 
 //***************************************************************************
@@ -146,6 +146,8 @@ vtkPVAnimationCue::vtkPVAnimationCue()
   this->CueVisibility = 1;
   this->InRecording = 0;
   this->KeyFramesCreatedCount = 0;
+
+  this->ParentCue = 0;
 }
 
 
@@ -189,6 +191,7 @@ vtkPVAnimationCue::~vtkPVAnimationCue()
     }
   this->SetName(NULL);
   this->SetTclNameCommand(0);
+  this->SetParentAnimationCue(0);
 }
 
 //-----------------------------------------------------------------------------
@@ -226,6 +229,12 @@ void vtkPVAnimationCue::SetPVSource(vtkPVSource* src)
 void vtkPVAnimationCue::SetAnimationScene(vtkPVAnimationScene* scene)
 {
   this->PVAnimationScene = scene;
+}
+
+//-----------------------------------------------------------------------------
+void vtkPVAnimationCue::SetParentAnimationCue(vtkPVAnimationCue* parent)
+{
+  this->ParentCue = parent;
 }
 
 //-----------------------------------------------------------------------------
@@ -1284,6 +1293,24 @@ void vtkPVAnimationCue::SaveState(ofstream* file)
     pvKF->SaveState(file);
     }
   iter->Delete();
+}
+
+//-----------------------------------------------------------------------------
+char* vtkPVAnimationCue::GetTextRepresentation()
+{
+  ostrstream str;
+  if (this->ParentCue)
+    {
+    char * ptext = this->ParentCue->GetTextRepresentation();
+    if (ptext)
+      {
+      str <<  ptext << " : ";
+      delete [] ptext;
+      }
+    str << this->GetLabelText() << ends;
+    return str.str();
+    }
+  return 0;
 }
 
 //-----------------------------------------------------------------------------

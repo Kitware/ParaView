@@ -27,7 +27,7 @@
 #include "vtkKWEvent.h"
 
 vtkStandardNewMacro(vtkPVAnimationCueTree);
-vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.10");
+vtkCxxRevisionMacro(vtkPVAnimationCueTree, "1.11");
 
 //-----------------------------------------------------------------------------
 vtkPVAnimationCueTree::vtkPVAnimationCueTree()
@@ -136,6 +136,7 @@ void vtkPVAnimationCueTree::AddChild(vtkPVAnimationCue* child)
   
   child->SetTraceReferenceObject(this);
   child->SetTraceReferenceCommand(str.str());
+  child->SetParentAnimationCue(this);
   str.rdbuf()->freeze(0);
   child->Create(this->GetApplication(), "-relief flat");
   child->PackWidget();

@@ -37,9 +37,10 @@
 #include "vtkKWEntry.h"
 #include "vtkKWScale.h"
 #include "vtkKWCheckButton.h"
+#include "vtkKWTkUtilities.h"
 
 vtkStandardNewMacro(vtkPVVerticalAnimationInterface);
-vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.4");
+vtkCxxRevisionMacro(vtkPVVerticalAnimationInterface, "1.5");
 vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFrame);
 
 #define VTK_PV_RAMP_INDEX 1
@@ -50,6 +51,8 @@ vtkCxxSetObjectMacro(vtkPVVerticalAnimationInterface, ActiveKeyFrame, vtkPVKeyFr
 #define VTK_PV_EXPONENTIAL_LABEL "Exponential"
 #define VTK_PV_SINUSOID_INDEX 4
 #define VTK_PV_SINUSOID_LABEL "Sinusoid"
+
+#define VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL "Active Key Frame Properties"
 
 //*****************************************************************************
 class vtkPVVerticalAnimationInterfaceObserver : public vtkCommand
@@ -107,6 +110,8 @@ vtkPVVerticalAnimationInterface::vtkPVVerticalAnimationInterface()
   this->IndexLabel = vtkKWLabel::New();
   this->IndexScale = vtkKWScale::New();
   this->CacheGeometry = 1;
+
+  this->TitleLabel = vtkKWLabel::New();
 }
 
 //-----------------------------------------------------------------------------
@@ -134,6 +139,7 @@ vtkPVVerticalAnimationInterface::~vtkPVVerticalAnimationInterface()
   this->AdvancedAnimationCheck->Delete();
   
   this->SetActiveKeyFrame(NULL);
+  this->TitleLabel->Delete();
 }
 
 //-----------------------------------------------------------------------------
@@ -151,6 +157,15 @@ void vtkPVVerticalAnimationInterface::SetAnimationCue(vtkPVAnimationCue* cue)
       {
       this->InitializeObservers(this->AnimationCue);
       this->AnimationCue->Register(this);
+      char* text = this->AnimationCue->GetTextRepresentation();
+      this->TitleLabel->SetLabel(text);
+      delete []text;
+      this->Script("pack %s -side top -fill none -expand f -anchor nw ",
+        this->TitleLabel->GetWidgetName());
+      }
+    else
+      {
+      this->Script("pack forget %s", this->TitleLabel->GetWidgetName());
       }
     }
 }
@@ -180,29 +195,35 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->ScenePropertiesFrame->ShowHideFrameOn();
   this->ScenePropertiesFrame->Create(app, 0);
   this->ScenePropertiesFrame->SetLabel("Animation Control");
-  this->Script("pack %s -side top -fill both -expand t -anchor center",
+  this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
     this->ScenePropertiesFrame->GetWidgetName());
  
   // KEYFRAME PROPERTIES FRAME
   this->KeyFramePropertiesFrame->SetParent(this->TopFrame->GetFrame());
   this->KeyFramePropertiesFrame->ShowHideFrameOn();
   this->KeyFramePropertiesFrame->Create(app, 0);
-  this->KeyFramePropertiesFrame->SetLabel("Key Frame Properties");
-  this->Script("pack %s -side top -fill both -expand t -anchor center",
+  this->KeyFramePropertiesFrame->SetLabel(VTK_PV_KEYFRAME_PROPERTIES_DEFAULT_LABEL);
+  this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
     this->KeyFramePropertiesFrame->GetWidgetName());
+
+  this->TitleLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
+  this->TitleLabel->Create(app,"-relief flat");
+  vtkKWTkUtilities::ChangeFontWeightToBold(
+    this->GetApplication()->GetMainInterp(), this->TitleLabel->GetWidgetName());
 
   this->PropertiesFrame->SetParent(this->KeyFramePropertiesFrame->GetFrame());
   this->PropertiesFrame->Create(app, 0);
 
   this->IndexLabel->SetParent(this->PropertiesFrame->GetFrame());
   this->IndexLabel->Create(app, 0);
-  this->IndexLabel->SetLabel("No:");
+  this->IndexLabel->SetLabel("Index:");
   
   this->IndexScale->SetParent(this->PropertiesFrame->GetFrame());
   this->IndexScale->Create(app,0);
   this->IndexScale->DisplayEntry();
   this->IndexScale->DisplayEntryAndLabelOnTopOff();
   this->IndexScale->SetResolution(1);
+  this->IndexScale->DisplayLabel("Index:");
   this->IndexScale->SetCommand(this, "IndexChangedCallback");
   this->IndexScale->SetEntryCommand(this, "IndexChangedCallback");
   this->IndexScale->SetEndCommand(this, "IndexChangedCallback");
@@ -211,20 +232,25 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   
   this->TypeLabel->SetParent(this->PropertiesFrame->GetFrame());
   this->TypeLabel->Create(app, 0);
-  this->TypeLabel->SetLabel("Out:");
+  this->TypeLabel->SetLabel("Interpolation:");
  
   this->TypeImage->SetParent(this->PropertiesFrame->GetFrame());
   this->TypeImage->Create(app, "-relief flat");
+  this->TypeImage->SetBalloonHelpString("Specify the type of interpolation "
+    "following the active key frame.");
   
   this->TypeMenuButton->SetParent(this->PropertiesFrame->GetFrame());
   this->TypeMenuButton->Create(app, "-image PVToolbarPullDownArrow -relief flat");
+  this->TypeMenuButton->SetBalloonHelpString("Specify the type of interpolation "
+    "following the active key frame.");
   this->TypeMenuButton->IndicatorOff();
 
   this->BuildTypeMenu();
     
   this->SelectKeyFrameLabel->SetParent(this->KeyFramePropertiesFrame->GetFrame());
-  this->SelectKeyFrameLabel->SetLabel("Select a key frame to display it's "
-    "properties.");
+  this->SelectKeyFrameLabel->SetLabel("Select a key frame in the Animation Tracks "
+    "window to show its properties.");
+
   this->SelectKeyFrameLabel->Create(app, 0);
   this->SelectKeyFrameLabel->AdjustWrapLengthToWidthOn();
 
@@ -233,7 +259,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->SaveFrame->ShowHideFrameOn();
   this->SaveFrame->SetLabel("Animation Settings");
   this->SaveFrame->Create(app, 0);
-  this->Script("pack %s -side top -fill both -expand t -anchor center",
+  this->Script("pack %s -side top -fill x -expand t -padx 2 -pady 2", 
     this->SaveFrame->GetWidgetName());
 
 
@@ -245,7 +271,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->CacheGeometryCheck->SetBalloonHelpString(
     "Specify caching of geometry for the animation. Note that cache can be "
     "used only in Sequence mode.");
-  this->Script("grid %s -sticky w", this->CacheGeometryCheck->GetWidgetName());
+  this->Script("grid %s x -sticky w", this->CacheGeometryCheck->GetWidgetName());
 
   this->RecordAllButton->SetParent(this->SaveFrame->GetFrame());
   this->RecordAllButton->Create(app, 0);
@@ -254,7 +280,7 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
   this->RecordAllButton->SetCommand(this, "RecordAllChangedCallback");
   this->RecordAllButton->SetBalloonHelpString("Specify if changes in all properties "
     "are to be recorded or only for the highlighted property.");
-  this->Script("grid %s -sticky w", this->RecordAllButton->GetWidgetName());
+  this->Script("grid %s x -sticky w", this->RecordAllButton->GetWidgetName());
 
   this->AdvancedAnimationCheck->SetParent(this->SaveFrame->GetFrame());
   this->AdvancedAnimationCheck->Create(app, 0);
@@ -265,7 +291,10 @@ void vtkPVVerticalAnimationInterface::Create(vtkKWApplication* app,
     "When checked, all properties that can be animated are shown. Otherwise only a "
     "small usually used subset of these properties are shown in the keyframe animation "
     "interface.");
-  this->Script("grid %s  -sticky w", this->AdvancedAnimationCheck->GetWidgetName());
+  this->Script("grid %s x -sticky w", this->AdvancedAnimationCheck->GetWidgetName());
+
+  this->Script("grid columnconfigure %s 2 -weight 2",
+    this->SaveFrame->GetFrame()->GetWidgetName());
 
   this->Update();
 }
@@ -429,7 +458,7 @@ void vtkPVVerticalAnimationInterface::Update()
     (id = this->AnimationCue->GetTimeLine()->GetSelectedPoint())==-1)
     {
     this->Script("pack forget %s", this->PropertiesFrame->GetWidgetName());
-    this->Script("pack %s -side top -fill x -expand t -anchor center",
+    this->Script("pack %s -side bottom -fill x -expand t -anchor w",
       this->SelectKeyFrameLabel->GetWidgetName());
     this->SetActiveKeyFrame(NULL);
     }
@@ -480,14 +509,15 @@ void vtkPVVerticalAnimationInterface::ShowKeyFrame(int id)
   this->UpdateTypeImage(pvKeyFrame);
   
   this->PropertiesFrame->GetFrame()->UnpackChildren();
-  this->Script("grid %s %s - -sticky ew",
-    this->IndexLabel->GetWidgetName(),
+
+  this->Script("grid %s - - -sticky ew",
+    /*this->IndexLabel->GetWidgetName(),*/
     this->IndexScale->GetWidgetName());
   
   this->Script("grid %s -columnspan 3 -sticky ew",
     pvKeyFrame->GetWidgetName());
   
-  this->Script("grid %s %s %s -sticky w",
+  this->Script("grid %s %s %s -columnspan 1 -sticky w",
     this->TypeLabel->GetWidgetName(),
     this->TypeImage->GetWidgetName(),
     this->TypeMenuButton->GetWidgetName());

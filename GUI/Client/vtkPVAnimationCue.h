@@ -268,6 +268,15 @@ public:
   // to be deleted.
   virtual void Detach();
 
+  // Description:
+  // Pointer to the parent animation Cue tree, if any.
+  // Note that parent is not reference counted.
+  void SetParentAnimationCue(vtkPVAnimationCue*);
+ 
+  // Description:
+  // Returns a readable text for the cue. Note that memory is 
+  // allocated, so the caller must clean it up.
+  char* GetTextRepresentation();
 protected:
   vtkPVAnimationCue();
   ~vtkPVAnimationCue();
@@ -376,7 +385,8 @@ protected:
   // This variable indicates if a keyframe was added in the previous call to
   // RecordState
   int PreviousStepKeyFrameAdded;
-
+  
+  vtkPVAnimationCue* ParentCue;
 private:
   vtkPVAnimationCue(const vtkPVAnimationCue&); // Not implemented.
   void operator=(const vtkPVAnimationCue&); // Not implemented.
