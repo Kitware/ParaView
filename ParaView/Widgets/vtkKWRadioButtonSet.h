@@ -91,9 +91,11 @@ public:
   int HasButton(int id);
 
   // Description:
-  // Convenience method to select a particular button or query if it is selected.
+  // Convenience method to select a particular button or query if it is 
+  // selected.
   void SelectButton(int id);
   int IsButtonSelected(int id);
+  int IsAnyButtonSelected();
 
   // Description:
   // Convenience method to hide/show a button
