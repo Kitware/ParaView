@@ -289,7 +289,7 @@ void vtkPVApplication::AddAboutText(ostream &os)
   this->Options->PrintSelf( str, indent.GetNextIndent() );
   str << ends;
   vtkstd::string tmp = str.str();
-  os << endl << tmp.substr( tmp.find( "Runtime information:" ) );
+  os << endl << tmp.substr( tmp.find( "Runtime information:" ) ).c_str();
   str.rdbuf()->freeze(0);
 }
 
