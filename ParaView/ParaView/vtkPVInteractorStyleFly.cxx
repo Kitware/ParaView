@@ -47,7 +47,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkMath.h"
 
-vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.2");
+vtkCxxRevisionMacro(vtkPVInteractorStyleFly, "1.3");
 vtkStandardNewMacro(vtkPVInteractorStyleFly);
 
 //-------------------------------------------------------------------------
@@ -55,6 +55,7 @@ vtkPVInteractorStyleFly::vtkPVInteractorStyleFly()
 {
   this->FlyFlag = 0;
   this->Speed = 20.0;
+  this->LastRenderTime = 0.1; // Assume 10 frames per second.
   
   this->CameraXAxis[0] = 1.0;
   this->CameraXAxis[1] = 0.0;
@@ -83,10 +84,8 @@ void vtkPVInteractorStyleFly::OnLeftButtonDown()
     {
     return;
     }
-  float speed = this->Speed;
   double *range = this->CurrentRenderer->GetActiveCamera()->GetClippingRange();
-  speed *= (range[1] - range[0]) / 200.0;
-  this->Fly(speed);
+  this->Fly(range[1], this->Speed);
 }
 
 //-------------------------------------------------------------------------
@@ -104,10 +103,8 @@ void vtkPVInteractorStyleFly::OnRightButtonDown()
     {
     return;
     }
-  float speed = this->Speed;
   double *range = this->CurrentRenderer->GetActiveCamera()->GetClippingRange();
-  speed *= -(range[1] - range[0]) / 200.0;
-  this->Fly(speed);
+  this->Fly(range[1], -this->Speed);
 }
 
 //-------------------------------------------------------------------------
@@ -117,8 +114,10 @@ void vtkPVInteractorStyleFly::OnRightButtonUp()
 }
 
 //-------------------------------------------------------------------------
-void vtkPVInteractorStyleFly::Fly(float speed)
+void vtkPVInteractorStyleFly::Fly(float scale, float speed)
 {
+  double time;
+
   this->FlyFlag = 1;
 
   if ( ! this->CurrentRenderer)
@@ -129,6 +128,7 @@ void vtkPVInteractorStyleFly::Fly(float speed)
   // This is not a vtkKWObject, which is what contains the Script method,
   // so we'll call Script on vtkPVRenderView instead.
   // This seems very hackish.
+  // This is to just get the current mouse position.
   vtkPVGenericRenderWindowInteractor *iren =
     (vtkPVGenericRenderWindowInteractor*)this->Interactor;
   vtkPVRenderView *view = iren->GetPVRenderView();
@@ -155,36 +155,52 @@ void vtkPVInteractorStyleFly::Fly(float speed)
     view->Script("winfo pointery %s", renWidgetName);
     y = vtkKWObject::GetIntegerResult(app);
     
+    // Relative to renderer not window.
     x -= xmin;
     y -= ymin;
     
+    // Compute the rotation angles (fx, fy).
+    // Relative to center of renderer.
     camera = this->CurrentRenderer->GetActiveCamera();
     pos = camera->GetPosition();
     size = this->CurrentRenderer->GetSize();
+    // Normalized -0.5 to 0.5
     fx = (size[0] * 0.5 - x) / size[0];
     fy = (size[1] * 0.5 - y) / size[1];
-    
-    // slow the velocity down during tight turns
+
+    // At this point we will compute the velocity from
+    // the intermediate angle computation (normalize pointer position).
+    // Absolute Value.
     px = (fx > 0 ? fx : -fx);
     py = (fy > 0 ? fy : -fy);
+    // Maximum.
     if (px < py)
       {
       px = py;
       }
+    // Just in case, clamp below 0.5
     if (px > 0.5)
       {
       px = 0.5;
       }
-    
-    velocity = speed * (1.0 - 2.0 * px);
+
+    // Compute the forwad movement.
+    // Slow the velocity down during tight turns
+    velocity = 0.02 * (speed * this->LastRenderTime) * scale * (1.0 - 2.0*px);
+
+    // Finish computing the rotation angles.
+    // I thought aboput scaling rotation with speed, but I want fly to degenerate
+    // to rotate at zero speed.
+    fx = 30.0 * fx * this->LastRenderTime;
+    fy = 30.0 * fy * this->LastRenderTime;
     
     // move the camera
     this->ComputeCameraAxes();
     transform->Identity();
     transform->Translate(pos[0], pos[1], pos[2]);
-    transform->RotateWXYZ(fx*3.0, this->CameraYAxis[0],
+    transform->RotateWXYZ(fx, this->CameraYAxis[0],
                           this->CameraYAxis[1], this->CameraYAxis[2]);
-    transform->RotateWXYZ(fy*3.0, this->CameraXAxis[0],
+    transform->RotateWXYZ(fy, this->CameraXAxis[0],
                           this->CameraXAxis[1], this->CameraXAxis[2]);
     transform->Translate(-pos[0], -pos[1], -pos[2]);
     
@@ -193,16 +209,20 @@ void vtkPVInteractorStyleFly::Fly(float speed)
                          -velocity * this->CameraZAxis[1],
                          -velocity * this->CameraZAxis[2]);
     camera->ApplyTransform(transform);
-    
     camera->OrthogonalizeViewUp();
-    this->ResetLights();
-    
+
+    // Time the render to make flying independant from rendering rates.
+    time = vtkTimerLog::GetCurrentTime();
+    this->ResetLights();  
     this->CurrentRenderer->ResetCameraClippingRange();
     this->Interactor->Render();
+    this->LastRenderTime = vtkTimerLog::GetCurrentTime() - time;
     
     // Check to see if the user has released the mouse button
     view->Script("update");
     }
+    
+  this->StopState();
   
   transform->Delete();
 }

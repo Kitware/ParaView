@@ -65,7 +65,7 @@ public:
   
   // Description:
   // These methods are for the interactions for this interactor style.
-  virtual void Fly(float speed);
+  virtual void Fly(float scale, float speed);
   
   // Description:
   // Set the fly speed
@@ -82,6 +82,7 @@ protected:
   // Used to signal the fly loop to stop.
   int FlyFlag;
   float Speed;
+  double LastRenderTime;
   double CameraXAxis[3];
   double CameraYAxis[3];
   double CameraZAxis[3];

@@ -62,6 +62,7 @@ class vtkPVAnimationInterface;
 class vtkKWRotateCameraInteractor;
 class vtkKWCompositeCollection;
 class vtkKWTclInteractor;
+class vtkPVTimerLogDisplay;
 class vtkPVGenericRenderWindowInteractor;
 class vtkGenericRenderWindowInteractor;
 class vtkPVInteractorStyleTranslateCamera;
@@ -221,8 +222,7 @@ public:
   virtual void Close();
 
   // Stuff for creating a log file for times.
-  void StartLog();
-  void StopLog();
+  void ShowLog();
   
   // Description:
   // Callback fronm the file menus "SaveData" entry.
@@ -418,7 +418,8 @@ protected:
   vtkPVAnimationInterface *AnimationInterface;
   
   vtkKWTclInteractor *TclInteractor;
-  
+  vtkPVTimerLogDisplay *TimerLogDisplay;
+
   // Description:
   // This method gives the window an opportunity to get rid
   // of circular references before closing.

@@ -82,7 +82,7 @@ void vtkPVTreeComposite::InitializeRMIs()
   this->vtkCompositeManager::InitializeRMIs();
 
   this->Controller->AddRMI(vtkPVTreeCompositeCheckForDataRMI, (void*)this, 
-                           vtkPVTreeComposite::RENDER_RMI_TAG);
+                           vtkPVTreeComposite::CHECK_FOR_DATA_TAG);
 } 
 
 
@@ -120,7 +120,7 @@ int vtkPVTreeComposite::CheckForData()
     while ( (actor = actors->GetNextItem()) )
       {
       mapper = actor->GetMapper();
-      if (mapper)
+      if (actor->GetVisibility() && mapper)
         {
         mapper->Update();
         if (mapper->GetInput()->GetNumberOfCells() > 0)
@@ -155,17 +155,16 @@ int vtkPVTreeComposite::ShouldIComposite()
     vtkErrorMacro("This method should only be called from process 0.");
     }
 
-  // To keep the updates balanced.
-  this->CheckForData();
-
   for (idx = 1; idx < numProcs; ++idx)
     {
     this->Controller->TriggerRMI(idx, NULL, 0, 
                                  vtkPVTreeComposite::CHECK_FOR_DATA_TAG);
     }
+  // To keep the updates balanced.
+  this->CheckForData();
   for (idx = 1; idx < numProcs; ++idx)
     {
-    tmp = this->Controller->Receive(&tmp, 1, idx, 877630);
+    this->Controller->Receive(&tmp, 1, idx, 877630);
     if (tmp)
       {
       dataFlag = 1;

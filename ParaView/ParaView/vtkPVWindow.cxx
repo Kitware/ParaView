@@ -72,6 +72,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVExtractGeometryByScalar.h"
 
 #include "vtkKWSplitFrame.h"
+#include "vtkPVTimerLogDisplay.h"
 #include "vtkKWTclInteractor.h"
 #include "vtkKWCompositeCollection.h"
 #include "vtkKWFrame.h"
@@ -86,7 +87,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVInteractorStyleTranslateCamera.h"
 #include "vtkPVInteractorStyleRotateCamera.h"
 #include "vtkPVInteractorStyleCenterOfRotation.h"
-#include "vtkInteractorStyleTrackballCamera.h"
+//#include "vtkInteractorStyleTrackballCamera.h"
 #include "vtkPVInteractorStyleFly.h"
 
 #include "vtkAxes.h"
@@ -140,7 +141,7 @@ vtkPVWindow::vtkPVWindow()
   this->FlyButton = vtkKWRadioButton::New();
   this->RotateCameraButton = vtkKWRadioButton::New();
   this->TranslateCameraButton = vtkKWRadioButton::New();
-  this->TrackballCameraButton = vtkKWRadioButton::New();
+  //this->TrackballCameraButton = vtkKWRadioButton::New();
   
   this->GenericInteractor = vtkPVGenericRenderWindowInteractor::New();
   
@@ -160,7 +161,7 @@ vtkPVWindow::vtkPVWindow()
   
   this->ApplicationAreaFrame = vtkKWLabeledFrame::New();
   
-  this->TrackballCameraStyle = vtkInteractorStyleTrackballCamera::New();
+  //this->TrackballCameraStyle = vtkInteractorStyleTrackballCamera::New();
   this->TranslateCameraStyle = vtkPVInteractorStyleTranslateCamera::New();
   this->RotateCameraStyle = vtkPVInteractorStyleRotateCamera::New();
   this->CenterOfRotationStyle = vtkPVInteractorStyleCenterOfRotation::New();
@@ -206,6 +207,7 @@ vtkPVWindow::vtkPVWindow()
   // Frame used for animations.
   this->AnimationInterface = vtkPVAnimationInterface::New();
 
+  this->TimerLogDisplay = NULL;
   this->TclInteractor = NULL;
 
 
@@ -252,11 +254,16 @@ vtkPVWindow::~vtkPVWindow()
   this->GlyphSources->Delete();
   this->GlyphSources = NULL;
   
+  if (this->TimerLogDisplay)
+    {
+    this->TimerLogDisplay->Delete();
+    this->TimerLogDisplay = NULL;
+    }
   if (this->TclInteractor)
     {
     this->TclInteractor->Delete();
+    this->TclInteractor = NULL;
     }
-  this->TclInteractor = NULL;
 
   this->Modules->Delete();
   this->Modules = NULL;
@@ -278,8 +285,12 @@ vtkPVWindow::~vtkPVWindow()
 //----------------------------------------------------------------------------
 void vtkPVWindow::CloseNoPrompt()
 {
-  // Trying to get rid of circular references.
-  this->GenericInteractor->SetInteractorStyle(NULL);
+  if (this->TimerLogDisplay )
+    {
+    this->TimerLogDisplay->SetMasterWindow(NULL);
+    this->TimerLogDisplay->Delete();
+    this->TimerLogDisplay = NULL;
+    }
 
   if (this->TclInteractor )
     {
@@ -501,11 +512,11 @@ void vtkPVWindow::PrepareForDelete()
     this->ApplicationAreaFrame = NULL;
     }
   
-  if (this->TrackballCameraStyle)
-    {
-    this->TrackballCameraStyle->Delete();
-    this->TrackballCameraStyle = NULL;
-    }
+  //if (this->TrackballCameraStyle)
+  //  {
+  //  this->TrackballCameraStyle->Delete();
+  //  this->TrackballCameraStyle = NULL;
+  //  }
   
   if (this->MainView)
     {
@@ -651,11 +662,9 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
 				    "Write a script which can be "
     "parsed by the vtk executable");
   // Log stuff (not traced)
-  this->AdvancedMenu->InsertCommand(5, "Start Log", this, "StartLog", 2,
-				    "Start logging render events and timing");
-  this->AdvancedMenu->InsertCommand(6, "Stop Log", this, "StopLog", 2,
-				    "Stop logging render events and timing");
-  
+  this->AdvancedMenu->InsertCommand(5, "Show Log", this, "ShowLog", 2,
+				    "Show log of render events and timing");
+              
   // Create the menu for creating data sources.  
   this->SourceMenu->SetParent(this->AdvancedMenu);
   this->SourceMenu->Create(this->Application, "-tearoff 0");
@@ -818,6 +827,7 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
   // rotate camera interactor style
   this->RotateCameraButton->SetParent(this->InteractorStyleToolbar);
   this->RotateCameraButton->Create(app, "-indicatoron 0 -image KWRotateViewButton -selectimage KWActiveRotateViewButton -bd 0");
+  this->RotateCameraButton->SetState(1);
   this->RotateCameraButton->SetBalloonHelpString(
     "Rotate View Mode\n   Left Button: Rotate.\n  Shift + LeftButton: Z roll.\n   Right Button: Behaves like translate view mode.");
   this->Script("%s configure -command {%s ChangeInteractorStyle 1}",
@@ -836,15 +846,15 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                this->TranslateCameraButton->GetWidgetName());
 
   // trackball camera interactor style
-  this->TrackballCameraButton->SetParent(this->InteractorStyleToolbar);
-  this->TrackballCameraButton->Create(app, "-text Trackball");
-  this->TrackballCameraButton->SetBalloonHelpString(
-    "Trackball Camera Mode\n   Left Button: Rotate.\n   Shift + Left Button: Pan.\n   Right Button: Zoom.  (Zoom direction is reversed from Translate View Mode)");
-  this->Script("%s configure -command {%s ChangeInteractorStyle 3}",
-               this->TrackballCameraButton->GetWidgetName(), this->GetTclName());
-  this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2",
-               this->TrackballCameraButton->GetWidgetName());
-  this->TrackballCameraButton->SetState(1);
+  //this->TrackballCameraButton->SetParent(this->InteractorStyleToolbar);
+  //this->TrackballCameraButton->Create(app, "-text Trackball");
+  //this->TrackballCameraButton->SetBalloonHelpString(
+  //  "Trackball Camera Mode\n   Left Button: Rotate.\n   Shift + Left Button: Pan.\n   Right Button: Zoom.  (Zoom direction is reversed from Translate View Mode)");
+  //this->Script("%s configure -command {%s ChangeInteractorStyle 3}",
+  //             this->TrackballCameraButton->GetWidgetName(), this->GetTclName());
+  //this->Script("pack %s -side left -fill none -expand no -padx 2 -pady 2",
+  //             this->TrackballCameraButton->GetWidgetName());
+  //this->TrackballCameraButton->SetState(1);
   
   this->RotateCameraStyle->SetCenter(0.0, 0.0, 0.0);
   this->MainView->ResetCamera();
@@ -940,7 +950,8 @@ void vtkPVWindow::Create(vtkKWApplication *app, char* vtkNotUsed(args))
                this->FlySpeedScale->GetWidgetName());
   
   this->GenericInteractor->SetPVRenderView(this->MainView);
-  this->GenericInteractor->SetInteractorStyle(this->TrackballCameraStyle);
+  //this->GenericInteractor->SetInteractorStyle(this->TrackballCameraStyle);
+  this->GenericInteractor->SetInteractorStyle(this->RotateCameraStyle);
   
   // set up bindings for the interactor  
   const char *wname = this->MainView->GetVTKWidget()->GetWidgetName();
@@ -1099,7 +1110,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
     case 0:
       this->RotateCameraButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
-      this->TrackballCameraButton->SetState(0);
+      //this->TrackballCameraButton->SetState(0);
       this->CenterActor->VisibilityOff();
       this->GenericInteractor->SetInteractorStyle(this->FlyStyle);
       this->Script("pack %s -side left",
@@ -1108,7 +1119,7 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
     case 1:
       this->FlyButton->SetState(0);
       this->TranslateCameraButton->SetState(0);
-      this->TrackballCameraButton->SetState(0);
+      //this->TrackballCameraButton->SetState(0);
       this->GenericInteractor->SetInteractorStyle(this->RotateCameraStyle);
       this->Script("pack %s -side left",
                    this->PickCenterToolbar->GetWidgetName());
@@ -1118,16 +1129,17 @@ void vtkPVWindow::ChangeInteractorStyle(int index)
     case 2:
       this->FlyButton->SetState(0);
       this->RotateCameraButton->SetState(0);
-      this->TrackballCameraButton->SetState(0);
+      //this->TrackballCameraButton->SetState(0);
       this->GenericInteractor->SetInteractorStyle(this->TranslateCameraStyle);
       this->CenterActor->VisibilityOff();
       break;
     case 3:
-      this->FlyButton->SetState(0);
-      this->RotateCameraButton->SetState(0);
-      this->TranslateCameraButton->SetState(0);
-      this->GenericInteractor->SetInteractorStyle(this->TrackballCameraStyle);
-      this->CenterActor->VisibilityOff();
+      vtkErrorMacro("Trackball no longer suported.");
+      //this->FlyButton->SetState(0);
+      //this->RotateCameraButton->SetState(0);
+      //this->TranslateCameraButton->SetState(0);
+      //this->GenericInteractor->SetInteractorStyle(this->TrackballCameraStyle);
+      //this->CenterActor->VisibilityOff();
       break;
     case 4:
       this->GenericInteractor->SetInteractorStyle(this->CenterOfRotationStyle);
@@ -3129,25 +3141,17 @@ vtkPVApplication *vtkPVWindow::GetPVApplication()
 
 
 //----------------------------------------------------------------------------
-void vtkPVWindow::StartLog()
+void vtkPVWindow::ShowLog()
 {
-  char *filename = NULL;
-  
-  this->Script("tk_getSaveFile -filetypes {{{Log Text File} {.txt}}}");
-  filename = this->Application->GetMainInterp()->result;
-
-  if (strcmp(filename, "") == 0)
+  if ( ! this->TimerLogDisplay )
     {
-    return;
+    this->TimerLogDisplay = vtkPVTimerLogDisplay::New();
+    this->TimerLogDisplay->SetTitle("Performance Log");
+    this->TimerLogDisplay->SetMasterWindow(this);
+    this->TimerLogDisplay->Create(this->GetPVApplication());
     }
   
-  this->GetPVApplication()->StartLog(filename);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVWindow::StopLog()
-{
-  this->GetPVApplication()->StopLog();
+  this->TimerLogDisplay->Display();
 }
 
 //----------------------------------------------------------------------------

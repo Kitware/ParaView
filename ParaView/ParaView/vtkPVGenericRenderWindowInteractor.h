@@ -58,7 +58,7 @@ public:
   void SetPVRenderView(vtkPVRenderView *view);
   vtkGetObjectMacro(PVRenderView, vtkPVRenderView);
 
-  void Render();
+  virtual void Render();
   
 protected:
   vtkPVGenericRenderWindowInteractor();

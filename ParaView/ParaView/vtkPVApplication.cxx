@@ -48,7 +48,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderer.h"
 #include "vtkRenderWindow.h"
 #include "vtkKWMessageDialog.h"
-#include "vtkTimerLog.h"
 #include "vtkObjectFactory.h"
 #include "vtkTclUtil.h"
 #include "vtkPolyDataMapper.h"
@@ -67,7 +66,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVCutButton.h"
 #include "vtkPVClipButton.h"
 #include "vtkPVExtractGridButton.h"
-#include "vtkTimerLog.h"
 #include "vtkProbeFilter.h"
 #include "vtkMapper.h"
 
@@ -94,6 +92,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 extern "C" int Vtktkrenderwidget_Init(Tcl_Interp *interp);
 extern "C" int Vtkkwparaviewtcl_Init(Tcl_Interp *interp);
+
+
+// initialze the class variables
+int vtkPVApplication::GlobalLODFlag = 0;
+
 
 Tcl_Interp *vtkPVApplication::InitializeTcl(int argc, char *argv[])
 {
@@ -145,8 +148,6 @@ vtkPVApplication::vtkPVApplication()
   this->SetApplicationReleaseName("development");
 
   this->Controller = NULL;
-  this->Log = NULL;
-  this->LogFileName = NULL;
 
   struct stat fs;
 
@@ -207,10 +208,6 @@ void vtkPVApplication::SetController(vtkMultiProcessController *c)
 vtkPVApplication::~vtkPVApplication()
 {
   this->SetController(NULL);
-  if (this->Log)
-    {
-    this->StopLog();
-    }
 }
 
 
@@ -358,7 +355,6 @@ int vtkPVApplication::CheckRegistration()
 //----------------------------------------------------------------------------
 void vtkPVApplication::Start(int argc, char*argv[])
 {
-  
   vtkOutputWindow::GetInstance()->PromptUserOn();
 
   // set the font size to be small
@@ -627,37 +623,6 @@ void vtkPVApplication::CreatePhoto(char *name, unsigned char *data,
 
 }
 
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::StartLog(char *filename)
-{
-  if (this->Log)
-    {
-    this->StopLog();
-    }
-  this->Log = (void *)(vtkTimerLog::New());
-  ((vtkTimerLog*)this->Log)->SetMaxEntries(1000);
-
-  this->SetLogFileName(filename);
-}
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::StopLog()
-{
-  if (this->Log)
-    {
-    ((vtkTimerLog*)this->Log)->DumpLog(this->LogFileName);
-    ((vtkTimerLog*)this->Log)->Delete();
-    this->Log = NULL;
-    this->SetLogFileName(NULL);
-    }
-}
-
-
-
-
-
 //----------------------------------------------------------------------------
 void vtkPVApplication::StartRecordingScript(char *filename)
 {
@@ -692,19 +657,6 @@ void vtkPVApplication::StopRecordingScript()
     this->TraceFile = NULL;
     }
 }
-
-
-
-
-//----------------------------------------------------------------------------
-void vtkPVApplication::AddLogEntry(char *tag, float val)
-{
-  if (this->Log)
-    {
-    ((vtkTimerLog*)this->Log)->FormatAndMarkEvent("%s: %f", tag, val);
-    }
-}
-
 
 
 //----------------------------------------------------------------------------
@@ -929,6 +881,27 @@ void vtkPVApplication::SendCompleteArrays(vtkMapper *mapper)
     }
   mapper->GetInput()->GetCellData()->GetAttributeIndices(activeAttributes);
   this->Controller->Send(activeAttributes, 5, 0, 987258);
+}
+
+
+void vtkPVApplication::SetGlobalLODFlag(int val)
+{
+  vtkPVApplication::GlobalLODFlag = val;
+
+  if (this->Controller->GetLocalProcessId() == 0)
+    {
+    int idx, num;
+    num = this->Controller->GetNumberOfProcesses();
+    for (idx = 1; idx < num; ++idx)
+      {
+      this->RemoteScript(idx, "Application SetGlobalLODFlag %d", val);
+      }
+    }
+}
+
+int vtkPVApplication::GetGlobalLODFlag()
+{
+  return vtkPVApplication::GlobalLODFlag;
 }
 
 

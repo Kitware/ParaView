@@ -282,6 +282,10 @@ void vtkPVRenderView::CreateRenderObjects(vtkPVApplication *pvApp)
   // Create the compositer.
   this->Composite = static_cast<vtkPVTreeComposite*>(pvApp->MakeTclObject("vtkPVTreeComposite", "TreeComp1"));
 
+  // Try using a more efficient compositer (if it exists).
+  // This should be a part of a module.
+  pvApp->BroadcastScript("if {[catch {vtkCompressCompositer pvTmp}] == 0} {TreeComp1 SetCompositer pvTmp; pvTmp Delete}");
+
   this->CompositeTclName = NULL;
   this->SetCompositeTclName("TreeComp1");
   pvApp->BroadcastScript("%s AddRenderer %s", this->RenderWindowTclName,
@@ -751,7 +755,7 @@ void vtkPVRenderView::SetCameraState(float p0, float p1, float p2,
 //----------------------------------------------------------------------------
 void vtkPVRenderView::ResetCameraClippingRange()
 {
-  this->GetRenderer()->ResetCameraClippingRange();
+  this->GetComposite()->ResetCameraClippingRange(this->GetRenderer());
 }
 
 void vtkPVRenderView::AddBindings()
@@ -895,7 +899,20 @@ void vtkPVRenderView::Render()
     {
     this->StartRender();
     }
+
+  // I have this test here so that setting the frame rate slider to 0 will
+  // cause full res to render.  It needs to be cleaned up.
+  if (this->InteractiveUpdateRate > 0.001)
+    {
+    pvApp->SetGlobalLODFlag(1);
+    }
+  else
+    {
+    pvApp->SetGlobalLODFlag(0);
+    }
+  vtkTimerLog::MarkStartEvent("Interactive Render");
   this->RenderWindow->Render();
+  vtkTimerLog::MarkEndEvent("Interactive Render");
 
   if (this->Composite)
     {
@@ -903,10 +920,7 @@ void vtkPVRenderView::Render()
     this->InteractiveCompositeTime = this->Composite->GetCompositeTime()
       + this->Composite->GetGetBuffersTime()
       + this->Composite->GetSetBuffersTime();
-    pvApp->AddLogEntry("InteractiveRender", this->InteractiveRenderTime);
-    pvApp->AddLogEntry("InteractiveCcomposite", this->InteractiveCompositeTime);
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -958,7 +972,11 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     {
     this->StartRender();
     }
+
+  pvApp->SetGlobalLODFlag(0);
+  vtkTimerLog::MarkStartEvent("Still Render");
   this->RenderWindow->Render();
+  vtkTimerLog::MarkEndEvent("Still Render");
 
   if (this->Composite)
     {
@@ -966,8 +984,6 @@ void vtkPVRenderView::EventuallyRenderCallBack()
     this->StillCompositeTime = this->Composite->GetCompositeTime()
       + this->Composite->GetGetBuffersTime()
       + this->Composite->GetSetBuffersTime();
-    pvApp->AddLogEntry("StillRender", this->StillRenderTime);
-    pvApp->AddLogEntry("StillCcomposite", this->StillCompositeTime);
     }
 }
 
@@ -997,6 +1013,16 @@ void vtkPVRenderView::TriangleStripsCallback()
                            pvd->GetGeometryTclName(),
                            this->TriangleStripsCheck->GetState());
     }
+
+  if (this->TriangleStripsCheck->GetState())
+    {
+    vtkTimerLog::MarkEvent("--- Enable triangle strips.");
+    }
+  else
+    {
+    vtkTimerLog::MarkEvent("--- Disable triangle strips.");
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1028,6 +1054,15 @@ void vtkPVRenderView::ImmediateModeCallback()
                            pvd->GetLODMapperTclName(),
                            this->ImmediateModeCheck->GetState());
     }
+
+  if (this->ImmediateModeCheck->GetState())
+    {
+    vtkTimerLog::MarkEvent("--- Disable display lists.");
+    }
+  else
+    {
+    vtkTimerLog::MarkEvent("--- Enable display lists.");
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -1057,6 +1092,16 @@ void vtkPVRenderView::CompositeWithFloatCallback()
       }
     this->EventuallyRender();
     }
+
+  if (this->CompositeWithFloatCheck->GetState())
+    {
+    vtkTimerLog::MarkEvent("--- Get color buffers as floats.");
+    }
+  else
+    {
+    vtkTimerLog::MarkEvent("--- Get color buffers as unsigned char.");
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1074,6 +1119,15 @@ void vtkPVRenderView::CompositeWithRGBACallback()
       this->CompositeWithFloatCheck->SetState(0);
       }
     this->EventuallyRender();
+    }
+
+  if (this->CompositeWithRGBACheck->GetState())
+    {
+    vtkTimerLog::MarkEvent("--- Use RGBA pixels to get color buffers.");
+    }
+  else
+    {
+    vtkTimerLog::MarkEvent("--- Use RGB pixels to get color buffers.");
     }
 }
 

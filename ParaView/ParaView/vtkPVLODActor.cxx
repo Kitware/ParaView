@@ -45,6 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkRenderWindow.h"
 #include "vtkTimerLog.h"
 #include "vtkObjectFactory.h"
+#include "vtkPVApplication.h"
 
 //-----------------------------------------------------------------------------
 vtkPVLODActor* vtkPVLODActor::New()
@@ -71,7 +72,6 @@ vtkPVLODActor::vtkPVLODActor()
   m->Delete();
   
   this->LODMapper = NULL;
-  this->TimePerPoint = this->LODTimePerPoint = 0.00001;
 }
 
 //----------------------------------------------------------------------------
@@ -87,8 +87,6 @@ vtkPVLODActor::~vtkPVLODActor()
 // A good example is verts.  One cell can contain any number of verticies.
 vtkMapper *vtkPVLODActor::SelectMapper()
 {
-  float myTime, timePerPoint;
-
   if (this->Mapper == NULL || this->Mapper->GetInput() == NULL)
     {
     return this->LODMapper;
@@ -98,14 +96,7 @@ vtkMapper *vtkPVLODActor::SelectMapper()
     return this->Mapper;
     }
 
-  // Figure out how much time we have to render.
-  myTime = this->AllocatedRenderTime;
-
-  // Choose the smallest time constant.
-  timePerPoint = 0.5 * (this->TimePerPoint + this->LODTimePerPoint);
-
-  // Will the high res take too long?
-  if ( (timePerPoint * this->Mapper->GetInput()->GetNumberOfPoints()) > myTime)
+  if (vtkPVApplication::GetGlobalLODFlag())
     {
     return this->LODMapper;
     }
@@ -167,16 +158,6 @@ void vtkPVLODActor::Render(vtkRenderer *ren, vtkMapper *vtkNotUsed(m))
   this->Device->Render(ren,mapper);
   this->EstimatedRenderTime = mapper->GetTimeToDraw();
 
-  // Now since We cannot use the mappers "TimeToDraw" before the render,
-  // we need to save the information.
-  if (mapper == this->Mapper)
-    {
-    this->TimePerPoint = mapper->GetTimeToDraw() / mapper->GetInput()->GetNumberOfPoints();
-    }
-  else if (mapper == this->LODMapper)
-    {
-    this->LODTimePerPoint = mapper->GetTimeToDraw() / mapper->GetInput()->GetNumberOfPoints();
-    }
 }
 
 int vtkPVLODActor::RenderOpaqueGeometry(vtkViewport *vp)

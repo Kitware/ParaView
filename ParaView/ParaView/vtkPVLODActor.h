@@ -85,6 +85,11 @@ public:
   vtkGetObjectMacro(LODMapper, vtkMapper);
 
   // Description:
+  // This is a bit of a hack.  This returns the last mapper used to render.
+  // It does this so that compositing can descide if anything was actually renderered.
+  vtkMapper *GetMapper() {return this->SelectMapper();}
+
+  // Description:
   // When this objects gets modified, this method also modifies the object.
   void Modified();
   
@@ -102,10 +107,6 @@ protected:
   vtkMapper           *LODMapper;
 
   vtkMapper *SelectMapper();
-  // We use points as the size of the data, because cells cqan mislead.
-  // A good example is verts.  One cell can contain any number of verticies.
-  float TimePerPoint;
-  float LODTimePerPoint;
 };
 
 #endif

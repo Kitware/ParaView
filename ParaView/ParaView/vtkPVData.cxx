@@ -354,11 +354,11 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("vtkPVGeometryFilter %s", tclName);
   this->SetGeometryTclName(tclName);
   
-  //sprintf(tclName, "Collect%d", this->InstanceCount);
-  //pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  //this->SetCollectTclName(tclName);
-  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-  //                       this->CollectTclName, this->GeometryTclName);
+  sprintf(tclName, "Collect%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+  this->SetCollectTclName(tclName);
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                         this->CollectTclName, this->GeometryTclName);
   
   // Get rid of previous object created by the superclass.
   if (this->Mapper)
@@ -372,10 +372,10 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   this->MapperTclName = NULL;
   this->SetMapperTclName(tclName);
   
-  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
-  //                       this->CollectTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
-                         this->GeometryTclName);
+                         this->CollectTclName);
+  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", this->MapperTclName,
+  //                       this->GeometryTclName);
   
   sprintf(tclName, "ScalarBar%d", this->InstanceCount);
   this->SetScalarBarTclName(tclName);
@@ -403,12 +403,14 @@ void vtkPVData::CreateParallelTclObjects(vtkPVApplication *pvApp)
   pvApp->BroadcastScript("%s UseInternalTrianglesOff", this->LODDeciTclName);
   //pvApp->BroadcastScript("%s UseFeatureEdgesOn", this->LODDeciTclName);
   //pvApp->BroadcastScript("%s UseFeaturePointsOn", this->LODDeciTclName);
+  pvApp->BroadcastScript("%s SetNumberOfDivisions 50 50 50", 
+                         this->LODDeciTclName);
 
-  //sprintf(tclName, "LODCollect%d", this->InstanceCount);
-  //pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
-  //this->SetLODCollectTclName(tclName);
-  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
-  //                       this->LODCollectTclName, this->LODDeciTclName);
+  sprintf(tclName, "LODCollect%d", this->InstanceCount);
+  pvApp->BroadcastScript("vtkCollectPolyData %s", tclName);
+  this->SetLODCollectTclName(tclName);
+  pvApp->BroadcastScript("%s SetInput [%s GetOutput]", 
+                         this->LODCollectTclName, this->LODDeciTclName);
 
   sprintf(tclName, "LODMapper%d", this->InstanceCount);
   pvApp->BroadcastScript("vtkPolyDataMapper %s", tclName);
@@ -1059,7 +1061,6 @@ void vtkPVData::UpdateProperties()
   vtkDataArray *array;
   char *currentColorBy;
   int currentColorByFound = 0;
-  float time;
   vtkPVWindow *window;
   
   if (this->UpdateTime > this->GetVTKData()->GetMTime())
@@ -1070,42 +1071,22 @@ void vtkPVData::UpdateProperties()
 
   window = this->GetPVApplication()->GetMainWindow();
 
-  vtkDebugMacro( << "Start timer");
-  vtkTimerLog *timer = vtkTimerLog::New();
-
   // Update and time the filter.
-  timer->StartTimer();
+  char *str = new char[strlen(this->GetVTKDataTclName()) + 80];
+  sprintf(str, "Accept: %s", this->GetVTKDataTclName());
+  vtkTimerLog::MarkStartEvent(str);
   pvApp->BroadcastScript("%s Update", this->MapperTclName);
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);
-  timer->StopTimer();
-  time = timer->GetElapsedTime();
-  if (time > 0.05)
-    {
-    sprintf(tmp, "%s : took %f seconds", 
-            this->GetVTKDataTclName(), time); 
-    window->SetStatusText(tmp);
-    pvApp->AddLogEntry(this->GetVTKDataTclName(), time);
-    pvApp->AddLogEntry("NumCells", this->GetVTKData()->GetNumberOfCells());
-    }
-
-  vtkDebugMacro(<< "Stop timer : " << this->GetVTKDataTclName() << " : took " 
-                  << time << " seconds.");
-
+  vtkTimerLog::MarkEndEvent(str);
+  delete [] str;
 
   // Time creation of the LOD
-  timer->StartTimer();
+  vtkTimerLog::MarkStartEvent("Create LOD");
   pvApp->BroadcastScript("%s Update", this->LODMapperTclName);
   // Get bounds to time completion (not just triggering) of update.
   this->GetBounds(bounds);
-  timer->StopTimer();
-  time = timer->GetElapsedTime();
-  if (time > 0.05)
-    {
-    pvApp->AddLogEntry("DeciTime", time);
-    }
-
-  timer->Delete(); 
+  vtkTimerLog::MarkEndEvent("Create LOD");
 
   sprintf(tmp, "number of cells: %d", 
 	  this->GetNumberOfCells());
@@ -1651,12 +1632,12 @@ void vtkPVData::Initialize()
 			       this->GetVTKDataTclName());
     }
   
-  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-  //			 this->LODMapperTclName,
-  //			 this->LODCollectTclName);
   pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
-			 this->LODMapperTclName,
-			 this->LODDeciTclName);
+                         this->LODMapperTclName,
+                         this->LODCollectTclName);
+  //pvApp->BroadcastScript("%s SetInput [%s GetOutput]",
+  //                       this->LODMapperTclName,
+  //                       this->LODDeciTclName);
 
   vtkDebugMacro( << "Initialize --------")
   this->UpdateProperties();

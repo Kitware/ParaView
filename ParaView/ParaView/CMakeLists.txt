@@ -51,6 +51,7 @@ vtkPVSourceInterface
 vtkPVSourceInterfaceParser
 vtkPVStringEntry
 vtkPVThreshold 
+vtkPVTimerLogDisplay
 vtkPVTreeComposite 
 vtkPVVectorEntry
 vtkPVWidget

@@ -137,14 +137,6 @@ public:
   void GetMapperColorRange(float range[2], vtkPolyDataMapper *mapper);
   
   // Description:
-  // Methods that will create a text log file.
-  // I do not know what kind of login I will be doing, (multi threading ...)
-  // So I will keep the interface generic.
-  void StartLog(char *filename);
-  void StopLog();
-  void AddLogEntry(char *tag, float value);
-
-  // Description:
   // A start at recording macros in ParaView.  Create a custom trace file
   // that can be loaded back into paraview.  
   // Window variables get initialized when the file is opened.
@@ -187,13 +179,18 @@ public:
       return 15;
     };
 
+  // Description:
+  // Need to put a global flag that indicates interactive rendering.
+  // All process must be consistent in choosing LODs because
+  // of the vtkCollectPolydata filter.
+  void SetGlobalLODFlag(int val);
+  static int GetGlobalLODFlag();
+
 protected:
   vtkPVApplication();
   ~vtkPVApplication();
-  
-  void *Log;
-  char *LogFileName;
-  vtkSetStringMacro(LogFileName);
+  vtkPVApplication(const vtkPVApplication&) {};
+  void operator=(const vtkPVApplication&) {};
 
   void CreateButtonPhotos();
   void CreatePhoto(char *name, unsigned char *data, int width, int height);
@@ -202,6 +199,11 @@ protected:
 
   int MajorVersion;
   int MinorVersion;
+
+  // Need to put a global flag that indicates interactive rendering.
+  // All process must be consistent in choosing LODs because
+  // of the vtkCollectPolydata filter.
+  static int GlobalLODFlag;
 
   vtkMultiProcessController *Controller;
 
