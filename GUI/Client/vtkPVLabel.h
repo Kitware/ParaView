@@ -56,6 +56,10 @@ public:
   // Empty method to keep superclass from complaining.
   virtual void Trace(ofstream *) {};
 
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *) {};
+
 protected:
   vtkPVLabel();
   ~vtkPVLabel();

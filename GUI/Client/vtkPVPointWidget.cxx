@@ -35,7 +35,7 @@
 #include "vtkRenderer.h"
 
 vtkStandardNewMacro(vtkPVPointWidget);
-vtkCxxRevisionMacro(vtkPVPointWidget, "1.25");
+vtkCxxRevisionMacro(vtkPVPointWidget, "1.26");
 
 int vtkPVPointWidgetCommand(ClientData cd, Tcl_Interp *interp,
                         int argc, char *argv[]);
@@ -166,8 +166,19 @@ void vtkPVPointWidget::UpdateVTKObject()
 
 
 //----------------------------------------------------------------------------
-void vtkPVPointWidget::SaveInBatchScriptForPart(ofstream *, vtkClientServerID)
+void vtkPVPointWidget::SaveInBatchScript(ofstream *file)
 {
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
+  // Point1
+  if (this->VariableName)
+    {  
+    *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+          << this->VariableName << "] SetElements3 "
+          << this->PositionEntry[0]->GetValueAsFloat() << " "
+          << this->PositionEntry[1]->GetValueAsFloat() << " "
+          << this->PositionEntry[2]->GetValueAsFloat() << endl;
+    }
 }
 
 //----------------------------------------------------------------------------

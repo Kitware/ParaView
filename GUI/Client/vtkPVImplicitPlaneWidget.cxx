@@ -41,7 +41,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVImplicitPlaneWidget);
-vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.26");
+vtkCxxRevisionMacro(vtkPVImplicitPlaneWidget, "1.27");
 
 vtkCxxSetObjectMacro(vtkPVImplicitPlaneWidget, InputMenu, vtkPVInputMenu);
 
@@ -243,18 +243,6 @@ void vtkPVImplicitPlaneWidget::AcceptInternal(vtkClientServerID sourceID)
                   << this->Widget3DID << "SetDrawPlane" << 0
                   << vtkClientServerStream::End;
   pm->SendStreamToClientAndServer();
-  // This should be done in the initialization.
-  // There must be a more general way of hooking up the plane object.
-  // ExtractCTH uses this varible, General Clipping uses the select widget.
-  if (this->VariableName && sourceID.ID != 0)
-    {
-    ostrstream str;
-    str << "Set" << this->VariableName << ends;
-    pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                    << str.str() << this->PlaneID << vtkClientServerStream::End;
-    pm->SendStreamToServer();
-    delete [] str.str();
-    }
   if ( this->PlaneID.ID != 0 )
     {
     double val[3];
@@ -307,31 +295,31 @@ void vtkPVImplicitPlaneWidget::Trace(ofstream *file)
 }
 
 //----------------------------------------------------------------------------
-void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream *file)
+void vtkPVImplicitPlaneWidget::SaveInBatchScript(ofstream* file)
 {
-  *file << "vtkPlane " << "pvTemp" << this->PlaneID.ID << endl;
-  *file << "\t" << this->PlaneID.ID << " SetOrigin ";
-  this->Script("%s GetOrigin", this->PlaneID.ID);
-  *file << this->Application->GetMainInterp()->result << endl;
-  *file << "\t" << this->PlaneID.ID << " SetNormal ";
-  this->Script("%s GetNormal", this->PlaneID.ID);
-  *file << this->Application->GetMainInterp()->result << endl;
+  *file << endl;
+  *file << "set pvTemp" <<  this->PlaneID.ID
+        << " [$proxyManager NewProxy implicit_functions Plane]"
+        << endl;
 
+  double val[3];
+  int cc;
 
-  // There must be a more general way of hooking up the plane object.
-  // ExtractCTH uses this varible, General Clipping uses the select widget.
-  if (this->VariableName && this->PVSource)
+  for ( cc = 0; cc < 3; cc ++ )
     {
-    int num, idx;
-    num = this->PVSource->GetNumberOfVTKSources();
-    for (idx = 0; idx < num; ++idx)
-      {
-      *file << this->PVSource->GetVTKSourceID(idx).ID
-            << " Set" << this->VariableName << " " 
-            << this->PlaneID.ID << endl;                  
-      }
+    val[cc] = atof( this->CenterEntry[cc]->GetValue() );
     }
+  *file << "  [$pvTemp" << this->PlaneID.ID << " GetProperty Origin] "
+        << "SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
 
+  for ( cc = 0; cc < 3; cc ++ )
+    {
+    val[cc] = atof( this->NormalEntry[cc]->GetValue() );
+    }
+  *file << "  [$pvTemp" << this->PlaneID.ID << " GetProperty Normal] "
+        << "SetElements3 " << val[0] << " " << val[1] << " " << val[2] << endl;
+  *file << "  $pvTemp" << this->PlaneID.ID << " UpdateVTKObjects" << endl;
+  *file << endl;
 }
 
 //----------------------------------------------------------------------------

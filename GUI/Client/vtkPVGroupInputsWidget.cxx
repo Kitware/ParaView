@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVGroupInputsWidget);
-vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.19");
+vtkCxxRevisionMacro(vtkPVGroupInputsWidget, "1.20");
 
 int vtkPVGroupInputsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -274,9 +274,6 @@ void vtkPVGroupInputsWidget::Trace(ofstream *file)
     }
 }
 
-
-
-
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::AllOnCallback()
 {
@@ -306,29 +303,6 @@ void vtkPVGroupInputsWidget::AllOffCallback()
 
   this->ModifiedCallback();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //----------------------------------------------------------------------------
 void vtkPVGroupInputsWidget::SaveInBatchScript(ofstream*)

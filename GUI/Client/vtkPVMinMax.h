@@ -18,18 +18,18 @@
 #ifndef __vtkPVMinMax_h
 #define __vtkPVMinMax_h
 
-#include "vtkPVObjectWidget.h"
+#include "vtkPVWidget.h"
 
 class vtkKWScale;
 class vtkKWLabel;
 class vtkPVArrayMenu;
 class vtkPVScalarListWidgetProperty;
 
-class VTK_EXPORT vtkPVMinMax : public vtkPVObjectWidget
+class VTK_EXPORT vtkPVMinMax : public vtkPVWidget
 {
 public:
   static vtkPVMinMax* New();
-  vtkTypeRevisionMacro(vtkPVMinMax, vtkPVObjectWidget);
+  vtkTypeRevisionMacro(vtkPVMinMax, vtkPVWidget);
   void PrintSelf(ostream& os, vtkIndent indent);
 
   virtual void Create(vtkKWApplication *pvApp);
@@ -56,11 +56,7 @@ public:
   // Description:
   // These commands are used to set/get values on/from the
   // underlying VTK object.
-  vtkSetStringMacro(GetMinCommand);
-  vtkSetStringMacro(GetMaxCommand);
   vtkSetStringMacro(SetCommand);
-  vtkGetStringMacro(GetMinCommand);
-  vtkGetStringMacro(GetMaxCommand);
   vtkGetStringMacro(SetCommand);
 
   // Description:
@@ -167,6 +163,10 @@ public:
   // of 3D widgets, etc.
   virtual void UpdateEnableState();
  
+  // Description:
+  // Save this widget to a file.
+  virtual void SaveInBatchScript(ofstream *file);
+ 
 protected:
   vtkPVMinMax();
   ~vtkPVMinMax();
@@ -180,8 +180,6 @@ protected:
   vtkKWWidget *MinFrame;
   vtkKWWidget *MaxFrame;
 
-  char *GetMinCommand;
-  char *GetMaxCommand;
   char *SetCommand;
 
   char* MinHelp;
@@ -206,10 +204,6 @@ protected:
 
   int ReadXMLAttributes(vtkPVXMLElement* element,
                         vtkPVXMLPackageParser* parser);
-  
-  // Description:
-  // Save this widget to a file
-  virtual void SaveInBatchScriptForPart(ofstream *file, vtkClientServerID);
   
 private:
   vtkPVMinMax(const vtkPVMinMax&); // Not implemented

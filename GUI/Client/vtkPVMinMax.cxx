@@ -24,11 +24,12 @@
 #include "vtkPVScalarListWidgetProperty.h"
 #include "vtkPVXMLElement.h"
 #include "vtkPVProcessModule.h"
+#include "vtkPVSource.h"
 #include "vtkClientServerStream.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.29");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.30");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -44,8 +45,6 @@ vtkPVMinMax::vtkPVMinMax()
   this->MinScale = vtkKWScale::New();
   this->MaxScale = vtkKWScale::New();
 
-  this->GetMinCommand = NULL;
-  this->GetMaxCommand = NULL;
   this->SetCommand = NULL;
 
   this->MinHelp = 0;
@@ -79,8 +78,6 @@ vtkPVMinMax::~vtkPVMinMax()
   this->MinFrame = NULL;
   this->MaxFrame->Delete();
   this->MaxFrame = NULL;
-  this->SetGetMinCommand(NULL);
-  this->SetGetMaxCommand(NULL);
   this->SetSetCommand(NULL);
   this->SetMinHelp(0);
   this->SetMaxHelp(0);
@@ -282,6 +279,14 @@ void vtkPVMinMax::SetMaxValue(float val)
   this->ModifiedCallback();
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVMinMax::SaveInBatchScript(ofstream *file)
+{
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+        <<  " GetProperty " << this->SetCommand << "] SetElements2 "
+        << this->GetMinValue() << " " << this->GetMaxValue() << endl;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVMinMax::AcceptInternal(vtkClientServerID sourceID)
 {
@@ -433,37 +438,6 @@ void vtkPVMinMax::MaxValueCallback()
 }
 
 //----------------------------------------------------------------------------
-void vtkPVMinMax::SaveInBatchScriptForPart(ofstream *file,
-                                           vtkClientServerID sourceID)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule();
-  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                  << this->GetMinCommand
-                  << vtkClientServerStream::End; 
-  pm->SendStreamToClient();
-  {
-  ostrstream result;
-  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
-  result << ends;
-  *file << "pvTemp" << sourceID << " " << this->SetCommand;
-  *file << " " << result.str();
-  }
-  
-  pm->GetStream() << vtkClientServerStream::Invoke << sourceID
-                  << this->GetMaxCommand
-                  << vtkClientServerStream::End; 
-  pm->SendStreamToClient();
-  {
-  ostrstream result;
-  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
-  result << ends;
-  *file << " " << result.str() << "\n";
-  }
-}
-
-
-//----------------------------------------------------------------------------
 vtkPVMinMax* vtkPVMinMax::ClonePrototype(vtkPVSource* pvSource,
                                  vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
 {
@@ -497,8 +471,6 @@ void vtkPVMinMax::CopyProperties(vtkPVWidget* clone, vtkPVSource* pvSource,
     this->MinScale->GetRange(min, max);
     pvmm->SetRange(min, max);
     pvmm->SetSetCommand(this->SetCommand);
-    pvmm->SetGetMinCommand(this->GetMinCommand);
-    pvmm->SetGetMaxCommand(this->GetMaxCommand);
     pvmm->SetMinValue(this->GetMinValue());
     pvmm->SetMaxValue(this->GetMaxValue());
     }
@@ -575,24 +547,6 @@ int vtkPVMinMax::ReadXMLAttributes(vtkPVXMLElement* element,
     }
   this->SetMaximumHelp(max_help);
   
-  // Setup the GetMinCommand.
-  const char* get_min_command = element->GetAttribute("get_min_command");
-  if(!get_min_command)
-    {
-    vtkErrorMacro("No get_min_command attribute.");
-    return 0;
-    }
-  this->SetGetMinCommand(get_min_command);
-  
-  // Setup the GetMaxCommand.
-  const char* get_max_command = element->GetAttribute("get_max_command");
-  if(!get_max_command)
-    {
-    vtkErrorMacro("No get_max_command attribute.");
-    return 0;
-    }
-  this->SetGetMaxCommand(get_max_command);
-  
   // Setup the SetCommand.
   const char* set_command = element->GetAttribute("set_command");
   if(!set_command)
@@ -665,10 +619,6 @@ void vtkPVMinMax::UpdateEnableState()
 void vtkPVMinMax::PrintSelf(ostream& os, vtkIndent indent)
 {
   this->Superclass::PrintSelf(os, indent);
-  os << "GetMaxCommand: " 
-     << (this->GetGetMaxCommand()?this->GetGetMaxCommand():"none") << endl;
-  os << "GetMinCommand: " 
-     << (this->GetGetMinCommand()?this->GetGetMinCommand():"none") << endl;
   os << "SetCommand: " << (this->SetCommand?this->SetCommand:"none") << endl;
   os << "PackVertically: " << this->PackVertically << endl;
   os << "MinScale: " << this->MinScale << endl;

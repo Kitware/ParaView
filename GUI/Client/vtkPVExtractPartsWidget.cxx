@@ -30,7 +30,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtractPartsWidget);
-vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVExtractPartsWidget, "1.16");
 
 int vtkPVExtractPartsWidgetCommand(ClientData cd, Tcl_Interp *interp,
                                 int argc, char *argv[]);
@@ -300,16 +300,27 @@ void vtkPVExtractPartsWidget::AllOffCallback()
 void vtkPVExtractPartsWidget::SaveInBatchScript(ofstream *file)
 {
   int num, idx;
-  int state;
 
-  num = this->PartSelectionList->GetNumberOfItems();
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
+  vtkPVScalarListWidgetProperty* property =
+    vtkPVScalarListWidgetProperty::SafeDownCast(this->Property);
+
+  num = property->GetNumberOfScalars();
+
+  *file << "  [$pvTemp" << sourceID.ID 
+        << " GetProperty InputMask] SetNumberOfElements "
+        << num << endl;
 
   // Now loop through the input mask setting the selection states.
-  for (idx = 0; idx < num; ++idx)
+  for (idx = 0; idx < num; idx+=2)
     {
-    state = this->PartSelectionList->GetSelectState(idx);  
-    *file << "\t" << "pvTemp" << this->PVSource->GetVTKSourceID(0) 
-          << " SetInputMask " << idx << " " << state << endl;  
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty InputMask] SetElement "
+          << idx << " " << property->GetScalar(idx) << endl;
+    *file << "  [$pvTemp" << sourceID.ID 
+          << " GetProperty InputMask] SetElement "
+          << idx+1 << " " << property->GetScalar(idx+1) << endl;
     }
 }
 

@@ -23,7 +23,7 @@
 #include "vtkPVProcessModule.h"
 #include <vtkstd/string>
 
-vtkCxxRevisionMacro(vtkPVObjectWidget, "1.15");
+vtkCxxRevisionMacro(vtkPVObjectWidget, "1.16");
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget::vtkPVObjectWidget()
@@ -38,35 +38,6 @@ vtkPVObjectWidget::~vtkPVObjectWidget()
   this->SetVariableName(NULL);
 }
 
-
-//----------------------------------------------------------------------------
-void vtkPVObjectWidget::SaveInBatchScriptForPart(ofstream *file,
-                                                 vtkClientServerID sourceID)
-{
-  vtkPVApplication *pvApp = this->GetPVApplication();
-  vtkPVProcessModule* pm = pvApp->GetProcessModule(); 
- 
-  if (sourceID.ID == 0 || this->VariableName == NULL)
-    {
-    vtkErrorMacro(<< this->GetClassName()
-                  << " must not have SaveInBatchScript method.");
-    return;
-    } 
-
-  *file << "\t" << "pvTemp" << sourceID << " Set" << this->VariableName;
-  ostrstream str;
-  str << "Get" << this->VariableName << ends;
-  pm->GetStream() << vtkClientServerStream::Invoke << this->ObjectID
-                  << str.str() 
-                  << vtkClientServerStream::End;
-  pm->SendStreamToClient();
-  ostrstream result;
-  pm->GetLastClientResult().PrintArgumentValue(result, 0,0);
-  result << ends;
-  *file << " " << result.str() << "\n";
-  delete [] result.str();
-  delete [] str.str();
-}
 
 //----------------------------------------------------------------------------
 vtkPVObjectWidget* vtkPVObjectWidget::ClonePrototype(vtkPVSource* pvSource,

@@ -23,7 +23,7 @@
 #include "vtkPVWidget.h"
 
 vtkStandardNewMacro(vtkPVContourWidgetProperty);
-vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.6");
+vtkCxxRevisionMacro(vtkPVContourWidgetProperty, "1.7");
 
 void vtkPVContourWidgetProperty::SetAnimationTime(float time)
 {
@@ -54,6 +54,15 @@ void vtkPVContourWidgetProperty::SetAnimationTime(float time)
     }
   this->Widget->ModifiedCallback();
   this->Widget->Reset();
+}
+
+void vtkPVContourWidgetProperty::SetAnimationTimeInBatch(
+  ofstream *file, float val)
+{
+  *file << "[$pvTemp" << this->Widget->GetPVSource()->GetVTKSourceID(0)
+        << " GetProperty ContourValues] SetElement 0 " << val << endl;
+  *file << "$pvTemp" << this->Widget->GetPVSource()->GetVTKSourceID(0)
+        << " UpdateVTKObjects" << endl;
 }
 
 void vtkPVContourWidgetProperty::AcceptInternal()

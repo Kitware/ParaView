@@ -33,10 +33,11 @@
 #include "vtkPVXMLElement.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.13");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.14");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, InputMenu, vtkPVInputMenu);
 
+//----------------------------------------------------------------------------
 vtkPVOrientScaleWidget::vtkPVOrientScaleWidget()
 {
   this->LabeledFrame = vtkKWLabeledFrame::New();
@@ -88,6 +89,7 @@ vtkPVOrientScaleWidget::vtkPVOrientScaleWidget()
   this->CurrentScaleMode = 0;
 }
 
+//----------------------------------------------------------------------------
 vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
 {
   this->LabeledFrame->Delete();
@@ -137,6 +139,7 @@ vtkPVOrientScaleWidget::~vtkPVOrientScaleWidget()
   this->SetCurrentScaleMode(NULL);
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
 {
   if (this->Application)
@@ -228,6 +231,7 @@ void vtkPVOrientScaleWidget::Create(vtkKWApplication *app)
                this->LabeledFrame->GetWidgetName());
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::UpdateActiveState()
 {
   const char *orientMode = this->OrientModeMenu->GetValue();
@@ -260,6 +264,7 @@ void vtkPVOrientScaleWidget::UpdateActiveState()
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::Trace(ofstream *file)
 {
   if (!this->InitializeTrace(file))
@@ -279,6 +284,7 @@ void vtkPVOrientScaleWidget::Trace(ofstream *file)
         << this->ScaleFactorEntry->GetValueAsFloat() << endl;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::Update()
 {
   this->UpdateArrayMenus();
@@ -288,6 +294,7 @@ void vtkPVOrientScaleWidget::Update()
   this->Superclass::Update();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::UpdateArrayMenus()
 {
   int i, num;
@@ -429,6 +436,7 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::UpdateModeMenus()
 {
   vtkKWMenu *scaleMenu = this->ScaleModeMenu->GetMenu();
@@ -506,6 +514,7 @@ void vtkPVOrientScaleWidget::UpdateModeMenus()
   this->UpdateScaleFactor();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::UpdateScaleFactor()
 {
   if (!this->InputMenu)
@@ -605,6 +614,7 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::CopyProperties(
   vtkPVWidget *clone, vtkPVSource *pvSource,
   vtkArrayMap<vtkPVWidget*, vtkPVWidget*>* map)
@@ -633,6 +643,7 @@ void vtkPVOrientScaleWidget::CopyProperties(
     }
 }
 
+//----------------------------------------------------------------------------
 int vtkPVOrientScaleWidget::ReadXMLAttributes(vtkPVXMLElement *element,
                                               vtkPVXMLPackageParser *parser)
 {
@@ -675,6 +686,7 @@ int vtkPVOrientScaleWidget::ReadXMLAttributes(vtkPVXMLElement *element,
   return 1;
 }
 
+//----------------------------------------------------------------------------
 vtkPVDataSetAttributesInformation* vtkPVOrientScaleWidget::GetPointDataInformation()
 {
   if (!this->InputMenu)
@@ -691,6 +703,7 @@ vtkPVDataSetAttributesInformation* vtkPVOrientScaleWidget::GetPointDataInformati
   return input->GetDataInformation()->GetPointDataInformation();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::ScalarsMenuEntryCallback()
 {
   if (this->CurrentScalars &&
@@ -705,6 +718,7 @@ void vtkPVOrientScaleWidget::ScalarsMenuEntryCallback()
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::VectorsMenuEntryCallback()
 {
   if (this->CurrentVectors &&
@@ -719,6 +733,7 @@ void vtkPVOrientScaleWidget::VectorsMenuEntryCallback()
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::ScaleModeMenuCallback()
 {
   if (this->CurrentScaleMode &&
@@ -732,6 +747,7 @@ void vtkPVOrientScaleWidget::ScaleModeMenuCallback()
   this->UpdateScaleFactor();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::OrientModeMenuCallback()
 {
   if (this->CurrentOrientMode &&
@@ -744,6 +760,7 @@ void vtkPVOrientScaleWidget::OrientModeMenuCallback()
   this->UpdateActiveState();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::AcceptInternal(vtkClientServerID sourceID)
 {
   float scalars[3];
@@ -762,6 +779,7 @@ void vtkPVOrientScaleWidget::AcceptInternal(vtkClientServerID sourceID)
   this->ModifiedFlag = 0;
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::ResetInternal()
 {
   if (!this->ModifiedFlag)
@@ -789,6 +807,7 @@ void vtkPVOrientScaleWidget::ResetInternal()
     }
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SetProperty(vtkPVWidgetProperty *prop)
 {
   this->Property = vtkPVStringAndScalarListWidgetProperty::SafeDownCast(prop);
@@ -806,16 +825,19 @@ void vtkPVOrientScaleWidget::SetProperty(vtkPVWidgetProperty *prop)
     }
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidgetProperty* vtkPVOrientScaleWidget::GetProperty()
 {
   return this->Property;
 }
 
+//----------------------------------------------------------------------------
 vtkPVWidgetProperty* vtkPVOrientScaleWidget::CreateAppropriateProperty()
 {
   return vtkPVStringAndScalarListWidgetProperty::New();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SetOrientMode(char *mode)
 {
   this->OrientModeMenu->SetValue(mode);
@@ -823,6 +845,7 @@ void vtkPVOrientScaleWidget::SetOrientMode(char *mode)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SetScaleMode(char *mode)
 {
   this->ScaleModeMenu->SetValue(mode);
@@ -831,6 +854,7 @@ void vtkPVOrientScaleWidget::SetScaleMode(char *mode)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SetScalars(char *scalars)
 {
   this->ScalarsMenu->SetValue(scalars);
@@ -839,6 +863,7 @@ void vtkPVOrientScaleWidget::SetScalars(char *scalars)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SetVectors(char *vectors)
 {
   this->VectorsMenu->SetValue(vectors);
@@ -847,6 +872,7 @@ void vtkPVOrientScaleWidget::SetVectors(char *vectors)
   this->ModifiedCallback();
 }
 
+//----------------------------------------------------------------------------
 void vtkPVOrientScaleWidget::SetScaleFactor(float factor)
 {
   this->ScaleFactorEntry->SetValue(factor);
@@ -876,6 +902,33 @@ void vtkPVOrientScaleWidget::UpdateEnableState()
   this->PropagateEnableState(this->ScaleFactorEntry);
 
   this->PropagateEnableState(this->InputMenu);
+}
+
+//----------------------------------------------------------------------------
+void vtkPVOrientScaleWidget::SaveInBatchScript(ofstream* file)
+{
+  vtkClientServerID sourceID = this->PVSource->GetVTKSourceID(0);
+
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->ScalarsCommand << "] SetElement 0 {" 
+        << this->ScalarsMenu->GetValue() << "}" << endl;
+  *file << "  " << "[$pvTemp" << sourceID <<" GetProperty " 
+        << this->VectorsCommand << "] SetElement 0 {" 
+        << this->VectorsMenu->GetValue() << "}" << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->OrientCommand << "] SetElement 0 " 
+        << this->OrientModeMenu->GetMenu()->GetIndex(
+          this->OrientModeMenu->GetValue())
+        << endl;;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->ScaleModeCommand << "] SetElement 0 " 
+        << this->ScaleModeMenu->GetMenu()->GetIndex(
+          this->ScaleModeMenu->GetValue())
+        << endl;
+  *file << "  " << "[$pvTemp" << sourceID << " GetProperty " 
+        << this->ScaleFactorCommand
+        << "] SetElement 0 " << this->ScaleFactorEntry->GetValueAsFloat()
+        << endl;
 }
 
 //----------------------------------------------------------------------------

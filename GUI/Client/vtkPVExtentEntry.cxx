@@ -36,7 +36,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.34");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.35");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -222,6 +222,18 @@ void vtkPVExtentEntry::Create(vtkKWApplication *pvApp)
   this->SetBalloonHelpString(this->BalloonHelpString);
 }
 
+
+//-----------------------------------------------------------------------------
+void vtkPVExtentEntry::SaveInBatchScript(ofstream *file)
+{
+  int cc;
+  for ( cc = 0; cc < this->Property->GetNumberOfScalars(); cc ++ )
+    {
+    *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+          <<  " GetProperty " << this->VariableName << "] SetElement "
+          << cc << " " << this->Property->GetScalar(cc) << endl;
+    }
+}
 
 //-----------------------------------------------------------------------------
 void vtkPVExtentEntry::AcceptInternal(vtkClientServerID sourceID)
@@ -444,19 +456,19 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
 
   if (mode == 0)
     {
-    ai->SetLabelAndScript("X Axis", NULL);
+    ai->SetLabelAndScript("X Axis", NULL, this->GetTraceName());
     ai->SetTimeStart(ext[0]);
     ai->SetTimeEnd(ext[1]);
     }
   else if (mode == 1)
     {
-    ai->SetLabelAndScript("Y Axis", NULL);
+    ai->SetLabelAndScript("Y Axis", NULL, this->GetTraceName());
     ai->SetTimeStart(ext[2]);
     ai->SetTimeEnd(ext[3]);
     }
   else if (mode == 2)
     {
-    ai->SetLabelAndScript("Z Axis", NULL);
+    ai->SetLabelAndScript("Z Axis", NULL, this->GetTraceName());
     ai->SetTimeStart(ext[4]);
     ai->SetTimeEnd(ext[5]);
     }

@@ -28,6 +28,7 @@ public:
   void PrintSelf(ostream& os, vtkIndent indent);
   
   virtual void SetAnimationTime(float time);
+  virtual void SetAnimationTimeInBatch(ofstream *file, float val);
 
   virtual void AcceptInternal();
   

@@ -20,11 +20,12 @@
 #include "vtkObjectFactory.h"
 #include "vtkPVApplication.h"
 #include "vtkPVIndexWidgetProperty.h"
+#include "vtkPVSource.h"
 #include "vtkPVXMLElement.h"
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVLabeledToggle);
-vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.25");
+vtkCxxRevisionMacro(vtkPVLabeledToggle, "1.26");
 
 //----------------------------------------------------------------------------
 vtkPVLabeledToggle::vtkPVLabeledToggle()
@@ -160,6 +161,14 @@ void vtkPVLabeledToggle::Trace(ofstream *file)
         << this->GetState() << endl;
 }
 
+//-----------------------------------------------------------------------------
+void vtkPVLabeledToggle::SaveInBatchScript(ofstream *file)
+{
+  *file << "  [$pvTemp" << this->PVSource->GetVTKSourceID(0) 
+        <<  " GetProperty " << this->VariableName << "] SetElements1 "
+        << this->Property->GetIndex() << endl;
+}
+
 //----------------------------------------------------------------------------
 void vtkPVLabeledToggle::AcceptInternal(vtkClientServerID sourceID)
 {
@@ -238,7 +247,15 @@ int vtkPVLabeledToggle::ReadXMLAttributes(vtkPVXMLElement* element,
     }
 
   const char* defaultValue = element->GetAttribute("default_value");
-  this->DefaultValue = atoi(defaultValue);
+  if (defaultValue)
+    {
+    this->DefaultValue = atoi(defaultValue);
+    }
+  else
+    {
+    vtkErrorMacro("No default value is specified. Setting to 1");
+    this->DefaultValue = 1;
+    }
   
   return 1;
 }
