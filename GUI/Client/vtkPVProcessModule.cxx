@@ -62,7 +62,7 @@ struct vtkPVArgs
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVProcessModule);
-vtkCxxRevisionMacro(vtkPVProcessModule, "1.42");
+vtkCxxRevisionMacro(vtkPVProcessModule, "1.43");
 
 int vtkPVProcessModuleCommand(ClientData cd, Tcl_Interp *interp,
                              int argc, char *argv[]);
@@ -469,7 +469,7 @@ void vtkPVProcessModule::InitializeInterpreter()
   // Create the interpreter and supporting stream.
   this->Interpreter = vtkClientServerInterpreter::New();
   this->ClientServerStream = new vtkClientServerStream;
-  this->Interpreter->SetLogFile("./cs.log");
+  //this->Interpreter->SetLogFile("./cs.log");
   
   // Setup a callback for the interpreter to report errors.
   this->InterpreterObserver = vtkCallbackCommand::New();
