@@ -41,12 +41,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 =========================================================================*/
 #include "vtkPVMultiDisplayPartDisplay.h"
 #include "vtkObjectFactory.h"
-
+#include "vtkPVApplication.h"
 
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayPartDisplay);
-vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.1");
+vtkCxxRevisionMacro(vtkPVMultiDisplayPartDisplay, "1.2");
 
 
 //----------------------------------------------------------------------------
@@ -59,6 +59,30 @@ vtkPVMultiDisplayPartDisplay::~vtkPVMultiDisplayPartDisplay()
 {
 }
 
+//----------------------------------------------------------------------------
+void vtkPVMultiDisplayPartDisplay::SetLODCollectionDecision(int)
+{
+  // Always colect LOD.
+  this->Superclass::SetLODCollectionDecision(1);
+}
+
+
+
+//----------------------------------------------------------------------------
+void vtkPVMultiDisplayPartDisplay::CreateParallelTclObjects(vtkPVApplication *pvApp)
+{
+  this->Superclass::CreateParallelTclObjects(pvApp);
+
+  // Connect up full res path to LOD pipeline on local process.
+  if (this->LODCollectTclName)
+    {
+    pvApp->Script("%s SetInput [%s GetOutput]", 
+                  this->UpdateSuppressorTclName, 
+                  this->LODCollectTclName);
+    }
+
+
+}
 
 //----------------------------------------------------------------------------
 void vtkPVMultiDisplayPartDisplay::PrintSelf(ostream& os, vtkIndent indent)

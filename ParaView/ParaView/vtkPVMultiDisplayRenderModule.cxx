@@ -45,10 +45,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "vtkPVApplication.h"
 #include "vtkPVProcessModule.h"
 #include "vtkPVMultiDisplayPartDisplay.h"
+#include "vtkPVLODPartDisplayInformation.h"
+#include "vtkCollection.h"
+#include "vtkRenderer.h"
+#include "vtkTimerLog.h"
+
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMultiDisplayRenderModule);
-vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.2");
+vtkCxxRevisionMacro(vtkPVMultiDisplayRenderModule, "1.3");
 
 
 
@@ -105,6 +110,121 @@ vtkPVPartDisplay* vtkPVMultiDisplayRenderModule::CreatePartDisplay()
 {
   return vtkPVMultiDisplayPartDisplay::New();
 }
+
+
+//----------------------------------------------------------------------------
+// This is almost an exact duplicate of the superclass.
+// Think about reorganizing methods to reduce code duplication.
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+void vtkPVMultiDisplayRenderModule::InteractiveRender()
+{
+  vtkObject* object;
+  vtkPVCompositePartDisplay* pDisp;
+  vtkPVLODPartDisplayInformation* info;
+  unsigned long totalGeoMemory = 0;
+  unsigned long totalLODMemory = 0;
+  unsigned long tmpMemory;
+  int localRender;
+  int useLOD;
+
+  // Compute memory totals.
+  this->PartDisplays->InitTraversal();
+  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+    {
+    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    if (pDisp->GetVisibility())
+      {
+      // This updates if required (collection disabled).
+      info = pDisp->GetInformation();
+      totalGeoMemory += info->GetGeometryMemorySize();
+      totalLODMemory += info->GetLODGeometryMemorySize();
+      }
+    }
+
+  // Make LOD decision.
+  if ((float)(totalGeoMemory)/1000.0 < this->GetLODThreshold())
+    {
+    useLOD = 0;
+    tmpMemory = totalGeoMemory;
+    this->GetPVApplication()->SetGlobalLODFlag(0);
+    }
+  else
+    {
+    useLOD = 1;
+    tmpMemory = totalLODMemory;
+    this->GetPVApplication()->SetGlobalLODFlag(1);
+    }
+
+  // MakeCollection Decision.
+  localRender = 0;
+  if ((float)(tmpMemory)/1000.0 < this->GetCollectThreshold())
+    {
+    localRender = 1;
+    }
+  if (useLOD)
+    {
+    localRender = 1;
+    }
+
+  // Change the collection flags and update.
+  this->PartDisplays->InitTraversal();
+  while ( (object = this->PartDisplays->GetNextItemAsObject()) )
+    {
+    pDisp = vtkPVCompositePartDisplay::SafeDownCast(object);
+    if (pDisp->GetVisibility())
+      {
+      if (useLOD)
+        {
+        pDisp->SetLODCollectionDecision(localRender);
+        }
+      else
+        {
+        pDisp->SetCollectionDecision(localRender);
+        }
+      pDisp->Update();
+      }
+    }
+
+  // Switch the compositer to local/composite mode.
+  if (this->LocalRender != localRender)
+    {
+    if (this->CompositeTclName)
+      {
+      if (localRender)
+        {
+        this->PVApplication->Script("%s UseCompositingOff", this->CompositeTclName);
+        }
+      else
+        {
+        this->PVApplication->Script("%s UseCompositingOn", this->CompositeTclName);
+        }
+      this->LocalRender = localRender;
+      }
+    }
+
+  // Still Render can get called some funky ways.
+  // Interactive renders get called through the PVInteractorStyles
+  // which cal ResetCameraClippingRange on the Renderer.
+  // We could convert them to call a method on the module directly ...
+  this->Renderer->ResetCameraClippingRange();
+
+  // This might be used for Reduction factor.
+  this->RenderWindow->SetDesiredUpdateRate(5.0);
+  // this->GetPVWindow()->GetInteractor()->GetStillUpdateRate());
+
+  // Compute reduction factor. 
+  if (this->Composite && ! localRender)
+    {
+    this->ComputeReductionFactor();
+    }
+
+  vtkTimerLog::MarkStartEvent("Interactive Render");
+  this->RenderWindow->Render();
+  vtkTimerLog::MarkEndEvent("Interactive Render");
+
+}
+
+
 
 
 

@@ -56,11 +56,20 @@ public:
   static vtkPVMultiDisplayPartDisplay* New();
   vtkTypeRevisionMacro(vtkPVMultiDisplayPartDisplay, vtkPVCompositePartDisplay);
   void PrintSelf(ostream& os, vtkIndent indent);
+
+  // Description:
+  // Override super class so that the LOD is always collected.
+  virtual void SetLODCollectionDecision(int val);
     
 protected:
   vtkPVMultiDisplayPartDisplay();
   ~vtkPVMultiDisplayPartDisplay();
   
+  // Description:
+  // This method should be called immediately after the object is constructed.
+  // It create VTK objects which have to exeist on all processes.
+  virtual void CreateParallelTclObjects(vtkPVApplication *pvApp);
+
   vtkPVMultiDisplayPartDisplay(const vtkPVMultiDisplayPartDisplay&); // Not implemented
   void operator=(const vtkPVMultiDisplayPartDisplay&); // Not implemented
 };

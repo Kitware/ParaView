@@ -60,7 +60,10 @@ public:
   // Description:
   // Set the application right after construction.
   virtual void SetPVApplication(vtkPVApplication *pvApp);
-  
+
+  // Description:
+  // Always collect when using LOD
+  virtual void InteractiveRender();
 
 protected:
   vtkPVMultiDisplayRenderModule();
