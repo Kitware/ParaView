@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define VTK_KW_WINDOW_GEOMETRY_REG_KEY "WindowGeometry"
 #define VTK_KW_WINDOW_FRAME1_SIZE_REG_KEY "WindowFrame1Size"
 
-vtkCxxRevisionMacro(vtkKWWindow, "1.162");
+vtkCxxRevisionMacro(vtkKWWindow, "1.163");
 vtkCxxSetObjectMacro(vtkKWWindow, PropertiesParent, vtkKWWidget);
 
 class vtkKWWindowMenuEntry
@@ -1383,6 +1383,7 @@ void vtkKWWindow::WarningMessage(const char* message)
     this->GetApplication(), this, "VTK Warning",
     message, vtkKWMessageDialog::WarningIcon);
   this->SetErrorIcon(2);
+  this->InvokeEvent(vtkKWEvent::WarningMessageEvent, (void*)message);
 }
 
 //----------------------------------------------------------------------------
@@ -1415,6 +1416,7 @@ void vtkKWWindow::ErrorMessage(const char* message)
     this->GetApplication(), this, "VTK Error",
     message, vtkKWMessageDialog::ErrorIcon);
   this->SetErrorIcon(2);
+  this->InvokeEvent(vtkKWEvent::ErrorMessageEvent, (void*)message);
 }
 
 //----------------------------------------------------------------------------
