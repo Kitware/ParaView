@@ -66,7 +66,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.17");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.18");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -345,15 +345,6 @@ void vtkPVSelectTimeSet::Reset()
       this->Script("%s opentree %s", this->Tree->GetWidgetName(), 
                    timeSetName);
       }
-    }
-  
-  this->TimeSets->InitTraversal();
-  if(!matchFound && (da=this->TimeSets->GetNextItem()))
-    {
-    float timeValue = da->GetTuple1(0);
-    sprintf(timeValueName, "time%d_%-12.5e", 1, timeValue);
-    this->Script("%s selection set %s", this->Tree->GetWidgetName(),
-                 timeValueName);
     }
   
   this->SetTimeValue(actualTimeValue);
