@@ -105,3 +105,10 @@ TARGET_LINK_LIBRARIES (ParaView vtkKWParaViewTCL vtkKWWidgetsTCL vtkCommonTCL
                        vtkPatentedTCL 
                        vtkHybridTCL
                        vtkIOTCL)
+
+IF (HAVE_PNG)
+  TARGET_LINK_LIBRARIES(ParaView ${PNG_LIBRARY})
+  IF (ZLIB_LIBRARY)
+    TARGET_LINK_LIBRARIES(ParaView ${ZLIB_LIBRARY})
+  ENDIF (ZLIB_LIBRARY)
+ENDIF (HAVE_PNG)
