@@ -99,7 +99,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVApplication);
-vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.5");
+vtkCxxRevisionMacro(vtkPVApplication, "1.156.2.6");
 
 int vtkPVApplicationCommand(ClientData cd, Tcl_Interp *interp,
                             int argc, char *argv[]);
@@ -778,8 +778,8 @@ void vtkPVApplication::Start(int argc, char*argv[])
     else
       {
       ifs >> numPipes;
-      if (numPipes > numProcs) numPipes = numProcs;
-      if (numPipes < 1) numPipes = 1;
+      if (numPipes > numProcs) { numPipes = numProcs; }
+      if (numPipes < 1) { numPipes = 1; }
       }
 
     
