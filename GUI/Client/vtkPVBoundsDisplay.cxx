@@ -29,7 +29,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVBoundsDisplay);
-vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.21");
+vtkCxxRevisionMacro(vtkPVBoundsDisplay, "1.22");
 
 vtkCxxSetObjectMacro(vtkPVBoundsDisplay, Widget, vtkKWBoundsDisplay);
 
@@ -110,6 +110,7 @@ void vtkPVBoundsDisplay::Update()
   
   if (!prop || !dom)
     {
+    vtkErrorMacro("Property or domain could not be found.");
     return;
     }
 

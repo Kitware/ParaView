@@ -26,7 +26,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScalarRangeLabel);
-vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.24");
+vtkCxxRevisionMacro(vtkPVScalarRangeLabel, "1.25");
 
 vtkCxxSetObjectMacro(vtkPVScalarRangeLabel, ArrayMenu, vtkPVArrayMenu);
 
@@ -87,6 +87,7 @@ void vtkPVScalarRangeLabel::Update()
     }
   if (!prop || !dom)
     {
+    vtkErrorMacro("Could not find required domain (scalar_range)");
     this->Label->SetLabel("Missing Array");
     this->Superclass::Update();
     return;

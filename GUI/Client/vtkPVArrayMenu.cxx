@@ -39,7 +39,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVArrayMenu);
-vtkCxxRevisionMacro(vtkPVArrayMenu, "1.59");
+vtkCxxRevisionMacro(vtkPVArrayMenu, "1.60");
 
 vtkCxxSetObjectMacro(vtkPVArrayMenu, InputMenu, vtkPVInputMenu);
 vtkCxxSetObjectMacro(vtkPVArrayMenu, FieldMenu, vtkPVFieldMenu);
@@ -296,6 +296,11 @@ void vtkPVArrayMenu::Update()
     {
     vtkSMArrayListDomain* dom = vtkSMArrayListDomain::SafeDownCast(
       property->GetDomain("array_list"));
+    if (!dom)
+      {
+      vtkErrorMacro("Required domain (array_list) can not be found.");
+      return;
+      }
     unsigned int numStrings = dom->GetNumberOfStrings();
 
     int arrayFound = 0;
@@ -339,6 +344,11 @@ void vtkPVArrayMenu::UpdateArrayMenu()
     {
     vtkSMArrayListDomain* dom = vtkSMArrayListDomain::SafeDownCast(
       property->GetDomain("array_list"));
+    if (!dom)
+      {
+      vtkErrorMacro("Required domain (array_list) could not be found.");
+      return;
+      }
     unsigned int numStrings = dom->GetNumberOfStrings();
     
     for (unsigned int i=0; i<numStrings; i++)

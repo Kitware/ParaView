@@ -72,7 +72,7 @@ public:
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFileEntry);
-vtkCxxRevisionMacro(vtkPVFileEntry, "1.89");
+vtkCxxRevisionMacro(vtkPVFileEntry, "1.90");
 
 //----------------------------------------------------------------------------
 vtkPVFileEntry::vtkPVFileEntry()
@@ -286,6 +286,7 @@ void vtkPVFileEntry::SetTimeStep(int ts)
   
   if (!prop || !dom)
     {
+    vtkErrorMacro("Property or domain (files) could not be found.");
     return;
     }
   
@@ -410,6 +411,7 @@ void vtkPVFileEntry::SetValue(const char* fileName)
   
   if (!prop || !dom)
     {
+    vtkErrorMacro("Property or domain (files) could not be found.");
     return;
     }
   
@@ -725,6 +727,10 @@ void vtkPVFileEntry::Accept()
       str.rdbuf()->freeze(0);
       }
     }
+  else
+    {
+    vtkErrorMacro("Required domain (files) could not be found.");
+    }
 
   this->UpdateAvailableFiles();
   
@@ -772,6 +778,10 @@ void vtkPVFileEntry::ResetInternal()
         this->FileListSelect->AddFinalElement(filename, 1);
         delete [] filename;
         }
+      }
+    else
+      {
+      vtkErrorMacro("Required domain (files) could not be found.");
       }
     }
 
@@ -867,6 +877,7 @@ int vtkPVFileEntry::GetNumberOfFiles()
   
   if ( !dom )
     {
+    vtkErrorMacro("Required domain (files) could not be found.");
     return 0;
     }
   return dom->GetNumberOfStrings();
@@ -885,6 +896,7 @@ void vtkPVFileEntry::SaveInBatchScript(ofstream* file)
   
   if (!dom)
     {
+    vtkErrorMacro("Required domain (files) could not be found.");
     return;
     }
 
@@ -934,6 +946,7 @@ void vtkPVFileEntry::AddAnimationScriptsToMenu(vtkKWMenu *menu,
   
   if (!dom)
     {
+    vtkErrorMacro("Required domain (files) could not be found.");
     return;
     }
   
@@ -964,6 +977,7 @@ void vtkPVFileEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
   
   if (!prop || !dom)
     {
+    vtkErrorMacro("Required property or domain (files) could not be found.");
     return;
     }
   

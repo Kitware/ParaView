@@ -23,7 +23,7 @@
 #include "vtkSMBoundsDomain.h"
 
 vtkStandardNewMacro(vtkPVScaleFactorEntry);
-vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.12");
+vtkCxxRevisionMacro(vtkPVScaleFactorEntry, "1.13");
 
 vtkPVScaleFactorEntry::vtkPVScaleFactorEntry()
 {
@@ -62,6 +62,10 @@ void vtkPVScaleFactorEntry::UpdateScaleFactor()
   
   if (!prop || !dom)
     {
+    if (prop)
+      {
+      vtkErrorMacro("Could not find required domain (bounds)");
+      }
     this->Superclass::Update();
     return;
     }

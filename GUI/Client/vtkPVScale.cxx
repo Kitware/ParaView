@@ -36,7 +36,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVScale);
-vtkCxxRevisionMacro(vtkPVScale, "1.48");
+vtkCxxRevisionMacro(vtkPVScale, "1.49");
 
 //----------------------------------------------------------------------------
 vtkPVScale::vtkPVScale()
@@ -384,6 +384,10 @@ void vtkPVScale::ResetInternal()
         this->Scale->SetRange(min, max);
         }
       }
+    else
+      {
+      vtkErrorMacro("Could not find a required domain (range)");
+      }
     }
 
   if (dvp)
@@ -569,6 +573,10 @@ void vtkPVScale::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
         ai->SetTimeStart(this->GetRangeMin());
         ai->SetTimeEnd(this->GetRangeMax());
         }
+      }
+    else
+      {
+      vtkErrorMacro("Could not find required domain (range)");
       }
     }
   else

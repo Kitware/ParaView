@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVFieldMenu);
-vtkCxxRevisionMacro(vtkPVFieldMenu, "1.17");
+vtkCxxRevisionMacro(vtkPVFieldMenu, "1.18");
 
 
 vtkCxxSetObjectMacro(vtkPVFieldMenu, InputMenu, vtkPVInputMenu);
@@ -143,6 +143,10 @@ void vtkPVFieldMenu::SetValue(int field)
           this->FieldMenu->SetValue(edom->GetEntryText(i));
           }
         }
+      }
+    else
+      {
+      vtkErrorMacro("Required domain (field_list) could not be found");
       }
     }
   
@@ -278,6 +282,10 @@ void vtkPVFieldMenu::Update()
           }
         }
       }
+    else
+      {
+      vtkErrorMacro("Required property (field_list) could not be found.");
+      }
     }
 
   this->UpdateProperty();
@@ -308,7 +316,11 @@ void vtkPVFieldMenu::Update()
         this->FieldMenu->SetCurrentEntry(valid);
         }
       }
-     }
+    else
+      {
+      vtkErrorMacro("Required domain (field_list) could not be found.");
+      }
+    }
 
   // This updates any array menu dependent on this widget.
   this->Superclass::Update();

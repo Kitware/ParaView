@@ -33,7 +33,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVSelectTimeSet);
-vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.44");
+vtkCxxRevisionMacro(vtkPVSelectTimeSet, "1.45");
 
 //-----------------------------------------------------------------------------
 int vtkDataArrayCollectionCommand(ClientData cd, Tcl_Interp *interp,
@@ -435,6 +435,10 @@ void vtkPVSelectTimeSet::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
       ai->SetTimeStart(min);
       ai->SetTimeEnd(max);
       }
+    }
+  else
+    {
+    vtkErrorMacro("Could not find required domain (range)");
     }
   
   ai->Update();

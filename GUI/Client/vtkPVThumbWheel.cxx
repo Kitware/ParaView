@@ -32,7 +32,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVThumbWheel);
-vtkCxxRevisionMacro(vtkPVThumbWheel, "1.7");
+vtkCxxRevisionMacro(vtkPVThumbWheel, "1.8");
 
 //-----------------------------------------------------------------------------
 vtkPVThumbWheel::vtkPVThumbWheel()
@@ -249,6 +249,10 @@ void vtkPVThumbWheel::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai)
         ai->SetTimeEnd(min);
         }
       }
+    }
+  else
+    {
+    vtkErrorMacro("Could not find required domain (range)");
     }
   
   ai->Update();

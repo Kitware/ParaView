@@ -34,7 +34,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVVectorEntry);
-vtkCxxRevisionMacro(vtkPVVectorEntry, "1.58");
+vtkCxxRevisionMacro(vtkPVVectorEntry, "1.59");
 
 //-----------------------------------------------------------------------------
 vtkPVVectorEntry::vtkPVVectorEntry()
@@ -702,6 +702,10 @@ void vtkPVVectorEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
         ai->SetTimeEnd(max);
         }
       }
+    }
+  else
+    {
+    vtkErrorMacro("Could not find required domain (range)");
     }
   ai->Update();
 }

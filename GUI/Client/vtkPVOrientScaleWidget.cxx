@@ -39,7 +39,7 @@
 #include "vtkSMStringVectorProperty.h"
 
 vtkStandardNewMacro(vtkPVOrientScaleWidget);
-vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.20");
+vtkCxxRevisionMacro(vtkPVOrientScaleWidget, "1.21");
 
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMScalarProperty, vtkSMProperty);
 vtkCxxSetObjectMacro(vtkPVOrientScaleWidget, SMVectorProperty, vtkSMProperty);
@@ -336,6 +336,8 @@ void vtkPVOrientScaleWidget::UpdateArrayMenus()
 
   if (!scalarProp || !vectorProp || !scalarDom || !vectorDom)
     {
+    vtkErrorMacro("One of the properties or required domains (array_list) "
+                  "could not be found.");
     this->ScalarsMenu->SetValue("None");
     this->SetCurrentScalars("None");
     this->VectorsMenu->SetValue("None");
@@ -519,6 +521,8 @@ void vtkPVOrientScaleWidget::UpdateScaleFactor()
 
   if (!prop || !scalarRangeDom || !vectorRangeDom || !boundsDom)
     {
+    vtkErrorMacro("One of the properties or required domains (scalar_range, "
+                  "vector_range, bounds) could not be found.");
     return;
     }
   

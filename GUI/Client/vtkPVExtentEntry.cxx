@@ -38,7 +38,7 @@
 
 //-----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVExtentEntry);
-vtkCxxRevisionMacro(vtkPVExtentEntry, "1.42");
+vtkCxxRevisionMacro(vtkPVExtentEntry, "1.43");
 
 vtkCxxSetObjectMacro(vtkPVExtentEntry, InputMenu, vtkPVInputMenu);
 
@@ -99,6 +99,7 @@ void vtkPVExtentEntry::Update()
   
   if (!prop || !dom)
     {
+    vtkErrorMacro("Property or domain (extent) could not be found.");
     this->SetRange(0, 0, 0, 0, 0, 0);
     this->SetValue(0, 0, 0, 0, 0, 0);
     }
@@ -474,7 +475,7 @@ void vtkPVExtentEntry::AnimationMenuCallback(vtkPVAnimationInterfaceEntry *ai,
   
   if (!prop || !dom)
     {
-    vtkErrorMacro("Error getting extent domain.");
+    vtkErrorMacro("Error getting property or domain (extent).");
     return;
     }
   

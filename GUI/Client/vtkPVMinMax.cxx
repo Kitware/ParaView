@@ -32,7 +32,7 @@
 
 //----------------------------------------------------------------------------
 vtkStandardNewMacro(vtkPVMinMax);
-vtkCxxRevisionMacro(vtkPVMinMax, "1.37");
+vtkCxxRevisionMacro(vtkPVMinMax, "1.38");
 
 vtkCxxSetObjectMacro(vtkPVMinMax, ArrayMenu, vtkPVArrayMenu);
 
@@ -384,6 +384,10 @@ void vtkPVMinMax::Update()
         range[1] = max;
         }
       }
+    }
+  else
+    {
+    vtkErrorMacro("Required domain (range) could not be found.");
     }
 
   if (range[0] > range[1])
