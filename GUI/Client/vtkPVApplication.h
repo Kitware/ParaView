@@ -330,6 +330,10 @@ public:
   vtkGetStringMacro(MachinesFileName);
 
   // Description:
+  // This is used by the cave render module only.
+  vtkGetStringMacro(CaveConfigurationFileName);
+
+  // Description:
   // The name of the trace file.
   vtkGetStringMacro(TraceFileName);
 
@@ -493,6 +497,8 @@ protected:
 
   vtkSetStringMacro(MachinesFileName);
   char* MachinesFileName;
+  vtkSetStringMacro(CaveConfigurationFileName);
+  char* CaveConfigurationFileName;
   vtkSetStringMacro(TraceFileName);
   char* TraceFileName;
   char* Argv0;
